@@ -32,8 +32,24 @@ Notes:
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
+POV-Ray v3.7.0.3
+------------------------------------------------------------------------------
+
+Commit 6b4aefd on 2017-05-18 by Christoph Lipka
+
+    Silence a (warranted) GNU g++ 5.4 warning.
+
+Commit 3364e8f on 2017-05-18 by Christoph Lipka
+
+    Fix compatibility with GNU g++ 6.3 compiler.
+
+------------------------------------------------------------------------------
 POV-Ray v3.7.0.2
 ------------------------------------------------------------------------------
+
+Commit 3de604c on 2017-05-16 by Christoph Lipka
+
+    Bump version number and update change log.
 
 Commit 4b3282d on 2017-05-16 by Christoph Lipka
 

@@ -29,6 +29,31 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
+Changes between 3.7.0.2 and 3.7.0.3
+===================================
+
+(Note: This version has not been released in binary form, as it does not
+feature any changes in functionality over the original 3.7.0 binaries.)
+
+This version constitutes a maintenance update of the POV-Ray 3.7.0 source
+code, focused on restoring compatibility with contemporary build environments.
+
+Fixed or Mitigated Bugs
+-----------------------
+
+  - Updated OpenEXR file handling code to be compatible with GNU C++ compiler
+    g++ 6.x (missed that code portion in 3.7.0.2).
+  - Fixed a bug discovered in bicubic patch code that could theoretically lead
+    to unpredictable behaviour. (To our knowledge, the official 3.7.0 Windows
+    binaries should be safe.)
+
+Other Noteworthy
+----------------
+
+  - The Windows build process is now documented in `Windows/README.md` instead
+    of `Windows/README.html` and `Windows/README.txt`.
+
+
 Changes between 3.7.0.1 and 3.7.0.2
 ===================================
 

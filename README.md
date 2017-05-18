@@ -1,19 +1,11 @@
 [POV-Ray](http://www.povray.org/) - The Persistence of Vision Raytracer
 =======================================================================
 
-This document is a WIP
---------------------------------------
-
-This document is still a work in progress. While the POV-Ray project itself
-has existed for more than 20 years, this is the first time we have done a
-release on github, so please bear with us - it's a little bare at the moment.
-
-Please also be aware that we are in the process of actually doing the 3.7
-release right now, and this document may refer to things that have not happened
-yet on the main website (e.g. the release of the binaries, updating of pages,
-and so forth).
-
-Last edit: 2013-11-06
+[![Semaphore Build Status](https://semaphoreci.com/api/v1/pov-ray/povray/branches/master/shields_badge.svg?label=Semaphore)](https://semaphoreci.com/pov-ray/povray  "Semaphore: Ubuntu 14.04 LTE 64-bit with gcc 4.8")
+[![AppVeyor Build status](https://img.shields.io/appveyor/ci/c-lipka/povray-exwy4.svg?label=appveyor)](https://ci.appveyor.com/project/c-lipka/povray-exwy4 "AppVeyor: Windows Server 2012 with Visual Studio 2015")
+[![Travis CI Build Status](https://img.shields.io/travis/POV-Ray/povray.svg?label=travis%20ci)](https://travis-ci.org/POV-Ray/povray "Travis CI: Ubuntu 12.04 LTE 64-bit with gcc 4.6; OS X 10.11 with clang 4.2")
+[![Coverity Code Analysis](https://scan.coverity.com/projects/269/badge.svg)](https://scan.coverity.com/projects/pov-ray "Coverity: Static Code Analysis")
+[![Maintenance Status](https://img.shields.io/maintenance/yes/2017.svg)](README.md "Last edited 2017-03-24")
 
 License
 --------------------------------------
@@ -37,35 +29,39 @@ Bug Reports
 
 It's generally a good idea to mention a bug in the forums prior to lodging a formal
 report; this can save you some time if it's a non-bug or a solution is known. You
-should also check our bug tracker at http://bugs.povray.org/ first to see if it's
-been reported.
+should also first check the [known issues](https://github.com/POV-Ray/povray/issues)
+to see if it has been reported already.
 
-If you're sure something is a bug then please do lodge a bugreport on the tracker.
-While we are aware that github has its own tracker, please keep in mind that POV-Ray
-is a long-established project (more than 20 years) and we prefer to use our own tracker.
-We do not do our primary develoment on github (at least, not at this point). Our RCS
-for the past 15 or so years has been Perforce. We will be pulling patches from here
-into perforce, and pushing changes out to github from time to time. At some point we
-will switch to using Perforce's Git Fusion product and this process will become
-automatic.
+If you're sure something is a bug then please do lodge a bug report on the GitHub issues tracker.
 
 Official Binaries
 --------------------------------------
 
-At this point in time, the only platform for which the project distributes pre-
-built 'official' (i.e. supported) binaries is Microsoft Windows. These may be
+At this point in time, the only platform for which the project distributes pre-built
+'official' (i.e. supported) binaries is Microsoft Windows. These may be
 obtained via http://www.povray.org/download/. We do intend to provide Mac OS X
 binaries shortly, but these will be console-mode only (based on the unix build).
+
+Official Windows binaries of selected development versions are made availabe at
+https://github.com/POV-Ray/povray/projects on a semi-irregular basis.
 
 Building POV-Ray
 --------------------------------------
 
-At this point in time we recommend building from the 3.7-stable branch. POV-Ray
-should compile on any POSIX-compliant system with the required tools (please see
+At this point in time we generally recommend building from the latest version of the
+[3.7-stable branch](https://github.com/POV-Ray/povray/tree/3.7-stable). Alternatively,
+you may want to opt for a recent [tagged version](https://github.com/POV-Ray/povray/tags)
+to test-drive features that have been added since the last stable release.
+
+_Please do not build directly from the master branch_ (or any other non-stable branch
+for that matter), as versions from that branch may report ambiguous version numbers,
+making it difficult to obtain version-specific support or report bugs in a useful manner.
+
+POV-Ray 3.7.0 should compile on any POSIX-compliant system with the required tools (please see
 [unix/README.md](unix/README.md) for build instructions),
 on Microsoft Windows systems that have Visual Studio 2010 or later installed (targeting
-XP or later, both 32 and 64-bit - be sure to see README.HTML in the windows source dir,
-otherwise your build *will not work*), and also on Mac systems (console mode only, using
+XP or later, both 32 and 64-bit - be sure to see [windows/README.md](windows/README.md),
+otherwise your build _will not work_), and also on Mac systems (console mode only, using
 an appropriately-modified version of the unix build - not currently provided by us).
 
 If you are using an operating system with a package or ports system such as
@@ -94,7 +90,7 @@ Putting it another way: we consider getting a cross-platform IDE a high priority
 POV-Ray does not currently have its own 3d modelling application (at least, not one
 in a usable state). We do own the rights to the Moray modeller, which was formerly
 commercial, but it needs a little work to get it working with v3.7. It is also
-windows only (due to its use of MFC). Nevertheless we will be adding the source
+Windows only (due to its use of MFC). Nevertheless we will be adding the source
 to the repository at a future date.
 
 Authors of open-source modellers with a compatible licence wishing to directly
@@ -108,9 +104,9 @@ of POV-Ray come with documentation. For the Unix build, this is in the form of a
 manpage giving basic usage, and full HTML-based documentation. For the Windows
 version, there is a HtmlHelp (.CHM) file provided.
 
-The official location for the online documentation is http://www.povray.org/documentation/,
-however please be aware that at the time of writing this still has the version 3.6 docs.
-This will be updated shortly.
+The official location for the online documentation is http://www.povray.org/documentation/.
+Further information, as well as online documentation for the current development
+version, can be found at http://wiki.povray.org.
 
 Contacting Us
 --------------------------------------
