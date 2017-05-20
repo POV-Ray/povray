@@ -178,7 +178,8 @@ typedef void(*DNoiseFunction) (Vector3d& result, const Vector3d& EPoint);
 ///
 /// This function shall select one of multiple implementations of the noise generator functions
 /// (the portable default implementations being @ref PortableNoise() and @ref PortableDNoise(),
-/// respectively), depending on the runtime environment (typically CPU features).
+/// respectively), depending on the runtime environment (typically CPU features), an provide
+/// meta-information about the implementation selected.
 ///
 /// This function shall also perform any additional initialization required by the selected noise
 /// generator.
@@ -200,14 +201,15 @@ typedef void(*DNoiseFunction) (Vector3d& result, const Vector3d& EPoint);
 ///
 /// @param[out] pFnNoise    Selected implementation of @ref PortableNoise().
 /// @param[out] pFnDNoise   Selected implementation of @ref PortableDNoise().
-/// @param[out] pDetected   String identifying the machine features detected (e.g. "AVX,non-Intel")
-///                         on which the selection was based.
 /// @param[out] pImpl       String unambiguously identifying the implementation selected.
+///                         The recommended format is `CPUFEATURES-AUTHOR`[`.REVISION`].
+/// @param[out] pInfo       String providing additional noteworthy information about the
+///                         implementation selected.
 /// @return                 `true` if an alternative implementation was chosen and the parameters
 ///                         set accordingly, `false` otherwise.
 ///
 bool TryOptimizedNoise(NoiseFunction* pFnNoise, DNoiseFunction* pFnDNoise,
-                       std::string* pDetected = NULL, std::string* pImpl = NULL);
+                       std::string* pImpl = NULL, std::string* pInfo = NULL);
 
 extern NoiseFunction Noise;
 extern DNoiseFunction DNoise;

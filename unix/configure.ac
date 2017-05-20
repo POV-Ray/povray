@@ -60,6 +60,7 @@ m4_include([unix/config/ax_arg_with.m4])
 m4_include([unix/config/ax_boost_base.m4])
 m4_include([unix/config/ax_boost_thread.m4])
 m4_include([unix/config/ax_test_compiler_flags.m4])
+m4_include([unix/config/ax_check_compile_flag.m4])
 m4_include([unix/config/ax_check_lib.m4])
 m4_include([unix/config/ax_check_libjpeg.m4])
 m4_include([unix/config/ax_check_libsdl.m4])
@@ -988,6 +989,24 @@ else
 fi
 
 AC_DEFINE_UNQUOTED([BUILT_FOR], ["$pov_built_for"], [Host platform.])
+
+case "$pov_built_for" in
+  i?86-* | x86_64-*)
+    pov_cpu='x86'
+    AC_DEFINE([BUILD_X86], [], [Build for x86 or x86-64 architecture])
+    AX_CHECK_COMPILE_FLAG([-mavx],  [pov_avx='-mavx'],   [pov_avx=''])
+    AX_CHECK_COMPILE_FLAG([-mavx2], [pov_avx2='-mavx2'], [pov_avx2=''])
+    AX_CHECK_COMPILE_FLAG([-mfma],  [pov_fma3='-mfma'],  [pov_fma3=''])
+    AX_CHECK_COMPILE_FLAG([-mfma4], [pov_fma4='-mfma4'], [pov_fma4=''])
+    ;;
+  *)
+    pov_cpu=''
+    ;;
+esac
+AM_CONDITIONAL([BUILD_x86], [test x"$pov_cpu" = x"x86"])
+AM_CONDITIONAL([BUILD_x86avx], [test x"$pov_avx" != x""])
+AM_CONDITIONAL([BUILD_x86avxfma4], [test x"$pov_avx" != x"" -a x"$pov_fma4" != x"" ])
+AM_CONDITIONAL([BUILD_x86avx2fma3], [test x"$pov_avx2" != x"" -a x"$pov_fma3" != x"" ])
 
 
 # Add flags specified at the command line.

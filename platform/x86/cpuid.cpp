@@ -36,6 +36,8 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "cpuid.h"
 
+#include <cstring>
+
 #ifdef MACHINE_INTRINSICS_H
 #include MACHINE_INTRINSICS_H
 #endif
@@ -50,7 +52,7 @@
 #error "Don't know how to read XCR0 register in this build environment."
 #endif
 
-#elif defined(__linux__) // Build environment: GNU/Linux (presumably GCC or Clang)
+#elif defined(__GNUC__) // Build environment: GCC (or Clang imitating GCC)
 
 #define CPUID cpuid
 static void cpuid(int *out, int in) __attribute__((noinline));
@@ -96,7 +98,7 @@ static unsigned long long getXCR0()
 }
 
 #else // Build environment
-#error "Don't know how to invoke CPUID in this build environment."
+#error "Don't know how to invoke CPUID or read XCR0 register in this build environment."
 #endif // Build environment
 
 // Indices into the CPUID result table corresponding to the individual CPU registers.
@@ -220,11 +222,10 @@ bool IsIntelCPU()
 {
     int info[4];
     char vendor[12];
-
     CPUID(info, 0x0);
-    memcpy(vendor, &info[CPUID_EBX], 4);
-    memcpy(vendor + 4, &info[CPUID_EDX], 4);
-    memcpy(vendor + 8, &info[CPUID_ECX], 4);
+    std::memcpy(vendor, &info[CPUID_EBX], 4);
+    std::memcpy(vendor + 4, &info[CPUID_EDX], 4);
+    std::memcpy(vendor + 8, &info[CPUID_ECX], 4);
 
-    return strncmp("GenuineIntel", vendor, 12) == 0;
+    return std::strncmp("GenuineIntel", vendor, 12) == 0;
 }
