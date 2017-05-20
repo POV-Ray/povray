@@ -16,7 +16,7 @@ Dependencies
 
 By default POV-Ray will attempt to build using system-supplied libraries for
 boost, zlib, libpng, libjpeg, libtiff, and openexr. We recommend you have the
-following packages pre-installed: 
+following packages pre-installed:
 
     libboost-dev
     libboost-date-time-dev
@@ -26,7 +26,11 @@ following packages pre-installed:
     libjpeg8-dev
     libtiff5-dev
     libopenexr-dev
-    
+
+To enable the, as rendering, Simple DirectMedia Layer display also pre-install:
+
+    libsdl-dev
+
 Generating configure and building the code
 ==========================================
 
