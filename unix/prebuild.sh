@@ -1434,7 +1434,7 @@ endif
 if BUILD_x86avx2fma3
 libraries_platformcpu += libx86avx2fma3.a
 libx86avx2fma3_a_SOURCES =  `echo $files_x86avx2fma3`
-libx86avx2fma3_a_CXXFLAGS = \$(CXXFLAGS) -mavx2 -mfma3
+libx86avx2fma3_a_CXXFLAGS = \$(CXXFLAGS) -mavx2 -mfma
 endif
 
 # Libraries to build.
