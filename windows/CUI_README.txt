@@ -63,7 +63,7 @@
 	locations for the povray conf, INI, scene, and include files are:
 	
 	- System Location:  C:\ProgramData\POV-Ray\Version[-release]\
-	- User Location:    %USERPROFILE%\POV-Ray\Version[-release]\
+	- User Location:    %USERPROFILE%\Documents\POV-Ray\Version[-release]\
 	
 	There is no default location for the povray binary itself. 
 	At this moment, the default	locations are fixed (hard-coded) only.
@@ -148,7 +148,7 @@
 	;   read+write = directory   ; read/write directory
 	;   read+write* = directory  ; read/write directory including its descendants
 	; where directory is a string (to be quoted or doubly-quoted if it contains
-	; space caracters; see the commented example below).  Any number of spaces
+	; space characters; see the commented example below).  Any number of spaces
 	; can be placed before and after the equal sign.  Read-only and read/write
 	; entries can be specified in any order.
 	;
@@ -164,17 +164,65 @@
 	; will also need to be specified in the user povray.conf file.
 	
 	[Permitted Paths]
-	;read = "C:\this\directory\contains space characters"
-	;read* = %INSTALLDIR%\include
-	;read* = %INSTALLDIR%\scenes
-	;read* = %INSTALLDIR%\ini
-	;read* = %HOME%\Documents\POV-Ray\v3.7
-	;read* = %HOME%\POV-Ray\3.7
-	;read* = %HOME%
-	;read+write* = "%HOME%..\..\tmp"
-	;read+write* = .
+	; You can set permitted paths to control where POV-Ray can access content.
+	; To enable remove the preceding ';'.
+
+	; This example shows how to qualify path names containing space(s):
+	; read = "C:\this\directory\contains space characters"
+	
+	; You can use %HOME% and/or %INSTALLDIR% as the origin to explicitly define content paths:
+	
+	; %HOME% is hard-coded to the path returned by the %USERPROFILE% environment variable.
+	; read* = "%HOME%\Documents\POV-Ray\3.7\include"
+	; read* = "%HOME%\Documents\POV-Ray\3.7\scenes"
+	; read* = "%HOME%\Documents\POV-Ray\3.7\ini"	
+	; read+write* = "HOME%\..\..\tmp"
+	
+	; %INSTALLDIR% is hard-coded to: C:\ProgramData\POV-Ray\LPub3D-Trace
+	; read* = "%INSTALLDIR%\include"
+	; read* = "%INSTALLDIR%\scenes"	
+	; read* = "%INSTALLDIR%\ini"
+	; read+write* = "%INSTALLDIR%\..\..\..\tmp"
+	
+	; You can also use your working directory path as the origin.
+	
+	; 1. Map POV-Ray library paths at 'C:\Users\<Joe Blow>\Documents\POV-Ray\3.7' from desktop
+	; working directory, where a model is being rendered, at 'C:\Users\<Joe Blow>\Desktop\Models\FooModel'.	
+	; 2. Working directory read and write access - to write rendered images.
+	; read* = "..\..\..\..\..\Documents\POV-Ray\3.7\include"
+	; read* = "..\..\..\..\..\Documents\POV-Ray\3.7\scenes"
+	; read* = "..\..\..\..\..\Documents\POV-Ray\3.7\ini"
+	; read+write* = .
 	
 	; End povray conf file
+
+	Here are the INI file options for the conf file above (cut and paste to create your povray.ini file(s)):
+
+	; Specify path to search for any files not found in current directory.
+	; For example: Library_Path="C:\Program Files\POV-Ray for Windows\include"
+	; There may be some entries already here; if there are they were
+	; probably added by the install process or whoever set up the
+	; software for you. At the least you can expect an entry that
+	; points to the standard POV-Ray include files directory; on
+	; some operating systems there may also be one which points to
+	; the system's fonts directory.
+	;
+	; Note that some platforms (e.g. Windows, unless this feature is
+	; turned off via the configuration file) will automatically append
+	; standard locations like those mentioned above to the library
+	; path list after reading this file, so in those cases you don't
+	; necessarily have to have anything at all here.
+	;
+	
+	System INI:
+	; Library_Path="C:\ProgramData\POV-Ray\3.7\scenes"
+	; Library_Path="C:\ProgramData\POV-Ray\3.7\include"
+	; Library_Path="C:\ProgramData\POV-Ray\3.7\ini"
+	
+	User INI
+	; Library_Path="C:\Users\<Joe Blow>\Documents\POV-Ray\3.7\scenes"
+	; Library_Path="C:\Users\<Joe Blow>\Documents\POV-Ray\3.7\include"
+	; Library_Path="C:\Users\<Joe Blow>\Documents\POV-Ray\3.7\ini"
 	
 	/// Updated files
     /////////////////////////////////////////////////////

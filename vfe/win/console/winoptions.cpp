@@ -56,7 +56,7 @@ namespace vfePlatform
         WinConOptionsProcessor::Option_Info("general", "help", "off", false, "--help|-help|-h|-?", "", "display usage information"),
         WinConOptionsProcessor::Option_Info("general", "temppath", "", true, "", "POV_TEMP_DIR", "directory for temporary files"),
         WinConOptionsProcessor::Option_Info("general", "version", "off", false, "--version|-version|--V", "", "display program version"),
-        WinConOptionsProcessor::Option_Info("general", "benchmark", "off", false, "--benchmark|-benchmark", "", "run the standard POV-Ray benchmark"),
+        WinConOptionsProcessor::Option_Info("general", "benchmark", "off", false, "--benchmark|-benchmark", "", "run the standard " PACKAGE " benchmark"),
         WinConOptionsProcessor::Option_Info("", "", "", false, "", "", "") // has to be last
     };
 
@@ -83,8 +83,8 @@ namespace vfePlatform
         // user configuration file
         if (m_home.length() > 0)
         {
-            m_user_dir = m_home + "\\" PACKAGE "\\" VERSION_BASE;
-            m_userconf = m_home + "\\" PACKAGE "\\" VERSION_BASE "\\povray.conf";
+            m_user_dir = m_home + "\\" DEFAULT_USER_PATH;
+            m_userconf = m_home + "\\" DEFAULT_USER_PATH "\\povray.conf";
         }
         else
         {
@@ -94,11 +94,11 @@ namespace vfePlatform
 
         // system ini file
         m_sysini     = POVCONFDIR "\\ini\\povray.ini";
-        m_sysini_old = POVCONFDIR_BACKWARD "\\povray.ini";
+        m_sysini_old = POVCONFDIR_BACKWARD "\\ini\\povray.ini";
 
         // user ini file
         if (m_home.length() > 0)
-            m_userini = m_home + "\\" PACKAGE "\\" VERSION_BASE "\\povray.ini";
+            m_userini = m_home + "\\" DEFAULT_USER_PATH "\\ini\\povray.ini";
         else
             m_userini = "";
 
@@ -108,7 +108,7 @@ namespace vfePlatform
             m_userini_old = "";
 
 #ifdef WIN_DEBUG
-        cerr << "PATHS" << endl;
+        cerr << "DEFAULT PATHS" << endl;
         cerr << "  HOME        = " << m_home << endl;
         cerr << "  SYSCONF     = " << m_sysconf << endl;
         cerr << "  USERCONF    = " << m_userconf << endl;
@@ -479,11 +479,12 @@ namespace vfePlatform
             s.erase(0, 2);
             s.insert(0, win_getcwd());
         }
-        else if(s[0] != '\\' || boost::starts_with(s, "..\\"))
+        else if(/* s[0] != '\\' || This comparison is not used on Windows */ boost::starts_with(s, "..\\"))
         {
             s.insert(0, win_getcwd());
         }
 
+#if 0   // This section is not used on Windows
         // substitute all occurences of "dir\\.." by ""
         string tmp = s;
         string::size_type pos = s.find("\\..");
@@ -496,6 +497,7 @@ namespace vfePlatform
 #endif
             pos = s.find("\\..", pos+3);
         }
+#endif
 
         // remove the last "\\." if any
         if (boost::ends_with(s, "\\."))
@@ -891,7 +893,18 @@ namespace vfePlatform
             {
                 m_permitted_paths = paths;  // assign new paths
             }
-        }
+        } 
+		else 
+		{
+			// If only system configuration file exist, assign permitted paths
+			if (!file_exist(m_userconf))
+			{
+				m_permitted_paths = paths;  // assign new paths
+#ifdef WIN_DEBUG
+				cerr << PACKAGE << ": user configuration file does not exist. Using system permitted paths." << endl;
+#endif				
+			}	
+		}
     }
 
     // based on 3.6 unix_process_povray_conf()
@@ -933,7 +946,7 @@ namespace vfePlatform
                 perror(m_userconf.c_str());
             }
         }
-
+		
         // no file was read, disable I/O restrictions
         if(m_conf.length() == 0)
             fprintf(stderr, "%s: I/O restrictions are disabled\n", PACKAGE);
@@ -1062,7 +1075,7 @@ namespace vfePlatform
 		}
 
         // warn that no INI file was found and add minimal library_path setting
-        fprintf(stderr, "%s: cannot open an INI file, adding default library path\n", PACKAGE);
+        fprintf(stderr, "%s: cannot open an INI file, adding default library path\n%s\\ini\n", PACKAGE, POVLIBDIR);
         opts.AddLibraryPath(string(POVLIBDIR "\\ini"));
     }
 

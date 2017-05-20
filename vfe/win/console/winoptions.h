@@ -55,16 +55,24 @@ using boost::to_lower_copy;
  * Default values for the location of the povray library and configuration.
  * These constants don't have to be in config.h .
  */
+#ifndef DEFAULT_SYSTEM_PATH
+# define DEFAULT_SYSTEM_PATH "C:\\ProgramData\\" PACKAGE "\\" VERSION_BASE
+#endif
+
+#ifndef DEFAULT_USER_PATH
+# define DEFAULT_USER_PATH "Documents\\" PACKAGE "\\" VERSION_BASE
+#endif
+
 #ifndef POVLIBDIR
-# define POVLIBDIR  "C:\\ProgramData\\" PACKAGE "\\" VERSION_BASE
+# define POVLIBDIR  DEFAULT_SYSTEM_PATH
 #endif
 
 #ifndef POVCONFDIR_BACKWARD
-# define POVCONFDIR_BACKWARD  "C:\\ProgramData"
+# define POVCONFDIR_BACKWARD  DEFAULT_SYSTEM_PATH
 #endif
 
 #ifndef POVCONFDIR
-# define POVCONFDIR  "C:\\ProgramData\\" PACKAGE "\\" VERSION_BASE
+# define POVCONFDIR  DEFAULT_SYSTEM_PATH
 #endif
 
 namespace vfePlatform

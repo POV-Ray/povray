@@ -7,7 +7,7 @@ Title POV-Ray on Windows auto build script
 :: This script is intended to be called from autobuild.cmd
 :: --
 ::  Trevor SANDY <trevor.sandy@gmail.com>
-::  Last Update: April 17, 2017
+::  Last Update: May 19, 2017
 ::  Copyright (c) 2017 by Trevor SANDY
 :: --
 :: This script is distributed in the hope that it will be useful,
@@ -21,29 +21,8 @@ SET DEV_ENV=unknown
 SET GIT_SHA=unknown
 SET VERSION=unknown
 SET RELEASE=unknown
-SET CONSOLE=unknown
 SET VERFILE="..\..\source\base\version.h"
-:: Populate to build with trace output - e.g. SET TRACE=Yes (useful for debugging)
-SET TRACE=
 
-:: Check if CUI build flag passed in
-IF /I "%1"=="-c" GOTO :CUI ELSE GOTO :GUI
-
-:GUI
-:: Building GUI project so set Console variable to empty
-ECHO.
-ECHO -Automatically building GUI project (Default)...
-SET CONSOLE=
-GOTO :PROCESS_DEFS
-
-:CUI
-:: Building CUI project, set Console variable
-ECHO. 
-ECHO -Automatically building CUI project...
-SET CONSOLE=BUILD
-GOTO :PROCESS_DEFS 
-
-:PROCESS_DEFS
 :: Get some source details to populate the required defines
 :: These are not fixed. You can change as you like
 FOR /F "tokens=3*" %%i IN ('FINDSTR /c:"#define OFFICIAL_VERSION_STRING" %VERFILE%') DO SET VERSION=%%i
@@ -63,13 +42,13 @@ SET BUILD_ID="%VERSION%(Rev: %GIT_SHA%)"
 :: Set project build defines - configured to build GUI project at this stage 
 SET PovBuildDefs=POV_RAY_IS_AUTOBUILD=1;POV_RAY_BUILD_ID=%BUILD_ID%;BUILT_BY=%BUILT_BY%;
 :: If console variable is not empty append console define to project build defines
-IF NOT [%CONSOLE%]==[] SET PovBuildDefs=%PovBuildDefs%_CONSOLE=1;
-:: If trace variable is not empty append tracing define to project build defines
-IF NOT [%TRACE%]==[] SET PovBuildDefs=%PovBuildDefs%WIN_DEBUG=1;
+IF %CONSOLE%==1 SET PovBuildDefs=%PovBuildDefs%_CONSOLE=1;
+:: If verbose variable is not empty append tracing define to project build defines
+IF %VERBOSE%==1 SET PovBuildDefs=%PovBuildDefs%WIN_DEBUG=1;
 
 :: Display the define attributes to visually confirm all is well.
 ECHO.
-ECHO -Build Defines:
+ECHO -Build Parameters:
 ECHO.
 ECHO   VERSION...........[%VERSION%]
 ECHO   RELEASE...........[%RELEASE%]

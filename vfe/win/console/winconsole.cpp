@@ -249,12 +249,12 @@ static ReturnValue PrepareBenchmark(vfeSession *session, vfeRenderOptions& opts,
   int benchversion = pov::Get_Benchmark_Version();
   fprintf(stderr, "\
 %s %s\n\n\
-Entering the standard POV-Ray %s benchmark version %x.%02x.\n\n\
-This built-in benchmark requires POV-Ray to be installed on your system\n\
+Entering the standard " PACKAGE " %s benchmark version %x.%02x.\n\n\
+This built-in benchmark requires " PACKAGE " to be installed on your system\n\
 before running it.  There will be neither display nor file output, and\n\
 any additional command-line option except setting the number of render\n\
 threads (+wtN for N threads) and library paths (+Lpath) will be ignored.\n\
-To get an accurate benchmark result you might consider running POV-Ray\n\
+To get an accurate benchmark result you might consider running  " PACKAGE "\n\
 with the Win 'time' command (e.g. 'time povray -benchmark').\n\n\
 The benchmark will run using %d render thread(s).\n\
 Press <Enter> to continue or <Ctrl-C> to abort.\n\
@@ -320,7 +320,7 @@ Press <Enter> to continue or <Ctrl-C> to abort.\n\
   {
       fprintf(stderr, "%s: creating %s\n", PACKAGE, ini.c_str());
       fprintf(stderr, "%s: creating %s\n", PACKAGE, pov.c_str());
-      fprintf(stderr, "Running standard POV-Ray benchmark version %x.%02x\n", benchversion / 256, benchversion % 256);
+      fprintf(stderr, "Running standard " PACKAGE " benchmark version %x.%02x\n", benchversion / 256, benchversion % 256);
   }
   else
   {
@@ -344,7 +344,7 @@ static void CleanupBenchmark(vfeWinSession *session, string& ini, string& pov)
 
 // This is the console user interface build of POV-Ray under Windows 
 // using the VFE (virtual front-end) library. This implementation 
-// includes the same capabiliteis as the Unix console build. 
+// includes the same capabilities as the Unix console build. 
 // It is not officially supported.
 int main (int argc, char **argv)
 {
