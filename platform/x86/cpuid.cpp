@@ -36,6 +36,8 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "cpuid.h"
 
+#include <cstring>
+
 #ifdef MACHINE_INTRINSICS_H
 #include MACHINE_INTRINSICS_H
 #endif
@@ -220,11 +222,10 @@ bool IsIntelCPU()
 {
     int info[4];
     char vendor[12];
-
     CPUID(info, 0x0);
-    memcpy(vendor, &info[CPUID_EBX], 4);
-    memcpy(vendor + 4, &info[CPUID_EDX], 4);
-    memcpy(vendor + 8, &info[CPUID_ECX], 4);
+    std::memcpy(vendor, &info[CPUID_EBX], 4);
+    std::memcpy(vendor + 4, &info[CPUID_EDX], 4);
+    std::memcpy(vendor + 8, &info[CPUID_ECX], 4);
 
-    return strncmp("GenuineIntel", vendor, 12) == 0;
+    return std::strncmp("GenuineIntel", vendor, 12) == 0;
 }
