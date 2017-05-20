@@ -61,7 +61,7 @@ namespace pov
 {
 
 bool TryOptimizedNoise(NoiseFunction* pFnNoise, DNoiseFunction* pFnDNoise,
-                       std::string* pDetected, std::string* pImpl)
+                       std::string* pImpl, std::string* pInfo)
 {
     bool doInit = (pFnNoise || pFnDNoise);
 #ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
@@ -70,8 +70,8 @@ bool TryOptimizedNoise(NoiseFunction* pFnNoise, DNoiseFunction* pFnDNoise,
         if (doInit)     AVX2FMA3NoiseInit();
         if (pFnNoise)   *pFnNoise   = AVX2FMA3Noise;
         if (pFnDNoise)  *pFnDNoise  = AVX2FMA3DNoise;
-        if (pDetected)  *pDetected  = "AVX2,FMA3,Intel";
-        if (pImpl)      *pImpl      = "hand-optimized for AVX2/FMA3 by Intel";
+        if (pImpl)      *pImpl      = "AVX2FMA3-Intel";
+        if (pInfo)      *pInfo      = "hand-optimized by Intel";
         return true;
     }
 #endif
@@ -80,8 +80,8 @@ bool TryOptimizedNoise(NoiseFunction* pFnNoise, DNoiseFunction* pFnDNoise,
     {
         if (pFnNoise)   *pFnNoise   = AVXFMA4Noise;
         if (pFnDNoise)  *pFnDNoise  = AVXFMA4DNoise;
-        if (pDetected)  *pDetected  = "AVX,FMA4";
-        if (pImpl)      *pImpl      = "hand-optimized for AVX/FMA4 by AMD (2017-04 update)";
+        if (pImpl)      *pImpl      = "AVXFMA4-AMD.2";
+        if (pInfo)      *pInfo      = "hand-optimized by AMD, 2017-04 update";
         return true;
     }
 #endif
@@ -91,8 +91,8 @@ bool TryOptimizedNoise(NoiseFunction* pFnNoise, DNoiseFunction* pFnDNoise,
         if (doInit)     AVXNoiseInit();
         if (pFnNoise)   *pFnNoise   = AVXNoise;
         if (pFnDNoise)  *pFnDNoise  = AVXDNoise;
-        if (pDetected)  *pDetected  = "AVX,Intel";
-        if (pImpl)      *pImpl      = "hand-optimized for AVX by Intel";
+        if (pImpl)      *pImpl      = "AVX-Intel";
+        if (pInfo)      *pInfo      = "hand-optimized by Intel";
         return true;
     }
 #endif
@@ -101,8 +101,8 @@ bool TryOptimizedNoise(NoiseFunction* pFnNoise, DNoiseFunction* pFnDNoise,
     {
         if (pFnNoise)   *pFnNoise   = AVXPortableNoise;
         if (pFnDNoise)  *pFnDNoise  = AVXPortableDNoise;
-        if (pDetected)  *pDetected  = "AVX";
-        if (pImpl)      *pImpl      = "compiler-optimized for AVX";
+        if (pImpl)      *pImpl      = "AVX-Portable";
+        if (pInfo)      *pInfo      = "auto-optimized by compiler";
         return true;
     }
 #endif

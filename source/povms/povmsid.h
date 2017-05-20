@@ -282,6 +282,7 @@ enum
     kPOVAttrib_AssistingDevs         = 'Asst',
     kPOVAttrib_ContributingDevs      = 'Cont',
     kPOVAttrib_ImageLibVersions      = 'ILVe',
+    kPOVAttrib_Optimizations         = 'Opti',
 
     // options handled by frontend
     kPOVAttrib_TestAbort             = 'TstA', // currently not supported by code

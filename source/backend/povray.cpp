@@ -483,6 +483,31 @@ void BuildInitInfo(POVMSObjectPtr msg)
 #endif  // DONT_SHOW_IMAGE_LIB_VERSIONS
     if(err == kNoErr)
         err = POVMSObject_Set(msg, &attrlist, kPOVAttrib_ImageLibVersions);
+
+    if (err == kNoErr)
+        err = POVMSAttrList_New(&attrlist);
+    if (err == kNoErr)
+    {
+#ifdef TRY_OPTIMIZED_NOISE
+        std::string noiseGenSelection;
+        std::string noiseGenInfo;
+        if (TryOptimizedNoise(NULL, NULL, &noiseGenSelection, &noiseGenInfo))
+            noiseGenInfo = "Noise generator: " + noiseGenSelection + " (" + noiseGenInfo + ")";
+        else
+            noiseGenInfo = "Noise generator: Portable";
+        err = POVMSAttr_New(&attr);
+        if (err == kNoErr)
+        {
+            err = POVMSAttr_Set(&attr, kPOVMSType_CString, reinterpret_cast<const void *>(noiseGenInfo.c_str()), noiseGenInfo.length() + 1);
+            if (err == kNoErr)
+                err = POVMSAttrList_Append(&attrlist, &attr);
+            else
+                err = POVMSAttr_Delete(&attr);
+        }
+#endif
+    }
+    if (err == kNoErr)
+        err = POVMSObject_Set(msg, &attrlist, kPOVAttrib_Optimizations);
 }
 
 void ExtractLibraryVersion(const char *str, char *buffer)

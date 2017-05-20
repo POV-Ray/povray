@@ -50,7 +50,7 @@
 #error "Don't know how to read XCR0 register in this build environment."
 #endif
 
-#elif defined(__linux__) // Build environment: GNU/Linux (presumably GCC or Clang)
+#elif defined(__GNUC__) // Build environment: GCC (or Clang imitating GCC)
 
 #define CPUID cpuid
 static void cpuid(int *out, int in) __attribute__((noinline));
@@ -96,7 +96,7 @@ static unsigned long long getXCR0()
 }
 
 #else // Build environment
-#error "Don't know how to invoke CPUID in this build environment."
+#error "Don't know how to invoke CPUID or read XCR0 register in this build environment."
 #endif // Build environment
 
 // Indices into the CPUID result table corresponding to the individual CPU registers.
