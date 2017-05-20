@@ -29,8 +29,8 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
-Changes between 3.7.1-beta.7 and 3.7.1-TBD
-==========================================
+Changes between 3.7.1-beta.7 and 3.7.1-beta.8
+=============================================
 
 Fixed or Mitigated Bugs
 -----------------------
@@ -43,6 +43,8 @@ Other Noteworthy
 ----------------
 
   - Minor updates to the documentation.
+  - The Unix build process and source code have been updated to make use of
+    the CPU-specific optimized noise implementations.
 
 
 Changes between 3.7.1-beta.6 and 3.7.1-beta.7
