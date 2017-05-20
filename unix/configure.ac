@@ -994,9 +994,9 @@ case "$pov_built_for" in
   i?86-* | x86_64-*)
     pov_cpu='x86'
     AC_DEFINE([BUILD_X86], [], [Build for x86 or x86-64 architecture])
-    AX_CHECK_COMPILE_FLAG([-mavx], [pov_avx='-mavx'], [pov_avx=''])
+    AX_CHECK_COMPILE_FLAG([-mavx],  [pov_avx='-mavx'],   [pov_avx=''])
     AX_CHECK_COMPILE_FLAG([-mavx2], [pov_avx2='-mavx2'], [pov_avx2=''])
-    AX_CHECK_COMPILE_FLAG([-mfma3], [pov_fma3='-mfma3'], [pov_fma3=''])
+    AX_CHECK_COMPILE_FLAG([-mfma],  [pov_fma3='-mfma'],  [pov_fma3=''])
     AX_CHECK_COMPILE_FLAG([-mfma4], [pov_fma4='-mfma4'], [pov_fma4=''])
     ;;
   *)
