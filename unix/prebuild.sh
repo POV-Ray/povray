@@ -796,7 +796,7 @@ case "$1" in
   ;;
 
   *)
-  files=`find $dir -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g`
+  files=`find $dir -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g | sort`
 
   echo "Create $makefile.am"
   cat Makefile.header > $makefile.am
@@ -1334,7 +1334,7 @@ case "$1" in
 
   *)
   # includes the vfe/unix/ files to avoid circular dependencies when linking
-  files=`find $dir $dir/unix -maxdepth 1 -name \*.cpp -or -name \*.h | sed s,"$dir/",,g`
+  files=`find $dir $dir/unix -maxdepth 1 -name \*.cpp -or -name \*.h | sed s,"$dir/",,g | sort`
 
   echo "Create $makefile.am"
   cat Makefile.header > $makefile.am
@@ -1398,10 +1398,10 @@ case "$1" in
   ;;
 
   *)
-  files=`find $dir/unix -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g`
-  files_x86=`find $dir/x86 -maxdepth 1 -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g`
+  files=`find $dir/unix -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g | sort`
+  files_x86=`find $dir/x86 -maxdepth 1 -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g | sort`
   for ext in avx avxfma4 avx2fma3; do
-    files_ext=`find $dir/x86/$ext -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g`
+    files_ext=`find $dir/x86/$ext -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g | sort`
     eval files_x86$ext='$files_ext'
   done
 
