@@ -1113,7 +1113,7 @@ void SphereSweep::Scale(const Vector3d& Vector, const TRANSFORM *tr)
         for(int i = 0; i < Num_Modeling_Spheres; i++)
         {
             Modeling_Sphere[i].Center *= Vector[X];
-            Modeling_Sphere[i].Radius *= Vector[X];
+            Modeling_Sphere[i].Radius *= fabs(Vector[X]);
         }
         Compute();
         Compute_BBox();
