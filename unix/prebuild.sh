@@ -1,11 +1,11 @@
 #!/bin/sh
 
 ###############################################################################
-# prebuild.sh script (maintainers only)
+# prebuild.sh script (maintainers only) 
 # Written by Nicolas Calimet and Christoph Hormann
 #
-# This prebuild.sh script prepares the Perforce source tree for building
-# the Unix/Linux version of POV-Ray.  Unlike the former versions, the
+# This prebuild.sh script prepares the source tree for building the
+# Unix/Linux version of POV-Ray.  Unlike the former versions, the
 # prebuild procedure does not change the directory structure, so that
 # the overall layout of the UNIX source distribution remains consistent
 # with the other supported architectures (namely Windows and Macintosh).
@@ -40,12 +40,6 @@
 #
 # Note that the 'clean' and 'doc(s)(clean)' options are mutually exclusive.
 #
-# $File: //depot/povray/smp/unix/prebuild.sh $
-# $Revision: #31 $
-# $Change: 6136 $
-# $DateTime: 2013/11/25 16:36:15 $
-# $Author: clipka $
-# $Log$
 ###############################################################################
 
 umask 022
@@ -119,7 +113,7 @@ fi
 
 case "$1" in
 
-  # Cleanup all files not in the Perforce repositery
+  # Cleanup all files not in the repository
   clean)
   if test -f ../Makefile; then
     makeclean=`\
