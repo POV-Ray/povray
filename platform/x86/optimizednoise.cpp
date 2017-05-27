@@ -37,6 +37,8 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "optimizednoise.h"
 
+#include "core/material/noise.h"
+
 #ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
 #include "avx2fma3/avx2fma3noise.h"
 #endif
@@ -60,54 +62,63 @@
 namespace pov
 {
 
-bool TryOptimizedNoise(NoiseFunction* pFnNoise, DNoiseFunction* pFnDNoise,
-                       std::string* pImpl, std::string* pInfo)
-{
-    bool doInit = (pFnNoise || pFnDNoise);
+static bool AVXSupported()      { return CPUInfo::SupportsAVX(); }
+static bool AVXFMA4Supported()  { return CPUInfo::SupportsAVX() && CPUInfo::SupportsFMA4(); }
+static bool AVX2FMA3Supported() { return CPUInfo::SupportsAVX2() && CPUInfo::SupportsFMA3(); }
+
+/// List of optimized noise implementations.
+///
+/// @note
+///     Entries must be listed in descending order of preference.
+///
+OptimizedNoiseInfo gaOptimizedNoiseInfo[] = {
 #ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
-    if (HaveAVX2FMA3() && IsIntelCPU())
     {
-        if (doInit)     AVX2FMA3NoiseInit();
-        if (pFnNoise)   *pFnNoise   = AVX2FMA3Noise;
-        if (pFnDNoise)  *pFnDNoise  = AVX2FMA3DNoise;
-        if (pImpl)      *pImpl      = "AVX2FMA3-Intel";
-        if (pInfo)      *pInfo      = "hand-optimized by Intel";
-        return true;
-    }
+        "avx2fma3-intel",           // name,
+        "hand-optimized by Intel",  // info,
+        AVX2FMA3Noise,              // noise,
+        AVX2FMA3DNoise,             // dNoise,
+        AVX2FMA3Supported,          // supported,
+        CPUInfo::IsIntel,           // recommended,
+        AVX2FMA3NoiseInit           // init
+    },
 #endif
 #ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
-    if (HaveAVXFMA4())
     {
-        if (pFnNoise)   *pFnNoise   = AVXFMA4Noise;
-        if (pFnDNoise)  *pFnDNoise  = AVXFMA4DNoise;
-        if (pImpl)      *pImpl      = "AVXFMA4-AMD.2";
-        if (pInfo)      *pInfo      = "hand-optimized by AMD, 2017-04 update";
-        return true;
-    }
+        "avxfma4-amd.2",            // name,
+        "hand-optimized by AMD, 2017-04 update", // info,
+        AVXFMA4Noise,               // noise,
+        AVXFMA4DNoise,              // dNoise,
+        AVXFMA4Supported,           // supported,
+        NULL,                       // recommended,
+        NULL                        // init
+    },
 #endif
 #ifdef TRY_OPTIMIZED_NOISE_AVX
-    if (HaveAVX() && IsIntelCPU())
     {
-        if (doInit)     AVXNoiseInit();
-        if (pFnNoise)   *pFnNoise   = AVXNoise;
-        if (pFnDNoise)  *pFnDNoise  = AVXDNoise;
-        if (pImpl)      *pImpl      = "AVX-Intel";
-        if (pInfo)      *pInfo      = "hand-optimized by Intel";
-        return true;
-    }
+        "avx-intel",                // name,
+        "hand-optimized by Intel",  // info,
+        AVXNoise,                   // noise,
+        AVXDNoise,                  // dNoise,
+        AVXSupported,               // supported,
+        CPUInfo::IsIntel,           // recommended,
+        AVXNoiseInit                // init
+    },
 #endif
 #ifdef TRY_OPTIMIZED_NOISE_AVX_PORTABLE
-    if (HaveAVX())
     {
-        if (pFnNoise)   *pFnNoise   = AVXPortableNoise;
-        if (pFnDNoise)  *pFnDNoise  = AVXPortableDNoise;
-        if (pImpl)      *pImpl      = "AVX-Portable";
-        if (pInfo)      *pInfo      = "auto-optimized by compiler";
-        return true;
-    }
+        "avx-generic",              // name,
+        "compiler-optimized",       // info,
+        AVXPortableNoise,           // noise,
+        AVXPortableDNoise,          // dNoise,
+        AVXSupported,               // supported,
+        NULL,                       // recommended,
+        NULL                        // init
+    },
 #endif
-    return false;
-}
+    // End-of-list entry.
+    { NULL }
+};
 
 }
 

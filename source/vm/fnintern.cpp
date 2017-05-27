@@ -12,7 +12,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,8 +44,8 @@
 
 #include "base/mathutil.h"
 
+#include "core/material/noise.h"
 #include "core/material/pigment.h"
-#include "core/material/texture.h"
 #include "core/material/warp.h"
 #include "core/math/matrix.h"
 #include "core/math/spline.h"

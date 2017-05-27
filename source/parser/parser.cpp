@@ -56,6 +56,7 @@
 #include "core/lighting/subsurface.h"
 #include "core/material/blendmap.h"
 #include "core/material/interior.h"
+#include "core/material/noise.h"
 #include "core/material/normal.h"
 #include "core/material/pigment.h"
 #include "core/material/texture.h"

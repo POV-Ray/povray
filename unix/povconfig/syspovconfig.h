@@ -127,6 +127,10 @@ const int NULL=0;
 
 #ifdef BUILD_X86
 
+#define POV_CPUINFO         CPUInfo::GetFeatures()
+#define POV_CPUINFO_DETAILS CPUInfo::GetDetails()
+#define POV_CPUINFO_H       "cpuid.h"
+
 #if defined(__INTEL_COMPILER)
     // Intel compiler
     #if (__INTEL_COMPILER >= 1110) // 11.1

@@ -38,6 +38,5 @@
 #define POVRAY_OPTIMIZEDNOISE_H
 
 #include "core/configcore.h"
-#include "core/material/texture.h"
 
 #endif // POVRAY_OPTIMIZEDNOISE_H

@@ -93,13 +93,7 @@
 
 #ifdef TRY_OPTIMIZED_NOISE
 // TODO - This is a hack; we should get the noise generator choice information via POVMS from the back-end.
-namespace pov
-{
-  typedef DBL(*NoiseFunction) (const Vector3d& EPoint, int noise_generator);
-  typedef void(*DNoiseFunction) (Vector3d& result, const Vector3d& EPoint);
-  extern bool TryOptimizedNoise(NoiseFunction* pFnNoise, DNoiseFunction* pFnDNoise,
-                                std::string* pImpl = NULL, std::string* pInfo = NULL);
-}
+#include "core/material/noise.h"
 #endif
 
 
@@ -5350,7 +5344,7 @@ void NoAVX2 (void)
 
 inline void TestAVX2 (void)
 {
-  if (!HaveAVX2())
+  if (!CPUInfo::SupportsAVX2())
     NoAVX2();
 }
 #endif // BUILD_AVX2
@@ -5368,7 +5362,7 @@ void NoAVX (void)
 
 inline void TestAVX (void)
 {
-  if (!HaveAVX())
+  if (!CPUInfo::SupportsAVX())
     NoAVX();
 }
 #endif // BUILD_AVX
@@ -5389,7 +5383,7 @@ inline void TestSSE2 (void)
   if (HaveVistaOrLater())
   {
     // Use the canonical test.
-    if (!HaveSSE2())
+    if (!CPUInfo::SupportsSSE2())
       NoSSE2();
   }
   else
@@ -6228,8 +6222,8 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
   // TODO FIXME
   // technically we should ask the backend what it's using, but given this is not a remoted version
   // of POVWIN, we just call the test here.
-  if (!TryOptimizedNoise(NULL, NULL, &selectedNoiseFunc, NULL))
-    selectedNoiseFunc = "Portable";
+  const OptimizedNoiseInfo* pNoise = GetRecommendedOptimizedNoise();
+  selectedNoiseFunc = pNoise->name;
 #endif // TRY_OPTIMIZED_NOISE
 
   load_tool_menu (ToolIniFileName) ;

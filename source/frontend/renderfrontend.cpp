@@ -878,6 +878,18 @@ void InitInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
         (void)POVMSAttrList_Delete(&attrlist);
     }
 
+    l = 1024;
+    charbuf[0] = 0;
+    std::string cpuInfo;
+    if (POVMSUtil_GetString(msg, kPOVAttrib_CPUInfo, charbuf, &l) == kNoErr)
+        cpuInfo = charbuf;
+#if POV_CPUINFO_DEBUG
+    l = 1024;
+    std::string cpuDetails;
+    if (POVMSUtil_GetString(msg, kPOVAttrib_CPUInfoDetails, charbuf, &l) == kNoErr)
+        cpuDetails = charbuf;
+#endif
+
     if (POVMSObject_Get(msg, &attrlist, kPOVAttrib_Optimizations) == kNoErr)
     {
         cnt = 0;
@@ -887,7 +899,14 @@ void InitInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
             if (cnt > 0)
             {
                 tsb->printf("\n");
-                tsb->printf("Dynamic optimizations active:\n");
+                tsb->printf("Dynamic optimizations:\n");
+
+                if (!cpuInfo.empty())
+                    tsb->printf("  CPU detected: %s\n", cpuInfo.c_str());
+#if POV_CPUINFO_DEBUG
+                if (!cpuDetails.empty())
+                    tsb->printf("  CPU details: %s\n", cpuDetails.c_str());
+#endif
 
                 for (i = 1; i <= cnt; i++)
                 {
