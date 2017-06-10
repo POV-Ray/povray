@@ -2230,10 +2230,10 @@ pigment {
 #declare Resolution = max_extent ( MatteImage );
 
 #declare MatteNormalizationScale =
-<min(1,Resolution.x/Resolution.y),
- min(1,Resolution.y/Resolution.x),1>;
+&lt;min(1,Resolution.x/Resolution.y),
+ min(1,Resolution.y/Resolution.x),1&gt;;
 
-box { 0, <1,1,0.001
+box { 0, &lt;1,1,0.001&gt;
   pigment { MatteImage }
   scale MatteNormalizationScale // Fit matte to unit square
   scale MatteSceneScale // Size matte for scene
@@ -2248,9 +2248,9 @@ box { 0, <1,1,0.001
 #declare Density0 = density { density_file df3 "A20x30x40.df3" interpolate 0 }
 #declare Df3MapRange = max_extent(Density0);
 #declare Df3NormalizationScale =
-<min(1,Df3MapRange.x/max(Df3MapRange.y,Df3MapRange.z)),
+&lt;min(1,Df3MapRange.x/max(Df3MapRange.y,Df3MapRange.z)),
  min(1,Df3MapRange.y/max(Df3MapRange.x,Df3MapRange.z)),
- min(1,Df3MapRange.z/max(Df3MapRange.x,Df3MapRange.y))>;
+ min(1,Df3MapRange.z/max(Df3MapRange.x,Df3MapRange.y))&gt;;
 </pre> 
 <p><code>trace(OBJECT_IDENTIFIER, A, B, [VECTOR_IDENTIFIER])</code>.
 <code>trace</code> helps you finding the exact location of a ray intersecting
