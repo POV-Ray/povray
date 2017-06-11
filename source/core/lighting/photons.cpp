@@ -2265,7 +2265,7 @@ void PhotonGatherer::gatherPhotonsRec(int start, int end)
 {
     DBL delta;
     int DimToUse;
-    DBL dx,dy,dz,dSqr;
+    DBL dSqr;
     int mid;
     Photon *photon;
     Vector3d ptToPhoton;
