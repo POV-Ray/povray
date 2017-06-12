@@ -235,7 +235,7 @@ TraceTask::TraceTask(ViewData *vd, unsigned int tm, DBL js, DBL aat, unsigned in
     highReproducibility(hr),
     media(GetViewDataPtr(), &trace, &photonGatherer),
     radiosity(vd->GetSceneData(), GetViewDataPtr(),
-              vd->GetSceneData()->radiositySettings, vd->GetRadiosityCache(), cooperate, final, vd->GetCamera().Location),
+              vd->GetSceneData()->radiositySettings, vd->GetRadiosityCache(), cooperate, true, vd->GetCamera().Location),
     photonGatherer(&vd->GetSceneData()->mediaPhotonMap, vd->GetSceneData()->photonSettings)
 {
 #ifdef PROFILE_INTERSECTIONS

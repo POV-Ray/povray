@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -272,7 +272,7 @@ class RadiosityFunction : public Trace::RadiosityFunctor
         //      rs      - the radiosity settings as parsed from the scene file
         //      rc      - the radiosity cache to retrieve previously computed samples from, and store newly computed samples in
         //      cf      - the cooperate functor (whatever that is - some thing that handles inter-thread communication?)
-        //      pts     - number of the current pretrace step (PRETRACE_FIRST to PRETRACE_MAX, or FINAL_TRACE for main render)
+        //      ft      - whether this is the final trace (i.e. not a radiosity pretrace step)
         //      camera  - position of the camera
         RadiosityFunction(shared_ptr<SceneData> sd, TraceThreadData *td,
                           const SceneRadiositySettings& rs, RadiosityCache& rc, Trace::CooperateFunctor& cf, bool ft, const Vector3d& camera);
@@ -280,11 +280,11 @@ class RadiosityFunction : public Trace::RadiosityFunctor
 
         // looks up the ambient value for a certain point
         //      ipoint          - point on the surface
-        //      raw_normal      - the geometry raw norml at this pont
-        //      layer_normal    - texture-pertubed normal
+        //      raw_normal      - the geometry raw normal at this point
+        //      layer_normal    - texture-perturbed normal
         //      brilliance      - brilliance
         //      ambient_colour  - (output) the ambient color at this point
-        //      weight          - the base "weight" of the traced ray (used to compare againgst ADC bailout)
+        //      weight          - the base "weight" of the traced ray (used to compare against ADC bailout)
         virtual void ComputeAmbient(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, DBL brilliance, MathColour& ambient_colour, DBL weight, TraceTicket& ticket);
 
         // checks whether the specified recursion depth is still within the configured limits
