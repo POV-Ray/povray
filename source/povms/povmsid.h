@@ -612,12 +612,13 @@ enum
     kPOVAttrib_PixelsCompleted       = 'PCom',
 
     // render pixel data/control
-    kPOVAttrib_PixelId               = 'PiId',
+    kPOVAttrib_PixelId               = 'PiId',  ///< (Int) ID of render block; only set if rendered to completion.
     kPOVAttrib_PixelSize             = 'PiSi',
     kPOVAttrib_PixelBlock            = 'PBlo',
     kPOVAttrib_PixelColors           = 'PCol',
     kPOVAttrib_PixelPositions        = 'PPos',
     kPOVAttrib_PixelSkipList         = 'PSLi',
+    kPOVAttrib_PixelFinal            = 'PFin',  ///< (Void) Set if pixel data is relevant for final image.
 
     // scene/view error reporting and TBD
     kPOVAttrib_CurrentLine           = 'CurL',
