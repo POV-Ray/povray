@@ -32,8 +32,57 @@ Notes:
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
+POV-Ray v3.7.1-beta.9
+------------------------------------------------------------------------------
+
+Commit c53549c on 2017-06-17 by Christoph Lipka
+
+    Fix artifacts in output image file caused by certain mosaic pretrace
+    settings.
+
+    Using mosaic pretrace with `+ep1 -a` caused every second pixel in every
+    second row to turn black in the output image file, due to a conceptual
+    error introduced in commit 2d12f46. Fixed.
+
+    Also includes some minor code cleanup.
+
+Commit d99e80a on 2017-06-12 by Christoph Lipka
+
+    Permanent fix for GitHub issue #137.
+
+Commit 923bd8d on 2017-06-11 by Christoph Lipka
+
+    Minor code cleanup.
+
+Commit cc77eea on 2017-06-11 by Christoph Lipka
+
+    More refactoring of optimized noise generator mechanism and CPU feature
+    detection.
+
+Commit e469760 on 2017-06-10 by Christoph Lipka
+
+    Update docs.
+
+Commit 9834334 on 2017-05-23 by William F. Pokorny (wfpokorny)
+
+    Removing Perforce references and related comments. (#297)
+
+Commit 6fe910c on 2017-05-22 by Bernhard M. Wiedemann
+
+    Improve reproducibility of Unix builds. (#296)
+
+    This commit enforces alphabetical ordering of code units (`.cpp` files)
+    in the linkage process, making sure that builds produce bit-identical
+    binaries regardless of the physical ordering of the files in the file
+    system (on otherwise identical build environments).
+
+------------------------------------------------------------------------------
 POV-Ray v3.7.1-beta.8
 ------------------------------------------------------------------------------
+
+Commit e817cc4 on 2017-05-20 by Christoph Lipka
+
+    Bump version number and update change log.
 
 Commit 295022b on 2017-05-20 by Christoph Lipka
 
