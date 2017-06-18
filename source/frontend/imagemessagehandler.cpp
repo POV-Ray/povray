@@ -33,12 +33,13 @@
 ///
 //*******************************************************************************
 
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/imagemessagehandler.h"
 
-#include "base/types.h"
-#include "frontend/configfrontend.h"
+#include "base/image/encoding.h"
+#include "base/image/image.h"
+
+#include "frontend/display.h"
 #include "frontend/renderfrontend.h"
 
 // this must be the last file included

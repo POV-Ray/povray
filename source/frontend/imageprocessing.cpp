@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,17 +33,14 @@
 ///
 //******************************************************************************
 
-#include <string>
-#include <cctype>
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "frontend/imageprocessing.h"
 
 #include <boost/scoped_ptr.hpp>
 
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
-#include "base/types.h"
-#include "base/image/encoding.h"
+#include "base/image/image.h"
 
-#include "frontend/imageprocessing.h"
+#include "povms/povmsid.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

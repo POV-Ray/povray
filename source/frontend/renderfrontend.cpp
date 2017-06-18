@@ -33,19 +33,19 @@
 ///
 //******************************************************************************
 
-#include <boost/scoped_ptr.hpp>
-
-// configfrontend.h must always be the first POV file included within frontend *.cpp files
-#include "frontend/configfrontend.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/renderfrontend.h"
 
-#include "povms/povmscpp.h"
+#include <boost/scoped_ptr.hpp>
+
+#include "base/platformbase.h"
+#include "base/textstream.h"
+#include "base/textstreambuffer.h"
+#include "base/image/encoding.h"
+
 #include "povms/povmsid.h"
 
-#include "base/fileinputoutput.h"
-#include "base/platformbase.h"
-#include "base/types.h"
-
+#include "frontend/console.h"
 #include "frontend/processoptions.h"
 
 // this must be the last file included

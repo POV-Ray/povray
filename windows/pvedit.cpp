@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -297,11 +297,11 @@ char *Get_INI_Keywords(void)
 {
   int length = 0 ;
 
-  for (struct pov_base::ProcessOptions::INI_Parser_Table *op = pov_frontend::RenderOptions_INI_Table; op->keyword != NULL; op++)
+  for (struct pov_frontend::ProcessOptions::INI_Parser_Table *op = pov_frontend::RenderOptions_INI_Table; op->keyword != NULL; op++)
     length += strlen(op->keyword) + 1;
   char *result = (char *) malloc (++length) ;
   char *s = result;
-  for (struct pov_base::ProcessOptions::INI_Parser_Table *op = pov_frontend::RenderOptions_INI_Table; op->keyword != NULL; op++)
+  for (struct pov_frontend::ProcessOptions::INI_Parser_Table *op = pov_frontend::RenderOptions_INI_Table; op->keyword != NULL; op++)
     s += sprintf (s, "%s\n", op->keyword) ;
   *--s = '\0' ;
   return (result) ;
