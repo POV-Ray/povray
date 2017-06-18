@@ -102,13 +102,13 @@ void Free_Noise_Tables (void);
 
 DBL SolidNoise(const Vector3d& P);
 
+DBL PortableNoise(const Vector3d& EPoint, int noise_generator);
+void PortableDNoise(Vector3d& result, const Vector3d& EPoint);
+
 #ifdef TRY_OPTIMIZED_NOISE
 
 typedef DBL(*NoiseFunction) (const Vector3d& EPoint, int noise_generator);
 typedef void(*DNoiseFunction) (Vector3d& result, const Vector3d& EPoint);
-
-DBL PortableNoise(const Vector3d& EPoint, int noise_generator);
-void PortableDNoise(Vector3d& result, const Vector3d& EPoint);
 
 /// Optimized noise dispatch information.
 struct OptimizedNoiseInfo
@@ -178,13 +178,6 @@ extern DNoiseFunction DNoise;
 void Initialise_NoiseDispatch();
 
 #else // TRY_OPTIMIZED_NOISE
-
-class PortableNoiseGenerator
-{
-public:
-    static DBL Noise(const Vector3d& EPoint, int noise_generator);
-    static void DNoise(Vector3d& result, const Vector3d& EPoint);
-};
 
 inline DBL Noise(const Vector3d& EPoint, int noise_generator) { return PortableNoise(EPoint, noise_generator); }
 inline void DNoise(Vector3d& result, const Vector3d& EPoint) { PortableDNoise(result, EPoint); }
