@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,14 +37,17 @@
 #ifndef PROCESSOPTIONS_H
 #define PROCESSOPTIONS_H
 
-#include "base/configbase.h"
-
-#include "povms/povmscpp.h"
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "frontend/configfrontend.h"
 
 #include "base/textstream.h"
 
-namespace pov_base
+#include "povms/povmscpp.h"
+
+namespace pov_frontend
 {
+
+using namespace pov_base;
 
 enum {
     kINIOptFlag_SuppressWrite   = 0x0001,   ///< Suppress when writing complete list of options

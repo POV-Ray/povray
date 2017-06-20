@@ -43,8 +43,7 @@
 #include MACHINE_INTRINSICS_H
 #endif
 
-#include "core/material/pattern.h"
-#include "core/material/texture.h"
+#include "core/material/noise.h"
 
 /// @file
 /// @attention

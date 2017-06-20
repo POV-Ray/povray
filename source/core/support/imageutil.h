@@ -48,7 +48,7 @@
 namespace pov
 {
 
-struct ImageData;
+class ImageData;
 struct ImagePattern;
 
 //##############################################################################

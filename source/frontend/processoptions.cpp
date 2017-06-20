@@ -33,24 +33,17 @@
 ///
 //******************************************************************************
 
-#include <cstdarg>
-#include <cctype>
-
-// configfrontend.h must always be the first POV file included in frontend sources (pulls in platform config)
-#include "frontend/configfrontend.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/processoptions.h"
 
-#include "povms/povmscpp.h"
-#include "povms/povmsid.h"
-
 #include "base/platformbase.h"
-#include "base/pov_err.h"
-#include "base/stringutilities.h"
+
+#include "povms/povmsid.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
-namespace pov_base
+namespace pov_frontend
 {
 
 ProcessOptions::ProcessOptions(INI_Parser_Table *pit, Cmd_Parser_Table *pct)

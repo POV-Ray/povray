@@ -46,8 +46,7 @@
 #include "core/material/portablenoise.h"
 #endif // PORTABLE_OPTIMIZED_NOISE
 
-#include "core/material/pattern.h"
-#include "core/material/texture.h"
+#include "core/material/noise.h"
 
 namespace pov
 {
