@@ -45,6 +45,8 @@
 namespace pov
 {
 
+extern const bool kAVXPortableNoiseEnabled;
+
 DBL AVXPortableNoise(const Vector3d& EPoint, int noise_generator);
 
 void AVXPortableDNoise(Vector3d& result, const Vector3d& EPoint);

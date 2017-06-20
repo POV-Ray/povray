@@ -131,6 +131,8 @@ const int NULL=0;
 #define POV_CPUINFO_DETAILS CPUInfo::GetDetails()
 #define POV_CPUINFO_H       "cpuid.h"
 
+// Test which enhanced instruction sets the compiler is generally able to support.
+
 #if defined(__INTEL_COMPILER)
     // Intel compiler
     #if (__INTEL_COMPILER >= 1110) // 11.1
@@ -161,10 +163,37 @@ const int NULL=0;
     #endif
 #endif
 
+// Test which enhanced instruction sets are actually enabled.
+
+// NOTE: The following tests may yield different results for individual translation units,
+// most notably platform-specific optimized implementations.
+#if defined (__GNUC__)
+    // GCC compiler (or any compiler imitating GCC)
+    #if !defined (__AVX__)
+        #define DISABLE_AVX
+    #endif
+    #if !defined (__AVX2__)
+        #define DISABLE_AVX2
+    #endif
+    #if !defined (__FMA__)
+        #define DISABLE_FMA3
+    #endif
+    #if !defined (__FMA4__)
+        #define DISABLE_FMA4
+    #endif
+#endif
+
+// Decide which optimized code to enable.
+
 #if defined(HAVE_ASM_AVX)
     #define TRY_OPTIMIZED_NOISE                 // optimized noise master switch.
     #define TRY_OPTIMIZED_NOISE_AVX_PORTABLE    // AVX-only compiler-optimized noise.
     #define TRY_OPTIMIZED_NOISE_AVX             // AVX-only hand-optimized noise (Intel).
+#endif
+
+#if defined(DISABLE_AVX)
+    #define DISABLE_OPTIMIZED_NOISE_AVX
+    #define DISABLE_OPTIMIZED_NOISE_AVX_PORTABLE
 #endif
 
 #if defined(HAVE_ASM_AVX) && defined(HAVE_ASM_FMA4)
@@ -172,9 +201,17 @@ const int NULL=0;
     #define TRY_OPTIMIZED_NOISE_AVXFMA4         // AVX/FMA4 hand-optimized noise (AMD).
 #endif
 
+#if defined(DISABLE_AVX) || defined(DISABLE_FMA4)
+    #define DISABLE_OPTIMIZED_NOISE_AVXFMA4
+#endif
+
 #if defined(HAVE_ASM_AVX2) && defined(HAVE_ASM_FMA3)
     #define TRY_OPTIMIZED_NOISE                 // optimized noise master switch.
     #define TRY_OPTIMIZED_NOISE_AVX2FMA3        // AVX2/FMA3 hand-optimized noise (Intel).
+#endif
+
+#if defined(DISABLE_AVX2) || defined(DISABLE_FMA3)
+    #define DISABLE_OPTIMIZED_NOISE_AVX2FMA3
 #endif
 
 #endif // BUILD_X86

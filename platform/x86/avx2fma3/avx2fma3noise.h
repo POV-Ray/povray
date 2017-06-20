@@ -45,6 +45,8 @@
 namespace pov
 {
 
+extern const bool kAVX2FMA3NoiseEnabled;
+
 void AVX2FMA3NoiseInit();
 
 /// Optimized Noise function using AVX2 and FMA3 instructions.

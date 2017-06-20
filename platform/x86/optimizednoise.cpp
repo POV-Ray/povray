@@ -78,6 +78,7 @@ OptimizedNoiseInfo gaOptimizedNoiseInfo[] = {
         "hand-optimized by Intel",  // info,
         AVX2FMA3Noise,              // noise,
         AVX2FMA3DNoise,             // dNoise,
+        &kAVX2FMA3NoiseEnabled,     // enabled,
         AVX2FMA3Supported,          // supported,
         CPUInfo::IsIntel,           // recommended,
         AVX2FMA3NoiseInit           // init
@@ -89,6 +90,7 @@ OptimizedNoiseInfo gaOptimizedNoiseInfo[] = {
         "hand-optimized by AMD, 2017-04 update", // info,
         AVXFMA4Noise,               // noise,
         AVXFMA4DNoise,              // dNoise,
+        &kAVXFMA4NoiseEnabled,      // enabled,
         AVXFMA4Supported,           // supported,
         NULL,                       // recommended,
         NULL                        // init
@@ -100,6 +102,7 @@ OptimizedNoiseInfo gaOptimizedNoiseInfo[] = {
         "hand-optimized by Intel",  // info,
         AVXNoise,                   // noise,
         AVXDNoise,                  // dNoise,
+        &kAVXNoiseEnabled,          // enabled,
         AVXSupported,               // supported,
         CPUInfo::IsIntel,           // recommended,
         AVXNoiseInit                // init
@@ -111,6 +114,7 @@ OptimizedNoiseInfo gaOptimizedNoiseInfo[] = {
         "compiler-optimized",       // info,
         AVXPortableNoise,           // noise,
         AVXPortableDNoise,          // dNoise,
+        &kAVXPortableNoiseEnabled,  // enabled,
         AVXSupported,               // supported,
         NULL,                       // recommended,
         NULL                        // init
