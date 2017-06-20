@@ -13,6 +13,11 @@ Notes:
   For example, to read FS#270, visit:
   http://bugs.povray.org/270
 
+  (Note: As of 3.7.1-beta.8 our flyspray bug tracker is officially mothballed,
+  and we no longer refer to it in the changelog. Any flyspray reports that
+  were still open at that point have been duplicated as GitHub issues titled
+  "Port of FSxxx - ...")
+
 - To view a referenced newsgroup posting (<xxxxx@news.povray.org>), prefix
   the message ID with the URL http://news.povray.org/.
   The '<' and '>' are optional (if using a shell you may want to omit them).
@@ -38,7 +43,7 @@ Changes between 3.7.1-TBD and 3.7.1
 TBD
 
 
-Changes between 3.7.1-beta.5 and 3.7.1-TBD
+Changes between 3.7.1-beta.7 and 3.7.1-beta.9
 =============================================
 
 Fixed or Mitigated Bugs
@@ -46,11 +51,114 @@ Fixed or Mitigated Bugs
 
 Reported via GitHub:
 
+  - #137 ("Port of FS313 - radiosity.cpp pov::RadiosityFunction::BeforeTile assertion failed") [final fix]
+
+Reported via the Newsgroups:
+
+  - <web.5943b6fab6538c359c5d6c810@news.povray.org>
+    (2017-06-16, povray.beta-test, "Re: Testing Required: Mosaic Pretrace and Abort-Continue")
+    Mosaic pretrace causes artifacts in the rendered image if `+ep1` or `+ep2`
+    is used without anti-aliasing (independent of abort-continue).
+
+Other Noteworthy
+----------------
+
+  - Unix build process now enforces alphabetical ordering of code units
+    (`.cpp` files) in the linkage process, to ensure bit-identical binaries
+    regardless of physical ordering of the files in the file system.
+  - Minor updates to the documentation.
+
+
+Changes between 3.7.1-beta.7 and 3.7.1-beta.8
+=============================================
+
+Fixed or Mitigated Bugs
+-----------------------
+
+Reported via GitHub:
+
+  - #147 ("Port of FS81 - sphere_sweep generating artifacts")
+
+Other Noteworthy
+----------------
+
+  - Minor updates to the documentation.
+  - The Unix build process and source code have been updated to make use of
+    the CPU-specific optimized noise implementations.
+
+
+Changes between 3.7.1-beta.6 and 3.7.1-beta.7
+=============================================
+
+This version is essentially a hotfix for some issues with beta.6.
+
+Fixed or Mitigated Bugs
+-----------------------
+
+Miscellaneous:
+
+  - Fixed a bug in the new `cubic_spline` sphere sweep bounding code.
+  - Reverted most of the sphere sweep performance and memory footprint
+    improvements introduced in the previous beta, as they caused artifacts.
+  - Fixed some sphere sweep inside texture inconsistencies when using
+    control points with negative radius.
+  - Fixed crash of Windows version on machines without AVX support.
+  - Fixed performance loss of Windows version observed with previous beta.
+
+
+Changes between 3.7.1-beta.5 and 3.7.1-beta.6
+=============================================
+
+The focus of this version has been on various performance improvements, as well
+as fixing a few bugs.
+
+Fixed or Mitigated Bugs
+-----------------------
+
+Reported via GitHub:
+
   - #260 ("Pavement pattern broken")
+  - #285 ("Port of FS243 - Sphere sweep behaves wrong when scaled")
+  - #287 ("Differencing a cubic sphere sweep - artifact problem!")
+
+Reported via FlySpray:
+
+  - FS#243 ("Sphere sweep behaves wrong when scaled")
+
+Reported via the Newsgroups:
+
+  - <58de4765$1@news.povray.org>
+    (2017-03-31, povray.advanced-users, "Parse error")
+    New lathe point sanity check breaks legacy scenes.
+  - <web.58e39b3f29046ace8464b730@news.povray.org>
+    (2017-04-04, povray.beta-test, "Re-Render of Editor-Bitmaps failed with Beta 5 ?")
+    Command-line-style switches with optional parameters (e.g. `-jN`) are not
+    accepted in INI files if the parameter is omitted (e.g. `-j`).
 
 Miscellaneous:
 
   - Minor updates to the documentation.
+  - Fixed `cubic_spline` sphere sweep bounding issue (see GitHub issue #147 /
+    FlySpray report FS#81).
+
+Known Issues
+------------
+
+  - The (non-bounding related) artifacts described in GitHub issue #147
+    (formerly FS#81) are back, as the workaround has been identified as the root
+    cause of even worse issues.
+
+Other Noteworthy
+----------------
+
+  - Improved anti-aliasing performance.
+  - Added another AVX-optimized noise generator implementation (this one using
+    compiler optimization), improving performance on AMD CPUs supporting AVX
+    but not FMA4.
+  - The choice of noise generator will now be written to the benchmark log.
+  - Improved performance of AVX/FMA4-optimized noise generator.
+  - Improved photons performance in main render phase.
+  - Improved sphere sweep performance and memory footprint.
 
 
 Changes between 3.7.1-beta.4 and 3.7.1-beta.5
@@ -143,7 +251,7 @@ Reported via GitHub:
 Reported via FlySpray:
 
   - FS#301 ("Fallback to default image size causes wrong values to be printed in message output")
-  - FS#321 ("FS#321 - bounding threshold inconsistency")
+  - FS#321 ("bounding threshold inconsistency")
 
 Reported via the Newsgroups:
 

@@ -15,9 +15,6 @@
     <ClCompile Include="..\..\source\frontend\console.cpp">
       <Filter>Frontend source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\frontend\defaultplatformbase.cpp">
-      <Filter>Frontend source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\frontend\display.cpp">
       <Filter>Frontend source</Filter>
     </ClCompile>
@@ -63,9 +60,6 @@
       <Filter>Frontend Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\frontend\console.h">
-      <Filter>Frontend Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\frontend\defaultplatformbase.h">
       <Filter>Frontend Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\frontend\display.h">

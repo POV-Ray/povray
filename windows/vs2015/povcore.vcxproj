@@ -413,7 +413,9 @@
     <ClCompile Include="..\..\source\core\material\blendmap.cpp" />
     <ClCompile Include="..\..\source\core\material\interior.cpp" />
     <ClCompile Include="..\..\source\core\material\media.cpp" />
+    <ClCompile Include="..\..\source\core\material\noise.cpp" />
     <ClCompile Include="..\..\source\core\material\pattern.cpp" />
+    <ClCompile Include="..\..\source\core\material\portablenoise.cpp" />
     <ClCompile Include="..\..\source\core\material\warp.cpp" />
     <ClCompile Include="..\..\source\core\material\normal.cpp" />
     <ClCompile Include="..\..\source\core\material\pigment.cpp" />
@@ -491,7 +493,9 @@
     <ClInclude Include="..\..\source\core\material\blendmap.h" />
     <ClInclude Include="..\..\source\core\material\interior.h" />
     <ClInclude Include="..\..\source\core\material\media.h" />
+    <ClInclude Include="..\..\source\core\material\noise.h" />
     <ClInclude Include="..\..\source\core\material\pattern.h" />
+    <ClInclude Include="..\..\source\core\material\portablenoise.h" />
     <ClInclude Include="..\..\source\core\material\warp.h" />
     <ClInclude Include="..\..\source\core\material\normal.h" />
     <ClInclude Include="..\..\source\core\material\pigment.h" />

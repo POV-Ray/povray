@@ -39,6 +39,8 @@
 #ifndef POVRAY_WINDOWS_SYSPOVCONFIG_MSVC_H
 #define POVRAY_WINDOWS_SYSPOVCONFIG_MSVC_H
 
+// TODO - a lot of stuff in here is only valid when compiling for x86 or x86_64.
+
 #if _MSC_VER < 1400
   #error "minimum Visual C++ version supported is 14.0 (supplied with VS 2005)"
 #endif
@@ -207,27 +209,22 @@
 #define ALIGN32                             __declspec(align(32))
 #define MACHINE_INTRINSICS_H                <intrin.h>
 
-// AVX-only optimized noise (Intel).
-#if (_MSC_VER >= 1900) || ((_MSC_VER >= 1600) && (defined(BUILD_AVX) || defined(BUILD_AVX2)))
-    // MSVC 2010 is known to give poor performance without `/arch:AVX`; MSVC 2015 is known to be fine.
-    #define TRY_OPTIMIZED_NOISE_AVX
-#endif
-
-// AVX/FMA4 optimized noise (AMD).
 #if _MSC_VER >= 1600
-    // TODO - review performance results of MSVC 2010 versions without `/arch:AVX`.
-    #define TRY_OPTIMIZED_NOISE_AVXFMA4
+    // compiler supports AVX.
+    #define TRY_OPTIMIZED_NOISE                 // optimized noise master switch.
+    #define TRY_OPTIMIZED_NOISE_AVX_PORTABLE    // AVX-only compiler-optimized noise.
+    #define TRY_OPTIMIZED_NOISE_AVX             // AVX-only hand-optimized noise (Intel).
+    #define TRY_OPTIMIZED_NOISE_AVXFMA4         // AVX/FMA4 hand-optimized noise (AMD).
 #endif
 
-// AVX2/FMA3 optimized noise (Intel).
 #if _MSC_VER >= 1900
-    // MSVC 2010 does not support AVX2 at all, so no need to worry about `/arch` setting.
-    #define TRY_OPTIMIZED_NOISE_AVX2FMA3
+    // compiler supports AVX2.
+    #define TRY_OPTIMIZED_NOISE                 // optimized noise master switch.
+    #define TRY_OPTIMIZED_NOISE_AVX2FMA3        // AVX2/FMA3 hand-optimized noise (Intel).
 #endif
 
-#if defined(TRY_OPTIMIZED_NOISE_AVX) || defined(TRY_OPTIMIZED_NOISE_AVXFMA4) || defined(TRY_OPTIMIZED_NOISE_AVX2FMA3)
-#define TRY_OPTIMIZED_NOISE(Noise,DNoise)   TryOptimizedNoise(Noise,DNoise)
-#define OPTIMIZED_NOISE_H                   "optimizednoise.h"
-#endif
+#define POV_CPUINFO         CPUInfo::GetFeatures()
+#define POV_CPUINFO_DETAILS CPUInfo::GetDetails()
+#define POV_CPUINFO_H       "cpuid.h"
 
 #endif // POVRAY_WINDOWS_SYSPOVCONFIG_MSVC_H

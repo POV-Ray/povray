@@ -266,6 +266,12 @@
     <ClCompile Include="..\..\source\core\bounding\bsptree.cpp">
       <Filter>Core Source\Bounding</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\core\material\portablenoise.cpp">
+      <Filter>Core Source\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\material\noise.cpp">
+      <Filter>Core Source\Material</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\core\configcore.h">
@@ -483,6 +489,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\core\bounding\bsptree.h">
       <Filter>Core Headers\Bounding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\material\portablenoise.h">
+      <Filter>Core Headers\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\material\noise.h">
+      <Filter>Core Headers\Material</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

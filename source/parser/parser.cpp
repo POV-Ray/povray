@@ -56,6 +56,7 @@
 #include "core/lighting/subsurface.h"
 #include "core/material/blendmap.h"
 #include "core/material/interior.h"
+#include "core/material/noise.h"
 #include "core/material/normal.h"
 #include "core/material/pigment.h"
 #include "core/material/texture.h"
@@ -3010,7 +3011,11 @@ ObjectPtr Parser::Parse_Lathe()
 
               if (Points[i][X] < 0.0)
               {
-                 Error("Lathe with linear spline has a point with an x value < 0.0.");
+                 if ((sceneData->EffectiveLanguageVersion() < 371) && ((i == 0) || (i == Object->Number - 1)))
+                     Warning("Lathe with linear spline has a first or last point with an x value < 0.0.\n"
+                             "Leads to artifacts and an error in #version 3.71 onward.");
+                 else
+                     Error("Lathe with linear spline has a point with an x value < 0.0.");
               }
 
               break;
@@ -3019,7 +3024,11 @@ ObjectPtr Parser::Parse_Lathe()
 
               if ((i > 0) && (Points[i][X] < 0.0))
               {
-                 Error("Lathe with quadratic spline has a point with an x value < 0.0.");
+                 if ((sceneData->EffectiveLanguageVersion() < 371) && (i == Object->Number - 1))
+                     Warning("Lathe with quadratic spline has last point with an x value < 0.0.\n"
+                             "Leads to artifacts and an error in #version 3.71 onward.");
+                 else
+                     Error("Lathe with quadratic spline has a point with an x value < 0.0.");
               }
 
               break;
@@ -3037,7 +3046,11 @@ ObjectPtr Parser::Parse_Lathe()
 
               if (((i%4 == 0) || (i%4 == 3)) && (Points[i][X] < 0.0))
               {
-                 Error("Lathe with Bezier spline has a point with an x value < 0.0.");
+                 if ((sceneData->EffectiveLanguageVersion() < 371) && ((i == 0) || (i == Object->Number - 1)))
+                     Warning("Lathe with Bezier spline has a first or last point with an x value < 0.0.\n"
+                             "Leads to artifacts and an error in #version 3.71 onward.");
+                 else
+                     Error("Lathe with Bezier spline has a point with an x value < 0.0.");
               }
               else if (!AlreadyWarned && (i%4 != 0) && (i%4 != 3) && (Points[i][X] < 0.0))
               {

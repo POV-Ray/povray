@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -282,6 +282,9 @@ enum
     kPOVAttrib_AssistingDevs         = 'Asst',
     kPOVAttrib_ContributingDevs      = 'Cont',
     kPOVAttrib_ImageLibVersions      = 'ILVe',
+    kPOVAttrib_Optimizations         = 'Opti',
+    kPOVAttrib_CPUInfo               = 'CPUI',
+    kPOVAttrib_CPUInfoDetails        = 'CPUD',
 
     // options handled by frontend
     kPOVAttrib_TestAbort             = 'TstA', // currently not supported by code
@@ -609,12 +612,13 @@ enum
     kPOVAttrib_PixelsCompleted       = 'PCom',
 
     // render pixel data/control
-    kPOVAttrib_PixelId               = 'PiId',
+    kPOVAttrib_PixelId               = 'PiId',  ///< (Int) ID of render block; only set if rendered to completion.
     kPOVAttrib_PixelSize             = 'PiSi',
     kPOVAttrib_PixelBlock            = 'PBlo',
     kPOVAttrib_PixelColors           = 'PCol',
     kPOVAttrib_PixelPositions        = 'PPos',
     kPOVAttrib_PixelSkipList         = 'PSLi',
+    kPOVAttrib_PixelFinal            = 'PFin',  ///< (Void) Set if pixel data is relevant for final image.
 
     // scene/view error reporting and TBD
     kPOVAttrib_CurrentLine           = 'CurL',
@@ -644,54 +648,6 @@ enum
     kPOVAttrib_EndColumn             = kPOVAttrib_Right,
     kPOVAttrib_StartRow              = kPOVAttrib_Top,
     kPOVAttrib_EndRow                = kPOVAttrib_Bottom
-};
-
-// Add new progress messages ONLY at the end!!!
-enum
-{
-    kPOVList_Prog_CreatingBoundingSlabs = 1,
-    kPOVList_Prog_CreatingVistaBuffer,
-    kPOVList_Prog_CreatingLightBuffers,
-    kPOVList_Prog_BuildingPhotonMaps,
-    kPOVList_Prog_LoadingPhotonMaps,
-    kPOVList_Prog_SavingPhotonMaps,
-    kPOVList_Prog_SortingPhotons,
-    kPOVList_Prog_ReclaimingMemory,
-    kPOVList_Prog_WritingINIFile,
-    kPOVList_Prog_WritingHistogramFile,
-    kPOVList_Prog_PerformingShelloutCommand,
-    kPOVList_Prog_ResumingInterruptedTrace,
-    kPOVList_Prog_ProcessingFrame,
-    kPOVList_Prog_Parsing,
-    kPOVList_Prog_Displaying,
-    kPOVList_Prog_Rendering,
-    kPOVList_Prog_DoneTracing,
-    kPOVList_Prog_AbortingRender,
-    kPOVList_Prog_UserAbort
-};
-
-// TODO FIXME - make this enum obsolete
-enum
-{
-    PROGRESS_CREATING_BOUNDING_SLABS = kPOVList_Prog_CreatingBoundingSlabs,
-    PROGRESS_CREATING_VISTA_BUFFER = kPOVList_Prog_CreatingVistaBuffer,
-    PROGRESS_CREATE_LIGHT_BUFFERS = kPOVList_Prog_CreatingLightBuffers,
-    PROGRESS_BUILDING_PHOTON_MAPS = kPOVList_Prog_BuildingPhotonMaps,
-    PROGRESS_LOADING_PHOTON_MAPS = kPOVList_Prog_LoadingPhotonMaps,
-    PROGRESS_SAVING_PHOTON_MAPS = kPOVList_Prog_SavingPhotonMaps,
-    PROGRESS_SORTING_PHOTONS = kPOVList_Prog_SortingPhotons,
-    PROGRESS_RECLAIMING_MEMORY = kPOVList_Prog_ReclaimingMemory,
-    PROGRESS_WRITE_INI_FILE = kPOVList_Prog_WritingINIFile,
-    PROGRESS_WRITE_HISTOGRAM_FILE = kPOVList_Prog_WritingHistogramFile,
-    PROGRESS_PERFORMING_SHELLOUT_COMMAND = kPOVList_Prog_PerformingShelloutCommand,
-    PROGRESS_RESUMING_INTERRUPTED_TRACE = kPOVList_Prog_ResumingInterruptedTrace,
-    PROGRESS_PROCESSING_FRAME = kPOVList_Prog_ProcessingFrame,
-    PROGRESS_PARSING = kPOVList_Prog_Parsing,
-    PROGRESS_DISPLAYING = kPOVList_Prog_Displaying,
-    PROGRESS_RENDERING = kPOVList_Prog_Rendering,
-    PROGRESS_DONE_TRACING = kPOVList_Prog_DoneTracing,
-    PROGRESS_ABORTING_RENDER = kPOVList_Prog_AbortingRender,
-    PROGRESS_USER_ABORT = kPOVList_Prog_UserAbort
 };
 
 enum

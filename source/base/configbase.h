@@ -863,6 +863,15 @@
     #define POV_COLOURSPACE_DEBUG POV_DEBUG
 #endif
 
+/// @def POV_CPUINFO_DEBUG
+/// Enable CPU detection run-time sanity checks and debugging aids.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_CPUINFO_DEBUG
+    #define POV_CPUINFO_DEBUG POV_DEBUG
+#endif
+
 /// @def POV_FILE_DEBUG
 /// Enable run-time sanity checks for file handling.
 ///
@@ -956,6 +965,12 @@
     #define POV_COLOURSPACE_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
     #define POV_COLOURSPACE_ASSERT(expr) POV_ASSERT_DISABLE(expr)
+#endif
+
+#if POV_CPUINFO_DEBUG
+    #define POV_CPUINFO_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_CPUINFO_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #if POV_FILE_DEBUG

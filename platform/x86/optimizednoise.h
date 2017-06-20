@@ -2,8 +2,8 @@
 ///
 /// @file platform/x86/optimizednoise.h
 ///
-/// This file dispatches to declarations related to implementations of the noise
-/// generator optimized for various specific extended x86 instruction set.
+/// Declarations related to the dynamic dispatch of the optimized noise
+/// generator implementations for the x86 family of CPUs.
 ///
 /// @copyright
 /// @parblock
@@ -37,64 +37,6 @@
 #ifndef POVRAY_OPTIMIZEDNOISE_H
 #define POVRAY_OPTIMIZEDNOISE_H
 
-#include "syspovconfigbase.h"
-#include "backend/frame.h"
-
-#ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
-#include "avx2fma3noise.h"
-#endif
-
-#ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
-#include "avxfma4noise.h"
-#endif
-
-#ifdef TRY_OPTIMIZED_NOISE_AVX
-#include "avxnoise.h"
-#endif
-
-#ifdef TRY_OPTIMIZED_NOISE
-
-namespace pov
-{
-
-typedef DBL (*NoiseFunction) (const Vector3d& EPoint, int noise_generator);
-typedef void (*DNoiseFunction) (Vector3d& result, const Vector3d& EPoint);
-
-inline bool TryOptimizedNoise(NoiseFunction* pFnNoise, DNoiseFunction* pFnDNoise)
-{
-    // TODO - review priority
-    // NOTE - Any change to the priorization should also be reflected in `pvengine.cpp`.
-#ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
-    if (AVX2FMA3NoiseSupported())
-    {
-        AVX2FMA3NoiseInit();
-        *pFnNoise  = AVX2FMA3Noise;
-        *pFnDNoise = AVX2FMA3DNoise;
-        return true;
-    }
-#endif
-#ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
-    if (AVXFMA4NoiseSupported())
-    {
-        *pFnNoise  = AVXFMA4Noise;
-        *pFnDNoise = AVXFMA4DNoise;
-        return true;
-    }
-#endif
-#ifdef TRY_OPTIMIZED_NOISE_AVX
-    if (AVXNoiseSupported())
-    {
-        AVXNoiseInit();
-        *pFnNoise  = AVXNoise;
-        *pFnDNoise = AVXDNoise;
-        return true;
-    }
-#endif
-    return false;
-}
-
-}
-
-#endif // TRY_OPTIMIZED_NOISE
+#include "core/configcore.h"
 
 #endif // POVRAY_OPTIMIZEDNOISE_H

@@ -37,21 +37,26 @@
 #ifndef POVRAY_CPUID_H
 #define POVRAY_CPUID_H
 
-#include "syspovconfigbase.h"
+#include "base/configbase.h"
 
-/// Test whether SSE2 is supported by both CPU and OS.
-bool HaveSSE2();
-
-/// Test whether AVX is supported by both CPU and OS.
-bool HaveAVX();
-
-/// Test whether AVX2 is supported by both CPU and OS.
-bool HaveAVX2();
-
-/// Test whether AVX and FMA4 are supported by both CPU and OS.
-bool HaveAVXFMA4();
-
-/// Test whether AVX2 and FMA3 are supported by both CPU and OS.
-bool HaveAVX2FMA3();
+class CPUInfo
+{
+public:
+    static bool SupportsSSE2();             ///< Test whether CPU and OS support SSE2.
+    static bool SupportsAVX();              ///< Test whether CPU and OS support AVX.
+    static bool SupportsAVX2();             ///< Test whether CPU and OS support AVX2.
+    static bool SupportsFMA3();             ///< Test whether CPU and OS support FMA3.
+    static bool SupportsFMA4();             ///< Test whether CPU and OS support FMA4.
+    static bool IsIntel();                  ///< Test whether CPU is genuine Intel product.
+    static bool IsAMD();                    ///< Test whether CPU is genuine AMD product.
+    static bool IsVM();                     ///< Test whether CPU cannot be detected reliably due to running in a VM.
+    static std::string GetFeatures();       ///< Query ASCII text string summarizing the features detected.
+#if POV_CPUINFO_DEBUG
+    static std::string GetDetails();        ///< Query ASCII text string detailing the raw CPUID (and related) information gathered.
+#endif
+private:
+    struct Data;
+    static const Data* gpData;
+};
 
 #endif // POVRAY_CPUID_H

@@ -112,16 +112,6 @@ enum WaveType
     kWaveType_Poly
 };
 
-enum NoiseGenType
-{
-    kNoiseGen_Default        = 0, ///< Indicates that the scene's global settings noise generator should be used.
-    kNoiseGen_Original       = 1, ///< POV-Ray original noise generator (pre-v3.5).
-    kNoiseGen_RangeCorrected = 2, ///< POV-Ray original noise generator with range correction (v3.5 and later).
-    kNoiseGen_Perlin         = 3  ///< Perlin noise generator.
-};
-const int kNoiseGen_Min = 1;
-const int kNoiseGen_Max = 3;
-
 /// Density file interpolation types
 enum DensityFileInterpolationType
 {

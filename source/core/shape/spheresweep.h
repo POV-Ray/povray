@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -142,9 +142,32 @@ class SphereSweep : public ObjectBase
 
         void Compute();
     protected:
+
+        /// @note
+        ///     This function is quasi-guaranteed to always compute a pair of intersection points
+        ///     (if any), even in the case of a "glancing blow", and with surface normals oriented
+        ///     away from the spline "backbone".
+        ///
         static bool Intersect_Sphere(const BasicRay &ray, const SPHSWEEP_SPH *Sphere, SPHSWEEP_INT *Isect);
+
+        /// @note
+        ///     This function is quasi-guaranteed to always compute pairs of intersection points
+        ///     (if any), even in the case of a "glancing blow", and with surface normals oriented
+        ///     away from the spline "backbone".
+        ///
         static int Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segment, SPHSWEEP_INT *Isect, TraceThreadData *Thread);
+
+        /// Eliminate interior surfaces.
+        ///
+        /// This function cleans up the intersections found, discarding any that lie inside other
+        /// portions of the sphere sweep.
+        ///
+        /// @note
+        ///     This function requires that intersections always come in pairs, with surface
+        ///     normals oriented away from the spline "backbone".
+        ///
         static int Find_Valid_Points(SPHSWEEP_INT *Inter, int Num_Inter, const BasicRay &ray);
+
         static int Comp_Isects(const void *Intersection_1, const void *Intersection_2);
         static int bezier_01(int degree, const DBL* Coef, DBL* Roots, bool sturm, DBL tolerance, TraceThreadData *Thread);
 };

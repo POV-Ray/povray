@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file platform/x86/avx2fma3noise.h
+/// @file platform/x86/avx2fma3/avx2fma3noise.h
 ///
 /// This file contains declarations related to implementations of the noise
 /// generator optimized for the AVX2 and FMA3 instruction set.
@@ -37,15 +37,13 @@
 #ifndef POVRAY_AVX2FMA3NOISE_H
 #define POVRAY_AVX2FMA3NOISE_H
 
-#include "syspovconfigbase.h"
-#include "backend/frame.h"
+#include "core/configcore.h"
+#include "core/math/vector.h"
 
 #ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
 
 namespace pov
 {
-
-bool AVX2FMA3NoiseSupported();
 
 void AVX2FMA3NoiseInit();
 

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,12 +33,13 @@
 ///
 //*******************************************************************************
 
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/imagemessagehandler.h"
 
-#include "base/types.h"
-#include "frontend/configfrontend.h"
+#include "base/image/encoding.h"
+#include "base/image/image.h"
+
+#include "frontend/display.h"
 #include "frontend/renderfrontend.h"
 
 // this must be the last file included
@@ -57,7 +58,8 @@ ImageMessageHandler::~ImageMessageHandler()
 
 void ImageMessageHandler::HandleMessage(const SceneData& sd, const ViewData& vd, POVMSType ident, POVMS_Object& msg)
 {
-    bool final = msg.Exist(kPOVAttrib_PixelId); // only final blocks will be stored in the image buffer, others are just sent to the preview display
+    // only blocks relevant for final image will be stored in the buffer, others are just sent to the preview display
+    bool final = msg.Exist(kPOVAttrib_PixelFinal);
 
     switch(ident)
     {

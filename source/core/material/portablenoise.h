@@ -1,9 +1,8 @@
 //******************************************************************************
 ///
-/// @file platform/x86/avxfma4noise.h
+/// @file core/material/portablenoise.h
 ///
-/// This file contains declarations related to implementations of the noise
-/// generator optimized for the AVX and FMA4 instruction set.
+/// Declarations related to the portable noise generator.
 ///
 /// @copyright
 /// @parblock
@@ -34,29 +33,10 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_AVXFMA4NOISE_H
-#define POVRAY_AVXFMA4NOISE_H
+#ifndef POVRAY_CORE_PORTABLENOISE_H
+#define POVRAY_CORE_PORTABLENOISE_H
 
-#include "syspovconfigbase.h"
-#include "backend/frame.h"
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "core/configcore.h"
 
-#ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
-
-namespace pov
-{
-
-bool AVXFMA4NoiseSupported();
-
-/// Optimized Noise function using AVX and FMA4 instructions.
-/// @author Optimized by AMD
-DBL AVXFMA4Noise(const Vector3d& EPoint, int noise_generator);
-
-/// Optimized DNoise function using AVX and FMA4 instructions.
-/// @author Optimized by AMD
-void AVXFMA4DNoise(Vector3d& result, const Vector3d& EPoint);
-
-}
-
-#endif // TRY_OPTIMIZED_NOISE_AVXFMA4
-
-#endif // POVRAY_AVXFMA4NOISE_H
+#endif // POVRAY_CORE_PORTABLENOISE_H

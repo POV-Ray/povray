@@ -60,26 +60,10 @@ struct GenericTurbulenceWarp;
 * Global preprocessor defines
 ******************************************************************************/
 
-/*
- * Macro to create random number in the [0; 1] range.
- */
-
 #define FLOOR(x)  ((x) >= 0.0 ? floor(x) : (0.0 - floor(0.0 - (x)) - 1.0))
-
-// Hash1dRTableIndex assumed values in the range 0..8191
-#define Hash1dRTableIndex(a,b)   \
-    ((hashTable[(int)(a) ^ (b)] & 0xFF) * 2)
-
-// Hash2d assumed values in the range 0..8191
-#define Hash2d(a,b)   \
-    hashTable[(int)(hashTable[(int)(a)] ^ (b))]
 
 #define Hash3d(a,b,c) \
     hashTable[(int)(hashTable[(int)(hashTable[(int)((a) & 0xfff)] ^ ((b) & 0xfff))] ^ ((c) & 0xfff))]
-
-const int NOISE_MINX = -10000;
-const int NOISE_MINY = NOISE_MINX;
-const int NOISE_MINZ = NOISE_MINX;
 
 
 /*****************************************************************************
@@ -148,37 +132,9 @@ struct Finish_Struct
 
 
 /*****************************************************************************
-* Global variables
-******************************************************************************/
-
-#ifdef DYNAMIC_HASHTABLE
-extern unsigned short *hashTable;
-#else
-extern ALIGN16 unsigned short hashTable[8192];
-#endif
-
-
-/*****************************************************************************
 * Global functions
 ******************************************************************************/
 
-void Initialize_Noise (void);
-void Initialize_Waves(vector<double>& waveFrequencies, vector<Vector3d>& waveSources, unsigned int numberOfWaves);
-void Free_Noise_Tables (void);
-
-DBL SolidNoise(const Vector3d& P);
-
-#ifdef TRY_OPTIMIZED_NOISE
-extern DBL (*Noise) (const Vector3d& EPoint, int noise_generator);
-extern void (*DNoise) (Vector3d& result, const Vector3d& EPoint);
-void Initialise_NoiseDispatch();
-#else // TRY_OPTIMIZED_NOISE
-INLINE_NOISE DBL Noise (const Vector3d& EPoint, int noise_generator);
-INLINE_NOISE void DNoise (Vector3d& result, const Vector3d& EPoint);
-#endif // TRY_OPTIMIZED_NOISE
-
-DBL Turbulence (const Vector3d& EPoint, const GenericTurbulenceWarp* Turb, int noise_generator);
-void DTurbulence (Vector3d& result, const Vector3d& EPoint, const GenericTurbulenceWarp* Turb);
 DBL cycloidal (DBL value);
 DBL Triangle_Wave (DBL value);
 void Transform_Textures (TEXTURE *Textures, const TRANSFORM *Trans);

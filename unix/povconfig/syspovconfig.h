@@ -125,18 +125,59 @@ const int NULL=0;
 #define METADATA_PLATFORM_STRING BUILD_ARCH
 #define METADATA_COMPILER_STRING COMPILER_VERSION
 
-#if 0 // TODO - more work needed before we can enable this
+#ifdef BUILD_X86
 
-#ifdef ENABLE_AVX2
-#define TRY_OPTIMIZED_NOISE
-#define TRY_OPTIMIZED_NOISE_AVX2FMA3
+#define POV_CPUINFO         CPUInfo::GetFeatures()
+#define POV_CPUINFO_DETAILS CPUInfo::GetDetails()
+#define POV_CPUINFO_H       "cpuid.h"
+
+#if defined(__INTEL_COMPILER)
+    // Intel compiler
+    #if (__INTEL_COMPILER >= 1110) // 11.1
+        #define HAVE_ASM_AVX
+    #endif
+    #if (__INTEL_COMPILER >= 1400) // 14.0
+        #define HAVE_ASM_AVX2
+        #define HAVE_ASM_FMA3
+    #endif
+#elif defined(__GNUC__)
+    // GCC compiler (or yet another compiler imitating GCC)
+    #if (__GNUC__ == 4) // 4.x
+        #if (__GNUC_MINOR__ >= 5) // 4.5 or later
+            #define HAVE_ASM_FMA4
+        #endif
+        #if (__GNUC_MINOR__ >= 6) // 4.6 or later
+            #define HAVE_ASM_AVX
+        #endif
+        #if (__GNUC_MINOR__ >= 7) // 4.7 or later
+            #define HAVE_ASM_AVX2
+            #define HAVE_ASM_FMA3
+        #endif
+    #elif (__GNUC__ >= 5) // 5.x or later
+        #define HAVE_ASM_AVX
+        #define HAVE_ASM_AVX2
+        #define HAVE_ASM_FMA3
+        #define HAVE_ASM_FMA4
+    #endif
 #endif
 
-#ifdef TRY_OPTIMIZED_NOISE
-#define OPTIMIZED_NOISE_H "optimizednoise.h"
+#if defined(HAVE_ASM_AVX)
+    #define TRY_OPTIMIZED_NOISE                 // optimized noise master switch.
+    #define TRY_OPTIMIZED_NOISE_AVX_PORTABLE    // AVX-only compiler-optimized noise.
+    #define TRY_OPTIMIZED_NOISE_AVX             // AVX-only hand-optimized noise (Intel).
 #endif
 
+#if defined(HAVE_ASM_AVX) && defined(HAVE_ASM_FMA4)
+    #define TRY_OPTIMIZED_NOISE                 // optimized noise master switch.
+    #define TRY_OPTIMIZED_NOISE_AVXFMA4         // AVX/FMA4 hand-optimized noise (AMD).
 #endif
+
+#if defined(HAVE_ASM_AVX2) && defined(HAVE_ASM_FMA3)
+    #define TRY_OPTIMIZED_NOISE                 // optimized noise master switch.
+    #define TRY_OPTIMIZED_NOISE_AVX2FMA3        // AVX2/FMA3 hand-optimized noise (Intel).
+#endif
+
+#endif // BUILD_X86
 
 
 #ifdef HAVE_NAN

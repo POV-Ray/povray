@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file platform/x86/avxnoise.h
+/// @file platform/x86/avx/avxnoise.h
 ///
 /// This file contains declarations related to implementations of the noise
 /// generator optimized for the AVX instruction set.
@@ -37,16 +37,13 @@
 #ifndef POVRAY_AVXNOISE_H
 #define POVRAY_AVXNOISE_H
 
-#include "syspovconfigbase.h"
-#include "backend/frame.h"
+#include "core/configcore.h"
+#include "core/math/vector.h"
 
 #ifdef TRY_OPTIMIZED_NOISE_AVX
 
 namespace pov
 {
-
-bool AVXNoiseSupported();
-
 
 void AVXNoiseInit();
 

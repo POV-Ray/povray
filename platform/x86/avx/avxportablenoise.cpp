@@ -1,14 +1,15 @@
 //******************************************************************************
 ///
-/// @file frontend/defaultplatformbase.cpp
+/// @file platform/x86/avx/avxportablenoise.cpp
 ///
-/// This module contains the C++ DefaultPlatformBase class.
+/// This file serves as a stub to compile an alternative AVX-optimized version
+/// of the default portable noise implementation.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,18 +34,25 @@
 ///
 //******************************************************************************
 
-// configfrontend.h must always be the first POV file included within frontend *.cpp files
-#include "frontend/configfrontend.h"
-#include "frontend/defaultplatformbase.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "avxportablenoise.h"
 
-#include "povms/povmscpp.h"
+#include "core/material/pattern.h"
+#include "core/material/texture.h"
 
-#include "base/pov_err.h"
+/// @file
+/// @attention
+///     This file **must not** contain any code that might get called before CPU
+///     support for this optimized implementation has been confirmed. Most
+///     notably, the function to detect support itself must not reside in this
+///     file.
 
-// this must be the last file included
-#include "base/povdebug.h"
+#ifdef TRY_OPTIMIZED_NOISE_AVX_PORTABLE
 
-namespace pov_base
-{
+#define PORTABLE_OPTIMIZED_NOISE
+#define PortableNoise  AVXPortableNoise
+#define PortableDNoise AVXPortableDNoise
+#include "core/material/portablenoise.cpp" // pulls in the actual code
 
-}
+#endif // TRY_OPTIMIZED_NOISE_AVX_PORTABLE
+

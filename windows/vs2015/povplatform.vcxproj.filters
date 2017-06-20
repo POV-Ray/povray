@@ -25,9 +25,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\platform\x86\avxfma4noise.cpp">
-      <Filter>Platform Source\x86</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\platform\x86\cpuid.cpp">
       <Filter>Platform Source\x86</Filter>
     </ClCompile>
@@ -43,17 +40,23 @@
     <ClCompile Include="..\..\platform\windows\syspovpath.cpp">
       <Filter>Platform Source\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\platform\x86\avx2fma3noise.cpp">
+    <ClCompile Include="..\..\platform\x86\avx2fma3\avx2fma3noise.cpp">
       <Filter>Platform Source\x86</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\platform\x86\avxnoise.cpp">
+    <ClCompile Include="..\..\platform\x86\avxfma4\avxfma4noise.cpp">
+      <Filter>Platform Source\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\platform\x86\avx\avxnoise.cpp">
+      <Filter>Platform Source\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\platform\x86\avx\avxportablenoise.cpp">
+      <Filter>Platform Source\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\platform\x86\optimizednoise.cpp">
       <Filter>Platform Source\x86</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\platform\x86\avxfma4noise.h">
-      <Filter>Platform Headers\x86</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\platform\x86\cpuid.h">
       <Filter>Platform Headers\x86</Filter>
     </ClInclude>
@@ -72,13 +75,19 @@
     <ClInclude Include="..\..\platform\windows\syspovdebug.h">
       <Filter>Platform Headers\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\platform\x86\avx2fma3noise.h">
-      <Filter>Platform Headers\x86</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\platform\x86\optimizednoise.h">
       <Filter>Platform Headers\x86</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\platform\x86\avxnoise.h">
+    <ClInclude Include="..\..\platform\x86\avx2fma3\avx2fma3noise.h">
+      <Filter>Platform Headers\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\x86\avxfma4\avxfma4noise.h">
+      <Filter>Platform Headers\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\x86\avx\avxnoise.h">
+      <Filter>Platform Headers\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\x86\avx\avxportablenoise.h">
       <Filter>Platform Headers\x86</Filter>
     </ClInclude>
   </ItemGroup>

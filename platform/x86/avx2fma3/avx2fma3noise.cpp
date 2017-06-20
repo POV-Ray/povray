@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file platform/x86/avx2fma3noise.cpp
+/// @file platform/x86/avx2fma3/avx2fma3noise.cpp
 ///
 /// This file contains implementations of the noise generator optimized for the
 /// AVX2 and FMA3 instruction set.
@@ -41,16 +41,21 @@
 ///
 //******************************************************************************
 
-#include "syspovconfigbase.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "avx2fma3noise.h"
 
 #ifdef MACHINE_INTRINSICS_H
 #include MACHINE_INTRINSICS_H
 #endif
 
-#include "core/material/pattern.h"
-#include "core/material/texture.h"
-#include "cpuid.h"
+#include "core/material/noise.h"
+
+/// @file
+/// @attention
+///     This file **must not** contain any code that might get called before CPU
+///     support for this optimized implementation has been confirmed. Most
+///     notably, the function to detect support itself must not reside in this
+///     file.
 
 /*****************************************************************************/
 
@@ -128,12 +133,6 @@ void AVX2FMA3NoiseInit()
         avx2table[(4 * i) + 3] = RTable[2 * i + 6];
 #endif
     }
-}
-
-
-bool AVX2FMA3NoiseSupported()
-{
-    return HaveAVX2FMA3();
 }
 
 /*****************************************************************************
@@ -305,7 +304,6 @@ DBL AVX2FMA3Noise(const Vector3d& EPoint, int noise_generator)
 
 #if CHECK_FUNCTIONAL
     {
-        extern DBL PortableNoise(const Vector3d& EPoint, int noise_generator);
         DBL orig_sum = PortableNoise(EPoint, noise_generator);
         if (fabs(orig_sum - sum) >= EPSILON)
         {
@@ -479,7 +477,6 @@ void AVX2FMA3DNoise(Vector3d& result, const Vector3d& EPoint)
 
 #if CHECK_FUNCTIONAL
     {
-        extern void PortableDNoise(Vector3d& result, const Vector3d& EPoint);
         Vector3d portable_res;
         PortableDNoise(portable_res , param);
         if (fabs(portable_res[X] - result[X]) >= EPSILON)
