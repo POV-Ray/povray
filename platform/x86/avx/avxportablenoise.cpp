@@ -49,10 +49,28 @@
 
 #ifdef TRY_OPTIMIZED_NOISE_AVX_PORTABLE
 
+#ifndef DISABLE_OPTIMIZED_NOISE_AVX_PORTABLE
+
+namespace pov
+{
+const bool kAVXPortableNoiseEnabled = true;
+}
+
 #define PORTABLE_OPTIMIZED_NOISE
 #define PortableNoise  AVXPortableNoise
 #define PortableDNoise AVXPortableDNoise
 #include "core/material/portablenoise.cpp" // pulls in the actual code
+
+#else // DISABLE_OPTIMIZED_NOISE_AVX_PORTABLE
+
+namespace pov
+{
+const bool kAVXPortableNoiseEnabled = false;
+DBL AVXPortableNoise(const Vector3d& EPoint, int noise_generator) { POV_ASSERT(false); return 0.0; }
+void AVXPortableDNoise(Vector3d& result, const Vector3d& EPoint) { POV_ASSERT(false); }
+}
+
+#endif // DISABLE_OPTIMIZED_NOISE_AVX_PORTABLE
 
 #endif // TRY_OPTIMIZED_NOISE_AVX_PORTABLE
 

@@ -138,6 +138,9 @@ struct OptimizedNoiseInfo
     /// Pointer to the optimized implementation of @ref PortableDNoise().
     DNoiseFunction dNoise;
 
+    /// Pointer to a constant indicating whether the implementation is enabled in the binary.
+    const bool* enabled;
+
     /// Pointer to a function testing whether the optimized implementation is supported.
     /// A value of `NULL` indicates universal support.
     bool(*supported)();

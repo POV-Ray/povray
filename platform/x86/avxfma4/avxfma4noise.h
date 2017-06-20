@@ -45,6 +45,8 @@
 namespace pov
 {
 
+extern const bool kAVXFMA4NoiseEnabled;
+
 /// Optimized Noise function using AVX and FMA4 instructions.
 /// @author Optimized by AMD
 DBL AVXFMA4Noise(const Vector3d& EPoint, int noise_generator);
