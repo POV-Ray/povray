@@ -45,6 +45,8 @@
 namespace pov
 {
 
+extern const bool kAVXNoiseEnabled;
+
 void AVXNoiseInit();
 
 /// Optimized Noise function using AVX instructions.

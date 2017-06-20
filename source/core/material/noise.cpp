@@ -668,6 +668,7 @@ OptimizedNoiseInfo gPortableNoiseInfo = {
     "portable",     // info,
     PortableNoise,  // noise,
     PortableDNoise, // dNoise,
+    NULL,           // enabled,
     NULL,           // supported,
     NULL,           // recommended,
     NULL            // init
@@ -677,9 +678,12 @@ const OptimizedNoiseInfo* GetRecommendedOptimizedNoise()
 {
     for (const OptimizedNoiseInfo* p = gaOptimizedNoiseInfo; p->name != NULL; ++p)
     {
-        POV_CORE_ASSERT(p->supported);
-        if (p->supported() && ((p->recommended == NULL) || p->recommended()))
-            return p;
+        if ((p->enabled == NULL) || *p->enabled)
+        {
+            POV_CORE_ASSERT(p->supported);
+            if (p->supported() && ((p->recommended == NULL) || p->recommended()))
+                return p;
+        }
     }
 
     // No optimized implementation found; go for the portable implementation.
@@ -690,9 +694,12 @@ const OptimizedNoiseInfo* GetOptimizedNoise(std::string name)
 {
     for (const OptimizedNoiseInfo* p = gaOptimizedNoiseInfo; p->name != NULL; ++p)
     {
-        POV_CORE_ASSERT(p->supported);
-        if (p->name == name)
-            return p;
+        if ((p->enabled == NULL) || *p->enabled)
+        {
+            POV_CORE_ASSERT(p->supported);
+            if (p->name == name)
+                return p;
+        }
     }
 
     // Specified implementation not found; go for the portable implementation.
