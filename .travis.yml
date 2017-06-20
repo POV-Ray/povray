@@ -25,6 +25,9 @@ matrix:
   - os: linux
     compiler: gcc
 
+sudo: required
+dist: trusty
+
 addons:
   apt:
     packages:
