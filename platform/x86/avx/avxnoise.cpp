@@ -48,8 +48,7 @@
 #include MACHINE_INTRINSICS_H
 #endif
 
-#include "core/material/pattern.h"
-#include "core/material/texture.h"
+#include "core/material/noise.h"
 
 /// @file
 /// @attention
@@ -63,6 +62,12 @@
 
 #ifdef TRY_OPTIMIZED_NOISE_AVX
 
+namespace pov
+{
+
+#ifndef DISABLE_OPTIMIZED_NOISE_AVX
+
+const bool kAVXNoiseEnabled = true;
 
 #define FMA_PD(a,b,c) _mm256_add_pd(_mm256_mul_pd((a),(b)),(c))
 
@@ -121,9 +126,6 @@ static inline __m256d permute4x64_functional(const __m256d& x, int i)
 /* AVX Specific optimizations: Its found that more than 50% of the time is spent in         */
 /* Noise and DNoise. These functions have been optimized using AVX instructions             */
 /********************************************************************************************/
-
-namespace pov
-{
 
 
 
@@ -318,7 +320,6 @@ DBL AVXNoise(const Vector3d& EPoint, int noise_generator)
 
 #if CHECK_FUNCTIONAL
     {
-        extern DBL PortableNoise(const Vector3d& EPoint, int noise_generator);
         DBL orig_sum = PortableNoise(EPoint, noise_generator);
         if (fabs(orig_sum - sum) >= EPSILON)
         {
@@ -492,7 +493,6 @@ void AVXDNoise(Vector3d& result, const Vector3d& EPoint)
 
 #if CHECK_FUNCTIONAL
     {
-        extern void PortableDNoise(Vector3d& result, const Vector3d& EPoint);
         Vector3d portable_res;
         PortableDNoise(portable_res , param);
         if (fabs(portable_res[X] - result[X]) >= EPSILON)
@@ -518,6 +518,15 @@ void AVXDNoise(Vector3d& result, const Vector3d& EPoint)
     return;
 
 }
+
+#else // DISABLE_OPTIMIZED_NOISE_AVX
+
+const bool kAVXNoiseEnabled = false;
+void AVXNoiseInit() { POV_ASSERT(false); }
+DBL AVXNoise(const Vector3d& EPoint, int noise_generator) { POV_ASSERT(false); return 0.0; }
+void AVXDNoise(Vector3d& result, const Vector3d& EPoint) { POV_ASSERT(false); }
+
+#endif // DISABLE_OPTIMIZED_NOISE_AVX
 
 }
 

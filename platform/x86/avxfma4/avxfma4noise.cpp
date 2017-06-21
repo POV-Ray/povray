@@ -43,8 +43,7 @@
 #include MACHINE_INTRINSICS_H
 #endif
 
-#include "core/material/pattern.h"
-#include "core/material/texture.h"
+#include "core/material/noise.h"
 
 /// @file
 /// @attention
@@ -64,6 +63,10 @@
 
 namespace pov
 {
+
+#ifndef DISABLE_OPTIMIZED_NOISE_AVXFMA4
+
+const bool kAVXFMA4NoiseEnabled = true;
 
 extern DBL RTable[];
 
@@ -404,6 +407,14 @@ void AVXFMA4DNoise(Vector3d& result, const Vector3d& EPoint)
     _mm_storeu_pd(*result, sum_X_Y);
     _mm_store_sd(&result[Z], sum__Z);
 }
+
+#else // DISABLE_OPTIMIZED_NOISE_AVXFMA4
+
+const bool kAVXFMA4NoiseEnabled = false;
+DBL AVXFMA4Noise(const Vector3d& EPoint, int noise_generator) { POV_ASSERT(false); return 0.0; }
+void AVXFMA4DNoise(Vector3d& result, const Vector3d& EPoint) { POV_ASSERT(false); }
+
+#endif // DISABLE_OPTIMIZED_NOISE_AVXFMA4
 
 }
 

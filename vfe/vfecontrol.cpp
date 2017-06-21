@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -50,9 +50,9 @@ namespace pov_frontend
   extern struct ProcessRenderOptions::Output_FileType_Table FileTypeTable[];
 }
 
-static struct pov_base::ProcessOptions::INI_Parser_Table *GetPT(const char *OptionName)
+static struct pov_frontend::ProcessOptions::INI_Parser_Table *GetPT(const char *OptionName)
 {
-  for (struct pov_base::ProcessOptions::INI_Parser_Table *op = pov_frontend::RenderOptions_INI_Table; op->keyword != NULL; op++)
+  for (struct pov_frontend::ProcessOptions::INI_Parser_Table *op = pov_frontend::RenderOptions_INI_Table; op->keyword != NULL; op++)
     if (strcmp(op->keyword, OptionName) == 0)
       return op;
   return NULL;

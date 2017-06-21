@@ -39,27 +39,4 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
-#include "core/coretypes.h"
-
-namespace pov
-{
-
-//##############################################################################
-///
-/// @defgroup PovCoreMaterialTexture Textures
-/// @ingroup PovCore
-///
-/// @{
-
-DBL PortableNoise(const Vector3d& EPoint, int noise_generator);
-
-void PortableDNoise(Vector3d& result, const Vector3d& EPoint);
-
-
-/// @}
-///
-//##############################################################################
-
-}
-
 #endif // POVRAY_CORE_PORTABLENOISE_H

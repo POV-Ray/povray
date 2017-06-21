@@ -48,8 +48,7 @@
 #include MACHINE_INTRINSICS_H
 #endif
 
-#include "core/material/pattern.h"
-#include "core/material/texture.h"
+#include "core/material/noise.h"
 
 /// @file
 /// @attention
@@ -63,6 +62,12 @@
 
 #ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
 
+namespace pov
+{
+
+#ifndef DISABLE_OPTIMIZED_NOISE_AVX2FMA3
+
+const bool kAVX2FMA3NoiseEnabled = true;
 
 /******************************************************/
 /* Use avx2 intrinsics for vpermpd and native fma3    */
@@ -108,9 +113,6 @@
 /* AVX2+FMA3 Specific optimizations: Its found that more than 50% of the time is spent in   */
 /* Noise and DNoise. These functions have been optimized using AVX2 and FMA3 instructions   */
 /********************************************************************************************/
-
-namespace pov
-{
 
 
 
@@ -305,7 +307,6 @@ DBL AVX2FMA3Noise(const Vector3d& EPoint, int noise_generator)
 
 #if CHECK_FUNCTIONAL
     {
-        extern DBL PortableNoise(const Vector3d& EPoint, int noise_generator);
         DBL orig_sum = PortableNoise(EPoint, noise_generator);
         if (fabs(orig_sum - sum) >= EPSILON)
         {
@@ -479,7 +480,6 @@ void AVX2FMA3DNoise(Vector3d& result, const Vector3d& EPoint)
 
 #if CHECK_FUNCTIONAL
     {
-        extern void PortableDNoise(Vector3d& result, const Vector3d& EPoint);
         Vector3d portable_res;
         PortableDNoise(portable_res , param);
         if (fabs(portable_res[X] - result[X]) >= EPSILON)
@@ -505,6 +505,15 @@ void AVX2FMA3DNoise(Vector3d& result, const Vector3d& EPoint)
     return;
 
 }
+
+#else // DISABLE_OPTIMIZED_NOISE_AVX2FMA3
+
+const bool kAVX2FMA3NoiseEnabled = false;
+void AVX2FMA3NoiseInit() { POV_ASSERT(false); }
+DBL AVX2FMA3Noise(const Vector3d& EPoint, int noise_generator) { POV_ASSERT(false); return 0.0; }
+void AVX2FMA3DNoise(Vector3d& result, const Vector3d& EPoint) { POV_ASSERT(false); }
+
+#endif // DISABLE_OPTIMIZED_NOISE_AVX2FMA3
 
 }
 

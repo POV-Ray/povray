@@ -387,7 +387,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\source\frontend\animationprocessing.cpp" />
     <ClCompile Include="..\..\source\frontend\console.cpp" />
-    <ClCompile Include="..\..\source\frontend\defaultplatformbase.cpp" />
     <ClCompile Include="..\..\source\frontend\display.cpp" />
     <ClCompile Include="..\..\source\frontend\filemessagehandler.cpp" />
     <ClCompile Include="..\..\source\frontend\imagemessagehandler.cpp" />
@@ -412,7 +411,6 @@
     <ClInclude Include="..\..\source\frontend\animationprocessing.h" />
     <ClInclude Include="..\..\source\frontend\configfrontend.h" />
     <ClInclude Include="..\..\source\frontend\console.h" />
-    <ClInclude Include="..\..\source\frontend\defaultplatformbase.h" />
     <ClInclude Include="..\..\source\frontend\display.h" />
     <ClInclude Include="..\..\source\frontend\filemessagehandler.h" />
     <ClInclude Include="..\..\source\frontend\imagemessagehandler.h" />

@@ -49,10 +49,7 @@
 #include "base/stringutilities.h"
 #include "base/version_info.h"
 
-#include "core/material/blendmap.h"
-#include "core/material/pattern.h"
-#include "core/material/texture.h"
-#include "core/math/matrix.h"
+#include "core/material/noise.h"
 #include "core/scene/scenedata.h"
 
 // this must be the last file included

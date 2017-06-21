@@ -51,11 +51,15 @@
 #include "base/timer.h"
 #include "base/types.h"
 
+#include "core/material/noise.h"
 #include "core/material/pattern.h"
-#include "core/material/texture.h"
 
 #include "backend/control/renderbackend.h"
 #include "backend/support/task.h"
+
+#ifdef POV_CPUINFO_H
+#include POV_CPUINFO_H
+#endif
 
 #ifndef DONT_SHOW_IMAGE_LIB_VERSIONS
     // these are needed for copyright notices and version numbers
@@ -483,6 +487,39 @@ void BuildInitInfo(POVMSObjectPtr msg)
 #endif  // DONT_SHOW_IMAGE_LIB_VERSIONS
     if(err == kNoErr)
         err = POVMSObject_Set(msg, &attrlist, kPOVAttrib_ImageLibVersions);
+
+#ifdef POV_CPUINFO
+    std::string cpuInfo(POV_CPUINFO);
+    if (err == kNoErr)
+        err = POVMSUtil_SetString(msg, kPOVAttrib_CPUInfo, cpuInfo.c_str());
+#endif
+
+#if POV_CPUINFO_DEBUG && defined(POV_CPUINFO_DETAILS)
+    std::string cpuDetail(POV_CPUINFO_DETAILS);
+    if (err == kNoErr)
+        err = POVMSUtil_SetString(msg, kPOVAttrib_CPUInfoDetails, cpuDetail.c_str());
+#endif
+
+    if (err == kNoErr)
+        err = POVMSAttrList_New(&attrlist);
+    if (err == kNoErr)
+    {
+#ifdef TRY_OPTIMIZED_NOISE
+        const OptimizedNoiseInfo* pNoise = GetRecommendedOptimizedNoise();
+        std::string noiseGenInfo = "Noise generator: " + std::string(pNoise->name) + " (" + ::string(pNoise->info) + ")";
+        err = POVMSAttr_New(&attr);
+        if (err == kNoErr)
+        {
+            err = POVMSAttr_Set(&attr, kPOVMSType_CString, reinterpret_cast<const void *>(noiseGenInfo.c_str()), noiseGenInfo.length() + 1);
+            if (err == kNoErr)
+                err = POVMSAttrList_Append(&attrlist, &attr);
+            else
+                err = POVMSAttr_Delete(&attr);
+        }
+#endif
+    }
+    if (err == kNoErr)
+        err = POVMSObject_Set(msg, &attrlist, kPOVAttrib_Optimizations);
 }
 
 void ExtractLibraryVersion(const char *str, char *buffer)
