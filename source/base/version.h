@@ -72,17 +72,17 @@
 
 /// Official source code version formatted for Windows resource files.
 /// @note For pre-releases this should be _marginally less_ than the planned final version.
-#define OFFICIAL_VERSION_WINRC  3,7,0,9999
+#define OFFICIAL_VERSION_WINRC  3,7,1
 
 /// @def POV_RAY_PRERELEASE
 /// Pre-release identifier.
 /// Leave undefined for final releases.
-#define POV_RAY_PRERELEASE "beta.9"
+#define POV_RAY_PRERELEASE "rc.1"
 
 /// @def POVRAY_IS_BETA
 /// Whether this version is a beta.
 /// Leave undefined for pre-beta, release candidate or final releases.
-#define POVRAY_IS_BETA
+//#define POVRAY_IS_BETA
 
 /// @}
 ///

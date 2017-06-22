@@ -29,7 +29,21 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
-Changes between 3.7.1-beta.7 and 3.7.1-beta.9
+Changes between 3.7.1-beta.9 and 3.7.1-rc.1
+===========================================
+
+Fixed or Mitigated Bugs
+-----------------------
+
+Miscellaneous:
+
+  - Fixed a bug that broke builds without optimized noise.
+  - Fixed an issue in optimized noise when building on Unix with C++ compiler
+    switches disabling any of the relevant enhanced instruction sets (e.g.
+    `CXXFLAGS=-mno-fma`).
+
+
+Changes between 3.7.1-beta.8 and 3.7.1-beta.9
 =============================================
 
 Fixed or Mitigated Bugs
