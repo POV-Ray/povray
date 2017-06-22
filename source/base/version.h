@@ -72,7 +72,7 @@
 
 /// Official source code version formatted for Windows resource files.
 /// @note For pre-releases this should be _marginally less_ than the planned final version.
-#define OFFICIAL_VERSION_WINRC  3,7,1
+#define OFFICIAL_VERSION_WINRC  3,7,1,0
 
 /// @def POV_RAY_PRERELEASE
 /// Pre-release identifier.
