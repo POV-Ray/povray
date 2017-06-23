@@ -8,9 +8,6 @@ will need to run a pre-build step. This generates the configure script
 and does a few other things usually performed by our developers prior to
 releasing a source package.
 
-NB if you have improvements to the below instructions, please add a comment
-to issue #1, or (if you are working in a branch) send us a pull request.
-
 Dependencies
 ============
 
@@ -21,15 +18,25 @@ following packages pre-installed:
     libboost-dev
     libboost-date-time-dev
     libboost-thread-dev
-    zlib1g-dev
-    libpng12-dev
-    libjpeg8-dev
-    libtiff5-dev
+    zlib-dev
+    libpng-dev
+    libjpeg-dev
+    libtiff-dev
     libopenexr-dev
 
-To enable the, as rendering, Simple DirectMedia Layer display also pre-install:
+To enable the render preview display also pre-install:
 
     libsdl-dev
+
+The --with-x ./configure option is currently meaningless as no X11
+display option is presently implemented.
+
+Lastly, certain OSX environments do not install the program pkg-config
+with autoconf. The program is currently necessary when determining the
+link library flags for openexr. In these situations also install:
+
+    pkg-config
+
 
 Generating configure and building the code
 ==========================================
