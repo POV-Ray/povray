@@ -80,11 +80,13 @@ libraries.
 
 The build system must have:
 
-- a modern C++ compiler which supports C++ templates and follows the ISO C++
-  standard as much as possible; for instance, the GNU GCC 4.x series and the
-  Intel C++ compiler version 9.x or above.  They are available at:
-  http://www.gnu.org/software/gcc
-  http://www.intel.com/software/products/compilers
+- a modern C++ compiler which complies with the ISO C++11 standard as much as
+  possible; for instance, the GNU GCC 5.x series, the Clang++ compiler version
+  3.3 or above, and the Intel C++ compiler version 15.x or above.  They are
+  available at:
+  https://www.gnu.org/software/gcc/
+  https://clang.llvm.org/
+  https://software.intel.com/en-us/intel-compilers
 
 - a working 'make' utility.  We strongly recommand to use GNU Make version 3.79
   or above.  Most GNU/Linux distribution should come with it.  Other platforms

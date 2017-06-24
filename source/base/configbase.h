@@ -102,6 +102,24 @@
 
 //******************************************************************************
 ///
+/// @name C++ Language Standard
+///
+/// @{
+
+/// @def POV_CPP11_SUPPORTED
+/// Whether the compiler supports C++11.
+///
+/// Define as non-zero if the compiler is known to support all the C++11 language features
+/// required to build POV-Ray, or zero if you are sure it doesn't. If in doubt, leave undefined.
+///
+#ifndef POV_CPP11_SUPPORTED
+    #define POV_CPP11_SUPPORTED (__cplusplus >= 201103L)
+#endif
+
+/// @}
+///
+//******************************************************************************
+///
 /// @name Fundamental Data Types
 ///
 /// The following macros define essential data types. It is recommended that system-specific
@@ -1012,5 +1030,12 @@
 /// @}
 ///
 //##############################################################################
+
+//******************************************************************************
+// Sanity Checks
+
+#if !POV_CPP11_SUPPORTED
+    #error "This version of POV-Ray requires C++11, which your compiler does not seem to support."
+#endif
 
 #endif // POVRAY_BASE_CONFIGBASE_H

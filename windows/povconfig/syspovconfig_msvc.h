@@ -94,6 +94,7 @@
     #define POV_COMPILER_VER                  "msvc8"
     #define METADATA_COMPILER_STRING          "msvc 8"
     #define NEED_INVHYP
+    #define POV_CPP11_SUPPORTED               0
   #elif _MSC_VER >= 1400 && _MSC_VER < 1500 && defined (_WIN64)
     // MS Visual C++ 2005 (aka 8.0), compiling for 64 bit target
     #define POV_COMPILER_VER                  "msvc8"
@@ -108,11 +109,13 @@
     inline const unsigned long& max(const unsigned long& _X, const unsigned long& _Y) {return (_X < _Y ? _Y : _X); }
     inline const unsigned long& min(const unsigned long& _X, const unsigned long& _Y) {return (_Y < _X ? _Y : _X); }
     #define NEED_INVHYP
+    #define POV_CPP11_SUPPORTED               0
   #elif _MSC_VER >= 1500 && _MSC_VER < 1600
     // MS Visual C++ 2008 (aka 9.0)
     #define POV_COMPILER_VER                  "msvc9"
     #define METADATA_COMPILER_STRING          "msvc 9"
     #define NEED_INVHYP
+    #define POV_CPP11_SUPPORTED               0
   #elif _MSC_VER >= 1600 && _MSC_VER < 1700
     // MS Visual C++ 2010 (aka 10.0)
     #define POV_COMPILER_VER                  "msvc10"
@@ -121,6 +124,7 @@
     // this is valid according to the C++ standard, but causes msvc10 to issue warnings.
     #pragma warning(disable : 4099)
     #define NEED_INVHYP
+    #define POV_CPP11_SUPPORTED               0
   #elif _MSC_VER >= 1700 && _MSC_VER < 1800
     // MS Visual C++ 2012 (aka 11.0)
     #define POV_COMPILER_VER                  "msvc11"
@@ -128,18 +132,20 @@
     #error "Please update syspovconfig_msvc.h to include this version of MSVC"
     // The following settings are just guesswork, and have never been tested:
     #define NEED_INVHYP
+    #define POV_CPP11_SUPPORTED               0
   #elif _MSC_VER >= 1800 && _MSC_VER < 1900
     // MS Visual C++ 2013 (aka 12.0)
     #define POV_COMPILER_VER                  "msvc12"
     #define METADATA_COMPILER_STRING          "msvc 12"
     #error "Please update syspovconfig_msvc.h to include this version of MSVC"
     // The following settings are just guesswork, and have never been tested:
-    // (no special settings)
+    #define POV_CPP11_SUPPORTED               0
   // NB: The Microsoft Visual Studio developers seem to have skipped internal version number 13 entirely.
   #elif _MSC_VER >= 1900 && _MSC_VER < 2000
     // MS Visual C++ 2015 (aka 14.0)
     #define POV_COMPILER_VER                  "msvc14"
     #define METADATA_COMPILER_STRING          "msvc 14"
+    #define POV_CPP11_SUPPORTED               1
   #else
     #error "Please update syspovconfig_msvc.h to include this version of MSVC"
   #endif
