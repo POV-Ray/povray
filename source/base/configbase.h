@@ -594,6 +594,10 @@
 ///
 #ifndef POV_BUILD_INFO
     // leave undefined
+    #ifdef DOXYGEN
+        // doxygen cannot document undefined macros
+        #define POV_BUILD_INFO ""
+    #endif
 #endif
 
 /// @def POV_RAY_BUILD_ID
@@ -609,6 +613,10 @@
 ///
 #ifndef POV_RAY_BUILD_ID
     // leave undefined
+    #ifdef DOXYGEN
+        // doxygen cannot document undefined macros
+        #define POV_RAY_BUILD_ID ""
+    #endif
 #endif
 
 /// @def POV_COMPILER_INFO
@@ -620,6 +628,10 @@
 ///
 #ifndef POV_COMPILER_INFO
     // leave undefined
+    #ifdef DOXYGEN
+        // doxygen cannot document undefined macros
+        #define POV_COMPILER_INFO ""
+    #endif
 #endif
 
 /// @def POV_SYS_IMAGE_TYPE
