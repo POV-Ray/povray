@@ -40,7 +40,7 @@ AC_DEFUN([AX_CHECK_LIBJPEG],
         [jpeglib.h],
         [
           # check library version, update LIBS
-	  if test x"$1" != x"$ax_check_libjpeg_version_num"; then
+	        if test x"$1" != x"$ax_check_libjpeg_version_num"; then
             AC_MSG_CHECKING([for libjpeg version >= $1 ($ax_check_libjpeg_version_num)])
           else
             AC_MSG_CHECKING([for libjpeg version >= $1])
@@ -48,13 +48,13 @@ AC_DEFUN([AX_CHECK_LIBJPEG],
           AC_RUN_IFELSE(
             [
               AC_LANG_SOURCE(
-[#include <stdio.h>
-#include "jpeglib.h"
-int main (void)
-{
-  fprintf (stderr, "%d\n", JPEG_LIB_VERSION);
-  return 0;
-}]
+                [#include <stdio.h>
+                #include "jpeglib.h"
+                int main (void)
+                {
+                  fprintf (stderr, "%d\n", JPEG_LIB_VERSION);
+                  return 0;
+                }]
               )
             ],
             [
