@@ -218,12 +218,12 @@ if test "x$acx_pthread_ok" = xyes; then
   CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
 
   # Detect AIX lossage: JOINABLE attribute is called UNDETACHED.
-	AC_MSG_CHECKING([for joinable pthread attribute])
-	attr_name=unknown
-	for attr in PTHREAD_CREATE_JOINABLE PTHREAD_CREATE_UNDETACHED; do
+  AC_MSG_CHECKING([for joinable pthread attribute])
+  attr_name=unknown
+  for attr in PTHREAD_CREATE_JOINABLE PTHREAD_CREATE_UNDETACHED; do
     AC_TRY_LINK([#include <pthread.h>], [int attr=$attr; return attr;],
                 [attr_name=$attr; break])
-	done
+  done
   AC_MSG_RESULT($attr_name)
   if test "$attr_name" != PTHREAD_CREATE_JOINABLE; then
     AC_DEFINE_UNQUOTED(PTHREAD_CREATE_JOINABLE, $attr_name,
@@ -246,11 +246,11 @@ if test "x$acx_pthread_ok" = xyes; then
   CFLAGS="$save_CFLAGS"
 
   # More AIX lossage: must compile with xlc_r or cc_r
-	if test x"$GCC" != xyes; then
+  if test x"$GCC" != xyes; then
     AC_CHECK_PROGS(PTHREAD_CC, xlc_r cc_r, ${CC})
   else
     PTHREAD_CC=$CC
-	fi
+  fi
 else
   PTHREAD_CC="$CC"
 fi
