@@ -22,5 +22,5 @@
 AC_DEFUN([AX_ARG_WITH],
 [
   AC_ARG_WITH(m4_bpatsubst([$1], [^--with[^-]*-], []),
-    [ifelse(len($2), 0, AS_HELP_STRING([$1], [$3]), AS_HELP_STRING([$1@<:@=$2@:>@], [$3]))])
+              [ifelse(len($2), 0, AS_HELP_STRING([$1], [$3]), AS_HELP_STRING([$1@<:@=$2@:>@], [$3]))])
 ])
