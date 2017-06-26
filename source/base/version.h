@@ -11,7 +11,7 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -60,29 +60,29 @@
 #define POV_RAY_COPYRIGHT "Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd."
 
 /// First two components of official source code version string.
-#define OFFICIAL_GENERATION_STRING "3.7"
+#define OFFICIAL_GENERATION_STRING "3.8"
 
 /// Official source code version string.
 /// @note For pre-releases this should be _equal to_ the planned final version.
-#define OFFICIAL_VERSION_STRING "3.7.1"
+#define OFFICIAL_VERSION_STRING "3.8.0"
 
 /// Official source code version as integer.
 /// @note For pre-releases this should be _equal to_ the planned final version.
-#define OFFICIAL_VERSION_NUMBER 371
+#define OFFICIAL_VERSION_NUMBER 380
 
 /// Official source code version formatted for Windows resource files.
 /// @note For pre-releases this should be _marginally less_ than the planned final version.
-#define OFFICIAL_VERSION_WINRC  3,7,1,0
+#define OFFICIAL_VERSION_WINRC  3,7,9999,9999
 
 /// @def POV_RAY_PRERELEASE
 /// Pre-release identifier.
 /// Leave undefined for final releases.
-#define POV_RAY_PRERELEASE "rc.1"
+#define POV_RAY_PRERELEASE "beta.1"
 
 /// @def POVRAY_IS_BETA
 /// Whether this version is a beta.
 /// Leave undefined for pre-beta, release candidate or final releases.
-//#define POVRAY_IS_BETA
+#define POVRAY_IS_BETA
 
 /// @}
 ///
