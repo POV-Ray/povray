@@ -5,7 +5,7 @@ To build the HTML Help file for POV-Ray for Windows, you need the following piec
   - **Microsoft HTML Help Workshop**: Version 4.7.4.8702.0 has successfully been tested; other
     versions may work just as fine.
 
-Perl is presumed to be associated with the `.pl` file extension; HTML Workshop is presumed to be
+Perl is presumed to be associated with the `.pl` file extension; HTML Help Workshop is presumed to be
 found in the command search path.
 
 To build the POV-Ray for Windows help files, proceed as follows:
@@ -16,7 +16,7 @@ To build the POV-Ray for Windows help files, proceed as follows:
   - Run `makedocs.bat`.
 
 The generated HTML Help file will be placed in `distribution/platform-specific/windows/Help/`
-as `povray37.chm`, ready for inclusion in the installer package.
+as `povray.chm`, ready for inclusion in the installer package.
 
 (**Note:** Don't forget to also update the Unix HTML help files residing in
 `doc/html`.)

@@ -131,7 +131,7 @@
 !define MYCOPYRIGHT  "Copyright(c) 2050-2051 Acme Space Blasters. Inc."
 !define MYEXEPREFIX  "lasray"
 !define MYSCENEEXT   "pov"
-!define MYHELPFILE   "povray37.chm"
+!define MYHELPFILE   "povray.chm"
 ###################################################################################################
 
 RequestExecutionLevel highest

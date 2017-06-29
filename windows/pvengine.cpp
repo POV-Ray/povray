@@ -5622,7 +5622,7 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
   splitpath (str, modulePath, NULL) ;
   validatePath (modulePath) ;
 
-  sprintf (engineHelpPath, "%shelp\\povray37.chm", BinariesPath) ;
+  sprintf (engineHelpPath, "%shelp\\povray.chm", BinariesPath) ;
   HtmlHelp (NULL, NULL, HH_INITIALIZE, (DWORD_PTR) &help_cookie) ;
   memset (&hh_aklink, 0, sizeof (hh_aklink)) ;
   hh_aklink.cbStruct = sizeof (hh_aklink) ;
