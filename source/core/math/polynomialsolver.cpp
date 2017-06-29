@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -1590,7 +1590,7 @@ int Solve_Polynomial(int n, const DBL *c0, DBL *r, int sturm, DBL epsilon, Rende
 
     i = 0;
 
-    while ((fabs(c0[i]) < SMALL_ENOUGH) && (i < n))
+    while ((i < n) && (fabs(c0[i]) < SMALL_ENOUGH))
     {
         i++;
     }
