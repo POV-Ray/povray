@@ -131,8 +131,6 @@ class SceneData
         pov_base::SimpleGammaCurvePtr workingGamma;
         /// Working gamma to sRGB encoding/decoding.
         pov_base::GammaCurvePtr workingGammaToSRGB;
-        /// Whether the user has explicitly specified a default input file gamma. [will be removed in 3.7x]
-        bool inputFileGammaSet;
         /// Default assumed decoding gamma of input files.
         SimpleGammaCurvePtr inputFileGamma;
         /// What gamma mode to use.
@@ -155,8 +153,8 @@ class SceneData
         bool subsurfaceUseRadiosity;
 
         // ********************************************************************************
-        // temporary variables for BSP testing ... we may or may not keep these come 3.7
-        // release, depending on whether or not a valid need for them has been demonstrated.
+        // temporary variables for BSP testing ... we may or may not keep these in future
+        // releases, depending on whether or not a valid need for them has been demonstrated.
         // ********************************************************************************
         unsigned int bspMaxDepth;
         float bspObjectIsectCost;

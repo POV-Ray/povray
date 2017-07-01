@@ -57,7 +57,7 @@ case "$OPTIONS" in
   *log* | *LOG* | *Log* )
     DATE=`date`
     LOG_FILE="log.txt"
-    echo "log file for POV-Ray 3.7 sample scene render $DATE" > "$LOG_FILE"
+    echo "log file for POV-Ray $VERSION sample scene render $DATE" > "$LOG_FILE"
     ;;
   *all* | *ALL* | *All* )
     RENDER_ALL=--all

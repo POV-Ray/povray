@@ -49,9 +49,9 @@ Building POV-Ray
 --------------------------------------
 
 At this point in time we generally recommend building from the latest version of the
-[3.7-stable branch](https://github.com/POV-Ray/povray/tree/3.7-stable). Alternatively,
+[`latest-stable` branch](https://github.com/POV-Ray/povray/tree/latest-stable). Alternatively,
 you may want to opt for a recent [tagged version](https://github.com/POV-Ray/povray/tags)
-to test-drive features that have been added since the last stable release.
+to test-drive features that have been added since the latest stable release.
 
 _Please do not build directly from the master branch_ (or any other non-stable branch
 for that matter), as versions from that branch may report ambiguous version numbers,

@@ -48,7 +48,7 @@ Generating configure and building the code
     % make
 
 Note that the prebuild step will generate a few warnings as it still looks
-for some files no longer included in v3.7. This is harmless.
+for some files no longer included in current versions of POV-Ray. This is harmless.
 
 Installing
 ==========

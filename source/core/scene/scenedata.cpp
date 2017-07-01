@@ -78,7 +78,6 @@ SceneData::SceneData() :
     parsedAdcBailout = 1.0 / 255.0; // adc bailout sufficient for displays
     workingGamma.reset();
     workingGammaToSRGB.reset();
-    inputFileGammaSet = false; // TODO remove for 3.7x
     inputFileGamma = SRGBGammaCurve::Get();
     gammaMode = kPOVList_GammaMode_None; // default setting for 3.62, which in turn is the default for the language
 

@@ -104,11 +104,6 @@ class Scene
          *  Stop parsing a POV-Ray scene. Parsing may take a few
          *  seconds to stop. Internally stopping is performed by
          *  throwing an exception at well-defined points.
-         *  Note that currently if parsing has been stopped, it
-         *  *cannot* be started again. Eventually this limitation
-         *  will be removed once we have verified that the old
-         *  3.6 parser code can properly handle this condition
-         *  without leaking memory. [trf]
          *  If parsing is not in progress, no action is taken.
          */
         void StopParser();

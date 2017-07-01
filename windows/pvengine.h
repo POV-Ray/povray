@@ -91,15 +91,15 @@
 
 #if POV_RAY_IS_OFFICIAL
   #ifdef _WIN64
-    #define CLASSNAMEPREFIX "Pov37-Win64-"
+    #define CLASSNAMEPREFIX "Pov" OFFICIAL_GENERATION_ABBREV "-Win64-"
   #else
-    #define CLASSNAMEPREFIX "Pov37-Win32-"
+    #define CLASSNAMEPREFIX "Pov" OFFICIAL_GENERATION_ABBREV "-Win32-"
   #endif
 #else
   #ifdef _WIN64
-    #define CLASSNAMEPREFIX "Unofficial-Pov37-Win64-"
+    #define CLASSNAMEPREFIX "Unofficial-Pov" OFFICIAL_GENERATION_ABBREV "-Win64-"
   #else
-    #define CLASSNAMEPREFIX "Unofficial-Pov37-Win32-"
+    #define CLASSNAMEPREFIX "Unofficial-Pov" OFFICIAL_GENERATION_ABBREV "-Win32-"
   #endif
 #endif
 

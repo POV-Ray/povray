@@ -73,7 +73,7 @@ void Ray::AppendInterior(Interior *i)
 
 void Ray::AppendInteriors(RayInteriorVector& ii)
 {
-//  interiors.reserve(interiors.size() + ii.size()); // TODO FIXME - remove FixedSimpleVector from POV-Ray 3.7
+//  interiors.reserve(interiors.size() + ii.size()); // TODO FIXME - remove FixedSimpleVector
 
     for(RayInteriorVector::iterator it(ii.begin()); it != ii.end(); it++)
     {

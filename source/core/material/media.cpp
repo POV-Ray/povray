@@ -957,9 +957,9 @@ void MediaFunction::ComputeOneMediaSample(MediaVector& medias, LightSourceEntryV
 
             // determine whether or not this media is ignoring photons
             // save this in the thread data... it will be used by ComputeShadowColour
-            // maybe this should be (or already is?) computed elsewhere and passed in
-            // as a parameter ( see the ignore_photons parameter! )
-            // I need to look closer at the new 3.7 code to clean that up [NK]
+            // TODO - maybe this should be (or already is?) computed elsewhere and passed in
+            //        as a parameter ( see the ignore_photons parameter! )
+            //        I need to look closer at the new code to clean that up [NK]
             // assume true, set to false if we find even one
             threadData->litObjectIgnoresPhotons = true;
             for(MediaVector::iterator i(medias.begin()); i != medias.end(); i++)

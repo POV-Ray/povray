@@ -335,7 +335,7 @@ void Parser::Run()
         (sceneData->bspChildAccessCost != 0.0f) || (sceneData->bspMissChance != 0.0f))
     {
         Warning("You have overridden a default BSP tree cost constant. Note that these "
-                "INI settings may be removed or changed prior to the final 3.7 release.\n");
+                "INI settings may be removed or changed without notice in future versions.\n");
     }
 
     // TODO FIXME - review whole if-statement and line after it below [trf]
@@ -3387,7 +3387,7 @@ ObjectPtr Parser::Parse_Light_Source ()
         /* NK phmap */
         CASE (COLOUR_MAP_TOKEN)
             // TODO - apparently this undocumented syntax was once intended to do something related to dispersion,
-            //        but in 3.7 is dysfunctional, doing nothing except provide an undocumented means of averaging
+            //        but is currently dysfunctional, doing nothing except provide an undocumented means of averaging
             //        different colours. Can we safely drop it?
             Warning("Undocumented syntax ignored (colour_map in light_source);"
                     " future versions of POV-Ray may drop support for it entirely.");
@@ -9277,9 +9277,9 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
             // Reason: Code like this would be unreadable but possible. Is it
             // a recursive function or not? - It is not recursive because the
             // foo in the second line refers to the first function, which is
-            // not logical. Further, recursion is not supported in POV-Ray 3.5
+            // not logical. Further, recursion is not supported in current POV-Ray
             // anyway. However, allowing such code now would cause problems
-            // implementing recursive functions after POV-Ray 3.5!
+            // implementing recursive functions in future versions!
             if(sym != NULL)
                 Temp_Data  = reinterpret_cast<void *>(Parse_DeclareFunction(NumberPtr, sym->Token_Name, is_local));
             else

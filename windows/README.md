@@ -132,7 +132,7 @@ Build Steps
     the executable will attempt to load the debug version of POV-Ray's
     editor DLLs. In this case, if you want the editor to be available in
     the GUI, copy the standard editor DLLs that come with the official
-    POV-Ray 3.7 distribution to their debug equivalent names (e.g. copy
+    POV-Ray distribution to their debug equivalent names (e.g. copy
     `cmedit32.dll` to `cmedit32d.dll`, etc).
 
     Note that the copied `cmedit32.dll` will still attempt to load
@@ -243,7 +243,7 @@ the POV-Ray executable and `cmedit32.dll`). Note that if you alter this
 API at all, you must change the editor version (`EDITDLLVERSION` in
 `windows\pvedit.h`).
 
-By default, POV-Ray 3.7 will attempt to load the editor DLL's from the
+By default, POV-Ray will attempt to load the editor DLL's from the
 directory in which the EXE resides first. (The previous strategy was to
 look in the current working directory first; POV-Ray no longer checks
 the CWD, though you can force that behaviour if you wish by using the

@@ -62,6 +62,9 @@
 /// First two components of official source code version string.
 #define OFFICIAL_GENERATION_STRING "3.8"
 
+/// First two components of official source code version string in short form.
+#define OFFICIAL_GENERATION_ABBREV "38"
+
 /// Official source code version string.
 /// @note For pre-releases this should be _equal to_ the planned final version.
 #define OFFICIAL_VERSION_STRING "3.8.0"
