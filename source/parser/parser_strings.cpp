@@ -778,16 +778,16 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
     char_string = reinterpret_cast<UCS2 *>(POV_MALLOC((char_array_size + 1) * sizeof(UCS2), "UCS2 String"));
     for(index_in = 0, index_out = 0; index_in < char_array_size; index_in++, index_out++)
     {
-        if((char_array[index_in] == '\\') && (sceneData->EffectiveLanguageVersion() >= 371 || !pathname))
+        if((char_array[index_in] == '\\') && (sceneData->EffectiveLanguageVersion() >= 380 || !pathname))
         {
             // Historically, escape sequences were ignored when parsing for a filename.
-            // As of POV-Ray 3.71, this has been changed.
+            // As of POV-Ray v3.8, this has been changed.
 
 #if POV_BACKSLASH_IS_PATH_SEPARATOR
             if (pathname)
             {
                 Warning("Backslash encountered while parsing for a filename."
-                        " As of version 3.71, this is interpreted as an escape sequence just like in any other string literal."
+                        " As of POV-Ray v3.8, this is interpreted as an escape sequence just like in any other string literal."
                         " If this is supposed to be a path separator, use a forward slash instead.");
             }
 #endif
@@ -851,15 +851,15 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
             if ((char_array[index_in] == '\\') && pathname)
             {
                 // Historically, escape sequences were ignored when parsing for a filename.
-                // As of POV-Ray 3.71, this has been changed.
+                // As of POV-Ray 3.8, this has been changed.
 
 #if POV_BACKSLASH_IS_PATH_SEPARATOR
                 Warning("Backslash encountered while parsing for a filename."
-                        " In legacy (pre-3.71) scenes, this is NOT interpreted as the start of an escape sequence."
+                        " In legacy (pre-3.8) scenes, this is NOT interpreted as the start of an escape sequence."
                         " However, for future compatibility it is recommended to use a forward slash as path separator instead.");
 #else
                 Warning("Backslash encountered while parsing for a filename."
-                        " In legacy (pre-3.71) scenes, this is NOT interpreted as the start of an escape sequence.");
+                        " In legacy (pre-3.8) scenes, this is NOT interpreted as the start of an escape sequence.");
 #endif
             }
 

@@ -3011,9 +3011,9 @@ ObjectPtr Parser::Parse_Lathe()
 
               if (Points[i][X] < 0.0)
               {
-                 if ((sceneData->EffectiveLanguageVersion() < 371) && ((i == 0) || (i == Object->Number - 1)))
+                 if ((sceneData->EffectiveLanguageVersion() < 380) && ((i == 0) || (i == Object->Number - 1)))
                      Warning("Lathe with linear spline has a first or last point with an x value < 0.0.\n"
-                             "Leads to artifacts and an error in #version 3.71 onward.");
+                             "Leads to artifacts, and would be considered an error in v3.8 and later scenes.");
                  else
                      Error("Lathe with linear spline has a point with an x value < 0.0.");
               }
@@ -3024,9 +3024,9 @@ ObjectPtr Parser::Parse_Lathe()
 
               if ((i > 0) && (Points[i][X] < 0.0))
               {
-                 if ((sceneData->EffectiveLanguageVersion() < 371) && (i == Object->Number - 1))
+                 if ((sceneData->EffectiveLanguageVersion() < 380) && (i == Object->Number - 1))
                      Warning("Lathe with quadratic spline has last point with an x value < 0.0.\n"
-                             "Leads to artifacts and an error in #version 3.71 onward.");
+                             "Leads to artifacts, and would be considered an error in v3.8 and later scenes.");
                  else
                      Error("Lathe with quadratic spline has a point with an x value < 0.0.");
               }
@@ -3046,9 +3046,9 @@ ObjectPtr Parser::Parse_Lathe()
 
               if (((i%4 == 0) || (i%4 == 3)) && (Points[i][X] < 0.0))
               {
-                 if ((sceneData->EffectiveLanguageVersion() < 371) && ((i == 0) || (i == Object->Number - 1)))
+                 if ((sceneData->EffectiveLanguageVersion() < 380) && ((i == 0) || (i == Object->Number - 1)))
                      Warning("Lathe with Bezier spline has a first or last point with an x value < 0.0.\n"
-                             "Leads to artifacts and an error in #version 3.71 onward.");
+                             "Leads to artifacts, and would be considered an error in v3.8 and later scenes.");
                  else
                      Error("Lathe with Bezier spline has a point with an x value < 0.0.");
               }
@@ -3646,9 +3646,9 @@ ObjectPtr Parser::Parse_Light_Source ()
         END_CASE
     END_EXPECT
 
-    if ((Object->Fade_Power != 0) && (fabs(Object->Fade_Distance) < EPSILON) && (sceneData->EffectiveLanguageVersion() < 371))
+    if ((Object->Fade_Power != 0) && (fabs(Object->Fade_Distance) < EPSILON) && (sceneData->EffectiveLanguageVersion() < 380))
     {
-        Warning("fade_power with fade_distance 0 is not supported in legacy (pre-3.71) scenes; fade_power is ignored.");
+        Warning("fade_power with fade_distance 0 is not supported in legacy (pre-v3.8) scenes; fade_power is ignored.");
         Object->Fade_Power    = 0;
         Object->Fade_Distance = 0;
     }
