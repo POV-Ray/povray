@@ -80,12 +80,12 @@
 /// @def POV_RAY_PRERELEASE
 /// Pre-release identifier.
 /// Leave undefined for final releases.
-#define POV_RAY_PRERELEASE "beta.1"
+#define POV_RAY_PRERELEASE "alpha"
 
 /// @def POVRAY_IS_BETA
 /// Whether this version is a beta.
 /// Leave undefined for pre-beta, release candidate or final releases.
-#define POVRAY_IS_BETA
+//#define POVRAY_IS_BETA
 
 /// @}
 ///
