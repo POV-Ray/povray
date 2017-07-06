@@ -184,6 +184,12 @@ void Parser::Run()
         Default_Texture->Pigment = Create_Pigment();
         Default_Texture->Tnormal = NULL;
         Default_Texture->Finish  = Create_Finish();
+        // [JG] the version has been *explictly* set in the ini or command line,
+        // override the default ambient (rgb 0.1) (in Create_Finish) for 0.0
+        if ((sceneData->languageVersionSet)&&(sceneData->languageVersion >= 380))
+        {
+            Default_Texture->Finish->Ambient.Clear();
+        }
 
         Not_In_Default = true;
         Ok_To_Declare = true;
