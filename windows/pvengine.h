@@ -116,12 +116,9 @@
 #ifdef _WIN64
   #define BINDIRNAME            "bin64"
   #define INSTALLTIMEKEY        "InstallTime64"
-  #ifdef _DEBUG
-    #define EDITDLLNAME         "cmedit64d.dll"
-  #else
-    // NB: We're using the standard editor DLLs regardless of architecture optimization (e.g. AVX)
-    #define EDITDLLNAME         "cmedit64.dll"
-  #endif
+  // NB: We're using the standard editor DLLs regardless of architecture optimization (e.g. AVX)
+  #define EDITDLLNAME           "cmedit64.dll"
+  #define EDITDLLNAME_DEBUG     "cmedit64d.dll"
   #if !defined POVRAY_IS_BETA
     #define NEWESTVERSIONVAL    "NewestVersion64"
     #define VERSIONVAL          "VersionNo64"
@@ -136,16 +133,13 @@
 #else
   #define BINDIRNAME            "bin32"
   #define INSTALLTIMEKEY        "InstallTime32"
-  #ifdef _DEBUG
-    #define EDITDLLNAME         "cmedit32d.dll"
+  // TODO - use the standard editor DLLs regardless of architecture optimization (e.g. SSE2)
+  #ifdef BUILD_SSE2
+    #define EDITDLLNAME         "cmedit32-sse2.dll"
   #else
-    // TODO - use the standard editor DLLs regardless of architecture optimization (e.g. SSE2)
-    #ifdef BUILD_SSE2
-        #define EDITDLLNAME     "cmedit32-sse2.dll"
-    #else
-        #define EDITDLLNAME     "cmedit32.dll"
-    #endif
+    #define EDITDLLNAME         "cmedit32.dll"
   #endif
+  #define EDITDLLNAME_DEBUG     "cmedit32d.dll"
   #if !defined POVRAY_IS_BETA
     #define NEWESTVERSIONVAL    "NewestVersion32"
     #define VERSIONVAL          "VersionNo32"

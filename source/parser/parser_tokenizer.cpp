@@ -2701,6 +2701,14 @@ void Parser::Parse_Directive(int After_Hash)
             EXIT
         END_CASE
 
+#if POV_DEBUG
+        CASE(BREAKPOINT_TOKEN)
+            // This statement does nothing, except allow you to set a debug breakpoint here
+            // so that you can effectively trigger the debugger via an SDL command.
+            EXIT
+        END_CASE
+#endif
+
         OTHERWISE
             Parsing_Directive = false;
             UNGET

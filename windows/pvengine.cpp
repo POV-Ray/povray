@@ -5870,19 +5870,41 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
   {
     if (EditDLLPath != NULL)
     {
-      sprintf (str, "%s" EDITDLLNAME, EditDLLPath) ;
-      if (!LoadEditorDLL (str, false))
-        use_editors = false ;
+#ifdef _DEBUG
+      // Prefer debug DLL, but don't complain if it's not available.
+      sprintf(str, "%s" EDITDLLNAME_DEBUG, EditDLLPath);
+      if (!LoadEditorDLL(str, true))
+      {
+#endif
+        sprintf(str, "%s" EDITDLLNAME, EditDLLPath);
+        if (!LoadEditorDLL (str, false))
+          use_editors = false ;
+#ifdef _DEBUG
+      }
+#endif
     }
     else
     {
-      sprintf (str, "%s\\" EDITDLLNAME, modulePath) ;
-      if (!LoadEditorDLL (str, true))
+#ifdef _DEBUG
+      // Prefer debug DLL, but don't complain if it's not available.
+      sprintf (str, "%s\\" EDITDLLNAME_DEBUG, modulePath);
+      if (!LoadEditorDLL(str, true))
       {
-        sprintf (str, "%sbin\\" EDITDLLNAME, BinariesPath) ;
-        if (!LoadEditorDLL (str, false))
-          use_editors = false ;
+        sprintf (str, "%sbin\\" EDITDLLNAME_DEBUG, BinariesPath) ;
+        if (!LoadEditorDLL (str, true))
+        {
+#endif
+          sprintf (str, "%s\\" EDITDLLNAME, modulePath) ;
+          if (!LoadEditorDLL (str, true))
+          {
+            sprintf (str, "%sbin\\" EDITDLLNAME, BinariesPath) ;
+            if (!LoadEditorDLL (str, false))
+              use_editors = false ;
+          }
+#ifdef _DEBUG
+        }
       }
+#endif
     }
   }
   else

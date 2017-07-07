@@ -118,6 +118,9 @@ const RESERVED_WORD Reserved_Words[] = {
     { BOZO_TOKEN,                   "bozo" },
     { B_SPLINE_TOKEN,               "b_spline" },
     { BREAK_TOKEN,                  "break" },
+#if POV_DEBUG
+    { BREAKPOINT_TOKEN,             "breakpoint" },
+#endif
     { BRICK_TOKEN,                  "brick" },
     { BRICK_SIZE_TOKEN,             "brick_size" },
     { BRIGHTNESS_TOKEN,             "brightness" },
