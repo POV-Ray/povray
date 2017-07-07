@@ -4922,9 +4922,13 @@ ObjectPtr Parser::Parse_Ovus()
     }
     if (Object->VerticalSpherePosition < Object->BottomRadius)
     {
-        Error("distance of Ovus must be greater than bottom radius");
+        Error("distance of Ovus must be greater or equal to bottom radius");
+        // in theory, it would be possible to allow VerticalSpherePosition + TopRadius >= BottomRadius
+        // (with VerticalSpherePosition > 0)
+        // but the computation of BottomVertical & TopVertical would need more work, as the current formula
+        // use a simplification based on VerticalSpherePosition >= BottomRadius
     }
-    if ( Object->TopRadius+Object->BottomRadius+Object->VerticalSpherePosition > 2*Object->ConnectingRadius)
+    if ( Object->TopRadius + Object->BottomRadius + Object->VerticalSpherePosition > 2*Object->ConnectingRadius)
     {
         Error("Connecting radius of Ovus is too small. Should be at least half the sum of the three other distances. sphere or lemon object could also be considered.");
     }
@@ -4983,8 +4987,8 @@ ObjectPtr Parser::Parse_Ovus()
     {
         Object->VerticalPosition = Object->VerticalSpherePosition-sqrt(Sqr(Object->ConnectingRadius-Object->TopRadius)-Sqr(Object->HorizontalPosition));
     }
-    // if not a degenerated sphere
-    if (Object->HorizontalPosition)
+    // if not a degenerated sphere, HorizontalPosition is a square root, test only against 0, as negative is not possible
+    if (Object->HorizontalPosition != 0.0)
     {
         Object->BottomVertical = -Object->VerticalPosition*Object->BottomRadius/(Object->ConnectingRadius-Object->BottomRadius);
         Object->TopVertical = -( Object->VerticalPosition-Object->VerticalSpherePosition)* Object->TopRadius / (Object->ConnectingRadius - Object->TopRadius)  + Object->VerticalSpherePosition;

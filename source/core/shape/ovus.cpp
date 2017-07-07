@@ -828,14 +828,16 @@ void Ovus::Compute_BBox()
         biggest = TopRadius;
     }
     // handle degenerated ovus in sphere
-    if (!BottomRadius)
+    // negative value have been intercepted by Parser::Parse_Ovus
+    // and the 0.0 is only possible for detected degenerated ovus in that function
+    if (BottomRadius == 0.0)
     {
         bottom = VerticalSpherePosition-TopRadius;
         length = 2*TopRadius;
     }
 
     Make_BBox(BBox, -biggest, bottom, -biggest,
-            2.0 * biggest, length, 2.0 * biggest);
+              2.0 * biggest, length, 2.0 * biggest);
 
     Recompute_BBox(&BBox, Trans);
 }
@@ -917,36 +919,41 @@ void Ovus::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
     // Determine its angle from the point (0, 0, 0) in the x-z plane.
     len = x * x + z * z;
 
-    if ((P[Y]>EPSILON)&&(P[Y]<(VerticalSpherePosition-EPSILON)))
+    if ( (P[Y] > EPSILON) && (P[Y] < (VerticalSpherePosition - EPSILON) ) )
     {
-    // when not on a face, the range 0.25 to 0.75 is used (just plain magic 25% for face, no other reason, but it makes C-Lipka happy)
+    // when on the spindle, the range 0.25 to 0.75 is used 
+    // Verbatim from C-Lipka:
+    // Dividing at 1/4 and 3/4 has the advantage of the division being exactly at a pixel boundary
+    // if the texture is an image 2^N by 2^M pixels in size, which is common for image textures
+    // originally designed for mesh-based renderers. It also happens to work for 20N by 20M pixels, 
+    // which is common for image textures with "arbitrary" sizes.
         phi = 0.75-0.5*(P[Y])/(VerticalSpherePosition);
     }
     else if (P[Y]>EPSILON)
     {
-    // aka P[Y] is above VerticalSpherePositon, use TopRadius, from 0% to 25%
-       phi = 0.0;
-       if (TopRadius)
-       {
+        // aka P[Y] is above VerticalSpherePositon, use TopRadius, from 0% to 25%
+        phi = 0.0;
+        if (TopRadius != 0.0)
+        {
             t = ((P[Y]-VerticalSpherePosition)/(TopRadius));
             phi = (sin(sqrt(1-t)*M_PI_2)/(4.0));
-       }
+        }
     }
     else
     {
-    // aka P[Y] is below origin (<0), use BottomRadius, from 75% to 100%
-       phi = 1.0;
-       if (BottomRadius)
-       {
-          t = ((BottomRadius+P[Y])/(BottomRadius));
-          phi = 1.0-sin(sqrt(t)*M_PI_2)/(4.0);
-       }
-       else if (TopRadius)
-       {
-        // degenerate ovus in sphere
-          t = ((TopRadius-VerticalSpherePosition+P[Y])/(TopRadius));
-          phi = 1.0-sin(sqrt(t)*M_PI_2)/(4.0);
-       }
+        // aka P[Y] is below origin (<0), use BottomRadius, from 75% to 100%
+        phi = 1.0;
+        if (BottomRadius != 0.0)
+        {
+            t = ((BottomRadius+P[Y])/(BottomRadius));
+            phi = 1.0-sin(sqrt(t)*M_PI_2)/(4.0);
+        }
+        else if (TopRadius != 0.0) // per Parser::Parse_Ovus, TopRadius & BottomRadius cannot be both 0.0 at the same time, but keep the test due to division
+        {
+            // degenerate ovus in sphere
+            t = ((TopRadius-VerticalSpherePosition+P[Y])/(TopRadius));
+            phi = 1.0-sin(sqrt(t)*M_PI_2)/(4.0);
+        }
     }
 
 
