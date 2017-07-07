@@ -63,7 +63,6 @@ enum BlackHoleType
 {
     kBlackHoleSpherical_Original=0,
     kBlackHoleSpherical_Clamped,
-    kBlackHoleSpherical_WhatMightBeUseful
 };
 
 /*****************************************************************************
@@ -208,10 +207,10 @@ bool BlackHoleWarp::WarpPoint(Vector3d& TPoint) const
             // the surface of the spherical region for the inward pulling black hole.
             //
             // When inverted (pushing outward), clamping S to 1.0 is enough because
-            // well never look further inward than the origin of the spherical region
+            // we'll never look further inward than the origin of the spherical region
             // for the point to push outward. Good.
             //
-            // When pulling inward, clamping S to 1.0 OK for effects, but it does
+            // When pulling inward, clamping S to 1.0 is OK for effects, but it does
             // not prevent the code from reaching outside the spherical region for
             // the point to pull. The type below does and provides for a more realistic
             // and controllable inward pulling black_hole.
