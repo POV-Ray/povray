@@ -1443,7 +1443,7 @@ bool copy37NoBetaEditSettings(void)
     return (false) ;
   }
 
-  if (RegOpenKeyEx (HKEY_CURRENT_USER, "Software\\" REGKEY "\\" REGVER, 0, KEY_READ, &hKeySrc) != ERROR_SUCCESS)
+  if (RegOpenKeyEx (HKEY_CURRENT_USER, "Software\\" REGKEY "\\v" POV_RAY_GENERATION, 0, KEY_READ, &hKeySrc) != ERROR_SUCCESS)
   {
     FreeLibrary (hLib) ;
     return (false) ;
@@ -1482,7 +1482,7 @@ bool checkEditKey37NoBeta (void)
 {
   HKEY        key ;
 
-  if (RegOpenKeyEx (HKEY_CURRENT_USER, "Software\\" REGKEY "\\" REGVER "\\POV-Edit", 0, KEY_READ, &key) == ERROR_SUCCESS)
+  if (RegOpenKeyEx (HKEY_CURRENT_USER, "Software\\" REGKEY "\\v" POV_RAY_GENERATION "\\POV-Edit", 0, KEY_READ, &key) == ERROR_SUCCESS)
   {
     RegCloseKey (key) ;
     return (true) ;

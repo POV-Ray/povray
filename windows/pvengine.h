@@ -91,15 +91,15 @@
 
 #if POV_RAY_IS_OFFICIAL
   #ifdef _WIN64
-    #define CLASSNAMEPREFIX "Pov" OFFICIAL_GENERATION_ABBREV "-Win64-"
+    #define CLASSNAMEPREFIX "Pov" POV_RAY_MAJOR_VERSION POV_RAY_MINOR_VERSION "-Win64-"
   #else
-    #define CLASSNAMEPREFIX "Pov" OFFICIAL_GENERATION_ABBREV "-Win32-"
+    #define CLASSNAMEPREFIX "Pov" POV_RAY_MAJOR_VERSION POV_RAY_MINOR_VERSION "-Win32-"
   #endif
 #else
   #ifdef _WIN64
-    #define CLASSNAMEPREFIX "Unofficial-Pov" OFFICIAL_GENERATION_ABBREV "-Win64-"
+    #define CLASSNAMEPREFIX "Unofficial-Pov" POV_RAY_MAJOR_VERSION POV_RAY_MINOR_VERSION "-Win64-"
   #else
-    #define CLASSNAMEPREFIX "Unofficial-Pov" OFFICIAL_GENERATION_ABBREV "-Win32-"
+    #define CLASSNAMEPREFIX "Unofficial-Pov" POV_RAY_MAJOR_VERSION POV_RAY_MINOR_VERSION "-Win32-"
   #endif
 #endif
 
@@ -119,17 +119,7 @@
   // NB: We're using the standard editor DLLs regardless of architecture optimization (e.g. AVX)
   #define EDITDLLNAME           "cmedit64.dll"
   #define EDITDLLNAME_DEBUG     "cmedit64d.dll"
-  #if !defined POVRAY_IS_BETA
-    #define NEWESTVERSIONVAL    "NewestVersion64"
-    #define VERSIONVAL          "VersionNo64"
-    #define NEXTVERSIONCHECKVAL "NextVersionCheck64"
-    #define VERSIONCHECKDAYS    4
-  #else
-    #define NEWESTVERSIONVAL    "NewestBetaVersion64"
-    #define VERSIONVAL          "BetaVersionNo64"
-    #define NEXTVERSIONCHECKVAL "NextBetaVersionCheck64"
-    #define VERSIONCHECKDAYS    1
-  #endif
+  #define VERSIONVAL            POV_RAY_BETA_PREFIX "VersionNo64"
 #else
   #define BINDIRNAME            "bin32"
   #define INSTALLTIMEKEY        "InstallTime32"
@@ -140,17 +130,7 @@
     #define EDITDLLNAME         "cmedit32.dll"
   #endif
   #define EDITDLLNAME_DEBUG     "cmedit32d.dll"
-  #if !defined POVRAY_IS_BETA
-    #define NEWESTVERSIONVAL    "NewestVersion32"
-    #define VERSIONVAL          "VersionNo32"
-    #define NEXTVERSIONCHECKVAL "NextVersionCheck32"
-    #define VERSIONCHECKDAYS    4
-  #else
-    #define NEWESTVERSIONVAL    "NewestBetaVersion32"
-    #define VERSIONVAL          "BetaVersionNo32"
-    #define NEXTVERSIONCHECKVAL "NextBetaVersionCheck32"
-    #define VERSIONCHECKDAYS    1
-  #endif
+  #define VERSIONVAL            POV_RAY_BETA_PREFIX "VersionNo32"
 #endif
 
 // ----------------------------------------------------------------------

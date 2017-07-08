@@ -761,7 +761,7 @@ void InitInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
 
     tsb->printf("\n");
 
-    tsb->printf("Primary POV-Ray " OFFICIAL_GENERATION_STRING " Architects/Developers: (Alphabetically)\n");
+    tsb->printf("Primary POV-Ray v" POV_RAY_GENERATION " Architects/Developers: (Alphabetically)\n");
     if(POVMSObject_Get(msg, &attrlist, kPOVAttrib_PrimaryDevs) == kNoErr)
     {
         cnt = 0;

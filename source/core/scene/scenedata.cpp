@@ -65,7 +65,7 @@ SceneData::SceneData() :
 
     iridWavelengths = MathColour::DefaultWavelengths();
 
-    languageVersion = OFFICIAL_VERSION_NUMBER;
+    languageVersion = POV_RAY_VERSION_INT;
     languageVersionSet = false;
     languageVersionLate = false;
     warningLevel = 10; // all warnings

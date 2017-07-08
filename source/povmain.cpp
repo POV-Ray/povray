@@ -110,7 +110,7 @@ int main(int argc, char **argv)
     int ret = 0;
     int i = 0;
 
-    printf("Welcome to POV-Ray v" OFFICIAL_GENERATION_STRING " SMP!\n");
+    printf("Welcome to POV-Ray v" POV_RAY_GENERATION " SMP!\n");
     fflush(stdout);
 
     // Init

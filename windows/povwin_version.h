@@ -43,30 +43,49 @@
 /// @file
 /// @note
 ///     This file _must not_ pull in any POV-Ray header whatsoever, except
-///     @ref base/version.h
+///     @ref base/version.h, the path of which must be specified relative to
+///     this file.
 
-#include "base/version.h"
+#include "../source/base/version.h"
 
 //------------------------------------------------------------------------------
 
 #define POVWIN_APPLICATION_NAME         "POV-Ray for Windows"
 
-#ifdef POVRAY_IS_BETA
-#define POVWIN_GENERATION_STRING        OFFICIAL_GENERATION_STRING "-beta"
+// format "X.Y[-beta]"
+// used for directories and similar names
+#ifdef POV_RAY_HOST_VERSION
+#define POVWIN_DIR_VERSION_STRING       POV_RAY_HOST_VERSION
 #else
-#define POVWIN_GENERATION_STRING        OFFICIAL_GENERATION_STRING
+#define POVWIN_DIR_VERSION_STRING       POV_RAY_GENERATION POV_RAY_BETA_SUFFIX
+#endif
+
+// format "X.Y.Z[.P][-PRE]"
+// used for version display
+#ifdef POV_RAY_PRERELEASE
+#define POVWIN_VERSION_STRING           POV_RAY_PATCH_VERSION "-" POV_RAY_PRERELEASE
+#else
+#define POVWIN_VERSION_STRING           POV_RAY_PATCH_VERSION
 #endif
 
 #ifdef POV_RAY_PRERELEASE
-#define POVWIN_VERSION_STRING           OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE
+#if POV_RAY_PATCHLEVEL_INT > 0
+#define POVWIN_VERSION_RC               POV_RAY_MAJOR_VERSION_INT, POV_RAY_MINOR_VERSION_INT, POV_RAY_REVISION_INT, POV_RAY_PATCHLEVEL_INT-1
+#elif POV_RAY_REVISION_INT > 0
+#define POVWIN_VERSION_RC               POV_RAY_MAJOR_VERSION_INT, POV_RAY_MINOR_VERSION_INT, POV_RAY_REVISION_INT-1, 9999
+#elif POV_RAY_MINOR_VERSION_INT > 0
+#define POVWIN_VERSION_RC               POV_RAY_MAJOR_VERSION_INT, POV_RAY_MINOR_VERSION_INT-1, 9999, 9999
 #else
-#define POVWIN_VERSION_STRING           OFFICIAL_VERSION_STRING
+#define POVWIN_VERSION_RC               POV_RAY_MAJOR_VERSION_INT-1, 9999, 9999, 9999
+#endif
+#else
+#define POVWIN_VERSION_RC               POV_RAY_MAJOR_VERSION_INT, POV_RAY_MINOR_VERSION_INT, POV_RAY_REVISION_INT, POV_RAY_PATCHLEVEL
 #endif
 
 //------------------------------------------------------------------------------
 
 #define POVWIN_WINRC_COMPANY_NAME       "Persistence of Vision Raytracer Pty. Ltd."
-#define POVWIN_WINRC_FILE_DESCRIPTION   POVWIN_APPLICATION_NAME " v" POVWIN_GENERATION_STRING
+#define POVWIN_WINRC_FILE_DESCRIPTION   POVWIN_APPLICATION_NAME " v" POV_RAY_GENERATION POV_RAY_BETA_SUFFIX
 #define POVWIN_WINRC_FILE_VERSION       POVWIN_VERSION_STRING
 #define POVWIN_WINRC_INTERNAL_NAME      "PVEngine"
 #define POVWIN_WINRC_LEGAL_COPYRIGHT    POV_RAY_COPYRIGHT " All Rights Reserved. This software is licensed under the terms of the GNU Affero General Public License."

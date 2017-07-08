@@ -2462,7 +2462,7 @@ void Parser::Parse_Directive(int After_Hash)
                             }
                             Parse_Semi_Colon(false);
 
-                            if (sceneData->EffectiveLanguageVersion() > OFFICIAL_VERSION_NUMBER)
+                            if (sceneData->EffectiveLanguageVersion() > POV_RAY_VERSION_INT)
                             {
                                 Error("Your scene file requires POV-Ray version %g or later!\n", (DBL)(sceneData->EffectiveLanguageVersion() / 100.0));
                             }

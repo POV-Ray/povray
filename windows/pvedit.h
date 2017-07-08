@@ -72,8 +72,7 @@
 // documents directory if it is not found in the registry, hence must be valid
 // path components as well as valid registry keys.
 #define REGKEY                    "POV-Ray"
-#define REGVER                    "v" OFFICIAL_GENERATION_STRING
-#define REGVERKEY                 "v" POVWIN_GENERATION_STRING
+#define REGVERKEY                 "v" POVWIN_DIR_VERSION_STRING
 
 namespace povwin
 {
