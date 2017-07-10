@@ -1350,10 +1350,10 @@ AC_MSG_RESULT([Built-in features:
   I/O restrictions:          ${pov_io_msg}
   X Window display:          ${pov_xwin_msg}
   Supported image formats:   $pov_img_fmt_builtin $pov_img_fmt_enabled
-  Unsupported image formats: $pov_img_fmt_disabled 
+  Unsupported image formats: $pov_img_fmt_disabled
 
 Compilation settings:
-  Build architecture:  $build
+  Build architecture:  $build 
   Built/Optimized for: $pov_built_for
   Compiler vendor:     $pov_compiler_vendor
   Compiler version:    $pov_compiler_version
