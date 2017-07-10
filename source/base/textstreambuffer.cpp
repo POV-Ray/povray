@@ -55,24 +55,20 @@
 // this must be the last file included
 #include "base/povdebug.h"
 
-unsigned int GetTerminalWidth()
-{
-#if defined(TIOCGWINSZ) && defined(HAVE_IOCTL)
-    struct winsize w;
-    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == 0)
-        return (unsigned int)w.ws_col;
-#endif
-    return 80;
-}
-
 namespace pov_base
 {
 
 TextStreamBuffer::TextStreamBuffer(size_t buffersize, unsigned int wrapwidth)
 {
+#if defined(TIOCGWINSZ) && defined(HAVE_IOCTL)
+    struct winsize w;
+    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == 0)
+        wrap = (unsigned int)w.ws_col;
+    else
+#endif
+    wrap = wrapwidth;
     boffset = 0;
     bsize = buffersize;
-    wrap = GetTerminalWidth();
     curline = 0;
     buffer = new char[bsize];
     if(buffer == NULL)
