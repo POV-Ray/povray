@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,9 +40,10 @@
 
 #include <boost/bind.hpp>
 
-#include "base/version.h"
+#include "base/version_info.h"
 
 #include "core/material/pattern.h"
+#include "core/material/noise.h"
 #include "core/scene/atmosphere.h"
 
 // this must be the last file included
@@ -51,11 +52,11 @@
 namespace pov
 {
 
-SceneData::SceneData(GenericFunctionContextFactory* fcf) :
+SceneData::SceneData() :
     fog(NULL),
     rainbow(NULL),
     skysphere(NULL),
-    functionContextFactory(fcf)
+    functionContextFactory()
 {
     atmosphereIOR = 1.0;
     atmosphereDispersion = 0.0;
@@ -71,6 +72,7 @@ SceneData::SceneData(GenericFunctionContextFactory* fcf) :
     stringEncoding = kStringEncoding_ASCII;
     noiseGenerator = kNoiseGen_RangeCorrected;
     explicitNoiseGenerator = false; // scene has not set the noise generator explicitly
+    boundingMethod = 0;
     numberOfWaves = 10;
     parsedMaxTraceLevel = MAX_TRACE_LEVEL_DEFAULT;
     parsedAdcBailout = 1.0 / 255.0; // adc bailout sufficient for displays
@@ -124,7 +126,6 @@ SceneData::~SceneData()
     // TODO: perhaps ObjectBase::~ObjectBase would be a better place
     //       to handle cleanup of individual objects ?
     Destroy_Object(objects);
-    delete functionContextFactory;
 
     if(tree != NULL)
         delete tree;

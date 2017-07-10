@@ -199,7 +199,7 @@
 <table class="HeaderFooter" width="100%">
 <tr>
   <td colspan=5 align="left" class="HeaderFooter">
-    POV-Ray for Unix <strong class="HeaderFooter">version 3.7</strong>
+    POV-Ray for Unix <strong class="HeaderFooter">version 3.7.1</strong>
   </td>
 </tr>
 <tr >
@@ -224,8 +224,8 @@ scene description language to create your own scenes. The use of almost every
 feature of POV-Ray's language is explained in detail. We will learn basic
 things like placing cameras and light sources. We will also learn how to
 create a large variety of objects and how to assign different textures to
-them. The more sophisticated features like <a href="r3_4.html#r3_4_4_3_2">radiosity</a>,
-<a href="r3_4.html#r3_4_8_1">interior</a>, <a href="r3_4.html#r3_4_8">media</a> and <a href="r3_4.html#r3_4_3_1">atmospheric effects</a> will be explained in detail.</p>
+them. The more sophisticated features like <a href="r3_4.html#r3_4_3_3_2">radiosity</a>,
+<a href="r3_7.html#r3_7_2_1">interior</a>, <a href="r3_7.html#r3_7_2">media</a> and <a href="r3_7.html#r3_7_1_1">atmospheric effects</a> will be explained in detail.</p>
 
 </div>
 <a name="t2_2_1"></a>
@@ -241,31 +241,38 @@ thrive on spheres, that is what we will render first.</p>
 <table class="centered" width="700px" cellpadding="0" cellspacing="10">
 <tr>
   <td>
-    <img class="leftpanel" width="220px" src="images/f/fd/TutImgHanded.gif">
-  </td>
-  <td>
     <p class="tabletext">This kind of coordinate system is called a left-handed coordinate system. If we use our left hand's fingers we can easily see why it is called left-handed. We just point our thumb in the direction of the positive x-axis (to the right), the index finger in the direction of the positive y-axis (straight up) and the middle finger in the positive z-axis direction (forward). We can only do this with our left hand. If we had used our right hand we would not have been able to point the middle finger in the correct direction.</p>
   </td>
   <td>
-    <img class="rightpanel" width="220px" src="images/d/db/TutImgAerobics.png">
+    <img class="rightpanel" width="220px" src="images/f/fd/TutImgHanded.gif">
+  </td>
+</tr>
+<tr>
+  <td></td>
+  <td>
+    <p class="caption">The left-handed coordinate system</p>
+  </td>
+</tr>
+</table>
+
+<table class="centered" width="700px" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <img class="leftpanel" width="220px" src="images/d/db/TutImgAerobics.png">
+  </td>
+  <td>
+    <p class="tabletext">The left hand can also be used to determine rotation directions. To do this we must perform the famous <em>Computer Graphics Aerobics</em> exercise. We hold up our left hand and point our thumb in the positive direction of the axis of rotation. Our fingers will curl in the positive direction of rotation. Similarly if we point our thumb in the negative direction of the axis our fingers will curl in the negative direction of rotation.</p>
+<p class="tabletext">In this illustration, the left hand is curling around the x-axis. The thumb points in the positive x direction and the fingers curl over in the positive rotation direction.</p>
   </td>
 </tr>
 <tr>
   <td>
-    <p class="caption">The left-handed coordinate system</p>
-  </td>
-  <td>
-    
-  </td>
-  <td>
     <p class="caption">Computer Graphics Aerobics</p>
   </td>
+  <td></td>
 </tr>
 </table>
-<p>The left hand can also be used to determine rotation directions. To do this we must perform the famous <em>Computer Graphics Aerobics</em> exercise. We hold up our left hand and point our thumb in the positive direction of the axis of rotation. Our fingers will curl in the positive direction of rotation. Similarly if we point our thumb in the negative direction of the axis our fingers will curl in the negative direction of rotation.</p>
-<p>In the above illustration, the left hand is curling around the x-axis. The thumb points in the positive x direction and the fingers curl over in the positive rotation direction.</p>
-<p>
-If we want to use a right-handed system, as some CAD systems and modelers do, the <code>right</code> vector in the camera specification needs to be changed. See the detailed description in <a href="r3_4.html#r3_4_2_1_7">Handedness</a>. In a right-handed system we use our right hand for the <em>Aerobics</em>.</p>
+<p>When a right-handed system is used, as some CAD systems and modelers do, the <code>right</code> vector in the camera specification will need to be changed, additionally be sure to use the right hand for the <em>Aerobics</em> exercise. This pertains to <em>both</em> the coordinate system and rotations. See the detailed description in <a href="r3_4.html#r3_4_2_1_7">handedness</a> for more information.</p>
 <p>There is some controversy over whether POV-Ray's method of doing a right-handed system is really proper. To avoid problems we stick with the left-handed system which is not in dispute.</p>
 
 </div>
@@ -303,8 +310,9 @@ include files.</p>
 <p>We may have as many include files as needed in a scene file. Include files
 may themselves contain include files, but we are limited to declaring
 includes nested only ten levels deep.</p>
-<p>Filenames specified in the include statements will be searched for in the current directory first. If it fails to find your .Inc files in the current directory, POV-Ray searches any <a href="r3_2.html#r3_2_5_4">library paths</a> that you have specified. Library paths are options set by the <code>+L</code> <a href="t2_2.html#t2_2_8_1">command-line switch</a> or <code><a href="r3_2.html#r3_2_5_4">Library_Path</a></code> option. See the chapter <a href="t2_2.html#t2_2_8">Setting POV-Ray Options</a> for more information on library paths.</p>
+<p>Filenames specified in the include statements will be searched for in the current directory first. If it fails to find your .Inc files in the current directory, POV-Ray searches any <a href="r3_2.html#r3_2_5_3">library paths</a> that you have specified. Library paths are options set by the <code>+L</code> <a href="t2_2.html#t2_2_8_1">command-line switch</a> or <code><a href="r3_2.html#r3_2_5_3">Library_Path</a></code> option. See the chapter <a href="t2_2.html#t2_2_8">Setting POV-Ray Options</a> for more information on library paths.</p>
 <p>Because it is more useful to keep include files in a separate directory, standard installations of POV-Ray place these files in the <code>c:\povray3\include</code> directory (replace <code>c:\povray3</code> with the actual directory that you installed POV-Ray in). If you get an error message saying that POV-Ray cannot open <em>colors.inc</em> or other include files, make sure that you specify the library path properly.</p>
+
 </div>
 <a name="t2_2_1_3"></a>
 <div class="content-level-h4" contains="Adding a Camera" id="t2_2_1_3">
@@ -401,6 +409,7 @@ specify the pink color is:</p>
 </pre>
 
 <p>Colors are explained in more detail in section <a href="r3_3.html#r3_3_1_7">Color Expressions</a>.</p>
+
 </div>
 <a name="t2_2_1_6"></a>
 <div class="content-level-h4" contains="Defining a Light Source" id="t2_2_1_6">
@@ -571,7 +580,7 @@ shorthand. Thus the plane could be defined as:</p>
 floor. Shadows are calculated very accurately by the ray-tracer, which
 creates precise, sharp shadows. In the real world, penumbral or
 soft shadows are often seen. Later we will learn how to use
-<a href="r3_4.html#r3_4_4_1_5">extended light sources</a> to soften the shadows.</p>
+<a href="r3_4.html#r3_4_3_1_5">extended light sources</a> to soften the shadows.</p>
 </div>
 <a name="t2_2_2_5"></a>
 <div class="content-level-h4" contains="Torus Object" id="t2_2_2_5">
@@ -918,11 +927,12 @@ sections.</p>
 <a name="t2_2_3_1"></a>
 <div class="content-level-h4" contains="What is CSG?" id="t2_2_3_1">
 <h4>2.2.3.1 What is CSG?</h4>
-<p><em>CSG</em> stands for <em>Constructive Solid Geometry</em>. POV-Ray allows us to construct complex solids by combining primitive shapes in four different ways. In the <code><a href="r3_4.html#r3_4_5_4_2">union</a></code> statement, two or more shapes are added together. With the <code><a href="r3_4.html#r3_4_5_4_3">intersection</a></code> statement, two or more shapes are combined to make a new shape that consists of the area common to both shapes. The <code><a href="r3_4.html#r3_4_5_4_4">difference</a></code> statement, an initial shape has all subsequent shapes subtracted from it.</p>
+<p><em>CSG</em> stands for <em>Constructive Solid Geometry</em>. POV-Ray allows us to construct complex solids by combining primitive shapes in four different ways. In the <code><a href="r3_5.html#r3_5_1_4_2">union</a></code> statement, two or more shapes are added together. With the <code><a href="r3_5.html#r3_5_1_4_3">intersection</a></code> statement, two or more shapes are combined to make a new shape that consists of the area common to both shapes. The <code><a href="r3_5.html#r3_5_1_4_4">difference</a></code> statement, an initial shape has all subsequent shapes subtracted from it.</p>
 <p>
-And last but not least <code><a href="r3_4.html#r3_4_5_4_5">merge</a></code>, which is like a union where the surfaces inside the union are removed (useful in transparent CSG objects). We will deal with each of these in detail in the next few sections.</p>
+And last but not least <code><a href="r3_5.html#r3_5_1_4_5">merge</a></code>, which is like a union where the surfaces inside the union are removed (useful in transparent CSG objects). We will deal with each of these in detail in the next few sections.</p>
 <p>
 CSG objects can be extremely complex. They can be deeply nested. In other words there can be unions of differences or intersections of merges or differences of intersections or even unions of intersections of differences of merges... ad infinitum. CSG objects are (almost always) finite objects and thus respond to auto-bounding and can be transformed like any other POV primitive shape.</p>
+
 </div>
 <a name="t2_2_3_2"></a>
 <div class="content-level-h4" contains="CSG Union" id="t2_2_3_2">
@@ -1128,6 +1138,7 @@ some filter to the pigment block.</p>
 
 <p>We render the file again. This looks pretty good... only... we can see
 parts of each of the lens objects inside the union! This is not good.</p>
+
 </div>
 <a name="t2_2_3_5"></a>
 <div class="content-level-h4" contains="CSG Merge" id="t2_2_3_5">
@@ -1147,6 +1158,7 @@ with our object. Let's try it.</p>
 </pre>
 
 <p>Sure enough, it does!</p>
+
 </div>
 <a name="t2_2_3_6"></a>
 <div class="content-level-h4" contains="CSG Pitfalls" id="t2_2_3_6">
@@ -1205,6 +1217,7 @@ their surfaces must come from a light source. There are many kinds of light
 sources available in POV-Ray and careful use of the correct kind can yield
 very impressive results. Let's take a moment to explore some of the
 different kinds of light sources and their various parameters.</p>
+
 </div>
 <a name="t2_2_4_1"></a>
 <div class="content-level-h4" contains="The Pointlight Source" id="t2_2_4_1">
@@ -1285,16 +1298,17 @@ light source are brightest in color with the areas that are facing away from
 the light source being darkest. We also note that the checkered plane is
 illuminated evenly all the way to the horizon. This allows us to see the
 plane, but it is not very realistic.</p>
+
 </div>
 <a name="t2_2_4_2"></a>
 <div class="content-level-h4" contains="The Spotlight Source" id="t2_2_4_2">
 <h4>2.2.4.2 The Spotlight Source</h4>
 <p>Spotlights are a very useful type of light source. They can be used to add
 highlights and illuminate features much as a photographer uses spots to do
-the same thing. To create a spotlight simply add the <code><a href="r3_4.html#r3_4_4_1_2">spotlight</a></code>
+the same thing. To create a spotlight simply add the <code><a href="r3_4.html#r3_4_3_1_2">spotlight</a></code>
 keyword to a regular point light. There are a few more parameters with
-spotlights than with pointlights. These are <code><a href="r3_4.html#r3_4_4_1_2">radius</a></code>,
-<code><a href="r3_4.html#r3_4_4_1_2">falloff</a></code>, <code><a href="r3_4.html#r3_4_4_1_2">falloff</a></code> and <code><a href="r3_4.html#r3_4_4_1_2">point_at</a></code>. The <code>radius</code> parameter is the angle of the fully illuminated cone. The <code>falloff</code> parameter is the angle of the <em>umbra</em> cone where the light falls off to darkness. The <code>tightness</code> is a parameter that determines the rate of the light falloff. The <code>point_at</code> parameter is just what it says, the location where the spotlight is pointing to. Let's change the light in our scene as follows:</p>
+spotlights than with pointlights. These are <code><a href="r3_4.html#r3_4_3_1_2">radius</a></code>,
+<code><a href="r3_4.html#r3_4_3_1_2">falloff</a></code>, <code><a href="r3_4.html#r3_4_3_1_2">falloff</a></code> and <code><a href="r3_4.html#r3_4_3_1_2">point_at</a></code>. The <code>radius</code> parameter is the angle of the fully illuminated cone. The <code>falloff</code> parameter is the angle of the <em>umbra</em> cone where the light falls off to darkness. The <code>tightness</code> is a parameter that determines the rate of the light falloff. The <code>point_at</code> parameter is just what it says, the location where the spotlight is pointing to. Let's change the light in our scene as follows:</p>
 <pre>
   light_source {
     &lt;0, 10, -3&gt;
@@ -1368,6 +1382,7 @@ dimmer. This is because the cylindrical constraints do not let the light
 spread out like in a spotlight. Larger radius and falloff values are needed
 to do the job. We try a radius of 20 and a falloff of 30 for all three
 lights. That's the ticket!</p>
+
 </div>
 <a name="t2_2_4_4"></a>
 <div class="content-level-h4" contains="The Area Light Source" id="t2_2_4_4">
@@ -1468,6 +1483,7 @@ of four (2*2) lights, three different colors, all shining on our scene. We
 render this and it appears to work perfectly. All our
 shadows have small, tight umbrae, just the sort we would expect to find on an
 object under a real spotlight.</p>
+
 </div>
 <a name="t2_2_4_5"></a>
 <div class="content-level-h4" contains="The Ambient Light Source" id="t2_2_4_5">
@@ -1491,6 +1507,7 @@ Below is an example of a red ambient light source.</p>
   global_settings { ambient_light rgb&lt;1, 0, 0&gt; }
 </pre>
 <p>See <a href="r3_4.html#r3_4_1_2">Ambient Light</a> for more details.</p>
+
 </div>
 <a name="t2_2_4_6"></a>
 <div class="content-level-h4" contains="Light Source Specials" id="t2_2_4_6">
@@ -1522,6 +1539,7 @@ and comment out any other lights we have made. Now we add the following:</p>
 <p>This is a fairly dim light 20 units over the center of the scene. It will
 give a dim illumination to all objects including the plane in the background.
 We render it and see.</p>
+
 </div>
 <a name="t2_2_4_6_2"></a>
 <div class="content-level-h5" contains="Assigning an Object to a Light Source" id="t2_2_4_6_2">
@@ -1590,6 +1608,7 @@ are sharp, so let's make our bulb an area light:</p>
 the x-z-plane. We also note that the actual appearance of the light bulb is
 not affected in any way by the light source. The bulb must be illuminated by
 some other light source or by, as in this case, a high ambient value.</p>
+
 </div>
 <a name="t2_2_4_6_3"></a>
 <div class="content-level-h5" contains="Using Light Fading" id="t2_2_4_6_3">
@@ -1624,6 +1643,7 @@ render this to see the result.</p>
 That definitely worked! Now let's try a fade power of 2 and a fade
 distance of 10. Again, this works well. The falloff is much faster with a
 fade power of 2 so we had to raise the fade distance to 10.</p>
+
 </div>
 <a name="t2_2_5"></a>
 <div class="content-level-h3" contains="Simple Texture Options" id="t2_2_5">
@@ -1631,6 +1651,7 @@ fade power of 2 so we had to raise the fade distance to 10.</p>
 <p>The pictures rendered so far where somewhat boring regarding the
 appearance of the objects. Let's add some fancy features to the
 texture.</p>
+
 </div>
 <a name="t2_2_5_1"></a>
 <div class="content-level-h4" contains="Surface Finishes" id="t2_2_5_1">
@@ -1650,7 +1671,7 @@ definition of the sphere to this:</p>
   }
 </pre>
 
-<p>We render the scene. The <code><a href="r3_4.html#r3_4_6_3_4_1">phong</a></code> keyword adds a highlight the same color of the light shining on the object. It adds a lot of credibility to the picture and makes the object look smooth and shiny. Lower values of phong will make the highlight less bright (values should be between 0 and 1).</p>
+<p>We render the scene. The <code><a href="r3_6.html#r3_6_1_3_4_1">phong</a></code> keyword adds a highlight the same color of the light shining on the object. It adds a lot of credibility to the picture and makes the object look smooth and shiny. Lower values of phong will make the highlight less bright (values should be between 0 and 1).</p>
 
 </div>
 
@@ -1686,6 +1707,7 @@ surface normal. The value 0.4 controls the apparent depth of the bumps.
 Usually the bumps are about 1 unit wide which does not work very well with
 a sphere of radius 2. The scale makes the bumps 1/5th as wide but does not
 affect their depth.</p>
+
 </div>
 <a name="t2_2_5_3"></a>
 <div class="content-level-h4" contains="Creating Color Patterns" id="t2_2_5_3">
@@ -1728,16 +1750,16 @@ complex patterns in the pigment block like in these examples:</p>
   }
 </pre>
 
-<p>The keyword <code><a href="r3_4.html#r3_4_7_1_30">wood</a></code> specifies a pigment 
-<a href="r3_4.html#r3_4_7">pattern</a> of concentric rings like rings in wood.
+<p>The keyword <code><a href="r3_6.html#r3_6_2_1_30">wood</a></code> specifies a pigment 
+<a href="r3_6.html#r3_6_2">pattern</a> of concentric rings like rings in wood.
 For every position in POV-space, a pattern returns a float value in the range 
 from zero to one. Values outside the zero to one range are ignored. The 
-<code><a href="r3_4.html#r3_4_6_1_2">color_map</a></code> specifies what color vector
+<code><a href="r3_6.html#r3_6_1_1_2">color_map</a></code> specifies what color vector
 is assigned to that float value. In the first example the color of the wood blends
 from <code>DarkTan</code> to <code>DarkBrown</code> over the first 90% of the vein
 and from <code>DarkBrown</code> to <code>VeryDarkBrown</code> over the remaining 10%.
 In the second example the colors do not blend from one to an other, but change abrupt.
-The <code><a href="r3_4.html#r3_4_7_5_5_9">turbulence</a></code> keyword slightly stirs up the pattern so the veins are not perfect circles and the <code><a href="r3_3.html#r3_3_1_12_2">scale</a></code> keyword adjusts the size of the pattern.</p>
+The <code><a href="r3_6.html#r3_6_2_5_5_9">turbulence</a></code> keyword slightly stirs up the pattern so the veins are not perfect circles and the <code><a href="r3_3.html#r3_3_1_12_2">scale</a></code> keyword adjusts the size of the pattern.</p>
 <p>
 Most patterns are set up by default to give us one <em>feature</em> across
 a sphere of radius 1.0. A feature is very roughly defined as a color
@@ -1791,6 +1813,7 @@ the pieces.</p>
     texture { PinkAlabaster }
   }
 </pre>
+
 </div>
 <a name="t2_2_6"></a>
 <div class="content-level-h3" contains="Using the Camera" id="t2_2_6">
@@ -2210,7 +2233,7 @@ example:</p>
 
 <p>Transformations may also be independently applied to pigment patterns and
 surface normal patterns.</p>
-<p class="Note"><strong>Note:</strong> Scaling a normal pattern not only affects the width and spacing. It does also affect the apparent height or depth of the bumps, for how to avoid this see <a href="r3_4.html#r3_4_6_2_4">Scaling normals</a>.</p>
+<p class="Note"><strong>Note:</strong> Scaling a normal pattern not only affects the width and spacing. It does also affect the apparent height or depth of the bumps, for how to avoid this see <a href="r3_6.html#r3_6_1_2_4">Scaling normals</a>.</p>
 <p>For example:</p>
 <pre>
  box { &lt;0, 0, 0&gt;, &lt;1, 1, 1&gt;
@@ -2286,6 +2309,7 @@ Almost all <code> +</code> or <code>-</code> switches have an equivalent
 option which can be used in an INI file which is described in the next
 section. A detailed description of each switch is given in the option
 reference section.</p>
+
 </div>
 <a name="t2_2_8_2"></a>
 <div class="content-level-h4" contains="Using INI Files" id="t2_2_8_2">

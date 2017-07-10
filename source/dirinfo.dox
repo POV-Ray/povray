@@ -1,2 +1,7 @@
-/// @dir
-/// Source code files for the back- and front-end.
+/**
+
+@dir
+@ingroup PovSource
+Platform-neutral source code files.
+
+*/

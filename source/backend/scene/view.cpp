@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -48,8 +48,6 @@
 #include "core/lighting/radiosity.h"
 #include "core/math/matrix.h"
 #include "core/support/octree.h"
-
-#include "vm/fnpovfpu.h"
 
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
@@ -386,7 +384,7 @@ bool ViewData::GetNextRectangle(POVRect& rect, unsigned int& serial, BlockInfo*&
     return true;
 }
 
-void ViewData::CompletedRectangle(const POVRect& rect, unsigned int serial, const vector<RGBTColour>& pixels, unsigned int size, bool final, float completion, BlockInfo* blockInfo)
+void ViewData::CompletedRectangle(const POVRect& rect, unsigned int serial, const vector<RGBTColour>& pixels, unsigned int size, bool relevant, bool complete, float completion, BlockInfo* blockInfo)
 {
     if (realTimeRaytracing == true)
     {
@@ -427,7 +425,11 @@ void ViewData::CompletedRectangle(const POVRect& rect, unsigned int serial, cons
             POVMS_Attribute pixelattr(pixelvector);
 
             pixelblockmsg.Set(kPOVAttrib_PixelBlock, pixelattr);
-            if(final == true) // only final blocks get a block id (used by continue-trace to identify completely rendered blocks that do not need to be rendered again)
+            if (relevant)
+                pixelblockmsg.SetVoid(kPOVAttrib_PixelFinal);
+            if (complete)
+                // only completely rendered blocks get a block id
+                // (used by continue-trace to identify blocks that do not need to be rendered again)
                 pixelblockmsg.SetInt(kPOVAttrib_PixelId, serial);
             pixelblockmsg.SetInt(kPOVAttrib_PixelSize, size);
             pixelblockmsg.SetInt(kPOVAttrib_Left, rect.left);
@@ -452,7 +454,7 @@ void ViewData::CompletedRectangle(const POVRect& rect, unsigned int serial, cons
     CompletedRectangle(rect, serial, completion, blockInfo);
 }
 
-void ViewData::CompletedRectangle(const POVRect& rect, unsigned int serial, const vector<Vector2d>& positions, const vector<RGBTColour>& colors, unsigned int size, bool final, float completion, BlockInfo* blockInfo)
+void ViewData::CompletedRectangle(const POVRect& rect, unsigned int serial, const vector<Vector2d>& positions, const vector<RGBTColour>& colors, unsigned int size, bool relevant, bool complete, float completion, BlockInfo* blockInfo)
 {
     try
     {
@@ -486,7 +488,11 @@ void ViewData::CompletedRectangle(const POVRect& rect, unsigned int serial, cons
 
         pixelblockmsg.Set(kPOVAttrib_PixelPositions, pixelposattr);
         pixelblockmsg.Set(kPOVAttrib_PixelColors, pixelcolattr);
-        if(final == true) // only final blocks get a block id (used by continue-trace to identify completely rendered blocks that do not need to be rendered again)
+        if (relevant)
+            pixelblockmsg.SetVoid(kPOVAttrib_PixelFinal);
+        if (complete)
+            // only completely rendered blocks get a block id
+            // (used by continue-trace to identify blocks that do not need to be rendered again)
             pixelblockmsg.SetInt(kPOVAttrib_PixelId, serial);
         pixelblockmsg.SetInt(kPOVAttrib_PixelSize, size);
 
@@ -679,7 +685,7 @@ void View::StartRender(POVMS_Object& renderOptions)
     shared_ptr<ViewData::BlockIdSet> blockskiplist(new ViewData::BlockIdSet());
 
     if(renderControlThread == NULL)
-        renderControlThread = Task::NewBoostThread(boost::bind(&View::RenderControlThread, this), 1024 * 64);
+        renderControlThread = Task::NewBoostThread(boost::bind(&View::RenderControlThread, this), POV_THREAD_STACK_SIZE);
 
     viewData.qualityFlags = QualityFlags(clip(renderOptions.TryGetInt(kPOVAttrib_Quality, 9), 0, 9));
 
@@ -1070,7 +1076,7 @@ void View::StartRender(POVMS_Object& renderOptions)
             // wait for pretrace to finish
             renderTasks.AppendSync();
 
-            // reset block size counter and block skip list for final render
+            // reset block size counter and block skip list for main render
             renderTasks.AppendFunction(boost::bind(&View::SetNextRectangle, this, _1, blockskiplist, nextblock));
 
             // wait for block size counter and block skip list reset to finish
@@ -1083,9 +1089,13 @@ void View::StartRender(POVMS_Object& renderOptions)
     // do render with mosaic preview
     if(previewstartsize > 1)
     {
+        // If the mosaic preview goes all the way down to single-pixel size and no anti-aliasing is required,
+        // we don't need a dedicated final render pass.
+        bool previewIsFinalPass = (previewendsize == 1) && (tracingmethod == 0);
+
         // do render with mosaic preview start size
         for(int i = 0; i < maxRenderThreads; i++)
-            viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new TraceTask(&viewData, 0, jitterscale, aathreshold, aadepth, aaGammaCurve, previewstartsize, false, false, highReproducibility))));
+            viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new TraceTask(&viewData, 0, jitterscale, aathreshold, aadepth, aaGammaCurve, previewstartsize, false, previewIsFinalPass, highReproducibility))));
 
         for(unsigned int step = (previewstartsize >> 1); step >= previewendsize; step >>= 1)
         {
@@ -1100,11 +1110,10 @@ void View::StartRender(POVMS_Object& renderOptions)
 
             // do render with current mosaic preview size
             for(int i = 0; i < maxRenderThreads; i++)
-                viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new TraceTask(&viewData, 0, jitterscale, aathreshold, aadepth, aaGammaCurve, step, true, ((step == 1) && (tracingmethod == 0)), highReproducibility))));
+                viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new TraceTask(&viewData, 0, jitterscale, aathreshold, aadepth, aaGammaCurve, step, true, previewIsFinalPass, highReproducibility))));
         }
 
-        // do render everything again if the final mosaic preview block size was not one or anti-aliasing is required
-        if((previewendsize > 1) || (tracingmethod > 0))
+        if (!previewIsFinalPass)
         {
             // wait for previous mosaic preview step to finish
             renderTasks.AppendSync();

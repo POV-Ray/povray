@@ -55,6 +55,13 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @defgroup PovBaseColour Colour Data Types
+/// @ingroup PovBase
+///
+/// @{
+
 typedef COLC ColourChannel;
 typedef DBL  PreciseColourChannel;
 
@@ -2232,6 +2239,10 @@ class GenericRGBEColour
 
 typedef GenericRGBEColour<128,false>    RadianceHDRColour;  ///< RGBE format as originally proposed by Greg Ward.
 typedef GenericRGBEColour<250,true>     PhotonColour;       ///< RGBE format as adapted by Nathan Kopp for photon mapping.
+
+/// @}
+///
+//##############################################################################
 
 }
 

@@ -2,7 +2,7 @@
 ///
 /// @file base/platformbase.cpp
 ///
-/// Implementations related to the @ref PlatformBase class.
+/// Implementations related to the @ref pov_base::PlatformBase class.
 ///
 /// @copyright
 /// @parblock
@@ -45,7 +45,66 @@
 namespace pov_base
 {
 
+//******************************************************************************
+
 /// Platform specific function interface self reference pointer
 PlatformBase *PlatformBase::self = NULL;
+
+//******************************************************************************
+
+DefaultPlatformBase::DefaultPlatformBase()
+{
+}
+
+DefaultPlatformBase::~DefaultPlatformBase()
+{
+}
+
+UCS2String DefaultPlatformBase::GetTemporaryPath()
+{
+    return ASCIItoUCS2String("/tmp/");
+}
+
+UCS2String DefaultPlatformBase::CreateTemporaryFile()
+{
+    static int cnt = 0;
+    char buffer[32];
+
+    cnt++;
+    sprintf(buffer, "/tmp/pov%08x.dat", cnt);
+
+    FILE *f = fopen(buffer, "wb");
+    if (f != NULL)
+        fclose(f);
+
+    return UCS2String(ASCIItoUCS2String(buffer));
+}
+
+void DefaultPlatformBase::DeleteTemporaryFile(const UCS2String& filename)
+{
+    remove(UCS2toASCIIString(filename).c_str());
+}
+
+bool DefaultPlatformBase::ReadFileFromURL(OStream *, const UCS2String&, const UCS2String&)
+{
+    return false;
+}
+
+FILE* DefaultPlatformBase::OpenLocalFile(const UCS2String& name, const char *mode)
+{
+    return fopen(UCS2toASCIIString(UCS2String(name)).c_str(), mode);
+}
+
+void DefaultPlatformBase::DeleteLocalFile(const UCS2String& name)
+{
+    POV_DELETE_FILE(UCS2toASCIIString(UCS2String(name)).c_str());
+}
+
+bool DefaultPlatformBase::AllowLocalFileAccess(const UCS2String& name, const unsigned int fileType, bool write)
+{
+    return true;
+}
+
+//******************************************************************************
 
 }

@@ -44,17 +44,23 @@
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor definitions
-******************************************************************************/
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
+
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
 
 #define SUPERELLIPSOID_OBJECT (BASIC_OBJECT)
 
-
-
-/*****************************************************************************
-* Global typedefs
-******************************************************************************/
+/// @}
+///
+//******************************************************************************
 
 class Superellipsoid : public ObjectBase
 {
@@ -86,6 +92,10 @@ class Superellipsoid : public ObjectBase
         bool check_hit2(const Vector3d& P, const Vector3d& D, DBL t0, Vector3d& P0, DBL v0, DBL t1, DBL *t, Vector3d& Q) const;
         bool insert_hit(const BasicRay& ray, DBL Depth, IStack& Depth_Stack, TraceThreadData *Thread);
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

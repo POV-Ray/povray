@@ -51,6 +51,13 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @defgroup PovBaseFileinputoutput Basic File In- and Output
+/// @ingroup PovBase
+///
+/// @{
+
 // NOTE: Remember to modify gPOV_File_Extensions in fileinputoutput.cpp!
 enum
 {
@@ -219,6 +226,10 @@ UCS2String GetFileName(const Path& p);
 
 bool CheckIfFileExists(const Path& p);
 POV_LONG GetFileLength(const Path& p);
+
+/// @}
+///
+//##############################################################################
 
 }
 

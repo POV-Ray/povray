@@ -44,11 +44,23 @@
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor definitions
-******************************************************************************/
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
+
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
 
 #define PRISM_OBJECT (STURM_OK_OBJECT)
+
+/// @}
+///
+//******************************************************************************
 
 #define LINEAR_SPLINE    1
 #define QUADRATIC_SPLINE 2
@@ -114,6 +126,10 @@ class Prism : public ObjectBase
         int in_curve(DBL u, DBL v, TraceThreadData *Thread) const;
         static bool test_rectangle(const Vector3d& P, const Vector3d& D, DBL x1, DBL y1, DBL x2, DBL y2);
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

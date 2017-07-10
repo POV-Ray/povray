@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,17 +33,10 @@
 ///
 //******************************************************************************
 
-#include <string>
-#include <cctype>
-
-// configfrontend.h must always be the first POV file included within frontend *.cpp files
-#include "frontend/configfrontend.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/animationprocessing.h"
 
-#include "povms/povmscpp.h"
 #include "povms/povmsid.h"
-
-#include "base/types.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -89,6 +82,8 @@ AnimationProcessing::AnimationProcessing(POVMS_Object& options) :
             subsetEndFrame = POVMSFloat((finalFrame - initialFrame + 1) * subsetEndPercent);
         if (subsetEndFrame < subsetStartFrame)
             subsetEndFrame = subsetStartFrame; // TODO: should we be issuing a warning or throwing an error here?
+        if (subsetEndFrame > finalFrame)
+            subsetEndFrame = finalFrame;
     }
     else
     {
@@ -100,10 +95,23 @@ AnimationProcessing::AnimationProcessing(POVMS_Object& options) :
     fieldRenderFlag = renderOptions.TryGetBool(kPOVAttrib_FieldRender, false);
     oddFieldFlag = renderOptions.TryGetBool(kPOVAttrib_OddField, false);
 
-    clockDelta = double(finalClock - initialClock) / double(finalFrame - initialFrame);
-    runningFrameNumber = 1;
-    nominalFrameNumber = subsetStartFrame;
-    clockValue = POVMSFloat(double(clockDelta * double(subsetStartFrame - initialFrame)) + double(initialClock));
+    if (finalFrame == initialFrame)
+    {
+        // TODO - review the choice of `clockDelta` and `clockValue` for this case,
+        // or make sure animation is never triggered in the first place when finalFrame and
+        // initialFrame are set to the same value
+        clockDelta = 1.0;
+        runningFrameNumber = 1;
+        nominalFrameNumber = subsetStartFrame;
+        clockValue = initialClock;
+    }
+    else
+    {
+        clockDelta = double(finalClock - initialClock) / double(finalFrame - initialFrame);
+        runningFrameNumber = 1;
+        nominalFrameNumber = subsetStartFrame;
+        clockValue = POVMSFloat(double(clockDelta * double(subsetStartFrame - initialFrame)) + double(initialClock));
+    }
 
     frameNumberDigits = 1;
     for(POVMSInt i = finalFrame; i >= 10; i /= 10)

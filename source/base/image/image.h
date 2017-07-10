@@ -48,6 +48,13 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @defgroup PovBaseImage Image Handling
+/// @ingroup PovBase
+///
+/// @{
+
 /**
  *  Generic image data container.
  *
@@ -59,6 +66,8 @@ namespace pov_base
  *  @note   When backed by a gamma-encoded data container, unsigned int access methods are presumed
  *          to read/write raw encoded data, while float access methods will read/write logical
  *          linear values.
+ *
+ *  @note   Image coordinates increase from left (x=0) to right (x>0) and from top (y=0) to bottom (y>0).
  */
 class Image
 {
@@ -164,6 +173,7 @@ class Image
             GrayA_Gamma16
         };
 
+        /// Image file type identifier.
         enum ImageFileType
         {
             GIF,
@@ -179,6 +189,15 @@ class Image
             BMP,
             EXR,
             HDR
+        };
+
+        /// The mode to use for alpha handling.
+        enum AlphaMode
+        {
+            kAlphaMode_None,            ///< Disable alpha channel. @note Not a valid setting for input files.
+            kAlphaMode_Default,         ///< Use auto-detection or file format specific default.
+            kAlphaMode_Premultiplied,   ///< Enforce premultiplied mode, aka associated alpha.
+            kAlphaMode_Straight,        ///< Enforce straight mode, aka unassociated alpha.
         };
 
         struct ReadOptions
@@ -197,19 +216,107 @@ class Image
 
         struct WriteOptions
         {
-            unsigned char bpcc; // bits per colour component
-            bool alphachannel;
-            bool grayscale;
-            unsigned char compress;
-            SimpleGammaCurvePtr encodingGamma;  // the gamma curve to use for encoding from linear if the file format leaves any choice (NULL to use file format recommendation)
-            SimpleGammaCurvePtr workingGamma;   // the working colour space gamma
-            bool premultiplyOverride;           // whether to override file-format default for alpha premultiplication
-            bool premultiply;                   // whether to output premultiplied ("associated") alpha or not ("straight alpha")
-            DitherHandlerPtr dither;
-            unsigned int offset_x;              ///< Currently not actively set.
-            unsigned int offset_y;              ///< Currently not actively set.
+            //------------------------------------------------------------------------------
+            /// @name Gamma Handling
+            /// @{
 
-            WriteOptions() : bpcc(8), alphachannel(false), grayscale(false), compress(0) /*, gamma(1.0f) */, premultiplyOverride(false), premultiply(false), offset_x(0), offset_y(0) { }
+            /// Gamma to encode for.
+            /// Set this to `NULL` to use the file format specific default.
+            /// @note
+            ///     This setting is ignored with file formats that mandate linear encoding or a
+            ///     specific encoding gamma.
+            SimpleGammaCurvePtr encodingGamma;
+
+            /// Working colour space gamma to encode from.
+            /// Set to `NULL` or a neutral gamma curve to indicate linear working colour space.
+            SimpleGammaCurvePtr workingGamma;
+
+            /// @}
+            //------------------------------------------------------------------------------
+
+            /// Dithering algorithm.
+            /// Leave this at the default to disable dithering.
+            /// @note
+            ///     This setting is ignored with file formats that are not prone to colour banding
+            ///     artifacts (such as OpenEXR) or do not benefit from dithering (such as JPEG).
+            DitherStrategySPtr ditherStrategy;
+
+            unsigned int offset_x; ///< Currently not actively set.
+            unsigned int offset_y; ///< Currently not actively set.
+
+            /// How to handle image transparency.
+            /// Set this to @ref kAlphaMode_None to disable creation of an alpha channel,
+            /// @ref kAlphaMode_Default to write an alpha channel using a file format specific
+            /// default mode, @ref kAlphaMode_Premultiplied to write an alpha channel using
+            /// premultiplied mode (aka associated alpha), or @ref kAlphaMode_Straight to write an
+            /// alpha channel using straight mode (aka unassociated alpha).
+            /// @note
+            ///     This setting is ignored with file formats that do not support transparency, or
+            ///     for which transparency support has not been implemented in POV-Ray.
+            AlphaMode alphaMode;
+
+            /// Bits per colour channel.
+            /// Set this to `0` to use the file format specific default.
+            /// @note
+            ///     This setting is ignored with file formats that mandate a particular bit depth,
+            ///     for which POV-Ray only supports a particular bit depth, or for which bit depth
+            ///     is not applicable (such as JPEG).
+            /// @note
+            ///     The actual bit depth may differ if the file format or POV-Ray's implementation
+            ///     thereof does not support the requested bit depth. In that case, the next higher
+            ///     supported bit depth is used if possible, or the highest supported bit depth
+            ///     otherwise.
+            unsigned char bitsPerChannel;
+
+            /// Whether to use compression.
+            /// Set this to a negative value to use the file format specific default setting, `0`
+            /// to disable, or any higher value to enable. Depending on the file format, such a
+            /// setting may be interpreted as a format specific compression parameter.
+            /// @note
+            ///     Whether a positive value indicates a mode, compression level or quality level
+            ///     is specific to the file format.
+            /// @note
+            ///     This setting is ignored with file formats that never use compression, always
+            ///     use compression, or for which POV-Ray's implementation leaves no choice.
+            signed short compression;
+
+            /// Whether to write a greyscale image.
+            /// @note
+            ///     This setting is ignored with file formats that do not support a dedicated
+            ///     greyscale mode, or for which support of such a mode has not been implemented
+            ///     in POV-Ray.
+            bool grayscale : 1;
+
+            WriteOptions() :
+                ditherStrategy(GetNoOpDitherStrategy()),
+                offset_x(0),
+                offset_y(0),
+                alphaMode(kAlphaMode_None),
+                bitsPerChannel(8),
+                compression(-1),
+                grayscale(false)
+            {}
+
+            inline bool AlphaIsEnabled() const
+            {
+                return (alphaMode != Image::kAlphaMode_None);
+            }
+
+            inline bool AlphaIsPremultiplied(bool defaultToPremultiplied) const
+            {
+                if (defaultToPremultiplied)
+                    return (alphaMode != Image::kAlphaMode_Straight);
+                else
+                    return (alphaMode == Image::kAlphaMode_Premultiplied);
+            }
+
+            GammaCurvePtr GetTranscodingGammaCurve(GammaCurvePtr defaultEncodingGamma) const
+            {
+                if (encodingGamma)
+                    return TranscodingGammaCurve::Get(workingGamma, encodingGamma);
+                else
+                    return TranscodingGammaCurve::Get(workingGamma, defaultEncodingGamma);
+            }
         };
 
         virtual ~Image() { }
@@ -225,8 +332,6 @@ class Image
         // ftype = use this image type, if "Undefined" use best match
         static Image *Read(ImageFileType ftype, IStream *file, const ReadOptions& options = ReadOptions());
 
-        // bitperpixel = use this number of bits per pixel or closest supported match, if "0" use best match
-        // compress = if "0" use no compression, other values use fomat specific compression (TBD)
         static void Write(ImageFileType ftype, OStream *file, const Image *image, const WriteOptions& options = WriteOptions());
 
         unsigned int GetWidth() const { return width; }
@@ -395,6 +500,10 @@ class Image
         /// not available
         Image& operator=(Image&);
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

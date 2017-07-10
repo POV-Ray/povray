@@ -54,6 +54,13 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @defgroup PovBaseImageColourspace Colour Space Management
+/// @ingroup PovBaseImage
+///
+/// @{
+
 class GammaCurve;
 class SimpleGammaCurve;
 
@@ -590,6 +597,10 @@ enum GammaTypeId
 /// @param  param   parameter for parameterized transfer function (e.g. gamma of power-law function)
 ///
 SimpleGammaCurvePtr GetGammaCurve(GammaTypeId typeId, float param);
+
+/// @}
+///
+//##############################################################################
 
 }
 

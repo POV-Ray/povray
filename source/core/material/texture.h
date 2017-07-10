@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -46,6 +46,13 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreMaterialTexture Textures
+/// @ingroup PovCore
+///
+/// @{
+
 typedef struct Turb_Struct TURB;
 struct GenericTurbulenceWarp;
 
@@ -53,26 +60,10 @@ struct GenericTurbulenceWarp;
 * Global preprocessor defines
 ******************************************************************************/
 
-/*
- * Macro to create random number in the [0; 1] range.
- */
-
 #define FLOOR(x)  ((x) >= 0.0 ? floor(x) : (0.0 - floor(0.0 - (x)) - 1.0))
-
-// Hash1dRTableIndex assumed values in the range 0..8191
-#define Hash1dRTableIndex(a,b)   \
-    ((hashTable[(int)(a) ^ (b)] & 0xFF) * 2)
-
-// Hash2d assumed values in the range 0..8191
-#define Hash2d(a,b)   \
-    hashTable[(int)(hashTable[(int)(a)] ^ (b))]
 
 #define Hash3d(a,b,c) \
     hashTable[(int)(hashTable[(int)(hashTable[(int)((a) & 0xfff)] ^ ((b) & 0xfff))] ^ ((c) & 0xfff))]
-
-const int NOISE_MINX = -10000;
-const int NOISE_MINY = NOISE_MINX;
-const int NOISE_MINZ = NOISE_MINX;
 
 
 /*****************************************************************************
@@ -112,12 +103,16 @@ struct Texture_Struct : public Pattern_Struct
     PIGMENT *Pigment;
     TNORMAL *Tnormal;
     FINISH *Finish;
-    vector<TEXTURE*> Materials; // used for BITMAP_PATTERN (and only there)
+    vector<TEXTURE*> Materials; // used for `material_map` (and only there)
 };
 
 struct Finish_Struct
 {
-    SNGL Diffuse, DiffuseBack, Brilliance, BrillianceOut, BrillianceAdjust, BrillianceAdjustRad;
+    SNGL Diffuse, DiffuseBack, Brilliance;
+#if POV_PARSER_EXPERIMENTAL_BRILLIANCE_OUT
+    SNGL BrillianceOut;
+#endif
+    SNGL BrillianceAdjust, BrillianceAdjustRad;
     SNGL Specular, Roughness;
     SNGL Phong, Phong_Size;
     SNGL Irid, Irid_Film_Thickness, Irid_Turb;
@@ -128,45 +123,18 @@ struct Finish_Struct
     //MathColour SigmaPrimeS, SigmaA;
     SNGL Reflection_Falloff;  // Added by MBP 8/27/98
     bool Reflection_Fresnel;
-    bool Fresnel;
+    SNGL Fresnel;
     SNGL Reflect_Metallic; // MBP
     int Conserve_Energy;  // added by NK Dec 19 1999
     bool UseSubsurface;   // whether to use subsurface light transport
+    bool AlphaKnockout;   // whether pigment alpha knocks out finish effects
 };
-
-
-/*****************************************************************************
-* Global variables
-******************************************************************************/
-
-#ifdef DYNAMIC_HASHTABLE
-extern unsigned short *hashTable;
-#else
-extern ALIGN16 unsigned short hashTable[8192];
-#endif
 
 
 /*****************************************************************************
 * Global functions
 ******************************************************************************/
 
-void Initialize_Noise (void);
-void Initialize_Waves(vector<double>& waveFrequencies, vector<Vector3d>& waveSources, unsigned int numberOfWaves);
-void Free_Noise_Tables (void);
-
-DBL SolidNoise(const Vector3d& P);
-
-#if defined(TRY_OPTIMIZED_NOISE)
-extern DBL (*Noise) (const Vector3d& EPoint, int noise_generator);
-extern void (*DNoise) (Vector3d& result, const Vector3d& EPoint);
-void Initialise_NoiseDispatch();
-#else
-INLINE_NOISE DBL Noise (const Vector3d& EPoint, int noise_generator);
-INLINE_NOISE void DNoise (Vector3d& result, const Vector3d& EPoint);
-#endif
-
-DBL Turbulence (const Vector3d& EPoint, const GenericTurbulenceWarp* Turb, int noise_generator);
-void DTurbulence (Vector3d& result, const Vector3d& EPoint, const GenericTurbulenceWarp* Turb);
 DBL cycloidal (DBL value);
 DBL Triangle_Wave (DBL value);
 void Transform_Textures (TEXTURE *Textures, const TRANSFORM *Trans);
@@ -178,6 +146,10 @@ TEXTURE *Copy_Texture_Pointer (TEXTURE *Texture);
 TEXTURE *Copy_Textures (TEXTURE *Textures);
 TEXTURE *Create_Texture (void);
 int Test_Opacity (const TEXTURE *Texture);
+
+/// @}
+///
+//##############################################################################
 
 }
 

@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,7 +40,65 @@
 
 #include "syspovconfigbase.h"
 
+#include <limits>
+
 #include <boost/version.hpp>
+
+//##############################################################################
+///
+/// @defgroup PovBaseConfig Base Compile-Time Configuration
+/// @ingroup PovBase
+/// @ingroup PovConfig
+///
+/// In addition to the configuration settings listed below, platform-specific compile-time
+/// configuration needs to define various symbols to have the same semantics as those of the same
+/// name from the namespaces of common standard libraries. Typically this will be done by including
+/// the corresponding header files and specifying `using NAMESPACE::SYMBOL`. However, alternative
+/// implementations may also be provided unless noted otherwise.
+///
+/// The following symbols must have the same semantics as those from C++03's `std::` namespace:
+///
+///   - `list`
+///   - `runtime_error` (should be identical to `std::runtime_error`)
+///   - `string`
+///   - `vector`
+///
+/// The following symbols must have the same semantics as those from either Boost's `boost::`
+/// namespace, TR1's `std::tr1::` namespace, or C++11's `std::` namespace:
+///
+///   - `const_pointer_cast`
+///   - `dynamic_pointer_cast`
+///   - `shared_ptr`
+///   - `static_pointer_cast`
+///   - `weak_ptr`
+///
+/// The following symbols must have the same semantics as those from Boost's `boost::` namespace:
+///
+///   - `intrusive_ptr`
+///
+/// @todo
+///     The following POSIX features also need to be present or emulated:
+///       - `O_CREAT`, `O_RDWR`, `O_TRUNC`
+///       - `S_IRUSR`, `S_IWUSR`
+///       - `int open(const char*, int, int)`
+///       - `int close(int)`
+///       - `ssize_t write(int, const void*, size_t)`
+///       - `ssize_t read(int, void*, size_t)`
+///       - `off64_t lseek64(int, off64_t, int)
+///
+/// @todo
+///     The following somewhat obscure macros also need to be defined:
+///       - `IFF_SWITCH_CAST`
+///
+/// @todo
+///     The following macros currently default to unexpected values; also, the implementations
+///     they default to are currently not part of the base module:
+///       - `POV_MALLOC`
+///       - `POV_REALLOC`
+///       - `POV_FREE`
+///       - `POV_MEMMOVE`
+///
+/// @{
 
 //******************************************************************************
 ///
@@ -51,13 +109,13 @@
 /// which type fits the requirements, the algorithm may fail on some exotic systems.
 ///
 /// @compat
-///     The automatic type detection is almost certain fail on systems that employ padding bits
+///     The automatic type detection is almost certain to fail on systems that employ padding bits
 ///     and/or do not use two's complement format for negative values.
 ///
 /// @{
 
 /// @def POV_INT8
-/// The smallest integer data type that can handle values in the range from -2^7 to 2^7-1.
+/// The smallest integer data type that can handle values in the range from @f$ -2^7 @f$ to @f$ 2^7-1 @f$.
 ///
 /// @attention
 ///     Some legacy portions of the code may rely on this type to be _exactly_ 8 bits wide,
@@ -77,7 +135,7 @@
 #endif
 
 /// @def POV_UINT8
-/// The smallest integer data type that can handle values in the range from 0 to 2^8-1.
+/// The smallest integer data type that can handle values in the range from @f$ 0 @f$ to @f$ 2^8-1 @f$.
 ///
 /// @attention
 ///     Some legacy portions of the code may rely on this type to be _exactly_ 8 bits wide,
@@ -97,7 +155,7 @@
 #endif
 
 /// @def POV_INT16
-/// The smallest integer data type that can handle values in the range from -2^15 to 2^15-1.
+/// The smallest integer data type that can handle values in the range from @f$ -2^{15} @f$ to @f$ 2^{15}-1 @f$.
 ///
 /// @attention
 ///     Some legacy portions of the code may rely on this type to be _exactly_ 16 bits wide,
@@ -117,7 +175,7 @@
 #endif
 
 /// @def POV_UINT16
-/// The smallest integer data type that can handle values in the range from 0 to 2^16-1.
+/// The smallest integer data type that can handle values in the range from @f$ 0 @f$ to @f$ 2^{16}-1 @f$.
 ///
 /// @attention
 ///     Some legacy portions of the code may rely on this type to be _exactly_ 16 bits wide,
@@ -137,7 +195,7 @@
 #endif
 
 /// @def POV_INT32
-/// The smallest integer data type that can handle values in the range from -2^31 to 2^31-1.
+/// The smallest integer data type that can handle values in the range from @f$ -2^{31} @f$ to @f$ 2^{31}-1 @f$.
 ///
 /// @attention
 ///     Some legacy portions of the code may rely on this type to be _exactly_ 32 bits wide,
@@ -157,7 +215,7 @@
 #endif
 
 /// @def POV_UINT32
-/// The smallest integer data type that can handle values in the range from 0 to 2^32-1.
+/// The smallest integer data type that can handle values in the range from @f$ 0 @f$ to @f$ 2^{32}-1 @f$.
 ///
 /// @attention
 ///     Some legacy portions of the code may rely on this type to be _exactly_ 32 bits wide,
@@ -177,7 +235,7 @@
 #endif
 
 /// @def POV_INT64
-/// The smallest integer data type that can handle values in the range from -2^63 to 2^63-1.
+/// The smallest integer data type that can handle values in the range from @f$ -2^{63} @f$ to @f$ 2^{63}-1 @f$.
 ///
 /// @attention
 ///     Some legacy portions of the code may rely on this type to be _exactly_ 64 bits wide,
@@ -197,7 +255,7 @@
 #endif
 
 /// @def POV_UINT64
-/// The smallest integer data type that can handle values in the range from 0 to 2^64-1.
+/// The smallest integer data type that can handle values in the range from @f$ 0 @f$ to @f$ 2^{64}-1 @f$.
 ///
 /// @attention
 ///     Some legacy portions of the code may rely on this type to be _exactly_ 64 bits wide,
@@ -222,6 +280,9 @@
 /// It is recommended to use a data type providing at least the same range and precision as the
 /// IEEE 754 "double" type (15 decimal digits in the range from 1e-308 to 1e+308) and supporting
 /// both infinities and quiet NaN values.
+///
+/// @note
+///     When overriding this macro, make sure to also override @ref POV_DBL_FORMAT_STRING.
 ///
 /// @attention
 ///     Many portions of the code currently presume this type to be an alias for `double`.
@@ -290,9 +351,12 @@
 ///     For clarity, this data type should _not_ be used as the base type for UTF-16 encoded
 ///     full-fledged Unicode strings. Use @ref UTF16 instead.
 ///
+/// @note
+///     Currently, the actual type must be identical to that of @ref UTF16.
+///
 /// @attention
 ///     Some legacy portions of the code may improperly use this type where they should use
-///     @ref UCS2 instead.
+///     @ref UTF16 instead.
 ///
 #ifndef UCS2
     #define UCS2 POV_UINT16
@@ -315,6 +379,9 @@
 ///     For clarity, this data type should _not_ be used to store regular UCS2 characters
 ///     (16-bit Base Multilingual Plane subset of Unicode). For that purpose, use @ref UCS2
 ///     instead.
+///
+/// @note
+///     Currently, the actual type must be identical to that of @ref UTF16.
 ///
 /// @attention
 ///     Some legacy portions of the code may improperly use @ref UCS2 where they should use this
@@ -400,6 +467,66 @@
 ///
 //******************************************************************************
 ///
+/// @name Floating-Point Special Values
+///
+/// The following macros are used to identify certain special floating-point values.
+///
+/// @{
+
+/// @def POV_ISINF(x)
+/// Test whether floating-point value x denotes positive or negative infinity.
+///
+/// The default implementation tests whether the absolute of the value is larger than the largest
+/// finite value representable by the data type.
+///
+/// @note
+///     The macro must be implemented in a manner that it works properly for all floating-point
+///     data types.
+///
+#ifndef POV_ISINF
+    template<typename T>
+    inline bool pov_isinf(T x) { volatile T v = std::numeric_limits<T>::max(); return std::fabs(x) > v; }
+    #define POV_ISINF(x) pov_isinf(x)
+#endif
+
+/// @def POV_ISNAN(x)
+/// Test whether floating-point value x denotes "not-a-number" (NaN).
+///
+/// "Not-a-number" is any special value denoting neither a finite number nor positive or negative
+/// infinity. Examples include the result of dividing 0 by 0, or raising a negative value to a
+/// non-integer power.
+///
+/// The default implementation exploits the property that (on most systems) NaNs (and only NaNs)
+/// are considered non-equal to any value including themselves.
+///
+/// @note
+///     The macro must be implemented in a manner that it works properly for all floating-point
+///     data types.
+///
+#ifndef POV_ISNAN
+    template<typename T>
+    inline bool pov_isnan(T x) { volatile T v = x; return (v != x); }
+    #define POV_ISNAN(x) pov_isnan(x)
+#endif
+
+/// @def POV_ISFINITE(x)
+/// Test whether floating-point value x denotes a proper finite number.
+///
+/// The default implementation tests whether the value is neither infinity nor "not-a-number",
+/// using the @ref POV_ISINF and @ref POV_ISNAN macros.
+///
+/// @note
+///     The macro must be implemented in a manner that it works properly for all floating-point
+///     data types.
+///
+#ifndef POV_ISFINITE
+    #define POV_ISFINITE(x) (!POV_ISINF(x) && !POV_ISNAN(x))
+#endif
+
+/// @}
+///
+//******************************************************************************
+///
 /// @name Memory Allocation
 ///
 /// The following macros are used for memory allocation and related stuff. Check existing code
@@ -411,45 +538,43 @@
 /// @{
 
 #ifndef POV_MALLOC
-    #define POV_MALLOC(size,msg)        pov_malloc ((size), __FILE__, __LINE__, (msg))
+    #define POV_MALLOC(size,msg)        pov_base::pov_malloc ((size), __FILE__, __LINE__, (msg))
 #endif
 
 #ifndef POV_REALLOC
-    #define POV_REALLOC(ptr,size,msg)   pov_realloc ((ptr), (size), __FILE__, __LINE__, (msg))
+    #define POV_REALLOC(ptr,size,msg)   pov_base::pov_realloc ((ptr), (size), __FILE__, __LINE__, (msg))
 #endif
 
 #ifndef POV_FREE
-    #define POV_FREE(ptr)               do { pov_free (static_cast<void *>(ptr), __FILE__, __LINE__); (ptr) = NULL; } while(false)
+    #define POV_FREE(ptr)               do { pov_base::pov_free (static_cast<void *>(ptr), __FILE__, __LINE__); (ptr) = NULL; } while(false)
 #endif
 
 #ifndef POV_MEM_INIT
-    #define POV_MEM_INIT()              mem_init()
+    #define POV_MEM_INIT()              pov_base::mem_init()
 #endif
 
 #ifndef POV_MEM_RELEASE_ALL
-    #define POV_MEM_RELEASE_ALL()       mem_release_all()
+    #define POV_MEM_RELEASE_ALL()       pov_base::mem_release_all()
 #endif
 
 #ifndef POV_STRDUP
-    #define POV_STRDUP(str)             pov_strdup(str)
+    #define POV_STRDUP(str)             pov_base::pov_strdup(str)
 #endif
 
 // For those systems that don't have memmove, this can also be pov_memmove
 #ifndef POV_MEMMOVE
-    #define POV_MEMMOVE(dst,src,len)    pov_memmove((dst),(src),(len))
+    #define POV_MEMMOVE(dst,src,len)    pov_base::pov_memmove((dst),(src),(len))
 #endif
 
 #ifndef POV_MEMCPY
-    #define POV_MEMCPY(dst,src,len)     memcpy((dst),(src),(len))
+    #define POV_MEMCPY(dst,src,len)     std::memcpy((dst),(src),(len))
 #endif
 
 #ifndef POV_MEM_STATS
     #define POV_MEM_STATS                       0
     #define POV_GLOBAL_MEM_STATS(a,f,c,p,s,l)   (false)
-    #define POV_THREAD_MEM_STATS(a,f,c,p,s,l)   (false)
     #define POV_MEM_STATS_RENDER_BEGIN()
     #define POV_MEM_STATS_RENDER_END()
-    #define POV_MEM_STATS_COOKIE                void *
 #endif
 
 /// @}
@@ -460,27 +585,106 @@
 ///
 /// @{
 
-#ifndef POV_SYS_FILE_EXTENSION
-    #define POV_SYS_FILE_EXTENSION ".tga"
+/// @def POV_BUILD_INFO
+/// Additional build information.
+///
+/// An ASCII string containing only alphanumeric and/or hyphen characters (`A`-`Z`, `a`-`z`,
+/// `0`-`9`, `-`), intended to differentiate builds created from the same source code but using
+/// different build tools or settings.
+///
+#ifndef POV_BUILD_INFO
+    // leave undefined
+    #ifdef DOXYGEN
+        // doxygen cannot document undefined macros
+        #define POV_BUILD_INFO ""
+    #endif
+#endif
+
+/// @def POV_RAY_BUILD_ID
+/// Unique build identifier.
+///
+/// An ASCII string containing only alphanumeric and/or hyphen characters (`A`-`Z`, `a`-`z`,
+/// `0`-`9`, `-`), intended to further differentiate different builds created from the same source
+/// code in cases where @ref POV_BUILD_INFO would be the same.
+///
+/// @note
+///     This macro is _not_ intended to be set via hard-coded compile-time configuration files,
+///     but rather injected during the actual build via compiler parameters.
+///
+#ifndef POV_RAY_BUILD_ID
+    // leave undefined
+    #ifdef DOXYGEN
+        // doxygen cannot document undefined macros
+        #define POV_RAY_BUILD_ID ""
+    #endif
+#endif
+
+/// @def POV_COMPILER_INFO
+/// Verbose compiler name.
+///
+/// @note
+///     If the compiler information is already encoded in @ref POV_BUILD_INFO, this macro should be
+///     left undefined.
+///
+#ifndef POV_COMPILER_INFO
+    // leave undefined
+    #ifdef DOXYGEN
+        // doxygen cannot document undefined macros
+        #define POV_COMPILER_INFO ""
+    #endif
+#endif
+
+/// @def POV_SYS_IMAGE_TYPE
+/// The system's canonical image file format.
+///
+/// Set this to the file type, as defined in @ref pov_base::Image::ImageFileType, corresponding to the
+/// input image file format selected by the `sys` keyword.
+///
+/// @note
+///     When overriding this setting, make sure to also override @ref POV_SYS_IMAGE_EXTENSION.
+///
+#ifndef POV_SYS_IMAGE_TYPE
+    // leave undefined by default
+    #ifdef DOXYGEN
+        // doxygen cannot document undefined macros
+        #define POV_SYS_IMAGE_TYPE SYS
+    #endif
+#endif
+
+/// @def POV_SYS_IMAGE_EXTENSION
+/// The system's canonical image file format extension.
+///
+/// Set this to the file extension string (including leading dot) corresponding to the
+/// input image file format selected by the `sys` keyword.
+///
+/// @note
+///     When overriding this setting, make sure to also override @ref POV_SYS_IMAGE_TYPE.
+///
+#ifndef POV_SYS_IMAGE_EXTENSION
+    #define POV_SYS_IMAGE_EXTENSION ".tga"
 #endif
 
 /// @def POV_PATH_SEPARATOR
-/// The system's path separator character.
-///
-/// @note
-///     If the operating system supports multiple different separator characters, set this to the canonical one.
+/// The system's canonical path separator character.
 ///
 #ifndef POV_PATH_SEPARATOR
     #define POV_PATH_SEPARATOR '/'
 #endif
 
-/// @def POV_PATH_SEPARATOR_2
-/// The system's alternative path separator character.
+/// @def POV_IS_PATH_SEPARATOR(c)
+/// Test whether `c` is any of the system's supported path separator characters.
 ///
-/// If the operating system does not support an alternative path separator character, leave this undefined.
+/// If the operating system does not support alternative path separator characters, leave this undefined, in which
+/// case it will evaluate to a test for @ref POV_PATH_SEPARATOR.
 ///
-#ifndef POV_PATH_SEPARATOR_2
-    // Leave undefined.
+/// @note
+///     This macro must also test for the canonical path separator.
+/// @note
+///     When the macro parameter is a character constant, this macro must expand to a _constant expression_, i.e. it
+///     must be usable in preprocessor directives.
+///
+#ifndef POV_IS_PATH_SEPARATOR
+    #define POV_IS_PATH_SEPARATOR(c) ((c) == POV_PATH_SEPARATOR)
 #endif
 
 /// @def POV_SLASH_IS_SWITCH_CHARACTER
@@ -488,6 +692,24 @@
 ///
 #ifndef POV_SLASH_IS_SWITCH_CHARACTER
     #define POV_SLASH_IS_SWITCH_CHARACTER 0
+#endif
+
+/// @def POV_DBL_FORMAT_STRING
+/// `scanf` format string to read a value of type @ref DBL.
+///
+#ifndef POV_DBL_FORMAT_STRING
+    #define POV_DBL_FORMAT_STRING "%lf"
+#endif
+
+/// @def POV_NEW_LINE_STRING
+/// The system's canonical end-of-line string.
+///
+#ifndef POV_NEW_LINE_STRING
+    // leave undefined, optimizing the code for "\n" as used internally
+    #ifdef DOXYGEN
+        // doxygen cannot document undefined macros
+        #define POV_NEW_LINE_STRING "\n"
+    #endif
 #endif
 
 #ifndef EXIST_FONT_FILE
@@ -511,12 +733,33 @@
 #define DEFAULT_WORKING_GAMMA       1.0
 #define DEFAULT_WORKING_GAMMA_TEXT  "1.0"
 
+/// @def DEFAULT_AUTO_BOUNDINGTHRESHOLD
+/// Define the default auto-bounding threshold used and reported.
+///
+/// The shipped povray.ini file defines this with:
+/// Bounding_Threshold=3
+/// and the definition here should be aligned so when users run
+/// without the bounding threshold setting by ini file or command
+/// line option the default is still the documented value of 3.
+///
+#ifndef DEFAULT_AUTO_BOUNDINGTHRESHOLD
+    #define DEFAULT_AUTO_BOUNDINGTHRESHOLD 3
+#endif
+
 #ifndef CDECL
     #define CDECL
 #endif
 
 #ifndef ALIGN16
     #define ALIGN16
+#endif
+
+#ifndef ALIGN32
+    // leave undefined, allowing code to detect that forced 32-bit alignment isn't supported
+    #ifdef DOXYGEN
+        // doxygen cannot document undefined macros
+        #define ALIGN32
+    #endif
 #endif
 
 #ifndef FORCEINLINE
@@ -536,7 +779,7 @@
 /// @def POV_USE_DEFAULT_DELAY
 /// Whether to use a default implementation for the millisecond-precision delay function.
 ///
-/// Define as non-zero to use a default implementation for the @ref Delay() function, or zero if
+/// Define as non-zero to use a default implementation for the @ref pov_base::Delay() function, or zero if
 /// the platform provides its own implementation.
 ///
 /// @note
@@ -550,7 +793,7 @@
 /// @def POV_USE_DEFAULT_TIMER
 /// Whether to use a default implementation for the millisecond-precision timer.
 ///
-/// Define as non-zero to use a default implementation for the @ref Timer class, or zero if the
+/// Define as non-zero to use a default implementation for the @ref pov_base::Timer class, or zero if the
 /// platform provides its own implementation.
 ///
 /// @note
@@ -564,14 +807,33 @@
 /// @def POV_USE_DEFAULT_PATH_PARSER
 /// Whether to use a default implementation for the path string parser.
 ///
-/// Define as non-zero to use a default implementation for the @ref Path::ParsePathString() method, or zero if the
-/// platform provides its own implementation.
+/// Define as non-zero to use a default implementation for the @ref pov_base::Path::ParsePathString() method,
+/// or zero if the platform provides its own implementation.
 ///
 /// @note
 ///     The default implementation supports only local files on a single anonymous volume.
 ///
 #ifndef POV_USE_DEFAULT_PATH_PARSER
     #define POV_USE_DEFAULT_PATH_PARSER 1
+#endif
+
+/// @def POV_DELETE_FILE
+/// Delete a given file.
+///
+/// Define as a single command that erases the specified file from the file system.
+///
+/// @note
+///     There is no default implementation for this macro.
+///
+/// @param[in]  name    UTF-8 encoded file name in system-specific format.
+///
+#ifndef POV_DELETE_FILE
+    #ifdef DOXYGEN
+        // doxygen cannot document undefined macros
+        #define POV_DELETE_FILE(name) do{;}while(0)
+    #else
+        #error "No default implementation for POV_DELETE_FILE."
+    #endif
 #endif
 
 /// @}
@@ -611,6 +873,15 @@
 ///
 #ifndef POV_COLOURSPACE_DEBUG
     #define POV_COLOURSPACE_DEBUG POV_DEBUG
+#endif
+
+/// @def POV_CPUINFO_DEBUG
+/// Enable CPU detection run-time sanity checks and debugging aids.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_CPUINFO_DEBUG
+    #define POV_CPUINFO_DEBUG POV_DEBUG
 #endif
 
 /// @def POV_FILE_DEBUG
@@ -690,7 +961,7 @@
 /// @def POV_BACKSLASH_IS_PATH_SEPARATOR
 /// Whether the system supports the backslash as a separator character.
 ///
-#if (POV_PATH_SEPARATOR == '\\') || (defined(POV_PATH_SEPARATOR_2) &&  (POV_PATH_SEPARATOR_2 == '\\'))
+#if POV_IS_PATH_SEPARATOR('\\')
     #define POV_BACKSLASH_IS_PATH_SEPARATOR 1
 #else
     #define POV_BACKSLASH_IS_PATH_SEPARATOR 0
@@ -706,6 +977,12 @@
     #define POV_COLOURSPACE_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
     #define POV_COLOURSPACE_ASSERT(expr) POV_ASSERT_DISABLE(expr)
+#endif
+
+#if POV_CPUINFO_DEBUG
+    #define POV_CPUINFO_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_CPUINFO_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #if POV_FILE_DEBUG
@@ -743,5 +1020,9 @@
 /// @}
 ///
 //******************************************************************************
+
+/// @}
+///
+//##############################################################################
 
 #endif // POVRAY_BASE_CONFIGBASE_H

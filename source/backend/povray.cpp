@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -51,11 +51,15 @@
 #include "base/timer.h"
 #include "base/types.h"
 
+#include "core/material/noise.h"
 #include "core/material/pattern.h"
-#include "core/material/texture.h"
 
 #include "backend/control/renderbackend.h"
 #include "backend/support/task.h"
+
+#ifdef POV_CPUINFO_H
+#include POV_CPUINFO_H
+#endif
 
 #ifndef DONT_SHOW_IMAGE_LIB_VERSIONS
     // these are needed for copyright notices and version numbers
@@ -126,7 +130,7 @@ namespace
 using namespace pov;
 using namespace pov_base;
 
-/// Primary Developers
+/// Primary Developers.
 const char *PrimaryDevelopers[] =
 {
     "Chris Cason",
@@ -135,7 +139,7 @@ const char *PrimaryDevelopers[] =
     NULL
 };
 
-/// Assisting Developers
+/// Assisting Developers.
 const char *AssistingDevelopers[] =
 {
     "Nicolas Calimet",
@@ -148,7 +152,8 @@ const char *AssistingDevelopers[] =
     NULL
 };
 
-/// Past Contributing Developers
+/// Past Contributing Developers.
+/// By convention, current developers are also already included here.
 const char *ContributingDevelopers[] =
 {
     "Steve Anger",
@@ -165,6 +170,7 @@ const char *ContributingDevelopers[] =
     "Dan Farmer",
     "Thorsten Froehlich",
     "Mark Gordon",
+    "Jerome Grimbert",
     "James Holsenback",
     "Christoph Hormann",
     "Mike Hough",
@@ -179,6 +185,7 @@ const char *ContributingDevelopers[] =
     "Douglas Muir",
     "Juha Nieminen",
     "Ron Parker",
+    "William F. Pokorny",
     "Bill Pulver",
     "Eduard Schwan",
     "Wlodzimierz Skiba",
@@ -283,12 +290,12 @@ void BuildInitInfo(POVMSObjectPtr msg)
         err = POVMSUtil_SetString(msg, kPOVAttrib_PlatformName, POVRAY_PLATFORM_NAME);
     if(err == kNoErr)
         err = POVMSUtil_SetFormatString(msg, kPOVAttrib_CoreVersion,
-                                        "Persistence of Vision(tm) Ray Tracer Version %s%s", POV_RAY_VERSION, COMPILER_VER);
+                                        "Persistence of Vision(tm) Ray Tracer Version %s", POV_RAY_VERSION_INFO);
     if(err == kNoErr)
         err = POVMSUtil_SetString(msg, kPOVAttrib_EnglishText,
                                   DISTRIBUTION_MESSAGE_1 "\n" DISTRIBUTION_MESSAGE_2 "\n" DISTRIBUTION_MESSAGE_3
                                   "\nPOV-Ray is based on DKBTrace 2.12 by David K. Buck & Aaron A. Collins\n" POV_RAY_COPYRIGHT);
-#if POV_RAY_IS_OFFICIAL == 1
+#if POV_RAY_IS_OFFICIAL
     if(err == kNoErr)
         err = POVMSUtil_SetBool(msg, kPOVAttrib_Official, true);
 #else
@@ -480,6 +487,39 @@ void BuildInitInfo(POVMSObjectPtr msg)
 #endif  // DONT_SHOW_IMAGE_LIB_VERSIONS
     if(err == kNoErr)
         err = POVMSObject_Set(msg, &attrlist, kPOVAttrib_ImageLibVersions);
+
+#ifdef POV_CPUINFO
+    std::string cpuInfo(POV_CPUINFO);
+    if (err == kNoErr)
+        err = POVMSUtil_SetString(msg, kPOVAttrib_CPUInfo, cpuInfo.c_str());
+#endif
+
+#if POV_CPUINFO_DEBUG && defined(POV_CPUINFO_DETAILS)
+    std::string cpuDetail(POV_CPUINFO_DETAILS);
+    if (err == kNoErr)
+        err = POVMSUtil_SetString(msg, kPOVAttrib_CPUInfoDetails, cpuDetail.c_str());
+#endif
+
+    if (err == kNoErr)
+        err = POVMSAttrList_New(&attrlist);
+    if (err == kNoErr)
+    {
+#ifdef TRY_OPTIMIZED_NOISE
+        const OptimizedNoiseInfo* pNoise = GetRecommendedOptimizedNoise();
+        std::string noiseGenInfo = "Noise generator: " + std::string(pNoise->name) + " (" + ::string(pNoise->info) + ")";
+        err = POVMSAttr_New(&attr);
+        if (err == kNoErr)
+        {
+            err = POVMSAttr_Set(&attr, kPOVMSType_CString, reinterpret_cast<const void *>(noiseGenInfo.c_str()), noiseGenInfo.length() + 1);
+            if (err == kNoErr)
+                err = POVMSAttrList_Append(&attrlist, &attr);
+            else
+                err = POVMSAttr_Delete(&attr);
+        }
+#endif
+    }
+    if (err == kNoErr)
+        err = POVMSObject_Set(msg, &attrlist, kPOVAttrib_Optimizations);
 }
 
 void ExtractLibraryVersion(const char *str, char *buffer)
@@ -603,7 +643,7 @@ boost::thread *povray_init(const boost::function0<void>& threadExit, POVMSAddres
         Initialize_Noise();
         pov::InitializePatternGenerators();
 
-        POV_MainThread = Task::NewBoostThread(boost::bind(&MainThreadFunction, threadExit), 1024 * 64);
+        POV_MainThread = Task::NewBoostThread(boost::bind(&MainThreadFunction, threadExit), POV_THREAD_STACK_SIZE);
 
         // we can't depend on boost::thread::yield here since under windows it is not
         // guaranteed to give up a time slice [see API docs for Sleep(0)]

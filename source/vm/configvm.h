@@ -41,8 +41,13 @@
 #include "core/configcore.h"
 #include "syspovconfigvm.h"
 
-namespace pov
-{
+//##############################################################################
+///
+/// @defgroup PovVMConfig VM Compile-Time Configuration
+/// @ingroup PovVM
+/// @ingroup PovConfig
+///
+/// @{
 
 // Adjust to match floating-point parameter(s) of functions in math.h/cmath
 #ifndef SYS_MATH_PARAM
@@ -98,7 +103,7 @@ namespace pov
 /// @{
 
 /// @def POV_VM_DEBUG
-/// Enable run-time sanity checks for the VM.
+/// Enable run-time sanity checks for the @ref PovVM.
 ///
 /// Define as non-zero integer to enable, or zero to disable.
 ///
@@ -127,6 +132,8 @@ namespace pov
 ///
 //******************************************************************************
 
-}
+/// @}
+///
+//##############################################################################
 
 #endif // POVRAY_VM_CONFIGVM_H

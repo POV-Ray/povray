@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,12 +40,19 @@
 
 #include <algorithm>
 #include <limits>
+#include <string>
 #include <vector>
 
-#include "pov_mem.h"
+#include "base/pov_mem.h"
 
 namespace pov_base
 {
+
+//##############################################################################
+///
+/// @addtogroup PovBase
+///
+/// @{
 
 /// A macro wrapping a sequence of statements into a single one.
 ///
@@ -271,33 +278,14 @@ struct POVRect
     unsigned int GetHeight() const { return (bottom - top + 1); }
 };
 
-class GenericSetting
-{
-    public:
-        explicit GenericSetting(bool set = false): set(set) {}
-        void Unset() { set = false; }
-        bool isSet() const { return set; }
-    protected:
-        bool set;
-};
-
-class FloatSetting : public GenericSetting
-{
-    public:
-        explicit FloatSetting(double data = 0.0, bool set = false): data(data), GenericSetting(set) {}
-        double operator=(double b)          { data = b; set = true; return data; }
-        operator double() const             { return data; }
-        double operator()(double def) const { if (set) return data; else return def; }
-    private:
-        double  data;
-};
-
 enum StringEncoding
 {
     kStringEncoding_ASCII  = 0,
     kStringEncoding_UTF8   = 1,
     kStringEncoding_System = 2
 };
+
+typedef std::string UTF8String;
 
 enum GammaMode
 {
@@ -347,6 +335,10 @@ class ThreadData
     public:
         virtual ~ThreadData() { }
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

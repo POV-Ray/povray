@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -91,9 +91,6 @@ static void norm_dist(DBL *factors, DBL x, DBL y);
 static void cubic(DBL *factors, DBL x);
 static void Interp(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTColour& colour, int *index, bool premul);
 static void InterpolateBicubic(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTColour& colour, int *index, bool premul);
-static void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTColour& colour, int *index); // TODO ALPHA - caller should decide whether to prefer premultiplied or non-premultiplied alpha
-static void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTColour& colour, int *index, bool premul);
-static int map_pos(const Vector3d& EPoint, const BasicPattern* pPattern, DBL *xcoor, DBL *ycoor);
 
 /*
  * 2-D to 3-D Procedural Texture Mapping of a Bitmapped Image onto an Object:
@@ -109,61 +106,6 @@ static int map_pos(const Vector3d& EPoint, const BasicPattern* pPattern, DBL *xc
  *
  * 1. Cylindrical mapping 2. Spherical mapping 3. Torus mapping
  */
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   image_map
-*
-* INPUT
-*
-*   EPoint   -- 3-D point at which function is evaluated
-*   Pigment  -- Pattern containing various parameters
-*
-* OUTPUT
-*
-*   Colour   -- color at EPoint
-*
-* RETURNS
-*
-*   int - true,  if current point on the image map
-*         false, if current point is not on the image map
-*
-* AUTHOR
-*
-*   POV-Ray Team
-*
-* DESCRIPTION   : Determines color of a 3-D point from a 2-D bitmap
-*
-* CHANGES
-*
-******************************************************************************/
-
-bool image_map(const Vector3d& EPoint, const PIGMENT *Pigment, TransColour& colour)
-{
-    // TODO ALPHA - the caller does expect non-premultiplied data, but maybe he could profit from premultiplied data?
-
-    int reg_number;
-    DBL xcoor = 0.0, ycoor = 0.0;
-
-    // If outside map coverage area, return clear
-
-    if(map_pos(EPoint, Pigment->pattern.get(), &xcoor, &ycoor))
-    {
-        colour = ToTransColour(RGBFTColour(1.0, 1.0, 1.0, 0.0, 1.0));
-        return false;
-    }
-    else
-    {
-        RGBFTColour rgbft;
-        image_colour_at(dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage, xcoor, ycoor, rgbft, &reg_number, false);
-        colour = ToTransColour(rgbft);
-        return true;
-    }
-}
-
-
 
 /*****************************************************************************
 *
@@ -199,11 +141,15 @@ TEXTURE *material_map(const Vector3d& EPoint, const TEXTURE *Texture)
      * texture index.
      */
 
-    if(map_pos(EPoint, Texture->pattern.get(), &xcoor, &ycoor))
+    // NB: Can't use `static_cast` here due to multi-inheritance in the pattern class hierarchy.
+    const ImagePatternImpl *pattern = dynamic_cast<ImagePatternImpl*>(Texture->pattern.get());
+    POV_PATTERN_ASSERT(pattern);
+
+    if(map_pos(EPoint, pattern->pImage, &xcoor, &ycoor))
         Material_Number = 0;
     else
     {
-        image_colour_at(dynamic_cast<ImagePattern*>(Texture->pattern.get())->pImage, xcoor, ycoor, colour, &reg_number); // TODO ALPHA - we should decide whether we prefer premultiplied or non-premultiplied alpha
+        image_colour_at(pattern->pImage, xcoor, ycoor, colour, &reg_number); // TODO ALPHA - we should decide whether we prefer premultiplied or non-premultiplied alpha
 
         if(reg_number == -1)
             Material_Number = (int)(colour.red() * 255.0);
@@ -247,12 +193,18 @@ void bump_map(const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal)
     Vector3d xprime, yprime, zprime;
     DBL Length;
     DBL Amount = Tnormal->Amount;
-    const ImageData *image = dynamic_cast<ImagePattern*>(Tnormal->pattern.get())->pImage;
+    const ImageData *image;
+
+    // NB: Can't use `static_cast` here due to multi-inheritance in the pattern class hierarchy.
+    const ImagePatternImpl *pattern = dynamic_cast<ImagePatternImpl*>(Tnormal->pattern.get());
+    POV_PATTERN_ASSERT(pattern);
+
+    image = pattern->pImage;
 
     // going to have to change this
     // need to know if bump point is off of image for all 3 points
 
-    if(map_pos(EPoint, Tnormal->pattern.get(), &xcoor, &ycoor))
+    if(map_pos(EPoint, image, &xcoor, &ycoor))
         return;
     else
         image_colour_at(image, xcoor, ycoor, colour1, &index); // TODO ALPHA - we should decide whether we prefer premultiplied or non-premultiplied alpha
@@ -363,12 +315,12 @@ void bump_map(const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal)
 *
 ******************************************************************************/
 
-DBL image_pattern(const Vector3d& EPoint, const BasicPattern* pPattern)
+DBL image_pattern(const Vector3d& EPoint, const ImagePattern* pPattern)
 {
     DBL xcoor = 0.0, ycoor = 0.0;
     int index = -1;
     RGBFTColour colour;
-    const ImageData *image = dynamic_cast<const ImagePattern*>(pPattern)->pImage;
+    const ImageData *image = pPattern->pImage;
     DBL Value;
 
     colour.Clear();
@@ -376,7 +328,7 @@ DBL image_pattern(const Vector3d& EPoint, const BasicPattern* pPattern)
     // going to have to change this
     // need to know if bump point is off of image for all 3 points
 
-    if(map_pos(EPoint, pPattern, &xcoor, &ycoor))
+    if(map_pos(EPoint, pPattern->pImage, &xcoor, &ycoor))
         return 0.0;
     else
         image_colour_at(image, xcoor, ycoor, colour, &index); // TODO ALPHA - we should decide whether we prefer premultiplied or non-premultiplied alpha
@@ -425,7 +377,7 @@ DBL image_pattern(const Vector3d& EPoint, const BasicPattern* pPattern)
 *
 ******************************************************************************/
 
-static void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTColour& colour, int *index)
+void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTColour& colour, int *index)
 {
     // TODO ALPHA - caller should decide whether to prefer premultiplied or non-premultiplied alpha
 
@@ -434,7 +386,7 @@ static void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTC
     image_colour_at(image, xcoor, ycoor, colour, index, image->data->IsPremultiplied());
 }
 
-static void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTColour& colour, int *index, bool premul)
+void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTColour& colour, int *index, bool premul)
 {
     *index = -1;
 
@@ -970,11 +922,9 @@ static int planar_image_map(const Vector3d& EPoint, const ImageData *image, DBL 
 *
 ******************************************************************************/
 
-static int map_pos(const Vector3d& EPoint, const BasicPattern* pPattern, DBL *xcoor, DBL *ycoor)
+int map_pos(const Vector3d& EPoint, const ImageData* image, DBL *xcoor, DBL *ycoor)
 {
-    const ImageData *image = dynamic_cast<const ImagePattern*>(pPattern)->pImage;
-
-    // Now determine which mapper to use.
+    // Determine which mapper to use.
 
     switch(image->Map_Type)
     {
@@ -1016,7 +966,7 @@ static int map_pos(const Vector3d& EPoint, const BasicPattern* pPattern, DBL *xc
     }
 
     *xcoor = wrap( *xcoor, (DBL)(image->iwidth));
-    *ycoor = wrap(-*ycoor, (DBL)(image->iheight)); // (Compensate for y coordinates on the images being upsidedown)
+    *ycoor = wrap(-*ycoor, (DBL)(image->iheight)); // (Compensate for y coordinates on the images being upside down)
 
     return (0);
 }

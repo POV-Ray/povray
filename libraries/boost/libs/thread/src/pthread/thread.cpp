@@ -35,6 +35,7 @@
 #include <string>
 #include <set>
 #include <vector>
+#include <string.h> // memcmp.
 
 namespace boost
 {
@@ -79,7 +80,9 @@ namespace boost
             {
                 static void tls_destructor(void* data)
                 {
-                    boost::detail::thread_data_base* thread_info=static_cast<boost::detail::thread_data_base*>(data);
+                    //boost::detail::thread_data_base* thread_info=static_cast<boost::detail::thread_data_base*>(data);
+                    boost::detail::thread_data_ptr thread_info = static_cast<boost::detail::thread_data_base*>(data)->shared_from_this();
+
                     if(thread_info)
                     {
                         while(!thread_info->tss_data.empty() || thread_info->thread_exit_callbacks)
@@ -107,16 +110,12 @@ namespace boost
                                 thread_info->tss_data.erase(current);
                             }
                         }
-                        if (thread_info) // fixme: should we test this?
-                        {
-                          thread_info->self.reset();
-                        }
+                        thread_info->self.reset();
                     }
                 }
             }
 
 #if defined BOOST_THREAD_PATCH
-
             struct  delete_current_thread_tls_key_on_dlclose_t
             {
                 delete_current_thread_tls_key_on_dlclose_t()
@@ -124,15 +123,18 @@ namespace boost
                 }
                 ~delete_current_thread_tls_key_on_dlclose_t()
                 {
-                    if (current_thread_tls_init_flag.epoch!=BOOST_ONCE_INITIAL_FLAG_VALUE)
+                    const boost::once_flag uninitialized = BOOST_ONCE_INIT;
+                    if (memcmp(&current_thread_tls_init_flag, &uninitialized, sizeof(boost::once_flag)))
                     {
+                        void* data = pthread_getspecific(current_thread_tls_key);
+                        if (data)
+                            tls_destructor(data);
                         pthread_key_delete(current_thread_tls_key);
                     }
                 }
             };
             delete_current_thread_tls_key_on_dlclose_t delete_current_thread_tls_key_on_dlclose;
 #endif
-
             void create_current_thread_tls_key()
             {
                 BOOST_VERIFY(!pthread_key_create(&current_thread_tls_key,&tls_destructor));
@@ -158,8 +160,9 @@ namespace boost
         {
             static void* thread_proxy(void* param)
             {
-                boost::detail::thread_data_ptr thread_info = static_cast<boost::detail::thread_data_base*>(param)->self;
-                //thread_info->self.reset();
+                //boost::detail::thread_data_ptr thread_info = static_cast<boost::detail::thread_data_base*>(param)->self;
+                boost::detail::thread_data_ptr thread_info = static_cast<boost::detail::thread_data_base*>(param)->shared_from_this();
+                thread_info->self.reset();
                 detail::set_current_thread_data(thread_info.get());
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
                 BOOST_TRY
@@ -252,7 +255,6 @@ namespace boost
         {
             thread_info->self.reset();
             return false;
-//            boost::throw_exception(thread_resource_error(res, "boost thread: failed in pthread_create"));
         }
         return true;
     }
@@ -266,7 +268,6 @@ namespace boost
         {
             thread_info->self.reset();
             return false;
-//            boost::throw_exception(thread_resource_error(res, "boost thread: failed in pthread_create"));
         }
         int detached_state;
         res = pthread_attr_getdetachstate(h, &detached_state);
@@ -274,7 +275,6 @@ namespace boost
         {
             thread_info->self.reset();
             return false;
-//            boost::throw_exception(thread_resource_error(res, "boost thread: failed in pthread_attr_getdetachstate"));
         }
         if (PTHREAD_CREATE_DETACHED==detached_state)
         {
@@ -430,7 +430,7 @@ namespace boost
     {
       namespace no_interruption_point
       {
-        namespace hiden
+        namespace hidden
         {
           void BOOST_THREAD_DECL sleep_for(const timespec& ts)
           {
@@ -490,7 +490,7 @@ namespace boost
 
         }
       }
-      namespace hiden
+      namespace hidden
       {
         void BOOST_THREAD_DECL sleep_for(const timespec& ts)
         {
@@ -503,7 +503,7 @@ namespace boost
             }
             else
             {
-              boost::this_thread::no_interruption_point::hiden::sleep_for(ts);
+              boost::this_thread::no_interruption_point::hidden::sleep_for(ts);
             }
         }
 
@@ -518,10 +518,10 @@ namespace boost
             }
             else
             {
-              boost::this_thread::no_interruption_point::hiden::sleep_until(ts);
+              boost::this_thread::no_interruption_point::hidden::sleep_until(ts);
             }
         }
-      } // hiden
+      } // hidden
     } // this_thread
 
     namespace this_thread
@@ -542,7 +542,7 @@ namespace boost
             timespec ts;
             ts.tv_sec= 0;
             ts.tv_nsec= 0;
-            hiden::sleep_for(ts);
+            hidden::sleep_for(ts);
 #   endif
         }
     }

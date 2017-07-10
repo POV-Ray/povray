@@ -1,0 +1,180 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Backend Source">
+      <UniqueIdentifier>{37dcbdbc-965f-456a-88ef-94e719c9e899}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Source\Bounding">
+      <UniqueIdentifier>{3ea739c5-294f-471c-a68b-70a28d905b60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Source\Control">
+      <UniqueIdentifier>{b22c9c92-48f1-4112-980c-e207ccad1c32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Source\Render">
+      <UniqueIdentifier>{4597a4bd-79eb-455a-9067-ef35ac278ec1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Source\Scene">
+      <UniqueIdentifier>{97a33130-22df-4bd3-b88a-ed2b3622e70e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Source\Support">
+      <UniqueIdentifier>{4eb01538-921e-45c5-80f5-523ea4298683}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Source\Lighting">
+      <UniqueIdentifier>{efe26d90-2df7-4436-9c9c-c96b2a613976}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Headers">
+      <UniqueIdentifier>{62ce9b25-12bf-42da-a54c-71a5f67023f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Headers\Bounding">
+      <UniqueIdentifier>{00f8c35e-011c-4355-9c1d-da3cb3dd702d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Headers\Control">
+      <UniqueIdentifier>{b69d0461-17ec-477a-a1d2-2113a27f1922}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Headers\Render">
+      <UniqueIdentifier>{84996b87-deae-4ae5-a01a-de129397d353}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Headers\Scene">
+      <UniqueIdentifier>{f05be98c-12a6-41c3-8edf-4807d99ccebd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Headers\Support">
+      <UniqueIdentifier>{819550ea-076f-4b0b-b5e9-ff574bdb9261}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Headers\Lighting">
+      <UniqueIdentifier>{7d2e4c81-3e0a-4c87-8ea2-1eb7ff86db26}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\backend\povray.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\control\benchmark.cpp">
+      <Filter>Backend Source\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\control\messagefactory.cpp">
+      <Filter>Backend Source\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\control\renderbackend.cpp">
+      <Filter>Backend Source\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\control\scene.cpp">
+      <Filter>Backend Source\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\render\radiositytask.cpp">
+      <Filter>Backend Source\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\render\rendertask.cpp">
+      <Filter>Backend Source\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\render\tracetask.cpp">
+      <Filter>Backend Source\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\scene\view.cpp">
+      <Filter>Backend Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\support\task.cpp">
+      <Filter>Backend Source\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\support\taskqueue.cpp">
+      <Filter>Backend Source\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\lighting\photonestimationtask.cpp">
+      <Filter>Backend Source\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\lighting\photonshootingstrategy.cpp">
+      <Filter>Backend Source\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\lighting\photonshootingtask.cpp">
+      <Filter>Backend Source\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\lighting\photonsortingtask.cpp">
+      <Filter>Backend Source\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\lighting\photonstrategytask.cpp">
+      <Filter>Backend Source\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\bounding\boundingtask.cpp">
+      <Filter>Backend Source\Bounding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\scene\viewthreaddata.cpp">
+      <Filter>Backend Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\scene\backendscenedata.cpp">
+      <Filter>Backend Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\precomp.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\backend\configbackend.h">
+      <Filter>Backend Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\frame.h">
+      <Filter>Backend Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\povray.h">
+      <Filter>Backend Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\control\benchmark.h">
+      <Filter>Backend Headers\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\control\messagefactory.h">
+      <Filter>Backend Headers\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\control\renderbackend.h">
+      <Filter>Backend Headers\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\control\scene.h">
+      <Filter>Backend Headers\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\render\radiositytask.h">
+      <Filter>Backend Headers\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\render\rendertask.h">
+      <Filter>Backend Headers\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\render\tracetask.h">
+      <Filter>Backend Headers\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\scene\view.h">
+      <Filter>Backend Headers\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\support\task.h">
+      <Filter>Backend Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\support\taskqueue.h">
+      <Filter>Backend Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\lighting\photonestimationtask.h">
+      <Filter>Backend Headers\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\lighting\photonshootingstrategy.h">
+      <Filter>Backend Headers\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\lighting\photonshootingtask.h">
+      <Filter>Backend Headers\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\lighting\photonsortingtask.h">
+      <Filter>Backend Headers\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\lighting\photonstrategytask.h">
+      <Filter>Backend Headers\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\povconfig\syspovconfigbackend.h">
+      <Filter>Backend Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\bounding\boundingtask.h">
+      <Filter>Backend Headers\Bounding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\scene\viewthreaddata.h">
+      <Filter>Backend Headers\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\scene\backendscenedata.h">
+      <Filter>Backend Headers\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\precomp.h">
+      <Filter>Backend Headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

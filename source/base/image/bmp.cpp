@@ -459,26 +459,21 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
     int             width = image->GetWidth();
     int             height = image->GetHeight();
     int             pad = (4 - ((width * 3) % 4)) & 0x03 ;
-    bool            alpha = image->HasTransparency() && options.alphachannel;
+    bool            alpha = image->HasTransparency() && options.AlphaIsEnabled();
     unsigned int    r ;
     unsigned int    g ;
     unsigned int    b ;
     unsigned int    a ;
     GammaCurvePtr   gamma;
-    DitherHandler*  dither = options.dither.get();
+    DitherStrategy& dither = *options.ditherStrategy;
 
-    if (options.encodingGamma)
-        gamma = TranscodingGammaCurve::Get(options.workingGamma, options.encodingGamma);
-    else
-        // BMP files used to have no clearly defined gamma by default, but a Microsoft recommendation exists to assume sRGB.
-        gamma = TranscodingGammaCurve::Get(options.workingGamma, SRGBGammaCurve::Get());
+    // BMP files used to have no clearly defined gamma by default, but a Microsoft recommendation exists to assume sRGB.
+    gamma = options.GetTranscodingGammaCurve(SRGBGammaCurve::Get());
 
     // TODO ALPHA - check if BMP should really keep presuming non-premultiplied alpha
     // We presume non-premultiplied alpha, unless the user overrides
     // (e.g. to handle a non-compliant file).
-    bool premul = false;
-    if (options.premultiplyOverride)
-        premul = options.premultiply;
+    bool premul = options.AlphaIsPremultiplied(false);
 
     int count = (width * (alpha ? 32 : 24) + 31) / 32 * 4 * height;
 
@@ -505,9 +500,9 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
         for (int x = 0 ; x < width ; x++)
         {
             if (alpha)
-                GetEncodedRGBAValue (image, x, y, gamma, 255, r, g, b, a, *dither, premul);
+                GetEncodedRGBAValue (image, x, y, gamma, 255, r, g, b, a, dither, premul);
             else
-                GetEncodedRGBValue (image, x, y, gamma, 255, r, g, b, *dither) ;
+                GetEncodedRGBValue (image, x, y, gamma, 255, r, g, b, dither) ;
             file->Write_Byte((unsigned char) b);
             file->Write_Byte((unsigned char) g);
             file->Write_Byte((unsigned char) r);

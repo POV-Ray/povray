@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -147,7 +147,7 @@ namespace vfePlatform
     {
         char str [FILE_NAME_LENGTH] = "";
         snprintf(str, FILE_NAME_LENGTH, "%spov%d", m_OptionsProc->GetTemporaryPath().c_str(), getpid ());
-        DELETE_FILE (str);
+        POV_DELETE_FILE (str);
 
         return ASCIItoUCS2String (str);
     }
@@ -158,7 +158,7 @@ namespace vfePlatform
     // example doesn't do that but it's not a bad idea to add.
     void vfeUnixSession::DeleteTemporaryFile(const UCS2String& filename) const
     {
-        DELETE_FILE (UCS2toASCIIString (filename).c_str());
+        POV_DELETE_FILE (UCS2toASCIIString (filename).c_str());
     }
 
     //////////////////////////////////////////////////////////////

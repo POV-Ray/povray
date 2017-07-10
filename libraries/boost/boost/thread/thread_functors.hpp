@@ -43,9 +43,9 @@ namespace boost
   {
     void operator()(thread& t)
     {
-      t.interrupt();
       if (t.joinable())
       {
+        t.interrupt();
         t.join();
       }
     }

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,24 +33,17 @@
 ///
 //******************************************************************************
 
-#include <cstdarg>
-#include <cctype>
-
-// configfrontend.h must always be the first POV file included in frontend sources (pulls in platform config)
-#include "frontend/configfrontend.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/processoptions.h"
 
-#include "povms/povmscpp.h"
-#include "povms/povmsid.h"
-
 #include "base/platformbase.h"
-#include "base/pov_err.h"
-#include "base/stringutilities.h"
+
+#include "povms/povmsid.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
-namespace pov_base
+namespace pov_frontend
 {
 
 ProcessOptions::ProcessOptions(INI_Parser_Table *pit, Cmd_Parser_Table *pct)
@@ -406,16 +399,12 @@ bool ProcessOptions::Matches(const char *v1, const char *v2)
 
 int ProcessOptions::POVMSAttr_SetUTF8String(POVMSAttributePtr attr, POVMSType type, const char *s)
 {
-    UCS2 *ustr = new UCS2[strlen(s) + 1];
-    size_t len = ConvertUTF8ToUCS2(s, ustr);
-    int err = POVMSAttr_Set(attr, type, (void *)ustr, (int(len) * 2) + 2);
-
-    delete[] ustr;
-
-    return err;
+    UCS2String ustr = UTF8toUCS2String(UTF8String(s));
+    size_t len = ustr.length();
+    return POVMSAttr_Set(attr, type, (void *)ustr.c_str(), (int(len) * 2) + 2);
 }
 
-int ProcessOptions::POVMSAttr_GetUTF8String(POVMSAttributePtr attr, POVMSType type, char *s, int *maxdatasize)
+int ProcessOptions::POVMSAttr_GetUTF8String(POVMSAttributePtr attr, POVMSType type, UTF8String& s)
 {
     int ulen = 0;
     int err = POVMSAttr_Size(attr, &ulen);
@@ -425,9 +414,10 @@ int ProcessOptions::POVMSAttr_GetUTF8String(POVMSAttributePtr attr, POVMSType ty
         err = POVMSAttr_Get(attr, type, (void *)ustr, &ulen);
 
     if(err == kNoErr)
-        *maxdatasize = ConvertUCS2ToUTF8(ustr, s);
-    else
-        *maxdatasize = 0;
+    {
+        POV_FRONTEND_ASSERT(ustr[ulen / 2] == '\0');
+        ConvertUCS2ToUTF8(ustr, s);
+    }
 
     delete[] ustr;
 
@@ -436,126 +426,84 @@ int ProcessOptions::POVMSAttr_GetUTF8String(POVMSAttributePtr attr, POVMSType ty
 
 int ProcessOptions::POVMSUtil_SetUTF8String(POVMSObjectPtr object, POVMSType key, const char *s)
 {
-    UCS2 *ustr = new UCS2[strlen(s) + 1];
-    size_t len = ConvertUTF8ToUCS2(s, ustr);
-    int err = POVMSUtil_SetUCS2String(object, key, ustr);
-
-    delete[] ustr;
-
-    return err;
+    UCS2String ustr = UTF8toUCS2String(UTF8String(s));
+    return POVMSUtil_SetUCS2String(object, key, ustr.c_str());
 }
 
-const unsigned char gUTF8SequenceArray[256] =
+size_t ProcessOptions::ConvertUTF16ToUTF8(const UTF16 *char_array, UTF8String& s)
 {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-    3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5
-};
-
-const unsigned int gUTF8Offsets[6] =
-{
-    0x00000000UL,
-    0x00003080UL,
-    0x000E2080UL,
-    0x03C82080UL,
-    0xFA082080UL,
-    0x82082080UL
-};
-
-// Note that this is duplicate code, but cleaning up all the string handling is beyond the scope of POV-Ray 3.7 :-( [trf]
-size_t ProcessOptions::ConvertUTF8ToUCS2(const char *text_array, UCS2 *char_array)
-{
+    int i, len;
     UCS4 chr;
-    int i, j, k, seqlen;
-    int text_array_size = strlen(text_array);
 
-    for(i = 0, k = 0; i < text_array_size; k++, i++)
-    {
-        seqlen = gUTF8SequenceArray[text_array[i]];
-        chr = 0;
-        for(j = seqlen; j > 0; j--)
-        {
-            chr += text_array[i];
-            chr <<= 6;
-            i++;
-        }
-
-        chr += text_array[i];
-        chr -= gUTF8Offsets[seqlen];
-
-        if(chr <= 0x0000FFFFUL)
-            char_array[k] = chr;
-        else
-            char_array[k] = 0x0000FFFDUL;
-    }
-
-    char_array[k] = 0;
-
-    return k;
-}
-
-size_t ProcessOptions::ConvertUCS2ToUTF8(const UCS2 *char_array, char *text_array)
-{
-    int i, k, len;
-    unsigned int chr;
-
-    for(len = 0, i = 0; char_array[i] != 0; i++)
-    {
-        if(char_array[i] < 0x00000080)
-            len += 1;
-        else if(char_array[i] < 0x00000800)
-            len += 2;
-        else
-            len += 3;
-    }
-
-    for(i = 0, k = 0; (char_array[i] != 0) && (k < len); i++)
+    for (len = 0, i = 0; char_array[i] != '\0'; ++i)
     {
         chr = char_array[i];
-
-        if(chr < 0x00000080)
+        if ((chr >= 0xD800u) && (chr < 0xDBFFu) && (char_array[i+1] >= 0xDC00u) && (char_array[i+1] <= 0xDFFFu))
         {
-            text_array[k] = char(chr);
-            k++;
+            // surrogate pair
+            ++i;
+            chr = ((chr & 0x3FF) << 10) | (char_array[i] & 0x3FF);
         }
-        else if (chr < 0x00000800)
+        // no need to map lonely surrogates to 0xFFFD here, as it doesn't change the UTF-8 encoding length.
+
+        if (chr < 0x0080u)
+            len += 1;
+        else if (chr < 0x0800u)
+            len += 2;
+        else if (chr < 0x10000u)
+            len += 3;
+        else
+            len += 4;
+    }
+
+    s.reserve(len);
+
+    for (i = 0; char_array[i] != 0; ++i)
+    {
+        chr = char_array[i];
+        if ((chr >= 0xD800u) && (chr < 0xDBFFu) && (char_array[i+1] >= 0xDC00u) && (char_array[i+1] <= 0xDFFFu))
         {
-            text_array[k] = ((chr >> 6) | 0xC0);
-            k++;
-            text_array[k] = ((chr | 0x80) & 0xBF);
-            k++;
+            // surrogate pair
+            ++i;
+            chr = ((chr & 0x3FF) << 10) | (char_array[i] & 0x3FF);
+        }
+        else if ((chr >= 0xD800u) && (chr < 0xDBFFu))
+            // unmatched surrogate; can't represent in well-formed UTF-8.
+            chr = 0xFFFDu;
+
+        if(chr < 0x0080u)
+        {
+            s.push_back(char(chr));
+        }
+        else if (chr < 0x0800u)
+        {
+            s.push_back(char((chr >> 6) | 0xC0));
+            s.push_back(char((chr & 0x3F) | 0x80));
+        }
+        else if (chr < 0x10000u)
+        {
+            s.push_back(char((chr >> 12) | 0xE0));
+            s.push_back(char(((chr >> 6) & 0x3F) | 0x80));
+            s.push_back(char((chr & 0x3F) | 0x80));
         }
         else
         {
-            if(chr >= 0x00010000)
-                chr = (unsigned int)0x0000FFFDUL;
-
-            text_array[k] = ((chr >> 12) | 0xE0);
-            k++;
-            text_array[k] = (((chr >> 6) | 0x80) & 0xBF);
-            k++;
-            text_array[k] = ((chr | 0x80) & 0xBF);
-            k++;
+            s.push_back(char((chr >> 18) | 0xF0));
+            s.push_back(char(((chr >> 12) & 0x3F) | 0x80));
+            s.push_back(char(((chr >> 6) & 0x3F) | 0x80));
+            s.push_back(char((chr & 0x3F) | 0x80));
         }
     }
-
-    text_array[k] = 0;
 
     return size_t(len);
 }
+
+size_t ProcessOptions::ConvertUCS2ToUTF8(const UCS2 *char_array, UTF8String& s)
+{
+    // UCS2 is effectively a subset of UTF16.
+    return ConvertUTF16ToUTF8(reinterpret_cast<const UTF16*>(char_array), s);
+}
+
 
 int ProcessOptions::ReadSpecialOptionHandler(INI_Parser_Table *, char *, POVMSObjectPtr)
 {
@@ -678,11 +626,9 @@ int ProcessOptions::Output_INI_Option(INI_Parser_Table *option, POVMSObjectPtr o
             err = POVMSAttr_Size(&item, &l);
             if(l > 0)
             {
-                bufptr = new char[l * 3];
-                bufptr[0] = 0;
-                if(POVMSAttr_GetUTF8String(&item, kPOVMSType_UCS2String, bufptr, &l) == 0)
-                    file->printf("%s=\"%s\"\n", option->keyword, bufptr);
-                delete[] bufptr;
+                UTF8String buf;
+                if (POVMSAttr_GetUTF8String(&item, kPOVMSType_UCS2String, buf) == 0)
+                    file->printf("%s=\"%s\"\n", option->keyword, buf.c_str());
             }
             (void)POVMSAttr_Delete(&item);
             break;
@@ -959,7 +905,7 @@ int ProcessOptions::Parse_INI_Switch(ITextStream *file, int token, POVMSObjectPt
     }
     else
     {
-        // if there is a quoted string directory following the switch, parse it matching quotes
+        // if there is a quoted string directly following the switch, parse it, matching quotes
         chr = file->getchar();
         if((chr == '\"') || (chr == '\''))
         {
@@ -997,16 +943,21 @@ int ProcessOptions::Parse_INI_Switch(ITextStream *file, int token, POVMSObjectPt
                     srcptr = value;
 
                 // only if a paremeter is expected allow it, and vice versa
-                if(((*srcptr > ' ') && (table->type != kPOVMSType_Null)) || ((*srcptr <= ' ') && (table->type == kPOVMSType_Null)))
+                if ((table->flags & kCmdOptFlag_Optional) ||
+                    ((*srcptr >  ' ') && (table->type != kPOVMSType_Null)) ||
+                    ((*srcptr <= ' ') && (table->type == kPOVMSType_Null)))
                 {
                     err = Process_Switch(table, srcptr, obj, (token != '-'));
-                    break;
                 }
+
+                // We're aborting the search now either way, because due how the table is supposed to be sorted,
+                // if the switch would match another entry we should have encountered that one earlier.
+                break;
             }
             table++;
         }
 
-        // if there was no sucessful match so far, see if it is a system specific switch
+        // if there was no successful match so far, see if it is a system specific switch
         if((table == NULL) || (table->command == NULL))
         {
             if(ProcessUnknownSwitch(key, value, obj) == false)
@@ -1262,7 +1213,7 @@ int ProcessOptions::Parse_CL_Switch(const char *&commandline, int token, POVMSOb
     }
     else
     {
-        // if there is a quoted string directly following the switch, parse its matching quotes
+        // if there is a quoted string directly following the switch, parse it, matching quotes
         chr = *commandline;
         commandline++;
         if((chr == '\"') || (chr == '\''))

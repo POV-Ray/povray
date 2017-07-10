@@ -44,11 +44,23 @@
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
+
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
 
 #define MESH_OBJECT (PATCH_OBJECT+HIERARCHY_OK_OBJECT) // NOTE: During parsing, the PATCH_OBJECT type flag may be cleared if an inside_vector is specified
+
+/// @}
+///
+//******************************************************************************
 
 typedef struct BBox_Tree_Struct BBOX_TREE;
 
@@ -179,6 +191,10 @@ private:
         static HASH_TABLE **Normal_Hash_Table;
         static UV_HASH_TABLE **UV_Hash_Table;
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

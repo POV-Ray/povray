@@ -2,8 +2,8 @@
 ///
 /// @file platform/windows/syspovtimer.cpp
 ///
-/// This file contains a Windows-specific implementation of the @ref Timer
-/// class.
+/// Windows-specific implementation of the @ref pov_base::Delay() function and
+/// @ref pov_base::Timer class.
 ///
 /// @copyright
 /// @parblock

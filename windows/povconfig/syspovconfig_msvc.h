@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,27 +39,16 @@
 #ifndef POVRAY_WINDOWS_SYSPOVCONFIG_MSVC_H
 #define POVRAY_WINDOWS_SYSPOVCONFIG_MSVC_H
 
+// TODO - a lot of stuff in here is only valid when compiling for x86 or x86_64.
+
 #if _MSC_VER < 1400
   #error "minimum Visual C++ version supported is 14.0 (supplied with VS 2005)"
 #endif
 
-#undef TRY_OPTIMIZED_NOISE
-#if _MSC_VER >= 1600
-  #define TRY_OPTIMIZED_NOISE
-  #define OPTIMIZED_NOISE_SUPPORTED (AVXFMA4NoiseSupported())
-  #define OPTIMIZED_NOISE           AVXFMA4Noise
-  #define OPTIMIZED_DNOISE          AVXFMA4DNoise
-  #define OPTIMIZED_NOISE_H         "avxfma4noise.h"
-#endif
-
 #include <cstdio>
 #include <direct.h>
-#include <intrin.h>
 
 #pragma auto_inline(on)
-#pragma warning(disable : 4018) /* signed/unsigned mismatch */
-#pragma warning(disable : 4305) /* truncation from 'type1' to 'type2' (mostly double to float) */
-#pragma warning(disable : 4244) /* possible loss of data (converting ints to shorts) */
 
 #ifdef __INTEL_COMPILER
 
@@ -75,10 +64,10 @@
   #endif
 
   #if __INTEL_COMPILER >= 1000 && __INTEL_COMPILER < 1100
-    #define COMPILER_VER                      ".icl10"
+    #define POV_COMPILER_VER                  "icl10"
     #define METADATA_COMPILER_STRING          "icl 10"
   #elif __INTEL_COMPILER >= 1100 && __INTEL_COMPILER < 1200
-    #define COMPILER_VER                      ".icl11"
+    #define POV_COMPILER_VER                  "icl11"
     #define METADATA_COMPILER_STRING          "icl 11"
   #else
     #error "Please update syspovconfig_msvc.h to include this version of ICL"
@@ -97,14 +86,18 @@
   #pragma inline_recursion(on)
   #pragma inline_depth(255)
 
+  #pragma warning(disable : 4018) /* signed/unsigned mismatch */
+  #pragma warning(disable : 4305) /* truncation from 'type1' to 'type2' (mostly double to float) */
+  #pragma warning(disable : 4244) /* possible loss of data (converting ints to shorts) */
+
   #if _MSC_VER >= 1400 && _MSC_VER < 1500 && !defined (_WIN64)
     // MS Visual C++ 2005 (aka 8.0), compiling for 32 bit target
-    #define COMPILER_VER                      ".msvc8"
+    #define POV_COMPILER_VER                  "msvc8"
     #define METADATA_COMPILER_STRING          "msvc 8"
     #define NEED_INVHYP
   #elif _MSC_VER >= 1400 && _MSC_VER < 1500 && defined (_WIN64)
     // MS Visual C++ 2005 (aka 8.0), compiling for 64 bit target
-    #define COMPILER_VER                      ".msvc8"
+    #define POV_COMPILER_VER                  "msvc8"
     #define METADATA_COMPILER_STRING          "msvc 8"
     #define ALIGN16                           __declspec(align(16))
     inline const int& max(const int& _X, const int& _Y) {return (_X < _Y ? _Y : _X); }
@@ -118,12 +111,12 @@
     #define NEED_INVHYP
   #elif _MSC_VER >= 1500 && _MSC_VER < 1600
     // MS Visual C++ 2008 (aka 9.0)
-    #define COMPILER_VER                      ".msvc9"
+    #define POV_COMPILER_VER                  "msvc9"
     #define METADATA_COMPILER_STRING          "msvc 9"
     #define NEED_INVHYP
   #elif _MSC_VER >= 1600 && _MSC_VER < 1700
     // MS Visual C++ 2010 (aka 10.0)
-    #define COMPILER_VER                      ".msvc10"
+    #define POV_COMPILER_VER                  "msvc10"
     #define METADATA_COMPILER_STRING          "msvc 10"
     // msvc10 defines std::hash<> as a class, while boost's flyweight_fwd.hpp may forward-declare it as a struct;
     // this is valid according to the C++ standard, but causes msvc10 to issue warnings.
@@ -131,14 +124,14 @@
     #define NEED_INVHYP
   #elif _MSC_VER >= 1700 && _MSC_VER < 1800
     // MS Visual C++ 2012 (aka 11.0)
-    #define COMPILER_VER                      ".msvc11"
+    #define POV_COMPILER_VER                  "msvc11"
     #define METADATA_COMPILER_STRING          "msvc 11"
     #error "Please update syspovconfig_msvc.h to include this version of MSVC"
     // The following settings are just guesswork, and have never been tested:
     #define NEED_INVHYP
   #elif _MSC_VER >= 1800 && _MSC_VER < 1900
     // MS Visual C++ 2013 (aka 12.0)
-    #define COMPILER_VER                      ".msvc12"
+    #define POV_COMPILER_VER                  "msvc12"
     #define METADATA_COMPILER_STRING          "msvc 12"
     #error "Please update syspovconfig_msvc.h to include this version of MSVC"
     // The following settings are just guesswork, and have never been tested:
@@ -146,7 +139,7 @@
   // NB: The Microsoft Visual Studio developers seem to have skipped internal version number 13 entirely.
   #elif _MSC_VER >= 1900 && _MSC_VER < 2000
     // MS Visual C++ 2015 (aka 14.0)
-    #define COMPILER_VER                      ".msvc14"
+    #define POV_COMPILER_VER                  "msvc14"
     #define METADATA_COMPILER_STRING          "msvc 14"
   #else
     #error "Please update syspovconfig_msvc.h to include this version of MSVC"
@@ -213,5 +206,26 @@
 
 #undef ReturnAddress
 #define ReturnAddress()                     _ReturnAddress()
+
+#define ALIGN32                             __declspec(align(32))
+#define MACHINE_INTRINSICS_H                <intrin.h>
+
+#if _MSC_VER >= 1600
+    // compiler supports AVX.
+    #define TRY_OPTIMIZED_NOISE                 // optimized noise master switch.
+    #define TRY_OPTIMIZED_NOISE_AVX_PORTABLE    // AVX-only compiler-optimized noise.
+    #define TRY_OPTIMIZED_NOISE_AVX             // AVX-only hand-optimized noise (Intel).
+    #define TRY_OPTIMIZED_NOISE_AVXFMA4         // AVX/FMA4 hand-optimized noise (AMD).
+#endif
+
+#if _MSC_VER >= 1900
+    // compiler supports AVX2.
+    #define TRY_OPTIMIZED_NOISE                 // optimized noise master switch.
+    #define TRY_OPTIMIZED_NOISE_AVX2FMA3        // AVX2/FMA3 hand-optimized noise (Intel).
+#endif
+
+#define POV_CPUINFO         CPUInfo::GetFeatures()
+#define POV_CPUINFO_DETAILS CPUInfo::GetDetails()
+#define POV_CPUINFO_H       "cpuid.h"
 
 #endif // POVRAY_WINDOWS_SYSPOVCONFIG_MSVC_H

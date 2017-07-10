@@ -14,7 +14,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -46,13 +46,10 @@
 
 #include <limits>
 
-#include "base/version.h"
 #include "base/stringutilities.h"
+#include "base/version_info.h"
 
-#include "core/material/blendmap.h"
-#include "core/material/pattern.h"
-#include "core/material/texture.h"
-#include "core/math/matrix.h"
+#include "core/material/noise.h"
 #include "core/scene/scenedata.h"
 
 // this must be the last file included
@@ -157,6 +154,7 @@ void Parser::pre_init_tokenizer ()
     Token.Token_File_Pos.offset = 0;
     Token.Token_Col_No = 0;
     Token.Token_String  = NULL;
+    Token.freeString    = false;
     Token.Unget_Token   = false;
     Token.End_Of_File   = false;
     Token.Data = NULL;
@@ -170,14 +168,14 @@ void Parser::pre_init_tokenizer ()
 
     // make sure these are NULL otherwise cleanup() will crash if we terminate early
     Default_Texture = NULL;
-    Brace_Stack = NULL;
 
     CS_Index            = 0;
     Skipping            = false;
     Inside_Ifdef        = false;
     Inside_MacroDef     = false;
-    Inside_IdentFn      = kIdentifierModeUndefined;
     Parsing_Directive   = false;
+    parseRawIdentifiers = false;
+    parseOptionalRValue = false;
     Cond_Stack          = NULL;
     Table_Index         = -1;
 
@@ -186,7 +184,7 @@ void Parser::pre_init_tokenizer ()
 
     // TODO - on modern machines it may be faster to do the comparisons for each token
     //        than to access the conversion table.
-    for(i = 0; i < LAST_TOKEN; i++)
+    for(i = 0; i < TOKEN_COUNT; i++)
     {
         Conversion_Util_Table[i] = i;
         if(i < FLOAT_FUNCT_TOKEN)
@@ -326,6 +324,8 @@ void Parser::Get_Token ()
 
     Token.Token_Id = END_OF_FILE_TOKEN;
     Token.is_array_elem = false;
+    Token.is_mixed_array_elem = false;
+    Token.is_dictionary_elem = false;
 
     while (Token.Token_Id == END_OF_FILE_TOKEN)
     {
@@ -340,6 +340,8 @@ void Parser::Get_Token ()
             {
                 Token.Token_Id = END_OF_FILE_TOKEN;
                 Token.is_array_elem = false;
+                Token.is_mixed_array_elem = false;
+                Token.is_dictionary_elem = false;
                 Token.End_Of_File = true;
                 return;
             }
@@ -351,9 +353,9 @@ void Parser::Get_Token ()
 
                 Token.Token_Id = END_OF_FILE_TOKEN;
                 Token.is_array_elem = false;
-
+                Token.is_mixed_array_elem = false;
+                Token.is_dictionary_elem = false;
                 Token.End_Of_File = true;
-
                 return;
             }
 
@@ -627,26 +629,6 @@ void Parser::Get_Token ()
             case '_':
                 Echo_ungetc(c);
                 Read_Symbol ();
-                if (!Parsing_Directive && (Inside_IdentFn == kIdentifierModeUndefined) && ((Token.Token_Id == LOCAL_TOKEN) || (Token.Token_Id == GLOBAL_TOKEN)))
-                {
-                    if (!Skip_Spaces())
-                        Error("Expected '(', end of file reached instead", c2);
-                    c2 = Echo_getc();
-                    if (c2 != '(')
-                        Error("Expected '(', found '%c' instead", c2);
-                    if (!Skip_Spaces())
-                        Error("Expected 'identifier', end of file reached instead", c2);
-
-                    Inside_IdentFn = (Token.Token_Id == LOCAL_TOKEN) ? kIdentifierModeLocal : kIdentifierModeGlobal;
-                    Read_Symbol();
-                    Inside_IdentFn = kIdentifierModeUndefined;
-
-                    if (!Skip_Spaces())
-                        Error("Expected ')', end of file reached instead", c2);
-                    c2 = Echo_getc();
-                    if (c2 != ')')
-                        Error("Expected ')', found '%c' instead", c2);
-                }
                 break;
             case '\t':
             case '\r':
@@ -1050,8 +1032,6 @@ void Parser::Read_String_Literal()
     End_String();
 
     Write_Token(STRING_LITERAL_TOKEN, col);
-
-    Token.Token_String = String;
 }
 
 
@@ -1231,7 +1211,7 @@ bool Parser::Read_Float()
 
     Write_Token (FLOAT_TOKEN, col);
 
-    if (sscanf (String, DBL_FORMAT_STRING, &Token.Token_Float) == 0)
+    if (sscanf (String, POV_DBL_FORMAT_STRING, &Token.Token_Float) == 0)
     {
         return (false);
     }
@@ -1273,6 +1253,9 @@ void Parser::Read_Symbol()
     SYM_ENTRY *Temp_Entry;
     POV_PARAM *Par;
     DBL val;
+    SYM_TABLE *table = NULL;
+    char *dictIndex = NULL;
+    int pseudoDictionary = -1;
 
     Begin_String_Fast();
 
@@ -1300,137 +1283,287 @@ void Parser::Read_Symbol()
     End_String_Fast();
 
     /* If its a reserved keyword, write it and return */
-    if ( (Temp_Entry = Find_Symbol(0,String)) != NULL)
+    if ( (Temp_Entry = Find_Symbol(SYM_TABLE_RESERVED,String)) != NULL)
     {
-        if (!Inside_Ifdef || ((sceneData->EffectiveLanguageVersion() >= 3.71) &&
-                              ((Temp_Entry->Token_Number == LOCAL_TOKEN) || (Temp_Entry->Token_Number == GLOBAL_TOKEN))))
+        if (!Parsing_Directive && (Temp_Entry->Token_Number == LOCAL_TOKEN))
+        {
+            pseudoDictionary = Table_Index;
+        }
+        else if (!Parsing_Directive && (Temp_Entry->Token_Number == GLOBAL_TOKEN))
+        {
+            pseudoDictionary = SYM_TABLE_GLOBAL;
+        }
+        else if (Inside_Ifdef)
+        {
+            Warning("Tried to test whether a reserved keyword is defined. Test result may not be what you expect.");
+        }
+        else
         {
             Write_Token (Temp_Entry->Token_Number, Token.Token_Col_No);
             return;
         }
+    }
+
+    if (!Skipping && !parseRawIdentifiers)
+    {
+        if (pseudoDictionary >= 0)
+        {
+            Token.Token_Id = DICTIONARY_ID_TOKEN;
+            Token.is_array_elem = false;
+            Token.is_mixed_array_elem = false;
+            Token.is_dictionary_elem = false;
+            Token.NumberPtr = &(Temp_Entry->Token_Number);
+            Token.DataPtr   = &(Temp_Entry->Data);
+
+            table = NULL;
+        }
         else
         {
-            Warning("Tried to test whether a reserved keyword is defined. Test result may not be what you expect.");
-        }
-    }
-
-    if (!Skipping)
-    {
-        /* Search tables from newest to oldest */
-        int firstIndex = Table_Index;
-        int lastIndex  = 1; // index 0 is reserved for reserved words, not identifiers
-        if (Inside_IdentFn == kIdentifierModeGlobal)
-            // if inside "global()" pseudo-function, just test the global table
-            firstIndex = 1;
-        else if (Inside_IdentFn == kIdentifierModeLocal)
-            // if inside "local()" pseudo-function, just test the most local table
-            lastIndex = Table_Index;
-        for (Local_Index = firstIndex; Local_Index >= lastIndex; Local_Index--)
-        {
-            /* See if it's a previously declared identifier. */
-            if ((Temp_Entry = Find_Symbol(Local_Index,String)) != NULL)
+            /* Search tables from newest to oldest */
+            int firstIndex = Table_Index;
+            int lastIndex  = SYM_TABLE_RESERVED+1; // index SYM_TABLE_RESERVED is reserved for reserved words, not identifiers
+            for (Local_Index = firstIndex; Local_Index >= lastIndex; Local_Index--)
             {
-                if (Temp_Entry->deprecated && !Temp_Entry->deprecatedShown)
+                /* See if it's a previously declared identifier. */
+                if ((Temp_Entry = Find_Symbol(Local_Index,String)) != NULL)
                 {
-                    Temp_Entry->deprecatedShown = Temp_Entry->deprecatedOnce;
-                    Warning("%s", Temp_Entry->Deprecation_Message);
-                }
-
-                if ((Temp_Entry->Token_Number==MACRO_ID_TOKEN) && (!Inside_Ifdef))
-                {
-                    Token.Data = Temp_Entry->Data;
-                    if (Ok_To_Declare)
+                    if (Temp_Entry->deprecated && !Temp_Entry->deprecatedShown)
                     {
-                        Invoke_Macro();
+                        Temp_Entry->deprecatedShown = Temp_Entry->deprecatedOnce;
+                        Warning("%s", Temp_Entry->Deprecation_Message);
                     }
-                    else
+
+                    if ((Temp_Entry->Token_Number==MACRO_ID_TOKEN) && (!Inside_Ifdef))
                     {
-                        Token.Token_Id=MACRO_ID_TOKEN;
-                        Token.is_array_elem = false;
-                        Token.NumberPtr = &(Temp_Entry->Token_Number);
-                        Token.DataPtr   = &(Temp_Entry->Data);
-                        Write_Token (Token.Token_Id, Token.Token_Col_No);
-
-                        Token.Table_Index = Local_Index;
-                    }
-                    return;
-                }
-
-                Token.Token_Id  =   Temp_Entry->Token_Number;
-                Token.is_array_elem = false;
-                Token.NumberPtr = &(Temp_Entry->Token_Number);
-                Token.DataPtr   = &(Temp_Entry->Data);
-
-                while ((Token.Token_Id==PARAMETER_ID_TOKEN) ||
-                       (Token.Token_Id==ARRAY_ID_TOKEN))
-                {
-                    if (Token.Token_Id==ARRAY_ID_TOKEN)
-                    {
-                        Skip_Spaces();
-                        c = Echo_getc();
-                        Echo_ungetc(c);
-
-                        if (c!='[')
+                        Token.Data = Temp_Entry->Data;
+                        if (Ok_To_Declare)
                         {
-                            break;
+                            Invoke_Macro();
                         }
-
-                        a = reinterpret_cast<POV_ARRAY *>(*(Token.DataPtr));
-                        j = 0;
-
-                        for (i=0; i <= a->Dims; i++)
+                        else
                         {
-                            GET(LEFT_SQUARE_TOKEN)
-                            val=Parse_Float();
-                            k=(int)(val + EPSILON);
+                            Token.Token_Id=MACRO_ID_TOKEN;
+                            Token.is_array_elem = false;
+                            Token.is_mixed_array_elem = false;
+                            Token.is_dictionary_elem = false;
+                            Token.NumberPtr = &(Temp_Entry->Token_Number);
+                            Token.DataPtr   = &(Temp_Entry->Data);
+                            Write_Token (Token.Token_Id, Token.Token_Col_No, Tables[Local_Index]);
 
-                            if ((k < 0) || (val < -EPSILON))
-                            {
-                                Error("Negative subscript");
-                            }
-
-                            if (k >= a->Sizes[i])
-                            {
-                                Error("Array subscript out of range");
-                            }
-                            j += k * a->Mags[i];
-                            GET(RIGHT_SQUARE_TOKEN)
+                            Token.context = Local_Index;
                         }
+                        return;
+                    }
 
-                        Token.DataPtr   = &(a->DataPtrs[j]);
-                        Token.NumberPtr = &(a->Type);
-                        Token.Token_Id = a->Type;
-                        Token.is_array_elem = true;
-                        if (!LValue_Ok && !Inside_Ifdef)
-                        {
-                            if (*Token.DataPtr == NULL)
-                                Error("Attempt to access uninitialized array element.");
-                        }
-                    }
-                    else
-                    {
-                        Par             = reinterpret_cast<POV_PARAM *>(Temp_Entry->Data);
-                        Token.Token_Id  = *(Par->NumberPtr);
-                        Token.is_array_elem = false;
-                        Token.NumberPtr = Par->NumberPtr;
-                        Token.DataPtr   = Par->DataPtr;
-                    }
+                    Token.Token_Id  =   Temp_Entry->Token_Number;
+                    Token.is_array_elem = false;
+                    Token.is_mixed_array_elem = false;
+                    Token.is_dictionary_elem = false;
+                    Token.NumberPtr = &(Temp_Entry->Token_Number);
+                    Token.DataPtr   = &(Temp_Entry->Data);
+
+                    table = Tables[Local_Index];
+
+                    break;
                 }
-
-                Write_Token (Token.Token_Id, Token.Token_Col_No);
-
-                Token.Data        = *(Token.DataPtr);
-                Token.Table_Index = Local_Index;
-                return;
             }
         }
+
+        if (table || (pseudoDictionary >= 0))
+        {
+            bool breakLoop = false;
+            while (!breakLoop)
+            {
+                switch (Token.Token_Id)
+                {
+                    case ARRAY_ID_TOKEN:
+                        {
+                            if (dictIndex)
+                                POV_FREE (dictIndex);
+
+                            Skip_Spaces();
+                            c = Echo_getc();
+                            Echo_ungetc(c);
+
+                            if (c!='[')
+                            {
+                                breakLoop = true;
+                                break;
+                            }
+
+                            a = reinterpret_cast<POV_ARRAY *>(*(Token.DataPtr));
+                            j = 0;
+
+                            for (i=0; i <= a->Dims; i++)
+                            {
+                                Parse_Square_Begin();
+                                val=Parse_Float();
+                                k=(int)(val + EPSILON);
+
+                                if ((k < 0) || (val < -EPSILON))
+                                {
+                                    Error("Negative subscript");
+                                }
+
+                                if (k >= a->Sizes[i])
+                                {
+                                    if (a->resizable)
+                                    {
+                                        POV_PARSER_ASSERT (a->Dims == 0);
+                                        a->DataPtrs.resize (k+1);
+                                        a->Sizes[0] = a->DataPtrs.size();
+                                    }
+                                    else
+                                        Error("Array subscript out of range");
+                                }
+                                j += k * a->Mags[i];
+                                Parse_Square_End();
+                            }
+
+                            if (!LValue_Ok && !Inside_Ifdef)
+                            {
+                                if (a->DataPtrs[j] == NULL)
+                                    Error("Attempt to access uninitialized array element.");
+                            }
+
+                            Token.DataPtr = &(a->DataPtrs[j]);
+                            Token.is_mixed_array_elem = !a->Types.empty();
+                            if (Token.is_mixed_array_elem)
+                                Token.NumberPtr = &(a->Types[j]);
+                            else
+                                Token.NumberPtr = &(a->Type);
+                            Token.Token_Id = *Token.NumberPtr;
+                            Token.is_array_elem = true;
+                            Token.is_dictionary_elem = false;
+                        }
+                        break;
+
+                    case DICTIONARY_ID_TOKEN:
+                        {
+                            if (dictIndex)
+                                POV_FREE (dictIndex);
+
+                            Skip_Spaces();
+                            c = Echo_getc();
+                            Echo_ungetc(c);
+
+                            if (pseudoDictionary >= 0)
+                            {
+                                table = Tables [pseudoDictionary];
+                                pseudoDictionary = -1;
+                                if ((c != '[') && (c != '.'))
+                                {
+                                    Get_Token(); // ensures the error is reported at the right token
+                                    Expectation_Error ("'[' or '.'");
+                                }
+                            }
+                            else
+                                table = reinterpret_cast<SYM_TABLE *>(*(Token.DataPtr));
+
+                            if (c =='.')
+                            {
+                                if (table == NULL)
+                                {
+                                    POV_PARSER_ASSERT (Token.is_array_elem);
+                                    Error ("Attempt to access uninitialized array element.");
+                                }
+
+                                GET (PERIOD_TOKEN)
+                                bool oldParseRawIdentifiers = parseRawIdentifiers;
+                                parseRawIdentifiers = true;
+                                Get_Token ();
+                                parseRawIdentifiers = oldParseRawIdentifiers;
+
+                                if (Token.Token_Id != IDENTIFIER_TOKEN)
+                                    Expectation_Error ("dictionary element identifier");
+
+                                Temp_Entry = Find_Symbol (table, Token.Token_String);
+                            }
+                            else if (c == '[')
+                            {
+                                if (table == NULL)
+                                {
+                                    POV_PARSER_ASSERT (Token.is_array_elem);
+                                    Error ("Attempt to access uninitialized array element.");
+                                }
+
+                                Parse_Square_Begin();
+                                dictIndex = Parse_C_String();
+                                Parse_Square_End();
+
+                                Temp_Entry = Find_Symbol (table, dictIndex);
+                            }
+                            else
+                            {
+                                breakLoop = true;
+                                break;
+                            }
+
+                            if (Temp_Entry)
+                            {
+                                Token.Token_Id      = Temp_Entry->Token_Number;
+                                Token.NumberPtr     = &(Temp_Entry->Token_Number);
+                                Token.DataPtr       = &(Temp_Entry->Data);
+                            }
+                            else
+                            {
+                                if (!LValue_Ok && !Inside_Ifdef && !parseOptionalRValue)
+                                    Error ("Attempt to access uninitialized dictionary element.");
+                                Token.Token_Id  = IDENTIFIER_TOKEN;
+                                Token.DataPtr   = NULL;
+                                Token.NumberPtr = NULL;
+                            }
+                            Token.is_array_elem = false;
+                            Token.is_mixed_array_elem = false;
+                            Token.is_dictionary_elem = true;
+                        }
+                        break;
+
+                    case PARAMETER_ID_TOKEN:
+                        {
+                            if (dictIndex)
+                                POV_FREE(dictIndex);
+
+                            Par             = reinterpret_cast<POV_PARAM *>(Temp_Entry->Data);
+                            Token.Token_Id  = *(Par->NumberPtr);
+                            Token.is_array_elem = false;
+                            Token.is_mixed_array_elem = false;
+                            Token.is_dictionary_elem = false;
+                            Token.NumberPtr = Par->NumberPtr;
+                            Token.DataPtr   = Par->DataPtr;
+                        }
+                        break;
+
+                    default:
+                        breakLoop = true;
+                        break;
+                }
+            }
+
+            Write_Token (Token.Token_Id, Token.Token_Col_No, table);
+
+            if (Token.DataPtr != NULL)
+                Token.Data = *(Token.DataPtr);
+            Token.context = Local_Index;
+            if (dictIndex != NULL)
+            {
+                Token.Token_String = dictIndex;
+                Token.freeString = true;
+            }
+            return;
+        }
     }
 
-    Write_Token(IDENTIFIER_TOKEN, Token.Token_Col_No);
+    Write_Token (IDENTIFIER_TOKEN, Token.Token_Col_No);
 }
 
-inline void Parser::Write_Token (TOKEN Token_Id, int col)
+inline void Parser::Write_Token (TOKEN Token_Id, int col, SYM_TABLE *table)
 {
+    if (Token.freeString)
+    {
+        POV_FREE (Token.Token_String);
+        Token.freeString = false;
+    }
     Token.Token_File_Pos = Input_File->In_File->tellg();
     Token.Token_Col_No   = col;
     Token.FileHandle     = Input_File->In_File;
@@ -1438,6 +1571,7 @@ inline void Parser::Write_Token (TOKEN Token_Id, int col)
     Token.Data           = NULL;
     Token.Token_Id       = Conversion_Util_Table[Token_Id];
     Token.Function_Id    = Token_Id;
+    Token.table          = table;
 }
 
 
@@ -1712,6 +1846,8 @@ void Parser::Parse_Directive(int After_Hash)
             }
             Token.Token_Id = END_OF_FILE_TOKEN;
             Token.is_array_elem = false;
+            Token.is_mixed_array_elem = false;
+            Token.is_dictionary_elem = false;
 
             return;
         }
@@ -1723,6 +1859,8 @@ void Parser::Parse_Directive(int After_Hash)
         {
             Token.Token_Id=HASH_TOKEN;
             Token.is_array_elem = false;
+            Token.is_mixed_array_elem = false;
+            Token.is_dictionary_elem = false;
         }
         Token.Unget_Token = false;
 
@@ -1731,7 +1869,8 @@ void Parser::Parse_Directive(int After_Hash)
 
     Parsing_Directive = true;
 
-    EXPECT
+    EXPECT  // we're normally running this loop only once, but a few directives cause it to be looped
+
         CASE(IFDEF_TOKEN)
             Parsing_Directive = false;
             Inc_CS_Index();
@@ -1860,9 +1999,11 @@ void Parser::Parse_Directive(int After_Hash)
                 }
                 else
                 {
-                    // terminate loop
+                    // terminate loop before it has even started
                     Cond_Stack[CS_Index].Cond_Type = SKIP_TIL_END_COND;
                     Skip_Tokens(SKIP_TIL_END_COND);
+                    // need to do some cleanup otherwise deferred via the Cond_Stack
+                    POV_FREE(Identifier);
                 }
             }
             EXIT
@@ -1881,6 +2022,8 @@ void Parser::Parse_Directive(int After_Hash)
                     Cond_Stack[CS_Index].Cond_Type = ELSE_COND;
                     Token.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
                     Token.is_array_elem = false;
+                    Token.is_mixed_array_elem = false;
+                    Token.is_dictionary_elem = false;
                     UNGET
                     break;
 
@@ -1894,6 +2037,8 @@ void Parser::Parse_Directive(int After_Hash)
                     {
                         Token.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
                         Token.is_array_elem = false;
+                        Token.is_mixed_array_elem = false;
+                        Token.is_dictionary_elem = false;
                         UNGET
                     }
                     break;
@@ -1920,6 +2065,8 @@ void Parser::Parse_Directive(int After_Hash)
                         Cond_Stack[CS_Index].Cond_Type=IF_TRUE_COND;
                         Token.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
                         Token.is_array_elem = false;
+                        Token.is_mixed_array_elem = false;
+                        Token.is_dictionary_elem = false;
                         UNGET
                     }
                     else
@@ -1951,7 +2098,7 @@ void Parser::Parse_Directive(int After_Hash)
                 Cond_Stack[CS_Index].Switch_Value=Parse_Cond_Param();
                 Cond_Stack[CS_Index].Cond_Type=SWITCH_COND;
                 Cond_Stack[CS_Index].Switch_Case_Ok_Flag=false;
-                EXPECT
+                EXPECT_ONE
                     // NOTE: We actually expect a "#case" or "#range" here; however, this will trigger a nested call
                     // to Parse_Directive, so we'll encounter that CASE_TOKEN or RANGE_TOKEN here only by courtesy of the
                     // respective handler, which will UNGET the token and inform us via the Switch_Case_Ok_Flag
@@ -1981,7 +2128,6 @@ void Parser::Parse_Directive(int After_Hash)
                             Cond_Stack[CS_Index].Cond_Type=CASE_FALSE_COND;
                             Skip_Tokens(CASE_FALSE_COND);
                         }
-                        EXIT
                     END_CASE
 
                     OTHERWISE
@@ -2024,6 +2170,8 @@ void Parser::Parse_Directive(int After_Hash)
                         {
                             Token.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
                             Token.is_array_elem = false;
+                            Token.is_mixed_array_elem = false;
+                            Token.is_dictionary_elem = false;
                             UNGET
                         }
                     }
@@ -2059,6 +2207,8 @@ void Parser::Parse_Directive(int After_Hash)
                 case IF_FALSE_COND:
                     Token.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
                     Token.is_array_elem = false;
+                    Token.is_mixed_array_elem = false;
+                    Token.is_dictionary_elem = false;
                     UNGET
                     // FALLTHROUGH
                 case IF_TRUE_COND:
@@ -2099,6 +2249,8 @@ void Parser::Parse_Directive(int After_Hash)
                     {
                         Token.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
                         Token.is_array_elem = false;
+                        Token.is_mixed_array_elem = false;
+                        Token.is_dictionary_elem = false;
                         UNGET
                     }
                     break;
@@ -2244,7 +2396,7 @@ void Parser::Parse_Directive(int After_Hash)
                             parsingVersionDirective = true;
                             EXPECT_ONE
                                 CASE (UNOFFICIAL_TOKEN)
-#if POV_RAY_IS_OFFICIAL == 1
+#if POV_RAY_IS_OFFICIAL
                                     Get_Token();
                                     Error("This file was created for an unofficial version and\ncannot work as-is with this official version.");
 #else
@@ -2459,24 +2611,30 @@ void Parser::Parse_Directive(int After_Hash)
             else
             {
                 Ok_To_Declare = false;
-                EXPECT
+                EXPECT_ONE
                     CASE (IDENTIFIER_TOKEN)
                         Warning("Attempt to undef unknown identifier");
-                        EXIT
                     END_CASE
 
+                    CASE (FILE_ID_TOKEN)
+                        if (reinterpret_cast<DATA_FILE *>(Token.Data)->busyParsing)
+                            Error("Can't undefine a file identifier inside a file directive that accesses it.");
+                        else
+                            PossibleError("Undefining an open file identifier. Use '#fclose' instead.");
+                        // FALLTHROUGH
                     CASE2 (MACRO_ID_TOKEN, PARAMETER_ID_TOKEN)
-                    CASE3 (FILE_ID_TOKEN,  FUNCT_ID_TOKEN, VECTFUNCT_ID_TOKEN)
+                    CASE2 (FUNCT_ID_TOKEN, VECTFUNCT_ID_TOKEN)
                     // These have to match Parse_Declare in parse.cpp! [trf]
-                    CASE4 (TNORMAL_ID_TOKEN, FINISH_ID_TOKEN, TEXTURE_ID_TOKEN, OBJECT_ID_TOKEN)
+                    CASE4 (NORMAL_ID_TOKEN, FINISH_ID_TOKEN, TEXTURE_ID_TOKEN, OBJECT_ID_TOKEN)
                     CASE4 (COLOUR_MAP_ID_TOKEN, TRANSFORM_ID_TOKEN, CAMERA_ID_TOKEN, PIGMENT_ID_TOKEN)
                     CASE4 (SLOPE_MAP_ID_TOKEN, NORMAL_MAP_ID_TOKEN, TEXTURE_MAP_ID_TOKEN, COLOUR_ID_TOKEN)
                     CASE4 (PIGMENT_MAP_ID_TOKEN, MEDIA_ID_TOKEN, STRING_ID_TOKEN, INTERIOR_ID_TOKEN)
                     CASE4 (DENSITY_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_MAP_ID_TOKEN, UV_ID_TOKEN)
                     CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
-                    CASE2 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN)
-                        Remove_Symbol (Token.Table_Index, Token.Token_String, Token.is_array_elem, Token.DataPtr, Token.Token_Id);
-                        EXIT
+                    CASE3 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN, DICTIONARY_ID_TOKEN)
+                        Remove_Symbol (Token.table, Token.Token_String, Token.is_array_elem, Token.DataPtr, Token.Token_Id);
+                        if (Token.is_mixed_array_elem)
+                            *Token.NumberPtr = IDENTIFIER_TOKEN;
                     END_CASE
 
                     CASE2 (VECTOR_FUNCT_TOKEN, FLOAT_FUNCT_TOKEN)
@@ -2484,14 +2642,15 @@ void Parser::Parse_Directive(int After_Hash)
                         {
                             case VECTOR_ID_TOKEN:
                             case FLOAT_ID_TOKEN:
-                                Remove_Symbol (Token.Table_Index, Token.Token_String, Token.is_array_elem, Token.DataPtr, Token.Token_Id);
+                                Remove_Symbol (Token.table, Token.Token_String, Token.is_array_elem, Token.DataPtr, Token.Token_Id);
+                                if (Token.is_mixed_array_elem)
+                                    *Token.NumberPtr = IDENTIFIER_TOKEN;
                                 break;
 
                             default:
                                 Parse_Error(IDENTIFIER_TOKEN);
                                 break;
                         }
-                        EXIT
                     END_CASE
 
                     OTHERWISE
@@ -2552,6 +2711,8 @@ void Parser::Parse_Directive(int After_Hash)
     {
         Token.Token_Id = END_OF_FILE_TOKEN;
         Token.is_array_elem = false;
+        Token.is_mixed_array_elem = false;
+        Token.is_dictionary_elem = false;
     }
 }
 
@@ -2619,7 +2780,8 @@ void Parser::Open_Include()
 
     Token.Token_Id = END_OF_FILE_TOKEN;
     Token.is_array_elem = false;
-
+    Token.is_mixed_array_elem = false;
+    Token.is_dictionary_elem = false;
 }
 
 
@@ -2660,6 +2822,8 @@ void Parser::Skip_Tokens(COND_TYPE cond)
     {
         Token.Token_Id=END_OF_FILE_TOKEN;
         Token.is_array_elem = false;
+        Token.is_mixed_array_elem = false;
+        Token.is_dictionary_elem = false;
         Token.Unget_Token=false;
     }
     else
@@ -2722,6 +2886,8 @@ void Parser::Break()
     {
         Token.Token_Id=END_OF_FILE_TOKEN;
         Token.is_array_elem = false;
+        Token.is_mixed_array_elem = false;
+        Token.is_dictionary_elem = false;
         Token.Unget_Token=false;
     }
     else
@@ -2801,46 +2967,47 @@ void Parser::init_sym_tables()
 
     for (i = 0; Reserved_Words[i].Token_Name != NULL; i++)
     {
-        Add_Symbol(0,Reserved_Words[i].Token_Name,Reserved_Words[i].Token_Number);
+        Add_Symbol(SYM_TABLE_RESERVED,Reserved_Words[i].Token_Name,Reserved_Words[i].Token_Number);
     }
 
     Add_Sym_Table();
 }
 
+Parser::SYM_TABLE *Parser::Create_Sym_Table (bool copyNames)
+{
+    SYM_TABLE *New = reinterpret_cast<SYM_TABLE *>(POV_MALLOC(sizeof(SYM_TABLE),"symbol table"));
+    New->namesAreCopies = copyNames;
+
+    for (int i = 0; i < SYM_TABLE_SIZE; i++)
+    {
+        New->Table[i] = NULL;
+    }
+
+    return New;
+}
+
 void Parser::Add_Sym_Table()
 {
-    int i;
-
-    SYM_TABLE *New;
-
     if ((++Table_Index)==MAX_NUMBER_OF_TABLES)
     {
         Table_Index--;
         Error("Too many nested symbol tables");
     }
 
-    Tables[Table_Index]=New=reinterpret_cast<SYM_TABLE *>(POV_MALLOC(sizeof(SYM_TABLE),"symbol table"));
-
-    for (i = 0; i < SYM_TABLE_SIZE; i++)
-    {
-        New->Table[i] = NULL;
-    }
-
+    Tables[Table_Index] = Create_Sym_Table (Table_Index != 0);
 }
 
-void Parser::Destroy_Table(int index)
+void Parser::Destroy_Sym_Table (Parser::SYM_TABLE *Table)
 {
-    int i;
-    SYM_TABLE *Table = Tables[index];
     SYM_ENTRY *Entry;
 
-    for(i = SYM_TABLE_SIZE - 1; i >= 0; i--)
+    for(int i = SYM_TABLE_SIZE - 1; i >= 0; i--)
     {
         Entry = Table->Table[i];
 
         while(Entry)
         {
-            Entry = Destroy_Entry(index, Entry);
+            Entry = Destroy_Entry (Entry, Table->namesAreCopies);
         }
 
         Table->Table[i] = NULL;
@@ -2850,7 +3017,33 @@ void Parser::Destroy_Table(int index)
 
 }
 
-SYM_ENTRY *Parser::Create_Entry (int Index,const char *Name,TOKEN Number)
+void Parser::Destroy_Table(int index)
+{
+    Destroy_Sym_Table (Tables[index]);
+}
+
+Parser::SYM_TABLE *Parser::Copy_Sym_Table (const Parser::SYM_TABLE *table)
+{
+    SYM_TABLE *newTable = Create_Sym_Table (true);
+    SYM_ENTRY *Entry, *newEntry;
+
+    for(int i = SYM_TABLE_SIZE - 1; i >= 0; i--)
+    {
+        Entry = table->Table[i];
+
+        while(Entry)
+        {
+            newEntry = Copy_Entry (Entry);
+            newEntry->next = newTable->Table[i];
+            newTable->Table[i] = newEntry;
+            Entry = Entry->next;
+        }
+    }
+
+    return newTable;
+}
+
+SYM_ENTRY *Parser::Create_Entry (const char *Name, TOKEN Number, bool copyName)
 {
     SYM_ENTRY *New;
 
@@ -2863,12 +3056,30 @@ SYM_ENTRY *Parser::Create_Entry (int Index,const char *Name,TOKEN Number)
     New->deprecatedShown     = false;
     New->Deprecation_Message = NULL;
     New->ref_count           = 1;
-    if (Index != 0)
+    if (copyName)
         New->Token_Name = POV_STRDUP(Name);
     else
         New->Token_Name = const_cast<char*>(Name);
 
     return(New);
+}
+
+SYM_ENTRY *Parser::Copy_Entry (const SYM_ENTRY *oldEntry)
+{
+    SYM_ENTRY *newEntry;
+
+    newEntry = reinterpret_cast<SYM_ENTRY *>(POV_MALLOC(sizeof(SYM_ENTRY), "symbol table entry"));
+
+    newEntry->Token_Number        = oldEntry->Token_Number;
+    newEntry->Data                = Copy_Identifier (oldEntry->Data, oldEntry->Token_Number);
+    newEntry->deprecated          = false;
+    newEntry->deprecatedOnce      = false;
+    newEntry->deprecatedShown     = false;
+    newEntry->Deprecation_Message = NULL;
+    newEntry->ref_count           = 1;
+    newEntry->Token_Name          = POV_STRDUP (oldEntry->Token_Name);
+
+    return newEntry;
 }
 
 void Parser::Acquire_Entry_Reference (SYM_ENTRY *Entry)
@@ -2880,7 +3091,7 @@ void Parser::Acquire_Entry_Reference (SYM_ENTRY *Entry)
     Entry->ref_count ++;
 }
 
-void Parser::Release_Entry_Reference (int Index, SYM_ENTRY *Entry)
+void Parser::Release_Entry_Reference (SYM_TABLE *table, SYM_ENTRY *Entry)
 {
     if (Entry == NULL)
         return;
@@ -2890,7 +3101,7 @@ void Parser::Release_Entry_Reference (int Index, SYM_ENTRY *Entry)
 
     if (Entry->ref_count == 0)
     {
-        if(Index != 0) // NB reserved words reference hard-coded token names in code segment, rather than allocated on heap
+        if (table->namesAreCopies) // NB reserved words reference hard-coded token names in code segment, rather than allocated on heap
         {
             POV_FREE(Entry->Token_Name);
             Destroy_Ident_Data (Entry->Data, Entry->Token_Number); // TODO - shouldn't this be outside the if() block?
@@ -2902,7 +3113,7 @@ void Parser::Release_Entry_Reference (int Index, SYM_ENTRY *Entry)
     }
 }
 
-SYM_ENTRY *Parser::Destroy_Entry (int Index, SYM_ENTRY *Entry)
+SYM_ENTRY *Parser::Destroy_Entry (SYM_ENTRY *Entry, bool destroyName)
 {
     SYM_ENTRY *Next;
 
@@ -2919,7 +3130,7 @@ SYM_ENTRY *Parser::Destroy_Entry (int Index, SYM_ENTRY *Entry)
 
     if (Entry->ref_count == 0)
     {
-        if(Index != 0) // NB reserved words reference hard-coded token names in code segment, rather than allocated on heap
+        if (destroyName) // NB reserved words reference hard-coded token names in code segment, rather than allocated on heap
         {
             POV_FREE(Entry->Token_Name);
             Destroy_Ident_Data (Entry->Data, Entry->Token_Number); // TODO - shouldn't this be outside the if() block?
@@ -2934,33 +3145,46 @@ SYM_ENTRY *Parser::Destroy_Entry (int Index, SYM_ENTRY *Entry)
 }
 
 
-void Parser::Add_Entry (int Index,SYM_ENTRY *Table_Entry)
+void Parser::Add_Entry (SYM_TABLE *table, SYM_ENTRY *Table_Entry)
 {
     int i = get_hash_value(Table_Entry->Token_Name);
 
-    Table_Entry->next       = Tables[Index]->Table[i];
-    Tables[Index]->Table[i] = Table_Entry;
+    Table_Entry->next       = table->Table[i];
+    table->Table[i] = Table_Entry;
 }
 
+void Parser::Add_Entry (int Index,SYM_ENTRY *Table_Entry)
+{
+    Add_Entry (Tables[Index], Table_Entry);
+}
+
+
+SYM_ENTRY *Parser::Add_Symbol (SYM_TABLE *table, const char *Name, TOKEN Number)
+{
+    SYM_ENTRY *New;
+
+    New = Create_Entry (Name, Number, table->namesAreCopies);
+    Add_Entry (table, New);
+
+    return(New);
+}
 
 SYM_ENTRY *Parser::Add_Symbol (int Index,const char *Name,TOKEN Number)
 {
     SYM_ENTRY *New;
 
-    New = Create_Entry (Index,Name,Number);
+    New = Create_Entry (Name, Number, (Index != SYM_TABLE_RESERVED));
     Add_Entry(Index,New);
 
     return(New);
 }
 
 
-SYM_ENTRY *Parser::Find_Symbol (int Index, const char *Name)
+SYM_ENTRY *Parser::Find_Symbol (const SYM_TABLE *table, const char *Name, int hash)
 {
     SYM_ENTRY *Entry;
 
-    int i = get_hash_value(Name);
-
-    Entry = Tables[Index]->Table[i];
+    Entry = table->Table[hash];
 
     while (Entry)
     {
@@ -2975,13 +3199,23 @@ SYM_ENTRY *Parser::Find_Symbol (int Index, const char *Name)
     return(Entry);
 }
 
+SYM_ENTRY *Parser::Find_Symbol (const SYM_TABLE *table, const char *name)
+{
+    return Find_Symbol (table, name, get_hash_value (name));
+}
+
+SYM_ENTRY *Parser::Find_Symbol (int index, const char *name)
+{
+    return Find_Symbol (Tables[index], name, get_hash_value(name));
+}
 
 SYM_ENTRY *Parser::Find_Symbol (const char *name)
 {
     SYM_ENTRY *entry;
+    int hash = get_hash_value (name);
     for (int index = Table_Index; index > 0; --index)
     {
-        entry = Find_Symbol (index, name);
+        entry = Find_Symbol (Tables[index], name, hash);
         if (entry)
             return entry;
     }
@@ -2989,7 +3223,7 @@ SYM_ENTRY *Parser::Find_Symbol (const char *name)
 }
 
 
-void Parser::Remove_Symbol (int Index, const char *Name, bool is_array_elem, void **DataPtr, int ttype)
+void Parser::Remove_Symbol (SYM_TABLE *table, const char *Name, bool is_array_elem, void **DataPtr, int ttype)
 {
     if(is_array_elem == true)
     {
@@ -3013,7 +3247,7 @@ void Parser::Remove_Symbol (int Index, const char *Name, bool is_array_elem, voi
 
         int i = get_hash_value(Name);
 
-        EntryPtr = &(Tables[Index]->Table[i]);
+        EntryPtr = &(table->Table[i]);
         Entry    = *EntryPtr;
 
         while (Entry)
@@ -3021,7 +3255,7 @@ void Parser::Remove_Symbol (int Index, const char *Name, bool is_array_elem, voi
             if (strcmp(Name, Entry->Token_Name) == 0)
             {
                 *EntryPtr = Entry->next;
-                Destroy_Entry(Index, Entry);
+                Destroy_Entry (Entry, table->namesAreCopies);
                 return;
             }
 
@@ -3031,6 +3265,11 @@ void Parser::Remove_Symbol (int Index, const char *Name, bool is_array_elem, voi
 
         Error("Tried to free undefined symbol");
     }
+}
+
+void Parser::Remove_Symbol (int Index, const char *Name, bool is_array_elem, void **DataPtr, int ttype)
+{
+    return Remove_Symbol (Tables[Index], Name, is_array_elem, DataPtr, ttype);
 }
 
 void Parser::Check_Macro_Vers(void)
@@ -3046,23 +3285,21 @@ Parser::Macro *Parser::Parse_Macro()
 {
     Macro *New;
     SYM_ENTRY *Table_Entry=NULL;
-    int Old_Ok = Ok_To_Declare;
+    bool Old_Ok = Ok_To_Declare;
     MacroParameter newParameter;
 
     Check_Macro_Vers();
 
     Ok_To_Declare = false;
 
-    EXPECT
+    EXPECT_ONE
         CASE (IDENTIFIER_TOKEN)
-            Table_Entry = Add_Symbol (1,Token.Token_String,TEMPORARY_MACRO_ID_TOKEN);
-            EXIT
+            Table_Entry = Add_Symbol (SYM_TABLE_GLOBAL,Token.Token_String,TEMPORARY_MACRO_ID_TOKEN);
         END_CASE
 
         CASE (MACRO_ID_TOKEN)
-            Remove_Symbol(1,Token.Token_String,false,NULL,0);
-            Table_Entry = Add_Symbol (1,Token.Token_String,TEMPORARY_MACRO_ID_TOKEN);
-            EXIT
+            Remove_Symbol(SYM_TABLE_GLOBAL,Token.Token_String,false,NULL,0);
+            Table_Entry = Add_Symbol (SYM_TABLE_GLOBAL,Token.Token_String,TEMPORARY_MACRO_ID_TOKEN);
         END_CASE
 
         OTHERWISE
@@ -3076,18 +3313,19 @@ Parser::Macro *Parser::Parse_Macro()
 
     New->Macro_Filename = NULL;
 
-    EXPECT
-        CASE (LEFT_PAREN_TOKEN )
-            EXIT
+    EXPECT_ONE
+        CASE (LEFT_PAREN_TOKEN)
+            UNGET
         END_CASE
         CASE (TEMPORARY_MACRO_ID_TOKEN)
             Error( "Can't invoke a macro while declaring its parameters");
         END_CASE
-
         OTHERWISE
             Expectation_Error ("identifier");
         END_CASE
     END_EXPECT
+
+    Parse_Paren_Begin();
 
     newParameter.optional = false;
     EXPECT
@@ -3098,13 +3336,13 @@ Parser::Macro *Parser::Parse_Macro()
         CASE3 (MACRO_ID_TOKEN, IDENTIFIER_TOKEN, PARAMETER_ID_TOKEN)
         CASE3 (FILE_ID_TOKEN,  FUNCT_ID_TOKEN, VECTFUNCT_ID_TOKEN)
         // These have to match Parse_Declare in parse.cpp! [trf]
-        CASE4 (TNORMAL_ID_TOKEN, FINISH_ID_TOKEN, TEXTURE_ID_TOKEN, OBJECT_ID_TOKEN)
+        CASE4 (NORMAL_ID_TOKEN, FINISH_ID_TOKEN, TEXTURE_ID_TOKEN, OBJECT_ID_TOKEN)
         CASE4 (COLOUR_MAP_ID_TOKEN, TRANSFORM_ID_TOKEN, CAMERA_ID_TOKEN, PIGMENT_ID_TOKEN)
         CASE4 (SLOPE_MAP_ID_TOKEN, NORMAL_MAP_ID_TOKEN, TEXTURE_MAP_ID_TOKEN, COLOUR_ID_TOKEN)
         CASE4 (PIGMENT_MAP_ID_TOKEN, MEDIA_ID_TOKEN, STRING_ID_TOKEN, INTERIOR_ID_TOKEN)
         CASE4 (DENSITY_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_MAP_ID_TOKEN, UV_ID_TOKEN)
         CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
-        CASE2 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN)
+        CASE3 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN, DICTIONARY_ID_TOKEN)
             newParameter.name = POV_STRDUP(Token.Token_String);
             New->parameters.push_back(newParameter);
             Parse_Comma();
@@ -3152,6 +3390,8 @@ Parser::Macro *Parser::Parse_Macro()
     New->Macro_File_Pos = Input_File->In_File->tellg();
     New->Macro_File_Col = Echo_Indx;
 
+    Parse_Paren_End();
+
     Check_Macro_Vers();
 
     return (New);
@@ -3176,7 +3416,7 @@ void Parser::Invoke_Macro()
 
     Check_Macro_Vers();
 
-    GET(LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
 
     if (PMac->parameters.size() > 0)
     {
@@ -3194,7 +3434,7 @@ void Parser::Invoke_Macro()
         for (i=0; i<PMac->parameters.size(); i++)
         {
             bool finalParameter = (i == PMac->parameters.size()-1);
-            Table_Entries[i]=Create_Entry(1,PMac->parameters[i].name,IDENTIFIER_TOKEN);
+            Table_Entries[i] = Create_Entry (PMac->parameters[i].name, IDENTIFIER_TOKEN, true);
             if (!Parse_RValue(IDENTIFIER_TOKEN, &(Table_Entries[i]->Token_Number), &(Table_Entries[i]->Data), NULL, true, false, true, true, true, Local_Index))
             {
                 EXPECT_ONE
@@ -3226,14 +3466,14 @@ void Parser::Invoke_Macro()
                     END_CASE
                 END_EXPECT
 
-                Destroy_Entry(1,Table_Entries[i]);
+                Destroy_Entry (Table_Entries[i], true);
                 Table_Entries[i] = NULL;
             }
             properlyDelimited = Parse_Comma();
         }
     }
 
-    GET(RIGHT_PAREN_TOKEN);
+    Parse_Paren_End();
 
     Cond_Stack[CS_Index].Cond_Type = INVOKING_MACRO_COND;
 
@@ -3296,6 +3536,8 @@ void Parser::Invoke_Macro()
 
     Token.Token_Id = END_OF_FILE_TOKEN;
     Token.is_array_elem = false;
+    Token.is_mixed_array_elem = false;
+    Token.is_dictionary_elem = false;
 
     Check_Macro_Vers();
 
@@ -3359,42 +3601,41 @@ Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
     POV_ARRAY *New;
     int i,j;
 
-    New=reinterpret_cast<POV_ARRAY *>(POV_MALLOC(sizeof(POV_ARRAY),"array"));
+    New = new POV_ARRAY;
+    New->resizable = false;
 
     i=0;
     j=1;
 
     Ok_To_Declare = false;
 
-    EXPECT
-        CASE (LEFT_SQUARE_TOKEN)
-            if (i>4)
-            {
-                Error("Too many array dimensions");
-            }
-            New->Sizes[i]=(int)(Parse_Float() + EPSILON);
-            j *= New->Sizes[i];
-            if ( j <= 0) {
-                Error("Invalid dimension size for an array");
-            }
-            i++;
-            GET(RIGHT_SQUARE_TOKEN)
-        END_CASE
-
-        OTHERWISE
-            UNGET
-            EXIT
-        END_CASE
-    END_EXPECT
-
-    if ( i < 1 ) {
-        Error( "An array declaration must have at least one dimension");
+    while (Parse_Square_Begin(false))
+    {
+        if (i>4)
+        {
+            Error("Too many array dimensions");
+        }
+        New->Sizes[i]=(int)(Parse_Float() + EPSILON);
+        j *= New->Sizes[i];
+        if ( j <= 0) {
+            Error("Invalid dimension size for an array");
+        }
+        i++;
+        Parse_Square_End();
     }
 
-    New->Dims     = i-1;
-    New->Total    = j;
-    New->Type     = EMPTY_ARRAY_TOKEN;
-    New->DataPtrs = reinterpret_cast<void **>(POV_MALLOC(sizeof(void *)*j,"array"));
+    if (i == 0) {
+        // new syntax: Dynamically sized one-dimensional array
+        New->Sizes[0] = 0;
+        New->resizable = true;
+        New->Dims     = 0;
+    }
+    else
+    {
+        New->Dims     = i-1;
+        New->DataPtrs.resize (j);
+    }
+    New->Type = EMPTY_ARRAY_TOKEN;
 
     j = 1;
 
@@ -3404,16 +3645,74 @@ Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
         j *= New->Sizes[i];
     }
 
-    for (i=0; i<New->Total; i++)
+    for (i=0; i<New->DataPtrs.size(); i++)
     {
-        New->DataPtrs[i] = NULL;
+        POV_PARSER_ASSERT (New->DataPtrs[i] == NULL);
     }
 
-    EXPECT
+    EXPECT_ONE
         CASE2(LEFT_CURLY_TOKEN, OPTIONAL_TOKEN)
             UNGET
                 Parse_Initalizer(0,0,New);
-            EXIT
+        END_CASE
+
+        OTHERWISE
+            UNGET
+        END_CASE
+    END_EXPECT
+
+    Ok_To_Declare = true;
+    return(New);
+};
+
+
+Parser::SYM_TABLE *Parser::Parse_Dictionary_Declare()
+{
+    SYM_TABLE *newDictionary;
+    SYM_ENTRY *newEntry;
+    bool oldParseRawIdentifiers;
+    char *dictIndex;
+
+    newDictionary = Create_Sym_Table (true);
+
+    // TODO REVIEW - maybe we need `Ok_To_Declare = false`?
+
+    if (!Parse_Begin (false))
+        return newDictionary;
+
+    EXPECT
+        CASE (PERIOD_TOKEN)
+            oldParseRawIdentifiers = parseRawIdentifiers;
+            parseRawIdentifiers = true;
+            Get_Token();
+            parseRawIdentifiers = oldParseRawIdentifiers;
+            if (Token.Token_Id != IDENTIFIER_TOKEN)
+                Expectation_Error ("dictionary element identifier");
+            newEntry = Add_Symbol (newDictionary, Token.Token_String, IDENTIFIER_TOKEN);
+
+            GET (COLON_TOKEN);
+
+            if (!Parse_RValue (IDENTIFIER_TOKEN, &(newEntry->Token_Number), &(newEntry->Data), newEntry, false, false, true, true, false, MAX_NUMBER_OF_TABLES))
+                Expectation_Error("RValue");
+
+            Parse_Comma();
+        END_CASE
+
+        CASE (LEFT_SQUARE_TOKEN)
+            UNGET
+            Parse_Square_Begin();
+            dictIndex = Parse_C_String();
+            newEntry = Add_Symbol (newDictionary, dictIndex, IDENTIFIER_TOKEN);
+            POV_PARSER_ASSERT (newDictionary->namesAreCopies);
+            POV_FREE (dictIndex);
+            Parse_Square_End();
+
+            GET (COLON_TOKEN);
+
+            if (!Parse_RValue (IDENTIFIER_TOKEN, &(newEntry->Token_Number), &(newEntry->Data), newEntry, false, false, true, true, false, MAX_NUMBER_OF_TABLES))
+                Expectation_Error("RValue");
+
+            Parse_Comma();
         END_CASE
 
         OTHERWISE
@@ -3422,8 +3721,9 @@ Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
         END_CASE
     END_EXPECT
 
-    Ok_To_Declare = true;
-    return(New);
+    Parse_End();
+
+    return newDictionary;
 
 };
 
@@ -3453,9 +3753,17 @@ void Parser::Parse_Initalizer (int Sub, int Base, POV_ARRAY *a)
     else
     {
         bool properlyDelimited = true;
-        for(i=0; i < a->Sizes[Sub]; i++)
+        bool finalParameter = (!a->resizable && (a->Sizes[Sub] == 0));
+        for(i=0; !finalParameter; i++)
         {
-            bool finalParameter = (i == a->Sizes[Sub]-1);
+            if (a->resizable)
+            {
+                a->DataPtrs.push_back (NULL);
+                a->Sizes[Sub] = a->DataPtrs.size();
+            }
+            else
+                finalParameter = (i == (a->Sizes[Sub]-1));
+
             if (!Parse_RValue (a->Type, &(a->Type), &(a->DataPtrs[Base+i]), NULL, false, false, true, false, true, MAX_NUMBER_OF_TABLES))
             {
                 EXPECT_ONE
@@ -3466,12 +3774,22 @@ void Parser::Parse_Initalizer (int Sub, int Base, POV_ARRAY *a)
                     END_CASE
 
                     CASE (RIGHT_CURLY_TOKEN)
-                        if (!(finalParameter && properlyDelimited))
-                            // the parameter list was closed prematurely
-                            Error("Expected %d initializers but only %d found.",a->Sizes[Sub],i);
-                        // the parameter was left empty
-                        if(!optional)
-                            Error("Cannot omit elements of non-optional array initializer.");
+                        if (a->resizable)
+                        {
+                            finalParameter = true;
+                            POV_PARSER_ASSERT (a->DataPtrs.back() == NULL);
+                            a->DataPtrs.pop_back();
+                            a->Sizes[Sub] = a->DataPtrs.size();
+                        }
+                        else
+                        {
+                            if (!(finalParameter && properlyDelimited))
+                                // the parameter list was closed prematurely
+                                Error("Expected %d initializers but only %d found.",a->Sizes[Sub],i);
+                            // the parameter was left empty
+                            if(!optional)
+                                Error("Cannot omit elements of non-optional array initializer.");
+                        }
                         UNGET
                     END_CASE
 
@@ -3507,17 +3825,20 @@ void Parser::Parse_Fopen(void)
     New=reinterpret_cast<DATA_FILE *>(POV_MALLOC(sizeof(DATA_FILE),"user file"));
     New->In_File=NULL;
     New->Out_File=NULL;
-    New->fopenCompleted = false;
+
+    // Safeguard against accidental nesting of other file access directives inside the `#fopen`
+    // directive (or the user forgetting portions of the directive).
+    New->busyParsing = true;
 
     GET(IDENTIFIER_TOKEN)
-    Entry = Add_Symbol (1,Token.Token_String,FILE_ID_TOKEN);
+    Entry = Add_Symbol (SYM_TABLE_GLOBAL,Token.Token_String,FILE_ID_TOKEN);
     Entry->Data=reinterpret_cast<void *>(New);
 
     asciiFileName = Parse_C_String(true);
     fileName = ASCIItoUCS2String(asciiFileName);
     POV_FREE(asciiFileName);
 
-    EXPECT
+    EXPECT_ONE
         CASE(READ_TOKEN)
             New->R_Flag = true;
             rfile = Locate_File(fileName.c_str(), POV_File_Text_User, ign, true);
@@ -3528,7 +3849,6 @@ void Parser::Parse_Fopen(void)
 
             if(New->In_File == NULL)
                 Error ("Cannot open user file %s (read).", UCS2toASCIIString(fileName).c_str());
-            EXIT
         END_CASE
 
         CASE(WRITE_TOKEN)
@@ -3541,7 +3861,6 @@ void Parser::Parse_Fopen(void)
 
             if(New->Out_File == NULL)
                 Error ("Cannot open user file %s (write).", UCS2toASCIIString(fileName).c_str());
-            EXIT
         END_CASE
 
         CASE(APPEND_TOKEN)
@@ -3554,7 +3873,6 @@ void Parser::Parse_Fopen(void)
 
             if(New->Out_File == NULL)
                 Error ("Cannot open user file %s (append).", UCS2toASCIIString(fileName).c_str());
-            EXIT
         END_CASE
 
         OTHERWISE
@@ -3562,18 +3880,20 @@ void Parser::Parse_Fopen(void)
         END_CASE
     END_EXPECT
 
-    New->fopenCompleted = true;
+    New->busyParsing = false;
 }
 
 void Parser::Parse_Fclose(void)
 {
     DATA_FILE *Data;
 
-    EXPECT
+    EXPECT_ONE
         CASE(FILE_ID_TOKEN)
             Data=reinterpret_cast<DATA_FILE *>(Token.Data);
-            if (!Data->fopenCompleted)
-                Error ("#fopen statement incomplete.");
+            if (Data->busyParsing)
+                Error ("Can't nest directives accessing the same file.");
+            // NB no need to set Data->busyParsing, as we're not reading any tokens where the
+            // tokenizer might stumble upon nested file access directives
             if(Data->In_File != NULL)
                 delete Data->In_File;
             if(Data->Out_File != NULL)
@@ -3581,12 +3901,14 @@ void Parser::Parse_Fclose(void)
             Got_EOF=false;
             Data->In_File = NULL;
             Data->Out_File = NULL;
-            Remove_Symbol (1,Token.Token_String,false,NULL,0);
-            EXIT
+            Remove_Symbol (SYM_TABLE_GLOBAL,Token.Token_String,false,NULL,0);
         END_CASE
 
         OTHERWISE
-            EXIT
+            // To allow `#fclose` to be invoked on an already-closed file,
+            // we need to accept IDENTIFIER_TOKEN, but also any *_ID_TOKEN
+            // since it may be used at a less local level.
+            // (Caveat: This allows to accidentally close a file at a less local level.)
         END_CASE
     END_EXPECT
 }
@@ -3598,15 +3920,19 @@ void Parser::Parse_Read()
     int End_File=false;
     char *File_Id;
 
-    GET(LEFT_PAREN_TOKEN)
+    Parse_Paren_Begin();
 
     GET(FILE_ID_TOKEN)
     User_File=reinterpret_cast<DATA_FILE *>(Token.Data);
+    if (User_File->busyParsing)
+        Error ("Can't nest directives accessing the same file.");
     File_Id=POV_STRDUP(Token.Token_String);
-    if (!User_File->fopenCompleted)
-        Error ("#fopen statement incomplete.");
     if(User_File->In_File == NULL)
         Error("Cannot read from file %s because the file is open for writing only.", UCS2toASCIIString(UCS2String(User_File->Out_File->name())).c_str());
+
+    // Safeguard against accidental nesting of other file access directives inside the `#fopen`
+    // directive (or the user forgetting portions of the directive).
+    User_File->busyParsing = true;
 
     Parse_Comma(); /* Scene file comma between File_Id and 1st data ident */
 
@@ -3616,9 +3942,11 @@ void Parser::Parse_Read()
         CASE (IDENTIFIER_TOKEN)
             if (!End_File)
             {
-                Temp_Entry = Add_Symbol (1,Token.Token_String,IDENTIFIER_TOKEN);
+                Temp_Entry = Add_Symbol (SYM_TABLE_GLOBAL,Token.Token_String,IDENTIFIER_TOKEN);
                 End_File=Parse_Read_Value (User_File,Token.Token_Id, &(Temp_Entry->Token_Number), &(Temp_Entry->Data));
                 Token.is_array_elem = false;
+                Token.is_mixed_array_elem = false;
+                Token.is_dictionary_elem = false;
                 Parse_Comma(); /* Scene file comma between 2 idents */
             }
         END_CASE
@@ -3628,6 +3956,8 @@ void Parser::Parse_Read()
             {
                 End_File=Parse_Read_Value (User_File,Token.Token_Id,Token.NumberPtr,Token.DataPtr);
                 Token.is_array_elem = false;
+                Token.is_mixed_array_elem = false;
+                Token.is_dictionary_elem = false;
                 Parse_Comma(); /* Scene file comma between 2 idents */
             }
         END_CASE
@@ -3658,6 +3988,7 @@ void Parser::Parse_Read()
         END_CASE
 
         CASE(RIGHT_PAREN_TOKEN)
+            UNGET
             EXIT
         END_CASE
 
@@ -3666,6 +3997,9 @@ void Parser::Parse_Read()
         END_CASE
     END_EXPECT
 
+    Parse_Paren_End();
+
+    User_File->busyParsing = false;
     LValue_Ok = false;
 
     if (End_File)
@@ -3673,7 +4007,7 @@ void Parser::Parse_Read()
         delete User_File->In_File;
         Got_EOF=false;
         User_File->In_File = NULL;
-        Remove_Symbol (1,File_Id,false,NULL,0);
+        Remove_Symbol (SYM_TABLE_GLOBAL,File_Id,false,NULL,0);
     }
     POV_FREE(File_Id);
 }
@@ -3697,7 +4031,7 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File,int Previous,int *NumberPtr,vo
 
     try
     {
-        EXPECT
+        EXPECT_ONE
             CASE3 (PLUS_TOKEN,DASH_TOKEN,FLOAT_FUNCT_TOKEN)
                 UNGET
                 Val=Parse_Signed_Float();
@@ -3706,10 +4040,12 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File,int Previous,int *NumberPtr,vo
                 *DataPtr   = reinterpret_cast<void *>(Create_Float());
                 *(reinterpret_cast<DBL *>(*DataPtr)) = Val;
                 Parse_Comma(); /* data file comma between 2 data items  */
-                EXIT
             END_CASE
 
             CASE (LEFT_ANGLE_TOKEN)
+                UNGET
+                Parse_Angle_Begin();
+
                 i=1;
                 Express[X]=Parse_Signed_Float();  Parse_Comma();
                 Express[Y]=Parse_Signed_Float();  Parse_Comma();
@@ -3725,6 +4061,7 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File,int Previous,int *NumberPtr,vo
                     END_CASE
 
                     CASE (RIGHT_ANGLE_TOKEN)
+                        UNGET
                         EXIT
                     END_CASE
 
@@ -3732,6 +4069,8 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File,int Previous,int *NumberPtr,vo
                         Expectation_Error("vector");
                     END_CASE
                 END_EXPECT
+
+                Parse_Angle_End();
 
                 switch(i)
                 {
@@ -3763,7 +4102,6 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File,int Previous,int *NumberPtr,vo
                 }
 
                 Parse_Comma(); // data file comma between 2 data items
-                EXIT
             END_CASE
 
             CASE(STRING_LITERAL_TOKEN)
@@ -3771,11 +4109,9 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File,int Previous,int *NumberPtr,vo
                 Test_Redefine(Previous,NumberPtr,*DataPtr);
                 *DataPtr   = String_Literal_To_UCS2(Token.Token_String, false);
                 Parse_Comma(); // data file comma between 2 data items
-                EXIT
             END_CASE
 
             CASE (END_OF_FILE_TOKEN)
-                EXIT
             END_CASE
 
             OTHERWISE
@@ -3812,14 +4148,19 @@ void Parser::Parse_Write(void)
     EXPRESS Express;
     int Terms;
 
-    GET(LEFT_PAREN_TOKEN)
+    Parse_Paren_Begin();
+
     GET(FILE_ID_TOKEN)
 
     User_File=reinterpret_cast<DATA_FILE *>(Token.Data);
-    if (!User_File->fopenCompleted)
-        Error ("#fopen statement incomplete.");
+    if (User_File->busyParsing)
+        Error ("Can't nest directives accessing the same file.");
     if(User_File->Out_File == NULL)
         Error("Cannot write to file %s because the file is open for reading only.", UCS2toASCIIString(UCS2String(User_File->In_File->name())).c_str());
+
+    // Safeguard against accidental nesting of other file access directives inside the `#fopen`
+    // directive (or the user forgetting portions of the directive).
+    User_File->busyParsing = true;
 
     Parse_Comma();
 
@@ -3827,20 +4168,20 @@ void Parser::Parse_Write(void)
         CASE5 (SINT8_TOKEN,SINT16BE_TOKEN,SINT16LE_TOKEN,SINT32BE_TOKEN,SINT32LE_TOKEN)
         CASE3 (UINT8_TOKEN,UINT16BE_TOKEN,UINT16LE_TOKEN)
             {
-                signed long val_min;
-                signed long val_max;
+                POV_INT32 val_min;
+                POV_INT32 val_max;
                 int  num_bytes;
                 bool big_endian = false;
                 switch (Token.Token_Id)
                 {
-                    case SINT8_TOKEN:                                        val_min =            -128; val_max =        127; num_bytes = 1; break; // -2^7  to 2^7-1
-                    case UINT8_TOKEN:                                        val_min =               0; val_max =        255; num_bytes = 1; break; //  0    to 2^8-1
-                    case SINT16BE_TOKEN: big_endian = true; // FALLTHROUGH
-                    case SINT16LE_TOKEN:                                     val_min =          -32768; val_max =      32767; num_bytes = 2; break; // -2^15 to 2^15-1
-                    case UINT16BE_TOKEN: big_endian = true; // FALLTHROUGH
-                    case UINT16LE_TOKEN:                                     val_min =               0; val_max =      65535; num_bytes = 2; break; //  0    to 2^16-1
-                    case SINT32BE_TOKEN: big_endian = true; // FALLTHROUGH
-                    case SINT32LE_TOKEN:                                     val_min = (-2147483647-1); val_max = 2147483647; num_bytes = 4; break; // -2^31 to 2^31-1 (using unconventional notation to avoid a warning with some compiler)
+                    case SINT8_TOKEN:    val_min = SIGNED8_MIN;  val_max = SIGNED8_MAX;    num_bytes = 1; break;
+                    case UINT8_TOKEN:    val_min = 0;            val_max = UNSIGNED8_MAX;  num_bytes = 1; break;
+                    case SINT16BE_TOKEN: val_min = SIGNED16_MIN; val_max = SIGNED16_MAX;   num_bytes = 2; big_endian = true;  break;
+                    case SINT16LE_TOKEN: val_min = SIGNED16_MIN; val_max = SIGNED16_MAX;   num_bytes = 2; big_endian = false; break;
+                    case UINT16BE_TOKEN: val_min = 0;            val_max = UNSIGNED16_MAX; num_bytes = 2; big_endian = true;  break;
+                    case UINT16LE_TOKEN: val_min = 0;            val_max = UNSIGNED16_MAX; num_bytes = 2; big_endian = false; break;
+                    case SINT32BE_TOKEN: val_min = SIGNED32_MIN; val_max = SIGNED32_MAX;   num_bytes = 4; big_endian = true;  break;
+                    case SINT32LE_TOKEN: val_min = SIGNED32_MIN; val_max = SIGNED32_MAX;   num_bytes = 4; big_endian = false; break;
                 }
                 EXPECT
                     CASE_VECTOR
@@ -3927,6 +4268,7 @@ void Parser::Parse_Write(void)
         END_CASE
 
         CASE (RIGHT_PAREN_TOKEN)
+            UNGET
             EXIT
         END_CASE
 
@@ -3937,12 +4279,16 @@ void Parser::Parse_Write(void)
             Expectation_Error("string");
         END_CASE
     END_EXPECT
+
+    Parse_Paren_End();
+
+    User_File->busyParsing = false;
 }
 
 DBL Parser::Parse_Cond_Param(void)
 {
-    int Old_Ok = Ok_To_Declare;
-    int Old_Sk = Skipping;
+    bool Old_Ok = Ok_To_Declare;
+    bool Old_Sk = Skipping;
     DBL Val;
 
     Ok_To_Declare = false;
@@ -3958,8 +4304,8 @@ DBL Parser::Parse_Cond_Param(void)
 
 void Parser::Parse_Cond_Param2(DBL *V1,DBL *V2)
 {
-    int Old_Ok = Ok_To_Declare;
-    int Old_Sk = Skipping;
+    bool Old_Ok = Ok_To_Declare;
+    bool Old_Sk = Skipping;
 
     Ok_To_Declare = false;
     Skipping      = false;
@@ -3988,7 +4334,8 @@ bool Parser::Parse_Ifdef_Param ()
 {
     bool retval = false;
 
-    GET(LEFT_PAREN_TOKEN)
+    Parse_Paren_Begin();
+
     Inside_Ifdef=true;
     Get_Token();
     String2 = POV_STRDUP(String);
@@ -3999,7 +4346,7 @@ bool Parser::Parse_Ifdef_Param ()
     else
         retval = (Token.Token_Id != IDENTIFIER_TOKEN);
 
-    GET(RIGHT_PAREN_TOKEN)
+    Parse_Paren_End();
 
     POV_FREE(String2);
     String2 = NULL;
@@ -4012,36 +4359,45 @@ int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
     int Previous=-1;
     SYM_ENTRY *Temp_Entry = NULL;
 
-    GET(LEFT_PAREN_TOKEN)
+    Parse_Paren_Begin();
 
     LValue_Ok = true;
 
     EXPECT_ONE
         CASE (IDENTIFIER_TOKEN)
             POV_PARSER_ASSERT(!Token.is_array_elem);
+            if (Token.is_dictionary_elem)
+                Error("#for loop variable must not be an array or dictionary element");
             Temp_Entry = Add_Symbol (Table_Index,Token.Token_String,IDENTIFIER_TOKEN);
             Token.NumberPtr = &(Temp_Entry->Token_Number);
             Token.DataPtr = &(Temp_Entry->Data);
             Previous = Token.Token_Id;
         END_CASE
 
+        CASE3 (FILE_ID_TOKEN, MACRO_ID_TOKEN, PARAMETER_ID_TOKEN)
+            // TODO - We should allow assignment if the identifier is non-local.
+            if (Token.is_array_elem || Token.is_dictionary_elem)
+                Error("#for loop variable must not be an array or dictionary element");
+            Parse_Error(IDENTIFIER_TOKEN);
+        END_CASE
+
         CASE2 (FUNCT_ID_TOKEN, VECTFUNCT_ID_TOKEN)
-            if (Token.is_array_elem)
-                Error("#for loop variable must not be an array element");
+            if (Token.is_array_elem || Token.is_dictionary_elem)
+                Error("#for loop variable must not be an array or dictionary element");
             Error("Redeclaring functions is not allowed - #undef the function first!");
         END_CASE
 
         // These have to match Parse_Declare in parse.cpp!
-        CASE4 (TNORMAL_ID_TOKEN, FINISH_ID_TOKEN, TEXTURE_ID_TOKEN, OBJECT_ID_TOKEN)
+        CASE4 (NORMAL_ID_TOKEN, FINISH_ID_TOKEN, TEXTURE_ID_TOKEN, OBJECT_ID_TOKEN)
         CASE4 (COLOUR_MAP_ID_TOKEN, TRANSFORM_ID_TOKEN, CAMERA_ID_TOKEN, PIGMENT_ID_TOKEN)
         CASE4 (SLOPE_MAP_ID_TOKEN, NORMAL_MAP_ID_TOKEN, TEXTURE_MAP_ID_TOKEN, COLOUR_ID_TOKEN)
         CASE4 (PIGMENT_MAP_ID_TOKEN, MEDIA_ID_TOKEN, STRING_ID_TOKEN, INTERIOR_ID_TOKEN)
         CASE4 (DENSITY_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_MAP_ID_TOKEN, UV_ID_TOKEN)
         CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
-        CASE2 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN)
-            if (Token.is_array_elem)
-                Error("#for loop variable must not be an array element");
-            if (Token.Table_Index != Table_Index)
+        CASE3 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN, DICTIONARY_ID_TOKEN)
+            if (Token.is_array_elem || Token.is_dictionary_elem)
+                Error("#for loop variable must not be an array or dictionary element");
+            if (Token.context != Table_Index)
             {
                 Temp_Entry = Add_Symbol (Table_Index,Token.Token_String,IDENTIFIER_TOKEN);
                 Token.NumberPtr = &(Temp_Entry->Token_Number);
@@ -4055,19 +4411,19 @@ int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
         END_CASE
 
         CASE (EMPTY_ARRAY_TOKEN)
-            POV_PARSER_ASSERT(Token.is_array_elem);
+            POV_PARSER_ASSERT (Token.is_array_elem && !Token.is_mixed_array_elem);
             Error("#for loop variable must not be an array element");
             Previous = Token.Token_Id;
         END_CASE
 
         CASE2 (VECTOR_FUNCT_TOKEN, FLOAT_FUNCT_TOKEN)
-            if (Token.is_array_elem)
-                Error("#for loop variable must not be an array element");
+            if (Token.is_array_elem || Token.is_dictionary_elem)
+                Error("#for loop variable must not be an array or dictionary element");
             switch(Token.Function_Id)
             {
                 case VECTOR_ID_TOKEN:
                 case FLOAT_ID_TOKEN:
-                    if (Token.Table_Index != Table_Index)
+                    if (Token.context != Table_Index)
                     {
                         Temp_Entry = Add_Symbol (Table_Index,Token.Token_String,IDENTIFIER_TOKEN);
                         Token.NumberPtr = &(Temp_Entry->Token_Number);
@@ -4087,8 +4443,8 @@ int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
         END_CASE
 
         OTHERWISE
-            if (Token.is_array_elem)
-                Error("#for loop variable must not be an array element");
+            if (Token.is_array_elem || Token.is_dictionary_elem)
+                Error("#for loop variable must not be an array or dictionary element");
             Parse_Error(IDENTIFIER_TOKEN);
         END_CASE
     END_EXPECT
@@ -4114,7 +4470,7 @@ int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
     if (fabs(*StepPtr) < EPSILON)
         Error ("#for loop increment must be non-zero.");
 
-    GET(RIGHT_PAREN_TOKEN)
+    Parse_Paren_End();
 
     return ((*StepPtr > 0) && (*CurrentPtr < *EndPtr + EPSILON)) ||
            ((*StepPtr < 0) && (*CurrentPtr > *EndPtr - EPSILON));
@@ -4170,6 +4526,8 @@ void Parser::IncludeHeader(const UCS2String& formalFileName)
 
     Token.Token_Id = END_OF_FILE_TOKEN;
     Token.is_array_elem = false;
+    Token.is_mixed_array_elem = false;
+    Token.is_dictionary_elem = false;
 }
 
 }

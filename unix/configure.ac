@@ -42,7 +42,7 @@ AC_PREREQ(2.59)
 
 # Inits.
 
-# The file VERSION must contain only the version string MAJOR.MINOR(.PATCHLEVEL)
+# The file VERSION must contain only the version string MAJOR.MINOR(.PATCHLEVEL)(-PRERELEASE)
 AC_INIT([POV-Ray], m4_normalize(m4_include([VERSION])), [unix-bugreports-2011@povray.org], [povray])
 
 # VERSION_BASE is then defined as MAJOR.MINOR
@@ -60,6 +60,7 @@ m4_include([unix/config/ax_arg_with.m4])
 m4_include([unix/config/ax_boost_base.m4])
 m4_include([unix/config/ax_boost_thread.m4])
 m4_include([unix/config/ax_test_compiler_flags.m4])
+m4_include([unix/config/ax_check_compile_flag.m4])
 m4_include([unix/config/ax_check_lib.m4])
 m4_include([unix/config/ax_check_libjpeg.m4])
 m4_include([unix/config/ax_check_libsdl.m4])
@@ -83,6 +84,7 @@ required_libsdl_version="1.2"
 required_openexr_version="1.2"
 
 # Supported options.
+# AX_ARG_ENABLE([--enable-avx2],             [enable AVX2 features and compiler optmization])
 AX_ARG_ENABLE([--enable-watch-cursor],     [enable a watch cursor over the display while rendering (X Window only)])
 AX_ARG_ENABLE([--enable-debug],            [enable compiler debugging mode])
 AX_ARG_ENABLE([--enable-profile],          [enable program execution profiling])
@@ -217,14 +219,28 @@ pov_built_for="$host"  # default
 AC_DEFINE_UNQUOTED([BUILD_ARCH], ["$build"], [Build architecture.])
 AC_DEFINE_UNQUOTED([COMPILER_VENDOR], ["$pov_compiler_vendor"], [Compiler vendor.])
 AC_DEFINE_UNQUOTED([COMPILER_VERSION], ["$pov_compiler_version"], [Compiler version.])
-AC_DEFINE_UNQUOTED([COMPILER_VER], [" ($pov_compiler_version @ $build)"], [Compiler version (processed).])
-
+AC_DEFINE_UNQUOTED([POV_COMPILER_INFO], ["$pov_compiler_version @ $build"], [Compiler version (processed).])
 
 
 # Not necessary when AM_MAINTAINER_MODE is called above.
 ###AC_PROG_MAKE_SET
 
 AC_PROG_RANLIB
+
+
+AC_MSG_CHECKING([for stat format option])
+echo "trying stat --format='%u,%g' ." >>config.log
+if stat --format='%u,%g' . >>config.log 2>>config.log && test x`stat --format=Foo .` = x"Foo"; then
+  stat_format="--format="
+else
+  echo "trying stat --f '%u,%g' ." >>config.log
+  if stat -f '%u,%g' . >>config.log 2>>config.log && test x`stat -f Foo .` = x"Foo"; then
+    stat_format="-f "
+  else
+    AC_MSG_FAILURE([stat command does not behave as required])
+  fi
+fi
+AC_MSG_RESULT([$stat_format])
 
 
 ###############################################################################
@@ -507,6 +523,16 @@ else
       AC_MSG_RESULT([no])
     fi
   fi
+
+#  AM_CONDITIONAL([BUILD_AVX2], [test x$enable_avx2 = xyes])
+#  if test x"$enable_avx2" = x"yes"; then
+#    AC_MSG_RESULT([yes])
+#    AC_DEFINE([ENABLE_AVX2], [],[Enable AVX2 features and compiler optimization])
+#
+#    CXXFLAGS="$CXXFLAGS -mavx2 -mfma"  # append
+#  else
+#    AC_MSG_RESULT([no])
+#  fi
 
   ### Note from Warp <warp@tag.povray.org> :
   # Using "-static" for static linking in Solaris causes a linkage error.
@@ -968,6 +994,24 @@ fi
 
 AC_DEFINE_UNQUOTED([BUILT_FOR], ["$pov_built_for"], [Host platform.])
 
+case "$pov_built_for" in
+  i?86-* | x86_64-*)
+    pov_cpu='x86'
+    AC_DEFINE([BUILD_X86], [], [Build for x86 or x86-64 architecture])
+    AX_CHECK_COMPILE_FLAG([-mavx],  [pov_avx='-mavx'],   [pov_avx=''])
+    AX_CHECK_COMPILE_FLAG([-mavx2], [pov_avx2='-mavx2'], [pov_avx2=''])
+    AX_CHECK_COMPILE_FLAG([-mfma],  [pov_fma3='-mfma'],  [pov_fma3=''])
+    AX_CHECK_COMPILE_FLAG([-mfma4], [pov_fma4='-mfma4'], [pov_fma4=''])
+    ;;
+  *)
+    pov_cpu=''
+    ;;
+esac
+AM_CONDITIONAL([BUILD_x86], [test x"$pov_cpu" = x"x86"])
+AM_CONDITIONAL([BUILD_x86avx], [test x"$pov_avx" != x""])
+AM_CONDITIONAL([BUILD_x86avxfma4], [test x"$pov_avx" != x"" -a x"$pov_fma4" != x"" ])
+AM_CONDITIONAL([BUILD_x86avx2fma3], [test x"$pov_avx2" != x"" -a x"$pov_fma3" != x"" ])
+
 
 # Add flags specified at the command line.
 CXXFLAGS=`echo $CXXFLAGS $pov_save_cxxflags`
@@ -1259,8 +1303,8 @@ AC_DEFINE_UNQUOTED([BUILTIN_XWIN_DISPLAY], ["$pov_xwin_msg"], [X Window display.
 AC_DEFINE_UNQUOTED([BUILTIN_IMG_FORMATS], ["$pov_img_fmt_builtin $pov_img_fmt_enabled"], [Supported image formats.])
 AC_DEFINE_UNQUOTED([MISSING_IMG_FORMATS], ["$pov_img_fmt_disabled"], [Unsupported image formats.])
 
-povowner=`stat --format=%u ${HOME} || stat -f %u ${HOME}`
-povgroup=`stat --format=%g ${HOME} || stat -f %g ${HOME}`
+povowner=`stat ${stat_format}%u ${HOME}`
+povgroup=`stat ${stat_format}%g ${HOME}`
 AC_SUBST([povowner])
 AC_SUBST([povgroup])
 

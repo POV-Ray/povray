@@ -5,7 +5,7 @@
 /// Windows-specific general POV-Ray compile-time configuration.
 ///
 /// This header file configures module-independent aspects of POV-Ray for
-/// running properly on a Unix platform.
+/// running properly on a Windows platform.
 ///
 /// @author Christopher J. Cason
 ///
@@ -13,7 +13,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -55,16 +55,20 @@
 // failure to do so will lead to link errors.
 // #define _CONSOLE
 
+// C++ variants of C standard headers
 #include <cmath>
 #include <cstdarg>
 #include <cstdlib>
 
+// C++ standard headers
 #include <exception>
 #include <list>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
+// boost headers
+#include <boost/intrusive_ptr.hpp>
 #include <boost/tr1/memory.hpp>
 
 #include <io.h>
@@ -95,6 +99,8 @@ using std::tr1::weak_ptr;
 using std::tr1::dynamic_pointer_cast;
 using std::tr1::static_pointer_cast;
 using std::tr1::const_pointer_cast;
+
+using boost::intrusive_ptr;
 
 #endif // STD_POV_TYPES_DECLARED
 
@@ -127,20 +133,21 @@ using std::tr1::const_pointer_cast;
   #error "unknown compiler configuration"
 #endif
 
-#ifdef BUILD_SSE2
-  #define SSE2_INCLUDED "-sse2"
+#ifndef POV_COMPILER_VER
+  #define POV_COMPILER_VER "u"
+#endif
+
+#if defined(BUILD_AVX2)
+  #define POV_BUILD_INFO POV_COMPILER_VER ".avx2." POVRAY_PLATFORM_NAME
+#elif defined(BUILD_AVX)
+  #define POV_BUILD_INFO POV_COMPILER_VER ".avx." POVRAY_PLATFORM_NAME
+#elif defined(BUILD_SSE2)
+  #define POV_BUILD_INFO POV_COMPILER_VER ".sse2." POVRAY_PLATFORM_NAME
 #else
-  #define SSE2_INCLUDED ""
+  #define POV_BUILD_INFO POV_COMPILER_VER "." POVRAY_PLATFORM_NAME
 #endif
 
 /////////////////////////////////////////////////////////////
-
-#ifndef MAX
-  #define MAX(a,b) ((a>b)?a:b)
-#endif
-#ifndef MIN
-  #define MIN(a,b) ((a>b)?b:a)
-#endif
 
 #ifndef __GENDEFS
   #define __GENDEFS
@@ -208,7 +215,7 @@ namespace pov_base
 #define ALTMAIN
 #define LITTLE_ENDIAN
 #define POV_PATH_SEPARATOR                  '\\'
-#define POV_PATH_SEPARATOR_2                '/'
+#define POV_IS_PATH_SEPARATOR(c)            (((c) == POV_PATH_SEPARATOR) || ((c) == '/'))
 #define POV_SLASH_IS_SWITCH_CHARACTER       1 // allow forward slash as a switch character (even despite its use as a path separator!)
 #define DEFAULT_OUTPUT_FORMAT               kPOVList_FileType_PNG
 #define POV_IS1                             ".bmp"
@@ -216,10 +223,10 @@ namespace pov_base
 #define DEFAULT_DISPLAY_GAMMA_TYPE          kPOVList_GammaType_SRGB
 #define DEFAULT_DISPLAY_GAMMA               2.2
 #define RENAME_FILE(orig,new)               rename(orig,new)
-#define DELETE_FILE(name)                   _unlink(name)
-#define NEW_LINE_STRING                     "\r\n"
-#define POV_SYS_FILE_EXTENSION              ".bmp"
-#define SYS_TO_STANDARD                     BMP
+#define POV_DELETE_FILE(name)               _unlink(name)
+#define POV_NEW_LINE_STRING                 "\r\n"
+#define POV_SYS_IMAGE_EXTENSION             ".bmp"
+#define POV_SYS_IMAGE_TYPE                  BMP
 #define vsnprintf                           _vsnprintf
 #define snprintf                            _snprintf
 #define FILE_NAME_LENGTH                    _MAX_PATH
@@ -227,8 +234,8 @@ namespace pov_base
 #define IFF_SWITCH_CAST                     (long)
 #define USE_OFFICIAL_BOOST                  1
 
-#define POV_MEMMOVE(dst,src,len)            memmove((dst),(src),(len))
-#define POV_MEMCPY(dst,src,len)             memcpy((dst),(src),(len))
+#define POV_MEMMOVE(dst,src,len)            std::memmove((dst),(src),(len))
+#define POV_MEMCPY(dst,src,len)             std::memcpy((dst),(src),(len))
 
 #ifdef _CONSOLE
 
@@ -259,10 +266,8 @@ namespace pov_base
 #endif
 
 #define POV_GLOBAL_MEM_STATS(a,f,c,p,s,l)   povwin::WinMemReport(true, a, f, c, p, s, l)
-#define POV_THREAD_MEM_STATS(a,f,c,p,s,l)   povwin::WinMemReport(false, a, f, c, p, s, l)
 #define POV_MEM_STATS_RENDER_BEGIN()        povwin::WinMemStage(true)
 #define POV_MEM_STATS_RENDER_END()          povwin::WinMemStage(false)
-#define POV_MEM_STATS_COOKIE                void *
 
 #define POV_IMPLEMENT_RTR                   1
 
@@ -296,7 +301,8 @@ namespace pov
 
 #define HAVE_NAN
 #define HAVE_INF
-#define POV_ISNAN(x) _isnan(x)
-#define POV_ISINF(x) _isinf(x)
+#define POV_ISNAN(x)    (_isnan(x) != 0)
+#define POV_ISFINITE(x) (_finite(x) != 0)
+#define POV_ISINF(x)    (!POV_ISFINITE(x) && !POV_ISNAN(x))
 
 #endif // POVRAY_WINDOWS_SYSPOVCONFIG_H

@@ -1,0 +1,207 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{9ee610c7-4fa9-4ab7-8414-d1129c0cb4c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Bitmaps">
+      <UniqueIdentifier>{17236962-9406-4bed-a1ee-0e0e649a0cb3}</UniqueIdentifier>
+      <Extensions>*.bmp</Extensions>
+    </Filter>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{90b6ce8a-dc01-4cad-a954-9ffb99251dfb}</UniqueIdentifier>
+      <Extensions>*.h</Extensions>
+    </Filter>
+    <Filter Include="Source">
+      <UniqueIdentifier>{b4c844cc-f3b1-4765-8c77-911f3b2d69b2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\icons\pvengine-xp.ico">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="..\icons\renderwindow-xp.ico">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="..\bitmaps\about.bmp">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\BACKGND1.BMP">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\BACKGND2.BMP">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\BACKGND4.BMP">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\BACKGND5.BMP">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\toolbar\cmdline.bmp">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\DEFAULT.BMP">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\toolbar\fileclose.bmp">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\toolbar\filenew.bmp">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\toolbar\fileopen.bmp">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\toolbar\filequeue.bmp">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\toolbar\filerender.bmp">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\toolbar\filesave.bmp">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\toolbar\goirtc.bmp">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\toolbar\gopovray.bmp">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\toolbar\helpcont.bmp">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\toolbar\helpirtccd.bmp">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\toolbar\helppovcd.bmp">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\toolbar\helppovray.bmp">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\icons\Pvengine.ico">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\renderanim-4bpp.bmp">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\renderanim.bmp">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\toolbar\renderclose.bmp">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\toolbar\rendershow.bmp">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\toolbar\renderstop.bmp">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\icons\renderwindow.ico">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\toolbar\rerun.bmp">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\toolbar\sleep.bmp">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\toolbar\sourcefile.bmp">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\StretchDIBits.bmp">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\bitmaps\toolbar\SysTray.bmp">
+      <Filter>Resources\Bitmaps</Filter>
+    </None>
+    <None Include="..\README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\pvengine.rc">
+      <Filter>Resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\pvbitmap.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pvdemo.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pvdialog.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pvdisplay.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pvedit.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pvengine.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pvfrontend.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pvguiext.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pvlegal.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pvmem.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\resource.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\winprecomp.h" />
+    <ClInclude Include="..\povwin_version.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\pvbitmap.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pvdialog.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pvdisplay.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pvedit.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pvengine.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pvfiles.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pvfrontend.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pvguiext.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pvmem.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pvmenu.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pvmisc.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pvtext.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pvupdate.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\winprecomp.cpp" />
+  </ItemGroup>
+</Project>

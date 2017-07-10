@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,14 +37,17 @@
 #ifndef PROCESSOPTIONS_H
 #define PROCESSOPTIONS_H
 
-#include "base/configbase.h"
-
-#include "povms/povmscpp.h"
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "frontend/configfrontend.h"
 
 #include "base/textstream.h"
 
-namespace pov_base
+#include "povms/povmscpp.h"
+
+namespace pov_frontend
 {
+
+using namespace pov_base;
 
 enum {
     kINIOptFlag_SuppressWrite   = 0x0001,   ///< Suppress when writing complete list of options
@@ -87,11 +90,11 @@ class ProcessOptions
         static bool IsTrue(const char *);
         static bool IsFalse(const char *);
 
-        static int POVMSAttr_GetUTF8String(POVMSAttributePtr, POVMSType, char *, int *);
+        static int POVMSAttr_GetUTF8String(POVMSAttributePtr attr, POVMSType type, UTF8String& s);
         static int POVMSAttr_SetUTF8String(POVMSAttributePtr, POVMSType, const char *);
         static int POVMSUtil_SetUTF8String(POVMSObjectPtr, POVMSType, const char *);
-        static size_t ConvertUTF8ToUCS2(const char *, UCS2 *);
-        static size_t ConvertUCS2ToUTF8(const UCS2 *, char *);
+        static size_t ConvertUTF16ToUTF8(const UTF16 *source, UTF8String& dest);
+        static size_t ConvertUCS2ToUTF8(const UCS2 *source, UTF8String& dest);
     protected:
         virtual int ReadSpecialOptionHandler(INI_Parser_Table *, char *, POVMSObjectPtr);
         virtual int ReadSpecialSwitchHandler(Cmd_Parser_Table *, char *, POVMSObjectPtr, bool);

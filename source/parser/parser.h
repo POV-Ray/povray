@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -86,6 +86,12 @@ const int SYM_TABLE_SIZE = 257;
 typedef struct Sym_Table_Entry SYM_ENTRY;
 typedef unsigned short SymTableEntryRefCount;
 
+// Special symbol tables
+enum {
+    SYM_TABLE_RESERVED = 0,        // reserved words
+    SYM_TABLE_GLOBAL,              // identifiers declared using #declare (or #local in top-level file), #function, #macro, etc.
+};
+
 /// Structure holding information about a symbol
 struct Sym_Table_Entry
 {
@@ -107,6 +113,8 @@ struct ClassicTurbulence; // full declaration in core/material/warp.h
 struct BlackHoleWarp; // full declaration in core/material/warp.h
 class Mesh;
 class SceneData;
+struct PavementPattern;
+struct TilingPattern;
 
 /*****************************************************************************
 * Global preprocessor defines
@@ -196,6 +204,10 @@ struct BetaFlags
 
 class Parser : public SceneTask
 {
+    private:
+
+        struct SYM_TABLE;
+
     public:
 
         class DebugTextStreamBuffer : public TextStreamBuffer
@@ -221,7 +233,7 @@ class Parser : public SceneTask
             TOKEN Function_Id;                              ///< token type ID, in case Token_Id is an identifier ID
             pov_base::ITextStream::FilePos Token_File_Pos;  ///< location of this token in the scene or include file (line number & file position)
             int Token_Col_No;                               ///< location of this token in the scene or include file (column)
-            int Table_Index;
+            int context;                                    ///< context the token is local to (i.e., table index)
             char *Token_String;                             ///< reference to token value (if it is a string literal) or character sequence comprising the token
             DBL Token_Float;                                ///< token value (if it is a float literal)
             int Unget_Token, End_Of_File;
@@ -229,7 +241,11 @@ class Parser : public SceneTask
             void *Data;                                     ///< reference to token value (if it is a non-float identifier)
             int *NumberPtr;
             void **DataPtr;
-            bool is_array_elem;                             ///< true if token is actually an array element reference
+            SYM_TABLE *table;                               ///< table or dictionary the token references an element of
+            bool is_array_elem          : 1;                ///< true if token is actually an array element reference
+            bool is_mixed_array_elem    : 1;                ///< true if token is actually a mixed-type array element reference
+            bool is_dictionary_elem     : 1;                ///< true if token is actually a dictionary element reference
+            bool freeString             : 1;                ///< true if Token_String must be freed before being assigned a new value
         };
 
         struct LValue
@@ -266,32 +282,26 @@ class Parser : public SceneTask
 
         struct POV_ARRAY
         {
-            int Dims, Type, Total;
+            int Dims, Type;
             int Sizes[5];
             int Mags[5];
-            void **DataPtrs;
+            vector<void*> DataPtrs;
+            vector<int> Types;
+            bool resizable;
         };
 
         struct POV_PARAM
         {
             int *NumberPtr;
             void **DataPtr;
-            int Table_Index;
         };
 
         struct DATA_FILE
         {
             pov_base::ITextStream *In_File;
             pov_base::OTextStream *Out_File;
-            bool fopenCompleted : 1; ///< `false` if still busy parsing `#fopen', `true` otherwise.
+            bool busyParsing    : 1; ///< `true` if parsing a statement related to the file, `false` otherwise.
             bool R_Flag         : 1;
-        };
-
-        enum IdentifierMode
-        {
-            kIdentifierModeUndefined,
-            kIdentifierModeLocal,
-            kIdentifierModeGlobal,
         };
 
         // constructor
@@ -309,9 +319,18 @@ class Parser : public SceneTask
         // parse.h/parse.cpp
         void Parse_Error (TOKEN Token_Id);
         void Found_Instead_Error (const char *exstr, const char *extokstr);
-        bool Parse_Begin (bool mandatory = true);
-        void Parse_End (void);
+        bool Parse_Begin (TOKEN tokenId, bool mandatory);
+        void Parse_End (TOKEN tokenId);
+        inline bool Parse_Begin (bool mandatory = true) { return Parse_Begin(LEFT_CURLY_TOKEN, mandatory); }
+        inline void Parse_End (void) { Parse_End(RIGHT_CURLY_TOKEN); }
+        inline bool Parse_Paren_Begin (bool mandatory = true) { return Parse_Begin(LEFT_PAREN_TOKEN, mandatory); }
+        inline void Parse_Paren_End (void) { Parse_End(RIGHT_PAREN_TOKEN); }
+        inline bool Parse_Angle_Begin (bool mandatory = true) { return Parse_Begin(LEFT_ANGLE_TOKEN, mandatory); }
+        inline void Parse_Angle_End (void) { Parse_End(RIGHT_ANGLE_TOKEN); }
+        inline bool Parse_Square_Begin (bool mandatory = true) { return Parse_Begin(LEFT_SQUARE_TOKEN, mandatory); }
+        inline void Parse_Square_End (void) { Parse_End(RIGHT_SQUARE_TOKEN); }
         bool Parse_Comma (void);
+        bool Peek_Token (TOKEN tokenId);
         void Parse_Semi_Colon (bool force_semicolon);
         void Destroy_Frame (void);
         void MAError (const char *str, long size);
@@ -330,6 +349,7 @@ class Parser : public SceneTask
         void Parse_Declare (bool is_local, bool after_hash);
         void Parse_Matrix (MATRIX Matrix);
         void Destroy_Ident_Data (void *Data, int Type);
+        bool PassParameterByReference (int oldTableIndex);
         bool Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTRY *sym, bool ParFlag, bool SemiFlag, bool is_local, bool allow_redefine, bool allowUndefined, int old_table_index);
         const char *Get_Token_String (TOKEN Token_Id);
         void Test_Redefine(TOKEN Previous, TOKEN *NumberPtr, void *Data, bool allow_redefine = true);
@@ -346,11 +366,14 @@ class Parser : public SceneTask
         void VersionWarning(unsigned int sinceVersion, const char *format,...);
         void PossibleError(const char *format,...);
         void Error(const char *format,...);
+        void ErrorInfo(const SourceInfo& loc, const char *format,...);
 
         int Debug_Info(const char *format,...);
         void FlushDebugMessageBuffer();
 
-        static void Convert_Filter_To_Transmit(PIGMENT *Pigment); // NK layers - 1999 July 10 - for backwards compatiblity with layered textures
+        // NK layers - 1999 July 10 - for backwards compatibility with layered textures
+        static void Convert_Filter_To_Transmit(PIGMENT *Pigment);
+        static void Convert_Filter_To_Transmit(GenericPigmentBlendMap *pBlendMap);
 
         /// @param[in]  formalFileName  Name by which the file is known to the user.
         /// @param[out] actualFileName  Name by which the file is known to the parsing computer.
@@ -371,12 +394,15 @@ class Parser : public SceneTask
         void pre_init_tokenizer (void);
         void Initialize_Tokenizer (void);
         void Terminate_Tokenizer (void);
+        SYM_ENTRY *Add_Symbol (SYM_TABLE *table, const char *Name,TOKEN Number);
         SYM_ENTRY *Add_Symbol (int Index,const char *Name,TOKEN Number);
         POV_ARRAY *Parse_Array_Declare (void);
-        SYM_ENTRY *Create_Entry (int Index,const char *Name,TOKEN Number);
+        SYM_TABLE *Parse_Dictionary_Declare();
+        SYM_ENTRY *Create_Entry (const char *Name, TOKEN Number, bool copyName);
+        SYM_ENTRY *Copy_Entry (const SYM_ENTRY *);
         void Acquire_Entry_Reference (SYM_ENTRY *Entry);
-        void Release_Entry_Reference (int Index, SYM_ENTRY *Entry);
-        SYM_ENTRY *Destroy_Entry (int Index,SYM_ENTRY *Entry);
+        void Release_Entry_Reference (SYM_TABLE *table, SYM_ENTRY *Entry);
+        SYM_ENTRY *Destroy_Entry (SYM_ENTRY *Entry, bool destroyName);
         bool Parse_Ifdef_Param ();
         int Parse_For_Param (char**, DBL*, DBL*);
 
@@ -446,8 +472,9 @@ class Parser : public SceneTask
         FUNCTION_PTR Parse_Function(void);
         FUNCTION_PTR Parse_FunctionContent(void);
         FUNCTION_PTR Parse_FunctionOrContent(void);
-        void Parse_FunctionOrContentList(GenericScalarFunctionPtr* apFn, unsigned int count);
+        void Parse_FunctionOrContentList(GenericScalarFunctionPtr* apFn, unsigned int count, bool mandatory = true);
         FUNCTION_PTR Parse_DeclareFunction(int *token_id, const char *fn_name, bool is_local);
+        intrusive_ptr<FunctionVM> GetFunctionVM() const;
 
         // parsestr.h/parsestr.cpp
         char *Parse_C_String(bool pathname = false);
@@ -477,7 +504,16 @@ class Parser : public SceneTask
 
         shared_ptr<BackendSceneData> backendSceneData; // TODO FIXME HACK - make private again once Locate_Filename is fixed [trf]
         shared_ptr<SceneData> sceneData;
+
     private:
+
+        struct BraceStackEntry
+        {
+            TOKEN       openToken;
+            SourceInfo  sourceInfo;
+        };
+
+        intrusive_ptr<FunctionVM> mpFunctionVM;
         FPUContext *fnVMContext;
 
         bool Had_Max_Trace_Level;
@@ -490,15 +526,14 @@ class Parser : public SceneTask
         bool useClock;
 
         // parse.h/parse.cpp
-        short Not_In_Default;
-        short Ok_To_Declare;
-        short LValue_Ok;
+        bool Not_In_Default;
+        bool Ok_To_Declare;
+        bool LValue_Ok;
 
         /// true if a #version statement is being parsed
         bool parsingVersionDirective;
 
-        TOKEN *Brace_Stack;
-        int Brace_Index;
+        vector<BraceStackEntry> maBraceStack;
         bool Destroying_Frame;
 
         Camera Default_Camera;
@@ -524,6 +559,7 @@ class Parser : public SceneTask
         struct SYM_TABLE
         {
             SYM_ENTRY *Table[SYM_TABLE_SIZE];
+            bool namesAreCopies;
         };
 
         SYM_TABLE *Tables[MAX_NUMBER_OF_TABLES];
@@ -577,12 +613,11 @@ class Parser : public SceneTask
 
         CS_ENTRY *Cond_Stack;
         int CS_Index;
-        bool Skipping, Inside_Ifdef, Inside_MacroDef, Parsing_Directive;
-        IdentifierMode Inside_IdentFn;
+        bool Skipping, Inside_Ifdef, Inside_MacroDef, Parsing_Directive, parseRawIdentifiers, parseOptionalRValue;
 
-        int Got_EOF; // WARNING: Changes to the use of this variable are very dangerous as it is used in many places assuming certain non-obvious side effects! [trf]
+        bool Got_EOF; // WARNING: Changes to the use of this variable are very dangerous as it is used in many places assuming certain non-obvious side effects! [trf]
 
-        TOKEN Conversion_Util_Table[LAST_TOKEN];
+        TOKEN Conversion_Util_Table[TOKEN_COUNT];
 
         // parstxtr.h/parstxtr.cpp
         TEXTURE *Default_Texture;
@@ -633,7 +668,9 @@ class Parser : public SceneTask
         ObjectPtr Parse_Mesh();
         ObjectPtr Parse_Mesh2();
 
+#if POV_PARSER_EXPERIMENTAL_OBJ_IMPORT
         void Parse_Obj (Mesh*);
+#endif
         void Parse_Mesh1 (Mesh*);
         void Parse_Mesh2 (Mesh*);
 
@@ -659,8 +696,9 @@ class Parser : public SceneTask
         void Set_CSG_Children_Flag(ObjectPtr, unsigned int, unsigned int, unsigned int);
         void Set_CSG_Tree_Flag(ObjectPtr, unsigned int, int);
 
-        ObjectPtr Parse_Isosurface(void);
-        ObjectPtr Parse_Parametric(void);
+        ObjectPtr Parse_Isosurface();
+        ObjectPtr Parse_Parametric();
+        void ParseContainedBy(shared_ptr<ContainedByShape>& container, ObjectPtr obj);
 
         ObjectPtr Parse_Sphere_Sweep(void);
         int Parse_Three_UVCoords(Vector2d& UV1, Vector2d& UV2, Vector2d& UV3);
@@ -680,20 +718,27 @@ class Parser : public SceneTask
         inline void End_String_Fast (void);
         bool Read_Float (void);
         void Read_Symbol (void);
-        SYM_ENTRY *Find_Symbol (int Index, const char *s);
+        SYM_ENTRY *Find_Symbol (const SYM_TABLE *table, const char *s, int hash);
+        SYM_ENTRY *Find_Symbol (const SYM_TABLE *table, const char *s);
+        SYM_ENTRY *Find_Symbol (int index, const char *s);
         SYM_ENTRY *Find_Symbol (const char *s);
         void Skip_Tokens (COND_TYPE cond);
         void Break (void);
 
         int get_hash_value (const char *s);
-        inline void Write_Token (TOKEN Token_Id, int col);
+        inline void Write_Token (TOKEN Token_Id, int col, SYM_TABLE *table = NULL);
         void Destroy_Table (int index);
         void init_sym_tables (void);
         void Add_Sym_Table ();
+        SYM_TABLE *Create_Sym_Table (bool copyNames);
+        void Destroy_Sym_Table (SYM_TABLE *);
+        SYM_TABLE *Copy_Sym_Table (const SYM_TABLE *);
+        void Remove_Symbol (SYM_TABLE *table, const char *Name, bool is_array_elem, void **DataPtr, int ttype);
         void Remove_Symbol (int Index, const char *Name, bool is_array_elem, void **DataPtr, int ttype);
         Macro *Parse_Macro(void);
         void Invoke_Macro(void);
         void Return_From_Macro(void);
+        void Add_Entry (SYM_TABLE *table, SYM_ENTRY *Table_Entry);
         void Add_Entry (int Index,SYM_ENTRY *Table_Entry);
         void Parse_Initalizer (int Sub, int Base, POV_ARRAY *a);
 
@@ -710,7 +755,17 @@ class Parser : public SceneTask
         // parstxtr.h/parstxtr.cpp
         void Make_Pattern_Image(ImageData *image, FUNCTION_PTR fn, int token);
 
-        void Parse_Image_Pattern (TPATTERN *TPattern);
+        PatternPtr ParseDensityFilePattern();
+        PatternPtr ParseImagePattern();
+        PatternPtr ParseJuliaPattern();
+        PatternPtr ParseMagnetPattern();
+        PatternPtr ParseMandelPattern();
+        PatternPtr ParsePotentialPattern();
+        PatternPtr ParseSlopePattern();
+        template<typename PATTERN_T> PatternPtr ParseSpiralPattern();
+        void VerifyPavementPattern(shared_ptr<PavementPattern> pattern);
+        void VerifyTilingPattern(shared_ptr<TilingPattern> pattern);
+        void VerifyPattern(PatternPtr pattern);
         void Parse_Bump_Map (TNORMAL *Tnormal);
         void Parse_Image_Map (PIGMENT *Pigment);
         template<typename MAP_T, typename PATTERN_T> void Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type);
@@ -732,8 +787,7 @@ class Parser : public SceneTask
         UCS2 *Parse_Strupr(bool pathname);
         UCS2 *Parse_Strlwr(bool pathname);
 
-        UCS4 *Convert_UTF8_To_UCS4(const unsigned char *text_array, int text_array_size, int *char_array_size);
-        UCS2 *Convert_UTF8_To_UCS2(const unsigned char *text_array, int text_array_size, int *char_array_size);
+        UCS2 *Convert_UTF8_To_UCS2(const unsigned char *text_array, int *char_array_size);
 
         // express.h/express.cpp
         void Parse_Vector_Param (Vector3d& Vector);

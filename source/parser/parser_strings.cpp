@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,8 +41,6 @@
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-#include "pov_mem.h" // TODO
-
 #include "core/scene/scenedata.h"
 
 // this must be the last file included
@@ -50,41 +48,6 @@
 
 namespace pov
 {
-
-/*****************************************************************************
-* Local variables
-******************************************************************************/
-
-const unsigned char gUTF8SequenceArray[256] =
-{
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-    3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5
-};
-
-const unsigned int gUTF8Offsets[6] =
-{
-    0x00000000UL,
-    0x00003080UL,
-    0x000E2080UL,
-    0x03C82080UL,
-    0xFA082080UL,
-    0x82082080UL
-};
-
 
 /*****************************************************************************
  *
@@ -232,13 +195,13 @@ UCS2 *Parser::Parse_Str(bool pathname)
     DBL val;
     int l, d;
 
-    GET(LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
     val = Parse_Float();
     Parse_Comma();
     l = (int)Parse_Float();
     Parse_Comma();
     d = (int)Parse_Float();
-    GET(RIGHT_PAREN_TOKEN);
+    Parse_Paren_End();
 
     p = temp3;
     *p++ = '%';
@@ -305,7 +268,7 @@ UCS2 *Parser::Parse_VStr(bool pathname)
     UCS2 *str2;
     UCS2 *New;
 
-    GET(LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
 
     vl = (int)Parse_Float();
     Parse_Comma();
@@ -325,7 +288,7 @@ UCS2 *Parser::Parse_VStr(bool pathname)
     Parse_Comma();
     d = (int)Parse_Float();
 
-    GET(RIGHT_PAREN_TOKEN);
+    Parse_Paren_End();
 
     p = temp3;
     *(p++) = '%';
@@ -396,12 +359,13 @@ UCS2 *Parser::Parse_Concat(bool pathname)
     UCS2 *str;
     UCS2 *New;
 
-    GET(LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
 
     New = Parse_String();
 
     EXPECT
         CASE(RIGHT_PAREN_TOKEN)
+            UNGET
             EXIT
         END_CASE
 
@@ -413,6 +377,8 @@ UCS2 *Parser::Parse_Concat(bool pathname)
             POV_FREE(str);
         END_CASE
     END_EXPECT
+
+    Parse_Paren_End();
 
     return New;
 }
@@ -481,15 +447,16 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
     int vlen = 0;
     char val[PARSE_NOW_VAL_LENGTH + 1]; // Arbitrary size, usually a date format string is far less
 
-    GET(LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
+
     std::time_t timestamp = floor((Parse_Float() + (365*30+7)) * 24*60*60 + 0.5);
     Parse_Comma();
-    EXPECT
+    EXPECT_ONE
         CASE(RIGHT_PAREN_TOKEN)
+            UNGET
             CallFree = false;
             // we use GMT as some platforms (e.g. windows) have different ideas of what to print when handling '%z'.
             FormatStr = (char *)"%Y-%m-%d %H:%M:%SZ";
-            EXIT
         END_CASE
 
         OTHERWISE
@@ -506,10 +473,10 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
                 POV_FREE(FormatStr);
                 Error("Format string too long.");
             }
-            GET(RIGHT_PAREN_TOKEN);
-            EXIT
         END_CASE
     END_EXPECT
+
+    Parse_Paren_End();
 
     // NB don't wrap only the call to strftime() in the try, because visual C++ will, in release mode,
     // optimize the try/catch away since it doesn't believe that the RTL can throw exceptions. since
@@ -572,7 +539,7 @@ UCS2 *Parser::Parse_Substr(bool pathname)
     UCS2 *New;
     int l, d;
 
-    GET(LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
 
     str = Parse_String(pathname);
     Parse_Comma();
@@ -580,7 +547,7 @@ UCS2 *Parser::Parse_Substr(bool pathname)
     Parse_Comma();
     d = (int)Parse_Float();
 
-    GET(RIGHT_PAREN_TOKEN);
+    Parse_Paren_End();
 
     if(((l + d - 1) > UCS2_strlen(str)) || (l < 0) || (d < 0))
         Error("Illegal parameters in substr.");
@@ -617,12 +584,12 @@ UCS2 *Parser::Parse_Strupr(bool pathname)
 {
     UCS2 *New;
 
-    GET(LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
 
     New = Parse_String(pathname);
     UCS2_strupr(New);
 
-    GET(RIGHT_PAREN_TOKEN);
+    Parse_Paren_End();
 
     return New;
 }
@@ -650,12 +617,12 @@ UCS2 *Parser::Parse_Strlwr(bool pathname)
 {
     UCS2 *New;
 
-    GET(LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
 
     New = Parse_String(pathname);
     UCS2_strlwr(New);
 
-    GET(RIGHT_PAREN_TOKEN);
+    Parse_Paren_End();
 
     return New;
 }
@@ -720,10 +687,10 @@ UCS2 *Parser::String_To_UCS2(const char *str)
             }
             break;
         case kStringEncoding_UTF8:
-            char_array = Convert_UTF8_To_UCS2(reinterpret_cast<const unsigned char *>(str), (int)strlen(str), &char_array_size);
+            char_array = Convert_UTF8_To_UCS2(reinterpret_cast<const unsigned char *>(str), &char_array_size);
             break;
         case kStringEncoding_System:
-            char_array = POV_CONVERT_TEXT_TO_UCS2(reinterpret_cast<const unsigned char *>(str), strlen(str), &char_array_size);
+            char_array = POV_CONVERT_TEXT_TO_UCS2(reinterpret_cast<const unsigned char *>(str), &char_array_size);
             if(char_array == NULL)
                 Error("Cannot convert system specific text format to Unicode.");
             break;
@@ -793,10 +760,10 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
             }
             break;
         case kStringEncoding_UTF8:
-            char_array = Convert_UTF8_To_UCS2(reinterpret_cast<const unsigned char *>(str), (int)strlen(str), &char_array_size);
+            char_array = Convert_UTF8_To_UCS2(reinterpret_cast<const unsigned char *>(str), &char_array_size);
             break;
         case kStringEncoding_System:
-            char_array = POV_CONVERT_TEXT_TO_UCS2(reinterpret_cast<const unsigned char *>(str), strlen(str), &char_array_size);
+            char_array = POV_CONVERT_TEXT_TO_UCS2(reinterpret_cast<const unsigned char *>(str), &char_array_size);
             if(char_array == NULL)
                 Error("Cannot convert system specific text format to Unicode.");
             break;
@@ -955,70 +922,6 @@ char *Parser::UCS2_To_String(const UCS2 *str)
 *
 * FUNCTION
 *
-*   Convert_UTF8_To_UCS4
-*
-* INPUT
-*
-*   Array of bytes, length of this sequence
-*
-* OUTPUT
-*
-*   Size of the array of UCS4s returned
-*
-* RETURNS
-*
-*   Array of UCS4s (allocated with POV_MALLOC)
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-*   Converts UTF8 to UCS4 characters.
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-UCS4 *Parser::Convert_UTF8_To_UCS4(const unsigned char *text_array, int text_array_size, int *char_array_size)
-{
-    UCS4 *char_array = NULL;
-    UCS4 chr;
-    int i, j, k, seqlen;
-
-    if((text_array == NULL) || (text_array_size == 0) || (char_array_size == NULL))
-        return NULL;
-
-    char_array = reinterpret_cast<UCS4 *>(POV_MALLOC(text_array_size * sizeof(UCS4), "Character Array"));
-    if(char_array == NULL)
-        throw POV_EXCEPTION_CODE(kOutOfMemoryErr);
-
-    for(i = 0, k = 0; i < text_array_size; k++, i++)
-    {
-        seqlen = gUTF8SequenceArray[text_array[i]];
-        chr = 0;
-        for(j = seqlen; j > 0; j--)
-        {
-            chr += text_array[i];
-            chr <<= 6;
-            i++;
-        }
-        chr += text_array[i];
-
-        char_array[k] = chr - gUTF8Offsets[seqlen];
-    }
-
-    char_array = reinterpret_cast<UCS4 *>(POV_REALLOC(char_array, k * sizeof(UCS4), "Character Array"));
-    *char_array_size = k;
-
-    return char_array;
-}
-
-/*****************************************************************************
-*
-* FUNCTION
-*
 *   Convert_UTF8_To_UCS2
 *
 * INPUT
@@ -1045,41 +948,25 @@ UCS4 *Parser::Convert_UTF8_To_UCS4(const unsigned char *text_array, int text_arr
 *
 ******************************************************************************/
 
-UCS2 *Parser::Convert_UTF8_To_UCS2(const unsigned char *text_array, int text_array_size, int *char_array_size)
+UCS2 *Parser::Convert_UTF8_To_UCS2(const unsigned char *text_array, int *char_array_size)
 {
-    UCS2 *char_array = NULL;
-    UCS4 chr;
-    int i, j, k, seqlen;
+    POV_PARSER_ASSERT(text_array);
+    POV_PARSER_ASSERT(char_array_size);
 
-    if((text_array == NULL) || (text_array_size == 0) || (char_array_size == NULL))
+    UCS2String s = UTF8toUCS2String(UTF8String(reinterpret_cast<const char*>(text_array)));
+    UCS2String::size_type len = s.length();
+    *char_array_size = len;
+
+    if (len == 0)
         return NULL;
 
-    char_array = reinterpret_cast<UCS2 *>(POV_MALLOC(text_array_size * sizeof(UCS2), "Character Array"));
+    size_t size = (len+1)*sizeof(UCS2);
+
+    UCS2 *char_array = reinterpret_cast<UCS2 *>(POV_MALLOC(size, "Character Array"));
     if(char_array == NULL)
         throw POV_EXCEPTION_CODE(kOutOfMemoryErr);
 
-    for(i = 0, k = 0; i < text_array_size; k++, i++)
-    {
-        seqlen = gUTF8SequenceArray[text_array[i]];
-        chr = 0;
-        for(j = seqlen; j > 0; j--)
-        {
-            chr += text_array[i];
-            chr <<= 6;
-            i++;
-        }
-
-        chr += text_array[i];
-        chr -= gUTF8Offsets[seqlen];
-
-        if(chr <= 0x0000FFFFUL)
-            char_array[k] = chr;
-        else
-            char_array[k] = 0x0000FFFDUL;
-    }
-
-    char_array = reinterpret_cast<UCS2 *>(POV_REALLOC(char_array, k * sizeof(UCS2), "Character Array"));
-    *char_array_size = k;
+    memcpy(char_array, s.c_str(), size);
 
     return char_array;
 }
@@ -1266,7 +1153,7 @@ void Parser::UCS2_strupr(UCS2 *str)
     }
 
     if(err == true)
-        Warning("Non-ASCII charcater in string, strupr may not work as expected.");
+        Warning("Non-ASCII character in string, strupr may not work as expected.");
 }
 
 
@@ -1304,7 +1191,7 @@ void Parser::UCS2_strlwr(UCS2 *str)
     }
 
     if(err == true)
-        Warning("Non-ASCII charcater in string, strlwr may not work as expected.");
+        Warning("Non-ASCII character in string, strlwr may not work as expected.");
 }
 
 UCS2 *Parser::UCS2_strdup(const UCS2 *s)

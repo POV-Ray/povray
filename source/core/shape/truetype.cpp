@@ -38,6 +38,8 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/truetype.h"
 
+#include <map>
+
 #include "base/fileinputoutput.h"
 
 #include "core/bounding/boundingbox.h"

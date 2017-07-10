@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2001-2014.
+//  (C) Copyright Gennadiy Rozental 2001.
 //  (C) Copyright Beman Dawes 2001.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
@@ -63,6 +63,18 @@
 #if !defined(BOOST_NO_FENV_H)
   #include <boost/detail/fenv.hpp>
 #endif
+
+#endif
+
+
+// Additional macro documentations not being generated without this hack
+#ifdef BOOST_TEST_DOXYGEN_DOC__
+
+//! Disables the support of the alternative stack
+//! during the compilation of the Boost.test framework. This is especially useful
+//! in case it is not possible to detect the lack of alternative stack support for
+//! your compiler (for instance, ESXi).
+#define BOOST_TEST_DISABLE_ALT_STACK
 
 #endif
 
@@ -276,7 +288,7 @@ private:
 }; // execution_exception
 
 // ************************************************************************** //
-/// Function execution monitor
+/// @brief Function execution monitor
 
 /// This class is used to uniformly detect and report an occurrence of several types of signals and exceptions, reducing various
 /// errors to a uniform execution_exception that is returned to a caller.
@@ -415,10 +427,10 @@ public:
     // translator holder interface
     virtual int operator()( boost::function<int ()> const& F )
     {
-        BOOST_TEST_IMPL_TRY {
+        BOOST_TEST_I_TRY {
             return m_next ? (*m_next)( F ) : F();
         }
-        BOOST_TEST_IMPL_CATCH( ExceptionType, e ) {
+        BOOST_TEST_I_CATCH( ExceptionType, e ) {
             m_translator( e );
             return boost::exit_exception_failure;
         }
@@ -461,13 +473,12 @@ public:
     // Constructor
     explicit    system_error( char const* exp );
 
-    unit_test::readonly_property<long>          p_errno;
-    unit_test::readonly_property<char const*>   p_failed_exp;
+    long const          p_errno;
+    char const* const   p_failed_exp;
 };
 
-#define BOOST_TEST_SYS_ASSERT( exp ) \
-    if( (exp) ) ; \
-    else BOOST_TEST_IMPL_THROW( ::boost::system_error( BOOST_STRINGIZE( exp ) ) )
+//!@internal
+#define BOOST_TEST_SYS_ASSERT( cond ) BOOST_TEST_I_ASSRT( cond, ::boost::system_error( BOOST_STRINGIZE( exp ) ) )
 
 // ************************************************************************** //
 // **************Floating point exception management interface ************** //

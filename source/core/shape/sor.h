@@ -44,11 +44,23 @@
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor definitions
-******************************************************************************/
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
+
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
 
 #define SOR_OBJECT (STURM_OK_OBJECT)
+
+/// @}
+///
+//******************************************************************************
 
 /* Generate additional surface of revolution statistics. */
 
@@ -107,6 +119,10 @@ class Sor : public ObjectBase
         bool Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread);
         bool test_hit(const BasicRay&, IStack&, DBL, DBL, int, int, TraceThreadData *Thread);
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

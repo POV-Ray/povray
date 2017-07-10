@@ -59,6 +59,8 @@ namespace pov
 const DBL BEZIER_EPSILON = 1.0e-10;
 const DBL BEZIER_TOLERANCE = 1.0e-5;
 
+#define BEZIER_INTERIOR_NODE 0
+#define BEZIER_LEAF_NODE 1
 
 
 /*****************************************************************************

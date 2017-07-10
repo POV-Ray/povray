@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,19 +37,26 @@
 #ifndef POVRAY_CPUID_H
 #define POVRAY_CPUID_H
 
-#include "syspovconfigbase.h"
+#include "base/configbase.h"
 
-#if defined(LINUX)
-#define CPUID cpuid
-#else
-#define CPUID __cpuid // TODO it's a bit naive to presume this intrinsic to exist on any non-Linux platform
+class CPUInfo
+{
+public:
+    static bool SupportsSSE2();             ///< Test whether CPU and OS support SSE2.
+    static bool SupportsAVX();              ///< Test whether CPU and OS support AVX.
+    static bool SupportsAVX2();             ///< Test whether CPU and OS support AVX2.
+    static bool SupportsFMA3();             ///< Test whether CPU and OS support FMA3.
+    static bool SupportsFMA4();             ///< Test whether CPU and OS support FMA4.
+    static bool IsIntel();                  ///< Test whether CPU is genuine Intel product.
+    static bool IsAMD();                    ///< Test whether CPU is genuine AMD product.
+    static bool IsVM();                     ///< Test whether CPU cannot be detected reliably due to running in a VM.
+    static std::string GetFeatures();       ///< Query ASCII text string summarizing the features detected.
+#if POV_CPUINFO_DEBUG
+    static std::string GetDetails();        ///< Query ASCII text string detailing the raw CPUID (and related) information gathered.
 #endif
-
-#define CPUID_00000001_OSXSAVE_MASK    (0x1 << 27)
-#define CPUID_00000001_AVX_MASK        (0x1 << 28)
-#define CPUID_80000001_FMA4_MASK       (0x1 << 16)
-
-/// Tests whether AVX and FMA4 are supported.
-bool HaveAVXFMA4();
+private:
+    struct Data;
+    static const Data* gpData;
+};
 
 #endif // POVRAY_CPUID_H

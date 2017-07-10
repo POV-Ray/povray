@@ -1,6 +1,6 @@
 mesh {
   // Utah teapot with (non-smoothed) triangles
-  #include "..\scenes\advanced\teapot\teapot_tri.inc"
+  #include "../scenes/advanced/teapot/teapot_tri.inc"
   rotate<-90,0,0>
   scale 0.35
   

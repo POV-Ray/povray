@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -86,12 +86,16 @@
 #include "backend/povray.h"
 
 #ifdef RTR_SUPPORT
-  #include "rtrsupport.h"
+#include "rtrsupport.h"
 #endif
 
-#if defined(TRY_OPTIMIZED_NOISE)
-  #include OPTIMIZED_NOISE_H
+#include "cpuid.h"
+
+#ifdef TRY_OPTIMIZED_NOISE
+// TODO - This is a hack; we should get the noise generator choice information via POVMS from the back-end.
+#include "core/material/noise.h"
 #endif
+
 
 // this must be the last file included
 #include "syspovdebug.h"
@@ -125,11 +129,6 @@ char *WriteDump(struct _EXCEPTION_POINTERS *pExceptionInfo, bool full, long time
 namespace pov_frontend
 {
   extern shared_ptr<Display> gDisplay;
-}
-
-namespace vfePlatform
-{
-  extern bool GetCPUCount(unsigned int *TotAvailLogical, unsigned int *TotAvailCore, unsigned int *PhysicalNum);
 }
 
 using namespace pov;
@@ -354,9 +353,6 @@ unsigned                on_completion = CM_COMPLETION_NOTHING ;
 unsigned                window_count = 0 ;
 unsigned                ThreadCount = 2 ;
 unsigned                NumberOfCPUs ;
-unsigned                NumLogicalCPUs ;
-unsigned                NumCPUCores ;
-unsigned                NumPhysicalCPUs ;
 HPALETTE                hPalApp ;
 HPALETTE                hPalBitmap ;
 COLORREF                background_colour ;
@@ -460,6 +456,8 @@ extern HACCEL           hAccelerators ;
 extern HINSTANCE        hLibPovEdit ;
 
 #define MAX_INSERT_MENU_SECTIONS  8192
+
+std::string selectedNoiseFunc;
 
 typedef std::vector<int> InsMenuSecList;
 
@@ -779,9 +777,12 @@ void PrintRenderTimes (int Finished, int NormalCompletion)
             fprintf(f, "----------------------------------------------------------------------------\n");
             GenerateDumpMeta(true);
             fwrite(DumpMeta, strlen(DumpMeta), 1, f);
-            fprintf(f, "povversion=%s\n", POV_RAY_VERSION) ;
-            fprintf(f, "compilerversion=%s\n", COMPILER_VER) ;
-            fprintf(f, "platformversion=%s\n", PVENGINE_VER) ;
+            fprintf(f, "povversion=%s\n", POV_RAY_SOURCE_VERSION) ;
+            fprintf(f, "compilerversion=%s\n", POV_COMPILER_VER) ;
+            fprintf(f, "platformversion=%s\n", POVRAY_PLATFORM_NAME) ;
+#ifdef TRY_OPTIMIZED_NOISE
+            fprintf(f, "noisefunctions=%s\n", selectedNoiseFunc.c_str()) ;
+#endif // TRY_OPTIMIZED_NOISE
             fclose(f);
           }
         }
@@ -1274,8 +1275,8 @@ bool checkRegKey (void)
   if (RegOpenKeyEx (HKEY_CURRENT_USER, "Software\\" REGKEY "\\CurrentVersion\\Windows", 0, KEY_READ | KEY_WRITE, &key) == ERROR_SUCCESS)
   {
     len = sizeof (str) ;
-    if (RegQueryValueEx (key, VERSIONVAL, 0, NULL, (BYTE *) str, &len) != 0 || strcmp (str, POV_RAY_VERSION) != 0)
-        RegSetValueEx (key, VERSIONVAL, 0, REG_SZ, (BYTE *) POV_RAY_VERSION, (int) strlen (POV_RAY_VERSION) + 1) ;
+    if (RegQueryValueEx (key, VERSIONVAL, 0, NULL, (BYTE *) str, &len) != 0 || strcmp (str, POV_RAY_SOURCE_VERSION) != 0)
+        RegSetValueEx (key, VERSIONVAL, 0, REG_SZ, (BYTE *) POV_RAY_SOURCE_VERSION, (int) strlen (POV_RAY_SOURCE_VERSION) + 1) ;
     RegCloseKey (key) ;
   }
 
@@ -1424,6 +1425,46 @@ bool copy36EditSettings(void)
   return (result == ERROR_SUCCESS) ;
 }
 
+#ifdef POVRAY_IS_BETA
+bool copy37NoBetaEditSettings(void)
+{
+  HKEY        hKeySrc ;
+  HKEY        hKeyDst ;
+  DWORD       result ;
+  HINSTANCE   hLib ;
+  shCopyType  *shCopyKey ;
+
+  if ((hLib = LoadLibrary ("shlwapi.dll")) == NULL)
+    return (false) ;
+  shCopyKey = (shCopyType *) GetProcAddress (hLib, "SHCopyKeyA") ;
+  if (shCopyKey == NULL)
+  {
+    FreeLibrary (hLib) ;
+    return (false) ;
+  }
+
+  if (RegOpenKeyEx (HKEY_CURRENT_USER, "Software\\" REGKEY "\\" REGVER, 0, KEY_READ, &hKeySrc) != ERROR_SUCCESS)
+  {
+    FreeLibrary (hLib) ;
+    return (false) ;
+  }
+
+  if (RegCreateKeyEx (HKEY_CURRENT_USER, "Software\\" REGKEY "\\" REGVERKEY "\\POV-Edit", 0, "", REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hKeyDst, NULL) != ERROR_SUCCESS)
+  {
+    RegCloseKey (hKeySrc) ;
+    FreeLibrary (hLib) ;
+    return (false) ;
+  }
+
+  result = shCopyKey (hKeySrc, "POV-Edit", hKeyDst, NULL) ;
+  RegCloseKey (hKeySrc) ;
+  RegCloseKey (hKeyDst) ;
+  FreeLibrary (hLib) ;
+
+  return (result == ERROR_SUCCESS) ;
+}
+#endif
+
 bool checkEditKey36 (void)
 {
   HKEY        key ;
@@ -1435,6 +1476,20 @@ bool checkEditKey36 (void)
   }
   return (false) ;
 }
+
+#ifdef POVRAY_IS_BETA
+bool checkEditKey37NoBeta (void)
+{
+  HKEY        key ;
+
+  if (RegOpenKeyEx (HKEY_CURRENT_USER, "Software\\" REGKEY "\\" REGVER "\\POV-Edit", 0, KEY_READ, &key) == ERROR_SUCCESS)
+  {
+    RegCloseKey (key) ;
+    return (true) ;
+  }
+  return (false) ;
+}
+#endif
 
 bool checkEditKey37 (void)
 {
@@ -1464,7 +1519,7 @@ bool CloneOptions (void)
       reg_printf (true, "Software\\" REGKEY "\\CurrentVersion\\Windows", "Home", "%s", BinariesPath) ;
   }
 
-  reg_printf (true, "Software\\" REGKEY "\\CurrentVersion\\Windows", VERSIONVAL, "%s", POV_RAY_VERSION) ;
+  reg_printf (true, "Software\\" REGKEY "\\CurrentVersion\\Windows", VERSIONVAL, "%s", POV_RAY_SOURCE_VERSION) ;
 
   cond_reg_printf ("Software\\" REGKEY "\\" REGVERKEY "\\POV-Edit\\Open",   "Open0",   "%sChanges.txt,1,1,0,0,8,2",                   DocumentsPath) ;
   cond_reg_printf ("Software\\" REGKEY "\\" REGVERKEY "\\POV-Edit\\Recent", "Recent0", "%sChanges.txt,1,1,0,0,8,2",                   DocumentsPath) ;
@@ -1690,7 +1745,7 @@ char *GetExceptionDescription (DWORD code)
   }
 }
 
-#if POV_RAY_HAS_OFFICIAL_FEATURES == 1
+#if POV_RAY_HAS_CRASHDUMP_UPLOAD || POV_RAY_HAS_UPDATE_CHECK
 // this pulls in the code for update checks and crash dump submission.
 // it is only used in official releases made by the POV-Ray developers,
 // so the source is not included in the public distribution.
@@ -1739,7 +1794,7 @@ LONG WINAPI ExceptionHandler(struct _EXCEPTION_POINTERS* ExceptionInfo)
   ExitProcess (1) ;
   return (EXCEPTION_CONTINUE_SEARCH) ; // make compiler happy
 }
-#endif // POV_RAY_HAS_OFFICIAL_FEATURES
+#endif // POV_RAY_HAS_CRASHDUMP_UPLOAD
 
 int execute_tool (char *s)
 {
@@ -2715,7 +2770,7 @@ void WIN_Debug_Log (unsigned int from, const char *msg)
     OutputDebugString (msg) ;
 }
 
-#if POV_RAY_IS_OFFICIAL != 1
+#if !POV_RAY_IS_OFFICIAL
 void WIN_PrintOtherCredits (void)
 {
   char        *s = DISTRIBUTION_MESSAGE_2 ;
@@ -3713,7 +3768,7 @@ bool handle_main_command (WPARAM wParam, LPARAM lParam)
          return (true) ;
 
     case CM_CHECKUPDATENOW:
-#if POV_RAY_HAS_OFFICIAL_FEATURES == 1
+#if POV_RAY_HAS_UPDATE_CHECK
          ManualUpdateCheck();
 #endif
          return true;
@@ -4182,7 +4237,7 @@ LRESULT CALLBACK PovMainWndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM 
            break ;
          seconds++ ;
 
-#if POV_RAY_HAS_OFFICIAL_FEATURES == 1
+#if POV_RAY_HAS_UPDATE_CHECK
          if (seconds % 600 == 0)
            DoUpdateCheck () ;
 #endif
@@ -4225,6 +4280,8 @@ LRESULT CALLBACK PovMainWndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM 
            if (seconds % 10 == 0)
            {
              if (PreventSleep && !rendersleep)
+               // TODO FIXME - According to Microsoft's API documentation,
+               // ES_AWAYMODE_REQUIRED has no effect if used without ES_CONTINUOUS.
                SetThreadExecutionState(ES_AWAYMODE_REQUIRED | ES_SYSTEM_REQUIRED);
              if (rendersleep)
                FlashWindow (main_window, true) ;
@@ -4879,7 +4936,7 @@ void ShowAboutBox (void)
   int         oldMode ;
   MSG         msg ;
   HDC         hdcMemory ;
-  char        *s = POV_RAY_VERSION COMPILER_VER SSE2_INCLUDED "." PVENGINE_VER ;
+  char        *s = POV_RAY_VERSION ;
   SIZE        size ;
   HFONT       oldFont ;
   BITMAP      bm ;
@@ -5178,9 +5235,9 @@ bool WriteDumpMeta(struct _EXCEPTION_POINTERS *ExceptionInfo, const char *filena
   fprintf(f, "faultaddress=%u\n", ExceptionInfo->ContextRecord->Eip);
   fprintf(f, "faultplatform=win32\n");
 #endif
-  fprintf(f, "povversion=%s\n", POV_RAY_VERSION) ;
-  fprintf(f, "compilerversion=%s\n", COMPILER_VER) ;
-  fprintf(f, "platformversion=%s\n", PVENGINE_VER) ;
+  fprintf(f, "povversion=%s\n", POV_RAY_SOURCE_VERSION) ;
+  fprintf(f, "compilerversion=%s\n", POV_COMPILER_VER) ;
+  fprintf(f, "platformversion=%s\n", POVRAY_PLATFORM_NAME) ;
   fprintf(f, "remotesession=%u\n", GetSystemMetrics(SM_REMOTESESSION)) ;
   fclose(f);
   return true;
@@ -5222,9 +5279,9 @@ char *WriteDump(struct _EXCEPTION_POINTERS *pExceptionInfo, bool full, long time
       static char szDumpPath[_MAX_PATH];
 
       if (full)
-        sprintf(szScratch, "POV-Ray-" POV_RAY_VERSION COMPILER_VER SSE2_INCLUDED "." PVENGINE_VER "-%08X.dmp", timestamp);
+        sprintf(szScratch, "POV-Ray-" POV_RAY_VERSION "-%08X.dmp", timestamp);
       else
-        sprintf(szScratch, "POV-Ray-" POV_RAY_VERSION COMPILER_VER SSE2_INCLUDED "." PVENGINE_VER "-%08X.minidump", timestamp);
+        sprintf(szScratch, "POV-Ray-" POV_RAY_VERSION "-%08X.minidump", timestamp);
 
       // work out a good place for the dump file
       if (!GetTempPath( _MAX_PATH - 64, szDumpPath))
@@ -5274,6 +5331,42 @@ char *WriteDump(struct _EXCEPTION_POINTERS *pExceptionInfo, bool full, long time
   return NULL;
 }
 
+#ifdef BUILD_AVX2
+void NoAVX2 (void)
+{
+  MessageBox (NULL,
+              "This build of POV-Ray requires that your processor provides AVX2 support.\n"
+              "Please use the standard non-AVX2 version of POV-Ray on this computer.",
+              "POV-Ray for Windows",
+              MB_ICONSTOP | MB_OK) ;
+  exit (-1) ;
+}
+
+inline void TestAVX2 (void)
+{
+  if (!CPUInfo::SupportsAVX2())
+    NoAVX2();
+}
+#endif // BUILD_AVX2
+
+#ifdef BUILD_AVX
+void NoAVX (void)
+{
+  MessageBox (NULL,
+              "This build of POV-Ray requires that your processor provides AVX support.\n"
+              "Please use the standard non-AVX version of POV-Ray on this computer.",
+              "POV-Ray for Windows",
+              MB_ICONSTOP | MB_OK) ;
+  exit (-1) ;
+}
+
+inline void TestAVX (void)
+{
+  if (!CPUInfo::SupportsAVX())
+    NoAVX();
+}
+#endif // BUILD_AVX
+
 #ifdef BUILD_SSE2
 void NoSSE2 (void)
 {
@@ -5285,18 +5378,30 @@ void NoSSE2 (void)
   exit (-1) ;
 }
 
-inline int TestSSE2 (void)
+inline void TestSSE2 (void)
 {
-  __try
+  if (HaveVistaOrLater())
   {
-    __asm { movapd xmm0,xmm1 }
+    // Use the canonical test.
+    if (!CPUInfo::SupportsSSE2())
+      NoSSE2();
   }
-  __except(NoSSE2(),1)
+  else
   {
+    // On Windows XP (and presumably also Windows Server 2003), the canonical test does not seem
+    // to work properly for yet unknown reasons, so we test for support the dirty way by trying to
+    // actually execute an SSE2 instruction.
+    __try
+    {
+      __asm { movapd xmm0, xmm1 }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+      NoSSE2();
+    }
   }
-  return (0) ;
 }
-#endif
+#endif // BUILD_SSE2
 
 void InvalidParameterHandler(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved)
 {
@@ -5306,7 +5411,13 @@ void InvalidParameterHandler(const wchar_t* expression, const wchar_t* function,
 int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 {
 #ifdef BUILD_SSE2
-  TestSSE2 () ;
+  TestSSE2();
+#endif
+#ifdef BUILD_AVX
+  TestAVX();
+#endif
+#ifdef BUILD_AVX2
+  TestAVX2();
 #endif
 
   int                   show_state ;
@@ -5316,7 +5427,6 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
   char                  str [_MAX_PATH * 2] ;
   char                  *s = szCmdLine ;
   bool                  exit_loop = false ;
-  bool                  have_cpu_info = false;
   unsigned              n ;
   MSG                   msg ;
   HDC                   hDC ;
@@ -5366,13 +5476,6 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
   GetSystemInfo (&sysinfo) ;
   ThreadCount = sysinfo.dwNumberOfProcessors ;
   NumberOfCPUs = sysinfo.dwNumberOfProcessors ;
-
-  if (GetCPUCount(&NumLogicalCPUs, &NumCPUCores, &NumPhysicalCPUs) && NumLogicalCPUs > 1)
-  {
-    have_cpu_info = true;
-    ThreadCount = NumLogicalCPUs ;
-    NumberOfCPUs = NumCPUCores ;
-  }
 
   while (*s == ' ' || *s == '\t')
     s++ ;
@@ -5435,8 +5538,18 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
   sprintf(ToolIniFileName, "%sini\\pvtools.ini", DocumentsPath);
   sprintf(EngineIniFileName, "%sini\\pvengine.ini", DocumentsPath);
 
-  if (checkEditKey37() == false && checkEditKey36() == true)
-    copy36EditSettings();
+  if (!checkEditKey37())
+  {
+#ifdef POVRAY_IS_BETA
+    if (checkEditKey37NoBeta())
+      copy37NoBetaEditSettings();
+    else if (checkEditKey36())
+      copy36EditSettings();
+#else
+    if (checkEditKey36())
+      copy36EditSettings();
+#endif
+  }
 
   if (checkRegKey () == false || FreshInstall == true)
     if (!CloneOptions())
@@ -5777,26 +5890,16 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 
   GetHKCU("General", VERSIONVAL, "[unknown]", str, (DWORD) strlen (str)) ;
   if (debugging)
-    debug_output("Registry records version %s, and we are %s\n", str, POV_RAY_VERSION COMPILER_VER SSE2_INCLUDED "." PVENGINE_VER) ;
+    // TODO REVIEW - that's not data from the registry, that's data from `pvengine.ini`.
+    debug_output("Registry records version %s, and we are %s\n", str, POV_RAY_VERSION) ;
 
-  if (strcmp (str, POV_RAY_VERSION COMPILER_VER "." PVENGINE_VER) != 0)
-  {
-    // we don't want to set the newVersion flag if the only thing that changed
-    // was the compiler used to generate the binary. in this case we add an
-    // explicit check for the intel, msvc, and watcom versions.
-    if ((s = strstr (str, ".icl")) != NULL)
-      strcpy (s, s + 4) ;
-    else if ((s = strstr (str, ".msvc")) != NULL)
-      strcpy (s, s + 5) ;
-    else if ((s = strstr (str, ".watcom")) != NULL)
-      strcpy (s, s + 7) ;
-    // strip off any trailing digits from the compiler version
-    if (s)
-      while (isdigit (*s))
-        strcpy (s, s + 1) ;
-    if (strcmp (str, POV_RAY_VERSION "." PVENGINE_VER) != 0)
-      newVersion = true ;
-  }
+  // In determining whether we want to set the newVersion flag, we don't care about build-specific
+  // stuff like compiler version or even the CPU architecture.
+  s = strstr(str, "+");
+  if (s != NULL)
+    *s = '\0';
+  if (strcmp (str, POV_RAY_SOURCE_VERSION) != 0)
+    newVersion = true ;
 
   if ((run_count = GetHKCU("General", "RunCount", 0)) == 0 || newVersion)
   {
@@ -6092,7 +6195,7 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 
   buffer_message (mIDE, "Persistence of Vision Raytracer(tm) for Windows.\n") ;
   buffer_message (mIDE, "POV-Ray for Windows is part of the POV-Ray(tm) suite of programs.\n") ;
-  buffer_message (mIDE, "  This is version " POV_RAY_VERSION COMPILER_VER SSE2_INCLUDED "." PVENGINE_VER ".\n") ;
+  buffer_message (mIDE, "  This is version " POV_RAY_VERSION_INFO ".\n") ;
   buffer_message (mIDE, POV_RAY_COPYRIGHT "\n") ;
   buffer_message (mIDE, "  " DISCLAIMER_MESSAGE_1 "\n") ;
   buffer_message (mIDE, "  " DISCLAIMER_MESSAGE_2 "\n") ;
@@ -6109,21 +6212,19 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
   buffer_message (mIDE, "\n") ;
   strcpy (tool_commands [0], "notepad.exe \"%ipovray.ini\"") ;
 
-#if POV_RAY_IS_OFFICIAL != 1
+#if !POV_RAY_IS_OFFICIAL
   WIN_PrintOtherCredits () ;
   buffer_message (mIDE, "This unofficial build is derived from the POV-Ray for Windows source code.\n") ;
 #endif
   buffer_message (mDivider, "\n") ;
 
-#if defined(TRY_OPTIMIZED_NOISE)
+#ifdef TRY_OPTIMIZED_NOISE
+  // TODO FIXME
   // technically we should ask the backend what it's using, but given this is not a remoted version
   // of POVWIN, we just call the test here.
-  if (OPTIMIZED_NOISE_SUPPORTED)
-  {
-    buffer_message (mIDE, "FMA4 instruction support detected: using FMA4-optimized noise functions.\n") ;
-    buffer_message (mDivider, "\n") ;
-  }
-#endif
+  const OptimizedNoiseInfo* pNoise = GetRecommendedOptimizedNoise();
+  selectedNoiseFunc = pNoise->name;
+#endif // TRY_OPTIMIZED_NOISE
 
   load_tool_menu (ToolIniFileName) ;
   if (GetHKCU("FileQueue", "ReloadOnStartup", 0))
@@ -6140,12 +6241,6 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
       message_printf ("Loaded %d entr%s into file queue\n", queued_file_count, queued_file_count == 1 ? "y" : "ies") ;
     update_queue_status (false) ;
   }
-
-  if (have_cpu_info)
-    message_printf("Detected %u CPU%s providing %u physical core%s and %u logical one%s.\n",
-                   NumPhysicalCPUs, NumPhysicalCPUs > 1 ? "'s" : "",
-                   NumCPUCores, NumCPUCores > 1 ? "s" : "",
-                   NumLogicalCPUs, NumLogicalCPUs > 1 ? "s" : "");
 
   buffer_message (mDivider, "\n") ;
 
@@ -6246,7 +6341,7 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
     }
   }
 
-#if POV_RAY_HAS_OFFICIAL_FEATURES == 1
+#if POV_RAY_HAS_UPDATE_CHECK
   DoUpdateCheck () ;
 #endif
 

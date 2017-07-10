@@ -49,6 +49,12 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @addtogroup PovCore
+///
+/// @{
+
 using namespace pov_base;
 
 // from <algorithm>; we don't want to always type the namespace for these.
@@ -93,14 +99,13 @@ typedef const ObjectBase * ConstObjectPtr;
 
 typedef struct Transform_Struct TRANSFORM;
 
-//******************************************************************************
+/// @}
 ///
-/// @name Blend Map Stuff
+//##############################################################################
+///
+/// @addtogroup PovCoreMaterialPattern
+///
 /// @{
-
-#if 0
-#pragma mark * Blend Map
-#endif
 
 typedef struct Pattern_Struct TPATTERN;
 typedef struct Texture_Struct TEXTURE;
@@ -112,6 +117,11 @@ typedef TEXTURE* TexturePtr;
 
 /// @}
 ///
+//##############################################################################
+///
+/// @addtogroup PovCoreMaterialMedia
+///
+/// @{
 
 class Media
 {
@@ -156,6 +166,14 @@ class Media
         void PostProcess();
 };
 
+/// @}
+///
+//##############################################################################
+///
+/// @addtogroup PovCoreMaterialInterior
+///
+/// @{
+
 class SubsurfaceInterior;
 class Interior
 {
@@ -182,6 +200,14 @@ class Interior
 typedef shared_ptr<Interior> InteriorPtr;
 typedef shared_ptr<const Interior> ConstInteriorPtr;
 
+/// @}
+///
+//##############################################################################
+///
+/// @addtogroup PovCoreMaterialPattern
+///
+/// @{
+
 struct BasicPattern;
 
 typedef shared_ptr<BasicPattern> PatternPtr;
@@ -194,6 +220,14 @@ struct Pattern_Struct
     unsigned short Flags;
     PatternPtr pattern;
 };
+
+/// @}
+///
+//##############################################################################
+///
+/// @addtogroup PovCore
+///
+/// @{
 
 typedef struct Material_Struct MATERIAL;
 
@@ -273,6 +307,14 @@ class ObjectDebugHelper
 
 typedef unsigned short HF_VAL;
 
+/// @}
+///
+//##############################################################################
+///
+/// @addtogroup PovCoreRender
+///
+/// @{
+
 /// Ray-object intersection data.
 ///
 /// This class holds various information on a ray-object intersection.
@@ -285,7 +327,7 @@ class Intersection
         DBL Depth;
         /// Point of the intersection in global coordinate space.
         Vector3d IPoint;
-        /// Unpertubed surface normal at the intersection point.
+        /// Unperturbed surface normal at the intersection point.
         /// @attention This is not necessarily the true geometric surface normal, as it may include fake smoothing.
         /// @note This value is invalid if haveNormal is false.
         /// @todo We should have two distinct vectors: A true geometric one, and a separate one for faked smoothing.
@@ -449,6 +491,14 @@ struct TruePointObjectCondition : public PointObjectCondition
     virtual bool operator()(const Vector3d&, ConstObjectPtr) const { return true; }
 };
 
+/// @}
+///
+//##############################################################################
+///
+/// @addtogroup PovCore
+///
+/// @{
+
 struct FrameSettings
 {
     DBL Clock_Value;      // May change between frames of an animation
@@ -470,19 +520,13 @@ struct FrameSettings
     bool Odd_Field_Flag;
 };
 
-struct BYTE_XYZ
-{
-    unsigned char x, y, z;
-};
-
-inline void VUnpack(Vector3d& dest_vec, const BYTE_XYZ * pack_vec)
-{
-    dest_vec[X] = ((double)pack_vec->x * (1.0 / 255.0)) * 2.0 - 1.0;
-    dest_vec[Y] = ((double)pack_vec->y * (1.0 / 255.0));
-    dest_vec[Z] = ((double)pack_vec->z * (1.0 / 255.0)) * 2.0 - 1.0;
-
-    dest_vec.normalize(); // already good to about 1%, but we can do better
-}
+/// @}
+///
+//##############################################################################
+///
+/// @addtogroup PovCoreMaterialPattern
+///
+/// @{
 
 class Fractal;
 
@@ -527,6 +571,15 @@ struct QualityFlags
     {}
 };
 
+/// @}
+///
+//##############################################################################
+///
+/// @defgroup PovCoreFunction User-Defined Functions
+/// @ingroup PovCore
+///
+/// @{
+
 class TraceThreadData;
 
 class GenericFunctionContext
@@ -540,15 +593,28 @@ typedef GenericFunctionContext* GenericFunctionContextPtr;
 class GenericFunctionContextFactory
 {
     public:
-        virtual GenericFunctionContextPtr CreateFunctionContext(TraceThreadData* pTd) = 0;
+        GenericFunctionContextFactory() : mRefCounter(0) {}
         virtual ~GenericFunctionContextFactory() {}
+        virtual GenericFunctionContextPtr CreateFunctionContext(TraceThreadData* pTd) = 0;
+
+    private:
+        mutable size_t mRefCounter;
+        friend void intrusive_ptr_add_ref(GenericFunctionContextFactory* f);
+        friend void intrusive_ptr_release(GenericFunctionContextFactory* f);
 };
 
-struct FunctionSourceInfo
+inline void intrusive_ptr_add_ref(GenericFunctionContextFactory* f) { ++f->mRefCounter; }
+inline void intrusive_ptr_release(GenericFunctionContextFactory* f) { if (!(--f->mRefCounter)) delete f; }
+
+typedef intrusive_ptr<GenericFunctionContextFactory>    GenericFunctionContextFactoryIPtr;
+typedef GenericFunctionContextFactory*                  GenericFunctionContextFactoryTPtr;
+
+struct SourceInfo
 {
-    char* name;
-    UCS2* filename;
-    pov_base::ITextStream::FilePos filepos;
+    char*                           name;
+    UCS2*                           filename;
+    pov_base::ITextStream::FilePos  filepos;
+    int                             col;
 };
 
 template<typename RETURN_T, typename ARG_T>
@@ -562,7 +628,7 @@ public:
     virtual void PushArgument(GenericFunctionContextPtr pContext, ARG_T arg) = 0;
     virtual RETURN_T Execute(GenericFunctionContextPtr pContext) = 0;
     virtual GenericCustomFunction* Clone() const = 0;
-    virtual const FunctionSourceInfo* GetSourceInfo() const { return NULL; }
+    virtual const SourceInfo* GetSourceInfo() const { return NULL; }
 };
 
 typedef GenericCustomFunction<double, double> GenericScalarFunction;
@@ -646,6 +712,10 @@ private:
 
 typedef GenericCustomFunctionInstance<double, double> GenericScalarFunctionInstance;
 typedef GenericScalarFunctionInstance* GenericScalarFunctionInstancePtr;
+
+/// @}
+///
+//##############################################################################
 
 }
 

@@ -42,10 +42,10 @@
 #include "backend/frame.h"
 #include "backend/bounding/boundingtask.h"
 
+#include "core/bounding/bsptree.h"
 #include "core/math/matrix.h"
 #include "core/scene/object.h"
 #include "core/scene/tracethreaddata.h"
-#include "core/support/bsptree.h"
 
 #include "povms/povmsid.h"
 

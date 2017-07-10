@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -81,8 +81,6 @@ namespace pov
 {
 
 using namespace pov_base;
-
-extern BYTE_XYZ rad_samples[];
 
 // #define RAD_GRADIENT 1 // [CLi] gradient seems to provide no gain at best, and may actually cause artifacts
 // #define SAW_METHOD 1
@@ -289,7 +287,7 @@ RadiosityRecursionSettings* SceneRadiositySettings::GetRecursionSettings(bool fi
 RadiosityFunction::RadiosityFunction(shared_ptr<SceneData> sd, TraceThreadData *td, const SceneRadiositySettings& rs,
                                      RadiosityCache& rc, Trace::CooperateFunctor& cf, bool ft, const Vector3d& camera) :
     threadData(td),
-    trace(sd, td, GetRadiosityQualityFlags(rs, QualityFlags(9)), cf, media, *this), // TODO FIXME - we can only use hard-coded Level-9 quality because Radiosity happens to be disabled at lower settings!
+    trace(sd, td, GetRadiosityQualityFlags(rs, QualityFlags(9)), cf, media, *this), // TODO FIXME - the only reason we can safely hard-code level-9 quality here is because radiosity happens to be disabled at lower settings
     media(td, &trace, &photonGatherer),
     photonGatherer(&sd->surfacePhotonMap, sd->photonSettings),
     radiosityCache(rc),
@@ -335,13 +333,10 @@ void RadiosityFunction::ResetTopLevelStats()
 
 void RadiosityFunction::BeforeTile(int id, unsigned int pts)
 {
-    // TODO - find out why this assertion does not hold true when mosaic pretrace is enabled
-    /*
     if (isFinalTrace)
-        POV_RADIOSITY_ASSERT( pts == FINAL_TRACE );
+        POV_RADIOSITY_ASSERT(pts == FINAL_TRACE);
     else
-        POV_RADIOSITY_ASSERT( (pts >= PRETRACE_FIRST) && (pts <= PRETRACE_MAX) );
-    */
+        POV_RADIOSITY_ASSERT((pts >= PRETRACE_FIRST) && (pts <= PRETRACE_MAX));
 
     // different pretrace step than last tile
     if (pts != pretraceStep)

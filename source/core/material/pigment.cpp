@@ -14,7 +14,7 @@
 /// ----------------------------------------------------------------------------
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -270,7 +270,8 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
             break;
 
         case PLAIN_PATTERN:
-        case BITMAP_PATTERN:
+        case IMAGE_MAP_PATTERN:
+        case COLOUR_PATTERN:
 
             break;
 
@@ -296,7 +297,7 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
             break;
     }
 
-    /* Now we test wether this pigment is opaque or not. [DB 8/94] */
+    // Now we test whether this pigment is opaque or not.
 
     hasFilter = false;
 
@@ -305,11 +306,9 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
         hasFilter = true;
     }
 
-    if ((Pigment->Type == BITMAP_PATTERN) &&
-        (dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage != NULL))
+    if (const ColourPattern* pattern = dynamic_cast<ColourPattern*>(Pigment->pattern.get()))
     {
-        // bitmaps are transparent if they are used only once, or the image is not opaque
-        if ((dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage->Once_Flag) || !is_image_opaque(dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage))
+        if (pattern->HasTransparency())
             hasFilter = true;
     }
 
@@ -432,13 +431,15 @@ bool Compute_Pigment (TransColour& colour, const PIGMENT *Pigment, const Vector3
                 Colour_Found = Pigment->Blend_Map->ComputeUVMapped(colour, Intersect, ray, Thread);
                 break;
 
-            case BITMAP_PATTERN:
+            case IMAGE_MAP_PATTERN:
+            case COLOUR_PATTERN:
 
                 Warp_EPoint (TPoint, EPoint, Pigment);
 
                 colour.Clear();
 
-                Colour_Found = image_map (TPoint, Pigment, colour);
+                POV_PATTERN_ASSERT(dynamic_pointer_cast<ColourPattern>(Pigment->pattern));
+                Colour_Found = static_pointer_cast<ColourPattern>(Pigment->pattern)->Evaluate(colour, TPoint, Intersect, ray, Thread);
 
                 break;
 

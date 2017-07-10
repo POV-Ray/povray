@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,15 +36,18 @@
 #ifndef POVRAY_FRONTEND_IMAGEMESSAGEHANDLER_H
 #define POVRAY_FRONTEND_IMAGEMESSAGEHANDLER_H
 
-#include "base/types.h"
-
+// Module config header file must be the first file included within POV-Ray unit header files
 #include "frontend/configfrontend.h"
-#include "frontend/renderfrontend.h"
+
+#include "povms/povmscpp.h"
 
 namespace pov_frontend
 {
 
 using namespace pov_base;
+
+struct SceneData;
+struct ViewData;
 
 class ImageMessageHandler
 {

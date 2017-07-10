@@ -39,8 +39,17 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
 
+#include "base/types.h"
+
 namespace pov_base
 {
+
+//##############################################################################
+///
+/// @defgroup PovBaseStringutilities String Utilities
+/// @ingroup PovBase
+///
+/// @{
 
 /// Type holding an UCS2-encoded string of characters.
 ///
@@ -54,8 +63,14 @@ typedef std::basic_string<UCS2> UCS2String;
 UCS2String ASCIItoUCS2String(const char *s);
 std::string UCS2toASCIIString(const UCS2String& s);
 
+UCS2String UTF8toUCS2String(const UTF8String& s);
+
 int pov_stricmp(const char *, const char *);
 const char *pov_tsprintf(const char *, ...);
+
+/// @}
+///
+//##############################################################################
 
 }
 

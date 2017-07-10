@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,19 +33,19 @@
 ///
 //******************************************************************************
 
-#include <boost/scoped_ptr.hpp>
-
-// configfrontend.h must always be the first POV file included within frontend *.cpp files
-#include "frontend/configfrontend.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/renderfrontend.h"
 
-#include "povms/povmscpp.h"
+#include <boost/scoped_ptr.hpp>
+
+#include "base/platformbase.h"
+#include "base/textstream.h"
+#include "base/textstreambuffer.h"
+#include "base/image/encoding.h"
+
 #include "povms/povmsid.h"
 
-#include "base/fileinputoutput.h"
-#include "base/platformbase.h"
-#include "base/types.h"
-
+#include "frontend/console.h"
 #include "frontend/processoptions.h"
 
 // this must be the last file included
@@ -308,13 +308,8 @@ RenderFrontendBase::SceneId RenderFrontendBase::CreateScene(SceneData& shd, POVM
                 UCS2String str = lp.GetUCS2String();
                 if (str.empty() == true)
                     continue;
-#ifndef POV_PATH_SEPARATOR_2
-                if (*str.rbegin() != POV_PATH_SEPARATOR)
+                if (!POV_IS_PATH_SEPARATOR(*str.rbegin()))
                     str += POV_PATH_SEPARATOR;
-#else
-                if (*str.rbegin() != POV_PATH_SEPARATOR && *str.rbegin() != POV_PATH_SEPARATOR_2)
-                    str += POV_PATH_SEPARATOR;
-#endif
                 shd.searchpaths.push_back(Path(str));
             }
         }
@@ -854,7 +849,6 @@ void InitInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
     tsb->printf("\n");
     tsb->printf("Other contributors are listed in the documentation.\n");
 
-    tsb->printf("\n");
     if(POVMSObject_Get(msg, &attrlist, kPOVAttrib_ImageLibVersions) == kNoErr)
     {
         cnt = 0;
@@ -863,6 +857,7 @@ void InitInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
         {
             if(cnt > 0)
             {
+                tsb->printf("\n");
                 tsb->printf("Support libraries used by POV-Ray:\n");
 
                 for(i = 1; i <= cnt; i++)
@@ -872,6 +867,54 @@ void InitInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
                         l = 1023;
                         charbuf[0] = 0;
                         if(POVMSAttr_Get(&item, kPOVMSType_CString, charbuf, &l) == kNoErr)
+                            tsb->printf("  %s\n", charbuf);
+
+                        (void)POVMSAttr_Delete(&item);
+                    }
+                }
+            }
+        }
+
+        (void)POVMSAttrList_Delete(&attrlist);
+    }
+
+    l = 1024;
+    charbuf[0] = 0;
+    std::string cpuInfo;
+    if (POVMSUtil_GetString(msg, kPOVAttrib_CPUInfo, charbuf, &l) == kNoErr)
+        cpuInfo = charbuf;
+#if POV_CPUINFO_DEBUG
+    l = 1024;
+    std::string cpuDetails;
+    if (POVMSUtil_GetString(msg, kPOVAttrib_CPUInfoDetails, charbuf, &l) == kNoErr)
+        cpuDetails = charbuf;
+#endif
+
+    if (POVMSObject_Get(msg, &attrlist, kPOVAttrib_Optimizations) == kNoErr)
+    {
+        cnt = 0;
+
+        if (POVMSAttrList_Count(&attrlist, &cnt) == kNoErr)
+        {
+            if (cnt > 0)
+            {
+                tsb->printf("\n");
+                tsb->printf("Dynamic optimizations:\n");
+
+                if (!cpuInfo.empty())
+                    tsb->printf("  CPU detected: %s\n", cpuInfo.c_str());
+#if POV_CPUINFO_DEBUG
+                if (!cpuDetails.empty())
+                    tsb->printf("  CPU details: %s\n", cpuDetails.c_str());
+#endif
+
+                for (i = 1; i <= cnt; i++)
+                {
+                    if (POVMSAttrList_GetNth(&attrlist, i, &item) == kNoErr)
+                    {
+                        l = 1023;
+                        charbuf[0] = 0;
+                        if (POVMSAttr_Get(&item, kPOVMSType_CString, charbuf, &l) == kNoErr)
                             tsb->printf("  %s\n", charbuf);
 
                         (void)POVMSAttr_Delete(&item);
@@ -948,7 +991,8 @@ void RenderOptions(POVMS_Object& obj, TextStreamBuffer *tsb)
     tsb->printf("  Quality: %2d\n", clip(obj.TryGetInt(kPOVAttrib_Quality, 9), 0, 9));
 
     if(obj.TryGetBool (kPOVAttrib_Bounding, true))
-        tsb->printf("  Bounding boxes.......On   Bounding threshold: %d\n", obj.TryGetInt (kPOVAttrib_BoundingThreshold, 3));
+        tsb->printf("  Bounding boxes.......On   Bounding threshold: %d\n",
+                    clip<int>(obj.TryGetInt(kPOVAttrib_BoundingThreshold,DEFAULT_AUTO_BOUNDINGTHRESHOLD),1,SIGNED16_MAX));
     else
         tsb->printf("  Bounding boxes.......Off\n");
 
@@ -1002,8 +1046,10 @@ void OutputOptions(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
 
     tsb->printf("Image Output Options\n");
 
-    (void)POVMSUtil_GetInt(msg, kPOVAttrib_Width, &i);
-    (void)POVMSUtil_GetInt(msg, kPOVAttrib_Height, &i2);
+    if (POVMSUtil_GetInt(msg, kPOVAttrib_Width, &i) != kNoErr)
+        i = 160;
+    if (POVMSUtil_GetInt(msg, kPOVAttrib_Height, &i2) != kNoErr)
+        i2 = 120;
     if (POVMSUtil_GetFloat(msg, kPOVAttrib_StartRow, &f) != kNoErr)
         f = 0.0;
     if (POVMSUtil_GetFloat(msg, kPOVAttrib_EndRow, &f2) != kNoErr)

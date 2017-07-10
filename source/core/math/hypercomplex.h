@@ -45,21 +45,12 @@
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
-
-/*****************************************************************************
-* Global typedefs
-******************************************************************************/
-
-/*****************************************************************************
-* Global variables
-******************************************************************************/
-
-/*****************************************************************************
-* Global functions
-******************************************************************************/
+//##############################################################################
+///
+/// @defgroup PovCoreMathHypercomplex Hypercomplex Numbers
+/// @ingroup PovCoreMath
+///
+/// @{
 
 struct Complex;
 
@@ -130,6 +121,10 @@ void Complex_Sqrt (Complex *target, const Complex *source, const Complex *);
 void Complex_Pwr (Complex *target, const Complex *source1, const Complex *source2);
 void Complex_Mult (Complex *target, const Complex *source1, const Complex *source2);
 void Complex_Div (Complex *target, const Complex *source1, const Complex *source2);
+
+/// @}
+///
+//##############################################################################
 
 }
 

@@ -46,6 +46,12 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @addtogroup PovCoreRender
+///
+/// @{
+
 class Interior;
 
 typedef FixedSimpleVector<Interior *, RAYINTERIOR_VECTOR_SIZE> RayInteriorVector;
@@ -116,6 +122,10 @@ class Ray : public BasicRay
         bool hollowRay : 1;
         bool pretraceRay : 1;
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

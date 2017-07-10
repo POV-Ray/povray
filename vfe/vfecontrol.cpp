@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -50,9 +50,9 @@ namespace pov_frontend
   extern struct ProcessRenderOptions::Output_FileType_Table FileTypeTable[];
 }
 
-static struct pov_base::ProcessOptions::INI_Parser_Table *GetPT(const char *OptionName)
+static struct pov_frontend::ProcessOptions::INI_Parser_Table *GetPT(const char *OptionName)
 {
-  for (struct pov_base::ProcessOptions::INI_Parser_Table *op = pov_frontend::RenderOptions_INI_Table; op->keyword != NULL; op++)
+  for (struct pov_frontend::ProcessOptions::INI_Parser_Table *op = pov_frontend::RenderOptions_INI_Table; op->keyword != NULL; op++)
     if (strcmp(op->keyword, OptionName) == 0)
       return op;
   return NULL;
@@ -359,6 +359,16 @@ int vfeSession::SetOptions (vfeRenderOptions& opts)
       AppendStatusMessage ("Grayscale output not currently supported with selected output file type.");
       AppendErrorMessage ("Grayscale output not currently supported with selected output file type.") ;
       return (m_LastError = vfeUnsupportedOptionCombination);
+    }
+    if (oft == kPOVList_FileType_PPM)
+    {
+        if (!ropts.Exist(kPOVAttrib_FileGammaType))
+        {
+            AppendWarningMessage ("Warning: Output image gamma not specified for Netpbm (PGM/PPM) file; POV-Ray will default to the\n"
+                                  "official standard, but competing de-facto standards exist. To get rid of this warning,\n"
+                                  "explicitly specify \"File_Gamma=bt709\". If the results do not match your expectations, try\n"
+                                  "\"File_Gamma=srgb\" or \"File_Gamma=1.0\".");
+        }
     }
     if (ropts.TryGetBool(kPOVAttrib_OutputAlpha, false) && !hasAlpha)
     {

@@ -47,6 +47,13 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreLightingSubsurface Subsurface Scattering
+/// @ingroup PovCore
+///
+/// @{
+
 using boost::flyweights::flyweight;
 using boost::flyweights::key_value;
 
@@ -88,6 +95,10 @@ inline double FresnelDiffuseReflectance(double eta)
         return ( (1.0-1.0/eta) + 3*pow(1.0-1.0/eta,4.5) ) / 4.0;
 #endif
 }
+
+/// @}
+///
+//##############################################################################
 
 } // end of namespace
 

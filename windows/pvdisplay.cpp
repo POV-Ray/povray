@@ -1,33 +1,37 @@
-/*******************************************************************************
- * pvdisplay.cpp
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/windows/pvdisplay.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file windows/pvdisplay.cpp
+///
+/// @todo   What's in here?
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 #define POVWIN_FILE
 #define DECLARE_TABLES
@@ -48,6 +52,13 @@
 
 // this must be the last file included
 #include "syspovdebug.h"
+
+#ifndef MAX
+    #define MAX(a,b) ((a>b)?a:b)
+#endif
+#ifndef MIN
+    #define MIN(a,b) ((a>b)?b:a)
+#endif
 
 namespace povwin
 {
@@ -262,7 +273,7 @@ bool WinLegacyDisplay::CreateRenderWindow (void)
 
   if (!main_window_hidden)
   {
-    mainwin_placement.length = sizeof (WINDOWPLACEMENT) ; 
+    mainwin_placement.length = sizeof (WINDOWPLACEMENT) ;
     GetWindowPlacement (main_window, &mainwin_placement) ;
     if (mainwin_placement.showCmd != SW_SHOWMINIMIZED)
     {
@@ -437,13 +448,13 @@ void WinLegacyDisplay::DrawFilledRectangle(unsigned int x1, unsigned int y1, uns
 {
   if (GetWidth() == 0 || GetHeight() == 0)
     return;
-  
+
   if (x2 >= GetWidth())
     x2 = GetWidth() - 1 ;
 
   if (y2 >= GetHeight())
     y2 = GetHeight() - 1 ;
-  
+
   if (x1 > x2 || y1 > y2)
     return ;
 
@@ -725,7 +736,7 @@ LRESULT WinLegacyDisplay::WindowProc (UINT message, WPARAM wParam, LPARAM lParam
                           true) ;
          SendMessage (main_window, WM_COMMAND, CM_RENDERCLOSE, 0L) ;
          return (0) ;
-    
+
     case WM_COMMAND :
          if (handle_main_command (wParam, lParam))
            return (0) ;

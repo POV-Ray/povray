@@ -1,2 +1,7 @@
-/// @dir
-/// Source code files for the actual render engine core.
+/**
+
+@dir
+@ingroup PovCore
+Source code files for the actual render engine core.
+
+*/

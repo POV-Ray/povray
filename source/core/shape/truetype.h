@@ -51,17 +51,28 @@ class IStream;
 namespace pov
 {
 
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
+
 class CSG;
 class Parser;
 
 using pov_base::IStream;
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
 
 #define TTF_OBJECT (BASIC_OBJECT)
 
+/// @}
+///
+//******************************************************************************
 
 
 /*****************************************************************************
@@ -110,6 +121,10 @@ class TrueType : public ObjectBase
         void GetZeroOneHits(const GlyphStruct* glyph, const Vector3d& P, const Vector3d& D, DBL glyph_depth, double *t0, double *t1) const;
         bool GlyphIntersect(const Vector3d& P, const Vector3d& D, const GlyphStruct* glyph, DBL glyph_depth, const BasicRay &ray, IStack& Depth_Stack, TraceThreadData *Thread);
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

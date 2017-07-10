@@ -90,8 +90,8 @@ that our rules may differ substantially.)
     <!-- MISRA C++ 2008 **required** rule 2-7-2, advisory rule 2-7-3 -->
 
   - **Identifier Names**: We expect any sane developer to be using a fixed-pitch font with reasonably
-    discernable characters, including (but not limited to) the notorious lowercase letter 'l' and
-    digit '1'. However, try to avoid cryptic identifiers with a high percentage of such problematic
+    discernable characters, including (but not limited to) the notorious lowercase letter `l` and
+    digit `1`. However, try to avoid cryptic identifiers with a high percentage of such problematic
     characters. Well, actually, better avoid _any_ cryptic identifiers.
     <!-- MISRA C++ 2008 **required** rule 2-10-1 -->
   - Avoid name collisions with identifiers in an outer scope ("shadowing").
@@ -350,29 +350,29 @@ that our rules may differ substantially.)
   - (Where a function's declaration includes an exception specification, the function shall only be capable of throwing exceptions of the indicated types) <!-- MISRA C++ 2008 **required** rule 15-5-2 -->
   - (The terminate() function shall not be called implicitly (see earlier rules)) <!-- MISRA C++ 2008 **required** rule 15-5-3 -->
 
-  - (#include directives in a file shall only be preceded by other preprocessor directives or comments) <!-- MISRA C++ 2008 **required** rule 16-0-1 -->
+  - (`#``include` directives in a file shall only be preceded by other preprocessor directives or comments) <!-- MISRA C++ 2008 **required** rule 16-0-1 -->
   - (Macros shall only be defined or undefined in the global namespace) <!-- MISRA C++ 2008 **required** rule 16-0-2 -->
-  - ('#undef' shall not be used) <!-- MISRA C++ 2008 **required** rule 16-0-3 -->
+  - (`#``undef` shall not be used) <!-- MISRA C++ 2008 **required** rule 16-0-3 -->
   - (function-like macros shall not be defined) <!-- MISRA C++ 2008 **required** rule 16-0-4 -->
   - (Arguments to a function-like macro shall not contain tokens that look like preprocessing directives) <!-- MISRA C++ 2008 **required** rule 16-0-5 -->
-  - (in the definition of a function-like macro, each instance of a parameter shall be enclosed in parentheses, unless it is used as the operand of # or ##) <!-- MISRA C++ 2008 **required** rule 16-0-6 -->
-  - (undefined macro identifiers shall not be used in #if or #elif preprocessor directives, except as operands to the `defined` operator) <!-- MISRA C++ 2008 **required** rule 16-0-7 -->
-  - (if the # token appears as the first token on a line, then it shall be immediately followed by a preprocessing token) <!-- MISRA C++ 2008 **required** rule 16-0-8 -->
+  - (in the definition of a function-like macro, each instance of a parameter shall be enclosed in parentheses, unless it is used as the operand of `#` or `##`) <!-- MISRA C++ 2008 **required** rule 16-0-6 -->
+  - (undefined macro identifiers shall not be used in `#``if` or `#``elif` preprocessor directives, except as operands to the `defined` operator) <!-- MISRA C++ 2008 **required** rule 16-0-7 -->
+  - (if the `#` token appears as the first token on a line, then it shall be immediately followed by a preprocessing token) <!-- MISRA C++ 2008 **required** rule 16-0-8 -->
 
   - (The `defined` operator shall only be used in the form `defined ( identifier )` or `defined identifier`) <!-- MISRA C++ 2008 **required** rule 16-1-1 -->
-  - (All #else, #elif and #endif preprocessor directives shall reside in the same file as the #if or #ifdef directive to which they are related) <!-- MISRA C++ 2008 **required** rule 16-1-2 -->
+  - (All `#``else`, `#``elif` and `#``endif` preprocessor directives shall reside in the same file as the `#``if` or `#``ifdef` directive to which they are related) <!-- MISRA C++ 2008 **required** rule 16-1-2 -->
 
   - (The preprocessor shall only be used for file inclusion and include guards) <!-- MISRA C++ 2008 **required** rule 16-2-1 -->
   - (macros shall only be used for include guards, type qualifiers, or storage class specifiers) <!-- MISRA C++ 2008 **required** rule 16-2-2 -->
   - (include guards shall be provided) <!-- MISRA C++ 2008 **required** rule 16-2-3 -->
   - (the ', ", /* or // character sequences shall not occur in a header file name) <!-- MISRA C++ 2008 **required** rule 16-2-4 -->
   - (the \ character should not occur in a header file name) <!-- MISRA C++ 2008 advisory rule 16-2-5 -->
-  - (the #include directive shall be followed by either a <filename> or "filename" sequence) <!-- MISRA C++ 2008 **required** rule 16-2-6 -->
+  - (the `#``include` directive shall be followed by either a <filename> or "filename" sequence) <!-- MISRA C++ 2008 **required** rule 16-2-6 -->
 
-  - (There shall be at most one occurrence of the # or ## operators in a single macro definition) <!-- MISRA C++ 2008 **required** rule 16-3-1 -->
-  - (The # and ## operators should not be used) <!-- MISRA C++ 2008 advisory rule 16-3-2 -->
+  - (There shall be at most one occurrence of the `#` or `##` operators in a single macro definition) <!-- MISRA C++ 2008 **required** rule 16-3-1 -->
+  - (The `#` and `##` operators should not be used) <!-- MISRA C++ 2008 advisory rule 16-3-2 -->
 
-  - (All uses of the #pragma directive shall be documented) <!-- MISRA C++ 2008 document rule 16-6-1 -->
+  - (All uses of the `#``pragma` directive shall be documented) <!-- MISRA C++ 2008 document rule 16-6-1 -->
 
   - (Reserved identifiers, macros and functions in the standard library shall not be defined, redefined or undefined) <!-- MISRA C++ 2008 **required** rule 17-0-1 -->
   - (The names of standard library macros and objects shall not be reused) <!-- MISRA C++ 2008 **required** rule 17-0-2 -->

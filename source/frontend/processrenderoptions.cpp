@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,24 +33,15 @@
 ///
 //******************************************************************************
 
-#include <cctype>
-
-// configfrontend.h must always be the first POV file included within frontend *.cpp files
-#include "frontend/configfrontend.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/processrenderoptions.h"
 
-#include "povms/povmscpp.h"
-#include "povms/povmsid.h"
-
-#include "base/fileinputoutput.h"
 #include "base/fileutil.h"
 #include "base/platformbase.h"
-#include "base/pov_err.h"
-#include "base/stringutilities.h"
-#include "base/textstream.h"
-#include "base/types.h"
 #include "base/image/colourspace.h"
 #include "base/image/encoding.h"
+
+#include "povms/povmsid.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -766,11 +757,9 @@ int ProcessRenderOptions::WriteSpecialOptionHandler(INI_Parser_Table *option, PO
                     err = POVMSAttr_Size(&item, &l);
                     if(l > 0)
                     {
-                        bufptr = new char[l * 3];
-                        bufptr[0] = 0;
-                        if(POVMSAttr_GetUTF8String(&item, kPOVMSType_UCS2String, bufptr, &l) == 0)
-                            file->printf("%s=\"%s\"\n", option->keyword, bufptr);
-                        delete[] bufptr;
+                        UTF8String buf;
+                        if(POVMSAttr_GetUTF8String(&item, kPOVMSType_UCS2String, buf) == 0)
+                            file->printf("%s=\"%s\"\n", option->keyword, buf.c_str());
                     }
                     (void)POVMSAttr_Delete(&item);
                 }
@@ -860,12 +849,8 @@ int ProcessRenderOptions::ProcessUnknownString(char *str, POVMSObjectPtr obj)
     {
         if(strlen(str) > 0)
         {
-            if(str[strlen(str) - 1] == POV_PATH_SEPARATOR)
+            if(POV_IS_PATH_SEPARATOR(str[strlen(str) - 1]))
                 state = 2; // library path
-#ifdef POV_PATH_SEPARATOR_2
-            else if(str[strlen(str) - 1] == POV_PATH_SEPARATOR_2)
-                state = 2; // library path
-#endif
         }
     }
 
@@ -950,9 +935,9 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
     // TODO FIXME - use proper C++ strings instead of C character arrays
 
     int i,ii,l[POV_FILE_EXTENSIONS_PER_TYPE];
-    char pathname[1024];
-    char file[1024];
-    char file_x[POV_FILE_EXTENSIONS_PER_TYPE][1024];
+    UTF8String filepath;
+    UTF8String libpath;
+    UTF8String file_x[POV_FILE_EXTENSIONS_PER_TYPE];
     int cnt = 0;
     int ll;
     POVMSAttribute attr, item;
@@ -968,8 +953,8 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
     {
         if((l[i] = strlen(pov_base::gPOV_File_Extensions[stype].ext[i])) > 0)
         {
-            strcpy(file_x[i], filename);
-            strcat(file_x[i], pov_base::gPOV_File_Extensions[stype].ext[i]);
+            file_x[i] = filename;
+            file_x[i] += pov_base::gPOV_File_Extensions[stype].ext[i];
         }
     }
 
@@ -986,7 +971,7 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
         {
             if(CheckIfFileExists(file_x[i]) == true)
             {
-                return new IBufferedTextStream(ASCIItoUCS2String(file_x[i]).c_str(), stype);
+                return new IBufferedTextStream(UTF8toUCS2String(file_x[i]).c_str(), stype);
             }
         }
     }
@@ -1016,34 +1001,33 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
             (void)POVMSAttr_Delete(&item);
             continue;
         }
-        if(POVMSAttr_GetUTF8String(&item, kPOVMSType_UCS2String, file, &ll) != 0) // TODO FIXME!!!
+        if(POVMSAttr_GetUTF8String(&item, kPOVMSType_UCS2String, libpath) != 0)
         {
             (void)POVMSAttr_Delete(&item);
             continue;
         }
         (void)POVMSAttr_Delete(&item);
 
-        file[strlen(file)+1] = '\0';
-        file[strlen(file)] = POV_PATH_SEPARATOR;
+        libpath.push_back(POV_PATH_SEPARATOR);
 
-        strcpy(pathname, file);
-        strcat(pathname, filename);
-        if((hasextension == true) && (CheckIfFileExists(pathname) == true))
+        filepath = libpath;
+        filepath += filename;
+        if((hasextension == true) && (CheckIfFileExists(filepath) == true))
         {
             (void)POVMSAttrList_Delete(&attr);
-            return new IBufferedTextStream(ASCIItoUCS2String(pathname).c_str(), stype);
+            return new IBufferedTextStream(UTF8toUCS2String(filepath).c_str(), stype);
         }
 
         for(ii = 0; ii < POV_FILE_EXTENSIONS_PER_TYPE; ii++)
         {
             if(l[ii])
             {
-                strcpy(pathname, file);
-                strcat(pathname, file_x[ii]);
-                if(CheckIfFileExists(pathname) == true)
+                filepath = libpath;
+                filepath += file_x[ii];
+                if(CheckIfFileExists(filepath.c_str()) == true)
                 {
                     (void)POVMSAttrList_Delete(&attr);
-                    return new IBufferedTextStream(ASCIItoUCS2String(pathname).c_str(), stype);
+                    return new IBufferedTextStream(UTF8toUCS2String(filepath).c_str(), stype);
                 }
             }
         }
@@ -1078,11 +1062,11 @@ struct ProcessRenderOptions::Output_FileType_Table FileTypeTable[] =
     { 'B',  0,                              kPOVList_FileType_BMP,              false,              false /*[1]*/ },
     { 'E',  0,                              kPOVList_FileType_OpenEXR,          false /*[2]*/,      true },
     { 'H',  0,                              kPOVList_FileType_RadianceHDR,      false,              false },
-#ifdef SYS_TO_STANDARD
+#ifdef POV_SYS_IMAGE_TYPE
     { 'S',  0,                              kPOVList_FileType_System,           SYS_GRAYSCALE_FLAG, SYS_ALPHA_FLAG },
-#endif // SYS_TO_STANDARD
+#endif // POV_SYS_IMAGE_TYPE
 
-    //  [1] Alpha support for BMP uses an inofficial extension to the BMP file format, which is not recognized by
+    //  [1] Alpha support for BMP uses an unofficial extension to the BMP file format, which is not recognized by
     //      most image pocessing software.
 
     //  [2] While OpenEXR does support greyscale output at >8 bits, the variants currently supported by POV-Ray

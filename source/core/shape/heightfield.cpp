@@ -12,7 +12,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -218,6 +218,11 @@ bool HField::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
     px = (int)Test[X];
     pz = (int)Test[Z];
 
+    // This deals with fringe cases that could slip through the above floating-point tests,
+    // and would cause out-of-bounds array accesses (most notably #IND values).
+    px = clip(px, 0, this->Data->max_x - 2);
+    pz = clip(pz, 0, this->Data->max_z - 2);
+
     x = Test[X] - (DBL)px;
     z = Test[Z] - (DBL)pz;
 
@@ -233,14 +238,11 @@ bool HField::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
     }
     else
     {
-        px = (int)ceil(Test[X]);
-        pz = (int)ceil(Test[Z]);
+        y1 = max(Get_Height(px+1, pz+1), water);
+        y2 = max(Get_Height(px,   pz+1), water);
+        y3 = max(Get_Height(px+1, pz),   water);
 
-        y1 = max(Get_Height(px,   pz), water);
-        y2 = max(Get_Height(px-1, pz), water);
-        y3 = max(Get_Height(px,   pz-1), water);
-
-        Local_Origin = Vector3d((DBL)px,y1,(DBL)pz);
+        Local_Origin = Vector3d((DBL)(px+1),y1,(DBL)(pz+1));
 
         H_Normal = Vector3d(y2-y1, 1.0, y3-y1);
     }

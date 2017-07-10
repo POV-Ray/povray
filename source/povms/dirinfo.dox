@@ -1,2 +1,7 @@
-/// @dir
-/// Source code files for the povms layer.
+/**
+
+@dir
+@ingroup PovMS
+Source code files for the povms layer.
+
+*/

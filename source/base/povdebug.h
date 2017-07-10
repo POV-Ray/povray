@@ -46,5 +46,18 @@
 
 #include "syspovdebug.h"
 
+//##############################################################################
+///
+/// @defgroup PovBaseDebug Debugging Aids
+/// @ingroup PovBase
+///
+/// @{
+
+// (nothing in here at present)
+
+/// @}
+///
+//##############################################################################
+
 #endif // POVRAY_BASE_POVDEBUG_H
 
