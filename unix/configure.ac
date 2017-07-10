@@ -728,6 +728,10 @@ if test x"$C99_COMPATIBLE_RADIOSITY" != x"" || test x"$ac_cv_sizeof_int" != x"4"
   fi
 fi
 
+AC_HEADER_TIOCGWINSZ
+AC_CHECK_HEADERS([sys/ioctl.h])
+AC_CHECK_FUNCS([ioctl])
+
 
 ###############################################################################
 

@@ -48,6 +48,8 @@
 #include <string>
 #include <boost/algorithm/string.hpp>
 
+int GetTerminalWidth();
+
 using boost::to_lower_copy;
 
 /*

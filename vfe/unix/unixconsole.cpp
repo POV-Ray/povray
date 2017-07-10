@@ -56,6 +56,10 @@
 #include "backend/povray.h"
 #include "backend/control/benchmark.h"
 
+#if defined(HAVE_SYS_IOCTL_H)
+#include <sys/ioctl.h>
+#endif
+
 namespace pov_frontend
 {
     shared_ptr<Display> gDisplay;
@@ -85,7 +89,17 @@ static bool gCancelRender = false;
 // for handling asynchronous (external) signals
 static int gSignalNumber = 0;
 static boost::mutex gSignalMutex;
+static vfeUnixSession *gSession;
 
+int GetTerminalWidth()
+{
+#if defined(TIOCGWINSZ) && defined(HAVE_IOCTL)
+    struct winsize w;
+    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == 0)
+        return (int)w.ws_col;
+#endif
+    return 80;
+}
 
 static void SignalHandler (void)
 {
@@ -134,11 +148,18 @@ static void ProcessSignal (void)
             gCancelRender = true;
             break;
 #endif
+#ifdef SIGWINCH
+        case SIGWINCH:
+            if (gSession)
+                gSession->SetConsoleWidth(GetTerminalWidth());
+            break;
+#endif
+#ifdef SIGCHLD
         case SIGCHLD:
             // for now, ignore this (side-effect of the shell-out code).
             // once properly implemented, the shell-out code would want to know this has happened, though.
             break;
-
+#endif
         default:
             // fprintf(stderr, "\n%s: received signal %d\n", PACKAGE, gSignalNumber);
             break;
@@ -389,7 +410,6 @@ static void CleanupBenchmark(vfeUnixSession *session, string& ini, string& pov)
 
 int main (int argc, char **argv)
 {
-    vfeUnixSession   *session;
     vfeStatusFlags    flags;
     vfeRenderOptions  opts;
     ReturnValue       retval = RETURN_OK;
@@ -401,6 +421,7 @@ int main (int argc, char **argv)
     char **           argv_copy=argv; /* because argv is updated later */
     int               argc_copy=argc; /* because it might also be updated */
 
+    gSession = NULL;
     /*fprintf(stderr, "%s: This is a RELEASE CANDIDATE version of POV-Ray. General distribution is discouraged.\n", PACKAGE);*/
 
     // block some signals for this thread as well as those created afterwards
@@ -421,23 +442,26 @@ int main (int argc, char **argv)
 #ifdef SIGCHLD
     sigaddset(&sigset, SIGCHLD);
 #endif
+#ifdef SIGWINCH
+    sigaddset(&sigset, SIGWINCH);
+#endif
 
     pthread_sigmask(SIG_BLOCK, &sigset, NULL);
 
     // create the signal handling thread
     sigthread = new boost::thread(SignalHandler);
 
-    session = new vfeUnixSession();
-    if (session->Initialize(NULL, NULL) != vfeNoError)
-        ErrorExit(session);
+    gSession = new vfeUnixSession();
+    if (gSession->Initialize(NULL, NULL) != vfeNoError)
+        ErrorExit(gSession);
 
     // display mode registration
 #ifdef HAVE_LIBSDL
-    if (UnixSDLDisplay::Register(session))
+    if (UnixSDLDisplay::Register(gSession))
         gDisplayMode = DISP_MODE_SDL;
     else
 #endif
-    if (UnixTextDisplay::Register(session))
+    if (UnixTextDisplay::Register(gSession))
         gDisplayMode = DISP_MODE_TEXT;
     else
         gDisplayMode = DISP_MODE_NONE;
@@ -456,35 +480,35 @@ int main (int argc, char **argv)
     opts.SetThreadCount(nthreads);
 
     // process command-line options
-    session->GetUnixOptions()->ProcessOptions(&argc, &argv);
-    if (session->GetUnixOptions()->isOptionSet("general", "help"))
+    gSession->GetUnixOptions()->ProcessOptions(&argc, &argv);
+    if (gSession->GetUnixOptions()->isOptionSet("general", "help"))
     {
-        session->Shutdown() ;
-        PrintStatus (session) ;
+        gSession->Shutdown() ;
+        PrintStatus (gSession) ;
         // TODO: general usage display (not yet in core code)
-        session->GetUnixOptions()->PrintOptions();
+        gSession->GetUnixOptions()->PrintOptions();
         delete sigthread;
-        delete session;
+        delete gSession;
         return RETURN_OK;
     }
-    else if (session->GetUnixOptions()->isOptionSet("general", "version"))
+    else if (gSession->GetUnixOptions()->isOptionSet("general", "version"))
     {
-        session->Shutdown() ;
+        gSession->Shutdown() ;
         PrintVersion();
         delete sigthread;
-        delete session;
+        delete gSession;
         return RETURN_OK;
     }
-    else if (session->GetUnixOptions()->isOptionSet("general", "benchmark"))
+    else if (gSession->GetUnixOptions()->isOptionSet("general", "benchmark"))
     {
-        retval = PrepareBenchmark(session, opts, bench_ini_name, bench_pov_name, argc, argv);
+        retval = PrepareBenchmark(gSession, opts, bench_ini_name, bench_pov_name, argc, argv);
         if (retval == RETURN_OK)
             running_benchmark = true;
         else
         {
-            session->Shutdown();
+            gSession->Shutdown();
             delete sigthread;
-            delete session;
+            delete gSession;
             return retval;
         }
     }
@@ -500,8 +524,8 @@ int main (int argc, char **argv)
     else
     {
         char *s = getenv ("POVINC");
-        session->SetDisplayCreator(UnixDisplayCreator);
-        session->GetUnixOptions()->Process_povray_ini(opts);
+        gSession->SetDisplayCreator(UnixDisplayCreator);
+        gSession->GetUnixOptions()->Process_povray_ini(opts);
         if (s != NULL)
             opts.AddLibraryPath (s);
         while (*++argv)
@@ -509,39 +533,39 @@ int main (int argc, char **argv)
     }
 
     // set all options and start rendering
-    if (session->SetOptions(opts) != vfeNoError)
+    if (gSession->SetOptions(opts) != vfeNoError)
     {
         fprintf(stderr,"\nProblem with option setting\n");
         for(int loony=0;loony<argc_copy;loony++)
         {
             fprintf(stderr,"%s%c",argv_copy[loony],loony+1<argc_copy?' ':'\n');
         }
-        ErrorExit(session);
+        ErrorExit(gSession);
     }
-    if (session->StartRender() != vfeNoError)
-        ErrorExit(session);
+    if (gSession->StartRender() != vfeNoError)
+        ErrorExit(gSession);
 
     // set inter-frame pause for animation
-    if (session->RenderingAnimation() && session->GetBoolOption("Pause_When_Done", false))
-        session->PauseWhenDone(true);
+    if (gSession->RenderingAnimation() && gSession->GetBoolOption("Pause_When_Done", false))
+        gSession->PauseWhenDone(true);
 
     // main render loop
-    session->SetEventMask(stBackendStateChanged);  // immediatly notify this event
-    while (((flags = session->GetStatus(true, 200)) & stRenderShutdown) == 0)
+    gSession->SetEventMask(stBackendStateChanged);  // immediatly notify this event
+    while (((flags = gSession->GetStatus(true, 200)) & stRenderShutdown) == 0)
     {
         ProcessSignal();
         if (gCancelRender)
         {
-            CancelRender(session);
+            CancelRender(gSession);
             break;
         }
 
         if (flags & stAnimationStatus)
-            fprintf(stderr, "\nRendering frame %d of %d (#%d)\n", session->GetCurrentFrame(), session->GetTotalFrames(), session->GetCurrentFrameId());
+            fprintf(stderr, "\nRendering frame %d of %d (#%d)\n", gSession->GetCurrentFrame(), gSession->GetTotalFrames(), gSession->GetCurrentFrameId());
         if (flags & stAnyMessage)
-            PrintStatus (session);
+            PrintStatus (gSession);
         if (flags & stBackendStateChanged)
-            PrintStatusChanged (session);
+            PrintStatusChanged (gSession);
 
         if (GetRenderWindow() != NULL)
         {
@@ -549,42 +573,42 @@ int main (int argc, char **argv)
             if (GetRenderWindow()->HandleEvents())
             {
                 gCancelRender = true;  // will set proper return value
-                CancelRender(session);
+                CancelRender(gSession);
                 break;
             }
 
             GetRenderWindow()->UpdateScreen();
 
             // inter-frame pause
-            if (session->GetCurrentFrame() < session->GetTotalFrames()
-            && session->GetPauseWhenDone()
+            if (gSession->GetCurrentFrame() < gSession->GetTotalFrames()
+            && gSession->GetPauseWhenDone()
             && (flags & stAnimationFrameCompleted) != 0
-            && session->Failed() == false)
+            && gSession->Failed() == false)
             {
-                PauseWhenDone(session);
+                PauseWhenDone(gSession);
                 if (! gCancelRender)
-                    session->Resume();
+                    gSession->Resume();
             }
         }
     }
 
     // pause when done for single or last frame of an animation
-    if (session->Failed() == false && GetRenderWindow() != NULL && session->GetBoolOption("Pause_When_Done", false))
+    if (gSession->Failed() == false && GetRenderWindow() != NULL && gSession->GetBoolOption("Pause_When_Done", false))
     {
-        PrintStatusChanged(session, kPausedRendering);
-        PauseWhenDone(session);
+        PrintStatusChanged(gSession, kPausedRendering);
+        PauseWhenDone(gSession);
         gCancelRender = false;
     }
 
     if (running_benchmark)
-        CleanupBenchmark(session, bench_ini_name, bench_pov_name);
+        CleanupBenchmark(gSession, bench_ini_name, bench_pov_name);
 
-    if (session->Succeeded() == false)
+    if (gSession->Succeeded() == false)
         retval = gCancelRender ? RETURN_USER_ABORT : RETURN_ERROR;
-    session->Shutdown();
-    PrintStatus (session);
+    gSession->Shutdown();
+    PrintStatus (gSession);
     delete sigthread;
-    delete session;
+    delete gSession;
 
     return retval;
 }
