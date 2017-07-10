@@ -103,7 +103,7 @@ AX_ARG_WITH([--with-libjpeg],       [DIR], [use the JPEG library (in directory D
 AX_ARG_WITH([--with-libtiff],       [DIR], [use the TIFF library (in directory DIR)])
 AX_ARG_WITH([--with-libsdl],        [DIR], [use the SDL library (in directory DIR)])
 AX_ARG_WITH([--with-libmkl],        [DIR], [use the Intel(R) Math Kernel Library (in directory DIR)])
-AX_ARG_WITH([--with-openexr],       [DIR], [use the OpenEXR library (in directory DIR)]) 
+AX_ARG_WITH([--with-openexr],       [DIR], [use the OpenEXR library (in directory DIR)])
 
 AC_ARG_VAR([COMPILED_BY], [customize the "unofficial version" message (required argument)])
 AC_ARG_VAR([NON_REDISTRIBUTABLE_BUILD], [see the installation documentation])
@@ -263,7 +263,7 @@ if test x"$with_cygwin_dll" = x"no"; then
             [
               LDFLAGS="$LDFLAGS $pov_flags"
               # -D__CYGWIN is required for tiffio.h (incl. in tiff_pov.cpp)
-              CPPFLAGS="$CPPFLAGS -D__CYGWIN $pov_flags" 
+              CPPFLAGS="$CPPFLAGS -D__CYGWIN $pov_flags"
             ],
             [with_cygwin_dll="yes"]
           )
@@ -356,7 +356,7 @@ AC_DEFINE([USE_OFFICIAL_BOOST], [], [Use the official Boost libraries.])
 # Intel Math Kernel library
 pov_save_ldflags="$LDFLAGS"
 test x"$with_libmkl" != x"" && test x"$with_libmkl" != x"no" && LDFLAGS="-L$with_libmkl $LDFLAGS"
-AC_CHECK_LIB([mkl], [sin]) 
+AC_CHECK_LIB([mkl], [sin])
 test x"$ac_cv_lib_mkl_sin" = x"no" && LDFLAGS="$pov_save_ldflags"
 
 # libm
@@ -473,7 +473,7 @@ if test x"$with_cygwin_dll" = x"no"; then
   AC_DEFINE([X_DISPLAY_MISSING], [], [Don't use the X Window System.])
   pov_xwin_msg="disabled"
 
-else 
+else
 
   # libX11
   # first add default paths to help finding X11
@@ -728,6 +728,9 @@ if test x"$C99_COMPATIBLE_RADIOSITY" != x"" || test x"$ac_cv_sizeof_int" != x"4"
   fi
 fi
 
+AC_HEADER_TIOCGWINSZ
+AC_CHECK_HEADERS([sys/ioctl.h])
+AC_CHECK_FUNCS([ioctl])
 
 ###############################################################################
 
@@ -1350,7 +1353,7 @@ AC_MSG_RESULT([Built-in features:
   Unsupported image formats: $pov_img_fmt_disabled
 
 Compilation settings:
-  Build architecture:  $build 
+  Build architecture:  $build
   Built/Optimized for: $pov_built_for
   Compiler vendor:     $pov_compiler_vendor
   Compiler version:    $pov_compiler_version
