@@ -59,7 +59,7 @@ unsigned int GetTerminalWidth()
 {
 #if defined(TIOCGWINSZ) && defined(HAVE_IOCTL)
     struct winsize w;
-    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == 0)
+    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == 0 && w.ws_col != 0)
         return (unsigned int)w.ws_col;
 #endif
     return 80;
@@ -72,7 +72,7 @@ TextStreamBuffer::TextStreamBuffer(size_t buffersize, unsigned int wrapwidth)
 {
     boffset = 0;
     bsize = buffersize;
-    wrap = ~0;
+    wrap = GetTerminalWidth();
     curline = 0;
     buffer = new char[bsize];
     if(buffer == NULL)
@@ -93,9 +93,6 @@ TextStreamBuffer::~TextStreamBuffer()
 void TextStreamBuffer::printf(const char *format, ...)
 {
     va_list marker;
-
-    if (wrap == ~0)
-        wrap = GetTerminalWidth();
 
     va_start(marker, format);
     vsnprintf(&buffer[boffset], bsize - boffset - 1, format, marker);
