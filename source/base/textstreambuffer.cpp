@@ -46,6 +46,9 @@
 #if defined(HAVE_SYS_IOCTL_H)
 #include <sys/ioctl.h>
 #endif
+#if !defined(GWINSZ_IN_SYS_IOCTL)
+#include <termios.h>
+#endif
 
 // POV-Ray base header files
 #include "base/pov_err.h"
