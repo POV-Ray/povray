@@ -46,7 +46,7 @@
 #if defined(HAVE_SYS_IOCTL_H)
 #include <sys/ioctl.h>
 #endif
-#if !defined(GWINSZ_IN_SYS_IOCTL)
+#if !defined(GWINSZ_IN_SYS_IOCTL) && !defined(_WIN32)
 #include <termios.h>
 #endif
 
