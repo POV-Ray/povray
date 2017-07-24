@@ -37,7 +37,8 @@
 #endif
 
 #undef USE_AVX_FMA4_FOR_NOISE
-#if _MSC_VER >= 1600
+#if _MSC_FULL_VER >= 160040219
+  // MS Visual C++ 2010 (aka 10.0) SP1
   #define USE_AVX_FMA4_FOR_NOISE
 #endif
 
