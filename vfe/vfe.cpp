@@ -662,11 +662,11 @@ bool VirtualFrontEnd::Start(POVMS_Object& opts)
   if(start_column >= 1.0)
       start_column = (int)start_column / width;
   if(end_column > 1.0)
-      end_column = (int)(end_column + 1) / width;
+      end_column = (int)end_column / width;
   if(start_row >= 1.0)
       start_row = (int)start_row / height;
   if(end_row > 1.0)
-      end_row = (int)(end_row + 1) / height;
+      end_row = (int)end_row / height;
 
   POVMS_Object image_start_column(kPOVMSType_WildCard);
   image_start_column.SetString(kPOVAttrib_Identifier, "image_start_column");
