@@ -41,7 +41,7 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 
-// Windows stnadard headers
+// Windows standard headers
 #include <windows.h>
 #include <stdio.h>
 

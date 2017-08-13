@@ -78,6 +78,8 @@ namespace vfePlatform
 
         // system configuration file
         m_conf    = "";
+
+        // sys configuration file
         m_sysconf = POVCONFDIR "\\povray.conf";
 
         // user configuration file
