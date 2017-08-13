@@ -278,6 +278,8 @@ namespace pov_base
 /* Base version number of package. */
 #include "..\..\source\base\version.h"
 #define VERSION_BASE OFFICIAL_GENERATION_STRING
+/* SDL display library */
+#define HAVE_LIBSDL
 
 #define POV_MALLOC(size,msg)                malloc (size)
 #define POV_REALLOC(ptr,size,msg)           realloc ((ptr), (size))

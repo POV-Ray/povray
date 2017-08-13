@@ -2,11 +2,11 @@
 ///
 /// @file vfe/win/console/winconsole.cpp
 ///
-/// This file contains a POV implementation using VFE. 
-/// 
+/// This file contains a POV implementation using VFE.
+///
 /// @author Trevor SANDY<trevor.sandy@gmial.com>
-/// @author Based on VFE proof-of-concept by Christopher J. Cason 
-/// and extensions adapted from vfe/unix/unixconsole.cpp 
+/// @author Based on VFE proof-of-concept by Christopher J. Cason
+/// and extensions adapted from vfe/unix/unixconsole.cpp
 ///
 /// @copyright
 /// @parblock
@@ -41,39 +41,65 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 
+// Windows stnadard headers
 #include <windows.h>
 #include <stdio.h>
-
-#include "base/version_info.h"
-
-#include "backend/povray.h"
-#include "backend/control/benchmark.h"
 
 // boost headers
 #include <boost/shared_ptr.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/thread.hpp>
 
-// from directory "vfe"
-#include "vfe.h"
+// version details
+#include "base/version_info.h"
 
-// from directory "vfe/win/console"
-#include "winoptions.h"
-
+// from syspovconfig
 #ifndef _CONSOLE
 #error "You must define _CONSOLE in windows/povconfig/syspovconfig.h prior to building the console version, otherwise you will get link errors."
 #endif
 
-using namespace vfe;
-using namespace vfePlatform;
+#ifdef HAVE_LIBSDL
+// from libraries directory SDL include
+#include <SDL.h>
+#endif
+
+// from directory "vfe"
+#include "vfe.h"
+
+// from directory "windows"
+#include "disp.h"
+#include "disp_text.h"
+#include "disp_sdl.h"
+
+#include "backend/povray.h"
+#include "backend/control/benchmark.h"
+
+// verbose tracing
+using std::cerr;
+using std::endl;
 
 namespace pov_frontend
 {
+  shared_ptr<Display> gDisplay;
+
   ////////////////////////////////
   // Called from the shellout code
   ////////////////////////////////
   bool MinimizeShellouts(void) { return false; } // TODO
   bool ShelloutsPermitted(void) { return false; } // TODO
 }
+
+using namespace vfe;
+using namespace vfePlatform;
+
+enum DispMode
+{
+	DISP_MODE_NONE,
+	DISP_MODE_TEXT,
+	DISP_MODE_SDL
+};
+
+static DispMode gDisplayMode;
 
 enum ReturnValue
 {
@@ -82,12 +108,12 @@ enum ReturnValue
   RETURN_USER_ABORT
 };
 
+static bool gCancelRender = false;
+
 // for handling console events
 BOOL WINAPI ConsoleHandler(DWORD);
 HANDLE hStdin;
 DWORD fdwSaveOldMode;
-
-static bool gCancelRender = false;
 
 BOOL WINAPI ConsoleHandler(DWORD CEvent)
 {
@@ -114,30 +140,60 @@ BOOL WINAPI ConsoleHandler(DWORD CEvent)
         gCancelRender = true;
         break;
     default:
-        fprintf(stderr, "\n%s: received UNKNOWN EVENT: Unknown interrupt; requested render cancel\n", PACKAGE);	
-        gCancelRender = true;
+        gCancelRender = false;
     }
     return TRUE;
 }
 
-void PrintStatus (vfeSession *session)
+static vfeDisplay *WinConDisplayCreator(unsigned int width, unsigned int height, GammaCurvePtr gamma, vfeSession *session, bool visible)
 {
-  string str;
-  vfeSession::MessageType type;
-  static vfeSession::MessageType lastType = vfeSession::mUnclassified;
+	WinConDisplay *display = GetRenderWindow();
+	switch (gDisplayMode)
+	{
+#ifdef HAVE_LIBSDL
+	case DISP_MODE_SDL:
+		if (display != NULL && display->GetWidth() == width && display->GetHeight() == height)
+		{
+			WinConDisplay *p = new WinConSDLDisplay(width, height, gamma, session, false);
+			if (p->TakeOver(display))
+				return p;
+			delete p;
+		}
+		return new WinConSDLDisplay(width, height, gamma, session, visible);
+		break;
+#endif
+	case DISP_MODE_TEXT:
+		return new WinConTextDisplay(width, height, gamma, session, visible);
+		break;
+	default:
+		return NULL;
+	}
+}
 
-  while (session->GetNextCombinedMessage (type, str))
-  {
-    if (type != vfeSession::mGenericStatus)
-    {
-      if (lastType == vfeSession::mGenericStatus)
-        fprintf (stderr, "\n") ;
-      fprintf (stderr, "%s\n", str.c_str());
-    }
-    else
-      fprintf (stderr, "%s\r", str.c_str());
-    lastType = type;
-  }
+/* Show a message */
+static void PrintMessage(const char *title, const char *message)
+{
+	fprintf(stderr, "%s: %s\n", title, message);
+}
+
+void PrintStatus(vfeSession *session)
+{
+	string str;
+	vfeSession::MessageType type;
+	static vfeSession::MessageType lastType = vfeSession::mUnclassified;
+
+	while (session->GetNextCombinedMessage(type, str))
+	{
+		if (type != vfeSession::mGenericStatus)
+		{
+			if (lastType == vfeSession::mGenericStatus)
+				fprintf(stderr, "\n");
+			fprintf(stderr, "%s\n", str.c_str());
+		}
+		else
+			fprintf(stderr, "%s\r", str.c_str());
+		lastType = type;
+	}
 }
 
 static void PrintStatusChanged (vfeSession *session, State force = kUnknown)
@@ -150,10 +206,32 @@ static void PrintStatusChanged (vfeSession *session, State force = kUnknown)
           fprintf (stderr, "==== [Parsing...] ==========================================================\n");
           break;
       case kRendering:
-          fprintf (stderr, "==== [Rendering...] ========================================================\n");
+#ifdef HAVE_LIBSDL
+            if ((gDisplay != NULL) && (gDisplayMode == DISP_MODE_SDL))
+            {
+                fprintf (stderr, "==== [Rendering... Press p to pause, q to quit] ============================\n");
+            }
+            else
+            {
+                fprintf (stderr, "==== [Rendering...] ========================================================\n");
+            }
+#else
+            fprintf (stderr, "==== [Rendering...] ========================================================\n");
+#endif
           break;
       case kPausedRendering:
-          fprintf (stderr, "==== [Paused...] ===========================================================\n");
+#ifdef HAVE_LIBSDL
+            if ((gDisplay != NULL) && (gDisplayMode == DISP_MODE_SDL))
+            {
+                fprintf (stderr, "==== [Paused... Press p to resume] =========================================\n");
+            }
+            else
+            {
+                fprintf (stderr, "==== [Paused...] ===========================================================\n");
+            }
+#else
+            fprintf (stderr, "==== [Paused...] ===========================================================\n");
+#endif
           break;
   }
 }
@@ -212,17 +290,21 @@ static void CancelRender(vfeSession *session)
 
 static void PauseWhenDone(vfeSession *session)
 {
-	if (session->GetBoolOption("Pause_When_Done", false))
+	GetRenderWindow()->UpdateScreen(true);
+	GetRenderWindow()->PauseWhenDoneNotifyStart();
+	while (GetRenderWindow()->PauseWhenDoneResumeIsRequested() == false)
 	{
-		fprintf(stderr, "Press enter to continue ... ");
-		fflush(stderr);
-		getchar();
+		if (gCancelRender)
+			break;
+		else
+			Delay(10);
 	}
+	GetRenderWindow()->PauseWhenDoneNotifyEnd();
 }
 
 static ReturnValue PrepareBenchmark(vfeSession *session, vfeRenderOptions& opts, string& ini, string& pov, int argc, char **argv)
 {
- 
+
   // parse command-line options
   while (*++argv)
   {
@@ -268,17 +350,17 @@ Press <Enter> to continue or <Ctrl-C> to abort.\n\
   INPUT_RECORD irInBuf[128];
   int counter = 0;
 
-  // Get the standard input handle. 
+  // Get the standard input handle.
   hStdin = GetStdHandle(STD_INPUT_HANDLE);
   if (hStdin == INVALID_HANDLE_VALUE)
 	  BenchMarkErrorExit("Invalid standard input handle.");
 
-  // Save the current input mode, to be restored on exit. 
+  // Save the current input mode, to be restored on exit.
 
   if (!GetConsoleMode(hStdin, &fdwSaveOldMode))
 	  BenchMarkErrorExit("Unable to get current console mode.");
 
-  // Enable the window and mouse input events. 
+  // Enable the window and mouse input events.
 
   fdwMode = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT;
   if (!SetConsoleMode(hStdin, fdwMode))
@@ -287,23 +369,22 @@ Press <Enter> to continue or <Ctrl-C> to abort.\n\
   // wait for user input from stdin (including abort signals)
   while (true)
   {
-
 	  if (gCancelRender)
 	  {
 		  fprintf(stderr, "Render cancelled by user\n");
 		  return RETURN_USER_ABORT;
 	  }
 
-	  // Wait for user input events. 
+	  // Wait for user input events.
 	  if (!ReadConsoleInput(
-		  hStdin,      // input buffer handle 
-		  irInBuf,     // buffer to read into 
-		  128,         // size of read buffer 
-		  &cNumRead))  // number of records read 
+		  hStdin,      // input buffer handle
+		  irInBuf,     // buffer to read into
+		  128,         // size of read buffer
+		  &cNumRead))  // number of records read
 		  BenchMarkErrorExit("ReadConsoleInput");
 
-	  if (cNumRead > 0)  // user input is available 
-	  {				
+	  if (cNumRead > 0)  // user input is available
+	  {
 		  for (i = 0; i < cNumRead; i++)     // read till <ENTER> is hit
 		  {
 			  if (irInBuf[i].EventType == KEY_EVENT && irInBuf[i].Event.KeyEvent.wVirtualKeyCode == VK_RETURN)
@@ -342,11 +423,16 @@ static void CleanupBenchmark(vfeWinSession *session, string& ini, string& pov)
     session->DeleteTemporaryFile(ASCIItoUCS2String(pov.c_str()));
 }
 
-// This is the console user interface build of POV-Ray under Windows 
-// using the VFE (virtual front-end) library. This implementation 
-// includes the same capabilities as the Unix console build. 
+// This is the console user interface build of POV-Ray under Windows
+// using the VFE (virtual front-end) library. This implementation
+// includes the same capabilities as the Unix console build.
 // It is not officially supported.
-int main (int argc, char **argv)
+
+
+/**
+*  For SDL on Windows, declare main() function using C linkage like this:
+*/
+extern "C" int main(int argc, char **argv)
 {
   char              *s;
   vfeWinSession     *session;
@@ -358,7 +444,7 @@ int main (int argc, char **argv)
   string            bench_pov_name;
   char **           argv_copy=argv; /* because argv is updated later */
   int               argc_copy=argc; /* because it might also be updated */
-	
+
   fprintf(stderr,
           "\nThis is the console user interface build of POV-Ray under Windows.\n\n"
           "Persistence of Vision(tm) Ray Tracer Version " POV_RAY_VERSION_INFO ".\n\n"
@@ -369,15 +455,49 @@ int main (int argc, char **argv)
           DISCLAIMER_MESSAGE_1 "\n"
           DISCLAIMER_MESSAGE_2 "\n\n");
 
-  session = new vfeWinSession();
-  if (session->Initialize(NULL, NULL) != vfeNoError)
-    ErrorExit(session);
-
-  if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)ConsoleHandler,TRUE)) 
+  // create handler to manage console signals
+  if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)ConsoleHandler,TRUE))
   {
      fprintf(stderr, "Unable to install console control handler!\n");
      return RETURN_ERROR;
   }
+
+  // create display session
+  session = new vfeWinSession();
+  if (session->Initialize(NULL, NULL) != vfeNoError)
+    ErrorExit(session);
+
+  // display mode registration
+#ifdef HAVE_LIBSDL
+	if (WinConSDLDisplay::Register(session))
+	{
+		gDisplayMode = DISP_MODE_SDL;
+#ifdef WIN_DEBUG
+		PrintMessage("--INFO", "Display Mode: SDL.\n");
+#endif
+	}
+	else
+#endif
+	if (WinConTextDisplay::Register(session))
+	{
+		gDisplayMode = DISP_MODE_TEXT;
+#ifdef WIN_DEBUG
+		PrintMessage("--INFO", "Display Mode: Text.\n");
+#endif
+	}
+	else
+	{
+		gDisplayMode = DISP_MODE_NONE;
+#ifdef WIN_DEBUG
+		PrintMessage("--INFO", "Display Mode: None.\n");
+#endif
+	}
+
+  // default number of work threads: number of CPUs or 4
+  int nthreads = boost::thread::hardware_concurrency();
+  if (nthreads < 2)
+	  nthreads = 4;
+  opts.SetThreadCount(nthreads);
 
   // process command-line options
   session->GetWinConOptions()->ProcessOptions(&argc, &argv);
@@ -421,6 +541,7 @@ int main (int argc, char **argv)
   else
   {
     s = getenv ("POVINC");
+	session->SetDisplayCreator(WinConDisplayCreator);
     session->GetWinConOptions()->Process_povray_ini(opts);
     if (s != NULL)
       opts.AddLibraryPath (s);
@@ -446,7 +567,7 @@ int main (int argc, char **argv)
     session->PauseWhenDone(true);
 
   // main render loop
-  session->SetEventMask(stBackendStateChanged);  // immediately notify this event 
+  session->SetEventMask(stBackendStateChanged);  // immediately notify this event
 
   while (((flags = session->GetStatus(true, 200)) & stRenderShutdown) == 0)
   {
@@ -463,20 +584,33 @@ int main (int argc, char **argv)
 	  if (flags & stBackendStateChanged)
 		  PrintStatusChanged(session);
 
-	  // inter-frame pause
-	  if (session->GetCurrentFrame() < session->GetTotalFrames()
-		  && session->GetPauseWhenDone()
-		  && (flags & stAnimationFrameCompleted) != 0
-		  && session->Failed() == false)
+	  if (GetRenderWindow() != NULL)
 	  {
-		  PauseWhenDone(session);
-		  if (!gCancelRender)
-			  session->Resume();
+		  // early exit
+		  if (GetRenderWindow()->HandleEvents())
+		  {
+			  gCancelRender = true;  // will set proper return value
+			  CancelRender(session);
+			  break;
+		  }
+
+		  GetRenderWindow()->UpdateScreen();
+
+		  // inter-frame pause
+		  if (session->GetCurrentFrame() < session->GetTotalFrames()
+			  && session->GetPauseWhenDone()
+			  && (flags & stAnimationFrameCompleted) != 0
+			  && session->Failed() == false)
+		  {
+			  PauseWhenDone(session);
+			  if (!gCancelRender)
+				  session->Resume();
+		  }
 	  }
   }
 
   // pause when done for single or last frame of an animation
-  if (session->Failed() == false && session->GetBoolOption("Pause_When_Done", false))
+  if (session->Failed() == false && GetRenderWindow() != NULL && session->GetBoolOption("Pause_When_Done", false))
   {
 	PrintStatusChanged(session, kPausedRendering);
     PauseWhenDone(session);
@@ -488,6 +622,7 @@ int main (int argc, char **argv)
 
   if (session->Succeeded() == false)
     retval = gCancelRender ? RETURN_USER_ABORT : RETURN_ERROR;
+
   session->Shutdown();
   PrintStatus (session);
   delete session;

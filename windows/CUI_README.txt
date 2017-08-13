@@ -4,7 +4,8 @@
 	//////////////////////////////////////////////////////
 	
 	Updated Windows Console User Interface (CUI) POV-Ray build, including:
-	- Port Unix CUI functionality to Windows project (except image display during rendering)
+	- Port Unix CUI functionality to Windows project
+	- SDL2 image display window (Using SDL2 v2.0.5)
 	- Options processor class
 	- Benchmark, help and version options
 	- Detailed console output_iterator 
@@ -236,14 +237,23 @@
 	8.  openexr_toFloat.vcxproj../windows/vs2015
 	9.  povray.sln.............../windows/vs2015
 	10. syspovconfig.h.........../windows/povconfig
-	11. vfeplatform.cpp........../vfe/win
-	12. vfeplatform.h............/vfe/win
-	13. winconsole.cpp.........../vfe/win/console
-	14. winoptions.cpp.........../vfe/win/console...(New)
-	15. winoptions.h............./vfe/win/console...(New)
-	16. CUI_README.txt.........../windows...........(New)
-	17. autobuild.cmd............/windows/vs2015....(New)
-	18. autobuild_defs.cmd......./windows/vs2015....(New)
+	11. vfesession.h............./vfe
+	12. vfeplatform.cpp........../vfe/win
+	13. vfeplatform.h............/vfe/win
+	14. disp.h.................../windows...........(New) 
+	15. disp_sdl.cpp............./windows...........(New) 
+	16. disp_sdl.h.............../windows...........(New) 
+	17. disp_text.h............../windows...........(New) 
+	18. disp_text.cpp............/windows...........(New) 
+	19. winconsole.cpp.........../vfe/win/console
+	20. winoptions.cpp.........../vfe/win/console...(New)
+	21. winoptions.h............./vfe/win/console...(New)
+	22. CUI_README.txt.........../windows...........(New)
+	23. autobuild.cmd............/windows/vs2015....(New)
+	24. autobuild_defs.cmd......./windows/vs2015....(New)
+	25. SDL2.vcxproj............./windows/vs2015....(New)
+	26. SDL2_vcxproj.filters...../windows/vs2015....(New)
+	27. SDL2Main.vcxproj........./windows/vs2015....(New)
 	
 	Note: Although I used VS2017 to develop the components described here.
 	I do not believe there is any material difference between VS2017 and VS2015
