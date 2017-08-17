@@ -9,7 +9,7 @@ Notes:
   changes in the order they were included in the branch rather than
   chronologically.
 
-- As of commit 39ce8a2 (2013-11-16), this branch (`release/v3.7.0`) has been
+- As of commit 39ce8a24 (2013-11-16), this branch (`release/v3.7.0`) has been
   detached from the main POV-Ray 3.7 development, and no longer shares updates
   with it. Development of this branch is now generally limited to maintaining
   compatibility of the 3.7.0 source code with contemporary build environments.
@@ -32,14 +32,34 @@ Notes:
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
+POV-Ray v3.7.0.4
+------------------------------------------------------------------------------
+
+Commit 28adc671 on 2017-07-24 by Christoph Lipka
+
+    Fix POV-Ray for Windows failing to compile on VS 2010 without SP1.
+
+Commit f82f5b56 on 2017-06-27 by Christoph Lipka
+
+    Fix a minor error in Unix man page.
+
+------------------------------------------------------------------------------
 POV-Ray v3.7.0.3
 ------------------------------------------------------------------------------
 
-Commit 6b4aefd on 2017-05-18 by Christoph Lipka
+Commit 5e12ea17 on 2017-05-18 by Christoph Lipka
+
+    Bump version number and update change log.
+
+    Also updated `./README.md`, and replaced the HTML and plaintext versions
+    of the Windows build instructions with a single Markdown-formatted
+    version.
+
+Commit 6b4aefdf on 2017-05-18 by Christoph Lipka
 
     Silence a (warranted) GNU g++ 5.4 warning.
 
-Commit 3364e8f on 2017-05-18 by Christoph Lipka
+Commit 3364e8ff on 2017-05-18 by Christoph Lipka
 
     Fix compatibility with GNU g++ 6.3 compiler.
 
@@ -47,11 +67,11 @@ Commit 3364e8f on 2017-05-18 by Christoph Lipka
 POV-Ray v3.7.0.2
 ------------------------------------------------------------------------------
 
-Commit 3de604c on 2017-05-16 by Christoph Lipka
+Commit 3de604c1 on 2017-05-16 by Christoph Lipka
 
     Bump version number and update change log.
 
-Commit 4b3282d on 2017-05-16 by Christoph Lipka
+Commit 4b3282d4 on 2017-05-16 by Christoph Lipka
 
     Silence various clang warnings, some of which might cause actual
     issues. (#290)
@@ -61,11 +81,11 @@ Commit 4b3282d on 2017-05-16 by Christoph Lipka
 
     Also cleaned up some clang (4.2) compiler warnings along the way.
 
-Commit 9863a01 on 2017-05-13 by Christoph Lipka
+Commit 9863a01a on 2017-05-13 by Christoph Lipka
 
     Update change log, `.gitignore` file and Travis CI configuration.
 
-Commit bd856d6 on 2016-12-03 by Christoph Lipka
+Commit bd856d66 on 2016-12-03 by Christoph Lipka
 
     Update boost version to 1.62.
 
@@ -73,7 +93,7 @@ Commit bd856d6 on 2016-12-03 by Christoph Lipka
 POV-Ray v3.7.0.1
 ------------------------------------------------------------------------------
 
-Commit 4f3f49e on 2016-10-10 by Christoph Lipka
+Commit 4f3f49eb on 2016-10-10 by Christoph Lipka
 
     Improve compatibility with diverse build environments. (#112)
 
@@ -82,18 +102,18 @@ Commit 4f3f49e on 2016-10-10 by Christoph Lipka
     as well as additional changes (presumably duplicating changes to the
     master branch) to make the Unix version compatible with Mac OS X.
 
-Commit 3e668f9 on 2016-09-10 by Christoph Lipka
+Commit 3e668f92 on 2016-09-10 by Christoph Lipka
 
     Cherry-picked changes from master branch to make Unix build process
     compatible with contemporary versions of Automake and boost.
 
-Commit 942ca94 on 2015-11-20 by Christoph Lipka (c-lipka)
+Commit 942ca940 on 2015-11-20 by Christoph Lipka (c-lipka)
 
     Merge pull request #45 from selvik/patch-1
 
     Trivial update to README.md
 
-Commit af8fcee on 2015-10-12 by Selvi K
+Commit af8fcee2 on 2015-10-12 by Selvi K
 
     Minor update to README.md
 
@@ -101,35 +121,35 @@ Commit af8fcee on 2015-10-12 by Selvi K
     instructions, so that one doesn't have to have the configure step fail
     multiple times before hitting each dependency.
 
-Commit 39ce8a2 on 2013-11-16 by Chris Cason (chris20)
+Commit 39ce8a24 on 2013-11-16 by Chris Cason (chris20)
 
     Merge pull request #3 from POV-Ray/master
 
     Merge documentation into stable branch
 
-Commit fbc04c9 on 2013-11-16 by Chris Cason (chris20)
+Commit fbc04c97 on 2013-11-16 by Chris Cason (chris20)
 
     Merge pull request #2 from POV-Ray/3.7-stable
 
     3.7 stable
 
-Commit cfbd0c1 on 2013-11-16 by Chris Cason (chris20)
+Commit cfbd0c1a on 2013-11-16 by Chris Cason (chris20)
 
     Update README.md
 
-Commit 16c80a3 on 2013-11-16 by Chris Cason (chris20)
+Commit 16c80a36 on 2013-11-16 by Chris Cason (chris20)
 
     Update README.md
 
-Commit b775d60 on 2013-11-16 by Chris Cason (chris20)
+Commit b775d60f on 2013-11-16 by Chris Cason (chris20)
 
     Update README.md
 
-Commit 0bbe2b7 on 2013-11-16 by Chris Cason (chris20)
+Commit 0bbe2b76 on 2013-11-16 by Chris Cason (chris20)
 
     Create README.md
 
-Commit 373631e on 2013-11-16 by Chris Cason (chris20)
+Commit 373631e4 on 2013-11-16 by Chris Cason (chris20)
 
     Add docs
 
@@ -137,23 +157,23 @@ Commit 373631e on 2013-11-16 by Chris Cason (chris20)
 POV-Ray v3.7.0.0
 ------------------------------------------------------------------------------
 
-Commit 392510a on 2013-11-06 by Chris Cason (chris20)
+Commit 392510ad on 2013-11-06 by Chris Cason (chris20)
 
     Fix typo
 
-Commit b0fd27d on 2013-11-06 by Chris Cason (chris20)
+Commit b0fd27df on 2013-11-06 by Chris Cason (chris20)
 
     Add .gitignore
 
-Commit c7442df on 2013-11-06 by Chris Cason (chris20)
+Commit c7442dfc on 2013-11-06 by Chris Cason (chris20)
 
     Update README.md
 
-Commit 5378182 on 2013-11-06 by Chris Cason (chris20)
+Commit 5378182e on 2013-11-06 by Chris Cason (chris20)
 
     Add README.md
 
-Commit 86f4639 on 2013-11-06 by Chris Cason (chris20)
+Commit 86f4639d on 2013-11-06 by Chris Cason (chris20)
 
     Initial import
     [to GitHub]

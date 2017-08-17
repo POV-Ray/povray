@@ -29,6 +29,23 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
+Changes between 3.7.0.3 and 3.7.0.4
+===================================
+
+(Note: This version has not been released in binary form, as it does not
+feature any changes in functionality over the original 3.7.0 binaries.)
+
+This version constitutes a maintenance update of the POV-Ray 3.7.0 source
+code, focused on restoring compatibility with contemporary build environments.
+
+Fixed or Mitigated Bugs
+-----------------------
+
+  - Fixed minor error in Unix man page.
+  - Fixed a bug that caused build errors when trying to compile with VS 2010
+    without SP1.
+
+
 Changes between 3.7.0.2 and 3.7.0.3
 ===================================
 
