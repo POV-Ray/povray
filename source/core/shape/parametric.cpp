@@ -38,7 +38,7 @@
 
 #include <algorithm>
 
-#include <boost/tr1/array.hpp>
+#include <array>
 
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
@@ -441,7 +441,7 @@ void Parametric::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *
     Vector3d RU, RV;
     Vector2d uv_vect;
 
-    std::tr1::array<GenericScalarFunctionInstance,3> aFn = {
+    std::array<GenericScalarFunctionInstance,3> aFn = {
         GenericScalarFunctionInstance(Function[0], Thread),
         GenericScalarFunctionInstance(Function[1], Thread),
         GenericScalarFunctionInstance(Function[2], Thread)
@@ -919,7 +919,7 @@ void Parametric::Precompute_Parametric_Values(char flags, int depth, TraceThread
         throw POV_EXCEPTION_STRING("Cannot allocate memory for parametric precomputation data.");
 
     PrecompLastDepth = 1 << (depth - 1);
-    std::tr1::array<GenericScalarFunctionInstance,3> aFn = {
+    std::array<GenericScalarFunctionInstance,3> aFn = {
         GenericScalarFunctionInstance(Function[0], Thread),
         GenericScalarFunctionInstance(Function[1], Thread),
         GenericScalarFunctionInstance(Function[2], Thread)
