@@ -81,6 +81,6 @@
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
 #endif
-#include <boost/tr1/memory.hpp>
+#include <memory>
 #include <boost/unordered_map.hpp>
 
