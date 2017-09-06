@@ -60,6 +60,7 @@
 #include <exception>
 #include <list>
 #include <map>
+#include <memory>
 #include <new>
 #include <set>
 #include <stack>
@@ -78,6 +79,5 @@
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
 #endif
-#include <boost/tr1/memory.hpp>
 #include <boost/unordered_map.hpp>
 
