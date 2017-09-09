@@ -67,7 +67,20 @@ using std::min;
 #include <string>
 #include <vector>
 #include <list>
-#include <boost/tr1/memory.hpp>
+
+#include <boost/version.hpp>
+#if BOOST_VERSION < 106500
+    // Pulling in smart pointers is easy with Boost versions prior to 1.65.0, with the
+    // `boost/tr1/*.hpp` set of headers simply pulling in whatever is available (C++11, TR1 or
+    // boost's own implementation) and making it available in the `std::tr1` namespace.
+    #include <boost/tr1/memory.hpp>
+    #define POV_TR1_NAMESPACE std::tr1
+#else
+    // With `boost/tr1/*.hpp` unavailable, we're currently blindly relying on the compiler to
+    // be compliant with C++11.
+    #include <memory>
+    #define POV_TR1_NAMESPACE std
+#endif
 
 // when we say 'string' we mean std::string
 using std::string;
@@ -83,8 +96,12 @@ using std::list;
 using std::runtime_error;
 
 // these may actually be the boost implementations, depending on what boost/tr1/memory.hpp has pulled in
-using std::tr1::shared_ptr;
-using std::tr1::weak_ptr;
+// (NOTE: If you're running into a compile error here, you're probably trying to compile POV-Ray
+// for Windows with Boost 1.65.0 or later and a non-C++11-compliant compiler. We currently do not
+// support such a combination. Please use the Boost version that came bundled with the POV-Ray
+// source code.)
+using POV_TR1_NAMESPACE::shared_ptr;
+using POV_TR1_NAMESPACE::weak_ptr;
 
 #endif // STD_POV_TYPES_DECLARED
 

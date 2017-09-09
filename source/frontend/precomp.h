@@ -33,6 +33,8 @@
 ///
 //******************************************************************************
 
+#include "base/configbase.h"
+
 #include <algorithm>
 #include <cassert>
 #include <cctype>
@@ -64,6 +66,4 @@
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/unordered_map.hpp>
-#include <boost/tr1/memory.hpp>
-
-
+//#include <boost/tr1/memory.hpp> // now pulled in by "base/configbase.h"

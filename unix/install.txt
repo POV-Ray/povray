@@ -136,6 +136,13 @@ recommanded to generate a fully-featured POV-Ray executable.
   http://www.libsdl.org
 
 
+2.4 Compatibility Issues
+    ====================
+
+- We currently do not support Boost 1.65 or above unless a C++11-compliant
+  compiler is used.
+
+
 ====================================================
 3. Configuring, building, and (un)installing POV-Ray
 ====================================================
