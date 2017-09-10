@@ -35,6 +35,17 @@ Notes:
 POV-Ray v3.7.0.4
 ------------------------------------------------------------------------------
 
+Commit a847cb72 on 2017-09-10 by Christoph Lipka
+
+    Partial fix for issue #317 in v3.7.0.
+
+    When Boost 1.65.0 or higher is used, we'll rely on C++11 for smart
+    pointers instead of the `boost/tr1/*.hpp` headers.
+
+Commit 2be93aa9 on 2017-08-17 by Christoph Lipka
+
+    Bump version number and update change log.
+
 Commit 28adc671 on 2017-07-24 by Christoph Lipka
 
     Fix POV-Ray for Windows failing to compile on VS 2010 without SP1.

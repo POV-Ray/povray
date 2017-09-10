@@ -44,6 +44,13 @@ Fixed or Mitigated Bugs
   - Fixed minor error in Unix man page.
   - Fixed a bug that caused build errors when trying to compile with VS 2010
     without SP1.
+  - Partially fixed incompatibility with Boost 1.65.0.
+
+Known Issues
+------------
+
+  - To compile with Boost 1.65.0 or later, a C++11-compliant compiler is
+    required.
 
 
 Changes between 3.7.0.2 and 3.7.0.3
