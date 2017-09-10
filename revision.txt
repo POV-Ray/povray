@@ -19,7 +19,7 @@ Notes:
   For example, to read FS#270, visit:
   http://bugs.povray.org/270
 
-  (Note: As of 3.7.1-beta.8 our flyspray bug tracker is officially mothballed,
+  (Note: As of v3.7.1-beta.8 our flyspray bug tracker is officially mothballed,
   and we no longer refer to it in the changelog. Any flyspray reports that
   were still open at that point have been duplicated as GitHub issues titled
   "Port of FSxxx - ...")
@@ -32,8 +32,104 @@ Notes:
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
+POV-Ray v3.8.0-???
+------------------------------------------------------------------------------
+
+Commit 1dbca0ba on 2017-09-06 by Christoph Lipka
+
+    Remove dependency on `boost::tr1` to fix issue #317.
+
+Commit 7bddd06f on 2017-09-06 by Christoph Lipka
+
+    Enable and require C++11.
+
+Commit 7a99e7c6 on 2017-08-18 by Christoph Lipka
+
+    [ci skip] Update and fix `README.md`.
+
+Commit 2c3afc43 on 2017-07-09 by Christoph Lipka
+
+    [ci skip] Update source documentation of version numbering.
+
+Commit 443ae796 on 2017-07-08 by Christoph Lipka
+
+    Major overhaul of version number macro system in `version.h`.
+
+    Replaced the various redundant representations of the version number as
+    authoritative sources of information with a set of integers, each one
+    corresponding to a single numerical field of the version number. Any
+    other representations of the version number are now automatically
+    derived from these (plus the prerelease tag, if applicable).
+
+    Also added a mechanism that allows v3.8 binaries to run on top of a v3.7
+    host installation for now, so that we don't need any 3.8 installers yet.
+
+    Note that this commit comes with an updated Git pre-commit hook; to
+    install it, copy `pre-commit` from `tools/git/hooks/` to `.git/hooks/`
+    in your local repository.
+
+Commit 463442e2 on 2017-07-08 by Christoph Lipka
+
+    Update version number in AppVeyor automated build config.
+
+Commit 9f644fed on 2017-07-07 by Christoph Lipka
+
+    Add some debugging aids.
+
+    - When compiled in debug mode, a new statement `#breakpoint` is now
+      available. Its sole purpose is to serve as a hook for a breakpoint,
+      which can then be triggered anytime from the scene file.
+    - When compiled in debug mode, POV-Ray for Windows will now make do with
+      the release version of the editor DLLs if it can't find the debug version.
+
+Commit b1087484 on 2017-07-05 by Christoph Lipka
+
+    Demote version back to alpha status for now.
+
+Commit bdbb0b57 on 2017-07-02 by Christoph Lipka
+
+    Bump version threshold for new features to 3.8.
+
+    Any new behaviour formerly activated by `#version 3.71` now requires
+    `#version 3.8` (or higher); specifying `#version 3.71` will trigger a
+    corresponding warning.
+    Also updated sample scenes and include files accordingly.
+
+Commit 71b165fd on 2017-07-02 by Christoph Lipka
+
+    Eliminate various explicit mentions of version numbers.
+
+Commit 7957ad5c on 2017-06-29 by Christoph Lipka
+
+    Elimiate unnecessary version numbers from HTML Help infrastructure.
+
+Commit 71958105 on 2017-06-26 by Christoph Lipka
+
+    Update remaining source code file header comments.
+
+Commit b0557b87 on 2017-06-26 by Christoph Lipka
+
+    Update bulk of source code file header comments.
+
+Commit 09f1014d on 2017-06-26 by Christoph Lipka
+
+    Bump version number in the most essential places.
+
+Commit 9808f53a on 2017-06-24 by William F. Pokorny (wfpokorny)
+
+    Update list of required packages for Unix builds. ( #294)
+
+------------------------------------------------------------------------------
 POV-Ray v3.7.1-rc.1
 ------------------------------------------------------------------------------
+
+Commit e3c1738c on 2017-06-22 by Christoph Lipka
+
+    Fix a blunder in `version.h`.
+
+Commit 315bb46a on 2017-06-22 by Christoph Lipka
+
+    Bump version number and update change log.
 
 Commit b08846b3 on 2017-06-20 by Christoph Lipka
 

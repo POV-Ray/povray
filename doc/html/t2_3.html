@@ -6,7 +6,7 @@
 <head>
 <meta http-equiv=Content-Type content="text/html; charset=windows-1252">
 <title>Tutorial Section 3</title>
-<link rel="StyleSheet" href="povray37.css" type="text/css">
+<link rel="StyleSheet" href="povray.css" type="text/css">
 <link rel="shortcut icon" href="favicon.ico">
 
 <!--  NOTE: In order to help users find information about POV-Ray using web      -->
@@ -511,7 +511,7 @@
 <table class="HeaderFooter" width="100%">
 <tr>
   <td colspan=5 align="left" class="HeaderFooter">
-    POV-Ray for Unix <strong class="HeaderFooter">version 3.7.1</strong>
+    POV-Ray for Unix <strong class="HeaderFooter">version 3.8</strong>
   </td>
 </tr>
 <tr >
@@ -4333,7 +4333,7 @@ happy with that, we do a final trace at 640x480 <code>+A0.2</code>.</p>
   Display_Gamma=1.8
 </pre>
 
-<p>Instead of a numerical value, you can also specify <code>Display_Gamma=sRGB</code> to explicitly tell POV-Ray that your system is calibrated to match the sRGB standard (which, as already mentioned, is actually the default setting). <font class="New">New</font> in version 3.7.1, you can also specify <code>Display_Gamma=BT709</code> or <code>Display_Gamma=BT2020</code> to explicitly tell POV-Ray that your system is calibrated to match the transfer functions specified in ITU-R BT.709 or BT.2020, respectively, but you shouldn't use these unless you absolutely know what you are doing.</p>
+<p>Instead of a numerical value, you can also specify <code>Display_Gamma=sRGB</code> to explicitly tell POV-Ray that your system is calibrated to match the sRGB standard (which, as already mentioned, is actually the default setting). <font class="New">New</font> in version 3.8, you can also specify <code>Display_Gamma=BT709</code> or <code>Display_Gamma=BT2020</code> to explicitly tell POV-Ray that your system is calibrated to match the transfer functions specified in ITU-R BT.709 or BT.2020, respectively, but you shouldn't use these unless you absolutely know what you are doing.</p>
 
 <p>Again, the gamma showcase scene can be used as a sanity check; use the following parameters:</p>
 
@@ -4358,7 +4358,7 @@ happy with that, we do a final trace at 640x480 <code>+A0.2</code>.</p>
   File_Gamma=1.8
 </pre>
 
-<p>Again, <code>sRGB</code> as well as, <font class="New">New</font> in version 3.7.1, <code>BT709</code> or <code>BT2020</code>, are valid values, specifying that POV-Ray should apply the sRGB, ITU-R BT.709 or BT.2020 transfer function, respectively.</p>
+<p>Again, <code>sRGB</code> as well as, <font class="New">New</font> in version 3.8, <code>BT709</code> or <code>BT2020</code>, are valid values, specifying that POV-Ray should apply the sRGB, ITU-R BT.709 or BT.2020 transfer function, respectively.</p>
 
 <p class="Note"><strong>Note:</strong> Some of the file formats supported by POV-Ray are explicitly specified to never use gamma pre-correction or gamma encoding. For such file types (currently OpenEXR and Radiance HDR), <code>File_Gamma</code> has no effect whatsoever. For certain other file types (currently PNG), <code>File_Gamma</code> does have an effect on the encoding of the image, but not on the general visual appearance.</p>
 
@@ -4366,8 +4366,8 @@ happy with that, we do a final trace at 640x480 <code>+A0.2</code>.</p>
 
 <ul>
   <li>For OpenEXR and Radiance HDR, which are officially specified to store linear light intensity values, POV-Ray <em>always</em> stores linear values, ignoring the <code>File_Gamma</code> setting.</li>
-  <li>For PNG, which explicitly allows different encoding gamma values, POV-Ray will interpret the <code>File_Gamma</code> setting as the decoding gamma to encode for, and <em>always</em> write corresponding metadata into the header; as a result, the image will always look virtually identical irregardless of the <code>File_Gamma</code> setting; however, to minimize visible encoding artifacts like color banding, it is strongly recommended to use a setting of around 2.2, or <code>sRGB</code>. If <code>File_Gamma</code> is not specified, PNG output defaults to <code>sRGB</code>. <font class="New">New</font> in version 3.7.1, note that a setting of <code>BT709</code> or <code>BT2020</code> is possible, but cannot be conveyed correctly via PNG metadata and is therefore strongly discouraged for this file format.</li>
-  <li><font class="New">New</font> in version 3.7.1, for Netpbm PPM, which is officially specified to store gamma-encoded values using the ITU-R BT.709 transfer function, POV-Ray adheres to the Netpbm standard by default. However, if the <code>File_Gamma</code> setting is specified, POV-Ray will interpret it as a display gamma to pre-correct for, to account for the widespread use of competing de-facto standards, most notably the use of linear encoding (corresponding to a setting of <code>File_Gamma=1.0</code>) or sRGB gamma pre-correction (corresponding to a setting of <code>File_Gamma=sRGB</code>).</li>
+  <li>For PNG, which explicitly allows different encoding gamma values, POV-Ray will interpret the <code>File_Gamma</code> setting as the decoding gamma to encode for, and <em>always</em> write corresponding metadata into the header; as a result, the image will always look virtually identical irregardless of the <code>File_Gamma</code> setting; however, to minimize visible encoding artifacts like color banding, it is strongly recommended to use a setting of around 2.2, or <code>sRGB</code>. If <code>File_Gamma</code> is not specified, PNG output defaults to <code>sRGB</code>. <font class="New">New</font> in version 3.8, note that a setting of <code>BT709</code> or <code>BT2020</code> is possible, but cannot be conveyed correctly via PNG metadata and is therefore strongly discouraged for this file format.</li>
+  <li><font class="New">New</font> in version 3.8, for Netpbm PPM, which is officially specified to store gamma-encoded values using the ITU-R BT.709 transfer function, POV-Ray adheres to the Netpbm standard by default. However, if the <code>File_Gamma</code> setting is specified, POV-Ray will interpret it as a display gamma to pre-correct for, to account for the widespread use of competing de-facto standards, most notably the use of linear encoding (corresponding to a setting of <code>File_Gamma=1.0</code>) or sRGB gamma pre-correction (corresponding to a setting of <code>File_Gamma=sRGB</code>).</li>
   <li>For all other file formats, POV-Ray will interpret the <code>File_Gamma</code> setting as the display gamma to pre-correct for; as a result, the image will look different depending on the value used. It will also look different than the preview if you use a value other than your system's display gamma. If <code>File_Gamma</code> is not specified, these output file formats default to sRGB pre-correction.
 </ul>
 
@@ -4381,7 +4381,7 @@ happy with that, we do a final trace at 640x480 <code>+A0.2</code>.</p>
   global_settings { assumed_gamma 1.8 }
 </pre>
 
-<p>This instructs POV-Ray to work with colors pre-corrected for a display gamma of whatever value you specify (in this example obviously a gamma of 1.8). You can also specify <code>srgb</code> instead of a numerical value, instructing POV-Ray to work with colors pre-corrected according to the sRGB standard. <font class="New">New</font> in version 3.7.1, you can also specify <code>bt709</code> or <code>bt2020</code>, but both are strongly discouraged.</p>
+<p>This instructs POV-Ray to work with colors pre-corrected for a display gamma of whatever value you specify (in this example obviously a gamma of 1.8). You can also specify <code>srgb</code> instead of a numerical value, instructing POV-Ray to work with colors pre-corrected according to the sRGB standard. <font class="New">New</font> in version 3.8, you can also specify <code>bt709</code> or <code>bt2020</code>, but both are strongly discouraged.</p>
 
 <p class="Note"><strong>Note:</strong> It is highly recommended to either set <code>assumed_gamma</code> to your system's display gamma for convenience, or set it to <code>1.0</code> for maximum realism. Using it for purely artistic purposes is strongly discouraged.</p>
 
@@ -4425,7 +4425,7 @@ The following is also valid and gives the expected results:
   image_map { jpeg "foo.jpg" gamma 1.8 }
 </pre>
 
-<p>Instead of a numerical value, you can also use the <code>srgb</code> keyword to inform POV-Ray that the file conforms to the sRGB standard. <font class="New">New</font> in version 3.7.1, you can also specify <code>bt709</code> or <code>bt2020</code> to inform POV-Ray that the file is gamma-encoded using the ITU-R BT.709 or BT.2020 transfer functions, respectively</p>
+<p>Instead of a numerical value, you can also use the <code>srgb</code> keyword to inform POV-Ray that the file conforms to the sRGB standard. <font class="New">New</font> in version 3.8, you can also specify <code>bt709</code> or <code>bt2020</code> to inform POV-Ray that the file is gamma-encoded using the ITU-R BT.709 or BT.2020 transfer functions, respectively</p>
 
 <p class="Note"><strong>Note:</strong> Specifying <code>gamma bt709</code> or <code>gamma bt2020</code> only affects the <em>transfer function</em> used. Specifically, it does <em>not</em> affect the digital representation of nominal black and white, which remain at 0 and 255 (presuming 8-bit encoding), respectively, as opposed to 16 and 235 for full-fledged ITU-R BT-709 encoding.</p>
 
@@ -4441,7 +4441,7 @@ The following is also valid and gives the expected results:
 <ul>
   <li>For OpenEXR and Radiance HDR, POV-Ray will presume the data to be linear, as per official file format specification.</li>
   <li>For PNG, POV-Ray will presume the image data to be encoded according to file header information (currently sRGB or gAMA chunks); in the absence of such information, POV-Ray will presume sRGB-compliant encoding as per official recommendation.</li>
-  <li>For PPM and PGM, POV-Ray will currently presume the image data to match the <code>assumed_gamma</code> (in other words, no gamma adjustment will be performed by default). <font class="New">New</font> in version 3.7.1, POV-Ray will presume the image data to comply with the Netpbm specification, i.e. being gamma-encoded using the ITU-R BT.709 transfer function.</li>
+  <li>For PPM and PGM, POV-Ray will currently presume the image data to match the <code>assumed_gamma</code> (in other words, no gamma adjustment will be performed by default). <font class="New">New</font> in version 3.8, POV-Ray will presume the image data to comply with the Netpbm specification, i.e. being gamma-encoded using the ITU-R BT.709 transfer function.</li>
   <li>For any other file formats, POV-Ray will presume sRGB-compliant encoding, to match either official recommendations or common practice.</li>
 </ul>
 
