@@ -53,6 +53,8 @@ Other Noteworthy
 ----------------
 
   - The source code now requires a C++11-compliant compiler.
+  - Added `--generation` command-line switch to POV-Ray for Unix, which will
+    cause POV-Ray to print its abbreviated version number to standard output.
 
 
 Changes between 3.7.1-beta.9 and 3.7.1-rc.1
