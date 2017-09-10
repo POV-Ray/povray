@@ -1,5 +1,5 @@
-Building POV-Ray 3.7 for GNU/Linux and similar systems
-======================================================
+Building POV-Ray v3.8 for GNU/Linux and similar systems
+=======================================================
 
 This distribution contains the complete source code of POV-Ray for UNIX
 as well as its accompanying HTML documentation and supporting files. In
@@ -57,14 +57,15 @@ Installing
 
 This above installs POV-Ray under system-wide directories and needs root privileges.
 Installing as non-privileged user is also possible. By default (i.e. as root), 'make
-install' installs the following components:
+install' installs the following components (X.Y representing the first two fields of
+the version number, e.g. for v3.8.1 this would be 3.8):
 
     povray binary (executable)              in /usr/local/bin
-    data files (e.g. includes, scene files) in /usr/local/share/povray-3.7
-    documentation (text and html)           in /usr/local/share/doc/povray-3.7
-    configuration files (e.g. povray.conf)  in /usr/local/etc/povray/3.7
+    data files (e.g. includes, scene files) in /usr/local/share/povray-X.Y
+    documentation (text and html)           in /usr/local/share/doc/povray-X.Y
+    configuration files (e.g. povray.conf)  in /usr/local/etc/povray/X.Y
 
-The configuration files are also copied under the $HOME/.povray/3.7 directory
+The configuration files are also copied under the $HOME/.povray/X.Y directory
 of the user (or root) who is doing the installation.
 
 Please see [unix/install.txt](install.txt) for more details about available

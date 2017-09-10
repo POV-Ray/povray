@@ -302,12 +302,12 @@ BEGIN
     "        BEGIN\r\n"
     "            VALUE ""CompanyName"", ""Persistence of Vision Raytracer Pty. Ltd.""\r\n"
     "            VALUE ""FileDescription"", ""POV-Ray for Windows editor interface DLL""\r\n"
-    "            VALUE ""FileVersion"", ""3.7.0.0""\r\n"
+    "            VALUE ""FileVersion"", ""3.8.0.0""\r\n"
     "            VALUE ""InternalName"", DLLNAME\r\n"
-    "            VALUE ""LegalCopyright"", ""Copyright 2004-2008 Persistence of Vision Raytracer Pty. Ltd.""\r\n"
+    "            VALUE ""LegalCopyright"", ""Copyright 2004-2017 Persistence of Vision Raytracer Pty. Ltd.""\r\n"
     "            VALUE ""OriginalFilename"", DLLNAME\r\n"
     "            VALUE ""ProductName"", ""The Persistence of Vision Raytracer""\r\n"
-    "            VALUE ""ProductVersion"", ""3.7.0.0""\r\n"
+    "            VALUE ""ProductVersion"", ""3.8.0.0""\r\n"
     "        END\r\n"
     "    END\r\n"
     "    BLOCK ""VarFileInfo""\r\n"
@@ -822,12 +822,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Persistence of Vision Raytracer Pty. Ltd."
             VALUE "FileDescription", "POV-Ray for Windows editor interface DLL"
-            VALUE "FileVersion", "3.7.0.0"
+            VALUE "FileVersion", "3.8.0.0"
             VALUE "InternalName", DLLNAME
-            VALUE "LegalCopyright", "Copyright 2004-2008 Persistence of Vision Raytracer Pty. Ltd."
+            VALUE "LegalCopyright", "Copyright 2004-2017 Persistence of Vision Raytracer Pty. Ltd."
             VALUE "OriginalFilename", DLLNAME
             VALUE "ProductName", "The Persistence of Vision Raytracer"
-            VALUE "ProductVersion", "3.7.0.0"
+            VALUE "ProductVersion", "3.8.0.0"
         END
     END
     BLOCK "VarFileInfo"

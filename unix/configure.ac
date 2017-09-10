@@ -1,10 +1,12 @@
 ##############################################################################
-#               configure.ac
+#
+# configure.ac
 #
 # Process this file with autoconf to produce the configure script.
 #
 # ---------------------------------------------------------------------------
-# Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+#
+# Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 # Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 #
 # POV-Ray is free software: you can redistribute it and/or modify
@@ -19,30 +21,28 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 #---------------------------------------------------------------------------
+#
 # POV-Ray is based on the popular DKB raytracer version 2.12.
 # DKBTrace was originally written by David K. Buck.
 # DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
-#---------------------------------------------------------------------------
-# $File: N/A $
-# $Revision: N/A $
-# $Change: N/A $
-# $DateTime: N/A $
-# $Author: N/A $
-# $Log$
+#
 ##############################################################################
 
-# configure.ac for the source distribution of POV-Ray 3.7 for UNIX
+# configure.ac for the source distribution of POV-Ray 3.8 for UNIX
+# Report bugs via https://github.com/POV-Ray/povray/issues
+#
+# Based on configure.ac from POV-Ray v3.7
 # Written by Nicolas Calimet <nicolas.calimet@povray.org>
-# Report bugs via http://bugs.povray.org/
-# Based on configure.ac from POV-Ray 3.6
+# Based on configure.ac from POV-Ray v3.6
 
 # Required autoconf version.
 AC_PREREQ(2.59)
 
 # Inits.
 
-# The file VERSION must contain only the version string MAJOR.MINOR(.PATCHLEVEL)(-PRERELEASE)
+# The file VERSION must contain only the version string MAJOR.MINOR.REVISION(.PATCHLEVEL)(-PRERELEASE)
 AC_INIT([POV-Ray], m4_normalize(m4_include([VERSION])), [unix-bugreports-2011@povray.org], [povray])
 
 # VERSION_BASE is then defined as MAJOR.MINOR

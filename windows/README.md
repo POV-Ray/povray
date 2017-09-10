@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------
 
-Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 
 POV-Ray is free software: you can redistribute it and/or modify it under
@@ -68,7 +68,7 @@ Including the Editor Support DLL (cmedit) in the Build
 
 It is not necessary to build the editor support DLL (cmedit), as it is
 loaded via `LoadLibrary()` and thus no import library is required. You
-can just use the DLL's included with the official version 3.7 binary
+can just use the DLL's included with the official binary
 distribution. If however you do wish to build it, either enable it in
 the configuration manager or initiate a build of that specific project
 manually.
@@ -365,6 +365,6 @@ Thanks
 ======
 
 The POV-Team would like to thank all those who have assisted in bringing
-POV-Ray 3.7 and its predecessors to the public - you know who you are,
+POV-Ray v3.8 and its predecessors to the public - you know who you are,
 and we salute you.
 
