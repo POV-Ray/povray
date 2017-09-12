@@ -1,0 +1,3957 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<!--  This file copyright Persistence of Vision Raytracer Pty. Ltd. 2009-2011  -->
+
+<html lang="en">
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<title>Reference Section 5</title>
+<link rel="StyleSheet" href="povray.css" type="text/css">
+<link rel="shortcut icon" href="favicon.ico">
+
+<!--  NOTE: In order to help users find information about POV-Ray using web      -->
+<!--  search engines, we ask that you *not* let them index documentation         -->
+<!--  mirrors because effectively, when searching, users will get hundreds of    -->
+<!--  results containing the same information! For this reason, these meta tags  -->
+<!--  below disable archiving of this page by search engines.                    -->
+
+<meta name="robots" content="noarchive">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="expires" content="0">
+</head>
+<body>
+
+<div class="Page">
+
+<!-- NavPanel Begin -->
+<div class="NavPanel">
+<table class="NavTable">
+<tr>
+  <td class="FixedPanelHeading"><a title="3.5" href="#r3_5">The Object Zoo</a></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="3.5.1" href="#r3_5_1">Object</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.5.1.1" href="#r3_5_1_1">Finite Solid Primitives</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.1.1" href="#r3_5_1_1_1">Blob</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.1.2" href="#r3_5_1_1_2">Box</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.1.3" href="#r3_5_1_1_3">Cone</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.1.4" href="#r3_5_1_1_4">Cylinder</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.1.5" href="#r3_5_1_1_5">Height Field</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.1.6" href="#r3_5_1_1_6">Isosurface</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.1.7" href="#r3_5_1_1_7">Julia Fractal</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.1.8" href="#r3_5_1_1_8">Lathe</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.1.9" href="#r3_5_1_1_9">Lemon</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.1.10" href="#r3_5_1_1_10">Ovus</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.1.11" href="#r3_5_1_1_11">Parametric</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.1.12" href="#r3_5_1_1_12">Prism</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.1.13" href="#r3_5_1_1_13">Sphere</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.1.14" href="#r3_5_1_1_14">Sphere Sweep</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.1.15" href="#r3_5_1_1_15">Superquadric Ellipsoid</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.1.16" href="#r3_5_1_1_16">Surface of Revolution</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.1.17" href="#r3_5_1_1_17">Text</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.1.18" href="#r3_5_1_1_18">Torus</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.5.1.2" href="#r3_5_1_2">Finite Patch Primitives</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.2.1" href="#r3_5_1_2_1">Bicubic Patch</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.2.2" href="#r3_5_1_2_2">Disc</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.2.3" href="#r3_5_1_2_3">Mesh</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh5"><a title="3.5.1.2.3.1" href="#r3_5_1_2_3_1">Solid Mesh</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.2.4" href="#r3_5_1_2_4">Mesh2</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh5"><a title="3.5.1.2.4.1" href="#r3_5_1_2_4_1">Smooth and Flat triangles in the same mesh</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh5"><a title="3.5.1.2.4.2" href="#r3_5_1_2_4_2">Mesh Triangle Textures</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.2.5" href="#r3_5_1_2_5">Polygon</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.2.6" href="#r3_5_1_2_6">Triangle</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.2.7" href="#r3_5_1_2_7">Smooth Triangle</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.5.1.3" href="#r3_5_1_3">Infinite Solid Primitives</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.3.1" href="#r3_5_1_3_1">Plane</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.3.2" href="#r3_5_1_3_2">Poly</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.3.3" href="#r3_5_1_3_3">Cubic</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.3.4" href="#r3_5_1_3_4">Quartic</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.3.5" href="#r3_5_1_3_5">Polynomial</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.3.6" href="#r3_5_1_3_6">Quadric</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.5.1.4" href="#r3_5_1_4">Constructive Solid Geometry</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.4.1" href="#r3_5_1_4_1">Inside and Outside</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.4.2" href="#r3_5_1_4_2">Union</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh5"><a title="3.5.1.4.2.1" href="#r3_5_1_4_2_1">Split_Union</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.4.3" href="#r3_5_1_4_3">Intersection</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.4.4" href="#r3_5_1_4_4">Difference</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.4.5" href="#r3_5_1_4_5">Merge</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.5.1.5" href="#r3_5_1_5">Object Modifiers</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.5.1" href="#r3_5_1_5_1">Clipped By Object Modifier</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.5.2" href="#r3_5_1_5_2">Bounded By Object Modifier</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.5.3" href="#r3_5_1_5_3">Material</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.5.4" href="#r3_5_1_5_4">Hollow Object Modifier</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.5.5" href="#r3_5_1_5_5">Inverse Object Modifier</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.5.6" href="#r3_5_1_5_6">No Shadow Object Modifier</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.5.7" href="#r3_5_1_5_7">No Image Object Modifier</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.5.8" href="#r3_5_1_5_8">No Reflection Object Modifier</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.5.9" href="#r3_5_1_5_9">Double Illuminate Object Modifier</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.5.10" href="#r3_5_1_5_10">No Radiosity Object Modifier</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.5.1.5.11" href="#r3_5_1_5_11">Sturm Object Modifier</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh1">&nbsp;</div></td>
+</tr>
+<tr>
+  <td><div class="divh1">&nbsp;</div></td>
+</tr>
+</table>
+</div>
+<!-- NavPanel End -->
+
+<div class="Content">
+<table class="HeaderFooter" width="100%">
+<tr>
+  <td colspan=5 align="left" class="HeaderFooter">
+    POV-Ray for Unix <strong class="HeaderFooter">version 3.8</strong>
+  </td>
+</tr>
+<tr >
+  <td colspan=5>
+    <hr align="right" width="70%">
+  </td>
+</tr>
+<tr>
+  <td width="30%"></td>
+  <td class="NavBar"><a href="index.html" title="The Front Door">Home</a></td>
+  <td class="NavBar"><a href="u1_0.html" title="Unix Table of Contents">POV-Ray for Unix</a></td>
+  <td class="NavBar"><a href="t2_0.html" title="Tutorial Table of Contents">POV-Ray Tutorial</a></td>
+  <td class="NavBar"><a href="r3_0.html" title="Reference Table of Contents">POV-Ray Reference</a></td>
+</tr>
+</table>
+
+<a name="r3_5"></a>
+<div class="content-level-h2" contains="The Object Zoo" id="r3_5">
+<h2>3.5 The Object Zoo</h2>
+<p>Quick Links:</p>
+
+<ul>
+  <li><a href="r3_5.html#r3_5_1_1">Finite Solid Primitives</a></li>
+  <li><a href="r3_5.html#r3_5_1_2">Finite Patch Primitives</a></li>
+  <li><a href="r3_5.html#r3_5_1_3">Infinite Solid Primitives</a></li>
+  <li><a href="r3_5.html#r3_5_1_4">Constructive Solid Geometry</a></li>
+  <li><a href="r3_5.html#r3_5_1_5">Object Modifiers</a></li>
+</ul></div>
+
+<a name="r3_5_1"></a>
+<div class="content-level-h3" contains="Object" id="r3_5_1">
+<h3>3.5.1 Object</h3>
+
+
+<p>Objects are the building blocks of your scene. There are a lot of different types of objects supported by POV-Ray. In the following sections, we describe <a href="r3_5.html#r3_5_1_1">Finite Solid Primitives</a>, <a href="r3_5.html#r3_5_1_2">Finite Patch Primitives</a> and <a href="r3_5.html#r3_5_1_3">Infinite Solid Primitives</a>. These primitive shapes may be combined into complex shapes using <a href="r3_5.html#r3_5_1_4">Constructive Solid Geometry</a> (also known as CSG).</p>
+<p>
+The basic syntax of an object is a keyword describing its type, some floats,
+vectors or other parameters which further define its location and/or shape
+and some optional object modifiers such as texture, interior_texture, pigment, normal, finish,
+interior, bounding, clipping or transformations. Specifically the syntax
+is:</p>
+<pre>
+OBJECT:
+  FINITE_SOLID_OBJECT | FINITE_PATCH_OBJECT | 
+  INFINITE_SOLID_OBJECT | CSG_OBJECT | LIGHT_SOURCE |
+  object { OBJECT_IDENTIFIER [OBJECT_MODIFIERS...] }
+FINITE_SOLID_OBJECT:
+  BLOB | BOX | CONE | CYLINDER | HEIGHT_FIELD | ISOSURFACE | JULIA_FRACTAL |
+  LATHE | OVUS | PARAMETRIC | PRISM | SPHERE | SPHERE_SWEEP | SUPERELLIPSOID |
+  SOR | TEXT | TORUS
+FINITE_PATCH_OBJECT:
+  BICUBIC_PATCH | DISC | MESH | MESH2 | POLYGON | TRIANGLE |
+  SMOOTH_TRIANGLE
+  INFINITE_SOLID_OBJECT:
+  PLANE | POLY | CUBIC | QUARTIC | QUADRIC 
+CSG_OBJECT:
+  UNION | INTERSECTION | DIFFERENCE | MERGE
+</pre>
+
+<p>Object identifiers may be declared to make scene files more readable and
+to parameterize scenes so that changing a single declaration changes many
+values. An identifier is declared as follows.</p>
+<pre>
+OBJECT_DECLARATION:
+  #declare IDENTIFIER = OBJECT |
+  #local IDENTIFIER = OBJECT
+</pre>
+
+<p>Where <em>IDENTIFIER</em> is the name of the identifier up to 40
+characters long and <em>OBJECT</em> is any valid object. To invoke
+an object identifier, you wrap it in an <code>object{...}</code> statement.
+You use the <code>object</code> statement regardless of what type of object
+it originally was. Although early versions of POV-Ray required this <code>
+object</code> wrapper all of the time, now it is only used with <em>
+OBJECT_IDENTIFIERS</em>.</p>
+<p>
+Object modifiers are covered in detail later. However here is a brief
+overview.</p>
+<p>
+The texture describes the surface properties of the object. Complete details
+are in <a href="r3_6.html#r3_6_1">textures</a>. Textures are combinations of pigments, normals,
+and finishes. In the section <a href="r3_6.html#r3_6_1_1">pigment</a> you will learn how to
+specify the color or pattern of colors inherent in the material. In <a href="r3_6.html#r3_6_1_2">normal</a>, we describe a method of simulating various patterns of bumps, dents, ripples
+or waves by modifying the surface normal vector. The section on <a href="r3_6.html#r3_6_1_3">finish</a> describes the reflective properties of the surface. The <a href="r3_7.html#r3_7_2_1">Interior</a> is a feature introduced in POV-Ray 3.1. It contains information
+about the interior of the object which was formerly contained in the finish
+and halo parts of a texture. Interior items are no longer part of the
+texture. Instead, they attach directly to the objects. The halo feature has
+been discontinued and replaced with a new feature called <a href="r3_7.html#r3_7_2">Media</a> which replaces both halo and atmosphere.</p>
+<p>
+Bounding shapes are finite, invisible shapes which wrap around complex, slow
+rendering shapes in order to speed up rendering time. Clipping shapes are
+used to cut away parts of shapes to expose a hollow interior. Transformations
+tell the ray-tracer how to move, size or rotate the shape and/or the texture
+in the scene.</p></div>
+
+<a name="r3_5_1_1"></a>
+<div class="content-level-h4" contains="Finite Solid Primitives" id="r3_5_1_1">
+<h4>3.5.1.1 Finite Solid Primitives</h4>
+<p>There are seventeen different solid finite primitive shapes: <a href="r3_5.html#r3_5_1_1_1">blob</a>, <a href="r3_5.html#r3_5_1_1_2">box</a>,
+<a href="r3_5.html#r3_5_1_1_3">cone</a>, <a href="r3_5.html#r3_5_1_1_4">cylinder</a>, <a href="r3_5.html#r3_5_1_1_5">height field</a>, <a href="r3_5.html#r3_5_1_1_6">isosurface</a>, <a href="r3_5.html#r3_5_1_1_7">Julia fractal</a>, <a href="r3_5.html#r3_5_1_1_8">lathe</a>, <a href="r3_5.html#r3_5_1_1_10">ovus</a>, <a href="r3_5.html#r3_5_1_1_11">parametric</a>, <a href="r3_5.html#r3_5_1_1_12">prism</a>, <a href="r3_5.html#r3_5_1_1_13">sphere</a>, <a href="r3_5.html#r3_5_1_1_14">sphere_sweep</a>, <a href="r3_5.html#r3_5_1_1_15">superellipsoid</a>, <a href="r3_5.html#r3_5_1_1_16">surface of revolution</a>, <a href="r3_5.html#r3_5_1_1_17">text</a> and <a href="r3_5.html#r3_5_1_1_18">torus</a>. These have a
+well-defined <em>inside</em> and can be used in CSG: see <a href="r3_5.html#r3_5_1_4">Constructive Solid Geometry</a>. They are finite and respond to automatic bounding. You may specify an interior for these objects.</p></div>
+
+<a name="r3_5_1_1_1"></a>
+<div class="content-level-h5" contains="Blob" id="r3_5_1_1_1">
+<h5>3.5.1.1.1 Blob</h5>
+
+
+<p>Blobs are an interesting and flexible object type. Mathematically they are iso-surfaces of scalar fields, i.e. their surface is defined by the strength of the field in each point. If this strength is equal to a threshold value you are on the surface otherwise you are not.</p>
+<p>Picture each blob component as an object floating in space. This object is <em> filled</em> with a field that has its maximum at the center of the object and drops off to zero at the object's surface. The field strength of all those components are added together to form the field of the blob. Now POV-Ray looks for points where this field has a given value, the threshold
+value. All these points form the surface of the blob object. Points with a greater field value than the threshold value are considered to be inside while points with a smaller field value are outside.</p>
+<p>There's another, simpler way of looking at blobs. They can be seen as a union of flexible components that attract or repel each other to form a blobby organic looking shape. The components' surfaces actually stretch out smoothly and connect as if they were made of honey or something similar.</p>
+<p>The syntax for <code>blob</code> is defined as follows:</p>
+<pre>
+BLOB:
+  blob { BLOB_ITEM... [BLOB_MODIFIERS...]}
+BLOB_ITEM:
+  sphere{&lt;Center&gt;, Radius,
+    [ strength ] Strength[COMPONENT_MODIFIER...] } |
+  cylinder{&lt;End1&gt;, &lt;End2&gt;, Radius,
+    [ strength ] Strength [COMPONENT_MODIFIER...] } |
+  component Strength, Radius, &lt;Center&gt; |
+  threshold Amount
+COMPONENT_MODIFIER:
+  TEXTURE | PIGMENT | NORMAL | FINISH | TRANSFORMATION
+BLOB_MODIFIER:
+  hierarchy [Boolean] | sturm [Boolean] | OBJECT_MODIFIER
+</pre>
+
+<p>Blob default values:</p>
+<pre>
+hierarchy : on
+sturm     : off
+threshold : 1.0
+</pre>
+
+<p>The <code>threshold</code> keyword is followed by a float value which determines the total field strength value that POV-Ray is looking for. The default value if none is specified is <code>threshold 1.0</code>. By following the ray out into space and looking at how each blob component affects the ray, POV-Ray will find the points in space where the field strength is equal to the threshold value. The following list shows some things you should know about the threshold value.</p>
+
+<ol>
+<li>The threshold value must be positive.</li>
+<li>A component disappears if the threshold value is greater than its strength.</li>
+<li>As the threshold value gets larger, the surface you see gets closer to the centers of the components.</li>
+<li>As the threshold value gets smaller, the surface you see gets closer to the surface of the components.</li>
+</ol>
+
+<p>Cylindrical components are specified by a <code>cylinder</code> statement. The center of the end-caps of the cylinder is defined by the vectors <em><code>&lt;End1&gt;</code></em> and <em><code> &lt;End2&gt;</code></em>. Next is the float value of the <em>Radius</em> followed by the float <em>Strength</em>. These vectors and floats are required and should be separated
+by commas. The keyword <code> strength</code> may optionally precede the strength value. The cylinder has hemispherical caps at each end.</p>
+
+<p>Spherical components are specified by a <code>sphere</code> statement. The location is defined by the vector <em><code>&lt;Center&gt;</code></em>. Next is the float value of the <em> Radius</em> followed by the float <em>
+Strength</em>. These vector and float values are required and should be separated by commas. The keyword <code> strength</code> may optionally precede the strength value.</p>
+<p>You usually will apply a single texture to the entire blob object, and you typically use transformations to change its size, location, and orientation. However both the <code>cylinder</code> and <code>sphere</code> statements may have individual texture, pigment, normal, finish, and transformations applied to them. You may not apply separate <code>interior</code> statements to the components but you may specify one for the entire blob.</p>
+<p class="Note"><strong>Note:</strong> By unevenly scaling a spherical component you can create ellipsoidal components. The
+tutorial section on <a href="t2_3.html#t2_3_3_1">Blob Object</a> illustrates individually textured blob components and many other blob examples.</p>
+
+<p>The <code>component</code> keyword is an obsolete method for specifying a spherical component and is only used for compatibility with earlier POV-Ray versions. It may not have textures or transformations individually applied to it.</p>
+
+<p>The <code>strength</code> parameter of either type of blob component is a float value specifying the field strength at the center of the object. The strength may be positive or negative. A positive value will make that component attract other components while a negative value will make it repel other components. Components in different, separate blob shapes do not affect each other.</p>
+<p>You should keep the following things in mind.</p>
+
+<ol>
+<li>The strength value may be positive or negative. Zero is a bad value, as the net result is that no field was added -- you might just as well have not used this component.</li>
+<li>If strength is positive, then POV-Ray will add the component's field to the space around the center of the component. If this adds enough field strength to be greater than the threshold value you will see a surface.</li>
+<li>If the strength value is negative, then POV-Ray will subtract the component's field from the space around the center of the component. This will only do something if there happen to be positive components nearby. The surface around any nearby positive components will be dented away from the center of the negative component.</li>
+</ol>
+
+<p>After all components and the optional <code>threshold</code> value have been specified you may specify zero or more blob modifiers. A blob modifier is any regular object modifier or the <code>hierarchy</code> or <code>
+sturm</code> keywords.</p>
+<p>The components of each blob object are internally bounded by a spherical bounding hierarchy to speed up blob intersection tests and other operations. Using the optional keyword <code>hierarchy</code> followed by an optional boolean float value will turn it off or on. By default it is on.</p>
+
+<p>If additional accuracy is required you can add the <code><a href="r3_5.html#r3_5_1_5_11">sturm</a></code> object modifier.</p>
+<p>An example of a three component blob is:</p>
+<pre>
+BLOB:
+  blob {
+    threshold 0.6
+      sphere { &lt;.75, 0, 0&gt;, 1, 1 }
+      sphere { &lt;-.375, .64952, 0&gt;, 1, 1 }
+      sphere { &lt;-.375, -.64952, 0&gt;, 1, 1 }
+    scale 2
+    }
+</pre>
+
+<p>If you have a single blob component then the surface you see will just look like the object used, i.e. a sphere or a cylinder, with the surface being somewhere inside the surface specified for the component. The exact surface location can be determined from the blob equation listed below (you will probably never need to know this, blobs are more for visual appeal than
+for exact modeling).</p>
+<p>For the more mathematically minded, here's the formula used internally by POV-Ray to create blobs. You do not need to understand this to use blobs. The density of the blob field of a single component is:</p>
+
+<table class="centered" width="405x" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <img class="center" width="385px" src="images/6/69/RefImgBlobdens.png">
+  </td>
+</tr>
+<tr>
+  <td>
+    <p class="caption">Blob Density</p>
+  </td>
+</tr>
+</table>
+
+<p>Where <em>distance</em> is the distance of a given point from the spherical blob's center or cylinder blob's axis. This formula has a convenient property that it is exactly equal to the strength parameter at the center of the component and drops off to exactly 0 at a distance from the center of the component that is equal to the radius value. The density formula for more than one blob component is just the sum of the individual component densities.</p></div>
+
+<a name="r3_5_1_1_2"></a>
+<div class="content-level-h5" contains="Box" id="r3_5_1_1_2">
+<h5>3.5.1.1.2 Box</h5>
+
+
+<p>A simple box can be defined by listing two corners of the box using the
+following syntax for a <code>box</code> statement:</p>
+<pre>
+BOX:
+  box {
+    &lt;Corner_1&gt;, &lt;Corner_2&gt;
+    [OBJECT_MODIFIERS...]
+    }
+</pre>
+
+<table class="centered" width="660x" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <img class="center" width="640px" src="images/9/98/RefImgBoxgeom.gif">
+  </td>
+</tr>
+<tr>
+  <td>
+    <p class="caption">The geometry of a box.</p>
+  </td>
+</tr>
+</table>
+
+<p>Where <em><code>&lt;Corner_1&gt;</code></em> and <em><code>
+&lt;Corner_2&gt;</code></em> are vectors defining the x, y, z coordinates of
+the opposite corners of the box.</p>
+<p class="Note"><strong>Note:</strong> All boxes are defined with their faces parallel to the coordinate axes. They may later be rotated to any orientation using the <code>rotate</code> keyword.</p>
+<p>
+Boxes are calculated efficiently and make good bounding shapes (if manually
+bounding seems to be necessary).</p></div>
+
+<a name="r3_5_1_1_3"></a>
+<div class="content-level-h5" contains="Cone" id="r3_5_1_1_3">
+<h5>3.5.1.1.3 Cone</h5>
+
+
+<p>The <code>cone</code> statement creates a finite length cone or a <em>
+frustum</em> (a cone with the point cut off). The syntax is:</p>
+<pre>
+CONE:
+  cone {
+    &lt;Base_Point&gt;, Base_Radius, &lt;Cap_Point&gt;, Cap_Radius
+    [ open ][OBJECT_MODIFIERS...]
+    }
+</pre>
+
+<table class="centered" width="660x" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <img class="center" width="640px" src="images/9/93/RefImgConegeom.gif">
+  </td>
+</tr>
+<tr>
+  <td>
+    <p class="caption">The geometry of a cone.</p>
+  </td>
+</tr>
+</table>
+
+<p>Where <em><code>&lt;Base_Point&gt;</code></em> and <em><code>&lt;
+Cap_Point&gt;</code></em> are vectors defining the x, y, z coordinates of the
+center of the cone's base and cap and <em><code> Base_Radius</code></em>
+and <em><code>Cap_Radius</code></em> are float values for the corresponding
+radii.</p>
+<p>Normally the ends of a cone are closed by flat discs that are parallel to
+each other and perpendicular to the length of the cone. Adding the optional
+keyword <code>open</code> after <em><code>Cap_Radius</code></em> will remove
+the end caps and results in a tapered hollow tube like a megaphone or
+funnel.</p></div>
+
+<a name="r3_5_1_1_4"></a>
+<div class="content-level-h5" contains="Cylinder" id="r3_5_1_1_4">
+<h5>3.5.1.1.4 Cylinder</h5>
+
+
+<p>The <code>cylinder</code> statement creates a finite length cylinder with
+parallel end caps The syntax is:</p>
+<pre>
+CYLINDER:
+  cylinder {
+    &lt;Base_Point&gt;, &lt;Cap_Point&gt;, Radius
+    [ open ][OBJECT_MODIFIERS...]
+    }
+</pre>
+
+<table class="centered" width="660x" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+      <img class="center" width="640px" src="images/1/18/RefImgCylgeom.gif">
+  </td>
+</tr>
+<tr>
+  <td>
+    <p class="caption">The geometry of a cylinder.</p>
+  </td>
+</tr>
+</table>
+
+<p>Where <em><code>&lt;Base_Point&gt;</code></em> and <em><code>
+&lt;Cap_Point&gt;</code></em> are vectors defining the x, y, z coordinates of
+the cylinder's base and cap and <em><code>Radius</code></em> is a float
+value for the radius.</p>
+<p>
+Normally the ends of a cylinder are closed by flat discs that are parallel
+to each other and perpendicular to the length of the cylinder. Adding the
+optional keyword <code>open</code> after the radius will remove the end caps
+and results in a hollow tube.</p></div>
+
+<a name="r3_5_1_1_5"></a>
+<div class="content-level-h5" contains="Height Field" id="r3_5_1_1_5">
+<h5>3.5.1.1.5 Height Field</h5>
+
+
+<p>Height fields are fast, efficient objects that are generally used to
+create mountains or other raised surfaces out of hundreds of triangles in a
+mesh. The <code>height_field</code> statement syntax is:</p>
+<pre>
+HEIGHT_FIELD:
+  height_field {
+    [HF_TYPE] &quot;filename&quot; [gamma GAMMA] [premultiplied BOOL] | [HF_FUNCTION]
+    [HF_MODIFIER...]
+    [OBJECT_MODIFIER...]
+    }
+HF_TYPE:
+  exr | gif | hdr | iff | jpeg | pgm | png | pot | ppm | sys | tga | tiff
+GAMMA:
+  Float_Value | srgb | bt709 | bt2020
+HF_FUNCTION:
+  function FieldResolution_X, FieldResolution_Y { UserDefined_Function }
+HF_MODIFIER:
+  smooth & water_level Level
+OBJECT_MODIFIER:
+  hierarchy [Boolean]
+</pre>
+
+<p>Height_field default values:</p>
+<pre>
+hierarchy   : on
+smooth      : off
+water_level : 0.0
+</pre>
+
+<p>A height field is essentially a one unit wide by one unit long square with
+a mountainous surface on top. The height of the mountain at each point is
+taken from the color number or palette index of the pixels in a graphic image
+file. The maximum height is one, which corresponds to the maximum possible
+color or palette index value in the image file.</p>
+
+<table class="centered" width="660x" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <img class="center" width="640px" src="images/0/0c/RefImgUnhfield.gif">
+  </td>
+</tr>
+<tr>
+  <td>
+    <p class="caption">The size and orientation of an unscaled height field.</p>
+  </td>
+</tr>
+</table>
+
+<p>The mesh of triangles corresponds directly to the pixels in the image
+file. Each square formed by four neighboring pixels is divided into two
+triangles. An image with a resolution of <em><code>N*M</code></em> pixels has
+<em><code>(N-1)*(M-1)</code></em> squares that are divided into <em> <code>
+2*(N-1)*(M-1)</code></em> triangles.</p>
+
+<table class="centered" width="660x" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <img class="center" width="640px" src="images/3/3c/RefImgPixhfld.gif">
+  </td>
+</tr>
+<tr>
+  <td>
+    <p class="caption">Relationship of pixels and triangles in a height field.</p>
+  </td>
+</tr>
+</table>
+
+<p>The resolution of the height field is influenced by two factors: the
+resolution of the image and the resolution of the color/index values. The
+size of the image determines the resolution in the x- and z-direction. A
+larger image uses more triangles and looks smoother. The resolution of the
+color/index value determines the resolution along the y-axis. A height field
+made from an 8-bit image can have 256 different height levels while one made
+from a 16-bit image can have up to 65536 different height levels. Thus the
+second height field will look much smoother in the y-direction if the height
+field is created appropriately.</p>
+<p>
+The size/resolution of the image does not affect the size of the height
+field. The unscaled height field size will always be 1 by 1 by 1. Higher
+resolution image files will create smaller triangles, not larger height
+fields.</p>
+
+<p>The image file type used to create a height field is specified by one of the keywords <a href="r3_5.html#r3_5_1_1_5">listed</a> above. Specifying the file type is optional. If it is not defined the same file type will be assumed as the one that is set as the output file type. This is useful when the source for the <code>height_field</code> is also generated with POV-Ray.</p>
+
+<p>The GIF, PNG, PGM, TIFF and possibly SYS format files are the only
+ones that can be created using a standard paint program. Though there are
+paint programs for creating TGA image files they will not be of much use for
+creating the special 16 bit TGA files used by POV-Ray (see below and
+<a href="r3_4.html#r3_4_1_4">HF_Gray_16</a> for more details).</p>
+<p>
+In an image file that uses a color palette, like GIF, the color number is the
+palette index at a given pixel. Use a paint program to look at the palette of
+a GIF image. The first color is palette index zero, the second is index one,
+the third is index two and so on. The last palette entry is index 255.
+Portions of the image that use low palette entries will result in lower parts
+of the height field. Portions of the image that use higher palette entries
+will result in higher parts of the height field.</p>
+<p>
+Height fields created from GIF files can only have 256 different height
+levels because the maximum number of colors in a GIF file is 256.</p>
+<p>
+The color of the palette entry does not affect the height of the pixel.
+Color entry 0 could be red, blue, black or orange but the height of any pixel
+that uses color entry 0 will always be 0. Color entry 255 could be indigo,
+hot pink, white or sky blue but the height of any pixel that uses color entry
+255 will always be 1.</p>
+<p>
+You can create height field GIF images with a paint program or a fractal program like <em>Fractint</em>.</p>
+<p>
+A POT file is essentially a GIF file with a 16 bit palette. The maximum
+number of colors in a POT file is 65536. This means a POT height field can
+have up to 65536 possible height values. This makes it possible to have much
+smoother height fields.</p>
+<p class="Note"><strong>Note:</strong> The maximum height of the field is still 1
+even though more intermediate values are possible.</p>
+<p> At the time of this writing the only program that created POT files was a freeware MS-Dos/Windows program called <em>Fractint</em>. POT files generated with this fractal program create fantastic landscapes.</p>
+<p>
+The TGA and PPM file formats may be used as a storage device for 16 bit
+numbers rather than an image file. These formats use the red and green bytes
+of each pixel to store the high and low bytes of a height value. These files
+are as smooth as POT files but they must be generated with special
+custom-made programs. Several programs can create TGA heightfields in the
+format POV uses, such as <em>Gforge</em> and <em>Terrain Maker</em>.</p>
+<p>
+PNG format heightfields are usually stored in the form of a grayscale image
+with black corresponding to lower and white to higher parts of the height
+field. Because PNG files can store up to 16 bits in grayscale images they
+will be as smooth as TGA and PPM images. Since they are grayscale images you
+will be able to view them with a regular image viewer. <em>Gforge</em>
+can create 16-bit heightfields in PNG format. Color PNG images will be used
+in the same way as TGA and PPM images.</p>
+<p>
+SYS format is a platform specific file format. See your platform specific
+documentation for details.</p>
+<p>
+In addition to all the usual object modifiers, there are three additional
+height field modifiers available.</p>
+
+<p>The optional <code>water_level</code> parameter may be added after the file
+name. It consists of the keyword <code>water_level</code> followed by a
+float value telling the program to ignore parts of the height field below
+that value. The default value is zero and legal values are between zero and
+one. For example <code>water_level 0.5</code> tells POV-Ray to only render
+the top half of the height field. The other half is <em>below the water</em>
+and could not be seen anyway. Using <code>water_level</code> renders
+faster than cutting off the lower part using CSG or clipping. This term comes
+from the popular use of height fields to render landscapes. A height field
+would be used to create islands and another shape would be used to simulate
+water around the islands. A large portion of the height field would be
+obscured by the water so the <code>water_level</code> parameter was
+introduced to allow the ray-tracer to ignore the unseen parts of the height
+field. <code>water_level</code> is also used to cut away unwanted lower
+values in a height field. For example if you have an image of a fractal on a
+solid colored background, where the background color is palette entry 0, you
+can remove the background in the height field by specifying, <code>
+water_level 0.001</code>.</p>
+
+<p>Normally height fields have a rough, jagged look because they are made of
+lots of flat triangles. Adding the keyword <code>smooth</code> causes
+POV-Ray to modify the surface normal vectors of the triangles in such a way
+that the lighting and shading of the triangles will give a smooth look. This
+may allow you to use a lower resolution file for your height field than would
+otherwise be needed. However, smooth triangles will take longer to render.
+The default value is off.</p>
+
+<p>In order to speed up the intersection tests a one-level bounding hierarchy
+is available. By default it is always used but it can be switched off using
+<code>hierarchy off</code> to improve the rendering speed for small height
+fields (i.e. low resolution images). You may optionally use a boolean value
+such as <code>hierarchy on</code> or <code>hierarchy off</code>.</p>
+<p>While POV-Ray will normally interpret the height field input file as a container of linear data irregardless of file type, this can be overridden for any individual height field input file by specifying <code>gamma</code> GAMMA immediately after the file name. For example:</p>
+<pre>
+height field {
+  jpeg "foobar.jpg" gamma 1.8
+  }
+</pre>
+<p>This will cause POV-Ray to perform gamma adjustment or decoding on the input file data before building the height field. Alternatively to a numerical value, <code>srgb</code> may be specified to denote that the file format is pre-corrected or encoded using the ''sRGB transfer function'' instead of a power-law gamma function. <font class="New">New</font> in version 3.8, other valid special values are <code>bt709</code> and <code>bt2020</code>, denoting that the file is encoded or pre-corrected using the ITU-R BT.709 or BT.2020 transfer function, respectively. See section <a href="t2_3.html#t2_3_4">Gamma Handling</a> for more details.</p>
+<p>The height field object also allows for substituting a <a href="r3_6.html#r3_6_2_1_12">user defined function</a> instead of specifying an image. That function can either be in it's literal form, or it can be a call to a function that you have predeclared. The user supplied parameters <code>FieldResolution_X</code> and <code>FieldResolution_Y</code> are integer values that affect the resolution of the color/index values, <em>not</em> size of the unscaled height field.</p></div>
+
+<a name="r3_5_1_1_6"></a>
+<div class="content-level-h5" contains="Isosurface" id="r3_5_1_1_6">
+<h5>3.5.1.1.6 Isosurface</h5>
+
+
+<p>See the <code>isosurface</code> <a href="t2_3.html#t2_3_3_3">tutorial</a> for more about working with <em>isosurfaces</em>.</p>
+
+<p><font class="New">New</font> in version 3.8 a <code>potential</code> pattern has been added to define a pattern based on the <em>potential</em> field of a <code>blob</code> or <code>isosurface</code> object. See also: <a href="r3_6.html#r3_6_2_4_3">Potential Pattern</a>.</p>
+
+<p>The syntax basics are as follows:</p>
+
+<pre>
+isosurface {
+  function { FUNCTION_ITEMS }
+  [contained_by { SPHERE | BOX }]
+  [threshold FLOAT_VALUE]
+  [accuracy FLOAT_VALUE]
+  [max_gradient FLOAT_VALUE]
+  [evaluate P0, P1, P2]
+  [open]
+  [max_trace INTEGER] | [all_intersections]
+  [polarity on | +VALUE | off | -VALUE] 
+  [OBJECT_MODIFIERS...]
+  }
+</pre>
+
+<p>Isosurface default values:</p>
+<pre>
+contained_by : box{-1,1}
+threshold    : 0.0
+accuracy     : 0.001
+max_gradient : 1.1
+polarity     : off
+</pre>
+
+<p>Since <em>isosurfaces</em> are defined by a user supplied <code>function { ... }</code> it must be specified as the first item of the <code>isosurface</code> statement. Here you place all the mathematical functions that will describe the surface.</p>
+
+<p>The <code>contained_by</code> <em>object</em> limits the area where POV-Ray samples for the surface of the function. This container can either be a <code>sphere</code> or a <code>box</code> both of which use the standard POV-Ray syntax. If nothing is specified a default <code>box</code>, as noted above, will be used. See additional usage examples below:</p>
+
+<pre>
+contained_by { sphere { CENTER, RADIUS } }
+contained_by { box { CORNER1, CORNER2 } }
+</pre>
+
+<p>Using <code>threshold</code> specifies how much strength, or substance to give the <code>isosurface</code>. The surface appears where the <code>function</code> value equals the <code>threshold</code> value. See above for the listed default value.</p>
+
+<p>The <code>isosurface</code> resolver uses a recursive subdivision method. This subdivision goes on until the length of the interval where POV-Ray finds a surface point is less than the specified <code>accuracy</code>. See above for the listed default value. Be aware that smaller values produce more accurate surfaces, but takes longer to render.</p>
+
+<p>POV-Ray can find the first intersecting point between a ray and the <code>isosurface</code> of any continuous function if the maximum gradient of the function is known. To that end you can specify a <code>max_gradient</code> for the function. See above for the listed default value. When the <code>max_gradient</code> used to find the intersecting point is too high, the render slows down considerably. Conversely, when it is too low, artifacts or holes may appear on the isosurface, and in some cases when it is way too low, the surface does not show at all. While rendering the <code>isosurface</code> POV-Ray stores the found gradient values and issues a warning, if these values are either higher or much lower than the specified <code>max_gradient</code> value:</p>
+
+<pre>
+Warning: The maximum gradient found was 5.257, but max_gradient of
+the isosurface was set to 5.000. The isosurface may contain holes!
+Adjust max_gradient to get a proper rendering of the isosurface.
+</pre>
+
+<pre>
+Warning: The maximum gradient found was 5.257, but max_gradient of
+the isosurface was set to 7.000. Adjust max_gradient to
+get a faster rendering of the isosurface.
+</pre>
+
+<p>For best performance you should specify a value close to the real maximum gradient.</p>
+<p><em>Isosurfaces</em> can also dynamically adapt the used <code>max_gradient</code>. To activate this technique you have to specify the <code>evaluate</code> keyword followed by these three parameters:</p>
+
+<ul>
+  <li><strong>P0:</strong> the minimum <code>max_gradient</code> in the estimation process.</li>
+  <li><strong>P1:</strong> an over-estimating factor. That is, the <code>max_gradient</code> is multiplied by the <em>P1</em> parameter.</li>
+  <li><strong>P2:</strong> an attenuation parameter of 1 or less</li>
+</ul>
+
+<p>In this case POV-Ray starts with the <code>max_gradient</code> value <em>P0</em> and dynamically changes it during the render using <em>P1</em> and <em>P2</em>. In the evaluation process, the <em>P1</em> and <em>P2</em> parameters are used in
+quadratic functions. This means that over-estimation increases more rapidly with higher values and attenuates more rapidly with lower values. It should also be noted that when using dynamic <code>max_gradient</code>, there can be artifacts or holes.</p>
+
+<p>If you are unsure what values to use, just start a render <em>without</em> using <code>evaluate</code> to get a value for the <code>max_gradient</code>, then use that value with <code>evaluate</code> like this:</p>
+
+<ul>
+  <li><strong>P0:</strong> <code>max_gradient * Min_Factor</code></li>
+  <li><strong>P1:</strong> <code>sqrt(max_gradient/(max_gradient * Min_Factor))</code></li>
+  <li><strong>P2:</strong> should be 1 or less use 0.7 as a good starting point.</li>
+</ul>
+
+<p>Where <em>Min_Factor</em> is a float between 0 and 1 to reduce the <code>max_gradient</code> to a <em>minimum</em> <code>max_gradient</code>. The ideal value for <em>P0</em> would be the average of the found maximum gradients, but we do not
+have access to that information. A good starting point for <em>Min_Factor</em> is 0.6</p>
+
+<p>If there are artifacts or holes in the <code>isosurface</code>, you can just increase <em>Min_Factor</em> and / or <em>P2</em>. For Example: when the first run gives a <em>found</em> <code>max_gradient</code> of 356, start with:</p>
+<pre>
+#declare Min_factor= 0.6;
+isosurface {
+  ...
+  evaluate 356*Min_factor,  sqrt(356/(356*Min_factor)),  0.7
+  //evaluate 213.6, 1.29, 0.7
+  ...
+  }
+</pre>
+
+<p>This method is only an approximation of what happens internally, but it gives faster rendering speeds with the majority of <em>isosurfaces</em>.</p>
+
+<p>When the <code>isosurface</code> is not fully contained within the <code>contained_by</code> object, there will be a cross section. When this happens, you will see the surface of the container. Using the <code>open</code> keyword, these cross section surfaces are removed, and the inside of the <code>isosurface</code> becomes visible.</p>
+
+<p class="Note"><strong>Note:</strong> Using <code>open</code> slows down the render speed, and it is not recommended for use with CSG operations.</p>
+
+<p><em>Isosurfaces</em> can be used in CSG shapes since they are solid finite objects - if not finite by themselves, they are through the cross section with the container. By default POV-Ray searches only for the first surface which the ray intersects. However, when using an <code>isosurface</code> in CSG operations, the other surfaces must also be found. Consequently, the keyword <code>max_trace</code> followed by an integer value, must be added to the <code>isosurface</code> statement. To check for all surfaces, use the keyword <code>all_intersections</code> instead. With <code>max_trace</code> it only checks until that number is reached.</p>
+<p class="Note"><strong>Note:</strong> The current implementation has a <em>limit</em> of 10 <em>intersections</em> in all cases.</p>
+<p>By default, the inside of an <code>isosurface</code> is defined as the set of all points inside the <code>contained_by</code> shape where the function values are below the threshold. <font class="New">New</font> in version 3.8 this can be changed via the <code>polarity</code> keyword. Specifying a <em>positive</em> setting or <code>on</code> will instead cause function values <em>above</em> the threshold to be considered inside. Specifying a <em>negative</em> setting or <code>off</code> will give the default behavior.</div>
+
+<a name="r3_5_1_1_7"></a>
+<div class="content-level-h5" contains="Julia Fractal" id="r3_5_1_1_7">
+<h5>3.5.1.1.7 Julia Fractal</h5>
+
+
+<p>A <em>julia fractal</em> object is a 3-D <em>slice</em> of a 4-D object
+created by generalizing the process used to create the classic Julia sets.
+You can make a wide variety of strange objects using the <code>
+julia_fractal</code> statement including some that look like bizarre blobs of
+twisted taffy. The <code>julia_fractal</code> syntax is:</p>
+<pre>
+JULIA_FRACTAL:
+  julia_fractal {
+    &lt;4D_Julia_Parameter&gt;
+    [JF_ITEM...] [OBJECT_MODIFIER...]
+    }
+JF_ITEM:
+  ALGEBRA_TYPE | FUNCTION_TYPE | max_iteration Count |
+  precision Amt | slice &lt;4D_Normal&gt;, Distance
+ALGEBRA_TYPE:
+  quaternion | hypercomplex
+FUNCTION_TYPE:
+  QUATERNATION: 
+    sqr | cube
+  HYPERCOMPLEX:
+    sqr | cube | exp | reciprocal | sin | asin | sinh |
+    asinh | cos | acos | cosh | acosh | tan | atan |tanh |
+    atanh | ln | pwr( X_Val, Y_Val )
+</pre>
+
+<p>Julia Fractal default values:</p>
+<pre>
+ALGEBRA_TYPE    : quaternion
+FUNCTION_TYPE   : sqr
+max_iteration   : 20
+precision       : 20
+slice, DISTANCE : &lt;0,0,0,1&gt;, 0.0
+</pre>
+
+<p>The required 4-D vector <em><code>&lt;4D_Julia_Parameter&gt;</code></em>
+is the classic Julia parameter <em><code>p</code></em> in the iterated
+formula <em><code>f(h) + p</code></em>. The julia fractal object is
+calculated by using an algorithm that determines whether an arbitrary point
+<em><code>h(0)</code></em> in 4-D space is inside or outside the object. The
+algorithm requires generating the sequence of vectors <em><code>h(0), h(1),
+...</code></em> by iterating the formula <em><code>h(n+1) = f(h(n)) + p (n =
+0, 1, ..., max_iteration-1)</code></em> where <em><code> p</code></em> is the
+fixed 4-D vector parameter of the julia fractal and <em><code>f()</code></em>
+is one of the functions <code>sqr</code>, <code> cube</code>, ... specified
+by the presence of the corresponding keyword. The point <em><code>
+h(0)</code></em> that begins the sequence is considered inside the julia
+fractal object if none of the vectors in the sequence escapes a hypersphere
+of radius 4 about the origin before the iteration number reaches the integer
+<code>max_iteration</code> value. As you increase <code>max_iteration</code>,
+some points escape that did not previously escape, forming the julia fractal.
+Depending on the <em><code> &lt;4D_Julia_Parameter&gt;</code></em>, the julia
+fractal object is not necessarily connected; it may be scattered fractal
+dust. Using a low <code> max_iteration</code> can fuse together the dust to
+make a solid object. A high <code>max_iteration</code> is more accurate but
+slows rendering. Even though it is not accurate, the solid shapes you get
+with a low <code>max_iteration</code> value can be quite interesting. If
+none is specified, the default is <code>max_iteration 20</code>.</p>
+
+<p>Since the mathematical object described by this algorithm is four-dimensional
+and POV-Ray renders three dimensional objects, there must be a way to reduce
+the number of dimensions of the object from four dimensions to three. This is
+accomplished by intersecting the 4-D fractal with a 3-D plane defined by the <code>slice</code> modifier and then projecting the
+intersection to 3-D space. The keyword is followed by 4-D vector and a float
+separated by a comma. The slice plane is the 3-D space that is perpendicular
+to <em><code> &lt;4D_Normal&gt;</code></em> and is <em><code>
+Distance</code></em> units from the origin. Zero length <em><code>
+&lt;4D_Normal&gt;</code></em> vectors or a <em><code>
+&lt;4D_Normal&gt;</code></em> vector with a zero fourth component are
+illegal. If none is specified, the default is <code> slice
+&lt;0,0,0,1&gt;,0</code>.</p>
+<p>
+You can get a good feel for the four dimensional nature of a julia fractal by
+using POV-Ray's animation feature to vary a slice's <em><code>
+Distance</code></em> parameter. You can make the julia fractal appear from
+nothing, grow, then shrink to nothing as <em><code>
+Distance</code></em> changes, much as the cross section of a 3-D object
+changes as it passes through a plane.</p>
+
+<p>The <code> precision</code> parameter is a tolerance used in the
+determination of whether points are inside or outside the fractal object.
+Larger values give more accurate results but slower rendering. Use as low a
+value as you can without visibly degrading the fractal object's
+appearance but note values less than 1.0 are clipped at 1.0. The default if
+none is specified is <code>precision 20</code>.</p>
+
+<p>The presence of the keywords <code> quaternion</code> or <code>
+hypercomplex</code> determine which 4-D algebra is used to calculate the
+fractal. The default is <code>quaternion</code>. Both are 4-D generalizations
+of the complex numbers but neither satisfies all the field properties (all
+the properties of real and complex numbers that many of us slept through in
+high school). Quaternions have non-commutative multiplication and
+hypercomplex numbers can fail to have a multiplicative inverse for some
+non-zero elements (it has been proved that you cannot successfully generalize
+complex numbers to four dimensions with all the field properties intact, so
+something has to break). Both of these algebras were discovered in the 19th
+century. Of the two, the quaternions are much better known, but one can argue
+that hypercomplex numbers are more useful for our purposes, since complex
+valued functions such as sin, cos, etc. can be generalized to work for
+hypercomplex numbers in a uniform way.</p>
+<p>
+For the mathematically curious, the algebraic properties of these two
+algebras can be derived from the multiplication properties of the unit basis
+vectors 1 = &lt;1,0,0,0&gt;, i=&lt; 0,1,0,0&gt;, j=&lt;0,0,1,0&gt; and k=&lt;
+0,0,0,1&gt;. In both algebras 1 x = x 1 = x for any x (1 is the
+multiplicative identity). The basis vectors 1 and i behave exactly like the
+familiar complex numbers 1 and i in both algebras.</p>
+
+<table SUMMARY="Quaternion basis vector multiplication rules" width="75%">
+<tr>
+<td width="33%"><code>ij = k</code></td>
+<td width="33%"><code>jk = i</code></td>
+<td width="33%"><code>ki = j</code></td>
+</tr>
+
+<tr>
+<td><code>ji = -k</code></td>
+<td><code>kj = -i</code></td>
+<td><code>ik = -j</code></td>
+</tr>
+
+<tr>
+<td><code>ii = jj = kk = -1</code></td>
+<td><code>ijk = -1</code></td>
+<td>&nbsp;&nbsp;&nbsp;</td>
+</tr>
+</table>
+
+<table SUMMARY="Hypercomplex basis vector multiplication rules" width="75%">
+<tr>
+<td width="33%"><code>ij = k</code></td>
+<td width="33%"><code>jk = -i</code></td>
+<td width="33%"><code>ki = -j</code></td>
+</tr>
+
+<tr>
+<td><code>ji = k</code></td>
+<td><code>kj = -i</code></td>
+<td><code>ik = -j</code></td>
+</tr>
+
+<tr>
+<td><code>ii = jj = kk = -1</code></td>
+<td><code>ijk = 1</code></td>
+<td>&nbsp;&nbsp;&nbsp;</td>
+</tr>
+</table>
+
+<p>A distance estimation calculation is used with the quaternion calculations
+to speed them up. The proof that this distance estimation formula works does
+not generalize from two to four dimensions but the formula seems to work well
+anyway, the absence of proof notwithstanding!</p>
+
+<p>The presence of one of the function keywords <code>sqr</code>, <code>
+cube</code>, etc. determines which function is used for <em><code>
+f(h)</code></em> in the iteration formula <em> <code>h(n+1) = f(h(n)) +
+p</code></em>. The default is <code>sqr.</code> Most of the function keywords
+work only if the <code>hypercomplex</code> keyword is present. Only <code>
+sqr</code> and <code>cube</code> work with <code> quaternion</code>. The
+functions are all familiar complex functions generalized to four dimensions.
+Function Keyword Maps 4-D value h to:</p>
+
+<table SUMMARY="Function Keyword Maps 4-D value of h" width="75%">
+<tr>
+<td width="30%"><code>sqr</code></td>
+<td width="70%">h*h</td>
+</tr>
+
+<tr>
+<td><code>cube</code></td>
+<td>h*h*h</td>
+</tr>
+
+<tr>
+<td><code>exp</code></td>
+<td>e raised to the power h</td>
+</tr>
+
+<tr>
+<td><code>reciprocal</code></td>
+<td>1/h</td>
+</tr>
+
+<tr>
+<td><code>sin</code></td>
+<td>sine of h</td>
+</tr>
+
+<tr>
+<td><code>asin</code></td>
+<td>arcsine of h</td>
+</tr>
+
+<tr>
+<td><code>sinh</code></td>
+<td>hyperbolic sine of h</td>
+</tr>
+
+<tr>
+<td><code>asinh</code></td>
+<td>inverse hyperbolic sine of h</td>
+</tr>
+
+<tr>
+<td><code>cos</code></td>
+<td>cosine of h</td>
+</tr>
+
+<tr>
+<td><code>acos</code></td>
+<td>arccosine of h</td>
+</tr>
+
+<tr>
+<td><code>cosh</code></td>
+<td>hyperbolic cos of h</td>
+</tr>
+
+<tr>
+<td><code>acosh</code></td>
+<td>inverse hyperbolic cosine of h</td>
+</tr>
+
+<tr>
+<td><code>tan</code></td>
+<td>tangent of h</td>
+</tr>
+
+<tr>
+<td><code>atan</code></td>
+<td>arctangent of h</td>
+</tr>
+
+<tr>
+<td><code>tanh</code></td>
+<td>hyperbolic tangent of h</td>
+</tr>
+
+<tr>
+<td><code>atanh</code></td>
+<td>inverse hyperbolic tangent of h</td>
+</tr>
+
+<tr>
+<td><code>ln</code></td>
+<td>natural logarithm of h</td>
+</tr>
+
+<tr>
+<td><code>pwr(x,y)</code></td>
+<td>h raised to the complex power x+iy</td>
+</tr>
+</table>
+
+<p>A simple example of a julia fractal object is:</p>
+<pre>
+julia_fractal {
+  &lt;-0.083,0.0,-0.83,-0.025&gt;
+  quaternion
+  sqr
+  max_iteration 8
+  precision 15
+  }
+</pre>
+
+<p>The first renderings of julia fractals using quaternions were done by Alan
+Norton and later by John Hart in the '80's. This POV-Ray
+implementation follows <em>Fractint</em> in pushing beyond what is known
+in the literature by using hypercomplex numbers and by generalizing the
+iterating formula to use a variety of transcendental functions instead of
+just the classic Mandelbrot <em>z2 + c</em> formula. With an extra two
+dimensions and eighteen functions to work with, intrepid explorers should be
+able to locate some new fractal beasts in hyperspace, so have at it!</p></div>
+
+<a name="r3_5_1_1_8"></a>
+<div class="content-level-h5" contains="Lathe" id="r3_5_1_1_8">
+<h5>3.5.1.1.8 Lathe</h5>
+
+
+<p>The <code>lathe</code> is an object generated from rotating a two-dimensional curve about an axis. This curve is defined by a set of points which are connected by linear, quadratic, cubic or bezier spline curves. The syntax is:</p>
+<pre>
+LATHE:
+  lathe {
+    [SPLINE_TYPE] Number_Of_Points, &lt;Point_1&gt;
+    &lt;Point_2&gt;... &lt;Point_n&gt;
+    [LATHE_MODIFIER...]
+    }
+SPLINE_TYPE:
+  linear_spline | quadratic_spline | cubic_spline | bezier_spline
+LATHE_MODIFIER:
+  sturm | OBJECT_MODIFIER
+</pre>
+
+<p>Lathe default values:</p>
+<pre>
+SPLINE_TYPE   : linear_spline
+sturm         : off
+</pre>
+
+<p>The first item is a keyword specifying the type of spline. The default if none is specified is <code>linear_spline</code>. The required integer value <em><code>Number_Of_Points</code></em> specifies how many two-dimensional points are used to define the curve. The points follow and are specified by 2-D vectors. The curve is not automatically closed, i.e. the first and last
+points are not automatically connected. You will have to do this yourself if you want a closed curve. The curve thus defined is rotated about the y-axis to form the lathe object, centered at the origin.</p>
+<p>The following example creates a simple lathe object that looks like a thick cylinder, i.e. a cylinder with a thick wall:</p>
+<pre>
+lathe {
+  linear_spline
+  5,
+  &lt;2, 0&gt;, &lt;3, 0&gt;, &lt;3, 5&gt;, &lt;2, 5&gt;, &lt;2, 0&gt;
+  pigment {Red}
+  }
+</pre>
+
+<p>The cylinder has an inner radius of 2 and an outer radius of 3, giving a wall width of 1. It's height is 5 and it's located at the origin pointing up, i.e. the rotation axis is the y-axis.</p>
+<p class="Note"><strong>Note:</strong> The first and last point are equal to get a closed curve.</p>
+<p>The splines that are used by the lathe and prism objects are a little bit difficult to understand. The basic concept of splines is to draw a curve through a given set of points in a determined way. The default <code>linear_spline</code> is the simplest spline because it's nothing more than connecting consecutive points with a line. This means the curve that is drawn between two points only depends on those two points. No additional information is taken into account. The other splines are different in that they do take other points into account when connecting two points. This creates a smooth curve and, in the case of the cubic spline, produces smoother transitions at each point.</p>
+
+<p>The <code>quadratic_spline</code> keyword creates splines that are made of quadratic curves. Each of them connects two consecutive points. Since those two points (call them second and third point) are not sufficient to describe a quadratic curve, the predecessor of the second point is taken into account when the curve is drawn. Mathematically, the relationship (their relative locations on the 2-D plane) between the first and second point determines the slope of the curve at the second point. The slope of the curve at the third point is out of control. Thus quadratic splines look much smoother than linear splines but
+the transitions at each point are generally not smooth because the slopes on both sides of the point are different.</p>
+
+<p>The <code>cubic_spline</code> keyword creates splines which overcome the transition problem of quadratic splines because they also take a fourth point into account when drawing the curve between the second and third point. The slope at the fourth point is under control now and allows a smooth transition at each point. Thus cubic splines produce the most flexible and
+smooth curves.</p>
+
+<p>The <code>bezier_spline</code> is an alternate kind of cubic spline. Points 1 and 4 specify the end points of a segment and points 2 and 3 are control points which specify the slope at the endpoints. Points 2 and 3 do not actually lie on the spline. They adjust the slope of the spline. If you draw an imaginary line between point 1 and 2, it represents the slope at point 1.
+It is a line tangent to the curve at point 1. The greater the distance between 1 and 2, the flatter the curve. With a short tangent the spline can bend more. The same holds true for control point 3 and endpoint 4. If you want the spline to be smooth between segments, points 3 and 4 on one segment and points 1 and 2 on the next segment must form a straight line and point 4 of one segment must be the same as point 1 on the next segment.</p>
+<p>You should note that the number of spline segments, i. e. curves between two points, depends on the spline type used. For linear splines you get n-1 segments connecting the points P[i], i=1,...,n. A quadratic spline gives you n-2 segments because the last point is only used for determining the slope, as explained above (thus you will need at least three points to define a
+quadratic spline). The same holds for cubic splines where you get n-3 segments with the first and last point used only for slope calculations (thus needing at least four points). The bezier spline requires 4 points per segment, creating n/4 segments.</p>
+<p>If you want to get a closed quadratic and cubic spline with smooth transitions at the end points you have to make sure that in the cubic case P[n-1] = P[2] (to get a closed curve), P[n] = P[3] and P[n-2] = P[1] (to smooth the transition). In the quadratic case P[n-1] = P[1] (to close the curve) and P[n] = P[2].</p>
+<p>The surface normal determination for lathes depends upon the order in which the splines points are specified.  The following code will render with the color Red on the outside and the color Blue on the inside.</p>
+<pre>
+#declare Lathe_InitialOrder = lathe {
+    bezier_spline
+    16,
+    &lt;0.45,0&gt;,&lt;0.45,0.0828427&gt;,&lt;0.382843,0.15&gt;,&lt;0.3,0.15&gt;
+    &lt;0.3,0.15&gt;,&lt;0.217157,0.15&gt;,&lt;0.15,0.0828427&gt;,&lt;0.15,0&gt;
+    &lt;0.15,0&gt;,&lt;0.15,-0.0828427&gt;,&lt;0.217157,-0.15&gt;,&lt;0.3,-0.15&gt;
+    &lt;0.3,-0.15&gt;,&lt;0.382843,-0.15&gt;,&lt;0.45,-0.0828427&gt;,&lt;0.45,0&gt;
+    sturm
+    texture          { pigment { Red } }
+    interior_texture { pigment { Blue } }
+}
+</pre>
+<p>While the following example will render inside-out, with the color Blue on the outside and the color Red on the inside.</p>
+<pre>
+#declare Lathe_ReverseOrder = lathe {
+    bezier_spline
+    16,
+    &lt;0.45,0&gt;,&lt;0.45,-0.0828427&gt;,&lt;0.382843,-0.15&gt;,&lt;0.3,-0.15&gt;
+    &lt;0.3,-0.15&gt;,&lt;0.217157,-0.15&gt;,&lt;0.15,-0.0828427&gt;,&lt;0.15,0&gt;
+    &lt;0.15,0&gt;,&lt;0.15,0.0828427&gt;,&lt;0.217157,0.15&gt;,&lt;0.3,0.15&gt;
+    &lt;0.3,0.15&gt;,&lt;0.382843,0.15&gt;,&lt;0.45,0.0828427&gt;,&lt;0.45,0&gt;
+    sturm
+    texture          { pigment { Red } }
+    interior_texture { pigment { Blue } }
+}
+</pre>
+<p>The actual normal determination is more complicated for complex splines. If the surface normal is important to the visual result, it is best to check how the lathe is being rendered by testing with substantially different inside and outside textures.</p>
+<p class="Note"><strong>Note:</strong> With the bezier spline, unlike all the other spline types used with the lathe, it is possible to create independent closed curves within a single lathe definition.</p>
+
+<p>If additional accuracy is required you can add the <code><a href="r3_5.html#r3_5_1_5_11">sturm</a></code> object modifier.</p></div>
+
+<a name="r3_5_1_1_9"></a>
+<div class="content-level-h5" contains="Lemon" id="r3_5_1_1_9">
+<h5>3.5.1.1.9 Lemon</h5>
+<table class="left" width="700px" cellpadding="0" cellspacing="20">
+<tr>
+  <td>
+    <p><font class="New">New</font> to version 3.8 the <code>lemon</code> object has been added. It is similar to the <code>cone</code> in that it's basically described the same way but with these differences:</p>
+    <ul>
+      <li>end points are connected along their axis via the revolution surface that's generated by the circular arc of the <em>Inner_Radius</em></li>
+      <li>for the minimal value of <em>Inner_Radius</em> the surface is a spherical segment where the center of the arc lies along the end points axis</li>
+      <li>with larger values for <em>Inner_Radius</em> the surface is the inner part of a self intersecting torus or <a href="https://en.wikipedia.org/wiki/Frustum">frustum</a></li>
+      <li>if the given <em>Inner_Radius</em> is too small the minimal value is used instead and a warning is issued</li>
+      <li><em>both</em> or <em>either</em> of the end points radii can be zero</li>
+    </ul>
+  </td>
+  <td>
+    <img class="centered" width="220px" src="images/5/51/RefImgLemon.png">
+  </td>
+</tr>
+<tr>
+  <td>
+  </td>
+  <td>
+    <p class="caption">example lemon objects</p>
+  </td>
+</tr>
+</table>
+<p class="Note"><strong>Note:</strong> The minimal <em>Inner_Radius</em> value is defined as: sqrt ( Radius<sup>2</sup> + ( DistanceBetweenEndPoints/2 )<sup>2</sup> )</p>
+<p>The syntax is as follows:</p>
+<pre>
+lemon { 
+    &lt;Base_Point&gt;, Base_Radius, &lt;Cap_Point&gt;, Cap_Radius, Inner_Radius
+    [LEMON_MODIFIERS]
+  }
+
+LEMON_MODIFIERS:
+  sturm | open | OBJECT_MODIFIER
+
+</pre>
+
+<p>The following example produced the above image:</p>
+<pre>
+#version 3.8;
+global_settings { assumed_gamma 1.0 }
+
+camera {
+  location -560*z
+  direction z
+  up y
+  rotate x*20
+  right image_width*x/image_height
+  angle 5
+  }
+
+#include "colors.inc"
+
+#macro LightSource (LightColor)
+  light_source { &lt;0,0,-200&gt;, LightColor area_light x*15, z*15 20,20 adaptive 1 jitter orient circular }
+#end
+
+background { White }
+plane { y,-20 pigment { White } }
+
+object { LightSource (1.0) rotate x*40 }
+object { LightSource (0.8) rotate x*-40 rotate y*330 }
+object { LightSource (1.2) rotate x*80 rotate y*210 }
+
+lemon { &lt;0,-20,0&gt;, 0, &lt;0,20,0&gt;, 0, 30
+  texture { pigment { color srgb &lt;1,0,0&gt; }}
+  translate x*-12
+  sturm
+  }
+  
+lemon { &lt;0,0,0&gt;, 5, &lt;0,-20,0&gt;, 0, 15
+  texture { pigment { color srgb &lt;0,1,0&gt; }}
+  translate y*10
+  translate &lt;3,-10,-10&gt;
+  sturm
+  }
+  
+lemon { &lt;0,0,0&gt;, 5, &lt;0,-20,0&gt;, 5, 15
+  open
+  texture { pigment { color srgb &lt;0,0,1&gt; }}
+  interior_texture { pigment { srgb &lt;1,1,0&gt; }}
+  translate y*10
+  translate &lt;12,2,12&gt;
+  sturm
+  }
+</pre>
+<p>If additional accuracy is required you can add the <code><a href="r3_5.html#r3_5_1_5_11">sturm</a></code> object modifier.</p>
+<p>See also the <code><a href="r3_5.html#r3_5_1_1_3">cone</a></code> object.</p></div>
+
+<a name="r3_5_1_1_10"></a>
+<div class="content-level-h5" contains="Ovus" id="r3_5_1_1_10">
+<h5>3.5.1.1.10 Ovus</h5>
+
+
+<p>An <code>ovus</code> is a shape that looks like an egg. A <font class="Change">Change</font> in version 3.8 has extended the syntax of the <code>ovus</code> object by adding <code>radius</code>, <code>distance</code> and <code>precision</code> controls.</p>
+<p>The syntax is as follows:</p>
+<pre>
+ovus {
+  Bottom_radius, Top_radius [radius Inner_radius] [distance Vertical_distance] [precision Root_tolerance]
+  [OBJECT_MODIFIERS...] 
+  }
+</pre>
+
+<p>Where <em>Bottom_radius</em> is a float value giving the radius of the bottom sphere and <em>Top_radius</em> is a float specifying the radius of the top sphere. The top and bottom spheres are connected together with a suitably truncated lemon, or self intersection of a torus, that is automatically computed so as to provide the needed continuity to the shape. The <code>distance</code> is a float value that represents the length between the center of the two spheres, defaulting to <em>Bottom_radius</em>. The <code>radius</code> float value represents the inner circle of the connecting torus and it's default is twice the greater of either <em>Top_radius</em> or <em>Bottom_radius</em>. The <code>precision</code> float value is the tolerance used for the root solving of the connecting torus, and it's default is <code>1e-4</code>. If additional accuracy is required you can now add the <code><a href="r3_5.html#r3_5_1_5_11">sturm</a></code> object modifier.</p>
+
+<table class="centered" width="700px" cellpadding="0" cellspacing="10">
+<tr>
+  <td><img class="left" width="125px" src="images/1/12/RefImgOvus2D.png"></td>
+  <td>
+    <ul>
+      <li>The center of the top sphere lies on the top of the bottom sphere</li>
+      <li>The bottom sphere of the <code>ovus</code> is centered at the origin</li>
+      <li>The top sphere of the <code>ovus</code> lies on the y-axis</li>
+      <li>The minor radius of the lemon is twice the largest radius</li>
+      <li>The <code>distance</code> <em>must</em> be greater than or equal to <em>Bottom_radius</em></li>
+      <li>The <code>radius</code> <em>must</em> be greater than or equal to half the sum of <em>Bottom_radius</em>, <em>Top_radius</em> and <em>Vertical_distance</em></li>
+    </ul>
+  </td>
+</tr>
+<tr>
+  <td><p class="caption">An ovus 2D section</p></td>
+  <td></td>
+</tr>
+</table>
+
+<table class="centered" width="640px" cellpadding="0" cellspacing="10">
+<tr>
+  <td><img class="centered" width="620px" src="images/7/72/RefImgOvus3D.png"></td>
+</tr>
+<tr>
+  <td><p class="caption">The ovus and it's constituent 3D shapes</p></td>
+</tr>
+</table>
+
+<p class="Note"><strong>Note:</strong> According to the ratio of the radius, the pointy part is the smallest radius, but is <em>not</em> always on top!</p>
+
+<table class="centered" width="690px" cellpadding="0" cellspacing="10">
+<tr>
+  <td><img class="centered" width="670px" src="images/4/46/RefImgDemoOvus.jpg"></td>
+</tr>
+<tr>
+  <td><p class="caption">Evolution of ratio from 0 to 1.95 in 0.15 steps.</p></td>
+</tr>
+</table>
+
+<p>See also: <a href="r3_6.html#r3_6_1_7_1">UV Mapping</a>.</p>
+
+<p class="Note"><strong>Note:</strong> See the following <em>MathWorld</em> references for more information about the math behind how the <code>ovus</code> object is constructed.</p>
+<ul>
+  <li><a href="http://mathworld.wolfram.com/Torus.html">Torus</a></li>
+  <li><a href="http://mathworld.wolfram.com/Lemon.html">Lemon</a></li>
+  <li><a href="http://mathworld.wolfram.com/SpindleTorus.html">SpindleTorus</a></li>
+</ul></div>
+
+<a name="r3_5_1_1_11"></a>
+<div class="content-level-h5" contains="Parametric" id="r3_5_1_1_11">
+<h5>3.5.1.1.11 Parametric</h5>
+
+
+<p>While the <code>isosurface</code> object uses implicit surface functions like <strong><em>F(x,y,z) = 0</em></strong> the <code>parametric</code> object uses is a set of equations for a surface expressed in the form of the parameters that locate points on the surface. For example: <code>x(u,v)</code>, <code>y(u,v)</code>, <code>z(u,v)</code>. Each of the pairs of values for <code>u</code> and <code>v</code> gives a single point <code>&lt;x,y,z&gt;</code> in 3d space.</p>
+
+<p>The <code>parametric</code> object is not a solid it is <em>hollow</em>, like a thin shell. The syntax is as follows:</p>
+<pre>
+parametric {
+  function { FUNCTION_ITEMS },
+  function { FUNCTION_ITEMS },
+  function { FUNCTION_ITEMS }
+  
+  &lt;u1,v1&gt;, &lt;u2,v2&gt;
+  [contained_by { SPHERE | BOX }]
+  [max_gradient FLOAT_VALUE]
+  [accuracy FLOAT_VALUE]
+  [precompute DEPTH, VarList]
+  }
+</pre>
+
+<p>The default values are:</p>
+<pre>
+accuracy     : 0.001
+contained_by : box {&lt;-1,-1,-1&gt;, &lt;1,1,1&gt;} 
+</pre>
+<ol>
+  <li>The first function calculates the <code>x</code> value of the surface, the second <code>y</code> and the third the <code>z</code> value. Any function that results in a float is allowed.</li>
+  <li>The <code>&lt;u1,v1&gt;</code> and the <code>&lt;u2,v2&gt;</code> boundaries of the <code>(u,v)</code> space, in which the surface <em>has</em> to be calculated.</li>
+  <li>The <code>contained_by</code> <em>object</em> limits the area where POV-Ray samples for the surface of the function. The container can either be a <code>sphere</code> or a <code>box</code>.</li>
+  <li>The <code>max_gradient</code> is the maximum magnitude of all six partial derivatives over the specified ranges of u and v.</li>
+  <ol type="a">
+    <li>Take <code>dx/du</code>, <code>dx/dv</code>, <code>dy/du</code>, <code>dy/dv</code>, <code>dz/du</code>, and <code>dz/dv</code> and calculate them over the entire range</li>
+    <li>The <code>max_gradient</code> should be at least the maximum (absolute value) of all of those values.</li>
+    <li>Choosing a <em>too small</em> of a value will create holes or artifacts in the object.</li>
+  </ol>
+  <li>For <code>accuracy</code> smaller values produces more accurate surfaces, but take longer to render.</li>
+  <li>Using <code>precompute</code> can speedup the rendering of parametric surfaces by simply dividing the parametric surfaces into smaller ones</li>
+    <ol type="a">
+      <li>The maximum value for <em>DEPTH</em> is 20. High values of depth can produce arrays that use a lot of memory, take longer to parse and render.</li>
+      <li>It <em>precomputes</em> the ranges for the <em>VarList</em> variables (x,y,z)</li>
+      <li>If you declare a <code>parametric</code> surface using <code>precompute</code> and then use it twice, all arrays are in memory only once.</li>
+    </ol> 
+</ol>
+<p>Example, a unit sphere:</p>
+<pre>
+parametric {
+  function { sin(u)*cos(v) }
+  function { sin(u)*sin(v) }
+  function { cos(u) }
+
+  &lt;0,0&gt;, &lt;2*pi,pi&gt;
+  contained_by { sphere{0, 1.1} }
+  max_gradient ??
+  accuracy 0.0001
+  precompute 10 x,y,z
+  pigment {rgb 1}
+  }
+</pre></div>
+
+<a name="r3_5_1_1_12"></a>
+<div class="content-level-h5" contains="Prism" id="r3_5_1_1_12">
+<h5>3.5.1.1.12 Prism</h5>
+
+
+<p>The <code>prism</code> is an object generated by specifying one or more two-dimensional, closed curves in the x-z plane and sweeping them along y axis. These curves are defined by a set of points which are connected by linear, quadratic, cubic or bezier splines.</p>
+<p>The syntax for the prism is:</p>
+<pre>
+PRISM:
+  prism {
+    [PRISM_ITEMS...] Height_1, Height_2, Number_Of_Points,
+    &lt;Point_1&gt;, &lt;Point_2&gt;, ... &lt;Point_n&gt;
+    [ open ] [PRISM_MODIFIERS...]
+    }
+PRISM_ITEM:
+  linear_spline | quadratic_spline | cubic_spline |
+  bezier_spline | linear_sweep | conic_sweep
+PRISM_MODIFIER:
+  sturm | OBJECT_MODIFIER
+</pre>
+<p>Prism default values:</p>
+<pre>
+SPLINE_TYPE   : linear_spline
+SWEEP_TYPE    : linear_sweep
+sturm         : off
+</pre>
+<p>The first items specify the spline type and sweep type. The defaults if none is specified is <code>linear_spline</code> and <code> linear_sweep</code>. This is followed by two float values <em><code>Height_1</code></em> and <em> <code>Height_2</code></em> which are the y
+coordinates of the top and bottom of the prism. This is followed by a float value specifying the number of 2-D points you will use to define the prism.This includes all control points needed for quadratic, cubic and bezier splines. This is followed by the specified number of 2-D vectors which define the shape in the x-z plane.</p>
+<p>The interpretation of the points depends on the spline type. The prism object allows you to use any number of sub-prisms inside one prism statement, they are of the same spline and sweep type. Wherever an even number of sub-prisms overlaps a hole appears.</p>
+<p class="Note"><strong>Note:</strong> You need not have multiple sub-prisms and they need not overlap as in the following examples.</p>
+<p>In the <code>linear_spline</code> the first point specified is the start of the first sub-prism. The following points are connected by straight lines. If you specify a value identical to the first point, this closes the sub-prism and next point starts a new one. When you specify the value of that sub-prism's start, then it is closed. Each of the sub-prisms has to be closed by repeating the first point of a sub-prism at the end of the sub-prism's point sequence.</p>
+<p>In the following example, there are two rectangular sub-prisms nested inside each other to create a frame.</p>
+<pre>
+prism {
+  linear_spline
+  0, 1, 10,
+  &lt;0,0&gt;, &lt;6,0&gt;, &lt;6,8&gt;, &lt;0,8&gt;, &lt;0,0&gt;,  //outer rim
+  &lt;1,1&gt;, &lt;5,1&gt;, &lt;5,7&gt;, &lt;1,7&gt;, &lt;1,1&gt;   //inner rim
+  }
+</pre>
+<p>The last sub-prism of a linear spline prism is automatically closed, just like the last sub-polygon in the polygon statement, if the first and last point of the sub-polygon's point sequence are not the same. This makes it very easy to convert between polygons and prisms. Quadratic, cubic and bezier splines are <em>never</em> automatically closed.</p>
+<p>In the <code> quadratic_spline</code>, each sub-prism needs an additional control point at the beginning of each sub-prisms point sequence to determine the slope at the start of the curve. The first point specified is the control point which is not actually part of the spline. The second point is the start of the spline. The sub-prism ends when this second point is duplicated. The next point is the control point of the next sub-prism. The point after that is the first point of the second sub-prism.</p>
+<p>Here is an example:</p>
+<pre>
+prism {
+  quadratic_spline
+  0, 1, 12,
+  &lt;1,-1&gt;, &lt;0,0&gt;, &lt;6,0&gt;, //outer rim; &lt;1,-1&gt; is control point and
+  &lt;6,8&gt;, &lt;0,8&gt;, &lt;0,0&gt;,  //&lt;0,0&gt; is first &amp; last point
+  &lt;2,0&gt;, &lt;1,1&gt;, &lt;5,1&gt;,  //inner rim; &lt;2,0&gt; is control point and
+  &lt;5,7&gt;, &lt;1,7&gt;, &lt;1,1&gt;   //&lt;1,1&gt; is first &amp; last point
+  }
+</pre>
+<p>In the <code>cubic_spline</code>, each sub-prism needs two additional control points, one at the beginning of each sub-prisms point sequence to determine the slope at the start of the curve and one at the end. The first point specified is the control point which is not actually part of the spline. The second point is the start of the spline. The sub-prism ends when this second point is duplicated. The next point is the control point of the end of the first sub-prism. Next is the beginning control point of the next sub-prism. The point after that is the first point of the second sub-prism.</p>
+<p>Here is an example:</p>
+<pre>
+prism {
+  cubic_spline
+  0, 1, 14,
+  &lt;1,-1&gt;, &lt;0,0&gt;, &lt;6,0&gt;, //outer rim; First control is &lt;1,-1&gt; and
+  &lt;6,8&gt;, &lt;0,8&gt;, &lt;0,0&gt;,  //&lt;0,0&gt; is first &amp; last point.
+  &lt;-1,1&gt;,                           //Last control of first spline is &lt;-1,1&gt;
+  &lt;2,0&gt;, &lt;1,1&gt;, &lt;5,1&gt;,  //inner rim; First control is &lt;2,0&gt; and
+  &lt;5,7&gt;, &lt;1,7&gt;, &lt;1,1&gt;,  //&lt;1,1&gt; is first &amp; last point
+  &lt;0,2&gt;                             //Last control of first spline is &lt;0,2&gt;
+  }
+</pre>
+<p>The <code>bezier_spline</code> is an alternate kind of cubic spline. Points 1 and 4 specify the end points of a segment and points 2 and 3 are control points which specify the slope at the endpoints. Points 2 and 3 do not actually lie on the spline. They adjust the slope of the spline. If you draw an imaginary line between point 1 and 2, it represents the slope at point 1. It is a line tangent to the curve at point 1. The greater the distance between 1 and 2, the flatter the curve. With a short tangent the spline can bend more. The same holds true for control point 3 and endpoint 4. If you want the spline to be smooth between segments, point 3 and 4 on one segment and point 1 and 2 on the next segment must form a straight line and point 4 of one segment must be the same as point one on the next segment.</p>
+<p>By default linear sweeping is used to create the prism, that is, the prism's walls are perpendicular to the x-z plane. The size of the curve does not change during the sweep. You can also use <code>conic_sweep</code> that leads to a prism with cone-like walls by scaling the curve down during the sweep.</p>
+<p>Like cylinders the prism is normally closed. You can remove the caps on the prism by using the <code>open</code> keyword. If you do, you should not use it in CSG operations, because the result may not be as expected.</p>
+<p>The surface normal determination for prism sides depends upon the order in which the splines points are specified.  Prism ends have normals which face outward at one end and inward at the other end.  The following code will render sides with the color Red on the outside and the color Blue on the inside.</p>
+<pre>
+#declare Prism_InitialOrder = prism {
+    linear_spline
+    linear_sweep
+    0,1,5,
+    &lt;0.5,-0.5&gt;,&lt;0.5,0.5&gt;,&lt;0.3,0.5&gt;,&lt;0.3,-0.5&gt;,&lt;0.5,-0.5&gt;
+    texture          { pigment { Red } }
+    interior_texture { pigment { Blue } }
+}
+</pre>
+<p>While the following example will render sides inside-out with the color Blue on the outside and the color Red on the inside. Surface normals for the prism ends are unchanged.</p>
+<pre>
+#declare Prism_ReverseOrder = prism {
+    linear_spline
+    linear_sweep
+    0,1,5,
+    &lt;0.5,-0.5&gt;,&lt;0.3,-0.5&gt;,&lt;0.3,0.5&gt;,&lt;0.5,0.5&gt;,&lt;0.5,-0.5&gt;
+    texture          { pigment { Red } }
+    interior_texture { pigment { Blue } }
+}
+</pre>
+<p>The actual normal determination is more complicated for complex splines. If the surface normal is important to the visual result, it is best to check how the prism is being rendered by testing with substantially different inside and outside textures.</p>
+<p>There is presently a inconsistency with the bezier spline mode of the prism in that the point order with respect to side surface normals is reversed from all other prism spline types. The behavior of the bezier spline prism will likely be aligned with the other spline types in a later release. Further end behavior may be made consistent for all spline types.</p>
+<p>If additional accuracy is required you can add the <code><a href="r3_5.html#r3_5_1_5_11">sturm</a></code> object modifier.</p>
+<p>For an explanation of the spline concept read the description for the <a href="r3_5.html#r3_5_1_1_8">Lathe</a> object.</p>
+<p>See also the tutorials on <a href="t2_3.html#t2_3_1_1">Lathe</a> and <a href="t2_3.html#t2_3_1_3">Prism</a> objects.</p></div>
+
+<a name="r3_5_1_1_13"></a>
+<div class="content-level-h5" contains="Sphere" id="r3_5_1_1_13">
+<h5>3.5.1.1.13 Sphere</h5>
+
+
+<p>The syntax of the <code>sphere</code> object is:</p>
+<pre>
+SPHERE:
+  sphere {
+    &lt;Center&gt;, Radius
+    [OBJECT_MODIFIERS...] 
+    }
+</pre>
+
+<table class="centered" width="660x" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <img class="center" width="640px" src="images/b/b2/RefImgSphgeom.gif">
+  </td>
+</tr>
+<tr>
+  <td>
+    <p class="caption">The geometry of a sphere.</p>
+  </td>
+</tr>
+</table>
+
+<p>Where <em><code>&lt;Center&gt;</code></em> is a vector specifying the x,
+y, z coordinates of the center of the sphere and <em><code>
+Radius</code></em> is a float value specifying the radius. Spheres may be
+scaled unevenly giving an ellipsoid shape.</p>
+<p>
+Because spheres are highly optimized they make good bounding shapes (if
+manual bounding seems to be necessary).</p></div>
+
+<a name="r3_5_1_1_14"></a>
+<div class="content-level-h5" contains="Sphere Sweep" id="r3_5_1_1_14">
+<h5>3.5.1.1.14 Sphere Sweep</h5>
+
+
+<p>The syntax of the <code>sphere_sweep</code> object is:</p>
+<pre>
+SPHERE_SWEEP:
+  sphere_sweep {
+    linear_spline | b_spline | cubic_spline
+    NUM_OF_SPHERES,
+
+    CENTER, RADIUS,
+    CENTER, RADIUS,
+    ...
+    CENTER, RADIUS
+    [tolerance DEPTH_TOLERANCE]
+    [OBJECT_MODIFIERS]
+    }
+</pre>
+
+<p>Sphere_sweep default values:</p>
+<pre>
+tolerance : 1.0e-6 (0.000001) 
+</pre>
+
+<p>A Sphere Sweep is the envelope of a moving sphere with varying radius, or, in other words, the
+space a sphere occupies during its movement along a spline.
+<br>Sphere Sweeps are modeled by specifying a list of single spheres which are then interpolated.
+<br>Three kinds of interpolation are supported:</p><ul>
+<li><code>linear_spline</code> : Interpolating the input data with a linear function, which means
+that the single spheres are connected by straight tubes.</li>
+<li><code>b_spline</code> : Approximating the input data using a cubic b-spline function, which
+results in a curved object.</li>
+<li><code>cubic_spline</code> : Approximating the input data using a cubic spline,
+which results in a curved object.</li></ul>
+<p>The sphere list (center and radius of each sphere) can take as many spheres as you like to describe
+the object, but you will need at least two spheres for a <code>linear_spline</code>, and four spheres
+for <code>b_spline</code> or <code>cubic_spline</code>.</p>
+
+<p>Optional: The depth tolerance that should be used for the intersection calculations. This is done by
+adding the <code>tolerance</code> keyword and the desired value: the default distance is
+1.0e-6 (0.000001) and should do for most sphere sweep objects.
+<br>You should change this when you see dark spots on the surface of the object. These are probably
+caused by an effect called <em>self-shading</em>. This means that the object casts shadows onto itself at some
+points because of calculation errors. A ray tracing program usually defines the minimal distance a ray
+must travel before it actually hits another (or the same) object to avoid this effect. If this distance is
+chosen too small, self-shading may occur.
+<br>If so, specify <code>tolerance 1.0e-4</code> or higher.</p>
+
+<p class="Note"><strong>Note:</strong> If these dark spots remain after raising the tolerance, you might get rid of these spots by
+using adaptive super-sampling (method 2) for anti-aliasing. Images look better with anti-aliasing anyway.</p>
+<p class="Note"><strong>Note:</strong> The merge CSG operation is not recommended with Sphere Sweeps: there could be a small gap
+between the merged objects!</p></div>
+
+<a name="r3_5_1_1_15"></a>
+<div class="content-level-h5" contains="Superquadric Ellipsoid" id="r3_5_1_1_15">
+<h5>3.5.1.1.15 Superquadric Ellipsoid</h5>
+
+
+<p>The <code>superellipsoid</code> object creates a shape known as a <em>
+superquadric ellipsoid</em> object. It is an extension of the quadric
+ellipsoid. It can be used to create boxes and cylinders with round edges and
+other interesting shapes. Mathematically it is given by the equation:</p>
+
+<table class="centered" width="465x" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <!--<img src="ref_tex/sqemath.tex" alt="">---><img class="center" width="445px" src="images/5/5b/RefImgSqemath.png">
+  </td>
+</tr>
+<tr>
+  <td>
+    <p class="caption">Superquadric Ellipsoid Formula</p>
+  </td>
+</tr>
+</table>
+
+<p>The values of <em><code>e</code></em> and <em><code>n</code></em>, called
+the <em>east-west</em> and <em>north-south</em> exponent, determine the shape
+of the superquadric ellipsoid. Both have to be greater than zero. The sphere
+is given by <em>e = 1</em> and <em>n = 1</em>.</p>
+<p>
+The syntax of the superquadric ellipsoid is:</p>
+<pre>
+SUPERELLIPSOID:
+  superellipsoid {
+    &lt;Value_E, Value_N&gt;
+    [OBJECT_MODIFIERS...]
+    }
+</pre>
+
+<p>The 2-D vector specifies the <em><code>e</code></em> and <em><code>
+n</code></em> values in the equation above. The object sits at the origin and
+occupies a space about the size of a <code>
+box{&lt;-1,-1,-1&gt;,&lt;1,1,1&gt;}</code>.</p>
+<p>
+Two useful objects are the rounded box and the rounded cylinder. These are
+declared in the following way.</p>
+<pre>
+#declare Rounded_Box = superellipsoid { &lt;Round, Round&gt; }
+#declare Rounded_Cylinder = superellipsoid { &lt;1, Round&gt; }
+</pre>
+
+<p>The roundedness value <code>Round</code> determines the roundedness of the
+edges and has to be greater than zero and smaller than one. The smaller you
+choose the values, the smaller and sharper the edges will get.</p>
+<p>
+Very small values of <em><code>e</code></em> and <em><code>n</code></em>
+might cause problems with the root solver (the Sturmian root solver cannot be
+used).</p></div>
+
+<a name="r3_5_1_1_16"></a>
+<div class="content-level-h5" contains="Surface of Revolution" id="r3_5_1_1_16">
+<h5>3.5.1.1.16 Surface of Revolution</h5>
+
+
+<p>The <code>sor</code> object is a <em>surface of revolution</em> generated by rotating the graph of a function about the y-axis. This function describes the dependence of the radius from the position on the rotation axis.</p>
+<p>The syntax is:</p>
+<pre>
+SOR:
+  sor {
+    Number_Of_Points, &lt;Point_1&gt;, &lt;Point_2&gt;, ... &lt;Point_n&gt;
+    [ open ] [SOR_MODIFIERS...]
+    }
+SOR_MODIFIER:
+  sturm | OBJECT_MODIFIER
+</pre>
+
+<p>SOR default values:</p>
+<pre>
+sturm : off
+</pre>
+
+<p>The float value <em><code>Number_Of_Points</code></em> specifies the number of 2-D vectors which follow. The points <em><code>
+&lt;Point_1&gt;</code></em> through <em><code>&lt;Point_n&gt;</code></em> are two-dimensional vectors consisting of the radius and the corresponding height, i.e. the position on the rotation axis. These points are smoothly connected (the curve is passing through the specified points) and rotated about the y-axis to form the SOR object. The first and last points are only used to determine the slopes of the function at the start and end point. They do not actually lie on the curve. The function used for the SOR object is similar to the splines used for the lathe object. The difference is that the SOR object is less flexible because it underlies the restrictions of any mathematical function, i.e. to any given point y on the rotation axis belongs at most one function value, i.e. one radius value. You cannot rotate closed curves with the SOR object. Also, make sure that the curve does not cross zero (y-axis) as this can result in 'less than perfect' bounding cylinders. POV-Ray will very likely fail to render large chunks of the part of the spline contained in such an interval.</p>
+<p>The optional keyword <code>open</code> allows you to remove the caps on the SOR object. If you do this you should not use it with CSG because the results may be wrong.</p>
+<p> The SOR object is useful for creating bottles, vases, and things like that. A simple vase could look like this:</p>
+<pre>
+#declare Vase = sor {
+  7,
+  &lt;0.000000, 0.000000&gt;
+  &lt;0.118143, 0.000000&gt;
+  &lt;0.620253, 0.540084&gt;
+  &lt;0.210970, 0.827004&gt;
+  &lt;0.194093, 0.962025&gt;
+  &lt;0.286920, 1.000000&gt;
+  &lt;0.468354, 1.033755&gt;
+  open
+  }
+</pre>
+<p>One might ask why there is any need for a SOR object if there is already a lathe object which is much more flexible. The reason is quite simple. The intersection test with a SOR object involves solving a cubic polynomial while the test with a lathe object requires to solve a 6th order polynomial (you need a cubic spline for the same smoothness). Since most SOR and lathe objects will have several segments this will make a great difference in speed. The roots of the 3rd order polynomial will also be more accurate and easier to find.</p>
+
+<p>If additional accuracy is required you can add the <code><a href="r3_5.html#r3_5_1_5_11">sturm</a></code> object modifier.</p>
+<p>The following explanations are for the mathematically interested reader who wants to know how the surface of revolution is calculated. Though it is not necessary to read on it might help in understanding the SOR object.</p>
+<p>The function that is rotated about the y-axis to get the final SOR object is given by:</p>
+
+<table class="centered" width="380x" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <!--<img src="ref_tex/sormath.tex" alt="">---><img class="center" width="360px" src="images/a/af/RefImgSormath.png">
+  </td>
+</tr>
+<tr>
+  <td>
+    <p class="caption">Surface of Revolution Formula</p>
+  </td>
+</tr>
+</table>
+
+<p>with radius <em><code>r</code></em> and height <em><code>h</code></em>. Since this is a cubic function in h it has enough flexibility to allow smooth curves.</p>
+<p>The curve itself is defined by a set of n points P(i), i=0...n-1, which are interpolated using one function for every segment of the curve. A segment j, j=1...n-3, goes from point P(j) to point P(j+1) and uses points P(j-1) and P(j+2) to determine the slopes at the endpoints. If there are n points we will have n-3 segments. This means that we need at least four points to get a proper curve. The coefficients A(j), B(j), C(j) and D(j) are calculated for every segment using the equation</p>
+
+<table class="centered" width="470x" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <!--<img src="ref_tex/curvmath.tex" alt="">---><img class="center" width="450px" src="images/a/af/RefImgCurvmath.png">
+  </td>
+</tr>
+<tr>
+  <td>
+    <p class="caption">Curve Math</p>
+  </td>
+</tr>
+</table>
+
+<p>Where r(j) is the radius and h(j) is the height of point P(j).</p>
+<p>The figure below shows the configuration of the points P(i), the location of segment j, and the curve that is defined by this segment.</p>
+
+<table class="centered" width="660x" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <img class="center" width="640px" src="images/e/e7/RefImgSegmpts.gif">
+  </td>
+</tr>
+<tr>
+  <td>
+    <p class="caption">Points on a surface of revolution.</p>
+  </td>
+</tr>
+</table></div>
+
+<a name="r3_5_1_1_17"></a>
+<div class="content-level-h5" contains="Text" id="r3_5_1_1_17">
+<h5>3.5.1.1.17 Text</h5>
+
+
+<p>A <code>text</code> object creates 3-D text as an extruded block letter. Currently only TrueType fonts (ttf) and TrueType Collections (ttc) are supported but the syntax allows for other font types to be added in the future. If TrueType Collections are used, the first font found in the collection will be used. The syntax is:</p>
+<pre>
+TEXT_OBECT:
+  text {
+    ttf &quot;fontname.ttf/ttc&quot; &quot;String_of_Text&quot;
+    Thickness, &lt;Offset&gt;
+    [OBJECT_MODIFIERS...]
+    }
+</pre>
+
+<p>Where <code>fontname.ttf</code> or <code>fontname.ttc</code> is the name of the TrueType font file. It is a quoted string literal or string expression. The string expression which follows is the actual text of the string object. It too may be a quoted string literal or string expression. See section <a href="r3_3.html#r3_3_1_9">Strings</a> for more on string expressions.</p>
+
+<p>In version 3.7 several fonts are now <em>built-in</em>. It should be noted that this is only a preliminary solution so the benchmark program will run without installing POV-Ray. Future versions may lack this mechanism, so in scene files (other than the built-in benchmark) you should continue to reference the external font files as before. Consequently, the following <em>alternate</em> syntax is available:</p>
+<pre>
+TEXT_OBECT:
+  text {
+    internal Font_Number &quot;String_of_Text&quot;
+    Thickness, &lt;Offset&gt;
+    [OBJECT_MODIFIERS] }
+    }
+</pre>
+
+<p>Where <code><em>Font_Number</em></code> is one of the <em>integer</em> values from the list below:</p>
+<ol start=0>
+  <li>povlogo.ttf</li>
+  <li>timrom.ttf</li>
+  <li>cyrvetic.ttf</li>
+  <li>crystal.ttf</li>
+</ol>
+
+<p class="Note"><strong>Note:</strong> An out of range <code><em>Font_Number</em></code> value will default to 0.</p>
+
+<p>The text will start with the origin at the lower left, front of the first character and will extend in the +x-direction. The baseline of the text follows the x-axis and descender drop into the -y-direction. The front of the character sits in the x-y-plane and the text is extruded in the +z-direction. The front-to-back thickness is specified by the required value <em><code>
+Thickness</code></em>.</p>
+
+<p>Characters are generally sized so that 1 unit of vertical spacing is correct. The characters are about 0.5 to 0.75 units tall.</p>
+
+<p>The horizontal spacing is handled by POV-Ray internally including any kerning information stored in the font. The required vector <em><code>&lt;Offset&gt;</code></em> defines any extra translation between each character. Normally you should specify a zero for this value. Specifying <code>0.1*x</code> would put additional 0.1 units of space between each character. Here is an example:</p>
+<pre>
+text {
+  ttf &quot;timrom.ttf&quot; &quot;POV-Ray&quot; 1, 0
+  pigment { Red }
+  }
+</pre>
+
+<p>Only printable characters are allowed in text objects. Characters such as return, line feed, tabs, backspace etc. are not supported.</p>
+
+<p>For easy access to your fonts, set the <a href="r3_2.html#r3_2_5_3">Library_Path</a> to the directory that contains your font collection.</p></div>
+
+<a name="r3_5_1_1_18"></a>
+<div class="content-level-h5" contains="Torus" id="r3_5_1_1_18">
+<h5>3.5.1.1.18 Torus</h5>
+
+
+<p>A <code>torus</code> is a 4th order quartic polynomial shape that looks like a donut or inner tube. Because this shape is so useful and quartics are difficult to define, POV-Ray lets you take a short-cut and define a torus by:</p>
+<pre>
+TORUS:
+  torus {
+    Major, Minor [SPINDLE_MODE]
+    [TORUS_MODIFIER...]
+    }
+TORUS_MODIFIER:
+  sturm | OBJECT_MODIFIER
+SPINDLE_MODE:
+  difference | intersection | merge | union
+</pre>
+
+<p>Torus default values:</p>
+<pre>
+union
+sturm : off
+</pre>
+
+<p>where <em><code>Major</code></em> is a float value giving the major radius and <em><code>Minor</code></em> is a float specifying the minor radius. The major radius extends from the center of the hole to the mid-line of the rim while the minor radius is the radius of the cross-section of the rim. The torus is centered at the origin and lies in the x-z-plane with the y-axis
+sticking through the hole.</p>
+
+<table class="centered" width="660x" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <img class="center" width="640px" src="images/2/29/RefImgMimxrtor.gif">
+  </td>
+</tr>
+<tr>
+  <td>
+    <p class="caption">Major and minor radius of a torus.</p>
+  </td>
+</tr>
+</table>
+
+<p>The torus is internally bounded by two cylinders and two rings forming a thick cylinder. With this bounding cylinder the performance of the torus intersection test is vastly increased. The test for a valid torus intersection, i.e. solving a 4th order polynomial, is only performed if the bounding cylinder is hit. Thus a lot of slow root solving calculations are avoided.</p>
+
+<p><font class="New">New</font> in version 3.8 is a torus with a minor radius greater than the major radius (aka <em>spindle torus</em>) will self-intersect in a spindle-shaped region. The behavior with respect to the spindle can be controlled by specifying either of the <code>difference</code>,<code>intersection</code>, <code>merge</code> or <code>union</code> keywords, which act similar to the corresponding CSG operations:</p>
+<ul>
+<li>Using the <code>difference</code> keyword, the self-intersecting portion is cut away from the torus, so that the spindle volume is considered <em>outside</em> the primitive; the spindle surface is visible (provided you cut open the torus, or make it semi-transparent).</li>
+<li>Using the <code>intersection</code> keyword, the resulting shape consists of <em>only</em> the self-intersecting portion, so that only the spindle volume is considered inside the primitive, and only the spindle surface is visible.</li>
+<li>Using the <code>merge</code> keyword, the surface within the self-intersecting portion is hidden, so that the spindle surface is <em>not</em> visible; the spindle volume is considered inside the primitive.</li>
+<li>Using the <code>union</code> keyword, the entire torus surface remains visible and the spindle volume is considered inside the primitive (this is the default).</li>
+</ul>
+<p>In a non-spindle torus, the <code>intersection</code> keyword will cause a "possible parse error" warning and make the torus invisible, while the other spindle mode keywords will have no effect whatsoever.</p>
+<p class="Note"><strong>Note:</strong> The <code>difference</code> spindle mode does <em>not</em> affect the behavior with respect to the
+<code><a href="r3_6.html#r3_6_1_9">interior_texture</a></code> keyword. An <code>interior_texture</code> will always be applied to the side of the spindle surface facing the spindle volume.</p>
+
+<table class="centered" width="420px" cellpadding="0" cellspacing="10">
+<tr>
+  <td><img class="centered" width="200px" src="images/5/5c/SpindleTorusDifference.png"></td>
+  <td><img class="centered" width="200px" src="images/2/24/SpindleTorusIntersection.png"></td>
+  <td><img class="centered" width="200px" src="images/b/b1/SpindleTorusMerge.png"></td>
+  <td><img class="centered" width="200px" src="images/0/0c/SpindleTorusUnion.png"></td>
+</tr>
+<tr>
+  <td colspan="4"><p class="caption">cutaway view of spindle torus using the <code>difference</code>, <code>intersection</code>, <code>merge</code> and <code>union</code> mode, respectively</p></td>
+</tr>
+</table>
+
+<p>If additional accuracy is required you can add the <code><a href="r3_5.html#r3_5_1_5_11">sturm</a></code> object modifier.</p></div>
+
+<a name="r3_5_1_2"></a>
+<div class="content-level-h4" contains="Finite Patch Primitives" id="r3_5_1_2">
+<h4>3.5.1.2 Finite Patch Primitives</h4>
+<p>There are six totally thin, finite objects which have no well-defined inside. They are <a href="r3_5.html#r3_5_1_2_1">bicubic patch</a>, <a href="r3_5.html#r3_5_1_2_2">disc</a>, <a href="r3_5.html#r3_5_1_2_7">smooth triangle</a>, <a href="r3_5.html#r3_5_1_2_6">triangle</a>, <a href="r3_5.html#r3_5_1_2_5">polygon</a>, <a href="r3_5.html#r3_5_1_2_3">mesh</a>, and <a href="r3_5.html#r3_5_1_2_4">mesh2</a>. They may be combined in CSG union, but cannot be used inside a <code>clipped_by</code> statement.</p>
+<p class="Note"><strong>Note:</strong> Patch objects <em>may</em> give unexpected results when used in differences and intersections.</p>
+<p>These conditions apply:</p>
+<ol>
+<li>Solids may be differenced from bicubic patches with the expected results.</li>
+<li>Differencing a bicubic patch from a solid <em>may</em> give unexpected results.</li>
+<ul>
+<li>Especially if the inverse keyword is used!</li>
+</ul>
+<li>Intersecting a solid and a bicubic patch will give the expected results.</li>
+<ul>
+<li>The parts of the patch that intersect the solid object will be visible.</li>
+</ul>
+<li>Merging a solid and a bicubic patch will remove the parts of the bicubic patch that intersect the solid.</li>
+</ol>
+
+<p>Because these types are finite POV-Ray can use automatic bounding on them to speed up rendering time. As with all shapes they can be translated, rotated and scaled.</p></div>
+
+<a name="r3_5_1_2_1"></a>
+<div class="content-level-h5" contains="Bicubic Patch" id="r3_5_1_2_1">
+<h5>3.5.1.2.1 Bicubic Patch</h5>
+
+
+<p>A <code>bicubic_patch</code> is a 3D curved surface created from a mesh of
+triangles. POV-Ray supports a type of bicubic patch called a <em>Bezier
+patch</em>. A bicubic patch is defined as follows:</p>
+<pre>
+BICUBIC_PATCH:
+  bicubic_patch {
+    PATCH_ITEMS...
+    &lt;Point_1&gt;,&lt;Point_2&gt;,&lt;Point_3&gt;,&lt;Point_4&gt;,
+    &lt;Point_5&gt;,&lt;Point_6&gt;,&lt;Point_7&gt;,&lt;Point_8&gt;,
+    &lt;Point_9&gt;,&lt;Point_10&gt;,&lt;Point_11&gt;,&lt;Point_12&gt;,
+    &lt;Point_13&gt;,&lt;Point_14&gt;,&lt;Point_15&gt;,&lt;Point_16&gt;
+    [OBJECT_MODIFIERS...]
+    }
+PATCH_ITEMS:
+  type Patch_Type | u_steps Num_U_Steps | v_steps Num_V_Steps |
+  flatness Flatness
+</pre>
+
+<p>Bicubic patch default values:</p>
+<pre>
+flatness : 0.0
+u_steps  : 0
+v_steps  : 0
+</pre>
+
+<p>The keyword <code>type</code> is followed by a float <em><code>
+Patch_Type</code></em> which currently must be either 0 or 1. For type 0 only
+the control points are retained within POV-Ray. This means that a minimal
+amount of memory is needed but POV-Ray will need to perform many extra
+calculations when trying to render the patch. Type 1 preprocesses the patch
+into many subpatches. This results in a significant speedup in rendering at
+the cost of memory.</p>
+
+<p>The four parameters <code>type</code>, <code>flatness</code>, <code>
+u_steps</code> and <code>v_steps</code> may appear in any order. Only
+<code>type</code> is required. They are followed by 16 vectors (4 rows
+of 4) that define the x, y, z coordinates of the 16 control points which
+define the patch. The patch touches the four corner points <em><code>
+&lt;Point_1&gt;</code></em>, <em><code>&lt;Point_4&gt;</code></em>, <em>
+<code>&lt;Point_13&gt;</code></em> and <em> <code>
+&lt;Point_16&gt;</code></em> while the other 12 points pull and stretch the
+patch into shape. The Bezier surface is enclosed by the convex hull formed by
+the 16 control points, this is known as the <em>convex hull property</em>.</p>
+
+<p>The keywords <code>u_steps</code> and <code>v_steps</code> are each followed
+by integer values which tell how many rows and columns of triangles are the
+minimum to use to create the surface, both default to 0. The maximum number of individual pieces
+of the patch that are tested by POV-Ray can be calculated from the following:
+<em>pieces = 2^u_steps * 2^v_steps</em>.</p>
+
+<p>This means that you really should keep <code>u_steps</code> and <code>
+v_steps</code> under 4. Most patches look just fine with <code>u_steps
+3</code> and <code>v_steps 3</code>, which translates to 64 sub-patches (128
+smooth triangles).</p>
+
+<p>As POV-Ray processes the Bezier patch it makes a test of the current piece
+of the patch to see if it is flat enough to just pretend it is a rectangle.
+The statement that controls this test is specified with the <code>
+flatness</code> keyword followed by a float. Typical flatness values range
+from 0 to 1 (the lower the slower). The default if none is specified is
+0.0.</p>
+
+<p>If the value for flatness is 0 POV-Ray will always subdivide the patch to
+the extend specified by <code>u_steps</code> and <code>v_steps</code>. If
+flatness is greater than 0 then every time the patch is split, POV-Ray will
+check to see if there is any need to split further.</p>
+
+<p>There are both advantages and disadvantages to using a non-zero flatness.
+The advantages include:</p>
+
+<p>- If the patch is not very curved, then this will be detected and
+POV-Ray will not waste a lot of time looking at the wrong pieces.</p>
+
+<p>- If the patch is only highly curved in a couple of places, POV-Ray will keep
+subdividing there and concentrate its efforts on the hard part.</p>
+
+<p>The biggest disadvantage is that if POV-Ray stops subdividing at a
+particular level on one part of the patch and at a different level on an
+adjacent part of the patch there is the potential for cracking. This is
+typically visible as spots within the patch where you can see through. How
+bad this appears depends very highly on the angle at which you are viewing
+the patch.</p>
+
+<p>
+Like triangles, the bicubic patch is not meant to be generated by hand. These
+shapes should be created by a special utility. You may be able to acquire
+utilities to generate these shapes from the same source from which you
+obtained POV-Ray. Here is an example:</p>
+<pre>
+bicubic_patch {
+  type 0
+  flatness 0.01
+  u_steps 4
+  v_steps 4
+  &lt;0, 0, 2&gt;, &lt;1, 0, 0&gt;, &lt;2, 0, 0&gt;, &lt;3, 0,-2&gt;,
+  &lt;0, 1  0&gt;, &lt;1, 1, 0&gt;, &lt;2, 1, 0&gt;, &lt;3, 1, 0&gt;,
+  &lt;0, 2, 0&gt;, &lt;1, 2, 0&gt;, &lt;2, 2, 0&gt;, &lt;3, 2, 0&gt;,
+  &lt;0, 3, 2&gt;, &lt;1, 3, 0&gt;, &lt;2, 3, 0&gt;, &lt;3, 3, -2&gt;
+  }
+</pre>
+
+<p>The triangles in a POV-Ray <code>bicubic_patch</code> are automatically
+smoothed using normal interpolation but it is up to the user (or the
+user's utility program) to create control points which smoothly stitch
+together groups of patches.</p></div>
+
+<a name="r3_5_1_2_2"></a>
+<div class="content-level-h5" contains="Disc" id="r3_5_1_2_2">
+<h5>3.5.1.2.2 Disc</h5>
+
+
+<p>Another flat, finite object available with POV-Ray is the <code>
+disc</code>. The disc is infinitely thin, it has no thickness. If you want a
+disc with true thickness you should use a very short cylinder. A disc shape
+may be defined by:</p>
+<pre>
+DISC:
+  disc {
+    &lt;Center&gt;, &lt;Normal&gt;, Radius [, Hole_Radius]
+    [OBJECT_MODIFIERS...]
+    }
+</pre>
+
+<p>Disc default values:</p>
+<pre>
+HOLE RADIUS : 0.0
+</pre>
+
+<p>The vector <em><code>&lt;Center&gt;</code></em> defines the x, y, z
+coordinates of the center of the disc. The <em><code>
+&lt;Normal&gt;</code></em> vector describes its orientation by describing its
+surface normal vector. This is followed by a float specifying the <em> <code>
+Radius</code></em>. This may be optionally followed by another float
+specifying the radius of a hole to be cut from the center of the disc.</p>
+
+<p class="Note"><strong>Note:</strong> The inside of a disc is the inside of the plane that contains
+the disc.  Also note that it is not constrained by the radius of the disc.</p></div>
+
+<a name="r3_5_1_2_3"></a>
+<div class="content-level-h5" contains="Mesh" id="r3_5_1_2_3">
+<h5>3.5.1.2.3 Mesh</h5>
+
+
+<p>The <code>mesh</code> object can be used to efficiently store large numbers of triangles.</p>
+<p>The syntax is:</p>
+<pre>
+MESH:
+  mesh {
+    MESH_TRIANGLE...
+    [MESH_MODIFIER...]
+    }
+
+MESH_TRIANGLE:
+  triangle {
+    &lt;Corner_1&gt;, &lt;Corner_2&gt;, &lt;Corner_3&gt;
+    [uv_vectors &lt;uv_Corner_1&gt;, &lt;uv_Corner_2&gt;, &lt;uv_Corner_3&gt;]
+    [MESH_TEXTURE]
+    } |
+  smooth_triangle {
+    &lt;Corner_1&gt;, &lt;Normal_1&gt;,
+    &lt;Corner_2&gt;, &lt;Normal_2&gt;,
+    &lt;Corner_3&gt;, &lt;Normal_3&gt;
+    [uv_vectors &lt;uv_Corner_1&gt;, &lt;uv_Corner_2&gt;, &lt;uv_Corner_3&gt;]
+    [MESH_TEXTURE]
+    }
+
+MESH_MODIFIER:
+  inside_vector &lt;direction&gt; | hierarchy [ Boolean ] |
+  OBJECT_MODIFIER
+
+MESH_TEXTURE:
+  texture { TEXTURE_IDENTIFIER }
+  texture_list {
+    TEXTURE_IDENTIFIER TEXTURE_IDENTIFIER TEXTURE_IDENTIFIER
+    }
+</pre>
+
+<p>Mesh default values:</p>
+<pre>
+hierarchy : on
+</pre>
+
+<p>Any number of <code>triangle</code> and/or <code>smooth_triangle</code> statements can be used and each of those triangles can be individually textured by assigning a texture identifier to it. The texture has to be declared before the mesh is parsed. It is not possible to use texture definitions inside the triangle or smooth triangle statements. This is a restriction that is necessary for an efficient storage of the assigned textures. See <a href="r3_6.html#r3_6_1_8">Triangle and Smooth Triangle</a> for more information on triangles.</p>
+<p>The <code>mesh</code> object can support <code>uv_mapping</code>. For this, per triangle the keyword <code>uv_vectors</code> has to be given, together with three 2D uv-vectors. Each vector specifies a location in the xy-plane from which the texture has to be mapped to the matching points of the triangle. Also see the section <a href="r3_6.html#r3_6_1_7">uv_mapping</a>.</p>
+
+<p>The mesh's components are internally bounded by a bounding box hierarchy to speed up intersection testing. The bounding hierarchy can be turned off with the <code>hierarchy off</code> keyword. This should only be done if memory is short or the mesh consists of only a few triangles. The default is <code>hierarchy on</code>.</p>
+
+<p>Copies of a mesh object refer to the same triangle data and thus consume very little memory. You can easily trace a hundred copies of a 10000 triangle mesh without running out of memory (assuming the first mesh fits into memory). The mesh object has two advantages over a union of triangles: it needs less memory and it is transformed faster. The memory requirements are reduced by efficiently storing the triangles vertices and normals. The parsing time for transformed meshes is reduced because only the mesh object has to be transformed and not every single triangle as it is necessary for unions.</p>
+
+</div>
+<a name="r3_5_1_2_3_1"></a>
+<div class="content-level-h6" contains="Solid Mesh" id="r3_5_1_2_3_1">
+<h6>3.5.1.2.3.1 Solid Mesh</h6>
+<p>The triangle mesh objects <code>mesh</code> (and <code>mesh2</code>) can be used in CSG objects such as difference and intersect. Adding the <code>inside_vector</code> they do have a defined <em>inside</em>. This will only work for well-behaved meshes, which are completely closed volumes. If meshes have any holes in them, this might work, but the results are not guaranteed.</p>
+
+<p>To determine if a point is inside a triangle mesh, POV-Ray shoots a ray from the point in some arbitrary direction. If this vector intersects an odd number of triangles, the point is inside the mesh. If it intersects an even number of triangles, the point is outside of the mesh. You can specify the direction of this vector. For example, to use <code>+z</code> as the direction, you would add the following line to the triangle mesh description (following all other mesh data, but before the object modifiers).</p>
+<pre>
+inside_vector &lt;0, 0, 1&gt;
+</pre>
+<p>This change does not have any effect on unions of triangles, these will still be always hollow.</p></div>
+
+<a name="r3_5_1_2_4"></a>
+<div class="content-level-h5" contains="Mesh2" id="r3_5_1_2_4">
+<h5>3.5.1.2.4 Mesh2</h5>
+
+
+<p>The new mesh syntax is designed for use in conversion from other file formats.</p>
+
+<pre>
+MESH2 :
+  mesh2{
+    VECTORS...
+    LISTS...   |
+    INDICES... |
+    MESH_MODIFIERS
+    }
+VECTORS :
+  vertex_vectors {
+  number_of_vertices,
+  &lt;vertex1&gt;, &lt;vertex2&gt;, ...
+  }|
+  normal_vectors {
+    number_of_normals,
+    &lt;normal1&gt;, &lt;normal2&gt;, ...
+    }|
+  uv_vectors {
+    number_of_uv_vectors,
+    &lt;uv_vect1&gt;, &lt;uv_vect2&gt;, ...
+    }
+LISTS :
+  texture_list {
+    number_of_textures,
+    texture { Texture1 },
+    texture { Texture2 }, ...
+    }|
+INDICES :
+  face_indices {
+    number_of_faces,
+      &lt;index_a, index_b, index_c&gt; [,texture_index [,
+    texture_index, texture_index]],
+      &lt;index_d, index_e, index_f&gt; [,texture_index [,
+      texture_index, texture_index]],
+      ...
+      }|
+  normal_indices {
+    number_of_faces,
+      &lt;index_a, index_b, index_c&gt;,
+      &lt;index_d, index_e, index_f&gt;,
+      ...
+      }|
+  uv_indices {
+    number_of_faces,
+      &lt;index_a, index_b, index_c&gt;,
+      &lt;index_d, index_e, index_f&gt;,
+      ...
+      }
+MESH_MODIFIER :
+  inside_vector &lt;direction&gt; | OBJECT_MODIFIERS
+</pre>
+
+<p>Best practices dictate that the <code>mesh2</code> object definition <em>SHOULD</em> be specified in the following order:</p>
+<ul>
+<li>VECTORS</li>
+<li>LISTS</li>
+<li>INDICES</li>
+</ul>
+<p>However, the actual implementation also allows the <code>texture_list</code> to be placed <em>BEFORE</em> <code>vertex_vectors</code>.</p>
+<p>The <code>normal_vectors</code>, <code>uv_vectors</code>, and <code>texture_list</code> sections are optional. 
+If the number of normals equals the number of vertices then the normal_indices section is optional and the indexes from the <code>face_indices</code> section are used instead. Likewise for the <code>uv_indices</code> section.</p>
+<p class="Note"><strong>Note:</strong> The <code>texture_list</code> section is optional <em>only</em> if <code>face_indices</code> doesn't contain any texture index values.</p>
+<p>For example:</p>
+<pre>
+face_indices {
+  number_of_faces,
+  &lt;index_a, index_b, index_c&gt;,
+  &lt;index_d, index_e, index_f&gt;,
+  ...
+  }
+</pre>
+<p class="Note"><strong>Note:</strong> The numbers of <code>uv_indices</code> must equal number of faces.</p>
+<p>The indexes are <em>zero based</em>, so the first item in each list has an index of zero.</p>
+
+</div>
+<a name="r3_5_1_2_4_1"></a>
+<div class="content-level-h6" contains="Smooth and Flat triangles in the same mesh" id="r3_5_1_2_4_1">
+<h6>3.5.1.2.4.1 Smooth and Flat triangles in the same mesh</h6>
+<p>You can specify both flat and smooth triangles in the same mesh. To do this, specify
+the smooth triangles first in the <code>face_indices</code>
+section, followed by the flat triangles. Then, specify normal indices (in the 
+<code>normal_indices</code> section) for only the
+smooth triangles. Any remaining triangles that do not have normal indices associated with
+them will be assumed to be flat triangles.</p>
+
+</div>
+<a name="r3_5_1_2_4_2"></a>
+<div class="content-level-h6" contains="Mesh Triangle Textures" id="r3_5_1_2_4_2">
+<h6>3.5.1.2.4.2 Mesh Triangle Textures</h6>
+<p>To specify a texture for an individual mesh triangle, specify a single integer texture
+index following the face-index vector for that triangle.</p>
+
+<p>To specify three textures for vertex-texture interpolation, specify three integer
+texture indices (separated by commas) following the face-index vector for that triangle.</p>
+
+<p>Vertex-texture interpolation and textures for an individual triangle can be mixed in the same mesh.</p></div>
+
+<a name="r3_5_1_2_5"></a>
+<div class="content-level-h5" contains="Polygon" id="r3_5_1_2_5">
+<h5>3.5.1.2.5 Polygon</h5>
+
+
+<p>The <code>polygon</code> object is useful for creating rectangles, squares
+and other planar shapes with more than three edges. Their syntax is:</p>
+<pre>
+POLYGON:
+  polygon {
+    Number_Of_Points, &lt;Point_1&gt; &lt;Point_2&gt;... &lt;Point_n&gt;
+    [OBJECT_MODIFIER...]
+    }
+</pre>
+
+<p>The float <em><code>Number_Of_Points</code></em> tells how many points are
+used to define the polygon. The points <em><code>&lt;Point_1&gt;</code></em>
+through <em><code>&lt;Point_n&gt;</code></em> describe the polygon or
+polygons. A polygon can contain any number of sub-polygons, either
+overlapping or not. In places where an even number of polygons overlaps a
+hole appears. When you repeat the first point of a sub-polygon, it closes it
+and starts a new sub-polygon's point sequence. This means that all points
+of a sub-polygon are different.</p>
+<p>
+If the last sub-polygon is not closed a warning is issued and the program
+automatically closes the polygon. This is useful because polygons imported
+from other programs may not be closed, i.e. their first and last point are
+not the same.</p>
+<p>
+All points of a polygon are three-dimensional vectors that have to lay on
+the same plane. If this is not the case an error occurs. It is common to use
+two-dimensional vectors to describe the polygon. POV-Ray assumes that the z
+value is zero in this case.</p>
+<p>
+A square polygon that matches the default planar image map is simply:</p>
+<pre>
+polygon {
+  4,
+  &lt;0, 0&gt;, &lt;0, 1&gt;, &lt;1, 1&gt;, &lt;1, 0&gt;
+  texture {
+    finish { ambient 1 diffuse 0 }
+    pigment { image_map { gif &quot;test.gif&quot;  } }
+    }
+  //scale and rotate as needed here
+  }
+</pre>
+
+<p>The sub-polygon feature can be used to generate complex shapes like the
+letter &quot;P&quot;, where a hole is cut into another polygon:</p>
+<pre>
+#declare P = polygon {
+  12,
+  &lt;0, 0&gt;, &lt;0, 6&gt;, &lt;4, 6&gt;, &lt;4, 3&gt;, &lt;1, 3&gt;, &lt;1,0&gt;, &lt;0, 0&gt;, 
+  &lt;1, 4&gt;, &lt;1, 5&gt;, &lt;3, 5&gt;, &lt;3, 4&gt;, &lt;1, 4&gt;
+  }
+</pre>
+
+<p>The first sub-polygon (on the first line) describes the outer shape of the
+letter &quot;P&quot;. The second sub-polygon (on the second line) describes
+the rectangular hole that is cut in the top of the letter &quot;P&quot;. Both
+rectangles are closed, i.e. their first and last points are the same.</p>
+<p>
+The feature of cutting holes into a polygon is based on the polygon
+inside/outside test used. A point is considered to be inside a polygon if a
+straight line drawn from this point in an arbitrary direction crosses an odd
+number of edges, this is known as <em>Jordan's curve theorem</em>.</p>
+<p>
+Another very complex example showing one large triangle with three small
+holes and three separate, small triangles is given below:</p>
+<pre>
+polygon {
+  28,
+  &lt;0, 0&gt; &lt;1, 0&gt; &lt;0, 1&gt; &lt;0, 0&gt;          // large outer triangle
+  &lt;.3, .7&gt; &lt;.4, .7&gt; &lt;.3, .8&gt; &lt;.3, .7&gt;  // small outer triangle #1
+  &lt;.5, .5&gt; &lt;.6, .5&gt; &lt;.5, .6&gt; &lt;.5, .5&gt;  // small outer triangle #2
+  &lt;.7, .3&gt; &lt;.8, .3&gt; &lt;.7, .4&gt; &lt;.7, .3&gt;  // small outer triangle #3
+  &lt;.5, .2&gt; &lt;.6, .2&gt; &lt;.5, .3&gt; &lt;.5, .2&gt;  // inner triangle #1
+  &lt;.2, .5&gt; &lt;.3, .5&gt; &lt;.2, .6&gt; &lt;.2, .5&gt;  // inner triangle #2
+  &lt;.1, .1&gt; &lt;.2, .1&gt; &lt;.1, .2&gt; &lt;.1, .1&gt;  // inner triangle #3
+  }
+</pre></div>
+
+<a name="r3_5_1_2_6"></a>
+<div class="content-level-h5" contains="Triangle" id="r3_5_1_2_6">
+<h5>3.5.1.2.6 Triangle</h5>
+
+
+<p>The <code>triangle</code> primitive is available in order to make more
+complex objects than the built-in shapes will permit. Triangles are usually
+not created by hand but are converted from other files or generated by
+utilities. A triangle is defined by</p>
+<pre>
+TRIANGLE:
+  triangle {
+    &lt;Corner_1&gt;, &lt;Corner_2&gt;, &lt;Corner_3&gt;
+    [OBJECT_MODIFIER...]
+    }
+</pre>
+
+<p>where <em><code>&lt;Corner_n&gt;</code></em> is a vector defining the x,
+y, z coordinates of each corner of the triangle.</p>
+<p>
+Because triangles are perfectly flat surfaces it would require extremely
+large numbers of very small triangles to approximate a smooth, curved
+surface. However much of our perception of smooth surfaces is dependent upon
+the way light and shading is done. By artificially modifying the surface
+normals we can simulate a smooth surface and hide the sharp-edged seams
+between individual triangles.</p></div>
+
+<a name="r3_5_1_2_7"></a>
+<div class="content-level-h5" contains="Smooth Triangle" id="r3_5_1_2_7">
+<h5>3.5.1.2.7 Smooth Triangle</h5>
+
+
+<p>The <code>smooth_triangle</code> primitive is used for just such purposes.
+The smooth triangles use a formula called Phong normal interpolation to
+calculate the surface normal for any point on the triangle based on normal
+vectors which you define for the three corners. This makes the triangle
+appear to be a smooth curved surface. A smooth triangle is defined by</p>
+<pre>
+SMOOTH_TRIANGLE:
+  smooth_triangle {
+  &lt;Corner_1&gt;, &lt;Normal_1&gt;, &lt;Corner_2&gt;,
+  &lt;Normal_2&gt;, &lt;Corner_3&gt;, &lt;Normal_3&gt;
+  [OBJECT_MODIFIER...]
+  }
+</pre>
+
+<p>where the corners are defined as in regular triangles and <em><code>
+&lt;Normal_n&gt;</code></em> is a vector describing the direction of the
+surface normal at each corner.</p>
+<p>
+These normal vectors are prohibitively difficult to compute by hand.
+Therefore smooth triangles are almost always generated by utility programs.
+To achieve smooth results, any triangles which share a common vertex should
+have the same normal vector at that vertex. Generally the smoothed normal
+should be the average of all the actual normals of the triangles which share
+that point.</p>
+<p>
+The <code>mesh</code> object is a way to combine many <code>triangle</code>
+and <code>smooth_triangle</code> objects together in a very efficient way.
+See <a href="r3_5.html#r3_5_1_2_3">Mesh</a> for details.</p></div>
+
+<a name="r3_5_1_3"></a>
+<div class="content-level-h4" contains="Infinite Solid Primitives" id="r3_5_1_3">
+<h4>3.5.1.3 Infinite Solid Primitives</h4>
+<p>There are six polynomial primitive shapes that are possibly infinite and
+do not respond to automatic bounding. They are <a href="r3_5.html#r3_5_1_3_1">plane</a>, <a href="r3_5.html#r3_5_1_3_3">cubic</a>, <a href="r3_5.html#r3_5_1_3_2">poly</a>, <a href="r3_5.html#r3_5_1_3_4">quartic</a>, <a href="r3_5.html#r3_5_1_3_5">polynomial</a>,
+and <a href="r3_5.html#r3_5_1_3_6">quadric</a>. They do have a well defined inside and may be used in CSG and
+inside a <code>clipped_by</code> statement. As with all shapes they can be
+translated, rotated and scaled.</p></div>
+
+<a name="r3_5_1_3_1"></a>
+<div class="content-level-h5" contains="Plane" id="r3_5_1_3_1">
+<h5>3.5.1.3.1 Plane</h5>
+
+
+<p>The <code>plane</code> primitive is a simple way to define an infinite
+flat surface. The plane is not a thin boundary or can be compared to a sheet
+of paper. A plane is a solid object of infinite size that divides POV-space
+in two parts, inside and outside the plane. The plane is specified as follows:</p>
+<pre>
+PLANE:
+  plane {
+    &lt;Normal&gt;, Distance
+    [OBJECT_MODIFIERS...]
+    }
+</pre>
+
+<p>The <em><code>&lt;Normal&gt;</code></em> vector defines the surface normal
+of the plane. A surface normal is a vector which points up from the surface
+at a 90 degree angle. This is followed by a float value that gives the
+distance along the normal that the plane is from the origin (that is only
+true if the normal vector has unit length; see below). For example:</p>
+<pre>
+plane { &lt;0, 1, 0&gt;, 4 }
+</pre>
+
+<p>This is a plane where straight up is defined in the positive y-direction.
+The plane is 4 units in that direction away from the origin. Because most
+planes are defined with surface normals in the direction of an axis you will
+often see planes defined using the <code>x</code>, <code>y</code> or <code>
+z</code> built-in vector identifiers. The example above could be specified
+as:</p>
+<pre>
+plane { y, 4 }
+</pre>
+
+<p>The plane extends infinitely in the x- and z-directions. It effectively
+divides the world into two pieces. By definition the normal vector points to
+the outside of the plane while any points away from the vector are defined as
+inside. This inside/outside distinction is important when using planes in CSG
+and <code>clipped_by</code>. It is also important when using fog or
+atmospheric media. If you place a camera on the &quot;inside&quot; half of
+the world, then the fog or media will not appear. Such issues arise in any
+solid object but it is more common with planes. Users typically know when
+they have accidentally placed a camera inside a sphere or box but
+&quot;inside a plane&quot; is an unusual concept. In general you can reverse the
+inside/outside properties of an object by adding the object modifier <code>
+inverse</code>. See <a href="r3_5.html#r3_5_1_5_5">Inverse</a> and <a href="r3_7.html#r3_7_2_1_2">Empty and Solid Objects</a> for details.</p>
+<p>
+A plane is called a <em>polynomial</em> shape because it is defined by a
+first order polynomial equation. Given a plane:</p>
+<pre>
+plane { &lt;A, B, C&gt;, D }
+</pre>
+
+<p>it can be represented by the equation <em><code>A*x + B*y + C*z - D*sqrt(A^2 + B^2 + C^2) = 0</code></em>.</p>
+<p>
+Therefore our example <code>plane{y,4}</code> is actually the polynomial
+equation y=4. You can think of this as a set of all x, y, z points where all
+have y values equal to 4, regardless of the x or z values.</p>
+<p>
+This equation is a first order polynomial because each term contains only
+single powers of x, y or z. A second order equation has terms like x^2, y^2,
+z^2, xy, xz and yz. Another name for a 2nd order equation is a quadric
+equation. Third order polys are called cubics. A 4th order equation is a
+quartic. Such shapes are described in the sections below.</p></div>
+
+<a name="r3_5_1_3_2"></a>
+<div class="content-level-h5" contains="Poly" id="r3_5_1_3_2">
+<h5>3.5.1.3.2 Poly</h5>
+
+
+<p>Higher order polynomial surfaces may be defined by the use of a <code>poly</code> shape.</p>
+<p>The syntax is</p>
+<pre>
+POLY:
+  poly {
+    Order, &lt;A1, A2, A3,... An&gt;
+    [POLY_MODIFIERS...]
+    }
+POLY_MODIFIERS:
+  sturm | OBJECT_MODIFIER
+</pre>
+
+<p>Poly default values:</p>
+<pre>
+sturm : off
+</pre>
+
+<p>Where <em><code>Order</code></em> is an integer number from 2 to 35 inclusively that specifies the order of the equation. <em><code>A1, A2, ...An</code></em> are float values for the coefficients of the equation. There are <em><code>n</code></em> such terms where <em><code>n = ((Order+1)*(Order+2)*(Order+3))/6.</code></em></p>
+<p>If additional accuracy is required you can add the <code><a href="r3_5.html#r3_5_1_5_11">sturm</a></code> object modifier.</p></div>
+
+<a name="r3_5_1_3_3"></a>
+<div class="content-level-h5" contains="Cubic" id="r3_5_1_3_3">
+<h5>3.5.1.3.3 Cubic</h5>
+
+
+<p>The <code>cubic</code> object
+is an alternate way to specify 3rd order polys. Its syntax is:</p>
+<pre>
+CUBIC:
+  cubic {
+    &lt;A1, A2, A3,... A20&gt;
+    [POLY_MODIFIERS...]
+    }
+</pre>
+<p>If additional accuracy is required you can add the <code><a href="r3_5.html#r3_5_1_5_11">sturm</a></code> object modifier.</p></div>
+
+<a name="r3_5_1_3_4"></a>
+<div class="content-level-h5" contains="Quartic" id="r3_5_1_3_4">
+<h5>3.5.1.3.4 Quartic</h5>
+
+
+<p>Also 4th order equations may be specified with the <code>quartic</code> object.</p>
+<p>Its syntax is:</p>
+<pre>
+QUARTIC:
+  quartic {
+    &lt;A1, A2, A3,... A35&gt;
+    [POLY_MODIFIERS...]
+    }
+</pre>
+<p>If additional accuracy is required you can add the <code><a href="r3_5.html#r3_5_1_5_11">sturm</a></code> object modifier.</p></div>
+
+<a name="r3_5_1_3_5"></a>
+<div class="content-level-h5" contains="Polynomial" id="r3_5_1_3_5">
+<h5>3.5.1.3.5 Polynomial</h5>
+
+
+<p>Poly, cubic and quartics are just like quadrics in that you do not have
+to understand one to use one. The file <code>shapesq.inc</code> has
+plenty of pre-defined quartics for you to play with.</p>
+
+<p>For convenience an alternate syntax is available as <code>polynomial</code>. It doesn't care about the order of the coefficients, as long as you do not define them more than once, otherwise only the value of the last definition is kept. Additionally the default with all coefficients is 0, which can be especially useful typing shortcut.</p>
+<p>See the <a href="t2_3.html#t2_3_3_4_3">tutorial</a> section for more examples of the simplified syntax.</p>
+<pre>
+POLYNOMIAL:
+  polynomial {
+    Order, [COEFFICIENTS...]
+    [POLY_MODIFIERS...]
+    }
+COEFFICIENTS:
+  xyz(&lt;x_power&gt;,&lt;y_power&gt;,&lt;z_power&gt;):&lt;value&gt;[,]
+POLY_MODIFIERS:
+  sturm | OBJECT_MODIFIER
+</pre>
+<p>Same as the torus above, but with the polynomial syntax:</p>
+<pre>
+// Torus having major radius sqrt(40), minor radius sqrt(12)
+polynomial { 4,
+  xyz(4,0,0):1,   
+  xyz(2,2,0):2,  
+  xyz(2,0,2):2,
+  xyz(2,0,0):-104,  
+  xyz(0,4,0):1,
+  xyz(0,2,2):2,
+  xyz(0,2,0):56,
+  xyz(0,0,4):1,
+  xyz(0,0,2):-104, 
+  xyz(0,0,0):784
+  sturm
+  }
+</pre>
+
+<p>The following table shows which polynomial terms correspond to which x,y,z
+factors for the orders 2 to 7. Remember <code>cubic</code> is actually a 3rd order polynomial and
+<code>quartic</code> is 4th order.</p>
+
+<table class="matte" SUMMARY="Cubic and quartic polynomial terms" width="700px">
+<tr>
+<!-- That this is only 99% is intentional! [trf] -->
+<th width="5%"> </th>
+<th width="5%">2<sup>nd</sup></th>
+<th width="6%">3<sup>rd</sup></th>
+<th width="7%">4<sup>th</sup></th>
+<th width="8%">5<sup>th</sup></th>
+<th width="9%">6<sup>th</sup></th>
+<th width="10%">7<sup>th</sup></th>
+<th width="6%"> </th>
+<th width="8%">5<sup>th</sup></th>
+<th width="9%">6<sup>th</sup></th>
+<th width="10%">7<sup>th</sup></th>
+<th width="6%"> </th>
+<th width="5%">6<sup>th</sup></th>
+<th width="5%">7<sup>th</sup></th>
+</tr>
+<tr>
+<td>A<sub>1</sub></td>
+<td>x<sup>2</sup></td>
+<td>x<sup>3</sup></td>
+<td>x<sup>4</sup></td>
+<td>x<sup>5</sup></td>
+<td>x<sup>6</sup></td>
+<td>x<sup>7</sup></td>
+<td>A<sub>41</sub></td>
+<td>y<sup>3</sup></td>
+<td>xy<sup>3</sup></td>
+<td>x<sup>2</sup>y<sup>3</sup></td>
+<td>A<sub>81</sub></td>
+<td>z<sup>3</sup></td>
+<td>xz<sup>3</sup></td>
+</tr>
+<tr>
+<td>A<sub>2</sub></td>
+<td>xy</td>
+<td>x<sup>2</sup>y</td>
+<td>x<sup>3</sup>y</td>
+<td>x<sup>4</sup>y</td>
+<td>x<sup>5</sup>y</td>
+<td>x<sup>6</sup>y</td>
+<td>A<sub>42</sub></td>
+<td>y<sup>2</sup>z<sup>3</sup></td>
+<td>xy<sup>2</sup>z<sup>3</sup></td>
+<td>x<sup>2</sup>y<sup>2</sup>z<sup>3</sup></td>
+<td>A<sub>82</sub></td>
+<td>z<sup>2</sup></td>
+<td>xz<sup>2</sup></td>
+</tr>
+<tr>
+<td>A<sub>3</sub></td>
+<td>xz</td>
+<td>x<sup>2</sup>z</td>
+<td>x<sup>3</sup>z</td>
+<td>x<sup>4</sup>z</td>
+<td>x<sup>5</sup>z</td>
+<td>x<sup>6</sup>z</td>
+<td>A<sub>43</sub></td>
+<td>y<sup>2</sup>z<sup>2</sup></td>
+<td>xy<sup>2</sup>z<sup>2</sup></td>
+<td>x<sup>2</sup>y<sup>2</sup>z<sup>2</sup></td>
+<td>A<sub>83</sub></td>
+<td>z</td>
+<td>xz</td>
+</tr>
+<tr>
+<td>A<sub>4</sub></td>
+<td>x</td>
+<td>x<sup>2</sup></td>
+<td>x<sup>3</sup></td>
+<td>x<sup>4</sup></td>
+<td>x<sup>5</sup></td>
+<td>x<sup>6</sup></td>
+<td>A<sub>44</sub></td>
+<td>y<sup>2</sup>z</td>
+<td>xy<sup>2</sup>z</td>
+<td>x<sup>2</sup>y<sup>2</sup>z</td>
+<td>A<sub>84</sub></td>
+<td>1</td>
+<td>x</td>
+</tr>
+<tr>
+<td>A<sub>5</sub></td>
+<td>y<sup>2</sup></td>
+<td>xy<sup>2</sup></td>
+<td>x<sup>2</sup>y<sup>2</sup></td>
+<td>x<sup>3</sup>y<sup>2</sup></td>
+<td>x<sup>4</sup>y<sup>2</sup></td>
+<td>x<sup>5</sup>y<sup>2</sup></td>
+<td>A<sub>45</sub></td>
+<td>y<sup>2</sup></td>
+<td>xy<sup>2</sup></td>
+<td>x<sup>2</sup>y<sup>2</sup></td>
+<td>A<sub>85</sub></td>
+<td> </td>
+<td>y<sup>7</sup></td>
+</tr>
+<tr>
+<td>A<sub>6</sub></td>
+<td>yz</td>
+<td>xyz</td>
+<td>x<sup>2</sup>yz</td>
+<td>x<sup>3</sup>yz</td>
+<td>x<sup>4</sup>yz</td>
+<td>x<sup>5</sup>yz</td>
+<td>A<sub>46</sub></td>
+<td>yz<sup>4</sup></td>
+<td>xyz<sup>4</sup></td>
+<td>x<sup>2</sup>yz<sup>4</sup></td>
+<td>A<sub>86</sub></td>
+<td> </td>
+<td>y<sup>6</sup>z</td>
+</tr>
+<tr>
+<td>A<sub>7</sub></td>
+<td>y</td>
+<td>xy</td>
+<td>x<sup>2</sup>y</td>
+<td>x<sup>3</sup>y</td>
+<td>x<sup>4</sup>y</td>
+<td>x<sup>5</sup>y</td>
+<td>A<sub>47</sub></td>
+<td>yz<sup>3</sup></td>
+<td>xyz<sup>3</sup></td>
+<td>x<sup>2</sup>yz<sup>3</sup></td>
+<td>A<sub>87</sub></td>
+<td> </td>
+<td>y<sup>6</sup></td>
+</tr>
+<tr>
+<td>A<sub>8</sub></td>
+<td>z<sup>2</sup></td>
+<td>xz<sup>2</sup></td>
+<td>x<sup>2</sup>z<sup>2</sup></td>
+<td>x<sup>3</sup>z<sup>2</sup></td>
+<td>x<sup>4</sup>z<sup>2</sup></td>
+<td>x<sup>5</sup>z<sup>2</sup></td>
+<td>A<sub>48</sub></td>
+<td>yz<sup>2</sup></td>
+<td>xyz<sup>2</sup></td>
+<td>x<sup>2</sup>yz<sup>2</sup></td>
+<td>A<sub>88</sub></td>
+<td> </td>
+<td>y<sup>5</sup>z<sup>2</sup></td>
+</tr>
+<tr>
+<td>A<sub>9</sub></td>
+<td>z</td>
+<td>xz</td>
+<td>x<sup>2</sup>z</td>
+<td>x<sup>3</sup>z</td>
+<td>x<sup>4</sup>z</td>
+<td>x<sup>5</sup>z</td>
+<td>A<sub>49</sub></td>
+<td>yz</td>
+<td>xyz</td>
+<td>x<sup>2</sup>yz</td>
+<td>A<sub>89</sub></td>
+<td> </td>
+<td>y<sup>5</sup>z</td>
+</tr>
+<tr>
+<td>A<sub>10</sub></td>
+<td>1</td>
+<td>x</td>
+<td>x<sup>2</sup></td>
+<td>x<sup>3</sup></td>
+<td>x<sup>4</sup></td>
+<td>x<sup>5</sup></td>
+<td>A<sub>50</sub></td>
+<td>y</td>
+<td>xy</td>
+<td>x<sup>2</sup>y</td>
+<td>A<sub>90</sub></td>
+<td> </td>
+<td>y<sup>5</sup></td>
+</tr>
+<tr>
+<td>A<sub>11</sub></td>
+<td> </td>
+<td>y<sup>3</sup></td>
+<td>xy<sup>3</sup></td>
+<td>x<sup>2</sup>y<sup>3</sup></td>
+<td>x<sup>3</sup>y<sup>3</sup></td>
+<td>x<sup>4</sup>y<sup>3</sup></td>
+<td>A<sub>51</sub></td>
+<td>z<sup>5</sup></td>
+<td>xz<sup>5</sup></td>
+<td>x<sup>2</sup>z<sup>5</sup></td>
+<td>A<sub>91</sub></td>
+<td> </td>
+<td>y<sup>4</sup>z<sup>3</sup></td>
+</tr>
+<tr>
+<td>A<sub>12</sub></td>
+<td> </td>
+<td>y<sup>2</sup>z</td>
+<td>xy<sup>2</sup>z</td>
+<td>x<sup>2</sup>y<sup>2</sup>z</td>
+<td>x<sup>3</sup>y<sup>2</sup>z</td>
+<td>x<sup>4</sup>y<sup>2</sup>z</td>
+<td>A<sub>52</sub></td>
+<td>z<sup>4</sup></td>
+<td>xz<sup>4</sup></td>
+<td>x<sup>2</sup>z<sup>4</sup></td>
+<td>A<sub>92</sub></td>
+<td> </td>
+<td>y<sup>4</sup>z<sup>2</sup></td>
+</tr>
+<tr>
+<td>A<sub>13</sub></td>
+<td> </td>
+<td>y<sup>2</sup></td>
+<td>xy<sup>2</sup></td>
+<td>x<sup>2</sup>y<sup>2</sup></td>
+<td>x<sup>3</sup>y<sup>2</sup></td>
+<td>x<sup>4</sup>y<sup>2</sup></td>
+<td>A<sub>53</sub></td>
+<td>z<sup>3</sup></td>
+<td>xz<sup>3</sup></td>
+<td>x<sup>2</sup>z<sup>3</sup></td>
+<td>A<sub>93</sub></td>
+<td> </td>
+<td>y<sup>4</sup>z</td>
+</tr>
+<tr>
+<td>A<sub>14</sub></td>
+<td> </td>
+<td>yz<sup>2</sup></td>
+<td>xyz<sup>2</sup></td>
+<td>x<sup>2</sup>yz<sup>2</sup></td>
+<td>x<sup>3</sup>yz<sup>2</sup></td>
+<td>x<sup>4</sup>yz<sup>2</sup></td>
+<td>A<sub>54</sub></td>
+<td>z<sup>2</sup></td>
+<td>xz<sup>2</sup></td>
+<td>x<sup>2</sup>z<sup>2</sup></td>
+<td>A<sub>94</sub></td>
+<td> </td>
+<td>y<sup>4</sup></td>
+</tr>
+<tr>
+<td>A<sub>15</sub></td>
+<td> </td>
+<td>yz</td>
+<td>xyz</td>
+<td>x<sup>2</sup>yz</td>
+<td>x<sup>3</sup>yz</td>
+<td>x<sup>4</sup>yz</td>
+<td>A<sub>55</sub></td>
+<td>z</td>
+<td>xz</td>
+<td>x<sup>2</sup>z</td>
+<td>A<sub>95</sub></td>
+<td> </td>
+<td>y<sup>3</sup>z<sup>4</sup></td>
+</tr>
+<tr>
+<td>A<sub>16</sub></td>
+<td> </td>
+<td>y</td>
+<td>xy</td>
+<td>x<sup>2</sup>y</td>
+<td>x<sup>3</sup>y</td>
+<td>x<sup>4</sup>y</td>
+<td>A<sub>56</sub></td>
+<td>1</td>
+<td>x</td>
+<td>x<sup>2</sup></td>
+<td>A<sub>96</sub></td>
+<td> </td>
+<td>y<sup>3</sup>z<sup>3</sup></td>
+</tr>
+<tr>
+<td>A<sub>17</sub></td>
+<td> </td>
+<td>z<sup>3</sup></td>
+<td>xz<sup>3</sup></td>
+<td>x<sup>2</sup>z<sup>3</sup></td>
+<td>x<sup>3</sup>z<sup>3</sup></td>
+<td>x<sup>4</sup>z<sup>3</sup></td>
+<td>A<sub>57</sub></td>
+<td>&nbsp;</td>
+<td>y<sup>6</sup></td>
+<td>xy<sup>6</sup></td>
+<td>A<sub>97</sub></td>
+<td> </td>
+<td>y<sup>3</sup>z<sup>2</sup></td>
+</tr>
+<tr>
+<td>A<sub>18</sub></td>
+<td> </td>
+<td>z<sup>2</sup></td>
+<td>xz<sup>2</sup></td>
+<td>x<sup>2</sup>z<sup>2</sup></td>
+<td>x<sup>3</sup>z<sup>2</sup></td>
+<td>x<sup>4</sup>z<sup>2</sup></td>
+<td>A<sub>58</sub></td>
+<td> </td>
+<td>y<sup>5</sup>z</td>
+<td>xy<sup>5</sup>z</td>
+<td>A<sub>98</sub></td>
+<td> </td>
+<td>y<sup>3</sup>z</td>
+</tr>
+<tr>
+<td>A<sub>19</sub></td>
+<td> </td>
+<td>z</td>
+<td>xz</td>
+<td>x<sup>2</sup>z</td>
+<td>x<sup>3</sup>z</td>
+<td>x<sup>4</sup>z</td>
+<td>A<sub>59</sub></td>
+<td> </td>
+<td>y<sup>5</sup></td>
+<td>xy<sup>5</sup></td>
+<td>A<sub>99</sub></td>
+<td> </td>
+<td>y<sup>3</sup></td>
+</tr>
+<tr>
+<td>A<sub>20</sub></td>
+<td> </td>
+<td>1</td>
+<td>x</td>
+<td>x<sup>2</sup></td>
+<td>x<sup>3</sup></td>
+<td>x<sup>4</sup></td>
+<td>A<sub>60</sub></td>
+<td> </td>
+<td>y<sup>4</sup>z<sup>2</sup></td>
+<td>xy<sup>4</sup>z<sup>2</sup></td>
+<td>A<sub>100</sub></td>
+<td> </td>
+<td>y<sup>2</sup>z<sup>5</sup></td>
+</tr>
+<tr>
+<td>A<sub>21</sub></td>
+<td> </td>
+<td> </td>
+<td>y<sup>4</sup></td>
+<td>xy<sup>4</sup></td>
+<td>x<sup>2</sup>y<sup>4</sup></td>
+<td>x<sup>3</sup>y<sup>4</sup></td>
+<td>A<sub>61</sub></td>
+<td> </td>
+<td>y<sup>4</sup>z</td>
+<td>xy<sup>4</sup>z</td>
+<td>A<sub>101</sub></td>
+<td> </td>
+<td>y<sup>2</sup>z<sup>4</sup></td>
+</tr>
+<tr>
+<td>A<sub>22</sub></td>
+<td> </td>
+<td> </td>
+<td>y<sup>3</sup>z</td>
+<td>xy<sup>3</sup>z</td>
+<td>x<sup>2</sup>y<sup>3</sup>z</td>
+<td>x<sup>3</sup>y<sup>3</sup>z</td>
+<td>A<sub>62</sub></td>
+<td> </td>
+<td>y<sup>4</sup></td>
+<td>xy<sup>4</sup></td>
+<td>A<sub>102</sub></td>
+<td> </td>
+<td>y<sup>2</sup>z<sup>3</sup></td>
+</tr>
+<tr>
+<td>A<sub>23</sub></td>
+<td> </td>
+<td> </td>
+<td>y<sup>3</sup></td>
+<td>xy<sup>3</sup></td>
+<td>x<sup>2</sup>y<sup>3</sup></td>
+<td>x<sup>3</sup>y<sup>3</sup></td>
+<td>A<sub>63</sub></td>
+<td> </td>
+<td>y<sup>3</sup>z<sup>3</sup></td>
+<td>xy<sup>3</sup>z<sup>3</sup></td>
+<td>A<sub>103</sub></td>
+<td> </td>
+<td>y<sup>2</sup>z<sup>2</sup></td>
+</tr>
+<tr>
+<td>A<sub>24</sub></td>
+<td> </td>
+<td> </td>
+<td>y<sup>2</sup>z<sup>2</sup></td>
+<td>xy<sup>2</sup>z<sup>2</sup></td>
+<td>x<sup>2</sup>y<sup>2</sup>z<sup>2</sup></td>
+<td>x<sup>3</sup>y<sup>2</sup>z<sup>2</sup></td>
+<td>A<sub>64</sub></td>
+<td> </td>
+<td>y<sup>3</sup>z<sup>2</sup></td>
+<td>xy<sup>3</sup>z<sup>2</sup></td>
+<td>A<sub>104</sub></td>
+<td> </td>
+<td>y<sup>2</sup>z</td>
+</tr>
+<tr>
+<td>A<sub>25</sub></td>
+<td> </td>
+<td> </td>
+<td>y<sup>2</sup>z</td>
+<td>xy<sup>2</sup>z</td>
+<td>x<sup>2</sup>y<sup>2</sup>z</td>
+<td>x<sup>3</sup>y<sup>2</sup>z</td>
+<td>A<sub>65</sub></td>
+<td> </td>
+<td>y<sup>3</sup>z</td>
+<td>xy<sup>3</sup>z</td>
+<td>A<sub>105</sub></td>
+<td> </td>
+<td>y<sup>2</sup></td>
+</tr>
+<tr>
+<td>A<sub>26</sub></td>
+<td> </td>
+<td> </td>
+<td>y<sup>2</sup></td>
+<td>xy<sup>2</sup></td>
+<td>x<sup>2</sup>y<sup>2</sup></td>
+<td>x<sup>3</sup>y<sup>2</sup></td>
+<td>A<sub>66</sub></td>
+<td> </td>
+<td>y<sup>3</sup></td>
+<td>xy<sup>3</sup></td>
+<td>A<sub>106</sub></td>
+<td> </td>
+<td>yz<sup>6</sup></td>
+</tr>
+<tr>
+<td>A<sub>27</sub></td>
+<td> </td>
+<td> </td>
+<td>yz<sup>3</sup></td>
+<td>xyz<sup>3</sup></td>
+<td>x<sup>2</sup>yz<sup>3</sup></td>
+<td>x<sup>3</sup>yz<sup>3</sup></td>
+<td>A<sub>67</sub></td>
+<td> </td>
+<td>y<sup>2</sup>z<sup>4</sup></td>
+<td>xy<sup>2</sup>z<sup>4</sup></td>
+<td>A<sub>107</sub></td>
+<td> </td>
+<td>yz<sup>5</sup></td>
+</tr>
+<tr>
+<td>A<sub>28</sub></td>
+<td> </td>
+<td> </td>
+<td>yz<sup>2</sup></td>
+<td>xyz<sup>2</sup></td>
+<td>x<sup>2</sup>yz<sup>2</sup></td>
+<td>x<sup>3</sup>yz<sup>2</sup></td>
+<td>A<sub>68</sub></td>
+<td> </td>
+<td>y<sup>2</sup>z<sup>3</sup></td>
+<td>xy<sup>2</sup>z<sup>3</sup></td>
+<td>A<sub>108</sub></td>
+<td> </td>
+<td>yz<sup>4</sup></td>
+</tr>
+<tr>
+<td>A<sub>29</sub></td>
+<td> </td>
+<td> </td>
+<td>yz</td>
+<td>xyz</td>
+<td>x<sup>2</sup>yz</td>
+<td>x<sup>3</sup>yz</td>
+<td>A<sub>69</sub></td>
+<td> </td>
+<td>y<sup>2</sup>z<sup>2</sup></td>
+<td>xy<sup>2</sup>z<sup>2</sup></td>
+<td>A<sub>109</sub></td>
+<td> </td>
+<td>yz<sup>3</sup></td>
+</tr>
+<tr>
+<td>A<sub>30</sub></td>
+<td> </td>
+<td> </td>
+<td>y</td>
+<td>xy</td>
+<td>x<sup>2</sup>y</td>
+<td>x<sup>3</sup>y</td>
+<td>A<sub>70</sub></td>
+<td> </td>
+<td>y<sup>2</sup>z</td>
+<td>xy<sup>2</sup>z</td>
+<td>A<sub>110</sub></td>
+<td> </td>
+<td>yz<sup>2</sup></td>
+</tr>
+<tr>
+<td>A<sub>31</sub></td>
+<td> </td>
+<td> </td>
+<td>z<sup>4</sup></td>
+<td>xz<sup>4</sup></td>
+<td>x<sup>2</sup>z<sup>4</sup></td>
+<td>x<sup>3</sup>z<sup>4</sup></td>
+<td>A<sub>71</sub></td>
+<td> </td>
+<td>y<sup>2</sup></td>
+<td>xy<sup>2</sup></td>
+<td>A<sub>111</sub></td>
+<td> </td>
+<td>yz</td>
+</tr>
+<tr>
+<td>A<sub>32</sub></td>
+<td> </td>
+<td> </td>
+<td>z<sup>3</sup></td>
+<td>xz<sup>3</sup></td>
+<td>x<sup>2</sup>z<sup>3</sup></td>
+<td>x<sup>3</sup>z<sup>3</sup></td>
+<td>A<sub>72</sub></td>
+<td> </td>
+<td>yz<sup>5</sup></td>
+<td>xyz<sup>5</sup></td>
+<td>A<sub>112</sub></td>
+<td> </td>
+<td>y</td>
+</tr>
+<tr>
+<td>A<sub>33</sub></td>
+<td> </td>
+<td> </td>
+<td>z<sup>2</sup></td>
+<td>xz<sup>2</sup></td>
+<td>x<sup>2</sup>z<sup>2</sup></td>
+<td>x<sup>3</sup>z<sup>2</sup></td>
+<td>A<sub>73</sub></td>
+<td> </td>
+<td>yz<sup>4</sup></td>
+<td>xyz<sup>4</sup></td>
+<td>A<sub>113</sub></td>
+<td> </td>
+<td>z<sup>7</sup></td>
+</tr>
+<tr>
+<td>A<sub>34</sub></td>
+<td> </td>
+<td> </td>
+<td>z</td>
+<td>xz</td>
+<td>x<sup>2</sup>z</td>
+<td>x<sup>3</sup>z</td>
+<td>A<sub>74</sub></td>
+<td> </td>
+<td>yz<sup>3</sup></td>
+<td>xyz<sup>3</sup></td>
+<td>A<sub>114</sub></td>
+<td> </td>
+<td>z<sup>6</sup></td>
+</tr>
+<tr>
+<td>A<sub>35</sub></td>
+<td> </td>
+<td> </td>
+<td>1</td>
+<td>x</td>
+<td>x<sup>2</sup></td>
+<td>x<sup>3</sup></td>
+<td>A<sub>75</sub></td>
+<td> </td>
+<td>yz<sup>2</sup></td>
+<td>xyz<sup>2</sup></td>
+<td>A<sub>115</sub></td>
+<td> </td>
+<td>z<sup>5</sup></td>
+</tr>
+<tr>
+<td>A<sub>36</sub></td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td>y<sup>5</sup></td>
+<td>xy<sup>5</sup></td>
+<td>x<sup>2</sup>y<sup>5</sup></td>
+<td>A<sub>76</sub></td>
+<td> </td>
+<td>yz</td>
+<td>xyz</td>
+<td>A<sub>116</sub></td>
+<td> </td>
+<td>z<sup>4</sup></td>
+</tr>
+<tr>
+<td>A<sub>37</sub></td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td>y<sup>4</sup>z</td>
+<td>xy<sup>4</sup>z</td>
+<td>x<sup>2</sup>y<sup>4</sup>z</td>
+<td>A<sub>77</sub></td>
+<td> </td>
+<td>y</td>
+<td>xy</td>
+<td>A<sub>117</sub></td>
+<td> </td>
+<td>z<sup>3</sup></td>
+</tr>
+<tr>
+<td>A<sub>38</sub></td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td>y<sup>4</sup></td>
+<td>xy<sup>4</sup></td>
+<td>x<sup>2</sup>y<sup>4</sup></td>
+<td>A<sub>78</sub></td>
+<td> </td>
+<td>z<sup>6</sup></td>
+<td>xz<sup>6</sup></td>
+<td>A<sub>118</sub></td>
+<td> </td>
+<td>z<sup>2</sup></td>
+</tr>
+<tr>
+<td>A<sub>39</sub></td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td>y<sup>3</sup>z<sup>2</sup></td>
+<td>xy<sup>3</sup>z<sup>2</sup></td>
+<td>x<sup>2</sup>y<sup>3</sup>z<sup>2</sup></td>
+<td>A<sub>79</sub></td>
+<td> </td>
+<td>z<sup>5</sup></td>
+<td>xz<sup>5</sup></td>
+<td>A<sub>119</sub></td>
+<td> </td>
+<td>z</td>
+</tr>
+<tr>
+<td>A<sub>40</sub></td>
+<td> </td>
+<td> </td>
+<td> </td>
+<td>y<sup>3</sup>z</td>
+<td>xy<sup>3</sup>z</td>
+<td>x<sup>2</sup>y<sup>3</sup>z</td>
+<td>A<sub>80</sub></td>
+<td> </td>
+<td>z<sup>4</sup></td>
+<td>xz<sup>4</sup></td>
+<td>A<sub>120</sub></td>
+<td> </td>
+<td>1</td>
+</tr>
+</table>
+
+<p>Polynomial shapes can be used to describe a large class of shapes
+including the torus, the lemniscate, etc. For example, to declare a quartic
+surface requires that each of the coefficients (<em><code>A1 ...
+A35</code></em>) be placed in order into a single long vector of 35 terms. As an example let's define a torus the hard way. A Torus can be represented by the equation: <code>x<sup>4</sup> + y<sup>4</sup> + z<sup>4</sup> + 2 x<sup>2</sup> y<sup>2</sup> + 2 x<sup>2</sup> z<sup>2</sup> + 2 y<sup>2</sup> z<sup>2</sup> - 2 (r_02 + r_12)
+x<sup>2</sup> + 2 (r_02 - r_12) y<sup>2</sup> - 2 (r_02 + r_12) z<sup>2</sup> + (r_02 - r_12)<sup>2</sup> = 0</code></p>
+
+<p>Where r_0 is the major radius of the torus, the distance from the hole of
+the donut to the middle of the ring of the donut, and r_1 is the minor radius
+of the torus, the distance from the middle of the ring of the donut to the
+outer surface. The following object declaration is for a torus having major
+radius 6.3 minor radius 3.5 (Making the maximum width just under 20).</p>
+<pre>
+// Torus having major radius sqrt(40), minor radius sqrt(12)
+quartic {
+  &lt; 1,   0,   0,   0,   2,   0,   0,   2,   0,
+  -104,   0,   0,   0,   0,   0,   0,   0,   0,
+  0,   0,   1,   0,   0,   2,   0,  56,   0,
+  0,   0,   0,   1,   0, -104,  0, 784 &gt;
+  sturm
+  }
+</pre>
+
+<p>
+Polynomial surfaces use highly complex computations and will not always render perfectly.
+If the surface is not smooth, has dropouts, or extra random pixels, try using
+the optional keyword <code>sturm</code> in the definition. This will cause a
+slower but more accurate calculation method to be used. Usually, but not
+always, this will solve the problem. If sturm does not work, try rotating
+or translating the shape by some small amount.</p>
+<p>
+There are really so many different polynomial shapes, we cannot even
+begin to list or describe them all. We suggest you find a good reference
+or text book if you want to investigate the subject further.</p></div>
+
+<a name="r3_5_1_3_6"></a>
+<div class="content-level-h5" contains="Quadric" id="r3_5_1_3_6">
+<h5>3.5.1.3.6 Quadric</h5>
+
+
+<p>The <code>quadric</code> object can produce shapes like paraboloids (dish
+shapes) and hyperboloids (saddle or hourglass shapes). It can also produce
+ellipsoids, spheres, cones, and cylinders but you should use the <code>
+sphere</code>, <code>cone</code>, and <code>cylinder</code> objects built
+into POV-Ray because they are faster than the quadric version.</p>
+<p class="Note"><strong>Note:</strong> Do not confuse &quot;quaDRic&quot; with
+&quot;quaRTic&quot;. A quadric is a 2nd order polynomial while a quartic
+is 4th order.</p>
+<p>
+Quadrics render much
+faster and are less error-prone but produce less complex objects. The syntax
+is:</p>
+<pre>
+QUADRIC:
+  quadric {
+    &lt;A,B,C&gt;,&lt;D,E,F&gt;,&lt;G,H,I&gt;,J
+    [OBJECT_MODIFIERS...]
+    }
+</pre>
+
+<p>Although the syntax actually will parse 3 vector expressions followed by a
+float, we traditionally have written the syntax as above where <em><code>
+A</code></em> through <em><code>J</code></em> are float expressions. These 10
+float that define a surface of x, y, z points which satisfy the equation A x<sup>2</sup>
++ B y<sup>2</sup> + C z<sup>2</sup> + D xy + E xz + F yz + G x + H y + I z + J = 0</p>
+
+<p>Different values of <em><code>A, B, C, ... J</code></em> will give
+different shapes. If you take any three dimensional point and use its x, y
+and z coordinates in the above equation the answer will be 0 if the point is
+on the surface of the object. The answer will be negative if the point is
+inside the object and positive if the point is outside the object. Here are
+some examples:</p>
+
+<table SUMMARY="Some quartic shapes" width="100%">
+<tr>
+<td width="30%">X<sup>2</sup> + Y<sup>2</sup> + Z<sup>2</sup> - 1 = 0</td>
+
+<td width="70%">Sphere</td>
+</tr>
+
+<tr>
+<td>X<sup>2</sup> + Y<sup>2</sup> - 1 = 0</td>
+
+<td>Infinite cylinder along the Z axis</td>
+</tr>
+
+<tr>
+<td>X<sup>2</sup> + Y<sup>2</sup> - Z<sup>2</sup> = 0</td>
+
+<td>Infinite cone along the Z axis</td>
+</tr>
+</table>
+
+<p>The easiest way to use these shapes is to include the standard file <code>
+shapes.inc</code> into your program. It contains several pre-defined quadrics
+and you can transform these pre-defined shapes (using translate, rotate and
+scale) into the ones you want. For a complete list, see the file <code>
+shapes.inc</code>.</p></div>
+
+<a name="r3_5_1_4"></a>
+<div class="content-level-h4" contains="Constructive Solid Geometry" id="r3_5_1_4">
+<h4>3.5.1.4 Constructive Solid Geometry</h4>
+<p>In addition to all of the primitive shapes POV-Ray supports, you can also combine multiple simple shapes into complex shapes using <em> Constructive Solid Geometry</em> (CSG). There are four basic types of CSG operations: <a href="r3_5.html#r3_5_1_4_2">union</a>, <a href="r3_5.html#r3_5_1_4_3">intersection</a>, <a href="r3_5.html#r3_5_1_4_4">difference</a>, and <a href="r3_5.html#r3_5_1_4_5">merge</a>. CSG objects can be composed of primitives or other CSG objects to create more, and more complex shapes.</p>
+
+</div>
+<a name="r3_5_1_4_1"></a>
+<div class="content-level-h5" contains="Inside and Outside" id="r3_5_1_4_1">
+<h5>3.5.1.4.1 Inside and Outside</h5>
+<p>Most shape primitives, like spheres, boxes and blobs divide the world into
+two regions. One region is inside the object and one is outside. Given any
+point in space you can say it is either inside or outside any particular
+primitive object. Well, it could be exactly on the surface but this case is
+rather hard to determine due to numerical problems.</p>
+<p>
+Even planes have an inside and an outside. By definition, the surface normal
+of the plane points towards the outside of the plane. You should note that
+triangles cannot be used as solid objects in CSG since they have no well defined inside and outside. Triangle-based shapes (<code>mesh</code> and <code>mesh2</code>) can only be used in CSG when they are closed objects and have an inside vector specified. </p>
+<p class="Note"><strong>Note:</strong> Although the <code>triangle</code>, the <code>bicubic_patch</code> and some other shapes have no well defined inside and outside, they have a front- and backside which makes it possible to use a texture on the front side and an <code>interior_texture</code> on the back side.</p>
+<p>
+CSG uses the concepts of inside and outside to combine shapes together as
+explained in the following sections.</p>
+<p>
+Imagine you have two objects that partially overlap like shown in the figure
+below. Four different areas of points can be distinguished: points that are
+neither in object <code>A</code> nor in object <code>B</code>, points that
+are in object <code>A</code> but not in object <code>B</code>, points that
+are not in object <code>A</code> but in object <code>B</code> and last not
+least points that are in object <code>A</code> and object <code>B</code>.
+</p>
+
+<table class="centered" width="660x" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <img class="center" width="640px" src="images/8/8f/RefImgObjoverl.gif">
+  </td>
+</tr>
+<tr>
+  <td>
+    <p class="caption">Two overlapping objects.</p>
+  </td>
+</tr>
+</table>
+
+<p>Keeping this in mind it will be quite easy to understand how the CSG
+operations work.</p>
+<p>
+When using CSG it is often useful to invert an object so that it will be
+inside-out. The appearance of the object is not changed, just the way that
+POV-Ray perceives it. When the <code>inverse</code> keyword is used the <em>
+inside</em> of the shape is flipped to become the <em> outside</em> and vice
+versa.</p>
+<p>
+The inside/outside distinction is not important for a <code>union</code>, but is important for <code>intersection</code>, <code>difference</code>, and <code>merge</code>. Therefore any objects may be combined using <code>union</code> but only solid objects, i.e. objects that have a well-defined interior can be used in the other kinds of CSG. The objects described in
+<a href="r3_5.html#r3_5_1_2">Finite Patch Primitives</a> have no well defined inside/outside. All objects described in the sections <a href="r3_5.html#r3_5_1_1">Finite Solid Primitives</a> and <a href="r3_5.html#r3_5_1_3">Infinite Solid Primitives</a>.</p></div>
+
+<a name="r3_5_1_4_2"></a>
+<div class="content-level-h5" contains="Union" id="r3_5_1_4_2">
+<h5>3.5.1.4.2 Union</h5>
+
+
+<table class="centered" width="660x" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <img class="center" width="640px" src="images/0/0d/RefImgUnionobj.gif">
+  </td>
+</tr>
+<tr>
+  <td>
+    <p class="caption">The union of two objects.</p>
+  </td>
+</tr>
+</table>
+
+<p>The simplest kind of CSG is the <code>union</code>. The syntax is:</p>
+<pre>
+UNION:
+  union {
+    OBJECTS...
+    [OBJECT_MODIFIERS...]
+    }
+</pre>
+
+<p>Unions are simply glue used to bind two or more shapes into a single
+entity that can be manipulated as a single object. The image above shows the
+union of <code>A</code> and <code>B</code>. The new object created by the
+union operation can be scaled, translated and rotated as a single shape. The
+entire union can share a single texture but each object contained in the
+union may also have its own texture, which will override any texture
+statements in the parent object.</p>
+<p>
+You should be aware that the surfaces inside the union will not be removed.
+As you can see from the figure this may be a problem for transparent unions.
+If you want those surfaces to be removed you will have to use the <code>
+merge</code> operations explained in a later section.</p>
+<p>
+The following union will contain a box and a sphere.</p>
+<pre>
+union {
+  box { &lt;-1.5, -1, -1&gt;, &lt;0.5, 1, 1&gt; }
+  cylinder { &lt;0.5, 0, -1&gt;, &lt;0.5, 0, 1&gt;, 1 }
+  }
+</pre>
+
+<p>Earlier versions of POV-Ray placed restrictions on unions so you often had
+to combine objects with <code>composite</code> statements. Those earlier
+restrictions have been lifted so <code>composite</code> is no longer needed.
+It is still supported for backwards compatibility.</p>
+
+</div>
+<a name="r3_5_1_4_2_1"></a>
+<div class="content-level-h6" contains="Split_Union" id="r3_5_1_4_2_1">
+<h6>3.5.1.4.2.1 Split_Union</h6>
+<p><code>split_union</code> is a boolean keyword that can be added to a union.
+It has two states <code>on</code>/<code>off</code>, its default is <code>on</code>.</p>
+
+<p><code>split_union</code> is used when <a href="r3_4.html#r3_4_3_4_4">photons</a> are shot 
+at the CSG-object. The object is split up in its compound parts, photons are shot at 
+each part separately. This is to prevent photons from being shot at 'empty spaces' in the object,
+for example the holes in a grid. With compact objects, without 'empty spaces'
+<code>split_union off</code> can improve photon 
+gathering.</p>
+<pre>
+union {
+  object {...}
+  object {...}
+  split_union off
+  }
+</pre></div>
+
+<a name="r3_5_1_4_3"></a>
+<div class="content-level-h5" contains="Intersection" id="r3_5_1_4_3">
+<h5>3.5.1.4.3 Intersection</h5>
+
+
+<p>The <code>intersection</code> object creates a shape containing only those
+areas where all components overlap. A point is part of an intersection if it is
+inside both objects, <code>A</code> and <code>B</code>, as show in the figure
+below.</p>
+
+<table class="centered" width="660x" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <img class="center" width="640px" src="images/7/75/RefImgIsectobj.gif">
+  </td>
+</tr>
+<tr>
+  <td>
+    <p class="caption">The intersection of two objects.</p>
+  </td>
+</tr>
+</table>
+
+<p>The syntax is:</p>
+<pre>
+INTERSECTION:
+  intersection {
+    SOLID_OBJECTS...
+    [OBJECT_MODIFIERS...]
+    }
+</pre>
+
+<p>The component objects must have well defined inside/outside properties.
+Patch objects are not allowed.</p>
+<p class="Note"><strong>Note:</strong> If all components do not overlap, the intersection object disappears.</p>
+<p>
+Here is an example that overlaps:</p>
+<pre>
+intersection {
+  box { &lt;-1.5, -1, -1&gt;, &lt;0.5, 1, 1&gt; }
+  cylinder { &lt;0.5, 0, -1&gt;, &lt;0.5, 0, 1&gt;, 1 }
+  }
+</pre></div>
+
+<a name="r3_5_1_4_4"></a>
+<div class="content-level-h5" contains="Difference" id="r3_5_1_4_4">
+<h5>3.5.1.4.4 Difference</h5>
+
+
+<p>The CSG <code>difference</code> operation takes the intersection between
+the first object and the inverse of all subsequent objects. Thus only points
+inside object <code>A</code> and outside object <code>B</code> belong to the
+difference of both objects.</p>
+<p>
+The result is a subtraction of the 2nd shape from the first shape as shown
+in the figure below.</p>
+
+<table class="centered" width="660x" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <img class="center" width="640px" src="images/3/3b/RefImgDiffobj.gif">
+  </td>
+</tr>
+<tr>
+  <td>
+    <p class="caption">The difference between two objects.</p>
+  </td>
+</tr>
+</table>
+
+<p>The syntax is:</p>
+<pre>
+DIFFERENCE:
+  difference {
+    SOLID_OBJECTS...
+    [OBJECT_MODIFIERS...]
+    }
+</pre>
+
+<p>The component objects must have well defined inside/outside properties.
+Patch objects are not allowed. </p>
+<p class="Note"><strong>Note:</strong> If the first object is entirely inside the subtracted objects, the difference object disappears.</p>
+<p>
+Here is an example of a properly formed difference:</p>
+<pre>
+difference {
+  box { &lt;-1.5, -1, -1&gt;, &lt;0.5, 1, 1&gt; }
+  cylinder { &lt;0.5, 0, -1&gt;, &lt;0.5, 0, 1&gt;, 1 }
+  }
+</pre>
+
+<p class="Note"><strong>Note:</strong> Internally, POV-Ray simply adds the <code>inverse</code> keyword
+to the second (and subsequent) objects and then performs an intersection.</p>
+<p> The
+example above is equivalent to:</p>
+<pre>
+intersection {
+  box { &lt;-1.5, -1, -1&gt;, &lt;0.5, 1, 1&gt; }
+  cylinder { &lt;0.5, 0, -1&gt;, &lt;0.5, 0, 1&gt;, 1 inverse }
+  }
+</pre></div>
+
+<a name="r3_5_1_4_5"></a>
+<div class="content-level-h5" contains="Merge" id="r3_5_1_4_5">
+<h5>3.5.1.4.5 Merge</h5>
+
+
+<p>The <code>union</code> operation just glues objects together, it does not
+remove the objects' surfaces inside the <code>union</code>. Under most
+circumstances this does not matter. However if a transparent <code>
+union</code> is used, those interior surfaces will be visible. The <code>
+merge</code> operations can be used to avoid this problem. It works just like
+<code>union</code> but it eliminates the inner surfaces like shown in the
+figure below.</p>
+
+<table class="centered" width="660x" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <img class="center" width="640px" src="images/2/25/RefImgMergeobj.gif">
+  </td>
+</tr>
+<tr>
+  <td>
+    <p class="caption">Merge removes inner surfaces.</p>
+  </td>
+</tr>
+</table>
+
+<p>The syntax is:</p>
+<pre>
+MERGE:
+  merge {
+    SOLID_OBJECTS...
+    [OBJECT_MODIFIERS...]
+    }
+</pre>
+
+<p>The component objects must have well defined inside/outside properties.
+Patch objects are not allowed. </p>
+<p class="Note"><strong>Note:</strong> In general <code>merge</code> is slower rendering than <code>union</code> when used with non transparent objects. A small test may be needed to determine what is the optimal solution regarding speed and visual result.</p></div>
+
+<a name="r3_5_1_5"></a>
+<div class="content-level-h4" contains="Object Modifiers" id="r3_5_1_5">
+<h4>3.5.1.5 Object Modifiers</h4>
+<p>A variety of modifiers may be attached to objects. The following items may
+be applied to any object:</p>
+<pre>
+OBJECT_MODIFIER:
+  clipped_by { UNTEXTURED_SOLID_OBJECT... } |
+  clipped_by { bounded_by }                 |
+  bounded_by { UNTEXTURED_SOLID_OBJECT... } |
+  bounded_by { clipped_by }                 |
+  no_shadow                  |
+  no_image [ Bool ]          |
+  no_radiosity [ Bool ]      |
+  no_reflection [ Bool ]     |
+  inverse                    |
+  sturm [ Bool ]             |
+  hierarchy [ Bool ]         |
+  double_illuminate [ Bool ] |
+  hollow  [ Bool ]           |
+  interior { INTERIOR_ITEMS... }                        |
+  material { [MATERIAL_IDENTIFIER][MATERIAL_ITEMS...] } |
+  texture { TEXTURE_BODY }   |
+  interior_texture { TEXTURE_BODY } |
+  pigment { PIGMENT_BODY }   |
+  normal { NORMAL_BODY }     |
+  finish { FINISH_ITEMS... } |
+  photons { PHOTON_ITEMS...}
+  radiosity { RADIOSITY_ITEMS...}
+  TRANSFORMATION
+</pre>
+
+<p>Transformations such as translate, rotate and scale have already been discussed. The modifiers <em><a href="r3_6.html#r3_6_1">Textures</a></em> and its parts <em><a href="r3_6.html#r3_6_1_1">Pigment</a></em>, <em><a href="r3_6.html#r3_6_1_2">Normal</a></em>, and <em><a href="r3_6.html#r3_6_1_3">Finish</a></em> as well as <em><a href="r3_7.html#r3_7_2_1">Interior</a></em>, and <em><a href="r3_7.html#r3_7_2">Media</a></em> (which is part of interior) are each in major chapters of their own below. In the sub-sections below we cover several other important modifiers: <code><a href="r3_5.html#r3_5_1_5_1">clipped_by</a></code>, <code><a href="r3_5.html#r3_5_1_5_2">bounded_by</a></code>, <code><a href="r3_5.html#r3_5_1_5_3">material</a></code>, <code><a href="r3_5.html#r3_5_1_5_5">inverse</a></code>, <code><a href="r3_5.html#r3_5_1_5_4">hollow</a></code>, <code><a href="r3_5.html#r3_5_1_5_6">no_shadow</a></code>, <code><a href="r3_5.html#r3_5_1_5_7">no_image</a></code>, <code><a href="r3_5.html#r3_5_1_5_8">no_reflection</a></code>, <code><a href="r3_5.html#r3_5_1_5_9">double_illuminate</a></code>, <code><a href="r3_5.html#r3_5_1_5_10">no_radiosity</a></code> and <code><a href="r3_5.html#r3_5_1_5_11">sturm</a></code>. Although the examples below use object statements and object identifiers, these modifiers may be used on any type of object such as sphere, box etc.</p></div>
+
+<a name="r3_5_1_5_1"></a>
+<div class="content-level-h5" contains="Clipped By Object Modifier" id="r3_5_1_5_1">
+<h5>3.5.1.5.1 Clipped By Object Modifier</h5>
+
+<p>The <code>clipped_by</code> statement is technically an object modifier
+but it provides a type of CSG similar to CSG intersection. The syntax is:</p>
+<pre>
+CLIPPED_BY:
+  clipped_by { UNTEXTURED_SOLID_OBJECT... } |
+  clipped_by { bounded_by }
+</pre>
+
+<p>Where <em>UNTEXTURED_SOLID_OBJECT</em> is one or more solid objects which
+have had no texture applied. For example:</p>
+<pre>
+object {
+  My_Thing
+  clipped_by{plane{y,0}}
+  }
+</pre>
+
+<p>Every part of the object <code>My_Thing</code> that is inside the plane is
+retained while the remaining part is clipped off and discarded. In an <code>
+intersection</code> object the hole is closed off. With <code>
+clipped_by</code> it leaves an opening. For example the following figure
+shows object <code>A</code> being clipped by object <code>B</code>.</p>
+
+<table class="centered" width="660x" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <img class="center" width="640px" src="images/c/c6/RefImgClipobj.gif">
+  </td>
+</tr>
+<tr>
+  <td>
+    <p class="caption">An object clipped by another object.</p>
+  </td>
+</tr>
+</table>
+
+<p>You may use <code>clipped_by</code> to slice off portions of any shape. In
+many cases it will also result in faster rendering times than other methods
+of altering a shape. Occasionally you will want to use the <code>
+clipped_by</code> and <code>bounded_by</code> options with the same object.
+The following shortcut saves typing and uses less memory.</p>
+<pre>
+object {
+  My_Thing
+  bounded_by { box { &lt;0,0,0&gt;, &lt;1,1,1&gt; } }
+  clipped_by { bounded_by }
+  }
+</pre>
+
+<p>This tells POV-Ray to use the same box as a clip that was used as a
+bound.</p></div>
+
+<a name="r3_5_1_5_2"></a>
+<div class="content-level-h5" contains="Bounded By Object Modifier" id="r3_5_1_5_2">
+<h5>3.5.1.5.2 Bounded By Object Modifier</h5>
+
+<p>The calculations necessary to test if a ray hits an object can be quite
+time consuming. Each ray has to be tested against every object in the scene.
+POV-Ray attempts to speed up the process by building a set of invisible
+boxes, called bounding boxes, which cluster the objects together. This way a
+ray that travels in one part of the scene does not have to be tested
+against objects in another, far away part of the scene. When a large number
+of objects are present the boxes are nested inside each other. POV-Ray can
+use bounding boxes on any finite object and even some clipped or bounded
+quadrics. However infinite objects (such as a planes, quartic, cubic and
+poly) cannot be automatically bound. CSG objects are automatically bound if
+they contain finite (and in some cases even infinite) objects. This works by
+applying the CSG set operations to the bounding boxes of all objects used
+inside the CSG object. For difference and intersection operations this will
+hardly ever lead to an optimal bounding box. It is sometimes better
+(depending on the complexity of the CSG object) to have you place a bounding
+shape yourself using a <code>bounded_by</code> statement.</p>
+<p>
+Normally bounding shapes are not necessary but there are cases where they
+can be used to speed up the rendering of complex objects. Bounding shapes
+tell the ray-tracer that the object is totally enclosed by a simple shape.
+When tracing rays, the ray is first tested against the simple bounding shape.
+If it strikes the bounding shape the ray is further tested against the more
+complicated object inside. Otherwise the entire complex shape is skipped,
+which greatly speeds rendering. The syntax is:</p>
+<pre>
+BOUNDED_BY:
+  bounded_by { UNTEXTURED_SOLID_OBJECT... } |
+  bounded_by { clipped_by }
+</pre>
+
+<p>Where <em>UNTEXTURED_SOLID_OBJECT</em> is one or more solid objects which
+have had no texture applied. For example:</p>
+<pre>
+intersection {
+  sphere { &lt;0,0,0&gt;, 2 }
+  plane  { &lt;0,1,0&gt;, 0 }
+  plane  { &lt;1,0,0&gt;, 0 }
+  bounded_by { sphere { &lt;0,0,0&gt;, 2 } }
+  }
+</pre>
+
+<p>The best bounding shape is a sphere or a box since these shapes are highly
+optimized, although, any shape may be used. If the bounding shape is itself a
+finite shape which responds to bounding slabs then the object which it
+encloses will also be used in the slab system.</p>
+<p>
+While it may a good idea to manually add a <code>bounded_by</code> to
+intersection, difference and merge, it is best to <em>never</em> bound a
+union. If a union has no <code>bounded_by</code> POV-Ray can internally
+split apart the components of a union and apply automatic bounding slabs to
+any of its finite parts. Note that some utilities such as <code>
+raw2pov</code> may be able to generate bounds more efficiently than
+POV-Ray's current system. However most unions you create yourself can be
+easily bounded by the automatic system. For technical reasons POV-Ray cannot
+split a merge object. It is maybe best to hand bound a merge, especially if
+it is very complex.</p>
+<p class="Note"><strong>Note:</strong> If bounding shape is too small or positioned incorrectly it may
+clip the object in undefined ways or the object may not appear at all. To do
+true clipping, use <code>clipped_by</code> as explained in the previous
+section. Occasionally you will want to use the <code>clipped_by</code> and
+<code>bounded_by</code> options with the same object. The following shortcut
+saves typing and uses less memory.</p>
+<pre>
+object {
+  My_Thing
+  clipped_by{ box { &lt;0,0,0&gt;,&lt;1,1,1 &gt; }}
+  bounded_by{ clipped_by }
+  }
+</pre>
+
+<p>This tells POV-Ray to use the same box as a bound that was used as a
+clip.</p></div>
+
+<a name="r3_5_1_5_3"></a>
+<div class="content-level-h5" contains="Material" id="r3_5_1_5_3">
+<h5>3.5.1.5.3 Material</h5>
+
+<p>One of the changes in POV-Ray 3.1 was the removal of several items from <code>
+texture { finish{</code>...<code>} }</code> and to move them to the new <code>
+interior</code> statement. The <code><a href="r3_6.html#r3_6_1_4">halo</a></code> statement, formerly part of
+<code><a href="r3_6.html#r3_6_1">texture</a></code>, is now renamed <code><a href="r3_7.html#r3_7_2">media</a></code> and made a part of
+the <code><a href="r3_7.html#r3_7_2_1">interior</a></code>.</p>
+<p>
+This split was deliberate and purposeful (see
+<a href="r3_7.html#r3_7_2_1_1">Why are Interior and Media Necessary?</a>)
+however beta testers pointed out that it made it difficult to 
+entirely describe the surface properties and interior of an object in one 
+statement that can be referenced by a single identifier in a texture 
+library.</p>
+<p>
+The result is that we created a <em>wrapper</em> around <code>texture</code> and <code>interior</code> which we call <code>material</code>.</p>
+<p>
+The syntax is:</p>
+<pre>
+MATERIAL:
+  material { [MATERIAL_IDENTIFIER][MATERIAL_ITEMS...] }
+MATERIAL_ITEMS:
+  TEXTURE | INTERIOR_TEXTURE | INTERIOR | TRANSFORMATIONS
+</pre>
+
+<p>For example:</p>
+<pre>
+#declare MyGlass=material{ texture{ Glass_T } interior{ Glass_I }}
+object { MyObject material{ MyGlass}}
+</pre>
+
+<p>Internally, the <em>material</em> is not attached to the object. The
+material is just a container that brings the texture and interior to the
+object. It is the texture and interior itself that is attached to the object.
+Users should still consider texture and interior as separate items attached
+to the object.</p>
+<p>
+The material is just a <em>bucket</em> to carry them. If the object
+already has a texture, then the material texture is layered over it. If the object
+already has an interior, the material interior fully replaces it and the old
+interior is destroyed. Transformations inside the material affect only the
+textures and interiors which are inside the <code>material{}</code> wrapper
+and only those textures or interiors specified are affected. For example:</p>
+<pre>
+object {
+  MyObject
+    material {
+      texture { MyTexture }
+      scale 4         //affects texture but not object or interior
+      interior { MyInterior }
+      translate 5*x   //affects texture and interior, not object
+      }
+  }
+</pre>
+
+<p class="Note"><strong>Note:</strong> The <code>material</code> statement has nothing to do with the
+<code><a href="r3_6.html#r3_6_1_5_3">material_map</a></code> statement. A <code>material_map</code> is <em> not</em> a way to create patterned material. See <a href="r3_6.html#r3_6_1_5_3">Material Maps</a> for explanation of this unrelated, yet similarly named, older feature.</p></div>
+
+<a name="r3_5_1_5_4"></a>
+<div class="content-level-h5" contains="Hollow Object Modifier" id="r3_5_1_5_4">
+<h5>3.5.1.5.4 Hollow Object Modifier</h5>
+
+<p>POV-Ray by default assumes that objects are made of a solid material that
+completely fills the interior of an object. By adding the <code>
+hollow</code> keyword to the object you can make it hollow, also see the 
+<a href="r3_7.html#r3_7_2_1_2">Empty and Solid Objects</a> chapter. That is very
+useful if you want atmospheric effects to exist inside an object. It is even
+required for objects containing an interior media. The keyword may optionally
+be followed by a float expression which is interpreted as a boolean value.
+For example <code>hollow off</code> may be used to force it off. When the
+keyword is specified alone, it is the same as <code>hollow on</code>. 
+By default <code>hollow</code> is <code>off</code> when not specified.</p>
+<p>
+In order to get a hollow CSG object you just have to make the top level
+object hollow. All children will assume the same <code>hollow</code> state
+except when their state is explicitly set. The following example will set both
+spheres inside the union hollow</p>
+<pre>
+union {
+  sphere { -0.5*x, 1 }
+  sphere {  0.5*x, 1 }
+  hollow
+  }
+</pre>
+
+<p>while the next example will only set the second sphere hollow because the
+first sphere was explicitly set to be not hollow.</p>
+<pre>
+union {
+  sphere { -0.5*x, 1 hollow off }
+  sphere {  0.5*x, 1 }
+  hollow on
+  }
+</pre></div>
+
+<a name="r3_5_1_5_5"></a>
+<div class="content-level-h5" contains="Inverse Object Modifier" id="r3_5_1_5_5">
+<h5>3.5.1.5.5 Inverse Object Modifier</h5>
+
+<p>When using <a href="r3_5.html#r3_5_1_4">CSG</a> it is often useful to invert an object so that it will be
+inside-out. The appearance of the object is not changed, just the way that
+POV-Ray perceives it. When the <code>inverse</code> keyword is used the <em>
+inside</em> of the shape is flipped to become the <em>outside</em> and vice
+versa. For example:</p>
+<pre>
+object { MyObject inverse }
+</pre>
+
+<p>The inside/outside distinction is also important when attaching
+<code><a href="r3_7.html#r3_7_2_1">interior</a></code> to an object especially if
+<code><a href="r3_7.html#r3_7_1_1">media</a></code> is also used. Atmospheric media 
+and fog also do not work as expected if your camera is inside an object. 
+Using <code>inverse</code> is useful to correct that problem.</p></div>
+
+<a name="r3_5_1_5_6"></a>
+<div class="content-level-h5" contains="No Shadow Object Modifier" id="r3_5_1_5_6">
+<h5>3.5.1.5.6 No Shadow Object Modifier</h5>
+
+<p>You may specify the <code>no_shadow</code> keyword in an object to make
+that object cast no shadow. This is useful for special effects and for
+creating the illusion that a light source actually is visible. This keyword
+was necessary in earlier versions of POV-Ray which did not have the <code>
+looks_like</code> statement. Now it is useful for creating things like laser
+beams or other unreal effects. During test rendering it speeds things up if
+<code>no_shadow</code> is applied.</p>
+<p>
+Simply attach the keyword as follows:</p>
+<pre>
+object {
+  My_Thing
+  no_shadow
+  }
+</pre></div>
+
+<a name="r3_5_1_5_7"></a>
+<div class="content-level-h5" contains="No Image Object Modifier" id="r3_5_1_5_7">
+<h5>3.5.1.5.7 No Image Object Modifier</h5>
+
+<p>Syntax:</p>
+<pre>
+OBJECT {
+  [OBJECT_ITEMS...]
+  no_image
+  }
+</pre>
+<p>This keyword is very similar in usage and function to the
+<code>no_shadow</code> keyword, and control an object's visibility.
+<br>You can use any combination of no_image, no_reflection and no_shadow with your object.</p>
+<p>When <code>no_image</code> is used, the object will not be seen by
+the camera, either directly or through transparent/refractive objects. However,
+it will still cast shadows, and show up in reflections (unless <code>no_reflection
+</code> and/or <code>no_shadow</code> is used also).</p>
+
+<p>Using these three keywords you can produce interesting effects like a sphere
+casting a rectangular shadow, a cube that shows up as a cone in mirrors,
+etc.</p></div>
+
+<a name="r3_5_1_5_8"></a>
+<div class="content-level-h5" contains="No Reflection Object Modifier" id="r3_5_1_5_8">
+<h5>3.5.1.5.8 No Reflection Object Modifier</h5>
+
+<p>Syntax:</p>
+<pre>
+OBJECT {
+  [OBJECT_ITEMS...]
+  no_reflection
+  }
+</pre>
+<p>This keyword is very similar in usage and function to the
+<code>no_shadow</code> keyword, and control an object's visibility.
+<br>You can use any combination of no_reflection, no_image and no_shadow with your object.</p>
+<p>When <code>no_reflection</code> is used, the object will not show up in
+reflections. It will be seen by the camera (and through transparent/refractive objects)
+and cast shadows, unless <code>no_image</code> and/or <code>no_shadow
+</code> is used.</p></div>
+
+<a name="r3_5_1_5_9"></a>
+<div class="content-level-h5" contains="Double Illuminate Object Modifier" id="r3_5_1_5_9">
+<h5>3.5.1.5.9 Double Illuminate Object Modifier</h5>
+
+<p>Syntax:</p>
+<pre>
+OBJECT {
+  [OBJECT_ITEMS...]
+  double_illuminate
+  }
+</pre>
+
+<p>A surface has two sides; usually, only the side facing the light source is illuminated,
+the other side remains in shadow. When <code>double_illuminate</code> is used,
+the other side is also illuminated.
+<br>This is useful for simulating effects like translucency (as in a lamp shade, sheet of paper, etc).</p>
+
+<p class="Note"><strong>Note:</strong> Using <code>double_illuminate</code> only illuminates both sides of the same
+surface, so on a sphere, for example, you will not see the effect unless the
+sphere is either partially transparent, or if the camera is inside and the light source
+outside of the sphere (or vise versa).</p></div>
+
+<a name="r3_5_1_5_10"></a>
+<div class="content-level-h5" contains="No Radiosity Object Modifier" id="r3_5_1_5_10">
+<h5>3.5.1.5.10 No Radiosity Object Modifier</h5>
+
+<p>Specifying <code>no_radiosity</code> in an object block makes that object invisible to radiosity rays, in the same way as <code>no_image</code>, <code>no_reflection</code> and <code>no_shadow</code> make an object invisible to primary, reflected and shadow test rays, respectively.</p></div>
+
+<a name="r3_5_1_5_11"></a>
+<div class="content-level-h5" contains="Sturm Object Modifier" id="r3_5_1_5_11">
+<h5>3.5.1.5.11 Sturm Object Modifier</h5>
+
+<p>Some of POV-Ray's objects allow you to choose between a fast but
+sometimes inaccurate root solver and a slower but more accurate one. This is
+the case for all objects that involve the solution of a cubic or quartic
+polynomial. There are analytic mathematical solutions for those polynomials
+that can be used.</p>
+<p>
+Lower order polynomials are trivial to solve while higher order polynomials
+require iterative algorithms to solve them. One of those algorithms is the
+Sturmian root solver. For example:</p>
+<pre>
+blob {
+  threshold .65
+  sphere { &lt;.5,0,0&gt;, .8, 1 }
+  sphere { &lt;-.5,0,0&gt;,.8, 1 }
+  sturm
+  }
+</pre>
+
+<p>The keyword may optionally be followed by a float expression which is
+interpreted as a boolean value. For example <code>sturm off</code> may be
+used to force it off. When the keyword is specified alone, it is the same as
+<code>sturm on</code>. By default <code>sturm</code> is <code>off</code> when not specified.</p>
+<p>
+The following list shows all objects for which the Sturmian root solver can
+be used.</p>
+<ul>
+<li>blob</li>
+<li>cubic</li>
+<li>lathe (only with quadratic splines)</li>
+<li>lemon</li>
+<li>ovus</li>
+<li>poly</li>
+<li>prism (only with cubic splines)</li>
+<li>quartic</li>
+<li>sor</li>
+<li>torus</li>
+</ul></div>
+
+</div>
+
+</div>
+</body>
+</html>

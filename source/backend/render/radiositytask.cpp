@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -241,7 +241,7 @@ void RadiosityTask::Run()
 
         GetViewDataPtr()->AfterTile();
         if(pixelpositions.size() > 0)
-            GetViewData()->CompletedRectangle(rect, serial, pixelpositions, pixelcolors, int(ceil(pretraceSize)), false, progressWeight, pBlockInfo);
+            GetViewData()->CompletedRectangle(rect, serial, pixelpositions, pixelcolors, int(ceil(pretraceSize)), false, false, progressWeight, pBlockInfo);
         else
             GetViewData()->CompletedRectangle(rect, serial, progressWeight, pBlockInfo);
     }

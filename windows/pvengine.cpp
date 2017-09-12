@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -76,6 +76,9 @@
 #include <cstdlib>
 #include <cstdio>
 #include <tchar.h>
+
+#include <string>
+
 #include "pvengine.h"
 #include "resource.h"
 #include "pvdialog.h"
@@ -86,12 +89,16 @@
 #include "backend/povray.h"
 
 #ifdef RTR_SUPPORT
-  #include "rtrsupport.h"
+#include "rtrsupport.h"
 #endif
 
-#if defined(TRY_OPTIMIZED_NOISE)
-  #include OPTIMIZED_NOISE_H
+#include "cpuid.h"
+
+#ifdef TRY_OPTIMIZED_NOISE
+// TODO - This is a hack; we should get the noise generator choice information via POVMS from the back-end.
+#include "core/material/noise.h"
 #endif
+
 
 // this must be the last file included
 #include "syspovdebug.h"
@@ -417,6 +424,16 @@ char                    *AboutURLs[NUM_ABOUT_LINKS] =
                           "http://softwarefreedom.org/"
                         };
 
+const char              *CanInheritFromVersions[] =
+                        {
+#ifdef POVRAY_IS_BETA
+                          "v" POV_RAY_GENERATION,
+#endif
+                          "v3.7",
+                          "v3.6",
+                          NULL // end of list
+                        };
+
 bool handle_main_command (WPARAM wParam, LPARAM lParam) ;
 void SetStatusPanelItemText (int id, LPCSTR format, ...) ;
 void ShowAboutBox (void);
@@ -452,6 +469,8 @@ extern HACCEL           hAccelerators ;
 extern HINSTANCE        hLibPovEdit ;
 
 #define MAX_INSERT_MENU_SECTIONS  8192
+
+std::string selectedNoiseFunc;
 
 typedef std::vector<int> InsMenuSecList;
 
@@ -774,6 +793,9 @@ void PrintRenderTimes (int Finished, int NormalCompletion)
             fprintf(f, "povversion=%s\n", POV_RAY_SOURCE_VERSION) ;
             fprintf(f, "compilerversion=%s\n", POV_COMPILER_VER) ;
             fprintf(f, "platformversion=%s\n", POVRAY_PLATFORM_NAME) ;
+#ifdef TRY_OPTIMIZED_NOISE
+            fprintf(f, "noisefunctions=%s\n", selectedNoiseFunc.c_str()) ;
+#endif // TRY_OPTIMIZED_NOISE
             fclose(f);
           }
         }
@@ -1349,13 +1371,15 @@ bool inferHome (void)
   return (true) ;
 }
 
-string get36Home(void)
+string getHome(const char* ver)
 {
   char        str[_MAX_PATH];
   HKEY        key ;
   DWORD       len = sizeof(str);
 
-  if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, "Software\\" REGKEY "\\v3.6\\Windows", 0, KEY_READ, &key) == ERROR_SUCCESS)
+  std::string keyName = std::string("Software\\" REGKEY "\\") + ver + "\\Windows";
+
+  if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, keyName.c_str(), 0, KEY_READ, &key) == ERROR_SUCCESS)
   {
     if (RegQueryValueEx (key, "Home", 0, NULL, (BYTE *) str, &len) == 0)
     {
@@ -1365,7 +1389,7 @@ string get36Home(void)
     }
     RegCloseKey (key) ;
   }
-  if (RegOpenKeyEx (HKEY_CURRENT_USER, "Software\\" REGKEY "\\v3.6\\Windows", 0, KEY_READ, &key) == ERROR_SUCCESS)
+  if (RegOpenKeyEx (HKEY_CURRENT_USER, keyName.c_str(), 0, KEY_READ, &key) == ERROR_SUCCESS)
   {
     if (RegQueryValueEx (key, "Home", 0, NULL, (BYTE *) str, &len) == 0)
     {
@@ -1378,7 +1402,7 @@ string get36Home(void)
   return string();
 }
 
-bool copy36EditSettings(void)
+bool copyEditSettings(const char* ver)
 {
   HKEY        hKeySrc ;
   HKEY        hKeyDst ;
@@ -1395,7 +1419,9 @@ bool copy36EditSettings(void)
     return (false) ;
   }
 
-  if (RegOpenKeyEx (HKEY_CURRENT_USER, "Software\\" REGKEY "\\v3.6", 0, KEY_READ, &hKeySrc) != ERROR_SUCCESS)
+  std::string keyName = std::string("Software\\" REGKEY "\\") + ver;
+
+  if (RegOpenKeyEx (HKEY_CURRENT_USER, keyName.c_str(), 0, KEY_READ, &hKeySrc) != ERROR_SUCCESS)
   {
     FreeLibrary (hLib) ;
     return (false) ;
@@ -1416,23 +1442,13 @@ bool copy36EditSettings(void)
   return (result == ERROR_SUCCESS) ;
 }
 
-bool checkEditKey36 (void)
+bool checkEditKey (const char* ver)
 {
   HKEY        key ;
 
-  if (RegOpenKeyEx (HKEY_CURRENT_USER, "Software\\" REGKEY "\\v3.6\\POV-Edit", 0, KEY_READ, &key) == ERROR_SUCCESS)
-  {
-    RegCloseKey (key) ;
-    return (true) ;
-  }
-  return (false) ;
-}
+  std::string keyName = std::string("Software\\" REGKEY "\\") + ver + "\\POV-Edit";
 
-bool checkEditKey37 (void)
-{
-  HKEY        key ;
-
-  if (RegOpenKeyEx (HKEY_CURRENT_USER, "Software\\" REGKEY "\\" REGVERKEY "\\POV-Edit", 0, KEY_READ, &key) == ERROR_SUCCESS)
+  if (RegOpenKeyEx (HKEY_CURRENT_USER, keyName.c_str(), 0, KEY_READ, &key) == ERROR_SUCCESS)
   {
     RegCloseKey (key) ;
     return (true) ;
@@ -5268,6 +5284,42 @@ char *WriteDump(struct _EXCEPTION_POINTERS *pExceptionInfo, bool full, long time
   return NULL;
 }
 
+#ifdef BUILD_AVX2
+void NoAVX2 (void)
+{
+  MessageBox (NULL,
+              "This build of POV-Ray requires that your processor provides AVX2 support.\n"
+              "Please use the standard non-AVX2 version of POV-Ray on this computer.",
+              "POV-Ray for Windows",
+              MB_ICONSTOP | MB_OK) ;
+  exit (-1) ;
+}
+
+inline void TestAVX2 (void)
+{
+  if (!CPUInfo::SupportsAVX2())
+    NoAVX2();
+}
+#endif // BUILD_AVX2
+
+#ifdef BUILD_AVX
+void NoAVX (void)
+{
+  MessageBox (NULL,
+              "This build of POV-Ray requires that your processor provides AVX support.\n"
+              "Please use the standard non-AVX version of POV-Ray on this computer.",
+              "POV-Ray for Windows",
+              MB_ICONSTOP | MB_OK) ;
+  exit (-1) ;
+}
+
+inline void TestAVX (void)
+{
+  if (!CPUInfo::SupportsAVX())
+    NoAVX();
+}
+#endif // BUILD_AVX
+
 #ifdef BUILD_SSE2
 void NoSSE2 (void)
 {
@@ -5279,18 +5331,30 @@ void NoSSE2 (void)
   exit (-1) ;
 }
 
-inline int TestSSE2 (void)
+inline void TestSSE2 (void)
 {
-  __try
+  if (HaveVistaOrLater())
   {
-    __asm { movapd xmm0,xmm1 }
+    // Use the canonical test.
+    if (!CPUInfo::SupportsSSE2())
+      NoSSE2();
   }
-  __except(NoSSE2(),1)
+  else
   {
+    // On Windows XP (and presumably also Windows Server 2003), the canonical test does not seem
+    // to work properly for yet unknown reasons, so we test for support the dirty way by trying to
+    // actually execute an SSE2 instruction.
+    __try
+    {
+      __asm { movapd xmm0, xmm1 }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+      NoSSE2();
+    }
   }
-  return (0) ;
 }
-#endif
+#endif // BUILD_SSE2
 
 void InvalidParameterHandler(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved)
 {
@@ -5300,7 +5364,13 @@ void InvalidParameterHandler(const wchar_t* expression, const wchar_t* function,
 int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 {
 #ifdef BUILD_SSE2
-  TestSSE2 () ;
+  TestSSE2();
+#endif
+#ifdef BUILD_AVX
+  TestAVX();
+#endif
+#ifdef BUILD_AVX2
+  TestAVX2();
 #endif
 
   int                   show_state ;
@@ -5421,8 +5491,17 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
   sprintf(ToolIniFileName, "%sini\\pvtools.ini", DocumentsPath);
   sprintf(EngineIniFileName, "%sini\\pvengine.ini", DocumentsPath);
 
-  if (checkEditKey37() == false && checkEditKey36() == true)
-    copy36EditSettings();
+  if (!checkEditKey(REGVERKEY))
+  {
+    for (const char **oldVer = CanInheritFromVersions; *oldVer != NULL; ++oldVer)
+    {
+      if (checkEditKey(*oldVer))
+      {
+        copyEditSettings(*oldVer);
+        break;
+      }
+    }
+  }
 
   if (checkRegKey () == false || FreshInstall == true)
     if (!CloneOptions())
@@ -5443,28 +5522,28 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 #ifndef MAP_INI_TO_REGISTRY
   if (!fileExists(EngineIniFileName))
   {
-    // no INI file: see if we can copy the 3.6 INI options, should they exist
-    if (debugging)
-      debug_output("no pvengine.ini: seeing if there is a v3.6 ini\n") ;
-
-    string str(get36Home());
-    if (str.empty() == false)
+    bool foundOld = false;
+    for (const char **oldVer = CanInheritFromVersions; *oldVer != NULL; ++oldVer)
     {
-      string oldINIpath = str + "ini\\pvengine.ini";
-      if (fileExists(oldINIpath.c_str()))
+      // no INI file: see if we can copy an older version's INI options, should they exist
+      if (debugging)
+        debug_output("no pvengine.ini: seeing if there is a %s ini\n", *oldVer) ;
+
+      string str(getHome(*oldVer));
+      if (str.empty() == false)
       {
+        string oldINIpath = str + "ini\\pvengine.ini";
+        if (!fileExists(oldINIpath.c_str()))
+          continue;
+
         if (debugging)
           debug_output("cloning INI file %s to %s\n", oldINIpath.c_str(), EngineIniFileName) ;
         cloneOldIni(str, DocumentsPath);
-      }
-      else
-      {
-        if (debugging)
-          debug_output("creating default INI file %s\n", EngineIniFileName) ;
-        cloneOldIni("", DocumentsPath);
+        foundOld = true;
+        break;
       }
     }
-    else
+    if (!foundOld)
     {
       if (debugging)
         debug_output("creating default INI file %s\n", EngineIniFileName) ;
@@ -5495,7 +5574,7 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
   splitpath (str, modulePath, NULL) ;
   validatePath (modulePath) ;
 
-  sprintf (engineHelpPath, "%shelp\\povray37.chm", BinariesPath) ;
+  sprintf (engineHelpPath, "%shelp\\povray.chm", BinariesPath) ;
   HtmlHelp (NULL, NULL, HH_INITIALIZE, (DWORD_PTR) &help_cookie) ;
   memset (&hh_aklink, 0, sizeof (hh_aklink)) ;
   hh_aklink.cbStruct = sizeof (hh_aklink) ;
@@ -5743,19 +5822,41 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
   {
     if (EditDLLPath != NULL)
     {
-      sprintf (str, "%s" EDITDLLNAME, EditDLLPath) ;
-      if (!LoadEditorDLL (str, false))
-        use_editors = false ;
+#ifdef _DEBUG
+      // Prefer debug DLL, but don't complain if it's not available.
+      sprintf(str, "%s" EDITDLLNAME_DEBUG, EditDLLPath);
+      if (!LoadEditorDLL(str, true))
+      {
+#endif
+        sprintf(str, "%s" EDITDLLNAME, EditDLLPath);
+        if (!LoadEditorDLL (str, false))
+          use_editors = false ;
+#ifdef _DEBUG
+      }
+#endif
     }
     else
     {
-      sprintf (str, "%s\\" EDITDLLNAME, modulePath) ;
-      if (!LoadEditorDLL (str, true))
+#ifdef _DEBUG
+      // Prefer debug DLL, but don't complain if it's not available.
+      sprintf (str, "%s\\" EDITDLLNAME_DEBUG, modulePath);
+      if (!LoadEditorDLL(str, true))
       {
-        sprintf (str, "%sbin\\" EDITDLLNAME, BinariesPath) ;
-        if (!LoadEditorDLL (str, false))
-          use_editors = false ;
+        sprintf (str, "%sbin\\" EDITDLLNAME_DEBUG, BinariesPath) ;
+        if (!LoadEditorDLL (str, true))
+        {
+#endif
+          sprintf (str, "%s\\" EDITDLLNAME, modulePath) ;
+          if (!LoadEditorDLL (str, true))
+          {
+            sprintf (str, "%sbin\\" EDITDLLNAME, BinariesPath) ;
+            if (!LoadEditorDLL (str, false))
+              use_editors = false ;
+          }
+#ifdef _DEBUG
+        }
       }
+#endif
     }
   }
   else
@@ -6091,15 +6192,13 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 #endif
   buffer_message (mDivider, "\n") ;
 
-#if defined(TRY_OPTIMIZED_NOISE)
+#ifdef TRY_OPTIMIZED_NOISE
+  // TODO FIXME
   // technically we should ask the backend what it's using, but given this is not a remoted version
   // of POVWIN, we just call the test here.
-  if (OPTIMIZED_NOISE_SUPPORTED)
-  {
-    buffer_message (mIDE, "FMA4 instruction support detected: using FMA4-optimized noise functions.\n") ;
-    buffer_message (mDivider, "\n") ;
-  }
-#endif
+  const OptimizedNoiseInfo* pNoise = GetRecommendedOptimizedNoise();
+  selectedNoiseFunc = pNoise->name;
+#endif // TRY_OPTIMIZED_NOISE
 
   load_tool_menu (ToolIniFileName) ;
   if (GetHKCU("FileQueue", "ReloadOnStartup", 0))

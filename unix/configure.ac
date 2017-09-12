@@ -1,11 +1,13 @@
 ##############################################################################
-#               configure.ac
+#
+# configure.ac
 #
 # Process this file with autoconf to produce the configure script.
 #
 # ---------------------------------------------------------------------------
-# Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-# Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
+#
+# Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+# Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 #
 # POV-Ray is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -19,30 +21,28 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 #---------------------------------------------------------------------------
+#
 # POV-Ray is based on the popular DKB raytracer version 2.12.
 # DKBTrace was originally written by David K. Buck.
 # DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
-#---------------------------------------------------------------------------
-# $File: N/A $
-# $Revision: N/A $
-# $Change: N/A $
-# $DateTime: N/A $
-# $Author: N/A $
-# $Log$
+#
 ##############################################################################
 
-# configure.ac for the source distribution of POV-Ray 3.7 for UNIX
+# configure.ac for the source distribution of POV-Ray 3.8 for UNIX
+# Report bugs via https://github.com/POV-Ray/povray/issues
+#
+# Based on configure.ac from POV-Ray v3.7
 # Written by Nicolas Calimet <nicolas.calimet@povray.org>
-# Report bugs via http://bugs.povray.org/
-# Based on configure.ac from POV-Ray 3.6
+# Based on configure.ac from POV-Ray v3.6
 
 # Required autoconf version.
 AC_PREREQ(2.59)
 
 # Inits.
 
-# The file VERSION must contain only the version string MAJOR.MINOR(.PATCHLEVEL)(-PRERELEASE)
+# The file VERSION must contain only the version string MAJOR.MINOR.REVISION(.PATCHLEVEL)(-PRERELEASE)
 AC_INIT([POV-Ray], m4_normalize(m4_include([VERSION])), [unix-bugreports-2011@povray.org], [povray])
 
 # VERSION_BASE is then defined as MAJOR.MINOR
@@ -54,12 +54,16 @@ AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_SRCDIR([unix/disp_text.cpp])
 
 # Additional autoconf macros.
+# Those required by other macros go first.
+m4_include([unix/config/ax_require_defined.m4])
+# The remainder we're sorting alphabetically.
 m4_include([unix/config/acx_pthread.m4])
 m4_include([unix/config/ax_arg_enable.m4])
 m4_include([unix/config/ax_arg_with.m4])
 m4_include([unix/config/ax_boost_base.m4])
 m4_include([unix/config/ax_boost_thread.m4])
 m4_include([unix/config/ax_test_compiler_flags.m4])
+m4_include([unix/config/ax_check_compile_flag.m4])
 m4_include([unix/config/ax_check_lib.m4])
 m4_include([unix/config/ax_check_libjpeg.m4])
 m4_include([unix/config/ax_check_libsdl.m4])
@@ -68,6 +72,7 @@ m4_include([unix/config/ax_check_openexr.m4])
 m4_include([unix/config/ax_compare_version.m4])
 m4_include([unix/config/ax_compiler_vendor.m4])
 m4_include([unix/config/ax_compiler_version.m4])
+m4_include([unix/config/ax_cxx_compile_stdcxx.m4])
 m4_include([unix/config/ax_fix_incorrect_path.m4])
 m4_include([unix/config/ax_prog_ld_static.m4])
 m4_include([unix/config/ax_x86_arch.m4])
@@ -83,6 +88,7 @@ required_libsdl_version="1.2"
 required_openexr_version="1.2"
 
 # Supported options.
+# AX_ARG_ENABLE([--enable-avx2],             [enable AVX2 features and compiler optmization])
 AX_ARG_ENABLE([--enable-watch-cursor],     [enable a watch cursor over the display while rendering (X Window only)])
 AX_ARG_ENABLE([--enable-debug],            [enable compiler debugging mode])
 AX_ARG_ENABLE([--enable-profile],          [enable program execution profiling])
@@ -203,6 +209,7 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM],
   ]
 )
 AC_PROG_CXXCPP
+AX_CXX_COMPILE_STDCXX(11)
 
 AX_COMPILER_VENDOR
 AX_COMPILER_VERSION
@@ -220,11 +227,25 @@ AC_DEFINE_UNQUOTED([COMPILER_VERSION], ["$pov_compiler_version"], [Compiler vers
 AC_DEFINE_UNQUOTED([POV_COMPILER_INFO], ["$pov_compiler_version @ $build"], [Compiler version (processed).])
 
 
-
 # Not necessary when AM_MAINTAINER_MODE is called above.
 ###AC_PROG_MAKE_SET
 
 AC_PROG_RANLIB
+
+
+AC_MSG_CHECKING([for stat format option])
+echo "trying stat --format='%u,%g' ." >>config.log
+if stat --format='%u,%g' . >>config.log 2>>config.log && test x`stat --format=Foo .` = x"Foo"; then
+  stat_format="--format="
+else
+  echo "trying stat --f '%u,%g' ." >>config.log
+  if stat -f '%u,%g' . >>config.log 2>>config.log && test x`stat -f Foo .` = x"Foo"; then
+    stat_format="-f "
+  else
+    AC_MSG_FAILURE([stat command does not behave as required])
+  fi
+fi
+AC_MSG_RESULT([$stat_format])
 
 
 ###############################################################################
@@ -507,6 +528,16 @@ else
       AC_MSG_RESULT([no])
     fi
   fi
+
+#  AM_CONDITIONAL([BUILD_AVX2], [test x$enable_avx2 = xyes])
+#  if test x"$enable_avx2" = x"yes"; then
+#    AC_MSG_RESULT([yes])
+#    AC_DEFINE([ENABLE_AVX2], [],[Enable AVX2 features and compiler optimization])
+#
+#    CXXFLAGS="$CXXFLAGS -mavx2 -mfma"  # append
+#  else
+#    AC_MSG_RESULT([no])
+#  fi
 
   ### Note from Warp <warp@tag.povray.org> :
   # Using "-static" for static linking in Solaris causes a linkage error.
@@ -964,6 +995,24 @@ fi
 
 AC_DEFINE_UNQUOTED([BUILT_FOR], ["$pov_built_for"], [Host platform.])
 
+case "$pov_built_for" in
+  i?86-* | x86_64-*)
+    pov_cpu='x86'
+    AC_DEFINE([BUILD_X86], [], [Build for x86 or x86-64 architecture])
+    AX_CHECK_COMPILE_FLAG([-mavx],  [pov_avx='-mavx'],   [pov_avx=''])
+    AX_CHECK_COMPILE_FLAG([-mavx2], [pov_avx2='-mavx2'], [pov_avx2=''])
+    AX_CHECK_COMPILE_FLAG([-mfma],  [pov_fma3='-mfma'],  [pov_fma3=''])
+    AX_CHECK_COMPILE_FLAG([-mfma4], [pov_fma4='-mfma4'], [pov_fma4=''])
+    ;;
+  *)
+    pov_cpu=''
+    ;;
+esac
+AM_CONDITIONAL([BUILD_x86], [test x"$pov_cpu" = x"x86"])
+AM_CONDITIONAL([BUILD_x86avx], [test x"$pov_avx" != x""])
+AM_CONDITIONAL([BUILD_x86avxfma4], [test x"$pov_avx" != x"" -a x"$pov_fma4" != x"" ])
+AM_CONDITIONAL([BUILD_x86avx2fma3], [test x"$pov_avx2" != x"" -a x"$pov_fma3" != x"" ])
+
 
 # Add flags specified at the command line.
 CXXFLAGS=`echo $CXXFLAGS $pov_save_cxxflags`
@@ -1255,8 +1304,8 @@ AC_DEFINE_UNQUOTED([BUILTIN_XWIN_DISPLAY], ["$pov_xwin_msg"], [X Window display.
 AC_DEFINE_UNQUOTED([BUILTIN_IMG_FORMATS], ["$pov_img_fmt_builtin $pov_img_fmt_enabled"], [Supported image formats.])
 AC_DEFINE_UNQUOTED([MISSING_IMG_FORMATS], ["$pov_img_fmt_disabled"], [Unsupported image formats.])
 
-povowner=`stat --format=%u ${HOME} || stat -f %u ${HOME}`
-povgroup=`stat --format=%g ${HOME} || stat -f %g ${HOME}`
+povowner=`stat ${stat_format}%u ${HOME}`
+povgroup=`stat ${stat_format}%g ${HOME}`
 AC_SUBST([povowner])
 AC_SUBST([povgroup])
 

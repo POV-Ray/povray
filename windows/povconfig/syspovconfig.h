@@ -12,8 +12,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -63,13 +63,13 @@
 // C++ standard headers
 #include <exception>
 #include <list>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
 // boost headers
 #include <boost/intrusive_ptr.hpp>
-#include <boost/tr1/memory.hpp>
 
 #include <io.h>
 #include <fcntl.h>
@@ -93,12 +93,12 @@ using std::list;
 // to in a few other places.
 using std::runtime_error;
 
-// these may actually be the boost implementations, depending on what boost/tr1/memory.hpp has pulled in
-using std::tr1::shared_ptr;
-using std::tr1::weak_ptr;
-using std::tr1::dynamic_pointer_cast;
-using std::tr1::static_pointer_cast;
-using std::tr1::const_pointer_cast;
+// we use the C++11 standard shared pointers
+using std::shared_ptr;
+using std::weak_ptr;
+using std::dynamic_pointer_cast;
+using std::static_pointer_cast;
+using std::const_pointer_cast;
 
 using boost::intrusive_ptr;
 
@@ -137,7 +137,11 @@ using boost::intrusive_ptr;
   #define POV_COMPILER_VER "u"
 #endif
 
-#ifdef BUILD_SSE2
+#if defined(BUILD_AVX2)
+  #define POV_BUILD_INFO POV_COMPILER_VER ".avx2." POVRAY_PLATFORM_NAME
+#elif defined(BUILD_AVX)
+  #define POV_BUILD_INFO POV_COMPILER_VER ".avx." POVRAY_PLATFORM_NAME
+#elif defined(BUILD_SSE2)
   #define POV_BUILD_INFO POV_COMPILER_VER ".sse2." POVRAY_PLATFORM_NAME
 #else
   #define POV_BUILD_INFO POV_COMPILER_VER "." POVRAY_PLATFORM_NAME
@@ -297,7 +301,8 @@ namespace pov
 
 #define HAVE_NAN
 #define HAVE_INF
-#define POV_ISNAN(x) _isnan(x)
-#define POV_ISINF(x) _isinf(x)
+#define POV_ISNAN(x)    (_isnan(x) != 0)
+#define POV_ISFINITE(x) (_finite(x) != 0)
+#define POV_ISINF(x)    (!POV_ISFINITE(x) && !POV_ISNAN(x))
 
 #endif // POVRAY_WINDOWS_SYSPOVCONFIG_H

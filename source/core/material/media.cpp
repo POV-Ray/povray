@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -957,9 +957,9 @@ void MediaFunction::ComputeOneMediaSample(MediaVector& medias, LightSourceEntryV
 
             // determine whether or not this media is ignoring photons
             // save this in the thread data... it will be used by ComputeShadowColour
-            // maybe this should be (or already is?) computed elsewhere and passed in
-            // as a parameter ( see the ignore_photons parameter! )
-            // I need to look closer at the new 3.7 code to clean that up [NK]
+            // TODO - maybe this should be (or already is?) computed elsewhere and passed in
+            //        as a parameter ( see the ignore_photons parameter! )
+            //        I need to look closer at the new code to clean that up [NK]
             // assume true, set to false if we find even one
             threadData->litObjectIgnoresPhotons = true;
             for(MediaVector::iterator i(medias.begin()); i != medias.end(); i++)

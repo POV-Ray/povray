@@ -5,13 +5,13 @@
 /// Implementation of radiosity.
 ///
 /// @author Jim McElhiney (original code)
-/// @author Christoph Lipka (revisions and updates for POV-Ray 3.7)
+/// @author Christoph Lipka (revisions and updates for POV-Ray v3.7)
 ///
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -177,10 +177,10 @@ RadiosityRecursionSettings* SceneRadiositySettings::GetRecursionSettings(bool fi
         //  The deeper we recurse, the higher the error we can accept; the original paper
         //  by Ward et al. suggests to reduce the number of rays by 50% per bounce, based
         //  on an estimated average reflectivity of 50% throughout the scene; the version
-        //  3.6 code enforced a minimum of 5 rays, possibly for some hidden reason, so we
+        //  v3.6 code enforced a minimum of 5 rays, possibly for some hidden reason, so we
         //  follow this example.
         // Compatibility:
-        //  POV-Ray 3.6 reduced by factor 3 for 1st recursion, and again by factor 2 for
+        //  POV-Ray v3.6 reduced by factor 3 for 1st recursion, and again by factor 2 for
         //  2nd recursion, using that same value for all consecutive recursions; in any
         //  case, at least 5 rays were shot.
 
@@ -193,7 +193,7 @@ RadiosityRecursionSettings* SceneRadiositySettings::GetRecursionSettings(bool fi
         //  The rays picking up deeper bounce samples will be more or less random and
         //  averaged anyway, so we can be lazy about this at deeper bounces.
         // Compatibility:
-        //  POV-Ray 3.6 reduced to 2 for 1st recursion, 1 for all consecutive recursions
+        //  POV-Ray v3.6 reduced to 2 for 1st recursion, 1 for all consecutive recursions
 
         switch (depth)
         {
@@ -209,9 +209,9 @@ RadiosityRecursionSettings* SceneRadiositySettings::GetRecursionSettings(bool fi
         //  The deeper we recurse, the higher the error we can accept; the original paper
         //  from Ward et al. suggests to increase the error bound by 40% per bounce, based
         //  on an estimated average reflectivity of 50% throughout the scene; however, we
-        //  follow the more radical example of POV-Ray 3.6.
+        //  follow the more radical example of POV-Ray v3.6.
         // Compatibility:
-        //  POV-Ray 3.6 increased by factor 2 per recursion
+        //  POV-Ray v3.6 increased by factor 2 per recursion
 
         recSettings[depth].errorBoundFactor = 1.0 * pow(2.0, (double)depth);
 
@@ -223,7 +223,7 @@ RadiosityRecursionSettings* SceneRadiositySettings::GetRecursionSettings(bool fi
         //  arbitrary value. (NOTE: The effect of this *multiplies* with that of
         //  errorBoundFactor!)
         // Compatibility:
-        //  POV-Ray 3.6 increased by factor 2 per recursion
+        //  POV-Ray v3.6 increased by factor 2 per recursion
 
         recSettings[depth].minReuseFactor = minimumReuse * pow(2.0, (double)depth);
         recSettings[depth].maxReuseFactor = maximumReuse * pow(2.0, (double)depth);
@@ -243,7 +243,7 @@ RadiosityRecursionSettings* SceneRadiositySettings::GetRecursionSettings(bool fi
         //  recursion depth, we are going for optimum performance. 8 has proven a good
         //  value in this respect.
         // Compatibility:
-        //  POV-Ray 3.6 used 1 for top-level samples, increasing by factor of 2 [?] per
+        //  POV-Ray v3.6 used 1 for top-level samples, increasing by factor of 2 [?] per
         //  recursion; there is reason to believe that this was unintentional.
 
         if (depth == 0)
@@ -266,7 +266,7 @@ RadiosityRecursionSettings* SceneRadiositySettings::GetRecursionSettings(bool fi
         //  level increment per radiosity recursion, and the basic radiosity brightness
         //  factor.
         // Compatibility:
-        //  POV-Ray 3.6 used the trace level of the primary ray that happened to cause the
+        //  POV-Ray v3.6 used the trace level of the primary ray that happened to cause the
         //  sample to be taken, causing artifacts in scenes with reflective surfaces.
 
         recSettings[depth].traceLevel = int((1.5 * ((double)depth + 1)));
@@ -287,7 +287,7 @@ RadiosityRecursionSettings* SceneRadiositySettings::GetRecursionSettings(bool fi
 RadiosityFunction::RadiosityFunction(shared_ptr<SceneData> sd, TraceThreadData *td, const SceneRadiositySettings& rs,
                                      RadiosityCache& rc, Trace::CooperateFunctor& cf, bool ft, const Vector3d& camera) :
     threadData(td),
-    trace(sd, td, GetRadiosityQualityFlags(rs, QualityFlags(9)), cf, media, *this), // TODO FIXME - we can only use hard-coded Level-9 quality because Radiosity happens to be disabled at lower settings!
+    trace(sd, td, GetRadiosityQualityFlags(rs, QualityFlags(9)), cf, media, *this), // TODO FIXME - the only reason we can safely hard-code level-9 quality here is because radiosity happens to be disabled at lower settings
     media(td, &trace, &photonGatherer),
     photonGatherer(&sd->surfacePhotonMap, sd->photonSettings),
     radiosityCache(rc),
@@ -333,13 +333,10 @@ void RadiosityFunction::ResetTopLevelStats()
 
 void RadiosityFunction::BeforeTile(int id, unsigned int pts)
 {
-    // TODO - find out why this assertion does not hold true when mosaic pretrace is enabled
-    /*
     if (isFinalTrace)
-        POV_RADIOSITY_ASSERT( pts == FINAL_TRACE );
+        POV_RADIOSITY_ASSERT(pts == FINAL_TRACE);
     else
-        POV_RADIOSITY_ASSERT( (pts >= PRETRACE_FIRST) && (pts <= PRETRACE_MAX) );
-    */
+        POV_RADIOSITY_ASSERT((pts >= PRETRACE_FIRST) && (pts <= PRETRACE_MAX));
 
     // different pretrace step than last tile
     if (pts != pretraceStep)
@@ -594,7 +591,9 @@ double RadiosityFunction::GatherLight(const Vector3d& ipoint, const Vector3d& ra
             // this is necessary to fix problems splotchiness caused by very
             // bright objects
             // changed lighting.c to ignore phong/specular if tracing radiosity beam
-            // TODO FIXME - while the following line is required for backward compatibility, we might consider replacing .max() with .weight(), .weightMax() or .weightMaxAbs() for v3.7.x
+            // TODO FIXME - while the following line is required for backward compatibility,
+            //              we might consider replacing .max() with .weight(), .weightMax() or .weightMaxAbs()
+            //              in the future
             ColourChannel max_ill = temp_colour.Max();
 
             if((max_ill > settings.maxSample) && (settings.maxSample > 0.0))

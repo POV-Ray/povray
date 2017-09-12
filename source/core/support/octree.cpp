@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -998,7 +998,6 @@ void ot_parent(OT_ID *dad_id, OT_ID  *kid_id)
     // that region, because otherwise we would enter an infinite loop trying to find a common parent.
     // (That doesn't mean that all is well in that region; we're just avoiding a catastrophe.)
 #if 1
-    //  This is the code found in 3.7.0.beta.29;
     //  note that it parents (-2:-1) by (0)
     dad_id->x = (kid_id->x >= 0) ? (kid_id->x >> 1) : (kid_id->x + 1) / 2;
     dad_id->y = (kid_id->y >= 0) ? (kid_id->y >> 1) : (kid_id->y + 1) / 2;

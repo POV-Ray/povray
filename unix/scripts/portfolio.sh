@@ -1,9 +1,10 @@
 #!/bin/sh
 # ==============================================================================
-# POV-Ray 3.7 
+# POV-Ray v3.8
 # portfolio.sh - render the POV-Ray portfolio
 # ==============================================================================
 # written November 2003 by Christoph Hormann
+# updated 2017-09-10 for POV-Ray v3.8 by Christoph Lipka
 # This file is part of POV-Ray and subject to the POV-Ray licence
 # see POVLEGAL.DOC for details
 # ------------------------------------------------------------------------------
@@ -18,14 +19,16 @@
 # log:              log all text output of POV-Ray to a file (log.txt) 
 # scene_directory:  if specified the portfolio scene in this directory are
 #                   rendered, otherwise the scene directory is determined form
-#                   the main povray ini file.
-#                   (usually /usr/local/share/povray-3.7/scenes/portfolio).
+#                   the main povray ini file
+#                   (usually /usr/local/share/povray-X.Y/scenes/portfolio,
+#                   where X.Y represents the first two fields of the version
+#                   number, e.g. for v3.8.1 this would be 3.8).
 # ==============================================================================
 
 # test mode
 #SCENE_DIR=.
 
-VERSION=3.7
+VERSION=`povray --generation`
 VER_DIR=povray-$VERSION
 DEFAULT_DIR=/usr/local
 SYSCONFDIR=$DEFAULT_DIR/etc
@@ -52,7 +55,7 @@ case "$OPTIONS" in
   *log* | *LOG* | *Log* )
     DATE=`date`
     LOG_FILE="log.txt"
-    echo "log file for POV-Ray 3.7 sample scene render $DATE" > "$LOG_FILE"
+    echo "log file for POV-Ray v$VERSION sample scene render $DATE" > "$LOG_FILE"
     ;;
 esac
 
@@ -67,7 +70,7 @@ if [ -z "$SCENE_DIR" ] ; then
 		echo "------------------------------------------------------"
     echo "  the sample scene render script could not determine"
     echo "  the location where POV-Ray is installed.  Make sure"
-    echo "  POV-Ray $VERSION has been correctly installed on this"
+    echo "  POV-Ray v$VERSION has been correctly installed on this"
     echo "  computer.  If you continue the script will try to"
     echo "  the scenes from the current directory."
     echo ""

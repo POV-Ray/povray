@@ -2,7 +2,7 @@
 
 #######################################################################
 #
-# makedocs.pl - HTML Help doc conversion tool for POV-Ray 3.7.
+# makedocs.pl - HTML Help doc conversion tool for POV-Ray.
 #
 # This tool generates the output files needed for the POVWIN HTML Help
 # documentation. It has only been tested under Win32.
@@ -24,8 +24,8 @@
 #
 #######################################################################
 #
-# Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-# Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+# Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+# Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 #
 # POV-Ray is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -54,7 +54,7 @@ sub by_section { $section_sort{$a} <=> $section_sort{$b} }
 sub hh_index
 {
   %primaryindex = %index ;
-  open (OUT, ">output/povray37.hhk") || die "Cannot open povray37.hhk: $!" ;
+  open (OUT, ">output/povray.hhk") || die "Cannot open povray.hhk: $!" ;
   print OUT qq*<html>
 <head>
 <meta name="GENERATOR" content="POV-Ray Documentation Generation System">
@@ -165,7 +165,7 @@ sub hh_index
 # make the HTML Help Table of Contents (TOC)
 sub hh_toc
 {
-  open (OUT, ">output/povray37.hhc") || die "Cannot open povray37.hhc: $!" ;
+  open (OUT, ">output/povray.hhc") || die "Cannot open povray.hhc: $!" ;
   print OUT qq*<html>
 <head>
 <meta name="GENERATOR" content="POV-Ray Documentation Generation System">
@@ -291,8 +291,9 @@ foreach $file (@files)
     $result .= $line;
   }
 
+  $result .= "<meta http-equiv=\"X-UA-Compatible\" content=\"IE=9\"/>\n";
   $result .= "<object classid=\"clsid:adb880a6-d8ff-11cf-9377-00aa003b7a11\" id=\"htmlhelp\" type=\"application/x-oleobject\"></object>\n";
-  $result .= "<script language=\"javascript\" src=\"povray37.js\"></script>\n";
+  $result .= "<script language=\"javascript\" src=\"povray.js\"></script>\n";
   $result .= $line;
 
   while ($line = <IN>)
@@ -420,7 +421,7 @@ foreach $file (@files)
     }
     die "$file:$lineno - Orphaned indexentry '$line'" if $line =~ /indexentry/i ;
     $newline = "" ;
-    while ($line =~ /(.*)(<a ([^>]+)>)(.*)/i)
+    while ($line =~ /(.*?)(<a ([^>]+)>)(.*)/i)
     {
       my $left = $1 ;
       my $attributes = $3 ;
@@ -432,7 +433,7 @@ foreach $file (@files)
       {
         # we have an <a href="...">, now see if it's an external link
         $destination = $1 ;
-        if ($destination =~ /^http:\/\//i)
+        if ($destination =~ /^[a-z]*:\/\//i)
         {
           if ($attributes !~ /target\s*=\s*"([^"]+)"/i)
           {

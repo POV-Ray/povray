@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,36 +36,35 @@
 #ifndef POVRAY_FRONTEND_RENDERFRONTEND_H
 #define POVRAY_FRONTEND_RENDERFRONTEND_H
 
-#include <list>
-#include <map>
-#include <set>
-#include <string>
-#include <vector>
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "frontend/configfrontend.h"
 
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <set>
 
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
 
 #include "base/path.h"
 #include "base/platformbase.h"
-#include "base/stringutilities.h"
-#include "base/textstreambuffer.h"
-#include "base/types.h"
 #include "base/image/colourspace.h"
 #include "base/image/image.h"
 
-#include "frontend/configfrontend.h"
 #include "frontend/console.h"
-#include "frontend/display.h"
 #include "frontend/imageprocessing.h"
+
+namespace pov_base
+{
+class TextStreamBuffer;
+class Image;
+class OStream;
+}
 
 namespace pov_frontend
 {
 
 using namespace pov_base;
+
+class Display;
 
 enum
 {
@@ -147,18 +146,6 @@ struct ViewData
 
     Path imageBackupFile;
 };
-
-}
-
-#include "frontend/parsermessagehandler.h"
-#include "frontend/filemessagehandler.h"
-#include "frontend/rendermessagehandler.h"
-#include "frontend/imagemessagehandler.h"
-
-namespace pov_frontend
-{
-
-using namespace pov_base;
 
 namespace Message2Console
 {

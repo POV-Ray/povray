@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -216,11 +216,10 @@ RGBTColour& TraceTask::SubdivisionBuffer::operator()(size_t x, size_t y)
 
 void TraceTask::SubdivisionBuffer::Clear()
 {
-    for(vector<bool>::iterator i(sampled.begin()); i != sampled.end(); i++)
-        *i = false;
+    sampled.assign(sampled.size(), false);
 }
 
-TraceTask::TraceTask(ViewData *vd, unsigned int tm, DBL js, DBL aat, unsigned int aad, pov_base::GammaCurvePtr& aag, unsigned int ps, bool psc, bool final, bool hr) :
+TraceTask::TraceTask(ViewData *vd, unsigned int tm, DBL js, DBL aat, unsigned int aad, pov_base::GammaCurvePtr& aag, unsigned int ps, bool psc, bool contributesToImage, bool hr) :
     RenderTask(vd, "Trace"),
     trace(vd->GetSceneData(), &vd->GetCamera(), GetViewDataPtr(), vd->GetSceneData()->parsedMaxTraceLevel, vd->GetSceneData()->parsedAdcBailout,
           vd->GetQualityFeatureFlags(), cooperate, media, radiosity),
@@ -232,11 +231,12 @@ TraceTask::TraceTask(ViewData *vd, unsigned int tm, DBL js, DBL aat, unsigned in
     aaGamma(aag),
     previewSize(ps),
     previewSkipCorner(psc),
-    finalTrace(final),
+    passContributesToImage(contributesToImage),
+    passCompletesImage((ps == 0) || ((ps == 1) && contributesToImage)),
     highReproducibility(hr),
     media(GetViewDataPtr(), &trace, &photonGatherer),
     radiosity(vd->GetSceneData(), GetViewDataPtr(),
-              vd->GetSceneData()->radiositySettings, vd->GetRadiosityCache(), cooperate, final, vd->GetCamera().Location),
+              vd->GetSceneData()->radiositySettings, vd->GetRadiosityCache(), cooperate, true, vd->GetCamera().Location),
     photonGatherer(&vd->GetSceneData()->mediaPhotonMap, vd->GetSceneData()->photonSettings)
 {
 #ifdef PROFILE_INTERSECTIONS
@@ -428,7 +428,7 @@ void TraceTask::SimpleSamplingM0()
         radiosity.AfterTile();
 
         GetViewDataPtr()->AfterTile();
-        GetViewData()->CompletedRectangle(rect, serial, pixels, 1, finalTrace);
+        GetViewData()->CompletedRectangle(rect, serial, pixels, 1, passContributesToImage, passCompletesImage);
 
         Cooperate();
     }
@@ -493,7 +493,7 @@ void TraceTask::SimpleSamplingM0P()
 
         GetViewDataPtr()->AfterTile();
         if(pixelpositions.size() > 0)
-            GetViewData()->CompletedRectangle(rect, serial, pixelpositions, pixelcolors, previewSize, finalTrace);
+            GetViewData()->CompletedRectangle(rect, serial, pixelpositions, pixelcolors, previewSize, passContributesToImage, passCompletesImage);
 
         Cooperate();
     }
@@ -576,7 +576,7 @@ void TraceTask::NonAdaptiveSupersamplingM1()
         radiosity.AfterTile();
 
         GetViewDataPtr()->AfterTile();
-        GetViewData()->CompletedRectangle(rect, serial, pixels.GetPixels(), 1, finalTrace);
+        GetViewData()->CompletedRectangle(rect, serial, pixels.GetPixels(), 1, passContributesToImage, passCompletesImage);
 
         Cooperate();
     }
@@ -586,7 +586,7 @@ void TraceTask::AdaptiveSupersamplingM2()
 {
     POVRect rect;
     unsigned int serial;
-    size_t subsize = (1 << aaDepth);
+    size_t subsize = (size_t(1) << aaDepth);
     SubdivisionBuffer buffer(subsize + 1);
 
     jitterScale = jitterScale / DBL((1 << aaDepth) + 1);
@@ -631,7 +631,7 @@ void TraceTask::AdaptiveSupersamplingM2()
         radiosity.AfterTile();
 
         GetViewDataPtr()->AfterTile();
-        GetViewData()->CompletedRectangle(rect, serial, pixels.GetPixels(), 1, finalTrace);
+        GetViewData()->CompletedRectangle(rect, serial, pixels.GetPixels(), 1, passContributesToImage, passCompletesImage);
 
         Cooperate();
     }

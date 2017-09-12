@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,6 +39,8 @@
 #define POVRAY_BASE_CONFIGBASE_H
 
 #include "syspovconfigbase.h"
+
+#include <limits>
 
 #include <boost/version.hpp>
 
@@ -98,6 +100,24 @@
 ///
 /// @{
 
+//******************************************************************************
+///
+/// @name C++ Language Standard
+///
+/// @{
+
+/// @def POV_CPP11_SUPPORTED
+/// Whether the compiler supports C++11.
+///
+/// Define as non-zero if the compiler is known to support all the C++11 language features
+/// required to build POV-Ray, or zero if you are sure it doesn't. If in doubt, leave undefined.
+///
+#ifndef POV_CPP11_SUPPORTED
+    #define POV_CPP11_SUPPORTED (__cplusplus >= 201103L)
+#endif
+
+/// @}
+///
 //******************************************************************************
 ///
 /// @name Fundamental Data Types
@@ -465,6 +485,66 @@
 ///
 //******************************************************************************
 ///
+/// @name Floating-Point Special Values
+///
+/// The following macros are used to identify certain special floating-point values.
+///
+/// @{
+
+/// @def POV_ISINF(x)
+/// Test whether floating-point value x denotes positive or negative infinity.
+///
+/// The default implementation tests whether the absolute of the value is larger than the largest
+/// finite value representable by the data type.
+///
+/// @note
+///     The macro must be implemented in a manner that it works properly for all floating-point
+///     data types.
+///
+#ifndef POV_ISINF
+    template<typename T>
+    inline bool pov_isinf(T x) { volatile T v = std::numeric_limits<T>::max(); return std::fabs(x) > v; }
+    #define POV_ISINF(x) pov_isinf(x)
+#endif
+
+/// @def POV_ISNAN(x)
+/// Test whether floating-point value x denotes "not-a-number" (NaN).
+///
+/// "Not-a-number" is any special value denoting neither a finite number nor positive or negative
+/// infinity. Examples include the result of dividing 0 by 0, or raising a negative value to a
+/// non-integer power.
+///
+/// The default implementation exploits the property that (on most systems) NaNs (and only NaNs)
+/// are considered non-equal to any value including themselves.
+///
+/// @note
+///     The macro must be implemented in a manner that it works properly for all floating-point
+///     data types.
+///
+#ifndef POV_ISNAN
+    template<typename T>
+    inline bool pov_isnan(T x) { volatile T v = x; return (v != x); }
+    #define POV_ISNAN(x) pov_isnan(x)
+#endif
+
+/// @def POV_ISFINITE(x)
+/// Test whether floating-point value x denotes a proper finite number.
+///
+/// The default implementation tests whether the value is neither infinity nor "not-a-number",
+/// using the @ref POV_ISINF and @ref POV_ISNAN macros.
+///
+/// @note
+///     The macro must be implemented in a manner that it works properly for all floating-point
+///     data types.
+///
+#ifndef POV_ISFINITE
+    #define POV_ISFINITE(x) (!POV_ISINF(x) && !POV_ISNAN(x))
+#endif
+
+/// @}
+///
+//******************************************************************************
+///
 /// @name Memory Allocation
 ///
 /// The following macros are used for memory allocation and related stuff. Check existing code
@@ -659,12 +739,33 @@
 #define DEFAULT_WORKING_GAMMA       1.0
 #define DEFAULT_WORKING_GAMMA_TEXT  "1.0"
 
+/// @def DEFAULT_AUTO_BOUNDINGTHRESHOLD
+/// Define the default auto-bounding threshold used and reported.
+///
+/// The shipped povray.ini file defines this with:
+/// Bounding_Threshold=3
+/// and the definition here should be aligned so when users run
+/// without the bounding threshold setting by ini file or command
+/// line option the default is still the documented value of 3.
+///
+#ifndef DEFAULT_AUTO_BOUNDINGTHRESHOLD
+    #define DEFAULT_AUTO_BOUNDINGTHRESHOLD 3
+#endif
+
 #ifndef CDECL
     #define CDECL
 #endif
 
 #ifndef ALIGN16
     #define ALIGN16
+#endif
+
+#ifndef ALIGN32
+    // leave undefined, allowing code to detect that forced 32-bit alignment isn't supported
+    #ifdef DOXYGEN
+        // doxygen cannot document undefined macros
+        #define ALIGN32
+    #endif
 #endif
 
 #ifndef FORCEINLINE
@@ -780,6 +881,15 @@
     #define POV_COLOURSPACE_DEBUG POV_DEBUG
 #endif
 
+/// @def POV_CPUINFO_DEBUG
+/// Enable CPU detection run-time sanity checks and debugging aids.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_CPUINFO_DEBUG
+    #define POV_CPUINFO_DEBUG POV_DEBUG
+#endif
+
 /// @def POV_FILE_DEBUG
 /// Enable run-time sanity checks for file handling.
 ///
@@ -875,6 +985,12 @@
     #define POV_COLOURSPACE_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
+#if POV_CPUINFO_DEBUG
+    #define POV_CPUINFO_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_CPUINFO_ASSERT(expr) POV_ASSERT_DISABLE(expr)
+#endif
+
 #if POV_FILE_DEBUG
     #define POV_FILE_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
@@ -914,5 +1030,12 @@
 /// @}
 ///
 //##############################################################################
+
+//******************************************************************************
+// Sanity Checks
+
+#if !POV_CPP11_SUPPORTED
+    #error "This version of POV-Ray requires C++11, which your compiler does not seem to support."
+#endif
 
 #endif // POVRAY_BASE_CONFIGBASE_H

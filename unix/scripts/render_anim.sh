@@ -1,6 +1,6 @@
 #!/bin/sh
 # ==============================================================================
-# POV-Ray 3.7 
+# POV-Ray v3.8
 # render_anim.sh - render a scene scene as animation
 # ==============================================================================
 # written November 2003 by Christoph Hormann

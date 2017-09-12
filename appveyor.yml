@@ -1,12 +1,9 @@
-version: 3.7+av{build}
+version: 3.8+av{build}
 pull_requests:
   do_not_increment_build_number: true
 branches:
   except:
   - coverity_scan
-
-# Only build tags on this branch.
-skip_non_tags: true
 
 image: Visual Studio 2015
 
@@ -16,49 +13,35 @@ matrix:
   fast_finish: true
 
 environment:
+  PovBuildDefs:
+    secure: dQ/GBBYlkqKDmBEgJfgajfBn58ziSh1JPXsiWtnBL1dE3/s4QZJutGdDtLxiG3eNq0DXMVhDIbGqyPSma9Q9xazlpRZkuU7Gl8rXCw7c03A/oliLoR6q/0Jb+Q9LNH5R/oYiDCHhNP8Cx6OXys4d5A==
   matrix:
   - configuration: Release
     platform: x64
     bin_dir: bin64
     artifact_suffix: -Win64
-    PlatformToolset: v140
   - configuration: Release-SSE2
     platform: Win32
     bin_dir: bin32
     artifact_suffix: -Win32-sse2
-    PlatformToolset: v140
   - configuration: Release
     platform: Win32
     bin_dir: bin32
     artifact_suffix: -Win32
-    PlatformToolset: v140
 
 before_build:
-- ps: |
-    $env:devenv = $env:VS140COMNTOOLS + '\..\IDE\devenv'
-    & $env:devenv windows\vs10\povray.sln /upgrade
 
 build:
-  project: windows/vs10/povray.sln
+  project: windows/vs2015/povray.sln
   parallel: true
   verbosity: minimal
 
 after_build:
 - ps: |
-    $version_h = 'source/base/version.h'
-    $regexp = '^\s*#define\s+OFFICIAL_VERSION_STRING\s*"[^"]+"\s*$'
-    $line = ( select-string -Path $version_h -Pattern $regexp | % { $_.Matches } | % { $_.Value } )
-    $string = ( select-string -InputObject $line -Pattern '"[^"]+"' | % { $_.Matches } | % { $_.Value } )
-    $official_version = ( select-string -InputObject $string -Pattern '[^"]+' | % { $_.Matches } | % { $_.Value } )
-    $regexp = '^\s*#define\s+POV_RAY_PRERELEASE\s*"[^"]+"\s*$'
-    $line = ( select-string -Path $version_h -Pattern $regexp | % { $_.Matches } | % { $_.Value } )
-    $string = ( select-string -InputObject $line -Pattern '"[^"]+"' | % { $_.Matches } | % { $_.Value } )
-    $prerelease = ( select-string -InputObject $string -Pattern '[^"]+' | % { $_.Matches } | % { $_.Value } )
-    if ($prerelease) {
-      $env:pov_exe_version = $official_version + '-' + $prerelease
-    } else {
-      $env:pov_exe_version = $official_version
-    }
+    Set-ExecutionPolicy remotesigned -scope process -force
+    ./tools/windows/get-source-version.ps1 ./source/base/version.h
+    $prerelease = $env:POV_SOURCE_PRERELEASE
+    $env:pov_exe_version = $env:POV_SOURCE_VERSION
     $env:pov_tag_version = 'v' + $env:pov_exe_version
     $env:pov_build_version = $env:pov_tag_version + '+av' + $env:APPVEYOR_BUILD_NUMBER
     $env:pov_build_message = ''
@@ -103,5 +86,3 @@ deploy:
     secure: WkcFPXyr/SJ9TXixTQyivhfoR9FzlryIbc4deHeQ0eA6YRXL0wQopMYJ6XL1/FJK
   draft: true
   prerelease: true
-  on:
-    appveyor_repo_tag: true

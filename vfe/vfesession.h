@@ -10,8 +10,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -45,6 +45,13 @@
 #include <boost/thread/condition.hpp>
 
 #include "base/image/colourspace.h"
+
+#include "frontend/simplefrontend.h"
+
+namespace pov_frontend
+{
+  class Display;
+}
 
 namespace vfe
 {

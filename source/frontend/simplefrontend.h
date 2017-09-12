@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,19 +36,28 @@
 #ifndef POVRAY_FRONTEND_SIMPLEFRONTEND_H
 #define POVRAY_FRONTEND_SIMPLEFRONTEND_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "frontend/configfrontend.h"
+
 #include <boost/scoped_ptr.hpp>
 
-#include "syspovconfigfrontend.h"
-
-#include "frontend/renderfrontend.h"
-#include "frontend/imageprocessing.h"
 #include "frontend/animationprocessing.h"
+#include "frontend/renderfrontend.h"
 #include "frontend/shelloutprocessing.h"
+
+namespace pov_base
+{
+class Image;
+}
 
 namespace pov_frontend
 {
 
 using namespace pov_base;
+
+class ImageProcessing;
+class AnimationProcessing;
+class ShelloutProcessing;
 
 enum State
 {

@@ -1,37 +1,39 @@
-/*******************************************************************************
- * pvbitmap.cpp
- *
- * Provides an API for bitmap manipulation.
- *
- * This file is derived from Microsoft sample source and is used by permission.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/windows/pvbitmap.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file windows/pvbitmap.cpp
+///
+/// Provides an API for bitmap manipulation.
+///
+/// This file is derived from Microsoft sample source and is used by permission.
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 #define POVWIN_FILE
 #define _WIN32_IE COMMONCTRL_VERSION
@@ -72,7 +74,7 @@ extern HPALETTE         hPalBitmap ;
  * Parameters:
  *
  * DWORD dwWidth    - Width for new bitmap, in pixels
- * DWORD dwHeight   - Height for new bitmap 
+ * DWORD dwHeight   - Height for new bitmap
  * WORD  wBitCount  - Bit Count for new DIB (1, 4, 8, or 24)
  *
  * Return Value:
@@ -85,7 +87,7 @@ extern HPALETTE         hPalBitmap ;
  * filling in the BITMAPINFOHEADER, allocating memory for the color
  * table, and allocating memory for the bitmap bits.  As with all
  * HDIBs, the header, colortable and bits are all in one contiguous
- * memory block.  This function is similar to the CreateBitmap() 
+ * memory block.  This function is similar to the CreateBitmap()
  * Windows API.
  *
  * The colortable and bitmap bits are left uninitialized (zeroed) in the
@@ -124,7 +126,7 @@ HDIB CreateDIB(DWORD dwWidth, DWORD dwHeight, WORD wBitCount)
    bi.biHeight = dwHeight;       // fill in height from parameter
    bi.biPlanes = 1;              // must be 1
    bi.biBitCount = wBitCount;    // from parameter
-   bi.biCompression = BI_RGB;    
+   bi.biCompression = BI_RGB;
    bi.biSizeImage = 0;           // 0's here mean "default"
    bi.biXPelsPerMeter = 0;
    bi.biYPelsPerMeter = 0;
@@ -905,12 +907,12 @@ int PalEntriesOnDevice(HDC hDC)
  *
  * This function returns a handle to a palette which represents the system
  * palette.  The system RGB values are copied into our logical palette using
- * the GetSystemPaletteEntries function.  
+ * the GetSystemPaletteEntries function.
  *
  * History:
- *            
- *    Date      Author               Reason        
- *    6/01/91   Garrett McAuliffe    Created        
+ *
+ *    Date      Author               Reason
+ *    6/01/91   Garrett McAuliffe    Created
  *    9/15/91   Patrick Schreiber    Added header and comments
  *    12/20/91  Mark Bader           Added GetSystemPaletteEntries call
  *
@@ -949,7 +951,7 @@ HPALETTE GetSystemPalette(void)
 
    /* Copy the current system palette into our logical palette */
 
-   GetSystemPaletteEntries(hDC, 0, nColors, 
+   GetSystemPaletteEntries(hDC, 0, nColors,
                            (LPPALETTEENTRY)(lpLogPal->palPalEntry));
 
    /*  Go ahead and create the palette.  Once it's created,
@@ -1081,15 +1083,15 @@ HANDLE AllocRoomForDIB(BITMAPINFOHEADER bi, HBITMAP hBitmap)
  * DIB, but we wanted to allow the programmer to check whether this
  * conversion succeeded or failed.
  *
- * History:   
- *            
- *   Date      Author             Reason         
- *   6/01/91   Garrett McAuliffe  Created         
- *   12/10/91  Patrick Schreiber  Modified from converting RGB to RLE8        
- *                                  to converting RGB/RLE to RGB/RLE.         
- *                                  Added wBitCount and dwCompression         
- *                                  parameters. Also added header and         
- *                                  comments.         
+ * History:
+ *
+ *   Date      Author             Reason
+ *   6/01/91   Garrett McAuliffe  Created
+ *   12/10/91  Patrick Schreiber  Modified from converting RGB to RLE8
+ *                                  to converting RGB/RLE to RGB/RLE.
+ *                                  Added wBitCount and dwCompression
+ *                                  parameters. Also added header and
+ *                                  comments.
  *
  ************************************************************************/
 
@@ -1248,18 +1250,18 @@ HDIB ChangeDIBFormat(HDIB hDIB, WORD wBitCount, DWORD dwCompression)
  * and compression format. The bitmap and it's palette will remain
  * after calling this function.
  *
- * History:   
- *            
+ * History:
+ *
  *   Date      Author             Reason
- *   6/01/91   Garrett McAuliffe  Created         
- *   12/10/91  Patrick Schreiber  Modified from converting RGB to RLE8         
- *                                 to converting RGB/RLE to RGB/RLE.         
- *                                 Added wBitCount and dwCompression         
- *                                 parameters. Also added header and         
- *                                 comments.         
- *   12/11/91  Patrick Schreiber  Destroy old DIB if conversion was         
- *                                 successful.         
- *   12/16/91  Patrick Schreiber  Modified from converting DIB to new         
+ *   6/01/91   Garrett McAuliffe  Created
+ *   12/10/91  Patrick Schreiber  Modified from converting RGB to RLE8
+ *                                 to converting RGB/RLE to RGB/RLE.
+ *                                 Added wBitCount and dwCompression
+ *                                 parameters. Also added header and
+ *                                 comments.
+ *   12/11/91  Patrick Schreiber  Destroy old DIB if conversion was
+ *                                 successful.
+ *   12/16/91  Patrick Schreiber  Modified from converting DIB to new
  *                                 DIB to bitmap to new DIB. Added palette
  *                                 parameter.
  *
@@ -1648,7 +1650,7 @@ HANDLE ReadDIBFile(int hFile)
     * get length of DIB in bytes for use when reading
     */
 
-   // Allocate memory for header & color table.	We'll enlarge this
+   // Allocate memory for header & color table. We'll enlarge this
    // memory as needed.
 
    hDIB = GlobalAlloc(GMEM_MOVEABLE,
@@ -1668,7 +1670,7 @@ HANDLE ReadDIBFile(int hFile)
    if (sizeof (BITMAPFILEHEADER) != _lread (hFile, (LPSTR)&bmfHeader, sizeof (BITMAPFILEHEADER)))
      goto ErrExit;
 
-   if (bmfHeader.bfType != 0x4d42)	/* 'BM' */
+   if (bmfHeader.bfType != 0x4d42)  /* 'BM' */
      goto ErrExit;
 
    // read the BITMAPINFOHEADER
@@ -1706,7 +1708,7 @@ HANDLE ReadDIBFile(int hFile)
    if (lpbi->biSizeImage == 0)
    {
      lpbi->biSizeImage = ((((lpbi->biWidth * (DWORD)lpbi->biBitCount) + 31) & ~31) >> 3)
-			 * lpbi->biHeight;
+                         * lpbi->biHeight;
    }
 
    // get a proper-sized buffer for header, color table and bits

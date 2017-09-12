@@ -58,7 +58,7 @@ that our rules may differ substantially.)
          IGNORED: This depends on the user's choice of compiler, and is therefore beyond the scope of any
          platform-independent project. -->
 
-  - **Language Standard**: Source code should be written in C++ adhering to the ISO-IEC 14882-2003 standard (aka C++03).
+  - **Language Standard**: Source code should be written in C++ adhering to the ISO/IEC 14882:2011 standard (aka C++11).
     Compiler-specific language extensions may only be used in the dedicated headers intended to _hide_ compiler-specific
     implementation details.
     <!-- MISRA C++ 2008 **required** rule 1-0-1 -->

@@ -1,11 +1,11 @@
 #!/bin/sh
 
 ###############################################################################
-# prebuild.sh script (maintainers only)
+# prebuild.sh script (maintainers only) 
 # Written by Nicolas Calimet and Christoph Hormann
 #
-# This prebuild.sh script prepares the Perforce source tree for building
-# the Unix/Linux version of POV-Ray.  Unlike the former versions, the
+# This prebuild.sh script prepares the source tree for building the
+# Unix/Linux version of POV-Ray.  Unlike the former versions, the
 # prebuild procedure does not change the directory structure, so that
 # the overall layout of the UNIX source distribution remains consistent
 # with the other supported architectures (namely Windows and Macintosh).
@@ -40,18 +40,12 @@
 #
 # Note that the 'clean' and 'doc(s)(clean)' options are mutually exclusive.
 #
-# $File: //depot/povray/smp/unix/prebuild.sh $
-# $Revision: #31 $
-# $Change: 6136 $
-# $DateTime: 2013/11/25 16:36:15 $
-# $Author: clipka $
-# $Log$
 ###############################################################################
 
 umask 022
 
 pov_version_base=`cat ./VERSION | sed 's,\([0-9]*.[0-9]*\).*,\1,g'`
-pov_config_bugreport="POV-Ray Bugtracker http://bugs.povray.org/"
+pov_config_bugreport="POV-Ray issue tracker at https://github.com/POV-Ray/povray/issues"
 
 # documentation
 timestamp=`date +%Y-%m-%d`
@@ -119,7 +113,7 @@ fi
 
 case "$1" in
 
-  # Cleanup all files not in the Perforce repositery
+  # Cleanup all files not in the repository
   clean)
   if test -f ../Makefile; then
     makeclean=`\
@@ -418,7 +412,7 @@ case "$1" in
   cat << pbEOF >> $makefile.am
 
 # Makefile.am for the source distribution of POV-Ray $pov_version_base for UNIX
-# Written by $pov_config_bugreport
+# Please report bugs to $pov_config_bugreport
 
 # Programs to build.
 bin_PROGRAMS = povray
@@ -429,6 +423,22 @@ povray_SOURCES = \\
   disp_sdl.cpp disp_sdl.h \\
   disp_text.cpp disp_text.h
 
+cppflags_platformcpu =
+ldadd_platformcpu =
+if BUILD_x86
+cppflags_platformcpu += -I\$(top_srcdir)/platform/x86
+ldadd_platformcpu += \$(top_builddir)/platform/libx86.a
+endif
+if BUILD_x86avx
+ldadd_platformcpu += \$(top_builddir)/platform/libx86avx.a
+endif
+if BUILD_x86avxfma4
+ldadd_platformcpu += \$(top_builddir)/platform/libx86avxfma4.a
+endif
+if BUILD_x86avx2fma3
+ldadd_platformcpu += \$(top_builddir)/platform/libx86avx2fma3.a
+endif
+
 # Include paths for headers.
 AM_CPPFLAGS = \\
   -I\$(top_srcdir)/unix/povconfig \\
@@ -436,6 +446,7 @@ AM_CPPFLAGS = \\
   -I\$(top_srcdir)/source \\
   -I\$(top_builddir)/source \\
   -I\$(top_srcdir)/platform/unix \\
+  \$(cppflags_platformcpu) \\
   -I\$(top_srcdir)/vfe \\
   -I\$(top_srcdir)/vfe/unix
 
@@ -446,7 +457,8 @@ LDADD = \\
   \$(top_builddir)/vfe/libvfe.a \\
   \$(top_builddir)/source/libpovray.a \\
   \$(top_builddir)/vfe/libvfe.a \\
-  \$(top_builddir)/platform/libplatform.a
+  \$(top_builddir)/platform/libplatform.a \\
+  \$(ldadd_platformcpu)
 pbEOF
   ;;
 esac
@@ -565,7 +577,7 @@ case "$1" in
   cat << pbEOF >> $makefile.am
 
 # Makefile.am for the source distribution of POV-Ray $pov_version_base for UNIX
-# Written by $pov_config_bugreport
+# Please report bugs to $pov_config_bugreport
 
 # Directories.
 povlibdir = @datadir@/@PACKAGE@-@VERSION_BASE@
@@ -718,7 +730,7 @@ case "$1" in
 #!/bin/sh -x
 
 # bootstrap for the source distribution of POV-Ray $pov_version_base for UNIX
-# Written by $pov_config_bugreport
+# Please report bugs to $pov_config_bugreport
 # Run this script if configure.ac or any Makefile.am has changed
 
 rm -f config.log config.status
@@ -778,27 +790,33 @@ case "$1" in
   ;;
 
   *)
-  files=`find $dir -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g`
+  files=`find $dir -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g | sort`
 
   echo "Create $makefile.am"
   cat Makefile.header > $makefile.am
   cat << pbEOF >> $makefile.am
 
 # Makefile.am for the source distribution of POV-Ray $pov_version_base for UNIX
-# Written by $pov_config_bugreport
+# Please report bugs to $pov_config_bugreport
 
 # Libraries to build.
 noinst_LIBRARIES = libpovray.a
 
 # Source files.
 libpovray_a_SOURCES = \\
-`echo $files`
+  `echo $files`
+
+cppflags_platformcpu = 
+if BUILD_x86
+cppflags_platformcpu += -I\$(top_srcdir)/platform/x86
+endif
 
 # Include paths for headers.
 AM_CPPFLAGS = \\
   -I\$(top_srcdir)/unix/povconfig \\
   -I\$(top_srcdir) \\
   -I\$(top_srcdir)/platform/unix \\
+  \$(cppflags_platformcpu) \\
   -I\$(top_srcdir)/unix \\
   -I\$(top_srcdir)/vfe \\
   -I\$(top_srcdir)/vfe/unix
@@ -1310,26 +1328,32 @@ case "$1" in
 
   *)
   # includes the vfe/unix/ files to avoid circular dependencies when linking
-  files=`find $dir $dir/unix -maxdepth 1 -name \*.cpp -or -name \*.h | sed s,"$dir/",,g`
+  files=`find $dir $dir/unix -maxdepth 1 -name \*.cpp -or -name \*.h | sed s,"$dir/",,g | sort`
 
   echo "Create $makefile.am"
   cat Makefile.header > $makefile.am
   cat << pbEOF >> $makefile.am
 
 # Makefile.am for the source distribution of POV-Ray $pov_version_base for UNIX
-# Written by $pov_config_bugreport
+# Please report bugs to $pov_config_bugreport
 
 # Libraries to build.
 noinst_LIBRARIES = libvfe.a
 
 # Source files.
 libvfe_a_SOURCES = \\
-`echo $files`
+  `echo $files`
+
+cppflags_platformcpu = 
+if BUILD_x86
+cppflags_platformcpu += -I\$(top_srcdir)/platform/x86
+endif
 
 # Include paths for headers.
 AM_CPPFLAGS = \\
   -I\$(top_srcdir)/unix/povconfig \\
   -I\$(top_srcdir)/platform/unix \\
+  \$(cppflags_platformcpu) \\
   -I\$(top_srcdir)/vfe/unix \\
   -I\$(top_srcdir)/unix \\
   -I\$(top_srcdir)/source
@@ -1368,26 +1392,59 @@ case "$1" in
   ;;
 
   *)
-  files=`find $dir/unix -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g`
+  files=`find $dir/unix -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g | sort`
+  files_x86=`find $dir/x86 -maxdepth 1 -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g | sort`
+  for ext in avx avxfma4 avx2fma3; do
+    files_ext=`find $dir/x86/$ext -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g | sort`
+    eval files_x86$ext='$files_ext'
+  done
 
   echo "Create $makefile.am"
   cat Makefile.header > $makefile.am
   cat << pbEOF >> $makefile.am
 
 # Makefile.am for the source distribution of POV-Ray $pov_version_base for UNIX
-# Written by $pov_config_bugreport
+# Please report bugs to $pov_config_bugreport
+
+# Platform-specifics.
+cppflags_platformcpu =
+libraries_platformcpu =
+if BUILD_x86
+cppflags_platformcpu += -I\$(top_srcdir)/platform/x86
+libraries_platformcpu += libx86.a
+libx86_a_SOURCES = `echo $files_x86`
+libx86_a_CXXFLAGS = \$(CXXFLAGS)
+endif
+if BUILD_x86avx
+libraries_platformcpu += libx86avx.a
+libx86avx_a_SOURCES = `echo $files_x86avx`
+libx86avx_a_CXXFLAGS = \$(CXXFLAGS) -mavx
+endif
+if BUILD_x86avxfma4
+libraries_platformcpu += libx86avxfma4.a
+libx86avxfma4_a_SOURCES = `echo $files_x86avxfma4`
+libx86avxfma4_a_CXXFLAGS = \$(CXXFLAGS) -mavx -mfma4
+endif
+if BUILD_x86avx2fma3
+libraries_platformcpu += libx86avx2fma3.a
+libx86avx2fma3_a_SOURCES =  `echo $files_x86avx2fma3`
+libx86avx2fma3_a_CXXFLAGS = \$(CXXFLAGS) -mavx2 -mfma
+endif
 
 # Libraries to build.
-noinst_LIBRARIES = libplatform.a
+noinst_LIBRARIES = \\
+  libplatform.a \\
+  \$(libraries_platformcpu)
 
 # Source files.
 libplatform_a_SOURCES = \\
-`echo $files`
+  `echo $files`
 
 # Include paths for headers.
 AM_CPPFLAGS = \\
   -I\$(top_srcdir)/unix/povconfig \\
   -I\$(top_srcdir)/platform/unix \\
+  \$(cppflags_platformcpu) \\
   -I\$(top_srcdir)/vfe \\
   -I\$(top_srcdir)/vfe/unix \\
   -I\$(top_srcdir)/unix \\

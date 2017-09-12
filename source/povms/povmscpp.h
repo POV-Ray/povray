@@ -8,8 +8,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -221,6 +221,9 @@ class POVMS_Object : public POVMS_Container
         void SetFloat(POVMSType key, POVMSFloat value);
         void SetBool(POVMSType key, POVMSBool value);
         void SetType(POVMSType key, POVMSType value);
+
+        /// Set an attribute without any payload data.
+        void SetVoid(POVMSType key);
 
         void SetIntVector(POVMSType key, std::vector<POVMSInt>& value);
         void SetLongVector(POVMSType key, std::vector<POVMSLong>& value);

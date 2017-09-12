@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -49,7 +49,7 @@
 #endif
 
 #ifdef _CONSOLE
-#error "You are building the GUI platform with _CONSOLE defined (check vfe\win\syspovconfig.h)."
+#error "You are building the GUI platform with _CONSOLE defined (check windows/povconfig/syspovconfig.h)."
 #endif
 
 #include <string.h>
@@ -91,15 +91,15 @@
 
 #if POV_RAY_IS_OFFICIAL
   #ifdef _WIN64
-    #define CLASSNAMEPREFIX "Pov37-Win64-"
+    #define CLASSNAMEPREFIX "Pov" POV_RAY_MAJOR_VERSION POV_RAY_MINOR_VERSION "-Win64-"
   #else
-    #define CLASSNAMEPREFIX "Pov37-Win32-"
+    #define CLASSNAMEPREFIX "Pov" POV_RAY_MAJOR_VERSION POV_RAY_MINOR_VERSION "-Win32-"
   #endif
 #else
   #ifdef _WIN64
-    #define CLASSNAMEPREFIX "Unofficial-Pov37-Win64-"
+    #define CLASSNAMEPREFIX "Unofficial-Pov" POV_RAY_MAJOR_VERSION POV_RAY_MINOR_VERSION "-Win64-"
   #else
-    #define CLASSNAMEPREFIX "Unofficial-Pov37-Win32-"
+    #define CLASSNAMEPREFIX "Unofficial-Pov" POV_RAY_MAJOR_VERSION POV_RAY_MINOR_VERSION "-Win32-"
   #endif
 #endif
 
@@ -116,45 +116,21 @@
 #ifdef _WIN64
   #define BINDIRNAME            "bin64"
   #define INSTALLTIMEKEY        "InstallTime64"
-  #ifdef _DEBUG
-    #define EDITDLLNAME         "cmedit64d.dll"
-  #else
-    #define EDITDLLNAME         "cmedit64.dll"
-  #endif
-  #if !defined POVRAY_IS_BETA
-    #define NEWESTVERSIONVAL    "NewestVersion64"
-    #define VERSIONVAL          "VersionNo64"
-    #define NEXTVERSIONCHECKVAL "NextVersionCheck64"
-    #define VERSIONCHECKDAYS    4
-  #else
-    #define NEWESTVERSIONVAL    "NewestBetaVersion64"
-    #define VERSIONVAL          "BetaVersionNo64"
-    #define NEXTVERSIONCHECKVAL "NextBetaVersionCheck64"
-    #define VERSIONCHECKDAYS    1
-  #endif
+  // NB: We're using the standard editor DLLs regardless of architecture optimization (e.g. AVX)
+  #define EDITDLLNAME           "cmedit64.dll"
+  #define EDITDLLNAME_DEBUG     "cmedit64d.dll"
+  #define VERSIONVAL            POV_RAY_BETA_PREFIX "VersionNo64"
 #else
   #define BINDIRNAME            "bin32"
   #define INSTALLTIMEKEY        "InstallTime32"
-  #ifdef _DEBUG
-    #define EDITDLLNAME         "cmedit32d.dll"
+  // TODO - use the standard editor DLLs regardless of architecture optimization (e.g. SSE2)
+  #ifdef BUILD_SSE2
+    #define EDITDLLNAME         "cmedit32-sse2.dll"
   #else
-    #ifdef BUILD_SSE2
-        #define EDITDLLNAME     "cmedit32-sse2.dll"
-    #else
-        #define EDITDLLNAME     "cmedit32.dll"
-    #endif
+    #define EDITDLLNAME         "cmedit32.dll"
   #endif
-  #if !defined POVRAY_IS_BETA
-    #define NEWESTVERSIONVAL    "NewestVersion32"
-    #define VERSIONVAL          "VersionNo32"
-    #define NEXTVERSIONCHECKVAL "NextVersionCheck32"
-    #define VERSIONCHECKDAYS    4
-  #else
-    #define NEWESTVERSIONVAL    "NewestBetaVersion32"
-    #define VERSIONVAL          "BetaVersionNo32"
-    #define NEXTVERSIONCHECKVAL "NextBetaVersionCheck32"
-    #define VERSIONCHECKDAYS    1
-  #endif
+  #define EDITDLLNAME_DEBUG     "cmedit32d.dll"
+  #define VERSIONVAL            POV_RAY_BETA_PREFIX "VersionNo32"
 #endif
 
 // ----------------------------------------------------------------------

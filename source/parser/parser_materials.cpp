@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,6 +44,7 @@
 #include "core/material/blendmap.h"
 #include "core/material/interior.h"
 #include "core/material/media.h"
+#include "core/material/noise.h"
 #include "core/material/normal.h"
 #include "core/material/pattern.h"
 #include "core/material/pigment.h"
@@ -431,10 +432,10 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
 
         if (GammaCorrect && !options.gammaOverride && ((filetype == PGM_FILE) || (filetype == PPM_FILE)))
         {
-            // As of POV-Ray 3.7.1, our default gamma handling for Netpbm (PGM/PPM) input images adheres to the
+            // As of POV-Ray v3.8, our default gamma handling for Netpbm (PGM/PPM) input images adheres to the
             // official standard, which mandates data to be gamma-encoded using the ITU-R BT.709 transfer function.
 
-            if (sceneData->EffectiveLanguageVersion() < 371)
+            if (sceneData->EffectiveLanguageVersion() < 380)
             {
                 // For legacy scenes we simulate the old behaviour, which was to perform no gamma correction at all.
                 options.gammacorrect = false;
@@ -560,7 +561,7 @@ void Parser::Parse_Image_Map (PIGMENT *Pigment)
     image = Parse_Image (IMAGE_FILE, true);
     image->Use = USE_COLOUR; // was true [trf]
 
-    image->AllTransmitLegacyMode = (sceneData->EffectiveLanguageVersion() < 371);
+    image->AllTransmitLegacyMode = (sceneData->EffectiveLanguageVersion() < 380);
 
     EXPECT                   /* Look for image_attribs */
         CASE (ONCE_TOKEN)
@@ -2160,6 +2161,9 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
     }
 
     VerifyPattern(New->pattern);
+
+    if (!New->pattern->Precompute())
+        Error("Unspecified parse error in pattern.");
 }
 
 
@@ -5496,6 +5500,9 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
     END_EXPECT
 
     VerifyPattern(New->pattern);
+
+    if (!New->pattern->Precompute())
+        Error("Unspecified parse error in pattern.");
 }
 
 }

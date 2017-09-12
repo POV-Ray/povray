@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -61,7 +61,7 @@ namespace pov
 class TraceTask : public RenderTask
 {
     public:
-        TraceTask(ViewData *vd, unsigned int tm, DBL js, DBL aat, unsigned int aad, pov_base::GammaCurvePtr& aag, unsigned int ps, bool psc, bool final, bool hr);
+        TraceTask(ViewData *vd, unsigned int tm, DBL js, DBL aat, unsigned int aad, pov_base::GammaCurvePtr& aag, unsigned int ps, bool psc, bool contributesToImage, bool hr);
         virtual ~TraceTask();
 
         virtual void Run();
@@ -100,7 +100,8 @@ class TraceTask : public RenderTask
         unsigned int aaDepth;
         unsigned int previewSize;
         bool previewSkipCorner;
-        bool finalTrace;
+        bool passContributesToImage;    ///< Pass computes pixels for the final image.
+        bool passCompletesImage;        ///< Pass is the last one computing pixels for the final image.
         bool highReproducibility;
         pov_base::GammaCurvePtr aaGamma;
 

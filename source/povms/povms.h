@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -248,7 +248,7 @@
 #endif
 
 #undef POVMS_VERSION
-#define POVMS_VERSION 2
+#define POVMS_VERSION 0x0371
 
 
 /*****************************************************************************
@@ -285,6 +285,7 @@ enum
     kPOVMSType_Double           = 'FLT8',
     kPOVMSType_Bool             = 'BOOL',
     kPOVMSType_Type             = 'TYPE',
+    kPOVMSType_Void             = 'VOID',
     kPOVMSType_List             = 'LIST',
     kPOVMSType_VectorInt        = 'VIN4',
     kPOVMSType_VectorLong       = 'VIN8',
@@ -379,7 +380,6 @@ POVMS_EXPORT int POVMS_CDECL POVMSObject_Set        (POVMSObjectPtr object, POVM
 POVMS_EXPORT int POVMS_CDECL POVMSObject_Remove     (POVMSObjectPtr object, POVMSType key);
 POVMS_EXPORT int POVMS_CDECL POVMSObject_Exist      (POVMSObjectPtr object, POVMSType key);
 POVMS_EXPORT int POVMS_CDECL POVMSObject_Count      (POVMSObjectPtr object, int  *cnt);
-POVMS_EXPORT int POVMS_CDECL POVMSObject_GetClass   (POVMSObjectPtr object, POVMSType *objclass);
 
 #ifndef POVMS_NO_DUMP_SUPPORT
 // Object debug functions
@@ -422,6 +422,7 @@ POVMS_EXPORT int POVMS_CDECL POVMSUtil_SetLong      (POVMSObjectPtr object, POVM
 POVMS_EXPORT int POVMS_CDECL POVMSUtil_SetFloat     (POVMSObjectPtr object, POVMSType key, POVMSFloat value);
 POVMS_EXPORT int POVMS_CDECL POVMSUtil_SetBool      (POVMSObjectPtr object, POVMSType key, POVMSBool boolvalue);
 POVMS_EXPORT int POVMS_CDECL POVMSUtil_SetType      (POVMSObjectPtr object, POVMSType key, POVMSType typevalue);
+POVMS_EXPORT int POVMS_CDECL POVMSUtil_SetVoid      (POVMSObjectPtr object, POVMSType key);
 POVMS_EXPORT int POVMS_CDECL POVMSUtil_GetStringLength(POVMSObjectPtr object, POVMSType key, int *len); // Note: Includes trailing \0 character code!
 POVMS_EXPORT int POVMS_CDECL POVMSUtil_GetString    (POVMSObjectPtr object, POVMSType key, char *str, int *maxlen);
 POVMS_EXPORT int POVMS_CDECL POVMSUtil_GetUCS2StringLength(POVMSObjectPtr object, POVMSType key, int *len); // Note: Includes trailing \0 character code!

@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,24 +33,15 @@
 ///
 //******************************************************************************
 
-#include <cctype>
-
-// configfrontend.h must always be the first POV file included within frontend *.cpp files
-#include "frontend/configfrontend.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/processrenderoptions.h"
 
-#include "povms/povmscpp.h"
-#include "povms/povmsid.h"
-
-#include "base/fileinputoutput.h"
 #include "base/fileutil.h"
 #include "base/platformbase.h"
-#include "base/pov_err.h"
-#include "base/stringutilities.h"
-#include "base/textstream.h"
-#include "base/types.h"
 #include "base/image/colourspace.h"
 #include "base/image/encoding.h"
+
+#include "povms/povmsid.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -1075,7 +1066,7 @@ struct ProcessRenderOptions::Output_FileType_Table FileTypeTable[] =
     { 'S',  0,                              kPOVList_FileType_System,           SYS_GRAYSCALE_FLAG, SYS_ALPHA_FLAG },
 #endif // POV_SYS_IMAGE_TYPE
 
-    //  [1] Alpha support for BMP uses an inofficial extension to the BMP file format, which is not recognized by
+    //  [1] Alpha support for BMP uses an unofficial extension to the BMP file format, which is not recognized by
     //      most image pocessing software.
 
     //  [2] While OpenEXR does support greyscale output at >8 bits, the variants currently supported by POV-Ray

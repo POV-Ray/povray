@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -554,7 +554,7 @@ POVMS_EXPORT int POVMS_CDECL POVMS_ProcessMessages(POVMSContext contextref, POVM
             err = kCannotHandleDataErr;
 
         datasize += POVMSStream_ReadInt(&version, stream + datasize, &maxsize);        // version      4 byte
-        if(version != 0x0351)
+        if(version != POVMS_VERSION)
             err = kVersionErr;
 
         datasize += POVMSStream_ReadInt(&totalsize, stream + datasize, &maxsize);      // total size   4 byte
@@ -766,7 +766,7 @@ POVMS_EXPORT int POVMS_CDECL POVMS_Send(POVMSContext contextref, POVMSObjectPtr 
         if(stream != NULL)
         {
             datasize += POVMSStream_WriteString("POVRAYMS", stream, &maxsize);             // header       8 byte
-            datasize += POVMSStream_WriteInt(0x0351, stream + datasize, &maxsize);         // version      4 byte
+            datasize += POVMSStream_WriteInt(POVMS_VERSION, stream + datasize, &maxsize);  // version      4 byte
             datasize += POVMSStream_WriteInt(totalsize, stream + datasize, &maxsize);      // total size   4 byte
             datasize += POVMSStream_WriteInt(mode, stream + datasize, &maxsize);           // flags        4 byte
             datasize += POVMSStream_WriteInt(objectcnt, stream + datasize, &maxsize);      // objects      4 byte
@@ -1420,6 +1420,10 @@ POVMS_EXPORT int POVMS_CDECL POVMSStream_Read(struct POVMSData *data, POVMSStrea
             data->ptr = (void *)POVMS_Sys_Malloc(data->size);
             ret += POVMSStream_ReadType(((POVMSType *)(data->ptr)), stream + ret, maxstreamsize);
             break;
+        case kPOVMSType_Void:
+            data->size = 0;
+            data->ptr = NULL;
+            break;
         case kPOVMSType_VectorInt:
             data->ptr = (void *)POVMS_Sys_Malloc(sizeof(POVMSInt) * data->size);
             for(int i = 0; i < data->size; i++)
@@ -1749,6 +1753,9 @@ POVMS_EXPORT int POVMS_CDECL POVMSStream_Write(struct POVMSData *data, POVMSStre
             ret += POVMSStream_WriteInt(4, stream + ret, maxstreamsize);
             ret += POVMSStream_WriteType(*((POVMSType *)(data->ptr)), stream + ret, maxstreamsize);
             break;
+        case kPOVMSType_Void:
+            ret += POVMSStream_WriteInt(0, stream + ret, maxstreamsize);
+            break;
         case kPOVMSType_VectorInt:
             ret += POVMSStream_WriteInt(data->size / 4, stream + ret, maxstreamsize);
             for(int i = 0; i < data->size / 4; i++)
@@ -1843,6 +1850,9 @@ POVMS_EXPORT int POVMS_CDECL POVMSStream_Size(struct POVMSData *data)
             break;
         case kPOVMSType_Type:
             ret += 4;
+            break;
+        case kPOVMSType_Void:
+            ret += 0;
             break;
         case kPOVMSType_VectorInt:
             ret += data->size / sizeof(POVMSInt) * 4;
@@ -1967,7 +1977,7 @@ POVMS_EXPORT int POVMS_CDECL POVMSStream_CheckMessageHeader(POVMSStream *stream,
             err = kCannotHandleDataErr;
 
         datasize += POVMSStream_ReadInt(&version, stream + datasize, &streamsize);     // version      4 byte
-        if(version != 0x0351)
+        if(version != POVMS_VERSION)
             err = kVersionErr;
 
         datasize += POVMSStream_ReadInt(totalsize, stream + datasize, &streamsize);    // total size   4 byte
@@ -2871,6 +2881,9 @@ POVMS_EXPORT int POVMS_CDECL POVMSObject_DumpAttr(FILE *file, POVMSAttributePtr 
                                           , (char)((*((unsigned int *)(attr->ptr))) >> 8)
                                           , (char)((*((unsigned int *)(attr->ptr)))));
             break;
+        case kPOVMSType_Void:
+            fprintf(file, "[no data]\n");
+            break;
         default:
             fprintf(file, "[cannot dump data]\n");
             break;
@@ -3170,7 +3183,7 @@ POVMS_EXPORT int POVMS_CDECL POVMSAttr_Set(POVMSAttributePtr attr, POVMSType typ
 
     if(attr == NULL)
         return kParamErr;
-    if(data == NULL)
+    if((data == NULL) && (datasize > 0))
         return kParamErr;
     if(datasize < 0)
         return kParamErr;
@@ -3179,14 +3192,20 @@ POVMS_EXPORT int POVMS_CDECL POVMSAttr_Set(POVMSAttributePtr attr, POVMSType typ
     if(attr->size != 0)
         return kParamErr;
 
-    attr->ptr = (void *)POVMS_Sys_Malloc(datasize);
-    if(POVMS_ASSERT(attr->ptr != NULL, "POVMSAttr_Set failed, out of memory") == false)
-        return kMemFullErr;
+    if (datasize > 0)
+    {
+        attr->ptr = (void *)POVMS_Sys_Malloc(datasize);
+        if (POVMS_ASSERT(attr->ptr != NULL, "POVMSAttr_Set failed, out of memory") == false)
+            return kMemFullErr;
 
-    //if(attr->type == kPOVMSType_Address)
-    //  (void)NetPOVMS_DeleteAddress((POVMSAddressPtr)(attr->ptr));
+        //if(attr->type == kPOVMSType_Address)
+        //  (void)NetPOVMS_DeleteAddress((POVMSAddressPtr)(attr->ptr));
 
-    POVMS_Sys_Memmove(attr->ptr, data, datasize);
+        POVMS_Sys_Memmove(attr->ptr, data, datasize);
+    }
+    else
+        attr->ptr = NULL;
+
     attr->type = type;
     attr->size = datasize;
 
@@ -3945,6 +3964,39 @@ POVMS_EXPORT int POVMS_CDECL POVMSUtil_SetType(POVMSObjectPtr object, POVMSType 
     if(ret == kNoErr)
         ret = POVMSAttr_Set(&attr, kPOVMSType_Type, (void *)(&typevalue), sizeof(POVMSType));
     if(ret == kNoErr)
+        ret = POVMSObject_Set(object, &attr, key);
+
+    return ret;
+}
+
+
+/*****************************************************************************
+*
+* FUNCTION
+*   POVMSUtil_SetVoid
+*
+* DESCRIPTION
+*  Stores a void value in the given attribute.
+*
+* CHANGES
+*   -
+*
+******************************************************************************/
+
+POVMS_EXPORT int POVMS_CDECL POVMSUtil_SetVoid(POVMSObjectPtr object, POVMSType key)
+{
+    POVMSAttribute attr;
+    int ret;
+
+    POVMS_LOG_OUTPUT("POVMSUtil_SetVoid");
+
+    if (object == NULL)
+        return kParamErr;
+
+    ret = POVMSAttr_New(&attr);
+    if (ret == kNoErr)
+        ret = POVMSAttr_Set(&attr, kPOVMSType_Void, NULL, 0);
+    if (ret == kNoErr)
         ret = POVMSObject_Set(object, &attr, key);
 
     return ret;

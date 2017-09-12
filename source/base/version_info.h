@@ -5,15 +5,15 @@
 /// Secondary version information.
 ///
 /// This file defines version information macros derived from the primary
-/// version information defned in @ref base/version.h, build information defined
+/// version information defined in @ref base/version.h, build information defined
 /// in @ref base/build.h, and other compile-time configuration pulled in via
 /// @ref base/configbase.h.
 ///
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -61,15 +61,15 @@
 /// Source code version string.
 #if POV_RAY_IS_OFFICIAL
     #ifdef POV_RAY_PRERELEASE
-        #define POV_RAY_SOURCE_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE
+        #define POV_RAY_SOURCE_VERSION POV_RAY_PATCH_VERSION "-" POV_RAY_PRERELEASE
     #else
-        #define POV_RAY_SOURCE_VERSION OFFICIAL_VERSION_STRING
+        #define POV_RAY_SOURCE_VERSION POV_RAY_PATCH_VERSION
     #endif
 #else
     #ifdef POV_RAY_PRERELEASE
-        #define POV_RAY_SOURCE_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE ".unofficial"
+        #define POV_RAY_SOURCE_VERSION POV_RAY_PATCH_VERSION "-" POV_RAY_PRERELEASE ".unofficial"
     #else
-        #define POV_RAY_SOURCE_VERSION OFFICIAL_VERSION_STRING "-unofficial"
+        #define POV_RAY_SOURCE_VERSION POV_RAY_PATCH_VERSION "-unofficial"
     #endif
 #endif
 
