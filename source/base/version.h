@@ -54,6 +54,15 @@
 ///
 /// @name Primary Version and Copyright Information
 ///
+/// @note
+///     The macro definition in this section may be probed by external tools, and must therefore
+///     conform to the following rules:
+///       - The definitions must reside on a single line each.
+///       - The lines must not be disabled via conditional compilation or multi-line comments.
+///       - The lines must not contain any whitespace other than plain blanks (ASCII 0x20).
+///       - The macros must be defined as plain string literals, plain decimal integer literals,
+///         or plain empty, depending on their purpose.
+///
 /// @{
 
 /// Copyright string.
@@ -74,7 +83,7 @@
 /// or complex bugfixes that require thorough testing.
 #define POV_RAY_REVISION_INT        0
 
-/// Fourth numerical component of official source code version ("patch level") as integer.
+/// Fourth numerical component of official source code version ("maintenance patch level") as integer.
 /// Increment this field to indicate simple bugfixes.
 #define POV_RAY_PATCHLEVEL_INT      0
 
@@ -91,7 +100,7 @@
 /// where `N` is a serial number starting at 1 in each phase, `TIME` is the number of minutes
 /// since 2000-01-01 00:00, and `FEATURE` is an arbitrary alphanumeric moniker for a particular
 /// experimental feature.
-#define POV_RAY_PRERELEASE "alpha"
+#define POV_RAY_PRERELEASE          "alpha"
 
 /// @def POVRAY_IS_BETA
 /// Whether this version is a beta.
