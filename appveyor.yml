@@ -64,7 +64,7 @@ after_build:
     $env:pov_build_message += 'build system. Please contact us on http://news.povray.org/povray.beta-test if you need '
     $env:pov_build_message += 'Windows XP-compatible binaries of this particular version.'
     $env:pov_zipdir = "povray-" + $env:pov_exe_version + '-av' + $env:APPVEYOR_BUILD_NUMBER + $env:artifact_suffix
-    $env:pov_binary = "Windows\vs10\" + $env:bin_dir + "\pvengine*.exe"
+    $env:pov_binary = "Windows\vs2015\" + $env:bin_dir + "\pvengine*.exe"
     $env:pov_zip = "artifacts\" + $env:pov_zipdir + ".7z"
     New-Item -ItemType directory -Path $env:pov_zipdir | Out-Null
     New-Item -ItemType directory -Path "artifacts" | Out-Null
