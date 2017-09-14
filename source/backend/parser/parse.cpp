@@ -191,7 +191,7 @@ void Parser::Run()
 				{
 					Temp_Entry = Add_Symbol(1, i->first.c_str(), FLOAT_ID_TOKEN);
 					Temp_Entry->Data = Create_Float();
-					*((DBL *)(Temp_Entry->Data)) = atof(i->second.c_str());
+					*((DBL *)(Temp_Entry->Data)) = std::atof(i->second.c_str());
 				}
 			}
 		}
