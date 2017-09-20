@@ -43,6 +43,13 @@
 // Standard C++ header files
 #include <algorithm>
 
+#if defined(HAVE_SYS_IOCTL_H)
+#include <sys/ioctl.h>
+#endif
+#if !defined(GWINSZ_IN_SYS_IOCTL) && !defined(_WIN32)
+#include <termios.h>
+#endif
+
 // POV-Ray base header files
 #include "base/pov_err.h"
 #include "base/stringutilities.h"
@@ -51,6 +58,16 @@
 // this must be the last file included
 #include "base/povdebug.h"
 
+unsigned int GetTerminalWidth()
+{
+#if defined(TIOCGWINSZ) && defined(HAVE_IOCTL)
+    struct winsize w;
+    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == 0 && w.ws_col != 0)
+        return (unsigned int)w.ws_col;
+#endif
+    return 80;
+}
+
 namespace pov_base
 {
 
@@ -58,7 +75,7 @@ TextStreamBuffer::TextStreamBuffer(size_t buffersize, unsigned int wrapwidth)
 {
     boffset = 0;
     bsize = buffersize;
-    wrap = wrapwidth;
+    wrap = GetTerminalWidth();
     curline = 0;
     buffer = new char[bsize];
     if(buffer == NULL)
