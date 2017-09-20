@@ -2430,7 +2430,12 @@ void Parser::Parse_Directive(int After_Hash)
                                 if (Include_File_Index == 0)
                                     Error("As of POV-Ray 3.7, the '#version' directive must be the first non-comment "
                                           "statement in the scene file. If your scene will adapt to whatever version "
-                                          "is un use dynamically, start your scene with '#version version'.");
+                                          "is in use dynamically, start your scene with '#version version'.");
+                            }
+                            else if ((!sceneData->languageVersionSet)&&(sceneData->languageVersion >= 380))
+                            {// [JG] first item, not languageVersionLate : override the default ambient (rgb 0.1) (in Create_Finish) for 0.0
+                             // Do not bother to create a copy, it has not been used yet
+                                Default_Texture->Finish->Ambient.Clear();
                             }
 
                             // NB: This must be set _after_ parsing the value, in order for the `#version version`
