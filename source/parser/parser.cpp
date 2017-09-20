@@ -4877,6 +4877,8 @@ TEXTURE *Parser::Parse_Mesh_Texture (TEXTURE **t2, TEXTURE **t3)
 * CHANGES
 *
 *   Jul 2010 : Creation.
+*   Jul 2016 : extension with distance & radius
+*
 *
 ******************************************************************************/
 
@@ -4898,51 +4900,119 @@ ObjectPtr Parser::Parse_Ovus()
     Object->BottomRadius = Parse_Float(); /* Bottom radius */
     Parse_Comma();
     Object->TopRadius = Parse_Float(); /* Top radius */
+    // default values, for backward compatibility
+    Object->VerticalSpherePosition = Object->BottomRadius;
+    Object->ConnectingRadius = 2.0 * std::max(Object->BottomRadius, Object->TopRadius);
+    EXPECT
+        CASE(RADIUS_TOKEN)
+            Object->ConnectingRadius = Parse_Float();
+        END_CASE
+        CASE(DISTANCE_TOKEN)
+            Object->VerticalSpherePosition = Parse_Float();
+        END_CASE
+        CASE(PRECISION_TOKEN)
+            Object->RootTolerance = Parse_Float();
+        END_CASE
+        OTHERWISE
+            UNGET
+            EXIT
+        END_CASE
+    END_EXPECT
 
     /*
      ** Pre-compute the important values
      */
-    if ((Object->TopRadius < 0)||(Object->BottomRadius < 0))
+    if ((Object->TopRadius < 0)||(Object->BottomRadius <= 0))
     {
-        Error("Both Ovus radii must be positive");
+        Error("Both Ovus radii must be positive, and bottom radius must be strictly positive");
     }
-    if (Object->TopRadius < 2.0 * Object->BottomRadius)
+    if (Object->VerticalSpherePosition < Object->BottomRadius)
     {
-        if (Object->BottomRadius > Object->TopRadius)
-        {
-            Object->ConnectingRadius = 2.0 * Object->BottomRadius;
-            Object->VerticalPosition = 2.0 * Object->TopRadius - Object->BottomRadius - (Object->TopRadius * Object->TopRadius / (2.0 * Object->BottomRadius) );
-            Object->HorizontalPosition = sqrt((Object->BottomRadius)*(Object->BottomRadius) -(Object->VerticalPosition)*(Object->VerticalPosition));
-            Object->BottomVertical = -Object->VerticalPosition;
-            distance = Object->ConnectingRadius - Object->TopRadius;
-            Object->TopVertical = ((Object->BottomRadius - Object->VerticalPosition) * Object->TopRadius / distance ) + Object->BottomRadius;
-        } else {
-            Object->ConnectingRadius = 2.0 * Object->TopRadius;
-            Object->VerticalPosition = - 2.0 * Object->TopRadius + Object->BottomRadius + (1.5 * Object->TopRadius * Object->TopRadius / Object->BottomRadius);
-            Object->HorizontalPosition = sqrt((Object->TopRadius)*(Object->TopRadius) - ((Object->VerticalPosition - Object->BottomRadius) * (Object->VerticalPosition - Object->BottomRadius)));
-            Object->TopVertical = 2.0 * Object->BottomRadius - Object->VerticalPosition;
-            distance = Object->ConnectingRadius - Object->BottomRadius;
-            Object->BottomVertical = -Object->VerticalPosition * Object->BottomRadius / distance;
-        }
+        Error("distance of Ovus must be greater or equal to bottom radius");
+        // in theory, it would be possible to allow VerticalSpherePosition + TopRadius >= BottomRadius
+        // (with VerticalSpherePosition > 0)
+        // but the computation of BottomVertical & TopVertical would need more work, as the current formula
+        // use a simplification based on VerticalSpherePosition >= BottomRadius
+    }
+    if ( Object->TopRadius + Object->BottomRadius + Object->VerticalSpherePosition > 2*Object->ConnectingRadius)
+    {
+        Error("Connecting radius of Ovus is too small. Should be at least half the sum of the three other distances. sphere or lemon object could also be considered.");
+    }
+    /*
+     *  b : BottomRadius
+     *  r : ConnectingRadius
+     *  t : TopRadius
+     *  v : VerticalSpherePosition
+     *
+     * solve (x^2+y^2)=(r-b)^2, (x^2+(y-v)^2)=(r-t)^2, v>=b, t>=0, b>0, 2r>=(b+t+v) for x,y
+     *  intersection of two circles:
+     *   from the origin (center of bottom sphere), connecting radius - bottom radius
+     *   from the center of top sphere, connecting radius - top radius
+     *
+     * x = +/- 1/2 sqrt( - (b²-2bt+t²-v²)(b²-4br+2bt+4r²-4rt+t²-v²)/v²)
+     * remaining code expect x >= 0
+     */
 
-        Object->Compute_BBox();
-        Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
-        return (reinterpret_cast<ObjectPtr>(Object));
+    Object->HorizontalPosition = sqrt(
+            -(Sqr(Object->BottomRadius)-2.0*Object->BottomRadius*Object->TopRadius+Sqr(Object->TopRadius)-Sqr(Object->VerticalSpherePosition))
+            *(Sqr(Object->BottomRadius)-4.0*Object->BottomRadius*Object->ConnectingRadius+2.0*Object->BottomRadius*Object->TopRadius+4.0*Sqr(Object->ConnectingRadius)-4.0*Object->ConnectingRadius*Object->TopRadius+Sqr(Object->TopRadius) -Sqr(Object->VerticalSpherePosition))
+            )
+        /(Object->VerticalSpherePosition*2.0);
+
+    /*
+     * for t=b+v and r> (b²-t²-v²)/(2(b-t))
+     *
+     * y = sqrt( r²-2rt+t²-x²) 
+     *
+     *
+     * for t>b+v and r = (b+v+t)/2 
+     * for b<t<b+v and r> (b²-t²-v²)/(2(b-t)) 
+     * for t=b+v and r> (b²-t²-v²)/(2(b-t))
+     *
+     * y = sqrt( r²-2rt+t²-x²) +v
+     *
+     *
+     * else
+     *
+     * y = v- sqrt( r²-2rt+t²-x²) 
+     */
+    if ((Object->TopRadius == (Object->BottomRadius+Object->VerticalSpherePosition))&&(Object->ConnectingRadius > ((Sqr(Object->BottomRadius)-Sqr(Object->TopRadius)-Sqr(Object->VerticalSpherePosition))/(2.0*Object->VerticalSpherePosition))))
+    {
+        Object->VerticalPosition = sqrt(Sqr(Object->ConnectingRadius-Object->TopRadius)-Sqr(Object->HorizontalPosition));
+    }
+    else if
+        (
+         (( Object->TopRadius > (Object->BottomRadius + Object->VerticalSpherePosition ) ) && ( Object->ConnectingRadius == ((Object->BottomRadius+Object->TopRadius+Object->VerticalSpherePosition)/2.0)))
+         ||((Object->BottomRadius < Object->TopRadius) && (Object->TopRadius < (Object->BottomRadius+Object->VerticalSpherePosition))&&(Object->ConnectingRadius > ((Sqr(Object->BottomRadius)-Sqr(Object->TopRadius)-Sqr(Object->VerticalSpherePosition))/(2.0*Object->VerticalSpherePosition))))
+         ||( (Object->TopRadius == (Object->BottomRadius+Object->VerticalSpherePosition))&&(Object->ConnectingRadius > ((Sqr(Object->BottomRadius)-Sqr(Object->TopRadius)-Sqr(Object->VerticalSpherePosition))/(2.0*Object->VerticalSpherePosition))))
+        )
+    {
+        Object->VerticalPosition = Object->VerticalSpherePosition+sqrt(Sqr(Object->ConnectingRadius-Object->TopRadius)-Sqr(Object->HorizontalPosition));
     }
     else
     {
-        PossibleError("Ovus second radius should be less than twice first radius\nSubstituing a sphere to ovus as it would be identical & simpler");
-        Sphere * Replacement;
-        Replacement = new Sphere();
-        Replacement->Center[X]=0;
-        Replacement->Center[Y]=Object->BottomRadius;
-        Replacement->Center[Z]=0;
-        Replacement->Radius = Object->TopRadius;
-        delete Object;
-        Replacement->Compute_BBox();
-        Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Replacement));
-        return (reinterpret_cast<ObjectPtr>(Replacement));
+        Object->VerticalPosition = Object->VerticalSpherePosition-sqrt(Sqr(Object->ConnectingRadius-Object->TopRadius)-Sqr(Object->HorizontalPosition));
     }
+    // if not a degenerated sphere, HorizontalPosition is a square root, test only against 0, as negative is not possible
+    if (Object->HorizontalPosition != 0.0)
+    {
+        Object->BottomVertical = -Object->VerticalPosition*Object->BottomRadius/(Object->ConnectingRadius-Object->BottomRadius);
+        Object->TopVertical = -( Object->VerticalPosition-Object->VerticalSpherePosition)* Object->TopRadius / (Object->ConnectingRadius - Object->TopRadius)  + Object->VerticalSpherePosition;
+    }
+    else
+    { // replace the ovus with the top sphere, keeping the parsing of option compatible with ovus (sturm)
+        Object->VerticalSpherePosition = Object->VerticalPosition;
+        Object->TopRadius = Object->ConnectingRadius;
+        Object->TopVertical = Object->VerticalSpherePosition-Object->ConnectingRadius;
+        Object->BottomVertical = -Object->ConnectingRadius;// low enough
+        Object->BottomRadius = 0.0;
+        Object->ConnectingRadius = 0.0;
+        Warning(0, "Ovus is reduced to a sphere, consider using a real sphere instead");
+    }
+
+    Object->Compute_BBox();
+    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+    return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 /*****************************************************************************
