@@ -2418,7 +2418,7 @@ void Parser::Parse_Directive(int After_Hash)
                                         "Use '#version 3.8' instead.");
                             }
 
-                            if ((sceneData->languageVersionLate) && sceneData->languageVersion >= 380)
+                            if ((sceneData->languageVersionLate) && (sceneData->languageVersion >= 380))
                             {
                                 // As of POV-Ray v3.7, all scene files are supposed to begin with a `#version` directive.
                                 // As of POV-Ray v3.8, we no longer tolerate violation of that rule if the main scene
@@ -2432,7 +2432,7 @@ void Parser::Parse_Directive(int After_Hash)
                                           "statement in the scene file. If your scene will adapt to whatever version "
                                           "is in use dynamically, start your scene with '#version version'.");
                             }
-                            else if ((!sceneData->languageVersionSet)&&(sceneData->languageVersion >= 380))
+                            else if ((!sceneData->languageVersionSet) && (sceneData->languageVersion >= 380))
                             {// [JG] first item, not languageVersionLate : override the default ambient (rgb 0.1) (in Create_Finish) for 0.0
                              // Do not bother to create a copy, it has not been used yet
                                 Default_Texture->Finish->Ambient.Clear();
@@ -2446,7 +2446,7 @@ void Parser::Parse_Directive(int After_Hash)
                             if (sceneData->explicitNoiseGenerator == false)
                                 sceneData->noiseGenerator = (sceneData->EffectiveLanguageVersion() < 350 ?
                                                              kNoiseGen_Original : kNoiseGen_RangeCorrected);
-                            // [CLi] if assumed_gamma is not specified in a legacy (3.6.x or earlier) scene, gammaMode defaults to kPOVList_GammaMode_None;
+                            // [CLi] if assumed_gamma is not specified in a pre-v3.7 scene, gammaMode defaults to kPOVList_GammaMode_None;
                             // this is enforced later anyway after parsing, but we may need this information /now/ during parsing already
                             switch (sceneData->gammaMode)
                             {

@@ -184,9 +184,9 @@ void Parser::Run()
         Default_Texture->Pigment = Create_Pigment();
         Default_Texture->Tnormal = NULL;
         Default_Texture->Finish  = Create_Finish();
-        // [JG] the version has been *explictly* set in the ini or command line,
-        // override the default ambient (rgb 0.1) (in Create_Finish) for 0.0
-        if ((sceneData->languageVersionSet)&&(sceneData->languageVersion >= 380))
+        // [JG] If the version has been *explictly* set in the ini or command line,
+        // override the default ambient (rgb 0.1) (in Create_Finish) to 0.0
+        if ((sceneData->languageVersionSet) && (sceneData->languageVersion >= 380))
         {
             Default_Texture->Finish->Ambient.Clear();
         }
@@ -1429,7 +1429,7 @@ void Parser::Parse_Camera (Camera& Cam)
     {
 
         /*
-         * The camera statement in version 3.5 is a tiny bit more restrictive
+         * The camera statement in version v3.5 is a tiny bit more restrictive
          * than in previous versions (Note: Backward compatibility is available
          * with the version switch!).  It will always apply camera modifiers in
          * the same order, regardless of the order in which they appeared in the
@@ -2731,7 +2731,7 @@ void Parser::ParseContainedBy(shared_ptr<pov::ContainedByShape>& container, Obje
 *
 * CHANGES
 *
-*   Dec 1994 : Adopted to version 3.0. [DB]
+*   Dec 1994 : Adopted to version v3.0. [DB]
 *   Sept 1995 : Total rewrite for new syntax [TW]
 *
 ******************************************************************************/
@@ -4879,7 +4879,6 @@ TEXTURE *Parser::Parse_Mesh_Texture (TEXTURE **t2, TEXTURE **t3)
 *   Jul 2010 : Creation.
 *   Jul 2016 : extension with distance & radius
 *
-*
 ******************************************************************************/
 
 ObjectPtr Parser::Parse_Ovus()
@@ -4949,7 +4948,7 @@ ObjectPtr Parser::Parse_Ovus()
      *   from the origin (center of bottom sphere), connecting radius - bottom radius
      *   from the center of top sphere, connecting radius - top radius
      *
-     * x = +/- 1/2 sqrt( - (b²-2bt+t²-v²)(b²-4br+2bt+4r²-4rt+t²-v²)/v²)
+     * x = +/- 1/2 sqrt( - (b^2-2bt+t^2-v^2)(b^2-4br+2bt+4r^2-4rt+t^2-v^2)/v^2)
      * remaining code expect x >= 0
      */
 
@@ -4960,21 +4959,21 @@ ObjectPtr Parser::Parse_Ovus()
         /(Object->VerticalSpherePosition*2.0);
 
     /*
-     * for t=b+v and r> (b²-t²-v²)/(2(b-t))
+     * for t=b+v and r> (b^2-t^2-v^2)/(2(b-t))
      *
-     * y = sqrt( r²-2rt+t²-x²) 
+     * y = sqrt( r^2-2rt+t^2-x^2)
      *
      *
-     * for t>b+v and r = (b+v+t)/2 
-     * for b<t<b+v and r> (b²-t²-v²)/(2(b-t)) 
-     * for t=b+v and r> (b²-t²-v²)/(2(b-t))
+     * for t>b+v and r = (b+v+t)/2
+     * for b<t<b+v and r> (b^2-t^2-v^2)/(2(b-t))
+     * for t=b+v and r> (b^2-t^2-v^2)/(2(b-t))
      *
-     * y = sqrt( r²-2rt+t²-x²) +v
+     * y = sqrt( r^2-2rt+t^2-x^2) +v
      *
      *
      * else
      *
-     * y = v- sqrt( r²-2rt+t²-x²) 
+     * y = v- sqrt( r^2-2rt+t^2-x^2)
      */
     if ((Object->TopRadius == (Object->BottomRadius+Object->VerticalSpherePosition))&&(Object->ConnectingRadius > ((Sqr(Object->BottomRadius)-Sqr(Object->TopRadius)-Sqr(Object->VerticalSpherePosition))/(2.0*Object->VerticalSpherePosition))))
     {
@@ -9865,6 +9864,7 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
         }
         if (Object->interior == NULL)
         {
+            // TODO - may need to copy the interior, as we may need to modify a few of its fields.
             Object->interior = Parent->interior;
         }
 
