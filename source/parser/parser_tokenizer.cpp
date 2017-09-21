@@ -2418,7 +2418,7 @@ void Parser::Parse_Directive(int After_Hash)
                                         "Use '#version 3.8' instead.");
                             }
 
-                            if ((sceneData->languageVersionLate) && sceneData->languageVersion >= 380)
+                            if ((sceneData->languageVersionLate) && (sceneData->languageVersion >= 380))
                             {
                                 // As of POV-Ray v3.7, all scene files are supposed to begin with a `#version` directive.
                                 // As of POV-Ray v3.8, we no longer tolerate violation of that rule if the main scene
@@ -2430,7 +2430,14 @@ void Parser::Parse_Directive(int After_Hash)
                                 if (Include_File_Index == 0)
                                     Error("As of POV-Ray 3.7, the '#version' directive must be the first non-comment "
                                           "statement in the scene file. If your scene will adapt to whatever version "
-                                          "is un use dynamically, start your scene with '#version version'.");
+                                          "is in use dynamically, start your scene with '#version version'.");
+                            }
+
+                            if (!sceneData->languageVersionLate && !sceneData->languageVersionSet)
+                            {
+                                // Got `#version` as the first statement of the file.
+                                // Initialize various defaults depending on language version specified.
+                                InitDefaults(sceneData->languageVersion);
                             }
 
                             // NB: This must be set _after_ parsing the value, in order for the `#version version`
@@ -2441,7 +2448,7 @@ void Parser::Parse_Directive(int After_Hash)
                             if (sceneData->explicitNoiseGenerator == false)
                                 sceneData->noiseGenerator = (sceneData->EffectiveLanguageVersion() < 350 ?
                                                              kNoiseGen_Original : kNoiseGen_RangeCorrected);
-                            // [CLi] if assumed_gamma is not specified in a legacy (3.6.x or earlier) scene, gammaMode defaults to kPOVList_GammaMode_None;
+                            // [CLi] if assumed_gamma is not specified in a pre-v3.7 scene, gammaMode defaults to kPOVList_GammaMode_None;
                             // this is enforced later anyway after parsing, but we may need this information /now/ during parsing already
                             switch (sceneData->gammaMode)
                             {

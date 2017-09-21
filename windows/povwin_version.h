@@ -79,7 +79,7 @@
 #define POVWIN_VERSION_RC               POV_RAY_MAJOR_VERSION_INT-1, 9999, 9999, 9999
 #endif
 #else
-#define POVWIN_VERSION_RC               POV_RAY_MAJOR_VERSION_INT, POV_RAY_MINOR_VERSION_INT, POV_RAY_REVISION_INT, POV_RAY_PATCHLEVEL
+#define POVWIN_VERSION_RC               POV_RAY_MAJOR_VERSION_INT, POV_RAY_MINOR_VERSION_INT, POV_RAY_REVISION_INT, POV_RAY_PATCHLEVEL_INT
 #endif
 
 //------------------------------------------------------------------------------

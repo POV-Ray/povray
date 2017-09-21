@@ -633,6 +633,7 @@ class Parser : public SceneTask
 
         // parse.h/parse.cpp
         void Frame_Init(void);
+        void InitDefaults(int version);
         void Parse_Coeffs(int order, DBL *Coeffs);
 
         ObjectPtr Parse_Bicubic_Patch(void);

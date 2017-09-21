@@ -1040,7 +1040,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     if (!parsingVersionDirective)
                     {
                         // Normally, the `version` pseudo-variable needs to return the effective language version
-                        // (which now defaults to 3.6.2) so that include files can properly switch back after
+                        // (which now defaults to v3.6.2) so that include files can properly switch back after
                         // temporarily overriding the `#version` setting.
                         Val = sceneData->EffectiveLanguageVersion() / 100.0;
                     }
@@ -2661,7 +2661,7 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
                 // Note: Setting up for potential warning on single value float promote to
                 // five value color vector. Any single float will be promoted to the full
                 // 'tgtTerms' value. This usually results in filter and trasmit values >0,
-                // which caused shadow artifacts back to at least version 3.6.1.
+                // which caused shadow artifacts back to at least version v3.6.1.
                 if ((Token.Token_Id==FLOAT_FUNCT_TOKEN) || (Token.Token_Id==FUNCT_ID_TOKEN))
                     sawFloatOrFloatFnct = true;
                 else
