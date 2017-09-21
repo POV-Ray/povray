@@ -100,7 +100,7 @@
 /// where `N` is a serial number starting at 1 in each phase, `TIME` is the number of minutes
 /// since 2000-01-01 00:00, and `FEATURE` is an arbitrary alphanumeric moniker for a particular
 /// experimental feature.
-#define POV_RAY_PRERELEASE          "alpha.9309453"
+#define POV_RAY_PRERELEASE          "alpha.9322209"
 
 /// @def POVRAY_IS_BETA
 /// Whether this version is a beta.
