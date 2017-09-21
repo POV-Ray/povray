@@ -5,6 +5,8 @@ branches:
   except:
   - coverity_scan
 
+skip_tags: true
+
 image: Visual Studio 2015
 
 shallow_clone: true
