@@ -184,12 +184,9 @@ void Parser::Run()
         Default_Texture->Pigment = Create_Pigment();
         Default_Texture->Tnormal = NULL;
         Default_Texture->Finish  = Create_Finish();
-        // [JG] If the version has been *explictly* set in the ini or command line,
-        // override the default ambient (rgb 0.1) (in Create_Finish) to 0.0
-        if ((sceneData->languageVersionSet) && (sceneData->languageVersion >= 380))
-        {
-            Default_Texture->Finish->Ambient.Clear();
-        }
+
+        // Initialize various defaults depending on language version as per command line / INI settings.
+        InitDefaults(sceneData->EffectiveLanguageVersion());
 
         Not_In_Default = true;
         Ok_To_Declare = true;
@@ -512,6 +509,34 @@ void Parser::Frame_Init()
     sceneData->skysphere = NULL;
 }
 
+
+/****************************************************************************/
+
+void Parser::InitDefaults(int version)
+{
+    // Initialize defaults depending on version:
+    // As of v3.8...
+    //   - `ambient` defaults to 0.0.
+    //   - Camera `right` length defaults to output image aspect ratio.
+    // Prior to that...
+    //   - `ambient` defaulted to 0.1.
+    //   - Camera `right` length defaulted to 1.33.
+
+    double ambientLevel;
+    double rightLength;
+    if (version >= 380)
+    {
+        ambientLevel = 0.0;
+        rightLength = sceneData->aspectRatio;
+    }
+    else
+    {
+        ambientLevel = 0.1;
+        rightLength = 1.33;
+    }
+    Default_Texture->Finish->Ambient = MathColour(ambientLevel);
+    Default_Camera.Right = Vector3d(rightLength, 0.0, 0.0);
+}
 
 
 /*****************************************************************************
@@ -4883,7 +4908,6 @@ TEXTURE *Parser::Parse_Mesh_Texture (TEXTURE **t2, TEXTURE **t3)
 
 ObjectPtr Parser::Parse_Ovus()
 {
-    DBL distance;
     Ovus *Object;
 
     Parse_Begin();

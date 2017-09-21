@@ -32,6 +32,8 @@ should be located in the same directory as this file is.
 Changes between v3.7.1-rc.1 and v3.8.0-???
 ==========================================
 
+This version is still under active development, and not finalized yet.
+
 NOTE: This release cycle has been redesignated v3.8.0. There will not be a
 v3.7.1 release proper.
 
@@ -48,6 +50,11 @@ Changed Behaviour
   - Any new behaviour formerly activated by `#version 3.71` now requires
     `#version 3.8` (or higher); specifying `#version 3.71` will trigger a
     corresponding warning.
+  - Some defaults have been changed (requires `#version 3.8` as the _very first_
+    statement of the scene, or a corresponding command line / INI setting):
+      - `ambient` now defaults to 0.0 instead of 0.1.
+      - Camera `right` vector length now defaults to the output image aspect
+        ratio (presuming square pixels) instead of 1.33.
 
 Other Noteworthy
 ----------------

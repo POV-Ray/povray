@@ -2432,10 +2432,12 @@ void Parser::Parse_Directive(int After_Hash)
                                           "statement in the scene file. If your scene will adapt to whatever version "
                                           "is in use dynamically, start your scene with '#version version'.");
                             }
-                            else if ((!sceneData->languageVersionSet) && (sceneData->languageVersion >= 380))
-                            {// [JG] first item, not languageVersionLate : override the default ambient (rgb 0.1) (in Create_Finish) for 0.0
-                             // Do not bother to create a copy, it has not been used yet
-                                Default_Texture->Finish->Ambient.Clear();
+
+                            if (!sceneData->languageVersionLate && !sceneData->languageVersionSet)
+                            {
+                                // Got `#version` as the first statement of the file.
+                                // Initialize various defaults depending on language version specified.
+                                InitDefaults(sceneData->languageVersion);
                             }
 
                             // NB: This must be set _after_ parsing the value, in order for the `#version version`
