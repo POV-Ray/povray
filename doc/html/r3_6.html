@@ -6,7 +6,7 @@
 <head>
 <meta http-equiv=Content-Type content="text/html; charset=windows-1252">
 <title>Reference Section 6</title>
-<link rel="StyleSheet" href="povray37.css" type="text/css">
+<link rel="StyleSheet" href="povray.css" type="text/css">
 <link rel="shortcut icon" href="favicon.ico">
 
 <!--  NOTE: In order to help users find information about POV-Ray using web      -->
@@ -403,7 +403,7 @@
 <table class="HeaderFooter" width="100%">
 <tr>
   <td colspan=5 align="left" class="HeaderFooter">
-    POV-Ray for Unix <strong class="HeaderFooter">version 3.7.1</strong>
+    POV-Ray for Unix <strong class="HeaderFooter">version 3.8</strong>
   </td>
 </tr>
 <tr >
@@ -684,16 +684,22 @@ sphere {
 <a name="r3_6_1_1_2"></a>
 <div class="content-level-h5" contains="Color Map" id="r3_6_1_1_2">
 <h5>3.6.1.1.2 Color Map</h5>
-<p>Most of the color patterns do not use abrupt color changes of just two or three colors like those in the <code>brick</code>, <code>checker</code> or <code>hexagon</code> patterns. They instead use smooth transitions of many colors that gradually change from one point to the next. The colors are defined in a pigment modifier called a <code>color_map</code> that describes how the pattern blends from one color to the next. <font class="New">New</font> in version 3.7.1 non-linear color map interpolation support has been added.</p>
+<p>Most of the color patterns do not use abrupt color changes of just two or three colors like those in the <code>brick</code>, <code>checker</code> or <code>hexagon</code> patterns. They instead use smooth transitions of many colors that gradually change from one point to the next. The colors are defined in a pigment modifier called a <code>color_map</code> that describes how the pattern blends from one color to the next. <font class="New">New</font> in version 3.8 non-linear color map interpolation support has been added.</p>
 <p>Each of the various pattern types available is in fact a mathematical function that takes any x, y, z location and turns it into a number between 0.0 and 1.0 inclusive. That number is used to specify what mix of colors to use from the color map.</p>
 <p>The syntax for <code> color_map</code> is as follows:</p>
+
 <pre>
 COLOR_MAP:
-  color_map { COLOR_MAP_BODY } | color_map { COLOR_MAP_BODY }
+  color_map { COLOR_MAP_BODY } |
+  colour_map { COLOR_MAP_BODY }
 COLOR_MAP_BODY:
-  COLOR_MAP_IDENTIFIER | [blend_mode [BLEND_MODE]] [blend_gamma [FLOAT]] | COLOR_MAP_ENTRY...
+  COLOR_MAP_IDENTIFIER |
+  [BLEND_MAP_MODIFIERS...] COLOR_MAP_ENTRY...
+BLEND_MAP_MODIFIERS:
+  blend_mode BLEND_MODE |
+  blend_gamma FLOAT
 BLEND_MODE:
-  [0] | 1 | 2 | 3
+  0 | 1 | 2 | 3
 COLOR_MAP_ENTRY:
   [ Value COLOR ] | 
   [ Value_1, Value_2 color COLOR_1 color COLOR_2 ]
@@ -701,10 +707,18 @@ COLOR_MAP_ENTRY:
 
 <p>Where each <em><code>Value_n</code></em> is a float values between 0.0 and 1.0 inclusive and each <em>COLOR_n</em>, are color specifications.</p>
 
+<p>The possible values for <code>blend_mode</code> and their descriptions are as follows:</p>
+<ul>
+  <li><strong>0:</strong> Color interpolation is performed in the working gamma space as defined by <code>assumed_gamma</code> (default)</li>
+  <li><strong>1:</strong> Color interpolation is performed in the linear color space</li>
+  <li><strong>2:</strong> Color interpolation is performed in the gamma space defined by <code>blend_gamma</code> (default is 2.5)</li>
+  <li><strong>3:</strong> Chromatic interpolation is performed in the linear space while brightness interpolation is performed in the gamma space defined by <code>blend_gamma</code></li>
+</ul>
+
 <p class="Note"><strong>Note:</strong> The <code>[]</code> brackets that are part of the actual <em>COLOR_MAP_ENTRY</em> should not confused with the symbols denoting optional syntax.</p>
 
-<p>In <em>previous</em> versions there <em>had</em> to be from 2 to 256 entries in the map. A <font class="Change">Change</font> in version 3.7.1 has removed the upper restriction. The alternate spelling <code>colour_map</code> can also be used.</p>
-<p>Here's an example:</p>
+<p>In <em>previous</em> versions there <em>had</em> to be from 2 to 256 entries in the map. A <font class="Change">Change</font> in version 3.8 has removed the upper restriction. The alternate spelling <code>colour_map</code> can also be used.</p>
+<p>Here's a simple example:</p>
 <pre>
 sphere {
   &lt;0,1,2&gt;, 2
@@ -762,6 +776,32 @@ object {
   }
 </pre>
 
+<p>See also: <a href="r3_6.html#r3_6_1_1_3">Pigment Maps</a>.</p></div>
+
+<a name="r3_6_1_1_3"></a>
+<div class="content-level-h5" contains="Pigment Map" id="r3_6_1_1_3">
+<h5>3.6.1.1.3 Pigment Map</h5>
+<p>In addition to specifying blended colors with a color map you may create a blend of pigments using a  <code>pigment_map</code>. The syntax for a pigment map is identical to a color map except you specify a pigment in each map
+entry and not a color. <font class="New">New</font> in version 3.8 non-linear pigment map interpolation support has been added.</p>
+
+<p>The syntax for <code>pigment_map</code> is as follows:</p>
+<pre>
+PIGMENT_MAP:
+  pigment_map { PIGMENT_MAP_BODY }
+PIGMENT_MAP_BODY:
+  PIGMENT_MAP_IDENTIFIER |
+  [BLEND_MAP_MODIFIERS...] PIGMENT_MAP_ENTRY...
+BLEND_MAP_MODIFIERS:
+  blend_mode BLEND_MODE |
+  blend_gamma FLOAT
+BLEND_MODE:
+  0 | 1 | 2 | 3
+PIGMENT_MAP_ENTRY:
+  [ Value PIGMENT_BODY ]
+</pre>
+
+<p>Where <em><code>Value</code></em> is a float value between 0.0 and 1.0 inclusive and each <em>PIGMENT_BODY</em> is anything which can be inside a <code>pigment{...}</code> statement. The <code>pigment</code> keyword and <code>{}</code> braces need not be specified.</p>
+
 <p>The possible values for <code>blend_mode</code> and their descriptions are as follows:</p>
 <ul>
   <li><strong>0:</strong> Color interpolation is performed in the working gamma space as defined by <code>assumed_gamma</code> (default)</li>
@@ -770,33 +810,11 @@ object {
   <li><strong>3:</strong> Chromatic interpolation is performed in the linear space while brightness interpolation is performed in the gamma space defined by <code>blend_gamma</code></li>
 </ul>
 
-<p><a href="r3_6.html#r3_6_1_1_3">Pigment Maps</a> also support the <font class="New">New</font> non-linear interpolation scheme.</p></div>
-
-<a name="r3_6_1_1_3"></a>
-<div class="content-level-h5" contains="Pigment Map" id="r3_6_1_1_3">
-<h5>3.6.1.1.3 Pigment Map</h5>
-<p>In addition to specifying blended colors with a color map you may create a blend of pigments using a  <code>pigment_map</code>. The syntax for a pigment map is identical to a color map except you specify a pigment in each map
-entry and not a color. <font class="New">New</font> in version 3.7.1 non-linear pigment map interpolation support has been added.</p>
-
-<p>The syntax for <code>pigment_map</code> is as follows:</p>
-<pre>
-PIGMENT_MAP:
-  pigment_map { PIGMENT_MAP_BODY }
-PIGMENT_MAP_BODY:
-  PIGMENT_MAP_IDENTIFIER | [blend_mode [BLEND_MODE]] [blend_gamma [FLOAT]] | PIGMENT_MAP_ENTRY...
-BLEND_MODE:
-  [0] | 1 | 2 | 3
-PIGMENT_MAP_ENTRY:
-  [Value PIGMENT_BODY]
-</pre>
-
-<p>Where <em><code>Value</code></em> is a float value between 0.0 and 1.0 inclusive and each <em>PIGMENT_BODY</em> is anything which can be inside a <code>pigment{...}</code> statement. The <code>pigment</code> keyword and <code>{}</code> braces need not be specified.</p>
-
 <p class="Note"><strong>Note:</strong> The <code>[]</code> brackets that are part of the actual <em>PIGMENT_MAP_ENTRY</em> should not confused with the symbols denoting optional syntax.</p>
 
-<p>In <em>previous</em> versions there <em>had</em> to be from 2 to 256 entries in the map. A <font class="Change">Change</font> in version 3.7.1 has removed the upper restriction.</p>
+<p>In <em>previous</em> versions there <em>had</em> to be from 2 to 256 entries in the map. A <font class="Change">Change</font> in version 3.8 has removed the upper restriction.</p>
 
-<p>Here's an example:</p>
+<p>Here's a simple example:</p>
 
 <pre>
 sphere {
@@ -835,15 +853,7 @@ pigment {
 
 <p>You may declare and use pigment map identifiers but the only way to declare a pigment block pattern list is to declare a pigment identifier for the entire pigment.</p>
 
-<p>The possible values for <code>blend_mode</code> and their descriptions are as follows:</p>
-<ul>
-  <li><strong>0:</strong> Color interpolation is performed in the working gamma space as defined by <code>assumed_gamma</code> (default)</li>
-  <li><strong>1:</strong> Color interpolation is performed in the linear color space</li>
-  <li><strong>2:</strong> Color interpolation is performed in the gamma space defined by <code>blend_gamma</code> (default is 2.5)</li>
-  <li><strong>3:</strong> Chromatic interpolation is performed in the linear space while brightness interpolation is performed in the gamma space defined by <code>blend_gamma</code></li>
-</ul>
-
-<p><a href="r3_6.html#r3_6_1_1_2">Color Maps</a> also support the <font class="New">New</font> non-linear interpolation scheme.</p></div>
+<p>See also: <a href="r3_6.html#r3_6_1_1_2">Color Maps</a>.</p></div>
 
 <a name="r3_6_1_2"></a>
 <div class="content-level-h4" contains="Normal" id="r3_6_1_2">
@@ -901,7 +911,7 @@ NORMAL_MAP_ENTRY:
 </pre>
 <p>Where <em><code>Value</code></em> is a float value between 0.0 and 1.0 inclusive and each <em>NORMAL_BODY</em> is anything which can be inside a <code>normal{...}</code> statement. The <code>normal</code> keyword and <code>{}</code> braces need not be specified.</p>
 <p class="Note"><strong>Note:</strong> The <code>[]</code> brackets are part of the actual <em>NORMAL_MAP_ENTRY</em>. They are not notational symbols denoting optional parts. The brackets surround each entry in the normal map.</p>
-<p>In <em>previous</em> versions there <em>had</em> to be from 2 to 256 entries in the map. A <font class="Change">Change</font> in version 3.7.1 has removed the upper restriction.</p>
+<p>In <em>previous</em> versions there <em>had</em> to be from 2 to 256 entries in the map. A <font class="Change">Change</font> in version 3.8 has removed the upper restriction.</p>
 <p>For example:</p>
 <pre>
 normal {
@@ -949,7 +959,7 @@ SLOPE_MAP_ENTRY:
   [ Value, &lt;Height, Slope&gt; ]
 </pre>
 <p class="Note"><strong>Note:</strong> The <code>[]</code> brackets are part of the actual <em>SLOPE_MAP_ENTRY</em>. They are not notational symbols denoting optional parts. The brackets surround each entry in the slope map.</p>
-<p>In <em>previous</em> versions there <em>had</em> to be from 2 to 256 entries in the map. A <font class="Change">Change</font> in version 3.7.1 has removed the upper restriction.</p>
+<p>In <em>previous</em> versions there <em>had</em> to be from 2 to 256 entries in the map. A <font class="Change">Change</font> in version 3.8 has removed the upper restriction.</p>
 <p>Each <em><code>Value</code></em> is a float value between 0.0 and 1.0 inclusive and each <em><code> &lt;Height</code></em>, <em><code>Slope&gt;</code></em> is a 2 component vector such as &lt;0,1&gt; where the first value represents the apparent height of the wave and the second value represents the slope of the wave at that point. The height should range between 0.0 and 1.0 but any value could be used.</p>
 <p>The slope value is the change in height per unit of distance. For example a slope of zero means flat, a slope of 1.0 means slope upwards at a 45 degree angle and a slope of -1 means slope down at 45 degrees. Theoretically a slope straight up would have infinite slope. In practice, slope values should be kept in the range -3.0 to +3.0. Keep in mind that this is only the visually apparent slope. A normal does not actually change the surface.</p>
 <p>For example here is how to make the ramp slope up for the first half and back down on the second half creating a triangle wave with a sharp peak in the center.</p>
@@ -1061,7 +1071,7 @@ bump_map {
   jpeg "foobar.jpg" gamma 1.8
   }
 </pre>
-<p>This will cause POV-Ray to perform gamma adjustment or decoding on the input file data before building the bump map. Alternatively to a numerical value, <code>srgb</code> may be specified to denote that the file is pre-corrected or encoded using the <em>sRGB transfer function</em> instead of a power-law gamma function. <font class="New">New</font> in version 3.7.1, other valid special values are <code>bt709</code> and <code>bt2020</code>, denoting that the file is encoded or pre-corrected using the ITU-R BT.709 or BT.2020 transfer function, respectively. See section <a href="t2_3.html#t2_3_4">Gamma Handling</a> for more details.</p>
+<p>This will cause POV-Ray to perform gamma adjustment or decoding on the input file data before building the bump map. Alternatively to a numerical value, <code>srgb</code> may be specified to denote that the file is pre-corrected or encoded using the <em>sRGB transfer function</em> instead of a power-law gamma function. <font class="New">New</font> in version 3.8, other valid special values are <code>bt709</code> and <code>bt2020</code>, denoting that the file is encoded or pre-corrected using the ITU-R BT.709 or BT.2020 transfer function, respectively. See section <a href="t2_3.html#t2_3_4">Gamma Handling</a> for more details.</p>
 <p>The file name is optionally followed by one or more <em>BITMAP_MODIFIERS</em>. The <code>bump_size</code>, <code>use_color</code> and <code>use_index</code> modifiers are specific to bump maps and are discussed in the following sections. See the section <a href="r3_6.html#r3_6_2_7">Bitmap Modifiers</a> where the generic bitmap modifiers <code>map_type</code>, <code>once</code> and <code>interpolate</code> are described.</p>
 
 </div>
@@ -1162,7 +1172,7 @@ FINISH_DECLARATION:
 </pre>
 <p>Where <em>IDENTIFIER</em> is the name of the identifier and <em>FINISH</em> is any valid <code>finish</code> statement. See <a href="r3_3.html#r3_3_2_2_2">#declare vs. #local</a> for information on identifier scope.</p>
 
-<p class="Note"><strong>Note:</strong> For more physical realism a <font class="Change">Change</font> in version 3.7.1 expands <code>fresnel</code> angle-dependent attenuation use to now include the <code>ambient</code>, <code>diffuse</code>, <code>emission</code>, <code>specular</code> and <code>phong</code> components. The details are as follows:</p>
+<p class="Note"><strong>Note:</strong> For more physical realism a <font class="Change">Change</font> in version 3.8 expands <code>fresnel</code> angle-dependent attenuation use to now include the <code>ambient</code>, <code>diffuse</code>, <code>emission</code>, <code>specular</code> and <code>phong</code> components. The details are as follows:</p>
 
 <p>When used directly in the <code>finish</code> block the <code>fresnel</code> keyword activates <em>Fresnel</em> effects for all of the <code>ambient</code>, <code>diffuse</code>, <code>emission</code>, <code>specular</code> and <code>phong</code> attributes. At steep viewing and/or light source angles it decreases the brightness of the <code>specular</code> and <code>phong</code> components. At shallow viewing angles and/or light source angles it instead decreases the brightness of the <code>ambient</code>, <code>diffuse</code> and <code>emission</code> components. The <code>fresnel</code> parameter can also be set to an intermediate value, in order to allow for the approximate modelling of anti-reactive coatings.</p>
 
@@ -1190,7 +1200,7 @@ finish {
 
 <p>Radiosity-based illumination currently does not account for the <em>Fresnel</em> effect on incoming light, regardless of the finish-level <code>fresnel</code> parameter.</p>
 
-<p><font class="New">New</font> in version 3.7.1 you can now specify <code>use_alpha</code> in the <code>finish</code> block. If set to <code>off</code>, the default and also the old behavior, then <code>pigment</code> <em>filter</em> and <em>transmit</em> only hide the surface's <code>diffuse</code>, <code>ambient</code> and <code>emission</code> components. If set to <code>on</code> then <code>pigment</code> <em>filter</em> and <em>transmit</em> also hide the surface's highlights and <code>specular</code> reflection.</p>
+<p><font class="New">New</font> in version 3.8 you can now specify <code>use_alpha</code> in the <code>finish</code> block. If set to <code>off</code>, the default and also the old behavior, then <code>pigment</code> <em>filter</em> and <em>transmit</em> only hide the surface's <code>diffuse</code>, <code>ambient</code> and <code>emission</code> components. If set to <code>on</code> then <code>pigment</code> <em>filter</em> and <em>transmit</em> also hide the surface's highlights and <code>specular</code> reflection.</p>
 
 </div>
 <a name="r3_6_1_3_1"></a>
@@ -1221,6 +1231,8 @@ finish { ambient rgb &lt;0.3,0.1,0.1&gt; } //a pink ambient
 <p>There has been a <font class="Change">Change</font> as of version 3.7 in that the <em>ambient</em> mechanism is now automatically turned off when <code>radiosity</code> is enabled, provided that <code>#version</code> is set to 3.7 or higher. This will allow use of the same material definitions in both <em>radiosity and non-radiosity</em> scenes. As a consequence, the practice of co-opting <code>ambient</code> to model glowing materials will no longer work in <code>radiosity</code> scenes and is therefore strongly discouraged altogether; instead, the new <code>emission</code> keyword has been added specifically for this purpose.</p>
 
 <p class="Note"><strong>Note:</strong> Specular reflected indirect illumination like a flashlight shining in a mirror cannot modeled by either ambient light or radiosity. Use <a href="r3_4.html#r3_4_3_4">photons</a> instead.</p>
+
+<p>There has been an important <font class="Change">Change</font> in version 3.8 regarding the default <code>ambient</code> setting. When <code><a href="r3_3.html#r3_3_2_5">#version</a></code> is set as <em>either</em> the first statement of the scene file or via <a href="r3_2.html#r3_2_5_4">command-line option</a> and the version is 3.8 or greater the default setting is now <code>ambient 0</code> as opposed to the <code>ambient 0.1</code> value used in previous versions.</p>
 
 </div>
 <a name="r3_6_1_3_2"></a>
@@ -1655,7 +1667,7 @@ inclusive and each <em>TEXTURE_BODY</em> is anything which can be inside a
 <p class="Note"><strong>Note:</strong> The <code>[]</code> brackets are part of the actual <em>
 TEXTURE_MAP_ENTRY</em>. They are not notational symbols denoting optional
 parts. The brackets surround each entry in the texture map.</p>
-<p>In <em>previous</em> versions there <em>had</em> to be from 2 to 256 entries in the map. A <font class="Change">Change</font> in version 3.7.1 has removed the upper restriction.</p>
+<p>In <em>previous</em> versions there <em>had</em> to be from 2 to 256 entries in the map. A <font class="Change">Change</font> in version 3.8 has removed the upper restriction.</p>
 <p>
 For example:</p>
 <pre>
@@ -1977,21 +1989,22 @@ texture {
 <a name="r3_6_1_7_1"></a>
 <div class="content-level-h5" contains="Supported Objects" id="r3_6_1_7_1">
 <h5>3.6.1.7.1 Supported Objects</h5>
-<p><font class="New">New</font> for version 3.7.1 the <code>cone</code>, <code>cylinder</code> and <code>lemon</code> were added to the growing list of objects that support UV mapping:</p>
+<p><font class="New">New</font> for version 3.8 the <code>cone</code>, <code>cylinder</code> and <code>lemon</code> were added to the growing list of objects that support UV mapping:</p>
+<p class="Note"><strong>Note:</strong> A <font class="Change">Change</font> in version 3.8 improves <code>ovus</code> mapping as noted below. Backward compatibility can be obtained by simply using a <em>spherical</em> <code>warp</code> instead.</p>
 <ul>
-  <li><strong>bicubic_patch</strong> : UV coordinates are based on the patch's parametric coordinates. They stretch with the control points. The default range is (0..1) and can be changed.</li>
-  <li><strong>box</strong> : the image is <em>wrapped</em> around the box, as shown below.</li>
-  <li><strong>cone, cylinder</strong> : mapping is the same as the lemon object listed below, however, keep in mind that a <em>true</em> cone is <em>not</em> a cylinder.</li>
-  <li><strong>lathe, sor</strong> : modified spherical mapping... the u coordinate (0..1) wraps around the y axis, while the v coordinate is linked to the object's control points (also ranging 0..1). Surface of Revolution also has special disc mapping on the end caps if the object is not <em>open</em>.</li>
-   <li><strong>lemon</strong> : wrapped around the object axis (<em>u coordinate</em>) from the base point to the cap point in these (<em>v coordinate</em>) proportions: [0 to 0.25] base (center to radius) [0.25 to 0.75] spindle and [0.75 to 1.0] cap (radius to center).</li>
-  <li><strong>mesh, mesh2</strong> : UV coordinates are defined for each vertex and interpolated between.</li>
-  <li><strong>ovus</strong> : spherical mapping centered near the center of mass of the ovus (moving from one sphere to another as the ratio of radius progresses).</li>
-  <li><strong>parametric</strong> : in this case the map is not taken from a fixed set of coordinates but the map is taken from the area defined by the boundaries of the uv-space, in which the parametric surface has to be calculated.</li>
-  <li><strong>sphere</strong> : traditional spherical mapping.</li>
-  <li><strong>torus</strong> : the map is taken from the area &lt;0,0&gt;&lt;1,1&gt; where the u-coordinate is wrapped around the major radius and the the v-coordinate is wrapped around the minor radius. </li>
+  <li><strong>bicubic_patch:</strong> UV coordinates are based on the patch's parametric coordinates. They stretch with the control points. The default range is (0..1) and can be changed.</li>
+  <li><strong>box:</strong> the image is <em>wrapped</em> around the box, as shown below.</li>
+  <li><strong>cone, cylinder:</strong> mapping is the same as the lemon object listed below, however, keep in mind that a <em>true</em> cone is <em>not</em> a cylinder.</li>
+  <li><strong>lathe, sor:</strong> modified spherical mapping... the u coordinate (0..1) wraps around the y axis, while the v coordinate is linked to the object's control points (also ranging 0..1). Surface of Revolution also has special disc mapping on the end caps if the object is not <em>open</em>.</li>
+   <li><strong>lemon:</strong> wrapped around the object axis (<em>u coordinate</em>) from the base point to the cap point in these (<em>v coordinate</em>) proportions: [0 to 0.25] base (center to radius) [0.25 to 0.75] spindle and [0.75 to 1.0] cap (radius to center).</li>
+  <li><strong>mesh, mesh2:</strong> UV coordinates are defined for each vertex and interpolated between.</li>
+  <li><strong>ovus:</strong> uses a slightly bulging conical mapping scheme that has rounded end caps with the same proportions as the aforementioned lemon.</li>
+  <li><strong>parametric:</strong> in this case the map is not taken from a fixed set of coordinates but the map is taken from the area defined by the boundaries of the uv-space, in which the parametric surface has to be calculated.</li>
+  <li><strong>sphere:</strong> traditional spherical mapping.</li>
+  <li><strong>torus:</strong> the map is taken from the area &lt;0,0&gt;&lt;1,1&gt; where the u-coordinate is wrapped around the major radius and the the v-coordinate is wrapped around the minor radius. </li>
 </ul>
 
-<p class="Note"><strong>Note:</strong> Recent additions revealed <strong>torus</strong> mapping to be reversed with respect to the u-coordinate. For backward compatibility reasons it remains the same in this release, however this <em>may</em> change in the future.</p> 
+<p class="Note"><strong>Note:</strong> Recent additions revealed <code>torus</code> mapping to be reversed with respect to the u-coordinate. For backward compatibility reasons it remains the same in this release, however this <em>may</em> change in the future.</p> 
 
 <table class="centered" width="660x" cellpadding="0" cellspacing="10">
 <tr>
@@ -2002,6 +2015,19 @@ texture {
 <tr>
   <td>
     <p class="caption">UV Boxmap</p>
+  </td>
+</tr>
+</table>
+
+<table class="centered" width="660x" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <img class="center" width="640px" src="images/5/56/RefImgUvmapping.png">
+  </td>
+</tr>
+<tr>
+  <td>
+    <p class="caption">Additional UV Examples</p>
   </td>
 </tr>
 </table>
@@ -2230,7 +2256,7 @@ functions or media.</p>
 <code><a href="r3_6.html#r3_6_2_1_16">marble</a></code><br>
 <code><a href="r3_6.html#r3_6_2_1_17">onion</a></code><br>
 <code><a href="r3_6.html#r3_6_2_1_20">planar</a></code><br>
-<code><a href="r3_6.html#r3_6_2_4_3">potential</a></code> <font class="New">New</font> in 3.7.1<br>
+<code><a href="r3_6.html#r3_6_2_4_3">potential</a></code> <font class="New">New</font> in 3.8<br>
 <code><a href="r3_6.html#r3_6_2_1_21">quilted</a></code><br>
 <code><a href="r3_6.html#r3_6_2_1_22">radial</a></code><br>
 </td>
@@ -3887,7 +3913,7 @@ normal {
   [NORMAL_ITEMS ...]
   }
 </pre>
-<p><font class="New">New</font> to version 3.7.1 <code>repeat</code> causes the pattern to repeat seamlessly at regular intervals along the X, Y and/or Z axis, as specified by the corresponding components of the specified vector. Values of 0 indicate no repetition along the corresponding axis. For technical reasons, only integer intervals are supported. The default for this parameter is <code>&lt;0,0,0&gt;</code>, i.e. no repetition.</p>
+<p><font class="New">New</font> to version 3.8 <code>repeat</code> causes the pattern to repeat seamlessly at regular intervals along the X, Y and/or Z axis, as specified by the corresponding components of the specified vector. Values of 0 indicate no repetition along the corresponding axis. For technical reasons, only integer intervals are supported. The default for this parameter is <code>&lt;0,0,0&gt;</code>, i.e. no repetition.</p>
 
 <p><strong>Solid</strong></p>
 <pre>
@@ -4335,7 +4361,7 @@ keyword and <code>{}</code> braces need not be specified.</p>
 <p class="Note"><strong>Note:</strong> The <code>[]</code> brackets are part of the actual <em>
 PIGMENT_MAP_ENTRY</em>. They are not notational symbols denoting optional
 parts. The brackets surround each entry in the <code>pigment_map</code>.</p>
-<p>In <em>previous</em> versions there <em>had</em> to be from 2 to 256 entries in the map. A <font class="Change">Change</font> in version 3.7.1 has removed the upper restriction.</p>
+<p>In <em>previous</em> versions there <em>had</em> to be from 2 to 256 entries in the map. A <font class="Change">Change</font> in version 3.8 has removed the upper restriction.</p>
 <p>
 For example</p>
 <pre>
@@ -4421,7 +4447,7 @@ image_pattern {
   jpeg "foobar.jpg" gamma 1.8
   }
 </pre>
-<p>This will cause POV-Ray to perform gamma adjustment or decoding on the input file data before building the image pattern. Alternatively to a numerical value, <code>srgb</code> may be specified to denote that the file format is pre-corrected or encoded using the <em>sRGB transfer function</em> instead of a power-law gamma function. <font class="New">New</font> in version 3.7.1, other valid special values are <code>bt709</code> and <code>bt2020</code>, denoting that the file is encoded or pre-corrected using the ITU-R BT.709 or BT.2020 transfer function, respectively. See section <a href="t2_3.html#t2_3_4">Gamma Handling</a> for more details.</p>
+<p>This will cause POV-Ray to perform gamma adjustment or decoding on the input file data before building the image pattern. Alternatively to a numerical value, <code>srgb</code> may be specified to denote that the file format is pre-corrected or encoded using the <em>sRGB transfer function</em> instead of a power-law gamma function. <font class="New">New</font> in version 3.8, other valid special values are <code>bt709</code> and <code>bt2020</code>, denoting that the file is encoded or pre-corrected using the ITU-R BT.709 or BT.2020 transfer function, respectively. See section <a href="t2_3.html#t2_3_4">Gamma Handling</a> for more details.</p>
 
 
 <table class="centered" width="420px" cellpadding="0" cellspacing="10">
@@ -4437,7 +4463,7 @@ image_pattern {
 <a name="r3_6_2_4_3"></a>
 <div class="content-level-h5" contains="Potential Pattern" id="r3_6_2_4_3">
 <h5>3.6.2.4.3 Potential Pattern</h5>
-<p><font class="New">New</font> in version 3.7.1 a <code>potential</code> pattern has been added to define a pattern based on the <em>potential</em> field of a <code>blob</code> or <code>isosurface</code> object.</p>
+<p><font class="New">New</font> in version 3.8 a <code>potential</code> pattern has been added to define a pattern based on the <em>potential</em> field of a <code>blob</code> or <code>isosurface</code> object.</p>
 <p>Using <code>pigment</code> in the following example, the syntax for the new pattern is as follows:</p>
 
 <pre>
@@ -4473,7 +4499,7 @@ isosurface {
 <a name="r3_6_2_4_4"></a>
 <div class="content-level-h5" contains="User Defined Pattern" id="r3_6_2_4_4">
 <h5>3.6.2.4.4 User Defined Pattern</h5>
-<p><font class="New">New</font> in version 3.7.1 a special pigment pattern <code>user_defined</code> has been added to define the pigment color directly in terms of a set of functions.</p>
+<p><font class="New">New</font> in version 3.8 a special pigment pattern <code>user_defined</code> has been added to define the pigment color directly in terms of a set of functions.</p>
 
 <p>The syntax is a follows:</p>
 
@@ -5408,7 +5434,7 @@ image_map {
   interpolate 2
   }
 </pre>
-<p>Alternatively to a numerical value, <code>srgb</code> may be specified to denote that the file is encoded or pre-corrected using the <em>sRGB transfer function</em> instead of a power-law gamma function. <font class="New">New</font> in version 3.7.1, other valid special values are <code>bt709</code> and <code>bt2020</code>, denoting that the file is encoded or pre-corrected using the ITU-R BT.709 or BT.2020 transfer function, respectively.</p>
+<p>Alternatively to a numerical value, <code>srgb</code> may be specified to denote that the file is encoded or pre-corrected using the <em>sRGB transfer function</em> instead of a power-law gamma function. <font class="New">New</font> in version 3.8, other valid special values are <code>bt709</code> and <code>bt2020</code>, denoting that the file is encoded or pre-corrected using the ITU-R BT.709 or BT.2020 transfer function, respectively.</p>
 <p>
 See section <a href="t2_3.html#t2_3_4">Gamma Handling</a> for more information on gamma.</p>
 
@@ -5452,7 +5478,7 @@ different transparency for each color index in the PNG file, if desired. If your
 <ul>
 <li> PNG will use straight alpha as per specification.</li>
 <li> OpenEXR will use <em>associated</em> (ala <em>premultiplied</em>) alpha as per specifications.</li>
-<li> <font class="New">New</font> as of version 3.7.1, TIFF will use straight or associated alpha as per the file header (3.7.0 expected associated alpha).</li>
+<li> <font class="New">New</font> as of version 3.8, TIFF will use straight or associated alpha as per the file header (3.7.0 expected associated alpha).</li>
 <li> TGA and BMP 32-bit RGBA will use straight alpha, retaining file input compatibility for now, until a final decision has been made on these formats.</li>
 </ul>
 
@@ -5471,7 +5497,7 @@ different transparency for each color index in the PNG file, if desired. If your
 
 <p class="Note"><strong>Note:</strong> See also <code><a href="r3_7.html#r3_7_1_2">background</a></code> and <code><a href="r3_7.html#r3_7_1_4">sky_sphere</a></code> for additional information.</p>
 
-<p><font class="New">New</font> as of version 3.7.1, using <code>filter all</code> and <code>transmit all</code> on an image file with an alpha channel is now supported properly (requires <code>#version 3.71</code> or higher).</p></div>
+<p><font class="New">New</font> as of version 3.8, using <code>filter all</code> and <code>transmit all</code> on an image file with an alpha channel is now supported properly (requires <code>#version 3.8</code> or higher).</p></div>
 
 <a name="r3_6_2_7"></a>
 <div class="content-level-h4" contains="Bitmap Modifiers" id="r3_6_2_7">
@@ -5517,7 +5543,7 @@ image_map {
   <li>With <code>map_type 2</code> you get a cylindrical mapping. It assumes that a cylinder of any diameter lies along the y-axis. The image wraps around the cylinder just like the spherical map but the image remains one unit tall from y=0 to y=1. This band of color is repeated at all heights unless the <code>once</code> keyword is applied.</li>
   <li>A <code>map_type 5</code> gives a torus or donut shaped mapping. It assumes that a torus of major radius one sits at the origin in the x-z-plane. The image is wrapped around similar to spherical or cylindrical maps. However the top and bottom edges of the map wrap over and under the torus where they meet each other on the inner rim.</li>
   <li>Types 3 and 4 are still under development.</li>
-  <li>Finally <code>map_type 7</code> produces an <em>angular</em> shaped mapping to be used with light probes.</li>
+  <li>A <code>map_type 7</code> <font class="New">New</font> in version 3.8 produces an <em>angular</em> shaped mapping to be used with light probes.</li>
 </ul>
 <p class="Note"><strong>Note:</strong> The <code>map_type</code> option may also be applied to <code>
 bump_map</code> and <code>material_map</code> statements.</p>

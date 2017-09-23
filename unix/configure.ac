@@ -1,11 +1,13 @@
 ##############################################################################
-#               configure.ac
+#
+# configure.ac
 #
 # Process this file with autoconf to produce the configure script.
 #
 # ---------------------------------------------------------------------------
-# Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-# Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
+#
+# Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+# Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 #
 # POV-Ray is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -19,30 +21,28 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 #---------------------------------------------------------------------------
+#
 # POV-Ray is based on the popular DKB raytracer version 2.12.
 # DKBTrace was originally written by David K. Buck.
 # DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
-#---------------------------------------------------------------------------
-# $File: N/A $
-# $Revision: N/A $
-# $Change: N/A $
-# $DateTime: N/A $
-# $Author: N/A $
-# $Log$
+#
 ##############################################################################
 
-# configure.ac for the source distribution of POV-Ray 3.7 for UNIX
+# configure.ac for the source distribution of POV-Ray 3.8 for UNIX
+# Report bugs via https://github.com/POV-Ray/povray/issues
+#
+# Based on configure.ac from POV-Ray v3.7
 # Written by Nicolas Calimet <nicolas.calimet@povray.org>
-# Report bugs via http://bugs.povray.org/
-# Based on configure.ac from POV-Ray 3.6
+# Based on configure.ac from POV-Ray v3.6
 
 # Required autoconf version.
 AC_PREREQ(2.59)
 
 # Inits.
 
-# The file VERSION must contain only the version string MAJOR.MINOR(.PATCHLEVEL)(-PRERELEASE)
+# The file VERSION must contain only the version string MAJOR.MINOR.REVISION(.PATCHLEVEL)(-PRERELEASE)
 AC_INIT([POV-Ray], m4_normalize(m4_include([VERSION])), [unix-bugreports-2011@povray.org], [povray])
 
 # VERSION_BASE is then defined as MAJOR.MINOR
@@ -54,6 +54,9 @@ AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_SRCDIR([unix/disp_text.cpp])
 
 # Additional autoconf macros.
+# Those required by other macros go first.
+m4_include([unix/config/ax_require_defined.m4])
+# The remainder we're sorting alphabetically.
 m4_include([unix/config/acx_pthread.m4])
 m4_include([unix/config/ax_arg_enable.m4])
 m4_include([unix/config/ax_arg_with.m4])
@@ -69,6 +72,7 @@ m4_include([unix/config/ax_check_openexr.m4])
 m4_include([unix/config/ax_compare_version.m4])
 m4_include([unix/config/ax_compiler_vendor.m4])
 m4_include([unix/config/ax_compiler_version.m4])
+m4_include([unix/config/ax_cxx_compile_stdcxx.m4])
 m4_include([unix/config/ax_fix_incorrect_path.m4])
 m4_include([unix/config/ax_prog_ld_static.m4])
 m4_include([unix/config/ax_x86_arch.m4])
@@ -205,6 +209,7 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM],
   ]
 )
 AC_PROG_CXXCPP
+AX_CXX_COMPILE_STDCXX(11)
 
 AX_COMPILER_VENDOR
 AX_COMPILER_VERSION

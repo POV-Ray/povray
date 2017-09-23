@@ -1,37 +1,39 @@
-/*******************************************************************************
- * pvguiext.cpp
- *
- * This file contains POV-Ray for Windows GUI Extension support code.
- *
- * Author: Christopher J. Cason.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/windows/pvguiext.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file windows/pvguiext.cpp
+///
+/// This file contains POV-Ray for Windows GUI Extension support code.
+///
+/// @author Christopher J. Cason
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 #define POVWIN_FILE
 #define _WIN32_IE COMMONCTRL_VERSION
@@ -197,20 +199,20 @@ void ExternalDisplayPlotBlock (int x1, int y1, int x2, int y2, const GuiRGBA8* c
 
   if (!ExtensionsEnabled)
     return ;
-  
+
   int pixelsCount = ( x2 - x1 + 1 ) * ( y2 - y1 + 1 );
   GuiRGBA8* localColourCopy = NULL;
-  	
+
   p = GuiPointerBlocks ;
   while (p)
   {
     if (p->DisplayPlotBlock != NULL)
-	{
-		if (localColourCopy == NULL)
-		  localColourCopy = new GuiRGBA8[ pixelsCount ];
-		memcpy( localColourCopy, colour, pixelsCount * sizeof( GuiRGBA8 ) );
-		(*p->DisplayPlotBlock) (&p->InstanceData, x1, y1, x2, y2, localColourCopy ) ;
-	}
+    {
+      if (localColourCopy == NULL)
+        localColourCopy = new GuiRGBA8[ pixelsCount ];
+      memcpy( localColourCopy, colour, pixelsCount * sizeof( GuiRGBA8 ) );
+      (*p->DisplayPlotBlock) (&p->InstanceData, x1, y1, x2, y2, localColourCopy ) ;
+    }
     p = p->Next ;
   }
   delete[] localColourCopy;
@@ -389,7 +391,7 @@ ExternalRequestResult WINAPI ExternalRequest (ExternalRequests Request, void *Re
            return (ExRequestFailedNotRendering) ;
          stop_rendering = true ;
          message_printf ("Rendering stopped by GUI extension\n") ;
-		 SendMessage (main_window, WM_COMMAND, CM_STOPRENDER, 0) ;
+         SendMessage (main_window, WM_COMMAND, CM_STOPRENDER, 0) ;
          return (ExRequestOK) ;
 
     case RequestExit :
@@ -611,15 +613,15 @@ void LoadGUIExtensions (void)
       {
         case 100 :
              PointerBlock.AssignPixel = NULL ;
-			 PointerBlock.DisplayPlotBlock = NULL;
+             PointerBlock.DisplayPlotBlock = NULL;
              break ;
 
         case 101 :
-			 PointerBlock.DisplayPlotBlock = NULL;
+             PointerBlock.DisplayPlotBlock = NULL;
              break ;
 
-		case 102 :
-			 break;
+        case 102 :
+             break;
 
         default :
              if (debugging)

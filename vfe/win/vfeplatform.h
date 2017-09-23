@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -50,8 +50,8 @@
 
 namespace vfePlatform
 {
-  using namespace vfe;  
- 
+  using namespace vfe;
+
 #ifdef _CONSOLE
   using namespace pov_base;
   class WinConOptionsProcessor;
@@ -111,7 +111,7 @@ namespace vfePlatform
       virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height) { return new WinShelloutProcessing(opts, scene, width, height); }
 
 #ifdef _CONSOLE
-	  shared_ptr<WinConOptionsProcessor> GetWinConOptions(void) { return m_OptionsProc; }
+      shared_ptr<WinConOptionsProcessor> GetWinConOptions(void) { return m_OptionsProc; }
 #endif
 
       virtual void Clear(bool Notify = true);
@@ -143,11 +143,11 @@ namespace vfePlatform
       mutable __int64 m_TimestampOffset;
 
 #ifdef _CONSOLE
-	  ///////////////////////////////////////////////////////////////////////
-	  // platform specific configuration options
-	  shared_ptr<WinConOptionsProcessor> m_OptionsProc;
+      ///////////////////////////////////////////////////////////////////////
+      // platform specific configuration options
+      shared_ptr<WinConOptionsProcessor> m_OptionsProc;
 #endif
-	  
+
       ////////////////////////////////////////////////////////////////////
       // used to store the location of the temp path. this is used by both
       // GetTemporaryPath() and TestAccessAllowed().

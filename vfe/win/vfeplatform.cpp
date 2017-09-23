@@ -9,12 +9,12 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
-/// published by the Free Software Foundation, either version 3 of the 
+/// published by the Free Software Foundation, either version 3 of the
 /// License, or (at your option) any later version.
 ///
 /// POV-Ray is distributed in the hope that it will be useful,
@@ -78,20 +78,20 @@ namespace vfePlatform
     vfeSession(id)
   {
 #ifdef _CONSOLE
-	  m_OptionsProc = shared_ptr<WinConOptionsProcessor>(new WinConOptionsProcessor(this));
-	  m_TempPath = Path(m_OptionsProc->GetTemporaryPath().c_str());
-	  m_TempPathString = m_OptionsProc->GetTemporaryPath().c_str();
+      m_OptionsProc = shared_ptr<WinConOptionsProcessor>(new WinConOptionsProcessor(this));
+      m_TempPath = Path(m_OptionsProc->GetTemporaryPath().c_str());
+      m_TempPathString = m_OptionsProc->GetTemporaryPath().c_str();
 #else
-	  char str[MAX_PATH];
+      char str[MAX_PATH];
 
-	  if (GetTempPath(sizeof(str) - 7, str) == 0)
-		  throw vfeException("Could not get temp dir from Windows API");
-	  strcat(str, "povwin\\");
-	  // if we fail to creat our temp dir, just use the default one
-	  if (CreateDirectory(str, NULL) == 0 && GetLastError() != ERROR_ALREADY_EXISTS)
-		  GetTempPath(sizeof(str), str);
-	  m_TempPath = Path(str);
-	  m_TempPathString = str;
+      if (GetTempPath(sizeof(str) - 7, str) == 0)
+          throw vfeException("Could not get temp dir from Windows API");
+      strcat(str, "povwin\\");
+      // if we fail to creat our temp dir, just use the default one
+      if (CreateDirectory(str, NULL) == 0 && GetLastError() != ERROR_ALREADY_EXISTS)
+          GetTempPath(sizeof(str), str);
+      m_TempPath = Path(str);
+      m_TempPathString = str;
 #endif
 
   }
@@ -212,9 +212,9 @@ namespace vfePlatform
   void vfeWinSession::NotifyCriticalError (const char *message, const char *filename, int line)
   {
 #ifdef _CONSOLE
-	fprintf(stderr, "POV-Ray Critical Error: %s", message);
+    fprintf(stderr, "POV-Ray Critical Error: %s", message);
 #else
-	MessageBox(NULL, message, "POV-Ray Critical Error", MB_ICONERROR | MB_OK);
+    MessageBox(NULL, message, "POV-Ray Critical Error", MB_ICONERROR | MB_OK);
 #endif
   }
 

@@ -3,7 +3,9 @@
 if "%~1" == "" goto :PARAMETER_ERROR
 
 rem set PLANTUML_JAR_PATH=C:\Program Files\PlantUML
-set /p POV_VER= < "../../unix/VERSION"
+
+call "../windows/get-source-version.bat" "../../source/base/version.h"
+set POV_VER=%POV_SOURCE_VERSION%
 
 call :JAVA_SYMLINK_FIX
 

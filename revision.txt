@@ -19,7 +19,7 @@ Notes:
   For example, to read FS#270, visit:
   http://bugs.povray.org/270
 
-  (Note: As of 3.7.1-beta.8 our flyspray bug tracker is officially mothballed,
+  (Note: As of v3.7.1-beta.8 our flyspray bug tracker is officially mothballed,
   and we no longer refer to it in the changelog. Any flyspray reports that
   were still open at that point have been duplicated as GitHub issues titled
   "Port of FSxxx - ...")
@@ -32,10 +32,128 @@ Notes:
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
+POV-Ray v3.8.0-???
+------------------------------------------------------------------------------
+
+Commit 1dbca0ba on 2017-09-06 by Christoph Lipka
+
+    Remove dependency on `boost::tr1` to fix issue #317.
+
+Commit 7bddd06f on 2017-09-06 by Christoph Lipka
+
+    Enable and require C++11.
+
+Commit 7a99e7c6 on 2017-08-18 by Christoph Lipka
+
+    [ci skip] Update and fix `README.md`.
+
+Commit 2c3afc43 on 2017-07-09 by Christoph Lipka
+
+    [ci skip] Update source documentation of version numbering.
+
+Commit 443ae796 on 2017-07-08 by Christoph Lipka
+
+    Major overhaul of version number macro system in `version.h`.
+
+    Replaced the various redundant representations of the version number as
+    authoritative sources of information with a set of integers, each one
+    corresponding to a single numerical field of the version number. Any
+    other representations of the version number are now automatically
+    derived from these (plus the prerelease tag, if applicable).
+
+    Also added a mechanism that allows v3.8 binaries to run on top of a v3.7
+    host installation for now, so that we don't need any 3.8 installers yet.
+
+    Note that this commit comes with an updated Git pre-commit hook; to
+    install it, copy `pre-commit` from `tools/git/hooks/` to `.git/hooks/`
+    in your local repository.
+
+Commit 463442e2 on 2017-07-08 by Christoph Lipka
+
+    Update version number in AppVeyor automated build config.
+
+Commit 9f644fed on 2017-07-07 by Christoph Lipka
+
+    Add some debugging aids.
+
+    - When compiled in debug mode, a new statement `#breakpoint` is now
+      available. Its sole purpose is to serve as a hook for a breakpoint,
+      which can then be triggered anytime from the scene file.
+    - When compiled in debug mode, POV-Ray for Windows will now make do with
+      the release version of the editor DLLs if it can't find the debug version.
+
+Commit b1087484 on 2017-07-05 by Christoph Lipka
+
+    Demote version back to alpha status for now.
+
+Commit bdbb0b57 on 2017-07-02 by Christoph Lipka
+
+    Bump version threshold for new features to 3.8.
+
+    Any new behaviour formerly activated by `#version 3.71` now requires
+    `#version 3.8` (or higher); specifying `#version 3.71` will trigger a
+    corresponding warning.
+    Also updated sample scenes and include files accordingly.
+
+Commit 71b165fd on 2017-07-02 by Christoph Lipka
+
+    Eliminate various explicit mentions of version numbers.
+
+Commit 7957ad5c on 2017-06-29 by Christoph Lipka
+
+    Elimiate unnecessary version numbers from HTML Help infrastructure.
+
+Commit 71958105 on 2017-06-26 by Christoph Lipka
+
+    Update remaining source code file header comments.
+
+Commit b0557b87 on 2017-06-26 by Christoph Lipka
+
+    Update bulk of source code file header comments.
+
+Commit 09f1014d on 2017-06-26 by Christoph Lipka
+
+    Bump version number in the most essential places.
+
+Commit 9808f53a on 2017-06-24 by William F. Pokorny (wfpokorny)
+
+    Update list of required packages for Unix builds. ( #294)
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-rc.1
+------------------------------------------------------------------------------
+
+Commit e3c1738c on 2017-06-22 by Christoph Lipka
+
+    Fix a blunder in `version.h`.
+
+Commit 315bb46a on 2017-06-22 by Christoph Lipka
+
+    Bump version number and update change log.
+
+Commit b08846b3 on 2017-06-20 by Christoph Lipka
+
+    Fix potential issue in optimized noise when building on Unix with
+    `CXXFLAGS=-fno-fma` or similar.
+
+Commit 3bc30fbd on 2017-06-18 by Christoph Lipka
+
+    Fix bug introduced with commit cc77eea that broke builds without
+    optimized noise.
+
+Commit 50cd2a0d on 2017-06-18 by Christoph Lipka
+
+    Clean up include hierarchy in `frontend` module.
+
+------------------------------------------------------------------------------
 POV-Ray v3.7.1-beta.9
 ------------------------------------------------------------------------------
 
-Commit c53549c on 2017-06-17 by Christoph Lipka
+Commit 037f20ea on 2017-06-17 by Christoph Lipka
+
+    Bump version number and update change log.
+
+Commit e2f3882a on 2017-06-17 by Christoph Lipka
 
     Fix artifacts in output image file caused by certain mosaic pretrace
     settings.
@@ -46,28 +164,28 @@ Commit c53549c on 2017-06-17 by Christoph Lipka
 
     Also includes some minor code cleanup.
 
-Commit d99e80a on 2017-06-12 by Christoph Lipka
+Commit d99e80a2 on 2017-06-12 by Christoph Lipka
 
     Permanent fix for GitHub issue #137.
 
-Commit 923bd8d on 2017-06-11 by Christoph Lipka
+Commit 923bd8dd on 2017-06-11 by Christoph Lipka
 
     Minor code cleanup.
 
-Commit cc77eea on 2017-06-11 by Christoph Lipka
+Commit cc77eea6 on 2017-06-11 by Christoph Lipka
 
     More refactoring of optimized noise generator mechanism and CPU feature
     detection.
 
-Commit e469760 on 2017-06-10 by Christoph Lipka
+Commit e469760a on 2017-06-10 by Christoph Lipka
 
     Update docs.
 
-Commit 9834334 on 2017-05-23 by William F. Pokorny (wfpokorny)
+Commit 98343346 on 2017-05-23 by William F. Pokorny (wfpokorny)
 
     Removing Perforce references and related comments. (#297)
 
-Commit 6fe910c on 2017-05-22 by Bernhard M. Wiedemann
+Commit 6fe910ca on 2017-05-22 by Bernhard M. Wiedemann
 
     Improve reproducibility of Unix builds. (#296)
 
@@ -80,19 +198,19 @@ Commit 6fe910c on 2017-05-22 by Bernhard M. Wiedemann
 POV-Ray v3.7.1-beta.8
 ------------------------------------------------------------------------------
 
-Commit e817cc4 on 2017-05-20 by Christoph Lipka
+Commit e817cc4b on 2017-05-20 by Christoph Lipka
 
     Bump version number and update change log.
 
-Commit 295022b on 2017-05-20 by Christoph Lipka
+Commit 295022b8 on 2017-05-20 by Christoph Lipka
 
     Add support for CPU-specific optimizations to Unix version. (#293)
 
-Commit 3d30fb3 on 2017-05-16 by Christoph Lipka
+Commit 3d30fb36 on 2017-05-16 by Christoph Lipka
 
     Fix bulk of GitHub issue #147 sphere sweep artifacts for good.
 
-Commit 36b2a15 on 2017-05-14 by Christoph Lipka
+Commit 36b2a150 on 2017-05-14 by Christoph Lipka
 
     Update docs.
 
@@ -100,11 +218,11 @@ Commit 36b2a15 on 2017-05-14 by Christoph Lipka
 POV-Ray v3.7.1-beta.7
 ------------------------------------------------------------------------------
 
-Commit 8725d43 on 2017-05-14 by Christoph Lipka
+Commit 8725d43b on 2017-05-14 by Christoph Lipka
 
     Bump version number and update change log.
 
-Commit 5e4653d on 2017-05-14 by Christoph Lipka
+Commit 5e4653d3 on 2017-05-14 by Christoph Lipka
 
     Fix crashes and performance losses related to noise optimizations.
 
@@ -116,7 +234,7 @@ Commit 5e4653d on 2017-05-14 by Christoph Lipka
     is now turned off for all source files designated to make use of enhanced
     instruction sets.
 
-Commit 06469c5 on 2017-05-09 by Christoph Lipka
+Commit 06469c5f on 2017-05-09 by Christoph Lipka
 
     More sphere sweep changes.
 
@@ -128,7 +246,7 @@ Commit 06469c5 on 2017-05-09 by Christoph Lipka
     - Document some of the insight gained into the workings of the sphere
       sweep code.
 
-Commit 887467e on 2017-05-09 by Christoph Lipka
+Commit 887467ef on 2017-05-09 by Christoph Lipka
 
     Fix bug in new cublic spline sphere sweep bounding box computations.
 
@@ -136,30 +254,30 @@ Commit 887467e on 2017-05-09 by Christoph Lipka
 POV-Ray v3.7.1-beta.6
 ------------------------------------------------------------------------------
 
-Commit 6345350 on 2017-05-07 by Christoph Lipka
+Commit 6345350c on 2017-05-07 by Christoph Lipka
 
     Update change log.
 
-Commit ab22c3e on 2017-05-07 by Christoph Lipka
+Commit ab22c3e2 on 2017-05-07 by Christoph Lipka
 
     Fix for a bug in recent commit ce8b193.
 
-Commit 329ad8a on 2017-05-07 by Christoph Lipka
+Commit 329ad8ae on 2017-05-07 by Christoph Lipka
 
     [ci skip] Bump version number and update change log.
 
-Commit ce8b193 on 2017-05-07 by Christoph Lipka
+Commit ce8b1939 on 2017-05-07 by Christoph Lipka
 
     Fix some sphere sweep issues.
 
     - Fix GitHub issue #285.
     - Fix `cubic_spline` sphere sweep bounding (see GitHub issue #147).
 
-Commit 57cdebb on 2017-05-07 by Christoph Lipka
+Commit 57cdebbb on 2017-05-07 by Christoph Lipka
 
     Remove obsolete constants from the POVMS interface.
 
-Commit be3225d on 2017-05-07 by Christoph Lipka
+Commit be3225da on 2017-05-07 by Christoph Lipka
 
     Sphere sweep performance improvements.
 
@@ -169,7 +287,7 @@ Commit be3225d on 2017-05-07 by Christoph Lipka
       and the sphere sweep memory footprint reduced along the way.
     - Minor improvements to avoid some unnecessary copying of information.
 
-Commit b0b6917 on 2017-05-07 by Christoph Lipka
+Commit b0b6917c on 2017-05-07 by Christoph Lipka
 
     Fix GitHub issue #287.
 
@@ -178,15 +296,15 @@ Commit b0b6917 on 2017-05-07 by Christoph Lipka
     report 81 (now tracked as GitHub issue #147) but has now turned out to
     cause severe problems when using shpere sweeps in differences or merges.
 
-Commit 3f16f20 on 2017-05-07 by Christoph Lipka
+Commit 3f16f205 on 2017-05-07 by Christoph Lipka
 
     Minor source comment fixes.
 
-Commit 1f3dc8f on 2017-05-07 by William F. Pokorny (wfpokorny)
+Commit 1f3dc8f6 on 2017-05-07 by William F. Pokorny (wfpokorny)
 
     Improving performance of gatherPhotonsRec function. (#280)
 
-Commit d50fe7c on 2017-05-05 by Christoph Lipka
+Commit d50fe7c0 on 2017-05-05 by Christoph Lipka
 
     More updates to optimized noise.
 
@@ -206,14 +324,14 @@ Commit d50fe7c on 2017-05-05 by Christoph Lipka
       set extensions required, and the functions to probe for support have
       been pulled out of the files.
 
-Commit ea3d549 on 2017-04-13 by Anshu Arya
+Commit ea3d549a on 2017-04-13 by Anshu Arya
 
     Update AVXFMA4 noise implementation (#268)
 
     Improved performance and code readability. The changes only affect AMD
     parts with FMA4 support.
 
-Commit 8a8c73e on 2017-04-13 by Anshu Arya
+Commit 8a8c73e2 on 2017-04-13 by Anshu Arya
 
     Add alternative AVX-optimized noise implementation. (#267)
 
@@ -227,25 +345,25 @@ Commit 8a8c73e on 2017-04-13 by Anshu Arya
 
     - Added noise function selection to benchmark log.
 
-Commit 3adbf75 on 2017-04-12 by William F. Pokorny (wfpokorny)
+Commit 3adbf759 on 2017-04-12 by William F. Pokorny (wfpokorny)
 
     Improve AA performance. (#270)
 
     Especially helps where agressive AA applied to trivial or sparse scenes.
 
-Commit 2be22dd on 2017-04-06 by William F. Pokorny (wfpokorny)
+Commit 2be22dd2 on 2017-04-06 by William F. Pokorny (wfpokorny)
 
     Relax Parse_Lathe point checking for versions <=3.7.0 (#263)
 
-Commit 59ab7f2 on 2017-04-04 by Christoph Lipka
+Commit 59ab7f26 on 2017-04-04 by Christoph Lipka
 
     Fix optional parameters of command-line-style switches in INI files.
 
-Commit 5ca45b2 on 2017-04-02 by Christoph Lipka
+Commit 5ca45b2a on 2017-04-02 by Christoph Lipka
 
     [ci skip] Update Windows help file and Unix HTML doc.
 
-Commit 04dc90e on 2017-03-27 by Christoph Lipka
+Commit 04dc90e3 on 2017-03-27 by Christoph Lipka
 
     Fix GitHub issue #260.
 
@@ -253,31 +371,31 @@ Commit 04dc90e on 2017-03-27 by Christoph Lipka
 POV-Ray v3.7.1-beta.5
 ------------------------------------------------------------------------------
 
-Commit 8da24d1 on 2017-03-25 by Christoph Lipka
+Commit 8da24d16 on 2017-03-25 by Christoph Lipka
 
     Bump version number. Also add a doc on our use of GitHub issues.
 
-Commit 6db6b87 on 2017-03-25 by Christoph Lipka
+Commit 6db6b879 on 2017-03-25 by Christoph Lipka
 
     Eliminate or clean up a few more instances of `dynamic_cast`.
 
-Commit 32f1606 on 2017-03-25 by Christoph Lipka
+Commit 32f16065 on 2017-03-25 by Christoph Lipka
 
     Minor update to README.md
 
-Commit 7ffe150 on 2017-03-24 by Christoph Lipka
+Commit 7ffe150e on 2017-03-24 by Christoph Lipka
 
     Restore turbulent pattern performance as discussed in GitHub issue #48.
 
-Commit 741fae5 on 2017-03-24 by Christoph Lipka
+Commit 741fae52 on 2017-03-24 by Christoph Lipka
 
     Overhaul version information, addressing GitHub issue #257.
 
-Commit ea95aa9 on 2017-03-14 by Christoph Lipka
+Commit ea95aa93 on 2017-03-14 by Christoph Lipka
 
     Update Unix build process to address GitHub issue #226 (#252)
 
-Commit 6f6ac48 on 2017-03-13 by Christoph Lipka
+Commit 6f6ac481 on 2017-03-13 by Christoph Lipka
 
     Update VS2015 project files to avoid requiring a specific Windows SDK.
 
@@ -285,11 +403,11 @@ Commit 6f6ac48 on 2017-03-13 by Christoph Lipka
     instead, build instructions now contain a section dedicated to building
     XP-compatible binaries.
 
-Commit d0ca075 on 2017-03-13 by William F. Pokorny (wfpokorny)
+Commit d0ca075a on 2017-03-13 by William F. Pokorny (wfpokorny)
 
     [ci skip] Updating devutils.md per current behavior. (#251)
 
-Commit 8a8b503 on 2017-03-12 by Christoph Lipka
+Commit 8a8b5033 on 2017-03-12 by Christoph Lipka
 
     Restore user-defined function VM performance as discussed in GitHub
     issue #48.
@@ -298,37 +416,37 @@ Commit 8a8b503 on 2017-03-12 by Christoph Lipka
 POV-Ray v3.7.1-beta.4
 ------------------------------------------------------------------------------
 
-Commit dc1a27c on 2017-03-04 by Christoph Lipka
+Commit dc1a27c0 on 2017-03-04 by Christoph Lipka
 
     Bump version number.
 
-Commit 6eb1d94 on 2017-03-04 by Christoph Lipka
+Commit 6eb1d948 on 2017-03-04 by Christoph Lipka
 
     Fix SSE2 support detection on Windows XP.
 
-Commit 5e34fd0 on 2017-03-04 by Christoph Lipka
+Commit 5e34fd04 on 2017-03-04 by Christoph Lipka
 
     Upgrade Visual Studio project files from VS 2010 to VS 2015.
 
-Commit 9cc7117 on 2017-02-27 by Christoph Lipka
+Commit 9cc71176 on 2017-02-27 by Christoph Lipka
 
     Replace Windows plaintext and HTML "readme" files with a Markdown file.
 
-Commit d4cea4d on 2017-02-27 by Christoph Lipka
+Commit d4cea4d4 on 2017-02-27 by Christoph Lipka
 
     Fix GitHub issue #241, as well as Windows console version related error
     messages and doc files.
 
-Commit a32a20b on 2017-02-27 by William F. Pokorny (wfpokorny)
+Commit a32a20bc on 2017-02-27 by William F. Pokorny (wfpokorny)
 
     Fix parse errors in two demo scenes. (#242)
 
-Commit 63e9b8a on 2017-02-22 by Christoph Lipka
+Commit 63e9b8ad on 2017-02-22 by Christoph Lipka
 
     Fix handling of directory names starting with `../../` in POV-Ray
     for Windows.
 
-Commit 7c74478 on 2017-02-22 by Christoph Lipka
+Commit 7c744786 on 2017-02-22 by Christoph Lipka
 
     Fix `ior.inc`.
 
@@ -336,22 +454,22 @@ Commit 7c74478 on 2017-02-22 by Christoph Lipka
 POV-Ray v3.7.1-beta.3
 ------------------------------------------------------------------------------
 
-Commit 5ed6025 on 2017-02-19 by Christoph Lipka
+Commit 5ed6025e on 2017-02-19 by Christoph Lipka
 
     Update change log as well as some comments and build instructions.
 
-Commit 7f41d96 on 2017-02-19 by Christoph Lipka
+Commit 7f41d96b on 2017-02-19 by Christoph Lipka
 
     Add optimized noise implementation from Intel for AVX2/FMA3-capable CPUs.
 
     Also overhauled optimized noise for AVX/FMA4-capable CPUs, as well as
     CPU type identification code.
 
-Commit 9cf8a79 on 2017-02-16 by Christoph Lipka
+Commit 9cf8a798 on 2017-02-16 by Christoph Lipka
 
     Fix handling of special directory name `.` in POV-Ray for Windows.
 
-Commit b4605a5 on 2017-02-14 by William F. Pokorny (wfpokorny)
+Commit b4605a5d on 2017-02-14 by William F. Pokorny (wfpokorny)
 
     Fixing thread stack size overrun crash. (#235)
 
@@ -360,53 +478,53 @@ Commit b4605a5 on 2017-02-14 by William F. Pokorny (wfpokorny)
     POV_THREAD_STACK_SIZE macro mechanism to all NewBoostThread
     calls.
 
-Commit 0e8dbe8 on 2017-02-08 by William F. Pokorny (wfpokorny)
+Commit 0e8dbe80 on 2017-02-08 by William F. Pokorny (wfpokorny)
 
     Adding POV_THREAD_STACK_SIZE macro. (#231)
 
     Unix default is 4MB due regression, otherise 2MB. Checks added for a min
     size of 64KB.
 
-Commit 060464b on 2017-02-05 by Christoph Lipka
+Commit 060464bd on 2017-02-05 by Christoph Lipka
 
     [ci skip] Minor update to `README.md`.
 
-Commit cfaa14d on 2017-02-05 by Christoph Lipka
+Commit cfaa14d5 on 2017-02-05 by Christoph Lipka
 
     [ci skip] Update POV-Ray for Windows "about" box.
 
-Commit 07646c1 on 2017-01-27 by Christoph Lipka
+Commit 07646c1e on 2017-01-27 by Christoph Lipka
 
     Fix a crash and another bug related to `charset utf8`.
 
-Commit 75f497c on 2017-01-26 by William F. Pokorny (wfpokorny)
+Commit 75f497c4 on 2017-01-26 by William F. Pokorny (wfpokorny)
 
     [ci skip] Adding potential.pov demo scene to the distribution. (#220)
 
     Also corrects small typo in unix/povray.1 manpage.
 
-Commit de52f67 on 2017-01-25 by Christoph Lipka
+Commit de52f677 on 2017-01-25 by Christoph Lipka
 
     Fix unix build error introduced with previous commit.
 
-Commit 050584a on 2017-01-25 by Christoph Lipka
+Commit 050584ac on 2017-01-25 by Christoph Lipka
 
     Make optional fields in macro parameters and tuple assignments accept
     uninitialized directory entries.
 
     Also includes some code beautification.
 
-Commit 1cceb44 on 2017-01-25 by William F. Pokorny (wfpokorny)
+Commit 1cceb44a on 2017-01-25 by William F. Pokorny (wfpokorny)
 
     [ci skip] Adding aoi.pov demo scene to the distribution. (#219)
 
     Note. The scene makes use of 3.71's blend_mode and blend_gamma as well.
 
-Commit eef5c26 on 2017-01-25 by Christoph Lipka
+Commit eef5c263 on 2017-01-25 by Christoph Lipka
 
     Fix GitHub issue #212 (plus a few trivial changes).
 
-Commit b367ec1 on 2017-01-17 by William F. Pokorny (wfpokorny)
+Commit b367ec11 on 2017-01-17 by William F. Pokorny (wfpokorny)
 
     Fixing issues with bounding threshold option. (#186)
 
@@ -414,15 +532,15 @@ Commit b367ec1 on 2017-01-17 by William F. Pokorny (wfpokorny)
     centralizes the setting and reporting of the bounding threshold to 3.
     Further, restores the clamping of values to 1+ which existed in 3.6.
 
-Commit 72e18d9 on 2017-01-16 by Christoph Lipka
+Commit 72e18d9d on 2017-01-16 by Christoph Lipka
 
     Try to fix broken pull request build testing.
 
-Commit ae99108 on 2017-01-15 by Christoph Lipka
+Commit ae991084 on 2017-01-15 by Christoph Lipka
 
     Remove unused variable in cone primitive code.
 
-Commit 5ddf12c on 2017-01-15 by Christoph Lipka
+Commit 5ddf12c3 on 2017-01-15 by Christoph Lipka
 
     Fix GitHub issue #184.
 
@@ -432,15 +550,15 @@ Commit 5ddf12c on 2017-01-15 by Christoph Lipka
     transparent), instead of propagating such values to the render engine
     where it might lead to undefined behaviour.
 
-Commit 6b88d76 on 2017-01-15 by Christoph Lipka
+Commit 6b88d762 on 2017-01-15 by Christoph Lipka
 
     Make heightfield code more robust (partially addresses GitHub issue #184).
 
-Commit 7f15133 on 2017-01-14 by Christoph Lipka
+Commit 7f151336 on 2017-01-14 by Christoph Lipka
 
     [ci skip] Bump version to next beta.
 
-Commit 6ebc927 on 2017-01-14 by Christoph Lipka
+Commit 6ebc9277 on 2017-01-14 by Christoph Lipka
 
     [ci skip] Fix some external links in the POV-Ray for Windows inbuilt help.
 
@@ -448,11 +566,11 @@ Commit 6ebc927 on 2017-01-14 by Christoph Lipka
 POV-Ray v3.7.1-beta.2
 ------------------------------------------------------------------------------
 
-Commit 144b856 on 2017-01-09 by Christoph Lipka
+Commit 144b8565 on 2017-01-09 by Christoph Lipka
 
     Update change log.
 
-Commit 481db07 on 2017-01-09 by Christoph Lipka
+Commit 481db071 on 2017-01-09 by Christoph Lipka
 
     Fix some more beta registry key issues.
 
@@ -460,24 +578,24 @@ Commit 481db07 on 2017-01-09 by Christoph Lipka
     - Beta now only copies v3.6 registry data if no existing v3.7 proper
     installation is found.
 
-Commit b6532d0 on 2017-01-09 by Christoph Lipka
+Commit b6532d07 on 2017-01-09 by Christoph Lipka
 
     Update change logs.
 
-Commit e2fe17d on 2017-01-09 by Christoph Lipka
+Commit e2fe17dd on 2017-01-09 by Christoph Lipka
 
     Update some strings in the Windows binary headers.
 
-Commit 90d12db on 2017-01-08 by Christoph Lipka
+Commit 90d12dbb on 2017-01-08 by Christoph Lipka
 
     Update change logs.
 
-Commit 3410c23 on 2017-01-08 by Christoph Lipka
+Commit 3410c236 on 2017-01-08 by Christoph Lipka
 
     Make betas live happily alongside the previous release, by using a
     different registry key and directory name.
 
-Commit 6aa8ee7 on 2017-01-08 by Christoph Lipka
+Commit 6aa8ee71 on 2017-01-08 by Christoph Lipka
 
     [ci skip] Disable automated generation of GitHub release draft.
 
@@ -485,46 +603,46 @@ Commit 6aa8ee7 on 2017-01-08 by Christoph Lipka
 POV-Ray v3.7.1-beta.1  (not officially released)
 ------------------------------------------------------------------------------
 
-Commit 978ca52 on 2017-01-01 by Christoph Lipka
+Commit 978ca529 on 2017-01-01 by Christoph Lipka
 
     Prepare for 3.7.1 beta phase.
 
-Commit c3ad8b2 on 2017-01-01 by Christoph Lipka
+Commit c3ad8b20 on 2017-01-01 by Christoph Lipka
 
     Update copyright notices and change logs.
 
-Commit 605359b on 2017-01-01 by Christoph Lipka
+Commit 605359b6 on 2017-01-01 by Christoph Lipka
 
     Update POV-Ray for Windows inbuilt help.
 
-Commit 873a63c on 2016-12-30 by Christoph Lipka
+Commit 873a63ca on 2016-12-30 by Christoph Lipka
 
     Add `boost/atomic` package to our subset of the boost library.
 
-Commit 6ba9ec7 on 2016-12-24 by Christoph Lipka
+Commit 6ba9ec7c on 2016-12-24 by Christoph Lipka
 
     Update colors.pov.
 
-Commit 938caae on 2016-12-24 by Christoph Lipka
+Commit 938caaee on 2016-12-24 by Christoph Lipka
 
     Fix colors_ral.inc.
 
-Commit 6dda7c3 on 2016-12-23 by Christoph Lipka
+Commit 6dda7c3f on 2016-12-23 by Christoph Lipka
 
     Update our preferred bug reporting channel in some files. (issue #119)
 
-Commit 9e20adb on 2016-12-23 by Christoph Lipka
+Commit 9e20adbe on 2016-12-23 by Christoph Lipka
 
     Update copyright notices.
 
-Commit 63e8f73 on 2016-12-23 by William F. Pokorny (wfpokorny)
+Commit 63e8f730 on 2016-12-23 by William F. Pokorny (wfpokorny)
 
     [ci skip] Updating the unix man page. Small typo. (#169)
 
     Updating our unix man page to be current with recent 3.7.1 master
     version. Also small typo in processrenderoptions.cpp.
 
-Commit 0174c03 on 2016-12-22 by Christoph Lipka
+Commit 0174c037 on 2016-12-22 by Christoph Lipka
 
     Update colors_ral.inc.
 
@@ -532,107 +650,107 @@ Commit 0174c03 on 2016-12-22 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8927145
 ------------------------------------------------------------------------------
 
-Commit f24d656 on 2016-12-21 by Christoph Lipka
+Commit f24d6560 on 2016-12-21 by Christoph Lipka
 
     Fix `version.h` erroneously flagging this as a beta version.
 
-Commit 8cce165 on 2016-12-21 by Christoph Lipka
+Commit 8cce1651 on 2016-12-21 by Christoph Lipka
 
     Fix bug in previous commit.
 
-Commit 56c574a on 2016-12-21 by Christoph Lipka
+Commit 56c574a6 on 2016-12-21 by Christoph Lipka
 
     Modified the way the finish-level `fresnel` parameter works.
 
-Commit f0fdc36 on 2016-12-20 by Christoph Lipka
+Commit f0fdc362 on 2016-12-20 by Christoph Lipka
 
     Fix some issues discovered by static code analysis.
 
-Commit 243e9ad on 2016-12-20 by Christoph Lipka
+Commit 243e9ad1 on 2016-12-20 by Christoph Lipka
 
     Partial overhaul of string utilities to fix some unsafe string handling.
 
-Commit c6a6e98 on 2016-12-20 by Christoph Lipka
+Commit c6a6e984 on 2016-12-20 by Christoph Lipka
 
     Fix GitHub issue #175 ("Coredump due recent 3.7.1 parser updates.")
 
-Commit 24b7f9f on 2016-12-20 by Christoph Lipka
+Commit 24b7f9fc on 2016-12-20 by Christoph Lipka
 
     Update README.md
 
-Commit 2ebea6c on 2016-12-19 by Christoph Lipka
+Commit 2ebea6c8 on 2016-12-19 by Christoph Lipka
 
     Final(?) update of version number stuff.
 
-Commit 0b9d345 on 2016-12-19 by Christoph Lipka
+Commit 0b9d345b on 2016-12-19 by Christoph Lipka
 
     Yet more version numbering related changes.
 
-Commit cc91a26 on 2016-12-19 by Christoph Lipka
+Commit cc91a260 on 2016-12-19 by Christoph Lipka
 
     Update revision.txt.
 
-Commit a61c792 on 2016-12-19 by Christoph Lipka
+Commit a61c7923 on 2016-12-19 by Christoph Lipka
 
     More version string related changes.
 
-Commit 1514773 on 2016-12-19 by Christoph Lipka
+Commit 1514773c on 2016-12-19 by Christoph Lipka
 
     Update to Windows help file stylesheet.
 
-Commit 1896f8d on 2016-12-19 by Christoph Lipka
+Commit 1896f8d3 on 2016-12-19 by Christoph Lipka
 
     Update `version.h` to allow for build IDs in manual builds.
 
-Commit 5e09f10 on 2016-12-17 by Christoph Lipka
+Commit 5e09f104 on 2016-12-17 by Christoph Lipka
 
     Add new mechanism for automated builds to inject additional defines
     into Windows builds.
 
-Commit fbab8ad on 2016-12-17 by Christoph Lipka
+Commit fbab8adc on 2016-12-17 by Christoph Lipka
 
     Addendum to latest two commits.
 
-Commit 6b4cf74 on 2016-12-17 by Christoph Lipka
+Commit 6b4cf749 on 2016-12-17 by Christoph Lipka
 
     Trim down `pov_mem.*` to what's actually still used.
 
-Commit 64ff308 on 2016-12-17 by Christoph Lipka
+Commit 64ff3080 on 2016-12-17 by Christoph Lipka
 
     More changes to simplify official builds, including movement of the
     `pov_mem.*` source files.
 
-Commit c84a990 on 2016-12-17 by Christoph Lipka
+Commit c84a9904 on 2016-12-17 by Christoph Lipka
 
     Minor changes to Visual Studio projects for easier official release
     builds.
 
-Commit f233f60 on 2016-12-17 by Christoph Lipka
+Commit f233f601 on 2016-12-17 by Christoph Lipka
 
     Amendment to previous commit.
 
-Commit d96b54f on 2016-12-17 by Christoph Lipka
+Commit d96b54fb on 2016-12-17 by Christoph Lipka
 
     Amputated remnants of some legacy features.
 
-Commit a535aaf on 2016-12-16 by Christoph Lipka
+Commit a535aaff on 2016-12-16 by Christoph Lipka
 
     [ci skip] Add tools for generating the Windows help file to the repo.
 
-Commit 5f89d41 on 2016-12-15 by Christoph Lipka
+Commit 5f89d414 on 2016-12-15 by Christoph Lipka
 
     Update revision.txt.
 
-Commit b4d0b88 on 2016-12-15 by Christoph Lipka
+Commit b4d0b886 on 2016-12-15 by Christoph Lipka
 
     Fix two recently introduced parser bugs, one of which tripped the Unix
     build tests.
 
-Commit a04d241 on 2016-12-15 by Christoph Lipka
+Commit a04d2414 on 2016-12-15 by Christoph Lipka
 
     Update to the Git pre-commit hook.
 
-Commit 983ab18 on 2016-12-15 by Christoph Lipka
+Commit 983ab18b on 2016-12-15 by Christoph Lipka
 
     Fix some issues discovered by static code analysis.
 
@@ -640,40 +758,40 @@ Commit 983ab18 on 2016-12-15 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8917471
 ------------------------------------------------------------------------------
 
-Commit f814383 on 2016-12-14 by Christoph Lipka
+Commit f8143832 on 2016-12-14 by Christoph Lipka
 
     Improved behaviour of media with respect to large distances or high
     densities (method 3 only).
 
-Commit 1968b7d on 2016-12-13 by Christoph Lipka
+Commit 1968b7df on 2016-12-13 by Christoph Lipka
 
     Disable bidirectional brilliance for now, due to it probably becoming
     obsolete soon anyway.
 
-Commit e47718e on 2016-12-13 by Christoph Lipka
+Commit e47718ee on 2016-12-13 by Christoph Lipka
 
     Canonicalize file paths in insert menu snippets and sample scenes to
     use forward slashes.
 
-Commit 30dac78 on 2016-12-13 by Christoph Lipka
+Commit 30dac782 on 2016-12-13 by Christoph Lipka
 
     Disable Wavefront OBJ import for now, due to the syntax definitely not
     being final.
 
-Commit e51eec7 on 2016-12-13 by Christoph Lipka
+Commit e51eec77 on 2016-12-13 by Christoph Lipka
 
     Fix GitHub issue #161 and closely related potential trouble.
 
-Commit 6671b3e on 2016-12-13 by Christoph Lipka
+Commit 6671b3e1 on 2016-12-13 by Christoph Lipka
 
     Update change log.
 
-Commit 2e6787a on 2016-12-12 by Christoph Lipka
+Commit 2e6787a8 on 2016-12-12 by Christoph Lipka
 
     Address GitHub issue #160 by including round, square and angle brackets
     in the brace nesting limit.
 
-Commit f618086 on 2016-12-12 by Christoph Lipka
+Commit f618086c on 2016-12-12 by Christoph Lipka
 
     [ci skip] Update source docs to allow the C++11 `decltype()` feature
     in well-defined cases.
@@ -682,16 +800,16 @@ Commit f618086 on 2016-12-12 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8913469
 ------------------------------------------------------------------------------
 
-Commit 3f1de0d on 2016-12-11 by Christoph Lipka
+Commit 3f1de0d6 on 2016-12-11 by Christoph Lipka
 
     Fix GitHub issue #114 (FlySpray 298).
 
-Commit 7d9671d on 2016-12-11 by Christoph Lipka
+Commit 7d9671d9 on 2016-12-11 by Christoph Lipka
 
     Fix a bug related to colour blend maps in v3.1 (and earlier) legacy
     scenes.
 
-Commit d58bc85 on 2016-12-06 by Christoph Lipka
+Commit d58bc854 on 2016-12-06 by Christoph Lipka
 
     Moved and added some bounding-related source files.
 
@@ -699,7 +817,7 @@ Commit d58bc85 on 2016-12-06 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8901709
 ------------------------------------------------------------------------------
 
-Commit 015e45b on 2016-12-03 by William F. Pokorny (wfpokorny)
+Commit 015e45bb on 2016-12-03 by William F. Pokorny (wfpokorny)
 
     Improving unix console messages with SDL display use. (#109)
 
@@ -711,7 +829,7 @@ Commit 015e45b on 2016-12-03 by William F. Pokorny (wfpokorny)
     compiles without SDL installed - and so no-display - not picking up
     general key press events.
 
-Commit 469a87c on 2016-12-03 by William F. Pokorny (wfpokorny)
+Commit 469a87cb on 2016-12-03 by William F. Pokorny (wfpokorny)
 
     Cleaning up some recent commits. Jim's fix for #149. (#166)
 
@@ -719,34 +837,34 @@ Commit 469a87c on 2016-12-03 by William F. Pokorny (wfpokorny)
     Picking up missed removal of Old_Image pointer from parser_materials.cpp.
     Picking up Jim's prefix to Prefix var name patch for mesh camaera scenes.
 
-Commit 766e1bd on 2016-12-03 by Christoph Lipka
+Commit 766e1bdc on 2016-12-03 by Christoph Lipka
 
     Update boost version to 1.62.
 
-Commit bd73d0e on 2016-12-03 by Christoph Lipka
+Commit bd73d0e6 on 2016-12-03 by Christoph Lipka
 
     Miscellaneous refactoring, mostly related to file output.
 
     Also added support for "Compression=1" to Targa format and "Compression=0"
     to Netpbm PPM/PGM format.
 
-Commit 13aa062 on 2016-12-02 by Christoph Lipka
+Commit 13aa062b on 2016-12-02 by Christoph Lipka
 
     Some refactoring and Doxygen documentation work.
 
-Commit c5cade4 on 2016-11-27 by Christoph Lipka
+Commit c5cade40 on 2016-11-27 by Christoph Lipka
 
     Miscellaneous refactoring.
 
-Commit 10f089d on 2016-11-26 by Christoph Lipka
+Commit 10f089d5 on 2016-11-26 by Christoph Lipka
 
     Fix some issues discovered by static code analysis.
 
-Commit 446f066 on 2016-11-26 by Christoph Lipka
+Commit 446f0668 on 2016-11-26 by Christoph Lipka
 
     Fix error in previous commit.
 
-Commit 55eec19 on 2016-11-26 by Christoph Lipka
+Commit 55eec190 on 2016-11-26 by Christoph Lipka
 
     Pattern-related parser refactoring and fixing of old age-old unreported
     bugs.
@@ -755,133 +873,133 @@ Commit 55eec19 on 2016-11-26 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8889454
 ------------------------------------------------------------------------------
 
-Commit 38a45ef on 2016-11-25 by Christoph Lipka
+Commit 38a45ef2 on 2016-11-25 by Christoph Lipka
 
     Fix bug in full-colour function-based pigment.
 
-Commit e692c16 on 2016-11-25 by Christoph Lipka
+Commit e692c161 on 2016-11-25 by Christoph Lipka
 
     Merge branch 'feature/specular_knockout'
 
-Commit e205d77 on 2016-11-19 by Christoph Lipka
+Commit e205d776 on 2016-11-19 by Christoph Lipka
 
     Add feature to knock out highlights and reflections depending on pigment
     transparency.
 
-Commit fd19745 on 2016-11-25 by Christoph Lipka
+Commit fd19745b on 2016-11-25 by Christoph Lipka
 
     Merge branch 'feature/dictionary'
 
-Commit e592aaf on 2016-11-21 by Christoph Lipka
+Commit e592aaf7 on 2016-11-21 by Christoph Lipka
 
     Fix bug introduced with previous commit.
 
-Commit 2b12beb on 2016-11-21 by Christoph Lipka
+Commit 2b12bebc on 2016-11-21 by Christoph Lipka
 
     Replaced `local()`/`global()` pseudo-functions with `local`/`global`
     pseudo-dictionaries.
 
-Commit 03b9654 on 2016-11-16 by Christoph Lipka
+Commit 03b96543 on 2016-11-16 by Christoph Lipka
 
     Update dictionary initializer syntax and fix a memory leak.
 
-Commit d1a61d6 on 2016-11-16 by Christoph Lipka
+Commit d1a61d63 on 2016-11-16 by Christoph Lipka
 
     Merge branch 'master' into feature/dictionary
 
-Commit 5bc4f0b on 2016-11-16 by Christoph Lipka
+Commit 5bc4f0bb on 2016-11-16 by Christoph Lipka
 
     Add support for mixed-type arrays.
 
-Commit a2bee50 on 2016-10-12 by Christoph Lipka
+Commit a2bee50a on 2016-10-12 by Christoph Lipka
 
     Merge branch 'master' into feature/dictionary
 
-Commit 351d888 on 2016-09-26 by Christoph Lipka
+Commit 351d888b on 2016-09-26 by Christoph Lipka
 
     Merge branch 'master' into feature/dictionary
 
-Commit 093def7 on 2016-09-18 by Christoph Lipka
+Commit 093def73 on 2016-09-18 by Christoph Lipka
 
     Implement dynamically-sized arrays.
 
-Commit 0b5ac83 on 2016-09-17 by Christoph Lipka
+Commit 0b5ac835 on 2016-09-17 by Christoph Lipka
 
     Implement array-style dictionary access.
 
-Commit 535bac5 on 2016-09-17 by Christoph Lipka
+Commit 535bac52 on 2016-09-17 by Christoph Lipka
 
     Implement dictionary initializers.
 
-Commit 5039065 on 2016-09-17 by Christoph Lipka
+Commit 5039065c on 2016-09-17 by Christoph Lipka
 
     Add support for `dictionary` data container.
 
-Commit 4171d08 on 2016-11-25 by Christoph Lipka
+Commit 4171d080 on 2016-11-25 by Christoph Lipka
 
     Add full-colour function-based pigment pattern.
 
-Commit da27569 on 2016-11-25 by Christoph Lipka
+Commit da275691 on 2016-11-25 by Christoph Lipka
 
     Some pattern-related refactoring.
 
-Commit 4d21059 on 2016-11-24 by Christoph Lipka
+Commit 4d21059c on 2016-11-24 by Christoph Lipka
 
     Minor changes to debug sanity checks.
 
-Commit 68fa749 on 2016-11-24 by Christoph Lipka
+Commit 68fa7496 on 2016-11-24 by Christoph Lipka
 
     Minor parser code fixes and refactoring.
 
-Commit 02f7e25 on 2016-11-21 by Christoph Lipka
+Commit 02f7e257 on 2016-11-21 by Christoph Lipka
 
     Update Unix installation instructions.
 
-Commit 2775c4f on 2016-11-20 by Christoph Lipka
+Commit 2775c4fc on 2016-11-20 by Christoph Lipka
 
     Fix GitHub issue #153.
 
-Commit fa4a158 on 2016-11-20 by Ben Small (BentSm)
+Commit fa4a1586 on 2016-11-20 by Ben Small (BentSm)
 
     Fix promotion bug (#130)
 
     This fixes the bug reported in
     [newsgroup post <3c4bb31d$1@news.povray.org>].
 
-Commit 79ed353 on 2016-11-16 by Christoph Lipka
+Commit 79ed3534 on 2016-11-16 by Christoph Lipka
 
     [ci skip] Update changes.txt.
 
-Commit 4be08d8 on 2016-11-15 by William F. Pokorny (wfpokorny)
+Commit 4be08d8e on 2016-11-15 by William F. Pokorny (wfpokorny)
 
     Port of JG diff for github issue #128 and FS331 (#129)
 
-Commit 1319df5 on 2016-11-15 by William F. Pokorny (wfpokorny)
+Commit 1319df52 on 2016-11-15 by William F. Pokorny (wfpokorny)
 
     Flipping uv_mapping of lemon in V to usual orientation. (#133)
 
     The UV mapping orientation for the originally implemented lemon
     was upside down to the usual mapping.
 
-Commit df90a3a on 2016-11-15 by William F. Pokorny (wfpokorny)
+Commit df90a3ab on 2016-11-15 by William F. Pokorny (wfpokorny)
 
     Port of JG uv_mapping for cylinder and cone. (#131)
 
     Note I flipped the UV mapping in V as it looked upside down to the usual
     POV-Ray UV mapping. Related comments in the code.
 
-Commit 2ec18ab on 2016-11-15 by William F. Pokorny (wfpokorny)
+Commit 2ec18abc on 2016-11-15 by William F. Pokorny (wfpokorny)
 
     Fix placement of break statement in Solve_Polynomial. (#143)
 
     See:
     [newsgroup post <web.580874a6f9e539ccf4af9d600@news.povray.org>]
 
-Commit b458018 on 2016-11-15 by Christoph Lipka
+Commit b4580182 on 2016-11-15 by Christoph Lipka
 
     [ci skip] Trim down Travis CI build matrix.
 
-Commit 220b3a5 on 2016-11-12 by Christoph Lipka
+Commit 220b3a57 on 2016-11-12 by Christoph Lipka
 
     Fixed ill-formed `#error` preprocessor statements.
 
@@ -891,19 +1009,19 @@ Commit 220b3a5 on 2016-11-12 by Christoph Lipka
     enclosed in double quotes. For consistency, double quotes have also
     been added to other `#error` statements.
 
-Commit d62de5c on 2016-11-06 by Christoph Lipka
+Commit d62de5cb on 2016-11-06 by Christoph Lipka
 
     Fix FlySpray task 336 (http://bugs.povray.org/task/336).
 
-Commit 8c8a18f on 2016-10-19 by Christoph Lipka
+Commit 8c8a18f7 on 2016-10-19 by Christoph Lipka
 
     Fix GitHub issue #124.
 
-Commit 3cd6b6c on 2016-10-13 by Christoph Lipka
+Commit 3cd6b6ce on 2016-10-13 by Christoph Lipka
 
     Fix an issue with the previous commit.
 
-Commit bbb4643 on 2016-10-13 by Christoph Lipka
+Commit bbb46437 on 2016-10-13 by Christoph Lipka
 
     Fix a couple of issues discovered by static code analysis.
 
@@ -911,11 +1029,11 @@ Commit bbb4643 on 2016-10-13 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8826150
 ------------------------------------------------------------------------------
 
-Commit b24c6c7 on 2016-10-12 by Christoph Lipka
+Commit b24c6c78 on 2016-10-12 by Christoph Lipka
 
     Fix unix build error introduced with previous commit.
 
-Commit 269cc8e on 2016-10-12 by Christoph Lipka
+Commit 269cc8ec on 2016-10-12 by Christoph Lipka
 
     Overhauled mechanism for output file gamma default.
 
@@ -931,26 +1049,26 @@ Commit 269cc8e on 2016-10-12 by Christoph Lipka
       but in practice this was overridden by the now-eliminated `File_Gamma`
       default.
 
-Commit 6838c28 on 2016-10-11 by Christoph Lipka
+Commit 6838c286 on 2016-10-11 by Christoph Lipka
 
     Suppress PNG file oFFs chunk creation if offset is zero.
 
-Commit cc2d946 on 2016-10-09 by Christoph Lipka
+Commit cc2d946e on 2016-10-09 by Christoph Lipka
 
     [ci skip] Minor update to build status section in `README.md`.
 
-Commit a1d372e on 2016-10-09 by Christoph Lipka
+Commit a1d372e1 on 2016-10-09 by Christoph Lipka
 
     Add master branch build status to `README.md`.
 
-Commit 29d5251 on 2016-10-09 by Christoph Lipka
+Commit 29d52514 on 2016-10-09 by Christoph Lipka
 
     Fix compatibility with libjpeg 8b and earlier.
 
     Also fixing the format in which we're reporting the libjpeg version
     number to the user.
 
-Commit 8e619b3 on 2016-10-09 by Christoph Lipka
+Commit 8e619b32 on 2016-10-09 by Christoph Lipka
 
     Eliminate use of `jversion.h`.
 
@@ -960,23 +1078,23 @@ Commit 8e619b3 on 2016-10-09 by Christoph Lipka
     effect we can now stop creating a fake `jversion.h` as part of the Unix
     build process.
 
-Commit a70069e on 2016-10-09 by Christoph Lipka
+Commit a70069ed on 2016-10-09 by Christoph Lipka
 
     Enable automated Mac OS X build testing.
 
-Commit d451fc5 on 2016-10-09 by Christoph Lipka
+Commit d451fc52 on 2016-10-09 by Christoph Lipka
 
     Fixed a few coding flaws discovered by clang.
 
-Commit c470dae on 2016-10-09 by Christoph Lipka
+Commit c470daee on 2016-10-09 by Christoph Lipka
 
     Hopefully fix Unix build error introduced with commit be34de4.
 
-Commit 261f57f on 2016-10-09 by Christoph Lipka
+Commit 261f57fd on 2016-10-09 by Christoph Lipka
 
     Forgot to include some changes in previous commit; fixed.
 
-Commit be34de4 on 2016-10-09 by Christoph Lipka
+Commit be34de43 on 2016-10-09 by Christoph Lipka
 
     Major overhaul of Netpbm (PGM/PPM) input, fixing GitHub issue #111.
 
@@ -984,7 +1102,7 @@ Commit be34de4 on 2016-10-09 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8820458
 ------------------------------------------------------------------------------
 
-Commit 66cef4e on 2016-10-08 by Christoph Lipka
+Commit 66cef4ed on 2016-10-08 by Christoph Lipka
 
     Partially fix GitHub issue #110.
 
@@ -999,50 +1117,50 @@ Commit 66cef4e on 2016-10-08 by Christoph Lipka
     are now valid parameters for the `assumed_gamma` global setting and the
     `Display_Gamma` INI setting.
 
-Commit 598f29a on 2016-10-06 by William F. Pokorny (wfpokorny)
+Commit 598f29af on 2016-10-06 by William F. Pokorny (wfpokorny)
 
     Adding parser warning on float promote to full color vector. (#91)
 
     These promotions create colors with filter and transmit values >0 which
     cause shadow artifacts back to at least version 3.6.1.
 
-Commit 089a77c on 2016-10-06 by Ben Small (BentSm)
+Commit 089a77c7 on 2016-10-06 by Ben Small (BentSm)
 
     Added unix/config/compile to .gitignore and unix/prebuild.sh cleanup,
     (#108)
 
-Commit 7e6a9c7 on 2016-10-02 by William F. Pokorny (wfpokorny)
+Commit 7e6a9c71 on 2016-10-02 by William F. Pokorny (wfpokorny)
 
     Fixing potential pattern threshold keyword use in function. (#94)
 
     When used in a pattern function, the `potential` pattern erroneously
     failed to support the `threshold` keyword.
 
-Commit 3f48996 on 2016-10-02 by Ben Small (BentSm)
+Commit 3f489964 on 2016-10-02 by Ben Small (BentSm)
 
     Replaced broken comparison in hdr.cpp (#106)
 
     Replaced invalid comparison of IStream to bool.
 
-Commit 606fd2e on 2016-10-02 by Ben Small (BentSm)
+Commit 606fd2e3 on 2016-10-02 by Ben Small (BentSm)
 
     Fixed file append bug (#105)
 
     Fixed silent failure when attempting to append to files.
 
-Commit ffc1b74 on 2016-10-01 by William F. Pokorny (wfpokorny)
+Commit ffc1b74c on 2016-10-01 by William F. Pokorny (wfpokorny)
 
     Fixing tiling pattern use in functions. (#96)
 
-Commit 4821b7d on 2016-10-01 by William F. Pokorny (wfpokorny)
+Commit 4821b7d8 on 2016-10-01 by William F. Pokorny (wfpokorny)
 
     Adding shapes.inc include to all HF_ macro templates. (#103)
 
-Commit 6e2d27b on 2016-10-01 by Christoph Lipka
+Commit 6e2d27b4 on 2016-10-01 by Christoph Lipka
 
     Fixed issues with default Timer class and Delay function.
 
-Commit 308dbdf on 2016-10-01 by Ben Small (BentSm)
+Commit 308dbdfe on 2016-10-01 by Ben Small (BentSm)
 
     Fix 4D vector parsing anomaly (#102)
 
@@ -1056,53 +1174,53 @@ Commit 308dbdf on 2016-10-01 by Ben Small (BentSm)
 POV-Ray v3.7.1-alpha.8809617
 ------------------------------------------------------------------------------
 
-Commit d410909 on 2016-09-30 by Christoph Lipka
+Commit d4109092 on 2016-09-30 by Christoph Lipka
 
     Ditching the idea of having unique version numbers for every commit.
 
-Commit a6d5591 on 2016-09-30 by Christoph Lipka
+Commit a6d55918 on 2016-09-30 by Christoph Lipka
 
     Update to Git pre-commit hook. Also fixed Travis CI clang builds.
 
-Commit 6e73117 on 2016-09-30 by William F. Pokorny (wfpokorny)
+Commit 6e731179 on 2016-09-30 by William F. Pokorny (wfpokorny)
 
     Correcting small typo in lemon.cpp comment. (#95)
 
-Commit ceafcc0 on 2016-09-30 by William F. Pokorny (wfpokorny)
+Commit ceafcc0c on 2016-09-30 by William F. Pokorny (wfpokorny)
 
     Adding missing close paren in 30_HF_Sphere_macro.txt (#101)
 
     Reported by omniverse on povray.documentation.inbuilt.
 
-Commit e70a6f0 on 2016-09-30 by William F. Pokorny (wfpokorny)
+Commit e70a6f01 on 2016-09-30 by William F. Pokorny (wfpokorny)
 
     Adding switch code to tiling.pov with scaling information. (#100)
 
-Commit a77e827 on 2016-09-30 by William F. Pokorny (wfpokorny)
+Commit a77e8278 on 2016-09-30 by William F. Pokorny (wfpokorny)
 
     Fixing pavement pattern use in functions. (#99)
 
-Commit 5c706d7 on 2016-09-30 by William F. Pokorny (wfpokorny)
+Commit 5c706d79 on 2016-09-30 by William F. Pokorny (wfpokorny)
 
     Adding pavement pattern demo scene file to distribution. (#97)
 
-Commit b4e5a7d on 2016-09-26 by Christoph Lipka
+Commit b4e5a7d0 on 2016-09-26 by Christoph Lipka
 
     Fix error in previous commit.
 
-Commit a68a23e on 2016-09-26 by Christoph Lipka
+Commit a68a23e3 on 2016-09-26 by Christoph Lipka
 
     Fix GitHub issue #98, plus a similar problem in the new OBJ import.
 
-Commit 2c3b3d6 on 2016-09-22 by Christoph Lipka
+Commit 2c3b3d62 on 2016-09-22 by Christoph Lipka
 
     Fix `+A.n` command line option.
 
-Commit 01febac on 2016-09-18 by Christoph Lipka
+Commit 01febac3 on 2016-09-18 by Christoph Lipka
 
     Fail more gracefully when encountering an empty `normal{}` statement.
 
-Commit ba30980 on 2016-09-17 by Christoph Lipka
+Commit ba309803 on 2016-09-17 by Christoph Lipka
 
     A bit more housekeeping.
 
@@ -1110,23 +1228,23 @@ Commit ba30980 on 2016-09-17 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8789352
 ------------------------------------------------------------------------------
 
-Commit 08262ab on 2016-09-16 by Christoph Lipka
+Commit 08262ab3 on 2016-09-16 by Christoph Lipka
 
     Miscellaneous housekeeping.
 
-Commit 23f936a on 2016-09-15 by Christoph Lipka
+Commit 23f936a6 on 2016-09-15 by Christoph Lipka
 
     Implemented `potential` pattern and isosurface `polarity` keyword. (#88)
 
-Commit c52c176 on 2016-09-15 by Christoph Lipka
+Commit c52c176d on 2016-09-15 by Christoph Lipka
 
     Implemented basic Wavefront OBJ import. (#90)
 
-Commit 7d06e7f on 2016-09-09 by Christoph Lipka
+Commit 7d06e7fe on 2016-09-09 by Christoph Lipka
 
     Fixed some parser flaws related to the re-defining of variables.
 
-Commit f1b394a on 2016-09-08 by Christoph Lipka
+Commit f1b394a7 on 2016-09-08 by Christoph Lipka
 
     Address some issues in base and core modules found by static code
     analysis.
@@ -1137,11 +1255,11 @@ Commit f1b394a on 2016-09-08 by Christoph Lipka
     CID 1372653-1372654, plus various issues related to Coverity not
     understanding some of our `POV_*_ASSERT()` macros.
 
-Commit 0147678 on 2016-09-08 by Christoph Lipka
+Commit 01476788 on 2016-09-08 by Christoph Lipka
 
     Help static code analysis tools better understand our code.
 
-Commit 3220eb6 on 2016-09-08 by Christoph Lipka
+Commit 3220eb61 on 2016-09-08 by Christoph Lipka
 
     Relaxed our enforcement of an initial `#version` directive.
 
@@ -1150,7 +1268,7 @@ Commit 3220eb6 on 2016-09-08 by Christoph Lipka
     if the version demanded is 3.7.0. (It still causes an error if the
     version demanded is 3.7.1 or higher.)
 
-Commit 486a48f on 2016-09-08 by Christoph Lipka
+Commit 486a48f5 on 2016-09-08 by Christoph Lipka
 
     Overhauled list of reserved words.
 
@@ -1159,23 +1277,23 @@ Commit 486a48f on 2016-09-08 by Christoph Lipka
     so that `reservedwords.h` no longer needs placeholders for tokens with
     alternative spelling (e.g. `color` and `colour`).
 
-Commit 5988aec on 2016-09-08 by Christoph Lipka
+Commit 5988aec3 on 2016-09-08 by Christoph Lipka
 
     [ci skip] Update to AppVeyor config.
 
-Commit ff0fbcd on 2016-09-08 by Christoph Lipka
+Commit ff0fbcd1 on 2016-09-08 by Christoph Lipka
 
     [ci skip] Reverted order of automated builds, to build 64-bit version
     first.
 
-Commit f547721 on 2016-09-08 by Christoph Lipka
+Commit f5477210 on 2016-09-08 by Christoph Lipka
 
     Fixed a few bugs found by static code analysis.
 
     Addressed Coverity Scan issues CID 1372548, CID 1372555-1372557, CID
     1372562, CID 1372655-1372657.
 
-Commit 8442344 on 2016-09-07 by Christoph Lipka
+Commit 84423445 on 2016-09-07 by Christoph Lipka
 
     Fixed minor flaw in Visual Studio project for the VFE module.
 
@@ -1183,33 +1301,33 @@ Commit 8442344 on 2016-09-07 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8776412
 ------------------------------------------------------------------------------
 
-Commit 04fb97e on 2016-09-07 by Christoph Lipka
+Commit 04fb97ea on 2016-09-07 by Christoph Lipka
 
     FIx Windows build error.
 
-Commit 6b6b1b3 on 2016-09-07 by Christoph Lipka
+Commit 6b6b1b32 on 2016-09-07 by Christoph Lipka
 
     Fix unix build errors introduced with the previous commit.
 
-Commit e50d5b4 on 2016-09-07 by Christoph Lipka
+Commit e50d5b4a on 2016-09-07 by Christoph Lipka
 
     Removed all remaining dependencies on the `vfe` module from the `backend`,
     `base` and `frontend` modules.
 
-Commit f53e52a on 2016-09-05 by Christoph Lipka
+Commit f53e52aa on 2016-09-05 by Christoph Lipka
 
     [ci skip] Source documentation housekeeping; we're now relying on
     Doxygen 1.8.12.
 
-Commit 8673205 on 2016-09-05 by William F. Pokorny (wfpokorny)
+Commit 86732052 on 2016-09-05 by William F. Pokorny (wfpokorny)
 
     Porting Jerome Grimbert's lemon object to master. (#84)
 
-Commit a92639e on 2016-09-05 by Christoph Lipka
+Commit a92639e2 on 2016-09-05 by Christoph Lipka
 
     [ci skip] Some git housekeeping.
 
-Commit 3e59e15 on 2016-09-05 by William F. Pokorny (wfpokorny)
+Commit 3e59e155 on 2016-09-05 by William F. Pokorny (wfpokorny)
 
     [ci skip] Adding new platform/Makefile variants to .gitignore (#85)
 
@@ -1217,43 +1335,43 @@ Commit 3e59e15 on 2016-09-05 by William F. Pokorny (wfpokorny)
 POV-Ray v3.7.1-alpha.8772883
 ------------------------------------------------------------------------------
 
-Commit e600a5f on 2016-09-05 by Christoph Lipka
+Commit e600a5f7 on 2016-09-05 by Christoph Lipka
 
     Fixed typo in `configure.ac`.
 
-Commit e4ce574 on 2016-09-05 by Christoph Lipka
+Commit e4ce5741 on 2016-09-05 by Christoph Lipka
 
     This should fix the Unix build at last.
 
-Commit e921ef4 on 2016-09-04 by Christoph Lipka
+Commit e921ef4c on 2016-09-04 by Christoph Lipka
 
     Further work on Unix build, adding makefile for `platform/unix`.
 
-Commit ecd0799 on 2016-09-04 by Christoph Lipka
+Commit ecd07990 on 2016-09-04 by Christoph Lipka
 
     Fix a fourth unix build error.
 
-Commit 41ed63c on 2016-09-04 by Christoph Lipka
+Commit 41ed63c8 on 2016-09-04 by Christoph Lipka
 
     Fix a third unix build error (hopefully).
 
-Commit 448f5bb on 2016-09-04 by Christoph Lipka
+Commit 448f5bbf on 2016-09-04 by Christoph Lipka
 
     Fix another Unix build error.
 
-Commit 08fc136 on 2016-09-04 by Christoph Lipka
+Commit 08fc1365 on 2016-09-04 by Christoph Lipka
 
     Fix unix build error.
 
-Commit b404e9f on 2016-09-04 by Christoph Lipka
+Commit b404e9f3 on 2016-09-04 by Christoph Lipka
 
     Changed Angular Map to map type 7 to match MegaPOV.
 
-Commit 09a4582 on 2016-09-04 by Christoph Lipka
+Commit 09a4582e on 2016-09-04 by Christoph Lipka
 
     Merge remote-tracking branch 'origin/master'
 
-Commit 46e227f on 2016-09-04 by Denis Bodor
+Commit 46e227f7 on 2016-09-04 by Denis Bodor
 
     [ci skip] Added support for Angular Map projection for input images. (#41)
 
@@ -1261,20 +1379,20 @@ Commit 46e227f on 2016-09-04 by Denis Bodor
     "Angular Map" light probe projection popularized by Paul Devebec
     (corresponding to MegaPOV map type 7).
 
-Commit 619e0f7 on 2016-09-04 by Christoph Lipka
+Commit 619e0f7c on 2016-09-04 by Christoph Lipka
 
     [ci skip] Giving up on our attempts to set up automated XP-compatible
     builds for now.
 
-Commit bc3ebd2 on 2016-09-02 by Christoph Lipka
+Commit bc3ebd2a on 2016-09-02 by Christoph Lipka
 
     [ci skip] Updates to the source code documentation.
 
-Commit 8ce6457 on 2016-08-31 by Christoph Lipka
+Commit 8ce64574 on 2016-08-31 by Christoph Lipka
 
     Refactored and overhauled timer handling.
 
-Commit 47d2603 on 2016-08-31 by Christoph Lipka
+Commit 47d2603f on 2016-08-31 by Christoph Lipka
 
     Improved separation of modules.
 
@@ -1287,17 +1405,17 @@ Commit 47d2603 on 2016-08-31 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8764097
 ------------------------------------------------------------------------------
 
-Commit 8afb143 on 2016-08-30 by Christoph Lipka
+Commit 8afb1435 on 2016-08-30 by Christoph Lipka
 
     Trying to make automated 64-bit Windows builds compatible with Windows
     XP again. (#83)
 
-Commit 46c9ecb on 2016-08-24 by Christoph Lipka
+Commit 46c9ecb6 on 2016-08-24 by Christoph Lipka
 
     Clean up error message for pigment/normal/density variant of
     `max_extent()` function.
 
-Commit f162f53 on 2016-08-22 by William F. Pokorny (wfpokorny)
+Commit f162f530 on 2016-08-22 by William F. Pokorny (wfpokorny)
 
     Adding df3, density_file query range support to max_extent. (#80)
 
@@ -1312,12 +1430,12 @@ Commit f162f53 on 2016-08-22 by William F. Pokorny (wfpokorny)
       for image and density_file range determination with max_extent. Also
       re-worked the conditionals as requested.
 
-Commit 79f6c9b on 2016-08-18 by Christoph Lipka
+Commit 79f6c9bf on 2016-08-18 by Christoph Lipka
 
     Fixed bug in flat trianges that could cause interior_texture to show
     on the wrong side.
 
-Commit 4d52c26 on 2016-08-12 by Christoph Lipka
+Commit 4d52c264 on 2016-08-12 by Christoph Lipka
 
     Fixed a bug causing radiosity to ignore refracted `no_image` objects.
 
@@ -1325,15 +1443,15 @@ Commit 4d52c26 on 2016-08-12 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8737777
 ------------------------------------------------------------------------------
 
-Commit 50f20db on 2016-08-11 by Christoph Lipka
+Commit 50f20db4 on 2016-08-11 by Christoph Lipka
 
     Fixed bug in transformed spheres introduced with commit 53f0ebd.
 
-Commit 6418cd0 on 2016-08-10 by Christoph Lipka
+Commit 6418cd0c on 2016-08-10 by Christoph Lipka
 
     Fix `repeat` in crackle pattern not allowing further object modifiers.
 
-Commit 6997488 on 2016-08-07 by Christoph Lipka
+Commit 6997488e on 2016-08-07 by Christoph Lipka
 
     Fixed memory leak in textured `projected_through` objects.
 
@@ -1341,7 +1459,7 @@ Commit 6997488 on 2016-08-07 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8730959
 ------------------------------------------------------------------------------
 
-Commit 53f0ebd on 2016-08-07 by Christoph Lipka
+Commit 53f0ebd6 on 2016-08-07 by Christoph Lipka
 
     Reduced memory footprint of sphere primitive.
 
@@ -1354,23 +1472,23 @@ Commit 53f0ebd on 2016-08-07 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8704732
 ------------------------------------------------------------------------------
 
-Commit 8e965a9 on 2016-07-20 by Christoph Lipka
+Commit 8e965a93 on 2016-07-20 by Christoph Lipka
 
     Improved cached macro performance.
 
-Commit fa3a1dc on 2016-07-18 by Christoph Lipka
+Commit fa3a1dc3 on 2016-07-18 by Christoph Lipka
 
     Fixed a code flaw in macro caching.
 
-Commit 39a6c9f on 2016-07-17 by Christoph Lipka
+Commit 39a6c9f4 on 2016-07-17 by Christoph Lipka
 
     [ci skip] Minor changes to comments and dev documentation.
 
-Commit edfae26 on 2016-07-15 by Christoph Lipka
+Commit edfae26c on 2016-07-15 by Christoph Lipka
 
     Fixed a bug in cleanup of fog with turbulence.
 
-Commit 3b5b4eb on 2016-07-15 by gryken2014
+Commit 3b5b4ebe on 2016-07-15 by gryken2014
 
     added missing file pavement_s3_t6_p12.txt / issue #37 (#77)
 
@@ -1378,7 +1496,7 @@ Commit 3b5b4eb on 2016-07-15 by gryken2014
 POV-Ray v3.7.1-alpha.8697421
 ------------------------------------------------------------------------------
 
-Commit 051b674 on 2016-07-15 by Christoph Lipka
+Commit 051b674d on 2016-07-15 by Christoph Lipka
 
     Implemented macro caching.
 
@@ -1386,18 +1504,18 @@ Commit 051b674 on 2016-07-15 by Christoph Lipka
     macro) are now cached in memory, improving parsing speed of invocations,
     especially when the macro in question is defined in a different file.
 
-Commit 2d0a42c on 2016-07-14 by gryken2014
+Commit 2d0a42cf on 2016-07-14 by gryken2014
 
     fix filenames / issue #36 (#76)
 
-Commit 4e714f1 on 2016-07-14 by Christoph Lipka
+Commit 4e714f1c on 2016-07-14 by Christoph Lipka
 
     Fix flaws in `randomsequence.cpp` and `randomsequence.h`.
 
     - Eliminate SIZE_MAX hack.
     - Eliminate obsolete include.
 
-Commit d3c3fd5 on 2016-07-14 by gryken2014
+Commit d3c3fd51 on 2016-07-14 by gryken2014
 
     fix filename / issue #38 (#75)
 
@@ -1405,41 +1523,41 @@ Commit d3c3fd5 on 2016-07-14 by gryken2014
 POV-Ray v3.7.1-alpha.8696519
 ------------------------------------------------------------------------------
 
-Commit 2dc0dad on 2016-07-14 by Christoph Lipka
+Commit 2dc0dadc on 2016-07-14 by Christoph Lipka
 
     Added support for Diffusion and Floyd-Steinberg dithering in HDR output.
 
-Commit 550e602 on 2016-07-13 by Christoph Lipka
+Commit 550e6028 on 2016-07-13 by Christoph Lipka
 
     Fixed broken error message when expecting opening curly brace.
 
-Commit 6e54a1f on 2016-07-10 by Christoph Lipka
+Commit 6e54a1fe on 2016-07-10 by Christoph Lipka
 
     All instances of `gray` in keywords or INI file options can now
     alternatively be spelt `grey`.
 
-Commit df5fc7a on 2016-07-10 by William F. Pokorny (wfpokorny)
+Commit df5fc7a5 on 2016-07-10 by William F. Pokorny (wfpokorny)
 
     Adding user_defined camera example scene (#72)
 
-Commit 57077c3 on 2016-07-10 by William F. Pokorny (wfpokorny)
+Commit 57077c3d on 2016-07-10 by William F. Pokorny (wfpokorny)
 
     Fixing a typo in scenes file incdemo.htm (#71)
 
-Commit 0889275 on 2016-06-16 by Christoph Lipka
+Commit 08892759 on 2016-06-16 by Christoph Lipka
 
     Fix isosurface bug introduced with commit a10629b.
 
-Commit 05ca335 on 2016-06-11 by Christoph Lipka
+Commit 05ca335a on 2016-06-11 by Christoph Lipka
 
     Minor fixes to the `GenericRGBColour` and `GenericColour` classes.
 
-Commit 1f7fdef on 2016-06-03 by Christoph Lipka
+Commit 1f7fdef1 on 2016-06-03 by Christoph Lipka
 
     Fixed the designated default implementation for the `POV_TIMER`
     platform-specific millisecond timer.
 
-Commit 6576907 on 2016-06-03 by Christoph Lipka
+Commit 65769073 on 2016-06-03 by Christoph Lipka
 
     Fix an issue in the user-defined function cleanup.
 
@@ -1451,25 +1569,25 @@ Commit 6576907 on 2016-06-03 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8615129
 ------------------------------------------------------------------------------
 
-Commit 3c07635 on 2016-05-18 by Christoph Lipka
+Commit 3c076350 on 2016-05-18 by Christoph Lipka
 
     Fix GitHub issue #63.
 
-Commit 2ec4a4e on 2016-05-18 by Christoph Lipka
+Commit 2ec4a4e8 on 2016-05-18 by Christoph Lipka
 
     Merge pull request #62 from wfpokorny/master
 
     Lathe parser updates related to github issue #60
 
-Commit 0e72828 on 2016-05-18 by William F Pokorny
+Commit 0e72828b on 2016-05-18 by William F Pokorny
 
     Updated warning control variable to bool per Christoph. Issue #60
 
-Commit b17450c on 2016-05-14 by William F Pokorny
+Commit b17450c1 on 2016-05-14 by William F Pokorny
 
     Lathe parser updates related to github issue #60
 
-Commit c51505d on 2016-05-12 by William F. Pokorny (wfpokorny)
+Commit c51505d9 on 2016-05-12 by William F. Pokorny (wfpokorny)
 
     Merge pull request #1 from POV-Ray/master
 
@@ -1479,38 +1597,38 @@ Commit c51505d on 2016-05-12 by William F. Pokorny (wfpokorny)
 POV-Ray v3.7.1-alpha.8600570
 ------------------------------------------------------------------------------
 
-Commit 5c8fb1d on 2016-05-08 by Christoph Lipka
+Commit 5c8fb1df on 2016-05-08 by Christoph Lipka
 
     Fixed memory leak in pattern cleanup.
 
-Commit a666f07 on 2016-05-05 by Christoph Lipka
+Commit a666f07a on 2016-05-05 by Christoph Lipka
 
     [ci skip] Updated `revision.txt` and cleaned up whitespace in
     `changes.txt`.
 
-Commit fad8dda on 2016-05-05 by Christoph Lipka
+Commit fad8dda1 on 2016-05-05 by Christoph Lipka
 
     Forgot to include changes to `reservedwords.cpp` in previous
     commit. Fixed.
 
-Commit 6eb488e on 2016-05-05 by Christoph Lipka
+Commit 6eb488e6 on 2016-05-05 by Christoph Lipka
 
     Added `global()` pseudo-function to match the earlier `local()`
     pseudo-function.
 
-Commit de317f1 on 2016-05-05 by Christoph Lipka
+Commit de317f1a on 2016-05-05 by Christoph Lipka
 
     [ci skip] Added sample scene to demonstrate spindle torus options.
 
-Commit c326111 on 2016-04-29 by Christoph Lipka
+Commit c326111f on 2016-04-29 by Christoph Lipka
 
     [ci skip] Another fix to the AppVeyor config.
 
-Commit 796039b on 2016-04-29 by Christoph Lipka
+Commit 796039be on 2016-04-29 by Christoph Lipka
 
     [ci skip] Fixed AppVeyor config.
 
-Commit e287133 on 2016-04-29 by Christoph Lipka
+Commit e287133b on 2016-04-29 by Christoph Lipka
 
     Updated AppVeyor config.
 
@@ -1520,7 +1638,7 @@ Commit e287133 on 2016-04-29 by Christoph Lipka
 
     Also updated the developers' documentation on version numbering.
 
-Commit a04e0ef on 2016-04-29 by Christoph Lipka
+Commit a04e0ef8 on 2016-04-29 by Christoph Lipka
 
     Changed INI file parser to no longer issue a warning on trailing
     whitespace.
@@ -1532,7 +1650,7 @@ Commit a04e0ef on 2016-04-29 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8586521
 ------------------------------------------------------------------------------
 
-Commit eeeb039 on 2016-04-28 by Christoph Lipka
+Commit eeeb039d on 2016-04-28 by Christoph Lipka
 
     Overhauled frame number handling in animation status messages.
 
@@ -1542,34 +1660,34 @@ Commit eeeb039 on 2016-04-28 by Christoph Lipka
     Additionally, the status messages now also show the nominal frame number
     as used in the `frame_number` variable and the output filename.
 
-Commit 8706877 on 2016-04-26 by Christoph Lipka
+Commit 87068771 on 2016-04-26 by Christoph Lipka
 
     [ci skip] Updated `changes.txt` and `revision.txt`, and added a Unix
     shell script to help keep the latter up to date.
 
-Commit be8158a on 2016-04-25 by Christoph Lipka
+Commit be8158ab on 2016-04-25 by Christoph Lipka
 
     Fixed wrong include for `std::tr1::array` in `parametric.cpp`.
 
-Commit a10629b on 2016-04-24 by Christoph Lipka
+Commit a10629bf on 2016-04-24 by Christoph Lipka
 
     Internal changes to user-defined function handling.
 
-Commit 8df1db3 on 2016-04-14 by Christoph Lipka
+Commit 8df1db33 on 2016-04-14 by Christoph Lipka
 
     Added inbuilt support for tau constant (=2*pi).
 
-Commit de214eb on 2016-04-12 by Christoph Lipka
+Commit de214ebb on 2016-04-12 by Christoph Lipka
 
     Fixed an uninitialized data bug in POVMS that would cause povray to
     crash hard on some platforms.
 
-Commit 2bf2c56 on 2016-04-11 by Christoph Lipka
+Commit 2bf2c561 on 2016-04-11 by Christoph Lipka
 
     [ci skip] Added mention of `prebuild.sh` to unix README and INSTALL
     instructions.
 
-Commit 94eeba7 on 2016-04-08 by Christoph Lipka
+Commit 94eeba73 on 2016-04-08 by Christoph Lipka
 
     Fixed repeating crackle pattern not working in pattern functions.
 
@@ -1577,13 +1695,13 @@ Commit 94eeba7 on 2016-04-08 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8514084
 ------------------------------------------------------------------------------
 
-Commit 0a062cc on 2016-03-12 by Christoph Lipka
+Commit 0a062cca on 2016-03-12 by Christoph Lipka
 
     Merge pull request #56 from wfpokorny/master
 
     Update vector.h
 
-Commit 06268c3 on 2016-03-11 by William F. Pokorny (wfpokorny)
+Commit 06268c38 on 2016-03-11 by William F. Pokorny (wfpokorny)
 
     Update vector.h
 
@@ -1596,7 +1714,7 @@ Commit 06268c3 on 2016-03-11 by William F. Pokorny (wfpokorny)
 POV-Ray v3.7.1-alpha.8514084
 ------------------------------------------------------------------------------
 
-Commit 1eca8d0 on 2016-03-09 by Christoph Lipka
+Commit 1eca8d0e on 2016-03-09 by Christoph Lipka
 
     Added repeating crackle pattern.
 
@@ -1609,7 +1727,7 @@ Commit 1eca8d0 on 2016-03-09 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8509766
 ------------------------------------------------------------------------------
 
-Commit c5f8d78 on 2016-03-06 by Christoph Lipka
+Commit c5f8d78e on 2016-03-06 by Christoph Lipka
 
     Added function-based user-defined camera.
 
@@ -1622,15 +1740,15 @@ Commit c5f8d78 on 2016-03-06 by Christoph Lipka
     a ray origin and direction for a given pixel. A direction of <0,0,0>
     indicates that the pixel is to be left black.
 
-Commit 9adacd7 on 2016-03-05 by Christoph Lipka
+Commit 9adacd7a on 2016-03-05 by Christoph Lipka
 
     Fixed bug in bezier primitive caused by uninitialized data.
 
-Commit 0c1607c on 2016-03-05 by Christoph Lipka
+Commit 0c1607cc on 2016-03-05 by Christoph Lipka
 
     Fixed another bug in the user-defined function cleanup.
 
-Commit c891131 on 2016-03-05 by Christoph Lipka
+Commit c8911315 on 2016-03-05 by Christoph Lipka
 
     Fixed two mesh camera bugs and other camera flaws.
 
@@ -1642,7 +1760,7 @@ Commit c891131 on 2016-03-05 by Christoph Lipka
       of a media container.
     - A bit of refactoring (changed `TracePixel::operator()` semantics).
 
-Commit 167ed19 on 2016-03-02 by Christoph Lipka
+Commit 167ed19d on 2016-03-02 by Christoph Lipka
 
     [ci skip] Fixed a bug and a flaw in the sample scenes.
 
@@ -1650,11 +1768,11 @@ Commit 167ed19 on 2016-03-02 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8503825
 ------------------------------------------------------------------------------
 
-Commit 10465bb on 2016-03-02 by Christoph Lipka
+Commit 10465bbc on 2016-03-02 by Christoph Lipka
 
     Fixed build error in previous commit.
 
-Commit 010dba5 on 2016-03-02 by Christoph Lipka
+Commit 010dba52 on 2016-03-02 by Christoph Lipka
 
     Fixed some crashes related to mismatched parentheses in conditionals
     or loops.
@@ -1667,7 +1785,7 @@ Commit 010dba5 on 2016-03-02 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8499454
 ------------------------------------------------------------------------------
 
-Commit 5b5e312 on 2016-02-28 by Christoph Lipka
+Commit 5b5e3125 on 2016-02-28 by Christoph Lipka
 
     Fixed bug in media photons.
 
@@ -1675,7 +1793,7 @@ Commit 5b5e312 on 2016-02-28 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8498421
 ------------------------------------------------------------------------------
 
-Commit 6211eee on 2016-02-27 by Christoph Lipka
+Commit 6211eee2 on 2016-02-27 by Christoph Lipka
 
     Fixed bug in splines even more.
 
@@ -1683,11 +1801,11 @@ Commit 6211eee on 2016-02-27 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8498353
 ------------------------------------------------------------------------------
 
-Commit 832d571 on 2016-02-27 by Christoph Lipka
+Commit 832d5713 on 2016-02-27 by Christoph Lipka
 
     Fixed bug in splines.
 
-Commit 147066f on 2016-02-27 by Christoph Lipka
+Commit 147066f7 on 2016-02-27 by Christoph Lipka
 
     Fixed bug in `animations/reflection` sample scene INI file.
 
@@ -1695,7 +1813,7 @@ Commit 147066f on 2016-02-27 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8497793
 ------------------------------------------------------------------------------
 
-Commit f6888be on 2016-02-27 by Christoph Lipka
+Commit f6888be8 on 2016-02-27 by Christoph Lipka
 
     Eliminated some inconsistencies in RGBE-format colour handling.
 
@@ -1703,7 +1821,7 @@ Commit f6888be on 2016-02-27 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8492620
 ------------------------------------------------------------------------------
 
-Commit 9762bc5 on 2016-02-23 by Christoph Lipka
+Commit 9762bc5a on 2016-02-23 by Christoph Lipka
 
     Fixed a bug in the copying of multi-textured blobs.
 
@@ -1711,14 +1829,14 @@ Commit 9762bc5 on 2016-02-23 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8463913
 ------------------------------------------------------------------------------
 
-Commit 0f349a7 on 2016-02-18 by Christoph Lipka
+Commit 0f349a7a on 2016-02-18 by Christoph Lipka
 
     Fixed a bug in the cleanup of sky_sphere transforms.
 
     Also cleaned up cleanup (no pun intended) of object transforms along
     the way.
 
-Commit 373f727 on 2016-02-05 by Christoph Lipka
+Commit 373f7270 on 2016-02-05 by Christoph Lipka
 
     [ci skip] Changed GitHub release description in AppVeyor build settings.
 
@@ -1726,21 +1844,21 @@ Commit 373f727 on 2016-02-05 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8463913
 ------------------------------------------------------------------------------
 
-Commit 2a06a9d on 2016-02-05 by Christoph Lipka
+Commit 2a06a9d5 on 2016-02-05 by Christoph Lipka
 
     [ci skip] Changed AppVeyor build settings to produce Windows XP-compatible
     dev builds.
 
-Commit 50c9c67 on 2016-02-03 by Christoph Lipka
+Commit 50c9c67d on 2016-02-03 by Christoph Lipka
 
     Fixed a bug in the user-defined function cleanup.
 
-Commit 13e48ab on 2016-01-31 by Christoph Lipka
+Commit 13e48abf on 2016-01-31 by Christoph Lipka
 
     [ci skip] Updated Travis CI configuration to (hopefully) fix the lack
     of notification emails.
 
-Commit c04d9c4 on 2016-01-31 by Christoph Lipka
+Commit c04d9c42 on 2016-01-31 by Christoph Lipka
 
     Addressed a potential portability issue related to shared pointers.
 
@@ -1750,16 +1868,16 @@ Commit c04d9c4 on 2016-01-31 by Christoph Lipka
     `static_pointer_cast` and `const_pointer_cast`) to pull them in from
     `std::tr1` into the default namespace.
 
-Commit 756cba6 on 2016-01-31 by Christoph Lipka
+Commit 756cba66 on 2016-01-31 by Christoph Lipka
 
     Added support for increased thread stack sizes when boost 1.50 or later
     is used.
 
-Commit 2ea0b83 on 2016-01-28 by Christoph Lipka
+Commit 2ea0b83e on 2016-01-28 by Christoph Lipka
 
     Fix broken Unix build.
 
-Commit fdcb367 on 2016-01-28 by Christoph Lipka
+Commit fdcb3676 on 2016-01-28 by Christoph Lipka
 
     Overhauled POVMS config settings.
 
@@ -1769,7 +1887,7 @@ Commit fdcb367 on 2016-01-28 by Christoph Lipka
     along the way, moved around some documentation stuff, and fixed a few
     coding flaws.
 
-Commit b9d9b25 on 2016-01-27 by Christoph Lipka
+Commit b9d9b250 on 2016-01-27 by Christoph Lipka
 
     [ci skip] Added Release-SSE2 configuration for the x64 platform to the
     Visual Studio solution.
@@ -1779,15 +1897,15 @@ Commit b9d9b25 on 2016-01-27 by Christoph Lipka
     solution level, but is configured to actually build the Release|x64
     combo of the individual projects.
 
-Commit 5eb63e8 on 2016-01-27 by Christoph Lipka
+Commit 5eb63e83 on 2016-01-27 by Christoph Lipka
 
     Fixed build dependencies related to function VM.
 
-Commit 3d04acb on 2016-01-27 by Christoph Lipka
+Commit 3d04acb1 on 2016-01-27 by Christoph Lipka
 
     Pulled function VM out of the backend project into its own new project.
 
-Commit 57e9180 on 2016-01-27 by Christoph Lipka
+Commit 57e91808 on 2016-01-27 by Christoph Lipka
 
     Trivial update to commit 601786a.
 
@@ -1795,12 +1913,12 @@ Commit 57e9180 on 2016-01-27 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8451792
 ------------------------------------------------------------------------------
 
-Commit e1cafea on 2016-01-27 by Christoph Lipka
+Commit e1cafead on 2016-01-27 by Christoph Lipka
 
     Add configuration files for automated build testing on Travis CI and
     AppVeyor.
 
-Commit 9a3567b on 2016-01-26 by Christoph Lipka
+Commit 9a3567b2 on 2016-01-26 by Christoph Lipka
 
     Ditched the `#version auto` syntax again.
 
@@ -1808,7 +1926,7 @@ Commit 9a3567b on 2016-01-26 by Christoph Lipka
     to `#version version`, so it has been removed and the use of `version`
     inside a `#version` statement un-deprecated again.
 
-Commit e1e7b0d on 2016-01-24 by Christoph Lipka
+Commit e1e7b0df on 2016-01-24 by Christoph Lipka
 
     Fix GitHub issue #53.
 
@@ -1827,12 +1945,12 @@ Commit e1e7b0d on 2016-01-24 by Christoph Lipka
         directive but does have a `#version 3.7` (or later) directive anywhere
         in the main scene file.
 
-Commit bb59a4e on 2016-01-20 by Christoph Lipka
+Commit bb59a4e1 on 2016-01-20 by Christoph Lipka
 
     Generate a parse warning when `ambient` appears to be misused to model
     glowing materials in a non-legacy scene.
 
-Commit 7d01226 on 2016-01-20 by Christoph Lipka
+Commit 7d01226b on 2016-01-20 by Christoph Lipka
 
     Fixed bug that could cause strange parse errors when including a file
     from a macro.
@@ -1848,7 +1966,7 @@ Commit 7d01226 on 2016-01-20 by Christoph Lipka
     now this has been fixed by adding a simple filename check, in order to
     minimize changes to the parser.
 
-Commit 965908d on 2016-01-12 by Christoph Lipka
+Commit 965908db on 2016-01-12 by Christoph Lipka
 
     Visual Studio projects housekeeping.
 
@@ -1856,7 +1974,7 @@ Commit 965908d on 2016-01-12 by Christoph Lipka
     - Added more project dependencies.
     - Removed unused "Backend Headers/Texture" filter from povbackend project.
 
-Commit 7889428 on 2016-01-11 by Christoph Lipka
+Commit 7889428b on 2016-01-11 by Christoph Lipka
 
     Changed input image alpha handling:
 
@@ -1866,11 +1984,11 @@ Commit 7889428 on 2016-01-11 by Christoph Lipka
       `#version 3.71`.
     - Minor code refactoring for more clarity.
 
-Commit 601786a on 2016-01-09 by Christoph Lipka
+Commit 601786a0 on 2016-01-09 by Christoph Lipka
 
     Eliminated the need for global thread-local storage.
 
-Commit 3c719d2 on 2016-01-03 by Christoph Lipka
+Commit 3c719d20 on 2016-01-03 by Christoph Lipka
 
     Trimmed down the memory footprint of all objects (except spheres).
 
@@ -1878,60 +1996,60 @@ Commit 3c719d2 on 2016-01-03 by Christoph Lipka
     `Sphere` class.
     Also did a bit of code cleanup in `trace.cpp` along the way.
 
-Commit eaeb2bf on 2016-01-03 by Christoph Lipka
+Commit eaeb2bf7 on 2016-01-03 by Christoph Lipka
 
     Minor updates to reflect the fact that the IFF image file format
     supported by POV-Ray is more precisely the IFF-based ILBM format.
 
-Commit eeeb2c5 on 2016-01-03 by Christoph Lipka
+Commit eeeb2c53 on 2016-01-03 by Christoph Lipka
 
     Some cleanup of `unix/prebuild.sh` script.
 
-Commit efb3db7 on 2016-01-03 by Christoph Lipka
+Commit efb3db7e on 2016-01-03 by Christoph Lipka
 
     Partial overhaul of `.gitignore`.
 
-Commit a4c66a2 on 2016-01-02 by Christoph Lipka
+Commit a4c66a28 on 2016-01-02 by Christoph Lipka
 
     Some housekeeping in base and core.
 
     Standardized include file hierarchy and include guards, updated file-level
     comments, and moved Metadata implementation out of the header file.
 
-Commit 1adf978 on 2016-01-01 by Christoph Lipka
+Commit 1adf9788 on 2016-01-01 by Christoph Lipka
 
     Added some run-time sanity checks (active in debug builds only) as well
     as a parser sanity-check for fractal pattern maximum iterations.
 
-Commit 87de094 on 2016-01-01 by Christoph Lipka
+Commit 87de0945 on 2016-01-01 by Christoph Lipka
 
     Removed some unnecessary and misleading junk from dispersion handling.
 
-Commit 6d20f85 on 2016-01-01 by Christoph Lipka
+Commit 6d20f859 on 2016-01-01 by Christoph Lipka
 
     Weeded out a few bits of unused code.
 
-Commit 4c01e85 on 2015-12-31 by Christoph Lipka
+Commit 4c01e859 on 2015-12-31 by Christoph Lipka
 
     Minor performance improvements in bounding mechanism.
 
-Commit 2de6599 on 2015-12-30 by Christoph Lipka
+Commit 2de65994 on 2015-12-30 by Christoph Lipka
 
     Fixed a hard crash when sum() was called with only three parameters.
 
-Commit 7abff38 on 2015-12-24 by Christoph Lipka
+Commit 7abff382 on 2015-12-24 by Christoph Lipka
 
     Fixed a bug in bounding boxes code.
 
-Commit 1f74520 on 2015-12-23 by Christoph Lipka
+Commit 1f745200 on 2015-12-23 by Christoph Lipka
 
     Consolidation of matrix transformation code.
 
-Commit 797bf5e on 2015-11-30 by Christoph Lipka
+Commit 797bf5ee on 2015-11-30 by Christoph Lipka
 
     Fix `.gitattributes` file.
 
-Commit 711444c on 2015-11-29 by Christoph Lipka
+Commit 711444cb on 2015-11-29 by Christoph Lipka
 
     Minor preparations for automated builds.
 
@@ -1943,21 +2061,21 @@ Commit 711444c on 2015-11-29 by Christoph Lipka
       crash dumps to the dev team, checking for availability of updates)
       will also be unavailable in official automated builds for now.
 
-Commit 28f5dfe on 2015-11-28 by Christoph Lipka
+Commit 28f5dfe6 on 2015-11-28 by Christoph Lipka
 
     Update git pre-commit hook to work more nicely on Windows systems.
 
     Note: To make use of the modified hook, you need to copy
     `tools/git/hooks/pre-commit` to `.git/hooks/pre-commit`.
 
-Commit b11eb9e on 2015-11-27 by Christoph Lipka
+Commit b11eb9ef on 2015-11-27 by Christoph Lipka
 
     Improve programming language identification on GitHub.
 
     Added `.gitattributes` file to assist GitHub in determining more
     accurately the programming languages used in our project.
 
-Commit 0656ae9 on 2015-11-22 by Christoph Lipka
+Commit 0656ae9a on 2015-11-22 by Christoph Lipka
 
     Fix a VS2015 compatibility issue.
 
@@ -1967,21 +2085,21 @@ Commit 0656ae9 on 2015-11-22 by Christoph Lipka
     into `povray.vcxproj` (aka "GUI" project). The VS2010 project setup
     has been cleaned up to prevent this issue.
 
-Commit 3aa4655 on 2015-11-20 by Christoph Lipka
+Commit 3aa46558 on 2015-11-20 by Christoph Lipka
 
     Fix package dependency list in Unix build instructions.
 
-Commit 77d4493 on 2015-11-20 by Christoph Lipka
+Commit 77d44931 on 2015-11-20 by Christoph Lipka
 
     Merge remote-tracking branch 'origin/3.7-stable'
 
-Commit 942ca94 on 2015-11-20 by Christoph Lipka (c-lipka)
+Commit 942ca940 on 2015-11-20 by Christoph Lipka (c-lipka)
 
     Merge pull request #45 from selvik/patch-1
 
     Trivial update to README.md
 
-Commit af8fcee on 2015-10-12 by Selvi K
+Commit af8fcee2 on 2015-10-12 by Selvi K
 
     Minor update to README.md
 
@@ -1989,47 +2107,47 @@ Commit af8fcee on 2015-10-12 by Selvi K
     instructions, so that one doesn't have to have the configure step fail
     multiple times before hitting each dependency.
 
-Commit 39ce8a2 on 2013-11-16 by Chris Cason (chris20)
+Commit 39ce8a24 on 2013-11-16 by Chris Cason (chris20)
 
     Merge pull request #3 from POV-Ray/master
 
     Merge documentation into stable branch
 
-Commit e14be1c on 2015-11-18 by Christoph Lipka
+Commit e14be1ce on 2015-11-18 by Christoph Lipka
 
     Fixed a missing dependency in the Visual Studio projects.
 
-Commit 509c930 on 2015-11-18 by Christoph Lipka
+Commit 509c930e on 2015-11-18 by Christoph Lipka
 
     Fix GitHub issue #50.
 
-Commit 277acbe on 2015-11-15 by Christoph Lipka
+Commit 277acbe9 on 2015-11-15 by Christoph Lipka
 
     Fix GitHub issue #49.
 
-Commit 4983507 on 2015-11-15 by Christoph Lipka
+Commit 49835074 on 2015-11-15 by Christoph Lipka
 
     Added mechanism to selectively enable or disable various run-time
     sanity checks.
 
-Commit ed4afec on 2015-11-15 by Christoph Lipka
+Commit ed4afecb on 2015-11-15 by Christoph Lipka
 
     Moved various code snippets from `base/types.h` to `base/mathutil.h`.
 
-Commit 2901ef9 on 2015-11-15 by Christoph Lipka
+Commit 2901ef9b on 2015-11-15 by Christoph Lipka
 
     Moved `mathutil.*` from `core/math` to `base`, in preparation to move
     various code snippets from `base/types.h` to `mathutil.h`.
 
-Commit 3c0cc67 on 2015-11-13 by Christoph Lipka
+Commit 3c0cc671 on 2015-11-13 by Christoph Lipka
 
     Updated console project to build again.
 
-Commit a371c26 on 2015-11-12 by Christoph Lipka
+Commit a371c269 on 2015-11-12 by Christoph Lipka
 
     Updated the Windows build instructions to mention Visual Studio 2015.
 
-Commit 87e624f on 2015-11-12 by Christoph Lipka
+Commit 87e624f9 on 2015-11-12 by Christoph Lipka
 
     Boost-related and miscellaneous changes to improve compatibility with
     Visual Studio 2015.
@@ -2043,7 +2161,7 @@ Commit 87e624f on 2015-11-12 by Christoph Lipka
     - Added compiler-specific compile-time configuration for VS 2015
       (aka msvc14).
 
-Commit 70f2184 on 2015-11-12 by Christoph Lipka
+Commit 70f2184a on 2015-11-12 by Christoph Lipka
 
     OpenEXR-related changes to improve compatibility with Visual Studio 2015.
 
@@ -2057,16 +2175,16 @@ Commit 70f2184 on 2015-11-12 by Christoph Lipka
       entirely, which suffered from the same issue but upon closer inspection
       turned out to not be required anyway.
 
-Commit d1d01eb on 2015-09-18 by Christoph Lipka
+Commit d1d01eb1 on 2015-09-18 by Christoph Lipka
 
     Fix GitHub issue #44.
 
-Commit 93b9ae9 on 2015-09-12 by Christoph Lipka
+Commit 93b9ae98 on 2015-09-12 by Christoph Lipka
 
     Modified base, core and parser modules to (again) support runtime
     environments that don't provide multithreading.
 
-Commit 9364568 on 2015-09-11 by Christoph Lipka
+Commit 93645688 on 2015-09-11 by Christoph Lipka
 
     Decoupled the isosurface post-render message dispatch mechanism from
     the back-end code.
@@ -2075,7 +2193,7 @@ Commit 9364568 on 2015-09-11 by Christoph Lipka
     instance of the back-end `MessageFactory` type, but rather to an abstract
     core type `CoreMessenger` which is in turn subclassed by `MessageFactory`.
 
-Commit 3e93e2e on 2015-09-11 by Christoph Lipka
+Commit 3e93e2e2 on 2015-09-11 by Christoph Lipka
 
     Miscellaneous changes:
 
@@ -2085,16 +2203,16 @@ Commit 3e93e2e on 2015-09-11 by Christoph Lipka
     - Eliminated some integer type potential portability issues in TrueType
       processing and a few other places.
 
-Commit f74039e on 2015-09-07 by Christoph Lipka
+Commit f74039e2 on 2015-09-07 by Christoph Lipka
 
     Added Release configurations to VS10 unit test project (tests.vcxproj)
 
-Commit dd1874d on 2015-09-05 by Christoph Lipka
+Commit dd1874db on 2015-09-05 by Christoph Lipka
 
     Fix various Unix build errors introduced with recent commits, including
     GitHub issue #43.
 
-Commit ac1170d on 2015-08-21 by Christoph Lipka
+Commit ac1170d6 on 2015-08-21 by Christoph Lipka
 
     Eliminated some cases of improper use of `UINT_MAX` and its siblings
     (as defined in `<climits>`).
@@ -2113,23 +2231,23 @@ Commit ac1170d on 2015-08-21 by Christoph Lipka
     test suite.
     Also overhauled other unrelated test cases.
 
-Commit 6d3f8a9 on 2015-08-21 by Christoph Lipka
+Commit 6d3f8a9e on 2015-08-21 by Christoph Lipka
 
     Some reorganization of the unit test suite.
 
-Commit 6231482 on 2015-08-21 by Christoph Lipka
+Commit 62314823 on 2015-08-21 by Christoph Lipka
 
     Update to the Git pre-commit hook.
 
-Commit 11b672c on 2015-08-21 by Christoph Lipka
+Commit 11b672cf on 2015-08-21 by Christoph Lipka
 
     Minor cosmetic fix for Doxygen output.
 
-Commit 7eabf09 on 2015-08-20 by Christoph Lipka
+Commit 7eabf090 on 2015-08-20 by Christoph Lipka
 
     Workaround for Doxygen failing to invoke PlantUML.
 
-Commit 150f461 on 2015-08-17 by Christoph Lipka
+Commit 150f461c on 2015-08-17 by Christoph Lipka
 
     Moved some more source files from the back-end subdirectory to its new
     dedicated place in the core subdirectory. Renamed some of the files
@@ -2138,7 +2256,7 @@ Commit 150f461 on 2015-08-17 by Christoph Lipka
     Also eliminated obsolete custom memory allocators (`FileAllocator` and
     `MallocAllocator`) and the file they resided in (`fixedallocator.h`)
 
-Commit 04ed702 on 2015-08-05 by Christoph Lipka
+Commit 04ed7026 on 2015-08-05 by Christoph Lipka
 
     More disentangling of the "core" code from the "backend" code.
 
@@ -2146,28 +2264,28 @@ Commit 04ed702 on 2015-08-05 by Christoph Lipka
     system-specific line endings, discarding the limited TEXTSTREAM_CRLF
     mechanism in favour of the previously dormant NEW_LINE_STRING mechanism.
 
-Commit 117f215 on 2015-08-05 by Christoph Lipka
+Commit 117f215c on 2015-08-05 by Christoph Lipka
 
     Moved around some more files in the source tree to prepare for more
     disentangling of the core code.
     NOTE: This commit will NOT compile.
 
-Commit 9bacee3 on 2015-08-02 by Christoph Lipka
+Commit 9bacee3f on 2015-08-02 by Christoph Lipka
 
     Eliminated POV_CALLOC and POVMS_Sys_Calloc, as well as direct calls to
     calloc() outside the Windows-specific portion of the code.
 
-Commit b00144f on 2015-08-01 by Christoph Lipka
+Commit b00144fa on 2015-08-01 by Christoph Lipka
 
     Fixed bug in meshmaker.inc that would scramble the SDL language version
     to use for a scene.
 
-Commit d1bb614 on 2015-06-30 by Christoph Lipka
+Commit d1bb6145 on 2015-06-30 by Christoph Lipka
 
     Fixed bug introduced with commit 35a20c2, causing the wrong default
     noise generator to be active during parsing.
 
-Commit cbe3c65 on 2015-06-27 by Christoph Lipka
+Commit cbe3c653 on 2015-06-27 by Christoph Lipka
 
     Extended torus syntax to give more control over the spindle in a
     self-intersecting torus:
@@ -2190,7 +2308,7 @@ Commit cbe3c65 on 2015-06-27 by Christoph Lipka
     bulk of the torus was outside, making it consistent with the texturing
     of the torus proper.
 
-Commit 1b5aab6 on 2015-06-27 by Christoph Lipka
+Commit 1b5aab60 on 2015-06-27 by Christoph Lipka
 
     More refactoring and moving around of code, primarily to further
     disentangle the different components of POV-Ray:
@@ -2213,12 +2331,12 @@ Commit 1b5aab6 on 2015-06-27 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8141620
 ------------------------------------------------------------------------------
 
-Commit aaff0bb on 2015-06-25 by Christoph Lipka
+Commit aaff0bba on 2015-06-25 by Christoph Lipka
 
     Updated `ior.inc` default include file, showcasing some of the recent
     syntax extensions.
 
-Commit 3870e21 on 2015-06-24 by Christoph Lipka
+Commit 3870e217 on 2015-06-24 by Christoph Lipka
 
     Extended tuple assignment syntax to allow for omission of right-hand
     side elements; extend array initializer syntax to allow for omission
@@ -2238,12 +2356,12 @@ Commit 3870e21 on 2015-06-24 by Christoph Lipka
     does _not_ encompass uninitialized array elements. This limitation also
     applies to optional macro parameters.
 
-Commit 9279248 on 2015-06-24 by Christoph Lipka
+Commit 92792481 on 2015-06-24 by Christoph Lipka
 
     Fixed a bug pertaining to the use of the "deprecated" keyword in tuple
     #declare statements
 
-Commit a572730 on 2015-06-24 by Christoph Lipka
+Commit a5727308 on 2015-06-24 by Christoph Lipka
 
     Implement mechanisms to allow omission of macro parameters.
 
@@ -2260,7 +2378,7 @@ Commit a572730 on 2015-06-24 by Christoph Lipka
     parameters on to other macros, without potential interference from
     global variables of the same name.
 
-Commit 9c1352f on 2015-06-24 by Christoph Lipka
+Commit 9c1352f9 on 2015-06-24 by Christoph Lipka
 
     Extended #declare and #local tuple syntax to also support assignment from
     arrays, and to support assignment to mismatching number of identifiers.
@@ -2275,12 +2393,12 @@ Commit 9c1352f on 2015-06-24 by Christoph Lipka
     Also fixed the error message reported when an array initializer does
     not have enough elements, and did some minor code cleanup along the way.
 
-Commit c3551f2 on 2015-04-09 by Christoph Lipka
+Commit c3551f24 on 2015-04-09 by Christoph Lipka
 
     Fixed spindle torus shading issues resulting from bogus surface normal
     computations for points on the spindle.
 
-Commit dc0fc6d on 2015-03-30 by Christoph Lipka
+Commit dc0fc6d1 on 2015-03-30 by Christoph Lipka
 
     Fixed Unix build error introduced with commit 29f573e.
 
@@ -2288,11 +2406,11 @@ Commit dc0fc6d on 2015-03-30 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8004333
 ------------------------------------------------------------------------------
 
-Commit 25af702 on 2015-03-21 by Christoph Lipka
+Commit 25af702e on 2015-03-21 by Christoph Lipka
 
     Updated Unix build instructions with known compatibility issues.
 
-Commit 29f573e on 2015-03-21 by Christoph Lipka
+Commit 29f573ea on 2015-03-21 by Christoph Lipka
 
     Fixed bug in tuple extensions to #declare and #local causing hard crashes.
 
@@ -2300,49 +2418,49 @@ Commit 29f573e on 2015-03-21 by Christoph Lipka
 POV-Ray v3.7.1-alpha.7981337
 ------------------------------------------------------------------------------
 
-Commit 6ed60ad on 2015-03-05 by Christoph Lipka
+Commit 6ed60ade on 2015-03-05 by Christoph Lipka
 
     Moved a batch of render engine core source code to its new dedicated
     place. Renamed some of the files along the way.
 
-Commit 8930c3d on 2015-03-05 by Christoph Lipka
+Commit 8930c3d0 on 2015-03-05 by Christoph Lipka
 
     Moved most parser-specific source code to its new dedicated place. Renamed
     the files along the way.
 
-Commit d38cfa7 on 2015-03-05 by Christoph Lipka
+Commit d38cfa76 on 2015-03-05 by Christoph Lipka
 
     Eliminated homebrew smart pointer type `Pointer<>`.
 
-Commit d3deba9 on 2015-03-05 by Christoph Lipka
+Commit d3deba99 on 2015-03-05 by Christoph Lipka
 
     Eliminated Visual Studio 2010 warning about exception handling in
     `png.cpp` and `jpeg.cpp` vs. precompiled header.
 
-Commit c9316b7 on 2015-03-04 by Christoph Lipka
+Commit c9316b7f on 2015-03-04 by Christoph Lipka
 
     Moved platform-specific compile-time configuration headers out of the
     `vfe` directory sub-tree.
 
-Commit 0c7f977 on 2015-03-03 by Christoph Lipka
+Commit 0c7f9773 on 2015-03-03 by Christoph Lipka
 
     Fixed Unix build errors.
 
-Commit 3d45f89 on 2015-03-03 by Christoph Lipka
+Commit 3d45f89c on 2015-03-03 by Christoph Lipka
 
     Introduced new future locations for the source code of the render engine
     core and parser, respectively, along with dedicated header files to
     place corresponding compile-time configuration settings.
 
-Commit 1f7a4fa on 2015-03-03 by Christoph Lipka
+Commit 1f7a4fa4 on 2015-03-03 by Christoph Lipka
 
     Fixed a compile error in `vfe/win/vfeplatform.h` introduced recently.
 
-Commit fd19354 on 2015-03-03 by Christoph Lipka
+Commit fd19354c on 2015-03-03 by Christoph Lipka
 
     Moved unit test source code out of the main source code tree.
 
-Commit 371dca2 on 2015-03-03 by Christoph Lipka
+Commit 371dca2c on 2015-03-03 by Christoph Lipka
 
     Moved source code related to the POVMS message-passing layer into a
     separate directory.
@@ -2350,30 +2468,30 @@ Commit 371dca2 on 2015-03-03 by Christoph Lipka
     Also created a separate Visual Studio 2010 project for it.
     Renamed a few files along the way.
 
-Commit 514e339 on 2015-03-01 by Christoph Lipka
+Commit 514e339c on 2015-03-01 by Christoph Lipka
 
     Split up a few files in preparation for future source code tree
     reorganization.
     Also removed a few obsolete files.
 
-Commit df32f3a on 2015-03-01 by Christoph Lipka
+Commit df32f3a7 on 2015-03-01 by Christoph Lipka
 
     Fix typo bug in `frontend/simplefrontend.h`
 
-Commit 24aaeb1 on 2015-03-01 by Christoph Lipka
+Commit 24aaeb1d on 2015-03-01 by Christoph Lipka
 
     Minor source code documentation fix.
 
-Commit f5e5ba6 on 2015-03-01 by Christoph Lipka
+Commit f5e5ba6e on 2015-03-01 by Christoph Lipka
 
     Moved version information from its legacy location in `backend/povray.h`
     to new dedicated files `base/build.h` and `base/versoion.h`.
 
-Commit 58d51f4 on 2015-03-01 by Christoph Lipka
+Commit 58d51f49 on 2015-03-01 by Christoph Lipka
 
     Fixed scrambled warning messages.
 
-Commit a94c1ab on 2015-03-01 by Christoph Lipka
+Commit a94c1ab6 on 2015-03-01 by Christoph Lipka
 
     Implemented tuple extensions to #declare and #local.
 
@@ -2407,32 +2525,32 @@ Commit a94c1ab on 2015-03-01 by Christoph Lipka
     placing it right before the respective identifier, e.g.:
         #declare (A, deprecated B) = (47, 11);
 
-Commit dad781b on 2015-02-22 by Christoph Lipka
+Commit dad781b1 on 2015-02-22 by Christoph Lipka
 
     Hotfix for previous commit (forgot to submit changes to `bezier.h`).
 
-Commit 6e20d0b on 2015-02-13 by Christoph Lipka
+Commit 6e20d0b7 on 2015-02-13 by Christoph Lipka
 
     Fixed bezier patch not honouring clipped_by statement.
 
-Commit 14a8aa1 on 2015-02-10 by Christoph Lipka
+Commit 14a8aa1d on 2015-02-10 by Christoph Lipka
 
     Fixed crash when using turbulence parameters (lambda, omega etc.) without
     specifying a pattern type.
 
-Commit baa95d2 on 2015-02-03 by Christoph Lipka
+Commit baa95d20 on 2015-02-03 by Christoph Lipka
 
     Added missing file from the boost/test library.
 
-Commit 3f56c5f on 2015-02-03 by Christoph Lipka
+Commit 3f56c5fb on 2015-02-03 by Christoph Lipka
 
     Fixed Unix build errors.
 
-Commit 725efe1 on 2015-02-03 by Christoph Lipka
+Commit 725efe1f on 2015-02-03 by Christoph Lipka
 
     Merge branch 'refactor'
 
-Commit 44e5f50 on 2015-01-31 by Christoph Lipka
+Commit 44e5f50d on 2015-01-31 by Christoph Lipka
 
     Eliminated more "C-isms" in favour of C++-style code.
 
@@ -2450,36 +2568,36 @@ Commit 44e5f50 on 2015-01-31 by Christoph Lipka
     and derived classes)
     Renamed `POV_MACRO` type to `Macro`.
 
-Commit 1fac52a on 2015-02-03 by Christoph Lipka
+Commit 1fac52a9 on 2015-02-03 by Christoph Lipka
 
     Merge branch 'feature/unit_tests'
 
-Commit 4d42e38 on 2015-01-19 by Christoph Lipka
+Commit 4d42e38c on 2015-01-19 by Christoph Lipka
 
     Add skeleton for unit tests, based on the boost test library.
 
-Commit 845851e on 2015-02-03 by Christoph Lipka
+Commit 845851e7 on 2015-02-03 by Christoph Lipka
 
     Source code documentation pertaining to entities spanning more than
     one file (namespaces, directories) now resides in `source-doc/*.dox`.
 
-Commit e16458c on 2015-02-03 by Christoph Lipka
+Commit e16458c3 on 2015-02-03 by Christoph Lipka
 
     Fixed Unix build errors
 
-Commit 4291131 on 2015-02-03 by Christoph Lipka
+Commit 4291131c on 2015-02-03 by Christoph Lipka
 
     Fixed bug in parser causing an error when no file type is specified
     and the file name is specified using a variable.
 
     Also renamed some macros in the parser for clarity.
 
-Commit f775c54 on 2015-02-03 by Christoph Lipka
+Commit f775c54f on 2015-02-03 by Christoph Lipka
 
     updated Git pre-commit hook; now automatically cleans up leading tabs
     and trailing blanks in updated C/C++ files.
 
-Commit 54c2f4e on 2015-02-02 by Christoph Lipka
+Commit 54c2f4e7 on 2015-02-02 by Christoph Lipka
 
     Header Overhaul.
 
@@ -2487,20 +2605,20 @@ Commit 54c2f4e on 2015-02-02 by Christoph Lipka
     map specializations) to other files.
     Also updated file comments to new format, and cleaned up whitespace.
 
-Commit b159379 on 2015-02-01 by Christoph Lipka
+Commit b1593797 on 2015-02-01 by Christoph Lipka
 
     Merge branch 'hotfix/OTOc_issue'
 
-Commit 3ca7476 on 2015-01-06 by Christoph Lipka
+Commit 3ca74763 on 2015-01-06 by Christoph Lipka
 
     hopefully fixes issue with OTOc.inc ("Odd Tiles Object") reported in
     povray.binaries.images.
 
-Commit a587015 on 2015-02-01 by Christoph Lipka
+Commit a5870150 on 2015-02-01 by Christoph Lipka
 
     Under-the-hood changes related to scene language version and warnings.
 
-Commit fd2e0dd on 2015-01-30 by Christoph Lipka
+Commit fd2e0dd1 on 2015-01-30 by Christoph Lipka
 
     More work on Developer's Manual.
 
@@ -2514,16 +2632,16 @@ Commit fd2e0dd on 2015-01-30 by Christoph Lipka
 POV-Ray v3.7.1-alpha.7930357
 ------------------------------------------------------------------------------
 
-Commit e24c93e on 2015-01-29 by Christoph Lipka
+Commit e24c93ee on 2015-01-29 by Christoph Lipka
 
     Fixed unwarranted "Rainbow's up and direction vector are co-linear"
     error message.
 
-Commit 44d47df on 2015-01-27 by Christoph Lipka
+Commit 44d47df6 on 2015-01-27 by Christoph Lipka
 
     Fixed `colour_map` not accepting `blend_mode` and `blend_gamma`.
 
-Commit c4deb40 on 2015-01-24 by Christoph Lipka
+Commit c4deb40f on 2015-01-24 by Christoph Lipka
 
     POV-Ray for Windows now displays file names and line numbers of warnings
     in message pane.
@@ -2532,70 +2650,70 @@ Commit c4deb40 on 2015-01-24 by Christoph Lipka
 POV-Ray v3.7.1-alpha.7918791
 ------------------------------------------------------------------------------
 
-Commit 4f3a8be on 2015-01-21 by Christoph Lipka (c-lipka)
+Commit 4f3a8bec on 2015-01-21 by Christoph Lipka (c-lipka)
 
     [accidental empty merge]
 
-Commit c48e776 on 2015-01-21 by Christoph Lipka
+Commit c48e776c on 2015-01-21 by Christoph Lipka
 
     Fixed newest Git pre-commit hook to automatically stage any changes it
     makes to files.
 
-Commit 93c7ed8 on 2015-01-21 by Christoph Lipka
+Commit 93c7ed86 on 2015-01-21 by Christoph Lipka
 
     Cleanup of previously undocumented backslash handling in string literals
     when parsing for a filename.
 
-Commit ec597b9 on 2015-01-14 by Christoph Lipka
+Commit ec597b99 on 2015-01-14 by Christoph Lipka
 
     updated Git pre-commit hook; now also performs some sanity-checking of
     updated C/C++ files.
 
-Commit 2d82f74 on 2015-01-13 by Christoph Lipka
+Commit 2d82f74d on 2015-01-13 by Christoph Lipka
 
     Trivial to minor code cleanup; some format cleanup in separate source
     doc files.
 
-Commit 036fe3d on 2015-01-13 by Christoph Lipka
+Commit 036fe3da on 2015-01-13 by Christoph Lipka
 
     Add some small dev utilities for VS 2010
 
-Commit 7086fa9 on 2014-09-04 by Chris Cason
+Commit 7086fa93 on 2014-09-04 by Chris Cason
 
     Merge pull request #34 from POV-Ray/revert-33-develop
 
     Revert "Develop" (meant to merge into a test branch.)
 
-Commit d23ff77 on 2014-09-04 by Chris Cason
+Commit d23ff77b on 2014-09-04 by Chris Cason
 
     Revert "Develop"
 
-Commit bd4b762 on 2014-09-04 by Chris Cason
+Commit bd4b762f on 2014-09-04 by Chris Cason
 
     [accidental merge, reverted by Commit d23ff77]
 
-Commit b15d86b on 2014-08-18 by Christoph Lipka
+Commit b15d86b1 on 2014-08-18 by Christoph Lipka
 
     Merge branch 'hotfix/mesh_camera'
 
-Commit 4bc2086 on 2014-08-18 by Christoph Lipka
+Commit 4bc20862 on 2014-08-18 by Christoph Lipka
 
     Fixed bug in mesh_camera with distribution 3
 
-Commit 11ff214 on 2014-08-18 by Christoph Lipka
+Commit 11ff2144 on 2014-08-18 by Christoph Lipka
 
     Silence g++ compiler warning about non-template friend function in
     base/colour.h
 
-Commit ad6d545 on 2014-08-09 by Christoph Lipka
+Commit ad6d5457 on 2014-08-09 by Christoph Lipka
 
     Merge branch 'hotfix/average_texture'
 
-Commit 0dcda86 on 2014-08-09 by Christoph Lipka
+Commit 0dcda867 on 2014-08-09 by Christoph Lipka
 
     Fixed a bug in average textures introduced during colour refactoring.
 
-Commit ca0d798 on 2014-08-07 by Christoph Lipka
+Commit ca0d798a on 2014-08-07 by Christoph Lipka
 
     Light sources' distance-based fading can now be set to obey an
     inverse-power law at all distances.
@@ -2613,17 +2731,17 @@ Commit ca0d798 on 2014-08-07 by Christoph Lipka
     mimicking the behaviour of previous versions, except that now a parse
     warning will be generated.
 
-Commit c9fb89c on 2014-08-07 by Christoph Lipka
+Commit c9fb89c6 on 2014-08-07 by Christoph Lipka
 
     Merge branch 'feature/auto-revision-number' and update version number
     to 3.7.1 (alpha)
 
-Commit 1c7f198 on 2014-08-07 by Christoph Lipka
+Commit 1c7f1987 on 2014-08-07 by Christoph Lipka
 
     Added some basic documentation on version numbering in
     `source-doc/versioning.md`
 
-Commit 6166f5a on 2014-08-07 by Christoph Lipka
+Commit 6166f5a2 on 2014-08-07 by Christoph Lipka
 
     Modified povray.h and pre-commit hook for new version numbering scheme.
 
@@ -2644,15 +2762,15 @@ Commit 6166f5a on 2014-08-07 by Christoph Lipka
     Note that the pre-commit hook script in .git/hooks in your local workspace
     needs to be replaced with the new version provided in "tools/git/hooks".
 
-Commit b2f7144 on 2014-07-26 by Christoph Lipka
+Commit b2f7144e on 2014-07-26 by Christoph Lipka
 
     Updated comments in povray.h
 
-Commit 1736635 on 2014-07-26 by Christoph Lipka
+Commit 17366352 on 2014-07-26 by Christoph Lipka
 
     Implemented a mechanism for automatic version numbering,
 
-Commit 4881e0f on 2014-08-05 by Christoph Lipka
+Commit 4881e0f9 on 2014-08-05 by Christoph Lipka
 
     Implemented non-linear colour and pigment map interpolation.
 
@@ -2679,24 +2797,24 @@ Commit 4881e0f on 2014-08-05 by Christoph Lipka
            brightness interpolation is performed in the gamma space defined
            by blend_gamma.
 
-Commit 4395982 on 2014-08-05 by Christoph Lipka
+Commit 43959828 on 2014-08-05 by Christoph Lipka
 
     Update for `colors_ral.inc`.
 
     Added previously undefined RAL_8000 colour.
 
-Commit 5f4474c on 2014-08-05 by Christoph Lipka
+Commit 5f4474c9 on 2014-08-05 by Christoph Lipka
 
     Added CIE L*a*b* conversion macros to `colors.inc`, and added
     `colors_ral.inc` containing RAL Classic colours.
 
-Commit a3fe721 on 2014-07-28 by Christoph Lipka
+Commit a3fe7214 on 2014-07-28 by Christoph Lipka
 
     Corrected wrong rotation in `Round_Pyramid_N_in` in shapes3.inc.
 
     Submitted on behalf of Friedrich Lohmueller.
 
-Commit 54b283a on 2014-07-23 by Christoph Lipka
+Commit 54b283a0 on 2014-07-23 by Christoph Lipka
 
     Improved finish features for more realism:
 
@@ -2719,39 +2837,39 @@ Commit 54b283a on 2014-07-23 by Christoph Lipka
         value as the reflection maximum; the reflection minimum should be
         set to zero.
 
-Commit 9b10411 on 2014-07-21 by Christoph Lipka
+Commit 9b10411d on 2014-07-21 by Christoph Lipka
 
     fix for GitHub issue #32
 
-Commit 08c53d8 on 2014-07-21 by Christoph Lipka
+Commit 08c53d8e on 2014-07-21 by Christoph Lipka
 
     more fix for GitHub issue #31
 
-Commit 159e23b on 2014-07-21 by Christoph Lipka
+Commit 159e23b6 on 2014-07-21 by Christoph Lipka
 
     fix for GitHub issue #31
 
-Commit f1699ea on 2014-07-07 by Christoph Lipka
+Commit f1699ead on 2014-07-07 by Christoph Lipka
 
     fix for GitHub issue #30
 
-Commit af80da4 on 2014-07-02 by Christoph Lipka
+Commit af80da48 on 2014-07-02 by Christoph Lipka
 
     This should wrap it up for GitHub issue #29.
 
-Commit ca65fc5 on 2014-07-01 by Christoph Lipka
+Commit ca65fc52 on 2014-07-01 by Christoph Lipka
 
     Hopefully the final fixes for GitHub issue #29.
 
-Commit 38a31fb on 2014-07-01 by Christoph Lipka
+Commit 38a31fba on 2014-07-01 by Christoph Lipka
 
     Even more fixes for GitHub issue #29.
 
-Commit 583d4c8 on 2014-06-30 by Christoph Lipka
+Commit 583d4c85 on 2014-06-30 by Christoph Lipka
 
     Yet more fixes for GitHub issue #29.
 
-Commit f42a95b on 2014-06-30 by Christoph Lipka
+Commit f42a95b6 on 2014-06-30 by Christoph Lipka
 
     More fixes for GitHub issue #29.
 
@@ -2760,55 +2878,55 @@ Commit f42a95b on 2014-06-30 by Christoph Lipka
     header file includes with the respective C++ counterparts along the
     way throughout the project (except the Windows specific code for now).
 
-Commit f68065b on 2014-06-29 by Christoph Lipka
+Commit f68065bb on 2014-06-29 by Christoph Lipka
 
     Fixes for GitHub issue #29
 
-Commit bdd7ccc on 2014-06-27 by Christoph Lipka
+Commit bdd7cccf on 2014-06-27 by Christoph Lipka
 
     Merge branch 'styleguide'
 
-Commit 365fc8f on 2014-06-27 by Christoph Lipka
+Commit 365fc8fd on 2014-06-27 by Christoph Lipka
 
     5th iteration of the styleguide draft; Minor changes:
 
       - Source comments can now use the "Dot" tool.
       - Certain method names can now use `camelCase`.
 
-Commit a190a10 on 2014-06-12 by Christoph Lipka
+Commit a190a10c on 2014-06-12 by Christoph Lipka
 
     4th iteration of the styleguide draft.
     Most notable changes: Most of the "Miscellaneous Coding Rules" now
     reside on a separate page. Naming conventions have been established.
 
-Commit d9b5eb0 on 2014-06-11 by Christoph Lipka
+Commit d9b5eb01 on 2014-06-11 by Christoph Lipka
 
     Third iteration of the styleguide draft: Fleshed out a few more rules;
     changed file encoding rules to permit plain-ASCII only; minor other
     changes.
 
-Commit 30aaf02 on 2014-06-08 by Christoph Lipka
+Commit 30aaf025 on 2014-06-08 by Christoph Lipka
 
     Second iteration of the styleguide draft.
 
-Commit 910610f on 2014-06-08 by Christoph Lipka
+Commit 910610f7 on 2014-06-08 by Christoph Lipka
 
     First draft for a coding styleguide, up for discussion among the dev team.
 
-Commit 652bf21 on 2014-06-27 by Christoph Lipka
+Commit 652bf210 on 2014-06-27 by Christoph Lipka
 
     Merge branch 'refactor'
 
-Commit 92899df on 2014-06-25 by Christoph Lipka
+Commit 92899dfb on 2014-06-25 by Christoph Lipka
 
     Merge branch 'hotfix/photons_eca922a2' into refactor
 
-Commit 9fafc3c on 2014-06-25 by Christoph Lipka
+Commit 9fafc3c5 on 2014-06-25 by Christoph Lipka
 
     fix photons bug introduced with commit
     'eca922a2819fabbadd82c31e4bfadaa0c425b5b5'
 
-Commit eee8ece on 2014-06-25 by Christoph Lipka
+Commit eee8ecee on 2014-06-25 by Christoph Lipka
 
     More colour related refactoring.
 
@@ -2817,12 +2935,12 @@ Commit eee8ece on 2014-06-25 by Christoph Lipka
     Also "unbundled" colour and filter/transmit information in many places,
     in preparation for full-colour transparency computations.
 
-Commit 58e27fe on 2014-06-23 by Christoph Lipka
+Commit 58e27fe4 on 2014-06-23 by Christoph Lipka
 
     Minor refactoring (quality level, experimental feature warnings) to
     eliminate povrayold.h.
 
-Commit 0ea2da4 on 2014-06-23 by Christoph Lipka
+Commit 0ea2da40 on 2014-06-23 by Christoph Lipka
 
     More colour data type refactoring.
 
@@ -2833,56 +2951,56 @@ Commit 0ea2da4 on 2014-06-23 by Christoph Lipka
     - render engine colour math (currently RGBFT format; intended to be
       later replaced with RGB colour + RGB transmit)
 
-Commit eca922a on 2014-06-19 by Christoph Lipka
+Commit eca922a2 on 2014-06-19 by Christoph Lipka
 
     Replaced `SMALL_COLOUR` legacy type with new type `PhotonColour` based
     on new class template `GenericRGBEColour`; also employing this new type
     in Radiance HDR image file reading & writing.
 
-Commit c9dc791 on 2014-06-19 by Christoph Lipka
+Commit c9dc791a on 2014-06-19 by Christoph Lipka
 
     Merge branch 'master' into refactor
 
-Commit 914fff1 on 2014-06-19 by Christoph Lipka
+Commit 914fff13 on 2014-06-19 by Christoph Lipka
 
     Reduced warning level in Visual Studio 2010 external library projects
 
-Commit e5bd529 on 2014-06-19 by Christoph Lipka
+Commit e5bd5298 on 2014-06-19 by Christoph Lipka
 
     Further refactoring of blend map handling. Also got rid of legacy data
     types COLOUR, RGB and UV_VECT for good.
 
-Commit d7504bf on 2014-06-18 by Christoph Lipka
+Commit d7504bf0 on 2014-06-18 by Christoph Lipka
 
     Merge branch 'master' into refactor
 
-Commit ac564f7 on 2014-06-18 by Christoph Lipka
+Commit ac564f72 on 2014-06-18 by Christoph Lipka
 
     Fixing waves pattern in normals
 
-Commit 9a278c7 on 2014-06-16 by Christoph Lipka
+Commit 9a278c7f on 2014-06-16 by Christoph Lipka
 
     Merge branch 'hotfix/image_pattern'
 
-Commit cf1c3fb on 2014-06-18 by Christoph Lipka
+Commit cf1c3fbe on 2014-06-18 by Christoph Lipka
 
     Refactored blend map handling
     Removed the hard-coded limit of 256 blend map entries along the way.
     More work to follow.
 
-Commit 7502593 on 2014-06-16 by Christoph Lipka
+Commit 75025936 on 2014-06-16 by Christoph Lipka
 
     Merge branch 'hotfix/image_pattern' into refactor
 
-Commit cc24c62 on 2014-06-16 by Christoph Lipka
+Commit cc24c626 on 2014-06-16 by Christoph Lipka
 
     fixing broken image_pattern
 
-Commit 2a2d1a8 on 2014-06-15 by Christoph Lipka
+Commit 2a2d1a8f on 2014-06-15 by Christoph Lipka
 
     Gotten rid of legacy VECTOR type for good.
 
-Commit 2a41f04 on 2014-06-14 by Christoph Lipka
+Commit 2a41f046 on 2014-06-14 by Christoph Lipka
 
     Eliminated some circular include file dependencies. Also thrown out a
     bit of dead code.
@@ -2891,40 +3009,40 @@ Commit 2a41f04 on 2014-06-14 by Christoph Lipka
 POV-Ray v3.7.0.20140613
 ------------------------------------------------------------------------------
 
-Commit 2c4e9f2 on 2014-06-13 by Christoph Lipka
+Commit 2c4e9f28 on 2014-06-13 by Christoph Lipka
 
     Merge branch 'refactor'
 
-Commit 35a20c2 on 2014-06-13 by Christoph Lipka
+Commit 35a20c26 on 2014-06-13 by Christoph Lipka
 
     More refactoring work on the Pattern classes, as well as some
     documentation work; also introducing new file header comments
 
-Commit 2423c2f on 2014-05-29 by Christoph Lipka
+Commit 2423c2fe on 2014-05-29 by Christoph Lipka
 
     Merge branch 'master' into refactor
 
-Commit 16f24ce on 2014-05-29 by Christoph Lipka
+Commit 16f24ce0 on 2014-05-29 by Christoph Lipka
 
     Merge branch 'master' into refactor
 
-Commit 50d8f95 on 2013-12-17 by Christoph Lipka
+Commit 50d8f958 on 2013-12-17 by Christoph Lipka
 
     Merge branch 'master' into refactor
 
-Commit 02eb3ae on 2013-12-17 by Christoph Lipka
+Commit 02eb3aeb on 2013-12-17 by Christoph Lipka
 
     Merge branch 'master' into refactor
 
-Commit 137ccc2 on 2013-12-16 by Christoph Lipka
+Commit 137ccc2f on 2013-12-16 by Christoph Lipka
 
     Merge branch 'hotfix' into refactor
 
-Commit 9fc31fa on 2013-12-16 by Christoph Lipka
+Commit 9fc31fa0 on 2013-12-16 by Christoph Lipka
 
     forgot to commit source/base/colour.h
 
-Commit f24393f on 2013-12-16 by Christoph Lipka
+Commit f24393f6 on 2013-12-16 by Christoph Lipka
 
     overhauled the implementation of the "inverse" keyword; also fixed
     three bugs discovered along the way (FS#315, FS#316, and another one
@@ -2932,7 +3050,7 @@ Commit f24393f on 2013-12-16 by Christoph Lipka
 
     corresponds to Perforce change 6164.
 
-Commit 4f39fd0 on 2013-12-16 by Christoph Lipka
+Commit 4f39fd01 on 2013-12-16 by Christoph Lipka
 
     header file cleanup: Weeded out frame.h, removing obsolete stuff and
     moving some definitions out to other headers; also weeded out a few
@@ -2941,7 +3059,7 @@ Commit 4f39fd0 on 2013-12-16 by Christoph Lipka
 
     corresponds to Perforce change 6163.
 
-Commit 58ff3f5 on 2013-12-16 by Christoph Lipka
+Commit 58ff3f50 on 2013-12-16 by Christoph Lipka
 
     introduced new class BasicRay as lightweight alternative to (and base
     class for) class Ray, to be used in cases where only geometric properties
@@ -2950,35 +3068,35 @@ Commit 58ff3f5 on 2013-12-16 by Christoph Lipka
 
     corresponds to Perforce changes 6161, 6162.
 
-Commit 87dd6ee on 2013-12-16 by Christoph Lipka
+Commit 87dd6eec on 2013-12-16 by Christoph Lipka
 
     disentangling the legacy PATTERN, PIGMENT, TEXTURE and TNORMAL types
 
     corresponds to Perforce changes 6156, 6158.
 
-Commit a03dd73 on 2013-12-16 by Christoph Lipka
+Commit a03dd730 on 2013-12-16 by Christoph Lipka
 
     Merge branch 'master' into refactor
 
-Commit b75c069 on 2013-12-16 by Christoph Lipka
+Commit b75c069e on 2013-12-16 by Christoph Lipka
 
     turned pattern handling code into a legion of polymorphic classes;
     some work on special cases still pending.
 
     corresponds to Perforce change 6154.
 
-Commit d35825d on 2013-12-16 by Christoph Lipka
+Commit d35825d5 on 2013-12-16 by Christoph Lipka
 
     replaced legacy VECTOR and UV_VECT types with Vector3d and Vector2d,
     respectively, throughout almost all of the POV-Ray code.
 
     corresponds to Perforce changes 6146, 6147, 6150.
 
-Commit 7c4abbf on 2013-12-16 by Christoph Lipka
+Commit 7c4abbf9 on 2013-12-16 by Christoph Lipka
 
     Merge branch 'hotfix' into refactor
 
-Commit 5cee76e on 2013-12-16 by Christoph Lipka
+Commit 5cee76ec on 2013-12-16 by Christoph Lipka
 
     replaced legacy VECTOR, SNGL_VECT and UV_VECT types with Vector3d,
     SnglVector3d and Vector2d, respectively, in shapes code, plus other
@@ -2987,7 +3105,7 @@ Commit 5cee76e on 2013-12-16 by Christoph Lipka
     corresponds to Perforce changes 6123, 6124, 6138, 6139, 6140, 6142,
     6143, 6144, 6145, 6149.
 
-Commit 838ce9d on 2013-12-16 by Christoph Lipka
+Commit 838ce9d6 on 2013-12-16 by Christoph Lipka
 
     replaced legacy VECTOR and UV_VECT types with Vector3d and Vector2d,
     respectively, in ObjectBase interface, objects.h functions, and throughout
@@ -2996,7 +3114,7 @@ Commit 838ce9d on 2013-12-16 by Christoph Lipka
 
     corresponds to Perforce changes 6121, 6122, 6134, 6151, 6153.
 
-Commit 40d9c39 on 2013-12-16 by Christoph Lipka
+Commit 40d9c39a on 2013-12-16 by Christoph Lipka
 
     replaced legacy VECTOR, SNGL_VECT and BBOX_VECT types with Vector3d, new
     SnglVector3d and new BBoxVector3d types, respectively, in Intersection
@@ -3009,64 +3127,64 @@ Commit 40d9c39 on 2013-12-16 by Christoph Lipka
 
     corresponds to Perforce changes 6118, 6119, 6120.
 
-Commit ca930a9 on 2014-06-10 by Christoph Lipka
+Commit ca930a9f on 2014-06-10 by Christoph Lipka
 
     Adding a bit of documentation on the POVMS interface
 
-Commit 19c420e on 2014-06-04 by Christoph Lipka
+Commit 19c420eb on 2014-06-04 by Christoph Lipka
 
     minor fixes in dithering code
 
-Commit 31010d1 on 2014-05-29 by Christoph Lipka
+Commit 31010d11 on 2014-05-29 by Christoph Lipka
 
     Merge branch 'hotfix'
 
-Commit 0b40390 on 2014-01-06 by Christoph Lipka
+Commit 0b403907 on 2014-01-06 by Christoph Lipka
 
     fix typo in configure.ac
 
-Commit 98a3cdf on 2014-01-06 by Christoph Lipka
+Commit 98a3cdf1 on 2014-01-06 by Christoph Lipka
 
     Merge branch 'master' into hotfix/boost1.49-boost_system
 
-Commit b039cf3 on 2014-01-04 by Christoph Lipka
+Commit b039cf35 on 2014-01-04 by Christoph Lipka
 
     Merge branch 'master' into hotfix/boost1.49-boost_system
 
-Commit 16ea3b4 on 2014-01-04 by Christoph Lipka
+Commit 16ea3b40 on 2014-01-04 by Christoph Lipka
 
     Fix for configure attempting to link boost_system even with boost 1.49
     or earlier.
 
-Commit 34d0c6c on 2014-05-24 by Christoph Lipka (c-lipka)
+Commit 34d0c6c0 on 2014-05-24 by Christoph Lipka (c-lipka)
 
     Merge pull request #25 from nicolas17/comment-typos
 
     Fix some comment typos.
 
-Commit 1bdfcac on 2014-03-07 by Nicolás Alvarez
+Commit 1bdfcac3 on 2014-03-07 by Nicolás Alvarez
 
     Fix some comment typos.
 
-Commit d76159a on 2014-01-06 by Christoph Lipka
+Commit d76159a1 on 2014-01-06 by Christoph Lipka
 
     Reverted last change 4e6ca9e257030a4d949735665348e3d02937b5f2 due to
     unacceptable side effects, and implemented a different approach to try
     and fix issue #18
 
-Commit 4e6ca9e on 2014-01-01 by Christoph Lipka (c-lipka)
+Commit 4e6ca9e2 on 2014-01-01 by Christoph Lipka (c-lipka)
 
     Merge pull request #18 from jlec/master
 
     Only test mkl library with --with-libmkl
 
-Commit 20de88e on 2013-12-26 by Justin Lecher
+Commit 20de88e4 on 2013-12-26 by Justin Lecher
 
     Update logic for mkl location testing
 
     Signed-off-by: Justin Lecher <jlec@gentoo.org>
 
-Commit 781b2f3 on 2013-12-25 by Justin Lecher
+Commit 781b2f33 on 2013-12-25 by Justin Lecher
 
     Only test mkl library with --with-libmkl
 
@@ -3076,11 +3194,11 @@ Commit 781b2f3 on 2013-12-25 by Justin Lecher
 
     Signed-off-by: Justin Lecher <jlec@gentoo.org>
 
-Commit 5673a34 on 2013-12-25 by Christoph Lipka
+Commit 5673a34c on 2013-12-25 by Christoph Lipka
 
     Whitespace cleanup
 
-Commit 171a5b6 on 2013-12-25 by Christoph Lipka
+Commit 171a5b69 on 2013-12-25 by Christoph Lipka
 
     Add `Create_Continue_Trace_Log` ini setting and `-CC` command line option.
 
@@ -3089,13 +3207,13 @@ Commit 171a5b6 on 2013-12-25 by Christoph Lipka
     even speed up simple renders, if you abort the render you will be unable
     to continue it later using the `Continue_Trace=yes` or `+C` options.
 
-Commit 4745018 on 2013-12-20 by Christoph Lipka (c-lipka)
+Commit 4745018a on 2013-12-20 by Christoph Lipka (c-lipka)
 
     Merge pull request #17 from LeForgeron/master
 
     Proposal to fix fs#314 (perforce #6159)
 
-Commit a21c6e8 on 2013-12-20 by Jérôme Grimbert
+Commit a21c6e8d on 2013-12-20 by Jérôme Grimbert
 
     Proposal to fix fs#314 (perforce #6159)
 
@@ -3103,33 +3221,33 @@ Commit a21c6e8 on 2013-12-20 by Jérôme Grimbert
 POV-Ray v3.7.0.20131220
 ------------------------------------------------------------------------------
 
-Commit 5a081e9 on 2013-12-20 by Christoph Lipka
+Commit 5a081e92 on 2013-12-20 by Christoph Lipka
 
     fix <http://bugs.povray.org/task/318> and other media sampling method
     3 bogosities
 
-Commit 8c26649 on 2013-12-17 by Christoph Lipka
+Commit 8c26649c on 2013-12-17 by Christoph Lipka
 
     update various file headers to reflect that they no longer match the
     Perforce depot
 
-Commit 2fd1779 on 2013-12-16 by Christoph Lipka (c-lipka)
+Commit 2fd1779e on 2013-12-16 by Christoph Lipka (c-lipka)
 
     Merge pull request #16 from LeForgeron/master
 
     Fixing fs#317
 
-Commit 7ae56bc on 2013-12-15 by Jérôme Grimbert
+Commit 7ae56bc2 on 2013-12-15 by Jérôme Grimbert
 
     Fixing fs#317
 
-Commit 4add3ce on 2013-12-16 by Christoph Lipka
+Commit 4add3ce2 on 2013-12-16 by Christoph Lipka
 
     disabled the arbitrary limit on the number of blob components
 
     corresponds to Perforce change 6155.
 
-Commit 21fddef on 2013-12-16 by Christoph Lipka
+Commit 21fddefc on 2013-12-16 by Christoph Lipka
 
     updated platform config for OS X based
     on a patch by GitHub user Nyoho (see
@@ -3137,19 +3255,19 @@ Commit 21fddef on 2013-12-16 by Christoph Lipka
 
     corresponds to Perforce change 6148.
 
-Commit 0221338 on 2013-12-16 by Christoph Lipka
+Commit 02213382 on 2013-12-16 by Christoph Lipka
 
     attempt to fix GitHub issue #7
 
     corresponds to Perforce change 6137.
 
-Commit d8921a4 on 2013-12-16 by Christoph Lipka
+Commit d8921a46 on 2013-12-16 by Christoph Lipka
 
     fix GitHub issues #5 and #6.
 
     corresponds to Perforce changes 6135, 6136.
 
-Commit c69dd33 on 2013-12-16 by Christoph Lipka
+Commit c69dd33b on 2013-12-16 by Christoph Lipka
 
     now using std::tr1 smart pointers if available, or boost's implementation
     otherwise; we're using <boost/tr1/memory.hpp> to pull in either. Should
@@ -3157,13 +3275,13 @@ Commit c69dd33 on 2013-12-16 by Christoph Lipka
 
     corresponds to Perforce change 6132.
 
-Commit a417f97 on 2013-12-16 by Christoph Lipka
+Commit a417f975 on 2013-12-16 by Christoph Lipka
 
     eliminate uint type from platform-independent code; fixes GitHub issue #10
 
     corresponds to Perforce change 6130.
 
-Commit 7807b53 on 2013-12-16 by Christoph Lipka
+Commit 7807b535 on 2013-12-16 by Christoph Lipka
 
     added header files to hold Unix flavor-specific config settings;
     also thrown out the unused fseek64 macro from both Unix and Windows
@@ -3171,42 +3289,42 @@ Commit 7807b53 on 2013-12-16 by Christoph Lipka
 
     corresponds to Perforce changes 6129, 6131, 6133.
 
-Commit b260c34 on 2013-12-16 by Christoph Lipka
+Commit b260c34c on 2013-12-16 by Christoph Lipka
 
     Merge branch 'hotfix'
 
-Commit f69d768 on 2013-12-16 by Christoph Lipka
+Commit f69d768d on 2013-12-16 by Christoph Lipka
 
     fix for build error introduced with latest change (forgot to commit
     types.h)
 
-Commit c768ecd on 2013-12-16 by Christoph Lipka
+Commit c768ecdd on 2013-12-16 by Christoph Lipka
 
     eliminating some redundant computations in SSLT code
 
     corresponds to Perforce changes 6109, 6110.
 
-Commit e703a8b on 2013-12-16 by Christoph Lipka
+Commit e703a8ba on 2013-12-16 by Christoph Lipka
 
     various changes related to color computations.
 
     corresponds to Perforce changes 6089, 6090, 6095, 6096, 6097, 6113.
 
-Commit 278eb39 on 2013-12-16 by Christoph Lipka
+Commit 278eb390 on 2013-12-16 by Christoph Lipka
 
     preliminary workaround for FS#313 (radiosity.cpp
     pov::RadiosityFunction::BeforeTile assertion failed)
 
     corresponds to Perforce change 6092.
 
-Commit 956d8ab on 2013-12-16 by Christoph Lipka
+Commit 956d8ab8 on 2013-12-16 by Christoph Lipka
 
     VS2010 kept reporting GUI project to be out of date even if it wasn't;
     fixed.
 
     corresponds to Perforce change 6088.
 
-Commit 2d12f46 on 2013-12-16 by Christoph Lipka
+Commit 2d12f464 on 2013-12-16 by Christoph Lipka
 
     hotfix for residual issues with FS#270; the artifacts still observed
     with radiosity abort-continue will now only show in the preview, but
@@ -3214,52 +3332,52 @@ Commit 2d12f46 on 2013-12-16 by Christoph Lipka
 
     corresponds to Perforce change 6086.
 
-Commit ba9fd68 on 2013-12-16 by Christoph Lipka
+Commit ba9fd68c on 2013-12-16 by Christoph Lipka
 
     eliminated a host of C-style pointer casts, mostly by replacing with
     C++-style casts
 
     corresponds to Perforce changes 6083, 6084, 6085.
 
-Commit ce3f659 on 2013-12-16 by Christoph Lipka
+Commit ce3f6594 on 2013-12-16 by Christoph Lipka
 
     atmospheric fog, rainbows and sky spheres now use C++ style memory
     allocation instead of POV_MALLOC
 
     corresponds to Perforce change 6082.
 
-Commit 3c71689 on 2013-12-16 by Christoph Lipka
+Commit 3c71689e on 2013-12-16 by Christoph Lipka
 
     minor robustness improvement in IFF image reading code
 
     corresponds to Perforce change 6081.
 
-Commit c1d54d3 on 2013-12-16 by Christoph Lipka
+Commit c1d54d3e on 2013-12-16 by Christoph Lipka
 
     minor change in how zlib is included in povmscpp.cpp
 
     corresponds to Perforce change 6080.
 
-Commit a53e090 on 2013-12-16 by Christoph Lipka
+Commit a53e0901 on 2013-12-16 by Christoph Lipka
 
     more sophisticated way of pulling in the libtiff headers in povray.cpp
     without breaking the Windows build
 
     corresponds to Perforce change 6079.
 
-Commit af319dd on 2013-12-16 by Christoph Lipka
+Commit af319dd9 on 2013-12-16 by Christoph Lipka
 
     minor improvements in SSLT relating to the storage of precomputed values
 
     corresponds to Perforce change 6078.
 
-Commit 1430e54 on 2013-12-16 by Christoph Lipka
+Commit 1430e54d on 2013-12-16 by Christoph Lipka
 
     require boost >= 1.38
 
     corresponds to Perforce change 6077.
 
-Commit 51947bd on 2013-12-16 by Christoph Lipka
+Commit 51947bd3 on 2013-12-16 by Christoph Lipka
 
     fixed two yet unreported bugs:
     - Iridescence did not properly honor full area diffuse lighting.
@@ -3268,13 +3386,13 @@ Commit 51947bd on 2013-12-16 by Christoph Lipka
 
     corresponds to Perforce change 6076.
 
-Commit c86bd0a on 2013-12-16 by Christoph Lipka
+Commit c86bd0ad on 2013-12-16 by Christoph Lipka
 
     minor beautifications
 
     corresponds to Perforce change 6075.
 
-Commit d60416f on 2013-12-06 by Christoph Lipka (c-lipka)
+Commit d60416f4 on 2013-12-06 by Christoph Lipka (c-lipka)
 
     Merge pull request #14 from yoe/master
 
@@ -3282,7 +3400,7 @@ Commit d60416f on 2013-12-06 by Christoph Lipka (c-lipka)
     using the --add-missing parameter.
     Fixes issue #6. Thanks to Wouter "yoe" Verhelst.
 
-Commit 9e7e624 on 2013-12-06 by Wouter Verhelst
+Commit 9e7e624b on 2013-12-06 by Wouter Verhelst
 
     Make sure Makefile.in gets generated properly
 
@@ -3299,7 +3417,7 @@ Commit 9e7e624 on 2013-12-06 by Wouter Verhelst
     work, regardless of the version, and will avoid any issues due to the
     used scripts not matching the used automake version.
 
-Commit 227c801 on 2013-12-05 by Christoph Lipka (c-lipka)
+Commit 227c801d on 2013-12-05 by Christoph Lipka (c-lipka)
 
     Merge pull request #13 from yoe/master
 
@@ -3307,7 +3425,7 @@ Commit 227c801 on 2013-12-05 by Christoph Lipka (c-lipka)
     requires -lboost_system to work. (Thanks to Wouter "yoe" Verhelst for
     the fix.)
 
-Commit cba5bc5 on 2013-12-06 by Wouter Verhelst
+Commit cba5bc53 on 2013-12-06 by Wouter Verhelst
 
     Account for changes in boost dependencies
 
@@ -3319,56 +3437,56 @@ Commit cba5bc5 on 2013-12-06 by Wouter Verhelst
     Make it try without -lboost_system first, but try again with it added to
     $LIBS if that fails.
 
-Commit 8986ec3 on 2013-12-05 by Christoph Lipka
+Commit 8986ec37 on 2013-12-05 by Christoph Lipka
 
     minor whitespace cleanup
 
-Commit 63cb736 on 2013-12-04 by Chris Cason (chris20)
+Commit 63cb736a on 2013-12-04 by Chris Cason (chris20)
 
     Merge pull request #11 from c-lipka/master
 
     eliminate duplicate inclusion of hcmplx.h in backend/math/hcmplx.cpp
 
-Commit b557f95 on 2013-12-05 by Christoph Lipka
+Commit b557f952 on 2013-12-05 by Christoph Lipka
 
     eliminate duplicate inclusion of hcmplx.h in backend/math/hcmplx.cpp
 
-Commit 6d3d43e on 2013-11-17 by Chris Cason (chris20)
+Commit 6d3d43e5 on 2013-11-17 by Chris Cason (chris20)
 
     Merge pull request #4 from ideasman42/master
 
     quiet compiler warnings building with gcc and clang.
 
-Commit b3846f5 on 2013-11-17 by Campbell Barton
+Commit b3846f57 on 2013-11-17 by Campbell Barton
 
     quiet compiler warnings building with gcc and clang.
     - define variables and functions as static when not declared by headers.
     - remove some unused defines.
     - other minor changes to quiet warnings.
 
-Commit fbc04c9 on 2013-11-16 by Chris Cason (chris20)
+Commit fbc04c97 on 2013-11-16 by Chris Cason (chris20)
 
     Merge pull request #2 from POV-Ray/3.7-stable
 
     3.7 stable
 
-Commit cfbd0c1 on 2013-11-16 by Chris Cason (chris20)
+Commit cfbd0c1a on 2013-11-16 by Chris Cason (chris20)
 
     Update README.md
 
-Commit 16c80a3 on 2013-11-16 by Chris Cason (chris20)
+Commit 16c80a36 on 2013-11-16 by Chris Cason (chris20)
 
     Update README.md
 
-Commit b775d60 on 2013-11-16 by Chris Cason (chris20)
+Commit b775d60f on 2013-11-16 by Chris Cason (chris20)
 
     Update README.md
 
-Commit 0bbe2b7 on 2013-11-16 by Chris Cason (chris20)
+Commit 0bbe2b76 on 2013-11-16 by Chris Cason (chris20)
 
     Create README.md
 
-Commit 373631e on 2013-11-16 by Chris Cason (chris20)
+Commit 373631e4 on 2013-11-16 by Chris Cason (chris20)
 
     Add docs
 
@@ -3376,23 +3494,23 @@ Commit 373631e on 2013-11-16 by Chris Cason (chris20)
 POV-Ray v3.7.0.0
 ------------------------------------------------------------------------------
 
-Commit 392510a on 2013-11-06 by Chris Cason (chris20)
+Commit 392510ad on 2013-11-06 by Chris Cason (chris20)
 
     Fix typo
 
-Commit b0fd27d on 2013-11-06 by Chris Cason (chris20)
+Commit b0fd27df on 2013-11-06 by Chris Cason (chris20)
 
     Add .gitignore
 
-Commit c7442df on 2013-11-06 by Chris Cason (chris20)
+Commit c7442dfc on 2013-11-06 by Chris Cason (chris20)
 
     Update README.md
 
-Commit 5378182 on 2013-11-06 by Chris Cason (chris20)
+Commit 5378182e on 2013-11-06 by Chris Cason (chris20)
 
     Add README.md
 
-Commit 86f4639 on 2013-11-06 by Chris Cason (chris20)
+Commit 86f4639d on 2013-11-06 by Chris Cason (chris20)
 
     Initial import
     [to GitHub]

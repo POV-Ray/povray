@@ -7,7 +7,7 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -185,6 +185,9 @@ void Parser::Run()
         Default_Texture->Tnormal = NULL;
         Default_Texture->Finish  = Create_Finish();
 
+        // Initialize various defaults depending on language version as per command line / INI settings.
+        InitDefaults(sceneData->EffectiveLanguageVersion());
+
         Not_In_Default = true;
         Ok_To_Declare = true;
         LValue_Ok = false;
@@ -335,7 +338,7 @@ void Parser::Run()
         (sceneData->bspChildAccessCost != 0.0f) || (sceneData->bspMissChance != 0.0f))
     {
         Warning("You have overridden a default BSP tree cost constant. Note that these "
-                "INI settings may be removed or changed prior to the final 3.7 release.\n");
+                "INI settings may be removed or changed without notice in future versions.\n");
     }
 
     // TODO FIXME - review whole if-statement and line after it below [trf]
@@ -506,6 +509,34 @@ void Parser::Frame_Init()
     sceneData->skysphere = NULL;
 }
 
+
+/****************************************************************************/
+
+void Parser::InitDefaults(int version)
+{
+    // Initialize defaults depending on version:
+    // As of v3.8...
+    //   - `ambient` defaults to 0.0.
+    //   - Camera `right` length defaults to output image aspect ratio.
+    // Prior to that...
+    //   - `ambient` defaulted to 0.1.
+    //   - Camera `right` length defaulted to 1.33.
+
+    double ambientLevel;
+    double rightLength;
+    if (version >= 380)
+    {
+        ambientLevel = 0.0;
+        rightLength = sceneData->aspectRatio;
+    }
+    else
+    {
+        ambientLevel = 0.1;
+        rightLength = 1.33;
+    }
+    Default_Texture->Finish->Ambient = MathColour(ambientLevel);
+    Default_Camera.Right = Vector3d(rightLength, 0.0, 0.0);
+}
 
 
 /*****************************************************************************
@@ -1423,7 +1454,7 @@ void Parser::Parse_Camera (Camera& Cam)
     {
 
         /*
-         * The camera statement in version 3.5 is a tiny bit more restrictive
+         * The camera statement in version v3.5 is a tiny bit more restrictive
          * than in previous versions (Note: Backward compatibility is available
          * with the version switch!).  It will always apply camera modifiers in
          * the same order, regardless of the order in which they appeared in the
@@ -2725,7 +2756,7 @@ void Parser::ParseContainedBy(shared_ptr<pov::ContainedByShape>& container, Obje
 *
 * CHANGES
 *
-*   Dec 1994 : Adopted to version 3.0. [DB]
+*   Dec 1994 : Adopted to version v3.0. [DB]
 *   Sept 1995 : Total rewrite for new syntax [TW]
 *
 ******************************************************************************/
@@ -3011,9 +3042,9 @@ ObjectPtr Parser::Parse_Lathe()
 
               if (Points[i][X] < 0.0)
               {
-                 if ((sceneData->EffectiveLanguageVersion() < 371) && ((i == 0) || (i == Object->Number - 1)))
+                 if ((sceneData->EffectiveLanguageVersion() < 380) && ((i == 0) || (i == Object->Number - 1)))
                      Warning("Lathe with linear spline has a first or last point with an x value < 0.0.\n"
-                             "Leads to artifacts and an error in #version 3.71 onward.");
+                             "Leads to artifacts, and would be considered an error in v3.8 and later scenes.");
                  else
                      Error("Lathe with linear spline has a point with an x value < 0.0.");
               }
@@ -3024,9 +3055,9 @@ ObjectPtr Parser::Parse_Lathe()
 
               if ((i > 0) && (Points[i][X] < 0.0))
               {
-                 if ((sceneData->EffectiveLanguageVersion() < 371) && (i == Object->Number - 1))
+                 if ((sceneData->EffectiveLanguageVersion() < 380) && (i == Object->Number - 1))
                      Warning("Lathe with quadratic spline has last point with an x value < 0.0.\n"
-                             "Leads to artifacts and an error in #version 3.71 onward.");
+                             "Leads to artifacts, and would be considered an error in v3.8 and later scenes.");
                  else
                      Error("Lathe with quadratic spline has a point with an x value < 0.0.");
               }
@@ -3046,9 +3077,9 @@ ObjectPtr Parser::Parse_Lathe()
 
               if (((i%4 == 0) || (i%4 == 3)) && (Points[i][X] < 0.0))
               {
-                 if ((sceneData->EffectiveLanguageVersion() < 371) && ((i == 0) || (i == Object->Number - 1)))
+                 if ((sceneData->EffectiveLanguageVersion() < 380) && ((i == 0) || (i == Object->Number - 1)))
                      Warning("Lathe with Bezier spline has a first or last point with an x value < 0.0.\n"
-                             "Leads to artifacts and an error in #version 3.71 onward.");
+                             "Leads to artifacts, and would be considered an error in v3.8 and later scenes.");
                  else
                      Error("Lathe with Bezier spline has a point with an x value < 0.0.");
               }
@@ -3387,7 +3418,7 @@ ObjectPtr Parser::Parse_Light_Source ()
         /* NK phmap */
         CASE (COLOUR_MAP_TOKEN)
             // TODO - apparently this undocumented syntax was once intended to do something related to dispersion,
-            //        but in 3.7 is dysfunctional, doing nothing except provide an undocumented means of averaging
+            //        but is currently dysfunctional, doing nothing except provide an undocumented means of averaging
             //        different colours. Can we safely drop it?
             Warning("Undocumented syntax ignored (colour_map in light_source);"
                     " future versions of POV-Ray may drop support for it entirely.");
@@ -3646,9 +3677,9 @@ ObjectPtr Parser::Parse_Light_Source ()
         END_CASE
     END_EXPECT
 
-    if ((Object->Fade_Power != 0) && (fabs(Object->Fade_Distance) < EPSILON) && (sceneData->EffectiveLanguageVersion() < 371))
+    if ((Object->Fade_Power != 0) && (fabs(Object->Fade_Distance) < EPSILON) && (sceneData->EffectiveLanguageVersion() < 380))
     {
-        Warning("fade_power with fade_distance 0 is not supported in legacy (pre-3.71) scenes; fade_power is ignored.");
+        Warning("fade_power with fade_distance 0 is not supported in legacy (pre-v3.8) scenes; fade_power is ignored.");
         Object->Fade_Power    = 0;
         Object->Fade_Distance = 0;
     }
@@ -4871,12 +4902,12 @@ TEXTURE *Parser::Parse_Mesh_Texture (TEXTURE **t2, TEXTURE **t3)
 * CHANGES
 *
 *   Jul 2010 : Creation.
+*   Jul 2016 : extension with distance & radius
 *
 ******************************************************************************/
 
 ObjectPtr Parser::Parse_Ovus()
 {
-    DBL distance;
     Ovus *Object;
 
     Parse_Begin();
@@ -4892,51 +4923,119 @@ ObjectPtr Parser::Parse_Ovus()
     Object->BottomRadius = Parse_Float(); /* Bottom radius */
     Parse_Comma();
     Object->TopRadius = Parse_Float(); /* Top radius */
+    // default values, for backward compatibility
+    Object->VerticalSpherePosition = Object->BottomRadius;
+    Object->ConnectingRadius = 2.0 * std::max(Object->BottomRadius, Object->TopRadius);
+    EXPECT
+        CASE(RADIUS_TOKEN)
+            Object->ConnectingRadius = Parse_Float();
+        END_CASE
+        CASE(DISTANCE_TOKEN)
+            Object->VerticalSpherePosition = Parse_Float();
+        END_CASE
+        CASE(PRECISION_TOKEN)
+            Object->RootTolerance = Parse_Float();
+        END_CASE
+        OTHERWISE
+            UNGET
+            EXIT
+        END_CASE
+    END_EXPECT
 
     /*
      ** Pre-compute the important values
      */
-    if ((Object->TopRadius < 0)||(Object->BottomRadius < 0))
+    if ((Object->TopRadius < 0)||(Object->BottomRadius <= 0))
     {
-        Error("Both Ovus radii must be positive");
+        Error("Both Ovus radii must be positive, and bottom radius must be strictly positive");
     }
-    if (Object->TopRadius < 2.0 * Object->BottomRadius)
+    if (Object->VerticalSpherePosition < Object->BottomRadius)
     {
-        if (Object->BottomRadius > Object->TopRadius)
-        {
-            Object->ConnectingRadius = 2.0 * Object->BottomRadius;
-            Object->VerticalPosition = 2.0 * Object->TopRadius - Object->BottomRadius - (Object->TopRadius * Object->TopRadius / (2.0 * Object->BottomRadius) );
-            Object->HorizontalPosition = sqrt((Object->BottomRadius)*(Object->BottomRadius) -(Object->VerticalPosition)*(Object->VerticalPosition));
-            Object->BottomVertical = -Object->VerticalPosition;
-            distance = Object->ConnectingRadius - Object->TopRadius;
-            Object->TopVertical = ((Object->BottomRadius - Object->VerticalPosition) * Object->TopRadius / distance ) + Object->BottomRadius;
-        } else {
-            Object->ConnectingRadius = 2.0 * Object->TopRadius;
-            Object->VerticalPosition = - 2.0 * Object->TopRadius + Object->BottomRadius + (1.5 * Object->TopRadius * Object->TopRadius / Object->BottomRadius);
-            Object->HorizontalPosition = sqrt((Object->TopRadius)*(Object->TopRadius) - ((Object->VerticalPosition - Object->BottomRadius) * (Object->VerticalPosition - Object->BottomRadius)));
-            Object->TopVertical = 2.0 * Object->BottomRadius - Object->VerticalPosition;
-            distance = Object->ConnectingRadius - Object->BottomRadius;
-            Object->BottomVertical = -Object->VerticalPosition * Object->BottomRadius / distance;
-        }
+        Error("distance of Ovus must be greater or equal to bottom radius");
+        // in theory, it would be possible to allow VerticalSpherePosition + TopRadius >= BottomRadius
+        // (with VerticalSpherePosition > 0)
+        // but the computation of BottomVertical & TopVertical would need more work, as the current formula
+        // use a simplification based on VerticalSpherePosition >= BottomRadius
+    }
+    if ( Object->TopRadius + Object->BottomRadius + Object->VerticalSpherePosition > 2*Object->ConnectingRadius)
+    {
+        Error("Connecting radius of Ovus is too small. Should be at least half the sum of the three other distances. sphere or lemon object could also be considered.");
+    }
+    /*
+     *  b : BottomRadius
+     *  r : ConnectingRadius
+     *  t : TopRadius
+     *  v : VerticalSpherePosition
+     *
+     * solve (x^2+y^2)=(r-b)^2, (x^2+(y-v)^2)=(r-t)^2, v>=b, t>=0, b>0, 2r>=(b+t+v) for x,y
+     *  intersection of two circles:
+     *   from the origin (center of bottom sphere), connecting radius - bottom radius
+     *   from the center of top sphere, connecting radius - top radius
+     *
+     * x = +/- 1/2 sqrt( - (b^2-2bt+t^2-v^2)(b^2-4br+2bt+4r^2-4rt+t^2-v^2)/v^2)
+     * remaining code expect x >= 0
+     */
 
-        Object->Compute_BBox();
-        Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
-        return (reinterpret_cast<ObjectPtr>(Object));
+    Object->HorizontalPosition = sqrt(
+            -(Sqr(Object->BottomRadius)-2.0*Object->BottomRadius*Object->TopRadius+Sqr(Object->TopRadius)-Sqr(Object->VerticalSpherePosition))
+            *(Sqr(Object->BottomRadius)-4.0*Object->BottomRadius*Object->ConnectingRadius+2.0*Object->BottomRadius*Object->TopRadius+4.0*Sqr(Object->ConnectingRadius)-4.0*Object->ConnectingRadius*Object->TopRadius+Sqr(Object->TopRadius) -Sqr(Object->VerticalSpherePosition))
+            )
+        /(Object->VerticalSpherePosition*2.0);
+
+    /*
+     * for t=b+v and r> (b^2-t^2-v^2)/(2(b-t))
+     *
+     * y = sqrt( r^2-2rt+t^2-x^2)
+     *
+     *
+     * for t>b+v and r = (b+v+t)/2
+     * for b<t<b+v and r> (b^2-t^2-v^2)/(2(b-t))
+     * for t=b+v and r> (b^2-t^2-v^2)/(2(b-t))
+     *
+     * y = sqrt( r^2-2rt+t^2-x^2) +v
+     *
+     *
+     * else
+     *
+     * y = v- sqrt( r^2-2rt+t^2-x^2)
+     */
+    if ((Object->TopRadius == (Object->BottomRadius+Object->VerticalSpherePosition))&&(Object->ConnectingRadius > ((Sqr(Object->BottomRadius)-Sqr(Object->TopRadius)-Sqr(Object->VerticalSpherePosition))/(2.0*Object->VerticalSpherePosition))))
+    {
+        Object->VerticalPosition = sqrt(Sqr(Object->ConnectingRadius-Object->TopRadius)-Sqr(Object->HorizontalPosition));
+    }
+    else if
+        (
+         (( Object->TopRadius > (Object->BottomRadius + Object->VerticalSpherePosition ) ) && ( Object->ConnectingRadius == ((Object->BottomRadius+Object->TopRadius+Object->VerticalSpherePosition)/2.0)))
+         ||((Object->BottomRadius < Object->TopRadius) && (Object->TopRadius < (Object->BottomRadius+Object->VerticalSpherePosition))&&(Object->ConnectingRadius > ((Sqr(Object->BottomRadius)-Sqr(Object->TopRadius)-Sqr(Object->VerticalSpherePosition))/(2.0*Object->VerticalSpherePosition))))
+         ||( (Object->TopRadius == (Object->BottomRadius+Object->VerticalSpherePosition))&&(Object->ConnectingRadius > ((Sqr(Object->BottomRadius)-Sqr(Object->TopRadius)-Sqr(Object->VerticalSpherePosition))/(2.0*Object->VerticalSpherePosition))))
+        )
+    {
+        Object->VerticalPosition = Object->VerticalSpherePosition+sqrt(Sqr(Object->ConnectingRadius-Object->TopRadius)-Sqr(Object->HorizontalPosition));
     }
     else
     {
-        PossibleError("Ovus second radius should be less than twice first radius\nSubstituing a sphere to ovus as it would be identical & simpler");
-        Sphere * Replacement;
-        Replacement = new Sphere();
-        Replacement->Center[X]=0;
-        Replacement->Center[Y]=Object->BottomRadius;
-        Replacement->Center[Z]=0;
-        Replacement->Radius = Object->TopRadius;
-        delete Object;
-        Replacement->Compute_BBox();
-        Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Replacement));
-        return (reinterpret_cast<ObjectPtr>(Replacement));
+        Object->VerticalPosition = Object->VerticalSpherePosition-sqrt(Sqr(Object->ConnectingRadius-Object->TopRadius)-Sqr(Object->HorizontalPosition));
     }
+    // if not a degenerated sphere, HorizontalPosition is a square root, test only against 0, as negative is not possible
+    if (Object->HorizontalPosition != 0.0)
+    {
+        Object->BottomVertical = -Object->VerticalPosition*Object->BottomRadius/(Object->ConnectingRadius-Object->BottomRadius);
+        Object->TopVertical = -( Object->VerticalPosition-Object->VerticalSpherePosition)* Object->TopRadius / (Object->ConnectingRadius - Object->TopRadius)  + Object->VerticalSpherePosition;
+    }
+    else
+    { // replace the ovus with the top sphere, keeping the parsing of option compatible with ovus (sturm)
+        Object->VerticalSpherePosition = Object->VerticalPosition;
+        Object->TopRadius = Object->ConnectingRadius;
+        Object->TopVertical = Object->VerticalSpherePosition-Object->ConnectingRadius;
+        Object->BottomVertical = -Object->ConnectingRadius;// low enough
+        Object->BottomRadius = 0.0;
+        Object->ConnectingRadius = 0.0;
+        Warning(0, "Ovus is reduced to a sphere, consider using a real sphere instead");
+    }
+
+    Object->Compute_BBox();
+    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+    return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 /*****************************************************************************
@@ -9277,9 +9376,9 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
             // Reason: Code like this would be unreadable but possible. Is it
             // a recursive function or not? - It is not recursive because the
             // foo in the second line refers to the first function, which is
-            // not logical. Further, recursion is not supported in POV-Ray 3.5
+            // not logical. Further, recursion is not supported in current POV-Ray
             // anyway. However, allowing such code now would cause problems
-            // implementing recursive functions after POV-Ray 3.5!
+            // implementing recursive functions in future versions!
             if(sym != NULL)
                 Temp_Data  = reinterpret_cast<void *>(Parse_DeclareFunction(NumberPtr, sym->Token_Name, is_local));
             else
@@ -9789,6 +9888,7 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
         }
         if (Object->interior == NULL)
         {
+            // TODO - may need to copy the interior, as we may need to modify a few of its fields.
             Object->interior = Parent->interior;
         }
 

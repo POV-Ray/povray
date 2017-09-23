@@ -1,5 +1,5 @@
 ===============================================================================
-POV-Ray 3.7 for UNIX/Linux - INSTALL file
+POV-Ray v3.8 for UNIX/Linux - INSTALL file
 
 Compiling and installing POV-Ray for Unix from sources.
 
@@ -54,13 +54,14 @@ are listed in section 3.
 The last command in the example above installs POV-Ray under system-wide
 directories and needs root privileges.  Installing as non-privileged user is
 also possible; see section 3.1.  By default (i.e. as root), 'make install'
-installs the following components:
+installs the following components (X.Y representing the first two fields of
+the version number, e.g. for v3.8.1 this would be 3.8):
   povray binary (executable)              in /usr/local/bin
-  data files (e.g. includes, scene files) in /usr/local/share/povray-3.7
-  documentation (text and html)           in /usr/local/share/doc/povray-3.7
-  configuration files (e.g. povray.conf)  in /usr/local/etc/povray/3.7
+  data files (e.g. includes, scene files) in /usr/local/share/povray-X.Y
+  documentation (text and html)           in /usr/local/share/doc/povray-X.Y
+  configuration files (e.g. povray.conf)  in /usr/local/etc/povray/X.Y
 
-The configuration files are also copied under the $HOME/.povray/3.7 directory
+The configuration files are also copied under the $HOME/.povray/X.Y directory
 of the user (or root) who is doing the installation.  For further details
 regarding those files, please read the instructions in README.unix and in
 chapter 1 of the documentation.
@@ -80,11 +81,13 @@ libraries.
 
 The build system must have:
 
-- a modern C++ compiler which supports C++ templates and follows the ISO C++
-  standard as much as possible; for instance, the GNU GCC 4.x series and the
-  Intel C++ compiler version 9.x or above.  They are available at:
-  http://www.gnu.org/software/gcc
-  http://www.intel.com/software/products/compilers
+- a modern C++ compiler which complies with the ISO C++11 standard as much as
+  possible; for instance, the GNU GCC 5.x series, the Clang++ compiler version
+  3.3 or above, and the Intel C++ compiler version 15.x or above.  They are
+  available at:
+  https://www.gnu.org/software/gcc/
+  https://clang.llvm.org/
+  https://software.intel.com/en-us/intel-compilers
 
 - a working 'make' utility.  We strongly recommand to use GNU Make version 3.79
   or above.  Most GNU/Linux distribution should come with it.  Other platforms
