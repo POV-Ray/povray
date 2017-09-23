@@ -41,7 +41,6 @@
 #include "base/platformbase.h"
 #include "base/textstream.h"
 #include "base/textstreambuffer.h"
-#include "base/version.h"
 #include "base/image/encoding.h"
 
 #include "povms/povmsid.h"
@@ -748,6 +747,7 @@ void InitInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
     int h, i, j;
     int cnt;
     int l;
+    std::string generation;
 
     l = 1024;
     charbuf[0] = 0;
@@ -756,12 +756,17 @@ void InitInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
 
     l = 1024;
     charbuf[0] = 0;
+    if (POVMSUtil_GetString(msg, kPOVAttrib_CoreVersion, charbuf, &l) == kNoErr)
+        generation = charbuf;
+
+    l = 1024;
+    charbuf[0] = 0;
     if(POVMSUtil_GetString(msg, kPOVAttrib_EnglishText, charbuf, &l) == kNoErr)
         tsb->printf("%s\n", charbuf);
 
     tsb->printf("\n");
 
-    tsb->printf("Primary POV-Ray v" POV_RAY_GENERATION " Architects/Developers: (Alphabetically)\n");
+    tsb->printf("Primary %s Architects/Developers: (Alphabetically)\n", generation.c_str());
     if(POVMSObject_Get(msg, &attrlist, kPOVAttrib_PrimaryDevs) == kNoErr)
     {
         cnt = 0;

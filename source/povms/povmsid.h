@@ -276,6 +276,7 @@ enum
 
     // backend init
     kPOVAttrib_CoreVersion           = 'Core',
+    kPOVAttrib_CoreGeneration        = 'CorG',
     kPOVAttrib_PlatformName          = 'Plat',
     kPOVAttrib_Official              = 'Offi',
     kPOVAttrib_PrimaryDevs           = 'Prim',
