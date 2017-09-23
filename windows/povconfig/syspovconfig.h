@@ -275,9 +275,6 @@ namespace pov_base
 #define BUILTIN_IO_RESTRICTIONS "enabled"
 /* I/O restrictions. */
 #define IO_RESTRICTIONS_DISABLED 0
-/* Base version number of package. */
-#include "..\..\source\base\version.h"
-#define VERSION_BASE OFFICIAL_GENERATION_STRING
 /* SDL display library */
 #define HAVE_LIBSDL
 

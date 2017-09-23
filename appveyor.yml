@@ -1,7 +1,4 @@
-init:
-  - cmd:call "tools/windows/get-source-version.bat" "source/base/version.h"
-
-version: $env:POV_SOURCE_GENERATION+av{build}
+version: 3.8+av{build}
 pull_requests:
   do_not_increment_build_number: true
 branches:
@@ -19,7 +16,7 @@ environment:
   GUIProj: windows/vs2015/povray.sln
   GUIDefs: POV_RAY_IS_AUTOBUILD=1;POV_RAY_BUILD_ID="av$(APPVEYOR_BUILD_NUMBER)";BUILT_BY="AppVeyor";
   CUIProj: windows/vs2015/console.vcxproj
-  CUIDefs: $(GUIDefs)VERSION_BASE="$env:POV_SOURCE_GENERATION";_CONSOLE;
+  CUIDefs: $(GUIDefs)VERSION_BASE="3.8";_CONSOLE;
   matrix:
   # Graphic User Interface (GUI) build matrix
   - PovBuildProj: $(GUIProj)

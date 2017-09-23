@@ -173,6 +173,8 @@ static void PrintMessage(const char *title, const char *message)
 
 void PrintStatus(vfeSession *session)
 {
+  // TODO -- when invoked while processing "--help" command-line switch,
+  //         GNU/Linux customs would be to print to stdout (among other differences).
   string str;
   vfeSession::MessageType type;
   static vfeSession::MessageType lastType = vfeSession::mUnclassified;
@@ -233,6 +235,7 @@ static void PrintStatusChanged (vfeSession *session, State force = kUnknown)
 
 static void PrintVersion(void)
 {
+  // TODO -- GNU/Linux customs would be to print to stdout (among other differences).
   fprintf(stderr,
       "%s %s\n\n"
       "%s\n%s\n%s\n"
@@ -257,6 +260,12 @@ static void PrintVersion(void)
       BUILD_ARCH, BUILT_FOR, COMPILER_VENDOR, COMPILER_VERSION
   );
 }
+
+static void PrintGeneration(void)
+{
+    fprintf(stdout, "%s\n", POV_RAY_GENERATION POV_RAY_BETA_SUFFIX);
+}
+
 
 void ErrorExit(vfeSession *session)
 {
@@ -511,6 +520,13 @@ extern "C" int main(int argc, char **argv)
     PrintVersion();
     delete session;
     return RETURN_OK;
+  }
+  else if (session->GetWinConOptions()->isOptionSet("general", "generation"))
+  {
+      session->Shutdown();
+      PrintGeneration();
+      delete session;
+      return RETURN_OK;
   }
   else if (session->GetWinConOptions()->isOptionSet("general", "benchmark"))
   {
