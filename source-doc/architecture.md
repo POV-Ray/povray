@@ -4,7 +4,7 @@
 Modules
 =======
 
-The original architectural design of POV-Ray 3.7.0 identified POV-Ray as being comprised of two main entities, called
+The original architectural design of POV-Ray v3.7.0 identified POV-Ray as being comprised of two main entities, called
 the _back-end_ and _front-end_. In a nutshell, the front-end would identify what scene file to render, start up one or
 more back-end instances, make sure those have access to the input files, and let them parse the scene and subsequently
 compute raw output image data from it. The front-end would then wait for the image data to trickle in, and ultimately
@@ -24,7 +24,7 @@ Current platform-specific implementations of POV-Ray also make use of another en
 _VFE_, the code of which resides outside the main source tree despite being shared across platforms. The purpose of this
 entity is to abstract away various details of the _POVMS_ interface exposed by the official _front-end_.
 
-Since the official release of POV-Ray 3.7.0, ongoing work has been put into further refining the architectural design,
+Since the official release of POV-Ray v3.7.0, ongoing work has been put into further refining the architectural design,
 currently distinguishing the following _modules_, each of which again resides in its own separate source sub-tree:
 
 

@@ -563,7 +563,7 @@ class ScaledGammaCurve : public GammaCurve
 
 /// Class representing a transformation between different (non-linear) "gamma spaces".
 ///
-/// @note   This class is only required for backward compatibility with POV-Ray 3.6.
+/// @note   This class is only required for backward compatibility with POV-Ray v3.6.
 ///
 class TranscodingGammaCurve : public GammaCurve
 {

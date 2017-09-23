@@ -59,7 +59,7 @@
 
 // behavior of pass_through objects
 #define PT_FILTER_BEFORE_TARGET     // pass_through objects encountered before target do affect photons color
-//#define PT_AMPLIFY_BUG              // replicate bogus 3.6 "photon amplifier" effect
+//#define PT_AMPLIFY_BUG              // replicate bogus v3.6 "photon amplifier" effect
 
 namespace pov
 {

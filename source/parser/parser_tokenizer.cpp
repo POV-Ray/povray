@@ -2428,9 +2428,10 @@ void Parser::Parse_Directive(int After_Hash)
                                 // originally designed.)
 
                                 if (Include_File_Index == 0)
-                                    Error("As of POV-Ray 3.7, the '#version' directive must be the first non-comment "
-                                          "statement in the scene file. If your scene will adapt to whatever version "
-                                          "is in use dynamically, start your scene with '#version version'.");
+                                    Error("As of POV-Ray v3.7, the '#version' directive must be the first non-comment "
+                                          "statement in the scene file. To indicate that your scene will dynamically "
+                                          "adapt to whatever POV-Ray version is actually used, start your scene with "
+                                          "'#version version;'.");
                             }
 
                             if (!sceneData->languageVersionLate && !sceneData->languageVersionSet)

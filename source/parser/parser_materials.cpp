@@ -155,7 +155,7 @@ void Parser::Make_Pattern_Image(ImageData *image, FUNCTION_PTR fn, int token)
                                            float(fnVMContext->GetLocal(pRED)),
                                            float(fnVMContext->GetLocal(pGREEN)),
                                            float(fnVMContext->GetLocal(pBLUE)),
-                                           float(fnVMContext->GetLocal(pFILTER)), // N.B. pFILTER component is currently ignored by the RGBA_Int16 SetRGBFTValue (matches 3.6 behavior)
+                                           float(fnVMContext->GetLocal(pFILTER)), // N.B. pFILTER component is currently ignored by the RGBA_Int16 SetRGBFTValue (matches v3.6 behavior)
                                            float(fnVMContext->GetLocal(pTRANSM)));
             }
         }
@@ -425,7 +425,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
 
         if (options.gammacorrect && !options.gammaOverride && (filetype == PNG_FILE) && (sceneData->EffectiveLanguageVersion() < 370))
         {
-            PossibleError("PNG input image default gamma handling has changed for pre POV-Ray 3.7 scenes;\n"
+            PossibleError("PNG input image default gamma handling has changed for pre POV-Ray v3.7 scenes;\n"
                           "results may differ from original intention. See the documentation for more\n"
                           "details.");
         }
@@ -2527,7 +2527,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
 
     if ((sceneData->EffectiveLanguageVersion() >= 370) && ambientSet)
     {
-        // As of version 3.7, use of "ambient" to model glowing materials is deprecated, and "emission" should be used
+        // As of v3.7, use of "ambient" to model glowing materials is deprecated, and "emission" should be used
         // instead.
 
         // We can only guess what the user is trying to achieve with the "ambient" keyword. Our heuristic is based on
@@ -2539,7 +2539,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
         if ((New->Ambient.Greyscale() >= 0.3) && !emissionSet)
         {
             PossibleError("Suspiciously high 'ambient' value found. Are you trying to model a glowing material?"
-                          " As of version 3.7, 'ambient' is disabled when using radiosity, and its use to model glowing"
+                          " As of POV-Ray v3.7, 'ambient' is disabled when using radiosity, and its use to model glowing"
                           " materials is generally deprecated; use 'emission' for this purpose instead."
                           " If your intention is to model unusually high ambient illumination in a non-radiosity scene,"
                           " you can avoid this warning by explicitly specifying 'emission 0'.");
@@ -3561,7 +3561,7 @@ void Parser::Parse_Media(vector<Media>& medialist)
 
         OTHERWISE
             UNGET
-            /* with version 3.5+, the default media method is now 3 */
+            /* as of v3.5, the default media method is now 3 */
             if(sceneData->EffectiveLanguageVersion() >= 350)
             {
                 IMedia->Intervals = 1;
