@@ -89,7 +89,6 @@ What To Change
 When updating a version number, the following files _always_ need to be changed accordingly:
 
   - `source/base/version.h`
-  - `unix/VERSION`
 
 When updating the minor or major version number, a host of other files need to be changed as well.
 To identify the files affected, search the _entire_ repository for the regular expression
@@ -114,7 +113,6 @@ The directory `tools/git/hooks` contains scripts intended to (among other things
 Git; to benefit from them, copy them to the `.git/hooks` directory in your local Git workspace. Whenever you perform a
 commit, they will automatically take care of the following:
 
-  - Verify that `unix/VERSION` and the various version number fields in `source/base/version.h` match.
   - Update the `ID` portion of pre-release versions whenever any files in one of the following directory sub-trees have
     been staged for commit: `source`, `vfe`, `platform`, `mac`, `unix`, `windows` or `libraries`. The new value of the
     `ID` portion will be the number of minutes elapsed since 2000-01-01 00:00 UTC. (If the `ID`

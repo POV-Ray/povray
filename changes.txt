@@ -67,6 +67,11 @@ Other Noteworthy
   - The source code now requires a C++11-compliant compiler.
   - Added `--generation` command-line switch to POV-Ray for Unix, which will
     cause POV-Ray to print its abbreviated version number to standard output.
+  - To simplify version number housekeeping, the file `unix/VERSION` is now
+    created on the fly by the `unix/prebuild.sh` script, and has been dropped
+    from the repository. To retrieve version information from the source
+    package, use one of the new `get-source-version.*` scripts provided in
+    `tools/unix/` and `tools/windows/`, respectively.
 
 
 Changes between 3.7.1-beta.9 and 3.7.1-rc.1
