@@ -119,7 +119,7 @@
   // NB: We're using the standard editor DLLs regardless of architecture optimization (e.g. AVX)
   #define EDITDLLNAME           "cmedit64.dll"
   #define EDITDLLNAME_DEBUG     "cmedit64d.dll"
-  #define VERSIONVAL            POV_RAY_BETA_PREFIX "VersionNo64"
+  #define VERSIONVAL            POVWIN_BETA_PREFIX "VersionNo64"
 #else
   #define BINDIRNAME            "bin32"
   #define INSTALLTIMEKEY        "InstallTime32"
@@ -130,7 +130,7 @@
     #define EDITDLLNAME         "cmedit32.dll"
   #endif
   #define EDITDLLNAME_DEBUG     "cmedit32d.dll"
-  #define VERSIONVAL            POV_RAY_BETA_PREFIX "VersionNo32"
+  #define VERSIONVAL            POVWIN_BETA_PREFIX "VersionNo32"
 #endif
 
 // ----------------------------------------------------------------------
