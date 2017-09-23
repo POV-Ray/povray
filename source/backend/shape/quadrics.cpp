@@ -110,7 +110,7 @@ bool Quadric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 {
 	DBL Depth1, Depth2;
 	VECTOR IPoint;
-	register int Intersection_Found;
+	int Intersection_Found;
 
 	Intersection_Found = false;
 
@@ -175,7 +175,7 @@ bool Quadric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 
 bool Quadric::Intersect(const Ray& ray, DBL *Depth1, DBL *Depth2) const
 {
-	register DBL a, b, c, d;
+	DBL a, b, c, d;
 
 	a = Xd * (QA * Xd + QB * Yd + QC * Zd) +
 	    Yd * (QE * Yd + QF * Zd) +

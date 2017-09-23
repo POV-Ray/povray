@@ -4991,7 +4991,7 @@ static DBL pavement_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 
 static DBL agate_pattern (const VECTOR EPoint, const TPATTERN *TPat, int noise_generator)
 {
-	register DBL noise, turb_val;
+	DBL noise, turb_val;
 	const TURB* Turb;
 
 	Turb=Search_For_Turb(TPat->Warps);
@@ -5047,7 +5047,7 @@ static DBL agate_pattern (const VECTOR EPoint, const TPATTERN *TPat, int noise_g
 
 static DBL boxed_pattern (const VECTOR EPoint)
 {
-	register DBL value;
+	DBL value;
 
 	value = max(fabs(EPoint[X]), max(fabs(EPoint[Y]), fabs(EPoint[Z])));
 	CLIP_DENSITY(value);
@@ -5599,7 +5599,7 @@ static DBL crackle_pattern (const VECTOR EPoint, const TPATTERN *TPat, TraceThre
 
 static DBL cylindrical_pattern (const VECTOR EPoint)
 {
-	register DBL value;
+	DBL value;
 
 	value = sqrt(Sqr(EPoint[X]) + Sqr(EPoint[Z]));
 	CLIP_DENSITY(value);
@@ -6013,8 +6013,8 @@ static DBL gradient_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 
 static DBL granite_pattern (const VECTOR EPoint, int noise_generator)
 {
-	register int i;
-	register DBL temp, noise = 0.0, freq = 1.0;
+	int i;
+	DBL temp, noise = 0.0, freq = 1.0;
 	VECTOR tv1,tv2;
 
 	VScale(tv1,EPoint,4.0);
@@ -6749,7 +6749,7 @@ static DBL juliax_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 
 static DBL leopard_pattern (const VECTOR EPoint)
 {
-	register DBL value, temp1, temp2, temp3;
+	DBL value, temp1, temp2, temp3;
 
 	/* This form didn't work with Zortech 386 compiler */
 	/* value = Sqr((sin(x)+sin(y)+sin(z))/3); */
@@ -7394,7 +7394,7 @@ static DBL mandelx_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 
 static DBL marble_pattern (const VECTOR EPoint, const TPATTERN *TPat, int noise_generator)
 {
-	register DBL turb_val;
+	DBL turb_val;
 	const TURB *Turb;
 
 	if ((Turb=Search_For_Turb(TPat->Warps)) != NULL)
@@ -7483,7 +7483,7 @@ static DBL onion_pattern (const VECTOR EPoint)
 {
 	/* The variable noise is not used as noise in this function */
 
-	register DBL noise;
+	DBL noise;
 
 /*
 	 This ramp goes 0-1,1-0,0-1,1-0...
@@ -7571,7 +7571,7 @@ static DBL pigment_pattern (const VECTOR EPoint, const TPATTERN *TPat, const Int
 
 static DBL planar_pattern (const VECTOR EPoint)
 {
-	register DBL value = fabs(EPoint[Y]);
+	DBL value = fabs(EPoint[Y]);
 
 	CLIP_DENSITY(value);
 
@@ -7653,7 +7653,7 @@ static DBL quilted_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 
 static DBL radial_pattern (const VECTOR EPoint)
 {
-	register DBL value;
+	DBL value;
 
 	if ((fabs(EPoint[X])<0.001) && (fabs(EPoint[Z])<0.001))
 	{
@@ -7701,8 +7701,8 @@ static DBL radial_pattern (const VECTOR EPoint)
 
 static DBL ripples_pattern (const VECTOR EPoint, const TPATTERN *TPat, const TraceThreadData *Thread)
 {
-	register unsigned int i;
-	register DBL length, index;
+	unsigned int i;
+	DBL length, index;
 	DBL scalar =0.0;
 	VECTOR point;
 
@@ -8088,7 +8088,7 @@ static DBL spiral2_pattern (const VECTOR EPoint, const TPATTERN *TPat, int noise
 
 static DBL spherical_pattern (const VECTOR EPoint)
 {
-	register DBL value;
+	DBL value;
 
 	VLength(value, EPoint);
 	CLIP_DENSITY(value);
@@ -8130,8 +8130,8 @@ static DBL spherical_pattern (const VECTOR EPoint)
 
 static DBL waves_pattern (const VECTOR EPoint, const TPATTERN *TPat, const TraceThreadData *Thread)
 {
-	register unsigned int i;
-	register DBL length, index;
+	unsigned int i;
+	DBL length, index;
 	DBL scalar = 0.0;
 	VECTOR point;
 
@@ -8188,7 +8188,7 @@ static DBL waves_pattern (const VECTOR EPoint, const TPATTERN *TPat, const Trace
 
 static DBL wood_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 {
-	register DBL length;
+	DBL length;
 	VECTOR WoodTurbulence;
 	VECTOR point;
 	DBL x=EPoint[X];
@@ -8251,7 +8251,7 @@ static DBL wood_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 
 static DBL wrinkles_pattern (const VECTOR EPoint, int noise_generator)
 {
-	register int i;
+	int i;
 	DBL lambda = 2.0;
 	DBL omega = 0.5;
 	DBL value;

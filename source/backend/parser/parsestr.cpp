@@ -1035,7 +1035,7 @@ UCS2 *Parser::UCS2_strcat(UCS2 *s1, const UCS2 *s2)
 
 int Parser::UCS2_strlen(const UCS2 *str)
 {
-	register int i;
+	int i;
 
 	for(i = 0; *str != 0; str++, i++) { }
 

@@ -45,12 +45,22 @@ Compatibility Improvements
     `shared_ptr` from C++11 rather than boost/tr1 (GitHub issue #339).
   - Fixed compatibility with systems not exposing `atof` in the global
     namespace (reported in discussion about GitHub issue #317).
+  - Eliminated use of `register` keyword to silence warnings with C++11 (where
+    the keyword is deprecated) and improve compatibility with C++17 (where the
+    keyword is disallowed).
 
 Compiler Requirements
 ---------------------
 
   - To compile with Boost 1.65.0 or later, a C++11-compliant compiler will be
     required for this and any future versions of the v3.7.0 series.
+
+Known Issues
+------------
+
+  - The 3rd party libraries bundled with the POV-Ray 3.7.0 source code have not
+    been updated for C++17 compliance; as a consequence, POV-Ray for Windows
+    may not compile on fully C++17-compliant compilers.
 
 
 Changes between 3.7.0.3 and 3.7.0.4

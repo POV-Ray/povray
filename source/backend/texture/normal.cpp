@@ -116,8 +116,8 @@ static void facets (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal, 
 
 static void ripples (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal, const TraceThreadData *Thread)
 {
-	register unsigned int i;
-	register DBL length, scalar, index;
+	unsigned int i;
+	DBL length, scalar, index;
 	VECTOR point;
 
 	for (i = 0 ; i < Thread->numberOfWaves ; i++)
@@ -162,8 +162,8 @@ static void ripples (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal,
 
 static void waves (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal, const TraceThreadData *Thread)
 {
-	register unsigned int i;
-	register DBL length, scalar, index, sinValue ;
+	unsigned int i;
+	DBL length, scalar, index, sinValue ;
 	VECTOR point;
 
 	for (i = 0 ; i < Thread->numberOfWaves ; i++)
@@ -303,8 +303,8 @@ static void dents (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal, c
 
 static void wrinkles (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal)
 {
-	register int i;
-	register DBL scale = 1.0;
+	int i;
+	DBL scale = 1.0;
 	VECTOR result, value, value2;
 
 	Make_Vector(result, 0.0, 0.0, 0.0);

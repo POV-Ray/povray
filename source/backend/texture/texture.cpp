@@ -1053,7 +1053,7 @@ DBL cycloidal(DBL value)
 
 DBL Triangle_Wave(DBL value)
 {
-	register DBL offset;
+	DBL offset;
 
 	if (value >= 0.0)
 	{

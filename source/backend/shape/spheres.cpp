@@ -85,7 +85,7 @@ bool Sphere::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 
 	if(Do_Ellipsoid)
 	{
-		register int Intersection_Found;
+		int Intersection_Found;
 		DBL Depth1, Depth2, len;
 		VECTOR IPoint;
 		Ray New_Ray;
@@ -132,7 +132,7 @@ bool Sphere::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 	}
 	else
 	{
-		register int Intersection_Found;
+		int Intersection_Found;
 		DBL Depth1, Depth2;
 		VECTOR IPoint;
 

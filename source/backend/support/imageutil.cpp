@@ -1212,7 +1212,7 @@ static void bilinear(DBL *factors, DBL x, DBL y)
 
 static void norm_dist(DBL *factors, DBL x, DBL y)
 {
-	register int i;
+	int i;
 
 	DBL p, q;
 	DBL wts[4];

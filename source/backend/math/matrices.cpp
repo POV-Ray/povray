@@ -101,7 +101,7 @@ namespace pov
 
 void MZero (MATRIX result)
 {
-	register int i, j;
+	int i, j;
 
 	for (i = 0 ; i < 4 ; i++)
 	{
@@ -145,7 +145,7 @@ void MZero (MATRIX result)
 
 void MIdentity (MATRIX result)
 {
-	register int i, j;
+	int i, j;
 
 	for (i = 0 ; i < 4 ; i++)
 	{
@@ -298,7 +298,7 @@ void MTimesC (MATRIX result, const MATRIX matrix1, const MATRIX matrix2)
 
 void MAdd (MATRIX result, MATRIX matrix1, MATRIX matrix2)
 {
-	register int i, j;
+	int i, j;
 
 	for (i = 0 ; i < 4 ; i++)
 		for (j = 0 ; j < 4 ; j++)
@@ -307,7 +307,7 @@ void MAdd (MATRIX result, MATRIX matrix1, MATRIX matrix2)
 
 void MSub (MATRIX result, MATRIX matrix1, MATRIX matrix2)
 {
-	register int i, j;
+	int i, j;
 
 	for (i = 0 ; i < 4 ; i++)
 		for (j = 0 ; j < 4 ; j++)
@@ -316,7 +316,7 @@ void MSub (MATRIX result, MATRIX matrix1, MATRIX matrix2)
 
 void MScale (MATRIX result, MATRIX matrix1, DBL amount)
 {
-	register int i, j;
+	int i, j;
 
 	for (i = 0 ; i < 4 ; i++)
 		for (j = 0 ; j < 4 ; j++)
@@ -368,7 +368,7 @@ void MTranspose (MATRIX result)
 
 void MTranspose (MATRIX result, const MATRIX matrix1)
 {
-	register int i, j;
+	int i, j;
 
 	for (i = 0 ; i < 4 ; i++)
 	{
@@ -405,7 +405,7 @@ void MTranspose (MATRIX result, const MATRIX matrix1)
 
 void MTransPoint (VECTOR result, const VECTOR vector, const TRANSFORM *transform)
 {
-	register int i;
+	int i;
 	DBL answer_array[4];
 	const MATRIX *matrix;
 
@@ -451,7 +451,7 @@ void MTransPoint (VECTOR result, const VECTOR vector, const TRANSFORM *transform
 
 void MInvTransPoint (VECTOR result, const VECTOR vector, const TRANSFORM *transform)
 {
-	register int i;
+	int i;
 	DBL answer_array[4];
 	const MATRIX *matrix;
 
@@ -497,7 +497,7 @@ void MInvTransPoint (VECTOR result, const VECTOR vector, const TRANSFORM *transf
 
 void MTransDirection (VECTOR result, const VECTOR vector, const TRANSFORM *transform)
 {
-	register int i;
+	int i;
 	DBL answer_array[4];
 	const MATRIX *matrix;
 
@@ -543,7 +543,7 @@ void MTransDirection (VECTOR result, const VECTOR vector, const TRANSFORM *trans
 
 void MInvTransDirection (VECTOR result, const VECTOR vector, const TRANSFORM*transform)
 {
-	register int i;
+	int i;
 	DBL answer_array[4];
 	const MATRIX *matrix;
 
@@ -589,7 +589,7 @@ void MInvTransDirection (VECTOR result, const VECTOR vector, const TRANSFORM*tra
 
 void MTransNormal (VECTOR result, const VECTOR vector, const TRANSFORM*transform)
 {
-	register int i;
+	int i;
 	DBL answer_array[3];
 	const MATRIX *matrix;
 
@@ -635,7 +635,7 @@ void MTransNormal (VECTOR result, const VECTOR vector, const TRANSFORM*transform
 
 void MInvTransNormal (VECTOR result, const VECTOR vector, const TRANSFORM*transform)
 {
-	register int i;
+	int i;
 	DBL answer_array[3];
 	const MATRIX *matrix;
 
@@ -728,7 +728,7 @@ void Compute_Scaling_Transform (TRANSFORM *result, const VECTOR vector)
 
 void Compute_Matrix_Transform (TRANSFORM *result, const MATRIX matrix)
 {
-	register int i;
+	int i;
 
 	for (i = 0; i < 4; i++)
 	{
@@ -831,7 +831,7 @@ void Compute_Translation_Transform (TRANSFORM *transform, const VECTOR vector)
 
 void Compute_Rotation_Transform (TRANSFORM *transform, const VECTOR vector)
 {
-	register DBL cosx, cosy, cosz, sinx, siny, sinz;
+	DBL cosx, cosy, cosz, sinx, siny, sinz;
 	MATRIX Matrix;
 	VECTOR Radian_Vector;
 

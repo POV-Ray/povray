@@ -491,7 +491,7 @@ bool Compute_Pigment (Colour& colour, const PIGMENT *Pigment, const VECTOR EPoin
 	int Colour_Found;
 	VECTOR TPoint;
 	DBL value;
-	register DBL fraction;
+	DBL fraction;
 	const BLEND_MAP_ENTRY *Cur, *Prev;
 	Colour Temp_Colour;
 	const BLEND_MAP *Blend_Map = Pigment->Blend_Map;
