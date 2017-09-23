@@ -44,6 +44,11 @@ Reported via GitHub:
 
   - #317 ("Boost 1.65.0 incompatibility")
 
+Miscellaneous:
+
+  - Eliminated use of deprecated C++ `register` keyword (except in 3rd party
+    libraries bundled with the POV-Ray source code).
+
 Changed Behaviour
 -----------------
 

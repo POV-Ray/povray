@@ -1085,8 +1085,8 @@ DBL Superellipsoid::evaluate_superellipsoid(const Vector3d& P) const
 
 DBL Superellipsoid::power(DBL x, DBL  e)
 {
-    register int i;
-    register DBL b;
+    int i;
+    DBL b;
 
     b = x;
 

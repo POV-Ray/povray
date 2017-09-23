@@ -307,7 +307,7 @@ void Parser::Terminate_Tokenizer()
 
 void Parser::Get_Token ()
 {
-    register int c,c2;
+    int c,c2;
     int col;
 
     if (Token.Unget_Token)
@@ -713,7 +713,7 @@ void Parser::Unget_Token ()
 
 bool Parser::Skip_Spaces()
 {
-    register int c;
+    int c;
 
     while(true)
     {
@@ -755,7 +755,7 @@ bool Parser::Skip_Spaces()
 
 int Parser::Parse_C_Comments()
 {
-    register int c, c2;
+    int c, c2;
     bool End_Of_Comment = false;
 
     while(!End_Of_Comment)
@@ -1005,7 +1005,7 @@ inline void Parser::End_String_Fast()
 
 void Parser::Read_String_Literal()
 {
-    register int c;
+    int c;
     int col = Echo_Indx;
 
     Begin_String();
@@ -1061,8 +1061,8 @@ void Parser::Read_String_Literal()
 
 bool Parser::Read_Float()
 {
-    register int c, Phase;
-    register bool Finished;
+    int c, Phase;
+    bool Finished;
     int col = Echo_Indx;
 
     Finished = false;
@@ -1247,7 +1247,7 @@ bool Parser::Read_Float()
 
 void Parser::Read_Symbol()
 {
-    register int c;
+    int c;
     int Local_Index,i,j,k;
     POV_ARRAY *a;
     SYM_ENTRY *Temp_Entry;
@@ -1595,7 +1595,7 @@ inline void Parser::Write_Token (TOKEN Token_Id, int col, SYM_TABLE *table)
 
 const char *Parser::Get_Token_String (TOKEN Token_Id)
 {
-    register int i;
+    int i;
 
     for (i = 0; Reserved_Words[i].Token_Name != NULL; i++)
         if (Reserved_Words[i].Token_Number == Token_Id)
@@ -1691,7 +1691,7 @@ char *Parser::Get_Reserved_Words (const char *additional_words)
 
 int Parser::Echo_getc()
 {
-    register int c;
+    int c;
 
     if((Input_File == NULL) || (Input_File->In_File == NULL) || (c = Input_File->In_File->getchar()) == EOF)
     {
