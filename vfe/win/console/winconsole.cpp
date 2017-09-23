@@ -53,18 +53,13 @@
 // version details
 #include "base/version_info.h"
 
-// from syspovconfig
+// from directory "vfe"
+#include "vfe.h"
+
+// from command line
 #ifndef _CONSOLE
 #error "You must define _CONSOLE in windows/povconfig/syspovconfig.h prior to building the console version, otherwise you will get link errors."
 #endif
-
-#ifdef HAVE_LIBSDL
-// from libraries directory SDL include
-#include <SDL.h>
-#endif
-
-// from directory "vfe"
-#include "vfe.h"
 
 // from directory "windows"
 #include "disp.h"
@@ -94,9 +89,9 @@ using namespace vfePlatform;
 
 enum DispMode
 {
-    DISP_MODE_NONE,
-    DISP_MODE_TEXT,
-    DISP_MODE_SDL
+  DISP_MODE_NONE,
+  DISP_MODE_TEXT,
+  DISP_MODE_SDL
 };
 
 static DispMode gDisplayMode;
@@ -147,53 +142,53 @@ BOOL WINAPI ConsoleHandler(DWORD CEvent)
 
 static vfeDisplay *WinConDisplayCreator(unsigned int width, unsigned int height, GammaCurvePtr gamma, vfeSession *session, bool visible)
 {
-    WinConDisplay *display = GetRenderWindow();
-    switch (gDisplayMode)
-    {
+  WinConDisplay *display = GetRenderWindow();
+  switch (gDisplayMode)
+  {
 #ifdef HAVE_LIBSDL
-    case DISP_MODE_SDL:
-        if (display != NULL && display->GetWidth() == width && display->GetHeight() == height)
-        {
-            WinConDisplay *p = new WinConSDLDisplay(width, height, gamma, session, false);
-            if (p->TakeOver(display))
-                return p;
-            delete p;
-        }
-        return new WinConSDLDisplay(width, height, gamma, session, visible);
-        break;
-#endif
-    case DISP_MODE_TEXT:
-        return new WinConTextDisplay(width, height, gamma, session, visible);
-        break;
-    default:
-        return NULL;
+  case DISP_MODE_SDL:
+    if (display != NULL && display->GetWidth() == width && display->GetHeight() == height)
+    {
+      WinConDisplay *p = new WinConSDLDisplay(width, height, gamma, session, false);
+      if (p->TakeOver(display))
+        return p;
+      delete p;
     }
+    return new WinConSDLDisplay(width, height, gamma, session, visible);
+    break;
+#endif
+  case DISP_MODE_TEXT:
+    return new WinConTextDisplay(width, height, gamma, session, visible);
+    break;
+  default:
+    return NULL;
+  }
 }
 
 /* Show a message */
 static void PrintMessage(const char *title, const char *message)
 {
-    fprintf(stderr, "%s: %s\n", title, message);
+  fprintf(stderr, "%s: %s\n", title, message);
 }
 
 void PrintStatus(vfeSession *session)
 {
-    string str;
-    vfeSession::MessageType type;
-    static vfeSession::MessageType lastType = vfeSession::mUnclassified;
+  string str;
+  vfeSession::MessageType type;
+  static vfeSession::MessageType lastType = vfeSession::mUnclassified;
 
-    while (session->GetNextCombinedMessage(type, str))
+  while (session->GetNextCombinedMessage(type, str))
+  {
+    if (type != vfeSession::mGenericStatus)
     {
-        if (type != vfeSession::mGenericStatus)
-        {
-            if (lastType == vfeSession::mGenericStatus)
-                fprintf(stderr, "\n");
-            fprintf(stderr, "%s\n", str.c_str());
-        }
-        else
-            fprintf(stderr, "%s\r", str.c_str());
-        lastType = type;
+      if (lastType == vfeSession::mGenericStatus)
+        fprintf(stderr, "\n");
+      fprintf(stderr, "%s\n", str.c_str());
     }
+    else
+      fprintf(stderr, "%s\r", str.c_str());
+    lastType = type;
+  }
 }
 
 static void PrintStatusChanged (vfeSession *session, State force = kUnknown)
@@ -273,10 +268,10 @@ void ErrorExit(vfeSession *session)
 
 void BenchMarkErrorExit(LPSTR lpszMessage)
 {
-    fprintf(stderr, "%s\n", lpszMessage);
-    // Restore input mode on exit.
-    SetConsoleMode(hStdin, fdwSaveOldMode);
-    ExitProcess(0);
+  fprintf(stderr, "%s\n", lpszMessage);
+  // Restore input mode on exit.
+  SetConsoleMode(hStdin, fdwSaveOldMode);
+  ExitProcess(0);
 }
 
 static void CancelRender(vfeSession *session)
@@ -290,16 +285,16 @@ static void CancelRender(vfeSession *session)
 
 static void PauseWhenDone(vfeSession *session)
 {
-    GetRenderWindow()->UpdateScreen(true);
-    GetRenderWindow()->PauseWhenDoneNotifyStart();
-    while (GetRenderWindow()->PauseWhenDoneResumeIsRequested() == false)
-    {
-        if (gCancelRender)
-            break;
-        else
-            Delay(10);
-    }
-    GetRenderWindow()->PauseWhenDoneNotifyEnd();
+  GetRenderWindow()->UpdateScreen(true);
+  GetRenderWindow()->PauseWhenDoneNotifyStart();
+  while (GetRenderWindow()->PauseWhenDoneResumeIsRequested() == false)
+  {
+    if (gCancelRender)
+      break;
+    else
+      Delay(10);
+  }
+  GetRenderWindow()->PauseWhenDoneNotifyEnd();
 }
 
 static ReturnValue PrepareBenchmark(vfeSession *session, vfeRenderOptions& opts, string& ini, string& pov, int argc, char **argv)
@@ -353,45 +348,45 @@ Press <Enter> to continue or <Ctrl-C> to abort.\n\
   // Get the standard input handle.
   hStdin = GetStdHandle(STD_INPUT_HANDLE);
   if (hStdin == INVALID_HANDLE_VALUE)
-      BenchMarkErrorExit("Invalid standard input handle.");
+    BenchMarkErrorExit("Invalid standard input handle.");
 
   // Save the current input mode, to be restored on exit.
 
   if (!GetConsoleMode(hStdin, &fdwSaveOldMode))
-      BenchMarkErrorExit("Unable to get current console mode.");
+    BenchMarkErrorExit("Unable to get current console mode.");
 
   // Enable the window and mouse input events.
 
   fdwMode = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT;
   if (!SetConsoleMode(hStdin, fdwMode))
-      BenchMarkErrorExit("Unable to set console mode with window and mouse input.");
+    BenchMarkErrorExit("Unable to set console mode with window and mouse input.");
 
   // wait for user input from stdin (including abort signals)
   while (true)
   {
-      if (gCancelRender)
-      {
-          fprintf(stderr, "Render cancelled by user\n");
-          return RETURN_USER_ABORT;
-      }
+    if (gCancelRender)
+    {
+      fprintf(stderr, "Render cancelled by user\n");
+      return RETURN_USER_ABORT;
+    }
 
-      // Wait for user input events.
-      if (!ReadConsoleInput(
-          hStdin,      // input buffer handle
-          irInBuf,     // buffer to read into
-          128,         // size of read buffer
-          &cNumRead))  // number of records read
-          BenchMarkErrorExit("ReadConsoleInput");
+    // Wait for user input events.
+    if (!ReadConsoleInput(
+      hStdin,      // input buffer handle
+      irInBuf,     // buffer to read into
+      128,         // size of read buffer
+      &cNumRead))  // number of records read
+      BenchMarkErrorExit("ReadConsoleInput");
 
-      if (cNumRead > 0)  // user input is available
+    if (cNumRead > 0)  // user input is available
+    {
+      for (i = 0; i < cNumRead; i++)     // read till <ENTER> is hit
       {
-          for (i = 0; i < cNumRead; i++)     // read till <ENTER> is hit
-          {
-              if (irInBuf[i].EventType == KEY_EVENT && irInBuf[i].Event.KeyEvent.wVirtualKeyCode == VK_RETURN)
-                  break;
-          }
+        if (irInBuf[i].EventType == KEY_EVENT && irInBuf[i].Event.KeyEvent.wVirtualKeyCode == VK_RETURN)
+          break;
       }
-      Delay(20);
+    }
+    Delay(20);
   }
 
   string basename = UCS2toASCIIString(session->CreateTemporaryFile());
@@ -469,34 +464,34 @@ extern "C" int main(int argc, char **argv)
 
   // display mode registration
 #ifdef HAVE_LIBSDL
-    if (WinConSDLDisplay::Register(session))
-    {
-        gDisplayMode = DISP_MODE_SDL;
+  if (WinConSDLDisplay::Register(session))
+  {
+    gDisplayMode = DISP_MODE_SDL;
 #ifdef WIN_DEBUG
-        PrintMessage("--INFO", "Display Mode: SDL.\n");
+    PrintMessage("--INFO", "Display Mode: SDL.\n");
 #endif
-    }
-    else
+  }
+  else
 #endif
-    if (WinConTextDisplay::Register(session))
-    {
-        gDisplayMode = DISP_MODE_TEXT;
+  if (WinConTextDisplay::Register(session))
+  {
+    gDisplayMode = DISP_MODE_TEXT;
 #ifdef WIN_DEBUG
-        PrintMessage("--INFO", "Display Mode: Text.\n");
+    PrintMessage("--INFO", "Display Mode: Text.\n");
 #endif
-    }
-    else
-    {
-        gDisplayMode = DISP_MODE_NONE;
+  }
+  else
+  {
+    gDisplayMode = DISP_MODE_NONE;
 #ifdef WIN_DEBUG
-        PrintMessage("--INFO", "Display Mode: None.\n");
+    PrintMessage("--INFO", "Display Mode: None.\n");
 #endif
-    }
+  }
 
   // default number of work threads: number of CPUs or 4
   int nthreads = boost::thread::hardware_concurrency();
   if (nthreads < 2)
-      nthreads = 4;
+    nthreads = 4;
   opts.SetThreadCount(nthreads);
 
   // process command-line options
@@ -541,7 +536,7 @@ extern "C" int main(int argc, char **argv)
   else
   {
     s = getenv ("POVINC");
-    session->SetDisplayCreator(WinConDisplayCreator);
+  session->SetDisplayCreator(WinConDisplayCreator);
     session->GetWinConOptions()->Process_povray_ini(opts);
     if (s != NULL)
       opts.AddLibraryPath (s);
@@ -571,48 +566,48 @@ extern "C" int main(int argc, char **argv)
 
   while (((flags = session->GetStatus(true, 200)) & stRenderShutdown) == 0)
   {
-      if (gCancelRender)
+    if (gCancelRender)
+    {
+      CancelRender(session);
+      break;
+    }
+
+    if (flags & stAnimationStatus)
+      fprintf(stderr, "\nRendering frame %d of %d (#%d)\n", session->GetCurrentFrame(), session->GetTotalFrames(), session->GetCurrentFrameId());
+    if (flags & stAnyMessage)
+      PrintStatus(session);
+    if (flags & stBackendStateChanged)
+      PrintStatusChanged(session);
+
+    if (GetRenderWindow() != NULL)
+    {
+      // early exit
+      if (GetRenderWindow()->HandleEvents())
       {
-          CancelRender(session);
-          break;
+        gCancelRender = true;  // will set proper return value
+        CancelRender(session);
+        break;
       }
 
-      if (flags & stAnimationStatus)
-          fprintf(stderr, "\nRendering frame %d of %d (#%d)\n", session->GetCurrentFrame(), session->GetTotalFrames(), session->GetCurrentFrameId());
-      if (flags & stAnyMessage)
-          PrintStatus(session);
-      if (flags & stBackendStateChanged)
-          PrintStatusChanged(session);
+      GetRenderWindow()->UpdateScreen();
 
-      if (GetRenderWindow() != NULL)
+      // inter-frame pause
+      if (session->GetCurrentFrame() < session->GetTotalFrames()
+        && session->GetPauseWhenDone()
+        && (flags & stAnimationFrameCompleted) != 0
+        && session->Failed() == false)
       {
-          // early exit
-          if (GetRenderWindow()->HandleEvents())
-          {
-              gCancelRender = true;  // will set proper return value
-              CancelRender(session);
-              break;
-          }
-
-          GetRenderWindow()->UpdateScreen();
-
-          // inter-frame pause
-          if (session->GetCurrentFrame() < session->GetTotalFrames()
-              && session->GetPauseWhenDone()
-              && (flags & stAnimationFrameCompleted) != 0
-              && session->Failed() == false)
-          {
-              PauseWhenDone(session);
-              if (!gCancelRender)
-                  session->Resume();
-          }
+        PauseWhenDone(session);
+        if (!gCancelRender)
+          session->Resume();
       }
+    }
   }
 
   // pause when done for single or last frame of an animation
   if (session->Failed() == false && GetRenderWindow() != NULL && session->GetBoolOption("Pause_When_Done", false))
   {
-    PrintStatusChanged(session, kPausedRendering);
+  PrintStatusChanged(session, kPausedRendering);
     PauseWhenDone(session);
     gCancelRender = false;
   }

@@ -10,7 +10,7 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -77,7 +77,7 @@ namespace pov_frontend
         m_display_scale = 1.;
         m_screen = NULL;
         m_display = NULL;
-		m_window = NULL;
+        m_window = NULL;
     }
 
     WinConSDLDisplay::~WinConSDLDisplay()
@@ -106,9 +106,9 @@ namespace pov_frontend
         m_valid = p->m_valid;
         m_display_scaled = p->m_display_scaled;
         m_display_scale = p->m_display_scale;
-		m_window = p->m_window;
+        m_window = p->m_window;
         m_display = p->m_display;
-		m_screen = p->m_screen;
+        m_screen = p->m_screen;
 
         if (m_display_scaled)
         {
@@ -132,16 +132,16 @@ namespace pov_frontend
         m_PxCount.clear();
         m_valid = false;
 
-		// Deallocate surface
-		SDL_FreeSurface(m_display);
-		m_display = NULL;
+        // Deallocate surface
+        SDL_FreeSurface(m_display);
+        m_display = NULL;
 
-		// Destroy window
-		SDL_DestroyWindow(m_window);
-		m_window = NULL;
+        // Destroy window
+        SDL_DestroyWindow(m_window);
+        m_window = NULL;
 
-		// Quit subsystems
-		SDL_Quit();
+        // Quit subsystems
+        SDL_Quit();
     }
 
     void WinConSDLDisplay::SetCaption(bool paused)
@@ -157,7 +157,7 @@ namespace pov_frontend
         else
             f = boost::format(PACKAGE_NAME " " VERSION_BASE " SDL display%s")
                 % (paused ? " [paused]" : "");
-		SDL_SetWindowTitle(m_window, f.str().c_str());
+        SDL_SetWindowTitle(m_window, f.str().c_str());
     }
 
     void WinConSDLDisplay::Show()
@@ -168,9 +168,9 @@ namespace pov_frontend
         if (!m_valid)
         {
             // Initialize SDL
-			if (SDL_Init(SDL_INIT_VIDEO) < 0)
+            if (SDL_Init(SDL_INIT_VIDEO) < 0)
             {
-				SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s", SDL_GetError());
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s", SDL_GetError());
                 return;
             }
 
@@ -179,25 +179,25 @@ namespace pov_frontend
 
             vfeWinSession *UxSession = dynamic_cast<vfeWinSession *>(m_Session);
 
-			// determine desktop area
-			if (UxSession->GetWinConOptions()->isOptionSet("display", "scaled"))
-			{
-				SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");			   // make the scaled rendering look smoother.
+            // determine desktop area
+            if (UxSession->GetWinConOptions()->isOptionSet("display", "scaled"))
+            {
+                SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");              // make the scaled rendering look smoother.
 
-				SDL_DisplayMode mode;
-				static int display_in_use = 0;										// only using first display
-				if (SDL_GetDesktopDisplayMode(display_in_use, &mode) < 0) {
-					SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't get desktop display mode: %s", SDL_GetError());
-					return;
-				}
+                SDL_DisplayMode mode;
+                static int display_in_use = 0;                                      // only using first display
+                if (SDL_GetDesktopDisplayMode(display_in_use, &mode) < 0) {
+                    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't get desktop display mode: %s", SDL_GetError());
+                    return;
+                }
 
-				//if the window was created with SDL_WINDOW_ALLOW_HIGHDPI on a
-				//platform with high-dpi support (e.g. iOS or OS X). Use SDL_GL_GetDrawableSize() or
-				//SDL_GetRendererOutputSize() to get the real client area size in pixels.
+                //if the window was created with SDL_WINDOW_ALLOW_HIGHDPI on a
+                //platform with high-dpi support (e.g. iOS or OS X). Use SDL_GL_GetDrawableSize() or
+                //SDL_GetRendererOutputSize() to get the real client area size in pixels.
 
-				width = min(mode.w - 10, width);
-				height = min(mode.h - 80, height);
-			}
+                width = min(mode.w - 10, width);
+                height = min(mode.h - 80, height);
+            }
 
             // calculate display area
             float AspectRatio = float(width)/float(height);
@@ -207,52 +207,52 @@ namespace pov_frontend
             else if (AspectRatio != AspectRatio_Full)
                 height = int(float(width)/AspectRatio_Full);
 
-			// create display window
-			m_window = SDL_CreateWindow(PACKAGE_NAME, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
-			if (m_window == NULL)
-			{
-				SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create W%d x H%d SDL window: %s", width, height, SDL_GetError());
-				return;
-			}
+            // create display window
+            m_window = SDL_CreateWindow(PACKAGE_NAME, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
+            if (m_window == NULL)
+            {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create W%d x H%d SDL window: %s", width, height, SDL_GetError());
+                return;
+            }
 
             // Initialize the display
-			m_screen = SDL_GetWindowSurface(m_window);
-			if (m_screen == NULL)
-			{
-				SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't get SDL window surface: %s", SDL_GetError());
-				return;
-			}
+            m_screen = SDL_GetWindowSurface(m_window);
+            if (m_screen == NULL)
+            {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't get SDL window surface: %s", SDL_GetError());
+                return;
+            }
 
-			int depth = 32;
-			int unused = 0;
-			Uint32 Rmask, Gmask, Bmask, Amask;
+            int depth = 32;
+            int unused = 0;
+            Uint32 Rmask, Gmask, Bmask, Amask;
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
-			Rmask = 0xff000000;
-			Gmask = 0x00ff0000;
-			Bmask = 0x0000ff00;
-			Amask = 0x000000ff;
+            Rmask = 0xff000000;
+            Gmask = 0x00ff0000;
+            Bmask = 0x0000ff00;
+            Amask = 0x000000ff;
 #else
-			Rmask = 0x000000ff;
-			Gmask = 0x0000ff00;
-			Bmask = 0x00ff0000;
-			Amask = 0xff000000;
+            Rmask = 0x000000ff;
+            Gmask = 0x0000ff00;
+            Bmask = 0x00ff0000;
+            Amask = 0xff000000;
 #endif
-			SDL_Surface *optimized_surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, depth, Rmask, Gmask, Bmask, Amask);
-			if (optimized_surface == NULL)
-			{
-				SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create optimized RGB surface for repeated blitting:: %s", SDL_GetError());
-				return;
-			}
+            SDL_Surface *optimized_surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, depth, Rmask, Gmask, Bmask, Amask);
+            if (optimized_surface == NULL)
+            {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create optimized RGB surface for repeated blitting:: %s", SDL_GetError());
+                return;
+            }
 
-			SDL_PixelFormat* pixelFormat = m_screen->format;
-			Uint32 pixelFormatEnum = pixelFormat->format;
-			m_display = SDL_ConvertSurfaceFormat(optimized_surface, pixelFormatEnum, unused);
-			SDL_FreeSurface(optimized_surface);
-			if (m_display == NULL)
-			{
-				SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't convert to optimized RGB display surface for repeated blitting:: %s", SDL_GetError());
-				return;
-			}
+            SDL_PixelFormat* pixelFormat = m_screen->format;
+            Uint32 pixelFormatEnum = pixelFormat->format;
+            m_display = SDL_ConvertSurfaceFormat(optimized_surface, pixelFormatEnum, unused);
+            SDL_FreeSurface(optimized_surface);
+            if (m_display == NULL)
+            {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't convert to optimized RGB display surface for repeated blitting:: %s", SDL_GetError());
+                return;
+            }
 
             m_PxCount.clear();
             m_PxCount.reserve(width*height);
@@ -572,17 +572,17 @@ namespace pov_frontend
             return;
         if (Force || m_PxCnt >= UpdateInterval)
         {
-			if (SDL_BlitSurface(m_display, &m_update_rect, m_screen, &m_update_rect) < 0)
-			{
-				SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't copy display surface to screen surface: %s", SDL_GetError());
-				exit(1);
-			}
+            if (SDL_BlitSurface(m_display, &m_update_rect, m_screen, &m_update_rect) < 0)
+            {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't copy display surface to screen surface: %s", SDL_GetError());
+                exit(1);
+            }
 
-			if (SDL_UpdateWindowSurface(m_window) < 0)
-			{
-				SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't update window surface: %s", SDL_GetError());
-				exit(1);
-			}
+            if (SDL_UpdateWindowSurface(m_window) < 0)
+            {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't update window surface: %s", SDL_GetError());
+                exit(1);
+            }
 
             m_PxCnt = 0;
         }

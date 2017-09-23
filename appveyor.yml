@@ -1,11 +1,14 @@
-version: 3.8+av{build}
+init:
+  - cmd:call "tools/windows/get-source-version.bat" "source/base/version.h"
+
+version: $env:POV_SOURCE_GENERATION+av{build}
 pull_requests:
   do_not_increment_build_number: true
 branches:
   except:
   - coverity_scan
 
-image: Visual Studio 2015
+image: Visual Studio 2017
 
 shallow_clone: true
 
@@ -16,13 +19,13 @@ environment:
   GUIProj: windows/vs2015/povray.sln
   GUIDefs: POV_RAY_IS_AUTOBUILD=1;POV_RAY_BUILD_ID="av$(APPVEYOR_BUILD_NUMBER)";BUILT_BY="AppVeyor";
   CUIProj: windows/vs2015/console.vcxproj
-  CUIDefs: $(GUIDefs)_CONSOLE;
+  CUIDefs: $(GUIDefs)VERSION_BASE="$env:POV_SOURCE_GENERATION";_CONSOLE;
   matrix:
   # Graphic User Interface (GUI) build matrix
   - PovBuildProj: $(GUIProj)
     PovBuildDefs: $(GUIDefs)
     configuration: Release
-    platform: x64  
+    platform: x64
     bin_dir: bin64
     artifact_suffix: -Win64
   - PovBuildProj: $(GUIProj)
@@ -36,12 +39,12 @@ environment:
     configuration: Release
     platform: Win32
     bin_dir: bin32
-    artifact_suffix: -Win32	
+    artifact_suffix: -Win32
   # Console User Interface (CUI) build matrix
   - PovBuildProj: $(CUIProj)
     PovBuildDefs: $(CUIDefs)
     configuration: Release
-    platform: x64  
+    platform: x64
     bin_dir: bin64
     artifact_suffix: -Win64
   - PovBuildProj: $(CUIProj)

@@ -10,7 +10,7 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -56,7 +56,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-	int main(int argc, char **argv);
+    int main(int argc, char **argv);
 #ifdef __cplusplus
 };
 #endif
@@ -66,29 +66,29 @@ namespace pov_frontend
     using namespace vfe;
     using namespace vfePlatform;
 
-	class WinConSDLDisplay : public WinConDisplay
-	{
-	public:
-		static const WinConOptionsProcessor::Option_Info Options[];
-		static bool Register(vfeWinSession *session);
+    class WinConSDLDisplay : public WinConDisplay
+    {
+    public:
+        static const WinConOptionsProcessor::Option_Info Options[];
+        static bool Register(vfeWinSession *session);
 
-		WinConSDLDisplay(unsigned int w, unsigned int h, GammaCurvePtr gamma, vfeSession *session, bool visible);
-		virtual ~WinConSDLDisplay();
-		void Initialise();
-		void Close();
-		void Show();
-		void Hide();
-		bool TakeOver(WinConDisplay *display);
-		void DrawPixel(unsigned int x, unsigned int y, const RGBA8& colour);
-		void DrawRectangleFrame(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8& colour);
-		void DrawFilledRectangle(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8& colour);
-		void DrawPixelBlock(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8 *colour);
-		void Clear();
-		bool HandleEvents();
-		void UpdateScreen(bool Force);
-		void PauseWhenDoneNotifyStart();
-		bool PauseWhenDoneResumeIsRequested();
-		void PauseWhenDoneNotifyEnd();
+        WinConSDLDisplay(unsigned int w, unsigned int h, GammaCurvePtr gamma, vfeSession *session, bool visible);
+        virtual ~WinConSDLDisplay();
+        void Initialise();
+        void Close();
+        void Show();
+        void Hide();
+        bool TakeOver(WinConDisplay *display);
+        void DrawPixel(unsigned int x, unsigned int y, const RGBA8& colour);
+        void DrawRectangleFrame(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8& colour);
+        void DrawFilledRectangle(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8& colour);
+        void DrawPixelBlock(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8 *colour);
+        void Clear();
+        bool HandleEvents();
+        void UpdateScreen(bool Force);
+        void PauseWhenDoneNotifyStart();
+        bool PauseWhenDoneResumeIsRequested();
+        void PauseWhenDoneNotifyEnd();
         protected:
             /// Number of Pixels before the display is updated
             static const unsigned int UpdateInterval = 100;
@@ -118,9 +118,9 @@ namespace pov_frontend
             float m_display_scale;
             /// for update interval
             unsigned int m_PxCnt;
-			SDL_Window   *m_window;
-			SDL_Surface  *m_screen;
-			SDL_Surface  *m_display;
+            SDL_Window   *m_window;
+            SDL_Surface  *m_screen;
+            SDL_Surface  *m_display;
             SDL_Rect m_screen_rect;
             SDL_Rect m_update_rect;
             /// for mixing colors in scaled down display
