@@ -42,10 +42,13 @@ Fixed or Mitigated Bugs
 
 Reported via GitHub:
 
+  - #65 ("Normal for the prism's bezier spline mode is reversed from other
+    spline types & lathe uses.")
   - #317 ("Boost 1.65.0 incompatibility")
 
 Miscellaneous:
 
+  - Fix `interior_texture` for text objects (as mentioned in GitHub issue #65)
   - Eliminated use of deprecated C++ `register` keyword (except in 3rd party
     libraries bundled with the POV-Ray source code).
 

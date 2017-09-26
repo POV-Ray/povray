@@ -694,44 +694,62 @@ void Prism::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Threa
     PRISM_SPLINE_ENTRY Entry;
     Vector3d N;
 
-    N = Vector3d(0.0, 1.0, 0.0);
-
-    if (Inter->i1 == SPLINE_HIT)
+    switch (Inter->i1)
     {
-        Entry = Spline->Entry[Inter->i2];
+        case BASE_HIT:
 
-        switch (Sweep_Type)
-        {
-            case LINEAR_SWEEP:
+            N = Vector3d(0.0, -1.0, 0.0);
 
-                N[X] =   Inter->d1 * (3.0 * Entry.A[Y] * Inter->d1 + 2.0 * Entry.B[Y]) + Entry.C[Y];
-                N[Y] =   0.0;
-                N[Z] = -(Inter->d1 * (3.0 * Entry.A[X] * Inter->d1 + 2.0 * Entry.B[X]) + Entry.C[X]);
+            break;
 
-                break;
+        case CAP_HIT:
 
-            case CONIC_SWEEP:
+            N = Vector3d(0.0, 1.0, 0.0);
 
-                /* Transform the point into the prism space. */
+            break;
 
-                MInvTransPoint(P, Inter->IPoint, Trans);
+        case SPLINE_HIT:
 
-                if (fabs(P[Y]) > EPSILON)
-                {
+            Entry = Spline->Entry[Inter->i2];
+
+            switch (Sweep_Type)
+            {
+                case LINEAR_SWEEP:
+
                     N[X] =   Inter->d1 * (3.0 * Entry.A[Y] * Inter->d1 + 2.0 * Entry.B[Y]) + Entry.C[Y];
+                    N[Y] =   0.0;
                     N[Z] = -(Inter->d1 * (3.0 * Entry.A[X] * Inter->d1 + 2.0 * Entry.B[X]) + Entry.C[X]);
-                    N[Y] = -(P[X] * N[X] + P[Z] * N[Z]) / P[Y];
-                }
 
-                break;
+                    break;
 
-            default:
+                case CONIC_SWEEP:
 
-                throw POV_EXCEPTION_STRING("Unknown sweep type in Prism_Normal().");
-        }
+                    /* Transform the point into the prism space. */
+
+                    MInvTransPoint(P, Inter->IPoint, Trans);
+
+                    if (fabs(P[Y]) > EPSILON)
+                    {
+                        N[X] =   Inter->d1 * (3.0 * Entry.A[Y] * Inter->d1 + 2.0 * Entry.B[Y]) + Entry.C[Y];
+                        N[Z] = -(Inter->d1 * (3.0 * Entry.A[X] * Inter->d1 + 2.0 * Entry.B[X]) + Entry.C[X]);
+                        N[Y] = -(P[X] * N[X] + P[Z] * N[Z]) / P[Y];
+                    }
+
+                    break;
+
+                default:
+
+                    throw POV_EXCEPTION_STRING("Unknown sweep type in Prism::Normal().");
+            }
+
+            break;
+
+        default:
+
+            throw POV_EXCEPTION_STRING("Unknown side code in Prism::Normal().");
     }
 
-    /* Transform the normalt out of the prism space. */
+    /* Transform the normal out of the prism space. */
 
     MTransNormal(Result, N, Trans);
 
@@ -1489,10 +1507,10 @@ void Prism::Compute_Prism(Vector2d *P, TraceThreadData *Thread)
 
                 /* Use Bernstein blending function interpolation. */
 
-                A = P[i] - 3.0 * P[i1] + 3.0 * P[i2] -       P[i3];
-                B =        3.0 * P[i1] - 6.0 * P[i2] + 3.0 * P[i3];
-                C =        3.0 * P[i2] - 3.0 * P[i3];
-                D =                                          P[i3];
+                A = P[i3] - 3.0 * P[i2] + 3.0 * P[i1] -       P[i];
+                B =         3.0 * P[i2] - 6.0 * P[i1] + 3.0 * P[i];
+                C =                       3.0 * P[i1] - 3.0 * P[i];
+                D =                                           P[i];
 
                 x[0] = P[i][X];
                 x[1] = P[i1][X];
