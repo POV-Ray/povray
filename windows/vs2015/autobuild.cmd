@@ -10,7 +10,7 @@ Title POV-Ray on Windows auto build script
 :: This script is requires autobuild_defs.cmd
 :: --
 ::  Trevor SANDY <trevor.sandy@gmail.com>
-::  Last Update: September 23, 2017
+::  Last Update: September 26, 2017
 ::  Copyright (c) 2017 by Trevor SANDY
 :: --
 :: This script is distributed in the hope that it will be useful,
@@ -27,32 +27,36 @@ SET DEFAULT_PLATFORM=x64
 SET PACKAGE=povconsole
 SET DEBUG=0
 
-:: Build checks settings - set according to your check requirements
+:: Build checks settings - set according to your check requirements - do not add quotes
 :: Check 01
-rem SET BUILD_CHK_MY_OUTPUT=
+::------------------------------------------
 rem SET BUILD_CHK_POV_FILE=..\..\distribution\scenes\advanced\biscuit.pov
-rem SET BUILD_CHK_WH_PARMS=+w320 +h240
-rem SET BUILD_CHK_MY_PARMS=-f +d +p +v +a0.3 +UA +A
+rem SET BUILD_CHK_MY_OUTPUT=..\..\distribution\scenes\advanced\biscuit
+rem SET BUILD_CHK_MY_PARMS=-f +d +p +v +a0.3 +UA +A +w320 +h240
 rem SET BUILD_CHK_MY_INCLUDES=
-:: Check 01
-SET BUILD_CHK_MY_OUTPUT=
-SET BUILD_CHK_POV_FILE=..\..\distribution\scenes\advanced\biscuit.pov
-SET BUILD_CHK_WH_PARMS=+w320 +h240
-SET BUILD_CHK_MY_PARMS=+d -p +a0.3 +UA +A
-SET BUILD_CHK_MY_INCLUDES=
-:: Check 03
-rem SET BUILD_CHK_MY_OUTPUT=
-rem SET BUILD_CHK_POV_FILE=tests\csi.ldr.pov
-rem SET BUILD_CHK_WH_PARMS=+w2549 +h1650
-rem SET BUILD_CHK_MY_PARMS=+d +a0.3 +UA +A
-rem SET BUILD_CHK_MY_INCLUDES=+L"%USERPROFILE%\LDraw\lgeo\ar" +L"%USERPROFILE%\LDraw\lgeo\lg" +L"%USERPROFILE%\LDraw\lgeo\stl"
 
-:: Build check static settings - don't change these.
+:: Check 03
+::------------------------------------------
+rem SET BUILD_CHK_MY_POV_FILE=tests\csi.ldr.pov
+rem SET BUILD_CHK_MY_OUTPUT=tests\csi.ldr
+rem SET BUILD_CHK_MY_PARMS=+d +a0.3 +UA +A +w2549 +h1650
+rem SET BUILD_CHK_MY_INCLUDES=+L%USERPROFILE%\LDraw\lgeo\ar +L%USERPROFILE%\LDraw\lgeo\lg +L%USERPROFILE%\LDraw\lgeo\stl
+
+:: Check 02
+::------------------------------------------
+SET BUILD_CHK_MY_POV_FILE=tests\space in dir name test\biscuit.pov
+SET BUILD_CHK_MY_OUTPUT=tests\space in dir name test\biscuit space in file name test
+SET BUILD_CHK_MY_PARMS=+d -p +a0.3 +UA +A +w320 +h240
+SET BUILD_CHK_MY_INCLUDES=
+
+:: Build check static settings - do not modify these.
+SET BUILD_CHK_OUTPUT=%BUILD_CHK_MY_OUTPUT%
+SET BUILD_CHK_POV_FILE=%BUILD_CHK_MY_POV_FILE%
+SET BUILD_CHK_PARAMS=%BUILD_CHK_MY_PARMS%
 SET BUILD_CHK_INCLUDE=+L"..\..\distribution\ini" +L"..\..\distribution\include" +L"..\..\distribution\scenes"
 SET BUILD_CHK_INCLUDE=%BUILD_CHK_INCLUDE% %BUILD_CHK_MY_INCLUDES%
-SET BUILD_CHK_PARAMS=%BUILD_CHK_WH_PARMS% %BUILD_CHK_MY_PARMS% %BUILD_CHK_INCLUDE%
 
-:: VS Command Argument: +d +UA +A +W2549 +H1650 +I"$(ProjectDir)\tests\cli.ldr.pov" +O"$(ProjectDir)\tests\cli.ldr.pov.png" +L"$(ProjectDir)\..\..\distribution\ini" +L"$(ProjectDir)\..\..\distribution\include" +L"$(ProjectDir)\..\..\distribution\scenes" +L"$(USERPROFILE%\LDraw\lgeo\ar)" +L"$(USERPROFILE%\LDraw\lgeo\lg)" +L"$(USERPROFILE%\LDraw\lgeo\stl)"
+:: Visual Studio 'debug' comand line: +I"tests\space in dir name test\biscuit.pov" +O"tests\space in dir name test\biscuit space in file name test.png" +w320 +h240 +d -p +a0.3 +UA +A +L"..\..\distribution\ini" +L"..\..\distribution\include" +L"..\..\distribution\scenes"
 
 SET CONFIGURATION=unknown
 SET PLATFORM=unknown
@@ -342,13 +346,7 @@ IF %1==Win32 SET PL=32
 IF %1==x64 SET PL=64
 ECHO.
 ECHO --Check %CONFIGURATION% Configuration, %PL%bit Platform...
-ECHO.
-IF NOT [%BUILD_CHK_MY_OUTPUT%]==[] (
-	SET BUILD_CHK_OUTPUT=%BUILD_CHK_MY_OUTPUT%
-) ELSE (
-	SET BUILD_CHK_OUTPUT=%BUILD_CHK_POV_FILE%.%PL%bit.png
-)
-SET BUILD_CHK_COMMAND=+I"%BUILD_CHK_POV_FILE%" +O"%BUILD_CHK_OUTPUT%" %BUILD_CHK_PARAMS%
+SET BUILD_CHK_COMMAND=+I"%BUILD_CHK_POV_FILE%" +O"%BUILD_CHK_OUTPUT%.%PL%bit.png" %BUILD_CHK_PARAMS% %BUILD_CHK_INCLUDE%
 ECHO   RUN_COMMAND.......[%PACKAGE%%PL%%d%.exe %BUILD_CHK_COMMAND%]
 ECHO.
 IF EXIST "%BUILD_CHK_OUTPUT%" (
