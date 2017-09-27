@@ -5030,7 +5030,7 @@ ObjectPtr Parser::Parse_Ovus()
         Object->BottomVertical = -Object->ConnectingRadius;// low enough
         Object->BottomRadius = 0.0;
         Object->ConnectingRadius = 0.0;
-        Warning(0, "Ovus is reduced to a sphere, consider using a real sphere instead");
+        Warning("Ovus is reduced to a sphere, consider using a real sphere instead");
     }
 
     Object->Compute_BBox();
