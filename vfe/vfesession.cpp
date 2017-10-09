@@ -42,7 +42,9 @@
 
 #include "vfe.h"
 #include "backend/povray.h"
+#ifndef _MSC_VER
 #include "syspovconsole.h"
+#endif
 
 static POVMSContext POVMS_Output_Context = NULL;
 
@@ -75,7 +77,11 @@ vfeSession::vfeSession(int id)
   m_MaxGenericMessages = -1;
   m_MaxConsoleMessages = -1;
   m_OptimizeForConsoleOutput = true;
+#ifdef _MSC_VER
+  m_ConsoleWidth = 80;
+#else
   m_ConsoleWidth = pov_base::GetTerminalWidth();
+#endif
   m_RequestFlag = rqNoRequest;
   m_RequestResult = 0;
   m_StartTime = 0;
