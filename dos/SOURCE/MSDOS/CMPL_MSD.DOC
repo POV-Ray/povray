@@ -1,0 +1,150 @@
+                  COMPILER AND SOURCE CODE DOCUMENTATION 
+                 FOR MS-DOS SPECIFIC PARTS OF POV-Ray 3.00
+
+
+1.0   INTRODUCTION AND DISCLAIMERS
+
+This documentation is to help you compile the portable C source code into a 
+working executable version of POV-Ray for MS-Dos.  Before proceeding any 
+farther, you should first read the file COMPILE.DOC in the root directory 
+of the source archive.  It provides important information about the generic 
+parts of POV-Ray.
+
+This documentation DOES NOT tell you how to use POV-Ray for MS-Dos.  It is 
+assumed you already have obtained the official executable archive compiled 
+for MS-Dos and that you are familiar with using it.  It contains essential 
+user documentation, sample scenes and standard scene include files.  User 
+documentation is in the executable archive in the hypertext file 
+POVHELP.PHE.  The executable archive also includes a help reader program to 
+read PHE files and utilities to translate PHE into other forms.  MS-Dos 
+specific user documentation is in the text file POVMSDOS.DOC in the 
+executable archive.  
+
+The first question you should ask yourself before proceeding is "Do I 
+really need to compile POV-Ray at all?"  If you do not intend to add any 
+custom or experimental features to the program, or to port it to an 
+unsupported compiler you need not compile this program yourself.
+
+As explained in COMPILE.DOC, if you do want to proceed you should be aware 
+that you are very nearly on your own.  This documentation and other related 
+compiling documentation assumes you know what you are doing.  In general 
+you should not expect any technical support from the POV-Ray Team on how to 
+compile the program.  Everything is provided here "as is".  All we can say 
+with any certainty is that we were able to compile it on our system.  If it 
+doesn't work for you, we probably cannot tell you why.
+
+When making any custom version of POV-Ray or any unofficial compile, please 
+make sure you read and follow all provisions of our license in the file 
+POVLEGAL.DOC.  In general you can modify and use POV-Ray on your own 
+however you want but if you distribute your unofficial version you must 
+follow our rules.  You may not under any circumstances use portions of POV-
+Ray source code in other programs.
+
+
+2.0   SUPPORTED COMPILERS
+
+POV-Ray 3.0 must be compiled using a 32-bit protected mode, flat memory 
+model compiler for 386 CPU or better.  It cannot be compiled as a real mode 
+or 286 protected mode program.  It cannot be compiled in small, medium, 
+large or even huge memory models.  This limits your choices in what 
+compiler you may use.
+
+We have successfully compiled the program on three such compilers and have 
+provided the necessary makefiles and configuration to use those compilers.  
+They are:
+
+1)  Watcom C/C++ version 10.6 by Powersoft.  The Watcom compiler is the 
+compiler used for our officially distributed version.  It compiles 
+reasonably fast and produces the fastest, most stable executables we have 
+tried.  The major drawback is that the DOS4GW dos extender that comes with 
+it is limited to 16 meg of physical memory and 16 meg virtual memory 
+however other unlimited dos extenders may be purchased.  Many large 
+triangle mesh or recursive object scenes can exceed this limit.  Although 
+we use the current version 10.6, we have successfully used 10.0a, 10.5 and 
+10.5a versions.  See CMPL_WAT.DOC & USER_WAT.DOC in the SOURCE\MSDOS\WATCOM 
+directory for further details.
+
+2) BC++ 4.52 with the Dos Power Pack by Borland Intl.  The Borland compiler 
+is the fastest compiling C compiler we have ever seen.  The resulting 
+executable is not as fast as Watcom but the dos extender has no memory 
+limits.  BC++ alone, is NOT sufficient to compile a 32-bit dos program.  
+You MUST have an add-on package called the Dos Power Pack.  The Dos Power 
+Pack works with versions from BC++ 4.02 through BC++ 4.52 and we have 
+successfully compiled.  The current Borland release BC++ 5.0 does not 
+officially support the Dos Power Pack.  The last time we checked, the Dos 
+Power Pack was no longer for sale.  We have been told that it is still 
+possible to use the command-line 5.0 compiler with an old Dos Power Pack to 
+create 32-bit Dos programs but we have not personally verified this.  See 
+CMPL_BOR.DOC & USER_BOR.DOC in the SOURCE\MSDOS\BORLAND directory for 
+further details.
+
+3) DJGPP 2.0 Gnu C/C++ Compiler for MS-Dos.  The DJGPP compiler is a 
+freeware compiler available on the internet at the Simtel archives and at 
+www.djgpp.com.  It is an MS-Dos port of the famous freeware Unix Gnu 
+compiler supported by the Free Software Foundation.  The compiling speed is 
+somewhat slow but executable speed is usually reasonable.  We had good 
+results compiling POV-Ray under DJGPP version 1.xx but our recent port to 
+DJGPP 2.0 is less promising.  We can only run with all optimizations off.  
+Even then, we experience floating point exceptions and there are problems 
+with the current linker.  We are hopeful these problems will be resolved in 
+future releases.  Our current POV-Ray code supports only DJGPP 2.0.  See 
+CMPL_DJG.DOC & USER_DJG.DOC in the SOURCE\MSDOS\DJGPP directory for further 
+details.
+
+Each of the three compiler specific directories contains makefiles and 
+linkage files for that particular compiler.  They are designed to be used 
+with the command-line versions of the compilers with an appropriate "make" 
+utility.  We do not supply IDE project files but you should be able to 
+create one yourself.
+
+The makefiles are designed to be run from the compiler-specific directory.  
+All OBJ files and the resulting executable will be created in that 
+compiler-specific directory.  Files in the SOURCE\MSDOS and SOURCE 
+directories are referenced backwards up the directory tree.  For example 
+POVRAY.C is referenced as ..\..\POVRAY.C rather than 
+C:\POVRAY3\SOURCE\POVRAY.C so that you can install the source on any drive 
+or any root directory and not need to edit the makefiles.  It also keeps 
+OBJ and EXE files for each compiler separate.  This was useful for team 
+members who used more than one compiler.
+
+
+3.0   LIBRARIES
+
+POV-Ray for MS-Dos uses four pre-compiled libraries from outside sources in 
+addition to any standard libraries that come with the C compiler.  They are 
+LIBPNG.LIB, ZLIB.LIB, PMODE.LIB & ZTIMER.LIB (Note DJGPP uses "file.A" 
+extensions rather than "file.LIB".  Pre-compiled, ready-to-link versions of 
+these libraries are provided in each compiler-specific directory.  Although 
+the file names for the Watcom and Borland versions are the same, these 
+libraries are compiler-specific and should not get mixed up.
+
+The full C source for LIBPNG & ZLIB are provided in the SOURCE\LIBPNG and 
+SOURCE\ZLIB directories.  Although you will probably never need to do so, 
+you can re-compile both of them by running the BUILDPNG.BAT file.  ZLIB is 
+a data compression and decompression library required by LIBPNG.  LIBPNG 
+reads and writes PNG (Portable Network Graphics) image files.
+
+The PMODE and ZTIMER libraries are freeware libraries created by Scitech 
+Software.  ZTIMER is a timer routine used by POV-Ray's histogram profiling 
+feature.  PMODE is used to call MS-Dos interrupts, and to access real mode 
+memory and physical memory-mapped devices such as video memory.  Various 
+compilers support these functions in differently.  The PMODE library 
+provides a portable compile-independent interface that greatly simplifies 
+the job of protected mode access to real mode assets.
+
+They are created from a combination of both C and assembler code.  The 
+Borland assembler TASM 4.0 or greater is required to assembly the code even 
+if you are using Watcom or DJGPP.  In addition DJGPP requires a special 
+utility to translate OBJ files from TASM into files that DJGPP can use.  
+Although we supply the source code for these libraries in 
+SOURCE\MSDOS\PMODE in SOURCE\MSDOS\ZTIMER, we do not have these source 
+files as organized as ZLIB or LIBPNG.  We recommend you stick with the pre-
+compiled version.  
+
+The files vesavbe.c, vesavbe.h, console.c, console.h, debug.h, ztimer.h and 
+pmode.h in the SOURCE\MSDOS directory are also the work of Scitech 
+Software.  See SCITECH.DOC for details on where to get updated versions of 
+these libraries or versions for other compilers.
+
+4.0   CONCLUSION
+

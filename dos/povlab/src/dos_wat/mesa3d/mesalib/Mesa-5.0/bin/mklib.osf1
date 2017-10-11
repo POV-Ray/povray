@@ -1,0 +1,48 @@
+#!/bin/sh
+
+# Make a digital unix shared library (OSF/1)
+# provided by Thomas Graichen (graichen@rzpd.de)
+
+#--identification------------------------------------------------------
+
+# $Id: mklib.osf1,v 1.2 1999/09/15 15:10:20 brianp Exp $
+
+# $Log: mklib.osf1,v $
+# Revision 1.2  1999/09/15 15:10:20  brianp
+# added third, tiny version number to arguments
+#
+# Revision 1.1  1999/08/19 13:53:05  brianp
+# initial check-in (post-crash)
+#
+
+
+#--common--------------------------------------------------------------
+
+LIBRARY=$1
+shift 1
+
+MAJOR=$1
+shift 1
+
+MINOR=$1
+shift 1
+
+TINY=$1
+shift 1
+
+OBJECTS=$*
+
+#--platform------------------------------------------------------------
+
+VERSION="${MAJOR}.${MINOR}"
+
+LIBNAME=`basename $LIBRARY`
+ARNAME=`basename $LIBNAME .so`.a
+DIRNAME=`dirname $LIBRARY`
+
+rm -f ${LIBRARY}.${VERSION}
+ld -o ${LIBRARY}.${VERSION} -shared -no_archive -set_version ${VERSION} -soname ${LIBNAME}.${VERSION} -expect_unresolved \* -all ${OBJECTS}
+(cd $DIRNAME; ln -sf ${LIBNAME}.${VERSION} ${LIBNAME})
+
+rm -f ${DIRNAME}/${ARNAME}
+ar clqz ${DIRNAME}/${ARNAME} ${OBJECTS}

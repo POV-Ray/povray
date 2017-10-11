@@ -1,0 +1,79 @@
+Content-type: text/html
+
+<HTML><HEAD><TITLE>Manpage of uglMesaGetIntegerv</TITLE>
+</HEAD><BODY>
+<H1>uglMesaGetIntegerv</H1>
+Section: WRS (3)<BR>Updated: AOUT 2001<BR><A HREF="#index">Index</A>
+<A HREF="http://localhost/cgi-bin/man/man2html">Return to Main Contents</A><HR>
+
+<P>
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+uglMesaGetIntegerv - Return an integer value like glGetIntegerv
+<P>
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>#include &lt;<A HREF="file:/usr/include/GL/uglmesa.h">GL/uglmesa.h</A>&gt;</B>
+
+<P>
+
+<B>uglMesaGetIntegerv (GLint </B><I>pname</I><B>, GLint * </B><I>value</I><B>);</B>
+
+<P>
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+The <B>uglMesaGetIntegerv</B> function returns an integer value like
+glGetIntegerv
+<P>
+<A NAME="lbAE">&nbsp;</A>
+<H2>INPUT VALUES</H2>
+
+<I>pname</I> - can takes the following values
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UGL_MESA_LEFT_X,&nbsp;return&nbsp;the&nbsp;x&nbsp;axis&nbsp;value&nbsp;of&nbsp;the&nbsp;most&nbsp;left&nbsp;pixel
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UGL_MESA_TOP_Y,&nbsp;return&nbsp;the&nbsp;y&nbsp;axis&nbsp;value&nbsp;of&nbsp;the&nbsp;topper&nbsp;pixel
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UGL_MESA_WIDTH,&nbsp;return&nbsp;current&nbsp;image&nbsp;width
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UGL_MESA_HEIGHT,&nbsp;return&nbsp;current&nbsp;image&nbsp;height
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UGL_MESA_DISPLAY_WIDTH,&nbsp;return&nbsp;screen&nbsp;width
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UGL_MESA_DISPLAY_HEIGHT,&nbsp;return&nbsp;screen&nbsp;height
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UGL_MESA_ROW_LENGTH,&nbsp;return&nbsp;row&nbsp;length&nbsp;in&nbsp;pixels
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UGL_MESA_RGB,&nbsp;return&nbsp;true&nbsp;if&nbsp;RGB&nbsp;mode
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UGL_MESA_COLOR_INDEXED,&nbsp;return&nbsp;true&nbsp;if&nbsp;color&nbsp;indexed
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UGL_MESA_DOUBLE_BUFFER,&nbsp;return&nbsp;true&nbsp;if&nbsp;it&nbsp;uses&nbsp;a&nbsp;double&nbsp;buffer
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UGL_MESA_SINGLE_BUFFER,&nbsp;return&nbsp;true&nbsp;if&nbsp;it&nbsp;only&nbsp;uses&nbsp;a&nbsp;single&nbsp;buffer
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UGL_MESA_DOUBLE_BUFFER_SOFTWARE,&nbsp;return&nbsp;true&nbsp;if&nbsp;the&nbsp;double&nbsp;buffer&nbsp;is&nbsp;software&nbsp;(malloc)
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case&nbsp;UGL_MESA_DOUBLE_BUFFER_HARDWARE,&nbsp;return&nbsp;true&nbsp;if&nbsp;the&nbsp;double&nbsp;buffer&nbsp;is&nbsp;hardware&nbsp;(video&nbsp;memory)
+<P>
+
+<I>value</I> - pointer to integer in which to return result.
+<P>
+<A NAME="lbAF">&nbsp;</A>
+<H2>RETURN VALUE</H2>
+
+No value is returned.
+<P>
+<A NAME="lbAG">&nbsp;</A>
+<H2>COPYRIGHT</H2>
+
+Copyright &#169; 2001 Wind River Systems, Inc.
+<P>
+
+<HR>
+<A NAME="index">&nbsp;</A><H2>Index</H2>
+<DL>
+<DT><A HREF="#lbAB">NAME</A><DD>
+<DT><A HREF="#lbAC">SYNOPSIS</A><DD>
+<DT><A HREF="#lbAD">DESCRIPTION</A><DD>
+<DT><A HREF="#lbAE">INPUT VALUES</A><DD>
+<DT><A HREF="#lbAF">RETURN VALUE</A><DD>
+<DT><A HREF="#lbAG">COPYRIGHT</A><DD>
+</DL>
+<HR>
+This document was created by
+<A HREF="http://localhost/cgi-bin/man/man2html">man2html</A>,
+using the manual pages.<BR>
+Time: 09:32:46 GMT, August 30, 2001
+</BODY>
+</HTML>

@@ -1,0 +1,106 @@
+;POVLAB version 4.0 shareware - ascii scene for 3D modeller.
+;(C) 1997, Denis Olivier.
+;All rights reserved.
+;Date=Tuesday 04-24-2001.
+;Time=14:40:46.
+;user_name=REGISTER!
+ColorCamera=4
+ColorViewport=0
+ColorTextBackground=8
+ColorSelection=6
+ColorInterface=7
+ColorAxis=5
+ColorGrid=2
+GrilleType=1
+CurrentViewport=0
+Viewportx4=1
+DisplayAxis=1
+DisplayGrid=1
+CurrentTexture=Planet_1
+CurrentCamera=1
+BackgroundImageRGB: 50 50 60
+Fog: 255 255 255 0 10 1 0 0 0 0
+Atmosphere: 0 1 10 0.1 0 20 0.25 0.1 8 255 255 255
+UseSelection: 0
+RayGlobal: 0.003922 2.2 2 64 10 0.25 0.18 0.14
+Scale-X/Y F0: 19.09
+Shift-X F0: 0
+Shift-Y F0: 2.669
+Scale-X/Y F1: 23.26
+Shift-X F1: -0.5699
+Shift-Y F1: 2.669
+Scale-X/Y F2: 17.83
+Shift-X F2: 0
+Shift-Y F2: -0.5699
+Scale-X/Y F3: 45
+Shift-X F3: 0
+Shift-Y F3: 0
+Camera: 3.776 -2.554 5.786 0 0.0272 0 77.5 6.168 0 0 0 0 0 0
+Display_Camera: 1
+
+Spot 001: -0.1048 -6.668 0 0 0 0 255 255 255 3 20 14 1 1 0 245 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+Display_Spot: 1
+
+Nb-Object: 2
+
+[EndInitSection]
+
+Object 00001: 1
+Object 00001: 0 0 0
+Object 00001: 1 1 1
+Object 00001: 0 0 0
+Object 00001: 0 0 0
+Object 00001: 7
+Object 00001: Pink_Alabaster
+Object 00001: 0
+Object 00001: 0
+Object 00001: Object001
+Object 00001: -1
+Object 00001: 0 // display
+Object 00001: 1 1 1
+Object 00001: 0 0 0
+Object 00001: 0 0 0
+Object 00001: 1
+Object 00001: 0
+Object 00001: 0
+Object 00001: 0 0
+Object 00001: 0
+Object 00001: 1
+Object 00001: 8
+Object 00001: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00001: 0000000000000
+Object 00001: 0 0
+Object 00001: # 0 0 0 0 0 0 0 0
+Object 00001: # 0 0 0 0 0 0 0 0
+Object 00001: 0 0
+
+Object 00002: 2
+Object 00002: 0 0 0
+Object 00002: 6.837 0.1761 4.646
+Object 00002: 0 0 0
+Object 00002: 0 1.154 0
+Object 00002: 7
+Object 00002: Planet_1
+Object 00002: 0
+Object 00002: 0
+Object 00002: Sol
+Object 00002: -1
+Object 00002: 0 // display
+Object 00002: 1 1 1
+Object 00002: 0 0 0
+Object 00002: 0 0 0
+Object 00002: 1
+Object 00002: 0
+Object 00002: 0
+Object 00002: 0 0
+Object 00002: 0
+Object 00002: 1
+Object 00002: 70
+Object 00002: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00002: 0000000000000
+Object 00002: 0 0
+Object 00002: # 0 0 0 0 0 0 0 0
+Object 00002: # 0 0 0 0 0 0 0 0
+Object 00002: 0 0
+
+End of file: SPOT2.SCN

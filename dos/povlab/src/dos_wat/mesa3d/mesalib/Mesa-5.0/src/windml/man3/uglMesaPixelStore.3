@@ -1,0 +1,30 @@
+.TH uglMesaPixelStore "3" "AOUT 2001" "WindML/Mesa" "WRS"
+
+.SH NAME
+uglMesaPixelStore \- Set pixel store/packing parameters for the current context.
+
+.SH SYNOPSIS
+.B #include <GL/uglmesa.h>
+.PP
+.BI "void uglMesaPixelStore (GLint " pname ", GLint " value );
+
+.SH DESCRIPTION
+The \fBuglMesaPixelStore\fR function set pixels store/packing
+parameters for the current context. This is similar to glPixelStore.
+.PP
+WindML uses Y coordinates increase downward.
+
+.SH INPUT VALUES
+\fIpname\fR - can takes the following values
+      UGL_MESA_ROW_LENGTH, value specify actual pixels per row in
+image buffer and zero, same as image width (default)
+      UGL_MESA_Y_UP, non-zero = Y coordinates increase upward and
+zero = Y coordinates increase downward (default)
+.PP
+\fIvalue\fR - value for the parameter pname.
+
+.SH RETURN VALUE
+No value is returned.
+
+.SH COPYRIGHT
+Copyright \(co 2001 Wind River Systems, Inc.

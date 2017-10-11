@@ -1,0 +1,63 @@
+ Here are the changes between public POV-Ray 3.1 and 3.1g
+
+ 3.1g               04/26/99 Chris Young
+ Fixed 4d vector bug
+
+ 3.1f               04/22/99 Chris Young
+ Fixed problem with missing ) in #write that crashed
+ Fixed bump_map bug introduced in 3.1e
+ Fixed problem with empty textures
+ Fixed #macro inside #while problem
+ Traped vnormalize(<0,0,0>)
+ Updated copyright, removed compuserve
+
+ 3.1e               03/05/99 Chris Young
+ Fixed bump_map bug introduced in 3.1a
+ Misc unix/linux fixes and cleanups
+
+ 3.1d               1/30/99 Chris Young
+ Fixed crash in #write of vector or float
+ Added #write and #read now support 2d, 4d, & 5d vectors.
+
+ 3.1c               1/29/99 Chris Young
+ Fixed radiosity preview with odd screen size.
+ Reinitialized max_trace_level & radiosity_trace_level properly
+ Fixed token at end of file with no cr/lf or newline
+ 
+ 3.1b               1/18/99 Chris Young
+ Blob elements transformed after textures now works
+ Can now declare 2D vectors
+ Can now declare 4D vectors
+ Can now declare 5D vectors as colors
+ Fixed vector.v bug
+ Partial fix to bump_map bugs
+ Fixed bug involving "once" and "interpolate"
+ Fixed reflection leak bug
+ Fixed potential GPF in ListReflect
+ Fixed normal checker, hexagon bug
+ Fixed skysphere with no color_map crash
+ Fixed transform identifier parsing problem
+ Fixed #local with same name as #declare of different type bug
+ Fixed average normal bug and other normal flipping problems
+ Removed double_illuminate for normal{} but retained it for 
+  smooth_triangle, smoothed height_fields, and bicubic_patch.
+  Will redesign in 3.5 and consider added optional keyword double_illuminate.
+ Fixed normal{average} with no map crash
+ Fixed various conic_sweep prism bugs
+ Change in resumed render line numbering
+ Fixed focal blur gamma correction bug
+ Fixed recursive include overflow bug
+ Fixed recursive macro overflow bug
+ Fixed #write double closing which crashed Linux
+ Delete degenerate smooth_triangles when normals bend too much.
+ Many MS-Dos changes so C++ compiler can be used.
+ Changed EPSILON small value in MS-Dos version
+ 
+ 3.1a               9/29/98 Chris Young
+ Fixed problem with sor and lathe affecting unix and amiga
+ Fixed fclose in FILE_EXISTS
+ Fixed crackle and black_hole use of POV_SRAND.
+   Note POV_SRAND and POV_RAND no longer reconfigurable 
+   in frame.h or config.h.  If you redefined them on your
+   platform -- don't.
+ 

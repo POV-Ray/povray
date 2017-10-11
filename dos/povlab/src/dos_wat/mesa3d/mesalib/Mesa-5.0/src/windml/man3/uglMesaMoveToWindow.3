@@ -1,0 +1,24 @@
+.TH uglMesaMoveToWindow "3" "AOUT 2001" "WindML/Mesa" "WRS"
+
+.SH NAME
+uglMesaMoveToWindow \- Move an OpenGL window to an absolute position
+
+.SH SYNOPSIS
+.B #include <GL/uglmesa.h>
+.PP
+.BI "GLboolean uglMesaMoveToWindow (GLsizei " left ", GLsizei " top );
+
+.SH DESCRIPTION
+The \fBuglMesaMoveToWindow\fR function moves an OpenGL window to an absolute position
+
+.SH INPUT
+\fIleft, top\fR - new coordinates in pixels.
+
+.SH RETURN VALUES
+GL_TRUE if success, GL_FALSE if error because of invalid coordinates.
+
+.SH SEE ALSO
+.BR uglMesaMoveWindow "(3)"
+
+.SH COPYRIGHT
+Copyright \(co 2001 Wind River Systems, Inc.

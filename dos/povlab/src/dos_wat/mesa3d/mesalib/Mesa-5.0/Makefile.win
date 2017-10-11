@@ -1,0 +1,58 @@
+# Makefile for Win32
+
+# Oct 15, 2001
+# This makefile currently builds the Mesa, GLU, and GLUT libs.
+# The Windows driver and OSMesa drivers are built.
+# This makefile will build the demos dir, but only the pgms that work.
+# You will probably have to copy the DLL files from ./lib to a place
+# where Windows can find them.  To run just demo pgms, you can copy them
+# to demos.  You can also copy them to a Windows system directory such
+# as c:\winnt\system32.
+# The install target will also copy DLL, LIB, and header files into
+# places that may or may not be useful.  CHECK carefully before
+# making the install target.
+
+# Debug build:      nmake -f Makefile.win
+# Optimized build:  nmake -f Makefile.win NODEBUG=1
+# Remove objects:   nmake -f Makefile.win clobber  (or clean)
+
+# Build the libs
+SUBDIRS	=  src.dir si-glu.dir src-glut.dir demos.dir book.dir samples.dir
+
+CLEAN	= $(SUBDIRS:.dir=.clean)
+CLOBBER	= $(SUBDIRS:.dir=.clobber)
+LIBDIR  = lib
+
+# default rule
+default	: $(LIBDIR) $(SUBDIRS)
+
+# cleanup rules
+clean	: $(CLEAN)
+clobber	: $(CLOBBER)
+
+# inference rules
+$(LIBDIR)	:
+	@echo.
+	@mkdir $(LIBDIR)
+
+$(SUBDIRS)	:
+	@echo.
+	@echo Making in $* subdirectory...
+	@cd $*
+	@nmake -f Makefile.win -nologo
+	@cd ..
+
+$(CLEAN)	:
+	@del *~
+	@echo.
+	@echo Cleaning in $* subdirectory...
+	@cd $*
+	@nmake -f Makefile.win -nologo clean
+	@cd ..
+
+$(CLOBBER)	:
+	@echo.
+	@echo Clobbering in $* subdirectory...
+	@cd $*
+	@nmake -f Makefile.win -nologo clobber
+	@cd ..

@@ -1,0 +1,267 @@
+POVLAB modeller for POV-Ray 3.0.
+Copyright 1994,1999 Denis Olivier & ChromaGraphics.
+All rights reserved.
+-------------------------------------------------------------------------------
+WHAT'S NEW AROUND POVLAB 3D MODELLER
+-------------------------------------------------------------------------------
+
+- Postal adress   
+
+  DENIS OLIVIER   
+  5, Bld Franck Lamy   
+  17200 Royan
+  France   
+
+- Internet
+                                                     
+  Internet : dolivier@povlab.org                       
+  Home pages : http://www.povlab.org                   
+                                                     
+This is the latest release of POVLAB. Read this text for new features,
+but see the POVLAB documentation for more details (POVLAB.DOC, Microsoft Word
+for Windows 6.0 format).
+
+Corrected in 4.00 SP4 version :
+-----------------------------
+- 22.Dec.1998 : POVLAB becomes free
+
+Corrected in 4.00 SP3 version :
+-----------------------------
+- 05.01.98 : Create backup copy of scene (.bak)
+- 05.12.97 : Added multiple layers fog (5).<
+- 21.09.97 : Counter for # rendering.
+- 20.09.97 : Bug in frozen display.
+
+Corrected in 4.00 SP2 version :
+-----------------------------
+- 31.08.97 : Improving cylinder mapping.
+- 30.08.97 : Rotating cam position in camera viewport.
+- 27.08.97 : Read better TGA files.
+- 27.08.97 : Correct a bug in multi-objects raw files.
+- 27.08.97 : Added Lens Flare 4.0 by Nathan Kopp.
+- 26.08.97 : Frozen object = same color as grid.
+- 21.08.97 : Added rolling for camera (manual & mouse).
+- 15.08.97 : Key "U" to unfreeze all frozen objects.
+- 14.08.97 : Allow torus, 1/4 torus to be redefined.
+- 13.08.97 : Allow tubes, truncated cones, 1/4 tubes to be redefined.
+- 05.08.97 : Declared cam locations for scripting (generic).
+- 05.08.97 : Add new shortkeys.
+- 02.08.97 : Do not use radiosity for preview.
+- 02.08.97 : Detect for Windows NT 4.0 DOS mode.
+- 01.08.97 : Corrected a problem with spherical mapping.
+
+Corrected in 4.00 SP1 version :
+-----------------------------
+- 30.06.97 : Added new POV-Ray complex wood textures.
+- 30.06.97 : Fixed problems user's include file
+- 03.06.97 : Fixed problems with Cylindrical blobs
+- 03.06.97 : Exporting triangle in mesh and not union
+- 03.06.97 : Fixed an error in the loader
+- 03.06.97 : Fixed error with raw > 20000 faces
+- 01.06.97 : Added radiosity support
+- 01.06.97 : Corrected shelling bug to POV-Ray
+- 24.05.97 : Added new camera options (placement).
+- 24.05.97 : Added new keyboard shorcuts.
+
+Corrected final version :
+-------------------------
+- 08.02.97 : fixed some grammatical mistakes.
+- 08.02.97 : Added debug full info.
+- 08.02.97 : removed some little bugs.
+- 08.02.97 : Added some new textures.
+- 08.02.97 : Corrected problem in POV-Ray path in preferences.
+- 06.02.97 : Added POVLAB.SCN to load at startup
+- 15.11.96 : Corrected a problem with hollow/blob
+- 15.11.96 : Show or not bspline/bezier ctrl points
+- 15.11.96 : Added area-spotlight radius edition
+- 15.11.96 : Added hollow when create an object
+- 15.11.96 : Corrected a problem in raw files naming
+- 15.11.96 : Optimised move/scale/rotate function
+
+Corrected/added alpha version :
+-------------------------------
+- 04.11.96 : Extruder edition upgraded
+- 04.11.96 : Added zoom in extruder
+- 04.11.96 : Corrected a bug in Bezier patch display
+- 04.11.96 : The mouse pos is restored after SRT operation
+- 04.11.96 : Environment (colors, grid status, ...) saved
+- 30.10.96 : Added -5 to +5 for bumping size
+- 16.10.96 : Added the support for Bezier patches
+- 16.10.96 : Corrected inversion for extruded objects
+- 27.09.96 : Problem with 16 color mode and texture menu thumbnail
+- 07.09.96 : Corrected a bug in superellipsoid dialog box
+- 05.09.96 : Corrected a bug in spot area light
+- 05.09.96 : Correction in rendering hidden objects
+- 05.09.96 : Libraries extended to 10
+- 01.09.96 : Corrected a bug in texture selector
+- 01.09.96 : Added some drawing aids in extruder
+- 31.08.96 : View all lights in 3d static/dynamic
+- 31.08.96 : Added area spotlights
+- 31.08.96 : Added real arealights
+- 30.08.96 : New extruder with powered functions
+- 28.08.96 : Corrected a bug in manual/value rotations
+- 28.08.96 : Added Preview of current texture
+- 28.08.96 : Added automapping square
+- 28.08.96 : Added the LATHE objects
+
+Corrected/added in the beta 10 version :
+----------------------------------------
+- 24.08.96 : The doc is corrected by englishmen ;)
+- 24.08.96 : Checking for mapping paths before rendering
+- 20.08.96 : Pan with correct objects color
+- 20.08.96 : Snap to virtual grid for each viewport
+- 20.08.96 : Show coordinates for each viewport
+- 19.08.96 : Fixed a severe bug in CSG
+- 18.08.96 : Fixed a bug in the text zone
+- 18.08.96 : Adding superellipsoid object
+- 18.08.96 : New box for mapping manipulations
+- 15.08.96 : Changed startup windows design
+- 15.08.96 : Allow comments in POVLAB.TEX file
+- 15.08.96 : Corrected a mem bug in texture dialog box
+- 15.08.96 : Added looks_like for omni and area
+- 14.08.96 : Rewrited the HSL-RVB conversion
+- 13.08.96 : Added Redraw viewport in right mouse button box option
+- 13.08.96 : Reconstruction of the POVLAB.TEX/.INC files
+- 12.08.96 : Correction and addon in material box
+- 12.08.96 : Corrected bug in 3D fonts generator
+- 12.08.96 : Added turbulence option to layered fog
+- 12.08.96 : Added filter option to image_map
+- 12.08.96 : Added PVENGINE.EXE support in makethem (not tested)
+- 12.08.96 : Added Hollow support in makethem
+- 12.08.96 : Add the possibility to arrange texture by group
+- 12.08.96 : Some changes in CSG operations
+- 12.08.96 : Fixed some naming convention
+- 11.08.96 : Fixed problem in mapping function (type of)
+- 27.07.96 : Correcting problems in keyboard support
+- 27.07.96 : Adding editing .TEX and .INC from interface
+- 27.07.96 : Library paths support
+- 27.07.96 : Extended mapping functions
+- 26.07.96 : Right mouse button options with a dialog box
+- 25.07.96 : Allow checking or not of textures when rendering
+- 25.07.96 : Allow rendering of hidden objects
+- 25.07.96 : Tabulation works fine now
+
+Corrected in the beta 9 version :
+-------------------------------
+- 06.07.96 : Corrected a bug in manual translation editing
+- 09.07.96 : Added color rendering from editing if texture default
+- 09.07.96 : Added power computing raw floats
+- 09.07.96 : Added some path and file checking
+- 14.07.96 : Compilation and 8087 options modified
+- 14.07.96 : Palette box has only one form (landscape)
+- 14.07.96 : Change douceur spelling to adaptive
+- 15.07.96 : Interface improvments (menus)
+- 15.07.96 : Correction when view pov scene source
+- 16.07.96 : Added scaling or not raw in a unit box
+- 18.07.96 : Fixed a bug into POV-Ray exe name/path
+- 18.07.96 : Corrected a bug in fade_power/fade_distance
+- 20.07.96 : Added some correction to arealights (radius/adaptive)
+- 20.07.96 : Added user specific .INC texture library file
+- 20.07.96 : Corrected a bug in menu bar enable/disable item
+- 20.07.96 : Some corrections in makethem.exe
+- 20.07.96 : Show statistics in POV-Ray at the end of the rendering
+- 23.07.96 : Added cone for spot un cyl lights viewing
+- 23.07.96 : Added generation of hidden objects under /* ... */
+- 23.07.96 : Added specular keyword to finish parameters
+- 23.07.96 : Corrected a bug in the omni light menu buttons
+- 25.07.96 : The tutorial is only available via Internet
+
+Corrected in the beta 8 version :
+-------------------------------
+  - You can know specify a executable (for various compilations).
+  - Corrected some problems in bump_map.
+  - Added support for bump_size in bump_mapping
+  - Other minors bugs or correction done.
+  - Corrected some bugs in CSG when deleting objects.
+  - Delete the POVLAB.DEF for a POVLAB.INI file.
+  - Beta releases will expire after one month.
+
+Corrected in the beta 7 version :
+-------------------------------
+  - Correction of problems with multi-objects in raw files.
+  - You can know specify a executable (for various compilations).
+  - Corrected some problems in image_map.
+  - Corrected some problems in path searching.
+  - Other minors bugs or correction done.
+  - This version work only for 3.0 version.
+  - Some options added in MAKETHEM.EXE utility.
+
+Version 4.0 new enhancements :
+----------------------------
+  - Corrected many bugs everywhere (HF, CSG, texture, interface).
+  - Shell to your favorite viewer.
+  - Some changes in the interface design and spelling.
+  - Support a lot of new options in POV-Ray 3.0 as :
+      - Extended light sources (atmosphere, fading, ... ).
+      - Focal blur.
+      - Atmospheric effects.
+      - Global setting.
+      - New textures.
+      - New finish options (caustics, fade_distance, fade_power).
+      - Adding blobs for spheres and cylinders.
+      - Adding hollow keyword.
+      - Lights cast shadows or not.
+      - New layered fog supported.
+      - Added cylindrical lights.
+  - Added roughness and brilliance in finish options.
+  - Modify some options on selected objects with yes, let, no
+    possibilities.
+  - Added set and add quick object manipulation.
+  - Works fine under WIN95.
+  - Support rendering in WINPOV.
+  - Extended final render box.
+  - Add B-Spline path with CTDS like connections.
+  - Added Water_Level for HF.
+  - New texture files (Martin Conlon).
+  - Auto naming when multii copying.
+  - New texture generator.
+  - Adding debugging infos an files.
+  - New plugins.
+  - Add finish statement for a selection.
+  - Adding fast pan with mouse.
+  - Adding grid from -100 to 100.
+  - Problem with merge of raw objects corrected.
+  - Separate directory for images and scene output.
+  - Adding panning in second mouse button configuration.
+  - View the last rendering image in the modeller.
+  - View POV scene code.
+  - Smooth key vertices on the spline.
+  - Added 2 types of grids.
+  - Added lights and cameras manual editing.
+  - Added viewing the POV generated file.
+  - Support powered mapping functions.
+  - Added OS/2 setup files.
+  - Added tab for textzone.
+  - Added freeze to selected options.
+  - Added check cases for axis on rotate, translate, scale boxes.
+
+Version 3.1 have new enhancements :
+---------------------------------
+  - You can now copy a selection of CSG objects without destroying the boolean
+    connection.
+  - Added the way to show height-fields like they will be rendered in POV-Ray,
+    not just a cube around the shape, but polygons !
+  - Use a real camera, based on the FOV in POV-Ray.
+  - NEW AND VERY GOOD. Plugins, allow you to program your own external
+    procedures like object generators, linking directly with POVLAB's
+    interface (graphic and object creation). See it, give your old
+    programs a new life ! See documentation for more details.
+  - Mesh precision control.
+  - Up to 20000 objects now. Read documentation for more information.
+  - Allow you to correct raytracing parameters for textures in POVLAB. Like
+    that you can make more materials with just one description in the .TEX
+    file. Parameters are : ior, refraction, ambient, phong, phong_size,
+    diffuse, crand, reflection.
+  - Add some effects on windows.
+  - Create 3D fonts (read TrueType fonts - thanks to Jean Arnaud).
+  - Image files viewer, best palette fitting (dithering, scaling and more).
+  - Video configuration for POV-Ray.
+  - POV-Ray scenes output dir (thanks to Dan Farmer).
+  - Tabs formatting for output to POV-Ray (thanks to Dan Farmer).
+  - RGB and HSL color dialog boxes.
+  - Can now change viewport in full screen (keys 1,2,3).
+
+Version 3.0 :
+-----------
+  - first "world" release on Compuserve and Internet.
+

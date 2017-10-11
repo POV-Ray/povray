@@ -1,0 +1,86 @@
+#!/bin/sh
+
+# Make a Linux ELF shared for 3Dfx Glide with threading for MITS
+
+#--identification------------------------------------------------------
+
+# $Id: mklib.mits,v 1.5 2000/07/10 23:41:18 brianp Exp $
+
+# $Log: mklib.mits,v $
+# Revision 1.5  2000/07/10 23:41:18  brianp
+# replace libMesaGL.so with libGL.so
+#
+# Revision 1.4  1999/11/30 13:02:16  brianp
+# restored MAJOR version number in soname
+#
+# Revision 1.3  1999/11/18 15:29:52  brianp
+# removed MAJOR version number from soname
+#
+# Revision 1.2  1999/09/15 15:10:20  brianp
+# added third, tiny version number to arguments
+#
+# Revision 1.1  1999/08/19 13:53:04  brianp
+# initial check-in (post-crash)
+#
+
+
+#--common--------------------------------------------------------------
+
+LIBRARY=$1
+shift 1
+
+MAJOR=$1
+shift 1
+
+MINOR=$1
+shift 1
+
+TINY=$1
+shift 1
+
+OBJECTS=$*
+
+#--platform------------------------------------------------------------
+
+# If we're making the libGL.so file then also link in the Glide libs.
+# The -L/usr/i486-linux-libc5/lib option is specified so that licb5 is
+# used on RedHat 5.x systems.  This helps to fix Quake problems.  This
+# tip comes from Emil Briggs (briggs@tick.physics.ncsu.edu).  Thanks!
+if [ $LIBRARY = "libGL.so" ] ; then
+    GLIDELIBS="-L/usr/local/glide/lib -lglide2x -L/usr/i486-linux-libc5/lib -lm -lpthread"
+fi
+
+
+# the following provided by Thomas Hiller (Hiller@tu-harburg.d400.de)
+
+VERSION="${MAJOR}.${MINOR}"
+
+LIBNAME=`basename $LIBRARY`
+ARNAME=`basename $LIBNAME .so`.a
+DIRNAME=`dirname $LIBRARY`
+
+gcc -shared -Wl,-soname,${LIBNAME}.${MAJOR} -o ${LIBRARY}.${VERSION} ${OBJECTS} ${GLIDELIBS}
+(cd $DIRNAME; ln -s ${LIBNAME}.${VERSION} ${LIBNAME}.${MAJOR})
+
+ln -s ${LIBNAME}.${MAJOR} ${LIBRARY}
+
+
+# also make regular .a files,
+# provided by Danek Duvall (duvall@dhduvall.student.princeton.edu)
+
+ar ruv ${DIRNAME}/${ARNAME} ${OBJECTS}
+ranlib ${DIRNAME}/${ARNAME}
+
+
+# Print a reminder about shared libs:
+DIR=`cd .. ; pwd`
+echo
+echo "******Be sure to add" ${DIR}"/lib to your LD_LIBRARY_PATH variable"
+echo
+sleep 2
+
+
+
+#### NOTES:
+# One Mesa user reports having to run the "ldconfig -v" command to make
+# Linux aware of the shared libs.

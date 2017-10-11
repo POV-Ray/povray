@@ -1,0 +1,222 @@
+;POVLAB version 4.0 shareware - ascii scene for 3D modeller.
+;(C) 1997, Denis Olivier.
+;All rights reserved.
+;Date=Tuesday 04-24-2001.
+;Time=14:38:12.
+;user_name=REGISTER!
+ColorCamera=4
+ColorViewport=0
+ColorTextBackground=8
+ColorSelection=6
+ColorInterface=7
+ColorAxis=5
+ColorGrid=247
+GrilleType=1
+CurrentViewport=0
+Viewportx4=1
+DisplayAxis=1
+DisplayGrid=1
+CurrentTexture=Fire_Map
+CurrentCamera=1
+BackgroundImageRGB: 50 50 60
+Fog: 255 255 255 1 1 2 0 1 0.5 0
+Atmosphere: 0 1 10 0.1 0 20 0.25 0.1 8 255 255 255
+UseSelection: 0
+RayGlobal: 0.003922 2.2 3 64 10 0.25 0.18 0.14
+Scale-X/Y F0: 20.82
+Shift-X F0: 0
+Shift-Y F0: 2.848
+Scale-X/Y F1: 20.82
+Shift-X F1: 0
+Shift-Y F1: 2.848
+Scale-X/Y F2: 14.84
+Shift-X F2: -2.384e-007
+Shift-Y F2: -2.384e-007
+Scale-X/Y F3: 45
+Shift-X F3: 0
+Shift-Y F3: 0
+Camera: 1e-005 -4.514 13.5 1.55 1e-005 0.2695 75 5 0 0 25 2 0 0.9
+Display_Camera: 1
+
+Omni 001: 5.81 -5.907 0 255 255 255 3 1 1 100 1 0 0 0
+Display_Omni: 1
+
+Nb-Object: 6
+
+[EndInitSection]
+
+Object 00001: 2
+Object 00001: 0 0 0
+Object 00001: 6.267 0.1 6.267
+Object 00001: 0 0 0
+Object 00001: 0 0.1111 0
+Object 00001: 7
+Object 00001: Default
+Object 00001: 0
+Object 00001: 0
+Object 00001: Cube0000
+Object 00001: -1
+Object 00001: 0 // display
+Object 00001: 1 1 1
+Object 00001: 0 0 0
+Object 00001: 0 0 0
+Object 00001: 1
+Object 00001: 0
+Object 00001: 0
+Object 00001: 0 0
+Object 00001: 0
+Object 00001: 1
+Object 00001: 1
+Object 00001: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00001: 0000000000000
+Object 00001: 0 0
+Object 00001: # 0 0 0 0 0 0 0 0
+Object 00001: # 0 0 0 0 0 0 0 0
+Object 00001: 0 0
+
+Object 00002: 0
+Object 00002: 0 0 0
+Object 00002: 1 1.238 1
+Object 00002: 0 0 0
+Object 00002: 0 -1.227 0
+Object 00002: 7
+Object 00002: Fire_Map
+Object 00002: 0
+Object 00002: 0
+Object 00002: Cyli0000
+Object 00002: -1
+Object 00002: 0 // display
+Object 00002: 1 1 1
+Object 00002: 0 0 0
+Object 00002: 0 0 0
+Object 00002: 1
+Object 00002: 0
+Object 00002: 0
+Object 00002: 0 0
+Object 00002: 0
+Object 00002: 1
+Object 00002: 1
+Object 00002: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00002: 0000000000000
+Object 00002: 0 0
+Object 00002: # 0 0 0 0 0 0 0 0
+Object 00002: # 0 0 0 0 0 0 0 0
+Object 00002: 0 0
+
+Object 00003: 0
+Object 00003: 0 0 0
+Object 00003: 1 1.864 1
+Object 00003: 0 0 0
+Object 00003: -4.447 -1.853 -4.38
+Object 00003: 7
+Object 00003: Fire_Map
+Object 00003: 0
+Object 00003: 0
+Object 00003: Cyli0001
+Object 00003: -1
+Object 00003: 0 // display
+Object 00003: 1 1 1
+Object 00003: 0 0 0
+Object 00003: 0 0 0
+Object 00003: 1
+Object 00003: 0
+Object 00003: 0
+Object 00003: 0 0
+Object 00003: 0
+Object 00003: 1
+Object 00003: 1
+Object 00003: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00003: 0000000000000
+Object 00003: 0 0
+Object 00003: # 0 0 0 0 0 0 0 0
+Object 00003: # 0 0 0 0 0 0 0 0
+Object 00003: 0 0
+
+Object 00004: 0
+Object 00004: 0 0 0
+Object 00004: 1 0.5662 1
+Object 00004: 0 0 0
+Object 00004: 4.717 -0.5551 4.717
+Object 00004: 7
+Object 00004: Fire_Map
+Object 00004: 0
+Object 00004: 0
+Object 00004: Cyli0002
+Object 00004: -1
+Object 00004: 0 // display
+Object 00004: 1 1 1
+Object 00004: 0 0 0
+Object 00004: 0 0 0
+Object 00004: 1
+Object 00004: 0
+Object 00004: 0
+Object 00004: 0 0
+Object 00004: 0
+Object 00004: 1
+Object 00004: 1
+Object 00004: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00004: 0000000000000
+Object 00004: 0 0
+Object 00004: # 0 0 0 0 0 0 0 0
+Object 00004: # 0 0 0 0 0 0 0 0
+Object 00004: 0 0
+
+Object 00005: 0
+Object 00005: 0 0 0
+Object 00005: 1 1.551 1
+Object 00005: 0 0 0
+Object 00005: -2.224 -1.54 -2.224
+Object 00005: 7
+Object 00005: Fire_Map
+Object 00005: 0
+Object 00005: 0
+Object 00005: Cyli0003
+Object 00005: -1
+Object 00005: 0 // display
+Object 00005: 1 1 1
+Object 00005: 0 0 0
+Object 00005: 0 0 0
+Object 00005: 1
+Object 00005: 0
+Object 00005: 0
+Object 00005: 0 0
+Object 00005: 0
+Object 00005: 1
+Object 00005: 1
+Object 00005: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00005: 0000000000000
+Object 00005: 0 0
+Object 00005: # 0 0 0 0 0 0 0 0
+Object 00005: # 0 0 0 0 0 0 0 0
+Object 00005: 0 0
+
+Object 00006: 0
+Object 00006: 0 0 0
+Object 00006: 1 0.8796 1
+Object 00006: 0 0 0
+Object 00006: 2.426 -0.8684 2.426
+Object 00006: 7
+Object 00006: Fire_Map
+Object 00006: 0
+Object 00006: 0
+Object 00006: Cyli0004
+Object 00006: -1
+Object 00006: 0 // display
+Object 00006: 1 1 1
+Object 00006: 0 0 0
+Object 00006: 0 0 0
+Object 00006: 1
+Object 00006: 0
+Object 00006: 0
+Object 00006: 0 0
+Object 00006: 0
+Object 00006: 1
+Object 00006: 1
+Object 00006: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00006: 0000000000000
+Object 00006: 0 0
+Object 00006: # 0 0 0 0 0 0 0 0
+Object 00006: # 0 0 0 0 0 0 0 0
+Object 00006: 0 0
+
+End of file: LAYER_F.SCN

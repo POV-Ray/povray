@@ -1,0 +1,44 @@
+#!/bin/sh
+
+# Make a shared lib for SunOS 4.x library file
+
+#--identification------------------------------------------------------
+
+# $Id: mklib.sunos4,v 1.2 1999/09/15 15:10:20 brianp Exp $
+
+# $Log: mklib.sunos4,v $
+# Revision 1.2  1999/09/15 15:10:20  brianp
+# added third, tiny version number to arguments
+#
+# Revision 1.1  1999/08/19 13:53:06  brianp
+# initial check-in (post-crash)
+#
+
+
+#--common--------------------------------------------------------------
+
+# Usage:  mklib libname major minor tiny file.o ...
+#
+# First argument is name of output library (LIBRARY)
+# Second arg is major version number (MAJOR)
+# Third arg is minor version number (MINOR)
+# Fourth arg is tiny version number (TINY)
+# Rest of arguments are object files (OBJECTS)
+
+LIBRARY=$1
+shift 1
+
+MAJOR=$1
+shift 1
+
+MINOR=$1
+shift 1
+
+TINY=$1
+shift 1
+
+OBJECTS=$*
+
+#--platform-------------------------------------------------------------
+
+ld -assert pure-text -o $LIBRARY $OBJECTS

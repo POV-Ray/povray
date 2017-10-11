@@ -1,0 +1,56 @@
+#!/bin/sh
+
+# Make a library file for BeOS on PowerPC
+
+#--identification------------------------------------------------------
+
+# $Id: mklib.beos-ppc,v 1.2 1999/09/15 15:10:20 brianp Exp $
+
+# $Log: mklib.beos-ppc,v $
+# Revision 1.2  1999/09/15 15:10:20  brianp
+# added third, tiny version number to arguments
+#
+# Revision 1.1  1999/08/19 13:52:58  brianp
+# initial check-in (post-crash)
+#
+
+
+#--common--------------------------------------------------------------
+
+LIBRARY=$1
+shift 1
+
+MAJOR=$1
+shift 1
+
+MINOR=$1
+shift 1
+
+TINY=$1
+shift 1
+
+OBJECTS=$*
+
+#--platform-------------------------------------------------------------
+
+# build system library pathnames
+SYSLIBNAMES="libmoto.a libroot.so libbe.so glue-noinit.a init_term_dyn.o start_dyn.o lib3DfxGlide2X.so"
+
+for i in `echo $BELIBRARIES | sed "s/;/ /g"`
+do
+	for j in $SYSLIBNAMES
+	do
+		if [ -e $i/$j ] ; then SYSLIBS="$SYSLIBS $i/$j" ; fi
+	done
+done
+
+# remove previous library before linking to avoid duplicate symbols
+rm ../lib/$LIBRARY 2>/dev/null
+
+# Other libraries which we may be dependent on.  Since we make the libraries
+# in the order libMesaGL.a, libMesaGLU.a, libMesatk.a, libMesaaux.a each
+# just depends on its predecessor.
+# (code picked up from mklib.aix)
+OTHERLIBS=`ls ../lib/*.so 2>/dev/null`
+
+mwccppc -sharedlibrary -export pragma -term '' -init '' $SYSLIBS $OTHERLIBS -o $LIBRARY $OBJECTS

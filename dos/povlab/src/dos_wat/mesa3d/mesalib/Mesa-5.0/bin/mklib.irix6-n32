@@ -1,0 +1,53 @@
+#!/bin/sh
+
+# Make an n32 IRIX 6.x DSO
+
+#--identification------------------------------------------------------
+
+# $Id: mklib.irix6-n32,v 1.2 1999/09/15 15:10:20 brianp Exp $
+
+# $Log: mklib.irix6-n32,v $
+# Revision 1.2  1999/09/15 15:10:20  brianp
+# added third, tiny version number to arguments
+#
+# Revision 1.1  1999/08/19 13:53:03  brianp
+# initial check-in (post-crash)
+#
+
+
+#--common--------------------------------------------------------------
+
+LIBRARY=$1
+shift 1
+
+MAJOR=$1
+shift 1
+
+MINOR=$1
+shift 1
+
+TINY=$1
+shift 1
+
+OBJECTS=$*
+
+#--platform------------------------------------------------------------
+
+# This is a bit of a kludge, but...
+if test ${LIBRARY} = "libGL.so" ; then
+	# must add libXext.a to Mesa libGL.so in case one relinks a precompiled
+	# OpenGL program which wasn't linked with -lXext or -lm.
+	OBJECTS="${OBJECTS} -lXext -lm"
+fi
+
+
+ld -n32 -shared -all -o ${LIBRARY} ${OBJECTS}
+
+
+# You may want to add the following to the ld line:
+#   -soname <path>$LIBNAME
+#
+# where LIBNAME=`basename $LIBRARY` and <path> is where you're going to
+# put Mesa's libraries.  This may solve problems with the runtime
+# loader/linker (rld) not being able to find the library.
+# For example:  -soname /usr/local/lib/$LIBNAME

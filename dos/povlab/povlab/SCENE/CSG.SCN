@@ -1,0 +1,373 @@
+;POVLAB version 4.00 SP4 - ascii scene for 3D modeller.
+;(C) 1998, Denis Olivier.
+;All rights reserved.
+;Date=Tuesday 04-24-2001.
+;Time=15:35:22.
+;user_name=USER
+NbRendu=1
+ColorCamera=4
+ColorViewport=0
+ColorTextBackground=8
+ColorSelection=6
+ColorInterface=7
+ColorAxis=5
+ColorGrid=2
+GrilleType=1
+CurrentViewport=1
+Viewportx4=1
+DisplayAxis=1
+DisplayGrid=1
+CurrentTexture=Default
+CurrentCamera=1
+BackgroundImageRGB: 50 50 60
+FogLayer: 0 255 255 255 0 0 1 0 0 0 0
+FogLayer: 1 255 255 255 0 10 1 0 1 0 0
+FogLayer: 2 255 255 255 0 10 1 0 1 0 0
+FogLayer: 3 255 255 255 0 10 1 0 1 0 0
+FogLayer: 4 255 255 255 0 10 1 0 1 0 0
+Atmosphere: 0 1 10 0.1 0 20 0.25 0.1 8 255 255 255
+UseSelection: 0
+RayGlobal: 0.003922 2.2 3 64 10 0.25 0.18 0.14
+Radiosity: 0 3 3.3 200 10 0.3 0.5 0.75 0.017 7 1
+Scale-X/Y F0: 27.66
+Shift-X F0: -0.0273
+Shift-Y F0: 1.375
+Scale-X/Y F1: 27.66
+Shift-X F1: -1.726
+Shift-Y F1: 1.375
+Scale-X/Y F2: 24.96
+Shift-X F2: -0.0273
+Shift-Y F2: -2.726
+Scale-X/Y F3: 45
+Shift-X F3: 0
+Shift-Y F3: 0
+Camera: 0 -3.639 5.648 0 0 0 74.5 5.961 0 0 0 0 0 0 0
+Display_Camera: 1
+
+Omni 001: 3.574 -4.737 6.452 255 255 255 3 1 1 0 0 0 0 0 
+Display_Omni: 1
+
+Nb-Object: 11
+
+[EndInitSection]
+
+Object 00001: 1
+Object 00001: 0 0 0
+Object 00001: 1 1 1
+Object 00001: 0 0 0
+Object 00001: 0 0 0
+Object 00001: 7
+Object 00001: Default
+Object 00001: 4
+Object 00001: 0
+Object 00001: Sphe0000
+Object 00001: -1
+Object 00001: 0
+Object 00001: 1 1 1
+Object 00001: 0 0 0
+Object 00001: 0 0 0
+Object 00001: 1
+Object 00001: 0
+Object 00001: 0
+Object 00001: 2 0
+Object 00001: 4
+Object 00001: 1
+Object 00001: 110
+Object 00001: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00001: 0000000000000
+Object 00001: 0 0
+Object 00001: # 0 0 0 0 0 0 0 0
+Object 00001: # 0 0 0 0 0 0 0 0
+Object 00001: 0 0
+
+Object 00002: 1
+Object 00002: 0 0 0
+Object 00002: 1 1 1
+Object 00002: 0 0 0
+Object 00002: 2.225 0 -0.4407
+Object 00002: 7
+Object 00002: Default
+Object 00002: 6
+Object 00002: 0
+Object 00002: Sphe0001
+Object 00002: -1
+Object 00002: 0
+Object 00002: 1 1 1
+Object 00002: 0 0 0
+Object 00002: 0 0 0
+Object 00002: 1
+Object 00002: 0
+Object 00002: 0
+Object 00002: 3 0
+Object 00002: 6
+Object 00002: 1
+Object 00002: 224
+Object 00002: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00002: 0000000000000
+Object 00002: 0 0
+Object 00002: # 0 0 0 0 0 0 0 0
+Object 00002: # 0 0 0 0 0 0 0 0
+Object 00002: 0 0
+
+Object 00003: 1
+Object 00003: 0 0 0
+Object 00003: 1 1 1
+Object 00003: 0 0 0
+Object 00003: -2.519 0 0
+Object 00003: 7
+Object 00003: Default
+Object 00003: 5
+Object 00003: 0
+Object 00003: Sphe0002
+Object 00003: -1
+Object 00003: 0
+Object 00003: 1 1 1
+Object 00003: 0 0 0
+Object 00003: 0 0 0
+Object 00003: 1
+Object 00003: 0
+Object 00003: 0
+Object 00003: 4 0
+Object 00003: 5
+Object 00003: 1
+Object 00003: 7
+Object 00003: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00003: 0000000000000
+Object 00003: 0 0
+Object 00003: # 0 0 0 0 0 0 0 0
+Object 00003: # 0 0 0 0 0 0 0 0
+Object 00003: 0 0
+
+Object 00004: 2
+Object 00004: 0 0 0
+Object 00004: 1 1 1
+Object 00004: 0 0 0
+Object 00004: 0 0.9869 0
+Object 00004: 7
+Object 00004: Default
+Object 00004: 0
+Object 00004: 0
+Object 00004: Cube0000
+Object 00004: -1
+Object 00004: 0
+Object 00004: 1 1 1
+Object 00004: 0 0 0
+Object 00004: 0 0 0
+Object 00004: 1
+Object 00004: 0
+Object 00004: 0
+Object 00004: 1 0
+Object 00004: 0
+Object 00004: 1
+Object 00004: 0
+Object 00004: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00004: 0000000000000
+Object 00004: 0 0
+Object 00004: # 0 0 0 0 0 0 0 0
+Object 00004: # 0 0 0 0 0 0 0 0
+Object 00004: 0 0
+
+Object 00005: 2
+Object 00005: 0 0 0
+Object 00005: 1 1 1
+Object 00005: 0 0 0
+Object 00005: -2.498 0.9869 0
+Object 00005: 7
+Object 00005: Default
+Object 00005: 0
+Object 00005: 0
+Object 00005: Cube0001
+Object 00005: -1
+Object 00005: 0
+Object 00005: 1 1 1
+Object 00005: 0 0 0
+Object 00005: 0 0 0
+Object 00005: 1
+Object 00005: 0
+Object 00005: 0
+Object 00005: 1 0
+Object 00005: 0
+Object 00005: 1
+Object 00005: 0
+Object 00005: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00005: 0000000000000
+Object 00005: 0 0
+Object 00005: # 0 0 0 0 0 0 0 0
+Object 00005: # 0 0 0 0 0 0 0 0
+Object 00005: 0 0
+
+Object 00006: 2
+Object 00006: 0 0 0
+Object 00006: 1 1 1
+Object 00006: 0 0 0
+Object 00006: 2.56 0.9869 0
+Object 00006: 7
+Object 00006: Default
+Object 00006: 0
+Object 00006: 0
+Object 00006: Cube0002
+Object 00006: -1
+Object 00006: 0
+Object 00006: 1 1 1
+Object 00006: 0 0 0
+Object 00006: 0 0 0
+Object 00006: 1
+Object 00006: 0
+Object 00006: 0
+Object 00006: 1 0
+Object 00006: 0
+Object 00006: 1
+Object 00006: 0
+Object 00006: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00006: 0000000000000
+Object 00006: 0 0
+Object 00006: # 0 0 0 0 0 0 0 0
+Object 00006: # 0 0 0 0 0 0 0 0
+Object 00006: 0 0
+
+Object 00007: 0
+Object 00007: 0 0 0
+Object 00007: 0.2652 2.175 0.2652
+Object 00007: 90 0 0
+Object 00007: 0 1.446 0
+Object 00007: 7
+Object 00007: Default
+Object 00007: 4
+Object 00007: 0
+Object 00007: Cyli0000
+Object 00007: -1
+Object 00007: 0
+Object 00007: 1 1 1
+Object 00007: 0 0 0
+Object 00007: 0 0 0
+Object 00007: 1
+Object 00007: 0
+Object 00007: 0
+Object 00007: 4 0
+Object 00007: 4
+Object 00007: 1
+Object 00007: 0
+Object 00007: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00007: 0000000000000
+Object 00007: 0 0
+Object 00007: # 0 0 0 0 0 0 0 0
+Object 00007: # 0 0 0 0 0 0 0 0
+Object 00007: 0 0
+
+Object 00008: 0
+Object 00008: 0 0 0
+Object 00008: 0.2652 2.175 0.2652
+Object 00008: 90 0 0
+Object 00008: -2.567 1.446 0
+Object 00008: 7
+Object 00008: Default
+Object 00008: 5
+Object 00008: 0
+Object 00008: Cyli0001
+Object 00008: -1
+Object 00008: 0
+Object 00008: 1 1 1
+Object 00008: 0 0 0
+Object 00008: 0 0 0
+Object 00008: 1
+Object 00008: 0
+Object 00008: 0
+Object 00008: 4 0
+Object 00008: 5
+Object 00008: 1
+Object 00008: 0
+Object 00008: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00008: 0000000000000
+Object 00008: 0 0
+Object 00008: # 0 0 0 0 0 0 0 0
+Object 00008: # 0 0 0 0 0 0 0 0
+Object 00008: 0 0
+
+Object 00009: 0
+Object 00009: 0 0 0
+Object 00009: 0.2652 2.175 0.2652
+Object 00009: 90 0 0
+Object 00009: 2.603 0.3253 0
+Object 00009: 7
+Object 00009: Default
+Object 00009: 6
+Object 00009: 0
+Object 00009: Cyli0002
+Object 00009: -1
+Object 00009: 0
+Object 00009: 1 1 1
+Object 00009: 0 0 0
+Object 00009: 0 0 0
+Object 00009: 1
+Object 00009: 0
+Object 00009: 0
+Object 00009: 4 0
+Object 00009: 6
+Object 00009: 1
+Object 00009: 0
+Object 00009: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00009: 0000000000000
+Object 00009: 0 0
+Object 00009: # 0 0 0 0 0 0 0 0
+Object 00009: # 0 0 0 0 0 0 0 0
+Object 00009: 0 0
+
+Object 00010: 0
+Object 00010: 0 0 0
+Object 00010: 0.2652 2.175 0.2652
+Object 00010: 270 90 180
+Object 00010: 0 -1.771 0
+Object 00010: 7
+Object 00010: Default
+Object 00010: 0
+Object 00010: 0
+Object 00010: Cyli0003
+Object 00010: -1
+Object 00010: 0
+Object 00010: 1 1 1
+Object 00010: 0 0 0
+Object 00010: 0 0 0
+Object 00010: 1
+Object 00010: 0
+Object 00010: 0
+Object 00010: 1 0
+Object 00010: 0
+Object 00010: 1
+Object 00010: 0
+Object 00010: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00010: 0000000000000
+Object 00010: 0 0
+Object 00010: # 0 0 0 0 0 0 0 0
+Object 00010: # 0 0 0 0 0 0 0 0
+Object 00010: 0 0
+
+Object 00011: 1
+Object 00011: 0 0 0
+Object 00011: 1 0.1867 1
+Object 00011: 0 0 0
+Object 00011: 0 -1.807 0
+Object 00011: 7
+Object 00011: Default
+Object 00011: 10
+Object 00011: 0
+Object 00011: Sphe0003
+Object 00011: -1
+Object 00011: 0
+Object 00011: 1 1 1
+Object 00011: 0 0 0
+Object 00011: 0 0 0
+Object 00011: 1
+Object 00011: 0
+Object 00011: 0
+Object 00011: 4 0
+Object 00011: 10
+Object 00011: 1
+Object 00011: 0
+Object 00011: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00011: 0000000000000
+Object 00011: 0 0
+Object 00011: # 0 0 0 0 0 0 0 0
+Object 00011: # 0 0 0 0 0 0 0 0
+Object 00011: 0 0
+
+End of file: CSG.SCN

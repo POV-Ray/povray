@@ -1,0 +1,222 @@
+;POVLAB version 4.0 shareware - ascii scene for 3D modeller.
+;(C) 1997, Denis Olivier.
+;All rights reserved.
+;Date=Tuesday 04-24-2001.
+;Time=14:33:14.
+;user_name=REGISTER!
+ColorCamera=4
+ColorViewport=0
+ColorTextBackground=8
+ColorSelection=6
+ColorInterface=7
+ColorAxis=5
+ColorGrid=2
+GrilleType=1
+CurrentViewport=0
+Viewportx4=1
+DisplayAxis=1
+DisplayGrid=0
+CurrentTexture=Default
+CurrentCamera=1
+BackgroundImageRGB: 50 50 60
+Fog: 255 255 0 1 22.02 1 0 0 0 0
+Atmosphere: 0 1 10 0.1 0 20 0.25 0.1 8 255 255 255
+UseSelection: 0
+RayGlobal: 0.003922 2.2 2 64 10 0.25 0.18 0.14
+Scale-X/Y F0: 16.3
+Shift-X F0: 0
+Shift-Y F0: 2.162
+Scale-X/Y F1: 10.5
+Shift-X F1: -4.42
+Shift-Y F1: 2.162
+Scale-X/Y F2: 7.485
+Shift-X F2: 0
+Shift-Y F2: -4.42
+Scale-X/Y F3: 45
+Shift-X F3: 0
+Shift-Y F3: 0
+Camera: 0 -2.465 16.84 0 0 0 50 16.92 0 0 0 0 0 0
+Display_Camera: 1
+
+Omni 001: -6.735 -5.324 9.582 255 255 255 3 1 1 0 0 0 0 0
+Display_Omni: 1
+
+Nb-Object: 6
+
+[EndInitSection]
+
+Object 00001: 0
+Object 00001: 0 0 0
+Object 00001: 1 1 1
+Object 00001: 0 313 0
+Object 00001: -4.621 0 -3.969
+Object 00001: 7
+Object 00001: Default
+Object 00001: 0
+Object 00001: 0
+Object 00001: Cyli0000
+Object 00001: -1
+Object 00001: 0 // display
+Object 00001: 1 1 1
+Object 00001: 0 0 0
+Object 00001: 0 0 0
+Object 00001: 1
+Object 00001: 0
+Object 00001: 0
+Object 00001: 0 0
+Object 00001: 0
+Object 00001: 1
+Object 00001: 7
+Object 00001: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00001: 0000000000000
+Object 00001: 0 0
+Object 00001: # 0 0 0 0 0 0 0 0
+Object 00001: # 0 0 0 0 0 0 0 0
+Object 00001: 0 0
+
+Object 00002: 7
+Object 00002: 0 0 0
+Object 00002: 8.004 1 8.004
+Object 00002: 0 0 0
+Object 00002: 0 0.9962 0
+Object 00002: 7
+Object 00002: Default
+Object 00002: 0
+Object 00002: 0
+Object 00002: Sol
+Object 00002: -1
+Object 00002: 0 // display
+Object 00002: 1 1 1
+Object 00002: 0 0 0
+Object 00002: 0 0 0
+Object 00002: 1
+Object 00002: 0
+Object 00002: 0
+Object 00002: 0 0
+Object 00002: 0
+Object 00002: 1
+Object 00002: 7
+Object 00002: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00002: 0000000000000
+Object 00002: 0 0
+Object 00002: # 0 0 0 0 0 0 0 0
+Object 00002: # 0 0 0 0 0 0 0 0
+Object 00002: 0 0
+
+Object 00003: 0
+Object 00003: 0 0 0
+Object 00003: 1 1 1
+Object 00003: 0 313 0
+Object 00003: -2.76 0 -1.973
+Object 00003: 7
+Object 00003: Default
+Object 00003: 0
+Object 00003: 0
+Object 00003: Cyli0001
+Object 00003: -1
+Object 00003: 0 // display
+Object 00003: 1 1 1
+Object 00003: 0 0 0
+Object 00003: 0 0 0
+Object 00003: 1
+Object 00003: 0
+Object 00003: 0
+Object 00003: 0 0
+Object 00003: 0
+Object 00003: 1
+Object 00003: 7
+Object 00003: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00003: 0000000000000
+Object 00003: 0 0
+Object 00003: # 0 0 0 0 0 0 0 0
+Object 00003: # 0 0 0 0 0 0 0 0
+Object 00003: 0 0
+
+Object 00004: 0
+Object 00004: 0 0 0
+Object 00004: 1 1 1
+Object 00004: 0 313 0
+Object 00004: -0.9419 0 -0.02321
+Object 00004: 7
+Object 00004: Default
+Object 00004: 0
+Object 00004: 0
+Object 00004: Cyli0002
+Object 00004: -1
+Object 00004: 0 // display
+Object 00004: 1 1 1
+Object 00004: 0 0 0
+Object 00004: 0 0 0
+Object 00004: 1
+Object 00004: 0
+Object 00004: 0
+Object 00004: 0 0
+Object 00004: 0
+Object 00004: 1
+Object 00004: 7
+Object 00004: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00004: 0000000000000
+Object 00004: 0 0
+Object 00004: # 0 0 0 0 0 0 0 0
+Object 00004: # 0 0 0 0 0 0 0 0
+Object 00004: 0 0
+
+Object 00005: 0
+Object 00005: 0 0 0
+Object 00005: 1 1 1
+Object 00005: 0 313 0
+Object 00005: 0.9193 0 1.973
+Object 00005: 7
+Object 00005: Default
+Object 00005: 0
+Object 00005: 0
+Object 00005: Cyli0003
+Object 00005: -1
+Object 00005: 0 // display
+Object 00005: 1 1 1
+Object 00005: 0 0 0
+Object 00005: 0 0 0
+Object 00005: 1
+Object 00005: 0
+Object 00005: 0
+Object 00005: 0 0
+Object 00005: 0
+Object 00005: 1
+Object 00005: 7
+Object 00005: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00005: 0000000000000
+Object 00005: 0 0
+Object 00005: # 0 0 0 0 0 0 0 0
+Object 00005: # 0 0 0 0 0 0 0 0
+Object 00005: 0 0
+
+Object 00006: 0
+Object 00006: 0 0 0
+Object 00006: 1 1 1
+Object 00006: 0 313 0
+Object 00006: 2.78 0 3.969
+Object 00006: 7
+Object 00006: Default
+Object 00006: 0
+Object 00006: 0
+Object 00006: Cyli0004
+Object 00006: -1
+Object 00006: 0 // display
+Object 00006: 1 1 1
+Object 00006: 0 0 0
+Object 00006: 0 0 0
+Object 00006: 1
+Object 00006: 0
+Object 00006: 0
+Object 00006: 0 0
+Object 00006: 0
+Object 00006: 1
+Object 00006: 48
+Object 00006: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00006: 0000000000000
+Object 00006: 0 0
+Object 00006: # 0 0 0 0 0 0 0 0
+Object 00006: # 0 0 0 0 0 0 0 0
+Object 00006: 0 0
+
+End of file: FOG.SCN

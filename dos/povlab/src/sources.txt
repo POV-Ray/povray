@@ -1,0 +1,133 @@
+Please read LEGAL.TXT before any sources modification or utilisation.
+
+
+
+WARNING FOR CODE MAINTENANCE
+-------------------------------------------------------------------------
+
+You need to modify the source code as clearly as possible and comment
+the code you have changed in this specified format in every .C or .CPP source 
+files. This will allow better changes in different versions as the sample 
+bellow. Please keep in mind that the interface should as portable as possible.
+
+
+
+PLATFORM CONSIDERATION
+-------------------------------------------------------------------------
+
+For now all the code is written for Watcom C/C++ 32 10.6, with some Microsoft
+WINDOWS defines to try a direct port (POVLAB own interface in a Microsoft
+window) but without any success.
+
+Since I write all the primary code and some really good guys helped me to add 
+some new features, many things should be rewritten, especially optimized and translated to english.
+Keep in mind that I wasn't a C programmer when I started the POVLAB project, but a 
+BASIC one, this is why you will not find a lot of pointer definition and memory 
+allocation function and strange "NOT GURU" code written ! ;)
+
+So before going ahead, you should perhaps clean/optimise/translate some functions/files.
+
+Another problem is that many function are named and explained in French. You and 
+We will, days after days, surely change all this. For example, the function that 
+display a button is :
+
+        affiche_bouton(#boutton);
+
+And it could be named in english :
+
+        display_button(#button);
+        
+We will need to change this in the future too.
+        
+
+CODE FORMAT
+-------------------------------------------------------------------------        
+
+If you need to add or change something, please add all source code and comments 
+in english, wich is the more portable language.
+
+Thy to indent with 2 spaces (not tabs), to make line shorter as possible and
+code more readable.
+
+If we want to make it available for many platforms, we should be very carefull
+of changes, and uses of #IF, #ELSE, #ENDIF is highly recommended.
+
+
+GRAPHIC CONSIDERATION
+-------------------------------------------------------------------------
+
+For the graphic library, I've always used the Watcom build in. The better
+thing should be to rewrite it, based on a PUTPIXEL function, from where all the
+rest will be done (line with Bresemham, clipping, font definition, etc, ...).
+This would allow a maximum port on every platform, the graphic library would
+only be based on a pixel writting.
+
+We can have something like AURA or LIGHTWAVE, that have exported the AMIGA
+graphic design interface in any platform window. This technic will allow
+to port very quickly the interface to any platform, and the user won't be lost
+from one to another platform version.
+
+The font file is the equivalent of the SSERIF.FON of the Microsoft Windows 
+interface. The Watcom C/C++ 32 10.6 have a built-in reader for this type of font 
+that works under DOS.
+
+The mouse use DOS int 33H for cursor moving. Here again it should be fine
+to write a specific platform library.
+
+
+
+COMPILING THE SOURCE CODE
+-------------------------------------------------------------------------
+
+In general you should not expect any technical support from the POVLAB 
+authors on how to compile the program.  Everything is provided here "as is".  
+All I can say with any certainty is that I was able to compile it on our 
+systems.  If it doesn't work for you, we probably cannot tell you why.
+
+There is no technical documentation for the source code itself except for 
+the comments in the source files.
+
+We do not provide any technical support to help you to add features.
+We do not explain how a particular feature works.
+
+If you do not intend to add any custom or experimental features to the program, 
+and if an executable already exists for your platform then you need not compile 
+the program by yourself.
+
+If you do want to proceed, you should be aware that you are very nearly on your 
+own.  This file and other related compiling documentation assumes you 
+know what you are doing.  It assumes you have the good C compiler installed 
+and working.  It assumes you know how to compile and link large, multi-part 
+programs using a "make" utility or an IDE project file if your compiler supports 
+them.  Because makefiles and project files often specify drive, directory or 
+path information, I cannot promise our makefiles or projects will work on your 
+system.  I assume you know how to make changes to makefiles and projects to 
+specify where your system libraries and other necessary files are located.
+
+
+HOW TO REPORT A CODE BUG, CODE SOURCE, NEW FILES ETC
+---------------------------------------------------------------------------------------
+
+You need to report any kind of new features by mail to me. A mailing list
+is running and you could share with other programmers directions and
+ideas about POVLAB programming. You're strongly welcome to join it.
+For this send a email to :
+
+        robot@povlab.org
+        
+With in the mail body the command :
+
+        join povlab-dev Firstname Lastname        
+
+You will receive a confirmation message.        
+
+All must be clearly explained, ready to use. If you just changed some code
+in a function already listed in source files, just then it to me, with new
+code, where you have change it and what you have changed in the report line
+format (see a the beginning of the file).
+
+Good luck !
+
+Denis Olivier,
+POVLAB Primary author.
+http://www.povlab.org

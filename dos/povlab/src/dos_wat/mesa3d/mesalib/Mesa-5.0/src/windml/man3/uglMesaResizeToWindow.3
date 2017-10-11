@@ -1,0 +1,25 @@
+.TH uglMesaResizeToWindow "3" "AOUT 2001" "WindML/Mesa" "WRS"
+
+.SH NAME
+uglMesaResizeToWindow \- Resize an OpenGL window to an absolute size
+
+.SH SYNOPSIS
+.B #include <GL/uglmesa.h>
+.PP
+.BI "GLboolean uglMesaResizeToWindow (GLsizei " width ", GLsizei " height );
+
+.SH DESCRIPTION
+The \fBuglMesaResizeToWindow\fR function resizes an OpenGL window to
+an absolute size
+
+.SH INPUT
+\fIwidth, height\fR - new dimensions in pixels, you can also use UGL_MESA_FULLSCREEN_WIDTH and UGL_MESA_FULLSCREEN_HEIGHT constants.
+
+.SH RETURN VALUES
+GL_TRUE if success, GL_FALSE if error because of invalid coordinates.
+
+.SH SEE ALSO
+.BR uglMesaResizeWindow "(3)"
+
+.SH COPYRIGHT
+Copyright \(co 2001 Wind River Systems, Inc.

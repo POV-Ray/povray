@@ -1,0 +1,116 @@
+USER DOCUMENTATION FOR POV-Ray FOR MS-DOS USING BORLAND VERSION
+
+1.0   Introduction
+
+The Borland compiled version of POV-Ray is designated by ".msdos.bcc" after 
+the POV-Ray version number on the opening banner.  Everything in this 
+document ONLY applies to that version.  Other versions will operate under 
+different rules.  This file is NOT the only documentation for POV-Ray.  
+There is a file called MSDOS.DOC which covers the MSDOS-specific features 
+but that still isn't everything.  There is an archive called POVDOC.ZIP 
+which contains the main documentation for POV-Ray itself that is common to 
+all versions.  POVDOC.ZIP also contains other REQUIRED files.
+
+2.0   Memory Usage
+
+This version has been compiled as a 32-bit DOS protected mode application.  
+It must be run on a 386 or higher system with at least 4 meg of memory.  
+More memory is preferred.
+
+The program comes with two files 32RTM.EXE and DPMI32VM.OVL which must be 
+in the execution directory or available in your DOS PATH.  Additionally the 
+file WINDPMI.386 is required when running under Windows.  See part 4.0 on 
+Windows below.  When you run POV-Ray, it first automatically runs the 
+Borland 32-bit run-time manager 32RTM.EXE and then loads POV-Ray.  32RTM 
+then detects whether or not DPMI services are available.  
+
+2.1   Existing DPMI
+
+If there are existing DPMI services available then POV-Ray will use the 
+existing DPMI.  It is then up to the existing DPMI server to manage memory 
+and to create and use a virtual memory swap file if needed.  For example in 
+a dos box under Windows, the DPMI is managed by Windows.  Under DOS alone 
+DPMI services might be provided by Quarterdeck's QDPMI or some other memory 
+manager you might be using.
+
+2.2   No DPMI available
+
+If no existing DPMI services are found, then DPMI32VM.OVL is automatically 
+loaded and it provides DPMI services of its own.  The Borland DPMI32 server 
+then takes all available VCPI, XMS and Extended memory unless you specify 
+otherwise via an environment variable.  An environment variable also 
+specifies the location of a virtual memory swap file.  In your AUTOEXEC.BAT 
+file put the line...
+
+SET DPMIMEM=MAXMEM nnn
+
+or
+
+SET DPMI32=MAXMEM nnn SWAPFILE d:\path\filename
+
+ ... where nnn specifies the maximum number of kilobytes of physical memory 
+to use and "d:\path\filename" is the drive, path and name of the swap file.  
+Before using a swap file for virtual memory, you must first create one 
+using the utility MAKESWAP.EXE which is provided.  
+
+Usage: makeswap Kbytes [swapfile]
+
+ Creates a swap file for the 32bit DPMI server to use.  Kbytes is the size
+of the swap file in Kbytes 4K<Kbytes<1024M, and will be rounded down
+to the nearest 4K boundary. If swapfile name is not specified, it
+will default to edpmi.swp in the current directory.
+
+e.g.: makeswap 4096
+      makeswap 0x2000
+      makeswap 4M
+      makeswap 4M c:edpmi.swp
+
+Note that the environment variables and swap file discussed are only used 
+if no DPMI services are available.
+
+2.2   Spawning applications
+
+The DPMI 0.9 specification doesn't allow 32-bit and 16-bit protected mode 
+programs to coexist.  32RTM takes care of the problem and allows 16-bit or 
+32-bit applications to be spawned.  POV-Ray spawns other programs in the 
+Pre_Render_Command, Pre_Frame_Command, Post_Render_Command and 
+Post_Frame_Command options.  
+
+Some applications may want to spawn POV-Ray.  If it is a 32-bit program 
+then there should be no problem.  However if it is a 16-bit protected mode 
+program then you will have to install 32RTM before the 16-bit application.
+
+3.0   Floating Point Emulation
+
+POV-Ray depends on lots of floating point calculations.  It is best run on 
+486-DX or Pentium processors with built-in floating point hardware.  A 386 
+with a 387 co-processor or a 486-SX with 487 also has hardware floating 
+point power but is not as fast as built-in floating point.  Warning some 
+so-called "586" chips that are not true Pentiums do not have hardware 
+floating point.
+
+POV-Ray can still run no floating point processor is available.  32RTM will 
+provide software floating point emulation but hardware floating point is 
+usually 7 to 10 times faster.
+
+4.0   Other Operating Systems
+
+This version of POV-Ray will run under MS-Dos 4.01 or later.  It will run 
+under OS/2.2X or later in a DOS box.  It will run in Windows 3.1 or 3.11 in 
+a DOS box.  It will not run under Windows NT because it directly accesses 
+video and dos memory.
+
+If you run it from Windows in a DOS box you must first have WINDPMI.386 
+installed.  Copy the WINDPMI.386 to your \WINDOWS\SYSTEM directory.  Then 
+edit your \WINDOWS\SYSTEM.INI file.  Find the [386Enh] section and add the 
+line...
+
+ [386Enh]
+ device=WINDPMI.386
+
+5.0   Conclusion
+
+Be sure to read POVMSDOS.DOC and run POVHELP to make sure you have all the 
+remaining documentation.  This file only applies to the Borland compiled 
+version.  Also read POVWHERE.GET for more information on POV-Ray archives 
+and support information.

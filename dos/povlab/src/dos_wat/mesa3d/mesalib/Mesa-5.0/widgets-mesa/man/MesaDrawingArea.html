@@ -1,0 +1,139 @@
+Scanning pods...
+Creating MesaDrawingArea.html from MesaDrawingArea.pod
+ <HTML>
+	    <TITLE>MESADRAWINGAREA</TITLE>
+<p><hr>
+
+<H1> 
+<A NAME="MesaDrawingArea_name_0">
+NAME</A>
+</H1>
+
+MesaDrawingArea - An Xt widget for Mesa/X with richer semantics
+<p><p><hr>
+
+<H1> 
+<A NAME="MesaDrawingArea_description_0">
+DESCRIPTION</A>
+</H1>
+
+The <EM>MesaDrawingArea</EM> widget is an extension of the <EM>GLwDrawingArea</EM>
+widget which takes advantage of some features of the <STRONG>Mesa/X</STRONG>
+implementation of the <STRONG>OpenGL</STRONG> API.  
+<p>It also simplifies programming by associating a drawing context
+transparently to the widget.  This feature is particulary convenient
+in applications that have to deal with multiple instances of a
+<EM>MesaDrawingArea</EM> widget.
+<p><p><hr>
+
+<H1> 
+<A NAME="MesaDrawingArea_resources_0">
+Resources</A>
+</H1>
+
+The following X resources are available in addition to the
+<EM>GLwDrawingArea</EM> resources:
+<p>
+<XMP>
+  ___________________________________________________________________________
+  |                    |                    |         |                      |
+  | Name               | Class              | Type    | OpenGL attribute     |
+  |____________________|____________________|_________|______________________|
+  |                    |                    |         |                      |
+  | GLwNximage         | GLwCXImage         | Boolean | N/A                  |
+  |____________________|____________________|_________|______________________|
+  |                    |                    |         |                      |
+  | GLwNshareLists     | GLwCShareLists     | Boolean | N/A                  |
+  |____________________|____________________|_________|______________________|
+  |                    |                    |         |                      |
+  | GLwNshareListsWith | GLwCShareListsWith | Widget  | N/A                  |
+  |____________________|____________________|_________|______________________|
+
+</XMP>
+<p>
+<DL>
+<DT><STRONG>
+
+<A NAME="MesaDrawingArea_boolean_0">
+Boolean ximage</A>
+
+</STRONG></DT>
+<DD>
+
+Is <EM>False</EM> by default, setting it to <EM>True</EM> will cause <STRONG>Mesa/X</STRONG> to
+use an Ximage (in contrast to a pixmap) as second buffer.
+<p></DD>
+<DT><STRONG>
+
+<A NAME="MesaDrawingArea_boolean_1">
+Boolean shareLists</A>
+
+</STRONG></DT>
+<DD>
+
+Is <EM>False</EM> by default, setting it to <EM>True</EM> will cause <STRONG>Mesa/X</STRONG> to
+share display lists among all widgets that have this ressource set to
+<EM>True</EM>.
+<p></DD>
+<DT><STRONG>
+
+<A NAME="MesaDrawingArea_boolean_2">
+Boolean shareListsWith</A>
+
+</STRONG></DT>
+<DD>
+
+<STRONG>[Caveat: This resource is not honored yet.]</STRONG>
+<p>Is <EM>NULL</EM> by default, setting it to another <EM>MesaDrawingArea</EM> widget
+will cause the two widgets to share display lists.
+<p></DD>
+</DL>
+.
+<p><p><hr>
+
+<H1> 
+<A NAME="MesaDrawingArea_utility_0">
+Utility functions</A>
+</H1>
+
+The following utility functions are available
+<p>
+<DL>
+<DT><STRONG>
+
+<A NAME="MesaDrawingArea_void_0">
+void GLwMakeCurrent (Widget w)</A>
+
+</STRONG></DT>
+<DD>
+
+switches the <STRONG>Mesa/X</STRONG> context to the one associated to the widget <EM>w</EM>.
+<p></DD>
+</DL>
+.
+<p><p><hr>
+
+<H1> 
+<A NAME="MesaDrawingArea_see_0">
+SEE ALSO</A>
+</H1>
+
+<EM>GLwDrawingArea</EM>, <EM>MesaWorkstation</EM>
+<p><p><hr>
+
+<H1> 
+<A NAME="MesaDrawingArea_author_0">
+AUTHOR</A>
+</H1>
+
+Thorsten.Ohl <STRONG>@ </STRONG>Physik.TH-Darmstadt.de
+<p><p><hr>
+
+<H1> 
+<A NAME="MesaDrawingArea_date_0">
+DATE</A>
+</H1>
+
+<STRONG>$Id: MesaDrawingArea.html,v 1.1.1.1 1999/08/19 00:55:42 jtg Exp $
+<p>
+</HTML>

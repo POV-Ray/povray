@@ -1,0 +1,759 @@
+;****************************************************************************
+;*
+;*                  Copyright (C) 1996 SciTech Software.
+;*                          All rights reserved.
+;*
+;* Filename:    $Workfile:   model.mac  $
+;* Version:     $Revision:   1.0  $
+;*
+;* Language:    Turbo Assembler 3.0
+;* Environment: IBM PC (MS DOS)
+;*
+;* Description: Macros to provide memory model independant assembly language
+;*              module for C programming. Supports the large memory model
+;*              and 386 extended memory models.
+;*
+;*          	The defines that you should use when assembling modules that
+;*				use this macro package are:
+;*
+;*					__LARGE__	Assemble for 16 bit large model
+;*					__COMPACT__	Assemble for 16 bit model
+;*                  __WINDOWS16__ Assemble for Hybrid 16/32 bit PM large model
+;*                  __X386__    Assemble for 386 extended memory model
+;*                  __FLAT__    Assemble for 386 FLAT memory model
+;*                  __8086__	Assemble for 8086 real mode code
+;*					__80286__	Assemble for 80286 real mode code
+;*					__COMM__	Declare global variables as COMMunal
+;*                  ES_NOT_DS   Assemble assuming ES != DS for 32 bit code
+;*                  BUILD_DLL   Assembler for use in a DLL
+;*
+;*				By default the real mode LARGE memory model targeted for the
+;*				80386 processor is selected.
+;*
+;*              Note that we use the TASM simplified segment directives so
+;*              that 32 bit code will assemble correctly, and we also use
+;*              TASM's IDEAL mode syntax, so this is not compatible with
+;*              MASM. The __FLAT__ mode should be used whenever possible to
+;*              assemble code that needs to be converted to Unix style .o
+;*              files for DJGPP and EMX, and for most new compilers. Symantec
+;*              C++ however requires the __X386__ memory model, or it will
+;*				not link correctly). You should specify either of __X386__ or
+;*              __FLAT__ to assemble code correctly.
+;*
+;*				The main intent of the macro file is to enable programmers
+;*				to write _one_ set of source that can be assembled to run
+;*				in either 16 bit real and protected modes or 32 bit
+;*				protected mode without the need to riddle the code with
+;*				'if flatmodel' style conditional assembly (it is still there
+;*				but nicely hidden by a macro layer that enhances the
+;*				readability and understandability of the resulting code).
+;*
+;* NOTES:   When you declare the data and code segments, you should specify
+;*          a name to be used. This name should be the name of the file
+;*          being assembled, but you may use the same name for mutiple
+;*          modules if you wish so that the data and code for these modules
+;*          are all contained in the same segments. Of course the maximum
+;*          size of data and code must be less than 64k respectively.
+;*
+;* $Date:   05 Feb 1996 18:53:52  $ $Author:   KendallB  $
+;*
+;****************************************************************************
+
+		IDEAL
+
+; Define the __WINDOWS__ symbol if we are compiling for any Windows
+; environment
+
+ifdef	__WINDOWS16__
+__WINDOWS__ = 1
+endif
+ifdef	__WINDOWS32__
+__WINDOWS__ = 1
+endif
+
+; Define symbols codesize and datasize depending on the requested memory
+; model. Note that because of the differences in addressing used in the
+; 16 and 32 bit memory models, we need a couple of macros to define things
+; such as what register is used for looping (CX or ECX) etc. Note that we
+; can use simple 16 bit code in 32 bit mode and vice-versa, but unless this
+; is absolutely necessary it poses the performance hit of requiring an
+; operand size prefex for the instruction. Hence if we simply need to use
+; a set of registers for an operation, use the macros to use the best
+; register for the current mode of operation. Of course the real registers
+; may be specified for operations that specifically require 16 or 32 bits.
+;
+; The following things are defined:
+;
+;	UCHAR	- Typedef for a character type
+;   USHORT - Typedef for a short type
+;	UINT	- Typedef for an integer type
+;	BOOL	- Typedef for a boolean type
+;   DPTR    - Operand size of data pointers
+;   DDIST   - Distance to data variables (NEAR or FAR)
+;   CPTR    - Operand size of code pointers
+;	FCPTR	- Operand size of far code pointers
+;	NCPTR	- Operand size of near code pointers
+;   FPTR    - Function pointer modifier, either NEAR or FAR
+;	_AX		- General accumulator register, either AX or EAX
+;	_BX		- General base register, either BX or EBX
+;   _CX	    - Loop counter register, either CX or ECX
+;   CXPTR   - Operand size of loop counter, either WORD or DWORD
+;   _DX		- General data register, either DX or EDX
+;	_SI		- Source index register, either SI or ESI
+;	_DI		- Destination index register, either DI or EDI
+;	_BP		- Base pointer register, either BP or EBP
+;	_SP		- Stack pointer register, either SP or ESP
+;	_ES		- ES segment override - evaluates to nothing in 32 bit PM
+
+ifdef   __FLAT__
+		__X386__ = 1
+endif
+
+ifdef   __X386__
+		flatmodel	EQU	1		; This is a flat memory model
+		pmode		EQU	1		; This is a protected mode memory model
+		intsize		EQU	4		; Size of an integer
+		datasize    EQU 0       ; Near data memory model
+		dptrsize    EQU 4       ; Size of a data pointer (32 bit near)
+        stackalign  EQU 4       ; Align stack to 4 byte boundary
+		typedef UCHAR BYTE		; Size of a character
+		typedef USHORT WORD		; Size of a short
+		typedef UINT DWORD		; Size of an integer
+		typedef ULONG DWORD		; Size of a long
+        typedef BOOL DWORD      ; Size of a boolean
+		typedef DPTR DWORD		; Size of a data pointer
+		typedef FDPTR FWORD		; Size of a far data pointer
+		typedef	NDPTR DWORD		; Size of a near data pointer
+		DDIST       EQU NEAR
+		codesize    EQU 0       ; Near code memory model
+		cptrsize    EQU 4
+		typedef CPTR DWORD		; Size of a code pointer
+		typedef FCPTR FWORD		; Size of a far code pointer
+		typedef NCPTR DWORD		; Size of a near code pointer
+		FPTR        EQU NEAR
+		_AX			EQU	EAX		; EAX is used for accumulator
+		_BX			EQU	EBX		; EBX is used for accumulator
+		_CX        	EQU ECX     ; ECX is used for looping
+		CXPTR		EQU	DWORD	; loop variables are 32 bits
+		_DX			EQU	EDX		; EDX is used for data register
+		_SI			EQU	ESI		; ESI is the source index register
+		_DI			EQU	EDI		; EDI is the destination index register
+		_BP			EQU	EBP		; EBP is used for base pointer register
+		_SP			EQU	ESP		; ESP is used for stack pointer register
+		_ES			EQU			; ES and DS are the same in 32 bit PM
+		P386                    ; Turn on 386 code generation
+ifdef   __FLAT__
+		MODEL       FLAT        ; Set up for 32 bit simplified FLAT model
+		S_UCHAR		EQU	UCHAR
+		S_USHORT	EQU	USHORT
+		S_BOOL 		EQU	BOOL
+else
+; The following is for Symantec C++ which wont link with code assembled in
+; the FLAT model (stuffed if I know why), but TASM does not correctly set
+; the size of WORD arguments on the stack to 4 bytes, so we create a set
+; of macros to do this for us.
+		LARGESTACK              ; Set up for a 32 bit stack model
+		S_UCHAR		EQU	BYTE:4
+		S_USHORT	EQU	WORD:2
+        S_BOOL      EQU BOOL
+endif
+else
+		flatmodel	EQU	0		; This is a segmented memory model
+ifdef   __WINDOWS16__
+		pmode		EQU	1		; This is a protected mode memory model
+else
+		pmode		EQU	0		; This is a real mode memory model
+endif
+		intsize		EQU	2		; Size of an integer
+		datasize    EQU 1       ; Far data memory model
+        dptrsize    EQU 4       ; Size of a data pointer
+        stackalign  EQU 2       ; Align stack to 2 byte boundary
+        typedef UCHAR BYTE      ; Size of a character
+		typedef USHORT WORD		; Size of a short
+		typedef UINT WORD		; Size of an integer
+		typedef ULONG DWORD		; Size of a long
+		typedef BOOL WORD		; Size of a boolean
+		typedef DPTR DWORD		; Size of a data pointer
+		typedef FDPTR DWORD		; Size of a far data pointer
+		typedef	NDPTR WORD		; Size of a near data pointer
+		DDIST       EQU FAR
+ifdef	__COMPACT__
+		codesize    EQU 0       ; Near code memory model
+		cptrsize    EQU 2       ; Size of a code pointer
+		typedef CPTR WORD		; Size of a code pointer
+		typedef FCPTR DWORD		; Size of a far code pointer
+		typedef NCPTR WORD		; Size of a near code pointer
+		FPTR        EQU NEAR
+else
+		codesize    EQU 1       ; Far code memory model
+		cptrsize    EQU 4       ; Size of a code pointer
+		typedef CPTR DWORD		; Size of a code pointer
+		typedef FCPTR DWORD		; Size of a far code pointer
+		typedef NCPTR WORD		; Size of a near code pointer
+		FPTR        EQU FAR
+endif
+		_AX			EQU	AX		; AX is used for accumulator
+		_BX			EQU	BX		; BX is used for accumulator
+		_CX        	EQU CX     	; CX is used for looping
+		CXPTR		EQU	WORD	; loop variables are 16 bits
+		_DX			EQU	DX		; DX is used for data register
+		_SI			EQU	SI		; SI is the source index register
+		_DI			EQU	DI		; DI is the destination index register
+		_BP			EQU	BP		; BP is used for base pointer register
+		_SP			EQU	SP		; SP is used for stack pointer register
+		_ES			EQU es:		; ES is used for segment override
+		S_UCHAR		EQU	UCHAR
+		S_USHORT	EQU	USHORT
+		S_BOOL 		EQU	BOOL
+ifndef	__8086__
+ifdef	__80286__
+		P286					; Turn on 286 code generation
+else
+		P386					; Turn on 386 code generation
+endif
+endif
+endif
+
+; Provide a typedef for real floating point numbers
+
+ifdef	DOUBLE
+		typedef REAL QWORD
+else
+		typedef	REAL DWORD
+endif
+
+; Macros for declaring external global variables
+
+ifdef   __COMM__
+MACRO   $EXTRN      name,type
+		COMM        DDIST name:type
+ENDM
+else
+MACRO   $EXTRN      name,type
+		EXTRN       name:type
+ENDM
+endif
+
+; Macros for entering and exiting C callable functions. Note that we must
+; always save and restore the SI and DI registers for C functions, and for
+; 32 bit C functions we also need to save and restore EBX and clear the
+; direction flag.
+
+MACRO	save_c_regs
+ifdef	__X386__
+		push	ebx
+endif
+		push	_si
+		push	_di
+ENDM
+
+MACRO	enter_c	LocalSize
+		push    _bp
+		mov     _bp,_sp
+	IFDIFI	<LocalSize>,<0>
+		sub		_sp,LocalSize
+	ENDIF
+		save_c_regs
+ENDM
+
+MACRO	restore_c_regs
+		pop		_di
+		pop		_si
+ifdef	__X386__
+		pop		ebx
+endif
+ENDM
+
+MACRO	leave_c
+		restore_c_regs
+		cld
+        mov     _sp,_bp
+        pop     _bp
+ENDM
+
+MACRO	leave_c_nolocal
+		restore_c_regs
+		cld
+		pop     _bp
+ENDM
+
+MACRO   use_ebx
+if flatmodel
+        push    ebx
+endif
+ENDM
+
+MACRO   unuse_ebx
+if flatmodel
+        pop     ebx
+endif
+ENDM
+
+; Macros for saving and restoring the value of DS,ES,FS,GS when it is to
+; be used in assembly routines. This evaluates to nothing in the flat memory
+; model, but is saves and restores DS in the large memory model.
+
+MACRO	use_ds
+ife flatmodel
+		push	ds
+endif
+ENDM
+
+MACRO	unuse_ds
+ife flatmodel
+		pop		ds
+endif
+ENDM
+
+MACRO	use_es
+ife flatmodel
+		push	es
+endif
+ENDM
+
+MACRO	unuse_es
+ife flatmodel
+		pop		es
+endif
+ENDM
+
+MACRO	use_fs
+ife flatmodel
+		push	fs
+endif
+ENDM
+
+MACRO	unuse_fs
+ife flatmodel
+		pop		fs
+endif
+ENDM
+
+; Macros for loading the address of a data pointer into a segment and
+; index register pair. The macro explicitly loads DS or ES in the 16 bit
+; memory model, or it simply loads the offset into the register in the flat
+; memory model since DS and ES always point to all addressable memory. You
+; must use the correct _REG (ie: _BX) macros for documentation purposes.
+
+MACRO	_lds	reg, addr
+if flatmodel
+		mov     reg,addr
+else
+		lds		reg,addr
+endif
+ENDM
+
+MACRO   _les	reg, addr
+if flatmodel
+		mov     reg,addr
+else
+		les		reg,addr
+endif
+ENDM
+
+; Macros to use the FS register as a scratch segment register for 16 bit
+; code. For 32 bit code we assume DS addresses the same area.
+
+MACRO   _lfs	reg, addr
+if flatmodel
+		mov     reg,addr
+else
+		lfs		reg,addr
+endif
+ENDM
+
+if flatmodel
+		_FS	EQU
+else
+		_FS	EQU	fs:
+endif
+
+; Macro to force the value of ES to be the same as DS for 32 bit assembler
+; code. For most compilers this evaluates to nothing, but for Symantec C++
+; we cant assume that DS == ES at all times (since Symantec uses a different
+; selector for SS).
+
+MACRO	force_es_eq_ds
+ifdef   ES_NOT_DS
+		push	ds				; Force ES == DS for following code
+		pop		es
+endif
+ENDM
+
+; Macros for setting the value of the DS,ES,FS,GS registers to the same
+; value. This does nothing in 32 bit protected mode, except for compilers
+; that assume that DS != ES (Symantec C++ is one) and hence ES is always
+; available to be loaded with any value you desire.
+
+MACRO	es_eq_ds
+ife flatmodel
+		push	ds
+		pop		es
+endif
+ENDM
+
+MACRO	ds_eq_es
+ife flatmodel
+		push	es
+		pop		ds
+endif
+ENDM
+
+MACRO	ds_eq_ss
+ife flatmodel
+		push	ss
+		pop		ds
+else
+ifdef   ES_NOT_DS
+		push	ss
+		pop		ds
+endif
+endif
+ENDM
+
+MACRO	fs_eq_ds
+ife flatmodel
+		push	ds
+		pop		fs
+endif
+ENDM
+
+; Macros for adding and subtracting a value from registers. Two value are
+; provided, one for 16 bit modes and another for 32 bit modes (the extended
+; register is used in 32 bit modes).
+
+MACRO   _add	reg, val16, val32
+if flatmodel
+		add		e&reg&, val32
+else
+		add		reg, val16
+endif
+ENDM
+
+MACRO	_sub	reg, val16, val32
+if flatmodel
+		sub		e&reg&, val32
+else
+		sub		reg, val16
+endif
+ENDM
+
+; Macro to clear the high order word for the 32 bit extended registers.
+; This is used to convert an unsigned 16 bit value to an unsigned 32 bit
+; value, and will evaluate to nothing in 16 bit modes.
+
+MACRO	clrhi	reg
+if pmode
+		movzx	e&reg&,reg
+endif
+ENDM
+
+MACRO	sgnhi	reg
+if pmode
+		movsx	e&reg&,reg
+endif
+ENDM
+
+; Macro to clear the high order word for the 32 bit extended registers.
+; This is used to convert an unsigned 16 bit value to an unsigned 32 bit
+; value in 16 bit real mode and PM USE32 code. For 32 bit FLAT model
+; code it will evaluate to nothing.
+
+MACRO	clrhi16	reg
+ife	flatmodel
+		movzx	e&reg&,reg
+endif
+ENDM
+
+MACRO	sgnhi16	reg
+ife	flatmodel
+		movsx	e&reg&,reg
+endif
+ENDM
+
+; Macro to load an extended register with an integer value in either mode
+
+MACRO	loadint	reg,val
+if flatmodel
+		mov		e&reg&,val
+else
+		xor		e&reg&,e&reg&
+		mov     reg,val
+endif
+ENDM
+
+; Macros to load and store integer values with string instructions
+
+MACRO	LODSINT
+if flatmodel
+		lodsd
+else
+		lodsw
+endif
+ENDM
+
+MACRO	STOSINT
+if flatmodel
+		stosd
+else
+		stosw
+endif
+ENDM
+
+; Macros for procedure definitions given a name. Note that they also export
+; the symbol with the PUBLIC directive, so that it need not be explicitly
+; exported.
+
+MACRO   procstart name          ; Set up model independant proc
+if codesize
+PROC    name FAR
+else
+PROC    name NEAR
+endif
+		PUBLIC name
+ENDM
+
+MACRO   procstartdll name       ; Set up DLL _export'ed proc
+if codesize
+PROC    name FAR
+else
+PROC    name NEAR
+endif
+ifdef   BUILD_DLL
+		PUBLICDLL name
+else
+        PUBLIC name
+endif
+ENDM
+
+; This macro sets up a procedure to be exported from a 16 bit DLL. Since the
+; calling conventions are always _far _pascal for 16 bit DLL's, we actually
+; rename this routine with an extra underscore with 'C' calling conventions
+; and a small DLL stub will be provided by the high level code to call the
+; assembler routine.
+
+MACRO   procstartdll16 name      ; Set up DLL _export'ed proc
+ifdef	__WINDOWS16__
+procstartdll	_&name&
+else
+procstartdll	name
+endif
+ENDM
+
+MACRO   procenddll16 name
+ifdef	__WINDOWS16__
+procend		_&name&
+else
+procend		name
+endif
+ENDM
+
+MACRO   procstatic name         ; Set up model independant private proc
+if codesize
+PROC    name FAR
+else
+PROC    name NEAR
+endif
+ENDM
+
+MACRO   procnear name           ; Set up near proc
+PROC    name NEAR               ; and export name
+        PUBLIC name
+ENDM
+
+MACRO   procfar name            ; Set up far proc
+PROC    name FAR                ; and export name
+		PUBLIC name
+ENDM
+
+MACRO   procend name            ; End procedure macro
+ENDP    name
+ENDM
+
+; Macros for the _DATA data segment. This segment contains initialised data.
+
+MACRO   begdataseg name
+ifdef   __FLAT__
+        DATASEG
+else
+if flatmodel
+SEGMENT _DATA DWORD PUBLIC USE32 'DATA'
+else
+SEGMENT _DATA WORD PUBLIC 'DATA'
+endif
+endif
+ENDM
+
+MACRO   enddataseg name
+ifndef  __FLAT__
+ENDS    _DATA
+endif
+ENDM
+
+MACRO   procstart32 name        ; Set up hybrid 16/32 proc
+ifdef   __WINDOWS16__            ; and export name
+; For the hybrid 16/32 bit memory model, the function is actually FAR,
+; but because the segment is marked as USE32, TASM assumes a 32 bit
+; calling convention, which causes the ARG directives to be off by 2
+; bytes. To fix this we make the far functions 32 bit NEAR, so that the
+; return stack frame is 4 bytes not 6 bytes for a 32 bit FAR function.
+; To return from a hybrid 16/32 function you must use the ret32 macro
+; rather than issuing a normal ret instruction.
+PROC	name NEAR
+else
+if codesize
+PROC    name FAR
+else
+PROC    name NEAR
+endif
+endif
+		PUBLIC name
+ENDM
+
+; Macros for the _BSS data segment. This segment contains initialised data.
+
+MACRO   begbssseg name
+ifdef   __FLAT__
+        DATASEG
+else
+if flatmodel
+SEGMENT _BSS DWORD PUBLIC USE32 'BSS'
+else
+SEGMENT _BSS WORD PUBLIC 'BSS'
+endif
+endif
+ENDM
+
+MACRO   endbssseg name
+ifndef  __FLAT__
+ENDS    _BSS
+endif
+ENDM
+
+; Macro to be invoked at the start of all modules to set up segments for
+; later use.
+
+MACRO   header name
+begdataseg name
+enddataseg name
+begbssseg  name
+endbssseg  name
+ENDM
+
+; Macro for the main code segment.
+
+MACRO   begcodeseg name
+ifdef   __FLAT__
+        CODESEG
+		ASSUME  CS:FLAT,DS:FLAT,SS:FLAT
+else
+if flatmodel
+SEGMENT _TEXT DWORD PUBLIC USE32 'CODE'
+GROUP   DGROUP _DATA,_BSS
+		ASSUME  CS:_TEXT,DS:DGROUP
+else
+SEGMENT &name&_TEXT BYTE PUBLIC USE16 'CODE'
+GROUP   DGROUP _DATA,_BSS
+        ASSUME CS:&name&_TEXT,DS:DGROUP
+endif
+endif
+ENDM
+
+MACRO   endcodeseg name
+ifndef  __FLAT__
+if flatmodel
+ENDS    _TEXT
+else
+ENDS    &name&_TEXT
+endif
+endif
+ENDM
+
+; Macro to begin a 32 bit code segment. For 32 bit protected mode this is
+; no different to a normal FLAT mode code segment. For 16 bit protected mode,
+; this is a USE32 code segment, with 16 bit calling conventions. The code
+; itself is assembled as full 32 bit code, but the stack is 16 bit and
+; the functions are 16 bit far functions. This allows the code full access
+; to 4Gb from the start of a data segment, so we can get full access to
+; large memory blocks from 16 bit PM without needing to resort to horrid
+; selector/offset manipulation. This does of course require a 386 or higher
+; processor! Note also that you _CANNOT_ link this USE32 code with other
+; USE16 code segments. You should put all your 32 bit code in one hybrid
+; segment if possible - maximum of 64k in each of course. If you have
+; more than one segment, you will need to declare and call multiple
+; ??_enable32() functions to convert the segments to 32 bit hyrbid code
+; under Windows DPMI.
+
+MACRO   begcodeseg32 name
+ifdef   __WINDOWS16__
+SEGMENT &name&_TEXT32 DWORD PUBLIC USE32 'CODE'
+GROUP   DGROUP _DATA,_BSS
+		ASSUME CS:&name&_TEXT32,DS:DGROUP
+else
+begcodeseg	name
+endif
+ENDM
+
+MACRO   endcodeseg32 name
+ifdef   __WINDOWS16__
+ENDS    &name&_TEXT32
+else
+endcodeseg	name
+endif
+ENDM
+
+; Macro to return from a 32 bit routine to the native protected mode
+; environment. In 16 bit PM this does a 16:16 far return to the original
+; 16 bit code. Under 32 bit PM this will be a 32 bit near return.
+
+MACRO	ret32
+ifdef   __WINDOWS16__
+		db 066h,0CBh
+else
+		ret
+endif
+ENDM
+
+; Macro to create a routine to convert the CS selector for the segment from
+; a 16 bit selector to a 32 bit selector. We do this by checking if we
+; are running 16 or 32 bit code, if we are running 16 bit code we convert
+; the selector to 32 bit (the code currently requires DPMI for this, but
+; we only support Borland's DPMI16 and Windows DPMI for 16 bit PM code
+; anyway). This code comes courtesy of the 32 bit hacked CMACROS.INC
+; in the Microsoft WinG Software Development Kit.
+;
+; Note that you will need to explicitly call this function before accessing
+; any 32 bit code in each separate 32 bit segment that you have created.
+
+MACRO   define_enable32 name
+ifdef   __WINDOWS16__
+&name&_fix_cs:
+		db 057h                     ; push    di
+		db 083h,0ECh,008h           ; sub     sp,8
+		db 08Ch,0CBh                ; mov     bx,cs
+		db 08Ch,0D0h                ; mov     ax,ss
+		db 08Eh,0C0h                ; mov     es,ax
+		db 08Bh,0FCh                ; mov     di,sp
+		db 0B8h,00Bh,000h           ; mov     ax,000Bh
+		db 0CDh,031h                ; int     31h
+		db 026h,080h,04Dh,006h,040h ; or      byte ptr es:[di+6],40h
+		db 0B8h,00Ch,000h           ; mov     ax,000Ch
+		db 0CDh,031h                ; int     31h
+		add     sp,8                ; db 083h,0C4h,008h
+		pop     di                  ; db 05Fh
+procfar		&name&_enable32
+		xor		eax,eax
+		mov		ah,80h
+		add		eax,eax
+		jc		short &name&_fix_cs
+		db 066h,0CBh				; 16:16 retf
+procend		&name&_enable32
+endif
+ENDM
+
+; Boolean truth values (same as those in debug.h)
+
+False		=	0
+True		=	1
+No			=	0
+Yes			=	1

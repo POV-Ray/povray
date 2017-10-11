@@ -1,0 +1,435 @@
+/* Copyright (C) 1992-2000 the Florida State University
+   Distributed by the Florida State University under the terms of the
+   GNU Library General Public License.
+
+This file is part of Pthreads.
+
+Pthreads is free software; you can redistribute it and/or
+modify it under the terms of the GNU Library General Public
+License as published by the Free Software Foundation (version 2).
+
+Pthreads is distributed "AS IS" in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU Library General Public License for more details.
+
+You should have received a copy of the GNU Library General Public
+License along with Pthreads; see the file COPYING.  If not, write
+to the Free Software Foundation, 675 Mass Ave, Cambridge,
+MA 02139, USA.
+
+Report problems and direct all questions to:
+
+  pthreads-bugs@ada.cs.fsu.edu
+
+  @(#)README	3.14 11/8/00
+
+*/
+
+
+WARNING
+=======
+
+Read this file. If you have compilation problems, the answer is most
+likely to be found here. Read the explanations for each compile flag
+that you decide to use.
+
+For example, if you use a GENERIC_SMALL kernel and define IO as a
+compilation flag, your code will not work! There will be no error
+message form the linker referring to unresolved externals (unless you
+use the Gnu loader) but your executables will not work. This happens
+because asynchronous IO (AIO) and light-weight processes (LWP) are not
+defined in GENERIC_SMALL but are essential for the compile flag IO.
+After reconfiguring your kernel to GENERIC, everything will suddenly
+work (see IO compile flag below).
+
+Introduction
+============
+
+This directory contains complete sources for Pthreads version 3.14.
+
+Pthreads is a prototype implementation of POSIX 1003.1c.  It
+is a C-language library that supports multiple threads of control
+within a single process.
+
+This library was developed to support the PART Ada runtime System
+(RTS).  As such, it does not implement the entire Pthreads interface.
+It runs on a SPARCstation under the SunOS operating system, and its
+use on that platform will also be non-compliant since the bulk of the
+POSIX 1003.1 base standard and POSIX 1003.4 Real-Time Extensions to
+which Pthreads is an extension will not be available.  The Pthreads
+library does provide some of the capability of these other standards.
+
+In the following exposition, the directory into which this software
+has been released will be referred to as $threads.  The file
+$threads/lib/libgthreads.a archive contains the object code of the
+library.  Linking with this archive makes pthread functions
+
+
+Building the Pthreads Library
+=============================
+
+To build a new version of the Pthreads library, simply type:
+
+	cd $threads/src
+	./configure
+
+You may want to edit the CFLAGS in the Makefile if you wish a
+different configuration (e.g., if you want to support round-robin
+scheduling, add -DDEF_RR etc.). If so, type "make" after saving the
+changes.
+
+This Pthreads implementation has been compiled using the Sun C
+compiler and the Gnu C compiler.  The C compiler used by Makefile can
+be controlled by setting the value of the CC variable.
+
+There are a number of conditional compilation options supported by the
+Pthreads source code. They should be set to the right combination by
+the "configure" script. But you can customize them, if you want.
+
+
+The __dos__ flag should be used for compilation on DOS systems in
+conjuction with the _POSIX compile flag.  The DOS port assumes
+filename of style 8.3 (8 chars base name, 3 ext).  It may only work
+correctly under Windows95 if the Makefile is edited.  It requires
+DJGPP v2 (see http://www.delorie.com/) with min. of djdev200.zip,
+bnu252b.zip, gcc272b.zip, mak373b.zip, maybe csdpmi3b.zip.
+
+The __FreeBSD__ flag should be used for compilation on FreeBSD
+systems.  Notice that the files SYS.h and DEFS.h are in
+threads/src/freebsd. These files are part of the Gnu libc
+distribution. You may have to update them first if they changed
+for future FreeBSD releases. (Please report such problems.)
+
+The __linux__ flag should be used for compilation on Linux systems.
+
+The _M_UNIX flag should be used for compilation on SCO UNIX systems.
+
+The _POSIX flag should only be set in conjuction with the __dos__ flag
+for compilation on DOS systems/
+
+The ASM_SETJMP flag should be used for a faster (less portable)
+implementation	of setjmp/longjmp (with thread-specific	signal mask)
+in assembly. If this flag is not set, the regular C library routines
+will be used. This increases the portability but violates Pthreads
+since the thread-specific signal mask may or may not be saved. Thus,
+it should only be omitted when absolutely necessary (for quick & dirty
+portability).
+
+The C_CONTEXT_SWITCH flag should be used if someone intends to port
+this package to a new architecture. If set, the context switch written
+in C will be invoked. Otherwise the context switch written in assembly
+will be active. Notice that the assembly version for the SPARC is
+faster but by far less portable (see portability notes in
+pthread_disp.c and the assembly files *.S).  Internal signal handling
+(pthread_kill) is also much slower with the context switch in C, about
+a factor 2.
+  speed(C context switch) =~ 1.2*speed(as context switch)
+NOTICE: The numbers are outdated at version 2.2 of Pthreads.
+
+The C_INTERFACE option should be set if the threads implementation is
+intended for use by C application programs.  This flag should not be
+defined if Pthreads is to be used to support the PART Ada RTS.  Some
+Verdix Ada compilers optimize the allocation of stack frames.  The
+setjmp()/longjmp() calls provided by the C library would not tolerate
+this.  The Pthreads library generated without the C_INTERFACE flag
+provides a version of setjmp()/longjmp() that will, but it wastes
+stack space.
+
+The CLEANUP_HEAP flag produces versions of pthread_cleanup_push() and
+pthread_cleanup_pop() that allocate space to record cleanup handlers
+using malloc().  Without this flag, the space is allocated from the
+stack.  The stack allocation forms of these functions are unsafe when
+used by a Verdix Ada application, since the compiler sometimes
+generates code to restore the stack to a previously saved value.
+
+The DEBUG flag causes Pthreads to print a number of messages, largely
+concerned with signal handling.  It will indicate when no threads are
+running (waiting for a signal) and when a signal is received.
+
+The DEF_RR flag enables round-robin as a scheduling option. If FIFO
+scheduling is sufficient for an application, this flag should not be
+set since low-level operations (e.g. context switches) tend to consume
+more time when round-robin is enabled. This option only works properly
+when MALLOC is defined as well. Furthermore, it might not work if
+non-reentrant library routines (thread-unsafe library routines) are
+called. (Remark: Heap allocation is generally not thread-safe, unless
+you defined MALLOC. Heap allocation routines are widely used, even in
+library routines such as printf. The MALLOC option of Pthreads fixes
+this problem but does not fix problems with other non-reentrant
+libraries.)
+
+The GNAT flag generates a library specifically for linking with Gnu
+Ada Translator translated programs. It should only be used for this
+purpose and not in conjunction with C programs.
+
+The IO flag generates versions of POSIX.1 I/O operations that block
+only the calling thread, not the whole process.  Such single-thread
+blocking is required by Pthreads.  This option requires SunOS
+Asynchronous I/O, which in turn requires Light-Weight Processes (LWP).
+Both of these are configuration options in the SunOS 4.1.x kernel, so
+the use of the IO flag may require reconfiguration of the kernel.
+Under Solaris, no kernel reconfiguration is required but the linker
+arguments have to include the dynamic link library and the
+asynchronous I/O library (-laio -ldl). Notice that simultaneous
+reads/writes to the same device from different threads may have
+undefined results. (It works under SunOS 4.1.x but does not work under
+Solaris.)
+
+The MALLOC flag provides thread-safe allocation routines. When this
+flag is set, the target programs have to be linked with the Gnu
+allocation library, specifically modified for Pthreads. The sources of
+the Gnu malloc lib can be obtained from the Free Software Foundation
+or our ftp site. You need to run "gmalloc_patch.csh" (with the file
+"gmalloc_patch.awk") in the Gnu malloc source directory before you
+compile the Gnu malloc lib. Notice that the Gnu malloc sources only
+compile with the Gnu C compiler, not with the Sun C compiler. Programs
+will then be linked with "libmalloc.o" or "gmalloc.o".
+
+The MUT_SWITCH flag for "perverted scheduling" forces a context
+switch upon locking a mutex successfully while preserving the priority
+scheduling policies. (Do not defined NOERR_CHECK.)
+
+The NOERR_CHECK flag generates faster versions of Pthreads mutex
+operations which fail to detect some of the optional Pthreads errors.
+These errors include EDEADLK, returned when a thread tries to lock a
+mutex it has already locked; and an EINVAL error returned when a
+thread tries to unlock a mutex it has not locked.  This latter error
+is not specified by Pthreads; the behavior being undefined.
+
+The NO_INLINE flag makes calls to the assembly-language dispatcher
+_pthread_sched to exit from the Pthreads kernel.  Without this flag, a
+C macro checking for certain common cases are expanded at these exit
+points; this macro will usually avoid the call to the dispatcher.
+With a sufficiently optimizing C compiler, leaving this flag out
+should improve performance.
+
+The RAND_SWITCH flag forces a context switch upon successfully locking
+a mutex at random intervals (using a binary random number) and to a
+new random thread (using another random number). The priority
+scheduling policies and not enforced. (Do not defined NOERR_CHECK.)
+
+The REAL_TIME flag provides deadline scheduling support, i.e. the
+specification of start times, deadlines, and periods of threads is
+supported. This requires DEF_RR right now.
+
+The RR_SWITCH forces a context switch every time the Pthreads kernel
+is left reordering threads in a round-robin fashion. The priority
+scheduling policies are not enforced. (Do not defined NOERR_CHECK.)
+
+The SIGNAL_STACK allows user to run a signal handler in case of stack
+overflow in a more gaceful fashion than STACK_CHECK alone. The handler
+is executed on the thread's stack. The user has to install handlers
+for SIGILL, SIGSEGV, and SIGBUS because one of the two signals which
+is delivered on a stack overflow. The corresponding error codes for
+the above signals are ILL_STACK, FC_PROT (SunOS 4.1 x), FC_HWERR
+(Soalris) or FC_ALIGN (Solaris), and FC_OBJERR, respectively.  After
+the stack overflow, it is the user's resposibility to reenable the
+stack check by calling pthread_lock_stack(pthread_self()) some time
+after returning from the signal handler. Control should generally be
+transferred out of the signal handler by manipulating the return PC of
+the signal handler (see code below). The call to pthread_lock_stack
+should then be executed where corresponding setjmp returns a non-zero
+value.  For the SIGNAL_STACK option, STACK_CHECK has to be defined.
+
+The SIM_KERNEL flag attempts to simulate the performance of a kernel
+implementation of Pthreads.  It adds a kernel call to each Pthreads
+library call that would be likely to require a kernel call in such an
+implementation.  This kernel call is intended to be a no-op.  This
+option is strictly for experimental purposes, to try to gauge the cost
+of implementing Pthreads in the UNIX (POSIX) kernel, and should not be
+used for development of Pthreads applications.
+
+The SOLARIS flag supports Pthreads under Solaris 2.x. The flag is
+always set in conjuction with the SVR4 flag. If both flags are not set,
+SunOS 4.1.x is assumed. You will have to change the Makefile to
+compiler for Solaris. Search for "Solaris" in the Makefile and remove
+comment designators ("#") where needed and introduce them elsewhere.
+More explanations can be found in the Makefile.
+
+The SRP flag supports mutex ceilings under the stack resource policy
+(SRP) protocol (see Pthreads USENIX paper on ftp). This assumes that
+mutexes are unlock in the opposite order they were locked (LIFO like a
+stack). SRP allows for a relatively efficient implementation of
+priority ceilings. Under this policy it is assumed that the base
+priority of a thread may not exceed the priority ceiling of a mutex
+that this thread locks; otherwise the behavior is undefined.
+
+The STACK_CHECK check ensures that a stack overflow causes a signal.
+If SIGNAL_STACK is not set in conjuction with STACK_CHECK, the program
+is terminated on a stack overflow. If this option is not set, programs
+might freeze if the stack overflows. Notice than STACK_CHECK does
+currently not work for the main thread!
+
+The STAND_ALONE option supports a micro-kernel for the VME SPARC
+Engine 1E which replaces UNIX. This works only in conjunction with SRP
+and no other compile options. The resulting micro-kernel can be linked
+with regular C programs under SunOS 4.0.3e to produce and executable
+(with special link options) which boots and executes a stand-alone
+program on a VME SPARC Engine 1E.
+
+The sun4e and sun4m options have to be set in conjunction with
+STAND_ALONE to provide the Pthreads portion of the MythOS micro
+kernel. Depending on the architecture, SPARC 1E VME engines need sun4e
+as an option, Force 3CE VME boards need sun4m. Notice that the proper
+include path needs to be inserted in the Makefile if cross compilation
+is done.
+
+The SVR4 flag should be defined for System V Release 4 UNIX systems.
+The flag is provided or portability to different UNIX flavors.
+Currently supports Solaris only. If not defined, BSD (Berkley) UNIX is
+assumed (currently SunOS 4.1.x).
+
+TDI_SUPPORT enables thread awareness of gdb-tdi, a special version of
+gdb; also requires -ldl for linking (and -rdynamic for linking under
+Linux). For more information, see
+  http://www.informatik.hu-berlin.de/~mueller/TDI
+
+TDI_STATIC allows static binding with libTDISrv.a for debugging.
+
+The TIMER_DEBUG flag prints out lengthy information about timer setups
+and signals which can be useful for debugging the round-robin
+scheduling policy.
+
+The VME_ICACHE_OFF and VME_DCACHE_OFF flags turn off the I-cache and
+D-cache, respectively (only w/ STAND_ALONE and sun4m).
+
+Writing Multi-Threaded C Programs
+=================================
+
+Any application using Pthreads written in C must first include (as the
+first #include directive!!!) the Pthreads header file. The function
+pthread_init() has to be called as the first thing in main for some
+architectures. (For the SPARC architecture, systems supporting ELF and
+systems with a C++ compiler such as gcc, this call is redundant since
+it is performed as part of the initialization before main is
+called. Nonetheless, it should be included for compatibility reasons.)
+Afterwards, the objects defined in the Pthreads standard might be
+referred to at any time.
+
+Example:
+
+#include <pthread.h>
+
+void new_thread(arg)
+  int *arg;
+{
+  printf("new thread argument = %d\n", *arg);
+}
+
+main()
+{
+  pthread_t th;
+  int i = 1;
+
+  pthread_init();
+
+  pthread_create(&th, NULL, new_thread, &i);
+  pthread_join(th, NULL);
+}
+
+When you compile a multi-threaded program, make sure to provide the
+Pthreads library to the linker and the include directory to the
+compiler (replace $threads by the proper relative or absolute path):
+
+Example:
+
+SunOS 4.1.x:
+
+gcc -I$threads/include -o create_thread create_thread.c $threads/lib/libgthreads.a $threads/lib/libmalloc.a -ldl
+
+Solaris 2.x:
+
+gcc -I$threads/include -o create_thread create_thread.c $threads/lib/libgthreads.a $threads/lib/libmalloc.a -ldl -laio
+
+Linux:
+
+gcc -I$threads/include -o create_thread create_thread.c $threads/lib/libgthreads.a $threads/lib/libmalloc.a -rdynamic -ldl
+
+for DOS or other systems that do not use the malloc package use:
+
+gcc -I$threads/include -o create_thread create_thread.c $threads/lib/libgthreads.a
+
+Installing Pthreads
+===================
+
+The Makefile now includes an installation facility. If you want to
+install the Pthreads library, login as root, build the Pthreads
+library and then use the install label in the Makefile:
+
+su root
+cd $threads
+make
+make install
+
+Thereafter, the compile option -lgthreads -lmalloc (-lgthreads under
+DOS) will be sufficient to supply the linker with the additional
+libraries. The compiler will find the include file automatically.
+
+Example:
+
+cc -o create_thread create_thread.c -lgthreads -lmalloc
+
+APPENDIX
+========
+
+Most of this code was produced by FSU students and faculty under the
+POSIX/Ada Real-Time (PART) project, funded by the Ada Joint Program
+Office under the Ada Technology Insertion Program, through the U.S.
+Army Communications Electronics Command, Software Engineering
+Directorate, subcontracted through the Telos Corporation.
+
+PART project members have included Ted Baker (Principal Investigator),
+Ted Giering (Chief Programmer), Pratit Santiprabhob (Research
+Associate), Offer Pazy (Consultant), and Ganesh Rangarajan, R. Ramesh,
+Frank Mueller, Teguh Ghazalie, Viresh Rustagi, Seung-jin Moon, Dong-Ik
+Oh, and Ashwin Goyal (Graduate Research Assistants).
+
+This software is still under development, and contains known bugs.
+The user assumes all risks associated with its use.
+
+This subdirectory contains a library implementation of the POSIX
+1003.1c standard for multiple threads of control within POSIX
+processes, known for short as Pthreads.  This is implemented over
+SunOS for the SPARC microprocessor (SunOS is a trademark of Sun
+Microsystems, Inc., and SPARC is a trademark of SPARC International,
+Inc).  This was originally based on the C threads library of Eric
+Cooper [1].  This library was modified to support Pthreads syntax and
+non-preemptive priority scheduling on the Motorola MC680x0 family of
+processors by Ganesh Rangarajan [2].  R. Ramesh and Ted Giering ported
+this library to the SPARC processor, and R. Ramesh merged the two
+levels of scheduling entities provided by C threads into one and added
+further Pthreads features.  Frank Mueller modified the resulting
+library to support preemptive scheduling, per-thread signals, and
+other features.  Viresh Rustagi implemented single-thread blocking I/O
+and refined the context switch.  Details of the design and
+implementation can be found in the literature [3,4].
+
+Ted Giering				Frank Mueller
+September 16, 1992			Nov 19, 1993
+
+
+References
+==========
+
+[1] E. Cooper and R. Draves. C Threads. Technical Report CMU-CS-88-154,
+	Department of Computer Science, Carnegie Mellon University,
+	1988.
+
+[2] Ganesh Rangarajan. A Library Implementation of POSIX Threads. July
+	1991.  Master's Project Report, Florida State University
+	Department of Computer Science.
+
+[3] Frank Mueller. Implementing POSIX Threads under UNIX:
+	Description of Work in Progress. In Proceedings of the 
+	Second Software Engineering Research Forum, November 1992.
+	p. 253-261.
+
+[4] Frank Mueller. A Library Implementation of POSIX Threads under
+	UNIX. In Proceedings of the USENIX Conference, Winter 1993.
+	p. 29-41.
+
+[5] T. P. Baker, F. Mueller and Viresh Rustagi. Experience with a
+	Prototype of the POSIX ``Minimal Realtime System Profile''.
+	In Proceedings of the 11th IEEE Workshop on Real-Time Operating
+	Systems and Software, May 1994.

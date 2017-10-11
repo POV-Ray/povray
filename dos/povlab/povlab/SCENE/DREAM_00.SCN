@@ -1,0 +1,373 @@
+;POVLAB version 4.00 SP4 - ascii scene for 3D modeller.
+;(C) 1998, Denis Olivier.
+;All rights reserved.
+;Date=Tuesday 04-24-2001.
+;Time=15:33:36.
+;user_name=USER
+NbRendu=6
+ColorCamera=4
+ColorViewport=0
+ColorTextBackground=8
+ColorSelection=6
+ColorInterface=7
+ColorAxis=5
+ColorGrid=2
+GrilleType=1
+CurrentViewport=0
+Viewportx4=1
+DisplayAxis=1
+DisplayGrid=1
+CurrentTexture=Mountains
+CurrentCamera=1
+BackgroundImageRGB: 210 210 255
+FogLayer: 0 221 221 255 1 11.45 1 0 0 0 0
+FogLayer: 1 255 255 255 0 10 1 0 1 0 0
+FogLayer: 2 255 255 255 0 10 1 0 1 0 0
+FogLayer: 3 255 255 255 0 10 1 0 1 0 0
+FogLayer: 4 255 255 255 0 10 1 0 1 0 0
+Atmosphere: 0 1 10 0.1 0 20 0.25 0.1 8 255 255 255
+UseSelection: 0
+RayGlobal: 0.003922 2.2 2 64 10 0.25 0.18 0.14
+Radiosity: 0 3 3.3 200 10 0.3 0.5 0.75 0.017 7 1
+Scale-X/Y F0: 13.06
+Shift-X F0: 5.793
+Shift-Y F0: 3.477
+Scale-X/Y F1: 16.47
+Shift-X F1: 3.726
+Shift-Y F1: 3.477
+Scale-X/Y F2: 11.74
+Shift-X F2: 5.793
+Shift-Y F2: 3.726
+Scale-X/Y F3: 45
+Shift-X F3: 0
+Shift-Y F3: 0
+Camera: 0.177 0.7917 1.709 -0.5485 0.1358 0.2181 111.5 1.789 0 0 0 0 0 0 0
+Display_Camera: 1
+
+Omni 001: -1.98 0.4961 -1.266 255 255 255 3 1 1 0 0 0 0 0 
+Display_Omni: 1
+
+Nb-Object: 11
+
+[EndInitSection]
+
+Object 00001: 38
+Object 00001: 1 1.047 0.9823
+Object 00001: 1 1.047 0.9823
+Object 00001: 0 0 0
+Object 00001: 0 0 0
+Object 00001: 165
+Object 00001: Mountains
+Object 00001: 0
+Object 00001: 0
+Object 00001: HFld0000
+Object 00001: #..\POVLAB\HFIELD\MONTAGNE.TGA 0
+Object 00001: 0
+Object 00001: 1 1 1
+Object 00001: 0 0 0
+Object 00001: 0 0 0
+Object 00001: 0
+Object 00001: 0
+Object 00001: 0
+Object 00001: 0 0
+Object 00001: 0
+Object 00001: 1
+Object 00001: 1
+Object 00001: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00001: 0000000000000
+Object 00001: 0 0
+Object 00001: # 0 0 0 0 0 0 0 0
+Object 00001: # 0 0 0 0 0 0 0 0
+Object 00001: 0 0
+
+Object 00002: 7
+Object 00002: 0 0 0
+Object 00002: 4.198 1e-004 4.198
+Object 00002: 0 0 0
+Object 00002: 0 0.9357 0
+Object 00002: 7
+Object 00002: Water
+Object 00002: 0
+Object 00002: 0
+Object 00002: Mer
+Object 00002: -1
+Object 00002: 0
+Object 00002: 0.2346 0.2346 0.2346
+Object 00002: 0 0 0
+Object 00002: 0 0 0
+Object 00002: 1
+Object 00002: 0
+Object 00002: 0
+Object 00002: 0 0
+Object 00002: 0
+Object 00002: 1
+Object 00002: 0
+Object 00002: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00002: 0000000000000
+Object 00002: 0 0
+Object 00002: # 0 0 0 0 0 0 0 0
+Object 00002: # 0 0 0 0 0 0 0 0
+Object 00002: 0 0
+
+Object 00003: 38
+Object 00003: 1.632 0.9718 1.603
+Object 00003: 1.632 0.9718 1.603
+Object 00003: 0 0 0
+Object 00003: -2.618 0 -2.663
+Object 00003: 7
+Object 00003: Mountains
+Object 00003: 0
+Object 00003: 0
+Object 00003: HFld0001
+Object 00003: #..\POVLAB\HFIELD\MONTAGNE.TGA 0
+Object 00003: 0
+Object 00003: 1 1 1
+Object 00003: 0 0 0
+Object 00003: 0 0 0
+Object 00003: 0
+Object 00003: 0
+Object 00003: 0
+Object 00003: 0 0
+Object 00003: 0
+Object 00003: 1
+Object 00003: 1
+Object 00003: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00003: 0000000000000
+Object 00003: 0 0
+Object 00003: # 0 0 0 0 0 0 0 0
+Object 00003: # 0 0 0 0 0 0 0 0
+Object 00003: 0 0
+
+Object 00004: 38
+Object 00004: 3.395 1.871 3.335
+Object 00004: 3.395 1.871 3.335
+Object 00004: 0 339 0
+Object 00004: -11.42 0 -6.358
+Object 00004: 75
+Object 00004: Mountains
+Object 00004: 0
+Object 00004: 0
+Object 00004: HFld0002
+Object 00004: #..\POVLAB\HFIELD\MONTAGNE.TGA 0
+Object 00004: 0
+Object 00004: 1 1 1
+Object 00004: 0 0 0
+Object 00004: 0 0 0
+Object 00004: 0
+Object 00004: 0
+Object 00004: 0
+Object 00004: 0 0
+Object 00004: 0
+Object 00004: 1
+Object 00004: 1
+Object 00004: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00004: 0000000000000
+Object 00004: 0 0
+Object 00004: # 0 0 0 0 0 0 0 0
+Object 00004: # 0 0 0 0 0 0 0 0
+Object 00004: 0 0
+
+Object 00005: 38
+Object 00005: 1 0.9718 0.9823
+Object 00005: 1 0.9718 0.9823
+Object 00005: 0 36 0
+Object 00005: -2.392 0 0.7673
+Object 00005: 7
+Object 00005: Mountains
+Object 00005: 0
+Object 00005: 0
+Object 00005: HFld0003
+Object 00005: #..\POVLAB\HFIELD\MONTAGNE.TGA 0
+Object 00005: 0
+Object 00005: 1 1 1
+Object 00005: 0 0 0
+Object 00005: 0 0 0
+Object 00005: 0
+Object 00005: 0
+Object 00005: 0
+Object 00005: 0 0
+Object 00005: 0
+Object 00005: 1
+Object 00005: 1
+Object 00005: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00005: 0000000000000
+Object 00005: 0 0
+Object 00005: # 0 0 0 0 0 0 0 0
+Object 00005: # 0 0 0 0 0 0 0 0
+Object 00005: 0 0
+
+Object 00006: 38
+Object 00006: 1 0.9718 0.9823
+Object 00006: 1 0.9718 0.9823
+Object 00006: 0 0 0
+Object 00006: -4.965 0 -1.219
+Object 00006: 7
+Object 00006: Mountains
+Object 00006: 0
+Object 00006: 0
+Object 00006: HFld0004
+Object 00006: #..\POVLAB\HFIELD\MONTAGNE.TGA 0
+Object 00006: 0
+Object 00006: 1 1 1
+Object 00006: 0 0 0
+Object 00006: 0 0 0
+Object 00006: 0
+Object 00006: 0
+Object 00006: 0
+Object 00006: 0 0
+Object 00006: 0
+Object 00006: 1
+Object 00006: 1
+Object 00006: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00006: 0000000000000
+Object 00006: 0 0
+Object 00006: # 0 0 0 0 0 0 0 0
+Object 00006: # 0 0 0 0 0 0 0 0
+Object 00006: 0 0
+
+Object 00007: 38
+Object 00007: 1 0.9718 0.9823
+Object 00007: 1 0.9718 0.9823
+Object 00007: 0 36 0
+Object 00007: 0.08801 0 -3.464
+Object 00007: 7
+Object 00007: Mountains
+Object 00007: 0
+Object 00007: 0
+Object 00007: HFld0005
+Object 00007: #..\POVLAB\HFIELD\MONTAGNE.TGA 0
+Object 00007: 0
+Object 00007: 1 1 1
+Object 00007: 0 0 0
+Object 00007: 0 0 0
+Object 00007: 0
+Object 00007: 0
+Object 00007: 0
+Object 00007: 0 0
+Object 00007: 0
+Object 00007: 1
+Object 00007: 1
+Object 00007: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00007: 0000000000000
+Object 00007: 0 0
+Object 00007: # 0 0 0 0 0 0 0 0
+Object 00007: # 0 0 0 0 0 0 0 0
+Object 00007: 0 0
+
+Object 00008: 38
+Object 00008: 1 0.9718 0.9823
+Object 00008: 1 0.9718 0.9823
+Object 00008: 180 82 180
+Object 00008: 0.8708 0 -1.705
+Object 00008: 7
+Object 00008: Mountains
+Object 00008: 0
+Object 00008: 0
+Object 00008: HFld0006
+Object 00008: #..\POVLAB\HFIELD\MONTAGNE.TGA 0
+Object 00008: 0
+Object 00008: 1 1 1
+Object 00008: 0 0 0
+Object 00008: 0 0 0
+Object 00008: 0
+Object 00008: 0
+Object 00008: 0
+Object 00008: 0 0
+Object 00008: 0
+Object 00008: 1
+Object 00008: 1
+Object 00008: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00008: 0000000000000
+Object 00008: 0 0
+Object 00008: # 0 0 0 0 0 0 0 0
+Object 00008: # 0 0 0 0 0 0 0 0
+Object 00008: 0 0
+
+Object 00009: 38
+Object 00009: 3.395 1.871 3.335
+Object 00009: 3.395 1.871 3.335
+Object 00009: 0 346 0
+Object 00009: -4.731 -0.7482 -7.593
+Object 00009: 75
+Object 00009: Mountains
+Object 00009: 0
+Object 00009: 0
+Object 00009: HFld0007
+Object 00009: #..\POVLAB\HFIELD\MONTAGNE.TGA 0
+Object 00009: 0
+Object 00009: 1 1 1
+Object 00009: 0 0 0
+Object 00009: 0 0 0
+Object 00009: 0
+Object 00009: 0
+Object 00009: 0
+Object 00009: 0 0
+Object 00009: 0
+Object 00009: 1
+Object 00009: 1
+Object 00009: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00009: 0000000000000
+Object 00009: 0 0
+Object 00009: # 0 0 0 0 0 0 0 0
+Object 00009: # 0 0 0 0 0 0 0 0
+Object 00009: 0 0
+
+Object 00010: 7
+Object 00010: 0 0 0
+Object 00010: 4.198 1e-004 4.198
+Object 00010: 0 0 0
+Object 00010: 0 0.9561 0
+Object 00010: 7
+Object 00010: Water
+Object 00010: 0
+Object 00010: 0
+Object 00010: Fond
+Object 00010: -1
+Object 00010: 0
+Object 00010: 1 1 1
+Object 00010: 0 0 0
+Object 00010: 0 0 0
+Object 00010: 1
+Object 00010: 0
+Object 00010: 0
+Object 00010: 0 0
+Object 00010: 0
+Object 00010: 1
+Object 00010: 1
+Object 00010: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00010: 0000000000000
+Object 00010: 0 0
+Object 00010: # 0 0 0 0 0 0 0 0
+Object 00010: # 0 0 0 0 0 0 0 0
+Object 00010: 0 0
+
+Object 00011: 7
+Object 00011: 0 0 0
+Object 00011: 4.198 1e-004 4.198
+Object 00011: 0 0 0
+Object 00011: 0 -2.874 0
+Object 00011: 7
+Object 00011: Grey_Blue_Alabaster
+Object 00011: 0
+Object 00011: 0
+Object 00011: Ciel
+Object 00011: -1
+Object 00011: 0
+Object 00011: 3.368 3.368 3.368
+Object 00011: 0 0 0
+Object 00011: 0 0 0
+Object 00011: 1
+Object 00011: 0
+Object 00011: 0
+Object 00011: 0 0
+Object 00011: 0
+Object 00011: 1
+Object 00011: 1
+Object 00011: 1.00 63 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00011: 1100000000000
+Object 00011: 0 0
+Object 00011: # 0 0 0 0 0 0 0 0
+Object 00011: # 0 0 0 0 0 0 0 0
+Object 00011: 0 0
+
+End of file: DREAM_00.SCN

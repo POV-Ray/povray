@@ -1,0 +1,81 @@
+# Mesa 3-D graphics library
+# Version:  3.5
+
+# Copyright (C) 2001 Wind River Systems, Inc
+
+# The MIT License
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+# OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+# DEALINGS IN THE SOFTWARE.
+
+include rules.windml
+
+H_FILES = gl.h glext.h glu.h osmesa.h uglmesa.h uglglutshapes.h
+
+#CFG_FILES = src$(DIRCHAR)ugl$(DIRCHAR)tornado$(DIRCHAR)01uglmesa.cdf
+
+all:
+ifeq ($(WIND_HOST_TYPE),x86-win32)
+	@-md $(TGT_DIR)$(DIRCHAR)h$(DIRCHAR)GL
+	@-md $(TGT_DIR)$(DIRCHAR)h$(DIRCHAR)GL$(DIRCHAR)internal
+else
+	@ - if [ -d $(TGT_DIR)$(DIRCHAR)h$(DIRCHAR)GL$(DIRCHAR)internal ]; \
+	then \
+		echo ; \
+	else \
+		mkdir -p $(TGT_DIR)$(DIRCHAR)h$(DIRCHAR)GL; \
+	fi
+endif
+
+# ifeq ($(WIND_HOST_TYPE),x86-win32)
+# 	$(CP) $(CFG_FILES) \
+# 	$(TGT_DIR)$(DIRCHAR)config$(DIRCHAR)comps$(DIRCHAR)vxworks
+# else
+# 	$(CP) $(CFG_FILES) \
+# 	$(TGT_DIR)$(DIRCHAR)config$(DIRCHAR)comps$(DIRCHAR)vxworks
+# endif
+
+ifeq ($(WIND_HOST_TYPE),x86-win32)
+	@ for %f in ($(H_FILES)) do \
+	$(CP) include$(DIRCHAR)GL$(DIRCHAR)%f \
+	$(TGT_DIR)$(DIRCHAR)h$(DIRCHAR)GL$(DIRCHAR)%f
+else
+	@ for FILE in ($(H_FILES)); \
+	do \
+	$(CP) include$(DIRCHAR)GL$(DIRCHAR)$$FILE \
+	$(TGT_DIR)$(DIRCHAR)h$(DIRCHAR)GL$(DIRCHAR)$$FILE; \
+	done
+endif
+	$(MAKE) -C src -f Makefile.ugl CPU=$(CPU)
+	$(MAKE) -C src-glu -f Makefile.ugl CPU=$(CPU)
+#	$(MAKE) -C si-glu -f Makefile.ugl CPU=$(CPU)
+	$(MAKE) -C windmldemos -f Makefile.ugl CPU=$(CPU)
+
+depend:
+	$(MAKE) -C src -f Makefile.ugl CPU=$(CPU) depend.$(CPU)$(TOOL)
+	$(MAKE) -C src-glu -f Makefile.ugl CPU=$(CPU) depend.$(CPU)$(TOOL)
+#	$(MAKE) -C si-glu -f Makefile.ugl CPU=$(CPU) depend.$(CPU)$(TOOL)
+	$(MAKE) -C windmldemos -f Makefile.ugl CPU=$(CPU) depend.$(CPU)$(TOOL)
+
+check:
+	$(MAKE) -C windmldemos -f Makefile.ugl CPU=$(CPU)
+
+clean:
+	$(MAKE) -C src -f Makefile.ugl CPU=$(CPU) clean
+	$(MAKE) -C src-glu -f Makefile.ugl CPU=$(CPU) clean
+	$(MAKE) -C windmldemos -f Makefile.ugl CPU=$(CPU) clean
+#	$(RM) $(MESA_OBJNAME)

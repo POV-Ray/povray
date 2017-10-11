@@ -1,0 +1,513 @@
+POVLAB modeler for POV-Ray 3.0
+Copyright 1994,1995 Denis Olivier & ChromaGraphics.
+All rights reserved.
+-------------------------------------------------------------------------------
+MANAGING TEXTURES AROUND POVLAB 3D MODELLER
+-------------------------------------------------------------------------------
+
+           Postal adress   E-mail
+
+           DENIS OLIVIER   Internet : dolivier@cyberstation.fr
+      5, Bld Franck Lamy   Home pages :
+             17200 Royan   http://www.povlab.org
+                  France
+
+
+This file describes how to manage textures with the new utilities. For more
+information, please read the documentation POVLAB.DOC.
+
+There are two sections in this file:
+
+SECTION A describes how MAKETHEM works.
+SECTION B gives some advices of how to use MAKETHEM.
+
+See also "About version 1.4" at the end of this file.
+
+                       *---------------------*
+                       | SECTION A:          |
+                       | How does it works.  |
+                       *---------------------*
+
+The textures are described by 2 files, POVLAB.TEX and POVLAB.INC.
+The first contains library assignments for both the texture's name and
+the thumbnail's name. POVLAB.INC is a POV-Ray file like TEXTURES.INC.
+
+I've written 2 utilities to help manage the textures library.
+MAKETHEM.EXE is the program that actually manages the library.
+TGAVGIF.EXE is a program to convert TGA files to 8 bits GIF files, with
+good color reduction and dithering. You can use it for other images besides
+texture thumbnails.
+It needs DOS4GW.EXE in the path to run.
+
+Here is how to render each thumbnails for unallocated textures names.
+Go to the POVLAB\TEXTURE path, type "MAKETHEM -?" without the quotes.
+
+You will see :
+
+        MAKE THEM ALL release 1.4, (C) Copyright ChromaGraphics, 1994-1997.
+        Texture library maker and manager for POVLAB.
+        All rights reserved, (R) Denis Olivier & Juan R. Migoya - Jul 12 1997.
+
+            Syntax : makethem [option(s)]
+
+            -Ppath : specifie path for POV-Ray (default current)
+            -Ipath : specifie file library.TEX (default POVLAB.TEX)
+            -D     : display while rendering (+d0)
+            -An.n  : use antialiasing rendering option (-A0.3 for example)
+            -T     : render all the textures int library.TEX (overwrite)
+            -Lpath : specifie library for map files (optional). If path is
+                   : omitted, the path indicated with -I option is used
+            -On    : use object described as bellow (default sphere)
+                     considering n : 1=cylinder
+                                     2=cone
+                                     3=cut sphere
+            -?     : syntax and help screen
+
+            Example : makethem -pc:\povray -ic:\povlab\povlab.tex
+
+-P : to tell the program where POV-Ray is (just the path)
+-I : choose one texture library for POVLAB.
+-D : display the rendering image while computing
+-F : only for POV-Ray 2.2 users
+-A : use antialiasing for better display
+-O : to choose a object for render the texture on
+
+Command line options description:
+--------------------------------
+(Upper or lowercase can be used).
+
+-P: Tells the program where POVRAY is (just the path, don't use the EXE
+    filename). If the POVRAY directory is in the PATH enviroment variable,
+    you can skip this option.
+
+    Example: -p\POV-RAY\DOS
+
+-I: Tells MAKETHEM what TEX file must be used and where is it. The thumbnails
+    and the MAKETHEM.LOG file (see below) will be put in the directory
+    in which this TEX file is.
+
+    Examples:
+    -ipovlab.tex       // povlab.tex and the TEXTURE directory will be used.
+    -imine\mine.tex    // mine.tex and the mine directory (below the current
+                          directory will be used).
+    -i\povray\include\povray.tex       // povray.tex and the \povray\include
+                                          directory will be used.
+
+-D: display the rendering image while computing
+
+-F: only for POV-Ray 2.2 users
+
+-A: use antialiasing for better display
+
+    Example:
+    -A0.3
+
+-T: overwrite existents thumbnails. Makethem will create new thumbnails
+    even when the TEX0nnnn.GIF files indicated in the TEX files already
+    exist (in the directory where the TEX file is).
+
+How it works
+------------
+First, you must know the structure of the TEX file. A TEX file is
+a text file with TEX extension. The first line has the format:
+
+"path\includefilename" (without the quotes)
+
+This informs MAKETHEM of what is the include file in which the textures
+are described. Later, it will be used by POVRAY to render the thumbnails.
+
+Example:
+C:\POVLAB\TEXTURE\POVLAB.INC
+
+The next lines in the file have the format:
+
+"texture_name                  path\TEX0nnn.GIF" (without the quotes).
+
+<texture_name>: is the name of a texture as it appears in the include file
+specified at the top of the file.
+
+<path> is the path in which the thumbnail will be render. Actually it's not
+used by MAKETHEM (see below).
+<TEX0nnn.GIF> is the name of the GIF file for the thumbnail, whith nnn between
+000 and 999.
+
+MAKETHEM will read the POVLAB.TEX file (or the one you've specified) and
+check for unallocated texture names, i.e: for those textures whose GIF
+thumbnail doesn't exist in the directory specified with the -i option, or,
+what it's the same, the directory in which the TEX file is located.
+(Unless you have used the -t option: see below).
+
+Then it prepares a .POV file, sends it to POV-Ray, and converts the TGA
+file output of POVRAY into .GIF format with TGAVGIF.EXE.
+
+You can stop MAKETHEM pressing the ESC key, but this will not work
+while POVRAY is working.
+
+If you stop the rendering (with the apropiate POVRAY command) before the
+TGA file is completed, no .GIF will be created.
+
+Name of the texture thumbnails
+------------------------------
+MAKETHEM will automatically assign new names to textures thumbnails.
+The prefix is TEX followed by 4 digits (e.g. 0000), and then .TGA or .GIF.
+You can have up to 1000 files (POVLAB only supports 1000 per .TEX file),
+named from TEX0000.GIF to TEX0999.GIF.
+
+In what follows, we assume that the -t option (overwrite) hasn't been used.
+
+At the beginnig, MAKETHEM open a file called MAKETHEM.LOG in the same
+directory in wich the thumbnails files will created, i.e. the directory
+indicated in the -i option of the command line, this in which the TEX file
+is located.
+
+MAKETHEM will read the name of the GIF file for the thumbnail in the TEX
+file. (MAKETHEM, doesn't use the <path>: it will use always the path given
+in the -i option). If the GIF file exists (again: in the TEX file path),
+the program gives a "texture already rendered" message and continues with
+the next line of the TEX file.
+
+When it finds an unallocated texture, it doesn't neccesarily use this GIF
+name: instead, it check whether TEX0000.TGA exists and if it does will
+continue checking for the existence of TEX0001.TGA, TEX0002.TGA etc...
+and stops when it finds an unused name for the GIF file. Of course, when
+the program is building many thumbnails, after creating the TEX0nnn.GIF file
+it only checks for the TEX0(nnn+1).GIF file and the next that follows. It
+already knows that files with smaller numbers have been used.
+
+After a thumbnail has been rendered, MAKETHEM writes a new line in the
+MAKETHEM.LOG file with the same format we have seen in the TEX file,
+but with the correct <path> and <TEX0nnn.GIF> names.
+
+If POVRAY find an error and doesn't create the TGA file, MAKETHEM
+will put a line in MAKETHEM.LOG with the format:
+
+"texture_name                  --------->ERROR!" (without the quotes)
+
+When MAKETHEM find a title or comment (a line beginning with '#'), it
+writes this line as is, in MAKETHEM.LOG.
+
+
+Assign names and thumbnails together
+------------------------------------
+When MAKETHEM has finished, the file MAKETHEM.LOG will have a
+similar structure to POVLAB.TEX, with names and thumbnails associated.
+If you have used a TEX file that is the only TEX file in this directory,
+then you can just edit MAKETHEM.LOG to check for "<-------ERROR!" strings,
+and then copy this file over the original TEX file. Now you have a TEX
+file POVLAB can use to display thumbnail textures.
+In other case, you need to replace the lines with new textures in the
+TEX file with the related lines of MAKETHEM.LOG.
+
+Options used in MAKETHEM for POV-Ray and TGAVGIF
+------------------------------------------------
+POV-Ray : -iTEXTURE.POV -oTEX????.TGA +ft +w100 +h100 +v +mb2 +a +x
+TGAVGIF : TEX???? /f /i
+
+Using MAKETHEM and POV-Ray for Windows
+--------------------------------------
+Althought you can use it with WINPOV (it will find
+alone the PVENGINE.EXE exe file), you cannot use it in a good way cos
+WINPOV don't wait the render to be finished to continue the process
+with MEKETHEM. So TGAVGIF will load the thumbnail and WINPOV will not
+finished to render this thumbnail and there will be a lot of errors (cos
+MAKETHEM will reload many times WINPOV too).
+The better way is to find just a POVRAY.EXE dos version just for rendering
+thumbnails for texture previews.
+
+
+
+                       *---------------------*
+                       | SECTION B:          |
+                       | How can be used.    |
+                       *---------------------*
+
+Generalities:
+------------
+
+MAKETHEM will allow you two main taks:
+
+       1-. To create .TEX extension files with sets of thumbnails.
+           You can instruct POVLAB to use any of this files to display
+           the thumbnails for the textures you are currently using in
+           a scene or project, provided that the include file asociated
+           with the TEX file, in which the textures are defined, does
+           exist and is accesible for POVLAB.
+
+       2-. Add thumbnails to existing TEX files for some new textures
+           provided that you make the definition of these textures
+           available to POVLAB. This can be done in two ways:
+               a) Putting these definitions inside the include file
+                  referenced in the first line of the TEX file.
+               b) Putting an #include stament in the include file
+                  referenced in the TEX file. With this #include
+                  you make reference to another include file that
+                  contains the definition of those textures.
+
+Having a clear idea of this two tasks, you will also know what MAKETHEM
+can do and what it can't do. And remember:
+
+       MAKETHEM IS AIMED AT CREATING THUMBNAILS, NOT AT CREATING TEXTURES.
+
+
+Getting the POVLAB textures thumbnails
+--------------------------------------
+
+This is a special task of type 1 because you MUST do it, unless
+you get the thumbnails already rendered from other sources (internet
+for example, but think that the textures that comes with POVLAB may
+change and may be not guarantee that the files in internet will be
+update. If you have a fast computer -75 MHz Pentium may be a reasonable
+low limit- it is preferable that you render the thumbnails by yourself.
+In a 133 MHz Pentium machine, building 237 thumbnails takes about 15'.)
+
+POVLAB comes with a set of textures. You must use MAKETHEM to create
+the thumbnails for those textures. To do so, just run MAKETHEM from
+the \POVLAB\TEXTURE directory, using the -p option as explained
+above, and optionally -ipovlab.tex. When makethem finishes, make a
+backup of povlab.tex, check MAKETHEM.LOG for errors, remove the
+lines with error if any, and copy makethem.log over povlab.tex.
+You can delete MAKETEM.LOG, and the .TGA and .OUT files.
+
+Note that this is valid only when you have not yet any thumbnail, so
+you can overwrite the povlab.tex. Anyway, make a backup of it.
+
+Important Note: Sometimes it happens that POVRAY issues an error
+when rendering the thumbnails. You could think that all the
+texture definitions are wrong. This is not the case. Press the
+<Pause> key in your computer when the POVRAY message appears and
+write down the message. Then press ESC until MAKETHEM stops
+and edit the POVLAB.INC file. Then search for what you have taken
+note and fix it up. Sometimes is something very simple: for example
+may it happens that in a pigment stament like this
+
+               pigment { color <1,1,1> ....
+
+the word "color" has been missing. Besides, the POVRAY message
+will tell you what is expected and what is found. This may help.
+
+
+Creating a file with thumbnails for other textures
+--------------------------------------------------
+
+Usually you will have textures from another sources, POVRAY for
+example. If you want to use them and that POVLAB shows you the
+thumbnails, you must use MAKETHEM to create the thumbails. To do
+so follow these steps:
+
+       NOTE: The examples show here may not work. It is very
+             important that you read the next paragraph:
+             "Working with directories and disk units".
+
+       - You can create a new directory for the new thumbnails
+         or use some existent directory. Think though that as
+         the number of GIF files after the whole process may be
+         large, it may be preferable to use an empty directory
+         for ease of management of the files. It's not good idea
+         to mix POV files with TEX files with GIF files, etc...
+         Anyway, it's up to you.
+
+       - Create a file with TEX extension. In the first line
+         put the full path (filename also) of the include file
+         in which the textures are defined. May it happens that
+         the textures are defined in several files. In this case
+         put only the name of one of this file and write the
+         #include staments you need in this file, making reference
+         to all others files. For example, if the first line
+         of your TEX file is
+
+               C:\POVRAY\INCLUDE\WOODS.INC
+
+         at the beginning of WOODS.INC put these lines:
+
+               #include C:\POVRAY\INCLUDE\MAT.INC
+               #include C:\POVRAY\INCLUDE\STONES.INC
+               #include C:\POVLAB\TEXTURE\MINE\MINE.INC
+               (etc...)
+
+         where MAT.INC, STONES.INC, MINE.INC are files in which
+         other textures are defined.
+
+         Be carefull tough because there may be already another
+         #include staments in those files, and may it happens that
+         the order in which these staments appears is relevant.
+
+       - In the next files of your TEX file put one line for each
+         texture whit the format given above, i.e:
+
+         texture_name                  path\TEX0nnn.GIF
+
+         <path> is irrelevant: you may write anything. The names
+         TEX0nnn.GIF with nnn between 000 and 999 may be in any
+         order (you will get all the thumbnails ordered when
+         MAKETHEM finishes), but don't use the same number for
+         diferent textures: if you do so, only the first texture
+         with this number will be rendered.
+
+       - You can write also titles for the textures. For example,
+         at the beginning of a group of Stones texture you can
+         put:
+
+               #------Stones--------
+
+         and so on. (See POVLAB.TEX as an example).
+         You must begin always the line with the # character, and
+         do not put spaces (POVLAB would skip the text after the
+         first space). The other characters are optional: you
+         can use what you like, but it is preferable to use only
+         characters with ASCII codes below 128.
+         Never begin a line with a space: the line would be skipped
+         by MAKETHEM.
+         These titles you put in the TEX files, will be shown
+         by POVLAB when you are selecting a texture, helping in
+         identifying them.
+
+       - Save the TEX file. Assume the filename is MINE.TEX and
+         it is in the \POVRAY\INCLUDE\MINE directory. Change to
+         the \POVLAB\TEXTURE directory and run MAKETHEM in this
+         way:
+
+         MAKETHEM -p\POVRAY -i\POVRAY\INCLUDE\MINE\MINE.TEX -A0.3
+
+         It has been assumed that your POVRAY.EXE is in the \POVRAY
+         directory. The -A0.3 option is not needed. You can also
+         use the f option if you have the 2.2 version of POVRAY.
+
+         Note: It's very important that TGAVGIF.EXE should be located
+         in the \POVLAB\TEXTURE directory or the PATH enviroment
+         variable should include the TGAVGIF.EXE location.
+
+       - Change to the TEX file directory (\POVRAY\INCLUDE\MINE in
+         the example). If all has gone right, you should find:
+
+         A MAKETHEM.LOG file.
+         Several TEX0nnn.TGA files
+         Several TEX0nnn.GIF files
+         Several TEX0nnn.OUT files
+
+         The last ones are generated by POVRAY and give information
+         about the rendering process of each texture.
+         You can delete the TGA files unless you want them for
+         another purpose.
+         Edit the MAKETHEM.LOG. Search for the string "ERROR" (without
+         the quotes). If you find any, take note of this texture
+         and delete the line. When you have finished searching ERROR,
+         save the file with the name you want and TEX extension.
+         If there are not errors, you have finished.
+         In POVLAB, in the ENVIROMENT menu, put the full path to this
+         TEX file when you want to use it. You don't need to put
+         the include file as a USER'S INCLUDE FILE, unless you want
+         to use some others objects of this file.
+         For the textures with ERROR: Check the texture definition
+         and fix it if you know how. If you don't, make a small POV file
+         with this texture and run POVRAY with it. Then you will
+         get some advice about what the problem is.
+         When you have all the textures with ERROR fixed, follow
+         the instructions in the next paragraph to get their thumbnails.
+
+
+Working with directories and disk units
+---------------------------------------
+
+As it is said above, you can work with your own directories and also
+with diferents disk units than that in wich POVLAB is installed.
+(This is since the version of 28/02/97 only).
+
+BUT you must keep in mind that there is a limitation: The spawn
+function used by Makethem doesn't work with arguments greater
+than 128 bytes. Then, you can't use the -i option with paths so
+larges as those of the examples above, and note also that the -p
+option may be more or less large, depending on where you have
+the POVRAY.EXE for DOS. Beside, you must run makethem from its
+directory, wich makes the things worse. The best turn-around is
+as follows:
+
+       1-. If you work with the same disk unit, put the subdirectories
+           below the TEXTURE directory. In this way you can use
+           just "-imydir\mytex.tex", wich is pretty short.
+
+       2-. If you work with other disk unit, change first in this
+           unit to the directory in which you have your .TEX file.
+           Then change to the unit and directory where makethem is
+           and use just -iX:mytex.tex, wich is shorter (X is the
+           letter of the disk unit).
+
+And how will you know if you are using a path too large?
+
+       POVRAY won't run at all and TGAVGIF won't find the TGA file.
+       There will be NO error messages from POVRAY, only from TGAVGIF.
+
+And remember: You must run MAKETHEM from its directory. If not,
+may it be that all would work well apparently, but most probably when
+you run POVLAB it will be unable to locate the thumbnails.
+
+
+Adding thumbnails to a TEX file
+-------------------------------
+
+From time to time, you will need to work with new textures or with
+textures you don't have thumbnails for. The task is very similar to
+what has been explained above.
+
+You can add some lines with the new textures to your current TEX
+file, but it will be troublesome if the file is large because
+MAKETHEM will browse the whole file only to use several lines of it.
+Be sure that the numbers in the TEX0nnnn.GIF filenames for the new
+textures are greater that the greatest of the current thumbnails (it
+doesn't matter if them aren't consecutive).
+After runing MAKETHEM, edit the MAKETHEM.LOG file, check it for ERROR
+and copy the lines in it to the TEX file, replacing the new lines you
+had put in it. If you want, delete the .TGA and .OUT files.
+
+You can also use a diferent TEX file (a new one) with just the new
+textures. Run makethem with this TEX file and do the same that has
+been explained above. This time, discard this TEX file after finished.
+A WARNING: The new TEX file must be in the same directory that the
+current TEX file. Remember: Makethem will use the path to this TEX
+file as the path in the string "path\TEX0nnn.GIF" that it writes in
+MAKETHEM.LOG.
+
+
+About Version 1.4:
+-------------------
+
+There are some improvements and bugs fixed in version 1.4:
+
+1-. A new option "-L" has been added, to provide a path for the
+mapping files POVRAY would need to render some thumbnail. This
+option may be used alone, i.e: -L , and Makethem will use as
+library path the same path where the .TEX file is into. Also
+you can write -Lpath, where path is the path to the mapping files.
+**This path should be accesible from the TEXTURE directory.**
+
+2.- Now, Makethem sends the commands to POVRAY into a file called
+POVRAY.INI created in the Texture directory. In this way, there is
+no restriction on the size of the paths any more.
+
+3.- Now you can use "-I..\mytext\mytex.tex". There was a bug when
+you used "..\".
+
+4.- Problem overwriting files has been fixed. Now, you MUST use
+the -T option to overwrite the old *.TGA and *.GIF files.
+
+             ---------- End of File -------------
+
+MAKE THEM ALL release 1.4, (C) Copyright ChromaGraphics, 1994-1997.
+Texture library maker and manager for POVLAB.
+All rights reserved, (R) Denis Olivier & Juan R. Migoya - Jul 12 1997.
+
+    Syntax : makethem [option(s)]
+
+    -Ppath : specifie path for POV-Ray (default current)
+    -Ipath : specifie file library.TEX (default POVLAB.TEX)
+    -D     : display while rendering (+d0)
+    -An.n  : use antialiasing rendering option (-A0.3 for example)
+    -T     : render all the textures int library.TEX (overwrite)
+    -Lpath : specifie library for map files (optional). If path is
+           : omitted, the path indicated with -I option is used
+    -On    : use object described as bellow (default sphere)
+             considering n : 1=cylinder
+                             2=cone
+                             3=cut sphere
+    -?     : syntax and help screen
+
+    Example : makethem -pc:\povray -ic:\povlab\povlab.tex

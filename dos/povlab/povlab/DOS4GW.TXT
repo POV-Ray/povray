@@ -1,0 +1,559 @@
+POVLAB modeler for POV-Ray 3.0.
+Copyright 1994,1996 Denis Olivier & ChromaGraphics.
+All rights reserved.
+-------------------------------------------------------------------------------
+DOS/4GW CONFIGURATION GUIDE - This file is (C) WATCOM International Corporation
+-------------------------------------------------------------------------------
+
+           Postal adress   E-mail:
+
+           DENIS OLIVIER   Internet : dolivier@cyberstation.fr
+      5, Bld Franck Lamy   Home pages :
+             17200 Royan   http://www.cyberstation.fr/~dolivier/povlab.html
+                  France   http://www.cyberstation.fr/~dolivier/author.html
+
+Generalities
+------------
+You need this file (DOS4GW.EXE) to run POVLAB. If you don't already have a
+copy in your path. check for it on your hard drive or download it.
+
+
+1 Configuring DOS/4GW
+
+
+     This chapter explains how to use the DOS4G environment variable to
+     suppress the banner that is displayed by DOS/4GW at startup.  It also
+     explains how to use the DOS16M environment variable to select the switch
+     mode setting, if necessary, and to specify the range of extended memory in
+     which DOS/4GW will operate.  DOS/4GW is based on Rational Systems' DOS/16M
+     16-bit Protected-Mode support; hence the DOS16M environment variable name
+     remains unchanged.
+
+1.1 Suppressing the DOS/4GW Banner
+
+     The banner that is displayed by DOS/4GW at startup can be suppressed by
+     issuing the following command:
+
+       set DOS4G=quiet
+
+     Do not insert a space between DOS4G and the equal sign.  A space to the
+     right of the equal sign is optional.
+
+1.2 Changing the Switch Mode Setting
+
+     In almost all cases, DOS/4GW programs can detect the type of machine that
+     is running and automatically choose an appropriate real- to protected-mode
+     switch technique.  For the few cases in which this default setting does
+     not work we provide the DOS16M DOS environment variable, which overrides
+     the default setting.
+
+     Change the switch mode settings by issuing the following command:
+
+       set DOS16M=value
+
+     Do not insert a space between DOS16M and the equal sign.  A space to the
+     right of the equal sign is optional.
+
+     The table below lists the machines and the settings you would use with
+     them.  Many settings have mnemonics, listed in the column "Alternate
+     Name", that you can use instead of the number.  Settings that you must set
+     with the DOS16M variable have the notation req'd in the first column.
+     Settings you may use are marked option, and settings that will
+     automatically be set are marked auto.
+
+
+
+
+
+
+
+
+
+                                           Changing the Switch Mode Setting   1Chapter 1
+-------------------------------------------------------------------------------
+
++-------+---------------+-------+----------+-----------------------------------+
+|       |               |       |Alternate |                                   |
+|Status |Machine        |Setting|Name      |Comment                            |
++-------+---------------+-------+----------+-----------------------------------+
+|auto   |386/486 w/ DPMI|0      |None      |Set automatically if DPMI is active|
+|req'd  |NEC 98-series  |1      |9801      |Must be set for NEC 98-series      |
+|auto   |PS/2           |2      |None      |Set automatically for PS/2         |
+|auto   |386/486        |3      |386, 80386|Set automatically for 386 or 486   |
+|auto   |386            |INBOARD|None      |386 with Intel Inboard             |
+|req'd  |Fujitsu FMR-70 |5      |None      |Must be set for Fujitsu FMR-70     |
+|auto   |386/486 w/ VCPI|11     |None      |Set automatically if VCPI detected |
+|req'd  |Hitachi B32    |14     |None      |Must be set for Hitachi B32        |
+|req'd  |OKI if800      |15     |None      |Must be set for OKI if800          |
+|option |IBM PS/55      |16     |None      |May be needed for some PS/55s      |
++-------+---------------+-------+----------+-----------------------------------+
+
+     The following procedure shows you how to test the switch mode setting.
+
+       1. If you have one of the machines listed below, set the DOS16M
+         environment variable to the value shown for that machine and specify a
+         range of extended memory.  For example, if your machine is an NEC
+         98-series, set DOS16M=1 @2M-4M.  See the section, "Fine Control of
+         Memory Usage" later in this chapter for more information about setting
+         the memory range.
+
+            +--------------------+---------+
+            | Machine            | Setting |
+            +--------------------+---------+
+            | NEC 98-series      | 1       |
+            | Fujitsu FMR-60,-70 | 5       |
+            | Hitachi B32        | 14      |
+            | OKI if800          | 15      |
+            +--------------------+---------+
+
+         Before running DOS/4GW applications, check the switch mode setting by
+         following this procedure:
+
+       2. Run PMINFO and note the switch setting reported on the last line of
+         the display.  (PMINFO, which reports on the protected-mode resources
+         available to your programs, is described in more detail in the
+         chapter, "Utilities".)
+
+         If PMINFO runs, the setting is usable on your machine.
+
+       3. If you changed the switch setting, add the new setting to your
+         AUTOEXEC.BAT file.
+
+     Note:  PMINFO will run successfully on 286 machines.  If your DOS/4GW
+     application does not run, and PMINFO does, check the CPU type reported on
+     the first line of the display.
+
+2   Changing the Switch Mode Setting                                                            Configuring DOS/4GW
+-------------------------------------------------------------------------------
+
+     You are authorized (and encouraged) to distribute PMINFO to your
+     customers.  You may also include a copy of this section in your
+     documentation.
+
+1.3 Fine Control of Memory Usage
+
+     In addition to setting the switch mode as described above, the DOS16M
+     environment variable enables you to specify which portion of extended
+     memory DOS/4GW will use.  The variable also allows you to instruct DOS/4GW
+     to search for extra memory and use it if it is present.
+
+1.3.1 Specifying a Range of Extended Memory
+
+     Normally, you don't need to specify a range of memory with the DOS16M
+     variable.  You must use the variable, however, in the following cases:
+
+       * You are running on a Fujitsu FMR-series, NEC 98-series, OKI
+        if800-series or Hitachi B-series machine.
+
+       * You have older programs that use extended memory but don't follow one
+        of the standard disciplines.
+
+       * You want to shell out of DOS/4GW to use another program that requires
+        extended memory.
+
+     If none of these conditions applies to you, you can skip this section.
+
+     The general syntax is:
+
+       set DOS16M= [switch_mode] [@start_address [- end_address]] [:size]
+
+     In the syntax shown above, start_address, end_address and size represent
+     numbers, expressed in decimal or in hexadecimal (hex requires a 0x
+     prefix).  The number may end with a K to indicate an address or size in
+     kilobytes, or an M to indicate megabytes.  If no suffix is given, the
+     address or size is assumed to be in kilobytes.  If both a size and a range
+     are specified, the more restrictive interpretation is used.
+
+     The most flexible strategy is to specify only a size.  However, if you are
+     running with other software that does not follow a convention for
+     indicating its use of extended memory, and these other programs start
+     before DOS/4GW, you will need to calculate the range of memory used by the
+     other programs and specify a range for DOS/4GW programs to use.
+
+     DOS/4GW ignores specifications (or parts of specifications) that conflict
+     with other information about extended memory use.  Below are some examples
+     of memory usage control:
+
+
+
+
+                                               Fine Control of Memory Usage   3Chapter 1
+-------------------------------------------------------------------------------
+
+     set DOS16M= 1 @2m-4m    Mode 1, for NEC 98-series machines, and use
+                             extended memory between 2.0 and 4.0MB.
+
+     set DOS16M= :1M         Use the last full megabyte of extended memory, or
+                             as much as available limited to 1MB.
+
+     set DOS16M= @2m         Use any extended memory available above 2MB.
+
+     set DOS16M= @ 0 - 5m    Use any available extended memory from 0.0 (really
+                             1.0) to 5.0MB.
+
+     set DOS16M= :0          Use no extended memory.
+
+     As a default condition DOS/4GW applications take all extended memory that
+     is not otherwise in use.  Multiple DOS/4GW programs that execute
+     simultaneously will share the reserved range of extended memory.  Any
+     non-DOS/4GW programs started while DOS/4GW programs are executing will
+     find that extended memory above the start of the DOS/4GW range is
+     unavailable, so they may not be able to run.  This is very safe.  There
+     will be a conflict only if the other program does not check the BIOS
+     configuration call (Interrupt 15H function 88H, get extended memory size).
+
+     To create a private pool of extended memory for your DOS/4GW application,
+     use the PRIVATXM program, described in the chapter, "Utilities".
+
+     The default memory allocation strategy is to use extended memory if
+     available, and overflow into DOS (low) memory.
+
+     In a VCPI or DPMI environment, the start_address and end_address arguments
+     are not meaningful.  DOS/4GW memory under these protocols is not allocated
+     according to specific addresses because VCPI and DPMI automatically
+     prevent address conflicts between extended memory programs.  You can
+     specify a size for memory managed by VCPI or DPMI, but DOS/4GW will not
+     necessarily allocate this memory from the highest available extended
+     memory address, as it does for memory managed under other protocols.
+
+1.3.2 Using Extra Memory
+
+     Some machines contain extra non-extended, non-conventional memory just
+     below 16MB.  When DOS/4GW runs on a Compaq 386, it automatically uses this
+     memory because the memory is allocated according to a certain protocol,
+     which DOS/4GW follows.  Other machines have no protocol for allocating
+     this memory.  To use the extra memory that may exist on these machines,
+     set DOS16M with the + option.
+
+       set DOS16M=+
+
+     Setting the + option causes DOS/4GW to search for memory in the range from
+     FA0000 to FFFFFF and determine whether the memory is usable.  DOS/4GW does
+     this by writing into the extra memory and reading what it has written.  In
+
+4   Fine Control of Memory Usage                                                            Configuring DOS/4GW
+-------------------------------------------------------------------------------
+
+     some cases, this memory is mapped for DOS or BIOS usage, or for other
+     system uses.  If DOS/4GW finds extra memory that is mapped this way, and
+     is not marked read-only, it will write into that memory.  This will cause
+     a crash, but won't have any other effect on your system.
+
+1.4 Setting Runtime Options
+
+     The DOS16M environment variable sets certain runtime options for all
+     DOS/4GW programs running on the same system.
+
+     To set the environment variable, the syntax is:
+
+       set DOS16M=[switch_mode_setting]^options.
+
+     Note:  Some command line editing TSRs, such as CED, use the caret (^) as a
+     delimiter.  If you want to set DOS16M using the syntax above while one of
+     these TSRs is resident, modify the TSR to use a different delimiter.
+
+     These are the options:
+
+     0x01       check A20 line -- This option forces DOS/4GW to wait until the
+                A20 line is enabled before switching to protected mode.  When
+                DOS/4GW switches to real mode, this option suspends your
+                program's execution until the A20 line is disabled, unless an
+                XMS manager (such as HIMEM.SYS) is active.  If an XMS manager
+                is running, your program's execution is suspended until the A20
+                line is restored to the state it had when the CPU was last in
+                real mode.  Specify this option if you have a machine that runs
+                DOS/4GW but is not truly AT-compatible.  For more information
+                on the A20 line, see the section, "Controlling Address Line
+                A20" in this chapter.
+
+     0x02       prevent initialization of VCPI -- By default, DOS/4GW searches
+                for a VCPI server and, if one is present, forces it on.  This
+                option is useful if your application does not use EMS
+                explicitly, is not a resident program, and may be used with
+                386-based EMS simulator software.
+
+     0x04       directly pass down keyboard status calls -- When this option is
+                set, status requests are passed down immediately and
+                unconditionally.  When disabled, pass-downs are limited so the
+                8042 auxiliary processor does not become overloaded by keyboard
+                polling loops.
+
+     0x10       restore only changed interrupts -- Normally, when a DOS/4GW
+                program terminates, all interrupts are restored to the values
+                they had at the time of program startup.  When you use this
+                option, only the interrupts changed by the DOS/4GW program are
+                restored.
+
+
+                                                    Setting Runtime Options   5Chapter 1
+-------------------------------------------------------------------------------
+
+     0x20       set new memory to 00 -- When DOS/4GW allocates a new segment or
+                increases the size of a segment, the memory is zeroed.  This
+                can help you find bugs having to do with uninitialized memory.
+                You can also use it to provide a consistent working environment
+                regardless of what programs were run earlier.  This option only
+                affects segment allocations or expansions that are made through
+                the DOS/4GW kernel (with DOS function 48H or 4AH).  This option
+                does not affect memory allocated with a compiler's malloc
+                function.
+
+     0x40       set new memory to FF -- When DOS/4GW allocates a new segment or
+                increases the size of a segment, the memory is set to 0xFF
+                bytes.  This is helpful in making reproducible cases of bugs
+                caused by using uninitialized memory.  This option only affects
+                segment allocations or expansions that are made through the
+                DOS/4GW kernel (with DOS function 48H or 4AH).  This option
+                does not affect memory allocated with a compiler's malloc
+                function.
+
+     0x80       new selector rotation -- When DOS/4GW allocates a new selector,
+                it usually looks for the first available (unused) selector in
+                numerical order starting with the highest selector used when
+                the program was loaded.  When this option is set, the new
+                selector search begins after the last selector that was
+                allocated.  This causes new selectors to rotate through the
+                range.  Use this option to find references to stale selectors,
+                i.e., segments that have been cancelled or freed.
+
+1.5 Controlling Address Line 20
+
+     This section explains how DOS/4GW uses address line 20 (A20) and describes
+     the related DOS16M environment variable settings.  It is unlikely that you
+     will need to use these settings.
+
+     Because the 8086 and 8088 chips have a 20-bit address spaces, their
+     highest addressable memory location is one byte below 1MB.  If you specify
+     an address at 1MB or over, which would require a twenty-first bit to set,
+     the address wraps back to zero.  Some parts of DOS depend on this wrap, so
+     on the 286 and 386, the twenty-first address bit is disabled.  To address
+     extended memory, DOS/4GW enables the twenty-first address bit (the A20
+     line).  The A20 line must be enabled for the CPU to run in protected mode,
+     but it may be either enabled or disabled in real mode.
+
+     By default, when DOS/4GW returns to real mode, it disables the A20 line.
+     Some software depends on the line being enabled.  DOS/4GW recognizes the
+     most common software in this class, the XMS managers (such as HIMEM.SYS),
+     and enables the A20 line when it returns to real mode if an XMS manager is
+     present.  For other software that requires the A20 line to be enabled, use
+     the A20 option.  The A20 option makes DOS/4GW restore the A20 line to the
+
+
+6   Controlling Address Line 20                                                            Configuring DOS/4GW
+-------------------------------------------------------------------------------
+
+     setting it had when DOS/4GW switched to protected mode.  Set the
+     environment variable as follows:
+
+       set DOS16M= A20
+
+     To specify more than one option on the command line, separate the options
+     with spaces.
+
+     The DOS16M variable also lets you to specify the length of the delay
+     between a DOS/4GW instruction to change the status of the A20 line and the
+     next DOS/4GW operation.  By default, this delay is 1 loop instruction when
+     DOS/4GW is running on a 386 machine.  In some cases, you may need to
+     specify a longer delay for a machine that will run DOS/4GW but is not
+     truly AT-compatible.  To change the delay, set DOS16M to the desired
+     number of loop instructions, preceded by a comma:
+
+       set DOS16M=,loops
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                Controlling Address Line 20   7Chapter 1
+-------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+8   Controlling Address Line 20
+
+
+2 VMM
+
+
+     The Virtual Memory Manager (VMM) uses a swap file on disk to augment RAM.
+     With VMM you can use more memory than your machine actually has.  When RAM
+     is not sufficient, part of your program is swapped out to the disk file
+     until it is needed again.  The combination of the swap file and available
+     RAM is the virtual memory.
+
+     Your program can use VMM if you set the DOS environment variable, DOS4GVM,
+     as follows.  To set the DOS4GVM environment variable, use the format shown
+     below.
+
+       set DOS4GVM= [option[#value]] [option[#value]]
+
+     A "#" is used with options that take values since the DOS command shell
+     will not accept "=".
+
+     If you set DOS4GVM equal to 1, the default parameters are used for all
+     options.
+
+     Example:
+       C>set DOS4GVM=1
+
+2.1 VMM Default Parameters
+
+     VMM parameters control the options listed below.
+
+     MINMEM      The minimum amount of RAM managed by VMM.  The default is
+                 512KB.
+
+     MAXMEM      The maximum amount of RAM managed by VMM.  The default is 4MB.
+
+     SWAPMIN     The minimum or initial size of the swap file.  If this option
+                 is not used, the size of the swap file is based on VIRTUALSIZE
+                 (see below).
+
+     SWAPINC     The size by which the swap file grows.
+
+     SWAPNAME    The swap file name.  The default name is "DOS4GVM.SWP".  By
+                 default the file is in the root directory of the current
+                 drive.  Specify the complete path name if you want to keep the
+                 swap file somewhere else.
+
+     DELETESWAP  Whether the swap file is deleted when your program exits.  By
+                 default the file is not deleted.  Program startup is quicker
+                 if the file is not deleted.
+
+     VIRTUALSIZE The size of the virtual memory space.  The default is 16MB.
+
+
+                                                     VMM Default Parameters   9Chapter 2
+-------------------------------------------------------------------------------
+
+2.2 Changing the Defaults
+
+     You can change the defaults in two ways.
+
+       1. Specify different parameter values as arguments to the DOS4GVM
+         environment variable, as shown in the example below.
+
+           set DOS4GVM=deleteswap maxmem#8192
+
+       2. Create a configuration file with the filetype extension ".VMC", and
+         call that as an argument to the DOS4GVM environment variable, as shown
+         below.
+
+           set DOS4GVM=@NEW4G.VMC
+
+2.2.1 The .VMC File
+
+     A ".VMC" file contains VMM parameters and settings as shown in the example
+     below.  Comments are permitted.  Comments on lines by themselves are
+     preceded by an exclamation point (!).  Comments that follow option
+     settings are preceded by white space.  Do not insert blank lines:
+     processing stops at the first blank line.
+
+       !Sample .VMC file
+       !This file shows the default parameter values.
+       minmem = 512            At least 512K bytes of RAM is required.
+       maxmem = 4096           Uses no more than 4MB of RAM
+       virtualsize = 16384     Swap file plus allocated memory is 16MB
+       !To delete the swap file automatically when the program exits, add
+       !deleteswap
+       !To store the swap file in a directory called SWAPFILE, add
+       !swapname = c:\swapfile\dos4gvm.swp
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+10  Changing the Defaults
+

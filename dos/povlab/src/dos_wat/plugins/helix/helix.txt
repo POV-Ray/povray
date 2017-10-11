@@ -1,0 +1,129 @@
+
+This is a quick help file for the POVLAB plugin "helix.exe" by Robert
+Hodkinson.
+
+POVLAB 3.2 and later is needed to use this plugin.
+
+Some brief explanations for those of you that are slightly confused over the
+terms i have used in the interface you see within POVLAB.
+
+All of the options here can be used in _any_ combination.
+
+NOTE: please note where non integer values are not acceptable (pretty
+      obvious when you think about it), if non integer values are entered,
+      the fractional part will be discarded.
+
+
+Helix Radius Start: (integer and floating)
+----------
+This is the starting radius of the helix.
+
+
+Helix Radius End: (integer and floating)
+--------
+This is the ending radius of the helix.
+
+
+Helix Length: (integer and floating)
+-------------
+This is the total length of the helix.  If a +ve number is given the
+Helix is created from 0 in the Y axis, to the +ve value given.  If a -ve
+value is given a Helix is created from 0 in the Y axis to the -ve value
+given.
+
+
+Objects per Rev: (integer)
+----------------
+This is the total number of objects to use per 360 degree revolution in a
+single arm of the Helix.
+
+
+Length per Rev: (integer and floating)
+---------------
+This is the length taken for the helix to complete one 360 degree revolution.
+
+eg.  if 'helix length' = 10, 'length per rev' = 20, 'objects per rev' = 40,
+     a one half revolution of a helix will be made containing 20 objects.
+
+
+Helix offset X, Helix offset Y, Helix offset Z: (integer and floating)
+-----------------------------------------------
+This is to enable the helix to be moved about in three dimentional space.
+
+
+Helix Rotate Y: (integer and floating)
+---------------
+This is to enable rotation of the _entire_ helix being created.
+
+
+Object No start: (integer)
+----------------
+This is to enable a non zero numbered object to be chosen as the first
+object created in the helix.
+
+
+Scale object X, Scale object Y, Scale object Z: (integer and floating)
+-----------------------------------------------
+This enables you to scale the object within the helix.
+
+
+Rotate object X, Rotate object Y, Rotate object Z: (integer and floating)
+--------------------------------------------------
+This enables you to rotate each object within the helix.
+
+
+Sphere/Cube object: (one choice only)
+-------------------
+This is the current list of objects that can be used as helix elements.
+
+
+Single/Double/Triple/Quadruple/Quintiple/Hextaple Helix: (one choice)
+--------------------------------------------------------
+These are the number of helix elements that can be used to create the helix.
+A double helix will create the familiar DNA shape.
+
+
+Clockwise/Anticlockwise: (one choice)
+------------------------
+This is where you can decide weather your helix rotates in the clockwise
+or anticlockwise direction.
+
+eg. If a +ve helix length and clockwise options are chosen.  Then the helix
+is created clockwise when looking down from the +ve Y axis, if a -ve length
+and the clockwise option is chosen the helix is created anticlockwise!
+
+
+Face object inwards: (check or un-check)
+--------------------
+If you wish all the objects within the helix to face towards the center of
+the helix, check this option (the same face of each object will face the
+center of the helix).
+
+
+Random notes and hints.
+-----------------------
+To create a straight cylinder start and end radius are the same.
+
+To create s cone helix, start and end values need to be different.
+
+You can create a double cone (points touching) by having one -ve radius and
+one +ve radius.
+
+At the moment of writing a 'flat' spiral of objects (0 helix length) is not
+possible, the helix length has to be slightly greater or less than zero.
+eg. 0.000001 will work.
+
+If you create a helix with many objects, then butt up another helix of
+objects, the join will not be perfect because of rounding errors, you can
+compensate this by fiddling with the 'Helix Rotate Y' option.
+
+END OF FILE.
+
+
+
+
+
+
+
+
+

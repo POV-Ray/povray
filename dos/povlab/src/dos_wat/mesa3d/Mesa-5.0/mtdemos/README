@@ -1,0 +1,24 @@
+
+Mesa Multithreaded Demos README
+-------------------------------
+
+  This directory contains demos programs which can be used to verify
+proper operation of an MT-safe build of Mesa.  Some of these demos
+are non-portable at present, but will be more generally useful in 
+future versions of Mesa. 
+
+  To build the demo(s), just type "make" in conjunction with the same
+build target you used to build the MT-safe Mesa lib.
+
+Examples:
+  make -f Makefile.X11 sunos5-pthread      (for Solaris 2.[56] with POSIX threads)
+  make -f Makefile.X11 linux-386-pthread   (for Linux 2.x systems with Linux threads)
+
+
+If you have questions or problems with these demo programs, send email
+to John Stone or Cristoph Poliwoda.  (see README.THREADS in top level 
+Mesa directory)
+
+mt_osdemo.c -- Renders using multiple threads, and one ore more osmesa 
+               rendering contexts.  Requires pthreads currently.
+

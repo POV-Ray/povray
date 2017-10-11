@@ -1,0 +1,206 @@
+# Makefile.in --- Mesa GL Widget for X11 Toolkit Programming
+# Copyright (C) 1995 by
+#   Jeroen van der Zijp <jvz@cyberia.cfdrc.com>
+#   Thorsten Ohl <Thorsten.Ohl@Physik.TH-Darmstadt.de>
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Library General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Library General Public License for more details.
+#
+# You should have received a copy of the GNU Library General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# $Id: Makefile.in,v 1.1.1.1 1999/08/19 00:55:43 jtg Exp $
+#
+########################################################################
+
+CFLAGS = -O
+LDFLAGS =
+
+########################################################################
+# autoconf(1):
+########################################################################
+
+SHELL = /bin/sh
+
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+mesa_srcdir = @mesa_srcdir@
+VPATH = @srcdir@
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+binprefix =
+manprefix =
+
+bindir = $(exec_prefix)/bin
+libdir = $(prefix)/lib
+srcincdir = $(top_srcdir)/include/GL
+
+CC = @CC@
+CPP = @CPP@
+
+CPPFLAGS = @CPPFLAGS@ -I$(mesa_srcdir)/include -I$(top_srcdir)/include
+DEFS = @DEFS@
+
+SYS_CFLAGS = @SYS_CFLAGS@
+X_CFLAGS = @X_CFLAGS@ @HAVE_XMU@
+
+ARFLAGS = @ARFLAGS@
+RANLIB = @RANLIB@
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+
+MOTIF_OBJS = @MOTIF_OBJS@
+
+XAW_LIBS = @XAW_LIBS@
+MOTIF_LIBS = @MOTIF_LIBS@
+
+########################################################################
+# No user serviceable parts below!
+########################################################################
+
+ALL_CFLAGS = $(DEFS) $(SYS_CFLAGS) $(X_CFLAGS) $(CFLAGS)
+OBJS = GLwDrawingArea.o MesaDrawingArea.o MesaWorkstation.o \
+       GLwDrawingAreaMakeCurrent.o GLwDrawingAreaSwapBuffers.o \
+       GLwMakeCurrent.o
+
+.SUFFIXES:
+.SUFFIXES: .c .o
+
+.c.o:
+	$(CC) $(CPPFLAGS) $(ALL_CFLAGS) -c $<
+
+all: $(XAW_LIBS) $(MOTIF_LIBS)
+
+libMesaGLw.a: $(OBJS)
+	ar $(ARFLAGS) $@ $(OBJS)
+	-$(RANLIB) $@
+
+libMesaGLwM.a: $(MOTIF_OBJS)
+	ar $(ARFLAGS) $@ $(MOTIF_OBJS)
+	-$(RANLIB) $@
+
+install: all
+	$(INSTALL_DATA) $(XAW_LIBS) $(MOTIF_LIBS) $(libdir)
+
+uninstall:
+	for i in $(XAW_LIBS) $(MOTIF_LIBS) ; do \
+		rm -f $(libdir)/$$i \
+	done
+
+# Standard GNU clean* targets:
+maintainer-clean: clean
+	@echo "This command is intended for maintainers to use;"
+	@echo "it deletes files that may require special tools to rebuild."
+
+mostlyclean: clean
+
+distclean: clean
+	rm -f Makefile config.cache
+
+clean:
+	rm -f $(XAW_LIBS) $(MOTIF_LIBS) *.o .*~ *~
+
+# Additional clean* targets:
+realclean: distclean
+	rm -f configure
+
+# GNU autoconf(1) targets:
+Makefile: Makefile.in $(top_srcdir)/config.status
+	cd $(top_srcdir); $(SHELL) config.status
+
+#
+depend:
+	gcc -M $(CPPFLAGS) *.c | \
+	  sed -e 's|/usr[^ ]*||g' \
+	      -e 's|\.\./include/GL|\$$(srcincdir)|g' \
+	      -e '/^ *\\$$/d'
+
+# slightly edited:
+
+GLwCreateMDrawingArea.o: \
+  GLwCreateMDrawingArea.c \
+  $(srcincdir)/GLwMDrawA.h \
+  $(srcincdir)/GLwDrawA.h
+
+GLwDrawingArea.o: \
+  GLwDrawingArea.c \
+  $(srcincdir)/GLwDrawAP.h \
+  $(srcincdir)/GLwDrawA.h
+
+GLwDrawingAreaMakeCurrent.o: GLwDrawingAreaMakeCurrent.c
+GLwDrawingAreaSwapBuffers.o: GLwDrawingAreaSwapBuffers.c
+
+GLwMDrawingArea.o: \
+  GLwMDrawingArea.c \
+  GLwDrawingArea.c \
+  $(srcincdir)/GLwMDrawAP.h \
+  $(srcincdir)/GLwDrawAP.h $(srcincdir)/GLwMDrawA.h \
+  $(srcincdir)/GLwDrawA.h
+
+GLwMMakeCurrent.o: \
+  GLwMMakeCurrent.c \
+  $(srcincdir)/MesaMDrawingAreaP.h \
+  $(srcincdir)/MesaDrawingAreaP.h \
+  $(srcincdir)/GLwDrawAP.h \
+  $(srcincdir)/GLwMDrawA.h \
+  $(srcincdir)/GLwDrawA.h \
+  $(srcincdir)/MesaDrawingArea.h
+
+GLwMakeCurrent.o: \
+  GLwMakeCurrent.c  \
+  $(srcincdir)/MesaDrawingAreaP.h \
+  $(srcincdir)/GLwDrawAP.h \
+  $(srcincdir)/GLwDrawA.h \
+  $(srcincdir)/MesaDrawingArea.h
+
+MesaDrawingArea.o: \
+  MesaDrawingArea.c \
+  $(srcincdir)/MesaDrawingAreaP.h \
+  $(srcincdir)/GLwDrawAP.h \
+  $(srcincdir)/GLwDrawA.h \
+  $(srcincdir)/MesaDrawingArea.h
+
+MesaMDrawingArea.o: \
+  MesaMDrawingArea.c \
+  MesaDrawingArea.c \
+  $(srcincdir)/MesaMDrawingAreaP.h \
+  $(srcincdir)/MesaDrawingAreaP.h \
+  $(srcincdir)/GLwDrawAP.h \
+  $(srcincdir)/GLwMDrawA.h \
+  $(srcincdir)/GLwDrawA.h \
+  $(srcincdir)/MesaDrawingArea.h
+
+MesaWorkstation.o: \
+  MesaWorkstation.c \
+  $(srcincdir)/MesaWorkstationP.h \
+  $(srcincdir)/MesaDrawingAreaP.h \
+  $(srcincdir)/GLwDrawAP.h \
+  $(srcincdir)/GLwDrawA.h  \
+  $(srcincdir)/MesaDrawingArea.h \
+  $(srcincdir)/MesaWorkstation.h
+
+MesaMWorkstation.o: \
+  MesaMWorkstation.c \
+  MesaWorkstation.c \
+  $(srcincdir)/MesaWorkstationP.h \
+  $(srcincdir)/MesaMWorkstationP.h \
+  $(srcincdir)/MesaWorkstation.h \
+  $(srcincdir)/MesaMWorkstation.h \
+  $(srcincdir)/MesaMDrawingAreaP.h \
+  $(srcincdir)/MesaDrawingAreaP.h \
+  $(srcincdir)/GLwDrawAP.h \
+  $(srcincdir)/GLwMDrawA.h \
+  $(srcincdir)/GLwDrawA.h \
+  $(srcincdir)/MesaDrawingArea.h
+
+# The End.

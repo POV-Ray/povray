@@ -1,0 +1,46 @@
+"FONTESGR" FONTS
+----------------
+
+FONT LIST
+---------
+POVLAB contains also TrueType fonts :
+
+  - Balcco Bold
+  - Candle Bold
+  - Candle Bold Italique
+  - Cargo Bold
+  - Dekko
+  - Inca
+  - Sleed Medium
+  - Wire Book.
+
+The shareware versions of BALCCO BOLD, CANDLE BOLD, CARGO MEDIUM, SLEED MEDIUM
+and WIRE BOOK are without accentued chars. The complete versions can be
+found at the adress at the end of this text.
+
+COPYRIGHT
+---------
+BALCCO BOLD, CANDLE BOLD, CARGO MEDIUM, DEKKO, INCA, SLEED MEDIUM and
+WIRE BOOK are copyrighted by Guy ROGER. When you acquire the original
+disk version of these fonts, you can only use them on one computer at
+one time. You can only use them in personal, commercial or publicy documents,
+only made on your computer.
+
+All rights are retained by the author and are protected under French laws.
+Fonts should be use as any copyrighted documents (as books).
+You can't copy, distribute, sell or give these fonts without the explicit consent
+of the author.
+
+All diffusions, free of charge anyway, can be done after you have contacted
+the author.
+French law of 11 march 1957 for books and artistic productions.
+
+AUTHOR
+------
+Guy ROGER
+Multimedia Designer
+3 Jardin Montaigne
+37300 JOUE LES TOURS
+FRANCE
+(33) 47672071
+

@@ -1,0 +1,28 @@
+=head1 NAME
+
+GLwDrawingAreaSwapBuffers - swap buffers in a GLwDrawingArea.
+
+=head1 SYNOPSIS
+
+  #include <GL/GLwDrawA.h>
+  void GLwDrawingAreaSwapBuffers(w)
+       Widget w;
+
+=head1 DESCRIPTION
+
+=over 4
+
+=item GLwDrawingAreaSwapBuffers
+
+is a front end to I<glXSwapBuffers>, however instead of passing in a
+Display and a Window, a Widget is passed in.
+
+=back
+
+=head1 RELATED INFORMATION
+
+L<GLwMDrawingArea>, L<glXSwapBuffers>.
+
+=head1 DATE
+
+$Id: GLwDrawingAreaSwapBuffers.pod,v 1.1.1.1 1999/08/19 00:55:42 jtg Exp $

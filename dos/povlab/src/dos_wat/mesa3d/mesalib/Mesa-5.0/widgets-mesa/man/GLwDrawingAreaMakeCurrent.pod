@@ -1,0 +1,29 @@
+=head1 NAME
+
+GLwDrawingAreaMakeCurrent - Make the current GLwDrawingArea current.
+
+=head1 SYNOPSIS
+
+  #include <GL/GLwDrawA.h>
+  void GLwDrawingAreaMakeCurrent(w, ctx)
+       Widget w;
+       GLXContext ctx;
+
+=head1 DESCRIPTION
+
+=over 4
+
+=item GLwDrawingAreaMakeCurrent
+
+is a front end to I<glXMakeCurrent>, however instead of passing in a
+Display and a Window, a Widget is passed in.
+
+=back
+
+=head1 RELATED INFORMATION
+
+L<GLwMDrawingArea>, L<glXMakeCurrent>.
+
+=head1 DATE
+
+$Id: GLwDrawingAreaMakeCurrent.pod,v 1.1.1.1 1999/08/19 00:55:42 jtg Exp $

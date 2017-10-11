@@ -1,0 +1,42 @@
+; Script for building Mesa and example programs for Amiga
+
+if not exists lib
+makedir lib
+endif
+
+echo "Making MESAGL.LIB"
+cd src
+smake amiga
+cd /
+
+echo "Making MesaGLU.LIB"
+cd src-glu
+smake amiga
+cd /
+
+echo "Making Mesaaux.LIB"
+cd src-aux
+smake amiga
+cd /
+
+echo "Making Mesatk.LIB"
+cd src-tk
+smake amiga
+cd /
+
+echo "Making book examples."
+cd book
+smake amiga
+cd /
+
+echo "Making sample code."
+cd samples
+smake amiga
+cd /
+
+echo "Making demo code."
+cd demos
+smake amiga
+cd /
+
+echo "Finished making all libraries and programs."

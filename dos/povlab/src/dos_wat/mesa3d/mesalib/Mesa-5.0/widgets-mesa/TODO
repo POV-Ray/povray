@@ -1,0 +1,53 @@
+Some of the things hat need to be done:
+
+GLwDrawingArea:
+***************
+
+  * Handle all resources, conform to the manpage.
+
+
+MesaDrawingArea:
+****************
+
+  * Implement the missing resources that are not inherited from
+  GLwDrawingArea, callbacks in particular.
+
+  * Check Motif support with ``real'' Motif.
+
+  * Implement the shareListWith resource
+
+MesaWorkstation:
+****************
+
+  * Finish the Motif support, in particular the keyboard translations.
+
+  * Rethink the geometry for views to make sure it is intuitive.
+
+  * Sanitize the translations for controlling parametrized views.
+
+  * Maybe implement a MapleV style viewing cube.
+
+  * Rethink Redraw events to find a way for adding backing store.
+
+
+Demos:
+******
+
+  * finish the Motif version of the event display demo.
+
+  * write the Motif version of the tea demo.
+
+  * Fix the colormapping in the Motif demos.
+
+
+Documentation:
+**************
+
+  * As always :-( ...
+
+
+
+$Id: TODO,v 1.1.1.1 1999/08/19 00:55:42 jtg Exp $
+Local Variables:
+mode:indented-text
+End:

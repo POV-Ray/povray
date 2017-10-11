@@ -1,0 +1,29 @@
+.TH uglMesaGetSetColor "3" "AOUT 2001" "WindML/Mesa" "WRS"
+
+.SH NAME
+uglMesaSetColor \- Make color allocation in indexed mode
+
+.SH SYNOPSIS
+.B #include <GL/uglmesa.h>
+.PP
+.BI "GLboolean uglMesaSetColor(GLubyte " index ", GLfloat " red ", GLfloat " green ", GLfloat " blue );
+
+.SH DESCRIPTION
+The \fBuglMesaSetColor\fR function makes color allocation in indexed mode.
+.PP
+This function does nothing in RGB mode.
+
+.SH INPUT VALUES
+\fIindex\fR - Value for the current color index
+.PP
+\fIred\fR - Red component (between 0 and 1)
+.PP
+\fIgreen\fR - Green component (between 0 and 1)
+.PP
+\fIblue\fR - Blue component (between 0 and 1)
+
+.SH RETURN VALUES
+GL_TRUE if success, or GL_FALSE if \fIindex\fR<0 or clutSize<\fIindex\fR, \fIred\fR, \fIgreen\fR and \fIblue\fR are not between 0.0 and 1.0.
+
+.SH COPYRIGHT
+Copyright \(co 2001 Wind River Systems, Inc.

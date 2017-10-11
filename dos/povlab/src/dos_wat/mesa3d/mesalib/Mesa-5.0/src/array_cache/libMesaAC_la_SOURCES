@@ -1,0 +1,5 @@
+libMesaAC_la_SOURCES = \
+	ac_context.c \
+	ac_context.h \
+	ac_import.c \
+	acache.h

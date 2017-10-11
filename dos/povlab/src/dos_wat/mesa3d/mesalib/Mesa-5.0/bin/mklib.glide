@@ -1,0 +1,68 @@
+#!/bin/sh
+
+# Make a Linux ELF shared library, including 3Dfx Glide libs
+
+#--identification------------------------------------------------------
+
+# $Id: mklib.glide,v 1.7 2001/11/15 19:49:36 brianp Exp $
+
+#--common--------------------------------------------------------------
+
+LIBRARY=$1
+shift 1
+
+MAJOR=$1
+shift 1
+
+MINOR=$1
+shift 1
+
+TINY=$1
+shift 1
+
+OBJECTS=$*
+
+#--platform------------------------------------------------------------
+
+if [ $LIBRARY = "libGL.so" ] ; then
+    GLIDELIBS="-L/usr/local/glide/lib -lglide2x -lm"
+fi
+
+
+# the following provided by Thomas Hiller (Hiller@tu-harburg.d400.de)
+
+VERSION="${MAJOR}.${MINOR}"
+
+LIBNAME=`basename $LIBRARY`
+ARNAME=`basename $LIBNAME .so`.a
+DIRNAME=`dirname $LIBRARY`
+
+if [ $LIBRARY = "libGL.so" ] ; then
+    EXTRA_FLAGS="-Xlinker -Bsymbolic"
+fi
+
+gcc ${EXTRA_FLAGS} -shared -Wl,-soname,${LIBNAME}.${MAJOR} -o ${LIBRARY}.${VERSION} ${OBJECTS} ${GLIDELIBS}
+(cd $DIRNAME; ln -s ${LIBNAME}.${VERSION} ${LIBNAME}.${MAJOR})
+
+ln -s ${LIBNAME}.${MAJOR} ${LIBRARY}
+
+
+# also make regular .a files,
+# provided by Danek Duvall (duvall@dhduvall.student.princeton.edu)
+
+ar ruv ${DIRNAME}/${ARNAME} ${OBJECTS}
+ranlib ${DIRNAME}/${ARNAME}
+
+
+# Print a reminder about shared libs:
+DIR=`cd .. ; pwd`
+echo
+echo "******Be sure to add" ${DIR}"/lib to your LD_LIBRARY_PATH variable"
+echo
+sleep 2
+
+
+
+#### NOTES:
+# One Mesa user reports having to run the "ldconfig -v" command to make
+# Linux aware of the shared libs.

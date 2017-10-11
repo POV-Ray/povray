@@ -1,0 +1,51 @@
+#!/bin/sh
+
+# Make a NetBSD shared library
+# contributed by Michael Graff (explorer@flame.org)
+# updated by Jarkko Hietaniemi (jarkko.hietaniemi@research.nokia.com)
+
+#--identification------------------------------------------------------
+
+# $Id: mklib.netbsd,v 1.2 1999/09/15 15:10:20 brianp Exp $
+
+# $Log: mklib.netbsd,v $
+# Revision 1.2  1999/09/15 15:10:20  brianp
+# added third, tiny version number to arguments
+#
+# Revision 1.1  1999/08/19 13:53:04  brianp
+# initial check-in (post-crash)
+#
+
+
+#--common--------------------------------------------------------------
+
+LIBRARY=$1
+shift 1
+
+MAJOR=$1
+shift 1
+
+MINOR=$1
+shift 1
+
+TINY=$1
+shift 1
+
+OBJECTS=$*
+
+#--platform------------------------------------------------------------
+
+set -x
+
+LIBRARY=`basename ${LIBRARY} .so`
+
+VERSION="${MAJOR}.${MINOR}"
+
+echo "Building PIC library $LIBRARY"
+rm -f ${LIBRARY}_pic.a ${LIBRARY}.so.${VERSION}
+ar cq ${LIBRARY}_pic.a ${OBJECTS}
+ranlib ${LIBRARY}_pic.a
+
+ld -x -Bshareable -Bforcearchive -o ${LIBRARY}.so.${VERSION} ${LIBRARY}_pic.a
+
+cp ${LIBRARY}_pic.a ${LIBRARY}.so.${VERSION} ../lib

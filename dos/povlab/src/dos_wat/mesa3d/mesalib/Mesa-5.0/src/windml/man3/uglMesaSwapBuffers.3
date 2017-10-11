@@ -1,0 +1,21 @@
+.TH uglMesaSwapBuffers "3" "AOUT 2001" "WindML/Mesa" "WRS"
+
+.SH NAME
+uglMesaSwapBuffers \- Swap front and back buffers in double buffering mode
+
+.SH SYNOPSIS
+.B #include <GL/uglmesa.h>
+.PP
+.BI "void uglMesaSwapBuffers (void);"
+
+.SH DESCRIPTION
+The \fBuglMesaSwapBuffers\fR function swaps front and back buffers in double buffering mode. This function is a no-op if there's no back buffer. 
+.PP
+In case of software double buffering a copy occurs from off-screen
+buffer to front buffer, thus it works faster with an hardware support.
+
+.SH RETURN VALUE
+No value is returned.
+
+.SH COPYRIGHT
+Copyright \(co 2001 Wind River Systems, Inc.

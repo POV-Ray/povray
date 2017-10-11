@@ -1,0 +1,156 @@
+# configure.in --- Mesa GL Widget for X11 Toolkit Programming
+# Copyright (C) 1995 by
+#   Jeroen van der Zijp <jvz@cyberia.cfdrc.com>
+#   Thorsten Ohl <Thorsten.Ohl@Physik.TH-Darmstadt.de>
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Library General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Library General Public License for more details.
+#
+# You should have received a copy of the GNU Library General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# $Id: configure.in,v 1.2 2000/06/17 14:45:49 tan Exp $
+#
+########################################################################
+AC_INIT([src/GLwDrawingArea.c])dnl
+AC_CANONICAL_HOST
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_CHECK_PROG([POD2MAN], [pod2man], [pod2man])dnl
+AC_CHECK_PROG([POD2HTML], [pod2html], [pod2html])dnl
+AC_PROG_RANLIB
+ARFLAGS="ruv"
+AC_SUBST([ARFLAGS])dnl
+AC_SUBST([SYS_CFLAGS])dnl
+AC_SUBST([SYS_LDFLAGS])dnl
+AC_PROG_CC
+test "$CC" = "gcc" && SYS_CFLAGS="$SYS_CFLAGS -pipe -Wall"
+AC_PROG_CPP
+# Query Brian Paul's database for compiling Mesa:
+case "$host" in
+  *-hp-hpux*)
+    SYS_CFLAGS="$SYS_CFLAGS -D_HPUX_SOURCE"
+    test "$CC" = "cc" || SYS_CFLAGS="$SYS_CFLAGS +O2 +Oall +Onolimit -Aa"
+    ;;
+  mips-sgi-irix4*)
+    test "$CC" = "cc" || SYS_CFLAGS="$SYS_CFLAGS -float"
+    ARFLAGS="rcv"
+    ;;
+  mips-sgi-irix5*)
+    # On IRIX 5.3 -sopt causes a problem in drawpixels.c so we don't use it
+    test "$CC" = "cc" || \
+      SYS_CFLAGS="$SYS_CFLAGS -ansi -float"
+    ARFLAGS="rcv"
+    ;;
+  mips-sgi-irix6*)
+    #   1068 - integer conversion resulted in a change of sign
+    #   1069 - integer conversion resulted in truncation
+    #   1174 - variable was declared but never referenced
+    #   1185 - enumerated type mixed with another type
+    #   1209 - controlling expression is constant
+    #   1474 - declaring a void parameter list with a typedef is nonstandard
+    #   1552 - variable was set but never used
+    test "$CC" = "cc" || \
+      SYS_CFLAGS="$SYS_CFLAGS"
+    ARFLAGS="rcv"
+    ;;
+  *-linux*)
+    SYS_CFLAGS="$SYS_CFLAGS -DSHM"
+    SYS_LDFLAGS="$SYS_LDFLAGS"
+    ;;
+  *-netbsd*)
+    ARFLAGS="rcv"
+    ;;
+  alpha-dec-osf*)
+    test "$CC" = "gcc" || SYS_CFLAGS="$SYS_CFLAGS -std1 -DSHM"
+    ;;
+  sparc-sun-solaris2*)
+    test "$CC" = "gcc" || SYS_CFLAGS="$SYS_CFLAGS -Xa"
+    ;;
+  *-ultrix*)
+    test "$CC" = "gcc" || SYS_CFLAGS="$SYS_CFLAGS -Dconst=/**/"
+    ARFLAGS="rusv"
+    ;;
+esac
+AC_PATH_XTRA
+# It has been reported that some vendors don't ship libXmu.
+# Allow to compile a stripped down widget set w/o the colormap functions.
+if test -n "$x_libraries"; then
+  ac_save_LDFLAGS="$LDFLAGS"
+  LDFLAGS="$LDFLAGS -L$x_libraries"
+  AC_CHECK_LIB(Xmu, XmuRegisterExternalAgent,
+               [XMU_LIB="-lXmu"; AC_DEFINE([HAVE_XMU])], , $X_EXTRA_LIBS)
+  LDFLAGS="$ac_save_LDFLAGS"
+fi
+AC_SUBST([HAVE_XMU])
+AC_SUBST([XMU_LIB])
+# Some vendors don't ship libXaw.
+if test -n "$x_libraries"; then
+  ac_save_LDFLAGS="$LDFLAGS"
+  LDFLAGS="$LDFLAGS -L$x_libraries"
+  AC_CHECK_LIB(Xaw, XawInitializeWidgetSet,
+               [XAW_LIB="-lXaw"
+                AC_DEFINE([HAVE_XAW])
+                XAW_DEMOS="cube mcube ed tea"
+                XAW_LIBS="libMesaGLw.a"],
+               [XAW_DEMOS=
+                XAW_LIBS=],
+               [$XMU_LIB -lXt -lX11 $X_EXTRA_LIBS])
+  LDFLAGS="$ac_save_LDFLAGS"
+fi
+AC_SUBST([HAVE_XAW])
+AC_SUBST([XAW_LIB])
+AC_SUBST([XAW_DEMOS])
+AC_SUBST([XAW_LIBS])dnl
+AC_HEADER_STDC
+AC_C_CONST
+AC_C_INLINE
+AC_CHECK_FUNCS(strchr memcpy memmove)dnl
+AC_ARG_ENABLE(debug,
+  [  --enable-debug          also compile debugging code],
+  [case x$withval in
+    xno) ;;
+    x*)  AC_DEFINE([DEBUG]);;
+   esac])dnl
+AC_ARG_WITH(motif,
+  [  --with-motif            also compile the Motif widgets (untested)],
+  [case x$withval in
+    xno) MOTIF_OBJS=; MOTIF_DEMOS=;;
+    x*)
+	save_CPPFLAGS="$CPPFLAGS"
+	CPPFLAGS="$CPPFLAGS -I$x_includes"
+        AC_CHECK_HEADER([Xm/Xm.h],
+           [MOTIF_OBJS="GLwMDrawingArea.o GLwCreateMDrawingArea.o dnl
+                        MesaMDrawingArea.o GLwMMakeCurrent.o dnl
+                        GLwDrawingAreaMakeCurrent.o GLwDrawingAreaSwapBuffers.o dnl
+                        MesaMWorkstation.o";
+            MOTIF_DEMOS="cube-m mcube-m ed-m tea-m";
+            MOTIF_LIBS="libMesaGLwM.a"
+	])
+	CPPFLAGS="$save_CPPFLAGS"
+	;;
+   esac],
+  [MOTIF_OBJS=; MOTIF_DEMOS=; MOTIF_LIBS=])dnl
+AC_SUBST([MOTIF_OBJS])dnl
+AC_SUBST([MOTIF_DEMOS])dnl
+AC_SUBST([MOTIF_LIBS])dnl
+AC_ARG_WITH(mesadir,
+  [  --with-mesadir=PATH     use the Mesa tree rooted in PATH (default: ..)],
+  [case x$withval in
+    xno) mesa_srcdir="`pwd`";;
+    x)   mesa_srcdir="`cd .. && pwd`";;
+    x*)  mesa_srcdir="`cd $withval && pwd`";;
+   esac],
+  [mesa_srcdir="`cd .. && pwd`"])dnl
+AC_SUBST([mesa_srcdir])dnl
+AC_OUTPUT([Makefile src/Makefile include/GL/Makefile
+           demos/Makefile man/Makefile])dnl
+

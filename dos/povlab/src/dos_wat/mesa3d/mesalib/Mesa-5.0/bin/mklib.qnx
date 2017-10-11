@@ -1,0 +1,45 @@
+#!/bin/sh
+
+# Make a QNX library file  (from Steven Bellenot, sfb@entropy.math.fsu.edu)
+
+
+#--identification------------------------------------------------------
+
+# $Id: mklib.qnx,v 1.2 1999/09/15 15:10:20 brianp Exp $
+
+# $Log: mklib.qnx,v $
+# Revision 1.2  1999/09/15 15:10:20  brianp
+# added third, tiny version number to arguments
+#
+# Revision 1.1  1999/08/19 13:53:06  brianp
+# initial check-in (post-crash)
+#
+
+
+#--common--------------------------------------------------------------
+
+LIBRARY=$1
+shift 1
+
+MAJOR=$1
+shift 1
+
+MINOR=$1
+shift 1
+
+TINY=$1
+shift 1
+
+OBJECTS=$*
+
+#--debug---------------------------------------------------------------
+
+#echo LIBRARY = $LIBRARY
+#echo MAJOR = $MAJOR
+#echo MINOR = $MINOR
+#echo OBJECTS = $OBJECTS
+
+#--platform-------------------------------------------------------------
+
+Put your OS/platform-specific commands here for making static/shared libs.
+wlib $LIBRARY $OBJECTS

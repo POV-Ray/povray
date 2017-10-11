@@ -1,0 +1,2020 @@
+;POVLAB version 4.0 shareware - ascii scene for 3D modeller.
+;(C) 1997, Denis Olivier.
+;All rights reserved.
+;Date=Tuesday 04-24-2001.
+;Time=14:39:43.
+;user_name=REGISTER!
+ColorCamera=4
+ColorViewport=0
+ColorTextBackground=8
+ColorSelection=6
+ColorInterface=7
+ColorAxis=5
+ColorGrid=2
+GrilleType=1
+CurrentViewport=1
+Viewportx4=1
+DisplayAxis=1
+DisplayGrid=1
+CurrentTexture=Metal_Chrome_1
+CurrentCamera=1
+BackgroundImageRGB: 50 50 60
+Fog: 255 255 255 0 0 1 0 0 0 0
+Atmosphere: 0 1 10 0.1 0 20 0.25 0.1 8 255 255 255
+UseSelection: 0
+RayGlobal: 0.003922 2.2 3 64 10 0.25 0.18 0.14
+Scale-X/Y F0: 4.763
+Shift-X F0: 0
+Shift-Y F0: 3.741
+Scale-X/Y F1: 4.763
+Shift-X F1: -0.023
+Shift-Y F1: 3.741
+Scale-X/Y F2: 6.016
+Shift-X F2: 0
+Shift-Y F2: -0.023
+Scale-X/Y F3: 45
+Shift-X F3: 0
+Shift-Y F3: 0
+Camera: 1.382 -4.559 5.058 0 1.173 0 87.5 5.61 0 0 0 0 0 0
+Display_Camera: 1
+
+Omni 001: 16.04 -13.5 15.48 255 255 255 3 1 1 0 0 0 0 0
+Display_Omni: 1
+
+Nb-Object: 68
+
+[EndInitSection]
+
+Object 00001: 4
+Object 00001: 0.9921 0.0079 1.016
+Object 00001: 0.8752 0.01937 0.8752
+Object 00001: 0 45 0
+Object 00001: 0.00321 -1.177 0
+Object 00001: 7
+Object 00001: Metal_Chrome_1
+Object 00001: 0
+Object 00001: 0
+Object 00001: Bord
+Object 00001: -1
+Object 00001: 0 // display
+Object 00001: 1 1 1
+Object 00001: 0 0 0
+Object 00001: 0 0 0
+Object 00001: 1
+Object 00001: 0
+Object 00001: 0
+Object 00001: 0 0
+Object 00001: 0
+Object 00001: 1
+Object 00001: 0
+Object 00001: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00001: 0000000000000
+Object 00001: 0 0
+Object 00001: # 0 0 0 0 0 0 0 0
+Object 00001: # 0 0 0 0 0 0 0 0
+Object 00001: 0 0
+
+Object 00002: 5
+Object 00002: 0.8726 0.995 0
+Object 00002: 0.995 0.995 0.02341
+Object 00002: 90 0 0
+Object 00002: 0 -1.148 0.00321
+Object 00002: 58
+Object 00002: Metal_Chrome_1
+Object 00002: 0
+Object 00002: 0
+Object 00002: Tube0000
+Object 00002: -1
+Object 00002: 0 // display
+Object 00002: 1 1 1
+Object 00002: 0 0 0
+Object 00002: 0 0 0
+Object 00002: 1
+Object 00002: 0
+Object 00002: 0
+Object 00002: 0 0
+Object 00002: 0
+Object 00002: 1
+Object 00002: 0
+Object 00002: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00002: 0000000000000
+Object 00002: 0 0
+Object 00002: # 0 0 0 0 0 0 0 0
+Object 00002: # 0 0 0 0 0 0 0 0
+Object 00002: 0 0
+
+Object 00003: 4
+Object 00003: 0.9921 0.0079 1.016
+Object 00003: 1.016 0.02248 1.016
+Object 00003: 0 0 0
+Object 00003: 0.00321 1.178 0
+Object 00003: 7
+Object 00003: Metal_Chrome_1
+Object 00003: 0
+Object 00003: 0
+Object 00003: Bord0000
+Object 00003: -1
+Object 00003: 0 // display
+Object 00003: 1 1 1
+Object 00003: 0 0 0
+Object 00003: 0 0 0
+Object 00003: 1
+Object 00003: 0
+Object 00003: 0
+Object 00003: 0 0
+Object 00003: 0
+Object 00003: 1
+Object 00003: 0
+Object 00003: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00003: 0000000000000
+Object 00003: 0 0
+Object 00003: # 0 0 0 0 0 0 0 0
+Object 00003: # 0 0 0 0 0 0 0 0
+Object 00003: 0 0
+
+Object 00004: 5
+Object 00004: 0.9903 0.9951 0
+Object 00004: 0.9951 0.9951 1.174
+Object 00004: 90 0 0
+Object 00004: -0.00232 0 0.00276
+Object 00004: 7
+Object 00004: Metal_Chrome_1
+Object 00004: 0
+Object 00004: 0
+Object 00004: Pot
+Object 00004: -1
+Object 00004: 0 // display
+Object 00004: 1 1 1
+Object 00004: 0 0 0
+Object 00004: 0 0 0
+Object 00004: 1
+Object 00004: 0
+Object 00004: 0
+Object 00004: 0 0
+Object 00004: 0
+Object 00004: 1
+Object 00004: 192
+Object 00004: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00004: 0000000000000
+Object 00004: 0 0
+Object 00004: # 0 0 0 0 0 0 0 0
+Object 00004: # 0 0 0 0 0 0 0 0
+Object 00004: 0 0
+
+Object 00005: 4
+Object 00005: 0.9921 0.0079 1.016
+Object 00005: 1.016 0.02248 1.016
+Object 00005: 0 0 0
+Object 00005: 0.00321 -1.177 0
+Object 00005: 7
+Object 00005: Metal_Chrome_1
+Object 00005: 0
+Object 00005: 0
+Object 00005: Bord0001
+Object 00005: -1
+Object 00005: 0 // display
+Object 00005: 1 1 1
+Object 00005: 0 0 0
+Object 00005: 0 0 0
+Object 00005: 1
+Object 00005: 0
+Object 00005: 0
+Object 00005: 0 0
+Object 00005: 0
+Object 00005: 1
+Object 00005: 0
+Object 00005: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00005: 0000000000000
+Object 00005: 0 0
+Object 00005: # 0 0 0 0 0 0 0 0
+Object 00005: # 0 0 0 0 0 0 0 0
+Object 00005: 0 0
+
+Object 00006: 7
+Object 00006: 0 0 0
+Object 00006: 15.44 15.44 15.44
+Object 00006: 0 0 0
+Object 00006: 0 1.19 0
+Object 00006: 7
+Object 00006: White_Blue_Checker
+Object 00006: 0
+Object 00006: 0
+Object 00006: Sol
+Object 00006: -1
+Object 00006: 0 // display
+Object 00006: 1 1 1
+Object 00006: 0 0 0
+Object 00006: 0 0 0
+Object 00006: 1
+Object 00006: 0
+Object 00006: 0
+Object 00006: 0 0
+Object 00006: 0
+Object 00006: 1
+Object 00006: 96
+Object 00006: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00006: 0000000000000
+Object 00006: 0 0
+Object 00006: # 0 0 0 0 0 0 0 0
+Object 00006: # 0 0 0 0 0 0 0 0
+Object 00006: 0 0
+
+Object 00007: 8
+Object 00007: 0 0 0
+Object 00007: 19.52 19.52 19.52
+Object 00007: 0 0 0
+Object 00007: 0 -3.741 -1.87
+Object 00007: 7
+Object 00007: White_Blue_Checker
+Object 00007: 0
+Object 00007: 0
+Object 00007: Mur
+Object 00007: -1
+Object 00007: 0 // display
+Object 00007: 1 1 1
+Object 00007: 0 0 0
+Object 00007: 0 0 0
+Object 00007: 1
+Object 00007: 0
+Object 00007: 0
+Object 00007: 0 0
+Object 00007: 0
+Object 00007: 1
+Object 00007: 0
+Object 00007: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00007: 0000000000000
+Object 00007: 0 0
+Object 00007: # 0 0 0 0 0 0 0 0
+Object 00007: # 0 0 0 0 0 0 0 0
+Object 00007: 0 0
+
+Object 00008: 15
+Object 00008: 0 0 0
+Object 00008: 0.9994 0.9994 1
+Object 00008: 90 0 0
+Object 00008: -0.00129 -0.6718 -0.00482
+Object 00008: 75
+Object 00008: Yellow_RPlastic
+Object 00008: 0
+Object 00008: 0
+Object 00008: Peinture
+Object 00008: -1
+Object 00008: 0 // display
+Object 00008: 1 1 1
+Object 00008: 0 0 0
+Object 00008: 0 0 0
+Object 00008: 1
+Object 00008: 0
+Object 00008: 0
+Object 00008: 0 0
+Object 00008: 0
+Object 00008: 1
+Object 00008: 0
+Object 00008: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00008: 0000000000000
+Object 00008: 0 0
+Object 00008: # 0 0 0 0 0 0 0 0
+Object 00008: # 0 0 0 0 0 0 0 0
+Object 00008: 0 0
+
+Object 00009: 4
+Object 00009: 0.9921 0.0079 1.016
+Object 00009: 0.8752 0.01937 0.8752
+Object 00009: 0 45 0
+Object 00009: 2.506 -1.177 0.09914
+Object 00009: 7
+Object 00009: Metal_Chrome_1
+Object 00009: 0
+Object 00009: 0
+Object 00009: Bord0002
+Object 00009: -1
+Object 00009: 0 // display
+Object 00009: 1 1 1
+Object 00009: 0 0 0
+Object 00009: 0 0 0
+Object 00009: 1
+Object 00009: 0
+Object 00009: 0
+Object 00009: 0 0
+Object 00009: 0
+Object 00009: 1
+Object 00009: 0
+Object 00009: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00009: 0000000000000
+Object 00009: 0 0
+Object 00009: # 0 0 0 0 0 0 0 0
+Object 00009: # 0 0 0 0 0 0 0 0
+Object 00009: 0 0
+
+Object 00010: 5
+Object 00010: 0.8726 0.995 0
+Object 00010: 0.995 0.995 0.02341
+Object 00010: 90 0 0
+Object 00010: 2.502 -1.148 0.1023
+Object 00010: 58
+Object 00010: Metal_Chrome_1
+Object 00010: 0
+Object 00010: 0
+Object 00010: Tube0001
+Object 00010: -1
+Object 00010: 0 // display
+Object 00010: 1 1 1
+Object 00010: 0 0 0
+Object 00010: 0 0 0
+Object 00010: 1
+Object 00010: 0
+Object 00010: 0
+Object 00010: 0 0
+Object 00010: 0
+Object 00010: 1
+Object 00010: 0
+Object 00010: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00010: 0000000000000
+Object 00010: 0 0
+Object 00010: # 0 0 0 0 0 0 0 0
+Object 00010: # 0 0 0 0 0 0 0 0
+Object 00010: 0 0
+
+Object 00011: 4
+Object 00011: 0.9921 0.0079 1.016
+Object 00011: 1.016 0.02248 1.016
+Object 00011: 0 0 0
+Object 00011: 2.506 1.178 0.09914
+Object 00011: 7
+Object 00011: Metal_Chrome_1
+Object 00011: 0
+Object 00011: 0
+Object 00011: Bord0003
+Object 00011: -1
+Object 00011: 0 // display
+Object 00011: 1 1 1
+Object 00011: 0 0 0
+Object 00011: 0 0 0
+Object 00011: 1
+Object 00011: 0
+Object 00011: 0
+Object 00011: 0 0
+Object 00011: 0
+Object 00011: 1
+Object 00011: 0
+Object 00011: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00011: 0000000000000
+Object 00011: 0 0
+Object 00011: # 0 0 0 0 0 0 0 0
+Object 00011: # 0 0 0 0 0 0 0 0
+Object 00011: 0 0
+
+Object 00012: 5
+Object 00012: 0.9903 0.9951 0
+Object 00012: 0.9951 0.9951 1.174
+Object 00012: 90 0 0
+Object 00012: 2.5 -0.00288 0.1019
+Object 00012: 7
+Object 00012: Metal_Chrome_1
+Object 00012: 0
+Object 00012: 0
+Object 00012: Pot0000
+Object 00012: -1
+Object 00012: 0 // display
+Object 00012: 1 1 1
+Object 00012: 0 0 0
+Object 00012: 0 0 0
+Object 00012: 1
+Object 00012: 0
+Object 00012: 0
+Object 00012: 0 0
+Object 00012: 0
+Object 00012: 1
+Object 00012: 0
+Object 00012: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00012: 0000000000000
+Object 00012: 0 0
+Object 00012: # 0 0 0 0 0 0 0 0
+Object 00012: # 0 0 0 0 0 0 0 0
+Object 00012: 0 0
+
+Object 00013: 4
+Object 00013: 0.9921 0.0079 1.016
+Object 00013: 1.016 0.02248 1.016
+Object 00013: 0 0 0
+Object 00013: 2.506 -1.177 0.09914
+Object 00013: 7
+Object 00013: Metal_Chrome_1
+Object 00013: 0
+Object 00013: 0
+Object 00013: Bord0004
+Object 00013: -1
+Object 00013: 0 // display
+Object 00013: 1 1 1
+Object 00013: 0 0 0
+Object 00013: 0 0 0
+Object 00013: 1
+Object 00013: 0
+Object 00013: 0
+Object 00013: 0 0
+Object 00013: 0
+Object 00013: 1
+Object 00013: 0
+Object 00013: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00013: 0000000000000
+Object 00013: 0 0
+Object 00013: # 0 0 0 0 0 0 0 0
+Object 00013: # 0 0 0 0 0 0 0 0
+Object 00013: 0 0
+
+Object 00014: 15
+Object 00014: 0 0 0
+Object 00014: 0.9994 0.9994 1
+Object 00014: 90 0 0
+Object 00014: 2.501 -0.5312 0.09432
+Object 00014: 75
+Object 00014: Red_RPlastic
+Object 00014: 0
+Object 00014: 0
+Object 00014: Peinture0000
+Object 00014: -1
+Object 00014: 0 // display
+Object 00014: 1 1 1
+Object 00014: 0 0 0
+Object 00014: 0 0 0
+Object 00014: 1
+Object 00014: 0
+Object 00014: 0
+Object 00014: 0 0
+Object 00014: 0
+Object 00014: 1
+Object 00014: 0
+Object 00014: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00014: 0000000000000
+Object 00014: 0 0
+Object 00014: # 0 0 0 0 0 0 0 0
+Object 00014: # 0 0 0 0 0 0 0 0
+Object 00014: 0 0
+
+Object 00015: 4
+Object 00015: 0.9921 0.0079 1.016
+Object 00015: 0.8752 0.01937 0.8752
+Object 00015: 0 45 0
+Object 00015: -2.735 -1.177 0.2738
+Object 00015: 7
+Object 00015: Metal_Chrome_1
+Object 00015: 0
+Object 00015: 0
+Object 00015: Bord0005
+Object 00015: -1
+Object 00015: 0 // display
+Object 00015: 1 1 1
+Object 00015: 0 0 0
+Object 00015: 0 0 0
+Object 00015: 1
+Object 00015: 0
+Object 00015: 0
+Object 00015: 0 0
+Object 00015: 0
+Object 00015: 1
+Object 00015: 0
+Object 00015: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00015: 0000000000000
+Object 00015: 0 0
+Object 00015: # 0 0 0 0 0 0 0 0
+Object 00015: # 0 0 0 0 0 0 0 0
+Object 00015: 0 0
+
+Object 00016: 5
+Object 00016: 0.8726 0.995 0
+Object 00016: 0.995 0.995 0.02341
+Object 00016: 90 0 0
+Object 00016: -2.738 -1.148 0.277
+Object 00016: 58
+Object 00016: Metal_Chrome_1
+Object 00016: 0
+Object 00016: 0
+Object 00016: Tube0002
+Object 00016: -1
+Object 00016: 0 // display
+Object 00016: 1 1 1
+Object 00016: 0 0 0
+Object 00016: 0 0 0
+Object 00016: 1
+Object 00016: 0
+Object 00016: 0
+Object 00016: 0 0
+Object 00016: 0
+Object 00016: 1
+Object 00016: 0
+Object 00016: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00016: 0000000000000
+Object 00016: 0 0
+Object 00016: # 0 0 0 0 0 0 0 0
+Object 00016: # 0 0 0 0 0 0 0 0
+Object 00016: 0 0
+
+Object 00017: 4
+Object 00017: 0.9921 0.0079 1.016
+Object 00017: 1.016 0.02248 1.016
+Object 00017: 0 0 0
+Object 00017: -2.735 1.178 0.2738
+Object 00017: 7
+Object 00017: Metal_Chrome_1
+Object 00017: 0
+Object 00017: 0
+Object 00017: Bord0006
+Object 00017: -1
+Object 00017: 0 // display
+Object 00017: 1 1 1
+Object 00017: 0 0 0
+Object 00017: 0 0 0
+Object 00017: 1
+Object 00017: 0
+Object 00017: 0
+Object 00017: 0 0
+Object 00017: 0
+Object 00017: 1
+Object 00017: 0
+Object 00017: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00017: 0000000000000
+Object 00017: 0 0
+Object 00017: # 0 0 0 0 0 0 0 0
+Object 00017: # 0 0 0 0 0 0 0 0
+Object 00017: 0 0
+
+Object 00018: 5
+Object 00018: 0.9903 0.9951 0
+Object 00018: 0.9951 0.9951 1.174
+Object 00018: 90 0 0
+Object 00018: -2.74 0 0.2766
+Object 00018: 7
+Object 00018: Metal_Chrome_1
+Object 00018: 0
+Object 00018: 0
+Object 00018: Pot0001
+Object 00018: -1
+Object 00018: 0 // display
+Object 00018: 1 1 1
+Object 00018: 0 0 0
+Object 00018: 0 0 0
+Object 00018: 1
+Object 00018: 0
+Object 00018: 0
+Object 00018: 0 0
+Object 00018: 0
+Object 00018: 1
+Object 00018: 0
+Object 00018: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00018: 0000000000000
+Object 00018: 0 0
+Object 00018: # 0 0 0 0 0 0 0 0
+Object 00018: # 0 0 0 0 0 0 0 0
+Object 00018: 0 0
+
+Object 00019: 4
+Object 00019: 0.9921 0.0079 1.016
+Object 00019: 1.016 0.02248 1.016
+Object 00019: 0 0 0
+Object 00019: -2.735 -1.177 0.2738
+Object 00019: 7
+Object 00019: Metal_Chrome_1
+Object 00019: 0
+Object 00019: 0
+Object 00019: Bord0007
+Object 00019: -1
+Object 00019: 0 // display
+Object 00019: 1 1 1
+Object 00019: 0 0 0
+Object 00019: 0 0 0
+Object 00019: 1
+Object 00019: 0
+Object 00019: 0
+Object 00019: 0 0
+Object 00019: 0
+Object 00019: 1
+Object 00019: 0
+Object 00019: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00019: 0000000000000
+Object 00019: 0 0
+Object 00019: # 0 0 0 0 0 0 0 0
+Object 00019: # 0 0 0 0 0 0 0 0
+Object 00019: 0 0
+
+Object 00020: 15
+Object 00020: 0 0 0
+Object 00020: 0.9994 0.9994 1
+Object 00020: 90 0 0
+Object 00020: -2.739 -0.9541 0.269
+Object 00020: 75
+Object 00020: Blue_RPlastic
+Object 00020: 0
+Object 00020: 0
+Object 00020: Peinture0001
+Object 00020: -1
+Object 00020: 0 // display
+Object 00020: 1 1 1
+Object 00020: 0 0 0
+Object 00020: 0 0 0
+Object 00020: 1
+Object 00020: 0
+Object 00020: 0
+Object 00020: 0 0
+Object 00020: 0
+Object 00020: 1
+Object 00020: 0
+Object 00020: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00020: 0000000000000
+Object 00020: 0 0
+Object 00020: # 0 0 0 0 0 0 0 0
+Object 00020: # 0 0 0 0 0 0 0 0
+Object 00020: 0 0
+
+Object 00021: 4
+Object 00021: 0.9921 0.0079 1.016
+Object 00021: 0.8752 0.01937 0.8752
+Object 00021: 0 45 0
+Object 00021: -1.341 -1.177 2.514
+Object 00021: 7
+Object 00021: Metal_Chrome_1
+Object 00021: 0
+Object 00021: 0
+Object 00021: Bord0008
+Object 00021: -1
+Object 00021: 0 // display
+Object 00021: 1 1 1
+Object 00021: 0 0 0
+Object 00021: 0 0 0
+Object 00021: 1
+Object 00021: 0
+Object 00021: 0
+Object 00021: 0 0
+Object 00021: 0
+Object 00021: 1
+Object 00021: 0
+Object 00021: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00021: 0000000000000
+Object 00021: 0 0
+Object 00021: # 0 0 0 0 0 0 0 0
+Object 00021: # 0 0 0 0 0 0 0 0
+Object 00021: 0 0
+
+Object 00022: 5
+Object 00022: 0.8726 0.995 0
+Object 00022: 0.995 0.995 0.02341
+Object 00022: 90 0 0
+Object 00022: -1.344 -1.148 2.517
+Object 00022: 58
+Object 00022: Metal_Chrome_1
+Object 00022: 0
+Object 00022: 0
+Object 00022: Tube0003
+Object 00022: -1
+Object 00022: 0 // display
+Object 00022: 1 1 1
+Object 00022: 0 0 0
+Object 00022: 0 0 0
+Object 00022: 1
+Object 00022: 0
+Object 00022: 0
+Object 00022: 0 0
+Object 00022: 0
+Object 00022: 1
+Object 00022: 0
+Object 00022: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00022: 0000000000000
+Object 00022: 0 0
+Object 00022: # 0 0 0 0 0 0 0 0
+Object 00022: # 0 0 0 0 0 0 0 0
+Object 00022: 0 0
+
+Object 00023: 4
+Object 00023: 0.9921 0.0079 1.016
+Object 00023: 1.016 0.02248 1.016
+Object 00023: 0 0 0
+Object 00023: -1.341 1.178 2.514
+Object 00023: 7
+Object 00023: Metal_Chrome_1
+Object 00023: 0
+Object 00023: 0
+Object 00023: Bord0009
+Object 00023: -1
+Object 00023: 0 // display
+Object 00023: 1 1 1
+Object 00023: 0 0 0
+Object 00023: 0 0 0
+Object 00023: 1
+Object 00023: 0
+Object 00023: 0
+Object 00023: 0 0
+Object 00023: 0
+Object 00023: 1
+Object 00023: 0
+Object 00023: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00023: 0000000000000
+Object 00023: 0 0
+Object 00023: # 0 0 0 0 0 0 0 0
+Object 00023: # 0 0 0 0 0 0 0 0
+Object 00023: 0 0
+
+Object 00024: 5
+Object 00024: 0.9903 0.9951 0
+Object 00024: 0.9951 0.9951 1.174
+Object 00024: 90 0 0
+Object 00024: -1.346 0 2.517
+Object 00024: 7
+Object 00024: Metal_Chrome_1
+Object 00024: 0
+Object 00024: 0
+Object 00024: Pot0002
+Object 00024: -1
+Object 00024: 0 // display
+Object 00024: 1 1 1
+Object 00024: 0 0 0
+Object 00024: 0 0 0
+Object 00024: 1
+Object 00024: 0
+Object 00024: 0
+Object 00024: 0 0
+Object 00024: 0
+Object 00024: 1
+Object 00024: 0
+Object 00024: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00024: 0000000000000
+Object 00024: 0 0
+Object 00024: # 0 0 0 0 0 0 0 0
+Object 00024: # 0 0 0 0 0 0 0 0
+Object 00024: 0 0
+
+Object 00025: 4
+Object 00025: 0.9921 0.0079 1.016
+Object 00025: 1.016 0.02248 1.016
+Object 00025: 0 0 0
+Object 00025: -1.341 -1.177 2.514
+Object 00025: 7
+Object 00025: Metal_Chrome_1
+Object 00025: 0
+Object 00025: 0
+Object 00025: Bord0010
+Object 00025: -1
+Object 00025: 0 // display
+Object 00025: 1 1 1
+Object 00025: 0 0 0
+Object 00025: 0 0 0
+Object 00025: 1
+Object 00025: 0
+Object 00025: 0
+Object 00025: 0 0
+Object 00025: 0
+Object 00025: 1
+Object 00025: 0
+Object 00025: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00025: 0000000000000
+Object 00025: 0 0
+Object 00025: # 0 0 0 0 0 0 0 0
+Object 00025: # 0 0 0 0 0 0 0 0
+Object 00025: 0 0
+
+Object 00026: 15
+Object 00026: 0 0 0
+Object 00026: 0.9994 0.9994 1
+Object 00026: 90 0 0
+Object 00026: -1.345 -0.8761 2.509
+Object 00026: 75
+Object 00026: White_RPlastic
+Object 00026: 0
+Object 00026: 0
+Object 00026: Peinture0002
+Object 00026: -1
+Object 00026: 0 // display
+Object 00026: 1 1 1
+Object 00026: 0 0 0
+Object 00026: 0 0 0
+Object 00026: 1
+Object 00026: 0
+Object 00026: 0
+Object 00026: 0 0
+Object 00026: 0
+Object 00026: 1
+Object 00026: 0
+Object 00026: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00026: 0000000000000
+Object 00026: 0 0
+Object 00026: # 0 0 0 0 0 0 0 0
+Object 00026: # 0 0 0 0 0 0 0 0
+Object 00026: 0 0
+
+Object 00027: 4
+Object 00027: 0.9921 0.0079 1.016
+Object 00027: 0.8752 0.01937 0.8752
+Object 00027: 0 45 0
+Object 00027: 0.7131 -1.177 2.011
+Object 00027: 7
+Object 00027: Metal_Chrome_1
+Object 00027: 0
+Object 00027: 0
+Object 00027: Bord0011
+Object 00027: -1
+Object 00027: 0 // display
+Object 00027: 1 1 1
+Object 00027: 0 0 0
+Object 00027: 0 0 0
+Object 00027: 1
+Object 00027: 0
+Object 00027: 0
+Object 00027: 0 0
+Object 00027: 0
+Object 00027: 1
+Object 00027: 0
+Object 00027: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00027: 0000000000000
+Object 00027: 0 0
+Object 00027: # 0 0 0 0 0 0 0 0
+Object 00027: # 0 0 0 0 0 0 0 0
+Object 00027: 0 0
+
+Object 00028: 5
+Object 00028: 0.8726 0.995 0
+Object 00028: 0.995 0.995 0.02341
+Object 00028: 90 0 0
+Object 00028: 0.7099 -1.148 2.014
+Object 00028: 58
+Object 00028: Metal_Chrome_1
+Object 00028: 0
+Object 00028: 0
+Object 00028: Tube0004
+Object 00028: -1
+Object 00028: 0 // display
+Object 00028: 1 1 1
+Object 00028: 0 0 0
+Object 00028: 0 0 0
+Object 00028: 1
+Object 00028: 0
+Object 00028: 0
+Object 00028: 0 0
+Object 00028: 0
+Object 00028: 1
+Object 00028: 0
+Object 00028: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00028: 0000000000000
+Object 00028: 0 0
+Object 00028: # 0 0 0 0 0 0 0 0
+Object 00028: # 0 0 0 0 0 0 0 0
+Object 00028: 0 0
+
+Object 00029: 4
+Object 00029: 0.9921 0.0079 1.016
+Object 00029: 1.016 0.02248 1.016
+Object 00029: 0 0 0
+Object 00029: 0.7131 1.178 2.011
+Object 00029: 7
+Object 00029: Metal_Chrome_1
+Object 00029: 0
+Object 00029: 0
+Object 00029: Bord0012
+Object 00029: -1
+Object 00029: 0 // display
+Object 00029: 1 1 1
+Object 00029: 0 0 0
+Object 00029: 0 0 0
+Object 00029: 1
+Object 00029: 0
+Object 00029: 0
+Object 00029: 0 0
+Object 00029: 0
+Object 00029: 1
+Object 00029: 0
+Object 00029: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00029: 0000000000000
+Object 00029: 0 0
+Object 00029: # 0 0 0 0 0 0 0 0
+Object 00029: # 0 0 0 0 0 0 0 0
+Object 00029: 0 0
+
+Object 00030: 5
+Object 00030: 0.9903 0.9951 0
+Object 00030: 0.9951 0.9951 1.174
+Object 00030: 90 0 0
+Object 00030: 0.7076 0 2.013
+Object 00030: 7
+Object 00030: Metal_Chrome_1
+Object 00030: 0
+Object 00030: 0
+Object 00030: Pot0003
+Object 00030: -1
+Object 00030: 0 // display
+Object 00030: 1 1 1
+Object 00030: 0 0 0
+Object 00030: 0 0 0
+Object 00030: 1
+Object 00030: 0
+Object 00030: 0
+Object 00030: 0 0
+Object 00030: 0
+Object 00030: 1
+Object 00030: 0
+Object 00030: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00030: 0000000000000
+Object 00030: 0 0
+Object 00030: # 0 0 0 0 0 0 0 0
+Object 00030: # 0 0 0 0 0 0 0 0
+Object 00030: 0 0
+
+Object 00031: 4
+Object 00031: 0.9921 0.0079 1.016
+Object 00031: 1.016 0.02248 1.016
+Object 00031: 0 0 0
+Object 00031: 0.7131 -1.177 2.011
+Object 00031: 7
+Object 00031: Metal_Chrome_1
+Object 00031: 0
+Object 00031: 0
+Object 00031: Bord0013
+Object 00031: -1
+Object 00031: 0 // display
+Object 00031: 1 1 1
+Object 00031: 0 0 0
+Object 00031: 0 0 0
+Object 00031: 1
+Object 00031: 0
+Object 00031: 0
+Object 00031: 0 0
+Object 00031: 0
+Object 00031: 1
+Object 00031: 0
+Object 00031: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00031: 0000000000000
+Object 00031: 0 0
+Object 00031: # 0 0 0 0 0 0 0 0
+Object 00031: # 0 0 0 0 0 0 0 0
+Object 00031: 0 0
+
+Object 00032: 15
+Object 00032: 0 0 0
+Object 00032: 0.9994 0.9994 1
+Object 00032: 90 0 0
+Object 00032: 0.7086 -0.5558 2.006
+Object 00032: 75
+Object 00032: Green_RPlastic
+Object 00032: 0
+Object 00032: 0
+Object 00032: Peinture0003
+Object 00032: -1
+Object 00032: 0 // display
+Object 00032: 1 1 1
+Object 00032: 0 0 0
+Object 00032: 0 0 0
+Object 00032: 1
+Object 00032: 0
+Object 00032: 0
+Object 00032: 0 0
+Object 00032: 0
+Object 00032: 1
+Object 00032: 0
+Object 00032: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00032: 0000000000000
+Object 00032: 0 0
+Object 00032: # 0 0 0 0 0 0 0 0
+Object 00032: # 0 0 0 0 0 0 0 0
+Object 00032: 0 0
+
+Object 00033: 4
+Object 00033: 0.9921 0.0079 1.016
+Object 00033: 0.8752 0.01937 0.8752
+Object 00033: 0 45 0
+Object 00033: -3.83 -1.177 3.559
+Object 00033: 7
+Object 00033: Metal_Chrome_1
+Object 00033: 0
+Object 00033: 0
+Object 00033: Bord0014
+Object 00033: -1
+Object 00033: 0 // display
+Object 00033: 1 1 1
+Object 00033: 0 0 0
+Object 00033: 0 0 0
+Object 00033: 1
+Object 00033: 0
+Object 00033: 0
+Object 00033: 0 0
+Object 00033: 0
+Object 00033: 1
+Object 00033: 0
+Object 00033: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00033: 0000000000000
+Object 00033: 0 0
+Object 00033: # 0 0 0 0 0 0 0 0
+Object 00033: # 0 0 0 0 0 0 0 0
+Object 00033: 0 0
+
+Object 00034: 5
+Object 00034: 0.8726 0.995 0
+Object 00034: 0.995 0.995 0.02341
+Object 00034: 90 0 0
+Object 00034: -3.833 -1.148 3.563
+Object 00034: 58
+Object 00034: Metal_Chrome_1
+Object 00034: 0
+Object 00034: 0
+Object 00034: Tube0005
+Object 00034: -1
+Object 00034: 0 // display
+Object 00034: 1 1 1
+Object 00034: 0 0 0
+Object 00034: 0 0 0
+Object 00034: 1
+Object 00034: 0
+Object 00034: 0
+Object 00034: 0 0
+Object 00034: 0
+Object 00034: 1
+Object 00034: 0
+Object 00034: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00034: 0000000000000
+Object 00034: 0 0
+Object 00034: # 0 0 0 0 0 0 0 0
+Object 00034: # 0 0 0 0 0 0 0 0
+Object 00034: 0 0
+
+Object 00035: 4
+Object 00035: 0.9921 0.0079 1.016
+Object 00035: 1.016 0.02248 1.016
+Object 00035: 0 0 0
+Object 00035: -3.83 1.178 3.559
+Object 00035: 7
+Object 00035: Metal_Chrome_1
+Object 00035: 0
+Object 00035: 0
+Object 00035: Bord0015
+Object 00035: -1
+Object 00035: 0 // display
+Object 00035: 1 1 1
+Object 00035: 0 0 0
+Object 00035: 0 0 0
+Object 00035: 1
+Object 00035: 0
+Object 00035: 0
+Object 00035: 0 0
+Object 00035: 0
+Object 00035: 1
+Object 00035: 0
+Object 00035: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00035: 0000000000000
+Object 00035: 0 0
+Object 00035: # 0 0 0 0 0 0 0 0
+Object 00035: # 0 0 0 0 0 0 0 0
+Object 00035: 0 0
+
+Object 00036: 5
+Object 00036: 0.9903 0.9951 0
+Object 00036: 0.9951 0.9951 1.174
+Object 00036: 90 0 0
+Object 00036: -3.835 0 3.562
+Object 00036: 7
+Object 00036: Metal_Chrome_1
+Object 00036: 0
+Object 00036: 0
+Object 00036: Pot0004
+Object 00036: -1
+Object 00036: 0 // display
+Object 00036: 1 1 1
+Object 00036: 0 0 0
+Object 00036: 0 0 0
+Object 00036: 1
+Object 00036: 0
+Object 00036: 0
+Object 00036: 0 0
+Object 00036: 0
+Object 00036: 1
+Object 00036: 0
+Object 00036: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00036: 0000000000000
+Object 00036: 0 0
+Object 00036: # 0 0 0 0 0 0 0 0
+Object 00036: # 0 0 0 0 0 0 0 0
+Object 00036: 0 0
+
+Object 00037: 4
+Object 00037: 0.9921 0.0079 1.016
+Object 00037: 1.016 0.02248 1.016
+Object 00037: 0 0 0
+Object 00037: -3.83 -1.177 3.559
+Object 00037: 7
+Object 00037: Metal_Chrome_1
+Object 00037: 0
+Object 00037: 0
+Object 00037: Bord0016
+Object 00037: -1
+Object 00037: 0 // display
+Object 00037: 1 1 1
+Object 00037: 0 0 0
+Object 00037: 0 0 0
+Object 00037: 1
+Object 00037: 0
+Object 00037: 0
+Object 00037: 0 0
+Object 00037: 0
+Object 00037: 1
+Object 00037: 0
+Object 00037: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00037: 0000000000000
+Object 00037: 0 0
+Object 00037: # 0 0 0 0 0 0 0 0
+Object 00037: # 0 0 0 0 0 0 0 0
+Object 00037: 0 0
+
+Object 00038: 15
+Object 00038: 0 0 0
+Object 00038: 0.9994 0.9994 1
+Object 00038: 90 0 0
+Object 00038: -3.834 -0.6718 3.555
+Object 00038: 75
+Object 00038: LightBlue_RPlastic
+Object 00038: 0
+Object 00038: 0
+Object 00038: Peinture0004
+Object 00038: -1
+Object 00038: 0 // display
+Object 00038: 1 1 1
+Object 00038: 0 0 0
+Object 00038: 0 0 0
+Object 00038: 1
+Object 00038: 0
+Object 00038: 0
+Object 00038: 0 0
+Object 00038: 0
+Object 00038: 1
+Object 00038: 0
+Object 00038: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00038: 0000000000000
+Object 00038: 0 0
+Object 00038: # 0 0 0 0 0 0 0 0
+Object 00038: # 0 0 0 0 0 0 0 0
+Object 00038: 0 0
+
+Object 00039: 4
+Object 00039: 0.9921 0.0079 1.016
+Object 00039: 0.8752 0.01937 0.8752
+Object 00039: 0 45 0
+Object 00039: 3.149 -1.177 2.658
+Object 00039: 7
+Object 00039: Metal_Chrome_1
+Object 00039: 0
+Object 00039: 0
+Object 00039: Bord0017
+Object 00039: -1
+Object 00039: 0 // display
+Object 00039: 1 1 1
+Object 00039: 0 0 0
+Object 00039: 0 0 0
+Object 00039: 1
+Object 00039: 0
+Object 00039: 0
+Object 00039: 0 0
+Object 00039: 0
+Object 00039: 1
+Object 00039: 0
+Object 00039: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00039: 0000000000000
+Object 00039: 0 0
+Object 00039: # 0 0 0 0 0 0 0 0
+Object 00039: # 0 0 0 0 0 0 0 0
+Object 00039: 0 0
+
+Object 00040: 5
+Object 00040: 0.8726 0.995 0
+Object 00040: 0.995 0.995 0.02341
+Object 00040: 90 0 0
+Object 00040: 3.145 -1.148 2.661
+Object 00040: 58
+Object 00040: Metal_Chrome_1
+Object 00040: 0
+Object 00040: 0
+Object 00040: Tube0006
+Object 00040: -1
+Object 00040: 0 // display
+Object 00040: 1 1 1
+Object 00040: 0 0 0
+Object 00040: 0 0 0
+Object 00040: 1
+Object 00040: 0
+Object 00040: 0
+Object 00040: 0 0
+Object 00040: 0
+Object 00040: 1
+Object 00040: 0
+Object 00040: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00040: 0000000000000
+Object 00040: 0 0
+Object 00040: # 0 0 0 0 0 0 0 0
+Object 00040: # 0 0 0 0 0 0 0 0
+Object 00040: 0 0
+
+Object 00041: 4
+Object 00041: 0.9921 0.0079 1.016
+Object 00041: 1.016 0.02248 1.016
+Object 00041: 0 0 0
+Object 00041: 3.149 1.178 2.658
+Object 00041: 7
+Object 00041: Metal_Chrome_1
+Object 00041: 0
+Object 00041: 0
+Object 00041: Bord0018
+Object 00041: -1
+Object 00041: 0 // display
+Object 00041: 1 1 1
+Object 00041: 0 0 0
+Object 00041: 0 0 0
+Object 00041: 1
+Object 00041: 0
+Object 00041: 0
+Object 00041: 0 0
+Object 00041: 0
+Object 00041: 1
+Object 00041: 0
+Object 00041: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00041: 0000000000000
+Object 00041: 0 0
+Object 00041: # 0 0 0 0 0 0 0 0
+Object 00041: # 0 0 0 0 0 0 0 0
+Object 00041: 0 0
+
+Object 00042: 5
+Object 00042: 0.9903 0.9951 0
+Object 00042: 0.9951 0.9951 1.174
+Object 00042: 90 0 0
+Object 00042: 3.143 0 2.661
+Object 00042: 7
+Object 00042: Metal_Chrome_1
+Object 00042: 0
+Object 00042: 0
+Object 00042: Pot0005
+Object 00042: -1
+Object 00042: 0 // display
+Object 00042: 1 1 1
+Object 00042: 0 0 0
+Object 00042: 0 0 0
+Object 00042: 1
+Object 00042: 0
+Object 00042: 0
+Object 00042: 0 0
+Object 00042: 0
+Object 00042: 1
+Object 00042: 0
+Object 00042: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00042: 0000000000000
+Object 00042: 0 0
+Object 00042: # 0 0 0 0 0 0 0 0
+Object 00042: # 0 0 0 0 0 0 0 0
+Object 00042: 0 0
+
+Object 00043: 4
+Object 00043: 0.9921 0.0079 1.016
+Object 00043: 1.016 0.02248 1.016
+Object 00043: 0 0 0
+Object 00043: 3.149 -1.177 2.658
+Object 00043: 7
+Object 00043: Metal_Chrome_1
+Object 00043: 0
+Object 00043: 0
+Object 00043: Bord0019
+Object 00043: -1
+Object 00043: 0 // display
+Object 00043: 1 1 1
+Object 00043: 0 0 0
+Object 00043: 0 0 0
+Object 00043: 1
+Object 00043: 0
+Object 00043: 0
+Object 00043: 0 0
+Object 00043: 0
+Object 00043: 1
+Object 00043: 0
+Object 00043: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00043: 0000000000000
+Object 00043: 0 0
+Object 00043: # 0 0 0 0 0 0 0 0
+Object 00043: # 0 0 0 0 0 0 0 0
+Object 00043: 0 0
+
+Object 00044: 15
+Object 00044: 0 0 0
+Object 00044: 0.9994 0.9994 1
+Object 00044: 90 0 0
+Object 00044: 3.144 -0.6718 2.653
+Object 00044: 75
+Object 00044: Pink_RPlastic
+Object 00044: 0
+Object 00044: 0
+Object 00044: Peinture0005
+Object 00044: -1
+Object 00044: 0 // display
+Object 00044: 1 1 1
+Object 00044: 0 0 0
+Object 00044: 0 0 0
+Object 00044: 1
+Object 00044: 0
+Object 00044: 0
+Object 00044: 0 0
+Object 00044: 0
+Object 00044: 1
+Object 00044: 0
+Object 00044: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00044: 0000000000000
+Object 00044: 0 0
+Object 00044: # 0 0 0 0 0 0 0 0
+Object 00044: # 0 0 0 0 0 0 0 0
+Object 00044: 0 0
+
+Object 00045: 4
+Object 00045: 0.9921 0.0079 1.016
+Object 00045: 0.8752 0.01937 0.8752
+Object 00045: 0 45 0
+Object 00045: -0.7397 -1.177 4.66
+Object 00045: 7
+Object 00045: Metal_Chrome_1
+Object 00045: 0
+Object 00045: 0
+Object 00045: Bord0020
+Object 00045: -1
+Object 00045: 0 // display
+Object 00045: 1 1 1
+Object 00045: 0 0 0
+Object 00045: 0 0 0
+Object 00045: 1
+Object 00045: 0
+Object 00045: 0
+Object 00045: 0 0
+Object 00045: 0
+Object 00045: 1
+Object 00045: 0
+Object 00045: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00045: 0000000000000
+Object 00045: 0 0
+Object 00045: # 0 0 0 0 0 0 0 0
+Object 00045: # 0 0 0 0 0 0 0 0
+Object 00045: 0 0
+
+Object 00046: 5
+Object 00046: 0.8726 0.995 0
+Object 00046: 0.995 0.995 0.02341
+Object 00046: 90 0 0
+Object 00046: -0.7429 -1.148 4.663
+Object 00046: 58
+Object 00046: Metal_Chrome_1
+Object 00046: 0
+Object 00046: 0
+Object 00046: Tube0007
+Object 00046: -1
+Object 00046: 0 // display
+Object 00046: 1 1 1
+Object 00046: 0 0 0
+Object 00046: 0 0 0
+Object 00046: 1
+Object 00046: 0
+Object 00046: 0
+Object 00046: 0 0
+Object 00046: 0
+Object 00046: 1
+Object 00046: 0
+Object 00046: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00046: 0000000000000
+Object 00046: 0 0
+Object 00046: # 0 0 0 0 0 0 0 0
+Object 00046: # 0 0 0 0 0 0 0 0
+Object 00046: 0 0
+
+Object 00047: 4
+Object 00047: 0.9921 0.0079 1.016
+Object 00047: 1.016 0.02248 1.016
+Object 00047: 0 0 0
+Object 00047: -0.7397 1.178 4.66
+Object 00047: 7
+Object 00047: Metal_Chrome_1
+Object 00047: 0
+Object 00047: 0
+Object 00047: Bord0021
+Object 00047: -1
+Object 00047: 0 // display
+Object 00047: 1 1 1
+Object 00047: 0 0 0
+Object 00047: 0 0 0
+Object 00047: 1
+Object 00047: 0
+Object 00047: 0
+Object 00047: 0 0
+Object 00047: 0
+Object 00047: 1
+Object 00047: 0
+Object 00047: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00047: 0000000000000
+Object 00047: 0 0
+Object 00047: # 0 0 0 0 0 0 0 0
+Object 00047: # 0 0 0 0 0 0 0 0
+Object 00047: 0 0
+
+Object 00048: 5
+Object 00048: 0.9903 0.9951 0
+Object 00048: 0.9951 0.9951 1.174
+Object 00048: 90 0 0
+Object 00048: -0.7452 0 4.663
+Object 00048: 7
+Object 00048: Metal_Chrome_1
+Object 00048: 0
+Object 00048: 0
+Object 00048: Pot0006
+Object 00048: -1
+Object 00048: 0 // display
+Object 00048: 1 1 1
+Object 00048: 0 0 0
+Object 00048: 0 0 0
+Object 00048: 1
+Object 00048: 0
+Object 00048: 0
+Object 00048: 0 0
+Object 00048: 0
+Object 00048: 1
+Object 00048: 0
+Object 00048: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00048: 0000000000000
+Object 00048: 0 0
+Object 00048: # 0 0 0 0 0 0 0 0
+Object 00048: # 0 0 0 0 0 0 0 0
+Object 00048: 0 0
+
+Object 00049: 4
+Object 00049: 0.9921 0.0079 1.016
+Object 00049: 1.016 0.02248 1.016
+Object 00049: 0 0 0
+Object 00049: -0.7397 -1.177 4.66
+Object 00049: 7
+Object 00049: Metal_Chrome_1
+Object 00049: 0
+Object 00049: 0
+Object 00049: Bord0022
+Object 00049: -1
+Object 00049: 0 // display
+Object 00049: 1 1 1
+Object 00049: 0 0 0
+Object 00049: 0 0 0
+Object 00049: 1
+Object 00049: 0
+Object 00049: 0
+Object 00049: 0 0
+Object 00049: 0
+Object 00049: 1
+Object 00049: 0
+Object 00049: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00049: 0000000000000
+Object 00049: 0 0
+Object 00049: # 0 0 0 0 0 0 0 0
+Object 00049: # 0 0 0 0 0 0 0 0
+Object 00049: 0 0
+
+Object 00050: 15
+Object 00050: 0 0 0
+Object 00050: 0.9994 0.9994 1
+Object 00050: 90 0 0
+Object 00050: -0.7442 -0.6718 4.655
+Object 00050: 75
+Object 00050: Brown_RPlastic
+Object 00050: 0
+Object 00050: 0
+Object 00050: Peinture0006
+Object 00050: -1
+Object 00050: 0 // display
+Object 00050: 1 1 1
+Object 00050: 0 0 0
+Object 00050: 0 0 0
+Object 00050: 1
+Object 00050: 0
+Object 00050: 0
+Object 00050: 0 0
+Object 00050: 0
+Object 00050: 1
+Object 00050: 0
+Object 00050: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00050: 0000000000000
+Object 00050: 0 0
+Object 00050: # 0 0 0 0 0 0 0 0
+Object 00050: # 0 0 0 0 0 0 0 0
+Object 00050: 0 0
+
+Object 00051: 4
+Object 00051: 0.9921 0.0079 1.016
+Object 00051: 0.8752 0.01937 0.8752
+Object 00051: 0 45 0
+Object 00051: 4.966 -1.177 0.5008
+Object 00051: 7
+Object 00051: Metal_Chrome_1
+Object 00051: 0
+Object 00051: 0
+Object 00051: Bord0023
+Object 00051: -1
+Object 00051: 0 // display
+Object 00051: 1 1 1
+Object 00051: 0 0 0
+Object 00051: 0 0 0
+Object 00051: 1
+Object 00051: 0
+Object 00051: 0
+Object 00051: 0 0
+Object 00051: 0
+Object 00051: 1
+Object 00051: 0
+Object 00051: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00051: 0000000000000
+Object 00051: 0 0
+Object 00051: # 0 0 0 0 0 0 0 0
+Object 00051: # 0 0 0 0 0 0 0 0
+Object 00051: 0 0
+
+Object 00052: 5
+Object 00052: 0.8726 0.995 0
+Object 00052: 0.995 0.995 0.02341
+Object 00052: 90 0 0
+Object 00052: 4.963 -1.148 0.504
+Object 00052: 58
+Object 00052: Metal_Chrome_1
+Object 00052: 0
+Object 00052: 0
+Object 00052: Tube0008
+Object 00052: -1
+Object 00052: 0 // display
+Object 00052: 1 1 1
+Object 00052: 0 0 0
+Object 00052: 0 0 0
+Object 00052: 1
+Object 00052: 0
+Object 00052: 0
+Object 00052: 0 0
+Object 00052: 0
+Object 00052: 1
+Object 00052: 0
+Object 00052: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00052: 0000000000000
+Object 00052: 0 0
+Object 00052: # 0 0 0 0 0 0 0 0
+Object 00052: # 0 0 0 0 0 0 0 0
+Object 00052: 0 0
+
+Object 00053: 4
+Object 00053: 0.9921 0.0079 1.016
+Object 00053: 1.016 0.02248 1.016
+Object 00053: 0 0 0
+Object 00053: 4.966 1.178 0.5008
+Object 00053: 7
+Object 00053: Metal_Chrome_1
+Object 00053: 0
+Object 00053: 0
+Object 00053: Bord0024
+Object 00053: -1
+Object 00053: 0 // display
+Object 00053: 1 1 1
+Object 00053: 0 0 0
+Object 00053: 0 0 0
+Object 00053: 1
+Object 00053: 0
+Object 00053: 0
+Object 00053: 0 0
+Object 00053: 0
+Object 00053: 1
+Object 00053: 0
+Object 00053: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00053: 0000000000000
+Object 00053: 0 0
+Object 00053: # 0 0 0 0 0 0 0 0
+Object 00053: # 0 0 0 0 0 0 0 0
+Object 00053: 0 0
+
+Object 00054: 5
+Object 00054: 0.9903 0.9951 0
+Object 00054: 0.9951 0.9951 1.174
+Object 00054: 90 0 0
+Object 00054: 4.96 0 0.5035
+Object 00054: 7
+Object 00054: Metal_Chrome_1
+Object 00054: 0
+Object 00054: 0
+Object 00054: Pot0007
+Object 00054: -1
+Object 00054: 0 // display
+Object 00054: 1 1 1
+Object 00054: 0 0 0
+Object 00054: 0 0 0
+Object 00054: 1
+Object 00054: 0
+Object 00054: 0
+Object 00054: 0 0
+Object 00054: 0
+Object 00054: 1
+Object 00054: 0
+Object 00054: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00054: 0000000000000
+Object 00054: 0 0
+Object 00054: # 0 0 0 0 0 0 0 0
+Object 00054: # 0 0 0 0 0 0 0 0
+Object 00054: 0 0
+
+Object 00055: 4
+Object 00055: 0.9921 0.0079 1.016
+Object 00055: 1.016 0.02248 1.016
+Object 00055: 0 0 0
+Object 00055: 4.966 -1.177 0.5008
+Object 00055: 7
+Object 00055: Metal_Chrome_1
+Object 00055: 0
+Object 00055: 0
+Object 00055: Bord0025
+Object 00055: -1
+Object 00055: 0 // display
+Object 00055: 1 1 1
+Object 00055: 0 0 0
+Object 00055: 0 0 0
+Object 00055: 1
+Object 00055: 0
+Object 00055: 0
+Object 00055: 0 0
+Object 00055: 0
+Object 00055: 1
+Object 00055: 0
+Object 00055: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00055: 0000000000000
+Object 00055: 0 0
+Object 00055: # 0 0 0 0 0 0 0 0
+Object 00055: # 0 0 0 0 0 0 0 0
+Object 00055: 0 0
+
+Object 00056: 15
+Object 00056: 0 0 0
+Object 00056: 0.9994 0.9994 1
+Object 00056: 90 0 0
+Object 00056: 4.961 -0.6718 0.496
+Object 00056: 75
+Object 00056: Aquamarine_RPlastic
+Object 00056: 0
+Object 00056: 0
+Object 00056: Peinture0007
+Object 00056: -1
+Object 00056: 0 // display
+Object 00056: 1 1 1
+Object 00056: 0 0 0
+Object 00056: 0 0 0
+Object 00056: 1
+Object 00056: 0
+Object 00056: 0
+Object 00056: 0 0
+Object 00056: 0
+Object 00056: 1
+Object 00056: 0
+Object 00056: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00056: 0000000000000
+Object 00056: 0 0
+Object 00056: # 0 0 0 0 0 0 0 0
+Object 00056: # 0 0 0 0 0 0 0 0
+Object 00056: 0 0
+
+Object 00057: 4
+Object 00057: 0.9921 0.0079 1.016
+Object 00057: 0.8752 0.01937 0.8752
+Object 00057: 0 45 0
+Object 00057: -5.527 -1.177 0.3
+Object 00057: 7
+Object 00057: Metal_Chrome_1
+Object 00057: 0
+Object 00057: 0
+Object 00057: Bord0026
+Object 00057: -1
+Object 00057: 0 // display
+Object 00057: 1 1 1
+Object 00057: 0 0 0
+Object 00057: 0 0 0
+Object 00057: 1
+Object 00057: 0
+Object 00057: 0
+Object 00057: 0 0
+Object 00057: 0
+Object 00057: 1
+Object 00057: 0
+Object 00057: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00057: 0000000000000
+Object 00057: 0 0
+Object 00057: # 0 0 0 0 0 0 0 0
+Object 00057: # 0 0 0 0 0 0 0 0
+Object 00057: 0 0
+
+Object 00058: 5
+Object 00058: 0.8726 0.995 0
+Object 00058: 0.995 0.995 0.02341
+Object 00058: 90 0 0
+Object 00058: -5.531 -1.148 0.3032
+Object 00058: 58
+Object 00058: Metal_Chrome_1
+Object 00058: 0
+Object 00058: 0
+Object 00058: Tube0009
+Object 00058: -1
+Object 00058: 0 // display
+Object 00058: 1 1 1
+Object 00058: 0 0 0
+Object 00058: 0 0 0
+Object 00058: 1
+Object 00058: 0
+Object 00058: 0
+Object 00058: 0 0
+Object 00058: 0
+Object 00058: 1
+Object 00058: 0
+Object 00058: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00058: 0000000000000
+Object 00058: 0 0
+Object 00058: # 0 0 0 0 0 0 0 0
+Object 00058: # 0 0 0 0 0 0 0 0
+Object 00058: 0 0
+
+Object 00059: 4
+Object 00059: 0.9921 0.0079 1.016
+Object 00059: 1.016 0.02248 1.016
+Object 00059: 0 0 0
+Object 00059: -5.527 1.178 0.3
+Object 00059: 7
+Object 00059: Metal_Chrome_1
+Object 00059: 0
+Object 00059: 0
+Object 00059: Bord0027
+Object 00059: -1
+Object 00059: 0 // display
+Object 00059: 1 1 1
+Object 00059: 0 0 0
+Object 00059: 0 0 0
+Object 00059: 1
+Object 00059: 0
+Object 00059: 0
+Object 00059: 0 0
+Object 00059: 0
+Object 00059: 1
+Object 00059: 0
+Object 00059: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00059: 0000000000000
+Object 00059: 0 0
+Object 00059: # 0 0 0 0 0 0 0 0
+Object 00059: # 0 0 0 0 0 0 0 0
+Object 00059: 0 0
+
+Object 00060: 5
+Object 00060: 0.9903 0.9951 0
+Object 00060: 0.9951 0.9951 1.174
+Object 00060: 90 0 0
+Object 00060: -5.533 0 0.3027
+Object 00060: 7
+Object 00060: Metal_Chrome_1
+Object 00060: 0
+Object 00060: 0
+Object 00060: Pot0008
+Object 00060: -1
+Object 00060: 0 // display
+Object 00060: 1 1 1
+Object 00060: 0 0 0
+Object 00060: 0 0 0
+Object 00060: 1
+Object 00060: 0
+Object 00060: 0
+Object 00060: 0 0
+Object 00060: 0
+Object 00060: 1
+Object 00060: 0
+Object 00060: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00060: 0000000000000
+Object 00060: 0 0
+Object 00060: # 0 0 0 0 0 0 0 0
+Object 00060: # 0 0 0 0 0 0 0 0
+Object 00060: 0 0
+
+Object 00061: 4
+Object 00061: 0.9921 0.0079 1.016
+Object 00061: 1.016 0.02248 1.016
+Object 00061: 0 0 0
+Object 00061: -5.527 -1.177 0.3
+Object 00061: 7
+Object 00061: Metal_Chrome_1
+Object 00061: 0
+Object 00061: 0
+Object 00061: Bord0028
+Object 00061: -1
+Object 00061: 0 // display
+Object 00061: 1 1 1
+Object 00061: 0 0 0
+Object 00061: 0 0 0
+Object 00061: 1
+Object 00061: 0
+Object 00061: 0
+Object 00061: 0 0
+Object 00061: 0
+Object 00061: 1
+Object 00061: 0
+Object 00061: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00061: 0000000000000
+Object 00061: 0 0
+Object 00061: # 0 0 0 0 0 0 0 0
+Object 00061: # 0 0 0 0 0 0 0 0
+Object 00061: 0 0
+
+Object 00062: 15
+Object 00062: 0 0 0
+Object 00062: 0.9994 0.9994 1
+Object 00062: 90 0 0
+Object 00062: -5.532 -0.6718 0.2951
+Object 00062: 75
+Object 00062: Magenta_RPlastic
+Object 00062: 0
+Object 00062: 0
+Object 00062: Peinture0008
+Object 00062: -1
+Object 00062: 0 // display
+Object 00062: 1 1 1
+Object 00062: 0 0 0
+Object 00062: 0 0 0
+Object 00062: 1
+Object 00062: 0
+Object 00062: 0
+Object 00062: 0 0
+Object 00062: 0
+Object 00062: 1
+Object 00062: 0
+Object 00062: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00062: 0000000000000
+Object 00062: 0 0
+Object 00062: # 0 0 0 0 0 0 0 0
+Object 00062: # 0 0 0 0 0 0 0 0
+Object 00062: 0 0
+
+Object 00063: 4
+Object 00063: 0.9921 0.0079 1.016
+Object 00063: 0.8752 0.01937 0.8752
+Object 00063: 0 45 0
+Object 00063: 1.452 -1.177 4.035
+Object 00063: 7
+Object 00063: Metal_Chrome_1
+Object 00063: 0
+Object 00063: 0
+Object 00063: Bord0029
+Object 00063: -1
+Object 00063: 0 // display
+Object 00063: 1 1 1
+Object 00063: 0 0 0
+Object 00063: 0 0 0
+Object 00063: 1
+Object 00063: 0
+Object 00063: 0
+Object 00063: 0 0
+Object 00063: 0
+Object 00063: 1
+Object 00063: 0
+Object 00063: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00063: 0000000000000
+Object 00063: 0 0
+Object 00063: # 0 0 0 0 0 0 0 0
+Object 00063: # 0 0 0 0 0 0 0 0
+Object 00063: 0 0
+
+Object 00064: 5
+Object 00064: 0.8726 0.995 0
+Object 00064: 0.995 0.995 0.02341
+Object 00064: 90 0 0
+Object 00064: 1.448 -1.148 4.038
+Object 00064: 58
+Object 00064: Metal_Chrome_1
+Object 00064: 0
+Object 00064: 0
+Object 00064: Tube0010
+Object 00064: -1
+Object 00064: 0 // display
+Object 00064: 1 1 1
+Object 00064: 0 0 0
+Object 00064: 0 0 0
+Object 00064: 1
+Object 00064: 0
+Object 00064: 0
+Object 00064: 0 0
+Object 00064: 0
+Object 00064: 1
+Object 00064: 0
+Object 00064: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00064: 0000000000000
+Object 00064: 0 0
+Object 00064: # 0 0 0 0 0 0 0 0
+Object 00064: # 0 0 0 0 0 0 0 0
+Object 00064: 0 0
+
+Object 00065: 4
+Object 00065: 0.9921 0.0079 1.016
+Object 00065: 1.016 0.02248 1.016
+Object 00065: 0 0 0
+Object 00065: 1.452 1.178 4.035
+Object 00065: 7
+Object 00065: Metal_Chrome_1
+Object 00065: 0
+Object 00065: 0
+Object 00065: Bord0030
+Object 00065: -1
+Object 00065: 0 // display
+Object 00065: 1 1 1
+Object 00065: 0 0 0
+Object 00065: 0 0 0
+Object 00065: 1
+Object 00065: 0
+Object 00065: 0
+Object 00065: 0 0
+Object 00065: 0
+Object 00065: 1
+Object 00065: 0
+Object 00065: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00065: 0000000000000
+Object 00065: 0 0
+Object 00065: # 0 0 0 0 0 0 0 0
+Object 00065: # 0 0 0 0 0 0 0 0
+Object 00065: 0 0
+
+Object 00066: 5
+Object 00066: 0.9903 0.9951 0
+Object 00066: 0.9951 0.9951 1.174
+Object 00066: 90 0 0
+Object 00066: 1.446 0 4.038
+Object 00066: 7
+Object 00066: Metal_Chrome_1
+Object 00066: 0
+Object 00066: 0
+Object 00066: Pot0009
+Object 00066: -1
+Object 00066: 0 // display
+Object 00066: 1 1 1
+Object 00066: 0 0 0
+Object 00066: 0 0 0
+Object 00066: 1
+Object 00066: 0
+Object 00066: 0
+Object 00066: 0 0
+Object 00066: 0
+Object 00066: 1
+Object 00066: 0
+Object 00066: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00066: 0000000000000
+Object 00066: 0 0
+Object 00066: # 0 0 0 0 0 0 0 0
+Object 00066: # 0 0 0 0 0 0 0 0
+Object 00066: 0 0
+
+Object 00067: 4
+Object 00067: 0.9921 0.0079 1.016
+Object 00067: 1.016 0.02248 1.016
+Object 00067: 0 0 0
+Object 00067: 1.452 -1.177 4.035
+Object 00067: 7
+Object 00067: Metal_Chrome_1
+Object 00067: 0
+Object 00067: 0
+Object 00067: Bord0031
+Object 00067: -1
+Object 00067: 0 // display
+Object 00067: 1 1 1
+Object 00067: 0 0 0
+Object 00067: 0 0 0
+Object 00067: 1
+Object 00067: 0
+Object 00067: 0
+Object 00067: 0 0
+Object 00067: 0
+Object 00067: 1
+Object 00067: 0
+Object 00067: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00067: 0000000000000
+Object 00067: 0 0
+Object 00067: # 0 0 0 0 0 0 0 0
+Object 00067: # 0 0 0 0 0 0 0 0
+Object 00067: 0 0
+
+Object 00068: 15
+Object 00068: 0 0 0
+Object 00068: 0.9994 0.9994 1
+Object 00068: 90 0 0
+Object 00068: 1.447 -0.6718 4.03
+Object 00068: 75
+Object 00068: Magenta_RPlastic
+Object 00068: 0
+Object 00068: 0
+Object 00068: Peinture0009
+Object 00068: -1
+Object 00068: 0 // display
+Object 00068: 1 1 1
+Object 00068: 0 0 0
+Object 00068: 0 0 0
+Object 00068: 1
+Object 00068: 0
+Object 00068: 0
+Object 00068: 0 0
+Object 00068: 0
+Object 00068: 1
+Object 00068: 0
+Object 00068: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00068: 0000000000000
+Object 00068: 0 0
+Object 00068: # 0 0 0 0 0 0 0 0
+Object 00068: # 0 0 0 0 0 0 0 0
+Object 00068: 0 0
+
+End of file: PAINT.SCN

@@ -1,0 +1,64 @@
+.TH uglMesaCreateNewContextExt "3" "AOUT 2001" "WindML/Mesa" "WRS"
+
+.SH NAME
+uglMesaCreateNewContextExt \- Create a WindML/Mesa rendering context
+
+.SH SYNOPSIS
+.B #include <GL/uglmesa.h>
+.PP
+.nf
+.BI "UGL_MESA_CONTEXT uglMesaCreateNewContextExt ("
+.BI "                 GLenum " mode ,
+.BI "                 GLint " depth_bits ,
+.BI "                 GLint " stencil_bits ,
+.BI "                 GLint " accum_red_bits ,
+.BI "                 GLint " accum_green_bits ,
+.BI "                 GLint " accum_blue_bits ,
+.BI "                 GLint " accum_alpha_bits ,
+.BI "                 UGL_MESA_CONTEXT " share_list );
+.fi
+
+.SH DESCRIPTION
+The \fBuglMesaCreateNewContextExt\fR function creates a WindML/Mesa
+rendering context and specifies desired size of depth buffer, stencil
+buffer and accumulation buffer.
+.PP
+If you specify zero for \fIdepth_bits\fR, \fIstencil_bits\fR,
+\fIaccum_[red|gren|blue]_bits\fR, you can save some memory.
+
+.SH INPUT
+\fImode\fR - can takes the following mask values:
+      UGL_MESA_SINGLE = single buffer mode
+
+      UGL_MESA_DOUBLE = double buffer mode, first tries hardware mode and then software mode
+      UGL_MESA_DOUBLE_SOFTWARE = double buffer software, fails if impossible
+      UGL_MESA_DOUBLE_HARDWARE = double buffer hardware, fails if impossible
+
+      UGL_MESA_WINDML_EXCLUSIVE = uses only WindML calls to write into the memory screen
+.PP
+For example, uglMesaCreateNewContext(UGL_MESA_SINGLE | UGL_MESA_WINDML_EXCLUSIVE) will use a single buffer and will only write into the screen memory with WindML calls. UGL_MESA_DOUBLE_SOFTWARE will be replaced by UGL_MESA_DOUBLE in WindML mode. There is no sense to use single and double buffer at the same time.
+.PP
+\fIdepth_bits\fR - depth buffer size
+.PP
+\fIstencil_bits\fR - stencil buffer size
+.PP
+\fIaccum_red_bits\fR - accumulation red buffer size
+.PP
+\fIaccum_green_bits\fR - accumulation green buffer size
+.PP
+\fIaccum_blue_bits\fR - accumulation blue buffer size
+.PP
+\fIaccum_alpha_bits\fR - accumulation alpha buffer size
+.PP
+\fIshare_list\fR - specifies another UGL_MESA_CONTEXT with which to share
+display lists. NULL indicates no sharing.
+
+.SH RETURN VALUES
+a UGL_MESA_CONTEXT, or zero if error.
+
+.SH SEE ALSO
+.BR uglMesaCreateNewContext "(3), " uglMesaMakeCurrentContext "(3)"
+
+.SH COPYRIGHT
+Copyright \(co 2001 Wind River Systems, Inc.
+

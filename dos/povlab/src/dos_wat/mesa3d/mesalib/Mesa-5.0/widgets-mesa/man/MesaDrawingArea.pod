@@ -1,0 +1,80 @@
+=head1 NAME
+
+MesaDrawingArea - An Xt widget for Mesa/X with richer semantics
+
+=head1 DESCRIPTION
+
+The I<MesaDrawingArea> widget is an extension of the I<GLwDrawingArea>
+widget which takes advantage of some features of the B<Mesa/X>
+implementation of the B<OpenGL> API.  
+
+It also simplifies programming by associating a drawing context
+transparently to the widget.  This feature is particulary convenient
+in applications that have to deal with multiple instances of a
+I<MesaDrawingArea> widget.
+
+=head1 Resources
+
+The following X resources are available in addition to the
+I<GLwDrawingArea> resources:
+
+  ___________________________________________________________________________
+  |                    |                    |         |                      |
+  | Name               | Class              | Type    | OpenGL attribute     |
+  |____________________|____________________|_________|______________________|
+  |                    |                    |         |                      |
+  | GLwNximage         | GLwCXImage         | Boolean | N/A                  |
+  |____________________|____________________|_________|______________________|
+  |                    |                    |         |                      |
+  | GLwNshareLists     | GLwCShareLists     | Boolean | N/A                  |
+  |____________________|____________________|_________|______________________|
+  |                    |                    |         |                      |
+  | GLwNshareListsWith | GLwCShareListsWith | Widget  | N/A                  |
+  |____________________|____________________|_________|______________________|
+
+
+=over 4
+
+=item Boolean ximage
+
+Is I<False> by default, setting it to I<True> will cause B<Mesa/X> to
+use an Ximage (in contrast to a pixmap) as second buffer.
+
+=item Boolean shareLists
+
+Is I<False> by default, setting it to I<True> will cause B<Mesa/X> to
+share display lists among all widgets that have this ressource set to
+I<True>.
+
+=item Boolean shareListsWith
+
+B<[Caveat: This resource is not honored yet.]>
+
+Is I<NULL> by default, setting it to another I<MesaDrawingArea> widget
+will cause the two widgets to share display lists.
+
+=back
+
+=head1 Utility functions
+
+The following utility functions are available
+
+=over 4
+
+=item void GLwMakeCurrent (Widget w)
+
+switches the B<Mesa/X> context to the one associated to the widget I<w>.
+
+=back
+
+=head1 SEE ALSO
+
+L<GLwDrawingArea>, L<MesaWorkstation>
+
+=head1 AUTHOR
+
+Thorsten.Ohl @ Physik.TH-Darmstadt.de
+
+=head1 DATE
+
+$Id: MesaDrawingArea.pod,v 1.1.1.1 1999/08/19 00:55:42 jtg Exp $

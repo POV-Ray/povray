@@ -1,0 +1,48 @@
+
+
+The mklib.* scripts are use to make shared libraries on different
+flavors of Unix (and other Unix-like OSes).  But these scripts are
+only used with the Makefile.X11 (and similar) makefiles.  These
+scripts are NOT used by GNU configure.
+
+In all cases, the command line arguments are:
+
+	mklib libname major minor tiny file.o [...]
+
+where
+	libname = the library name ("libGL.so" for example)
+	major = the major version number ("1" for example)
+	minor = the minor version number ("2" for example)
+	tiny = the tiny version number ("310" for example)
+	file.o [...] = the list of one or more object files
+
+On most OSes, the final library name will be of the form:
+	libname.major.minor.tiny
+
+For example,
+	mklib libGL.so 1 2 310 file.o ...
+
+would generate the library named "libGL.so.1.2.310" which would be
+the Mesa 3.1.0 implementation of the OpenGL 1.2 spec.
+
+
+
+
+The *.py Python scripts are used to generate several Mesa source
+files from a gl.spec file.  The gl.spec file describes all the
+OpenGL functions and extensions.  From the gl.spec file we generate
+the following:
+
+script			generated file
+---------------------   --------------
+gloffsets.py		src/glapioffsets.h
+gltable.py		src/glapitable.h
+glx86asm.py		src/X86/glapi_x86.S
+glsparcasm.py		src/SPARC/glapi_sparc.S
+
+The gl.spec file can be obtained from the OpenGL SI codebase
+in projects/ogl-sample/main/doc/registry/specs/gl.spec
+
+
+----------------------------------------------------------------------
+$Id: README,v 1.4 2001/06/05 22:25:07 davem69 Exp $

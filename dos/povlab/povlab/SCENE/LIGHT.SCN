@@ -1,0 +1,108 @@
+;POVLAB version 4.0 shareware - ascii scene for 3D modeller.
+;(C) 1997, Denis Olivier.
+;All rights reserved.
+;Date=Tuesday 04-24-2001.
+;Time=14:39:02.
+;user_name=REGISTER!
+ColorCamera=4
+ColorViewport=0
+ColorTextBackground=8
+ColorSelection=6
+ColorInterface=7
+ColorAxis=5
+ColorGrid=2
+GrilleType=1
+CurrentViewport=3
+Viewportx4=1
+DisplayAxis=1
+DisplayGrid=1
+CurrentTexture=White_RPlastic
+CurrentCamera=1
+BackgroundImageRGB: 50 50 60
+Fog: 255 255 255 0 0 1 0 0 0 0
+Atmosphere: 0 1 10 0.1 0 20 0.25 0.1 8 255 255 255
+UseSelection: 0
+RayGlobal: 0.003922 2.2 3 64 10 0.25 0.18 0.14
+Scale-X/Y F0: 38.86
+Shift-X F0: -0.4851
+Shift-Y F0: 2.389
+Scale-X/Y F1: 27.82
+Shift-X F1: -2.033
+Shift-Y F1: 2.389
+Scale-X/Y F2: 19.83
+Shift-X F2: -0.4851
+Shift-Y F2: -2.033
+Scale-X/Y F3: 45
+Shift-X F3: 0
+Shift-Y F3: 0
+Camera: 0 -4.782 6.724 0 -0.9679 0 67.5 7.002 0 0 0 0 0 0
+Display_Camera: 1
+
+Omni 001: -1.961 -3.5 2.347 0 0 255 3 1 0 0 0 0 0 0
+Omni 002: 2.931 -3.5 0.1424 0 255 0 3 1 0 0 0 0 0 0
+Omni 003: -1.329 -3.474 -2.658 255 0 0 3 1 0 0 0 0 0 0
+Display_Omni: 1
+
+Nb-Object: 2
+
+[EndInitSection]
+
+Object 00001: 7
+Object 00001: 0 0 0
+Object 00001: 1 1 1
+Object 00001: 0 0 0
+Object 00001: 0 0 0
+Object 00001: 7
+Object 00001: White_RPlastic
+Object 00001: 0
+Object 00001: 0
+Object 00001: Sol
+Object 00001: -1
+Object 00001: 143 // display
+Object 00001: 1 1 1
+Object 00001: 0 0 0
+Object 00001: 0 0 0
+Object 00001: 1
+Object 00001: 0
+Object 00001: 0
+Object 00001: 0 0
+Object 00001: 0
+Object 00001: 1
+Object 00001: 76
+Object 00001: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00001: 0000000000000
+Object 00001: 0 0
+Object 00001: # 0 0 0 0 0 0 0 0
+Object 00001: # 0 0 0 0 0 0 0 0
+Object 00001: 0 0
+
+Object 00002: 1
+Object 00002: 0 0 0
+Object 00002: 1 1 1
+Object 00002: 0 0 0
+Object 00002: 0 -0.9962 0
+Object 00002: 7
+Object 00002: White_RPlastic
+Object 00002: 0
+Object 00002: 0
+Object 00002: Sphère
+Object 00002: -1
+Object 00002: 0 // display
+Object 00002: 1 1 1
+Object 00002: 0 0 0
+Object 00002: 0 0 0
+Object 00002: 1
+Object 00002: 0
+Object 00002: 0
+Object 00002: 0 0
+Object 00002: 0
+Object 00002: 1
+Object 00002: 132
+Object 00002: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00002: 0000000000000
+Object 00002: 0 0
+Object 00002: # 0 0 0 0 0 0 0 0
+Object 00002: # 0 0 0 0 0 0 0 0
+Object 00002: 0 0
+
+End of file: LIGHT.SCN

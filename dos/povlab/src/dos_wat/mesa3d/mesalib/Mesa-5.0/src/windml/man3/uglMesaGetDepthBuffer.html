@@ -1,0 +1,72 @@
+Content-type: text/html
+
+<HTML><HEAD><TITLE>Manpage of uglMesaGetDepthBuffer</TITLE>
+</HEAD><BODY>
+<H1>uglMesaGetDepthBuffer</H1>
+Section: WRS (3)<BR>Updated: AOUT 2001<BR><A HREF="#index">Index</A>
+<A HREF="http://localhost/cgi-bin/man/man2html">Return to Main Contents</A><HR>
+
+<P>
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+uglMesaMoveGetDepthBuffer - Return the depth buffer associated with an UGL/Mesa context
+<P>
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>#include &lt;<A HREF="file:/usr/include/GL/uglmesa.h">GL/uglmesa.h</A>&gt;</B>
+
+<P>
+
+<PRE>
+<B>GLboolean uglMesaGetDepthBuffer (GLint * </B><I>width</I><B>, GLint *</B><I>height</I><B>,</B>
+<B>                                 GLint *</B><I>bytesPerValue</I><B>,</B>
+<B>                                 void **</B><I>buffer</I><B>);</B>
+</PRE>
+
+<P>
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+The <B>uglMesaGetDepthBuffer</B> function returns the depth buffer associated with an UGL/Mesa context.
+<P>
+<A NAME="lbAE">&nbsp;</A>
+<H2>INPUT VALUES</H2>
+
+<I>width, height</I> - size of buffer in pixels
+<P>
+
+<I>bytesPerValue</I> - bytes per depth value (2 or 4)
+<P>
+
+<I>buffer</I> - pointer to depth buffer values
+<P>
+<A NAME="lbAF">&nbsp;</A>
+<H2>RETURN VALUES</H2>
+
+GL_TRUE or GL_FALSE to indicate success or failure.
+<P>
+<A NAME="lbAG">&nbsp;</A>
+<H2>COPYRIGHT</H2>
+
+Copyright &#169; 2001 Wind River Systems, Inc.
+<P>
+
+<HR>
+<A NAME="index">&nbsp;</A><H2>Index</H2>
+<DL>
+<DT><A HREF="#lbAB">NAME</A><DD>
+<DT><A HREF="#lbAC">SYNOPSIS</A><DD>
+<DT><A HREF="#lbAD">DESCRIPTION</A><DD>
+<DT><A HREF="#lbAE">INPUT VALUES</A><DD>
+<DT><A HREF="#lbAF">RETURN VALUES</A><DD>
+<DT><A HREF="#lbAG">COPYRIGHT</A><DD>
+</DL>
+<HR>
+This document was created by
+<A HREF="http://localhost/cgi-bin/man/man2html">man2html</A>,
+using the manual pages.<BR>
+Time: 09:32:46 GMT, August 30, 2001
+</BODY>
+</HTML>

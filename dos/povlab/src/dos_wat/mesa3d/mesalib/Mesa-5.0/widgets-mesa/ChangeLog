@@ -1,0 +1,41 @@
+Mon Jan 15 01:41:30 1996  Thorsten Ohl  <ohl@tholix1.home.de>
+
+	* began with Motif support for the Mesa* widgets.  Not finished
+	yet (e.g. Keyboard translations).
+
+Wed Jan  3 22:32:34 1996  Thorsten Ohl  <ohl@tholix1>
+
+	* configure.in: A few compilation problems fixed by The Net.
+
+Thu Jun  8 11:49:40 1995  Thorsten Ohl  <ohl@localhost>
+
+	* configure.in:  test for memmove() separately.  SunOS has memcopy
+	but not memmove() (<Frederic.Devernay@sophia.inria.fr>).
+
+Tue Apr 11 22:13:43 1995  Thorsten Ohl  <ohl@localhost>
+
+	* use GLPL throughout.  Some files still had a GPL.
+
+Mon Apr 10 21:04:46 1995  Thorsten Ohl  <ohl@localhost>
+
+	* Canonicalize utility function names.  Use GLw* instead of mesa_*
+	as common prefix.  Even though I prefer to separate words in
+	function names by underscores, it's better to stick to common
+	practice, which in X11 programs is captalization.
+
+Sat Apr  8 18:22:21 1995  Thorsten Ohl  <ohl@localhost>
+
+	* configure.in:  --enable-debug
+
+Tue Apr  4 00:13:41 1995  Thorsten Ohl  <ohl@localhost>
+
+	* Makefile.in (demo.*): new targets for debugging specific 8-bit
+	visuals
+
+Thu Mar 30 23:03:29 1995  Thorsten Ohl  <ohl@localhost>
+
+	* Makefile.in: SHELL = /bin/sh
+
+	* configure.in (mesa_srcdir): like top_srcdir, pointing to the
+	root of the Mesa source tree.
+

@@ -1,0 +1,440 @@
+               Persistence of Vision(tm) Ray Tracer
+                                 
+                      POV-Ray(tm) Version 3.1g
+                                 
+                   Legal Information and License
+                                 
+                             May 1999
+                                 
+             GENERAL LICENSE AGREEMENT -- POVLEGAL.DOC
+                                 
+THIS NOTICE MUST ACCOMPANY ALL OFFICIAL OR CUSTOM PERSISTENCE OF
+VISION FILES. IT MAY NOT BE REMOVED OR MODIFIED. THIS INFORMATION
+PERTAINS TO ALL USE OF THE PACKAGE WORLDWIDE.  THIS DOCUMENT
+SUPERSEDES ALL PREVIOUS GENERAL LICENSES OR DISTRIBUTION POLICIES.
+ANY INDIVIDUALS, COMPANIES OR GROUPS WHO HAVE BEEN GRANTED SPECIAL
+LICENSES MAY CONTINUE TO DISTRIBUTE VERSION 2.x BUT MUST RE-APPLY
+FOR VERSION 3.00 OR LATER.
+
+This document pertains to the use and distribution of the
+Persistence of Vision(tm) Ray Tracer a.k.a POV-Ray(tm). It applies
+to all POV-Ray program source files, executable (binary) files,
+scene files, documentation files, help file, bitmaps and INI files
+contained in official POV-Ray Team(tm) archives.  All of these are
+referred to here as "the software". The POV-Team reserves the
+right to revise these rules in future versions and to make
+additional rules to address new circumstances at any time.
+
+All of this software is Copyright 1991,1999 by the POV-Ray
+Team(tm). Although it is distributed as freeware, it is NOT PUBLIC
+DOMAIN.
+
+The copyrighted package may ONLY be distributed and/or modified
+according to the license granted herein.  The spirit of the
+license is to promote POV-Ray as a standard ray tracer, provide
+the full POV-Ray package freely to as many users as possible,
+prevent POV-Ray users and developers from being taken advantage
+of, enhance the life quality of those who come in contact with POV-
+Ray.  This license was created so these goals could be realized.
+You are legally bound to follow these rules, but we hope you will
+follow them as a matter of ethics, rather than fear of litigation.
+
+                         USAGE PROVISIONS
+                                 
+Permission is granted to the user to use the software and
+associated files in this package to create and render images. The
+use of this software for the purpose of creating images is
+completely free. The creator of a scene file and the image created
+from the scene file, retains all rights to the image and scene
+file they created and may use them for any purpose commercial or
+non-commercial.
+
+The user is also granted the right to use the scenes files, fonts,
+bitmaps, and include files distributed in the INCLUDE and
+SCENES\INCDEMO sub-directories in their own scenes.  Such
+permission does not extend to files in the SCENES directory or its
+sub-directories.  The SCENES files are for your enjoyment and
+education but may not be the basis of any derivative works.
+
+                GENERAL RULES FOR ALL DISTRIBUTION
+                                 
+The permission to distribute this package under certain very
+specific conditions is granted in advance, provided that the
+following conditions are met.
+
+These archives must not be re-archived using a different method
+without the explicit permission of the POV-Team.  You may rename
+the archives only to meet the file name conventions of your system
+or to avoid file name duplications but we ask that you try to keep
+file names as similar to the originals as possible.  (For example:
+POVSRC.ZIP to POVSRC30.ZIP)
+
+Ready-to-run unarchived distribution on CD-ROM is also permitted
+if the files are arranged in our standard directory or folder
+structure as though it had been properly installed on a hard disk.
+
+You must distribute a FULL PACKAGE of files as described in the
+next section.  No portion of this package may be separated from
+the package and distributed separately other than under the
+conditions specified in the provisions given below.
+
+Non-commercial distribution in which no money or compensation is
+charged (such as a user copying the software for a personal friend
+or colleague) is permitted with no other restrictions.
+
+Teachers and educational institutions may also distribute the
+material to students for free or they may charge minimal copying
+costs if the software is to be used in a course.
+
+                   DEFINITION OF "FULL PACKAGE"
+                                 
+A "full package" contains an executable program, documentation,
+and sample scenes.  For generic Unix platforms, there are no
+executables available so the portable C source code must be
+included instead of the executable program.
+
+POV-Ray is officially distributed for MS-Dos; Windows 95/98/NT;
+Linux for Intel x86 series; Apple Macintosh; Apple PowerPC; SunOS;
+and Amiga. Other systems may be added in the future.
+
+Distributors need not support all platforms but for each platform
+you support you must distribute a full package. For example a
+Macintosh only CD-ROM need not distribute the Windows versions.
+
+This software may ONLY be bundled with other software packages
+according to the conditions specified in the provisions below.
+
+   CONDITIONS FOR CD-ROM OR SHAREWARE/FREEWARE DISTRIBUTION 
+                                 
+Shareware and freeware distribution companies may distribute the
+software included in software-only compilations using media such
+as, but not limited to, floppy disk, CD-ROM, tape backup, optical
+disks, hard disks, or memory cards. This section only applies to
+distributors of collected programs. Anyone wishing to bundle the
+package with a shareware product must use the commercial bundling
+rules.
+
+Distribution on CD-ROM or high capacity media such as backup tape 
+is permitted if the total cost to the user is no more than $0.08
+U.S. dollars per megabyte of data. For example a CD-ROM with 600
+meg could cost no more than $48.00 US. 
+
+Any bundling with books,magazines or other print media is 
+permitted if the total cost of the book or magazine with CD is 
+less than the $48.00 limit.  Bundling with more expensive 
+publications or distributions should use the commercial rules.
+
+For floppy disk distribution, no more than five dollars U.S. ($5)
+can be charged per disk for the copying of this software and the
+media it is provided on. Space on each disk must be used as fully
+as possible. You may not spread the files over more disks than are
+necessary.
+
+   CONDITIONS FOR ON-LINE SERVICES AND BBS'S INCLUDING INTERNET
+                                 
+On-line services, BBS's and internet sites may distribute the POV-
+Ray software under the conditions in this section. Sites which
+allow users to run POV-Ray from remote locations must use separate
+provisions in the section below.
+
+The archives must all be easily available on the service and
+should be grouped together in a similar on-line area.
+
+It is strongly requested that sites remove prior versions of POV-
+Ray to avoid user confusion and simplify or minimize our support
+efforts.
+
+The site may only charge standard usage rates for the downloading
+of this software. A premium may not be charged for this package.
+I.E. CompuServe or America On-Line may make these archives
+available to their users, but they may only charge regular usage
+rates for the time required to download.
+
+               ONLINE OR REMOTE EXECUTION OF POV-Ray
+                                 
+Some internet sites have been set up so that remote users can
+actually run POV-Ray software on the internet server. Other
+companies sell CPU time for running POV-Ray software on
+workstations or high-speed computers. Such use of POV-Ray software
+is permitted under the following conditions.
+
+Fees or charges, if any, for such services must be for connect
+time, storage or processor usage ONLY. No premium charges may be
+assessed for use of POV-Ray beyond that charged for use of other
+software. Users must be clearly notified that they are being
+charged for use of the computer and not for use of POV-Ray
+software.
+
+Users must be prominently informed that they are using POV-Ray
+software, that such software is free, and where they can find
+official POV-Ray software. Any attempt to obscure the fact that
+the user is running POV-Ray is expressly prohibited.
+
+All files normally available in a full package distribution,
+especially a copy of this license and full documentation must be
+available for download or readable online so that users of an
+online executable have access to all of the material of a full
+user package.
+
+If the POV-Ray software has been modified in any way, it must also
+follow the provisions for custom versions below.
+
+            PERMITTED MODIFICATION AND CUSTOM VERSIONS
+                                 
+Although the full source code for POV-Ray is distributed, there
+are strict rules for the use of the source code. The source
+distribution is provided to;  1) promote the porting of POV-Ray to
+hardware and operating systems which the POV-Team cannot support.
+2) promote experimentation and development of new features to the
+core code which might eventually be incorporated into the official
+version.  3) provide insight into the inner workings of the
+program for educational purposes.
+
+These license provisions have been established to promote the
+growth of POV-Ray and prevent difficulties for users and
+developers alike. Please follow them carefully for the benefit of
+all concerned when creating a custom version.
+
+The user is granted the privilege to modify and compile the source
+code for their own personal use in any fashion they see fit. What
+you do with the software in your own home is your business.
+
+However severe restrictions are imposed if the user wishes to
+distribute a modified version of the software, documentation or
+other parts of the package (here after referred to as a "custom
+version"). You must follow the provisions given below. This
+includes any translation of the documentation into other languages
+or other file formats.
+
+A "custom version" is defined as a fully functional version of POV-
+Ray with all existing features intact. ANY OTHER USE OF ANY POV-
+Ray SOURCE CODE IS EXPRESSLY PROHIBITED. The POV-Team does not
+license source code for any use outside POV-Ray. No portion of the
+POV-Ray source code may be incorporated into another program
+unless it is clearly a custom version of POV-Ray that includes all
+of the basic functions of POV-Ray.
+
+All executables, documentation, modified files and descriptions of
+the same must clearly identify themselves as a modified and
+unofficial version of POV-Ray. Any attempt to obscure the fact
+that the user is running POV-Ray or to obscure that this is an
+unofficial version expressly prohibited.
+
+POV-Ray may not be linked into other software either at compile-
+time using an object code linker nor at run-time as a DLL,
+ActiveX, or other system. Such linkage can tend to blur the end-
+user's perception of which program provides which functions and
+thus qualifies as an attempt to obscure what is running.
+
+To allow POV-Ray to communicate with outside programs, the official
+versions of POV-Ray include several internal communication "hooks" 
+for it to call other tasks, often called an Application Programming 
+Interface, or API. For example: the generic part of POV-Ray provides
+operating system shell-out API commands. The Windows version has a 
+GUI-extension API and the ability to replace the text editor.
+Modification to these APIs or other officially supported
+communication mechanisms to increase functionality beyond that of 
+the official version IS EXPRESSLY PROHIBITED.
+
+          CONDITIONS FOR DISTRIBUTION OF CUSTOM VERSIONS
+                                 
+If your re-compiled version meets all requirements for custom
+versions listed above, the following conditions apply to its
+distribution:
+
+You must provide all POV-Ray support for all users who use your
+custom version. You must provide information so that user may
+contact you for support for your custom version. The POV-Ray Team
+is not obligated to provide you or your users any technical
+support.
+
+Include contact information in the DISTRIBUTION_MESSAGE macros in
+the source file OPTOUT.H and insure that the program prominently
+displays this information. Display all copyright notices and
+credit screens for the official version.
+
+Custom versions may only be distributed as freeware. You must make
+all of your modifications to POV-Ray freely and publicly available
+with FULL SOURCE CODE to the modified portions of POV-Ray and must
+freely distribute full source to any new parts of the custom
+version. The goal is that users must be able to re-compile the
+program themselves using readily available compilers and run-time
+libraries and to be able to further improve the program with their
+own modifications.
+
+You must provide documentation for any and all modifications that
+you have made to the program that you are distributing. Include
+clear and obvious information on how to obtain the official POV-
+Ray.
+
+The user is encouraged to send enhancements and bug fixes to the
+POV-Ray Team, but the team is in no way required to utilize these
+enhancements or fixes. By sending material to the team, the
+contributor asserts that he owns the materials or has the right to
+distribute these materials. He authorizes the team to use the
+materials any way they like. The contributor still retains rights
+to the donated material, but by donating, grants unrestricted,
+irrevocable usage and distribution rights to the POV- Team. The
+team doesn't have to use the material, but if we do, you do not
+acquire any rights related to POV-Ray. The team will give you
+credit as the creator of new code if applicable.
+
+Include a copy of this document (POVLEGAL.DOC).
+
+                CONDITIONS FOR COMMERCIAL BUNDLING
+                                 
+Vendors wishing to bundle POV-Ray with commercial software
+(including shareware) or other distribution not already described
+above must first obtain explicit permission from the POV-Team.
+Such permission is rarely granted. The POV-Team will decide if
+such distribution will be allowed on a case-by-case basis and may
+impose certain restrictions as it sees fit. The minimum terms are
+given below. Other conditions may be imposed.
+
+    The product must be an existing product that has proven itself 
+as commercially viable without POV-Ray included.
+
+    The inclusion of POV-Ray should be promoted only as a free
+bonus and not as a feature designed to encourage customers to
+purchase or upgrade solely for the POV-Ray capability.
+
+    Purchasers of your product must not be led to believe that
+they are paying for POV-Ray. Any mention of the POV-Ray bundle on
+the box, in advertising or in instruction manuals must be clearly
+marked with a disclaimer that POV-Ray is free software and can be
+obtained for free or nominal cost from various sources.
+
+    Include clear and obvious information on how to obtain the
+official POV-Ray.
+
+    You must provide all POV-Ray support for all users who
+acquired POV- Ray through your product. The POV-Team is not
+obligated to provide you or your customers any technical support.
+
+    Include a credit page or pages in your documentation for POV-
+Ray.
+
+    If you modify any portion POV-Ray for use with your hardware
+or software, you must follow the custom version rules in addition
+to these rules.
+
+    Include contact and support information for your product.
+
+    Include a full user package as described above.
+
+                 POV-Team ENDORSEMENT PROHIBITIONS
+                                 
+On rare occasions, the POV-Team endorses distributions in which
+POV-Team members are compensated participants and which the POV-
+Team has given approval.
+
+Without specific approval, distributors (whether free or
+commercial) must not claim or imply in any way that the POV-Team
+officially endorses or supports the distributor or the product
+(such as CD, book, or magazine) associated with the distribution.
+
+You may not claim or imply that the POV-Team derives any benefit
+from your distribution.
+
+If you wish to emphasize that your distribution is legal, you may
+use this language "This distribution of the official version of
+POV-Ray is permitted under the terms of the General License in the
+file POVLEGAL.DOC. The POV- Team does not endorse the distributor
+or its products. The POV-Team receives no compensation for this
+distribution."
+
+                   RETAIL VALUE OF THIS SOFTWARE
+                                 
+Although POV-Ray is, when distributed within the terms of this
+agreement, free of charge, the retail value (or price) of this
+program is determined as US$20.00 per copy distributed or copied.
+If the software is distributed or copied without authorization you
+are legally liable to this debt to the copyright holder or any
+other person or organization delegated by the copyright holder for
+the collection of this debt, and you agree that you are legally
+bound by the above and will pay this debt within 30 days of the
+event.
+
+However, none of the above paragraph constitutes permission for
+you to distribute this software outside of the terms of this
+agreement. In particular, the conditions and debt mentioned above
+(whether paid or unpaid) do not allow you to avoid statutory
+damages or other legal penalties and does not constitute any
+agreement that would allow you to avoid such other legal remedies
+as are available to the copyright holder.
+
+Put simply, POV-Ray is only free if you comply with our
+distribution conditions; it is not free otherwise. The copyright
+holder of this software chooses to give it away free under these
+and only these conditions.
+
+For the purpose of copyright regulations, the retail value of this
+software is US$20.00 per copy.
+
+                         OTHER PROVISIONS
+                                 
+The team permits and encourages the creation of programs,
+including commercial packages, which import, export or translate
+files in the POV-Ray Scene Description Language. There are no
+restrictions on use of the language itself. We reserve the right
+to add or remove or change any part of the language.
+
+"POV-Ray", "Persistence of Vision", "POV-Team" and "POV-Help" are
+trademarks of the POV-Team.
+
+While we do not claim any restrictions on the letters "POV" alone,
+we humbly request that you not use POV in the name of your
+product. Such use tends to imply it is a product of the POV-Team.
+Existing programs which used "POV" prior to the publication of
+this document need not feel guilty for doing so provided that you
+make it clear that the program is not the work of the team nor
+endorsed by us.
+
+                       REVOCATION OF LICENSE
+                                 
+VIOLATION OF THIS LICENSE IS A VIOLATION OF COPYRIGHT LAWS. IT
+WILL RESULT IN REVOCATION OF ALL DISTRIBUTION PRIVILEGES AND MAY
+RESULT IN CIVIL OR CRIMINAL PENALTY.
+
+Such violators who are prohibited from distribution will be
+identified in this document.
+
+In this regard, "PC Format", a magazine published by Future
+Publishing, Ltd. in the United Kingdom, distributed incomplete
+versions of POV-Ray 1.0 in violation the license which was effect
+at the time. They later attempted to distribute POV-Ray 2.2
+without prior permission of the POV- Team in violation the license
+which was in effect at the time. There is evidence that other
+Future Publishing companies have also violated our terms.
+Therefore "PC Format", and any other magazine, book or CD-ROM
+publication owned by Future Publishing is expressly prohibited
+from any distribution of POV-Ray software until further notice.
+
+                            DISCLAIMER
+                                 
+This software is provided as is without any guarantees or
+warranty. Although the authors have attempted to find and correct
+any bugs in the package, they are not responsible for any damage
+or losses of any kind caused by the use or misuse of the package.
+The authors are under no obligation to provide service,
+corrections, or upgrades to this package.
+
+                 ---End of License Information---
+                                 
+We sincerely hope you have fun with our program. If you have any problems with the program, the team would like to hear about them. Also, if you have any comments, questions or enhancements, please the POV-Ray Team on the internet at http://www.povray.org or our private news server news.povray.org with over a dozen povray-related news groups.  The USENET group comp.graphics.rendering.raytracing is also a great source of information on POV-Ray and related topics. 
+License inquiries should be made via email and limited technical
+support is available via email to:
+
+POV-Ray Team Coordinator team-coord@povray.org 
+
+The following postal address is only for official license business
+and only if email is impossible.
+
+We do not provide technical support via regular mail, only email.
+We don't care if you don't have a modem or online access. We will
+not mail you disks with updated versions. Do not send money.
+
+Chris Young; 3119 Cossell Drive; Indianapolis, IN 46224 U.S.A.
+
+The other authors' contact information may be found in the
+documentation.

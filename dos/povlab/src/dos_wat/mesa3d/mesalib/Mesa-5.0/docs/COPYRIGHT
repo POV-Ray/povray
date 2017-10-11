@@ -1,0 +1,168 @@
+
+                   Mesa Copyright / License Information
+
+
+The Mesa distribution consists of several components.  Different copyrights
+and licenses apply to different components.  For example, GLUT is copyrighted
+by Mark Kilgard, some demo programs are copyrighted by SGI, some of the Mesa
+device drivers are copyrighted by their authors.  See below for a list of
+Mesa's components and the copyright/license for each.
+
+The core Mesa library is licensed according to the terms of the XFree86
+copyright (an MIT-style license).  This allows integration with the
+XFree86/DRI project.  Unless otherwise stated, the Mesa source code and
+documentation is licensed as follows:
+
+Copyright (C) 1999-2001  Brian Paul   All Rights Reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+BRIAN PAUL BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+
+Contributors:
+
+When contributing to the Mesa project you must agree to relinquish your
+work to the holder of the copyright for the particular component you're
+contributing to.  That is, you can't put your own copyright on the code,
+unless it's a modular piece that can be omitted from Mesa (like a new
+device driver).  If for example, you contribute a bug fix to Mesa's
+texture mapping code, your code will become a part of the body of work
+which is copyrighted by Brian Paul and licensed by the above terms.
+
+
+
+Mesa Component Licenses:
+
+Component       Files                 Primary Author      License
+----------------------------------------------------------------------------
+core Mesa code  src/*.[ch]            Brian Paul          Mesa
+                include/GL/gl.h
+
+GLX driver      src/X/*               Brian Paul          Mesa
+                include/GL/glx.h
+                include/GL/xmesa.h
+
+OS/Mesa driver  src/OSmesa/*          Brian Paul          Mesa
+                include/GL/osmesa.h
+
+3Dfx driver     src/FX/*              David Bucciarelli   Mesa
+                include/GL/fxmesa.h
+
+BeOS R4 driver  src/BeOS/*            Brian Paul          Mesa
+
+MGL driver      src/MGL/*             SciTech, Inc        SciTech copyright
+                include/GL/mglmesa.h
+
+Windows driver  src/Windows/*         Li Wei              copyright by Li Wei
+                include/GL/wmesa.h
+
+SVGA driver     src/SVGA/*            Brian Paul          GNU-LGPL
+                include/GL/svgamesa.h
+
+DOS driver      src/DOS/*             Charlie Wallace     GNU-LGPL
+                include/GL/dosmesa.h
+
+GGI driver      src/GGI/*             Uwe Maurer          GNU-LGPL
+                include/GL/ggimesa.h
+
+S3 driver       src/S3/*              S3, Inc.            S3 copyright
+
+GLUT            src-glut/*            Mark Kilgard        Mark's copyright
+                include/GL/*glut*.h
+
+GLU library     src-glu/*             Brian Paul          GNU-LGPL
+
+SI GLU library  si-glu/*              SGI                 SGI Free B
+                include/GL/glu.h
+
+Ext registry    include/GL/glext.h    SGI                 SGI Free B
+                include/GL/glxext.h
+
+demo programs   demos/*               various             see source files
+
+X demos         xdemos/*              Brian Paul          see source files
+
+SGI demos       samples/*             SGI                 SGI copyright
+
+RedBook demos   book/*                SGI                 SGI copyright
+
+
+
+NVIDIA vertex program license:
+
+Mesa 4.1 includes an implementation of the GL_NV_vertex_program extension
+designed by NVIDIA Corporation.  Implementing the extension requires a
+license from NVIDIA.  The license agreement for Mesa's implementation of
+GL_NV_vertex_program follows:
+
+
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are met:
+
+   o Redistribution of the source code must contain a copyright notice
+     and this list of conditions;
+
+   o Redistribution in binary and source code form must contain the
+     following Notice in the software and any documentation and/or other
+     materials provided with the distribution; and
+
+   o The name of Nvidia may not be used to promote or endorse software
+     derived from the software.
+
+   NOTICE: Nvidia hereby grants to each recipient a non-exclusive worldwide
+   royalty free patent license under patent claims that are licensable by
+   Nvidia and which are necessarily required and for which no commercially
+   viable non infringing alternative exists to make, use, sell, offer to sell,
+   import and otherwise transfer the vertex extension for the Mesa 3D Graphics
+   Library as distributed in source code and object code form.  No hardware or
+   hardware implementation (including a semiconductor implementation and chips)
+   are licensed hereunder. If a recipient makes a patent claim or institutes
+   patent litigation against Nvidia or Nvidia's customers for use or sale of
+   Nvidia products, then this license grant as to such recipient shall
+   immediately terminate and recipient immediately agrees to cease use and
+   distribution of the Mesa Program and derivatives thereof. 
+
+   THE MESA 3D GRAPHICS LIBRARY IS PROVIDED ON AN "AS IS BASIS, WITHOUT
+   WARRANTIES OR CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED INCLUDING,
+   WITHOUT LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE, NON-NFRINGEMENT
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+   NVIDIA SHALL NOT HAVE ANY LIABILITY FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING WITHOUT LIMITATION
+   LOST PROFITS), HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+   ARISING IN ANY WAY OUT OF THE USE OR DISTRIBUTION OF THE MESA 3D GRAPHICS
+   LIBRARY OR EVIDENCE OR THE EXERCISE OF ANY RIGHTS GRANTED HEREUNDR, EVEN
+   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+   If you do not comply with this agreement, then Nvidia may cancel the license
+   and rights granted herein.
+
+
+It basically says that anyone is free to redistribute Mesa with this
+extension, the extension must be conformant to the GL_NV_vertex_program
+specification, hardware implementations are not permitted, and NVIDIA
+Corporation can't be held responsible for any problems encountered while
+using this code.
+
+
+----------------------------------------------------------------------
+$Id: COPYRIGHT,v 1.7 2002/03/23 02:26:15 brianp Exp $
+
+
+

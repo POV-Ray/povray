@@ -1,0 +1,258 @@
+
+             Mesa compilation and installation instructions
+
+
+As of version 3.1, Mesa has GNU autoconfig/automake for compilation and
+installation.  Mesa's old-style Makefiles are still included since the
+GNU configure scripts frequently fail on non-GNU/Linux systems.  If you
+try "configure;make" and that fails, please try the old-style Makefiles.
+
+To build Mesa you can use either of these two methods:
+
+  NEW-STYLE:  Basically, type "./configure" followed by "make"
+              This should work on most Unix-like operating systems.
+              For more details, see the NEW-STYLE section below.
+
+  OLD-STYLE:  Simply type "make" and you'll see a list of supported
+              system configurations.  Pick one and type "make <config>"
+              For more details, see the OLD-STYLE section below.
+
+NOTE: The GLUT library and demonstrations programs are in the
+MesaDemos-x.y.z.tar.gz file.  If you don't have GLUT or you want to
+run some demos, download the MesaDemos package too.
+
+
+!!! NOTE: The NEW-STYLE build uses GNU autoconf/automake - it very likely
+!!! won't work on non-GNU-based systems.  If you try it, and it fails,
+!!! copy Makefile.X11 over Makefile and try the OLD-STYLE build system.
+
+
+
+===============================================================================
+NEW-STYLE Mesa compilation and installation instructions begin here
+-------------------------------------------------------------------------------
+
+0) If you've downloaded Mesa via CVS there will not be a "configure"
+   script.  You'll have to run the "bootstrap" script first.  This script
+   may not work on any OS other than Linux.  You'll need these programs
+   to run the bootstrap script:
+
+	autoconf 2.50
+	automake 1.4-p2
+	libtool 1.4
+
+
+1) Run the configure script
+
+	./configure [options]
+
+For Linux, it is recommended that you use:
+	./configure --prefix=/usr
+So that the headers and libs are located according to the Linux/OpenGL
+standard spec at http://oss.sgi.com/projects/ogl-sample/ABI/
+
+Possible options are:
+
+--prefix=DIR
+	The toplevel directory of the hierachy in which Mesa
+	will be installed (DIR/include,DIR/lib etc.).
+	The default is "/usr/local".
+
+--sysconfdir=DIR
+	The directory where Mesa configuration files
+	will be stored.	The default is "$prefix/etc".
+	You may want to overwrite the default with --sysconfdir=/etc.
+
+--enable-static
+	Enable building of static libraries.
+	Static libraries are NOT built by default.
+	
+--disable-shared
+	Disable building of shared libraries.
+	Shared libraries are built by default.
+
+--with-pic
+--without-pic
+	In normal operation, libtool will build shared libraries from
+	PIC objects and static archives from non-PIC objects, except where one
+	or the other is not provided by the target host.  By specifying
+	--with-pic you are asking libtool to build static archives from
+	PIC objects, and similarly by specifying --without-pic you are asking
+	libtool to build shared	libraries from non-PIC objects.
+	libtool will only honour this flag where it will produce a
+	working library, otherwise it reverts to the default.
+	
+--enable-debug
+	Enable debugging messages (disabled by default).
+	
+--enable-profile
+	Enable profiling (disabled by default).
+	
+--disable-optimize
+	Disable extra optimizations (enabled by default,
+	i.e., optimize for maximum performance).
+	
+--enable-warn
+	Enable extended compiler warnings (disabled by default).
+	
+--enable-x86[=ARG]
+--disable-x86
+	Enable/disable x86 assembler support to speed up Mesa
+	(autodetected by default). You may set `on' or `off'.
+	
+--enable-3dnow[=ARG]
+--disable-3dnow
+	Enable/disable 3Dnow support to speed up Mesa
+	(autodetected by default). You may set `on' or `off'.
+	
+--enable-mmx[=ARG]
+--disable-mmx
+	Enable/disable MMX support to speed up Mesa
+	(autodetected by default). You may set `on' or `off'.
+	
+--enable-sse[=ARG]
+--disable-sse
+	Enable/disable SSE support to speed up Mesa
+	(autodetected by default). You may set `on' or `off'.
+	If you have a PentiumIII and want to use SSE make sure you have the
+	PIII Linux kernel-patch installed or things will fail!
+	You can get the patch from http://www.redhat.com/~dledford/linux_kernel.html
+	
+--with-glide[=DIR]
+--without-glide
+	Enable/disable support for Glide (disabled by default).
+	DIR is the installation directory of Glide.
+	If Glide cannot be found, the driver won't be built.
+	
+--with-glut[=DIR]
+--without-glut
+	Don't/use already-installed GLUT (autodetected by default).
+	DIR is the installation directory of Glut.
+	If GLUT cannot be found, the version shipped with Mesa will be built.
+	
+--with-ggi[=DIR]
+--without-ggi
+	Enable/disable support for GGI (autodetected by default).
+	DIR is the installation directory of GGI.
+	If GGI cannot be found, the driver won't be built.
+
+--disable-ggi-fbdev
+	Don't build the GGI fbdev target (autodetected by default).
+	
+--disable-ggi-genkgi
+	Don't build the GGI generic KGI driver (autodetected by default).
+	
+--disable-ggi-savage4
+	Don't build the GGI Savage4 KGI driver (autodetected by default).
+	
+--disable-osmesa
+	Disable OSmesa (offscreen rendering) support (enabled by default).
+
+--with-svga[=DIR]
+--without-svga
+	Enable/disable support for SVGALib (autodetected by default).
+	DIR is the installation directory of SVGALib.
+	If SVGALib cannot be found, the driver won't be built.
+
+--x-includes=DIR
+	Search for the X include files in DIR.
+	
+--x-libraries=DIR
+	Search for the X library files in DIR.
+
+User specific compiler options can be set using the shell variable
+CFLAGS. For instance,
+	CFLAGS="-g -O2" ./configure
+(on some systems: env CFLAGS="-g -O2" ./configure)
+sets the compiler flags to "-g -O2".
+
+For more options run "./configure --help" and read INSTALL.GNU.
+
+
+2) To build the Mesa libraries run:
+
+	make
+
+When finished, libGL.so will be in src/.libs/, libGLU.so will be in
+si-glu/.libs/, etc.
+
+Optionally, you can strip the libraries using
+
+	make strip
+	
+Now make sure that you have the permissions to install Mesa in the 
+specified directories, for example, by becoming super user ("su")
+Then run:
+
+	make install
+
+Mesa is now installed.
+Please don't move the installed files but rerun all installation
+steps if you want to use other directories.
+
+
+3) To test whether Mesa works properly you might want to run the Mesa demos:
+
+	make check
+	
+Builds all demos.
+
+	make exec
+
+Builds and executes all demos.	
+
+
+
+
+
+
+===============================================================================
+OLD-STYLE Mesa compilation and installation instructions begin here
+-------------------------------------------------------------------------------
+
+To build Mesa on most Unix-like operations systems, start by typing
+"make" alone.  You'll see a list of supported system configurations.
+Choose one, call it <config>, type "make <config>".
+
+Note: first copy Makefile.X11 over Makefile if you previously tried
+"./configure ; make" but it failed.
+
+For system-specific information check out these files in the docs/
+directory (some of them are _way_ out of date however):
+
+	System				README file
+	-----------------		------------
+	Unix/X11			README.X11
+	Windows 95/N%			README.WIN32
+	DOS				README.DOS
+	Linux/Windows w/ 3Dfx hardware	README.3DFX
+	Linux with GGI			README.GGI
+	Linux with threading		README.MITS
+	Amigas with Amiwin		README.AMIWIN
+	BeOS				README.BEOS
+	LynxOS				README.LYNXOS
+	SciTech MGL			README.MGL
+	IBM OS/2			README.OS2
+	Windows w/ S3 Virge hardware	README.VIRGE
+	VMS				README.VMS
+	Allegro DJGPP			README.DJA
+	Direct3D driver			README.D3D
+
+
+Header and library files:
+   After you've compiled Mesa and tried the demos I recommend the following
+   procedure for "installing" Mesa on Unix systems.  This is in compliance
+   with the Linux/OpenGL standard base specification.
+   See http://oss.sgi.com/projects/ogl-sample/ABI/
+
+   Copy the Mesa include/GL directory to /usr/local/include:
+	cp -r include/GL /usr/include
+
+   Copy the Mesa library files to /usr/local/lib:
+	cp lib/* /usr/lib
+
+	(actually, use "cp -d" on Linux to preserve symbolic links)
+
+
+===============================================================================
+$Id: INSTALL,v 1.14 2002/10/15 15:43:45 brianp Exp $

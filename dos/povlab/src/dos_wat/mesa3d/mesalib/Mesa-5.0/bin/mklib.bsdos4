@@ -1,0 +1,48 @@
+#!/bin/sh
+
+# Make a BSD/OS 4.x shared library
+# contributed by David MacKenzie <djm@uu.net>
+
+#--identification------------------------------------------------------
+
+
+# $Log: mklib.bsdos4,v $
+# Revision 1.2  1999/09/15 15:10:20  brianp
+# added third, tiny version number to arguments
+#
+# Revision 1.1  1999/08/19 13:52:59  brianp
+# initial check-in (post-crash)
+#
+
+
+#--common--------------------------------------------------------------
+
+LIBRARY=$1
+shift 1
+
+MAJOR=$1
+shift 1
+
+MINOR=$1
+shift 1
+
+TINY=$1
+shift 1
+
+OBJECTS=$*
+
+#--platform------------------------------------------------------------
+
+VERSION=$MAJOR.$MINOR
+
+BASENAME=`echo ${LIBRARY} | sed "s/\.a//g"`
+SHLIB=${BASENAME}.so
+STLIB=${BASENAME}.a
+
+rm -f ${SHLIB} ${STLIB}
+
+ar cq ${STLIB} ${OBJECTS}
+ranlib ${STLIB}
+gcc -shared -Wl,-h,${SHLIB} -o ${SHLIB} ${OBJECTS}
+
+mv ${SHLIB} ../lib

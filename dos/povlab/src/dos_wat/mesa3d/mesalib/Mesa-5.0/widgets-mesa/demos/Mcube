@@ -1,0 +1,13 @@
+! Mcube --
+! $Id: Mcube,v 1.1.1.1 1999/08/19 00:55:42 jtg Exp $
+!
+! X11 Resources for the Mesa Widget
+*MesaDrawingArea.width: 100
+*MesaDrawingArea.height: 100
+*MesaDrawingArea.debug: false
+*MesaDrawingArea.rgba: false
+*MesaDrawingArea.installColormap: true
+*MesaDrawingArea.doublebuffer: true
+*MesaDrawingArea.ximage: false
+*mesa.width: 300
+*mesa.height: 300

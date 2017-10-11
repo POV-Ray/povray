@@ -1,0 +1,95 @@
+The following files in this directory are copyrighted freeware created by 
+SciTech Software.  
+
+  CONSOLE.C
+  CONSOLE.H
+  DEBUG.H
+  PMODE.H
+  PMPRO.H
+  VESAVBE.C
+  VESAVBE.H
+  PMODE\MODEL.MAC
+  PMODE\PMLITE.C
+  PMODE\PMPRO.C
+  PMODE\VFLAT.C
+  PMODE\_PMLITE.ASM
+  PMODE\_PMPRO.ASM
+  PMODE\_VFLAT.ASM
+  ZTIMER.H
+  ZTIMER\ULZTIMER.C
+  ZTIMER\LZTIMER.ASM
+  ZTIMER\ZTIMER.CPP
+
+  PMODE.LIB  (various versions found in compiler-specific directories)
+  ZTIMER.LIB
+
+The POV-Ray Team has been given explicit permission to include these files
+in the MS-Dos version of POV-Ray.  Here is an overview of what the files do.
+
+CONSOLE.C and CONSOLE.H provide functions to display and manipulate text
+on the console using fast routines that directly access video memory.  These
+routines are required for our module MSDOSTXT.C.  If for some reason you 
+don't want the fancy text, undefine FANCY_TEXT in CONFIG.H and recompile.
+You will get the generic "fprintf(stderr,...)" output from POV-Ray.
+
+PMODE.H and PMODE.LIB provide a compiler-independent way to do interrupts,
+access real-mode DOS memory or DOS BIOS areas or video memory.  Every
+32-bit protected mode compiler does these things differently but PMODE 
+insulates you from those differences.  In each of the compiler-specific
+directories you will find a file called PMODE.LIB but each of these files
+is different.  Each is tailored to that specific compiler.  It is supplied
+as a pre-compiled .LIB because part of the code is written in assembly
+language and is designed to be assembled with Borland's TASM 4.0 which 
+you might not have.
+
+VESAVBE.C and VESAVBE.H provide generic VESA Video BIOS Extensions support
+functions, and provide a plug in module for interfacing with VBE graphics
+cards. This module calls upon the PMODE.C files to perform DOS extender
+specific tasks, and insulates the remaining modules of the details about
+interfacing correctly with VBE graphics cards. Note that although the
+MSDOSVID.C file calls upon this module, it is important to keep it
+separate so that the VESA support can be updated simply by pluggin in
+the latest version of this module from SciTech Software's SuperVGA Kit.
+
+In keeping with POV-Ray's philosophy of full source code availability, we
+have included the source to the Zen Timer libraries and the PM/Pro libraries
+which will allow you to re-assemble and recompile if you have TASM available.
+Note that these three files are not necessary if you plan to use the
+already compiled PMODE.LIB and ZTIMER.LIB files.
+
+DEBUG.H is an additional header that is used by CONSOLE.H and PMODE.H and
+is required to compile POV-Ray for MS-Dos.
+
+ZTIMER.H and ZTIMER.LIB are an interrupt driven routine to provide timing
+functions for POV-Ray speed profiling histogram option.  Like PMODE.LIB,
+the ZTIMER.LIB exists in different versions for different compilers.  
+Therefore ZTIMER.LIB is not in SOURCE\MSDOS but is in a compiler
+specific directory.  UZLTIMER.C and LZTIMER.ASM are the source code to
+ZTIMER.LIB but you will probably not need them.
+
+The POV-Ray Team knows just enough about SciTech's modules to make them
+work for our limited purposes.  We cannot provide technical support for them.
+More details on these SciTech modules is available in their full packages.
+
+The latest releases of all SciTech Software products are always uploaded to
+the Simtel-20 MSDOS internet archives (oak.oakland.edu) and to various
+areas on CompuServe and America Online. However to obtain the absolute
+latest release of all SciTech Software products, you can ftp them from
+their home site or from their web page:
+
+    ftp.scitechsoft.com
+    www.scitechsoft.com
+
+If you wish to contact SciTech Software for feedback or bug reports on
+their products, you can do so as follows:
+
+SciTech Software, Inc.
+5 Governors Lane, Suite D
+Chico, CA 95926 USA
+
+Phone:          916-894-8400
+Fax:            916-894-9069
+
+Internet:       support@scitechsoft.com
+Compuserve:     >INTERNET:support@scitechsoft.com
+

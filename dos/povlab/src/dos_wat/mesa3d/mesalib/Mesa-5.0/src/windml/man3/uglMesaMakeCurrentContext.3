@@ -1,0 +1,49 @@
+.TH uglMesaMakeCurrentContext "3" "AOUT 2001" "WindML/Mesa" "WRS"
+
+.SH NAME
+uglMesaMakeCurrentContext \- Bind an UGL_MESA_CONTEXT to an image buffer
+
+.SH SYNOPSIS
+.B #include <GL/uglmesa.h>
+.PP
+.nf
+.BI "GLboolean uglMesaMakeCurrentContext (UGL_MESA_CONTEXT " umc ,
+.BI "                                     GLsizei " left ", GLsizei " top ,
+.BI "                                     GLsizei " width ", GLsizei " height );
+.fi
+
+.SH DESCRIPTION
+The \fBuglMesaMakeCurrentContext\fR binds an UGL_MESA_CONTEXT to an
+image buffer. The image buffer is just a block of memory which the
+client provides.  Its size must be at least as large as
+width*height*sizeof(type).  Its address should be a multiple of 4 if
+using RGBA mode.
+.PP 
+Image data is stored in the order of glDrawPixels: row-major order
+with the lower-left image pixel stored in the first array position
+(ie. bottom-to-top).
+.PP
+Since the only type initially supported is GL_UNSIGNED_BYTE, if the
+context is in RGBA mode, each pixel will be stored as a 4-byte RGBA
+value.  If the context is in color indexed mode, each pixel will be
+stored as a 1-byte value.
+.PP
+If the context's viewport hasn't been initialized yet, it will now be
+initialized to (0, 0, width, height).
+
+.SH INPUT
+\fIumc\fR - a rendering context
+.PP
+\fIleft, top\fR - coordinates in pixels of (left,top) pixel (0,0) in
+fullscreen mode.
+.PP
+\fIwidth, height\fR - size of image buffer in pixels, at least 1 else fullscreen dimensions are used (UGL_MESA_DISPLAY_WIDTH and UGL_MESA_DISPLAY_HEIGHT).
+
+.SH RETURN VALUES
+GL_TRUE if success, GL_FALSE if error because of invalid \fIumc\fR, \fIwidth\fR<1, \fIheight\fR<1, \fIwidth\fR>internal limit or \fIheight\fR>internal limit.
+
+.SH SEE ALSO
+.BR uglMesaCreateNewContext "(3), " uglMesaCreateNewContextExt "(3)"
+
+.SH COPYRIGHT
+Copyright \(co 2001 Wind River Systems, Inc.

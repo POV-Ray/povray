@@ -1,0 +1,55 @@
+/* conf.h.in.  Generated automatically from configure.in by autoheader.  */
+#undef HAVE_XMU
+#undef USE_X86_ASM
+#undef USE_SPARC_ASM
+#undef USE_3DNOW_ASM
+#undef USE_SSE_ASM
+#undef USE_MMX_ASM
+#undef MESA_DEBUG
+#undef MESA_TRACE
+#undef FX
+#undef FX_GLIDE3
+#undef GGI
+#undef SVGA
+#undef USE_XSHM
+#undef FAST_MATH
+
+/* Define if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
+
+/* Define if you have the <malloc.h> header file. */
+#undef HAVE_MALLOC_H
+
+/* Define if you have the <math.h> header file. */
+#undef HAVE_MATH_H
+
+/* Define if you have the `memcpy' function. */
+#undef HAVE_MEMCPY
+
+/* Define if you have the `memmove' function. */
+#undef HAVE_MEMMOVE
+
+/* Define if you have the <pthread.h> header file. */
+#undef HAVE_PTHREAD_H
+
+/* Define if you have the `strchr' function. */
+#undef HAVE_STRCHR
+
+/* Name of package */
+#undef PACKAGE
+
+/* Define if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Version number of package */
+#undef VERSION
+
+/* Define if the X Window System is missing or not being used. */
+#undef X_DISPLAY_MISSING
+
+/* Define to empty if `const' does not conform to ANSI C. */
+#undef const
+
+/* Define as `__inline' if that's what the C compiler calls it, or to nothing
+   if it is not supported. */
+#undef inline

@@ -1,0 +1,19 @@
+! Tea --
+! $Id: Tea,v 1.1.1.1 1999/08/19 00:55:42 jtg Exp $
+!
+! X11 Resources for the Mesa Workstation Widget
+*MesaWorkstation.debug: false
+! We have it hardcoded:
+! *MesaWorkstation.rgba: true
+*MesaWorkstation.installColormap: true
+*MesaWorkstation.ximage: true
+!
+! It only pays to enable double buffering if you have
+! really fast hardware.  Otherwise, the machine just
+! appears to be idle for too long ...
+*MesaWorkstation.doublebuffer: false
+!
+! X11 Resources for the demo program
+*quit.label: Exit
+*mesa.width: 400
+*mesa.height: 400

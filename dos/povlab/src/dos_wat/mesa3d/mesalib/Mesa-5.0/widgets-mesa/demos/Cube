@@ -1,0 +1,9 @@
+! Cube --
+! $Id: Cube,v 1.1.1.1 1999/08/19 00:55:42 jtg Exp $
+!
+! X11 Resources for the Mesa Widget
+*GLwDrawingArea.width: 300
+*GLwDrawingArea.height: 300
+*GLwDrawingArea.rgba: true
+*GLwDrawingArea.installColormap: true
+*GLwDrawingArea.doublebuffer: true

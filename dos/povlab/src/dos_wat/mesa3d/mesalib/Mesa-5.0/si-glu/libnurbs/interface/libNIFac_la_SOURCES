@@ -1,0 +1,19 @@
+libNIFac_la_SOURCES = \
+	bezierEval.cc \
+	bezierEval.h \
+	bezierPatch.cc \
+	bezierPatch.h \
+	bezierPatchMesh.cc \
+	bezierPatchMesh.h \
+	glcurveval.cc \
+	glcurveval.h \
+	glinterface.cc \
+	glrenderer.cc \
+	glrenderer.h \
+	glsurfeval.cc \
+	glsurfeval.h \
+	incurveeval.cc \
+	insurfeval.cc \
+	glimports.h \
+	mystdio.h \
+	mystdlib.h

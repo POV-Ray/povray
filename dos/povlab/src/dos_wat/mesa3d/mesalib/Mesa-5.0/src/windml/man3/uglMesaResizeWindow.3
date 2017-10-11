@@ -1,0 +1,25 @@
+.TH uglMesaResizeWindow "3" "AOUT 2001" "WindML/Mesa" "WRS"
+
+.SH NAME
+uglMesaResizeWindow \- Resize an OpenGL window by a delta value
+
+.SH SYNOPSIS
+.B #include <GL/uglmesa.h>
+.PP
+.BI "GLboolean uglMesaResizeWindow(GLsizei " dw ", GLsizei " dh );
+
+.SH DESCRIPTION
+The \fBuglMesaResizeWindow\fR function resizes an OpenGL window by a
+delta value
+
+.SH INPUT
+\fIdw, dh\fR - delta values in pixels.
+
+.SH RETURN VALUES
+GL_TRUE if success, GL_FALSE if error because of invalid coordinates.
+
+.SH SEE ALSO
+.BR uglMesaResizeToWindow "(3)"
+
+.SH COPYRIGHT
+Copyright \(co 2001 Wind River Systems, Inc.

@@ -1,0 +1,74 @@
+Content-type: text/html
+
+<HTML><HEAD><TITLE>Manpage of uglMesaGetSetColor</TITLE>
+</HEAD><BODY>
+<H1>uglMesaGetSetColor</H1>
+Section: WRS (3)<BR>Updated: AOUT 2001<BR><A HREF="#index">Index</A>
+<A HREF="http://localhost/cgi-bin/man/man2html">Return to Main Contents</A><HR>
+
+<P>
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+uglMesaSetColor - Make color allocation in indexed mode
+<P>
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>#include &lt;<A HREF="file:/usr/include/GL/uglmesa.h">GL/uglmesa.h</A>&gt;</B>
+
+<P>
+
+<B>GLboolean uglMesaSetColor(GLubyte </B><I>index</I><B>, GLfloat </B><I>red</I><B>, GLfloat </B><I>green</I><B>, GLfloat </B><I>blue</I><B>);</B>
+
+<P>
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+The <B>uglMesaSetColor</B> function makes color allocation in indexed mode.
+<P>
+
+This function does nothing in RGB mode.
+<P>
+<A NAME="lbAE">&nbsp;</A>
+<H2>INPUT VALUES</H2>
+
+<I>index</I> - Value for the current color index
+<P>
+
+<I>red</I> - Red component (between 0 and 1)
+<P>
+
+<I>green</I> - Green component (between 0 and 1)
+<P>
+
+<I>blue</I> - Blue component (between 0 and 1)
+<P>
+<A NAME="lbAF">&nbsp;</A>
+<H2>RETURN VALUES</H2>
+
+GL_TRUE if success, or GL_FALSE if <I>index</I>&lt;0 or clutSize&lt;<I>index</I>, <I>red</I>, <I>green</I> and <I>blue</I> are not between 0.0 and 1.0.
+<P>
+<A NAME="lbAG">&nbsp;</A>
+<H2>COPYRIGHT</H2>
+
+Copyright &#169; 2001 Wind River Systems, Inc.
+<P>
+
+<HR>
+<A NAME="index">&nbsp;</A><H2>Index</H2>
+<DL>
+<DT><A HREF="#lbAB">NAME</A><DD>
+<DT><A HREF="#lbAC">SYNOPSIS</A><DD>
+<DT><A HREF="#lbAD">DESCRIPTION</A><DD>
+<DT><A HREF="#lbAE">INPUT VALUES</A><DD>
+<DT><A HREF="#lbAF">RETURN VALUES</A><DD>
+<DT><A HREF="#lbAG">COPYRIGHT</A><DD>
+</DL>
+<HR>
+This document was created by
+<A HREF="http://localhost/cgi-bin/man/man2html">man2html</A>,
+using the manual pages.<BR>
+Time: 09:32:47 GMT, August 30, 2001
+</BODY>
+</HTML>

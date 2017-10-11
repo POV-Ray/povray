@@ -1,0 +1,98 @@
+File: docs/README.WIN32
+
+Last updated: Nov 08, 2002 - Karl Schultz - kschultz@users.sourceforge.net
+
+Quick Start
+
+Unzip both ZIP files (MesaLib and MesaDemos) into the same directory.
+This is important because the current makefiles in MesaLib assume that
+the directories in MesaDemos are present.
+
+If you have Microsoft Visual C++ 6.0 installed, simply go to the top directory
+of the Mesa distribution and type 'nmake -f Makefile.win NODEBUG=1' for
+an optimized build.  Note that you may have to run ...VC98/BIN/VCVARS32.BAT
+to set up the appropriate compiler environment variables.
+
+Details and Notes
+
+- Building Mesa as noted above should visit and build the following:
+  src        MesaGL.dll, MesaGL.lib, osmesa.dll, osmesa.lib
+  si-glu     MesaGLU.dll, MesaGLU.lib
+  src-glut   glut32.dll, glut32.lib
+  demos      a handful of demo executables.
+  book       more examples
+  samples    more examples
+
+- After building, you can copy the above DLL files to a place in your PATH
+  such as $SystemRoot/SYSTEM32.  If you don't like putting things in a
+  system directory, place them in the same directory as the executable(s).
+  For example, you can copy the DLL files to the demos directory if you
+  just want to run the demos. The build process places the DLL and LIB files
+  in the ./lib directory.  The makefile creates this directory if it does 
+  not already exist.
+
+- The make targets 'clean' and 'clobber' will remove objects and libraries.
+  But the files in ./lib are never cleaned.
+
+- The make target 'install' will take its best shot at copying DLL files,
+  LIB files, and headers to the right places.  I strongly suggest that
+  you examine the makefiles to make sure that 'install' doesn't do anything
+  that you can't live with.
+
+- The makefiles are designed to work with Microsoft's NMAKE, and do,
+  unfortunately, have some Microsoft-specific things in them.  If you
+  would like to use gcc or some other build tools like the Cygnus tools,
+  then you will have to hack the makefiles to make them work with your
+  tools.  I'm sorry about this; I wasn't motivated to make this any
+  different, but if you end up modifying the makefiles for your tools,
+  you can send me the changes and I can apply the changes to the 
+  source tree.
+
+- There are no Microsoft Visual Studio project files.  However, these
+  should be very easy to create.  One can use the compiler and linker
+  options found in the makefiles to make quick progress in creating
+  projects.
+
+- The DLL files are built so that the external entry points use the
+  stdcall calling convention.
+
+- Static LIB files are not built.  The LIB files that are built with
+  the current makefiles are the linker import files associated with
+  the DLL files.  If static LIB's are desired, it should not be too
+  difficult to modify the makefiles to generate them.
+
+- The si-glu sources are used to build the GLU libs.  This was done
+  mainly to get the better tessellator code.
+
+- The osmesa driver builds and should work on Windows as well as
+  any other platform.
+
+- The Windows driver (in src/Windows) builds and runs at least at
+  a minimal level.  I modified this driver to work with the new
+  Mesa 4.0 code and driver architecture, but I did not do a great
+  deal of optimization and testing.  There are many opportunities
+  for optimization, many of which can be done by coding more specific
+  paths for the rasterizers.  See src/osmesa/osmesa.c for some good
+  examples.
+
+- There is DirectDraw support in the Windows driver, updated by
+  Daniel Slater.  You'll need to uncomment the #define DDRAW line
+  in src/Windows/wmesadef.h and add ddraw.lib to the list of libraries
+  in src/Makefile.win.  On some systems, you will acheive significantly
+  higher framerates with DirectDraw.
+
+- Some of the more specialized code like FX drivers, stereo, and
+  parallel support isn't compiled or tested.  I left much of this
+  code alone, but it may need some work to get it 'turned on' again.
+
+- No assembly code is compiled or assembled.  Again, this may need
+  some work to turn it back on or use it again.
+
+If you have a Windows-related build problem or question, it is
+probably better to direct it to me (kschultz@users.sourceforge.net),
+rather than directly to the other Mesa developers.  I will help you
+as much as I can.  I also monitor the Mesa mailing lists and will
+answer questions in this area there as well.
+
+
+Karl Schultz

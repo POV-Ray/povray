@@ -1,0 +1,187 @@
+=head1 NAME
+
+MesaWorkstation - A simple workstation abstraction widget for Mesa/X
+
+=head1 DESCRIPTION
+
+=head1 Resources
+
+The following X resources are available in addition to the B<MesaDrawingArea>
+resources:
+
+  ___________________________________________________________________________
+  |                    |                    |         |                      |
+  | Name               | Class              | Type    | OpenGL attribute     |
+  |____________________|____________________|_________|______________________|
+  |                    |                    |         |                      |
+  |                    |                    |         |                      |
+  |____________________|____________________|_________|______________________|
+
+
+=over 4
+
+=back
+
+=head1 Actions
+
+=over 4
+
+=item Projection ()
+
+=item Move ()
+
+=back
+
+=head1 Translations
+
+=over 4
+
+=item ~Shift<Key>Left: I<Move(l)>
+
+=item Shift<Key>Left: I<Move(l,10)>
+
+=item ~Shift<Key>Right: I<Move(r)>
+
+=item Shift<Key>Right: I<Move(r,10)>
+
+=item ~Shift<Key>Up: I<Move(u)>
+
+=item Shift<Key>Up: I<Move(u,10)>
+
+=item ~Shift<Key>Down: I<Move(d)>
+
+=item Shift<Key>Down: I<Move(d,10)>
+
+=item <Key>plus: I<Move(+)>
+
+=item <Key>minus: I<Move(-)>
+
+=item ~Shift<Key>l: I<Projection(l)>
+
+=item Shift<Key>l: I<Projection(L)>
+
+=item ~Shift<Key>r: I<Projection(r)>
+
+=item Shift<Key>r: I<Projection(R)>
+
+=item ~Shift<Key>b: I<Projection(b)>
+
+=item Shift<Key>b: I<Projection(B)>
+
+=item ~Shift<Key>t: I<Projection(t)>
+
+=item Shift<Key>t: I<Projection(T)>
+
+=item ~Shift<Key>n: I<Projection(n)>
+
+=item Shift<Key>n: I<Projection(N)>
+
+=item ~Shift<Key>f: I<Projection(f)>
+
+=item Shift<Key>f: I<Projection(F)>
+
+=item ~Shift<Key>a: I<Projection(a)>
+
+=item Shift<Key>a: I<Projection(A)>
+
+=item <Key>p: I<Projection(p)>
+
+=item <Key>o: I<Projection(o)>
+
+=back
+
+=head1 Utility functions
+
+The following utility functions are available
+
+=over 4
+
+=item void GLwBeginProjection (Widget w)
+
+=item void GLwEndProjection (void)
+
+The following code snippet selects perspective projection for the
+workstation I<ws>:
+
+	GLwBeginProjection (ws);
+	  glFrustum (-1.0, 1.0, -1.0, 1.0, 1.0, 10.0);
+	GLwEndProjection ();
+
+During redisplay, this will be executed as a display list with the
+matrix mode set to I<GL_PROJECTION> and an identity matrix on top of
+the projection matrix stack.
+
+=item void GLwPostProjectionList (Widget w, GLuint p)
+
+=item void GLwPostProjectionMatrix (Widget w, GLdouble *m)
+
+=item void GLwPostCurrentProjection (Widget w)
+
+=item void GLwUnpostProjection (Widget w)
+
+=item GLuint GLwGetProjectionList (Widget w)
+
+=item int GLwGetProjectionMatrix (Widget w, GLdouble *m)
+
+=item void GLwSetFrustumProjection (Widget w, GLdouble left, GLdouble right,
+	GLdouble bottom, GLdouble top, GLdouble near, GLdouble far)
+
+=item void GLwSetOrthoProjection (Widget w, GLdouble left, GLdouble right,
+	GLdouble bottom, GLdouble top, GLdouble near, GLdouble far)
+
+=item void GLwBeginView (Widget w)
+
+=item void GLwEndView (void)
+
+The following code snippet selects a view from the z-axis for the
+workstation I<ws>:
+
+	GLwBeginView (ws);
+	  gluLookAt (0.0, 0.0, 3.0,
+		     0.0, 0.0, 0.0,
+		     0.0, 1.0, 0.0);
+	GLwEndView ();
+
+During redisplay, this will be executed as a display list with the
+matrix mode set to I<GL_MODELVIEW> and an identity matrix on top of
+the model view matrix stack.
+
+=item void GLwPostViewList (Widget w, GLuint v)
+
+=item void GLwPostViewMatrix (Widget w, GLdouble *m)
+
+=item void GLwPostCurrentView (Widget w)
+
+=item void GLwUnpostView (Widget w)
+
+=item GLuint GLwGetViewList (Widget w)
+
+=item int GLwGetViewMatrix (Widget w, GLdouble *m)
+
+=item void GLwSetPolarView (Widget w, GLdouble r, GLdouble theta, GLdouble phi)
+
+=item void GLwPostObject (Widget w, GLuint o)
+
+posts I<object> to I<w>.
+
+=item void GLwUnpostObject (Widget w, GLuint o)
+
+=item void GLwUnpostAllObjects (Widget w)
+
+=item void GLwRedrawObjects (Widget w)
+
+force a redraw of all objects posted to I<w>.
+
+=back
+
+=head1 SEE ALSO
+
+L<GLwDrawingArea>, L<MesaDrawingArea>
+
+=head1 AUTHOR
+
+Thorsten.Ohl @ Physik.TH-Darmstadt.de
+
+=head1 DATE
+
+$Id: MesaWorkstation.pod,v 1.1.1.1 1999/08/19 00:55:42 jtg Exp $

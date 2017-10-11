@@ -1,0 +1,166 @@
+;POVLAB version 4.0 shareware - ascii scene for 3D modeller.
+;(C) 1997, Denis Olivier.
+;All rights reserved.
+;Date=Tuesday 04-24-2001.
+;Time=14:40:37.
+;user_name=REGISTER!
+ColorCamera=4
+ColorViewport=0
+ColorTextBackground=8
+ColorSelection=6
+ColorInterface=7
+ColorAxis=5
+ColorGrid=2
+GrilleType=1
+CurrentViewport=2
+Viewportx4=1
+DisplayAxis=1
+DisplayGrid=1
+CurrentTexture=White_Plastic
+CurrentCamera=1
+BackgroundImageRGB: 0 0 0
+Fog: 255 255 255 0 0 1 0 0 0 0
+Atmosphere: 0 1 10 0.1 0 20 0.25 0.1 8 255 255 255
+UseSelection: 0
+RayGlobal: 0.003922 2.2 2 64 10 0.25 0.18 0.14
+Scale-X/Y F0: 19.09
+Shift-X F0: 2.384e-007
+Shift-Y F0: 3.035
+Scale-X/Y F1: 21.3
+Shift-X F1: -0.8875
+Shift-Y F1: 3.035
+Scale-X/Y F2: 16.81
+Shift-X F2: 2.384e-007
+Shift-Y F2: -0.8875
+Scale-X/Y F3: 45
+Shift-X F3: 0
+Shift-Y F3: 0
+Camera: -2.919 -5.957 6.421 0 0.6416 0 71 6.96 0 0 0 0 0 0
+Display_Camera: 1
+
+Spot 001: -3.929 -7.087 1.677 -3.091 0.1048 0 0 255 0 3 11 8.5 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+Spot 002: 1.362 -7.349 1.991 2.986 -0.1048 0 0 0 255 3 12.5 10.5 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+Spot 003: -1.033 -7.086 1.725 0 0 0 255 0 0 3 13 10 1 1 100 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+Display_Spot: 1
+
+Nb-Object: 4
+
+[EndInitSection]
+
+Object 00001: 1
+Object 00001: 0 0 0
+Object 00001: 1 1 1
+Object 00001: 0 0 0
+Object 00001: 0 0 0
+Object 00001: 7
+Object 00001: White_RPlastic
+Object 00001: 0
+Object 00001: 0
+Object 00001: Object001
+Object 00001: -1
+Object 00001: 0 // display
+Object 00001: 1 1 1
+Object 00001: 0 0 0
+Object 00001: 0 0 0
+Object 00001: 1
+Object 00001: 0
+Object 00001: 0
+Object 00001: 0 0
+Object 00001: 0
+Object 00001: 1
+Object 00001: 0
+Object 00001: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00001: 0000000000000
+Object 00001: 0 0
+Object 00001: # 0 0 0 0 0 0 0 0
+Object 00001: # 0 0 0 0 0 0 0 0
+Object 00001: 0 0
+
+Object 00002: 2
+Object 00002: 0 0 0
+Object 00002: 6.837 0.1761 4.646
+Object 00002: 0 0 0
+Object 00002: 0 1.154 0
+Object 00002: 7
+Object 00002: White_RPlastic
+Object 00002: 0
+Object 00002: 0
+Object 00002: Sol
+Object 00002: -1
+Object 00002: 0 // display
+Object 00002: 1 1 1
+Object 00002: 0 0 0
+Object 00002: 0 0 0
+Object 00002: 1
+Object 00002: 0
+Object 00002: 0
+Object 00002: 0 0
+Object 00002: 0
+Object 00002: 1
+Object 00002: 0
+Object 00002: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00002: 0000000000000
+Object 00002: 0 0
+Object 00002: # 0 0 0 0 0 0 0 0
+Object 00002: # 0 0 0 0 0 0 0 0
+Object 00002: 0 0
+
+Object 00003: 1
+Object 00003: 0 0 0
+Object 00003: 1 1 1
+Object 00003: 0 0 0
+Object 00003: -3.007 0 0
+Object 00003: 7
+Object 00003: White_RPlastic
+Object 00003: 0
+Object 00003: 0
+Object 00003: Object001003
+Object 00003: -1
+Object 00003: 0 // display
+Object 00003: 1 1 1
+Object 00003: 0 0 0
+Object 00003: 0 0 0
+Object 00003: 1
+Object 00003: 0
+Object 00003: 0
+Object 00003: 0 0
+Object 00003: 0
+Object 00003: 1
+Object 00003: 30
+Object 00003: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00003: 0000000000000
+Object 00003: 0 0
+Object 00003: # 0 0 0 0 0 0 0 0
+Object 00003: # 0 0 0 0 0 0 0 0
+Object 00003: 0 0
+
+Object 00004: 1
+Object 00004: 0 0 0
+Object 00004: 1 1 1
+Object 00004: 0 200 301
+Object 00004: 3.049 0 0
+Object 00004: 7
+Object 00004: White_RPlastic
+Object 00004: 0
+Object 00004: 0
+Object 00004: Object001004
+Object 00004: -1
+Object 00004: 0 // display
+Object 00004: 1 1 1
+Object 00004: 0 0 0
+Object 00004: 0 0 0
+Object 00004: 1
+Object 00004: 0
+Object 00004: 0
+Object 00004: 0 0
+Object 00004: 0
+Object 00004: 1
+Object 00004: 49
+Object 00004: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00004: 0000000000000
+Object 00004: 0 0
+Object 00004: # 0 0 0 0 0 0 0 0
+Object 00004: # 0 0 0 0 0 0 0 0
+Object 00004: 0 0
+
+End of file: SPOT.SCN

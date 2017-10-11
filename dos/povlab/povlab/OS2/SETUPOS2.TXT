@@ -1,0 +1,31 @@
+POVLAB modeler for POV-Ray 3.0
+Copyright 1994,1995, 1996 Denis Olivier & ChromaGraphics.
+All rights reserved.
+
+********* OS/2 setup By Martin Conlon (mconlon@engsoc.carleton.ca)
+
+The SETUPOS2.CMD file is a REXX script to setup POVLAB under OS/2.  It should
+be run from the OS/2 command line (in an OS/2 shell) by typing:
+
+SETUPOS2 [enter]
+
+       where "[enter]" indicates that the "enter" key on the keyboard
+       should be pressed
+
+The script will setup an icon called "POVLAB" on the desktop.  This icon may
+then be dragged into an appropriate folder.
+
+The "POVLAB" icon is setup with the appropriate memory setting required to run
+POVLAB successfully under OS/2.  As well, all *.SCN files (POVLAB's scene
+files) are liked to the POVLAB executable so that double clicking on one of
+them launches POVLAB.  This linking is only apparent after a shutdown and
+reboot. (When all scene files get an icon similar to POVLAB's).
+
+*** Note:  At this time, POVLAB is unable to spawn POV-Ray under OS/2.  When the
+           OS/2 version of POVRAY becomes available, this file (and the script)
+           will be updated.
+           In order to render your scenes, you must generate the *.POV file
+           using the "-->POV-Ray (.POV)" option in the "File" menu and render
+           as you would normally (from the DOS command line).
+           The memory settings still need some work.
+

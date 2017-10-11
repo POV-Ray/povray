@@ -1,0 +1,27 @@
+libtess_la_SOURCES = \
+	dict-list.h \
+	dict.c \
+	dict.h \
+	geom.c \
+	geom.h \
+	memalloc.c \
+	memalloc.h \
+	mesh.c \
+	mesh.h \
+	normal.c \
+	normal.h \
+	priorityq.c \
+	priorityq.h \
+	render.c \
+	render.h \
+	sweep.c \
+	sweep.h \
+	tess.c \
+	tess.h \
+	tessmono.c \
+	tessmono.h
+
+EXTRA_DIST = \
+	priorityq-heap.c \
+	priorityq-heap.h \
+	priorityq-sort.h

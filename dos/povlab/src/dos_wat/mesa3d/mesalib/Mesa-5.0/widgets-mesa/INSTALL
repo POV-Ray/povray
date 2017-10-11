@@ -1,0 +1,26 @@
+./configure	# add `--with-motif' iff you want the Motif widget
+make
+make demo.gl
+make demo.mesa
+make demo.ws	# load `next' event and play with cursor keys
+make demo.tea	# play with cursor keys again
+make install	# iff you like it
+
+That's it.  Enjoy.
+
+PS:   If you don't build in a Mesa source tree and don't have Mesa's
+      header files installed, you can use `--with-mesadir=PATH' as an
+      argument to configure to specify another PATH to the Mesa source
+      tree.
+
+P^2S: I can not test the Motif widget myself, therefore it is not build
+      by default.  But people have used it successfully, it should
+      work for you too.
+
+P^3S: A more verbose description will follow ...
+
+
+$Id: INSTALL,v 1.1.1.1 1999/08/19 00:55:42 jtg Exp $
+Local Variables:
+mode:indented-text
+End:

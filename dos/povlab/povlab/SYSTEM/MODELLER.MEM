@@ -1,0 +1,6 @@
+minmem = 2048
+maxmem = 16384
+virtualsize = 16384
+deleteswap
+!swapname = MODELEUR.TMP
+

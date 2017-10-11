@@ -1,0 +1,65 @@
+#!/bin/sh
+# Copyright (C) 1992-2000 the Florida State University
+#  Distributed by the Florida State University under the terms of the
+#  GNU Library General Public License.
+#
+#This file is part of Pthreads.
+#
+#Pthreads is free software; you can redistribute it and/or
+#modify it under the terms of the GNU Library General Public
+#License as published by the Free Software Foundation (version 2).
+#
+#Pthreads is distributed "AS IS" in the hope that it will be
+#useful, but WITHOUT ANY WARRANTY; without even the implied
+#warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#See the GNU Library General Public License for more details.
+#
+#You should have received a copy of the GNU Library General Public
+#License along with Pthreads; see the file COPYING.  If not, write
+#to the Free Software Foundation, 675 Mass Ave, Cambridge,
+#MA 02139, USA.
+#
+#Report problems and direct all questions to:
+#
+#  pthreads-bugs@ada.cs.fsu.edu
+#
+#  @(#)configure	3.14 11/8/00
+#
+
+echo
+echo Please specify the operating system you want to install Pthreads on:
+echo
+echo 1. SunOS 4.x
+echo 2. Solaris 2.x
+echo 3. Linux
+echo 4. FreeBSD
+echo 5. SCO UNIX
+echo 6. SCO OpenServer
+echo
+echo -n Enter number:
+read x
+
+rm -f Makefile
+
+case $x in
+
+1) cp Makefile.SunOS   Makefile ;;
+2) cp Makefile.Solaris Makefile ;;
+3) cp Makefile.Linux   Makefile ;;
+4) cp Makefile.FreeBSD Makefile ;;
+5) cp Makefile.SCO     Makefile ;;
+6) cp Makefile.SC5     Makefile ;;
+*) echo; echo exit; exit
+
+esac
+
+echo
+echo Please ignore warnings during compilation
+echo
+echo make
+
+make
+
+echo
+echo "To install Pthreads (as super user), type: make install"
+echo

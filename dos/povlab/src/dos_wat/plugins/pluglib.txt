@@ -1,0 +1,8 @@
+Here's a little library to write your own plugins for POVLAB.
+It's very simple, and you can make some powerfull shapes with that.
+
+see samples provided with the sources.
+
+Denis Olivier.
+
+

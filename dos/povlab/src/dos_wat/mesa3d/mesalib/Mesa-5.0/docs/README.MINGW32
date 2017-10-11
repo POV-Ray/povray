@@ -1,0 +1,53 @@
+August 30, 1998 -- Paul Garceau
+Updated January 13, 2000 -- Paul Garceau (pgarceau@teleport.com)
+
+DISCLAIMER:  I make this port of the Mesa 3-D Graphics Library as a service
+to the general public.  I can, in no way support or make any guarantee that the
+build will work for your system.
+
+	The associated packages and batch files I have included as part of the GCC-2.95.2/Mingw32 extension are provided "As-is" with out any guarantee of support or functionality from this author.
+
+	Feel free to modify or change things as you see fit, just remember that
+I can't support any modifications you might want to make to the files which I
+have included OR the lgpl protected Mesa 3-D Graphics Library.
+
+	I recommend using GCC-2.95.2/Mingw32 which is available at Mumit Khans' ftp site:
+
+		(ftp://ftp.xraylith.wisc.edu/pub/khan/gnu-win32/mingw32/)
+
+	This build has been tested under WinNT4/SP6.  Win9x and WinNT5 remain untested by me.  I have not tested any of the demos included with Mesa3d.
+
+	I recommend using the GCC-2.95.2/Mingw32.
+
+	ftp://ftp.xraylith.wisc.edu/pub/khan/gnu-win32/mingw32/gcc-2.95.2
+
+	Much thanks to the combined efforts of Mumit Khan, Jan-Jaap Vanderhagen
+and Colin Peters for making it possible for the Mingw32 toolchain to exist.  Also, thanks go out to Stephane Rehel for the work that was completed on the Cygwin build.
+
+Installing GCC-2.95.2/Mingw32 Build:
+
+	a) Open the file archive (either tar.gz or .zip extensions)
+
+	b) Decide the directory you want to move the archived files to.
+
+	d) Extract the files from the archive.
+	
+	e) Edit the mingw32.bat file to accomodate your choice of directory structure.
+
+		%mesaroot%:	This is your root directory (Mesa-3.3)
+		%mesasrc%:	This is the Mesa-3.3 src directory (Mesa-3.3\src)
+		%mesalib%:	This is where the build will put libGL.a and libGLU.a
+
+Running the Build:
+
+	Open your Command Prompt or MS-DOS prompt.
+	Go to your Mesa-3.3 'root' directory
+	At the command line type: mingw32
+
+	That's all there is to it.
+
+	Enjoy!
+
+	Peace,
+
+		Paul G. (pgarceau@teleport.com)

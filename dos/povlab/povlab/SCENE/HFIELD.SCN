@@ -1,0 +1,280 @@
+;POVLAB version 4.0 shareware - ascii scene for 3D modeller.
+;(C) 1997, Denis Olivier.
+;All rights reserved.
+;Date=Tuesday 04-24-2001.
+;Time=14:37:56.
+;user_name=REGISTER!
+ColorCamera=4
+ColorViewport=0
+ColorTextBackground=8
+ColorSelection=6
+ColorInterface=7
+ColorAxis=5
+ColorGrid=2
+GrilleType=1
+CurrentViewport=1
+Viewportx4=1
+DisplayAxis=1
+DisplayGrid=1
+CurrentTexture=Blue_Plastic
+CurrentCamera=1
+BackgroundImageRGB: 50 50 60
+Fog: 255 255 255 0 10 1 0 0 0 0
+Atmosphere: 0 1 10 0.1 0 20 0.25 0.1 8 255 255 255
+UseSelection: 0
+RayGlobal: 0.003922 2.2 3 64 10 0.25 0.18 0.14
+Scale-X/Y F0: 111.8
+Shift-X F0: 0.0002
+Shift-Y F0: 0.1846
+Scale-X/Y F1: 66.44
+Shift-X F1: -0.0128
+Shift-Y F1: 0.4781
+Scale-X/Y F2: 74.22
+Shift-X F2: -0.2707
+Shift-Y F2: -0.0128
+Scale-X/Y F3: 45
+Shift-X F3: 0
+Shift-Y F3: 0
+Camera: 0 -0.8995 1.56 0 0.0143 -0.3795 75 2.163 0 0 0 0 0 0
+Display_Camera: 1
+
+Omni 001: 1.579 -1.37 1.266 255 255 255 3 1 1 0 0 0 0 0
+Display_Omni: 1
+
+Nb-Object: 8
+
+[EndInitSection]
+
+Object 00001: 1
+Object 00001: 0 0 0
+Object 00001: 0.08411 0.08411 0.08411
+Object 00001: 0 0 0
+Object 00001: -0.9531 -0.2681 -0.1936
+Object 00001: 7
+Object 00001: Chrome_Metal_2
+Object 00001: 0
+Object 00001: 0
+Object 00001: Sphe0000
+Object 00001: -1
+Object 00001: 0 // display
+Object 00001: 1 1 1
+Object 00001: 0 0 0
+Object 00001: 0 0 0
+Object 00001: 1
+Object 00001: 0
+Object 00001: 0
+Object 00001: 0 0
+Object 00001: 0
+Object 00001: 1
+Object 00001: 1
+Object 00001: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00001: 0000000000000
+Object 00001: 0 0
+Object 00001: # 0 0 0 0 0 0 0 0
+Object 00001: # 0 0 0 0 0 0 0 0
+Object 00001: 0 0
+
+Object 00002: 1
+Object 00002: 0 0 0
+Object 00002: 0.08411 0.08411 0.08411
+Object 00002: 0 0 0
+Object 00002: 1.041 -0.2681 -0.1936
+Object 00002: 7
+Object 00002: Chrome_Metal_2
+Object 00002: 0
+Object 00002: 0
+Object 00002: Sphe0001
+Object 00002: -1
+Object 00002: 0 // display
+Object 00002: 1 1 1
+Object 00002: 0 0 0
+Object 00002: 0 0 0
+Object 00002: 1
+Object 00002: 0
+Object 00002: 0
+Object 00002: 0 0
+Object 00002: 0
+Object 00002: 1
+Object 00002: 1
+Object 00002: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00002: 0000000000000
+Object 00002: 0 0
+Object 00002: # 0 0 0 0 0 0 0 0
+Object 00002: # 0 0 0 0 0 0 0 0
+Object 00002: 0 0
+
+Object 00003: 1
+Object 00003: 0 0 0
+Object 00003: 0.08411 0.08411 0.08411
+Object 00003: 0 0 0
+Object 00003: -0.9531 0.08936 -0.968
+Object 00003: 7
+Object 00003: Chrome_Metal_2
+Object 00003: 0
+Object 00003: 0
+Object 00003: Sphe0002
+Object 00003: -1
+Object 00003: 0 // display
+Object 00003: 1 1 1
+Object 00003: 0 0 0
+Object 00003: 0 0 0
+Object 00003: 1
+Object 00003: 0
+Object 00003: 0
+Object 00003: 0 0
+Object 00003: 0
+Object 00003: 1
+Object 00003: 1
+Object 00003: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00003: 0000000000000
+Object 00003: 0 0
+Object 00003: # 0 0 0 0 0 0 0 0
+Object 00003: # 0 0 0 0 0 0 0 0
+Object 00003: 0 0
+
+Object 00004: 1
+Object 00004: 0 0 0
+Object 00004: 0.08411 0.08411 0.08411
+Object 00004: 0 0 0
+Object 00004: 1.022 0.08936 -0.968
+Object 00004: 7
+Object 00004: Chrome_Metal_2
+Object 00004: 0
+Object 00004: 0
+Object 00004: Sphe0003
+Object 00004: -1
+Object 00004: 0 // display
+Object 00004: 1 1 1
+Object 00004: 0 0 0
+Object 00004: 0 0 0
+Object 00004: 1
+Object 00004: 0
+Object 00004: 0
+Object 00004: 0 0
+Object 00004: 0
+Object 00004: 1
+Object 00004: 1
+Object 00004: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00004: 0000000000000
+Object 00004: 0 0
+Object 00004: # 0 0 0 0 0 0 0 0
+Object 00004: # 0 0 0 0 0 0 0 0
+Object 00004: 0 0
+
+Object 00005: 1
+Object 00005: 0 0 0
+Object 00005: 0.2902 0.2902 0.2902
+Object 00005: 0 0 0
+Object 00005: 0.01489 -0.2681 -0.9501
+Object 00005: 7
+Object 00005: Chrome_Metal_2
+Object 00005: 0
+Object 00005: 0
+Object 00005: Sphe0004
+Object 00005: -1
+Object 00005: 0 // display
+Object 00005: 1 1 1
+Object 00005: 0 0 0
+Object 00005: 0 0 0
+Object 00005: 1
+Object 00005: 0
+Object 00005: 0
+Object 00005: 0 0
+Object 00005: 0
+Object 00005: 1
+Object 00005: 1
+Object 00005: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00005: 0000000000000
+Object 00005: 0 0
+Object 00005: # 0 0 0 0 0 0 0 0
+Object 00005: # 0 0 0 0 0 0 0 0
+Object 00005: 0 0
+
+Object 00006: 1
+Object 00006: 0 0 0
+Object 00006: 0.08411 0.08411 0.08411
+Object 00006: 0 0 0
+Object 00006: -0.523 -0.2536 -0.4591
+Object 00006: 4
+Object 00006: Blue_Plastic
+Object 00006: 0
+Object 00006: 0
+Object 00006: Sphe0005
+Object 00006: -1
+Object 00006: 0 // display
+Object 00006: 1 1 1
+Object 00006: 0 0 0
+Object 00006: 0 0 0
+Object 00006: 1
+Object 00006: 0
+Object 00006: 0
+Object 00006: 0 0
+Object 00006: 0
+Object 00006: 1
+Object 00006: 1
+Object 00006: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00006: 0000000000000
+Object 00006: 0 0
+Object 00006: # 0 0 0 0 0 0 0 0
+Object 00006: # 0 0 0 0 0 0 0 0
+Object 00006: 0 0
+
+Object 00007: 1
+Object 00007: 0 0 0
+Object 00007: 0.08411 0.08411 0.08411
+Object 00007: 0 0 0
+Object 00007: -0.07342 -0.2536 -0.2287
+Object 00007: 4
+Object 00007: Blue_Plastic
+Object 00007: 0
+Object 00007: 0
+Object 00007: Sphe0006
+Object 00007: -1
+Object 00007: 0 // display
+Object 00007: 1 1 1
+Object 00007: 0 0 0
+Object 00007: 0 0 0
+Object 00007: 1
+Object 00007: 0
+Object 00007: 0
+Object 00007: 0 0
+Object 00007: 0
+Object 00007: 1
+Object 00007: 1
+Object 00007: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00007: 0000000000000
+Object 00007: 0 0
+Object 00007: # 0 0 0 0 0 0 0 0
+Object 00007: # 0 0 0 0 0 0 0 0
+Object 00007: 0 0
+
+Object 00008: 38
+Object 00008: 1 0.2142 1
+Object 00008: 1 0.2142 1
+Object 00008: 0 0 0
+Object 00008: 0 0 0
+Object 00008: 7
+Object 00008: Default
+Object 00008: 0
+Object 00008: 0
+Object 00008: HFld0000
+Object 00008: #..\POVLAB\HFIELD\MONTAGNE.TGA 0
+Object 00008: 0 // display
+Object 00008: 1 1 1
+Object 00008: 0 0 0
+Object 00008: 0 0 0
+Object 00008: 0
+Object 00008: 0
+Object 00008: 0
+Object 00008: 0 0
+Object 00008: 0
+Object 00008: 1
+Object 00008: 1
+Object 00008: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00008: 0000000000000
+Object 00008: 0 0
+Object 00008: # 0 0 0 0 0 0 0 0
+Object 00008: # 0 0 0 0 0 0 0 0
+Object 00008: 0 0
+
+End of file: HFIELD.SCN

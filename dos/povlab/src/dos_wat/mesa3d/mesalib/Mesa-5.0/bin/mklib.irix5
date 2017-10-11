@@ -1,0 +1,56 @@
+#!/bin/sh
+
+# Make an IRIX 5.x DSO
+
+#--identification------------------------------------------------------
+
+# $Id: mklib.irix5,v 1.3 2000/07/10 23:41:18 brianp Exp $
+
+# $Log: mklib.irix5,v $
+# Revision 1.3  2000/07/10 23:41:18  brianp
+# replace libMesaGL.so with libGL.so
+#
+# Revision 1.2  1999/09/15 15:10:20  brianp
+# added third, tiny version number to arguments
+#
+# Revision 1.1  1999/08/19 13:53:01  brianp
+# initial check-in (post-crash)
+#
+
+
+#--common--------------------------------------------------------------
+
+LIBRARY=$1
+shift 1
+
+MAJOR=$1
+shift 1
+
+MINOR=$1
+shift 1
+
+TINY=$1
+shift 1
+
+OBJECTS=$*
+
+#--platform------------------------------------------------------------
+
+# This is a bit of a kludge, but...
+if test ${LIBRARY} = "libGL.so" ; then
+	# must add libXext.a to libGL.so in case one relinks a precompiled
+	# OpenGL program which wasn't linked with -lXext or -lm.
+	OBJECTS="${OBJECTS} -lXext -lm"
+fi
+
+
+ld -shared -all -o ${LIBRARY} ${OBJECTS}
+
+
+# You may want to add the following to the ld line:
+#   -soname <path>$LIBNAME
+#
+# where LIBNAME=`basename $LIBRARY` and <path> is where you're going to
+# put Mesa's libraries.  This may solve problems with the runtime
+# loader/linker (rld) not being able to find the library.
+# For example:  -soname /usr/local/lib/$LIBNAME

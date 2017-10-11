@@ -1,0 +1,103 @@
+      COMPILING DOCUMENTATION FOR POV-Ray FOR MS-DOS USING BORLAND C 
+
+1.0   INTRODUCTION AND DISCLAIMERS
+
+This documentation is to help you compile the portable C source code into a 
+working executable version of POV-Ray for MS-Dos using a Borland C 
+compiler.  The Borland compiled version of POV-Ray is designated by 
+".msdos.bcc" after the POV-Ray version number on the opening banner.  
+Everything in this document ONLY applies to that version.  Other versions 
+will operate under different rules.  This file is NOT the only compiling 
+documentation for POV-Ray.  Before proceeding any farther, you should first 
+read the file COMPILE.DOC in the root directory of the source archive.  It 
+provides important information about the generic parts of POV-Ray.  Also 
+read SOURCE\MSDOS\CMPL_MSD.DOC which provides MS-Dos specific information.
+
+When this document refers to "this directory" it means the 
+SOURCE\MSDOS\BORLAND directory.  All of the compiler-specific files for 
+this version are found in there.  The makefiles are designed under the 
+assumption that you are compiling from this directory.  
+
+This documentation DOES NOT tell you how to use POV-Ray for MS-Dos.  It is 
+assumed you already have obtained the official executable archive compiled 
+for MS-Dos and that you are familiar with using it.  It contains essential 
+user documentation, sample scenes and standard scene include files.  User 
+documentation is in the executable archive in the hypertext file 
+POVHELP.PHE.  The executable archive also includes a help reader program to 
+read PHE files and utilities to translate PHE into other forms.  MS-Dos 
+specific user documentation is in the text file POVMSDOS.DOC in the 
+executable archive.  Borland specific user documentation can be found in 
+CMPL_BOR.DOC in this directory.
+
+The first question you should ask yourself before proceeding is "Do I 
+really need to compile POV-Ray at all?"  If you do not intend to add any 
+custom or experimental features to the program, or to port it to an 
+unsupported compiler you need not compile this program yourself.
+
+As explained in COMPILE.DOC, if you do want to proceed you should be aware 
+that you are very nearly on your own.  This documentation and other related 
+compiling documentation assumes you know what you are doing.  In general 
+you should not expect any technical support from the POV-Ray Team on how to 
+compile the program.  Everything is provided here "as is".  All we can say 
+with any certainty is that we were able to compile it on our system.  If it 
+doesn't work for you, we probably cannot tell you why.
+
+When making any custom version of POV-Ray or any unofficial compile, please 
+make sure you read and follow all provisions of our license in the file 
+POVLEGAL.DOC.  In general you can modify and use POV-Ray on your own 
+however you want but if you distribute your unofficial version you must 
+follow our rules.  You may not under any circumstances use portions of POV-
+Ray source code in other programs.
+
+
+2.0   SUPPORTED COMPILER VERSIONS
+
+POV-Ray 3.0 must be compiled using a 32-bit protected mode, flat memory 
+model compiler for 386 CPU or better.  It cannot be compiled as a real mode 
+or 286 protected mode program.  It cannot be compiled in small, medium, 
+large or even huge memory models.  
+
+We recommend the BC++ 4.52 with the Dos Power Pack.  The Borland compiler 
+is the fastest compiling C compiler we have ever seen.  The resulting 
+executable is not as fast as Watcom but the dos extender has no memory 
+limits.  BC++ alone, is NOT sufficient to compile a 32-bit dos program.  
+You MUST have an add-on package called the Dos Power Pack.  The Dos Power 
+Pack works with versions from BC++ 4.02 through BC++ 4.52 and we have 
+successfully compiled.  
+
+PLEASE NOTE: The current Borland release BC++ 5.0 does not officially 
+support the Dos Power Pack.  The last time we checked, the Dos Power Pack 
+was no longer for sale.  We have been told that it is still possible to use 
+the command-line 5.0 compiler with an old Dos Power Pack to create 32-bit 
+Dos programs but we have not personally verified this.  
+
+
+3.0   Libraries
+
+This version requires 4 libraries.  Pre-compiled versions of these 
+libraries are provided in this directory.  The first 2, LIBPNG.LIB and 
+ZLIB.LIB add support for PNG format files.  If you need to re-compile them 
+for any reason, you may use the batch file BUILDPNG.BAT.  It will log to 
+the ..\..\ZLIB directory, erase any previously compiled lib, re-compile 
+ZLIB, copy it to this directory, and cleans up the ZLIB directory.  Then it 
+does the same for LIBPNG.LIB and the ..\..\LIBPNG directory.
+
+PMODE.LIB provides access to video and dos memory from protected mode.  
+ZTIMER.LIB provides a precision timer for the histogram profiling feature.  
+There are source files in SOURCE\MSDOS\PMODE and SOURCE\MSDOS\ZTIMER but we 
+have not provided make files.  Parts of these libs are written in assembler 
+and require Borland Tasm 4.0 to re-compile.  For this reason we suggest you 
+do not attempt to re-compile them unless you absolutely have to do so.
+
+4.0   Compiling
+
+To compile POV-Ray type the following command from this directory...
+
+  MAKE -fMSDOSBC.MAK
+
+The Borland compiler will compile each FILE.C into an object file such as 
+FILE.OBJ and these object files are linked with the libs to create 
+POVRAY.EXE.  If you do not plan to re-compile, you may DEL *.OBJ to save 
+space.  If you do plan to re-compile, the MAKE utility will compile only 
+those files which have changed.  
+

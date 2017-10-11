@@ -1,0 +1,18 @@
+Sat Apr 22 16:12:13 1995  Thorsten Ohl  <ohl@localhost>
+
+	* Makefile.in: don't forget to define INSTALL_DATA
+
+Sun Apr  9 23:20:41 1995  Thorsten Ohl  <ohl@localhost>
+
+	* MesaWorkstation.pod: list actions and translations
+
+Sat Apr  1 01:51:09 1995  Thorsten Ohl  <ohl@localhost>
+
+	* MesaDrawingArea.pod: add ximage ressource
+
+Thu Mar 30 23:08:35 1995  Thorsten Ohl  <ohl@localhost>
+
+	* Makefile.in:  `SHELL = /bin/sh'
+
+
+

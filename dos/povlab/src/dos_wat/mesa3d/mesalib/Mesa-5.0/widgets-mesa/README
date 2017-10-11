@@ -1,0 +1,107 @@
+
+NOTICE: You probably don't want to use this widget code.  It uses
+the "XMesa" interface, not "GLX".  Therefore, it will only work
+with Mesa and no other OpenGL implementation.  You should probably
+use 'widgets-sgi' instead.
+
+
+This is a beta release of a widget set for Mesa/OpenGL programming.
+
+Objectives:
+***********
+
+  * Provide a GLwDrawingArea widget which is 100%ly compatible with
+  SGI's widget.  Applications should port over with (almost) no
+  changes to the source code.
+
+  * Add a better widget (MesaDrawingArea) alongside or atop of it.  In
+  particular, attach a XMesaContext transparently to the widget.  This
+  should simplify applications with multiple widgets considerably.
+
+  * Provide a high level workstation abstraction (MesaWorkstation)
+  atop of MesaDrawingArea to allow PHIGS/PEX enthusiasts to continue
+  in their style.
+
+
+Status:
+*******
+
+  * The widgets work, but are in differing stages of completion:
+
+    * GLwDrawingArea is almost complete: a couple of resources are
+    still ignored and I need to add code to handle cases in which a
+    colormap resource is provided explicitely.  Currently, I allocate
+    a fresh colormap for RGBA mode and use the default in color index
+    mode.
+
+    * GLwMDrawingArea (the Motif version of the above) needs testing.
+    Use `./configure --with-motif' to build it.
+
+    * MesaDrawingArea is complete (I think).
+
+    * MesaWorkstation is stabilizing, but changes to the user
+    interface are still expected.  The programming interfase is more
+    stable, but also subject to change.
+
+  * See also: TODO
+
+  * This code should still be considered late beta, however.
+  Comments, bugreports and in particular bugfixes are welcome.
+
+  * PLEASE: the sample code in the demos subdirectory is not to be
+  mistaken for examples of good coding practice.  It mushroomed wildly
+  during development of the widgets and is only intended for testing.
+  It is planned to improve and clean up ed, though.
+
+
+Authors:
+********
+
+  Jeroen van der Zijp <jvz@cyberia.cfdrc.com>
+  Thorsten Ohl <Thorsten.Ohl@Physik.TH-Darmstadt.de>
+
+
+Copyleft:
+*********
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+
+$Id: README,v 1.2 2002/10/22 15:02:01 brianp Exp $
+Local Variables:
+mode:indented-text
+End:
+
+
+Trouble Shooting:
+*****************
+
+If you get an error such as:
+
+   Error: MesaDrawingArea: unable to find visual
+
+The problem is that the fallback resources specify:
+
+        *MesaDrawingArea.rgba: false
+
+You will need to override this by either installing a suitable
+app-defaults file (the supplied one duplicates the fallback
+resources), or specifying the value on the command line, e.g.
+
+        ./mcube -xrm "*MesaDrawingArea.rgba: true"
+
+
+Thanks to Glynn Clements <glynn@sensei.co.uk> for this info.
+

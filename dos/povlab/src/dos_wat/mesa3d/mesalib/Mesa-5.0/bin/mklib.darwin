@@ -1,0 +1,66 @@
+#!/bin/sh
+
+# Make a Darwin (Max OS X) shared library
+
+#--identification------------------------------------------------------
+
+# $Id: mklib.darwin,v 1.1 2001/11/30 19:39:45 kschultz Exp $
+
+#--common--------------------------------------------------------------
+
+LIBRARY=$1
+shift 1
+
+MAJOR=$1
+shift 1
+
+MINOR=$1
+shift 1
+
+TINY=$1
+shift 1
+
+OBJECTS=$*
+
+#--platform------------------------------------------------------------
+
+VERSION="${MAJOR}.${MINOR}.${TINY}"
+
+LIBNAME=`basename $LIBRARY`
+ARNAME=`basename $LIBNAME .dylib`.a
+DIRNAME=`dirname $LIBRARY`
+
+# When making shared libraries, also link with any libraries we're
+# depenedant on.
+if [ $LIBRARY = "libGL.dylib" ] ; then
+    EXTRA_LIBS=${GL_LIB_DEPS}
+elif [ $LIBRARY = "libGLU.dylib" ] ; then
+    EXTRA_LIBS=${GLU_LIB_DEPS}
+elif [ $LIBRARY = "libglut.dylib" ] ; then
+    EXTRA_LIBS=${GLUT_LIB_DEPS}
+elif [ $LIBRARY = "libOSMesa.dylib" ] ; then
+    EXTRA_LIBS=${GLU_LIB_DEPS}
+fi
+
+cc ${EXTRA_FLAGS} -dynamiclib -multiply_defined suppress \
+        -o ${LIBRARY} ${OBJECTS} ${EXTRA_LIBS} 
+
+# also make regular .a files,
+# provided by Danek Duvall (duvall@dhduvall.student.princeton.edu)
+
+ar ruv ${DIRNAME}/${ARNAME} ${OBJECTS}
+ranlib ${DIRNAME}/${ARNAME}
+
+
+# Print a reminder about shared libs:
+DIR=`cd .. ; pwd`
+echo
+echo "******Be sure to add" ${DIR}"/lib to your DYLD_LIBRARY_PATH variable"
+echo
+sleep 2
+
+
+
+#### NOTES:
+# One Mesa user reports having to run the "ldconfig -v" command to make
+# Linux aware of the shared libs.

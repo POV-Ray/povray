@@ -1,0 +1,38 @@
+#!/bin/sh
+
+# Make a standard .a library using Cygnus on Linux
+# contributed by Stephane Rehel <rehel@worldnet.fr>
+
+#--identification------------------------------------------------------
+
+# $Id: mklib.cygnus-linux,v 1.2 1999/09/15 15:10:20 brianp Exp $
+
+# $Log: mklib.cygnus-linux,v $
+# Revision 1.2  1999/09/15 15:10:20  brianp
+# added third, tiny version number to arguments
+#
+# Revision 1.1  1999/08/19 13:52:59  brianp
+# initial check-in (post-crash)
+#
+
+
+#--common--------------------------------------------------------------
+
+LIBRARY=$1
+shift 1
+
+MAJOR=$1
+shift 1
+
+MINOR=$1
+shift 1
+
+TINY=$1
+shift 1
+
+OBJECTS=$*
+
+#--platform-------------------------------------------------------------
+
+gnuwin32ar ruv $LIBRARY $OBJECTS
+

@@ -1,0 +1,114 @@
+Thu Jun  8 11:47:49 1995  Thorsten Ohl  <ohl@localhost>
+
+	* MesaWorkstation.c: memmove() is not available in
+	SunOS (<Frederic.Devernay@sophia.inria.fr>).
+
+Thu Jun  1 11:03:39 1995  Thorsten Ohl  <ohl@localhost>
+
+	* GLwDrawingArea.c (Realize): add EnterWindowMask, LeaveWindowMask
+	and PointerMotionMask to event_mask.   This is apparently needed
+	for picking (communicated by Saif A. Warsi <warsi@nas.nasa.gov>).
+
+Fri May 19 22:29:36 1995  Thorsten Ohl  <ohl@localhost>
+
+	* MesaWorkstation.c: posting and retrieving matrices.
+
+	* MesaDrawingArea.c: shareLists and shareListsWith resources.
+
+Sat Apr 22 16:54:48 1995  Thorsten Ohl  <ohl@localhost>
+
+	* GLwCreateMDrawingArea.c, GLwDrawingAreaMakeCurrent.c,
+	GLwDrawingAreaSwapBuffers.c GLwMakeCurrent.c: separate files.
+
+Wed Apr 19 02:48:19 1995  Thorsten Ohl  <ohl@localhost>
+
+	* MesaDrawingArea.c (Realize): switch to the new (1.1.4) API.
+
+Wed Apr 12 01:13:33 1995  Thorsten Ohl  <ohl@localhost>
+
+	* GLwDrawingArea.c (Realize): honor the installColormap resource.
+
+Tue Apr 11 20:19:47 1995  Thorsten Ohl  <ohl@localhost>
+
+	* MesaWorkstation.c: remove empty resource declaration, ANSI C
+	doesn't allow them.
+
+Mon Apr 10 19:06:03 1995  Thorsten Ohl  <ohl@localhost>
+
+	* MesaDrawingArea.c, MesaWorkstation.c: fix the tails of the class
+	records.
+
+Sun Apr  9 23:21:51 1995  Thorsten Ohl  <ohl@localhost>
+
+	* MesaWorkstation.c: add procjection and view state to the widget.
+
+	* MesaWorkstation.c (Move, Projection): new action for
+	transforming the state.
+
+Sat Apr  8 18:24:11 1995  Thorsten Ohl  <ohl@localhost>
+
+	* GLwDrawingArea.c: debugging option and colormap cache.
+
+Wed Apr  5 01:14:11 1995  Thorsten Ohl  <ohl@localhost>
+
+	* MesaDrawingArea.c (Initialize): handled by GLwDrawingArea.
+
+	* MesaDrawingArea.c (Realize): remove all code that handles
+	colormaps, visual, etc., because this is now handled by
+	GLwDrawingArea.
+
+Tue Apr  4 23:36:03 1995  Thorsten Ohl  <ohl@localhost>
+
+	* GLwDrawingArea.c: include X11/Xmu/StdCmap.h.
+
+	* GLwDrawingArea.c (GLwMapping): removed.  It is unnecessary and
+	was doing the wrong thing (installing a colormap) anyway.
+
+	* GLwDrawingArea.c (Initialize): move here sanitized
+	initialization code from Realize.  We should now be able to handle
+	TrueColor visuals correctly.
+
+	* GLwDrawingArea.c (generate_attrib_list): new function (from
+	Realize).
+
+	* GLwDrawingArea.c (get_standard_rgb_map, post_colormap): new
+	functions.
+
+	* GLwDrawingArea.c (Realize): sanitized, install colormap
+	property.
+
+Sat Apr  1 01:47:11 1995  Thorsten Ohl  <ohl@localhost>
+
+	* MesaDrawingArea.c (Realize): use mesaDrawingArea.ximage in
+	MesaCreateContext to decide whether or not to use an Ximage as
+	second buffer.
+
+Fri Mar 31 22:41:39 1995  Thorsten Ohl  <ohl@localhost>
+
+	* GLwDrawingArea.c (resources): fix braino: the Motif resources
+	are members of the `primitive' structure.  No wonder the Motif
+	code didn't compile ...
+
+Fri Mar 31 20:58:00 1995  Thorsten Ohl  <ohl@localhost>
+
+	* MesaWorkstation.c (mesa_unpost_object): don't use `=' for `=='.
+
+Thu Mar 30 23:05:41 1995  Thorsten Ohl  <ohl@localhost>
+
+	* Makefile.in: `SHELL = /bin/sh'
+
+	* Makefile.in: add `-I$(mesa_srcdir)/include' to CPPFLAGS, in case
+	Mesa is not installed yet.
+
+Wed Mar 29 15:58:43 1995  Thorsten Ohl  <ohl@localhost>
+
+	* GLwDrawingArea.c (Realize): take colormap handling from
+	MesaDrawingArea.  This has to be improved, but works for the moment.
+
+Wed Mar 29 11:44:45 1995  Thorsten Ohl  <ohl@localhost>
+
+	* MesaDrawingArea.c: Replace *single by *doublebuffer to be
+	compatible with the Glw* widget.
+
+	* Mesa*.c: Change Xt* macros to Mesa*, like the GLw* widget does.
+

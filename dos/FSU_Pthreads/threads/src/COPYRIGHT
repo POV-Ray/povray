@@ -1,0 +1,61 @@
+                        NOTICE OF COPYRIGHT
+
+Except for files with internal markings to the contrary, copyright to
+all the material in this directory and all its subdirectories belongs
+to the Florida State University.  Most of this code was produced by
+FSU students and faculty under the POSIX/Ada Real-Time (PART) project,
+funded by the Ada Joint Program Office under the Ada Technology
+Insertion Program, through the U.S. Army Communications Electronics
+Command, Software Engineering Directorate, subcontracted through the
+Telos Corporation.
+
+PART project members have included Ted Baker (Principal Investigator),
+Ted Giering (Chief Programmer), Pratit Santiprabhob (Research
+Associate), Offer Pazy (Consultant), and Ganesh Rangarajan, R. Ramesh,
+Frank Mueller, Teguh Ghazalie, Viresh Rustagi, and Seung-jin Moon
+(Graduate Research Assistants).
+
+This software is still under development, and contains known bugs.
+The user assumes all risks associated with its use.
+
+This subdirectory contains a library implementation of the
+POSIX 1003.4a/D6 draft standard for multiple threads of control within
+POSIX processes, known for short as Pthreads.  This is implemented
+over SunOS for the SPARC microprocessor (SunOS is a trademark of Sun
+Microsystems, Inc., and SPARC is a trademark of SPARC International,
+Inc).  This was originally based on the C threads library of Eric
+Cooper [1].  This library was modified to support Pthreads syntax and
+non-preemptive priority scheduling on the Motorola MC680x0 family of
+processors by Ganesh Rangarajan [2].  R. Ramesh and Ted Giering ported
+this library to the SPARC processor, and R. Ramesh merged the two
+levels of scheduling entities provided by C threads into one and added
+further Pthreads features.  Frank Mueller modified the resulting
+library to support preemptive scheduling, per-thread signals, and
+other features.  Viresh Rustagi implemented single-thread blocking I/O
+and refined the context switch.  Details of the design and
+implementation can be found in the literature [3,4].
+
+Ted Giering
+September 16, 1992
+
+
+References
+
+[1] E. Cooper and R. Draves. C Threads. Technical Report CMU-CS-88-154,
+	Department of Computer Science, Carnegie Mellon University,
+	1988.
+
+[2] Ganesh Rangarajan. A Library Implementation of {POSIX} Threads. July
+	1991.  Master's Project Report, Florida State University
+	Department of Computer Science.
+
+[3] Frank Mueller. Implementing {POSIX} Threads under UNIX:
+	Description of Work in Progress. In "Proceedings of the 
+	Second Software Engineering Research Forum", November 1992.
+	To appear.
+
+[4] Frank Mueller. A Library Implementation of POSIX Threads under
+	UNIX. In Proceedings of the USENIX Conference, Winter 1993.
+	To appear.
+
+

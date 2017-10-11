@@ -1,0 +1,43 @@
+Fri May 19 22:28:06 1995  Thorsten Ohl  <ohl@localhost>
+
+	* MesaWorkstation.h: posting and retrieving matrices.
+
+	* MesaDrawingArea.h: shareLists, and shareListsWith resources.
+
+Sun Apr  9 23:21:17 1995  Thorsten Ohl  <ohl@localhost>
+
+	* MesaWorkstationP.h: add prjection and view state to the widget.
+
+Sat Apr  8 18:23:28 1995  Thorsten Ohl  <ohl@localhost>
+
+	* GLwDrawAP.h: debugging option and colormap cache.
+
+Wed Apr  5 01:12:25 1995  Thorsten Ohl  <ohl@localhost>
+
+	* MesaDrawingArea.h, MesaDrawingAreaP.h: subclass it from
+	GLwDrawingArea.
+
+	* MesaWorkstation.h, MesaWorkstation.h: adjust to that.
+
+Tue Apr  4 23:34:41 1995  Thorsten Ohl  <ohl@localhost>
+
+	* GLwDrawAP.h (GLwDrawingAreaPart): rename myList and myAttrib to
+	attribList_allocated and visualInfo_allocated, which are more
+	descriptive.
+
+Sat Apr  1 01:46:20 1995  Thorsten Ohl  <ohl@localhost>
+
+	* MesaDrawingAreaP.h: new field mesaDrawingArea.ximage
+
+Thu Mar 30 23:07:55 1995  Thorsten Ohl  <ohl@localhost>
+
+	* Makefile.in:  `SHELL = /bin/sh'
+
+Wed Mar 29 11:45:54 1995  Thorsten Ohl  <ohl@localhost>
+
+	* MesaDrawingArea*.h: Replace *single by *doublebuffer to be
+	compatible with the Glw* widget.
+
+	* Mesa*.h: Change Xt* macros to Mesa*, like the GLw* widget does.
+
+

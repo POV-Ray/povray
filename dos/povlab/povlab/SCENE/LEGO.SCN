@@ -1,0 +1,7037 @@
+;POVLAB version 4.0 shareware - ascii scene for 3D modeller.
+;(C) 1997, Denis Olivier.
+;All rights reserved.
+;Date=Tuesday 04-24-2001.
+;Time=14:38:24.
+;user_name=REGISTER!
+ColorCamera=4
+ColorViewport=0
+ColorTextBackground=8
+ColorSelection=6
+ColorInterface=7
+ColorAxis=5
+ColorGrid=2
+GrilleType=1
+CurrentViewport=1
+Viewportx4=1
+DisplayAxis=1
+DisplayGrid=1
+CurrentTexture=Stone15
+CurrentCamera=1
+BackgroundImageRGB: 50 50 60
+Fog: 255 255 255 0 0 1 0 0 0 0
+Atmosphere: 0 1 10 0.1 0 20 0.25 0.1 8 255 255 255
+UseSelection: 0
+RayGlobal: 0.003922 2.2 3 64 10 0.25 0.18 0.14
+Scale-X/Y F0: 25.35
+Shift-X F0: -0.9239
+Shift-Y F0: 2.572
+Scale-X/Y F1: 20.63
+Shift-X F1: 1.592
+Shift-Y F1: 2.572
+Scale-X/Y F2: 14.7
+Shift-X F2: -0.9239
+Shift-Y F2: 1.592
+Scale-X/Y F3: 45
+Shift-X F3: 0
+Shift-Y F3: 0
+Camera: -3.995 -4.196 -7.73 -0.8029 -0.0287 -1.794 58.5 6.362 0 0 0 0 0 0
+Display_Camera: 1
+
+Omni 001: 2 -5.353 -7.917 255 255 255 3 1 0 0 0 0 0 0
+Display_Omni: 1
+
+Nb-Object: 241
+
+[EndInitSection]
+
+Object 00001: 2
+Object 00001: 0 0 0
+Object 00001: 0.8956 0.0361 0.4553
+Object 00001: 0 90 0
+Object 00001: -2.688 -0.3222 -3.09
+Object 00001: 7
+Object 00001: Green_RPlastic
+Object 00001: 0
+Object 00001: 0
+Object 00001: Object0001
+Object 00001: -1
+Object 00001: 2 // display
+Object 00001: 1 1 1
+Object 00001: 0 0 0
+Object 00001: 0 0 0
+Object 00001: 1
+Object 00001: 0
+Object 00001: 0
+Object 00001: 0 0
+Object 00001: 0
+Object 00001: 1
+Object 00001: 76
+Object 00001: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00001: 0000000000000
+Object 00001: 0 0
+Object 00001: # 0 0 0 0 0 0 0 0
+Object 00001: # 0 0 0 0 0 0 0 0
+Object 00001: 0 0
+
+Object 00002: 0
+Object 00002: 0 0 0
+Object 00002: 0.1431 0.0563 0.1431
+Object 00002: 0 90 0
+Object 00002: -2.482 -0.4142 -2.449
+Object 00002: 7
+Object 00002: Green_RPlastic
+Object 00002: 0
+Object 00002: 0
+Object 00002: Object0002
+Object 00002: -1
+Object 00002: 2 // display
+Object 00002: 1 1 1
+Object 00002: 0 0 0
+Object 00002: 0 0 0
+Object 00002: 1
+Object 00002: 0
+Object 00002: 0
+Object 00002: 0 0
+Object 00002: 0
+Object 00002: 1
+Object 00002: 133
+Object 00002: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00002: 0000000000000
+Object 00002: 0 0
+Object 00002: # 0 0 0 0 0 0 0 0
+Object 00002: # 0 0 0 0 0 0 0 0
+Object 00002: 0 0
+
+Object 00003: 0
+Object 00003: 0 0 0
+Object 00003: 0.1431 0.0563 0.1431
+Object 00003: 0 90 0
+Object 00003: -2.897 -0.4142 -2.449
+Object 00003: 7
+Object 00003: Green_RPlastic
+Object 00003: 0
+Object 00003: 0
+Object 00003: Object0003
+Object 00003: -1
+Object 00003: 2 // display
+Object 00003: 1 1 1
+Object 00003: 0 0 0
+Object 00003: 0 0 0
+Object 00003: 1
+Object 00003: 0
+Object 00003: 0
+Object 00003: 0 0
+Object 00003: 0
+Object 00003: 1
+Object 00003: 0
+Object 00003: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00003: 0000000000000
+Object 00003: 0 0
+Object 00003: # 0 0 0 0 0 0 0 0
+Object 00003: # 0 0 0 0 0 0 0 0
+Object 00003: 0 0
+
+Object 00004: 0
+Object 00004: 0 0 0
+Object 00004: 0.1431 0.0563 0.1431
+Object 00004: 0 90 0
+Object 00004: -2.897 -0.4142 -3.758
+Object 00004: 7
+Object 00004: Green_RPlastic
+Object 00004: 0
+Object 00004: 0
+Object 00004: Object0004
+Object 00004: -1
+Object 00004: 2 // display
+Object 00004: 1 1 1
+Object 00004: 0 0 0
+Object 00004: 0 0 0
+Object 00004: 1
+Object 00004: 0
+Object 00004: 0
+Object 00004: 0 0
+Object 00004: 0
+Object 00004: 1
+Object 00004: 14
+Object 00004: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00004: 0000000000000
+Object 00004: 0 0
+Object 00004: # 0 0 0 0 0 0 0 0
+Object 00004: # 0 0 0 0 0 0 0 0
+Object 00004: 0 0
+
+Object 00005: 0
+Object 00005: 0 0 0
+Object 00005: 0.1431 0.0563 0.1431
+Object 00005: 0 90 0
+Object 00005: -2.479 -0.4142 -3.758
+Object 00005: 7
+Object 00005: Green_RPlastic
+Object 00005: 0
+Object 00005: 0
+Object 00005: Object0005
+Object 00005: -1
+Object 00005: 2 // display
+Object 00005: 1 1 1
+Object 00005: 0 0 0
+Object 00005: 0 0 0
+Object 00005: 1
+Object 00005: 0
+Object 00005: 0
+Object 00005: 0 0
+Object 00005: 0
+Object 00005: 1
+Object 00005: 0
+Object 00005: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00005: 0000000000000
+Object 00005: 0 0
+Object 00005: # 0 0 0 0 0 0 0 0
+Object 00005: # 0 0 0 0 0 0 0 0
+Object 00005: 0 0
+
+Object 00006: 0
+Object 00006: 0 0 0
+Object 00006: 0.1431 0.0563 0.1431
+Object 00006: 0 90 0
+Object 00006: -2.481 -0.4142 -3.332
+Object 00006: 7
+Object 00006: Green_RPlastic
+Object 00006: 0
+Object 00006: 0
+Object 00006: Object0006
+Object 00006: -1
+Object 00006: 2 // display
+Object 00006: 1 1 1
+Object 00006: 0 0 0
+Object 00006: 0 0 0
+Object 00006: 1
+Object 00006: 0
+Object 00006: 0
+Object 00006: 0 0
+Object 00006: 0
+Object 00006: 1
+Object 00006: 192
+Object 00006: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00006: 0000000000000
+Object 00006: 0 0
+Object 00006: # 0 0 0 0 0 0 0 0
+Object 00006: # 0 0 0 0 0 0 0 0
+Object 00006: 0 0
+
+Object 00007: 0
+Object 00007: 0 0 0
+Object 00007: 0.1431 0.0563 0.1431
+Object 00007: 0 90 0
+Object 00007: -2.89 -0.4142 -3.332
+Object 00007: 7
+Object 00007: Green_RPlastic
+Object 00007: 0
+Object 00007: 0
+Object 00007: Object0007
+Object 00007: -1
+Object 00007: 2 // display
+Object 00007: 1 1 1
+Object 00007: 0 0 0
+Object 00007: 0 0 0
+Object 00007: 1
+Object 00007: 0
+Object 00007: 0
+Object 00007: 0 0
+Object 00007: 0
+Object 00007: 1
+Object 00007: 84
+Object 00007: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00007: 0000000000000
+Object 00007: 0 0
+Object 00007: # 0 0 0 0 0 0 0 0
+Object 00007: # 0 0 0 0 0 0 0 0
+Object 00007: 0 0
+
+Object 00008: 0
+Object 00008: 0 0 0
+Object 00008: 0.1431 0.0563 0.1431
+Object 00008: 0 90 0
+Object 00008: -2.897 -0.4142 -2.89
+Object 00008: 7
+Object 00008: Green_RPlastic
+Object 00008: 0
+Object 00008: 0
+Object 00008: Object0008
+Object 00008: -1
+Object 00008: 2 // display
+Object 00008: 1 1 1
+Object 00008: 0 0 0
+Object 00008: 0 0 0
+Object 00008: 1
+Object 00008: 0
+Object 00008: 0
+Object 00008: 0 0
+Object 00008: 0
+Object 00008: 1
+Object 00008: 95
+Object 00008: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00008: 0000000000000
+Object 00008: 0 0
+Object 00008: # 0 0 0 0 0 0 0 0
+Object 00008: # 0 0 0 0 0 0 0 0
+Object 00008: 0 0
+
+Object 00009: 0
+Object 00009: 0 0 0
+Object 00009: 0.1431 0.0563 0.1431
+Object 00009: 0 90 0
+Object 00009: -2.482 -0.4142 -2.89
+Object 00009: 7
+Object 00009: Green_RPlastic
+Object 00009: 0
+Object 00009: 0
+Object 00009: Object0009
+Object 00009: -1
+Object 00009: 2 // display
+Object 00009: 1 1 1
+Object 00009: 0 0 0
+Object 00009: 0 0 0
+Object 00009: 1
+Object 00009: 0
+Object 00009: 0
+Object 00009: 0 0
+Object 00009: 0
+Object 00009: 1
+Object 00009: 91
+Object 00009: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00009: 0000000000000
+Object 00009: 0 0
+Object 00009: # 0 0 0 0 0 0 0 0
+Object 00009: # 0 0 0 0 0 0 0 0
+Object 00009: 0 0
+
+Object 00010: 2
+Object 00010: 0 0 0
+Object 00010: 0.8956 0.2797 0.0393
+Object 00010: 0 90 0
+Object 00010: -2.271 -0.0786 -3.09
+Object 00010: 7
+Object 00010: Green_RPlastic
+Object 00010: 0
+Object 00010: 0
+Object 00010: Object0010
+Object 00010: -1
+Object 00010: 2 // display
+Object 00010: 1 1 1
+Object 00010: 0 0 0
+Object 00010: 0 0 0
+Object 00010: 1
+Object 00010: 0
+Object 00010: 0
+Object 00010: 0 0
+Object 00010: 0
+Object 00010: 1
+Object 00010: 111
+Object 00010: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00010: 0000000000000
+Object 00010: 0 0
+Object 00010: # 0 0 0 0 0 0 0 0
+Object 00010: # 0 0 0 0 0 0 0 0
+Object 00010: 0 0
+
+Object 00011: 2
+Object 00011: 0 0 0
+Object 00011: 0.8956 0.2797 0.0393
+Object 00011: 0 90 0
+Object 00011: -3.104 -0.0786 -3.09
+Object 00011: 7
+Object 00011: Green_RPlastic
+Object 00011: 0
+Object 00011: 0
+Object 00011: Object0011
+Object 00011: -1
+Object 00011: 2 // display
+Object 00011: 1 1 1
+Object 00011: 0 0 0
+Object 00011: 0 0 0
+Object 00011: 1
+Object 00011: 0
+Object 00011: 0
+Object 00011: 0 0
+Object 00011: 0
+Object 00011: 1
+Object 00011: 255
+Object 00011: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00011: 0000000000000
+Object 00011: 0 0
+Object 00011: # 0 0 0 0 0 0 0 0
+Object 00011: # 0 0 0 0 0 0 0 0
+Object 00011: 0 0
+
+Object 00012: 2
+Object 00012: 0 0 0
+Object 00012: 0.0369 0.2797 0.4553
+Object 00012: 0 90 0
+Object 00012: -2.688 -0.0786 -2.231
+Object 00012: 7
+Object 00012: Green_RPlastic
+Object 00012: 0
+Object 00012: 0
+Object 00012: Object0012
+Object 00012: -1
+Object 00012: 2 // display
+Object 00012: 1 1 1
+Object 00012: 0 0 0
+Object 00012: 0 0 0
+Object 00012: 1
+Object 00012: 0
+Object 00012: 0
+Object 00012: 0 0
+Object 00012: 0
+Object 00012: 1
+Object 00012: 201
+Object 00012: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00012: 0000000000000
+Object 00012: 0 0
+Object 00012: # 0 0 0 0 0 0 0 0
+Object 00012: # 0 0 0 0 0 0 0 0
+Object 00012: 0 0
+
+Object 00013: 2
+Object 00013: 0 0 0
+Object 00013: 0.0369 0.2797 0.4553
+Object 00013: 0 90 0
+Object 00013: -2.688 -0.0786 -3.949
+Object 00013: 7
+Object 00013: Green_RPlastic
+Object 00013: 0
+Object 00013: 0
+Object 00013: Object0013
+Object 00013: -1
+Object 00013: 2 // display
+Object 00013: 1 1 1
+Object 00013: 0 0 0
+Object 00013: 0 0 0
+Object 00013: 1
+Object 00013: 0
+Object 00013: 0
+Object 00013: 0 0
+Object 00013: 0
+Object 00013: 1
+Object 00013: 54
+Object 00013: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00013: 0000000000000
+Object 00013: 0 0
+Object 00013: # 0 0 0 0 0 0 0 0
+Object 00013: # 0 0 0 0 0 0 0 0
+Object 00013: 0 0
+
+Object 00014: 5
+Object 00014: 0.831 0 0
+Object 00014: 0.1948 0.1948 0.2456
+Object 00014: 90 90 0
+Object 00014: -2.696 -0.0451 -2.618
+Object 00014: 7
+Object 00014: Green_RPlastic
+Object 00014: 0
+Object 00014: 0
+Object 00014: Object0014
+Object 00014: -1
+Object 00014: 2 // display
+Object 00014: 1 1 1
+Object 00014: 0 0 0
+Object 00014: 0 0 0
+Object 00014: 1
+Object 00014: 0
+Object 00014: 0
+Object 00014: 0 0
+Object 00014: 0
+Object 00014: 1
+Object 00014: 129
+Object 00014: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00014: 0000000000000
+Object 00014: 0 0
+Object 00014: # 0 0 0 0 0 0 0 0
+Object 00014: # 0 0 0 0 0 0 0 0
+Object 00014: 0 0
+
+Object 00015: 5
+Object 00015: 0.831 0 0
+Object 00015: 0.1948 0.1948 0.2456
+Object 00015: 90 90 0
+Object 00015: -2.696 -0.0451 -3.59
+Object 00015: 7
+Object 00015: Green_RPlastic
+Object 00015: 0
+Object 00015: 0
+Object 00015: Object0015
+Object 00015: -1
+Object 00015: 2 // display
+Object 00015: 1 1 1
+Object 00015: 0 0 0
+Object 00015: 0 0 0
+Object 00015: 1
+Object 00015: 0
+Object 00015: 0
+Object 00015: 0 0
+Object 00015: 0
+Object 00015: 1
+Object 00015: 197
+Object 00015: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00015: 0000000000000
+Object 00015: 0 0
+Object 00015: # 0 0 0 0 0 0 0 0
+Object 00015: # 0 0 0 0 0 0 0 0
+Object 00015: 0 0
+
+Object 00016: 5
+Object 00016: 0.831 0 0
+Object 00016: 0.1948 0.1948 0.2456
+Object 00016: 90 90 0
+Object 00016: -2.696 -0.0451 -3.112
+Object 00016: 7
+Object 00016: Green_RPlastic
+Object 00016: 0
+Object 00016: 0
+Object 00016: Object0016
+Object 00016: -1
+Object 00016: 2 // display
+Object 00016: 1 1 1
+Object 00016: 0 0 0
+Object 00016: 0 0 0
+Object 00016: 1
+Object 00016: 0
+Object 00016: 0
+Object 00016: 0 0
+Object 00016: 0
+Object 00016: 1
+Object 00016: 75
+Object 00016: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00016: 0000000000000
+Object 00016: 0 0
+Object 00016: # 0 0 0 0 0 0 0 0
+Object 00016: # 0 0 0 0 0 0 0 0
+Object 00016: 0 0
+
+Object 00017: 2
+Object 00017: 0 0 0
+Object 00017: 101.7 0.1394 101.7
+Object 00017: 0 0 0
+Object 00017: 0 0.345 0
+Object 00017: 7
+Object 00017: Stone15
+Object 00017: 0
+Object 00017: 0
+Object 00017: Object0017
+Object 00017: -1
+Object 00017: 2 // display
+Object 00017: 1 1 1
+Object 00017: 0 0 0
+Object 00017: 0 0 0
+Object 00017: 1
+Object 00017: 0
+Object 00017: 4
+Object 00017: 0 0
+Object 00017: 0
+Object 00017: 1
+Object 00017: 177
+Object 00017: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00017: 0000000000000
+Object 00017: 0 0
+Object 00017: # 0 0 0 0 0 0 0 0
+Object 00017: # 0 0 0 0 0 0 0 0
+Object 00017: 0 0
+
+Object 00018: 2
+Object 00018: 0 0 0
+Object 00018: 0.8956 0.0361 0.4553
+Object 00018: 0 0 0
+Object 00018: -2.707 -0.8864 -3.09
+Object 00018: 7
+Object 00018: Blue_RPlastic
+Object 00018: 0
+Object 00018: 0
+Object 00018: Object0018
+Object 00018: -1
+Object 00018: 2 // display
+Object 00018: 1 1 1
+Object 00018: 0 0 0
+Object 00018: 0 0 0
+Object 00018: 1
+Object 00018: 0
+Object 00018: 0
+Object 00018: 0 0
+Object 00018: 0
+Object 00018: 1
+Object 00018: 86
+Object 00018: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00018: 0000000000000
+Object 00018: 0 0
+Object 00018: # 0 0 0 0 0 0 0 0
+Object 00018: # 0 0 0 0 0 0 0 0
+Object 00018: 0 0
+
+Object 00019: 0
+Object 00019: 0 0 0
+Object 00019: 0.1431 0.0563 0.1431
+Object 00019: 0 0 0
+Object 00019: -3.349 -0.9784 -2.885
+Object 00019: 7
+Object 00019: Blue_RPlastic
+Object 00019: 0
+Object 00019: 0
+Object 00019: Object0019
+Object 00019: -1
+Object 00019: 2 // display
+Object 00019: 1 1 1
+Object 00019: 0 0 0
+Object 00019: 0 0 0
+Object 00019: 1
+Object 00019: 0
+Object 00019: 0
+Object 00019: 0 0
+Object 00019: 0
+Object 00019: 1
+Object 00019: 74
+Object 00019: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00019: 0000000000000
+Object 00019: 0 0
+Object 00019: # 0 0 0 0 0 0 0 0
+Object 00019: # 0 0 0 0 0 0 0 0
+Object 00019: 0 0
+
+Object 00020: 0
+Object 00020: 0 0 0
+Object 00020: 0.1431 0.0563 0.1431
+Object 00020: 0 0 0
+Object 00020: -3.349 -0.9784 -3.3
+Object 00020: 7
+Object 00020: Blue_RPlastic
+Object 00020: 0
+Object 00020: 0
+Object 00020: Object0020
+Object 00020: -1
+Object 00020: 2 // display
+Object 00020: 1 1 1
+Object 00020: 0 0 0
+Object 00020: 0 0 0
+Object 00020: 1
+Object 00020: 0
+Object 00020: 0
+Object 00020: 0 0
+Object 00020: 0
+Object 00020: 1
+Object 00020: 122
+Object 00020: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00020: 0000000000000
+Object 00020: 0 0
+Object 00020: # 0 0 0 0 0 0 0 0
+Object 00020: # 0 0 0 0 0 0 0 0
+Object 00020: 0 0
+
+Object 00021: 0
+Object 00021: 0 0 0
+Object 00021: 0.1431 0.0563 0.1431
+Object 00021: 0 0 0
+Object 00021: -2.039 -0.9784 -3.3
+Object 00021: 7
+Object 00021: Blue_RPlastic
+Object 00021: 0
+Object 00021: 0
+Object 00021: Object0021
+Object 00021: -1
+Object 00021: 2 // display
+Object 00021: 1 1 1
+Object 00021: 0 0 0
+Object 00021: 0 0 0
+Object 00021: 1
+Object 00021: 0
+Object 00021: 0
+Object 00021: 0 0
+Object 00021: 0
+Object 00021: 1
+Object 00021: 91
+Object 00021: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00021: 0000000000000
+Object 00021: 0 0
+Object 00021: # 0 0 0 0 0 0 0 0
+Object 00021: # 0 0 0 0 0 0 0 0
+Object 00021: 0 0
+
+Object 00022: 0
+Object 00022: 0 0 0
+Object 00022: 0.1431 0.0563 0.1431
+Object 00022: 0 0 0
+Object 00022: -2.039 -0.9784 -2.882
+Object 00022: 7
+Object 00022: Blue_RPlastic
+Object 00022: 0
+Object 00022: 0
+Object 00022: Object0022
+Object 00022: -1
+Object 00022: 2 // display
+Object 00022: 1 1 1
+Object 00022: 0 0 0
+Object 00022: 0 0 0
+Object 00022: 1
+Object 00022: 0
+Object 00022: 0
+Object 00022: 0 0
+Object 00022: 0
+Object 00022: 1
+Object 00022: 160
+Object 00022: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00022: 0000000000000
+Object 00022: 0 0
+Object 00022: # 0 0 0 0 0 0 0 0
+Object 00022: # 0 0 0 0 0 0 0 0
+Object 00022: 0 0
+
+Object 00023: 0
+Object 00023: 0 0 0
+Object 00023: 0.1431 0.0563 0.1431
+Object 00023: 0 0 0
+Object 00023: -2.465 -0.9784 -2.884
+Object 00023: 7
+Object 00023: Blue_RPlastic
+Object 00023: 0
+Object 00023: 0
+Object 00023: Object0023
+Object 00023: -1
+Object 00023: 2 // display
+Object 00023: 1 1 1
+Object 00023: 0 0 0
+Object 00023: 0 0 0
+Object 00023: 1
+Object 00023: 0
+Object 00023: 0
+Object 00023: 0 0
+Object 00023: 0
+Object 00023: 1
+Object 00023: 123
+Object 00023: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00023: 0000000000000
+Object 00023: 0 0
+Object 00023: # 0 0 0 0 0 0 0 0
+Object 00023: # 0 0 0 0 0 0 0 0
+Object 00023: 0 0
+
+Object 00024: 0
+Object 00024: 0 0 0
+Object 00024: 0.1431 0.0563 0.1431
+Object 00024: 0 0 0
+Object 00024: -2.465 -0.9784 -3.293
+Object 00024: 7
+Object 00024: Blue_RPlastic
+Object 00024: 0
+Object 00024: 0
+Object 00024: Object0024
+Object 00024: -1
+Object 00024: 2 // display
+Object 00024: 1 1 1
+Object 00024: 0 0 0
+Object 00024: 0 0 0
+Object 00024: 1
+Object 00024: 0
+Object 00024: 0
+Object 00024: 0 0
+Object 00024: 0
+Object 00024: 1
+Object 00024: 190
+Object 00024: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00024: 0000000000000
+Object 00024: 0 0
+Object 00024: # 0 0 0 0 0 0 0 0
+Object 00024: # 0 0 0 0 0 0 0 0
+Object 00024: 0 0
+
+Object 00025: 0
+Object 00025: 0 0 0
+Object 00025: 0.1431 0.0563 0.1431
+Object 00025: 0 0 0
+Object 00025: -2.907 -0.9784 -3.3
+Object 00025: 7
+Object 00025: Blue_RPlastic
+Object 00025: 0
+Object 00025: 0
+Object 00025: Object0025
+Object 00025: -1
+Object 00025: 2 // display
+Object 00025: 1 1 1
+Object 00025: 0 0 0
+Object 00025: 0 0 0
+Object 00025: 1
+Object 00025: 0
+Object 00025: 0
+Object 00025: 0 0
+Object 00025: 0
+Object 00025: 1
+Object 00025: 113
+Object 00025: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00025: 0000000000000
+Object 00025: 0 0
+Object 00025: # 0 0 0 0 0 0 0 0
+Object 00025: # 0 0 0 0 0 0 0 0
+Object 00025: 0 0
+
+Object 00026: 0
+Object 00026: 0 0 0
+Object 00026: 0.1431 0.0563 0.1431
+Object 00026: 0 0 0
+Object 00026: -2.907 -0.9784 -2.885
+Object 00026: 7
+Object 00026: Blue_RPlastic
+Object 00026: 0
+Object 00026: 0
+Object 00026: Object0026
+Object 00026: -1
+Object 00026: 2 // display
+Object 00026: 1 1 1
+Object 00026: 0 0 0
+Object 00026: 0 0 0
+Object 00026: 1
+Object 00026: 0
+Object 00026: 0
+Object 00026: 0 0
+Object 00026: 0
+Object 00026: 1
+Object 00026: 131
+Object 00026: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00026: 0000000000000
+Object 00026: 0 0
+Object 00026: # 0 0 0 0 0 0 0 0
+Object 00026: # 0 0 0 0 0 0 0 0
+Object 00026: 0 0
+
+Object 00027: 2
+Object 00027: 0 0 0
+Object 00027: 0.8956 0.2797 0.0393
+Object 00027: 0 0 0
+Object 00027: -2.707 -0.6428 -2.674
+Object 00027: 7
+Object 00027: Blue_RPlastic
+Object 00027: 0
+Object 00027: 0
+Object 00027: Object0027
+Object 00027: -1
+Object 00027: 2 // display
+Object 00027: 1 1 1
+Object 00027: 0 0 0
+Object 00027: 0 0 0
+Object 00027: 1
+Object 00027: 0
+Object 00027: 0
+Object 00027: 0 0
+Object 00027: 0
+Object 00027: 1
+Object 00027: 75
+Object 00027: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00027: 0000000000000
+Object 00027: 0 0
+Object 00027: # 0 0 0 0 0 0 0 0
+Object 00027: # 0 0 0 0 0 0 0 0
+Object 00027: 0 0
+
+Object 00028: 2
+Object 00028: 0 0 0
+Object 00028: 0.8956 0.2797 0.0393
+Object 00028: 0 0 0
+Object 00028: -2.707 -0.6428 -3.506
+Object 00028: 7
+Object 00028: Blue_RPlastic
+Object 00028: 0
+Object 00028: 0
+Object 00028: Object0028
+Object 00028: -1
+Object 00028: 2 // display
+Object 00028: 1 1 1
+Object 00028: 0 0 0
+Object 00028: 0 0 0
+Object 00028: 1
+Object 00028: 0
+Object 00028: 0
+Object 00028: 0 0
+Object 00028: 0
+Object 00028: 1
+Object 00028: 210
+Object 00028: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00028: 0000000000000
+Object 00028: 0 0
+Object 00028: # 0 0 0 0 0 0 0 0
+Object 00028: # 0 0 0 0 0 0 0 0
+Object 00028: 0 0
+
+Object 00029: 2
+Object 00029: 0 0 0
+Object 00029: 0.0369 0.2797 0.4553
+Object 00029: 0 0 0
+Object 00029: -3.566 -0.6428 -3.09
+Object 00029: 7
+Object 00029: Blue_RPlastic
+Object 00029: 0
+Object 00029: 0
+Object 00029: Object0029
+Object 00029: -1
+Object 00029: 2 // display
+Object 00029: 1 1 1
+Object 00029: 0 0 0
+Object 00029: 0 0 0
+Object 00029: 1
+Object 00029: 0
+Object 00029: 0
+Object 00029: 0 0
+Object 00029: 0
+Object 00029: 1
+Object 00029: 183
+Object 00029: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00029: 0000000000000
+Object 00029: 0 0
+Object 00029: # 0 0 0 0 0 0 0 0
+Object 00029: # 0 0 0 0 0 0 0 0
+Object 00029: 0 0
+
+Object 00030: 2
+Object 00030: 0 0 0
+Object 00030: 0.0369 0.2797 0.4553
+Object 00030: 0 0 0
+Object 00030: -1.848 -0.6428 -3.09
+Object 00030: 7
+Object 00030: Blue_RPlastic
+Object 00030: 0
+Object 00030: 0
+Object 00030: Object0030
+Object 00030: -1
+Object 00030: 2 // display
+Object 00030: 1 1 1
+Object 00030: 0 0 0
+Object 00030: 0 0 0
+Object 00030: 1
+Object 00030: 0
+Object 00030: 0
+Object 00030: 0 0
+Object 00030: 0
+Object 00030: 1
+Object 00030: 249
+Object 00030: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00030: 0000000000000
+Object 00030: 0 0
+Object 00030: # 0 0 0 0 0 0 0 0
+Object 00030: # 0 0 0 0 0 0 0 0
+Object 00030: 0 0
+
+Object 00031: 5
+Object 00031: 0.831 0 0
+Object 00031: 0.1948 0.1948 0.2456
+Object 00031: 90 0 0
+Object 00031: -3.179 -0.6093 -3.099
+Object 00031: 7
+Object 00031: Blue_RPlastic
+Object 00031: 0
+Object 00031: 0
+Object 00031: Object0031
+Object 00031: -1
+Object 00031: 2 // display
+Object 00031: 1 1 1
+Object 00031: 0 0 0
+Object 00031: 0 0 0
+Object 00031: 1
+Object 00031: 0
+Object 00031: 0
+Object 00031: 0 0
+Object 00031: 0
+Object 00031: 1
+Object 00031: 39
+Object 00031: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00031: 0000000000000
+Object 00031: 0 0
+Object 00031: # 0 0 0 0 0 0 0 0
+Object 00031: # 0 0 0 0 0 0 0 0
+Object 00031: 0 0
+
+Object 00032: 5
+Object 00032: 0.831 0 0
+Object 00032: 0.1948 0.1948 0.2456
+Object 00032: 90 0 0
+Object 00032: -2.207 -0.6093 -3.099
+Object 00032: 7
+Object 00032: Blue_RPlastic
+Object 00032: 0
+Object 00032: 0
+Object 00032: Object0032
+Object 00032: -1
+Object 00032: 2 // display
+Object 00032: 1 1 1
+Object 00032: 0 0 0
+Object 00032: 0 0 0
+Object 00032: 1
+Object 00032: 0
+Object 00032: 0
+Object 00032: 0 0
+Object 00032: 0
+Object 00032: 1
+Object 00032: 249
+Object 00032: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00032: 0000000000000
+Object 00032: 0 0
+Object 00032: # 0 0 0 0 0 0 0 0
+Object 00032: # 0 0 0 0 0 0 0 0
+Object 00032: 0 0
+
+Object 00033: 5
+Object 00033: 0.831 0 0
+Object 00033: 0.1948 0.1948 0.2456
+Object 00033: 90 0 0
+Object 00033: -2.685 -0.6093 -3.099
+Object 00033: 7
+Object 00033: Blue_RPlastic
+Object 00033: 0
+Object 00033: 0
+Object 00033: Object0033
+Object 00033: -1
+Object 00033: 2 // display
+Object 00033: 1 1 1
+Object 00033: 0 0 0
+Object 00033: 0 0 0
+Object 00033: 1
+Object 00033: 0
+Object 00033: 0
+Object 00033: 0 0
+Object 00033: 0
+Object 00033: 1
+Object 00033: 224
+Object 00033: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00033: 0000000000000
+Object 00033: 0 0
+Object 00033: # 0 0 0 0 0 0 0 0
+Object 00033: # 0 0 0 0 0 0 0 0
+Object 00033: 0 0
+
+Object 00034: 2
+Object 00034: 0 0 0
+Object 00034: 0.8956 0.0361 0.4553
+Object 00034: 90 0 0
+Object 00034: 1.475 -0.2564 -2.957
+Object 00034: 7
+Object 00034: Red_RPlastic
+Object 00034: 0
+Object 00034: 0
+Object 00034: Object0034
+Object 00034: -1
+Object 00034: 2 // display
+Object 00034: 1 1 1
+Object 00034: 0 0 0
+Object 00034: 0 0 0
+Object 00034: 1
+Object 00034: 0
+Object 00034: 0
+Object 00034: 0 0
+Object 00034: 0
+Object 00034: 1
+Object 00034: 154
+Object 00034: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00034: 0000000000000
+Object 00034: 0 0
+Object 00034: # 0 0 0 0 0 0 0 0
+Object 00034: # 0 0 0 0 0 0 0 0
+Object 00034: 0 0
+
+Object 00035: 0
+Object 00035: 0 0 0
+Object 00035: 0.1431 0.0563 0.1431
+Object 00035: 90 0 0
+Object 00035: 0.8333 -0.0512 -2.865
+Object 00035: 7
+Object 00035: Red_RPlastic
+Object 00035: 0
+Object 00035: 0
+Object 00035: Object0035
+Object 00035: -1
+Object 00035: 2 // display
+Object 00035: 1 1 1
+Object 00035: 0 0 0
+Object 00035: 0 0 0
+Object 00035: 1
+Object 00035: 0
+Object 00035: 0
+Object 00035: 0 0
+Object 00035: 0
+Object 00035: 1
+Object 00035: 121
+Object 00035: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00035: 0000000000000
+Object 00035: 0 0
+Object 00035: # 0 0 0 0 0 0 0 0
+Object 00035: # 0 0 0 0 0 0 0 0
+Object 00035: 0 0
+
+Object 00036: 0
+Object 00036: 0 0 0
+Object 00036: 0.1431 0.0563 0.1431
+Object 00036: 90 0 0
+Object 00036: 0.8333 -0.466 -2.865
+Object 00036: 7
+Object 00036: Red_RPlastic
+Object 00036: 0
+Object 00036: 0
+Object 00036: Object0036
+Object 00036: -1
+Object 00036: 2 // display
+Object 00036: 1 1 1
+Object 00036: 0 0 0
+Object 00036: 0 0 0
+Object 00036: 1
+Object 00036: 0
+Object 00036: 0
+Object 00036: 0 0
+Object 00036: 0
+Object 00036: 1
+Object 00036: 62
+Object 00036: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00036: 0000000000000
+Object 00036: 0 0
+Object 00036: # 0 0 0 0 0 0 0 0
+Object 00036: # 0 0 0 0 0 0 0 0
+Object 00036: 0 0
+
+Object 00037: 0
+Object 00037: 0 0 0
+Object 00037: 0.1431 0.0563 0.1431
+Object 00037: 90 0 0
+Object 00037: 2.142 -0.466 -2.865
+Object 00037: 7
+Object 00037: Red_RPlastic
+Object 00037: 0
+Object 00037: 0
+Object 00037: Object0037
+Object 00037: -1
+Object 00037: 2 // display
+Object 00037: 1 1 1
+Object 00037: 0 0 0
+Object 00037: 0 0 0
+Object 00037: 1
+Object 00037: 0
+Object 00037: 0
+Object 00037: 0 0
+Object 00037: 0
+Object 00037: 1
+Object 00037: 192
+Object 00037: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00037: 0000000000000
+Object 00037: 0 0
+Object 00037: # 0 0 0 0 0 0 0 0
+Object 00037: # 0 0 0 0 0 0 0 0
+Object 00037: 0 0
+
+Object 00038: 0
+Object 00038: 0 0 0
+Object 00038: 0.1431 0.0563 0.1431
+Object 00038: 90 0 0
+Object 00038: 2.142 -0.048 -2.865
+Object 00038: 7
+Object 00038: Red_RPlastic
+Object 00038: 0
+Object 00038: 0
+Object 00038: Object0038
+Object 00038: -1
+Object 00038: 2 // display
+Object 00038: 1 1 1
+Object 00038: 0 0 0
+Object 00038: 0 0 0
+Object 00038: 1
+Object 00038: 0
+Object 00038: 0
+Object 00038: 0 0
+Object 00038: 0
+Object 00038: 1
+Object 00038: 130
+Object 00038: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00038: 0000000000000
+Object 00038: 0 0
+Object 00038: # 0 0 0 0 0 0 0 0
+Object 00038: # 0 0 0 0 0 0 0 0
+Object 00038: 0 0
+
+Object 00039: 0
+Object 00039: 0 0 0
+Object 00039: 0.1431 0.0563 0.1431
+Object 00039: 90 0 0
+Object 00039: 1.717 -0.0501 -2.865
+Object 00039: 7
+Object 00039: Red_RPlastic
+Object 00039: 0
+Object 00039: 0
+Object 00039: Object0039
+Object 00039: -1
+Object 00039: 2 // display
+Object 00039: 1 1 1
+Object 00039: 0 0 0
+Object 00039: 0 0 0
+Object 00039: 1
+Object 00039: 0
+Object 00039: 0
+Object 00039: 0 0
+Object 00039: 0
+Object 00039: 1
+Object 00039: 202
+Object 00039: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00039: 0000000000000
+Object 00039: 0 0
+Object 00039: # 0 0 0 0 0 0 0 0
+Object 00039: # 0 0 0 0 0 0 0 0
+Object 00039: 0 0
+
+Object 00040: 0
+Object 00040: 0 0 0
+Object 00040: 0.1431 0.0563 0.1431
+Object 00040: 90 0 0
+Object 00040: 1.717 -0.4592 -2.865
+Object 00040: 7
+Object 00040: Red_RPlastic
+Object 00040: 0
+Object 00040: 0
+Object 00040: Object0040
+Object 00040: -1
+Object 00040: 2 // display
+Object 00040: 1 1 1
+Object 00040: 0 0 0
+Object 00040: 0 0 0
+Object 00040: 1
+Object 00040: 0
+Object 00040: 0
+Object 00040: 0 0
+Object 00040: 0
+Object 00040: 1
+Object 00040: 89
+Object 00040: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00040: 0000000000000
+Object 00040: 0 0
+Object 00040: # 0 0 0 0 0 0 0 0
+Object 00040: # 0 0 0 0 0 0 0 0
+Object 00040: 0 0
+
+Object 00041: 0
+Object 00041: 0 0 0
+Object 00041: 0.1431 0.0563 0.1431
+Object 00041: 90 0 0
+Object 00041: 1.275 -0.466 -2.865
+Object 00041: 7
+Object 00041: Red_RPlastic
+Object 00041: 0
+Object 00041: 0
+Object 00041: Object0041
+Object 00041: -1
+Object 00041: 2 // display
+Object 00041: 1 1 1
+Object 00041: 0 0 0
+Object 00041: 0 0 0
+Object 00041: 1
+Object 00041: 0
+Object 00041: 0
+Object 00041: 0 0
+Object 00041: 0
+Object 00041: 1
+Object 00041: 124
+Object 00041: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00041: 0000000000000
+Object 00041: 0 0
+Object 00041: # 0 0 0 0 0 0 0 0
+Object 00041: # 0 0 0 0 0 0 0 0
+Object 00041: 0 0
+
+Object 00042: 0
+Object 00042: 0 0 0
+Object 00042: 0.1431 0.0563 0.1431
+Object 00042: 90 0 0
+Object 00042: 1.275 -0.0512 -2.865
+Object 00042: 7
+Object 00042: Red_RPlastic
+Object 00042: 0
+Object 00042: 0
+Object 00042: Object0042
+Object 00042: -1
+Object 00042: 2 // display
+Object 00042: 1 1 1
+Object 00042: 0 0 0
+Object 00042: 0 0 0
+Object 00042: 1
+Object 00042: 0
+Object 00042: 0
+Object 00042: 0 0
+Object 00042: 0
+Object 00042: 1
+Object 00042: 53
+Object 00042: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00042: 0000000000000
+Object 00042: 0 0
+Object 00042: # 0 0 0 0 0 0 0 0
+Object 00042: # 0 0 0 0 0 0 0 0
+Object 00042: 0 0
+
+Object 00043: 2
+Object 00043: 0 0 0
+Object 00043: 0.8956 0.2797 0.0393
+Object 00043: 90 0 0
+Object 00043: 1.474 0.1599 -3.2
+Object 00043: 7
+Object 00043: Red_RPlastic
+Object 00043: 0
+Object 00043: 0
+Object 00043: Object0043
+Object 00043: -1
+Object 00043: 2 // display
+Object 00043: 1 1 1
+Object 00043: 0 0 0
+Object 00043: 0 0 0
+Object 00043: 1
+Object 00043: 0
+Object 00043: 0
+Object 00043: 0 0
+Object 00043: 0
+Object 00043: 1
+Object 00043: 10
+Object 00043: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00043: 0000000000000
+Object 00043: 0 0
+Object 00043: # 0 0 0 0 0 0 0 0
+Object 00043: # 0 0 0 0 0 0 0 0
+Object 00043: 0 0
+
+Object 00044: 2
+Object 00044: 0 0 0
+Object 00044: 0.8956 0.2797 0.0393
+Object 00044: 90 0 0
+Object 00044: 1.474 -0.6725 -3.2
+Object 00044: 7
+Object 00044: Red_RPlastic
+Object 00044: 0
+Object 00044: 0
+Object 00044: Object0044
+Object 00044: -1
+Object 00044: 2 // display
+Object 00044: 1 1 1
+Object 00044: 0 0 0
+Object 00044: 0 0 0
+Object 00044: 1
+Object 00044: 0
+Object 00044: 0
+Object 00044: 0 0
+Object 00044: 0
+Object 00044: 1
+Object 00044: 9
+Object 00044: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00044: 0000000000000
+Object 00044: 0 0
+Object 00044: # 0 0 0 0 0 0 0 0
+Object 00044: # 0 0 0 0 0 0 0 0
+Object 00044: 0 0
+
+Object 00045: 2
+Object 00045: 0 0 0
+Object 00045: 0.0369 0.2797 0.4553
+Object 00045: 90 0 0
+Object 00045: 0.6162 -0.2564 -3.2
+Object 00045: 7
+Object 00045: Red_RPlastic
+Object 00045: 0
+Object 00045: 0
+Object 00045: Object0045
+Object 00045: -1
+Object 00045: 2 // display
+Object 00045: 1 1 1
+Object 00045: 0 0 0
+Object 00045: 0 0 0
+Object 00045: 1
+Object 00045: 0
+Object 00045: 0
+Object 00045: 0 0
+Object 00045: 0
+Object 00045: 1
+Object 00045: 157
+Object 00045: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00045: 0000000000000
+Object 00045: 0 0
+Object 00045: # 0 0 0 0 0 0 0 0
+Object 00045: # 0 0 0 0 0 0 0 0
+Object 00045: 0 0
+
+Object 00046: 2
+Object 00046: 0 0 0
+Object 00046: 0.0369 0.2797 0.4553
+Object 00046: 90 0 0
+Object 00046: 2.334 -0.2564 -3.2
+Object 00046: 7
+Object 00046: Red_RPlastic
+Object 00046: 0
+Object 00046: 0
+Object 00046: Object0046
+Object 00046: -1
+Object 00046: 2 // display
+Object 00046: 1 1 1
+Object 00046: 0 0 0
+Object 00046: 0 0 0
+Object 00046: 1
+Object 00046: 0
+Object 00046: 0
+Object 00046: 0 0
+Object 00046: 0
+Object 00046: 1
+Object 00046: 195
+Object 00046: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00046: 0000000000000
+Object 00046: 0 0
+Object 00046: # 0 0 0 0 0 0 0 0
+Object 00046: # 0 0 0 0 0 0 0 0
+Object 00046: 0 0
+
+Object 00047: 5
+Object 00047: 0.831 0 0
+Object 00047: 0.1948 0.1948 0.2456
+Object 00047: 180 0 0
+Object 00047: 1.003 -0.2652 -3.234
+Object 00047: 7
+Object 00047: Red_RPlastic
+Object 00047: 0
+Object 00047: 0
+Object 00047: Object0047
+Object 00047: -1
+Object 00047: 2 // display
+Object 00047: 1 1 1
+Object 00047: 0 0 0
+Object 00047: 0 0 0
+Object 00047: 1
+Object 00047: 0
+Object 00047: 0
+Object 00047: 0 0
+Object 00047: 0
+Object 00047: 1
+Object 00047: 130
+Object 00047: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00047: 0000000000000
+Object 00047: 0 0
+Object 00047: # 0 0 0 0 0 0 0 0
+Object 00047: # 0 0 0 0 0 0 0 0
+Object 00047: 0 0
+
+Object 00048: 5
+Object 00048: 0.831 0 0
+Object 00048: 0.1948 0.1948 0.2456
+Object 00048: 180 0 0
+Object 00048: 1.974 -0.2652 -3.234
+Object 00048: 7
+Object 00048: Red_RPlastic
+Object 00048: 0
+Object 00048: 0
+Object 00048: Object0048
+Object 00048: -1
+Object 00048: 2 // display
+Object 00048: 1 1 1
+Object 00048: 0 0 0
+Object 00048: 0 0 0
+Object 00048: 1
+Object 00048: 0
+Object 00048: 0
+Object 00048: 0 0
+Object 00048: 0
+Object 00048: 1
+Object 00048: 81
+Object 00048: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00048: 0000000000000
+Object 00048: 0 0
+Object 00048: # 0 0 0 0 0 0 0 0
+Object 00048: # 0 0 0 0 0 0 0 0
+Object 00048: 0 0
+
+Object 00049: 5
+Object 00049: 0.831 0 0
+Object 00049: 0.1948 0.1948 0.2456
+Object 00049: 180 0 0
+Object 00049: 1.497 -0.2652 -3.234
+Object 00049: 7
+Object 00049: Red_RPlastic
+Object 00049: 0
+Object 00049: 0
+Object 00049: Object0049
+Object 00049: -1
+Object 00049: 2 // display
+Object 00049: 1 1 1
+Object 00049: 0 0 0
+Object 00049: 0 0 0
+Object 00049: 1
+Object 00049: 0
+Object 00049: 0
+Object 00049: 0 0
+Object 00049: 0
+Object 00049: 1
+Object 00049: 105
+Object 00049: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00049: 0000000000000
+Object 00049: 0 0
+Object 00049: # 0 0 0 0 0 0 0 0
+Object 00049: # 0 0 0 0 0 0 0 0
+Object 00049: 0 0
+
+Object 00050: 2
+Object 00050: 0 0 0
+Object 00050: 0.8956 0.0361 0.4553
+Object 00050: 0 90 0
+Object 00050: 2.491 -0.3222 1.597
+Object 00050: 7
+Object 00050: Yellow_RPlastic
+Object 00050: 0
+Object 00050: 0
+Object 00050: Object0050
+Object 00050: -1
+Object 00050: 2 // display
+Object 00050: 1 1 1
+Object 00050: 0 0 0
+Object 00050: 0 0 0
+Object 00050: 1
+Object 00050: 0
+Object 00050: 0
+Object 00050: 0 0
+Object 00050: 0
+Object 00050: 1
+Object 00050: 154
+Object 00050: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00050: 0000000000000
+Object 00050: 0 0
+Object 00050: # 0 0 0 0 0 0 0 0
+Object 00050: # 0 0 0 0 0 0 0 0
+Object 00050: 0 0
+
+Object 00051: 0
+Object 00051: 0 0 0
+Object 00051: 0.1431 0.0563 0.1431
+Object 00051: 0 90 0
+Object 00051: 2.696 -0.4142 2.239
+Object 00051: 7
+Object 00051: Yellow_RPlastic
+Object 00051: 0
+Object 00051: 0
+Object 00051: Object0051
+Object 00051: -1
+Object 00051: 2 // display
+Object 00051: 1 1 1
+Object 00051: 0 0 0
+Object 00051: 0 0 0
+Object 00051: 1
+Object 00051: 0
+Object 00051: 0
+Object 00051: 0 0
+Object 00051: 0
+Object 00051: 1
+Object 00051: 111
+Object 00051: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00051: 0000000000000
+Object 00051: 0 0
+Object 00051: # 0 0 0 0 0 0 0 0
+Object 00051: # 0 0 0 0 0 0 0 0
+Object 00051: 0 0
+
+Object 00052: 0
+Object 00052: 0 0 0
+Object 00052: 0.1431 0.0563 0.1431
+Object 00052: 0 90 0
+Object 00052: 2.281 -0.4142 2.239
+Object 00052: 7
+Object 00052: Yellow_RPlastic
+Object 00052: 0
+Object 00052: 0
+Object 00052: Object0052
+Object 00052: -1
+Object 00052: 2 // display
+Object 00052: 1 1 1
+Object 00052: 0 0 0
+Object 00052: 0 0 0
+Object 00052: 1
+Object 00052: 0
+Object 00052: 0
+Object 00052: 0 0
+Object 00052: 0
+Object 00052: 1
+Object 00052: 34
+Object 00052: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00052: 0000000000000
+Object 00052: 0 0
+Object 00052: # 0 0 0 0 0 0 0 0
+Object 00052: # 0 0 0 0 0 0 0 0
+Object 00052: 0 0
+
+Object 00053: 0
+Object 00053: 0 0 0
+Object 00053: 0.1431 0.0563 0.1431
+Object 00053: 0 90 0
+Object 00053: 2.281 -0.4142 0.9299
+Object 00053: 7
+Object 00053: Yellow_RPlastic
+Object 00053: 0
+Object 00053: 0
+Object 00053: Object0053
+Object 00053: -1
+Object 00053: 2 // display
+Object 00053: 1 1 1
+Object 00053: 0 0 0
+Object 00053: 0 0 0
+Object 00053: 1
+Object 00053: 0
+Object 00053: 0
+Object 00053: 0 0
+Object 00053: 0
+Object 00053: 1
+Object 00053: 158
+Object 00053: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00053: 0000000000000
+Object 00053: 0 0
+Object 00053: # 0 0 0 0 0 0 0 0
+Object 00053: # 0 0 0 0 0 0 0 0
+Object 00053: 0 0
+
+Object 00054: 0
+Object 00054: 0 0 0
+Object 00054: 0.1431 0.0563 0.1431
+Object 00054: 0 90 0
+Object 00054: 2.699 -0.4142 0.9299
+Object 00054: 7
+Object 00054: Yellow_RPlastic
+Object 00054: 0
+Object 00054: 0
+Object 00054: Object0054
+Object 00054: -1
+Object 00054: 2 // display
+Object 00054: 1 1 1
+Object 00054: 0 0 0
+Object 00054: 0 0 0
+Object 00054: 1
+Object 00054: 0
+Object 00054: 0
+Object 00054: 0 0
+Object 00054: 0
+Object 00054: 1
+Object 00054: 249
+Object 00054: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00054: 0000000000000
+Object 00054: 0 0
+Object 00054: # 0 0 0 0 0 0 0 0
+Object 00054: # 0 0 0 0 0 0 0 0
+Object 00054: 0 0
+
+Object 00055: 0
+Object 00055: 0 0 0
+Object 00055: 0.1431 0.0563 0.1431
+Object 00055: 0 90 0
+Object 00055: 2.697 -0.4142 1.355
+Object 00055: 7
+Object 00055: Yellow_RPlastic
+Object 00055: 0
+Object 00055: 0
+Object 00055: Object0055
+Object 00055: -1
+Object 00055: 2 // display
+Object 00055: 1 1 1
+Object 00055: 0 0 0
+Object 00055: 0 0 0
+Object 00055: 1
+Object 00055: 0
+Object 00055: 0
+Object 00055: 0 0
+Object 00055: 0
+Object 00055: 1
+Object 00055: 212
+Object 00055: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00055: 0000000000000
+Object 00055: 0 0
+Object 00055: # 0 0 0 0 0 0 0 0
+Object 00055: # 0 0 0 0 0 0 0 0
+Object 00055: 0 0
+
+Object 00056: 0
+Object 00056: 0 0 0
+Object 00056: 0.1431 0.0563 0.1431
+Object 00056: 0 90 0
+Object 00056: 2.288 -0.4142 1.355
+Object 00056: 7
+Object 00056: Yellow_RPlastic
+Object 00056: 0
+Object 00056: 0
+Object 00056: Object0056
+Object 00056: -1
+Object 00056: 2 // display
+Object 00056: 1 1 1
+Object 00056: 0 0 0
+Object 00056: 0 0 0
+Object 00056: 1
+Object 00056: 0
+Object 00056: 0
+Object 00056: 0 0
+Object 00056: 0
+Object 00056: 1
+Object 00056: 226
+Object 00056: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00056: 0000000000000
+Object 00056: 0 0
+Object 00056: # 0 0 0 0 0 0 0 0
+Object 00056: # 0 0 0 0 0 0 0 0
+Object 00056: 0 0
+
+Object 00057: 0
+Object 00057: 0 0 0
+Object 00057: 0.1431 0.0563 0.1431
+Object 00057: 0 90 0
+Object 00057: 2.281 -0.4142 1.797
+Object 00057: 7
+Object 00057: Yellow_RPlastic
+Object 00057: 0
+Object 00057: 0
+Object 00057: Object0057
+Object 00057: -1
+Object 00057: 2 // display
+Object 00057: 1 1 1
+Object 00057: 0 0 0
+Object 00057: 0 0 0
+Object 00057: 1
+Object 00057: 0
+Object 00057: 0
+Object 00057: 0 0
+Object 00057: 0
+Object 00057: 1
+Object 00057: 33
+Object 00057: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00057: 0000000000000
+Object 00057: 0 0
+Object 00057: # 0 0 0 0 0 0 0 0
+Object 00057: # 0 0 0 0 0 0 0 0
+Object 00057: 0 0
+
+Object 00058: 0
+Object 00058: 0 0 0
+Object 00058: 0.1431 0.0563 0.1431
+Object 00058: 0 90 0
+Object 00058: 2.696 -0.4142 1.797
+Object 00058: 7
+Object 00058: Yellow_RPlastic
+Object 00058: 0
+Object 00058: 0
+Object 00058: Object0058
+Object 00058: -1
+Object 00058: 2 // display
+Object 00058: 1 1 1
+Object 00058: 0 0 0
+Object 00058: 0 0 0
+Object 00058: 1
+Object 00058: 0
+Object 00058: 0
+Object 00058: 0 0
+Object 00058: 0
+Object 00058: 1
+Object 00058: 246
+Object 00058: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00058: 0000000000000
+Object 00058: 0 0
+Object 00058: # 0 0 0 0 0 0 0 0
+Object 00058: # 0 0 0 0 0 0 0 0
+Object 00058: 0 0
+
+Object 00059: 2
+Object 00059: 0 0 0
+Object 00059: 0.8956 0.2797 0.0393
+Object 00059: 0 90 0
+Object 00059: 2.907 -0.0786 1.598
+Object 00059: 7
+Object 00059: Yellow_RPlastic
+Object 00059: 0
+Object 00059: 0
+Object 00059: Object0059
+Object 00059: -1
+Object 00059: 2 // display
+Object 00059: 1 1 1
+Object 00059: 0 0 0
+Object 00059: 0 0 0
+Object 00059: 1
+Object 00059: 0
+Object 00059: 0
+Object 00059: 0 0
+Object 00059: 0
+Object 00059: 1
+Object 00059: 232
+Object 00059: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00059: 0000000000000
+Object 00059: 0 0
+Object 00059: # 0 0 0 0 0 0 0 0
+Object 00059: # 0 0 0 0 0 0 0 0
+Object 00059: 0 0
+
+Object 00060: 2
+Object 00060: 0 0 0
+Object 00060: 0.8956 0.2797 0.0393
+Object 00060: 0 90 0
+Object 00060: 2.075 -0.0786 1.598
+Object 00060: 7
+Object 00060: Yellow_RPlastic
+Object 00060: 0
+Object 00060: 0
+Object 00060: Object0060
+Object 00060: -1
+Object 00060: 2 // display
+Object 00060: 1 1 1
+Object 00060: 0 0 0
+Object 00060: 0 0 0
+Object 00060: 1
+Object 00060: 0
+Object 00060: 0
+Object 00060: 0 0
+Object 00060: 0
+Object 00060: 1
+Object 00060: 64
+Object 00060: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00060: 0000000000000
+Object 00060: 0 0
+Object 00060: # 0 0 0 0 0 0 0 0
+Object 00060: # 0 0 0 0 0 0 0 0
+Object 00060: 0 0
+
+Object 00061: 2
+Object 00061: 0 0 0
+Object 00061: 0.0369 0.2797 0.4553
+Object 00061: 0 90 0
+Object 00061: 2.491 -0.0786 2.456
+Object 00061: 7
+Object 00061: Yellow_RPlastic
+Object 00061: 0
+Object 00061: 0
+Object 00061: Object0061
+Object 00061: -1
+Object 00061: 2 // display
+Object 00061: 1 1 1
+Object 00061: 0 0 0
+Object 00061: 0 0 0
+Object 00061: 1
+Object 00061: 0
+Object 00061: 0
+Object 00061: 0 0
+Object 00061: 0
+Object 00061: 1
+Object 00061: 87
+Object 00061: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00061: 0000000000000
+Object 00061: 0 0
+Object 00061: # 0 0 0 0 0 0 0 0
+Object 00061: # 0 0 0 0 0 0 0 0
+Object 00061: 0 0
+
+Object 00062: 2
+Object 00062: 0 0 0
+Object 00062: 0.0369 0.2797 0.4553
+Object 00062: 0 90 0
+Object 00062: 2.491 -0.0786 0.7386
+Object 00062: 7
+Object 00062: Yellow_RPlastic
+Object 00062: 0
+Object 00062: 0
+Object 00062: Object0062
+Object 00062: -1
+Object 00062: 2 // display
+Object 00062: 1 1 1
+Object 00062: 0 0 0
+Object 00062: 0 0 0
+Object 00062: 1
+Object 00062: 0
+Object 00062: 0
+Object 00062: 0 0
+Object 00062: 0
+Object 00062: 1
+Object 00062: 0
+Object 00062: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00062: 0000000000000
+Object 00062: 0 0
+Object 00062: # 0 0 0 0 0 0 0 0
+Object 00062: # 0 0 0 0 0 0 0 0
+Object 00062: 0 0
+
+Object 00063: 5
+Object 00063: 0.831 0 0
+Object 00063: 0.1948 0.1948 0.2456
+Object 00063: 90 90 0
+Object 00063: 2.482 -0.0451 2.07
+Object 00063: 7
+Object 00063: Yellow_RPlastic
+Object 00063: 0
+Object 00063: 0
+Object 00063: Object0063
+Object 00063: -1
+Object 00063: 2 // display
+Object 00063: 1 1 1
+Object 00063: 0 0 0
+Object 00063: 0 0 0
+Object 00063: 1
+Object 00063: 0
+Object 00063: 0
+Object 00063: 0 0
+Object 00063: 0
+Object 00063: 1
+Object 00063: 20
+Object 00063: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00063: 0000000000000
+Object 00063: 0 0
+Object 00063: # 0 0 0 0 0 0 0 0
+Object 00063: # 0 0 0 0 0 0 0 0
+Object 00063: 0 0
+
+Object 00064: 5
+Object 00064: 0.831 0 0
+Object 00064: 0.1948 0.1948 0.2456
+Object 00064: 90 90 0
+Object 00064: 2.482 -0.0451 1.098
+Object 00064: 7
+Object 00064: Yellow_RPlastic
+Object 00064: 0
+Object 00064: 0
+Object 00064: Object0064
+Object 00064: -1
+Object 00064: 2 // display
+Object 00064: 1 1 1
+Object 00064: 0 0 0
+Object 00064: 0 0 0
+Object 00064: 1
+Object 00064: 0
+Object 00064: 0
+Object 00064: 0 0
+Object 00064: 0
+Object 00064: 1
+Object 00064: 117
+Object 00064: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00064: 0000000000000
+Object 00064: 0 0
+Object 00064: # 0 0 0 0 0 0 0 0
+Object 00064: # 0 0 0 0 0 0 0 0
+Object 00064: 0 0
+
+Object 00065: 5
+Object 00065: 0.831 0 0
+Object 00065: 0.1948 0.1948 0.2456
+Object 00065: 90 90 0
+Object 00065: 2.482 -0.0451 1.576
+Object 00065: 7
+Object 00065: Yellow_RPlastic
+Object 00065: 0
+Object 00065: 0
+Object 00065: Object0065
+Object 00065: -1
+Object 00065: 2 // display
+Object 00065: 1 1 1
+Object 00065: 0 0 0
+Object 00065: 0 0 0
+Object 00065: 1
+Object 00065: 0
+Object 00065: 0
+Object 00065: 0 0
+Object 00065: 0
+Object 00065: 1
+Object 00065: 232
+Object 00065: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00065: 0000000000000
+Object 00065: 0 0
+Object 00065: # 0 0 0 0 0 0 0 0
+Object 00065: # 0 0 0 0 0 0 0 0
+Object 00065: 0 0
+
+Object 00066: 2
+Object 00066: 0 0 0
+Object 00066: 0.8956 0.0361 0.4553
+Object 00066: 0 0 0
+Object 00066: 2.471 -0.8864 1.597
+Object 00066: 7
+Object 00066: Blue_RPlastic
+Object 00066: 0
+Object 00066: 0
+Object 00066: Object0066
+Object 00066: -1
+Object 00066: 2 // display
+Object 00066: 1 1 1
+Object 00066: 0 0 0
+Object 00066: 0 0 0
+Object 00066: 1
+Object 00066: 0
+Object 00066: 0
+Object 00066: 0 0
+Object 00066: 0
+Object 00066: 1
+Object 00066: 91
+Object 00066: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00066: 0000000000000
+Object 00066: 0 0
+Object 00066: # 0 0 0 0 0 0 0 0
+Object 00066: # 0 0 0 0 0 0 0 0
+Object 00066: 0 0
+
+Object 00067: 0
+Object 00067: 0 0 0
+Object 00067: 0.1431 0.0563 0.1431
+Object 00067: 0 0 0
+Object 00067: 1.83 -0.9784 1.803
+Object 00067: 7
+Object 00067: Blue_RPlastic
+Object 00067: 0
+Object 00067: 0
+Object 00067: Object0067
+Object 00067: -1
+Object 00067: 2 // display
+Object 00067: 1 1 1
+Object 00067: 0 0 0
+Object 00067: 0 0 0
+Object 00067: 1
+Object 00067: 0
+Object 00067: 0
+Object 00067: 0 0
+Object 00067: 0
+Object 00067: 1
+Object 00067: 0
+Object 00067: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00067: 0000000000000
+Object 00067: 0 0
+Object 00067: # 0 0 0 0 0 0 0 0
+Object 00067: # 0 0 0 0 0 0 0 0
+Object 00067: 0 0
+
+Object 00068: 0
+Object 00068: 0 0 0
+Object 00068: 0.1431 0.0563 0.1431
+Object 00068: 0 0 0
+Object 00068: 1.83 -0.9784 1.388
+Object 00068: 7
+Object 00068: Blue_RPlastic
+Object 00068: 0
+Object 00068: 0
+Object 00068: Object0068
+Object 00068: -1
+Object 00068: 2 // display
+Object 00068: 1 1 1
+Object 00068: 0 0 0
+Object 00068: 0 0 0
+Object 00068: 1
+Object 00068: 0
+Object 00068: 0
+Object 00068: 0 0
+Object 00068: 0
+Object 00068: 1
+Object 00068: 0
+Object 00068: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00068: 0000000000000
+Object 00068: 0 0
+Object 00068: # 0 0 0 0 0 0 0 0
+Object 00068: # 0 0 0 0 0 0 0 0
+Object 00068: 0 0
+
+Object 00069: 0
+Object 00069: 0 0 0
+Object 00069: 0.1431 0.0563 0.1431
+Object 00069: 0 0 0
+Object 00069: 3.139 -0.9784 1.388
+Object 00069: 7
+Object 00069: Blue_RPlastic
+Object 00069: 0
+Object 00069: 0
+Object 00069: Object0069
+Object 00069: -1
+Object 00069: 2 // display
+Object 00069: 1 1 1
+Object 00069: 0 0 0
+Object 00069: 0 0 0
+Object 00069: 1
+Object 00069: 0
+Object 00069: 0
+Object 00069: 0 0
+Object 00069: 0
+Object 00069: 1
+Object 00069: 0
+Object 00069: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00069: 0000000000000
+Object 00069: 0 0
+Object 00069: # 0 0 0 0 0 0 0 0
+Object 00069: # 0 0 0 0 0 0 0 0
+Object 00069: 0 0
+
+Object 00070: 0
+Object 00070: 0 0 0
+Object 00070: 0.1431 0.0563 0.1431
+Object 00070: 0 0 0
+Object 00070: 3.139 -0.9784 1.806
+Object 00070: 7
+Object 00070: Blue_RPlastic
+Object 00070: 0
+Object 00070: 0
+Object 00070: Object0070
+Object 00070: -1
+Object 00070: 2 // display
+Object 00070: 1 1 1
+Object 00070: 0 0 0
+Object 00070: 0 0 0
+Object 00070: 1
+Object 00070: 0
+Object 00070: 0
+Object 00070: 0 0
+Object 00070: 0
+Object 00070: 1
+Object 00070: 0
+Object 00070: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00070: 0000000000000
+Object 00070: 0 0
+Object 00070: # 0 0 0 0 0 0 0 0
+Object 00070: # 0 0 0 0 0 0 0 0
+Object 00070: 0 0
+
+Object 00071: 0
+Object 00071: 0 0 0
+Object 00071: 0.1431 0.0563 0.1431
+Object 00071: 0 0 0
+Object 00071: 2.713 -0.9784 1.804
+Object 00071: 7
+Object 00071: Blue_RPlastic
+Object 00071: 0
+Object 00071: 0
+Object 00071: Object0071
+Object 00071: -1
+Object 00071: 2 // display
+Object 00071: 1 1 1
+Object 00071: 0 0 0
+Object 00071: 0 0 0
+Object 00071: 1
+Object 00071: 0
+Object 00071: 0
+Object 00071: 0 0
+Object 00071: 0
+Object 00071: 1
+Object 00071: 0
+Object 00071: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00071: 0000000000000
+Object 00071: 0 0
+Object 00071: # 0 0 0 0 0 0 0 0
+Object 00071: # 0 0 0 0 0 0 0 0
+Object 00071: 0 0
+
+Object 00072: 0
+Object 00072: 0 0 0
+Object 00072: 0.1431 0.0563 0.1431
+Object 00072: 0 0 0
+Object 00072: 2.713 -0.9784 1.395
+Object 00072: 7
+Object 00072: Blue_RPlastic
+Object 00072: 0
+Object 00072: 0
+Object 00072: Object0072
+Object 00072: -1
+Object 00072: 2 // display
+Object 00072: 1 1 1
+Object 00072: 0 0 0
+Object 00072: 0 0 0
+Object 00072: 1
+Object 00072: 0
+Object 00072: 0
+Object 00072: 0 0
+Object 00072: 0
+Object 00072: 1
+Object 00072: 0
+Object 00072: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00072: 0000000000000
+Object 00072: 0 0
+Object 00072: # 0 0 0 0 0 0 0 0
+Object 00072: # 0 0 0 0 0 0 0 0
+Object 00072: 0 0
+
+Object 00073: 0
+Object 00073: 0 0 0
+Object 00073: 0.1431 0.0563 0.1431
+Object 00073: 0 0 0
+Object 00073: 2.272 -0.9784 1.388
+Object 00073: 7
+Object 00073: Blue_RPlastic
+Object 00073: 0
+Object 00073: 0
+Object 00073: Object0073
+Object 00073: -1
+Object 00073: 2 // display
+Object 00073: 1 1 1
+Object 00073: 0 0 0
+Object 00073: 0 0 0
+Object 00073: 1
+Object 00073: 0
+Object 00073: 0
+Object 00073: 0 0
+Object 00073: 0
+Object 00073: 1
+Object 00073: 0
+Object 00073: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00073: 0000000000000
+Object 00073: 0 0
+Object 00073: # 0 0 0 0 0 0 0 0
+Object 00073: # 0 0 0 0 0 0 0 0
+Object 00073: 0 0
+
+Object 00074: 0
+Object 00074: 0 0 0
+Object 00074: 0.1431 0.0563 0.1431
+Object 00074: 0 0 0
+Object 00074: 2.272 -0.9784 1.803
+Object 00074: 7
+Object 00074: Blue_RPlastic
+Object 00074: 0
+Object 00074: 0
+Object 00074: Object0074
+Object 00074: -1
+Object 00074: 2 // display
+Object 00074: 1 1 1
+Object 00074: 0 0 0
+Object 00074: 0 0 0
+Object 00074: 1
+Object 00074: 0
+Object 00074: 0
+Object 00074: 0 0
+Object 00074: 0
+Object 00074: 1
+Object 00074: 0
+Object 00074: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00074: 0000000000000
+Object 00074: 0 0
+Object 00074: # 0 0 0 0 0 0 0 0
+Object 00074: # 0 0 0 0 0 0 0 0
+Object 00074: 0 0
+
+Object 00075: 2
+Object 00075: 0 0 0
+Object 00075: 0.8956 0.2797 0.0393
+Object 00075: 0 0 0
+Object 00075: 2.471 -0.6428 2.014
+Object 00075: 7
+Object 00075: Blue_RPlastic
+Object 00075: 0
+Object 00075: 0
+Object 00075: Object0075
+Object 00075: -1
+Object 00075: 2 // display
+Object 00075: 1 1 1
+Object 00075: 0 0 0
+Object 00075: 0 0 0
+Object 00075: 1
+Object 00075: 0
+Object 00075: 0
+Object 00075: 0 0
+Object 00075: 0
+Object 00075: 1
+Object 00075: 0
+Object 00075: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00075: 0000000000000
+Object 00075: 0 0
+Object 00075: # 0 0 0 0 0 0 0 0
+Object 00075: # 0 0 0 0 0 0 0 0
+Object 00075: 0 0
+
+Object 00076: 2
+Object 00076: 0 0 0
+Object 00076: 0.8956 0.2797 0.0393
+Object 00076: 0 0 0
+Object 00076: 2.471 -0.6428 1.181
+Object 00076: 7
+Object 00076: Blue_RPlastic
+Object 00076: 0
+Object 00076: 0
+Object 00076: Object0076
+Object 00076: -1
+Object 00076: 2 // display
+Object 00076: 1 1 1
+Object 00076: 0 0 0
+Object 00076: 0 0 0
+Object 00076: 1
+Object 00076: 0
+Object 00076: 0
+Object 00076: 0 0
+Object 00076: 0
+Object 00076: 1
+Object 00076: 0
+Object 00076: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00076: 0000000000000
+Object 00076: 0 0
+Object 00076: # 0 0 0 0 0 0 0 0
+Object 00076: # 0 0 0 0 0 0 0 0
+Object 00076: 0 0
+
+Object 00077: 2
+Object 00077: 0 0 0
+Object 00077: 0.0369 0.2797 0.4553
+Object 00077: 0 0 0
+Object 00077: 1.613 -0.6428 1.597
+Object 00077: 7
+Object 00077: Blue_RPlastic
+Object 00077: 0
+Object 00077: 0
+Object 00077: Object0077
+Object 00077: -1
+Object 00077: 2 // display
+Object 00077: 1 1 1
+Object 00077: 0 0 0
+Object 00077: 0 0 0
+Object 00077: 1
+Object 00077: 0
+Object 00077: 0
+Object 00077: 0 0
+Object 00077: 0
+Object 00077: 1
+Object 00077: 0
+Object 00077: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00077: 0000000000000
+Object 00077: 0 0
+Object 00077: # 0 0 0 0 0 0 0 0
+Object 00077: # 0 0 0 0 0 0 0 0
+Object 00077: 0 0
+
+Object 00078: 2
+Object 00078: 0 0 0
+Object 00078: 0.0369 0.2797 0.4553
+Object 00078: 0 0 0
+Object 00078: 3.33 -0.6428 1.597
+Object 00078: 7
+Object 00078: Blue_RPlastic
+Object 00078: 0
+Object 00078: 0
+Object 00078: Object0078
+Object 00078: -1
+Object 00078: 2 // display
+Object 00078: 1 1 1
+Object 00078: 0 0 0
+Object 00078: 0 0 0
+Object 00078: 1
+Object 00078: 0
+Object 00078: 0
+Object 00078: 0 0
+Object 00078: 0
+Object 00078: 1
+Object 00078: 0
+Object 00078: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00078: 0000000000000
+Object 00078: 0 0
+Object 00078: # 0 0 0 0 0 0 0 0
+Object 00078: # 0 0 0 0 0 0 0 0
+Object 00078: 0 0
+
+Object 00079: 5
+Object 00079: 0.831 0 0
+Object 00079: 0.1948 0.1948 0.2456
+Object 00079: 90 0 0
+Object 00079: 1.999 -0.6093 1.589
+Object 00079: 7
+Object 00079: Blue_RPlastic
+Object 00079: 0
+Object 00079: 0
+Object 00079: Object0079
+Object 00079: -1
+Object 00079: 2 // display
+Object 00079: 1 1 1
+Object 00079: 0 0 0
+Object 00079: 0 0 0
+Object 00079: 1
+Object 00079: 0
+Object 00079: 0
+Object 00079: 0 0
+Object 00079: 0
+Object 00079: 1
+Object 00079: 0
+Object 00079: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00079: 0000000000000
+Object 00079: 0 0
+Object 00079: # 0 0 0 0 0 0 0 0
+Object 00079: # 0 0 0 0 0 0 0 0
+Object 00079: 0 0
+
+Object 00080: 5
+Object 00080: 0.831 0 0
+Object 00080: 0.1948 0.1948 0.2456
+Object 00080: 90 0 0
+Object 00080: 2.971 -0.6093 1.589
+Object 00080: 7
+Object 00080: Blue_RPlastic
+Object 00080: 0
+Object 00080: 0
+Object 00080: Object0080
+Object 00080: -1
+Object 00080: 2 // display
+Object 00080: 1 1 1
+Object 00080: 0 0 0
+Object 00080: 0 0 0
+Object 00080: 1
+Object 00080: 0
+Object 00080: 0
+Object 00080: 0 0
+Object 00080: 0
+Object 00080: 1
+Object 00080: 0
+Object 00080: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00080: 0000000000000
+Object 00080: 0 0
+Object 00080: # 0 0 0 0 0 0 0 0
+Object 00080: # 0 0 0 0 0 0 0 0
+Object 00080: 0 0
+
+Object 00081: 5
+Object 00081: 0.831 0 0
+Object 00081: 0.1948 0.1948 0.2456
+Object 00081: 90 0 0
+Object 00081: 2.493 -0.6093 1.589
+Object 00081: 7
+Object 00081: Blue_RPlastic
+Object 00081: 0
+Object 00081: 0
+Object 00081: Object0081
+Object 00081: -1
+Object 00081: 2 // display
+Object 00081: 1 1 1
+Object 00081: 0 0 0
+Object 00081: 0 0 0
+Object 00081: 1
+Object 00081: 0
+Object 00081: 0
+Object 00081: 0 0
+Object 00081: 0
+Object 00081: 1
+Object 00081: 0
+Object 00081: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00081: 0000000000000
+Object 00081: 0 0
+Object 00081: # 0 0 0 0 0 0 0 0
+Object 00081: # 0 0 0 0 0 0 0 0
+Object 00081: 0 0
+
+Object 00082: 2
+Object 00082: 0 0 0
+Object 00082: 0.8956 0.0361 0.4553
+Object 00082: 90 313 0
+Object 00082: 1.718 -0.2564 -0.6352
+Object 00082: 7
+Object 00082: Green_RPlastic
+Object 00082: 0
+Object 00082: 0
+Object 00082: Object0082
+Object 00082: -1
+Object 00082: 2 // display
+Object 00082: 1 1 1
+Object 00082: 0 0 0
+Object 00082: 0 0 0
+Object 00082: 1
+Object 00082: 0
+Object 00082: 0
+Object 00082: 0 0
+Object 00082: 0
+Object 00082: 1
+Object 00082: 0
+Object 00082: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00082: 0000000000000
+Object 00082: 0 0
+Object 00082: # 0 0 0 0 0 0 0 0
+Object 00082: # 0 0 0 0 0 0 0 0
+Object 00082: 0 0
+
+Object 00083: 0
+Object 00083: 0 0 0
+Object 00083: 0.1431 0.0563 0.1431
+Object 00083: 90 313 0
+Object 00083: 1.214 -0.0512 -1.042
+Object 00083: 7
+Object 00083: Green_RPlastic
+Object 00083: 0
+Object 00083: 0
+Object 00083: Object0083
+Object 00083: -1
+Object 00083: 2 // display
+Object 00083: 1 1 1
+Object 00083: 0 0 0
+Object 00083: 0 0 0
+Object 00083: 1
+Object 00083: 0
+Object 00083: 0
+Object 00083: 0 0
+Object 00083: 0
+Object 00083: 1
+Object 00083: 0
+Object 00083: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00083: 0000000000000
+Object 00083: 0 0
+Object 00083: # 0 0 0 0 0 0 0 0
+Object 00083: # 0 0 0 0 0 0 0 0
+Object 00083: 0 0
+
+Object 00084: 0
+Object 00084: 0 0 0
+Object 00084: 0.1431 0.0563 0.1431
+Object 00084: 90 313 0
+Object 00084: 1.214 -0.466 -1.042
+Object 00084: 7
+Object 00084: Green_RPlastic
+Object 00084: 0
+Object 00084: 0
+Object 00084: Object0084
+Object 00084: -1
+Object 00084: 2 // display
+Object 00084: 1 1 1
+Object 00084: 0 0 0
+Object 00084: 0 0 0
+Object 00084: 1
+Object 00084: 0
+Object 00084: 0
+Object 00084: 0 0
+Object 00084: 0
+Object 00084: 1
+Object 00084: 0
+Object 00084: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00084: 0000000000000
+Object 00084: 0 0
+Object 00084: # 0 0 0 0 0 0 0 0
+Object 00084: # 0 0 0 0 0 0 0 0
+Object 00084: 0 0
+
+Object 00085: 0
+Object 00085: 0 0 0
+Object 00085: 0.1431 0.0563 0.1431
+Object 00085: 90 313 0
+Object 00085: 2.106 -0.466 -0.0843
+Object 00085: 7
+Object 00085: Green_RPlastic
+Object 00085: 0
+Object 00085: 0
+Object 00085: Object0085
+Object 00085: -1
+Object 00085: 2 // display
+Object 00085: 1 1 1
+Object 00085: 0 0 0
+Object 00085: 0 0 0
+Object 00085: 1
+Object 00085: 0
+Object 00085: 0
+Object 00085: 0 0
+Object 00085: 0
+Object 00085: 1
+Object 00085: 0
+Object 00085: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00085: 0000000000000
+Object 00085: 0 0
+Object 00085: # 0 0 0 0 0 0 0 0
+Object 00085: # 0 0 0 0 0 0 0 0
+Object 00085: 0 0
+
+Object 00086: 0
+Object 00086: 0 0 0
+Object 00086: 0.1431 0.0563 0.1431
+Object 00086: 90 313 0
+Object 00086: 2.106 -0.048 -0.0843
+Object 00086: 7
+Object 00086: Green_RPlastic
+Object 00086: 0
+Object 00086: 0
+Object 00086: Object0086
+Object 00086: -1
+Object 00086: 2 // display
+Object 00086: 1 1 1
+Object 00086: 0 0 0
+Object 00086: 0 0 0
+Object 00086: 1
+Object 00086: 0
+Object 00086: 0
+Object 00086: 0 0
+Object 00086: 0
+Object 00086: 1
+Object 00086: 0
+Object 00086: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00086: 0000000000000
+Object 00086: 0 0
+Object 00086: # 0 0 0 0 0 0 0 0
+Object 00086: # 0 0 0 0 0 0 0 0
+Object 00086: 0 0
+
+Object 00087: 0
+Object 00087: 0 0 0
+Object 00087: 0.1431 0.0563 0.1431
+Object 00087: 90 313 0
+Object 00087: 1.816 -0.0501 -0.3956
+Object 00087: 7
+Object 00087: Green_RPlastic
+Object 00087: 0
+Object 00087: 0
+Object 00087: Object0087
+Object 00087: -1
+Object 00087: 2 // display
+Object 00087: 1 1 1
+Object 00087: 0 0 0
+Object 00087: 0 0 0
+Object 00087: 1
+Object 00087: 0
+Object 00087: 0
+Object 00087: 0 0
+Object 00087: 0
+Object 00087: 1
+Object 00087: 0
+Object 00087: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00087: 0000000000000
+Object 00087: 0 0
+Object 00087: # 0 0 0 0 0 0 0 0
+Object 00087: # 0 0 0 0 0 0 0 0
+Object 00087: 0 0
+
+Object 00088: 0
+Object 00088: 0 0 0
+Object 00088: 0.1431 0.0563 0.1431
+Object 00088: 90 313 0
+Object 00088: 1.816 -0.4592 -0.3956
+Object 00088: 7
+Object 00088: Green_RPlastic
+Object 00088: 0
+Object 00088: 0
+Object 00088: Object0088
+Object 00088: -1
+Object 00088: 2 // display
+Object 00088: 1 1 1
+Object 00088: 0 0 0
+Object 00088: 0 0 0
+Object 00088: 1
+Object 00088: 0
+Object 00088: 0
+Object 00088: 0 0
+Object 00088: 0
+Object 00088: 1
+Object 00088: 0
+Object 00088: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00088: 0000000000000
+Object 00088: 0 0
+Object 00088: # 0 0 0 0 0 0 0 0
+Object 00088: # 0 0 0 0 0 0 0 0
+Object 00088: 0 0
+
+Object 00089: 0
+Object 00089: 0 0 0
+Object 00089: 0.1431 0.0563 0.1431
+Object 00089: 90 313 0
+Object 00089: 1.515 -0.466 -0.7186
+Object 00089: 7
+Object 00089: Green_RPlastic
+Object 00089: 0
+Object 00089: 0
+Object 00089: Object0089
+Object 00089: -1
+Object 00089: 2 // display
+Object 00089: 1 1 1
+Object 00089: 0 0 0
+Object 00089: 0 0 0
+Object 00089: 1
+Object 00089: 0
+Object 00089: 0
+Object 00089: 0 0
+Object 00089: 0
+Object 00089: 1
+Object 00089: 0
+Object 00089: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00089: 0000000000000
+Object 00089: 0 0
+Object 00089: # 0 0 0 0 0 0 0 0
+Object 00089: # 0 0 0 0 0 0 0 0
+Object 00089: 0 0
+
+Object 00090: 0
+Object 00090: 0 0 0
+Object 00090: 0.1431 0.0563 0.1431
+Object 00090: 90 313 0
+Object 00090: 1.515 -0.0512 -0.7186
+Object 00090: 7
+Object 00090: Green_RPlastic
+Object 00090: 0
+Object 00090: 0
+Object 00090: Object0090
+Object 00090: -1
+Object 00090: 2 // display
+Object 00090: 1 1 1
+Object 00090: 0 0 0
+Object 00090: 0 0 0
+Object 00090: 1
+Object 00090: 0
+Object 00090: 0
+Object 00090: 0 0
+Object 00090: 0
+Object 00090: 1
+Object 00090: 0
+Object 00090: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00090: 0000000000000
+Object 00090: 0 0
+Object 00090: # 0 0 0 0 0 0 0 0
+Object 00090: # 0 0 0 0 0 0 0 0
+Object 00090: 0 0
+
+Object 00091: 2
+Object 00091: 0 0 0
+Object 00091: 0.8956 0.2797 0.0393
+Object 00091: 90 313 0
+Object 00091: 1.896 0.1599 -0.8016
+Object 00091: 7
+Object 00091: Green_RPlastic
+Object 00091: 0
+Object 00091: 0
+Object 00091: Object0091
+Object 00091: -1
+Object 00091: 2 // display
+Object 00091: 1 1 1
+Object 00091: 0 0 0
+Object 00091: 0 0 0
+Object 00091: 1
+Object 00091: 0
+Object 00091: 0
+Object 00091: 0 0
+Object 00091: 0
+Object 00091: 1
+Object 00091: 0
+Object 00091: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00091: 0000000000000
+Object 00091: 0 0
+Object 00091: # 0 0 0 0 0 0 0 0
+Object 00091: # 0 0 0 0 0 0 0 0
+Object 00091: 0 0
+
+Object 00092: 2
+Object 00092: 0 0 0
+Object 00092: 0.8956 0.2797 0.0393
+Object 00092: 90 313 0
+Object 00092: 1.896 -0.6725 -0.8016
+Object 00092: 7
+Object 00092: Green_RPlastic
+Object 00092: 0
+Object 00092: 0
+Object 00092: Object0092
+Object 00092: -1
+Object 00092: 2 // display
+Object 00092: 1 1 1
+Object 00092: 0 0 0
+Object 00092: 0 0 0
+Object 00092: 1
+Object 00092: 0
+Object 00092: 0
+Object 00092: 0 0
+Object 00092: 0
+Object 00092: 1
+Object 00092: 0
+Object 00092: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00092: 0000000000000
+Object 00092: 0 0
+Object 00092: # 0 0 0 0 0 0 0 0
+Object 00092: # 0 0 0 0 0 0 0 0
+Object 00092: 0 0
+
+Object 00093: 2
+Object 00093: 0 0 0
+Object 00093: 0.0369 0.2797 0.4553
+Object 00093: 90 313 0
+Object 00093: 1.311 -0.2564 -1.429
+Object 00093: 7
+Object 00093: Green_RPlastic
+Object 00093: 0
+Object 00093: 0
+Object 00093: Object0093
+Object 00093: -1
+Object 00093: 2 // display
+Object 00093: 1 1 1
+Object 00093: 0 0 0
+Object 00093: 0 0 0
+Object 00093: 1
+Object 00093: 0
+Object 00093: 0
+Object 00093: 0 0
+Object 00093: 0
+Object 00093: 1
+Object 00093: 0
+Object 00093: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00093: 0000000000000
+Object 00093: 0 0
+Object 00093: # 0 0 0 0 0 0 0 0
+Object 00093: # 0 0 0 0 0 0 0 0
+Object 00093: 0 0
+
+Object 00094: 2
+Object 00094: 0 0 0
+Object 00094: 0.0369 0.2797 0.4553
+Object 00094: 90 313 0
+Object 00094: 2.482 -0.2564 -0.1733
+Object 00094: 7
+Object 00094: Green_RPlastic
+Object 00094: 0
+Object 00094: 0
+Object 00094: Object0094
+Object 00094: -1
+Object 00094: 2 // display
+Object 00094: 1 1 1
+Object 00094: 0 0 0
+Object 00094: 0 0 0
+Object 00094: 1
+Object 00094: 0
+Object 00094: 0
+Object 00094: 0 0
+Object 00094: 0
+Object 00094: 1
+Object 00094: 0
+Object 00094: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00094: 0000000000000
+Object 00094: 0 0
+Object 00094: # 0 0 0 0 0 0 0 0
+Object 00094: # 0 0 0 0 0 0 0 0
+Object 00094: 0 0
+
+Object 00095: 5
+Object 00095: 0.831 0 0
+Object 00095: 0.1948 0.1948 0.2456
+Object 00095: 180 313 0
+Object 00095: 1.599 -0.2652 -1.17
+Object 00095: 7
+Object 00095: Green_RPlastic
+Object 00095: 0
+Object 00095: 0
+Object 00095: Object0095
+Object 00095: -1
+Object 00095: 2 // display
+Object 00095: 1 1 1
+Object 00095: 0 0 0
+Object 00095: 0 0 0
+Object 00095: 1
+Object 00095: 0
+Object 00095: 0
+Object 00095: 0 0
+Object 00095: 0
+Object 00095: 1
+Object 00095: 0
+Object 00095: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00095: 0000000000000
+Object 00095: 0 0
+Object 00095: # 0 0 0 0 0 0 0 0
+Object 00095: # 0 0 0 0 0 0 0 0
+Object 00095: 0 0
+
+Object 00096: 5
+Object 00096: 0.831 0 0
+Object 00096: 0.1948 0.1948 0.2456
+Object 00096: 180 313 0
+Object 00096: 2.262 -0.2652 -0.4589
+Object 00096: 7
+Object 00096: Green_RPlastic
+Object 00096: 0
+Object 00096: 0
+Object 00096: Object0096
+Object 00096: -1
+Object 00096: 2 // display
+Object 00096: 1 1 1
+Object 00096: 0 0 0
+Object 00096: 0 0 0
+Object 00096: 1
+Object 00096: 0
+Object 00096: 0
+Object 00096: 0 0
+Object 00096: 0
+Object 00096: 1
+Object 00096: 0
+Object 00096: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00096: 0000000000000
+Object 00096: 0 0
+Object 00096: # 0 0 0 0 0 0 0 0
+Object 00096: # 0 0 0 0 0 0 0 0
+Object 00096: 0 0
+
+Object 00097: 5
+Object 00097: 0.831 0 0
+Object 00097: 0.1948 0.1948 0.2456
+Object 00097: 180 313 0
+Object 00097: 1.936 -0.2652 -0.8083
+Object 00097: 7
+Object 00097: Green_RPlastic
+Object 00097: 0
+Object 00097: 0
+Object 00097: Object0097
+Object 00097: -1
+Object 00097: 2 // display
+Object 00097: 1 1 1
+Object 00097: 0 0 0
+Object 00097: 0 0 0
+Object 00097: 1
+Object 00097: 0
+Object 00097: 0
+Object 00097: 0 0
+Object 00097: 0
+Object 00097: 1
+Object 00097: 0
+Object 00097: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00097: 0000000000000
+Object 00097: 0 0
+Object 00097: # 0 0 0 0 0 0 0 0
+Object 00097: # 0 0 0 0 0 0 0 0
+Object 00097: 0 0
+
+Object 00098: 2
+Object 00098: 0 0 0
+Object 00098: 0.8956 0.0361 0.4553
+Object 00098: 0 132 0
+Object 00098: -2.688 -0.3222 2.062
+Object 00098: 7
+Object 00098: Yellow_RPlastic
+Object 00098: 0
+Object 00098: 0
+Object 00098: Object0098
+Object 00098: -1
+Object 00098: 2 // display
+Object 00098: 1 1 1
+Object 00098: 0 0 0
+Object 00098: 0 0 0
+Object 00098: 1
+Object 00098: 0
+Object 00098: 0
+Object 00098: 0 0
+Object 00098: 0
+Object 00098: 1
+Object 00098: 0
+Object 00098: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00098: 0000000000000
+Object 00098: 0 0
+Object 00098: # 0 0 0 0 0 0 0 0
+Object 00098: # 0 0 0 0 0 0 0 0
+Object 00098: 0 0
+
+Object 00099: 0
+Object 00099: 0 0 0
+Object 00099: 0.1431 0.0563 0.1431
+Object 00099: 0 132 0
+Object 00099: -2.106 -0.4142 2.402
+Object 00099: 7
+Object 00099: Yellow_RPlastic
+Object 00099: 0
+Object 00099: 0
+Object 00099: Object0099
+Object 00099: -1
+Object 00099: 2 // display
+Object 00099: 1 1 1
+Object 00099: 0 0 0
+Object 00099: 0 0 0
+Object 00099: 1
+Object 00099: 0
+Object 00099: 0
+Object 00099: 0 0
+Object 00099: 0
+Object 00099: 1
+Object 00099: 0
+Object 00099: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00099: 0000000000000
+Object 00099: 0 0
+Object 00099: # 0 0 0 0 0 0 0 0
+Object 00099: # 0 0 0 0 0 0 0 0
+Object 00099: 0 0
+
+Object 00100: 0
+Object 00100: 0 0 0
+Object 00100: 0.1431 0.0563 0.1431
+Object 00100: 0 132 0
+Object 00100: -2.414 -0.4142 2.679
+Object 00100: 7
+Object 00100: Yellow_RPlastic
+Object 00100: 0
+Object 00100: 0
+Object 00100: Object0100
+Object 00100: -1
+Object 00100: 2 // display
+Object 00100: 1 1 1
+Object 00100: 0 0 0
+Object 00100: 0 0 0
+Object 00100: 1
+Object 00100: 0
+Object 00100: 0
+Object 00100: 0 0
+Object 00100: 0
+Object 00100: 1
+Object 00100: 0
+Object 00100: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00100: 0000000000000
+Object 00100: 0 0
+Object 00100: # 0 0 0 0 0 0 0 0
+Object 00100: # 0 0 0 0 0 0 0 0
+Object 00100: 0 0
+
+Object 00101: 0
+Object 00101: 0 0 0
+Object 00101: 0.1431 0.0563 0.1431
+Object 00101: 0 132 0
+Object 00101: -3.29 -0.4142 1.706
+Object 00101: 7
+Object 00101: Yellow_RPlastic
+Object 00101: 0
+Object 00101: 0
+Object 00101: Object0101
+Object 00101: -1
+Object 00101: 2 // display
+Object 00101: 1 1 1
+Object 00101: 0 0 0
+Object 00101: 0 0 0
+Object 00101: 1
+Object 00101: 0
+Object 00101: 0
+Object 00101: 0 0
+Object 00101: 0
+Object 00101: 1
+Object 00101: 0
+Object 00101: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00101: 0000000000000
+Object 00101: 0 0
+Object 00101: # 0 0 0 0 0 0 0 0
+Object 00101: # 0 0 0 0 0 0 0 0
+Object 00101: 0 0
+
+Object 00102: 0
+Object 00102: 0 0 0
+Object 00102: 0.1431 0.0563 0.1431
+Object 00102: 0 132 0
+Object 00102: -2.979 -0.4142 1.427
+Object 00102: 7
+Object 00102: Yellow_RPlastic
+Object 00102: 0
+Object 00102: 0
+Object 00102: Object0102
+Object 00102: -1
+Object 00102: 2 // display
+Object 00102: 1 1 1
+Object 00102: 0 0 0
+Object 00102: 0 0 0
+Object 00102: 1
+Object 00102: 0
+Object 00102: 0
+Object 00102: 0 0
+Object 00102: 0
+Object 00102: 1
+Object 00102: 0
+Object 00102: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00102: 0000000000000
+Object 00102: 0 0
+Object 00102: # 0 0 0 0 0 0 0 0
+Object 00102: # 0 0 0 0 0 0 0 0
+Object 00102: 0 0
+
+Object 00103: 0
+Object 00103: 0 0 0
+Object 00103: 0.1431 0.0563 0.1431
+Object 00103: 0 132 0
+Object 00103: -2.696 -0.4142 1.744
+Object 00103: 7
+Object 00103: Yellow_RPlastic
+Object 00103: 0
+Object 00103: 0
+Object 00103: Object0103
+Object 00103: -1
+Object 00103: 2 // display
+Object 00103: 1 1 1
+Object 00103: 0 0 0
+Object 00103: 0 0 0
+Object 00103: 1
+Object 00103: 0
+Object 00103: 0
+Object 00103: 0 0
+Object 00103: 0
+Object 00103: 1
+Object 00103: 0
+Object 00103: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00103: 0000000000000
+Object 00103: 0 0
+Object 00103: # 0 0 0 0 0 0 0 0
+Object 00103: # 0 0 0 0 0 0 0 0
+Object 00103: 0 0
+
+Object 00104: 0
+Object 00104: 0 0 0
+Object 00104: 0.1431 0.0563 0.1431
+Object 00104: 0 132 0
+Object 00104: -3 -0.4142 2.018
+Object 00104: 7
+Object 00104: Yellow_RPlastic
+Object 00104: 0
+Object 00104: 0
+Object 00104: Object0104
+Object 00104: -1
+Object 00104: 2 // display
+Object 00104: 1 1 1
+Object 00104: 0 0 0
+Object 00104: 0 0 0
+Object 00104: 1
+Object 00104: 0
+Object 00104: 0
+Object 00104: 0 0
+Object 00104: 0
+Object 00104: 1
+Object 00104: 0
+Object 00104: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00104: 0000000000000
+Object 00104: 0 0
+Object 00104: # 0 0 0 0 0 0 0 0
+Object 00104: # 0 0 0 0 0 0 0 0
+Object 00104: 0 0
+
+Object 00105: 0
+Object 00105: 0 0 0
+Object 00105: 0.1431 0.0563 0.1431
+Object 00105: 0 132 0
+Object 00105: -2.71 -0.4142 2.351
+Object 00105: 7
+Object 00105: Yellow_RPlastic
+Object 00105: 0
+Object 00105: 0
+Object 00105: Object0105
+Object 00105: -1
+Object 00105: 2 // display
+Object 00105: 1 1 1
+Object 00105: 0 0 0
+Object 00105: 0 0 0
+Object 00105: 1
+Object 00105: 0
+Object 00105: 0
+Object 00105: 0 0
+Object 00105: 0
+Object 00105: 1
+Object 00105: 0
+Object 00105: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00105: 0000000000000
+Object 00105: 0 0
+Object 00105: # 0 0 0 0 0 0 0 0
+Object 00105: # 0 0 0 0 0 0 0 0
+Object 00105: 0 0
+
+Object 00106: 0
+Object 00106: 0 0 0
+Object 00106: 0.1431 0.0563 0.1431
+Object 00106: 0 132 0
+Object 00106: -2.401 -0.4142 2.073
+Object 00106: 7
+Object 00106: Yellow_RPlastic
+Object 00106: 0
+Object 00106: 0
+Object 00106: Object0106
+Object 00106: -1
+Object 00106: 2 // display
+Object 00106: 1 1 1
+Object 00106: 0 0 0
+Object 00106: 0 0 0
+Object 00106: 1
+Object 00106: 0
+Object 00106: 0
+Object 00106: 0 0
+Object 00106: 0
+Object 00106: 1
+Object 00106: 0
+Object 00106: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00106: 0000000000000
+Object 00106: 0 0
+Object 00106: # 0 0 0 0 0 0 0 0
+Object 00106: # 0 0 0 0 0 0 0 0
+Object 00106: 0 0
+
+Object 00107: 2
+Object 00107: 0 0 0
+Object 00107: 0.8956 0.2797 0.0393
+Object 00107: 0 132 0
+Object 00107: -2.378 -0.0786 1.784
+Object 00107: 7
+Object 00107: Yellow_RPlastic
+Object 00107: 0
+Object 00107: 0
+Object 00107: Object0107
+Object 00107: -1
+Object 00107: 2 // display
+Object 00107: 1 1 1
+Object 00107: 0 0 0
+Object 00107: 0 0 0
+Object 00107: 1
+Object 00107: 0
+Object 00107: 0
+Object 00107: 0 0
+Object 00107: 0
+Object 00107: 1
+Object 00107: 0
+Object 00107: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00107: 0000000000000
+Object 00107: 0 0
+Object 00107: # 0 0 0 0 0 0 0 0
+Object 00107: # 0 0 0 0 0 0 0 0
+Object 00107: 0 0
+
+Object 00108: 2
+Object 00108: 0 0 0
+Object 00108: 0.8956 0.2797 0.0393
+Object 00108: 0 132 0
+Object 00108: -2.997 -0.0786 2.341
+Object 00108: 7
+Object 00108: Yellow_RPlastic
+Object 00108: 0
+Object 00108: 0
+Object 00108: Object0108
+Object 00108: -1
+Object 00108: 2 // display
+Object 00108: 1 1 1
+Object 00108: 0 0 0
+Object 00108: 0 0 0
+Object 00108: 1
+Object 00108: 0
+Object 00108: 0
+Object 00108: 0 0
+Object 00108: 0
+Object 00108: 1
+Object 00108: 0
+Object 00108: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00108: 0000000000000
+Object 00108: 0 0
+Object 00108: # 0 0 0 0 0 0 0 0
+Object 00108: # 0 0 0 0 0 0 0 0
+Object 00108: 0 0
+
+Object 00109: 2
+Object 00109: 0 0 0
+Object 00109: 0.0369 0.2797 0.4553
+Object 00109: 0 132 0
+Object 00109: -2.113 -0.0786 2.7
+Object 00109: 7
+Object 00109: Yellow_RPlastic
+Object 00109: 0
+Object 00109: 0
+Object 00109: Object0109
+Object 00109: -1
+Object 00109: 2 // display
+Object 00109: 1 1 1
+Object 00109: 0 0 0
+Object 00109: 0 0 0
+Object 00109: 1
+Object 00109: 0
+Object 00109: 0
+Object 00109: 0 0
+Object 00109: 0
+Object 00109: 1
+Object 00109: 0
+Object 00109: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00109: 0000000000000
+Object 00109: 0 0
+Object 00109: # 0 0 0 0 0 0 0 0
+Object 00109: # 0 0 0 0 0 0 0 0
+Object 00109: 0 0
+
+Object 00110: 2
+Object 00110: 0 0 0
+Object 00110: 0.0369 0.2797 0.4553
+Object 00110: 0 132 0
+Object 00110: -3.262 -0.0786 1.424
+Object 00110: 7
+Object 00110: Yellow_RPlastic
+Object 00110: 0
+Object 00110: 0
+Object 00110: Object0110
+Object 00110: -1
+Object 00110: 2 // display
+Object 00110: 1 1 1
+Object 00110: 0 0 0
+Object 00110: 0 0 0
+Object 00110: 1
+Object 00110: 0
+Object 00110: 0
+Object 00110: 0 0
+Object 00110: 0
+Object 00110: 1
+Object 00110: 0
+Object 00110: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00110: 0000000000000
+Object 00110: 0 0
+Object 00110: # 0 0 0 0 0 0 0 0
+Object 00110: # 0 0 0 0 0 0 0 0
+Object 00110: 0 0
+
+Object 00111: 5
+Object 00111: 0.831 0 0
+Object 00111: 0.1948 0.1948 0.2456
+Object 00111: 90 132 0
+Object 00111: -2.378 -0.0451 2.419
+Object 00111: 7
+Object 00111: Yellow_RPlastic
+Object 00111: 0
+Object 00111: 0
+Object 00111: Object0111
+Object 00111: -1
+Object 00111: 2 // display
+Object 00111: 1 1 1
+Object 00111: 0 0 0
+Object 00111: 0 0 0
+Object 00111: 1
+Object 00111: 0
+Object 00111: 0
+Object 00111: 0 0
+Object 00111: 0
+Object 00111: 1
+Object 00111: 0
+Object 00111: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00111: 0000000000000
+Object 00111: 0 0
+Object 00111: # 0 0 0 0 0 0 0 0
+Object 00111: # 0 0 0 0 0 0 0 0
+Object 00111: 0 0
+
+Object 00112: 5
+Object 00112: 0.831 0 0
+Object 00112: 0.1948 0.1948 0.2456
+Object 00112: 90 132 0
+Object 00112: -3.028 -0.0451 1.697
+Object 00112: 7
+Object 00112: Yellow_RPlastic
+Object 00112: 0
+Object 00112: 0
+Object 00112: Object0112
+Object 00112: -1
+Object 00112: 2 // display
+Object 00112: 1 1 1
+Object 00112: 0 0 0
+Object 00112: 0 0 0
+Object 00112: 1
+Object 00112: 0
+Object 00112: 0
+Object 00112: 0 0
+Object 00112: 0
+Object 00112: 1
+Object 00112: 0
+Object 00112: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00112: 0000000000000
+Object 00112: 0 0
+Object 00112: # 0 0 0 0 0 0 0 0
+Object 00112: # 0 0 0 0 0 0 0 0
+Object 00112: 0 0
+
+Object 00113: 5
+Object 00113: 0.831 0 0
+Object 00113: 0.1948 0.1948 0.2456
+Object 00113: 90 132 0
+Object 00113: -2.709 -0.0451 2.052
+Object 00113: 7
+Object 00113: Yellow_RPlastic
+Object 00113: 0
+Object 00113: 0
+Object 00113: Object0113
+Object 00113: -1
+Object 00113: 2 // display
+Object 00113: 1 1 1
+Object 00113: 0 0 0
+Object 00113: 0 0 0
+Object 00113: 1
+Object 00113: 0
+Object 00113: 0
+Object 00113: 0 0
+Object 00113: 0
+Object 00113: 1
+Object 00113: 0
+Object 00113: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00113: 0000000000000
+Object 00113: 0 0
+Object 00113: # 0 0 0 0 0 0 0 0
+Object 00113: # 0 0 0 0 0 0 0 0
+Object 00113: 0 0
+
+Object 00114: 2
+Object 00114: 0 0 0
+Object 00114: 0.8956 0.0361 0.4553
+Object 00114: 0 0 0
+Object 00114: -0.4159 -0.3222 2.062
+Object 00114: 7
+Object 00114: Green_RPlastic
+Object 00114: 0
+Object 00114: 0
+Object 00114: Object0114
+Object 00114: -1
+Object 00114: 2 // display
+Object 00114: 1 1 1
+Object 00114: 0 0 0
+Object 00114: 0 0 0
+Object 00114: 1
+Object 00114: 0
+Object 00114: 0
+Object 00114: 0 0
+Object 00114: 0
+Object 00114: 1
+Object 00114: 0
+Object 00114: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00114: 0000000000000
+Object 00114: 0 0
+Object 00114: # 0 0 0 0 0 0 0 0
+Object 00114: # 0 0 0 0 0 0 0 0
+Object 00114: 0 0
+
+Object 00115: 0
+Object 00115: 0 0 0
+Object 00115: 0.1431 0.0563 0.1431
+Object 00115: 0 0 0
+Object 00115: -1.058 -0.4142 2.267
+Object 00115: 7
+Object 00115: Green_RPlastic
+Object 00115: 0
+Object 00115: 0
+Object 00115: Object0115
+Object 00115: -1
+Object 00115: 2 // display
+Object 00115: 1 1 1
+Object 00115: 0 0 0
+Object 00115: 0 0 0
+Object 00115: 1
+Object 00115: 0
+Object 00115: 0
+Object 00115: 0 0
+Object 00115: 0
+Object 00115: 1
+Object 00115: 0
+Object 00115: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00115: 0000000000000
+Object 00115: 0 0
+Object 00115: # 0 0 0 0 0 0 0 0
+Object 00115: # 0 0 0 0 0 0 0 0
+Object 00115: 0 0
+
+Object 00116: 0
+Object 00116: 0 0 0
+Object 00116: 0.1431 0.0563 0.1431
+Object 00116: 0 0 0
+Object 00116: -1.058 -0.4142 1.852
+Object 00116: 7
+Object 00116: Green_RPlastic
+Object 00116: 0
+Object 00116: 0
+Object 00116: Object0116
+Object 00116: -1
+Object 00116: 2 // display
+Object 00116: 1 1 1
+Object 00116: 0 0 0
+Object 00116: 0 0 0
+Object 00116: 1
+Object 00116: 0
+Object 00116: 0
+Object 00116: 0 0
+Object 00116: 0
+Object 00116: 1
+Object 00116: 0
+Object 00116: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00116: 0000000000000
+Object 00116: 0 0
+Object 00116: # 0 0 0 0 0 0 0 0
+Object 00116: # 0 0 0 0 0 0 0 0
+Object 00116: 0 0
+
+Object 00117: 0
+Object 00117: 0 0 0
+Object 00117: 0.1431 0.0563 0.1431
+Object 00117: 0 0 0
+Object 00117: 0.2515 -0.4142 1.852
+Object 00117: 7
+Object 00117: Green_RPlastic
+Object 00117: 0
+Object 00117: 0
+Object 00117: Object0117
+Object 00117: -1
+Object 00117: 2 // display
+Object 00117: 1 1 1
+Object 00117: 0 0 0
+Object 00117: 0 0 0
+Object 00117: 1
+Object 00117: 0
+Object 00117: 0
+Object 00117: 0 0
+Object 00117: 0
+Object 00117: 1
+Object 00117: 0
+Object 00117: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00117: 0000000000000
+Object 00117: 0 0
+Object 00117: # 0 0 0 0 0 0 0 0
+Object 00117: # 0 0 0 0 0 0 0 0
+Object 00117: 0 0
+
+Object 00118: 0
+Object 00118: 0 0 0
+Object 00118: 0.1431 0.0563 0.1431
+Object 00118: 0 0 0
+Object 00118: 0.2515 -0.4142 2.27
+Object 00118: 7
+Object 00118: Green_RPlastic
+Object 00118: 0
+Object 00118: 0
+Object 00118: Object0118
+Object 00118: -1
+Object 00118: 2 // display
+Object 00118: 1 1 1
+Object 00118: 0 0 0
+Object 00118: 0 0 0
+Object 00118: 1
+Object 00118: 0
+Object 00118: 0
+Object 00118: 0 0
+Object 00118: 0
+Object 00118: 1
+Object 00118: 0
+Object 00118: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00118: 0000000000000
+Object 00118: 0 0
+Object 00118: # 0 0 0 0 0 0 0 0
+Object 00118: # 0 0 0 0 0 0 0 0
+Object 00118: 0 0
+
+Object 00119: 0
+Object 00119: 0 0 0
+Object 00119: 0.1431 0.0563 0.1431
+Object 00119: 0 0 0
+Object 00119: -0.1741 -0.4142 2.268
+Object 00119: 7
+Object 00119: Green_RPlastic
+Object 00119: 0
+Object 00119: 0
+Object 00119: Object0119
+Object 00119: -1
+Object 00119: 2 // display
+Object 00119: 1 1 1
+Object 00119: 0 0 0
+Object 00119: 0 0 0
+Object 00119: 1
+Object 00119: 0
+Object 00119: 0
+Object 00119: 0 0
+Object 00119: 0
+Object 00119: 1
+Object 00119: 0
+Object 00119: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00119: 0000000000000
+Object 00119: 0 0
+Object 00119: # 0 0 0 0 0 0 0 0
+Object 00119: # 0 0 0 0 0 0 0 0
+Object 00119: 0 0
+
+Object 00120: 0
+Object 00120: 0 0 0
+Object 00120: 0.1431 0.0563 0.1431
+Object 00120: 0 0 0
+Object 00120: -0.1741 -0.4142 1.859
+Object 00120: 7
+Object 00120: Green_RPlastic
+Object 00120: 0
+Object 00120: 0
+Object 00120: Object0120
+Object 00120: -1
+Object 00120: 2 // display
+Object 00120: 1 1 1
+Object 00120: 0 0 0
+Object 00120: 0 0 0
+Object 00120: 1
+Object 00120: 0
+Object 00120: 0
+Object 00120: 0 0
+Object 00120: 0
+Object 00120: 1
+Object 00120: 0
+Object 00120: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00120: 0000000000000
+Object 00120: 0 0
+Object 00120: # 0 0 0 0 0 0 0 0
+Object 00120: # 0 0 0 0 0 0 0 0
+Object 00120: 0 0
+
+Object 00121: 0
+Object 00121: 0 0 0
+Object 00121: 0.1431 0.0563 0.1431
+Object 00121: 0 0 0
+Object 00121: -0.6158 -0.4142 1.852
+Object 00121: 7
+Object 00121: Green_RPlastic
+Object 00121: 0
+Object 00121: 0
+Object 00121: Object0121
+Object 00121: -1
+Object 00121: 2 // display
+Object 00121: 1 1 1
+Object 00121: 0 0 0
+Object 00121: 0 0 0
+Object 00121: 1
+Object 00121: 0
+Object 00121: 0
+Object 00121: 0 0
+Object 00121: 0
+Object 00121: 1
+Object 00121: 0
+Object 00121: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00121: 0000000000000
+Object 00121: 0 0
+Object 00121: # 0 0 0 0 0 0 0 0
+Object 00121: # 0 0 0 0 0 0 0 0
+Object 00121: 0 0
+
+Object 00122: 0
+Object 00122: 0 0 0
+Object 00122: 0.1431 0.0563 0.1431
+Object 00122: 0 0 0
+Object 00122: -0.6158 -0.4142 2.267
+Object 00122: 7
+Object 00122: Green_RPlastic
+Object 00122: 0
+Object 00122: 0
+Object 00122: Object0122
+Object 00122: -1
+Object 00122: 2 // display
+Object 00122: 1 1 1
+Object 00122: 0 0 0
+Object 00122: 0 0 0
+Object 00122: 1
+Object 00122: 0
+Object 00122: 0
+Object 00122: 0 0
+Object 00122: 0
+Object 00122: 1
+Object 00122: 0
+Object 00122: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00122: 0000000000000
+Object 00122: 0 0
+Object 00122: # 0 0 0 0 0 0 0 0
+Object 00122: # 0 0 0 0 0 0 0 0
+Object 00122: 0 0
+
+Object 00123: 2
+Object 00123: 0 0 0
+Object 00123: 0.8956 0.2797 0.0393
+Object 00123: 0 0 0
+Object 00123: -0.4163 -0.0786 2.478
+Object 00123: 7
+Object 00123: Green_RPlastic
+Object 00123: 0
+Object 00123: 0
+Object 00123: Object0123
+Object 00123: -1
+Object 00123: 2 // display
+Object 00123: 1 1 1
+Object 00123: 0 0 0
+Object 00123: 0 0 0
+Object 00123: 1
+Object 00123: 0
+Object 00123: 0
+Object 00123: 0 0
+Object 00123: 0
+Object 00123: 1
+Object 00123: 0
+Object 00123: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00123: 0000000000000
+Object 00123: 0 0
+Object 00123: # 0 0 0 0 0 0 0 0
+Object 00123: # 0 0 0 0 0 0 0 0
+Object 00123: 0 0
+
+Object 00124: 2
+Object 00124: 0 0 0
+Object 00124: 0.8956 0.2797 0.0393
+Object 00124: 0 0 0
+Object 00124: -0.4163 -0.0786 1.646
+Object 00124: 7
+Object 00124: Green_RPlastic
+Object 00124: 0
+Object 00124: 0
+Object 00124: Object0124
+Object 00124: -1
+Object 00124: 2 // display
+Object 00124: 1 1 1
+Object 00124: 0 0 0
+Object 00124: 0 0 0
+Object 00124: 1
+Object 00124: 0
+Object 00124: 0
+Object 00124: 0 0
+Object 00124: 0
+Object 00124: 1
+Object 00124: 0
+Object 00124: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00124: 0000000000000
+Object 00124: 0 0
+Object 00124: # 0 0 0 0 0 0 0 0
+Object 00124: # 0 0 0 0 0 0 0 0
+Object 00124: 0 0
+
+Object 00125: 2
+Object 00125: 0 0 0
+Object 00125: 0.0369 0.2797 0.4553
+Object 00125: 0 0 0
+Object 00125: -1.275 -0.0786 2.062
+Object 00125: 7
+Object 00125: Green_RPlastic
+Object 00125: 0
+Object 00125: 0
+Object 00125: Object0125
+Object 00125: -1
+Object 00125: 2 // display
+Object 00125: 1 1 1
+Object 00125: 0 0 0
+Object 00125: 0 0 0
+Object 00125: 1
+Object 00125: 0
+Object 00125: 0
+Object 00125: 0 0
+Object 00125: 0
+Object 00125: 1
+Object 00125: 0
+Object 00125: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00125: 0000000000000
+Object 00125: 0 0
+Object 00125: # 0 0 0 0 0 0 0 0
+Object 00125: # 0 0 0 0 0 0 0 0
+Object 00125: 0 0
+
+Object 00126: 2
+Object 00126: 0 0 0
+Object 00126: 0.0369 0.2797 0.4553
+Object 00126: 0 0 0
+Object 00126: 0.4428 -0.0786 2.062
+Object 00126: 7
+Object 00126: Green_RPlastic
+Object 00126: 0
+Object 00126: 0
+Object 00126: Object0126
+Object 00126: -1
+Object 00126: 2 // display
+Object 00126: 1 1 1
+Object 00126: 0 0 0
+Object 00126: 0 0 0
+Object 00126: 1
+Object 00126: 0
+Object 00126: 0
+Object 00126: 0 0
+Object 00126: 0
+Object 00126: 1
+Object 00126: 0
+Object 00126: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00126: 0000000000000
+Object 00126: 0 0
+Object 00126: # 0 0 0 0 0 0 0 0
+Object 00126: # 0 0 0 0 0 0 0 0
+Object 00126: 0 0
+
+Object 00127: 5
+Object 00127: 0.831 0 0
+Object 00127: 0.1948 0.1948 0.2456
+Object 00127: 90 0 0
+Object 00127: -0.8882 -0.0451 2.053
+Object 00127: 7
+Object 00127: Green_RPlastic
+Object 00127: 0
+Object 00127: 0
+Object 00127: Object0127
+Object 00127: -1
+Object 00127: 2 // display
+Object 00127: 1 1 1
+Object 00127: 0 0 0
+Object 00127: 0 0 0
+Object 00127: 1
+Object 00127: 0
+Object 00127: 0
+Object 00127: 0 0
+Object 00127: 0
+Object 00127: 1
+Object 00127: 0
+Object 00127: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00127: 0000000000000
+Object 00127: 0 0
+Object 00127: # 0 0 0 0 0 0 0 0
+Object 00127: # 0 0 0 0 0 0 0 0
+Object 00127: 0 0
+
+Object 00128: 5
+Object 00128: 0.831 0 0
+Object 00128: 0.1948 0.1948 0.2456
+Object 00128: 90 0 0
+Object 00128: 0.0835 -0.0451 2.053
+Object 00128: 7
+Object 00128: Green_RPlastic
+Object 00128: 0
+Object 00128: 0
+Object 00128: Object0128
+Object 00128: -1
+Object 00128: 2 // display
+Object 00128: 1 1 1
+Object 00128: 0 0 0
+Object 00128: 0 0 0
+Object 00128: 1
+Object 00128: 0
+Object 00128: 0
+Object 00128: 0 0
+Object 00128: 0
+Object 00128: 1
+Object 00128: 0
+Object 00128: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00128: 0000000000000
+Object 00128: 0 0
+Object 00128: # 0 0 0 0 0 0 0 0
+Object 00128: # 0 0 0 0 0 0 0 0
+Object 00128: 0 0
+
+Object 00129: 5
+Object 00129: 0.831 0 0
+Object 00129: 0.1948 0.1948 0.2456
+Object 00129: 90 0 0
+Object 00129: -0.3942 -0.0451 2.053
+Object 00129: 7
+Object 00129: Green_RPlastic
+Object 00129: 0
+Object 00129: 0
+Object 00129: Object0129
+Object 00129: -1
+Object 00129: 2 // display
+Object 00129: 1 1 1
+Object 00129: 0 0 0
+Object 00129: 0 0 0
+Object 00129: 1
+Object 00129: 0
+Object 00129: 0
+Object 00129: 0 0
+Object 00129: 0
+Object 00129: 1
+Object 00129: 0
+Object 00129: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00129: 0000000000000
+Object 00129: 0 0
+Object 00129: # 0 0 0 0 0 0 0 0
+Object 00129: # 0 0 0 0 0 0 0 0
+Object 00129: 0 0
+
+Object 00130: 2
+Object 00130: 0 0 0
+Object 00130: 0.8956 0.0361 0.4553
+Object 00130: 90 0 0
+Object 00130: -0.3559 -0.2564 0.2985
+Object 00130: 7
+Object 00130: Red_RPlastic
+Object 00130: 0
+Object 00130: 0
+Object 00130: Object0130
+Object 00130: -1
+Object 00130: 2 // display
+Object 00130: 1 1 1
+Object 00130: 0 0 0
+Object 00130: 0 0 0
+Object 00130: 1
+Object 00130: 0
+Object 00130: 0
+Object 00130: 0 0
+Object 00130: 0
+Object 00130: 1
+Object 00130: 0
+Object 00130: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00130: 0000000000000
+Object 00130: 0 0
+Object 00130: # 0 0 0 0 0 0 0 0
+Object 00130: # 0 0 0 0 0 0 0 0
+Object 00130: 0 0
+
+Object 00131: 0
+Object 00131: 0 0 0
+Object 00131: 0.1431 0.0563 0.1431
+Object 00131: 90 0 0
+Object 00131: -0.9975 -0.0512 0.3905
+Object 00131: 7
+Object 00131: Red_RPlastic
+Object 00131: 0
+Object 00131: 0
+Object 00131: Object0131
+Object 00131: -1
+Object 00131: 2 // display
+Object 00131: 1 1 1
+Object 00131: 0 0 0
+Object 00131: 0 0 0
+Object 00131: 1
+Object 00131: 0
+Object 00131: 0
+Object 00131: 0 0
+Object 00131: 0
+Object 00131: 1
+Object 00131: 0
+Object 00131: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00131: 0000000000000
+Object 00131: 0 0
+Object 00131: # 0 0 0 0 0 0 0 0
+Object 00131: # 0 0 0 0 0 0 0 0
+Object 00131: 0 0
+
+Object 00132: 0
+Object 00132: 0 0 0
+Object 00132: 0.1431 0.0563 0.1431
+Object 00132: 90 0 0
+Object 00132: -0.9975 -0.466 0.3905
+Object 00132: 7
+Object 00132: Red_RPlastic
+Object 00132: 0
+Object 00132: 0
+Object 00132: Object0132
+Object 00132: -1
+Object 00132: 2 // display
+Object 00132: 1 1 1
+Object 00132: 0 0 0
+Object 00132: 0 0 0
+Object 00132: 1
+Object 00132: 0
+Object 00132: 0
+Object 00132: 0 0
+Object 00132: 0
+Object 00132: 1
+Object 00132: 0
+Object 00132: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00132: 0000000000000
+Object 00132: 0 0
+Object 00132: # 0 0 0 0 0 0 0 0
+Object 00132: # 0 0 0 0 0 0 0 0
+Object 00132: 0 0
+
+Object 00133: 0
+Object 00133: 0 0 0
+Object 00133: 0.1431 0.0563 0.1431
+Object 00133: 90 0 0
+Object 00133: 0.3115 -0.466 0.3905
+Object 00133: 7
+Object 00133: Red_RPlastic
+Object 00133: 0
+Object 00133: 0
+Object 00133: Object0133
+Object 00133: -1
+Object 00133: 2 // display
+Object 00133: 1 1 1
+Object 00133: 0 0 0
+Object 00133: 0 0 0
+Object 00133: 1
+Object 00133: 0
+Object 00133: 0
+Object 00133: 0 0
+Object 00133: 0
+Object 00133: 1
+Object 00133: 0
+Object 00133: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00133: 0000000000000
+Object 00133: 0 0
+Object 00133: # 0 0 0 0 0 0 0 0
+Object 00133: # 0 0 0 0 0 0 0 0
+Object 00133: 0 0
+
+Object 00134: 0
+Object 00134: 0 0 0
+Object 00134: 0.1431 0.0563 0.1431
+Object 00134: 90 0 0
+Object 00134: 0.3115 -0.048 0.3905
+Object 00134: 7
+Object 00134: Red_RPlastic
+Object 00134: 0
+Object 00134: 0
+Object 00134: Object0134
+Object 00134: -1
+Object 00134: 2 // display
+Object 00134: 1 1 1
+Object 00134: 0 0 0
+Object 00134: 0 0 0
+Object 00134: 1
+Object 00134: 0
+Object 00134: 0
+Object 00134: 0 0
+Object 00134: 0
+Object 00134: 1
+Object 00134: 0
+Object 00134: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00134: 0000000000000
+Object 00134: 0 0
+Object 00134: # 0 0 0 0 0 0 0 0
+Object 00134: # 0 0 0 0 0 0 0 0
+Object 00134: 0 0
+
+Object 00135: 0
+Object 00135: 0 0 0
+Object 00135: 0.1431 0.0563 0.1431
+Object 00135: 90 0 0
+Object 00135: -0.1141 -0.0501 0.3905
+Object 00135: 7
+Object 00135: Red_RPlastic
+Object 00135: 0
+Object 00135: 0
+Object 00135: Object0135
+Object 00135: -1
+Object 00135: 2 // display
+Object 00135: 1 1 1
+Object 00135: 0 0 0
+Object 00135: 0 0 0
+Object 00135: 1
+Object 00135: 0
+Object 00135: 0
+Object 00135: 0 0
+Object 00135: 0
+Object 00135: 1
+Object 00135: 0
+Object 00135: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00135: 0000000000000
+Object 00135: 0 0
+Object 00135: # 0 0 0 0 0 0 0 0
+Object 00135: # 0 0 0 0 0 0 0 0
+Object 00135: 0 0
+
+Object 00136: 0
+Object 00136: 0 0 0
+Object 00136: 0.1431 0.0563 0.1431
+Object 00136: 90 0 0
+Object 00136: -0.1141 -0.4592 0.3905
+Object 00136: 7
+Object 00136: Red_RPlastic
+Object 00136: 0
+Object 00136: 0
+Object 00136: Object0136
+Object 00136: -1
+Object 00136: 2 // display
+Object 00136: 1 1 1
+Object 00136: 0 0 0
+Object 00136: 0 0 0
+Object 00136: 1
+Object 00136: 0
+Object 00136: 0
+Object 00136: 0 0
+Object 00136: 0
+Object 00136: 1
+Object 00136: 0
+Object 00136: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00136: 0000000000000
+Object 00136: 0 0
+Object 00136: # 0 0 0 0 0 0 0 0
+Object 00136: # 0 0 0 0 0 0 0 0
+Object 00136: 0 0
+
+Object 00137: 0
+Object 00137: 0 0 0
+Object 00137: 0.1431 0.0563 0.1431
+Object 00137: 90 0 0
+Object 00137: -0.5558 -0.466 0.3905
+Object 00137: 7
+Object 00137: Red_RPlastic
+Object 00137: 0
+Object 00137: 0
+Object 00137: Object0137
+Object 00137: -1
+Object 00137: 2 // display
+Object 00137: 1 1 1
+Object 00137: 0 0 0
+Object 00137: 0 0 0
+Object 00137: 1
+Object 00137: 0
+Object 00137: 0
+Object 00137: 0 0
+Object 00137: 0
+Object 00137: 1
+Object 00137: 0
+Object 00137: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00137: 0000000000000
+Object 00137: 0 0
+Object 00137: # 0 0 0 0 0 0 0 0
+Object 00137: # 0 0 0 0 0 0 0 0
+Object 00137: 0 0
+
+Object 00138: 0
+Object 00138: 0 0 0
+Object 00138: 0.1431 0.0563 0.1431
+Object 00138: 90 0 0
+Object 00138: -0.5558 -0.0512 0.3905
+Object 00138: 7
+Object 00138: Red_RPlastic
+Object 00138: 0
+Object 00138: 0
+Object 00138: Object0138
+Object 00138: -1
+Object 00138: 2 // display
+Object 00138: 1 1 1
+Object 00138: 0 0 0
+Object 00138: 0 0 0
+Object 00138: 1
+Object 00138: 0
+Object 00138: 0
+Object 00138: 0 0
+Object 00138: 0
+Object 00138: 1
+Object 00138: 0
+Object 00138: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00138: 0000000000000
+Object 00138: 0 0
+Object 00138: # 0 0 0 0 0 0 0 0
+Object 00138: # 0 0 0 0 0 0 0 0
+Object 00138: 0 0
+
+Object 00139: 2
+Object 00139: 0 0 0
+Object 00139: 0.8956 0.2797 0.0393
+Object 00139: 90 0 0
+Object 00139: -0.3563 0.1599 0.0549
+Object 00139: 7
+Object 00139: Red_RPlastic
+Object 00139: 0
+Object 00139: 0
+Object 00139: Object0139
+Object 00139: -1
+Object 00139: 2 // display
+Object 00139: 1 1 1
+Object 00139: 0 0 0
+Object 00139: 0 0 0
+Object 00139: 1
+Object 00139: 0
+Object 00139: 0
+Object 00139: 0 0
+Object 00139: 0
+Object 00139: 1
+Object 00139: 0
+Object 00139: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00139: 0000000000000
+Object 00139: 0 0
+Object 00139: # 0 0 0 0 0 0 0 0
+Object 00139: # 0 0 0 0 0 0 0 0
+Object 00139: 0 0
+
+Object 00140: 2
+Object 00140: 0 0 0
+Object 00140: 0.8956 0.2797 0.0393
+Object 00140: 90 0 0
+Object 00140: -0.3563 -0.6725 0.0549
+Object 00140: 7
+Object 00140: Red_RPlastic
+Object 00140: 0
+Object 00140: 0
+Object 00140: Object0140
+Object 00140: -1
+Object 00140: 2 // display
+Object 00140: 1 1 1
+Object 00140: 0 0 0
+Object 00140: 0 0 0
+Object 00140: 1
+Object 00140: 0
+Object 00140: 0
+Object 00140: 0 0
+Object 00140: 0
+Object 00140: 1
+Object 00140: 0
+Object 00140: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00140: 0000000000000
+Object 00140: 0 0
+Object 00140: # 0 0 0 0 0 0 0 0
+Object 00140: # 0 0 0 0 0 0 0 0
+Object 00140: 0 0
+
+Object 00141: 2
+Object 00141: 0 0 0
+Object 00141: 0.0369 0.2797 0.4553
+Object 00141: 90 0 0
+Object 00141: -1.215 -0.2564 0.0549
+Object 00141: 7
+Object 00141: Red_RPlastic
+Object 00141: 0
+Object 00141: 0
+Object 00141: Object0141
+Object 00141: -1
+Object 00141: 2 // display
+Object 00141: 1 1 1
+Object 00141: 0 0 0
+Object 00141: 0 0 0
+Object 00141: 1
+Object 00141: 0
+Object 00141: 0
+Object 00141: 0 0
+Object 00141: 0
+Object 00141: 1
+Object 00141: 0
+Object 00141: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00141: 0000000000000
+Object 00141: 0 0
+Object 00141: # 0 0 0 0 0 0 0 0
+Object 00141: # 0 0 0 0 0 0 0 0
+Object 00141: 0 0
+
+Object 00142: 2
+Object 00142: 0 0 0
+Object 00142: 0.0369 0.2797 0.4553
+Object 00142: 90 0 0
+Object 00142: 0.5028 -0.2564 0.0549
+Object 00142: 7
+Object 00142: Red_RPlastic
+Object 00142: 0
+Object 00142: 0
+Object 00142: Object0142
+Object 00142: -1
+Object 00142: 2 // display
+Object 00142: 1 1 1
+Object 00142: 0 0 0
+Object 00142: 0 0 0
+Object 00142: 1
+Object 00142: 0
+Object 00142: 0
+Object 00142: 0 0
+Object 00142: 0
+Object 00142: 1
+Object 00142: 0
+Object 00142: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00142: 0000000000000
+Object 00142: 0 0
+Object 00142: # 0 0 0 0 0 0 0 0
+Object 00142: # 0 0 0 0 0 0 0 0
+Object 00142: 0 0
+
+Object 00143: 5
+Object 00143: 0.831 0 0
+Object 00143: 0.1948 0.1948 0.2456
+Object 00143: 180 0 0
+Object 00143: -0.8282 -0.2652 0.0214
+Object 00143: 7
+Object 00143: Red_RPlastic
+Object 00143: 0
+Object 00143: 0
+Object 00143: Object0143
+Object 00143: -1
+Object 00143: 2 // display
+Object 00143: 1 1 1
+Object 00143: 0 0 0
+Object 00143: 0 0 0
+Object 00143: 1
+Object 00143: 0
+Object 00143: 0
+Object 00143: 0 0
+Object 00143: 0
+Object 00143: 1
+Object 00143: 96
+Object 00143: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00143: 0000000000000
+Object 00143: 0 0
+Object 00143: # 0 0 0 0 0 0 0 0
+Object 00143: # 0 0 0 0 0 0 0 0
+Object 00143: 0 0
+
+Object 00144: 5
+Object 00144: 0.831 0 0
+Object 00144: 0.1948 0.1948 0.2456
+Object 00144: 180 0 0
+Object 00144: 0.1435 -0.2652 0.0214
+Object 00144: 7
+Object 00144: Red_RPlastic
+Object 00144: 0
+Object 00144: 0
+Object 00144: Object0144
+Object 00144: -1
+Object 00144: 2 // display
+Object 00144: 1 1 1
+Object 00144: 0 0 0
+Object 00144: 0 0 0
+Object 00144: 1
+Object 00144: 0
+Object 00144: 0
+Object 00144: 0 0
+Object 00144: 0
+Object 00144: 1
+Object 00144: 0
+Object 00144: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00144: 0000000000000
+Object 00144: 0 0
+Object 00144: # 0 0 0 0 0 0 0 0
+Object 00144: # 0 0 0 0 0 0 0 0
+Object 00144: 0 0
+
+Object 00145: 5
+Object 00145: 0.831 0 0
+Object 00145: 0.1948 0.1948 0.2456
+Object 00145: 180 0 0
+Object 00145: -0.3342 -0.2652 0.0214
+Object 00145: 7
+Object 00145: Red_RPlastic
+Object 00145: 0
+Object 00145: 0
+Object 00145: Object0145
+Object 00145: -1
+Object 00145: 2 // display
+Object 00145: 1 1 1
+Object 00145: 0 0 0
+Object 00145: 0 0 0
+Object 00145: 1
+Object 00145: 0
+Object 00145: 0
+Object 00145: 0 0
+Object 00145: 0
+Object 00145: 1
+Object 00145: 0
+Object 00145: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00145: 0000000000000
+Object 00145: 0 0
+Object 00145: # 0 0 0 0 0 0 0 0
+Object 00145: # 0 0 0 0 0 0 0 0
+Object 00145: 0 0
+
+Object 00146: 2
+Object 00146: 0 0 0
+Object 00146: 0.8956 0.0361 0.4553
+Object 00146: 0 59 0
+Object 00146: -3.373 -0.3222 -0.6718
+Object 00146: 7
+Object 00146: White_RPlastic
+Object 00146: 0
+Object 00146: 0
+Object 00146: Object0146
+Object 00146: -1
+Object 00146: 2 // display
+Object 00146: 1 1 1
+Object 00146: 0 0 0
+Object 00146: 0 0 0
+Object 00146: 1
+Object 00146: 0
+Object 00146: 0
+Object 00146: 0 0
+Object 00146: 0
+Object 00146: 1
+Object 00146: 0
+Object 00146: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00146: 0000000000000
+Object 00146: 0 0
+Object 00146: # 0 0 0 0 0 0 0 0
+Object 00146: # 0 0 0 0 0 0 0 0
+Object 00146: 0 0
+
+Object 00147: 0
+Object 00147: 0 0 0
+Object 00147: 0.1431 0.0563 0.1431
+Object 00147: 0 59 0
+Object 00147: -3.527 -0.4142 -0.0162
+Object 00147: 7
+Object 00147: White_RPlastic
+Object 00147: 0
+Object 00147: 0
+Object 00147: Object0147
+Object 00147: -1
+Object 00147: 2 // display
+Object 00147: 1 1 1
+Object 00147: 0 0 0
+Object 00147: 0 0 0
+Object 00147: 1
+Object 00147: 0
+Object 00147: 0
+Object 00147: 0 0
+Object 00147: 0
+Object 00147: 1
+Object 00147: 0
+Object 00147: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00147: 0000000000000
+Object 00147: 0 0
+Object 00147: # 0 0 0 0 0 0 0 0
+Object 00147: # 0 0 0 0 0 0 0 0
+Object 00147: 0 0
+
+Object 00148: 0
+Object 00148: 0 0 0
+Object 00148: 0.1431 0.0563 0.1431
+Object 00148: 0 59 0
+Object 00148: -3.883 -0.4142 -0.2298
+Object 00148: 7
+Object 00148: White_RPlastic
+Object 00148: 0
+Object 00148: 0
+Object 00148: Object0148
+Object 00148: -1
+Object 00148: 2 // display
+Object 00148: 1 1 1
+Object 00148: 0 0 0
+Object 00148: 0 0 0
+Object 00148: 1
+Object 00148: 0
+Object 00148: 0
+Object 00148: 0 0
+Object 00148: 0
+Object 00148: 1
+Object 00148: 0
+Object 00148: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00148: 0000000000000
+Object 00148: 0 0
+Object 00148: # 0 0 0 0 0 0 0 0
+Object 00148: # 0 0 0 0 0 0 0 0
+Object 00148: 0 0
+
+Object 00149: 0
+Object 00149: 0 0 0
+Object 00149: 0.1431 0.0563 0.1431
+Object 00149: 0 59 0
+Object 00149: -3.209 -0.4142 -1.352
+Object 00149: 7
+Object 00149: White_RPlastic
+Object 00149: 0
+Object 00149: 0
+Object 00149: Object0149
+Object 00149: -1
+Object 00149: 2 // display
+Object 00149: 1 1 1
+Object 00149: 0 0 0
+Object 00149: 0 0 0
+Object 00149: 1
+Object 00149: 0
+Object 00149: 0
+Object 00149: 0 0
+Object 00149: 0
+Object 00149: 1
+Object 00149: 0
+Object 00149: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00149: 0000000000000
+Object 00149: 0 0
+Object 00149: # 0 0 0 0 0 0 0 0
+Object 00149: # 0 0 0 0 0 0 0 0
+Object 00149: 0 0
+
+Object 00150: 0
+Object 00150: 0 0 0
+Object 00150: 0.1431 0.0563 0.1431
+Object 00150: 0 59 0
+Object 00150: -2.851 -0.4142 -1.137
+Object 00150: 7
+Object 00150: White_RPlastic
+Object 00150: 0
+Object 00150: 0
+Object 00150: Object0150
+Object 00150: -1
+Object 00150: 2 // display
+Object 00150: 1 1 1
+Object 00150: 0 0 0
+Object 00150: 0 0 0
+Object 00150: 1
+Object 00150: 0
+Object 00150: 0
+Object 00150: 0 0
+Object 00150: 0
+Object 00150: 1
+Object 00150: 0
+Object 00150: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00150: 0000000000000
+Object 00150: 0 0
+Object 00150: # 0 0 0 0 0 0 0 0
+Object 00150: # 0 0 0 0 0 0 0 0
+Object 00150: 0 0
+
+Object 00151: 0
+Object 00151: 0 0 0
+Object 00151: 0.1431 0.0563 0.1431
+Object 00151: 0 59 0
+Object 00151: -3.072 -0.4142 -0.7729
+Object 00151: 7
+Object 00151: White_RPlastic
+Object 00151: 0
+Object 00151: 0
+Object 00151: Object0151
+Object 00151: -1
+Object 00151: 2 // display
+Object 00151: 1 1 1
+Object 00151: 0 0 0
+Object 00151: 0 0 0
+Object 00151: 1
+Object 00151: 0
+Object 00151: 0
+Object 00151: 0 0
+Object 00151: 0
+Object 00151: 1
+Object 00151: 0
+Object 00151: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00151: 0000000000000
+Object 00151: 0 0
+Object 00151: # 0 0 0 0 0 0 0 0
+Object 00151: # 0 0 0 0 0 0 0 0
+Object 00151: 0 0
+
+Object 00152: 0
+Object 00152: 0 0 0
+Object 00152: 0.1431 0.0563 0.1431
+Object 00152: 0 59 0
+Object 00152: -3.422 -0.4142 -0.9835
+Object 00152: 7
+Object 00152: White_RPlastic
+Object 00152: 0
+Object 00152: 0
+Object 00152: Object0152
+Object 00152: -1
+Object 00152: 2 // display
+Object 00152: 1 1 1
+Object 00152: 0 0 0
+Object 00152: 0 0 0
+Object 00152: 1
+Object 00152: 0
+Object 00152: 0
+Object 00152: 0 0
+Object 00152: 0
+Object 00152: 1
+Object 00152: 0
+Object 00152: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00152: 0000000000000
+Object 00152: 0 0
+Object 00152: # 0 0 0 0 0 0 0 0
+Object 00152: # 0 0 0 0 0 0 0 0
+Object 00152: 0 0
+
+Object 00153: 0
+Object 00153: 0 0 0
+Object 00153: 0.1431 0.0563 0.1431
+Object 00153: 0 59 0
+Object 00153: -3.655 -0.4142 -0.6084
+Object 00153: 7
+Object 00153: White_RPlastic
+Object 00153: 0
+Object 00153: 0
+Object 00153: Object0153
+Object 00153: -1
+Object 00153: 2 // display
+Object 00153: 1 1 1
+Object 00153: 0 0 0
+Object 00153: 0 0 0
+Object 00153: 1
+Object 00153: 0
+Object 00153: 0
+Object 00153: 0 0
+Object 00153: 0
+Object 00153: 1
+Object 00153: 0
+Object 00153: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00153: 0000000000000
+Object 00153: 0 0
+Object 00153: # 0 0 0 0 0 0 0 0
+Object 00153: # 0 0 0 0 0 0 0 0
+Object 00153: 0 0
+
+Object 00154: 0
+Object 00154: 0 0 0
+Object 00154: 0.1431 0.0563 0.1431
+Object 00154: 0 59 0
+Object 00154: -3.3 -0.4142 -0.3948
+Object 00154: 7
+Object 00154: White_RPlastic
+Object 00154: 0
+Object 00154: 0
+Object 00154: Object0154
+Object 00154: -1
+Object 00154: 2 // display
+Object 00154: 1 1 1
+Object 00154: 0 0 0
+Object 00154: 0 0 0
+Object 00154: 1
+Object 00154: 0
+Object 00154: 0
+Object 00154: 0 0
+Object 00154: 0
+Object 00154: 1
+Object 00154: 0
+Object 00154: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00154: 0000000000000
+Object 00154: 0 0
+Object 00154: # 0 0 0 0 0 0 0 0
+Object 00154: # 0 0 0 0 0 0 0 0
+Object 00154: 0 0
+
+Object 00155: 2
+Object 00155: 0 0 0
+Object 00155: 0.8956 0.2797 0.0393
+Object 00155: 0 59 0
+Object 00155: -3.016 -0.0786 -0.4571
+Object 00155: 7
+Object 00155: White_RPlastic
+Object 00155: 0
+Object 00155: 0
+Object 00155: Object0155
+Object 00155: -1
+Object 00155: 2 // display
+Object 00155: 1 1 1
+Object 00155: 0 0 0
+Object 00155: 0 0 0
+Object 00155: 1
+Object 00155: 0
+Object 00155: 0
+Object 00155: 0 0
+Object 00155: 0
+Object 00155: 1
+Object 00155: 0
+Object 00155: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00155: 0000000000000
+Object 00155: 0 0
+Object 00155: # 0 0 0 0 0 0 0 0
+Object 00155: # 0 0 0 0 0 0 0 0
+Object 00155: 0 0
+
+Object 00156: 2
+Object 00156: 0 0 0
+Object 00156: 0.8956 0.2797 0.0393
+Object 00156: 0 59 0
+Object 00156: -3.73 -0.0786 -0.8858
+Object 00156: 7
+Object 00156: White_RPlastic
+Object 00156: 0
+Object 00156: 0
+Object 00156: Object0156
+Object 00156: -1
+Object 00156: 2 // display
+Object 00156: 1 1 1
+Object 00156: 0 0 0
+Object 00156: 0 0 0
+Object 00156: 1
+Object 00156: 0
+Object 00156: 0
+Object 00156: 0 0
+Object 00156: 0
+Object 00156: 1
+Object 00156: 0
+Object 00156: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00156: 0000000000000
+Object 00156: 0 0
+Object 00156: # 0 0 0 0 0 0 0 0
+Object 00156: # 0 0 0 0 0 0 0 0
+Object 00156: 0 0
+
+Object 00157: 2
+Object 00157: 0 0 0
+Object 00157: 0.0369 0.2797 0.4553
+Object 00157: 0 59 0
+Object 00157: -3.815 -0.0786 0.0643
+Object 00157: 7
+Object 00157: White_RPlastic
+Object 00157: 0
+Object 00157: 0
+Object 00157: Object0157
+Object 00157: -1
+Object 00157: 2 // display
+Object 00157: 1 1 1
+Object 00157: 0 0 0
+Object 00157: 0 0 0
+Object 00157: 1
+Object 00157: 0
+Object 00157: 0
+Object 00157: 0 0
+Object 00157: 0
+Object 00157: 1
+Object 00157: 0
+Object 00157: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00157: 0000000000000
+Object 00157: 0 0
+Object 00157: # 0 0 0 0 0 0 0 0
+Object 00157: # 0 0 0 0 0 0 0 0
+Object 00157: 0 0
+
+Object 00158: 2
+Object 00158: 0 0 0
+Object 00158: 0.0369 0.2797 0.4553
+Object 00158: 0 59 0
+Object 00158: -2.931 -0.0786 -1.408
+Object 00158: 7
+Object 00158: White_RPlastic
+Object 00158: 0
+Object 00158: 0
+Object 00158: Object0158
+Object 00158: -1
+Object 00158: 2 // display
+Object 00158: 1 1 1
+Object 00158: 0 0 0
+Object 00158: 0 0 0
+Object 00158: 1
+Object 00158: 0
+Object 00158: 0
+Object 00158: 0 0
+Object 00158: 0
+Object 00158: 1
+Object 00158: 0
+Object 00158: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00158: 0000000000000
+Object 00158: 0 0
+Object 00158: # 0 0 0 0 0 0 0 0
+Object 00158: # 0 0 0 0 0 0 0 0
+Object 00158: 0 0
+
+Object 00159: 5
+Object 00159: 0.831 0 0
+Object 00159: 0.1948 0.1948 0.2456
+Object 00159: 90 59 0
+Object 00159: -3.624 -0.0451 -0.2715
+Object 00159: 7
+Object 00159: White_RPlastic
+Object 00159: 0
+Object 00159: 0
+Object 00159: Object0159
+Object 00159: -1
+Object 00159: 2 // display
+Object 00159: 1 1 1
+Object 00159: 0 0 0
+Object 00159: 0 0 0
+Object 00159: 1
+Object 00159: 0
+Object 00159: 0
+Object 00159: 0 0
+Object 00159: 0
+Object 00159: 1
+Object 00159: 0
+Object 00159: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00159: 0000000000000
+Object 00159: 0 0
+Object 00159: # 0 0 0 0 0 0 0 0
+Object 00159: # 0 0 0 0 0 0 0 0
+Object 00159: 0 0
+
+Object 00160: 5
+Object 00160: 0.831 0 0
+Object 00160: 0.1948 0.1948 0.2456
+Object 00160: 90 59 0
+Object 00160: -3.123 -0.0451 -1.104
+Object 00160: 7
+Object 00160: White_RPlastic
+Object 00160: 0
+Object 00160: 0
+Object 00160: Object0160
+Object 00160: -1
+Object 00160: 2 // display
+Object 00160: 1 1 1
+Object 00160: 0 0 0
+Object 00160: 0 0 0
+Object 00160: 1
+Object 00160: 0
+Object 00160: 0
+Object 00160: 0 0
+Object 00160: 0
+Object 00160: 1
+Object 00160: 0
+Object 00160: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00160: 0000000000000
+Object 00160: 0 0
+Object 00160: # 0 0 0 0 0 0 0 0
+Object 00160: # 0 0 0 0 0 0 0 0
+Object 00160: 0 0
+
+Object 00161: 5
+Object 00161: 0.831 0 0
+Object 00161: 0.1948 0.1948 0.2456
+Object 00161: 90 59 0
+Object 00161: -3.369 -0.0451 -0.6949
+Object 00161: 7
+Object 00161: White_RPlastic
+Object 00161: 0
+Object 00161: 0
+Object 00161: Object0161
+Object 00161: -1
+Object 00161: 2 // display
+Object 00161: 1 1 1
+Object 00161: 0 0 0
+Object 00161: 0 0 0
+Object 00161: 1
+Object 00161: 0
+Object 00161: 0
+Object 00161: 0 0
+Object 00161: 0
+Object 00161: 1
+Object 00161: 0
+Object 00161: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00161: 0000000000000
+Object 00161: 0 0
+Object 00161: # 0 0 0 0 0 0 0 0
+Object 00161: # 0 0 0 0 0 0 0 0
+Object 00161: 0 0
+
+Object 00162: 2
+Object 00162: 0 0 0
+Object 00162: 0.8956 0.0361 0.4553
+Object 00162: 0 0 270
+Object 00162: -0.2286 -0.6877 4.278
+Object 00162: 7
+Object 00162: Blue_RPlastic
+Object 00162: 0
+Object 00162: 0
+Object 00162: Object0162
+Object 00162: -1
+Object 00162: 2 // display
+Object 00162: 1 1 1
+Object 00162: 0 0 0
+Object 00162: 0 0 0
+Object 00162: 1
+Object 00162: 0
+Object 00162: 0
+Object 00162: 0 0
+Object 00162: 0
+Object 00162: 1
+Object 00162: 0
+Object 00162: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00162: 0000000000000
+Object 00162: 0 0
+Object 00162: # 0 0 0 0 0 0 0 0
+Object 00162: # 0 0 0 0 0 0 0 0
+Object 00162: 0 0
+
+Object 00163: 0
+Object 00163: 0 0 0
+Object 00163: 0.1431 0.0563 0.1431
+Object 00163: 0 0 270
+Object 00163: -0.1366 -1.329 4.483
+Object 00163: 7
+Object 00163: Blue_RPlastic
+Object 00163: 0
+Object 00163: 0
+Object 00163: Object0163
+Object 00163: -1
+Object 00163: 2 // display
+Object 00163: 1 1 1
+Object 00163: 0 0 0
+Object 00163: 0 0 0
+Object 00163: 1
+Object 00163: 0
+Object 00163: 0
+Object 00163: 0 0
+Object 00163: 0
+Object 00163: 1
+Object 00163: 0
+Object 00163: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00163: 0000000000000
+Object 00163: 0 0
+Object 00163: # 0 0 0 0 0 0 0 0
+Object 00163: # 0 0 0 0 0 0 0 0
+Object 00163: 0 0
+
+Object 00164: 0
+Object 00164: 0 0 0
+Object 00164: 0.1431 0.0563 0.1431
+Object 00164: 0 0 270
+Object 00164: -0.1366 -1.329 4.069
+Object 00164: 7
+Object 00164: Blue_RPlastic
+Object 00164: 0
+Object 00164: 0
+Object 00164: Object0164
+Object 00164: -1
+Object 00164: 2 // display
+Object 00164: 1 1 1
+Object 00164: 0 0 0
+Object 00164: 0 0 0
+Object 00164: 1
+Object 00164: 0
+Object 00164: 0
+Object 00164: 0 0
+Object 00164: 0
+Object 00164: 1
+Object 00164: 136
+Object 00164: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00164: 0000000000000
+Object 00164: 0 0
+Object 00164: # 0 0 0 0 0 0 0 0
+Object 00164: # 0 0 0 0 0 0 0 0
+Object 00164: 0 0
+
+Object 00165: 0
+Object 00165: 0 0 0
+Object 00165: 0.1431 0.0563 0.1431
+Object 00165: 0 0 270
+Object 00165: -0.1366 -0.0203 4.069
+Object 00165: 7
+Object 00165: Blue_RPlastic
+Object 00165: 0
+Object 00165: 0
+Object 00165: Object0165
+Object 00165: -1
+Object 00165: 2 // display
+Object 00165: 1 1 1
+Object 00165: 0 0 0
+Object 00165: 0 0 0
+Object 00165: 1
+Object 00165: 0
+Object 00165: 0
+Object 00165: 0 0
+Object 00165: 0
+Object 00165: 1
+Object 00165: 0
+Object 00165: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00165: 0000000000000
+Object 00165: 0 0
+Object 00165: # 0 0 0 0 0 0 0 0
+Object 00165: # 0 0 0 0 0 0 0 0
+Object 00165: 0 0
+
+Object 00166: 0
+Object 00166: 0 0 0
+Object 00166: 0.1431 0.0563 0.1431
+Object 00166: 0 0 270
+Object 00166: -0.1366 -0.0203 4.486
+Object 00166: 7
+Object 00166: Blue_RPlastic
+Object 00166: 0
+Object 00166: 0
+Object 00166: Object0166
+Object 00166: -1
+Object 00166: 2 // display
+Object 00166: 1 1 1
+Object 00166: 0 0 0
+Object 00166: 0 0 0
+Object 00166: 1
+Object 00166: 0
+Object 00166: 0
+Object 00166: 0 0
+Object 00166: 0
+Object 00166: 1
+Object 00166: 0
+Object 00166: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00166: 0000000000000
+Object 00166: 0 0
+Object 00166: # 0 0 0 0 0 0 0 0
+Object 00166: # 0 0 0 0 0 0 0 0
+Object 00166: 0 0
+
+Object 00167: 0
+Object 00167: 0 0 0
+Object 00167: 0.1431 0.0563 0.1431
+Object 00167: 0 0 270
+Object 00167: -0.1366 -0.4459 4.484
+Object 00167: 7
+Object 00167: Blue_RPlastic
+Object 00167: 0
+Object 00167: 0
+Object 00167: Object0167
+Object 00167: -1
+Object 00167: 2 // display
+Object 00167: 1 1 1
+Object 00167: 0 0 0
+Object 00167: 0 0 0
+Object 00167: 1
+Object 00167: 0
+Object 00167: 0
+Object 00167: 0 0
+Object 00167: 0
+Object 00167: 1
+Object 00167: 0
+Object 00167: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00167: 0000000000000
+Object 00167: 0 0
+Object 00167: # 0 0 0 0 0 0 0 0
+Object 00167: # 0 0 0 0 0 0 0 0
+Object 00167: 0 0
+
+Object 00168: 0
+Object 00168: 0 0 0
+Object 00168: 0.1431 0.0563 0.1431
+Object 00168: 0 0 270
+Object 00168: -0.1366 -0.4459 4.075
+Object 00168: 7
+Object 00168: Blue_RPlastic
+Object 00168: 0
+Object 00168: 0
+Object 00168: Object0168
+Object 00168: -1
+Object 00168: 2 // display
+Object 00168: 1 1 1
+Object 00168: 0 0 0
+Object 00168: 0 0 0
+Object 00168: 1
+Object 00168: 0
+Object 00168: 0
+Object 00168: 0 0
+Object 00168: 0
+Object 00168: 1
+Object 00168: 0
+Object 00168: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00168: 0000000000000
+Object 00168: 0 0
+Object 00168: # 0 0 0 0 0 0 0 0
+Object 00168: # 0 0 0 0 0 0 0 0
+Object 00168: 0 0
+
+Object 00169: 0
+Object 00169: 0 0 0
+Object 00169: 0.1431 0.0563 0.1431
+Object 00169: 0 0 270
+Object 00169: -0.1366 -0.8876 4.069
+Object 00169: 7
+Object 00169: Blue_RPlastic
+Object 00169: 0
+Object 00169: 0
+Object 00169: Object0169
+Object 00169: -1
+Object 00169: 2 // display
+Object 00169: 1 1 1
+Object 00169: 0 0 0
+Object 00169: 0 0 0
+Object 00169: 1
+Object 00169: 0
+Object 00169: 0
+Object 00169: 0 0
+Object 00169: 0
+Object 00169: 1
+Object 00169: 0
+Object 00169: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00169: 0000000000000
+Object 00169: 0 0
+Object 00169: # 0 0 0 0 0 0 0 0
+Object 00169: # 0 0 0 0 0 0 0 0
+Object 00169: 0 0
+
+Object 00170: 0
+Object 00170: 0 0 0
+Object 00170: 0.1431 0.0563 0.1431
+Object 00170: 0 0 270
+Object 00170: -0.1366 -0.8876 4.483
+Object 00170: 7
+Object 00170: Blue_RPlastic
+Object 00170: 0
+Object 00170: 0
+Object 00170: Object0170
+Object 00170: -1
+Object 00170: 2 // display
+Object 00170: 1 1 1
+Object 00170: 0 0 0
+Object 00170: 0 0 0
+Object 00170: 1
+Object 00170: 0
+Object 00170: 0
+Object 00170: 0 0
+Object 00170: 0
+Object 00170: 1
+Object 00170: 0
+Object 00170: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00170: 0000000000000
+Object 00170: 0 0
+Object 00170: # 0 0 0 0 0 0 0 0
+Object 00170: # 0 0 0 0 0 0 0 0
+Object 00170: 0 0
+
+Object 00171: 2
+Object 00171: 0 0 0
+Object 00171: 0.8956 0.2797 0.0393
+Object 00171: 0 0 270
+Object 00171: -0.4722 -0.6881 4.694
+Object 00171: 7
+Object 00171: Blue_RPlastic
+Object 00171: 0
+Object 00171: 0
+Object 00171: Object0171
+Object 00171: -1
+Object 00171: 2 // display
+Object 00171: 1 1 1
+Object 00171: 0 0 0
+Object 00171: 0 0 0
+Object 00171: 1
+Object 00171: 0
+Object 00171: 0
+Object 00171: 0 0
+Object 00171: 0
+Object 00171: 1
+Object 00171: 0
+Object 00171: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00171: 0000000000000
+Object 00171: 0 0
+Object 00171: # 0 0 0 0 0 0 0 0
+Object 00171: # 0 0 0 0 0 0 0 0
+Object 00171: 0 0
+
+Object 00172: 2
+Object 00172: 0 0 0
+Object 00172: 0.8956 0.2797 0.0393
+Object 00172: 0 0 270
+Object 00172: -0.4722 -0.6881 3.862
+Object 00172: 7
+Object 00172: Blue_RPlastic
+Object 00172: 0
+Object 00172: 0
+Object 00172: Object0172
+Object 00172: -1
+Object 00172: 2 // display
+Object 00172: 1 1 1
+Object 00172: 0 0 0
+Object 00172: 0 0 0
+Object 00172: 1
+Object 00172: 0
+Object 00172: 0
+Object 00172: 0 0
+Object 00172: 0
+Object 00172: 1
+Object 00172: 0
+Object 00172: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00172: 0000000000000
+Object 00172: 0 0
+Object 00172: # 0 0 0 0 0 0 0 0
+Object 00172: # 0 0 0 0 0 0 0 0
+Object 00172: 0 0
+
+Object 00173: 2
+Object 00173: 0 0 0
+Object 00173: 0.0369 0.2797 0.4553
+Object 00173: 0 0 270
+Object 00173: -0.4722 -1.546 4.278
+Object 00173: 7
+Object 00173: Blue_RPlastic
+Object 00173: 0
+Object 00173: 0
+Object 00173: Object0173
+Object 00173: -1
+Object 00173: 2 // display
+Object 00173: 1 1 1
+Object 00173: 0 0 0
+Object 00173: 0 0 0
+Object 00173: 1
+Object 00173: 0
+Object 00173: 0
+Object 00173: 0 0
+Object 00173: 0
+Object 00173: 1
+Object 00173: 0
+Object 00173: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00173: 0000000000000
+Object 00173: 0 0
+Object 00173: # 0 0 0 0 0 0 0 0
+Object 00173: # 0 0 0 0 0 0 0 0
+Object 00173: 0 0
+
+Object 00174: 2
+Object 00174: 0 0 0
+Object 00174: 0.0369 0.2797 0.4553
+Object 00174: 0 0 270
+Object 00174: -0.4722 0.171 4.278
+Object 00174: 7
+Object 00174: Blue_RPlastic
+Object 00174: 0
+Object 00174: 0
+Object 00174: Object0174
+Object 00174: -1
+Object 00174: 2 // display
+Object 00174: 1 1 1
+Object 00174: 0 0 0
+Object 00174: 0 0 0
+Object 00174: 1
+Object 00174: 0
+Object 00174: 0
+Object 00174: 0 0
+Object 00174: 0
+Object 00174: 1
+Object 00174: 0
+Object 00174: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00174: 0000000000000
+Object 00174: 0 0
+Object 00174: # 0 0 0 0 0 0 0 0
+Object 00174: # 0 0 0 0 0 0 0 0
+Object 00174: 0 0
+
+Object 00175: 5
+Object 00175: 0.831 0 0
+Object 00175: 0.1948 0.1948 0.2456
+Object 00175: 90 0 270
+Object 00175: -0.5057 -1.16 4.269
+Object 00175: 7
+Object 00175: Blue_RPlastic
+Object 00175: 0
+Object 00175: 0
+Object 00175: Object0175
+Object 00175: -1
+Object 00175: 2 // display
+Object 00175: 1 1 1
+Object 00175: 0 0 0
+Object 00175: 0 0 0
+Object 00175: 1
+Object 00175: 0
+Object 00175: 0
+Object 00175: 0 0
+Object 00175: 0
+Object 00175: 1
+Object 00175: 0
+Object 00175: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00175: 0000000000000
+Object 00175: 0 0
+Object 00175: # 0 0 0 0 0 0 0 0
+Object 00175: # 0 0 0 0 0 0 0 0
+Object 00175: 0 0
+
+Object 00176: 5
+Object 00176: 0.831 0 0
+Object 00176: 0.1948 0.1948 0.2456
+Object 00176: 90 0 270
+Object 00176: -0.5057 -0.1883 4.269
+Object 00176: 7
+Object 00176: Blue_RPlastic
+Object 00176: 0
+Object 00176: 0
+Object 00176: Object0176
+Object 00176: -1
+Object 00176: 2 // display
+Object 00176: 1 1 1
+Object 00176: 0 0 0
+Object 00176: 0 0 0
+Object 00176: 1
+Object 00176: 0
+Object 00176: 0
+Object 00176: 0 0
+Object 00176: 0
+Object 00176: 1
+Object 00176: 0
+Object 00176: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00176: 0000000000000
+Object 00176: 0 0
+Object 00176: # 0 0 0 0 0 0 0 0
+Object 00176: # 0 0 0 0 0 0 0 0
+Object 00176: 0 0
+
+Object 00177: 5
+Object 00177: 0.831 0 0
+Object 00177: 0.1948 0.1948 0.2456
+Object 00177: 90 0 270
+Object 00177: -0.5057 -0.666 4.269
+Object 00177: 7
+Object 00177: Blue_RPlastic
+Object 00177: 0
+Object 00177: 0
+Object 00177: Object0177
+Object 00177: -1
+Object 00177: 2 // display
+Object 00177: 1 1 1
+Object 00177: 0 0 0
+Object 00177: 0 0 0
+Object 00177: 1
+Object 00177: 0
+Object 00177: 0
+Object 00177: 0 0
+Object 00177: 0
+Object 00177: 1
+Object 00177: 0
+Object 00177: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00177: 0000000000000
+Object 00177: 0 0
+Object 00177: # 0 0 0 0 0 0 0 0
+Object 00177: # 0 0 0 0 0 0 0 0
+Object 00177: 0 0
+
+Object 00178: 2
+Object 00178: 0 0 0
+Object 00178: 0.8956 0.0361 0.4553
+Object 00178: 90 0 0
+Object 00178: 1.855 -0.2564 4.466
+Object 00178: 7
+Object 00178: Green_RPlastic
+Object 00178: 0
+Object 00178: 0
+Object 00178: Object0178
+Object 00178: -1
+Object 00178: 2 // display
+Object 00178: 1 1 1
+Object 00178: 0 0 0
+Object 00178: 0 0 0
+Object 00178: 1
+Object 00178: 0
+Object 00178: 0
+Object 00178: 0 0
+Object 00178: 0
+Object 00178: 1
+Object 00178: 0
+Object 00178: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00178: 0000000000000
+Object 00178: 0 0
+Object 00178: # 0 0 0 0 0 0 0 0
+Object 00178: # 0 0 0 0 0 0 0 0
+Object 00178: 0 0
+
+Object 00179: 0
+Object 00179: 0 0 0
+Object 00179: 0.1431 0.0563 0.1431
+Object 00179: 90 0 0
+Object 00179: 1.214 -0.0512 4.558
+Object 00179: 7
+Object 00179: Green_RPlastic
+Object 00179: 0
+Object 00179: 0
+Object 00179: Object0179
+Object 00179: -1
+Object 00179: 2 // display
+Object 00179: 1 1 1
+Object 00179: 0 0 0
+Object 00179: 0 0 0
+Object 00179: 1
+Object 00179: 0
+Object 00179: 0
+Object 00179: 0 0
+Object 00179: 0
+Object 00179: 1
+Object 00179: 0
+Object 00179: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00179: 0000000000000
+Object 00179: 0 0
+Object 00179: # 0 0 0 0 0 0 0 0
+Object 00179: # 0 0 0 0 0 0 0 0
+Object 00179: 0 0
+
+Object 00180: 0
+Object 00180: 0 0 0
+Object 00180: 0.1431 0.0563 0.1431
+Object 00180: 90 0 0
+Object 00180: 1.214 -0.466 4.558
+Object 00180: 7
+Object 00180: Green_RPlastic
+Object 00180: 0
+Object 00180: 0
+Object 00180: Object0180
+Object 00180: -1
+Object 00180: 2 // display
+Object 00180: 1 1 1
+Object 00180: 0 0 0
+Object 00180: 0 0 0
+Object 00180: 1
+Object 00180: 0
+Object 00180: 0
+Object 00180: 0 0
+Object 00180: 0
+Object 00180: 1
+Object 00180: 0
+Object 00180: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00180: 0000000000000
+Object 00180: 0 0
+Object 00180: # 0 0 0 0 0 0 0 0
+Object 00180: # 0 0 0 0 0 0 0 0
+Object 00180: 0 0
+
+Object 00181: 0
+Object 00181: 0 0 0
+Object 00181: 0.1431 0.0563 0.1431
+Object 00181: 90 0 0
+Object 00181: 2.523 -0.466 4.558
+Object 00181: 7
+Object 00181: Green_RPlastic
+Object 00181: 0
+Object 00181: 0
+Object 00181: Object0181
+Object 00181: -1
+Object 00181: 2 // display
+Object 00181: 1 1 1
+Object 00181: 0 0 0
+Object 00181: 0 0 0
+Object 00181: 1
+Object 00181: 0
+Object 00181: 0
+Object 00181: 0 0
+Object 00181: 0
+Object 00181: 1
+Object 00181: 0
+Object 00181: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00181: 0000000000000
+Object 00181: 0 0
+Object 00181: # 0 0 0 0 0 0 0 0
+Object 00181: # 0 0 0 0 0 0 0 0
+Object 00181: 0 0
+
+Object 00182: 0
+Object 00182: 0 0 0
+Object 00182: 0.1431 0.0563 0.1431
+Object 00182: 90 0 0
+Object 00182: 2.523 -0.048 4.558
+Object 00182: 7
+Object 00182: Green_RPlastic
+Object 00182: 0
+Object 00182: 0
+Object 00182: Object0182
+Object 00182: -1
+Object 00182: 2 // display
+Object 00182: 1 1 1
+Object 00182: 0 0 0
+Object 00182: 0 0 0
+Object 00182: 1
+Object 00182: 0
+Object 00182: 0
+Object 00182: 0 0
+Object 00182: 0
+Object 00182: 1
+Object 00182: 0
+Object 00182: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00182: 0000000000000
+Object 00182: 0 0
+Object 00182: # 0 0 0 0 0 0 0 0
+Object 00182: # 0 0 0 0 0 0 0 0
+Object 00182: 0 0
+
+Object 00183: 0
+Object 00183: 0 0 0
+Object 00183: 0.1431 0.0563 0.1431
+Object 00183: 90 0 0
+Object 00183: 2.097 -0.0501 4.558
+Object 00183: 7
+Object 00183: Green_RPlastic
+Object 00183: 0
+Object 00183: 0
+Object 00183: Object0183
+Object 00183: -1
+Object 00183: 2 // display
+Object 00183: 1 1 1
+Object 00183: 0 0 0
+Object 00183: 0 0 0
+Object 00183: 1
+Object 00183: 0
+Object 00183: 0
+Object 00183: 0 0
+Object 00183: 0
+Object 00183: 1
+Object 00183: 0
+Object 00183: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00183: 0000000000000
+Object 00183: 0 0
+Object 00183: # 0 0 0 0 0 0 0 0
+Object 00183: # 0 0 0 0 0 0 0 0
+Object 00183: 0 0
+
+Object 00184: 0
+Object 00184: 0 0 0
+Object 00184: 0.1431 0.0563 0.1431
+Object 00184: 90 0 0
+Object 00184: 2.097 -0.4592 4.558
+Object 00184: 7
+Object 00184: Green_RPlastic
+Object 00184: 0
+Object 00184: 0
+Object 00184: Object0184
+Object 00184: -1
+Object 00184: 2 // display
+Object 00184: 1 1 1
+Object 00184: 0 0 0
+Object 00184: 0 0 0
+Object 00184: 1
+Object 00184: 0
+Object 00184: 0
+Object 00184: 0 0
+Object 00184: 0
+Object 00184: 1
+Object 00184: 0
+Object 00184: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00184: 0000000000000
+Object 00184: 0 0
+Object 00184: # 0 0 0 0 0 0 0 0
+Object 00184: # 0 0 0 0 0 0 0 0
+Object 00184: 0 0
+
+Object 00185: 0
+Object 00185: 0 0 0
+Object 00185: 0.1431 0.0563 0.1431
+Object 00185: 90 0 0
+Object 00185: 1.656 -0.466 4.558
+Object 00185: 7
+Object 00185: Green_RPlastic
+Object 00185: 0
+Object 00185: 0
+Object 00185: Object0185
+Object 00185: -1
+Object 00185: 2 // display
+Object 00185: 1 1 1
+Object 00185: 0 0 0
+Object 00185: 0 0 0
+Object 00185: 1
+Object 00185: 0
+Object 00185: 0
+Object 00185: 0 0
+Object 00185: 0
+Object 00185: 1
+Object 00185: 115
+Object 00185: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00185: 0000000000000
+Object 00185: 0 0
+Object 00185: # 0 0 0 0 0 0 0 0
+Object 00185: # 0 0 0 0 0 0 0 0
+Object 00185: 0 0
+
+Object 00186: 0
+Object 00186: 0 0 0
+Object 00186: 0.1431 0.0563 0.1431
+Object 00186: 90 0 0
+Object 00186: 1.656 -0.0512 4.558
+Object 00186: 7
+Object 00186: Green_RPlastic
+Object 00186: 0
+Object 00186: 0
+Object 00186: Object0186
+Object 00186: -1
+Object 00186: 2 // display
+Object 00186: 1 1 1
+Object 00186: 0 0 0
+Object 00186: 0 0 0
+Object 00186: 1
+Object 00186: 0
+Object 00186: 0
+Object 00186: 0 0
+Object 00186: 0
+Object 00186: 1
+Object 00186: 0
+Object 00186: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00186: 0000000000000
+Object 00186: 0 0
+Object 00186: # 0 0 0 0 0 0 0 0
+Object 00186: # 0 0 0 0 0 0 0 0
+Object 00186: 0 0
+
+Object 00187: 2
+Object 00187: 0 0 0
+Object 00187: 0.8956 0.2797 0.0393
+Object 00187: 90 0 0
+Object 00187: 1.855 0.1599 4.222
+Object 00187: 7
+Object 00187: Green_RPlastic
+Object 00187: 0
+Object 00187: 0
+Object 00187: Object0187
+Object 00187: -1
+Object 00187: 2 // display
+Object 00187: 1 1 1
+Object 00187: 0 0 0
+Object 00187: 0 0 0
+Object 00187: 1
+Object 00187: 0
+Object 00187: 0
+Object 00187: 0 0
+Object 00187: 0
+Object 00187: 1
+Object 00187: 0
+Object 00187: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00187: 0000000000000
+Object 00187: 0 0
+Object 00187: # 0 0 0 0 0 0 0 0
+Object 00187: # 0 0 0 0 0 0 0 0
+Object 00187: 0 0
+
+Object 00188: 2
+Object 00188: 0 0 0
+Object 00188: 0.8956 0.2797 0.0393
+Object 00188: 90 0 0
+Object 00188: 1.855 -0.6725 4.222
+Object 00188: 7
+Object 00188: Green_RPlastic
+Object 00188: 0
+Object 00188: 0
+Object 00188: Object0188
+Object 00188: -1
+Object 00188: 2 // display
+Object 00188: 1 1 1
+Object 00188: 0 0 0
+Object 00188: 0 0 0
+Object 00188: 1
+Object 00188: 0
+Object 00188: 0
+Object 00188: 0 0
+Object 00188: 0
+Object 00188: 1
+Object 00188: 0
+Object 00188: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00188: 0000000000000
+Object 00188: 0 0
+Object 00188: # 0 0 0 0 0 0 0 0
+Object 00188: # 0 0 0 0 0 0 0 0
+Object 00188: 0 0
+
+Object 00189: 2
+Object 00189: 0 0 0
+Object 00189: 0.0369 0.2797 0.4553
+Object 00189: 90 0 0
+Object 00189: 0.9968 -0.2564 4.222
+Object 00189: 7
+Object 00189: Green_RPlastic
+Object 00189: 0
+Object 00189: 0
+Object 00189: Object0189
+Object 00189: -1
+Object 00189: 2 // display
+Object 00189: 1 1 1
+Object 00189: 0 0 0
+Object 00189: 0 0 0
+Object 00189: 1
+Object 00189: 0
+Object 00189: 0
+Object 00189: 0 0
+Object 00189: 0
+Object 00189: 1
+Object 00189: 0
+Object 00189: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00189: 0000000000000
+Object 00189: 0 0
+Object 00189: # 0 0 0 0 0 0 0 0
+Object 00189: # 0 0 0 0 0 0 0 0
+Object 00189: 0 0
+
+Object 00190: 2
+Object 00190: 0 0 0
+Object 00190: 0.0369 0.2797 0.4553
+Object 00190: 90 0 0
+Object 00190: 2.714 -0.2564 4.222
+Object 00190: 7
+Object 00190: Green_RPlastic
+Object 00190: 0
+Object 00190: 0
+Object 00190: Object0190
+Object 00190: -1
+Object 00190: 2 // display
+Object 00190: 1 1 1
+Object 00190: 0 0 0
+Object 00190: 0 0 0
+Object 00190: 1
+Object 00190: 0
+Object 00190: 0
+Object 00190: 0 0
+Object 00190: 0
+Object 00190: 1
+Object 00190: 0
+Object 00190: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00190: 0000000000000
+Object 00190: 0 0
+Object 00190: # 0 0 0 0 0 0 0 0
+Object 00190: # 0 0 0 0 0 0 0 0
+Object 00190: 0 0
+
+Object 00191: 5
+Object 00191: 0.831 0 0
+Object 00191: 0.1948 0.1948 0.2456
+Object 00191: 180 0 0
+Object 00191: 1.383 -0.2652 4.189
+Object 00191: 7
+Object 00191: Green_RPlastic
+Object 00191: 0
+Object 00191: 0
+Object 00191: Object0191
+Object 00191: -1
+Object 00191: 2 // display
+Object 00191: 1 1 1
+Object 00191: 0 0 0
+Object 00191: 0 0 0
+Object 00191: 1
+Object 00191: 0
+Object 00191: 0
+Object 00191: 0 0
+Object 00191: 0
+Object 00191: 1
+Object 00191: 0
+Object 00191: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00191: 0000000000000
+Object 00191: 0 0
+Object 00191: # 0 0 0 0 0 0 0 0
+Object 00191: # 0 0 0 0 0 0 0 0
+Object 00191: 0 0
+
+Object 00192: 5
+Object 00192: 0.831 0 0
+Object 00192: 0.1948 0.1948 0.2456
+Object 00192: 180 0 0
+Object 00192: 2.355 -0.2652 4.189
+Object 00192: 7
+Object 00192: Green_RPlastic
+Object 00192: 0
+Object 00192: 0
+Object 00192: Object0192
+Object 00192: -1
+Object 00192: 2 // display
+Object 00192: 1 1 1
+Object 00192: 0 0 0
+Object 00192: 0 0 0
+Object 00192: 1
+Object 00192: 0
+Object 00192: 0
+Object 00192: 0 0
+Object 00192: 0
+Object 00192: 1
+Object 00192: 0
+Object 00192: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00192: 0000000000000
+Object 00192: 0 0
+Object 00192: # 0 0 0 0 0 0 0 0
+Object 00192: # 0 0 0 0 0 0 0 0
+Object 00192: 0 0
+
+Object 00193: 5
+Object 00193: 0.831 0 0
+Object 00193: 0.1948 0.1948 0.2456
+Object 00193: 180 0 0
+Object 00193: 1.877 -0.2652 4.189
+Object 00193: 7
+Object 00193: Green_RPlastic
+Object 00193: 0
+Object 00193: 0
+Object 00193: Object0193
+Object 00193: -1
+Object 00193: 2 // display
+Object 00193: 1 1 1
+Object 00193: 0 0 0
+Object 00193: 0 0 0
+Object 00193: 1
+Object 00193: 0
+Object 00193: 0
+Object 00193: 0 0
+Object 00193: 0
+Object 00193: 1
+Object 00193: 0
+Object 00193: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00193: 0000000000000
+Object 00193: 0 0
+Object 00193: # 0 0 0 0 0 0 0 0
+Object 00193: # 0 0 0 0 0 0 0 0
+Object 00193: 0 0
+
+Object 00194: 2
+Object 00194: 0 0 0
+Object 00194: 0.8956 0.0361 0.4553
+Object 00194: 0 90 0
+Object 00194: -0.6315 -0.3222 -1.817
+Object 00194: 7
+Object 00194: Yellow_RPlastic
+Object 00194: 0
+Object 00194: 0
+Object 00194: Object0194
+Object 00194: -1
+Object 00194: 2 // display
+Object 00194: 1 1 1
+Object 00194: 0 0 0
+Object 00194: 0 0 0
+Object 00194: 1
+Object 00194: 0
+Object 00194: 0
+Object 00194: 0 0
+Object 00194: 0
+Object 00194: 1
+Object 00194: 0
+Object 00194: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00194: 0000000000000
+Object 00194: 0 0
+Object 00194: # 0 0 0 0 0 0 0 0
+Object 00194: # 0 0 0 0 0 0 0 0
+Object 00194: 0 0
+
+Object 00195: 0
+Object 00195: 0 0 0
+Object 00195: 0.1431 0.0563 0.1431
+Object 00195: 0 90 0
+Object 00195: -0.4263 -0.4142 -1.176
+Object 00195: 7
+Object 00195: Yellow_RPlastic
+Object 00195: 0
+Object 00195: 0
+Object 00195: Object0195
+Object 00195: -1
+Object 00195: 2 // display
+Object 00195: 1 1 1
+Object 00195: 0 0 0
+Object 00195: 0 0 0
+Object 00195: 1
+Object 00195: 0
+Object 00195: 0
+Object 00195: 0 0
+Object 00195: 0
+Object 00195: 1
+Object 00195: 0
+Object 00195: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00195: 0000000000000
+Object 00195: 0 0
+Object 00195: # 0 0 0 0 0 0 0 0
+Object 00195: # 0 0 0 0 0 0 0 0
+Object 00195: 0 0
+
+Object 00196: 0
+Object 00196: 0 0 0
+Object 00196: 0.1431 0.0563 0.1431
+Object 00196: 0 90 0
+Object 00196: -0.8411 -0.4142 -1.176
+Object 00196: 7
+Object 00196: Yellow_RPlastic
+Object 00196: 0
+Object 00196: 0
+Object 00196: Object0196
+Object 00196: -1
+Object 00196: 2 // display
+Object 00196: 1 1 1
+Object 00196: 0 0 0
+Object 00196: 0 0 0
+Object 00196: 1
+Object 00196: 0
+Object 00196: 0
+Object 00196: 0 0
+Object 00196: 0
+Object 00196: 1
+Object 00196: 0
+Object 00196: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00196: 0000000000000
+Object 00196: 0 0
+Object 00196: # 0 0 0 0 0 0 0 0
+Object 00196: # 0 0 0 0 0 0 0 0
+Object 00196: 0 0
+
+Object 00197: 0
+Object 00197: 0 0 0
+Object 00197: 0.1431 0.0563 0.1431
+Object 00197: 0 90 0
+Object 00197: -0.8411 -0.4142 -2.485
+Object 00197: 7
+Object 00197: Yellow_RPlastic
+Object 00197: 0
+Object 00197: 0
+Object 00197: Object0197
+Object 00197: -1
+Object 00197: 2 // display
+Object 00197: 1 1 1
+Object 00197: 0 0 0
+Object 00197: 0 0 0
+Object 00197: 1
+Object 00197: 0
+Object 00197: 0
+Object 00197: 0 0
+Object 00197: 0
+Object 00197: 1
+Object 00197: 0
+Object 00197: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00197: 0000000000000
+Object 00197: 0 0
+Object 00197: # 0 0 0 0 0 0 0 0
+Object 00197: # 0 0 0 0 0 0 0 0
+Object 00197: 0 0
+
+Object 00198: 0
+Object 00198: 0 0 0
+Object 00198: 0.1431 0.0563 0.1431
+Object 00198: 0 90 0
+Object 00198: -0.4231 -0.4142 -2.485
+Object 00198: 7
+Object 00198: Yellow_RPlastic
+Object 00198: 0
+Object 00198: 0
+Object 00198: Object0198
+Object 00198: -1
+Object 00198: 2 // display
+Object 00198: 1 1 1
+Object 00198: 0 0 0
+Object 00198: 0 0 0
+Object 00198: 1
+Object 00198: 0
+Object 00198: 0
+Object 00198: 0 0
+Object 00198: 0
+Object 00198: 1
+Object 00198: 8
+Object 00198: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00198: 0000000000000
+Object 00198: 0 0
+Object 00198: # 0 0 0 0 0 0 0 0
+Object 00198: # 0 0 0 0 0 0 0 0
+Object 00198: 0 0
+
+Object 00199: 0
+Object 00199: 0 0 0
+Object 00199: 0.1431 0.0563 0.1431
+Object 00199: 0 90 0
+Object 00199: -0.4253 -0.4142 -2.059
+Object 00199: 7
+Object 00199: Yellow_RPlastic
+Object 00199: 0
+Object 00199: 0
+Object 00199: Object0199
+Object 00199: -1
+Object 00199: 2 // display
+Object 00199: 1 1 1
+Object 00199: 0 0 0
+Object 00199: 0 0 0
+Object 00199: 1
+Object 00199: 0
+Object 00199: 0
+Object 00199: 0 0
+Object 00199: 0
+Object 00199: 1
+Object 00199: 0
+Object 00199: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00199: 0000000000000
+Object 00199: 0 0
+Object 00199: # 0 0 0 0 0 0 0 0
+Object 00199: # 0 0 0 0 0 0 0 0
+Object 00199: 0 0
+
+Object 00200: 0
+Object 00200: 0 0 0
+Object 00200: 0.1431 0.0563 0.1431
+Object 00200: 0 90 0
+Object 00200: -0.8343 -0.4142 -2.059
+Object 00200: 7
+Object 00200: Yellow_RPlastic
+Object 00200: 0
+Object 00200: 0
+Object 00200: Object0200
+Object 00200: -1
+Object 00200: 2 // display
+Object 00200: 1 1 1
+Object 00200: 0 0 0
+Object 00200: 0 0 0
+Object 00200: 1
+Object 00200: 0
+Object 00200: 0
+Object 00200: 0 0
+Object 00200: 0
+Object 00200: 1
+Object 00200: 0
+Object 00200: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00200: 0000000000000
+Object 00200: 0 0
+Object 00200: # 0 0 0 0 0 0 0 0
+Object 00200: # 0 0 0 0 0 0 0 0
+Object 00200: 0 0
+
+Object 00201: 0
+Object 00201: 0 0 0
+Object 00201: 0.1431 0.0563 0.1431
+Object 00201: 0 90 0
+Object 00201: -0.8411 -0.4142 -1.617
+Object 00201: 7
+Object 00201: Yellow_RPlastic
+Object 00201: 0
+Object 00201: 0
+Object 00201: Object0201
+Object 00201: -1
+Object 00201: 2 // display
+Object 00201: 1 1 1
+Object 00201: 0 0 0
+Object 00201: 0 0 0
+Object 00201: 1
+Object 00201: 0
+Object 00201: 0
+Object 00201: 0 0
+Object 00201: 0
+Object 00201: 1
+Object 00201: 0
+Object 00201: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00201: 0000000000000
+Object 00201: 0 0
+Object 00201: # 0 0 0 0 0 0 0 0
+Object 00201: # 0 0 0 0 0 0 0 0
+Object 00201: 0 0
+
+Object 00202: 0
+Object 00202: 0 0 0
+Object 00202: 0.1431 0.0563 0.1431
+Object 00202: 0 90 0
+Object 00202: -0.4263 -0.4142 -1.617
+Object 00202: 7
+Object 00202: Yellow_RPlastic
+Object 00202: 0
+Object 00202: 0
+Object 00202: Object0202
+Object 00202: -1
+Object 00202: 2 // display
+Object 00202: 1 1 1
+Object 00202: 0 0 0
+Object 00202: 0 0 0
+Object 00202: 1
+Object 00202: 0
+Object 00202: 0
+Object 00202: 0 0
+Object 00202: 0
+Object 00202: 1
+Object 00202: 0
+Object 00202: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00202: 0000000000000
+Object 00202: 0 0
+Object 00202: # 0 0 0 0 0 0 0 0
+Object 00202: # 0 0 0 0 0 0 0 0
+Object 00202: 0 0
+
+Object 00203: 2
+Object 00203: 0 0 0
+Object 00203: 0.8956 0.2797 0.0393
+Object 00203: 0 90 0
+Object 00203: -0.2153 -0.0786 -1.817
+Object 00203: 7
+Object 00203: Yellow_RPlastic
+Object 00203: 0
+Object 00203: 0
+Object 00203: Object0203
+Object 00203: -1
+Object 00203: 2 // display
+Object 00203: 1 1 1
+Object 00203: 0 0 0
+Object 00203: 0 0 0
+Object 00203: 1
+Object 00203: 0
+Object 00203: 0
+Object 00203: 0 0
+Object 00203: 0
+Object 00203: 1
+Object 00203: 0
+Object 00203: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00203: 0000000000000
+Object 00203: 0 0
+Object 00203: # 0 0 0 0 0 0 0 0
+Object 00203: # 0 0 0 0 0 0 0 0
+Object 00203: 0 0
+
+Object 00204: 2
+Object 00204: 0 0 0
+Object 00204: 0.8956 0.2797 0.0393
+Object 00204: 0 90 0
+Object 00204: -1.048 -0.0786 -1.817
+Object 00204: 7
+Object 00204: Yellow_RPlastic
+Object 00204: 0
+Object 00204: 0
+Object 00204: Object0204
+Object 00204: -1
+Object 00204: 2 // display
+Object 00204: 1 1 1
+Object 00204: 0 0 0
+Object 00204: 0 0 0
+Object 00204: 1
+Object 00204: 0
+Object 00204: 0
+Object 00204: 0 0
+Object 00204: 0
+Object 00204: 1
+Object 00204: 0
+Object 00204: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00204: 0000000000000
+Object 00204: 0 0
+Object 00204: # 0 0 0 0 0 0 0 0
+Object 00204: # 0 0 0 0 0 0 0 0
+Object 00204: 0 0
+
+Object 00205: 2
+Object 00205: 0 0 0
+Object 00205: 0.0369 0.2797 0.4553
+Object 00205: 0 90 0
+Object 00205: -0.6315 -0.0786 -0.9585
+Object 00205: 7
+Object 00205: Yellow_RPlastic
+Object 00205: 0
+Object 00205: 0
+Object 00205: Object0205
+Object 00205: -1
+Object 00205: 2 // display
+Object 00205: 1 1 1
+Object 00205: 0 0 0
+Object 00205: 0 0 0
+Object 00205: 1
+Object 00205: 0
+Object 00205: 0
+Object 00205: 0 0
+Object 00205: 0
+Object 00205: 1
+Object 00205: 0
+Object 00205: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00205: 0000000000000
+Object 00205: 0 0
+Object 00205: # 0 0 0 0 0 0 0 0
+Object 00205: # 0 0 0 0 0 0 0 0
+Object 00205: 0 0
+
+Object 00206: 2
+Object 00206: 0 0 0
+Object 00206: 0.0369 0.2797 0.4553
+Object 00206: 0 90 0
+Object 00206: -0.6315 -0.0786 -2.676
+Object 00206: 7
+Object 00206: Yellow_RPlastic
+Object 00206: 0
+Object 00206: 0
+Object 00206: Object0206
+Object 00206: -1
+Object 00206: 2 // display
+Object 00206: 1 1 1
+Object 00206: 0 0 0
+Object 00206: 0 0 0
+Object 00206: 1
+Object 00206: 0
+Object 00206: 0
+Object 00206: 0 0
+Object 00206: 0
+Object 00206: 1
+Object 00206: 222
+Object 00206: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00206: 0000000000000
+Object 00206: 0 0
+Object 00206: # 0 0 0 0 0 0 0 0
+Object 00206: # 0 0 0 0 0 0 0 0
+Object 00206: 0 0
+
+Object 00207: 5
+Object 00207: 0.831 0 0
+Object 00207: 0.1948 0.1948 0.2456
+Object 00207: 90 90 0
+Object 00207: -0.6403 -0.0451 -1.345
+Object 00207: 7
+Object 00207: Yellow_RPlastic
+Object 00207: 0
+Object 00207: 0
+Object 00207: Object0207
+Object 00207: -1
+Object 00207: 2 // display
+Object 00207: 1 1 1
+Object 00207: 0 0 0
+Object 00207: 0 0 0
+Object 00207: 1
+Object 00207: 0
+Object 00207: 0
+Object 00207: 0 0
+Object 00207: 0
+Object 00207: 1
+Object 00207: 0
+Object 00207: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00207: 0000000000000
+Object 00207: 0 0
+Object 00207: # 0 0 0 0 0 0 0 0
+Object 00207: # 0 0 0 0 0 0 0 0
+Object 00207: 0 0
+
+Object 00208: 5
+Object 00208: 0.831 0 0
+Object 00208: 0.1948 0.1948 0.2456
+Object 00208: 90 90 0
+Object 00208: -0.6403 -0.0451 -2.317
+Object 00208: 7
+Object 00208: Yellow_RPlastic
+Object 00208: 0
+Object 00208: 0
+Object 00208: Object0208
+Object 00208: -1
+Object 00208: 2 // display
+Object 00208: 1 1 1
+Object 00208: 0 0 0
+Object 00208: 0 0 0
+Object 00208: 1
+Object 00208: 0
+Object 00208: 0
+Object 00208: 0 0
+Object 00208: 0
+Object 00208: 1
+Object 00208: 0
+Object 00208: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00208: 0000000000000
+Object 00208: 0 0
+Object 00208: # 0 0 0 0 0 0 0 0
+Object 00208: # 0 0 0 0 0 0 0 0
+Object 00208: 0 0
+
+Object 00209: 5
+Object 00209: 0.831 0 0
+Object 00209: 0.1948 0.1948 0.2456
+Object 00209: 90 90 0
+Object 00209: -0.6403 -0.0451 -1.839
+Object 00209: 7
+Object 00209: Yellow_RPlastic
+Object 00209: 0
+Object 00209: 0
+Object 00209: Object0209
+Object 00209: -1
+Object 00209: 2 // display
+Object 00209: 1 1 1
+Object 00209: 0 0 0
+Object 00209: 0 0 0
+Object 00209: 1
+Object 00209: 0
+Object 00209: 0
+Object 00209: 0 0
+Object 00209: 0
+Object 00209: 1
+Object 00209: 0
+Object 00209: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00209: 0000000000000
+Object 00209: 0 0
+Object 00209: # 0 0 0 0 0 0 0 0
+Object 00209: # 0 0 0 0 0 0 0 0
+Object 00209: 0 0
+
+Object 00210: 2
+Object 00210: 0 0 0
+Object 00210: 0.8956 0.0361 0.4553
+Object 00210: 0 40 0
+Object 00210: 5.094 -0.3222 2.114
+Object 00210: 7
+Object 00210: Green_RPlastic
+Object 00210: 0
+Object 00210: 0
+Object 00210: Object0210
+Object 00210: -1
+Object 00210: 2 // display
+Object 00210: 1 1 1
+Object 00210: 0 0 0
+Object 00210: 0 0 0
+Object 00210: 1
+Object 00210: 0
+Object 00210: 0
+Object 00210: 0 0
+Object 00210: 0
+Object 00210: 1
+Object 00210: 0
+Object 00210: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00210: 0000000000000
+Object 00210: 0 0
+Object 00210: # 0 0 0 0 0 0 0 0
+Object 00210: # 0 0 0 0 0 0 0 0
+Object 00210: 0 0
+
+Object 00211: 0
+Object 00211: 0 0 0
+Object 00211: 0.1431 0.0563 0.1431
+Object 00211: 0 40 0
+Object 00211: 4.734 -0.4142 2.683
+Object 00211: 7
+Object 00211: Green_RPlastic
+Object 00211: 0
+Object 00211: 0
+Object 00211: Object0211
+Object 00211: -1
+Object 00211: 2 // display
+Object 00211: 1 1 1
+Object 00211: 0 0 0
+Object 00211: 0 0 0
+Object 00211: 1
+Object 00211: 0
+Object 00211: 0
+Object 00211: 0 0
+Object 00211: 0
+Object 00211: 1
+Object 00211: 0
+Object 00211: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00211: 0000000000000
+Object 00211: 0 0
+Object 00211: # 0 0 0 0 0 0 0 0
+Object 00211: # 0 0 0 0 0 0 0 0
+Object 00211: 0 0
+
+Object 00212: 0
+Object 00212: 0 0 0
+Object 00212: 0.1431 0.0563 0.1431
+Object 00212: 0 40 0
+Object 00212: 4.468 -0.4142 2.365
+Object 00212: 7
+Object 00212: Green_RPlastic
+Object 00212: 0
+Object 00212: 0
+Object 00212: Object0212
+Object 00212: -1
+Object 00212: 2 // display
+Object 00212: 1 1 1
+Object 00212: 0 0 0
+Object 00212: 0 0 0
+Object 00212: 1
+Object 00212: 0
+Object 00212: 0
+Object 00212: 0 0
+Object 00212: 0
+Object 00212: 1
+Object 00212: 0
+Object 00212: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00212: 0000000000000
+Object 00212: 0 0
+Object 00212: # 0 0 0 0 0 0 0 0
+Object 00212: # 0 0 0 0 0 0 0 0
+Object 00212: 0 0
+
+Object 00213: 0
+Object 00213: 0 0 0
+Object 00213: 0.1431 0.0563 0.1431
+Object 00213: 0 40 0
+Object 00213: 5.47 -0.4142 1.524
+Object 00213: 7
+Object 00213: Green_RPlastic
+Object 00213: 0
+Object 00213: 0
+Object 00213: Object0213
+Object 00213: -1
+Object 00213: 2 // display
+Object 00213: 1 1 1
+Object 00213: 0 0 0
+Object 00213: 0 0 0
+Object 00213: 1
+Object 00213: 0
+Object 00213: 0
+Object 00213: 0 0
+Object 00213: 0
+Object 00213: 1
+Object 00213: 0
+Object 00213: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00213: 0000000000000
+Object 00213: 0 0
+Object 00213: # 0 0 0 0 0 0 0 0
+Object 00213: # 0 0 0 0 0 0 0 0
+Object 00213: 0 0
+
+Object 00214: 0
+Object 00214: 0 0 0
+Object 00214: 0.1431 0.0563 0.1431
+Object 00214: 0 40 0
+Object 00214: 5.739 -0.4142 1.844
+Object 00214: 7
+Object 00214: Green_RPlastic
+Object 00214: 0
+Object 00214: 0
+Object 00214: Object0214
+Object 00214: -1
+Object 00214: 2 // display
+Object 00214: 1 1 1
+Object 00214: 0 0 0
+Object 00214: 0 0 0
+Object 00214: 1
+Object 00214: 0
+Object 00214: 0
+Object 00214: 0 0
+Object 00214: 0
+Object 00214: 1
+Object 00214: 0
+Object 00214: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00214: 0000000000000
+Object 00214: 0 0
+Object 00214: # 0 0 0 0 0 0 0 0
+Object 00214: # 0 0 0 0 0 0 0 0
+Object 00214: 0 0
+
+Object 00215: 0
+Object 00215: 0 0 0
+Object 00215: 0.1431 0.0563 0.1431
+Object 00215: 0 40 0
+Object 00215: 5.412 -0.4142 2.116
+Object 00215: 7
+Object 00215: Green_RPlastic
+Object 00215: 0
+Object 00215: 0
+Object 00215: Object0215
+Object 00215: -1
+Object 00215: 2 // display
+Object 00215: 1 1 1
+Object 00215: 0 0 0
+Object 00215: 0 0 0
+Object 00215: 1
+Object 00215: 0
+Object 00215: 0
+Object 00215: 0 0
+Object 00215: 0
+Object 00215: 1
+Object 00215: 0
+Object 00215: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00215: 0000000000000
+Object 00215: 0 0
+Object 00215: # 0 0 0 0 0 0 0 0
+Object 00215: # 0 0 0 0 0 0 0 0
+Object 00215: 0 0
+
+Object 00216: 0
+Object 00216: 0 0 0
+Object 00216: 0.1431 0.0563 0.1431
+Object 00216: 0 40 0
+Object 00216: 5.149 -0.4142 1.803
+Object 00216: 7
+Object 00216: Green_RPlastic
+Object 00216: 0
+Object 00216: 0
+Object 00216: Object0216
+Object 00216: -1
+Object 00216: 2 // display
+Object 00216: 1 1 1
+Object 00216: 0 0 0
+Object 00216: 0 0 0
+Object 00216: 1
+Object 00216: 0
+Object 00216: 0
+Object 00216: 0 0
+Object 00216: 0
+Object 00216: 1
+Object 00216: 0
+Object 00216: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00216: 0000000000000
+Object 00216: 0 0
+Object 00216: # 0 0 0 0 0 0 0 0
+Object 00216: # 0 0 0 0 0 0 0 0
+Object 00216: 0 0
+
+Object 00217: 0
+Object 00217: 0 0 0
+Object 00217: 0.1431 0.0563 0.1431
+Object 00217: 0 40 0
+Object 00217: 4.806 -0.4142 2.082
+Object 00217: 7
+Object 00217: Green_RPlastic
+Object 00217: 0
+Object 00217: 0
+Object 00217: Object0217
+Object 00217: -1
+Object 00217: 2 // display
+Object 00217: 1 1 1
+Object 00217: 0 0 0
+Object 00217: 0 0 0
+Object 00217: 1
+Object 00217: 0
+Object 00217: 0
+Object 00217: 0 0
+Object 00217: 0
+Object 00217: 1
+Object 00217: 0
+Object 00217: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00217: 0000000000000
+Object 00217: 0 0
+Object 00217: # 0 0 0 0 0 0 0 0
+Object 00217: # 0 0 0 0 0 0 0 0
+Object 00217: 0 0
+
+Object 00218: 0
+Object 00218: 0 0 0
+Object 00218: 0.1431 0.0563 0.1431
+Object 00218: 0 40 0
+Object 00218: 5.073 -0.4142 2.399
+Object 00218: 7
+Object 00218: Green_RPlastic
+Object 00218: 0
+Object 00218: 0
+Object 00218: Object0218
+Object 00218: -1
+Object 00218: 2 // display
+Object 00218: 1 1 1
+Object 00218: 0 0 0
+Object 00218: 0 0 0
+Object 00218: 1
+Object 00218: 0
+Object 00218: 0
+Object 00218: 0 0
+Object 00218: 0
+Object 00218: 1
+Object 00218: 0
+Object 00218: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00218: 0000000000000
+Object 00218: 0 0
+Object 00218: # 0 0 0 0 0 0 0 0
+Object 00218: # 0 0 0 0 0 0 0 0
+Object 00218: 0 0
+
+Object 00219: 2
+Object 00219: 0 0 0
+Object 00219: 0.8956 0.2797 0.0393
+Object 00219: 0 40 0
+Object 00219: 5.361 -0.0786 2.433
+Object 00219: 7
+Object 00219: Green_RPlastic
+Object 00219: 0
+Object 00219: 0
+Object 00219: Object0219
+Object 00219: -1
+Object 00219: 2 // display
+Object 00219: 1 1 1
+Object 00219: 0 0 0
+Object 00219: 0 0 0
+Object 00219: 1
+Object 00219: 0
+Object 00219: 0
+Object 00219: 0 0
+Object 00219: 0
+Object 00219: 1
+Object 00219: 117
+Object 00219: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00219: 0000000000000
+Object 00219: 0 0
+Object 00219: # 0 0 0 0 0 0 0 0
+Object 00219: # 0 0 0 0 0 0 0 0
+Object 00219: 0 0
+
+Object 00220: 2
+Object 00220: 0 0 0
+Object 00220: 0.8956 0.2797 0.0393
+Object 00220: 0 40 0
+Object 00220: 4.826 -0.0786 1.795
+Object 00220: 7
+Object 00220: Green_RPlastic
+Object 00220: 0
+Object 00220: 0
+Object 00220: Object0220
+Object 00220: -1
+Object 00220: 2 // display
+Object 00220: 1 1 1
+Object 00220: 0 0 0
+Object 00220: 0 0 0
+Object 00220: 1
+Object 00220: 0
+Object 00220: 0
+Object 00220: 0 0
+Object 00220: 0
+Object 00220: 1
+Object 00220: 0
+Object 00220: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00220: 0000000000000
+Object 00220: 0 0
+Object 00220: # 0 0 0 0 0 0 0 0
+Object 00220: # 0 0 0 0 0 0 0 0
+Object 00220: 0 0
+
+Object 00221: 2
+Object 00221: 0 0 0
+Object 00221: 0.0369 0.2797 0.4553
+Object 00221: 0 40 0
+Object 00221: 4.436 -0.0786 2.666
+Object 00221: 7
+Object 00221: Green_RPlastic
+Object 00221: 0
+Object 00221: 0
+Object 00221: Object0221
+Object 00221: -1
+Object 00221: 2 // display
+Object 00221: 1 1 1
+Object 00221: 0 0 0
+Object 00221: 0 0 0
+Object 00221: 1
+Object 00221: 0
+Object 00221: 0
+Object 00221: 0 0
+Object 00221: 0
+Object 00221: 1
+Object 00221: 0
+Object 00221: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00221: 0000000000000
+Object 00221: 0 0
+Object 00221: # 0 0 0 0 0 0 0 0
+Object 00221: # 0 0 0 0 0 0 0 0
+Object 00221: 0 0
+
+Object 00222: 2
+Object 00222: 0 0 0
+Object 00222: 0.0369 0.2797 0.4553
+Object 00222: 0 40 0
+Object 00222: 5.752 -0.0786 1.562
+Object 00222: 7
+Object 00222: Green_RPlastic
+Object 00222: 0
+Object 00222: 0
+Object 00222: Object0222
+Object 00222: -1
+Object 00222: 2 // display
+Object 00222: 1 1 1
+Object 00222: 0 0 0
+Object 00222: 0 0 0
+Object 00222: 1
+Object 00222: 0
+Object 00222: 0
+Object 00222: 0 0
+Object 00222: 0
+Object 00222: 1
+Object 00222: 0
+Object 00222: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00222: 0000000000000
+Object 00222: 0 0
+Object 00222: # 0 0 0 0 0 0 0 0
+Object 00222: # 0 0 0 0 0 0 0 0
+Object 00222: 0 0
+
+Object 00223: 5
+Object 00223: 0.831 0 0
+Object 00223: 0.1948 0.1948 0.2456
+Object 00223: 90 40 0
+Object 00223: 4.726 -0.0451 2.411
+Object 00223: 7
+Object 00223: Green_RPlastic
+Object 00223: 0
+Object 00223: 0
+Object 00223: Object0223
+Object 00223: -1
+Object 00223: 2 // display
+Object 00223: 1 1 1
+Object 00223: 0 0 0
+Object 00223: 0 0 0
+Object 00223: 1
+Object 00223: 0
+Object 00223: 0
+Object 00223: 0 0
+Object 00223: 0
+Object 00223: 1
+Object 00223: 0
+Object 00223: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00223: 0000000000000
+Object 00223: 0 0
+Object 00223: # 0 0 0 0 0 0 0 0
+Object 00223: # 0 0 0 0 0 0 0 0
+Object 00223: 0 0
+
+Object 00224: 5
+Object 00224: 0.831 0 0
+Object 00224: 0.1948 0.1948 0.2456
+Object 00224: 90 40 0
+Object 00224: 5.471 -0.0451 1.786
+Object 00224: 7
+Object 00224: Green_RPlastic
+Object 00224: 0
+Object 00224: 0
+Object 00224: Object0224
+Object 00224: -1
+Object 00224: 2 // display
+Object 00224: 1 1 1
+Object 00224: 0 0 0
+Object 00224: 0 0 0
+Object 00224: 1
+Object 00224: 0
+Object 00224: 0
+Object 00224: 0 0
+Object 00224: 0
+Object 00224: 1
+Object 00224: 0
+Object 00224: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00224: 0000000000000
+Object 00224: 0 0
+Object 00224: # 0 0 0 0 0 0 0 0
+Object 00224: # 0 0 0 0 0 0 0 0
+Object 00224: 0 0
+
+Object 00225: 5
+Object 00225: 0.831 0 0
+Object 00225: 0.1948 0.1948 0.2456
+Object 00225: 90 40 0
+Object 00225: 5.105 -0.0451 2.093
+Object 00225: 7
+Object 00225: Green_RPlastic
+Object 00225: 0
+Object 00225: 0
+Object 00225: Object0225
+Object 00225: -1
+Object 00225: 2 // display
+Object 00225: 1 1 1
+Object 00225: 0 0 0
+Object 00225: 0 0 0
+Object 00225: 1
+Object 00225: 0
+Object 00225: 0
+Object 00225: 0 0
+Object 00225: 0
+Object 00225: 1
+Object 00225: 0
+Object 00225: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00225: 0000000000000
+Object 00225: 0 0
+Object 00225: # 0 0 0 0 0 0 0 0
+Object 00225: # 0 0 0 0 0 0 0 0
+Object 00225: 0 0
+
+Object 00226: 2
+Object 00226: 0 0 0
+Object 00226: 0.8956 0.0361 0.4553
+Object 00226: 90 0 0
+Object 00226: 1.01 -0.2564 -3.519
+Object 00226: 7
+Object 00226: Red_RPlastic
+Object 00226: 0
+Object 00226: 0
+Object 00226: Object0226
+Object 00226: -1
+Object 00226: 2 // display
+Object 00226: 1 1 1
+Object 00226: 0 0 0
+Object 00226: 0 0 0
+Object 00226: 1
+Object 00226: 0
+Object 00226: 0
+Object 00226: 0 0
+Object 00226: 0
+Object 00226: 1
+Object 00226: 0
+Object 00226: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00226: 0000000000000
+Object 00226: 0 0
+Object 00226: # 0 0 0 0 0 0 0 0
+Object 00226: # 0 0 0 0 0 0 0 0
+Object 00226: 0 0
+
+Object 00227: 0
+Object 00227: 0 0 0
+Object 00227: 0.1431 0.0563 0.1431
+Object 00227: 90 0 0
+Object 00227: 0.368 -0.0512 -3.427
+Object 00227: 7
+Object 00227: Red_RPlastic
+Object 00227: 0
+Object 00227: 0
+Object 00227: Object0227
+Object 00227: -1
+Object 00227: 2 // display
+Object 00227: 1 1 1
+Object 00227: 0 0 0
+Object 00227: 0 0 0
+Object 00227: 1
+Object 00227: 0
+Object 00227: 0
+Object 00227: 0 0
+Object 00227: 0
+Object 00227: 1
+Object 00227: 15
+Object 00227: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00227: 0000000000000
+Object 00227: 0 0
+Object 00227: # 0 0 0 0 0 0 0 0
+Object 00227: # 0 0 0 0 0 0 0 0
+Object 00227: 0 0
+
+Object 00228: 0
+Object 00228: 0 0 0
+Object 00228: 0.1431 0.0563 0.1431
+Object 00228: 90 0 0
+Object 00228: 0.368 -0.466 -3.427
+Object 00228: 7
+Object 00228: Red_RPlastic
+Object 00228: 0
+Object 00228: 0
+Object 00228: Object0228
+Object 00228: -1
+Object 00228: 2 // display
+Object 00228: 1 1 1
+Object 00228: 0 0 0
+Object 00228: 0 0 0
+Object 00228: 1
+Object 00228: 0
+Object 00228: 0
+Object 00228: 0 0
+Object 00228: 0
+Object 00228: 1
+Object 00228: 0
+Object 00228: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00228: 0000000000000
+Object 00228: 0 0
+Object 00228: # 0 0 0 0 0 0 0 0
+Object 00228: # 0 0 0 0 0 0 0 0
+Object 00228: 0 0
+
+Object 00229: 0
+Object 00229: 0 0 0
+Object 00229: 0.1431 0.0563 0.1431
+Object 00229: 90 0 0
+Object 00229: 1.677 -0.466 -3.427
+Object 00229: 7
+Object 00229: Red_RPlastic
+Object 00229: 0
+Object 00229: 0
+Object 00229: Object0229
+Object 00229: -1
+Object 00229: 2 // display
+Object 00229: 1 1 1
+Object 00229: 0 0 0
+Object 00229: 0 0 0
+Object 00229: 1
+Object 00229: 0
+Object 00229: 0
+Object 00229: 0 0
+Object 00229: 0
+Object 00229: 1
+Object 00229: 0
+Object 00229: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00229: 0000000000000
+Object 00229: 0 0
+Object 00229: # 0 0 0 0 0 0 0 0
+Object 00229: # 0 0 0 0 0 0 0 0
+Object 00229: 0 0
+
+Object 00230: 0
+Object 00230: 0 0 0
+Object 00230: 0.1431 0.0563 0.1431
+Object 00230: 90 0 0
+Object 00230: 1.677 -0.048 -3.427
+Object 00230: 7
+Object 00230: Red_RPlastic
+Object 00230: 0
+Object 00230: 0
+Object 00230: Object0230
+Object 00230: -1
+Object 00230: 2 // display
+Object 00230: 1 1 1
+Object 00230: 0 0 0
+Object 00230: 0 0 0
+Object 00230: 1
+Object 00230: 0
+Object 00230: 0
+Object 00230: 0 0
+Object 00230: 0
+Object 00230: 1
+Object 00230: 0
+Object 00230: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00230: 0000000000000
+Object 00230: 0 0
+Object 00230: # 0 0 0 0 0 0 0 0
+Object 00230: # 0 0 0 0 0 0 0 0
+Object 00230: 0 0
+
+Object 00231: 0
+Object 00231: 0 0 0
+Object 00231: 0.1431 0.0563 0.1431
+Object 00231: 90 0 0
+Object 00231: 1.251 -0.0501 -3.427
+Object 00231: 7
+Object 00231: Red_RPlastic
+Object 00231: 0
+Object 00231: 0
+Object 00231: Object0231
+Object 00231: -1
+Object 00231: 2 // display
+Object 00231: 1 1 1
+Object 00231: 0 0 0
+Object 00231: 0 0 0
+Object 00231: 1
+Object 00231: 0
+Object 00231: 0
+Object 00231: 0 0
+Object 00231: 0
+Object 00231: 1
+Object 00231: 0
+Object 00231: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00231: 0000000000000
+Object 00231: 0 0
+Object 00231: # 0 0 0 0 0 0 0 0
+Object 00231: # 0 0 0 0 0 0 0 0
+Object 00231: 0 0
+
+Object 00232: 0
+Object 00232: 0 0 0
+Object 00232: 0.1431 0.0563 0.1431
+Object 00232: 90 0 0
+Object 00232: 1.251 -0.4592 -3.427
+Object 00232: 7
+Object 00232: Red_RPlastic
+Object 00232: 0
+Object 00232: 0
+Object 00232: Object0232
+Object 00232: -1
+Object 00232: 2 // display
+Object 00232: 1 1 1
+Object 00232: 0 0 0
+Object 00232: 0 0 0
+Object 00232: 1
+Object 00232: 0
+Object 00232: 0
+Object 00232: 0 0
+Object 00232: 0
+Object 00232: 1
+Object 00232: 0
+Object 00232: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00232: 0000000000000
+Object 00232: 0 0
+Object 00232: # 0 0 0 0 0 0 0 0
+Object 00232: # 0 0 0 0 0 0 0 0
+Object 00232: 0 0
+
+Object 00233: 0
+Object 00233: 0 0 0
+Object 00233: 0.1431 0.0563 0.1431
+Object 00233: 90 0 0
+Object 00233: 0.8097 -0.466 -3.427
+Object 00233: 7
+Object 00233: Red_RPlastic
+Object 00233: 0
+Object 00233: 0
+Object 00233: Object0233
+Object 00233: -1
+Object 00233: 2 // display
+Object 00233: 1 1 1
+Object 00233: 0 0 0
+Object 00233: 0 0 0
+Object 00233: 1
+Object 00233: 0
+Object 00233: 0
+Object 00233: 0 0
+Object 00233: 0
+Object 00233: 1
+Object 00233: 0
+Object 00233: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00233: 0000000000000
+Object 00233: 0 0
+Object 00233: # 0 0 0 0 0 0 0 0
+Object 00233: # 0 0 0 0 0 0 0 0
+Object 00233: 0 0
+
+Object 00234: 0
+Object 00234: 0 0 0
+Object 00234: 0.1431 0.0563 0.1431
+Object 00234: 90 0 0
+Object 00234: 0.8097 -0.0512 -3.427
+Object 00234: 7
+Object 00234: Red_RPlastic
+Object 00234: 0
+Object 00234: 0
+Object 00234: Object0234
+Object 00234: -1
+Object 00234: 2 // display
+Object 00234: 1 1 1
+Object 00234: 0 0 0
+Object 00234: 0 0 0
+Object 00234: 1
+Object 00234: 0
+Object 00234: 0
+Object 00234: 0 0
+Object 00234: 0
+Object 00234: 1
+Object 00234: 0
+Object 00234: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00234: 0000000000000
+Object 00234: 0 0
+Object 00234: # 0 0 0 0 0 0 0 0
+Object 00234: # 0 0 0 0 0 0 0 0
+Object 00234: 0 0
+
+Object 00235: 2
+Object 00235: 0 0 0
+Object 00235: 0.8956 0.2797 0.0393
+Object 00235: 90 0 0
+Object 00235: 1.009 0.1599 -3.762
+Object 00235: 7
+Object 00235: Red_RPlastic
+Object 00235: 0
+Object 00235: 0
+Object 00235: Object0235
+Object 00235: -1
+Object 00235: 2 // display
+Object 00235: 1 1 1
+Object 00235: 0 0 0
+Object 00235: 0 0 0
+Object 00235: 1
+Object 00235: 0
+Object 00235: 0
+Object 00235: 0 0
+Object 00235: 0
+Object 00235: 1
+Object 00235: 0
+Object 00235: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00235: 0000000000000
+Object 00235: 0 0
+Object 00235: # 0 0 0 0 0 0 0 0
+Object 00235: # 0 0 0 0 0 0 0 0
+Object 00235: 0 0
+
+Object 00236: 2
+Object 00236: 0 0 0
+Object 00236: 0.8956 0.2797 0.0393
+Object 00236: 90 0 0
+Object 00236: 1.009 -0.6725 -3.762
+Object 00236: 7
+Object 00236: Red_RPlastic
+Object 00236: 0
+Object 00236: 0
+Object 00236: Object0236
+Object 00236: -1
+Object 00236: 2 // display
+Object 00236: 1 1 1
+Object 00236: 0 0 0
+Object 00236: 0 0 0
+Object 00236: 1
+Object 00236: 0
+Object 00236: 0
+Object 00236: 0 0
+Object 00236: 0
+Object 00236: 1
+Object 00236: 0
+Object 00236: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00236: 0000000000000
+Object 00236: 0 0
+Object 00236: # 0 0 0 0 0 0 0 0
+Object 00236: # 0 0 0 0 0 0 0 0
+Object 00236: 0 0
+
+Object 00237: 2
+Object 00237: 0 0 0
+Object 00237: 0.0369 0.2797 0.4553
+Object 00237: 90 0 0
+Object 00237: 0.1509 -0.2564 -3.762
+Object 00237: 7
+Object 00237: Red_RPlastic
+Object 00237: 0
+Object 00237: 0
+Object 00237: Object0237
+Object 00237: -1
+Object 00237: 2 // display
+Object 00237: 1 1 1
+Object 00237: 0 0 0
+Object 00237: 0 0 0
+Object 00237: 1
+Object 00237: 0
+Object 00237: 0
+Object 00237: 0 0
+Object 00237: 0
+Object 00237: 1
+Object 00237: 0
+Object 00237: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00237: 0000000000000
+Object 00237: 0 0
+Object 00237: # 0 0 0 0 0 0 0 0
+Object 00237: # 0 0 0 0 0 0 0 0
+Object 00237: 0 0
+
+Object 00238: 2
+Object 00238: 0 0 0
+Object 00238: 0.0369 0.2797 0.4553
+Object 00238: 90 0 0
+Object 00238: 1.868 -0.2564 -3.762
+Object 00238: 7
+Object 00238: Red_RPlastic
+Object 00238: 0
+Object 00238: 0
+Object 00238: Object0238
+Object 00238: -1
+Object 00238: 2 // display
+Object 00238: 1 1 1
+Object 00238: 0 0 0
+Object 00238: 0 0 0
+Object 00238: 1
+Object 00238: 0
+Object 00238: 0
+Object 00238: 0 0
+Object 00238: 0
+Object 00238: 1
+Object 00238: 0
+Object 00238: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00238: 0000000000000
+Object 00238: 0 0
+Object 00238: # 0 0 0 0 0 0 0 0
+Object 00238: # 0 0 0 0 0 0 0 0
+Object 00238: 0 0
+
+Object 00239: 5
+Object 00239: 0.831 0 0
+Object 00239: 0.1948 0.1948 0.2456
+Object 00239: 180 0 0
+Object 00239: 0.5373 -0.2652 -3.796
+Object 00239: 7
+Object 00239: Red_RPlastic
+Object 00239: 0
+Object 00239: 0
+Object 00239: Object0239
+Object 00239: -1
+Object 00239: 2 // display
+Object 00239: 1 1 1
+Object 00239: 0 0 0
+Object 00239: 0 0 0
+Object 00239: 1
+Object 00239: 0
+Object 00239: 0
+Object 00239: 0 0
+Object 00239: 0
+Object 00239: 1
+Object 00239: 0
+Object 00239: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00239: 0000000000000
+Object 00239: 0 0
+Object 00239: # 0 0 0 0 0 0 0 0
+Object 00239: # 0 0 0 0 0 0 0 0
+Object 00239: 0 0
+
+Object 00240: 5
+Object 00240: 0.831 0 0
+Object 00240: 0.1948 0.1948 0.2456
+Object 00240: 180 0 0
+Object 00240: 1.509 -0.2652 -3.796
+Object 00240: 7
+Object 00240: Red_RPlastic
+Object 00240: 0
+Object 00240: 0
+Object 00240: Object0240
+Object 00240: -1
+Object 00240: 2 // display
+Object 00240: 1 1 1
+Object 00240: 0 0 0
+Object 00240: 0 0 0
+Object 00240: 1
+Object 00240: 0
+Object 00240: 0
+Object 00240: 0 0
+Object 00240: 0
+Object 00240: 1
+Object 00240: 8
+Object 00240: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00240: 0000000000000
+Object 00240: 0 0
+Object 00240: # 0 0 0 0 0 0 0 0
+Object 00240: # 0 0 0 0 0 0 0 0
+Object 00240: 0 0
+
+Object 00241: 5
+Object 00241: 0.831 0 0
+Object 00241: 0.1948 0.1948 0.2456
+Object 00241: 180 0 0
+Object 00241: 1.031 -0.2652 -3.796
+Object 00241: 7
+Object 00241: Red_RPlastic
+Object 00241: 0
+Object 00241: 0
+Object 00241: Object0241
+Object 00241: -1
+Object 00241: 2 // display
+Object 00241: 1 1 1
+Object 00241: 0 0 0
+Object 00241: 0 0 0
+Object 00241: 1
+Object 00241: 0
+Object 00241: 0
+Object 00241: 0 0
+Object 00241: 0
+Object 00241: 1
+Object 00241: 0
+Object 00241: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00241: 0000000000000
+Object 00241: 0 0
+Object 00241: # 0 0 0 0 0 0 0 0
+Object 00241: # 0 0 0 0 0 0 0 0
+Object 00241: 0 0
+
+End of file: LEGO.SCN

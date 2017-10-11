@@ -1,0 +1,17 @@
+option verbose
+option stack=90000
+option caseexact
+name povray
+file atmosph, bbox, bcyl, bezier, blob, boxes, bsphere
+file camera, chi2, colour, cones, csg, discs, express
+file gif, gifdecod, hfield, iff, image, quatern, lathe
+file lbuffer, lighting, matrices, mem, mesh, normal
+file objects, octree, optin, optout, parse, parstxtr
+file pattern, pgm, pigment, planes, png_pov, point, poly
+file polygon, polysolv, povray, ppm, prism, quadrics
+file radiosit, ray, render, sor, spheres, super
+file targa, texture, tokenize, torus, triangle, truetype
+file txttest, userio, vbuffer, vlbuffer, warps, povray
+file msdostxt, msdosvid, vesavbe, console, fractal, hcmplx, rad_data
+file media, interior
+library zlib.lib, libpng.lib, pmode.lib, ztimer.lib

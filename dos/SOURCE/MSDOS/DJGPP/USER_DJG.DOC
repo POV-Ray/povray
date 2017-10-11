@@ -1,0 +1,35 @@
+USER DOCUMENTATION FOR POV-Ray FOR MS-DOS USING DJGPP VERSION
+
+1.0   Introduction
+
+The Borland compiled version of POV-Ray is designated by ".msdos.gcc" after 
+the POV-Ray version number on the opening banner.  Everything in this 
+document ONLY applies to that version.  Other versions will operate under 
+different rules.  This file is NOT the only documentation for POV-Ray.  
+There is a file called POVMSDOS.DOC which covers the MSDOS-specific 
+features but that still isn't everything.  There is a hypertext utility 
+POVHELP.EXE that reads a file POVHELP.PHE which contains the main 
+documentation for POV-Ray itself that is common to all versions.  
+
+This version has been compiled as a 32-bit DOS protected mode application.  
+It must be run on a 386 or higher system with at least 4 meg of memory.  
+More memory is preferred.
+
+
+2.0   Memory Usage
+
+This version has been compiled as a 32-bit DOS protected mode application.  
+It must be run on a 386 or higher system with at least 4 meg of memory.  
+More memory is preferred.
+
+DJGPP compiled programs require a DPMI server to be installed.  If you run 
+under Windows or OS/2 it will provide DPMI service.  Quarterdeck's QDPMI 
+will also work.  Finally the DJGPP compiler comes with a freeware DPMI 
+utility called CWSDPMI that works well too.
+
+3.0   Conclusion
+
+Be sure to read POVMSDOS.DOC and run POVHELP to make sure you have all the 
+remaining documentation.  This file only applies to the DJGPP compiled 
+version.  Also read POVWHERE.GET for more information on POV-Ray archives 
+and support information.

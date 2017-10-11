@@ -1,0 +1,11 @@
+atmosph.o bbox.o bcyl.o bezier.o blob.o boxes.o bsphere.o camera.o chi2.o 
+colour.o cones.o console.o csg.o discs.o express.o fractal.o 
+gif.o gifdecod.o interior.o media.o hcmplx.o hfield.o iff.o image.o quatern.o 
+lathe.o lbuffer.o lighting.o matrices.o mem.o mesh.o msdostxt.o vesavbe.o
+msdosvid.o normal.o objects.o octree.o optin.o optout.o parse.o rad_data.o
+parstxtr.o pattern.o pgm.o pigment.o planes.o png_pov.o point.o poly.o 
+polygon.o polysolv.o povray.o ppm.o prism.o quadrics.o radiosit.o ray.o 
+render.o sor.o spheres.o super.o targa.o texture.o tokenize.o torus.o 
+triangle.o truetype.o txttest.o userio.o vbuffer.o vlbuffer.o warps.o 
+pmlite.o pmpro.o vflat.o _pmlite.o _pmpro.o _vflat.o 
+ztimer.a libpng.a libz.a -lc -lpc

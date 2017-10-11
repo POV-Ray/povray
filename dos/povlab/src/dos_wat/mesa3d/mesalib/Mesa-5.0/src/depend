@@ -1,0 +1,776 @@
+# DO NOT DELETE
+
+api_arrayelt.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+api_arrayelt.o: ../include/GL/internal/glcore.h api_arrayelt.h mtypes.h
+api_arrayelt.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+api_arrayelt.o: context.h glapi.h imports.h macros.h
+api_loopback.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+api_loopback.o: ../include/GL/internal/glcore.h glapi.h glapitable.h macros.h
+api_loopback.o: colormac.h config.h mmath.h imports.h api_loopback.h
+api_noop.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+api_noop.o: ../include/GL/internal/glcore.h api_noop.h mtypes.h config.h
+api_noop.o: glapitable.h glthread.h math/m_matrix.h dd.h context.h glapi.h
+api_noop.o: api_validate.h colormac.h macros.h mmath.h imports.h light.h
+api_validate.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+api_validate.o: ../include/GL/internal/glcore.h api_validate.h mtypes.h
+api_validate.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+api_validate.o: context.h glapi.h imports.h state.h
+accum.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+accum.o: ../include/GL/internal/glcore.h accum.h mtypes.h config.h
+accum.o: glapitable.h glthread.h math/m_matrix.h dd.h context.h glapi.h
+accum.o: imports.h macros.h state.h
+attrib.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+attrib.o: ../include/GL/internal/glcore.h imports.h accum.h mtypes.h config.h
+attrib.o: glapitable.h glthread.h math/m_matrix.h dd.h attrib.h blend.h
+attrib.o: buffers.h colormac.h macros.h mmath.h context.h glapi.h depth.h
+attrib.o: enable.h enums.h fog.h hint.h light.h lines.h matrix.h points.h
+attrib.o: polygon.h simple_list.h stencil.h texobj.h texstate.h
+attrib.o: math/m_xform.h math/m_vector.h
+blend.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+blend.o: ../include/GL/internal/glcore.h blend.h mtypes.h config.h
+blend.o: glapitable.h glthread.h math/m_matrix.h dd.h colormac.h macros.h
+blend.o: mmath.h imports.h context.h glapi.h enums.h
+buffers.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+buffers.o: ../include/GL/internal/glcore.h imports.h accum.h mtypes.h
+buffers.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h buffers.h
+buffers.o: colormac.h macros.h mmath.h context.h glapi.h depth.h enums.h
+buffers.o: stencil.h state.h
+clip.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+clip.o: ../include/GL/internal/glcore.h clip.h mtypes.h config.h glapitable.h
+clip.o: glthread.h math/m_matrix.h dd.h context.h glapi.h macros.h mmath.h
+clip.o: imports.h math/m_xform.h math/m_vector.h
+colortab.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+colortab.o: ../include/GL/internal/glcore.h imports.h colortab.h mtypes.h
+colortab.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h context.h
+colortab.o: glapi.h image.h macros.h mmath.h state.h
+context.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+context.o: ../include/GL/internal/glcore.h imports.h buffers.h mtypes.h
+context.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h clip.h
+context.o: colortab.h context.h glapi.h dlist.h eval.h enums.h extensions.h
+context.o: fog.h get.h hash.h light.h macros.h mmath.h simple_list.h state.h
+context.o: teximage.h texobj.h texstate.h varray.h vpstate.h vtxfmt.h
+context.o: math/m_translate.h math/m_xform.h math/m_vector.h math/mathmod.h
+convolve.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+convolve.o: ../include/GL/internal/glcore.h colormac.h config.h macros.h
+convolve.o: mmath.h imports.h convolve.h mtypes.h glapitable.h glthread.h
+convolve.o: math/m_matrix.h dd.h context.h glapi.h image.h state.h
+debug.o: mtypes.h glheader.h ../include/GL/gl.h ../include/GL/glext.h
+debug.o: ../include/GL/internal/glcore.h config.h glapitable.h glthread.h
+debug.o: math/m_matrix.h dd.h context.h glapi.h imports.h debug.h
+depth.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+depth.o: ../include/GL/internal/glcore.h imports.h context.h glapi.h mtypes.h
+depth.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h enums.h
+depth.o: depth.h macros.h
+dispatch.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+dispatch.o: ../include/GL/internal/glcore.h glapi.h glapitable.h glthread.h
+dispatch.o: glapitemp.h
+dlist.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+dlist.o: ../include/GL/internal/glcore.h imports.h api_loopback.h attrib.h
+dlist.o: mtypes.h config.h glapitable.h glthread.h math/m_matrix.h dd.h
+dlist.o: blend.h buffers.h clip.h colormac.h macros.h mmath.h colortab.h
+dlist.o: context.h glapi.h convolve.h depth.h dlist.h enable.h enums.h eval.h
+dlist.o: extensions.h feedback.h get.h hash.h histogram.h image.h light.h
+dlist.o: lines.h matrix.h pixel.h points.h polygon.h state.h texobj.h
+dlist.o: teximage.h texstate.h varray.h vpstate.h math/m_xform.h
+dlist.o: math/m_vector.h
+drawpix.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+drawpix.o: ../include/GL/internal/glcore.h imports.h colormac.h config.h
+drawpix.o: macros.h mmath.h context.h glapi.h mtypes.h glapitable.h
+drawpix.o: glthread.h math/m_matrix.h dd.h drawpix.h feedback.h state.h
+enable.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+enable.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h config.h
+enable.o: glapitable.h glthread.h math/m_matrix.h dd.h enable.h light.h
+enable.o: macros.h mmath.h imports.h simple_list.h enums.h math/m_xform.h
+enable.o: math/m_vector.h
+enums.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+enums.o: ../include/GL/internal/glcore.h enums.h imports.h
+eval.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+eval.o: ../include/GL/internal/glcore.h imports.h colormac.h config.h
+eval.o: macros.h mmath.h context.h glapi.h mtypes.h glapitable.h glthread.h
+eval.o: math/m_matrix.h dd.h eval.h
+extensions.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+extensions.o: ../include/GL/internal/glcore.h imports.h context.h glapi.h
+extensions.o: mtypes.h config.h glapitable.h glthread.h math/m_matrix.h dd.h
+extensions.o: extensions.h simple_list.h
+feedback.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+feedback.o: ../include/GL/internal/glcore.h colormac.h config.h macros.h
+feedback.o: mmath.h imports.h context.h glapi.h mtypes.h glapitable.h
+feedback.o: glthread.h math/m_matrix.h dd.h enums.h feedback.h
+fog.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+fog.o: ../include/GL/internal/glcore.h colormac.h config.h macros.h mmath.h
+fog.o: imports.h context.h glapi.h mtypes.h glapitable.h glthread.h
+fog.o: math/m_matrix.h dd.h fog.h
+get.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+get.o: ../include/GL/internal/glcore.h colormac.h config.h macros.h mmath.h
+get.o: imports.h context.h glapi.h mtypes.h glapitable.h glthread.h
+get.o: math/m_matrix.h dd.h enable.h enums.h extensions.h get.h texcompress.h
+glapi.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+glapi.o: ../include/GL/internal/glcore.h glapi.h glapioffsets.h glapitable.h
+glapi.o: glthread.h glapitemp.h glprocs.h
+glthread.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+glthread.o: ../include/GL/internal/glcore.h glthread.h
+hash.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+hash.o: ../include/GL/internal/glcore.h imports.h glthread.h hash.h context.h
+hash.o: glapi.h mtypes.h config.h glapitable.h math/m_matrix.h dd.h
+hint.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+hint.o: ../include/GL/internal/glcore.h enums.h context.h glapi.h mtypes.h
+hint.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h hint.h
+hint.o: imports.h
+histogram.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+histogram.o: ../include/GL/internal/glcore.h colormac.h config.h macros.h
+histogram.o: mmath.h imports.h context.h glapi.h mtypes.h glapitable.h
+histogram.o: glthread.h math/m_matrix.h dd.h image.h histogram.h
+image.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+image.o: ../include/GL/internal/glcore.h colormac.h config.h macros.h mmath.h
+image.o: imports.h context.h glapi.h mtypes.h glapitable.h glthread.h
+image.o: math/m_matrix.h dd.h image.h histogram.h pixel.h
+imports.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+imports.o: ../include/GL/internal/glcore.h mtypes.h config.h glapitable.h
+imports.o: glthread.h math/m_matrix.h dd.h context.h glapi.h imports.h
+light.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+light.o: ../include/GL/internal/glcore.h imports.h colormac.h config.h
+light.o: macros.h mmath.h context.h glapi.h mtypes.h glapitable.h glthread.h
+light.o: math/m_matrix.h dd.h enums.h light.h simple_list.h math/m_xform.h
+light.o: math/m_vector.h
+lines.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+lines.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h config.h
+lines.o: glapitable.h glthread.h math/m_matrix.h dd.h depth.h lines.h
+lines.o: macros.h mmath.h imports.h texstate.h
+matrix.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+matrix.o: ../include/GL/internal/glcore.h imports.h buffers.h mtypes.h
+matrix.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h context.h
+matrix.o: glapi.h enums.h macros.h matrix.h mmath.h
+mmath.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+mmath.o: ../include/GL/internal/glcore.h mmath.h imports.h
+pixel.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+pixel.o: ../include/GL/internal/glcore.h imports.h colormac.h config.h
+pixel.o: macros.h mmath.h context.h glapi.h mtypes.h glapitable.h glthread.h
+pixel.o: math/m_matrix.h dd.h pixel.h
+points.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+points.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h config.h
+points.o: glapitable.h glthread.h math/m_matrix.h dd.h macros.h mmath.h
+points.o: imports.h points.h texstate.h
+polygon.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+polygon.o: ../include/GL/internal/glcore.h imports.h context.h glapi.h
+polygon.o: mtypes.h config.h glapitable.h glthread.h math/m_matrix.h dd.h
+polygon.o: image.h enums.h macros.h polygon.h
+rastpos.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+rastpos.o: ../include/GL/internal/glcore.h clip.h mtypes.h config.h
+rastpos.o: glapitable.h glthread.h math/m_matrix.h dd.h colormac.h macros.h
+rastpos.o: mmath.h imports.h context.h glapi.h feedback.h light.h rastpos.h
+rastpos.o: state.h simple_list.h math/m_xform.h math/m_vector.h
+state.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+state.o: ../include/GL/internal/glcore.h accum.h mtypes.h config.h
+state.o: glapitable.h glthread.h math/m_matrix.h dd.h api_loopback.h attrib.h
+state.o: blend.h buffers.h clip.h colortab.h context.h glapi.h convolve.h
+state.o: depth.h dlist.h drawpix.h enable.h eval.h get.h feedback.h fog.h
+state.o: hint.h histogram.h light.h lines.h matrix.h mmath.h imports.h
+state.o: pixel.h points.h polygon.h rastpos.h state.h stencil.h teximage.h
+state.o: texobj.h texstate.h varray.h vpstate.h math/m_xform.h
+state.o: math/m_vector.h
+stencil.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+stencil.o: ../include/GL/internal/glcore.h imports.h context.h glapi.h
+stencil.o: mtypes.h config.h glapitable.h glthread.h math/m_matrix.h dd.h
+stencil.o: depth.h macros.h stencil.h enable.h
+texcompress.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+texcompress.o: ../include/GL/internal/glcore.h imports.h context.h glapi.h
+texcompress.o: mtypes.h config.h glapitable.h glthread.h math/m_matrix.h dd.h
+texcompress.o: image.h texcompress.h texformat.h
+texformat.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+texformat.o: ../include/GL/internal/glcore.h colormac.h config.h macros.h
+texformat.o: mmath.h imports.h context.h glapi.h mtypes.h glapitable.h
+texformat.o: glthread.h math/m_matrix.h dd.h image.h texformat.h teximage.h
+texformat.o: texstate.h texformat_tmp.h
+teximage.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+teximage.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h
+teximage.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h convolve.h
+teximage.o: image.h imports.h macros.h mmath.h state.h texcompress.h
+teximage.o: texformat.h teximage.h texstate.h texstore.h
+texobj.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+texobj.o: ../include/GL/internal/glcore.h colortab.h mtypes.h config.h
+texobj.o: glapitable.h glthread.h math/m_matrix.h dd.h context.h glapi.h
+texobj.o: enums.h hash.h imports.h macros.h teximage.h texstate.h texobj.h
+texstate.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+texstate.o: ../include/GL/internal/glcore.h colormac.h config.h macros.h
+texstate.o: mmath.h imports.h context.h glapi.h mtypes.h glapitable.h
+texstate.o: glthread.h math/m_matrix.h dd.h enums.h extensions.h texobj.h
+texstate.o: teximage.h texstate.h math/m_xform.h math/m_vector.h
+texstore.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+texstore.o: ../include/GL/internal/glcore.h colormac.h config.h macros.h
+texstore.o: mmath.h imports.h context.h glapi.h mtypes.h glapitable.h
+texstore.o: glthread.h math/m_matrix.h dd.h convolve.h image.h texcompress.h
+texstore.o: texformat.h teximage.h texstore.h texutil.h
+texutil.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+texutil.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h
+texutil.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h enums.h
+texutil.o: image.h imports.h macros.h texformat.h texutil.h texutil_tmp.h
+varray.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+varray.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h config.h
+varray.o: glapitable.h glthread.h math/m_matrix.h dd.h enable.h enums.h
+varray.o: dlist.h light.h macros.h mmath.h imports.h state.h texstate.h
+varray.o: varray.h math/m_translate.h
+vpexec.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+vpexec.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h config.h
+vpexec.o: glapitable.h glthread.h math/m_matrix.h dd.h imports.h macros.h
+vpexec.o: vpexec.h
+vpparse.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+vpparse.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h
+vpparse.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h hash.h
+vpparse.o: imports.h macros.h vpparse.h
+vpstate.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+vpstate.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h
+vpstate.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h hash.h
+vpstate.o: imports.h macros.h vpexec.h vpparse.h vpstate.h
+vtxfmt.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+vtxfmt.o: ../include/GL/internal/glcore.h api_loopback.h context.h glapi.h
+vtxfmt.o: mtypes.h config.h glapitable.h glthread.h math/m_matrix.h dd.h
+vtxfmt.o: imports.h state.h vtxfmt.h vtxfmt_tmp.h
+X86/x86.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+X86/x86.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h
+X86/x86.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+X86/x86.o: math/m_xform.h math/m_vector.h tnl/t_context.h X86/x86.h
+X86/x86.o: X86/common_x86_macros.h
+X86/common_x86.o: context.h glapi.h ../include/GL/gl.h ../include/GL/glext.h
+X86/common_x86.o: mtypes.h glheader.h ../include/GL/internal/glcore.h
+X86/common_x86.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+X86/common_x86.o: X86/common_x86_asm.h X86/common_x86_features.h
+X86/3dnow.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+X86/3dnow.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h
+X86/3dnow.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+X86/3dnow.o: math/m_xform.h math/m_vector.h tnl/t_context.h X86/3dnow.h
+X86/3dnow.o: X86/common_x86_macros.h
+X86/sse.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+X86/sse.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h
+X86/sse.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+X86/sse.o: math/m_xform.h math/m_vector.h tnl/t_context.h X86/sse.h
+X86/sse.o: X86/common_x86_macros.h
+math/m_debug_clip.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+math/m_debug_clip.o: ../include/GL/internal/glcore.h context.h glapi.h
+math/m_debug_clip.o: mtypes.h config.h glapitable.h glthread.h
+math/m_debug_clip.o: math/m_matrix.h dd.h macros.h imports.h math/m_matrix.h
+math/m_debug_clip.o: math/m_xform.h math/m_vector.h math/m_debug.h
+math/m_debug_clip.o: math/m_debug_util.h
+math/m_debug_norm.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+math/m_debug_norm.o: ../include/GL/internal/glcore.h context.h glapi.h
+math/m_debug_norm.o: mtypes.h config.h glapitable.h glthread.h
+math/m_debug_norm.o: math/m_matrix.h dd.h macros.h imports.h mmath.h
+math/m_debug_norm.o: math/m_matrix.h math/m_xform.h math/m_vector.h
+math/m_debug_norm.o: math/m_debug.h math/m_debug_util.h
+math/m_debug_xform.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+math/m_debug_xform.o: ../include/GL/internal/glcore.h context.h glapi.h
+math/m_debug_xform.o: mtypes.h config.h glapitable.h glthread.h
+math/m_debug_xform.o: math/m_matrix.h dd.h macros.h imports.h math/m_matrix.h
+math/m_debug_xform.o: math/m_xform.h math/m_vector.h math/m_debug.h
+math/m_debug_xform.o: math/m_debug_util.h
+math/m_eval.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+math/m_eval.o: ../include/GL/internal/glcore.h config.h math/m_eval.h
+math/m_matrix.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+math/m_matrix.o: ../include/GL/internal/glcore.h imports.h macros.h mmath.h
+math/m_matrix.o: math/m_matrix.h
+math/m_translate.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+math/m_translate.o: ../include/GL/internal/glcore.h mtypes.h config.h
+math/m_translate.o: glapitable.h glthread.h math/m_matrix.h dd.h colormac.h
+math/m_translate.o: macros.h mmath.h imports.h math/m_translate.h
+math/m_translate.o: math/m_trans_tmp.h
+math/m_vector.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+math/m_vector.o: ../include/GL/internal/glcore.h imports.h macros.h
+math/m_vector.o: math/m_vector.h mtypes.h config.h glapitable.h glthread.h
+math/m_vector.o: math/m_matrix.h dd.h
+math/m_xform.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+math/m_xform.o: ../include/GL/internal/glcore.h macros.h mmath.h imports.h
+math/m_xform.o: math/m_eval.h math/m_matrix.h math/m_translate.h config.h
+math/m_xform.o: mtypes.h glapitable.h glthread.h math/m_matrix.h dd.h
+math/m_xform.o: math/m_xform.h math/m_vector.h math/mathmod.h
+math/m_xform.o: math/m_xform_tmp.h math/m_clip_tmp.h math/m_norm_tmp.h
+math/m_xform.o: math/m_dotprod_tmp.h math/m_copy_tmp.h
+array_cache/ac_context.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+array_cache/ac_context.o: ../include/GL/internal/glcore.h macros.h imports.h
+array_cache/ac_context.o: mmath.h mtypes.h config.h glapitable.h glthread.h
+array_cache/ac_context.o: math/m_matrix.h dd.h array_cache/ac_context.h
+array_cache/ac_context.o: array_cache/acache.h
+array_cache/ac_import.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+array_cache/ac_import.o: ../include/GL/internal/glcore.h macros.h imports.h
+array_cache/ac_import.o: mmath.h mtypes.h config.h glapitable.h glthread.h
+array_cache/ac_import.o: math/m_matrix.h dd.h math/m_translate.h
+array_cache/ac_import.o: array_cache/ac_context.h array_cache/acache.h
+swrast/s_aaline.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_aaline.o: ../include/GL/internal/glcore.h swrast/s_aaline.h mtypes.h
+swrast/s_aaline.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+swrast/s_aaline.o: swrast/swrast.h swrast/s_context.h swrast/s_span.h
+swrast/s_aaline.o: swrast/swrast.h mmath.h imports.h swrast/s_aalinetemp.h
+swrast/s_aatriangle.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_aatriangle.o: ../include/GL/internal/glcore.h macros.h imports.h
+swrast/s_aatriangle.o: mmath.h swrast/s_aatriangle.h mtypes.h config.h
+swrast/s_aatriangle.o: glapitable.h glthread.h math/m_matrix.h dd.h
+swrast/s_aatriangle.o: swrast/swrast.h swrast/s_context.h swrast/s_span.h
+swrast/s_aatriangle.o: swrast/s_aatritemp.h
+swrast/s_accum.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_accum.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h
+swrast/s_accum.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+swrast/s_accum.o: macros.h mmath.h imports.h swrast/s_accum.h swrast/swrast.h
+swrast/s_accum.o: swrast/s_alphabuf.h swrast/s_context.h swrast/s_masking.h
+swrast/s_accum.o: swrast/s_span.h
+swrast/s_alpha.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_alpha.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h
+swrast/s_alpha.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+swrast/s_alpha.o: colormac.h macros.h mmath.h imports.h swrast/s_alpha.h
+swrast/s_alpha.o: swrast/swrast.h swrast/s_context.h
+swrast/s_alphabuf.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_alphabuf.o: ../include/GL/internal/glcore.h context.h glapi.h
+swrast/s_alphabuf.o: mtypes.h config.h glapitable.h glthread.h
+swrast/s_alphabuf.o: math/m_matrix.h dd.h imports.h swrast/s_context.h
+swrast/s_alphabuf.o: swrast/swrast.h swrast/s_alphabuf.h
+swrast/s_bitmap.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_bitmap.o: ../include/GL/internal/glcore.h image.h mtypes.h config.h
+swrast/s_bitmap.o: glapitable.h glthread.h math/m_matrix.h dd.h macros.h
+swrast/s_bitmap.o: mmath.h imports.h pixel.h swrast/s_context.h
+swrast/s_bitmap.o: swrast/swrast.h swrast/s_span.h
+swrast/s_blend.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_blend.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h
+swrast/s_blend.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+swrast/s_blend.o: colormac.h macros.h mmath.h imports.h swrast/s_alphabuf.h
+swrast/s_blend.o: swrast/swrast.h swrast/s_blend.h swrast/s_context.h
+swrast/s_blend.o: swrast/s_span.h
+swrast/s_buffers.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_buffers.o: ../include/GL/internal/glcore.h colormac.h config.h
+swrast/s_buffers.o: macros.h mmath.h imports.h swrast/s_accum.h mtypes.h
+swrast/s_buffers.o: glapitable.h glthread.h math/m_matrix.h dd.h
+swrast/s_buffers.o: swrast/swrast.h swrast/s_alphabuf.h swrast/s_context.h
+swrast/s_buffers.o: swrast/s_depth.h swrast/s_masking.h swrast/s_stencil.h
+swrast/s_copypix.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_copypix.o: ../include/GL/internal/glcore.h colormac.h config.h
+swrast/s_copypix.o: macros.h mmath.h imports.h context.h glapi.h mtypes.h
+swrast/s_copypix.o: glapitable.h glthread.h math/m_matrix.h dd.h convolve.h
+swrast/s_copypix.o: feedback.h pixel.h swrast/s_context.h swrast/swrast.h
+swrast/s_copypix.o: swrast/s_depth.h swrast/s_histogram.h swrast/s_pixeltex.h
+swrast/s_copypix.o: swrast/s_span.h swrast/s_stencil.h swrast/s_texture.h
+swrast/s_copypix.o: swrast/s_zoom.h
+swrast/s_context.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_context.o: ../include/GL/internal/glcore.h context.h glapi.h
+swrast/s_context.o: mtypes.h config.h glapitable.h glthread.h math/m_matrix.h
+swrast/s_context.o: dd.h imports.h swrast/swrast.h swrast/s_blend.h
+swrast/s_context.o: swrast/s_context.h swrast/s_lines.h swrast/s_points.h
+swrast/s_context.o: swrast/s_span.h swrast/s_triangle.h swrast/s_texture.h
+swrast/s_depth.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_depth.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h
+swrast/s_depth.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+swrast/s_depth.o: macros.h imports.h swrast/s_depth.h swrast/swrast.h
+swrast/s_depth.o: swrast/s_context.h
+swrast/s_drawpix.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_drawpix.o: ../include/GL/internal/glcore.h colormac.h config.h
+swrast/s_drawpix.o: macros.h mmath.h imports.h context.h glapi.h mtypes.h
+swrast/s_drawpix.o: glapitable.h glthread.h math/m_matrix.h dd.h convolve.h
+swrast/s_drawpix.o: image.h pixel.h swrast/s_context.h swrast/swrast.h
+swrast/s_drawpix.o: swrast/s_drawpix.h swrast/s_pixeltex.h swrast/s_span.h
+swrast/s_drawpix.o: swrast/s_stencil.h swrast/s_texture.h swrast/s_zoom.h
+swrast/s_feedback.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_feedback.o: ../include/GL/internal/glcore.h colormac.h config.h
+swrast/s_feedback.o: macros.h mmath.h imports.h context.h glapi.h mtypes.h
+swrast/s_feedback.o: glapitable.h glthread.h math/m_matrix.h dd.h enums.h
+swrast/s_feedback.o: feedback.h swrast/s_context.h swrast/swrast.h
+swrast/s_feedback.o: swrast/s_feedback.h swrast/s_triangle.h
+swrast/s_fog.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_fog.o: ../include/GL/internal/glcore.h colormac.h config.h macros.h
+swrast/s_fog.o: mmath.h imports.h context.h glapi.h mtypes.h glapitable.h
+swrast/s_fog.o: glthread.h math/m_matrix.h dd.h swrast/s_context.h
+swrast/s_fog.o: swrast/swrast.h swrast/s_fog.h swrast/s_span.h
+swrast/s_histogram.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_histogram.o: ../include/GL/internal/glcore.h colormac.h config.h
+swrast/s_histogram.o: macros.h mmath.h imports.h image.h mtypes.h
+swrast/s_histogram.o: glapitable.h glthread.h math/m_matrix.h dd.h
+swrast/s_histogram.o: swrast/s_context.h swrast/swrast.h swrast/s_histogram.h
+swrast/s_histogram.o: swrast/s_span.h
+swrast/s_imaging.o: swrast/s_context.h mtypes.h glheader.h ../include/GL/gl.h
+swrast/s_imaging.o: ../include/GL/glext.h ../include/GL/internal/glcore.h
+swrast/s_imaging.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+swrast/s_imaging.o: swrast/swrast.h swrast/s_span.h
+swrast/s_lines.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_lines.o: ../include/GL/internal/glcore.h colormac.h config.h
+swrast/s_lines.o: macros.h mmath.h imports.h swrast/s_aaline.h mtypes.h
+swrast/s_lines.o: glapitable.h glthread.h math/m_matrix.h dd.h
+swrast/s_lines.o: swrast/swrast.h swrast/s_context.h swrast/s_depth.h
+swrast/s_lines.o: swrast/s_feedback.h swrast/s_lines.h swrast/s_span.h
+swrast/s_lines.o: swrast/s_linetemp.h
+swrast/s_logic.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_logic.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h
+swrast/s_logic.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+swrast/s_logic.o: imports.h macros.h swrast/s_alphabuf.h swrast/swrast.h
+swrast/s_logic.o: swrast/s_context.h swrast/s_logic.h swrast/s_span.h
+swrast/s_masking.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_masking.o: ../include/GL/internal/glcore.h enums.h macros.h
+swrast/s_masking.o: swrast/s_alphabuf.h mtypes.h config.h glapitable.h
+swrast/s_masking.o: glthread.h math/m_matrix.h dd.h swrast/swrast.h
+swrast/s_masking.o: swrast/s_context.h swrast/s_masking.h swrast/s_span.h
+swrast/s_pixeltex.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_pixeltex.o: ../include/GL/internal/glcore.h colormac.h config.h
+swrast/s_pixeltex.o: macros.h mmath.h imports.h swrast/s_context.h mtypes.h
+swrast/s_pixeltex.o: glapitable.h glthread.h math/m_matrix.h dd.h
+swrast/s_pixeltex.o: swrast/swrast.h swrast/s_pixeltex.h swrast/s_texture.h
+swrast/s_points.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_points.o: ../include/GL/internal/glcore.h colormac.h config.h
+swrast/s_points.o: macros.h mmath.h imports.h context.h glapi.h mtypes.h
+swrast/s_points.o: glapitable.h glthread.h math/m_matrix.h dd.h texstate.h
+swrast/s_points.o: swrast/s_context.h swrast/swrast.h swrast/s_feedback.h
+swrast/s_points.o: swrast/s_points.h swrast/s_span.h swrast/s_pointtemp.h
+swrast/s_readpix.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_readpix.o: ../include/GL/internal/glcore.h colormac.h config.h
+swrast/s_readpix.o: macros.h mmath.h imports.h convolve.h mtypes.h
+swrast/s_readpix.o: glapitable.h glthread.h math/m_matrix.h dd.h context.h
+swrast/s_readpix.o: glapi.h feedback.h image.h pixel.h swrast/s_alphabuf.h
+swrast/s_readpix.o: swrast/swrast.h swrast/s_context.h swrast/s_depth.h
+swrast/s_readpix.o: swrast/s_span.h swrast/s_stencil.h
+swrast/s_span.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_span.o: ../include/GL/internal/glcore.h colormac.h config.h macros.h
+swrast/s_span.o: mmath.h imports.h context.h glapi.h mtypes.h glapitable.h
+swrast/s_span.o: glthread.h math/m_matrix.h dd.h swrast/s_alpha.h
+swrast/s_span.o: swrast/swrast.h swrast/s_alphabuf.h swrast/s_blend.h
+swrast/s_span.o: swrast/s_context.h swrast/s_depth.h swrast/s_fog.h
+swrast/s_span.o: swrast/s_logic.h swrast/s_masking.h swrast/s_span.h
+swrast/s_span.o: swrast/s_stencil.h swrast/s_texture.h
+swrast/s_stencil.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_stencil.o: ../include/GL/internal/glcore.h context.h glapi.h
+swrast/s_stencil.o: mtypes.h config.h glapitable.h glthread.h math/m_matrix.h
+swrast/s_stencil.o: dd.h macros.h imports.h swrast/s_context.h
+swrast/s_stencil.o: swrast/swrast.h swrast/s_depth.h swrast/s_stencil.h
+swrast/s_texture.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_texture.o: ../include/GL/internal/glcore.h context.h glapi.h
+swrast/s_texture.o: mtypes.h config.h glapitable.h glthread.h math/m_matrix.h
+swrast/s_texture.o: dd.h colormac.h macros.h mmath.h imports.h texformat.h
+swrast/s_texture.o: teximage.h swrast/s_context.h swrast/swrast.h
+swrast/s_texture.o: swrast/s_texture.h
+swrast/s_texstore.o: colormac.h glheader.h ../include/GL/gl.h
+swrast/s_texstore.o: ../include/GL/glext.h ../include/GL/internal/glcore.h
+swrast/s_texstore.o: config.h macros.h mmath.h imports.h context.h glapi.h
+swrast/s_texstore.o: mtypes.h glapitable.h glthread.h math/m_matrix.h dd.h
+swrast/s_texstore.o: convolve.h image.h texformat.h teximage.h texstore.h
+swrast/s_texstore.o: swrast/s_context.h swrast/swrast.h swrast/s_depth.h
+swrast/s_texstore.o: swrast/s_span.h
+swrast/s_triangle.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_triangle.o: ../include/GL/internal/glcore.h context.h glapi.h
+swrast/s_triangle.o: mtypes.h config.h glapitable.h glthread.h
+swrast/s_triangle.o: math/m_matrix.h dd.h colormac.h macros.h mmath.h
+swrast/s_triangle.o: imports.h texformat.h teximage.h texstate.h
+swrast/s_triangle.o: swrast/s_aatriangle.h swrast/swrast.h swrast/s_context.h
+swrast/s_triangle.o: swrast/s_depth.h swrast/s_feedback.h swrast/s_span.h
+swrast/s_triangle.o: swrast/s_triangle.h swrast/s_tritemp.h
+swrast/s_zoom.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast/s_zoom.o: ../include/GL/internal/glcore.h macros.h imports.h
+swrast/s_zoom.o: colormac.h config.h mmath.h swrast/s_context.h mtypes.h
+swrast/s_zoom.o: glapitable.h glthread.h math/m_matrix.h dd.h swrast/swrast.h
+swrast/s_zoom.o: swrast/s_span.h swrast/s_stencil.h swrast/s_zoom.h
+swrast_setup/ss_context.o: glheader.h ../include/GL/gl.h
+swrast_setup/ss_context.o: ../include/GL/glext.h
+swrast_setup/ss_context.o: ../include/GL/internal/glcore.h imports.h
+swrast_setup/ss_context.o: swrast_setup/ss_context.h mtypes.h config.h
+swrast_setup/ss_context.o: glapitable.h glthread.h math/m_matrix.h dd.h
+swrast_setup/ss_context.o: swrast/swrast.h swrast_setup/swrast_setup.h
+swrast_setup/ss_context.o: swrast_setup/ss_triangle.h swrast_setup/ss_vb.h
+swrast_setup/ss_context.o: tnl/tnl.h tnl/t_context.h math/m_vector.h
+swrast_setup/ss_context.o: math/m_xform.h tnl/t_pipeline.h tnl/t_context.h
+swrast_setup/ss_triangle.o: glheader.h ../include/GL/gl.h
+swrast_setup/ss_triangle.o: ../include/GL/glext.h
+swrast_setup/ss_triangle.o: ../include/GL/internal/glcore.h colormac.h
+swrast_setup/ss_triangle.o: config.h macros.h mmath.h imports.h mtypes.h
+swrast_setup/ss_triangle.o: glapitable.h glthread.h math/m_matrix.h dd.h
+swrast_setup/ss_triangle.o: tnl/t_context.h math/m_vector.h math/m_xform.h
+swrast_setup/ss_triangle.o: swrast_setup/ss_triangle.h
+swrast_setup/ss_triangle.o: swrast_setup/ss_context.h swrast/swrast.h
+swrast_setup/ss_triangle.o: swrast_setup/swrast_setup.h
+swrast_setup/ss_triangle.o: swrast_setup/ss_tritmp.h
+swrast_setup/ss_vb.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+swrast_setup/ss_vb.o: ../include/GL/internal/glcore.h colormac.h config.h
+swrast_setup/ss_vb.o: macros.h mmath.h imports.h context.h glapi.h mtypes.h
+swrast_setup/ss_vb.o: glapitable.h glthread.h math/m_matrix.h dd.h
+swrast_setup/ss_vb.o: swrast/swrast.h tnl/t_context.h math/m_vector.h
+swrast_setup/ss_vb.o: math/m_xform.h math/m_translate.h
+swrast_setup/ss_vb.o: swrast_setup/ss_context.h swrast_setup/swrast_setup.h
+swrast_setup/ss_vb.o: swrast_setup/ss_vb.h swrast_setup/ss_vbtmp.h
+tnl/t_array_api.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+tnl/t_array_api.o: ../include/GL/internal/glcore.h api_validate.h mtypes.h
+tnl/t_array_api.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+tnl/t_array_api.o: context.h glapi.h imports.h macros.h mmath.h state.h
+tnl/t_array_api.o: array_cache/acache.h tnl/t_array_api.h tnl/t_context.h
+tnl/t_array_api.o: tnl/t_array_import.h tnl/t_imm_api.h tnl/t_imm_exec.h
+tnl/t_array_api.o: tnl/t_pipeline.h
+tnl/t_array_import.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+tnl/t_array_import.o: ../include/GL/internal/glcore.h context.h glapi.h
+tnl/t_array_import.o: mtypes.h config.h glapitable.h glthread.h
+tnl/t_array_import.o: math/m_matrix.h dd.h macros.h imports.h mmath.h state.h
+tnl/t_array_import.o: array_cache/acache.h math/m_translate.h
+tnl/t_array_import.o: tnl/t_array_import.h tnl/t_context.h tnl/t_imm_debug.h
+tnl/t_context.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+tnl/t_context.o: ../include/GL/internal/glcore.h imports.h macros.h mtypes.h
+tnl/t_context.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+tnl/t_context.o: dlist.h light.h vtxfmt.h tnl/t_context.h tnl/t_array_api.h
+tnl/t_context.o: tnl/t_eval_api.h tnl/t_imm_alloc.h tnl/t_imm_api.h
+tnl/t_context.o: tnl/t_imm_exec.h tnl/t_imm_dlist.h tnl/t_pipeline.h
+tnl/t_context.o: tnl/tnl.h
+tnl/t_eval_api.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+tnl/t_eval_api.o: ../include/GL/internal/glcore.h colormac.h config.h
+tnl/t_eval_api.o: macros.h mmath.h imports.h context.h glapi.h mtypes.h
+tnl/t_eval_api.o: glapitable.h glthread.h math/m_matrix.h dd.h math/m_eval.h
+tnl/t_eval_api.o: tnl/t_eval_api.h tnl/t_context.h tnl/t_imm_api.h
+tnl/t_eval_api.o: tnl/t_imm_alloc.h tnl/t_imm_exec.h
+tnl/t_imm_alloc.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+tnl/t_imm_alloc.o: ../include/GL/internal/glcore.h imports.h mtypes.h
+tnl/t_imm_alloc.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+tnl/t_imm_alloc.o: tnl/t_imm_alloc.h tnl/t_context.h
+tnl/t_imm_api.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+tnl/t_imm_api.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h
+tnl/t_imm_api.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+tnl/t_imm_api.o: dlist.h enums.h light.h imports.h state.h colormac.h
+tnl/t_imm_api.o: macros.h mmath.h vtxfmt.h tnl/t_context.h tnl/t_imm_api.h
+tnl/t_imm_api.o: tnl/t_imm_elt.h tnl/t_imm_exec.h tnl/t_imm_dlist.h
+tnl/t_imm_debug.o: mtypes.h glheader.h ../include/GL/gl.h
+tnl/t_imm_debug.o: ../include/GL/glext.h ../include/GL/internal/glcore.h
+tnl/t_imm_debug.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+tnl/t_imm_debug.o: context.h glapi.h imports.h tnl/t_context.h
+tnl/t_imm_debug.o: tnl/t_imm_debug.h
+tnl/t_imm_dlist.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+tnl/t_imm_dlist.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h
+tnl/t_imm_dlist.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+tnl/t_imm_dlist.o: dlist.h debug.h mmath.h imports.h state.h tnl/t_context.h
+tnl/t_imm_dlist.o: tnl/t_imm_api.h tnl/t_imm_elt.h tnl/t_imm_alloc.h
+tnl/t_imm_dlist.o: tnl/t_imm_dlist.h tnl/t_imm_debug.h tnl/t_imm_exec.h
+tnl/t_imm_dlist.o: tnl/t_imm_fixup.h tnl/t_pipeline.h
+tnl/t_imm_elt.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+tnl/t_imm_elt.o: ../include/GL/internal/glcore.h colormac.h config.h macros.h
+tnl/t_imm_elt.o: mmath.h imports.h context.h glapi.h mtypes.h glapitable.h
+tnl/t_imm_elt.o: glthread.h math/m_matrix.h dd.h math/m_translate.h
+tnl/t_imm_elt.o: tnl/t_context.h tnl/t_imm_elt.h math/m_trans_tmp.h
+tnl/t_imm_eval.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+tnl/t_imm_eval.o: ../include/GL/internal/glcore.h colormac.h config.h
+tnl/t_imm_eval.o: macros.h mmath.h imports.h context.h glapi.h mtypes.h
+tnl/t_imm_eval.o: glapitable.h glthread.h math/m_matrix.h dd.h math/m_eval.h
+tnl/t_imm_eval.o: tnl/t_context.h tnl/t_imm_debug.h tnl/t_imm_eval.h
+tnl/t_imm_eval.o: tnl/t_imm_exec.h tnl/t_imm_fixup.h tnl/t_imm_alloc.h
+tnl/t_imm_exec.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+tnl/t_imm_exec.o: ../include/GL/internal/glcore.h colormac.h config.h
+tnl/t_imm_exec.o: macros.h mmath.h imports.h context.h glapi.h mtypes.h
+tnl/t_imm_exec.o: glapitable.h glthread.h math/m_matrix.h dd.h enums.h
+tnl/t_imm_exec.o: dlist.h light.h state.h math/m_xform.h math/m_vector.h
+tnl/t_imm_exec.o: tnl/t_context.h tnl/t_array_import.h tnl/t_imm_alloc.h
+tnl/t_imm_exec.o: tnl/t_imm_api.h tnl/t_imm_debug.h tnl/t_imm_dlist.h
+tnl/t_imm_exec.o: tnl/t_imm_eval.h tnl/t_imm_elt.h tnl/t_imm_exec.h
+tnl/t_imm_exec.o: tnl/t_imm_fixup.h tnl/t_pipeline.h
+tnl/t_imm_fixup.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+tnl/t_imm_fixup.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h
+tnl/t_imm_fixup.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+tnl/t_imm_fixup.o: enums.h dlist.h colormac.h macros.h mmath.h imports.h
+tnl/t_imm_fixup.o: light.h state.h math/m_xform.h math/m_vector.h
+tnl/t_imm_fixup.o: tnl/t_context.h tnl/t_imm_alloc.h tnl/t_imm_debug.h
+tnl/t_imm_fixup.o: tnl/t_imm_elt.h tnl/t_imm_fixup.h tnl/t_imm_exec.h
+tnl/t_imm_fixup.o: tnl/t_pipeline.h
+tnl/t_pipeline.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+tnl/t_pipeline.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h
+tnl/t_pipeline.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+tnl/t_pipeline.o: imports.h mmath.h state.h math/m_translate.h math/m_xform.h
+tnl/t_pipeline.o: math/m_vector.h tnl/t_context.h tnl/t_pipeline.h
+tnl/t_vb_fog.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+tnl/t_vb_fog.o: ../include/GL/internal/glcore.h colormac.h config.h macros.h
+tnl/t_vb_fog.o: mmath.h imports.h context.h glapi.h mtypes.h glapitable.h
+tnl/t_vb_fog.o: glthread.h math/m_matrix.h dd.h math/m_xform.h
+tnl/t_vb_fog.o: math/m_vector.h tnl/t_context.h tnl/t_pipeline.h
+tnl/t_vb_light.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+tnl/t_vb_light.o: ../include/GL/internal/glcore.h colormac.h config.h
+tnl/t_vb_light.o: macros.h mmath.h imports.h light.h mtypes.h glapitable.h
+tnl/t_vb_light.o: glthread.h math/m_matrix.h dd.h simple_list.h
+tnl/t_vb_light.o: math/m_translate.h tnl/t_context.h tnl/t_pipeline.h
+tnl/t_vb_light.o: tnl/t_vb_lighttmp.h
+tnl/t_vb_normals.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+tnl/t_vb_normals.o: ../include/GL/internal/glcore.h colormac.h config.h
+tnl/t_vb_normals.o: macros.h mmath.h imports.h context.h glapi.h mtypes.h
+tnl/t_vb_normals.o: glapitable.h glthread.h math/m_matrix.h dd.h
+tnl/t_vb_normals.o: math/m_xform.h math/m_vector.h tnl/t_context.h
+tnl/t_vb_normals.o: tnl/t_pipeline.h
+tnl/t_vb_points.o: mtypes.h glheader.h ../include/GL/gl.h
+tnl/t_vb_points.o: ../include/GL/glext.h ../include/GL/internal/glcore.h
+tnl/t_vb_points.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+tnl/t_vb_points.o: imports.h tnl/t_context.h tnl/t_pipeline.h
+tnl/t_vb_program.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+tnl/t_vb_program.o: ../include/GL/internal/glcore.h api_noop.h mtypes.h
+tnl/t_vb_program.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+tnl/t_vb_program.o: context.h glapi.h colormac.h macros.h mmath.h imports.h
+tnl/t_vb_program.o: dlist.h hash.h light.h simple_list.h vpexec.h
+tnl/t_vb_program.o: math/m_translate.h tnl/t_context.h tnl/t_pipeline.h
+tnl/t_vb_program.o: tnl/t_imm_api.h tnl/t_imm_exec.h
+tnl/t_vb_render.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+tnl/t_vb_render.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h
+tnl/t_vb_render.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+tnl/t_vb_render.o: enums.h macros.h imports.h mmath.h math/m_xform.h
+tnl/t_vb_render.o: math/m_vector.h tnl/t_pipeline.h tnl/t_context.h
+tnl/t_vb_render.o: tnl/t_vb_cliptmp.h tnl/t_vb_rendertmp.h
+tnl/t_vb_texgen.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+tnl/t_vb_texgen.o: ../include/GL/internal/glcore.h colormac.h config.h
+tnl/t_vb_texgen.o: macros.h mmath.h imports.h context.h glapi.h mtypes.h
+tnl/t_vb_texgen.o: glapitable.h glthread.h math/m_matrix.h dd.h
+tnl/t_vb_texgen.o: math/m_xform.h math/m_vector.h tnl/t_context.h
+tnl/t_vb_texgen.o: tnl/t_pipeline.h
+tnl/t_vb_texmat.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+tnl/t_vb_texmat.o: ../include/GL/internal/glcore.h colormac.h config.h
+tnl/t_vb_texmat.o: macros.h mmath.h imports.h context.h glapi.h mtypes.h
+tnl/t_vb_texmat.o: glapitable.h glthread.h math/m_matrix.h dd.h
+tnl/t_vb_texmat.o: math/m_xform.h math/m_vector.h tnl/t_context.h
+tnl/t_vb_texmat.o: tnl/t_pipeline.h
+tnl/t_vb_vertex.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+tnl/t_vb_vertex.o: ../include/GL/internal/glcore.h colormac.h config.h
+tnl/t_vb_vertex.o: macros.h mmath.h imports.h context.h glapi.h mtypes.h
+tnl/t_vb_vertex.o: glapitable.h glthread.h math/m_matrix.h dd.h
+tnl/t_vb_vertex.o: math/m_xform.h math/m_vector.h tnl/t_context.h
+tnl/t_vb_vertex.o: tnl/t_pipeline.h
+FX/fxapi.o: FX/fxdrv.h glheader.h ../include/GL/gl.h ../include/GL/glext.h
+FX/fxapi.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h
+FX/fxapi.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h imports.h
+FX/fxapi.o: macros.h matrix.h ../include/GL/fxmesa.h FX/fxglidew.h
+FX/fxapi.o: math/m_vector.h
+FX/fxdd.o: image.h mtypes.h glheader.h ../include/GL/gl.h
+FX/fxdd.o: ../include/GL/glext.h ../include/GL/internal/glcore.h config.h
+FX/fxdd.o: glapitable.h glthread.h math/m_matrix.h dd.h FX/fxdrv.h context.h
+FX/fxdd.o: glapi.h imports.h macros.h matrix.h ../include/GL/fxmesa.h
+FX/fxdd.o: FX/fxglidew.h math/m_vector.h enums.h extensions.h texstore.h
+FX/fxdd.o: swrast/swrast.h swrast_setup/swrast_setup.h tnl/tnl.h
+FX/fxdd.o: tnl/t_context.h math/m_xform.h tnl/t_pipeline.h tnl/t_context.h
+FX/fxdd.o: array_cache/acache.h
+FX/fxddspan.o: FX/fxdrv.h glheader.h ../include/GL/gl.h ../include/GL/glext.h
+FX/fxddspan.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h
+FX/fxddspan.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+FX/fxddspan.o: imports.h macros.h matrix.h ../include/GL/fxmesa.h
+FX/fxddspan.o: FX/fxglidew.h math/m_vector.h swrast/swrast.h
+FX/fxddtex.o: FX/fxdrv.h glheader.h ../include/GL/gl.h ../include/GL/glext.h
+FX/fxddtex.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h
+FX/fxddtex.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h imports.h
+FX/fxddtex.o: macros.h matrix.h ../include/GL/fxmesa.h FX/fxglidew.h
+FX/fxddtex.o: math/m_vector.h image.h teximage.h texformat.h texstore.h
+FX/fxddtex.o: texutil.h
+FX/fxsetup.o: FX/fxdrv.h glheader.h ../include/GL/gl.h ../include/GL/glext.h
+FX/fxsetup.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h
+FX/fxsetup.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h imports.h
+FX/fxsetup.o: macros.h matrix.h ../include/GL/fxmesa.h FX/fxglidew.h
+FX/fxsetup.o: math/m_vector.h enums.h tnl/t_context.h math/m_xform.h
+FX/fxtexman.o: FX/fxdrv.h glheader.h ../include/GL/gl.h ../include/GL/glext.h
+FX/fxtexman.o: ../include/GL/internal/glcore.h context.h glapi.h mtypes.h
+FX/fxtexman.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h
+FX/fxtexman.o: imports.h macros.h matrix.h ../include/GL/fxmesa.h
+FX/fxtexman.o: FX/fxglidew.h math/m_vector.h
+FX/fxtris.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+FX/fxtris.o: ../include/GL/internal/glcore.h mtypes.h config.h glapitable.h
+FX/fxtris.o: glthread.h math/m_matrix.h dd.h macros.h colormac.h mmath.h
+FX/fxtris.o: imports.h swrast/swrast.h swrast_setup/swrast_setup.h
+FX/fxtris.o: tnl/t_context.h math/m_vector.h math/m_xform.h tnl/t_pipeline.h
+FX/fxtris.o: tnl/t_context.h FX/fxdrv.h context.h glapi.h matrix.h
+FX/fxtris.o: ../include/GL/fxmesa.h FX/fxglidew.h tnl_dd/t_dd_unfilled.h
+FX/fxtris.o: tnl_dd/t_dd_tritmp.h tnl_dd/t_dd_rendertmp.h
+FX/fxvb.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+FX/fxvb.o: ../include/GL/internal/glcore.h mtypes.h config.h glapitable.h
+FX/fxvb.o: glthread.h math/m_matrix.h dd.h imports.h macros.h colormac.h
+FX/fxvb.o: mmath.h math/m_translate.h swrast_setup/swrast_setup.h tnl/tnl.h
+FX/fxvb.o: tnl/t_context.h math/m_vector.h math/m_xform.h FX/fxdrv.h
+FX/fxvb.o: context.h glapi.h matrix.h ../include/GL/fxmesa.h FX/fxglidew.h
+FX/fxvb.o: FX/fxvbtmp.h
+FX/fxglidew.o: FX/fxglidew.h FX/fxdrv.h glheader.h ../include/GL/gl.h
+FX/fxglidew.o: ../include/GL/glext.h ../include/GL/internal/glcore.h
+FX/fxglidew.o: context.h glapi.h mtypes.h config.h glapitable.h glthread.h
+FX/fxglidew.o: math/m_matrix.h dd.h imports.h macros.h matrix.h
+FX/fxglidew.o: ../include/GL/fxmesa.h math/m_vector.h
+X/glxapi.o: glapi.h ../include/GL/gl.h ../include/GL/glext.h X/glxapi.h
+X/glxapi.o: ../include/GL/glx.h ../include/GL/glxext.h
+X/fakeglx.o: X/glxheader.h glheader.h ../include/GL/gl.h
+X/fakeglx.o: ../include/GL/glext.h ../include/GL/internal/glcore.h
+X/fakeglx.o: ../include/GL/glx.h ../include/GL/glxext.h X/glxapi.h
+X/fakeglx.o: ../include/GL/xmesa.h ../include/GL/xmesa_x.h context.h glapi.h
+X/fakeglx.o: mtypes.h config.h glapitable.h glthread.h math/m_matrix.h dd.h
+X/fakeglx.o: macros.h imports.h mmath.h X/xfonts.h X/xmesaP.h
+X/fakeglx.o: ../include/GL/fxmesa.h FX/fxdrv.h matrix.h FX/fxglidew.h
+X/fakeglx.o: math/m_vector.h
+X/xfonts.o: X/glxheader.h glheader.h ../include/GL/gl.h ../include/GL/glext.h
+X/xfonts.o: ../include/GL/internal/glcore.h ../include/GL/glx.h
+X/xfonts.o: ../include/GL/glxext.h context.h glapi.h mtypes.h config.h
+X/xfonts.o: glapitable.h glthread.h math/m_matrix.h dd.h imports.h X/xfonts.h
+X/xm_api.o: X/glxheader.h glheader.h ../include/GL/gl.h ../include/GL/glext.h
+X/xm_api.o: ../include/GL/internal/glcore.h ../include/GL/glx.h
+X/xm_api.o: ../include/GL/glxext.h ../include/GL/xmesa.h
+X/xm_api.o: ../include/GL/xmesa_x.h X/xmesaP.h mtypes.h config.h glapitable.h
+X/xm_api.o: glthread.h math/m_matrix.h dd.h ../include/GL/fxmesa.h FX/fxdrv.h
+X/xm_api.o: context.h glapi.h imports.h macros.h matrix.h FX/fxglidew.h
+X/xm_api.o: math/m_vector.h extensions.h mmath.h texformat.h texstore.h
+X/xm_api.o: swrast/swrast.h swrast_setup/swrast_setup.h array_cache/acache.h
+X/xm_api.o: tnl/tnl.h
+X/xm_dd.o: X/glxheader.h glheader.h ../include/GL/gl.h ../include/GL/glext.h
+X/xm_dd.o: ../include/GL/internal/glcore.h ../include/GL/glx.h
+X/xm_dd.o: ../include/GL/glxext.h context.h glapi.h mtypes.h config.h
+X/xm_dd.o: glapitable.h glthread.h math/m_matrix.h dd.h colormac.h macros.h
+X/xm_dd.o: mmath.h imports.h depth.h drawpix.h extensions.h state.h
+X/xm_dd.o: texstore.h texformat.h X/xmesaP.h ../include/GL/xmesa.h
+X/xm_dd.o: ../include/GL/xmesa_x.h ../include/GL/fxmesa.h FX/fxdrv.h matrix.h
+X/xm_dd.o: FX/fxglidew.h math/m_vector.h array_cache/acache.h
+X/xm_dd.o: swrast/s_context.h swrast/swrast.h swrast/swrast.h
+X/xm_dd.o: swrast/s_alphabuf.h swrast_setup/swrast_setup.h tnl/tnl.h
+X/xm_dd.o: tnl/t_context.h math/m_xform.h tnl/t_pipeline.h tnl/t_context.h
+X/xm_line.o: X/glxheader.h glheader.h ../include/GL/gl.h
+X/xm_line.o: ../include/GL/glext.h ../include/GL/internal/glcore.h
+X/xm_line.o: ../include/GL/glx.h ../include/GL/glxext.h depth.h mtypes.h
+X/xm_line.o: config.h glapitable.h glthread.h math/m_matrix.h dd.h macros.h
+X/xm_line.o: mmath.h imports.h X/xmesaP.h ../include/GL/xmesa.h
+X/xm_line.o: ../include/GL/xmesa_x.h ../include/GL/fxmesa.h FX/fxdrv.h
+X/xm_line.o: context.h glapi.h matrix.h FX/fxglidew.h math/m_vector.h
+X/xm_line.o: swrast/s_depth.h swrast/swrast.h swrast/s_points.h
+X/xm_line.o: swrast/s_lines.h swrast/s_context.h swrast/s_linetemp.h
+X/xm_span.o: X/glxheader.h glheader.h ../include/GL/gl.h
+X/xm_span.o: ../include/GL/glext.h ../include/GL/internal/glcore.h
+X/xm_span.o: ../include/GL/glx.h ../include/GL/glxext.h colormac.h config.h
+X/xm_span.o: macros.h mmath.h imports.h context.h glapi.h mtypes.h
+X/xm_span.o: glapitable.h glthread.h math/m_matrix.h dd.h depth.h drawpix.h
+X/xm_span.o: extensions.h state.h X/xmesaP.h ../include/GL/xmesa.h
+X/xm_span.o: ../include/GL/xmesa_x.h ../include/GL/fxmesa.h FX/fxdrv.h
+X/xm_span.o: matrix.h FX/fxglidew.h math/m_vector.h swrast/swrast.h
+X/xm_tri.o: X/glxheader.h glheader.h ../include/GL/gl.h ../include/GL/glext.h
+X/xm_tri.o: ../include/GL/internal/glcore.h ../include/GL/glx.h
+X/xm_tri.o: ../include/GL/glxext.h depth.h mtypes.h config.h glapitable.h
+X/xm_tri.o: glthread.h math/m_matrix.h dd.h macros.h imports.h mmath.h
+X/xm_tri.o: X/xmesaP.h ../include/GL/xmesa.h ../include/GL/xmesa_x.h
+X/xm_tri.o: ../include/GL/fxmesa.h FX/fxdrv.h context.h glapi.h matrix.h
+X/xm_tri.o: FX/fxglidew.h math/m_vector.h swrast/s_context.h swrast/swrast.h
+X/xm_tri.o: swrast/s_depth.h swrast/s_triangle.h swrast/s_tritemp.h
+SVGA/svgamesa.o: ../include/GL/svgamesa.h ../include/GL/gl.h
+SVGA/svgamesa.o: ../include/GL/glext.h context.h glapi.h mtypes.h glheader.h
+SVGA/svgamesa.o: ../include/GL/internal/glcore.h config.h glapitable.h
+SVGA/svgamesa.o: glthread.h math/m_matrix.h dd.h extensions.h imports.h
+SVGA/svgamesa.o: matrix.h swrast/swrast.h SVGA/svgapix.h SVGA/svgamesa8.h
+SVGA/svgamesa.o: SVGA/svgamesa15.h SVGA/svgamesa16.h SVGA/svgamesa24.h
+SVGA/svgamesa.o: SVGA/svgamesa32.h
+SVGA/svgamesa8.o: SVGA/svgapix.h ../include/GL/gl.h ../include/GL/glext.h
+SVGA/svgamesa8.o: ../include/GL/svgamesa.h context.h glapi.h mtypes.h
+SVGA/svgamesa8.o: glheader.h ../include/GL/internal/glcore.h config.h
+SVGA/svgamesa8.o: glapitable.h glthread.h math/m_matrix.h dd.h
+SVGA/svgamesa8.o: SVGA/svgamesa8.h swrast/swrast.h
+SVGA/svgamesa15.o: SVGA/svgapix.h ../include/GL/gl.h ../include/GL/glext.h
+SVGA/svgamesa15.o: ../include/GL/svgamesa.h context.h glapi.h mtypes.h
+SVGA/svgamesa15.o: glheader.h ../include/GL/internal/glcore.h config.h
+SVGA/svgamesa15.o: glapitable.h glthread.h math/m_matrix.h dd.h
+SVGA/svgamesa15.o: SVGA/svgamesa15.h swrast/swrast.h
+SVGA/svgamesa16.o: SVGA/svgapix.h ../include/GL/gl.h ../include/GL/glext.h
+SVGA/svgamesa16.o: ../include/GL/svgamesa.h context.h glapi.h mtypes.h
+SVGA/svgamesa16.o: glheader.h ../include/GL/internal/glcore.h config.h
+SVGA/svgamesa16.o: glapitable.h glthread.h math/m_matrix.h dd.h
+SVGA/svgamesa16.o: SVGA/svgamesa16.h swrast/swrast.h
+SVGA/svgamesa24.o: SVGA/svgapix.h ../include/GL/gl.h ../include/GL/glext.h
+SVGA/svgamesa24.o: ../include/GL/svgamesa.h context.h glapi.h mtypes.h
+SVGA/svgamesa24.o: glheader.h ../include/GL/internal/glcore.h config.h
+SVGA/svgamesa24.o: glapitable.h glthread.h math/m_matrix.h dd.h
+SVGA/svgamesa24.o: SVGA/svgamesa24.h swrast/swrast.h
+SVGA/svgamesa32.o: SVGA/svgapix.h ../include/GL/gl.h ../include/GL/glext.h
+SVGA/svgamesa32.o: ../include/GL/svgamesa.h context.h glapi.h mtypes.h
+SVGA/svgamesa32.o: glheader.h ../include/GL/internal/glcore.h config.h
+SVGA/svgamesa32.o: glapitable.h glthread.h math/m_matrix.h dd.h
+SVGA/svgamesa32.o: SVGA/svgamesa32.h swrast/swrast.h
+OSmesa/osmesa.o: glheader.h ../include/GL/gl.h ../include/GL/glext.h
+OSmesa/osmesa.o: ../include/GL/internal/glcore.h ../include/GL/osmesa.h
+OSmesa/osmesa.o: buffers.h mtypes.h config.h glapitable.h glthread.h
+OSmesa/osmesa.o: math/m_matrix.h dd.h context.h glapi.h colormac.h macros.h
+OSmesa/osmesa.o: mmath.h imports.h depth.h extensions.h matrix.h texformat.h
+OSmesa/osmesa.o: texstore.h array_cache/acache.h swrast/swrast.h
+OSmesa/osmesa.o: swrast_setup/swrast_setup.h swrast/s_context.h
+OSmesa/osmesa.o: swrast/swrast.h swrast/s_depth.h swrast/s_lines.h
+OSmesa/osmesa.o: swrast/s_triangle.h tnl/tnl.h tnl/t_context.h
+OSmesa/osmesa.o: math/m_vector.h math/m_xform.h tnl/t_pipeline.h
+OSmesa/osmesa.o: tnl/t_context.h swrast/s_linetemp.h swrast/s_tritemp.h

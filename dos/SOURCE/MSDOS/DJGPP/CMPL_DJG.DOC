@@ -1,0 +1,109 @@
+COMPILING DOCUMENTATION FOR POV-Ray FOR MS-DOS USING DJGPP
+
+1.0   Introduction
+
+This documentation is to help you compile the portable C source code into a 
+working executable version of POV-Ray for MS-Dos using DJGPP to compile 
+POV-Ray 3.0.  DJGPP is a copyrighted freeware C compiler that is an MS-Dos 
+port of the Gnu C compiler.  The DJGPP compiled version of POV-Ray is 
+designated by ".msdos.gcc" after the POV-Ray version number on the opening 
+banner.  Everything in this document ONLY applies to that version.  Other 
+versions will operate under different rules.  This file is NOT the only 
+compiling documentation for POV-Ray.  Before proceeding any farther, you 
+should first read the file COMPILE.DOC in the root directory of the source 
+archive.  It provides important information about the generic parts of POV-
+Ray.  Also read SOURCE\MSDOS\CMPL_MSD.DOC which provides MS-Dos specific 
+information.
+
+When this document refers to "this directory" it means the 
+SOURCE\MSDOS\DJGPP directory.  All of the compiler-specific files for this 
+version are found in there.  The makefiles are designed under the 
+assumption that you are compiling from this directory.  
+
+This documentation DOES NOT tell you how to use POV-Ray for MS-Dos.  It is 
+assumed you already have obtained the official executable archive compiled 
+for MS-Dos and that you are familiar with using it.  It contains essential 
+user documentation, sample scenes and standard scene include files.  User 
+documentation is in the executable archive in the hypertext file 
+POVHELP.PHE.  The executable archive also includes a help reader program to 
+read PHE files and utilities to translate PHE into other forms.  MS-Dos 
+specific user documentation is in the text file POVMSDOS.DOC in the 
+executable archive.  DJGPP specific user documentation can be found in 
+CMPL_DJG.DOC in this directory.
+
+The first question you should ask yourself before proceeding is "Do I 
+really need to compile POV-Ray at all?"  If you do not intend to add any 
+custom or experimental features to the program, or to port it to an 
+unsupported compiler you need not compile this program yourself.
+
+As explained in COMPILE.DOC, if you do want to proceed you should be aware 
+that you are very nearly on your own.  This documentation and other related 
+compiling documentation assumes you know what you are doing.  In general 
+you should not expect any technical support from the POV-Ray Team on how to 
+compile the program.  Everything is provided here "as is".  All we can say 
+with any certainty is that we were able to compile it on our system.  If it 
+doesn't work for you, we probably cannot tell you why.
+
+When making any custom version of POV-Ray or any unofficial compile, please 
+make sure you read and follow all provisions of our license in the file 
+POVLEGAL.DOC.  In general you can modify and use POV-Ray on your own 
+however you want but if you distribute your unofficial version you must 
+follow our rules.  You may not under any circumstances use portions of POV-
+Ray source code in other programs.
+
+
+2.0   SUPPORTED COMPILER VERSIONS
+
+POV-Ray 3.0 must be compiled using a 32-bit protected mode, flat memory 
+model compiler for 386 CPU or better.  It cannot be compiled as a real mode 
+or 286 protected mode program.  It cannot be compiled in small, medium, 
+large or even huge memory models.  
+
+The DJGPP compiler is a freeware compiler available on the internet at the 
+Simtel archives and at www.djgpp.com.  It is an MS-Dos port of the famous 
+freeware Unix Gnu compiler supported by the Free Software Foundation.  The 
+compiling speed is somewhat slow but executable speed is very good.
+
+Our current POV-Ray code supports only DJGPP 2.0.  See USER_DJG.DOC 
+in the SOURCE\MSDOS\DJGPP directory for further details.
+
+3.0   Libraries
+
+This version requires 4 libraries.  Pre-compiled versions of these 
+libraries are provided in this directory.  The first 2, LIBPNG.A and 
+ZLIB.A add support for PNG format files.  If you need to re-compile them 
+for any reason, you may use the batch file BUILDPNG.BAT.  It will log to 
+the ..\..\ZLIB directory, erase any previously compiled lib, re-compile 
+ZLIB, copy it to this directory, and cleans up the ZLIB directory.  Then it 
+does the same for LIBPNG.LIB and the ..\..\LIBPNG directory.
+
+PMODE.A provides access to video and dos memory from protected mode.  
+ZTIMER.A provides a precision timer for the histogram profiling feature.
+There are source files in SOURCE\MSDOS\PMODE and SOURCE\MSDOS\ZTIMER but we 
+have not provided make files.  Parts of these libs are written in assembler
+and require Borland Tasm 4.0 to re-compile.  You will also need a special 
+utility to translate Tasm OBJ files into DJGPP type O files.  For this 
+reason we suggest you do not attempt to re-compile them unless you 
+absolutely have to do so.  See SOURCE\MSDOS\SCITECH.DOC for more 
+information.
+
+Note there is currently a problem with the djgpp 2.0 linker.  Modifications
+have been made to the make file MSDOSGCC.MAK that will extract the object
+files from pmode.a so they can be linked. Also MSDOSGCC.LN1 has been added.
+When and if the linker problem is fixed, see MSDOSGCC.MAK on how to modify
+it to use pmode.a directly.
+
+Note pmode.a is not the pmode stub program that provides DPMI as a
+replacement for CWSDPMI.  This is a totally different product.
+
+4.0   Compiling
+
+To compile POV-Ray type the following command from this directory...
+
+  MAKE -fMSDOSGCC.MAK
+
+The GCC compiler will compile each FILE.C into an object file such as FILE.O
+and these object files are linked with the libs to create POVRAY.EXE.
+If you do not plan to re-compile, you may DEL *.O to save space.  If you do
+plan to re-compile, the MAKE utility will compile only those files which
+have changed.  

@@ -1,0 +1,284 @@
+# Makefile.in --- Mesa GL Widget for X11 Toolkit Programming
+# Copyright (C) 1995 by
+#   Jeroen van der Zijp <jvz@cyberia.cfdrc.com>
+#   Thorsten Ohl <Thorsten.Ohl@Physik.TH-Darmstadt.de>
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Library General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Library General Public License for more details.
+#
+# You should have received a copy of the GNU Library General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# $Id: Makefile.in,v 1.2 2000/03/19 23:39:17 brianp Exp $
+#
+########################################################################
+
+CFLAGS = -O2
+LDFLAGS =
+
+########################################################################
+# autoconf(1):
+########################################################################
+
+SHELL = /bin/sh
+
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+mesa_srcdir = @mesa_srcdir@
+VPATH = @srcdir@
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+binprefix =
+manprefix =
+
+bindir = $(exec_prefix)/bin
+libdir = $(prefix)/lib
+srcincdir = $(top_srcdir)/include/GL
+
+CC = @CC@
+CPP = @CPP@
+LD = $(CC)
+LIBS = @LIBS@
+
+CPPFLAGS = @CPPFLAGS@ -I$(mesa_srcdir)/include -I$(top_srcdir)/include
+DEFS = @DEFS@
+SYS_CFLAGS = @SYS_CFLAGS@
+SYS_LDFLAGS = @SYS_LDFLAGS@ -L$(mesa_srcdir)/lib
+
+GL_LIBS = -lGLU -lGL
+XAW_LIBS = @XAW_LIB@ @XMU_LIB@ -lXext -lXt
+MOTIF_LIBS = -lXm @XMU_LIB@ -lXext -lXt
+
+X_CFLAGS = @X_CFLAGS@
+X_EXTRA_LIBS = @X_EXTRA_LIBS@
+X_PRE_LIBS = @X_PRE_LIBS@
+X_LIBS = @X_LIBS@
+
+RANLIB = @RANLIB@
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+
+XAW_DEMOS = @XAW_DEMOS@
+MOTIF_DEMOS = @MOTIF_DEMOS@
+
+########################################################################
+# No user serviceable parts below!
+########################################################################
+
+ALL_CFLAGS = $(DEFS) $(SYS_CFLAGS) $(X_CFLAGS) $(CFLAGS)
+ALL_LDFLAGS = $(SYS_LDFLAGS) $(LDFLAGS)
+LDLIBS = $(GL_LIBS) $(X_LIBS) $(XAW_LIBS) $(X_PRE_LIBS) -lX11 \
+		$(X_EXTRA_LIBS) -lm $(LIBS)
+MLDLIBS = $(GL_LIBS) $(X_LIBS) $(MOTIF_LIBS) $(X_PRE_LIBS) -lX11 \
+		$(X_EXTRA_LIBS) -lm $(LIBS)
+
+.SUFFIXES:
+.SUFFIXES: .c .o
+
+.c.o:
+	$(CC) $(CPPFLAGS) $(ALL_CFLAGS) -c $<
+
+all: $(XAW_DEMOS) $(MOTIF_DEMOS)
+
+install:
+
+uninstall:
+
+cube: cube.o $(top_srcdir)/src/libMesaGLw.a
+	$(LD) $(ALL_LDFLAGS) cube.o -o $@ \
+	  -L$(top_srcdir)/src -lMesaGLw $(LDLIBS)
+
+cube-m: cube-m.o $(top_srcdir)/src/libMesaGLwM.a
+	$(LD) $(ALL_LDFLAGS) cube-m.o -o $@ \
+	  -L$(top_srcdir)/src -lMesaGLwM $(MLDLIBS)
+
+mcube: mcube.o $(top_srcdir)/src/libMesaGLw.a
+	$(LD) $(ALL_LDFLAGS) mcube.o -o $@ \
+	  -L$(top_srcdir)/src -lMesaGLw $(LDLIBS)
+
+mcube-m: mcube-m.o $(top_srcdir)/src/libMesaGLwM.a
+	$(LD) $(ALL_LDFLAGS) mcube-m.o -o $@ \
+	  -L$(top_srcdir)/src -lMesaGLwM $(MLDLIBS)
+
+ed: ed.o $(top_srcdir)/src/libMesaGLw.a
+	$(LD) $(ALL_LDFLAGS) ed.o -o $@ \
+	  -L$(top_srcdir)/src -lMesaGLw $(LDLIBS)
+
+ed-m: ed-m.o $(top_srcdir)/src/libMesaGLwM.a
+	$(LD) $(ALL_LDFLAGS) ed-m.o -o $@ \
+	  -L$(top_srcdir)/src -lMesaGLwM $(MLDLIBS)
+
+tea: tea.o $(top_srcdir)/src/libMesaGLw.a
+	$(LD) $(ALL_LDFLAGS) tea.o -o $@ \
+	  -L$(top_srcdir)/src -lMesaGLw $(LDLIBS)
+
+tea-m: tea-m.o $(top_srcdir)/src/libMesaGLwM.a
+	$(LD) $(ALL_LDFLAGS) tea-m.o -o $@ \
+	  -L$(top_srcdir)/src -lMesaGLwM $(MLDLIBS)
+
+$(top_srcdir)/src/libMesaGLw.a:
+	cd $(top_srcdir)/src && $(MAKE)
+
+$(top_srcdir)/src/libMesaGLwM.a:
+	cd $(top_srcdir)/src && $(MAKE)
+
+demo:
+	@echo "the following demos are available:"
+	@echo "  * 'make demo.gl' for a demo of the GLwDrawingArea widget"
+	@echo "  * 'make demo.mesa' for a demo of the MesaDrawingArea widget"
+	@echo "  * 'make demo.ws' for a demo of the MesaWorkstation widget"
+	@echo "  * 'make demo.tea' for a demo of the MesaWorkstation widget"
+
+demo.gl: cube
+	XAPPLRESDIR=`pwd` ./cube
+
+demo.mesa: mcube
+	XAPPLRESDIR=`pwd` ./mcube
+
+demo.ws: ed
+	XAPPLRESDIR=`pwd` ./ed < events
+
+demo.ws1: ed
+	@echo "don't worry, if this fails.  It can only work if you"
+	@echo "have the wopper event generator installed."
+	(echo set qcdmc 1; echo set rseed $(SEED); echo gen 1000) \
+	  | wopper 2>&1 | XAPPLRESDIR=`pwd` ./ed
+
+demo.tea: tea
+	XAPPLRESDIR=`pwd` ./tea
+
+# Specific 8-bit visuals
+demo.gl.pseudo: cube
+	MESA_RGB_VISUAL='PseudoColor 8' XAPPLRESDIR=`pwd` ./cube
+
+demo.gl.true: cube
+	MESA_RGB_VISUAL='TrueColor 8' XAPPLRESDIR=`pwd` ./cube
+
+demo.gl.pseudo.rgb:
+	MESA_RGB_VISUAL='PseudoColor 8' XAPPLRESDIR=`pwd` \
+	  ./cube -xrm '*mesa.rgba: true'
+
+demo.gl.true.rgb:
+	MESA_RGB_VISUAL='TrueColor 8' XAPPLRESDIR=`pwd` \
+	  ./cube -xrm '*mesa.rgba: true'
+
+demo.gl.pseudo.ci:
+	MESA_RGB_VISUAL='PseudoColor 8' XAPPLRESDIR=`pwd` \
+	  ./cube -xrm '*mesa.rgba: false'
+
+demo.gl.true.ci:
+	MESA_RGB_VISUAL='TrueColor 8' XAPPLRESDIR=`pwd` \
+	  ./cube -xrm '*mesa.rgba: false'
+
+demo.mesa.pseudo: mcube
+	MESA_RGB_VISUAL='PseudoColor 8' XAPPLRESDIR=`pwd` ./mcube
+
+demo.mesa.true: mcube
+	MESA_RGB_VISUAL='TrueColor 8' XAPPLRESDIR=`pwd` ./mcube
+
+demo.mesa.pseudo.rgb:
+	MESA_RGB_VISUAL='PseudoColor 8' XAPPLRESDIR=`pwd` \
+	  ./mcube -xrm '*mesa.rgba: true' -xrm  '*mesa1.rgba: true'
+
+demo.mesa.true.rgb:
+	MESA_RGB_VISUAL='TrueColor 8' XAPPLRESDIR=`pwd` \
+	  ./mcube -xrm '*mesa.rgba: true' -xrm  '*mesa1.rgba: true'
+
+demo.mesa.pseudo.ci:
+	MESA_RGB_VISUAL='PseudoColor 8' XAPPLRESDIR=`pwd` \
+	  ./mcube -xrm '*mesa.rgba: false' -xrm  '*mesa1.rgba: false'
+
+demo.mesa.true.ci:
+	MESA_RGB_VISUAL='TrueColor 8' XAPPLRESDIR=`pwd` \
+	  ./mcube -xrm '*mesa.rgba: false' -xrm  '*mesa1.rgba: false'
+
+# Standard GNU clean* targets:
+maintainer-clean: clean
+	@echo "This command is intended for maintainers to use;"
+	@echo "it deletes files that may require special tools to rebuild."
+
+mostlyclean: clean
+
+distclean: clean
+	rm -f Makefile
+
+clean:
+	rm -f $(XAW_DEMOS) $(MOTIF_DEMOS) *.o .*~ *~
+
+# Additional clean* targets:
+realclean: distclean
+
+# GNU autoconf(1) targets:
+Makefile: Makefile.in $(top_srcdir)/config.status
+	cd $(top_srcdir); $(SHELL) config.status
+
+#
+depend:
+	gcc -M $(CPPFLAGS) *.c | \
+	  sed -e 's|/usr[^ ]*||g' \
+	      -e 's|\.\./include/GL|\$$(srcincdir)|g' \
+	      -e '/^ *\\$$/d'
+
+# slightly edited:
+cube-m.o: \
+ cube-m.c cube.c \
+ $(srcincdir)/GLwDrawA.h \
+ $(srcincdir)/GLwMDrawA.h
+
+cube.o: \
+ cube.c \
+ $(srcincdir)/GLwDrawA.h
+
+ed-m.o: \
+  ed-m.c ed.c \
+  $(srcincdir)/MesaWorkstation.h \
+  $(srcincdir)/MesaMWorkstation.h \
+  $(srcincdir)/MesaDrawingArea.h \
+  $(srcincdir)/MesaMDrawingArea.h \
+  $(srcincdir)/GLwDrawA.h \
+  $(srcincdir)/GLwMDrawA.h
+
+ed.o: \
+  ed.c \
+  $(srcincdir)/MesaDrawingArea.h \
+  $(srcincdir)/GLwDrawA.h \
+  $(srcincdir)/MesaWorkstation.h
+
+mcube-m.o: \
+  mcube-m.c mcube.c \
+  $(srcincdir)/MesaDrawingArea.h \
+  $(srcincdir)/MesaMDrawingArea.h \
+  $(srcincdir)/GLwDrawA.h \
+  $(srcincdir)/GLwMDrawA.h
+
+mcube.o: \
+  mcube.c \
+  $(srcincdir)/MesaDrawingArea.h \
+  $(srcincdir)/GLwDrawA.h
+
+tea-m.o: \
+  tea-m.c tea.c \
+  $(srcincdir)/MesaWorkstation.h \
+  $(srcincdir)/MesaMWorkstation.h \
+  $(srcincdir)/MesaDrawingArea.h \
+  $(srcincdir)/MesaMDrawingArea.h \
+  $(srcincdir)/GLwDrawA.h \
+  $(srcincdir)/GLwMDrawA.h
+
+tea.o: \
+  tea.c \
+  $(srcincdir)/MesaWorkstation.h \
+  $(srcincdir)/GLwDrawA.h \
+  $(srcincdir)/MesaDrawingArea.h
+
+# The End.

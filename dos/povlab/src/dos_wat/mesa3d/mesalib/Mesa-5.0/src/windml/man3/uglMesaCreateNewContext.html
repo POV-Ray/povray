@@ -1,0 +1,91 @@
+Content-type: text/html
+
+<HTML><HEAD><TITLE>Manpage of uglMesaCreateNewContext</TITLE>
+</HEAD><BODY>
+<H1>uglMesaCreateNewContext</H1>
+Section: WRS (3)<BR>Updated: AOUT 2001<BR><A HREF="#index">Index</A>
+<A HREF="http://localhost/cgi-bin/man/man2html">Return to Main Contents</A><HR>
+
+<P>
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+uglMesaCreateNewContext - Create a simple WindML/Mesa rendering context
+<P>
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>#include &lt;<A HREF="file:/usr/include/GL/uglmesa.h">GL/uglmesa.h</A>&gt;</B>
+
+<P>
+
+<B>UGL_MESA_CONTEXT uglMesaCreateNewContext(GLenum </B><I>mode</I><B>, UGL_MESA_CONTEXT </B><I>share_list</I><B>);</B>
+
+<P>
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+The <B>uglMesaCreateNewContext</B> function creates a WindML/Mesa
+rendering context. The attributes needed are a buffer mode
+<I>mode</I> and a context sharelist <I>share_list</I>.
+<P>
+
+It's necessary to first call this function before using
+<B>uglMakeCurrentContext</B>. This function provides neither stencil
+nor accumulation buffer only a depth buffer to reduce memory
+footprint.
+<P>
+<A NAME="lbAE">&nbsp;</A>
+<H2>INPUT</H2>
+
+<I>mode</I> - can takes the following mask values:
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UGL_MESA_SINGLE&nbsp;=&nbsp;single&nbsp;buffer&nbsp;mode
+<P>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UGL_MESA_DOUBLE&nbsp;=&nbsp;double&nbsp;buffer&nbsp;mode,&nbsp;first&nbsp;tries&nbsp;hardware&nbsp;mode&nbsp;and&nbsp;then&nbsp;software&nbsp;mode
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UGL_MESA_DOUBLE_SOFTWARE&nbsp;=&nbsp;double&nbsp;buffer&nbsp;software,&nbsp;fails&nbsp;if&nbsp;impossible
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UGL_MESA_DOUBLE_HARDWARE&nbsp;=&nbsp;double&nbsp;buffer&nbsp;hardware,&nbsp;fails&nbsp;if&nbsp;impossible
+<P>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UGL_MESA_WINDML_EXCLUSIVE&nbsp;=&nbsp;uses&nbsp;only&nbsp;WindML&nbsp;calls&nbsp;to&nbsp;write&nbsp;into&nbsp;the&nbsp;memory&nbsp;screen
+<P>
+
+For example, uglMesaCreateNewContext(UGL_MESA_SINGLE | UGL_MESA_WINDML_EXCLUSIVE) will use a single buffer and will only write into the screen memory with WindML calls. UGL_MESA_DOUBLE_SOFTWARE will be replaced by UGL_MESA_DOUBLE in WindML mode. There is no sense to use single and double buffer at the same time.
+<P>
+
+<I>share_list</I> - specifies another UGL_MESA_CONTEXT with which to share
+display lists. NULL indicates no sharing.
+<P>
+<A NAME="lbAF">&nbsp;</A>
+<H2>RETURN VALUES</H2>
+
+a UGL_MESA_CONTEXT, or zero if error.
+<P>
+<A NAME="lbAG">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="./uglMesaCreateNewContextExt.html">uglMesaCreateNewContextExt</A></B>(3), <B><A HREF="./uglMesaMakeCurrentContext.html">uglMesaMakeCurrentContext</A></B>(3)
+
+<P>
+<A NAME="lbAH">&nbsp;</A>
+<H2>COPYRIGHT</H2>
+
+Copyright &#169; 2001 Wind River Systems, Inc.
+<P>
+
+<HR>
+<A NAME="index">&nbsp;</A><H2>Index</H2>
+<DL>
+<DT><A HREF="#lbAB">NAME</A><DD>
+<DT><A HREF="#lbAC">SYNOPSIS</A><DD>
+<DT><A HREF="#lbAD">DESCRIPTION</A><DD>
+<DT><A HREF="#lbAE">INPUT</A><DD>
+<DT><A HREF="#lbAF">RETURN VALUES</A><DD>
+<DT><A HREF="#lbAG">SEE ALSO</A><DD>
+<DT><A HREF="#lbAH">COPYRIGHT</A><DD>
+</DL>
+<HR>
+This document was created by
+<A HREF="http://localhost/cgi-bin/man/man2html">man2html</A>,
+using the manual pages.<BR>
+Time: 09:32:46 GMT, August 30, 2001
+</BODY>
+</HTML>

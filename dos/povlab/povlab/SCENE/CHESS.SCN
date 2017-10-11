@@ -1,0 +1,6168 @@
+;POVLAB version 4.00 SP4 - ascii scene for 3D modeller.
+;(C) 1998, Denis Olivier.
+;All rights reserved.
+;Date=Tuesday 04-24-2001.
+;Time=15:25:02.
+;user_name=USER
+NbRendu=2
+ColorCamera=4
+ColorViewport=0
+ColorTextBackground=8
+ColorSelection=6
+ColorInterface=7
+ColorAxis=5
+ColorGrid=2
+GrilleType=1
+CurrentViewport=0
+Viewportx4=1
+DisplayAxis=1
+DisplayGrid=1
+CurrentTexture=Metal_Chrome_1
+CurrentCamera=1
+BackgroundImageRGB: 108 63 48
+FogLayer: 0 255 255 255 0 0 1 0 0 0 0
+FogLayer: 1 255 255 255 0 10 1 0 1 0 0
+FogLayer: 2 255 255 255 0 10 1 0 1 0 0
+FogLayer: 3 255 255 255 0 10 1 0 1 0 0
+FogLayer: 4 255 255 255 0 10 1 0 1 0 0
+Atmosphere: 0 1 10 0.1 0 20 0.25 0.1 8 255 255 255
+UseSelection: 0
+RayGlobal: 0.003922 2.2 2 64 10 0.25 0.18 0.14
+Radiosity: 0 3 3.3 200 10 0.3 0.5 0.75 0.017 7 1
+Scale-X/Y F0: 8.718
+Shift-X F0: 0
+Shift-Y F0: 8.553
+Scale-X/Y F1: 8.718
+Shift-X F1: 0
+Shift-Y F1: 8.553
+Scale-X/Y F2: 6.213
+Shift-X F2: 0
+Shift-Y F2: 0
+Scale-X/Y F3: 45
+Shift-X F3: 0
+Shift-Y F3: 0
+Camera: -2.472 -11.72 -8.25 -0.3586 -0.6886 -3.51 74 5.805 0 0 0 0 0 0 0
+Display_Camera: 1
+
+Omni 001: -8.859 -17.11 9.247 255 255 255 3 1 0 0 0 0 0 0 
+Omni 002: -13.62 -10.89 -9.786 123 123 123 3 1 0 0 0 0 0 0 
+Display_Omni: 1
+
+Spot 001: -12.85 -15.91 5.882 0 0 0 255 255 255 3 30 25 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+Display_Spot: 1
+
+Nb-Object: 194
+
+[EndInitSection]
+
+Object 00001: 1
+Object 00001: 0 0 0
+Object 00001: 0.3385 0.3385 0.3385
+Object 00001: 0 0 0
+Object 00001: 0 -2.539 0
+Object 00001: 122
+Object 00001: Stone7
+Object 00001: 0
+Object 00001: 0
+Object 00001: SPH00004
+Object 00001: -1
+Object 00001: 0
+Object 00001: 1 1 1
+Object 00001: 0 0 0
+Object 00001: 0 0 0
+Object 00001: 1
+Object 00001: 0
+Object 00001: 0
+Object 00001: 0 0
+Object 00001: 0
+Object 00001: 1
+Object 00001: 0
+Object 00001: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00001: 0000000000000
+Object 00001: 0 0
+Object 00001: # 0 0 0 0 0 0 0 0
+Object 00001: # 0 0 0 0 0 0 0 0
+Object 00001: 0 0
+
+Object 00002: 3
+Object 00002: 0 0 0
+Object 00002: 0.2159 0.7506 0.2159
+Object 00002: 0 0 0
+Object 00002: 0 -2.098 0
+Object 00002: 175
+Object 00002: Stone7
+Object 00002: 0
+Object 00002: 0
+Object 00002: CORPSPION
+Object 00002: -1
+Object 00002: 0
+Object 00002: 1 1 1
+Object 00002: 0 0 0
+Object 00002: 0 0 0
+Object 00002: 1
+Object 00002: 0
+Object 00002: 0
+Object 00002: 0 0
+Object 00002: 0
+Object 00002: 1
+Object 00002: 0
+Object 00002: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00002: 0000000000000
+Object 00002: 0 0
+Object 00002: # 0 0 0 0 0 0 0 0
+Object 00002: # 0 0 0 0 0 0 0 0
+Object 00002: 0 0
+
+Object 00003: 3
+Object 00003: 0 0 0
+Object 00003: 0.443 0.2781 0.443
+Object 00003: 0 0 0
+Object 00003: 0 -1.545 0
+Object 00003: 91
+Object 00003: Stone7
+Object 00003: 0
+Object 00003: 0
+Object 00003: PIEDPION
+Object 00003: -1
+Object 00003: 0
+Object 00003: 1 1 1
+Object 00003: 0 0 0
+Object 00003: 0 0 0
+Object 00003: 1
+Object 00003: 0
+Object 00003: 0
+Object 00003: 0 0
+Object 00003: 0
+Object 00003: 1
+Object 00003: 0
+Object 00003: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00003: 0000000000000
+Object 00003: 0 0
+Object 00003: # 0 0 0 0 0 0 0 0
+Object 00003: # 0 0 0 0 0 0 0 0
+Object 00003: 0 0
+
+Object 00004: 1
+Object 00004: 0 0 0
+Object 00004: 0.2207 0.2207 0.2207
+Object 00004: 0 0 0
+Object 00004: 0 -2.37 0
+Object 00004: 7
+Object 00004: Stone7
+Object 00004: 0
+Object 00004: 0
+Object 00004: SPH0001
+Object 00004: -1
+Object 00004: 0
+Object 00004: 1 1 1
+Object 00004: 0 0 0
+Object 00004: 0 0 0
+Object 00004: 1
+Object 00004: 0
+Object 00004: 0
+Object 00004: 0 0
+Object 00004: 0
+Object 00004: 1
+Object 00004: 0
+Object 00004: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00004: 0000000000000
+Object 00004: 0 0
+Object 00004: # 0 0 0 0 0 0 0 0
+Object 00004: # 0 0 0 0 0 0 0 0
+Object 00004: 0 0
+
+Object 00005: 4
+Object 00005: 0.8819 0.1181 0
+Object 00005: 0.2256 0.02773 0.2256
+Object 00005: 0 0 0
+Object 00005: -0.00119 -1.557 -0.00058
+Object 00005: 7
+Object 00005: Stone7
+Object 00005: 0
+Object 00005: 0
+Object 00005: ANNEAU
+Object 00005: -1
+Object 00005: 0
+Object 00005: 1 1 1
+Object 00005: 0 0 0
+Object 00005: 0 0 0
+Object 00005: 1
+Object 00005: 0
+Object 00005: 0
+Object 00005: 0 0
+Object 00005: 0
+Object 00005: 1
+Object 00005: 0
+Object 00005: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00005: 0000000000000
+Object 00005: 0 0
+Object 00005: # 0 0 0 0 0 0 0 0
+Object 00005: # 0 0 0 0 0 0 0 0
+Object 00005: 0 0
+
+Object 00006: 4
+Object 00006: 0.8819 0.1181 0
+Object 00006: 0.2099 0.0258 0.2099
+Object 00006: 0 0 0
+Object 00006: -0.00119 -2.273 -0.00058
+Object 00006: 177
+Object 00006: Stone7
+Object 00006: 0
+Object 00006: 0
+Object 00006: ANN00006
+Object 00006: -1
+Object 00006: 0
+Object 00006: 1 1 1
+Object 00006: 0 0 0
+Object 00006: 0 0 0
+Object 00006: 1
+Object 00006: 0
+Object 00006: 0
+Object 00006: 0 0
+Object 00006: 0
+Object 00006: 1
+Object 00006: 0
+Object 00006: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00006: 0000000000000
+Object 00006: 0 0
+Object 00006: # 0 0 0 0 0 0 0 0
+Object 00006: # 0 0 0 0 0 0 0 0
+Object 00006: 0 0
+
+Object 00007: 4
+Object 00007: 0.8819 0.1181 0
+Object 00007: 0.1131 0.0139 0.1131
+Object 00007: 0 0 0
+Object 00007: -0.00119 -2.172 -0.00058
+Object 00007: 7
+Object 00007: Stone7
+Object 00007: 0
+Object 00007: 0
+Object 00007: ANN0000007
+Object 00007: -1
+Object 00007: 0
+Object 00007: 1 1 1
+Object 00007: 0 0 0
+Object 00007: 0 0 0
+Object 00007: 1
+Object 00007: 0
+Object 00007: 0
+Object 00007: 0 0
+Object 00007: 0
+Object 00007: 1
+Object 00007: 0
+Object 00007: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00007: 0000000000000
+Object 00007: 0 0
+Object 00007: # 0 0 0 0 0 0 0 0
+Object 00007: # 0 0 0 0 0 0 0 0
+Object 00007: 0 0
+
+Object 00008: 3
+Object 00008: 0 0 0
+Object 00008: 0.3064 0.04464 0.3064
+Object 00008: 0 0 0
+Object 00008: 0 -2.115 0
+Object 00008: 202
+Object 00008: Stone7
+Object 00008: 0
+Object 00008: 0
+Object 00008: COLERETTE
+Object 00008: -1
+Object 00008: 0
+Object 00008: 1 1 1
+Object 00008: 0 0 0
+Object 00008: 0 0 0
+Object 00008: 1
+Object 00008: 0
+Object 00008: 0
+Object 00008: 0 0
+Object 00008: 0
+Object 00008: 1
+Object 00008: 0
+Object 00008: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00008: 0000000000000
+Object 00008: 0 0
+Object 00008: # 0 0 0 0 0 0 0 0
+Object 00008: # 0 0 0 0 0 0 0 0
+Object 00008: 0 0
+
+Object 00009: 4
+Object 00009: 0.9644 0.03556 0
+Object 00009: 0.317 0.01127 0.317
+Object 00009: 0 0 0
+Object 00009: -0.00011 -2.059 -0.00113
+Object 00009: 7
+Object 00009: Stone7
+Object 00009: 0
+Object 00009: 0
+Object 00009: COLLERETTE2
+Object 00009: -1
+Object 00009: 0
+Object 00009: 1 1 1
+Object 00009: 0 0 0
+Object 00009: 0 0 0
+Object 00009: 1
+Object 00009: 0
+Object 00009: 0
+Object 00009: 0 0
+Object 00009: 0
+Object 00009: 1
+Object 00009: 0
+Object 00009: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00009: 0000000000000
+Object 00009: 0 0
+Object 00009: # 0 0 0 0 0 0 0 0
+Object 00009: # 0 0 0 0 0 0 0 0
+Object 00009: 0 0
+
+Object 00010: 4
+Object 00010: 0.8819 0.1181 0
+Object 00010: 0.4471 0.05494 0.4471
+Object 00010: 0 0 0
+Object 00010: -0.00119 -1.227 -0.00058
+Object 00010: 7
+Object 00010: Stone7
+Object 00010: 0
+Object 00010: 0
+Object 00010: ANN010
+Object 00010: -1
+Object 00010: 0
+Object 00010: 1 1 1
+Object 00010: 0 0 0
+Object 00010: 0 0 0
+Object 00010: 1
+Object 00010: 0
+Object 00010: 0
+Object 00010: 0 0
+Object 00010: 0
+Object 00010: 1
+Object 00010: 0
+Object 00010: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00010: 0000000000000
+Object 00010: 0 0
+Object 00010: # 0 0 0 0 0 0 0 0
+Object 00010: # 0 0 0 0 0 0 0 0
+Object 00010: 0 0
+
+Object 00011: 4
+Object 00011: 0.8819 0.1181 0
+Object 00011: 0.479 0.05886 0.479
+Object 00011: 0 0 0
+Object 00011: -0.00119 -1.132 -0.00058
+Object 00011: 7
+Object 00011: Stone7
+Object 00011: 0
+Object 00011: 0
+Object 00011: ANN011
+Object 00011: -1
+Object 00011: 0
+Object 00011: 1 1 1
+Object 00011: 0 0 0
+Object 00011: 0 0 0
+Object 00011: 1
+Object 00011: 0
+Object 00011: 0
+Object 00011: 0 0
+Object 00011: 0
+Object 00011: 1
+Object 00011: 0
+Object 00011: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00011: 0000000000000
+Object 00011: 0 0
+Object 00011: # 0 0 0 0 0 0 0 0
+Object 00011: # 0 0 0 0 0 0 0 0
+Object 00011: 0 0
+
+Object 00012: 2
+Object 00012: 0 0 0
+Object 00012: 1 0.06657 1
+Object 00012: 0 0 0
+Object 00012: 0 -0.9508 0
+Object 00012: 7
+Object 00012: Stone8
+Object 00012: 0
+Object 00012: 0
+Object 00012: PLAQUEBLANCH
+Object 00012: -1
+Object 00012: 0
+Object 00012: 1 1 1
+Object 00012: 0 0 0
+Object 00012: 0 0 0
+Object 00012: 1
+Object 00012: 0
+Object 00012: 0
+Object 00012: 0 0
+Object 00012: 0
+Object 00012: 1
+Object 00012: 0
+Object 00012: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00012: 0000000000000
+Object 00012: 0 0
+Object 00012: # 0 0 0 0 0 0 0 0
+Object 00012: # 0 0 0 0 0 0 0 0
+Object 00012: 0 0
+
+Object 00013: 2
+Object 00013: 0 0 0
+Object 00013: 1 0.06657 1
+Object 00013: 0 0 0
+Object 00013: 2 -0.9508 -2
+Object 00013: 7
+Object 00013: Stone8
+Object 00013: 0
+Object 00013: 0
+Object 00013: PLAQUEBLAN01
+Object 00013: -1
+Object 00013: 0
+Object 00013: 1 1 1
+Object 00013: 0 0 0
+Object 00013: 0 0 0
+Object 00013: 1
+Object 00013: 0
+Object 00013: 0
+Object 00013: 0 0
+Object 00013: 0
+Object 00013: 1
+Object 00013: 0
+Object 00013: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00013: 0000000000000
+Object 00013: 0 0
+Object 00013: # 0 0 0 0 0 0 0 0
+Object 00013: # 0 0 0 0 0 0 0 0
+Object 00013: 0 0
+
+Object 00014: 2
+Object 00014: 0 0 0
+Object 00014: 1 0.06657 1
+Object 00014: 0 0 0
+Object 00014: 2 -0.9508 2
+Object 00014: 7
+Object 00014: Stone8
+Object 00014: 0
+Object 00014: 0
+Object 00014: PLAQUEBL0000
+Object 00014: -1
+Object 00014: 0
+Object 00014: 1 1 1
+Object 00014: 0 0 0
+Object 00014: 0 0 0
+Object 00014: 1
+Object 00014: 0
+Object 00014: 0
+Object 00014: 0 0
+Object 00014: 0
+Object 00014: 1
+Object 00014: 0
+Object 00014: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00014: 0000000000000
+Object 00014: 0 0
+Object 00014: # 0 0 0 0 0 0 0 0
+Object 00014: # 0 0 0 0 0 0 0 0
+Object 00014: 0 0
+
+Object 00015: 2
+Object 00015: 0 0 0
+Object 00015: 1 0.06657 1
+Object 00015: 0 0 0
+Object 00015: -2 -0.9508 2
+Object 00015: 7
+Object 00015: Stone8
+Object 00015: 0
+Object 00015: 0
+Object 00015: PLAQUEBL0001
+Object 00015: -1
+Object 00015: 0
+Object 00015: 1 1 1
+Object 00015: 0 0 0
+Object 00015: 0 0 0
+Object 00015: 1
+Object 00015: 0
+Object 00015: 0
+Object 00015: 0 0
+Object 00015: 0
+Object 00015: 1
+Object 00015: 0
+Object 00015: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00015: 0000000000000
+Object 00015: 0 0
+Object 00015: # 0 0 0 0 0 0 0 0
+Object 00015: # 0 0 0 0 0 0 0 0
+Object 00015: 0 0
+
+Object 00016: 2
+Object 00016: 0 0 0
+Object 00016: 1 0.06657 1
+Object 00016: 0 0 0
+Object 00016: -2 -0.9508 -2
+Object 00016: 7
+Object 00016: Stone8
+Object 00016: 0
+Object 00016: 0
+Object 00016: PLAQUEBL0002
+Object 00016: -1
+Object 00016: 0
+Object 00016: 1 1 1
+Object 00016: 0 0 0
+Object 00016: 0 0 0
+Object 00016: 1
+Object 00016: 0
+Object 00016: 0
+Object 00016: 0 0
+Object 00016: 0
+Object 00016: 1
+Object 00016: 8
+Object 00016: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00016: 0000000000000
+Object 00016: 0 0
+Object 00016: # 0 0 0 0 0 0 0 0
+Object 00016: # 0 0 0 0 0 0 0 0
+Object 00016: 0 0
+
+Object 00017: 2
+Object 00017: 0 0 0
+Object 00017: 0.9864 0.06657 0.9949
+Object 00017: 0 0 0
+Object 00017: -0.00188 -0.9508 -2.003
+Object 00017: 21
+Object 00017: Stone7
+Object 00017: 0
+Object 00017: 0
+Object 00017: PLAQUENOIR02
+Object 00017: -1
+Object 00017: 0
+Object 00017: 1 1 1
+Object 00017: 0 0 0
+Object 00017: 0 0 0
+Object 00017: 1
+Object 00017: 0
+Object 00017: 0
+Object 00017: 0 0
+Object 00017: 0
+Object 00017: 1
+Object 00017: 0
+Object 00017: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00017: 0000000000000
+Object 00017: 0 0
+Object 00017: # 0 0 0 0 0 0 0 0
+Object 00017: # 0 0 0 0 0 0 0 0
+Object 00017: 0 0
+
+Object 00018: 2
+Object 00018: 0 0 0
+Object 00018: 0.9864 0.06657 0.9949
+Object 00018: 0 0 0
+Object 00018: 1.997 -0.9508 -0.0037
+Object 00018: 15
+Object 00018: Stone7
+Object 00018: 0
+Object 00018: 0
+Object 00018: PLAQUENOIR01
+Object 00018: -1
+Object 00018: 0
+Object 00018: 1 1 1
+Object 00018: 0 0 0
+Object 00018: 0 0 0
+Object 00018: 1
+Object 00018: 0
+Object 00018: 0
+Object 00018: 0 0
+Object 00018: 0
+Object 00018: 1
+Object 00018: 8
+Object 00018: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00018: 0000000000000
+Object 00018: 0 0
+Object 00018: # 0 0 0 0 0 0 0 0
+Object 00018: # 0 0 0 0 0 0 0 0
+Object 00018: 0 0
+
+Object 00019: 2
+Object 00019: 0 0 0
+Object 00019: 0.9864 0.06657 0.9949
+Object 00019: 0 0 0
+Object 00019: -1.994 -0.9508 -0.00369
+Object 00019: 15
+Object 00019: Stone7
+Object 00019: 0
+Object 00019: 0
+Object 00019: PLAQUENO0000
+Object 00019: -1
+Object 00019: 0
+Object 00019: 1 1 1
+Object 00019: 0 0 0
+Object 00019: 0 0 0
+Object 00019: 1
+Object 00019: 0
+Object 00019: 0
+Object 00019: 0 0
+Object 00019: 0
+Object 00019: 1
+Object 00019: 8
+Object 00019: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00019: 0000000000000
+Object 00019: 0 0
+Object 00019: # 0 0 0 0 0 0 0 0
+Object 00019: # 0 0 0 0 0 0 0 0
+Object 00019: 0 0
+
+Object 00020: 2
+Object 00020: 0 0 0
+Object 00020: 0.9864 0.06657 0.9949
+Object 00020: 0 0 0
+Object 00020: 0.00218 -0.9508 2.005
+Object 00020: 15
+Object 00020: Stone7
+Object 00020: 0
+Object 00020: 0
+Object 00020: PLAQUENO0001
+Object 00020: -1
+Object 00020: 0
+Object 00020: 1 1 1
+Object 00020: 0 0 0
+Object 00020: 0 0 0
+Object 00020: 1
+Object 00020: 0
+Object 00020: 0
+Object 00020: 0 0
+Object 00020: 0
+Object 00020: 1
+Object 00020: 7
+Object 00020: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00020: 0000000000000
+Object 00020: 0 0
+Object 00020: # 0 0 0 0 0 0 0 0
+Object 00020: # 0 0 0 0 0 0 0 0
+Object 00020: 0 0
+
+Object 00021: 7
+Object 00021: 0 3.118e+030 0
+Object 00021: 14.97 1 14.97
+Object 00021: 0 0 0
+Object 00021: 0 -0.8771 0
+Object 00021: 13
+Object 00021: Gray_Vein_Granit
+Object 00021: 0
+Object 00021: 0
+Object 00021: SOL
+Object 00021: -1
+Object 00021: 0
+Object 00021: 1 1 1
+Object 00021: 0 0 0
+Object 00021: 0 0 0
+Object 00021: 1
+Object 00021: 0
+Object 00021: 0
+Object 00021: 0 0
+Object 00021: 0
+Object 00021: 1
+Object 00021: 8
+Object 00021: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00021: 0000000000000
+Object 00021: 0 0
+Object 00021: # 0 0 0 0 0 0 0 0
+Object 00021: # 0 0 0 0 0 0 0 0
+Object 00021: 0 0
+
+Object 00022: 1
+Object 00022: 0 0 0
+Object 00022: 0.3336 0.3336 0.3336
+Object 00022: 0 0 0
+Object 00022: -2.245 -2.502 -1.74
+Object 00022: 122
+Object 00022: Stone7
+Object 00022: 0
+Object 00022: 0
+Object 00022: SPH00196
+Object 00022: -1
+Object 00022: 0
+Object 00022: 1 1 1
+Object 00022: 0 0 0
+Object 00022: 0 0 0
+Object 00022: 1
+Object 00022: 0
+Object 00022: 0
+Object 00022: 0 0
+Object 00022: 0
+Object 00022: 1
+Object 00022: 64
+Object 00022: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00022: 0000000000000
+Object 00022: 0 0
+Object 00022: # 0 0 0 0 0 0 0 0
+Object 00022: # 0 0 0 0 0 0 0 0
+Object 00022: 0 0
+
+Object 00023: 3
+Object 00023: 0 0 0
+Object 00023: 0.2128 0.7398 0.2128
+Object 00023: 0 0 0
+Object 00023: -2.245 -2.067 -1.74
+Object 00023: 175
+Object 00023: Stone7
+Object 00023: 0
+Object 00023: 0
+Object 00023: CORPSP197
+Object 00023: -1
+Object 00023: 0
+Object 00023: 1 1 1
+Object 00023: 0 0 0
+Object 00023: 0 0 0
+Object 00023: 1
+Object 00023: 0
+Object 00023: 0
+Object 00023: 0 0
+Object 00023: 0
+Object 00023: 1
+Object 00023: 0
+Object 00023: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00023: 0000000000000
+Object 00023: 0 0
+Object 00023: # 0 0 0 0 0 0 0 0
+Object 00023: # 0 0 0 0 0 0 0 0
+Object 00023: 0 0
+
+Object 00024: 3
+Object 00024: 0 0 0
+Object 00024: 0.4365 0.2741 0.4365
+Object 00024: 0 0 0
+Object 00024: -2.245 -1.523 -1.74
+Object 00024: 91
+Object 00024: Stone7
+Object 00024: 0
+Object 00024: 0
+Object 00024: PIEDP198
+Object 00024: -1
+Object 00024: 0
+Object 00024: 1 1 1
+Object 00024: 0 0 0
+Object 00024: 0 0 0
+Object 00024: 1
+Object 00024: 0
+Object 00024: 0
+Object 00024: 0 0
+Object 00024: 0
+Object 00024: 1
+Object 00024: 0
+Object 00024: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00024: 0000000000000
+Object 00024: 0 0
+Object 00024: # 0 0 0 0 0 0 0 0
+Object 00024: # 0 0 0 0 0 0 0 0
+Object 00024: 0 0
+
+Object 00025: 1
+Object 00025: 0 0 0
+Object 00025: 0.2174 0.2174 0.2174
+Object 00025: 0 0 0
+Object 00025: -2.245 -2.335 -1.74
+Object 00025: 7
+Object 00025: Stone7
+Object 00025: 0
+Object 00025: 0
+Object 00025: SPH00199
+Object 00025: -1
+Object 00025: 0
+Object 00025: 1 1 1
+Object 00025: 0 0 0
+Object 00025: 0 0 0
+Object 00025: 1
+Object 00025: 0
+Object 00025: 0
+Object 00025: 0 0
+Object 00025: 0
+Object 00025: 1
+Object 00025: 0
+Object 00025: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00025: 0000000000000
+Object 00025: 0 0
+Object 00025: # 0 0 0 0 0 0 0 0
+Object 00025: # 0 0 0 0 0 0 0 0
+Object 00025: 0 0
+
+Object 00026: 4
+Object 00026: 0.8819 0.1181 0
+Object 00026: 0.2224 0.02733 0.2224
+Object 00026: 0 0 0
+Object 00026: -2.246 -1.535 -1.741
+Object 00026: 7
+Object 00026: Stone7
+Object 00026: 0
+Object 00026: 0
+Object 00026: ANN200
+Object 00026: -1
+Object 00026: 0
+Object 00026: 1 1 1
+Object 00026: 0 0 0
+Object 00026: 0 0 0
+Object 00026: 1
+Object 00026: 0
+Object 00026: 0
+Object 00026: 0 0
+Object 00026: 0
+Object 00026: 1
+Object 00026: 0
+Object 00026: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00026: 0000000000000
+Object 00026: 0 0
+Object 00026: # 0 0 0 0 0 0 0 0
+Object 00026: # 0 0 0 0 0 0 0 0
+Object 00026: 0 0
+
+Object 00027: 4
+Object 00027: 0.8819 0.1181 0
+Object 00027: 0.2069 0.02543 0.2069
+Object 00027: 0 0 0
+Object 00027: -2.246 -2.24 -1.741
+Object 00027: 177
+Object 00027: Stone7
+Object 00027: 0
+Object 00027: 0
+Object 00027: ANN00201
+Object 00027: -1
+Object 00027: 0
+Object 00027: 1 1 1
+Object 00027: 0 0 0
+Object 00027: 0 0 0
+Object 00027: 1
+Object 00027: 0
+Object 00027: 0
+Object 00027: 0 0
+Object 00027: 0
+Object 00027: 1
+Object 00027: 0
+Object 00027: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00027: 0000000000000
+Object 00027: 0 0
+Object 00027: # 0 0 0 0 0 0 0 0
+Object 00027: # 0 0 0 0 0 0 0 0
+Object 00027: 0 0
+
+Object 00028: 4
+Object 00028: 0.8819 0.1181 0
+Object 00028: 0.1114 0.0137 0.1114
+Object 00028: 0 0 0
+Object 00028: -2.246 -2.141 -1.741
+Object 00028: 7
+Object 00028: Stone7
+Object 00028: 0
+Object 00028: 0
+Object 00028: ANN0000202
+Object 00028: -1
+Object 00028: 0
+Object 00028: 1 1 1
+Object 00028: 0 0 0
+Object 00028: 0 0 0
+Object 00028: 1
+Object 00028: 0
+Object 00028: 0
+Object 00028: 0 0
+Object 00028: 0
+Object 00028: 1
+Object 00028: 0
+Object 00028: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00028: 0000000000000
+Object 00028: 0 0
+Object 00028: # 0 0 0 0 0 0 0 0
+Object 00028: # 0 0 0 0 0 0 0 0
+Object 00028: 0 0
+
+Object 00029: 3
+Object 00029: 0 0 0
+Object 00029: 0.302 0.04399 0.302
+Object 00029: 0 0 0
+Object 00029: -2.245 -2.085 -1.74
+Object 00029: 202
+Object 00029: Stone7
+Object 00029: 0
+Object 00029: 0
+Object 00029: COLERE203
+Object 00029: -1
+Object 00029: 0
+Object 00029: 1 1 1
+Object 00029: 0 0 0
+Object 00029: 0 0 0
+Object 00029: 1
+Object 00029: 0
+Object 00029: 0
+Object 00029: 0 0
+Object 00029: 0
+Object 00029: 1
+Object 00029: 0
+Object 00029: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00029: 0000000000000
+Object 00029: 0 0
+Object 00029: # 0 0 0 0 0 0 0 0
+Object 00029: # 0 0 0 0 0 0 0 0
+Object 00029: 0 0
+
+Object 00030: 4
+Object 00030: 0.9644 0.03556 0
+Object 00030: 0.3124 0.01111 0.3124
+Object 00030: 0 0 0
+Object 00030: -2.245 -2.03 -1.741
+Object 00030: 7
+Object 00030: Stone7
+Object 00030: 0
+Object 00030: 0
+Object 00030: COLLERET204
+Object 00030: -1
+Object 00030: 0
+Object 00030: 1 1 1
+Object 00030: 0 0 0
+Object 00030: 0 0 0
+Object 00030: 1
+Object 00030: 0
+Object 00030: 0
+Object 00030: 0 0
+Object 00030: 0
+Object 00030: 1
+Object 00030: 0
+Object 00030: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00030: 0000000000000
+Object 00030: 0 0
+Object 00030: # 0 0 0 0 0 0 0 0
+Object 00030: # 0 0 0 0 0 0 0 0
+Object 00030: 0 0
+
+Object 00031: 4
+Object 00031: 0.8819 0.1181 0
+Object 00031: 0.4406 0.05414 0.4406
+Object 00031: 0 0 0
+Object 00031: -2.246 -1.209 -1.741
+Object 00031: 7
+Object 00031: Stone7
+Object 00031: 0
+Object 00031: 0
+Object 00031: ANN205
+Object 00031: -1
+Object 00031: 0
+Object 00031: 1 1 1
+Object 00031: 0 0 0
+Object 00031: 0 0 0
+Object 00031: 1
+Object 00031: 0
+Object 00031: 0
+Object 00031: 0 0
+Object 00031: 0
+Object 00031: 1
+Object 00031: 0
+Object 00031: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00031: 0000000000000
+Object 00031: 0 0
+Object 00031: # 0 0 0 0 0 0 0 0
+Object 00031: # 0 0 0 0 0 0 0 0
+Object 00031: 0 0
+
+Object 00032: 4
+Object 00032: 0.8819 0.1181 0
+Object 00032: 0.472 0.05801 0.472
+Object 00032: 0 0 0
+Object 00032: -2.246 -1.115 -1.741
+Object 00032: 7
+Object 00032: Stone7
+Object 00032: 0
+Object 00032: 0
+Object 00032: ANN206
+Object 00032: -1
+Object 00032: 0
+Object 00032: 1 1 1
+Object 00032: 0 0 0
+Object 00032: 0 0 0
+Object 00032: 1
+Object 00032: 0
+Object 00032: 0
+Object 00032: 0 0
+Object 00032: 0
+Object 00032: 1
+Object 00032: 0
+Object 00032: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00032: 0000000000000
+Object 00032: 0 0
+Object 00032: # 0 0 0 0 0 0 0 0
+Object 00032: # 0 0 0 0 0 0 0 0
+Object 00032: 0 0
+
+Object 00033: 1
+Object 00033: 0 0 0
+Object 00033: 0.3385 0.3385 0.3385
+Object 00033: 0 0 0
+Object 00033: -0.2994 -2.539 1.936
+Object 00033: 122
+Object 00033: Stone8
+Object 00033: 0
+Object 00033: 0
+Object 00033: SPH00207
+Object 00033: -1
+Object 00033: 0
+Object 00033: 1 1 1
+Object 00033: 0 0 0
+Object 00033: 0 0 0
+Object 00033: 1
+Object 00033: 0
+Object 00033: 0
+Object 00033: 0 0
+Object 00033: 0
+Object 00033: 1
+Object 00033: 0
+Object 00033: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00033: 0000000000000
+Object 00033: 0 0
+Object 00033: # 0 0 0 0 0 0 0 0
+Object 00033: # 0 0 0 0 0 0 0 0
+Object 00033: 0 0
+
+Object 00034: 3
+Object 00034: 0 0 0
+Object 00034: 0.2159 0.7506 0.2159
+Object 00034: 0 0 0
+Object 00034: -0.2994 -2.098 1.936
+Object 00034: 175
+Object 00034: Stone8
+Object 00034: 0
+Object 00034: 0
+Object 00034: CORPSP208
+Object 00034: -1
+Object 00034: 0
+Object 00034: 1 1 1
+Object 00034: 0 0 0
+Object 00034: 0 0 0
+Object 00034: 1
+Object 00034: 0
+Object 00034: 0
+Object 00034: 0 0
+Object 00034: 0
+Object 00034: 1
+Object 00034: 0
+Object 00034: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00034: 0000000000000
+Object 00034: 0 0
+Object 00034: # 0 0 0 0 0 0 0 0
+Object 00034: # 0 0 0 0 0 0 0 0
+Object 00034: 0 0
+
+Object 00035: 3
+Object 00035: 0 0 0
+Object 00035: 0.443 0.2781 0.443
+Object 00035: 0 0 0
+Object 00035: -0.2994 -1.545 1.936
+Object 00035: 91
+Object 00035: Stone8
+Object 00035: 0
+Object 00035: 0
+Object 00035: PIEDP209
+Object 00035: -1
+Object 00035: 0
+Object 00035: 1 1 1
+Object 00035: 0 0 0
+Object 00035: 0 0 0
+Object 00035: 1
+Object 00035: 0
+Object 00035: 0
+Object 00035: 0 0
+Object 00035: 0
+Object 00035: 1
+Object 00035: 0
+Object 00035: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00035: 0000000000000
+Object 00035: 0 0
+Object 00035: # 0 0 0 0 0 0 0 0
+Object 00035: # 0 0 0 0 0 0 0 0
+Object 00035: 0 0
+
+Object 00036: 1
+Object 00036: 0 0 0
+Object 00036: 0.2207 0.2207 0.2207
+Object 00036: 0 0 0
+Object 00036: -0.2994 -2.37 1.936
+Object 00036: 7
+Object 00036: Stone8
+Object 00036: 0
+Object 00036: 0
+Object 00036: SPH00210
+Object 00036: -1
+Object 00036: 0
+Object 00036: 1 1 1
+Object 00036: 0 0 0
+Object 00036: 0 0 0
+Object 00036: 1
+Object 00036: 0
+Object 00036: 0
+Object 00036: 0 0
+Object 00036: 0
+Object 00036: 1
+Object 00036: 0
+Object 00036: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00036: 0000000000000
+Object 00036: 0 0
+Object 00036: # 0 0 0 0 0 0 0 0
+Object 00036: # 0 0 0 0 0 0 0 0
+Object 00036: 0 0
+
+Object 00037: 4
+Object 00037: 0.8819 0.1181 0
+Object 00037: 0.2256 0.02773 0.2256
+Object 00037: 0 0 0
+Object 00037: -0.3006 -1.557 1.936
+Object 00037: 7
+Object 00037: Stone8
+Object 00037: 0
+Object 00037: 0
+Object 00037: ANN211
+Object 00037: -1
+Object 00037: 0
+Object 00037: 1 1 1
+Object 00037: 0 0 0
+Object 00037: 0 0 0
+Object 00037: 1
+Object 00037: 0
+Object 00037: 0
+Object 00037: 0 0
+Object 00037: 0
+Object 00037: 1
+Object 00037: 0
+Object 00037: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00037: 0000000000000
+Object 00037: 0 0
+Object 00037: # 0 0 0 0 0 0 0 0
+Object 00037: # 0 0 0 0 0 0 0 0
+Object 00037: 0 0
+
+Object 00038: 4
+Object 00038: 0.8819 0.1181 0
+Object 00038: 0.2099 0.0258 0.2099
+Object 00038: 0 0 0
+Object 00038: -0.3006 -2.273 1.936
+Object 00038: 177
+Object 00038: Stone8
+Object 00038: 0
+Object 00038: 0
+Object 00038: ANN00212
+Object 00038: -1
+Object 00038: 0
+Object 00038: 1 1 1
+Object 00038: 0 0 0
+Object 00038: 0 0 0
+Object 00038: 1
+Object 00038: 0
+Object 00038: 0
+Object 00038: 0 0
+Object 00038: 0
+Object 00038: 1
+Object 00038: 0
+Object 00038: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00038: 0000000000000
+Object 00038: 0 0
+Object 00038: # 0 0 0 0 0 0 0 0
+Object 00038: # 0 0 0 0 0 0 0 0
+Object 00038: 0 0
+
+Object 00039: 4
+Object 00039: 0.8819 0.1181 0
+Object 00039: 0.1131 0.0139 0.1131
+Object 00039: 0 0 0
+Object 00039: -0.3006 -2.172 1.936
+Object 00039: 7
+Object 00039: Stone8
+Object 00039: 0
+Object 00039: 0
+Object 00039: ANN0000213
+Object 00039: -1
+Object 00039: 0
+Object 00039: 1 1 1
+Object 00039: 0 0 0
+Object 00039: 0 0 0
+Object 00039: 1
+Object 00039: 0
+Object 00039: 0
+Object 00039: 0 0
+Object 00039: 0
+Object 00039: 1
+Object 00039: 0
+Object 00039: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00039: 0000000000000
+Object 00039: 0 0
+Object 00039: # 0 0 0 0 0 0 0 0
+Object 00039: # 0 0 0 0 0 0 0 0
+Object 00039: 0 0
+
+Object 00040: 3
+Object 00040: 0 0 0
+Object 00040: 0.3064 0.04464 0.3064
+Object 00040: 0 0 0
+Object 00040: -0.2994 -2.115 1.936
+Object 00040: 202
+Object 00040: Stone8
+Object 00040: 0
+Object 00040: 0
+Object 00040: COLERE214
+Object 00040: -1
+Object 00040: 0
+Object 00040: 1 1 1
+Object 00040: 0 0 0
+Object 00040: 0 0 0
+Object 00040: 1
+Object 00040: 0
+Object 00040: 0
+Object 00040: 0 0
+Object 00040: 0
+Object 00040: 1
+Object 00040: 0
+Object 00040: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00040: 0000000000000
+Object 00040: 0 0
+Object 00040: # 0 0 0 0 0 0 0 0
+Object 00040: # 0 0 0 0 0 0 0 0
+Object 00040: 0 0
+
+Object 00041: 4
+Object 00041: 0.9644 0.03556 0
+Object 00041: 0.317 0.01127 0.317
+Object 00041: 0 0 0
+Object 00041: -0.2995 -2.059 1.935
+Object 00041: 7
+Object 00041: Stone8
+Object 00041: 0
+Object 00041: 0
+Object 00041: COLLERET215
+Object 00041: -1
+Object 00041: 0
+Object 00041: 1 1 1
+Object 00041: 0 0 0
+Object 00041: 0 0 0
+Object 00041: 1
+Object 00041: 0
+Object 00041: 0
+Object 00041: 0 0
+Object 00041: 0
+Object 00041: 1
+Object 00041: 0
+Object 00041: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00041: 0000000000000
+Object 00041: 0 0
+Object 00041: # 0 0 0 0 0 0 0 0
+Object 00041: # 0 0 0 0 0 0 0 0
+Object 00041: 0 0
+
+Object 00042: 4
+Object 00042: 0.8819 0.1181 0
+Object 00042: 0.4471 0.05494 0.4471
+Object 00042: 0 0 0
+Object 00042: -0.3006 -1.227 1.936
+Object 00042: 7
+Object 00042: Stone8
+Object 00042: 0
+Object 00042: 0
+Object 00042: ANN216
+Object 00042: -1
+Object 00042: 0
+Object 00042: 1 1 1
+Object 00042: 0 0 0
+Object 00042: 0 0 0
+Object 00042: 1
+Object 00042: 0
+Object 00042: 0
+Object 00042: 0 0
+Object 00042: 0
+Object 00042: 1
+Object 00042: 0
+Object 00042: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00042: 0000000000000
+Object 00042: 0 0
+Object 00042: # 0 0 0 0 0 0 0 0
+Object 00042: # 0 0 0 0 0 0 0 0
+Object 00042: 0 0
+
+Object 00043: 4
+Object 00043: 0.8819 0.1181 0
+Object 00043: 0.479 0.05886 0.479
+Object 00043: 0 0 0
+Object 00043: -0.3006 -1.132 1.936
+Object 00043: 7
+Object 00043: Stone8
+Object 00043: 0
+Object 00043: 0
+Object 00043: ANN217
+Object 00043: -1
+Object 00043: 0
+Object 00043: 1 1 1
+Object 00043: 0 0 0
+Object 00043: 0 0 0
+Object 00043: 1
+Object 00043: 0
+Object 00043: 0
+Object 00043: 0 0
+Object 00043: 0
+Object 00043: 1
+Object 00043: 0
+Object 00043: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00043: 0000000000000
+Object 00043: 0 0
+Object 00043: # 0 0 0 0 0 0 0 0
+Object 00043: # 0 0 0 0 0 0 0 0
+Object 00043: 0 0
+
+Object 00044: 1
+Object 00044: 0 0 0
+Object 00044: 0.3385 0.3385 0.3385
+Object 00044: 0 0 0
+Object 00044: -2.011 -2.539 -5.984
+Object 00044: 122
+Object 00044: Stone7
+Object 00044: 0
+Object 00044: 0
+Object 00044: SPH00004058
+Object 00044: -1
+Object 00044: 0
+Object 00044: 1 1 1
+Object 00044: 0 0 0
+Object 00044: 0 0 0
+Object 00044: 1
+Object 00044: 0
+Object 00044: 0
+Object 00044: 0 0
+Object 00044: 0
+Object 00044: 1
+Object 00044: 0
+Object 00044: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00044: 0000000000000
+Object 00044: 0 0
+Object 00044: # 0 0 0 0 0 0 0 0
+Object 00044: # 0 0 0 0 0 0 0 0
+Object 00044: 0 0
+
+Object 00045: 3
+Object 00045: 0 0 0
+Object 00045: 0.2159 0.7506 0.2159
+Object 00045: 0 0 0
+Object 00045: -2.011 -2.098 -5.984
+Object 00045: 175
+Object 00045: Stone7
+Object 00045: 0
+Object 00045: 0
+Object 00045: CORPSPION059
+Object 00045: -1
+Object 00045: 0
+Object 00045: 1 1 1
+Object 00045: 0 0 0
+Object 00045: 0 0 0
+Object 00045: 1
+Object 00045: 0
+Object 00045: 0
+Object 00045: 0 0
+Object 00045: 0
+Object 00045: 1
+Object 00045: 0
+Object 00045: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00045: 0000000000000
+Object 00045: 0 0
+Object 00045: # 0 0 0 0 0 0 0 0
+Object 00045: # 0 0 0 0 0 0 0 0
+Object 00045: 0 0
+
+Object 00046: 3
+Object 00046: 0 0 0
+Object 00046: 0.443 0.2781 0.443
+Object 00046: 0 0 0
+Object 00046: -2.011 -1.545 -5.984
+Object 00046: 91
+Object 00046: Stone7
+Object 00046: 0
+Object 00046: 0
+Object 00046: PIEDPION060
+Object 00046: -1
+Object 00046: 0
+Object 00046: 1 1 1
+Object 00046: 0 0 0
+Object 00046: 0 0 0
+Object 00046: 1
+Object 00046: 0
+Object 00046: 0
+Object 00046: 0 0
+Object 00046: 0
+Object 00046: 1
+Object 00046: 0
+Object 00046: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00046: 0000000000000
+Object 00046: 0 0
+Object 00046: # 0 0 0 0 0 0 0 0
+Object 00046: # 0 0 0 0 0 0 0 0
+Object 00046: 0 0
+
+Object 00047: 1
+Object 00047: 0 0 0
+Object 00047: 0.2207 0.2207 0.2207
+Object 00047: 0 0 0
+Object 00047: -2.011 -2.37 -5.984
+Object 00047: 7
+Object 00047: Stone7
+Object 00047: 0
+Object 00047: 0
+Object 00047: SPH00004061
+Object 00047: -1
+Object 00047: 0
+Object 00047: 1 1 1
+Object 00047: 0 0 0
+Object 00047: 0 0 0
+Object 00047: 1
+Object 00047: 0
+Object 00047: 0
+Object 00047: 0 0
+Object 00047: 0
+Object 00047: 1
+Object 00047: 0
+Object 00047: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00047: 0000000000000
+Object 00047: 0 0
+Object 00047: # 0 0 0 0 0 0 0 0
+Object 00047: # 0 0 0 0 0 0 0 0
+Object 00047: 0 0
+
+Object 00048: 4
+Object 00048: 0.8819 0.1181 0
+Object 00048: 0.2256 0.02773 0.2256
+Object 00048: 0 0 0
+Object 00048: -2.012 -1.557 -5.984
+Object 00048: 7
+Object 00048: Stone7
+Object 00048: 0
+Object 00048: 0
+Object 00048: ANNEAU062
+Object 00048: -1
+Object 00048: 0
+Object 00048: 1 1 1
+Object 00048: 0 0 0
+Object 00048: 0 0 0
+Object 00048: 1
+Object 00048: 0
+Object 00048: 0
+Object 00048: 0 0
+Object 00048: 0
+Object 00048: 1
+Object 00048: 0
+Object 00048: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00048: 0000000000000
+Object 00048: 0 0
+Object 00048: # 0 0 0 0 0 0 0 0
+Object 00048: # 0 0 0 0 0 0 0 0
+Object 00048: 0 0
+
+Object 00049: 4
+Object 00049: 0.8819 0.1181 0
+Object 00049: 0.2099 0.0258 0.2099
+Object 00049: 0 0 0
+Object 00049: -2.012 -2.273 -5.984
+Object 00049: 177
+Object 00049: Stone7
+Object 00049: 0
+Object 00049: 0
+Object 00049: ANN00006063
+Object 00049: -1
+Object 00049: 0
+Object 00049: 1 1 1
+Object 00049: 0 0 0
+Object 00049: 0 0 0
+Object 00049: 1
+Object 00049: 0
+Object 00049: 0
+Object 00049: 0 0
+Object 00049: 0
+Object 00049: 1
+Object 00049: 0
+Object 00049: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00049: 0000000000000
+Object 00049: 0 0
+Object 00049: # 0 0 0 0 0 0 0 0
+Object 00049: # 0 0 0 0 0 0 0 0
+Object 00049: 0 0
+
+Object 00050: 4
+Object 00050: 0.8819 0.1181 0
+Object 00050: 0.1131 0.0139 0.1131
+Object 00050: 0 0 0
+Object 00050: -2.012 -2.172 -5.984
+Object 00050: 7
+Object 00050: Stone7
+Object 00050: 0
+Object 00050: 0
+Object 00050: ANN00000064
+Object 00050: -1
+Object 00050: 0
+Object 00050: 1 1 1
+Object 00050: 0 0 0
+Object 00050: 0 0 0
+Object 00050: 1
+Object 00050: 0
+Object 00050: 0
+Object 00050: 0 0
+Object 00050: 0
+Object 00050: 1
+Object 00050: 0
+Object 00050: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00050: 0000000000000
+Object 00050: 0 0
+Object 00050: # 0 0 0 0 0 0 0 0
+Object 00050: # 0 0 0 0 0 0 0 0
+Object 00050: 0 0
+
+Object 00051: 3
+Object 00051: 0 0 0
+Object 00051: 0.3064 0.04464 0.3064
+Object 00051: 0 0 0
+Object 00051: -2.011 -2.115 -5.984
+Object 00051: 202
+Object 00051: Stone7
+Object 00051: 0
+Object 00051: 0
+Object 00051: COLERETTE065
+Object 00051: -1
+Object 00051: 0
+Object 00051: 1 1 1
+Object 00051: 0 0 0
+Object 00051: 0 0 0
+Object 00051: 1
+Object 00051: 0
+Object 00051: 0
+Object 00051: 0 0
+Object 00051: 0
+Object 00051: 1
+Object 00051: 0
+Object 00051: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00051: 0000000000000
+Object 00051: 0 0
+Object 00051: # 0 0 0 0 0 0 0 0
+Object 00051: # 0 0 0 0 0 0 0 0
+Object 00051: 0 0
+
+Object 00052: 4
+Object 00052: 0.9644 0.03556 0
+Object 00052: 0.317 0.01127 0.317
+Object 00052: 0 0 0
+Object 00052: -2.011 -2.059 -5.985
+Object 00052: 7
+Object 00052: Stone7
+Object 00052: 0
+Object 00052: 0
+Object 00052: COLLERET066
+Object 00052: -1
+Object 00052: 0
+Object 00052: 1 1 1
+Object 00052: 0 0 0
+Object 00052: 0 0 0
+Object 00052: 1
+Object 00052: 0
+Object 00052: 0
+Object 00052: 0 0
+Object 00052: 0
+Object 00052: 1
+Object 00052: 0
+Object 00052: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00052: 0000000000000
+Object 00052: 0 0
+Object 00052: # 0 0 0 0 0 0 0 0
+Object 00052: # 0 0 0 0 0 0 0 0
+Object 00052: 0 0
+
+Object 00053: 4
+Object 00053: 0.8819 0.1181 0
+Object 00053: 0.4471 0.05494 0.4471
+Object 00053: 0 0 0
+Object 00053: -2.012 -1.227 -5.984
+Object 00053: 7
+Object 00053: Stone7
+Object 00053: 0
+Object 00053: 0
+Object 00053: ANN010067
+Object 00053: -1
+Object 00053: 0
+Object 00053: 1 1 1
+Object 00053: 0 0 0
+Object 00053: 0 0 0
+Object 00053: 1
+Object 00053: 0
+Object 00053: 0
+Object 00053: 0 0
+Object 00053: 0
+Object 00053: 1
+Object 00053: 0
+Object 00053: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00053: 0000000000000
+Object 00053: 0 0
+Object 00053: # 0 0 0 0 0 0 0 0
+Object 00053: # 0 0 0 0 0 0 0 0
+Object 00053: 0 0
+
+Object 00054: 4
+Object 00054: 0.8819 0.1181 0
+Object 00054: 0.479 0.05886 0.479
+Object 00054: 0 0 0
+Object 00054: -2.012 -1.132 -5.984
+Object 00054: 7
+Object 00054: Stone7
+Object 00054: 0
+Object 00054: 0
+Object 00054: ANN011068
+Object 00054: -1
+Object 00054: 0
+Object 00054: 1 1 1
+Object 00054: 0 0 0
+Object 00054: 0 0 0
+Object 00054: 1
+Object 00054: 0
+Object 00054: 0
+Object 00054: 0 0
+Object 00054: 0
+Object 00054: 1
+Object 00054: 0
+Object 00054: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00054: 0000000000000
+Object 00054: 0 0
+Object 00054: # 0 0 0 0 0 0 0 0
+Object 00054: # 0 0 0 0 0 0 0 0
+Object 00054: 0 0
+
+Object 00055: 2
+Object 00055: 0 0 0
+Object 00055: 1 0.06657 1
+Object 00055: 0 0 0
+Object 00055: -2.011 -0.9508 -5.984
+Object 00055: 7
+Object 00055: Stone8
+Object 00055: 0
+Object 00055: 0
+Object 00055: PLAQUEBL069
+Object 00055: -1
+Object 00055: 0
+Object 00055: 1 1 1
+Object 00055: 0 0 0
+Object 00055: 0 0 0
+Object 00055: 1
+Object 00055: 0
+Object 00055: 0
+Object 00055: 0 0
+Object 00055: 0
+Object 00055: 1
+Object 00055: 0
+Object 00055: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00055: 0000000000000
+Object 00055: 0 0
+Object 00055: # 0 0 0 0 0 0 0 0
+Object 00055: # 0 0 0 0 0 0 0 0
+Object 00055: 0 0
+
+Object 00056: 2
+Object 00056: 0 0 0
+Object 00056: 1 0.06657 1
+Object 00056: 0 0 0
+Object 00056: -0.01062 -0.9508 -7.984
+Object 00056: 7
+Object 00056: Stone8
+Object 00056: 0
+Object 00056: 0
+Object 00056: PLAQUEBL070
+Object 00056: -1
+Object 00056: 0
+Object 00056: 1 1 1
+Object 00056: 0 0 0
+Object 00056: 0 0 0
+Object 00056: 1
+Object 00056: 0
+Object 00056: 0
+Object 00056: 0 0
+Object 00056: 0
+Object 00056: 1
+Object 00056: 0
+Object 00056: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00056: 0000000000000
+Object 00056: 0 0
+Object 00056: # 0 0 0 0 0 0 0 0
+Object 00056: # 0 0 0 0 0 0 0 0
+Object 00056: 0 0
+
+Object 00057: 2
+Object 00057: 0 0 0
+Object 00057: 1 0.06657 1
+Object 00057: 0 0 0
+Object 00057: -0.01064 -0.9508 -3.984
+Object 00057: 7
+Object 00057: Stone8
+Object 00057: 0
+Object 00057: 0
+Object 00057: PLAQUEBL071
+Object 00057: -1
+Object 00057: 0
+Object 00057: 1 1 1
+Object 00057: 0 0 0
+Object 00057: 0 0 0
+Object 00057: 1
+Object 00057: 0
+Object 00057: 0
+Object 00057: 0 0
+Object 00057: 0
+Object 00057: 1
+Object 00057: 0
+Object 00057: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00057: 0000000000000
+Object 00057: 0 0
+Object 00057: # 0 0 0 0 0 0 0 0
+Object 00057: # 0 0 0 0 0 0 0 0
+Object 00057: 0 0
+
+Object 00058: 2
+Object 00058: 0 0 0
+Object 00058: 1 0.06657 1
+Object 00058: 0 0 0
+Object 00058: -4.01 -0.9508 -3.984
+Object 00058: 7
+Object 00058: Stone8
+Object 00058: 0
+Object 00058: 0
+Object 00058: PLAQUEBL072
+Object 00058: -1
+Object 00058: 0
+Object 00058: 1 1 1
+Object 00058: 0 0 0
+Object 00058: 0 0 0
+Object 00058: 1
+Object 00058: 0
+Object 00058: 0
+Object 00058: 0 0
+Object 00058: 0
+Object 00058: 1
+Object 00058: 0
+Object 00058: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00058: 0000000000000
+Object 00058: 0 0
+Object 00058: # 0 0 0 0 0 0 0 0
+Object 00058: # 0 0 0 0 0 0 0 0
+Object 00058: 0 0
+
+Object 00059: 2
+Object 00059: 0 0 0
+Object 00059: 1 0.06657 1
+Object 00059: 0 0 0
+Object 00059: -4.01 -0.9508 -7.984
+Object 00059: 7
+Object 00059: Stone8
+Object 00059: 0
+Object 00059: 0
+Object 00059: PLAQUEBL073
+Object 00059: -1
+Object 00059: 0
+Object 00059: 1 1 1
+Object 00059: 0 0 0
+Object 00059: 0 0 0
+Object 00059: 1
+Object 00059: 0
+Object 00059: 0
+Object 00059: 0 0
+Object 00059: 0
+Object 00059: 1
+Object 00059: 0
+Object 00059: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00059: 0000000000000
+Object 00059: 0 0
+Object 00059: # 0 0 0 0 0 0 0 0
+Object 00059: # 0 0 0 0 0 0 0 0
+Object 00059: 0 0
+
+Object 00060: 2
+Object 00060: 0 0 0
+Object 00060: 0.9864 0.06657 0.9949
+Object 00060: 0 0 0
+Object 00060: -2.012 -0.9508 -7.986
+Object 00060: 21
+Object 00060: Stone7
+Object 00060: 0
+Object 00060: 0
+Object 00060: PLAQUENO074
+Object 00060: -1
+Object 00060: 0
+Object 00060: 1 1 1
+Object 00060: 0 0 0
+Object 00060: 0 0 0
+Object 00060: 1
+Object 00060: 0
+Object 00060: 0
+Object 00060: 0 0
+Object 00060: 0
+Object 00060: 1
+Object 00060: 0
+Object 00060: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00060: 0000000000000
+Object 00060: 0 0
+Object 00060: # 0 0 0 0 0 0 0 0
+Object 00060: # 0 0 0 0 0 0 0 0
+Object 00060: 0 0
+
+Object 00061: 2
+Object 00061: 0 0 0
+Object 00061: 0.9864 0.06657 0.9949
+Object 00061: 0 0 0
+Object 00061: -0.01398 -0.9508 -5.987
+Object 00061: 15
+Object 00061: Stone7
+Object 00061: 0
+Object 00061: 0
+Object 00061: PLAQUENO075
+Object 00061: -1
+Object 00061: 0
+Object 00061: 1 1 1
+Object 00061: 0 0 0
+Object 00061: 0 0 0
+Object 00061: 1
+Object 00061: 0
+Object 00061: 0
+Object 00061: 0 0
+Object 00061: 0
+Object 00061: 1
+Object 00061: 0
+Object 00061: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00061: 0000000000000
+Object 00061: 0 0
+Object 00061: # 0 0 0 0 0 0 0 0
+Object 00061: # 0 0 0 0 0 0 0 0
+Object 00061: 0 0
+
+Object 00062: 2
+Object 00062: 0 0 0
+Object 00062: 0.9864 0.06657 0.9949
+Object 00062: 0 0 0
+Object 00062: -4.005 -0.9508 -5.987
+Object 00062: 15
+Object 00062: Stone7
+Object 00062: 0
+Object 00062: 0
+Object 00062: PLAQUENO076
+Object 00062: -1
+Object 00062: 0
+Object 00062: 1 1 1
+Object 00062: 0 0 0
+Object 00062: 0 0 0
+Object 00062: 1
+Object 00062: 0
+Object 00062: 0
+Object 00062: 0 0
+Object 00062: 0
+Object 00062: 1
+Object 00062: 0
+Object 00062: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00062: 0000000000000
+Object 00062: 0 0
+Object 00062: # 0 0 0 0 0 0 0 0
+Object 00062: # 0 0 0 0 0 0 0 0
+Object 00062: 0 0
+
+Object 00063: 2
+Object 00063: 0 0 0
+Object 00063: 0.9864 0.06657 0.9949
+Object 00063: 0 0 0
+Object 00063: -2.008 -0.9508 -3.979
+Object 00063: 15
+Object 00063: Stone7
+Object 00063: 0
+Object 00063: 0
+Object 00063: PLAQUENO077
+Object 00063: -1
+Object 00063: 0
+Object 00063: 1 1 1
+Object 00063: 0 0 0
+Object 00063: 0 0 0
+Object 00063: 1
+Object 00063: 0
+Object 00063: 0
+Object 00063: 0 0
+Object 00063: 0
+Object 00063: 1
+Object 00063: 0
+Object 00063: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00063: 0000000000000
+Object 00063: 0 0
+Object 00063: # 0 0 0 0 0 0 0 0
+Object 00063: # 0 0 0 0 0 0 0 0
+Object 00063: 0 0
+
+Object 00064: 3
+Object 00064: 0 0 0
+Object 00064: 0.4044 1.406 0.4044
+Object 00064: 0 0 0
+Object 00064: -0.00358 -2.987 -5.984
+Object 00064: 175
+Object 00064: Stone7
+Object 00064: 0
+Object 00064: 0
+Object 00064: CORPSP182078
+Object 00064: -1
+Object 00064: 0
+Object 00064: 1 1 1
+Object 00064: 0 0 0
+Object 00064: 0 0 0
+Object 00064: 1
+Object 00064: 0
+Object 00064: 0
+Object 00064: 0 0
+Object 00064: 0
+Object 00064: 1
+Object 00064: 0
+Object 00064: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00064: 0000000000000
+Object 00064: 0 0
+Object 00064: # 0 0 0 0 0 0 0 0
+Object 00064: # 0 0 0 0 0 0 0 0
+Object 00064: 0 0
+
+Object 00065: 3
+Object 00065: 0 0 0
+Object 00065: 0.8299 0.521 0.8299
+Object 00065: 0 0 0
+Object 00065: -0.00358 -1.952 -5.984
+Object 00065: 91
+Object 00065: Stone7
+Object 00065: 0
+Object 00065: 0
+Object 00065: PIEDP183079
+Object 00065: -1
+Object 00065: 0
+Object 00065: 1 1 1
+Object 00065: 0 0 0
+Object 00065: 0 0 0
+Object 00065: 1
+Object 00065: 0
+Object 00065: 0
+Object 00065: 0 0
+Object 00065: 0
+Object 00065: 1
+Object 00065: 13
+Object 00065: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00065: 0000000000000
+Object 00065: 0 0
+Object 00065: # 0 0 0 0 0 0 0 0
+Object 00065: # 0 0 0 0 0 0 0 0
+Object 00065: 0 0
+
+Object 00066: 4
+Object 00066: 0.8819 0.1181 0
+Object 00066: 0.4227 0.05195 0.4227
+Object 00066: 0 0 0
+Object 00066: -0.00581 -1.974 -5.985
+Object 00066: 7
+Object 00066: Stone7
+Object 00066: 0
+Object 00066: 0
+Object 00066: ANN185080
+Object 00066: -1
+Object 00066: 0
+Object 00066: 1 1 1
+Object 00066: 0 0 0
+Object 00066: 0 0 0
+Object 00066: 1
+Object 00066: 0
+Object 00066: 0
+Object 00066: 0 0
+Object 00066: 0
+Object 00066: 1
+Object 00066: 0
+Object 00066: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00066: 0000000000000
+Object 00066: 0 0
+Object 00066: # 0 0 0 0 0 0 0 0
+Object 00066: # 0 0 0 0 0 0 0 0
+Object 00066: 0 0
+
+Object 00067: 4
+Object 00067: 0.8819 0.1181 0
+Object 00067: 0.3933 0.04833 0.3933
+Object 00067: 0 0 0
+Object 00067: -0.00581 -3.028 -5.985
+Object 00067: 177
+Object 00067: Stone7
+Object 00067: 0
+Object 00067: 0
+Object 00067: ANN00186081
+Object 00067: -1
+Object 00067: 0
+Object 00067: 1 1 1
+Object 00067: 0 0 0
+Object 00067: 0 0 0
+Object 00067: 1
+Object 00067: 0
+Object 00067: 0
+Object 00067: 0 0
+Object 00067: 0
+Object 00067: 1
+Object 00067: 0
+Object 00067: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00067: 0000000000000
+Object 00067: 0 0
+Object 00067: # 0 0 0 0 0 0 0 0
+Object 00067: # 0 0 0 0 0 0 0 0
+Object 00067: 0 0
+
+Object 00068: 3
+Object 00068: 0 0 0
+Object 00068: 0.5741 0.08365 0.5741
+Object 00068: 0 0 0
+Object 00068: -0.00358 -3.02 -5.984
+Object 00068: 202
+Object 00068: Stone7
+Object 00068: 0
+Object 00068: 0
+Object 00068: COLERE188082
+Object 00068: -1
+Object 00068: 0
+Object 00068: 1 1 1
+Object 00068: 0 0 0
+Object 00068: 0 0 0
+Object 00068: 1
+Object 00068: 0
+Object 00068: 0
+Object 00068: 0 0
+Object 00068: 0
+Object 00068: 1
+Object 00068: 0
+Object 00068: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00068: 0000000000000
+Object 00068: 0 0
+Object 00068: # 0 0 0 0 0 0 0 0
+Object 00068: # 0 0 0 0 0 0 0 0
+Object 00068: 0 0
+
+Object 00069: 4
+Object 00069: 0.9644 0.03556 0
+Object 00069: 0.5939 0.02112 0.5939
+Object 00069: 0 0 0
+Object 00069: -0.00379 -2.915 -5.986
+Object 00069: 7
+Object 00069: Stone7
+Object 00069: 0
+Object 00069: 0
+Object 00069: COLLERET083
+Object 00069: -1
+Object 00069: 0
+Object 00069: 1 1 1
+Object 00069: 0 0 0
+Object 00069: 0 0 0
+Object 00069: 1
+Object 00069: 0
+Object 00069: 0
+Object 00069: 0 0
+Object 00069: 0
+Object 00069: 1
+Object 00069: 0
+Object 00069: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00069: 0000000000000
+Object 00069: 0 0
+Object 00069: # 0 0 0 0 0 0 0 0
+Object 00069: # 0 0 0 0 0 0 0 0
+Object 00069: 0 0
+
+Object 00070: 4
+Object 00070: 0.8819 0.1181 0
+Object 00070: 0.8376 0.1029 0.8376
+Object 00070: 0 0 0
+Object 00070: -0.00581 -1.356 -5.985
+Object 00070: 7
+Object 00070: Stone7
+Object 00070: 0
+Object 00070: 0
+Object 00070: ANN190084
+Object 00070: -1
+Object 00070: 0
+Object 00070: 1 1 1
+Object 00070: 0 0 0
+Object 00070: 0 0 0
+Object 00070: 1
+Object 00070: 0
+Object 00070: 0
+Object 00070: 0 0
+Object 00070: 0
+Object 00070: 1
+Object 00070: 0
+Object 00070: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00070: 0000000000000
+Object 00070: 0 0
+Object 00070: # 0 0 0 0 0 0 0 0
+Object 00070: # 0 0 0 0 0 0 0 0
+Object 00070: 0 0
+
+Object 00071: 4
+Object 00071: 0.8819 0.1181 0
+Object 00071: 0.8973 0.1103 0.8973
+Object 00071: 0 0 0
+Object 00071: -0.00581 -1.177 -5.985
+Object 00071: 7
+Object 00071: Stone7
+Object 00071: 0
+Object 00071: 0
+Object 00071: ANN191085
+Object 00071: -1
+Object 00071: 0
+Object 00071: 1 1 1
+Object 00071: 0 0 0
+Object 00071: 0 0 0
+Object 00071: 1
+Object 00071: 0
+Object 00071: 0
+Object 00071: 0 0
+Object 00071: 0
+Object 00071: 1
+Object 00071: 0
+Object 00071: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00071: 0000000000000
+Object 00071: 0 0
+Object 00071: # 0 0 0 0 0 0 0 0
+Object 00071: # 0 0 0 0 0 0 0 0
+Object 00071: 0 0
+
+Object 00072: 0
+Object 00072: 0 0 0
+Object 00072: 0.345 0.1621 0.345
+Object 00072: 0 0 0
+Object 00072: -0.00708 -3.194 -5.984
+Object 00072: 14
+Object 00072: Stone7
+Object 00072: 0
+Object 00072: 0
+Object 00072: SOUS_TET086
+Object 00072: -1
+Object 00072: 0
+Object 00072: 1 1 1
+Object 00072: 0 0 0
+Object 00072: 0 0 0
+Object 00072: 1
+Object 00072: 0
+Object 00072: 0
+Object 00072: 0 0
+Object 00072: 0
+Object 00072: 1
+Object 00072: 0
+Object 00072: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00072: 0000000000000
+Object 00072: 0 0
+Object 00072: # 0 0 0 0 0 0 0 0
+Object 00072: # 0 0 0 0 0 0 0 0
+Object 00072: 0 0
+
+Object 00073: 4
+Object 00073: 0.8819 0.1181 0
+Object 00073: 0.3611 0.04437 0.3611
+Object 00073: 0 0 0
+Object 00073: -0.00581 -3.358 -5.985
+Object 00073: 177
+Object 00073: Stone7
+Object 00073: 0
+Object 00073: 0
+Object 00073: ANN00190087
+Object 00073: -1
+Object 00073: 0
+Object 00073: 1 1 1
+Object 00073: 0 0 0
+Object 00073: 0 0 0
+Object 00073: 1
+Object 00073: 0
+Object 00073: 0
+Object 00073: 0 0
+Object 00073: 0
+Object 00073: 1
+Object 00073: 0
+Object 00073: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00073: 0000000000000
+Object 00073: 0 0
+Object 00073: # 0 0 0 0 0 0 0 0
+Object 00073: # 0 0 0 0 0 0 0 0
+Object 00073: 0 0
+
+Object 00074: 3
+Object 00074: 0 0 0
+Object 00074: 0.5741 0.6756 0.5741
+Object 00074: 0 0 180
+Object 00074: -0.00358 -3.322 -5.984
+Object 00074: 202
+Object 00074: Stone7
+Object 00074: 0
+Object 00074: 0
+Object 00074: COLERE191088
+Object 00074: -1
+Object 00074: 0
+Object 00074: 1 1 1
+Object 00074: 0 0 0
+Object 00074: 0 0 0
+Object 00074: 1
+Object 00074: 0
+Object 00074: 0
+Object 00074: 0 0
+Object 00074: 0
+Object 00074: 1
+Object 00074: 0
+Object 00074: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00074: 0000000000000
+Object 00074: 0 0
+Object 00074: # 0 0 0 0 0 0 0 0
+Object 00074: # 0 0 0 0 0 0 0 0
+Object 00074: 0 0
+
+Object 00075: 2
+Object 00075: 0 0 0
+Object 00075: 0.1612 0.2649 0.1274
+Object 00075: 0 0 0
+Object 00075: -0.00645 -4.267 -5.984
+Object 00075: 1
+Object 00075: Stone7
+Object 00075: 0
+Object 00075: 0
+Object 00075: CROIX_ROI089
+Object 00075: -1
+Object 00075: 0
+Object 00075: 1 1 1
+Object 00075: 0 0 0
+Object 00075: 0 0 0
+Object 00075: 1
+Object 00075: 0
+Object 00075: 0
+Object 00075: 0 0
+Object 00075: 0
+Object 00075: 1
+Object 00075: 0
+Object 00075: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00075: 0000000000000
+Object 00075: 0 0
+Object 00075: # 0 0 0 0 0 0 0 0
+Object 00075: # 0 0 0 0 0 0 0 0
+Object 00075: 0 0
+
+Object 00076: 2
+Object 00076: 0 0 0
+Object 00076: 0.2728 0.09302 0.1274
+Object 00076: 0 0 0
+Object 00076: -0.01079 -4.302 -5.984
+Object 00076: 1
+Object 00076: Stone7
+Object 00076: 0
+Object 00076: 0
+Object 00076: CROIX_194090
+Object 00076: -1
+Object 00076: 0
+Object 00076: 1 1 1
+Object 00076: 0 0 0
+Object 00076: 0 0 0
+Object 00076: 1
+Object 00076: 0
+Object 00076: 0
+Object 00076: 0 0
+Object 00076: 0
+Object 00076: 1
+Object 00076: 5
+Object 00076: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00076: 0000000000000
+Object 00076: 0 0
+Object 00076: # 0 0 0 0 0 0 0 0
+Object 00076: # 0 0 0 0 0 0 0 0
+Object 00076: 0 0
+
+Object 00077: 1
+Object 00077: 0 0 0
+Object 00077: 0.3336 0.3336 0.3336
+Object 00077: 0 0 0
+Object 00077: -4.255 -2.502 -7.724
+Object 00077: 122
+Object 00077: Stone7
+Object 00077: 0
+Object 00077: 0
+Object 00077: SPH00196092
+Object 00077: -1
+Object 00077: 0
+Object 00077: 1 1 1
+Object 00077: 0 0 0
+Object 00077: 0 0 0
+Object 00077: 1
+Object 00077: 0
+Object 00077: 0
+Object 00077: 0 0
+Object 00077: 0
+Object 00077: 1
+Object 00077: 0
+Object 00077: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00077: 0000000000000
+Object 00077: 0 0
+Object 00077: # 0 0 0 0 0 0 0 0
+Object 00077: # 0 0 0 0 0 0 0 0
+Object 00077: 0 0
+
+Object 00078: 3
+Object 00078: 0 0 0
+Object 00078: 0.2128 0.7398 0.2128
+Object 00078: 0 0 0
+Object 00078: -4.255 -2.067 -7.724
+Object 00078: 175
+Object 00078: Stone7
+Object 00078: 0
+Object 00078: 0
+Object 00078: CORPSP197093
+Object 00078: -1
+Object 00078: 0
+Object 00078: 1 1 1
+Object 00078: 0 0 0
+Object 00078: 0 0 0
+Object 00078: 1
+Object 00078: 0
+Object 00078: 0
+Object 00078: 0 0
+Object 00078: 0
+Object 00078: 1
+Object 00078: 0
+Object 00078: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00078: 0000000000000
+Object 00078: 0 0
+Object 00078: # 0 0 0 0 0 0 0 0
+Object 00078: # 0 0 0 0 0 0 0 0
+Object 00078: 0 0
+
+Object 00079: 3
+Object 00079: 0 0 0
+Object 00079: 0.4365 0.2741 0.4365
+Object 00079: 0 0 0
+Object 00079: -4.255 -1.523 -7.724
+Object 00079: 91
+Object 00079: Stone7
+Object 00079: 0
+Object 00079: 0
+Object 00079: PIEDP198094
+Object 00079: -1
+Object 00079: 0
+Object 00079: 1 1 1
+Object 00079: 0 0 0
+Object 00079: 0 0 0
+Object 00079: 1
+Object 00079: 0
+Object 00079: 0
+Object 00079: 0 0
+Object 00079: 0
+Object 00079: 1
+Object 00079: 0
+Object 00079: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00079: 0000000000000
+Object 00079: 0 0
+Object 00079: # 0 0 0 0 0 0 0 0
+Object 00079: # 0 0 0 0 0 0 0 0
+Object 00079: 0 0
+
+Object 00080: 1
+Object 00080: 0 0 0
+Object 00080: 0.2174 0.2174 0.2174
+Object 00080: 0 0 0
+Object 00080: -4.255 -2.335 -7.724
+Object 00080: 7
+Object 00080: Stone7
+Object 00080: 0
+Object 00080: 0
+Object 00080: SPH00199095
+Object 00080: -1
+Object 00080: 0
+Object 00080: 1 1 1
+Object 00080: 0 0 0
+Object 00080: 0 0 0
+Object 00080: 1
+Object 00080: 0
+Object 00080: 0
+Object 00080: 0 0
+Object 00080: 0
+Object 00080: 1
+Object 00080: 7
+Object 00080: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00080: 0000000000000
+Object 00080: 0 0
+Object 00080: # 0 0 0 0 0 0 0 0
+Object 00080: # 0 0 0 0 0 0 0 0
+Object 00080: 0 0
+
+Object 00081: 4
+Object 00081: 0.8819 0.1181 0
+Object 00081: 0.2224 0.02733 0.2224
+Object 00081: 0 0 0
+Object 00081: -4.257 -1.535 -7.724
+Object 00081: 7
+Object 00081: Stone7
+Object 00081: 0
+Object 00081: 0
+Object 00081: ANN200096
+Object 00081: -1
+Object 00081: 0
+Object 00081: 1 1 1
+Object 00081: 0 0 0
+Object 00081: 0 0 0
+Object 00081: 1
+Object 00081: 0
+Object 00081: 0
+Object 00081: 0 0
+Object 00081: 0
+Object 00081: 1
+Object 00081: 0
+Object 00081: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00081: 0000000000000
+Object 00081: 0 0
+Object 00081: # 0 0 0 0 0 0 0 0
+Object 00081: # 0 0 0 0 0 0 0 0
+Object 00081: 0 0
+
+Object 00082: 4
+Object 00082: 0.8819 0.1181 0
+Object 00082: 0.2069 0.02543 0.2069
+Object 00082: 0 0 0
+Object 00082: -4.257 -2.24 -7.724
+Object 00082: 177
+Object 00082: Stone7
+Object 00082: 0
+Object 00082: 0
+Object 00082: ANN00201097
+Object 00082: -1
+Object 00082: 0
+Object 00082: 1 1 1
+Object 00082: 0 0 0
+Object 00082: 0 0 0
+Object 00082: 1
+Object 00082: 0
+Object 00082: 0
+Object 00082: 0 0
+Object 00082: 0
+Object 00082: 1
+Object 00082: 0
+Object 00082: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00082: 0000000000000
+Object 00082: 0 0
+Object 00082: # 0 0 0 0 0 0 0 0
+Object 00082: # 0 0 0 0 0 0 0 0
+Object 00082: 0 0
+
+Object 00083: 4
+Object 00083: 0.8819 0.1181 0
+Object 00083: 0.1114 0.0137 0.1114
+Object 00083: 0 0 0
+Object 00083: -4.257 -2.141 -7.724
+Object 00083: 7
+Object 00083: Stone7
+Object 00083: 0
+Object 00083: 0
+Object 00083: ANN00002098
+Object 00083: -1
+Object 00083: 0
+Object 00083: 1 1 1
+Object 00083: 0 0 0
+Object 00083: 0 0 0
+Object 00083: 1
+Object 00083: 0
+Object 00083: 0
+Object 00083: 0 0
+Object 00083: 0
+Object 00083: 1
+Object 00083: 0
+Object 00083: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00083: 0000000000000
+Object 00083: 0 0
+Object 00083: # 0 0 0 0 0 0 0 0
+Object 00083: # 0 0 0 0 0 0 0 0
+Object 00083: 0 0
+
+Object 00084: 3
+Object 00084: 0 0 0
+Object 00084: 0.302 0.04399 0.302
+Object 00084: 0 0 0
+Object 00084: -4.255 -2.085 -7.724
+Object 00084: 202
+Object 00084: Stone7
+Object 00084: 0
+Object 00084: 0
+Object 00084: COLERE203099
+Object 00084: -1
+Object 00084: 0
+Object 00084: 1 1 1
+Object 00084: 0 0 0
+Object 00084: 0 0 0
+Object 00084: 1
+Object 00084: 0
+Object 00084: 0
+Object 00084: 0 0
+Object 00084: 0
+Object 00084: 1
+Object 00084: 0
+Object 00084: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00084: 0000000000000
+Object 00084: 0 0
+Object 00084: # 0 0 0 0 0 0 0 0
+Object 00084: # 0 0 0 0 0 0 0 0
+Object 00084: 0 0
+
+Object 00085: 4
+Object 00085: 0.9644 0.03556 0
+Object 00085: 0.3124 0.01111 0.3124
+Object 00085: 0 0 0
+Object 00085: -4.256 -2.03 -7.725
+Object 00085: 7
+Object 00085: Stone7
+Object 00085: 0
+Object 00085: 0
+Object 00085: COLLERET100
+Object 00085: -1
+Object 00085: 0
+Object 00085: 1 1 1
+Object 00085: 0 0 0
+Object 00085: 0 0 0
+Object 00085: 1
+Object 00085: 0
+Object 00085: 0
+Object 00085: 0 0
+Object 00085: 0
+Object 00085: 1
+Object 00085: 0
+Object 00085: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00085: 0000000000000
+Object 00085: 0 0
+Object 00085: # 0 0 0 0 0 0 0 0
+Object 00085: # 0 0 0 0 0 0 0 0
+Object 00085: 0 0
+
+Object 00086: 4
+Object 00086: 0.8819 0.1181 0
+Object 00086: 0.4406 0.05414 0.4406
+Object 00086: 0 0 0
+Object 00086: -4.257 -1.209 -7.724
+Object 00086: 7
+Object 00086: Stone7
+Object 00086: 0
+Object 00086: 0
+Object 00086: ANN205101
+Object 00086: -1
+Object 00086: 0
+Object 00086: 1 1 1
+Object 00086: 0 0 0
+Object 00086: 0 0 0
+Object 00086: 1
+Object 00086: 0
+Object 00086: 0
+Object 00086: 0 0
+Object 00086: 0
+Object 00086: 1
+Object 00086: 0
+Object 00086: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00086: 0000000000000
+Object 00086: 0 0
+Object 00086: # 0 0 0 0 0 0 0 0
+Object 00086: # 0 0 0 0 0 0 0 0
+Object 00086: 0 0
+
+Object 00087: 4
+Object 00087: 0.8819 0.1181 0
+Object 00087: 0.472 0.05801 0.472
+Object 00087: 0 0 0
+Object 00087: -4.257 -1.115 -7.724
+Object 00087: 7
+Object 00087: Stone7
+Object 00087: 0
+Object 00087: 0
+Object 00087: ANN206102
+Object 00087: -1
+Object 00087: 0
+Object 00087: 1 1 1
+Object 00087: 0 0 0
+Object 00087: 0 0 0
+Object 00087: 1
+Object 00087: 0
+Object 00087: 0
+Object 00087: 0 0
+Object 00087: 0
+Object 00087: 1
+Object 00087: 0
+Object 00087: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00087: 0000000000000
+Object 00087: 0 0
+Object 00087: # 0 0 0 0 0 0 0 0
+Object 00087: # 0 0 0 0 0 0 0 0
+Object 00087: 0 0
+
+Object 00088: 1
+Object 00088: 0 0 0
+Object 00088: 0.3385 0.3385 0.3385
+Object 00088: 0 0 0
+Object 00088: -2.31 -2.539 -4.048
+Object 00088: 122
+Object 00088: Stone8
+Object 00088: 0
+Object 00088: 0
+Object 00088: SPH00207103
+Object 00088: -1
+Object 00088: 0
+Object 00088: 1 1 1
+Object 00088: 0 0 0
+Object 00088: 0 0 0
+Object 00088: 1
+Object 00088: 0
+Object 00088: 0
+Object 00088: 0 0
+Object 00088: 0
+Object 00088: 1
+Object 00088: 0
+Object 00088: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00088: 0000000000000
+Object 00088: 0 0
+Object 00088: # 0 0 0 0 0 0 0 0
+Object 00088: # 0 0 0 0 0 0 0 0
+Object 00088: 0 0
+
+Object 00089: 3
+Object 00089: 0 0 0
+Object 00089: 0.2159 0.7506 0.2159
+Object 00089: 0 0 0
+Object 00089: -2.31 -2.098 -4.048
+Object 00089: 175
+Object 00089: Stone8
+Object 00089: 0
+Object 00089: 0
+Object 00089: CORPSP208104
+Object 00089: -1
+Object 00089: 0
+Object 00089: 1 1 1
+Object 00089: 0 0 0
+Object 00089: 0 0 0
+Object 00089: 1
+Object 00089: 0
+Object 00089: 0
+Object 00089: 0 0
+Object 00089: 0
+Object 00089: 1
+Object 00089: 0
+Object 00089: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00089: 0000000000000
+Object 00089: 0 0
+Object 00089: # 0 0 0 0 0 0 0 0
+Object 00089: # 0 0 0 0 0 0 0 0
+Object 00089: 0 0
+
+Object 00090: 3
+Object 00090: 0 0 0
+Object 00090: 0.443 0.2781 0.443
+Object 00090: 0 0 0
+Object 00090: -2.31 -1.545 -4.048
+Object 00090: 91
+Object 00090: Stone8
+Object 00090: 0
+Object 00090: 0
+Object 00090: PIEDP209105
+Object 00090: -1
+Object 00090: 0
+Object 00090: 1 1 1
+Object 00090: 0 0 0
+Object 00090: 0 0 0
+Object 00090: 1
+Object 00090: 0
+Object 00090: 0
+Object 00090: 0 0
+Object 00090: 0
+Object 00090: 1
+Object 00090: 0
+Object 00090: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00090: 0000000000000
+Object 00090: 0 0
+Object 00090: # 0 0 0 0 0 0 0 0
+Object 00090: # 0 0 0 0 0 0 0 0
+Object 00090: 0 0
+
+Object 00091: 1
+Object 00091: 0 0 0
+Object 00091: 0.2207 0.2207 0.2207
+Object 00091: 0 0 0
+Object 00091: -2.31 -2.37 -4.048
+Object 00091: 7
+Object 00091: Stone8
+Object 00091: 0
+Object 00091: 0
+Object 00091: SPH00210106
+Object 00091: -1
+Object 00091: 0
+Object 00091: 1 1 1
+Object 00091: 0 0 0
+Object 00091: 0 0 0
+Object 00091: 1
+Object 00091: 0
+Object 00091: 0
+Object 00091: 0 0
+Object 00091: 0
+Object 00091: 1
+Object 00091: 0
+Object 00091: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00091: 0000000000000
+Object 00091: 0 0
+Object 00091: # 0 0 0 0 0 0 0 0
+Object 00091: # 0 0 0 0 0 0 0 0
+Object 00091: 0 0
+
+Object 00092: 4
+Object 00092: 0.8819 0.1181 0
+Object 00092: 0.2256 0.02773 0.2256
+Object 00092: 0 0 0
+Object 00092: -2.311 -1.557 -4.048
+Object 00092: 7
+Object 00092: Stone8
+Object 00092: 0
+Object 00092: 0
+Object 00092: ANN211107
+Object 00092: -1
+Object 00092: 0
+Object 00092: 1 1 1
+Object 00092: 0 0 0
+Object 00092: 0 0 0
+Object 00092: 1
+Object 00092: 0
+Object 00092: 0
+Object 00092: 0 0
+Object 00092: 0
+Object 00092: 1
+Object 00092: 0
+Object 00092: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00092: 0000000000000
+Object 00092: 0 0
+Object 00092: # 0 0 0 0 0 0 0 0
+Object 00092: # 0 0 0 0 0 0 0 0
+Object 00092: 0 0
+
+Object 00093: 4
+Object 00093: 0.8819 0.1181 0
+Object 00093: 0.2099 0.0258 0.2099
+Object 00093: 0 0 0
+Object 00093: -2.311 -2.273 -4.048
+Object 00093: 177
+Object 00093: Stone8
+Object 00093: 0
+Object 00093: 0
+Object 00093: ANN00212108
+Object 00093: -1
+Object 00093: 0
+Object 00093: 1 1 1
+Object 00093: 0 0 0
+Object 00093: 0 0 0
+Object 00093: 1
+Object 00093: 0
+Object 00093: 0
+Object 00093: 0 0
+Object 00093: 0
+Object 00093: 1
+Object 00093: 14
+Object 00093: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00093: 0000000000000
+Object 00093: 0 0
+Object 00093: # 0 0 0 0 0 0 0 0
+Object 00093: # 0 0 0 0 0 0 0 0
+Object 00093: 0 0
+
+Object 00094: 4
+Object 00094: 0.8819 0.1181 0
+Object 00094: 0.1131 0.0139 0.1131
+Object 00094: 0 0 0
+Object 00094: -2.311 -2.172 -4.048
+Object 00094: 7
+Object 00094: Stone8
+Object 00094: 0
+Object 00094: 0
+Object 00094: ANN00002109
+Object 00094: -1
+Object 00094: 0
+Object 00094: 1 1 1
+Object 00094: 0 0 0
+Object 00094: 0 0 0
+Object 00094: 1
+Object 00094: 0
+Object 00094: 0
+Object 00094: 0 0
+Object 00094: 0
+Object 00094: 1
+Object 00094: 7
+Object 00094: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00094: 0000000000000
+Object 00094: 0 0
+Object 00094: # 0 0 0 0 0 0 0 0
+Object 00094: # 0 0 0 0 0 0 0 0
+Object 00094: 0 0
+
+Object 00095: 3
+Object 00095: 0 0 0
+Object 00095: 0.3064 0.04464 0.3064
+Object 00095: 0 0 0
+Object 00095: -2.31 -2.115 -4.048
+Object 00095: 202
+Object 00095: Stone8
+Object 00095: 0
+Object 00095: 0
+Object 00095: COLERE214110
+Object 00095: -1
+Object 00095: 0
+Object 00095: 1 1 1
+Object 00095: 0 0 0
+Object 00095: 0 0 0
+Object 00095: 1
+Object 00095: 0
+Object 00095: 0
+Object 00095: 0 0
+Object 00095: 0
+Object 00095: 1
+Object 00095: 7
+Object 00095: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00095: 0000000000000
+Object 00095: 0 0
+Object 00095: # 0 0 0 0 0 0 0 0
+Object 00095: # 0 0 0 0 0 0 0 0
+Object 00095: 0 0
+
+Object 00096: 4
+Object 00096: 0.9644 0.03556 0
+Object 00096: 0.317 0.01127 0.317
+Object 00096: 0 0 0
+Object 00096: -2.31 -2.059 -4.049
+Object 00096: 7
+Object 00096: Stone8
+Object 00096: 0
+Object 00096: 0
+Object 00096: COLLERET111
+Object 00096: -1
+Object 00096: 0
+Object 00096: 1 1 1
+Object 00096: 0 0 0
+Object 00096: 0 0 0
+Object 00096: 1
+Object 00096: 0
+Object 00096: 0
+Object 00096: 0 0
+Object 00096: 0
+Object 00096: 1
+Object 00096: 9
+Object 00096: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00096: 0000000000000
+Object 00096: 0 0
+Object 00096: # 0 0 0 0 0 0 0 0
+Object 00096: # 0 0 0 0 0 0 0 0
+Object 00096: 0 0
+
+Object 00097: 4
+Object 00097: 0.8819 0.1181 0
+Object 00097: 0.4471 0.05494 0.4471
+Object 00097: 0 0 0
+Object 00097: -2.311 -1.227 -4.048
+Object 00097: 7
+Object 00097: Stone8
+Object 00097: 0
+Object 00097: 0
+Object 00097: ANN216112
+Object 00097: -1
+Object 00097: 0
+Object 00097: 1 1 1
+Object 00097: 0 0 0
+Object 00097: 0 0 0
+Object 00097: 1
+Object 00097: 0
+Object 00097: 0
+Object 00097: 0 0
+Object 00097: 0
+Object 00097: 1
+Object 00097: 0
+Object 00097: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00097: 0000000000000
+Object 00097: 0 0
+Object 00097: # 0 0 0 0 0 0 0 0
+Object 00097: # 0 0 0 0 0 0 0 0
+Object 00097: 0 0
+
+Object 00098: 4
+Object 00098: 0.8819 0.1181 0
+Object 00098: 0.479 0.05886 0.479
+Object 00098: 0 0 0
+Object 00098: -2.311 -1.132 -4.048
+Object 00098: 7
+Object 00098: Stone8
+Object 00098: 0
+Object 00098: 0
+Object 00098: ANN217113
+Object 00098: -1
+Object 00098: 0
+Object 00098: 1 1 1
+Object 00098: 0 0 0
+Object 00098: 0 0 0
+Object 00098: 1
+Object 00098: 0
+Object 00098: 0
+Object 00098: 0 0
+Object 00098: 0
+Object 00098: 1
+Object 00098: 0
+Object 00098: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00098: 0000000000000
+Object 00098: 0 0
+Object 00098: # 0 0 0 0 0 0 0 0
+Object 00098: # 0 0 0 0 0 0 0 0
+Object 00098: 0 0
+
+Object 00099: 13
+Object 00099: 0 -2.297e+018 0
+Object 00099: 0.578 0.07252 0.581
+Object 00099: 0 0 0
+Object 00099: -0.00433 -4.002 -5.984
+Object 00099: 12
+Object 00099: Stone7
+Object 00099: 0
+Object 00099: 0
+Object 00099: Sphere114
+Object 00099: 0
+Object 00099: 224
+Object 00099: 0.4823973 0.569302 0.6788701 0.1079292 0.6636572 0.7531539 0.1418506 0.7652798 0.6469707
+Object 00099: 0.4823973 0.569302 0.6788701 0.1418506 0.7652798 0.6469707 0.2220266 0.8304687 0.5377768
+Object 00099: 0.4823973 0.569302 0.6788701 0.2220266 0.8304687 0.5377768 0.3362515 0.8492999 0.442196
+Object 00099: 0.4823973 0.569302 0.6788701 0.3362515 0.8492999 0.442196 0.4671348 0.8189073 0.374779
+Object 00099: 0.4823973 0.569302 0.6788701 0.4671348 0.8189073 0.374779 0.5947519 0.7439159 0.34579
+Object 00099: 0.4823973 0.569302 0.6788701 0.5947519 0.7439159 0.34579 0.6996734 0.6357442 0.3596426
+Object 00099: 0.4823973 0.569302 0.6788701 0.6996734 0.6357442 0.3596426 0.765926 0.5108598 0.414227
+Object 00099: 0.4823973 0.569302 0.6788701 0.765926 0.5108598 0.414227 0.7834237 0.388275 0.5012339
+Object 00099: 0.4823973 0.569302 0.6788701 0.7834237 0.388275 0.5012339 0.7495022 0.2866529 0.6074169
+Object 00099: 0.4823973 0.569302 0.6788701 0.7495022 0.2866529 0.6074169 0.6693266 0.2214639 0.7166113
+Object 00099: 0.4823973 0.569302 0.6788701 0.6693266 0.2214639 0.7166113 0.5551012 0.2026335 0.8121921
+Object 00099: 0.4823973 0.569302 0.6788701 0.5551012 0.2026335 0.8121921 0.4242179 0.2330266 0.8796089
+Object 00099: 0.4823973 0.569302 0.6788701 0.4242179 0.2330266 0.8796089 0.296601 0.3080176 0.9085977
+Object 00099: 0.4823973 0.569302 0.6788701 0.296601 0.3080176 0.9085977 0.1916795 0.4161888 0.8947453
+Object 00099: 0.4823973 0.569302 0.6788701 0.1916795 0.4161888 0.8947453 0.1254267 0.5410736 0.8401603
+Object 00099: 0.4823973 0.569302 0.6788701 0.1254267 0.5410736 0.8401603 0.1079292 0.6636572 0.7531539
+Object 00099: 0.1079292 0.6636572 0.7531539 -0.2829697 0.6569766 0.7127779 -0.2202913 0.8447508 0.5165771
+Object 00099: 0.1079292 0.6636572 0.7531539 -0.2202913 0.8447508 0.5165771 0.1418506 0.7652798 0.6469707
+Object 00099: 0.1418506 0.7652798 0.6469707 -0.2202913 0.8447508 0.5165771 -0.07214537 0.9652037 0.3148127
+Object 00099: 0.1418506 0.7652798 0.6469707 -0.07214537 0.9652037 0.3148127 0.2220266 0.8304687 0.5377768
+Object 00099: 0.2220266 0.8304687 0.5377768 -0.07214537 0.9652037 0.3148127 0.1389149 1 0.1382018
+Object 00099: 0.2220266 0.8304687 0.5377768 0.1389149 1 0.1382018 0.3362515 0.8492999 0.442196
+Object 00099: 0.3362515 0.8492999 0.442196 0.1389149 1 0.1382018 0.3807558 0.9438398 0.01363195
+Object 00099: 0.3362515 0.8492999 0.442196 0.3807558 0.9438398 0.01363195 0.4671348 0.8189073 0.374779
+Object 00099: 0.4671348 0.8189073 0.374779 0.3807558 0.9438398 0.01363195 0.6165611 0.8052755 -0.03993383
+Object 00099: 0.4671348 0.8189073 0.374779 0.6165611 0.8052755 -0.03993383 0.5947519 0.7439159 0.34579
+Object 00099: 0.5947519 0.7439159 0.34579 0.6165611 0.8052755 -0.03993383 0.8104311 0.6054006 -0.01433841
+Object 00099: 0.5947519 0.7439159 0.34579 0.8104311 0.6054006 -0.01433841 0.6996734 0.6357442 0.3596426
+Object 00099: 0.6996734 0.6357442 0.3596426 0.8104311 0.6054006 -0.01433841 0.9328495 0.3746436 0.08652233
+Object 00099: 0.6996734 0.6357442 0.3596426 0.9328495 0.3746436 0.08652233 0.765926 0.5108598 0.414227
+Object 00099: 0.765926 0.5108598 0.414227 0.9328495 0.3746436 0.08652233 0.9651814 0.148138 0.2472899
+Object 00099: 0.765926 0.5108598 0.414227 0.9651814 0.148138 0.2472899 0.7834237 0.388275 0.5012339
+Object 00099: 0.7834237 0.388275 0.5012339 0.9651814 0.148138 0.2472899 0.9025028 -0.03963625 0.4434908
+Object 00099: 0.7834237 0.388275 0.5012339 0.9025028 -0.03963625 0.4434908 0.7495022 0.2866529 0.6074169
+Object 00099: 0.7495022 0.2866529 0.6074169 0.9025028 -0.03963625 0.4434908 0.7543563 -0.1600892 0.6452551
+Object 00099: 0.7495022 0.2866529 0.6074169 0.7543563 -0.1600892 0.6452551 0.6693266 0.2214639 0.7166113
+Object 00099: 0.6693266 0.2214639 0.7166113 0.7543563 -0.1600892 0.6452551 0.5432965 -0.194885 0.8218657
+Object 00099: 0.6693266 0.2214639 0.7166113 0.5432965 -0.194885 0.8218657 0.5551012 0.2026335 0.8121921
+Object 00099: 0.5551012 0.2026335 0.8121921 0.5432965 -0.194885 0.8218657 0.3014551 -0.1387253 0.946436
+Object 00099: 0.5551012 0.2026335 0.8121921 0.3014551 -0.1387253 0.946436 0.4242179 0.2330266 0.8796089
+Object 00099: 0.4242179 0.2330266 0.8796089 0.3014551 -0.1387253 0.946436 0.0656496 -0.0001597248 1
+Object 00099: 0.4242179 0.2330266 0.8796089 0.0656496 -0.0001597248 1 0.296601 0.3080176 0.9085977
+Object 00099: 0.296601 0.3080176 0.9085977 0.0656496 -0.0001597248 1 -0.12822 0.1997152 0.9744042
+Object 00099: 0.296601 0.3080176 0.9085977 -0.12822 0.1997152 0.9744042 0.1916795 0.4161888 0.8947453
+Object 00099: 0.1916795 0.4161888 0.8947453 -0.12822 0.1997152 0.9744042 -0.2506385 0.4304717 0.8735445
+Object 00099: 0.1916795 0.4161888 0.8947453 -0.2506385 0.4304717 0.8735445 0.1254267 0.5410736 0.8401603
+Object 00099: 0.1254267 0.5410736 0.8401603 -0.2506385 0.4304717 0.8735445 -0.2829697 0.6569766 0.7127779
+Object 00099: 0.1254267 0.5410736 0.8401603 -0.2829697 0.6569766 0.7127779 0.1079292 0.6636572 0.7531539
+Object 00099: -0.2829697 0.6569766 0.7127779 -0.6307895 0.5502772 0.5638875 -0.5488955 0.7956152 0.3075389
+Object 00099: -0.2829697 0.6569766 0.7127779 -0.5488955 0.7956152 0.3075389 -0.2202913 0.8447508 0.5165771
+Object 00099: -0.2202913 0.8447508 0.5165771 -0.5488955 0.7956152 0.3075389 -0.3553337 0.9529952 0.04392145
+Object 00099: -0.2202913 0.8447508 0.5165771 -0.3553337 0.9529952 0.04392145 -0.07214537 0.9652037 0.3148127
+Object 00099: -0.07214537 0.9652037 0.3148127 -0.3553337 0.9529952 0.04392145 -0.07957046 0.9984591 -0.186834
+Object 00099: -0.07214537 0.9652037 0.3148127 -0.07957046 0.9984591 -0.186834 0.1389149 1 0.1382018
+Object 00099: 0.1389149 1 0.1382018 -0.07957046 0.9984591 -0.186834 0.2364103 0.9250821 -0.3495923
+Object 00099: 0.1389149 1 0.1382018 0.2364103 0.9250821 -0.3495923 0.3807558 0.9438398 0.01363195
+Object 00099: 0.3807558 0.9438398 0.01363195 0.2364103 0.9250821 -0.3495923 0.5445048 0.7440392 -0.4195777
+Object 00099: 0.3807558 0.9438398 0.01363195 0.5445048 0.7440392 -0.4195777 0.6165611 0.8052755 -0.03993383
+Object 00099: 0.6165611 0.8052755 -0.03993383 0.5445048 0.7440392 -0.4195777 0.7978078 0.4828892 -0.386135
+Object 00099: 0.6165611 0.8052755 -0.03993383 0.7978078 0.4828892 -0.386135 0.8104311 0.6054006 -0.01433841
+Object 00099: 0.8104311 0.6054006 -0.01433841 0.7978078 0.4828892 -0.386135 0.957756 0.1813922 -0.2543561
+Object 00099: 0.8104311 0.6054006 -0.01433841 0.957756 0.1813922 -0.2543561 0.9328495 0.3746436 0.08652233
+Object 00099: 0.9328495 0.3746436 0.08652233 0.957756 0.1813922 -0.2543561 1 -0.1145533 -0.04430309
+Object 00099: 0.9328495 0.3746436 0.08652233 1 -0.1145533 -0.04430309 0.9651814 0.148138 0.2472899
+Object 00099: 0.9651814 0.148138 0.2472899 1 -0.1145533 -0.04430309 0.9181049 -0.3598909 0.2120474
+Object 00099: 0.9651814 0.148138 0.2472899 0.9181049 -0.3598909 0.2120474 0.9025028 -0.03963625 0.4434908
+Object 00099: 0.9025028 -0.03963625 0.4434908 0.9181049 -0.3598909 0.2120474 0.7245429 -0.5172713 0.475665
+Object 00099: 0.9025028 -0.03963625 0.4434908 0.7245429 -0.5172713 0.475665 0.7543563 -0.1600892 0.6452551
+Object 00099: 0.7543563 -0.1600892 0.6452551 0.7245429 -0.5172713 0.475665 0.4487797 -0.5627341 0.7064183
+Object 00099: 0.7543563 -0.1600892 0.6452551 0.4487797 -0.5627341 0.7064183 0.5432965 -0.194885 0.8218657
+Object 00099: 0.5432965 -0.194885 0.8218657 0.4487797 -0.5627341 0.7064183 0.1327982 -0.4893571 0.8691762
+Object 00099: 0.5432965 -0.194885 0.8218657 0.1327982 -0.4893571 0.8691762 0.3014551 -0.1387253 0.946436
+Object 00099: 0.3014551 -0.1387253 0.946436 0.1327982 -0.4893571 0.8691762 -0.1752963 -0.3083133 0.9391612
+Object 00099: 0.3014551 -0.1387253 0.946436 -0.1752963 -0.3083133 0.9391612 0.0656496 -0.0001597248 1
+Object 00099: 0.0656496 -0.0001597248 1 -0.1752963 -0.3083133 0.9391612 -0.4285987 -0.04716333 0.905718
+Object 00099: 0.0656496 -0.0001597248 1 -0.4285987 -0.04716333 0.905718 -0.12822 0.1997152 0.9744042
+Object 00099: -0.12822 0.1997152 0.9744042 -0.4285987 -0.04716333 0.905718 -0.5885463 0.2543345 0.7739393
+Object 00099: -0.12822 0.1997152 0.9744042 -0.5885463 0.2543345 0.7739393 -0.2506385 0.4304717 0.8735445
+Object 00099: -0.2506385 0.4304717 0.8735445 -0.5885463 0.2543345 0.7739393 -0.6307895 0.5502772 0.5638875
+Object 00099: -0.2506385 0.4304717 0.8735445 -0.6307895 0.5502772 0.5638875 -0.2829697 0.6569766 0.7127779
+Object 00099: -0.6307895 0.5502772 0.5638875 -0.8825764 0.3598035 0.3291507 -0.7939361 0.6253551 0.05168068
+Object 00099: -0.6307895 0.5502772 0.5638875 -0.7939361 0.6253551 0.05168068 -0.5488955 0.7956152 0.3075389
+Object 00099: -0.5488955 0.7956152 0.3075389 -0.7939361 0.6253551 0.05168068 -0.5844257 0.7957026 -0.2336588
+Object 00099: -0.5488955 0.7956152 0.3075389 -0.5844257 0.7957026 -0.2336588 -0.3553337 0.9529952 0.04392145
+Object 00099: -0.3553337 0.9529952 0.04392145 -0.5844257 0.7957026 -0.2336588 -0.2859422 0.8449109 -0.4834242
+Object 00099: -0.3553337 0.9529952 0.04392145 -0.2859422 0.8449109 -0.4834242 -0.07957046 0.9984591 -0.186834
+Object 00099: -0.07957046 0.9984591 -0.186834 -0.2859422 0.8449109 -0.4834242 0.05607346 0.7654898 -0.6595927
+Object 00099: -0.07957046 0.9984591 -0.186834 0.05607346 0.7654898 -0.6595927 0.2364103 0.9250821 -0.3495923
+Object 00099: 0.2364103 0.9250821 -0.3495923 0.05607346 0.7654898 -0.6595927 0.3895523 0.5695283 -0.7353444
+Object 00099: 0.2364103 0.9250821 -0.3495923 0.3895523 0.5695283 -0.7353444 0.5445048 0.7440392 -0.4195777
+Object 00099: 0.5445048 0.7440392 -0.4195777 0.3895523 0.5695283 -0.7353444 0.6637253 0.2868628 -0.6991461
+Object 00099: 0.5445048 0.7440392 -0.4195777 0.6637253 0.2868628 -0.6991461 0.7978078 0.4828892 -0.386135
+Object 00099: 0.7978078 0.4828892 -0.386135 0.6637253 0.2868628 -0.6991461 0.8368526 -0.0394753 -0.5565099
+Object 00099: 0.7978078 0.4828892 -0.386135 0.8368526 -0.0394753 -0.5565099 0.957756 0.1813922 -0.2543561
+Object 00099: 0.957756 0.1813922 -0.2543561 0.8368526 -0.0394753 -0.5565099 0.8825756 -0.3598043 -0.3291501
+Object 00099: 0.957756 0.1813922 -0.2543561 0.8825756 -0.3598043 -0.3291501 1 -0.1145533 -0.04430309
+Object 00099: 1 -0.1145533 -0.04430309 0.8825756 -0.3598043 -0.3291501 0.7939344 -0.625356 -0.05167907
+Object 00099: 1 -0.1145533 -0.04430309 0.7939344 -0.625356 -0.05167907 0.9181049 -0.3598909 0.2120474
+Object 00099: 0.9181049 -0.3598909 0.2120474 0.7939344 -0.625356 -0.05167907 0.5844237 -0.7957031 0.2336594
+Object 00099: 0.9181049 -0.3598909 0.2120474 0.5844237 -0.7957031 0.2336594 0.7245429 -0.5172713 0.475665
+Object 00099: 0.7245429 -0.5172713 0.475665 0.5844237 -0.7957031 0.2336594 0.2859397 -0.8449109 0.4834245
+Object 00099: 0.7245429 -0.5172713 0.475665 0.2859397 -0.8449109 0.4834245 0.4487797 -0.5627341 0.7064183
+Object 00099: 0.4487797 -0.5627341 0.7064183 0.2859397 -0.8449109 0.4834245 -0.05607598 -0.7654901 0.6595931
+Object 00099: 0.4487797 -0.5627341 0.7064183 -0.05607598 -0.7654901 0.6595931 0.1327982 -0.4893571 0.8691762
+Object 00099: 0.1327982 -0.4893571 0.8691762 -0.05607598 -0.7654901 0.6595931 -0.3895547 -0.5695291 0.7353446
+Object 00099: 0.1327982 -0.4893571 0.8691762 -0.3895547 -0.5695291 0.7353446 -0.1752963 -0.3083133 0.9391612
+Object 00099: -0.1752963 -0.3083133 0.9391612 -0.3895547 -0.5695291 0.7353446 -0.6637275 -0.2868624 0.6991463
+Object 00099: -0.1752963 -0.3083133 0.9391612 -0.6637275 -0.2868624 0.6991463 -0.4285987 -0.04716333 0.905718
+Object 00099: -0.4285987 -0.04716333 0.905718 -0.6637275 -0.2868624 0.6991463 -0.8368537 0.03947612 0.556509
+Object 00099: -0.4285987 -0.04716333 0.905718 -0.8368537 0.03947612 0.556509 -0.5885463 0.2543345 0.7739393
+Object 00099: -0.5885463 0.2543345 0.7739393 -0.8368537 0.03947612 0.556509 -0.8825764 0.3598035 0.3291507
+Object 00099: -0.5885463 0.2543345 0.7739393 -0.8825764 0.3598035 0.3291507 -0.6307895 0.5502772 0.5638875
+Object 00099: -0.8825764 0.3598035 0.3291507 -1 0.1145521 0.04430409 -0.9181063 0.3598906 -0.212047
+Object 00099: -0.8825764 0.3598035 0.3291507 -0.9181063 0.3598906 -0.212047 -0.7939361 0.6253551 0.05168068
+Object 00099: -0.7939361 0.6253551 0.05168068 -0.9181063 0.3598906 -0.212047 -0.7245445 0.5172705 -0.4756649
+Object 00099: -0.7939361 0.6253551 0.05168068 -0.7245445 0.5172705 -0.4756649 -0.5844257 0.7957026 -0.2336588
+Object 00099: -0.5844257 0.7957026 -0.2336588 -0.7245445 0.5172705 -0.4756649 -0.448782 0.5627332 -0.7064181
+Object 00099: -0.5844257 0.7957026 -0.2336588 -0.448782 0.5627332 -0.7064181 -0.2859422 0.8449109 -0.4834242
+Object 00099: -0.2859422 0.8449109 -0.4834242 -0.448782 0.5627332 -0.7064181 -0.1328004 0.4893575 -0.8691767
+Object 00099: -0.2859422 0.8449109 -0.4834242 -0.1328004 0.4893575 -0.8691767 0.05607346 0.7654898 -0.6595927
+Object 00099: 0.05607346 0.7654898 -0.6595927 -0.1328004 0.4893575 -0.8691767 0.1752936 0.3083137 -0.9391611
+Object 00099: 0.05607346 0.7654898 -0.6595927 0.1752936 0.3083137 -0.9391611 0.3895523 0.5695283 -0.7353444
+Object 00099: 0.3895523 0.5695283 -0.7353444 0.1752936 0.3083137 -0.9391611 0.4285963 0.04716415 -0.905719
+Object 00099: 0.3895523 0.5695283 -0.7353444 0.4285963 0.04716415 -0.905719 0.6637253 0.2868628 -0.6991461
+Object 00099: 0.6637253 0.2868628 -0.6991461 0.4285963 0.04716415 -0.905719 0.5885449 -0.2543329 -0.7739404
+Object 00099: 0.6637253 0.2868628 -0.6991461 0.5885449 -0.2543329 -0.7739404 0.8368526 -0.0394753 -0.5565099
+Object 00099: 0.8368526 -0.0394753 -0.5565099 0.5885449 -0.2543329 -0.7739404 0.6307882 -0.5502788 -0.5638869
+Object 00099: 0.8368526 -0.0394753 -0.5565099 0.6307882 -0.5502788 -0.5638869 0.8825756 -0.3598043 -0.3291501
+Object 00099: 0.8825756 -0.3598043 -0.3291501 0.6307882 -0.5502788 -0.5638869 0.5488938 -0.795616 -0.3075381
+Object 00099: 0.8825756 -0.3598043 -0.3291501 0.5488938 -0.795616 -0.3075381 0.7939344 -0.625356 -0.05167907
+Object 00099: 0.7939344 -0.625356 -0.05167907 0.5488938 -0.795616 -0.3075381 0.3553314 -0.9529964 -0.04391985
+Object 00099: 0.7939344 -0.625356 -0.05167907 0.3553314 -0.9529964 -0.04391985 0.5844237 -0.7957031 0.2336594
+Object 00099: 0.5844237 -0.7957031 0.2336594 0.3553314 -0.9529964 -0.04391985 0.07956845 -0.9984587 0.1868344
+Object 00099: 0.5844237 -0.7957031 0.2336594 0.07956845 -0.9984587 0.1868344 0.2859397 -0.8449109 0.4834245
+Object 00099: 0.2859397 -0.8449109 0.4834245 0.07956845 -0.9984587 0.1868344 -0.2364132 -0.925083 0.3495927
+Object 00099: 0.2859397 -0.8449109 0.4834245 -0.2364132 -0.925083 0.3495927 -0.05607598 -0.7654901 0.6595931
+Object 00099: -0.05607598 -0.7654901 0.6595931 -0.2364132 -0.925083 0.3495927 -0.5445074 -0.7440384 0.4195772
+Object 00099: -0.05607598 -0.7654901 0.6595931 -0.5445074 -0.7440384 0.4195772 -0.3895547 -0.5695291 0.7353446
+Object 00099: -0.3895547 -0.5695291 0.7353446 -0.5445074 -0.7440384 0.4195772 -0.7978102 -0.4828888 0.386135
+Object 00099: -0.3895547 -0.5695291 0.7353446 -0.7978102 -0.4828888 0.386135 -0.6637275 -0.2868624 0.6991463
+Object 00099: -0.6637275 -0.2868624 0.6991463 -0.7978102 -0.4828888 0.386135 -0.9577578 -0.1813914 0.2543553
+Object 00099: -0.6637275 -0.2868624 0.6991463 -0.9577578 -0.1813914 0.2543553 -0.8368537 0.03947612 0.556509
+Object 00099: -0.8368537 0.03947612 0.556509 -0.9577578 -0.1813914 0.2543553 -1 0.1145521 0.04430409
+Object 00099: -0.8368537 0.03947612 0.556509 -1 0.1145521 0.04430409 -0.8825764 0.3598035 0.3291507
+Object 00099: -1 0.1145521 0.04430409 -0.9651829 -0.1481384 -0.2472901 -0.9025043 0.03963543 -0.4434907
+Object 00099: -1 0.1145521 0.04430409 -0.9025043 0.03963543 -0.4434907 -0.9181063 0.3598906 -0.212047
+Object 00099: -0.9181063 0.3598906 -0.212047 -0.9025043 0.03963543 -0.4434907 -0.7543582 0.1600887 -0.645255
+Object 00099: -0.9181063 0.3598906 -0.212047 -0.7543582 0.1600887 -0.645255 -0.7245445 0.5172705 -0.4756649
+Object 00099: -0.7245445 0.5172705 -0.4756649 -0.7543582 0.1600887 -0.645255 -0.5432988 0.1948846 -0.821866
+Object 00099: -0.7245445 0.5172705 -0.4756649 -0.5432988 0.1948846 -0.821866 -0.448782 0.5627332 -0.7064181
+Object 00099: -0.448782 0.5627332 -0.7064181 -0.5432988 0.1948846 -0.821866 -0.3014569 0.1387257 -0.9464359
+Object 00099: -0.448782 0.5627332 -0.7064181 -0.3014569 0.1387257 -0.9464359 -0.1328004 0.4893575 -0.8691767
+Object 00099: -0.1328004 0.4893575 -0.8691767 -0.3014569 0.1387257 -0.9464359 -0.06565162 0.0001597248 -0.9999999
+Object 00099: -0.1328004 0.4893575 -0.8691767 -0.06565162 0.0001597248 -0.9999999 0.1752936 0.3083137 -0.9391611
+Object 00099: 0.1752936 0.3083137 -0.9391611 -0.06565162 0.0001597248 -0.9999999 0.128218 -0.1997148 -0.9744049
+Object 00099: 0.1752936 0.3083137 -0.9391611 0.128218 -0.1997148 -0.9744049 0.4285963 0.04716415 -0.905719
+Object 00099: 0.4285963 0.04716415 -0.905719 0.128218 -0.1997148 -0.9744049 0.2506372 -0.4304709 -0.8735452
+Object 00099: 0.4285963 0.04716415 -0.905719 0.2506372 -0.4304709 -0.8735452 0.5885449 -0.2543329 -0.7739404
+Object 00099: 0.5885449 -0.2543329 -0.7739404 0.2506372 -0.4304709 -0.8735452 0.2829686 -0.6569778 -0.7127776
+Object 00099: 0.5885449 -0.2543329 -0.7739404 0.2829686 -0.6569778 -0.7127776 0.6307882 -0.5502788 -0.5638869
+Object 00099: 0.6307882 -0.5502788 -0.5638869 0.2829686 -0.6569778 -0.7127776 0.2202896 -0.8447508 -0.5165771
+Object 00099: 0.6307882 -0.5502788 -0.5638869 0.2202896 -0.8447508 -0.5165771 0.5488938 -0.795616 -0.3075381
+Object 00099: 0.5488938 -0.795616 -0.3075381 0.2202896 -0.8447508 -0.5165771 0.0721432 -0.9652045 -0.3148127
+Object 00099: 0.5488938 -0.795616 -0.3075381 0.0721432 -0.9652045 -0.3148127 0.3553314 -0.9529964 -0.04391985
+Object 00099: 0.3553314 -0.9529964 -0.04391985 0.0721432 -0.9652045 -0.3148127 -0.1389171 -1 -0.138201
+Object 00099: 0.3553314 -0.9529964 -0.04391985 -0.1389171 -1 -0.138201 0.07956845 -0.9984587 0.1868344
+Object 00099: 0.07956845 -0.9984587 0.1868344 -0.1389171 -1 -0.138201 -0.3807582 -0.9438402 -0.01363175
+Object 00099: 0.07956845 -0.9984587 0.1868344 -0.3807582 -0.9438402 -0.01363175 -0.2364132 -0.925083 0.3495927
+Object 00099: -0.2364132 -0.925083 0.3495927 -0.3807582 -0.9438402 -0.01363175 -0.6165635 -0.8052751 0.03993423
+Object 00099: -0.2364132 -0.925083 0.3495927 -0.6165635 -0.8052751 0.03993423 -0.5445074 -0.7440384 0.4195772
+Object 00099: -0.5445074 -0.7440384 0.4195772 -0.6165635 -0.8052751 0.03993423 -0.8104329 -0.6053998 0.01433841
+Object 00099: -0.5445074 -0.7440384 0.4195772 -0.8104329 -0.6053998 0.01433841 -0.7978102 -0.4828888 0.386135
+Object 00099: -0.7978102 -0.4828888 0.386135 -0.8104329 -0.6053998 0.01433841 -0.9328519 -0.3746432 -0.08652273
+Object 00099: -0.7978102 -0.4828888 0.386135 -0.9328519 -0.3746432 -0.08652273 -0.9577578 -0.1813914 0.2543553
+Object 00099: -0.9577578 -0.1813914 0.2543553 -0.9328519 -0.3746432 -0.08652273 -0.9651829 -0.1481384 -0.2472901
+Object 00099: -0.9577578 -0.1813914 0.2543553 -0.9651829 -0.1481384 -0.2472901 -1 0.1145521 0.04430409
+Object 00099: -0.9651829 -0.1481384 -0.2472901 -0.7834253 -0.3882762 -0.5012342 -0.7495036 -0.2866537 -0.6074169
+Object 00099: -0.9651829 -0.1481384 -0.2472901 -0.7495036 -0.2866537 -0.6074169 -0.9025043 0.03963543 -0.4434907
+Object 00099: -0.9025043 0.03963543 -0.4434907 -0.7495036 -0.2866537 -0.6074169 -0.6693276 -0.2214647 -0.7166111
+Object 00099: -0.9025043 0.03963543 -0.4434907 -0.6693276 -0.2214647 -0.7166111 -0.7543582 0.1600887 -0.645255
+Object 00099: -0.7543582 0.1600887 -0.645255 -0.6693276 -0.2214647 -0.7166111 -0.5551031 -0.2026335 -0.8121917
+Object 00099: -0.7543582 0.1600887 -0.645255 -0.5551031 -0.2026335 -0.8121917 -0.5432988 0.1948846 -0.821866
+Object 00099: -0.5432988 0.1948846 -0.821866 -0.5551031 -0.2026335 -0.8121917 -0.4242191 -0.233027 -0.8796089
+Object 00099: -0.5432988 0.1948846 -0.821866 -0.4242191 -0.233027 -0.8796089 -0.3014569 0.1387257 -0.9464359
+Object 00099: -0.3014569 0.1387257 -0.9464359 -0.4242191 -0.233027 -0.8796089 -0.2966024 -0.3080176 -0.9085982
+Object 00099: -0.3014569 0.1387257 -0.9464359 -0.2966024 -0.3080176 -0.9085982 -0.06565162 0.0001597248 -0.9999999
+Object 00099: -0.06565162 0.0001597248 -0.9999999 -0.2966024 -0.3080176 -0.9085982 -0.1916809 -0.4161892 -0.8947458
+Object 00099: -0.06565162 0.0001597248 -0.9999999 -0.1916809 -0.4161892 -0.8947458 0.128218 -0.1997148 -0.9744049
+Object 00099: 0.128218 -0.1997148 -0.9744049 -0.1916809 -0.4161892 -0.8947458 -0.1254279 -0.5410731 -0.8401609
+Object 00099: 0.128218 -0.1997148 -0.9744049 -0.1254279 -0.5410731 -0.8401609 0.2506372 -0.4304709 -0.8735452
+Object 00099: 0.2506372 -0.4304709 -0.8735452 -0.1254279 -0.5410731 -0.8401609 -0.1079304 -0.663658 -0.7531541
+Object 00099: 0.2506372 -0.4304709 -0.8735452 -0.1079304 -0.663658 -0.7531541 0.2829686 -0.6569778 -0.7127776
+Object 00099: 0.2829686 -0.6569778 -0.7127776 -0.1079304 -0.663658 -0.7531541 -0.1418518 -0.7652802 -0.6469708
+Object 00099: 0.2829686 -0.6569778 -0.7127776 -0.1418518 -0.7652802 -0.6469708 0.2202896 -0.8447508 -0.5165771
+Object 00099: 0.2202896 -0.8447508 -0.5165771 -0.1418518 -0.7652802 -0.6469708 -0.2220283 -0.8304691 -0.5377765
+Object 00099: 0.2202896 -0.8447508 -0.5165771 -0.2220283 -0.8304691 -0.5377765 0.0721432 -0.9652045 -0.3148127
+Object 00099: 0.0721432 -0.9652045 -0.3148127 -0.2220283 -0.8304691 -0.5377765 -0.3362531 -0.8493007 -0.4421952
+Object 00099: 0.0721432 -0.9652045 -0.3148127 -0.3362531 -0.8493007 -0.4421952 -0.1389171 -1 -0.138201
+Object 00099: -0.1389171 -1 -0.138201 -0.3362531 -0.8493007 -0.4421952 -0.4671366 -0.8189073 -0.3747784
+Object 00099: -0.1389171 -1 -0.138201 -0.4671366 -0.8189073 -0.3747784 -0.3807582 -0.9438402 -0.01363175
+Object 00099: -0.3807582 -0.9438402 -0.01363175 -0.4671366 -0.8189073 -0.3747784 -0.5947533 -0.7439167 -0.3457892
+Object 00099: -0.3807582 -0.9438402 -0.01363175 -0.5947533 -0.7439167 -0.3457892 -0.6165635 -0.8052751 0.03993423
+Object 00099: -0.6165635 -0.8052751 0.03993423 -0.5947533 -0.7439167 -0.3457892 -0.699675 -0.6357446 -0.3596428
+Object 00099: -0.6165635 -0.8052751 0.03993423 -0.699675 -0.6357446 -0.3596428 -0.8104329 -0.6053998 0.01433841
+Object 00099: -0.8104329 -0.6053998 0.01433841 -0.699675 -0.6357446 -0.3596428 -0.7659279 -0.5108603 -0.4142271
+Object 00099: -0.8104329 -0.6053998 0.01433841 -0.7659279 -0.5108603 -0.4142271 -0.9328519 -0.3746432 -0.08652273
+Object 00099: -0.9328519 -0.3746432 -0.08652273 -0.7659279 -0.5108603 -0.4142271 -0.7834253 -0.3882762 -0.5012342
+Object 00099: -0.9328519 -0.3746432 -0.08652273 -0.7834253 -0.3882762 -0.5012342 -0.9651829 -0.1481384 -0.2472901
+Object 00099: -0.4823984 -0.5693024 -0.6788703 -0.7659279 -0.5108603 -0.4142271 -0.699675 -0.6357446 -0.3596428
+Object 00099: -0.4823984 -0.5693024 -0.6788703 -0.699675 -0.6357446 -0.3596428 -0.5947533 -0.7439167 -0.3457892
+Object 00099: -0.4823984 -0.5693024 -0.6788703 -0.5947533 -0.7439167 -0.3457892 -0.4671366 -0.8189073 -0.3747784
+Object 00099: -0.4823984 -0.5693024 -0.6788703 -0.4671366 -0.8189073 -0.3747784 -0.3362531 -0.8493007 -0.4421952
+Object 00099: -0.4823984 -0.5693024 -0.6788703 -0.3362531 -0.8493007 -0.4421952 -0.2220283 -0.8304691 -0.5377765
+Object 00099: -0.4823984 -0.5693024 -0.6788703 -0.2220283 -0.8304691 -0.5377765 -0.1418518 -0.7652802 -0.6469708
+Object 00099: -0.4823984 -0.5693024 -0.6788703 -0.1418518 -0.7652802 -0.6469708 -0.1079304 -0.663658 -0.7531541
+Object 00099: -0.4823984 -0.5693024 -0.6788703 -0.1079304 -0.663658 -0.7531541 -0.1254279 -0.5410731 -0.8401609
+Object 00099: -0.4823984 -0.5693024 -0.6788703 -0.1254279 -0.5410731 -0.8401609 -0.1916809 -0.4161892 -0.8947458
+Object 00099: -0.4823984 -0.5693024 -0.6788703 -0.1916809 -0.4161892 -0.8947458 -0.2966024 -0.3080176 -0.9085982
+Object 00099: -0.4823984 -0.5693024 -0.6788703 -0.2966024 -0.3080176 -0.9085982 -0.4242191 -0.233027 -0.8796089
+Object 00099: -0.4823984 -0.5693024 -0.6788703 -0.4242191 -0.233027 -0.8796089 -0.5551031 -0.2026335 -0.8121917
+Object 00099: -0.4823984 -0.5693024 -0.6788703 -0.5551031 -0.2026335 -0.8121917 -0.6693276 -0.2214647 -0.7166111
+Object 00099: -0.4823984 -0.5693024 -0.6788703 -0.6693276 -0.2214647 -0.7166111 -0.7495036 -0.2866537 -0.6074169
+Object 00099: -0.4823984 -0.5693024 -0.6788703 -0.7495036 -0.2866537 -0.6074169 -0.7834253 -0.3882762 -0.5012342
+Object 00099: -0.4823984 -0.5693024 -0.6788703 -0.7834253 -0.3882762 -0.5012342 -0.7659279 -0.5108603 -0.4142271
+Object 00099: 0
+Object 00099: 1 1 1
+Object 00099: 0 0 0
+Object 00099: 0 0 0
+Object 00099: 1
+Object 00099: 0
+Object 00099: 0
+Object 00099: 0 0
+Object 00099: 0
+Object 00099: 1
+Object 00099: 0
+Object 00099: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00099: 0000000000000
+Object 00099: 0 0
+Object 00099: # 0 0 0 0 0 0 0 0
+Object 00099: # 0 0 0 0 0 0 0 0
+Object 00099: 0 0
+
+Object 00100: 1
+Object 00100: 0 0 0
+Object 00100: 0.3385 0.3385 0.3385
+Object 00100: 0 0 0
+Object 00100: 1.963 -2.539 -5.984
+Object 00100: 122
+Object 00100: Stone7
+Object 00100: 0
+Object 00100: 0
+Object 00100: SPH00004115
+Object 00100: -1
+Object 00100: 0
+Object 00100: 1 1 1
+Object 00100: 0 0 0
+Object 00100: 0 0 0
+Object 00100: 1
+Object 00100: 0
+Object 00100: 0
+Object 00100: 0 0
+Object 00100: 0
+Object 00100: 1
+Object 00100: 0
+Object 00100: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00100: 0000000000000
+Object 00100: 0 0
+Object 00100: # 0 0 0 0 0 0 0 0
+Object 00100: # 0 0 0 0 0 0 0 0
+Object 00100: 0 0
+
+Object 00101: 3
+Object 00101: 0 0 0
+Object 00101: 0.2159 0.7506 0.2159
+Object 00101: 0 0 0
+Object 00101: 1.963 -2.098 -5.984
+Object 00101: 175
+Object 00101: Stone7
+Object 00101: 0
+Object 00101: 0
+Object 00101: CORPSPION116
+Object 00101: -1
+Object 00101: 0
+Object 00101: 1 1 1
+Object 00101: 0 0 0
+Object 00101: 0 0 0
+Object 00101: 1
+Object 00101: 0
+Object 00101: 0
+Object 00101: 0 0
+Object 00101: 0
+Object 00101: 1
+Object 00101: 0
+Object 00101: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00101: 0000000000000
+Object 00101: 0 0
+Object 00101: # 0 0 0 0 0 0 0 0
+Object 00101: # 0 0 0 0 0 0 0 0
+Object 00101: 0 0
+
+Object 00102: 3
+Object 00102: 0 0 0
+Object 00102: 0.443 0.2781 0.443
+Object 00102: 0 0 0
+Object 00102: 1.963 -1.545 -5.984
+Object 00102: 91
+Object 00102: Stone7
+Object 00102: 0
+Object 00102: 0
+Object 00102: PIEDPION117
+Object 00102: -1
+Object 00102: 0
+Object 00102: 1 1 1
+Object 00102: 0 0 0
+Object 00102: 0 0 0
+Object 00102: 1
+Object 00102: 0
+Object 00102: 0
+Object 00102: 0 0
+Object 00102: 0
+Object 00102: 1
+Object 00102: 8
+Object 00102: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00102: 0000000000000
+Object 00102: 0 0
+Object 00102: # 0 0 0 0 0 0 0 0
+Object 00102: # 0 0 0 0 0 0 0 0
+Object 00102: 0 0
+
+Object 00103: 1
+Object 00103: 0 0 0
+Object 00103: 0.2207 0.2207 0.2207
+Object 00103: 0 0 0
+Object 00103: 1.963 -2.37 -5.984
+Object 00103: 7
+Object 00103: Stone7
+Object 00103: 0
+Object 00103: 0
+Object 00103: SPH00004118
+Object 00103: -1
+Object 00103: 0
+Object 00103: 1 1 1
+Object 00103: 0 0 0
+Object 00103: 0 0 0
+Object 00103: 1
+Object 00103: 0
+Object 00103: 0
+Object 00103: 0 0
+Object 00103: 0
+Object 00103: 1
+Object 00103: 0
+Object 00103: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00103: 0000000000000
+Object 00103: 0 0
+Object 00103: # 0 0 0 0 0 0 0 0
+Object 00103: # 0 0 0 0 0 0 0 0
+Object 00103: 0 0
+
+Object 00104: 4
+Object 00104: 0.8819 0.1181 0
+Object 00104: 0.2256 0.02773 0.2256
+Object 00104: 0 0 0
+Object 00104: 1.961 -1.557 -5.984
+Object 00104: 7
+Object 00104: Stone7
+Object 00104: 0
+Object 00104: 0
+Object 00104: ANNEAU119
+Object 00104: -1
+Object 00104: 0
+Object 00104: 1 1 1
+Object 00104: 0 0 0
+Object 00104: 0 0 0
+Object 00104: 1
+Object 00104: 0
+Object 00104: 0
+Object 00104: 0 0
+Object 00104: 0
+Object 00104: 1
+Object 00104: 0
+Object 00104: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00104: 0000000000000
+Object 00104: 0 0
+Object 00104: # 0 0 0 0 0 0 0 0
+Object 00104: # 0 0 0 0 0 0 0 0
+Object 00104: 0 0
+
+Object 00105: 4
+Object 00105: 0.8819 0.1181 0
+Object 00105: 0.2099 0.0258 0.2099
+Object 00105: 0 0 0
+Object 00105: 1.961 -2.273 -5.984
+Object 00105: 177
+Object 00105: Stone7
+Object 00105: 0
+Object 00105: 0
+Object 00105: ANN00006120
+Object 00105: -1
+Object 00105: 0
+Object 00105: 1 1 1
+Object 00105: 0 0 0
+Object 00105: 0 0 0
+Object 00105: 1
+Object 00105: 0
+Object 00105: 0
+Object 00105: 0 0
+Object 00105: 0
+Object 00105: 1
+Object 00105: 0
+Object 00105: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00105: 0000000000000
+Object 00105: 0 0
+Object 00105: # 0 0 0 0 0 0 0 0
+Object 00105: # 0 0 0 0 0 0 0 0
+Object 00105: 0 0
+
+Object 00106: 4
+Object 00106: 0.8819 0.1181 0
+Object 00106: 0.1131 0.0139 0.1131
+Object 00106: 0 0 0
+Object 00106: 1.961 -2.172 -5.984
+Object 00106: 7
+Object 00106: Stone7
+Object 00106: 0
+Object 00106: 0
+Object 00106: ANN00000121
+Object 00106: -1
+Object 00106: 0
+Object 00106: 1 1 1
+Object 00106: 0 0 0
+Object 00106: 0 0 0
+Object 00106: 1
+Object 00106: 0
+Object 00106: 0
+Object 00106: 0 0
+Object 00106: 0
+Object 00106: 1
+Object 00106: 0
+Object 00106: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00106: 0000000000000
+Object 00106: 0 0
+Object 00106: # 0 0 0 0 0 0 0 0
+Object 00106: # 0 0 0 0 0 0 0 0
+Object 00106: 0 0
+
+Object 00107: 3
+Object 00107: 0 0 0
+Object 00107: 0.3064 0.04464 0.3064
+Object 00107: 0 0 0
+Object 00107: 1.963 -2.115 -5.984
+Object 00107: 202
+Object 00107: Stone7
+Object 00107: 0
+Object 00107: 0
+Object 00107: COLERETTE122
+Object 00107: -1
+Object 00107: 0
+Object 00107: 1 1 1
+Object 00107: 0 0 0
+Object 00107: 0 0 0
+Object 00107: 1
+Object 00107: 0
+Object 00107: 0
+Object 00107: 0 0
+Object 00107: 0
+Object 00107: 1
+Object 00107: 0
+Object 00107: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00107: 0000000000000
+Object 00107: 0 0
+Object 00107: # 0 0 0 0 0 0 0 0
+Object 00107: # 0 0 0 0 0 0 0 0
+Object 00107: 0 0
+
+Object 00108: 4
+Object 00108: 0.9644 0.03556 0
+Object 00108: 0.317 0.01127 0.317
+Object 00108: 0 0 0
+Object 00108: 1.963 -2.059 -5.985
+Object 00108: 7
+Object 00108: Stone7
+Object 00108: 0
+Object 00108: 0
+Object 00108: COLLERET123
+Object 00108: -1
+Object 00108: 0
+Object 00108: 1 1 1
+Object 00108: 0 0 0
+Object 00108: 0 0 0
+Object 00108: 1
+Object 00108: 0
+Object 00108: 0
+Object 00108: 0 0
+Object 00108: 0
+Object 00108: 1
+Object 00108: 0
+Object 00108: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00108: 0000000000000
+Object 00108: 0 0
+Object 00108: # 0 0 0 0 0 0 0 0
+Object 00108: # 0 0 0 0 0 0 0 0
+Object 00108: 0 0
+
+Object 00109: 4
+Object 00109: 0.8819 0.1181 0
+Object 00109: 0.4471 0.05494 0.4471
+Object 00109: 0 0 0
+Object 00109: 1.961 -1.227 -5.984
+Object 00109: 7
+Object 00109: Stone7
+Object 00109: 0
+Object 00109: 0
+Object 00109: ANN010124
+Object 00109: -1
+Object 00109: 0
+Object 00109: 1 1 1
+Object 00109: 0 0 0
+Object 00109: 0 0 0
+Object 00109: 1
+Object 00109: 0
+Object 00109: 0
+Object 00109: 0 0
+Object 00109: 0
+Object 00109: 1
+Object 00109: 0
+Object 00109: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00109: 0000000000000
+Object 00109: 0 0
+Object 00109: # 0 0 0 0 0 0 0 0
+Object 00109: # 0 0 0 0 0 0 0 0
+Object 00109: 0 0
+
+Object 00110: 4
+Object 00110: 0.8819 0.1181 0
+Object 00110: 0.479 0.05886 0.479
+Object 00110: 0 0 0
+Object 00110: 1.961 -1.132 -5.984
+Object 00110: 7
+Object 00110: Stone7
+Object 00110: 0
+Object 00110: 0
+Object 00110: ANN011125
+Object 00110: -1
+Object 00110: 0
+Object 00110: 1 1 1
+Object 00110: 0 0 0
+Object 00110: 0 0 0
+Object 00110: 1
+Object 00110: 0
+Object 00110: 0
+Object 00110: 0 0
+Object 00110: 0
+Object 00110: 1
+Object 00110: 0
+Object 00110: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00110: 0000000000000
+Object 00110: 0 0
+Object 00110: # 0 0 0 0 0 0 0 0
+Object 00110: # 0 0 0 0 0 0 0 0
+Object 00110: 0 0
+
+Object 00111: 2
+Object 00111: 0 0 0
+Object 00111: 1 0.06657 1
+Object 00111: 0 0 0
+Object 00111: 1.963 -0.9508 -5.984
+Object 00111: 7
+Object 00111: Stone8
+Object 00111: 0
+Object 00111: 0
+Object 00111: PLAQUEBL126
+Object 00111: -1
+Object 00111: 0
+Object 00111: 1 1 1
+Object 00111: 0 0 0
+Object 00111: 0 0 0
+Object 00111: 1
+Object 00111: 0
+Object 00111: 0
+Object 00111: 0 0
+Object 00111: 0
+Object 00111: 1
+Object 00111: 0
+Object 00111: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00111: 0000000000000
+Object 00111: 0 0
+Object 00111: # 0 0 0 0 0 0 0 0
+Object 00111: # 0 0 0 0 0 0 0 0
+Object 00111: 0 0
+
+Object 00112: 2
+Object 00112: 0 0 0
+Object 00112: 1 0.06657 1
+Object 00112: 0 0 0
+Object 00112: 3.963 -0.9508 -7.984
+Object 00112: 7
+Object 00112: Stone8
+Object 00112: 0
+Object 00112: 0
+Object 00112: PLAQUEBL127
+Object 00112: -1
+Object 00112: 0
+Object 00112: 1 1 1
+Object 00112: 0 0 0
+Object 00112: 0 0 0
+Object 00112: 1
+Object 00112: 0
+Object 00112: 0
+Object 00112: 0 0
+Object 00112: 0
+Object 00112: 1
+Object 00112: 0
+Object 00112: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00112: 0000000000000
+Object 00112: 0 0
+Object 00112: # 0 0 0 0 0 0 0 0
+Object 00112: # 0 0 0 0 0 0 0 0
+Object 00112: 0 0
+
+Object 00113: 2
+Object 00113: 0 0 0
+Object 00113: 1 0.06657 1
+Object 00113: 0 0 0
+Object 00113: 3.963 -0.9508 -3.984
+Object 00113: 7
+Object 00113: Stone8
+Object 00113: 0
+Object 00113: 0
+Object 00113: PLAQUEBL128
+Object 00113: -1
+Object 00113: 0
+Object 00113: 1 1 1
+Object 00113: 0 0 0
+Object 00113: 0 0 0
+Object 00113: 1
+Object 00113: 0
+Object 00113: 0
+Object 00113: 0 0
+Object 00113: 0
+Object 00113: 1
+Object 00113: 0
+Object 00113: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00113: 0000000000000
+Object 00113: 0 0
+Object 00113: # 0 0 0 0 0 0 0 0
+Object 00113: # 0 0 0 0 0 0 0 0
+Object 00113: 0 0
+
+Object 00114: 2
+Object 00114: 0 0 0
+Object 00114: 0.9864 0.06657 0.9949
+Object 00114: 0 0 0
+Object 00114: 1.961 -0.9508 -7.986
+Object 00114: 21
+Object 00114: Stone7
+Object 00114: 0
+Object 00114: 0
+Object 00114: PLAQUENO129
+Object 00114: -1
+Object 00114: 0
+Object 00114: 1 1 1
+Object 00114: 0 0 0
+Object 00114: 0 0 0
+Object 00114: 1
+Object 00114: 0
+Object 00114: 0
+Object 00114: 0 0
+Object 00114: 0
+Object 00114: 1
+Object 00114: 14
+Object 00114: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00114: 0000000000000
+Object 00114: 0 0
+Object 00114: # 0 0 0 0 0 0 0 0
+Object 00114: # 0 0 0 0 0 0 0 0
+Object 00114: 0 0
+
+Object 00115: 2
+Object 00115: 0 0 0
+Object 00115: 0.9864 0.06657 0.9949
+Object 00115: 0 0 0
+Object 00115: 1.965 -0.9508 -3.979
+Object 00115: 15
+Object 00115: Stone7
+Object 00115: 0
+Object 00115: 0
+Object 00115: PLAQUENO131
+Object 00115: -1
+Object 00115: 0
+Object 00115: 1 1 1
+Object 00115: 0 0 0
+Object 00115: 0 0 0
+Object 00115: 1
+Object 00115: 0
+Object 00115: 0
+Object 00115: 0 0
+Object 00115: 0
+Object 00115: 1
+Object 00115: 8
+Object 00115: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00115: 0000000000000
+Object 00115: 0 0
+Object 00115: # 0 0 0 0 0 0 0 0
+Object 00115: # 0 0 0 0 0 0 0 0
+Object 00115: 0 0
+
+Object 00116: 1
+Object 00116: 0 0 0
+Object 00116: 0.3385 0.3385 0.3385
+Object 00116: 0 0 0
+Object 00116: 1.663 -2.539 -4.048
+Object 00116: 122
+Object 00116: Stone8
+Object 00116: 0
+Object 00116: 0
+Object 00116: SPH00207146
+Object 00116: -1
+Object 00116: 0
+Object 00116: 1 1 1
+Object 00116: 0 0 0
+Object 00116: 0 0 0
+Object 00116: 1
+Object 00116: 0
+Object 00116: 0
+Object 00116: 0 0
+Object 00116: 0
+Object 00116: 1
+Object 00116: 7
+Object 00116: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00116: 0000000000000
+Object 00116: 0 0
+Object 00116: # 0 0 0 0 0 0 0 0
+Object 00116: # 0 0 0 0 0 0 0 0
+Object 00116: 0 0
+
+Object 00117: 3
+Object 00117: 0 0 0
+Object 00117: 0.2159 0.7506 0.2159
+Object 00117: 0 0 0
+Object 00117: 1.663 -2.098 -4.048
+Object 00117: 175
+Object 00117: Stone8
+Object 00117: 0
+Object 00117: 0
+Object 00117: CORPSP208147
+Object 00117: -1
+Object 00117: 0
+Object 00117: 1 1 1
+Object 00117: 0 0 0
+Object 00117: 0 0 0
+Object 00117: 1
+Object 00117: 0
+Object 00117: 0
+Object 00117: 0 0
+Object 00117: 0
+Object 00117: 1
+Object 00117: 0
+Object 00117: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00117: 0000000000000
+Object 00117: 0 0
+Object 00117: # 0 0 0 0 0 0 0 0
+Object 00117: # 0 0 0 0 0 0 0 0
+Object 00117: 0 0
+
+Object 00118: 3
+Object 00118: 0 0 0
+Object 00118: 0.443 0.2781 0.443
+Object 00118: 0 0 0
+Object 00118: 1.663 -1.545 -4.048
+Object 00118: 91
+Object 00118: Stone8
+Object 00118: 0
+Object 00118: 0
+Object 00118: PIEDP209148
+Object 00118: -1
+Object 00118: 0
+Object 00118: 1 1 1
+Object 00118: 0 0 0
+Object 00118: 0 0 0
+Object 00118: 1
+Object 00118: 0
+Object 00118: 0
+Object 00118: 0 0
+Object 00118: 0
+Object 00118: 1
+Object 00118: 0
+Object 00118: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00118: 0000000000000
+Object 00118: 0 0
+Object 00118: # 0 0 0 0 0 0 0 0
+Object 00118: # 0 0 0 0 0 0 0 0
+Object 00118: 0 0
+
+Object 00119: 1
+Object 00119: 0 0 0
+Object 00119: 0.2207 0.2207 0.2207
+Object 00119: 0 0 0
+Object 00119: 1.663 -2.37 -4.048
+Object 00119: 7
+Object 00119: Stone8
+Object 00119: 0
+Object 00119: 0
+Object 00119: SPH00210149
+Object 00119: -1
+Object 00119: 0
+Object 00119: 1 1 1
+Object 00119: 0 0 0
+Object 00119: 0 0 0
+Object 00119: 1
+Object 00119: 0
+Object 00119: 0
+Object 00119: 0 0
+Object 00119: 0
+Object 00119: 1
+Object 00119: 0
+Object 00119: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00119: 0000000000000
+Object 00119: 0 0
+Object 00119: # 0 0 0 0 0 0 0 0
+Object 00119: # 0 0 0 0 0 0 0 0
+Object 00119: 0 0
+
+Object 00120: 4
+Object 00120: 0.8819 0.1181 0
+Object 00120: 0.2256 0.02773 0.2256
+Object 00120: 0 0 0
+Object 00120: 1.662 -1.557 -4.048
+Object 00120: 7
+Object 00120: Stone8
+Object 00120: 0
+Object 00120: 0
+Object 00120: ANN211150
+Object 00120: -1
+Object 00120: 0
+Object 00120: 1 1 1
+Object 00120: 0 0 0
+Object 00120: 0 0 0
+Object 00120: 1
+Object 00120: 0
+Object 00120: 0
+Object 00120: 0 0
+Object 00120: 0
+Object 00120: 1
+Object 00120: 0
+Object 00120: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00120: 0000000000000
+Object 00120: 0 0
+Object 00120: # 0 0 0 0 0 0 0 0
+Object 00120: # 0 0 0 0 0 0 0 0
+Object 00120: 0 0
+
+Object 00121: 4
+Object 00121: 0.8819 0.1181 0
+Object 00121: 0.2099 0.0258 0.2099
+Object 00121: 0 0 0
+Object 00121: 1.662 -2.273 -4.048
+Object 00121: 177
+Object 00121: Stone8
+Object 00121: 0
+Object 00121: 0
+Object 00121: ANN00212151
+Object 00121: -1
+Object 00121: 0
+Object 00121: 1 1 1
+Object 00121: 0 0 0
+Object 00121: 0 0 0
+Object 00121: 1
+Object 00121: 0
+Object 00121: 0
+Object 00121: 0 0
+Object 00121: 0
+Object 00121: 1
+Object 00121: 0
+Object 00121: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00121: 0000000000000
+Object 00121: 0 0
+Object 00121: # 0 0 0 0 0 0 0 0
+Object 00121: # 0 0 0 0 0 0 0 0
+Object 00121: 0 0
+
+Object 00122: 4
+Object 00122: 0.8819 0.1181 0
+Object 00122: 0.1131 0.0139 0.1131
+Object 00122: 0 0 0
+Object 00122: 1.662 -2.172 -4.048
+Object 00122: 7
+Object 00122: Stone8
+Object 00122: 0
+Object 00122: 0
+Object 00122: ANN00002152
+Object 00122: -1
+Object 00122: 0
+Object 00122: 1 1 1
+Object 00122: 0 0 0
+Object 00122: 0 0 0
+Object 00122: 1
+Object 00122: 0
+Object 00122: 0
+Object 00122: 0 0
+Object 00122: 0
+Object 00122: 1
+Object 00122: 0
+Object 00122: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00122: 0000000000000
+Object 00122: 0 0
+Object 00122: # 0 0 0 0 0 0 0 0
+Object 00122: # 0 0 0 0 0 0 0 0
+Object 00122: 0 0
+
+Object 00123: 3
+Object 00123: 0 0 0
+Object 00123: 0.3064 0.04464 0.3064
+Object 00123: 0 0 0
+Object 00123: 1.663 -2.115 -4.048
+Object 00123: 202
+Object 00123: Stone8
+Object 00123: 0
+Object 00123: 0
+Object 00123: COLERE214153
+Object 00123: -1
+Object 00123: 0
+Object 00123: 1 1 1
+Object 00123: 0 0 0
+Object 00123: 0 0 0
+Object 00123: 1
+Object 00123: 0
+Object 00123: 0
+Object 00123: 0 0
+Object 00123: 0
+Object 00123: 1
+Object 00123: 0
+Object 00123: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00123: 0000000000000
+Object 00123: 0 0
+Object 00123: # 0 0 0 0 0 0 0 0
+Object 00123: # 0 0 0 0 0 0 0 0
+Object 00123: 0 0
+
+Object 00124: 4
+Object 00124: 0.9644 0.03556 0
+Object 00124: 0.317 0.01127 0.317
+Object 00124: 0 0 0
+Object 00124: 1.663 -2.059 -4.049
+Object 00124: 7
+Object 00124: Stone8
+Object 00124: 0
+Object 00124: 0
+Object 00124: COLLERET154
+Object 00124: -1
+Object 00124: 0
+Object 00124: 1 1 1
+Object 00124: 0 0 0
+Object 00124: 0 0 0
+Object 00124: 1
+Object 00124: 0
+Object 00124: 0
+Object 00124: 0 0
+Object 00124: 0
+Object 00124: 1
+Object 00124: 0
+Object 00124: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00124: 0000000000000
+Object 00124: 0 0
+Object 00124: # 0 0 0 0 0 0 0 0
+Object 00124: # 0 0 0 0 0 0 0 0
+Object 00124: 0 0
+
+Object 00125: 4
+Object 00125: 0.8819 0.1181 0
+Object 00125: 0.4471 0.05494 0.4471
+Object 00125: 0 0 0
+Object 00125: 1.662 -1.227 -4.048
+Object 00125: 7
+Object 00125: Stone8
+Object 00125: 0
+Object 00125: 0
+Object 00125: ANN216155
+Object 00125: -1
+Object 00125: 0
+Object 00125: 1 1 1
+Object 00125: 0 0 0
+Object 00125: 0 0 0
+Object 00125: 1
+Object 00125: 0
+Object 00125: 0
+Object 00125: 0 0
+Object 00125: 0
+Object 00125: 1
+Object 00125: 0
+Object 00125: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00125: 0000000000000
+Object 00125: 0 0
+Object 00125: # 0 0 0 0 0 0 0 0
+Object 00125: # 0 0 0 0 0 0 0 0
+Object 00125: 0 0
+
+Object 00126: 4
+Object 00126: 0.8819 0.1181 0
+Object 00126: 0.479 0.05886 0.479
+Object 00126: 0 0 0
+Object 00126: 1.662 -1.132 -4.048
+Object 00126: 7
+Object 00126: Stone8
+Object 00126: 0
+Object 00126: 0
+Object 00126: ANN217156
+Object 00126: -1
+Object 00126: 0
+Object 00126: 1 1 1
+Object 00126: 0 0 0
+Object 00126: 0 0 0
+Object 00126: 1
+Object 00126: 0
+Object 00126: 0
+Object 00126: 0 0
+Object 00126: 0
+Object 00126: 1
+Object 00126: 0
+Object 00126: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00126: 0000000000000
+Object 00126: 0 0
+Object 00126: # 0 0 0 0 0 0 0 0
+Object 00126: # 0 0 0 0 0 0 0 0
+Object 00126: 0 0
+
+Object 00127: 1
+Object 00127: 0 0 0
+Object 00127: 0.3385 0.3385 0.3385
+Object 00127: 0 0 0
+Object 00127: 4.038 -2.539 -7.989
+Object 00127: 122
+Object 00127: Stone7
+Object 00127: 0
+Object 00127: 0
+Object 00127: SPH00004158
+Object 00127: -1
+Object 00127: 0
+Object 00127: 1 1 1
+Object 00127: 0 0 0
+Object 00127: 0 0 0
+Object 00127: 1
+Object 00127: 0
+Object 00127: 0
+Object 00127: 0 0
+Object 00127: 0
+Object 00127: 1
+Object 00127: 0
+Object 00127: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00127: 0000000000000
+Object 00127: 0 0
+Object 00127: # 0 0 0 0 0 0 0 0
+Object 00127: # 0 0 0 0 0 0 0 0
+Object 00127: 0 0
+
+Object 00128: 3
+Object 00128: 0 0 0
+Object 00128: 0.2159 0.7506 0.2159
+Object 00128: 0 0 0
+Object 00128: 4.038 -2.098 -7.989
+Object 00128: 175
+Object 00128: Stone7
+Object 00128: 0
+Object 00128: 0
+Object 00128: CORPSPION159
+Object 00128: -1
+Object 00128: 0
+Object 00128: 1 1 1
+Object 00128: 0 0 0
+Object 00128: 0 0 0
+Object 00128: 1
+Object 00128: 0
+Object 00128: 0
+Object 00128: 0 0
+Object 00128: 0
+Object 00128: 1
+Object 00128: 0
+Object 00128: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00128: 0000000000000
+Object 00128: 0 0
+Object 00128: # 0 0 0 0 0 0 0 0
+Object 00128: # 0 0 0 0 0 0 0 0
+Object 00128: 0 0
+
+Object 00129: 3
+Object 00129: 0 0 0
+Object 00129: 0.443 0.2781 0.443
+Object 00129: 0 0 0
+Object 00129: 4.038 -1.545 -7.989
+Object 00129: 91
+Object 00129: Stone7
+Object 00129: 0
+Object 00129: 0
+Object 00129: PIEDPION160
+Object 00129: -1
+Object 00129: 0
+Object 00129: 1 1 1
+Object 00129: 0 0 0
+Object 00129: 0 0 0
+Object 00129: 1
+Object 00129: 0
+Object 00129: 0
+Object 00129: 0 0
+Object 00129: 0
+Object 00129: 1
+Object 00129: 0
+Object 00129: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00129: 0000000000000
+Object 00129: 0 0
+Object 00129: # 0 0 0 0 0 0 0 0
+Object 00129: # 0 0 0 0 0 0 0 0
+Object 00129: 0 0
+
+Object 00130: 1
+Object 00130: 0 0 0
+Object 00130: 0.2207 0.2207 0.2207
+Object 00130: 0 0 0
+Object 00130: 4.038 -2.37 -7.989
+Object 00130: 7
+Object 00130: Stone7
+Object 00130: 0
+Object 00130: 0
+Object 00130: SPH00004161
+Object 00130: -1
+Object 00130: 0
+Object 00130: 1 1 1
+Object 00130: 0 0 0
+Object 00130: 0 0 0
+Object 00130: 1
+Object 00130: 0
+Object 00130: 0
+Object 00130: 0 0
+Object 00130: 0
+Object 00130: 1
+Object 00130: 0
+Object 00130: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00130: 0000000000000
+Object 00130: 0 0
+Object 00130: # 0 0 0 0 0 0 0 0
+Object 00130: # 0 0 0 0 0 0 0 0
+Object 00130: 0 0
+
+Object 00131: 4
+Object 00131: 0.8819 0.1181 0
+Object 00131: 0.2256 0.02773 0.2256
+Object 00131: 0 0 0
+Object 00131: 4.036 -1.557 -7.99
+Object 00131: 7
+Object 00131: Stone7
+Object 00131: 0
+Object 00131: 0
+Object 00131: ANNEAU162
+Object 00131: -1
+Object 00131: 0
+Object 00131: 1 1 1
+Object 00131: 0 0 0
+Object 00131: 0 0 0
+Object 00131: 1
+Object 00131: 0
+Object 00131: 0
+Object 00131: 0 0
+Object 00131: 0
+Object 00131: 1
+Object 00131: 0
+Object 00131: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00131: 0000000000000
+Object 00131: 0 0
+Object 00131: # 0 0 0 0 0 0 0 0
+Object 00131: # 0 0 0 0 0 0 0 0
+Object 00131: 0 0
+
+Object 00132: 4
+Object 00132: 0.8819 0.1181 0
+Object 00132: 0.2099 0.0258 0.2099
+Object 00132: 0 0 0
+Object 00132: 4.036 -2.273 -7.99
+Object 00132: 177
+Object 00132: Stone7
+Object 00132: 0
+Object 00132: 0
+Object 00132: ANN00006163
+Object 00132: -1
+Object 00132: 0
+Object 00132: 1 1 1
+Object 00132: 0 0 0
+Object 00132: 0 0 0
+Object 00132: 1
+Object 00132: 0
+Object 00132: 0
+Object 00132: 0 0
+Object 00132: 0
+Object 00132: 1
+Object 00132: 0
+Object 00132: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00132: 0000000000000
+Object 00132: 0 0
+Object 00132: # 0 0 0 0 0 0 0 0
+Object 00132: # 0 0 0 0 0 0 0 0
+Object 00132: 0 0
+
+Object 00133: 4
+Object 00133: 0.8819 0.1181 0
+Object 00133: 0.1131 0.0139 0.1131
+Object 00133: 0 0 0
+Object 00133: 4.036 -2.172 -7.99
+Object 00133: 7
+Object 00133: Stone7
+Object 00133: 0
+Object 00133: 0
+Object 00133: ANN00000164
+Object 00133: -1
+Object 00133: 0
+Object 00133: 1 1 1
+Object 00133: 0 0 0
+Object 00133: 0 0 0
+Object 00133: 1
+Object 00133: 0
+Object 00133: 0
+Object 00133: 0 0
+Object 00133: 0
+Object 00133: 1
+Object 00133: 0
+Object 00133: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00133: 0000000000000
+Object 00133: 0 0
+Object 00133: # 0 0 0 0 0 0 0 0
+Object 00133: # 0 0 0 0 0 0 0 0
+Object 00133: 0 0
+
+Object 00134: 3
+Object 00134: 0 0 0
+Object 00134: 0.3064 0.04464 0.3064
+Object 00134: 0 0 0
+Object 00134: 4.038 -2.115 -7.989
+Object 00134: 202
+Object 00134: Stone7
+Object 00134: 0
+Object 00134: 0
+Object 00134: COLERETTE165
+Object 00134: -1
+Object 00134: 0
+Object 00134: 1 1 1
+Object 00134: 0 0 0
+Object 00134: 0 0 0
+Object 00134: 1
+Object 00134: 0
+Object 00134: 0
+Object 00134: 0 0
+Object 00134: 0
+Object 00134: 1
+Object 00134: 0
+Object 00134: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00134: 0000000000000
+Object 00134: 0 0
+Object 00134: # 0 0 0 0 0 0 0 0
+Object 00134: # 0 0 0 0 0 0 0 0
+Object 00134: 0 0
+
+Object 00135: 4
+Object 00135: 0.9644 0.03556 0
+Object 00135: 0.317 0.01127 0.317
+Object 00135: 0 0 0
+Object 00135: 4.037 -2.059 -7.99
+Object 00135: 7
+Object 00135: Stone7
+Object 00135: 0
+Object 00135: 0
+Object 00135: COLLERET166
+Object 00135: -1
+Object 00135: 0
+Object 00135: 1 1 1
+Object 00135: 0 0 0
+Object 00135: 0 0 0
+Object 00135: 1
+Object 00135: 0
+Object 00135: 0
+Object 00135: 0 0
+Object 00135: 0
+Object 00135: 1
+Object 00135: 0
+Object 00135: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00135: 0000000000000
+Object 00135: 0 0
+Object 00135: # 0 0 0 0 0 0 0 0
+Object 00135: # 0 0 0 0 0 0 0 0
+Object 00135: 0 0
+
+Object 00136: 4
+Object 00136: 0.8819 0.1181 0
+Object 00136: 0.4471 0.05494 0.4471
+Object 00136: 0 0 0
+Object 00136: 4.036 -1.227 -7.99
+Object 00136: 7
+Object 00136: Stone7
+Object 00136: 0
+Object 00136: 0
+Object 00136: ANN010167
+Object 00136: -1
+Object 00136: 0
+Object 00136: 1 1 1
+Object 00136: 0 0 0
+Object 00136: 0 0 0
+Object 00136: 1
+Object 00136: 0
+Object 00136: 0
+Object 00136: 0 0
+Object 00136: 0
+Object 00136: 1
+Object 00136: 0
+Object 00136: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00136: 0000000000000
+Object 00136: 0 0
+Object 00136: # 0 0 0 0 0 0 0 0
+Object 00136: # 0 0 0 0 0 0 0 0
+Object 00136: 0 0
+
+Object 00137: 4
+Object 00137: 0.8819 0.1181 0
+Object 00137: 0.479 0.05886 0.479
+Object 00137: 0 0 0
+Object 00137: 4.036 -1.132 -7.99
+Object 00137: 7
+Object 00137: Stone7
+Object 00137: 0
+Object 00137: 0
+Object 00137: ANN011168
+Object 00137: -1
+Object 00137: 0
+Object 00137: 1 1 1
+Object 00137: 0 0 0
+Object 00137: 0 0 0
+Object 00137: 1
+Object 00137: 0
+Object 00137: 0
+Object 00137: 0 0
+Object 00137: 0
+Object 00137: 1
+Object 00137: 0
+Object 00137: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00137: 0000000000000
+Object 00137: 0 0
+Object 00137: # 0 0 0 0 0 0 0 0
+Object 00137: # 0 0 0 0 0 0 0 0
+Object 00137: 0 0
+
+Object 00138: 2
+Object 00138: 0 0 0
+Object 00138: 1 0.06657 1
+Object 00138: 0 0 0
+Object 00138: 3.973 -0.9508 0
+Object 00138: 7
+Object 00138: Stone8
+Object 00138: 0
+Object 00138: 0
+Object 00138: PLAQUEBL169
+Object 00138: -1
+Object 00138: 0
+Object 00138: 1 1 1
+Object 00138: 0 0 0
+Object 00138: 0 0 0
+Object 00138: 1
+Object 00138: 0
+Object 00138: 0
+Object 00138: 0 0
+Object 00138: 0
+Object 00138: 1
+Object 00138: 0
+Object 00138: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00138: 0000000000000
+Object 00138: 0 0
+Object 00138: # 0 0 0 0 0 0 0 0
+Object 00138: # 0 0 0 0 0 0 0 0
+Object 00138: 0 0
+
+Object 00139: 2
+Object 00139: 0 0 0
+Object 00139: 0.9864 0.06657 0.9949
+Object 00139: 0 0 0
+Object 00139: 3.971 -0.9508 -2.003
+Object 00139: 21
+Object 00139: Stone7
+Object 00139: 0
+Object 00139: 0
+Object 00139: PLAQUENO172
+Object 00139: -1
+Object 00139: 0
+Object 00139: 1 1 1
+Object 00139: 0 0 0
+Object 00139: 0 0 0
+Object 00139: 1
+Object 00139: 0
+Object 00139: 0
+Object 00139: 0 0
+Object 00139: 0
+Object 00139: 1
+Object 00139: 0
+Object 00139: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00139: 0000000000000
+Object 00139: 0 0
+Object 00139: # 0 0 0 0 0 0 0 0
+Object 00139: # 0 0 0 0 0 0 0 0
+Object 00139: 0 0
+
+Object 00140: 2
+Object 00140: 0 0 0
+Object 00140: 0.9864 0.06657 0.9949
+Object 00140: 0 0 0
+Object 00140: 3.975 -0.9508 2.005
+Object 00140: 15
+Object 00140: Stone7
+Object 00140: 0
+Object 00140: 0
+Object 00140: PLAQUENO174
+Object 00140: -1
+Object 00140: 0
+Object 00140: 1 1 1
+Object 00140: 0 0 0
+Object 00140: 0 0 0
+Object 00140: 1
+Object 00140: 0
+Object 00140: 0
+Object 00140: 0 0
+Object 00140: 0
+Object 00140: 1
+Object 00140: 0
+Object 00140: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00140: 0000000000000
+Object 00140: 0 0
+Object 00140: # 0 0 0 0 0 0 0 0
+Object 00140: # 0 0 0 0 0 0 0 0
+Object 00140: 0 0
+
+Object 00141: 1
+Object 00141: 0 0 0
+Object 00141: 0.3385 0.3385 0.3385
+Object 00141: 0 0 0
+Object 00141: 3.738 -2.539 -6.053
+Object 00141: 122
+Object 00141: Stone8
+Object 00141: 0
+Object 00141: 0
+Object 00141: SPH00207189
+Object 00141: -1
+Object 00141: 0
+Object 00141: 1 1 1
+Object 00141: 0 0 0
+Object 00141: 0 0 0
+Object 00141: 1
+Object 00141: 0
+Object 00141: 0
+Object 00141: 0 0
+Object 00141: 0
+Object 00141: 1
+Object 00141: 0
+Object 00141: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00141: 0000000000000
+Object 00141: 0 0
+Object 00141: # 0 0 0 0 0 0 0 0
+Object 00141: # 0 0 0 0 0 0 0 0
+Object 00141: 0 0
+
+Object 00142: 3
+Object 00142: 0 0 0
+Object 00142: 0.2159 0.7506 0.2159
+Object 00142: 0 0 0
+Object 00142: 3.738 -2.098 -6.053
+Object 00142: 175
+Object 00142: Stone8
+Object 00142: 0
+Object 00142: 0
+Object 00142: CORPSP208190
+Object 00142: -1
+Object 00142: 0
+Object 00142: 1 1 1
+Object 00142: 0 0 0
+Object 00142: 0 0 0
+Object 00142: 1
+Object 00142: 0
+Object 00142: 0
+Object 00142: 0 0
+Object 00142: 0
+Object 00142: 1
+Object 00142: 0
+Object 00142: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00142: 0000000000000
+Object 00142: 0 0
+Object 00142: # 0 0 0 0 0 0 0 0
+Object 00142: # 0 0 0 0 0 0 0 0
+Object 00142: 0 0
+
+Object 00143: 3
+Object 00143: 0 0 0
+Object 00143: 0.443 0.2781 0.443
+Object 00143: 0 0 0
+Object 00143: 3.738 -1.545 -6.053
+Object 00143: 91
+Object 00143: Stone8
+Object 00143: 0
+Object 00143: 0
+Object 00143: PIEDP209191
+Object 00143: -1
+Object 00143: 0
+Object 00143: 1 1 1
+Object 00143: 0 0 0
+Object 00143: 0 0 0
+Object 00143: 1
+Object 00143: 0
+Object 00143: 0
+Object 00143: 0 0
+Object 00143: 0
+Object 00143: 1
+Object 00143: 0
+Object 00143: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00143: 0000000000000
+Object 00143: 0 0
+Object 00143: # 0 0 0 0 0 0 0 0
+Object 00143: # 0 0 0 0 0 0 0 0
+Object 00143: 0 0
+
+Object 00144: 1
+Object 00144: 0 0 0
+Object 00144: 0.2207 0.2207 0.2207
+Object 00144: 0 0 0
+Object 00144: 3.738 -2.37 -6.053
+Object 00144: 7
+Object 00144: Stone8
+Object 00144: 0
+Object 00144: 0
+Object 00144: SPH00210192
+Object 00144: -1
+Object 00144: 0
+Object 00144: 1 1 1
+Object 00144: 0 0 0
+Object 00144: 0 0 0
+Object 00144: 1
+Object 00144: 0
+Object 00144: 0
+Object 00144: 0 0
+Object 00144: 0
+Object 00144: 1
+Object 00144: 0
+Object 00144: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00144: 0000000000000
+Object 00144: 0 0
+Object 00144: # 0 0 0 0 0 0 0 0
+Object 00144: # 0 0 0 0 0 0 0 0
+Object 00144: 0 0
+
+Object 00145: 4
+Object 00145: 0.8819 0.1181 0
+Object 00145: 0.2256 0.02773 0.2256
+Object 00145: 0 0 0
+Object 00145: 3.737 -1.557 -6.054
+Object 00145: 7
+Object 00145: Stone8
+Object 00145: 0
+Object 00145: 0
+Object 00145: ANN211193
+Object 00145: -1
+Object 00145: 0
+Object 00145: 1 1 1
+Object 00145: 0 0 0
+Object 00145: 0 0 0
+Object 00145: 1
+Object 00145: 0
+Object 00145: 0
+Object 00145: 0 0
+Object 00145: 0
+Object 00145: 1
+Object 00145: 0
+Object 00145: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00145: 0000000000000
+Object 00145: 0 0
+Object 00145: # 0 0 0 0 0 0 0 0
+Object 00145: # 0 0 0 0 0 0 0 0
+Object 00145: 0 0
+
+Object 00146: 4
+Object 00146: 0.8819 0.1181 0
+Object 00146: 0.2099 0.0258 0.2099
+Object 00146: 0 0 0
+Object 00146: 3.737 -2.273 -6.054
+Object 00146: 177
+Object 00146: Stone8
+Object 00146: 0
+Object 00146: 0
+Object 00146: ANN00212194
+Object 00146: -1
+Object 00146: 0
+Object 00146: 1 1 1
+Object 00146: 0 0 0
+Object 00146: 0 0 0
+Object 00146: 1
+Object 00146: 0
+Object 00146: 0
+Object 00146: 0 0
+Object 00146: 0
+Object 00146: 1
+Object 00146: 0
+Object 00146: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00146: 0000000000000
+Object 00146: 0 0
+Object 00146: # 0 0 0 0 0 0 0 0
+Object 00146: # 0 0 0 0 0 0 0 0
+Object 00146: 0 0
+
+Object 00147: 4
+Object 00147: 0.8819 0.1181 0
+Object 00147: 0.1131 0.0139 0.1131
+Object 00147: 0 0 0
+Object 00147: 3.737 -2.172 -6.054
+Object 00147: 7
+Object 00147: Stone8
+Object 00147: 0
+Object 00147: 0
+Object 00147: ANN00002195
+Object 00147: -1
+Object 00147: 0
+Object 00147: 1 1 1
+Object 00147: 0 0 0
+Object 00147: 0 0 0
+Object 00147: 1
+Object 00147: 0
+Object 00147: 0
+Object 00147: 0 0
+Object 00147: 0
+Object 00147: 1
+Object 00147: 0
+Object 00147: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00147: 0000000000000
+Object 00147: 0 0
+Object 00147: # 0 0 0 0 0 0 0 0
+Object 00147: # 0 0 0 0 0 0 0 0
+Object 00147: 0 0
+
+Object 00148: 3
+Object 00148: 0 0 0
+Object 00148: 0.3064 0.04464 0.3064
+Object 00148: 0 0 0
+Object 00148: 3.738 -2.115 -6.053
+Object 00148: 202
+Object 00148: Stone8
+Object 00148: 0
+Object 00148: 0
+Object 00148: COLERE214196
+Object 00148: -1
+Object 00148: 0
+Object 00148: 1 1 1
+Object 00148: 0 0 0
+Object 00148: 0 0 0
+Object 00148: 1
+Object 00148: 0
+Object 00148: 0
+Object 00148: 0 0
+Object 00148: 0
+Object 00148: 1
+Object 00148: 0
+Object 00148: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00148: 0000000000000
+Object 00148: 0 0
+Object 00148: # 0 0 0 0 0 0 0 0
+Object 00148: # 0 0 0 0 0 0 0 0
+Object 00148: 0 0
+
+Object 00149: 4
+Object 00149: 0.9644 0.03556 0
+Object 00149: 0.317 0.01127 0.317
+Object 00149: 0 0 0
+Object 00149: 3.738 -2.059 -6.054
+Object 00149: 7
+Object 00149: Stone8
+Object 00149: 0
+Object 00149: 0
+Object 00149: COLLERET197
+Object 00149: -1
+Object 00149: 0
+Object 00149: 1 1 1
+Object 00149: 0 0 0
+Object 00149: 0 0 0
+Object 00149: 1
+Object 00149: 0
+Object 00149: 0
+Object 00149: 0 0
+Object 00149: 0
+Object 00149: 1
+Object 00149: 0
+Object 00149: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00149: 0000000000000
+Object 00149: 0 0
+Object 00149: # 0 0 0 0 0 0 0 0
+Object 00149: # 0 0 0 0 0 0 0 0
+Object 00149: 0 0
+
+Object 00150: 4
+Object 00150: 0.8819 0.1181 0
+Object 00150: 0.4471 0.05494 0.4471
+Object 00150: 0 0 0
+Object 00150: 3.737 -1.227 -6.054
+Object 00150: 7
+Object 00150: Stone8
+Object 00150: 0
+Object 00150: 0
+Object 00150: ANN216198
+Object 00150: -1
+Object 00150: 0
+Object 00150: 1 1 1
+Object 00150: 0 0 0
+Object 00150: 0 0 0
+Object 00150: 1
+Object 00150: 0
+Object 00150: 0
+Object 00150: 0 0
+Object 00150: 0
+Object 00150: 1
+Object 00150: 0
+Object 00150: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00150: 0000000000000
+Object 00150: 0 0
+Object 00150: # 0 0 0 0 0 0 0 0
+Object 00150: # 0 0 0 0 0 0 0 0
+Object 00150: 0 0
+
+Object 00151: 4
+Object 00151: 0.8819 0.1181 0
+Object 00151: 0.479 0.05886 0.479
+Object 00151: 0 0 0
+Object 00151: 3.737 -1.132 -6.054
+Object 00151: 7
+Object 00151: Stone8
+Object 00151: 0
+Object 00151: 0
+Object 00151: ANN217199
+Object 00151: -1
+Object 00151: 0
+Object 00151: 1 1 1
+Object 00151: 0 0 0
+Object 00151: 0 0 0
+Object 00151: 1
+Object 00151: 0
+Object 00151: 0
+Object 00151: 0 0
+Object 00151: 0
+Object 00151: 1
+Object 00151: 0
+Object 00151: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00151: 0000000000000
+Object 00151: 0 0
+Object 00151: # 0 0 0 0 0 0 0 0
+Object 00151: # 0 0 0 0 0 0 0 0
+Object 00151: 0 0
+
+Object 00152: 1
+Object 00152: 0 0 0
+Object 00152: 0.3385 0.3385 0.3385
+Object 00152: 0 0 0
+Object 00152: -3.973 -2.539 0
+Object 00152: 122
+Object 00152: Stone7
+Object 00152: 0
+Object 00152: 0
+Object 00152: SPH00004201
+Object 00152: -1
+Object 00152: 0
+Object 00152: 1 1 1
+Object 00152: 0 0 0
+Object 00152: 0 0 0
+Object 00152: 1
+Object 00152: 0
+Object 00152: 0
+Object 00152: 0 0
+Object 00152: 0
+Object 00152: 1
+Object 00152: 0
+Object 00152: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00152: 0000000000000
+Object 00152: 0 0
+Object 00152: # 0 0 0 0 0 0 0 0
+Object 00152: # 0 0 0 0 0 0 0 0
+Object 00152: 0 0
+
+Object 00153: 3
+Object 00153: 0 0 0
+Object 00153: 0.2159 0.7506 0.2159
+Object 00153: 0 0 0
+Object 00153: -3.973 -2.098 0
+Object 00153: 175
+Object 00153: Stone7
+Object 00153: 0
+Object 00153: 0
+Object 00153: CORPSPION202
+Object 00153: -1
+Object 00153: 0
+Object 00153: 1 1 1
+Object 00153: 0 0 0
+Object 00153: 0 0 0
+Object 00153: 1
+Object 00153: 0
+Object 00153: 0
+Object 00153: 0 0
+Object 00153: 0
+Object 00153: 1
+Object 00153: 0
+Object 00153: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00153: 0000000000000
+Object 00153: 0 0
+Object 00153: # 0 0 0 0 0 0 0 0
+Object 00153: # 0 0 0 0 0 0 0 0
+Object 00153: 0 0
+
+Object 00154: 3
+Object 00154: 0 0 0
+Object 00154: 0.443 0.2781 0.443
+Object 00154: 0 0 0
+Object 00154: -3.973 -1.545 0
+Object 00154: 91
+Object 00154: Stone7
+Object 00154: 0
+Object 00154: 0
+Object 00154: PIEDPION203
+Object 00154: -1
+Object 00154: 0
+Object 00154: 1 1 1
+Object 00154: 0 0 0
+Object 00154: 0 0 0
+Object 00154: 1
+Object 00154: 0
+Object 00154: 0
+Object 00154: 0 0
+Object 00154: 0
+Object 00154: 1
+Object 00154: 0
+Object 00154: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00154: 0000000000000
+Object 00154: 0 0
+Object 00154: # 0 0 0 0 0 0 0 0
+Object 00154: # 0 0 0 0 0 0 0 0
+Object 00154: 0 0
+
+Object 00155: 1
+Object 00155: 0 0 0
+Object 00155: 0.2207 0.2207 0.2207
+Object 00155: 0 0 0
+Object 00155: -3.973 -2.37 0
+Object 00155: 7
+Object 00155: Stone7
+Object 00155: 0
+Object 00155: 0
+Object 00155: SPH00004204
+Object 00155: -1
+Object 00155: 0
+Object 00155: 1 1 1
+Object 00155: 0 0 0
+Object 00155: 0 0 0
+Object 00155: 1
+Object 00155: 0
+Object 00155: 0
+Object 00155: 0 0
+Object 00155: 0
+Object 00155: 1
+Object 00155: 14
+Object 00155: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00155: 0000000000000
+Object 00155: 0 0
+Object 00155: # 0 0 0 0 0 0 0 0
+Object 00155: # 0 0 0 0 0 0 0 0
+Object 00155: 0 0
+
+Object 00156: 4
+Object 00156: 0.8819 0.1181 0
+Object 00156: 0.2256 0.02773 0.2256
+Object 00156: 0 0 0
+Object 00156: -3.974 -1.557 -0.00058
+Object 00156: 7
+Object 00156: Stone7
+Object 00156: 0
+Object 00156: 0
+Object 00156: ANNEAU205
+Object 00156: -1
+Object 00156: 0
+Object 00156: 1 1 1
+Object 00156: 0 0 0
+Object 00156: 0 0 0
+Object 00156: 1
+Object 00156: 0
+Object 00156: 0
+Object 00156: 0 0
+Object 00156: 0
+Object 00156: 1
+Object 00156: 0
+Object 00156: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00156: 0000000000000
+Object 00156: 0 0
+Object 00156: # 0 0 0 0 0 0 0 0
+Object 00156: # 0 0 0 0 0 0 0 0
+Object 00156: 0 0
+
+Object 00157: 4
+Object 00157: 0.8819 0.1181 0
+Object 00157: 0.2099 0.0258 0.2099
+Object 00157: 0 0 0
+Object 00157: -3.974 -2.273 -0.00058
+Object 00157: 177
+Object 00157: Stone7
+Object 00157: 0
+Object 00157: 0
+Object 00157: ANN00006206
+Object 00157: -1
+Object 00157: 0
+Object 00157: 1 1 1
+Object 00157: 0 0 0
+Object 00157: 0 0 0
+Object 00157: 1
+Object 00157: 0
+Object 00157: 0
+Object 00157: 0 0
+Object 00157: 0
+Object 00157: 1
+Object 00157: 0
+Object 00157: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00157: 0000000000000
+Object 00157: 0 0
+Object 00157: # 0 0 0 0 0 0 0 0
+Object 00157: # 0 0 0 0 0 0 0 0
+Object 00157: 0 0
+
+Object 00158: 4
+Object 00158: 0.8819 0.1181 0
+Object 00158: 0.1131 0.0139 0.1131
+Object 00158: 0 0 0
+Object 00158: -3.974 -2.172 -0.00058
+Object 00158: 7
+Object 00158: Stone7
+Object 00158: 0
+Object 00158: 0
+Object 00158: ANN00000207
+Object 00158: -1
+Object 00158: 0
+Object 00158: 1 1 1
+Object 00158: 0 0 0
+Object 00158: 0 0 0
+Object 00158: 1
+Object 00158: 0
+Object 00158: 0
+Object 00158: 0 0
+Object 00158: 0
+Object 00158: 1
+Object 00158: 0
+Object 00158: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00158: 0000000000000
+Object 00158: 0 0
+Object 00158: # 0 0 0 0 0 0 0 0
+Object 00158: # 0 0 0 0 0 0 0 0
+Object 00158: 0 0
+
+Object 00159: 3
+Object 00159: 0 0 0
+Object 00159: 0.3064 0.04464 0.3064
+Object 00159: 0 0 0
+Object 00159: -3.973 -2.115 0
+Object 00159: 202
+Object 00159: Stone7
+Object 00159: 0
+Object 00159: 0
+Object 00159: COLERETTE208
+Object 00159: -1
+Object 00159: 0
+Object 00159: 1 1 1
+Object 00159: 0 0 0
+Object 00159: 0 0 0
+Object 00159: 1
+Object 00159: 0
+Object 00159: 0
+Object 00159: 0 0
+Object 00159: 0
+Object 00159: 1
+Object 00159: 0
+Object 00159: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00159: 0000000000000
+Object 00159: 0 0
+Object 00159: # 0 0 0 0 0 0 0 0
+Object 00159: # 0 0 0 0 0 0 0 0
+Object 00159: 0 0
+
+Object 00160: 4
+Object 00160: 0.9644 0.03556 0
+Object 00160: 0.317 0.01127 0.317
+Object 00160: 0 0 0
+Object 00160: -3.973 -2.059 -0.00113
+Object 00160: 7
+Object 00160: Stone7
+Object 00160: 0
+Object 00160: 0
+Object 00160: COLLERET209
+Object 00160: -1
+Object 00160: 0
+Object 00160: 1 1 1
+Object 00160: 0 0 0
+Object 00160: 0 0 0
+Object 00160: 1
+Object 00160: 0
+Object 00160: 0
+Object 00160: 0 0
+Object 00160: 0
+Object 00160: 1
+Object 00160: 0
+Object 00160: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00160: 0000000000000
+Object 00160: 0 0
+Object 00160: # 0 0 0 0 0 0 0 0
+Object 00160: # 0 0 0 0 0 0 0 0
+Object 00160: 0 0
+
+Object 00161: 4
+Object 00161: 0.8819 0.1181 0
+Object 00161: 0.4471 0.05494 0.4471
+Object 00161: 0 0 0
+Object 00161: -3.974 -1.227 -0.00058
+Object 00161: 7
+Object 00161: Stone7
+Object 00161: 0
+Object 00161: 0
+Object 00161: ANN010210
+Object 00161: -1
+Object 00161: 0
+Object 00161: 1 1 1
+Object 00161: 0 0 0
+Object 00161: 0 0 0
+Object 00161: 1
+Object 00161: 0
+Object 00161: 0
+Object 00161: 0 0
+Object 00161: 0
+Object 00161: 1
+Object 00161: 0
+Object 00161: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00161: 0000000000000
+Object 00161: 0 0
+Object 00161: # 0 0 0 0 0 0 0 0
+Object 00161: # 0 0 0 0 0 0 0 0
+Object 00161: 0 0
+
+Object 00162: 4
+Object 00162: 0.8819 0.1181 0
+Object 00162: 0.479 0.05886 0.479
+Object 00162: 0 0 0
+Object 00162: -3.974 -1.132 -0.00058
+Object 00162: 7
+Object 00162: Stone7
+Object 00162: 0
+Object 00162: 0
+Object 00162: ANN011211
+Object 00162: -1
+Object 00162: 0
+Object 00162: 1 1 1
+Object 00162: 0 0 0
+Object 00162: 0 0 0
+Object 00162: 1
+Object 00162: 0
+Object 00162: 0
+Object 00162: 0 0
+Object 00162: 0
+Object 00162: 1
+Object 00162: 0
+Object 00162: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00162: 0000000000000
+Object 00162: 0 0
+Object 00162: # 0 0 0 0 0 0 0 0
+Object 00162: # 0 0 0 0 0 0 0 0
+Object 00162: 0 0
+
+Object 00163: 2
+Object 00163: 0 0 0
+Object 00163: 1 0.06657 1
+Object 00163: 0 0 0
+Object 00163: -3.973 -0.9508 0
+Object 00163: 7
+Object 00163: Stone8
+Object 00163: 0
+Object 00163: 0
+Object 00163: PLAQUEBL212
+Object 00163: -1
+Object 00163: 0
+Object 00163: 1 1 1
+Object 00163: 0 0 0
+Object 00163: 0 0 0
+Object 00163: 1
+Object 00163: 0
+Object 00163: 0
+Object 00163: 0 0
+Object 00163: 0
+Object 00163: 1
+Object 00163: 0
+Object 00163: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00163: 0000000000000
+Object 00163: 0 0
+Object 00163: # 0 0 0 0 0 0 0 0
+Object 00163: # 0 0 0 0 0 0 0 0
+Object 00163: 0 0
+
+Object 00164: 2
+Object 00164: 0 0 0
+Object 00164: 0.9864 0.06657 0.9949
+Object 00164: 0 0 0
+Object 00164: -3.975 -0.9508 -2.003
+Object 00164: 21
+Object 00164: Stone7
+Object 00164: 0
+Object 00164: 0
+Object 00164: PLAQUENO213
+Object 00164: -1
+Object 00164: 0
+Object 00164: 1 1 1
+Object 00164: 0 0 0
+Object 00164: 0 0 0
+Object 00164: 1
+Object 00164: 0
+Object 00164: 0
+Object 00164: 0 0
+Object 00164: 0
+Object 00164: 1
+Object 00164: 0
+Object 00164: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00164: 0000000000000
+Object 00164: 0 0
+Object 00164: # 0 0 0 0 0 0 0 0
+Object 00164: # 0 0 0 0 0 0 0 0
+Object 00164: 0 0
+
+Object 00165: 2
+Object 00165: 0 0 0
+Object 00165: 0.9864 0.06657 0.9949
+Object 00165: 0 0 0
+Object 00165: -3.971 -0.9508 2.005
+Object 00165: 15
+Object 00165: Stone7
+Object 00165: 0
+Object 00165: 0
+Object 00165: PLAQUENO214
+Object 00165: -1
+Object 00165: 0
+Object 00165: 1 1 1
+Object 00165: 0 0 0
+Object 00165: 0 0 0
+Object 00165: 1
+Object 00165: 0
+Object 00165: 0
+Object 00165: 0 0
+Object 00165: 0
+Object 00165: 1
+Object 00165: 0
+Object 00165: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00165: 0000000000000
+Object 00165: 0 0
+Object 00165: # 0 0 0 0 0 0 0 0
+Object 00165: # 0 0 0 0 0 0 0 0
+Object 00165: 0 0
+
+Object 00166: 1
+Object 00166: 0 0 0
+Object 00166: 0.3385 0.3385 0.3385
+Object 00166: 0 0 0
+Object 00166: -4.273 -2.539 1.936
+Object 00166: 122
+Object 00166: Stone8
+Object 00166: 0
+Object 00166: 0
+Object 00166: SPH00207216
+Object 00166: -1
+Object 00166: 0
+Object 00166: 1 1 1
+Object 00166: 0 0 0
+Object 00166: 0 0 0
+Object 00166: 1
+Object 00166: 0
+Object 00166: 0
+Object 00166: 0 0
+Object 00166: 0
+Object 00166: 1
+Object 00166: 0
+Object 00166: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00166: 0000000000000
+Object 00166: 0 0
+Object 00166: # 0 0 0 0 0 0 0 0
+Object 00166: # 0 0 0 0 0 0 0 0
+Object 00166: 0 0
+
+Object 00167: 3
+Object 00167: 0 0 0
+Object 00167: 0.2159 0.7506 0.2159
+Object 00167: 0 0 0
+Object 00167: -4.273 -2.098 1.936
+Object 00167: 175
+Object 00167: Stone8
+Object 00167: 0
+Object 00167: 0
+Object 00167: CORPSP208217
+Object 00167: -1
+Object 00167: 0
+Object 00167: 1 1 1
+Object 00167: 0 0 0
+Object 00167: 0 0 0
+Object 00167: 1
+Object 00167: 0
+Object 00167: 0
+Object 00167: 0 0
+Object 00167: 0
+Object 00167: 1
+Object 00167: 0
+Object 00167: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00167: 0000000000000
+Object 00167: 0 0
+Object 00167: # 0 0 0 0 0 0 0 0
+Object 00167: # 0 0 0 0 0 0 0 0
+Object 00167: 0 0
+
+Object 00168: 3
+Object 00168: 0 0 0
+Object 00168: 0.443 0.2781 0.443
+Object 00168: 0 0 0
+Object 00168: -4.273 -1.545 1.936
+Object 00168: 91
+Object 00168: Stone8
+Object 00168: 0
+Object 00168: 0
+Object 00168: PIEDP209218
+Object 00168: -1
+Object 00168: 0
+Object 00168: 1 1 1
+Object 00168: 0 0 0
+Object 00168: 0 0 0
+Object 00168: 1
+Object 00168: 0
+Object 00168: 0
+Object 00168: 0 0
+Object 00168: 0
+Object 00168: 1
+Object 00168: 0
+Object 00168: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00168: 0000000000000
+Object 00168: 0 0
+Object 00168: # 0 0 0 0 0 0 0 0
+Object 00168: # 0 0 0 0 0 0 0 0
+Object 00168: 0 0
+
+Object 00169: 1
+Object 00169: 0 0 0
+Object 00169: 0.2207 0.2207 0.2207
+Object 00169: 0 0 0
+Object 00169: -4.273 -2.37 1.936
+Object 00169: 7
+Object 00169: Stone8
+Object 00169: 0
+Object 00169: 0
+Object 00169: SPH00210219
+Object 00169: -1
+Object 00169: 0
+Object 00169: 1 1 1
+Object 00169: 0 0 0
+Object 00169: 0 0 0
+Object 00169: 1
+Object 00169: 0
+Object 00169: 0
+Object 00169: 0 0
+Object 00169: 0
+Object 00169: 1
+Object 00169: 0
+Object 00169: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00169: 0000000000000
+Object 00169: 0 0
+Object 00169: # 0 0 0 0 0 0 0 0
+Object 00169: # 0 0 0 0 0 0 0 0
+Object 00169: 0 0
+
+Object 00170: 4
+Object 00170: 0.8819 0.1181 0
+Object 00170: 0.2256 0.02773 0.2256
+Object 00170: 0 0 0
+Object 00170: -4.274 -1.557 1.936
+Object 00170: 7
+Object 00170: Stone8
+Object 00170: 0
+Object 00170: 0
+Object 00170: ANN211220
+Object 00170: -1
+Object 00170: 0
+Object 00170: 1 1 1
+Object 00170: 0 0 0
+Object 00170: 0 0 0
+Object 00170: 1
+Object 00170: 0
+Object 00170: 0
+Object 00170: 0 0
+Object 00170: 0
+Object 00170: 1
+Object 00170: 0
+Object 00170: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00170: 0000000000000
+Object 00170: 0 0
+Object 00170: # 0 0 0 0 0 0 0 0
+Object 00170: # 0 0 0 0 0 0 0 0
+Object 00170: 0 0
+
+Object 00171: 4
+Object 00171: 0.8819 0.1181 0
+Object 00171: 0.2099 0.0258 0.2099
+Object 00171: 0 0 0
+Object 00171: -4.274 -2.273 1.936
+Object 00171: 177
+Object 00171: Stone8
+Object 00171: 0
+Object 00171: 0
+Object 00171: ANN00212221
+Object 00171: -1
+Object 00171: 0
+Object 00171: 1 1 1
+Object 00171: 0 0 0
+Object 00171: 0 0 0
+Object 00171: 1
+Object 00171: 0
+Object 00171: 0
+Object 00171: 0 0
+Object 00171: 0
+Object 00171: 1
+Object 00171: 0
+Object 00171: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00171: 0000000000000
+Object 00171: 0 0
+Object 00171: # 0 0 0 0 0 0 0 0
+Object 00171: # 0 0 0 0 0 0 0 0
+Object 00171: 0 0
+
+Object 00172: 4
+Object 00172: 0.8819 0.1181 0
+Object 00172: 0.1131 0.0139 0.1131
+Object 00172: 0 0 0
+Object 00172: -4.274 -2.172 1.936
+Object 00172: 7
+Object 00172: Stone8
+Object 00172: 0
+Object 00172: 0
+Object 00172: ANN00002222
+Object 00172: -1
+Object 00172: 0
+Object 00172: 1 1 1
+Object 00172: 0 0 0
+Object 00172: 0 0 0
+Object 00172: 1
+Object 00172: 0
+Object 00172: 0
+Object 00172: 0 0
+Object 00172: 0
+Object 00172: 1
+Object 00172: 0
+Object 00172: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00172: 0000000000000
+Object 00172: 0 0
+Object 00172: # 0 0 0 0 0 0 0 0
+Object 00172: # 0 0 0 0 0 0 0 0
+Object 00172: 0 0
+
+Object 00173: 3
+Object 00173: 0 0 0
+Object 00173: 0.3064 0.04464 0.3064
+Object 00173: 0 0 0
+Object 00173: -4.273 -2.115 1.936
+Object 00173: 202
+Object 00173: Stone8
+Object 00173: 0
+Object 00173: 0
+Object 00173: COLERE214223
+Object 00173: -1
+Object 00173: 0
+Object 00173: 1 1 1
+Object 00173: 0 0 0
+Object 00173: 0 0 0
+Object 00173: 1
+Object 00173: 0
+Object 00173: 0
+Object 00173: 0 0
+Object 00173: 0
+Object 00173: 1
+Object 00173: 0
+Object 00173: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00173: 0000000000000
+Object 00173: 0 0
+Object 00173: # 0 0 0 0 0 0 0 0
+Object 00173: # 0 0 0 0 0 0 0 0
+Object 00173: 0 0
+
+Object 00174: 4
+Object 00174: 0.9644 0.03556 0
+Object 00174: 0.317 0.01127 0.317
+Object 00174: 0 0 0
+Object 00174: -4.273 -2.059 1.935
+Object 00174: 7
+Object 00174: Stone8
+Object 00174: 0
+Object 00174: 0
+Object 00174: COLLERET224
+Object 00174: -1
+Object 00174: 0
+Object 00174: 1 1 1
+Object 00174: 0 0 0
+Object 00174: 0 0 0
+Object 00174: 1
+Object 00174: 0
+Object 00174: 0
+Object 00174: 0 0
+Object 00174: 0
+Object 00174: 1
+Object 00174: 8
+Object 00174: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00174: 0000000000000
+Object 00174: 0 0
+Object 00174: # 0 0 0 0 0 0 0 0
+Object 00174: # 0 0 0 0 0 0 0 0
+Object 00174: 0 0
+
+Object 00175: 4
+Object 00175: 0.8819 0.1181 0
+Object 00175: 0.4471 0.05494 0.4471
+Object 00175: 0 0 0
+Object 00175: -4.274 -1.227 1.936
+Object 00175: 7
+Object 00175: Stone8
+Object 00175: 0
+Object 00175: 0
+Object 00175: ANN216225
+Object 00175: -1
+Object 00175: 0
+Object 00175: 1 1 1
+Object 00175: 0 0 0
+Object 00175: 0 0 0
+Object 00175: 1
+Object 00175: 0
+Object 00175: 0
+Object 00175: 0 0
+Object 00175: 0
+Object 00175: 1
+Object 00175: 0
+Object 00175: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00175: 0000000000000
+Object 00175: 0 0
+Object 00175: # 0 0 0 0 0 0 0 0
+Object 00175: # 0 0 0 0 0 0 0 0
+Object 00175: 0 0
+
+Object 00176: 4
+Object 00176: 0.8819 0.1181 0
+Object 00176: 0.479 0.05886 0.479
+Object 00176: 0 0 0
+Object 00176: -4.274 -1.132 1.936
+Object 00176: 7
+Object 00176: Stone8
+Object 00176: 0
+Object 00176: 0
+Object 00176: ANN217226
+Object 00176: -1
+Object 00176: 0
+Object 00176: 1 1 1
+Object 00176: 0 0 0
+Object 00176: 0 0 0
+Object 00176: 1
+Object 00176: 0
+Object 00176: 0
+Object 00176: 0 0
+Object 00176: 0
+Object 00176: 1
+Object 00176: 0
+Object 00176: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00176: 0000000000000
+Object 00176: 0 0
+Object 00176: # 0 0 0 0 0 0 0 0
+Object 00176: # 0 0 0 0 0 0 0 0
+Object 00176: 0 0
+
+Object 00177: 13
+Object 00177: 0 0 0
+Object 00177: 0.8063 1.282 0.798
+Object 00177: 0 0 0
+Object 00177: -2.024 -2.342 -7.951
+Object 00177: 75
+Object 00177: Stone8
+Object 00177: 0
+Object 00177: 0
+Object 00177: WHITE_KNIGHT
+Object 00177: 1
+Object 00177: 258
+Object 00177: -0.9002557 0.6749798 0 -1 1 0 -0.8695652 1 -0.4987081
+Object 00177: -0.8695652 1 -0.4987081 -0.7851662 0.6749798 -0.4496125 -0.9002557 0.6749798 0
+Object 00177: -0.7851662 0.6749798 -0.4496125 -0.8695652 1 -0.4987081 -0.5089514 1 -0.8656332
+Object 00177: -0.01023018 1 0 -0.8695652 1 -0.4987081 -1 1 0
+Object 00177: -0.5089514 1 -0.8656332 -0.4578005 0.6749798 -0.7803619 -0.7851662 0.6749798 -0.4496125
+Object 00177: -0.01023018 1 0 -0.5089514 1 -0.8656332 -0.8695652 1 -0.4987081
+Object 00177: -0.4578005 0.6749798 -0.7803619 -0.5089514 1 -0.8656332 -0.01278772 1 -1
+Object 00177: -0.01023018 1 0 -0.01278772 1 -1 -0.5089514 1 -0.8656332
+Object 00177: -0.01278772 1 -1 -0.01278772 0.6749798 -0.8992249 -0.4578005 0.6749798 -0.7803619
+Object 00177: -0.9002557 0.6749798 0 -0.7109974 0.5752212 -0.4056848 -0.8184143 0.5752212 0
+Object 00177: -0.7109974 0.5752212 -0.4056848 -0.9002557 0.6749798 0 -0.7851662 0.6749798 -0.4496125
+Object 00177: -0.7851662 0.6749798 -0.4496125 -0.4143223 0.5752212 -0.7054264 -0.7109974 0.5752212 -0.4056848
+Object 00177: -0.4143223 0.5752212 -0.7054264 -0.7851662 0.6749798 -0.4496125 -0.4578005 0.6749798 -0.7803619
+Object 00177: -0.4578005 0.6749798 -0.7803619 -0.01278772 0.5752212 -0.8165374 -0.4143223 0.5752212 -0.7054264
+Object 00177: -0.01278772 0.5752212 -0.8165374 -0.4578005 0.6749798 -0.7803619 -0.01278772 0.6749798 -0.8992249
+Object 00177: -0.6521739 0.538214 0 -0.8184143 0.5752212 0 -0.7109974 0.5752212 -0.4056848
+Object 00177: -0.7109974 0.5752212 -0.4056848 -0.5703325 0.538214 -0.3229974 -0.6521739 0.538214 0
+Object 00177: -0.6521739 0.538214 0 -0.5549872 0.4625905 -0.3152455 -0.6368287 0.4625905 0
+Object 00177: -0.5549872 0.4625905 -0.3152455 -0.6521739 0.538214 0 -0.5703325 0.538214 -0.3229974
+Object 00177: -0.5703325 0.538214 -0.3229974 -0.7109974 0.5752212 -0.4056848 -0.4143223 0.5752212 -0.7054264
+Object 00177: -0.4936061 0.4320193 -0.124031 -0.6368287 0.4625905 0 -0.5549872 0.4625905 -0.3152455
+Object 00177: -0.4936061 0.4320193 -0.124031 -0.4961637 0.4239742 0 -0.6368287 0.4625905 0
+Object 00177: -0.4936061 0.4320193 -0.124031 -0.5549872 0.4625905 -0.3152455 -0.4910486 0.4400643 -0.2506461
+Object 00177: -0.4910486 0.4400643 -0.2506461 -0.5549872 0.4625905 -0.3152455 -0.4782609 0.4368463 -0.2506461
+Object 00177: -0.4782609 0.4368463 -0.2506461 -0.5549872 0.4625905 -0.3152455 -0.4450128 0.4271923 -0.2506461
+Object 00177: -0.5703325 0.538214 -0.3229974 -0.3248082 0.4625905 -0.5478036 -0.5549872 0.4625905 -0.3152455
+Object 00177: -0.3913043 0.4175382 -0.2506461 -0.4450128 0.4271923 -0.2506461 -0.5549872 0.4625905 -0.3152455
+Object 00177: -0.4143223 0.5752212 -0.7054264 -0.3324808 0.538214 -0.5633076 -0.5703325 0.538214 -0.3229974
+Object 00177: -0.3913043 0.4175382 -0.2506461 -0.5549872 0.4625905 -0.3152455 -0.3248082 0.4625905 -0.5478036
+Object 00177: -0.3248082 0.4625905 -0.5478036 -0.5703325 0.538214 -0.3229974 -0.3324808 0.538214 -0.5633076
+Object 00177: -0.3324808 0.538214 -0.5633076 -0.4143223 0.5752212 -0.7054264 -0.01278772 0.5752212 -0.8165374
+Object 00177: -0.3324808 0.538214 -0.5633076 -0.01023018 0.4625905 -0.633075 -0.3248082 0.4625905 -0.5478036
+Object 00177: -0.01278772 0.5752212 -0.8165374 -0.01023018 0.538214 -0.6485789 -0.3324808 0.538214 -0.5633076
+Object 00177: -0.01023018 0.4625905 -0.633075 -0.3324808 0.538214 -0.5633076 -0.01023018 0.538214 -0.6485789
+Object 00177: -0.3913043 0.4175382 -0.2506461 -0.2327366 0.4127111 -0.3875969 -0.370844 0.4127111 -0.2506461
+Object 00177: -0.3913043 0.4175382 -0.2506461 -0.3248082 0.4625905 -0.5478036 -0.2327366 0.4127111 -0.3875969
+Object 00177: -0.1534527 0.4127111 -0.2506461 -0.370844 0.4127111 -0.2506461 -0.2327366 0.4127111 -0.3875969
+Object 00177: -0.2327366 0.4127111 -0.3875969 -0.3248082 0.4625905 -0.5478036 -0.01023018 0.4625905 -0.633075
+Object 00177: -0.01023018 0.4127111 -0.2506461 -0.1534527 0.4127111 -0.2506461 -0.2327366 0.4127111 -0.3875969
+Object 00177: -0.01023018 0.4127111 -0.2506461 -0.2327366 0.4127111 -0.3875969 -0.01023018 0.4127111 -0.4496125
+Object 00177: -0.01023018 0.4625905 -0.633075 -0.01023018 0.4127111 -0.4496125 -0.2327366 0.4127111 -0.3875969
+Object 00177: -0.01278772 0.6749798 -0.8992249 -0.01278772 1 -1 0.4808184 1 -0.868217
+Object 00177: -0.01023018 1 0 0.4808184 1 -0.868217 -0.01278772 1 -1
+Object 00177: 0.4808184 1 -0.868217 0.4322251 0.6749798 -0.7803619 -0.01278772 0.6749798 -0.8992249
+Object 00177: -0.01023018 1 0 0.8439897 1 -0.501292 0.4808184 1 -0.868217
+Object 00177: 0.4322251 0.6749798 -0.7803619 0.4808184 1 -0.868217 0.8439897 1 -0.501292
+Object 00177: -0.01023018 1 0 0.9795396 1 0 0.8439897 1 -0.501292
+Object 00177: 0.8439897 1 -0.501292 0.7595908 0.6749798 -0.4521964 0.4322251 0.6749798 -0.7803619
+Object 00177: 0.7595908 0.6749798 -0.4521964 0.8439897 1 -0.501292 0.9795396 1 0
+Object 00177: 0.9795396 1 0 0.8823529 0.6749798 0 0.7595908 0.6749798 -0.4521964
+Object 00177: -0.01278772 0.6749798 -0.8992249 0.3913043 0.5752212 -0.7080104 -0.01278772 0.5752212 -0.8165374
+Object 00177: 0.3913043 0.5752212 -0.7080104 -0.01278772 0.6749798 -0.8992249 0.4322251 0.6749798 -0.7803619
+Object 00177: 0.4322251 0.6749798 -0.7803619 0.6879795 0.5752212 -0.4108528 0.3913043 0.5752212 -0.7080104
+Object 00177: 0.6879795 0.5752212 -0.4108528 0.4322251 0.6749798 -0.7803619 0.7595908 0.6749798 -0.4521964
+Object 00177: 0.7595908 0.6749798 -0.4521964 0.7979539 0.5752212 0 0.6879795 0.5752212 -0.4108528
+Object 00177: 0.7979539 0.5752212 0 0.7595908 0.6749798 -0.4521964 0.8823529 0.6749798 0
+Object 00177: 0.1304348 0.4127111 -0.2506461 -0.01023018 0.4127111 -0.2506461 -0.01023018 0.4127111 -0.4496125
+Object 00177: -0.01023018 0.4127111 -0.4496125 -0.01023018 0.4625905 -0.633075 0.3017903 0.4625905 -0.5478036
+Object 00177: -0.01023018 0.538214 -0.6485789 0.3017903 0.4625905 -0.5478036 -0.01023018 0.4625905 -0.633075
+Object 00177: 0.1304348 0.4127111 -0.2506461 -0.01023018 0.4127111 -0.4496125 0.2097187 0.4127111 -0.3901809
+Object 00177: -0.01023018 0.538214 -0.6485789 -0.01278772 0.5752212 -0.8165374 0.3913043 0.5752212 -0.7080104
+Object 00177: 0.3017903 0.4625905 -0.5478036 0.2097187 0.4127111 -0.3901809 -0.01023018 0.4127111 -0.4496125
+Object 00177: 0.3017903 0.4625905 -0.5478036 -0.01023018 0.538214 -0.6485789 0.3094629 0.538214 -0.5633076
+Object 00177: 0.3913043 0.5752212 -0.7080104 0.3094629 0.538214 -0.5633076 -0.01023018 0.538214 -0.6485789
+Object 00177: 0.2097187 0.4127111 -0.3901809 0.4168798 0.4271923 -0.2506461 0.3478261 0.4127111 -0.2506461
+Object 00177: 0.2097187 0.4127111 -0.3901809 0.3017903 0.4625905 -0.5478036 0.5319693 0.4625905 -0.3178295
+Object 00177: 0.3094629 0.538214 -0.5633076 0.5319693 0.4625905 -0.3178295 0.3017903 0.4625905 -0.5478036
+Object 00177: 0.2097187 0.4127111 -0.3901809 0.5319693 0.4625905 -0.3178295 0.4168798 0.4271923 -0.2506461
+Object 00177: 0.5319693 0.4625905 -0.3178295 0.3094629 0.538214 -0.5633076 0.5447571 0.538214 -0.3255815
+Object 00177: 0.3094629 0.538214 -0.5633076 0.3913043 0.5752212 -0.7080104 0.6879795 0.5752212 -0.4108528
+Object 00177: 0.6879795 0.5752212 -0.4108528 0.5447571 0.538214 -0.3255815 0.3094629 0.538214 -0.5633076
+Object 00177: 0.4731458 0.4416733 -0.2506461 0.4168798 0.4271923 -0.2506461 0.5319693 0.4625905 -0.3178295
+Object 00177: 0.4731458 0.4416733 -0.2506461 0.5319693 0.4625905 -0.3178295 0.4808184 0.4432823 -0.2506461
+Object 00177: 0.4808184 0.4432823 -0.2506461 0.6163683 0.4625905 0 0.4808184 0.4432823 -0.2299741
+Object 00177: 0.4808184 0.4432823 -0.2299741 0.6163683 0.4625905 0 0.4859335 0.4352373 -0.1214471
+Object 00177: 0.4859335 0.4352373 -0.1214471 0.6163683 0.4625905 0 0.4910486 0.4288013 0
+Object 00177: 0.4808184 0.4432823 -0.2506461 0.5319693 0.4625905 -0.3178295 0.6163683 0.4625905 0
+Object 00177: 0.5447571 0.538214 -0.3255815 0.6163683 0.4625905 0 0.5319693 0.4625905 -0.3178295
+Object 00177: 0.6163683 0.4625905 0 0.5447571 0.538214 -0.3255815 0.6342711 0.538214 0
+Object 00177: 0.7979539 0.5752212 0 0.6342711 0.538214 0 0.5447571 0.538214 -0.3255815
+Object 00177: 0.5447571 0.538214 -0.3255815 0.6879795 0.5752212 -0.4108528 0.7979539 0.5752212 0
+Object 00177: -1 1 0 -0.9002557 0.6749798 0 -0.7826087 0.6749798 0.4496124
+Object 00177: -0.7826087 0.6749798 0.4496124 -0.8695652 1 0.5012919 -1 1 0
+Object 00177: -0.8695652 1 0.5012919 -0.7826087 0.6749798 0.4496124 -0.455243 0.6749798 0.7803618
+Object 00177: -0.01023018 1 0 -1 1 0 -0.8695652 1 0.5012919
+Object 00177: -0.455243 0.6749798 0.7803618 -0.5038363 1 0.8656331 -0.8695652 1 0.5012919
+Object 00177: -0.01023018 1 0 -0.8695652 1 0.5012919 -0.5038363 1 0.8656331
+Object 00177: -0.5038363 1 0.8656331 -0.455243 0.6749798 0.7803618 -0.01023018 0.6749798 0.8992248
+Object 00177: -0.01023018 0.6749798 0.8992248 -0.01023018 1 1 -0.5038363 1 0.8656331
+Object 00177: -0.01023018 1 0 -0.5038363 1 0.8656331 -0.01023018 1 1
+Object 00177: -0.8184143 0.5752212 0 -0.7826087 0.6749798 0.4496124 -0.9002557 0.6749798 0
+Object 00177: -0.7826087 0.6749798 0.4496124 -0.8184143 0.5752212 0 -0.7109974 0.5752212 0.4082687
+Object 00177: -0.7109974 0.5752212 0.4082687 -0.455243 0.6749798 0.7803618 -0.7826087 0.6749798 0.4496124
+Object 00177: -0.455243 0.6749798 0.7803618 -0.7109974 0.5752212 0.4082687 -0.4143223 0.5752212 0.7080104
+Object 00177: -0.4143223 0.5752212 0.7080104 -0.01023018 0.6749798 0.8992248 -0.455243 0.6749798 0.7803618
+Object 00177: -0.01023018 0.6749798 0.8992248 -0.4143223 0.5752212 0.7080104 -0.01023018 0.5752212 0.8165374
+Object 00177: -0.567775 0.538214 0.3255814 -0.7109974 0.5752212 0.4082687 -0.8184143 0.5752212 0
+Object 00177: -0.8184143 0.5752212 0 -0.6521739 0.538214 0 -0.567775 0.538214 0.3255814
+Object 00177: -0.6368287 0.4625905 0 -0.567775 0.538214 0.3255814 -0.6521739 0.538214 0
+Object 00177: -0.567775 0.538214 0.3255814 -0.6368287 0.4625905 0 -0.5524297 0.4625905 0.3178295
+Object 00177: -0.4910486 0.4400643 0.245478 -0.5524297 0.4625905 0.3178295 -0.6368287 0.4625905 0
+Object 00177: -0.4936061 0.4336283 0.1343669 -0.6368287 0.4625905 0 -0.4961637 0.4239742 0
+Object 00177: -0.4910486 0.4400643 0.2377261 -0.6368287 0.4625905 0 -0.4936061 0.4336283 0.1343669
+Object 00177: -0.4910486 0.4400643 0.245478 -0.6368287 0.4625905 0 -0.4910486 0.4400643 0.2377261
+Object 00177: -0.4782609 0.4368463 0.245478 -0.5524297 0.4625905 0.3178295 -0.4910486 0.4400643 0.245478
+Object 00177: -0.4782609 0.4368463 0.245478 -0.4296675 0.4239742 0.245478 -0.5524297 0.4625905 0.3178295
+Object 00177: -0.2327366 0.4127111 0.3901809 -0.5524297 0.4625905 0.3178295 -0.4296675 0.4239742 0.245478
+Object 00177: -0.2327366 0.4127111 0.3901809 -0.4296675 0.4239742 0.245478 -0.3759591 0.4127111 0.245478
+Object 00177: -0.3759591 0.4127111 0.245478 -0.1508951 0.4127111 0.245478 -0.2327366 0.4127111 0.3901809
+Object 00177: -0.1508951 0.4127111 0.245478 -0.01023018 0.4127111 0.4496124 -0.2327366 0.4127111 0.3901809
+Object 00177: -0.1508951 0.4127111 0.245478 -0.01023018 0.4127111 0.245478 -0.01023018 0.4127111 0.4496124
+Object 00177: -0.7109974 0.5752212 0.4082687 -0.567775 0.538214 0.3255814 -0.3324808 0.538214 0.5633075
+Object 00177: -0.3324808 0.538214 0.5633075 -0.4143223 0.5752212 0.7080104 -0.7109974 0.5752212 0.4082687
+Object 00177: -0.5524297 0.4625905 0.3178295 -0.3324808 0.538214 0.5633075 -0.567775 0.538214 0.3255814
+Object 00177: -0.3324808 0.538214 0.5633075 -0.5524297 0.4625905 0.3178295 -0.3222506 0.4625905 0.5503876
+Object 00177: -0.2327366 0.4127111 0.3901809 -0.3222506 0.4625905 0.5503876 -0.5524297 0.4625905 0.3178295
+Object 00177: -0.4143223 0.5752212 0.7080104 -0.3324808 0.538214 0.5633075 -0.01023018 0.538214 0.6485788
+Object 00177: -0.3222506 0.4625905 0.5503876 -0.01023018 0.538214 0.6485788 -0.3324808 0.538214 0.5633075
+Object 00177: -0.3222506 0.4625905 0.5503876 -0.2327366 0.4127111 0.3901809 -0.01023018 0.4127111 0.4496124
+Object 00177: -0.01023018 0.538214 0.6485788 -0.01023018 0.5752212 0.8165374 -0.4143223 0.5752212 0.7080104
+Object 00177: -0.01023018 0.538214 0.6485788 -0.3222506 0.4625905 0.5503876 -0.01023018 0.4625905 0.6330749
+Object 00177: -0.01023018 0.4127111 0.4496124 -0.01023018 0.4625905 0.6330749 -0.3222506 0.4625905 0.5503876
+Object 00177: -0.01023018 1 1 -0.01023018 0.6749798 0.8992248 0.4347826 0.6749798 0.7803618
+Object 00177: -0.01023018 1 0 -0.01023018 1 1 0.4833759 1 0.8656331
+Object 00177: 0.4347826 0.6749798 0.7803618 0.4833759 1 0.8656331 -0.01023018 1 1
+Object 00177: -0.01023018 1 0 0.4833759 1 0.8656331 0.8465473 1 0.498708
+Object 00177: 0.4833759 1 0.8656331 0.4347826 0.6749798 0.7803618 0.7621483 0.6749798 0.4496124
+Object 00177: -0.01023018 1 0 0.8465473 1 0.498708 0.9795396 1 0
+Object 00177: 0.7621483 0.6749798 0.4496124 0.8465473 1 0.498708 0.4833759 1 0.8656331
+Object 00177: 0.8465473 1 0.498708 0.7621483 0.6749798 0.4496124 0.8823529 0.6749798 0
+Object 00177: 0.8823529 0.6749798 0 0.9795396 1 0 0.8465473 1 0.498708
+Object 00177: -0.01023018 0.5752212 0.8165374 0.4347826 0.6749798 0.7803618 -0.01023018 0.6749798 0.8992248
+Object 00177: 0.4347826 0.6749798 0.7803618 -0.01023018 0.5752212 0.8165374 0.3938619 0.5752212 0.7080104
+Object 00177: 0.3938619 0.5752212 0.7080104 0.7621483 0.6749798 0.4496124 0.4347826 0.6749798 0.7803618
+Object 00177: 0.7621483 0.6749798 0.4496124 0.3938619 0.5752212 0.7080104 0.6905371 0.5752212 0.4082687
+Object 00177: 0.6905371 0.5752212 0.4082687 0.8823529 0.6749798 0 0.7621483 0.6749798 0.4496124
+Object 00177: 0.8823529 0.6749798 0 0.6905371 0.5752212 0.4082687 0.7979539 0.5752212 0
+Object 00177: -0.01023018 0.4127111 0.245478 0.2122762 0.4127111 0.3901809 -0.01023018 0.4127111 0.4496124
+Object 00177: -0.01023018 0.4625905 0.6330749 -0.01023018 0.4127111 0.4496124 0.2122762 0.4127111 0.3901809
+Object 00177: -0.01023018 0.5752212 0.8165374 -0.01023018 0.538214 0.6485788 0.3120205 0.538214 0.5633075
+Object 00177: -0.01023018 0.4625905 0.6330749 0.3120205 0.538214 0.5633075 -0.01023018 0.538214 0.6485788
+Object 00177: -0.01023018 0.4127111 0.245478 0.1304348 0.4127111 0.245478 0.2122762 0.4127111 0.3901809
+Object 00177: 0.2122762 0.4127111 0.3901809 0.3017903 0.4625905 0.5478036 -0.01023018 0.4625905 0.6330749
+Object 00177: 0.3120205 0.538214 0.5633075 -0.01023018 0.4625905 0.6330749 0.3017903 0.4625905 0.5478036
+Object 00177: 0.1304348 0.4127111 0.245478 0.3529412 0.4127111 0.245478 0.2122762 0.4127111 0.3901809
+Object 00177: 0.3120205 0.538214 0.5633075 0.3938619 0.5752212 0.7080104 -0.01023018 0.5752212 0.8165374
+Object 00177: 0.3682865 0.4159292 0.245478 0.3017903 0.4625905 0.5478036 0.2122762 0.4127111 0.3901809
+Object 00177: 0.3682865 0.4159292 0.245478 0.2122762 0.4127111 0.3901809 0.3529412 0.4127111 0.245478
+Object 00177: 0.3682865 0.4159292 0.245478 0.4092072 0.4239742 0.245478 0.5319693 0.4625905 0.3152455
+Object 00177: 0.4731458 0.4416733 0.245478 0.5319693 0.4625905 0.3152455 0.4092072 0.4239742 0.245478
+Object 00177: 0.4808184 0.4432823 0.245478 0.5319693 0.4625905 0.3152455 0.4731458 0.4416733 0.245478
+Object 00177: 0.4859335 0.4384553 0.1602067 0.5319693 0.4625905 0.3152455 0.4808184 0.4432823 0.245478
+Object 00177: 0.4859335 0.4384553 0.1602067 0.4910486 0.4288013 0 0.6163683 0.4625905 0
+Object 00177: 0.4859335 0.4384553 0.1602067 0.6163683 0.4625905 0 0.5319693 0.4625905 0.3152455
+Object 00177: 0.5319693 0.4625905 0.3152455 0.6342711 0.538214 0 0.5447571 0.538214 0.3229974
+Object 00177: 0.6342711 0.538214 0 0.5319693 0.4625905 0.3152455 0.6163683 0.4625905 0
+Object 00177: 0.6905371 0.5752212 0.4082687 0.5447571 0.538214 0.3229974 0.6342711 0.538214 0
+Object 00177: 0.6342711 0.538214 0 0.7979539 0.5752212 0 0.6905371 0.5752212 0.4082687
+Object 00177: 0.3017903 0.4625905 0.5478036 0.5447571 0.538214 0.3229974 0.3120205 0.538214 0.5633075
+Object 00177: 0.3682865 0.4159292 0.245478 0.5319693 0.4625905 0.3152455 0.3017903 0.4625905 0.5478036
+Object 00177: 0.3938619 0.5752212 0.7080104 0.3120205 0.538214 0.5633075 0.5447571 0.538214 0.3229974
+Object 00177: 0.5447571 0.538214 0.3229974 0.3017903 0.4625905 0.5478036 0.5319693 0.4625905 0.3152455
+Object 00177: 0.5447571 0.538214 0.3229974 0.6905371 0.5752212 0.4082687 0.3938619 0.5752212 0.7080104
+Object 00177: -0.4782609 0.4368463 -0.2506461 -0.7263427 -0.2630732 -0.2506461 -0.4910486 0.4400643 -0.2506461
+Object 00177: -0.4782609 0.4368463 -0.2506461 0.1023018 -0.3934031 -0.2506461 -0.7263427 -0.2630732 -0.2506461
+Object 00177: -0.4450128 0.4271923 -0.2506461 0.1023018 -0.3934031 -0.2506461 -0.4782609 0.4368463 -0.2506461
+Object 00177: -0.3913043 0.4175382 -0.2506461 0.1023018 -0.3934031 -0.2506461 -0.4450128 0.4271923 -0.2506461
+Object 00177: -0.370844 0.4127111 -0.2506461 0.1023018 -0.3934031 -0.2506461 -0.3913043 0.4175382 -0.2506461
+Object 00177: -0.1534527 0.4127111 -0.2506461 0.1023018 -0.3934031 -0.2506461 -0.370844 0.4127111 -0.2506461
+Object 00177: -0.01023018 0.4127111 -0.2506461 0.1023018 -0.3934031 -0.2506461 -0.1534527 0.4127111 -0.2506461
+Object 00177: 0.1304348 0.4127111 -0.2506461 0.1023018 -0.3934031 -0.2506461 -0.01023018 0.4127111 -0.2506461
+Object 00177: -0.4910486 0.4400643 0.2377261 -0.7263427 -0.2630732 -0.2506461 -0.7263427 -0.2630732 0.245478
+Object 00177: -0.4936061 0.4336283 0.1343669 -0.4961637 0.4239742 0 -0.7263427 -0.2630732 -0.2506461
+Object 00177: -0.4961637 0.4239742 0 -0.4936061 0.4320193 -0.124031 -0.7263427 -0.2630732 -0.2506461
+Object 00177: -0.7263427 -0.2630732 -0.2506461 -0.4910486 0.4400643 0.2377261 -0.4936061 0.4336283 0.1343669
+Object 00177: -0.4936061 0.4320193 -0.124031 -0.4910486 0.4400643 -0.2506461 -0.7263427 -0.2630732 -0.2506461
+Object 00177: -0.4910486 0.4400643 0.2377261 -0.7263427 -0.2630732 0.245478 -0.4910486 0.4400643 0.245478
+Object 00177: 0.1023018 -0.3934031 0.245478 -0.4910486 0.4400643 0.245478 -0.7263427 -0.2630732 0.245478
+Object 00177: 0.1023018 -0.3934031 0.245478 -0.4782609 0.4368463 0.245478 -0.4910486 0.4400643 0.245478
+Object 00177: -0.4296675 0.4239742 0.245478 -0.4782609 0.4368463 0.245478 0.1023018 -0.3934031 0.245478
+Object 00177: -0.3759591 0.4127111 0.245478 -0.4296675 0.4239742 0.245478 0.1023018 -0.3934031 0.245478
+Object 00177: -0.1508951 0.4127111 0.245478 -0.3759591 0.4127111 0.245478 0.1023018 -0.3934031 0.245478
+Object 00177: -0.01023018 0.4127111 0.245478 -0.1508951 0.4127111 0.245478 0.1023018 -0.3934031 0.245478
+Object 00177: 0.1304348 0.4127111 0.245478 -0.01023018 0.4127111 0.245478 0.1023018 -0.3934031 0.245478
+Object 00177: 0.3478261 0.4127111 -0.2506461 0.1023018 -0.3934031 -0.2506461 0.1304348 0.4127111 -0.2506461
+Object 00177: 0.3478261 0.4127111 -0.2506461 0.1304348 0.4127111 -0.2506461 0.2097187 0.4127111 -0.3901809
+Object 00177: 0.4168798 0.4271923 -0.2506461 0.1023018 -0.3934031 -0.2506461 0.3478261 0.4127111 -0.2506461
+Object 00177: 0.4731458 0.4416733 -0.2506461 0.1023018 -0.3934031 -0.2506461 0.4168798 0.4271923 -0.2506461
+Object 00177: 0.5907928 0.2695092 -0.2506461 0.1023018 -0.3934031 -0.2506461 0.4731458 0.4416733 -0.2506461
+Object 00177: 0.1023018 -0.3934031 0.245478 0.1023018 -0.3934031 -0.2506461 0.5907928 0.2695092 -0.2506461
+Object 00177: 0.1023018 -0.3934031 0.245478 0.5907928 0.2695092 -0.2506461 0.5907928 0.2695092 0.245478
+Object 00177: 0.3529412 0.4127111 0.245478 0.1304348 0.4127111 0.245478 0.1023018 -0.3934031 0.245478
+Object 00177: 0.3682865 0.4159292 0.245478 0.3529412 0.4127111 0.245478 0.1023018 -0.3934031 0.245478
+Object 00177: 0.4092072 0.4239742 0.245478 0.3682865 0.4159292 0.245478 0.1023018 -0.3934031 0.245478
+Object 00177: 0.1023018 -0.3934031 0.245478 0.4731458 0.4416733 0.245478 0.4092072 0.4239742 0.245478
+Object 00177: 0.1023018 -0.3934031 0.245478 0.4808184 0.4432823 0.245478 0.4731458 0.4416733 0.245478
+Object 00177: 0.1023018 -0.3934031 0.245478 0.5907928 0.2695092 0.245478 0.4808184 0.4432823 0.245478
+Object 00177: 0.5907928 0.2695092 -0.2506461 0.4731458 0.4416733 -0.2506461 0.4808184 0.4432823 -0.2506461
+Object 00177: 0.4808184 0.4432823 -0.2299741 0.5907928 0.2695092 -0.2506461 0.4808184 0.4432823 -0.2506461
+Object 00177: 0.4859335 0.4352373 -0.1214471 0.5907928 0.2695092 0.245478 0.4808184 0.4432823 -0.2299741
+Object 00177: 0.4808184 0.4432823 0.245478 0.5907928 0.2695092 0.245478 0.4859335 0.4384553 0.1602067
+Object 00177: 0.4859335 0.4384553 0.1602067 0.5907928 0.2695092 0.245478 0.4910486 0.4288013 0
+Object 00177: 0.4910486 0.4288013 0 0.5907928 0.2695092 0.245478 0.4859335 0.4352373 -0.1214471
+Object 00177: 0.4808184 0.4432823 -0.2299741 0.5907928 0.2695092 0.245478 0.5907928 0.2695092 -0.2506461
+Object 00177: 0.8516624 -0.2695093 0.245478 0.6700767 -0.2550282 -0.2506461 0.6700767 -0.2550282 0.245478
+Object 00177: 0.8516624 -0.2695093 0.245478 0.8516624 -0.2695093 -0.2506461 0.6700767 -0.2550282 -0.2506461
+Object 00177: -0.7263427 -0.2630732 0.245478 -0.7263427 -0.2630732 -0.2506461 -0.6598465 -0.5510861 -0.2506461
+Object 00177: -0.7263427 -0.2630732 0.245478 -0.6598465 -0.5510861 -0.2506461 -0.6598465 -0.5510861 0.245478
+Object 00177: 0.1023018 -0.3934031 0.245478 -0.7263427 -0.2630732 0.245478 -0.6598465 -0.5510861 0.245478
+Object 00177: 0.1023018 -0.3934031 -0.2506461 -0.6598465 -0.5510861 -0.2506461 -0.7263427 -0.2630732 -0.2506461
+Object 00177: 0.5345268 -0.3499598 0.245478 0.1023018 -0.3934031 0.245478 -0.6598465 -0.5510861 0.245478
+Object 00177: 0.5345268 -0.3499598 -0.2506461 -0.6598465 -0.5510861 -0.2506461 0.1023018 -0.3934031 -0.2506461
+Object 00177: -0.6598465 -0.5510861 0.245478 -0.6598465 -0.5510861 -0.2506461 -0.3529412 -0.7602575 -0.2506461
+Object 00177: -0.6598465 -0.5510861 0.245478 -0.3529412 -0.7602575 -0.2506461 -0.3529412 -0.7602575 0.245478
+Object 00177: 0.5345268 -0.3499598 0.245478 -0.6598465 -0.5510861 0.245478 -0.3529412 -0.7602575 0.245478
+Object 00177: 0.5345268 -0.3499598 -0.2506461 -0.3529412 -0.7602575 -0.2506461 -0.6598465 -0.5510861 -0.2506461
+Object 00177: 0.5345268 -0.3499598 -0.2506461 0.07928389 -0.8761061 -0.2506461 -0.3529412 -0.7602575 -0.2506461
+Object 00177: 0.5345268 -0.3499598 0.245478 -0.3529412 -0.7602575 0.245478 0.07928389 -0.8761061 0.245478
+Object 00177: -0.3529412 -0.7602575 0.245478 -0.3529412 -0.7602575 -0.2506461 0.07928389 -0.8761061 -0.2506461
+Object 00177: -0.3529412 -0.7602575 0.245478 0.07928389 -0.8761061 -0.2506461 0.07928389 -0.8761061 0.245478
+Object 00177: 0.09462915 -0.8712791 0.2377261 0.07928389 -0.8761061 0.245478 0.07928389 -0.8761061 -0.2506461
+Object 00177: 0.09462915 -0.8712791 -0.2377261 0.07928389 -0.8761061 -0.2506461 0.0971867 -0.8696701 -0.2377261
+Object 00177: 0.1815857 -0.834272 -0.04392767 0.07928389 -0.8761061 -0.2506461 0.09462915 -0.8712791 -0.2377261
+Object 00177: 0.09462915 -0.8712791 0.2377261 0.07928389 -0.8761061 -0.2506461 0.1841432 -0.834272 0.04392767
+Object 00177: 0.2685422 -0.8004827 0.2377261 0.07928389 -0.8761061 0.245478 0.09462915 -0.8712791 0.2377261
+Object 00177: 0.1815857 -0.834272 -0.04392767 0.1841432 -0.834272 0.04392767 0.07928389 -0.8761061 -0.2506461
+Object 00177: 0.2404092 -0.8101367 -0.1782946 0.1841432 -0.834272 0.04392767 0.1841432 -0.834272 -0.04392767
+Object 00177: 0.5345268 -0.3499598 0.245478 0.1023018 -0.3934031 -0.2506461 0.1023018 -0.3934031 0.245478
+Object 00177: 0.5345268 -0.3499598 0.245478 0.5345268 -0.3499598 -0.2506461 0.1023018 -0.3934031 -0.2506461
+Object 00177: 0.0971867 -0.8696701 -0.2377261 0.07928389 -0.8761061 -0.2506461 1 -0.5012068 -0.2506461
+Object 00177: 0.07928389 -0.8761061 -0.2506461 0.5345268 -0.3499598 -0.2506461 0.6700767 -0.2550282 -0.2506461
+Object 00177: 0.07928389 -0.8761061 0.245478 0.6700767 -0.2550282 0.245478 0.5345268 -0.3499598 0.245478
+Object 00177: 0.2685422 -0.8004827 0.2377261 1 -0.5012068 0.245478 0.07928389 -0.8761061 0.245478
+Object 00177: 0.0971867 -0.8696701 -0.2377261 1 -0.5012068 -0.2506461 0.2685422 -0.8004827 -0.2377261
+Object 00177: 0.1841432 -0.834272 0.04392767 1 -0.5012068 -0.2506461 0.2352941 -0.8133548 0.1602067
+Object 00177: 0.2404092 -0.8101367 -0.1782946 1 -0.5012068 -0.2506461 0.1841432 -0.834272 0.04392767
+Object 00177: 1 -0.5012068 0.245478 0.2685422 -0.8004827 0.2377261 0.2352941 -0.8133548 0.1602067
+Object 00177: 0.2685422 -0.8004827 -0.2377261 1 -0.5012068 -0.2506461 0.2404092 -0.8101367 -0.1782946
+Object 00177: 0.07928389 -0.8761061 -0.2506461 0.6700767 -0.2550282 -0.2506461 0.8516624 -0.2695093 -0.2506461
+Object 00177: 0.07928389 -0.8761061 0.245478 0.8516624 -0.2695093 0.245478 0.6700767 -0.2550282 0.245478
+Object 00177: 0.6700767 -0.2550282 0.245478 0.5345268 -0.3499598 -0.2506461 0.5345268 -0.3499598 0.245478
+Object 00177: 0.6700767 -0.2550282 0.245478 0.6700767 -0.2550282 -0.2506461 0.5345268 -0.3499598 -0.2506461
+Object 00177: 0.07928389 -0.8761061 -0.2506461 0.8516624 -0.2695093 -0.2506461 1 -0.5012068 -0.2506461
+Object 00177: 0.07928389 -0.8761061 0.245478 1 -0.5012068 0.245478 0.8516624 -0.2695093 0.245478
+Object 00177: 1 -0.5012068 0.245478 0.2352941 -0.8133548 0.1602067 1 -0.5012068 -0.2506461
+Object 00177: 1 -0.5012068 0.245478 0.8516624 -0.2695093 -0.2506461 0.8516624 -0.2695093 0.245478
+Object 00177: 1 -0.5012068 0.245478 1 -0.5012068 -0.2506461 0.8516624 -0.2695093 -0.2506461
+Object 00177: 0.0971867 -0.8696701 -0.2377261 0.4066496 -1 -0.2377261 0.09462915 -0.8712791 -0.2377261
+Object 00177: 0.09462915 -0.8712791 -0.2377261 0.4066496 -1 -0.2377261 0.1815857 -0.834272 -0.04392767
+Object 00177: 0.1815857 -0.834272 -0.04392767 0.4066496 -1 -0.2377261 0.1841432 -0.834272 -0.04392767
+Object 00177: 0.2685422 -0.8004827 -0.2377261 0.4066496 -1 -0.2377261 0.0971867 -0.8696701 -0.2377261
+Object 00177: 0.1841432 -0.834272 -0.04392767 0.4066496 -1 -0.2377261 0.2404092 -0.8101367 -0.1782946
+Object 00177: 0.2404092 -0.8101367 -0.1782946 0.4066496 -1 -0.2377261 0.2685422 -0.8004827 -0.2377261
+Object 00177: 0.1841432 -0.834272 -0.04392767 0.1841432 -0.834272 0.04392767 0.1815857 -0.834272 -0.04392767
+Object 00177: 0.1841432 -0.834272 0.04392767 0.4066496 -1 0.2377261 0.09462915 -0.8712791 0.2377261
+Object 00177: 0.4066496 -1 0.2377261 0.2685422 -0.8004827 0.2377261 0.09462915 -0.8712791 0.2377261
+Object 00177: 0.2352941 -0.8133548 0.1602067 0.4066496 -1 0.2377261 0.1841432 -0.834272 0.04392767
+Object 00177: 0.2685422 -0.8004827 0.2377261 0.4066496 -1 0.2377261 0.2352941 -0.8133548 0.1602067
+Object 00177: 0
+Object 00177: 1 1 1
+Object 00177: 0 0 0
+Object 00177: 0 0 0
+Object 00177: 1
+Object 00177: 0
+Object 00177: 0
+Object 00177: 0 0
+Object 00177: 0
+Object 00177: 1
+Object 00177: 0
+Object 00177: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00177: 0000000000000
+Object 00177: 0 0
+Object 00177: # 0 0 0 0 0 0 0 0
+Object 00177: # 0 0 0 0 0 0 0 0
+Object 00177: 0 0
+
+Object 00178: 2
+Object 00178: 0 0 0
+Object 00178: 0.9864 0.06657 0.9949
+Object 00178: 0 0 0
+Object 00178: 4.03 -0.9508 -5.987
+Object 00178: 15
+Object 00178: Stone7
+Object 00178: 0
+Object 00178: 0
+Object 00178: PLAQUENO178
+Object 00178: -1
+Object 00178: 0
+Object 00178: 1 1 1
+Object 00178: 0 0 0
+Object 00178: 0 0 0
+Object 00178: 1
+Object 00178: 0
+Object 00178: 0
+Object 00178: 0 0
+Object 00178: 0
+Object 00178: 1
+Object 00178: 0
+Object 00178: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00178: 0000000000000
+Object 00178: 0 0
+Object 00178: # 0 0 0 0 0 0 0 0
+Object 00178: # 0 0 0 0 0 0 0 0
+Object 00178: 0 0
+
+Object 00179: 3
+Object 00179: 0 0 0
+Object 00179: 0.4044 1.406 0.4044
+Object 00179: 0 0 0
+Object 00179: -3.934 -2.987 -3.986
+Object 00179: 175
+Object 00179: Stone8
+Object 00179: 0
+Object 00179: 0
+Object 00179: CORPSP18179
+Object 00179: -1
+Object 00179: 0
+Object 00179: 1 1 1
+Object 00179: 0 0 0
+Object 00179: 0 0 0
+Object 00179: 1
+Object 00179: 0
+Object 00179: 0
+Object 00179: 0 0
+Object 00179: 0
+Object 00179: 1
+Object 00179: 0
+Object 00179: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00179: 0000000000000
+Object 00179: 0 0
+Object 00179: # 0 0 0 0 0 0 0 0
+Object 00179: # 0 0 0 0 0 0 0 0
+Object 00179: 0 0
+
+Object 00180: 3
+Object 00180: 0 0 0
+Object 00180: 0.8299 0.521 0.8299
+Object 00180: 0 0 0
+Object 00180: -3.934 -1.952 -3.986
+Object 00180: 91
+Object 00180: Stone8
+Object 00180: 0
+Object 00180: 0
+Object 00180: PIEDP183180
+Object 00180: -1
+Object 00180: 0
+Object 00180: 1 1 1
+Object 00180: 0 0 0
+Object 00180: 0 0 0
+Object 00180: 1
+Object 00180: 0
+Object 00180: 0
+Object 00180: 0 0
+Object 00180: 0
+Object 00180: 1
+Object 00180: 8
+Object 00180: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00180: 0000000000000
+Object 00180: 0 0
+Object 00180: # 0 0 0 0 0 0 0 0
+Object 00180: # 0 0 0 0 0 0 0 0
+Object 00180: 0 0
+
+Object 00181: 4
+Object 00181: 0.8819 0.1181 0
+Object 00181: 0.4227 0.05195 0.4227
+Object 00181: 0 0 0
+Object 00181: -3.936 -1.974 -3.987
+Object 00181: 7
+Object 00181: Stone8
+Object 00181: 0
+Object 00181: 0
+Object 00181: ANN185080181
+Object 00181: -1
+Object 00181: 0
+Object 00181: 1 1 1
+Object 00181: 0 0 0
+Object 00181: 0 0 0
+Object 00181: 1
+Object 00181: 0
+Object 00181: 0
+Object 00181: 0 0
+Object 00181: 0
+Object 00181: 1
+Object 00181: 0
+Object 00181: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00181: 0000000000000
+Object 00181: 0 0
+Object 00181: # 0 0 0 0 0 0 0 0
+Object 00181: # 0 0 0 0 0 0 0 0
+Object 00181: 0 0
+
+Object 00182: 4
+Object 00182: 0.8819 0.1181 0
+Object 00182: 0.3933 0.04833 0.3933
+Object 00182: 0 0 0
+Object 00182: -3.936 -3.028 -3.987
+Object 00182: 177
+Object 00182: Stone8
+Object 00182: 0
+Object 00182: 0
+Object 00182: ANN00186182
+Object 00182: -1
+Object 00182: 0
+Object 00182: 1 1 1
+Object 00182: 0 0 0
+Object 00182: 0 0 0
+Object 00182: 1
+Object 00182: 0
+Object 00182: 0
+Object 00182: 0 0
+Object 00182: 0
+Object 00182: 1
+Object 00182: 0
+Object 00182: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00182: 0000000000000
+Object 00182: 0 0
+Object 00182: # 0 0 0 0 0 0 0 0
+Object 00182: # 0 0 0 0 0 0 0 0
+Object 00182: 0 0
+
+Object 00183: 3
+Object 00183: 0 0 0
+Object 00183: 0.5741 0.08365 0.5741
+Object 00183: 0 0 0
+Object 00183: -3.934 -3.02 -3.986
+Object 00183: 202
+Object 00183: Stone8
+Object 00183: 0
+Object 00183: 0
+Object 00183: COLERE18183
+Object 00183: -1
+Object 00183: 0
+Object 00183: 1 1 1
+Object 00183: 0 0 0
+Object 00183: 0 0 0
+Object 00183: 1
+Object 00183: 0
+Object 00183: 0
+Object 00183: 0 0
+Object 00183: 0
+Object 00183: 1
+Object 00183: 0
+Object 00183: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00183: 0000000000000
+Object 00183: 0 0
+Object 00183: # 0 0 0 0 0 0 0 0
+Object 00183: # 0 0 0 0 0 0 0 0
+Object 00183: 0 0
+
+Object 00184: 4
+Object 00184: 0.9644 0.03556 0
+Object 00184: 0.5939 0.02112 0.5939
+Object 00184: 0 0 0
+Object 00184: -3.934 -2.915 -3.989
+Object 00184: 7
+Object 00184: Stone8
+Object 00184: 0
+Object 00184: 0
+Object 00184: COLLERET184
+Object 00184: -1
+Object 00184: 0
+Object 00184: 1 1 1
+Object 00184: 0 0 0
+Object 00184: 0 0 0
+Object 00184: 1
+Object 00184: 0
+Object 00184: 0
+Object 00184: 0 0
+Object 00184: 0
+Object 00184: 1
+Object 00184: 0
+Object 00184: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00184: 0000000000000
+Object 00184: 0 0
+Object 00184: # 0 0 0 0 0 0 0 0
+Object 00184: # 0 0 0 0 0 0 0 0
+Object 00184: 0 0
+
+Object 00185: 4
+Object 00185: 0.8819 0.1181 0
+Object 00185: 0.8376 0.1029 0.8376
+Object 00185: 0 0 0
+Object 00185: -3.936 -1.356 -3.987
+Object 00185: 7
+Object 00185: Stone8
+Object 00185: 0
+Object 00185: 0
+Object 00185: ANN190084185
+Object 00185: -1
+Object 00185: 0
+Object 00185: 1 1 1
+Object 00185: 0 0 0
+Object 00185: 0 0 0
+Object 00185: 1
+Object 00185: 0
+Object 00185: 0
+Object 00185: 0 0
+Object 00185: 0
+Object 00185: 1
+Object 00185: 0
+Object 00185: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00185: 0000000000000
+Object 00185: 0 0
+Object 00185: # 0 0 0 0 0 0 0 0
+Object 00185: # 0 0 0 0 0 0 0 0
+Object 00185: 0 0
+
+Object 00186: 4
+Object 00186: 0.8819 0.1181 0
+Object 00186: 0.8973 0.1103 0.8973
+Object 00186: 0 0 0
+Object 00186: -3.936 -1.177 -3.987
+Object 00186: 7
+Object 00186: Stone8
+Object 00186: 0
+Object 00186: 0
+Object 00186: ANN191085186
+Object 00186: -1
+Object 00186: 0
+Object 00186: 1 1 1
+Object 00186: 0 0 0
+Object 00186: 0 0 0
+Object 00186: 1
+Object 00186: 0
+Object 00186: 0
+Object 00186: 0 0
+Object 00186: 0
+Object 00186: 1
+Object 00186: 0
+Object 00186: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00186: 0000000000000
+Object 00186: 0 0
+Object 00186: # 0 0 0 0 0 0 0 0
+Object 00186: # 0 0 0 0 0 0 0 0
+Object 00186: 0 0
+
+Object 00187: 0
+Object 00187: 0 0 0
+Object 00187: 0.345 0.1621 0.345
+Object 00187: 0 0 0
+Object 00187: -3.937 -3.194 -3.986
+Object 00187: 14
+Object 00187: Stone8
+Object 00187: 0
+Object 00187: 0
+Object 00187: SOUS_TET187
+Object 00187: -1
+Object 00187: 0
+Object 00187: 1 1 1
+Object 00187: 0 0 0
+Object 00187: 0 0 0
+Object 00187: 1
+Object 00187: 0
+Object 00187: 0
+Object 00187: 0 0
+Object 00187: 0
+Object 00187: 1
+Object 00187: 0
+Object 00187: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00187: 0000000000000
+Object 00187: 0 0
+Object 00187: # 0 0 0 0 0 0 0 0
+Object 00187: # 0 0 0 0 0 0 0 0
+Object 00187: 0 0
+
+Object 00188: 4
+Object 00188: 0.8819 0.1181 0
+Object 00188: 0.3611 0.04437 0.3611
+Object 00188: 0 0 0
+Object 00188: -3.936 -3.358 -3.987
+Object 00188: 177
+Object 00188: Stone8
+Object 00188: 0
+Object 00188: 0
+Object 00188: ANN00190188
+Object 00188: -1
+Object 00188: 0
+Object 00188: 1 1 1
+Object 00188: 0 0 0
+Object 00188: 0 0 0
+Object 00188: 1
+Object 00188: 0
+Object 00188: 0
+Object 00188: 0 0
+Object 00188: 0
+Object 00188: 1
+Object 00188: 0
+Object 00188: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00188: 0000000000000
+Object 00188: 0 0
+Object 00188: # 0 0 0 0 0 0 0 0
+Object 00188: # 0 0 0 0 0 0 0 0
+Object 00188: 0 0
+
+Object 00189: 3
+Object 00189: 0 0 0
+Object 00189: 0.5741 0.6756 0.5741
+Object 00189: 0 0 180
+Object 00189: -3.934 -3.322 -3.986
+Object 00189: 202
+Object 00189: Stone8
+Object 00189: 0
+Object 00189: 0
+Object 00189: COLERE19189
+Object 00189: -1
+Object 00189: 0
+Object 00189: 1 1 1
+Object 00189: 0 0 0
+Object 00189: 0 0 0
+Object 00189: 1
+Object 00189: 0
+Object 00189: 0
+Object 00189: 0 0
+Object 00189: 0
+Object 00189: 1
+Object 00189: 0
+Object 00189: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00189: 0000000000000
+Object 00189: 0 0
+Object 00189: # 0 0 0 0 0 0 0 0
+Object 00189: # 0 0 0 0 0 0 0 0
+Object 00189: 0 0
+
+Object 00190: 2
+Object 00190: 0 0 0
+Object 00190: 0.1612 0.2649 0.1274
+Object 00190: 0 0 0
+Object 00190: -3.937 -4.267 -3.986
+Object 00190: 1
+Object 00190: Stone8
+Object 00190: 0
+Object 00190: 0
+Object 00190: CROIX_RO190
+Object 00190: -1
+Object 00190: 0
+Object 00190: 1 1 1
+Object 00190: 0 0 0
+Object 00190: 0 0 0
+Object 00190: 1
+Object 00190: 0
+Object 00190: 0
+Object 00190: 0 0
+Object 00190: 0
+Object 00190: 1
+Object 00190: 0
+Object 00190: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00190: 0000000000000
+Object 00190: 0 0
+Object 00190: # 0 0 0 0 0 0 0 0
+Object 00190: # 0 0 0 0 0 0 0 0
+Object 00190: 0 0
+
+Object 00191: 2
+Object 00191: 0 0 0
+Object 00191: 0.2728 0.09302 0.1274
+Object 00191: 0 0 0
+Object 00191: -3.941 -4.302 -3.986
+Object 00191: 1
+Object 00191: Stone8
+Object 00191: 0
+Object 00191: 0
+Object 00191: CROIX_19191
+Object 00191: -1
+Object 00191: 0
+Object 00191: 1 1 1
+Object 00191: 0 0 0
+Object 00191: 0 0 0
+Object 00191: 1
+Object 00191: 0
+Object 00191: 0
+Object 00191: 0 0
+Object 00191: 0
+Object 00191: 1
+Object 00191: 0
+Object 00191: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00191: 0000000000000
+Object 00191: 0 0
+Object 00191: # 0 0 0 0 0 0 0 0
+Object 00191: # 0 0 0 0 0 0 0 0
+Object 00191: 0 0
+
+Object 00192: 13
+Object 00192: 0 -2.297e+018 0
+Object 00192: 0.578 0.07252 0.581
+Object 00192: 0 0 0
+Object 00192: -3.934 -4.002 -3.986
+Object 00192: 12
+Object 00192: Stone8
+Object 00192: 0
+Object 00192: 0
+Object 00192: Sphere114192
+Object 00192: 0
+Object 00192: 0
+Object 00192: 1 1 1
+Object 00192: 0 0 0
+Object 00192: 0 0 0
+Object 00192: 1
+Object 00192: 0
+Object 00192: 0
+Object 00192: 0 0
+Object 00192: 0
+Object 00192: 1
+Object 00192: 14
+Object 00192: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00192: 0000000000000
+Object 00192: 0 0
+Object 00192: # 0 0 0 0 0 0 0 0
+Object 00192: # 0 0 0 0 0 0 0 0
+Object 00192: 0 0
+
+Object 00193: 1
+Object 00193: 0 0 0
+Object 00193: 1.203 1.203 1.203
+Object 00193: 0 0 0
+Object 00193: -5.806 -2.071 -5.024
+Object 00193: 7
+Object 00193: Metal_Chrome_1
+Object 00193: 0
+Object 00193: 0
+Object 00193: Bille
+Object 00193: -1
+Object 00193: 0
+Object 00193: 1 1 1
+Object 00193: 0 0 0
+Object 00193: 0 0 0
+Object 00193: 1
+Object 00193: 0
+Object 00193: 0
+Object 00193: 0 0
+Object 00193: 0
+Object 00193: 1
+Object 00193: 8
+Object 00193: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00193: 0000000000000
+Object 00193: 0 0
+Object 00193: # 0 0 0 0 0 0 0 0
+Object 00193: # 0 0 0 0 0 0 0 0
+Object 00193: 0 0
+
+Object 00194: 1
+Object 00194: 0 0 0
+Object 00194: 2.088 2.088 2.088
+Object 00194: 0 0 0
+Object 00194: 5.743 -2.966 -2.264
+Object 00194: 7
+Object 00194: Metal_Chrome_1
+Object 00194: 0
+Object 00194: 0
+Object 00194: Bille194
+Object 00194: -1
+Object 00194: 0
+Object 00194: 1 1 1
+Object 00194: 0 0 0
+Object 00194: 0 0 0
+Object 00194: 1
+Object 00194: 0
+Object 00194: 0
+Object 00194: 0 0
+Object 00194: 0
+Object 00194: 1
+Object 00194: 7
+Object 00194: 0.00 0 0 0 0 0 0 0 0 0 0 0 0 0
+Object 00194: 0000000000000
+Object 00194: 0 0
+Object 00194: # 0 0 0 0 0 0 0 0
+Object 00194: # 0 0 0 0 0 0 0 0
+Object 00194: 0 0
+
+End of file: CHESS.SCN

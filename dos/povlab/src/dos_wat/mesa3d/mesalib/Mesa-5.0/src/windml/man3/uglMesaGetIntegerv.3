@@ -1,0 +1,37 @@
+.TH uglMesaGetIntegerv "3" "AOUT 2001" "WindML/Mesa" "WRS"
+
+.SH NAME
+uglMesaGetIntegerv \- Return an integer value like glGetIntegerv
+
+.SH SYNOPSIS
+.B #include <GL/uglmesa.h>
+.PP
+.BI "uglMesaGetIntegerv (GLint " pname ", GLint * " value );
+
+.SH DESCRIPTION
+The \fBuglMesaGetIntegerv\fR function returns an integer value like
+glGetIntegerv
+
+.SH INPUT VALUES
+\fIpname\fR - can takes the following values
+      UGL_MESA_LEFT_X, return the x axis value of the most left pixel
+      UGL_MESA_TOP_Y, return the y axis value of the topper pixel
+      UGL_MESA_WIDTH, return current image width
+      UGL_MESA_HEIGHT, return current image height
+      UGL_MESA_DISPLAY_WIDTH, return screen width
+      UGL_MESA_DISPLAY_HEIGHT, return screen height
+      UGL_MESA_ROW_LENGTH, return row length in pixels
+      UGL_MESA_RGB, return true if RGB mode
+      UGL_MESA_COLOR_INDEXED, return true if color indexed
+      UGL_MESA_DOUBLE_BUFFER, return true if it uses a double buffer
+      UGL_MESA_SINGLE_BUFFER, return true if it only uses a single buffer
+      UGL_MESA_DOUBLE_BUFFER_SOFTWARE, return true if the double buffer is software (malloc)
+      case UGL_MESA_DOUBLE_BUFFER_HARDWARE, return true if the double buffer is hardware (video memory)
+.PP
+\fIvalue\fR - pointer to integer in which to return result.
+
+.SH RETURN VALUE
+No value is returned.
+
+.SH COPYRIGHT
+Copyright \(co 2001 Wind River Systems, Inc.

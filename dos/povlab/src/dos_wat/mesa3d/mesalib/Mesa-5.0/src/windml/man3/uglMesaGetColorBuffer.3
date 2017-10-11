@@ -1,0 +1,28 @@
+.TH uglMesaGetGetColorBuffer "3" "AOUT 2001" "WindML/Mesa" "WRS"
+
+.SH NAME
+uglMesaGetColorBuffer \- Return the color buffer associated with a WindML/Mesa context
+
+.SH SYNOPSIS
+.B #include <GL/uglmesa.h>
+.PP
+.nf
+.BI "GLboolean uglMesaGetColorBuffer (GLint *" width ", GLint *" height ","
+.BI "                                 GLint *" format ", void **" buffer );
+.fi
+
+.SH DESCRIPTION
+The \fBuglMesaGetColorBuffer\fR function returns the color buffer associated with a WindML/Mesa context.
+
+.SH INPUT VALUES
+\fIwidth, height\fR - size of buffer in pixels
+.PP
+\fIformat\fR - buffer format (UGLMESA_FORMAT)
+.PP
+\fIbuffer\fR - pointer to color buffer values
+
+.SH RETURN VALUES
+GL_TRUE or GL_FALSE to indicate success or failure.
+
+.SH COPYRIGHT
+Copyright \(co 2001 Wind River Systems, Inc.

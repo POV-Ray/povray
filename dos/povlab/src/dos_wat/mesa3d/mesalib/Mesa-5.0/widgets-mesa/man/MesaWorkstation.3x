@@ -1,0 +1,264 @@
+.rn '' }`
+''' $RCSfile: MesaWorkstation.3x,v $$Revision: 1.1.1.1 $$Date: 1999/08/19 00:55:42 $
+''' 
+''' $Log: MesaWorkstation.3x,v $
+''' Revision 1.1.1.1  1999/08/19 00:55:42  jtg
+''' Imported sources
+'''
+''' Revision 1.1  1999/02/25 01:55:01  brianp
+''' initial check-in
+'''
+''' 
+.de Sh
+.br
+.if t .Sp
+.ne 5
+.PP
+\fB\\$1\fR
+.PP
+..
+.de Sp
+.if t .sp .5v
+.if n .sp
+..
+.de Ip
+.br
+.ie \\n(.$>=3 .ne \\$3
+.el .ne 3
+.IP "\\$1" \\$2
+..
+.de Vb
+.ft CW
+.nf
+.ne \\$1
+..
+.de Ve
+.ft R
+
+.fi
+..
+'''
+'''
+'''     Set up \*(-- to give an unbreakable dash;
+'''     string Tr holds user defined translation string.
+'''     Bell System Logo is used as a dummy character.
+'''
+.tr \(*W-|\(bv\*(Tr
+.ie n \{\
+.ds -- \(*W-
+.if (\n(.H=4u)&(1m=24u) .ds -- \(*W\h'-12u'\(*W\h'-12u'-\" diablo 10 pitch
+.if (\n(.H=4u)&(1m=20u) .ds -- \(*W\h'-12u'\(*W\h'-8u'-\" diablo 12 pitch
+.ds L" ""
+.ds R" ""
+.ds L' '
+.ds R' '
+'br\}
+.el\{\
+.ds -- \(em\|
+.tr \*(Tr
+.ds L" ``
+.ds R" ''
+.ds L' `
+.ds R' '
+.if t .ds PI \(*p
+.if n .ds PI PI
+'br\}
+.TH MESAWORKSTATION 1 "\*(RP"
+.UC
+.if n .hy 0 
+.if n .na
+.ds C+ C\v'-.1v'\h'-1p'\s-2+\h'-1p'+\s0\v'.1v'\h'-1p'
+.de CQ          \" put $1 in typewriter font
+.ft CW
+'if n "\c
+'if t \\&\\$1\c
+'if n \\&\\$1\c
+'if n \&"
+\\&\\$2 \\$3 \\$4 \\$5 \\$6 \\$7
+'.ft R
+..
+.\" @(#)ms.acc 1.5 88/02/08 SMI; from UCB 4.2
+.	\" AM - accent mark definitions
+.bd S B 3
+.	\" fudge factors for nroff and troff
+.if n \{\
+.	ds #H 0
+.	ds #V .8m
+.	ds #F .3m
+.	ds #[ \f1
+.	ds #] \fP
+.\}
+.if t \{\
+.	ds #H ((1u-(\\\\n(.fu%2u))*.13m)
+.	ds #V .6m
+.	ds #F 0
+.	ds #[ \&
+.	ds #] \&
+.\}
+.	\" simple accents for nroff and troff
+.if n \{\
+.	ds ' \&
+.	ds ` \&
+.	ds ^ \&
+.	ds , \&
+.	ds ~ ~
+.	ds ? ?
+.	ds ! !
+.	ds / 
+.	ds q 
+.\}
+.if t \{\
+.	ds ' \\k:\h'-(\\n(.wu*8/10-\*(#H)'\'\h"|\\n:u"
+.	ds ` \\k:\h'-(\\n(.wu*8/10-\*(#H)'\`\h'|\\n:u'
+.	ds ^ \\k:\h'-(\\n(.wu*10/11-\*(#H)'^\h'|\\n:u'
+.	ds , \\k:\h'-(\\n(.wu*8/10)',\h'|\\n:u'
+.	ds ~ \\k:\h'-(\\n(.wu-\*(#H-.1m)'~\h'|\\n:u'
+.	ds ? \s-2c\h'-\w'c'u*7/10'\u\h'\*(#H'\zi\d\s+2\h'\w'c'u*8/10'
+.	ds ! \s-2\(or\s+2\h'-\w'\(or'u'\v'-.8m'.\v'.8m'
+.	ds / \\k:\h'-(\\n(.wu*8/10-\*(#H)'\z\(sl\h'|\\n:u'
+.	ds q o\h'-\w'o'u*8/10'\s-4\v'.4m'\z\(*i\v'-.4m'\s+4\h'\w'o'u*8/10'
+.\}
+.	\" troff and (daisy-wheel) nroff accents
+.ds : \\k:\h'-(\\n(.wu*8/10-\*(#H+.1m+\*(#F)'\v'-\*(#V'\z.\h'.2m+\*(#F'.\h'|\\n:u'\v'\*(#V'
+.ds 8 \h'\*(#H'\(*b\h'-\*(#H'
+.ds v \\k:\h'-(\\n(.wu*9/10-\*(#H)'\v'-\*(#V'\*(#[\s-4v\s0\v'\*(#V'\h'|\\n:u'\*(#]
+.ds _ \\k:\h'-(\\n(.wu*9/10-\*(#H+(\*(#F*2/3))'\v'-.4m'\z\(hy\v'.4m'\h'|\\n:u'
+.ds . \\k:\h'-(\\n(.wu*8/10)'\v'\*(#V*4/10'\z.\v'-\*(#V*4/10'\h'|\\n:u'
+.ds 3 \*(#[\v'.2m'\s-2\&3\s0\v'-.2m'\*(#]
+.ds o \\k:\h'-(\\n(.wu+\w'\(de'u-\*(#H)/2u'\v'-.3n'\*(#[\z\(de\v'.3n'\h'|\\n:u'\*(#]
+.ds d- \h'\*(#H'\(pd\h'-\w'~'u'\v'-.25m'\f2\(hy\fP\v'.25m'\h'-\*(#H'
+.ds D- D\\k:\h'-\w'D'u'\v'-.11m'\z\(hy\v'.11m'\h'|\\n:u'
+.ds th \*(#[\v'.3m'\s+1I\s-1\v'-.3m'\h'-(\w'I'u*2/3)'\s-1o\s+1\*(#]
+.ds Th \*(#[\s+2I\s-2\h'-\w'I'u*3/5'\v'-.3m'o\v'.3m'\*(#]
+.ds ae a\h'-(\w'a'u*4/10)'e
+.ds Ae A\h'-(\w'A'u*4/10)'E
+.ds oe o\h'-(\w'o'u*4/10)'e
+.ds Oe O\h'-(\w'O'u*4/10)'E
+.	\" corrections for vroff
+.if v .ds ~ \\k:\h'-(\\n(.wu*9/10-\*(#H)'\s-2\u~\d\s+2\h'|\\n:u'
+.if v .ds ^ \\k:\h'-(\\n(.wu*10/11-\*(#H)'\v'-.4m'^\v'.4m'\h'|\\n:u'
+.	\" for low resolution devices (crt and lpr)
+.if \n(.H>23 .if \n(.V>19 \
+\{\
+.	ds : e
+.	ds 8 ss
+.	ds v \h'-1'\o'\(aa\(ga'
+.	ds _ \h'-1'^
+.	ds . \h'-1'.
+.	ds 3 3
+.	ds o a
+.	ds d- d\h'-1'\(ga
+.	ds D- D\h'-1'\(hy
+.	ds th \o'bp'
+.	ds Th \o'LP'
+.	ds ae ae
+.	ds Ae AE
+.	ds oe oe
+.	ds Oe OE
+.\}
+.rm #[ #] #H #V #F C
+.SH "NAME"
+MesaWorkstation \- A simple workstation abstraction widget for Mesa/X
+.SH "DESCRIPTION"
+.SH "Resources"
+The following X resources are available in addition to the \fBMesaDrawingArea\fR
+resources:
+.PP
+.Vb 7
+\&  ___________________________________________________________________________
+\&  |                    |                    |         |                      |
+\&  | Name               | Class              | Type    | OpenGL attribute     |
+\&  |____________________|____________________|_________|______________________|
+\&  |                    |                    |         |                      |
+\&  |                    |                    |         |                      |
+\&  |____________________|____________________|_________|______________________|
+.Ve
+.SH "Actions"
+.Ip "Projection ()" 4
+.Ip "Move ()" 4
+.SH "Translations"
+.Ip "~Shift<Key>Left: \fIMove(l)\fR" 4
+.Ip "Shift<Key>Left: \fIMove(l,10)\fR" 4
+.Ip "~Shift<Key>Right: \fIMove(r)\fR" 4
+.Ip "Shift<Key>Right: \fIMove(r,10)\fR" 4
+.Ip "~Shift<Key>Up: \fIMove(u)\fR" 4
+.Ip "Shift<Key>Up: \fIMove(u,10)\fR" 4
+.Ip "~Shift<Key>Down: \fIMove(d)\fR" 4
+.Ip "Shift<Key>Down: \fIMove(d,10)\fR" 4
+.Ip "<Key>plus: \fIMove(+)\fR" 4
+.Ip "<Key>minus: \fIMove(\-)\fR" 4
+.Ip "~Shift<Key>l: \fIProjection(l)\fR" 4
+.Ip "Shift<Key>l: \fIProjection(L)\fR" 4
+.Ip "~Shift<Key>r: \fIProjection(r)\fR" 4
+.Ip "Shift<Key>r: \fIProjection(R)\fR" 4
+.Ip "~Shift<Key>b: \fIProjection(b)\fR" 4
+.Ip "Shift<Key>b: \fIProjection(B)\fR" 4
+.Ip "~Shift<Key>t: \fIProjection(t)\fR" 4
+.Ip "Shift<Key>t: \fIProjection(T)\fR" 4
+.Ip "~Shift<Key>n: \fIProjection(n)\fR" 4
+.Ip "Shift<Key>n: \fIProjection(N)\fR" 4
+.Ip "~Shift<Key>f: \fIProjection(f)\fR" 4
+.Ip "Shift<Key>f: \fIProjection(F)\fR" 4
+.Ip "~Shift<Key>a: \fIProjection(a)\fR" 4
+.Ip "Shift<Key>a: \fIProjection(A)\fR" 4
+.Ip "<Key>p: \fIProjection(p)\fR" 4
+.Ip "<Key>o: \fIProjection(o)\fR" 4
+.SH "Utility functions"
+The following utility functions are available
+.Ip "void GLwBeginProjection (Widget w)" 4
+.Ip "void GLwEndProjection (void)" 4
+The following code snippet selects perspective projection for the
+workstation \fIws\fR:
+.Sp
+.Vb 3
+\&        GLwBeginProjection (ws);
+\&          glFrustum (-1.0, 1.0, -1.0, 1.0, 1.0, 10.0);
+\&        GLwEndProjection ();
+.Ve
+During redisplay, this will be executed as a display list with the
+matrix mode set to \fI\s-1GL_PROJECTION\s0\fR and an identity matrix on top of
+the projection matrix stack.
+.Ip "void GLwPostProjectionList (Widget w, GLuint p)" 4
+.Ip "void GLwPostProjectionMatrix (Widget w, GLdouble *m)" 4
+.Ip "void GLwPostCurrentProjection (Widget w)" 4
+.Ip "void GLwUnpostProjection (Widget w)" 4
+.Ip "GLuint GLwGetProjectionList (Widget w)" 4
+.Ip "int GLwGetProjectionMatrix (Widget w, GLdouble *m)" 4
+.Ip "void GLwSetFrustumProjection (Widget w, GLdouble left, GLdouble right, 	GLdouble bottom, GLdouble top, GLdouble near, GLdouble far)" 4
+.Ip "void GLwSetOrthoProjection (Widget w, GLdouble left, GLdouble right, 	GLdouble bottom, GLdouble top, GLdouble near, GLdouble far)" 4
+.Ip "void GLwBeginView (Widget w)" 4
+.Ip "void GLwEndView (void)" 4
+The following code snippet selects a view from the z-axis for the
+workstation \fIws\fR:
+.Sp
+.Vb 5
+\&        GLwBeginView (ws);
+\&          gluLookAt (0.0, 0.0, 3.0,
+\&                     0.0, 0.0, 0.0,
+\&                     0.0, 1.0, 0.0);
+\&        GLwEndView ();
+.Ve
+During redisplay, this will be executed as a display list with the
+matrix mode set to \fI\s-1GL_MODELVIEW\s0\fR and an identity matrix on top of
+the model view matrix stack.
+.Ip "void GLwPostViewList (Widget w, GLuint v)" 4
+.Ip "void GLwPostViewMatrix (Widget w, GLdouble *m)" 4
+.Ip "void GLwPostCurrentView (Widget w)" 4
+.Ip "void GLwUnpostView (Widget w)" 4
+.Ip "GLuint GLwGetViewList (Widget w)" 4
+.Ip "int GLwGetViewMatrix (Widget w, GLdouble *m)" 4
+.Ip "void GLwSetPolarView (Widget w, GLdouble r, GLdouble theta, GLdouble phi)" 4
+.Ip "void GLwPostObject (Widget w, GLuint o)" 4
+posts \fIobject\fR to \fIw\fR.
+.Ip "void GLwUnpostObject (Widget w, GLuint o)" 4
+.Ip "void GLwUnpostAllObjects (Widget w)" 4
+.Ip "void GLwRedrawObjects (Widget w)" 4
+force a redraw of all objects posted to \fIw\fR.
+.SH "SEE ALSO"
+the \fIGLwDrawingArea\fR manpage, the \fIMesaDrawingArea\fR manpage
+.SH "AUTHOR"
+Thorsten.Ohl @ Physik.TH\-Darmstadt.de
+.SH "DATE"
+$Id: MesaWorkstation.3x,v 1.1.1.1 1999/08/19 00:55:42 jtg Exp $
+
+.rn }` ''

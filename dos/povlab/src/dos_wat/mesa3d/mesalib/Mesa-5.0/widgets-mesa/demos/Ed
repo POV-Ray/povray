@@ -1,0 +1,27 @@
+! Ed --
+! $Id: Ed,v 1.1.1.1 1999/08/19 00:55:42 jtg Exp $
+!
+! X11 Resources for the Mesa Workstation Widget
+*MesaWorkstation.debug: false
+*MesaWorkstation.rgba: false
+*MesaWorkstation.installColormap: true
+*MesaWorkstation.doublebuffer: true
+*MesaWorkstation.ximage: false
+*MesaWorkstation.translations: #augment \
+   <Key>q: Quit()\n\
+   <Key>Return: Next()\n\
+   <Key>space: Next()
+!
+! X11 Resources for the demo program
+*help.label: Help
+*about.label: About ed
+*quit.label: Exit
+*next.label: Next event
+*mesa.width: 400
+*mesa.height: 400
+*mesax.width: 100
+*mesax.height: 100
+*mesay.width: 100
+*mesay.height: 100
+*mesaz.width: 100
+*mesaz.height: 100

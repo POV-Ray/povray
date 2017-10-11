@@ -1,0 +1,99 @@
+Content-type: text/html
+
+<HTML><HEAD><TITLE>Manpage of uglMesaMakeCurrentContext</TITLE>
+</HEAD><BODY>
+<H1>uglMesaMakeCurrentContext</H1>
+Section: WRS (3)<BR>Updated: AOUT 2001<BR><A HREF="#index">Index</A>
+<A HREF="http://localhost/cgi-bin/man/man2html">Return to Main Contents</A><HR>
+
+<P>
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+uglMesaMakeCurrentContext - Bind an UGL_MESA_CONTEXT to an image buffer
+<P>
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>#include &lt;<A HREF="file:/usr/include/GL/uglmesa.h">GL/uglmesa.h</A>&gt;</B>
+
+<P>
+
+<PRE>
+<B>GLboolean uglMesaMakeCurrentContext (UGL_MESA_CONTEXT </B><I>umc</I><B>,</B>
+<B>                                     GLsizei </B><I>left</I><B>, GLsizei </B><I>top</I><B>,</B>
+<B>                                     GLsizei </B><I>width</I><B>, GLsizei </B><I>height</I><B>);</B>
+</PRE>
+
+<P>
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+The <B>uglMesaMakeCurrentContext</B> binds an UGL_MESA_CONTEXT to an
+image buffer. The image buffer is just a block of memory which the
+client provides.  Its size must be at least as large as
+width*height*sizeof(type).  Its address should be a multiple of 4 if
+using RGBA mode.
+<P>
+
+Image data is stored in the order of glDrawPixels: row-major order
+with the lower-left image pixel stored in the first array position
+(ie. bottom-to-top).
+<P>
+
+Since the only type initially supported is GL_UNSIGNED_BYTE, if the
+context is in RGBA mode, each pixel will be stored as a 4-byte RGBA
+value.  If the context is in color indexed mode, each pixel will be
+stored as a 1-byte value.
+<P>
+
+If the context's viewport hasn't been initialized yet, it will now be
+initialized to (0, 0, width, height).
+<P>
+<A NAME="lbAE">&nbsp;</A>
+<H2>INPUT</H2>
+
+<I>umc</I> - a rendering context
+<P>
+
+<I>left, top</I> - coordinates in pixels of (left,top) pixel (0,0) in
+fullscreen mode.
+<P>
+
+<I>width, height</I> - size of image buffer in pixels, at least 1 else fullscreen dimensions are used (UGL_MESA_DISPLAY_WIDTH and UGL_MESA_DISPLAY_HEIGHT).
+<P>
+<A NAME="lbAF">&nbsp;</A>
+<H2>RETURN VALUES</H2>
+
+GL_TRUE if success, GL_FALSE if error because of invalid <I>umc</I>, <I>width</I>&lt;1, <I>height</I>&lt;1, <I>width</I>&gt;internal limit or <I>height</I>&gt;internal limit.
+<P>
+<A NAME="lbAG">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="./uglMesaCreateNewContext.html">uglMesaCreateNewContext</A></B>(3), <B><A HREF="./uglMesaCreateNewContextExt.html">uglMesaCreateNewContextExt</A></B>(3)
+
+<P>
+<A NAME="lbAH">&nbsp;</A>
+<H2>COPYRIGHT</H2>
+
+Copyright &#169; 2001 Wind River Systems, Inc.
+<P>
+
+<HR>
+<A NAME="index">&nbsp;</A><H2>Index</H2>
+<DL>
+<DT><A HREF="#lbAB">NAME</A><DD>
+<DT><A HREF="#lbAC">SYNOPSIS</A><DD>
+<DT><A HREF="#lbAD">DESCRIPTION</A><DD>
+<DT><A HREF="#lbAE">INPUT</A><DD>
+<DT><A HREF="#lbAF">RETURN VALUES</A><DD>
+<DT><A HREF="#lbAG">SEE ALSO</A><DD>
+<DT><A HREF="#lbAH">COPYRIGHT</A><DD>
+</DL>
+<HR>
+This document was created by
+<A HREF="http://localhost/cgi-bin/man/man2html">man2html</A>,
+using the manual pages.<BR>
+Time: 09:32:46 GMT, August 30, 2001
+</BODY>
+</HTML>

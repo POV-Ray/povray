@@ -1,0 +1,81 @@
+#!/bin/sh
+
+# Make a shared library for GGI
+
+#--identification------------------------------------------------------
+
+# $Id: mklib.ggi,v 1.4 1999/11/30 13:02:16 brianp Exp $
+
+# $Log: mklib.ggi,v $
+# Revision 1.4  1999/11/30 13:02:16  brianp
+# restored MAJOR version number in soname
+#
+# Revision 1.3  1999/11/18 15:29:52  brianp
+# removed MAJOR version number from soname
+#
+# Revision 1.2  1999/09/15 15:10:20  brianp
+# added third, tiny version number to arguments
+#
+# Revision 1.1  1999/08/19 13:53:00  brianp
+# initial check-in (post-crash)
+#
+
+
+#--common--------------------------------------------------------------
+
+LIBRARY=$1
+shift 1
+
+MAJOR=$1
+shift 1
+
+MINOR=$1
+shift 1
+
+TINY=$1
+shift 1
+
+OBJECTS=$*
+
+#--platform------------------------------------------------------------
+if [ $LIBRARY = "libglut.so" ] ; then
+	GGILIBS="-L/usr/X11R6/lib -L/usr/X11/lib -lggi -lX11 -lXext -lm"
+fi
+
+if [ $LIBRARY = "libGL.so" ] ; then
+	GGILIBS="-L/usr/X11R6/lib -L/usr/X11/lib -lggi -lX11 -lXext -lm"
+fi
+
+# the following provided by Thomas Hiller (Hiller@tu-harburg.d400.de)
+
+VERSION="${MAJOR}.${MINOR}"
+
+LIBNAME=`basename $LIBRARY`
+ARNAME=`basename $LIBNAME .so`.a
+DIRNAME=`dirname $LIBRARY`
+
+gcc -shared -Wl,-soname,${LIBNAME}.${MAJOR} -o ${LIBRARY}.${VERSION} ${OBJECTS} ${GGILIBS}
+(cd $DIRNAME; ln -s ${LIBNAME}.${VERSION} ${LIBNAME}.${MAJOR})
+
+ln -s ${LIBNAME}.${MAJOR} ${LIBRARY}
+
+
+# also make regular .a files,
+# provided by Danek Duvall (duvall@dhduvall.student.princeton.edu)
+
+ar ruv ${DIRNAME}/${ARNAME} ${OBJECTS}
+ranlib ${DIRNAME}/${ARNAME}
+
+
+# Print a reminder about shared libs:
+DIR=`cd .. ; pwd`
+echo
+echo "******Be sure to add" ${DIR}"/lib to your LD_LIBRARY_PATH variable"
+echo
+sleep 2
+
+
+
+#### NOTES:
+# One Mesa user reports having to run the "ldconfig -v" command to make
+# Linux aware of the shared libs.

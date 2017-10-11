@@ -1,0 +1,118 @@
+Content-type: text/html
+
+<HTML><HEAD><TITLE>Manpage of uglMesaCreateNewContextExt</TITLE>
+</HEAD><BODY>
+<H1>uglMesaCreateNewContextExt</H1>
+Section: WRS (3)<BR>Updated: AOUT 2001<BR><A HREF="#index">Index</A>
+<A HREF="http://localhost/cgi-bin/man/man2html">Return to Main Contents</A><HR>
+
+<P>
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+uglMesaCreateNewContextExt - Create a WindML/Mesa rendering context
+<P>
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>#include &lt;<A HREF="file:/usr/include/GL/uglmesa.h">GL/uglmesa.h</A>&gt;</B>
+
+<P>
+
+<PRE>
+<B>UGL_MESA_CONTEXT uglMesaCreateNewContextExt (</B>
+<B>                 GLenum </B><I>mode</I><B>,</B>
+<B>                 GLint </B><I>depth_bits</I><B>,</B>
+<B>                 GLint </B><I>stencil_bits</I><B>,</B>
+<B>                 GLint </B><I>accum_red_bits</I><B>,</B>
+<B>                 GLint </B><I>accum_green_bits</I><B>,</B>
+<B>                 GLint </B><I>accum_blue_bits</I><B>,</B>
+<B>                 GLint </B><I>accum_alpha_bits</I><B>,</B>
+<B>                 UGL_MESA_CONTEXT </B><I>share_list</I><B>);</B>
+</PRE>
+
+<P>
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+The <B>uglMesaCreateNewContextExt</B> function creates a WindML/Mesa
+rendering context and specifies desired size of depth buffer, stencil
+buffer and accumulation buffer.
+<P>
+
+If you specify zero for <I>depth_bits</I>, <I>stencil_bits</I>,
+<I>accum_[red|gren|blue]_bits</I>, you can save some memory.
+<P>
+<A NAME="lbAE">&nbsp;</A>
+<H2>INPUT</H2>
+
+<I>mode</I> - can takes the following mask values:
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UGL_MESA_SINGLE&nbsp;=&nbsp;single&nbsp;buffer&nbsp;mode
+<P>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UGL_MESA_DOUBLE&nbsp;=&nbsp;double&nbsp;buffer&nbsp;mode,&nbsp;first&nbsp;tries&nbsp;hardware&nbsp;mode&nbsp;and&nbsp;then&nbsp;software&nbsp;mode
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UGL_MESA_DOUBLE_SOFTWARE&nbsp;=&nbsp;double&nbsp;buffer&nbsp;software,&nbsp;fails&nbsp;if&nbsp;impossible
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UGL_MESA_DOUBLE_HARDWARE&nbsp;=&nbsp;double&nbsp;buffer&nbsp;hardware,&nbsp;fails&nbsp;if&nbsp;impossible
+<P>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UGL_MESA_WINDML_EXCLUSIVE&nbsp;=&nbsp;uses&nbsp;only&nbsp;WindML&nbsp;calls&nbsp;to&nbsp;write&nbsp;into&nbsp;the&nbsp;memory&nbsp;screen
+<P>
+
+For example, uglMesaCreateNewContext(UGL_MESA_SINGLE | UGL_MESA_WINDML_EXCLUSIVE) will use a single buffer and will only write into the screen memory with WindML calls. UGL_MESA_DOUBLE_SOFTWARE will be replaced by UGL_MESA_DOUBLE in WindML mode. There is no sense to use single and double buffer at the same time.
+<P>
+
+<I>depth_bits</I> - depth buffer size
+<P>
+
+<I>stencil_bits</I> - stencil buffer size
+<P>
+
+<I>accum_red_bits</I> - accumulation red buffer size
+<P>
+
+<I>accum_green_bits</I> - accumulation green buffer size
+<P>
+
+<I>accum_blue_bits</I> - accumulation blue buffer size
+<P>
+
+<I>accum_alpha_bits</I> - accumulation alpha buffer size
+<P>
+
+<I>share_list</I> - specifies another UGL_MESA_CONTEXT with which to share
+display lists. NULL indicates no sharing.
+<P>
+<A NAME="lbAF">&nbsp;</A>
+<H2>RETURN VALUES</H2>
+
+a UGL_MESA_CONTEXT, or zero if error.
+<P>
+<A NAME="lbAG">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="./uglMesaCreateNewContext.html">uglMesaCreateNewContext</A></B>(3), <B><A HREF="./uglMesaMakeCurrentContext.html">uglMesaMakeCurrentContext</A></B>(3)
+
+<P>
+<A NAME="lbAH">&nbsp;</A>
+<H2>COPYRIGHT</H2>
+
+Copyright &#169; 2001 Wind River Systems, Inc.
+<P>
+<P>
+
+<HR>
+<A NAME="index">&nbsp;</A><H2>Index</H2>
+<DL>
+<DT><A HREF="#lbAB">NAME</A><DD>
+<DT><A HREF="#lbAC">SYNOPSIS</A><DD>
+<DT><A HREF="#lbAD">DESCRIPTION</A><DD>
+<DT><A HREF="#lbAE">INPUT</A><DD>
+<DT><A HREF="#lbAF">RETURN VALUES</A><DD>
+<DT><A HREF="#lbAG">SEE ALSO</A><DD>
+<DT><A HREF="#lbAH">COPYRIGHT</A><DD>
+</DL>
+<HR>
+This document was created by
+<A HREF="http://localhost/cgi-bin/man/man2html">man2html</A>,
+using the manual pages.<BR>
+Time: 09:32:46 GMT, August 30, 2001
+</BODY>
+</HTML>

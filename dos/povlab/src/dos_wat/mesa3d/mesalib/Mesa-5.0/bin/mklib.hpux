@@ -1,0 +1,51 @@
+#!/bin/sh
+
+# Make an HPUX shared library
+# contributed by Jan Springer (springer@nessi.informatik.hab-weimar.de)
+
+#--identification------------------------------------------------------
+
+# $Id: mklib.hpux,v 1.2 1999/09/15 15:10:20 brianp Exp $
+
+# $Log: mklib.hpux,v $
+# Revision 1.2  1999/09/15 15:10:20  brianp
+# added third, tiny version number to arguments
+#
+# Revision 1.1  1999/08/19 13:53:01  brianp
+# initial check-in (post-crash)
+#
+
+
+#--common--------------------------------------------------------------
+
+LIBRARY=$1
+shift 1
+
+MAJOR=$1
+shift 1
+
+MINOR=$1
+shift 1
+
+TINY=$1
+shift 1
+
+OBJECTS=$*
+
+RUNLIB=${LIBRARY}.${MAJOR}
+DEVLIB=${LIBRARY}.sl
+
+
+#--platform------------------------------------------------------------
+
+ld -b -o ${RUNLIB} +b ${RUNLIB} ${OBJECTS}
+ln -s ${RUNLIB} ${DEVLIB}
+
+echo "Be sure to set the LPATH and SHLIB_PATH variables as shown in mklib.hpux"
+
+
+# Comments:
+# You'll need to put the following setenv's in your .cshrc or .login file:
+#
+#   setenv LPATH .:/lib/pa1.1:/usr/lib/pa1.1:/lib:/usr/lib:/usr/lib/X11R5:/usr/lib/Motif1.2:/usr/local/xview3.2/lib:/usr/local/lib:/usr/local/lib/X11
+#   setenv SHLIB_PATH ${LPATH}

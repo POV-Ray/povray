@@ -1,0 +1,126 @@
+
+``A Library Implementation of POSIX Threads for the SPARC / ix86'', Version 3.14
+
+The PART (POSIX / Ada-Runtime Project) is happy to announce a new
+release of the C sources of the Pthreads library.
+
+FSU PThreads Sources:
+USA:    ftp://ftp.cs.fsu.edu/pub/PART/PTHREADS/pthreads.tar.gz OR pthreads.zip
+Europe: http://www.informatik.hu-berlin.de/~mueller/ftp/pub/PART/pthreads.tar.gz
+
+Thread Debugger Sources / Binaries:
+USA:    http://www.cs.fsu.edu/~mueller/TDI
+Europe: http://www.informatik.hu-berlin.de/~mueller/TDI
+
+Papers:
+USA:    http://www.cs.fsu.edu/~mueller/pthreads
+Europe: http://www.informatik.hu-berlin.de/~mueller/pthreads
+
+mail-list: mueller@informatik.hu-berlin.de	Subject: subscribe-pthreads
+
+There is also a Pthreads mailing list distributing information about
+new releases, bug patches and related issues. You can subscribe to the
+mailing list either
+- by sending e-mail to "mueller@informatik.hu-berlin.de" with the
+  subject line "subscribe-pthreads". [If your local mailer inserts an incorrect
+  return address, send mail message with a different subject and include
+  your correct e-mail address.]
+
+As part of the PART project we have been designing and implementing a
+library package of preemptive threads which is compliant with POSIX
+1003.1c. A description of the interface for our Pthreads
+library is also available on ftp. Our implementation is limited to the
+Sun SPARC architecture under SunOS 4.1.x / Solaris 2.x as well as
+Intel ix86 architecture under Linux, SCO, FreeBSD or DOS. We do not
+make any use of Sun's light-weight processes to achieve better
+performance (with one I/O-related exception).
+
+What's NEW:
+
+/*
+  .update: more enhancements for gdb debugging support via TDI, for details see:
+   http://www.informatik.hu-berlin.de/~mueller/TDI/
+  .update: faster I/O for Linux/FreeBSD with async I/O (no fd_server thread)
+  .update: Solaris 2.8 support
+  .update: Linux latest experimental glibc support
+  .bug fix: SunOS: COMP_C3 needed for signal.o
+  .bug fix: SCO: SEGV when no thread ready after SIGCHLD
+   (problem and fix by: Lucian B Landry <blandry@arlut.utexas.edu>)
+
+The following features are included in the current implementation:
+-from POSIX.1c:
+  .thread management: initializing, creating, joining, exiting, and
+   destroying threads
+  .synchronization: mutual exclusion, condition variables
+  .thread-specific data
+  .thread priority scheduling: priority management, preemptive
+   priority scheduling (FIFO, RR),
+   mutex priority ceilings through stack resource policy (SRP)
+  .signals: signal handlers, synchronous and asynchronous wait for
+   signals, masking and sending of signals, sleep, long jumps
+  .cancellation: cleanup handlers, asynchronous, synchronous, and
+   disabled interruptability.
+-from POSIX.1b:
+  .timers: nanosleep, read clock, priority scheduling bounds
+-from POSIX.1:
+  .synchronous I/O for threads (I/O only blocks current thread, not process)
+-others:
+  .perverted scheduling for debugging (MUT_SWITCH, RR_SWITCH, RAND_SWITCH)
+  .stack overflow check causes signal (optional STACK_CHECK)
+  .graceful handling of stack overflow (optional SIGNAL_STACK)
+  .repeated inclusion of header files prevented
+
+The support is currently being extended to include:
+-from POSIX.1c:
+  .process control: fork, wait, waitpid
+   (The above functions are not supported for threads. Their semantics
+    is whatever UNIX semantics for processes is. Consequently, a fork
+    will fork another process with ALL threads being duplicated, not
+    just the executing thread as required by POSIX.4a.
+    The functions exec and _exit behave as required without any
+    change, i.e. the UNIX process level semantics for these functions
+    is also adequate for threads.)
+-from POSIX.1:
+  .asynchronous timer objects
+-other:
+  .heap memory pools
+
+The current scheduling policies are strict priority scheduling
+(according to POSIX.1c FIFO scheduling) which preempts when signals
+are caught or round-robin (RR scheduling) which changes context to
+another thread of the same priority after a time-slice of 20msec.
+Besides asynchronous delivery of signals, context switches only occur
+where required by the priority policy, e.g. when resources (mutexes)
+are locked etc.
+
+"The current implementation has been tested and used as a base to
+implement the GNu Ada Runtime Library (GNARL) for the Gnu NYU Ada
+Translator (GNAT, see ftp://ftp.cs.nyu.edu/pub/gnat/).  But we do not
+make any claims about the completeness or correctness of this
+implementation.
+
+(C)OPYRIGHT NOTICE:
+
+Copyright (C) 1992-2000 the Florida State University
+   Distributed by the Florida State University under the terms of the
+   GNU Library General Public License.
+
+This file is part of Pthreads.
+
+Pthreads is free software; you can redistribute it and/or
+modify it under the terms of the GNU Library General Public
+License as published by the Free Software Foundation (version 2).
+
+Pthreads is distributed "AS IS" in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU Library General Public License for more details.
+
+You should have received a copy of the GNU Library General Public
+License along with Pthreads; see the file COPYING.  If not, write
+to the Free Software Foundation, 675 Mass Ave, Cambridge,
+MA 02139, USA.
+
+Report problems and direct all questions to:
+
+  pthreads-bugs@ada.cs.fsu.edu

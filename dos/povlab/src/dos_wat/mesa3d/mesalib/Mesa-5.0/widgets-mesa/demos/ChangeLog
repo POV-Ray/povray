@@ -1,0 +1,48 @@
+Fri May 19 22:25:58 1995  Thorsten Ohl  <ohl@localhost>
+
+	* cube.c: new API for XMesaCreateContext.
+
+	* ed.c, mcube.c: GLwNshareLists.
+
+Sat Apr 22 16:00:09 1995  Thorsten Ohl  <ohl@localhost>
+
+	* tea.c, ed.c, mcube.c, cube.c: use fallback resources.
+
+Wed Apr 19 02:47:16 1995  Thorsten Ohl  <ohl@localhost>
+
+	* tea.c (main): hardcode RGBA mode, because CI mode won't work
+	anyway.   Use nicer materials.
+
+	* cube.c (main): switch to the new (1.1.4) API.
+
+Wed Apr 12 03:39:33 1995  Thorsten Ohl  <ohl@localhost>
+
+	* tea.c: new demo
+
+Sun Apr  9 23:19:21 1995  Thorsten Ohl  <ohl@localhost>
+
+	* ViewControl.c, ViewControl.c: obsolete
+
+	* ed.c: use the translations of the MesaWorkstation widget.
+
+	* ed.c: new layout, some help.
+
+Tue Apr  4 00:14:32 1995  Thorsten Ohl  <ohl@localhost>
+
+	* Makefile.in (demo.*): new targets for debugging specific 8-bit
+	visuals
+
+Thu Mar 30 23:10:38 1995  Thorsten Ohl  <ohl@localhost>
+
+	* Makefile.in:  `SHELL = /bin/sh'
+
+	* Makefile.in: add `-I$(mesa_srcdir)/include' to CPPFLAGS and
+	-L$(mesa_srcdir)/lib to SYS_LDFLAGS, in case Mesa is not installed
+	yet.
+
+Thu Mar 30 02:02:51 1995  Thorsten Ohl  <ohl@localhost>
+
+	* ed.c (update_angles, update_number): new functions: print the
+	event number.
+
+	* ed.c (next_event, vc_callback): use them.

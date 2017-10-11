@@ -1,0 +1,38 @@
+Please read LEGAL.TXT before any sources modification or utilisation.
+
+
+
+WATCOM 32 C/C++ 10.6 CONSIDERATION
+---------------------------------------------------------------------------------------
+
+You should copy MAKEFILE and LINKFILE into POVLAB folder before compiling. They have
+been extracted from this directory for more lisibility.
+You should edit them as well to match your specific path.
+They're no warnings (level max), except for C++ files.
+
+
+
+
+SOURCE FOLDERS AND DIRECTORIES
+---------------------------------------------------------------------------------------
+
+Please respect folder hierarchie.
+
+open_source : POVLAB source root 
++---dos_wat : compiler version (here DOS WATCOM)
+    +---include : include file for POVLAB
+    +---plugins : plugins folder with library
+    |   +---gateway : plugin
+    |   +---rossler : plugin
+    |   +---sponge : plugin
+    |   +---rose : plugin
+    |   +---web : plugin
+    |   +---grass : plugin
+    |   +---helix : plugin
+    |   +---3dfern : plugin
+    |   +---bubbles : plugin
+    |   +---grid3d : plugin
+    |   \---lps2lab : lparser to POVLAB file converted
+    +---texture : texture utilities sources
+    \---misc : other utilities or tools for POVLAB
+        \---pdblab : PDB to POVLAB file converter

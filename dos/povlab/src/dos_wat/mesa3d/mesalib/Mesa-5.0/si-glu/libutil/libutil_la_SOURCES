@@ -1,0 +1,8 @@
+libutil_la_SOURCES = \
+	error.c \
+	glue.c \
+	gluint.h \
+	mipmap.c \
+	project.c \
+	quad.c \
+	registry.c

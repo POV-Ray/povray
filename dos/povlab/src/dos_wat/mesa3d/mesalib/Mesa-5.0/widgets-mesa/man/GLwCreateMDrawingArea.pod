@@ -1,0 +1,55 @@
+=head1 NAME
+
+GLwCreateMDrawingArea - Create a Motif/GL Drawing Widget.
+
+=head1 SYNOPSIS
+
+  #include <GL/GLwMDrawA.h>
+  Widget GLwCreateMDrawingArea (parent, name, arglist, argcount)
+       Widget   parent;
+       String   name;
+       ArgList  arglist;
+       Cardinal argcount;
+
+=head1 DESCRIPTION
+
+=over 4
+
+=item GLwCreateMDrawingArea
+
+creates an instance of a I<GLwMDrawingArea> widget and returns the
+associated widget ID
+
+=item parent
+
+Specifies the parent widget ID
+
+=item name
+
+Specifies the name of the created widget
+
+=item arglist
+
+Specifies the argument list
+
+=item argcount
+
+Specifies the number of attribute/value pairs in the
+argument list (I<arglist>)
+
+=back
+
+For a complete definition of I<GLwMDrawingAra> and its associated
+resources, see L<GLwMDrawingArea>. 
+
+=head1 RETURN VALUE
+
+Returns the I<GLwMDrawingArea> widget ID.
+
+=head1 RELATED INFORMATION
+
+L<GLwMDrawingArea>.
+
+=head1 DATE
+
+$Id: GLwCreateMDrawingArea.pod,v 1.1.1.1 1999/08/19 00:55:42 jtg Exp $

@@ -1,0 +1,137 @@
+        COMPILING DOCUMENTATION FOR POV-Ray FOR MS-DOS USING WATCOM
+
+
+1.0   INTRODUCTION AND DISCLAIMERS
+
+This documentation is to help you compile the portable C source code into a 
+working executable version of POV-Ray for MS-Dos using a Watcom C compiler.  
+The Watcom compiled version of POV-Ray is designated by ".msdos.wat" after 
+the POV-Ray version number on the opening banner.  Everything in this 
+document ONLY applies to that version.  Other versions will operate under 
+different rules.  This file is NOT the only compiling documentation for 
+POV-Ray.  Before proceeding any farther, you should first read the file 
+COMPILE.DOC in the root directory of the source archive.  It provides 
+important information about the generic parts of POV-Ray.  Also read 
+SOURCE\MSDOS\CMPL_MSD.DOC which provides MS-Dos specific information.
+
+When this document refers to "this directory" it means the 
+SOURCE\MSDOS\WATCOM directory.  All of the compiler-specific files for this 
+version are found in there.  The makefiles are designed under the 
+assumption that you are compiling from this directory.  
+
+This documentation DOES NOT tell you how to use POV-Ray for MS-Dos.  It is 
+assumed you already have obtained the official executable archive compiled 
+for MS-Dos and that you are familiar with using it.  It contains essential 
+user documentation, sample scenes and standard scene include files.  User 
+documentation is in the executable archive in the hypertext file 
+POVHELP.PHE.  The executable archive also includes a help reader program to 
+read PHE files and utilities to translate PHE into other forms.  MS-Dos 
+specific user documentation is in the text file POVMSDOS.DOC in the 
+executable archive.  Watcom specific user documentation can be found in 
+CMPL_WAT.DOC in this directory.
+
+The first question you should ask yourself before proceeding is "Do I 
+really need to compile POV-Ray at all?"  If you do not intend to add any 
+custom or experimental features to the program, or to port it to an 
+unsupported compiler you need not compile this program yourself.
+
+As explained in COMPILE.DOC, if you do want to proceed you should be aware 
+that you are very nearly on your own.  This documentation and other related 
+compiling documentation assumes you know what you are doing.  In general 
+you should not expect any technical support from the POV-Ray Team on how to 
+compile the program.  Everything is provided here "as is".  All we can say 
+with any certainty is that we were able to compile it on our system.  If it 
+doesn't work for you, we probably cannot tell you why.
+
+When making any custom version of POV-Ray or any unofficial compile, please 
+make sure you read and follow all provisions of our license in the file 
+POVLEGAL.DOC.  In general you can modify and use POV-Ray on your own 
+however you want but if you distribute your unofficial version you must 
+follow our rules.  You may not under any circumstances use portions of POV-
+Ray source code in other programs.
+
+
+2.0   SUPPORTED COMPILER VERSIONS
+
+POV-Ray 3.0 must be compiled using a 32-bit protected mode, flat memory 
+model compiler for 386 CPU or better.  It cannot be compiled as a real mode 
+or 286 protected mode program.  It cannot be compiled in small, medium, 
+large or even huge memory models.  
+
+The Watcom C/C++ version 10.6 by Powersoft is the compiler used for our 
+officially distributed version.  It compiles reasonably fast and produces 
+the fastest, most stable executables we have tried.  The major drawback is 
+that the DOS4GW dos extender that comes with it is limited to 16 meg of 
+physical memory and 16 meg virtual memory however other unlimited dos 
+extenders may be purchased.  Many large triangle mesh or recursive object 
+scenes can exceed this limit.  Although we use the current version 10.6, we 
+have successfully used 10.0a, 10.5 and 10.5a versions.  
+
+
+3.0   Libraries
+
+This version requires 4 libraries.  Pre-compiled versions of these 
+libraries are provided in this directory.  The first 2, LIBPNG.LIB and 
+ZLIB.LIB add support for PNG format files.  If you need to re-compile them 
+for any reason, you may use the batch file BUILDPNG.BAT.  It will log to 
+the ..\..\ZLIB directory, erase any previously compiled lib, re-compile 
+ZLIB, copy it to this directory, and cleans up the ZLIB directory.  Then it 
+does the same for LIBPNG.LIB and the ..\..\LIBPNG directory.
+
+PMODE.LIB provides access to video and dos memory from protected mode.  
+ZTIMER.LIB provides a precision timer for the histogram profiling feature.
+There are source files in SOURCE\MSDOS\PMODE and SOURCE\MSDOS\ZTIMER but we 
+have not provided make files.  Parts of these libs are written in assembler
+and require Borland Tasm 4.0 to re-compile.  For this reason we suggest you
+do not attempt to re-compile them unless you absolutely have to do so.  See 
+SOURCE\MSDOS\SCITECH.DOC for more information.
+
+
+4.0   Compiling
+
+To compile POV-Ray type the following command from this directory...
+
+  WMAKE -f MSDOSWAT.MAK
+
+The Watcom compiler will compile each FILE.C into an object file such as 
+FILE.OBJ and these object files are linked with the libs to create 
+POVRAY.EXE.  Error messages are sent to FILE.ERR and may be deleted.  If 
+you do not plan to re-compile, you may DEL *.OBJ to save space.  If you do 
+plan to re-compile, the WMAKE utility will compile only those files which 
+have changed.  
+
+
+5.0   The Causeway Dos Extender
+
+As noted earlier, the DOS4GW dos extender that comes with the Watcom 
+compiler is limited to 16 meg physical memory plus 16 meg virtual memory.  
+Various other dos extenders may be purchased to lift this limit.  The POV-
+Ray Team uses the Causeway Dos extender in its official compilation.  
+Because it is a commercial product we cannot redistribute it with our free 
+source.  After all, we don't give away free Watcom compilers either.  
+
+Our makefiles and source code contains special provisions for using 
+Causeway.  You should install Causeway according to the instructions that 
+came with the product.  Then to re-compile POV-Ray type the following 
+command from this directory...
+
+  WMAKE -f MSDOSWAT.MAK CW=1
+
+Note the libraries need not be re-compiled.  For more info on Causeway, you 
+can contact:
+
+   Postal:         Devore Software & Consulting
+                   PO Box 4283
+                   Naperville, IL  60567-4283
+                   USA
+   CompuServe:     71540,62
+   Internet:       71540.62@compuserve.com
+   Telephone:      1-708-717-6369
+   Fax:            1-708-717-6373
+   BBS:            1-708-717-9679
+   Note: The 708 area code changes to 630 in August of 1996.
+
+Information on other dos extenders was included when you purchased your 
+Watcom compiler.
+
+
