@@ -21,7 +21,7 @@ of report, and CHANGE OR ADD whatever you deem helpful.
 
 
 <!-- Build Problems Only ----------------------------------------------------------------------- -->
-<!-- PLEASE DELETE THIS ENTIRE SECTION for non-build issues. -->
+<!-- PLEASE DELETE THIS ENTIRE SECTION if reporting a non-build issue. -->
 
 ### Windows Build Settings
 
@@ -32,7 +32,8 @@ of report, and CHANGE OR ADD whatever you deem helpful.
  
 ### Unix Build Command Sequence
 
-<!-- Replace the following example with the actual command sequence you're using tro build POV-Ray for Unix: -->
+<!-- Replace the following example with the actual command sequence you're using to build POV-Ray
+for Unix: -->
 <!-- PLEASE DELETE THIS SUBSECTION for non-Unix/Mac builds. -->
 ~~~
 cd unix ; prebuild.sh ; cd ..
@@ -66,7 +67,7 @@ subsection): -->
 
 
 <!-- Non-Build Problems Only ------------------------------------------------------------------- -->
-<!-- PLEASE DELETE THIS ENTIRE SECTION for build issues. -->
+<!-- PLEASE DELETE THIS ENTIRE SECTION if reporting a build issue. -->
 
 ### Steps to Reproduce
 
@@ -86,7 +87,7 @@ subsection): -->
 
 
 <!-- Render Problems Only ---------------------------------------------------------------------- -->
-<!-- PLEASE DELETE THIS ENTIRE SECTION for non-render issues -->
+<!-- PLEASE DELETE THIS ENTIRE SECTION if reporting a non-render issue. -->
 
 ### Render Settings
 
