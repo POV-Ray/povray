@@ -59,6 +59,12 @@ namespace pov
 
 const DBL COORDINATE_LIMIT = 1.0e17;
 
+enum BlackHoleType
+{
+    kBlackHoleSpherical_Original=0,
+    kBlackHoleSpherical_Clamped,
+};
+
 /*****************************************************************************
 * Static functions
 ******************************************************************************/
@@ -117,7 +123,8 @@ void Warp_EPoint (Vector3d& TPoint, const Vector3d& EPoint, const TPATTERN *TPat
 
 bool BlackHoleWarp::WarpPoint(Vector3d& TPoint) const
 {
-    Vector3d C = Center;
+    Vector3d C = Center, Delta, DeltaCenterToPt, DeltaPtToSurface;
+    DBL LenFromCenter, NormLenFromSurface, S;
 
     if (Repeat)
     {
@@ -154,46 +161,82 @@ bool BlackHoleWarp::WarpPoint(Vector3d& TPoint) const
         C[Z] += Repeat_Vector[Z] * blockZ;
     }
 
-    Vector3d Delta = TPoint - C;
-    DBL Length = Delta.length();
+    DeltaCenterToPt = TPoint - C;
+    LenFromCenter   = DeltaCenterToPt.length();
 
-    /* Length is the distance from the centre of the black hole */
-    if (Length >= Radius)
+    /* LenFromCenter is the distance from the centre of the black hole */
+    if (LenFromCenter >= Radius)
         return true;
 
-    if (Type == 0)
+    switch (Type)
     {
-        /* now convert the length to a proportion (0 to 1) that the point
-            is from the edge of the black hole. a point on the perimeter
-            of the black hole will be 0.0; a point at the centre will be
-            1.0; a point exactly halfway will be 0.5, and so forth. */
-        Length = (Radius - Length) / Radius;
+        case kBlackHoleSpherical_Original:
+            /* now convert the length to a proportion (0 to 1) that the point
+                is from the edge of the black hole. a point on the perimeter
+                of the black hole will be 0.0; a point at the centre will be
+                1.0; a point exactly halfway will be 0.5, and so forth. */
+            NormLenFromSurface = (Radius - LenFromCenter) / Radius;
 
-        /* Strength is the magnitude of the transformation effect. firstly,
-            apply the Power variable to Length. this is meant to provide a
-            means of controlling how fast the power of the Black Hole falls
-            off from its centre. if Power is 2.0, then the effect is inverse
-            square. increasing power will cause the Black Hole to be a lot
-            weaker in its effect towards its perimeter.
+            /* Strength is the magnitude of the transformation effect. firstly,
+                apply the Power variable to Length. this is meant to provide a
+                means of controlling how fast the power of the Black Hole falls
+                off from its centre. if Power is 2.0, then the effect is inverse
+                square. increasing power will cause the Black Hole to be a lot
+                weaker in its effect towards its perimeter.
 
-            finally we multiply Strength with the Black Hole's Strength
-            variable. if the resultant value exceeds 1.0 we clip it to 1.0.
-            this means a point will never be transformed by more than its
-            original distance from the centre. the result of this clipping
-            is that you will have an 'exclusion' area near the centre of
-            the black hole where all points whose final value exceeded or
-            equalled 1.0 were moved by a fixed amount. this only happens
-            if the Strength value of the Black Hole was greater than one. */
+                finally we multiply Strength with the Black Hole's Strength
+                variable. if the resultant value exceeds 1.0 we clip it to 1.0.
+                this means a point will never be transformed by more than its
+                original distance from the centre. the result of this clipping
+                is that you will have an 'exclusion' area near the centre of
+                the black hole where all points whose final value exceeded or
+                equalled 1.0 were moved by a fixed amount. this only happens
+                if the Strength value of the Black Hole was greater than one. */
+            S = pow(NormLenFromSurface, Power) * Strength;
+            if (S > 1.0) S = 1.0;
 
-        DBL S = pow (Length, Power) * Strength;
-        if (S > 1.0) S = 1.0;
+            /* if the Black Hole is inverted, it gives the impression of 'push-
+                ing' the pattern away from its centre. otherwise it sucks. */
+            DeltaCenterToPt *= (Inverted ? -S : S);
 
-        /* if the Black Hole is inverted, it gives the impression of 'push-
-            ing' the pattern away from its centre. otherwise it sucks. */
-        Delta *= (Inverted ? -S : S);
+            /* add the scaled Delta to the input point to end up with TPoint. */
+            TPoint += DeltaCenterToPt;
+            break;
+        case kBlackHoleSpherical_Clamped:
+            // Note: The above black_hole method doesn't clamp properly at
+            // the surface of the spherical region for the inward pulling black hole.
+            //
+            // When inverted (pushing outward), clamping S to 1.0 is enough because
+            // we'll never look further inward than the origin of the spherical region
+            // for the point to push outward. Good.
+            //
+            // When pulling inward, clamping S to 1.0 is OK for effects, but it does
+            // not prevent the code from reaching outside the spherical region for
+            // the point to pull. The type below does and provides for a more realistic
+            // and controllable inward pulling black_hole.
+            //
+            NormLenFromSurface = (Radius - LenFromCenter) / Radius;
+            S                  = pow(NormLenFromSurface, Power) * Strength;
 
-        /* add the scaled Delta to the input point to end up with TPoint. */
-        TPoint += Delta;
+            if (Inverted)
+            {
+                if (S > 1.0) S = 1.0;
+                Delta          = DeltaCenterToPt * -S;
+            }
+            else
+            {
+                Delta            = DeltaCenterToPt;
+                Delta.normalize();
+                Delta           *= Radius;
+                DeltaPtToSurface = Delta - DeltaCenterToPt;
+                Delta            = DeltaPtToSurface/(1+S);
+                Delta           *= S;
+            }
+
+            TPoint += Delta;
+            break;
+        default:
+            break;
     }
 
     return true;
