@@ -1,11 +1,11 @@
-version: 3.7+av{build}
+version: 3.8+av{build}
 pull_requests:
   do_not_increment_build_number: true
 branches:
   except:
   - coverity_scan
 
-image: Visual Studio 2015
+image: Visual Studio 2017
 
 shallow_clone: true
 
@@ -13,25 +13,58 @@ matrix:
   fast_finish: true
 
 environment:
-  PovBuildDefs: POV_RAY_IS_AUTOBUILD=1;POV_RAY_BUILD_ID="av$(APPVEYOR_BUILD_NUMBER)";BUILT_BY="AppVeyor";
+  GUIProj: windows/vs2015/povray.sln
+  GUIDefs: POV_RAY_IS_AUTOBUILD=1;POV_RAY_BUILD_ID="av$(APPVEYOR_BUILD_NUMBER)";BUILT_BY="AppVeyor";
+  CUIProj: windows/vs2015/console.vcxproj
+  CUIDefs: $(GUIDefs)VERSION_BASE="3.8";_CONSOLE;
   matrix:
-  - configuration: Release
+  # Graphic User Interface (GUI) build matrix
+  - PovBuildProj: $(GUIProj)
+    PovBuildDefs: $(GUIDefs)
+    configuration: Release
     platform: x64
     bin_dir: bin64
     artifact_suffix: -Win64
-  - configuration: Release-SSE2
+  - PovBuildProj: $(GUIProj)
+    PovBuildDefs: $(GUIDefs)
+    configuration: Release-SSE2
     platform: Win32
     bin_dir: bin32
     artifact_suffix: -Win32-sse2
-  - configuration: Release
+  - PovBuildProj: $(GUIProj)
+    PovBuildDefs: $(GUIDefs)
+    configuration: Release
+    platform: Win32
+    bin_dir: bin32
+    artifact_suffix: -Win32
+  # Console User Interface (CUI) build matrix
+  - PovBuildProj: $(CUIProj)
+    PovBuildDefs: $(CUIDefs)
+    configuration: Release
+    platform: x64
+    bin_dir: bin64
+    artifact_suffix: -Win64
+  - PovBuildProj: $(CUIProj)
+    PovBuildDefs: $(CUIDefs)
+    configuration: Release-SSE2
+    platform: Win32
+    bin_dir: bin32
+    artifact_suffix: -Win32-sse2
+  - PovBuildProj: $(CUIProj)
+    PovBuildDefs: $(CUIDefs)
+    configuration: Release
     platform: Win32
     bin_dir: bin32
     artifact_suffix: -Win32
 
+install:
+  - ECHO Check PovBuildProj=%PovBuildProj%
+  - ECHO Check PovBuildDefs=%PovBuildDefs%
+
 before_build:
 
 build:
-  project: windows/vs2015/povray.sln
+  project: $(PovBuildProj)
   parallel: true
   verbosity: minimal
 

@@ -7,7 +7,7 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -98,6 +98,10 @@ void Scene::StartParser(POVMS_Object& parseOptions)
 
     sceneData->inputFile = parseOptions.TryGetUCS2String(kPOVAttrib_InputFile, "object.pov");
     sceneData->headerFile = parseOptions.TryGetUCS2String(kPOVAttrib_IncludeHeader, "");
+
+    DBL outputWidth  = parseOptions.TryGetFloat(kPOVAttrib_Width, 160);
+    DBL outputHeight = parseOptions.TryGetFloat(kPOVAttrib_Height, 120);
+    sceneData->aspectRatio = outputWidth / outputHeight;
 
     sceneData->defaultFileType = parseOptions.TryGetInt(kPOVAttrib_OutputFileType, DEFAULT_OUTPUT_FORMAT); // TODO - should get DEFAULT_OUTPUT_FORMAT from the front-end
     sceneData->clocklessAnimation = parseOptions.TryGetBool(kPOVAttrib_ClocklessAnimation, false); // TODO - experimental code

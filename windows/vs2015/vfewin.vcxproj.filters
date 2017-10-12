@@ -31,10 +31,10 @@
     <ClCompile Include="..\..\vfe\vfesession.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\vfe\vfeprecomp.cpp" />
     <ClCompile Include="..\..\vfe\win\vfeplatform.cpp">
       <Filter>Source\win</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\vfe\vfeprecomp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\vfe\vfe.h">
@@ -52,9 +52,9 @@
     <ClInclude Include="..\..\vfe\win\syspovimage.h">
       <Filter>Headers\win</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\vfe\vfeprecomp.h" />
     <ClInclude Include="..\..\vfe\win\vfeplatform.h">
       <Filter>Headers\win</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\vfe\vfeprecomp.h" />
   </ItemGroup>
 </Project>

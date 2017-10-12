@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -104,11 +104,6 @@ class Scene
          *  Stop parsing a POV-Ray scene. Parsing may take a few
          *  seconds to stop. Internally stopping is performed by
          *  throwing an exception at well-defined points.
-         *  Note that currently if parsing has been stopped, it
-         *  *cannot* be started again. Eventually this limitation
-         *  will be removed once we have verified that the old
-         *  3.6 parser code can properly handle this condition
-         *  without leaking memory. [trf]
          *  If parsing is not in progress, no action is taken.
          */
         void StopParser();

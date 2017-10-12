@@ -1,0 +1,26 @@
+[OPTIONS]
+Binary TOC=Yes
+Compatibility=1.1 or later
+Compiled file=povray.chm
+Contents file=povray.hhc
+Default Font=Verdana, 8
+Default Window=POV-Ray Help
+Default topic=index.html
+Display compile progress=No
+Error log file=errorlog.txt
+Full text search stop list file=povray.stp
+Full-text search=Yes
+Index file=povray.hhk
+Language=0x409 English (United States)
+Title=POV-Ray Help
+
+[WINDOWS]
+POV-Ray Help="POV-Ray Help","povray.hhc","povray.hhk","index.html","index.html",,"Start",,,0x63520,,0x70387e,[6,1,807,610],0xb0000,,,,,,0
+
+
+[FILES]
+index.html
+povray.js
+
+[INFOTYPES]
+

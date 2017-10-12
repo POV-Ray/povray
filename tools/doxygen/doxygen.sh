@@ -2,7 +2,7 @@
 
 # PLANTUML_JAR_PATH='/usr/bin'
 cd ../..
-POV_VER=`cat unix/VERSION`
+POV_VER=`cat ./VERSION`
 doxygen tools/doxygen/source-doc.cfg
 cd tools/doxygen/source-doc/latex
 make pdf

@@ -12,7 +12,7 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -60,19 +60,27 @@
 #include <cstdarg>
 #include <cstdlib>
 
+
 // C++ standard headers
+#ifdef _CONSOLE
+#include <algorithm>
+#include <limits>
+#endif
 #include <exception>
 #include <list>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
 // boost headers
 #include <boost/intrusive_ptr.hpp>
-#include <boost/tr1/memory.hpp>
 
 #include <io.h>
 #include <fcntl.h>
+
+// use this to verbose debug tracing
+//#define WIN_DEBUG
 
 #ifndef STD_TYPES_DECLARED
 #define STD_TYPES_DECLARED
@@ -93,12 +101,12 @@ using std::list;
 // to in a few other places.
 using std::runtime_error;
 
-// these may actually be the boost implementations, depending on what boost/tr1/memory.hpp has pulled in
-using std::tr1::shared_ptr;
-using std::tr1::weak_ptr;
-using std::tr1::dynamic_pointer_cast;
-using std::tr1::static_pointer_cast;
-using std::tr1::const_pointer_cast;
+// we use the C++11 standard shared pointers
+using std::shared_ptr;
+using std::weak_ptr;
+using std::dynamic_pointer_cast;
+using std::static_pointer_cast;
+using std::const_pointer_cast;
 
 using boost::intrusive_ptr;
 
@@ -112,30 +120,45 @@ using boost::intrusive_ptr;
 
 #ifdef _WIN64
   #define POVRAY_PLATFORM_NAME "win64"
+  #define BUILD_ARCH "Intel-based x86_64"
+  #define BUILT_FOR "Microsoft Windows 64bit"
 #else
   #define POVRAY_PLATFORM_NAME "win32"
+  #define BUILD_ARCH "Intel-based x86"
+  #define BUILT_FOR "Microsoft Windows 32bit"
 #endif
 
 #define ReturnAddress()           NULL
 
+// Pull in additional settings depending on development platform
+
 #if defined(__MINGW32__)                    /* MinGW GCC */
   #error "Currently not supported."
   #include "syspovconfig_mingw32.h"
+  #define COMPILER_VENDOR "MinGW GCC"
 #elif defined(__WATCOMC__)                  /* Watcom C/C++ C32 */
   #error "Currently not supported."
   #include "syspovconfig_watcom.h"
+  #define COMPILER_VENDOR "Watcom C/C++"
 #elif defined(__BORLANDC__)                 /* Borland C/C++ */
   #error "Currently not supported."
   #include "syspovconfig_borland.h"
+  #define COMPILER_VENDOR "Borland C/C++"
 #elif defined(_MSC_VER)                     /* Microsoft and Intel C++ */
   #include "syspovconfig_msvc.h"
+  #define COMPILER_VENDOR "Microsoft Visual C++"
 #else
   #error "unknown compiler configuration"
+  #define COMPILER_VENDOR "Unknown"
 #endif
+
+// Compiler version
 
 #ifndef POV_COMPILER_VER
   #define POV_COMPILER_VER "u"
 #endif
+
+// Define the platform name
 
 #if defined(BUILD_AVX2)
   #define POV_BUILD_INFO POV_COMPILER_VER ".avx2." POVRAY_PLATFORM_NAME
@@ -236,20 +259,34 @@ namespace pov_base
 
 #define POV_MEMMOVE(dst,src,len)            std::memmove((dst),(src),(len))
 #define POV_MEMCPY(dst,src,len)             std::memcpy((dst),(src),(len))
+#define MEM_STATS                           0
 
 #ifdef _CONSOLE
+
+/* Name of package */
+#define PACKAGE "POV-Ray"
+/* Define to the full name of this package. */
+#define PACKAGE_NAME PACKAGE " Console User Interface"
+/* Supported image formats. */
+#define BUILTIN_IMG_FORMATS "gif tga iff ppm pgm hdr png jpeg tiff"
+/* Unsupported image formats. */
+#define MISSING_IMG_FORMATS "none"
+/* I/O restrictions. */
+#define BUILTIN_IO_RESTRICTIONS "enabled"
+/* I/O restrictions. */
+#define IO_RESTRICTIONS_DISABLED 0
+/* SDL display library */
+#define HAVE_LIBSDL
 
 #define POV_MALLOC(size,msg)                malloc (size)
 #define POV_REALLOC(ptr,size,msg)           realloc ((ptr), (size))
 #define POV_FREE(ptr)                       do { free (static_cast<void *>(ptr)); (ptr) = NULL; } while(false)
-#define POV_STRDUP(str)                     strdup(str)
+#define POV_STRDUP(str)                     _strdup(str)
 
 #define NO_RTR                              1
-#define MEM_STATS                           0
 
 #else // not _CONSOLE
 
-#define MEM_STATS                           0
 #define POV_MEM_STATS                       0
 #define WIN_MEM_TRACKING                    0
 

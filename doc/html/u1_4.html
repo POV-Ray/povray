@@ -6,7 +6,7 @@
 <head>
 <meta http-equiv=Content-Type content="text/html; charset=windows-1252">
 <title>Unix Section 4</title>
-<link rel="StyleSheet" href="povray37.css" type="text/css">
+<link rel="StyleSheet" href="povray.css" type="text/css">
 <link rel="shortcut icon" href="favicon.ico">
 
 <!--  NOTE: In order to help users find information about POV-Ray using web      -->
@@ -61,7 +61,7 @@
 <table class="HeaderFooter" width="100%">
 <tr>
   <td colspan=5 align="left" class="HeaderFooter">
-    POV-Ray for Unix <strong class="HeaderFooter">version 3.7.1</strong>
+    POV-Ray for Unix <strong class="HeaderFooter">version 3.8</strong>
   </td>
 </tr>
 <tr >
@@ -100,8 +100,8 @@
 
 <p>The I/O Restrictions are configured by two separate configuration files. This can be a system-wide configuration, or a user configuration file located in the following places, on most systems <code>$PREFIX</code> is <code>/usr/local</code>.</p>
 <ul>
-  <li><code>$PREFIX/etc/povray/3.7/povray.conf</code></li>
-  <li><code>$HOME/.povray/3.7/povray.conf</code></li>
+  <li><code>$PREFIX/etc/povray/vX.y/povray.conf</code></li>
+  <li><code>$HOME/.povray/vX.y/povray.conf</code></li>
 </ul>
 
 <p>POV-Ray will always use the most strict version of what is specified; user settings can only make security more strict.</p>
@@ -159,7 +159,7 @@ setting
 
 <p>If the directory name contains spaces it has to be quoted or doubly-quoted. There can be spaces before and after the equal sign. Read-only and read/write entries can be specified in any order.</p>
 
-<p>If you want the permissions for a specified directory to also extend to all of its subdirectories wildcards are permitted.</p>
+<p>If you want the permissions for a specified directory to also extend to all of its sub-directories wildcards are permitted.</p>
 
 <p>For example:</p>
 <pre>
@@ -167,10 +167,9 @@ read*=directory
 read+write*=directory
 </pre>
 
-<p>Both relative and absolute paths are permitted, so <em>the dot</em> character can be especially useful.  The install directory, typically <code>/usr/local/share/povray-3.7</code> or <code>/usr/share/povray-3.7</code>, can be specified with <code>%INSTALLDIR%</code>, the user home directory with <code>%HOME%</code>.  The install directory and its
-descendents are typically only writable by root; therefore it does not make sense to have <code>%INSTALLDIR%</code> in read/write directory paths.</p>
+<p>Both relative and absolute paths are permitted, so <em>the dot</em> character can be especially useful. The install directory, typically <code>/usr/local/share/povray/vX.y</code> or <code>/usr/share/povray/vX.y</code> can be specified with <code>%INSTALLDIR%</code> and the user home directory with <code>%HOME%</code>. The install directory and its descendants are typically only writable by root; therefore it does not make sense to have <code>%INSTALLDIR%</code> in read/write directory paths.</p>
 
-<p class="Note"><strong>Note:</strong> Since user-level permissions are at least as strict as system-level restrictions, any paths specified in the system-wide <code>povray.conf</code> will also need to be specified in <code>~/.povray/3.7/povray.conf</code> if this file exists.</p>
+<p class="Note"><strong>Note:</strong> Since user-level permissions are at least as strict as system-level restrictions, any paths specified in the system-wide <code>povray.conf</code> will also need to be specified in <code>~/.povray/vX.y/povray.conf</code> if this file exists.</p>
 
 </div>
 <a name="u1_4_4_1"></a>

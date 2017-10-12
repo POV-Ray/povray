@@ -9,7 +9,7 @@
 // -w320 -h240
 // -w800 -h600 +a0.3
 
-#version 3.71;
+#version 3.8;
 
 #declare FRESNEL = off;
 

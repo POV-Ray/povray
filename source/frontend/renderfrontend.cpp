@@ -7,7 +7,7 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -41,6 +41,7 @@
 #include "base/platformbase.h"
 #include "base/textstream.h"
 #include "base/textstreambuffer.h"
+#include "base/version.h"
 #include "base/image/encoding.h"
 
 #include "povms/povmsid.h"
@@ -760,7 +761,7 @@ void InitInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
 
     tsb->printf("\n");
 
-    tsb->printf("Primary POV-Ray 3.7 Architects/Developers: (Alphabetically)\n");
+    tsb->printf("Primary POV-Ray v" POV_RAY_GENERATION " Architects/Developers: (Alphabetically)\n");
     if(POVMSObject_Get(msg, &attrlist, kPOVAttrib_PrimaryDevs) == kNoErr)
     {
         cnt = 0;

@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,12 +38,24 @@
 #ifndef __VFEPLATFORM_H__
 #define __VFEPLATFORM_H__
 
+#ifdef _CONSOLE
+#include <boost/shared_ptr.hpp>
+#include "base/path.h"
+#include "base/stringutilities.h"
+#endif
+
 #include "frontend/shelloutprocessing.h"
+
 #include "vfesession.h"
 
 namespace vfePlatform
 {
   using namespace vfe;
+
+#ifdef _CONSOLE
+  using namespace pov_base;
+  class WinConOptionsProcessor;
+#endif
 
   class WinShelloutProcessing: public pov_frontend::ShelloutProcessing
   {
@@ -98,6 +110,10 @@ namespace vfePlatform
       virtual bool ImageOutputToStdoutSupported(void) const { return m_OptimizeForConsoleOutput; }
       virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height) { return new WinShelloutProcessing(opts, scene, width, height); }
 
+#ifdef _CONSOLE
+      shared_ptr<WinConOptionsProcessor> GetWinConOptions(void) { return m_OptionsProc; }
+#endif
+
       virtual void Clear(bool Notify = true);
 
       const FilenameSet& GetReadFiles(void) const { return m_ReadFiles; }
@@ -126,6 +142,12 @@ namespace vfePlatform
       mutable __int64 m_LastTimestamp;
       mutable __int64 m_TimestampOffset;
 
+#ifdef _CONSOLE
+      ///////////////////////////////////////////////////////////////////////
+      // platform specific configuration options
+      shared_ptr<WinConOptionsProcessor> m_OptionsProc;
+#endif
+
       ////////////////////////////////////////////////////////////////////
       // used to store the location of the temp path. this is used by both
       // GetTemporaryPath() and TestAccessAllowed().
@@ -134,7 +156,7 @@ namespace vfePlatform
       mutable vector<string> m_TempFilenames;
       mutable FilenameSet m_ReadFiles;
       mutable FilenameSet m_WriteFiles;
-  } ;
+  };
 
   ///////////////////////////////////////////////////////////////////////
   // return a number that uniquely identifies the calling thread amongst

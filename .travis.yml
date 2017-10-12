@@ -17,6 +17,7 @@ matrix:
     compiler: clang
 
 sudo: false
+dist: trusty
 
 addons:
   apt:

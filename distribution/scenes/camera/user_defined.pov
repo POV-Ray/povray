@@ -8,7 +8,7 @@
 //
 // +w900 +h450 +a0.1
 
-#version 3.71;
+#version 3.8;
 global_settings { assumed_gamma 1 }
 
 #include "shapes.inc"

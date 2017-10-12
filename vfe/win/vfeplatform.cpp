@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -35,9 +35,18 @@
 ///
 //******************************************************************************
 
+#ifdef _CONSOLE
+// must come first, will pull in configuration macros
+#include "syspovconfig.h"
+#endif
+
 #include <windows.h>
 
 #include "vfe.h"
+
+#ifdef _CONSOLE
+#include "win/console/winoptions.h"
+#endif
 
 #include <boost/algorithm/string.hpp>
 
@@ -59,21 +68,32 @@ namespace vfePlatform
     return (GetCurrentThreadId ());
   }
 
+  //////////////////////////////////////////////////////////////
+  // User-interface functions
+  //////////////////////////////////////////////////////////////
+
   vfeWinSession::vfeWinSession(int id) :
     m_LastTimestamp(0),
     m_TimestampOffset(0),
     vfeSession(id)
   {
-    char str [MAX_PATH];
+#ifdef _CONSOLE
+      m_OptionsProc = shared_ptr<WinConOptionsProcessor>(new WinConOptionsProcessor(this));
+      m_TempPath = Path(m_OptionsProc->GetTemporaryPath().c_str());
+      m_TempPathString = m_OptionsProc->GetTemporaryPath().c_str();
+#else
+      char str[MAX_PATH];
 
-    if (GetTempPath (sizeof (str) - 7, str) == 0)
-      throw vfeException("Could not get temp dir from Windows API");
-    strcat (str, "povwin\\");
-    // if we fail to creat our temp dir, just use the default one
-    if (CreateDirectory(str, NULL) == 0 && GetLastError() != ERROR_ALREADY_EXISTS)
-      GetTempPath (sizeof (str), str);
-    m_TempPath = Path(str);
-    m_TempPathString = str;
+      if (GetTempPath(sizeof(str) - 7, str) == 0)
+          throw vfeException("Could not get temp dir from Windows API");
+      strcat(str, "povwin\\");
+      // if we fail to creat our temp dir, just use the default one
+      if (CreateDirectory(str, NULL) == 0 && GetLastError() != ERROR_ALREADY_EXISTS)
+          GetTempPath(sizeof(str), str);
+      m_TempPath = Path(str);
+      m_TempPathString = str;
+#endif
+
   }
 
   vfeWinSession::~vfeWinSession()
@@ -88,10 +108,6 @@ namespace vfePlatform
     m_WriteFiles.clear();
     vfeSession::Clear(Notify);
   }
-
-  //////////////////////////////////////////////////////////////
-  // User-interface functions
-  //////////////////////////////////////////////////////////////
 
   /////////////////////////////////////////////////////////////////////////
   // this method will get called when a render completes and the image writing
@@ -195,7 +211,11 @@ namespace vfePlatform
   // you would probably display the message immediately.
   void vfeWinSession::NotifyCriticalError (const char *message, const char *filename, int line)
   {
-    MessageBox (NULL, message, "POV-Ray Critical Error", MB_ICONERROR | MB_OK) ;
+#ifdef _CONSOLE
+    fprintf(stderr, "POV-Ray Critical Error: %s", message);
+#else
+    MessageBox(NULL, message, "POV-Ray Critical Error", MB_ICONERROR | MB_OK);
+#endif
   }
 
   ////////////////////////////////////////////////////////////////////////
