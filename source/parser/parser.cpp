@@ -516,24 +516,34 @@ void Parser::InitDefaults(int version)
 {
     // Initialize defaults depending on version:
     // As of v3.8...
+    //   - pigment defaults to `rgb <1,1,1>`
     //   - `ambient` defaults to 0.0.
     //   - Camera `right` length defaults to output image aspect ratio.
     // Prior to that...
+    //   - pigment defaulted to `rgb <0,0,0>`
     //   - `ambient` defaulted to 0.1.
     //   - Camera `right` length defaulted to 1.33.
 
+    unsigned short pigmentType;
+    MathColour pigmentColour;
     double ambientLevel;
     double rightLength;
     if (version >= 380)
     {
+        pigmentType = PLAIN_PATTERN;
+        pigmentColour = MathColour(1.0);
         ambientLevel = 0.0;
         rightLength = sceneData->aspectRatio;
     }
     else
     {
+        pigmentType = NO_PATTERN;
+        pigmentColour = MathColour(0.0);
         ambientLevel = 0.1;
         rightLength = 1.33;
     }
+    Default_Texture->Pigment->Type = pigmentType;
+    Default_Texture->Pigment->colour = TransColour(pigmentColour, 0.0, 0.0);
     Default_Texture->Finish->Ambient = MathColour(ambientLevel);
     Default_Camera.Right = Vector3d(rightLength, 0.0, 0.0);
 }
