@@ -292,7 +292,12 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
             }
 
             /* Intersect ray with all spline segments. */
-            if ((fabs(D[X]) > EPSILON) || (fabs(D[Z]) > EPSILON))
+
+            // TODO - review the quick bailout condition.
+            // While the test is quite simple, it may not kick in frequently enough to warrant the
+            // effort, except in a rather special use case involving an orthographic camera.
+
+            if ((fabs(D[X]) > EPSILON) || (fabs(D[Z]) > EPSILON)) // Quick bailout if ray is parallel to all sides
             {
                 Entry = Spline->Entry;
                 for (j = 0; j < Number; j++, Entry++)
@@ -473,103 +478,107 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
             k3 = P[X] * D[Z] - P[Z] * D[X];
 
             /* Intersect ray with the spline segments. */
-            if ((fabs(D[X]) > EPSILON) || (fabs(D[Z]) > EPSILON))
+
+            // NB: Unlike in the LINEAR_SWEEP case, the ray can't be parallel to each and every side
+            // (except in pathological cases), so there's no quick bailout test for that here.
+            // (The equivalent test would be whether the ray runs through the apex point, but that
+            // test is more complex, and there's also no clear-cut use case where it could be
+            // expected to kick in frequently enough to be of any benefit.)
+
+            Entry = Spline->Entry ;
+            for (j = 0; j < Number; j++, Entry++)
             {
-                Entry = Spline->Entry ;
-                for (j = 0; j < Number; j++, Entry++)
+                /* Test spline's bounding rectangle (modified Cohen-Sutherland). */
+                if (((D[X] >= 0.0) && (P[X] > Entry->x2)) ||
+                    ((D[X] <= 0.0) && (P[X] < Entry->x1)) ||
+                    ((D[Z] >= 0.0) && (P[Z] > Entry->y2)) ||
+                    ((D[Z] <= 0.0) && (P[Z] < Entry->y1)))
                 {
-                    /* Test spline's bounding rectangle (modified Cohen-Sutherland). */
-                    if (((D[X] >= 0.0) && (P[X] > Entry->x2)) ||
-                        ((D[X] <= 0.0) && (P[X] < Entry->x1)) ||
-                        ((D[Z] >= 0.0) && (P[Z] > Entry->y2)) ||
-                        ((D[Z] <= 0.0) && (P[Z] < Entry->y1)))
+                    continue;
+                }
+
+                /* Number of roots found. */
+
+                n = 0;
+                switch (Spline_Type)
+                {
+                    case LINEAR_SPLINE :
+
+                        /* Solve linear equation. */
+                        x[0] = Entry->C[X] * k1 + Entry->C[Y] * k2;
+                        x[1] = Entry->D[X] * k1 + Entry->D[Y] * k2 + k3;
+
+                        if (fabs(x[0]) > EPSILON)
+                            y[n++] = -x[1] / x[0];
+                        break;
+
+                    case QUADRATIC_SPLINE :
+
+                        /* Solve quadratic equation. */
+                        x[0] = Entry->B[X] * k1 + Entry->B[Y] * k2;
+                        x[1] = Entry->C[X] * k1 + Entry->C[Y] * k2;
+                        x[2] = Entry->D[X] * k1 + Entry->D[Y] * k2 + k3;
+
+                        n = Solve_Polynomial(2, x, y, false, 0.0, Thread->Stats());
+                        break;
+
+                    case CUBIC_SPLINE :
+                    case BEZIER_SPLINE :
+
+                        /* Solve cubic equation. */
+                        x[0] = Entry->A[X] * k1 + Entry->A[Y] * k2;
+                        x[1] = Entry->B[X] * k1 + Entry->B[Y] * k2;
+                        x[2] = Entry->C[X] * k1 + Entry->C[Y] * k2;
+                        x[3] = Entry->D[X] * k1 + Entry->D[Y] * k2 + k3;
+
+                        n = Solve_Polynomial(3, x, y, Test_Flag(this, STURM_FLAG), 0.0, Thread->Stats());
+                        break;
+                }
+
+                /* Test roots for valid intersections. */
+
+                while (n--)
+                {
+                    w = y[n];
+
+                    if ((w >= 0.0) && (w <= 1.0))
                     {
-                        continue;
-                    }
+                        k = w * (w * (w * Entry->A[X] + Entry->B[X]) + Entry->C[X]) + Entry->D[X];
+                        h = D[X] - k * D[Y];
 
-                    /* Number of roots found. */
-
-                    n = 0;
-                    switch (Spline_Type)
-                    {
-                        case LINEAR_SPLINE :
-
-                            /* Solve linear equation. */
-                            x[0] = Entry->C[X] * k1 + Entry->C[Y] * k2;
-                            x[1] = Entry->D[X] * k1 + Entry->D[Y] * k2 + k3;
-
-                            if (fabs(x[0]) > EPSILON)
-                                y[n++] = -x[1] / x[0];
-                            break;
-
-                        case QUADRATIC_SPLINE :
-
-                            /* Solve quadratic equation. */
-                            x[0] = Entry->B[X] * k1 + Entry->B[Y] * k2;
-                            x[1] = Entry->C[X] * k1 + Entry->C[Y] * k2;
-                            x[2] = Entry->D[X] * k1 + Entry->D[Y] * k2 + k3;
-
-                            n = Solve_Polynomial(2, x, y, false, 0.0, Thread->Stats());
-                            break;
-
-                        case CUBIC_SPLINE :
-                        case BEZIER_SPLINE :
-
-                            /* Solve cubic equation. */
-                            x[0] = Entry->A[X] * k1 + Entry->A[Y] * k2;
-                            x[1] = Entry->B[X] * k1 + Entry->B[Y] * k2;
-                            x[2] = Entry->C[X] * k1 + Entry->C[Y] * k2;
-                            x[3] = Entry->D[X] * k1 + Entry->D[Y] * k2 + k3;
-
-                            n = Solve_Polynomial(3, x, y, Test_Flag(this, STURM_FLAG), 0.0, Thread->Stats());
-                            break;
-                    }
-
-                    /* Test roots for valid intersections. */
-
-                    while (n--)
-                    {
-                        w = y[n];
-
-                        if ((w >= 0.0) && (w <= 1.0))
+                        if (fabs(h) > EPSILON)
                         {
-                            k = w * (w * (w * Entry->A[X] + Entry->B[X]) + Entry->C[X]) + Entry->D[X];
-                            h = D[X] - k * D[Y];
+                            k = (k * P[Y] - P[X]) / h;
+                        }
+                        else
+                        {
+                            k = w * (w * (w * Entry->A[Y] + Entry->B[Y]) + Entry->C[Y]) + Entry->D[Y];
+
+                            h = D[Z] - k * D[Y];
 
                             if (fabs(h) > EPSILON)
                             {
-                                k = (k * P[Y] - P[X]) / h;
+                                k = (k * P[Y] - P[Z]) / h;
                             }
                             else
                             {
-                                k = w * (w * (w * Entry->A[Y] + Entry->B[Y]) + Entry->C[Y]) + Entry->D[Y];
-
-                                h = D[Z] - k * D[Y];
-
-                                if (fabs(h) > EPSILON)
-                                {
-                                    k = (k * P[Y] - P[Z]) / h;
-                                }
-                                else
-                                {
-                                    /* This should never happen! */
-                                    continue;
-                                }
+                                /* This should never happen! */
+                                continue;
                             }
+                        }
 
-                            /* Verify that intersection height is valid. */
-                            h = P[Y] + k * D[Y];
-                            if ((h >= Height1) && (h <= Height2))
+                        /* Verify that intersection height is valid. */
+                        h = P[Y] + k * D[Y];
+                        if ((h >= Height1) && (h <= Height2))
+                        {
+                            distance = k / len;
+                            if ((distance > DEPTH_TOLERANCE) && (distance < MAX_DISTANCE))
                             {
-                                distance = k / len;
-                                if ((distance > DEPTH_TOLERANCE) && (distance < MAX_DISTANCE))
+                                IPoint = ray.Evaluate(distance);
+                                if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
                                 {
-                                    IPoint = ray.Evaluate(distance);
-                                    if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
-                                    {
-                                        Depth_Stack->push (Intersection (distance, IPoint, this, SPLINE_HIT, j, w));
-                                        Found = true;
-                                    }
+                                    Depth_Stack->push (Intersection (distance, IPoint, this, SPLINE_HIT, j, w));
+                                    Found = true;
                                 }
                             }
                         }
