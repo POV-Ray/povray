@@ -1510,7 +1510,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
 void Parser::Promote_Express(EXPRESS& Express,int *Old_Terms,int New_Terms)
 {
-    register int i;
+    int i;
 
     if (*Old_Terms >= New_Terms)
         return;
@@ -1558,7 +1558,7 @@ void Parser::Promote_Express(EXPRESS& Express,int *Old_Terms,int New_Terms)
 
 void Parser::Parse_Num_Term (EXPRESS& Express,int *Terms)
 {
-    register int i;
+    int i;
     EXPRESS Local_Express;
     int Local_Terms;
 
@@ -1629,7 +1629,7 @@ void Parser::Parse_Num_Term (EXPRESS& Express,int *Terms)
 
 void Parser::Parse_Rel_Factor (EXPRESS& Express,int *Terms)
 {
-    register int i;
+    int i;
     EXPRESS Local_Express;
     int Local_Terms;
 
@@ -1775,7 +1775,7 @@ DBL Parser::Parse_Rel_String_Term (const UCS2 *lhs)
 
 void Parser::Parse_Rel_Term (EXPRESS& Express,int *Terms)
 {
-    register int i;
+    int i;
     EXPRESS Local_Express;
     int Local_Terms;
 
@@ -1877,7 +1877,7 @@ void Parser::Parse_Rel_Term (EXPRESS& Express,int *Terms)
 
 void Parser::Parse_Logical (EXPRESS& Express,int *Terms)
 {
-    register int i;
+    int i;
     EXPRESS Local_Express;
     int Local_Terms;
 

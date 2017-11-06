@@ -605,7 +605,7 @@ static int sbisect(int np, const polynomial *sseq, DBL min_value, DBL  max_value
 
 static DBL polyeval(DBL x, int n, const DBL *Coeffs)
 {
-    register int i;
+    int i;
     DBL val;
 
     val = Coeffs[n];

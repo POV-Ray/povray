@@ -60,12 +60,14 @@
 #define POVWIN_DIR_VERSION_STRING       POV_RAY_GENERATION POV_RAY_BETA_SUFFIX
 #endif
 
-// format "X.Y.Z[.P][-PRE]"
-// used for version display
-#ifdef POV_RAY_PRERELEASE
-#define POVWIN_VERSION_STRING           POV_RAY_PATCH_VERSION "-" POV_RAY_PRERELEASE
+/// @def POVWIN_BETA_PREFIX
+/// Prefix to distinguish beta- from non-beta versions.
+/// For beta releases, this macro evaluates to `Beta`. Otherwise, this macro evaluates to an
+/// empty string.
+#if defined(POVRAY_IS_BETA)
+#define POVWIN_BETA_PREFIX "Beta"
 #else
-#define POVWIN_VERSION_STRING           POV_RAY_PATCH_VERSION
+#define POVWIN_BETA_PREFIX ""
 #endif
 
 #ifdef POV_RAY_PRERELEASE
@@ -86,12 +88,12 @@
 
 #define POVWIN_WINRC_COMPANY_NAME       "Persistence of Vision Raytracer Pty. Ltd."
 #define POVWIN_WINRC_FILE_DESCRIPTION   POVWIN_APPLICATION_NAME " v" POV_RAY_GENERATION POV_RAY_BETA_SUFFIX
-#define POVWIN_WINRC_FILE_VERSION       POVWIN_VERSION_STRING
+#define POVWIN_WINRC_FILE_VERSION       POV_RAY_FULL_VERSION
 #define POVWIN_WINRC_INTERNAL_NAME      "PVEngine"
 #define POVWIN_WINRC_LEGAL_COPYRIGHT    POV_RAY_COPYRIGHT " All Rights Reserved. This software is licensed under the terms of the GNU Affero General Public License."
 #define POVWIN_WINRC_LEGAL_TRADEMARKS   "POV-Ray(tm) is a trademark of Persistence of Vision Raytracer Pty. Ltd."
 #define POVWIN_WINRC_ORIGINAL_FILENAME  "pvengine.exe"
 #define POVWIN_WINRC_PRODUCT_NAME       POVWIN_APPLICATION_NAME
-#define POVWIN_WINRC_PRODUCT_VERSION    POVWIN_VERSION_STRING
+#define POVWIN_WINRC_PRODUCT_VERSION    POV_RAY_FULL_VERSION
 
 #endif // POVWIN_VERSION_H

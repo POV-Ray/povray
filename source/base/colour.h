@@ -1866,7 +1866,7 @@ class GenericTransColour
 
         /// Legacy opacity computation.
         ///
-        /// @deprecated This fomula was used instead of @ref Opacity() in POV-Ray 3.6 and earlier texture computations.
+        /// @deprecated This fomula was used instead of @ref Opacity() in POV-Ray v3.6 and earlier texture computations.
         ///             Do not use it - it is bogus, and we're only keeping it around for compatibility with legacy
         ///             scenes.
         ///

@@ -954,7 +954,7 @@ void View::StartRender(POVMS_Object& renderOptions)
     if((previewendsize > 1) && (tracingmethod == 0))
     {
         // TODO FIXME
-        // Warning("In POV-Ray 3.7 and later it is recommended to set the mosaic preview end size to one for\n"
+        // Warning("In POV-Ray v3.7 and later it is recommended to set the mosaic preview end size to one for\n"
         //         "maximum performance when rendering without anti-aliasing.");
     }
 

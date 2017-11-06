@@ -57,7 +57,7 @@ Metadata::~Metadata()
 
 string Metadata::getSoftware() const
 {
-    return "POV-Ray " POV_RAY_SOURCE_VERSION;
+    return "POV-Ray v" POV_RAY_SOURCE_VERSION;
 }
 
 string Metadata::getComment1() const

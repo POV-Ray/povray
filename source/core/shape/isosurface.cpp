@@ -4,8 +4,9 @@
 ///
 /// Implementation of the isosurface geometric primitive.
 ///
-/// @author R.Suzuki (original code)
-/// @author Thorsten Froehlich (porting to POV-Ray 3.5)
+/// @author D.Skarda, T.Bily (original code)
+/// @author R.Suzuki (modifications)
+/// @author Thorsten Froehlich (porting to POV-Ray v3.5)
 ///
 /// @copyright
 /// @parblock

@@ -56,20 +56,16 @@
 /// the corresponding header files and specifying `using NAMESPACE::SYMBOL`. However, alternative
 /// implementations may also be provided unless noted otherwise.
 ///
-/// The following symbols must have the same semantics as those from C++03's `std::` namespace:
-///
-///   - `list`
-///   - `runtime_error` (should be identical to `std::runtime_error`)
-///   - `string`
-///   - `vector`
-///
-/// The following symbols must have the same semantics as those from either Boost's `boost::`
-/// namespace, TR1's `std::tr1::` namespace, or C++11's `std::` namespace:
+/// The following symbols must have the same semantics as those from C++11's `std::` namespace:
 ///
 ///   - `const_pointer_cast`
 ///   - `dynamic_pointer_cast`
+///   - `list`
+///   - `runtime_error` (should be identical to `std::runtime_error`)
 ///   - `shared_ptr`
 ///   - `static_pointer_cast`
+///   - `string`
+///   - `vector`
 ///   - `weak_ptr`
 ///
 /// The following symbols must have the same semantics as those from Boost's `boost::` namespace:
@@ -84,6 +80,9 @@
 ///       - `int close(int)`
 ///       - `ssize_t write(int, const void*, size_t)`
 ///       - `ssize_t read(int, void*, size_t)`
+///
+/// @todo
+///     The following GNU/Linux features also need to be present or emulated:
 ///       - `off64_t lseek64(int, off64_t, int)
 ///
 /// @todo

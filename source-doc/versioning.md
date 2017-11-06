@@ -62,16 +62,48 @@ POV-Ray **build** version numbers have the form `X.Y.Z`[`.P`][`-PREB`][`+BUILD`]
     behalf of the POV-Ray team carry build identifiers of the form `avN`, where `N` is a running numeric value.
 
 
+Mentioning Version Numbers
+==========================
+
+In order to allow for comparatively easy searching for version numbers throughout the repository,
+thus simplifying version number housekeeping, any mention of a POV-Ray version number should be
+prepended with either of the following:
+
+  - The character `v` (e.g. `v3.8`).
+  - The word `version` (or, alternatively, `Version` or `VERSION`) on the very same line, separated
+    by a single blank (e.g. `version 3.8`).
+
+This applies to version numbers mentioned in source code comments, program output, documentation,
+or actually any file in the repository whatsoever. It is recommended to also use this format
+consistently in communication with users, such as on the newsgroups.
+
+In cases where a version number must be referenced in a non-compliant format for technical reasons,
+it should be mentioned again in a compliant format nearby (e.g. in a comment, ideally on the very
+same line), or the file explicitly mentioned in the section "What To Change" below as containing
+version numbers in a non-compliant format.
+
+
 What To Change
 ==============
 
 When updating a version number, the following files _always_ need to be changed accordingly:
 
   - `source/base/version.h`
-  - `unix/VERSION`
+
+When updating the minor or major version number, a host of other files need to be changed as well.
+To identify the files affected, search the _entire_ repository for the regular expression
+`(version |v)3\.?[0-9]` using _case-insensitive_ search, and decide on a case-by-case basis whether
+the version number needs updating. In addition, the following files contain version numbers that do
+not conform to this pattern:
+
+  - `windows\cmedit\cmedit.rc`
+  - `appveyor.yml`
 
 @warning
-    When updating the minor or major version number, a host of other files need to be changed as well.
+    At present, only version numbers in the platform-independent source code have been canonicalized
+    to match the above pattern. Other portions, such as platform-specific source code, sample scene
+    files or standard include file, may still contain additional non-matching version numbers,
+    requiring a more generic search pattern.
 
 
 Automatic Version Numbering
@@ -81,7 +113,6 @@ The directory `tools/git/hooks` contains scripts intended to (among other things
 Git; to benefit from them, copy them to the `.git/hooks` directory in your local Git workspace. Whenever you perform a
 commit, they will automatically take care of the following:
 
-  - Verify that `unix/VERSION` and the various version number fields in `source/base/version.h` match.
   - Update the `ID` portion of pre-release versions whenever any files in one of the following directory sub-trees have
     been staged for commit: `source`, `vfe`, `platform`, `mac`, `unix`, `windows` or `libraries`. The new value of the
     `ID` portion will be the number of minutes elapsed since 2000-01-01 00:00 UTC. (If the `ID`

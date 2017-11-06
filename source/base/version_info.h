@@ -60,16 +60,12 @@
 /// @def POV_RAY_SOURCE_VERSION
 /// Source code version string.
 #if POV_RAY_IS_OFFICIAL
-    #ifdef POV_RAY_PRERELEASE
-        #define POV_RAY_SOURCE_VERSION POV_RAY_PATCH_VERSION "-" POV_RAY_PRERELEASE
-    #else
-        #define POV_RAY_SOURCE_VERSION POV_RAY_PATCH_VERSION
-    #endif
+    #define POV_RAY_SOURCE_VERSION POV_RAY_FULL_VERSION
 #else
     #ifdef POV_RAY_PRERELEASE
-        #define POV_RAY_SOURCE_VERSION POV_RAY_PATCH_VERSION "-" POV_RAY_PRERELEASE ".unofficial"
+        #define POV_RAY_SOURCE_VERSION POV_RAY_FULL_VERSION ".unofficial"
     #else
-        #define POV_RAY_SOURCE_VERSION POV_RAY_PATCH_VERSION "-unofficial"
+        #define POV_RAY_SOURCE_VERSION POV_RAY_FULL_VERSION "-unofficial"
     #endif
 #endif
 

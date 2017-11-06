@@ -76,7 +76,7 @@ namespace Gif
 #define LOCAL static
 #define IMPORT extern
 
-#define FAST register
+#define FAST // nothing (was `register`, which is deprecated as of C++11 and disallowed as of C++17)
 
     typedef unsigned short UWORD;
     typedef unsigned char UTINY;

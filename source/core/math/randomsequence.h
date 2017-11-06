@@ -272,7 +272,7 @@ SequentialDoubleGeneratorPtr GetSubRandomDoubleGenerator(unsigned int id, double
 /// Gets a source for cosine-weighted sub-random (low discrepancy) vectors on the unit hemisphere centered around +Y.
 ///
 /// @note       If count is smaller than 1600, this function will return a generator for the hard-coded
-///             radiosity sampling direction sequence used in POV-Ray 3.6.
+///             radiosity sampling direction sequence used in POV-Ray v3.6.
 ///
 /// @param[in]  id              Selects one of multiple sources.
 /// @param[in]  count           Number of values to provide.

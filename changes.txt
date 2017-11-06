@@ -42,7 +42,22 @@ Fixed or Mitigated Bugs
 
 Reported via GitHub:
 
+  - #65 ("Normal for the prism's bezier spline mode is reversed from other
+    spline types & lathe uses.")
   - #317 ("Boost 1.65.0 incompatibility")
+
+Reported via the Newsgroups:
+
+  - <web.59fefd5f68f4d962ca73ee9d0@news.povray.org>
+    (2017-11-05, povray.newusers, "orthographic camera and conic_sweep object")
+    Sides of a `conic_sweep` prism become invisible when viewed head-on using
+    an orthographic camera.
+
+Miscellaneous:
+
+  - Fix `interior_texture` for text objects (as mentioned in GitHub issue #65)
+  - Eliminated use of deprecated C++ `register` keyword (except in 3rd party
+    libraries bundled with the POV-Ray source code).
 
 Changed Behaviour
 -----------------
@@ -52,8 +67,9 @@ Changed Behaviour
     corresponding warning.
   - Some defaults have been changed (requires `#version 3.8` as the _very first_
     statement of the scene, or a corresponding command line / INI setting):
+      - The pigment now defaults to plain white.
       - `ambient` now defaults to 0.0 instead of 0.1.
-      - Camera `right` vector length now defaults to the output image aspect
+      - The camera `right` vector length now defaults to the output image aspect
         ratio (presuming square pixels) instead of 1.33.
 
 Other Noteworthy
@@ -62,6 +78,11 @@ Other Noteworthy
   - The source code now requires a C++11-compliant compiler.
   - Added `--generation` command-line switch to POV-Ray for Unix, which will
     cause POV-Ray to print its abbreviated version number to standard output.
+  - To simplify version number housekeeping, the file `unix/VERSION` is now
+    created on the fly by the `unix/prebuild.sh` script, and has been dropped
+    from the repository. To retrieve version information from the source
+    package, use one of the new `get-source-version.*` scripts provided in
+    `tools/unix/` and `tools/windows/`, respectively.
 
 
 Changes between 3.7.1-beta.9 and 3.7.1-rc.1

@@ -1969,7 +1969,7 @@ unsigned int FNCode::compile_instruction(unsigned int op, unsigned int rs, unsig
         // to use an intermediate code representation and more
         // advanced optimisation techniques, but this is a
         // project of its own and it would have made a release
-        // of POV-Ray 3.5 next to impossible for at least
+        // of POV-Ray v3.5 next to impossible for at least
         // another year... [trf]
         //
         // ************************************************************

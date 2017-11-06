@@ -79,7 +79,7 @@ SceneData::SceneData() :
     workingGamma.reset();
     workingGammaToSRGB.reset();
     inputFileGamma = SRGBGammaCurve::Get();
-    gammaMode = kPOVList_GammaMode_None; // default setting for 3.62, which in turn is the default for the language
+    gammaMode = kPOVList_GammaMode_None; // default setting for v3.6.2, which in turn is the default for the language
 
     mmPerUnit = 10;
     useSubsurface = false;

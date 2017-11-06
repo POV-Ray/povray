@@ -357,14 +357,14 @@ void Parser::Run()
             sceneData->workingGamma.reset();
             sceneData->workingGammaToSRGB.reset();
             Warning("assumed_gamma not specified, so gamma_correction is turned off for compatibility\n"
-                    "with this pre POV-Ray 3.7 scene. See the documentation for more details.");
+                    "with this pre POV-Ray v3.7 scene. See the documentation for more details.");
         }
         else
         {
             sceneData->gammaMode = kPOVList_GammaMode_AssumedGamma37Implied;
             sceneData->workingGamma = GetGammaCurve(DEFAULT_WORKING_GAMMA_TYPE, DEFAULT_WORKING_GAMMA);
             sceneData->workingGammaToSRGB = TranscodingGammaCurve::Get(sceneData->workingGamma, SRGBGammaCurve::Get());
-            PossibleError("assumed_gamma not specified in this POV-Ray 3.7 or later scene. Future\n"
+            PossibleError("assumed_gamma not specified in this POV-Ray v3.7 or later scene. Future\n"
                           "versions of POV-Ray may consider this a fatal error. To avoid this\n"
                           "warning, explicitly specify 'assumed_gamma " DEFAULT_WORKING_GAMMA_TEXT "' in the global_settings\n"
                           "section. See the documentation for more details.");
@@ -373,9 +373,9 @@ void Parser::Run()
 
     if(sceneData->EffectiveLanguageVersion() < 350)
     {
-        Warning("The scene finished parsing with a language version set to 3.1 or earlier. Full\n"
+        Warning("The scene finished parsing with a language version set to v3.1 or earlier. Full\n"
                 "backward compatibility with scenes requiring support for bugs in POV-Ray\n"
-                "version 3.1 or earlier is not guaranteed. Please use POV-Ray 3.5 or earlier if\n"
+                "version v3.1 or earlier is not guaranteed. Please use POV-Ray v3.5 or earlier if\n"
                 "your scene depends on rendering defects caused by these bugs.");
 
         sceneData->languageVersion = 350;
@@ -384,19 +384,19 @@ void Parser::Run()
     if(sceneData->languageVersionLate)
     {
         Warning("This scene had other declarations preceding the first #version directive.\n"
-                "Please be aware that as of POV-Ray 3.7, unless already specified via an INI\n"
+                "Please be aware that as of POV-Ray v3.7, unless already specified via an INI\n"
                 "option, a #version is expected as the first declaration in a scene file. If\n"
                 "this is not done, POV-Ray may apply compatibility settings to some features\n"
-                "that are intended to make pre-3.7 scenes render as designed. You are strongly\n"
+                "that are intended to make pre-v3.7 scenes render as designed. You are strongly\n"
                 "encouraged to add a #version statement to the scene to make your intent clear.\n"
                 "Future versions of POV-Ray may make the presence of a #version mandatory.");
     }
     else if(sceneData->languageVersionSet == false)
     {
         Warning("This scene did not contain a #version directive. Please be aware that as of\n"
-                "POV-Ray 3.7, unless already specified via an INI option, a #version is\n"
+                "POV-Ray v3.7, unless already specified via an INI option, a #version is\n"
                 "expected as the first declaration in a scene file. POV-Ray may apply settings\n"
-                "to some features that are intended to maintain compatibility with pre-3.7\n"
+                "to some features that are intended to maintain compatibility with pre-v3.7\n"
                 "scenes. You are strongly encouraged to add a #version statement to the scene\n"
                 "to make your intent clear. Future versions of POV-Ray may make the presence of\n"
                 "a #version statement mandatory.");
@@ -516,24 +516,34 @@ void Parser::InitDefaults(int version)
 {
     // Initialize defaults depending on version:
     // As of v3.8...
+    //   - pigment defaults to `rgb <1,1,1>`
     //   - `ambient` defaults to 0.0.
     //   - Camera `right` length defaults to output image aspect ratio.
     // Prior to that...
+    //   - pigment defaulted to `rgb <0,0,0>`
     //   - `ambient` defaulted to 0.1.
     //   - Camera `right` length defaulted to 1.33.
 
+    unsigned short pigmentType;
+    MathColour pigmentColour;
     double ambientLevel;
     double rightLength;
     if (version >= 380)
     {
+        pigmentType = PLAIN_PATTERN;
+        pigmentColour = MathColour(1.0);
         ambientLevel = 0.0;
         rightLength = sceneData->aspectRatio;
     }
     else
     {
+        pigmentType = NO_PATTERN;
+        pigmentColour = MathColour(0.0);
         ambientLevel = 0.1;
         rightLength = 1.33;
     }
+    Default_Texture->Pigment->Type = pigmentType;
+    Default_Texture->Pigment->colour = TransColour(pigmentColour, 0.0, 0.0);
     Default_Texture->Finish->Ambient = MathColour(ambientLevel);
     Default_Camera.Right = Vector3d(rightLength, 0.0, 0.0);
 }
@@ -1905,7 +1915,7 @@ void Parser::Parse_Camera (Camera& Cam)
             END_CASE
 
             CASE2 (MESH_CAMERA_TOKEN, USER_DEFINED_TOKEN)
-                Error("This camera type not supported for language version < 3.5");
+                Error("This camera type not supported for language version < v3.5");
             END_CASE
 
             CASE (CYLINDER_TOKEN)
@@ -5030,7 +5040,7 @@ ObjectPtr Parser::Parse_Ovus()
         Object->BottomVertical = -Object->ConnectingRadius;// low enough
         Object->BottomRadius = 0.0;
         Object->ConnectingRadius = 0.0;
-        Warning(0, "Ovus is reduced to a sphere, consider using a real sphere instead");
+        Warning("Ovus is reduced to a sphere, consider using a real sphere instead");
     }
 
     Object->Compute_BBox();
@@ -6416,7 +6426,7 @@ ObjectPtr Parser::Parse_TrueType ()
     {
         PossibleError("Text may not be displayed as expected.\n"
                       "Please refer to the user manual regarding changes\n"
-                      "in POV-Ray 3.5 and later.");
+                      "in POV-Ray v3.5 and later.");
     }
 
     Parse_Begin ();
@@ -7037,7 +7047,7 @@ void Parser::Parse_Frame ()
 
             CASE (MAX_INTERSECTIONS_TOKEN)
                 Parse_Float();
-                VersionWarning(370, "'max_intersections' is no longer needed and has no effect in POV-Ray 3.7 or later.");
+                VersionWarning(370, "'max_intersections' is no longer needed and has no effect in POV-Ray v3.7 or later.");
             END_CASE
 
             CASE (DEFAULT_TOKEN)
@@ -7179,7 +7189,7 @@ void Parser::Parse_Global_Settings()
 
         CASE (MAX_INTERSECTIONS_TOKEN)
             Parse_Float();
-            VersionWarning(370, "'max_intersections' is no longer needed and has no effect in POV-Ray 3.7 or later.");
+            VersionWarning(370, "'max_intersections' is no longer needed and has no effect in POV-Ray v3.7 or later.");
         END_CASE
 
         CASE (NOISE_GENERATOR_TOKEN)
@@ -7360,7 +7370,7 @@ void Parser::Parse_Global_Settings()
             // enable radiosity only if the user includes a "radiosity" token
             if((sceneData->radiositySettings.radiosityEnabled == false) && (sceneData->EffectiveLanguageVersion() < 350))
             {
-                Warning("In POV-Ray 3.5 and later a radiosity{}-block will automatically\n"
+                Warning("In POV-Ray v3.5 and later a radiosity{}-block will automatically\n"
                         "turn on radiosity if the output quality is set to 9 or higher.\n"
                         "Read the documentation to find out more about radiosity changes!");
             }
@@ -7369,7 +7379,7 @@ void Parser::Parse_Global_Settings()
             Parse_Begin();
             EXPECT
                 CASE(LOAD_FILE_TOKEN)
-                    PossibleError("In POV-Ray 3.7 and later 'load_file' has to be specified as\n"
+                    PossibleError("In POV-Ray v3.7 and later 'load_file' has to be specified as\n"
                                   "an option on the command-line, in an INI file or in a dialog\n"
                                   "(on some platforms). The 'load_file' setting here will be ignored!\n"
                                   "Read the documentation to find out more about radiosity changes!");
@@ -7380,7 +7390,7 @@ void Parser::Parse_Global_Settings()
                 END_CASE
 
                 CASE(SAVE_FILE_TOKEN)
-                    PossibleError("In POV-Ray 3.7 and later 'save_file' has to be specified as\n"
+                    PossibleError("In POV-Ray v3.7 and later 'save_file' has to be specified as\n"
                                   "an option on the command-line, in an INI file or in a dialog\n"
                                   "(on some platforms). The 'save_file' setting here will be ignored!\n"
                                   "Read the documentation to find out more about radiosity changes!");
@@ -7530,7 +7540,7 @@ void Parser::Parse_Global_Settings()
         END_CASE
         CASE (HF_GRAY_16_TOKEN)
             Allow_Float(1.0);
-            PossibleError("In POV-Ray 3.7 and later 'hf_gray_16' has to be specified as\n"
+            PossibleError("In POV-Ray v3.7 and later 'hf_gray_16' has to be specified as\n"
                           "an option on the command-line (e.g. '+FNg'), in an INI file\n"
                           "(e.g. 'Grayscale_Output=true'), or (on some platforms) in a dialog.\n"
                           "The 'hf_gray_16' setting here is ignored. See the documentation\n"
@@ -8456,8 +8466,8 @@ void Parser::Parse_Semi_Colon (bool force_semicolon)
         if ((sceneData->EffectiveLanguageVersion() >= 350) && (force_semicolon == true))
         {
             Error("All #declares of float, vector, and color require semi-colon ';' at end if the\n"
-                  "language version is set to 3.5 or higher.\n"
-                  "Either add the semi-colon or set the language version to 3.1 or lower.");
+                  "language version is set to v3.5 or higher.\n"
+                  "Either add the semi-colon or set the language version to v3.1 or lower.");
         }
         else if (sceneData->EffectiveLanguageVersion() >= 310)
         {

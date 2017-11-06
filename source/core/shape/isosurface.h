@@ -4,8 +4,9 @@
 ///
 /// Declarations related to the isosurface geometric primitive.
 ///
-/// This module was written by D.Skarda & T.Bily and modified by R.Suzuki.
-/// Ported to POV-Ray 3.5 by Thorsten Froehlich.
+/// @author D.Skarda, T.Bily (original code)
+/// @author R.Suzuki (modifications)
+/// @author Thorsten Froehlich (porting to POV-Ray v3.5)
 ///
 /// @copyright
 /// @parblock
