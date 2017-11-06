@@ -76,6 +76,7 @@ Other Noteworthy
 ----------------
 
   - The source code now requires a C++11-compliant compiler.
+  - The Unix build process now officially requires Autoconf 2.68 or later.
   - Added `--generation` command-line switch to POV-Ray for Unix, which will
     cause POV-Ray to print its abbreviated version number to standard output.
   - To simplify version number housekeeping, the file `unix/VERSION` is now
