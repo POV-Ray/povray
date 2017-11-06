@@ -35,8 +35,8 @@
 ///
 //******************************************************************************
 
-#ifndef __VFEPOVMS_H__
-#define __VFEPOVMS_H__
+#ifndef POVRAY_VFE_VFEPOVMS_H
+#define POVRAY_VFE_VFEPOVMS_H
 
 namespace vfe
 {
@@ -56,4 +56,4 @@ template<> struct GetPOVMSTypeID<float> { enum { type_id = kPOVMSType_Float } ; 
 template<> struct GetPOVMSTypeID<char *> { enum { type_id = kPOVMSType_CString } ; } ;
 template<> struct GetPOVMSTypeID<pov_base::UCS2String&> { enum { type_id = kPOVMSType_UCS2String } ; } ;
 
-#endif // __VFEPOVMS_H__
+#endif // POVRAY_VFE_VFEPOVMS_H

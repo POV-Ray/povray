@@ -33,8 +33,8 @@
 ///
 //******************************************************************************
 
-#ifndef __SYSPOVIMAGE_H__
-#define __SYSPOVIMAGE_H__
+#ifndef POVRAY_VFE_WIN_SYSPOVIMAGE_H
+#define POVRAY_VFE_WIN_SYSPOVIMAGE_H
 
 #ifdef POV_VIDCAP_IMPL
   namespace pov
@@ -56,4 +56,4 @@
   }
 #endif // POV_VIDCAP_IMPL
 
-#endif
+#endif // POVRAY_VFE_WIN_SYSPOVIMAGE_H

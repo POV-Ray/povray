@@ -35,8 +35,8 @@
 ///
 //******************************************************************************
 
-#ifndef __VFECONF_H__
-#define __VFECONF_H__
+#ifndef POVRAY_VFE_VFECONF_H
+#define POVRAY_VFE_VFECONF_H
 
 //////////////////////////////////////////////////////////////
 // POVMS support
@@ -75,4 +75,4 @@ namespace vfe
 #define POVMS_Sys_QueueSend                   vfe::vfe_POVMS_Sys_QueueSend
 #define POVMS_Sys_GetCurrentThread            vfe::POVMS_GetCurrentThread
 
-#endif // __VFECONF_H__
+#endif // POVRAY_VFE_VFECONF_H

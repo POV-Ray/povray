@@ -36,8 +36,8 @@
 ///
 //*******************************************************************************
 
-#ifndef _DISP_H
-#define _DISP_H
+#ifndef POVRAY_UNIX_DISP_H
+#define POVRAY_UNIX_DISP_H
 
 #include "vfe.h"
 
@@ -101,4 +101,4 @@ namespace pov_frontend
     }
 }
 
-#endif
+#endif // POVRAY_UNIX_DISP_H

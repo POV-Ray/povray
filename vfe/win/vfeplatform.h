@@ -35,8 +35,8 @@
 ///
 //******************************************************************************
 
-#ifndef __VFEPLATFORM_H__
-#define __VFEPLATFORM_H__
+#ifndef POVRAY_VFE_WIN_VFEPLATFORM_H
+#define POVRAY_VFE_WIN_VFEPLATFORM_H
 
 #include "frontend/shelloutprocessing.h"
 #include "vfesession.h"
@@ -142,4 +142,4 @@ namespace vfePlatform
   POVMS_Sys_Thread_Type GetThreadId();
 }
 
-#endif
+#endif // POVRAY_VFE_WIN_VFEPLATFORM_H
