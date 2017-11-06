@@ -66,7 +66,7 @@ namespace vfePlatform
         m_Session(session)
     {
         char* value;
-        value = getenv("HOME");
+        value = std::getenv("HOME");
         m_home = value ? value:"";
 
         // Default values for I/O restrictions: everything is allowed.
@@ -300,7 +300,7 @@ namespace vfePlatform
             // environment variables:
             if ((*iter).EnvVariable != "")
             {
-                char *tmp = getenv((*iter).EnvVariable.c_str());
+                char *tmp = std::getenv((*iter).EnvVariable.c_str());
                 if (tmp) // variable defined?
                     (*iter).Value = tmp;
             }
@@ -393,7 +393,7 @@ namespace vfePlatform
             tmp = new char[len];
         }
 #else
-        string tmp = getenv("PWD");  // must not be NULL; checked by configure
+        string tmp = std::getenv("PWD");  // must not be NULL; checked by configure
         if(tmp.length() == 0)        // run-time checks are safer anyway
         {
             // TODO: correct error handling
@@ -403,7 +403,7 @@ namespace vfePlatform
             if(no_error_call)
             {
                 fprintf(stderr, "%s: %s\n", PACKAGE, errormsg);
-                exit(EXIT_FAILURE);
+                std::exit(EXIT_FAILURE);
             }
             else
                 Error("%s", errormsg);
@@ -1073,7 +1073,7 @@ namespace vfePlatform
     {
         // try the file pointed to by POVINI
         string povini;
-        char * povini_c = getenv("POVINI");
+        char * povini_c = std::getenv("POVINI");
         if (povini_c)
         {
             povini = povini_c;

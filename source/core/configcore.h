@@ -188,7 +188,7 @@
 //******************************************************************************
 
 #ifndef QSORT
-    #define QSORT(a,b,c,d) qsort((a),(b),(c),(d))
+    #define QSORT(a,b,c,d) std::qsort((a),(b),(c),(d))
 #endif
 
 /// @def TRY_OPTIMIZED_NOISE

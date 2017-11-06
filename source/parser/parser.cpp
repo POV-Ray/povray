@@ -211,7 +211,7 @@ void Parser::Run()
                 {
                     Temp_Entry = Add_Symbol(SYM_TABLE_GLOBAL, const_cast<char *>(i->first.c_str()), FLOAT_ID_TOKEN);
                     Temp_Entry->Data = Create_Float();
-                    *(reinterpret_cast<DBL *>(Temp_Entry->Data)) = atof(i->second.c_str());
+                    *(reinterpret_cast<DBL *>(Temp_Entry->Data)) = std::atof(i->second.c_str());
                 }
             }
         }

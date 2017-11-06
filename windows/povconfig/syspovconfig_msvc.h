@@ -195,7 +195,7 @@
   #endif
 #endif
 
-#define QSORT(a,b,c,d)                      qsort(reinterpret_cast<void *>(a), (size_t) b, (size_t) c, d)
+#define QSORT(a,b,c,d)                      std::qsort(reinterpret_cast<void *>(a), (size_t) b, (size_t) c, d)
 #define POV_LONG                            signed __int64
 #define POV_ULONG                           unsigned __int64
 #define FORCEINLINE                         __forceinline

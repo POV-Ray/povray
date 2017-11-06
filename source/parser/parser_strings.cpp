@@ -836,7 +836,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
                     buffer[3] = char_array[++index_in];
                     buffer[4] = 0;
 
-                    char_string[index_out] = (UCS2)strtoul(buffer, &dummy_ptr, 16);
+                    char_string[index_out] = (UCS2)std::strtoul(buffer, &dummy_ptr, 16);
                     break;
                 default:
                     char_string[index_out] = char_array[index_in];

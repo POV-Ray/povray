@@ -704,7 +704,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                 case VAL_TOKEN:
                     Parse_Paren_Begin();
                     Local_C_String=Parse_C_String();
-                    Val = atof(Local_C_String);
+                    Val = std::atof(Local_C_String);
                     POV_FREE(Local_C_String);
                     Parse_Paren_End();
                     break;

@@ -570,7 +570,7 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
     if (doDiffuse)
     {
         //ChooseRay(Ray &NewRay, Vector3d& Normal, Vector3d& Raw_Normal, int WhichRay)
-        ChooseRay(NewRay, LayNormal, rawnormal, rand()%400); // TODO - magic number
+        ChooseRay(NewRay, LayNormal, rawnormal, std::rand()%400); // TODO - magic number
 
         MathColour CurLightCol;
         CurLightCol = LightCol * ResCol;
@@ -1913,7 +1913,7 @@ void PhotonMap::setGatherOptions(ScenePhotonSettings &photonSettings, int mediaM
 
         for(i=0; i<numToSample; i++)
         {
-            j = rand() % this->numPhotons;
+            j = std::rand() % this->numPhotons;
 
             Point = Vector3d((PHOTON_AMF(this->head, j)).Loc);
 
@@ -1962,7 +1962,7 @@ void PhotonMap::setGatherOptions(ScenePhotonSettings &photonSettings, int mediaM
         greaterThan = 0;
         for(i=0; i<numToSample; i++)
         {
-            j = rand() % this->numPhotons;
+            j = std::rand() % this->numPhotons;
 
             Point = Vector3d((PHOTON_AMF(this->head, j)).Loc);
 
@@ -1993,7 +1993,7 @@ void PhotonMap::setGatherOptions(ScenePhotonSettings &photonSettings, int mediaM
         lessThan = 0;
         for(i=0; i<numToSample; i++)
         {
-            j = rand() % this->numPhotons;
+            j = std::rand() % this->numPhotons;
 
             Point = Vector3d((PHOTON_AMF(this->head, j)).Loc);
 

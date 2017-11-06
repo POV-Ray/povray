@@ -456,7 +456,7 @@ int ProcessRenderOptions::ReadSpecialOptionHandler(INI_Parser_Table *option, cha
                         err = POVMSUtil_SetString(&decobj, kPOVAttrib_Value, ptr);
                     }
                     else
-                        err = POVMSUtil_SetFloat(&decobj, kPOVAttrib_Value, atof(ptr));
+                        err = POVMSUtil_SetFloat(&decobj, kPOVAttrib_Value, std::atof(ptr));
                 }
                 if(err == kNoErr)
                     err = POVMSAttrList_Append(&list, &decobj);
@@ -510,7 +510,7 @@ int ProcessRenderOptions::ReadSpecialOptionHandler(INI_Parser_Table *option, cha
                 case kPOVAttrib_DisplayGamma:    typeKey = kPOVAttrib_DisplayGammaType;      break;
                 case kPOVAttrib_FileGamma:       typeKey = kPOVAttrib_FileGammaType;         break;
             }
-            floatval = atof(param);
+            floatval = std::atof(param);
             if (floatval == 1.0)
                 intval = kPOVList_GammaType_Neutral;
             else if (floatval > 0)

@@ -275,7 +275,7 @@ static void ErrorExit(vfeSession *session)
     fprintf(stderr, "%s\n", session->GetErrorString());
     session->Shutdown();
     delete session;
-    exit(RETURN_ERROR);
+    std::exit(RETURN_ERROR);
 }
 
 static void CancelRender(vfeSession *session)
@@ -313,7 +313,7 @@ static ReturnValue PrepareBenchmark(vfeSession *session, vfeRenderOptions& opts,
         if (boost::starts_with(s, "+wt") || boost::starts_with(s, "-wt"))
         {
             s.erase(0, 3);
-            int n = atoi(s.c_str());
+            int n = std::atoi(s.c_str());
             if (n)
                 opts.SetThreadCount(n);
             else
@@ -517,7 +517,7 @@ int main (int argc, char **argv)
     }
     else
     {
-        char *s = getenv ("POVINC");
+        char *s = std::getenv ("POVINC");
         session->SetDisplayCreator(UnixDisplayCreator);
         session->GetUnixOptions()->Process_povray_ini(opts);
         if (s != NULL)
