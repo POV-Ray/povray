@@ -36,15 +36,21 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
+// C++ variants of C standard header files
 #include <cctype>
+#include <cstdlib>
 
+// C++ standard header files
 #include <algorithm>
 
+// Boost header files
 #include <boost/date_time/posix_time/posix_time.hpp>
 
+// POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
 #include "base/mathutil.h"
 
+// POV-Ray header files (core module)
 #include "core/material/blendmap.h"
 #include "core/material/noise.h"
 #include "core/material/normal.h"
@@ -61,6 +67,7 @@
 #include "core/shape/heightfield.h"
 #include "core/support/imageutil.h"
 
+// POV-Ray header files (VM module)
 #include "vm/fnpovfpu.h"
 
 // this must be the last file included

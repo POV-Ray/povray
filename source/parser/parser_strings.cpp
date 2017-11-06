@@ -36,11 +36,14 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
-#include <cstdlib>
+// C++ variants of C standard header files
 #include <cctype>
+#include <cstdlib>
 
+// Boost header files
 #include <boost/date_time/posix_time/posix_time.hpp>
 
+// POV-Ray header files (core module)
 #include "core/scene/scenedata.h"
 
 // this must be the last file included

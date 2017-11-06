@@ -38,10 +38,19 @@
 //*******************************************************************************
 
 #include "unixoptions.h"
+
+// C++ variants of C standard header files
+#include <cstdlib>
+
+// C++ standard header files
 #include <fstream>
-#include <sys/stat.h>
+
+// Boost header files
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
+
+// Other library header files
+#include <sys/stat.h>
 
 namespace vfePlatform
 {

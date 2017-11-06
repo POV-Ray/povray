@@ -36,11 +36,16 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/processrenderoptions.h"
 
+// C++ variants of C standard header files
+#include <cstdlib>
+
+// POV-Ray header files (base module)
 #include "base/fileutil.h"
 #include "base/platformbase.h"
 #include "base/image/colourspace.h"
 #include "base/image/encoding.h"
 
+// POV-Ray header files (POVMS module)
 #include "povms/povmsid.h"
 
 // this must be the last file included

@@ -33,13 +33,14 @@
 ///
 //******************************************************************************
 
-// C++ variants of C standard headers
+// C++ variants of C standard header files
 #include <csignal>
+#include <cstdlib>
 
-// boost headers
+// Boost header files
 #include <boost/shared_ptr.hpp>
 
-// other library headers
+// Other library header files
 #include <termios.h>
 #include <unistd.h>
 #include <sys/select.h>

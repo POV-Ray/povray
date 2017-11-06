@@ -38,8 +38,12 @@
 #ifndef POVRAY_CORE_CONFIGCORE_H
 #define POVRAY_CORE_CONFIGCORE_H
 
+// Pull in other compile-time config header files first
 #include "base/configbase.h"
 #include "syspovconfigcore.h"
+
+// C++ variants of C standard header files
+#include <cstdlib>
 
 //##############################################################################
 ///

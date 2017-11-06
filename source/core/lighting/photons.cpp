@@ -36,8 +36,13 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/lighting/photons.h"
 
+// C++ variants of C standard header files
+#include <cstdlib>
+
+// C++ standard header files
 #include <algorithm>
 
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/lighting/lightgroup.h"
 #include "core/lighting/lightsource.h"

@@ -45,7 +45,11 @@
   #error "minimum Visual C++ version supported is 14.0 (supplied with VS 2005)"
 #endif
 
+// C++ variants of C standard header files
 #include <cstdio>
+#include <cstdlib>
+
+// Other library header files
 #include <direct.h>
 
 #pragma auto_inline(on)
