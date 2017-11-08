@@ -83,7 +83,7 @@
 ///
 /// @todo
 ///     The following GNU/Linux features also need to be present or emulated:
-///       - `off64_t lseek64(int, off64_t, int)
+///       - `off64_t lseek64(int, off64_t, int)`
 ///
 /// @todo
 ///     The following somewhat obscure macros also need to be defined:
@@ -611,6 +611,9 @@
 ///
 #ifndef POV_BUILD_INFO
     // leave undefined
+    // The following two lines work around doxygen being unable to document undefined macros.
+    #define POV_BUILD_INFO (undefined)
+    #undef POV_BUILD_INFO
 #endif
 
 /// @def POV_RAY_BUILD_ID
@@ -626,6 +629,9 @@
 ///
 #ifndef POV_RAY_BUILD_ID
     // leave undefined
+    // The following two lines work around doxygen being unable to document undefined macros.
+    #define POV_RAY_BUILD_ID (undefined)
+    #undef POV_RAY_BUILD_ID
 #endif
 
 /// @def POV_COMPILER_INFO
@@ -637,6 +643,9 @@
 ///
 #ifndef POV_COMPILER_INFO
     // leave undefined
+    // The following two lines work around doxygen being unable to document undefined macros.
+    #define POV_COMPILER_INFO (undefined)
+    #undef POV_COMPILER_INFO
 #endif
 
 /// @def POV_SYS_IMAGE_TYPE
@@ -650,10 +659,9 @@
 ///
 #ifndef POV_SYS_IMAGE_TYPE
     // leave undefined by default
-    #ifdef DOXYGEN
-        // doxygen cannot document undefined macros
-        #define POV_SYS_IMAGE_TYPE SYS
-    #endif
+    // The following two lines work around doxygen being unable to document undefined macros.
+    #define POV_SYS_IMAGE_TYPE (undefined)
+    #undef POV_SYS_IMAGE_TYPE
 #endif
 
 /// @def POV_SYS_IMAGE_EXTENSION
@@ -666,7 +674,10 @@
 ///     When overriding this setting, make sure to also override @ref POV_SYS_IMAGE_TYPE.
 ///
 #ifndef POV_SYS_IMAGE_EXTENSION
-    #define POV_SYS_IMAGE_EXTENSION ".tga"
+    // leave undefined by default
+    // The following two lines work around doxygen being unable to document undefined macros.
+    #define POV_SYS_IMAGE_EXTENSION (undefined)
+    #undef POV_SYS_IMAGE_EXTENSION
 #endif
 
 /// @def POV_PATH_SEPARATOR
@@ -711,10 +722,9 @@
 ///
 #ifndef POV_NEW_LINE_STRING
     // leave undefined, optimizing the code for "\n" as used internally
-    #ifdef DOXYGEN
-        // doxygen cannot document undefined macros
-        #define POV_NEW_LINE_STRING "\n"
-    #endif
+    // The following two lines work around doxygen being unable to document undefined macros.
+    #define POV_NEW_LINE_STRING (undefined)
+    #undef POV_NEW_LINE_STRING
 #endif
 
 #ifndef EXIST_FONT_FILE
@@ -761,10 +771,9 @@
 
 #ifndef ALIGN32
     // leave undefined, allowing code to detect that forced 32-bit alignment isn't supported
-    #ifdef DOXYGEN
-        // doxygen cannot document undefined macros
-        #define ALIGN32
-    #endif
+    // The following two lines work around doxygen being unable to document undefined macros.
+    #define ALIGN32 (undefined)
+    #undef ALIGN32
 #endif
 
 #ifndef FORCEINLINE
@@ -834,8 +843,10 @@
 ///
 #ifndef POV_DELETE_FILE
     #ifdef DOXYGEN
-        // doxygen cannot document undefined macros
-        #define POV_DELETE_FILE(name) do{;}while(0)
+        // just leave undefined when running doxygen
+        // The following two lines work around doxygen being unable to document undefined macros.
+        #define POV_DELETE_FILE(name) (undefined)
+        #undef POV_DELETE_FILE
     #else
         #error "No default implementation for POV_DELETE_FILE."
     #endif
