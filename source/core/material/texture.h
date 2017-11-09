@@ -79,7 +79,7 @@ struct WeightedTexture
         weight(w), texture(t) { }
 };
 
-typedef FixedSimpleVector<WeightedTexture, WEIGHTEDTEXTURE_VECTOR_SIZE> WeightedTextureVector;
+typedef PooledSimpleVector<WeightedTexture, WEIGHTEDTEXTURE_VECTOR_SIZE> WeightedTextureVector;
 
 
 /// Texture blend map.

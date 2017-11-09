@@ -55,12 +55,12 @@
 
 //******************************************************************************
 ///
-/// @name FixedSimpleVector Sizes
+/// @name PooledSimpleVector Sizes
 ///
-/// These defines affect the maximum size of some types based on @ref pov::FixedSimpleVector.
+/// These defines affect the initial size of some types based on @ref pov::PooledSimpleVector.
 ///
 /// @todo
-///     These sizes will need tweaking.
+///     These sizes may need tweaking.
 ///
 /// @{
 
@@ -90,6 +90,19 @@
 
 #ifndef RAYINTERIOR_VECTOR_SIZE
 #define RAYINTERIOR_VECTOR_SIZE         512
+#endif
+
+/// @def POV_VECTOR_POOL_SIZE
+/// Initial size of @ref PooledSimpleVector pools.
+#ifndef POV_VECTOR_POOL_SIZE
+#define POV_VECTOR_POOL_SIZE            16
+#endif
+
+/// @def POV_SIMPLE_VECTOR
+/// Vector type optimized for performance.
+/// May be either `std::vector`, `pov::SimpleVector`, or a compatible template.
+#ifndef POV_SIMPLE_VECTOR
+#define POV_SIMPLE_VECTOR               pov::SimpleVector
 #endif
 
 /// @}
@@ -208,7 +221,7 @@
 #ifndef TRY_OPTIMIZED_NOISE
     // leave undefined
     #ifdef DOXYGEN
-        // doxygen cannot document undefined macros; also, we want to force declaration of the
+        // Doxygen cannot document undefined macros; also, we want to force declaration of the
         // TryOptimizedNoise() function.
         #define TRY_OPTIMIZED_NOISE
     #endif

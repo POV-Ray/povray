@@ -128,11 +128,11 @@ struct LightSourceEntry
 };
 
 // TODO: these sizes will need tweaking.
-typedef FixedSimpleVector<Media *, MEDIA_VECTOR_SIZE> MediaVector; // TODO FIXME - cannot allow this to be fixed size [trf]
-typedef FixedSimpleVector<MediaInterval, MEDIA_INTERVAL_VECTOR_SIZE> MediaIntervalVector; // TODO FIXME - cannot allow this to be fixed size [trf]
-typedef FixedSimpleVector<LitInterval, LIT_INTERVAL_VECTOR_SIZE> LitIntervalVector; // TODO FIXME - cannot allow this to be fixed size [trf]
-typedef FixedSimpleVector<LightSourceIntersectionEntry, LIGHT_INTERSECTION_VECTOR_SIZE> LightSourceIntersectionVector; // TODO FIXME - cannot allow this to be fixed size [trf]
-typedef FixedSimpleVector<LightSourceEntry, LIGHTSOURCE_VECTOR_SIZE> LightSourceEntryVector; // TODO FIXME - cannot allow this to be fixed size [trf]
+typedef PooledSimpleVector<Media *, MEDIA_VECTOR_SIZE> MediaVector;
+typedef PooledSimpleVector<MediaInterval, MEDIA_INTERVAL_VECTOR_SIZE> MediaIntervalVector;
+typedef PooledSimpleVector<LitInterval, LIT_INTERVAL_VECTOR_SIZE> LitIntervalVector;
+typedef PooledSimpleVector<LightSourceIntersectionEntry, LIGHT_INTERSECTION_VECTOR_SIZE> LightSourceIntersectionVector;
+typedef PooledSimpleVector<LightSourceEntry, LIGHTSOURCE_VECTOR_SIZE> LightSourceEntryVector;
 
 
 struct TraceTicket

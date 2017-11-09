@@ -73,7 +73,7 @@ void Ray::AppendInterior(Interior *i)
 
 void Ray::AppendInteriors(RayInteriorVector& ii)
 {
-//  interiors.reserve(interiors.size() + ii.size()); // TODO FIXME - remove FixedSimpleVector
+    interiors.reserve(interiors.size() + ii.size());
 
     for(RayInteriorVector::iterator it(ii.begin()); it != ii.end(); it++)
     {
