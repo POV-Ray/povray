@@ -2,12 +2,7 @@
 ///
 /// @file backend/control/benchmark_pov.cpp
 ///
-/// Should be auto-generated from `distribution/scenes/advanced/benchmark/benchmark.pov`.
-///
-/// @todo
-///     The current version is not auto-generated yet, but rather contains a
-///     verbatim copy of code pulled out of `backend/control/benchmark.cpp`,
-///     which somehow got out of sync with the distribution copy.
+/// Auto-generated from `distribution/scenes/advanced/benchmark/benchmark.pov`.
 ///
 /// @copyright
 /// @parblock
@@ -47,158 +42,166 @@
 namespace pov {
 
 extern const char Benchmark_File[]=
-  // Persistence Of Vision Ray Tracer Scene Description File
-  //
-  // File:            benchmark.pov
-  // Benchmark Vers:  2.01 Scene File Version
-  // Desc:            POV-Ray benchmark scene
-  // Date:            October/November 2001
-  //
-  // Assembled by Christoph Hormann
-  // Contributions by:
-  //    - Ingo Janssen
-  //    - Mick Hazelgrove
-  //
-  // ==================================================================
-  //
-  //    Standard POV-Ray benchmark version 2.01 Scene File Version
-  //
-  // This is the official POV-Ray benchmark scene.  It is designed
-  // to test a variety of POV-Ray features and should render in a
-  // reasonable amount of time on current machines.  Note that the
-  // radiosity feature is still experimental and not very suitable for
-  // comparing results of different versions, therefore it is turned
-  // off by default.
-  //
-  // Please log all changes made to this file below.
-  //
-  // Note that only results generated with the above options and the
-  // unchanged scene file are allowed to be published as 'official
-  // POV-Ray benchmark results'.  Feel free to do additional tests, but
-  // make sure the differences are made clear when publishing them.
-  //
-  // When publishing results, be sure to quote the exact version of the
-  // benchmark scene used (2.01 Scene File Version), and the exact
-  // version of POV-Ray.
-  //
-  // ==================================================================
-  //
-  // Change history
-  // --------------
-  //
-  // Nov. 2001   Initial release (version 3.5.0)
-  // Jan. 2002   using 'max()' instead of '&' in isosurface
-  // Apr. 2002   changed max_gradient of isosurface (new ver is 1.01)
-  // Jun. 2002   added photons pass_through to clouds (new ver is 1.02)
-  // Dec. 2010   made ready for v3.7 release (new ver is 2.00)
-  // Dec. 2010   last minute changes re: assumed_gamma (kept version the same)
-  // Oct. 2012   allow to run without installation (same ver : 2.00)
-  // Jan. 2013   change version to 2.01 to differentiate from beta.
-  //
-  // ==================================================================
-  //
-  // Permission is granted for this file and the output from it to be
-  // freely redistributed in an unmodified form for the purpose of
-  // generating and maintaining POV-Ray benchmarks.  Derivative works
-  // are permitted provided that they have a clearly different filename
-  // and do not claim to be the standard benchmark file.
-  //
-  // ==================================================================
-  //
-  // Suggested command line options if not using an INI file:
-  //
-  // -w512 -h512 +a0.3 +v -d -f -x
-  //
-  // The following INI options are used when the 'Run Benchmark' command
-  // is chosen on versions of POV-Ray that support the built-in version.
-  //
-  // All_Console=On
-  // All_File=
-  // Antialias_Depth=3
-  // Antialias=On
-  // Antialias_Gamma=2.5
-  // Antialias_Threshold=0.3
-  // Bits_Per_Color=8
-  // Bounding=On
-  // Bounding_Method=1
-  // Bounding_Threshold=3
-  // Clock=0
-  // Continue_Trace=Off
-  // Clockless_Animation=off
-  // Cyclic_Animation=Off
-  // Debug_Console=On
-  // Display=Off
-  // Display_Gamma=2.2
-  // Dither=off
-  // End_Column=1
-  // End_Row=1
-  // Fatal_Console=On
-  // Fatal_Error_Command=
-  // Fatal_Error_Return=I
-  // Field_Render=Off
-  // Final_Clock=1
-  // Final_Frame=1
-  // Grayscale_Output=off
-  // Height=512
-  // High_Reproducibility=off
-  // Initial_Clock=0
-  // Initial_Frame=1
-  // Include_Header=
-  // Input_File_Name=benchmark.pov
-  // Jitter_Amount=0.3
-  // Jitter=On
-  // Light_Buffer=On
-  // Odd_Field=Off
-  // Output_Alpha=Off
-  // Output_File_Name=
-  // Output_File_Type=n
-  // Output_To_File=Off
-  // Palette=3
-  // Pause_When_Done=Off
-  // Post_Frame_Command=
-  // Post_Frame_Return=I
-  // Post_Scene_Command=
-  // Post_Scene_Return=I
-  // Preview_End_Size=1
-  // Preview_Start_Size=1
-  // Pre_Frame_Command=
-  // Pre_Frame_Return=I
-  // Pre_Scene_Command=
-  // Pre_Scene_Return=I
-  // Quality=9
-  // Radiosity_From_File=off
-  // Radiosity_To_File=off
-  // Radiosity_Vain_Pretrace=on
-  // Real_Time_Raytracing=off
-  // Remove_Bounds=On
-  // Render_Block_Size=16
-  // Render_Block_Step=0
-  // Render_Console=On
-  // Render_Pattern=0
-  // Sampling_Method=1
-  // Split_Unions=Off
-  // Start_Column=0
-  // Start_Row=0
-  // Statistic_Console=On
-  // Subset_End_Frame=1
-  // Subset_Start_Frame=1
-  // Test_Abort_Count=0
-  // Test_Abort=Off
-  // User_Abort_Command=
-  // User_Abort_Return=I
-  // Verbose=On
-  // Version=3.7
-  // Warning_Console=On
-  // Width=512
-  //
-  // ==================================================================
+  "// This work is licensed under the POV-Ray v3.7 distribution license.\n"
+  "// To view a copy of this license, visit http://www.povray.org/licences/v3.7/.\n"
+  "//\n"
+  "// The following exception is granted to the above license terms:\n"
+  "// Permission is granted for this file and the output from it to be\n"
+  "// freely redistributed in an unmodified form for the purpose of\n"
+  "// generating and maintaining POV-Ray benchmarks.  Derivative works\n"
+  "// are permitted provided that they have a clearly different filename\n"
+  "// and do not claim to be the standard benchmark file.\n"
+  "//\n"
+  "// ==================================================================\n"
+  "//\n"
+  "// Persistence Of Vision Ray Tracer Scene Description File\n"
+  "//\n"
+  "// File:            benchmark.pov\n"
+  "// Benchmark Vers:  2.02 Scene File Version\n"
+  "// Desc:            POV-Ray benchmark scene\n"
+  "// Date:            October/November 2001 (initial release)\n"
+  "//\n"
+  "// Assembled by Christoph Hormann\n"
+  "// Contributions by:\n"
+  "//    - Ingo Janssen\n"
+  "//    - Mick Hazelgrove\n"
+  "//\n"
+  "// ==================================================================\n"
+  "//\n"
+  "//    Standard POV-Ray benchmark version 2.02 Scene File Version\n"
+  "//\n"
+  "// This is the official POV-Ray benchmark scene.  It is designed\n"
+  "// to test a variety of POV-Ray features and should render in a\n"
+  "// reasonable amount of time on current machines.  Note that the\n"
+  "// radiosity feature is still experimental and not very suitable for\n"
+  "// comparing results of different versions, therefore it is turned\n"
+  "// off by default.\n"
+  "//\n"
+  "// Please log all changes made to this file below.\n"
+  "//\n"
+  "// Also, please make sure the distribution copy of this file\n"
+  "// (`distribution/scenes/advanced/benchmark/benchmark.pov`) remains in\n"
+  "// sync with the inbuilt copy (`source/backend/control/benchmark_pov.cpp`)\n"
+  "// and the version number in `source/backend/control/benchmark.cpp`.\n"
+  "//\n"
+  "// Note that only results generated with the above options and the\n"
+  "// unchanged scene file are allowed to be published as 'official\n"
+  "// POV-Ray benchmark results'.  Feel free to do additional tests, but\n"
+  "// make sure the differences are made clear when publishing them.\n"
+  "//\n"
+  "// When publishing results, be sure to quote the exact version of the\n"
+  "// benchmark scene used (2.02 Scene File Version), and the exact\n"
+  "// version of POV-Ray.\n"
+  "//\n"
+  "// ==================================================================\n"
+  "//\n"
+  "// Change history\n"
+  "// --------------\n"
+  "//\n"
+  "// Nov. 2001   Initial release (version 3.5.0)\n"
+  "// Jan. 2002   using 'max()' instead of '&' in isosurface\n"
+  "// Apr. 2002   changed max_gradient of isosurface (new ver is 1.01)\n"
+  "// Jun. 2002   added photons pass_through to clouds (new ver is 1.02)\n"
+  "// Dec. 2010   made ready for v3.7 release (new ver is 2.00)\n"
+  "// Dec. 2010   last minute changes re: assumed_gamma (kept version the same)\n"
+  "// Oct. 2012   allow to run without installation (same ver : 2.00)\n"
+  "// Jan. 2013   change version to 2.01 to differentiate from beta.\n"
+  "// Feb  2013   Updated for v3.7\n"
+  "// Nov. 2017   Re-synced distribution copy with built-in copy (new ver is 2.02)\n"
+  "//\n"
+  "// ==================================================================\n"
+  "//\n"
+  "// Suggested command line options if not using an INI file:\n"
+  "//\n"
+  "// -w512 -h512 +a0.3 +v -d -f -x\n"
+  "//\n"
+  "// The following INI options are used when the 'Run Benchmark' command\n"
+  "// is chosen on versions of POV-Ray that support the built-in version.\n"
+  "//\n"
+  "// All_Console=On\n"
+  "// All_File=\n"
+  "// Antialias_Depth=3\n"
+  "// Antialias=On\n"
+  "// Antialias_Gamma=2.5\n"
+  "// Antialias_Threshold=0.3\n"
+  "// Bits_Per_Color=8\n"
+  "// Bounding=On\n"
+  "// Bounding_Method=1\n"
+  "// Bounding_Threshold=3\n"
+  "// Clock=0\n"
+  "// Continue_Trace=Off\n"
+  "// Clockless_Animation=off\n"
+  "// Cyclic_Animation=Off\n"
+  "// Debug_Console=On\n"
+  "// Display=Off\n"
+  "// Display_Gamma=2.2\n"
+  "// Dither=off\n"
+  "// End_Column=1\n"
+  "// End_Row=1\n"
+  "// Fatal_Console=On\n"
+  "// Fatal_Error_Command=\n"
+  "// Fatal_Error_Return=I\n"
+  "// Field_Render=Off\n"
+  "// Final_Clock=1\n"
+  "// Final_Frame=1\n"
+  "// Grayscale_Output=off\n"
+  "// Height=512\n"
+  "// High_Reproducibility=off\n"
+  "// Initial_Clock=0\n"
+  "// Initial_Frame=1\n"
+  "// Include_Header=\n"
+  "// Input_File_Name=benchmark.pov\n"
+  "// Jitter_Amount=0.3\n"
+  "// Jitter=On\n"
+  "// Light_Buffer=On\n"
+  "// Odd_Field=Off\n"
+  "// Output_Alpha=Off\n"
+  "// Output_File_Name=\n"
+  "// Output_File_Type=n\n"
+  "// Output_To_File=Off\n"
+  "// Palette=3\n"
+  "// Pause_When_Done=Off\n"
+  "// Post_Frame_Command=\n"
+  "// Post_Frame_Return=I\n"
+  "// Post_Scene_Command=\n"
+  "// Post_Scene_Return=I\n"
+  "// Preview_End_Size=1\n"
+  "// Preview_Start_Size=1\n"
+  "// Pre_Frame_Command=\n"
+  "// Pre_Frame_Return=I\n"
+  "// Pre_Scene_Command=\n"
+  "// Pre_Scene_Return=I\n"
+  "// Quality=9\n"
+  "// Radiosity_From_File=off\n"
+  "// Radiosity_To_File=off\n"
+  "// Radiosity_Vain_Pretrace=on\n"
+  "// Real_Time_Raytracing=off\n"
+  "// Remove_Bounds=On\n"
+  "// Render_Block_Size=16\n"
+  "// Render_Block_Step=0\n"
+  "// Render_Console=On\n"
+  "// Render_Pattern=0\n"
+  "// Sampling_Method=1\n"
+  "// Split_Unions=Off\n"
+  "// Start_Column=0\n"
+  "// Start_Row=0\n"
+  "// Statistic_Console=On\n"
+  "// Subset_End_Frame=1\n"
+  "// Subset_Start_Frame=1\n"
+  "// Test_Abort_Count=0\n"
+  "// Test_Abort=Off\n"
+  "// User_Abort_Command=\n"
+  "// User_Abort_Return=I\n"
+  "// Verbose=On\n"
+  "// Version=3.7\n"
+  "// Warning_Console=On\n"
+  "// Width=512\n"
+  "//\n"
+  "// ==================================================================\n"
+  "\n"
   "#version 3.7;\n"
   "\n"
   "#default { texture { finish { ambient 0 diffuse 1 }}}\n"
-  "\n"
-  "//#include \"functions.inc\"\n"
-  "//#include \"colors.inc\"\n"
-  "//#include \"logo.inc\"\n"
   "\n"
   "#declare use_radiosity = false;\n"
   "\n"
@@ -251,16 +254,18 @@ extern const char Benchmark_File[]=
   "\n"
   "//====================================================================================\n"
   "\n"
+  "// This scene uses a non-standard camera set-up. \n"
+  "// (See CAMERA in the included documentation for details.) \n"
+  "// If you are new to POV-Ray, you might want to try a different demo scene.\n"
   "camera {\n"
   "   location  <3.2, 3.2, 1.8>\n"
   "   direction y\n"
   "   sky       z\n"
   "   up        z\n"
-  "   right     -x\n"
+  "   right     -x*(image_width/image_height) // keep propotions with any aspect ratio\n"
   "   look_at   <-1, -1, 0.9>\n"
   "   angle     45\n"
   "}\n"
-  "\n"
   "\n"
   "light_source {\n"
   "   <-0.7, 0.83, 0.24>*150000\n"
@@ -304,14 +309,14 @@ extern const char Benchmark_File[]=
   "\n"
   "// Copied from functions.inc for Oct 2012\n"
   "#declare f_ridged_mf = function { internal(59) }\n"
-  "// Parameters: x, y, z"
-  "  // Six extra parameters required:                          \n"
-  "  // 1. H \n"
-  "  // 2. Lacunarity \n"
-  "  // 3. octaves\n"
-  "  // 4. offset \n"
-  "  // 5. Gain \n"
-  "  // 6. noise\n"
+  "// Parameters: x, y, z\n"
+  "   // Six extra parameters required:\n"
+  "   // 1. H \n"
+  "   // 2. Lacunarity \n"
+  "   // 3. octaves\n"
+  "   // 4. offset \n"
+  "   // 5. Gain \n"
+  "   // 6. noise\n"
   "\n"
   "#declare RMF = function{ f_ridged_mf(x, y, z, 0.07, 2.2,  7, 0.6, 0.9, 1)}\n"
   "\n"
@@ -760,8 +765,7 @@ extern const char Benchmark_File[]=
   "\n"
   "#declare POV_Text =\n"
   "text {\n"
-  "   //ttf \"timrom.ttf\"\n"
-  "   internal 1\n"
+  "   internal 1 // ttf \"timrom.ttf\"\n"
   "   \"POV-Ray\"\n"
   "   0.25,0\n"
   "   scale 0.3\n"
@@ -771,8 +775,7 @@ extern const char Benchmark_File[]=
   "\n"
   "#declare Version_Text =\n"
   "text {\n"
-  "   //ttf \"timrom.ttf\"\n"
-  "   internal 1\n"
+  "   internal 1 // ttf \"timrom.ttf\"\n"
   "   \"Version 3.7\"\n"
   "   0.25,0\n"
   "   scale 0.3\n"
@@ -902,6 +905,7 @@ extern const char Benchmark_File[]=
   "\n"
   "   translate Pos1\n"
   "}\n"
+  "\n"
   "// Copied from logo.inc for Oct 2012\n"
   "// The original version is made of various objects.\n"
   "#declare Povray_Logo =\n"
@@ -920,7 +924,6 @@ extern const char Benchmark_File[]=
   "   translate <-0.5,-0.35,0>\n"
   "   scale 1/4\n"
   "}\n"
-  "\n"
   "\n"
   "\n"
   "object {\n"
@@ -1034,8 +1037,7 @@ extern const char Benchmark_File[]=
   "\n"
   "#declare Letter =\n"
   "text {\n"
-  "   //ttf \"timrom.ttf\"\n"
-  "   internal 1\n"
+  "   internal 1 // ttf \"timrom.ttf\"\n"
   "   \"X\"\n"
   "   1,0\n"
   "   scale <1/0.7,1/0.66,1>\n"
