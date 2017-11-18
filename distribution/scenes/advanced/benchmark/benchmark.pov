@@ -1,5 +1,5 @@
-// This work is licensed under the POV-Ray v3.7 distribution license.
-// To view a copy of this license, visit http://www.povray.org/licences/v3.7/.
+// This work is licensed under the POV-Ray v3.8 distribution license.
+// To view a copy of this license, visit http://www.povray.org/licences/v3.8/.
 //
 // The following exception is granted to the above license terms:
 // Permission is granted for this file and the output from it to be
@@ -13,7 +13,7 @@
 // Persistence Of Vision Ray Tracer Scene Description File
 //
 // File:            benchmark.pov
-// Benchmark Vers:  2.02 Scene File Version
+// Benchmark Vers:  2.03 Scene File Version
 // Desc:            POV-Ray benchmark scene
 // Date:            October/November 2001 (initial release)
 //
@@ -24,7 +24,7 @@
 //
 // ==================================================================
 //
-//    Standard POV-Ray benchmark version 2.02 Scene File Version
+//    Standard POV-Ray benchmark version 2.03 Scene File Version
 //
 // This is the official POV-Ray benchmark scene.  It is designed
 // to test a variety of POV-Ray features and should render in a
@@ -46,7 +46,7 @@
 // make sure the differences are made clear when publishing them.
 //
 // When publishing results, be sure to quote the exact version of the
-// benchmark scene used (2.02 Scene File Version), and the exact
+// benchmark scene used (2.03 Scene File Version), and the exact
 // version of POV-Ray.
 //
 // ==================================================================
@@ -64,6 +64,7 @@
 // Jan. 2013   change version to 2.01 to differentiate from beta.
 // Feb  2013   Updated for v3.7
 // Nov. 2017   Re-synced distribution copy with built-in copy (new ver is 2.02)
+// Nov. 2017   Updated for v3.8 (new ver is 2.03)
 //
 // ==================================================================
 //
@@ -149,15 +150,15 @@
 // User_Abort_Command=
 // User_Abort_Return=I
 // Verbose=On
-// Version=3.7
+// Version=3.8
 // Warning_Console=On
 // Width=512
 //
 // ==================================================================
 
-#version 3.7;
+#version 3.8;
 
-#default { texture { finish { ambient 0 diffuse 1 }}}
+#default { texture { finish { ambient 0.02 diffuse 1 }}}
 
 #declare use_radiosity = false;
 
@@ -201,12 +202,6 @@ global_settings {
    #end
 
 }
-
-#if (use_radiosity=false)
-   #default {finish {ambient 0.02}}
-#else
-   #default {finish {ambient 0.00}}
-#end
 
 //====================================================================================
 
@@ -398,7 +393,7 @@ sphere {           // --- Sky ---
       }
       finish {
          diffuse 0
-         ambient 1
+         emission 1
       }
    }
    scale Rad*<20, 20, 4>
@@ -732,7 +727,7 @@ text {
 #declare Version_Text =
 text {
    internal 1 // ttf "timrom.ttf"
-   "Version 3.7"
+   "Version 3.8"
    0.25,0
    scale 0.3
    rotate 90*x

@@ -72,6 +72,8 @@ Changed Behaviour
       - `ambient` now defaults to 0.0 instead of 0.1.
       - The camera `right` vector length now defaults to the output image aspect
         ratio (presuming square pixels) instead of 1.33.
+  - Minor changes have been made to the benchmark scene. New benchmark version
+    is 2.03.
 
 Other Noteworthy
 ----------------

@@ -74,7 +74,7 @@ bool Write_Benchmark_File (const char *Scene_File_Name, const char *INI_File_Nam
 
 unsigned int Get_Benchmark_Version (void)
 {
-    return (0x0202) ; // Benchmark version 2.02
+    return (0x0203) ; // Benchmark version 2.03
 }
 
 }

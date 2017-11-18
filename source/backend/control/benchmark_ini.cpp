@@ -117,7 +117,7 @@ extern const char Benchmark_Options[]=
   "User_Abort_Command=\n"
   "User_Abort_Return=I\n"
   "Verbose=On\n"
-  "Version=3.7\n"
+  "Version=3.8\n"
   "Warning_Console=On\n"
   "Width=512\n"
   ""

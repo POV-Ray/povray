@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# =============================================================================
+
 # Print header for single C++ source file.
 # $1 - output file name
 # $2 - input file name
@@ -62,10 +64,16 @@ function reswrap_benchmark {
     reswrap_text "source/backend/control/benchmark_$1" "distribution/scenes/advanced/benchmark/benchmark.$1" "pov" "$2"
 }
 
+# =============================================================================
+
+# TrueType Fonts
+
 reswrap_ttf "crystal"
 reswrap_ttf "cyrvetic"
 reswrap_ttf "povlogo"
 reswrap_ttf "timrom"
+
+# Benchmark Scene
 
 reswrap_benchmark "pov" "Benchmark_File"
 reswrap_benchmark "ini" "Benchmark_Options"
