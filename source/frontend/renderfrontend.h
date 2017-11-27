@@ -528,10 +528,10 @@ RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_M
 
 			if(obj.TryGetBool(kPOVAttrib_OutputToFile, true))
 			{
-				if (imageProcessing == NULL)
+				if (!imageProcessing)
 					throw POV_EXCEPTION(kNullPointerErr, "Internal error: output to file is set, but no ImageProcessing object supplied");
 				shared_ptr<Image> img(imageProcessing->GetImage());
-				if(img != NULL)
+				if(img)
 				{
 					if((img->GetWidth() != width) || (img->GetHeight() != height))
 						throw POV_EXCEPTION_STRING("Invalid partial rendered image. Image size does not match!");
