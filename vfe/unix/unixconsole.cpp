@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,13 +33,14 @@
 ///
 //******************************************************************************
 
-// C++ variants of C standard headers
+// C++ variants of C standard header files
 #include <csignal>
+#include <cstdlib>
 
-// boost headers
+// Boost header files
 #include <boost/shared_ptr.hpp>
 
-// other library headers
+// Other library header files
 #include <termios.h>
 #include <unistd.h>
 #include <sys/select.h>
@@ -173,6 +174,9 @@ static vfeDisplay *UnixDisplayCreator (unsigned int width, unsigned int height, 
 
 static void PrintStatus (vfeSession *session)
 {
+    // TODO -- when invoked while processing "--help" command-line switch,
+    //         GNU/Linux customs would be to print to stdout (among other differences).
+
     string str;
     vfeSession::MessageType type;
     static vfeSession::MessageType lastType = vfeSession::mUnclassified;
@@ -233,6 +237,8 @@ static void PrintStatusChanged (vfeSession *session, State force = kUnknown)
 
 static void PrintVersion(void)
 {
+    // TODO -- GNU/Linux customs would be to print to stdout (among other differences).
+
     fprintf(stderr,
         "%s %s\n\n"
         "%s\n%s\n%s\n"
@@ -260,12 +266,17 @@ static void PrintVersion(void)
     );
 }
 
+static void PrintGeneration(void)
+{
+    fprintf(stdout, "%s\n", POV_RAY_GENERATION POV_RAY_BETA_SUFFIX);
+}
+
 static void ErrorExit(vfeSession *session)
 {
     fprintf(stderr, "%s\n", session->GetErrorString());
     session->Shutdown();
     delete session;
-    exit(RETURN_ERROR);
+    std::exit(RETURN_ERROR);
 }
 
 static void CancelRender(vfeSession *session)
@@ -303,7 +314,7 @@ static ReturnValue PrepareBenchmark(vfeSession *session, vfeRenderOptions& opts,
         if (boost::starts_with(s, "+wt") || boost::starts_with(s, "-wt"))
         {
             s.erase(0, 3);
-            int n = atoi(s.c_str());
+            int n = std::atoi(s.c_str());
             if (n)
                 opts.SetThreadCount(n);
             else
@@ -475,6 +486,14 @@ int main (int argc, char **argv)
         delete session;
         return RETURN_OK;
     }
+    else if (session->GetUnixOptions()->isOptionSet("general", "generation"))
+    {
+        session->Shutdown();
+        PrintGeneration();
+        delete sigthread;
+        delete session;
+        return RETURN_OK;
+    }
     else if (session->GetUnixOptions()->isOptionSet("general", "benchmark"))
     {
         retval = PrepareBenchmark(session, opts, bench_ini_name, bench_pov_name, argc, argv);
@@ -499,7 +518,7 @@ int main (int argc, char **argv)
     }
     else
     {
-        char *s = getenv ("POVINC");
+        char *s = std::getenv ("POVINC");
         session->SetDisplayCreator(UnixDisplayCreator);
         session->GetUnixOptions()->Process_povray_ini(opts);
         if (s != NULL)

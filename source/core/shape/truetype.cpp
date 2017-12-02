@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -2744,7 +2744,7 @@ bool TrueType::GlyphIntersect(const Vector3d& P, const Vector3d& D, const GlyphS
 
                     if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
                     {
-                        N = Vector3d(d1, -d0, 0.0);
+                        N = Vector3d(-d1, d0, 0.0);
                         MTransNormal(N, N, Trans);
                         N.normalize();
                         Depth_Stack->push(Intersection(Depth, IPoint, N, this));
@@ -2817,7 +2817,7 @@ bool TrueType::GlyphIntersect(const Vector3d& P, const Vector3d& D, const GlyphS
 
                         if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
                         {
-                            N = Vector3d(2.0 * yt2 * S[l] + yt1, -2.0 * xt2 * S[l] - xt1, 0.0);
+                            N = Vector3d(-2.0 * yt2 * S[l] - yt1, 2.0 * xt2 * S[l] + xt1, 0.0);
                             MTransNormal(N, N, Trans);
                             N.normalize();
                             Depth_Stack->push(Intersection(Depth, IPoint, N, this));

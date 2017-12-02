@@ -18,7 +18,7 @@
 ///
 /// ----------------------------------------------------------------------------
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -130,7 +130,7 @@ DBL cycloidal(DBL value)
 
 DBL Triangle_Wave(DBL value)
 {
-    register DBL offset;
+    DBL offset;
 
     if (value >= 0.0)
     {
@@ -211,6 +211,10 @@ void Transform_Textures(TEXTURE *Textures, const TRANSFORM *Trans)
 * CHANGES
 *   6/27/98  MBP  Added initializers for reflection blur
 *   8/27/98  MBP  Added initializers for angle-based reflectivity
+*
+* NOTES
+*   since v3.8, the default ambient will be be overriden to 0.0 when the first statement
+*   is a #version with value 3.8 or greater or when such version is set explicitly in command line or ini file
 *
 ******************************************************************************/
 

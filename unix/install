@@ -15,7 +15,7 @@
 
 POVRAY=POV-Ray
 POV_DIR=povray
-VERSION_FULL=3.7.2
+VERSION_FULL=3.8.1
 VERSION=3.7
 VER_DIR=$POV_DIR-$VERSION
 TARGET_PLATFORM=x86
@@ -976,7 +976,7 @@ test_render()
 {
 	DIR=`pwd`
 	VER_STRING=`povray -version 2>&1`
-	if echo "$VER_STRING" | grep "3.7.2" > /dev/null ; then
+	if echo "$VER_STRING" | grep "$VERSION_FULL" > /dev/null ; then
 		cp scenes/advanced/biscuit.pov "$HOME/"
 		cd "$HOME"
 		povray -ibiscuit.pov -f +v +p -w320 -h240 +a0.3 $1 2>&1 | tee -a "$TMP_LOG"

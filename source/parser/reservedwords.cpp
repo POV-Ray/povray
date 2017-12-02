@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -118,6 +118,9 @@ const RESERVED_WORD Reserved_Words[] = {
     { BOZO_TOKEN,                   "bozo" },
     { B_SPLINE_TOKEN,               "b_spline" },
     { BREAK_TOKEN,                  "break" },
+#if POV_DEBUG
+    { BREAKPOINT_TOKEN,             "breakpoint" },
+#endif
     { BRICK_TOKEN,                  "brick" },
     { BRICK_SIZE_TOKEN,             "brick_size" },
     { BRIGHTNESS_TOKEN,             "brightness" },

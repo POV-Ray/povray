@@ -7,7 +7,7 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -36,15 +36,21 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
+// C++ variants of C standard header files
 #include <cctype>
+#include <cstdlib>
 
+// C++ standard header files
 #include <algorithm>
 
+// Boost header files
 #include <boost/date_time/posix_time/posix_time.hpp>
 
+// POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
 #include "base/mathutil.h"
 
+// POV-Ray header files (core module)
 #include "core/material/blendmap.h"
 #include "core/material/noise.h"
 #include "core/material/normal.h"
@@ -61,6 +67,7 @@
 #include "core/shape/heightfield.h"
 #include "core/support/imageutil.h"
 
+// POV-Ray header files (VM module)
 #include "vm/fnpovfpu.h"
 
 // this must be the last file included
@@ -704,7 +711,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                 case VAL_TOKEN:
                     Parse_Paren_Begin();
                     Local_C_String=Parse_C_String();
-                    Val = atof(Local_C_String);
+                    Val = std::atof(Local_C_String);
                     POV_FREE(Local_C_String);
                     Parse_Paren_End();
                     break;
@@ -1040,7 +1047,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     if (!parsingVersionDirective)
                     {
                         // Normally, the `version` pseudo-variable needs to return the effective language version
-                        // (which now defaults to 3.6.2) so that include files can properly switch back after
+                        // (which now defaults to v3.6.2) so that include files can properly switch back after
                         // temporarily overriding the `#version` setting.
                         Val = sceneData->EffectiveLanguageVersion() / 100.0;
                     }
@@ -1510,7 +1517,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
 void Parser::Promote_Express(EXPRESS& Express,int *Old_Terms,int New_Terms)
 {
-    register int i;
+    int i;
 
     if (*Old_Terms >= New_Terms)
         return;
@@ -1558,7 +1565,7 @@ void Parser::Promote_Express(EXPRESS& Express,int *Old_Terms,int New_Terms)
 
 void Parser::Parse_Num_Term (EXPRESS& Express,int *Terms)
 {
-    register int i;
+    int i;
     EXPRESS Local_Express;
     int Local_Terms;
 
@@ -1629,7 +1636,7 @@ void Parser::Parse_Num_Term (EXPRESS& Express,int *Terms)
 
 void Parser::Parse_Rel_Factor (EXPRESS& Express,int *Terms)
 {
-    register int i;
+    int i;
     EXPRESS Local_Express;
     int Local_Terms;
 
@@ -1775,7 +1782,7 @@ DBL Parser::Parse_Rel_String_Term (const UCS2 *lhs)
 
 void Parser::Parse_Rel_Term (EXPRESS& Express,int *Terms)
 {
-    register int i;
+    int i;
     EXPRESS Local_Express;
     int Local_Terms;
 
@@ -1877,7 +1884,7 @@ void Parser::Parse_Rel_Term (EXPRESS& Express,int *Terms)
 
 void Parser::Parse_Logical (EXPRESS& Express,int *Terms)
 {
-    register int i;
+    int i;
     EXPRESS Local_Express;
     int Local_Terms;
 
@@ -2661,7 +2668,7 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
                 // Note: Setting up for potential warning on single value float promote to
                 // five value color vector. Any single float will be promoted to the full
                 // 'tgtTerms' value. This usually results in filter and trasmit values >0,
-                // which caused shadow artifacts back to at least version 3.6.1.
+                // which caused shadow artifacts back to at least version v3.6.1.
                 if ((Token.Token_Id==FLOAT_FUNCT_TOKEN) || (Token.Token_Id==FUNCT_ID_TOKEN))
                     sawFloatOrFloatFnct = true;
                 else

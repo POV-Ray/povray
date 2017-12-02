@@ -9,7 +9,7 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -35,8 +35,8 @@
 ///
 //******************************************************************************
 
-#ifndef __VFE_H__
-#define __VFE_H__
+#ifndef POVRAY_VFE_VFE_H
+#define POVRAY_VFE_VFE_H
 
 #include <cassert>
 
@@ -263,4 +263,4 @@ namespace vfe
   };
 }
 
-#endif
+#endif // POVRAY_VFE_VFE_H

@@ -9,7 +9,7 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -633,6 +633,7 @@ class Parser : public SceneTask
 
         // parse.h/parse.cpp
         void Frame_Init(void);
+        void InitDefaults(int version);
         void Parse_Coeffs(int order, DBL *Coeffs);
 
         ObjectPtr Parse_Bicubic_Patch(void);

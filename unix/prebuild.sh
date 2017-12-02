@@ -18,7 +18,7 @@
 # (e.g. doc).
 #
 # Running prebuild.sh requires:
-#   1) GNU autoconf >= 2.59 and GNU automake >= 1.9
+#   1) GNU autoconf >= 2.68 and GNU automake >= 1.9
 #   2) perl and m4 (should be on any system, at least Linux is okay)
 #   3) Run from the unix/ directory where the script is located.
 #
@@ -44,7 +44,12 @@
 
 umask 022
 
-pov_version_base=`cat ./VERSION | sed 's,\([0-9]*.[0-9]*\).*,\1,g'`
+# Extract version information from `source/base/version.h`
+eval `../tools/unix/get-source-version.sh ../source/base/version.h`
+pov_copyright="$POV_RAY_COPYRIGHT"
+pov_version_base="$POV_RAY_GENERATION"
+pov_version="$POV_RAY_FULL_VERSION"
+
 pov_config_bugreport="POV-Ray issue tracker at https://github.com/POV-Ray/povray/issues"
 
 # documentation
@@ -52,7 +57,7 @@ timestamp=`date +%Y-%m-%d`
 build="./docs_$timestamp"
 builddoc="$build/documentation"
 
-required_autoconf="2.59"
+required_autoconf="2.68"
 required_automake="1.9"
 
 
@@ -350,7 +355,7 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
   # some shells seem unable to expand properly wildcards in the list entries
   # (e.g. ../distribution/in*/).
   for file in \
-    AUTHORS ChangeLog configure.ac COPYING NEWS README VERSION \
+    AUTHORS ChangeLog configure.ac COPYING NEWS README \
     povray.1 povray.conf \
     scripts \
     ../distribution/ini ../distribution/include ../distribution/scenes
@@ -367,6 +372,10 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
   echo "Create ../INSTALL"
   $cp_u -f install.txt ../INSTALL  ||  echo "INSTALL not copied !"
   chmod -f u+rw ../INSTALL
+
+  # VERSION
+  echo "Create ../VERSION"
+  echo "$pov_version" > ../VERSION  ||  echo "VERSION not created !"
 
   # icons/
   # don't copy the icons/source directory

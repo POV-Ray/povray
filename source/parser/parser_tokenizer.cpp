@@ -13,7 +13,7 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -307,7 +307,7 @@ void Parser::Terminate_Tokenizer()
 
 void Parser::Get_Token ()
 {
-    register int c,c2;
+    int c,c2;
     int col;
 
     if (Token.Unget_Token)
@@ -713,7 +713,7 @@ void Parser::Unget_Token ()
 
 bool Parser::Skip_Spaces()
 {
-    register int c;
+    int c;
 
     while(true)
     {
@@ -755,7 +755,7 @@ bool Parser::Skip_Spaces()
 
 int Parser::Parse_C_Comments()
 {
-    register int c, c2;
+    int c, c2;
     bool End_Of_Comment = false;
 
     while(!End_Of_Comment)
@@ -1005,7 +1005,7 @@ inline void Parser::End_String_Fast()
 
 void Parser::Read_String_Literal()
 {
-    register int c;
+    int c;
     int col = Echo_Indx;
 
     Begin_String();
@@ -1061,8 +1061,8 @@ void Parser::Read_String_Literal()
 
 bool Parser::Read_Float()
 {
-    register int c, Phase;
-    register bool Finished;
+    int c, Phase;
+    bool Finished;
     int col = Echo_Indx;
 
     Finished = false;
@@ -1247,7 +1247,7 @@ bool Parser::Read_Float()
 
 void Parser::Read_Symbol()
 {
-    register int c;
+    int c;
     int Local_Index,i,j,k;
     POV_ARRAY *a;
     SYM_ENTRY *Temp_Entry;
@@ -1595,7 +1595,7 @@ inline void Parser::Write_Token (TOKEN Token_Id, int col, SYM_TABLE *table)
 
 const char *Parser::Get_Token_String (TOKEN Token_Id)
 {
-    register int i;
+    int i;
 
     for (i = 0; Reserved_Words[i].Token_Name != NULL; i++)
         if (Reserved_Words[i].Token_Number == Token_Id)
@@ -1691,7 +1691,7 @@ char *Parser::Get_Reserved_Words (const char *additional_words)
 
 int Parser::Echo_getc()
 {
-    register int c;
+    int c;
 
     if((Input_File == NULL) || (Input_File->In_File == NULL) || (c = Input_File->In_File->getchar()) == EOF)
     {
@@ -2411,19 +2411,34 @@ void Parser::Parse_Directive(int After_Hash)
 
                             sceneData->languageVersion = (int)(Parse_Float() * 100 + 0.5);
 
-                            if ((sceneData->languageVersionLate) && sceneData->languageVersion >= 371)
+                            if (sceneData->languageVersion == 371)
                             {
-                                // As of POV-Ray 3.7, all scene files are supposed to begin with a `#version` directive.
-                                // As of POV-Ray 3.71, We no longer tolerate violation of that rule if the main scene
-                                // file claims to be compatible with POV-Ray 3.71 anywhere further down the road.
+                                Warning("The version of POV-Ray originally developed as v3.7.1 was ultimately "
+                                        "released as v3.8.0; '#version 3.71' will probably not work as expected. "
+                                        "Use '#version 3.8' instead.");
+                            }
+
+                            if ((sceneData->languageVersionLate) && (sceneData->languageVersion >= 380))
+                            {
+                                // As of POV-Ray v3.7, all scene files are supposed to begin with a `#version` directive.
+                                // As of POV-Ray v3.8, we no longer tolerate violation of that rule if the main scene
+                                // file claims to be compatible with POV-Ray v3.8 anywhere further down the road.
                                 // (We need to be more lax with include files though, as they may just as well be
                                 // standard include files that happens to have been updated since the scene was
                                 // originally designed.)
 
                                 if (Include_File_Index == 0)
-                                    Error("As of POV-Ray 3.7, the '#version' directive must be the first non-comment "
-                                          "statement in the scene file. If your scene will adapt to whatever version "
-                                          "is un use dynamically, start your scene with '#version version'.");
+                                    Error("As of POV-Ray v3.7, the '#version' directive must be the first non-comment "
+                                          "statement in the scene file. To indicate that your scene will dynamically "
+                                          "adapt to whatever POV-Ray version is actually used, start your scene with "
+                                          "'#version version;'.");
+                            }
+
+                            if (!sceneData->languageVersionLate && !sceneData->languageVersionSet)
+                            {
+                                // Got `#version` as the first statement of the file.
+                                // Initialize various defaults depending on language version specified.
+                                InitDefaults(sceneData->languageVersion);
                             }
 
                             // NB: This must be set _after_ parsing the value, in order for the `#version version`
@@ -2434,7 +2449,7 @@ void Parser::Parse_Directive(int After_Hash)
                             if (sceneData->explicitNoiseGenerator == false)
                                 sceneData->noiseGenerator = (sceneData->EffectiveLanguageVersion() < 350 ?
                                                              kNoiseGen_Original : kNoiseGen_RangeCorrected);
-                            // [CLi] if assumed_gamma is not specified in a legacy (3.6.x or earlier) scene, gammaMode defaults to kPOVList_GammaMode_None;
+                            // [CLi] if assumed_gamma is not specified in a pre-v3.7 scene, gammaMode defaults to kPOVList_GammaMode_None;
                             // this is enforced later anyway after parsing, but we may need this information /now/ during parsing already
                             switch (sceneData->gammaMode)
                             {
@@ -2455,7 +2470,7 @@ void Parser::Parse_Directive(int After_Hash)
                             }
                             Parse_Semi_Colon(false);
 
-                            if (sceneData->EffectiveLanguageVersion() > OFFICIAL_VERSION_NUMBER)
+                            if (sceneData->EffectiveLanguageVersion() > POV_RAY_VERSION_INT)
                             {
                                 Error("Your scene file requires POV-Ray version %g or later!\n", (DBL)(sceneData->EffectiveLanguageVersion() / 100.0));
                             }
@@ -2693,6 +2708,14 @@ void Parser::Parse_Directive(int After_Hash)
             Skip_Tokens(DECLARING_MACRO_COND);
             EXIT
         END_CASE
+
+#if POV_DEBUG
+        CASE(BREAKPOINT_TOKEN)
+            // This statement does nothing, except allow you to set a debug breakpoint here
+            // so that you can effectively trigger the debugger via an SDL command.
+            EXIT
+        END_CASE
+#endif
 
         OTHERWISE
             Parsing_Directive = false;

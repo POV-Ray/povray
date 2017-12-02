@@ -13,7 +13,7 @@ Notes:
   For example, to read FS#270, visit:
   http://bugs.povray.org/270
 
-  (Note: As of 3.7.1-beta.8 our flyspray bug tracker is officially mothballed,
+  (Note: As of v3.7.1-beta.8 our flyspray bug tracker is officially mothballed,
   and we no longer refer to it in the changelog. Any flyspray reports that
   were still open at that point have been duplicated as GitHub issues titled
   "Port of FSxxx - ...")
@@ -29,21 +29,89 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
-Changes between 3.7.1 and 3.7.2-TBD
-===================================
+Changes between v3.8.0 and v3.8.1-???
+=====================================
 
 This version is still under active development, and not finalized yet.
 
 TBD
 
 
-Changes between 3.7.1-TBD and 3.7.1
-===================================
+Changes between v3.7.1-rc.1 and v3.8.0-???
+==========================================
 
-TBD
+This version is still under active development, and not finalized yet.
+
+NOTE: This release cycle has been redesignated v3.8.0. There will not be a
+v3.7.1 release proper.
+
+Fixed or Mitigated Bugs
+-----------------------
+
+Reported via GitHub:
+
+  - #65 ("Normal for the prism's bezier spline mode is reversed from other
+    spline types & lathe uses.")
+  - #292 ("Port of FS227 - Fixed Vector Limitations")
+  - #317 ("Boost 1.65.0 incompatibility")
+
+Reported via the Newsgroups:
+
+  - <web.59fefd5f68f4d962ca73ee9d0@news.povray.org>
+    (2017-11-05, povray.newusers, "orthographic camera and conic_sweep object")
+    Sides of a `conic_sweep` prism become invisible when viewed head-on using
+    an orthographic camera.
+
+Miscellaneous:
+
+  - Fix `interior_texture` for text objects (as mentioned in GitHub issue #65)
+  - Eliminated use of deprecated C++ `register` keyword (except in 3rd party
+    libraries bundled with the POV-Ray source code).
+
+Changed Behaviour
+-----------------
+
+  - Any new behaviour formerly activated by `#version 3.71` now requires
+    `#version 3.8` (or higher); specifying `#version 3.71` will trigger a
+    corresponding warning.
+  - Some defaults have been changed (requires `#version 3.8` as the _very first_
+    statement of the scene, or a corresponding command line / INI setting):
+      - The pigment now defaults to plain white.
+      - `ambient` now defaults to 0.0 instead of 0.1.
+      - The camera `right` vector length now defaults to the output image aspect
+        ratio (presuming square pixels) instead of 1.33.
+  - Minor changes have been made to the benchmark scene. New benchmark version
+    is 2.03.
+
+Other Noteworthy
+----------------
+
+  - The source code now requires a C++11-compliant compiler.
+  - The Unix build process now officially requires Autoconf 2.68 or later.
+  - Added `--generation` command-line switch to POV-Ray for Unix, which will
+    cause POV-Ray to print its abbreviated version number to standard output.
+  - To simplify version number housekeeping, the file `unix/VERSION` is now
+    created on the fly by the `unix/prebuild.sh` script, and has been dropped
+    from the repository. To retrieve version information from the source
+    package, use one of the new `get-source-version.*` scripts provided in
+    `tools/unix/` and `tools/windows/`, respectively.
 
 
-Changes between 3.7.1-beta.7 and 3.7.1-beta.9
+Changes between 3.7.1-beta.9 and 3.7.1-rc.1
+===========================================
+
+Fixed or Mitigated Bugs
+-----------------------
+
+Miscellaneous:
+
+  - Fixed a bug that broke builds without optimized noise.
+  - Fixed an issue in optimized noise when building on Unix with C++ compiler
+    switches disabling any of the relevant enhanced instruction sets (e.g.
+    `CXXFLAGS=-mno-fma`).
+
+
+Changes between 3.7.1-beta.8 and 3.7.1-beta.9
 =============================================
 
 Fixed or Mitigated Bugs

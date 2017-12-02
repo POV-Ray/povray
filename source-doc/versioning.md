@@ -4,40 +4,56 @@
 Numbering Scheme
 ================
 
-The current POV-Ray version numbering scheme is designed to comply with the format and precedence rules of
+The current POV-Ray version numbering scheme is inspired by the format and precedence rules of
 [Semantic Versioning v2.0.0](http://semver.org/spec/v2.0.0.html). However, it differs notably in the semantics of the
-third field of the version number (referred to as _patch version_ in the Semantic Versioning standard), as well as
-in a few special uses of the _pre-release_ field.
+third field of the version number (referred to as _patch version_ in the Semantic Versioning standard),
+the addition of an optional fourth field, and in a few special uses of the _pre-release_ field.
 
-POV-Ray **source code** version numbers have the form `X.Y.Z`[-`PRE`], where:
+POV-Ray **source code** version numbers have the form `X.Y.Z`[`.P`][`-PRE`], where:
 
-  - `X` is the major version number, and is intended to indicate radical changes, such as the planned redesign of the
+  - `X`, dubbed the "major version", is intended to indicate radical changes, such as the planned redesign of the
     scene description language (SDL).
-  - `Y` is a minor version number, and is intended to indicate significant architectural or feature changes; for
+  - `Y`, dubbed the "minor version", is intended to indicate significant architectural or feature changes; for
     instance the addition of support for distributed rendering will certainly go along with an increase of the minor
     version number.
-  - `Z` is a sub-minor version number, and is primarily intended to indicate addition of, or changes in, minor features,
-    so that they can be tested for from the SDL.
-  - `PRE`, if present, is a pre-release identifier comprised of alphanumeric and numeric fields separated by dots
-    (`.`), indicating that the version is a forerunner to, but may still differ in functionality from, what will
-    ultimately become the official release `X.Y.Z`, and that the version should not be used in a production
-    environment. It typically has one of the following forms:
-      - `PHASE.ID`, with `PHASE` being one of `alpha`, `beta` or `rc`, indicates that the version is part of the
+  - `Z`, dubbed the "revision", is primarily intended to indicate addition of minor features,
+    non-surprising changes to existing features, or complex bugfixes that demand beta testing.
+  - `P`, dubbed the "maintenance patch level" (or "patch level" for short), is intended to indicate
+    simple bugfixes. In most representations of POV-Ray version numbers, this field is omitted
+    if it is zero.
+  - `PRE`, dubbed the "pre-release tag", is an identifier comprised of alphanumeric and numeric
+    fields separated by dots (`.`). Its presence indicates that the version is a forerunner to, but
+    may still differ in functionality from, what will ultimately become the official release
+    `X.Y.Z`[`.P`], and that the version should not be used in a production environment.
+    It typically has one of the following forms:
+      - `PHASE`[`.ID`], with `PHASE` being one of `alpha`, `beta` or `rc`, indicating that the version is part of the
         main line of development in the respective phase of the development cycle.
-      - `x.FEATURE.ID` indicates that the version is part of a side line of development, uniquely identified by the
-        alphanumeric moniker `FEATURE`, which may ultimately contribute to the main line, but in its current state is
+      - `x.FEATURE`[`.ID`], indicating that the version is part of an experimental side line of
+        development, with `FEATURE` being an alphanumeric moniker uniquely identifying the
+        particular side line, which may ultimately contribute to the main line, but in its current state is
         deemed unfit to be included for one reason or another.
       .
     In both cases `ID` is a numeric value uniquely distinguishing the pre-release in question from other pre-releases
-    of that same phase or side line.
+    of that same phase or side line. This field may be omitted where uniqueness is already
+    guaranteed (or not required; see the note about repository tags below).
+
+Generally, maintenance patches do not go through any of the typical pre-release phases (alpha, beta
+and release candidate), so the `P` and `PRE` fields usually only occur together in case of
+experimental versions.
+
+@note
+    Version numbers only need to be valid and unique for commits tagged in the repository.
+    Any untagged commits are deemed intermediate, and may carry the same version number as their
+    predecessors or successors. Users are advised to use only tagged versions when building from
+    source, and official binaries are always built from tagged versions as well.
 
 @note
     Due to the semantics of the `#version` directive and `version` pseudo-variable, both the `Y` and `Z` portions of
     the version number are restricted to single digits.
 
-POV-Ray **build** version numbers have the form `X.Y.Z`[-`PREB`][`+BUILD`], where:
+POV-Ray **build** version numbers have the form `X.Y.Z`[`.P`][`-PREB`][`+BUILD`], where:
 
-  - `X.Y.Z` matches the corresponding portion of the source code version.
+  - `X.Y.Z` and `P` match the corresponding portion of the source code version.
   - `PREB` generally matches the `PRE` portion of the source code version, except that it always contains an
     additional `unofficial` entry (separated from the `PRE` portion by a dot if applicable) unless the POV-Ray dev
     team has officially authorized the build for public distribution.
@@ -46,16 +62,48 @@ POV-Ray **build** version numbers have the form `X.Y.Z`[-`PREB`][`+BUILD`], wher
     behalf of the POV-Ray team carry build identifiers of the form `avN`, where `N` is a running numeric value.
 
 
+Mentioning Version Numbers
+==========================
+
+In order to allow for comparatively easy searching for version numbers throughout the repository,
+thus simplifying version number housekeeping, any mention of a POV-Ray version number should be
+prepended with either of the following:
+
+  - The character `v` (e.g. `v3.8`).
+  - The word `version` (or, alternatively, `Version` or `VERSION`) on the very same line, separated
+    by a single blank (e.g. `version 3.8`).
+
+This applies to version numbers mentioned in source code comments, program output, documentation,
+or actually any file in the repository whatsoever. It is recommended to also use this format
+consistently in communication with users, such as on the newsgroups.
+
+In cases where a version number must be referenced in a non-compliant format for technical reasons,
+it should be mentioned again in a compliant format nearby (e.g. in a comment, ideally on the very
+same line), or the file explicitly mentioned in the section "What To Change" below as containing
+version numbers in a non-compliant format.
+
+
 What To Change
 ==============
 
-When updating a version number, the following files need to be changed accordingly:
+When updating a version number, the following files _always_ need to be changed accordingly:
 
-  - `unix/VERSION`
   - `source/base/version.h`
 
+When updating the minor or major version number, a host of other files need to be changed as well.
+To identify the files affected, search the _entire_ repository for the regular expression
+`(version |v)3\.?[0-9]` using _case-insensitive_ search, and decide on a case-by-case basis whether
+the version number needs updating. In addition, the following files contain version numbers that do
+not conform to this pattern:
+
+  - `windows\cmedit\cmedit.rc`
+  - `appveyor.yml`
+
 @warning
-    When updating the minor or major version number, a host of other files need to be changed as well.
+    At present, only version numbers in the platform-independent source code have been canonicalized
+    to match the above pattern. Other portions, such as platform-specific source code, sample scene
+    files or standard include file, may still contain additional non-matching version numbers,
+    requiring a more generic search pattern.
 
 
 Automatic Version Numbering
@@ -65,7 +113,8 @@ The directory `tools/git/hooks` contains scripts intended to (among other things
 Git; to benefit from them, copy them to the `.git/hooks` directory in your local Git workspace. Whenever you perform a
 commit, they will automatically take care of the following:
 
-  - Verify that `unix/VERSION` and the various version number variants in `source/base/version.h` match.
   - Update the `ID` portion of pre-release versions whenever any files in one of the following directory sub-trees have
     been staged for commit: `source`, `vfe`, `platform`, `mac`, `unix`, `windows` or `libraries`. The new value of the
-    `ID` portion will be the number of minutes elapsed since 2000-01-01 00:00 UTC.
+    `ID` portion will be the number of minutes elapsed since 2000-01-01 00:00 UTC. (If the `ID`
+    portion has fewer than 7 digits it is presumed to be manually updated, and left untouched by
+    the script.)

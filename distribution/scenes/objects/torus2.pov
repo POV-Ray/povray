@@ -1,14 +1,14 @@
-// PoVRay 3.7.1 Scene File "torus2.pov"
+// PoVRay 3.8 Scene File "torus2.pov"
 // author: Christoph Lipka
-// date:   2016-05-05
+// date:   2017-07-02
 //
 // Demonstrates the use and effect of the torus spindle modes for
-// self-intersecting torus primitives, as introduced with POV-Ray 3.7.1
+// self-intersecting torus primitives, as introduced with POV-Ray 3.8
 //
 // +w200 +h200 +kfi1 +kff4 +ua
 //------------------------------------------------------------------------
 
-#version 3.71;
+#version 3.8;
 global_settings{ assumed_gamma 1.0 }
 
 camera {

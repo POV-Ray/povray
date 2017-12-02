@@ -7,7 +7,7 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -110,15 +110,8 @@ int main(int argc, char **argv)
     int ret = 0;
     int i = 0;
 
-    printf("Welcome to POV-Ray 3.7 SMP!\n");
+    printf("Welcome to POV-Ray v" POV_RAY_GENERATION " SMP!\n");
     fflush(stdout);
-
-//  char *nargv[2];
-//  nargv[0] = argv[0];
-//  nargv[1] = "'/Volumes/Iron/Official POV-Ray/POV-Ray 3.7 Source/benchmark.ini'";
-//  nargv[1] = "'/Volumes/Iron/Official POV-Ray/POV-Ray 3.7 Source/object7.ini'";
-//  argc = 2;
-//  argv = nargv;
 
     // Init
     povray_init(boost::bind(&BackendExitCallback), &backendAddress);

@@ -6,7 +6,7 @@
 <head>
 <meta http-equiv=Content-Type content="text/html; charset=windows-1252">
 <title>Unix Section 3</title>
-<link rel="StyleSheet" href="povray37.css" type="text/css">
+<link rel="StyleSheet" href="povray.css" type="text/css">
 <link rel="shortcut icon" href="favicon.ico">
 
 <!--  NOTE: In order to help users find information about POV-Ray using web      -->
@@ -85,7 +85,7 @@
 <table class="HeaderFooter" width="100%">
 <tr>
   <td colspan=5 align="left" class="HeaderFooter">
-    POV-Ray for Unix <strong class="HeaderFooter">version 3.7.1</strong>
+    POV-Ray for Unix <strong class="HeaderFooter">version 3.8</strong>
   </td>
 </tr>
 <tr >
@@ -111,9 +111,9 @@
 <a name="u1_3_1"></a>
 <div class="content-level-h3" contains="Available distributions" id="u1_3_1">
 <h3>1.3.1 Available distributions</h3>
-<p>The <em>official</em> distribution for version 3.7 of POV-Ray for Unix is a source code <em>only</em> release. This package contains all the source files and Makefiles required for building POV-Ray.  Building the program from source should work on most Unix/Linux systems. The package uses a configuration mechanism to detect the appropriate settings needed to build POV-Ray on your platform. Since all the required support libraries are <em>NOT</em> included in the package, you need to make sure you have an adequate build environment.</p>
+<p>The <em>official</em> distribution for version 3.8 of POV-Ray for Unix is a source code <em>only</em> release. This package contains all the source files and Makefiles required for building POV-Ray.  Building the program from source should work on most Unix/Linux systems. The package uses a configuration mechanism to detect the appropriate settings needed to build POV-Ray on your platform. Since all the required support libraries are <em>NOT</em> included in the package, you need to make sure you have an adequate build environment.</p>
 
-<p>The distribution package is available for download from the POV-Ray <a href="http://www.povray.org/">website</a>. See the INSTALL file in the source package for more details.</p>
+<p>The distribution package is available for download via the POV-Ray <a href="http://www.povray.org/">website</a>. See the INSTALL file in the source package for more details.</p>
 
 </div>
 <a name="u1_3_2"></a>
@@ -206,7 +206,7 @@ chmod 4755 povray
 <h3>1.3.6 Rendering the Sample Scenes</h3>
 <p>POV-Ray for Unix comes with a set of shell scripts to automatically render the sample scenes coming with POV-Ray.</p>
 
-<p>These shell scripts are usually installed in <code>/usr/local/share/povray-3.7/scripts</code>.  They require a bash 
+<p>These shell scripts are usually installed in <code>/usr/local/share/povray/vX.y/scripts</code>.  They require a bash 
 compatible shell.  There are three scripts that are supposed to be called by the user.</p>
 
 <ul>
@@ -229,7 +229,7 @@ compatible shell.  There are three scripts that are supposed to be called by the
 
 <p>If the option <code>log</code> is specified, a log file with the complete text output from POV-Ray is written to filename <code>log.txt</code></p>
 
-<p>If <code>scene_directory</code> is specified, the sample scenes in this directory are rendered, otherwise the scene directory is determined form the main povray ini file, usually <code>/usr/local/share/povray-3.7/scenes</code>.</p>
+<p>If <code>scene_directory</code> is specified, the sample scenes in this directory are rendered, otherwise the scene directory is determined form the main povray ini file, usually <code>/usr/local/share/povray/vX.y/scenes</code>.</p>
 
 <p>If <code>output_directory</code> is specified, all images are written to this directory; if it is not specified the images are written into the scene file directories.  If the directories are not writable, the images are written in the current directory.  All other files (html files, thumbnails) are written here as well.</p>
 

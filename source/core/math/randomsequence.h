@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -272,7 +272,7 @@ SequentialDoubleGeneratorPtr GetSubRandomDoubleGenerator(unsigned int id, double
 /// Gets a source for cosine-weighted sub-random (low discrepancy) vectors on the unit hemisphere centered around +Y.
 ///
 /// @note       If count is smaller than 1600, this function will return a generator for the hard-coded
-///             radiosity sampling direction sequence used in POV-Ray 3.6.
+///             radiosity sampling direction sequence used in POV-Ray v3.6.
 ///
 /// @param[in]  id              Selects one of multiple sources.
 /// @param[in]  count           Number of values to provide.
