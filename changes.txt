@@ -44,6 +44,7 @@ Reported via GitHub:
 
   - #65 ("Normal for the prism's bezier spline mode is reversed from other
     spline types & lathe uses.")
+  - #292 ("Port of FS227 - Fixed Vector Limitations")
   - #317 ("Boost 1.65.0 incompatibility")
 
 Reported via the Newsgroups:
@@ -71,11 +72,14 @@ Changed Behaviour
       - `ambient` now defaults to 0.0 instead of 0.1.
       - The camera `right` vector length now defaults to the output image aspect
         ratio (presuming square pixels) instead of 1.33.
+  - Minor changes have been made to the benchmark scene. New benchmark version
+    is 2.03.
 
 Other Noteworthy
 ----------------
 
   - The source code now requires a C++11-compliant compiler.
+  - The Unix build process now officially requires Autoconf 2.68 or later.
   - Added `--generation` command-line switch to POV-Ray for Unix, which will
     cause POV-Ray to print its abbreviated version number to standard output.
   - To simplify version number housekeeping, the file `unix/VERSION` is now

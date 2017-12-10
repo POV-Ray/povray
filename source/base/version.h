@@ -100,12 +100,24 @@
 /// where `N` is a serial number starting at 1 in each phase, `TIME` is the number of minutes
 /// since 2000-01-01 00:00, and `FEATURE` is an arbitrary alphanumeric moniker for a particular
 /// experimental feature.
-#define POV_RAY_PRERELEASE          "alpha.9387404"
+#define POV_RAY_PRERELEASE          "alpha.9436902"
+
+#if defined(DOXYGEN) && !defined(POV_RAY_PRERELEASE)
+    // Work around doxygen being unable to document undefined macros.
+    #define POV_RAY_PRERELEASE (undefined)
+    #undef POV_RAY_PRERELEASE
+#endif
 
 /// @def POVRAY_IS_BETA
 /// Whether this version is a beta.
 /// Leave undefined for pre-beta, release candidate or final releases.
 //#define POVRAY_IS_BETA
+
+#if defined(DOXYGEN) && !defined(POVRAY_IS_BETA)
+    // Work around doxygen being unable to document undefined macros.
+    #define POVRAY_IS_BETA (undefined)
+    #undef POVRAY_IS_BETA
+#endif
 
 /// @def POV_RAY_HOST_VERSION
 /// Version of required host installation.
@@ -114,6 +126,12 @@
 /// host installation to be dropped into. Define as the latest installable release's major and
 /// minor version number for vX.Y.0.0 pre-beta versions, or leave undefined otherwise.
 #define POV_RAY_HOST_VERSION        "3.7"
+
+#if defined(DOXYGEN) && !defined(POV_RAY_HOST_VERSION)
+    // Work around doxygen being unable to document undefined macros.
+    #define POV_RAY_HOST_VERSION (undefined)
+    #undef POV_RAY_HOST_VERSION
+#endif
 
 /// @}
 ///

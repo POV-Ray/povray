@@ -54,7 +54,7 @@ namespace pov
 
 class Interior;
 
-typedef FixedSimpleVector<Interior *, RAYINTERIOR_VECTOR_SIZE> RayInteriorVector;
+typedef PooledSimpleVector<Interior *, RAYINTERIOR_VECTOR_SIZE> RayInteriorVector;
 
 class Ray : public BasicRay
 {

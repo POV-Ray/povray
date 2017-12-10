@@ -35,8 +35,8 @@
 ///
 //*******************************************************************************
 
-#ifndef _DISP_TEXT_H
-#define _DISP_TEXT_H
+#ifndef POVRAY_UNIX_DISP_TEXT_H
+#define POVRAY_UNIX_DISP_TEXT_H
 
 #include "vfe.h"
 #include "unixoptions.h"
@@ -70,4 +70,4 @@ namespace pov_frontend
     };
 }
 
-#endif
+#endif // POVRAY_UNIX_DISP_TEXT_H

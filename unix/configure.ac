@@ -38,7 +38,7 @@
 # Based on configure.ac from POV-Ray v3.6
 
 # Required autoconf version.
-AC_PREREQ(2.59)
+AC_PREREQ(2.68)
 
 # Inits.
 
@@ -57,7 +57,7 @@ AC_CONFIG_SRCDIR([unix/disp_text.cpp])
 # Those required by other macros go first.
 m4_include([unix/config/ax_require_defined.m4])
 # The remainder we're sorting alphabetically.
-m4_include([unix/config/acx_pthread.m4])
+m4_include([unix/config/ax_pthread.m4])
 m4_include([unix/config/ax_arg_enable.m4])
 m4_include([unix/config/ax_arg_with.m4])
 m4_include([unix/config/ax_boost_base.m4])
@@ -177,6 +177,8 @@ AM_MAINTAINER_MODE
 
 AX_FIX_INCORRECT_PATH(C_INCLUDE_PATH, ".", [pov_warn_path="$pov_warn_path C_INCLUDE_PATH"])
 AX_FIX_INCORRECT_PATH(CPLUS_INCLUDE_PATH, ".", [pov_warn_path="$pov_warn_path CPLUS_INCLUDE_PATH"])
+
+AM_PROG_AR
 
 
 ###############################################################################
@@ -313,7 +315,7 @@ if test ! `$CXX -v < /dev/null 2> /dev/null`; then
 fi
 
 # Posix threads
-ACX_PTHREAD
+AX_PTHREAD
 CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"  # append
 LIBS="$LIBS $PTHREAD_CFLAGS $PTHREAD_LIBS"  # append
 

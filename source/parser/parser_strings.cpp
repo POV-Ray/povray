@@ -36,11 +36,14 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
-#include <cstdlib>
+// C++ variants of C standard header files
 #include <cctype>
+#include <cstdlib>
 
+// Boost header files
 #include <boost/date_time/posix_time/posix_time.hpp>
 
+// POV-Ray header files (core module)
 #include "core/scene/scenedata.h"
 
 // this must be the last file included
@@ -836,7 +839,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
                     buffer[3] = char_array[++index_in];
                     buffer[4] = 0;
 
-                    char_string[index_out] = (UCS2)strtoul(buffer, &dummy_ptr, 16);
+                    char_string[index_out] = (UCS2)std::strtoul(buffer, &dummy_ptr, 16);
                     break;
                 default:
                     char_string[index_out] = char_array[index_in];

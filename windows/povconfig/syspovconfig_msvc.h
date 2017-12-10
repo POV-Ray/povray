@@ -45,7 +45,11 @@
   #error "minimum Visual C++ version supported is 14.0 (supplied with VS 2005)"
 #endif
 
+// C++ variants of C standard header files
 #include <cstdio>
+#include <cstdlib>
+
+// Other library header files
 #include <direct.h>
 
 #pragma auto_inline(on)
@@ -195,7 +199,7 @@
   #endif
 #endif
 
-#define QSORT(a,b,c,d)                      qsort(reinterpret_cast<void *>(a), (size_t) b, (size_t) c, d)
+#define QSORT(a,b,c,d)                      std::qsort(reinterpret_cast<void *>(a), (size_t) b, (size_t) c, d)
 #define POV_LONG                            signed __int64
 #define POV_ULONG                           unsigned __int64
 #define FORCEINLINE                         __forceinline

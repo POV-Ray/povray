@@ -69,7 +69,6 @@
 
 #include <time.h>
 
-#define __USECTL3D__
 #define MAX_MESSAGE               1024
 #define MAX_ARGV                  256
 #define TOOLFILENAME              "PVTOOLS.INI"

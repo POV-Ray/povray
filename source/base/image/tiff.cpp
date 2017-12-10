@@ -48,7 +48,7 @@
 extern "C"
 {
 #ifndef __STDC__
-#define __STDC__ (1) // TODO - check if this is really necessary
+#define __STDC__ (1) // TODO - this is an ugly hack; check if it is really necessary
 #endif
 #ifndef AVOID_WIN32_FILEIO
 #define AVOID_WIN32_FILEIO // this stops the tiff headers from pulling in windows.h on win32/64

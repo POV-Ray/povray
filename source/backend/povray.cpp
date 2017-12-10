@@ -84,7 +84,7 @@
         extern "C"
         {
             #ifndef __STDC__
-            #define __STDC__        (1)
+            #define __STDC__        (1) // TODO - this is an ugly hack; check if it is really necessary
             #define UNDEF__STDC__
             #endif
             #ifndef AVOID_WIN32_FILEIO

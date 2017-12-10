@@ -408,14 +408,14 @@ int ProcessOptions::POVMSAttr_GetUTF8String(POVMSAttributePtr attr, POVMSType ty
 {
     int ulen = 0;
     int err = POVMSAttr_Size(attr, &ulen);
-    UCS2 *ustr = new UCS2[ulen / 2 + 1];
+    UCS2 *ustr = new UCS2[ulen / 2];
 
     if(err == kNoErr)
         err = POVMSAttr_Get(attr, type, (void *)ustr, &ulen);
 
     if(err == kNoErr)
     {
-        POV_FRONTEND_ASSERT(ustr[ulen / 2] == '\0');
+        POV_FRONTEND_ASSERT(ustr[ulen / 2 - 1] == '\0');
         ConvertUCS2ToUTF8(ustr, s);
     }
 

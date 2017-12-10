@@ -35,8 +35,8 @@
 ///
 //******************************************************************************
 
-#ifndef __VFEPLATFORM_H__
-#define __VFEPLATFORM_H__
+#ifndef POVRAY_VFE_UNIX_VFEPLATFORM_H
+#define POVRAY_VFE_UNIX_VFEPLATFORM_H
 
 #include <boost/shared_ptr.hpp>
 
@@ -136,4 +136,4 @@ namespace vfePlatform
     POVMS_Sys_Thread_Type GetThreadId();
 }
 
-#endif
+#endif // POVRAY_VFE_UNIX_VFEPLATFORM_H

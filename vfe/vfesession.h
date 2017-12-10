@@ -36,8 +36,8 @@
 ///
 //******************************************************************************
 
-#ifndef __VFESESSION_H__
-#define __VFESESSION_H__
+#ifndef POVRAY_VFE_VFESESSION_H
+#define POVRAY_VFE_VFESESSION_H
 
 #include <queue>
 
@@ -1296,4 +1296,4 @@ namespace vfe
   } ;
 }
 
-#endif // __VFESESSION_H__
+#endif // POVRAY_VFE_VFESESSION_H

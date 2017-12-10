@@ -1846,7 +1846,7 @@ void RenderInsertMenu (void)
       if ((s2 = strchr (s1, ']')) != NULL)
       {
         *s2  = '\0' ;
-        val = atoi (++s1) ;
+        val = std::atoi (++s1) ;
         if (val == 0)
           continue ;
         InsertMenuSections.push_back(val);
@@ -5292,7 +5292,7 @@ void NoAVX2 (void)
               "Please use the standard non-AVX2 version of POV-Ray on this computer.",
               "POV-Ray for Windows",
               MB_ICONSTOP | MB_OK) ;
-  exit (-1) ;
+  std::exit (-1) ;
 }
 
 inline void TestAVX2 (void)
@@ -5310,7 +5310,7 @@ void NoAVX (void)
               "Please use the standard non-AVX version of POV-Ray on this computer.",
               "POV-Ray for Windows",
               MB_ICONSTOP | MB_OK) ;
-  exit (-1) ;
+  std::exit (-1) ;
 }
 
 inline void TestAVX (void)
@@ -5328,7 +5328,7 @@ void NoSSE2 (void)
               "Please use the standard non-SSE2 version of POV-Ray on this computer.",
               "POV-Ray for Windows",
               MB_ICONSTOP | MB_OK) ;
-  exit (-1) ;
+  std::exit (-1) ;
 }
 
 inline void TestSSE2 (void)
@@ -6418,7 +6418,7 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
     if (debugging)
       debug_output ("%s\n", str) ;
     MessageBox (NULL, str, "POV-Ray Critical Error", MB_ICONSTOP) ;
-    exit(1);
+    std::exit(1);
   }
 
   if (debugging)

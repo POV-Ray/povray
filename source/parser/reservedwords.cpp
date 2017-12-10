@@ -510,7 +510,6 @@ const RESERVED_WORD Reserved_Words[] = {
     { SRGBFT_TOKEN,                 "srgbft" },
     { SRGBT_TOKEN,                  "srgbt" },
     { STATISTICS_TOKEN,             "statistics" },
-    { STEPS_TOKEN,                  "steps" },
     { STR_TOKEN,                    "str" },
     { STRCMP_TOKEN,                 "strcmp" },
     { STRENGTH_TOKEN,               "strength" },

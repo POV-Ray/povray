@@ -18,7 +18,7 @@
 # (e.g. doc).
 #
 # Running prebuild.sh requires:
-#   1) GNU autoconf >= 2.59 and GNU automake >= 1.9
+#   1) GNU autoconf >= 2.68 and GNU automake >= 1.9
 #   2) perl and m4 (should be on any system, at least Linux is okay)
 #   3) Run from the unix/ directory where the script is located.
 #
@@ -57,7 +57,7 @@ timestamp=`date +%Y-%m-%d`
 build="./docs_$timestamp"
 builddoc="$build/documentation"
 
-required_autoconf="2.59"
+required_autoconf="2.68"
 required_automake="1.9"
 
 

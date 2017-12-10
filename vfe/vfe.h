@@ -35,8 +35,8 @@
 ///
 //******************************************************************************
 
-#ifndef __VFE_H__
-#define __VFE_H__
+#ifndef POVRAY_VFE_VFE_H
+#define POVRAY_VFE_VFE_H
 
 #include <cassert>
 
@@ -263,4 +263,4 @@ namespace vfe
   };
 }
 
-#endif
+#endif // POVRAY_VFE_VFE_H
