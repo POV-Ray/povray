@@ -139,8 +139,7 @@ recommanded to generate a fully-featured POV-Ray executable.
 2.4 Compatibility Issues
     ====================
 
-- We currently do not support Boost 1.65 or above unless a C++11-compliant
-  compiler is used.
+- When using Boost 1.65 or above, the compiler must conform to C++11 or later.
 
 
 ====================================================
