@@ -29,6 +29,30 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
+Changes between 3.7.0.4 and 3.7.0.5
+===================================
+
+(Note: This version has not been released in binary form, as it does not
+feature any changes in functionality over the original 3.7.0 binaries.)
+
+This version constitutes a maintenance update of the POV-Ray 3.7.0 source
+code, focused on restoring compatibility with contemporary build environments.
+
+Compatibility Improvements
+--------------------------
+
+  - Fixed compatibility with systems defining `NULL` as `0` when using
+    `shared_ptr` from C++11 rather than boost/tr1 (GitHub issue #339).
+  - Fixed compatibility with systems not exposing `atof` in the global
+    namespace (reported in discussion about GitHub issue #317).
+
+Compiler Requirements
+---------------------
+
+  - To compile with Boost 1.65.0 or later, a C++11-compliant compiler will be
+    required for this and any future versions of the v3.7.0 series.
+
+
 Changes between 3.7.0.3 and 3.7.0.4
 ===================================
 

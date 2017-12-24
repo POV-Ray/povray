@@ -528,10 +528,10 @@ RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_M
 
 			if(obj.TryGetBool(kPOVAttrib_OutputToFile, true))
 			{
-				if (imageProcessing == NULL)
+				if (!imageProcessing)
 					throw POV_EXCEPTION(kNullPointerErr, "Internal error: output to file is set, but no ImageProcessing object supplied");
 				shared_ptr<Image> img(imageProcessing->GetImage());
-				if(img != NULL)
+				if(img)
 				{
 					if((img->GetWidth() != width) || (img->GetHeight() != height))
 						throw POV_EXCEPTION_STRING("Invalid partial rendered image. Image size does not match!");
@@ -549,7 +549,7 @@ RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_M
 			view2scene[vid] = sid;
 			scene2views[sid].insert(vid);
 
-			if(viewhandler[vid].data.display != NULL)
+			if(viewhandler[vid].data.display)
 				viewhandler[vid].data.display->Initialise();
 
 			shi->second.data.state = SceneData::Scene_Viewing;
@@ -790,7 +790,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::HandleRenderMessag
 			vhi->second.data.state = ViewData::View_Rendered;
 
 			// close the state file if it's open
-			if(vhi->second.data.imageBackup != NULL)
+			if(vhi->second.data.imageBackup)
 			{
 				vhi->second.data.imageBackup.reset();
 				POV_UCS2_REMOVE(vhi->second.data.imageBackupFile().c_str());
@@ -804,7 +804,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::HandleRenderMessag
 			vhi->second.data.state = ViewData::View_Failed;
 
 			// close the state file if it's open
-			if(vhi->second.data.imageBackup != NULL)
+			if(vhi->second.data.imageBackup)
 				vhi->second.data.imageBackup.reset();
 		}
 		else

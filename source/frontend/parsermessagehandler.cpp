@@ -58,14 +58,14 @@ void ParserMessageHandler::HandleMessage(const SceneData& sd, POVMSType ident, P
 	if(ident != kPOVMsgIdent_Progress)
 	{
 		sd.console->flush();
-		if(sd.streams[STATUS_STREAM] != NULL)
+		if(sd.streams[STATUS_STREAM])
 			sd.streams[STATUS_STREAM]->flush();
 	}
 
 	if(ident != kPOVMsgIdent_Debug)
 	{
 		sd.console->flush();
-		if(sd.streams[DEBUG_STREAM] != NULL)
+		if(sd.streams[DEBUG_STREAM])
 			sd.streams[DEBUG_STREAM]->flush();
 	}
 

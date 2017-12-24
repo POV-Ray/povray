@@ -160,7 +160,7 @@ void RenderFrontendBase::ConnectToBackend(POVMSAddress backendaddress, POVMS_Obj
 	if(resultobj != NULL)
 		*resultobj = result;
 
-	if(console != NULL)
+	if(console)
 		Message2Console::InitInfo(result, console.get());
 }
 
@@ -606,7 +606,7 @@ void RenderFrontendBase::NewBackup(POVMS_Object& ropts, ViewData& vd, const Path
 	if(POV_ALLOW_FILE_WRITE(vd.imageBackupFile().c_str(), POV_File_Data_Backup) == false)
 		throw POV_EXCEPTION(kCannotOpenFileErr, "Permission denied to create render state output file.");
 	vd.imageBackup = shared_ptr<OStream>(POV_PLATFORM_BASE.CreateOStream(POV_File_Data_Backup));
-	if(vd.imageBackup != NULL)
+	if(vd.imageBackup)
 	{
 		Backup_File_Header hdr;
 
@@ -721,7 +721,7 @@ void RenderFrontendBase::ContinueBackup(POVMS_Object& ropts, ViewData& vd, ViewI
 	if(outputToFile == true)
 	{
 		vd.imageBackup = shared_ptr<OStream>(POV_PLATFORM_BASE.CreateOStream(POV_File_Data_Backup));
-		if(vd.imageBackup != NULL)
+		if(vd.imageBackup)
 		{
 			if(vd.imageBackup->open(vd.imageBackupFile().c_str(), IOBase::append) == false)
 				throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot append to state output file.");

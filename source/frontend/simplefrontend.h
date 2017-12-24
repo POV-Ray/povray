@@ -157,7 +157,7 @@ bool SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::Start(POVMS_Object
 
 	if(opts.TryGetBool(kPOVAttrib_OutputToFile, true))
 	{
-		if(img != NULL)
+		if(img)
 			imageProcessing = shared_ptr<ImageProcessing>(new ImageProcessing(img));
 		else
 			imageProcessing = shared_ptr<ImageProcessing>(new ImageProcessing(options));

@@ -58,7 +58,7 @@ void RenderMessageHandler::HandleMessage(const SceneData& sd, const ViewData&, P
 	if(ident != kPOVMsgIdent_Progress)
 	{
 		sd.console->flush();
-		if(sd.streams[STATUS_STREAM] != NULL)
+		if(sd.streams[STATUS_STREAM])
 			sd.streams[STATUS_STREAM]->flush();
 	}
 
