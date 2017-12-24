@@ -32,6 +32,8 @@
  * $Author: chrisc $
  *******************************************************************************/
 
+#include <cstdlib>
+
 #include <ctype.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -699,7 +701,7 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 				case VAL_TOKEN:
 					GET (LEFT_PAREN_TOKEN);
 					Local_C_String=Parse_C_String();
-					Val = atof(Local_C_String);
+					Val = std::atof(Local_C_String);
 					POV_FREE(Local_C_String);
 					GET (RIGHT_PAREN_TOKEN);
 					break;
