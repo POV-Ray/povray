@@ -804,7 +804,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::HandleRenderMessag
 			vhi->second.data.state = ViewData::View_Failed;
 
 			// close the state file if it's open
-			if(vhi->second.data.imageBackup != NULL)
+			if(vhi->second.data.imageBackup)
 				vhi->second.data.imageBackup.reset();
 		}
 		else
