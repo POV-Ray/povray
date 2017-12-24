@@ -32,8 +32,28 @@ Notes:
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
+POV-Ray v3.7.0.5
+------------------------------------------------------------------------------
+
+Commit 11dec06d on 2017-12-25 by Christoph Lipka
+
+    Eliminate use of C++ `register` keyword (deprecated as of C++11,
+    disallowed as of C++17).
+
+Commit 3cba36cd on 2017-12-25 by Christoph Lipka
+
+    Fix compatibility issues. (#340)
+
+    Fixes GitHub issue #339, as well as an `atof`-related issue discussed
+    in GitHub issue #317.
+
+------------------------------------------------------------------------------
 POV-Ray v3.7.0.4
 ------------------------------------------------------------------------------
+
+Commit 0dcc58e1 on 2017-09-10 by Christoph Lipka
+
+    Update change log.
 
 Commit a847cb72 on 2017-09-10 by Christoph Lipka
 
