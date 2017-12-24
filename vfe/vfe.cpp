@@ -916,7 +916,7 @@ State VirtualFrontEnd::Process()
       try
       {
         m_Session->SetSucceeded (false);
-        if (animationProcessing != NULL)
+        if (animationProcessing)
         {
           shelloutProcessing->SetFrameClock(animationProcessing->GetFrameNumber(), animationProcessing->GetClockValue());
           if (shelloutProcessing->SkipNextFrame() == false)
@@ -1002,7 +1002,7 @@ State VirtualFrontEnd::Process()
         string str(shelloutProcessing->GetSkipMessage());
         m_Session->AppendStatusMessage (str) ;
         m_Session->AppendStreamMessage (vfeSession::mInformation, str.c_str()) ;
-        if ((animationProcessing != NULL) && (animationProcessing->MoreFrames() == true))
+        if (animationProcessing && (animationProcessing->MoreFrames() == true))
         {
           animationProcessing->ComputeNextFrame();
           m_Session->SetPixelsRendered(0, m_Session->GetTotalPixels());
@@ -1104,7 +1104,7 @@ State VirtualFrontEnd::Process()
               try { renderFrontend.CloseScene(sceneId); }
               catch (pov_base::Exception&) { /* Ignore any error here! */ }
 
-              if ((animationProcessing != NULL) && (animationProcessing->MoreFrames() == true))
+              if (animationProcessing && (animationProcessing->MoreFrames() == true))
               {
                 animationProcessing->ComputeNextFrame();
                 m_Session->SetPixelsRendered(0, m_Session->GetTotalPixels());
@@ -1126,7 +1126,7 @@ State VirtualFrontEnd::Process()
 
           // now we display the render window, if enabled
           shared_ptr<Display> display(GetDisplay());
-          if (display != NULL)
+          if (display)
           {
             vfeDisplay *disp = dynamic_cast<vfeDisplay *>(display.get());
             if (disp != NULL)
@@ -1158,7 +1158,7 @@ State VirtualFrontEnd::Process()
           }
           try
           {
-            if (animationProcessing != NULL)
+            if (animationProcessing)
             {
               if (m_Session->OutputToFileSet())
                 m_Session->AdviseOutputFilename (imageProcessing->WriteImage(options, animationProcessing->GetFrameNumber(), animationProcessing->GetFrameNumberDigits()));
@@ -1207,7 +1207,7 @@ State VirtualFrontEnd::Process()
     case kPostFrameShellout:
       if (shelloutProcessing->ShelloutRunning() || HandleShelloutCancel())
         return state;
-      if ((animationProcessing == NULL) || animationProcessing->MoreFrames() == false)
+      if (!animationProcessing || animationProcessing->MoreFrames() == false)
       {
         m_Session->SetSucceeded (true);
         if (m_PauseRequested)
