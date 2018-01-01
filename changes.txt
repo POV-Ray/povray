@@ -59,6 +59,8 @@ Miscellaneous:
   - Fix `interior_texture` for text objects (as mentioned in GitHub issue #65)
   - Eliminated use of deprecated C++ `register` keyword (except in 3rd party
     libraries bundled with the POV-Ray source code).
+  - Fix configure script failing to use -lboost_system with Boost 1.66
+    (reported for v3.7.0.5 as GitHub issue #341).
 
 Changed Behaviour
 -----------------
