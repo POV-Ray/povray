@@ -29,6 +29,22 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
+Changes between 3.7.0.5 and 3.7.0.6
+===================================
+
+(Note: This version has not been released in binary form, as it does not
+feature any changes in functionality over the original 3.7.0 binaries.)
+
+This version constitutes a maintenance update of the POV-Ray 3.7.0 source
+code, focused on restoring compatibility with contemporary build environments.
+
+Fixed or Mitigated Bugs
+-----------------------
+
+  - Fix configure script failing to use -lboost_system with Boost 1.66
+    (fixes GitHub issue #341, "macOS build failure for 3.7.0.5").
+
+
 Changes between 3.7.0.4 and 3.7.0.5
 ===================================
 
