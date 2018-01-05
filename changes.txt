@@ -48,6 +48,8 @@ Reported via GitHub:
   - #317 ("Boost 1.65.0 incompatibility")
   - #341 ("macOS build failure for 3.7.0.5", configure script failing to use
     -lboost_system with Boost 1.66)
+  - #342 ("AX_FIX_INCORRECT_PATH is broken", configure script failing to
+    properly handle `.` directory in `C_INCLUDE_PATH` or `CPLUS_INCLUDE_PATH`)
 
 Reported via the Newsgroups:
 
