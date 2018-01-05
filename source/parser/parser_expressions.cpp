@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -3209,11 +3209,21 @@ template<>
 shared_ptr<GenericPigmentBlendMap> Parser::Parse_Blend_List<GenericPigmentBlendMap> (int Count, ColourBlendMapConstPtr Def_Map, BlendMapTypeId Blend_Type)
 {
     shared_ptr<GenericPigmentBlendMap> New;
-    POV_BLEND_MAP_ASSERT(Blend_Type == kBlendMapType_Pigment);
+    POV_BLEND_MAP_ASSERT((Blend_Type == kBlendMapType_Pigment) ||
+                         (Blend_Type == kBlendMapType_Density));
     EXPECT_ONE
         CASE(PIGMENT_TOKEN)
+            if (Blend_Type != kBlendMapType_Pigment)
+                Only_In("pigment", "pigment map");
             UNGET
             New = Parse_Blend_List<PigmentBlendMap> (Count, Def_Map, kBlendMapType_Pigment);
+        END_CASE
+
+        CASE(DENSITY_TOKEN)
+            if (Blend_Type != kBlendMapType_Density)
+                Only_In("density", "density map");
+            UNGET
+            New = Parse_Blend_List<PigmentBlendMap> (Count, Def_Map, kBlendMapType_Density);
         END_CASE
 
         OTHERWISE

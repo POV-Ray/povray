@@ -57,6 +57,8 @@ Reported via the Newsgroups:
     (2017-11-05, povray.newusers, "orthographic camera and conic_sweep object")
     Sides of a `conic_sweep` prism become invisible when viewed head-on using
     an orthographic camera.
+  - <5a4f8ddc$1@news.povray.org>
+    (2018-01-05, povray.beta-test, "3.8.0 block pattern, density list parsing issue.")
 
 Miscellaneous:
 
