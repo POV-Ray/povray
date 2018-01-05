@@ -29,6 +29,23 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
+Changes between 3.7.0.6 and 3.7.0.7
+===================================
+
+(Note: This version has not been released in binary form, as it does not
+feature any changes in functionality over the original 3.7.0 binaries.)
+
+This version constitutes a maintenance update of the POV-Ray 3.7.0 source
+code, focused on restoring compatibility with contemporary build environments.
+
+Fixed or Mitigated Bugs
+-----------------------
+
+  - Fix configure script failing to properly handle `.` directory in
+    `C_INCLUDE_PATH` or `CPLUS_INCLUDE_PATH` (fixes GitHub issue #342,
+    "AX_FIX_INCORRECT_PATH is broken").
+
+
 Changes between 3.7.0.5 and 3.7.0.6
 ===================================
 
