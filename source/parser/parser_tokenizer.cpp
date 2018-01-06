@@ -14,7 +14,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -329,7 +329,12 @@ void Parser::Get_Token ()
 
     while (Token.Token_Id == END_OF_FILE_TOKEN)
     {
-        Skip_Spaces();
+        if (Skipping && !Parsing_Directive)
+            // If we're skipping, we're only interested in directives, such as `#else` or `#end`,
+            // so we just pretend any other characters in between are blanks.
+            SkipToDirective();
+        else
+            Skip_Spaces();
 
         Token.Token_Col_No = col = Echo_Indx;
         c = Echo_getc();
@@ -729,6 +734,85 @@ bool Parser::Skip_Spaces()
     Echo_ungetc(c);
 
     return true;
+}
+
+
+
+//*****************************************************************************
+
+bool Parser::SkipToDirective()
+{
+    int c;
+
+    while(true)
+    {
+        c = Echo_getc();
+
+        switch (c)
+        {
+            case EOF:
+                return false;
+
+            case '#' :
+                // Genuine Directive.
+                // We need to actually parse this.
+                Echo_ungetc(c);
+                return true;
+
+            case '/' :
+                // Possibly a comment.
+                // We need to examine the next character.
+                c = Echo_getc();
+                switch (c)
+                {
+                    case '*':
+                        // C style comment.
+                        // Ignore all characters until the terminating `*/`.
+                        Parse_C_Comments();
+                        break;
+
+                    case '/':
+                        // C++ style comment.
+                        // Ignore all characters until the end of line.
+                        do
+                        {
+                            c = Echo_getc();
+                            if (c == EOF)
+                                return false;
+                        }
+                        while (c != '\n');
+                        break;
+
+                    default:
+                        // The first slash was just an ordinary slash.
+                        // Look at the second character in more detail.
+                        Echo_ungetc(c);
+                        break;
+                }
+                break;
+
+            case '"' :
+                // String literal.
+                // Ignore all characters until the end of the string.
+                do
+                {
+                    c = Echo_getc();
+                    if (c == EOF)
+                        Error("No end quote for string.");
+                    if (c == '\\')
+                        // Escaped character.
+                        // Completely ignore the next character.
+                        (void)Echo_getc();
+                }
+                while (c != '"');
+                break;
+
+            default:
+                // Just any odd character.
+                // Ignore it.
+                break;
+        }
+    }
 }
 
 

@@ -32,9 +32,7 @@ addons:
     - zlib1g-dev
 
 install:
-- cd unix
-- ./prebuild.sh
-- cd ..
+- unix/prebuild.sh
 - ./configure COMPILED_BY="Travis CI" --prefix="$(pwd)/build"
 - make check
 - make install

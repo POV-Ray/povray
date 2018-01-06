@@ -337,18 +337,21 @@ for extralib in '' '-lboost_system'
 do
   LIBS=$SAVED_LIBS
   LIBS="$LIBS $extralib"
-AC_RUN_IFELSE(
-  [AC_LANG_PROGRAM([[
-#include <boost/thread/thread.hpp>
-    ]],
-    [[boost::defer_lock_t(); return 0;]])],
-  [
+  AC_RUN_IFELSE([
+    AC_LANG_PROGRAM([[
+      #include <boost/thread/thread.hpp>
+    ]],[[
+      boost::mutex m;
+      boost::defer_lock_t();
+      return 0;
+    ]])
+  ],[
     AC_MSG_RESULT([yes])
     BOOST_THREAD_LIB="$BOOST_THREAD_LIB $extralib"
     boost_thread_links=1
-  ],,
-  [AC_MSG_RESULT([cross-compiling])]  # FIXME
-)
+  ],,[
+    AC_MSG_RESULT([cross-compiling])  # FIXME
+  ])
   if test $boost_thread_links = '1'; then
     break
   fi
@@ -1362,6 +1365,7 @@ Compilation settings:
   Compiler vendor:     $pov_compiler_vendor
   Compiler version:    $pov_compiler_version
   Compiler flags:      $CXXFLAGS
+  Libraries:           $LIBS
 
 Type 'make check' to build the program and run a test render.
 Type 'make install' to install $PACKAGE_NAME on your system.
