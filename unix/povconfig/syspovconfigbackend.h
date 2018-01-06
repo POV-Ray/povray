@@ -10,8 +10,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -50,8 +50,7 @@
 #define POV_USE_DEFAULT_TASK_INITIALIZE 1
 #define POV_USE_DEFAULT_TASK_CLEANUP    1
 
-// In regression testing an old scene for the 3.7.1 release found
-// linux machines needed more stack storage than windows.
+// Linux machines appear to need more stack storage than windows.
 #ifndef POV_THREAD_STACK_SIZE
     #define POV_THREAD_STACK_SIZE (1024 * 1024 * 4)
 #else

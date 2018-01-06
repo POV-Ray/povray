@@ -9,7 +9,7 @@
 //
 // +w800 +h800 +am2 +r4 +a0.1
 
-#version 3.71;
+#version 3.8;
 global_settings { assumed_gamma 1 }
 #declare Black = srgb <0,0,0>;
 background { color Black }
@@ -37,7 +37,7 @@ background { color Black }
 // Azure in map to show values not seen with aoi pattern.
 #declare ColorMapSphere = color_map {
  // blend_mode 2 blend_gamma 0.5 // Uncomment one of these for
-    blend_mode 2 blend_gamma 2.5 // fun with new 3.71 color_map
+    blend_mode 2 blend_gamma 2.5 // fun with new 3.8 color_map
  // blend_mode 2 blend_gamma 5.5 // blend_mode, blend_gamma.
     [ 0 Azure ]
     [ 0.49 Azure ]

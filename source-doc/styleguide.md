@@ -26,8 +26,8 @@ Language Standard
 
 POV-Ray is being developed with portability high in mind. In practice and at present, this means:
 
-  - Source code should adhere to the ISO-IEC 14882-2003 standard (aka C++03), as we currently do _not_ expect C++11
-    (let alone C++14) to be readily available everywhere yet. Also, source code shold not rely on any compiler- or
+  - Source code should adhere to the ISO/IEC 14882:2011 standard (aka C++11), as we currently do _not_ expect C++14
+    to be readily available everywhere yet. Also, source code shold not rely on any compiler- or
     platform-specific behaviour except some essentials described in @ref compiler.
     @note
         Despite being standard-compliant, the following language constructs should _not_ be used, due to known
@@ -36,24 +36,24 @@ POV-Ray is being developed with portability high in mind. In practice and at pre
             contain boolean constants (`true` or `false`) after macro expansion. The integer constants `0` and `1`,
             respectively, should be used instead. [MS Visual Studio 2013 and earlier]
 
-  - As an exception to the above, the following C++11 constructs are fair game, as they has been supported by all major
-    compiler brands for quite a while now and are thought to provide significant benefit:
+  - Source code should use the new features of C++11 with caution, as even some major compiler
+    brands still have not achieved full compliance yet. The following constructs can be considered
+    fair game though, as they are thought to provide significant benefit, and support by all major
+    compiler brands seems to be mature by now:
+      - Features "borrowed" from ISO/IEC 9899:1990 (aka C90, aka C89).
+      - Features "borrowed" from ISO/IEC TR 19768:2007 (aka C++ Technical Report 1, aka TR1).
       - `decltype(v)`, with `v` being a simple variable or class member (as opposed to a more complex expression)
     @note
-        Other C++11 features may be added to the above list upon request if a reasonable case can be made in their
-        favour. Note however that at present we will only consider features that have been supported by GCC as early as
-        version 4.6, by Clang as early as version 4.2, and by MSVC as early as version 14 (Visual Studio 2015).
+        Other C++11 features will be added to the above list at the discretion of the dev team, or
+        upon request if a reasonable case can be made in their favour. Note however that at present
+        we will only consider features that have been properly supported by GCC as early as version
+        4.8, by Clang as early as version 4.2, and by MSVC as early as internal version 19.0
+        (Visual Studio 2015).
 
-  - Source code should avoid potential conflicts with later standard extensions to the C++ language, most notably
-    ISO-IEC DTR 19768 (aka TR1) and ISO-IEC 14882-2011 (aka C++11).
+  - Source code should avoid potential conflicts with later standard extensions to the C++ language,
+    most notably ISO/IEC 14882:2014 (aka C++14) and the upcoming successor (aka C++17).
 
-  - Use of smart pointers compatible with ISO-IEC DTR 19768 (aka TR1) is explicitly encouraged;
-    however, instead of directly including the TR1 headers, `<boost/tr1/memory.hpp>` should be
-    included for compatibility with environments that do not support TR1 out of the box.
-    @todo
-        Maybe we only want a subset of the smart pointers.
-
-  - While POV-Ray does require boost, we want to keep dependence on it to a minimum. The following are currently
+  - While POV-Ray does require boost, we want to keep dependency on it to a minimum. The following are currently
     considered fair game:
       - Flyweights.
       - Threads.
@@ -241,12 +241,6 @@ When using smart pointers, instead of the type suffix `Ptr` the following suffix
   - `SPtr` to denote a shared pointer type
   - `IPtr` to denote an intrusive pointer type
   - `TPtr` to denote a regular pointer type used as a temporary reference
-
-@note
-    When using `shared_ptr<>` or `intrusive_ptr<>`, do _not_ specify a namespace, and do _not_ include the header files
-    you think these templates are defined in. It is entirely up to compile-time configuration header files to include
-    the necessary headers and pull in the definitions to the global namespace, so that the code works equally well with
-    e.g. the `shared_ptr` implementations from either Boost, TR1 or C++11.
 
 
 Miscellaneous Coding Rules

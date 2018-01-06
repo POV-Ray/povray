@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -72,8 +72,7 @@
 // documents directory if it is not found in the registry, hence must be valid
 // path components as well as valid registry keys.
 #define REGKEY                    "POV-Ray"
-#define REGVER                    "v" OFFICIAL_GENERATION_STRING
-#define REGVERKEY                 "v" POVWIN_GENERATION_STRING
+#define REGVERKEY                 "v" POVWIN_DIR_VERSION_STRING
 
 namespace povwin
 {

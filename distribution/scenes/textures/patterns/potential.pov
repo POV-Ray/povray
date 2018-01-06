@@ -9,7 +9,7 @@
 //
 // +w800 +h600 +a0.3
 
-#version 3.71;
+#version 3.8;
 global_settings { assumed_gamma 1 }
 #default { finish { ambient 0.005 diffuse 0.45 } }
 #declare Grey50 = srgb <0.5,0.5,0.5>;

@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -35,8 +35,8 @@
 ///
 //******************************************************************************
 
-#ifndef __VFECONF_H__
-#define __VFECONF_H__
+#ifndef POVRAY_VFE_VFECONF_H
+#define POVRAY_VFE_VFECONF_H
 
 //////////////////////////////////////////////////////////////
 // POVMS support
@@ -56,12 +56,8 @@ namespace vfe
   void vfe_POVMS_Sys_QueueClose (POVMS_Sys_QueueNode *q) ;
   void *vfe_POVMS_Sys_QueueReceive (POVMS_Sys_QueueNode *q, int *l, bool, bool) ;
   int vfe_POVMS_Sys_QueueSend(POVMS_Sys_QueueNode *q, void *p, int l) ;
-  int Allow_File_Read (const unsigned short *Filename, const unsigned int FileType);
-  int Allow_File_Write (const unsigned short *Filename, const unsigned int FileType);
   POVMS_Sys_Thread_Type POVMS_GetCurrentThread();
   void vfeAssert (const char *message, const char *filename, int line) ;
-  FILE *vfeFOpen (const std::basic_string<unsigned short>& name, const char *mode);
-  bool vfeRemove (const std::basic_string<unsigned short>& name);
 }
 
 #define POVMS_ASSERT_OUTPUT                   vfe::vfeAssert
@@ -75,4 +71,4 @@ namespace vfe
 #define POVMS_Sys_QueueSend                   vfe::vfe_POVMS_Sys_QueueSend
 #define POVMS_Sys_GetCurrentThread            vfe::POVMS_GetCurrentThread
 
-#endif // __VFECONF_H__
+#endif // POVRAY_VFE_VFECONF_H

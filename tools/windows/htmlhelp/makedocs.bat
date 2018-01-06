@@ -3,6 +3,9 @@
 REM *** Prepare Clean Slate **************************************************
 
 rmdir /s /q "output"
+REM The rmdir command schedules a directory for demolition, but it may take
+REM a moment before the directory is actually gone for good.
+if exist "output" timeout /NOBREAK 1
 mkdir "output"
 
 REM *** Create TOC and Index *************************************************
@@ -24,7 +27,7 @@ REM *** Copy Auxiliary Files *************************************************
 echo Copying auxiliary files...
 
 xcopy "include" "output"
-REM copy "input\povray37.css" "output"
+REM copy "input\povray.css" "output"
 xcopy /i /s "input\images" "output\images"
 
 echo.
@@ -33,7 +36,7 @@ REM *** Create Compressed Help File ******************************************
 
 echo Creating compressed help file...
 
-hhc.exe "output\povray37.hhp"
+hhc.exe "output\povray.hhp"
 
 echo.
 
@@ -41,7 +44,7 @@ REM *** Copy To Final Location ***********************************************
 
 echo Copying result...
 
-copy "output\povray37.chm" "..\..\..\distribution\platform-specific\windows\help\povray37.chm"
+copy "output\povray.chm" "..\..\..\distribution\platform-specific\windows\help\povray.chm"
 
 echo.
 

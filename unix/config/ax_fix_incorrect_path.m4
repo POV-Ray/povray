@@ -9,7 +9,7 @@
 #
 # LAST MODIFICATION
 #
-#   2009-01-16
+#   2018-01-05
 #
 # COPYLEFT
 #
@@ -24,12 +24,12 @@ AC_DEFUN([AX_FIX_INCORRECT_PATH],
   AC_SUBST([$1])
 
   # process paths containing dots and create regexp
-  ax_fix_incorrect_path_regexp="[[=:]]*`echo $2 | sed 's,\.,\\\\.,g'`:*"
+  ax_fix_incorrect_path_regexp=":`echo $2 | sed 's,\.,\\\\.,g'`:"
   echo ax_fix_incorrect_path_regexp = $ax_fix_incorrect_path_regexp >&AS_MESSAGE_LOG_FD
 
   # initial and processed variable values
   eval "ax_fix_incorrect_path_old=\$$1"
-  ax_fix_incorrect_path_new=`echo $ax_fix_incorrect_path_old | sed s,$ax_fix_incorrect_path_regexp,,g`
+  ax_fix_incorrect_path_new=`echo :$ax_fix_incorrect_path_old: | sed s,$ax_fix_incorrect_path_regexp,:,g | sed s,^:,, | sed s,:$,,`
   echo ax_fix_incorrect_path_old    = $ax_fix_incorrect_path_old >&AS_MESSAGE_LOG_FD
   echo ax_fix_incorrect_path_new    = $ax_fix_incorrect_path_new >&AS_MESSAGE_LOG_FD
 

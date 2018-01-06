@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -954,7 +954,7 @@ void View::StartRender(POVMS_Object& renderOptions)
     if((previewendsize > 1) && (tracingmethod == 0))
     {
         // TODO FIXME
-        // Warning("In POV-Ray 3.7 and later it is recommended to set the mosaic preview end size to one for\n"
+        // Warning("In POV-Ray v3.7 and later it is recommended to set the mosaic preview end size to one for\n"
         //         "maximum performance when rendering without anti-aliasing.");
     }
 

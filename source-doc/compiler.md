@@ -1,17 +1,16 @@
 @page compiler  Compiler Requirements
 
 
-Compiling POV-Ray requires a compiler compatible with the C++03 language standard as defined by
-ISO-IEC 14882-2003. However, the following additional requirements apply.
+Compiling POV-Ray requires a compiler compatible with the C++11 language standard as defined by
+ISO/IEC 14882:2011. However, the following additional requirements apply.
 
 
 Language Extensions
 ===================
 
-Compiling POV-Ray will require support for the following language extensions beyond C++03:
+Compiling POV-Ray will require support for the following language extensions beyond C++11:
 
-  - `decltype(v)`, as introduced with the C++11 language standard, must be supported at least for
-    cases where `v` is a simple variable or class member.
+  - (none).
 
 
 Exotic Environments
