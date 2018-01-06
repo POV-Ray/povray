@@ -42,6 +42,11 @@
 #
 ###############################################################################
 
+# Change to the directory this script resides in
+scriptname=`basename $0`
+olddir=`pwd`
+cd `dirname $0`
+
 umask 022
 
 # Extract version information from `source/base/version.h`
@@ -65,16 +70,10 @@ required_automake="1.9"
 # Setup
 ###############################################################################
 
-# Prevents running from another directory.
-if test x"`dirname $0`" != x"."; then
-  echo "$0: must ran from POV-Ray's unix/ directory"
-  exit 1
-fi
-
 # Check optional argument.
 case "$1" in
   ""|clean|doc|docs|docclean|docsclean) ;;
-  *) echo "$0: error: unrecognized option '$1'"; exit ;;
+  *) echo "$scriptname: error: unrecognized option '$1'"; cd "$olddir" ; exit ;;
 esac
 
 # Check whether 'cp -u' is supported.
@@ -94,7 +93,8 @@ if test x"$1" = x""; then
     expr $autoconf \>= $required > /dev/null || autoconf=""
   fi
   if test x"$autoconf" = x""; then
-    echo "$0: error: requires autoconf $required_autoconf or above"
+    echo "$scriptname: error: requires autoconf $required_autoconf or above"
+    cd "$olddir"
     exit 1
   fi
 
@@ -106,7 +106,8 @@ if test x"$1" = x""; then
     expr $automake \>= $required > /dev/null || automake=""
   fi
   if test x"$automake" = x""; then
-    echo "$0: error: requires automake $required_automake or above"
+    echo "$scriptname: error: requires automake $required_automake or above"
+    cd "$olddir"
     exit 1
   fi
 fi
@@ -346,6 +347,7 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
   chmod u+rw docs_internal_$timestamp.log
   rm -f      $log_file
 
+  cd "$olddir"
   exit
   ;;
 
@@ -1526,3 +1528,6 @@ case "$1" in
   done
   ;;
 esac  # boost
+
+
+cd "$olddir"

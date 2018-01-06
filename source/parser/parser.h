@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -709,7 +709,11 @@ class Parser : public SceneTask
         // tokenize.h/tokenize.cpp
         void Echo_ungetc (int c);
         int Echo_getc (void);
+        /// Advance to the next non-whitespace character.
         bool Skip_Spaces (void);
+        /// Advance to the next hash sign.
+        /// Hash signs inside comments or strings are ignored.
+        bool SkipToDirective(void);
         int Parse_C_Comments (void);
         inline void Begin_String (void);
         inline void Stuff_Character (int c);
