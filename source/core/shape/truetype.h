@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -85,10 +85,10 @@ struct TrueTypeInfo;
 
 struct TrueTypeFont
 {
-    TrueTypeFont(UCS2* fn, IStream* fp, StringEncoding te);
+    TrueTypeFont(const UCS2String& fn, IStream* fp, StringEncoding te);
     ~TrueTypeFont();
 
-    UCS2*           filename;
+    UCS2String      filename;
     IStream*        fp;
     StringEncoding  textEncoding;
     TrueTypeInfo*   info;
