@@ -311,6 +311,7 @@ struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
     { "SC",  kPOVAttrib_Left,               kPOVMSType_Float,       kNoParameter },
     { "SF0", kPOVAttrib_SubsetStartFrame,   kPOVMSType_Float,       kNoParameter },
     { "SF",  kPOVAttrib_SubsetStartFrame,   kPOVMSType_Int,         kNoParameter },
+    { "SM",  kPOVAttrib_SharedMemory,       kPOVMSType_UCS2String,  kNoParameter },
     { "SP",  kPOVAttrib_PreviewStartSize,   kPOVMSType_Int,         kNoParameter },
     { "SR",  kPOVAttrib_Top,                kPOVMSType_Float,       kNoParameter },
     { "STP", kPOVAttrib_FrameStep,          kPOVMSType_Int,         kNoParameter },

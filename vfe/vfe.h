@@ -43,6 +43,11 @@
 #include <boost/format.hpp>
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
+#include <boost/interprocess/shared_memory_object.hpp>
+#include <boost/interprocess/mapped_region.hpp>
+#ifdef BOOST_WINDOWS
+#include <boost/interprocess/windows_shared_memory.hpp>
+#endif
 
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
@@ -212,8 +217,14 @@ namespace vfe
 
     protected:
       vfeSession *m_Session;
-      vector<RGBA8> m_Pixels;
+      void *m_Buffer;
       bool m_VisibleOnCreation;
+#ifdef BOOST_WINDOWS
+	  boost::interprocess::windows_shared_memory *m_SharedMemory;
+#else
+      boost::interprocess::shared_memory_object *m_SharedMemory;
+#endif
+      boost::interprocess::mapped_region *m_MappedRegion;
   };
 
   class VirtualFrontEnd

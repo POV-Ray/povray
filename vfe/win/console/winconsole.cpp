@@ -86,127 +86,6 @@ void ErrorExit(vfeSession *session)
   exit (1);
 }
 
-const char* gSharedMemoryName = "leocad-povray";
-
-struct lcSharedMemoryHeader
-{
-	uint32_t Version;
-	uint32_t Width;
-	uint32_t Height;
-	uint32_t PixelsWritten;
-	uint32_t PixelsRead;
-};
-
-class WinSharedMemoryDisplay : public vfeDisplay
-{
-public:
-	WinSharedMemoryDisplay(unsigned int width, unsigned int height, GammaCurvePtr gamma, vfeSession *session, bool visible = false)
-		: vfeDisplay( width, height, gamma, session, visible )
-	{
-		mBuffer = NULL;
-		mMapFile = INVALID_HANDLE_VALUE;
-	}
-
-	virtual ~WinSharedMemoryDisplay()
-	{
-		Close();
-	}
-
-	virtual void Initialise()
-	{
-		if (mMapFile != INVALID_HANDLE_VALUE)
-			return;
-
-		int BufferSize = sizeof(lcSharedMemoryHeader) + GetWidth() * GetHeight() * sizeof(RGBA8);
-
-		mMapFile = CreateFileMapping( INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, BufferSize, gSharedMemoryName);
-
-		if (!mMapFile)
-			return;
-
-		mBuffer = MapViewOfFile(mMapFile, FILE_MAP_ALL_ACCESS, 0, 0, BufferSize);
-
-		if (!mBuffer)
-		{
-			CloseHandle(mMapFile);
-			mMapFile = INVALID_HANDLE_VALUE;
-			return;
-		}
-
-		lcSharedMemoryHeader* Header = (lcSharedMemoryHeader*)mBuffer;
-		Header->Version = 1;
-		Header->Width = GetWidth();
-		Header->Height = GetHeight();
-		Header->PixelsWritten = 0;
-		Header->PixelsRead = 0;
-	}
-
-	virtual void Close()
-	{
-		if (mBuffer)
-		{
-			lcSharedMemoryHeader* Header = (lcSharedMemoryHeader*)mBuffer;
-			if (Header->PixelsWritten != Header->PixelsRead)
-				Sleep(5000);
-
-			UnmapViewOfFile(mBuffer);
-			mBuffer = NULL;
-		}
-
-		if (mMapFile != INVALID_HANDLE_VALUE)
-		{
-			CloseHandle(mMapFile);
-			mMapFile = INVALID_HANDLE_VALUE;
-		}
-	}
-
-	virtual void DrawPixel(unsigned int x, unsigned int y, const RGBA8& colour)
-	{
-		lcSharedMemoryHeader* Header = (lcSharedMemoryHeader*)mBuffer;
-		RGBA8* Pixels = (RGBA8*)(Header + 1);
-		Pixels[y * GetWidth() + x] = colour;
-		Header->PixelsWritten++;
-	}
-
-	virtual void DrawRectangleFrame(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8& colour)
-	{
-		for (unsigned int x = x1; x <= x2; x++)
-			DrawPixel(x, y1, colour);
-		for (unsigned int x = x1; x <= x2; x++)
-			DrawPixel(x, y2, colour);
-		for (unsigned int y = y1; y <= y2; y++)
-		{
-			DrawPixel(x1, y, colour);
-			DrawPixel(x2, y, colour);
-		}
-	}
-
-	virtual void DrawFilledRectangle(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8& colour)
-	{
-		for (unsigned int y = y1; y <= y2; y++)
-			for (unsigned int x = x1; x <= x2; x++)
-				DrawPixel(x, y, colour);
-	}
-
-	virtual void DrawPixelBlock(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8 *colour)
-	{
-		for (int y = y1; y <= y2; y++)
-			for (int x = x1; x <= x2; x++)
-				DrawPixel(x, y, *colour++);
-	}
-
-protected:
-	HANDLE mMapFile;
-	void* mBuffer;
-};
-
-vfeDisplay *SharedMemoryDisplayCreator(unsigned int width, unsigned int height, GammaCurvePtr gamma, vfeSession *session, bool visible)
-{
-	return new WinSharedMemoryDisplay(width, height, gamma, session, visible);
-}
-
-int pause = 0;
-
 // this is an example of a minimal console version of POV-Ray using the VFE
 // (virtual front-end) library. it is NOT INTENDED TO BE A FULLY-FEATURED
 // CONSOLE IMPLEMENTATION OF POV-RAY and is not officially supported. see
@@ -217,8 +96,6 @@ int main (int argc, char **argv)
   vfeWinSession     *session = new vfeWinSession() ;
   vfeStatusFlags    flags;
   vfeRenderOptions  opts;
-
-  session->SetDisplayCreator(SharedMemoryDisplayCreator);
 
   fprintf(stderr,
           "This is an example of a minimal console build of POV-Ray under Windows.\n\n"
@@ -235,32 +112,8 @@ int main (int argc, char **argv)
 
   if ((s = getenv ("POVINC")) != NULL)
     opts.AddLibraryPath (s);
-  argv++;
-  while (*argv)
-  {
-	  if (!strcmp(*argv, "-pause"))
-	  {
-		  pause = 1;
-		  argv++;
-	  }
-	  else if (!strcmp(*argv, "-shared-memory"))
-	  {
-		  argv++;
-		  if (*argv)
-		  {
-			  gSharedMemoryName = *argv;
-			  argv++;
-		  }
-	  }
-	  else
-	  {
-		  opts.AddCommand(*argv);
-		  argv++;
-	  }
-  }
-
-  if (pause)
-	  MessageBox(0, "", "", MB_OK);
+  while (*++argv)
+    opts.AddCommand(*argv);
 
   if (session->SetOptions(opts) != vfeNoError)
     ErrorExit(session);
