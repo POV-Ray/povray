@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,6 +39,8 @@
 // C++ variants of C standard header files
 #include <cctype>
 #include <cmath>
+#include <cstdarg>
+#include <cstdio>
 #include <cstdlib>
 
 // C++ standard header files
@@ -179,7 +181,7 @@ void Parser::Run()
 {
     int         error_line = -1;
     int         error_col = -1;
-    UCS2String  error_filename(MAX_PATH, 0); // Pre-claim some memory, so we can handle an out-of-memory error.
+    UCS2String  error_filename(POV_FILENAME_BUFFER_CHARS, 0); // Pre-claim some memory, so we can handle an out-of-memory error.
     POV_LONG    error_pos = -1;
 
     try
@@ -253,7 +255,7 @@ void Parser::Run()
             if (Token.FileHandle != NULL)
             {
                 // take a (local) copy of error location prior to freeing token data
-                // NB error_filename has been pre-allocated for strings up to _MAX_PATH
+                // NB error_filename has been pre-allocated for strings up to POV_FILENAME_BUFFER_CHARS
                 error_filename = Token.FileHandle->name();
                 error_line = Token.Token_File_Pos.lineno;
                 error_col = Token.Token_Col_No;
@@ -10772,7 +10774,7 @@ void Parser::Warning(const char *format,...)
     char localvsbuffer[1024];
 
     va_start(marker, format);
-    vsnprintf(localvsbuffer, 1023, format, marker);
+    std::vsnprintf(localvsbuffer, sizeof(localvsbuffer), format, marker);
     va_end(marker);
 
     Warning(kWarningGeneral, localvsbuffer);
@@ -10786,7 +10788,7 @@ void Parser::Warning(WarningLevel level, const char *format,...)
     char localvsbuffer[1024];
 
     va_start(marker, format);
-    vsnprintf(localvsbuffer, 1023, format, marker);
+    std::vsnprintf(localvsbuffer, sizeof(localvsbuffer), format, marker);
     va_end(marker);
 
     if(Token.FileHandle != NULL)
@@ -10803,7 +10805,7 @@ void Parser::VersionWarning(unsigned int sinceVersion, const char *format,...)
         char localvsbuffer[1024];
 
         va_start(marker, format);
-        vsnprintf(localvsbuffer, 1023, format, marker);
+        std::vsnprintf(localvsbuffer, sizeof(localvsbuffer), format, marker);
         va_end(marker);
 
         Warning(kWarningLanguage, localvsbuffer);
@@ -10816,7 +10818,7 @@ void Parser::PossibleError(const char *format,...)
     char localvsbuffer[1024];
 
     va_start(marker, format);
-    vsnprintf(localvsbuffer, 1023, format, marker);
+    std::vsnprintf(localvsbuffer, sizeof(localvsbuffer), format, marker);
     va_end(marker);
 
     if(Token.FileHandle != NULL)
@@ -10835,7 +10837,7 @@ void Parser::Error(const char *format,...)
     char localvsbuffer[1024];
 
     va_start(marker, format);
-    vsnprintf(localvsbuffer, 1023, format, marker);
+    std::vsnprintf(localvsbuffer, sizeof(localvsbuffer), format, marker);
     va_end(marker);
 
     if(Token.FileHandle != NULL)
@@ -10850,7 +10852,7 @@ void Parser::ErrorInfo(const SourceInfo& loc, const char *format,...)
     char localvsbuffer[1024];
 
     va_start(marker, format);
-    vsnprintf(localvsbuffer, 1023, format, marker);
+    std::vsnprintf(localvsbuffer, sizeof(localvsbuffer), format, marker);
     va_end(marker);
 
     messageFactory.PossibleErrorAt(loc.filename, loc.filepos.lineno, loc.col, loc.filepos.offset, "%s", localvsbuffer);
@@ -10862,7 +10864,7 @@ int Parser::Debug_Info(const char *format,...)
     char localvsbuffer[1024];
 
     va_start(marker, format);
-    vsnprintf(localvsbuffer, 1023, format, marker);
+    std::vsnprintf(localvsbuffer, sizeof(localvsbuffer), format, marker);
     va_end(marker);
 
     Debug_Message_Buffer.printf("%s", localvsbuffer);

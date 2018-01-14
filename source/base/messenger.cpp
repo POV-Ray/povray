@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -74,7 +74,7 @@ void GenericMessenger::Info(const char *format, ...)
     sprintf(localvsbuffer, "%s Info: ", stageName);
 
     va_start(marker, format);
-    vsnprintf(localvsbuffer + strlen(localvsbuffer), 1023 - strlen(localvsbuffer), format, marker);
+    std::vsnprintf(localvsbuffer + strlen(localvsbuffer), sizeof(localvsbuffer) - strlen(localvsbuffer), format, marker);
     va_end(marker);
 
     CleanupString(localvsbuffer);
@@ -94,7 +94,7 @@ void GenericMessenger::InfoAt(const UCS2 *filename, POV_LONG line, POV_LONG colu
     sprintf(localvsbuffer, "%s Info: ", stageName);
 
     va_start(marker, format);
-    vsnprintf(localvsbuffer + strlen(localvsbuffer), 1023 - strlen(localvsbuffer), format, marker);
+    std::vsnprintf(localvsbuffer + strlen(localvsbuffer), sizeof(localvsbuffer) - strlen(localvsbuffer), format, marker);
     va_end(marker);
 
     CleanupString(localvsbuffer);
@@ -113,7 +113,7 @@ void GenericMessenger::Warning(WarningLevel level, const char *format,...)
     sprintf(localvsbuffer, "%s Warning: ", stageName);
 
     va_start(marker, format);
-    vsnprintf(localvsbuffer + strlen(localvsbuffer), 1023 - strlen(localvsbuffer), format, marker);
+    std::vsnprintf(localvsbuffer + strlen(localvsbuffer), sizeof(localvsbuffer) - strlen(localvsbuffer), format, marker);
     va_end(marker);
 
     CleanupString(localvsbuffer);
@@ -132,7 +132,7 @@ void GenericMessenger::WarningAt(WarningLevel level, const UCS2 *filename, POV_L
     sprintf(localvsbuffer, "%s Warning: ", stageName);
 
     va_start(marker, format);
-    vsnprintf(localvsbuffer + strlen(localvsbuffer), 1023 - strlen(localvsbuffer), format, marker);
+    std::vsnprintf(localvsbuffer + strlen(localvsbuffer), sizeof(localvsbuffer) - strlen(localvsbuffer), format, marker);
     va_end(marker);
 
     CleanupString(localvsbuffer);
@@ -151,7 +151,7 @@ void GenericMessenger::PossibleError(const char *format,...)
     sprintf(localvsbuffer, "Possible %s Error: ", stageName);
 
     va_start(marker, format);
-    vsnprintf(localvsbuffer + strlen(localvsbuffer), 1023 - strlen(localvsbuffer), format, marker);
+    std::vsnprintf(localvsbuffer + strlen(localvsbuffer), sizeof(localvsbuffer) - strlen(localvsbuffer), format, marker);
     va_end(marker);
 
     CleanupString(localvsbuffer);
@@ -170,7 +170,7 @@ void GenericMessenger::PossibleErrorAt(const UCS2 *filename, POV_LONG line, POV_
     sprintf(localvsbuffer, "Possible %s Error: ", stageName);
 
     va_start(marker, format);
-    vsnprintf(localvsbuffer + strlen(localvsbuffer), 1023 - strlen(localvsbuffer), format, marker);
+    std::vsnprintf(localvsbuffer + strlen(localvsbuffer), sizeof(localvsbuffer) - strlen(localvsbuffer), format, marker);
     va_end(marker);
 
     CleanupString(localvsbuffer);
@@ -184,7 +184,7 @@ std::string GenericMessenger::SendError(const char *format, va_list arglist, con
     char localvsbuffer[1024];
 
     sprintf(localvsbuffer, "%s Error: ", stageName);
-    vsnprintf(localvsbuffer + strlen(localvsbuffer), 1023 - strlen(localvsbuffer), format, arglist);
+    std::vsnprintf(localvsbuffer + strlen(localvsbuffer), sizeof(localvsbuffer) - strlen(localvsbuffer), format, arglist);
     CleanupString(localvsbuffer);
 
     SendMessage(kMessageClass_Error, kWarningNone, localvsbuffer, filename, line, column, offset);

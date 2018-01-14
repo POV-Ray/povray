@@ -613,23 +613,6 @@ AC_LANG_POP([C])
 #AC_FUNC_STRFTIME  # FIXME
 #AC_FUNC_VPRINTF   # FIXME
 
-# vsnprintf <stdarg.h> (C99)
-AC_CHECK_FUNC([vsnprintf],
-  [],
-  [AC_MSG_ERROR([
-*** This system does not provide the C99 vsnprintf() function which
-*** is required to compile $PACKAGE_NAME.  You should consider updating
-*** your C library as it is too old.  Alternatively you might install
-*** a specific library implementing the (v)snprintf family of functions.
-*** Searching the web should give you appropriate pointers.
-***
-*** In case you want to try compiling $PACKAGE_NAME while your system lacks
-*** this function (meaning that compilation *will* fail unless you provide
-*** a replacement function), try the --disable-vsnprintf-check option.
-])
-  ]
-)
-
 # getcwd or its equivalent with getenv <unistd.h>
 AC_LANG_PUSH([C])
 AC_CHECK_FUNCS([getcwd],

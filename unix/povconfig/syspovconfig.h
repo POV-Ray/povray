@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -102,7 +102,7 @@ using boost::intrusive_ptr;
 
 #endif // STD_POV_TYPES_DECLARED
 
-// After Stroustrop in _The C++ Programming Language, 3rd Ed_ p. 88
+// After Stroustrup in _The C++ Programming Language, 3rd Ed_ p. 88
 #ifndef NULL
 const int NULL=0;
 #endif
@@ -110,13 +110,17 @@ const int NULL=0;
 #define POV_DELETE_FILE(name)  unlink(name)
 
 #if defined (PATH_MAX)
-# define FILE_NAME_LENGTH   PATH_MAX
+    // Use the system's actual limit if known.
+    // NB: PATH_MAX is understood including a terminating NUL character.
+    #define POV_FILENAME_BUFFER_CHARS   (PATH_MAX-1)
 #elif defined (_POSIX_PATH_MAX)
-# define FILE_NAME_LENGTH   _POSIX_PATH_MAX
+    // Otherwise, use the most restrictive limit allowed by POSIX if defined.
+    // NB: _POSIX_PATH_MAX is understood including a terminating NUL character.
+    #define POV_FILENAME_BUFFER_CHARS   (_POSIX_PATH_MAX-1)
 #else
-# define FILE_NAME_LENGTH   200
+    // As a fallback, use an even more conservative limit.
+    #define POV_FILENAME_BUFFER_CHARS   199
 #endif
-#define MAX_PATH FILE_NAME_LENGTH  // FIXME: remove later
 
 #define DEFAULT_OUTPUT_FORMAT       kPOVList_FileType_PNG
 #define DEFAULT_DISPLAY_GAMMA_TYPE  kPOVList_GammaType_SRGB
