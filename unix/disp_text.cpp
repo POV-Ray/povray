@@ -60,8 +60,14 @@ namespace pov_frontend
         return true;
     }
 
-    void UnixTextDisplay::DrawPixel(unsigned int x, unsigned int y, const RGBA8& colour)
-    {
-        //fprintf(stderr, "DrawPixel(%d,%d)\n", x, y);
-    }
+	void UnixTextDisplay::Initialise()
+	{
+		vfeDisplay::Initialise();
+	}
+
+	void UnixTextDisplay::DrawPixel(unsigned int x, unsigned int y, const RGBA8& colour)
+	{
+		vfeDisplay::DrawPixel(x, y, colour);
+		//fprintf(stderr, "DrawPixel(%d,%d)\n", x, y);
+	}
 }
