@@ -41,6 +41,9 @@
 #include <memory>
 #include <vector>
 
+#include <boost/interprocess/file_mapping.hpp>
+#include <boost/interprocess/mapped_region.hpp>
+
 #include "base/platformbase.h"
 #include "base/stringtypes.h"
 #include "base/timer.h"
@@ -208,8 +211,10 @@ namespace vfe
 
     protected:
       vfeSession *m_Session;
-      std::vector<RGBA8> m_Pixels;
+      void *m_Buffer;
       bool m_VisibleOnCreation;
+      boost::interprocess::file_mapping  *m_FileMapping;
+      boost::interprocess::mapped_region *m_MappedRegion;
   };
 
   class VirtualFrontEnd
