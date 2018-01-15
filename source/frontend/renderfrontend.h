@@ -7,7 +7,7 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -461,13 +461,13 @@ RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_M
             switch (shi->second.data.backwardCompatibilityData.legacyGammaMode)
             {
                 case kPOVList_GammaMode_None:
-                    // The scene didn't explicitly set assumed_gamma, and it ended up with a #version of less than 3.7,
+                    // The scene didn't explicitly set assumed_gamma, and it ended up with a #version of less than v3.7,
                     // which normally means no gamma correction is done whatsoever.
 
-                    if(obj.TryGetFloat(kPOVAttrib_Version, 0.0f) >= 3.7f)
+                    if(obj.TryGetFloat(kPOVAttrib_Version, 0.0f) >= 3.7f) // v3.7.0
                     {
-                        // INI file or command line specify a version of 3.7 or greater, which we take to imply that
-                        // output gamma handling should follow the 3.7 model.
+                        // INI file or command line specify a version of v3.7 or greater, which we take to imply that
+                        // output gamma handling should follow the v3.7 model.
 
                         shi->second.data.backwardCompatibilityData.legacyGammaMode = kPOVList_GammaMode_AssumedGamma37Implied;
                         shi->second.data.backwardCompatibilityData.workingGammaType = DEFAULT_WORKING_GAMMA_TYPE;
@@ -476,8 +476,8 @@ RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_M
                                                          "Warning: A version of 3.7 or greater was specified in an INI file or on the\n"
                                                          "command-line, but the scene finished parsing with a #version of 3.6x or\n"
                                                          "earlier and without assumed_gamma set. Output gamma correction is being turned\n"
-                                                         "on as per the 3.7 default using an assumed_gamma default of " DEFAULT_WORKING_GAMMA_TEXT ",\n"
-                                                         "rather than left off (which was the 3.6x and earlier default), because the INI\n"
+                                                         "on as per the v3.7 default using an assumed_gamma default of " DEFAULT_WORKING_GAMMA_TEXT ",\n"
+                                                         "rather than left off (which was the v3.6.x and earlier default), because the INI\n"
                                                          "file or command-line specified version directive takes precedence.");
                     }
                     break;
@@ -485,8 +485,8 @@ RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_M
                 case kPOVList_GammaMode_AssumedGamma36:
                 case kPOVList_GammaMode_AssumedGamma37:
                 case kPOVList_GammaMode_AssumedGamma37Implied:
-                    // The scene explicitly set assumed_gamma, and/or ended up with a #version of 3.7 or higher,
-                    // which normally means output gamma handling should follow the 3.6 / 3.7 assumed_gamma model
+                    // The scene explicitly set assumed_gamma, and/or ended up with a #version of v3.7 or higher,
+                    // which normally means output gamma handling should follow the v3.6 / v3.7 assumed_gamma model
                     // (which differs only in input image gamma handling, which is irrelevant here).
                     break;
 
@@ -654,7 +654,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::StartRender(ViewId
             {
                 // TODO: we need to check to see if the image file is of an appropriate
                 //       size and format. if so we must skip the entire render.
-                //       this will more or less duplicate the pre-3.7 behaviour, except
+                //       this will more or less duplicate the pre-v3.7 behaviour, except
                 //       that those versions would first load the image and then display
                 //       it if +d was set. I am not sure if it's important to replicate
                 //       this behaviour, however from a user's point of view it might be

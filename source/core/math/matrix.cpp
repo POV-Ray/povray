@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -102,7 +102,7 @@ namespace pov
 
 void MZero (MATRIX result)
 {
-    register int i, j;
+    int i, j;
 
     for (i = 0; i < 4; i++)
     {
@@ -146,7 +146,7 @@ void MZero (MATRIX result)
 
 void MIdentity (MATRIX result)
 {
-    register int i, j;
+    int i, j;
 
     for (i = 0; i < 4; i++)
     {
@@ -299,7 +299,7 @@ void MTimesC (MATRIX result, const MATRIX matrix1, const MATRIX matrix2)
 
 void MAdd (MATRIX result, MATRIX matrix1, MATRIX matrix2)
 {
-    register int i, j;
+    int i, j;
 
     for (i = 0; i < 4; i++)
         for (j = 0; j < 4; j++)
@@ -308,7 +308,7 @@ void MAdd (MATRIX result, MATRIX matrix1, MATRIX matrix2)
 
 void MSub (MATRIX result, MATRIX matrix1, MATRIX matrix2)
 {
-    register int i, j;
+    int i, j;
 
     for (i = 0; i < 4; i++)
         for (j = 0; j < 4; j++)
@@ -317,7 +317,7 @@ void MSub (MATRIX result, MATRIX matrix1, MATRIX matrix2)
 
 void MScale (MATRIX result, MATRIX matrix1, DBL amount)
 {
-    register int i, j;
+    int i, j;
 
     for (i = 0; i < 4; i++)
         for (j = 0; j < 4; j++)
@@ -369,7 +369,7 @@ void MTranspose (MATRIX result)
 
 void MTranspose (MATRIX result, const MATRIX matrix1)
 {
-    register int i, j;
+    int i, j;
 
     for (i = 0; i < 4; i++)
     {
@@ -408,7 +408,7 @@ void MTransPoint (Vector3d& result, const Vector3d& vector, const MATRIX *matrix
 {
     Vector3d temp; // needed in case vector and result refer to the same memory location
 
-    for (register int i = 0; i < 3; i++)
+    for (int i = 0; i < 3; i++)
     {
         temp[i] = vector[X] * (*matrix)[0][i] +
                   vector[Y] * (*matrix)[1][i] +
@@ -448,7 +448,7 @@ void MTransDirection (Vector3d& result, const Vector3d& vector, const MATRIX *ma
 {
     Vector3d temp; // needed in case vector and result refer to the same memory location
 
-    for (register int i = 0; i < 3; i++)
+    for (int i = 0; i < 3; i++)
     {
         temp[i] = vector[X] * (*matrix)[0][i] +
                   vector[Y] * (*matrix)[1][i] +
@@ -488,7 +488,7 @@ void MInvTransNormal (Vector3d& result, const Vector3d& vector, const MATRIX* ma
 {
     Vector3d temp; // needed in case vector and result refer to the same memory location
 
-    for (register int i = 0; i < 3; i++)
+    for (int i = 0; i < 3; i++)
     {
         temp[i] = vector[X] * (*matrix)[i][0] +
                   vector[Y] * (*matrix)[i][1] +
@@ -573,7 +573,7 @@ void Compute_Scaling_Transform (TRANSFORM *result, const Vector3d& vector)
 
 void Compute_Matrix_Transform (TRANSFORM *result, const MATRIX matrix)
 {
-    register int i;
+    int i;
 
     for (i = 0; i < 4; i++)
     {
@@ -676,7 +676,7 @@ void Compute_Translation_Transform (TRANSFORM *transform, const Vector3d& vector
 
 void Compute_Rotation_Transform (TRANSFORM *transform, const Vector3d& vector)
 {
-    register DBL cosx, cosy, cosz, sinx, siny, sinz;
+    DBL cosx, cosy, cosz, sinx, siny, sinz;
     MATRIX Matrix;
     Vector3d Radian_Vector;
 

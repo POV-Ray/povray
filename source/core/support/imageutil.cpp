@@ -7,7 +7,7 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -481,7 +481,7 @@ HF_VAL image_height_at(const ImageData *image, int x, int y)
     if (image->data->IsIndexed())
         return ((HF_VAL)image->data->GetIndexedValue(x, y) * 256);
     // TODO FIXME - should be *257 to get a max value of 255*257 = 65535
-    /* [JG-2013]: do not change 256 for 257, due to backward compatibility with all versions up to 3.6
+    /* [JG-2013]: do not change 256 for 257, due to backward compatibility with all versions up to v3.6
      * it's a shame to not being able to cover the full range when using indexed image, but
      * it was like that for a very very long time (since the introduction of height field in povray)
      */
@@ -1239,7 +1239,7 @@ static void bilinear(DBL *factors, DBL x, DBL y)
 
 static void norm_dist(DBL *factors, DBL x, DBL y)
 {
-    register int i;
+    int i;
 
     DBL p, q;
     DBL wts[4];

@@ -13,7 +13,7 @@
 ///
 /// ----------------------------------------------------------------------------
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -5384,7 +5384,7 @@ DBL AgatePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
 {
     int noise_generator = GetNoiseGen(pThread);
 
-    register DBL noise, turb_val;
+    DBL noise, turb_val;
     const ClassicTurbulence* Turb;
 
     Turb = GetTurb(warps);
@@ -5440,7 +5440,7 @@ DBL AgatePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
 
 DBL BoxedPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-    register DBL value;
+    DBL value;
 
     value = max(fabs(EPoint[X]), max(fabs(EPoint[Y]), fabs(EPoint[Z])));
     CLIP_DENSITY(value);
@@ -6022,7 +6022,7 @@ DBL CracklePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 
 DBL CylindricalPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-    register DBL value;
+    DBL value;
 
     value = sqrt(Sqr(EPoint[X]) + Sqr(EPoint[Z]));
     CLIP_DENSITY(value);
@@ -6428,8 +6428,8 @@ DBL GranitePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 {
     int noise_generator = GetNoiseGen(pThread);
 
-    register int i;
-    register DBL temp, noise = 0.0, freq = 1.0;
+    int i;
+    DBL temp, noise = 0.0, freq = 1.0;
     Vector3d tv1, tv2;
 
     tv1 = EPoint * 4.0;
@@ -7176,7 +7176,7 @@ DBL JuliaXPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsec
 
 DBL LeopardPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-    register DBL value, temp1, temp2, temp3;
+    DBL value, temp1, temp2, temp3;
 
     /* This form didn't work with Zortech 386 compiler */
     /* value = Sqr((sin(x)+sin(y)+sin(z))/3); */
@@ -7828,7 +7828,7 @@ DBL MandelXPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 
 DBL MarblePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-    register DBL turb_val;
+    DBL turb_val;
     const ClassicTurbulence *Turb;
 
     if (hasTurbulence)
@@ -7933,7 +7933,7 @@ DBL OnionPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
 {
     // TODO - The variable noise is not used as noise in this function
 
-    register DBL noise;
+    DBL noise;
 
 /*
      This ramp goes 0-1,1-0,0-1,1-0...
@@ -8021,7 +8021,7 @@ DBL PigmentPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 
 DBL PlanarPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-    register DBL value = fabs(EPoint[Y]);
+    DBL value = fabs(EPoint[Y]);
 
     CLIP_DENSITY(value);
 
@@ -8112,7 +8112,7 @@ DBL QuiltedPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 
 DBL RadialPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-    register DBL value;
+    DBL value;
 
     if ((fabs(EPoint[X])<0.001) && (fabs(EPoint[Z])<0.001))
     {
@@ -8160,8 +8160,8 @@ DBL RadialPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsec
 
 DBL RipplesPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-    register unsigned int i;
-    register DBL length, index;
+    unsigned int i;
+    DBL length, index;
     DBL scalar =0.0;
     Vector3d point;
 
@@ -8548,7 +8548,7 @@ DBL Spiral2Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 
 DBL SphericalPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-    register DBL value;
+    DBL value;
 
     value = EPoint.length();
     CLIP_DENSITY(value);
@@ -8590,8 +8590,8 @@ DBL SphericalPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pI
 
 DBL WavesPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-    register unsigned int i;
-    register DBL length, index;
+    unsigned int i;
+    DBL length, index;
     DBL scalar = 0.0;
     Vector3d point;
 
@@ -8648,7 +8648,7 @@ DBL WavesPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
 
 DBL WoodPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-    register DBL length;
+    DBL length;
     Vector3d WoodTurbulence;
     Vector3d point;
     DBL x=EPoint[X];
@@ -8719,7 +8719,7 @@ DBL WrinklesPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIs
 {
     int noise_generator = GetNoiseGen(pThread);
 
-    register int i;
+    int i;
     DBL lambda = 2.0;
     DBL omega = 0.5;
     DBL value;

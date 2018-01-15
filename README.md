@@ -5,12 +5,22 @@
 [![AppVeyor Build status](https://img.shields.io/appveyor/ci/c-lipka/povray-exwy4.svg?label=appveyor)](https://ci.appveyor.com/project/c-lipka/povray-exwy4 "AppVeyor: Windows Server 2012 with Visual Studio 2015")
 [![Travis CI Build Status](https://img.shields.io/travis/POV-Ray/povray.svg?label=travis%20ci)](https://travis-ci.org/POV-Ray/povray "Travis CI: Ubuntu 12.04 LTE 64-bit with gcc 4.6; OS X 10.11 with clang 4.2")
 [![Coverity Code Analysis](https://scan.coverity.com/projects/269/badge.svg)](https://scan.coverity.com/projects/pov-ray "Coverity: Static Code Analysis")
-[![Maintenance Status](https://img.shields.io/maintenance/yes/2017.svg)](README.md "Last edited 2017-03-24")
+[![Maintenance Status](https://img.shields.io/maintenance/yes/2017.svg)](README.md "Last edited 2017-08-18")
+
+- [License](#license)
+- [Forums](#forums)
+- [Bug Reports](#bug-reports)
+- [Offician Binaries](#official-binaries)
+- [Building POV-Ray](#building-pov-ray)
+- [IDE Versions](#ide-versions)
+- [3D Modeller](#3d-modeller)
+- [Documentation](#documentation)
+- [Contacting Us](#contacting-us)
 
 License
 --------------------------------------
 
-The source for POV-Ray v3.7 is licensed under the AGPL3. The documentation is under the
+As of version v3.7, the source for POV-Ray is licensed under the AGPL3. The documentation is under the
 Creative Commons Attribution-Noncommercial-ShareAlike 2.5 license, and support files such
 as SDL includes, macros, sample scenes and so forth are under the Creative Commons Attribution-ShareAlike
 3.0 Unported License (see each file header for the specific one).
@@ -43,15 +53,15 @@ obtained via http://www.povray.org/download/. We do intend to provide Mac OS X
 binaries shortly, but these will be console-mode only (based on the unix build).
 
 Official Windows binaries of selected development versions are made availabe at
-https://github.com/POV-Ray/povray/projects on a semi-irregular basis.
+https://github.com/POV-Ray/povray/releases on a semi-irregular basis.
 
 Building POV-Ray
 --------------------------------------
 
 At this point in time we generally recommend building from the latest version of the
-[3.7-stable branch](https://github.com/POV-Ray/povray/tree/3.7-stable). Alternatively,
+[`latest-stable` branch](https://github.com/POV-Ray/povray/tree/latest-stable). Alternatively,
 you may want to opt for a recent [tagged version](https://github.com/POV-Ray/povray/tags)
-to test-drive features that have been added since the last stable release.
+to test-drive features that have been added since the latest stable release.
 
 _Please do not build directly from the master branch_ (or any other non-stable branch
 for that matter), as versions from that branch may report ambiguous version numbers,
@@ -65,14 +75,14 @@ otherwise your build _will not work_), and also on Mac systems (console mode onl
 an appropriately-modified version of the unix build - not currently provided by us).
 
 If you are using an operating system with a package or ports system such as
-Ubuntu or FreeBSD, you may like to check whether or not POV-Ray 3.7 is available
+Ubuntu or FreeBSD, you may like to check whether or not POV-Ray is available
 via that route.
 
 IDE versions
 --------------------------------------
 
 Currently the only version of POV-Ray with an IDE as such is the Windows build.
-We do want to change that, though. With the release of POV-Ray 3.7 we have added
+We do want to change that, though. With the release of POV-Ray v3.7 we have added
 a clear split between the backend (renderer) and frontend (UI or console), along
 with a C++ layer which abstracts this into a fairly easily-understood set of 
 classes (VFE, aka 'Virtual Front End').
@@ -89,7 +99,7 @@ Putting it another way: we consider getting a cross-platform IDE a high priority
 
 POV-Ray does not currently have its own 3d modelling application (at least, not one
 in a usable state). We do own the rights to the Moray modeller, which was formerly
-commercial, but it needs a little work to get it working with v3.7. It is also
+commercial, but it needs a little work to get it working with v3.7 or later. It is also
 Windows only (due to its use of MFC). Nevertheless we will be adding the source
 to the repository at a future date.
 

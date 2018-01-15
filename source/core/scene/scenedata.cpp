@@ -7,7 +7,7 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -65,7 +65,7 @@ SceneData::SceneData() :
 
     iridWavelengths = MathColour::DefaultWavelengths();
 
-    languageVersion = OFFICIAL_VERSION_NUMBER;
+    languageVersion = POV_RAY_VERSION_INT;
     languageVersionSet = false;
     languageVersionLate = false;
     warningLevel = 10; // all warnings
@@ -78,9 +78,8 @@ SceneData::SceneData() :
     parsedAdcBailout = 1.0 / 255.0; // adc bailout sufficient for displays
     workingGamma.reset();
     workingGammaToSRGB.reset();
-    inputFileGammaSet = false; // TODO remove for 3.7x
     inputFileGamma = SRGBGammaCurve::Get();
-    gammaMode = kPOVList_GammaMode_None; // default setting for 3.62, which in turn is the default for the language
+    gammaMode = kPOVList_GammaMode_None; // default setting for v3.6.2, which in turn is the default for the language
 
     mmPerUnit = 10;
     useSubsurface = false;

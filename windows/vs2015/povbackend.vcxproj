@@ -399,6 +399,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\backend\bounding\boundingtask.cpp" />
+    <ClCompile Include="..\..\source\backend\control\benchmark_ini.cpp" />
+    <ClCompile Include="..\..\source\backend\control\benchmark_pov.cpp" />
     <ClCompile Include="..\..\source\backend\scene\backendscenedata.cpp" />
     <ClCompile Include="..\..\source\backend\scene\viewthreaddata.cpp" />
     <ClCompile Include="..\..\source\backend\povray.cpp" />
@@ -428,6 +430,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\backend\bounding\boundingtask.h" />
+    <ClInclude Include="..\..\source\backend\control\benchmark_ini.h" />
+    <ClInclude Include="..\..\source\backend\control\benchmark_pov.h" />
     <ClInclude Include="..\..\source\backend\scene\backendscenedata.h" />
     <ClInclude Include="..\..\source\backend\scene\viewthreaddata.h" />
     <ClInclude Include="..\..\source\backend\configbackend.h" />

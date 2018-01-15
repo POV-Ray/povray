@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -612,9 +612,17 @@ void MediaFunction::ComputeMediaLightInterval(LightSourceEntryVector& lights, Li
     if(lights.empty() == false)
     {
 #if 1
-        // TODO FIXME remove this workaround once the new, more efficient code after the #else is fixed
-        FixedSimpleVector<DBL, LIGHTSOURCE_VECTOR_SIZE> s0;
-        FixedSimpleVector<DBL, LIGHTSOURCE_VECTOR_SIZE> s1;
+        // Using thread storage duration for the following temporary lists to avoid repeated
+        // cycles of allocation, construction, upsizing and destruction. Of course we still
+        // need to make sure we start with a clean slate each time around. We also set an
+        // initial minimum capacity.
+        thread_local POV_SIMPLE_VECTOR<DBL> s0;
+        thread_local POV_SIMPLE_VECTOR<DBL> s1;
+        s0.clear();
+        s1.clear();
+        s0.reserve(LIGHTSOURCE_VECTOR_SIZE);
+        s1.reserve(LIGHTSOURCE_VECTOR_SIZE);
+
         for (LightSourceEntryVector::iterator i (lights.begin()); i != lights.end(); i++)
         {
             s0.push_back(i->s0);
@@ -957,9 +965,9 @@ void MediaFunction::ComputeOneMediaSample(MediaVector& medias, LightSourceEntryV
 
             // determine whether or not this media is ignoring photons
             // save this in the thread data... it will be used by ComputeShadowColour
-            // maybe this should be (or already is?) computed elsewhere and passed in
-            // as a parameter ( see the ignore_photons parameter! )
-            // I need to look closer at the new 3.7 code to clean that up [NK]
+            // TODO - maybe this should be (or already is?) computed elsewhere and passed in
+            //        as a parameter ( see the ignore_photons parameter! )
+            //        I need to look closer at the new code to clean that up [NK]
             // assume true, set to false if we find even one
             threadData->litObjectIgnoresPhotons = true;
             for(MediaVector::iterator i(medias.begin()); i != medias.end(); i++)

@@ -9,7 +9,7 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -38,8 +38,12 @@
 #ifndef POVRAY_CORE_CONFIGCORE_H
 #define POVRAY_CORE_CONFIGCORE_H
 
+// Pull in other compile-time config header files first
 #include "base/configbase.h"
 #include "syspovconfigcore.h"
+
+// C++ variants of C standard header files
+#include <cstdlib>
 
 //##############################################################################
 ///
@@ -51,12 +55,12 @@
 
 //******************************************************************************
 ///
-/// @name FixedSimpleVector Sizes
+/// @name PooledSimpleVector Sizes
 ///
-/// These defines affect the maximum size of some types based on @ref pov::FixedSimpleVector.
+/// These defines affect the initial size of some types based on @ref pov::PooledSimpleVector.
 ///
 /// @todo
-///     These sizes will need tweaking.
+///     These sizes may need tweaking.
 ///
 /// @{
 
@@ -86,6 +90,19 @@
 
 #ifndef RAYINTERIOR_VECTOR_SIZE
 #define RAYINTERIOR_VECTOR_SIZE         512
+#endif
+
+/// @def POV_VECTOR_POOL_SIZE
+/// Initial size of @ref PooledSimpleVector pools.
+#ifndef POV_VECTOR_POOL_SIZE
+#define POV_VECTOR_POOL_SIZE            16
+#endif
+
+/// @def POV_SIMPLE_VECTOR
+/// Vector type optimized for performance.
+/// May be either `std::vector`, `pov::SimpleVector`, or a compatible template.
+#ifndef POV_SIMPLE_VECTOR
+#define POV_SIMPLE_VECTOR               pov::SimpleVector
 #endif
 
 /// @}
@@ -188,7 +205,7 @@
 //******************************************************************************
 
 #ifndef QSORT
-    #define QSORT(a,b,c,d) qsort((a),(b),(c),(d))
+    #define QSORT(a,b,c,d) std::qsort((a),(b),(c),(d))
 #endif
 
 /// @def TRY_OPTIMIZED_NOISE
@@ -204,7 +221,7 @@
 #ifndef TRY_OPTIMIZED_NOISE
     // leave undefined
     #ifdef DOXYGEN
-        // doxygen cannot document undefined macros; also, we want to force declaration of the
+        // Doxygen cannot document undefined macros; also, we want to force declaration of the
         // TryOptimizedNoise() function.
         #define TRY_OPTIMIZED_NOISE
     #endif

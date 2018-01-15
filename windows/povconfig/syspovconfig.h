@@ -12,7 +12,7 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -63,13 +63,13 @@
 // C++ standard headers
 #include <exception>
 #include <list>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
 // boost headers
 #include <boost/intrusive_ptr.hpp>
-#include <boost/tr1/memory.hpp>
 
 #include <io.h>
 #include <fcntl.h>
@@ -93,12 +93,12 @@ using std::list;
 // to in a few other places.
 using std::runtime_error;
 
-// these may actually be the boost implementations, depending on what boost/tr1/memory.hpp has pulled in
-using std::tr1::shared_ptr;
-using std::tr1::weak_ptr;
-using std::tr1::dynamic_pointer_cast;
-using std::tr1::static_pointer_cast;
-using std::tr1::const_pointer_cast;
+// we use the C++11 standard shared pointers
+using std::shared_ptr;
+using std::weak_ptr;
+using std::dynamic_pointer_cast;
+using std::static_pointer_cast;
+using std::const_pointer_cast;
 
 using boost::intrusive_ptr;
 

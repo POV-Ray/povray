@@ -16,7 +16,7 @@
 ///
 /// ----------------------------------------------------------------------------
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -121,8 +121,8 @@ static void facets (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& no
 
 static void ripples (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal, const TraceThreadData *Thread)
 {
-    register unsigned int i;
-    register DBL length, scalar, index;
+    unsigned int i;
+    DBL length, scalar, index;
     Vector3d point;
 
     RipplesPattern* pPat = dynamic_cast<RipplesPattern*>(Tnormal->pattern.get());
@@ -171,8 +171,8 @@ static void ripples (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& n
 
 static void waves (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal, const TraceThreadData *Thread)
 {
-    register unsigned int i;
-    register DBL length, scalar, index, sinValue;
+    unsigned int i;
+    DBL length, scalar, index, sinValue;
     Vector3d point;
 
     WavesPattern* pPat = dynamic_cast<WavesPattern*>(Tnormal->pattern.get());
@@ -316,8 +316,8 @@ static void dents (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& nor
 
 static void wrinkles (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal)
 {
-    register int i;
-    register DBL scale = 1.0;
+    int i;
+    DBL scale = 1.0;
     Vector3d result, value, value2;
 
     result = Vector3d(0.0, 0.0, 0.0);

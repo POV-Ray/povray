@@ -9,7 +9,7 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -76,6 +76,9 @@
 #include <cstdlib>
 #include <cstdio>
 #include <tchar.h>
+
+#include <string>
+
 #include "pvengine.h"
 #include "resource.h"
 #include "pvdialog.h"
@@ -419,6 +422,16 @@ char                    *AboutURLs[NUM_ABOUT_LINKS] =
                           "http://www.perforce.com/",
                           "http://softwarefreedom.org/",
                           "http://softwarefreedom.org/"
+                        };
+
+const char              *CanInheritFromVersions[] =
+                        {
+#ifdef POVRAY_IS_BETA
+                          "v" POV_RAY_GENERATION,
+#endif
+                          "v3.7",
+                          "v3.6",
+                          NULL // end of list
                         };
 
 bool handle_main_command (WPARAM wParam, LPARAM lParam) ;
@@ -1358,13 +1371,15 @@ bool inferHome (void)
   return (true) ;
 }
 
-string get36Home(void)
+string getHome(const char* ver)
 {
   char        str[_MAX_PATH];
   HKEY        key ;
   DWORD       len = sizeof(str);
 
-  if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, "Software\\" REGKEY "\\v3.6\\Windows", 0, KEY_READ, &key) == ERROR_SUCCESS)
+  std::string keyName = std::string("Software\\" REGKEY "\\") + ver + "\\Windows";
+
+  if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, keyName.c_str(), 0, KEY_READ, &key) == ERROR_SUCCESS)
   {
     if (RegQueryValueEx (key, "Home", 0, NULL, (BYTE *) str, &len) == 0)
     {
@@ -1374,7 +1389,7 @@ string get36Home(void)
     }
     RegCloseKey (key) ;
   }
-  if (RegOpenKeyEx (HKEY_CURRENT_USER, "Software\\" REGKEY "\\v3.6\\Windows", 0, KEY_READ, &key) == ERROR_SUCCESS)
+  if (RegOpenKeyEx (HKEY_CURRENT_USER, keyName.c_str(), 0, KEY_READ, &key) == ERROR_SUCCESS)
   {
     if (RegQueryValueEx (key, "Home", 0, NULL, (BYTE *) str, &len) == 0)
     {
@@ -1387,7 +1402,7 @@ string get36Home(void)
   return string();
 }
 
-bool copy36EditSettings(void)
+bool copyEditSettings(const char* ver)
 {
   HKEY        hKeySrc ;
   HKEY        hKeyDst ;
@@ -1404,7 +1419,9 @@ bool copy36EditSettings(void)
     return (false) ;
   }
 
-  if (RegOpenKeyEx (HKEY_CURRENT_USER, "Software\\" REGKEY "\\v3.6", 0, KEY_READ, &hKeySrc) != ERROR_SUCCESS)
+  std::string keyName = std::string("Software\\" REGKEY "\\") + ver;
+
+  if (RegOpenKeyEx (HKEY_CURRENT_USER, keyName.c_str(), 0, KEY_READ, &hKeySrc) != ERROR_SUCCESS)
   {
     FreeLibrary (hLib) ;
     return (false) ;
@@ -1425,77 +1442,13 @@ bool copy36EditSettings(void)
   return (result == ERROR_SUCCESS) ;
 }
 
-#ifdef POVRAY_IS_BETA
-bool copy37NoBetaEditSettings(void)
-{
-  HKEY        hKeySrc ;
-  HKEY        hKeyDst ;
-  DWORD       result ;
-  HINSTANCE   hLib ;
-  shCopyType  *shCopyKey ;
-
-  if ((hLib = LoadLibrary ("shlwapi.dll")) == NULL)
-    return (false) ;
-  shCopyKey = (shCopyType *) GetProcAddress (hLib, "SHCopyKeyA") ;
-  if (shCopyKey == NULL)
-  {
-    FreeLibrary (hLib) ;
-    return (false) ;
-  }
-
-  if (RegOpenKeyEx (HKEY_CURRENT_USER, "Software\\" REGKEY "\\" REGVER, 0, KEY_READ, &hKeySrc) != ERROR_SUCCESS)
-  {
-    FreeLibrary (hLib) ;
-    return (false) ;
-  }
-
-  if (RegCreateKeyEx (HKEY_CURRENT_USER, "Software\\" REGKEY "\\" REGVERKEY "\\POV-Edit", 0, "", REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hKeyDst, NULL) != ERROR_SUCCESS)
-  {
-    RegCloseKey (hKeySrc) ;
-    FreeLibrary (hLib) ;
-    return (false) ;
-  }
-
-  result = shCopyKey (hKeySrc, "POV-Edit", hKeyDst, NULL) ;
-  RegCloseKey (hKeySrc) ;
-  RegCloseKey (hKeyDst) ;
-  FreeLibrary (hLib) ;
-
-  return (result == ERROR_SUCCESS) ;
-}
-#endif
-
-bool checkEditKey36 (void)
+bool checkEditKey (const char* ver)
 {
   HKEY        key ;
 
-  if (RegOpenKeyEx (HKEY_CURRENT_USER, "Software\\" REGKEY "\\v3.6\\POV-Edit", 0, KEY_READ, &key) == ERROR_SUCCESS)
-  {
-    RegCloseKey (key) ;
-    return (true) ;
-  }
-  return (false) ;
-}
+  std::string keyName = std::string("Software\\" REGKEY "\\") + ver + "\\POV-Edit";
 
-#ifdef POVRAY_IS_BETA
-bool checkEditKey37NoBeta (void)
-{
-  HKEY        key ;
-
-  if (RegOpenKeyEx (HKEY_CURRENT_USER, "Software\\" REGKEY "\\" REGVER "\\POV-Edit", 0, KEY_READ, &key) == ERROR_SUCCESS)
-  {
-    RegCloseKey (key) ;
-    return (true) ;
-  }
-  return (false) ;
-}
-#endif
-
-bool checkEditKey37 (void)
-{
-  HKEY        key ;
-
-  if (RegOpenKeyEx (HKEY_CURRENT_USER, "Software\\" REGKEY "\\" REGVERKEY "\\POV-Edit", 0, KEY_READ, &key) == ERROR_SUCCESS)
+  if (RegOpenKeyEx (HKEY_CURRENT_USER, keyName.c_str(), 0, KEY_READ, &key) == ERROR_SUCCESS)
   {
     RegCloseKey (key) ;
     return (true) ;
@@ -1893,7 +1846,7 @@ void RenderInsertMenu (void)
       if ((s2 = strchr (s1, ']')) != NULL)
       {
         *s2  = '\0' ;
-        val = atoi (++s1) ;
+        val = std::atoi (++s1) ;
         if (val == 0)
           continue ;
         InsertMenuSections.push_back(val);
@@ -5339,7 +5292,7 @@ void NoAVX2 (void)
               "Please use the standard non-AVX2 version of POV-Ray on this computer.",
               "POV-Ray for Windows",
               MB_ICONSTOP | MB_OK) ;
-  exit (-1) ;
+  std::exit (-1) ;
 }
 
 inline void TestAVX2 (void)
@@ -5357,7 +5310,7 @@ void NoAVX (void)
               "Please use the standard non-AVX version of POV-Ray on this computer.",
               "POV-Ray for Windows",
               MB_ICONSTOP | MB_OK) ;
-  exit (-1) ;
+  std::exit (-1) ;
 }
 
 inline void TestAVX (void)
@@ -5375,7 +5328,7 @@ void NoSSE2 (void)
               "Please use the standard non-SSE2 version of POV-Ray on this computer.",
               "POV-Ray for Windows",
               MB_ICONSTOP | MB_OK) ;
-  exit (-1) ;
+  std::exit (-1) ;
 }
 
 inline void TestSSE2 (void)
@@ -5538,17 +5491,16 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
   sprintf(ToolIniFileName, "%sini\\pvtools.ini", DocumentsPath);
   sprintf(EngineIniFileName, "%sini\\pvengine.ini", DocumentsPath);
 
-  if (!checkEditKey37())
+  if (!checkEditKey(REGVERKEY))
   {
-#ifdef POVRAY_IS_BETA
-    if (checkEditKey37NoBeta())
-      copy37NoBetaEditSettings();
-    else if (checkEditKey36())
-      copy36EditSettings();
-#else
-    if (checkEditKey36())
-      copy36EditSettings();
-#endif
+    for (const char **oldVer = CanInheritFromVersions; *oldVer != NULL; ++oldVer)
+    {
+      if (checkEditKey(*oldVer))
+      {
+        copyEditSettings(*oldVer);
+        break;
+      }
+    }
   }
 
   if (checkRegKey () == false || FreshInstall == true)
@@ -5570,28 +5522,28 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 #ifndef MAP_INI_TO_REGISTRY
   if (!fileExists(EngineIniFileName))
   {
-    // no INI file: see if we can copy the 3.6 INI options, should they exist
-    if (debugging)
-      debug_output("no pvengine.ini: seeing if there is a v3.6 ini\n") ;
-
-    string str(get36Home());
-    if (str.empty() == false)
+    bool foundOld = false;
+    for (const char **oldVer = CanInheritFromVersions; *oldVer != NULL; ++oldVer)
     {
-      string oldINIpath = str + "ini\\pvengine.ini";
-      if (fileExists(oldINIpath.c_str()))
+      // no INI file: see if we can copy an older version's INI options, should they exist
+      if (debugging)
+        debug_output("no pvengine.ini: seeing if there is a %s ini\n", *oldVer) ;
+
+      string str(getHome(*oldVer));
+      if (str.empty() == false)
       {
+        string oldINIpath = str + "ini\\pvengine.ini";
+        if (!fileExists(oldINIpath.c_str()))
+          continue;
+
         if (debugging)
           debug_output("cloning INI file %s to %s\n", oldINIpath.c_str(), EngineIniFileName) ;
         cloneOldIni(str, DocumentsPath);
-      }
-      else
-      {
-        if (debugging)
-          debug_output("creating default INI file %s\n", EngineIniFileName) ;
-        cloneOldIni("", DocumentsPath);
+        foundOld = true;
+        break;
       }
     }
-    else
+    if (!foundOld)
     {
       if (debugging)
         debug_output("creating default INI file %s\n", EngineIniFileName) ;
@@ -5622,7 +5574,7 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
   splitpath (str, modulePath, NULL) ;
   validatePath (modulePath) ;
 
-  sprintf (engineHelpPath, "%shelp\\povray37.chm", BinariesPath) ;
+  sprintf (engineHelpPath, "%shelp\\povray.chm", BinariesPath) ;
   HtmlHelp (NULL, NULL, HH_INITIALIZE, (DWORD_PTR) &help_cookie) ;
   memset (&hh_aklink, 0, sizeof (hh_aklink)) ;
   hh_aklink.cbStruct = sizeof (hh_aklink) ;
@@ -5870,19 +5822,41 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
   {
     if (EditDLLPath != NULL)
     {
-      sprintf (str, "%s" EDITDLLNAME, EditDLLPath) ;
-      if (!LoadEditorDLL (str, false))
-        use_editors = false ;
+#ifdef _DEBUG
+      // Prefer debug DLL, but don't complain if it's not available.
+      sprintf(str, "%s" EDITDLLNAME_DEBUG, EditDLLPath);
+      if (!LoadEditorDLL(str, true))
+      {
+#endif
+        sprintf(str, "%s" EDITDLLNAME, EditDLLPath);
+        if (!LoadEditorDLL (str, false))
+          use_editors = false ;
+#ifdef _DEBUG
+      }
+#endif
     }
     else
     {
-      sprintf (str, "%s\\" EDITDLLNAME, modulePath) ;
-      if (!LoadEditorDLL (str, true))
+#ifdef _DEBUG
+      // Prefer debug DLL, but don't complain if it's not available.
+      sprintf (str, "%s\\" EDITDLLNAME_DEBUG, modulePath);
+      if (!LoadEditorDLL(str, true))
       {
-        sprintf (str, "%sbin\\" EDITDLLNAME, BinariesPath) ;
-        if (!LoadEditorDLL (str, false))
-          use_editors = false ;
+        sprintf (str, "%sbin\\" EDITDLLNAME_DEBUG, BinariesPath) ;
+        if (!LoadEditorDLL (str, true))
+        {
+#endif
+          sprintf (str, "%s\\" EDITDLLNAME, modulePath) ;
+          if (!LoadEditorDLL (str, true))
+          {
+            sprintf (str, "%sbin\\" EDITDLLNAME, BinariesPath) ;
+            if (!LoadEditorDLL (str, false))
+              use_editors = false ;
+          }
+#ifdef _DEBUG
+        }
       }
+#endif
     }
   }
   else
@@ -6444,7 +6418,7 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
     if (debugging)
       debug_output ("%s\n", str) ;
     MessageBox (NULL, str, "POV-Ray Critical Error", MB_ICONSTOP) ;
-    exit(1);
+    std::exit(1);
   }
 
   if (debugging)

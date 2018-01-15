@@ -1,5 +1,5 @@
-// This work is licensed under the POV-Ray v3.7 distribution license.
-// To view a copy of this license, visit http://www.povray.org/licences/v3.7/.
+// This work is licensed under the POV-Ray v3.8 distribution license.
+// To view a copy of this license, visit http://www.povray.org/licences/v3.8/.
 //
 // The following exception is granted to the above license terms:
 // Permission is granted for this file and the output from it to be
@@ -8,13 +8,14 @@
 // are permitted provided that they have a clearly different filename
 // and do not claim to be the standard benchmark file.
 //
-
+// ==================================================================
+//
 // Persistence Of Vision Ray Tracer Scene Description File
 //
 // File:            benchmark.pov
-// Benchmark Vers:  2.01 Scene File Version
+// Benchmark Vers:  2.03 Scene File Version
 // Desc:            POV-Ray benchmark scene
-// Date:            October/November 2001
+// Date:            October/November 2001 (initial release)
 //
 // Assembled by Christoph Hormann
 // Contributions by:
@@ -23,7 +24,7 @@
 //
 // ==================================================================
 //
-//    Standard POV-Ray benchmark version 2.01 Scene File Version
+//    Standard POV-Ray benchmark version 2.03 Scene File Version
 //
 // This is the official POV-Ray benchmark scene.  It is designed
 // to test a variety of POV-Ray features and should render in a
@@ -34,13 +35,18 @@
 //
 // Please log all changes made to this file below.
 //
+// Also, please make sure the distribution copy of this file
+// (`distribution/scenes/advanced/benchmark/benchmark.pov`) remains in
+// sync with the inbuilt copy (`source/backend/control/benchmark_pov.cpp`)
+// and the version number in `source/backend/control/benchmark.cpp`.
+//
 // Note that only results generated with the above options and the
 // unchanged scene file are allowed to be published as 'official
 // POV-Ray benchmark results'.  Feel free to do additional tests, but
 // make sure the differences are made clear when publishing them.
 //
 // When publishing results, be sure to quote the exact version of the
-// benchmark scene used (2.01 Scene File Version), and the exact
+// benchmark scene used (2.03 Scene File Version), and the exact
 // version of POV-Ray.
 //
 // ==================================================================
@@ -53,9 +59,12 @@
 // Apr. 2002   changed max_gradient of isosurface (new ver is 1.01)
 // Jun. 2002   added photons pass_through to clouds (new ver is 1.02)
 // Dec. 2010   made ready for v3.7 release (new ver is 2.00)
-// Oct. 2012   allow run without installation (same ver : 2.00)
+// Dec. 2010   last minute changes re: assumed_gamma (kept version the same)
+// Oct. 2012   allow to run without installation (same ver : 2.00)
 // Jan. 2013   change version to 2.01 to differentiate from beta.
-// Feb  2013   Updated for 3.7
+// Feb  2013   Updated for v3.7
+// Nov. 2017   Re-synced distribution copy with built-in copy (new ver is 2.02)
+// Nov. 2017   Updated for v3.8 (new ver is 2.03)
 //
 // ==================================================================
 //
@@ -141,20 +150,15 @@
 // User_Abort_Command=
 // User_Abort_Return=I
 // Verbose=On
-// Version=3.7
+// Version=3.8
 // Warning_Console=On
 // Width=512
 //
 // ==================================================================
 
-#version 3.7;
-global_settings{ assumed_gamma 1.0 }
+#version 3.8;
 
-#default { texture { finish { ambient 0 diffuse 1 }}}
-
-//#include "functions.inc"
-//#include "colors.inc"
-//#include "logo.inc"
+#default { texture { finish { ambient 0.02 diffuse 1 }}}
 
 #declare use_radiosity = false;
 
@@ -167,8 +171,8 @@ global_settings{ assumed_gamma 1.0 }
 #declare Rad = 50000;
 
 global_settings {
-   max_trace_level 12
    assumed_gamma 1.0
+   max_trace_level 12
 
    #if (use_radiosity=true)
 
@@ -199,28 +203,20 @@ global_settings {
 
 }
 
-#if (use_radiosity=false)
-   #default {finish {ambient 0.02}}
-#else
-   #default {finish {ambient 0.00}}
-#end
-
 //====================================================================================
+
 // This scene uses a non-standard camera set-up. 
 // (See CAMERA in the included documentation for details.) 
 // If you are new to POV-Ray, you might want to try a different demo scene.
-//====================================================================================
 camera {
    location  <3.2, 3.2, 1.8>
    direction y
    sky       z
    up        z
-   right    -x*image_width/image_height // keep propotions with any aspect ratio
-   // right     -x
+   right     -x*(image_width/image_height) // keep propotions with any aspect ratio
    look_at   <-1, -1, 0.9>
    angle     45
 }
-
 
 light_source {
    <-0.7, 0.83, 0.24>*150000
@@ -265,14 +261,13 @@ fog{
 // Copied from functions.inc for Oct 2012
 #declare f_ridged_mf = function { internal(59) }
 // Parameters: x, y, z
-    // Six extra parameters required:                          
-    // 1. H 
-    // 2. Lacunarity 
-    // 3. octaves
-    // 4. offset 
-    // 5. Gain 
-    // 6. noise
-
+   // Six extra parameters required:
+   // 1. H 
+   // 2. Lacunarity 
+   // 3. octaves
+   // 4. offset 
+   // 5. Gain 
+   // 6. noise
 
 #declare RMF = function{ f_ridged_mf(x, y, z, 0.07, 2.2,  7, 0.6, 0.9, 1)}
 
@@ -398,7 +393,7 @@ sphere {           // --- Sky ---
       }
       finish {
          diffuse 0
-         ambient 1
+         emission 1
       }
    }
    scale Rad*<20, 20, 4>
@@ -721,8 +716,7 @@ difference {
 
 #declare POV_Text =
 text {
-   //ttf "timrom.ttf"
-   internal 1
+   internal 1 // ttf "timrom.ttf"
    "POV-Ray"
    0.25,0
    scale 0.3
@@ -732,9 +726,8 @@ text {
 
 #declare Version_Text =
 text {
-   //ttf "timrom.ttf"
-   internal 1
-   "Version 3.7"
+   internal 1 // ttf "timrom.ttf"
+   "Version 3.8"
    0.25,0
    scale 0.3
    rotate 90*x
@@ -995,8 +988,7 @@ sphere {
 
 #declare Letter =
 text {
-   //ttf "timrom.ttf"
-   internal 1
+   internal 1 // ttf "timrom.ttf"
    "X"
    1,0
    scale <1/0.7,1/0.66,1>

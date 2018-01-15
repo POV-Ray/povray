@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -76,7 +76,7 @@ namespace Gif
 #define LOCAL static
 #define IMPORT extern
 
-#define FAST register
+#define FAST // nothing (was `register`, which is deprecated as of C++11 and disallowed as of C++17)
 
     typedef unsigned short UWORD;
     typedef unsigned char UTINY;

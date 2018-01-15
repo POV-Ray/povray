@@ -63,24 +63,54 @@ else
   versionfile=source/backend/povray.h
 fi
 
-ver_povray_h=`sed -n 's/#define [ ]*OFFICIAL_VERSION_STRING [ ]*"\([0-9]*\.[0-9]*\.[0-9]*\)"/\1/p' "$versionfile"`
-ver_povray_h_int=`sed -n 's/#define [ ]*OFFICIAL_VERSION_NUMBER [ ]*\([0-9]*\)/\1/p' "$versionfile"`
-ver_povray_h_hex=`sed -n 's/#define [ ]*OFFICIAL_VERSION_NUMBER_HEX [ ]*\(0x[0]*[0-9]*\)/\1/p' "$versionfile"`
-prerelease_povray_h=`sed -n 's/^.*#define [ ]*POV_RAY_PRERELEASE [ ]*"\([^"]*\)".*$/\1/p' "$versionfile"`
+ver_povray_h_3=`sed -n 's/^[ ]*#define [ ]*OFFICIAL_VERSION_STRING [ ]*"\([0-9]*\.[0-9]*\.[0-9]*\)"/\1/p' "$versionfile"`
+ver_povray_h=`sed -n 's/^[ ]*#define [ ]*OFFICIAL_VERSION_STRING [ ]*"\([0-9.]*\)"/\1/p' "$versionfile"`
+ver_povray_h_int=`sed -n 's/^[ ]*#define [ ]*OFFICIAL_VERSION_NUMBER [ ]*\([0-9]*\)/\1/p' "$versionfile"`
+ver_povray_h_hex=`sed -n 's/^[ ]*#define [ ]*OFFICIAL_VERSION_NUMBER_HEX [ ]*\(0x[0]*[0-9]*\)/\1/p' "$versionfile"`
+ver_version_h_major=`sed -n 's/^[ ]*#define [ ]*POV_RAY_MAJOR_VERSION_INT [ ]*\([0-9]*\)/\1/p' "$versionfile"`
+ver_version_h_minor=`sed -n 's/^[ ]*#define [ ]*POV_RAY_MINOR_VERSION_INT [ ]*\([0-9]*\)/\1/p' "$versionfile"`
+ver_version_h_revision=`sed -n 's/^[ ]*#define [ ]*POV_RAY_REVISION_INT [ ]*\([0-9]*\)/\1/p' "$versionfile"`
+ver_version_h_patchlevel=`sed -n 's/^[ ]*#define [ ]*POV_RAY_PATCHLEVEL_INT [ ]*\([0-9]*\)/\1/p' "$versionfile"`
+ver_version_h_prerelease=`sed -n 's/^[ ]*#define [ ]*POV_RAY_PRERELEASE [ ]*"\([^"]*\)".*$/\1/p' "$versionfile"`
 ver_VERSION=`cat unix/VERSION`
 
-echo "$versionfile identifies this as version:"
-echo "  $ver_povray_h-$prerelease_povray_h"
-echo "  $ver_povray_h_int"
-if [ x"$ver_povray_h_hex" != x"" ]
+if [ x"$ver_povray_h" != x"" ]
 then
-  echo "  0x$ver_povray_h_hex"
+  ver_version_h_3="$ver_povray_h_3"
+  ver_version_h="$ver_povray_h"
+else
+  ver_version_h_3="$ver_version_h_major.$ver_version_h_minor.$ver_version_h_revision"
+  if [ $ver_version_h_patchlevel -gt 0 ]
+  then
+    ver_version_h="$ver_version_h_3.$ver_version_h_patchlevel"
+  else
+    ver_version_h="$ver_version_h_3"
+  fi
 fi
 
-if [ x"$ver_povray_h_int" != x"`echo $ver_povray_h | sed 's/\.//g'`" ]
+if [ x"$ver_version_h_prerelease" != x"" ]
 then
-  echo "MISMATCH."
-  exit 1
+  ver_version_h="$ver_version_h-$ver_version_h_prerelease"
+fi
+
+echo "$versionfile identifies this as version:"
+echo "  $ver_version_h"
+if [ x"$ver_povray_h_int" != x"" ]
+then
+  echo "  $ver_povray_h_int"
+fi
+if [ x"$ver_povray_h_hex" != x"" ]
+then
+  echo "  $ver_povray_h_hex"
+fi
+
+if [ x"$ver_povray_h_int" != x"" ]
+then
+  if [ x"$ver_povray_h_int" != x"`echo $ver_version_h_3 | sed 's/\.//g'`" ]
+  then
+    echo "MISMATCH."
+    exit 1
+  fi
 fi
 
 if [ x"$ver_povray_h_hex" != x"" ]
@@ -96,7 +126,7 @@ if [ x"$ver_VERSION" != x"" ]
 then
   echo "unix/VERSION identifies this as version:"
   echo "  $ver_VERSION"
-  if [ x"$ver_VERSION" != x"$ver_povray_h-$prerelease_povray_h" ]
+  if [ x"$ver_VERSION" != x"$ver_version_h" ]
   then
     echo "MISMATCH."
     exit 1
@@ -110,35 +140,38 @@ fi
 
 if git diff --cached --name-only | grep -E "$src_dir_pattern|^libraries/" >/dev/null
 then
-  if [ x"$prerelease_povray_h" = x"" ]
+  if [ x"$ver_version_h_prerelease" = x"" ]
   then
     echo "this does not seem intended to be a prerelease"
   else
-    revision=`echo "$prerelease_povray_h" | sed 's/^.*[^0-9]\([0-9]*\)$/\1/g'`
-    echo "prerelease id is $revision"
-    if [ x"$revision" = x"" ]
+    prerelease_id=`echo "$ver_version_h_prerelease" | sed 's/^.*[^0-9]\([0-9]*\)$/\1/g'`
+    echo "prerelease id is $prerelease_id"
+    if [ x"$prerelease_id" = x"" ]
     then
       echo "no trailing number to auto-increment"
-    elif [ "$revision" -le "999999" ]
+    elif [ "$prerelease_id" -le "999999" ]
     then
       echo "trailing number does not seem to be intended for auto-increment"
     else
       y2k=`date -u -d"2000-01-01" +"%s"`
       timestamp=`date -u +"%s"`
-      revision=`expr \( "$timestamp" - "$y2k" \) / 60`
-      echo "changes to the POV-Ray code detected, updating prerelease id to $revision."
+      prerelease_id=`expr \( "$timestamp" - "$y2k" \) / 60`
+      echo "changes to the POV-Ray code detected, updating prerelease id to $prerelease_id."
       if git diff --name-only "$versionfile" | grep "$versionfile" >/dev/null
       then
-        echo "ERROR: Unstaged changes to source/backend/povray.h detected, can't safely update prerelease id."
+        echo "ERROR: Unstaged changes to $versionfile detected, can't safely update prerelease id."
         exit 1
       fi
-      if git diff --name-only "unix/VERSION" | grep "unix/VERSION" >/dev/null
+      if [ -f unix/VERSION ]
       then
-        echo "ERROR: Unstaged changes to unix/VERSION detected, can't safely update prerelease id."
-        exit 1
+        if git diff --name-only "unix/VERSION" | grep "unix/VERSION" >/dev/null
+        then
+          echo "ERROR: Unstaged changes to unix/VERSION detected, can't safely update prerelease id."
+          exit 1
+        fi
       fi
       sed -i \
-        -e 's/\(#define [ ]*POV_RAY_PRERELEASE [ ]*".*[^0-9]\)[0-9][0-9]*"/\1'"$revision"'"/g' \
+        -e 's/\(#define [ ]*POV_RAY_PRERELEASE [ ]*".*[^0-9]\)[0-9][0-9]*"/\1'"$prerelease_id"'"/g' \
         -e "$sed_newline_fix" \
         "$versionfile" >/dev/null 2>/dev/null
       sed_i_fix "$versionfile"
@@ -147,7 +180,7 @@ then
       if [ -f unix/VERSION ]
       then
         sed -i \
-          -e 's/\([^0-9]\)[0-9][0-9]*$/\1'"$revision"'/g' \
+          -e 's/\([^0-9]\)[0-9][0-9]*$/\1'"$prerelease_id"'/g' \
           -e "$sed_newline_fix" \
           unix/VERSION >/dev/null 2>/dev/null
         sed_i_fix unix/VERSION
@@ -245,7 +278,10 @@ do
 
 done
 
-sed_i_fix $stage
+if [ x"$stage" != x"" ]
+then
+  sed_i_fix $stage
+fi
 
 if [ x"$errors" != x"" ]
 then
