@@ -7224,7 +7224,7 @@ void Parser::Parse_Global_Settings()
             sceneData->photonSettings.expandTolerance = 0.2;
             sceneData->photonSettings.minExpandCount = 35;
 
-            sceneData->photonSettings.fileName = NULL;
+            sceneData->photonSettings.fileName.clear();
             sceneData->photonSettings.loadFile = false;
 
             sceneData->photonSettings.surfaceSeparation = 1.0;
@@ -7305,28 +7305,26 @@ void Parser::Parse_Global_Settings()
                 END_CASE
 
                 CASE(LOAD_FILE_TOKEN)
-                    if(sceneData->photonSettings.fileName)
+                    if (!sceneData->photonSettings.fileName.empty())
                     {
                         if(sceneData->photonSettings.loadFile)
                             VersionWarning(100,"Filename already given, using new name");
                         else
                             VersionWarning(100,"Cannot both load and save photon map. Now switching to load mode.");
-                        POV_FREE(sceneData->photonSettings.fileName);
                     }
-                    sceneData->photonSettings.fileName = Parse_C_String(true);
+                    sceneData->photonSettings.fileName = Parse_ASCIIString(true);
                     sceneData->photonSettings.loadFile = true;
                 END_CASE
 
                 CASE(SAVE_FILE_TOKEN)
-                    if(sceneData->photonSettings.fileName)
+                    if (!sceneData->photonSettings.fileName.empty())
                     {
                         if(!sceneData->photonSettings.loadFile)
                             VersionWarning(100,"Filename already given, using new name");
                         else
                             VersionWarning(100,"Cannot both load and save photon map. Now switching to save mode.");
-                        POV_FREE(sceneData->photonSettings.fileName);
                     }
-                    sceneData->photonSettings.fileName = Parse_C_String(true);
+                    sceneData->photonSettings.fileName = Parse_ASCIIString(true);
                     sceneData->photonSettings.loadFile = false;
                 END_CASE
 

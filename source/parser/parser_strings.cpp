@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -169,6 +169,30 @@ UCS2 *Parser::Parse_String(bool pathname, bool require)
     END_EXPECT
 
     return New;
+}
+
+
+//****************************************************************************
+
+
+std::string Parser::Parse_ASCIIString(bool pathname, bool require)
+{
+    UCS2 *cstr = Parse_String(pathname, require);
+    std::string ret(UCS2toASCIIString(cstr));
+    POV_FREE(cstr);
+    return ret;
+}
+
+
+//****************************************************************************
+
+
+UCS2String Parser::Parse_UCS2String(bool pathname, bool require)
+{
+    UCS2 *cstr = Parse_String(pathname, require);
+    UCS2String ret(cstr);
+    POV_FREE(cstr);
+    return ret;
 }
 
 

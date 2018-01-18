@@ -41,6 +41,8 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "parser/configparser.h"
 
+#include <string>
+
 #include "base/image/image.h"
 #include "base/messenger.h"
 #include "base/stringutilities.h"
@@ -479,6 +481,8 @@ class Parser : public SceneTask
         // parsestr.h/parsestr.cpp
         char *Parse_C_String(bool pathname = false);
         UCS2 *Parse_String(bool pathname = false, bool require = true);
+        std::string Parse_ASCIIString(bool pathname = false, bool require = true);
+        UCS2String Parse_UCS2String(bool pathname = false, bool require = true);
 
         UCS2 *String_Literal_To_UCS2(const char *str, bool pathname = false);
         UCS2 *String_To_UCS2(const char *str);
