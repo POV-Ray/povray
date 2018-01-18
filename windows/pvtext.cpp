@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -1038,7 +1038,7 @@ void draw_ordinary_listbox (DRAWITEMSTRUCT *d, bool fitpath)
   int         dividerStep ;
   int         width ;
   int         length ;
-  char        str [MAX_PATH] ;
+  char        str [MAX_PATH] ; // TODO FIXME - this isn't safe
   RECT        rect ;
   HPEN        hpen1 ;
   HPEN        hpen2 ;
