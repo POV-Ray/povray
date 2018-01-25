@@ -2825,7 +2825,7 @@ shared_ptr<MAP_T> Parser::Parse_Blend_Map (BlendMapTypeId Blend_Type,int Pat_Typ
     Parse_Begin ();
 
     EXPECT
-        CASE2 (COLOUR_MAP_ID_TOKEN, PIGMENT_MAP_ID_TOKEN)
+        CASE3 (COLOUR_MAP_ID_TOKEN, PIGMENT_MAP_ID_TOKEN, DENSITY_MAP_ID_TOKEN)
         CASE3 (NORMAL_MAP_ID_TOKEN, TEXTURE_MAP_ID_TOKEN, SLOPE_MAP_ID_TOKEN)
             New = Copy_Blend_Map (*(reinterpret_cast<shared_ptr<MAP_T> *> (Token.Data)));
             if (Blend_Type != New->Type)
