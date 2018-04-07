@@ -1979,32 +1979,32 @@ void PhotonMap::setGatherOptions(ScenePhotonSettings &photonSettings, bool media
 
 //******************************************************************************
 
-inline Photon& PhotonMap::GetPhoton(unsigned int photonId)
+Photon& PhotonMap::GetPhoton(unsigned int photonId)
 {
     return (*mBlockList[GetBlockId(photonId)])[GetIndexInBlock(photonId)];
 }
 
-inline const Photon& PhotonMap::GetPhoton(unsigned int photonId) const
+const Photon& PhotonMap::GetPhoton(unsigned int photonId) const
 {
     return GetPhoton(GetBlockId(photonId), GetIndexInBlock(photonId));
 }
 
-inline unsigned int PhotonMap::GetBlockId(unsigned int photonId)
+unsigned int PhotonMap::GetBlockId(unsigned int photonId)
 {
     return photonId >> PHOTON_BLOCK_POWER;
 }
 
-inline unsigned int PhotonMap::GetIndexInBlock(unsigned int photonId)
+unsigned int PhotonMap::GetIndexInBlock(unsigned int photonId)
 {
     return photonId & PHOTON_BLOCK_MASK;
 }
 
-inline Photon& PhotonMap::GetPhoton(unsigned int blockId, unsigned int indexInBlock)
+Photon& PhotonMap::GetPhoton(unsigned int blockId, unsigned int indexInBlock)
 {
     return (*mBlockList[blockId])[indexInBlock];
 }
 
-inline const Photon& PhotonMap::GetPhoton(unsigned int blockId, unsigned int indexInBlock) const
+const Photon& PhotonMap::GetPhoton(unsigned int blockId, unsigned int indexInBlock) const
 {
     return (*mBlockList[blockId])[indexInBlock];
 }

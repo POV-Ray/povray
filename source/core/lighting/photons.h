@@ -206,8 +206,8 @@ class PhotonMap
 
         void mergeMap(PhotonMap* map);
 
-        inline Photon& GetPhoton(unsigned int photonId);
-        inline const Photon& GetPhoton(unsigned int photonId) const;
+        Photon& GetPhoton(unsigned int photonId);
+        const Photon& GetPhoton(unsigned int photonId) const;
 
     protected:
 
@@ -243,11 +243,11 @@ class PhotonMap
           into the photon map, they are not removed.
         */
 
-        static inline unsigned int GetBlockId(unsigned int photonId);
-        static inline unsigned int GetIndexInBlock(unsigned int photonId);
+        static unsigned int GetBlockId(unsigned int photonId);
+        static unsigned int GetIndexInBlock(unsigned int photonId);
 
-        inline Photon& GetPhoton(unsigned int blockId, unsigned int indexInBlock);
-        inline const Photon& GetPhoton(unsigned int blockId, unsigned int indexInBlock) const;
+        Photon& GetPhoton(unsigned int blockId, unsigned int indexInBlock);
+        const Photon& GetPhoton(unsigned int blockId, unsigned int indexInBlock) const;
 };
 
 
