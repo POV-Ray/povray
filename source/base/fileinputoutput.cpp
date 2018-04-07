@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,6 +38,7 @@
 
 // C++ variants of standard C header files
 #include <cstdarg>
+#include <cstdio>
 #include <cstdlib>
 
 // Standard C++ header files
@@ -301,7 +302,7 @@ void OStream::printf(const char *format, ...)
     char buffer[1024];
 
     va_start(marker, format);
-    vsnprintf(buffer, 1023, format, marker);
+    std::vsnprintf(buffer, sizeof(buffer), format, marker);
     va_end(marker);
 
     write(reinterpret_cast<const void *>(buffer), strlen(buffer));

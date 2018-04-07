@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -35,6 +35,8 @@
 
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/processoptions.h"
+
+#include <cstdio>
 
 #include "base/platformbase.h"
 
@@ -541,7 +543,7 @@ void ProcessOptions::ParseError(const char *format, ...)
     char error_buffer[1024];
 
     va_start(marker, format);
-    vsnprintf(error_buffer, 1023, format, marker);
+    std::vsnprintf(error_buffer, sizeof(error_buffer), format, marker);
     va_end(marker);
 
     fprintf(stderr, "%s\n", error_buffer);
@@ -553,7 +555,7 @@ void ProcessOptions::ParseErrorAt(ITextStream *file, const char *format, ...)
     char error_buffer[1024];
 
     va_start(marker, format);
-    vsnprintf(error_buffer, 1023, format, marker);
+    std::vsnprintf(error_buffer, sizeof(error_buffer), format, marker);
     va_end(marker);
 
     fprintf(stderr, "%s\nFile '%s' at line '%u'", error_buffer, UCS2toASCIIString(file->name()).c_str(), (unsigned int) file->line());
@@ -565,7 +567,7 @@ void ProcessOptions::WriteError(const char *format, ...)
     char error_buffer[1024];
 
     va_start(marker, format);
-    vsnprintf(error_buffer, 1023, format, marker);
+    std::vsnprintf(error_buffer, sizeof(error_buffer), format, marker);
     va_end(marker);
 
     fprintf(stderr, "%s\n", error_buffer);
@@ -942,7 +944,7 @@ int ProcessOptions::Parse_INI_Switch(ITextStream *file, int token, POVMSObjectPt
                 else if((value != NULL) && (*srcptr == 0))
                     srcptr = value;
 
-                // only if a paremeter is expected allow it, and vice versa
+                // only if a parameter is expected allow it, and vice versa
                 if ((table->flags & kCmdOptFlag_Optional) ||
                     ((*srcptr >  ' ') && (table->type != kPOVMSType_Null)) ||
                     ((*srcptr <= ' ') && (table->type == kPOVMSType_Null)))
@@ -1251,7 +1253,7 @@ int ProcessOptions::Parse_CL_Switch(const char *&commandline, int token, POVMSOb
                 else if((value != NULL) && (*srcptr == 0))
                     srcptr = value;
 
-                // only if a paremeter is expected allow it, and vice versa
+                // only if a parameter is expected allow it, and vice versa
                 if ((table->flags & kCmdOptFlag_Optional) ||
                     ((*srcptr >  ' ') && (table->type != kPOVMSType_Null)) ||
                     ((*srcptr <= ' ') && (table->type == kPOVMSType_Null)))

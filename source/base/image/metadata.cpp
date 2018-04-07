@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,6 +36,8 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/image/metadata.h"
 
+#include <cstdio>
+
 // POV-Ray base header files
 #include "base/version_info.h"
 
@@ -47,9 +49,7 @@ namespace pov_base
 
 Metadata::Metadata()
 {
-    boost::posix_time::ptime timestamp = boost::posix_time::second_clock::universal_time();
-    date = timestamp.date();
-    time = timestamp.time_of_day();
+    mTimestamp = boost::posix_time::second_clock::universal_time();
 }
 
 Metadata::~Metadata()
@@ -104,37 +104,41 @@ string Metadata::getComment4() const
 
 string Metadata::getDateTime() const
 {
-    return to_iso_extended_string(date) + " " + to_simple_string(time) + "Z";
+    // Not using boost's `to_iso_extended_string` because that would mean we couldn't reliably
+    // get away with using the boost date_time library in header-only mode.
+    char s[21]; // 10 (date) + 1 (blank) + 8 (time) + 1 (timezone "Z") + 1 (trailing NUL)
+    std::snprintf(s, sizeof(s), "%04d-%02d-%02d %02d:%02d:%02dZ", getYear(), getMonth(), getDay(), getHour(), getMin(), getSec());
+    return string(s);
 }
 
 int Metadata::getYear() const
 {
-    return date.year();
+    return mTimestamp.date().year();
 }
 
 int Metadata::getMonth() const
 {
-    return date.month();
+    return mTimestamp.date().month();
 }
 
 int Metadata::getDay() const
 {
-    return date.day();
+    return mTimestamp.date().day();
 }
 
 int Metadata::getHour() const
 {
-    return time.hours();
+    return mTimestamp.time_of_day().hours();
 }
 
 int Metadata::getMin() const
 {
-    return time.minutes();
+    return mTimestamp.time_of_day().minutes();
 }
 
 int Metadata::getSec() const
 {
-    return time.seconds();
+    return mTimestamp.time_of_day().seconds();
 }
 
 }

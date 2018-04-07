@@ -57,8 +57,11 @@ POV-Ray is being developed with portability high in mind. In practice and at pre
     considered fair game:
       - Flyweights.
       - Threads.
-      - Datetime.
-      - Intrusive Pointers.
+      - DateTime **except** features that may require linking with the lib (mostly conversions to/from string).
+      - SmartPtr intrusive pointers.
+      .
+    The following boost features are explicitly **not** allowed:
+      - DateTime conversions to/from string (they may require linking on some platforms).
       .
     @todo
         Make an inventory of what boost libraries we're actually using.

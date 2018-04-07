@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -678,6 +678,17 @@
     // The following two lines work around doxygen being unable to document undefined macros.
     #define POV_SYS_IMAGE_EXTENSION (undefined)
     #undef POV_SYS_IMAGE_EXTENSION
+#endif
+
+/// @def POV_FILENAME_BUFFER_CHARS
+/// The number of characters to reserve for file name buffers.
+///
+/// This setting is used in allocating temporary buffers to construct file names, and should be set
+/// to the maximum number of ASCII characters in a file name the system can handle safely.
+/// The value is understood to exclude any terminating NUL character.
+///
+#ifndef POV_FILENAME_BUFFER_CHARS
+    #define POV_FILENAME_BUFFER_CHARS 199
 #endif
 
 /// @def POV_PATH_SEPARATOR
