@@ -64,7 +64,7 @@ for:
       Set-ExecutionPolicy remotesigned -scope process -force
       ./tools/windows/get-source-version.ps1 ./source/base/version.h
       $prerelease = $env:POV_RAY_PRERELEASE
-      $env:pov_exe_version = $env:POV_RAY_VERSION
+      $env:pov_exe_version = $env:POV_RAY_FULL_VERSION
       $env:pov_tag_version = 'v' + $env:pov_exe_version
       $env:pov_build_version = $env:pov_tag_version + '+av' + $env:APPVEYOR_BUILD_NUMBER
       $env:pov_build_message = ''
