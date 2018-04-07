@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,6 +41,9 @@
 #endif
 
 #include "vfe.h"
+
+#include <cstdarg>
+#include <cstdio>
 
 #include "frontend/animationprocessing.h"
 #include "frontend/imageprocessing.h"
@@ -552,7 +555,7 @@ void vfeProcessRenderOptions::ParseError(const char *format, ...)
   va_list marker;
 
   va_start(marker, format);
-  vsnprintf(str, sizeof(str)-2, format, marker);
+  std::vsnprintf(str, sizeof(str), format, marker);
   va_end(marker);
 
   m_Session->AppendStatusMessage (str);
@@ -566,7 +569,7 @@ void vfeProcessRenderOptions::ParseErrorAt(ITextStream *file, const char *format
   va_list marker;
 
   va_start(marker, format);
-  vsnprintf(str, sizeof(str)-2, format, marker);
+  std::vsnprintf(str, sizeof(str), format, marker);
   va_end(marker);
 
   m_Session->AppendStatusMessage (str);
@@ -580,7 +583,7 @@ void vfeProcessRenderOptions::WriteError(const char *format, ...)
   va_list marker;
 
   va_start(marker, format);
-  vsnprintf(str, sizeof(str)-2, format, marker);
+  std::vsnprintf(str, sizeof(str), format, marker);
   va_end(marker);
 
   m_Session->AppendStatusMessage (str);

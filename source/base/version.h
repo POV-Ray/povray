@@ -12,7 +12,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -66,7 +66,7 @@
 /// @{
 
 /// Copyright string.
-#define POV_RAY_COPYRIGHT           "Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd."
+#define POV_RAY_COPYRIGHT           "Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd."
 
 /// First numerical component of official source code version ("major version") as integer.
 /// Increment this field (and set all subsequent fields to zero) to indicate a groundbreaking
@@ -81,7 +81,7 @@
 /// Third numerical component of official source code version ("revision") as integer.
 /// Increment this field (and set all subsequent fields to zero) to indicate new features,
 /// or complex bugfixes that require thorough testing.
-#define POV_RAY_REVISION_INT        1
+#define POV_RAY_REVISION_INT        0
 
 /// Fourth numerical component of official source code version ("maintenance patch level") as integer.
 /// Increment this field to indicate simple bugfixes.

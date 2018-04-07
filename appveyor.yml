@@ -3,7 +3,15 @@ pull_requests:
   do_not_increment_build_number: true
 branches:
   except:
+  # Special branch "coverity_scan" is used only to trigger Coverity Scan;
+  # no AppVeyor activity needed.
   - coverity_scan
+  # Branches ending with "-stable" are used only to point to other branches,
+  # which should already have been test-built at this point; no activity needed.
+  - /.*-stable/
+
+# We're not using tags to trigger deployment, so there's no need to re-build tagged commits.
+skip_tags: true
 
 image: Visual Studio 2015
 
@@ -36,3 +44,66 @@ build:
   verbosity: minimal
 
 test: off
+
+# Override individual settings depending on branch name
+for:
+
+# --------------------------------------------------------------------------------------------------
+# Setting overrides for branches starting with "autobuild"
+-
+  branches:
+    only:
+      - /autobuild.*/
+
+  environment:
+    PovBuildDefs:
+      secure: dQ/GBBYlkqKDmBEgJfgajfBn58ziSh1JPXsiWtnBL1dE3/s4QZJutGdDtLxiG3eNq0DXMVhDIbGqyPSma9Q9xazlpRZkuU7Gl8rXCw7c03A/oliLoR6q/0Jb+Q9LNH5R/oYiDCHhNP8Cx6OXys4d5A==
+
+  after_build:
+  - ps: |
+      Set-ExecutionPolicy remotesigned -scope process -force
+      ./tools/windows/get-source-version.ps1 ./source/base/version.h
+      $prerelease = $env:POV_RAY_PRERELEASE
+      $env:pov_exe_version = $env:POV_RAY_FULL_VERSION
+      $env:pov_tag_version = 'v' + $env:pov_exe_version
+      $env:pov_build_version = $env:pov_tag_version + '+av' + $env:APPVEYOR_BUILD_NUMBER
+      $env:pov_build_message = ''
+      if ($prerelease -match '^x') {
+        $env:pov_build_type = 'Experimental'
+        $env:pov_build_message += '**EXPERIMENTAL: This version of POV-Ray is not part of the official development branch!**'
+        $env:pov_build_message += "`n`n"
+      } elseif ($prerelease) {
+        $env:pov_build_type = 'Development'
+      } else {
+        $env:pov_build_type = 'Automated'
+      }
+      $env:pov_release_type = ($env:pov_build_type).ToLower() + ' release'
+      $env:pov_build_title = $env:pov_build_type + ' build'
+      $env:pov_build_message += '**Note:** This is a binary-only ' + $env:pov_release_type + '; to install, copy the '
+      $env:pov_build_message += 'binary into an existing POV-Ray 3.7 installation. (Make sure to backup the original '
+      $env:pov_build_message += 'binary first.)'
+      $env:pov_build_message += "`n`n"
+      $env:pov_build_message += 'These binaries require Windows Vista or higher, due to limitations of our automated '
+      $env:pov_build_message += 'build system. Please contact us on http://news.povray.org/povray.beta-test if you need '
+      $env:pov_build_message += 'Windows XP-compatible binaries of this particular version.'
+      $env:pov_zipdir = "povray-" + $env:pov_exe_version + '-av' + $env:APPVEYOR_BUILD_NUMBER + $env:artifact_suffix
+      $env:pov_binary = "Windows\vs2015\" + $env:bin_dir + "\pvengine*.exe"
+      $env:pov_zip = "artifacts\" + $env:pov_zipdir + ".7z"
+      New-Item -ItemType directory -Path $env:pov_zipdir | Out-Null
+      New-Item -ItemType directory -Path "artifacts" | Out-Null
+      Copy-Item $env:pov_binary $env:pov_zipdir
+      & "7z" "a" "-r" $env:pov_zip $env:pov_zipdir
+
+  artifacts:
+  - path: artifacts/*.7z
+    name: binaryOnly7z
+
+  deploy:
+  - provider: GitHub
+    tag: $(pov_tag_version)
+    release: $(pov_build_title) $(pov_build_version)
+    description: $(pov_build_message)
+    auth_token:
+      secure: WkcFPXyr/SJ9TXixTQyivhfoR9FzlryIbc4deHeQ0eA6YRXL0wQopMYJ6XL1/FJK
+    draft: true
+    prerelease: true

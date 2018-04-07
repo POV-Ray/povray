@@ -38,6 +38,7 @@
 
 // C++ variants of C standard header files
 #include <cctype>
+#include <cstdio>
 #include <cstdlib>
 
 // Boost header files
@@ -250,13 +251,13 @@ UCS2 *Parser::Parse_Str(bool pathname)
     // TODO: consider changing to %g rather than %f for large numbers (e.g.
     // anything over 1e+64 for example). for now, we will only use %g if the
     // snprintf filled the buffer.
-    // NB test for < 0 is because stupid windows _snprintf can return negative values.
-    if (((l = snprintf(temp4, sizeof(temp4) - 1, temp3, val)) >= sizeof(temp4) - 1) || (l < 0))
+    // NB `snprintf` may report errors via a negative return value.
+    if (((l = std::snprintf(temp4, sizeof(temp4), temp3, val)) >= sizeof(temp4)) || (l < 0))
     {
         *p = 'g';
 
         // it should not be possible to overflow with %g. but just in case ...
-        if (((l = snprintf(temp4, sizeof(temp4) - 1, temp3, val)) >= sizeof(temp4) - 1) || (l < 0))
+        if (((l = std::snprintf(temp4, sizeof(temp4), temp3, val)) >= sizeof(temp4)) || (l < 0))
             strcpy(temp4, "<invalid>");
     }
 
