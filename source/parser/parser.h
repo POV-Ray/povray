@@ -4,7 +4,7 @@
 ///
 /// Declarations related to the parser.
 ///
-//// This header file is included by virtually all parser C++ files in POV-Ray.
+/// This header file is included by virtually all parser C++ files in POV-Ray.
 ///
 /// @copyright
 /// @parblock
@@ -49,14 +49,10 @@
 #include "base/textstream.h"
 #include "base/textstreambuffer.h"
 
+#include "core/material/blendmap.h"
 #include "core/material/pigment.h"
 #include "core/material/warp.h"
-#include "core/math/matrix.h"
-#include "core/math/vector.h"
-#include "core/scene/atmosphere.h"
 #include "core/scene/camera.h"
-#include "core/shape/blob.h"
-#include "core/shape/truetype.h"
 
 #include "parser/fncode.h"
 #include "parser/reservedwords.h"
@@ -66,7 +62,26 @@
 namespace pov
 {
 
+class Blob_Element;
+struct ContainedByShape;
+struct Fog_Struct;
+struct GenericSpline;
+class ImageData;
+class Mesh;
+struct PavementPattern;
+struct Rainbow_Struct;
+class SceneData;
+struct Skysphere_Struct;
+struct TilingPattern;
+struct TrueTypeFont;
+
+}
+
+namespace pov_parser
+{
+
 using namespace pov_base;
+using namespace pov;
 
 const int MAX_BRACES = 200;
 
@@ -107,16 +122,6 @@ struct Sym_Table_Entry
     bool deprecatedShown : 1;
     SymTableEntryRefCount ref_count; ///< normally 1, but may be greater when passing symbols out of macros
 };
-
-class FPUContext;
-class ImageData;
-struct GenericSpline;
-struct ClassicTurbulence; // full declaration in core/material/warp.h
-struct BlackHoleWarp; // full declaration in core/material/warp.h
-class Mesh;
-class SceneData;
-struct PavementPattern;
-struct TilingPattern;
 
 /*****************************************************************************
 * Global preprocessor defines
@@ -417,9 +422,9 @@ class Parser : public SceneTask
         void Parse_Interior (InteriorPtr&);
         void Parse_Media_Density_Pattern (PIGMENT **);
         void Parse_Media_Density_Pattern (vector<PIGMENT*>&);
-        FOG *Parse_Fog (void);
-        RAINBOW *Parse_Rainbow (void);
-        SKYSPHERE *Parse_Skysphere (void);
+        Fog_Struct *Parse_Fog (void);
+        Rainbow_Struct *Parse_Rainbow (void);
+        Skysphere_Struct *Parse_Skysphere(void);
         ImageData *Parse_Image (int LegalTypes, bool GammaCorrect = false);
         SimpleGammaCurvePtr Parse_Gamma (void);
         void Parse_Material(MATERIAL *);

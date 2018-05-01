@@ -113,8 +113,10 @@
 // this must be the last file included
 #include "base/povdebug.h"
 
-namespace pov
+namespace pov_parser
 {
+
+using namespace pov;
 
 /*****************************************************************************
 * Local preprocessor defines
@@ -6475,7 +6477,7 @@ ObjectPtr Parser::Parse_TrueType ()
 
     /* Process all this good info */
     Object = new CSGUnion();
-    TrueType::ProcessNewTTF(reinterpret_cast<CSG *>(Object), font, text_string, depth, offset, this);
+    TrueType::ProcessNewTTF(reinterpret_cast<CSG *>(Object), font, text_string, depth, offset);
     if (filename)
     {
         /* Free up the filename  */
@@ -8067,7 +8069,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
     }
 
     if((Object->Texture ==NULL)&&(Object->Interior_Texture != NULL))
-            Error("Interior texture requires an exterior texture.");
+        Error("Interior texture requires an exterior texture.");
 
     Parse_End ();
 

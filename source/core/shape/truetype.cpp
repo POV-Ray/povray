@@ -452,7 +452,7 @@ static int compare_tag4(const BYTE *ttf_tag, const BYTE *known_tag)
 *   (triggered when filename is null) - Oct 2012 [JG]
 *
 ******************************************************************************/
-void TrueType::ProcessNewTTF(CSG *Object, TrueTypeFont *ffile, const UCS2 *text_string, DBL depth, const Vector3d& offset, Parser *parser)
+void TrueType::ProcessNewTTF(CSG *Object, TrueTypeFont *ffile, const UCS2 *text_string, DBL depth, const Vector3d& offset)
 {
     Vector3d local_offset, total_offset;
     TrueType *ttf;
