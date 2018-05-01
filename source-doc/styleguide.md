@@ -40,7 +40,7 @@ POV-Ray is being developed with portability high in mind. In practice and at pre
             [MS Visual Studio 2015]
           - _Static Thread-Local Template Members_: Template classes _must not_ have thread-local
             static member variables. See the @ref PooledSimpleVector template class for a viable
-            workaround. [XCode 8]
+            workaround. [XCode 8 and later, apparently still unresolved as of 2018-04-08]
 
   - Source code should use the new features of C++11 with caution, as even some major compiler
     brands still have not achieved full compliance yet. The following constructs can be considered

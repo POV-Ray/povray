@@ -2,7 +2,7 @@
 ///
 /// @file tools/doxygen/povconfig/syspovconfig.h
 ///
-/// Doxygen-specific general POV-Ray compile-time configuration.
+/// Platform-specific general POV-Ray compile-time configuration (Doxygen stub).
 ///
 /// This header file configures module-independent aspects of POV-Ray for
 /// generation of source documentation using Doxygen.

@@ -764,7 +764,7 @@ private:
     /// @note
     ///     This construct is deliberate; while it would seem natural to use a straightforward
     ///     `static thread_local` class member variable instead, in template classes that seems to
-    ///     lead to runtime errors with certain compilers (seen with XCode 8).
+    ///     lead to runtime errors with certain compilers (seen e.g. with XCode 9.3).
     ///
     static inline PoolType& GetPool()
     {

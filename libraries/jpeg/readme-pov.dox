@@ -1,0 +1,18 @@
+/**
+
+@dir
+@ingroup PovLibraries
+@brief Source code of _libjpeg_ 3rd party JPEG library.
+
+This directory contains a slightly adapted libjpeg 9 source distribution,
+and is part of the POV-Ray source distribution package.
+
+@note
+    This distribution of libjpeg differs from the original in the addition of
+    two config files, `jconfig.h` and `jconfig.pov`.
+
+Official libjpeg source distribution packages can be obtained via <http://ijg.org/>.
+
+See `README` file in this directory for licensing information.
+
+*/

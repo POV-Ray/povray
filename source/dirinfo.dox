@@ -1,7 +1,20 @@
 /**
 
+@defgroup PovSource POV-Ray Platform-Neutral Portions.
+@brief Modules code common to all platforms and _incarnations_.
+
+@{
+
 @dir
-@ingroup PovSource
-Platform-neutral source code files.
+@brief Platform-neutral source code files.
+
+@attention
+    Do **not** place any source files in this directory itself! Any such files that cannot be
+    assigned to a particular module need to go into @ref source/base instead.
+
+@}
+
+@defgroup PovConfig POV-Ray Compile-Time Configuration
+@brief Compile-Time Configuration of the various modules.
 
 */

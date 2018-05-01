@@ -1,19 +1,33 @@
+@page tools-metamake    Meta Build Process
+
 A few POV-Ray "source" files are actually generated themselves from other
 sources, and are included in the official repository only because setting up a
 portable build process for them is deemed too much effort.
 
-To re-create those files, you will need an Ubuntu machine with the following
+
+Prerequisites
+=============
+
+To re-create the files in question, you will need an Ubuntu machine with the following
 packages installed (or a compatible environment):
 
   - `bash`
   - `libfox-1.6-dev` (we expect other versions to work as well)
 
-Once you have those packages installed, invoke the following command from the
-root directory of the POV-Ray source package:
+
+Procedure
+=========
+
+
+Invoke the following command from the root directory of the POV-Ray source package:
 
     tools/meta-make/meta-make.sh
 
-This will re-create the following files:
+
+Output
+======
+
+The following files will be re-created:
 
 | Generated File                                    | Generated From                                            |
 |:--------------------------------------------------|:----------------------------------------------------------|
