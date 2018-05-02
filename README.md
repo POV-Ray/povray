@@ -10,7 +10,7 @@
 - [License](#license)
 - [Forums](#forums)
 - [Bug Reports](#bug-reports)
-- [Offician Binaries](#official-binaries)
+- [Official Binaries](#official-binaries)
 - [Building POV-Ray](#building-pov-ray)
 - [IDE Versions](#ide-versions)
 - [3D Modeller](#3d-modeller)
