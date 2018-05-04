@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -154,7 +154,7 @@ class Animation
         Animation(FileType aftype, CodecType codec, OStream *file, unsigned int w, unsigned int h, const WriteOptions& options);
 
         Image *ReadFrame(IStream *file);
-        POV_LONG WriteFrame(OStream *file, const Image *image);
+        POV_OFF_T WriteFrame(OStream *file, const Image *image);
 
         void ComputeBlurMask(const Image& image, Image& mask);
         void GetBlurredPixel(const Image& image, unsigned int x, unsigned int y, float& red, float& green, float& blue);

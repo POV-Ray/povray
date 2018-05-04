@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -82,27 +82,27 @@ class GenericMessenger
         void UserDebug(const char *text);
 
         void Info(const char *format,...);
-        void InfoAt(const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...);
+        void InfoAt(const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...);
 
         void Warning(WarningLevel level, const char *format,...);
-        void WarningAt(WarningLevel level, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...);
+        void WarningAt(WarningLevel level, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...);
 
         void PossibleError(const char *format,...);
-        void PossibleErrorAt(const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...);
+        void PossibleErrorAt(const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...);
 
         void Error(const char *format,...);
         void Error(const Exception& ex, const char *format,...);
         void Error(Exception& ex, const char *format,...);
-        void ErrorAt(const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...);
-        void ErrorAt(const Exception& ex, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...);
-        void ErrorAt(Exception& ex, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...);
+        void ErrorAt(const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...);
+        void ErrorAt(const Exception& ex, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...);
+        void ErrorAt(Exception& ex, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...);
 
         void SetWarningLevel(unsigned int Val) { warningLevel = Val ; } // TODO FIXME - not here, not this way
 
     protected:
 
         virtual void SendMessage(MessageClass mc, WarningLevel level, const char *text,
-                                 const UCS2 *filename = NULL, POV_LONG line = -1, POV_LONG column = -1, POV_LONG offset = -1) = 0;
+                                 const UCS2 *filename = NULL, POV_LONG line = -1, POV_LONG column = -1, POV_OFF_T offset = -1) = 0;
 
     private:
 
@@ -111,7 +111,7 @@ class GenericMessenger
 
         void CleanupString(char *str);
         std::string SendError(const char *format, va_list arglist,
-                              const UCS2 *filename = NULL, POV_LONG line = -1, POV_LONG column = -1, POV_LONG offset = -1);
+                              const UCS2 *filename = NULL, POV_LONG line = -1, POV_LONG column = -1, POV_OFF_T offset = -1);
 };
 
 /// @}

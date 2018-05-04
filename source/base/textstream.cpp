@@ -278,7 +278,7 @@ void IBufferedTextStream::RefillBuffer()
         curpos = stream->tellg() ;
 }
 
-IMemTextStream::IMemTextStream(const UCS2 *formalName, unsigned char* data, size_t size, const FilePos& formalStart)
+IMemTextStream::IMemTextStream(const UCS2 *formalName, const unsigned char* data, size_t size, const FilePos& formalStart)
 {
     if(formalName == NULL)
         throw POV_EXCEPTION_CODE(kParamErr);

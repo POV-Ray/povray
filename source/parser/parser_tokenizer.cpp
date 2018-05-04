@@ -1916,7 +1916,7 @@ void Parser::Parse_Directive(int After_Hash)
     char *ts;
     Macro *PMac=NULL;
     COND_TYPE Curr_Type = Cond_Stack[CS_Index].Cond_Type;
-    POV_LONG Hash_Loc = Input_File->In_File->tellg().offset;
+    POV_OFF_T Hash_Loc = Input_File->In_File->tellg().offset;
 
     if (Curr_Type == INVOKING_MACRO_COND)
     {
@@ -2308,7 +2308,7 @@ void Parser::Parse_Directive(int After_Hash)
                         {
                             PMac->Macro_End=Hash_Loc;
                             ITextStream::FilePos pos = Input_File->In_File->tellg();
-                            POV_LONG macroLength = pos.offset - PMac->Macro_File_Pos.offset;
+                            POV_OFF_T macroLength = pos.offset - PMac->Macro_File_Pos.offset;
                             if (macroLength <= MaxCachedMacroSize)
                             {
                                 PMac->CacheSize = macroLength;

@@ -281,7 +281,7 @@ class Parser : public SceneTask
             UCS2 *Macro_Filename;
             pov_base::ITextStream::FilePos Macro_File_Pos;
             int Macro_File_Col;
-            POV_LONG Macro_End; ///< The position _after_ the `#` in the terminating `#end` directive.
+            POV_OFF_T Macro_End; ///< The position _after_ the `#` in the terminating `#end` directive.
             vector<MacroParameter> parameters;
             unsigned char *Cache;
             size_t CacheSize;

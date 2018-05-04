@@ -198,7 +198,10 @@ namespace povwin
 #pragma warning(pop)
 #endif
 
-#define lseek64(handle,offset,whence) _lseeki64(handle,offset,whence)
+// MS Windows provides large file support via the `_lseeki64` function,
+// with file offsets having type `__int64`.
+#define POV_LSEEK(handle,offset,whence) _lseeki64(handle,offset,whence)
+#define POV_OFF_T __int64
 
 namespace pov_base
 {

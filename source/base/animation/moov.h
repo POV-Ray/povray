@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -56,13 +56,13 @@ namespace Moov
 {
 
 void *ReadFileHeader(IStream *file, float& lengthinseconds, unsigned int& lengthinframes, Animation::CodecType& codec, unsigned int& w, unsigned int& h, const Animation::ReadOptions& options, vector<string>& warnings);
-void PreReadFrame(IStream *file, unsigned int frame, POV_LONG& bytes, Animation::CodecType& codec, const Animation::ReadOptions& options, vector<string>& warnings, void *state);
-void PostReadFrame(IStream *file, unsigned int frame, POV_LONG bytes, Animation::CodecType& codec, const Animation::ReadOptions& options, vector<string>& warnings, void *state);
+void PreReadFrame(IStream *file, unsigned int frame, POV_OFF_T& bytes, Animation::CodecType& codec, const Animation::ReadOptions& options, vector<string>& warnings, void *state);
+void PostReadFrame(IStream *file, unsigned int frame, POV_OFF_T bytes, Animation::CodecType& codec, const Animation::ReadOptions& options, vector<string>& warnings, void *state);
 void FinishReadFile(IStream *file, vector<string>& warnings, void *state);
 
 void *WriteFileHeader(OStream *file, Animation::CodecType& codec, unsigned int w, unsigned int h, const Animation::WriteOptions& options, vector<string>& warnings);
 void PreWriteFrame(OStream *file, const Animation::WriteOptions& options, vector<string>& warnings, void *state);
-void PostWriteFrame(OStream *file, POV_LONG bytes, const Animation::WriteOptions& options, vector<string>& warnings, void *state);
+void PostWriteFrame(OStream *file, POV_OFF_T bytes, const Animation::WriteOptions& options, vector<string>& warnings, void *state);
 void FinishWriteFile(OStream *file, const Animation::WriteOptions& options, vector<string>& warnings, void *state);
 
 }
