@@ -154,15 +154,11 @@ Parser::Parser(shared_ptr<BackendSceneData> sd, bool useclk, DBL clk) :
     mpFunctionVM(new FunctionVM),
     fnVMContext(new FPUContext(mpFunctionVM.get(), GetParserDataPtr())),
     Destroying_Frame(false),
-    String_Index(0),
-    String_Buffer_Free(0),
-    String(NULL),
-    String2(NULL),
     last_progress(0),
     Current_Token_Count(0),
     token_count(0),
     line_count(10),
-    next_rand(NULL),
+    next_rand(nullptr),
     Debug_Message_Buffer(messageFactory)
 {
     pre_init_tokenizer();
@@ -194,7 +190,7 @@ void Parser::Run()
 
         Default_Texture = Create_Texture ();
         Default_Texture->Pigment = Create_Pigment();
-        Default_Texture->Tnormal = NULL;
+        Default_Texture->Tnormal = nullptr;
         Default_Texture->Finish  = Create_Finish();
 
         // Initialize various defaults depending on language version as per command line / INI settings.
@@ -211,7 +207,7 @@ void Parser::Run()
         {
             if(i->second.length() > 0)
             {
-                SYM_ENTRY *Temp_Entry = NULL;
+                SYM_ENTRY *Temp_Entry = nullptr;
 
                 if(i->second[0] == '\"')
                 {
@@ -228,9 +224,31 @@ void Parser::Run()
             }
         }
 
-        IncludeHeader(sceneData->headerFile);
+        try
+        {
+            IncludeHeader(sceneData->headerFile);
 
-        Parse_Frame();
+            Parse_Frame();
+        }
+        catch (const IncompleteCommentException& e)
+        {
+            Error(e, "Unterminated block comment in input file.");
+        }
+        catch (const IncompleteStringLiteralException& e)
+        {
+            Error(e, "Unterminated string literal in input file.");
+        }
+        catch (const InvalidCharacterException& e)
+        {
+            if (e.offendingCharacter <= 0x100u)
+                Error(e, "Illegal character %02x in input file.", int(e.offendingCharacter));
+            else
+                Error(e, "Illegal character U+%04x in input file.", int(e.offendingCharacter));
+        }
+        catch (const InvalidEscapeSequenceException& e)
+        {
+            Error(e, "Illegal escape sequence '%s' in string literal.", e.offendingText);
+        }
 
         // post process atmospheric media
         for(vector<Media>::iterator i(sceneData->atmosphere.begin()); i != sceneData->atmosphere.end(); i++)
@@ -254,20 +272,20 @@ void Parser::Run()
     {
         try
         {
-            if (Token.FileHandle != NULL)
+            if (mToken.sourceFile != nullptr)
             {
                 // take a (local) copy of error location prior to freeing token data
                 // NB error_filename has been pre-allocated for strings up to POV_FILENAME_BUFFER_CHARS
-                error_filename = Token.FileHandle->name();
-                error_line = Token.Token_File_Pos.lineno;
-                error_col = Token.Token_Col_No;
-                error_pos = Token.FileHandle->tellg().offset;
+                error_filename = mToken.sourceFile->Name();
+                error_line = mToken.raw.lexeme.position.line;
+                error_col = mToken.raw.lexeme.position.column;
+                error_pos = mToken.raw.lexeme.position.offset;
             }
 
             // free up some memory before proceeding with error notification.
             Terminate_Tokenizer();
             Destroy_Textures(Default_Texture);
-            Default_Texture = NULL;
+            Default_Texture = nullptr;
             Destroy_Random_Generators();
 
             if (error_line != -1)
@@ -466,7 +484,7 @@ void Parser::Cleanup()
     Terminate_Tokenizer();
 
     Destroy_Textures(Default_Texture);
-    Default_Texture = NULL;
+    Default_Texture = nullptr;
 
     Destroy_Random_Generators();
 }
@@ -516,9 +534,9 @@ void Parser::Frame_Init()
 
     /* Init atmospheric stuff. [DB 12/94] */
 
-    sceneData->fog = NULL;
-    sceneData->rainbow = NULL;
-    sceneData->skysphere = NULL;
+    sceneData->fog = nullptr;
+    sceneData->rainbow = nullptr;
+    sceneData->skysphere = nullptr;
 }
 
 
@@ -587,7 +605,7 @@ void Parser::Destroy_Frame()
     // This is necessary as a user who hits CANCEL during any IO performed
     // by this routine (e.g. Destroy_Object(), which can complain about
     // isosurface max_gradient), will cause this routine to be entered again
-    // before the relevent data member has been set to NULL (this is able
+    // before the relevent data member has been set to nullptr (this is able
     // to happen since cancel will invoke a longjmp on most platforms).
     // This causes the currently-executing segment to be destroyed twice,
     // which is a Bad Thing(tm). [CJC 11/01]
@@ -597,7 +615,7 @@ void Parser::Destroy_Frame()
 
     /* Destroy fogs. [DB 12/94] */
 
-    for (Fog = sceneData->fog; Fog != NULL;)
+    for (Fog = sceneData->fog; Fog != nullptr;)
     {
         Next_Fog = Fog->Next;
 
@@ -606,11 +624,11 @@ void Parser::Destroy_Frame()
         Fog = Next_Fog;
     }
 
-    sceneData->fog = NULL;
+    sceneData->fog = nullptr;
 
     /* Destroy rainbows. [DB 12/94] */
 
-    for (Rainbow = sceneData->rainbow; Rainbow != NULL;)
+    for (Rainbow = sceneData->rainbow; Rainbow != nullptr;)
     {
         Next_Rainbow = Rainbow->Next;
 
@@ -619,11 +637,11 @@ void Parser::Destroy_Frame()
         Rainbow = Next_Rainbow;
     }
 
-    sceneData->rainbow = NULL;
+    sceneData->rainbow = nullptr;
 
     /* Destroy skysphere. [DB 12/94] */
     Destroy_Skysphere(sceneData->skysphere);
-    sceneData->skysphere = NULL;
+    sceneData->skysphere = nullptr;
 
     if(!sceneData->objects.empty())
     {
@@ -659,31 +677,13 @@ void Parser::Destroy_Frame()
 *
 ******************************************************************************/
 
-bool Parser::Parse_Begin (TOKEN tokenId, bool mandatory)
+bool Parser::Parse_Begin (TokenId tokenId, bool mandatory)
 {
     Get_Token();
 
-    if(Token.Token_Id == tokenId)
+    if(mToken.Token_Id == tokenId)
     {
-        if(maBraceStack.size() >= MAX_BRACES)
-            Error("Too many nested braces, parentheses etc.");
-
-        BraceStackEntry stackEntry;
-        stackEntry.openToken = tokenId;
-        if(Token.FileHandle != NULL)
-        {
-            stackEntry.sourceInfo.filename = UCS2_strdup(Token.FileHandle->name());
-            stackEntry.sourceInfo.filepos = Token.FileHandle->tellg();
-        }
-        else
-        {
-            stackEntry.sourceInfo.filename = NULL;
-            stackEntry.sourceInfo.filepos.lineno = 0;
-            stackEntry.sourceInfo.filepos.offset = 0;
-        }
-        stackEntry.sourceInfo.col = Token.Token_Col_No;
-
-        maBraceStack.push_back(stackEntry);
+        maBraceStack.emplace_back(mToken);
         return true;
     }
     else
@@ -716,26 +716,20 @@ bool Parser::Parse_Begin (TOKEN tokenId, bool mandatory)
 *
 ******************************************************************************/
 
-void Parser::Parse_End (TOKEN tokenId)
+void Parser::Parse_End(TokenId openTokenId, TokenId expectTokenId)
 {
     Get_Token();
 
-    if(Token.Token_Id == tokenId)
+    if(mToken.Token_Id == expectTokenId)
     {
-        if(maBraceStack.empty())
-            // TODO - this should never happen, and we should encourage the user to report the issue
-            Warning("Possible '%s' mismatch.", Get_Token_String(tokenId));
-        else
-        {
-            if (maBraceStack.back().sourceInfo.filename)
-                POV_FREE(maBraceStack.back().sourceInfo.filename);
-            maBraceStack.pop_back();
-        }
+        POV_PARSER_ASSERT(!maBraceStack.empty());
+        POV_PARSER_ASSERT(openTokenId == maBraceStack.back().openToken);
+        maBraceStack.pop_back();
         return;
     }
 
-    ErrorInfo(maBraceStack.back().sourceInfo, "Unmatched %s", Get_Token_String(maBraceStack.back().openToken));
-    Error("No matching %s, %s found instead", Get_Token_String(tokenId), Get_Token_String(Token.Token_Id));
+    ErrorInfo(maBraceStack.back(), "Unmatched %s", Get_Token_String(maBraceStack.back().openToken));
+    Error("No matching %s, %s found instead", Get_Token_String(expectTokenId), Get_Token_String(mToken.Token_Id));
 }
 
 /*****************************************************************************
@@ -763,7 +757,7 @@ ObjectPtr Parser::Parse_Bicubic_Patch ()
 
     Parse_Begin ();
 
-    if ( (Object = reinterpret_cast<BicubicPatch *>(Parse_Object_Id())) != NULL)
+    if ( (Object = reinterpret_cast<BicubicPatch *>(Parse_Object_Id())) != nullptr)
     {
         return (reinterpret_cast<ObjectPtr>(Object));
     }
@@ -893,14 +887,14 @@ ObjectPtr Parser::Parse_Blob()
 
     Parse_Begin();
 
-    if ((Object = reinterpret_cast<Blob *>(Parse_Object_Id())) != NULL)
+    if ((Object = reinterpret_cast<Blob *>(Parse_Object_Id())) != nullptr)
     {
         return (reinterpret_cast<ObjectPtr>(Object));
     }
 
     Object = new Blob();
 
-    blob_components = NULL;
+    blob_components = nullptr;
 
     npoints = 0;
 
@@ -1126,7 +1120,7 @@ void Parser::Parse_Blob_Element_Mods(Blob_Element *Element)
         END_CASE
 
         CASE3 (PIGMENT_TOKEN, NORMAL_TOKEN, FINISH_TOKEN)
-            if (Element->Texture == NULL)
+            if (Element->Texture == nullptr)
             {
                 Element->Texture = Copy_Textures(Default_Texture);
             }
@@ -1202,7 +1196,7 @@ ObjectPtr Parser::Parse_Box ()
 
     Parse_Begin ();
 
-    if ( (Object = reinterpret_cast<Box *>(Parse_Object_Id())) != NULL)
+    if ( (Object = reinterpret_cast<Box *>(Parse_Object_Id())) != nullptr)
         return (reinterpret_cast<ObjectPtr>(Object));
 
     Object = new Box();
@@ -1266,7 +1260,7 @@ void Parser::Parse_Mesh_Camera (Camera& Cam)
     END_EXPECT
 
     ALLOW(SMOOTH_TOKEN);
-    Cam.Smooth = Token.Token_Id == SMOOTH_TOKEN;
+    Cam.Smooth = mToken.Token_Id == SMOOTH_TOKEN;
     if (Cam.Smooth && Cam.Face_Distribution_Method != 3)
         Error("Smooth can only be used with distribution method #3");
 
@@ -1342,10 +1336,10 @@ void Parser::Parse_User_Defined_Camera (Camera& Cam)
             {
                 for(unsigned int i = 0; i < 3; ++i)
                 {
-                    if (Cam.Location_Fn[i] != NULL)
+                    if (Cam.Location_Fn[i] != nullptr)
                     {
                         delete Cam.Location_Fn[i];
-                        Cam.Location_Fn[i] = NULL;
+                        Cam.Location_Fn[i] = nullptr;
                     }
                 }
                 Parse_Vector(Cam.Location);
@@ -1363,10 +1357,10 @@ void Parser::Parse_User_Defined_Camera (Camera& Cam)
             {
                 for(unsigned int i = 0; i < 3; ++i)
                 {
-                    if (Cam.Direction_Fn[i] != NULL)
+                    if (Cam.Direction_Fn[i] != nullptr)
                     {
                         delete Cam.Direction_Fn[i];
-                        Cam.Direction_Fn[i] = NULL;
+                        Cam.Direction_Fn[i] = nullptr;
                     }
                 }
                 Parse_Vector(Cam.Direction);
@@ -1412,7 +1406,7 @@ void Parser::Parse_Camera (Camera& Cam)
 
     EXPECT_ONE
         CASE (CAMERA_ID_TOKEN)
-            Cam = *reinterpret_cast<Camera *>(Token.Data);
+            Cam = *reinterpret_cast<Camera *>(mToken.Data);
             if (sceneData->EffectiveLanguageVersion() >= 350)
                 only_mods = true;
         END_CASE
@@ -2282,7 +2276,7 @@ ObjectPtr Parser::Parse_CSG(int CSG_Type)
 
     Parse_Begin();
 
-    if((Object = reinterpret_cast<CSG *>(Parse_Object_Id())) != NULL)
+    if((Object = reinterpret_cast<CSG *>(Parse_Object_Id())) != nullptr)
         return (reinterpret_cast<ObjectPtr>(Object));
 
     if(CSG_Type & CSG_UNION_TYPE)
@@ -2292,7 +2286,7 @@ ObjectPtr Parser::Parse_CSG(int CSG_Type)
     else
         Object = new CSGIntersection((CSG_Type & CSG_DIFFERENCE_TYPE) != 0);
 
-    while((Local = Parse_Object()) != NULL)
+    while((Local = Parse_Object()) != nullptr)
     {
         if((CSG_Type & CSG_INTERSECTION_TYPE) && (Local->Type & PATCH_OBJECT))
             Warning("Patch objects not allowed in intersection.");
@@ -2320,7 +2314,7 @@ ObjectPtr Parser::Parse_CSG(int CSG_Type)
     // different than the passed one, though the object will still be an instance
     // of a CSG. we use dynamic_cast here to aid debugging since the overhead is small.
     Object = dynamic_cast<CSG *>(Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object)));
-    POV_PARSER_ASSERT(Object != NULL);
+    POV_PARSER_ASSERT(Object != nullptr);
 
     if(CSG_Type & CSG_DIFFERENCE_TYPE)
         Object->Type |= CSG_DIFFERENCE_OBJECT;
@@ -2352,7 +2346,7 @@ ObjectPtr Parser::Parse_Cone ()
 
     Parse_Begin ();
 
-    if ( (Object = reinterpret_cast<Cone *>(Parse_Object_Id())) != NULL)
+    if ( (Object = reinterpret_cast<Cone *>(Parse_Object_Id())) != nullptr)
         return (reinterpret_cast<ObjectPtr>(Object));
 
     Object = new Cone();
@@ -2408,7 +2402,7 @@ ObjectPtr Parser::Parse_Cylinder ()
 
     Parse_Begin ();
 
-    if ( (Object = reinterpret_cast<Cone *>(Parse_Object_Id())) != NULL)
+    if ( (Object = reinterpret_cast<Cone *>(Parse_Object_Id())) != nullptr)
         return (reinterpret_cast<ObjectPtr>(Object));
 
     Object = new Cone();
@@ -2464,7 +2458,7 @@ ObjectPtr Parser::Parse_Disc ()
 
     Parse_Begin();
 
-    if((Object = reinterpret_cast<Disc *>(Parse_Object_Id())) != NULL)
+    if((Object = reinterpret_cast<Disc *>(Parse_Object_Id())) != nullptr)
         return (reinterpret_cast<ObjectPtr>(Object));
 
     Object = new Disc();
@@ -2527,7 +2521,7 @@ ObjectPtr Parser::Parse_HField ()
 
     Parse_Begin ();
 
-    if ( (Object = reinterpret_cast<HField *>(Parse_Object_Id())) != NULL)
+    if ( (Object = reinterpret_cast<HField *>(Parse_Object_Id())) != nullptr)
         return (reinterpret_cast<ObjectPtr>(Object));
 
     Object = new HField();
@@ -2597,13 +2591,13 @@ ObjectPtr Parser::Parse_Isosurface()
 
     Parse_Begin();
 
-    if ((Object = reinterpret_cast<IsoSurface *>(Parse_Object_Id())) != NULL)
+    if ((Object = reinterpret_cast<IsoSurface *>(Parse_Object_Id())) != nullptr)
         return (reinterpret_cast<ObjectPtr>(Object));
 
     Object = new IsoSurface();
 
     Get_Token();
-    if(Token.Token_Id != FUNCTION_TOKEN)
+    if(mToken.Token_Id != FUNCTION_TOKEN)
         Parse_Error(FUNCTION_TOKEN);
 
     Object->Function = new FunctionVM::CustomFunction(fnVMContext->functionvm.get(), Parse_Function());
@@ -2714,8 +2708,8 @@ void Parser::ParseContainedBy(shared_ptr<pov::ContainedByShape>& container, Obje
 
                 container = box;
 
-                // TODO REVIEW - where is the bounding box computed when obj->Trans is NULL?
-                if (obj->Trans != NULL)
+                // TODO REVIEW - where is the bounding box computed when obj->Trans is nullptr?
+                if (obj->Trans != nullptr)
                     obj->Compute_BBox();
             }
         END_CASE
@@ -2742,7 +2736,7 @@ void Parser::ParseContainedBy(shared_ptr<pov::ContainedByShape>& container, Obje
 
                 container = sphere;
 
-                if (obj->Trans != NULL)
+                if (obj->Trans != nullptr)
                     obj->Compute_BBox();
             }
         END_CASE
@@ -2790,7 +2784,7 @@ ObjectPtr Parser::Parse_Julia_Fractal ()
 
     Parse_Begin();
 
-    if ( (Object = reinterpret_cast<Fractal *>(Parse_Object_Id())) != NULL)
+    if ( (Object = reinterpret_cast<Fractal *>(Parse_Object_Id())) != nullptr)
         return(reinterpret_cast<ObjectPtr>(Object));
 
     Object = new Fractal();
@@ -2838,7 +2832,7 @@ ObjectPtr Parser::Parse_Julia_Fractal ()
         END_CASE
 
         CASE(FLOAT_FUNCT_TOKEN)
-            switch(Token.Function_Id)
+            switch(mToken.Function_Id)
             {
                 case EXP_TOKEN:
                     Object->Sub_Type = EXP_STYPE;
@@ -2972,7 +2966,7 @@ ObjectPtr Parser::Parse_Lathe()
 
     Parse_Begin();
 
-    if((Object = reinterpret_cast<Lathe *>(Parse_Object_Id())) != NULL)
+    if((Object = reinterpret_cast<Lathe *>(Parse_Object_Id())) != nullptr)
         return(reinterpret_cast<ObjectPtr>(Object));
 
     Object = new Lathe();
@@ -3173,7 +3167,7 @@ ObjectPtr Parser::Parse_Lemon ()
 
     Parse_Begin ();
 
-    if ( (Object = reinterpret_cast<Lemon *>(Parse_Object_Id())) != NULL)
+    if ( (Object = reinterpret_cast<Lemon *>(Parse_Object_Id())) != nullptr)
         return (reinterpret_cast<ObjectPtr>(Object));
 
     Object = new Lemon();
@@ -3204,7 +3198,7 @@ ObjectPtr Parser::Parse_Lemon ()
     END_EXPECT
 
     /* Compute run-time values for the lemon */
-    Object->Compute_Lemon_Data( messageFactory, Token.FileHandle, Token.Token_File_Pos, Token.Token_Col_No );
+    Object->Compute_Lemon_Data(messageFactory, mToken);
 
     Object->Compute_BBox();
     ptr = reinterpret_cast<ObjectPtr>(Object);
@@ -3260,7 +3254,7 @@ ObjectPtr Parser::Parse_Light_Group()
     Object->Type |= LIGHT_GROUP_OBJECT;
     Set_Flag(Object, NO_GLOBAL_LIGHTS_FLAG);
 
-    while((Local = Parse_Object()) != NULL)
+    while((Local = Parse_Object()) != nullptr)
     {
         // prevent light sources from being added to Frame.Light_Sources
         if((Local->Type & LIGHT_SOURCE_OBJECT) == LIGHT_SOURCE_OBJECT)
@@ -3425,7 +3419,7 @@ ObjectPtr Parser::Parse_Light_Source ()
 
     Parse_Begin ();
 
-    if ( (Object = reinterpret_cast<LightSource *>(Parse_Object_Id())) != NULL)
+    if ( (Object = reinterpret_cast<LightSource *>(Parse_Object_Id())) != nullptr)
         return (reinterpret_cast<ObjectPtr>(Object));
 
     Object = new LightSource ();
@@ -3510,7 +3504,7 @@ ObjectPtr Parser::Parse_Light_Source ()
             Parse_Begin ();
             Object->Type &= ~(int)PATCH_OBJECT;
             Object->children.push_back(Parse_Object());
-            if(Object->children.empty() || (Object->children[0] == NULL))
+            if(Object->children.empty() || (Object->children[0] == nullptr))
                 Expectation_Error("object");
             Compute_Translation_Transform(&Local_Trans, Object->Center);
             Translate_Object(Object->children[0], Object->Center, &Local_Trans);
@@ -3522,11 +3516,11 @@ ObjectPtr Parser::Parse_Light_Source ()
         END_CASE
 
         CASE (PROJECTED_THROUGH_TOKEN)
-            if (Object->Projected_Through_Object != NULL)
+            if (Object->Projected_Through_Object != nullptr)
                 Error("Only one projected through allowed per light_source.");
             Parse_Begin ();
             Object->Type &= ~(int)PATCH_OBJECT;
-            if ((Object->Projected_Through_Object = Parse_Object ()) == NULL)
+            if ((Object->Projected_Through_Object = Parse_Object ()) == nullptr)
                 Expectation_Error ("object");
             Object->Projected_Through_Object = Parse_Object_Mods (Object->Projected_Through_Object);
             Set_Flag(Object, NO_SHADOW_FLAG);
@@ -3766,7 +3760,7 @@ ObjectPtr Parser::Parse_Mesh()
 
     Parse_Begin();
 
-    if ((Object = reinterpret_cast<Mesh *>(Parse_Object_Id())) != NULL)
+    if ((Object = reinterpret_cast<Mesh *>(Parse_Object_Id())) != nullptr)
         return (reinterpret_cast<ObjectPtr>(Object));
 
     /* Create object. */
@@ -3914,7 +3908,7 @@ void Parser::Parse_Mesh1 (Mesh* Object)
                 /* NK */
                 /* read possibly three instead of only one texture */
                 /* read these before compute!!! */
-                t2 = t3 = NULL;
+                t2 = t3 = nullptr;
                 Triangles[number_of_triangles].Texture = Object->Mesh_Hash_Texture(&number_of_textures, &max_textures, &Textures, Parse_Mesh_Texture(&t2,&t3));
                 if (t2) Triangles[number_of_triangles].Texture2 = Object->Mesh_Hash_Texture(&number_of_textures, &max_textures, &Textures, t2);
                 if (t3) Triangles[number_of_triangles].Texture3 = Object->Mesh_Hash_Texture(&number_of_textures, &max_textures, &Textures, t3);
@@ -3935,7 +3929,7 @@ void Parser::Parse_Mesh1 (Mesh* Object)
                 /* parse the uv and texture info - even though we'll just throw it
                    away.  why?  if not we get a parse error - we should just ignore the
                    degenerate triangle */
-                t2=t3=NULL;
+                t2=t3=nullptr;
                 Parse_Three_UVCoords(UV1,UV2,UV3);
                 Parse_Mesh_Texture(&t2,&t3);
             }
@@ -4020,7 +4014,7 @@ void Parser::Parse_Mesh1 (Mesh* Object)
 
                 /* read possibly three instead of only one texture */
                 /* read these before compute!!! */
-                t2 = t3 = NULL;
+                t2 = t3 = nullptr;
                 Triangles[number_of_triangles].Texture = Object->Mesh_Hash_Texture(&number_of_textures, &max_textures, &Textures, Parse_Mesh_Texture(&t2,&t3));
                 if (t2) Triangles[number_of_triangles].Texture2 = Object->Mesh_Hash_Texture(&number_of_textures, &max_textures, &Textures, t2);
                 if (t3) Triangles[number_of_triangles].Texture3 = Object->Mesh_Hash_Texture(&number_of_textures, &max_textures, &Textures, t3);
@@ -4058,7 +4052,7 @@ void Parser::Parse_Mesh1 (Mesh* Object)
                 /* parse the uv and texture info - even though we'll just throw it
                    away.  why?  if not we get a parse error - we should just ignore the
                    degenerate triangle */
-                t2=t3=NULL;
+                t2=t3=nullptr;
                 Parse_Three_UVCoords(UV1,UV2,UV3);
                 Parse_Mesh_Texture(&t2,&t3);
             }
@@ -4097,7 +4091,7 @@ void Parser::Parse_Mesh1 (Mesh* Object)
 
     Object->Data->References = 1;
 
-    Object->Data->Tree = NULL;
+    Object->Data->Tree = nullptr;
     /* NK 1998 */
 
     if( (fabs(Inside_Vect[X]) < EPSILON) &&  (fabs(Inside_Vect[Y]) < EPSILON) &&  (fabs(Inside_Vect[Z]) < EPSILON))
@@ -4112,13 +4106,13 @@ void Parser::Parse_Mesh1 (Mesh* Object)
         Object->Type &= ~PATCH_OBJECT;
     }
 
-    Object->Data->Normals   = NULL;
+    Object->Data->Normals   = nullptr;
 
     /* [LSK] Removed "Data->" */
-    Object->Textures  = NULL;
+    Object->Textures  = nullptr;
 
-    Object->Data->Triangles = NULL;
-    Object->Data->Vertices  = NULL;
+    Object->Data->Triangles = nullptr;
+    Object->Data->Vertices  = nullptr;
 
     /* Allocate memory for normals, textures, triangles and vertices. */
 
@@ -4178,7 +4172,7 @@ void Parser::Parse_Mesh1 (Mesh* Object)
 
     /* NK 1998 */
     /* do the four steps above, but for UV coordinates*/
-    Object->Data->UVCoords  = NULL;
+    Object->Data->UVCoords  = nullptr;
     Object->Data->Number_Of_UVCoords = number_of_uvcoords;
     Object->Data->UVCoords = reinterpret_cast<MeshUVVector *>(POV_MALLOC(number_of_uvcoords*sizeof(MeshUVVector), "triangle mesh data"));
     for (i = 0; i < number_of_uvcoords; i++)
@@ -4244,7 +4238,7 @@ ObjectPtr Parser::Parse_Mesh2()
 
     Parse_Begin();
 
-    if ((Object = reinterpret_cast<Mesh *>(Parse_Object_Id())) != NULL)
+    if ((Object = reinterpret_cast<Mesh *>(Parse_Object_Id())) != nullptr)
         return (reinterpret_cast<ObjectPtr>(Object));
 
     /* Create object. */
@@ -4285,10 +4279,10 @@ void Parser::Parse_Mesh2 (Mesh* Object)
     Vector3d Inside_Vect;
 
     Vector2d UV1;
-    MeshVector *Normals = NULL;
-    MeshVector *Vertices = NULL;
-    TEXTURE **Textures = NULL;
-    MeshUVVector *UVCoords = NULL;
+    MeshVector *Normals = nullptr;
+    MeshVector *Vertices = nullptr;
+    TEXTURE **Textures = nullptr;
+    MeshUVVector *UVCoords = nullptr;
     MESH_TRIANGLE *Triangles;
 
     Inside_Vect = Vector3d(0.0, 0.0, 0.0);
@@ -4406,7 +4400,7 @@ void Parser::Parse_Mesh2 (Mesh* Object)
                 {
                     /*
                     GET(TEXTURE_ID_TOKEN)
-                    Textures[i] = Copy_Texture_Pointer((reinterpret_cast<EXTURE *>(Token.Data));
+                    Textures[i] = Copy_Texture_Pointer((reinterpret_cast<EXTURE *>(mToken.Data));
                     */
                     GET(TEXTURE_TOKEN);
                     Parse_Begin();
@@ -4770,7 +4764,7 @@ void Parser::Parse_Mesh2 (Mesh* Object)
     /* Init triangle mesh data. */
     Object->Data = reinterpret_cast<MESH_DATA *>(POV_MALLOC(sizeof(MESH_DATA), "triangle mesh data"));
     Object->Data->References = 1;
-    Object->Data->Tree = NULL;
+    Object->Data->Tree = nullptr;
     /* NK 1998 */
     /*YS* 31/12/1999 */
 
@@ -4855,7 +4849,7 @@ TEXTURE *Parser::Parse_Mesh_Texture (TEXTURE **t2, TEXTURE **t3)
 {
     TEXTURE *Texture;
 
-    Texture = NULL;
+    Texture = nullptr;
 
     EXPECT
         CASE(TEXTURE_TOKEN)
@@ -4863,7 +4857,7 @@ TEXTURE *Parser::Parse_Mesh_Texture (TEXTURE **t2, TEXTURE **t3)
 
             GET(TEXTURE_ID_TOKEN);
 
-            Texture = reinterpret_cast<TEXTURE *>(Token.Data);
+            Texture = reinterpret_cast<TEXTURE *>(mToken.Data);
 
             Parse_End();
         END_CASE
@@ -4873,17 +4867,17 @@ TEXTURE *Parser::Parse_Mesh_Texture (TEXTURE **t2, TEXTURE **t3)
             Parse_Begin();
 
             GET(TEXTURE_ID_TOKEN);
-            Texture = reinterpret_cast<TEXTURE *>(Token.Data);
+            Texture = reinterpret_cast<TEXTURE *>(mToken.Data);
 
             Parse_Comma();
 
             GET(TEXTURE_ID_TOKEN);
-            *t2 = reinterpret_cast<TEXTURE *>(Token.Data);
+            *t2 = reinterpret_cast<TEXTURE *>(mToken.Data);
 
             Parse_Comma();
 
             GET(TEXTURE_ID_TOKEN);
-            *t3 = reinterpret_cast<TEXTURE *>(Token.Data);
+            *t3 = reinterpret_cast<TEXTURE *>(mToken.Data);
 
             Parse_End();
             EXIT
@@ -4934,7 +4928,7 @@ ObjectPtr Parser::Parse_Ovus()
 
     Parse_Begin();
 
-    if ((Object = reinterpret_cast<Ovus *>(Parse_Object_Id())) != NULL)
+    if ((Object = reinterpret_cast<Ovus *>(Parse_Object_Id())) != nullptr)
     {
         return(reinterpret_cast<ObjectPtr>(Object));
     }
@@ -5090,7 +5084,7 @@ ObjectPtr Parser::Parse_Parametric(void)
 
     Parse_Begin();
 
-    if((Object = reinterpret_cast<Parametric *>(Parse_Object_Id())) != NULL)
+    if((Object = reinterpret_cast<Parametric *>(Parse_Object_Id())) != nullptr)
         return (reinterpret_cast<ObjectPtr>(Object));
 
     Object = new Parametric();
@@ -5134,7 +5128,7 @@ ObjectPtr Parser::Parse_Parametric(void)
 
             EXPECT_ONE
                 CASE(VECTOR_FUNCT_TOKEN)
-                    if(Token.Function_Id != X_TOKEN)
+                    if(mToken.Function_Id != X_TOKEN)
                     {
                         UNGET
                     }
@@ -5151,7 +5145,7 @@ ObjectPtr Parser::Parse_Parametric(void)
 
             EXPECT_ONE
                 CASE(VECTOR_FUNCT_TOKEN)
-                    if(Token.Function_Id != Y_TOKEN)
+                    if(mToken.Function_Id != Y_TOKEN)
                     {
                         UNGET
                     }
@@ -5168,7 +5162,7 @@ ObjectPtr Parser::Parse_Parametric(void)
 
             EXPECT_ONE
                 CASE(VECTOR_FUNCT_TOKEN)
-                    if(Token.Function_Id != Z_TOKEN)
+                    if(mToken.Function_Id != Z_TOKEN)
                     {
                         UNGET
                     }
@@ -5226,7 +5220,7 @@ ObjectPtr Parser::Parse_Plane ()
 
     Parse_Begin ();
 
-    if ( (Object = reinterpret_cast<Plane *>(Parse_Object_Id())) != NULL)
+    if ( (Object = reinterpret_cast<Plane *>(Parse_Object_Id())) != nullptr)
         return (reinterpret_cast<ObjectPtr>(Object));
 
     Object = new Plane();
@@ -5273,7 +5267,7 @@ ObjectPtr Parser::Parse_Poly (int order)
 
     Parse_Begin ();
 
-    if ( (Object = reinterpret_cast<Poly *>(Parse_Object_Id())) != NULL)
+    if ( (Object = reinterpret_cast<Poly *>(Parse_Object_Id())) != nullptr)
         return (reinterpret_cast<ObjectPtr>(Object));
 
     if (order == 0)
@@ -5321,7 +5315,7 @@ ObjectPtr Parser::Parse_Polynom ()
 
     Parse_Begin ();
 
-    if ( (Object = reinterpret_cast<Poly *>(Parse_Object_Id())) != NULL)
+    if ( (Object = reinterpret_cast<Poly *>(Parse_Object_Id())) != nullptr)
         return (reinterpret_cast<ObjectPtr>(Object));
 
     order = (int)Parse_Float();      Parse_Comma();
@@ -5403,7 +5397,7 @@ ObjectPtr Parser::Parse_Polygon()
 
     Parse_Begin();
 
-    if ((Object = reinterpret_cast<Polygon *>(Parse_Object_Id())) != NULL)
+    if ((Object = reinterpret_cast<Polygon *>(Parse_Object_Id())) != nullptr)
     {
         return(reinterpret_cast<ObjectPtr>(Object));
     }
@@ -5517,7 +5511,7 @@ ObjectPtr Parser::Parse_Prism()
 
     Parse_Begin();
 
-    if ((Object = reinterpret_cast<Prism *>(Parse_Object_Id())) != NULL)
+    if ((Object = reinterpret_cast<Prism *>(Parse_Object_Id())) != nullptr)
     {
         return(reinterpret_cast<ObjectPtr>(Object));
     }
@@ -5810,7 +5804,7 @@ ObjectPtr Parser::Parse_Quadric ()
 
     Parse_Begin ();
 
-    if ( (Object = reinterpret_cast<Quadric *>(Parse_Object_Id())) != NULL)
+    if ( (Object = reinterpret_cast<Quadric *>(Parse_Object_Id())) != nullptr)
         return (reinterpret_cast<ObjectPtr>(Object));
 
     Object = new Quadric();
@@ -5860,7 +5854,7 @@ ObjectPtr Parser::Parse_Smooth_Triangle ()
 
     Parse_Begin ();
 
-    if ( (Object = reinterpret_cast<SmoothTriangle *>(Parse_Object_Id())) != NULL)
+    if ( (Object = reinterpret_cast<SmoothTriangle *>(Parse_Object_Id())) != nullptr)
         return (reinterpret_cast<ObjectPtr>(Object));
 
     Object = new SmoothTriangle();
@@ -5946,7 +5940,7 @@ ObjectPtr Parser::Parse_Sor()
 
     Parse_Begin();
 
-    if ((Object = reinterpret_cast<Sor *>(Parse_Object_Id())) != NULL)
+    if ((Object = reinterpret_cast<Sor *>(Parse_Object_Id())) != nullptr)
     {
         return(reinterpret_cast<ObjectPtr>(Object));
     }
@@ -6055,7 +6049,7 @@ ObjectPtr Parser::Parse_Sphere()
 
     Parse_Begin();
 
-    if ((Object = reinterpret_cast<Sphere *>(Parse_Object_Id())) != NULL)
+    if ((Object = reinterpret_cast<Sphere *>(Parse_Object_Id())) != nullptr)
     {
         return (reinterpret_cast<ObjectPtr>(Object));
     }
@@ -6112,7 +6106,7 @@ ObjectPtr Parser::Parse_Sphere_Sweep()
 
     Parse_Begin();
 
-    if ((Object = reinterpret_cast<SphereSweep *>(Parse_Object_Id())) != NULL)
+    if ((Object = reinterpret_cast<SphereSweep *>(Parse_Object_Id())) != nullptr)
         return (reinterpret_cast<ObjectPtr>(Object));
 
     Object = new SphereSweep();
@@ -6218,7 +6212,7 @@ ObjectPtr Parser::Parse_Superellipsoid()
 
     Parse_Begin();
 
-    if ((Object = reinterpret_cast<Superellipsoid *>(Parse_Object_Id())) != NULL)
+    if ((Object = reinterpret_cast<Superellipsoid *>(Parse_Object_Id())) != nullptr)
     {
         return(reinterpret_cast<ObjectPtr>(Object));
     }
@@ -6283,7 +6277,7 @@ ObjectPtr Parser::Parse_Torus()
 
     Parse_Begin();
 
-    if ((Object = reinterpret_cast<Torus *>(Parse_Object_Id())) != NULL)
+    if ((Object = reinterpret_cast<Torus *>(Parse_Object_Id())) != nullptr)
     {
         return(reinterpret_cast<ObjectPtr>(Object));
     }
@@ -6383,7 +6377,7 @@ ObjectPtr Parser::Parse_Triangle()
 
     Parse_Begin();
 
-    if ((Object = reinterpret_cast<Triangle *>(Parse_Object_Id())) != NULL)
+    if ((Object = reinterpret_cast<Triangle *>(Parse_Object_Id())) != nullptr)
     {
         return(reinterpret_cast<ObjectPtr>(Object));
     }
@@ -6427,7 +6421,7 @@ ObjectPtr Parser::Parse_Triangle()
 ObjectPtr Parser::Parse_TrueType ()
 {
     ObjectPtr Object;
-    char *filename = NULL;
+    char *filename = nullptr;
     UCS2 *text_string;
     DBL depth;
     Vector3d offset;
@@ -6443,7 +6437,7 @@ ObjectPtr Parser::Parse_TrueType ()
 
     Parse_Begin ();
 
-    if ( (Object = reinterpret_cast<ObjectPtr>(Parse_Object_Id())) != NULL)
+    if ( (Object = reinterpret_cast<ObjectPtr>(Parse_Object_Id())) != nullptr)
         return (reinterpret_cast<ObjectPtr>(Object));
 
     EXPECT_ONE
@@ -6529,7 +6523,7 @@ ObjectPtr Parser::Parse_TrueType ()
 ******************************************************************************/
 TrueTypeFont *Parser::OpenFontFile(const char *asciifn, const int font_id)
 {
-    TrueTypeFont *font = NULL;
+    TrueTypeFont *font = nullptr;
     UCS2String ign;
     UCS2String formalFilename;
 
@@ -6547,13 +6541,13 @@ TrueTypeFont *Parser::OpenFontFile(const char *asciifn, const int font_id)
             }
 
     }
-    if(font != NULL)
+    if(font != nullptr)
     {
-        if(font->fp == NULL)
+        if(font->file == nullptr)
         {
             /* We have a match, use the previous information */
-            font->fp = Locate_File(font->filename,POV_File_Font_TTF,ign,true);
-            if(font->fp == NULL)
+            font->file = Locate_File(font->filename,POV_File_Font_TTF,ign,true);
+            if(font->file == nullptr)
             {
                 throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot open font file.");
             }
@@ -6572,21 +6566,21 @@ TrueTypeFont *Parser::OpenFontFile(const char *asciifn, const int font_id)
          * information and set some defaults
          */
 
-        IStream* fp = NULL;
+        shared_ptr<IStream> file;
 
         if (asciifn)
         {
-            if((fp = Locate_File(formalFilename,POV_File_Font_TTF,ign,true)) == NULL)
+            if((file = Locate_File(formalFilename,POV_File_Font_TTF,ign,true)) == nullptr)
             {
                 throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot open font file.");
             }
         }
         else
         {
-            fp = Internal_Font_File(font_id);
+            file = shared_ptr<IStream>(Internal_Font_File(font_id));
         }
 
-        font = new TrueTypeFont(formalFilename, fp, sceneData->stringEncoding);
+        font = new TrueTypeFont(formalFilename, file, sceneData->stringEncoding);
 
         sceneData->TTFonts.push_back(font);
     }
@@ -6615,7 +6609,7 @@ TrueTypeFont *Parser::OpenFontFile(const char *asciifn, const int font_id)
 
 ObjectPtr Parser::Parse_Object ()
 {
-    ObjectPtr Object = NULL;
+    ObjectPtr Object = nullptr;
 
     EXPECT_ONE
 
@@ -6734,7 +6728,7 @@ ObjectPtr Parser::Parse_Object ()
         END_CASE
 
         CASE (OBJECT_ID_TOKEN)
-            Object = Copy_Object(reinterpret_cast<ObjectPtr>(Token.Data));
+            Object = Copy_Object(reinterpret_cast<ObjectPtr>(mToken.Data));
         END_CASE
 
         CASE (UNION_TOKEN)
@@ -6847,7 +6841,7 @@ void Parser::Parse_Default ()
             Parse_End ();
             if (Default_Texture->Type != PLAIN_PATTERN)
                 Error("Default texture cannot be material map or tiles.");
-            if (Default_Texture->Next != NULL)
+            if (Default_Texture->Next != nullptr)
                 Error("Default texture cannot be layered.");
             Destroy_Textures(Local_Texture);
         END_CASE
@@ -6949,7 +6943,7 @@ void Parser::Parse_Frame ()
 
             CASE (SKYSPHERE_TOKEN)
                 Local_Skysphere = Parse_Skysphere();
-                if (sceneData->skysphere != NULL)
+                if (sceneData->skysphere != nullptr)
                 {
                     Warning("Only one sky-sphere allowed (last one will be used).");
                     Destroy_Skysphere(sceneData->skysphere);
@@ -7023,7 +7017,7 @@ void Parser::Parse_Frame ()
             END_CASE
 
             CASE (FLOAT_FUNCT_TOKEN)
-                switch(Token.Function_Id)
+                switch(mToken.Function_Id)
                 {
                     case VERSION_TOKEN:
                         UNGET
@@ -7077,9 +7071,9 @@ void Parser::Parse_Frame ()
             OTHERWISE
                 UNGET
                 Object = Parse_Object();
-                if (Object == NULL)
+                if (Object == nullptr)
                     Expectation_Error ("object or directive");
-                Post_Process (Object, NULL);
+                Post_Process (Object, nullptr);
                 Link_To_Frame (Object);
             END_CASE
         END_EXPECT
@@ -7131,12 +7125,15 @@ void Parser::Parse_Global_Settings()
             EXPECT_ONE
                 CASE (ASCII_TOKEN)
                     sceneData->stringEncoding = kStringEncoding_ASCII;
+                    mTokenizer.SetStringEncoding(kStringEncoding_ASCII);
                 END_CASE
                 CASE (UTF8_TOKEN)
                     sceneData->stringEncoding = kStringEncoding_UTF8;
+                    mTokenizer.SetStringEncoding(kStringEncoding_UTF8);
                 END_CASE
                 CASE (SYS_TOKEN)
                     sceneData->stringEncoding = kStringEncoding_System;
+                    mTokenizer.SetStringEncoding(kStringEncoding_System);
                 END_CASE
                 OTHERWISE
                     Expectation_Error ("charset type");
@@ -7630,7 +7627,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
         CASE(UV_MAPPING_TOKEN)
             /* if no texture than allow uv_mapping
                otherwise, warn user */
-            if (Object->Texture == NULL)
+            if (Object->Texture == nullptr)
             {
                 Set_Flag(Object, UV_FLAG);
             }
@@ -7641,7 +7638,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
         END_CASE
 
         CASE(SPLIT_UNION_TOKEN)
-            if(dynamic_cast<CSGUnion *>(Object) == NULL) // FIXME
+            if(dynamic_cast<CSGUnion *>(Object) == nullptr) // FIXME
                 Error("split_union found in non-union object.\n");
 
             (reinterpret_cast<CSG *>(Object))->do_split = (int)Parse_Float();
@@ -7716,7 +7713,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
         END_CASE
 
         CASE(CUTAWAY_TEXTURES_TOKEN)
-            if(dynamic_cast<CSGIntersection *>(Object) == NULL) // FIXME
+            if(dynamic_cast<CSGIntersection *>(Object) == nullptr) // FIXME
                 Error("cutaway_textures can only be used with intersection and difference.");
             Set_Flag(Object, CUTAWAY_TEXTURES_FLAG);
         END_CASE
@@ -7725,7 +7722,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
             Parse_Colour (Local_Colour);
             if (sceneData->EffectiveLanguageVersion() < 150)
             {
-                if (Object->Texture != NULL)
+                if (Object->Texture != nullptr)
                 {
                     if (Object->Texture->Type == PLAIN_PATTERN)
                     {
@@ -7806,7 +7803,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 
                     /* Compute quadric bounding box before transformations. [DB 8/94] */
 
-                    if (dynamic_cast<Quadric *>(Object) != NULL)
+                    if (dynamic_cast<Quadric *>(Object) != nullptr)
                     {
                         Min = Vector3d(-BOUND_HUGE);
                         Max = Vector3d(BOUND_HUGE);
@@ -7855,7 +7852,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 
         CASE3 (PIGMENT_TOKEN, NORMAL_TOKEN, FINISH_TOKEN)
             Object->Type |= TEXTURED_OBJECT;
-            if (Object->Texture == NULL)
+            if (Object->Texture == nullptr)
                 Object->Texture = Copy_Textures(Default_Texture);
             else
                 if (Object->Texture->Type != PLAIN_PATTERN)
@@ -7934,9 +7931,9 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
         CASE(HOLLOW_TOKEN)
             Bool_Flag (Object, HOLLOW_FLAG, (Allow_Float(1.0) > 0.0));
             Set_Flag (Object, HOLLOW_SET_FLAG);
-            if ((dynamic_cast<CSGIntersection *>(Object) != NULL) ||
-                (dynamic_cast<CSGMerge *>(Object) != NULL) ||
-                (dynamic_cast<CSGUnion *>(Object) != NULL))
+            if ((dynamic_cast<CSGIntersection *>(Object) != nullptr) ||
+                (dynamic_cast<CSGMerge *>(Object) != nullptr) ||
+                (dynamic_cast<CSGUnion *>(Object) != nullptr))
             {
                 Set_CSG_Children_Flag(Object, Test_Flag(Object, HOLLOW_FLAG), HOLLOW_FLAG, HOLLOW_SET_FLAG);
             }
@@ -7944,9 +7941,9 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 
         CASE(DOUBLE_ILLUMINATE_TOKEN)
             Bool_Flag (Object, DOUBLE_ILLUMINATE_FLAG, (Allow_Float(1.0) > 0.0));
-            if ((dynamic_cast<CSGIntersection *>(Object) != NULL) ||
-                (dynamic_cast<CSGMerge *>(Object) != NULL) ||
-                (dynamic_cast<CSGUnion *>(Object) != NULL))
+            if ((dynamic_cast<CSGIntersection *>(Object) != nullptr) ||
+                (dynamic_cast<CSGMerge *>(Object) != nullptr) ||
+                (dynamic_cast<CSGUnion *>(Object) != nullptr))
             {
                 Set_CSG_Tree_Flag(Object, DOUBLE_ILLUMINATE_FLAG,Test_Flag(Object, DOUBLE_ILLUMINATE_FLAG));
             }
@@ -8068,7 +8065,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
         }
     }
 
-    if((Object->Texture ==NULL)&&(Object->Interior_Texture != NULL))
+    if ((Object->Texture == nullptr) && (Object->Interior_Texture != nullptr))
         Error("Interior texture requires an exterior texture.");
 
     Parse_End ();
@@ -8152,17 +8149,17 @@ void Parser::Parse_Matrix(MATRIX Matrix)
 TRANSFORM *Parser::Parse_Transform(TRANSFORM *Trans)
 {
     Get_Token();
-    if(Token.Token_Id == TRANSFORM_ID_TOKEN)
+    if(mToken.Token_Id == TRANSFORM_ID_TOKEN)
     {
         /* using old "transform TRANS_IDENT" syntax */
-        if(Trans == NULL)
+        if(Trans == nullptr)
             Trans=Create_Transform();
         else
         {
             MIdentity (Trans->matrix);
             MIdentity (Trans->inverse);
         }
-        Compose_Transforms(Trans, reinterpret_cast<TRANSFORM *>(Token.Data));
+        Compose_Transforms(Trans, reinterpret_cast<TRANSFORM *>(mToken.Data));
     }
     else
     {
@@ -8198,7 +8195,7 @@ TRANSFORM *Parser::Parse_Transform_Block(TRANSFORM *New)
     bool isInverse = false;
 
     Parse_Begin();
-    if(New == NULL)
+    if(New == nullptr)
         New = Create_Transform();
     else
     {
@@ -8212,7 +8209,7 @@ TRANSFORM *Parser::Parse_Transform_Block(TRANSFORM *New)
         END_CASE
 
         CASE(TRANSFORM_ID_TOKEN)
-            Compose_Transforms(New, reinterpret_cast<TRANSFORM *>(Token.Data));
+            Compose_Transforms(New, reinterpret_cast<TRANSFORM *>(mToken.Data));
         END_CASE
 
         CASE (TRANSFORM_TOKEN)
@@ -8288,7 +8285,7 @@ void Parser::Parse_Bound_Clip(vector<ObjectPtr>& dest, bool notexture)
     ObjectPtr Current;
     vector<ObjectPtr> objects;
 
-    while((Current = Parse_Object()) != NULL)
+    while((Current = Parse_Object()) != nullptr)
     {
         if((notexture == true) && (Current->Type & (TEXTURED_OBJECT+PATCH_OBJECT)))
             Error ("Illegal texture or patch in clip, bound, object or potential pattern.");
@@ -8428,7 +8425,7 @@ int Parser::Parse_Three_UVCoords(Vector2d& UV1, Vector2d& UV2, Vector2d& UV3)
 bool Parser::Parse_Comma (void)
 {
     Get_Token();
-    if (Token.Token_Id != COMMA_TOKEN)
+    if (mToken.Token_Id != COMMA_TOKEN)
     {
         UNGET
         return false;
@@ -8439,11 +8436,11 @@ bool Parser::Parse_Comma (void)
 
 //******************************************************************************
 
-bool Parser::Peek_Token (TOKEN tokenId)
+bool Parser::Peek_Token (TokenId tokenId)
 {
     Get_Token();
-    bool tokenMatches = ((Token.Token_Id    == tokenId) ||
-                         (Token.Function_Id == tokenId));
+    bool tokenMatches = ((mToken.Token_Id    == tokenId) ||
+                         (mToken.Function_Id == tokenId));
     Unget_Token();
     return tokenMatches;
 }
@@ -8470,7 +8467,7 @@ bool Parser::Peek_Token (TOKEN tokenId)
 void Parser::Parse_Semi_Colon (bool force_semicolon)
 {
     Get_Token();
-    if (Token.Token_Id != SEMI_COLON_TOKEN)
+    if (mToken.Token_Id != SEMI_COLON_TOKEN)
     {
         UNGET
         if ((sceneData->EffectiveLanguageVersion() >= 350) && (force_semicolon == true))
@@ -8548,12 +8545,12 @@ ObjectPtr Parser::Parse_Object_Id ()
     EXPECT_ONE
         CASE (OBJECT_ID_TOKEN)
             Warn_State(OBJECT_ID_TOKEN, OBJECT_TOKEN);
-            Object = Copy_Object(reinterpret_cast<ObjectPtr>(Token.Data));
+            Object = Copy_Object(reinterpret_cast<ObjectPtr>(mToken.Data));
             Object = Parse_Object_Mods (Object);
         END_CASE
 
         OTHERWISE
-            Object = NULL;
+            Object = nullptr;
             UNGET
         END_CASE
     END_EXPECT
@@ -8585,7 +8582,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
     vector<LValue> lvalues;
     bool deprecated = false;
     bool deprecated_once = false;
-    int Previous;
+    TokenId Previous;
     int Local_Index;
     SYM_ENTRY *Temp_Entry;
     bool allow_redefine = true;
@@ -8593,8 +8590,8 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
     bool tupleDeclare = false;
     bool lvectorDeclare = false;
     bool larrayDeclare = false;
-    int* numberPtr = NULL;
-    void** dataPtr = NULL;
+    TokenId* numberPtr = nullptr;
+    void** dataPtr = nullptr;
     bool optional = false;
 
     Ok_To_Declare = false;
@@ -8651,15 +8648,15 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
     {
         deprecated = false;
         deprecated_once = false;
-        numberPtr = NULL;
-        dataPtr = NULL;
+        numberPtr = nullptr;
+        dataPtr = nullptr;
         optional = false;
 
         EXPECT
             CASE (DEPRECATED_TOKEN)
                 deprecated = true;
                 ALLOW(ONCE_TOKEN);
-                if (Token.Token_Id == ONCE_TOKEN)
+                if (mToken.Token_Id == ONCE_TOKEN)
                     deprecated_once = true;
                 deprecation_message = Parse_String(false, false);
             END_CASE
@@ -8674,30 +8671,30 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             END_CASE
         END_EXPECT
 
-        Previous = -1;
-        Temp_Entry = NULL;
+        Previous = NOT_A_TOKEN;
+        Temp_Entry = nullptr;
 
         EXPECT_ONE
             CASE (IDENTIFIER_TOKEN)
-                POV_PARSER_ASSERT(!Token.is_array_elem || Token.is_mixed_array_elem);
+                POV_PARSER_ASSERT(!mToken.is_array_elem || mToken.is_mixed_array_elem);
                 allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==IDENTIFIER_TOKEN
-                if (Token.is_array_elem || Token.is_dictionary_elem)
+                if (mToken.is_array_elem || mToken.is_dictionary_elem)
                 {
-                    if (is_local && (Token.context != Table_Index))
+                    if (is_local && (mToken.context != Table_Index))
                         Error ("Cannot use '#local' to assign a non-local array or dictionary element.");
-                    Temp_Entry = Add_Symbol (Token.table, Token.Token_String, IDENTIFIER_TOKEN);
+                    Temp_Entry = Add_Symbol (mToken.table, mToken.raw.lexeme.text.c_str(), IDENTIFIER_TOKEN);
                 }
                 else
-                    Temp_Entry = Add_Symbol (Local_Index, Token.Token_String, IDENTIFIER_TOKEN);
+                    Temp_Entry = Add_Symbol (Local_Index, mToken.raw.lexeme.text.c_str(), IDENTIFIER_TOKEN);
                 numberPtr = &(Temp_Entry->Token_Number);
                 dataPtr = &(Temp_Entry->Data);
-                Previous = Token.Token_Id;
+                Previous = mToken.Token_Id;
                 if (deprecated)
                 {
                     Temp_Entry->deprecated = true;;
                     if (deprecated_once)
                         Temp_Entry->deprecatedOnce = true;
-                    if (deprecation_message != NULL)
+                    if (deprecation_message != nullptr)
                     {
                         UCS2String str(deprecation_message);
                         POV_FREE(deprecation_message);
@@ -8706,7 +8703,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                     else
                     {
                         char str[256];
-                        sprintf(str, "Identifier '%.128s' was declared deprecated.", Token.Token_String);
+                        sprintf(str, "Identifier '%.128s' was declared deprecated.", mToken.raw.lexeme.text.c_str());
                         Temp_Entry->Deprecation_Message = POV_STRDUP(str);
                     }
                 }
@@ -8720,7 +8717,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             CASE2 (FUNCT_ID_TOKEN, VECTFUNCT_ID_TOKEN)
                 // Issue an error, _except_ when assigning to a still-empty element of a function array.
                 // TODO - We should allow assignment if `is_local` is set and the identifier is non-local.
-                if((!Token.is_array_elem) || (*(Token.DataPtr) != NULL))
+                if((!mToken.is_array_elem) || (*(mToken.DataPtr) != nullptr))
                     Error("Redeclaring functions is not allowed - #undef the function first!");
                 // FALLTHROUGH
 
@@ -8733,54 +8730,54 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             CASE4 (DENSITY_MAP_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_ID_TOKEN, UV_ID_TOKEN)
             CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
             CASE3 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN, DICTIONARY_ID_TOKEN)
-                if (is_local && (Token.context != Table_Index))
+                if (is_local && (mToken.context != Table_Index))
                 {
-                    if (Token.is_array_elem || Token.is_dictionary_elem)
+                    if (mToken.is_array_elem || mToken.is_dictionary_elem)
                         Error ("Cannot use '#local' to assign a non-local array or dictionary element.");
                     allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==IDENTIFIER_TOKEN
-                    Temp_Entry = Add_Symbol (Local_Index,Token.Token_String,IDENTIFIER_TOKEN);
+                    Temp_Entry = Add_Symbol (Local_Index,mToken.raw.lexeme.text.c_str(),IDENTIFIER_TOKEN);
                     numberPtr = &(Temp_Entry->Token_Number);
                     dataPtr   = &(Temp_Entry->Data);
                     Previous  = IDENTIFIER_TOKEN;
                 }
                 else
                 {
-                    allow_redefine = !Token.is_array_elem || Token.is_mixed_array_elem;
-                    numberPtr = Token.NumberPtr;
-                    dataPtr   = Token.DataPtr;
-                    Previous  = Token.Token_Id;
+                    allow_redefine = !mToken.is_array_elem || mToken.is_mixed_array_elem;
+                    numberPtr = mToken.NumberPtr;
+                    dataPtr   = mToken.DataPtr;
+                    Previous  = mToken.Token_Id;
                 }
             END_CASE
 
             CASE (EMPTY_ARRAY_TOKEN)
-                POV_PARSER_ASSERT(Token.is_array_elem);
+                POV_PARSER_ASSERT(mToken.is_array_elem);
                 allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==EMPTY_ARRAY_TOKEN
-                numberPtr = Token.NumberPtr;
-                dataPtr   = Token.DataPtr;
-                Previous  = Token.Token_Id;
+                numberPtr = mToken.NumberPtr;
+                dataPtr   = mToken.DataPtr;
+                Previous  = mToken.Token_Id;
             END_CASE
 
             CASE2 (VECTOR_FUNCT_TOKEN, FLOAT_FUNCT_TOKEN)
-                switch(Token.Function_Id)
+                switch(mToken.Function_Id)
                 {
                     case VECTOR_ID_TOKEN:
                     case FLOAT_ID_TOKEN:
-                        if (is_local && (Token.context != Table_Index))
+                        if (is_local && (mToken.context != Table_Index))
                         {
-                            if (Token.is_array_elem || Token.is_dictionary_elem)
+                            if (mToken.is_array_elem || mToken.is_dictionary_elem)
                                 Error("Cannot use '#local' to assign a non-local array or dictionary element.");
                             allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==IDENTIFIER_TOKEN
-                            Temp_Entry = Add_Symbol (Local_Index,Token.Token_String,IDENTIFIER_TOKEN);
+                            Temp_Entry = Add_Symbol (Local_Index,mToken.raw.lexeme.text.c_str(),IDENTIFIER_TOKEN);
                             numberPtr = &(Temp_Entry->Token_Number);
                             dataPtr   = &(Temp_Entry->Data);
                             Previous  = IDENTIFIER_TOKEN;
                         }
                         else
                         {
-                            allow_redefine  = !Token.is_array_elem || Token.is_mixed_array_elem;
-                            numberPtr = Token.NumberPtr;
-                            dataPtr   = Token.DataPtr;
-                            Previous  = Token.Function_Id;
+                            allow_redefine  = !mToken.is_array_elem || mToken.is_mixed_array_elem;
+                            numberPtr = mToken.NumberPtr;
+                            dataPtr   = mToken.DataPtr;
+                            Previous  = mToken.Function_Id;
                         }
                         break;
 
@@ -8813,8 +8810,8 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             END_CASE
         END_EXPECT
 
-        POV_PARSER_ASSERT((numberPtr != NULL) || (Token.NumberPtr == NULL));
-        POV_PARSER_ASSERT((dataPtr != NULL) || (Token.DataPtr == NULL));
+        POV_PARSER_ASSERT((numberPtr != nullptr) || (mToken.NumberPtr == nullptr));
+        POV_PARSER_ASSERT((dataPtr != nullptr) || (mToken.DataPtr == nullptr));
 
         LValue lvalue;
         lvalue.numberPtr = numberPtr;
@@ -8886,7 +8883,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
     else if (larrayDeclare)
     {
         SYM_ENTRY *rvalue = Create_Entry ("", DUMMY_SYMBOL_TOKEN, false);
-        if (!Parse_RValue (IDENTIFIER_TOKEN, &(rvalue->Token_Number), &(rvalue->Data), NULL, false, false, true, true, false, MAX_NUMBER_OF_TABLES) ||
+        if (!Parse_RValue (IDENTIFIER_TOKEN, &(rvalue->Token_Number), &(rvalue->Data), nullptr, false, false, true, true, false, MAX_NUMBER_OF_TABLES) ||
             (rvalue->Token_Number != ARRAY_ID_TOKEN))
             Expectation_Error("array RValue");
         POV_ARRAY *a = reinterpret_cast<POV_ARRAY *>(rvalue->Data);
@@ -8897,7 +8894,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
 
         for (int i = 0; i < lvalues.size(); ++i)
         {
-            if (a->DataPtrs[i] == NULL)
+            if (a->DataPtrs[i] == nullptr)
                 Error ("cannot assign from partially uninitialized array");
 
             numberPtr = lvalues[i].numberPtr;
@@ -8975,7 +8972,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
     // in tuple-style declarations
     for (vector<LValue>::iterator i = lvalues.begin(); i != lvalues.end(); ++i)
     {
-        if ((i->symEntry != NULL) && (i->symEntry->Token_Number == DUMMY_SYMBOL_TOKEN))
+        if ((i->symEntry != nullptr) && (i->symEntry->Token_Number == DUMMY_SYMBOL_TOKEN))
             Destroy_Entry (i->symEntry, false);
     }
 
@@ -8989,17 +8986,17 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
 
 bool Parser::PassParameterByReference (int callingContext)
 {
-    if (Token.is_dictionary_elem)
+    if (mToken.is_dictionary_elem)
     {
         return true;
     }
     else
     {
-        return (Token.context <= callingContext);
+        return (mToken.context <= callingContext);
     }
 }
 
-bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTRY *sym, bool ParFlag, bool SemiFlag, bool is_local, bool allow_redefine, bool allowUndefined, int old_table_index)
+bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr, SYM_ENTRY *sym, bool ParFlag, bool SemiFlag, bool is_local, bool allow_redefine, bool allowUndefined, int old_table_index)
 {
     EXPRESS Local_Express;
     RGBFTColour *Local_Colour;
@@ -9040,16 +9037,16 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
             {
                 // pass by reference
                 New_Par            = reinterpret_cast<POV_PARAM *>(POV_MALLOC(sizeof(POV_PARAM),"parameter"));
-                New_Par->NumberPtr = Token.NumberPtr;
-                New_Par->DataPtr   = Token.DataPtr;
+                New_Par->NumberPtr = mToken.NumberPtr;
+                New_Par->DataPtr   = mToken.DataPtr;
                 *NumberPtr = PARAMETER_ID_TOKEN;
                 *DataPtr   = reinterpret_cast<void *>(New_Par);
             }
             else
             {
                 // pass by value
-                Temp_Data  = reinterpret_cast<void *>(Copy_Identifier(reinterpret_cast<void *>(*Token.DataPtr),*Token.NumberPtr));
-                *NumberPtr = *Token.NumberPtr;
+                Temp_Data  = reinterpret_cast<void *>(Copy_Identifier(reinterpret_cast<void *>(*mToken.DataPtr),*mToken.NumberPtr));
+                *NumberPtr = *mToken.NumberPtr;
                 Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
                 *DataPtr   = Temp_Data;
             }
@@ -9068,7 +9065,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
         END_CASE
 
         CASE_COLOUR
-            if((Token.Token_Id != COLOUR_ID_TOKEN) || (sceneData->EffectiveLanguageVersion() < 350))
+            if((mToken.Token_Id != COLOUR_ID_TOKEN) || (sceneData->EffectiveLanguageVersion() < 350))
             {
                 Local_Colour  = Create_Colour();
                 Ok_To_Declare = false;
@@ -9094,8 +9091,8 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
             // BTW, when saying #declare it always implies "or #local" :-)
 
             // determine the type of the first identifier
-            function_identifier = (Token.Token_Id==FUNCT_ID_TOKEN) || (Token.Token_Id==VECTFUNCT_ID_TOKEN);
-            callable_identifier = (Token.Token_Id==FUNCT_ID_TOKEN) || (Token.Token_Id==VECTFUNCT_ID_TOKEN) || (Token.Token_Id==SPLINE_ID_TOKEN);
+            function_identifier = (mToken.Token_Id==FUNCT_ID_TOKEN) || (mToken.Token_Id==VECTFUNCT_ID_TOKEN);
+            callable_identifier = (mToken.Token_Id==FUNCT_ID_TOKEN) || (mToken.Token_Id==VECTFUNCT_ID_TOKEN) || (mToken.Token_Id==SPLINE_ID_TOKEN);
 
             // don't allow #declares from here
             Ok_To_Declare = false;
@@ -9106,9 +9103,9 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
             // found between now and the time when the function
             // Parse_Unknown_Vector returns
             if (callable_identifier || (ParFlag &&
-                (((Token.Token_Id==FLOAT_FUNCT_TOKEN) && (Token.Function_Id==FLOAT_ID_TOKEN)) ||
-                 ((Token.Token_Id==VECTOR_FUNCT_TOKEN) &&  (Token.Function_Id==VECTOR_ID_TOKEN)) ||
-                 (Token.Token_Id==VECTOR_4D_ID_TOKEN) || (Token.Token_Id==UV_ID_TOKEN) || (Token.Token_Id==COLOUR_ID_TOKEN))))
+                (((mToken.Token_Id==FLOAT_FUNCT_TOKEN) && (mToken.Function_Id==FLOAT_ID_TOKEN)) ||
+                 ((mToken.Token_Id==VECTOR_FUNCT_TOKEN) &&  (mToken.Function_Id==VECTOR_ID_TOKEN)) ||
+                 (mToken.Token_Id==VECTOR_4D_ID_TOKEN) || (mToken.Token_Id==UV_ID_TOKEN) || (mToken.Token_Id==COLOUR_ID_TOKEN))))
             {
                 Temp_Count = token_count;
             }
@@ -9120,19 +9117,19 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
             // so we claim dibs on it until we're done.
             // TODO - this is a bit hackish; ideally, if the Token is a symbol we should have it store the SYM_ENTRY pointer,
             // so we don't need to look it up again via name.
-            if ((Token.Token_Id==FUNCT_ID_TOKEN) || (Token.Token_Id==VECTFUNCT_ID_TOKEN) || (Token.Token_Id==SPLINE_ID_TOKEN) ||
-                (Token.Token_Id==UV_ID_TOKEN) || (Token.Token_Id==VECTOR_4D_ID_TOKEN) || (Token.Token_Id==COLOUR_ID_TOKEN))
+            if ((mToken.Token_Id==FUNCT_ID_TOKEN) || (mToken.Token_Id==VECTFUNCT_ID_TOKEN) || (mToken.Token_Id==SPLINE_ID_TOKEN) ||
+                (mToken.Token_Id==UV_ID_TOKEN) || (mToken.Token_Id==VECTOR_4D_ID_TOKEN) || (mToken.Token_Id==COLOUR_ID_TOKEN))
             {
-                symbol_entry = Find_Symbol (Token.table, Token.Token_String);
+                symbol_entry = Find_Symbol (mToken.table, mToken.raw.lexeme.text.c_str());
                 if (symbol_entry)
                 {
-                    symbol_entry_table = Token.table;
+                    symbol_entry_table = mToken.table;
                     Acquire_Entry_Reference(symbol_entry);
                 }
             }
             else
             {
-                symbol_entry = NULL;
+                symbol_entry = nullptr;
             }
 
             // parse the expression and determine if it was a callable identifier
@@ -9156,8 +9153,8 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
                 if(!(ParFlag) || (ParFlag && function_identifier))
                 {
                     // pass by value
-                    Temp_Data  = reinterpret_cast<void *>(Copy_Identifier(reinterpret_cast<void *>(*Token.DataPtr),*Token.NumberPtr));
-                    *NumberPtr = *Token.NumberPtr;
+                    Temp_Data  = reinterpret_cast<void *>(Copy_Identifier(reinterpret_cast<void *>(*mToken.DataPtr),*mToken.NumberPtr));
+                    *NumberPtr = *mToken.NumberPtr;
                     Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
                     *DataPtr   = Temp_Data;
                 }
@@ -9165,8 +9162,8 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
                 {
                     // pass by reference
                     New_Par            = reinterpret_cast<POV_PARAM *>(POV_MALLOC(sizeof(POV_PARAM),"parameter"));
-                    New_Par->NumberPtr = Token.NumberPtr;
-                    New_Par->DataPtr   = Token.DataPtr;
+                    New_Par->NumberPtr = mToken.NumberPtr;
+                    New_Par->DataPtr   = mToken.DataPtr;
 
                     *NumberPtr = PARAMETER_ID_TOKEN;
                     *DataPtr   = reinterpret_cast<void *>(New_Par);
@@ -9257,7 +9254,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
             Parse_Begin ();
             Local_Texture = Parse_Texture ();
             Parse_End ();
-            Temp_Texture=NULL;
+            Temp_Texture=nullptr;
             Link_Textures(&Temp_Texture, Local_Texture);
             Ok_To_Declare = false;
             EXPECT
@@ -9355,7 +9352,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
         END_CASE
 
         CASE (DENSITY_TOKEN)
-            Local_Density = NULL;
+            Local_Density = nullptr;
             Parse_Begin ();
             Parse_Media_Density_Pattern (&Local_Density);
             Parse_End ();
@@ -9399,10 +9396,10 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
             // not logical. Further, recursion is not supported in current POV-Ray
             // anyway. However, allowing such code now would cause problems
             // implementing recursive functions in future versions!
-            if(sym != NULL)
+            if(sym != nullptr)
                 Temp_Data  = reinterpret_cast<void *>(Parse_DeclareFunction(NumberPtr, sym->Token_Name, is_local));
             else
-                Temp_Data  = reinterpret_cast<void *>(Parse_DeclareFunction(NumberPtr, NULL, is_local));
+                Temp_Data  = reinterpret_cast<void *>(Parse_DeclareFunction(NumberPtr, nullptr, is_local));
             Test_Redefine(Previous, NumberPtr, *DataPtr, false);
             *DataPtr   = Temp_Data;
         END_CASE
@@ -9440,7 +9437,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
         OTHERWISE
             UNGET
             Local_Object = Parse_Object ();
-            Found=(Local_Object!=NULL);
+            Found = (Local_Object != nullptr);
             if (Found)
             {
                 *NumberPtr   = OBJECT_ID_TOKEN;
@@ -9462,7 +9459,7 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
     POV_ARRAY *a;
     DATA_FILE *Temp_File;
 
-    if(Data == NULL)
+    if(Data == nullptr)
         return;
 
     switch(Type)
@@ -9567,10 +9564,8 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
             break;
         case FILE_ID_TOKEN:
             Temp_File = reinterpret_cast<DATA_FILE *>(Data);
-            if(Temp_File->In_File != NULL)
-                delete Temp_File->In_File;
-            if(Temp_File->Out_File != NULL)
-                delete Temp_File->Out_File;
+            Temp_File->In_File = nullptr;
+            Temp_File->Out_File = nullptr;
             POV_FREE(Data);
             break;
         case FUNCT_ID_TOKEN:
@@ -9636,10 +9631,10 @@ void Parser::Link_Textures (TEXTURE **Old_Textures, TEXTURE *New_Textures)
 {
     TEXTURE *Layer;
 
-    if (New_Textures == NULL)
+    if (New_Textures == nullptr)
         return;
 
-    if ((*Old_Textures) != NULL)
+    if ((*Old_Textures) != nullptr)
     {
         if ((*Old_Textures)->Type != PLAIN_PATTERN)
         {
@@ -9647,7 +9642,7 @@ void Parser::Link_Textures (TEXTURE **Old_Textures, TEXTURE *New_Textures)
         }
     }
     for (Layer = New_Textures;
-         Layer->Next != NULL;
+         Layer->Next != nullptr;
          Layer = Layer->Next)
     {
         /* NK layers - 1999 June 10 - for backwards compatiblity with layered textures */
@@ -9656,13 +9651,13 @@ void Parser::Link_Textures (TEXTURE **Old_Textures, TEXTURE *New_Textures)
     }
 
     /* NK layers - 1999 Nov 16 - for backwards compatiblity with layered textures */
-    if ((sceneData->EffectiveLanguageVersion() <= 310) && (*Old_Textures != NULL))
+    if ((sceneData->EffectiveLanguageVersion() <= 310) && (*Old_Textures != nullptr))
         Convert_Filter_To_Transmit(Layer->Pigment);
 
     Layer->Next = *Old_Textures;
     *Old_Textures = New_Textures;
 
-    if ((New_Textures->Type != PLAIN_PATTERN) && (New_Textures->Next != NULL))
+    if ((New_Textures->Type != PLAIN_PATTERN) && (New_Textures->Next != nullptr))
     {
         Error("Cannot layer a patterned texture over another.");
     }
@@ -9688,7 +9683,7 @@ void Parser::Link_Textures (TEXTURE **Old_Textures, TEXTURE *New_Textures)
 *
 ******************************************************************************/
 
-void Parser::Test_Redefine(TOKEN Previous, TOKEN *NumberPtr, void *Data, bool allow_redefine)
+void Parser::Test_Redefine(TokenId Previous, TokenId *NumberPtr, void *Data, bool allow_redefine)
 {
     if ((Previous == IDENTIFIER_TOKEN) || (Previous == EMPTY_ARRAY_TOKEN))
     {
@@ -9738,7 +9733,7 @@ void Parser::Test_Redefine(TOKEN Previous, TOKEN *NumberPtr, void *Data, bool al
 *
 ******************************************************************************/
 
-void Parser::Parse_Error(TOKEN Token_Id)
+void Parser::Parse_Error(TokenId Token_Id)
 {
     Expectation_Error(Get_Token_String(Token_Id));
 }
@@ -9765,25 +9760,25 @@ void Parser::Found_Instead_Error(const char *exstr, const char *extokstr)
 {
     const char *found;
 
-    switch(Token.Token_Id)
+    switch(mToken.Token_Id)
     {
         case IDENTIFIER_TOKEN:
-            Error("%s '%s', undeclared identifier '%s' found instead", exstr, extokstr, Token.Token_String);
+            Error("%s '%s', undeclared identifier '%s' found instead", exstr, extokstr, mToken.raw.lexeme.text.c_str());
             break;
         case VECTOR_FUNCT_TOKEN:
-            found = Get_Token_String(Token.Function_Id);
+            found = Get_Token_String(mToken.Function_Id);
             Error("%s '%s', vector function '%s' found instead", exstr, extokstr, found);
             break;
         case FLOAT_FUNCT_TOKEN:
-            found = Get_Token_String(Token.Function_Id);
+            found = Get_Token_String(mToken.Function_Id);
             Error("%s '%s', float function '%s' found instead", exstr, extokstr, found);
             break;
         case COLOUR_KEY_TOKEN:
-            found = Get_Token_String(Token.Function_Id);
+            found = Get_Token_String(mToken.Function_Id);
             Error("%s '%s', color keyword '%s' found instead", exstr, extokstr, found);
             break;
         default:
-            found = Get_Token_String(Token.Token_Id);
+            found = Get_Token_String(mToken.Token_Id);
             Error("%s '%s', %s found instead", exstr, extokstr, found);
     }
 }
@@ -9807,7 +9802,7 @@ void Parser::Found_Instead_Error(const char *exstr, const char *extokstr)
 *
 ******************************************************************************/
 
-void Parser::Warn_State(TOKEN Token_Id, TOKEN Type)
+void Parser::Warn_State(TokenId Token_Id, TokenId Type)
 {
     char *str;
 
@@ -9875,7 +9870,7 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
     DBL Volume;
     FINISH *Finish;
 
-    if (Object == NULL)
+    if (Object == nullptr)
     {
         return;
     }
@@ -9891,22 +9886,22 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
 
     // Promote texture etc. from parent to children.
 
-    if (Parent != NULL)
+    if (Parent != nullptr)
     {
-        if (Object->Texture == NULL)
+        if (Object->Texture == nullptr)
         {
             Object->Texture = Copy_Texture_Pointer(Parent->Texture);
             // NK 1998 copy uv_mapping flag if and only if we copy the texture
             if (Test_Flag(Parent, UV_FLAG))
                 Set_Flag(Object, UV_FLAG);
         }
-        if (Object->Interior_Texture == NULL)
+        if (Object->Interior_Texture == nullptr)
         {
             Object->Interior_Texture = Copy_Texture_Pointer(Parent->Interior_Texture);
             if(Test_Flag(Parent, UV_FLAG))
                 Set_Flag(Object, UV_FLAG);
         }
-        if (Object->interior == NULL)
+        if (Object->interior == nullptr)
         {
             // TODO - may need to copy the interior, as we may need to modify a few of its fields.
             Object->interior = Parent->interior;
@@ -9987,16 +9982,16 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
         }
     }
 
-    if(Object->interior != NULL)
+    if(Object->interior != nullptr)
         Object->interior->PostProcess();
 
-    if ((Object->Texture == NULL) &&
+    if ((Object->Texture == nullptr) &&
         !(Object->Type & TEXTURED_OBJECT) &&
         !(Object->Type & LIGHT_SOURCE_OBJECT))
     {
         if (Parent)
         {
-            if((dynamic_cast<CSGIntersection *>(Parent) == NULL) ||
+            if((dynamic_cast<CSGIntersection *>(Parent) == nullptr) ||
                !Test_Flag(Parent, CUTAWAY_TEXTURES_FLAG))
             {
                 Object->Texture = Copy_Textures(Default_Texture);
@@ -10064,17 +10059,17 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
     if (Object->Type & LIGHT_SOURCE_OBJECT)
     {
         // post-process the light source
-        if ((reinterpret_cast<LightSource *>(Object))->Projected_Through_Object != NULL)
+        if ((reinterpret_cast<LightSource *>(Object))->Projected_Through_Object != nullptr)
         {
-            if ((reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->interior != NULL)
+            if ((reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->interior != nullptr)
             {
                 (reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->interior.reset();
                 Warning("Projected through objects can not have interior, interior removed.");
             }
-            if ((reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->Texture != NULL)
+            if ((reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->Texture != nullptr)
             {
                 Destroy_Textures((reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->Texture);
-                (reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->Texture = NULL;
+                (reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->Texture = nullptr;
                 Warning("Projected through objects can not have texture, texture removed.");
             }
         }
@@ -10093,7 +10088,7 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
 
         // If there is no interior create one.
 
-        if (Object->interior == NULL)
+        if (Object->interior == nullptr)
         {
             Object->interior = InteriorPtr(new Interior());
         }
@@ -10104,11 +10099,11 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
 
         // Promote finish's IOR to interior IOR.
 
-        if (Object->Texture != NULL)
+        if (Object->Texture != nullptr)
         {
             if (Object->Texture->Type == PLAIN_PATTERN)
             {
-                if ((Finish = Object->Texture->Finish) != NULL)
+                if ((Finish = Object->Texture->Finish) != nullptr)
                 {
                     if (Finish->Temp_IOR >= 0.0)
                     {
@@ -10161,10 +10156,10 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
 
     // Test if the object is opaque or not. [DB 8/94]
 
-    if ((dynamic_cast<Blob *>(Object) == NULL) && // FIXME
-        (dynamic_cast<Mesh *>(Object) == NULL) && // FIXME
+    if ((dynamic_cast<Blob *>(Object) == nullptr) && // FIXME
+        (dynamic_cast<Mesh *>(Object) == nullptr) && // FIXME
         (Test_Opacity(Object->Texture)) &&
-        ((Object->Interior_Texture==NULL) ||
+        ((Object->Interior_Texture == nullptr) ||
          Test_Opacity(Object->Interior_Texture)))
     {
         Set_Flag(Object, OPAQUE_FLAG);
@@ -10173,10 +10168,10 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
     {
         // Objects with multiple textures have to be handled separately.
 
-        if(dynamic_cast<Blob *>(Object) != NULL) // FIXME
+        if(dynamic_cast<Blob *>(Object) != nullptr) // FIXME
             (dynamic_cast<Blob *>(Object))->Test_Blob_Opacity();
 
-        if(dynamic_cast<Mesh *>(Object) != NULL) // FIXME
+        if(dynamic_cast<Mesh *>(Object) != nullptr) // FIXME
             (dynamic_cast<Mesh *>(Object))->Test_Mesh_Opacity();
     }
 }
@@ -10214,19 +10209,19 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
 
 void Parser::Link_To_Frame(ObjectPtr Object)
 {
-    if(Object == NULL)
+    if(Object == nullptr)
         return;
 
     /* Remove bounding object if object is cheap to intersect. [DB 8/94]  */
 
     if ((Object->Bound.empty() == false) && (sceneData->removeBounds == true))
     {
-        if ((dynamic_cast<CSGUnion *>(Object) == NULL)        && // FIXME
-            (dynamic_cast<CSGIntersection *>(Object) == NULL) && // FIXME
-            (dynamic_cast<CSGMerge *>(Object) == NULL)        && // FIXME
-            (dynamic_cast<Poly *>(Object) == NULL)            && // FIXME
-            (dynamic_cast<TrueType *>(Object) == NULL)        && // FIXME
-            ((dynamic_cast<Quadric *>(Object) == NULL) || (dynamic_cast<Quadric *>(Object)->Automatic_Bounds)))
+        if ((dynamic_cast<CSGUnion *>(Object) == nullptr)        && // FIXME
+            (dynamic_cast<CSGIntersection *>(Object) == nullptr) && // FIXME
+            (dynamic_cast<CSGMerge *>(Object) == nullptr)        && // FIXME
+            (dynamic_cast<Poly *>(Object) == nullptr)            && // FIXME
+            (dynamic_cast<TrueType *>(Object) == nullptr)        && // FIXME
+            ((dynamic_cast<Quadric *>(Object) == nullptr) || (dynamic_cast<Quadric *>(Object)->Automatic_Bounds)))
         {
             /* Destroy only, if bounding object is not used as clipping object. */
 
@@ -10243,12 +10238,12 @@ void Parser::Link_To_Frame(ObjectPtr Object)
      * if all children of a union have the no_shadow flag, then the union should
      * have it as well.
      */
-    if(dynamic_cast<CSGUnion *>(Object) != NULL && dynamic_cast<CSGMerge *>(Object) == NULL)
+    if(dynamic_cast<CSGUnion *>(Object) != nullptr && dynamic_cast<CSGMerge *>(Object) == nullptr)
     {
         vector<ObjectPtr>::iterator This_Sib = (dynamic_cast<CSG *>(Object))->children.begin();
         while (This_Sib != (dynamic_cast<CSG *>(Object))->children.end())
         {
-            if((dynamic_cast<LightSource *>(*This_Sib) == NULL) && !Test_Flag ((*This_Sib), NO_SHADOW_FLAG)) // FIXME
+            if((dynamic_cast<LightSource *>(*This_Sib) == nullptr) && !Test_Flag ((*This_Sib), NO_SHADOW_FLAG)) // FIXME
                 break;
             This_Sib++;
         }
@@ -10259,7 +10254,7 @@ void Parser::Link_To_Frame(ObjectPtr Object)
     // Link the object to the frame if it's not a CSG union object,
     // if it's clipped or if bounding slabs aren't used.
     // TODO FIXME - check if bound is used
-    if((Object->Clip.empty() == false) || (dynamic_cast<CSGUnion *>(Object) == NULL) || (dynamic_cast<CSGMerge *>(Object) != NULL))
+    if((Object->Clip.empty() == false) || (dynamic_cast<CSGUnion *>(Object) == nullptr) || (dynamic_cast<CSGMerge *>(Object) != nullptr))
     {
         Link(Object, sceneData->objects);
         return;
@@ -10417,19 +10412,8 @@ void Parser::Warn_Compat(bool definite, const char *syn)
 
 void Parser::Global_Setting_Warn()
 {
-    char *str;
-
-    str = reinterpret_cast<char *>(POV_MALLOC(strlen(Token.Token_String) + 80, "global setting warning string"));
-
     if (sceneData->EffectiveLanguageVersion() >= 300)
-    {
-        strcpy(str, "'");
-        strcat(str, Token.Token_String);
-        strcat(str, "' should be in 'global_settings{...}' statement.");
-        PossibleError(str);
-    }
-
-    POV_FREE(str);
+        PossibleError("'%s' should be in 'global_settings{...}' statement.", mToken.raw.lexeme.text.c_str());
 }
 
 /*****************************************************************************
@@ -10459,9 +10443,9 @@ void Parser::Set_CSG_Children_Flag(ObjectPtr Object, unsigned int f, unsigned in
         ObjectPtr p = *Sib;
         if(!Test_Flag (p, set_flag))
         {
-            if((dynamic_cast<CSGUnion *> (p) != NULL) || // FIXME
-               (dynamic_cast<CSGIntersection *> (p) != NULL) || // FIXME
-               (dynamic_cast<CSGMerge *> (p) != NULL)) // FIXME
+            if((dynamic_cast<CSGUnion *> (p) != nullptr) || // FIXME
+               (dynamic_cast<CSGIntersection *> (p) != nullptr) || // FIXME
+               (dynamic_cast<CSGMerge *> (p) != nullptr)) // FIXME
             {
                 Set_CSG_Children_Flag(p, f, flag, set_flag);
             }
@@ -10500,9 +10484,9 @@ void Parser::Set_CSG_Tree_Flag(ObjectPtr Object, unsigned int f, int val)
     for(vector<ObjectPtr>::iterator Sib = (reinterpret_cast<CSG *>(Object))->children.begin(); Sib != (reinterpret_cast<CSG *>(Object))->children.end(); Sib++)
     {
         ObjectPtr p = *Sib;
-        if((dynamic_cast<CSGUnion *>(p) != NULL) || // FIXME
-           (dynamic_cast<CSGIntersection *>(p) != NULL) || // FIXME
-           (dynamic_cast<CSGMerge *>(p) != NULL)) // FIXME
+        if((dynamic_cast<CSGUnion *>(p) != nullptr) || // FIXME
+           (dynamic_cast<CSGIntersection *>(p) != nullptr) || // FIXME
+           (dynamic_cast<CSGMerge *>(p) != nullptr)) // FIXME
         {
             Set_CSG_Tree_Flag(p, f, val);
         }
@@ -10539,11 +10523,11 @@ void *Parser::Copy_Identifier (void *Data, int Type)
     Vector2d *uvp;
     VECTOR_4D *v4p;
     int len;
-    void *New=NULL;
+    void *New=nullptr;
 
-    if (Data==NULL)
+    if (Data == nullptr)
     {
-        return(NULL);
+        return(nullptr);
     }
 
     switch (Type)
@@ -10631,7 +10615,7 @@ void *Parser::Copy_Identifier (void *Data, int Type)
             //New = reinterpret_cast<void *>(POV_STRDUP(reinterpret_cast<char *>(Data)));
             len = UCS2_strlen(reinterpret_cast<UCS2 *>(Data)) + 1;
             New = reinterpret_cast<UCS2 *>(POV_MALLOC(len * sizeof(UCS2), "UCS2 String"));
-            POV_MEMMOVE(reinterpret_cast<void *>(New), reinterpret_cast<void *>(Data), len * sizeof(UCS2));
+            POV_MEMCPY(reinterpret_cast<void *>(New), reinterpret_cast<void *>(Data), len * sizeof(UCS2));
             break;
         case ARRAY_ID_TOKEN:
             a = reinterpret_cast<POV_ARRAY *>(Data);
@@ -10791,8 +10775,8 @@ void Parser::Warning(WarningLevel level, const char *format,...)
     std::vsnprintf(localvsbuffer, sizeof(localvsbuffer), format, marker);
     va_end(marker);
 
-    if(Token.FileHandle != NULL)
-        messageFactory.WarningAt(level, Token.FileHandle->name(), Token.Token_File_Pos.lineno, Token.Token_Col_No, Token.FileHandle->tellg().offset, "%s", localvsbuffer);
+    if(mToken.sourceFile != nullptr)
+        messageFactory.WarningAt(level, mToken, "%s", localvsbuffer);
     else
         messageFactory.Warning(level, "%s", localvsbuffer);
 }
@@ -10821,8 +10805,8 @@ void Parser::PossibleError(const char *format,...)
     std::vsnprintf(localvsbuffer, sizeof(localvsbuffer), format, marker);
     va_end(marker);
 
-    if(Token.FileHandle != NULL)
-        messageFactory.PossibleErrorAt(Token.FileHandle->name(), Token.Token_File_Pos.lineno, Token.Token_Col_No, Token.FileHandle->tellg().offset, "%s", localvsbuffer);
+    if(mToken.sourceFile != nullptr)
+        messageFactory.PossibleErrorAt(mToken, "%s", localvsbuffer);
     else
         messageFactory.PossibleError("%s", localvsbuffer);
 }
@@ -10840,13 +10824,29 @@ void Parser::Error(const char *format,...)
     std::vsnprintf(localvsbuffer, sizeof(localvsbuffer), format, marker);
     va_end(marker);
 
-    if(Token.FileHandle != NULL)
-        messageFactory.ErrorAt(POV_EXCEPTION(kParseErr, localvsbuffer), Token.FileHandle->name(), Token.Token_File_Pos.lineno, Token.Token_Col_No, Token.FileHandle->tellg().offset, "%s", localvsbuffer);
+    if(mToken.sourceFile != nullptr)
+        messageFactory.ErrorAt(POV_EXCEPTION(kParseErr, localvsbuffer), mToken, "%s", localvsbuffer);
     else
         messageFactory.Error(POV_EXCEPTION(kParseErr, localvsbuffer), "%s", localvsbuffer);
 }
 
-void Parser::ErrorInfo(const SourceInfo& loc, const char *format,...)
+void Parser::Error(const MessageContext& loc, const char *format, ...)
+{
+#if POV_BOMB_ON_ERROR
+    POV_ASSERT_HARD(false);
+#endif
+
+    va_list marker;
+    char localvsbuffer[1024];
+
+    va_start(marker, format);
+    std::vsnprintf(localvsbuffer, sizeof(localvsbuffer), format, marker);
+    va_end(marker);
+
+    messageFactory.ErrorAt(POV_EXCEPTION(kParseErr, localvsbuffer), loc, "%s", localvsbuffer);
+}
+
+void Parser::ErrorInfo(const MessageContext& loc, const char *format,...)
 {
     va_list marker;
     char localvsbuffer[1024];
@@ -10855,7 +10855,7 @@ void Parser::ErrorInfo(const SourceInfo& loc, const char *format,...)
     std::vsnprintf(localvsbuffer, sizeof(localvsbuffer), format, marker);
     va_end(marker);
 
-    messageFactory.PossibleErrorAt(loc.filename, loc.filepos.lineno, loc.col, loc.filepos.offset, "%s", localvsbuffer);
+    messageFactory.PossibleErrorAt(loc, "%s", localvsbuffer);
 }
 
 int Parser::Debug_Info(const char *format,...)
@@ -10987,7 +10987,7 @@ void Parser::CheckPassThru(ObjectPtr o, int flag)
 *
 ******************************************************************************/
 
-IStream *Parser::Locate_File(const UCS2String& filename, unsigned int stype, UCS2String& buffer, bool err_flag)
+shared_ptr<IStream> Parser::Locate_File(const UCS2String& filename, unsigned int stype, UCS2String& buffer, bool err_flag)
 {
     UCS2String fn(filename);
     UCS2String foundfile(backendSceneData->FindFile(GetPOVMSContext(), fn, stype));
@@ -10997,7 +10997,7 @@ IStream *Parser::Locate_File(const UCS2String& filename, unsigned int stype, UCS
         if(err_flag == true)
             PossibleError("Cannot find file '%s', even after trying to append file type extension.", UCS2toASCIIString(fn).c_str());
 
-        return NULL;
+        return nullptr;
     }
 
     if(fn.find('.') == UCS2String::npos)
@@ -11012,9 +11012,9 @@ IStream *Parser::Locate_File(const UCS2String& filename, unsigned int stype, UCS
     }
 
     // ReadFile will store both fn and foundfile in the cache for next time round
-    IStream *result(backendSceneData->ReadFile(GetPOVMSContext(), fn, foundfile.c_str(), stype));
+    shared_ptr<IStream> result(backendSceneData->ReadFile(GetPOVMSContext(), fn, foundfile.c_str(), stype));
 
-    if((result == NULL) && (err_flag == true))
+    if((result == nullptr) && (err_flag == true))
         PossibleError("Cannot open file '%s'.", UCS2toASCIIString(foundfile).c_str());
 
     buffer = foundfile;
@@ -11022,7 +11022,7 @@ IStream *Parser::Locate_File(const UCS2String& filename, unsigned int stype, UCS
     return result;
 }
 /* TODO FIXME - code above should not be there, this is how it should work but this has bugs [trf]
-IStream *Parser::Locate_File(const UCS2String& filename, unsigned int stype, UCS2String& buffer, bool err_flag)
+shared_ptr<IStream> Parser::Locate_File(const UCS2String& filename, unsigned int stype, UCS2String& buffer, bool err_flag)
 {
     UCS2String foundfile(backendSceneData->FindFile(GetPOVMSContext(), filename, stype));
 
@@ -11031,12 +11031,12 @@ IStream *Parser::Locate_File(const UCS2String& filename, unsigned int stype, UCS
         if(err_flag == true)
             PossibleError("Cannot find file '%s', even after trying to append file type extension.", UCS2toASCIIString(filename).c_str());
 
-        return NULL;
+        return nullptr;
     }
 
-    IStream *result(sd->ReadFile(GetPOVMSContext(), foundfile.c_str(), stype));
+    shared_ptr<IStream> result(backendSceneData->ReadFile(GetPOVMSContext(), foundfile.c_str(), stype));
 
-    if((result == NULL) && (err_flag == true))
+    if((result == nullptr) && (err_flag == true))
         PossibleError("Cannot open file '%s'.", UCS2toASCIIString(foundfile).c_str());
 
     buffer = foundfile;
@@ -11118,9 +11118,9 @@ Image *Parser::Read_Image(int filetype, const UCS2 *filename, const Image::ReadO
             throw POV_EXCEPTION(kDataTypeErr, "Unknown file type.");
     }
 
-    boost::scoped_ptr<IStream> file(Locate_File(filename, stype, ign, true));
+    shared_ptr<IStream> file = Locate_File(filename, stype, ign, true);
 
-    if(file == NULL)
+    if(file == nullptr)
         throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot find image file.");
 
     return Image::Read(type, file.get(), options);
@@ -11137,10 +11137,10 @@ RGBFTColour *Parser::Create_Colour ()
 
 RGBFTColour *Parser::Copy_Colour (const RGBFTColour* Old)
 {
-    if (Old != NULL)
+    if (Old != nullptr)
         return new RGBFTColour(*Old);
     else
-        return NULL;
+        return nullptr;
 }
 
 void Parser::SignalProgress(POV_LONG elapsedTime, POV_LONG tokenCount)

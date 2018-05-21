@@ -56,6 +56,7 @@
 
 #include "parser/fncode.h"
 #include "parser/reservedwords.h"
+#include "parser/rawtokenizer.h"
 
 #include "backend/support/task.h"
 
@@ -89,8 +90,6 @@ const int MAX_NUMBER_OF_TABLES = 100;
 const int TOKEN_OVERFLOW_RESET_COUNT = 2500;
 const int MAX_PARAMETER_LIST = 56;
 
-const int MAX_INCLUDE_FILES = 32;
-
 const int COND_STACK_SIZE = 200;
 
 // needs to be a power of two
@@ -116,7 +115,7 @@ struct Sym_Table_Entry
     char *Token_Name;           ///< Symbol name
     char *Deprecation_Message;  ///< Warning to print if the symbol is deprecated
     void *Data;                 ///< Reference to the symbol value
-    TOKEN Token_Number;         ///< Unique ID of this symbol
+    TokenId Token_Number;       ///< Unique ID of this symbol
     bool deprecated      : 1;
     bool deprecatedOnce  : 1;
     bool deprecatedShown : 1;
@@ -131,9 +130,9 @@ struct Sym_Table_Entry
   makes the code easier to read. */
 
 #define EXPECT { int Exit_Flag; Exit_Flag = false; \
-    while (!Exit_Flag) {Get_Token();  switch (Token.Token_Id) {
+    while (!Exit_Flag) {Get_Token();  switch (mToken.Token_Id) {
 #define EXPECT_ONE { int Exit_Flag; Exit_Flag = false; \
-    {Get_Token();  switch (Token.Token_Id) {
+    {Get_Token();  switch (mToken.Token_Id) {
 #define CASE(x) case x:
 #define CASE2(x, y) case x: case y:
 #define CASE3(x, y, z) case x: case y: case z:
@@ -144,8 +143,8 @@ struct Sym_Table_Entry
 #define EXIT Exit_Flag = true;
 #define OTHERWISE default:
 #define END_EXPECT } } }
-#define GET(x) Get_Token(); if (Token.Token_Id != x) Parse_Error (x);
-#define ALLOW(x) Get_Token(); if (Token.Token_Id != x) Unget_Token();
+#define GET(x) Get_Token(); if (mToken.Token_Id != x) Parse_Error (x);
+#define ALLOW(x) Get_Token(); if (mToken.Token_Id != x) Unget_Token();
 #define UNGET Unget_Token();
 
 #define CASE_FLOAT CASE2 (LEFT_PAREN_TOKEN,FLOAT_FUNCT_TOKEN)\
@@ -234,38 +233,40 @@ class Parser : public SceneTask
         // tokenize.h/tokenize.cpp
 
         /// Structure holding information about the current token
-        struct Token_Struct
+        struct Token_Struct : MessageContext
         {
-            TOKEN Token_Id;                                 ///< reserved token (or token group) ID, or unique identifier ID
-            TOKEN Function_Id;                              ///< token type ID, in case Token_Id is an identifier ID
-            pov_base::ITextStream::FilePos Token_File_Pos;  ///< location of this token in the scene or include file (line number & file position)
-            int Token_Col_No;                               ///< location of this token in the scene or include file (column)
+            RawToken raw;
+            ConstSourcePtr sourceFile;
+            TokenId Token_Id;                               ///< reserved token (or token group) ID, or unique identifier ID
+            TokenId Function_Id;                            ///< token type ID, in case Token_Id is an identifier ID
             int context;                                    ///< context the token is local to (i.e., table index)
-            char *Token_String;                             ///< reference to token value (if it is a string literal) or character sequence comprising the token
             DBL Token_Float;                                ///< token value (if it is a float literal)
             int Unget_Token, End_Of_File;
-            pov_base::ITextStream *FileHandle;              ///< location of this token in the scene or include file (file)
             void *Data;                                     ///< reference to token value (if it is a non-float identifier)
-            int *NumberPtr;
+            TokenId *NumberPtr;
             void **DataPtr;
             SYM_TABLE *table;                               ///< table or dictionary the token references an element of
             bool is_array_elem          : 1;                ///< true if token is actually an array element reference
             bool is_mixed_array_elem    : 1;                ///< true if token is actually a mixed-type array element reference
             bool is_dictionary_elem     : 1;                ///< true if token is actually a dictionary element reference
-            bool freeString             : 1;                ///< true if Token_String must be freed before being assigned a new value
+
+            virtual UCS2String GetFileName() const override { return sourceFile->Name(); }
+            virtual POV_LONG GetLine() const override { return raw.lexeme.position.line; }
+            virtual POV_LONG GetColumn() const override { return raw.lexeme.position.column; }
+            virtual POV_LONG GetOffset() const override { return raw.lexeme.position.offset; }
         };
 
         struct LValue
         {
-            int*         numberPtr;
+            TokenId*     numberPtr;
             void**       dataPtr;
-            int          previous;
+            TokenId      previous;
             SYM_ENTRY*   symEntry;
             bool         allowRedefine : 1;
             bool         optional      : 1;
         };
 
-        Token_Struct Token;
+        Token_Struct mToken;
 
         struct MacroParameter
         {
@@ -278,10 +279,8 @@ class Parser : public SceneTask
             Macro(const char *);
             ~Macro();
             char *Macro_Name;
-            UCS2 *Macro_Filename;
-            pov_base::ITextStream::FilePos Macro_File_Pos;
-            int Macro_File_Col;
-            POV_OFF_T Macro_End; ///< The position _after_ the `#` in the terminating `#end` directive.
+            RawTokenizer::ColdBookmark source;
+            LexemePosition endPosition; ///< The position _after_ the `#` in the terminating `#end` directive.
             vector<MacroParameter> parameters;
             unsigned char *Cache;
             size_t CacheSize;
@@ -289,24 +288,25 @@ class Parser : public SceneTask
 
         struct POV_ARRAY
         {
-            int Dims, Type;
+            int Dims;
+            TokenId Type;
             int Sizes[5];
             int Mags[5];
             vector<void*> DataPtrs;
-            vector<int> Types;
+            vector<TokenId> Types;
             bool resizable;
         };
 
         struct POV_PARAM
         {
-            int *NumberPtr;
+            TokenId *NumberPtr;
             void **DataPtr;
         };
 
         struct DATA_FILE
         {
-            pov_base::ITextStream *In_File;
-            pov_base::OTextStream *Out_File;
+            shared_ptr<pov_base::ITextStream> In_File;
+            shared_ptr<pov_base::OTextStream> Out_File;
             bool busyParsing    : 1; ///< `true` if parsing a statement related to the file, `false` otherwise.
             bool R_Flag         : 1;
         };
@@ -324,24 +324,24 @@ class Parser : public SceneTask
         inline TraceThreadData *GetParserDataPtr() { return reinterpret_cast<TraceThreadData *>(GetDataPtr()); }
 
         // parse.h/parse.cpp
-        void Parse_Error (TOKEN Token_Id);
+        void Parse_Error (TokenId Token_Id);
         void Found_Instead_Error (const char *exstr, const char *extokstr);
-        bool Parse_Begin (TOKEN tokenId, bool mandatory);
-        void Parse_End (TOKEN tokenId);
+        bool Parse_Begin (TokenId tokenId, bool mandatory);
+        void Parse_End (TokenId openTokenId, TokenId expectTokenId);
         inline bool Parse_Begin (bool mandatory = true) { return Parse_Begin(LEFT_CURLY_TOKEN, mandatory); }
-        inline void Parse_End (void) { Parse_End(RIGHT_CURLY_TOKEN); }
+        inline void Parse_End (void) { Parse_End(LEFT_CURLY_TOKEN, RIGHT_CURLY_TOKEN); }
         inline bool Parse_Paren_Begin (bool mandatory = true) { return Parse_Begin(LEFT_PAREN_TOKEN, mandatory); }
-        inline void Parse_Paren_End (void) { Parse_End(RIGHT_PAREN_TOKEN); }
+        inline void Parse_Paren_End (void) { Parse_End(LEFT_PAREN_TOKEN, RIGHT_PAREN_TOKEN); }
         inline bool Parse_Angle_Begin (bool mandatory = true) { return Parse_Begin(LEFT_ANGLE_TOKEN, mandatory); }
-        inline void Parse_Angle_End (void) { Parse_End(RIGHT_ANGLE_TOKEN); }
+        inline void Parse_Angle_End (void) { Parse_End(LEFT_ANGLE_TOKEN, RIGHT_ANGLE_TOKEN); }
         inline bool Parse_Square_Begin (bool mandatory = true) { return Parse_Begin(LEFT_SQUARE_TOKEN, mandatory); }
-        inline void Parse_Square_End (void) { Parse_End(RIGHT_SQUARE_TOKEN); }
+        inline void Parse_Square_End (void) { Parse_End(LEFT_SQUARE_TOKEN, RIGHT_SQUARE_TOKEN); }
         bool Parse_Comma (void);
-        bool Peek_Token (TOKEN tokenId);
+        bool Peek_Token (TokenId tokenId);
         void Parse_Semi_Colon (bool force_semicolon);
         void Destroy_Frame (void);
         void MAError (const char *str, long size);
-        void Warn_State (TOKEN Token_Id, TOKEN Type);
+        void Warn_State (TokenId Token_Id, TokenId Type);
         void Only_In (const char *s1,const char *s2);
         void Not_With (const char *s1,const char *s2);
         void Warn_Compat (bool definite, const char *sym);
@@ -357,13 +357,13 @@ class Parser : public SceneTask
         void Parse_Matrix (MATRIX Matrix);
         void Destroy_Ident_Data (void *Data, int Type);
         bool PassParameterByReference (int oldTableIndex);
-        bool Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTRY *sym, bool ParFlag, bool SemiFlag, bool is_local, bool allow_redefine, bool allowUndefined, int old_table_index);
-        const char *Get_Token_String (TOKEN Token_Id);
-        void Test_Redefine(TOKEN Previous, TOKEN *NumberPtr, void *Data, bool allow_redefine = true);
+        bool Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr, SYM_ENTRY *sym, bool ParFlag, bool SemiFlag, bool is_local, bool allow_redefine, bool allowUndefined, int old_table_index);
+        const char *Get_Token_String (TokenId Token_Id);
+        void Test_Redefine(TokenId Previous, TokenId *NumberPtr, void *Data, bool allow_redefine = true);
         void Expectation_Error(const char *);
         void *Copy_Identifier(void *Data, int Type);
-        TRANSFORM *Parse_Transform(TRANSFORM *Trans = NULL);
-        TRANSFORM *Parse_Transform_Block(TRANSFORM *New = NULL);
+        TRANSFORM *Parse_Transform(TRANSFORM *Trans = nullptr);
+        TRANSFORM *Parse_Transform_Block(TRANSFORM *New = nullptr);
         char *Get_Reserved_Words (const char *additional_words);
 
         void SendFatalError(Exception& e);
@@ -373,7 +373,8 @@ class Parser : public SceneTask
         void VersionWarning(unsigned int sinceVersion, const char *format,...);
         void PossibleError(const char *format,...);
         void Error(const char *format,...);
-        void ErrorInfo(const SourceInfo& loc, const char *format,...);
+        void Error(const MessageContext& loc, const char *format, ...);
+        void ErrorInfo(const MessageContext& loc, const char *format,...);
 
         int Debug_Info(const char *format,...);
         void FlushDebugMessageBuffer();
@@ -384,7 +385,7 @@ class Parser : public SceneTask
 
         /// @param[in]  formalFileName  Name by which the file is known to the user.
         /// @param[out] actualFileName  Name by which the file is known to the parsing computer.
-        IStream *Locate_File(const UCS2String& formalFileName, unsigned int stype, UCS2String& actualFileName, bool err_flag = false);
+        shared_ptr<IStream> Locate_File(const UCS2String& formalFileName, unsigned int stype, UCS2String& actualFileName, bool err_flag = false);
 
         OStream *CreateFile(const UCS2String& filename, unsigned int stype, bool append);
         Image *Read_Image(int filetype, const UCS2 *filename, const Image::ReadOptions& options);
@@ -392,20 +393,17 @@ class Parser : public SceneTask
         // tokenize.h/tokenize.cpp
         void Get_Token (void);
         void Unget_Token (void);
-        void Read_String_Literal(void);
-        void Where_Error (POVMSObjectPtr msg);
-        void Where_Warning (POVMSObjectPtr msg);
         void Parse_Directive (int After_Hash);
         void Open_Include (void);
         void IncludeHeader(const UCS2String& temp);
         void pre_init_tokenizer (void);
         void Initialize_Tokenizer (void);
         void Terminate_Tokenizer (void);
-        SYM_ENTRY *Add_Symbol (SYM_TABLE *table, const char *Name,TOKEN Number);
-        SYM_ENTRY *Add_Symbol (int Index,const char *Name,TOKEN Number);
+        SYM_ENTRY *Add_Symbol (SYM_TABLE *table, const char *Name,TokenId Number);
+        SYM_ENTRY *Add_Symbol (int Index,const char *Name,TokenId Number);
         POV_ARRAY *Parse_Array_Declare (void);
         SYM_TABLE *Parse_Dictionary_Declare();
-        SYM_ENTRY *Create_Entry (const char *Name, TOKEN Number, bool copyName);
+        SYM_ENTRY *Create_Entry (const char *Name, TokenId Number, bool copyName);
         SYM_ENTRY *Copy_Entry (const SYM_ENTRY *);
         void Acquire_Entry_Reference (SYM_ENTRY *Entry);
         void Release_Entry_Reference (SYM_TABLE *table, SYM_ENTRY *Entry);
@@ -452,22 +450,22 @@ class Parser : public SceneTask
         DBL Allow_Float (DBL defval);
 
         /// Parses a FLOAT as an integer value.
-        int Parse_Int(const char* parameterName = NULL);
+        int Parse_Int(const char* parameterName = nullptr);
 
         /// Parses a FLOAT as an integer value with a given minimum.
-        int Parse_Int_With_Minimum(int minValue, const char* parameterName = NULL);
+        int Parse_Int_With_Minimum(int minValue, const char* parameterName = nullptr);
 
         /// Parses a FLOAT as an integer value with a given range.
-        int Parse_Int_With_Range(int minValue, int maxValue, const char* parameterName = NULL);
+        int Parse_Int_With_Range(int minValue, int maxValue, const char* parameterName = nullptr);
 
         /// Parses a FLOAT as a boolean value.
-        bool Parse_Bool(const char* parameterName = NULL);
+        bool Parse_Bool(const char* parameterName = nullptr);
 
         int Allow_Vector (Vector3d& Vect);
         void Parse_UV_Vect (Vector2d& UV_Vect);
         void Parse_Vector (Vector3d& Vector);
         void Parse_Vector4D (VECTOR_4D Vector);
-        int Parse_Unknown_Vector (EXPRESS& Express, bool allow_identifier = false, bool *had_identifier = NULL);
+        int Parse_Unknown_Vector (EXPRESS& Express, bool allow_identifier = false, bool *had_identifier = nullptr);
         void Parse_Scale_Vector (Vector3d& Vector);
         DBL Parse_Float_Param (void);
         void Parse_Float_Param2 (DBL *Val1, DBL *Val2);
@@ -480,7 +478,7 @@ class Parser : public SceneTask
         FUNCTION_PTR Parse_FunctionContent(void);
         FUNCTION_PTR Parse_FunctionOrContent(void);
         void Parse_FunctionOrContentList(GenericScalarFunctionPtr* apFn, unsigned int count, bool mandatory = true);
-        FUNCTION_PTR Parse_DeclareFunction(int *token_id, const char *fn_name, bool is_local);
+        FUNCTION_PTR Parse_DeclareFunction(TokenId *token_id, const char *fn_name, bool is_local);
         intrusive_ptr<FunctionVM> GetFunctionVM() const;
 
         // parsestr.h/parsestr.cpp
@@ -516,10 +514,15 @@ class Parser : public SceneTask
 
     private:
 
-        struct BraceStackEntry
+        struct BraceStackEntry : LexemePosition, MessageContext
         {
-            TOKEN       openToken;
-            SourceInfo  sourceInfo;
+            TokenId         openToken;
+            ConstSourcePtr  file;
+            BraceStackEntry(const Token_Struct& token) : LexemePosition(token.raw.lexeme.position), openToken(token.Token_Id), file(token.sourceFile) {}
+            virtual UCS2String GetFileName() const override { return file->Name(); }
+            virtual POV_LONG GetLine() const override { return line; }
+            virtual POV_LONG GetColumn() const override { return column; }
+            virtual POV_LONG GetOffset() const override { return offset; }
         };
 
         intrusive_ptr<FunctionVM> mpFunctionVM;
@@ -575,14 +578,6 @@ class Parser : public SceneTask
 
         int Table_Index;
 
-        char String_Fast_Buffer[MAX_STRING_LEN_FAST];
-
-        int String_Index;
-        int String_Buffer_Free;
-
-        char *String;
-        char *String2;
-
         POV_LONG last_progress;
 
         POV_LONG Current_Token_Count; // This variable really counts tokens! [trf]
@@ -591,42 +586,35 @@ class Parser : public SceneTask
 
         int line_count;
 
-        struct InputFileData
-        {
-            pov_base::ITextStream *In_File;
-            bool R_Flag;
-        };
+        bool readingExternalFile;
 
-        int Include_File_Index;
-        InputFileData *Input_File;
-        InputFileData Include_Files[MAX_INCLUDE_FILES];
-
-        int Echo_Indx;
+        vector<RawTokenizer::HotBookmark> maIncludeStack;
 
         struct CS_ENTRY
         {
             COND_TYPE Cond_Type;
             DBL Switch_Value;
-            pov_base::ITextStream *Loop_File;
-            pov_base::ITextStream *Macro_File;
-            const UCS2 *Macro_Return_Name;
-            int Macro_Return_Col;
+            RawTokenizer::HotBookmark returnToBookmark;
             bool Macro_Same_Flag;
             bool Switch_Case_Ok_Flag;
             Macro *PMac;
-            pov_base::ITextStream::FilePos File_Pos;
             char* Loop_Identifier;
             DBL For_Loop_End;
             DBL For_Loop_Step;
+            CS_ENTRY() : Cond_Type(BUSY_COND), PMac(nullptr), Loop_Identifier(nullptr) {}
+            ~CS_ENTRY() { POV_PARSER_ASSERT(Loop_Identifier == nullptr); }
         };
 
-        CS_ENTRY *Cond_Stack;
-        int CS_Index;
+        vector<CS_ENTRY> Cond_Stack;
         bool Skipping, Inside_Ifdef, Inside_MacroDef, Parsing_Directive, parseRawIdentifiers, parseOptionalRValue;
 
         bool Got_EOF; // WARNING: Changes to the use of this variable are very dangerous as it is used in many places assuming certain non-obvious side effects! [trf]
 
-        TOKEN Conversion_Util_Table[TOKEN_COUNT];
+        TokenId Conversion_Util_Table[TOKEN_COUNT];
+
+        RawTokenizer    mTokenizer;
+        RawToken        mPendingRawToken;
+        bool            mHavePendingRawToken;
 
         // parstxtr.h/parstxtr.cpp
         TEXTURE *Default_Texture;
@@ -716,22 +704,10 @@ class Parser : public SceneTask
         void SignalProgress(POV_LONG elapsedTime, POV_LONG tokenCount);
 
         // tokenize.h/tokenize.cpp
-        void Echo_ungetc (int c);
-        int Echo_getc (void);
-        /// Advance to the next non-whitespace character.
-        bool Skip_Spaces (void);
-        /// Advance to the next hash sign.
-        /// Hash signs inside comments or strings are ignored.
-        bool SkipToDirective(void);
-        int Parse_C_Comments (void);
-        inline void Begin_String (void);
-        inline void Stuff_Character (int c);
-        inline void End_String (void);
-        inline void Begin_String_Fast (void);
-        inline void Stuff_Character_Fast (int c);
-        inline void End_String_Fast (void);
-        bool Read_Float (void);
-        void Read_Symbol (void);
+        void UngetRawToken(const RawToken& rawToken);
+        bool GetRawToken(RawToken& rawToken, bool fastForwardToDirective);
+        bool PeekRawToken(RawToken& rawToken);
+        void Read_Symbol(const RawToken& rawToken);
         SYM_ENTRY *Find_Symbol (const SYM_TABLE *table, const char *s, int hash);
         SYM_ENTRY *Find_Symbol (const SYM_TABLE *table, const char *s);
         SYM_ENTRY *Find_Symbol (int index, const char *s);
@@ -740,7 +716,8 @@ class Parser : public SceneTask
         void Break (void);
 
         int get_hash_value (const char *s);
-        inline void Write_Token (TOKEN Token_Id, int col, SYM_TABLE *table = NULL);
+        inline void Write_Token(const RawToken& rawToken, SYM_TABLE *table = nullptr);
+        inline void Write_Token(TokenId Token_Id, const RawToken& rawToken, SYM_TABLE *table = nullptr);
         void Destroy_Table (int index);
         void init_sym_tables (void);
         void Add_Sym_Table ();
@@ -760,7 +737,7 @@ class Parser : public SceneTask
         void Parse_Fclose(void);
         void Parse_Read(void);
         void Parse_Write(void);
-        int Parse_Read_Value(DATA_FILE *User_File,int Previous,int *NumberPtr,void **DataPtr);
+        int Parse_Read_Value(DATA_FILE *User_File, TokenId Previous, TokenId *NumberPtr, void **DataPtr);
         void Check_Macro_Vers(void);
         DBL Parse_Cond_Param(void);
         void Parse_Cond_Param2(DBL *V1,DBL *V2);
@@ -847,7 +824,7 @@ class Parser : public SceneTask
         void FNSyntax_DeleteExpression(ExprNode *);
 
         ExprNode *parse_expr();
-        TOKEN expr_get_token();
+        TokenId expr_get_token();
         ExprNode *new_expr_node(int stage, int op);
 
         void optimise_expr(ExprNode *node);

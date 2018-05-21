@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -285,7 +285,29 @@ enum StringEncoding
     kStringEncoding_System = 2
 };
 
-typedef std::string UTF8String;
+/// Type holding an @glossary{UTF8}-encoded string of characters.
+///
+/// @todo
+///     Aliasing this as `std::string` may not be ideal, as it creates ambiguity
+///     with the use of that same type for ASCII strings. On the other hand,
+///     if we use `std::basic_string<unsigned char>`, it isn't compatible with
+///     the C++11 `u8"..."` UTF-8 string literal notation, which is of type
+///     `const char[]`.
+///
+using UTF8String = std::string;
+
+/// Type holding an @glossary{UCS2}-encoded string of characters.
+///
+/// @todo
+///     UCS-2 is a poor choice for internal string representation, as it cannot
+///     encode the full UCS/Unicode character set; we should use either UTF-8
+///     (the best space saver for the strings to be expected), or UTF-32
+///     (allowing easiest processing). We shouldn't use UTF-16, as it needs
+///     about just as much special processing as UTF-8 (but people tend to
+///     forget that, confusing UTF-16 with UCS-2), and for the expected typical
+///     ASCII-heavy use it is less memory-efficient than UTF-8.
+///
+using UCS2String = std::basic_string<UCS2>;
 
 enum GammaMode
 {

@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -463,7 +463,7 @@ const Opcode POVFPU_Opcodes[] =
     { "push",  OPCODE_PUSH,   ITYPE_J },
     { "pop",   OPCODE_POP,    ITYPE_J },
     { "nop",   OPCODE_NOP,    ITYPE_X },
-    { NULL,    0, 0 }
+    { nullptr, 0, 0 }
 };
 
 const Sys1 POVFPU_Sys1Table[] =
@@ -487,7 +487,7 @@ const Sys1 POVFPU_Sys1Table[] =
     log,            // 16
     log10,          // 17
     math_int,       // 18
-    NULL
+    nullptr
 };
 
 const Sys2 POVFPU_Sys2Table[] =
@@ -496,7 +496,7 @@ const Sys2 POVFPU_Sys2Table[] =
     atan2,          // 1
     fmod,           // 2
     math_div,       // 3
-    NULL
+    nullptr
 };
 
 
@@ -1130,13 +1130,13 @@ void POVFPU_Exception(FPUContext *context, FUNCTION fn, const char *msg)
 {
     vector<FunctionEntry>& functions(context->functionvm->functions);
 
-    if(functions[fn].fn.sourceInfo.name != NULL)
+    if(!functions[fn].fn.sourceInfo.name.empty())
     {
-        if(msg != NULL)
-;// TODO MESSAGE            ErrorAt(functions[fn].fn.filename, functions[fn].fn.filepos.lineno, functions[fn].fn.filepos.offset,
+        if(msg != nullptr)
+;// TODO MESSAGE            ErrorAt(functions[fn].fn.sourceInfo,
 //                  "Runtime error detected in function '%s'. %s", functions[fn].fn.name, msg);
         else
-;// TODO MESSAGE            ErrorAt(functions[fn].fn.filename, functions[fn].fn.filepos.lineno, functions[fn].fn.filepos.offset,
+;// TODO MESSAGE            ErrorAt(functions[fn].fn.sourceInfo,
 //                  "Floating-point exception detected in function '%s'. "
 //                  "Your function either attempted a division by zero, used a function outside its "
 //                  "domain or called an internal function with invalid parameters.",
@@ -1144,11 +1144,11 @@ void POVFPU_Exception(FPUContext *context, FUNCTION fn, const char *msg)
     }
     else
     {
-        if(msg != NULL)
-;// TODO MESSAGE            ErrorAt(functions[fn].fn.filename, functions[fn].fn.filepos.lineno, functions[fn].fn.filepos.offset,
+        if(msg != nullptr)
+;// TODO MESSAGE            ErrorAt(functions[fn].fn.sourceInfo,
 //                  "Runtime error detected in function. %s", msg);
         else
-;// TODO MESSAGE            ErrorAt(functions[fn].fn.filename, functions[fn].fn.filepos.lineno, functions[fn].fn.filepos.offset,
+;// TODO MESSAGE            ErrorAt(functions[fn].fn.sourceInfo,
 //                  "Floating-point exception detected in unnamed function. "
 //                  "Your function either attempted a division by zero, used a function outside its "
 //                  "domain or called an internal function with invalid parameters.");
@@ -1195,7 +1195,7 @@ DBL POVFPU_RunDefault(FPUContext *context, FUNCTION fn)
     DBL *dblstack = context->dblstackbase;
     unsigned int maxdblstacksize = context->maxdblstacksize;
     DBL r0, r1, r2, r3, r4, r5, r6, r7;
-    Instruction *program = NULL;
+    Instruction *program = nullptr;
     unsigned int k = 0;
     unsigned int pc = 0;
     unsigned int ccr = 0;
@@ -1496,44 +1496,34 @@ void FNCode_Delete(FunctionCode *f)
 {
     int i;
 
-    if(f->program != NULL)
+    if(f->program != nullptr)
     {
         POV_FREE(f->program);
-        f->program = NULL;
-    }
-    if(f->sourceInfo.name != NULL)
-    {
-        POV_FREE(f->sourceInfo.name);
-        f->sourceInfo.name = NULL;
-    }
-    if(f->sourceInfo.filename != NULL)
-    {
-        POV_FREE(f->sourceInfo.filename);
-        f->sourceInfo.filename = NULL;
+        f->program = nullptr;
     }
     for(i = 0; i < f->parameter_cnt; i++)
     {
-        if(f->parameter[i] != NULL)
+        if(f->parameter[i] != nullptr)
         {
             POV_FREE(f->parameter[i]);
-            f->parameter[i] = NULL;
+            f->parameter[i] = nullptr;
         }
     }
     for(i = 0; i < f->localvar_cnt; i++)
     {
-        if(f->localvar[i] != NULL)
+        if(f->localvar[i] != nullptr)
         {
             POV_FREE(f->localvar[i]);
-            f->localvar[i] = NULL;
+            f->localvar[i] = nullptr;
         }
     }
-    if(f->private_data != NULL)
+    if(f->private_data != nullptr)
     {
-        if(f->private_destroy_method != NULL)
+        if(f->private_destroy_method != nullptr)
             f->private_destroy_method(f->private_data);
         else
             POV_FREE(f->private_data);
-        f->private_data = NULL;
+        f->private_data = nullptr;
     }
 }
 
@@ -1541,8 +1531,8 @@ void FNCode_Delete(FunctionCode *f)
 
 FUNCTION_PTR FunctionVM::CopyFunction(FUNCTION_PTR pK)
 {
-    if (pK == NULL)
-        return NULL;
+    if (pK == nullptr)
+        return nullptr;
 
     FUNCTION_PTR ptr = (FUNCTION_PTR)POV_MALLOC(sizeof(FUNCTION), "Function ID");
 
@@ -1554,7 +1544,7 @@ FUNCTION_PTR FunctionVM::CopyFunction(FUNCTION_PTR pK)
 
 void FunctionVM::DestroyFunction(FUNCTION_PTR pK)
 {
-    if(pK != NULL)
+    if(pK != nullptr)
     {
         RemoveFunction(*pK);
         POV_FREE(pK);
@@ -1575,7 +1565,7 @@ FunctionVM::CustomFunction::~CustomFunction()
 
 GenericFunctionContextPtr FunctionVM::CustomFunction::AcquireContext(TraceThreadData* pThreadData)
 {
-    FPUContext* pContext = NULL;
+    FPUContext* pContext = nullptr;
     if (pThreadData->functionContextPool.empty())
         pContext = new FPUContext(mpVm.get(), pThreadData);
     else
@@ -1589,7 +1579,7 @@ GenericFunctionContextPtr FunctionVM::CustomFunction::AcquireContext(TraceThread
 void FunctionVM::CustomFunction::ReleaseContext(GenericFunctionContextPtr pGenericContext)
 {
     FPUContext* pContext = GetFPUContextPtr(pGenericContext);
-    POV_VM_ASSERT (pContext->threaddata != NULL);
+    POV_VM_ASSERT (pContext->threaddata != nullptr);
     pContext->threaddata->functionContextPool.push_back (pContext);
 }
 
@@ -1616,7 +1606,7 @@ GenericScalarFunctionPtr FunctionVM::CustomFunction::Clone() const
     return new CustomFunction(mpVm.get(), mpVm->CopyFunction(mpFn));
 }
 
-const SourceInfo* FunctionVM::CustomFunction::GetSourceInfo() const
+const CustomFunctionSourceInfo* FunctionVM::CustomFunction::GetSourceInfo() const
 {
     return &(mpVm->GetFunction(*mpFn)->sourceInfo);
 }
@@ -1625,7 +1615,7 @@ inline FPUContext* FunctionVM::CustomFunction::GetFPUContextPtr(GenericFunctionC
 {
 #if POV_VM_DEBUG
     FPUContext* pContext = dynamic_cast<FPUContext*>(pGenericContext);
-    POV_VM_ASSERT(pContext != NULL);
+    POV_VM_ASSERT(pContext != nullptr);
     return pContext;
 #else
     return static_cast<FPUContext*>(pGenericContext);

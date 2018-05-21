@@ -40,22 +40,21 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "parser/configparser.h"
 
+#include "parser/parsertypes.h"
+
 namespace pov_parser
 {
 
-using namespace pov;
-
 typedef struct Reserved_Word_Struct RESERVED_WORD;
-typedef int TOKEN;
 
 struct Reserved_Word_Struct
 {
-    TOKEN Token_Number;
+    TokenId Token_Number;
     const char *Token_Name;
 };
 
 // Token Definitions for Parser
-enum TOKEN_IDS
+enum TokenId : int
 {
     //------------------------------------------------------------------------------
     // Float Tokens.
@@ -732,8 +731,11 @@ enum TOKEN_IDS
     //------------------------------------------------------------------------------
     // End of list.
 
-    TOKEN_COUNT // Pseudo-Token to count the number of token identifiers.
+    TOKEN_COUNT_, // Pseudo-Token to count the number of token identifiers.
+    NOT_A_TOKEN = -1 // Pseudo-Token used to invalidate a token identifier variable.
 };
+
+constexpr int TOKEN_COUNT = int(TokenId::TOKEN_COUNT_);
 
 extern const RESERVED_WORD Reserved_Words[];
 

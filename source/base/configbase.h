@@ -51,6 +51,7 @@
 /// @defgroup PovBaseConfig Base Compile-Time Configuration
 /// @ingroup PovBase
 /// @ingroup PovConfig
+/// Compile-Time Configuration of the @ref PovBase.
 ///
 /// In addition to the configuration settings listed below, platform-specific compile-time
 /// configuration needs to define various symbols to have the same semantics as those of the same
@@ -358,15 +359,15 @@
 /// Data type used to represent individual UCS2 characters.
 ///
 /// This data type is used to represent characters from the UCS2 character set, i.e. the 16-bit
-/// Base Multilingual Plane subset of Unicode.
+/// Basic Multilingual Plane subset of Unicode.
 ///
-/// This should be an unsigned integer type at least 16 bits wide.
+/// This should be an unsigned character or integer type at least 16 bits wide.
 ///
 /// @note
 ///     For clarity, this data type should _not_ be used as the base type for UTF-16 encoded
 ///     full-fledged Unicode strings. Use @ref UTF16 instead.
 ///
-/// @note
+/// @todo
 ///     Currently, the actual type must be identical to that of @ref UTF16.
 ///
 /// @attention
@@ -374,16 +375,16 @@
 ///     @ref UTF16 instead.
 ///
 #ifndef UCS2
-    #define UCS2 POV_UINT16
+    #define UCS2 char16_t
 #endif
 
 /// @def UCS4
 /// Integer data type used to represent UCS4 or full-fledged Unicode characters.
 ///
-/// This should be an unsigned integer type at least 21 (sic!) bits wide.
+/// This should be an unsigned character or integer type at least 21 (sic!) bits wide.
 ///
 #ifndef UCS4
-    #define UCS4 POV_UINT32
+    #define UCS4 char32_t
 #endif
 
 /// @def UTF16
@@ -392,18 +393,18 @@
 ///
 /// @note
 ///     For clarity, this data type should _not_ be used to store regular UCS2 characters
-///     (16-bit Base Multilingual Plane subset of Unicode). For that purpose, use @ref UCS2
+///     (16-bit Basic Multilingual Plane subset of Unicode). For that purpose, use @ref UCS2
 ///     instead.
 ///
-/// @note
-///     Currently, the actual type must be identical to that of @ref UTF16.
+/// @todo
+///     Currently, the actual type must be identical to that of @ref UCS2.
 ///
 /// @attention
 ///     Some legacy portions of the code may improperly use @ref UCS2 where they should use this
 ///     type instead.
 ///
 #ifndef UTF16
-    #define UTF16 POV_UINT16
+    #define UTF16 UCS2
 #endif
 
 /// @def POV_LONG
@@ -561,7 +562,7 @@
 #endif
 
 #ifndef POV_FREE
-    #define POV_FREE(ptr)               do { pov_base::pov_free (static_cast<void *>(ptr), __FILE__, __LINE__); (ptr) = NULL; } while(false)
+    #define POV_FREE(ptr)               do { pov_base::pov_free (static_cast<void *>(ptr), __FILE__, __LINE__); (ptr) = nullptr; } while(false)
 #endif
 
 #ifndef POV_MEM_INIT
@@ -1003,6 +1004,15 @@ static_assert(
     #define POV_SAFEMATH_DEBUG POV_DEBUG
 #endif
 
+/// @def POV_STRING_DEBUG
+/// Enable run-time sanity checks for string handling.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_STRING_DEBUG
+    #define POV_STRING_DEBUG POV_DEBUG
+#endif
+
 /// @}
 ///
 //******************************************************************************
@@ -1087,6 +1097,12 @@ static_assert(
     #define POV_SAFEMATH_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
     #define POV_SAFEMATH_ASSERT(expr) POV_ASSERT_DISABLE(expr)
+#endif
+
+#if POV_STRING_DEBUG
+    #define POV_STRING_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_STRING_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #define M_TAU TWO_M_PI

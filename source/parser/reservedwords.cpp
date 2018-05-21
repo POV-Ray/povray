@@ -728,9 +728,9 @@ const RESERVED_WORD Reserved_Words[] = {
     { STRING_LITERAL_TOKEN,         "string literal" },
 
     //------------------------------------------------------------------------------
-    // End of list, marked by NULL token string.
+    // End of list, marked by TokenId TOKEN_COUNT_ and nullptr token string.
 
-    { TOKEN_COUNT,                  NULL }
+    { TOKEN_COUNT_,                 nullptr }
 };
 
 } // end of pov namespace

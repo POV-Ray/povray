@@ -16,7 +16,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -293,7 +293,7 @@ static int mem_check_tag(MEMNODE *node)
 {
     int isOK = false;
 
-    if (node != NULL)
+    if (node != nullptr)
         if (node->tag == MEMTAG_VALUE)
             isOK = true;
     return isOK;
@@ -490,9 +490,9 @@ void *pov_realloc(void *ptr, size_t size, const char *file, int line, const char
         memlist = node;
     else
         prev->next = node;
-    if (node->next != NULL)
+    if (node->next != nullptr)
         node->next->prev = node;
-    if (next != NULL)
+    if (next != nullptr)
         next->prev = node;
 #endif
 
@@ -595,11 +595,11 @@ void mem_release_all()
     totsize = 0;
 
 #if defined(MEM_TRACE)
-    if (p != NULL)
+    if (p != nullptr)
         f = New_OStream(MEM_LOG_FNAME, POV_File_Data_LOG, true);
 #endif
 
-    while (p != NULL)
+    while (p != nullptr)
     {
 #if defined(MEM_TRACE)
 
@@ -615,7 +615,7 @@ void mem_release_all()
             leak_msg = true;
         }
 
-        if (f != NULL)
+        if (f != nullptr)
             f->printf("File:%13s  Line:%4d  Size:%lu\n", p->file, p->line, (unsigned long)(p->size - NODESIZE - (MEM_GUARD_SIZE * 2)));
 #endif
 
@@ -625,7 +625,7 @@ void mem_release_all()
         FREE(tmp);
     }
 
-    if (f != NULL)
+    if (f != nullptr)
         delete f;
 
 //  if (totsize > 0)
@@ -679,10 +679,10 @@ static void remove_node(MEMNODE *node)
 #endif /* MEM_TAG */
 
     num_nodes--;
-    if (node->prev != NULL)
+    if (node->prev != nullptr)
         node->prev->next = node->next;
 
-    if (node->next != NULL)
+    if (node->next != nullptr)
         node->next->prev = node->prev;
 
     if (memlist == node)
@@ -721,10 +721,10 @@ char *pov_strdup(const char *s)
 /* A memmove routine for those systems that don't have one                  */
 /****************************************************************************/
 
-void *pov_memmove (void *dest, void  *src, size_t length)
+void *pov_memmove (void *dest, const void  *src, size_t length)
 {
-    char *csrc =reinterpret_cast<char *>(src);
-    char *cdest=reinterpret_cast<char *>(dest);
+    const char *csrc = reinterpret_cast<const char *>(src);
+    char *cdest = reinterpret_cast<char *>(dest);
 
     if (csrc < cdest && csrc + length >= cdest)
     {

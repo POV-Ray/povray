@@ -334,10 +334,10 @@ const BYTE tag_TTCFontFile[]    = "ttcf"; /* */
 ******************************************************************************/
 
 /* Byte order independent I/O routines (probably already in other routines) */
-SHORT readSHORT(IStream *infile, int line, const char *file);
-USHORT readUSHORT(IStream *infile, int line, const char *file);
-LONG readLONG(IStream *infile, int line, const char *file);
-ULONG readULONG(IStream *infile, int line, const char *file);
+SHORT readSHORT(IStream& infile, int line, const char *file);
+USHORT readUSHORT(IStream& infile, int line, const char *file);
+LONG readLONG(IStream& infile, int line, const char *file);
+ULONG readULONG(IStream& infile, int line, const char *file);
 int compare_tag4(BYTE *ttf_tag, BYTE *known_tag);
 
 /* Internal TTF input routines */
@@ -357,7 +357,7 @@ GlyphPtr ExtractGlyphInfo(TrueTypeFont *ffile, unsigned int glyph_index, unsigne
 GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index, unsigned int c);
 GlyphPtr ConvertOutlineToGlyph(TrueTypeFont *ffile, const GlyphOutline *ttglyph);
 
-SHORT readSHORT(IStream *infile, int line, const char *file)
+SHORT readSHORT(IStream& infile, int line, const char *file)
 {
     // On platforms using non-2's-complement representation for negative numbers, any approach
     // starting with a signed interpretation of the data is doomed to fail over those
@@ -375,11 +375,11 @@ SHORT readSHORT(IStream *infile, int line, const char *file)
         return SHORT(u);
 }
 
-USHORT readUSHORT(IStream *infile, int line, const char *file)
+USHORT readUSHORT(IStream& infile, int line, const char *file)
 {
     int i0, i1 = 0; /* To quiet warnings */
 
-    if ((i0  = infile->Read_Byte ()) == EOF || (i1  = infile->Read_Byte ()) == EOF)
+    if ((i0  = infile.Read_Byte ()) == EOF || (i1  = infile.Read_Byte ()) == EOF)
     {
         throw pov_base::Exception(__FUNCTION__, file, line, kFileDataErr, "Cannot read TrueType font file.");
     }
@@ -387,7 +387,7 @@ USHORT readUSHORT(IStream *infile, int line, const char *file)
     return (USHORT)((((USHORT)i0) << 8) | ((USHORT)i1));
 }
 
-LONG readLONG(IStream *infile, int line, const char *file)
+LONG readLONG(IStream& infile, int line, const char *file)
 {
     // On platforms using non-2's-complement representation for negative numbers, any approach
     // starting with a signed interpretation of the data is doomed to fail over those
@@ -405,12 +405,12 @@ LONG readLONG(IStream *infile, int line, const char *file)
         return LONG(u);
 }
 
-ULONG readULONG(IStream *infile, int line, const char *file)
+ULONG readULONG(IStream& infile, int line, const char *file)
 {
     int i0, i1 = 0, i2 = 0, i3 = 0;  /* To quiet warnings */
 
-    if ((i0 = infile->Read_Byte ()) == EOF || (i1 = infile->Read_Byte ()) == EOF ||
-        (i2 = infile->Read_Byte ()) == EOF || (i3 = infile->Read_Byte ()) == EOF)
+    if ((i0 = infile.Read_Byte ()) == EOF || (i1 = infile.Read_Byte ()) == EOF ||
+        (i2 = infile.Read_Byte ()) == EOF || (i3 = infile.Read_Byte ()) == EOF)
     {
         throw pov_base::Exception(__FUNCTION__, file, line, kFileDataErr, "Cannot read TrueType font file.");
     }
@@ -667,11 +667,7 @@ void TrueType::ProcessNewTTF(CSG *Object, TrueTypeFont *ffile, const UCS2 *text_
 #endif
 
     /* Close the font file descriptor */
-    if (ffile->fp != nullptr)
-    {
-        delete ffile->fp;
-        ffile->fp = nullptr;
-    }
+    ffile->file = nullptr;
 }
 
 /*****************************************************************************
@@ -731,34 +727,37 @@ void ProcessFontFile(TrueTypeFont* ffile)
         */
     switch(ffile->textEncoding)
     {
+        /// @todo Add support for alternative Unicode encoding IDs.
         case kStringEncoding_ASCII:
+            /// @todo Why this order of preference?
             // first choice
-            ffile->info->platformID[0] = 1;
-            ffile->info->specificID[0] = 0;
+            ffile->info->platformID[0] = 1; // Macintosh
+            ffile->info->specificID[0] = 0; // Roman
             // second choice
-            ffile->info->platformID[1] = 3;
-            ffile->info->specificID[1] = 1;
+            ffile->info->platformID[1] = 3; // Windows
+            ffile->info->specificID[1] = 1; // Unicode BMP
             // third choice
-            ffile->info->platformID[2] = 0;
-            ffile->info->specificID[2] = 3;
+            ffile->info->platformID[2] = 0; // Unicode
+            ffile->info->specificID[2] = 3; // Unicode 2.0+, BMP only
             // fourth choice
-            ffile->info->platformID[3] = 3;
-            ffile->info->specificID[3] = 0;
+            ffile->info->platformID[3] = 3; // Windows
+            ffile->info->specificID[3] = 0; // Symbol
             break;
         case kStringEncoding_UTF8:
         case kStringEncoding_System:
             // first choice
-            ffile->info->platformID[0] = 0;
-            ffile->info->specificID[0] = 3;
+            ffile->info->platformID[0] = 0; // Unicode
+            ffile->info->specificID[0] = 3; // Unicode 2.0+, BMP only
             // second choice
-            ffile->info->platformID[1] = 3;
-            ffile->info->specificID[1] = 1;
+            ffile->info->platformID[1] = 3; // Windows
+            ffile->info->specificID[1] = 1; // Unicode BMP
             // third choice
-            ffile->info->platformID[2] = 1;
-            ffile->info->specificID[2] = 0;
+            /// @todo If this is what we get, we should probably do some character re-mapping.
+            ffile->info->platformID[2] = 1; // Macintosh
+            ffile->info->specificID[2] = 0; // Roman
             // fourth choice
-            ffile->info->platformID[3] = 3;
-            ffile->info->specificID[3] = 0;
+            ffile->info->platformID[3] = 3; // Windows
+            ffile->info->specificID[3] = 0; // Symbol
             break;
     }
 
@@ -768,28 +767,28 @@ void ProcessFontFile(TrueTypeFont* ffile)
      */
     /// @compat
     /// This piece of code relies on BYTE having the same size as char.
-    if (!ffile->fp->read(reinterpret_cast<char *>(&temp_tag), sizeof(BYTE) * 4))
+    if (!ffile->file->read(reinterpret_cast<char *>(&temp_tag), sizeof(BYTE) * 4))
     {
         throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file table tag");
     }
     if (compare_tag4(temp_tag, tag_TTCFontFile))
     {
-        READFIXED(ffile->fp); // header version - ignored [trf]
-        READULONG(ffile->fp); // directory count - ignored [trf]
+        READFIXED(*ffile->file); // header version - ignored [trf]
+        READULONG(*ffile->file); // directory count - ignored [trf]
         // go to first font data block listed in the directory table entry [trf]
-        ffile->fp->seekg(READULONG(ffile->fp), IOBase::seek_set);
+        ffile->file->seekg(READULONG(*ffile->file), IOBase::seek_set);
     }
     else
     {
         // if it is no TTC style file, it is a regular TTF style file
-        ffile->fp->seekg(0, IOBase::seek_set);
+        ffile->file->seekg(0, IOBase::seek_set);
     }
 
-    OffsetTable.version = READFIXED(ffile->fp);
-    OffsetTable.numTables = READUSHORT(ffile->fp);
-    OffsetTable.searchRange = READUSHORT(ffile->fp);
-    OffsetTable.entrySelector = READUSHORT(ffile->fp);
-    OffsetTable.rangeShift = READUSHORT(ffile->fp);
+    OffsetTable.version = READFIXED(*ffile->file);
+    OffsetTable.numTables = READUSHORT(*ffile->file);
+    OffsetTable.searchRange = READUSHORT(*ffile->file);
+    OffsetTable.entrySelector = READUSHORT(*ffile->file);
+    OffsetTable.rangeShift = READUSHORT(*ffile->file);
 
 #ifdef TTF_DEBUG
     Debug_Info("OffsetTable:\n");
@@ -817,13 +816,13 @@ void ProcessFontFile(TrueTypeFont* ffile)
     {
         /// @compat
         /// This piece of code relies on BYTE having the same size as char.
-        if (!ffile->fp->read(reinterpret_cast<char *>(&Table.tag), sizeof(BYTE) * 4))
+        if (!ffile->file->read(reinterpret_cast<char *>(&Table.tag), sizeof(BYTE) * 4))
         {
             throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file table tag");
         }
-        Table.checkSum = READULONG(ffile->fp);
-        Table.offset   = READULONG(ffile->fp);
-        Table.length   = READULONG(ffile->fp);
+        Table.checkSum = READULONG(*ffile->file);
+        Table.offset   = READULONG(*ffile->file);
+        Table.length   = READULONG(*ffile->file);
 
 #ifdef TTF_DEBUG
         Debug_Info("\nTable %d:\n",i);
@@ -887,27 +886,27 @@ void ProcessHeadTable(TrueTypeFont *ffile, int head_table_offset)
     sfnt_FontHeader fontHeader;
 
     /* Read head table */
-    ffile->fp->seekg(head_table_offset);
+    ffile->file->seekg(head_table_offset);
 
-    fontHeader.version = READFIXED(ffile->fp);
-    fontHeader.fontRevision = READFIXED(ffile->fp);
-    fontHeader.checkSumAdjustment = READULONG(ffile->fp);
-    fontHeader.magicNumber = READULONG(ffile->fp);   /* should be 0x5F0F3CF5 */
-    fontHeader.flags = READUSHORT(ffile->fp);
-    fontHeader.unitsPerEm = READUSHORT(ffile->fp);
-    fontHeader.created.bc = READULONG(ffile->fp);
-    fontHeader.created.ad = READULONG(ffile->fp);
-    fontHeader.modified.bc = READULONG(ffile->fp);
-    fontHeader.modified.ad = READULONG(ffile->fp);
-    fontHeader.xMin = READFWORD(ffile->fp);
-    fontHeader.yMin = READFWORD(ffile->fp);
-    fontHeader.xMax = READFWORD(ffile->fp);
-    fontHeader.yMax = READFWORD(ffile->fp);
-    fontHeader.macStyle = READUSHORT(ffile->fp);
-    fontHeader.lowestRecPPEM = READUSHORT(ffile->fp);
-    fontHeader.fontDirectionHint = READSHORT(ffile->fp);
-    fontHeader.indexToLocFormat = READSHORT(ffile->fp);
-    fontHeader.glyphDataFormat = READSHORT(ffile->fp);
+    fontHeader.version = READFIXED(*ffile->file);
+    fontHeader.fontRevision = READFIXED(*ffile->file);
+    fontHeader.checkSumAdjustment = READULONG(*ffile->file);
+    fontHeader.magicNumber = READULONG(*ffile->file);   /* should be 0x5F0F3CF5 */
+    fontHeader.flags = READUSHORT(*ffile->file);
+    fontHeader.unitsPerEm = READUSHORT(*ffile->file);
+    fontHeader.created.bc = READULONG(*ffile->file);
+    fontHeader.created.ad = READULONG(*ffile->file);
+    fontHeader.modified.bc = READULONG(*ffile->file);
+    fontHeader.modified.ad = READULONG(*ffile->file);
+    fontHeader.xMin = READFWORD(*ffile->file);
+    fontHeader.yMin = READFWORD(*ffile->file);
+    fontHeader.xMax = READFWORD(*ffile->file);
+    fontHeader.yMax = READFWORD(*ffile->file);
+    fontHeader.macStyle = READUSHORT(*ffile->file);
+    fontHeader.lowestRecPPEM = READUSHORT(*ffile->file);
+    fontHeader.fontDirectionHint = READSHORT(*ffile->file);
+    fontHeader.indexToLocFormat = READSHORT(*ffile->file);
+    fontHeader.glyphDataFormat = READSHORT(*ffile->file);
 
 #ifdef TTF_DEBUG
     Debug_Info("\nfontHeader:\n");
@@ -947,7 +946,7 @@ void ProcessLocaTable(TrueTypeFont *ffile, int loca_table_offset)
     int i;
 
     /* Move to location of table in file */
-    ffile->fp->seekg(loca_table_offset);
+    ffile->file->seekg(loca_table_offset);
 
     ffile->info->loca_table = new ULONG[ffile->info->numGlyphs+1];
 
@@ -962,7 +961,7 @@ void ProcessLocaTable(TrueTypeFont *ffile, int loca_table_offset)
     {
         for (i = 0; i < ffile->info->numGlyphs; i++)
         {
-            ffile->info->loca_table[i] = ((ULONG)READUSHORT(ffile->fp)) << 1;
+            ffile->info->loca_table[i] = ((ULONG)READUSHORT(*ffile->file)) << 1;
 #ifdef TTF_DEBUG2
             Debug_Info("loca_table[%d] @ %u\n", i, ffile->info->loca_table[i]);
 #endif
@@ -972,7 +971,7 @@ void ProcessLocaTable(TrueTypeFont *ffile, int loca_table_offset)
     {
         for (i = 0; i < ffile->info->numGlyphs; i++)
         {
-            ffile->info->loca_table[i] = READULONG(ffile->fp);
+            ffile->info->loca_table[i] = READULONG(*ffile->file);
 #ifdef TTF_DEBUG2
             Debug_Info("loca_table[%d] @ %u\n", i, ffile->info->loca_table[i]);
 #endif
@@ -989,9 +988,9 @@ void ProcessLocaTable(TrueTypeFont *ffile, int loca_table_offset)
 void ProcessMaxpTable(TrueTypeFont *ffile, int maxp_table_offset)
 {
     /* seekg to the maxp table, skipping the 4 byte version number */
-    ffile->fp->seekg(maxp_table_offset + 4);
+    ffile->file->seekg(maxp_table_offset + 4);
 
-    ffile->info->numGlyphs = READUSHORT(ffile->fp);
+    ffile->info->numGlyphs = READUSHORT(*ffile->file);
 
 #ifdef TTF_DEBUG
     Debug_Info("\nmaximum profile table:\n");
@@ -1011,12 +1010,12 @@ void ProcessKernTable(TrueTypeFont *ffile, int kern_table_offset)
     kern_table = &ffile->info->kerning_tables;
 
     /* Move to the beginning of the kerning table, skipping the 2 byte version */
-    ffile->fp->seekg(kern_table_offset + 2);
+    ffile->file->seekg(kern_table_offset + 2);
 
     /* Read in the number of kerning tables */
 
-    kern_table->nTables = READUSHORT(ffile->fp);
-    kern_table->tables = NULL;      /*<==[esp] added (in case nTables is zero)*/
+    kern_table->nTables = READUSHORT(*ffile->file);
+    kern_table->tables = nullptr;      /*<==[esp] added (in case nTables is zero)*/
 
 #ifdef TTF_DEBUG
     Debug_Info("\nKerning table:\n", kern_table_offset);
@@ -1035,9 +1034,9 @@ void ProcessKernTable(TrueTypeFont *ffile, int kern_table_offset)
     {
         /* Read in a subtable */
 
-        temp16 = READUSHORT(ffile->fp);                      /* Subtable version */
-        length = READUSHORT(ffile->fp);                       /* Subtable length */
-        kern_table->tables[i].coverage = READUSHORT(ffile->fp); /* Coverage bits */
+        temp16 = READUSHORT(*ffile->file);                      /* Subtable version */
+        length = READUSHORT(*ffile->file);                       /* Subtable length */
+        kern_table->tables[i].coverage = READUSHORT(*ffile->file); /* Coverage bits */
 
 #ifdef TTF_DEBUG
         Debug_Info("Coverage table[%d] (0x%X):", i, kern_table->tables[i].coverage);
@@ -1052,30 +1051,30 @@ void ProcessKernTable(TrueTypeFont *ffile, int kern_table_offset)
                              " Override" : "" ));
 #endif
 
-        kern_table->tables[i].kern_pairs = NULL;   /*<==[esp] added*/
+        kern_table->tables[i].kern_pairs = nullptr;/*<==[esp] added*/
         kern_table->tables[i].nPairs = 0;          /*<==[esp] added*/
 
         if ((kern_table->tables[i].coverage >> 8) == 0)
         {
             /* Can only handle format 0 kerning subtables */
-            kern_table->tables[i].nPairs = READUSHORT(ffile->fp);
+            kern_table->tables[i].nPairs = READUSHORT(*ffile->file);
 
 #ifdef TTF_DEBUG
             Debug_Info("entries in table[%d]: %d\n", i, kern_table->tables[i].nPairs);
 #endif
 
-            temp16 = READUSHORT(ffile->fp);     /* searchRange */
-            temp16 = READUSHORT(ffile->fp);     /* entrySelector */
-            temp16 = READUSHORT(ffile->fp);     /* rangeShift */
+            temp16 = READUSHORT(*ffile->file);     /* searchRange */
+            temp16 = READUSHORT(*ffile->file);     /* entrySelector */
+            temp16 = READUSHORT(*ffile->file);     /* rangeShift */
 
             kern_table->tables[i].kern_pairs = new KernData[kern_table->tables[i].nPairs];
 
             for (j = 0; j < kern_table->tables[i].nPairs; j++)
             {
                 /* Read in a kerning pair */
-                kern_table->tables[i].kern_pairs[j].left = READUSHORT(ffile->fp);
-                kern_table->tables[i].kern_pairs[j].right = READUSHORT(ffile->fp);
-                kern_table->tables[i].kern_pairs[j].value = READFWORD(ffile->fp);
+                kern_table->tables[i].kern_pairs[j].left = READUSHORT(*ffile->file);
+                kern_table->tables[i].kern_pairs[j].right = READUSHORT(*ffile->file);
+                kern_table->tables[i].kern_pairs[j].value = READFWORD(*ffile->file);
 
 #ifdef TTF_DEBUG2
                 Debug_Info("Kern pair: <%d,%d> = %d\n",
@@ -1095,7 +1094,7 @@ void ProcessKernTable(TrueTypeFont *ffile, int kern_table_offset)
              * seekg to the end of this table, excluding the length of the version,
              * length, and coverage USHORTs, which we have already read.
              */
-            ffile->fp->seekg((int)(length - 6), IOBase::seek_cur);
+            ffile->file->seekg((int)(length - 6), IOBase::seek_cur);
             kern_table->tables[i].nPairs = 0;
         }
     }
@@ -1110,32 +1109,32 @@ void ProcessHheaTable(TrueTypeFont *ffile, int hhea_table_offset)
     sfnt_HorizHeader horizHeader;
 
     /* seekg to the hhea table */
-    ffile->fp->seekg(hhea_table_offset);
+    ffile->file->seekg(hhea_table_offset);
 
-    horizHeader.version = READFIXED(ffile->fp);
-    horizHeader.Ascender = READFWORD(ffile->fp);
-    horizHeader.Descender = READFWORD(ffile->fp);
-    horizHeader.LineGap = READFWORD(ffile->fp);
-    horizHeader.advanceWidthMax = READUFWORD(ffile->fp);
-    horizHeader.minLeftSideBearing = READFWORD(ffile->fp);
-    horizHeader.minRightSideBearing = READFWORD(ffile->fp);
-    horizHeader.xMaxExtent = READFWORD(ffile->fp);
-    horizHeader.caretSlopeRise = READSHORT(ffile->fp);
-    horizHeader.caretSlopeRun = READSHORT(ffile->fp);
-    horizHeader.reserved1 = READSHORT(ffile->fp);
-    horizHeader.reserved2 = READSHORT(ffile->fp);
-    horizHeader.reserved3 = READSHORT(ffile->fp);
-    horizHeader.reserved4 = READSHORT(ffile->fp);
-    horizHeader.reserved5 = READSHORT(ffile->fp);
-    horizHeader.metricDataFormat = READSHORT(ffile->fp);
+    horizHeader.version = READFIXED(*ffile->file);
+    horizHeader.Ascender = READFWORD(*ffile->file);
+    horizHeader.Descender = READFWORD(*ffile->file);
+    horizHeader.LineGap = READFWORD(*ffile->file);
+    horizHeader.advanceWidthMax = READUFWORD(*ffile->file);
+    horizHeader.minLeftSideBearing = READFWORD(*ffile->file);
+    horizHeader.minRightSideBearing = READFWORD(*ffile->file);
+    horizHeader.xMaxExtent = READFWORD(*ffile->file);
+    horizHeader.caretSlopeRise = READSHORT(*ffile->file);
+    horizHeader.caretSlopeRun = READSHORT(*ffile->file);
+    horizHeader.reserved1 = READSHORT(*ffile->file);
+    horizHeader.reserved2 = READSHORT(*ffile->file);
+    horizHeader.reserved3 = READSHORT(*ffile->file);
+    horizHeader.reserved4 = READSHORT(*ffile->file);
+    horizHeader.reserved5 = READSHORT(*ffile->file);
+    horizHeader.metricDataFormat = READSHORT(*ffile->file);
 #else
 
     /* seekg to the hhea table, skipping all that stuff we don't need */
-    ffile->fp->seekg (hhea_table_offset + 34);
+    ffile->file->seekg (hhea_table_offset + 34);
 
 #endif
 
-    ffile->info->numberOfHMetrics = READUSHORT(ffile->fp);
+    ffile->info->numberOfHMetrics = READUSHORT(*ffile->file);
 
 #ifdef TTF_DEBUG
     Debug_Info("\nhorizontal header table:\n");
@@ -1159,7 +1158,7 @@ void ProcessHmtxTable (TrueTypeFont *ffile, int hmtx_table_offset)
     longHorMetric *metric;
     uFWord lastAW = 0;     /* Just to quiet warnings. */
 
-    ffile->fp->seekg (hmtx_table_offset);
+    ffile->file->seekg (hmtx_table_offset);
 
     ffile->info->hmtx_table = new longHorMetric[ffile->info->numGlyphs];
 
@@ -1170,15 +1169,15 @@ void ProcessHmtxTable (TrueTypeFont *ffile, int hmtx_table_offset)
      */
     for (i=0, metric=ffile->info->hmtx_table; i < ffile->info->numberOfHMetrics; i++,metric++)
     {
-        lastAW = metric->advanceWidth = READUFWORD(ffile->fp);
-        metric->lsb = READFWORD(ffile->fp);
+        lastAW = metric->advanceWidth = READUFWORD(*ffile->file);
+        metric->lsb = READFWORD(*ffile->file);
     }
 
     /* Read in the remaining left offsets */
     for (; i < ffile->info->numGlyphs; i++, metric++)
     {
         metric->advanceWidth = lastAW;
-        metric->lsb = READFWORD(ffile->fp);
+        metric->lsb = READFWORD(*ffile->file);
     }
 }
 
@@ -1291,9 +1290,9 @@ USHORT ProcessCharMap(TrueTypeFont *ffile, unsigned int search_char)
     int i, j, table_count;
 
     /* Move to the start of the character map, skipping the 2 byte version */
-    ffile->fp->seekg (ffile->info->cmap_table_offset + 2);
+    ffile->file->seekg (ffile->info->cmap_table_offset + 2);
 
-    table_count = READUSHORT(ffile->fp);
+    table_count = READUSHORT(*ffile->file);
 
     #ifdef TTF_DEBUG
     Debug_Info("table_count=%d\n", table_count);
@@ -1304,17 +1303,17 @@ USHORT ProcessCharMap(TrueTypeFont *ffile, unsigned int search_char)
      * Just return the first one we find...
      */
 
-    initial_table_offset = ffile->fp->tellg (); /* Save the initial position */
+    initial_table_offset = ffile->file->tellg (); /* Save the initial position */
 
     for(j = 0; j <= 3; j++)
     {
-        ffile->fp->seekg(initial_table_offset); /* Always start new search at the initial position */
+        ffile->file->seekg(initial_table_offset); /* Always start new search at the initial position */
 
         for (i = 0; i < table_count; i++)
         {
-            cmapEntry.platformID = READUSHORT(ffile->fp);
-            cmapEntry.specificID = READUSHORT(ffile->fp);
-            cmapEntry.offset     = READULONG(ffile->fp);
+            cmapEntry.platformID = READUSHORT(*ffile->file);
+            cmapEntry.specificID = READUSHORT(*ffile->file);
+            cmapEntry.offset     = READULONG(*ffile->file);
 
             #ifdef TTF_DEBUG
             Debug_Info("cmapEntry: platformID=%d\n", cmapEntry.platformID);
@@ -1333,13 +1332,13 @@ USHORT ProcessCharMap(TrueTypeFont *ffile, unsigned int search_char)
 
             entry_offset = cmapEntry.offset;
 
-            old_table_offset = ffile->fp->tellg (); /* Save the current position */
+            old_table_offset = ffile->file->tellg (); /* Save the current position */
 
-            ffile->fp->seekg (ffile->info->cmap_table_offset + entry_offset);
+            ffile->file->seekg (ffile->info->cmap_table_offset + entry_offset);
 
-            encodingTable.format = READUSHORT(ffile->fp);
-            encodingTable.length = READUSHORT(ffile->fp);
-            encodingTable.version = READUSHORT(ffile->fp);
+            encodingTable.format = READUSHORT(*ffile->file);
+            encodingTable.length = READUSHORT(*ffile->file);
+            encodingTable.version = READUSHORT(*ffile->file);
 
             #ifdef TTF_DEBUG
             Debug_Info("Encoding table, format: %u, length: %u, version: %u\n",
@@ -1393,7 +1392,7 @@ USHORT ProcessCharMap(TrueTypeFont *ffile, unsigned int search_char)
             #endif
 
             /* Go to the next table entry if we didn't find a match */
-            ffile->fp->seekg (old_table_offset);
+            ffile->file->seekg (old_table_offset);
         }
     }
 
@@ -1438,11 +1437,11 @@ USHORT ProcessFormat0Glyph(TrueTypeFont *ffile, unsigned int search_char)
 {
     BYTE temp_index;
 
-    ffile->fp->seekg ((int)search_char, IOBase::seek_cur);
+    ffile->file->seekg ((int)search_char, IOBase::seek_cur);
 
     /// @compat
     /// This piece of code relies on BYTE having the same size as char.
-    if (!ffile->fp->read (reinterpret_cast<char *>(&temp_index), 1)) /* Each index is 1 byte */
+    if (!ffile->file->read (reinterpret_cast<char *>(&temp_index), 1)) /* Each index is 1 byte */
     {
         throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file.");
     }
@@ -1489,10 +1488,10 @@ USHORT ProcessFormat4Glyph(TrueTypeFont *ffile, unsigned int search_char)
     {
         USHORT temp16;
 
-        ffile->info->segCount = READUSHORT(ffile->fp) >> 1;
-        ffile->info->searchRange = READUSHORT(ffile->fp);
-        ffile->info->entrySelector = READUSHORT(ffile->fp);
-        ffile->info->rangeShift = READUSHORT(ffile->fp);
+        ffile->info->segCount = READUSHORT(*ffile->file) >> 1;
+        ffile->info->searchRange = READUSHORT(*ffile->file);
+        ffile->info->entrySelector = READUSHORT(*ffile->file);
+        ffile->info->rangeShift = READUSHORT(*ffile->file);
 
         /* Now allocate and read in the segment arrays */
 
@@ -1503,27 +1502,27 @@ USHORT ProcessFormat4Glyph(TrueTypeFont *ffile, unsigned int search_char)
 
         for (i = 0; i < ffile->info->segCount; i++)
         {
-            ffile->info->endCount[i] = READUSHORT(ffile->fp);
+            ffile->info->endCount[i] = READUSHORT(*ffile->file);
         }
 
-        temp16 = READUSHORT(ffile->fp);  /* Skip over 'reservedPad' */
+        temp16 = READUSHORT(*ffile->file);  /* Skip over 'reservedPad' */
 
         for (i = 0; i < ffile->info->segCount; i++)
         {
-            ffile->info->startCount[i] = READUSHORT(ffile->fp);
+            ffile->info->startCount[i] = READUSHORT(*ffile->file);
         }
 
         for (i = 0; i < ffile->info->segCount; i++)
         {
-            ffile->info->idDelta[i] = READUSHORT(ffile->fp);
+            ffile->info->idDelta[i] = READUSHORT(*ffile->file);
         }
 
         /* location of start of idRangeOffset */
-        ffile->info->glyphIDoffset = ffile->fp->tellg ();
+        ffile->info->glyphIDoffset = ffile->file->tellg ();
 
         for (i = 0; i < ffile->info->segCount; i++)
         {
-            ffile->info->idRangeOffset[i] = READUSHORT(ffile->fp);
+            ffile->info->idRangeOffset[i] = READUSHORT(*ffile->file);
         }
     }
 
@@ -1551,10 +1550,10 @@ glyph_search:
                      *
                      * (glyphIDoffset + i*2 + idRangeOffset[i]) == &idRangeOffset[i]
                      */
-                    ffile->fp->seekg (ffile->info->glyphIDoffset + 2*i + ffile->info->idRangeOffset[i]+
+                    ffile->file->seekg (ffile->info->glyphIDoffset + 2*i + ffile->info->idRangeOffset[i]+
                                      2*(search_char - ffile->info->startCount[i]));
 
-                    glyph_index = READUSHORT(ffile->fp);
+                    glyph_index = READUSHORT(*ffile->file);
 
                     if (glyph_index != 0)
                         glyph_index = glyph_index + ffile->info->idDelta[i];
@@ -1614,13 +1613,13 @@ USHORT ProcessFormat6Glyph(TrueTypeFont *ffile, unsigned int search_char)
     USHORT firstCode, entryCount;
     USHORT glyph_index;
 
-    firstCode = READUSHORT(ffile->fp);
-    entryCount = READUSHORT(ffile->fp);
+    firstCode = READUSHORT(*ffile->file);
+    entryCount = READUSHORT(*ffile->file);
 
     if (search_char >= firstCode && search_char < firstCode + entryCount)
     {
-        ffile->fp->seekg (((int)(search_char - firstCode))*2, IOBase::seek_cur);
-        glyph_index = READUSHORT(ffile->fp);
+        ffile->file->seekg (((int)(search_char - firstCode))*2, IOBase::seek_cur);
+        glyph_index = READUSHORT(*ffile->file);
     }
     else
         glyph_index = 0;
@@ -1791,13 +1790,13 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
     /* Have to treat space characters differently */
     if (c != ' ')
     {
-        ffile->fp->seekg (ffile->info->glyf_table_offset+ffile->info->loca_table[glyph_index]);
+        ffile->file->seekg (ffile->info->glyf_table_offset+ffile->info->loca_table[glyph_index]);
 
-        ttglyph->header.numContours = READSHORT(ffile->fp);
-        ttglyph->header.xMin = READFWORD(ffile->fp);   /* These may be  */
-        ttglyph->header.yMin = READFWORD(ffile->fp);   /* unreliable in */
-        ttglyph->header.xMax = READFWORD(ffile->fp);   /* some fonts.   */
-        ttglyph->header.yMax = READFWORD(ffile->fp);
+        ttglyph->header.numContours = READSHORT(*ffile->file);
+        ttglyph->header.xMin = READFWORD(*ffile->file);   /* These may be  */
+        ttglyph->header.yMin = READFWORD(*ffile->file);   /* unreliable in */
+        ttglyph->header.xMax = READFWORD(*ffile->file);   /* some fonts.   */
+        ttglyph->header.yMax = READFWORD(*ffile->file);
     }
 
 #ifdef TTF_DEBUG
@@ -1825,15 +1824,15 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
 
         for (i = 0; i < nc; i++)
         {
-            ttglyph->endPoints[i] = READUSHORT(ffile->fp);
+            ttglyph->endPoints[i] = READUSHORT(*ffile->file);
 #ifdef TTF_DEBUG
             Debug_Info("endPoints[%d]=%d\n", i, ttglyph->endPoints[i]);
 #endif
         }
 
         /* Skip over the instructions */
-        temp16 = READUSHORT(ffile->fp);
-        ffile->fp->seekg (temp16, IOBase::seek_cur);
+        temp16 = READUSHORT(*ffile->file);
+        ffile->file->seekg (temp16, IOBase::seek_cur);
 #ifdef TTF_DEBUG
         Debug_Info("skipping instruction bytes: %d\n", temp16);
 #endif
@@ -1853,7 +1852,7 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
         {
             /// @compat
             /// This piece of code relies on BYTE having the same size as char.
-            if (!ffile->fp->read(reinterpret_cast<char *>(&ttglyph->flags[i]), sizeof(BYTE)))
+            if (!ffile->file->read(reinterpret_cast<char *>(&ttglyph->flags[i]), sizeof(BYTE)))
             {
                 throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file.");
             }
@@ -1862,7 +1861,7 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
             {
                 /// @compat
                 /// This piece of code relies on BYTE having the same size as char.
-                if (!ffile->fp->read(reinterpret_cast<char *>(&repeat_count), sizeof(BYTE)))
+                if (!ffile->file->read(reinterpret_cast<char *>(&repeat_count), sizeof(BYTE)))
                 {
                     throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file.");
                 }
@@ -1904,7 +1903,7 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
 
                 /// @compat
                 /// This piece of code relies on BYTE having the same size as char.
-                if (!ffile->fp->read(reinterpret_cast<char *>(&temp8), 1))
+                if (!ffile->file->read(reinterpret_cast<char *>(&temp8), 1))
                 {
                     throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file.");
                 }
@@ -1916,7 +1915,7 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
             }
             else if (!(flag & NEXT_X_IS_ZERO))
             {
-                coord += READSHORT(ffile->fp);
+                coord += READSHORT(*ffile->file);
             }
 
             /* Find our own maximum and minimum x coordinates */
@@ -1942,7 +1941,7 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
 
                 /// @compat
                 /// This piece of code relies on BYTE having the same size as char.
-                if (!ffile->fp->read(reinterpret_cast<char *>(&temp8), 1))
+                if (!ffile->file->read(reinterpret_cast<char *>(&temp8), 1))
                 {
                     throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file.");
                 }
@@ -1954,7 +1953,7 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
             }
             else if (!(flag & NEXT_Y_IS_ZERO))
             {
-                coord += READSHORT(ffile->fp);
+                coord += READSHORT(*ffile->file);
             }
 
             /* Find out our own maximum and minimum y coordinates */
@@ -1988,8 +1987,8 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
             USHORT n2;
             SHORT nc2;
 
-            flags = READUSHORT(ffile->fp);
-            sub_glyph_index = READUSHORT(ffile->fp);
+            flags = READUSHORT(*ffile->file);
+            sub_glyph_index = READUSHORT(*ffile->file);
 
 #ifdef TTF_DEBUG
             Debug_Info("sub_glyph %d: ", sub_glyph_index);
@@ -2000,12 +1999,12 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
 #ifdef TTF_DEBUG
                 Debug_Info("ARG_1_AND_2_ARE_WORDS ");
 #endif
-                arg1 = READSHORT(ffile->fp);
-                arg2 = READSHORT(ffile->fp);
+                arg1 = READSHORT(*ffile->file);
+                arg2 = READSHORT(*ffile->file);
             }
             else
             {
-                arg1 = READUSHORT(ffile->fp);
+                arg1 = READUSHORT(*ffile->file);
                 arg2 = arg1 & 0xFF;
                 arg1 = (arg1 >> 8) & 0xFF;
             }
@@ -2024,7 +2023,7 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
 
             if (flags & WE_HAVE_A_SCALE)
             {
-                xscale = yscale = (DBL)READSHORT(ffile->fp)/0x4000;
+                xscale = yscale = (DBL)READSHORT(*ffile->file)/0x4000;
 #ifdef TTF_DEBUG
                 Debug_Info("WE_HAVE_A_SCALE ");
                 Debug_Info("xscale = %lf\t", xscale);
@@ -2035,8 +2034,8 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
             }
             else if (flags & WE_HAVE_AN_X_AND_Y_SCALE)
             {
-                xscale = (DBL)READSHORT(ffile->fp)/0x4000;
-                yscale = (DBL)READSHORT(ffile->fp)/0x4000;
+                xscale = (DBL)READSHORT(*ffile->file)/0x4000;
+                yscale = (DBL)READSHORT(*ffile->file)/0x4000;
 #ifdef TTF_DEBUG
                 Debug_Info("WE_HAVE_AN_X_AND_Y_SCALE ");
                 Debug_Info("xscale = %lf\t", xscale);
@@ -2047,10 +2046,10 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
             }
             else if (flags & WE_HAVE_A_TWO_BY_TWO)
             {
-                xscale  = (DBL)READSHORT(ffile->fp)/0x4000;
-                scale01 = (DBL)READSHORT(ffile->fp)/0x4000;
-                scale10 = (DBL)READSHORT(ffile->fp)/0x4000;
-                yscale  = (DBL)READSHORT(ffile->fp)/0x4000;
+                xscale  = (DBL)READSHORT(*ffile->file)/0x4000;
+                scale01 = (DBL)READSHORT(*ffile->file)/0x4000;
+                scale10 = (DBL)READSHORT(*ffile->file)/0x4000;
+                yscale  = (DBL)READSHORT(*ffile->file)/0x4000;
 #ifdef TTF_DEBUG
                 Debug_Info("WE_HAVE_A_TWO_BY_TWO ");
                 Debug_Info("xscale = %lf\t", xscale);
@@ -2085,9 +2084,9 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
                 ttglyph->myMetrics = sub_glyph_index;
             }
 
-            current_pos = ffile->fp->tellg ();
+            current_pos = ffile->file->tellg ();
             sub_ttglyph = ExtractGlyphOutline(ffile, sub_glyph_index, c);
-            ffile->fp->seekg (current_pos);
+            ffile->file->seekg (current_pos);
 
             if ((nc2 = sub_ttglyph->header.numContours) == 0)
                 continue;
@@ -2203,7 +2202,7 @@ GlyphPtr ConvertOutlineToGlyph(TrueTypeFont *ffile, const GlyphOutline *ttglyph)
     }
     else
     {
-        glyph->contours = NULL;
+        glyph->contours = nullptr;
     }
 
     /* Copy sizing information about this glyph */
@@ -2905,7 +2904,7 @@ TrueType::TrueType() : ObjectBase(TTF_OBJECT)
 
     Trans = Create_Transform();
 
-    glyph = NULL;
+    glyph = nullptr;
     depth = 1.0;
 
     /* Default bounds */
@@ -2978,19 +2977,18 @@ void TrueType::Compute_BBox()
 }
 
 
-TrueTypeFont::TrueTypeFont(const UCS2String& fn, IStream* fp, StringEncoding te) :
+TrueTypeFont::TrueTypeFont(const UCS2String& fn, const shared_ptr<IStream>& f, StringEncoding te) :
     filename(fn),
-    fp(fp),
+    file(f),
     textEncoding(te),
-    info(NULL)
+    info(nullptr)
 {
     ProcessFontFile(this);
 }
 
 TrueTypeFont::~TrueTypeFont()
 {
-    if (fp != nullptr)
-        delete fp;
+    file = nullptr;
 
     if (info != nullptr)
         delete info;
@@ -3002,18 +3000,18 @@ TrueTypeInfo::TrueTypeInfo() :
     numGlyphs(0),
     unitsPerEm(0),
     indexToLocFormat(0),
-    loca_table(NULL),
+    loca_table(nullptr),
     numberOfHMetrics(0),
-    hmtx_table(NULL),
+    hmtx_table(nullptr),
     glyphIDoffset(0),
     segCount(0),
     searchRange(0),
     entrySelector(0),
     rangeShift(0),
-    startCount(NULL),
-    endCount(NULL),
-    idDelta(NULL),
-    idRangeOffset(NULL)
+    startCount(nullptr),
+    endCount(nullptr),
+    idDelta(nullptr),
+    idRangeOffset(nullptr)
 {
     for (int i = 0; i < 4; i ++)
     {
@@ -3022,7 +3020,7 @@ TrueTypeInfo::TrueTypeInfo() :
     }
 
     kerning_tables.nTables = 0;
-    kerning_tables.tables = NULL;
+    kerning_tables.tables = nullptr;
 }
 
 TrueTypeInfo::~TrueTypeInfo()

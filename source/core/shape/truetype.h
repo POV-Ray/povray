@@ -84,13 +84,13 @@ struct TrueTypeInfo;
 
 struct TrueTypeFont
 {
-    TrueTypeFont(const UCS2String& fn, IStream* fp, StringEncoding te);
+    TrueTypeFont(const UCS2String& fn, const shared_ptr<IStream>& f, StringEncoding te);
     ~TrueTypeFont();
 
-    UCS2String      filename;
-    IStream*        fp;
-    StringEncoding  textEncoding;
-    TrueTypeInfo*   info;
+    UCS2String          filename;
+    shared_ptr<IStream> file;
+    StringEncoding      textEncoding;
+    TrueTypeInfo*       info;
 };
 
 class TrueType : public ObjectBase

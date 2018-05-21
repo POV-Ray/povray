@@ -45,12 +45,17 @@
 #include <cctype>
 
 #include <limits>
+#include <memory>
 
+#include "base/fileinputoutput.h"
 #include "base/stringutilities.h"
 #include "base/version_info.h"
 
 #include "core/material/noise.h"
 #include "core/scene/scenedata.h"
+
+#include "parser/scanner.h"
+#include "parser/rawtokenizer.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -87,44 +92,42 @@ using namespace pov;
 
 void Parser::Initialize_Tokenizer()
 {
-    IStream *rfile = NULL;
+    shared_ptr<IStream> rfile;
     UCS2String actualFileName;
-    int c;
 
     pre_init_tokenizer ();
 
     rfile = Locate_File(sceneData->inputFile.c_str(),POV_File_Text_POV,actualFileName,true);
-    if(rfile != NULL)
-    {
-        Input_File->In_File = new IBufferedTextStream(sceneData->inputFile.c_str(), rfile);
-        sceneData->inputFile = actualFileName;
-    }
+    if (rfile == nullptr)
+        Error("Cannot open input file.");
 
-    if (Input_File->In_File == NULL)
-    {
-        Error ("Cannot open input file.");
-    }
+    mTokenizer.SetInputStream(rfile);
+    mToken.sourceFile = mTokenizer.GetSource();
 
-    Input_File->R_Flag = false;
+    readingExternalFile = false;
+
+    mHavePendingRawToken = false;
 
     Got_EOF  = false;
 
     /* Init conditional stack. */
 
-    Cond_Stack = reinterpret_cast<CS_ENTRY*>(POV_MALLOC(sizeof(CS_ENTRY) * COND_STACK_SIZE, "conditional stack"));
-
-    Cond_Stack[0].Cond_Type    = ROOT_COND;
-    Cond_Stack[0].Switch_Value = 0.0;
+    Cond_Stack.emplace_back();
+    Cond_Stack.back().Cond_Type = ROOT_COND;
+    Cond_Stack.back().Switch_Value = 0.0;
 
     init_sym_tables();
     Max_Trace_Level = MAX_TRACE_LEVEL_DEFAULT;
     Had_Max_Trace_Level = false;
 
+    /// @todo Re-enable UTF-8 signature BOM handling.
+#if 0
     /* ignore any leading characters if they have character codes above 127, this
        takes care of UTF-8 files with encoding info at the beginning of the file */
     for(c = Echo_getc(); c > 127; c = Echo_getc())
         sceneData->stringEncoding = kStringEncoding_UTF8; // switch to UTF-8 automatically [trf]
     Echo_ungetc(c);
+#endif
 }
 
 
@@ -151,43 +154,35 @@ void Parser::pre_init_tokenizer ()
 {
     int i;
 
-    Token.Token_File_Pos.lineno = 0;
-    Token.Token_File_Pos.offset = 0;
-    Token.Token_Col_No = 0;
-    Token.Token_String  = NULL;
-    Token.freeString    = false;
-    Token.Unget_Token   = false;
-    Token.End_Of_File   = false;
-    Token.Data = NULL;
-    Token.FileHandle = NULL;
+    /// @todo Shouldn't these be initialized to -1?
+    mToken.raw.lexeme.position.line = 0;
+    mToken.raw.lexeme.position.offset = 0;
+    mToken.raw.lexeme.position.column = 0;
+    mToken.raw.lexeme.text.clear();
+    mToken.Unget_Token   = false;
+    mToken.End_Of_File   = false;
+    mToken.Data = nullptr;
 
     line_count = 10;
     token_count = 0;
     Current_Token_Count = 0;
-    Include_File_Index = 0;
-    Echo_Indx=0;
 
-    // make sure these are NULL otherwise cleanup() will crash if we terminate early
-    Default_Texture = NULL;
+    // make sure these are nullptr otherwise cleanup() will crash if we terminate early
+    Default_Texture = nullptr;
 
-    CS_Index            = 0;
     Skipping            = false;
     Inside_Ifdef        = false;
     Inside_MacroDef     = false;
     Parsing_Directive   = false;
     parseRawIdentifiers = false;
     parseOptionalRValue = false;
-    Cond_Stack          = NULL;
     Table_Index         = -1;
-
-    Input_File = &Include_Files[0];
-    Include_Files[0].In_File = NULL;
 
     // TODO - on modern machines it may be faster to do the comparisons for each token
     //        than to access the conversion table.
     for(i = 0; i < TOKEN_COUNT; i++)
     {
-        Conversion_Util_Table[i] = i;
+        Conversion_Util_Table[i] = TokenId(i);
         if(i < FLOAT_FUNCT_TOKEN)
             Conversion_Util_Table[i] = FLOAT_FUNCT_TOKEN;
         else
@@ -227,51 +222,14 @@ void Parser::pre_init_tokenizer ()
 
 void Parser::Terminate_Tokenizer()
 {
-    Token.FileHandle = NULL;
-
     while(Table_Index >= 0)
     {
         Destroy_Table(Table_Index--);
     }
 
-    if(Input_File->In_File != NULL)
-    {
-        delete Input_File->In_File;
-        Input_File->In_File = NULL;
-        Got_EOF = false;
-    }
+    maIncludeStack.clear();
 
-    while(Include_File_Index >= 0)
-    {
-        Input_File = &Include_Files[Include_File_Index--];
-
-        if(Input_File->In_File != NULL)
-        {
-            delete Input_File->In_File;
-            Input_File->In_File = NULL;
-            Got_EOF = false;
-        }
-    }
-
-    if(Cond_Stack != NULL)
-    {
-        for(int i = 0; i <= CS_Index; i++)
-        {
-            if((Cond_Stack[i].Cond_Type == INVOKING_MACRO_COND) && (Cond_Stack[i].Macro_Same_Flag == false))
-                delete Cond_Stack[i].Macro_File;
-        }
-        POV_FREE(Cond_Stack);
-
-        Cond_Stack = NULL;
-    }
-
-    if((String != NULL) && (String != String_Fast_Buffer))
-        POV_FREE(String);
-    String=NULL;
-
-    if((String2 != NULL) && (String2 != String_Fast_Buffer))
-        POV_FREE(String2);
-    String2=NULL;
+    Got_EOF = false;
 }
 
 
@@ -293,7 +251,7 @@ void Parser::Terminate_Tokenizer()
 *   The main tokenizing routine.  Set up the files and continue parsing
 *   until the end of file
 *
-*   Read a token from the input file and store it in the Token variable.
+*   Read a token from the input file and store it in the mToken variable.
 *   If the token is an INCLUDE token, then set the include file name and
 *   read another token.
 *
@@ -308,342 +266,95 @@ void Parser::Terminate_Tokenizer()
 
 void Parser::Get_Token ()
 {
-    int c,c2;
-    int col;
-
-    if (Token.Unget_Token)
+    if (mToken.Unget_Token)
     {
-        Token.Unget_Token = false;
+        mToken.Unget_Token = false;
 
         return;
     }
 
-    if (Token.End_Of_File)
+    if (mToken.End_Of_File)
     {
         return;
     }
 
-    Token.Token_Id = END_OF_FILE_TOKEN;
-    Token.is_array_elem = false;
-    Token.is_mixed_array_elem = false;
-    Token.is_dictionary_elem = false;
+    mToken.Token_Id = END_OF_FILE_TOKEN;
+    mToken.is_array_elem = false;
+    mToken.is_mixed_array_elem = false;
+    mToken.is_dictionary_elem = false;
 
-    while (Token.Token_Id == END_OF_FILE_TOKEN)
+    while (mToken.Token_Id == END_OF_FILE_TOKEN)
     {
-        if (Skipping && !Parsing_Directive)
-            // If we're skipping, we're only interested in directives, such as `#else` or `#end`,
-            // so we just pretend any other characters in between are blanks.
-            SkipToDirective();
-        else
-            Skip_Spaces();
+        bool fastForwardToDirective = (Skipping && !Parsing_Directive);
 
-        Token.Token_Col_No = col = Echo_Indx;
-        c = Echo_getc();
-
-        if (c == EOF)
+        if (!GetRawToken(mToken.raw, fastForwardToDirective))
         {
-            if (Input_File->R_Flag)
+            if (readingExternalFile)
             {
-                Token.Token_Id = END_OF_FILE_TOKEN;
-                Token.is_array_elem = false;
-                Token.is_mixed_array_elem = false;
-                Token.is_dictionary_elem = false;
-                Token.End_Of_File = true;
+                // In `#read` statement.
+                mToken.Token_Id = END_OF_FILE_TOKEN;
+                mToken.is_array_elem = false;
+                mToken.is_mixed_array_elem = false;
+                mToken.is_dictionary_elem = false;
+                mToken.End_Of_File = true;
                 return;
             }
 
-            if (Include_File_Index == 0)
+            if (maIncludeStack.empty())
             {
-                if (CS_Index !=0)
+                if (Cond_Stack.size() != 1)
                     Error("End of file reached but #end expected.");
 
-                Token.Token_Id = END_OF_FILE_TOKEN;
-                Token.is_array_elem = false;
-                Token.is_mixed_array_elem = false;
-                Token.is_dictionary_elem = false;
-                Token.End_Of_File = true;
+                mToken.Token_Id = END_OF_FILE_TOKEN;
+                mToken.is_array_elem = false;
+                mToken.is_mixed_array_elem = false;
+                mToken.is_dictionary_elem = false;
+                mToken.End_Of_File = true;
                 return;
             }
 
-            if (Input_File->In_File == Token.FileHandle)
-                Token.FileHandle = NULL;
+            // Returning from an include file.
 
-            delete Input_File->In_File; /* added to fix open file buildup JLN 12/91 */
-            Input_File->In_File = NULL;
             Got_EOF=false;
 
             Destroy_Table(Table_Index--);
 
-            Input_File = &Include_Files[--Include_File_Index];
-            if (Token.FileHandle == NULL)
-                Token.FileHandle = Input_File->In_File;
+            mTokenizer.GoToBookmark(maIncludeStack.back());
+            maIncludeStack.pop_back();
+            mToken.sourceFile = mTokenizer.GetSource();
 
             continue;
         }
 
-        Begin_String_Fast();
-
-        String[0] = c; /* This isn't necessary but helps debugging */
-
-        String[1] = '\0';
-
-        /*String_Index = 0;*/
-
-        switch (c)
+        TokenId tokenId;
+        switch (mToken.raw.GetTokenId())
         {
-            case '\n':
+            case IDENTIFIER_TOKEN:
+                Read_Symbol(mToken.raw);
                 break;
 
-            case '{' :
-                Write_Token (LEFT_CURLY_TOKEN, col);
-                break;
-
-            case '}' :
-                Write_Token (RIGHT_CURLY_TOKEN, col);
-                break;
-
-            case '@' :
-                Write_Token (AT_TOKEN, col);
-                break;
-
-            case '&' :
-                Write_Token (AMPERSAND_TOKEN, col);
-                break;
-
-            case '`' :
-                Write_Token (BACK_QUOTE_TOKEN, col);
-                break;
-
-            case '\\':
-                Write_Token (BACK_SLASH_TOKEN, col);
-                break;
-
-            case '|' :
-                Write_Token (BAR_TOKEN, col);
-                break;
-
-            case ':' :
-                Write_Token (COLON_TOKEN, col);
-                break;
-
-            case ',' :
-                Write_Token (COMMA_TOKEN, col);
-                break;
-
-            case '-' :
-                Write_Token (DASH_TOKEN, col);
-                break;
-
-            case '$' :
-                Write_Token (DOLLAR_TOKEN, col);
-                break;
-
-            case '=' :
-                Write_Token (EQUALS_TOKEN, col);
-                break;
-
-            case '!' :
-                c2 = Echo_getc();
-                if (c2 == (int)'=')
-                {
-                    Write_Token (REL_NE_TOKEN, col);
-                }
-                else
-                {
-                    Echo_ungetc(c2);
-                    Write_Token (EXCLAMATION_TOKEN, col);
-                }
-                break;
-
-            case '#' :
-                Parse_Directive(true);
-                /* Write_Token (HASH_TOKEN, col);*/
-                break;
-
-            case '^' :
-                Write_Token (HAT_TOKEN, col);
-                break;
-
-            case '<' :
-                c2 = Echo_getc();
-                if (c2 == (int)'=')
-                {
-                    Write_Token (REL_LE_TOKEN, col);
-                }
-                else
-                {
-                    Echo_ungetc(c2);
-                    Write_Token (LEFT_ANGLE_TOKEN, col);
-                }
-                break;
-
-            case '(' :
-                Write_Token (LEFT_PAREN_TOKEN, col);
-                break;
-
-            case '[' :
-                Write_Token (LEFT_SQUARE_TOKEN, col);
-                break;
-
-            case '%' :
-                Write_Token (PERCENT_TOKEN, col);
-                break;
-
-            case '+' :
-                Write_Token (PLUS_TOKEN, col);
-                break;
-
-            case '?' :
-                Write_Token (QUESTION_TOKEN, col);
-                break;
-
-            case '>' :
-                c2 = Echo_getc();
-                if (c2 == (int)'=')
-                {
-                    Write_Token (REL_GE_TOKEN, col);
-                }
-                else
-                {
-                    Echo_ungetc(c2);
-                    Write_Token (RIGHT_ANGLE_TOKEN, col);
-                }
-                break;
-
-            case ')' :
-                Write_Token (RIGHT_PAREN_TOKEN, col);
-                break;
-
-            case ']' :
-                Write_Token (RIGHT_SQUARE_TOKEN, col);
-                break;
-
-            case ';' : /* Parser doesn't use it, so let's ignore it */
-                Write_Token (SEMI_COLON_TOKEN, col);
-                break;
-
-            case '\'':
-                Write_Token (SINGLE_QUOTE_TOKEN, col);
-                break;
-
-                /* enable C++ style commenting */
-            case '/' :
-                c2 = Echo_getc();
-                if(c2 != (int) '/' && c2 != (int) '*')
-                {
-                    Echo_ungetc(c2);
-                    Write_Token (SLASH_TOKEN, col);
-                    break;
-                }
-                if(c2 == (int)'*')
-                {
-                    Parse_C_Comments();
-                    break;
-                }
-                while(c2 != (int)'\n')
-                {
-                    c2=Echo_getc();
-                    if(c2==EOF)
-                    {
-                        Echo_ungetc(c2);
-                        break;
-                    }
-                }
-                break;
-
-            case '*' :
-                Write_Token (STAR_TOKEN, col);
-                break;
-
-            case '~' :
-                Write_Token (TILDE_TOKEN, col);
-                break;
-
-            case '"' :
-                Read_String_Literal ();
-                break;
-
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-            case '.':
-                Echo_ungetc(c);
-                if (Read_Float () != true)
+            case FLOAT_TOKEN:
+                /*
+                POV_PARSER_ASSERT(dynamic_pointer_cast<const FloatValue>(mToken.raw.value) != nullptr);
+                if (dynamic_pointer_cast<const FloatValue>(mToken.raw.value) == nullptr)
+                    /// @todo
                     return;
+                */
+                //mToken.Token_Float = dynamic_pointer_cast<const FloatValue>(mToken.raw.value)->data;
+                mToken.Token_Float = mToken.raw.floatValue;
+                Write_Token(mToken.raw);
                 break;
 
-            case 'a':
-            case 'b':
-            case 'c':
-            case 'd':
-            case 'e':
-            case 'f':
-            case 'g':
-            case 'h':
-            case 'i':
-            case 'j':
-            case 'k':
-            case 'l':
-            case 'm':
-            case 'n':
-            case 'o':
-            case 'p':
-            case 'q':
-            case 'r':
-            case 's':
-            case 't':
-            case 'u':
-            case 'v':
-            case 'w':
-            case 'x':
-            case 'y':
-            case 'z':
-
-            case 'A':
-            case 'B':
-            case 'C':
-            case 'D':
-            case 'E':
-            case 'F':
-            case 'G':
-            case 'H':
-            case 'I':
-            case 'J':
-            case 'K':
-            case 'L':
-            case 'M':
-            case 'N':
-            case 'O':
-            case 'P':
-            case 'Q':
-            case 'R':
-            case 'S':
-            case 'T':
-            case 'U':
-            case 'V':
-            case 'W':
-            case 'X':
-            case 'Y':
-            case 'Z':
-            case '_':
-                Echo_ungetc(c);
-                Read_Symbol ();
+            case STRING_LITERAL_TOKEN:
+                Write_Token(mToken.raw);
                 break;
-            case '\t':
-            case '\r':
-            case '\032':   /* Control Z - EOF on many systems */
-            case '\0':
+
+            case HASH_TOKEN:
+                Parse_Directive(true);
                 break;
 
             default:
-                Error("Illegal character in input file, value is %02x.", c);
+                Write_Token(mToken.raw);
                 break;
         }
     }
@@ -692,616 +403,7 @@ void Parser::Get_Token ()
 
 void Parser::Unget_Token ()
 {
-    Token.Unget_Token = true;
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-*   Skip over spaces in the input file.
-*
-* CHANGES
-*
-******************************************************************************/
-
-bool Parser::Skip_Spaces()
-{
-    int c;
-
-    while(true)
-    {
-        c = Echo_getc();
-
-        if (c == EOF)
-            return false;
-
-        if(!(isspace(c)))
-            break;
-    }
-
-    Echo_ungetc(c);
-
-    return true;
-}
-
-
-
-//*****************************************************************************
-
-bool Parser::SkipToDirective()
-{
-    int c;
-
-    while(true)
-    {
-        c = Echo_getc();
-
-        switch (c)
-        {
-            case EOF:
-                return false;
-
-            case '#' :
-                // Genuine Directive.
-                // We need to actually parse this.
-                Echo_ungetc(c);
-                return true;
-
-            case '/' :
-                // Possibly a comment.
-                // We need to examine the next character.
-                c = Echo_getc();
-                switch (c)
-                {
-                    case '*':
-                        // C style comment.
-                        // Ignore all characters until the terminating `*/`.
-                        Parse_C_Comments();
-                        break;
-
-                    case '/':
-                        // C++ style comment.
-                        // Ignore all characters until the end of line.
-                        do
-                        {
-                            c = Echo_getc();
-                            if (c == EOF)
-                                return false;
-                        }
-                        while (c != '\n');
-                        break;
-
-                    default:
-                        // The first slash was just an ordinary slash.
-                        // Look at the second character in more detail.
-                        Echo_ungetc(c);
-                        break;
-                }
-                break;
-
-            case '"' :
-                // String literal.
-                // Ignore all characters until the end of the string.
-                do
-                {
-                    c = Echo_getc();
-                    if (c == EOF)
-                        Error("No end quote for string.");
-                    if (c == '\\')
-                        // Escaped character.
-                        // Completely ignore the next character.
-                        (void)Echo_getc();
-                }
-                while (c != '"');
-                break;
-
-            default:
-                // Just any odd character.
-                // Ignore it.
-                break;
-        }
-    }
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-*   C style comments with asterik and slash - CdW 8/91.
-*
-* CHANGES
-*
-******************************************************************************/
-
-int Parser::Parse_C_Comments()
-{
-    int c, c2;
-    bool End_Of_Comment = false;
-
-    while(!End_Of_Comment)
-    {
-        c = Echo_getc();
-
-        if(c == EOF)
-            Error("No */ closing comment found.");
-
-        if(c == (int) '*')
-        {
-            c2 = Echo_getc();
-
-            if(c2 != (int) '/')
-                Echo_ungetc(c2);
-            else
-                End_Of_Comment = true;
-        }
-
-        /* Check for and handle nested comments */
-
-        if(c == (int) '/')
-        {
-            c2 = Echo_getc();
-
-            if(c2 != (int) '*')
-                Echo_ungetc(c2);
-            else
-                Parse_C_Comments();
-        }
-    }
-
-    return true;
-}
-
-
-
-/* The following routines make it easier to handle strings.  They stuff
-   characters into a string buffer one at a time making all the proper
-   range checks.  Call Begin_String to start, Stuff_Character to put
-   characters in, and End_String to finish.  The String variable contains
-   the final string. */
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
-
-inline void Parser::Begin_String()
-{
-    if((String != NULL) && (String != String_Fast_Buffer))
-        POV_FREE(String);
-
-    String = reinterpret_cast<char *>(POV_MALLOC(256, "C String"));
-    String_Buffer_Free = 256;
-    String_Index = 0;
-}
-
-
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- * CHANGES
- *
-******************************************************************************/
-
-inline void Parser::Stuff_Character(int chr)
-{
-    if(String_Buffer_Free <= 0)
-    {
-        Error("String too long.");
-// This caused too many problems with buffer overflows [trf]
-//      String = reinterpret_cast<char *>(POV_REALLOC(String, String_Index + 256, "String Literal Buffer"));
-//      String_Buffer_Free += 256;
-    }
-
-    String[String_Index] = chr;
-    String_Buffer_Free--;
-    String_Index++;
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
-
-inline void Parser::End_String()
-{
-    Stuff_Character(0);
-
-    if(String_Buffer_Free > 0)
-        String = reinterpret_cast<char *>(POV_REALLOC(String, String_Index, "String Literal Buffer"));
-
-    String_Buffer_Free = 0;
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
-
-inline void Parser::Begin_String_Fast()
-{
-    if((String != NULL) && (String != String_Fast_Buffer))
-        POV_FREE(String);
-
-    String = String_Fast_Buffer;
-    String_Index = 0;
-}
-
-
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- * CHANGES
- *
-******************************************************************************/
-
-inline void Parser::Stuff_Character_Fast(int chr)
-{
-    String[String_Index & MAX_STRING_LEN_MASK] = chr;
-    String_Index++;
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
-
-inline void Parser::End_String_Fast()
-{
-    Stuff_Character_Fast(0);
-
-    String_Index--; // Stuff_Character_Fast incremented this
-
-    if(String_Index != (String_Index & MAX_STRING_LEN_MASK))
-        Error("String too long.");
-}
-
-
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- *   Parse a string from the input file into a token.
- *
- *   Does NOT handle escape sequences EXCEPT that double quotes after an
- *   odd number of backslashes (`\"`, `\\\"`, `\\\\\"` etc.) are treated as
- *   regular characters rather than the end of the string.
- *
- * CHANGES
- *
-******************************************************************************/
-
-void Parser::Read_String_Literal()
-{
-    int c;
-    int col = Echo_Indx;
-
-    Begin_String();
-
-    bool escaped = false;
-    while(true)
-    {
-        c = Echo_getc();
-
-        if(c == EOF)
-            Error("No end quote for string.");
-
-        if((c == '"') && !escaped)
-            break;
-
-        Stuff_Character(c);
-
-        if((c == '\\') && !escaped)
-            escaped = true;
-        else
-            escaped = false;
-    }
-
-    End_String();
-
-    Write_Token(STRING_LITERAL_TOKEN, col);
-}
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-*   Read a float from the input file and tokenize it as one token. The phase
-*   variable is 0 for the first character, 1 for all subsequent characters
-*   up to the decimal point, 2 for all characters after the decimal
-*   point, 3 for the E+/- and 4 for the exponent.  This helps to insure
-*   that the number is formatted properly. E format added 9/91 CEY
-*
-* CHANGES
-*
-******************************************************************************/
-
-bool Parser::Read_Float()
-{
-    int c, Phase;
-    bool Finished;
-    int col = Echo_Indx;
-
-    Finished = false;
-
-    Phase = 0;
-
-    Begin_String_Fast();
-
-    while (!Finished)
-    {
-        c = Echo_getc();
-
-        if (c == EOF)
-        {
-            Error ("Unexpected end of file.");
-        }
-
-        if (Phase > 1 && c == '.')
-        {
-            Error ("Unexpected additional '.' in floating-point number");
-        }
-
-        switch (Phase)
-        {
-            case 0:
-
-                Phase = 1;
-
-                if (isdigit(c))
-                {
-                    Stuff_Character_Fast(c);
-                }
-                else
-                {
-                    if (c == '.')
-                    {
-                        c = Echo_getc();
-
-                        if (c == EOF)
-                        {
-                            Error ("Unexpected end of file");
-                        }
-
-                        if (isdigit(c))
-                        {
-                            Stuff_Character_Fast('0');
-                            Stuff_Character_Fast('.');
-                            Stuff_Character_Fast(c);
-
-                            Phase = 2;
-                        }
-                        else
-                        {
-                            Echo_ungetc(c);
-
-                            Write_Token (PERIOD_TOKEN, col);
-
-                            return(true);
-                        }
-                    }
-                    else
-                    {
-                        Error ("Invalid decimal number");
-                    }
-                }
-
-                break;
-
-            case 1:
-                if (isdigit(c))
-                {
-                    Stuff_Character_Fast(c);
-                }
-                else
-                {
-                    if (c == (int) '.')
-                    {
-                        Stuff_Character_Fast(c); Phase = 2;
-                    }
-                    else
-                    {
-                        if ((c == 'e') || (c == 'E'))
-                        {
-                            Stuff_Character_Fast(c); Phase = 3;
-                        }
-                        else
-                        {
-                            Finished = true;
-                        }
-                    }
-                }
-
-                break;
-
-            case 2:
-
-                if (isdigit(c))
-                {
-                    Stuff_Character_Fast(c);
-                }
-                else
-                {
-                    if ((c == 'e') || (c == 'E'))
-                    {
-                        Stuff_Character_Fast(c); Phase = 3;
-                    }
-                    else
-                    {
-                        Finished = true;
-                    }
-                }
-
-                break;
-
-            case 3:
-
-                if (isdigit(c) || (c == '+') || (c == '-'))
-                {
-                    Stuff_Character_Fast(c); Phase = 4;
-                }
-                else
-                {
-                    Finished = true;
-                }
-
-                break;
-
-            case 4:
-
-                if (isdigit(c))
-                {
-                    Stuff_Character_Fast(c);
-                }
-                else
-                {
-                    Finished = true;
-                }
-
-                break;
-        }
-    }
-
-    Echo_ungetc(c);
-
-    End_String_Fast();
-
-    Write_Token (FLOAT_TOKEN, col);
-
-    if (sscanf (String, POV_DBL_FORMAT_STRING, &Token.Token_Float) == 0)
-    {
-        return (false);
-    }
-
-    return (true);
+    mToken.Unget_Token = true;
 }
 
 
@@ -1330,46 +432,24 @@ bool Parser::Read_Float()
 *
 ******************************************************************************/
 
-void Parser::Read_Symbol()
+void Parser::Read_Symbol(const RawToken& rawToken)
 {
-    int c;
     int Local_Index,i,j,k;
     POV_ARRAY *a;
     SYM_ENTRY *Temp_Entry;
     POV_PARAM *Par;
     DBL val;
-    SYM_TABLE *table = NULL;
-    char *dictIndex = NULL;
+    SYM_TABLE *table = nullptr;
+    char *dictIndex = nullptr;
     int pseudoDictionary = -1;
-
-    Begin_String_Fast();
-
-    while (true)
-    {
-        c = Echo_getc();
-
-        if (c == EOF)
-        {
-            Error ("Unexpected end of file.");
-        }
-
-        if (isalpha(c) || isdigit(c) || c == (int) '_')
-        {
-            Stuff_Character_Fast(c);
-        }
-        else
-        {
-            Echo_ungetc(c);
-
-            break;
-        }
-    }
-
-    End_String_Fast();
+    RawToken nextRawToken;
+    bool haveNextRawToken;
 
     /* If its a reserved keyword, write it and return */
-    if ( (Temp_Entry = Find_Symbol(SYM_TABLE_RESERVED,String)) != NULL)
+    if ( (Temp_Entry = Find_Symbol(SYM_TABLE_RESERVED, rawToken.lexeme.text.c_str())) != nullptr)
     {
+        POV_PARSER_ASSERT(false);
+
         if (!Parsing_Directive && (Temp_Entry->Token_Number == LOCAL_TOKEN))
         {
             pseudoDictionary = Table_Index;
@@ -1384,7 +464,7 @@ void Parser::Read_Symbol()
         }
         else
         {
-            Write_Token (Temp_Entry->Token_Number, Token.Token_Col_No);
+            Write_Token (Temp_Entry->Token_Number, rawToken);
             return;
         }
     }
@@ -1393,14 +473,14 @@ void Parser::Read_Symbol()
     {
         if (pseudoDictionary >= 0)
         {
-            Token.Token_Id = DICTIONARY_ID_TOKEN;
-            Token.is_array_elem = false;
-            Token.is_mixed_array_elem = false;
-            Token.is_dictionary_elem = false;
-            Token.NumberPtr = &(Temp_Entry->Token_Number);
-            Token.DataPtr   = &(Temp_Entry->Data);
+            mToken.Token_Id = DICTIONARY_ID_TOKEN;
+            mToken.is_array_elem = false;
+            mToken.is_mixed_array_elem = false;
+            mToken.is_dictionary_elem = false;
+            mToken.NumberPtr = &(Temp_Entry->Token_Number);
+            mToken.DataPtr   = &(Temp_Entry->Data);
 
-            table = NULL;
+            table = nullptr;
         }
         else
         {
@@ -1410,7 +490,7 @@ void Parser::Read_Symbol()
             for (Local_Index = firstIndex; Local_Index >= lastIndex; Local_Index--)
             {
                 /* See if it's a previously declared identifier. */
-                if ((Temp_Entry = Find_Symbol(Local_Index,String)) != NULL)
+                if ((Temp_Entry = Find_Symbol(Local_Index, rawToken.lexeme.text.c_str())) != nullptr)
                 {
                     if (Temp_Entry->deprecated && !Temp_Entry->deprecatedShown)
                     {
@@ -1420,32 +500,32 @@ void Parser::Read_Symbol()
 
                     if ((Temp_Entry->Token_Number==MACRO_ID_TOKEN) && (!Inside_Ifdef))
                     {
-                        Token.Data = Temp_Entry->Data;
+                        mToken.Data = Temp_Entry->Data;
                         if (Ok_To_Declare)
                         {
                             Invoke_Macro();
                         }
                         else
                         {
-                            Token.Token_Id=MACRO_ID_TOKEN;
-                            Token.is_array_elem = false;
-                            Token.is_mixed_array_elem = false;
-                            Token.is_dictionary_elem = false;
-                            Token.NumberPtr = &(Temp_Entry->Token_Number);
-                            Token.DataPtr   = &(Temp_Entry->Data);
-                            Write_Token (Token.Token_Id, Token.Token_Col_No, Tables[Local_Index]);
+                            mToken.Token_Id=MACRO_ID_TOKEN;
+                            mToken.is_array_elem = false;
+                            mToken.is_mixed_array_elem = false;
+                            mToken.is_dictionary_elem = false;
+                            mToken.NumberPtr = &(Temp_Entry->Token_Number);
+                            mToken.DataPtr   = &(Temp_Entry->Data);
+                            Write_Token (mToken.Token_Id, rawToken, Tables[Local_Index]);
 
-                            Token.context = Local_Index;
+                            mToken.context = Local_Index;
                         }
                         return;
                     }
 
-                    Token.Token_Id  =   Temp_Entry->Token_Number;
-                    Token.is_array_elem = false;
-                    Token.is_mixed_array_elem = false;
-                    Token.is_dictionary_elem = false;
-                    Token.NumberPtr = &(Temp_Entry->Token_Number);
-                    Token.DataPtr   = &(Temp_Entry->Data);
+                    mToken.Token_Id  =   Temp_Entry->Token_Number;
+                    mToken.is_array_elem = false;
+                    mToken.is_mixed_array_elem = false;
+                    mToken.is_dictionary_elem = false;
+                    mToken.NumberPtr = &(Temp_Entry->Token_Number);
+                    mToken.DataPtr   = &(Temp_Entry->Data);
 
                     table = Tables[Local_Index];
 
@@ -1459,24 +539,22 @@ void Parser::Read_Symbol()
             bool breakLoop = false;
             while (!breakLoop)
             {
-                switch (Token.Token_Id)
+                switch (mToken.Token_Id)
                 {
                     case ARRAY_ID_TOKEN:
                         {
                             if (dictIndex)
                                 POV_FREE (dictIndex);
 
-                            Skip_Spaces();
-                            c = Echo_getc();
-                            Echo_ungetc(c);
+                            haveNextRawToken = PeekRawToken(nextRawToken);
 
-                            if (c!='[')
+                            if (!haveNextRawToken || (nextRawToken.lexeme.category != Lexeme::Category::kOther) || (nextRawToken.lexeme.text != "["))
                             {
                                 breakLoop = true;
                                 break;
                             }
 
-                            a = reinterpret_cast<POV_ARRAY *>(*(Token.DataPtr));
+                            a = reinterpret_cast<POV_ARRAY *>(*(mToken.DataPtr));
                             j = 0;
 
                             for (i=0; i <= a->Dims; i++)
@@ -1507,19 +585,19 @@ void Parser::Read_Symbol()
 
                             if (!LValue_Ok && !Inside_Ifdef)
                             {
-                                if (a->DataPtrs[j] == NULL)
+                                if (a->DataPtrs[j] == nullptr)
                                     Error("Attempt to access uninitialized array element.");
                             }
 
-                            Token.DataPtr = &(a->DataPtrs[j]);
-                            Token.is_mixed_array_elem = !a->Types.empty();
-                            if (Token.is_mixed_array_elem)
-                                Token.NumberPtr = &(a->Types[j]);
+                            mToken.DataPtr = &(a->DataPtrs[j]);
+                            mToken.is_mixed_array_elem = !a->Types.empty();
+                            if (mToken.is_mixed_array_elem)
+                                mToken.NumberPtr = &(a->Types[j]);
                             else
-                                Token.NumberPtr = &(a->Type);
-                            Token.Token_Id = *Token.NumberPtr;
-                            Token.is_array_elem = true;
-                            Token.is_dictionary_elem = false;
+                                mToken.NumberPtr = &(a->Type);
+                            mToken.Token_Id = *mToken.NumberPtr;
+                            mToken.is_array_elem = true;
+                            mToken.is_dictionary_elem = false;
                         }
                         break;
 
@@ -1528,28 +606,28 @@ void Parser::Read_Symbol()
                             if (dictIndex)
                                 POV_FREE (dictIndex);
 
-                            Skip_Spaces();
-                            c = Echo_getc();
-                            Echo_ungetc(c);
+                            haveNextRawToken = PeekRawToken(nextRawToken);
 
                             if (pseudoDictionary >= 0)
                             {
                                 table = Tables [pseudoDictionary];
                                 pseudoDictionary = -1;
-                                if ((c != '[') && (c != '.'))
+
+                                if (!haveNextRawToken || (nextRawToken.lexeme.category != Lexeme::Category::kOther) ||
+                                    ((nextRawToken.lexeme.text != "[") && (nextRawToken.lexeme.text != ".")))
                                 {
                                     Get_Token(); // ensures the error is reported at the right token
-                                    Expectation_Error ("'[' or '.'");
+                                    Expectation_Error("'[' or '.'");
                                 }
                             }
                             else
-                                table = reinterpret_cast<SYM_TABLE *>(*(Token.DataPtr));
+                                table = reinterpret_cast<SYM_TABLE *>(*(mToken.DataPtr));
 
-                            if (c =='.')
+                            if (haveNextRawToken && (nextRawToken.lexeme.category == Lexeme::Category::kOther) && (nextRawToken.lexeme.text == "."))
                             {
-                                if (table == NULL)
+                                if (table == nullptr)
                                 {
-                                    POV_PARSER_ASSERT (Token.is_array_elem);
+                                    POV_PARSER_ASSERT (mToken.is_array_elem);
                                     Error ("Attempt to access uninitialized array element.");
                                 }
 
@@ -1559,16 +637,16 @@ void Parser::Read_Symbol()
                                 Get_Token ();
                                 parseRawIdentifiers = oldParseRawIdentifiers;
 
-                                if (Token.Token_Id != IDENTIFIER_TOKEN)
+                                if (mToken.Token_Id != IDENTIFIER_TOKEN)
                                     Expectation_Error ("dictionary element identifier");
 
-                                Temp_Entry = Find_Symbol (table, Token.Token_String);
+                                Temp_Entry = Find_Symbol (table, mToken.raw.lexeme.text.c_str());
                             }
-                            else if (c == '[')
+                            else if (haveNextRawToken && (nextRawToken.lexeme.category == Lexeme::Category::kOther) && (nextRawToken.lexeme.text == "["))
                             {
-                                if (table == NULL)
+                                if (table == nullptr)
                                 {
-                                    POV_PARSER_ASSERT (Token.is_array_elem);
+                                    POV_PARSER_ASSERT (mToken.is_array_elem);
                                     Error ("Attempt to access uninitialized array element.");
                                 }
 
@@ -1586,21 +664,21 @@ void Parser::Read_Symbol()
 
                             if (Temp_Entry)
                             {
-                                Token.Token_Id      = Temp_Entry->Token_Number;
-                                Token.NumberPtr     = &(Temp_Entry->Token_Number);
-                                Token.DataPtr       = &(Temp_Entry->Data);
+                                mToken.Token_Id      = Temp_Entry->Token_Number;
+                                mToken.NumberPtr     = &(Temp_Entry->Token_Number);
+                                mToken.DataPtr       = &(Temp_Entry->Data);
                             }
                             else
                             {
                                 if (!LValue_Ok && !Inside_Ifdef && !parseOptionalRValue)
                                     Error ("Attempt to access uninitialized dictionary element.");
-                                Token.Token_Id  = IDENTIFIER_TOKEN;
-                                Token.DataPtr   = NULL;
-                                Token.NumberPtr = NULL;
+                                mToken.Token_Id  = IDENTIFIER_TOKEN;
+                                mToken.DataPtr   = nullptr;
+                                mToken.NumberPtr = nullptr;
                             }
-                            Token.is_array_elem = false;
-                            Token.is_mixed_array_elem = false;
-                            Token.is_dictionary_elem = true;
+                            mToken.is_array_elem = false;
+                            mToken.is_mixed_array_elem = false;
+                            mToken.is_dictionary_elem = true;
                         }
                         break;
 
@@ -1610,12 +688,12 @@ void Parser::Read_Symbol()
                                 POV_FREE(dictIndex);
 
                             Par             = reinterpret_cast<POV_PARAM *>(Temp_Entry->Data);
-                            Token.Token_Id  = *(Par->NumberPtr);
-                            Token.is_array_elem = false;
-                            Token.is_mixed_array_elem = false;
-                            Token.is_dictionary_elem = false;
-                            Token.NumberPtr = Par->NumberPtr;
-                            Token.DataPtr   = Par->DataPtr;
+                            mToken.Token_Id  = *(Par->NumberPtr);
+                            mToken.is_array_elem = false;
+                            mToken.is_mixed_array_elem = false;
+                            mToken.is_dictionary_elem = false;
+                            mToken.NumberPtr = Par->NumberPtr;
+                            mToken.DataPtr   = Par->DataPtr;
                         }
                         break;
 
@@ -1625,38 +703,38 @@ void Parser::Read_Symbol()
                 }
             }
 
-            Write_Token (Token.Token_Id, Token.Token_Col_No, table);
+            Write_Token (mToken.Token_Id, rawToken, table);
 
-            if (Token.DataPtr != NULL)
-                Token.Data = *(Token.DataPtr);
-            Token.context = Local_Index;
-            if (dictIndex != NULL)
-            {
-                Token.Token_String = dictIndex;
-                Token.freeString = true;
-            }
+            if (mToken.DataPtr != nullptr)
+                mToken.Data = *(mToken.DataPtr);
+            mToken.context = Local_Index;
+            if (dictIndex != nullptr)
+                mToken.raw.lexeme.text = dictIndex;
             return;
         }
     }
 
-    Write_Token (IDENTIFIER_TOKEN, Token.Token_Col_No);
+    Write_Token (IDENTIFIER_TOKEN, rawToken);
 }
 
-inline void Parser::Write_Token (TOKEN Token_Id, int col, SYM_TABLE *table)
+inline void Parser::Write_Token(const RawToken& rawToken, SYM_TABLE *table)
 {
-    if (Token.freeString)
-    {
-        POV_FREE (Token.Token_String);
-        Token.freeString = false;
-    }
-    Token.Token_File_Pos = Input_File->In_File->tellg();
-    Token.Token_Col_No   = col;
-    Token.FileHandle     = Input_File->In_File;
-    Token.Token_String   = String;
-    Token.Data           = NULL;
-    Token.Token_Id       = Conversion_Util_Table[Token_Id];
-    Token.Function_Id    = Token_Id;
-    Token.table          = table;
+    POV_PARSER_ASSERT(mToken.sourceFile == mTokenizer.GetSource());
+    mToken.raw            = rawToken;
+    mToken.Data           = nullptr;
+    mToken.Token_Id       = rawToken.expressionId;
+    mToken.Function_Id    = rawToken.GetTokenId();
+    mToken.table          = table;
+}
+
+inline void Parser::Write_Token(TokenId Token_Id, const RawToken& rawToken, SYM_TABLE *table)
+{
+    POV_PARSER_ASSERT(mToken.sourceFile == mTokenizer.GetSource());
+    mToken.raw            = rawToken;
+    mToken.Data           = nullptr;
+    mToken.Token_Id       = Conversion_Util_Table[Token_Id];
+    mToken.Function_Id    = Token_Id;
+    mToken.table          = table;
 }
 
 
@@ -1678,11 +756,11 @@ inline void Parser::Write_Token (TOKEN Token_Id, int col, SYM_TABLE *table)
 *
 ******************************************************************************/
 
-const char *Parser::Get_Token_String (TOKEN Token_Id)
+const char *Parser::Get_Token_String (TokenId Token_Id)
 {
     int i;
 
-    for (i = 0; Reserved_Words[i].Token_Name != NULL; i++)
+    for (i = 0; Reserved_Words[i].Token_Name != nullptr; i++)
         if (Reserved_Words[i].Token_Number == Token_Id)
             return (Reserved_Words[i].Token_Name);
     return ("");
@@ -1721,11 +799,11 @@ char *Parser::Get_Reserved_Words (const char *additional_words)
 
     // Compute the length required for the buffer.
 
-    for (i = 0; Reserved_Words[i].Token_Name != NULL; i++)
+    for (i = 0; Reserved_Words[i].Token_Name != nullptr; i++)
     {
         if (!isalpha (Reserved_Words [i].Token_Name [0]))
             continue;
-        if (strchr (Reserved_Words [i].Token_Name, ' ') != NULL)
+        if (strchr (Reserved_Words [i].Token_Name, ' ') != nullptr)
             continue;
         length += (int)strlen (Reserved_Words[i].Token_Name) + 1;
     }
@@ -1742,11 +820,11 @@ char *Parser::Get_Reserved_Words (const char *additional_words)
 
     // Copy our own keywords into the buffer.
 
-    for (i = 0; Reserved_Words[i].Token_Name != NULL; i++)
+    for (i = 0; Reserved_Words[i].Token_Name != nullptr; i++)
     {
         if (!isalpha (Reserved_Words [i].Token_Name [0]))
             continue;
-        if (strchr (Reserved_Words [i].Token_Name, ' ') != NULL)
+        if (strchr (Reserved_Words [i].Token_Name, ' ') != nullptr)
             continue;
         s += sprintf (s, "%s\n", Reserved_Words[i].Token_Name);
     }
@@ -1774,53 +852,29 @@ char *Parser::Get_Reserved_Words (const char *additional_words)
 *
 ******************************************************************************/
 
-int Parser::Echo_getc()
+bool Parser::GetRawToken(RawToken& rawToken, bool fastForwardToDirective)
 {
-    int c;
-
-    if((Input_File == NULL) || (Input_File->In_File == NULL) || (c = Input_File->In_File->getchar()) == EOF)
+    if (mHavePendingRawToken)
     {
-        if (Got_EOF)
-            return EOF;
-        Got_EOF = true;
-        Echo_Indx = 0;
-        return ('\n');
+        rawToken = mPendingRawToken;
+        mHavePendingRawToken = false;
+        if (!fastForwardToDirective || ((rawToken.lexeme.category == Lexeme::Category::kOther) && (rawToken.lexeme.text == "#")))
+            return true;
     }
 
-    Echo_Indx++;
-    if(c == '\n')
-        Echo_Indx = 0;
-
-    return c;
+    if (fastForwardToDirective)
+        return mTokenizer.GetNextDirective(rawToken);
+    else
+        return mTokenizer.GetNextToken(rawToken);
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
-
-void Parser::Echo_ungetc(int c)
+bool Parser::PeekRawToken(RawToken& lexeme)
 {
-    if(Echo_Indx > 0)
-        Echo_Indx--;
+    if (!GetRawToken(lexeme, false))
+        return false;
 
-    if (!Got_EOF)
-        Input_File->In_File->ungetchar(c);
+    UngetRawToken(lexeme);
+    return true;
 }
 
 
@@ -1842,53 +896,12 @@ void Parser::Echo_ungetc(int c)
 *
 ******************************************************************************/
 
-void Parser::Where_Error(POVMSObjectPtr msg)
+void Parser::UngetRawToken(const RawToken& rawToken)
 {
-    // return if no filename is specified
-    if(Token.FileHandle == NULL)
-        return;
-
-    (void)POVMSUtil_SetUCS2String(msg, kPOVAttrib_FileName, Token.FileHandle->name());
-    (void)POVMSUtil_SetString(msg, kPOVAttrib_TokenName, Token.Token_String);
-    (void)POVMSUtil_SetLong(msg, kPOVAttrib_Line, Token.Token_File_Pos.lineno);
-    (void)POVMSUtil_SetInt(msg, kPOVAttrib_Column, Token.Token_Col_No);
-    if(Token.FileHandle != NULL)
-        (void)POVMSUtil_SetLong(msg, kPOVAttrib_FilePosition, Token.FileHandle->tellg().offset);
+    POV_PARSER_ASSERT(!mHavePendingRawToken);
+    mPendingRawToken = rawToken;
+    mHavePendingRawToken = true;
 }
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
-
-void Parser::Where_Warning(POVMSObjectPtr msg)
-{
-    // return if no filename is specified
-    if(Token.FileHandle == NULL)
-        return;
-
-    (void)POVMSUtil_SetUCS2String(msg, kPOVAttrib_FileName, Token.FileHandle->name());
-    (void)POVMSUtil_SetString(msg, kPOVAttrib_TokenName, Token.Token_String);
-    (void)POVMSUtil_SetLong(msg, kPOVAttrib_Line, Token.Token_File_Pos.lineno);
-    (void)POVMSUtil_SetInt(msg, kPOVAttrib_Column, Token.Token_Col_No);
-    if(Token.FileHandle != NULL)
-        (void)POVMSUtil_SetLong(msg, kPOVAttrib_FilePosition, Token.FileHandle->tellg().offset);
-}
-
 
 
 /*****************************************************************************
@@ -1914,25 +927,24 @@ void Parser::Parse_Directive(int After_Hash)
     DBL Value, Value2;
     int Flag;
     char *ts;
-    Macro *PMac=NULL;
-    COND_TYPE Curr_Type = Cond_Stack[CS_Index].Cond_Type;
-    POV_OFF_T Hash_Loc = Input_File->In_File->tellg().offset;
+    Macro *PMac=nullptr;
+    COND_TYPE Curr_Type = Cond_Stack.back().Cond_Type;
+    LexemePosition hashPosition = mToken.raw.lexeme.position;
 
     if (Curr_Type == INVOKING_MACRO_COND)
     {
-        POV_PARSER_ASSERT(Cond_Stack[CS_Index].PMac != NULL);
-        if ((Cond_Stack[CS_Index].PMac->Macro_End==Hash_Loc) &&
-            (UCS2_strcmp(Cond_Stack[CS_Index].PMac->Macro_Filename, Input_File->In_File->name()) == 0))
+        POV_PARSER_ASSERT(Cond_Stack.back().PMac != nullptr);
+        if ((Cond_Stack.back().PMac->endPosition == hashPosition) &&
+            (Cond_Stack.back().PMac->source.sourceName == mTokenizer.GetSourceName()))
         {
             Return_From_Macro();
-            if (--CS_Index < 0)
-            {
+            Cond_Stack.pop_back();
+            if (Cond_Stack.empty())
                 Error("Mis-matched '#end'.");
-            }
-            Token.Token_Id = END_OF_FILE_TOKEN;
-            Token.is_array_elem = false;
-            Token.is_mixed_array_elem = false;
-            Token.is_dictionary_elem = false;
+            mToken.Token_Id = END_OF_FILE_TOKEN;
+            mToken.is_array_elem = false;
+            mToken.is_mixed_array_elem = false;
+            mToken.is_dictionary_elem = false;
 
             return;
         }
@@ -1942,12 +954,12 @@ void Parser::Parse_Directive(int After_Hash)
     {
         if (After_Hash)
         {
-            Token.Token_Id=HASH_TOKEN;
-            Token.is_array_elem = false;
-            Token.is_mixed_array_elem = false;
-            Token.is_dictionary_elem = false;
+            mToken.Token_Id=HASH_TOKEN;
+            mToken.is_array_elem = false;
+            mToken.is_mixed_array_elem = false;
+            mToken.is_dictionary_elem = false;
         }
-        Token.Unget_Token = false;
+        mToken.Unget_Token = false;
 
         return;
     }
@@ -1962,18 +974,18 @@ void Parser::Parse_Directive(int After_Hash)
 
             if (Skipping)
             {
-                Cond_Stack[CS_Index].Cond_Type = SKIP_TIL_END_COND;
+                Cond_Stack.back().Cond_Type = SKIP_TIL_END_COND;
                 Skip_Tokens(SKIP_TIL_END_COND);
             }
             else
             {
                 if (Parse_Ifdef_Param())
                 {
-                    Cond_Stack[CS_Index].Cond_Type=IF_TRUE_COND;
+                    Cond_Stack.back().Cond_Type=IF_TRUE_COND;
                 }
                 else
                 {
-                    Cond_Stack[CS_Index].Cond_Type=IF_FALSE_COND;
+                    Cond_Stack.back().Cond_Type=IF_FALSE_COND;
                     Skip_Tokens(IF_FALSE_COND);
                 }
             }
@@ -1986,19 +998,19 @@ void Parser::Parse_Directive(int After_Hash)
 
             if (Skipping)
             {
-                Cond_Stack[CS_Index].Cond_Type = SKIP_TIL_END_COND;
+                Cond_Stack.back().Cond_Type = SKIP_TIL_END_COND;
                 Skip_Tokens(SKIP_TIL_END_COND);
             }
             else
             {
                 if (Parse_Ifdef_Param())
                 {
-                    Cond_Stack[CS_Index].Cond_Type=IF_FALSE_COND;
+                    Cond_Stack.back().Cond_Type=IF_FALSE_COND;
                     Skip_Tokens(IF_FALSE_COND);
                 }
                 else
                 {
-                    Cond_Stack[CS_Index].Cond_Type=IF_TRUE_COND;
+                    Cond_Stack.back().Cond_Type=IF_TRUE_COND;
                 }
             }
             EXIT
@@ -2010,7 +1022,7 @@ void Parser::Parse_Directive(int After_Hash)
 
             if (Skipping)
             {
-                Cond_Stack[CS_Index].Cond_Type = SKIP_TIL_END_COND;
+                Cond_Stack.back().Cond_Type = SKIP_TIL_END_COND;
                 Skip_Tokens(SKIP_TIL_END_COND);
             }
             else
@@ -2019,11 +1031,11 @@ void Parser::Parse_Directive(int After_Hash)
 
                 if (fabs(Value)>EPSILON)
                 {
-                    Cond_Stack[CS_Index].Cond_Type=IF_TRUE_COND;
+                    Cond_Stack.back().Cond_Type=IF_TRUE_COND;
                 }
                 else
                 {
-                    Cond_Stack[CS_Index].Cond_Type=IF_FALSE_COND;
+                    Cond_Stack.back().Cond_Type=IF_FALSE_COND;
                     Skip_Tokens(IF_FALSE_COND);
                 }
             }
@@ -2036,23 +1048,22 @@ void Parser::Parse_Directive(int After_Hash)
 
             if (Skipping)
             {
-                Cond_Stack[CS_Index].Cond_Type = SKIP_TIL_END_COND;
+                Cond_Stack.back().Cond_Type = SKIP_TIL_END_COND;
                 Skip_Tokens(SKIP_TIL_END_COND);
             }
             else
             {
-                Cond_Stack[CS_Index].Loop_File = Input_File->In_File;
-                Cond_Stack[CS_Index].File_Pos  = Input_File->In_File->tellg();
+                Cond_Stack.back().returnToBookmark = mTokenizer.GetHotBookmark();
 
                 Value=Parse_Cond_Param();
 
                 if (fabs(Value)>EPSILON)
                 {
-                    Cond_Stack[CS_Index].Cond_Type = WHILE_COND;
+                    Cond_Stack.back().Cond_Type = WHILE_COND;
                 }
                 else
                 {
-                    Cond_Stack[CS_Index].Cond_Type = SKIP_TIL_END_COND;
+                    Cond_Stack.back().Cond_Type = SKIP_TIL_END_COND;
                     Skip_Tokens(SKIP_TIL_END_COND);
                 }
             }
@@ -2065,27 +1076,26 @@ void Parser::Parse_Directive(int After_Hash)
 
             if (Skipping)
             {
-                Cond_Stack[CS_Index].Cond_Type = SKIP_TIL_END_COND;
+                Cond_Stack.back().Cond_Type = SKIP_TIL_END_COND;
                 Skip_Tokens(SKIP_TIL_END_COND);
             }
             else
             {
-                char* Identifier = NULL;
+                char* Identifier = nullptr;
                 DBL End, Step;
                 if (Parse_For_Param (&Identifier, &End, &Step))
                 {
                     // execute loop
-                    Cond_Stack[CS_Index].Cond_Type = FOR_COND;
-                    Cond_Stack[CS_Index].Loop_File = Input_File->In_File;
-                    Cond_Stack[CS_Index].File_Pos  = Input_File->In_File->tellg();
-                    Cond_Stack[CS_Index].Loop_Identifier = Identifier;
-                    Cond_Stack[CS_Index].For_Loop_End = End;
-                    Cond_Stack[CS_Index].For_Loop_Step = Step;
+                    Cond_Stack.back().Cond_Type = FOR_COND;
+                    Cond_Stack.back().returnToBookmark = mTokenizer.GetHotBookmark();
+                    Cond_Stack.back().Loop_Identifier = Identifier;
+                    Cond_Stack.back().For_Loop_End = End;
+                    Cond_Stack.back().For_Loop_Step = Step;
                 }
                 else
                 {
                     // terminate loop before it has even started
-                    Cond_Stack[CS_Index].Cond_Type = SKIP_TIL_END_COND;
+                    Cond_Stack.back().Cond_Type = SKIP_TIL_END_COND;
                     Skip_Tokens(SKIP_TIL_END_COND);
                     // need to do some cleanup otherwise deferred via the Cond_Stack
                     POV_FREE(Identifier);
@@ -2099,16 +1109,16 @@ void Parser::Parse_Directive(int After_Hash)
             switch (Curr_Type)
             {
                 case IF_TRUE_COND:
-                    Cond_Stack[CS_Index].Cond_Type = SKIP_TIL_END_COND;
+                    Cond_Stack.back().Cond_Type = SKIP_TIL_END_COND;
                     Skip_Tokens(SKIP_TIL_END_COND);
                     break;
 
                 case IF_FALSE_COND:
-                    Cond_Stack[CS_Index].Cond_Type = ELSE_COND;
-                    Token.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
-                    Token.is_array_elem = false;
-                    Token.is_mixed_array_elem = false;
-                    Token.is_dictionary_elem = false;
+                    Cond_Stack.back().Cond_Type = ELSE_COND;
+                    mToken.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
+                    mToken.is_array_elem = false;
+                    mToken.is_mixed_array_elem = false;
+                    mToken.is_dictionary_elem = false;
                     UNGET
                     break;
 
@@ -2117,13 +1127,13 @@ void Parser::Parse_Directive(int After_Hash)
                     break;
 
                 case CASE_FALSE_COND:
-                    Cond_Stack[CS_Index].Cond_Type = CASE_TRUE_COND;
+                    Cond_Stack.back().Cond_Type = CASE_TRUE_COND;
                     if (Skipping)
                     {
-                        Token.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
-                        Token.is_array_elem = false;
-                        Token.is_mixed_array_elem = false;
-                        Token.is_dictionary_elem = false;
+                        mToken.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
+                        mToken.is_array_elem = false;
+                        mToken.is_mixed_array_elem = false;
+                        mToken.is_dictionary_elem = false;
                         UNGET
                     }
                     break;
@@ -2139,7 +1149,7 @@ void Parser::Parse_Directive(int After_Hash)
             switch (Curr_Type)
             {
                 case IF_TRUE_COND:
-                    Cond_Stack[CS_Index].Cond_Type = SKIP_TIL_END_COND;
+                    Cond_Stack.back().Cond_Type = SKIP_TIL_END_COND;
                     Skip_Tokens(SKIP_TIL_END_COND);
                     break;
 
@@ -2147,11 +1157,11 @@ void Parser::Parse_Directive(int After_Hash)
                     Value=Parse_Cond_Param();
                     if (fabs(Value)>EPSILON)
                     {
-                        Cond_Stack[CS_Index].Cond_Type=IF_TRUE_COND;
-                        Token.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
-                        Token.is_array_elem = false;
-                        Token.is_mixed_array_elem = false;
-                        Token.is_dictionary_elem = false;
+                        Cond_Stack.back().Cond_Type=IF_TRUE_COND;
+                        mToken.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
+                        mToken.is_array_elem = false;
+                        mToken.is_mixed_array_elem = false;
+                        mToken.is_dictionary_elem = false;
                         UNGET
                     }
                     else
@@ -2175,42 +1185,42 @@ void Parser::Parse_Directive(int After_Hash)
 
             if (Skipping)
             {
-                Cond_Stack[CS_Index].Cond_Type = SKIP_TIL_END_COND;
+                Cond_Stack.back().Cond_Type = SKIP_TIL_END_COND;
                 Skip_Tokens(SKIP_TIL_END_COND);
             }
             else
             {
-                Cond_Stack[CS_Index].Switch_Value=Parse_Cond_Param();
-                Cond_Stack[CS_Index].Cond_Type=SWITCH_COND;
-                Cond_Stack[CS_Index].Switch_Case_Ok_Flag=false;
+                Cond_Stack.back().Switch_Value=Parse_Cond_Param();
+                Cond_Stack.back().Cond_Type=SWITCH_COND;
+                Cond_Stack.back().Switch_Case_Ok_Flag=false;
                 EXPECT_ONE
                     // NOTE: We actually expect a "#case" or "#range" here; however, this will trigger a nested call
                     // to Parse_Directive, so we'll encounter that CASE_TOKEN or RANGE_TOKEN here only by courtesy of the
                     // respective handler, which will UNGET the token and inform us via the Switch_Case_Ok_Flag
                     // that the CASE_TOKEN or RANGE_TOKEN we encounter here was properly preceded with a hash ("#").
                     CASE2(CASE_TOKEN,RANGE_TOKEN)
-                        if (!Cond_Stack[CS_Index].Switch_Case_Ok_Flag)
+                        if (!Cond_Stack.back().Switch_Case_Ok_Flag)
                             Error("#switch not followed by #case or #range.");
 
-                        if (Token.Token_Id==CASE_TOKEN)
+                        if (mToken.Token_Id==CASE_TOKEN)
                         {
                             Value=Parse_Cond_Param();
-                            Flag = (fabs(Value-Cond_Stack[CS_Index].Switch_Value)<EPSILON);
+                            Flag = (fabs(Value-Cond_Stack.back().Switch_Value)<EPSILON);
                         }
                         else
                         {
                             Parse_Cond_Param2(&Value,&Value2);
-                            Flag = ((Cond_Stack[CS_Index].Switch_Value >= Value) &&
-                                    (Cond_Stack[CS_Index].Switch_Value <= Value2));
+                            Flag = ((Cond_Stack.back().Switch_Value >= Value) &&
+                                    (Cond_Stack.back().Switch_Value <= Value2));
                         }
 
                         if(Flag)
                         {
-                            Cond_Stack[CS_Index].Cond_Type=CASE_TRUE_COND;
+                            Cond_Stack.back().Cond_Type=CASE_TRUE_COND;
                         }
                         else
                         {
-                            Cond_Stack[CS_Index].Cond_Type=CASE_FALSE_COND;
+                            Cond_Stack.back().Cond_Type=CASE_FALSE_COND;
                             Skip_Tokens(CASE_FALSE_COND);
                         }
                     END_CASE
@@ -2236,34 +1246,34 @@ void Parser::Parse_Directive(int After_Hash)
             {
                 case CASE_TRUE_COND:
                 case CASE_FALSE_COND:
-                    if (Token.Token_Id==CASE_TOKEN)
+                    if (mToken.Token_Id==CASE_TOKEN)
                     {
                         Value=Parse_Cond_Param();
-                        Flag = (fabs(Value-Cond_Stack[CS_Index].Switch_Value)<EPSILON);
+                        Flag = (fabs(Value-Cond_Stack.back().Switch_Value)<EPSILON);
                     }
                     else
                     {
                         Parse_Cond_Param2(&Value,&Value2);
-                        Flag = ((Cond_Stack[CS_Index].Switch_Value >= Value) &&
-                                (Cond_Stack[CS_Index].Switch_Value <= Value2));
+                        Flag = ((Cond_Stack.back().Switch_Value >= Value) &&
+                                (Cond_Stack.back().Switch_Value <= Value2));
                     }
 
                     if(Flag && (Curr_Type==CASE_FALSE_COND))
                     {
-                        Cond_Stack[CS_Index].Cond_Type=CASE_TRUE_COND;
+                        Cond_Stack.back().Cond_Type=CASE_TRUE_COND;
                         if (Skipping)
                         {
-                            Token.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
-                            Token.is_array_elem = false;
-                            Token.is_mixed_array_elem = false;
-                            Token.is_dictionary_elem = false;
+                            mToken.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
+                            mToken.is_array_elem = false;
+                            mToken.is_mixed_array_elem = false;
+                            mToken.is_dictionary_elem = false;
                             UNGET
                         }
                     }
                     break;
 
                 case SWITCH_COND:
-                    Cond_Stack[CS_Index].Switch_Case_Ok_Flag=true;
+                    Cond_Stack.back().Switch_Case_Ok_Flag=true;
                     UNGET
                     break;
 
@@ -2283,17 +1293,16 @@ void Parser::Parse_Directive(int After_Hash)
                 case INVOKING_MACRO_COND:
                     POV_PARSER_ASSERT(false); // We should have identified the macro's proper `#end` at the beginning of this function.
                     Return_From_Macro();
-                    if (--CS_Index < 0)
-                    {
+                    Cond_Stack.pop_back();
+                    if (Cond_Stack.empty())
                         Error("Mis-matched '#end'.");
-                    }
                     break;
 
                 case IF_FALSE_COND:
-                    Token.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
-                    Token.is_array_elem = false;
-                    Token.is_mixed_array_elem = false;
-                    Token.is_dictionary_elem = false;
+                    mToken.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
+                    mToken.is_array_elem = false;
+                    mToken.is_mixed_array_elem = false;
+                    mToken.is_dictionary_elem = false;
                     UNGET
                     // FALLTHROUGH
                 case IF_TRUE_COND:
@@ -2304,50 +1313,55 @@ void Parser::Parse_Directive(int After_Hash)
                 case SKIP_TIL_END_COND:
                     if (Curr_Type==DECLARING_MACRO_COND)
                     {
-                        if ((PMac=Cond_Stack[CS_Index].PMac)!=NULL)
+                        if ((PMac=Cond_Stack.back().PMac) != nullptr)
                         {
-                            PMac->Macro_End=Hash_Loc;
-                            ITextStream::FilePos pos = Input_File->In_File->tellg();
-                            POV_OFF_T macroLength = pos.offset - PMac->Macro_File_Pos.offset;
+                            if (PMac->source.sourceName != mTokenizer.GetSourceName())
+                                Error("#macro did not end in file where it started.");
+
+                            PMac->endPosition = hashPosition;
+                            POV_OFF_T macroLength = mToken.raw.lexeme.position - PMac->source;
+                            /// @todo Re-enable cached macros.
+#if 0
                             if (macroLength <= MaxCachedMacroSize)
                             {
                                 PMac->CacheSize = macroLength;
                                 PMac->Cache = new unsigned char[PMac->CacheSize];
                                 if (PMac->Cache)
                                 {
-                                    Input_File->In_File->seekg(PMac->Macro_File_Pos);
-                                    if (!Input_File->In_File->ReadRaw(PMac->Cache, PMac->CacheSize))
+                                    mTokenizer.GoToBookmark(PMac->source);
+                                    Input_File->inFile->seekg(PMac->Macro_File_Pos);
+                                    if (!Input_File->inFile->ReadRaw(PMac->Cache, PMac->CacheSize))
                                     {
                                         delete[] PMac->Cache;
-                                        PMac->Cache = NULL;
+                                        PMac->Cache = nullptr;
                                     }
-                                    Input_File->In_File->seekg(pos);
+                                    Input_File->inFile->seekg(pos);
                                 }
                             }
+#endif
                         }
                     }
-                    if (--CS_Index < 0)
-                    {
+                    Cond_Stack.pop_back();
+                    if (Cond_Stack.empty())
                         Error("Mis-matched '#end'.");
-                    }
                     if (Skipping)
                     {
-                        Token.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
-                        Token.is_array_elem = false;
-                        Token.is_mixed_array_elem = false;
-                        Token.is_dictionary_elem = false;
+                        mToken.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
+                        mToken.is_array_elem = false;
+                        mToken.is_mixed_array_elem = false;
+                        mToken.is_dictionary_elem = false;
                         UNGET
                     }
                     break;
 
                 case WHILE_COND:
-                    if (Cond_Stack[CS_Index].Loop_File != Input_File->In_File)
+                    if (Cond_Stack.back().returnToBookmark.pSource != mTokenizer.GetSource())
                     {
                         Error("#while loop did not end in file where it started.");
                     }
 
                     Got_EOF=false;
-                    if (!Input_File->In_File->seekg(Cond_Stack[CS_Index].File_Pos))
+                    if (!mTokenizer.GoToBookmark(Cond_Stack.back().returnToBookmark))
                     {
                         Error("Unable to seek in input file for #while directive.");
                     }
@@ -2356,39 +1370,39 @@ void Parser::Parse_Directive(int After_Hash)
 
                     if (fabs(Value)<EPSILON)
                     {
-                        Cond_Stack[CS_Index].Cond_Type = SKIP_TIL_END_COND;
+                        Cond_Stack.back().Cond_Type = SKIP_TIL_END_COND;
                         Skip_Tokens(SKIP_TIL_END_COND);
                     }
                     break;
 
                 case FOR_COND:
-                    if (Cond_Stack[CS_Index].Loop_File != Input_File->In_File)
+                    if (Cond_Stack.back().returnToBookmark.pSource != mTokenizer.GetSource())
                     {
                         Error("#for loop did not end in file where it started.");
                     }
 
                     Got_EOF=false;
-                    if (!Input_File->In_File->seekg(Cond_Stack[CS_Index].File_Pos))
+                    if (!mTokenizer.GoToBookmark(Cond_Stack.back().returnToBookmark))
                     {
                         Error("Unable to seek in input file for #for directive.");
                     }
 
                     {
-                        SYM_ENTRY* Entry = Find_Symbol(Table_Index, Cond_Stack[CS_Index].Loop_Identifier);
-                        if ((Entry == NULL) || (Entry->Token_Number != FLOAT_ID_TOKEN))
+                        SYM_ENTRY* Entry = Find_Symbol(Table_Index, Cond_Stack.back().Loop_Identifier);
+                        if ((Entry == nullptr) || (Entry->Token_Number != FLOAT_ID_TOKEN))
                             Error ("#for loop variable must remain defined and numerical during loop.");
 
                         DBL* CurrentPtr = reinterpret_cast<DBL *>(Entry->Data);
-                        DBL  End        = Cond_Stack[CS_Index].For_Loop_End;
-                        DBL  Step       = Cond_Stack[CS_Index].For_Loop_Step;
+                        DBL  End        = Cond_Stack.back().For_Loop_End;
+                        DBL  Step       = Cond_Stack.back().For_Loop_Step;
 
                         *CurrentPtr = *CurrentPtr + Step;
 
                         if ( ((Step > 0) && (*CurrentPtr > End + EPSILON)) ||
                              ((Step < 0) && (*CurrentPtr < End - EPSILON)) )
                         {
-                            POV_FREE(Cond_Stack[CS_Index].Loop_Identifier);
-                            Cond_Stack[CS_Index].Cond_Type = SKIP_TIL_END_COND;
+                            POV_FREE(Cond_Stack.back().Loop_Identifier);
+                            Cond_Stack.back().Cond_Type = SKIP_TIL_END_COND;
                             Skip_Tokens(SKIP_TIL_END_COND);
                         }
                     }
@@ -2409,14 +1423,14 @@ void Parser::Parse_Directive(int After_Hash)
             }
             else
             {
-                Parse_Declare(Token.Token_Id == LOCAL_TOKEN, After_Hash);
-                Curr_Type = Cond_Stack[CS_Index].Cond_Type;
-                if (Token.Unget_Token)
+                Parse_Declare(mToken.Token_Id == LOCAL_TOKEN, After_Hash);
+                Curr_Type = Cond_Stack.back().Cond_Type;
+                if (mToken.Unget_Token)
                 {
-                    switch (Token.Token_Id)
+                    switch (mToken.Token_Id)
                     {
                         case HASH_TOKEN:
-                            Token.Unget_Token=false;
+                            mToken.Unget_Token=false;
                             Parsing_Directive = true;
                             break;
 
@@ -2470,7 +1484,7 @@ void Parser::Parse_Directive(int After_Hash)
             }
             else
             {
-                switch(Token.Function_Id)
+                switch(mToken.Function_Id)
                 {
                     case VERSION_TOKEN:
                         {
@@ -2512,7 +1526,7 @@ void Parser::Parse_Directive(int After_Hash)
                                 // standard include files that happens to have been updated since the scene was
                                 // originally designed.)
 
-                                if (Include_File_Index == 0)
+                                if (maIncludeStack.empty())
                                     Error("As of POV-Ray v3.7, the '#version' directive must be the first non-comment "
                                           "statement in the scene file. To indicate that your scene will dynamically "
                                           "adapt to whatever POV-Ray version is actually used, start your scene with "
@@ -2562,10 +1576,10 @@ void Parser::Parse_Directive(int After_Hash)
 
                             Ok_To_Declare = true;
                             parsingVersionDirective = wasParsingVersionDirective;
-                            Curr_Type = Cond_Stack[CS_Index].Cond_Type;
-                            if (Token.Unget_Token && (Token.Token_Id==HASH_TOKEN))
+                            Curr_Type = Cond_Stack.back().Cond_Type;
+                            if (mToken.Unget_Token && (mToken.Token_Id==HASH_TOKEN))
                             {
-                                Token.Unget_Token=false;
+                                mToken.Unget_Token=false;
                                 Parsing_Directive = true;
                             }
                             else
@@ -2717,7 +1731,7 @@ void Parser::Parse_Directive(int After_Hash)
                     END_CASE
 
                     CASE (FILE_ID_TOKEN)
-                        if (reinterpret_cast<DATA_FILE *>(Token.Data)->busyParsing)
+                        if (reinterpret_cast<DATA_FILE *>(mToken.Data)->busyParsing)
                             Error("Can't undefine a file identifier inside a file directive that accesses it.");
                         else
                             PossibleError("Undefining an open file identifier. Use '#fclose' instead.");
@@ -2732,19 +1746,19 @@ void Parser::Parse_Directive(int After_Hash)
                     CASE4 (DENSITY_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_MAP_ID_TOKEN, UV_ID_TOKEN)
                     CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
                     CASE3 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN, DICTIONARY_ID_TOKEN)
-                        Remove_Symbol (Token.table, Token.Token_String, Token.is_array_elem, Token.DataPtr, Token.Token_Id);
-                        if (Token.is_mixed_array_elem)
-                            *Token.NumberPtr = IDENTIFIER_TOKEN;
+                        Remove_Symbol (mToken.table, mToken.raw.lexeme.text.c_str(), mToken.is_array_elem, mToken.DataPtr, mToken.Token_Id);
+                        if (mToken.is_mixed_array_elem)
+                            *mToken.NumberPtr = IDENTIFIER_TOKEN;
                     END_CASE
 
                     CASE2 (VECTOR_FUNCT_TOKEN, FLOAT_FUNCT_TOKEN)
-                        switch(Token.Function_Id)
+                        switch(mToken.Function_Id)
                         {
                             case VECTOR_ID_TOKEN:
                             case FLOAT_ID_TOKEN:
-                                Remove_Symbol (Token.table, Token.Token_String, Token.is_array_elem, Token.DataPtr, Token.Token_Id);
-                                if (Token.is_mixed_array_elem)
-                                    *Token.NumberPtr = IDENTIFIER_TOKEN;
+                                Remove_Symbol (mToken.table, mToken.raw.lexeme.text.c_str(), mToken.is_array_elem, mToken.DataPtr, mToken.Token_Id);
+                                if (mToken.is_mixed_array_elem)
+                                    *mToken.NumberPtr = IDENTIFIER_TOKEN;
                                 break;
 
                             default:
@@ -2788,8 +1802,8 @@ void Parser::Parse_Directive(int After_Hash)
                 PMac=Parse_Macro();
                 Inside_MacroDef=false;
             }
-            Cond_Stack[CS_Index].Cond_Type = DECLARING_MACRO_COND;
-            Cond_Stack[CS_Index].PMac      = PMac;
+            Cond_Stack.back().Cond_Type = DECLARING_MACRO_COND;
+            Cond_Stack.back().PMac      = PMac;
             Skip_Tokens(DECLARING_MACRO_COND);
             EXIT
         END_CASE
@@ -2811,16 +1825,16 @@ void Parser::Parse_Directive(int After_Hash)
 
     Parsing_Directive = false;
 
-    if (Token.Unget_Token)
+    if (mToken.Unget_Token)
     {
-        Token.Unget_Token = false;
+        mToken.Unget_Token = false;
     }
     else
     {
-        Token.Token_Id = END_OF_FILE_TOKEN;
-        Token.is_array_elem = false;
-        Token.is_mixed_array_elem = false;
-        Token.is_dictionary_elem = false;
+        mToken.Token_Id = END_OF_FILE_TOKEN;
+        mToken.is_array_elem = false;
+        mToken.is_mixed_array_elem = false;
+        mToken.is_dictionary_elem = false;
     }
 }
 
@@ -2847,49 +1861,12 @@ void Parser::Open_Include()
 {
     char *asciiFileName;
     UCS2String formalFileName; // Name the file is known by to the user.
-    UCS2String actualFileName; // Name the file is known by on the local system.
-
-    if (Skip_Spaces () != true)
-        Error ("Expecting a string after INCLUDE.");
 
     asciiFileName = Parse_C_String(true);
     formalFileName = ASCIItoUCS2String(asciiFileName);
     POV_FREE(asciiFileName);
 
-    Include_File_Index++;
-
-    if (Include_File_Index >= MAX_INCLUDE_FILES)
-    {
-        Include_File_Index--;
-        Error ("Too many nested include files.");
-    }
-
-    Echo_Indx = 0;
-
-    Input_File = &Include_Files[Include_File_Index];
-
-    // must set this to NULL in case it's uninitialized - if Locate_File throws an
-    // exception (e.g. I/O restriction error), the parser shut-down code will attempt
-    // to free In_File if it's not NULL.
-    Input_File->In_File = NULL;
-
-    IStream *is = Locate_File(formalFileName, POV_File_Text_INC, actualFileName, true);
-    if(is == NULL)
-    {
-        Input_File->In_File = NULL;  /* Keeps from closing failed file. */
-        Error ("Cannot open include file %s.", UCS2toASCIIString(formalFileName).c_str());
-    }
-    else
-        Input_File->In_File = new IBufferedTextStream(formalFileName.c_str(), is);
-
-    Input_File->R_Flag=false;
-
-    Add_Sym_Table();
-
-    Token.Token_Id = END_OF_FILE_TOKEN;
-    Token.is_array_elem = false;
-    Token.is_mixed_array_elem = false;
-    Token.is_dictionary_elem = false;
+    IncludeHeader(formalFileName);
 }
 
 
@@ -2914,25 +1891,25 @@ void Parser::Open_Include()
 
 void Parser::Skip_Tokens(COND_TYPE cond)
 {
-    int Temp      = CS_Index;
+    int Temp      = Cond_Stack.size();
     int Prev_Skip = Skipping;
 
     Skipping=true;
 
-    while ((CS_Index > Temp) || ((CS_Index == Temp) && (Cond_Stack[CS_Index].Cond_Type == cond)))
+    while ((Cond_Stack.size() > Temp) || ((Cond_Stack.size() == Temp) && (Cond_Stack.back().Cond_Type == cond)))
     {
         Get_Token();
     }
 
     Skipping=Prev_Skip;
 
-    if (Token.Token_Id==HASH_TOKEN)
+    if (mToken.Token_Id==HASH_TOKEN)
     {
-        Token.Token_Id=END_OF_FILE_TOKEN;
-        Token.is_array_elem = false;
-        Token.is_mixed_array_elem = false;
-        Token.is_dictionary_elem = false;
-        Token.Unget_Token=false;
+        mToken.Token_Id=END_OF_FILE_TOKEN;
+        mToken.is_array_elem = false;
+        mToken.is_mixed_array_elem = false;
+        mToken.is_dictionary_elem = false;
+        mToken.Unget_Token=false;
     }
     else
     {
@@ -2965,38 +1942,38 @@ void Parser::Break()
 
     Skipping=true;
 
-    while ( (CS_Index > 0) &&
-            (Cond_Stack[CS_Index].Cond_Type != WHILE_COND) &&
-            (Cond_Stack[CS_Index].Cond_Type != FOR_COND) &&
-            (Cond_Stack[CS_Index].Cond_Type != CASE_TRUE_COND) &&
-            (Cond_Stack[CS_Index].Cond_Type != INVOKING_MACRO_COND) )
+    while ( (Cond_Stack.size() > 1) &&
+            (Cond_Stack.back().Cond_Type != WHILE_COND) &&
+            (Cond_Stack.back().Cond_Type != FOR_COND) &&
+            (Cond_Stack.back().Cond_Type != CASE_TRUE_COND) &&
+            (Cond_Stack.back().Cond_Type != INVOKING_MACRO_COND) )
     {
         Get_Token();
     }
 
-    if (CS_Index == 0)
+    if (Cond_Stack.size() == 1)
         Error ("Invalid context for #break");
 
-    if (Cond_Stack[CS_Index].Cond_Type == INVOKING_MACRO_COND)
+    if (Cond_Stack.back().Cond_Type == INVOKING_MACRO_COND)
     {
         Skipping=Prev_Skip;
         Return_From_Macro();
-        --CS_Index;
+        Cond_Stack.pop_back();
         return;
     }
 
-    Cond_Stack[CS_Index].Cond_Type = SKIP_TIL_END_COND;
+    Cond_Stack.back().Cond_Type = SKIP_TIL_END_COND;
     Skip_Tokens (SKIP_TIL_END_COND);
 
     Skipping=Prev_Skip;
 
-    if (Token.Token_Id==HASH_TOKEN)
+    if (mToken.Token_Id==HASH_TOKEN)
     {
-        Token.Token_Id=END_OF_FILE_TOKEN;
-        Token.is_array_elem = false;
-        Token.is_mixed_array_elem = false;
-        Token.is_dictionary_elem = false;
-        Token.Unget_Token=false;
+        mToken.Token_Id=END_OF_FILE_TOKEN;
+        mToken.is_array_elem = false;
+        mToken.is_mixed_array_elem = false;
+        mToken.is_dictionary_elem = false;
+        mToken.Unget_Token=false;
     }
     else
     {
@@ -3073,7 +2050,7 @@ void Parser::init_sym_tables()
 
     Add_Sym_Table();
 
-    for (i = 0; Reserved_Words[i].Token_Name != NULL; i++)
+    for (i = 0; Reserved_Words[i].Token_Name != nullptr; i++)
     {
         Add_Symbol(SYM_TABLE_RESERVED,Reserved_Words[i].Token_Name,Reserved_Words[i].Token_Number);
     }
@@ -3088,7 +2065,7 @@ Parser::SYM_TABLE *Parser::Create_Sym_Table (bool copyNames)
 
     for (int i = 0; i < SYM_TABLE_SIZE; i++)
     {
-        New->Table[i] = NULL;
+        New->Table[i] = nullptr;
     }
 
     return New;
@@ -3118,7 +2095,7 @@ void Parser::Destroy_Sym_Table (Parser::SYM_TABLE *Table)
             Entry = Destroy_Entry (Entry, Table->namesAreCopies);
         }
 
-        Table->Table[i] = NULL;
+        Table->Table[i] = nullptr;
     }
 
     POV_FREE(Table);
@@ -3151,18 +2128,18 @@ Parser::SYM_TABLE *Parser::Copy_Sym_Table (const Parser::SYM_TABLE *table)
     return newTable;
 }
 
-SYM_ENTRY *Parser::Create_Entry (const char *Name, TOKEN Number, bool copyName)
+SYM_ENTRY *Parser::Create_Entry (const char *Name, TokenId Number, bool copyName)
 {
     SYM_ENTRY *New;
 
     New = reinterpret_cast<SYM_ENTRY *>(POV_MALLOC(sizeof(SYM_ENTRY), "symbol table entry"));
 
     New->Token_Number        = Number;
-    New->Data                = NULL;
+    New->Data                = nullptr;
     New->deprecated          = false;
     New->deprecatedOnce      = false;
     New->deprecatedShown     = false;
-    New->Deprecation_Message = NULL;
+    New->Deprecation_Message = nullptr;
     New->ref_count           = 1;
     if (copyName)
         New->Token_Name = POV_STRDUP(Name);
@@ -3183,7 +2160,7 @@ SYM_ENTRY *Parser::Copy_Entry (const SYM_ENTRY *oldEntry)
     newEntry->deprecated          = false;
     newEntry->deprecatedOnce      = false;
     newEntry->deprecatedShown     = false;
-    newEntry->Deprecation_Message = NULL;
+    newEntry->Deprecation_Message = nullptr;
     newEntry->ref_count           = 1;
     newEntry->Token_Name          = POV_STRDUP (oldEntry->Token_Name);
 
@@ -3192,7 +2169,7 @@ SYM_ENTRY *Parser::Copy_Entry (const SYM_ENTRY *oldEntry)
 
 void Parser::Acquire_Entry_Reference (SYM_ENTRY *Entry)
 {
-    if (Entry == NULL)
+    if (Entry == nullptr)
         return;
     if (Entry->ref_count >= std::numeric_limits<SymTableEntryRefCount>::max())
         Error("Too many unresolved references to symbol");
@@ -3201,7 +2178,7 @@ void Parser::Acquire_Entry_Reference (SYM_ENTRY *Entry)
 
 void Parser::Release_Entry_Reference (SYM_TABLE *table, SYM_ENTRY *Entry)
 {
-    if (Entry == NULL)
+    if (Entry == nullptr)
         return;
     if (Entry->ref_count <= 0)
         Error("Internal error: Symbol reference counter underflow");
@@ -3214,7 +2191,7 @@ void Parser::Release_Entry_Reference (SYM_TABLE *table, SYM_ENTRY *Entry)
             POV_FREE(Entry->Token_Name);
             Destroy_Ident_Data (Entry->Data, Entry->Token_Number); // TODO - shouldn't this be outside the if() block?
         }
-        if (Entry->Deprecation_Message != NULL)
+        if (Entry->Deprecation_Message != nullptr)
             POV_FREE(Entry->Deprecation_Message);
 
         POV_FREE(Entry);
@@ -3225,12 +2202,12 @@ SYM_ENTRY *Parser::Destroy_Entry (SYM_ENTRY *Entry, bool destroyName)
 {
     SYM_ENTRY *Next;
 
-    if(Entry == NULL)
-        return NULL;
+    if(Entry == nullptr)
+        return nullptr;
 
     // always unhook the entry from hash table (if it is still member of one)
     Next = Entry->next;
-    Entry->next = NULL;
+    Entry->next = nullptr;
 
     if (Entry->ref_count <= 0)
         Error("Internal error: Symbol reference counter underflow");
@@ -3243,7 +2220,7 @@ SYM_ENTRY *Parser::Destroy_Entry (SYM_ENTRY *Entry, bool destroyName)
             POV_FREE(Entry->Token_Name);
             Destroy_Ident_Data (Entry->Data, Entry->Token_Number); // TODO - shouldn't this be outside the if() block?
         }
-        if (Entry->Deprecation_Message != NULL)
+        if (Entry->Deprecation_Message != nullptr)
             POV_FREE(Entry->Deprecation_Message);
 
         POV_FREE(Entry);
@@ -3267,7 +2244,7 @@ void Parser::Add_Entry (int Index,SYM_ENTRY *Table_Entry)
 }
 
 
-SYM_ENTRY *Parser::Add_Symbol (SYM_TABLE *table, const char *Name, TOKEN Number)
+SYM_ENTRY *Parser::Add_Symbol (SYM_TABLE *table, const char *Name, TokenId Number)
 {
     SYM_ENTRY *New;
 
@@ -3277,7 +2254,7 @@ SYM_ENTRY *Parser::Add_Symbol (SYM_TABLE *table, const char *Name, TOKEN Number)
     return(New);
 }
 
-SYM_ENTRY *Parser::Add_Symbol (int Index,const char *Name,TOKEN Number)
+SYM_ENTRY *Parser::Add_Symbol (int Index,const char *Name,TokenId Number)
 {
     SYM_ENTRY *New;
 
@@ -3327,7 +2304,7 @@ SYM_ENTRY *Parser::Find_Symbol (const char *name)
         if (entry)
             return entry;
     }
-    return NULL;
+    return nullptr;
 }
 
 
@@ -3335,7 +2312,7 @@ void Parser::Remove_Symbol (SYM_TABLE *table, const char *Name, bool is_array_el
 {
     if(is_array_elem == true)
     {
-        if(DataPtr == NULL)
+        if(DataPtr == nullptr)
             Error("Invalid array element!");
 
         if(ttype == FLOAT_FUNCT_TOKEN)
@@ -3346,7 +2323,7 @@ void Parser::Remove_Symbol (SYM_TABLE *table, const char *Name, bool is_array_el
             ttype = COLOUR_ID_TOKEN;
 
         Destroy_Ident_Data (*DataPtr, ttype);
-        *DataPtr = NULL;
+        *DataPtr = nullptr;
     }
     else
     {
@@ -3392,7 +2369,7 @@ void Parser::Check_Macro_Vers(void)
 Parser::Macro *Parser::Parse_Macro()
 {
     Macro *New;
-    SYM_ENTRY *Table_Entry=NULL;
+    SYM_ENTRY *Table_Entry=nullptr;
     bool Old_Ok = Ok_To_Declare;
     MacroParameter newParameter;
 
@@ -3402,12 +2379,12 @@ Parser::Macro *Parser::Parse_Macro()
 
     EXPECT_ONE
         CASE (IDENTIFIER_TOKEN)
-            Table_Entry = Add_Symbol (SYM_TABLE_GLOBAL,Token.Token_String,TEMPORARY_MACRO_ID_TOKEN);
+            Table_Entry = Add_Symbol (SYM_TABLE_GLOBAL,mToken.raw.lexeme.text.c_str(),TEMPORARY_MACRO_ID_TOKEN);
         END_CASE
 
         CASE (MACRO_ID_TOKEN)
-            Remove_Symbol(SYM_TABLE_GLOBAL,Token.Token_String,false,NULL,0);
-            Table_Entry = Add_Symbol (SYM_TABLE_GLOBAL,Token.Token_String,TEMPORARY_MACRO_ID_TOKEN);
+            Remove_Symbol(SYM_TABLE_GLOBAL,mToken.raw.lexeme.text.c_str(),false,nullptr,0);
+            Table_Entry = Add_Symbol (SYM_TABLE_GLOBAL,mToken.raw.lexeme.text.c_str(),TEMPORARY_MACRO_ID_TOKEN);
         END_CASE
 
         OTHERWISE
@@ -3415,11 +2392,9 @@ Parser::Macro *Parser::Parse_Macro()
         END_CASE
     END_EXPECT
 
-    New = new Macro(Token.Token_String);
+    New = new Macro(mToken.raw.lexeme.text.c_str());
 
     Table_Entry->Data=reinterpret_cast<void *>(New);
-
-    New->Macro_Filename = NULL;
 
     EXPECT_ONE
         CASE (LEFT_PAREN_TOKEN)
@@ -3451,18 +2426,18 @@ Parser::Macro *Parser::Parse_Macro()
         CASE4 (DENSITY_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_MAP_ID_TOKEN, UV_ID_TOKEN)
         CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
         CASE3 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN, DICTIONARY_ID_TOKEN)
-            newParameter.name = POV_STRDUP(Token.Token_String);
+            newParameter.name = POV_STRDUP(mToken.raw.lexeme.text.c_str());
             New->parameters.push_back(newParameter);
             Parse_Comma();
             newParameter.optional = false;
         END_CASE
 
         CASE2 (VECTOR_FUNCT_TOKEN, FLOAT_FUNCT_TOKEN)
-            switch(Token.Function_Id)
+            switch(mToken.Function_Id)
             {
                 case VECTOR_ID_TOKEN:
                 case FLOAT_ID_TOKEN:
-                    newParameter.name = POV_STRDUP(Token.Token_String);
+                    newParameter.name = POV_STRDUP(mToken.raw.lexeme.text.c_str());
                     New->parameters.push_back(newParameter);
                     Parse_Comma();
                     newParameter.optional = false;
@@ -3494,9 +2469,7 @@ Parser::Macro *Parser::Parse_Macro()
 
     Table_Entry->Token_Number = MACRO_ID_TOKEN;
 
-    New->Macro_Filename = UCS2_strdup(Input_File->In_File->name());
-    New->Macro_File_Pos = Input_File->In_File->tellg();
-    New->Macro_File_Col = Echo_Indx;
+    New->source = mTokenizer.GetColdBookmark();
 
     Parse_Paren_End();
 
@@ -3508,16 +2481,16 @@ Parser::Macro *Parser::Parse_Macro()
 
 void Parser::Invoke_Macro()
 {
-    Macro *PMac=reinterpret_cast<Macro *>(Token.Data);
-    SYM_ENTRY **Table_Entries=NULL;
+    Macro *PMac=reinterpret_cast<Macro *>(mToken.Data);
+    SYM_ENTRY **Table_Entries=nullptr;
     int i,Local_Index;
 
     Inc_CS_Index();
 
-    if(PMac == NULL)
+    if(PMac == nullptr)
     {
-        if(Token.DataPtr!=NULL)
-            PMac = reinterpret_cast<Macro*>(*(Token.DataPtr));
+        if (mToken.DataPtr != nullptr)
+            PMac = reinterpret_cast<Macro*>(*(mToken.DataPtr));
         else
             Error("Error in Invoke_Macro");
     }
@@ -3543,7 +2516,7 @@ void Parser::Invoke_Macro()
         {
             bool finalParameter = (i == PMac->parameters.size()-1);
             Table_Entries[i] = Create_Entry (PMac->parameters[i].name, IDENTIFIER_TOKEN, true);
-            if (!Parse_RValue(IDENTIFIER_TOKEN, &(Table_Entries[i]->Token_Number), &(Table_Entries[i]->Data), NULL, true, false, true, true, true, Local_Index))
+            if (!Parse_RValue(IDENTIFIER_TOKEN, &(Table_Entries[i]->Token_Number), &(Table_Entries[i]->Data), nullptr, true, false, true, true, true, Local_Index))
             {
                 EXPECT_ONE
                     CASE (IDENTIFIER_TOKEN)
@@ -3575,7 +2548,7 @@ void Parser::Invoke_Macro()
                 END_EXPECT
 
                 Destroy_Entry (Table_Entries[i], true);
-                Table_Entries[i] = NULL;
+                Table_Entries[i] = nullptr;
             }
             properlyDelimited = Parse_Comma();
         }
@@ -3583,12 +2556,10 @@ void Parser::Invoke_Macro()
 
     Parse_Paren_End();
 
-    Cond_Stack[CS_Index].Cond_Type = INVOKING_MACRO_COND;
+    Cond_Stack.back().Cond_Type = INVOKING_MACRO_COND;
 
-    Cond_Stack[CS_Index].File_Pos          = Input_File->In_File->tellg();
-    Cond_Stack[CS_Index].Macro_Return_Col  = Echo_Indx;
-    Cond_Stack[CS_Index].Macro_Return_Name = Input_File->In_File->name();
-    Cond_Stack[CS_Index].PMac              = PMac;
+    Cond_Stack.back().returnToBookmark   = mTokenizer.GetHotBookmark();
+    Cond_Stack.back().PMac               = PMac;
 
     /* Gotta have new symbol table in case #local is used */
     Add_Sym_Table();
@@ -3597,55 +2568,50 @@ void Parser::Invoke_Macro()
     {
         for (i=0; i<PMac->parameters.size(); i++)
         {
-            if (Table_Entries[i] != NULL)
+            if (Table_Entries[i] != nullptr)
                 Add_Entry(Table_Index,Table_Entries[i]);
         }
 
         POV_FREE(Table_Entries);
     }
 
-    if (PMac->Cache || UCS2_strcmp(PMac->Macro_Filename,Input_File->In_File->name()))
+    if ((PMac->Cache != nullptr) || (PMac->source.sourceName != mTokenizer.GetSourceName()))
     {
         UCS2String ign;
         /* Not in same file */
-        Cond_Stack[CS_Index].Macro_Same_Flag=false;
-        Cond_Stack[CS_Index].Macro_File = Input_File->In_File;
-//  POV_DELETE(Input_File->In_File, IStream);
+        Cond_Stack.back().Macro_Same_Flag = false;
+        Cond_Stack.back().returnToBookmark = mTokenizer.GetHotBookmark();
         Got_EOF=false;
-        Input_File->R_Flag=false;
-        IStream *is;
+        POV_PARSER_ASSERT(!readingExternalFile);
+        shared_ptr<IStream> is;
         if (PMac->Cache)
         {
-            Input_File->In_File = new IMemTextStream(PMac->Macro_Filename, Cond_Stack[CS_Index].PMac->Cache, PMac->CacheSize, PMac->Macro_File_Pos);
+            is = std::make_shared<IMemStream>(Cond_Stack.back().PMac->Cache, PMac->CacheSize, PMac->source.sourceName, PMac->source.offset);
         }
         else
         {
-            is = Locate_File (PMac->Macro_Filename, POV_File_Text_Macro, ign, true);
-            if(is == NULL)
-            {
-                Input_File->In_File = NULL;  /* Keeps from closing failed file. */
-                Error ("Cannot open macro file '%s'.", UCS2toASCIIString(UCS2String(PMac->Macro_Filename)).c_str());
-            }
-            else
-                Input_File->In_File = new IBufferedTextStream(PMac->Macro_Filename, is);
+            is = Locate_File (PMac->source.sourceName, POV_File_Text_Macro, ign, true);
+            if(is == nullptr)
+                Error ("Cannot open macro file '%s'.", UCS2toASCIIString(PMac->source.sourceName).c_str());
         }
+        mTokenizer.SetInputStream(is);
     }
     else
     {
-        Cond_Stack[CS_Index].Macro_Same_Flag=true;
+        Cond_Stack.back().Macro_Same_Flag=true;
     }
 
     Got_EOF=false;
-    if (!Input_File->In_File->seekg(PMac->Macro_File_Pos))
+    if (!mTokenizer.GoToBookmark(PMac->source))
     {
         Error("Unable to file seek in macro.");
     }
-    Echo_Indx = PMac->Macro_File_Col;
 
-    Token.Token_Id = END_OF_FILE_TOKEN;
-    Token.is_array_elem = false;
-    Token.is_mixed_array_elem = false;
-    Token.is_dictionary_elem = false;
+    mToken.sourceFile = mTokenizer.GetSource();
+    mToken.Token_Id = END_OF_FILE_TOKEN;
+    mToken.is_array_elem = false;
+    mToken.is_mixed_array_elem = false;
+    mToken.is_dictionary_elem = false;
 
     Check_Macro_Vers();
 
@@ -3655,25 +2621,17 @@ void Parser::Return_From_Macro()
 {
     Check_Macro_Vers();
 
-    if (!Cond_Stack[CS_Index].Macro_Same_Flag)
+    if (!Cond_Stack.back().Macro_Same_Flag)
     {
-        if (Token.FileHandle == Input_File->In_File)
-            Token.FileHandle = NULL;
-        delete Input_File->In_File;
-        Input_File->R_Flag=false;
-        Input_File->In_File = Cond_Stack[CS_Index].Macro_File;
-        if (Token.FileHandle == NULL)
-            Token.FileHandle = Input_File->In_File;
+        POV_PARSER_ASSERT(!readingExternalFile);
+        mTokenizer.SetInputStream(Cond_Stack.back().returnToBookmark.pSource);
+        mToken.sourceFile = mTokenizer.GetSource();
     }
 
     Got_EOF=false;
 
-    if (!Input_File->In_File->seekg(Cond_Stack[CS_Index].File_Pos))
-    {
+    if (!mTokenizer.GoToBookmark(Cond_Stack.back().returnToBookmark))
         Error("Unable to file seek in return from macro.");
-    }
-
-    Echo_Indx = Cond_Stack[CS_Index].Macro_Return_Col;
 
     // Always destroy macro locals
     Destroy_Table(Table_Index--);
@@ -3681,8 +2639,7 @@ void Parser::Return_From_Macro()
 
 Parser::Macro::Macro(const char *s) :
     Macro_Name(POV_STRDUP(s)),
-    Macro_Filename(NULL),
-    Cache(NULL)
+    Cache(nullptr)
 {}
 
 Parser::Macro::~Macro()
@@ -3690,17 +2647,13 @@ Parser::Macro::~Macro()
     int i;
 
     POV_FREE(Macro_Name);
-    if (Macro_Filename!=NULL)
-    {
-        POV_FREE(Macro_Filename);
-    }
 
     for (i=0; i < parameters.size(); i++)
     {
         POV_FREE(parameters[i].name);
     }
 
-    if (Cache != NULL)
+    if (Cache != nullptr)
         delete[] Cache;
 }
 
@@ -3755,7 +2708,7 @@ Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
 
     for (i=0; i<New->DataPtrs.size(); i++)
     {
-        POV_PARSER_ASSERT (New->DataPtrs[i] == NULL);
+        POV_PARSER_ASSERT (New->DataPtrs[i] == nullptr);
     }
 
     EXPECT_ONE
@@ -3794,9 +2747,9 @@ Parser::SYM_TABLE *Parser::Parse_Dictionary_Declare()
             parseRawIdentifiers = true;
             Get_Token();
             parseRawIdentifiers = oldParseRawIdentifiers;
-            if (Token.Token_Id != IDENTIFIER_TOKEN)
+            if (mToken.Token_Id != IDENTIFIER_TOKEN)
                 Expectation_Error ("dictionary element identifier");
-            newEntry = Add_Symbol (newDictionary, Token.Token_String, IDENTIFIER_TOKEN);
+            newEntry = Add_Symbol (newDictionary, mToken.raw.lexeme.text.c_str(), IDENTIFIER_TOKEN);
 
             GET (COLON_TOKEN);
 
@@ -3866,13 +2819,13 @@ void Parser::Parse_Initalizer (int Sub, int Base, POV_ARRAY *a)
         {
             if (a->resizable)
             {
-                a->DataPtrs.push_back (NULL);
+                a->DataPtrs.push_back (nullptr);
                 a->Sizes[Sub] = a->DataPtrs.size();
             }
             else
                 finalParameter = (i == (a->Sizes[Sub]-1));
 
-            if (!Parse_RValue (a->Type, &(a->Type), &(a->DataPtrs[Base+i]), NULL, false, false, true, false, true, MAX_NUMBER_OF_TABLES))
+            if (!Parse_RValue (a->Type, &(a->Type), &(a->DataPtrs[Base+i]), nullptr, false, false, true, false, true, MAX_NUMBER_OF_TABLES))
             {
                 EXPECT_ONE
                     CASE (IDENTIFIER_TOKEN)
@@ -3885,7 +2838,7 @@ void Parser::Parse_Initalizer (int Sub, int Base, POV_ARRAY *a)
                         if (a->resizable)
                         {
                             finalParameter = true;
-                            POV_PARSER_ASSERT (a->DataPtrs.back() == NULL);
+                            POV_PARSER_ASSERT (a->DataPtrs.back() == nullptr);
                             a->DataPtrs.pop_back();
                             a->Sizes[Sub] = a->DataPtrs.size();
                         }
@@ -3922,8 +2875,8 @@ void Parser::Parse_Initalizer (int Sub, int Base, POV_ARRAY *a)
 
 void Parser::Parse_Fopen(void)
 {
-    IStream *rfile = NULL;
-    OStream *wfile = NULL;
+    shared_ptr<IStream> rfile;
+    OStream *wfile = nullptr;
     DATA_FILE *New;
     char *asciiFileName;
     UCS2String fileName;
@@ -3931,15 +2884,15 @@ void Parser::Parse_Fopen(void)
     SYM_ENTRY *Entry;
 
     New=reinterpret_cast<DATA_FILE *>(POV_MALLOC(sizeof(DATA_FILE),"user file"));
-    New->In_File=NULL;
-    New->Out_File=NULL;
+    New->In_File=nullptr;
+    New->Out_File=nullptr;
 
     // Safeguard against accidental nesting of other file access directives inside the `#fopen`
     // directive (or the user forgetting portions of the directive).
     New->busyParsing = true;
 
     GET(IDENTIFIER_TOKEN)
-    Entry = Add_Symbol (SYM_TABLE_GLOBAL,Token.Token_String,FILE_ID_TOKEN);
+    Entry = Add_Symbol (SYM_TABLE_GLOBAL,mToken.raw.lexeme.text.c_str(),FILE_ID_TOKEN);
     Entry->Data=reinterpret_cast<void *>(New);
 
     asciiFileName = Parse_C_String(true);
@@ -3950,36 +2903,36 @@ void Parser::Parse_Fopen(void)
         CASE(READ_TOKEN)
             New->R_Flag = true;
             rfile = Locate_File(fileName.c_str(), POV_File_Text_User, ign, true);
-            if(rfile != NULL)
-                New->In_File = new IBufferedTextStream(fileName.c_str(), rfile);
+            if (rfile != nullptr)
+                New->In_File = std::make_shared<IBufferedTextStream>(fileName.c_str(), rfile.get());
             else
-                New->In_File = NULL;
+                New->In_File = nullptr;
 
-            if(New->In_File == NULL)
+            if(New->In_File == nullptr)
                 Error ("Cannot open user file %s (read).", UCS2toASCIIString(fileName).c_str());
         END_CASE
 
         CASE(WRITE_TOKEN)
             New->R_Flag = false;
             wfile = CreateFile(fileName.c_str(), POV_File_Text_User, false);
-            if(wfile != NULL)
-                New->Out_File= new OTextStream(fileName.c_str(), wfile);
+            if(wfile != nullptr)
+                New->Out_File = std::make_shared<OTextStream>(fileName.c_str(), wfile);
             else
-                New->Out_File = NULL;
+                New->Out_File = nullptr;
 
-            if(New->Out_File == NULL)
+            if(New->Out_File == nullptr)
                 Error ("Cannot open user file %s (write).", UCS2toASCIIString(fileName).c_str());
         END_CASE
 
         CASE(APPEND_TOKEN)
             New->R_Flag = false;
             wfile = CreateFile(fileName.c_str(), POV_File_Text_User, true);
-            if(wfile != NULL)
-                New->Out_File= new OTextStream(fileName.c_str(), wfile);
+            if(wfile != nullptr)
+                New->Out_File = std::make_shared<OTextStream>(fileName.c_str(), wfile);
             else
-                New->Out_File = NULL;
+                New->Out_File = nullptr;
 
-            if(New->Out_File == NULL)
+            if(New->Out_File == nullptr)
                 Error ("Cannot open user file %s (append).", UCS2toASCIIString(fileName).c_str());
         END_CASE
 
@@ -3997,19 +2950,15 @@ void Parser::Parse_Fclose(void)
 
     EXPECT_ONE
         CASE(FILE_ID_TOKEN)
-            Data=reinterpret_cast<DATA_FILE *>(Token.Data);
+            Data=reinterpret_cast<DATA_FILE *>(mToken.Data);
             if (Data->busyParsing)
                 Error ("Can't nest directives accessing the same file.");
             // NB no need to set Data->busyParsing, as we're not reading any tokens where the
             // tokenizer might stumble upon nested file access directives
-            if(Data->In_File != NULL)
-                delete Data->In_File;
-            if(Data->Out_File != NULL)
-                delete Data->Out_File;
             Got_EOF=false;
-            Data->In_File = NULL;
-            Data->Out_File = NULL;
-            Remove_Symbol (SYM_TABLE_GLOBAL,Token.Token_String,false,NULL,0);
+            Data->In_File = nullptr;
+            Data->Out_File = nullptr;
+            Remove_Symbol (SYM_TABLE_GLOBAL,mToken.raw.lexeme.text.c_str(),false,nullptr,0);
         END_CASE
 
         OTHERWISE
@@ -4031,11 +2980,11 @@ void Parser::Parse_Read()
     Parse_Paren_Begin();
 
     GET(FILE_ID_TOKEN)
-    User_File=reinterpret_cast<DATA_FILE *>(Token.Data);
+    User_File=reinterpret_cast<DATA_FILE *>(mToken.Data);
     if (User_File->busyParsing)
         Error ("Can't nest directives accessing the same file.");
-    File_Id=POV_STRDUP(Token.Token_String);
-    if(User_File->In_File == NULL)
+    File_Id=POV_STRDUP(mToken.raw.lexeme.text.c_str());
+    if(User_File->In_File == nullptr)
         Error("Cannot read from file %s because the file is open for writing only.", UCS2toASCIIString(UCS2String(User_File->Out_File->name())).c_str());
 
     // Safeguard against accidental nesting of other file access directives inside the `#fopen`
@@ -4050,11 +2999,11 @@ void Parser::Parse_Read()
         CASE (IDENTIFIER_TOKEN)
             if (!End_File)
             {
-                Temp_Entry = Add_Symbol (SYM_TABLE_GLOBAL,Token.Token_String,IDENTIFIER_TOKEN);
-                End_File=Parse_Read_Value (User_File,Token.Token_Id, &(Temp_Entry->Token_Number), &(Temp_Entry->Data));
-                Token.is_array_elem = false;
-                Token.is_mixed_array_elem = false;
-                Token.is_dictionary_elem = false;
+                Temp_Entry = Add_Symbol (SYM_TABLE_GLOBAL,mToken.raw.lexeme.text.c_str(),IDENTIFIER_TOKEN);
+                End_File=Parse_Read_Value (User_File,mToken.Token_Id, &(Temp_Entry->Token_Number), &(Temp_Entry->Data));
+                mToken.is_array_elem = false;
+                mToken.is_mixed_array_elem = false;
+                mToken.is_dictionary_elem = false;
                 Parse_Comma(); /* Scene file comma between 2 idents */
             }
         END_CASE
@@ -4062,22 +3011,22 @@ void Parser::Parse_Read()
         CASE (STRING_ID_TOKEN)
             if (!End_File)
             {
-                End_File=Parse_Read_Value (User_File,Token.Token_Id,Token.NumberPtr,Token.DataPtr);
-                Token.is_array_elem = false;
-                Token.is_mixed_array_elem = false;
-                Token.is_dictionary_elem = false;
+                End_File=Parse_Read_Value (User_File,mToken.Token_Id,mToken.NumberPtr,mToken.DataPtr);
+                mToken.is_array_elem = false;
+                mToken.is_mixed_array_elem = false;
+                mToken.is_dictionary_elem = false;
                 Parse_Comma(); /* Scene file comma between 2 idents */
             }
         END_CASE
 
         CASE2 (VECTOR_FUNCT_TOKEN,FLOAT_FUNCT_TOKEN)
-            switch(Token.Function_Id)
+            switch(mToken.Function_Id)
             {
                 case VECTOR_ID_TOKEN:
                 case FLOAT_ID_TOKEN:
                     if (!End_File)
                     {
-                        End_File=Parse_Read_Value (User_File,Token.Function_Id,Token.NumberPtr,Token.DataPtr);
+                        End_File=Parse_Read_Value (User_File,mToken.Function_Id,mToken.NumberPtr,mToken.DataPtr);
                         Parse_Comma(); /* Scene file comma between 2 idents */
                     }
                     break;
@@ -4112,30 +3061,34 @@ void Parser::Parse_Read()
 
     if (End_File)
     {
-        delete User_File->In_File;
         Got_EOF=false;
-        User_File->In_File = NULL;
-        Remove_Symbol (SYM_TABLE_GLOBAL,File_Id,false,NULL,0);
+        User_File->In_File = nullptr;
+        Remove_Symbol (SYM_TABLE_GLOBAL,File_Id,false,nullptr,0);
     }
     POV_FREE(File_Id);
 }
 
-int Parser::Parse_Read_Value(DATA_FILE *User_File,int Previous,int *NumberPtr,void **DataPtr)
+int Parser::Parse_Read_Value(DATA_FILE *User_File, TokenId Previous, TokenId *NumberPtr, void **DataPtr)
 {
-    pov_base::ITextStream *Temp;
+    /// @todo Re-enable reading of external files.
+#if 1
+    return true;
+#else
+    shared_ptr<pov_base::ITextStream> Temp;
     bool Temp_R_Flag;
     DBL Val;
     int End_File=false;
     int i;
     EXPRESS Express;
 
-    Temp = Input_File->In_File;
-    Temp_R_Flag = Input_File->R_Flag;
-    Input_File->In_File = User_File->In_File;
-    Input_File->R_Flag = User_File->R_Flag;
-    if(User_File->In_File == NULL)
+    Temp = Input_File->inFile;
+    POV_PARSER_ASSERT(!readingExternalFile);
+    Input_File->inFile = User_File->In_File;
+    readingExternalFile = User_File->R_Flag;
+    if(User_File->In_File == nullptr)
         Error("Cannot read from file '%s' because the file is open for writing only.", UCS2toASCIIString(UCS2String(User_File->Out_File->name())).c_str());
-    User_File->In_File = NULL; // take control over pointer
+    POV_PARSER_ASSERT(readingExternalFile);
+    User_File->In_File = nullptr; // take control over pointer
 
     try
     {
@@ -4215,7 +3168,7 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File,int Previous,int *NumberPtr,vo
             CASE(STRING_LITERAL_TOKEN)
                 *NumberPtr = STRING_ID_TOKEN;
                 Test_Redefine(Previous,NumberPtr,*DataPtr);
-                *DataPtr   = String_Literal_To_UCS2(Token.Token_String, false);
+                *DataPtr   = String_Literal_To_UCS2(mToken.raw.lexeme.text.c_str(), false);
                 Parse_Comma(); // data file comma between 2 data items
             END_CASE
 
@@ -4230,23 +3183,24 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File,int Previous,int *NumberPtr,vo
     catch (...)
     {
         // re-assign the file pointers so that they are properly disposed of later on
-        User_File->In_File = Input_File->In_File;
-        Input_File->In_File = Temp;
-        Input_File->R_Flag = Temp_R_Flag;
+        User_File->In_File = Input_File->inFile;
+        Input_File->inFile = Temp;
+        readingExternalFile = false;
         throw;
     }
 
-    if (Token.Token_Id==END_OF_FILE_TOKEN)
+    if (mToken.Token_Id==END_OF_FILE_TOKEN)
         End_File = true;
 
-    Token.End_Of_File = false;
-    Token.Unget_Token = false;
+    mToken.End_Of_File = false;
+    mToken.Unget_Token = false;
     Got_EOF = false;
-    User_File->In_File = Input_File->In_File; // return control over pointer
-    Input_File->In_File = Temp;
-    Input_File->R_Flag = Temp_R_Flag;
+    User_File->In_File = Input_File->inFile; // return control over pointer
+    Input_File->inFile = Temp;
+    readingExternalFile = false;
 
     return End_File;
+#endif
 }
 
 void Parser::Parse_Write(void)
@@ -4260,10 +3214,10 @@ void Parser::Parse_Write(void)
 
     GET(FILE_ID_TOKEN)
 
-    User_File=reinterpret_cast<DATA_FILE *>(Token.Data);
+    User_File=reinterpret_cast<DATA_FILE *>(mToken.Data);
     if (User_File->busyParsing)
         Error ("Can't nest directives accessing the same file.");
-    if(User_File->Out_File == NULL)
+    if(User_File->Out_File == nullptr)
         Error("Cannot write to file %s because the file is open for reading only.", UCS2toASCIIString(UCS2String(User_File->In_File->name())).c_str());
 
     // Safeguard against accidental nesting of other file access directives inside the `#fopen`
@@ -4280,7 +3234,7 @@ void Parser::Parse_Write(void)
                 POV_INT32 val_max;
                 int  num_bytes;
                 bool big_endian = false;
-                switch (Token.Token_Id)
+                switch (mToken.Token_Id)
                 {
                     case SINT8_TOKEN:    val_min = SIGNED8_MIN;  val_max = SIGNED8_MAX;    num_bytes = 1; break;
                     case UINT8_TOKEN:    val_min = 0;            val_max = UNSIGNED8_MAX;  num_bytes = 1; break;
@@ -4426,16 +3380,7 @@ void Parser::Parse_Cond_Param2(DBL *V1,DBL *V2)
 
 void Parser::Inc_CS_Index()
 {
-    if (++CS_Index >= COND_STACK_SIZE)
-    {
-        Error("Too many nested conditionals or macros.");
-    }
-    Cond_Stack[CS_Index].Cond_Type = BUSY_COND;
-    Cond_Stack[CS_Index].Macro_File = NULL;
-    Cond_Stack[CS_Index].Macro_Return_Name = NULL;
-    Cond_Stack[CS_Index].PMac = NULL;
-    Cond_Stack[CS_Index].Loop_File = NULL;
-    Cond_Stack[CS_Index].Loop_Identifier = NULL;
+    Cond_Stack.emplace_back();
 }
 
 bool Parser::Parse_Ifdef_Param ()
@@ -4446,26 +3391,22 @@ bool Parser::Parse_Ifdef_Param ()
 
     Inside_Ifdef=true;
     Get_Token();
-    String2 = POV_STRDUP(String);
     Inside_Ifdef=false;
 
-    if (Token.is_array_elem)
-        retval = (*Token.DataPtr != NULL);
+    if (mToken.is_array_elem)
+        retval = (*mToken.DataPtr != nullptr);
     else
-        retval = (Token.Token_Id != IDENTIFIER_TOKEN);
+        retval = (mToken.Token_Id != IDENTIFIER_TOKEN);
 
     Parse_Paren_End();
-
-    POV_FREE(String2);
-    String2 = NULL;
 
     return retval;
 }
 
 int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
 {
-    int Previous=-1;
-    SYM_ENTRY *Temp_Entry = NULL;
+    TokenId Previous = NOT_A_TOKEN;
+    SYM_ENTRY *Temp_Entry = nullptr;
 
     Parse_Paren_Begin();
 
@@ -4473,24 +3414,24 @@ int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
 
     EXPECT_ONE
         CASE (IDENTIFIER_TOKEN)
-            POV_PARSER_ASSERT(!Token.is_array_elem);
-            if (Token.is_dictionary_elem)
+            POV_PARSER_ASSERT(!mToken.is_array_elem);
+            if (mToken.is_dictionary_elem)
                 Error("#for loop variable must not be an array or dictionary element");
-            Temp_Entry = Add_Symbol (Table_Index,Token.Token_String,IDENTIFIER_TOKEN);
-            Token.NumberPtr = &(Temp_Entry->Token_Number);
-            Token.DataPtr = &(Temp_Entry->Data);
-            Previous = Token.Token_Id;
+            Temp_Entry = Add_Symbol (Table_Index,mToken.raw.lexeme.text.c_str(),IDENTIFIER_TOKEN);
+            mToken.NumberPtr = &(Temp_Entry->Token_Number);
+            mToken.DataPtr = &(Temp_Entry->Data);
+            Previous = mToken.Token_Id;
         END_CASE
 
         CASE3 (FILE_ID_TOKEN, MACRO_ID_TOKEN, PARAMETER_ID_TOKEN)
             // TODO - We should allow assignment if the identifier is non-local.
-            if (Token.is_array_elem || Token.is_dictionary_elem)
+            if (mToken.is_array_elem || mToken.is_dictionary_elem)
                 Error("#for loop variable must not be an array or dictionary element");
             Parse_Error(IDENTIFIER_TOKEN);
         END_CASE
 
         CASE2 (FUNCT_ID_TOKEN, VECTFUNCT_ID_TOKEN)
-            if (Token.is_array_elem || Token.is_dictionary_elem)
+            if (mToken.is_array_elem || mToken.is_dictionary_elem)
                 Error("#for loop variable must not be an array or dictionary element");
             Error("Redeclaring functions is not allowed - #undef the function first!");
         END_CASE
@@ -4503,44 +3444,44 @@ int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
         CASE4 (DENSITY_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_MAP_ID_TOKEN, UV_ID_TOKEN)
         CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
         CASE3 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN, DICTIONARY_ID_TOKEN)
-            if (Token.is_array_elem || Token.is_dictionary_elem)
+            if (mToken.is_array_elem || mToken.is_dictionary_elem)
                 Error("#for loop variable must not be an array or dictionary element");
-            if (Token.context != Table_Index)
+            if (mToken.context != Table_Index)
             {
-                Temp_Entry = Add_Symbol (Table_Index,Token.Token_String,IDENTIFIER_TOKEN);
-                Token.NumberPtr = &(Temp_Entry->Token_Number);
-                Token.DataPtr   = &(Temp_Entry->Data);
+                Temp_Entry = Add_Symbol (Table_Index,mToken.raw.lexeme.text.c_str(),IDENTIFIER_TOKEN);
+                mToken.NumberPtr = &(Temp_Entry->Token_Number);
+                mToken.DataPtr   = &(Temp_Entry->Data);
                 Previous        = IDENTIFIER_TOKEN;
             }
             else
             {
-                Previous        = Token.Token_Id;
+                Previous        = mToken.Token_Id;
             }
         END_CASE
 
         CASE (EMPTY_ARRAY_TOKEN)
-            POV_PARSER_ASSERT (Token.is_array_elem && !Token.is_mixed_array_elem);
+            POV_PARSER_ASSERT (mToken.is_array_elem && !mToken.is_mixed_array_elem);
             Error("#for loop variable must not be an array element");
-            Previous = Token.Token_Id;
+            Previous = mToken.Token_Id;
         END_CASE
 
         CASE2 (VECTOR_FUNCT_TOKEN, FLOAT_FUNCT_TOKEN)
-            if (Token.is_array_elem || Token.is_dictionary_elem)
+            if (mToken.is_array_elem || mToken.is_dictionary_elem)
                 Error("#for loop variable must not be an array or dictionary element");
-            switch(Token.Function_Id)
+            switch(mToken.Function_Id)
             {
                 case VECTOR_ID_TOKEN:
                 case FLOAT_ID_TOKEN:
-                    if (Token.context != Table_Index)
+                    if (mToken.context != Table_Index)
                     {
-                        Temp_Entry = Add_Symbol (Table_Index,Token.Token_String,IDENTIFIER_TOKEN);
-                        Token.NumberPtr = &(Temp_Entry->Token_Number);
-                        Token.DataPtr   = &(Temp_Entry->Data);
+                        Temp_Entry = Add_Symbol (Table_Index,mToken.raw.lexeme.text.c_str(),IDENTIFIER_TOKEN);
+                        mToken.NumberPtr = &(Temp_Entry->Token_Number);
+                        mToken.DataPtr   = &(Temp_Entry->Data);
                         Previous        = IDENTIFIER_TOKEN;
                     }
                     else
                     {
-                        Previous        = Token.Function_Id;
+                        Previous        = mToken.Function_Id;
                     }
                     break;
 
@@ -4551,7 +3492,7 @@ int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
         END_CASE
 
         OTHERWISE
-            if (Token.is_array_elem || Token.is_dictionary_elem)
+            if (mToken.is_array_elem || mToken.is_dictionary_elem)
                 Error("#for loop variable must not be an array or dictionary element");
             Parse_Error(IDENTIFIER_TOKEN);
         END_CASE
@@ -4559,14 +3500,14 @@ int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
 
     LValue_Ok = false;
 
-    *Token.NumberPtr = FLOAT_ID_TOKEN;
-    Test_Redefine(Previous,Token.NumberPtr,*Token.DataPtr, true);
-    *Token.DataPtr   = reinterpret_cast<void *>(Create_Float());
-    DBL* CurrentPtr = (reinterpret_cast<DBL *>(*Token.DataPtr));
+    *mToken.NumberPtr = FLOAT_ID_TOKEN;
+    Test_Redefine(Previous,mToken.NumberPtr,*mToken.DataPtr, true);
+    *mToken.DataPtr   = reinterpret_cast<void *>(Create_Float());
+    DBL* CurrentPtr = (reinterpret_cast<DBL *>(*mToken.DataPtr));
 
-    size_t len = strlen(Token.Token_String)+1;
+    size_t len = strlen(mToken.raw.lexeme.text.c_str())+1;
     *IdentifierPtr = reinterpret_cast<char *>(POV_MALLOC(len, "loop identifier"));
-    memcpy(*IdentifierPtr, Token.Token_String, len);
+    memcpy(*IdentifierPtr, mToken.raw.lexeme.text.c_str(), len);
 
     Parse_Comma();
     *CurrentPtr = Parse_Float();
@@ -4609,33 +3550,23 @@ void Parser::IncludeHeader(const UCS2String& formalFileName)
     if (formalFileName.empty())
         return;
 
-    if (++Include_File_Index >= MAX_INCLUDE_FILES)
-    {
-        Include_File_Index--;
-        Error ("Too many nested include files.");
-    }
+    maIncludeStack.push_back(mTokenizer.GetHotBookmark());
 
-    Echo_Indx = 0;
+    shared_ptr<IStream> is = Locate_File (formalFileName.c_str(),POV_File_Text_INC,actualFileName,true);
+    if(is == nullptr)
+        Error ("Cannot open include file %s.", UCS2toASCIIString(formalFileName).c_str());
 
-    Input_File = &Include_Files[Include_File_Index];
-    Input_File->In_File = NULL;
-    IStream *is = Locate_File (formalFileName.c_str(),POV_File_Text_INC,actualFileName,true);
-    if(is == NULL)
-    {
-        Input_File->In_File = NULL;  /* Keeps from closing failed file. */
-        Error ("Cannot open include header file %s.", UCS2toASCIIString(formalFileName).c_str());
-    }
-    else
-        Input_File->In_File = new IBufferedTextStream(formalFileName.c_str(), is);
+    mTokenizer.SetInputStream(is);
 
-    Input_File->R_Flag=false;
+    POV_PARSER_ASSERT(!readingExternalFile);
 
     Add_Sym_Table();
 
-    Token.Token_Id = END_OF_FILE_TOKEN;
-    Token.is_array_elem = false;
-    Token.is_mixed_array_elem = false;
-    Token.is_dictionary_elem = false;
+    mToken.sourceFile = mTokenizer.GetSource();
+    mToken.Token_Id = END_OF_FILE_TOKEN;
+    mToken.is_array_elem = false;
+    mToken.is_mixed_array_elem = false;
+    mToken.is_dictionary_elem = false;
 }
 
 }

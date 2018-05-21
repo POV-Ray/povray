@@ -82,6 +82,26 @@ void GenericMessenger::Info(const char *format, ...)
     SendMessage(kMessageClass_Info, level, localvsbuffer);
 }
 
+void GenericMessenger::InfoAt(const MessageContext& context, const char *format, ...)
+{
+    WarningLevel level = kWarningGeneral;
+    if(warningLevel < level)
+        return;
+
+    va_list marker;
+    char localvsbuffer[1024];
+
+    sprintf(localvsbuffer, "%s Info: ", stageName);
+
+    va_start(marker, format);
+    std::vsnprintf(localvsbuffer + strlen(localvsbuffer), sizeof(localvsbuffer) - strlen(localvsbuffer), format, marker);
+    va_end(marker);
+
+    CleanupString(localvsbuffer);
+
+    SendMessage(kMessageClass_Info, level, localvsbuffer, context);
+}
+
 void GenericMessenger::InfoAt(const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...)
 {
     WarningLevel level = kWarningGeneral;
@@ -119,6 +139,25 @@ void GenericMessenger::Warning(WarningLevel level, const char *format,...)
     CleanupString(localvsbuffer);
 
     SendMessage(kMessageClass_Warning, level, localvsbuffer);
+}
+
+void GenericMessenger::WarningAt(WarningLevel level, const MessageContext& context, const char *format, ...)
+{
+    if(warningLevel < level)
+        return;
+
+    va_list marker;
+    char localvsbuffer[1024];
+
+    sprintf(localvsbuffer, "%s Warning: ", stageName);
+
+    va_start(marker, format);
+    std::vsnprintf(localvsbuffer + strlen(localvsbuffer), sizeof(localvsbuffer) - strlen(localvsbuffer), format, marker);
+    va_end(marker);
+
+    CleanupString(localvsbuffer);
+
+    SendMessage(kMessageClass_Warning, level, localvsbuffer, context);
 }
 
 void GenericMessenger::WarningAt(WarningLevel level, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...)
@@ -159,6 +198,25 @@ void GenericMessenger::PossibleError(const char *format,...)
     SendMessage(kMessageClass_PossibleError, kWarningNone, localvsbuffer);
 }
 
+void GenericMessenger::PossibleErrorAt(const MessageContext& context, const char *format, ...)
+{
+    if(warningLevel == 0)
+        return;
+
+    va_list marker;
+    char localvsbuffer[1024];
+
+    sprintf(localvsbuffer, "Possible %s Error: ", stageName);
+
+    va_start(marker, format);
+    std::vsnprintf(localvsbuffer + strlen(localvsbuffer), sizeof(localvsbuffer) - strlen(localvsbuffer), format, marker);
+    va_end(marker);
+
+    CleanupString(localvsbuffer);
+
+    SendMessage(kMessageClass_PossibleError, kWarningNone, localvsbuffer, context);
+}
+
 void GenericMessenger::PossibleErrorAt(const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...)
 {
     if(warningLevel == 0)
@@ -178,7 +236,25 @@ void GenericMessenger::PossibleErrorAt(const UCS2 *filename, POV_LONG line, POV_
     SendMessage(kMessageClass_PossibleError, kWarningNone, localvsbuffer, filename, line, column, offset);
 }
 
-// filename defaults to NULL, and line, column, and offset default to -1
+void GenericMessenger::SendMessage(MessageClass mc, WarningLevel level, const char *text, const MessageContext& context)
+{
+    SendMessage(mc, level, text, context.GetFileName().c_str(), context.GetLine(), context.GetColumn(), context.GetOffset());
+}
+
+std::string GenericMessenger::SendError(const char *format, va_list arglist, const MessageContext& context)
+{
+    char localvsbuffer[1024];
+
+    sprintf(localvsbuffer, "%s Error: ", stageName);
+    std::vsnprintf(localvsbuffer + strlen(localvsbuffer), sizeof(localvsbuffer) - strlen(localvsbuffer), format, arglist);
+    CleanupString(localvsbuffer);
+
+    SendMessage(kMessageClass_Error, kWarningNone, localvsbuffer, context);
+
+    return std::string(localvsbuffer);
+}
+
+// filename defaults to nullptr, and line, column, and offset default to -1
 std::string GenericMessenger::SendError(const char *format, va_list arglist, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset)
 {
     char localvsbuffer[1024];
@@ -241,6 +317,51 @@ void GenericMessenger::Error(Exception& ex, const char *format, ...)
     va_end(marker);
 
     // Terminate
+    throw ex;
+}
+
+void GenericMessenger::ErrorAt(const MessageContext& context, const char *format, ...)
+{
+    va_list marker;
+
+    va_start(marker, format);
+    std::string text = SendError(format, marker, context);
+    va_end(marker);
+
+    // Terminate by throwing an exception with the notification flag already set
+    pov_base::Exception ex(__FUNCTION__, __FILE__, __LINE__, text); // TODO - this location information isn't too helpful
+    ex.frontendnotified(true);
+
+    throw ex;
+}
+
+void GenericMessenger::ErrorAt(const Exception& ex, const MessageContext& context, const char *format, ...)
+{
+    va_list marker;
+
+    if (ex.frontendnotified())
+        throw ex;
+
+    va_start(marker, format);
+    SendError(format, marker, context);
+    va_end(marker);
+
+    pov_base::Exception local_ex(ex);
+    local_ex.frontendnotified(true);
+    throw local_ex;
+}
+
+void GenericMessenger::ErrorAt(Exception& ex, const MessageContext& context, const char *format, ...)
+{
+    va_list marker;
+
+    if (ex.frontendnotified(true))
+        throw ex;
+
+    va_start(marker, format);
+    SendError(format, marker, context);
+    va_end(marker);
+
     throw ex;
 }
 

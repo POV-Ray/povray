@@ -78,7 +78,7 @@ IStream::~IStream()
 {
 }
 
-IFileStream::IFileStream(const UCS2String& name) : IStream(name), f(NULL)
+IFileStream::IFileStream(const UCS2String& name) : IStream(name), f(nullptr)
 {
     if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdin") == 0)
     {
@@ -87,18 +87,18 @@ IFileStream::IFileStream(const UCS2String& name) : IStream(name), f(NULL)
     else if((pov_stricmp(UCS2toASCIIString(name).c_str(), "stdout") == 0) ||
             (pov_stricmp(UCS2toASCIIString(name).c_str(), "stderr") == 0))
     {
-        f = NULL;
+        f = nullptr;
     }
     else
     {
         f = PlatformBase::GetInstance().OpenLocalFile (name, "rb");
     }
-    fail = (f == NULL);
+    fail = (f == nullptr);
 }
 
 IFileStream::~IFileStream()
 {
-    if(f != NULL)
+    if (f != nullptr)
     {
         if (f != stdout && f != stderr && f != stdin)
             fclose(f);
@@ -119,16 +119,27 @@ bool IFileStream::UnRead_Byte(int c)
 // However, the macintosh code seems to need it to be called seekg, so it is ...
 bool IFileStream::seekg(POV_OFF_T pos, unsigned int whence)
 {
-    if(!fail)
-        fail = fseek(f, pos, whence) != 0;
+    fail = fseek(f, pos, whence) != 0;
     return !fail;
 }
 
-bool IFileStream::read(void *buffer, size_t count)
+bool IFileStream::read(void *buffer, size_t exactCount)
 {
-    if(!fail && count > 0)
-        fail = fread(buffer, count, 1, f) != 1;
+    if(!fail && exactCount > 0)
+        fail = fread(buffer, exactCount, 1, f) != 1;
     return !fail;
+}
+
+size_t IFileStream::readUpTo(void *buffer, size_t maxCount)
+{
+    if (!fail && maxCount > 0)
+    {
+        size_t count = fread(buffer, 1, maxCount, f);
+        fail = (count == 0);
+        return count;
+    }
+    else
+        return 0;
 }
 
 int IFileStream::Read_Byte()
@@ -190,7 +201,7 @@ IMemStream::~IMemStream()
 {
 }
 
-OStream::OStream(const UCS2String& name, unsigned int Flags) : IOBase(name), f(NULL)
+OStream::OStream(const UCS2String& name, unsigned int Flags) : IOBase(name), f(nullptr)
 {
     const char* mode;
 
@@ -210,29 +221,29 @@ OStream::OStream(const UCS2String& name, unsigned int Flags) : IOBase(name), f(N
 
     if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdin") == 0)
     {
-        f = NULL;
+        f = nullptr;
     }
     else if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdout") == 0)
     {
         if((Flags & append) != 0)
-            f = NULL;
+            f = nullptr;
         else
             f = stdout;
     }
     else if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stderr") == 0)
     {
         if((Flags & append) != 0)
-            f = NULL;
+            f = nullptr;
         else
             f = stdout;
     }
     else
     {
         f = PlatformBase::GetInstance().OpenLocalFile (name, mode);
-        if (f == NULL)
+        if (f == nullptr)
         {
             if((Flags & append) == 0)
-                f = NULL;
+                f = nullptr;
             else
             {
                 // to maintain traditional POV +c(continue) mode compatibility, if
@@ -243,7 +254,7 @@ OStream::OStream(const UCS2String& name, unsigned int Flags) : IOBase(name), f(N
             }
         }
 
-        if (f != NULL)
+        if (f != nullptr)
         {
             fail = false;
 
@@ -252,18 +263,18 @@ OStream::OStream(const UCS2String& name, unsigned int Flags) : IOBase(name), f(N
                 if(!seekg(0, seek_end))
                 {
                     fclose(f);
-                    f = NULL;
+                    f = nullptr;
                 }
             }
         }
     }
 
-    fail = (f == NULL);
+    fail = (f == nullptr);
 }
 
 OStream::~OStream()
 {
-    if(f != NULL)
+    if (f != nullptr)
     {
         if (f != stdout && f != stderr && f != stdin)
             fclose(f);
@@ -272,7 +283,7 @@ OStream::~OStream()
 
 OStream& OStream::flush()
 {
-    if(f != NULL)
+    if (f != nullptr)
         fflush(f);
     return *this;
 }
@@ -363,7 +374,7 @@ bool CheckIfFileExists(const Path& p)
 {
     FILE *tempf = PlatformBase::GetInstance().OpenLocalFile (p().c_str(), "r");
 
-    if(tempf != NULL)
+    if (tempf != nullptr)
         fclose(tempf);
     else
         return false;
@@ -376,7 +387,7 @@ POV_OFF_T GetFileLength(const Path& p)
     FILE *tempf = PlatformBase::GetInstance().OpenLocalFile (p().c_str(), "rb");
     POV_OFF_T result = -1;
 
-    if(tempf != NULL)
+    if (tempf != nullptr)
     {
         fseek(tempf, 0, SEEK_END);
         result = ftell(tempf);
@@ -386,7 +397,7 @@ POV_OFF_T GetFileLength(const Path& p)
     return result;
 }
 
-bool IMemStream::read(void *buffer, size_t maxCount)
+bool IMemStream::read(void *buffer, size_t exactCount)
 {
     size_t count = 0;
 
@@ -395,7 +406,7 @@ bool IMemStream::read(void *buffer, size_t maxCount)
 
     unsigned char* p = reinterpret_cast<unsigned char*>(buffer);
 
-    if (maxCount == 0)
+    if (exactCount == 0)
         return true;
 
     // read from unget buffer first
@@ -403,19 +414,49 @@ bool IMemStream::read(void *buffer, size_t maxCount)
     {
         *(p++) = (unsigned char)mUngetBuffer;
         mUngetBuffer = EOF;
-        if (++count == maxCount)
+        if (++count == exactCount)
             return true;
     }
 
-    size_t copyFromBuffer = min(maxCount-count, size-pos);
+    size_t copyFromBuffer = min(exactCount-count, size-pos);
     memcpy(p, &(start[pos]), copyFromBuffer);
     count += copyFromBuffer;
     pos += copyFromBuffer;
-    if (count == maxCount)
+    if (count == exactCount)
         return true;
 
     fail = true;
     return false;
+}
+
+size_t IMemStream::readUpTo(void *buffer, size_t maxCount)
+{
+    size_t count = 0;
+
+    if (fail)
+        return count;
+
+    unsigned char* p = reinterpret_cast<unsigned char*>(buffer);
+
+    if (maxCount == 0)
+        return count;
+
+    // read from unget buffer first
+    if (mUngetBuffer != EOF)
+    {
+        *(p++) = (unsigned char)mUngetBuffer;
+        mUngetBuffer = EOF;
+        if (++count == maxCount)
+            return count;
+    }
+
+    size_t copyFromBuffer = min(maxCount - count, size - pos);
+    memcpy(p, &(start[pos]), copyFromBuffer);
+    count += copyFromBuffer;
+    pos += copyFromBuffer;
+
+    fail = (count == 0);
+    return count;
 }
 
 int IMemStream::Read_Byte()
