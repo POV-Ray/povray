@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -161,10 +161,10 @@ void RenderFrontendBase::ConnectToBackend(POVMSAddress backendaddress, POVMS_Obj
 
     backendaddresses.insert(backendaddress);
 
-    if(resultobj != NULL)
+    if(resultobj != nullptr)
         *resultobj = result;
 
-    if(console != NULL)
+    if(console != nullptr)
         Message2Console::InitInfo(result, console.get());
 }
 
@@ -355,7 +355,7 @@ void RenderFrontendBase::StartParser(SceneData& shd, SceneId sid, POVMS_Object& 
     msg.SetDestinationAddress(sid.GetAddress());
     msg.SetInt(kPOVAttrib_SceneId, sid.GetIdentifier());
 
-    POVMS_SendMessage(context, msg, NULL, kPOVMSSendMode_NoReply);
+    POVMS_SendMessage(context, msg, nullptr, kPOVMSSendMode_NoReply);
 
     shd.state = SceneData::Scene_Parsing;
 }
@@ -483,7 +483,7 @@ void RenderFrontendBase::StartRender(ViewData& vhd, ViewId vid, POVMS_Object& ob
     msg.SetDestinationAddress(vid.GetAddress());
     msg.SetInt(kPOVAttrib_ViewId, vid.GetIdentifier());
 
-    POVMS_SendMessage(context, msg, NULL, kPOVMSSendMode_NoReply);
+    POVMS_SendMessage(context, msg, nullptr, kPOVMSSendMode_NoReply);
 
     vhd.state = ViewData::View_Rendering;
 }
@@ -605,7 +605,7 @@ void RenderFrontendBase::NewBackup(POVMS_Object& ropts, ViewData& vd, const Path
     if (!pov_base::PlatformBase::GetInstance().AllowLocalFileAccess (vd.imageBackupFile(), POV_File_Data_Backup, true))
         throw POV_EXCEPTION(kCannotOpenFileErr, "Permission denied to create render state output file.");
     vd.imageBackup = shared_ptr<OStream>(new OStream(vd.imageBackupFile().c_str()));
-    if(vd.imageBackup != NULL)
+    if(vd.imageBackup != nullptr)
     {
         Backup_File_Header hdr;
 
@@ -648,7 +648,7 @@ void RenderFrontendBase::ContinueBackup(POVMS_Object& ropts, ViewData& vd, ViewI
 
     size_t pos = sizeof(Backup_File_Header);
 
-    if(inbuffer != NULL)
+    if (inbuffer != nullptr)
     {
         Backup_File_Header hdr;
 
@@ -663,7 +663,7 @@ void RenderFrontendBase::ContinueBackup(POVMS_Object& ropts, ViewData& vd, ViewI
             // since they are generally useful. therefore we explicitly check
             // for the end of the file.
             inbuffer->seekg (0, IOBase::seek_end);
-            POV_LONG end = inbuffer->tellg();
+            POV_OFF_T end = inbuffer->tellg();
             inbuffer->seekg (0, IOBase::seek_set);
 
             if (inbuffer->read (&hdr, sizeof (hdr)) == false)
@@ -720,13 +720,13 @@ void RenderFrontendBase::ContinueBackup(POVMS_Object& ropts, ViewData& vd, ViewI
     if(outputToFile == true)
     {
         vd.imageBackup = shared_ptr<OStream>(new OStream(vd.imageBackupFile().c_str(), IOBase::append));
-        if(vd.imageBackup != NULL)
+        if(vd.imageBackup != nullptr)
         {
             if(!*vd.imageBackup)
                 throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot append to state output file.");
 
             vd.imageBackup->seekg(0, IOBase::seek_end);
-            vd.imageBackup->seekg(min((POV_LONG)pos, vd.imageBackup->tellg()), IOBase::seek_set);
+            vd.imageBackup->seekg(min((POV_OFF_T)pos, vd.imageBackup->tellg()), IOBase::seek_set);
         }
         else
             throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot create state output file stream.");
@@ -1228,37 +1228,37 @@ void OutputOptions(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
     tsb->printf("Information Output Options\n");
 
     tsb->printf("  All Streams to console.........%s", GetOptionSwitchString(msg, kPOVAttrib_AllConsole, true));
-//  if(streamnames[ALL_STREAM] != NULL)
+//  if (streamnames[ALL_STREAM] != nullptr)
 //      tsb->printf("  and file %s\n", streamnames[ALL_STREAM]);
 //  else
         tsb->printf("\n");
 
     tsb->printf("  Debug Stream to console........%s", GetOptionSwitchString(msg, kPOVAttrib_DebugConsole, true));
-//  if(streamnames[DEBUG_STREAM] != NULL)
+//  if (streamnames[DEBUG_STREAM] != nullptr)
 //      tsb->printf("  and file %s\n", streamnames[DEBUG_STREAM]);
 //  else
         tsb->printf("\n");
 
     tsb->printf("  Fatal Stream to console........%s", GetOptionSwitchString(msg, kPOVAttrib_FatalConsole, true));
-//  if(streamnames[FATAL_STREAM] != NULL)
+//  if (streamnames[FATAL_STREAM] != nullptr)
 //      tsb->printf("  and file %s\n", streamnames[FATAL_STREAM]);
 //  else
         tsb->printf("\n");
 
     tsb->printf("  Render Stream to console.......%s", GetOptionSwitchString(msg, kPOVAttrib_RenderConsole, true));
-//  if(streamnames[RENDER_STREAM] != NULL)
+//  if (streamnames[RENDER_STREAM] != nullptr)
 //      tsb->printf("  and file %s\n", streamnames[RENDER_STREAM]);
 //  else
         tsb->printf("\n");
 
     tsb->printf("  Statistics Stream to console...%s", GetOptionSwitchString(msg, kPOVAttrib_StatisticsConsole, true));
-//  if(streamnames[STATISTIC_STREAM] != NULL)
+//  if (streamnames[STATISTIC_STREAM] != nullptr)
 //      tsb->printf("  and file %s\n", streamnames[STATISTIC_STREAM]);
 //  else
         tsb->printf("\n");
 
     tsb->printf("  Warning Stream to console......%s", GetOptionSwitchString(msg, kPOVAttrib_WarningConsole, true));
-//  if(streamnames[WARNING_STREAM] != NULL)
+//  if (streamnames[WARNING_STREAM] != nullptr)
 //      tsb->printf("  and file %s\n", streamnames[WARNING_STREAM]);
 //  else
         tsb->printf("\n");
