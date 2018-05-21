@@ -193,11 +193,11 @@ UCS2 *Parser::Parse_String(bool pathname, bool require)
                      " instead. The use of single backslashes as path separators has never been"
                      " an officially documented feature, and as of POV-Ray v3.8 is no longer"
                      " supported.",
-                  e.offendingText);
+                  e.offendingText.c_str());
         }
         else
         {
-            Error(e, "Illegal escape sequence '%s' in string literal.", e.offendingText);
+            Error(e, "Illegal escape sequence '%s' in string literal.", e.offendingText.c_str());
         }
     }
 

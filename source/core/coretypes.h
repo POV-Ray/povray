@@ -621,7 +621,7 @@ struct SourceInfo : MessageContext
     virtual UCS2String GetFileName() const override { return fileName; }
     virtual POV_LONG GetLine() const override { return line; }
     virtual POV_LONG GetColumn() const override { return column; }
-    virtual POV_LONG GetOffset() const override { return offset; }
+    virtual POV_OFF_T GetOffset() const override { return offset; }
 };
 
 struct CustomFunctionSourceInfo : SourceInfo

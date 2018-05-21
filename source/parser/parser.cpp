@@ -247,7 +247,7 @@ void Parser::Run()
         }
         catch (const InvalidEscapeSequenceException& e)
         {
-            Error(e, "Illegal escape sequence '%s' in string literal.", e.offendingText);
+            Error(e, "Illegal escape sequence '%s' in string literal.", e.offendingText.c_str());
         }
 
         // post process atmospheric media
