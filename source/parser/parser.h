@@ -253,7 +253,7 @@ class Parser : public SceneTask
             virtual UCS2String GetFileName() const override { return sourceFile->Name(); }
             virtual POV_LONG GetLine() const override { return raw.lexeme.position.line; }
             virtual POV_LONG GetColumn() const override { return raw.lexeme.position.column; }
-            virtual POV_LONG GetOffset() const override { return raw.lexeme.position.offset; }
+            virtual POV_OFF_T GetOffset() const override { return raw.lexeme.position.offset; }
         };
 
         struct LValue
@@ -522,7 +522,7 @@ class Parser : public SceneTask
             virtual UCS2String GetFileName() const override { return file->Name(); }
             virtual POV_LONG GetLine() const override { return line; }
             virtual POV_LONG GetColumn() const override { return column; }
-            virtual POV_LONG GetOffset() const override { return offset; }
+            virtual POV_OFF_T GetOffset() const override { return offset; }
         };
 
         intrusive_ptr<FunctionVM> mpFunctionVM;
