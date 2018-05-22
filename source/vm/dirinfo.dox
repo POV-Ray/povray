@@ -1,7 +1,19 @@
 /**
 
+@defgroup PovVM POV-Ray User-Defined Function VM
+@ingroup PovSource
+@brief Virtual machine executing user-defined functions.
+
+This module implements a virtual machine to execute user-defined functions, both during parsing and
+at render time.
+
+The vm module depends on the @ref PovBase and @ref PovCore.
+
+@{
+
 @dir
-@ingroup PovVM
-Source code files for the virtual machine executing user-defined functions.
+@brief Source code files for the @ref PovVM.
+
+@}
 
 */

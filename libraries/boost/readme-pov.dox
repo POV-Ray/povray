@@ -1,0 +1,14 @@
+/**
+
+@dir
+@ingroup PovLibraries
+@brief Source code of _boost_ 3rd party libraries (subset).
+
+This directory contains a subset of the boost 1.62.0 source code, and is
+part of the POV-Ray source distribution package.
+
+Official boost source code packages can be obtained via <https://www.boost.org>.
+
+See `LICENSE_1_0.txt` file in this directory for licensing information.
+
+*/

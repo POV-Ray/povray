@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -43,7 +43,10 @@
 
 /// @file
 /// @todo Someone needs to verify that off_t is indeed always 64 bit on Mac OS X
-#define lseek64(handle,offset,whence) lseek(handle,offset,whence)
+// OS X appears to provide large file support via the `lseek` function,
+// with file offsets having type `off_t`.
+#define POV_LSEEK(handle,offset,whence) lseek(handle,offset,whence)
+#define POV_OFF_T off_t
 
 /// @file
 /// @todo The POV_LONG stuff is just copied from the Posix settings; someone needs to test this on OS X.

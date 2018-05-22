@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -42,17 +42,25 @@
 #include <unistd.h>
 
 #if defined(_POSIX_V6_LPBIG_OFFBIG) || defined(_POSIX_V6_LP64_OFF64) || defined(_POSIX_V6_ILP32_OFFBIG)
-    // off_t is at least 64 bits
-    #define lseek64(handle,offset,whence) lseek(handle,offset,whence)
+    // `off_t` is at least 64 bits.
+    // This variant of BSD provides large file support via the `lseek` function,
+    // with file offsets having type `off_t`.
+    #define POV_LSEEK(handle,offset,whence) lseek(handle,offset,whence)
+    #define POV_OFF_T off_t
 #elif defined(_POSIX_V6_ILP32_OFF32)
-    // off_t is 32 bits
+    // `off_t` is at least 32 bits.
+    // This variant of BSD does _not_ provide large file support via the `lseek` function.
     // Comment-out the following line to proceed anyway.
     #error "Image size will be limited to approx. 100 Megapixels. Proceed at your own risk."
-    #define lseek64(handle,offset,whence) lseek(handle,offset,whence)
+    #define POV_LSEEK(handle,offset,whence) lseek(handle,offset,whence)
+    #define POV_OFF_T off_t
 #else
-    // Unable to detect off_t size at compile-time; comment-out the following line to proceed anyway.
+    // Unable to detect `off_t` size at compile-time.
+    // This variant of BSD _may or may not_ provide large file support via the `lseek` function.
+    // Comment-out the following line to proceed anyway
     #error "Image size may be limited to approx. 100 Megapixels. Proceed at your own risk."
-    #define lseek64(handle,offset,whence) lseek(handle,offset,whence)
+    #define POV_LSEEK(handle,offset,whence) lseek(handle,offset,whence)
+    #define POV_OFF_T off_t
 #endif
 
 /// @file

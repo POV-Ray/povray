@@ -1,7 +1,32 @@
 /**
 
+@defgroup PovCore POV-Ray Core Module
+@ingroup PovSource
+@brief Actual render engine core.
+
+This module is designated to contain the actual render engine code, the job of which is to take an
+internal representation of the scene and camera, and trace individual rays for given pixel
+coordinates.
+
+@todo
+    The exact line between the core module and the @ref PovBackend has not been finalized yet.
+
+The core module is intended to be mostly unaware of multithreading, except that it makes provisions
+for sharing a few of its data structures -- mostly related to performance optimizations --
+among multiple core threads.
+
+The core module depends on the @ref PovBase.
+
+@note
+    Although the core module makes use of the @ref PovVM at run-time, the interface is entirely
+    abstract, and therefore does not constitute a formal dependency. From the perspective of the
+    core module, the VM module could be replaced any time with an entirely different implementation.
+
+@{
+
 @dir
-@ingroup PovCore
-Source code files for the actual render engine core.
+@brief Source code files for the @ref PovCore.
+
+@}
 
 */

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -257,7 +257,7 @@ void Animation::ClearWarnings()
 
 Image *Animation::ReadFrame(IStream *file)
 {
-    POV_LONG bytes = 0;
+    POV_OFF_T bytes = 0;
     Image *image = NULL;
     Image::ReadOptions options;
 
@@ -279,7 +279,7 @@ Image *Animation::ReadFrame(IStream *file)
             break;
     }
 
-    POV_LONG prepos = file->tellg();
+    POV_OFF_T prepos = file->tellg();
 
     switch(codec)
     {
@@ -326,7 +326,7 @@ Image *Animation::ReadFrame(IStream *file)
     return image;
 }
 
-POV_LONG Animation::WriteFrame(OStream *file, const Image *image)
+POV_OFF_T Animation::WriteFrame(OStream *file, const Image *image)
 {
     Image::WriteOptions options;
 
@@ -350,7 +350,7 @@ POV_LONG Animation::WriteFrame(OStream *file, const Image *image)
             break;
     }
 
-    POV_LONG bytes = file->tellg();
+    POV_OFF_T bytes = file->tellg();
 
     switch(codec)
     {

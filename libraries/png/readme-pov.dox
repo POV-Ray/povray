@@ -1,0 +1,20 @@
+/**
+
+@dir
+@ingroup PovLibraries
+@brief Source code of _libpng_ 3rd party PNG library (subset).
+
+This directory contains a subset of the libpng 1.5.14 source distribution,
+and is part of the POV-Ray source distribution package.
+
+@note
+    The `contrib` subdirectory of the official libpng source distribution
+    package is not included in the POV-Ray source distribution package, as its
+    contents are not part of libpng proper and are not required for building
+    the library.
+
+Official libpng source distribution packages can be obtained via <http://libpng.org/pub/png/libpng.html>.
+
+See `LICENSE` file in this directory for licensing information.
+
+*/

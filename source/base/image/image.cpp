@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -3060,23 +3060,23 @@ class FileBackedPixelContainer
             m_Blocksize = bs;
             m_Buffer.resize(m_Blocksize);
             // write extra data to create the big file and help 3rd party reader
-            POV_LONG pos;
-            // NB: The following use of SafeUnsignedProduct also safeguards later coputations of
+            POV_OFF_T pos;
+            // NB: The following use of SafeUnsignedProduct also safeguards later computations of
             // pixel positions within the file, as long as x and y coordinates are sane
-            pos = SafeUnsignedProduct<POV_LONG>(m_Width, m_Height);
+            pos = SafeUnsignedProduct<POV_OFF_T>(m_Width, m_Height);
             if ( pos% m_Blocksize)
             { /* issue: the block would overlap the end of file */
                 pos /= m_Blocksize;
                 pos++;
-                pos = SafeUnsignedProduct<POV_LONG>(pos, m_Blocksize);
+                pos = SafeUnsignedProduct<POV_OFF_T>(pos, m_Blocksize);
             }
             /* else fine case: the boundary of block match the boundary of pixels in file */
-            pos = SafeUnsignedProduct<POV_LONG>(pos, sizeof(pixel_type));
+            pos = SafeUnsignedProduct<POV_OFF_T>(pos, sizeof(pixel_type));
             size_type meta[3];
             meta[0] = sizeof(pixel_type);
             meta[1] = m_Width;
             meta[2] = m_Height;
-            if (lseek64(m_File, pos, SEEK_SET) != pos)
+            if (POV_LSEEK(m_File, pos, SEEK_SET) != pos)
                 throw POV_EXCEPTION(kFileDataErr, "Intermediate image storage backing file write/seek failed at creation.");
             if (write(m_File, &meta[0], (int) sizeof(size_type)*3) != (sizeof(size_type)*3))
                 throw POV_EXCEPTION(kFileDataErr, "Intermediate image storage backing file write failed at creation.");
@@ -3197,7 +3197,7 @@ class FileBackedPixelContainer
         int                 m_File;
         bool                m_Dirty;
         size_type           m_Blocksize;
-        POV_LONG            m_CurrentBlock;
+        POV_OFF_T           m_CurrentBlock;
         size_type           m_Width;
         size_type           m_Height;
         size_type           m_xPos;
@@ -3232,7 +3232,7 @@ class FileBackedPixelContainer
 
         void ReadPixel(size_type x, size_type y, pixel_type& pixel)
         {
-            POV_LONG pos, block = (y * (POV_LONG)(m_Width) + x) / m_Blocksize;
+            POV_OFF_T pos, block = (y * (POV_OFF_T)(m_Width) + x) / m_Blocksize;
 
             if (block != m_CurrentBlock) {
                 WriteCurrentBlock();
@@ -3247,7 +3247,7 @@ class FileBackedPixelContainer
 #endif
                 pos = block * sizeof(pixel_type) * m_Blocksize;
                 int chunk = sizeof(pixel_type) * m_Blocksize;
-                if (lseek64(m_File, pos, SEEK_SET) != pos)
+                if (POV_LSEEK(m_File, pos, SEEK_SET) != pos)
                     throw POV_EXCEPTION(kFileDataErr, "Intermediate image storage backing file read/seek failed.");
                 int bytes = read(m_File, &m_Buffer[0], chunk);
                 if (bytes != (sizeof(pixel_type) * m_Blocksize))
@@ -3255,23 +3255,23 @@ class FileBackedPixelContainer
                 m_CurrentBlock = block;
             }
             POV_IMAGE_ASSERT (m_Blocksize != 0);
-            memcpy(&pixel, m_Buffer[(y * (POV_LONG)(m_Width) + x) % m_Blocksize], sizeof(pixel));
+            memcpy(&pixel, m_Buffer[(y * (POV_OFF_T)(m_Width) + x) % m_Blocksize], sizeof(pixel));
         }
 #if 0
         bool BlockCommitted(size_type x, size_type y)
         {
-            POV_LONG block = (y * POV_LONG(m_Width) + x) / m_Blocksize;
+            POV_OFF_T block = (y * POV_OFF_T(m_Width) + x) / m_Blocksize;
 
             return(m_Committed[block]);
         }
 #endif
         void WriteCurrentBlock()
         {
-            POV_LONG pos;
+            POV_OFF_T pos;
 
             if (m_Dirty) {
                 pos = m_CurrentBlock * sizeof(pixel_type) * m_Blocksize;
-                if (lseek64(m_File, pos, SEEK_SET) != pos)
+                if (POV_LSEEK(m_File, pos, SEEK_SET) != pos)
                     throw POV_EXCEPTION(kFileDataErr, "Intermediate image storage backing file write/seek failed.");
                 if (write(m_File, &m_Buffer[0], (int) sizeof(pixel_type) * m_Blocksize) != (sizeof(pixel_type) * m_Blocksize))
                     throw POV_EXCEPTION(kFileDataErr, "Intermediate image storage backing file write failed.");
@@ -3285,7 +3285,7 @@ class FileBackedPixelContainer
             pixel_type dummy;
 
             ReadPixel(x, y, dummy);
-            memcpy(m_Buffer[(y * (POV_LONG)(m_Width) + x) % m_Blocksize], &pixel, sizeof(pixel));
+            memcpy(m_Buffer[(y * (POV_OFF_T)(m_Width) + x) % m_Blocksize], &pixel, sizeof(pixel));
             m_Dirty = true;
         }
 

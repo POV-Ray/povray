@@ -1,6 +1,11 @@
-/// @dir
-/// Source code files containing AVX-specific implementations of dynamically dispatched code.
-///
-/// The files in this directory contain code that is intended for dynamic dispatch,
-/// and therefore may need to be compiled with different options than the rest of POV-Ray.
-/// For instance, to compile these files with gcc, the `-mavx` flag will be needed.
+/**
+
+@dir
+@ingroup PovPlatform
+@brief Source code files containing AVX-specific implementations of dynamically dispatched code.
+
+The files in this directory contain code that is intended for dynamic dispatch,
+and therefore may need to be compiled with different options than the rest of POV-Ray.
+For instance, to compile these files with gcc, the `-mavx` flag will be needed.
+
+*/
