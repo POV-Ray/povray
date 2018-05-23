@@ -182,54 +182,77 @@ void Parser::Run()
     UCS2String  error_filename(POV_FILENAME_BUFFER_CHARS, 0); // Pre-claim some memory, so we can handle an out-of-memory error.
     POV_OFF_T   error_pos = -1;
 
+    // Outer try/catch block to handle out-of-memory conditions
+    // occurring during regular error handling.
     try
     {
-        Init_Random_Generators();
-
-        Initialize_Tokenizer();
-
-        Default_Texture = Create_Texture ();
-        Default_Texture->Pigment = Create_Pigment();
-        Default_Texture->Tnormal = nullptr;
-        Default_Texture->Finish  = Create_Finish();
-
-        // Initialize various defaults depending on language version as per command line / INI settings.
-        InitDefaults(sceneData->EffectiveLanguageVersion());
-
-        Not_In_Default = true;
-        Ok_To_Declare = true;
-        LValue_Ok = false;
-        parsingVersionDirective = false;
-
-        Frame_Init ();
-
-        for(SceneData::DeclaredVariablesMap::const_iterator i(sceneData->declaredVariables.begin()); i != sceneData->declaredVariables.end(); i++)
-        {
-            if(i->second.length() > 0)
-            {
-                SYM_ENTRY *Temp_Entry = nullptr;
-
-                if(i->second[0] == '\"')
-                {
-                    string tmp(i->second, 1, i->second.length() - 2);
-                    Temp_Entry = Add_Symbol(SYM_TABLE_GLOBAL, const_cast<char *>(i->first.c_str()), STRING_ID_TOKEN);
-                    Temp_Entry->Data = String_Literal_To_UCS2(const_cast<char *>(tmp.c_str()), false);
-                }
-                else
-                {
-                    Temp_Entry = Add_Symbol(SYM_TABLE_GLOBAL, const_cast<char *>(i->first.c_str()), FLOAT_ID_TOKEN);
-                    Temp_Entry->Data = Create_Float();
-                    *(reinterpret_cast<DBL *>(Temp_Entry->Data)) = std::atof(i->second.c_str());
-                }
-            }
-        }
-
+        // Main "try/catch" block to handle most error conditions.
         try
         {
+            Init_Random_Generators();
+
+            Initialize_Tokenizer();
+
+            Default_Texture = Create_Texture ();
+            Default_Texture->Pigment = Create_Pigment();
+            Default_Texture->Tnormal = nullptr;
+            Default_Texture->Finish  = Create_Finish();
+
+            // Initialize various defaults depending on language version as per command line / INI settings.
+            InitDefaults(sceneData->EffectiveLanguageVersion());
+
+            Not_In_Default = true;
+            Ok_To_Declare = true;
+            LValue_Ok = false;
+            parsingVersionDirective = false;
+
+            Frame_Init ();
+
+            for(SceneData::DeclaredVariablesMap::const_iterator i(sceneData->declaredVariables.begin()); i != sceneData->declaredVariables.end(); i++)
+            {
+                if(i->second.length() > 0)
+                {
+                    SYM_ENTRY *Temp_Entry = nullptr;
+
+                    if(i->second[0] == '\"')
+                    {
+                        string tmp(i->second, 1, i->second.length() - 2);
+                        Temp_Entry = Add_Symbol(SYM_TABLE_GLOBAL, const_cast<char *>(i->first.c_str()), STRING_ID_TOKEN);
+                        Temp_Entry->Data = String_Literal_To_UCS2(const_cast<char *>(tmp.c_str()), false);
+                    }
+                    else
+                    {
+                        Temp_Entry = Add_Symbol(SYM_TABLE_GLOBAL, const_cast<char *>(i->first.c_str()), FLOAT_ID_TOKEN);
+                        Temp_Entry->Data = Create_Float();
+                        *(reinterpret_cast<DBL *>(Temp_Entry->Data)) = std::atof(i->second.c_str());
+                    }
+                }
+            }
+
             IncludeHeader(sceneData->headerFile);
 
             Parse_Frame();
+
+            // post process atmospheric media
+            for (vector<Media>::iterator i(sceneData->atmosphere.begin()); i != sceneData->atmosphere.end(); i++)
+                i->PostProcess();
+
+            // post process global light sources
+            for (size_t i = 0; i < sceneData->lightSources.size(); i++)
+            {
+                sceneData->lightSources[i]->index = i;
+                sceneData->lightSources[i]->lightGroupLight = false;
+            }
+
+            // post process local light sources
+            for (size_t i = 0; i < sceneData->lightGroupLightSources.size(); i++)
+            {
+                sceneData->lightGroupLightSources[i]->index = i;
+                sceneData->lightGroupLightSources[i]->lightGroupLight = true;
+            }
         }
+        // Make sure any exceptional situations are reported as a parse error (pov_base::Exception)
+        // (both to the user interface and "upward" to the calling code)
         catch (const IncompleteCommentException& e)
         {
             Error(e, "Unterminated block comment in input file.");
@@ -249,23 +272,16 @@ void Parser::Run()
         {
             Error(e, "Illegal escape sequence '%s' in string literal.", e.offendingText.c_str());
         }
-
-        // post process atmospheric media
-        for(vector<Media>::iterator i(sceneData->atmosphere.begin()); i != sceneData->atmosphere.end(); i++)
-            i->PostProcess();
-
-        // post process global light sources
-        for(size_t i = 0; i < sceneData->lightSources.size(); i++)
+        catch (pov_base::Exception& e)
         {
-            sceneData->lightSources[i]->index = i;
-            sceneData->lightSources[i]->lightGroupLight = false;
+            // Error was detected by the parser, and already reported when first thrown
+            throw(e);
         }
-
-        // post process local light sources
-        for(size_t i = 0; i < sceneData->lightGroupLightSources.size(); i++)
+        catch (std::exception& e)
         {
-            sceneData->lightGroupLightSources[i]->index = i;
-            sceneData->lightGroupLightSources[i]->lightGroupLight = true;
+            // Some other exceptional situation occurred in a library or some such and couldn't be handled gracefully;
+            // handle it now by failing with a corresponding parse error
+            Error(e.what());
         }
     }
     catch(std::bad_alloc&)
@@ -6932,165 +6948,149 @@ void Parser::Parse_Frame ()
     SKYSPHERE  *Local_Skysphere;
     bool had_camera = false;
 
-    try
-    {
-        EXPECT
-            CASE (RAINBOW_TOKEN)
-                Local_Rainbow = Parse_Rainbow();
-                Local_Rainbow->Next = sceneData->rainbow;
-                sceneData->rainbow = Local_Rainbow;
-            END_CASE
+    EXPECT
+        CASE (RAINBOW_TOKEN)
+            Local_Rainbow = Parse_Rainbow();
+            Local_Rainbow->Next = sceneData->rainbow;
+            sceneData->rainbow = Local_Rainbow;
+        END_CASE
 
-            CASE (SKYSPHERE_TOKEN)
-                Local_Skysphere = Parse_Skysphere();
-                if (sceneData->skysphere != nullptr)
-                {
-                    Warning("Only one sky-sphere allowed (last one will be used).");
-                    Destroy_Skysphere(sceneData->skysphere);
-                }
-                sceneData->skysphere = Local_Skysphere;
-                for (vector<PIGMENT*>::iterator i = Local_Skysphere->Pigments.begin(); i != Local_Skysphere->Pigments.end(); ++ i)
-                {
-                    Post_Pigment(*i);
-                }
-            END_CASE
+        CASE (SKYSPHERE_TOKEN)
+            Local_Skysphere = Parse_Skysphere();
+            if (sceneData->skysphere != nullptr)
+            {
+                Warning("Only one sky-sphere allowed (last one will be used).");
+                Destroy_Skysphere(sceneData->skysphere);
+            }
+            sceneData->skysphere = Local_Skysphere;
+            for (vector<PIGMENT*>::iterator i = Local_Skysphere->Pigments.begin(); i != Local_Skysphere->Pigments.end(); ++ i)
+            {
+                Post_Pigment(*i);
+            }
+        END_CASE
 
-            CASE (FOG_TOKEN)
-                Local_Fog = Parse_Fog();
-                Local_Fog->Next = sceneData->fog;
-                sceneData->fog = Local_Fog;
-            END_CASE
+        CASE (FOG_TOKEN)
+            Local_Fog = Parse_Fog();
+            Local_Fog->Next = sceneData->fog;
+            sceneData->fog = Local_Fog;
+        END_CASE
 
-            CASE (MEDIA_TOKEN)
-                Parse_Media(sceneData->atmosphere);
-            END_CASE
+        CASE (MEDIA_TOKEN)
+            Parse_Media(sceneData->atmosphere);
+        END_CASE
 
-            CASE (BACKGROUND_TOKEN)
-                Parse_Begin();
-                Parse_Colour (sceneData->backgroundColour);
-                if (sceneData->EffectiveLanguageVersion() < 370)
-                {
-                    if (sceneData->outputAlpha)
-                        sceneData->backgroundColour.SetFT(0.0f, 1.0f);
-                    else
-                        sceneData->backgroundColour.SetFT(0.0f, 0.0f);
-                }
+        CASE (BACKGROUND_TOKEN)
+            Parse_Begin();
+            Parse_Colour (sceneData->backgroundColour);
+            if (sceneData->EffectiveLanguageVersion() < 370)
+            {
+                if (sceneData->outputAlpha)
+                    sceneData->backgroundColour.SetFT(0.0f, 1.0f);
                 else
+                    sceneData->backgroundColour.SetFT(0.0f, 0.0f);
+            }
+            else
+            {
+                if (!sceneData->outputAlpha)
                 {
-                    if (!sceneData->outputAlpha)
-                    {
-                        // if we're not outputting an alpha channel, precompose the scene background against a black "background behind the background"
-                        sceneData->backgroundColour.colour() *= sceneData->backgroundColour.Opacity();
-                        sceneData->backgroundColour.SetFT(0.0f, 0.0f);
-                    }
+                    // if we're not outputting an alpha channel, precompose the scene background against a black "background behind the background"
+                    sceneData->backgroundColour.colour() *= sceneData->backgroundColour.Opacity();
+                    sceneData->backgroundColour.SetFT(0.0f, 0.0f);
                 }
-                Parse_End();
-            END_CASE
+            }
+            Parse_End();
+        END_CASE
 
-            CASE (CAMERA_TOKEN)
-                if (sceneData->EffectiveLanguageVersion() >= 350)
+        CASE (CAMERA_TOKEN)
+            if (sceneData->EffectiveLanguageVersion() >= 350)
+            {
+                if (sceneData->clocklessAnimation == false)
                 {
-                    if (sceneData->clocklessAnimation == false)
-                    {
-                        if (had_camera == true)
-                            Warning("More than one camera in scene. Ignoring previous camera(s).");
-                    }
-                    had_camera = true;
-                    sceneData->parsedCamera = Default_Camera;
+                    if (had_camera == true)
+                        Warning("More than one camera in scene. Ignoring previous camera(s).");
                 }
+                had_camera = true;
+                sceneData->parsedCamera = Default_Camera;
+            }
 
-                Parse_Camera(sceneData->parsedCamera);
-                if (sceneData->clocklessAnimation == true)
-                    sceneData->cameras.push_back(sceneData->parsedCamera);
-            END_CASE
+            Parse_Camera(sceneData->parsedCamera);
+            if (sceneData->clocklessAnimation == true)
+                sceneData->cameras.push_back(sceneData->parsedCamera);
+        END_CASE
 
-            CASE (DECLARE_TOKEN)
-                UNGET
-                VersionWarning(295,"Should have '#' before 'declare'.");
-                Parse_Directive (false);
-            END_CASE
+        CASE (DECLARE_TOKEN)
+            UNGET
+            VersionWarning(295,"Should have '#' before 'declare'.");
+            Parse_Directive (false);
+        END_CASE
 
-            CASE (INCLUDE_TOKEN)
-                UNGET
-                VersionWarning(295,"Should have '#' before 'include'.");
-                Parse_Directive (false);
-            END_CASE
+        CASE (INCLUDE_TOKEN)
+            UNGET
+            VersionWarning(295,"Should have '#' before 'include'.");
+            Parse_Directive (false);
+        END_CASE
 
-            CASE (FLOAT_FUNCT_TOKEN)
-                switch(mToken.Function_Id)
-                {
-                    case VERSION_TOKEN:
-                        UNGET
-                        Parse_Directive (false);
-                        UNGET
-                        break;
+        CASE (FLOAT_FUNCT_TOKEN)
+            switch(mToken.Function_Id)
+            {
+                case VERSION_TOKEN:
+                    UNGET
+                    Parse_Directive (false);
+                    UNGET
+                    break;
 
-                    default:
-                        UNGET
-                        Expectation_Error ("object or directive");
-                        break;
-                }
-            END_CASE
-
-            CASE (MAX_TRACE_LEVEL_TOKEN)
-                if (sceneData->EffectiveLanguageVersion() >= 350)
-                {
-                    PossibleError("'max_trace_level' should be in global_settings block.\n"
-                                  "Future versions may not support 'max_trace_level' outside global_settings.");
-                }
-                Global_Setting_Warn();
-                Max_Trace_Level = (int)Parse_Float();
-                Max_Trace_Level = max(1, Max_Trace_Level);
-                Had_Max_Trace_Level = true;
-                if(Max_Trace_Level > MAX_TRACE_LEVEL_LIMIT)
-                {
-                    Warning("Maximum max_trace_level is %d but %d was specified.\n"
-                               "Going to use max_trace_level %d.",
-                               MAX_TRACE_LEVEL_LIMIT, Max_Trace_Level, MAX_TRACE_LEVEL_LIMIT);
-                    Max_Trace_Level = MAX_TRACE_LEVEL_LIMIT;
-                }
-            END_CASE
-
-            CASE (MAX_INTERSECTIONS_TOKEN)
-                Parse_Float();
-                VersionWarning(370, "'max_intersections' is no longer needed and has no effect in POV-Ray v3.7 or later.");
-            END_CASE
-
-            CASE (DEFAULT_TOKEN)
-                Parse_Default();
-            END_CASE
-
-            CASE (END_OF_FILE_TOKEN)
-                EXIT
-            END_CASE
-
-            CASE (GLOBAL_SETTINGS_TOKEN)
-                Parse_Global_Settings();
-            END_CASE
-
-            OTHERWISE
-                UNGET
-                Object = Parse_Object();
-                if (Object == nullptr)
+                default:
+                    UNGET
                     Expectation_Error ("object or directive");
-                Post_Process (Object, nullptr);
-                Link_To_Frame (Object);
-            END_CASE
-        END_EXPECT
-    }
-    // Make sure any exceptional situations are reported as a parse error (pov_base::Exception)
-    // (both to the user interface and "upward" to the calling code)
-    catch (pov_base::Exception& e)
-    {
-        // Error was detected by the parser, and already reported when first thrown
-        throw(e);
-    }
-    catch (std::exception& e)
-    {
-        // Some other exceptional situation occurred in a library or some such and couldn't be handled gracefully;
-        // handle it now by failing with a corresponding parse error
-        Error(e.what());
-    }
+                    break;
+            }
+        END_CASE
+
+        CASE (MAX_TRACE_LEVEL_TOKEN)
+            if (sceneData->EffectiveLanguageVersion() >= 350)
+            {
+                PossibleError("'max_trace_level' should be in global_settings block.\n"
+                                "Future versions may not support 'max_trace_level' outside global_settings.");
+            }
+            Global_Setting_Warn();
+            Max_Trace_Level = (int)Parse_Float();
+            Max_Trace_Level = max(1, Max_Trace_Level);
+            Had_Max_Trace_Level = true;
+            if(Max_Trace_Level > MAX_TRACE_LEVEL_LIMIT)
+            {
+                Warning("Maximum max_trace_level is %d but %d was specified.\n"
+                            "Going to use max_trace_level %d.",
+                            MAX_TRACE_LEVEL_LIMIT, Max_Trace_Level, MAX_TRACE_LEVEL_LIMIT);
+                Max_Trace_Level = MAX_TRACE_LEVEL_LIMIT;
+            }
+        END_CASE
+
+        CASE (MAX_INTERSECTIONS_TOKEN)
+            Parse_Float();
+            VersionWarning(370, "'max_intersections' is no longer needed and has no effect in POV-Ray v3.7 or later.");
+        END_CASE
+
+        CASE (DEFAULT_TOKEN)
+            Parse_Default();
+        END_CASE
+
+        CASE (END_OF_FILE_TOKEN)
+            EXIT
+        END_CASE
+
+        CASE (GLOBAL_SETTINGS_TOKEN)
+            Parse_Global_Settings();
+        END_CASE
+
+        OTHERWISE
+            UNGET
+            Object = Parse_Object();
+            if (Object == nullptr)
+                Expectation_Error ("object or directive");
+            Post_Process (Object, nullptr);
+            Link_To_Frame (Object);
+        END_CASE
+    END_EXPECT
 }
 
 
