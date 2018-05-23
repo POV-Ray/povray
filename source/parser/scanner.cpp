@@ -744,6 +744,38 @@ bool Scanner::EatNextBlockComment()
 
 //------------------------------------------------------------------------------
 
+bool Scanner::GetRaw(unsigned char* buffer, size_t size)
+{
+    POV_PARSER_ASSERT(!mEndOfStream);
+
+    unsigned char* pBufPos = buffer;
+    size_t sizeToCopy = size;
+    size_t sizeInBuffer = (mpBufferEnd - mpNextChar);
+    while (!mEndOfStream && (sizeToCopy >= sizeInBuffer))
+    {
+        memcpy(pBufPos, mpNextChar, sizeInBuffer);
+        pBufPos += sizeInBuffer;
+        mpNextChar += sizeInBuffer;
+        POV_PARSER_ASSERT(mpNextChar == mpBufferEnd);
+        RefillBuffer();
+        sizeToCopy -= sizeInBuffer;
+        sizeInBuffer = (mpBufferEnd - mpNextChar);
+    }
+
+    if (!mEndOfStream && (sizeToCopy > 0))
+    {
+        POV_PARSER_ASSERT(sizeToCopy < sizeInBuffer);
+        memcpy(pBufPos, mpNextChar, sizeToCopy);
+        pBufPos += sizeToCopy;
+        mpNextChar += sizeToCopy;
+        sizeToCopy -= sizeToCopy;
+    }
+
+    return (sizeToCopy == 0);
+}
+
+//------------------------------------------------------------------------------
+
 ConstSourcePtr Scanner::GetSource() const
 {
     return mpSource;

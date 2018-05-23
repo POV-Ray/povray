@@ -1321,24 +1321,19 @@ void Parser::Parse_Directive(int After_Hash)
                             PMac->endPosition = hashPosition;
                             POV_OFF_T macroLength = mToken.raw.lexeme.position - PMac->source;
                             /// @todo Re-enable cached macros.
-#if 0
                             if (macroLength <= MaxCachedMacroSize)
                             {
                                 PMac->CacheSize = macroLength;
                                 PMac->Cache = new unsigned char[PMac->CacheSize];
-                                if (PMac->Cache)
+                                RawTokenizer::HotBookmark pos = mTokenizer.GetHotBookmark();
+                                mTokenizer.GoToBookmark(PMac->source);
+                                if (!mTokenizer.GetRaw(PMac->Cache, PMac->CacheSize))
                                 {
-                                    mTokenizer.GoToBookmark(PMac->source);
-                                    Input_File->inFile->seekg(PMac->Macro_File_Pos);
-                                    if (!Input_File->inFile->ReadRaw(PMac->Cache, PMac->CacheSize))
-                                    {
-                                        delete[] PMac->Cache;
-                                        PMac->Cache = nullptr;
-                                    }
-                                    Input_File->inFile->seekg(pos);
+                                    delete[] PMac->Cache;
+                                    PMac->Cache = nullptr;
                                 }
+                                mTokenizer.GoToBookmark(pos);
                             }
-#endif
                         }
                     }
                     Cond_Stack.pop_back();
@@ -2580,7 +2575,6 @@ void Parser::Invoke_Macro()
         UCS2String ign;
         /* Not in same file */
         Cond_Stack.back().Macro_Same_Flag = false;
-        Cond_Stack.back().returnToBookmark = mTokenizer.GetHotBookmark();
         Got_EOF=false;
         POV_PARSER_ASSERT(!readingExternalFile);
         shared_ptr<IStream> is;
@@ -2604,7 +2598,8 @@ void Parser::Invoke_Macro()
     Got_EOF=false;
     if (!mTokenizer.GoToBookmark(PMac->source))
     {
-        Error("Unable to file seek in macro.");
+        ErrorInfo(mToken, "Invoking macro from here.");
+        Error(PMac->source, "Unable to file seek in macro invocation.");
     }
 
     mToken.sourceFile = mTokenizer.GetSource();
@@ -2621,17 +2616,16 @@ void Parser::Return_From_Macro()
 {
     Check_Macro_Vers();
 
-    if (!Cond_Stack.back().Macro_Same_Flag)
-    {
-        POV_PARSER_ASSERT(!readingExternalFile);
-        mTokenizer.SetInputStream(Cond_Stack.back().returnToBookmark.pSource);
-        mToken.sourceFile = mTokenizer.GetSource();
-    }
+    POV_PARSER_ASSERT(!readingExternalFile);
 
     Got_EOF=false;
 
     if (!mTokenizer.GoToBookmark(Cond_Stack.back().returnToBookmark))
-        Error("Unable to file seek in return from macro.");
+    {
+        ErrorInfo(mToken, "Returning from macro.");
+        Error(Cond_Stack.back().returnToBookmark, "Unable to file seek in return from macro.");
+    }
+    mToken.sourceFile = mTokenizer.GetSource();
 
     // Always destroy macro locals
     Destroy_Table(Table_Index--);
