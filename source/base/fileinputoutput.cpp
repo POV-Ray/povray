@@ -511,37 +511,35 @@ POV_OFF_T IMemStream::tellg() const
 
 bool IMemStream::seekg(POV_OFF_T posi, unsigned int whence)
 {
-    if(!fail)
-    {
-        // Any seek operation renders the unget buffer's content obsolete.
-        mUngetBuffer = EOF;
+    // Any seek operation renders the end-of-file status and unget buffer's content obsolete.
+    fail = false;
+    mUngetBuffer = EOF;
 
-        switch(whence)
-        {
-            case seek_set:
-                if (posi < formalStart)
-                    fail = true;
-                else if (posi - formalStart <= size)
-                    pos = posi - formalStart;
-                else
-                    fail = true;
-                break;
-            case seek_cur:
-                if ((posi <= size) && (pos <= size-posi))
-                    pos += posi;
-                else
-                    fail = true;
-                break;
-            case seek_end:
-                if (posi <= size)
-                    pos = size - posi;
-                else
-                    fail = true;
-                break;
-            default:
-                POV_ASSERT(false);
-                break;
-        }
+    switch(whence)
+    {
+        case seek_set:
+            if (posi < formalStart)
+                fail = true;
+            else if (posi - formalStart <= size)
+                pos = posi - formalStart;
+            else
+                fail = true;
+            break;
+        case seek_cur:
+            if ((posi <= size) && (pos <= size-posi))
+                pos += posi;
+            else
+                fail = true;
+            break;
+        case seek_end:
+            if (posi <= size)
+                pos = size - posi;
+            else
+                fail = true;
+            break;
+        default:
+            POV_ASSERT(false);
+            break;
     }
     return !fail;
 }

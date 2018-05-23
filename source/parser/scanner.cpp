@@ -337,14 +337,30 @@ void Scanner::SetInputStream(SourcePtr stream)
 
 bool Scanner::SetInputStream(SourcePtr stream, const Bookmark& bookmark)
 {
-    mpSource = stream;
+    if ((mpSource == stream) && (bookmark.offset >= mBase) &&
+        ((bookmark.offset - mBase) < (mpBufferEnd - maBuffer)))
+    {
+        // Bookmark is already loaded in the buffer.
+        // Just advance/rewind the next character accordingly.
+        mpNextChar = maBuffer + (bookmark.offset - mBase);
+    }
+    else
+    {
+        // Not in buffer at the moment.
 
-    mEndOfStream = !mpSource->seekg(bookmark.offset);
-    mBase = mpSource->tellg();
-    mpBufferEnd = maBuffer;
-    mpNextChar = maBuffer;
-    if (!mEndOfStream)
-        RefillBuffer();
+        // Make sure we have the right stream.
+        mpSource = stream;
+
+        // Refill the buffer.
+        mEndOfStream = !mpSource->seekg(bookmark.offset);
+        mBase = mpSource->tellg();
+        mpBufferEnd = maBuffer;
+        mpNextChar = maBuffer;
+        if (!mEndOfStream)
+            RefillBuffer();
+    }
+
+    // Set the scanner state back to when the bookmark was created.
 
     SetStringEncoding(bookmark.stringEncoding);
 
@@ -457,8 +473,10 @@ bool Scanner::GetNextDirective(Lexeme& lexeme)
 
     while (!mEndOfStream)
     {
-        // Skip over any whitespace (including blank lines).
-        while (IsWhitespace(*mpNextChar))
+        // Skip over pretty much anything, except stuff that may
+        // invalidate the lexeme we are looking for.
+        while (IsWhitespace(*mpNextChar) ||
+               ((*mpNextChar != '"') && (*mpNextChar != '/') && (*mpNextChar != '#')))
         {
             if (!Advance())
                 return false;
@@ -476,7 +494,7 @@ bool Scanner::GetNextDirective(Lexeme& lexeme)
         else if (*mpNextChar == '/')
         {
             // Either division operator or start of comment.
-            if (!CopyAndAdvance(lexeme))
+            if (!Advance())
                 return false;
             if (*mpNextChar == '/')
             {
@@ -491,17 +509,13 @@ bool Scanner::GetNextDirective(Lexeme& lexeme)
             }
             continue; // Not a lexeme we are looking for. Rinse & repeat.
         }
-        else if (*mpNextChar == '#')
+        else
         {
+            POV_PARSER_ASSERT(*mpNextChar == '#');
             // Found what we've been looking for.
             lexeme.category = Lexeme::Category::kOther;
             (void)CopyAndAdvance(lexeme);
             return true;
-        }
-        else
-        {
-            if (!Advance())
-                return false;
         }
     }
 
@@ -740,6 +754,38 @@ bool Scanner::EatNextBlockComment()
     }
 
     return true;
+}
+
+//------------------------------------------------------------------------------
+
+bool Scanner::GetRaw(unsigned char* buffer, size_t size)
+{
+    POV_PARSER_ASSERT(!mEndOfStream);
+
+    unsigned char* pBufPos = buffer;
+    size_t sizeToCopy = size;
+    size_t sizeInBuffer = (mpBufferEnd - mpNextChar);
+    while (!mEndOfStream && (sizeToCopy >= sizeInBuffer))
+    {
+        memcpy(pBufPos, mpNextChar, sizeInBuffer);
+        pBufPos += sizeInBuffer;
+        mpNextChar += sizeInBuffer;
+        POV_PARSER_ASSERT(mpNextChar == mpBufferEnd);
+        RefillBuffer();
+        sizeToCopy -= sizeInBuffer;
+        sizeInBuffer = (mpBufferEnd - mpNextChar);
+    }
+
+    if (!mEndOfStream && (sizeToCopy > 0))
+    {
+        POV_PARSER_ASSERT(sizeToCopy < sizeInBuffer);
+        memcpy(pBufPos, mpNextChar, sizeToCopy);
+        pBufPos += sizeToCopy;
+        mpNextChar += sizeToCopy;
+        sizeToCopy -= sizeToCopy;
+    }
+
+    return (sizeToCopy == 0);
 }
 
 //------------------------------------------------------------------------------

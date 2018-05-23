@@ -369,6 +369,13 @@ TokenId pov_parser::RawTokenizer::GetExpressionId(TokenId tokenId)
 
 //------------------------------------------------------------------------------
 
+bool RawTokenizer::GetRaw(unsigned char* buffer, size_t size)
+{
+    return mScanner.GetRaw(buffer, size);
+}
+
+//------------------------------------------------------------------------------
+
 pov_parser::ConstSourcePtr RawTokenizer::GetSource() const
 {
     return mScanner.GetSource();

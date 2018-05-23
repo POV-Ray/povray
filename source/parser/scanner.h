@@ -159,6 +159,13 @@ public:
     /// Advance to the next `#` lexeme in the input stream.
     bool GetNextDirective(Lexeme& lexeme);
 
+    /// Read raw data.
+    /// @deprecated
+    ///     This method is only intended as a temporary measure to implement
+    ///     binary-level macro caching, to provide a reference for performance
+    ///     testing of the envisioned token-level macro caching.
+    bool GetRaw(unsigned char* buffer, size_t size);
+
     /// Get current source for comparison.
     ConstSourcePtr GetSource() const;
 
