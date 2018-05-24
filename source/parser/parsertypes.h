@@ -56,6 +56,8 @@ class IStream;
 namespace pov_parser
 {
 
+using namespace pov_base;
+
 enum TokenId : int;
 
 //------------------------------------------------------------------------------
@@ -79,14 +81,14 @@ struct LexemePosition
 
 //------------------------------------------------------------------------------
 
-struct TokenizerException : std::exception, pov_base::MessageContext
+struct TokenizerException : std::exception, MessageContext
 {
-    pov_base::UCS2String    offendingStreamName;
-    LexemePosition          offendingPosition;
+    UCS2String      offendingStreamName;
+    LexemePosition  offendingPosition;
 
     TokenizerException(const ConstSourcePtr& os, const LexemePosition& op);
 
-    virtual pov_base::UCS2String GetFileName() const override;
+    virtual UCS2String GetFileName() const override;
     virtual POV_LONG GetLine() const override;
     virtual POV_LONG GetColumn() const override;
     virtual POV_OFF_T GetOffset() const override;
@@ -110,8 +112,10 @@ struct InvalidCharacterException : TokenizerException
 
 struct InvalidEscapeSequenceException : TokenizerException
 {
-    pov_base::UTF8String offendingText;
-    InvalidEscapeSequenceException(const ConstSourcePtr& os, const LexemePosition& op, const pov_base::UTF8String& ot);
+    UTF8String offendingText;
+    InvalidEscapeSequenceException(const ConstSourcePtr& os, const LexemePosition& op, const UTF8String& ot);
+    InvalidEscapeSequenceException(const ConstSourcePtr& os, const LexemePosition& op,
+                                   const UTF8String::const_iterator& otb, const UTF8String::const_iterator& ote);
 };
 
 }

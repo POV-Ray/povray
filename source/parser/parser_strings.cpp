@@ -106,100 +106,119 @@ UCS2 *Parser::Parse_String(bool pathname, bool require)
 {
     UCS2 *New = nullptr;
     int len = 0;
-    bool useRawText;
-    UCS2String temp;
-    const UCS2String* pS;
+    const UCS2String* pString;
+    const StringValue* stringValue = nullptr;
 
-    try
-    {
+    EXPECT
+        CASE(STRING_LITERAL_TOKEN)
+            /// @todo Add back support for non-ASCII string encodings.
+            stringValue = dynamic_cast<const StringValue*>(mToken.raw.value.get());
+            POV_PARSER_ASSERT(stringValue != nullptr);
 
-        EXPECT
-            CASE(STRING_LITERAL_TOKEN)
-                /// @todo Add back support for non-ASCII string encodings.
-                POV_PARSER_ASSERT(dynamic_pointer_cast<const StringValue>(mToken.raw.value) != nullptr);
-                len = dynamic_pointer_cast<const StringValue>(mToken.raw.value)->data.size() + 1;
-                New = reinterpret_cast<UCS2 *>(POV_MALLOC(len * sizeof(UCS2), "UCS2 String"));
-                POV_MEMCPY(reinterpret_cast<void *>(New),
-                           reinterpret_cast<const void *>(dynamic_pointer_cast<const StringValue>(mToken.raw.value)->data.c_str()),
-                           len * sizeof(UCS2));
-                EXIT
-            END_CASE
+            if (pathname)
+            {
+                // Historically, escape sequences were ignored when parsing for a filename.
+                // As of POV-Ray v3.8, this has been changed.
 
-            CASE(STR_TOKEN)
-                New = Parse_Str(pathname);
-                EXIT
-            END_CASE
+                if (sceneData->EffectiveLanguageVersion() >= 380)
+                {
+                    if (stringValue->IsAmbiguous())
+                    {
+#if POV_BACKSLASH_IS_PATH_SEPARATOR
+                        Warning("Backslash encountered while parsing for a filename."
+                                " As of POV-Ray v3.8, this is interpreted as an escape sequence just like in any other string literal."
+                                " If this is supposed to be a path separator, use a forward slash instead.");
+#endif
 
-            CASE(VSTR_TOKEN)
-                New = Parse_VStr(pathname);
-                EXIT
-            END_CASE
-
-            CASE(CONCAT_TOKEN)
-                New = Parse_Concat(pathname);
-                EXIT
-            END_CASE
-
-            CASE(CHR_TOKEN)
-                New = Parse_Chr(pathname);
-                EXIT
-            END_CASE
-
-            CASE(DATETIME_TOKEN)
-                New = Parse_Datetime(pathname);
-                EXIT
-            END_CASE
-
-            CASE(SUBSTR_TOKEN)
-                New = Parse_Substr(pathname);
-                EXIT
-            END_CASE
-
-            CASE(STRUPR_TOKEN)
-                New = Parse_Strupr(pathname);
-                EXIT
-            END_CASE
-
-            CASE(STRLWR_TOKEN)
-                New = Parse_Strlwr(pathname);
-                EXIT
-            END_CASE
-
-            CASE(STRING_ID_TOKEN)
-                len = UCS2_strlen(reinterpret_cast<UCS2 *>(mToken.Data)) + 1;
-                New = reinterpret_cast<UCS2 *>(POV_MALLOC(len * sizeof(UCS2), "UCS2 String"));
-                POV_MEMCPY(reinterpret_cast<void *>(New), reinterpret_cast<void *>(mToken.Data), len * sizeof(UCS2));
-                EXIT
-            END_CASE
-
-            OTHERWISE
-                if(require)
-                    Expectation_Error("string expression");
+                    }
+                    pString = &stringValue->GetData();
+                }
                 else
                 {
-                    UNGET
-                    EXIT
+                    if (stringValue->IsAmbiguous())
+                    {
+#if POV_BACKSLASH_IS_PATH_SEPARATOR
+                        Warning("Backslash encountered while parsing for a filename."
+                                " In legacy (pre-3.8) scenes, this is NOT interpreted as the start of an escape sequence."
+                                " However, for future compatibility it is recommended to use a forward slash as path separator instead.");
+#else
+                        Warning("Backslash encountered while parsing for a filename."
+                                " In legacy (pre-3.8) scenes, this is NOT interpreted as the start of an escape sequence.");
+#endif
+                    }
+                    pString = &stringValue->GetFileName();
                 }
-            END_CASE
-        END_EXPECT
+            }
+            else
+            {
+                pString = &stringValue->GetData();
+            }
 
-    }
-    catch (const InvalidEscapeSequenceException& e)
-    {
-        if (pathname)
-        {
-            Error(e, "Illegal escape sequence '%s' in string literal while parsing for a filename."
-                     " If this backslash is supposed to be a path separator, use a forward slash"
-                     " instead. The use of single backslashes as path separators has never been"
-                     " an officially documented feature, and as of POV-Ray v3.8 is no longer"
-                     " supported.",
-                  e.offendingText.c_str());
-        }
-        else
-        {
-            Error(e, "Illegal escape sequence '%s' in string literal.", e.offendingText.c_str());
-        }
-    }
+            len = pString->size() + 1;
+            New = reinterpret_cast<UCS2 *>(POV_MALLOC(len * sizeof(UCS2), "UCS2 String"));
+            POV_MEMCPY(reinterpret_cast<void *>(New),
+                        reinterpret_cast<const void *>(pString->c_str()),
+                        len * sizeof(UCS2));
+            EXIT
+        END_CASE
+
+        CASE(STR_TOKEN)
+            New = Parse_Str(pathname);
+            EXIT
+        END_CASE
+
+        CASE(VSTR_TOKEN)
+            New = Parse_VStr(pathname);
+            EXIT
+        END_CASE
+
+        CASE(CONCAT_TOKEN)
+            New = Parse_Concat(pathname);
+            EXIT
+        END_CASE
+
+        CASE(CHR_TOKEN)
+            New = Parse_Chr(pathname);
+            EXIT
+        END_CASE
+
+        CASE(DATETIME_TOKEN)
+            New = Parse_Datetime(pathname);
+            EXIT
+        END_CASE
+
+        CASE(SUBSTR_TOKEN)
+            New = Parse_Substr(pathname);
+            EXIT
+        END_CASE
+
+        CASE(STRUPR_TOKEN)
+            New = Parse_Strupr(pathname);
+            EXIT
+        END_CASE
+
+        CASE(STRLWR_TOKEN)
+            New = Parse_Strlwr(pathname);
+            EXIT
+        END_CASE
+
+        CASE(STRING_ID_TOKEN)
+            len = UCS2_strlen(reinterpret_cast<UCS2 *>(mToken.Data)) + 1;
+            New = reinterpret_cast<UCS2 *>(POV_MALLOC(len * sizeof(UCS2), "UCS2 String"));
+            POV_MEMCPY(reinterpret_cast<void *>(New), reinterpret_cast<void *>(mToken.Data), len * sizeof(UCS2));
+            EXIT
+        END_CASE
+
+        OTHERWISE
+            if(require)
+                Expectation_Error("string expression");
+            else
+            {
+                UNGET
+                EXIT
+            }
+        END_CASE
+    END_EXPECT
 
     return New;
 }
