@@ -75,6 +75,36 @@ using ConstValuePtr = shared_ptr<const Value>;
 struct StringValue : Value
 {
     UCS2String data;
+    virtual const UCS2String& GetData() const { return data; }      ///< Get value in generic context.
+    virtual const UCS2String& GetFileName() const { return data; }  ///< Get value in file name context.
+    virtual bool IsAmbiguous() const { return false; }              ///< Whether value depends on context.
+    virtual void Append(UCS2 codeUnit) { data += codeUnit; }        ///< Append an unambiguous character.
+};
+
+/// Structure representing a string value with backslashes.
+struct AmbiguousStringValue : StringValue
+{
+    struct InvalidEscapeSequenceInfo
+    {
+        ConstSourcePtr source;
+        LexemePosition position;
+        UTF8String text;
+        InvalidEscapeSequenceInfo(ConstSourcePtr s, LexemePosition p, UTF8String t) : source(s), position(p), text(t) {}
+        InvalidEscapeSequenceInfo(ConstSourcePtr s, LexemePosition p, const UTF8String::const_iterator& b, const UTF8String::const_iterator& e) :
+            source(s), position(p), text(b, e) {}
+        void Throw() const { throw InvalidEscapeSequenceException(source, position, text); }
+    };
+
+    UCS2String data;
+    UCS2String fileName;
+    InvalidEscapeSequenceInfo* invalidEscapeSequence;
+    AmbiguousStringValue(const StringValue& o) : data(o.GetData()), fileName(o.GetFileName()), invalidEscapeSequence(nullptr) {}
+    AmbiguousStringValue(const AmbiguousStringValue& o) : data(o.data), fileName(o.fileName), invalidEscapeSequence(o.invalidEscapeSequence) {}
+    ~AmbiguousStringValue() { if (invalidEscapeSequence != nullptr) delete invalidEscapeSequence; }
+    virtual const UCS2String& GetData() const override { if (invalidEscapeSequence != nullptr) invalidEscapeSequence->Throw(); return data; }
+    virtual const UCS2String& GetFileName() const override { return fileName; }
+    virtual bool IsAmbiguous() const override { return true; }
+    virtual void Append(UCS2 codeUnit) override { data += codeUnit; fileName += codeUnit; }
 };
 
 //------------------------------------------------------------------------------

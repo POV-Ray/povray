@@ -170,11 +170,8 @@ bool RawTokenizer::ProcessFloatLiteralLexeme(RawToken& token)
     token.id = int(FLOAT_TOKEN);
     token.expressionId = FLOAT_FUNCT_TOKEN;
 
-    //shared_ptr<FloatValue> pValue(std::make_shared<FloatValue>());
-    //if (sscanf(token.lexeme.text.c_str(), POV_DBL_FORMAT_STRING, &pValue->data) == 0)
     if (sscanf(token.lexeme.text.c_str(), POV_DBL_FORMAT_STRING, &token.floatValue) == 0)
         return false;
-    //token.value = pValue;
 
     return true;
 }
@@ -190,6 +187,7 @@ bool RawTokenizer::ProcessStringLiteralLexeme(RawToken& token)
     token.expressionId = STRING_LITERAL_TOKEN;
 
     shared_ptr<StringValue> pValue(std::make_shared<StringValue>());
+    shared_ptr<AmbiguousStringValue> pAmbiguousValue;
     UCS4 c;
 
     pValue->data.reserve(token.lexeme.text.size() - 2);
@@ -200,60 +198,96 @@ bool RawTokenizer::ProcessStringLiteralLexeme(RawToken& token)
     {
         if (*i == '\\')
         {
+            // For now, presume the escape sequence to be ambiguous.
+            bool isAmbiguous = true;
+            bool isInvalid = false;
+
             auto escapeSequenceBegin = i;
-            auto maxEscapeSequenceLength = payloadEnd - escapeSequenceBegin;
-            if (maxEscapeSequenceLength < 2) // Minimum length of escape sequence.
-                throw InvalidEscapeSequenceException(mScanner.GetSource(), token.lexeme.position, UTF8String(escapeSequenceBegin, payloadEnd));
-            auto escapeSequenceEnd = i + 2; // Typical length of escape sequence.
+            POV_PARSER_ASSERT(payloadEnd - escapeSequenceBegin >= 2); // Bare `\` at end of string should have escaped the end-of-string quote char.
+            auto escapeSequenceEnd = escapeSequenceBegin + 2; // Typical length of escape sequence.
 
             ++i;
             switch (*i)
             {
-                case 'a': ++i; c = 0x0007u; break;   // "Alert"         = BEL
-                case 'b': ++i; c = 0x0008u; break;   // "Backspace"     = BS
-                case 't': ++i; c = 0x0009u; break;   // "Tab"           = HT
-                case 'n': ++i; c = 0x000Au; break;   // "New line"      = LF
-                case 'v': ++i; c = 0x000Bu; break;   // "Vertical tab"  = VT
-                case 'f': ++i; c = 0x000Cu; break;   // "Form feed"     = FF
-                case 'r': ++i; c = 0x000Du; break;   // "Return"        = CR
-
-                case '\'':
                 case '\"':
-                case '\\': c = UCS4(*i); ++i; break;
-
-                case 'U':
+                    isAmbiguous = false;
+                    // FALLTHROUGH
+                case '\'':
+                case '\\':
+                    c = UCS4(*i);
                     ++i;
-                    escapeSequenceEnd = payloadEnd;
-                    if (!ProcessUCSEscapeDigits(c, i, escapeSequenceEnd, 6))
-                        throw InvalidEscapeSequenceException(mScanner.GetSource(), token.lexeme.position, UTF8String(escapeSequenceBegin, escapeSequenceEnd));
-                    /// @todo Do we want to add support for surrogate pairs?
                     break;
+
+                case 'a': c = 0x0007u; ++i; break;   // "Alert"         = BEL
+                case 'b': c = 0x0008u; ++i; break;   // "Backspace"     = BS
+                case 't': c = 0x0009u; ++i; break;   // "Tab"           = HT
+                case 'n': c = 0x000Au; ++i; break;   // "New line"      = LF
+                case 'v': c = 0x000Bu; ++i; break;   // "Vertical tab"  = VT
+                case 'f': c = 0x000Cu; ++i; break;   // "Form feed"     = FF
+                case 'r': c = 0x000Du; ++i; break;   // "Return"        = CR
 
                 case 'u':
                     ++i;
                     escapeSequenceEnd = payloadEnd;
                     if (!ProcessUCSEscapeDigits(c, i, escapeSequenceEnd, 4))
-                        throw InvalidEscapeSequenceException(mScanner.GetSource(), token.lexeme.position, UTF8String(escapeSequenceBegin, escapeSequenceEnd));
+                        isInvalid = true;
+                    /// @todo Do we want to add support for surrogate pairs?
+                    break;
+
+                case 'U':
+                    ++i;
+                    escapeSequenceEnd = payloadEnd;
+                    if (!ProcessUCSEscapeDigits(c, i, escapeSequenceEnd, 6))
+                        isInvalid = true;
                     /// @todo Do we want to add support for surrogate pairs?
                     break;
 
                 default:
-                    throw InvalidEscapeSequenceException(mScanner.GetSource(), token.lexeme.position, UTF8String(escapeSequenceBegin, escapeSequenceEnd));
+                    isInvalid = true;
+                    c = UCS4(*i);
+                    ++i;
+                    break;
+            }
+            if (isAmbiguous)
+            {
+                if (!pAmbiguousValue)
+                {
+                    // String has been unambiguous -- until now.
+                    pAmbiguousValue = std::make_shared<AmbiguousStringValue>(*pValue);
+                    pValue = pAmbiguousValue;
+                }
+
+                /// @todo Add support for non-BMP characters (requires UTF16String instead of UCS2String).
+                pAmbiguousValue->data += UCS2(c);
+
+                for (auto iEscapeChar = escapeSequenceBegin; iEscapeChar != escapeSequenceEnd; ++iEscapeChar)
+                {
+                    /// @todo Add support for non-BMP characters (requires UTF16String instead of UCS2String).
+                    pAmbiguousValue->fileName += UCS2(*iEscapeChar);
+                }
+
+                if (isInvalid && (pAmbiguousValue->invalidEscapeSequence == nullptr))
+                    pAmbiguousValue->invalidEscapeSequence = new AmbiguousStringValue::InvalidEscapeSequenceInfo(
+                        mScanner.GetSource(), token.lexeme.position, escapeSequenceBegin, escapeSequenceEnd);
+            }
+            else
+            {
+                pValue->Append(UCS2(c));
             }
         }
         else if (Octet(*i) <= 0x7F)
         {
-            c = UCS4(*i);
+            pValue->Append(UCS2(*i));
             ++i;
         }
         else
         {
             if (!pov_base::UCS::DecodeUTF8Sequence(c, i, payloadEnd))
                 c = pov_base::UCS::kReplacementCharacter;
-        }
 
-        /// @todo Add support for non-BMP characters.
-        pValue->data.push_back(UCS2(c));
+            /// @todo Add support for non-BMP characters (requires UTF16String instead of UCS2String).
+            pValue->Append(UCS2(c));
+        }
     }
 
     token.value = pValue;

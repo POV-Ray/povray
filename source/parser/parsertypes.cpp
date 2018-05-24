@@ -78,7 +78,7 @@ TokenizerException::TokenizerException(const ConstSourcePtr & os, const LexemePo
     offendingPosition(op)
 {}
 
-pov_base::UCS2String TokenizerException::GetFileName() const
+UCS2String TokenizerException::GetFileName() const
 {
     return offendingStreamName;
 }
@@ -112,9 +112,16 @@ InvalidCharacterException::InvalidCharacterException(const ConstSourcePtr& os, c
 {}
 
 InvalidEscapeSequenceException::InvalidEscapeSequenceException(const ConstSourcePtr& os, const LexemePosition& op,
-                                                               const pov_base::UTF8String& ot) :
+                                                               const UTF8String& ot) :
     TokenizerException(os, op),
     offendingText(ot)
+{}
+
+InvalidEscapeSequenceException::InvalidEscapeSequenceException(const ConstSourcePtr& os, const LexemePosition& op,
+                                                               const UTF8String::const_iterator& otb,
+                                                               const UTF8String::const_iterator& ote) :
+    TokenizerException(os, op),
+    offendingText(otb, ote)
 {}
 
 }
