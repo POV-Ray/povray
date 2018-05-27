@@ -278,6 +278,22 @@
 	#define POV_ALLOW_FILE_WRITE(f,t) (1)
 #endif
 
+/// @def POV_THREAD_STACK_SIZE
+/// Default thread stack size.
+///
+#ifndef POV_THREAD_STACK_SIZE
+	#define POV_THREAD_STACK_SIZE (2 * 1024 * 1024)
+#endif
+
+/// @def HAVE_BOOST_THREAD_ATTRIBUTES
+/// Whether boost::thread::attributes is available (and can be used to set a thread's stack size).
+///
+#if BOOST_VERSION >= 105000
+	#define HAVE_BOOST_THREAD_ATTRIBUTES 1
+#else
+	#define HAVE_BOOST_THREAD_ATTRIBUTES 0
+#endif
+
 #include "syspovprotobackend.h"
 
 #endif

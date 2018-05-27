@@ -39,4 +39,6 @@
 #define NEW_LINE_STRING "\n"  // default
 #define SYS_DEF_EXT     ""
 
+#define POV_THREAD_STACK_SIZE (4 * 1024 * 1024) // twice the usual default
+
 #endif

@@ -29,6 +29,22 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
+Changes between 3.7.0.7 and 3.7.0.8
+===================================
+
+(Note: This version has not been released in binary form, as it does not
+feature any changes in functionality over the original 3.7.0 binaries.)
+
+This version constitutes a maintenance update of the POV-Ray 3.7.0 source
+code, focused on improving compatibility with Mac OS builds.
+
+Fixed or Mitigated Bugs
+-----------------------
+
+  - Modify thread creation code to more easily address thread stack size issues
+    in Mac OS builds (requires Boost 1.50 or later to be effective).
+
+
 Changes between 3.7.0.6 and 3.7.0.7
 ===================================
 

@@ -48,6 +48,7 @@
 #include "backend/scene/view.h"
 #include "backend/render/tracetask.h"
 #include "backend/render/radiositytask.h"
+#include "backend/support/task.h"
 #include "backend/lighting/photons.h"
 #include "backend/lighting/radiosity.h"
 
@@ -681,11 +682,7 @@ void View::StartRender(POVMS_Object& renderOptions)
 	shared_ptr<std::set<unsigned int> > blockskiplist(new std::set<unsigned int>());
 
 	if(renderControlThread == NULL)
-#ifndef USE_OFFICIAL_BOOST
-		renderControlThread = new thread(boost::bind(&View::RenderControlThread, this), 1024 * 64);
-#else
-		renderControlThread = new boost::thread(boost::bind(&View::RenderControlThread, this));
-#endif
+		renderControlThread = Task::NewBoostThread(boost::bind(&View::RenderControlThread, this), POV_THREAD_STACK_SIZE);
 
 	viewData.qualitySettings.Quality = clip(renderOptions.TryGetInt(kPOVAttrib_Quality, 9), 0, 9);
 	viewData.qualitySettings.Quality_Flags = QualityValues[viewData.qualitySettings.Quality];

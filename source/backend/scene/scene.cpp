@@ -45,6 +45,7 @@
 #include "backend/control/renderbackend.h"
 #include "backend/scene/scene.h"
 #include "backend/scene/objects.h"
+#include "backend/support/task.h"
 #include "backend/parser/parse.h"
 #include "backend/bounding/boundingtask.h"
 #include "backend/texture/texture.h"
@@ -438,11 +439,7 @@ void Scene::StartParser(POVMS_Object& parseOptions)
 {
 	// A scene can only be parsed once
 	if(parserControlThread == NULL)
-#ifndef USE_OFFICIAL_BOOST
-		parserControlThread = new boost::thread(boost::bind(&Scene::ParserControlThread, this), 1024 * 64);
-#else
-		parserControlThread = new boost::thread(boost::bind(&Scene::ParserControlThread, this));
-#endif
+		parserControlThread = Task::NewBoostThread(boost::bind(&Scene::ParserControlThread, this), POV_THREAD_STACK_SIZE);
 	else
 		return;
 
