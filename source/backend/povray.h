@@ -76,9 +76,9 @@ bool povray_terminated();
 // POV-Ray version and copyright message macros
 
 #if POV_RAY_IS_OFFICIAL == 1
-#define POV_RAY_VERSION "3.7.0.7"
+#define POV_RAY_VERSION "3.7.0.8"
 #else
-#define POV_RAY_VERSION "3.7.0.7.unofficial"
+#define POV_RAY_VERSION "3.7.0.8.unofficial"
 #endif
 
 #define POV_RAY_COPYRIGHT "Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd."
