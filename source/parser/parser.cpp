@@ -6432,7 +6432,6 @@ ObjectPtr Parser::Parse_TrueType ()
     DBL depth;
     Vector3d offset;
     int builtin_font = 0;
-    TRANSFORM Local_Trans;
 
     if((sceneData->EffectiveLanguageVersion() < 350) && (sceneData->stringEncoding == kStringEncoding_ASCII))
     {
@@ -6489,11 +6488,6 @@ ObjectPtr Parser::Parse_TrueType ()
 
     /**** Compute_TTF_BBox(Object); */
     Object->Compute_BBox();
-
-    /* This tiny rotation should fix cracks in text that lies along an axis */
-    offset = Vector3d(0.001, 0.001, 0.001); // TODO - try to find a different solution to this hack
-    Compute_Rotation_Transform(&Local_Trans, offset);
-    Rotate_Object (reinterpret_cast<ObjectPtr>(Object), offset, &Local_Trans);
 
     /* Get any rotate/translate or texturing stuff */
     Object = Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
