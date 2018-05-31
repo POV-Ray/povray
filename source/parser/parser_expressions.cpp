@@ -3904,41 +3904,4 @@ void Parser::Destroy_Random_Generators()
     Number_Of_Random_Generators = 0;
 }
 
-DBL Parser::Parse_Signed_Float(void)
-{
-    DBL Sign=1.0;
-    DBL Val=0.0;
-    bool old_allow_id = Allow_Identifier_In_Call;
-    Allow_Identifier_In_Call = false;
-
-    EXPECT
-        CASE (PLUS_TOKEN)
-        END_CASE
-
-        CASE (DASH_TOKEN)
-            Sign=-1.0;
-            Get_Token();
-            // FALLTHROUGH
-        CASE (FLOAT_FUNCT_TOKEN)
-            if (mToken.Function_Id==FLOAT_TOKEN)
-            {
-                Val = Sign * mToken.Token_Float;
-                EXIT
-            }
-            else
-            {
-                Parse_Error(FLOAT_TOKEN);
-            }
-        END_CASE
-
-        OTHERWISE
-            Parse_Error(FLOAT_TOKEN);
-        END_CASE
-    END_EXPECT
-
-    Allow_Identifier_In_Call = old_allow_id;
-
-    return(Val);
-}
-
 }

@@ -610,18 +610,27 @@ inline void intrusive_ptr_release(GenericFunctionContextFactory* f) { if (!(--f-
 typedef intrusive_ptr<GenericFunctionContextFactory>    GenericFunctionContextFactoryIPtr;
 typedef GenericFunctionContextFactory*                  GenericFunctionContextFactoryTPtr;
 
-struct SourceInfo : MessageContext
+struct SourcePosition
 {
-    UCS2String  fileName;
     POV_LONG    line;
     POV_LONG    column;
     POV_OFF_T   offset;
+    SourcePosition() = default;
+    SourcePosition(const SourcePosition&) = default;
+    SourcePosition(POV_LONG l, POV_LONG c, POV_OFF_T o) : line(l), column(c), offset(o) {}
+};
+
+struct SourceInfo : MessageContext
+{
+    UCS2String      fileName;
+    SourcePosition  position;
     SourceInfo() = default;
-    SourceInfo(const MessageContext& o) : fileName(o.GetFileName()), line(o.GetLine()), column(o.GetColumn()), offset(o.GetOffset()) {}
+    SourceInfo(const MessageContext& o) : fileName(o.GetFileName()), position(o.GetLine(), o.GetColumn(), o.GetOffset()) {}
+    SourceInfo(const UCS2String& fn, SourcePosition& p) : fileName(fn), position(p) {}
     virtual UCS2String GetFileName() const override { return fileName; }
-    virtual POV_LONG GetLine() const override { return line; }
-    virtual POV_LONG GetColumn() const override { return column; }
-    virtual POV_OFF_T GetOffset() const override { return offset; }
+    virtual POV_LONG GetLine() const override { return position.line; }
+    virtual POV_LONG GetColumn() const override { return position.column; }
+    virtual POV_OFF_T GetOffset() const override { return position.offset; }
 };
 
 struct CustomFunctionSourceInfo : SourceInfo

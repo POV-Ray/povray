@@ -124,9 +124,7 @@ FNCode::FNCode(Parser *pa, FunctionCode *f, bool is_local, const char *n)
     else
         function->sourceInfo.name = POV_STRDUP("");
     function->sourceInfo.fileName = parser->UCS2_strdup(parser->mToken.sourceFile->Name());
-    function->sourceInfo.line = parser->mToken.raw.lexeme.position.line;
-    function->sourceInfo.column = parser->mToken.raw.lexeme.position.column;
-    function->sourceInfo.offset = parser->mToken.raw.lexeme.position.offset;
+    function->sourceInfo.position = parser->mToken.raw.lexeme.position;
     function->flags = 0;
     function->private_copy_method = nullptr;
     function->private_destroy_method = nullptr;

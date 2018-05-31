@@ -53,18 +53,15 @@
 namespace pov_parser
 {
 
+LexemePosition::LexemePosition() : SourcePosition(1, 1, 0)
+{}
+
 bool LexemePosition::operator==(const LexemePosition& o) const
 {
     bool result = (offset == o.offset);
     POV_PARSER_ASSERT(result == ((line == o.line) && (column == o.column)));
     return result;
 }
-
-LexemePosition::LexemePosition() :
-    line(1),
-    column(1),
-    offset(0)
-{}
 
 POV_OFF_T LexemePosition::operator-(const LexemePosition& o) const
 {
