@@ -326,7 +326,6 @@ void Parser::Get_Token ()
             continue;
         }
 
-        TokenId tokenId;
         switch (mToken.raw.GetTokenId())
         {
             case IDENTIFIER_TOKEN:
@@ -1081,14 +1080,12 @@ void Parser::Parse_Directive(int After_Hash)
             }
             else
             {
-                char* Identifier = nullptr;
                 DBL End, Step;
-                if (Parse_For_Param (&Identifier, &End, &Step))
+                if (Parse_For_Param (Cond_Stack.back().Loop_Identifier, &End, &Step))
                 {
                     // execute loop
                     Cond_Stack.back().Cond_Type = FOR_COND;
                     Cond_Stack.back().returnToBookmark = mTokenizer.GetHotBookmark();
-                    Cond_Stack.back().Loop_Identifier = Identifier;
                     Cond_Stack.back().For_Loop_End = End;
                     Cond_Stack.back().For_Loop_Step = Step;
                 }
@@ -1098,7 +1095,6 @@ void Parser::Parse_Directive(int After_Hash)
                     Cond_Stack.back().Cond_Type = SKIP_TIL_END_COND;
                     Skip_Tokens(SKIP_TIL_END_COND);
                     // need to do some cleanup otherwise deferred via the Cond_Stack
-                    POV_FREE(Identifier);
                 }
             }
             EXIT
@@ -1383,7 +1379,7 @@ void Parser::Parse_Directive(int After_Hash)
                     }
 
                     {
-                        SYM_ENTRY* Entry = Find_Symbol(Table_Index, Cond_Stack.back().Loop_Identifier);
+                        SYM_ENTRY* Entry = Find_Symbol(Table_Index, Cond_Stack.back().Loop_Identifier.c_str());
                         if ((Entry == nullptr) || (Entry->Token_Number != FLOAT_ID_TOKEN))
                             Error ("#for loop variable must remain defined and numerical during loop.");
 
@@ -1396,7 +1392,6 @@ void Parser::Parse_Directive(int After_Hash)
                         if ( ((Step > 0) && (*CurrentPtr > End + EPSILON)) ||
                              ((Step < 0) && (*CurrentPtr < End - EPSILON)) )
                         {
-                            POV_FREE(Cond_Stack.back().Loop_Identifier);
                             Cond_Stack.back().Cond_Type = SKIP_TIL_END_COND;
                             Skip_Tokens(SKIP_TIL_END_COND);
                         }
@@ -3397,7 +3392,7 @@ bool Parser::Parse_Ifdef_Param ()
     return retval;
 }
 
-int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
+int Parser::Parse_For_Param (UTF8String& identifierName, DBL* EndPtr, DBL* StepPtr)
 {
     TokenId Previous = NOT_A_TOKEN;
     SYM_ENTRY *Temp_Entry = nullptr;
@@ -3499,9 +3494,7 @@ int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
     *mToken.DataPtr   = reinterpret_cast<void *>(Create_Float());
     DBL* CurrentPtr = (reinterpret_cast<DBL *>(*mToken.DataPtr));
 
-    size_t len = strlen(mToken.raw.lexeme.text.c_str())+1;
-    *IdentifierPtr = reinterpret_cast<char *>(POV_MALLOC(len, "loop identifier"));
-    memcpy(*IdentifierPtr, mToken.raw.lexeme.text.c_str(), len);
+    identifierName = mToken.raw.lexeme.text;
 
     Parse_Comma();
     *CurrentPtr = Parse_Float();

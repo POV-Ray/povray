@@ -409,7 +409,7 @@ class Parser : public SceneTask
         void Release_Entry_Reference (SYM_TABLE *table, SYM_ENTRY *Entry);
         SYM_ENTRY *Destroy_Entry (SYM_ENTRY *Entry, bool destroyName);
         bool Parse_Ifdef_Param ();
-        int Parse_For_Param (char**, DBL*, DBL*);
+        int Parse_For_Param (UTF8String&, DBL*, DBL*);
 
         // parstxtr.h/parstxtr.cpp
         TEXTURE *Parse_Texture (void);
@@ -598,11 +598,11 @@ class Parser : public SceneTask
             bool Macro_Same_Flag;
             bool Switch_Case_Ok_Flag;
             Macro *PMac;
-            char* Loop_Identifier;
+            UTF8String Loop_Identifier;
             DBL For_Loop_End;
             DBL For_Loop_Step;
-            CS_ENTRY() : Cond_Type(BUSY_COND), PMac(nullptr), Loop_Identifier(nullptr) {}
-            ~CS_ENTRY() { POV_PARSER_ASSERT(Loop_Identifier == nullptr); }
+            CS_ENTRY() : Cond_Type(BUSY_COND), PMac(nullptr) {}
+            ~CS_ENTRY() {}
         };
 
         vector<CS_ENTRY> Cond_Stack;
