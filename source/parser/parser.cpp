@@ -9014,7 +9014,7 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
     void *Temp_Data;
     POV_PARAM *New_Par;
     bool Found=true;
-    int Temp_Count=3000000;
+    int Temp_Count=3000000; // TODO FIXME - magic value!
     bool Old_Ok=Ok_To_Declare;
     int Terms;
     bool function_identifier;
@@ -9142,7 +9142,7 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
             // get the number of tokens found
             Temp_Count -= token_count;
 
-            // no tokens have been found or a fucntion call had no parameters in parenthesis
+            // no tokens have been found or a function call had no parameters in parenthesis
             if (!((Temp_Count==-1) || (Temp_Count==TOKEN_OVERFLOW_RESET_COUNT)) && had_callable_identifier)
                 Error("Identifier expected, incomplete function call or spline call found instead.");
 
@@ -9457,7 +9457,6 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
 {
     int i;
     POV_ARRAY *a;
-    DATA_FILE *Temp_File;
 
     if(Data == nullptr)
         return;
@@ -9563,10 +9562,7 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
             POV_FREE(Data);
             break;
         case FILE_ID_TOKEN:
-            Temp_File = reinterpret_cast<DATA_FILE *>(Data);
-            Temp_File->In_File = nullptr;
-            Temp_File->Out_File = nullptr;
-            POV_FREE(Data);
+            delete reinterpret_cast<DATA_FILE *>(Data);
             break;
         case FUNCT_ID_TOKEN:
         case VECTFUNCT_ID_TOKEN:

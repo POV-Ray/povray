@@ -305,10 +305,31 @@ class Parser : public SceneTask
 
         struct DATA_FILE
         {
-            shared_ptr<pov_base::ITextStream> In_File;
+            shared_ptr<RawTokenizer>    inTokenizer;
+            RawToken                    inToken;
             shared_ptr<pov_base::OTextStream> Out_File;
+            bool inUngetToken   : 1;
             bool busyParsing    : 1; ///< `true` if parsing a statement related to the file, `false` otherwise.
-            bool R_Flag         : 1;
+
+            bool ReadNextToken()
+            {
+                POV_PARSER_ASSERT(inTokenizer != nullptr);
+                if (!inUngetToken && !inTokenizer->GetNextToken(inToken))
+                {
+                    inToken.id = END_OF_FILE_TOKEN;
+                    return false;
+                }
+                inUngetToken = false;
+                return true;
+            }
+            void UnReadToken()
+            {
+                POV_PARSER_ASSERT(!inUngetToken);
+                if (inToken.id != END_OF_FILE_TOKEN)
+                    inUngetToken = true;
+            }
+
+            DATA_FILE() : inUngetToken(false), busyParsing(false) {}
         };
 
         // constructor
@@ -409,7 +430,7 @@ class Parser : public SceneTask
         void Release_Entry_Reference (SYM_TABLE *table, SYM_ENTRY *Entry);
         SYM_ENTRY *Destroy_Entry (SYM_ENTRY *Entry, bool destroyName);
         bool Parse_Ifdef_Param ();
-        int Parse_For_Param (char**, DBL*, DBL*);
+        int Parse_For_Param (UTF8String&, DBL*, DBL*);
 
         // parstxtr.h/parstxtr.cpp
         TEXTURE *Parse_Texture (void);
@@ -471,7 +492,6 @@ class Parser : public SceneTask
         void Parse_Float_Param2 (DBL *Val1, DBL *Val2);
         void Init_Random_Generators (void);
         void Destroy_Random_Generators (void);
-        DBL Parse_Signed_Float(void);
 
         // function.h/function.cpp
         FUNCTION_PTR Parse_Function(void);
@@ -586,8 +606,6 @@ class Parser : public SceneTask
 
         int line_count;
 
-        bool readingExternalFile;
-
         vector<RawTokenizer::HotBookmark> maIncludeStack;
 
         struct CS_ENTRY
@@ -598,11 +616,11 @@ class Parser : public SceneTask
             bool Macro_Same_Flag;
             bool Switch_Case_Ok_Flag;
             Macro *PMac;
-            char* Loop_Identifier;
+            UTF8String Loop_Identifier;
             DBL For_Loop_End;
             DBL For_Loop_Step;
-            CS_ENTRY() : Cond_Type(BUSY_COND), PMac(nullptr), Loop_Identifier(nullptr) {}
-            ~CS_ENTRY() { POV_PARSER_ASSERT(Loop_Identifier == nullptr); }
+            CS_ENTRY() : Cond_Type(BUSY_COND), PMac(nullptr) {}
+            ~CS_ENTRY() {}
         };
 
         vector<CS_ENTRY> Cond_Stack;
@@ -738,6 +756,7 @@ class Parser : public SceneTask
         void Parse_Read(void);
         void Parse_Write(void);
         int Parse_Read_Value(DATA_FILE *User_File, TokenId Previous, TokenId *NumberPtr, void **DataPtr);
+        bool Parse_Read_Float_Value(DBL& val, DATA_FILE *User_File);
         void Check_Macro_Vers(void);
         DBL Parse_Cond_Param(void);
         void Parse_Cond_Param2(DBL *V1,DBL *V2);

@@ -48,6 +48,9 @@
 #include "base/types.h"
 #include "base/messenger.h"
 
+// POV-Ray header files (core module)
+#include "core/coretypes.h"
+
 namespace pov_base
 {
 class IStream;
@@ -67,14 +70,9 @@ using ConstSourcePtr = shared_ptr<const pov_base::IStream>;
 
 //------------------------------------------------------------------------------
 
-struct LexemePosition
+struct LexemePosition : pov::SourcePosition
 {
-    POV_LONG    line;
-    POV_LONG    column;
-    POV_OFF_T   offset;
-
     LexemePosition();
-    LexemePosition(const LexemePosition& o) = default;
     bool operator==(const LexemePosition& o) const;
     POV_OFF_T operator-(const LexemePosition& o) const;
 };

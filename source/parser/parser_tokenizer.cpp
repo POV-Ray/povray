@@ -104,8 +104,6 @@ void Parser::Initialize_Tokenizer()
     mTokenizer.SetInputStream(rfile);
     mToken.sourceFile = mTokenizer.GetSource();
 
-    readingExternalFile = false;
-
     mHavePendingRawToken = false;
 
     Got_EOF  = false;
@@ -289,17 +287,6 @@ void Parser::Get_Token ()
 
         if (!GetRawToken(mToken.raw, fastForwardToDirective))
         {
-            if (readingExternalFile)
-            {
-                // In `#read` statement.
-                mToken.Token_Id = END_OF_FILE_TOKEN;
-                mToken.is_array_elem = false;
-                mToken.is_mixed_array_elem = false;
-                mToken.is_dictionary_elem = false;
-                mToken.End_Of_File = true;
-                return;
-            }
-
             if (maIncludeStack.empty())
             {
                 if (Cond_Stack.size() != 1)
@@ -326,7 +313,6 @@ void Parser::Get_Token ()
             continue;
         }
 
-        TokenId tokenId;
         switch (mToken.raw.GetTokenId())
         {
             case IDENTIFIER_TOKEN:
@@ -334,13 +320,6 @@ void Parser::Get_Token ()
                 break;
 
             case FLOAT_TOKEN:
-                /*
-                POV_PARSER_ASSERT(dynamic_pointer_cast<const FloatValue>(mToken.raw.value) != nullptr);
-                if (dynamic_pointer_cast<const FloatValue>(mToken.raw.value) == nullptr)
-                    /// @todo
-                    return;
-                */
-                //mToken.Token_Float = dynamic_pointer_cast<const FloatValue>(mToken.raw.value)->data;
                 mToken.Token_Float = mToken.raw.floatValue;
                 Write_Token(mToken.raw);
                 break;
@@ -1081,14 +1060,12 @@ void Parser::Parse_Directive(int After_Hash)
             }
             else
             {
-                char* Identifier = nullptr;
                 DBL End, Step;
-                if (Parse_For_Param (&Identifier, &End, &Step))
+                if (Parse_For_Param (Cond_Stack.back().Loop_Identifier, &End, &Step))
                 {
                     // execute loop
                     Cond_Stack.back().Cond_Type = FOR_COND;
                     Cond_Stack.back().returnToBookmark = mTokenizer.GetHotBookmark();
-                    Cond_Stack.back().Loop_Identifier = Identifier;
                     Cond_Stack.back().For_Loop_End = End;
                     Cond_Stack.back().For_Loop_Step = Step;
                 }
@@ -1098,7 +1075,6 @@ void Parser::Parse_Directive(int After_Hash)
                     Cond_Stack.back().Cond_Type = SKIP_TIL_END_COND;
                     Skip_Tokens(SKIP_TIL_END_COND);
                     // need to do some cleanup otherwise deferred via the Cond_Stack
-                    POV_FREE(Identifier);
                 }
             }
             EXIT
@@ -1383,7 +1359,7 @@ void Parser::Parse_Directive(int After_Hash)
                     }
 
                     {
-                        SYM_ENTRY* Entry = Find_Symbol(Table_Index, Cond_Stack.back().Loop_Identifier);
+                        SYM_ENTRY* Entry = Find_Symbol(Table_Index, Cond_Stack.back().Loop_Identifier.c_str());
                         if ((Entry == nullptr) || (Entry->Token_Number != FLOAT_ID_TOKEN))
                             Error ("#for loop variable must remain defined and numerical during loop.");
 
@@ -1396,7 +1372,6 @@ void Parser::Parse_Directive(int After_Hash)
                         if ( ((Step > 0) && (*CurrentPtr > End + EPSILON)) ||
                              ((Step < 0) && (*CurrentPtr < End - EPSILON)) )
                         {
-                            POV_FREE(Cond_Stack.back().Loop_Identifier);
                             Cond_Stack.back().Cond_Type = SKIP_TIL_END_COND;
                             Skip_Tokens(SKIP_TIL_END_COND);
                         }
@@ -2576,7 +2551,6 @@ void Parser::Invoke_Macro()
         /* Not in same file */
         Cond_Stack.back().Macro_Same_Flag = false;
         Got_EOF=false;
-        POV_PARSER_ASSERT(!readingExternalFile);
         shared_ptr<IStream> is;
         if (PMac->Cache)
         {
@@ -2615,8 +2589,6 @@ void Parser::Invoke_Macro()
 void Parser::Return_From_Macro()
 {
     Check_Macro_Vers();
-
-    POV_PARSER_ASSERT(!readingExternalFile);
 
     Got_EOF=false;
 
@@ -2877,9 +2849,7 @@ void Parser::Parse_Fopen(void)
     UCS2String ign;
     SYM_ENTRY *Entry;
 
-    New=reinterpret_cast<DATA_FILE *>(POV_MALLOC(sizeof(DATA_FILE),"user file"));
-    New->In_File=nullptr;
-    New->Out_File=nullptr;
+    New = new DATA_FILE;
 
     // Safeguard against accidental nesting of other file access directives inside the `#fopen`
     // directive (or the user forgetting portions of the directive).
@@ -2895,19 +2865,15 @@ void Parser::Parse_Fopen(void)
 
     EXPECT_ONE
         CASE(READ_TOKEN)
-            New->R_Flag = true;
+            New->inTokenizer = std::make_shared<RawTokenizer>();
             rfile = Locate_File(fileName.c_str(), POV_File_Text_User, ign, true);
             if (rfile != nullptr)
-                New->In_File = std::make_shared<IBufferedTextStream>(fileName.c_str(), rfile.get());
+                New->inTokenizer->SetInputStream(rfile);
             else
-                New->In_File = nullptr;
-
-            if(New->In_File == nullptr)
                 Error ("Cannot open user file %s (read).", UCS2toASCIIString(fileName).c_str());
         END_CASE
 
         CASE(WRITE_TOKEN)
-            New->R_Flag = false;
             wfile = CreateFile(fileName.c_str(), POV_File_Text_User, false);
             if(wfile != nullptr)
                 New->Out_File = std::make_shared<OTextStream>(fileName.c_str(), wfile);
@@ -2919,7 +2885,6 @@ void Parser::Parse_Fopen(void)
         END_CASE
 
         CASE(APPEND_TOKEN)
-            New->R_Flag = false;
             wfile = CreateFile(fileName.c_str(), POV_File_Text_User, true);
             if(wfile != nullptr)
                 New->Out_File = std::make_shared<OTextStream>(fileName.c_str(), wfile);
@@ -2950,7 +2915,7 @@ void Parser::Parse_Fclose(void)
             // NB no need to set Data->busyParsing, as we're not reading any tokens where the
             // tokenizer might stumble upon nested file access directives
             Got_EOF=false;
-            Data->In_File = nullptr;
+            Data->inTokenizer = nullptr;
             Data->Out_File = nullptr;
             Remove_Symbol (SYM_TABLE_GLOBAL,mToken.raw.lexeme.text.c_str(),false,nullptr,0);
         END_CASE
@@ -2978,7 +2943,7 @@ void Parser::Parse_Read()
     if (User_File->busyParsing)
         Error ("Can't nest directives accessing the same file.");
     File_Id=POV_STRDUP(mToken.raw.lexeme.text.c_str());
-    if(User_File->In_File == nullptr)
+    if(User_File->inTokenizer == nullptr)
         Error("Cannot read from file %s because the file is open for writing only.", UCS2toASCIIString(UCS2String(User_File->Out_File->name())).c_str());
 
     // Safeguard against accidental nesting of other file access directives inside the `#fopen`
@@ -3056,7 +3021,7 @@ void Parser::Parse_Read()
     if (End_File)
     {
         Got_EOF=false;
-        User_File->In_File = nullptr;
+        User_File->inTokenizer = nullptr;
         Remove_Symbol (SYM_TABLE_GLOBAL,File_Id,false,nullptr,0);
     }
     POV_FREE(File_Id);
@@ -3064,137 +3029,127 @@ void Parser::Parse_Read()
 
 int Parser::Parse_Read_Value(DATA_FILE *User_File, TokenId Previous, TokenId *NumberPtr, void **DataPtr)
 {
-    /// @todo Re-enable reading of external files.
-#if 1
-    return true;
-#else
-    shared_ptr<pov_base::ITextStream> Temp;
-    bool Temp_R_Flag;
-    DBL Val;
     int End_File=false;
-    int i;
+    int numComponents;
     EXPRESS Express;
+    DBL sign = 1.0;
+    DBL val = 0.0;
+    bool ungetToken = false;
 
-    Temp = Input_File->inFile;
-    POV_PARSER_ASSERT(!readingExternalFile);
-    Input_File->inFile = User_File->In_File;
-    readingExternalFile = User_File->R_Flag;
-    if(User_File->In_File == nullptr)
+    if(User_File->inTokenizer == nullptr)
         Error("Cannot read from file '%s' because the file is open for writing only.", UCS2toASCIIString(UCS2String(User_File->Out_File->name())).c_str());
-    POV_PARSER_ASSERT(readingExternalFile);
-    User_File->In_File = nullptr; // take control over pointer
 
-    try
+    if (User_File->ReadNextToken())
     {
-        EXPECT_ONE
-            CASE3 (PLUS_TOKEN,DASH_TOKEN,FLOAT_FUNCT_TOKEN)
-                UNGET
-                Val=Parse_Signed_Float();
+        switch (User_File->inToken.GetTokenId())
+        {
+            case DASH_TOKEN:
+            case PLUS_TOKEN:
+            case FLOAT_TOKEN:
+                User_File->UnReadToken();
+                if (!Parse_Read_Float_Value(val, User_File))
+                    POV_PARSER_ASSERT(false);
                 *NumberPtr = FLOAT_ID_TOKEN;
                 Test_Redefine(Previous,NumberPtr,*DataPtr);
                 *DataPtr   = reinterpret_cast<void *>(Create_Float());
-                *(reinterpret_cast<DBL *>(*DataPtr)) = Val;
-                Parse_Comma(); /* data file comma between 2 data items  */
-            END_CASE
+                *(reinterpret_cast<DBL *>(*DataPtr)) = val;
+                break;
 
-            CASE (LEFT_ANGLE_TOKEN)
-                UNGET
-                Parse_Angle_Begin();
-
-                i=1;
-                Express[X]=Parse_Signed_Float();  Parse_Comma();
-                Express[Y]=Parse_Signed_Float();  Parse_Comma();
-
-                EXPECT
-                    CASE3 (PLUS_TOKEN,DASH_TOKEN,FLOAT_FUNCT_TOKEN)
-                        UNGET
-                        if (++i>4)
-                        {
-                            Error("Vector data too long");
-                        }
-                        Express[i]=Parse_Signed_Float(); Parse_Comma();
-                    END_CASE
-
-                    CASE (RIGHT_ANGLE_TOKEN)
-                        UNGET
-                        EXIT
-                    END_CASE
-
-                    OTHERWISE
-                        Expectation_Error("vector");
-                    END_CASE
-                END_EXPECT
-
-                Parse_Angle_End();
-
-                switch(i)
+            case LEFT_ANGLE_TOKEN:
+                numComponents = 0;
+                while (Parse_Read_Float_Value(val, User_File))
                 {
-                    case 1:
+                    if (numComponents == 5)
+                        Error(SourceInfo(User_File->inTokenizer->GetSourceName(), User_File->inToken.lexeme.position), "Too many components in vector.");
+                    Express[numComponents++] = val;
+                    if (!User_File->ReadNextToken())
+                        Error(SourceInfo(User_File->inTokenizer->GetSourceName(), User_File->inToken.lexeme.position), "Incomplete vector.");
+                    if (User_File->inToken.GetTokenId() != COMMA_TOKEN)
+                        User_File->UnReadToken();
+                }
+                if (!User_File->ReadNextToken() || (User_File->inToken.GetTokenId() != RIGHT_ANGLE_TOKEN))
+                    Error(SourceInfo(User_File->inTokenizer->GetSourceName(), User_File->inToken.lexeme.position), "Expected vector component or '>'.");
+                if (numComponents < 2)
+                    Error(SourceInfo(User_File->inTokenizer->GetSourceName(), User_File->inToken.lexeme.position), "Not enough components in vector.");
+
+                switch (numComponents)
+                {
+                    case 2:
                         *NumberPtr = UV_ID_TOKEN;
                         Test_Redefine(Previous,NumberPtr,*DataPtr);
                         *DataPtr   = reinterpret_cast<void *>(new Vector2d(Express));
                         break;
 
-                    case 2:
+                    case 3:
                         *NumberPtr = VECTOR_ID_TOKEN;
                         Test_Redefine(Previous,NumberPtr,*DataPtr);
                         *DataPtr   = reinterpret_cast<void *>(new Vector3d(Express));
                         break;
 
-                    case 3:
+                    case 4:
                         *NumberPtr = VECTOR_4D_ID_TOKEN;
                         Test_Redefine(Previous,NumberPtr,*DataPtr);
                         *DataPtr   = reinterpret_cast<void *>(Create_Vector_4D());
                         Assign_Vector_4D(reinterpret_cast<DBL *>(*DataPtr), Express);
                         break;
 
-                    case 4:
-                        *NumberPtr    = COLOUR_ID_TOKEN;
+                    case 5:
+                        *NumberPtr = COLOUR_ID_TOKEN;
                         Test_Redefine(Previous,NumberPtr,*DataPtr);
-                        *DataPtr      = reinterpret_cast<void *>(Create_Colour());
+                        *DataPtr   = reinterpret_cast<void *>(Create_Colour());
                         (*reinterpret_cast<RGBFTColour *>(*DataPtr)).Set(Express, 5); /* NK fix assign_colour bug */
                         break;
+
+                    default:
+                        POV_PARSER_ASSERT(false);
+                        break;
                 }
+                break;
 
-                Parse_Comma(); // data file comma between 2 data items
-            END_CASE
-
-            CASE(STRING_LITERAL_TOKEN)
+            case STRING_LITERAL_TOKEN:
                 *NumberPtr = STRING_ID_TOKEN;
                 Test_Redefine(Previous,NumberPtr,*DataPtr);
-                *DataPtr   = String_Literal_To_UCS2(mToken.raw.lexeme.text.c_str(), false);
-                Parse_Comma(); // data file comma between 2 data items
-            END_CASE
+                POV_PARSER_ASSERT(dynamic_pointer_cast<const StringValue>(User_File->inToken.value) != nullptr);
+                *DataPtr   = UCS2_strdup(dynamic_pointer_cast<const StringValue>(User_File->inToken.value)->GetData().c_str());
+                break;
 
-            CASE (END_OF_FILE_TOKEN)
-            END_CASE
+            default:
+                Error(SourceInfo(User_File->inTokenizer->GetSourceName(), User_File->inToken.lexeme.position), "Expected float, vector, or string literal");
+                break;
+        }
 
-            OTHERWISE
-                Expectation_Error ("float, vector, or string literal");
-            END_CASE
-        END_EXPECT
+        if (User_File->ReadNextToken() && (User_File->inToken.GetTokenId() != COMMA_TOKEN))
+            User_File->UnReadToken();
     }
-    catch (...)
+
+    /// @todo Returning `true` in case of end-of-file is counter-intuitive.
+    return (User_File->inToken.id == END_OF_FILE_TOKEN);
+}
+
+bool Parser::Parse_Read_Float_Value(DBL& val, DATA_FILE* User_File)
+{
+    DBL sign = 1.0;
+
+    if (!User_File->ReadNextToken())
+        return false;
+
+    switch (User_File->inToken.GetTokenId())
     {
-        // re-assign the file pointers so that they are properly disposed of later on
-        User_File->In_File = Input_File->inFile;
-        Input_File->inFile = Temp;
-        readingExternalFile = false;
-        throw;
+        case DASH_TOKEN:
+            sign = -1.0;
+            // FALLTHROUGH
+        case PLUS_TOKEN:
+            if (!User_File->ReadNextToken() || (User_File->inToken.GetTokenId() != FLOAT_TOKEN))
+                Error(SourceInfo(User_File->inTokenizer->GetSourceName(), User_File->inToken.lexeme.position), "Expected float literal");
+            // FALLTHROUGH
+        case FLOAT_TOKEN:
+            val = sign * User_File->inToken.floatValue;
+            return true;
+
+        default:
+            User_File->UnReadToken();
+            return false;
     }
-
-    if (mToken.Token_Id==END_OF_FILE_TOKEN)
-        End_File = true;
-
-    mToken.End_Of_File = false;
-    mToken.Unget_Token = false;
-    Got_EOF = false;
-    User_File->In_File = Input_File->inFile; // return control over pointer
-    Input_File->inFile = Temp;
-    readingExternalFile = false;
-
-    return End_File;
-#endif
 }
 
 void Parser::Parse_Write(void)
@@ -3212,7 +3167,7 @@ void Parser::Parse_Write(void)
     if (User_File->busyParsing)
         Error ("Can't nest directives accessing the same file.");
     if(User_File->Out_File == nullptr)
-        Error("Cannot write to file %s because the file is open for reading only.", UCS2toASCIIString(UCS2String(User_File->In_File->name())).c_str());
+        Error("Cannot write to file %s because the file is open for reading only.", UCS2toASCIIString(User_File->inTokenizer->GetSourceName()).c_str());
 
     // Safeguard against accidental nesting of other file access directives inside the `#fopen`
     // directive (or the user forgetting portions of the directive).
@@ -3397,7 +3352,7 @@ bool Parser::Parse_Ifdef_Param ()
     return retval;
 }
 
-int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
+int Parser::Parse_For_Param (UTF8String& identifierName, DBL* EndPtr, DBL* StepPtr)
 {
     TokenId Previous = NOT_A_TOKEN;
     SYM_ENTRY *Temp_Entry = nullptr;
@@ -3499,9 +3454,7 @@ int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
     *mToken.DataPtr   = reinterpret_cast<void *>(Create_Float());
     DBL* CurrentPtr = (reinterpret_cast<DBL *>(*mToken.DataPtr));
 
-    size_t len = strlen(mToken.raw.lexeme.text.c_str())+1;
-    *IdentifierPtr = reinterpret_cast<char *>(POV_MALLOC(len, "loop identifier"));
-    memcpy(*IdentifierPtr, mToken.raw.lexeme.text.c_str(), len);
+    identifierName = mToken.raw.lexeme.text;
 
     Parse_Comma();
     *CurrentPtr = Parse_Float();
@@ -3551,8 +3504,6 @@ void Parser::IncludeHeader(const UCS2String& formalFileName)
         Error ("Cannot open include file %s.", UCS2toASCIIString(formalFileName).c_str());
 
     mTokenizer.SetInputStream(is);
-
-    POV_PARSER_ASSERT(!readingExternalFile);
 
     Add_Sym_Table();
 
