@@ -40,7 +40,7 @@ before_build:
 
 build:
   project: windows/vs2015/povray.sln
-  parallel: true
+# parallel: true
   verbosity: minimal
 
 test: off
