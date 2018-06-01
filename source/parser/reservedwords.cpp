@@ -672,6 +672,7 @@ const RESERVED_WORD Reserved_Words[] = {
 
     { COLOUR_KEY_TOKEN,             "color keyword" },
     { FLOAT_FUNCT_TOKEN,            "float function" },
+    { SIGNATURE_FUNCT_TOKEN,        "signature function" },
     { VECTOR_FUNCT_TOKEN,           "vector function" },
 
     //------------------------------------------------------------------------------
@@ -726,6 +727,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { END_OF_FILE_TOKEN,            "End of File" },
     { FLOAT_TOKEN,                  "float constant" },
     { STRING_LITERAL_TOKEN,         "string literal" },
+    { UTF8_SIGNATURE_TOKEN,         "UTF-8 signature BOM" },
 
     //------------------------------------------------------------------------------
     // End of list, marked by TokenId TOKEN_COUNT_ and nullptr token string.

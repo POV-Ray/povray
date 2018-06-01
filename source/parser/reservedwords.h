@@ -57,6 +57,20 @@ struct Reserved_Word_Struct
 enum TokenId : int
 {
     //------------------------------------------------------------------------------
+    // Signature Tokens.
+    //
+    // All tokens that indicate a file format must go here.
+    //
+    // Please keep this section neatly sorted by the token identifier name,
+    // sorting underscore characters before digits, digits before letters,
+    // and short names before long ones, but _ignoring_ the trailing `_TOKEN` or
+    // `_ID_TOKEN`.
+
+    UTF8_SIGNATURE_TOKEN,
+
+    SIGNATURE_FUNCT_TOKEN, // must be last in this section
+
+    //------------------------------------------------------------------------------
     // Float Tokens.
     //
     // All tokens that may start a float expression must go here.

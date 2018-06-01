@@ -39,6 +39,7 @@
 // C++ variants of C standard header files
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 
 // C++ standard header files
 #include <limits>
@@ -395,6 +396,16 @@ bool Scanner::GetNextLexeme(Lexeme& lexeme)
 {
     if (mpSource == nullptr)
         return false;
+
+    if ((mpNextChar == maBuffer) && (mBase == 0))
+    {
+        // At the very start of the stream.
+        // Check for file format signatures.
+
+        // Currently, only UTF-8 is supported.
+        if (GetNextSignatureLexeme(lexeme, Lexeme::kUTF8SignatureBOM, u8"\uFEFF"))
+            return true;
+    }
 
     while (!mEndOfStream)
     {
@@ -754,6 +765,32 @@ bool Scanner::EatNextBlockComment()
     }
 
     return true;
+}
+
+//------------------------------------------------------------------------------
+
+bool Scanner::GetNextSignatureLexeme(Lexeme& lexeme, Lexeme::Category sigId, const Octet* sigToTest, size_t sigLength)
+{
+    POV_PARSER_ASSERT(!mEndOfStream);
+    POV_PARSER_ASSERT(mBase == 0);
+    POV_PARSER_ASSERT(mpNextChar == maBuffer);
+
+    if ((mpBufferEnd - mpNextChar) < sigLength)
+        return false;
+    if (std::memcmp(mpNextChar, sigToTest, sigLength) != 0)
+        return false;
+
+    lexeme.text = UTF8String(reinterpret_cast<const char*>(sigToTest), sigLength);
+    lexeme.position = mCurrentPosition;
+    lexeme.category = sigId;
+    mpNextChar += sigLength;
+    mCurrentPosition.offset += sigLength;
+    return true;
+}
+
+bool Scanner::GetNextSignatureLexeme(Lexeme& lexeme, Lexeme::Category sigId, const char* sigToTest)
+{
+    return GetNextSignatureLexeme(lexeme, sigId, reinterpret_cast<const Octet*>(sigToTest), std::strlen(sigToTest));
 }
 
 //------------------------------------------------------------------------------

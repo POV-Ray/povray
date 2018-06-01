@@ -420,6 +420,7 @@ class Parser : public SceneTask
         void pre_init_tokenizer (void);
         void Initialize_Tokenizer (void);
         void Terminate_Tokenizer (void);
+        void CheckFileSignature();
         SYM_ENTRY *Add_Symbol (SYM_TABLE *table, const char *Name,TokenId Number);
         SYM_ENTRY *Add_Symbol (int Index,const char *Name,TokenId Number);
         POV_ARRAY *Parse_Array_Declare (void);

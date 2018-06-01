@@ -241,6 +241,7 @@ private:
     bool ProcessOtherLexeme(RawToken& token);
     bool ProcessFloatLiteralLexeme(RawToken& token);
     bool ProcessStringLiteralLexeme(RawToken& token);
+    bool ProcessSignatureLexeme(RawToken& token);
 
     bool ProcessUCSEscapeDigits(UCS4& c, UTF8String::const_iterator& i, UTF8String::const_iterator& escapeSequenceEnd, unsigned int digits);
 

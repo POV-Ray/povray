@@ -75,6 +75,7 @@ struct Lexeme
         kFloatLiteral,
         kStringLiteral,
         kOther,
+        kUTF8SignatureBOM,
     };
     UTF8String      text;
     LexemePosition  position;
@@ -223,6 +224,9 @@ private:
 
     void EatNextLineComment();
     bool EatNextBlockComment();
+
+    bool GetNextSignatureLexeme(Lexeme& lexeme, Lexeme::Category sigId, const Octet* sigToTest, size_t sigLength);
+    bool GetNextSignatureLexeme(Lexeme& lexeme, Lexeme::Category sigId, const char* sigToTest);
 
     /// Copy character to lexeme, then advance stream.
     /// @return `true` if another character is available.
