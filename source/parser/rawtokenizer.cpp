@@ -126,6 +126,7 @@ bool RawTokenizer::GetNextToken(RawToken& token)
         case Lexeme::kFloatLiteral:     if (ProcessFloatLiteralLexeme(token))   return true;
         case Lexeme::kStringLiteral:    if (ProcessStringLiteralLexeme(token))  return true;
         case Lexeme::kOther:            if (ProcessOtherLexeme(token))          return true;
+        case Lexeme::kUTF8SignatureBOM: if (ProcessSignatureLexeme(token))      return true;
         default:                        POV_PARSER_ASSERT(false);               return true;
     }
 }
@@ -389,9 +390,30 @@ bool RawTokenizer::ProcessOtherLexeme(RawToken& token)
     return true;
 }
 
+bool RawTokenizer::ProcessSignatureLexeme(RawToken& token)
+{
+    POV_PARSER_ASSERT(token.lexeme.text.size() > 0);
+
+    TokenId tokenId = NOT_A_TOKEN;
+
+    switch (token.lexeme.category)
+    {
+        case Lexeme::kUTF8SignatureBOM: tokenId = UTF8_SIGNATURE_TOKEN; break;
+        default:                        POV_PARSER_ASSERT(false);       return false;
+    }
+
+    token.id = int(tokenId);
+    token.expressionId = GetExpressionId(tokenId);
+    token.value = nullptr;
+
+    return true;
+}
+
 TokenId pov_parser::RawTokenizer::GetExpressionId(TokenId tokenId)
 {
-    if (tokenId <= FLOAT_FUNCT_TOKEN)
+    if (tokenId <= SIGNATURE_FUNCT_TOKEN)
+        return SIGNATURE_FUNCT_TOKEN;
+    else if (tokenId <= FLOAT_FUNCT_TOKEN)
         return FLOAT_FUNCT_TOKEN;
     else if (tokenId <= VECTOR_FUNCT_TOKEN)
         return VECTOR_FUNCT_TOKEN;

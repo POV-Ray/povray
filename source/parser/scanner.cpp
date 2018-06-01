@@ -39,6 +39,7 @@
 // C++ variants of C standard header files
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 
 // C++ standard header files
 #include <limits>
@@ -396,6 +397,16 @@ bool Scanner::GetNextLexeme(Lexeme& lexeme)
     if (mpSource == nullptr)
         return false;
 
+    if ((mpNextChar == maBuffer) && (mBase == 0))
+    {
+        // At the very start of the stream.
+        // Check for file format signatures.
+
+        // Currently, only UTF-8 is supported.
+        if (GetNextSignatureLexeme(lexeme, Lexeme::kUTF8SignatureBOM, u8"\uFEFF"))
+            return true;
+    }
+
     while (!mEndOfStream)
     {
         // Skip over any whitespace (including blank lines).
@@ -423,7 +434,7 @@ bool Scanner::GetNextLexeme(Lexeme& lexeme)
         else if (*mpNextChar == '/')
         {
             // Either division operator or start of comment.
-            lexeme.category = Lexeme::Category::kOther;
+            lexeme.category = Lexeme::kOther;
             if (!CopyAndAdvance(lexeme))
                 return true;
             if (*mpNextChar == '/')
@@ -442,7 +453,7 @@ bool Scanner::GetNextLexeme(Lexeme& lexeme)
         else if ((*mpNextChar == '!') || (*mpNextChar == '<') || (*mpNextChar == '>'))
         {
             // Either single-character operator or comparison.
-            lexeme.category = Lexeme::Category::kOther;
+            lexeme.category = Lexeme::kOther;
             if (!CopyAndAdvance(lexeme))
                 return true;
             if (*mpNextChar == '=')
@@ -457,7 +468,7 @@ bool Scanner::GetNextLexeme(Lexeme& lexeme)
         else
         {
             // Single-character operator (or not a valid lexeme at all)
-            lexeme.category = Lexeme::Category::kOther;
+            lexeme.category = Lexeme::kOther;
             (void)CopyAndAdvance(lexeme);
             return true;
         }
@@ -513,7 +524,7 @@ bool Scanner::GetNextDirective(Lexeme& lexeme)
         {
             POV_PARSER_ASSERT(*mpNextChar == '#');
             // Found what we've been looking for.
-            lexeme.category = Lexeme::Category::kOther;
+            lexeme.category = Lexeme::kOther;
             (void)CopyAndAdvance(lexeme);
             return true;
         }
@@ -529,7 +540,7 @@ bool Scanner::GetNextWordLexeme(Lexeme& lexeme)
     POV_PARSER_ASSERT(!mEndOfStream);
     POV_PARSER_ASSERT(IsIdentifierChar1(*mpNextChar));
 
-    lexeme.category = Lexeme::Category::kWord;
+    lexeme.category = Lexeme::kWord;
 
     // Read identifier name.
     while (CopyAndAdvance(lexeme) && IsIdentifierChar2(*mpNextChar))
@@ -544,7 +555,7 @@ bool Scanner::GetNextFloatLiteralLexeme(Lexeme& lexeme)
 {
     POV_PARSER_ASSERT(!mEndOfStream);
 
-    lexeme.category = Lexeme::Category::kFloatLiteral;
+    lexeme.category = Lexeme::kFloatLiteral;
 
     if (!GetNextFloatLiteralDigits(lexeme))
         POV_PARSER_ASSERT(false);
@@ -577,7 +588,7 @@ bool Scanner::GetNextFloatLiteralOrDotLexeme(Lexeme& lexeme)
     if (CopyAndAdvance(lexeme) && IsDecimalDigit(*mpNextChar))
     {
         // Valid start of a numeric literal, starting with the decimal point.
-        lexeme.category = Lexeme::Category::kFloatLiteral;
+        lexeme.category = Lexeme::kFloatLiteral;
 
         // Read fractional part.
         if (!GetNextFloatLiteralDigits(lexeme))
@@ -593,7 +604,7 @@ bool Scanner::GetNextFloatLiteralOrDotLexeme(Lexeme& lexeme)
     else
     {
         // Dot operator.
-        lexeme.category = Lexeme::Category::kOther;
+        lexeme.category = Lexeme::kOther;
 
         // Dot has already been copied to lexeme.
 
@@ -667,7 +678,7 @@ bool Scanner::GetNextStringLiteralLexeme(Lexeme& lexeme)
     POV_PARSER_ASSERT(!mEndOfStream);
     POV_PARSER_ASSERT(*mpNextChar == '"');
 
-    lexeme.category = Lexeme::Category::kStringLiteral;
+    lexeme.category = Lexeme::kStringLiteral;
 
     if (!CopyAndAdvance(lexeme))
         return false;
@@ -754,6 +765,32 @@ bool Scanner::EatNextBlockComment()
     }
 
     return true;
+}
+
+//------------------------------------------------------------------------------
+
+bool Scanner::GetNextSignatureLexeme(Lexeme& lexeme, Lexeme::Category sigId, const Octet* sigToTest, size_t sigLength)
+{
+    POV_PARSER_ASSERT(!mEndOfStream);
+    POV_PARSER_ASSERT(mBase == 0);
+    POV_PARSER_ASSERT(mpNextChar == maBuffer);
+
+    if ((mpBufferEnd - mpNextChar) < sigLength)
+        return false;
+    if (std::memcmp(mpNextChar, sigToTest, sigLength) != 0)
+        return false;
+
+    lexeme.text = UTF8String(reinterpret_cast<const char*>(sigToTest), sigLength);
+    lexeme.position = mCurrentPosition;
+    lexeme.category = sigId;
+    mpNextChar += sigLength;
+    mCurrentPosition.offset += sigLength;
+    return true;
+}
+
+bool Scanner::GetNextSignatureLexeme(Lexeme& lexeme, Lexeme::Category sigId, const char* sigToTest)
+{
+    return GetNextSignatureLexeme(lexeme, sigId, reinterpret_cast<const Octet*>(sigToTest), std::strlen(sigToTest));
 }
 
 //------------------------------------------------------------------------------

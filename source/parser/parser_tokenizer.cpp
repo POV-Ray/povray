@@ -95,9 +95,9 @@ void Parser::Initialize_Tokenizer()
     shared_ptr<IStream> rfile;
     UCS2String actualFileName;
 
-    pre_init_tokenizer ();
+    pre_init_tokenizer();
 
-    rfile = Locate_File(sceneData->inputFile.c_str(),POV_File_Text_POV,actualFileName,true);
+    rfile = Locate_File(sceneData->inputFile.c_str(), POV_File_Text_POV, actualFileName, true);
     if (rfile == nullptr)
         Error("Cannot open input file.");
 
@@ -106,7 +106,7 @@ void Parser::Initialize_Tokenizer()
 
     mHavePendingRawToken = false;
 
-    Got_EOF  = false;
+    Got_EOF = false;
 
     /* Init conditional stack. */
 
@@ -118,16 +118,32 @@ void Parser::Initialize_Tokenizer()
     Max_Trace_Level = MAX_TRACE_LEVEL_DEFAULT;
     Had_Max_Trace_Level = false;
 
-    /// @todo Re-enable UTF-8 signature BOM handling.
-#if 0
-    /* ignore any leading characters if they have character codes above 127, this
-       takes care of UTF-8 files with encoding info at the beginning of the file */
-    for(c = Echo_getc(); c > 127; c = Echo_getc())
-        sceneData->stringEncoding = kStringEncoding_UTF8; // switch to UTF-8 automatically [trf]
-    Echo_ungetc(c);
-#endif
+    CheckFileSignature();
 }
 
+
+//******************************************************************************
+
+
+void Parser::CheckFileSignature()
+{
+    RawToken signature;
+    if (GetRawToken(signature, false))
+    {
+        if (signature.expressionId == SIGNATURE_FUNCT_TOKEN)
+        {
+            // Found a signature. Switch to the corresponding encoding automatically.
+            ///@todo Still need to work on the mechanism to handle string encoding.
+            switch (signature.id)
+            {
+                case UTF8_SIGNATURE_TOKEN:  /* sceneData->stringEncoding = kStringEncoding_UTF8; */ break;
+                default:                    POV_PARSER_ASSERT(false);                               break;
+            }
+        }
+        else
+            UngetRawToken(signature);
+    }
+}
 
 
 /*****************************************************************************
@@ -527,7 +543,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
 
                             haveNextRawToken = PeekRawToken(nextRawToken);
 
-                            if (!haveNextRawToken || (nextRawToken.lexeme.category != Lexeme::Category::kOther) || (nextRawToken.lexeme.text != "["))
+                            if (!haveNextRawToken || (nextRawToken.lexeme.category != Lexeme::kOther) || (nextRawToken.lexeme.text != "["))
                             {
                                 breakLoop = true;
                                 break;
@@ -592,7 +608,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
                                 table = Tables [pseudoDictionary];
                                 pseudoDictionary = -1;
 
-                                if (!haveNextRawToken || (nextRawToken.lexeme.category != Lexeme::Category::kOther) ||
+                                if (!haveNextRawToken || (nextRawToken.lexeme.category != Lexeme::kOther) ||
                                     ((nextRawToken.lexeme.text != "[") && (nextRawToken.lexeme.text != ".")))
                                 {
                                     Get_Token(); // ensures the error is reported at the right token
@@ -602,7 +618,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
                             else
                                 table = reinterpret_cast<SYM_TABLE *>(*(mToken.DataPtr));
 
-                            if (haveNextRawToken && (nextRawToken.lexeme.category == Lexeme::Category::kOther) && (nextRawToken.lexeme.text == "."))
+                            if (haveNextRawToken && (nextRawToken.lexeme.category == Lexeme::kOther) && (nextRawToken.lexeme.text == "."))
                             {
                                 if (table == nullptr)
                                 {
@@ -621,7 +637,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
 
                                 Temp_Entry = Find_Symbol (table, mToken.raw.lexeme.text.c_str());
                             }
-                            else if (haveNextRawToken && (nextRawToken.lexeme.category == Lexeme::Category::kOther) && (nextRawToken.lexeme.text == "["))
+                            else if (haveNextRawToken && (nextRawToken.lexeme.category == Lexeme::kOther) && (nextRawToken.lexeme.text == "["))
                             {
                                 if (table == nullptr)
                                 {
@@ -837,7 +853,7 @@ bool Parser::GetRawToken(RawToken& rawToken, bool fastForwardToDirective)
     {
         rawToken = mPendingRawToken;
         mHavePendingRawToken = false;
-        if (!fastForwardToDirective || ((rawToken.lexeme.category == Lexeme::Category::kOther) && (rawToken.lexeme.text == "#")))
+        if (!fastForwardToDirective || ((rawToken.lexeme.category == Lexeme::kOther) && (rawToken.lexeme.text == "#")))
             return true;
     }
 
@@ -847,12 +863,12 @@ bool Parser::GetRawToken(RawToken& rawToken, bool fastForwardToDirective)
         return mTokenizer.GetNextToken(rawToken);
 }
 
-bool Parser::PeekRawToken(RawToken& lexeme)
+bool Parser::PeekRawToken(RawToken& rawToken)
 {
-    if (!GetRawToken(lexeme, false))
+    if (!GetRawToken(rawToken, false))
         return false;
 
-    UngetRawToken(lexeme);
+    UngetRawToken(rawToken);
     return true;
 }
 
@@ -3512,6 +3528,8 @@ void Parser::IncludeHeader(const UCS2String& formalFileName)
     mToken.is_array_elem = false;
     mToken.is_mixed_array_elem = false;
     mToken.is_dictionary_elem = false;
+
+    CheckFileSignature();
 }
 
 }
