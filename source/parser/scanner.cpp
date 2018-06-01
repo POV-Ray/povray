@@ -423,7 +423,7 @@ bool Scanner::GetNextLexeme(Lexeme& lexeme)
         else if (*mpNextChar == '/')
         {
             // Either division operator or start of comment.
-            lexeme.category = Lexeme::Category::kOther;
+            lexeme.category = Lexeme::kOther;
             if (!CopyAndAdvance(lexeme))
                 return true;
             if (*mpNextChar == '/')
@@ -442,7 +442,7 @@ bool Scanner::GetNextLexeme(Lexeme& lexeme)
         else if ((*mpNextChar == '!') || (*mpNextChar == '<') || (*mpNextChar == '>'))
         {
             // Either single-character operator or comparison.
-            lexeme.category = Lexeme::Category::kOther;
+            lexeme.category = Lexeme::kOther;
             if (!CopyAndAdvance(lexeme))
                 return true;
             if (*mpNextChar == '=')
@@ -457,7 +457,7 @@ bool Scanner::GetNextLexeme(Lexeme& lexeme)
         else
         {
             // Single-character operator (or not a valid lexeme at all)
-            lexeme.category = Lexeme::Category::kOther;
+            lexeme.category = Lexeme::kOther;
             (void)CopyAndAdvance(lexeme);
             return true;
         }
@@ -513,7 +513,7 @@ bool Scanner::GetNextDirective(Lexeme& lexeme)
         {
             POV_PARSER_ASSERT(*mpNextChar == '#');
             // Found what we've been looking for.
-            lexeme.category = Lexeme::Category::kOther;
+            lexeme.category = Lexeme::kOther;
             (void)CopyAndAdvance(lexeme);
             return true;
         }
@@ -529,7 +529,7 @@ bool Scanner::GetNextWordLexeme(Lexeme& lexeme)
     POV_PARSER_ASSERT(!mEndOfStream);
     POV_PARSER_ASSERT(IsIdentifierChar1(*mpNextChar));
 
-    lexeme.category = Lexeme::Category::kWord;
+    lexeme.category = Lexeme::kWord;
 
     // Read identifier name.
     while (CopyAndAdvance(lexeme) && IsIdentifierChar2(*mpNextChar))
@@ -544,7 +544,7 @@ bool Scanner::GetNextFloatLiteralLexeme(Lexeme& lexeme)
 {
     POV_PARSER_ASSERT(!mEndOfStream);
 
-    lexeme.category = Lexeme::Category::kFloatLiteral;
+    lexeme.category = Lexeme::kFloatLiteral;
 
     if (!GetNextFloatLiteralDigits(lexeme))
         POV_PARSER_ASSERT(false);
@@ -577,7 +577,7 @@ bool Scanner::GetNextFloatLiteralOrDotLexeme(Lexeme& lexeme)
     if (CopyAndAdvance(lexeme) && IsDecimalDigit(*mpNextChar))
     {
         // Valid start of a numeric literal, starting with the decimal point.
-        lexeme.category = Lexeme::Category::kFloatLiteral;
+        lexeme.category = Lexeme::kFloatLiteral;
 
         // Read fractional part.
         if (!GetNextFloatLiteralDigits(lexeme))
@@ -593,7 +593,7 @@ bool Scanner::GetNextFloatLiteralOrDotLexeme(Lexeme& lexeme)
     else
     {
         // Dot operator.
-        lexeme.category = Lexeme::Category::kOther;
+        lexeme.category = Lexeme::kOther;
 
         // Dot has already been copied to lexeme.
 
@@ -667,7 +667,7 @@ bool Scanner::GetNextStringLiteralLexeme(Lexeme& lexeme)
     POV_PARSER_ASSERT(!mEndOfStream);
     POV_PARSER_ASSERT(*mpNextChar == '"');
 
-    lexeme.category = Lexeme::Category::kStringLiteral;
+    lexeme.category = Lexeme::kStringLiteral;
 
     if (!CopyAndAdvance(lexeme))
         return false;

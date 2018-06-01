@@ -527,7 +527,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
 
                             haveNextRawToken = PeekRawToken(nextRawToken);
 
-                            if (!haveNextRawToken || (nextRawToken.lexeme.category != Lexeme::Category::kOther) || (nextRawToken.lexeme.text != "["))
+                            if (!haveNextRawToken || (nextRawToken.lexeme.category != Lexeme::kOther) || (nextRawToken.lexeme.text != "["))
                             {
                                 breakLoop = true;
                                 break;
@@ -592,7 +592,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
                                 table = Tables [pseudoDictionary];
                                 pseudoDictionary = -1;
 
-                                if (!haveNextRawToken || (nextRawToken.lexeme.category != Lexeme::Category::kOther) ||
+                                if (!haveNextRawToken || (nextRawToken.lexeme.category != Lexeme::kOther) ||
                                     ((nextRawToken.lexeme.text != "[") && (nextRawToken.lexeme.text != ".")))
                                 {
                                     Get_Token(); // ensures the error is reported at the right token
@@ -602,7 +602,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
                             else
                                 table = reinterpret_cast<SYM_TABLE *>(*(mToken.DataPtr));
 
-                            if (haveNextRawToken && (nextRawToken.lexeme.category == Lexeme::Category::kOther) && (nextRawToken.lexeme.text == "."))
+                            if (haveNextRawToken && (nextRawToken.lexeme.category == Lexeme::kOther) && (nextRawToken.lexeme.text == "."))
                             {
                                 if (table == nullptr)
                                 {
@@ -621,7 +621,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
 
                                 Temp_Entry = Find_Symbol (table, mToken.raw.lexeme.text.c_str());
                             }
-                            else if (haveNextRawToken && (nextRawToken.lexeme.category == Lexeme::Category::kOther) && (nextRawToken.lexeme.text == "["))
+                            else if (haveNextRawToken && (nextRawToken.lexeme.category == Lexeme::kOther) && (nextRawToken.lexeme.text == "["))
                             {
                                 if (table == nullptr)
                                 {
@@ -837,7 +837,7 @@ bool Parser::GetRawToken(RawToken& rawToken, bool fastForwardToDirective)
     {
         rawToken = mPendingRawToken;
         mHavePendingRawToken = false;
-        if (!fastForwardToDirective || ((rawToken.lexeme.category == Lexeme::Category::kOther) && (rawToken.lexeme.text == "#")))
+        if (!fastForwardToDirective || ((rawToken.lexeme.category == Lexeme::kOther) && (rawToken.lexeme.text == "#")))
             return true;
     }
 
@@ -847,12 +847,12 @@ bool Parser::GetRawToken(RawToken& rawToken, bool fastForwardToDirective)
         return mTokenizer.GetNextToken(rawToken);
 }
 
-bool Parser::PeekRawToken(RawToken& lexeme)
+bool Parser::PeekRawToken(RawToken& rawToken)
 {
-    if (!GetRawToken(lexeme, false))
+    if (!GetRawToken(rawToken, false))
         return false;
 
-    UngetRawToken(lexeme);
+    UngetRawToken(rawToken);
     return true;
 }
 

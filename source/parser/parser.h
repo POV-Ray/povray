@@ -241,7 +241,7 @@ class Parser : public SceneTask
             TokenId Function_Id;                            ///< token type ID, in case Token_Id is an identifier ID
             int context;                                    ///< context the token is local to (i.e., table index)
             DBL Token_Float;                                ///< token value (if it is a float literal)
-            int Unget_Token, End_Of_File;
+            bool Unget_Token, End_Of_File;
             void *Data;                                     ///< reference to token value (if it is a non-float identifier)
             TokenId *NumberPtr;
             void **DataPtr;
