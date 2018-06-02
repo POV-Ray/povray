@@ -508,7 +508,7 @@ class Parser : public SceneTask
         std::string Parse_ASCIIString(bool pathname = false, bool require = true);
         UCS2String Parse_UCS2String(bool pathname = false, bool require = true);
 
-        UCS2 *String_Literal_To_UCS2(const char *str, bool pathname = false);
+        UCS2 *String_Literal_To_UCS2(const char *str);
         UCS2 *String_To_UCS2(const char *str);
         char *UCS2_To_String(const UCS2 *str);
 
