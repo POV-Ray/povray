@@ -406,6 +406,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { POLY_TOKEN,                   "poly" },
     { POLY_WAVE_TOKEN,              "poly_wave" },
     { POLYGON_TOKEN,                "polygon" },
+    { POLYLINE_TOKEN,               "polyline" },
     { POLYNOMIAL_TOKEN,             "polynomial" },
     { POT_TOKEN,                    "pot" },
     { POTENTIAL_TOKEN,              "potential" },
