@@ -230,7 +230,7 @@ bool Polyline::Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Threa
 *
 * FUNCTION
 *
-*   Inside_Polyline
+*   Inside
 *
 * INPUT
 *
@@ -268,7 +268,7 @@ bool Polyline::Inside(const Vector3d&, TraceThreadData *Thread) const
 *
 * FUNCTION
 *
-*   Polyline_Normal
+*   Normal
 *
 * INPUT
 *
@@ -307,7 +307,7 @@ void Polyline::Normal(Vector3d& Result, Intersection *, TraceThreadData *) const
 *
 * FUNCTION
 *
-*   Translate_Polyline
+*   Translate
 *
 * INPUT
 *
@@ -345,7 +345,7 @@ void Polyline::Translate(const Vector3d&, const TRANSFORM *tr)
 *
 * FUNCTION
 *
-*   Rotate_Polyline
+*   Rotate
 *
 * INPUT
 *
@@ -383,7 +383,7 @@ void Polyline::Rotate(const Vector3d&, const TRANSFORM *tr)
 *
 * FUNCTION
 *
-*   Scale_Polyline
+*   Scale
 *
 * INPUT
 *
@@ -421,7 +421,7 @@ void Polyline::Scale(const Vector3d&, const TRANSFORM *tr)
 *
 * FUNCTION
 *
-*   Transform_Polyline
+*   Transform
 *
 * INPUT
 *
@@ -472,7 +472,7 @@ void Polyline::Transform(const TRANSFORM *tr)
 *
 * FUNCTION
 *
-*   Create_Polyline
+*   Constructor
 *
 * INPUT
 *
@@ -509,7 +509,7 @@ Polyline::Polyline() : NonsolidObject(POLYLINE_OBJECT)
 *
 * FUNCTION
 *
-*   Copy_Polyline
+*   Copy
 *
 * INPUT
 *
@@ -553,7 +553,7 @@ ObjectPtr Polyline::Copy()
 *
 * FUNCTION
 *
-*   Destroy_Polyline
+*   Destructor
 *
 * INPUT
 *
@@ -602,7 +602,6 @@ Polyline::~Polyline()
 *
 * RETURNS
 * 
-*   true in case of problem
 *
 * AUTHOR
 *
@@ -622,7 +621,7 @@ Polyline::~Polyline()
 *
 ******************************************************************************/
 
-bool Polyline::Compute_Polyline(std::vector<Vector3d>& points, std::vector<bool>& range)
+void Polyline::Compute_Polyline(std::vector<Vector3d>& points, std::vector<bool>& range)
 {
     int i;
     DBL x, y, z, d;
@@ -661,7 +660,7 @@ bool Polyline::Compute_Polyline(std::vector<Vector3d>& points, std::vector<bool>
     if (i == points.size())
     {
         Set_Flag(this, DEGENERATE_FLAG);
-        return true;
+        return;
     }
 
     /* Find valid, i.e. non-zero v and w vectors. */
@@ -681,7 +680,7 @@ bool Polyline::Compute_Polyline(std::vector<Vector3d>& points, std::vector<bool>
     if (i == points.size())
     {
         Set_Flag(this, DEGENERATE_FLAG);
-        return true;
+        return;
     }
 
     u = cross(v, w);
@@ -727,7 +726,7 @@ bool Polyline::Compute_Polyline(std::vector<Vector3d>& points, std::vector<bool>
         if (fabs(d) > ZERO_TOLERANCE)
         {
             Set_Flag(this, DEGENERATE_FLAG);
-            return true;
+            return;
         }
 
         Data->Points[i][X] = x * u[X] + y * u[Y] + z * u[Z];
@@ -748,7 +747,7 @@ bool Polyline::Compute_Polyline(std::vector<Vector3d>& points, std::vector<bool>
 *
 * FUNCTION
 *
-*   Compute_Polyline_BBox
+*   Compute_BBox
 *
 * INPUT
 *

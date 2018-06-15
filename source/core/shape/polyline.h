@@ -95,7 +95,7 @@ class Polyline : public NonsolidObject
         virtual void Transform(const TRANSFORM *);
         virtual void Compute_BBox();
 
-        bool Compute_Polyline(std::vector<Vector3d>& points, std::vector<bool>& range);
+        void Compute_Polyline(std::vector<Vector3d>& points, std::vector<bool>& range);
     protected:
         bool Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Thread) const;
         bool in_polyline(DBL u, DBL  v)const;

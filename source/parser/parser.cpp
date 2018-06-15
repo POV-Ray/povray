@@ -11186,7 +11186,8 @@ void Parser::SignalProgress(POV_LONG elapsedTime, POV_LONG tokenCount)
 
 ObjectPtr Parser::Parse_Polyline()
 {
-    int i, closed = false;
+    int i, count;
+    bool closed = false;
     bool more = true;
     Polyline *Object;
     std::vector<Vector3d> Points;
@@ -11228,7 +11229,7 @@ ObjectPtr Parser::Parse_Polyline()
             {
               Range.resize( idx2+1, false );
             }
-            Range.resize( Points.size(), false );
+
             for(size_t i = idx1;i<=idx2;++i)
             {
               Range[i] = true;
@@ -11255,6 +11256,7 @@ ObjectPtr Parser::Parse_Polyline()
     /* Check for closed polygons. */
 
     P = Points[0];
+    count = 1;
 
     for (i = 1; i < Points.size(); i++)
     {
@@ -11267,21 +11269,34 @@ ObjectPtr Parser::Parse_Polyline()
             // force almost-identical vertices to be /exactly/ identical,
             // to make processing easier later
             Points[i] = P;
+            if ( count < 3 )
+            {
+              Error("elements of closed Polyline needs at least three points.");
+            }
 
             i++;
 
             if (i < Points.size())
             {
                 P = Points[i];
+                count = 1;
             }
 
             closed = true;
+        }
+        else
+        {
+          ++count;
         }
     }
 
     if (!closed)
     {
         Warning("Polyline not closed. Closing it.");
+        if ( count < 3 )
+        {
+          Error("elements of closed Polyline needs at least three points.");
+        }
         Points.push_back(P);
     }
 
