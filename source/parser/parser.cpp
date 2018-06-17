@@ -7027,8 +7027,8 @@ void Parser::Parse_Frame ()
                 {
                     case VERSION_TOKEN:
                         UNGET
+                        VersionWarning(295,"Should have '#' before 'version'.");
                         Parse_Directive (false);
-                        UNGET
                         break;
 
                     default:
