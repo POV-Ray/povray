@@ -92,6 +92,7 @@
 #include "core/shape/plane.h"
 #include "core/shape/polynomial.h"
 #include "core/shape/polygon.h"
+#include "core/shape/polyline.h"
 #include "core/shape/prism.h"
 #include "core/shape/quadric.h"
 #include "core/shape/sor.h"
@@ -6695,6 +6696,10 @@ ObjectPtr Parser::Parse_Object ()
 
         /* Parse prism primitive. [DB 8/94] */
 
+        CASE (POLYLINE_TOKEN)
+            Object = Parse_Polyline();
+        END_CASE
+
         CASE (PRISM_TOKEN)
             Object = Parse_Prism();
         END_CASE
@@ -11145,4 +11150,168 @@ void Parser::SignalProgress(POV_LONG elapsedTime, POV_LONG tokenCount)
     RenderBackend::SendSceneOutput(backendSceneData->sceneId, backendSceneData->frontendAddress, kPOVMsgIdent_Progress, obj);
 }
 
+/*****************************************************************************
+*
+* FUNCTION
+*
+*   Parse_Polyline
+*
+* INPUT
+*
+* OUTPUT
+*
+* RETURNS
+*
+*   ObjectPtr  -
+*
+* AUTHOR
+*
+*   Jérôme Grimbert
+*
+* DESCRIPTION
+*
+*   -
+*
+* CHANGES
+*
+*   Jun 2018 : Creation.
+*
+******************************************************************************/
+
+ObjectPtr Parser::Parse_Polyline()
+{
+    int i, count;
+    bool closed = false;
+    bool more = true;
+    Polyline *Object;
+    std::vector<Vector3d> Points;
+    std::vector<bool> Range;
+    Vector3d P;
+    Vector3d Local_Vector;
+
+    Parse_Begin();
+
+    if ((Object = dynamic_cast<Polyline *>(Parse_Object_Id())) != NULL)
+    {
+        return(dynamic_cast<ObjectPtr>(Object));
+    }
+
+    Object = new Polyline();
+    
+    while(more)
+    {
+       more = Allow_Vector(P);
+       if (more)
+       {
+         Points.push_back(P);
+         // NB we allow for a trailing comma at the end of the list,
+         // to facilitate auto-generation of lists.
+         Parse_Comma();
+       }
+    }
+
+    EXPECT
+      CASE(RANGE_TOKEN)
+        GET(LEFT_CURLY_TOKEN)
+        while(Allow_Vector(Local_Vector))
+        {
+          ssize_t idx1 = std::min(Local_Vector[0], Local_Vector[1]);
+          ssize_t idx2 = std::max(Local_Vector[0], Local_Vector[1]);
+          if ((idx1>=0)&&(idx2>=0))
+          {
+            if (Range.size() < idx2+1)
+            {
+              Range.resize( idx2+1, false );
+            }
+
+            for(size_t i = idx1;i<=idx2;++i)
+            {
+              Range[i] = true;
+            }
+          }
+          else
+          {
+            Error("invalid value for range (only positive values are expected)");
+          }
+          Parse_Comma();
+        }
+        GET(RIGHT_CURLY_TOKEN)
+        EXIT
+      END_CASE
+
+      OTHERWISE
+        UNGET
+        EXIT
+      END_CASE
+    END_EXPECT
+
+      
+
+    /* Check for closed polygons. */
+
+    P = Points[0];
+    count = 1;
+
+    for (i = 1; i < Points.size(); i++)
+    {
+        closed = false;
+
+        if ((fabs(P[X] - Points[i][X]) < EPSILON) &&
+            (fabs(P[Y] - Points[i][Y]) < EPSILON) &&
+            (fabs(P[Z] - Points[i][Z]) < EPSILON))
+        {
+            // force almost-identical vertices to be /exactly/ identical,
+            // to make processing easier later
+            Points[i] = P;
+            if ( count < 3 )
+            {
+              Error("elements of closed Polyline needs at least three points.");
+            }
+
+            i++;
+
+            if (i < Points.size())
+            {
+                P = Points[i];
+                count = 1;
+            }
+
+            closed = true;
+        }
+        else
+        {
+          ++count;
+        }
+    }
+
+    if (!closed)
+    {
+        Warning("Polyline not closed. Closing it.");
+        if ( count < 3 )
+        {
+          Error("elements of closed Polyline needs at least three points.");
+        }
+        Points.push_back(P);
+    }
+
+    more = false;
+    for(const auto& check: Range )
+    {
+      more |= check;
+    }
+    if (!more)
+    {
+        Warning("Polyline has no selected range.");
+    }
+
+    Object->Compute_Polyline(Points, Range);
+    if (Test_Flag(Object, DEGENERATE_FLAG))
+    {
+        Warning("Degenerated polyline, won't be rendered.");
+    }
+
+    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+
+    return(reinterpret_cast<ObjectPtr>(Object));
+}
 }
