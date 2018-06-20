@@ -113,7 +113,7 @@ const DBL ZERO_TOLERANCE = 1.0e-10;
 *
 * CHANGES
 *
-*   Jun 2018 : Creation.
+*   Jun 2018 : Creation. (from polygone code)
 *
 ******************************************************************************/
 
@@ -171,7 +171,7 @@ bool Polyline::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThrea
 *
 * CHANGES
 *
-*   Jun 2018 : Creation.
+*   Jun 2018 : Creation. (from polygone code)
 *
 ******************************************************************************/
 
@@ -531,7 +531,7 @@ Polyline::Polyline() : NonsolidObject(POLYLINE_OBJECT)
 *
 * CHANGES
 *
-*   Jun 2018 : Creation.
+*   Jun 2018 : Creation. 
 *
 ******************************************************************************/
 
@@ -617,7 +617,7 @@ Polyline::~Polyline()
 *
 * CHANGES
 *
-*   Jun 2018 : Creation.
+*   Jun 2018 : Creation. (from polygone code)
 *
 ******************************************************************************/
 
@@ -769,7 +769,7 @@ void Polyline::Compute_Polyline(std::vector<Vector3d>& points, std::vector<bool>
 *
 * CHANGES
 *
-*   Jun 2018 : Creation.
+*   Jun 2018 : Creation. (from polygone code)
 *
 ******************************************************************************/
 
@@ -834,13 +834,28 @@ void Polyline::Compute_BBox()
 *
 * AUTHOR
 *
+*   Jérôme Grimbert
 *
 * DESCRIPTION
 *
+* Compute the winding number, and return true when the absolute value is expected.
+*
+* For each segment whose y range contains the point
+*  (but ignore horizontal segment)
+*  increase the winding number for an upward segment with the point on the left
+*  decrease the winding number for a downard segment with the point on the right
+*  (aka change the winding number only when the segment is left of the point)
+*
+* handling of special cases (point of segment at the same height as the point) is done by
+* using strict and non-strict compare:
+* - an upward edge includes its starting point, and excludes its final point
+* - a downward edge excludes its starting point, and includes its final point
+* - horizontal edge are excluded
+* - the edge must always be the same side (for X) of the checked point
 *
 * CHANGES
 *
-*   -
+*   Jun 2018 : Creation.
 *
 ******************************************************************************/
 
@@ -925,16 +940,22 @@ bool Polyline::in_polyline(DBL u, DBL  v)const
 *
 * AUTHOR
 *
+*   Jérôme Grimbert
 *
 * DESCRIPTION
 *
 *   tests if a point is Left, On or Right of an infinite line
-*   The notion of Left / Right assumes an usual +X to the left, +Y to the top and is futile in 3D without enforced handness, but as long as the absolute value is used for the winding number, only a constant choice is needed for the
-*   computation of the winding number.
+*   The notion of Left / Right assumes an usual +X to the left, +Y to the top and is futile in 3D
+*   without enforced handness, but as long as the absolute value is used for the winding number, 
+*   only a constant choice is needed for the computation of the winding number.
+*
+*   Classical usage of cross product ba*ca, using only z component
+*   a, b, c being 3 points in 2D plane, 
+*   the sign of z component of ba*ca gives the relative position of c in regard to line a b
 *
 * CHANGES
 *
-*   -
+*   Jun 2018 : Creation. 
 *
 ******************************************************************************/
 
