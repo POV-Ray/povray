@@ -65,10 +65,14 @@ struct SplineEntry
 {
     DBL par;      // Parameter
     EXPRESS vec;  // Value at the parameter
+};
+struct SplineCoeff
+{
     DBL coeff[5]; // Interpolating coefficients at the parameter
 };
 
 typedef vector<SplineEntry> SplineEntryList;
+typedef vector<SplineCoeff> SplineCoeffList;
 
 typedef int SplineRefCount;
 
@@ -110,6 +114,9 @@ struct NaturalSpline : public GenericSpline
     NaturalSpline(const GenericSpline& o);
     virtual void Get(DBL p, EXPRESS& v);
     virtual GenericSpline* Clone() const { return new NaturalSpline(*this); }
+private:
+    SplineCoeffList SplinePreComputed;
+    void Precompute_Cubic_Coeffs( NaturalSpline * sp );
 };
 
 struct CatmullRomSpline : public GenericSpline

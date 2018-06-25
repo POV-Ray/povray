@@ -85,11 +85,10 @@ namespace pov
 
 DBL linear_interpolate(const SplineEntryList& se, SplineEntryList::size_type i, int k, DBL p);
 DBL quadratic_interpolate(const SplineEntryList& se, SplineEntryList::size_type i, int k, DBL p);
-DBL natural_interpolate(const SplineEntryList& se, SplineEntryList::size_type i, int k, DBL p);
+DBL natural_interpolate(const SplineEntryList& se, const SplineCoeffList& ce, SplineEntryList::size_type i, int k, DBL p);
 DBL catmull_rom_interpolate(const SplineEntryList& se, SplineEntryList::size_type i, int k, DBL p);
 SplineEntryList::size_type findt(const GenericSpline * sp, DBL Time);
 void mkfree(GenericSpline * sp, SplineEntryList::size_type i);
-void Precompute_Cubic_Coeffs(GenericSpline *sp);
 
 /*****************************************************************************
 *
@@ -117,7 +116,7 @@ void Precompute_Cubic_Coeffs(GenericSpline *sp);
 *
 ******************************************************************************/
 
-void Precompute_Cubic_Coeffs(GenericSpline *sp)
+void NaturalSpline::Precompute_Cubic_Coeffs(NaturalSpline *sp)
 {
     SplineEntryList::size_type i, k;
     DBL *h;
@@ -127,7 +126,8 @@ void Precompute_Cubic_Coeffs(GenericSpline *sp)
 
     SplineEntryList::size_type numEntries = sp->SplineEntries.size();
     POV_ASSERT(numEntries >= 2);
-
+    sp->SplinePreComputed.resize( numEntries );
+    
     h = new DBL[numEntries];
     b = new DBL[numEntries];
     u = new DBL[numEntries];
@@ -147,12 +147,12 @@ void Precompute_Cubic_Coeffs(GenericSpline *sp)
             u[i] = 2*(h[i]+h[i-1]) - (h[i-1]*h[i-1])/u[i-1];
             v[i] = 6*(b[i]-b[i-1]) - (h[i-1]*v[i-1])/u[i-1];
         }
-        sp->SplineEntries.back().coeff[k] = 0;
+        sp->SplinePreComputed.back().coeff[k] = 0;
         for(i = numEntries-2; i > 0; i--)
         {
-            sp->SplineEntries[i].coeff[k] = (v[i] - h[i]*sp->SplineEntries[i+1].coeff[k])/u[i];
+            sp->SplinePreComputed[i].coeff[k] = (v[i] - h[i]*sp->SplinePreComputed[i+1].coeff[k])/u[i];
         }
-        sp->SplineEntries[0].coeff[k] = 0;
+        sp->SplinePreComputed[0].coeff[k] = 0;
     }
     sp->Coeffs_Computed = true;
 
@@ -268,7 +268,8 @@ DBL quadratic_interpolate(const SplineEntryList& se, SplineEntryList::size_type 
 *
 * INPUT
 *
-*       se : a pointer to the entries in the spline
+*       se : reference to the entries in the spline
+*       ce : reference to pre computed coefficients in the spline
 *       i  : the first point in the interpolation interval
 *       k  : which dimension of the 5D vector to interpolate in
 *       p  : the parameter to interpolate the value for
@@ -290,12 +291,12 @@ DBL quadratic_interpolate(const SplineEntryList& se, SplineEntryList::size_type 
 *
 ******************************************************************************/
 
-DBL natural_interpolate(const SplineEntryList& se, SplineEntryList::size_type i, int k, DBL p)
+DBL natural_interpolate(const SplineEntryList& se, const SplineCoeffList& ce, SplineEntryList::size_type i, int k, DBL p)
 {
     DBL h, tmp;
     h = se[i+1].par - se[i].par;
-    tmp = se[i].coeff[k]/2.0 + ((p - se[i].par)*(se[i+1].coeff[k] - se[i].coeff[k]))/(6.0*h);
-    tmp = -(h/6.0)*(se[i+1].coeff[k] + 2.0*se[i].coeff[k]) + (se[i+1].vec[k] - se[i].vec[k])/h + (p - se[i].par)*tmp;
+    tmp = ce[i].coeff[k]/2.0 + ((p - se[i].par)*(ce[i+1].coeff[k] - ce[i].coeff[k]))/(6.0*h);
+    tmp = -(h/6.0)*(ce[i+1].coeff[k] + 2.0*ce[i].coeff[k]) + (se[i+1].vec[k] - se[i].vec[k])/h + (p - se[i].par)*tmp;
     return se[i].vec[k] + (p - se[i].par)*tmp;
 }
 
@@ -814,7 +815,7 @@ void NaturalSpline::Get(DBL p, EXPRESS& v)
                 v[k] = SplineEntries.back().vec[k];
             /* Else, normal case.  cubic_interpolate can handle the case of not enough points */
             else
-                v[k] = natural_interpolate(SplineEntries, i-1, k, p);
+                v[k] = natural_interpolate(SplineEntries, SplinePreComputed, i-1, k, p);
         }
     }
 }
