@@ -3876,6 +3876,128 @@ void Parser::Parse_Mesh1 (Mesh* Object)
     Object->Create_Mesh_Hash_Tables();
 
     EXPECT
+        CASE(GTS_LOAD_TOKEN)
+          Parse_Load_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(KEEP_TOKEN)
+          Parse_Select_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(CUBICLE_TOKEN)
+          Parse_Cubicle_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(CRISTAL_TOKEN)
+          Parse_Cristal_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(BOURKE_TOKEN)
+          Parse_Bourke_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(HELLER_TOKEN)
+          Parse_Heller_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(ROLL_TOKEN)
+          Parse_Roll_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(BEND_TOKEN)
+          Parse_Bend_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(MOVE_TOKEN)
+          Parse_Move_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(WARP_TOKEN)
+          Parse_Warp_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(SCREW_TOKEN)
+          Parse_Screw_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(SMOOTH_TOKEN)
+          Parse_Smooth_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(DISPLACE_TOKEN)
+          Parse_Displace_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+    
+        CASE(TESSELATE_TOKEN)
+          Parse_Tesselation_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(TESSEL_TOKEN)
+          Parse_Tessel_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+
         CASE(TRIANGLE_TOKEN)
             Parse_Begin();
 
@@ -6789,6 +6911,74 @@ ObjectPtr Parser::Parse_Object ()
             Object = Parse_Light_Source ();
         END_CASE
 
+        CASE (GTS_LOAD_TOKEN)
+            Object = Parse_Gts_Load();
+        END_CASE
+
+        CASE (STL_LOAD_TOKEN)
+            Object = Parse_Stl_Load();
+        END_CASE
+
+        CASE (KEEP_TOKEN)
+            Object = Parse_Select();
+        END_CASE
+
+        CASE (CUBICLE_TOKEN)
+            Object = Parse_Cubicle();
+        END_CASE
+
+        CASE (CRISTAL_TOKEN)
+            Object = Parse_Cristal();
+        END_CASE
+
+        CASE (BOURKE_TOKEN)
+            Object = Parse_Bourke();
+        END_CASE
+
+        CASE (HELLER_TOKEN)
+            Object = Parse_Heller();
+        END_CASE
+
+        CASE (ROLL_TOKEN)
+            Object = Parse_Roll();
+        END_CASE
+
+        CASE (BEND_TOKEN)
+            Object = Parse_Bend();
+        END_CASE
+
+        CASE (MOVE_TOKEN)
+            Object = Parse_Move_Object();
+        END_CASE
+
+        CASE (WARP_TOKEN)
+            Object = Parse_Warp_Object();
+        END_CASE
+
+        CASE (SCREW_TOKEN)
+            Object = Parse_Screw();
+        END_CASE
+
+        CASE (SMOOTH_TOKEN)
+            Object = Parse_Smooth();
+        END_CASE
+
+        CASE (DISPLACE_TOKEN)
+            Object = Parse_Displace();
+        END_CASE
+
+        CASE (PLANET_TOKEN)
+            Object = Parse_Planet();
+        END_CASE
+
+        CASE (TESSELATE_TOKEN)
+            Object = Parse_Tesselation();
+        END_CASE
+
+        CASE (TESSEL_TOKEN)
+            Object = Parse_Tessel();
+        END_CASE
+
         CASE (OBJECT_TOKEN)
             Parse_Begin ();
             Object = Parse_Object ();
@@ -7072,6 +7262,15 @@ void Parser::Parse_Frame ()
             CASE (GLOBAL_SETTINGS_TOKEN)
                 Parse_Global_Settings();
             END_CASE
+
+            CASE (GTS_SAVE_TOKEN)
+                Parse_Gts_Save();
+            END_CASE
+
+            CASE (STL_SAVE_TOKEN)
+                Parse_Stl_Save();
+            END_CASE
+
 
             OTHERWISE
                 UNGET

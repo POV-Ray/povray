@@ -65,6 +65,7 @@
 #include "core/scene/object.h"
 #include "core/scene/scenedata.h"
 #include "core/shape/heightfield.h"
+#include "core/shape/mesh.h"
 #include "core/support/imageutil.h"
 
 // POV-Ray header files (VM module)
@@ -730,6 +731,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
     int l1,l2;
     DBL Val,Val2;
     Vector3d Vect,Vect2,Vect3;
+    Mesh * LocalMesh;
     ObjectPtr Object;
     TRANSFORM Trans;
     TurbulenceWarp Turb;
@@ -1198,6 +1200,85 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                         Val = (now-y2k).total_microseconds() * (1.0e-6) / (24*60*60);
                     }
                     break;
+
+                case GET_TRIANGLE_COUNT_TOKEN:
+                    Parse_Paren_Begin();
+                    GET(OBJECT_ID_TOKEN)
+                    Object = (ObjectPtr)Token.Data;
+                    if ((LocalMesh=dynamic_cast<Mesh*>(Object)))
+                    {
+                      Val = LocalMesh->Data->Number_Of_Triangles;
+                    }
+                    else
+                    {
+                      Val = 0;
+                    }
+                    Parse_Paren_End();
+                    break;
+
+                case GET_VERTEX_COUNT_TOKEN:
+                    Parse_Paren_Begin();
+                    GET(OBJECT_ID_TOKEN)
+                    Object = (ObjectPtr)Token.Data;
+                    if ((LocalMesh=dynamic_cast<Mesh*>(Object)))
+                    {
+                      Val = LocalMesh->Data->Number_Of_Vertices;
+                    }
+                    else
+                    {
+                      Val = 0;
+                    }
+                    Parse_Paren_End();
+                    break;
+
+                case IS_SMOOTH_TRIANGLE_TOKEN:
+                    Parse_Paren_Begin();
+                    GET(OBJECT_ID_TOKEN)
+                    Object = (ObjectPtr)Token.Data;
+                    Parse_Comma();
+                    i = (int)Parse_Float();
+                    if ((LocalMesh = dynamic_cast<Mesh*>(Object))
+                        && (i>=0)
+                        &&(LocalMesh->Data->Number_Of_Triangles > i))
+                    {
+                      Val = LocalMesh->Data->Triangles[i].Smooth;
+                    }
+                    else
+                    {
+                      Val = 0;
+                    }
+                    Parse_Paren_End();
+                    break;
+
+                case GET_NORMAL_COUNT_TOKEN:
+                    Parse_Paren_Begin();
+                    GET(OBJECT_ID_TOKEN)
+                    Object = (ObjectPtr)Token.Data;
+                    if ((LocalMesh=dynamic_cast<Mesh*>(Object)))
+                    {
+                      Val = LocalMesh->Data->Number_Of_Normals;
+                    }
+                    else
+                    {
+                      Val = 0;
+                    }
+                    Parse_Paren_End();
+                    break;
+
+                case GET_UV_COUNT_TOKEN:
+                    Parse_Paren_Begin();
+                    GET(OBJECT_ID_TOKEN)
+                    Object = (ObjectPtr)Token.Data;
+                    if ((LocalMesh=dynamic_cast<Mesh*>(Object)))
+                    {
+                      Val = LocalMesh->Data->Number_Of_UVCoords;
+                    }
+                    else
+                    {
+                      Val = 0;
+                    }
+                    Parse_Paren_End();
+                    break;
             }
 
             *Terms = 1;
@@ -1335,6 +1416,135 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                             UNGET
                         END_CASE
                     END_EXPECT
+                    Parse_Paren_End();
+                    break;
+
+                case GET_VERTEX_INDICES_TOKEN:
+                    Parse_Paren_Begin();
+                    GET(OBJECT_ID_TOKEN)
+                    Object = (ObjectPtr)Token.Data;
+                    Parse_Comma();
+                    i = (int)Parse_Float();
+                    if ((LocalMesh = dynamic_cast<Mesh*>(Object))
+                        && (i>=0)
+                        &&(LocalMesh->Data->Number_Of_Triangles > i))
+                    {
+                      Vect = Vector3d(
+                          LocalMesh->Data->Triangles[i].P1,
+                          LocalMesh->Data->Triangles[i].P2,
+                          LocalMesh->Data->Triangles[i].P3);
+                    }
+                    else
+                    {
+                      Vect = Vector3d(-1.0,-1.0,-1.0);
+                    }
+                    Parse_Paren_End();
+                    break;
+
+                case GET_NORMAL_INDICES_TOKEN:
+                    Parse_Paren_Begin();
+                    GET(OBJECT_ID_TOKEN)
+                    Object = (ObjectPtr)Token.Data;
+                    Parse_Comma();
+                    i = (int)Parse_Float();
+                    if ((LocalMesh = dynamic_cast<Mesh*>(Object))
+                        && (i>=0)
+                        &&(LocalMesh->Data->Number_Of_Triangles > i))
+                    {
+                      Vect = Vector3d(
+                          LocalMesh->Data->Triangles[i].N1,
+                          LocalMesh->Data->Triangles[i].N2,
+                          LocalMesh->Data->Triangles[i].N3);
+                    }
+                    else
+                    {
+                      Vect = Vector3d(-1.0,-1.0,-1.0);
+                    }
+                    Parse_Paren_End();
+                    break;
+
+                case GET_UV_INDICES_TOKEN:
+                    Parse_Paren_Begin();
+                    GET(OBJECT_ID_TOKEN)
+                    Object = (ObjectPtr)Token.Data;
+                    Parse_Comma();
+                    i = (int)Parse_Float();
+                    if ((LocalMesh = dynamic_cast<Mesh*>(Object))
+                        && (i>=0)
+                        &&(LocalMesh->Data->Number_Of_Triangles > i))
+                    {
+                      Vect = Vector3d(
+                          LocalMesh->Data->Triangles[i].UV1,
+                          LocalMesh->Data->Triangles[i].UV2,
+                          LocalMesh->Data->Triangles[i].UV3);
+                    }
+                    else
+                    {
+                      Vect = Vector3d(-1.0,-1.0,-1.0);
+                    }
+                    Parse_Paren_End();
+                    break;
+
+                case GET_VERTEX_TOKEN:
+                    Parse_Paren_Begin();
+                    GET(OBJECT_ID_TOKEN)
+                    Object = (ObjectPtr)Token.Data;
+                    Parse_Comma();
+                    i = (int)Parse_Float();
+                    if ((LocalMesh = dynamic_cast<Mesh*>(Object))
+                        && (i>=0)
+                        &&(LocalMesh->Data->Number_Of_Vertices > i))
+                    {
+                      Vect[0]=LocalMesh->Data->Vertices[i][0];
+                      Vect[1]=LocalMesh->Data->Vertices[i][1];
+                      Vect[2]=LocalMesh->Data->Vertices[i][2];
+                    }
+                    else
+                    {
+                      Vect = Vector3d(0.0,0.0,0.0);
+                    }
+                    Parse_Paren_End();
+                    break;
+
+                case GET_NORMAL_TOKEN:
+                    Parse_Paren_Begin();
+                    GET(OBJECT_ID_TOKEN)
+                    Object = (ObjectPtr)Token.Data;
+                    Parse_Comma();
+                    i = (int)Parse_Float();
+                    if ((LocalMesh = dynamic_cast<Mesh*>(Object))
+                        && (i>=0)
+                        &&(LocalMesh->Data->Number_Of_Normals > i))
+                    {
+                      Vect[0]=LocalMesh->Data->Normals[i][0];
+                      Vect[1]=LocalMesh->Data->Normals[i][1];
+                      Vect[2]=LocalMesh->Data->Normals[i][2];
+                    }
+                    else
+                    {
+                      Vect = Vector3d(0.0,0.0,0.0);
+                    }
+                    Parse_Paren_End();
+                    break;
+
+                case GET_UV_TOKEN:
+                    Parse_Paren_Begin();
+                    GET(OBJECT_ID_TOKEN)
+                    Object = (ObjectPtr)Token.Data;
+                    Parse_Comma();
+                    i = (int)Parse_Float();
+                    if ((LocalMesh = dynamic_cast<Mesh*>(Object))
+                        && (i>=0)
+                        &&(LocalMesh->Data->Number_Of_Normals > i))
+                    {
+                      Vect[0]=LocalMesh->Data->UVCoords[i][0];
+                      Vect[1]=LocalMesh->Data->UVCoords[i][1];
+                      Vect[2]=0.0;
+                    }
+                    else
+                    {
+                      Vect = Vector3d(0.0,0.0,0.0);
+                    }
                     Parse_Paren_End();
                     break;
             }
