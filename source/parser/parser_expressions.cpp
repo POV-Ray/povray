@@ -578,17 +578,16 @@ void Parser::Parse_Spline_Call(EXPRESS& Express, int *Terms)
 {
     GenericSpline *spline = reinterpret_cast<GenericSpline *>(Token.Data);
     DBL Val;
+    int k;
 
     // NB while parsing the call parameters, the parser may drop out of the current scope (macro or include file)
     // before we get a chance to evaluate the spline, so we claim dibs on it.
     // TODO - use smart pointers for this
     Acquire_Spline_Reference(spline);
 
-    if(Parse_Call() == false)
-    {
-        Release_Spline_Reference(spline);
-        return;
-    }
+    EXPECT
+      CASE (LEFT_PAREN_TOKEN)
+
 
     Val=Parse_Float();
     Get_Token();
@@ -616,12 +615,34 @@ void Parser::Parse_Spline_Call(EXPRESS& Express, int *Terms)
             case NATURAL_SPLINE_TOKEN:
                 spline = new NaturalSpline(*spline);
                 break;
+            case SOR_SPLINE_TOKEN:
+                spline = new SorSpline(*spline);
+                break;
+            case AKIMA_SPLINE_TOKEN:
+                spline = new AkimaSpline(*spline);
+                break;
+            case TCB_SPLINE_TOKEN:
+                Warning("Transformation in tcb_spline does not provide values for tension, continuity and bias, default to 0.0.");
+                spline = new TcbSpline(*spline);
+                break;
+            case BASIC_X_SPLINE_TOKEN:
+                Warning("Transformation in basic_x_spline does not provide value for freedom_degree, default to 0.0.");
+                spline = new BasicXSpline(*spline);
+                break;
+            case EXTENDED_X_SPLINE_TOKEN:
+                Warning("Transformation in extended_x_spline does not provide values for freedom_degree, default to 0.0.");
+                spline = new ExtendedXSpline(*spline);
+                break;
+            case GENERAL_X_SPLINE_TOKEN:
+                Warning("Transformation in general_x_spline does not provide values for freedom_degree, default to 0.0.");
+                spline = new GeneralXSpline(*spline);
+                break;
             default:
-                Error("linear_spline, quadratic_spline, natural_spline, or cubic_spline expected.");
+                Error("linear_spline, quadratic_spline, natural_spline, cubic_spline, sor_spline, akima_spline, tcb_spline, basic_x_spline, extended_x_spline or general_x_spline expected.");
                 break;
         }
 
-        Parse_Paren_End();
+        GET(RIGHT_PAREN_TOKEN);
         Get_Spline_Val(spline, Val, Express, Terms);
         Destroy_Spline(spline);
         spline = NULL;
@@ -629,12 +650,61 @@ void Parser::Parse_Spline_Call(EXPRESS& Express, int *Terms)
     else
     {
         UNGET
-        Parse_Paren_End();
+        GET(RIGHT_PAREN_TOKEN);
         Get_Spline_Val(spline, Val, Express, Terms);
 
         // we claimed dibs on the spline, so now that we're done with it we must say so
         Release_Spline_Reference(spline);
     }
+		EXIT
+		END_CASE
+
+
+    
+		CASE (LEFT_SQUARE_TOKEN)
+			Val=Parse_Float();
+			k=int(1.0e-08+Val);
+			if ((k < 0) || (Val < -1.0e-08))
+			{
+				Error("Negative subscript");
+			}
+			if (k >= spline->SplineEntries.size() )
+			{
+				Error("Spline-Array subscript out of range");
+			}
+			GET(RIGHT_SQUARE_TOKEN);
+			GET(LEFT_SQUARE_TOKEN);
+      // value is rather symbolic, 0 get the progression value, 1 (not 0) get the associated point/vector
+			if ((int)Parse_Float())
+			{
+				*Terms = spline->Terms;
+				for(int j=0; j<spline->Terms; j++)
+				{
+					Express[j]=spline->SplineEntries[k].vec[j];
+				}
+			}
+			else
+			{
+				*Terms = 1;
+				Express[0]=spline->SplineEntries[k].par;
+			}
+			GET(RIGHT_SQUARE_TOKEN);
+		  Release_Spline_Reference(spline);
+			EXIT
+		END_CASE
+
+		OTHERWISE
+		  Release_Spline_Reference(spline);
+			UNGET
+			/* Allow Spline's identifier in macro call */
+      if (!Allow_Identifier_In_Call)
+      {
+          Expectation_Error ("( or [");
+      }
+			EXIT
+		END_CASE
+	END_EXPECT
+
 }
 
 /*****************************************************************************
@@ -673,6 +743,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
     bool Old_Ok=Ok_To_Declare;
     DBL greater_val, less_val, equal_val;
     PIGMENT *Pigment; // JN2007: Image map dimensions
+    GenericSpline *spline;
 
     Ok_To_Declare=true;
 
@@ -1096,14 +1167,29 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
                 case DIMENSION_SIZE_TOKEN:
                     Parse_Paren_Begin();
-                    GET(ARRAY_ID_TOKEN)
-                    Parse_Comma();
-                    a = reinterpret_cast<POV_ARRAY *>(*(Token.DataPtr));
-                    i = (int)Parse_Float()-1.0;
-                    if ((i < 0) || (i > a->Dims))
-                        Val = 0.0;
-                    else
-                        Val = a->Sizes[i];
+                    EXPECT
+                        CASE(ARRAY_ID_TOKEN)
+                        Parse_Comma();
+                        a = reinterpret_cast<POV_ARRAY *>(*(Token.DataPtr));
+                        i = (int)Parse_Float()-1.0;
+                        if ((i < 0) || (i > a->Dims))
+                            Val = 0.0;
+                        else
+                            Val = a->Sizes[i];
+                        EXIT
+                        END_CASE
+
+                        CASE(SPLINE_ID_TOKEN)
+                            spline = reinterpret_cast<GenericSpline*>(Token.Data);
+                            Val = spline->SplineEntries.size();
+                        EXIT
+                        END_CASE
+
+                        OTHERWISE
+                            Expectation_Error("spline or array");
+                        END_CASE
+                    END_EXPECT
+
                     Parse_Paren_End();
                     break;
 
@@ -3796,6 +3882,8 @@ GenericSpline *Parser::Parse_Spline()
     DBL par;
     bool old_allow_id = Allow_Identifier_In_Call;
     Allow_Identifier_In_Call = false;
+    SplineTcbParam defaultTcb, inTcb, outTcb;
+    SplineFreedom defaultFreedom, freedom;
 
     MaxTerms = 2;
 
@@ -3859,6 +3947,78 @@ GenericSpline *Parser::Parse_Spline()
             keepOld = false;
         END_CASE
 
+        CASE(SOR_SPLINE_TOKEN)
+            if (Old)
+                New = new SorSpline(*Old);
+            else
+                New = new SorSpline();
+            if (Old && !keepOld)
+                delete Old;
+            Old = New;
+            keepOld = false;
+        END_CASE
+
+
+        CASE(AKIMA_SPLINE_TOKEN)
+            if (Old)
+                New = new AkimaSpline(*Old);
+            else
+                New = new AkimaSpline();
+            if (Old && !keepOld)
+                delete Old;
+            Old = New;
+            keepOld = false;
+        END_CASE
+
+
+        CASE(TCB_SPLINE_TOKEN)
+            if (Old)
+                New = new TcbSpline(*Old);
+            else
+                New = new TcbSpline();
+            if (Old && !keepOld)
+                delete Old;
+            Old = New;
+            keepOld = false;
+        END_CASE
+
+
+        CASE(BASIC_X_SPLINE_TOKEN)
+            if (Old)
+                New = new BasicXSpline(*Old);
+            else
+                New = new BasicXSpline();
+            if (Old && !keepOld)
+                delete Old;
+            Old = New;
+            keepOld = false;
+        END_CASE
+
+
+        CASE(EXTENDED_X_SPLINE_TOKEN)
+            if (Old)
+                New = new ExtendedXSpline(*Old);
+            else
+                New = new ExtendedXSpline();
+            if (Old && !keepOld)
+                delete Old;
+            Old = New;
+            keepOld = false;
+        END_CASE
+
+
+        CASE(GENERAL_X_SPLINE_TOKEN)
+            if (Old)
+                New = new GeneralXSpline(*Old);
+            else
+                New = new GeneralXSpline();
+            if (Old && !keepOld)
+                delete Old;
+            Old = New;
+            keepOld = false;
+        END_CASE
+
+
         OTHERWISE
             UNGET
             EXIT
@@ -3872,21 +4032,131 @@ GenericSpline *Parser::Parse_Spline()
         else
             New = new LinearSpline();
     }
-
+    
+    switch( New->Extended() )
+    {
+      case GenericSpline::Extension::TCB:
+        	EXPECT
+            CASE (TENSION_TOKEN)
+              defaultTcb.tension = Parse_Float();
+              Parse_Comma();
+            END_CASE
+            CASE (CONTINUITY_TOKEN)
+              defaultTcb.continuity = Parse_Float();
+              Parse_Comma();
+            END_CASE
+            CASE (BIAS_TOKEN)
+              defaultTcb.bias = Parse_Float();
+              Parse_Comma();
+            END_CASE
+            OTHERWISE
+              UNGET
+              EXIT
+            END_CASE
+          END_EXPECT
+        break;
+      case GenericSpline::Extension::GlobalFreedom:
+      case GenericSpline::Extension::Freedom:
+          EXPECT
+            CASE (FREEDOM_DEGREE_TOKEN)
+              defaultFreedom.freedom_degree = Parse_Float();
+              Parse_Comma();
+              EXIT
+            END_CASE
+            OTHERWISE
+              UNGET
+              EXIT
+            END_CASE
+          END_EXPECT
+        break;
+    }
     EXPECT
         CASE_FLOAT
             /* Entry has the form float,vector */
             par = Parse_Float();
             Parse_Comma();
+            // for TCB, it's float, [in+out] vector [out override]
+            // for any X, it's float, vector []
+            // with [] the optional set of parameters
+            // [] for tcb: tension float, continuity float, bias float,
+            // [] for any X: freedom_degree float
+            switch( New->Extended() )
+            {
+              case GenericSpline::Extension::TCB:
+                inTcb = outTcb = defaultTcb;
+                EXPECT
+                  CASE (TENSION_TOKEN)
+                    inTcb.tension = outTcb.tension = Parse_Float();
+                    Parse_Comma();
+                  END_CASE
+                  CASE (CONTINUITY_TOKEN)
+                    inTcb.continuity = outTcb.continuity = Parse_Float();
+                    Parse_Comma();
+                  END_CASE
+                  CASE (BIAS_TOKEN)
+                    inTcb.bias = outTcb.bias = Parse_Float();
+                    Parse_Comma();
+                  END_CASE
+                  OTHERWISE
+                    UNGET
+                    EXIT
+                  END_CASE
+                END_EXPECT
+              break;
+            }
 
             Parse_Express(Express, &Terms);
             Promote_Express(Express,&Terms,2);
             if(Terms > 5)
                     Error("Too many components in vector!\n");
             MaxTerms = max(MaxTerms, Terms);
-            Parse_Comma();
+            switch( New->Extended() )
+            {
+            case GenericSpline::Extension::TCB:
+              EXPECT
+                CASE (TENSION_TOKEN)
+                  outTcb.tension = Parse_Float();
+                  Parse_Comma();
+                END_CASE
+                CASE (CONTINUITY_TOKEN)
+                  outTcb.continuity = Parse_Float();
+                  Parse_Comma();
+                END_CASE
+                CASE (BIAS_TOKEN)
+                  outTcb.bias = Parse_Float();
+                  Parse_Comma();
+                END_CASE
+                OTHERWISE
+                  UNGET
+                  EXIT
+                END_CASE
+              END_EXPECT
+              Insert_Spline_Entry(New, par, Express, inTcb, outTcb);
+              break;
+            case GenericSpline::Extension::Freedom:
+              freedom = defaultFreedom;
+              EXPECT
+                CASE (FREEDOM_DEGREE_TOKEN)
+                  freedom.freedom_degree = Parse_Float();
+                  Parse_Comma();
+                END_CASE
+                OTHERWISE
+                  UNGET
+                  EXIT
+                END_CASE
+              END_EXPECT
+              Insert_Spline_Entry(New, par, Express, freedom);
+              break;
+            case GenericSpline::Extension::GlobalFreedom:
+              Insert_Spline_Entry(New, par, Express, defaultFreedom);
+              Parse_Comma();
+              break;
+            case GenericSpline::Extension::None:
+              Parse_Comma();
             /* MWW 2000 -- Changed call for dynamic allocation version */
-            Insert_Spline_Entry(New, par, Express);
+              Insert_Spline_Entry(New, par, Express);
+              break;
+            }
             i++;
         END_CASE
 

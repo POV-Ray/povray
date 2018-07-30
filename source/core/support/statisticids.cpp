@@ -123,6 +123,8 @@ const INTERSECTION_STATS_INFO intersection_stats[kPOVList_Stat_Last] =
       "Plane" },
     { kPOVList_Stat_PolygonTest,        Ray_Polygon_Tests, Ray_Polygon_Tests_Succeeded,
       "Polygon" },
+    { kPOVList_Stat_PolylineTest,       Ray_Polyline_Tests, Ray_Polyline_Tests_Succeeded,
+      "Polyline" },
     { kPOVList_Stat_PrismTest,          Ray_Prism_Tests, Ray_Prism_Tests_Succeeded,
       "Prism" },
     { kPOVList_Stat_PrismBdTest,        Prism_Bound_Tests, Prism_Bound_Tests_Succeeded,

@@ -52,6 +52,7 @@
 
 #include "base/pov_err.h"
 #include "base/types.h"
+#include "core/coretypes.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -85,11 +86,444 @@ namespace pov
 
 DBL linear_interpolate(const SplineEntryList& se, SplineEntryList::size_type i, int k, DBL p);
 DBL quadratic_interpolate(const SplineEntryList& se, SplineEntryList::size_type i, int k, DBL p);
-DBL natural_interpolate(const SplineEntryList& se, SplineEntryList::size_type i, int k, DBL p);
+DBL natural_interpolate(const SplineEntryList& se, const SplineCoeffList& ce, SplineEntryList::size_type i, int k, DBL p);
 DBL catmull_rom_interpolate(const SplineEntryList& se, SplineEntryList::size_type i, int k, DBL p);
 SplineEntryList::size_type findt(const GenericSpline * sp, DBL Time);
-void mkfree(GenericSpline * sp, SplineEntryList::size_type i);
-void Precompute_Cubic_Coeffs(GenericSpline *sp);
+
+
+DBL basic_x_interpolate(const SplineEntryList& se, int i, int k, DBL p, DBL fd);
+DBL extended_x_interpolate(const SplineEntryList& se, int i, int k, DBL p, int N);
+DBL general_x_interpolate(const SplineEntryList& se, int i, int k, DBL p, int N);
+
+
+/*****************************************************************************
+*
+* FUNCTION
+*
+*       Precompute_SOR_Coeffs
+*
+* INPUT
+*
+*       sp : a pointer to the spline to compute interpolation coefficients for
+*
+* OUTPUT
+*
+* RETURNS
+*
+* AUTHOR
+*
+*       ABX (abx@abx.art.pl)
+*
+* DESCRIPTION
+*
+*       Computes the coefficients used in sor_interpolate.
+*
+* CHANGES
+*
+*       2002.08.09 - Initial version by ABX
+*
+******************************************************************************/
+
+void SorSpline::Precompute()
+{
+    SorSpline * sp = this;
+    int i, k;
+    // temporary variables for operations
+    // I hope that compilers remove part of it
+    DBL b0,b1,b2,b3;
+    DBL M00,M01,M02;
+    DBL M10,M11,M12;
+    DBL M20,M21,M30,M31;
+    DBL M2131,M1101,M1202;
+    DBL M1101_1,M1101_2;
+    DBL A,B,C,D;
+
+    SplinePreComputed.resize(SplineEntries.size());
+    for(k = 0; k < 5; k++)
+    {
+        for(i = 2; i < SplineEntries.size() - 1; i++)
+        {
+            b0=pow(sp->SplineEntries[i-1].vec[k],2);
+            b1=pow(sp->SplineEntries[i].vec[k],2);
+            b2=2*sp->SplineEntries[i-1].vec[k]*(sp->SplineEntries[i].vec[k]-sp->SplineEntries[i-2].vec[k])/
+               (sp->SplineEntries[i].par-sp->SplineEntries[i-2].par);
+            b3=2*sp->SplineEntries[i].vec[k]*(sp->SplineEntries[i+1].vec[k]-sp->SplineEntries[i-1].vec[k])/
+               (sp->SplineEntries[i+1].par-sp->SplineEntries[i-1].par);
+            M00=pow(sp->SplineEntries[i-1].par,3);
+            M01=pow(sp->SplineEntries[i-1].par,2);
+            M02=sp->SplineEntries[i-1].par;
+            M10=pow(sp->SplineEntries[i].par,3);
+            M11=pow(sp->SplineEntries[i].par,2);
+            M12=sp->SplineEntries[i].par;
+            M20=3*pow(sp->SplineEntries[i-1].par,2);
+            M21=2*sp->SplineEntries[i-1].par;
+            M30=3*pow(sp->SplineEntries[i].par,2);
+            M31=2*sp->SplineEntries[i].par;
+            M2131=M21-M31;
+            M1101=M11-M01;
+            M1202=M12-M02;
+            M1101_1=M1101-M31*M1202;
+            M1101_2=M21*M1202-M1101;
+            A=((b0-b1)*M2131+b2*M1101_1+b3*M1101_2)/
+              ((M00-M10)*M2131+M20*M1101_1+M30*M1101_2);
+            B=(b2-b3+A*(M30-M20))/M2131;
+            C=b3-M30*A-M31*B;
+            D=b1-M10*A-M11*B-M12*C;
+
+            sp->SplinePreComputed[i].coeff[k][0]=A;
+            sp->SplinePreComputed[i].coeff[k][1]=B;
+            sp->SplinePreComputed[i].coeff[k][2]=C;
+            sp->SplinePreComputed[i].coeff[k][3]=D;
+        }
+    }
+    sp->Coeffs_Computed = true;
+}
+
+/*****************************************************************************
+*
+* FUNCTION
+*
+*       SOR_interpolate
+*
+* INPUT
+*
+*       se : a pointer to the entries in the spline
+*       i  : the first point in the interpolation interval
+*       k  : which dimension of the 5D vector to interpolate in
+*       p  : the parameter to interpolate the value for
+*
+* OUTPUT
+*
+* RETURNS
+*
+*       The value of the kth dimension of the SOR interpolation of the
+*        vector at p
+*
+* AUTHOR
+*
+*       ABX (abx@abx.art.pl)
+*
+* DESCRIPTION
+*
+* CHANGES
+*
+*       2002.08.09 initial version
+*
+******************************************************************************/
+
+DBL SorSpline::interpolate(int i, int k, DBL p)const
+{
+    DBL Result=
+      sqrt(
+        SplinePreComputed[i+1].coeff[k][0]*pow(p,3)
+       +SplinePreComputed[i+1].coeff[k][1]*pow(p,2)
+       +SplinePreComputed[i+1].coeff[k][2]*p
+       +SplinePreComputed[i+1].coeff[k][3]
+      );
+    return Result;
+}
+
+
+
+/*****************************************************************************
+*
+* FUNCTION
+*
+*       Precompute_TCB_Coeffs
+*
+* INPUT
+*
+*       sp : a pointer to the spline to compute interpolation coefficients for
+*
+* AUTHOR
+*
+*       ABX (abx@abx.art.pl)
+*
+* DESCRIPTION
+*
+*       Computes the coefficients used in tcb spline also known as Kochanek-Bartels.
+*       Helpers tcb_in_T() and tcb_out_T() calculates components of incoming and outgoing tangents
+*
+* REFERENCE
+*
+*       http://www.magic-software.com/Documentation/KBSplines.pdf
+*
+* CHANGES
+*
+*       2003.04.10 - Initial version by ABX
+*
+******************************************************************************/
+
+inline DBL tcb_in_T(SplineEntry *se, SplineTcbParam *pe, int k)
+{
+  DBL p1=(1-pe[1].tension)*
+         (1+pe[1].continuity)*
+         (1-pe[1].bias)*
+         (se[2].vec[k]-se[1].vec[k])/2;
+  DBL p2=(1-pe[1].tension)*
+         (1-pe[1].continuity)*
+         (1+pe[1].bias)*
+         (se[1].vec[k]-se[0].vec[k])/2;
+  return p1+p2;
+}
+
+inline DBL tcb_out_T(SplineEntry *se, SplineTcbParam* pe, int k)
+{
+  DBL p1=(1-pe[1].tension)*
+         (1-pe[1].continuity)*
+         (1-pe[1].bias)*
+         (se[2].vec[k]-se[1].vec[k])/2;
+  DBL p2=(1-pe[1].tension)*
+         (1+pe[1].continuity)*
+         (1+pe[1].bias)*
+         (se[1].vec[k]-se[0].vec[k])/2;
+  return p1+p2;
+}
+
+void TcbSpline::Precompute()
+{
+    TcbSpline * sp = this;
+    SplinePreComputedIn.resize( sp->SplineEntries.size());
+    SplinePreComputedOut.resize( sp->SplineEntries.size());
+    for(int i = 1; i < sp->SplineEntries.size() - 2; i++)
+    {
+        for(int k = 0; k < 5; k++)
+        {
+            // incoming tangent from next key
+            sp->SplinePreComputedIn[i].coeff[k] =
+                  tcb_in_T( &(sp->SplineEntries[i]), &(sp->in[i]), k )
+                  * ( sp->SplineEntries[i+2].par - sp->SplineEntries[i+1].par );
+
+            // outgoing tangent from current key
+            sp->SplinePreComputedOut[i].coeff[k] =
+                  tcb_out_T( &(sp->SplineEntries[i-1]), &(sp->out[i-1]), k )
+                  * ( sp->SplineEntries[i+1].par - sp->SplineEntries[i].par );
+        }
+    }
+    sp->Coeffs_Computed = true;
+}
+
+inline DBL H0(DBL s){return (2*s*s-3*s)*s+1;}
+inline DBL H1(DBL s){return (3-2*s)*s*s;}
+inline DBL H2(DBL s){return (s-2)*s*s+s;}
+inline DBL H3(DBL s){return (s-1)*s*s;}
+
+DBL TcbSpline::interpolate(int i, int k, DBL p)const
+{
+    const DBL t=(p-SplineEntries[i].par)/(SplineEntries[i+1].par-SplineEntries[i].par);
+    return (H0(t)*SplineEntries[i].vec[k]+
+            H1(t)*SplineEntries[i+1].vec[k]+
+            H2(t)*SplinePreComputedOut[i].coeff[k]+
+            H3(t)*SplinePreComputedIn[i].coeff[k]);
+}
+
+
+
+/*****************************************************************************
+*
+* FUNCTION
+*
+*       Precompute_Akima_Coeffs
+*
+* INPUT
+*
+*       sp : a pointer to the spline to compute interpolation coefficients for
+*
+* AUTHOR
+*
+*       ABX (abx@abx.art.pl)
+*
+* DESCRIPTION
+*
+*       Computes the coefficients used in akima_spline
+*
+* CHANGES
+*
+*       2003.04.15 - Initial version by ABX
+*
+******************************************************************************/
+
+void AkimaSpline::Precompute()
+{
+    AkimaSpline * sp = this;
+    const int N = SplineEntries.size();
+    DBL* Slope;
+    DBL* Der;
+
+    SplinePreComputed.resize(N);
+    Slope = (DBL *)POV_MALLOC((N+3)*sizeof(DBL), "Spline coefficient storage");
+    Der = (DBL *)POV_MALLOC(N*sizeof(DBL), "Spline coefficient storage");
+
+    for (int k = 0; k < 5; k++)
+    {
+        for (int i = 0; i < N-1; i++)
+        {
+            Slope[i+2] =
+                (SplineEntries[i+1].vec[k] - SplineEntries[i].vec[k]) /
+                (SplineEntries[i+1].par - SplineEntries[i].par);
+        }
+
+        Slope[1  ] = 2.0 * Slope[2  ] - Slope[3  ];
+        Slope[0  ] = 2.0 * Slope[1  ] - Slope[2  ];
+        Slope[N+1] = 2.0 * Slope[N  ] - Slope[N-1];
+        Slope[N+2] = 2.0 * Slope[N+1] - Slope[N  ];
+
+        for (int i = 0; i < N; i++)
+        {
+            if ( Slope[i+1] != Slope[i+2] )
+            {
+                const bool compare = ( Slope[i+2] != Slope[i+3] );
+
+                if ( Slope[i] != Slope[i+1] )
+                {
+                    if ( compare )
+                    {
+                        const DBL d0 = fabs(Slope[i+3] - Slope[i+2]);
+                        const DBL d1 = fabs(Slope[i] - Slope[i+1]);
+                        Der[i] = (d0*Slope[i+1]+d1*Slope[i+2])/(d0+d1);
+                    }
+                    else
+                    {
+                        Der[i] = Slope[i+2];
+                    }
+                }
+                else
+                {
+                    Der[i] = ( compare ) ? ( Slope[i+1] ) : ( (Slope[i+1]+Slope[i+2])/2 ) ;
+                }
+            }
+            else
+            {
+                Der[i] = Slope[i+1];
+            }
+        }
+        for (int i = 0; i < N-1; i++)
+        {
+            const DBL d0 = SplineEntries[i+1].vec[k] - SplineEntries[i].vec[k];
+            const DBL d1 = SplineEntries[i+1].par - SplineEntries[i].par;
+            const DBL d2 = d1*d1;
+
+            SplinePreComputed[i].coeff[k][0] = SplineEntries[i].vec[k];
+            SplinePreComputed[i].coeff[k][1] = Der[i];
+            SplinePreComputed[i].coeff[k][2] = (3.0*d0-d1*(Der[i+1]+2.0*Der[i]))/d2;
+            SplinePreComputed[i].coeff[k][3] = (Der[i]+Der[i+1]-2.0*d0/d1)/d2;
+        }
+    }
+
+    POV_FREE(Der);
+    POV_FREE(Slope);
+
+    sp->Coeffs_Computed = true;
+}
+
+DBL AkimaSpline::interpolate(int i, int k, DBL p)const
+{
+    const DBL d=p-(DBL)SplineEntries[i].par;
+    return SplinePreComputed[i].coeff[k][0]+d*(SplinePreComputed[i].coeff[k][1]+d*(SplinePreComputed[i].coeff[k][2]+d*SplinePreComputed[i].coeff[k][3]));
+}
+
+
+  inline DBL x_f(DBL p, DBL u){return u*u*u*(10.0-p+(2.0*p-15.0)*u+(6.0-p)*u*u);};
+
+
+DBL BasicXSpline::interpolate( int i, int k, DBL p, DBL fd)const
+{
+    const DBL d1=SplineEntries[i+2].par-SplineEntries[i].par;
+    const DBL d2=SplineEntries[i+3].par-SplineEntries[i+1].par;
+    const DBL A0=x_f(fd,(SplineEntries[i+2].par-p)/d1);
+    const DBL A1=x_f(fd,(SplineEntries[i+3].par-p)/d2);
+    const DBL A2=x_f(fd,(p-SplineEntries[i+0].par)/d1);
+    const DBL A3=x_f(fd,(p-SplineEntries[i+1].par)/d2);
+    return (A0*SplineEntries[i  ].vec[k]+
+            A1*SplineEntries[i+1].vec[k]+
+            A2*SplineEntries[i+2].vec[k]+
+            A3*SplineEntries[i+3].vec[k])/
+           (A0+A1+A2+A3);
+}
+
+
+
+DBL ExtendedXSpline::interpolate(int i, int k, DBL p, int N)const
+{
+    const int i0=max(min(i  ,N),0);
+    const int i1=max(min(i+1,N),0);
+    const int i2=max(min(i+2,N),0);
+    const int i3=max(min(i+3,N),0);
+
+    const DBL pp=max(min(p,SplineEntries[N].par),SplineEntries[0].par);
+
+    const DBL d0=SplineEntries[i1].par-SplineEntries[i0].par;
+    const DBL d1=SplineEntries[i2].par-SplineEntries[i1].par;
+    const DBL d2=SplineEntries[i3].par-SplineEntries[i2].par;
+
+    const DBL d02=(SplineEntries[i2].par-SplineEntries[i0].par)/2;
+    const DBL d13=(SplineEntries[i3].par-SplineEntries[i1].par)/2;
+
+    const DBL T0=SplineEntries[i1].par+node[i1].freedom_degree*d1;
+    const DBL p0=2*Sqr((SplineEntries[i2].par-T0)/d02);
+    const DBL A0=(pp>T0)?0:x_f(p0,(T0-pp)/(T0-SplineEntries[i0].par));
+
+    const DBL T1=SplineEntries[i2].par+node[i2].freedom_degree*d2;
+    const DBL p1=2*Sqr((SplineEntries[i3].par-T1)/d13);
+    const DBL A1=(pp>T1)?0:x_f(p1,(pp-T1)/(SplineEntries[i1].par-T1));
+
+    const DBL T2=SplineEntries[i1].par-node[i1].freedom_degree*d0;
+    const DBL p2=2*Sqr((T2-SplineEntries[i0].par)/d02);
+    const DBL A2=(pp<T2)?0:x_f(p2,(pp-T2)/(SplineEntries[i2].par-T2));
+
+    const DBL T3=SplineEntries[i2].par-node[i2].freedom_degree*d1;
+    const DBL p3=2*Sqr((T3-SplineEntries[i1].par)/d13);
+    const DBL A3=(pp<T3)?0:x_f(p3,(pp-T3)/(SplineEntries[i3].par-T3));
+
+    return (A0*SplineEntries[i0].vec[k]+A1*SplineEntries[i1].vec[k]+A2*SplineEntries[i2].vec[k]+A3*SplineEntries[i3].vec[k])/
+           (A0+A1+A2+A3);
+}
+
+
+
+inline DBL x_g(DBL p, DBL q, DBL u){return q*u+2*q*u*u+(10-12*q-p)*u*u*u+(2*p+14*q-15)*u*u*u*u+(6-5*q-p)*u*u*u*u*u;};
+
+inline DBL x_h(DBL q, DBL u){return q*u+2*q*u*u-2*q*u*u*u*u-q*u*u*u*u*u;};
+
+DBL GeneralXSpline::interpolate(int i, int k, DBL p, int N)const
+{
+    const int i0=max(min(i  ,N),0);
+    const int i1=max(min(i+1,N),0);
+    const int i2=max(min(i+2,N),0);
+    const int i3=max(min(i+3,N),0);
+
+    const DBL pp=max(min(p,SplineEntries[N].par),SplineEntries[0].par);
+
+    const DBL d0=SplineEntries[i1].par-SplineEntries[i0].par;
+    const DBL d1=SplineEntries[i2].par-SplineEntries[i1].par;
+    const DBL d2=SplineEntries[i3].par-SplineEntries[i2].par;
+
+    const DBL d02=(SplineEntries[i2].par-SplineEntries[i0].par)/2;
+    const DBL d13=(SplineEntries[i3].par-SplineEntries[i1].par)/2;
+
+    const DBL T0=SplineEntries[i1].par+max(node[i1].freedom_degree,0.0)*d1;
+    const DBL q0=(node[i1].freedom_degree<0)?-node[i1].freedom_degree/2.0:0.0;
+    const DBL p0=(d02!=0.0)?2*Sqr((SplineEntries[i2].par-T0)/d02):0.0;
+    const DBL A0=(i0==i1)?0.0:((pp>T0)?((q0>0)?x_h(q0,(SplineEntries[i2].par-pp)/d1-1):0.0):x_g(p0,q0,(pp-T0)/(SplineEntries[i0].par-T0)));
+
+    const DBL T1=SplineEntries[i2].par+max(node[i2].freedom_degree,0.0)*d2;
+    const DBL q1=(node[i2].freedom_degree<0)?-node[i2].freedom_degree/2.0:0.0;
+    const DBL p1=(d13!=0.0)?2*Sqr((SplineEntries[i3].par-T1)/d13):0.0;
+    const DBL A1=(i1==i2)?0.0:((pp>T1)?0.0:x_g(p1,q1,(pp-T1)/(SplineEntries[i1].par-T1)));
+
+    const DBL T2=SplineEntries[i1].par-max(node[i1].freedom_degree,0.0)*d0;
+    const DBL q2=(node[i1].freedom_degree<0)?-node[i1].freedom_degree/2.0:0.0;
+    const DBL p2=(d02!=0.0)?2*Sqr((T2-SplineEntries[i0].par)/d02):0.0;
+    const DBL A2=(i1==i2)?0.0:((pp<T2)?0.0:x_g(p2,q2,(pp-T2)/(SplineEntries[i2].par-T2)));
+
+    const DBL T3=SplineEntries[i2].par-max(node[i2].freedom_degree,0.0)*d1;
+    const DBL q3=(node[i2].freedom_degree<0)?-node[i2].freedom_degree/2.0:0.0;
+    const DBL p3=(d13!=0.0)?2*Sqr((T3-SplineEntries[i1].par)/d13):0.0;
+    const DBL A3=(i2==i3)?0.0:((pp<T3)?((q3>0)?x_h(q3,(pp-SplineEntries[i1].par)/d1-1):0.0):x_g(p3,q3,(pp-T3)/(SplineEntries[i3].par-T3)));
+
+    return (A0*SplineEntries[i0].vec[k]+A1*SplineEntries[i1].vec[k]+A2*SplineEntries[i2].vec[k]+A3*SplineEntries[i3].vec[k])/
+           (A0+A1+A2+A3);
+}
 
 /*****************************************************************************
 *
@@ -117,17 +551,19 @@ void Precompute_Cubic_Coeffs(GenericSpline *sp);
 *
 ******************************************************************************/
 
-void Precompute_Cubic_Coeffs(GenericSpline *sp)
+void NaturalSpline::Precompute()
 {
     SplineEntryList::size_type i, k;
     DBL *h;
     DBL *b;
     DBL *u;
     DBL *v;
+    NaturalSpline * sp = this;
 
     SplineEntryList::size_type numEntries = sp->SplineEntries.size();
     POV_ASSERT(numEntries >= 2);
-
+    sp->SplinePreComputed.resize( numEntries );
+    
     h = new DBL[numEntries];
     b = new DBL[numEntries];
     u = new DBL[numEntries];
@@ -147,12 +583,12 @@ void Precompute_Cubic_Coeffs(GenericSpline *sp)
             u[i] = 2*(h[i]+h[i-1]) - (h[i-1]*h[i-1])/u[i-1];
             v[i] = 6*(b[i]-b[i-1]) - (h[i-1]*v[i-1])/u[i-1];
         }
-        sp->SplineEntries.back().coeff[k] = 0;
+        sp->SplinePreComputed.back().coeff[k] = 0;
         for(i = numEntries-2; i > 0; i--)
         {
-            sp->SplineEntries[i].coeff[k] = (v[i] - h[i]*sp->SplineEntries[i+1].coeff[k])/u[i];
+            sp->SplinePreComputed[i].coeff[k] = (v[i] - h[i]*sp->SplinePreComputed[i+1].coeff[k])/u[i];
         }
-        sp->SplineEntries[0].coeff[k] = 0;
+        sp->SplinePreComputed[0].coeff[k] = 0;
     }
     sp->Coeffs_Computed = true;
 
@@ -268,7 +704,8 @@ DBL quadratic_interpolate(const SplineEntryList& se, SplineEntryList::size_type 
 *
 * INPUT
 *
-*       se : a pointer to the entries in the spline
+*       se : reference to the entries in the spline
+*       ce : reference to pre computed coefficients in the spline
 *       i  : the first point in the interpolation interval
 *       k  : which dimension of the 5D vector to interpolate in
 *       p  : the parameter to interpolate the value for
@@ -290,12 +727,12 @@ DBL quadratic_interpolate(const SplineEntryList& se, SplineEntryList::size_type 
 *
 ******************************************************************************/
 
-DBL natural_interpolate(const SplineEntryList& se, SplineEntryList::size_type i, int k, DBL p)
+DBL natural_interpolate(const SplineEntryList& se, const SplineCoeffList& ce, SplineEntryList::size_type i, int k, DBL p)
 {
     DBL h, tmp;
     h = se[i+1].par - se[i].par;
-    tmp = se[i].coeff[k]/2.0 + ((p - se[i].par)*(se[i+1].coeff[k] - se[i].coeff[k]))/(6.0*h);
-    tmp = -(h/6.0)*(se[i+1].coeff[k] + 2.0*se[i].coeff[k]) + (se[i+1].vec[k] - se[i].vec[k])/h + (p - se[i].par)*tmp;
+    tmp = ce[i].coeff[k]/2.0 + ((p - se[i].par)*(ce[i+1].coeff[k] - ce[i].coeff[k]))/(6.0*h);
+    tmp = -(h/6.0)*(ce[i+1].coeff[k] + 2.0*ce[i].coeff[k]) + (se[i+1].vec[k] - se[i].vec[k])/h + (p - se[i].par)*tmp;
     return se[i].vec[k] + (p - se[i].par)*tmp;
 }
 
@@ -417,46 +854,6 @@ SplineEntryList::size_type findt(const GenericSpline * sp, DBL Time)
 *
 * FUNCTION
 *
-*       mkfree
-*
-* INPUT
-*
-*       sp : a pointer to the entries in the spline
-*       i  : the index of the entry to make available
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   Wolfgang Ortmann
-*
-* DESCRIPTION
-*
-*       Makes the spline entry at index i available for inserting a new entry
-*       by moving all entries starting with that index down by one slot in the
-*       array.
-*
-* CHANGES
-*
-******************************************************************************/
-
-void mkfree(GenericSpline * sp, SplineEntryList::size_type i)
-{
-    SplineEntryList::size_type j;
-    SplineEntryList& se = sp->SplineEntries;
-
-    se.resize(se.size()+1);
-    for (j=sp->SplineEntries.size()-1; j>i; j--)
-        se[j] = se[j-1];
-}
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
 *       Create_Spline
 *
 * INPUT
@@ -502,6 +899,26 @@ NaturalSpline::NaturalSpline() : GenericSpline()
 CatmullRomSpline::CatmullRomSpline() : GenericSpline()
 {}
 
+SorSpline::SorSpline(): GenericSpline()
+{}
+
+AkimaSpline::AkimaSpline(): GenericSpline()
+{}
+
+TcbSpline::TcbSpline(): GenericSpline()
+{}
+
+XSpline::XSpline(): GenericSpline()
+{}
+
+BasicXSpline::BasicXSpline(): GenericSpline()
+{}
+
+ExtendedXSpline::ExtendedXSpline(): XSpline()
+{}
+
+GeneralXSpline::GeneralXSpline(): XSpline()
+{}
 
 /*****************************************************************************
 *
@@ -551,6 +968,32 @@ NaturalSpline::NaturalSpline(const GenericSpline& o) : GenericSpline(o)
 {}
 
 CatmullRomSpline::CatmullRomSpline(const GenericSpline& o) : GenericSpline(o)
+{}
+
+SorSpline::SorSpline( const GenericSpline& o ): GenericSpline(o)
+{}
+
+AkimaSpline::AkimaSpline( const GenericSpline& o ): GenericSpline(o)
+{}
+
+TcbSpline::TcbSpline( const GenericSpline& o ): GenericSpline(o)
+{
+  in.resize( SplineEntries.size() );
+  out.resize( SplineEntries.size() );
+}
+
+XSpline::XSpline( const GenericSpline& o ): GenericSpline(o)
+{
+  node.resize( SplineEntries.size() );
+}
+
+BasicXSpline::BasicXSpline( const GenericSpline& o ): GenericSpline(o)
+{}
+
+ExtendedXSpline::ExtendedXSpline( const GenericSpline& o ): XSpline(o)
+{}
+
+GeneralXSpline::GeneralXSpline( const GenericSpline& o ): XSpline(o)
 {}
 
 GenericSpline * Copy_Spline(const GenericSpline * Old)
@@ -690,14 +1133,135 @@ void Insert_Spline_Entry(GenericSpline * sp, DBL p, const EXPRESS& v)
     }
     else
     {
+        SplineEntry fresh;
+        fresh.par = p;
+        for(k=0; k<5; k++)
+            fresh.vec[k] = v[k];
+        SplineEntryList::const_iterator pos = sp->SplineEntries.begin();
+        pos += i;
+        sp->SplineEntries.insert( pos, fresh );
+        /*
         mkfree(sp, i);
         sp->SplineEntries[i].par = p;
 
         for(k=0; k<5; k++)
             sp->SplineEntries[i].vec[k] = v[k];
+            */
     }
 }
 
+void Insert_Spline_Entry(GenericSpline * sp, DBL p, const EXPRESS& v, const SplineFreedom& f)
+{
+    XSpline * ssp = dynamic_cast<XSpline *>(sp);
+    BasicXSpline * bsp = dynamic_cast<BasicXSpline *>(sp);
+    SplineEntryList::size_type i;
+    int k;
+
+    /* Reset the Coeffs_Computed flag.  Inserting a new point invalidates
+     *  pre-computed coefficients */
+    sp->Coeffs_Computed = false;
+    if (bsp)
+    {
+        bsp->freedom = f;
+    }
+  
+    i = findt(sp, p);
+    // If p is already in the spline, replace it.
+    bool replace = false;
+    if (!sp->SplineEntries.empty())
+    {
+        // If p matches the _last_ spline entry, `findt()` is implemented to return `sp->SplineEntries.size()`
+        // instead of the index of the matching entry; this has some benefits in the other places `findt()` is used,
+        // but requires the following workaround here.
+        if (i < sp->SplineEntries.size())
+            replace = (sp->SplineEntries[i].par == p);
+        else if (sp->SplineEntries[i-1].par == p)
+        {
+            --i;
+            replace = true;
+        }
+    }
+    if(replace)
+    {
+        for(k=0; k<5; k++)
+            sp->SplineEntries[i].vec[k] = v[k];
+        if ( ssp)
+            ssp->node[i] = f;
+    }
+    else
+    {
+        SplineEntry fresh;
+        fresh.par = p;
+        for(k=0; k<5; k++)
+            fresh.vec[k] = v[k];
+        SplineEntryList::const_iterator pos = sp->SplineEntries.begin();
+        pos += i;
+        sp->SplineEntries.insert( pos, fresh );
+        if ( ssp)
+        {
+            SplineFreedomList::const_iterator posf = ssp->node.begin();
+            posf += i;
+            ssp->node.insert( posf, f );
+        }
+    }
+}
+
+
+void Insert_Spline_Entry(GenericSpline * sp, DBL p, const EXPRESS& v, const SplineTcbParam& intcb, const SplineTcbParam& outtcb )
+{
+    TcbSpline * tsp = dynamic_cast<TcbSpline *>(sp);
+    SplineEntryList::size_type i;
+    int k;
+
+    /* Reset the Coeffs_Computed flag.  Inserting a new point invalidates
+     *  pre-computed coefficients */
+    sp->Coeffs_Computed = false;
+    i = findt(sp, p);
+    // If p is already in the spline, replace it.
+    bool replace = false;
+    if (!sp->SplineEntries.empty())
+    {
+        // If p matches the _last_ spline entry, `findt()` is implemented to return `sp->SplineEntries.size()`
+        // instead of the index of the matching entry; this has some benefits in the other places `findt()` is used,
+        // but requires the following workaround here.
+        if (i < sp->SplineEntries.size())
+            replace = (sp->SplineEntries[i].par == p);
+        else if (sp->SplineEntries[i-1].par == p)
+        {
+            --i;
+            replace = true;
+        }
+    }
+    if(replace)
+    {
+        for(k=0; k<5; k++)
+            sp->SplineEntries[i].vec[k] = v[k];
+        if (tsp)
+        {
+            tsp->in[i] = intcb;
+            tsp->out[i] = outtcb;
+        }
+    }
+    else
+    {
+        SplineEntry fresh;
+        fresh.par = p;
+        for(k=0; k<5; k++)
+            fresh.vec[k] = v[k];
+        SplineEntryList::const_iterator pos = sp->SplineEntries.begin();
+        pos += i;
+        sp->SplineEntries.insert( pos, fresh );
+        if (tsp)
+        {
+            SplineTcbParamList::const_iterator posi = tsp->in.begin();
+            SplineTcbParamList::const_iterator poso = tsp->out.begin();
+            posi += i;
+            poso += i;
+            tsp->in.insert( posi, intcb );
+            tsp->out.insert( poso, outtcb );
+        }
+    }
+}
 
 /*****************************************************************************
 *
@@ -802,7 +1366,7 @@ void NaturalSpline::Get(DBL p, EXPRESS& v)
     else
     {
         if (!Coeffs_Computed)
-            Precompute_Cubic_Coeffs(this);
+            Precompute();
         /* Find which spline segment we're in.  i is the control point at the end of the segment */
         SplineEntryList::size_type i = findt(this, p);
         for(int k=0; k<5; k++)
@@ -814,10 +1378,118 @@ void NaturalSpline::Get(DBL p, EXPRESS& v)
                 v[k] = SplineEntries.back().vec[k];
             /* Else, normal case.  cubic_interpolate can handle the case of not enough points */
             else
-                v[k] = natural_interpolate(SplineEntries, i-1, k, p);
+                v[k] = natural_interpolate(SplineEntries, SplinePreComputed, i-1, k, p);
         }
     }
 }
+
+void SorSpline::Get(DBL p, EXPRESS& v)
+{
+    if (SplineEntries.size() == 1)
+        memcpy(&v, &SplineEntries.front().vec, sizeof(EXPRESS));
+    else
+    {
+        if (!Coeffs_Computed)
+            Precompute();
+        SplineEntryList::size_type last = SplineEntries.size()-1;
+        SplineEntryList::size_type i = findt(this, p);
+        for(int k=0; k<5; k++)
+        {
+            if(i <= 1)
+                v[k] = SplineEntries[1].vec[k];
+            else if(i >= last)
+                v[k] = SplineEntries[last-1].vec[k];
+            else
+                v[k] = interpolate( i-1, k, p);
+        }
+    }
+}
+
+void AkimaSpline::Get(DBL p, EXPRESS& v)
+{
+    if (SplineEntries.size() == 1)
+        memcpy(&v, &SplineEntries.front().vec, sizeof(EXPRESS));
+    else
+    {
+        if (!Coeffs_Computed)
+            Precompute();
+        SplineEntryList::size_type last = SplineEntries.size()-1;
+        SplineEntryList::size_type i = findt(this, p);
+        for(int k=0; k<5; k++)
+        {
+            if(i == 0)
+                v[k] = SplineEntries.front().vec[k];
+            else if(i > last )
+                v[k] = SplineEntries.back().vec[k];
+            else
+                v[k] = interpolate( i-1, k, p);
+        }
+    }
+}
+
+void TcbSpline::Get(DBL p, EXPRESS& v)
+{
+    if (SplineEntries.size() == 1)
+        memcpy(&v, &SplineEntries.front().vec, sizeof(EXPRESS));
+    else
+    {
+        if (!Coeffs_Computed)
+            Precompute();
+        SplineEntryList::size_type last = SplineEntries.size()-1;
+        SplineEntryList::size_type i = findt(this, p);
+        for(int k=0; k<5; k++)
+        {
+            if(i <= 1)
+                v[k] = SplineEntries[1].vec[k];
+            else if(i >= last)
+                v[k] = SplineEntries[last-1].vec[k];
+            else
+                v[k] = interpolate( i-1, k, p);
+        }
+    }
+}
+
+void BasicXSpline::Get(DBL p, EXPRESS& v)
+{
+    if (SplineEntries.size() == 1)
+        memcpy(&v, &SplineEntries.front().vec, sizeof(EXPRESS));
+    else
+    {
+        SplineEntryList::size_type last = SplineEntries.size()-1;
+        SplineEntryList::size_type i = findt(this, p);
+        for(int k=0; k<5; k++)
+        {
+            if(i <= 1)
+                v[k] = interpolate( 0, k, SplineEntries[1].par, freedom.freedom_degree );
+            else if(i >= last)
+                v[k] = interpolate( last-3, k, SplineEntries[last-1].par, freedom.freedom_degree );
+            else
+                v[k] = interpolate( i-2, k, p, freedom.freedom_degree );
+        }
+    }
+}
+
+
+void XSpline::Get(DBL p, EXPRESS& v)
+{
+    if (SplineEntries.size() == 1)
+        memcpy(&v, &SplineEntries.front().vec, sizeof(EXPRESS));
+    else
+    {
+        SplineEntryList::size_type last = SplineEntries.size()-1;
+        SplineEntryList::size_type i = findt(this, p);
+        for(int k=0; k<5; k++)
+        {
+            if(i == 0)
+                v[k] = SplineEntries.front().vec[k];
+            else if(i > last )
+                v[k] = SplineEntries.back().vec[k];
+            else
+                v[k] = interpolate( max(int(i-2),int(-1)), k, p, last);
+        }
+    }
+}
+
 
 void CatmullRomSpline::Get(DBL p, EXPRESS& v)
 {
@@ -844,6 +1516,8 @@ void CatmullRomSpline::Get(DBL p, EXPRESS& v)
         }
     }
 }
+
+
 
 DBL Get_Spline_Val(GenericSpline *sp, DBL p, EXPRESS& v, int *Terms)
 {

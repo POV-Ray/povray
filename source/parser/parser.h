@@ -783,6 +783,7 @@ class Parser : public SceneTask
         ObjectPtr Parse_Poly(int order);
         ObjectPtr Parse_Polynom();
         ObjectPtr Parse_Polygon();
+        ObjectPtr Parse_Polyline();
         ObjectPtr Parse_Prism();
         ObjectPtr Parse_Quadric();
         ObjectPtr Parse_Smooth_Triangle();
