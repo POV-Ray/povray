@@ -52,6 +52,7 @@
 #include "core/material/blendmap.h"
 #include "core/material/pigment.h"
 #include "core/material/warp.h"
+#include "core/shape/mesh.h"
 #include "core/scene/camera.h"
 
 #include "parser/fncode.h"
@@ -514,6 +515,121 @@ class Parser : public SceneTask
         shared_ptr<BackendSceneData> backendSceneData; // TODO FIXME HACK - make private again once Locate_Filename is fixed [trf]
         shared_ptr<SceneData> sceneData;
 
+        // tesselation.cpp
+        ObjectPtr Parse_Tesselation(void);
+        ObjectPtr Parse_Tessel(void);
+
+        void Parse_Tesselation_In_Mesh(Mesh* m, MESH_TRIANGLE** trs,TEXTURE*** textu,
+            SnglVector3d** verts, SnglVector3d** norms,bool& full,
+            int* m_tri,int *m_tex,int* m_vert,int* m_norm,
+            int* n_tri,int *n_tex,int* n_vert,int* n_norm);
+        void Parse_Tessel_In_Mesh(Mesh* m, MESH_TRIANGLE** trs,TEXTURE*** textu,
+            SnglVector3d** verts, SnglVector3d** norms,bool& full,
+            int* m_tri,int *m_tex,int* m_vert,int* m_norm,
+            int* n_tri,int *n_tex,int* n_vert,int* n_norm);
+
+        ObjectPtr Parse_Bourke(void);
+        ObjectPtr Parse_Heller(void);
+
+        void Parse_Bourke_In_Mesh(Mesh* m, MESH_TRIANGLE** trs,TEXTURE*** textu,
+            SnglVector3d** verts, SnglVector3d** norms,bool& full,
+            int* m_tri,int *m_tex,int* m_vert,int* m_norm,
+            int* n_tri,int *n_tex,int* n_vert,int* n_norm);
+        void Parse_Heller_In_Mesh(Mesh* m, MESH_TRIANGLE** trs,TEXTURE*** textu,
+            SnglVector3d** verts, SnglVector3d** norms,bool& full,
+            int* m_tri,int *m_tex,int* m_vert,int* m_norm,
+            int* n_tri,int *n_tex,int* n_vert,int* n_norm);
+
+        void Parse_Get_Vertex(Vector3d& Vect);
+        void Parse_Get_Normal(Vector3d& Vect);
+        void Parse_Get_Vertex_Indices(Vector3d& Vect);
+        void Parse_Get_Normal_Indices(Vector3d& Vect);
+
+        DBL Parse_Get_Triangles_Amount(void);
+        DBL Parse_Get_Vertices_Amount(void);
+        DBL Parse_Get_Normals_Amount(void);
+        DBL Parse_Is_Smooth_Triangle(void);
+
+        ObjectPtr Parse_Cubicle(void);
+        ObjectPtr Parse_Select(void);
+
+        void Parse_Cubicle_In_Mesh(Mesh* m, MESH_TRIANGLE** trs,TEXTURE*** textu,
+            SnglVector3d** verts, SnglVector3d** norms,bool& full,
+            int* m_tri,int *m_tex,int* m_vert,int* m_norm,
+            int* n_tri,int *n_tex,int* n_vert,int* n_norm);
+
+        void Parse_Select_In_Mesh(Mesh* m, MESH_TRIANGLE** trs,TEXTURE*** textu,
+            SnglVector3d** verts, SnglVector3d** norms,bool& full,
+            int* m_tri,int *m_tex,int* m_vert,int* m_norm,
+            int* n_tri,int *n_tex,int* n_vert,int* n_norm);
+
+        ObjectPtr Parse_Grid(void);
+
+        ObjectPtr Parse_Cristal(void);
+
+        void Parse_Cristal_In_Mesh(Mesh* m, MESH_TRIANGLE** trs, TEXTURE*** textu,
+            SnglVector3d** verts, SnglVector3d** norms,bool& full,
+            int* m_tri,int *m_tex,int* m_vert,int* m_norm,
+            int* n_tri,int* n_tex,int* n_vert,int* n_norm);
+
+
+        ObjectPtr Parse_Screw(void);
+
+        void Parse_Screw_In_Mesh(Mesh* m, MESH_TRIANGLE** trs, TEXTURE*** textu,
+            SnglVector3d** verts, SnglVector3d** norms,bool& full,
+            int* m_tri,int* m_tex,int* m_vert,int* m_norm,
+            int* n_tri,int* n_tex,int* n_vert,int* n_norm);
+
+        ObjectPtr Parse_Roll(void);
+
+        void Parse_Roll_In_Mesh(Mesh* m, MESH_TRIANGLE** trs, TEXTURE*** textu,
+            SnglVector3d** verts, SnglVector3d** norms,bool& full,
+            int* m_tri,int* m_tex,int* m_vert,int* m_norm,
+            int* n_tri,int* n_tex,int* n_vert,int* n_norm);
+
+        ObjectPtr Parse_Bend(void);
+        ObjectPtr Parse_Displace(void);
+        ObjectPtr Parse_Move_Object(void);
+        ObjectPtr Parse_Warp_Object(void);
+        ObjectPtr Parse_Planet(void);
+
+        void Parse_Warp_In_Mesh(Mesh* m, MESH_TRIANGLE** trs, TEXTURE*** textu,
+            SnglVector3d** verts, SnglVector3d** norms,bool& full,
+            int* m_tri,int* m_tex,int* m_vert,int* m_norm,
+            int* n_tri,int* n_tex,int* n_vert,int* n_norm);
+
+        void Parse_Bend_In_Mesh(Mesh* m, MESH_TRIANGLE** trs, TEXTURE*** textu,
+            SnglVector3d** verts, SnglVector3d** norms,bool& full,
+            int* m_tri,int* m_tex,int* m_vert,int* m_norm,
+            int* n_tri,int* n_tex,int* n_vert,int* n_norm);
+
+        void Parse_Displace_In_Mesh(Mesh* m, MESH_TRIANGLE** trs, TEXTURE*** textu,
+            SnglVector3d** verts, SnglVector3d** norms,bool& full,
+            int* m_tri,int* m_tex,int* m_vert,int* m_norm,
+            int* n_tri,int* n_tex,int* n_vert,int* n_norm);
+
+        void Parse_Move_In_Mesh(Mesh* m, MESH_TRIANGLE** trs, TEXTURE*** textu,
+            SnglVector3d** verts, SnglVector3d** norms,bool& full,
+            int* m_tri,int* m_tex,int* m_vert,int* m_norm,
+            int* n_tri,int* n_tex,int* n_vert,int* n_norm);
+
+        ObjectPtr Parse_Smooth(void);
+
+        void Parse_Smooth_In_Mesh(Mesh* m, MESH_TRIANGLE** trs, TEXTURE*** textu,
+            SnglVector3d** verts, SnglVector3d** norms, bool& full,
+            int* m_tri,int* m_tex,int* m_vert,int* m_norm,
+            int* n_tri,int* n_tex,int* n_vert,int* n_norm);
+
+        void Parse_Gts_Save(void);
+        void Parse_Stl_Save(void);
+        ObjectPtr Parse_Gts_Load(void);
+        ObjectPtr Parse_Stl_Load(void);
+
+        void Parse_Load_In_Mesh(Mesh* m, MESH_TRIANGLE** trs, TEXTURE*** textu,
+            SnglVector3d** verts, SnglVector3d** norms, bool& full,
+            int* m_tri,int* m_tex,int* m_vert,int* m_norm,
+            int* n_tri,int* n_tex,int* n_vert,int* n_norm);
+
     private:
 
         struct BraceStackEntry
@@ -667,6 +783,7 @@ class Parser : public SceneTask
         ObjectPtr Parse_Poly(int order);
         ObjectPtr Parse_Polynom();
         ObjectPtr Parse_Polygon();
+        ObjectPtr Parse_Polyline();
         ObjectPtr Parse_Prism();
         ObjectPtr Parse_Quadric();
         ObjectPtr Parse_Smooth_Triangle();
@@ -864,6 +981,260 @@ class Parser : public SceneTask
         // TODO - obsolete
         RGBFTColour *Create_Colour (void);
         RGBFTColour *Copy_Colour (const RGBFTColour* Old);
+
+
+
+        // tesselation.cpp
+        struct UNDERCONSTRUCTION
+        {
+            Mesh* tesselationMesh;
+            int number_of_normals, number_of_textures, number_of_triangles, number_of_vertices;
+            int max_normals, max_textures, max_vertices, max_triangles;
+            SnglVector3d *Normals, *Vertices;
+            MESH_TRIANGLE *Triangles;
+            TEXTURE **Textures;
+            TEXTURE *Default_Texture;
+            int albinos;
+            Vector3d Inside_Vect;
+        };
+
+        struct GTSInfo
+        {
+            ObjectPtr  object;
+            bool reverse; /* inverse right hand and left hand */
+        };
+
+        struct STLInfo
+        {
+            ObjectPtr  object;
+            bool reverse;/* inverse right hand and left hand */
+        };
+
+        struct STL_Entry
+        {
+            float normal[3];
+            float vertex1[3];
+            float vertex2[3];
+            float vertex3[3];
+            uint_least16_t attribute;
+        };
+
+        struct GTS_Edge
+        {
+            unsigned int first;
+            unsigned int second;
+            bool operator<(const GTS_Edge& o) const
+            {
+                return (first<o.first)||((first == o.first)&&(second<o.second));
+            }
+            GTS_Edge(const unsigned int a, const unsigned int b):first(a),second(b){}
+        };
+
+        struct TetraCoordInfo
+        {
+            ObjectPtr Object;
+            Vector3d Coord[8];
+            int Inside[8];
+            Vector3d Intersection[8][8][2];
+            TEXTURE *Texture[8][8];
+        };
+
+        struct MarchingCubeInfo
+        {
+            ObjectPtr Object;
+            Vector3d Coord[8]; /* cube vertex */
+            int Inside[8];
+            Vector3d Vertex[12]; /* vertex on the edge */
+        };
+
+        struct GTetraCoordInfo
+        {
+            ObjectPtr Object;
+            Vector3d Coord[8];
+            int Has_inter[8][8];
+            Vector3d Intersection[8][8][2];
+        };
+
+        struct CristalCoordInfo
+        {
+            Vector3d Coord[8];
+            int Inside[8];
+            int Count_Inside;
+        };
+
+
+        struct CubCoordInfo
+        {
+            Vector3d Coord[8];
+            int Inside[8];
+        };
+
+        struct ScrewCoordInfo
+        {
+            TEXTURE *NPat;
+            Vector3d origin;
+            Vector3d axis;
+            Vector3d angle;
+            DBL    x2,y2,z2,xy,xz,yz;
+            Vector3d no_move;
+            DBL amount;
+            int have_min;
+            int have_max;
+            DBL min_angle;
+            DBL max_angle;
+            int inverse; /* only to reverse a screw from left to right */
+        };
+
+        struct DisplaceInfo
+        {  TEXTURE *NPat;
+            DBL amount;
+            DBL offset;
+            int have_inside;
+            Vector3d inside;
+        };
+
+        struct PlanetInfo
+        {
+            Vector3d center;
+            unsigned int iteration;
+            DBL amount;
+            DBL jitter;
+            int seed;
+        };
+
+
+
+        void StartAddingTriangles(UNDERCONSTRUCTION *das);
+        void ExpandTrianglesTable(UNDERCONSTRUCTION *das);
+        void AddVertices(Vector3d& P1, Vector3d& P2, Vector3d& P3,UNDERCONSTRUCTION *das );
+        void AddTriangle(Vector3d& P1, Vector3d& P2, Vector3d& P3,
+                TEXTURE *T1, TEXTURE *T2, TEXTURE *T3,
+                UNDERCONSTRUCTION *das);
+        void AddSmoothTriangle(Vector3d& P1, Vector3d& P2, Vector3d& P3,
+                TEXTURE *T1, TEXTURE *T2, TEXTURE *T3,
+                Vector3d& N1, Vector3d& N2, Vector3d& N3, UNDERCONSTRUCTION *das);
+        void DoneAddingTriangles(UNDERCONSTRUCTION *das);
+        ObjectPtr  Gts_Load_Object(char *filename, GTSInfo *info,
+                UNDERCONSTRUCTION *das);
+        ObjectPtr  Stl_Load_Object(char *filename, STLInfo *info,
+                UNDERCONSTRUCTION *das);
+        void Stl_Save_Object(char *filename, STLInfo *info);
+        void Gts_Save_Object(char *filename, GTSInfo *info,
+                UNDERCONSTRUCTION *das);
+        void AssignTCoord(TetraCoordInfo* info, int cInd, DBL xc, DBL yc, DBL zc);
+        void CopyTCoord(TetraCoordInfo* info, int sInd, int dInd);
+        void CopyIntersection(TetraCoordInfo* info,
+                int sInd1, int sInd2, int dInd1, int dInd2);
+        Intersection tess_intersect;
+        void CalcIntersection(TetraCoordInfo* info, int P1ind, int P2ind,
+                int Smooth);
+        void TesselateTetrahedron(TetraCoordInfo* info,
+                int P1ind, int P2ind, int P3ind, int P4ind,
+				int Smooth, UNDERCONSTRUCTION *das);
+        ObjectPtr Tesselate_Object(ObjectPtr Obj,
+				int XAccuracy, int YAccuracy, int ZAccuracy,
+				int Sm, DBL BBoxOffs, UNDERCONSTRUCTION *das);
+        static const short bourke_table[256][16];
+        static const short heller_table[256][13];
+        static const short edgeTable[256];
+        void AssignMCCoord(MarchingCubeInfo* info, int cInd,
+                DBL xc, DBL yc, DBL zc);
+        void CopyMCCoord(MarchingCubeInfo* info, int sInd, int dInd);
+        void InterpolMC(int edge, int Preci, MarchingCubeInfo * info,
+                int ind1, int ind2);
+        ObjectPtr BourkeHeller_Object(ObjectPtr Obj, int which,
+                int XAccuracy, int YAccuracy, int ZAccuracy,
+                int Preci, DBL BBoxOffs, UNDERCONSTRUCTION *das);
+        void AssignGTCoord(GTetraCoordInfo* info, int cInd,
+                DBL xc, DBL yc, DBL zc);
+        void CopyGTCoord(GTetraCoordInfo* info, int sInd, int dInd);
+        ObjectPtr GTesselate_Object(ObjectPtr Obj,
+                int XAccuracy, int YAccuracy, int ZAccuracy,
+                int Sm, DBL BBoxOffs, UNDERCONSTRUCTION *das);
+        void AssignCrCoord(CristalCoordInfo* info, int cInd,
+                DBL xc, DBL yc, DBL zc);
+        void CopyCrCoord(CristalCoordInfo* info, int sInd, int dInd);
+        void CopyCrIntersection(CristalCoordInfo* info,
+                int sInd1, int sInd2, int dInd1, int dInd2);
+        void AddOneSurfaceCristal(CristalCoordInfo* info, int P1ind, int P2ind, int P3ind, int P4ind, 
+                UNDERCONSTRUCTION *das);
+        void AnalyseCubeFaceCristal(CristalCoordInfo* info, int P1ind,
+                int P2ind, int P3ind, int P4ind,
+                UNDERCONSTRUCTION *das);
+        ObjectPtr Cristallise_Object(ObjectPtr Obj,
+                int XAccuracy, int YAccuracy, int ZAccuracy,
+                UNDERCONSTRUCTION *das);
+        ObjectPtr Gridify_Object(ObjectPtr Obj, DBL factor, DBL nor);
+        void AssignCuCoord(CubCoordInfo* info, int cInd,
+				DBL xc, DBL yc, DBL zc);
+        void CopyCuCoord(CubCoordInfo* info, int sInd, int dInd);
+        void CopyCuIntersection(CubCoordInfo* info,
+                int sInd1, int sInd2, int dInd1, int dInd2);
+        static const int orthotable[5][2];
+        void AddOneSurfaceCube(CubCoordInfo* info, int P1ind, int P2ind,
+                UNDERCONSTRUCTION *das);
+        ObjectPtr Tesselate_Object_Cube(ObjectPtr Obj,
+                int XAccuracy, int YAccuracy, int ZAccuracy,
+                UNDERCONSTRUCTION *das);
+        void Init_Rotation_Transform(ScrewCoordInfo * info);
+        void Comp_Rotation_Transform(TRANSFORM *transform, ScrewCoordInfo * info,
+                DBL amount);
+        void Extract_Normal_Direct(SnglVector3d*n,
+                int norma, SnglVector3d vertex, SnglVector3d extr1, SnglVector3d extr2, Vector3d& modif);
+        ObjectPtr Screwlise_Object(ObjectPtr Obj,
+                ScrewCoordInfo *info, 
+                UNDERCONSTRUCTION *das);
+        ObjectPtr Roll_Object(ObjectPtr Obj,
+                ScrewCoordInfo *info,
+                UNDERCONSTRUCTION *das);
+        ObjectPtr Bend_Object(ObjectPtr Obj,
+                ScrewCoordInfo *info,
+                UNDERCONSTRUCTION *das);
+        struct SmoothInfo
+        {
+            int method;
+            DBL amount;
+        };
+        struct SelectInfo
+        {
+            ObjectPtr  bound;
+            int inside;
+            int outside;
+            int bin;
+            int bout;
+        };
+
+        void Extract_Normal(SmoothInfo *info,SnglVector3d*n,
+                int norma, SnglVector3d vertex, SnglVector3d extr1, SnglVector3d extr2, Vector3d& modif);
+        ObjectPtr Smooth_Object(ObjectPtr Obj,
+                SmoothInfo *info, UNDERCONSTRUCTION *das);
+        struct WarpInfo
+        {
+            TPATTERN dummy_texture;// used for warps
+            TEXTURE *NPat;
+            TRANSFORM transform;
+        };
+
+        struct MoveInfo
+        {  
+            TEXTURE *NPat;
+            TRANSFORM transform;
+        };
+
+        ObjectPtr Warp_Object(ObjectPtr Obj,
+                WarpInfo &info, UNDERCONSTRUCTION *das);
+        ObjectPtr Move_Object(ObjectPtr Obj,
+                MoveInfo *info, UNDERCONSTRUCTION *das);
+        ObjectPtr Select_Object(ObjectPtr Obj,
+                SelectInfo *info, UNDERCONSTRUCTION *das);
+        void Compute_Normal(Vector3d& Norm,Vector3d& V0,Vector3d& V1,Vector3d& V2,Vector3d& old);
+        ObjectPtr Displace_Object(ObjectPtr Obj,
+                DisplaceInfo *info, UNDERCONSTRUCTION *das);
+        ObjectPtr Planet_Object(ObjectPtr Obj,
+                PlanetInfo *info, UNDERCONSTRUCTION *das);
+        Mesh* ParseParameter(int OneParam);
+        int ParseSecondParameter(void);
+        void Apply_Texture(bool& full, UNDERCONSTRUCTION *das,int n_tri,TEXTURE *textu);
 };
 
 }

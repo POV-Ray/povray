@@ -92,6 +92,7 @@
 #include "core/shape/plane.h"
 #include "core/shape/polynomial.h"
 #include "core/shape/polygon.h"
+#include "core/shape/polyline.h"
 #include "core/shape/prism.h"
 #include "core/shape/quadric.h"
 #include "core/shape/sor.h"
@@ -4226,6 +4227,128 @@ void Parser::Parse_Mesh1 (Mesh* Object)
     Object->Create_Mesh_Hash_Tables();
 
     EXPECT
+        CASE(GTS_LOAD_TOKEN)
+          Parse_Load_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(KEEP_TOKEN)
+          Parse_Select_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(CUBICLE_TOKEN)
+          Parse_Cubicle_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(CRISTAL_TOKEN)
+          Parse_Cristal_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(BOURKE_TOKEN)
+          Parse_Bourke_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(HELLER_TOKEN)
+          Parse_Heller_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(ROLL_TOKEN)
+          Parse_Roll_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(BEND_TOKEN)
+          Parse_Bend_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(MOVE_TOKEN)
+          Parse_Move_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(WARP_TOKEN)
+          Parse_Warp_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(SCREW_TOKEN)
+          Parse_Screw_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(SMOOTH_TOKEN)
+          Parse_Smooth_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(DISPLACE_TOKEN)
+          Parse_Displace_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+    
+        CASE(TESSELATE_TOKEN)
+          Parse_Tesselation_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(TESSEL_TOKEN)
+          Parse_Tessel_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+
         CASE(TRIANGLE_TOKEN)
             Parse_Begin();
 
@@ -6783,7 +6906,6 @@ ObjectPtr Parser::Parse_TrueType ()
     DBL depth;
     Vector3d offset;
     int builtin_font = 0;
-    TRANSFORM Local_Trans;
 
     if((sceneData->EffectiveLanguageVersion() < 350) && (sceneData->stringEncoding == kStringEncoding_ASCII))
     {
@@ -6840,11 +6962,6 @@ ObjectPtr Parser::Parse_TrueType ()
 
     /**** Compute_TTF_BBox(Object); */
     Object->Compute_BBox();
-
-    /* This tiny rotation should fix cracks in text that lies along an axis */
-    offset = Vector3d(0.001, 0.001, 0.001); // TODO - try to find a different solution to this hack
-    Compute_Rotation_Transform(&Local_Trans, offset);
-    Rotate_Object (reinterpret_cast<ObjectPtr>(Object), offset, &Local_Trans);
 
     /* Get any rotate/translate or texturing stuff */
     Object = Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
@@ -7052,6 +7169,10 @@ ObjectPtr Parser::Parse_Object ()
 
         /* Parse prism primitive. [DB 8/94] */
 
+        CASE (POLYLINE_TOKEN)
+            Object = Parse_Polyline();
+        END_CASE
+
         CASE (PRISM_TOKEN)
             Object = Parse_Prism();
         END_CASE
@@ -7139,6 +7260,74 @@ ObjectPtr Parser::Parse_Object ()
 
         CASE (LIGHT_SOURCE_TOKEN)
             Object = Parse_Light_Source ();
+        END_CASE
+
+        CASE (GTS_LOAD_TOKEN)
+            Object = Parse_Gts_Load();
+        END_CASE
+
+        CASE (STL_LOAD_TOKEN)
+            Object = Parse_Stl_Load();
+        END_CASE
+
+        CASE (KEEP_TOKEN)
+            Object = Parse_Select();
+        END_CASE
+
+        CASE (CUBICLE_TOKEN)
+            Object = Parse_Cubicle();
+        END_CASE
+
+        CASE (CRISTAL_TOKEN)
+            Object = Parse_Cristal();
+        END_CASE
+
+        CASE (BOURKE_TOKEN)
+            Object = Parse_Bourke();
+        END_CASE
+
+        CASE (HELLER_TOKEN)
+            Object = Parse_Heller();
+        END_CASE
+
+        CASE (ROLL_TOKEN)
+            Object = Parse_Roll();
+        END_CASE
+
+        CASE (BEND_TOKEN)
+            Object = Parse_Bend();
+        END_CASE
+
+        CASE (MOVE_TOKEN)
+            Object = Parse_Move_Object();
+        END_CASE
+
+        CASE (WARP_TOKEN)
+            Object = Parse_Warp_Object();
+        END_CASE
+
+        CASE (SCREW_TOKEN)
+            Object = Parse_Screw();
+        END_CASE
+
+        CASE (SMOOTH_TOKEN)
+            Object = Parse_Smooth();
+        END_CASE
+
+        CASE (DISPLACE_TOKEN)
+            Object = Parse_Displace();
+        END_CASE
+
+        CASE (PLANET_TOKEN)
+            Object = Parse_Planet();
+        END_CASE
+
+        CASE (TESSELATE_TOKEN)
+            Object = Parse_Tesselation();
+        END_CASE
+
+        CASE (TESSEL_TOKEN)
+            Object = Parse_Tessel();
         END_CASE
 
         CASE (OBJECT_TOKEN)
@@ -7424,6 +7613,15 @@ void Parser::Parse_Frame ()
             CASE (GLOBAL_SETTINGS_TOKEN)
                 Parse_Global_Settings();
             END_CASE
+
+            CASE (GTS_SAVE_TOKEN)
+                Parse_Gts_Save();
+            END_CASE
+
+            CASE (STL_SAVE_TOKEN)
+                Parse_Stl_Save();
+            END_CASE
+
 
             OTHERWISE
                 UNGET
@@ -11502,4 +11700,168 @@ void Parser::SignalProgress(POV_LONG elapsedTime, POV_LONG tokenCount)
     RenderBackend::SendSceneOutput(backendSceneData->sceneId, backendSceneData->frontendAddress, kPOVMsgIdent_Progress, obj);
 }
 
+/*****************************************************************************
+*
+* FUNCTION
+*
+*   Parse_Polyline
+*
+* INPUT
+*
+* OUTPUT
+*
+* RETURNS
+*
+*   ObjectPtr  -
+*
+* AUTHOR
+*
+*   Jérôme Grimbert
+*
+* DESCRIPTION
+*
+*   -
+*
+* CHANGES
+*
+*   Jun 2018 : Creation.
+*
+******************************************************************************/
+
+ObjectPtr Parser::Parse_Polyline()
+{
+    int i, count;
+    bool closed = false;
+    bool more = true;
+    Polyline *Object;
+    std::vector<Vector3d> Points;
+    std::vector<bool> Range;
+    Vector3d P;
+    Vector3d Local_Vector;
+
+    Parse_Begin();
+
+    if ((Object = dynamic_cast<Polyline *>(Parse_Object_Id())) != NULL)
+    {
+        return(dynamic_cast<ObjectPtr>(Object));
+    }
+
+    Object = new Polyline();
+    
+    while(more)
+    {
+       more = Allow_Vector(P);
+       if (more)
+       {
+         Points.push_back(P);
+         // NB we allow for a trailing comma at the end of the list,
+         // to facilitate auto-generation of lists.
+         Parse_Comma();
+       }
+    }
+
+    EXPECT
+      CASE(RANGE_TOKEN)
+        GET(LEFT_CURLY_TOKEN)
+        while(Allow_Vector(Local_Vector))
+        {
+          ssize_t idx1 = std::min(Local_Vector[0], Local_Vector[1]);
+          ssize_t idx2 = std::max(Local_Vector[0], Local_Vector[1]);
+          if ((idx1>=0)&&(idx2>=0))
+          {
+            if (Range.size() < idx2+1)
+            {
+              Range.resize( idx2+1, false );
+            }
+
+            for(size_t i = idx1;i<=idx2;++i)
+            {
+              Range[i] = true;
+            }
+          }
+          else
+          {
+            Error("invalid value for range (only positive values are expected)");
+          }
+          Parse_Comma();
+        }
+        GET(RIGHT_CURLY_TOKEN)
+        EXIT
+      END_CASE
+
+      OTHERWISE
+        UNGET
+        EXIT
+      END_CASE
+    END_EXPECT
+
+      
+
+    /* Check for closed polygons. */
+
+    P = Points[0];
+    count = 1;
+
+    for (i = 1; i < Points.size(); i++)
+    {
+        closed = false;
+
+        if ((fabs(P[X] - Points[i][X]) < EPSILON) &&
+            (fabs(P[Y] - Points[i][Y]) < EPSILON) &&
+            (fabs(P[Z] - Points[i][Z]) < EPSILON))
+        {
+            // force almost-identical vertices to be /exactly/ identical,
+            // to make processing easier later
+            Points[i] = P;
+            if ( count < 3 )
+            {
+              Error("elements of closed Polyline needs at least three points.");
+            }
+
+            i++;
+
+            if (i < Points.size())
+            {
+                P = Points[i];
+                count = 1;
+            }
+
+            closed = true;
+        }
+        else
+        {
+          ++count;
+        }
+    }
+
+    if (!closed)
+    {
+        Warning("Polyline not closed. Closing it.");
+        if ( count < 3 )
+        {
+          Error("elements of closed Polyline needs at least three points.");
+        }
+        Points.push_back(P);
+    }
+
+    more = false;
+    for(const auto& check: Range )
+    {
+      more |= check;
+    }
+    if (!more)
+    {
+        Warning("Polyline has no selected range.");
+    }
+
+    Object->Compute_Polyline(Points, Range);
+    if (Test_Flag(Object, DEGENERATE_FLAG))
+    {
+        Warning("Degenerated polyline, won't be rendered.");
+    }
+
+    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+
+    return(reinterpret_cast<ObjectPtr>(Object));
+}
 }

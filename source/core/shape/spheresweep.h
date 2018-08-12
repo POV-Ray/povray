@@ -92,6 +92,8 @@ struct Sphere_Sweep_Sphere_Struct
 {
     Vector3d    Center;
     DBL         Radius;
+    DBL         Uvalue;
+    Vector3d    Vbase[2];
 };
 
 /* One segment of the sphere sweep */
@@ -103,6 +105,9 @@ struct Sphere_Sweep_Segment_Struct
     int           Num_Coefs;                      /* Number of coefficients        */
     Vector3d      Center_Coef[SPH_SWP_MAX_COEFS]; /* Coefs of center polynomial    */
     DBL           Radius_Coef[SPH_SWP_MAX_COEFS]; /* Coefs of radius polynomial    */
+    DBL           Uvalue[2];                      /* U value at each ends */
+    Vector3d      Vbase[4];                       /* base of V space, at each ends */
+
 };
 
 // Temporary storage for intersection values
@@ -111,6 +116,8 @@ struct Sphere_Sweep_Intersection_Structure
     DBL         t;          // Distance along ray
     Vector3d    Point;      // Intersection point
     Vector3d    Normal;     // Normal at intersection point
+    Vector2d    uv;
+    Vector3d    Vbase[2];
 };
 
 /* The complete object */
@@ -139,6 +146,8 @@ class SphereSweep : public ObjectBase
         virtual void Scale(const Vector3d&, const TRANSFORM *);
         virtual void Transform(const TRANSFORM *);
         virtual void Compute_BBox();
+        virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
+
 
         void Compute();
     protected:
@@ -170,6 +179,9 @@ class SphereSweep : public ObjectBase
 
         static int Comp_Isects(const void *Intersection_1, const void *Intersection_2);
         static int bezier_01(int degree, const DBL* Coef, DBL* Roots, bool sturm, DBL tolerance, TraceThreadData *Thread);
+
+        static void NormalVectorInterpolation(Vector3d& r, const Vector3d& start, DBL ratio, const Vector3d& end);
+
 };
 
 /// @}
