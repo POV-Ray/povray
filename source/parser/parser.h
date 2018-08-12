@@ -913,6 +913,7 @@ class Parser : public SceneTask
         UCS2 *Parse_VStr(bool pathname);
         UCS2 *Parse_Concat(bool pathname);
         UCS2 *Parse_Chr(bool pathname);
+        UCS2 *Parse_CameraType(bool pathname);
         UCS2 *Parse_Datetime(bool pathname);
         UCS2 *Parse_Substr(bool pathname);
         UCS2 *Parse_Strupr(bool pathname);
@@ -928,6 +929,7 @@ class Parser : public SceneTask
         bool Parse_Call();
         DBL Parse_Function_Call();
         void Parse_Vector_Function_Call(EXPRESS& Express, int *Terms);
+        void Parse_Camera_Access(Vector3d& Vector, const TOKEN tk);
         void Parse_Spline_Call(EXPRESS& Express, int *Terms);
 
         /// Parses a NUMERIC_FACTOR or VECTOR_FACTOR.
