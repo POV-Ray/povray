@@ -635,7 +635,68 @@ void Parser::Parse_Spline_Call(EXPRESS& Express, int *Terms)
         Release_Spline_Reference(spline);
     }
 }
+/*****************************************************************************
+*
+* FUNCTION Parse_Camera_Access
+*
+* INPUT
+*
+* OUTPUT
+*
+* RETURNS
+*
+* AUTHOR
+*
+* DESCRIPTION
+*
+* CHANGES
+*
+******************************************************************************/
+void Parser::Parse_Camera_Access(Vector3d &Vect,const TOKEN t)
+{
+    Camera that_camera;
+    unsigned int idx=0; /* default to first camera */
+    Vect = Vector3d(0.0,0.0,0.0); // default value
+    if (sceneData->clocklessAnimation == true)
+    {
+        EXPECT
+            CASE(LEFT_SQUARE_TOKEN)
+            idx = (unsigned int)Parse_Float();
+        GET(RIGHT_SQUARE_TOKEN)
+            EXIT
+            END_CASE
 
+            OTHERWISE
+            UNGET
+            EXIT
+            END_CASE
+        END_EXPECT
+            if (!(idx<sceneData->cameras.size()))
+            {
+                Error("Not enough cameras.");
+            }
+        that_camera = sceneData->cameras[idx];
+    }
+    else
+    {
+        that_camera = sceneData->parsedCamera;
+    }
+    switch(t)
+    {
+        case CAMERA_LOCATION_TOKEN:
+            Vect = that_camera.Location;
+            break;
+        case CAMERA_DIRECTION_TOKEN:
+            Vect = that_camera.Direction;
+            break;
+        case CAMERA_RIGHT_TOKEN:
+            Vect = that_camera.Right;
+            break;
+        case CAMERA_UP_TOKEN:
+            Vect = that_camera.Up;
+            break;
+    }
+}
 /*****************************************************************************
 *
 * FUNCTION
@@ -1250,6 +1311,13 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                         END_CASE
                     END_EXPECT
                     Parse_Paren_End();
+                    break;
+
+                case CAMERA_LOCATION_TOKEN:
+                case CAMERA_DIRECTION_TOKEN:
+                case CAMERA_RIGHT_TOKEN:
+                case CAMERA_UP_TOKEN:
+                    Parse_Camera_Access(Vect, Token.Function_Id);
                     break;
             }
 
