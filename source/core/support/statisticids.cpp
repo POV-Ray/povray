@@ -137,6 +137,8 @@ const INTERSECTION_STATS_INFO intersection_stats[kPOVList_Stat_Last] =
       "Quadric" },
     { kPOVList_Stat_QuadPolyTest,       Ray_Poly_Tests, Ray_Poly_Tests_Succeeded,
       "Quartic/Poly" },
+    { kPOVList_Stat_RationalTest,       Ray_Rational_Bezier_Patch_Tests, Ray_Rational_Bezier_Patch_Tests_Succeeded,
+      "Rational Bezier Patch" },
     { kPOVList_Stat_SphereTest,         Ray_Sphere_Tests, Ray_Sphere_Tests_Succeeded,
       "Sphere" },
     { kPOVList_Stat_SphereSweepTest,    Ray_Sphere_Sweep_Tests, Ray_Sphere_Sweep_Tests_Succeeded,

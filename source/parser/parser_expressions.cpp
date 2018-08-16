@@ -65,6 +65,7 @@
 #include "core/scene/object.h"
 #include "core/scene/scenedata.h"
 #include "core/shape/heightfield.h"
+#include "core/shape/rationalbezierpatch.h"
 #include "core/shape/mesh.h"
 #include "core/support/imageutil.h"
 
@@ -219,6 +220,210 @@ void Parser::Parse_Vector_Param2(Vector3d& Val1, Vector3d& Val2)
     Parse_Comma();
     Parse_Vector(Val2);
     Parse_Paren_End();
+}
+
+/*****************************************************************************
+*
+* FUNCTION
+*
+* INPUT
+*
+* OUTPUT
+*
+* RETURNS
+*
+* AUTHOR
+*
+* DESCRIPTION
+*
+* CHANGES
+*
+******************************************************************************/
+
+void Parser::Parse_UV_Min(Vector3d& Res)
+{
+    UVMeshable * uvm = NULL;
+    Vector2d value;
+
+    GET (LEFT_PAREN_TOKEN);
+
+    EXPECT
+        CASE (OBJECT_ID_TOKEN)
+            uvm = dynamic_cast<UVMeshable*>(reinterpret_cast<ObjectPtr>(Token.Data));
+            EXIT
+        END_CASE
+
+        OTHERWISE
+            UNGET
+            EXIT
+        END_CASE
+    END_EXPECT
+
+    if (uvm == NULL)
+        Error ("UV meshable object identifier expected.");
+
+    GET (RIGHT_PAREN_TOKEN);
+
+    uvm->minUV(value);
+    Res[X] = value[U];
+    Res[Y] = value[V];
+    Res[Z] = 0.0;
+}
+/*****************************************************************************
+*
+* FUNCTION
+*
+* INPUT
+*
+* OUTPUT
+*
+* RETURNS
+*
+* AUTHOR
+*
+* DESCRIPTION
+*
+* CHANGES
+*
+******************************************************************************/
+
+void Parser::Parse_UV_Max(Vector3d& Res)
+{
+    UVMeshable * uvm = NULL;
+    Vector2d value;
+
+    GET (LEFT_PAREN_TOKEN);
+
+    EXPECT
+        CASE (OBJECT_ID_TOKEN)
+            uvm = dynamic_cast<UVMeshable*>(reinterpret_cast<ObjectPtr>(Token.Data));
+            EXIT
+        END_CASE
+
+        OTHERWISE
+            UNGET
+            EXIT
+        END_CASE
+    END_EXPECT
+
+    if (uvm == NULL)
+        Error ("UV meshable object identifier expected.");
+
+    GET (RIGHT_PAREN_TOKEN);
+
+    uvm->maxUV(value);
+    Res[X] = value[U];
+    Res[Y] = value[V];
+    Res[Z] = 0.0;
+}
+
+/*****************************************************************************
+*
+* FUNCTION
+*
+* INPUT
+*
+* OUTPUT
+*
+* RETURNS
+*
+* AUTHOR
+*
+* DESCRIPTION
+*
+* CHANGES
+*
+******************************************************************************/
+
+void Parser::Parse_UV_Vertex(Vector3d& Res)
+{
+    UVMeshable * uvm = NULL;
+    DBL u,v;
+
+    GET (LEFT_PAREN_TOKEN);
+
+    EXPECT
+        CASE (OBJECT_ID_TOKEN)
+            uvm = dynamic_cast<UVMeshable*>(reinterpret_cast<ObjectPtr>(Token.Data));
+            EXIT
+        END_CASE
+
+        OTHERWISE
+            UNGET
+            EXIT
+        END_CASE
+    END_EXPECT
+
+    if (uvm == NULL)
+        Error ("UV meshable object identifier expected.");
+
+    Parse_Comma();
+
+    u = Parse_Float();
+    Parse_Comma();
+    v = Parse_Float();
+    GET (RIGHT_PAREN_TOKEN);
+    Vector2d maxvalue,minvalue;
+    uvm->maxUV(maxvalue);
+    uvm->minUV(minvalue);
+    if (( u< minvalue[U])||(v<minvalue[V])||(u>maxvalue[U])||(v>maxvalue[V]))
+      Error("u, v must be in range");
+
+    uvm->evalVertex(Res, u,v);
+}
+/*****************************************************************************
+*
+* FUNCTION
+*
+* INPUT
+*
+* OUTPUT
+*
+* RETURNS
+*
+* AUTHOR
+*
+* DESCRIPTION
+*
+* CHANGES
+*
+******************************************************************************/
+
+void Parser::Parse_UV_Normal(Vector3d& Res)
+{
+    UVMeshable * uvm = NULL;
+    DBL u,v;
+
+    GET (LEFT_PAREN_TOKEN);
+
+    EXPECT
+        CASE (OBJECT_ID_TOKEN)
+            uvm = dynamic_cast<UVMeshable*>(reinterpret_cast<ObjectPtr>(Token.Data));
+            EXIT
+        END_CASE
+
+        OTHERWISE
+            UNGET
+            EXIT
+        END_CASE
+    END_EXPECT
+
+    if (uvm == NULL)
+        Error ("UV meshable object identifier expected.");
+
+    Parse_Comma();
+
+    u = Parse_Float();
+    Parse_Comma();
+    v = Parse_Float();
+    GET (RIGHT_PAREN_TOKEN);
+    Vector2d maxvalue,minvalue;
+    uvm->maxUV(maxvalue);
+    uvm->minUV(minvalue);
+    if (( u< minvalue[U])||(v<minvalue[V])||(u>maxvalue[U])||(v>maxvalue[V]))
+      Error("u, v must be in range");
+
+    uvm->evalNormal( Res, u,v);
 }
 
 /*****************************************************************************
@@ -1423,6 +1628,22 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     Parse_Trace( Vect );
                     break;
 
+                case UV_MIN_EXTENT_TOKEN:
+                    Parse_UV_Min( Vect );
+                    break;
+
+                case UV_MAX_EXTENT_TOKEN:
+                    Parse_UV_Max( Vect );
+                    break;
+
+                case UV_VERTEX_TOKEN:
+                    Parse_UV_Vertex( Vect );
+                    break;
+
+                case UV_NORMAL_TOKEN:
+                    Parse_UV_Normal( Vect );
+                    break;
+
                 case MIN_EXTENT_TOKEN:
                     Parse_Paren_Begin();
                     EXPECT_ONE
@@ -2511,6 +2732,45 @@ int Parser::Allow_Vector (Vector3d& Vect)
     END_EXPECT
 
     return (retval);
+}
+
+/*****************************************************************************
+*
+* FUNCTION
+*
+* INPUT
+*
+* OUTPUT
+*
+* RETURNS
+*
+* AUTHOR
+*
+* DESCRIPTION
+*
+* CHANGES
+*
+******************************************************************************/
+
+int Parser::Allow_Vector4D (VECTOR_4D Vect)
+{
+	int retval;
+
+	EXPECT
+		CASE_EXPRESS
+			Parse_Vector4D(Vect);
+			retval = true;
+			EXIT
+		END_CASE
+
+		OTHERWISE
+			UNGET
+			retval = false;
+			EXIT
+		END_CASE
+	END_EXPECT
+
+	return (retval);
 }
 
 

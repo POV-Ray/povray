@@ -95,6 +95,7 @@
 #include "core/shape/polyline.h"
 #include "core/shape/prism.h"
 #include "core/shape/quadric.h"
+#include "core/shape/rationalbezierpatch.h"
 #include "core/shape/sor.h"
 #include "core/shape/sphere.h"
 #include "core/shape/spheresweep.h"
@@ -102,6 +103,7 @@
 #include "core/shape/torus.h"
 #include "core/shape/triangle.h"
 #include "core/shape/truetype.h"
+#include "core/shape/uvmeshable.h"
 #include "core/support/imageutil.h"
 #include "core/support/octree.h"
 
@@ -6304,6 +6306,87 @@ ObjectPtr Parser::Parse_Quadric ()
     return (reinterpret_cast<ObjectPtr>(Object));
 }
 
+/*****************************************************************************
+*
+* FUNCTION
+*
+*   Parse_Rational_Bezier_Patch
+*
+* INPUT
+*   
+* OUTPUT
+*   
+* RETURNS
+*
+*   OBJECT
+*
+* AUTHOR
+*
+*   Jerome Grimbert
+*   
+* DESCRIPTION
+*
+*   -
+*
+* CHANGES
+*
+*   Jul 2016 : Creation.
+*   Aug 2018 : Update for 3.8
+*
+******************************************************************************/
+
+ObjectPtr Parser::Parse_Rational_Bezier_Patch()
+{
+    RationalBezierPatch *Object;
+    size_t xdim, ydim;
+    VECTOR_4D vector4d;
+
+    Parse_Begin();
+
+    if ((Object = reinterpret_cast<RationalBezierPatch *>(Parse_Object_Id())) != NULL)
+    {
+        return(reinterpret_cast<ObjectPtr>(Object));
+    }
+
+    xdim = Parse_Float();
+    Parse_Comma();
+    ydim = Parse_Float();
+
+    if( ( xdim < 2 ) || ( ydim < 2 ) )
+    {
+        Error( "Minimal size of rational bezier patch is 2 , 2" );
+    }
+
+    Object = new RationalBezierPatch(xdim, ydim);
+    EXPECT
+        CASE(ACCURACY_TOKEN)
+            Object->setAccuracy ( Parse_Float() );
+        END_CASE
+        OTHERWISE
+            UNGET
+            EXIT
+        END_CASE
+    END_EXPECT
+    // get the xdim * ydim points
+    for( size_t i = 0; i < ydim; ++i )
+    {
+        for( size_t j = 0; j < xdim; ++j )
+        {
+            Parse_Vector4D( vector4d );
+
+            if( vector4d[3] < 0.0 )
+            {
+                Error( "Negative weight in rational bezier patch is not allowed" );
+            }
+
+            Object->set( j, i, vector4d );
+        }
+    }
+
+    Object->Compute_BBox();
+    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+    return (reinterpret_cast<ObjectPtr>(Object));
+}
 
 
 /*****************************************************************************
@@ -7141,6 +7224,10 @@ ObjectPtr Parser::Parse_Object ()
 
         CASE (POLYNOMIAL_TOKEN)
             Object = Parse_Polynom();
+        END_CASE
+
+        CASE (RATIONAL_BEZIER_PATCH_TOKEN)
+            Object = Parse_Rational_Bezier_Patch();
         END_CASE
 
         CASE (OVUS_TOKEN)
