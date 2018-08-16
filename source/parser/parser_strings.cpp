@@ -123,6 +123,11 @@ UCS2 *Parser::Parse_String(bool pathname, bool require)
             EXIT
         END_CASE
 
+        CASE(CAMERA_TYPE_TOKEN)
+            New = Parse_CameraType(pathname);
+            EXIT
+        END_CASE
+
         CASE(CONCAT_TOKEN)
             New = Parse_Concat(pathname);
             EXIT
@@ -447,6 +452,189 @@ UCS2 *Parser::Parse_Chr(bool /*pathname*/)
     New[1] = 0;
 
     return New;
+}
+
+/*****************************************************************************
+ *
+ * FUNCTION
+ *
+ * INPUT
+ *
+ * OUTPUT
+ *
+ * RETURNS
+ *
+ * AUTHOR
+ *
+ * DESCRIPTION
+ *
+ * CHANGES
+ *
+******************************************************************************/
+UCS2 *Parser::Parse_CameraType(bool )
+{
+    // sceneData->cameras (.size(), [])
+    Camera that_camera;
+    const char * textual;
+    char tmp_compound[4+strlen(Get_Token_String(CYLINDER_TOKEN))];
+    unsigned int idx=0; /* default to first camera */
+    if (sceneData->clocklessAnimation == true)
+    {
+
+        EXPECT
+            CASE(LEFT_SQUARE_TOKEN)
+            idx = (unsigned int)Parse_Float();
+        GET(RIGHT_SQUARE_TOKEN)
+            EXIT
+            END_CASE
+
+            OTHERWISE
+            UNGET
+            EXIT
+            END_CASE
+        END_EXPECT
+        if (!(idx<sceneData->cameras.size()))
+        {
+            Error("Not enough cameras.");
+        }
+        that_camera = sceneData->cameras[idx];
+    }
+    else
+    {
+        that_camera = sceneData->parsedCamera;
+    }
+    switch(that_camera.Type)
+    {
+        case GRID_CAMERA:
+            textual = Get_Token_String(GRID_TOKEN);
+            break;
+        case PERSPECTIVE_CAMERA:
+            textual = Get_Token_String(PERSPECTIVE_TOKEN);
+            break;
+        case ORTHOGRAPHIC_CAMERA:
+            textual = Get_Token_String(ORTHOGRAPHIC_TOKEN);
+            break;
+        case PROJ_PLATECARREE_CAMERA:
+            textual = Get_Token_String(PLATECARREE_TOKEN);
+            break;
+        case PROJ_MERCATOR_CAMERA:
+            textual = Get_Token_String(MERCATOR_TOKEN);
+            break;
+        case PROJ_LAMBERT_AZI_CAMERA:
+            textual = Get_Token_String(LAMBERTAZIMUTHAL_TOKEN);
+            break;
+        case PROJ_VAN_DER_GRINTEN_CAMERA:
+            textual = Get_Token_String(VAN_DER_GRINTEN_TOKEN);
+            break;
+        case PROJ_LAMBERT_CYL_CAMERA:
+            textual = Get_Token_String(LAMBERTCYLINDRICAL_TOKEN);
+            break;
+        case PROJ_BEHRMANN_CAMERA:
+            textual = Get_Token_String(BEHRMANN_TOKEN);
+            break;
+        case PROJ_CRASTER_CAMERA:
+            textual = Get_Token_String(SMYTH_CRASTER_TOKEN);
+            break;
+        case PROJ_EDWARDS_CAMERA:
+            textual = Get_Token_String(EDWARDS_TOKEN);
+            break;
+        case PROJ_HOBO_DYER_CAMERA:
+            textual = Get_Token_String(HOBO_DYER_TOKEN);
+            break;
+        case PROJ_PETERS_CAMERA:
+            textual = Get_Token_String(PETERS_TOKEN);
+            break;
+        case PROJ_GALL_CAMERA:
+            textual = Get_Token_String(GALL_TOKEN);
+            break;
+        case PROJ_BALTHASART_CAMERA:
+            textual = Get_Token_String(BALTHASART_TOKEN);
+            break;
+        case PROJ_MOLLWEIDE_CAMERA:
+            textual = Get_Token_String(MOLLWEIDE_TOKEN);
+            break;
+        case PROJ_AITOFF_CAMERA:
+            textual = Get_Token_String(AITOFF_HAMMER_TOKEN);
+            break;
+        case PROJ_ECKERT4_CAMERA:
+            textual = Get_Token_String(ECKERT4_TOKEN);
+            break;
+        case PROJ_ECKERT6_CAMERA:
+            textual = Get_Token_String(ECKERT6_TOKEN);
+            break;
+        case PROJ_MILLER_CAMERA:
+            textual = Get_Token_String(MILLERCYLINDRICAL_TOKEN);
+            break;
+        case PROJ_TETRA_CAMERA:
+            textual = Get_Token_String(TETRA_TOKEN);
+            break;
+        case PROJ_CUBE_CAMERA:
+            textual = Get_Token_String(CUBE_TOKEN);
+            break;
+        case PROJ_OCTA_CAMERA:
+            textual = Get_Token_String(OCTA_TOKEN);
+            break;
+        case PROJ_ICOSA_CAMERA:
+            textual = Get_Token_String(ICOSA_TOKEN);
+            break;
+        case STEREOSCOPIC_CAMERA:
+            textual = Get_Token_String(STEREO_TOKEN);
+            break;
+        case FISHEYE_CAMERA:
+            textual = Get_Token_String(FISHEYE_TOKEN);
+            break;
+        case FISHEYE_ORTHOGRAPHIC_CAMERA:
+            textual = Get_Token_String(FISHEYE_ORTHOGRAPHIC_TOKEN);
+            break;
+        case FISHEYE_EQUISOLIDANGLE_CAMERA:
+            textual = Get_Token_String(FISHEYE_EQUISOLIDANGLE_TOKEN);
+            break;
+        case FISHEYE_STEREOGRAPHIC_CAMERA:
+            textual = Get_Token_String(FISHEYE_STEREOGRAPHIC_TOKEN);
+            break;
+        case OMNI_DIRECTIONAL_STEREO_CAMERA:
+            textual = Get_Token_String(OMNI_DIRECTIONAL_STEREO_TOKEN);
+            break;
+        case ULTRA_WIDE_ANGLE_CAMERA:
+            textual = Get_Token_String(ULTRA_WIDE_ANGLE_TOKEN);
+            break;
+        case OMNIMAX_CAMERA:
+            textual = Get_Token_String(OMNIMAX_TOKEN);
+            break;
+        case PANORAMIC_CAMERA:
+            textual = Get_Token_String(PANORAMIC_TOKEN);
+            break;
+        case CYL_1_CAMERA:
+            sprintf(tmp_compound,"%s %d",Get_Token_String(CYLINDER_TOKEN),1);
+            textual = tmp_compound;
+            break;
+        case CYL_2_CAMERA:
+            sprintf(tmp_compound,"%s %d",Get_Token_String(CYLINDER_TOKEN),2);
+            textual = tmp_compound;
+            break;
+        case CYL_3_CAMERA:
+            sprintf(tmp_compound,"%s %d",Get_Token_String(CYLINDER_TOKEN),3);
+            textual = tmp_compound;
+            break;
+        case CYL_4_CAMERA:
+            sprintf(tmp_compound,"%s %d",Get_Token_String(CYLINDER_TOKEN),4);
+            textual = tmp_compound;
+            break;
+        case SPHERICAL_CAMERA:
+            textual = Get_Token_String(SPHERICAL_TOKEN);
+            break;
+        case MESH_CAMERA:
+            textual = Get_Token_String(MESH_CAMERA_TOKEN);
+            break;
+        case USER_DEFINED_CAMERA:
+            textual = Get_Token_String(USER_DEFINED_TOKEN);
+            break;
+
+        default: // Should never be seen unless a new camera type has been added
+            textual = "Unknown Camera type";
+            break;
+    }
+    return String_To_UCS2(textual);
 }
 
 

@@ -42,6 +42,8 @@
 *
 *  Version history (most recent changes first):
 *
+*  5.  Aug  2018: support uv-mapping 
+* 
 *  24. Feb. 1998: Fixed a bug in Compute_Sphere_Sweep_BBox that could
 *                 result in much too large bounding boxes for
 *                 Catmull-Rom-Spline Sphere Sweeps. Added statistics
@@ -248,7 +250,10 @@ bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
                 // Test for clipping volume
                 if (Clip.empty() || Point_In_Clip(Isect[i].Point, Clip, Thread))
                 {
-                    Depth_Stack->push(Intersection(Isect[i].t, Isect[i].Point, Isect[i].Normal, this));
+                    Isect[i].Vbase[0].normalize();
+                    Isect[i].Vbase[1].normalize();
+                    Isect[i].uv[V] = ( atan2( dot( Isect[i].Normal, Isect[i].Vbase[1] ), dot( Isect[i].Normal, Isect[i].Vbase[0] ))+M_PI)/TWO_M_PI;
+                    Depth_Stack->push(Intersection(Isect[i].t, Isect[i].Point, Isect[i].Normal, Isect[i].uv, this));
                     Intersection_Found = true;
                 }
             }
@@ -335,6 +340,11 @@ bool SphereSweep::Intersect_Sphere(const BasicRay &ray, const SPHSWEEP_SPH *Sphe
 
         // Calculate normal
         Inter[0].Normal = (Inter[0].Point - Sphere->Center) / fabs(Sphere->Radius);
+ 
+        // prepare UV
+        Inter[0].uv[U] = Sphere->Uvalue;
+        Inter[0].Vbase[0] =  Sphere->Vbase[0];
+        Inter[0].Vbase[1] =  Sphere->Vbase[1];
 
         // Calculate bigger depth
         Inter[1].t = t_Closest_Approach + Half_Chord;
@@ -344,6 +354,11 @@ bool SphereSweep::Intersect_Sphere(const BasicRay &ray, const SPHSWEEP_SPH *Sphe
 
         // Calculate normal
         Inter[1].Normal = (Inter[1].Point - Sphere->Center) / fabs(Sphere->Radius);
+
+        // prepare UV
+        Inter[1].uv[U] = Sphere->Uvalue;
+        Inter[1].Vbase[0] = Sphere->Vbase[0];
+        Inter[1].Vbase[1] = Sphere->Vbase[1];
 
         return true;
     }
@@ -449,6 +464,11 @@ int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segm
                 // Calculate normal
                 Isect[Isect_Count].Normal = -Segment->Center_Deriv[0].normalized();
 
+                // prepare UV
+                Isect[Isect_Count].uv[U] = Segment->Uvalue[0];
+                Isect[Isect_Count].Vbase[0] = Segment->Vbase[0];
+                Isect[Isect_Count].Vbase[1] = Segment->Vbase[1];
+
                 Isect_Count++;
             }
         }
@@ -479,6 +499,11 @@ int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segm
 
                 // Calculate normal
                 Isect[Isect_Count].Normal = Segment->Center_Deriv[1].normalized();
+
+                // prepare UV
+                Isect[Isect_Count].uv[U] = Segment->Uvalue[1] + Segment->Uvalue[0];
+                Isect[Isect_Count].Vbase[0] = Segment->Vbase[2];
+                Isect[Isect_Count].Vbase[1] = Segment->Vbase[3];
 
                 Isect_Count++;
             }
@@ -624,6 +649,10 @@ int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segm
         DBL rootPwr = 1;
         Temp_Sphere.Center = Segment->Center_Coef[0];
         Temp_Sphere.Radius = Segment->Radius_Coef[0];
+        // prepare UV
+        Temp_Sphere.Uvalue = Root[m]*Segment->Uvalue[1] + Segment->Uvalue[0];
+        NormalVectorInterpolation( Temp_Sphere.Vbase[0], Segment->Vbase[0], Root[m], Segment->Vbase[2]);
+        NormalVectorInterpolation( Temp_Sphere.Vbase[1], Segment->Vbase[1], Root[m], Segment->Vbase[3]);
         for (n = 1; n < Segment->Num_Coefs; ++n)
         {
             rootPwr *= Root[m];
@@ -672,6 +701,11 @@ int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segm
 
                 // Calculate normal
                 Isect[Isect_Count].Normal = (Isect[Isect_Count].Point - Temp_Sphere.Center).normalized();
+
+                // prepare UV
+                Isect[Isect_Count].uv[U] = Root[m]*Segment->Uvalue[1] + Segment->Uvalue[0];
+                NormalVectorInterpolation( Isect[Isect_Count].Vbase[0], Segment->Vbase[0], Root[m], Segment->Vbase[2]);
+                NormalVectorInterpolation( Isect[Isect_Count].Vbase[1], Segment->Vbase[1], Root[m], Segment->Vbase[3]);
 
                 // Sanity-check intersection point for proper radius
                 DBL rIsect = (Isect[Isect_Count].Point - Temp_Sphere.Center).length();
@@ -1374,7 +1408,7 @@ void SphereSweep::Compute_BBox()
 *
 * CHANGES
 *
-*   -
+*   - 5 Aug 2018 : support uv mapping
 *
 ******************************************************************************/
 
@@ -1386,6 +1420,9 @@ void SphereSweep::Compute()
     int     msph;
     int     last_sph;
     int     last_seg;
+    DBL     length = 0.0;
+    DBL     tmplength = 0.0;
+    Vector3d tmpSeg;
 
     switch(Interpolation)
     {
@@ -1517,6 +1554,10 @@ void SphereSweep::Compute()
 
     for(i = 0; i < Num_Segments; i++)
     {
+        // UValue, as absolute ([0]: first point (u = 0), [1]: increment to second point (u = 1)
+        Segment[i].Uvalue[0]=1.0*i/(Num_Segments+1.0);
+        Segment[i].Uvalue[1]=1.0/(Num_Segments+1.0);
+
         // Calculate closing sphere for u = 0
 
         // Center
@@ -1578,6 +1619,130 @@ void SphereSweep::Compute()
             Segment[i].Radius_Deriv[1] += coef *
                          Segment[i].Radius_Coef[coef];
         }
+
+        // UV big part
+        tmpSeg = Segment[i].Closing_Sphere[1].Center - Segment[i].Closing_Sphere[0].Center;
+        Segment[i].Uvalue[0] = length;
+        tmplength = tmpSeg.length();
+        Segment[i].Uvalue[1] = tmplength;
+        Segment[i].Uvalue[1] += fabs(Segment[i].Radius_Deriv[1]);
+        length += Segment[i].Uvalue[1];
+
+        if (i)
+        {
+          // Inspired from Reorient_Trans in transform.inc
+          Vector3d oldSeg;
+          oldSeg = cross( Segment[i-1].Vbase[0], Segment[i-1].Vbase[1]);
+          oldSeg.normalize();
+          // catch identical points (null segment) in else part
+          if (tmplength > 0)
+          {
+            tmpSeg /= tmplength;//.normalize(), but length is already known
+          }
+          else
+          {
+            tmpSeg = oldSeg;// keep the same direction, from previous segment
+          }
+          Vector3d foo;
+          foo = cross( oldSeg, tmpSeg);
+          DBL lenfoo;
+          lenfoo = foo.length();
+          if (lenfoo > 0)
+          { // fine, there is a plane to evolve from oldSeg into tmpSeg
+            Vector3d z1,z2,x1,x2;
+            foo /= lenfoo;// normalize, but we have already the length
+            x1 = cross( oldSeg, foo);
+            x2 = cross( tmpSeg, foo);
+            z1 = x1.normalized();
+            z2 = x2.normalized();
+            MATRIX m1,m2;
+            m1[0][0] = x1[0];
+            m1[1][0] = x1[1];
+            m1[2][0] = x1[2];
+            m1[3][0] = 0;
+            m1[0][1] = foo[0];
+            m1[1][1] = foo[1];
+            m1[2][1] = foo[2];
+            m1[3][1] = 0;
+            m1[0][2] = z1[0];
+            m1[1][2] = z1[1];
+            m1[2][2] = z1[2];
+            m1[3][2] = 0;
+            m1[0][3] = 0;
+            m1[1][3] = 0;
+            m1[2][3] = 0;
+            m1[3][3] = 1;
+            // not the same order as m1
+            m2[0][0] = x2[0];
+            m2[0][1] = x2[1];
+            m2[0][2] = x2[2];
+            m2[0][3] = 0;
+            m2[1][0] = foo[0];
+            m2[1][1] = foo[1];
+            m2[1][2] = foo[2];
+            m2[1][3] = 0;
+            m2[2][0] = z2[0];
+            m2[2][1] = z2[1];
+            m2[2][2] = z2[2];
+            m2[2][3] = 0;
+            m2[3][0] = 0;
+            m2[3][1] = 0;
+            m2[3][2] = 0;
+            m2[3][3] = 1;
+            MTimesA(m1,m2);// we do not need the inverse, and use a simpler version of MTransDirection 
+            for(int idx =0;idx < 3;++idx)
+            {
+              Segment[i].Vbase[0][idx] = 
+                Segment[i-1].Vbase[0][0]*m1[0][idx] +
+                Segment[i-1].Vbase[0][1]*m1[1][idx] +
+                Segment[i-1].Vbase[0][2]*m1[2][idx] ;
+            }
+          }// end of playing with matrixes
+          else
+          { // either same direction or opposite
+            foo = tmpSeg - oldSeg;
+            if (foo.lengthSqr() < 2.0) // either 0 or 4... with numerical imprecision of computer : test against 2
+            {
+              Segment[i].Vbase[0] = Segment[i-1].Vbase[0];
+            }
+            else
+            { // flip, total U-turn 
+              Segment[i].Vbase[0] = Segment[i-1].Vbase[0] * -1.0;
+            }
+
+          }
+        }
+        else
+        { // make a random choice... sort of : perpendicular to +x, or +y when going along x
+          Vector3d foo(1.0,0.0,0.0);
+          Vector3d bar(0.0,1.0,0.0);
+          DBL lenv0;
+          if (tmplength>0.0)
+          {
+            Segment[i].Vbase[0] = cross(tmpSeg, foo);
+            lenv0 = Segment[i].Vbase[0].length();
+            if (!(lenv0 > 0.0))
+            {
+              Segment[i].Vbase[0] = cross( tmpSeg, bar);
+              lenv0 = Segment[i].Vbase[0].length();
+              if (!(lenv0 > 0.0))
+              {
+                Segment[i].Vbase[0] =  foo;
+                tmpSeg = bar;
+              }
+            }
+          }
+          else
+          {
+            Segment[i].Vbase[0] = foo;
+            tmpSeg = bar;
+          }
+        }
+
+        Segment[i].Vbase[1] = cross( tmpSeg, Segment[i].Vbase[0]);
+        // [1] & [0] must have same length for atan2 of dot products to work
+        Segment[i].Vbase[1].normalize();
+        Segment[i].Vbase[0].normalize();
     }
 
     // Calculate single spheres
@@ -1601,6 +1766,17 @@ void SphereSweep::Compute()
         // Radius
         Sphere[i].Radius =
                       Segment[i].Radius_Coef[0];
+ 
+        // and adjust U to 0..1 range
+        Segment[i].Uvalue[0] /= length;
+        Segment[i].Uvalue[1] /= length;
+        Sphere[i].Uvalue= Segment[i].Uvalue[0];
+    }
+    // for Vbase, each sphere is mid-way from the two segments, notice the start at 1, not 0
+    for(i = 1; i< Num_Segments; i++)
+    {
+      NormalVectorInterpolation(Sphere[i].Vbase[0], Segment[i-1].Vbase[0], 0.5, Segment[i].Vbase[0]);
+      NormalVectorInterpolation(Sphere[i].Vbase[1], Segment[i-1].Vbase[1], 0.5, Segment[i].Vbase[1]);
     }
 
     // Calculate last sphere of last segment
@@ -1608,12 +1784,23 @@ void SphereSweep::Compute()
     last_sph = Num_Spheres - 1;
     last_seg = Num_Segments - 1;
 
+    // first sphere & last sphere are special for Vbase
+    Sphere[0].Vbase[0] = Segment[0].Vbase[0];
+    Sphere[0].Vbase[1] = Segment[0].Vbase[1];
+    Sphere[last_sph].Vbase[0] = Segment[last_seg].Vbase[0];
+    Sphere[last_sph].Vbase[1] = Segment[last_seg].Vbase[1];
+
     // Center
     Sphere[last_sph].Center =
                   Segment[last_seg].Center_Coef[0];
     // Radius
     Sphere[last_sph].Radius =
                   Segment[last_seg].Radius_Coef[0];
+    Sphere[last_sph].Uvalue=1.0;
+    
+    // Copy Vbase from last segment 
+    Segment[last_seg].Vbase[2] = Segment[last_seg].Vbase[0];
+    Segment[last_seg].Vbase[3] = Segment[last_seg].Vbase[1];
 
     for(coef = 1; coef < Segment[last_seg].Num_Coefs; coef++)
     {
@@ -1624,6 +1811,14 @@ void SphereSweep::Compute()
         // Radius
         Sphere[last_sph].Radius +=
                Segment[last_seg].Radius_Coef[coef];
+    }
+    // use the Vbase of the spheres at each end on each segment
+    for(i = 0; i < Num_Segments; i++)
+    {
+      Segment[i].Vbase[0] = Sphere[i].Vbase[0];
+      Segment[i].Vbase[1] = Sphere[i].Vbase[1];
+      Segment[i].Vbase[2] = Sphere[i+1].Vbase[0];
+      Segment[i].Vbase[3] = Sphere[i+1].Vbase[1];
     }
 }
 
@@ -1756,7 +1951,49 @@ int SphereSweep::Comp_Isects(const void *Intersection_1, const void *Intersectio
         return 1;
 }
 
+void SphereSweep::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
+{
+    Result[U] = Inter->Iuv[U];
+    Result[V] = Inter->Iuv[V];
+}
 
+
+/*
+ * Use Slerp : Spherical Linear intERPolation
+ * Constant speed motion along a unit-radius great-circle arc.
+ * start and end must be unit-length (normalized)
+ * ratio must be between 0.0 and 1.0
+ */
+void SphereSweep::NormalVectorInterpolation(Vector3d& r, const Vector3d& start, DBL ratio, const Vector3d& end)
+{
+    DBL cosomega, omega, sinomega;
+    cosomega= dot(start,end);
+    // we need that angle, otherwise sinomega= sqrt(1.0 - cosomega*cosomega) would have been easier
+    omega = acos(cosomega);
+    sinomega = sin(omega);
+    if (sinomega)
+    {
+        r = start*sin((1.0-ratio)*omega)/sinomega+ end*sin(ratio*omega)/sinomega;
+        // no need to normalize, the 1.0/sin(omega) factor did it already
+    }
+    else 
+    {
+        /*
+         * same start & end: no problem, always the same answer
+         *
+         * opposite start & end, choose one: the nearest
+         * there is no right answer for 0.5, so arbitrary choice between > and >=
+         */
+        if (ratio >0.5)
+        {
+            r = end;
+        }
+        else
+        {
+            r = start;
+        }
+    }
+}
 
 /*****************************************************************************
 *
