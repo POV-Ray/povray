@@ -102,6 +102,7 @@ enum
     kPOVList_Stat_RBezierTest,
     kPOVList_Stat_OvusTest,
     kPOVList_Stat_LemonTest,
+    kPOVList_Stat_RationalTest,
     kPOVList_Stat_Last
 };
 
@@ -186,6 +187,8 @@ typedef enum INTSTATS
     Ray_Quadric_Tests_Succeeded,
     Ray_Poly_Tests,
     Ray_Poly_Tests_Succeeded,
+    Ray_Rational_Bezier_Patch_Tests,
+    Ray_Rational_Bezier_Patch_Tests_Succeeded,
     Ray_Sphere_Tests,
     Ray_Sphere_Tests_Succeeded,
     Ray_Sphere_Sweep_Tests,

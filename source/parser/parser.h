@@ -464,6 +464,7 @@ class Parser : public SceneTask
         bool Parse_Bool(const char* parameterName = NULL);
 
         int Allow_Vector (Vector3d& Vect);
+        int Allow_Vector4D (VECTOR_4D Vector);
         void Parse_UV_Vect (Vector2d& UV_Vect);
         void Parse_Vector (Vector3d& Vector);
         void Parse_Vector4D (VECTOR_4D Vector);
@@ -669,6 +670,7 @@ class Parser : public SceneTask
         ObjectPtr Parse_Polygon();
         ObjectPtr Parse_Prism();
         ObjectPtr Parse_Quadric();
+        ObjectPtr Parse_Rational_Bezier_Patch();
         ObjectPtr Parse_Smooth_Triangle();
         ObjectPtr Parse_Sor();
         ObjectPtr Parse_Sphere();
@@ -807,6 +809,10 @@ class Parser : public SceneTask
         void Parse_Vector_Param (Vector3d& Vector);
         void Parse_Vector_Param2 (Vector3d& Vect1, Vector3d& Vect2);
         void Parse_Trace(Vector3d& Res);
+        void Parse_UV_Vertex(Vector3d& Res);
+        void Parse_UV_Normal(Vector3d& Res);
+        void Parse_UV_Min(Vector3d& Res);
+        void Parse_UV_Max(Vector3d& Res);
         int Parse_Inside();
         bool Parse_Call();
         DBL Parse_Function_Call();
