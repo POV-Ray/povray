@@ -664,6 +664,7 @@ class Parser : public SceneTask
         ObjectPtr Parse_Object_Id();
 
         ObjectPtr Parse_Ovus();
+        ObjectPtr Parse_Nurbs();
         ObjectPtr Parse_Plane();
         ObjectPtr Parse_Poly(int order);
         ObjectPtr Parse_Polynom();

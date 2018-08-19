@@ -362,6 +362,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { NUMBER_OF_SIDES_TOKEN,        "number_of_sides" },
     { NUMBER_OF_TILES_TOKEN,        "number_of_tiles" },
     { NUMBER_OF_WAVES_TOKEN,        "number_of_waves" },
+    { NURBS_TOKEN,                  "nurbs" },
 
 #if POV_PARSER_EXPERIMENTAL_OBJ_IMPORT
     { OBJ_TOKEN,                    "obj" },

@@ -87,6 +87,7 @@
 #include "core/shape/lathe.h"
 #include "core/shape/lemon.h"
 #include "core/shape/mesh.h"
+#include "core/shape/nurbs.h"
 #include "core/shape/ovus.h"
 #include "core/shape/parametric.h"
 #include "core/shape/plane.h"
@@ -5914,6 +5915,90 @@ ObjectPtr Parser::Parse_Rational_Bezier_Patch()
     return (reinterpret_cast<ObjectPtr>(Object));
 }
 
+/*****************************************************************************
+*
+* FUNCTION
+*
+*   Parse_Nurbs
+*
+* INPUT
+*   
+* OUTPUT
+*   
+* RETURNS
+*
+*   OBJECT
+*
+* AUTHOR
+*
+*   Jerome Grimbert
+*   
+* DESCRIPTION
+*
+*   -
+*
+* CHANGES
+*
+*   Jul 2016 : Creation.
+*   Aug 2018 : Update for 3.8
+*
+******************************************************************************/
+ObjectPtr Parser::Parse_Nurbs()
+{
+    Nurbs *Object;
+    size_t xorder,yorder,xdim, ydim;
+    VECTOR_4D vector4d;
+    DBL value;
+    Parse_Begin();
+
+    xorder = Parse_Float();
+    Parse_Comma();
+    yorder = Parse_Float();
+    Parse_Comma();
+    xdim = Parse_Float();
+    Parse_Comma();
+    ydim = Parse_Float();
+    Parse_Comma();
+
+    if( ( xorder < 2 ) || ( yorder < 2 ) )
+    {
+        Error( "Minimal order of nurbs is 2 , 2" );
+    }
+    if( ( xdim < xorder ) || ( ydim < yorder ) )
+    {
+        Error( "Minimal size of nurbs is the order" );
+    }
+
+    Object = new Nurbs(xdim, ydim, xorder, yorder);
+    // get the u knots
+    for( size_t i = 0; i < (xdim+xorder); ++i )
+    {
+      value = Parse_Float();
+      Parse_Comma();
+      Object->setUKnot( i, value );
+    }
+    // get the v knots
+    for( size_t i = 0; i < (ydim+yorder); ++i )
+    {
+      value = Parse_Float();
+      Parse_Comma();
+      Object->setVKnot( i, value );
+    }
+    // get the xdim * ydim points
+    for( size_t i = 0; i < ydim; ++i )
+    {
+        for( size_t j = 0; j < xdim; ++j )
+        {
+            Parse_Vector4D( vector4d );
+            Object->setControlPoint( j, i, vector4d );
+        }
+    }
+
+    Object->Compute_BBox();
+    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+
+    return (reinterpret_cast<ObjectPtr>(Object));
+}
 
 /*****************************************************************************
 *
@@ -6736,6 +6821,10 @@ ObjectPtr Parser::Parse_Object ()
 
         CASE (DISC_TOKEN)
             Object = Parse_Disc ();
+        END_CASE
+
+        CASE (NURBS_TOKEN)
+            Object = Parse_Nurbs();
         END_CASE
 
         CASE (QUADRIC_TOKEN)
