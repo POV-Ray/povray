@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -63,7 +63,7 @@ MessageFactory::~MessageFactory()
 {}
 
 void MessageFactory::SendMessage(MessageClass mc, WarningLevel level, const char *text,
-                                 const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset)
+                                 const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset)
 {
     POVMSObject msg;
     unsigned int msgIdent;

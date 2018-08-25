@@ -8,8 +8,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,8 +40,10 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "parser/configparser.h"
 
-namespace pov
+namespace pov_parser
 {
+
+using namespace pov;
 
 typedef struct Reserved_Word_Struct RESERVED_WORD;
 typedef int TOKEN;
@@ -254,6 +256,9 @@ enum TOKEN_IDS
     BOXED_TOKEN,
     BOZO_TOKEN,
     BREAK_TOKEN,
+#if POV_DEBUG
+    BREAKPOINT_TOKEN,
+#endif
     BRICK_TOKEN,
     BRICK_SIZE_TOKEN,
     BRIGHTNESS_TOKEN,
@@ -635,7 +640,6 @@ enum TOKEN_IDS
     SQUARE_TOKEN,
     STAR_TOKEN,
     STATISTICS_TOKEN,
-    STEPS_TOKEN,
     STR_TOKEN,
     STRENGTH_TOKEN,
     STRING_ID_TOKEN,

@@ -36,7 +36,7 @@ h3.groupheader {
         font-size: 100%;
 }
 
-h1 {
+.textblock h1 {
         border-bottom: 2px solid #879ECB;
         color: #354C7B;
         font-size: 200%;
@@ -47,7 +47,7 @@ h1 {
         width: 100%;
 }
 
-h2 {
+.textblock h2 {
         border-bottom: 1px solid #879ECB;
         color: #354C7B;
         font-size: 150%;
@@ -58,7 +58,7 @@ h2 {
         width: 100%;
 }
 
-h3 {
+.textblock h3 {
         font-size: 100%;
 }
 

@@ -6,7 +6,7 @@
 <head>
 <meta http-equiv=Content-Type content="text/html; charset=windows-1252">
 <title>Reference Section 4</title>
-<link rel="StyleSheet" href="povray37.css" type="text/css">
+<link rel="StyleSheet" href="povray.css" type="text/css">
 <link rel="shortcut icon" href="favicon.ico">
 
 <!--  NOTE: In order to help users find information about POV-Ray using web      -->
@@ -334,7 +334,7 @@
 <table class="HeaderFooter" width="100%">
 <tr>
   <td colspan=5 align="left" class="HeaderFooter">
-    POV-Ray for Unix <strong class="HeaderFooter">version 3.7.1</strong>
+    POV-Ray for Unix <strong class="HeaderFooter">version 3.8</strong>
   </td>
 </tr>
 <tr >
@@ -689,7 +689,7 @@ camera {
   perspective
   location &lt;0,0,0&gt;
   direction &lt;0,0,1&gt;
-  right 1.33*x
+  right &lt;image_width/image_height,0,0&gt;
   up y
   sky &lt;0,1,0&gt;
   }
@@ -701,7 +701,7 @@ CAMERA TYPE: perspective
   focal_point: &lt;0,0,0&gt;
   location   : &lt;0,0,0&gt;
   look_at    : z
-  right      : 1.33*x
+  right      : &lt;image_width/image_height,0,0&gt;
   sky        : &lt;0,1,0&gt;
   up         : y
   variance   : 1/128
@@ -791,7 +791,7 @@ the camera using the <code>sky</code> vector. For example:</p>
 <pre>
 camera {
   location &lt;3,5,-10&gt;
-  sky   &lt;1,1,0&gt;
+  sky &lt;1,1,0&gt;
   look_at &lt;0,2,1&gt;
   }
 </pre>
@@ -805,7 +805,7 @@ you are telling POV-Ray to assume that the sky isn't straight up.</p>
 <p>
 The <code>sky</code> vector does nothing on its own. It only modifies the
 way the <code>look_at</code> vector turns the camera. The default value is
-<code>sky&lt;0,1,0&gt;</code>.</p>
+<code>sky &lt;0,1,0&gt;</code>.</p>
 
 </div>
 <a name="r3_4_2_1_3"></a>
@@ -846,8 +846,8 @@ reflections of the environment (sometimes called environment mapping).</p>
 <p>You will probably not need to explicitly specify or change the camera
 <code>direction</code> vector but it is described here in case you do. It
 tells POV-Ray the initial direction to point the camera before moving it with
-the <code>look_at</code> or <code>rotate</code> vectors (the default value is
-<code>direction&lt;0,0,1&gt;</code>). It may also be used to control the
+the <code>look_at</code> or <code>rotate</code> vectors the default value is
+<code>direction &lt;0,0,1&gt;</code>. It may also be used to control the
 (horizontal) field of view with some types of projection. The length of the
 vector determines the distance of the viewing plane from the camera's
 location. A shorter <code>direction</code> vector gives a wider view while a
@@ -870,7 +870,7 @@ types.</p>
 is to tell POV-Ray the relative height and width of the view screen. The
 default values are:</p>
 <pre>
-right 4/3*x
+right &lt;image_width/image_height,0,0&gt;
 up y
 </pre>
 
@@ -905,52 +905,19 @@ the cylinder lies along the <code>right</code> vector. Viewing rays for type
 <a name="r3_4_2_1_6"></a>
 <div class="content-level-h5" contains="Aspect Ratio" id="r3_4_2_1_6">
 <h5>3.4.2.1.6 Aspect Ratio</h5>
-<p>Together the <code>up</code> and <code>right</code> vectors define the
-<em>aspect ratio</em> (height to width ratio) of the resulting image. The
-default values <code>up&lt;0,1,0&gt;</code> and <code>
-right&lt;1.33,0,0&gt;</code> result in an aspect ratio of 4 to 3. This is the
-aspect ratio of a typical computer monitor. If you wanted a tall skinny image
-or a short wide panoramic image or a perfectly square image you should adjust
-the <code>up</code> and <code>right</code> vectors to the appropriate
-proportions.</p>
-<p>
-Most computer video modes and graphics printers use perfectly square pixels.
-For example Macintosh displays and IBM SVGA modes 640x480, 800x600 and
-1024x768 all use square pixels. When your intended viewing method uses square
-pixels then the width and height you set with the <code>Width</code> and
-<code>Height</code> options or <code>+W</code> or <code>+H</code> switches
-should also have the same ratio as the <code>up</code> and <code>right</code>
-vectors.</p>
-<p class="Note"><strong>Note:</strong> 640/480 = 4/3 so the ratio is proper for this square pixel mode.</p>
-<p>
-Not all display modes use square pixels however. For example IBM VGA mode
-320x200 and Amiga 320x400 modes do not use square pixels. These two modes
-still produce a 4/3 aspect ratio image. Therefore images intended to be
-viewed on such hardware should still use 4/3 ratio on their <code>up</code>
-and <code>right</code> vectors but the pixel settings will not be 4/3.</p>
-<p>
-For example:</p>
+<p>Together the <code>right</code> <em>(width)</em> and <code>up</code> <em>(height)</em> vectors define the <em>aspect ratio</em> of the resulting image.</p>
+
+<p>A <font class="Change">Change</font> in version 3.8 redefines how the <code>right</code> vector default is derived. Previously a fixed value, it is now a calculated value that is based on the image width and height specified at render time. As usual, the image width and height can be specified from either the pull down menu available in <em>GUI</em> versions <em>ONLY</em> or the <code>+Wn</code> and <code>+Hn</code> command-line options available to <em>ALL</em> versions. This behavior is conditional upon the <em>last</em> effective <code>#version</code> directive before the camera definition. The default <code>up</code> vector remains as <code>&lt;0,1,0&gt;</code>.</p>
+
+<p>To retain legacy behavior see the example below:</p>
+
 <pre>
+#version X.y; // X.y is a version less than 3.8
 camera {
   location &lt;3,5,-10&gt;
-  up    &lt;0,1,0&gt;
-  right  &lt;1,0,0&gt;
   look_at &lt;0,2,1&gt;
   }
 </pre>
-
-<p>This specifies a perfectly square image. On a square pixel display like
-SVGA you would use pixel settings such as <code>+W480 +H480</code> or <code>
-+W600 +H600</code>. However on the non-square pixel Amiga 320x400 mode you
-would want to use values of <code>+W240 +H400</code> to render a square
-image.</p>
-<p>
-The bottom line issue is this: the <code>up</code> and <code>right</code>
-vectors should specify the artist's intended aspect ratio for the image
-and the pixel settings should be adjusted to that same ratio for square
-pixels and to an adjusted pixel resolution for non-square pixels. The <code>
-up</code> and <code>right</code> vectors should <em> not</em> be adjusted
-based on non-square pixels.</p>
 
 </div>
 <a name="r3_4_2_1_7"></a>
@@ -960,7 +927,7 @@ based on non-square pixels.</p>
 the camera. It tells POV-Ray where the right side of your screen is. The sign
 of the <code>right</code> vector can be used to determine the handedness of
 the coordinate system in use. The default value is: <code>
-right&lt;1.33,0,0&gt;</code>. This means that the +x-direction is to the
+right &lt;image_width/image_height,0,0&gt;</code>. This means that the +x-direction is to the
 right. It is called a <em>left-handed</em> system because you can use your
 left hand to keep track of the axes. Hold out your left hand with your palm
 facing to your right. Stick your thumb up. Point straight ahead with your
@@ -975,15 +942,15 @@ forward in the +z-direction but your other fingers now say the +x-direction
 is to the left. That means that the right side of your screen is now in the
 -x-direction. To tell POV-Ray to act like this you can use a negative x value
 in the <code>right</code> vector such as: <code>
-right&lt;-1.33,0,0&gt;</code>. Since having x values increasing to the left
+right &lt;-image_width/image_height,0,0&gt;</code>. Since having x values increasing to the left
 does not make much sense on a 2D screen you now rotate the whole thing 180
 degrees around by using a positive z value in your camera's location. You
 end up with something like this.</p>
 <pre>
 camera {
   location &lt;0,0,10&gt;
-  up    &lt;0,1,0&gt;
-  right  &lt;-1.33,0,0&gt;
+  up &lt;0,1,0&gt;
+  right &lt;-image_width/image_height,0,0&gt;
   look_at &lt;0,0,0&gt;
   }
 </pre>
@@ -1019,12 +986,12 @@ rotate</code> modifiers can re-position the camera once you have defined
 it. For example:</p>
 <pre>
 camera {
-  location &lt; 0, 0, 0&gt;
-  direction &lt; 0, 0, 1&gt;
-  up    &lt; 0, 1, 0&gt;
-  right   &lt; 1, 0, 0&gt;
-  rotate  &lt;30, 60, 30&gt;
-  translate &lt; 5, 3, 4&gt;
+  location &lt;0,0,0&gt;
+  direction &lt;0,0,1&gt;
+  up &lt;0,1,0&gt;
+  right &lt;1,0,0&gt;
+  rotate &lt;30,60,30&gt;
+  translate &lt;5,3,4&gt;
   }
 </pre>
 
@@ -1460,7 +1427,7 @@ camera {
 <a name="r3_4_2_2_10"></a>
 <div class="content-level-h5" contains="User defined projection" id="r3_4_2_2_10">
 <h5>3.4.2.2.10 User defined projection</h5>
-<p><font class="New">New</font> to version 3.7.1 a user defined camera capability was added. Similar to the <a href="r3_4.html#r3_4_2_2_3">mesh camera</a> the <code>user_defined</code> camera allows complete control over ray origin and direction, with the advantage of not having to actually load a mesh to function. It's inner workings are also less constrained than the mesh camera.</p>
+<p><font class="New">New</font> to version 3.8 a user defined camera capability was added. Similar to the <a href="r3_4.html#r3_4_2_2_3">mesh camera</a> the <code>user_defined</code> camera allows complete control over ray origin and direction, with the advantage of not having to actually load a mesh to function. It's inner workings are also less constrained than the mesh camera.</p>
 
 <p>In addition to being able to duplicate existing camera types, this mechanism can also be easily used for other arbitrary camera formats waiting to be integrated into POV-Ray. This includes light probe style, angular, cube mapping, side-by-side stereo-grams, Omni-Directional Stereo (ODS), Mercator, and other map projections.</p>
 
@@ -1518,7 +1485,7 @@ camera {
 <p class="Note"><strong>Note:</strong> While this behaves as a real camera does, the values for aperture are purely arbitrary and are not related to <em>f</em>-stops.</p>
 <p>You must also specify the <code>blur_samples</code> keyword followed by an integer value specifying the maximum number of rays to use for each pixel. More rays give a smoother appearance but is slower. By default no focal blur is used, i. e. the default aperture is 0 and the default number of samples is 0.</p>
 
-<p>The center of the <em>zone of sharpness</em> is specified by the <code>focal_point</code> vector. The <em>zone of sharpness</em> is a plane through the <code>focal_point</code> and is parallel to the camera. Objects close to this plane of focus are in focus and those farther from that plane are more blurred. The default value is <code>focal_point&lt;0,0,0&gt;</code>.</p>
+<p>The center of the <em>zone of sharpness</em> is specified by the <code>focal_point</code> vector. The <em>zone of sharpness</em> is a plane through the <code>focal_point</code> and is parallel to the camera. Objects close to this plane of focus are in focus and those farther from that plane are more blurred. The default value is <code>focal_point &lt;0,0,0&gt;</code>.</p>
 
 <p>Although <code>blur_samples</code> specifies the maximum number of samples, there is an adaptive mechanism that stops shooting rays when a certain degree of confidence has been reached. At that point, shooting more rays would not result in a significant change.</p>
 <p>Extra samples are generated in a circular rather than square pattern when <code>blur_samples</code> is <strong>not</strong> set to either 4, 7, 19 or 37, leading to a circular rather than square bokeh. The extra samples are generated from a <em>Halton</em> sequence rather than a random stream. You can also optionally specify a minimum number of samples to be taken before testing against the <code>confidence</code> and <code>variance</code> settings. The default is 4, if the <code>blur_samples</code> maximum is less than 7, otherwise the default is 7, to provide a means to get rid of stray non-blurred pixels.</p>
@@ -2189,7 +2156,7 @@ light_source {
 
 <p class="Note"><strong>Note:</strong> For maximum realism, use <code>fade_power 2</code> and set <code>fade_distance</code> to the approximate radius of the object supposedly giving off the light, e.g. the radius of a frosted incandescent light bulb, half the length of the tungsten filament in a clear incandescent light bulb, etc.; if this makes the light seem too dim, compensate by boosting the light source brightness. There is nothing wrong with a light source having a color of <code>rgb &lt;10000,8000,2000&gt;</code> if that's what it takes.</p>
 
-<p><font class="New">New</font> in POV-Ray 3.7.1 is an alternative mode for distance-based light fading, in which the light intensity follows an inverse power law at all distances. To activate this mode, specify <code>fade_distance 0</code>. Nominal light intensity is then achieved at unit distance. For backward compatibility, this mode requires <code>#version</code> to be set to <code>3.71</code> or higher.</p>
+<p><font class="New">New</font> in POV-Ray 3.8 is an alternative mode for distance-based light fading, in which the light intensity follows an inverse power law at all distances. To activate this mode, specify <code>fade_distance 0</code>. Nominal light intensity is then achieved at unit distance. For backward compatibility, this mode <em>requires</em> <code>#version 3.8</code> or higher to be set.</p>
 
 </div>
 <a name="r3_4_3_1_10"></a>

@@ -7,7 +7,7 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -36,11 +36,16 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/processrenderoptions.h"
 
+// C++ variants of C standard header files
+#include <cstdlib>
+
+// POV-Ray header files (base module)
 #include "base/fileutil.h"
 #include "base/platformbase.h"
 #include "base/image/colourspace.h"
 #include "base/image/encoding.h"
 
+// POV-Ray header files (POVMS module)
 #include "povms/povmsid.h"
 
 // this must be the last file included
@@ -456,7 +461,7 @@ int ProcessRenderOptions::ReadSpecialOptionHandler(INI_Parser_Table *option, cha
                         err = POVMSUtil_SetString(&decobj, kPOVAttrib_Value, ptr);
                     }
                     else
-                        err = POVMSUtil_SetFloat(&decobj, kPOVAttrib_Value, atof(ptr));
+                        err = POVMSUtil_SetFloat(&decobj, kPOVAttrib_Value, std::atof(ptr));
                 }
                 if(err == kNoErr)
                     err = POVMSAttrList_Append(&list, &decobj);
@@ -510,7 +515,7 @@ int ProcessRenderOptions::ReadSpecialOptionHandler(INI_Parser_Table *option, cha
                 case kPOVAttrib_DisplayGamma:    typeKey = kPOVAttrib_DisplayGammaType;      break;
                 case kPOVAttrib_FileGamma:       typeKey = kPOVAttrib_FileGammaType;         break;
             }
-            floatval = atof(param);
+            floatval = std::atof(param);
             if (floatval == 1.0)
                 intval = kPOVList_GammaType_Neutral;
             else if (floatval > 0)

@@ -6,7 +6,7 @@
 <head>
 <meta http-equiv=Content-Type content="text/html; charset=windows-1252">
 <title>Reference Section 5</title>
-<link rel="StyleSheet" href="povray37.css" type="text/css">
+<link rel="StyleSheet" href="povray.css" type="text/css">
 <link rel="shortcut icon" href="favicon.ico">
 
 <!--  NOTE: In order to help users find information about POV-Ray using web      -->
@@ -214,7 +214,7 @@
 <table class="HeaderFooter" width="100%">
 <tr>
   <td colspan=5 align="left" class="HeaderFooter">
-    POV-Ray for Unix <strong class="HeaderFooter">version 3.7.1</strong>
+    POV-Ray for Unix <strong class="HeaderFooter">version 3.8</strong>
   </td>
 </tr>
 <tr >
@@ -709,7 +709,7 @@ height field {
   jpeg "foobar.jpg" gamma 1.8
   }
 </pre>
-<p>This will cause POV-Ray to perform gamma adjustment or decoding on the input file data before building the height field. Alternatively to a numerical value, <code>srgb</code> may be specified to denote that the file format is pre-corrected or encoded using the ''sRGB transfer function'' instead of a power-law gamma function. <font class="New">New</font> in version 3.7.1, other valid special values are <code>bt709</code> and <code>bt2020</code>, denoting that the file is encoded or pre-corrected using the ITU-R BT.709 or BT.2020 transfer function, respectively. See section <a href="t2_3.html#t2_3_4">Gamma Handling</a> for more details.</p>
+<p>This will cause POV-Ray to perform gamma adjustment or decoding on the input file data before building the height field. Alternatively to a numerical value, <code>srgb</code> may be specified to denote that the file format is pre-corrected or encoded using the ''sRGB transfer function'' instead of a power-law gamma function. <font class="New">New</font> in version 3.8, other valid special values are <code>bt709</code> and <code>bt2020</code>, denoting that the file is encoded or pre-corrected using the ITU-R BT.709 or BT.2020 transfer function, respectively. See section <a href="t2_3.html#t2_3_4">Gamma Handling</a> for more details.</p>
 <p>The height field object also allows for substituting a <a href="r3_6.html#r3_6_2_1_12">user defined function</a> instead of specifying an image. That function can either be in it's literal form, or it can be a call to a function that you have predeclared. The user supplied parameters <code>FieldResolution_X</code> and <code>FieldResolution_Y</code> are integer values that affect the resolution of the color/index values, <em>not</em> size of the unscaled height field.</p></div>
 
 <a name="r3_5_1_1_6"></a>
@@ -719,7 +719,7 @@ height field {
 
 <p>See the <code>isosurface</code> <a href="t2_3.html#t2_3_3_3">tutorial</a> for more about working with <em>isosurfaces</em>.</p>
 
-<p><font class="New">New</font> in version 3.7.1 a <code>potential</code> pattern has been added to define a pattern based on the <em>potential</em> field of a <code>blob</code> or <code>isosurface</code> object. See also: <a href="r3_6.html#r3_6_2_4_3">Potential Pattern</a>.</p>
+<p><font class="New">New</font> in version 3.8 a <code>potential</code> pattern has been added to define a pattern based on the <em>potential</em> field of a <code>blob</code> or <code>isosurface</code> object. See also: <a href="r3_6.html#r3_6_2_4_3">Potential Pattern</a>.</p>
 
 <p>The syntax basics are as follows:</p>
 
@@ -816,7 +816,7 @@ isosurface {
 
 <p><em>Isosurfaces</em> can be used in CSG shapes since they are solid finite objects - if not finite by themselves, they are through the cross section with the container. By default POV-Ray searches only for the first surface which the ray intersects. However, when using an <code>isosurface</code> in CSG operations, the other surfaces must also be found. Consequently, the keyword <code>max_trace</code> followed by an integer value, must be added to the <code>isosurface</code> statement. To check for all surfaces, use the keyword <code>all_intersections</code> instead. With <code>max_trace</code> it only checks until that number is reached.</p>
 <p class="Note"><strong>Note:</strong> The current implementation has a <em>limit</em> of 10 <em>intersections</em> in all cases.</p>
-<p>By default, the inside of an <code>isosurface</code> is defined as the set of all points inside the <code>contained_by</code> shape where the function values are below the threshold. <font class="New">New</font> in version 3.7.1 this can be changed via the <code>polarity</code> keyword. Specifying a <em>positive</em> setting or <code>on</code> will instead cause function values <em>above</em> the threshold to be considered inside. Specifying a <em>negative</em> setting or <code>off</code> will give the default behavior.</div>
+<p>By default, the inside of an <code>isosurface</code> is defined as the set of all points inside the <code>contained_by</code> shape where the function values are below the threshold. <font class="New">New</font> in version 3.8 this can be changed via the <code>polarity</code> keyword. Specifying a <em>positive</em> setting or <code>on</code> will instead cause function values <em>above</em> the threshold to be considered inside. Specifying a <em>negative</em> setting or <code>off</code> will give the default behavior.</div>
 
 <a name="r3_5_1_1_7"></a>
 <div class="content-level-h5" contains="Julia Fractal" id="r3_5_1_1_7">
@@ -1187,7 +1187,7 @@ quadratic spline). The same holds for cubic splines where you get n-3 segments w
 <table class="left" width="700px" cellpadding="0" cellspacing="20">
 <tr>
   <td>
-    <p><font class="New">New</font> to version 3.7.1 the <code>lemon</code> object has been added. It is similar to the <code>cone</code> in that it's basically described the same way but with these differences:</p>
+    <p><font class="New">New</font> to version 3.8 the <code>lemon</code> object has been added. It is similar to the <code>cone</code> in that it's basically described the same way but with these differences:</p>
     <ul>
       <li>end points are connected along their axis via the revolution surface that's generated by the circular arc of the <em>Inner_Radius</em></li>
       <li>for the minimal value of <em>Inner_Radius</em> the surface is a spherical segment where the center of the arc lies along the end points axis</li>
@@ -1223,7 +1223,7 @@ LEMON_MODIFIERS:
 
 <p>The following example produced the above image:</p>
 <pre>
-#version 3.7.1;
+#version 3.8;
 global_settings { assumed_gamma 1.0 }
 
 camera {
@@ -1278,33 +1278,33 @@ lemon { &lt;0,0,0&gt;, 5, &lt;0,-20,0&gt;, 5, 15
 <h5>3.5.1.1.10 Ovus</h5>
 
 
-<p>An <code>ovus</code> is a shape that looks like an egg. The syntax of the <code>ovus</code> object is:</p>
+<p>An <code>ovus</code> is a shape that looks like an egg. A <font class="Change">Change</font> in version 3.8 has extended the syntax of the <code>ovus</code> object by adding <code>radius</code>, <code>distance</code> and <code>precision</code> controls.</p>
+<p>The syntax is as follows:</p>
 <pre>
-OVUS:
-  ovus {
-    Bottom_radius, Top_radius
-    [OBJECT_MODIFIERS...] 
-    }
+ovus {
+  Bottom_radius, Top_radius [radius Inner_radius] [distance Vertical_distance] [precision Root_tolerance]
+  [OBJECT_MODIFIERS...] 
+  }
 </pre>
+
+<p>Where <em>Bottom_radius</em> is a float value giving the radius of the bottom sphere and <em>Top_radius</em> is a float specifying the radius of the top sphere. The top and bottom spheres are connected together with a suitably truncated lemon, or self intersection of a torus, that is automatically computed so as to provide the needed continuity to the shape. The <code>distance</code> is a float value that represents the length between the center of the two spheres, defaulting to <em>Bottom_radius</em>. The <code>radius</code> float value represents the inner circle of the connecting torus and it's default is twice the greater of either <em>Top_radius</em> or <em>Bottom_radius</em>. The <code>precision</code> float value is the tolerance used for the root solving of the connecting torus, and it's default is <code>1e-4</code>. If additional accuracy is required you can now add the <code><a href="r3_5.html#r3_5_1_5_11">sturm</a></code> object modifier.</p>
 
 <table class="centered" width="700px" cellpadding="0" cellspacing="10">
 <tr>
-  <td width="290px">
-    <p>Where <em><code>Bottom_radius</code></em> is a float value giving the radius of the bottom sphere and <em><code>Top_radius</code></em> is a float specifying the radius of the top sphere. The top sphere and the bottom sphere are connected together with a suitably truncated lemon (self intersection of a torus), that is automatically computed so as to provide the needed continuity to the shape.</p>
-  </td>
   <td><img class="left" width="125px" src="images/1/12/RefImgOvus2D.png"></td>
   <td>
     <ul>
-      <li>The center of the top sphere lies on the top of the bottom sphere.</li>
-      <li>The bottom sphere of the <code>ovus</code> is centered at the origin.</li>
-      <li>The top sphere of the <code>ovus</code> lies on the y-axis.</li>
-      <li>The minor radius of the lemon is twice the largest radius.</li>
+      <li>The center of the top sphere lies on the top of the bottom sphere</li>
+      <li>The bottom sphere of the <code>ovus</code> is centered at the origin</li>
+      <li>The top sphere of the <code>ovus</code> lies on the y-axis</li>
+      <li>The minor radius of the lemon is twice the largest radius</li>
+      <li>The <code>distance</code> <em>must</em> be greater than or equal to <em>Bottom_radius</em></li>
+      <li>The <code>radius</code> <em>must</em> be greater than or equal to half the sum of <em>Bottom_radius</em>, <em>Top_radius</em> and <em>Vertical_distance</em></li>
     </ul>
   </td>
 </tr>
 <tr>
-  <td></td>
-    <td><p class="caption">An ovus 2D section</p></td>
+  <td><p class="caption">An ovus 2D section</p></td>
   <td></td>
 </tr>
 </table>
@@ -1318,8 +1318,6 @@ OVUS:
 </tr>
 </table>
 
-<p>Whenever the top radius is bigger than twice the bottom radius, the <code>ovus</code> degenerates into a <code>sphere</code> with an offset center. There are a lot of variations in the shape of the <code>ovus</code>.</p>
-
 <p class="Note"><strong>Note:</strong> According to the ratio of the radius, the pointy part is the smallest radius, but is <em>not</em> always on top!</p>
 
 <table class="centered" width="690px" cellpadding="0" cellspacing="10">
@@ -1330,6 +1328,8 @@ OVUS:
   <td><p class="caption">Evolution of ratio from 0 to 1.95 in 0.15 steps.</p></td>
 </tr>
 </table>
+
+<p>See also: <a href="r3_6.html#r3_6_1_7_1">UV Mapping</a>.</p>
 
 <p class="Note"><strong>Note:</strong> See the following <em>MathWorld</em> references for more information about the math behind how the <code>ovus</code> object is constructed.</p>
 <ul>
@@ -1830,7 +1830,7 @@ sticking through the hole.</p>
 
 <p>The torus is internally bounded by two cylinders and two rings forming a thick cylinder. With this bounding cylinder the performance of the torus intersection test is vastly increased. The test for a valid torus intersection, i.e. solving a 4th order polynomial, is only performed if the bounding cylinder is hit. Thus a lot of slow root solving calculations are avoided.</p>
 
-<p><font class="New">New</font> in version 3.7.1 is a torus with a minor radius greater than the major radius (aka <em>spindle torus</em>) will self-intersect in a spindle-shaped region. The behavior with respect to the spindle can be controlled by specifying either of the <code>difference</code>,<code>intersection</code>, <code>merge</code> or <code>union</code> keywords, which act similar to the corresponding CSG operations:</p>
+<p><font class="New">New</font> in version 3.8 is a torus with a minor radius greater than the major radius (aka <em>spindle torus</em>) will self-intersect in a spindle-shaped region. The behavior with respect to the spindle can be controlled by specifying either of the <code>difference</code>,<code>intersection</code>, <code>merge</code> or <code>union</code> keywords, which act similar to the corresponding CSG operations:</p>
 <ul>
 <li>Using the <code>difference</code> keyword, the self-intersecting portion is cut away from the torus, so that the spindle volume is considered <em>outside</em> the primitive; the spindle surface is visible (provided you cut open the torus, or make it semi-transparent).</li>
 <li>Using the <code>intersection</code> keyword, the resulting shape consists of <em>only</em> the self-intersecting portion, so that only the spindle volume is considered inside the primitive, and only the spindle surface is visible.</li>
@@ -3942,6 +3942,7 @@ be used.</p>
 <li>cubic</li>
 <li>lathe (only with quadratic splines)</li>
 <li>lemon</li>
+<li>ovus</li>
 <li>poly</li>
 <li>prism (only with cubic splines)</li>
 <li>quartic</li>

@@ -7,7 +7,7 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -1468,7 +1468,7 @@ bool Trace::TraceRefractionRay(const FINISH* finish, const Vector3d& ipoint, Ray
     return false;
 }
 
-// see Diffuse in the 3.6 code (lighting.cpp)
+// see Diffuse in the v3.6 code (lighting.cpp)
 void Trace::ComputeDiffuseLight(const FINISH *finish, const Vector3d& ipoint, const Ray& eye, const Vector3d& layer_normal, const MathColour& layer_pigment_colour,
                                 MathColour& colour, double attenuation, ObjectPtr object, double relativeIor)
 {
@@ -1617,7 +1617,7 @@ void Trace::ComputePhotonDiffuseLight(const FINISH *Finish, const Vector3d& IPoi
     colour += tmpCol;
 }
 
-// see Diffuse_One_Light in the 3.6 code (lighting.cpp)
+// see Diffuse_One_Light in the v3.6 code (lighting.cpp)
 void Trace::ComputeOneDiffuseLight(const LightSource &lightsource, const Vector3d& reye, const FINISH *finish, const Vector3d& ipoint, const Ray& eye, const Vector3d& layer_normal,
                                    const MathColour& layer_pigment_colour, MathColour& colour, double attenuation, ConstObjectPtr object, double relativeIor, int light_index)
 {
@@ -1852,7 +1852,7 @@ void Trace::ComputeFullAreaDiffuseLight(const LightSource &lightsource, const Ve
     }
 }
 
-// see do_light in version 3.6's lighting.cpp
+// see do_light in v3.6's lighting.cpp
 void Trace::ComputeOneLightRay(const LightSource &lightsource, double& lightsourcedepth, Ray& lightsourceray, const Vector3d& ipoint, MathColour& lightcolour, bool forceAttenuate)
 {
     double attenuation;
@@ -1872,7 +1872,7 @@ void Trace::ComputeOneLightRay(const LightSource &lightsource, double& lightsour
     lightcolour *= attenuation;
 }
 
-// see block_light_source in the version 3.6 source
+// see block_light_source in the v3.6 source
 void Trace::TraceShadowRay(const LightSource &lightsource, double depth, Ray& lightsourceray, const Vector3d& point, MathColour& colour)
 {
     // test and set highest level traced. We do it differently than TraceRay() does,
@@ -2254,7 +2254,7 @@ void Trace::TraceAreaLightSubsetShadowRay(const LightSource &lightsource, double
     lightcolour = (sample_Colour[0] + sample_Colour[1] + sample_Colour[2] + sample_Colour[3]) * 0.25;
 }
 
-// see filter_shadow_ray in version 3.6's lighting.cpp
+// see filter_shadow_ray in v3.6's lighting.cpp
 void Trace::ComputeShadowColour(const LightSource &lightsource, Intersection& isect, Ray& lightsourceray, MathColour& colour)
 {
     WeightedTextureVector wtextures;
@@ -2344,7 +2344,7 @@ void Trace::ComputeShadowColour(const LightSource &lightsource, Intersection& is
         ipoint[Z] = 0;
     }
 
-    // NB the 3.6 code doesn't set the light cache's Tested flags to false after incrementing the level.
+    // NB the v3.6 code doesn't set the light cache's Tested flags to false after incrementing the level.
     if (++lightColorCacheIndex >= lightColorCache.size())
     {
         lightColorCache.resize(lightColorCacheIndex + 10);

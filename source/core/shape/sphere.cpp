@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -86,7 +86,7 @@ bool Sphere::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 
     if(Do_Ellipsoid)
     {
-        register int Intersection_Found;
+        bool Intersection_Found;
         DBL Depth1, Depth2, len;
         Vector3d IPoint;
         BasicRay New_Ray;
@@ -132,7 +132,7 @@ bool Sphere::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
     }
     else
     {
-        register int Intersection_Found;
+        bool Intersection_Found;
         DBL Depth1, Depth2;
         Vector3d IPoint;
 

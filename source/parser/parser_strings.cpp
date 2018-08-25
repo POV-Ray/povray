@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,18 +36,24 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
-#include <cstdlib>
+// C++ variants of C standard header files
 #include <cctype>
+#include <cstdio>
+#include <cstdlib>
 
+// Boost header files
 #include <boost/date_time/posix_time/posix_time.hpp>
 
+// POV-Ray header files (core module)
 #include "core/scene/scenedata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
-namespace pov
+namespace pov_parser
 {
+
+using namespace pov;
 
 /*****************************************************************************
  *
@@ -169,6 +175,30 @@ UCS2 *Parser::Parse_String(bool pathname, bool require)
 }
 
 
+//****************************************************************************
+
+
+std::string Parser::Parse_ASCIIString(bool pathname, bool require)
+{
+    UCS2 *cstr = Parse_String(pathname, require);
+    std::string ret(UCS2toASCIIString(cstr));
+    POV_FREE(cstr);
+    return ret;
+}
+
+
+//****************************************************************************
+
+
+UCS2String Parser::Parse_UCS2String(bool pathname, bool require)
+{
+    UCS2 *cstr = Parse_String(pathname, require);
+    UCS2String ret(cstr);
+    POV_FREE(cstr);
+    return ret;
+}
+
+
 /*****************************************************************************
  *
  * FUNCTION
@@ -223,13 +253,13 @@ UCS2 *Parser::Parse_Str(bool pathname)
     // TODO: consider changing to %g rather than %f for large numbers (e.g.
     // anything over 1e+64 for example). for now, we will only use %g if the
     // snprintf filled the buffer.
-    // NB test for < 0 is because stupid windows _snprintf can return negative values.
-    if (((l = snprintf(temp4, sizeof(temp4) - 1, temp3, val)) >= sizeof(temp4) - 1) || (l < 0))
+    // NB `snprintf` may report errors via a negative return value.
+    if (((l = std::snprintf(temp4, sizeof(temp4), temp3, val)) >= sizeof(temp4)) || (l < 0))
     {
         *p = 'g';
 
         // it should not be possible to overflow with %g. but just in case ...
-        if (((l = snprintf(temp4, sizeof(temp4) - 1, temp3, val)) >= sizeof(temp4) - 1) || (l < 0))
+        if (((l = std::snprintf(temp4, sizeof(temp4), temp3, val)) >= sizeof(temp4)) || (l < 0))
             strcpy(temp4, "<invalid>");
     }
 
@@ -778,16 +808,16 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
     char_string = reinterpret_cast<UCS2 *>(POV_MALLOC((char_array_size + 1) * sizeof(UCS2), "UCS2 String"));
     for(index_in = 0, index_out = 0; index_in < char_array_size; index_in++, index_out++)
     {
-        if((char_array[index_in] == '\\') && (sceneData->EffectiveLanguageVersion() >= 371 || !pathname))
+        if((char_array[index_in] == '\\') && (sceneData->EffectiveLanguageVersion() >= 380 || !pathname))
         {
             // Historically, escape sequences were ignored when parsing for a filename.
-            // As of POV-Ray 3.71, this has been changed.
+            // As of POV-Ray v3.8, this has been changed.
 
 #if POV_BACKSLASH_IS_PATH_SEPARATOR
             if (pathname)
             {
                 Warning("Backslash encountered while parsing for a filename."
-                        " As of version 3.71, this is interpreted as an escape sequence just like in any other string literal."
+                        " As of POV-Ray v3.8, this is interpreted as an escape sequence just like in any other string literal."
                         " If this is supposed to be a path separator, use a forward slash instead.");
             }
 #endif
@@ -836,7 +866,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
                     buffer[3] = char_array[++index_in];
                     buffer[4] = 0;
 
-                    char_string[index_out] = (UCS2)strtoul(buffer, &dummy_ptr, 16);
+                    char_string[index_out] = (UCS2)std::strtoul(buffer, &dummy_ptr, 16);
                     break;
                 default:
                     char_string[index_out] = char_array[index_in];
@@ -851,15 +881,15 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
             if ((char_array[index_in] == '\\') && pathname)
             {
                 // Historically, escape sequences were ignored when parsing for a filename.
-                // As of POV-Ray 3.71, this has been changed.
+                // As of POV-Ray 3.8, this has been changed.
 
 #if POV_BACKSLASH_IS_PATH_SEPARATOR
                 Warning("Backslash encountered while parsing for a filename."
-                        " In legacy (pre-3.71) scenes, this is NOT interpreted as the start of an escape sequence."
+                        " In legacy (pre-3.8) scenes, this is NOT interpreted as the start of an escape sequence."
                         " However, for future compatibility it is recommended to use a forward slash as path separator instead.");
 #else
                 Warning("Backslash encountered while parsing for a filename."
-                        " In legacy (pre-3.71) scenes, this is NOT interpreted as the start of an escape sequence.");
+                        " In legacy (pre-3.8) scenes, this is NOT interpreted as the start of an escape sequence.");
 #endif
             }
 
@@ -1025,7 +1055,7 @@ UCS2 *Parser::UCS2_strcat(UCS2 *s1, const UCS2 *s2)
 
 int Parser::UCS2_strlen(const UCS2 *str)
 {
-    register int i;
+    int i;
 
     for(i = 0; *str != 0; str++, i++) { }
 

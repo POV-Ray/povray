@@ -18,7 +18,7 @@
 # (e.g. doc).
 #
 # Running prebuild.sh requires:
-#   1) GNU autoconf >= 2.59 and GNU automake >= 1.9
+#   1) GNU autoconf >= 2.68 and GNU automake >= 1.9
 #   2) perl and m4 (should be on any system, at least Linux is okay)
 #   3) Run from the unix/ directory where the script is located.
 #
@@ -42,9 +42,19 @@
 #
 ###############################################################################
 
+# Change to the directory this script resides in
+scriptname=`basename $0`
+olddir=`pwd`
+cd `dirname $0`
+
 umask 022
 
-pov_version_base=`cat ./VERSION | sed 's,\([0-9]*.[0-9]*\).*,\1,g'`
+# Extract version information from `source/base/version.h`
+eval `../tools/unix/get-source-version.sh ../source/base/version.h`
+pov_copyright="$POV_RAY_COPYRIGHT"
+pov_version_base="$POV_RAY_GENERATION"
+pov_version="$POV_RAY_FULL_VERSION"
+
 pov_config_bugreport="POV-Ray issue tracker at https://github.com/POV-Ray/povray/issues"
 
 # documentation
@@ -52,7 +62,7 @@ timestamp=`date +%Y-%m-%d`
 build="./docs_$timestamp"
 builddoc="$build/documentation"
 
-required_autoconf="2.59"
+required_autoconf="2.68"
 required_automake="1.9"
 
 
@@ -60,16 +70,10 @@ required_automake="1.9"
 # Setup
 ###############################################################################
 
-# Prevents running from another directory.
-if test x"`dirname $0`" != x"."; then
-  echo "$0: must ran from POV-Ray's unix/ directory"
-  exit 1
-fi
-
 # Check optional argument.
 case "$1" in
   ""|clean|doc|docs|docclean|docsclean) ;;
-  *) echo "$0: error: unrecognized option '$1'"; exit ;;
+  *) echo "$scriptname: error: unrecognized option '$1'"; cd "$olddir" ; exit ;;
 esac
 
 # Check whether 'cp -u' is supported.
@@ -89,7 +93,8 @@ if test x"$1" = x""; then
     expr $autoconf \>= $required > /dev/null || autoconf=""
   fi
   if test x"$autoconf" = x""; then
-    echo "$0: error: requires autoconf $required_autoconf or above"
+    echo "$scriptname: error: requires autoconf $required_autoconf or above"
+    cd "$olddir"
     exit 1
   fi
 
@@ -101,7 +106,8 @@ if test x"$1" = x""; then
     expr $automake \>= $required > /dev/null || automake=""
   fi
   if test x"$automake" = x""; then
-    echo "$0: error: requires automake $required_automake or above"
+    echo "$scriptname: error: requires automake $required_automake or above"
+    cd "$olddir"
     exit 1
   fi
 fi
@@ -341,6 +347,7 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
   chmod u+rw docs_internal_$timestamp.log
   rm -f      $log_file
 
+  cd "$olddir"
   exit
   ;;
 
@@ -350,7 +357,7 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
   # some shells seem unable to expand properly wildcards in the list entries
   # (e.g. ../distribution/in*/).
   for file in \
-    AUTHORS ChangeLog configure.ac COPYING NEWS README VERSION \
+    AUTHORS ChangeLog configure.ac COPYING NEWS README \
     povray.1 povray.conf \
     scripts \
     ../distribution/ini ../distribution/include ../distribution/scenes
@@ -367,6 +374,10 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
   echo "Create ../INSTALL"
   $cp_u -f install.txt ../INSTALL  ||  echo "INSTALL not copied !"
   chmod -f u+rw ../INSTALL
+
+  # VERSION
+  echo "Create ../VERSION"
+  echo "$pov_version" > ../VERSION  ||  echo "VERSION not created !"
 
   # icons/
   # don't copy the icons/source directory
@@ -1517,3 +1528,6 @@ case "$1" in
   done
   ;;
 esac  # boost
+
+
+cd "$olddir"

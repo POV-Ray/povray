@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,6 +38,7 @@
 
 // C++ variants of standard C header files
 #include <cstdarg>
+#include <cstdio>
 #include <cstdlib>
 
 // Standard C++ header files
@@ -116,7 +117,7 @@ bool IFileStream::UnRead_Byte(int c)
 // implies that only the input stream will be affected on streams opened for I/O
 // (which is not the case with fseek, since fseek moves the pointer for output too).
 // However, the macintosh code seems to need it to be called seekg, so it is ...
-bool IFileStream::seekg(POV_LONG pos, unsigned int whence)
+bool IFileStream::seekg(POV_OFF_T pos, unsigned int whence)
 {
     if(!fail)
         fail = fseek(f, pos, whence) != 0;
@@ -173,13 +174,13 @@ bool IFileStream::getline(char *s, size_t buflen)
     return !fail;
 }
 
-IMemStream::IMemStream(const unsigned char* data, size_t size, const char* formalName, POV_LONG formalStart) :
+IMemStream::IMemStream(const unsigned char* data, size_t size, const char* formalName, POV_OFF_T formalStart) :
     IStream(ASCIItoUCS2String(formalName)), size(size), pos(0), formalStart(formalStart), start(data), mUngetBuffer(EOF)
 {
     fail = false;
 }
 
-IMemStream::IMemStream(const unsigned char* data, size_t size, const UCS2String& formalName, POV_LONG formalStart) :
+IMemStream::IMemStream(const unsigned char* data, size_t size, const UCS2String& formalName, POV_OFF_T formalStart) :
     IStream(formalName), size(size), pos(0), formalStart(formalStart), start(data), mUngetBuffer(EOF)
 {
     fail = false;
@@ -281,7 +282,7 @@ OStream& OStream::flush()
 // implies that only the input stream will be affected on streams opened for I/O
 // (which is not the case with fseek, since fseek moves the pointer for output too).
 // However, the macintosh code seems to need it to be called seekg, so it is ...
-bool OStream::seekg(POV_LONG pos, unsigned int whence /* = seek_set */)
+bool OStream::seekg(POV_OFF_T pos, unsigned int whence /* = seek_set */)
 {
     if(!fail)
         fail = fseek(f, pos, whence) != 0;
@@ -301,7 +302,7 @@ void OStream::printf(const char *format, ...)
     char buffer[1024];
 
     va_start(marker, format);
-    vsnprintf(buffer, 1023, format, marker);
+    std::vsnprintf(buffer, sizeof(buffer), format, marker);
     va_end(marker);
 
     write(reinterpret_cast<const void *>(buffer), strlen(buffer));
@@ -370,10 +371,10 @@ bool CheckIfFileExists(const Path& p)
     return true;
 }
 
-POV_LONG GetFileLength(const Path& p)
+POV_OFF_T GetFileLength(const Path& p)
 {
     FILE *tempf = PlatformBase::GetInstance().OpenLocalFile (p().c_str(), "rb");
-    POV_LONG result = -1;
+    POV_OFF_T result = -1;
 
     if(tempf != NULL)
     {
@@ -459,7 +460,7 @@ bool IMemStream::getline(char *s,size_t buflen)
     return !fail;
 }
 
-POV_LONG IMemStream::tellg() const
+POV_OFF_T IMemStream::tellg() const
 {
     size_t physicalPos = pos;
     if (mUngetBuffer != EOF)
@@ -467,7 +468,7 @@ POV_LONG IMemStream::tellg() const
     return formalStart + physicalPos;
 }
 
-bool IMemStream::seekg(POV_LONG posi, unsigned int whence)
+bool IMemStream::seekg(POV_OFF_T posi, unsigned int whence)
 {
     if(!fail)
     {

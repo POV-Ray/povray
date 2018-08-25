@@ -1,7 +1,27 @@
 /**
 
+@defgroup PovParser POV-Ray Parser Module
+@ingroup PovSource
+@brief Scene file parser.
+
+This module is responsible for parsing a scene file, reading in any auxiliary files such as include
+files and input images, and generating an internal representation of the scene and camera in the
+format required by the @ref PovCore.
+
+The parser module is entirely unaware of multithreading: It does not seem to make sense to run
+multiple parser instances to process the same file, nor to share data between multiple parser
+instances processing different files.
+
+The parser module depends on the @ref PovBase, @ref PovCore, and @ref PovVM.
+
+@todo
+    At present, the parser module also depends on the @ref PovBackend.
+
+@{
+
 @dir
-@ingroup PovParser
-Source code files for the parser.
+@brief Source code files for the @ref PovParser.
+
+@}
 
 */

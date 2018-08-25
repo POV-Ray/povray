@@ -13,8 +13,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -355,7 +355,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     }
     image = Image::Create (width, height, imagetype) ;
     // NB: JPEG files don't use alpha, so premultiplied vs. non-premultiplied is not an issue
-    image->TryDeferDecoding(gamma, 255); // try to have gamma adjustment being deferred until image evaluation.
+    image->TryDeferDecoding(gamma, MAXJSAMPLE); // try to have gamma adjustment being deferred until image evaluation.
 
     // JSAMPLEs per row in output buffer
     readbuf.row_stride = readbuf.cinfo.output_width * readbuf.cinfo.output_components;
@@ -377,14 +377,14 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
                 unsigned int r = readbuf.row_pointer[0][col * 3];
                 unsigned int g = readbuf.row_pointer[0][(col * 3) + 1];
                 unsigned int b = readbuf.row_pointer[0][(col * 3) + 2];
-                SetEncodedRGBValue (image, col, row, gamma, 255, r, g, b) ;
+                SetEncodedRGBValue (image, col, row, gamma, MAXJSAMPLE, r, g, b) ;
             }
         }
         else if (readbuf.cinfo.output_components == 1) // 8-bit grayscale image
         {
             for (col = 0; col < width; col++)
             {
-                SetEncodedGrayValue (image, col, row, gamma, 255, (unsigned int) readbuf.row_pointer[0][col]) ;
+                SetEncodedGrayValue (image, col, row, gamma, MAXJSAMPLE, (unsigned int) readbuf.row_pointer[0][col]) ;
             }
         }
     }
@@ -510,7 +510,7 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
             for (int col = 0; col < width; col++)
             {
                 unsigned int r, g, b;
-                GetEncodedRGBValue(image, col, row, gamma, 255, r, g, b, *dither);
+                GetEncodedRGBValue(image, col, row, gamma, MAXJSAMPLE, r, g, b, *dither);
                 *sample++ = (JSAMPLE) r;
                 *sample++ = (JSAMPLE) g;
                 *sample++ = (JSAMPLE) b;
@@ -519,7 +519,7 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
         else if (writebuf.cinfo.input_components == 1) // 8-bit grayscale image
         {
             for (int col = 0; col < width; col++)
-                *sample++ = (JSAMPLE) GetEncodedGrayValue(image, col, row, gamma, 255, *dither);
+                *sample++ = (JSAMPLE) GetEncodedGrayValue(image, col, row, gamma, MAXJSAMPLE, *dither);
         }
         jpeg_write_scanlines(&writebuf.cinfo, writebuf.row_pointer, 1);
     }

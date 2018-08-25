@@ -1,4 +1,5 @@
 ###################################################################################################
+#
 # setup.nsi
 #
 # This file contains the NSIS setup script for the Windows version of POV-Ray.
@@ -12,8 +13,8 @@
 #
 ###################################################################################################
 #
-# Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-# Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
+# Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+# Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 # 
 # POV-Ray is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -27,14 +28,6 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-###################################################################################################
-#
-# $File: //depot/public/povray/3.x/windows/setup.nsi $
-# $Revision: #1 $
-# $Change: 6069 $
-# $DateTime: 2013/11/06 11:59:40 $
-# $Author: chrisc $
 #
 ###################################################################################################
 #
@@ -131,7 +124,7 @@
 !define MYCOPYRIGHT  "Copyright(c) 2050-2051 Acme Space Blasters. Inc."
 !define MYEXEPREFIX  "lasray"
 !define MYSCENEEXT   "pov"
-!define MYHELPFILE   "povray37.chm"
+!define MYHELPFILE   "povray.chm"
 ###################################################################################################
 
 RequestExecutionLevel highest

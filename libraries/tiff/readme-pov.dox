@@ -1,0 +1,19 @@
+/**
+
+@dir
+@ingroup PovLibraries
+@brief Source code of _libtiff_ 3rd party TIFF library.
+
+This directory contains a slightly adapted libtiff 3.8.2 source distribution,
+and is part of the POV-Ray source distribution package.
+
+@note
+    This distribution of libtiff differs from the original in the omission of
+    a config file, `libtiff/tiffconf.h`, which is instead re-created during the
+    build process.
+
+Official libtiff source distribution packages can be obtained via <http://simplesystems.org/libtiff/>.
+
+See `COPYRIGHT` file in this directory for licensing information.
+
+*/

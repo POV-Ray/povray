@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,6 +39,7 @@
 #include "syspovconfig.h"
 
 // C++ variants of C standard headers
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #ifdef HAVE_TIME_H
@@ -145,8 +146,9 @@ namespace vfePlatform
     // name to one that it can use.
     UCS2String vfeUnixSession::CreateTemporaryFile(void) const
     {
-        char str [FILE_NAME_LENGTH] = "";
-        snprintf(str, FILE_NAME_LENGTH, "%spov%d", m_OptionsProc->GetTemporaryPath().c_str(), getpid ());
+        // TODO FIXME - This allows only one temporary file per process!
+        char str [POV_FILENAME_BUFFER_CHARS+1] = "";
+        std::snprintf(str, sizeof(str), "%spov%d", m_OptionsProc->GetTemporaryPath().c_str(), getpid ());
         POV_DELETE_FILE (str);
 
         return ASCIItoUCS2String (str);
@@ -371,7 +373,7 @@ namespace vfePlatform
             throw POV_EXCEPTION(kParamErr, "Background execution of shellout commands not currently supported");
 
         m_ProcessRunning = true;
-        int result = system(command.c_str());
+        int result = std::system(command.c_str());
         m_ProcessRunning = false;
         if (result == -1)
         {

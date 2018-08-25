@@ -6,7 +6,7 @@
 <head>
 <meta http-equiv=Content-Type content="text/html; charset=windows-1252">
 <title>Reference Section 2</title>
-<link rel="StyleSheet" href="povray37.css" type="text/css">
+<link rel="StyleSheet" href="povray.css" type="text/css">
 <link rel="shortcut icon" href="favicon.ico">
 
 <!--  NOTE: In order to help users find information about POV-Ray using web      -->
@@ -202,7 +202,7 @@
 <table class="HeaderFooter" width="100%">
 <tr>
   <td colspan=5 align="left" class="HeaderFooter">
-    POV-Ray for Unix <strong class="HeaderFooter">version 3.7.1</strong>
+    POV-Ray for Unix <strong class="HeaderFooter">version 3.8</strong>
   </td>
 </tr>
 <tr >
@@ -917,7 +917,7 @@ scene lines parsed.</p>
 specified. Some file formats (namely TGA and PNG) also store information about where the file started (i. e. <code> +SC</code><em>n</em> and <code>+SR</code><em>n</em> options), alpha output <code>+UA</code>, and bit-depth
 <code>+FN</code><em>n</em>, which will override these settings. It is up to the user to make sure that all other options are set the same as the original render.</p>
 
-<p><font class="New">New</font> as of version 3.7.1 the <code>Create_Continue_Trace_Log</code> option was added to offer greater resource control. The user can suppress the creation of this file by simply setting the <em>ini-option</em> <code>Create_Continue_Trace_Log=false</code> or using the <code>-CC</code> command line option.</p> 
+<p><font class="New">New</font> as of version 3.8 the <code>Create_Continue_Trace_Log</code> option was added to offer greater resource control. The user can suppress the creation of this file by simply setting the <em>ini-option</em> <code>Create_Continue_Trace_Log=false</code> or using the <code>-CC</code> command line option.</p> 
 
 <p>The <code>Create_Ini</code> option or <code>+GI</code> switch provides an easy way to create an INI file with all of the rendering options, so you can re-run files with the same options, or ensure you have all the same options when resuming. This option creates an INI file with every option set at the value used for that rendering. This includes default values which you have not specified. For example if you run POV-Ray with...</p>
 
@@ -1019,11 +1019,11 @@ you could distribute along with your scene file so other users can exactly re-cr
 </tr>
 <tr>
 <td><code>Display_Gamma=BT709</code></td>
-<td>Sets the display gamma to match the <em>ITU-R BT.709 transfer function</em>. <font class="New">New</font> in version 3.7.1</td>
+<td>Sets the display gamma to match the <em>ITU-R BT.709 transfer function</em>. <font class="New">New</font> in version 3.8</td>
 </tr>
 <tr>
 <td><code>Display_Gamma=BT2020</code></td>
-<td>Sets the display gamma to match the <em>ITU-R BT.2020 transfer function</em>. <font class="New">New</font> in version 3.7.1</td>
+<td>Sets the display gamma to match the <em>ITU-R BT.2020 transfer function</em>. <font class="New">New</font> in version 3.8</td>
 </tr>
 </table>
 
@@ -1373,13 +1373,13 @@ encoded)</td>
 </tr>
 </table>
 <p>
-<font class="New">New</font> as of version 3.7.1, instead of <code>Output_File_Type=C</code> you can also use <code>Output_File_Type=T Compression=1</code> to choose RLE-encoded Targa format.
+<font class="New">New</font> as of version 3.8, instead of <code>Output_File_Type=C</code> you can also use <code>Output_File_Type=T Compression=1</code> to choose RLE-encoded Targa format.
 </p>
 <p>
 PNG is an image format designed not only to replace GIF, but to improve on its shortcomings. PNG offers the highest compression available without loss for high quality applications, such as ray-tracing.
 </p>
 <p>
-<font class="New">New</font> Prior to version 3.7.1, PPM output always created the compact <em>raw</em> (binary) format. The <code>Compression=0</code> ini setting can now be used to select the <em>plain</em> (ASCII) format instead.
+<font class="New">New</font> Prior to version 3.8, PPM output always created the compact <em>raw</em> (binary) format. The <code>Compression=0</code> ini setting can now be used to select the <em>plain</em> (ASCII) format instead.
 </p>
 <p>
 The system specific format depends on the platform used and is covered in the appropriate system specific documentation.
@@ -1551,11 +1551,11 @@ output file.</p>
 </tr>
 <tr>
 <td width="30%"><code>File_Gamma=BT709</code></td>
-<td width="70%"><font class="New">New</font> in version 3.7.1, selects the <em>ITU-R BT.709 transfer function</em> instead of a power-law output file gamma</td>
+<td width="70%"><font class="New">New</font> in version 3.8, selects the <em>ITU-R BT.709 transfer function</em> instead of a power-law output file gamma</td>
 </tr>
 <tr>
 <td width="30%"><code>File_Gamma=BT2020</code></td>
-<td width="70%"><font class="New">New</font> in version 3.7.1, selects the <em>ITU-R BT.2020 transfer function</em> instead of a power-law output file gamma</td>
+<td width="70%"><font class="New">New</font> in version 3.8, selects the <em>ITU-R BT.2020 transfer function</em> instead of a power-law output file gamma</td>
 </tr>
 </table>
 
@@ -1565,7 +1565,7 @@ Some other file formats do have a clearly specified gamma handling policy, but a
 
 The parameter has no effect on file formats mandating linear storage of color values (currently OpenEXR and Radiance HDR).
 
-Alternatively to a numeric value, <code>sRGB</code> can be specified, instructing POV-Ray to employ the <em>sRGB transfer function</em>, which is similar but not quite identical to a power-law gamma curve with a gamma of 2.2. <code>sRGB</code> is also the default on all platforms currently supported. <font class="New">New</font> in version 3.7.1, <code>BT709</code> or <code>BT2020</code> can also be specified, instructing POV-Ray to employ the <em>transfer function</em> specified in <em>ITU-R BT.709</em> or <em>ITU-R BT.2020</em>, respectively, which are similar but not quite identical to a power-law gamma curve with a gamma of roughly 1.9. When generating Netpbm PPM output, <code>BT709</code> is the effective default.
+Alternatively to a numeric value, <code>sRGB</code> can be specified, instructing POV-Ray to employ the <em>sRGB transfer function</em>, which is similar but not quite identical to a power-law gamma curve with a gamma of 2.2. <code>sRGB</code> is also the default on all platforms currently supported. <font class="New">New</font> in version 3.8, <code>BT709</code> or <code>BT2020</code> can also be specified, instructing POV-Ray to employ the <em>transfer function</em> specified in <em>ITU-R BT.709</em> or <em>ITU-R BT.2020</em>, respectively, which are similar but not quite identical to a power-law gamma curve with a gamma of roughly 1.9. When generating Netpbm PPM output, <code>BT709</code> is the effective default.
 
 <p class="Note"><strong>Note:</strong> Specifying <code>File_Gamma=BT709</code> or <code>File_Gamma=BT2020</code> only affects the <em>transfer function</em> used. Specifically, it does <em>not</em> affect the digital representation of nominal black and white, which remain at 0 and 255 (presuming 8-bit encoding), respectively, as opposed to 16 and 235 for full-fledged ITU-R BT-709 encoding.</p>
 
@@ -3101,7 +3101,7 @@ specify <code>Split_Unions=on</code> or use <code> +SU</code>. The default is
 <p>Please keep in mind that this implementation of BSP is highly beta and will not speed up scenes in many cases (and in fact may slow some down). In particular the building of the tree can take a long time and lots of memory in severe cases. Using the BSP tree rather than our traditional BVH (Bounding Volume Hierarchy) system (default or <code>+BM1</code>) is a choice best made for specific scenes that will benefit from the way the BSP operates, and in particular if the render is long enough to offset the build time. The BSP tree build time will be constant for a given scene and set of BSP parameters, regardless of the output resolution. A 30-second BSP build may not be a good choice on a 60-second test render but may be acceptable for a 60-minute final render if the use of BSP adds a few pixels per second.</p>
 <p>On some scenes the difference however will be dramatic, with short build times and radically increased render speed.</p>
 <p>We have provided some BSP-related options via the INI file and encourage you to experiment with them to see if you can get better results than the default values built in to POV-Ray. We will listen to feedback from this and if necessary tweak the defaults.</p>
-<p class="Note"><strong>Note:</strong> We do not guarantee that all of the following INI file settings will remain in the final release of 3.7</p>
+<p class="Note"><strong>Note:</strong> We do not guarantee that all of the following INI file settings will remain in future releases.</p>
 <pre>
   BSP_MaxDepth=128
   BSP_BaseAccessCost=1.0
@@ -3335,7 +3335,7 @@ Radiosity_To_File=&lt;on/off&gt;	or +RFO	to enable writing new samples to the ra
 <a name="r3_2_8_8_3"></a>
 <div class="content-level-h5" contains="Radiosity Vain Pretrace" id="r3_2_8_8_3">
 <h5>3.2.8.8.3 Radiosity Vain Pretrace</h5>
-<p>Also new as of version 3.7 an option has been added speed up radiosity pretrace:</p>
+<p>Also new as of version 3.7 an option has been added to speed up radiosity pretrace:</p>
 <p>As some computations don't contribute to the generation of radiosity samples, they can safely be skipped during radiosity pretrace to gain some speed if the pretrace's other role as a coarse preview is not required.</p>
 <p>The following .ini file/command line options control whether pretrace performs all computations so it can double-feature as a coarse preview  (vain pretrace):</p>
 <pre>

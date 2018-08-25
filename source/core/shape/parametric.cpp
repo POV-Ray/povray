@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,8 +37,7 @@
 #include "core/shape/parametric.h"
 
 #include <algorithm>
-
-#include <boost/tr1/array.hpp>
+#include <array>
 
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
@@ -441,7 +440,7 @@ void Parametric::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *
     Vector3d RU, RV;
     Vector2d uv_vect;
 
-    std::tr1::array<GenericScalarFunctionInstance,3> aFn = {
+    std::array<GenericScalarFunctionInstance,3> aFn = {
         GenericScalarFunctionInstance(Function[0], Thread),
         GenericScalarFunctionInstance(Function[1], Thread),
         GenericScalarFunctionInstance(Function[2], Thread)
@@ -919,7 +918,7 @@ void Parametric::Precompute_Parametric_Values(char flags, int depth, TraceThread
         throw POV_EXCEPTION_STRING("Cannot allocate memory for parametric precomputation data.");
 
     PrecompLastDepth = 1 << (depth - 1);
-    std::tr1::array<GenericScalarFunctionInstance,3> aFn = {
+    std::array<GenericScalarFunctionInstance,3> aFn = {
         GenericScalarFunctionInstance(Function[0], Thread),
         GenericScalarFunctionInstance(Function[1], Thread),
         GenericScalarFunctionInstance(Function[2], Thread)

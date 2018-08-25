@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -70,7 +70,7 @@ class TextStreamBuffer
         void print(const char *str);
         void puts(const char *str);
         void putc(int chr);
-        void printfile(const char *filename, POV_LONG offset, POV_LONG lines);
+        void printfile(const char *filename, POV_OFF_T offset, POV_LONG lines);
         void printfile(FILE *file, POV_LONG lines);
         void flush();
     protected:

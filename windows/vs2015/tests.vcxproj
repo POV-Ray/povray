@@ -117,6 +117,7 @@
     <OutDir>bin64\</OutDir>
     <IntDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>povtests64d</TargetName>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>bin32\</OutDir>
@@ -144,7 +145,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\source\tests;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\platform\windows;..\..\internal\windows;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\source\tests;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;_DEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;WINVER=0x0500;_WIN32_WINNT=0x0500;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -165,7 +166,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\source\tests;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\platform\windows;..\..\internal\windows;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\source\tests;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;_DEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;BUILDING_AMD64=1;COMMONCTRL_VERSION=0x500;_WIN32_WINNT=0x0500;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -188,7 +189,7 @@
       <Optimization>Full</Optimization>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\source\tests;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\platform\windows;..\..\internal\windows;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\source\tests;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;WINVER=0x0500;_WIN32_WINNT=0x0500;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -211,7 +212,7 @@
       <Optimization>Full</Optimization>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\source\tests;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\platform\windows;..\..\internal\windows;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\source\tests;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILDING_AMD64=1;COMMONCTRL_VERSION=0x500;_WIN32_WINNT=0x0500;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -234,7 +235,7 @@
       <Optimization>Full</Optimization>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\source\tests;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\platform\windows;..\..\internal\windows;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\source\tests;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;WINVER=0x0500;_WIN32_WINNT=0x0500;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILD_SSE2=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -258,7 +259,7 @@
       <Optimization>Full</Optimization>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\source\tests;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\platform\windows;..\..\internal\windows;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\source\tests;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILDING_AMD64=1;COMMONCTRL_VERSION=0x500;_WIN32_WINNT=0x0500;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -280,8 +281,14 @@
     <ProjectReference Include="boost_system.vcxproj">
       <Project>{d870a978-8130-4d1d-9fb2-3ee2028d2c50}</Project>
     </ProjectReference>
+    <ProjectReference Include="povbackend.vcxproj">
+      <Project>{c6d9b754-11eb-4fc3-8683-593b53e9ad1f}</Project>
+    </ProjectReference>
     <ProjectReference Include="povbase.vcxproj">
       <Project>{c6d9b754-11eb-4fc3-8683-593b2377d043}</Project>
+    </ProjectReference>
+    <ProjectReference Include="povplatform.vcxproj">
+      <Project>{0c227b07-1830-4c5b-8d4e-2defffd2792d}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

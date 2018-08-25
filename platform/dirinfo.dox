@@ -1,7 +1,13 @@
 /**
 
+@defgroup PovPlatform POV-Ray Platform-Specific Portions
+@brief Code specific to particular hardware platforms or operating systems.
+
+@{
+
 @dir
-@ingroup PovPlatform
-Source code files specific to individual operating systems or hardware platforms.
+@brief Source code files for @ref PovPlatform.
+
+@}
 
 */

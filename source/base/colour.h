@@ -8,8 +8,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -1866,7 +1866,7 @@ class GenericTransColour
 
         /// Legacy opacity computation.
         ///
-        /// @deprecated This fomula was used instead of @ref Opacity() in POV-Ray 3.6 and earlier texture computations.
+        /// @deprecated This fomula was used instead of @ref Opacity() in POV-Ray v3.6 and earlier texture computations.
         ///             Do not use it - it is bogus, and we're only keeping it around for compatibility with legacy
         ///             scenes.
         ///

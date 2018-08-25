@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -53,8 +53,10 @@
 // this must be the last header file included
 #include "base/povdebug.h"
 
-namespace pov
+namespace pov_parser
 {
+
+using namespace pov;
 
 /*****************************************************************************
 *
@@ -1969,7 +1971,7 @@ unsigned int FNCode::compile_instruction(unsigned int op, unsigned int rs, unsig
         // to use an intermediate code representation and more
         // advanced optimisation techniques, but this is a
         // project of its own and it would have made a release
-        // of POV-Ray 3.5 next to impossible for at least
+        // of POV-Ray v3.5 next to impossible for at least
         // another year... [trf]
         //
         // ************************************************************

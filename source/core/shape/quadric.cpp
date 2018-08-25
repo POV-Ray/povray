@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -111,7 +111,7 @@ bool Quadric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 {
     DBL Depth1, Depth2;
     Vector3d IPoint;
-    register int Intersection_Found;
+    bool Intersection_Found;
 
     Intersection_Found = false;
 
@@ -176,7 +176,7 @@ bool Quadric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 
 bool Quadric::Intersect(const BasicRay& ray, DBL *Depth1, DBL *Depth2) const
 {
-    register DBL a, b, c, d;
+    DBL a, b, c, d;
 
     a = Xd * (QA * Xd + QB * Yd + QC * Zd) +
         Yd * (QE * Yd + QF * Zd) +
@@ -710,7 +710,7 @@ Quadric::~Quadric()
 *
 * INPUT
 *
-*   Quadric - Qaudric object
+*   Quadric - Quadric object
 *
 * OUTPUT
 *
@@ -737,7 +737,7 @@ Quadric::~Quadric()
 *
 *   May 1994 : Creation.
 *
-*   Sep 1994 : Added support of hyperpoloids. Improved bounding of
+*   Sep 1994 : Added support of hyperboloids. Improved bounding of
 *              quadrics used in CSG intersections. [DB]
 *
 ******************************************************************************/
@@ -898,6 +898,9 @@ void Quadric::Compute_BBox(Vector3d& ClipMin, Vector3d& ClipMax)
 
     ClipMin -= T1;
     ClipMax -= T1;
+
+    // TODO FIXME - The following code disregards inside/outside information.
+    //              This is a huge problem in CSG intersection bounding box computations.
 
     /* We want A to be non-negative. */
 

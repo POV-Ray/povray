@@ -6,7 +6,7 @@
 <head>
 <meta http-equiv=Content-Type content="text/html; charset=windows-1252">
 <title>Tutorial Section 1</title>
-<link rel="StyleSheet" href="povray37.css" type="text/css">
+<link rel="StyleSheet" href="povray.css" type="text/css">
 <link rel="shortcut icon" href="favicon.ico">
 
 <!--  NOTE: In order to help users find information about POV-Ray using web      -->
@@ -45,10 +45,10 @@
   <td><div class="divh3"><a title="2.1.4.1" href="#t2_1_4_1">Changes and New Features Summary</a></div></td>
 </tr>
 <tr>
-  <td><div class="divh4"><a title="2.1.4.1.1" href="#t2_1_4_1_1">Version 3.7.1</a></div></td>
+  <td><div class="divh4"><a title="2.1.4.1.1" href="#t2_1_4_1_1">Version 3.8</a></div></td>
 </tr>
 <tr>
-  <td><div class="divh4"><a title="2.1.4.1.2" href="#t2_1_4_1_2">Version 3.7.0</a></div></td>
+  <td><div class="divh4"><a title="2.1.4.1.2" href="#t2_1_4_1_2">Version 3.7</a></div></td>
 </tr>
 <tr>
   <td><div class="divh2"><strong><a title="2.1.5" href="#t2_1_5">Trademarks</a></strong></div></td>
@@ -85,7 +85,7 @@
 <table class="HeaderFooter" width="100%">
 <tr>
   <td colspan=5 align="left" class="HeaderFooter">
-    POV-Ray for Unix <strong class="HeaderFooter">version 3.7.1</strong>
+    POV-Ray for Unix <strong class="HeaderFooter">version 3.8</strong>
   </td>
 </tr>
 <tr >
@@ -320,19 +320,18 @@ file, and by using the shape or material name in your scene.</p>
 <a name="t2_1_4_1"></a>
 <div class="content-level-h4" contains="Changes and New Features Summary" id="t2_1_4_1">
 <h4>2.1.4.1 Changes and New Features Summary</h4>
-<p>This section covers version 3.7.x <em>Changes</em> and <em>New Features</em> that apply no matter what platform you are using. Changes and information pertaining to your particular installation are covered in the platform specific documentation that's included with the distribution.</p>
-<p>The categorized list below outlines the additions, changes and improvements along with links (when appropriate) to their relevant passages in the <em>Reference Section</em>.</p>
+<p>The following sections cover changes and new features that apply no matter what platform you are using. Changes and information pertaining to your particular installation are covered in the platform specific documentation that's included with the distribution.</p>
+<p>The categorized lists below outline the additions, changes and improvements along with links (when appropriate) to their relevant passages in the <em>Reference Section</em>.</p>
 </div>
 <a name="t2_1_4_1_1"></a>
-<div class="content-level-h5" contains="Version 3.7.1" id="t2_1_4_1_1">
-<h5>2.1.4.1.1 Version 3.7.1</h5>
-<p>These changes (in no particular order) pertain to the version 3.7.1 release.</p>
+<div class="content-level-h5" contains="Version 3.8" id="t2_1_4_1_1">
+<h5>2.1.4.1.1 Version 3.8</h5>
+<p>These changes (in no particular order) pertain to the version 3.8 release.</p>
 <p><strong>General Changes</strong></p>
 <ol>
-  <li>Began using <font class="New">New</font> and <font class="Change">Change</font> in the documentation. See: <a href="t2_1.html#t2_1_8">Notation and Basic Assumptions</a> for additional information</li>
+  <li>For clarity and ease of maintenance, several new annotations now appear in the documentation. See: <a href="r3_3.html#r3_3_1_1">Notation and Basic Assumptions</a></li>
   <li>Bug tracking is now handled by the <a href="https://github.com/POV-Ray/povray/issues">issue tracker</a> on GitHub</li>
   <li>Animation status messages now include the nominal frame number</li>
-  <li>POV-Ray for Windows now reports file names and line numbers of warnings</li>
 </ol>
 <p><strong>Language Basics and Directives</strong></p>
 <ol>
@@ -344,14 +343,15 @@ file, and by using the shape or material name in your scene.</p>
   <li>The addition of a <code><a href="r3_2.html#r3_2_2_5">Create_Continue_Trace_Log</a></code> option allows for greater resource control</li>
   <li>The <a href="r3_3.html#r3_3_2_2">Declare and Local Directives</a> have been extended to support <em>tuple-style</em> assignments</li>
   <li>All instances of <code>gray</code> in keywords or INI file options can now alternatively be spelled <code>grey</code></li>
-  <li>Trailing whitespace in INI files no longer causes a warning</li>
+  <li>Trailing white-space in INI files no longer causes a warning</li>
   <li>The <code>version</code> pseudo-variable will now evaluate to the effective language version at the time the expression is parsed. See: <a href="r3_3.html#r3_3_1_5_6">Built-in Variables</a> and <a href="r3_3.html#r3_3_2_5">Version Directive</a></li>
 </ol>
 <p><strong>Patterns Pigments and Textures</strong></p>
 <ol>
+  <li>The default setting for <code><a href="r3_6.html#r3_6_1_3_1">ambient</a></code> has changed</li>
   <li>A <code>repeat</code> option has been added to <a href="r3_6.html#r3_6_2_2_3">Crackle Pattern</a></li>
   <li>The map entry upper limit restriction for <a href="r3_6.html#r3_6_1_1_2">Color Maps</a> and <a href="r3_6.html#r3_6_1_1_3">Pigment Maps</a> has been removed</li>
-  <li>UV mapping <a href="r3_6.html#r3_6_1_7_1">support</a> for the <code>cone</code>, <code>cylinder</code> and <code>lemon</code> was added</li>
+  <li>UV mapping <a href="r3_6.html#r3_6_1_7_1">support</a> for the <code>cone</code>, <code>cylinder</code> and <code>lemon</code> was added and <code>ovus</code> mapping has been improved</li>
   <li>A new finish parameter <code><a href="r3_6.html#r3_6_1_3">use_alpha</a></code> has been added to suppress highlights and reflections depending on pigment transparency</li>
   <li>Implemented a non-linear interpolation scheme for <a href="r3_6.html#r3_6_1_1_2">Color Maps</a> and <a href="r3_6.html#r3_6_1_1_3">Pigment Maps</a></li>
   <li>A new special pigment pattern <code><a href="r3_6.html#r3_6_2_4_4">user_defined</a></code> has been added to define the pigment color directly in terms of a set of functions</li>
@@ -363,6 +363,7 @@ file, and by using the shape or material name in your scene.</p>
 </ol>
 <p><strong>Images and Image Related</strong></p>
 <ol>
+  <li>The default <code>up</code> vector has changed. See: <a href="r3_4.html#r3_4_2_1_6">Aspect Ratio</a></li>
   <li>The <code>max_extent</code> <a href="r3_3.html#r3_3_1_6_5">function</a> has been extended</li>
   <li>Two gamma handling specifications have been added for:</li>
     <ol type="a">
@@ -382,6 +383,7 @@ file, and by using the shape or material name in your scene.</p>
 <p><strong>Objects and Object Related</strong></p>
 <ol>
   <li>The <code><a href="r3_5.html#r3_5_1_1_9">lemon</a></code> object was added</li>
+  <li>The <code><a href="r3_5.html#r3_5_1_1_10">ovus</a></code> object has been extended and <a href="r3_6.html#r3_6_1_7_1">uv mapping</a> has been improved</li>
   <li>Support for a <em>spindle</em> <code><a href="r3_5.html#r3_5_1_1_18">torus</a></code> was added</li>
   <li>The number of components per <code><a href="r3_5.html#r3_5_1_1_1">blob</a></code> is no longer artificially limited</li>
   <li>A <code><a href="r3_4.html#r3_4_2_2_10">user_defined</a></code> camera type was added</li>
@@ -390,9 +392,9 @@ file, and by using the shape or material name in your scene.</p>
 
 </div>
 <a name="t2_1_4_1_2"></a>
-<div class="content-level-h5" contains="Version 3.7.0" id="t2_1_4_1_2">
-<h5>2.1.4.1.2 Version 3.7.0</h5>
-<p>These items <em>definitely</em> deserve your attention, because some of them represent key changes or enhancements to the way POV-Ray operates or behaves.</p>
+<div class="content-level-h5" contains="Version 3.7" id="t2_1_4_1_2">
+<h5>2.1.4.1.2 Version 3.7</h5>
+<p>These version 3.7 items <em>definitely</em> deserve your attention, because some of them represent key changes or enhancements to the way POV-Ray operates or behaves.</p>
 <p>
 <ol>
 <li>POV-Ray now supports <a href="r3_2.html#r3_2_8_1">Symmetric MultiProcessing</a>.</li>
@@ -821,7 +823,7 @@ PvRay Version 0.5 BETA Release 9/07/91
 <a name="t2_1_8"></a>
 <div class="content-level-h3" contains="Notation and Basic Assumptions" id="t2_1_8">
 <h3>2.1.8 Notation and Basic Assumptions</h3>
-<p>Throughout the tutorial and reference books, a consistent notation is used to mark keywords of the scene description language, command line switches, INI file keywords and file names.</p>
+<p>Throughout the tutorial and reference sections, a consistent notation is used to mark keywords of the scene description language, command line switches, INI file keywords and file names.</p>
 <p><strong>For example:</strong></p>
 <p>Scene description language keywords and command-line switches:</p>
 <ul class="index">
@@ -853,15 +855,21 @@ PvRay Version 0.5 BETA Release 9/07/91
   <li><code>[ ITEM ]</code></li>
 </ul>
 
-<p>The usage of <font class="New">New</font> and <font class="Change">Change</font> are to bring attention to important passages.</p>
+<p><font class="New">New</font> in version 3.8 these additional annotations appear throughout the documentation:</p>
+<ul class="index">
+  <li><font class="Change">Change</font> followed by a version reference and designates a behavior change</li>
+  <li><font class="New">New</font> followed by a version reference to designate feature addition</li>
+  <li>The generic form <code>vX.y.z</code> of the version number and it's short form <code>vX.y</code> currently v3.8.0 and
+    v3.8 respectively</li>  
+</ul>
 
 <p class="Note"><strong>Note:</strong> POV-Ray is available as a command-line program on some platforms and as a GUI on others. Some of these platforms use folders to store files while others use directories. Some separate the folders and sub-folders with a slash character (<code>/</code>), back-slash character (<code>\</code>), or others. We have tried to make this documentation as generic as possible but sometimes we have to refer to folders, files, options etc., and rather than try to represent all possible combinations
 we sometimes simplify the documentation by referring to a hypothetical 'standard installation' of POV-Ray upon a Microsoft Windows computer.
 </p>
 <p> Here are some additional assumptions to be found in the documentation:</p>
 <ol>
-<li>You installed POV-Ray in the default location (on Windows, binaries in <code>c:\Program Files\POV-Ray\v3.7</code> and include/scene files in <code>My Documents\POV-Ray\v3.7</code>).
-If we say 'include files are stored in the <code>include</code> directory', we mean the directory called 'include' located immediately within the folder which was used for documents (in the above case, it would be <code>My Documents\POV-Ray\v3.7\include</code>). We assume you can translate that to something like <code>/usr/local/share/povray-3.7/include</code> (for Linux) or whatever is appropriate for your platform, operating system and personal installation.
+<li>You installed POV-Ray in the default location for Windows, with the binaries in <code>c:\Program Files\POV-Ray\vX.y</code> and include/scene files in <code>My Documents\POV-Ray\vX.y</code>.
+If we say 'include files are stored in the <code>include</code> directory', we mean the directory called 'include' located immediately within the folder which was used for documents, in the above case, it would be <code>My Documents\POV-Ray\vX.y\include</code>. We assume you can translate that to something like <code>/usr/local/share/povray/vX.y/include</code> for Linux or whatever is appropriate for your platform, operating system and personal installation.
 <li> POV-Ray uses INI files and/or command-line switches (if available) to choose options in all versions, but some platforms (e.g. Windows) also use dialog boxes or menu choices to set options. We will describe options assuming you are using switches or INI files when describing what the options do, as it is consistent across all platforms (all GUI versions of POV-Ray also provide a means of accepting command-line options and reading INI files from within the GUI - generally speaking, the menus and dialogs just provide
 an easier means of doing the same thing).
 <li>You may be reading this documentation using an operating-system specific help program, web browser, physical printout, PDF viewer, or text editor. We assume you know how to get around in which ever medium you are using. If we say &quot;See the chapter on <a href="t2_2.html#t2_2_8">Setting POV-Ray Options</a>&quot; we assume you can click, scroll, browse, flip pages or whatever to get there.</ol>

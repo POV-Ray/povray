@@ -12,8 +12,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -63,13 +63,13 @@
 // C++ standard headers
 #include <exception>
 #include <list>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
 // boost headers
 #include <boost/intrusive_ptr.hpp>
-#include <boost/tr1/memory.hpp>
 
 #include <io.h>
 #include <fcntl.h>
@@ -93,12 +93,12 @@ using std::list;
 // to in a few other places.
 using std::runtime_error;
 
-// these may actually be the boost implementations, depending on what boost/tr1/memory.hpp has pulled in
-using std::tr1::shared_ptr;
-using std::tr1::weak_ptr;
-using std::tr1::dynamic_pointer_cast;
-using std::tr1::static_pointer_cast;
-using std::tr1::const_pointer_cast;
+// we use the C++11 standard shared pointers
+using std::shared_ptr;
+using std::weak_ptr;
+using std::dynamic_pointer_cast;
+using std::static_pointer_cast;
+using std::const_pointer_cast;
 
 using boost::intrusive_ptr;
 
@@ -198,7 +198,10 @@ namespace povwin
 #pragma warning(pop)
 #endif
 
-#define lseek64(handle,offset,whence) _lseeki64(handle,offset,whence)
+// MS Windows provides large file support via the `_lseeki64` function,
+// with file offsets having type `__int64`.
+#define POV_LSEEK(handle,offset,whence) _lseeki64(handle,offset,whence)
+#define POV_OFF_T __int64
 
 namespace pov_base
 {
@@ -227,10 +230,7 @@ namespace pov_base
 #define POV_NEW_LINE_STRING                 "\r\n"
 #define POV_SYS_IMAGE_EXTENSION             ".bmp"
 #define POV_SYS_IMAGE_TYPE                  BMP
-#define vsnprintf                           _vsnprintf
-#define snprintf                            _snprintf
-#define FILE_NAME_LENGTH                    _MAX_PATH
-#define POV_NAME_MAX                        _MAX_FNAME
+#define POV_FILENAME_BUFFER_CHARS           (_MAX_PATH-1)   // (NB: _MAX_PATH includes terminating NUL character)
 #define IFF_SWITCH_CAST                     (long)
 #define USE_OFFICIAL_BOOST                  1
 
@@ -279,7 +279,7 @@ namespace pov
 }
 #endif // end of not _CONSOLE
 
-// see RLP comment in 3.6 windows config.h
+// see RLP comment in v3.6 windows config.h
 #undef HUGE_VAL
 
 // use a larger buffer for more efficient parsing
@@ -290,6 +290,7 @@ namespace pov
   #define OBJECT_DEBUG_HELPER
 #endif
 
+// TODO REVIEW - Is this actually required for any Windows platform?
 #ifndef MAX_PATH
   #define MAX_PATH _MAX_PATH
 #endif

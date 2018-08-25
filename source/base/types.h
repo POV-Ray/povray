@@ -7,7 +7,7 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -293,35 +293,35 @@ enum GammaMode
      *  No gamma handling.
      *  This model is based on the (wrong) presumption that image file pixel values are proportional to
      *  physical light intensities.
-     *  This is the default for POV-Ray 3.6 and earlier.
+     *  This is the default for POV-Ray v3.6 and earlier.
      */
     kPOVList_GammaMode_None,
     /**
-     *  Explicit assumed_gamma-based gamma handling model, 3.6 variant.
+     *  Explicit assumed_gamma-based gamma handling model, v3.6 variant.
      *  This model is based on the (wrong) presumption that render engine maths works equally well with
      *  both linear and gamma-encoded light intensity values.
      *  Using assumed_gamma=1.0 gives physically realistic results.
      *  Input image files without implicit or explicit gamma information will be presumed to match assumed_gamma,
      *  i.e. they will not be gamma corrected.
-     *  This is the mode used by POV-Ray 3.6 if assumed_gamma is specified.
+     *  This is the mode used by POV-Ray v3.6 and earlier if assumed_gamma is specified.
      */
     kPOVList_GammaMode_AssumedGamma36,
     /**
-     *  Explicit assumed_gamma-based gamma handling model, 3.7 variant.
+     *  Explicit assumed_gamma-based gamma handling model, v3.7 variant.
      *  This model is based on the (wrong) presumption that render engine maths works equally well with
      *  both linear and gamma-encoded light intensity values.
      *  Using assumed_gamma=1.0 gives physically realistic results.
      *  Input image files without implicit or explicit gamma information will be presumed to match official
      *  recommendations for the respective file format; files for which no official recommendations exists
      *  will be presumed to match assumed_gamma.
-     *  This is the mode used by POV-Ray 3.7 if assumed_gamma is specified.
+     *  This is the mode used by POV-Ray v3.7 and later if assumed_gamma is specified.
      */
     kPOVList_GammaMode_AssumedGamma37,
     /**
-     *  Implicit assumed_gamma-based gamma handling model, 3.7 variant.
-     *  This model is functionally idential to kPOVList_GammaMode_AssumedGamma37 except that it also serves as a marker
+     *  Implicit assumed_gamma-based gamma handling model, v3.7 variant.
+     *  This model is functionally identical to kPOVList_GammaMode_AssumedGamma37 except that it also serves as a marker
      *  that assumed_gamma has not been set explicitly.
-     *  This is the default for POV-Ray 3.7 and later.
+     *  This is the default for POV-Ray v3.7 and later.
      */
     kPOVList_GammaMode_AssumedGamma37Implied,
 };

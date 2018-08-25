@@ -13,7 +13,7 @@
 ///
 /// ----------------------------------------------------------------------------
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -159,8 +159,7 @@ PIGMENT *Copy_Pigment (PIGMENT *Old)
         Copy_TPat_Fields (New, Old);
         New->Blend_Map = shared_ptr<GenericPigmentBlendMap> (Old->Blend_Map);
 
-        if (Old->Type == PLAIN_PATTERN)
-            New->colour = Old->colour;
+        New->colour = Old->colour;
         New->Quick_Colour = Old->Quick_Colour;
     }
     else
@@ -254,8 +253,6 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
     if (Pigment->Type == NO_PATTERN)
     {
         Pigment->Type = PLAIN_PATTERN;
-
-        Pigment->colour.Clear();
 
 ;// TODO MESSAGE    Warning(150, "No pigment type given.");
     }

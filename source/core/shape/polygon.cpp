@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -894,9 +894,10 @@ void Polygon::Compute_BBox()
 
 bool Polygon::in_polygon(int number, Vector2d *points, DBL u, DBL  v)
 {
-    register int i, yflag0, yflag1, inside_flag;
-    register DBL ty, tx;
-    register const DBL *vtx0, *vtx1, *first;
+    int i, yflag0, yflag1;
+    bool inside_flag;
+    DBL ty, tx;
+    const DBL *vtx0, *vtx1, *first;
 
     tx = u;
     ty = v;

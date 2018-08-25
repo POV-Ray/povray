@@ -9,7 +9,7 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
 /// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
@@ -605,7 +605,7 @@ static int sbisect(int np, const polynomial *sseq, DBL min_value, DBL  max_value
 
 static DBL polyeval(DBL x, int n, const DBL *Coeffs)
 {
-    register int i;
+    int i;
     DBL val;
 
     val = Coeffs[n];
