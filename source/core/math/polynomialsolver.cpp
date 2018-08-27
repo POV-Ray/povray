@@ -1590,7 +1590,7 @@ int Solve_Polynomial(int n, const DBL *c0, DBL *r, int sturm, DBL epsilon, Rende
 
     i = 0;
 
-    while ((fabs(c0[i]) < SMALL_ENOUGH) && (i < n))
+    while ((i < n) && (fabs(c0[i]) < SMALL_ENOUGH))
     {
         i++;
     }

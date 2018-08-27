@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -101,7 +101,7 @@ ViewData::ViewData(shared_ptr<BackendSceneData> sd) :
 
 ViewData::~ViewData()
 {
-    if (rtrData != NULL)
+    if (rtrData != nullptr)
         delete rtrData;
 }
 
@@ -594,7 +594,7 @@ View::~View()
     stopRequsted = true; // NOTE: Order is important here, set this before stopping the queue!
     renderTasks.Stop();
 
-    if(renderControlThread != NULL)
+    if (renderControlThread != nullptr)
         renderControlThread->join();
     delete renderControlThread;
 
@@ -626,7 +626,7 @@ bool View::CheckCameraHollowObject(const Vector3d& point, const BBOX_TREE *node)
         // This is a leaf so test contained object.
         TraceThreadData threadData(viewData.GetSceneData());
         ObjectPtr object = reinterpret_cast<ObjectPtr>(node->Node);
-        if((object->interior != NULL) && (object->Inside(point, &threadData)))
+        if ((object->interior != nullptr) && (object->Inside(point, &threadData)))
             return true;
     }
 
@@ -650,14 +650,14 @@ bool View::CheckCameraHollowObject(const Vector3d& point)
 
         // test infinite objects
         for(vector<ObjectPtr>::iterator object = sd->objects.begin() + sd->numberOfFiniteObjects; object != sd->objects.end(); object++)
-            if(((*object)->interior != NULL) && Inside_BBox(point, (*object)->BBox) && (*object)->Inside(point, &threadData))
+            if (((*object)->interior != nullptr) && Inside_BBox(point, (*object)->BBox) && (*object)->Inside(point, &threadData))
                 return true;
     }
-    else if((sd->boundingMethod == 0) || (sd->boundingSlabs == NULL))
+    else if ((sd->boundingMethod == 0) || (sd->boundingSlabs == nullptr))
     {
         TraceThreadData threadData(sd); // TODO: avoid the need to construct threadData
         for(vector<ObjectPtr>::const_iterator object = viewData.GetSceneData()->objects.begin(); object != viewData.GetSceneData()->objects.end(); object++)
-            if((*object)->interior != NULL)
+            if ((*object)->interior != nullptr)
                 if((*object)->Inside(point, &threadData))
                     return true;
     }
@@ -970,7 +970,7 @@ void View::StartRender(POVMS_Object& renderOptions)
     */
     if(viewData.GetSceneData()->photonSettings.photonsEnabled)
     {
-        if (viewData.GetSceneData()->photonSettings.fileName && viewData.GetSceneData()->photonSettings.loadFile)
+        if (!viewData.GetSceneData()->photonSettings.fileName.empty() && viewData.GetSceneData()->photonSettings.loadFile)
         {
             vector<PhotonMap*> surfaceMaps;
             vector<PhotonMap*> mediaMaps;
@@ -1172,7 +1172,7 @@ void View::GetStatistics(POVMS_Object& renderStats)
     // object intersection stats
     POVMS_List isectStats;
 
-    for(size_t index = 0; intersection_stats[index].infotext != NULL; index++)
+    for (size_t index = 0; intersection_stats[index].infotext != nullptr; index++)
     {
         POVMS_Object isectStat(kPOVObjectClass_IsectStat);
 

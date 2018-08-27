@@ -113,8 +113,10 @@
 // this must be the last file included
 #include "base/povdebug.h"
 
-namespace pov
+namespace pov_parser
 {
+
+using namespace pov;
 
 /*****************************************************************************
 * Local preprocessor defines
@@ -182,7 +184,7 @@ void Parser::Run()
     int         error_line = -1;
     int         error_col = -1;
     UCS2String  error_filename(POV_FILENAME_BUFFER_CHARS, 0); // Pre-claim some memory, so we can handle an out-of-memory error.
-    POV_LONG    error_pos = -1;
+    POV_OFF_T   error_pos = -1;
 
     try
     {
@@ -6475,7 +6477,7 @@ ObjectPtr Parser::Parse_TrueType ()
 
     /* Process all this good info */
     Object = new CSGUnion();
-    TrueType::ProcessNewTTF(reinterpret_cast<CSG *>(Object), font, text_string, depth, offset, this);
+    TrueType::ProcessNewTTF(reinterpret_cast<CSG *>(Object), font, text_string, depth, offset);
     if (filename)
     {
         /* Free up the filename  */
@@ -6538,7 +6540,7 @@ TrueTypeFont *Parser::OpenFontFile(const char *asciifn, const int font_id)
         /* First look to see if we have already opened this font */
 
         for(vector<TrueTypeFont*>::iterator iFont = sceneData->TTFonts.begin(); iFont != sceneData->TTFonts.end(); ++iFont)
-            if(UCS2_strcmp(formalFilename.c_str(), (*iFont)->filename) == 0)
+            if(formalFilename == (*iFont)->filename)
             {
                 font = *iFont;
                 break;
@@ -6559,7 +6561,7 @@ TrueTypeFont *Parser::OpenFontFile(const char *asciifn, const int font_id)
         else
         {
             #ifdef TTF_DEBUG
-            Debug_Info("Using cached font info for %s\n", font->filename);
+            Debug_Info("Using cached font info for %s\n", font->filename.c_str());
             #endif
         }
     }
@@ -6584,7 +6586,7 @@ TrueTypeFont *Parser::OpenFontFile(const char *asciifn, const int font_id)
             fp = Internal_Font_File(font_id);
         }
 
-        font = new TrueTypeFont(UCS2_strdup(formalFilename.c_str()), fp, sceneData->stringEncoding);
+        font = new TrueTypeFont(formalFilename, fp, sceneData->stringEncoding);
 
         sceneData->TTFonts.push_back(font);
     }
@@ -7025,8 +7027,8 @@ void Parser::Parse_Frame ()
                 {
                     case VERSION_TOKEN:
                         UNGET
+                        VersionWarning(295,"Should have '#' before 'version'.");
                         Parse_Directive (false);
-                        UNGET
                         break;
 
                     default:
@@ -7226,7 +7228,7 @@ void Parser::Parse_Global_Settings()
             sceneData->photonSettings.expandTolerance = 0.2;
             sceneData->photonSettings.minExpandCount = 35;
 
-            sceneData->photonSettings.fileName = NULL;
+            sceneData->photonSettings.fileName.clear();
             sceneData->photonSettings.loadFile = false;
 
             sceneData->photonSettings.surfaceSeparation = 1.0;
@@ -7307,28 +7309,26 @@ void Parser::Parse_Global_Settings()
                 END_CASE
 
                 CASE(LOAD_FILE_TOKEN)
-                    if(sceneData->photonSettings.fileName)
+                    if (!sceneData->photonSettings.fileName.empty())
                     {
                         if(sceneData->photonSettings.loadFile)
                             VersionWarning(100,"Filename already given, using new name");
                         else
                             VersionWarning(100,"Cannot both load and save photon map. Now switching to load mode.");
-                        POV_FREE(sceneData->photonSettings.fileName);
                     }
-                    sceneData->photonSettings.fileName = Parse_C_String(true);
+                    sceneData->photonSettings.fileName = Parse_ASCIIString(true);
                     sceneData->photonSettings.loadFile = true;
                 END_CASE
 
                 CASE(SAVE_FILE_TOKEN)
-                    if(sceneData->photonSettings.fileName)
+                    if (!sceneData->photonSettings.fileName.empty())
                     {
                         if(!sceneData->photonSettings.loadFile)
                             VersionWarning(100,"Filename already given, using new name");
                         else
                             VersionWarning(100,"Cannot both load and save photon map. Now switching to save mode.");
-                        POV_FREE(sceneData->photonSettings.fileName);
                     }
-                    sceneData->photonSettings.fileName = Parse_C_String(true);
+                    sceneData->photonSettings.fileName = Parse_ASCIIString(true);
                     sceneData->photonSettings.loadFile = false;
                 END_CASE
 
@@ -8069,7 +8069,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
     }
 
     if((Object->Texture ==NULL)&&(Object->Interior_Texture != NULL))
-            Error("Interior texture requires an exterior texture.");
+        Error("Interior texture requires an exterior texture.");
 
     Parse_End ();
 

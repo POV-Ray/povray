@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -100,10 +100,10 @@ class IOBase
         enum { none = 0, append = 1 };
         enum { seek_set = SEEK_SET, seek_cur = SEEK_CUR, seek_end = SEEK_END };
 
-        virtual bool seekg(POV_LONG pos, unsigned int whence = seek_set) = 0;
+        virtual bool seekg(POV_OFF_T pos, unsigned int whence = seek_set) = 0;
 
         virtual bool eof() const = 0;
-        virtual POV_LONG tellg() const = 0;
+        virtual POV_OFF_T tellg() const = 0;
         virtual bool clearstate() = 0;
         inline const UCS2 *Name() const { return(filename.c_str()); }
 
@@ -136,7 +136,7 @@ class IStream : public IOBase
         virtual bool UnRead_Byte(int c) = 0;
 
         virtual bool getline(char *s, size_t buflen) = 0;
-        inline bool ignore(POV_LONG count) { return seekg(count, seek_cur); }
+        inline bool ignore(POV_OFF_T count) { return seekg(count, seek_cur); }
 };
 
 /// File-backed input stream.
@@ -150,8 +150,8 @@ class IFileStream : public IStream
         virtual ~IFileStream();
 
         virtual bool eof() const { return(fail ? true : feof(f) != 0); }
-        virtual bool seekg(POV_LONG pos, unsigned int whence = seek_set);
-        virtual POV_LONG tellg() const { return(f == NULL ? -1 : ftell(f)); }
+        virtual bool seekg(POV_OFF_T pos, unsigned int whence = seek_set);
+        virtual POV_OFF_T tellg() const { return(f == NULL ? -1 : ftell(f)); }
         virtual bool clearstate() { if(f != NULL) fail = false; return !fail; }
 
         virtual bool read(void *buffer, size_t count);
@@ -174,16 +174,16 @@ class IFileStream : public IStream
 class IMemStream : public IStream
 {
     public:
-        IMemStream(const unsigned char* data, size_t size, const char* formalName, POV_LONG formalStart = 0);
-        IMemStream(const unsigned char* data, size_t size, const UCS2String& formalName, POV_LONG formalStart = 0);
+        IMemStream(const unsigned char* data, size_t size, const char* formalName, POV_OFF_T formalStart = 0);
+        IMemStream(const unsigned char* data, size_t size, const UCS2String& formalName, POV_OFF_T formalStart = 0);
         virtual ~IMemStream();
 
         virtual int Read_Byte();
         virtual bool UnRead_Byte(int c);
         virtual bool getline(char *s, size_t buflen);
-        virtual POV_LONG tellg() const;
+        virtual POV_OFF_T tellg() const;
         virtual bool read(void *buffer, size_t count);
-        virtual bool seekg(POV_LONG pos, unsigned int whence = seek_set);
+        virtual bool seekg(POV_OFF_T pos, unsigned int whence = seek_set);
         virtual bool clearstate() { fail = false; return true; }
 
         virtual bool eof() const { return fail; }
@@ -192,7 +192,7 @@ class IMemStream : public IStream
 
         size_t size;
         size_t pos;
-        POV_LONG formalStart;
+        POV_OFF_T formalStart;
         const unsigned char * start;
         int mUngetBuffer;
 };
@@ -203,8 +203,8 @@ class OStream : public IOBase
         OStream(const UCS2String& name, unsigned int Flags = 0);
         ~OStream();
 
-        virtual bool seekg(POV_LONG pos, unsigned int whence = seek_set);
-        virtual POV_LONG tellg() const { return(f == NULL ? -1 : ftell(f)); }
+        virtual bool seekg(POV_OFF_T pos, unsigned int whence = seek_set);
+        virtual POV_OFF_T tellg() const { return(f == NULL ? -1 : ftell(f)); }
         inline bool clearstate() { if(f != NULL) fail = false; return !fail; }
         virtual bool eof() const { return(fail ? true : feof(f) != 0); }
 
@@ -225,7 +225,7 @@ UCS2String GetFileExtension(const Path& p);
 UCS2String GetFileName(const Path& p);
 
 bool CheckIfFileExists(const Path& p);
-POV_LONG GetFileLength(const Path& p);
+POV_OFF_T GetFileLength(const Path& p);
 
 /// @}
 ///

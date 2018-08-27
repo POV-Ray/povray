@@ -73,10 +73,11 @@
 // this must be the last file included
 #include "base/povdebug.h"
 
-namespace pov
+namespace pov_parser
 {
 
 using namespace pov_base;
+using namespace pov;
 
 /*****************************************************************************
 * Local preprocessor defines

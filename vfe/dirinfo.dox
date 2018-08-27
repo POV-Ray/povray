@@ -1,2 +1,16 @@
-/// @dir
-/// Source code files for the Virtual Front-End (VFE).
+/**
+
+@defgroup PovVFE POV-Ray Virtual Front-End (VFE) Module
+@brief Abstraction layer to simplify front-end implementation.
+
+This module contains code shared between several user interfaces for POV-Ray, designed to
+abstract away various details of the @ref PovVM exposed by the @ref PovFrontend.
+
+@{
+
+@dir
+@brief Source code files for the @ref PovVFE.
+
+@}
+
+*/

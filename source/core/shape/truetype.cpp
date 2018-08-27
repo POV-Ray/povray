@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -227,36 +227,22 @@ struct GlyphHeader
 struct GlyphOutline
 {
     GlyphHeader header;
-    USHORT numPoints;
-    USHORT *endPoints;
-    BYTE *flags;
-    DBL *x, *y;
+    std::vector<USHORT> endPoints;
+    std::vector<BYTE>   flags;
+    std::vector<DBL>    x, y;
     USHORT myMetrics;
 
     GlyphOutline() :
-        header(),
-        numPoints(0),
-        endPoints(NULL),
-        flags(NULL),
-        x(NULL), y(NULL),
         myMetrics(0)
     {}
-
-    ~GlyphOutline()
-    {
-        if (endPoints != NULL) POV_FREE(endPoints);
-        if (flags     != NULL) POV_FREE(flags);
-        if (x         != NULL) POV_FREE(x);
-        if (y         != NULL) POV_FREE(y);
-    }
 };
 
 typedef struct
 {
     BYTE inside_flag;             /* 1 if this an inside contour, 0 if outside */
     USHORT count;                 /* Number of points in the contour */
-    BYTE *flags;                  /* On/off curve flags */
-    DBL *x, *y;                   /* Coordinates of control vertices */
+    vector<BYTE> flags;           /* On/off curve flags */
+    vector<DBL> x, y;             /* Coordinates of control vertices */
 } Contour;
 
 
@@ -466,7 +452,7 @@ static int compare_tag4(const BYTE *ttf_tag, const BYTE *known_tag)
 *   (triggered when filename is null) - Oct 2012 [JG]
 *
 ******************************************************************************/
-void TrueType::ProcessNewTTF(CSG *Object, TrueTypeFont *ffile, const UCS2 *text_string, DBL depth, const Vector3d& offset, Parser *parser)
+void TrueType::ProcessNewTTF(CSG *Object, TrueTypeFont *ffile, const UCS2 *text_string, DBL depth, const Vector3d& offset)
 {
     Vector3d local_offset, total_offset;
     TrueType *ttf;
@@ -670,9 +656,9 @@ void TrueType::ProcessNewTTF(CSG *Object, TrueTypeFont *ffile, const UCS2 *text_
 #ifdef TTF_DEBUG
     // TODO - text_string is an UCS2 strings, while Debug_Info will expect char strings.
     #error "broken code"
-    if (filename)
+    if (!filename.empty())
     {
-        Debug_Info("TTF parsing of \"%s\" from %s complete\n", text_string, filename);
+        Debug_Info("TTF parsing of \"%s\" from %s complete\n", text_string, filename.c_str());
     }
     else
     {
@@ -681,10 +667,10 @@ void TrueType::ProcessNewTTF(CSG *Object, TrueTypeFont *ffile, const UCS2 *text_
 #endif
 
     /* Close the font file descriptor */
-    if(ffile->fp!=NULL)
+    if (ffile->fp != nullptr)
     {
         delete ffile->fp;
-        ffile->fp = NULL;
+        ffile->fp = nullptr;
     }
 }
 
@@ -732,7 +718,7 @@ void ProcessFontFile(TrueTypeFont* ffile)
 
     /* We have already read all the header info, no need to do it again */
 
-    if (ffile->info != NULL)
+    if (ffile->info != nullptr)
         return;
 
     ffile->info = new TrueTypeInfo;
@@ -822,7 +808,7 @@ void ProcessFontFile(TrueTypeFont* ffile)
     if (OffsetTable.numTables > 40)
     {
 // TODO MESSAGE    Warning("More than 40 (%d) TTF Tables in %s - some info may be lost!",
-//            OffsetTable.numTables, ffile->filename);
+//            OffsetTable.numTables, ffile->filename.c_str());
     }
 
     /* Process general font information and save it. */
@@ -871,23 +857,23 @@ void ProcessFontFile(TrueTypeFont* ffile)
         hhea_table_offset == 0 || hmtx_table_offset == 0 ||
         maxp_table_offset == 0)
     {
-// TODO MESSAGE    throw POV_EXCEPTION(kFileDataErr, "Invalid TrueType font headers in %s", ffile->filename);
+// TODO MESSAGE    throw POV_EXCEPTION(kFileDataErr, "Invalid TrueType font headers in %s", ffile->filename.c_str());
     }
 
     ProcessHeadTable(ffile, head_table_offset);  /* Need indexToLocFormat */
     if ((ffile->info->indexToLocFormat != 0 && ffile->info->indexToLocFormat != 1) ||
         (ffile->info->unitsPerEm < 16 || ffile->info->unitsPerEm > 16384))
-;// TODO MESSAGE    Error("Invalid TrueType font data in %s", ffile->filename);
+;// TODO MESSAGE    Error("Invalid TrueType font data in %s", ffile->filename.c_str());
 
     ProcessMaxpTable(ffile, maxp_table_offset);  /* Need numGlyphs */
     if (ffile->info->numGlyphs <= 0)
-;// TODO MESSAGE    Error("Invalid TrueType font data in %s", ffile->filename);
+;// TODO MESSAGE    Error("Invalid TrueType font data in %s", ffile->filename.c_str());
 
     ProcessLocaTable(ffile, loca_table_offset);  /* Now we can do loca_table */
 
     ProcessHheaTable(ffile, hhea_table_offset);  /* Need numberOfHMetrics */
     if (ffile->info->numberOfHMetrics <= 0)
-;// TODO MESSAGE    Error("Invalid TrueType font data in %s", ffile->filename);
+;// TODO MESSAGE    Error("Invalid TrueType font data in %s", ffile->filename.c_str());
 
     ProcessHmtxTable(ffile, hmtx_table_offset);  /* Now we can read HMetrics */
 
@@ -1241,7 +1227,7 @@ GlyphPtr ProcessCharacter(TrueTypeFont *ffile, unsigned int search_char, unsigne
     *glyph_index = ProcessCharMap(ffile, search_char);
     if (*glyph_index == 0)
 ;// TODO MESSAGE    Warning("Character %d (0x%X) not found in %s", (BYTE)search_char,
-//            search_char, ffile->filename);
+//            search_char, ffile->filename.c_str());
 
     /* See if we have already processed this glyph (using the glyph index) */
     iGlyph = ffile->info->glyphsByIndex.find(*glyph_index);
@@ -1674,7 +1660,7 @@ GlyphPtr ExtractGlyphInfo(TrueTypeFont *ffile, unsigned int glyph_index, unsigne
     GlyphPtr glyph;
 
     ttglyph = ExtractGlyphOutline(ffile, glyph_index, c);
-    POV_SHAPE_ASSERT (ttglyph);
+    POV_SHAPE_ASSERT(ttglyph != nullptr);
 
     /*
      * Convert the glyph outline information from TrueType layout into a more
@@ -1835,7 +1821,7 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
 
         /* Grab the contour endpoints */
 
-        ttglyph->endPoints = reinterpret_cast<USHORT *>(POV_MALLOC(nc * sizeof(USHORT), "ttf"));
+        ttglyph->endPoints.resize(nc);
 
         for (i = 0; i < nc; i++)
         {
@@ -1854,16 +1840,16 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
 
         /* Determine the number of points making up this glyph */
 
-        n = ttglyph->numPoints = ttglyph->endPoints[nc - 1] + 1;
+        n = ttglyph->endPoints[nc - 1] + 1;
 #ifdef TTF_DEBUG
-        Debug_Info("numPoints=%d\n", ttglyph->numPoints);
+        Debug_Info("numPoints=%d\n", n);
 #endif
 
         /* Read the flags */
 
-        ttglyph->flags = reinterpret_cast<BYTE *>(POV_MALLOC(n * sizeof(BYTE), "ttf"));
+        ttglyph->flags.resize(n);
 
-        for (i = 0; i < ttglyph->numPoints; i++)
+        for (i = 0; i < n; i++)
         {
             /// @compat
             /// This piece of code relies on BYTE having the same size as char.
@@ -1901,12 +1887,12 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
 #endif
         /* Read the coordinate vectors */
 
-        ttglyph->x = reinterpret_cast<DBL *>(POV_MALLOC(n * sizeof(DBL), "ttf"));
-        ttglyph->y = reinterpret_cast<DBL *>(POV_MALLOC(n * sizeof(DBL), "ttf"));
+        ttglyph->x.resize(n);
+        ttglyph->y.resize(n);
 
         coord = 0;
 
-        for (i = 0; i < ttglyph->numPoints; i++)
+        for (i = 0; i < n; i++)
         {
             /* Read each x coordinate */
 
@@ -1944,7 +1930,7 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
 
         coord = 0;
 
-        for (i = 0; i < ttglyph->numPoints; i++)
+        for (i = 0; i < n; i++)
         {
             /* Read each y coordinate */
 
@@ -1989,7 +1975,6 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
         USHORT flags;
 
         ttglyph->header.numContours = 0;
-        ttglyph->numPoints = 0;
 
         do
         {
@@ -2108,19 +2093,19 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
                 continue;
 
             nc = ttglyph->header.numContours;
-            n = ttglyph->numPoints;
-            n2 = sub_ttglyph->numPoints;
+            n = ttglyph->flags.size();
+            POV_SHAPE_ASSERT((n == ttglyph->x.size()) && (n == ttglyph->y.size()));
+            n2 = sub_ttglyph->flags.size();
+            POV_SHAPE_ASSERT((n2 == sub_ttglyph->x.size()) && (n2 == sub_ttglyph->y.size()));
 
-            ttglyph->endPoints = reinterpret_cast<USHORT *>(POV_REALLOC(ttglyph->endPoints,
-                                                                        (nc + nc2) * sizeof(USHORT), "ttf"));
-            ttglyph->flags = reinterpret_cast<BYTE *>(POV_REALLOC(ttglyph->flags, (n+n2)*sizeof(BYTE), "ttf"));
-            ttglyph->x = reinterpret_cast<DBL *>(POV_REALLOC(ttglyph->x, (n + n2) * sizeof(DBL), "ttf"));
-            ttglyph->y = reinterpret_cast<DBL *>(POV_REALLOC(ttglyph->y, (n + n2) * sizeof(DBL), "ttf"));
+            ttglyph->endPoints.resize(nc + nc2);
+            ttglyph->flags.resize(n + n2);
+            ttglyph->x.resize(n + n2);
+            ttglyph->y.resize(n + n2);
 
             /* Add the sub glyph info to the end of the current glyph */
 
             ttglyph->header.numContours += nc2;
-            ttglyph->numPoints += n2;
 
             for (i = 0; i < nc2; i++)
             {
@@ -2207,8 +2192,6 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
 GlyphPtr ConvertOutlineToGlyph(TrueTypeFont *ffile, const GlyphOutline *ttglyph)
 {
     GlyphPtr glyph;
-    DBL *temp_x, *temp_y;
-    BYTE *temp_f;
     USHORT i, j, last_j;
 
     /* Create storage for this glyph */
@@ -2225,7 +2208,7 @@ GlyphPtr ConvertOutlineToGlyph(TrueTypeFont *ffile, const GlyphOutline *ttglyph)
 
     /* Copy sizing information about this glyph */
 
-    POV_MEMCPY(&glyph->header, &ttglyph->header, sizeof(GlyphHeader));
+    glyph->header = ttglyph->header;
 
     /* Keep track of the size for this glyph */
 
@@ -2241,17 +2224,15 @@ GlyphPtr ConvertOutlineToGlyph(TrueTypeFont *ffile, const GlyphOutline *ttglyph)
 
         /* Copy the coordinate information into the glyph */
 
-        temp_x = reinterpret_cast<DBL *>(POV_MALLOC((j + 1) * sizeof(DBL), "ttf"));
-        temp_y = reinterpret_cast<DBL *>(POV_MALLOC((j + 1) * sizeof(DBL), "ttf"));
-
-        temp_f = reinterpret_cast<BYTE *>(POV_MALLOC((j + 1) * sizeof(BYTE), "ttf"));
-        POV_MEMCPY(temp_x, &ttglyph->x[last_j], j * sizeof(DBL));
-        POV_MEMCPY(temp_y, &ttglyph->y[last_j], j * sizeof(DBL));
-
-        POV_MEMCPY(temp_f, &ttglyph->flags[last_j], j * sizeof(BYTE));
-        temp_x[j] = ttglyph->x[last_j];
-        temp_y[j] = ttglyph->y[last_j];
-        temp_f[j] = ttglyph->flags[last_j];
+        glyph->contours[i].x.reserve(j + 1);
+        glyph->contours[i].y.reserve(j + 1);
+        glyph->contours[i].flags.reserve(j + 1);
+        glyph->contours[i].x.assign(ttglyph->x.cbegin() + last_j, ttglyph->x.cbegin() + last_j + j);
+        glyph->contours[i].y.assign(ttglyph->y.cbegin() + last_j, ttglyph->y.cbegin() + last_j + j);
+        glyph->contours[i].flags.assign(ttglyph->flags.cbegin() + last_j, ttglyph->flags.cbegin() + last_j + j);
+        glyph->contours[i].x.push_back(ttglyph->x[last_j]);
+        glyph->contours[i].y.push_back(ttglyph->y[last_j]);
+        glyph->contours[i].flags.push_back(ttglyph->flags[last_j]);
 
         /* Figure out if this is an inside or outside contour */
 
@@ -2260,9 +2241,6 @@ GlyphPtr ConvertOutlineToGlyph(TrueTypeFont *ffile, const GlyphOutline *ttglyph)
         /* Plug in the reset of the contour components into the glyph */
 
         glyph->contours[i].count = j;
-        glyph->contours[i].x = temp_x;
-        glyph->contours[i].y = temp_y;
-        glyph->contours[i].flags = temp_f;
 
         /*
          * Set last_j to point to the beginning of the next contour's coordinate
@@ -2320,9 +2298,9 @@ bool TrueType::Inside_Glyph(double x, double y, const GlyphStruct* glyph) const
 
     for (i = 0; i < n; i++)
     {
-        xv = contour[i].x;
-        yv = contour[i].y;
-        fv = contour[i].flags;
+        xv = contour[i].x.data();
+        yv = contour[i].y.data();
+        fv = contour[i].flags.data();
         x0 = xv[0];
         y0 = yv[0];
         n1 = contour[i].count;
@@ -2700,9 +2678,9 @@ bool TrueType::GlyphIntersect(const Vector3d& P, const Vector3d& D, const GlyphS
 
     for (i = 0, contour = glyph->contours; i < n; i++, contour++)
     {
-        xv = contour->x;
-        yv = contour->y;
-        fv = contour->flags;
+        xv = contour->x.data();
+        yv = contour->y.data();
+        fv = contour->flags.data();
         x0 = xv[0];
         y0 = yv[0];
         m = contour->count;
@@ -3000,7 +2978,7 @@ void TrueType::Compute_BBox()
 }
 
 
-TrueTypeFont::TrueTypeFont(UCS2* fn, IStream* fp, StringEncoding te) :
+TrueTypeFont::TrueTypeFont(const UCS2String& fn, IStream* fp, StringEncoding te) :
     filename(fn),
     fp(fp),
     textEncoding(te),
@@ -3011,13 +2989,10 @@ TrueTypeFont::TrueTypeFont(UCS2* fn, IStream* fp, StringEncoding te) :
 
 TrueTypeFont::~TrueTypeFont()
 {
-    if (fp != NULL)
+    if (fp != nullptr)
         delete fp;
 
-    if (filename != NULL)
-        POV_FREE(filename);
-
-    if (info != NULL)
+    if (info != nullptr)
         delete info;
 }
 
@@ -3052,48 +3027,40 @@ TrueTypeInfo::TrueTypeInfo() :
 
 TrueTypeInfo::~TrueTypeInfo()
 {
-    if (loca_table != NULL)
+    if (loca_table != nullptr)
         delete[] loca_table;
 
     for (GlyphPtrMap::iterator iGlyph = glyphsByIndex.begin(); iGlyph != glyphsByIndex.end(); ++iGlyph)
     {
-        if ((*iGlyph).second->contours != NULL)
-        {
-            for (int i = 0; i < (*iGlyph).second->header.numContours; i++)
-            {
-                POV_FREE((*iGlyph).second->contours[i].flags);
-                POV_FREE((*iGlyph).second->contours[i].x);
-                POV_FREE((*iGlyph).second->contours[i].y);
-            }
+        if ((*iGlyph).second->contours != nullptr)
             delete[] (*iGlyph).second->contours;
-        }
         delete (*iGlyph).second;
     }
 
-    if (kerning_tables.tables != NULL)
+    if (kerning_tables.tables != nullptr)
     {
         for (int i = 0; i < kerning_tables.nTables; i++)
         {
-            if (kerning_tables.tables[i].kern_pairs)
+            if (kerning_tables.tables[i].kern_pairs != nullptr)
                 delete[] kerning_tables.tables[i].kern_pairs;
         }
 
         delete[] kerning_tables.tables;
     }
 
-    if (hmtx_table != NULL)
+    if (hmtx_table != nullptr)
         delete[] hmtx_table;
 
-    if (endCount != NULL)
+    if (endCount != nullptr)
         delete[] endCount;
 
-    if (startCount != NULL)
+    if (startCount != nullptr)
         delete[] startCount;
 
-    if (idDelta != NULL)
+    if (idDelta != nullptr)
         delete[] idDelta;
 
-    if (idRangeOffset != NULL)
+    if (idRangeOffset != nullptr)
         delete[] idRangeOffset;
 }
 

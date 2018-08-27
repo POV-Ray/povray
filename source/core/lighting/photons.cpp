@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,6 +41,7 @@
 
 // C++ standard header files
 #include <algorithm>
+#include <limits>
 
 // POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
@@ -82,25 +83,34 @@ SinCosOptimizations sinCosData;
 //extern int disp_nelems;
 
 /* ------------------------------------------------------ */
-/* static functions */
-/* ------------------------------------------------------ */
-static void FreePhotonMemory();
-static void InitPhotonMemory();
-static int savePhotonMap(void);
-static int loadPhotonMap(void);
-
-/* ------------------------------------------------------ */
 /* static variables */
 /* ------------------------------------------------------ */
 
-const int PHOTON_BLOCK_POWER = 14;
-// PHOTON_BLOCK_SIZE must be equal to 2 raised to the power PHOTON_BLOCK_POWER
-const int PHOTON_BLOCK_SIZE = (16384);
-const int PHOTON_BLOCK_MASK = (PHOTON_BLOCK_SIZE-1);
-const int INITIAL_BASE_ARRAY_SIZE = 100;
+constexpr int PHOTON_BLOCK_POWER = 14;
+constexpr int PHOTON_BLOCK_SIZE = 1 << PHOTON_BLOCK_POWER;
+constexpr int PHOTON_BLOCK_MASK = PHOTON_BLOCK_SIZE - 1;
+
+static_assert(PHOTON_BLOCK_POWER < std::numeric_limits<decltype(PHOTON_BLOCK_SIZE)>::digits, "PHOTON_BLOCK_POWER too large");
+
+class PhotonMap::PhotonBlock
+{
+public:
+    inline Photon& operator[](size_t i)
+    {
+        POV_PHOTONS_ASSERT(i < PHOTON_BLOCK_SIZE); return mData[i];
+    }
+    inline const Photon& operator[](size_t i) const
+    {
+        POV_PHOTONS_ASSERT(i < PHOTON_BLOCK_SIZE); return mData[i];
+    }
+private:
+    Photon mData[PHOTON_BLOCK_SIZE];
+};
 
 
-PhotonTrace::PhotonTrace(shared_ptr<SceneData> sd, TraceThreadData *td, unsigned int mtl, DBL adcb, const QualityFlags& qf, Trace::CooperateFunctor& cf) :
+//******************************************************************************
+
+PhotonTrace::PhotonTrace(shared_ptr<SceneData> sd, TraceThreadData *td, const QualityFlags& qf, Trace::CooperateFunctor& cf) :
     Trace(sd, td, qf, cf, mediaPhotons, noRadiosity),
     mediaPhotons(sd, td, this, new PhotonGatherer(&sd->mediaPhotonMap, sd->photonSettings))
 {
@@ -146,7 +156,7 @@ DBL PhotonTrace::TraceRay(Ray& ray, MathColour& colour, ColourChannel&, COLC wei
         threadData->passThruPrev = threadData->passThruThis;
 
         // if this is the photonPass and we're shooting at a target
-        if(threadData->photonTargetObject)
+        if (threadData->photonTargetObject != nullptr)
         {
             // start with this assumption
             threadData->passThruThis = false;
@@ -304,7 +314,7 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
     // Get distance based attenuation.
     interior = isect.Object->interior.get();
 
-    if (interior != NULL)
+    if (interior != nullptr)
     {
         AttCol = MathColour(interior->Old_Refract);
         if (ray.IsInterior(interior) == true)
@@ -349,7 +359,7 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
 
 #ifndef PT_AMPLIFY_BUG
         // Make sure we get insideness right
-        if (interior != NULL)
+        if (interior != nullptr)
         {
             if (!NRay.RemoveInterior(interior))
                 NRay.AppendInterior(interior);
@@ -369,13 +379,13 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
     // phong and specular for these textures.
     one_colour_found = false;
     for (layer_number = 0, Layer = Texture;
-         (Layer != NULL) && (Trans > ray.GetTicket().adcBailout);
+         (Layer != nullptr) && (Trans > ray.GetTicket().adcBailout);
          layer_number++, Layer = Layer->Next)
     {
         // Get perturbed surface normal.
         LayNormal = rawnormal;
 
-        if (qualityFlags.normals && (Layer->Tnormal != NULL))
+        if (qualityFlags.normals && (Layer->Tnormal != nullptr))
         {
             for(vector<const TEXTURE *>::iterator i(warps.begin()); i != warps.end(); i++)
                 Warp_Normal(LayNormal, LayNormal, *i, Test_Flag(*i, DONT_SCALE_BUMPS_FLAG));
@@ -420,7 +430,7 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
         // angle-dependent reflectivity
         Cos_Angle_Incidence = -dot(ray.Direction, LayNormal);
 
-        if ((isect.Object->interior == NULL) && Layer->Finish->Reflection_Fresnel)
+        if ((isect.Object->interior == nullptr) && Layer->Finish->Reflection_Fresnel)
             throw POV_EXCEPTION_STRING("fresnel reflection used with no interior."); // TODO FIXME - wrong place to report this [trf]
 
         ComputeReflectivity (listWNRX->back().weight, listWNRX->back().reflec,
@@ -554,7 +564,7 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
 
 #ifndef PT_AMPLIFY_BUG
         // Make sure we get insideness right
-        if (interior != NULL)
+        if (interior != nullptr)
         {
             if (!NRay.RemoveInterior(interior))
                 NRay.AppendInterior(interior);
@@ -601,8 +611,8 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
                      threadData->passThruThis );
 
     // If the surface is translucent a transmitted ray is traced
-    // and its illunination is filtered by FilCol.
-    if (doRefraction && ((interior = isect.Object->interior.get()) != NULL) && (Trans > ray.GetTicket().adcBailout) && qualityFlags.refractions)
+    // and its illumination is filtered by FilCol.
+    if (doRefraction && ((interior = isect.Object->interior.get()) != nullptr) && (Trans > ray.GetTicket().adcBailout) && qualityFlags.refractions)
     {
         w1 = FilCol.WeightMax();
         New_Weight = weight * max(w1, 0.0);
@@ -618,7 +628,7 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
 
     // Shoot reflected photons.
 
-    // If total internal reflection occured all reflections using
+    // If total internal reflection occurred all reflections using
     // TopNormal are skipped.
 
     // only really do reflection if...
@@ -660,8 +670,8 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
                 }
             }
 
-            // if global photons, the stop after first layer
-            if (threadData->photonTargetObject==NULL)
+            // if global photons, then stop after first layer
+            if (threadData->photonTargetObject == nullptr)
                 break;
 
             Layer = Layer->Next;
@@ -799,12 +809,12 @@ bool PhotonTrace::ComputeRefractionForPhotons(const FINISH* finish, Interior *in
 
 bool PhotonTrace::TraceRefractionRayForPhotons(const FINISH* finish, const Vector3d& ipoint, Ray& ray, Ray& nray, DBL ior, DBL n, const Vector3d& normal, const Vector3d& rawnormal, const Vector3d& localnormal, MathColour& colour, COLC weight)
 {
-    // Compute refrated ray direction using Heckbert's method.
+    // Compute refracted ray direction using Heckbert's method.
     DBL t = 1.0 + Sqr(ior) * (Sqr(n) - 1.0);
 
     if(t < 0.0)
     {
-        // Total internal reflection occures.
+        // Total internal reflection occurred.
         threadData->Stats()[Internal_Reflected_Rays_Traced]++;
         ComputeReflection(finish, ipoint, ray, normal, rawnormal, colour, weight);
 
@@ -842,7 +852,7 @@ bool PhotonTrace::TraceRefractionRayForPhotons(const FINISH* finish, const Vecto
     InitBacktraceEverything() was called
     'Point' is the intersection point to store the photon
     'Origin' is the origin of the light ray
-    'LightCol' is the color of the light propogated through the scene
+    'LightCol' is the color of the light propagated through the scene
     'RawNorm' is the raw normal of the surface intersected
 
   Postconditions:
@@ -855,7 +865,7 @@ bool PhotonTrace::TraceRefractionRayForPhotons(const FINISH* finish, const Vecto
 void PhotonTrace::addSurfacePhoton(const Vector3d& Point, const Vector3d& Origin, const MathColour& LightCol)
 {
     // TODO FIXME - this seems to have a lot in common with addMediaPhoton()
-    Photon *Photon;
+    Photon *photon;
     MathColour LightCol2;
     DBL Attenuation;
     Vector3d d;
@@ -878,7 +888,7 @@ void PhotonTrace::addSurfacePhoton(const Vector3d& Point, const Vector3d& Origin
     // if too dark, maybe we should stop here
 
 #ifdef GLOBAL_PHOTONS
-    if(threadData->photonObject==NULL)
+    if (threadData->photonObject == nullptr)
     {
         map = &globalPhotonMap;
         threadData->Stats()[Number_Of_Global_Photons_Stored]++;
@@ -892,13 +902,13 @@ void PhotonTrace::addSurfacePhoton(const Vector3d& Point, const Vector3d& Origin
 
 
     // allocate the photon
-    Photon = map->AllocatePhoton();
+    photon = map->AllocatePhoton();
 
     // convert photon from three floats to 4 bytes
-    Photon->colour = PhotonColour(ToRGBColour(LightCol2));
+    photon->colour = PhotonColour(ToRGBColour(LightCol2));
 
     // store the location
-    Photon->Loc = PhotonVector3d(Point);
+    photon->Loc = PhotonVector3d(Point);
 
     // now determine rotation angles
     d = (Origin - Point).normalized();
@@ -911,8 +921,8 @@ void PhotonTrace::addSurfacePhoton(const Vector3d& Point, const Vector3d& Origin
     if (d[Y]<0) theta = -theta;
 
     // cram these rotation angles into two signed bytes
-    Photon->theta=(signed char)(theta*127.0/M_PI);
-    Photon->phi=(signed char)(phi*127.0/M_PI);
+    photon->theta=(signed char)(theta*127.0/M_PI);
+    photon->phi=(signed char)(phi*127.0/M_PI);
 
 }
 
@@ -934,7 +944,7 @@ PhotonMediaFunction::PhotonMediaFunction(shared_ptr<SceneData> sd, TraceThreadDa
     InitBacktraceEverything() was called
     'Point' is the intersection point to store the photon
     'Origin' is the origin of the light ray
-    'LightCol' is the color of the light propogated through the scene
+    'LightCol' is the color of the light propagated through the scene
 
   Postconditions:
     Another photon is allocated (by AllocatePhoton())
@@ -946,7 +956,7 @@ PhotonMediaFunction::PhotonMediaFunction(shared_ptr<SceneData> sd, TraceThreadDa
 void PhotonMediaFunction::addMediaPhoton(const Vector3d& Point, const Vector3d& Origin, const MathColour& LightCol, DBL depthDiff)
 {
     // TODO FIXME - this seems to have a lot in common with addSurfacePhoton()
-    Photon *Photon;
+    Photon *photon;
     MathColour LightCol2;
     DBL Attenuation;
     Vector3d d;
@@ -974,17 +984,18 @@ void PhotonMediaFunction::addMediaPhoton(const Vector3d& Point, const Vector3d& 
 
 
     // allocate the photon
-    if(threadData->photonTargetObject==NULL) return;
+    if (threadData->photonTargetObject == nullptr)
+        return;
 
     threadData->Stats()[Number_Of_Media_Photons_Stored]++;
 
-    Photon = threadData->mediaPhotonMap->AllocatePhoton();
+    photon = threadData->mediaPhotonMap->AllocatePhoton();
 
     // convert photon from three floats to 4 bytes
-    Photon->colour = PhotonColour(ToRGBColour(LightCol2));
+    photon->colour = PhotonColour(ToRGBColour(LightCol2));
 
     // store the location
-    Photon->Loc = PhotonVector3d(Point);
+    photon->Loc = PhotonVector3d(Point);
 
     // now determine rotation angles
     d = (Origin - Point).normalized();
@@ -997,8 +1008,8 @@ void PhotonMediaFunction::addMediaPhoton(const Vector3d& Point, const Vector3d& 
     if (d[Y]<0) theta = -theta;
 
     // cram these rotation angles into two signed bytes
-    Photon->theta=(signed char)(theta*127.0/M_PI);
-    Photon->phi=(signed char)(phi*127.0/M_PI);
+    photon->theta=(signed char)(theta*127.0/M_PI);
+    photon->phi=(signed char)(phi*127.0/M_PI);
 
 }
 
@@ -1031,10 +1042,10 @@ void PhotonMediaFunction::ComputeMediaAndDepositPhotons(MediaVector& medias, con
         // do not ignore photons if at least one media wants photons
         ignore_photons = ignore_photons && (*i)->ignore_photons;
 
-        // use extinction if at leeast one media wants extinction
+        // use extinction if at least one media wants extinction
         use_extinction = use_extinction || (*i)->use_extinction;
 
-        // use scattering if at leeast one media wants scattering
+        // use scattering if at least one media wants scattering
         use_scattering = use_scattering || (*i)->use_scattering;
 
         // NK fast light_ray media calculation for constant media
@@ -1214,17 +1225,7 @@ PhotonMap::PhotonMap()
     gatherRadStep=0.5;
     gatherNumSteps=2;
 
-    // memory initialization
-    int k;
-
-    // allocate the base array
     numPhotons = 0;
-    numBlocks = INITIAL_BASE_ARRAY_SIZE;
-    head = reinterpret_cast<PhotonBlock *>(POV_MALLOC(sizeof(PhotonBlock *)*INITIAL_BASE_ARRAY_SIZE, "photons"));
-
-    // zero the array
-    for(k=0; k<numBlocks; k++)
-        head[k] = NULL;
 }
 
 SinCosOptimizations::SinCosOptimizations()
@@ -1248,11 +1249,9 @@ SinCosOptimizations::~SinCosOptimizations()
 {
     if (sinTheta)
         delete[] sinTheta;
-    sinTheta = NULL;
 
     if (cosTheta)
         delete[] cosTheta;
-    cosTheta = NULL;
 }
 
 
@@ -1263,7 +1262,7 @@ SinCosOptimizations::~SinCosOptimizations()
   AllocatePhoton(PhotonMap *map)
     allocates a photon
 
-    Photons are allocated in blocks.  map->head is a
+    Photons are allocated in blocks.  map->mBlockList is a
     dynamically-created array of these blocks.  The blocks themselves
     are allocated as they are needed.
 
@@ -1284,46 +1283,21 @@ Photon* PhotonMap::AllocatePhoton()
     // from different threads...
     // but we have a different map for each thread, so there's no danger there...
 
-    int i,j,k;
+    int i,j;
 
-    // array mapping funciton
+    // array mapping function
 
-    // !!!!!!!!!!! warning
-    // This code does the same function as the macro PHOTON_AMF
-    // It is done here separatly instead of using the macro for
-    // speed reasons (to avoid duplicate operations).  If the
-    // macro is changed, this MUST ALSO BE CHANGED!
-    i=(this->numPhotons & PHOTON_BLOCK_MASK);
-    j=(this->numPhotons >> (PHOTON_BLOCK_POWER));
+    i = GetIndexInBlock(numPhotons);
+    j = GetBlockId(numPhotons);
 
     // new photon
-    this->numPhotons++;
+    numPhotons++;
 
-    if(j == this->numBlocks)
-    {
-        // the base array is too small, we need to reallocate it
-        Photon **newMap;
-        newMap = reinterpret_cast<Photon **>(POV_MALLOC(sizeof(Photon *)*this->numBlocks*2, "photons"));
-        this->numBlocks*=2;
-
-        // copy entries
-        for(k=0; k<j; k++)
-            newMap[k] = this->head[k];
-
-        // set new entries to zero
-        for(k=j; k<this->numBlocks; k++)
-            newMap[k] = NULL;
-
-        // free old map and put the new map in place
-        POV_FREE(this->head);
-        this->head = newMap;
-    }
-
-    if(this->head[j] == NULL)
+    if (j >= mBlockList.size())
         // allocate a new block of photons
-        this->head[j] = reinterpret_cast<Photon *>(POV_MALLOC(sizeof(Photon)*PHOTON_BLOCK_SIZE, "photons"));
+        mBlockList.push_back(new PhotonBlock);
 
-    return &(this->head[j][i]);
+    return &GetPhoton(j, i);
 }
 
 /*
@@ -1333,92 +1307,62 @@ the merge is complete.
 */
 void PhotonMap::mergeMap(PhotonMap* map)
 {
-    int thisi = ((this->numPhotons) & PHOTON_BLOCK_MASK);
-    int thisj = ((this->numPhotons) >> (PHOTON_BLOCK_POWER));
+    int thisi = GetIndexInBlock(numPhotons);
+    int thisj = GetBlockId(numPhotons);
 
-    int mapi = ((map->numPhotons) & (PHOTON_BLOCK_MASK));
-    int mapj = ((map->numPhotons) >> (PHOTON_BLOCK_POWER));
+    int mapi = GetIndexInBlock(map->numPhotons);
+    int mapj = GetBlockId(map->numPhotons);
 
-    int blocksNeeded = thisj+mapj+2;
-
-    // increase block count if necessary
-    if(blocksNeeded > this->numBlocks)
+    // Set aside any partially filled blocks from both lists;
+    // we'll deal with them later.
+    PhotonBlock* thisPartialBlock = nullptr;
+    if (thisi > 0)
     {
-        // the base array is too small, we need to reallocate it
-        Photon **newMap;
-        newMap = reinterpret_cast<Photon **>(POV_MALLOC(sizeof(Photon *)*blocksNeeded, "photons"));
-        this->numBlocks = blocksNeeded;
-
-        int k;
-
-        // copy entries
-        for(k=0; k<=thisj; k++)
-            newMap[k] = this->head[k];
-
-        // set new entries to zero
-        for(k=thisj+1; k<this->numBlocks; k++)
-            newMap[k] = NULL;
-
-        // free old map and put the new map in place
-        POV_FREE(this->head);
-        this->head = newMap;
+        thisPartialBlock = mBlockList.back();
+        mBlockList.pop_back();
+    }
+    PhotonBlock* mapPartialBlock = nullptr;
+    if (mapi > 0)
+    {
+        mapPartialBlock = map->mBlockList.back();
+        map->mBlockList.pop_back();
     }
 
-    // backup the pointer to the last block.
-    Photon* lastBlock = this->head[thisj];
+    // Transplant all the (pointers to the) completely filled blocks from the other map.
+    mBlockList.insert(mBlockList.end(), map->mBlockList.begin(), map->mBlockList.end());
+    map->mBlockList.clear();
 
-    int j;
-    for(j=0; j<mapj; j++)
+    // If both maps had partially filled blocks, merge them.
+    if ((thisPartialBlock != nullptr) && (mapPartialBlock != nullptr))
     {
-        this->head[thisj] = map->head[j];
-        thisj++;
-    }
-    this->head[thisj] = lastBlock;
-
-    if(map->head[mapj]!=NULL)
-    {
-        if(this->head[thisj]==NULL)
-            this->head[thisj] = reinterpret_cast<Photon *>(POV_MALLOC(sizeof(Photon)*PHOTON_BLOCK_SIZE, "photons"));
-
+        // Retain the old map's block, and fill it up with data from the new map's block.
         int i;
-        for(i=0; thisi<PHOTON_BLOCK_SIZE && i<mapi; i++,thisi++)
+        for (i = 0; (thisi < PHOTON_BLOCK_SIZE) && (i < mapi); i++, thisi++)
+            (*thisPartialBlock)[thisi] = (*mapPartialBlock)[i];
+        // Now move any remaining data in the new map's block to its start.
+        if (i < mapi)
         {
-            this->head[thisj][thisi] = map->head[mapj][i];
+            for (thisi = 0; i < mapi; i++, thisi++)
+                (*mapPartialBlock)[thisi] = (*mapPartialBlock)[i];
         }
-        // continue in a new block if necessary
-        if(i<mapi)
+        else
         {
-            thisj++;
-            this->head[thisj] = reinterpret_cast<Photon *>(POV_MALLOC(sizeof(Photon)*PHOTON_BLOCK_SIZE, "photons"));
-            thisi=0;
-            for(/*nothing*/;i<mapi;i++,thisi++)
-            {
-                this->head[thisj][thisi] = map->head[mapj][i];
-            }
+            // Everything fit into the old map's block; ditch the new map's block.
+            delete mapPartialBlock;
+            mapPartialBlock = nullptr;
         }
-        POV_FREE(map->head[mapj]);
     }
 
-    // pretented that the passed-in map is already freed, so that we don't
-    // de-allocate the memory when it is deconstructued (since we're using
-    // its blocks in this map)
-    map->head = NULL;
+    // Re-append the contents of the partially filled blocks.
+    if (thisPartialBlock != nullptr)
+        mBlockList.push_back(thisPartialBlock);
+    if (mapPartialBlock != nullptr)
+        mBlockList.push_back(mapPartialBlock);
 
-    this->numPhotons = this->numPhotons + map->numPhotons;
+    numPhotons += map->numPhotons;
 }
 
 
-
-/*****************************************************************************
-
- FUNCTION
-
-   InitPhotonMemory()
-
-  Initializes photon memory.
-  Must only be called by InitBacktraceEverything().
-
-******************************************************************************/
 
 /*****************************************************************************
 
@@ -1433,24 +1377,12 @@ void PhotonMap::mergeMap(PhotonMap* map)
 
 PhotonMap::~PhotonMap()
 {
-    int j;
-
-    // if already freed then stop now
-    if (head==NULL)
-        return;
-
-    // free all non-NULL arrays
-    for(j=0; j<numBlocks; j++)
+    // free all non-nullptr blocks
+    for (auto&& block : mBlockList)
     {
-        if(head[j] != NULL)
-        {
-            POV_FREE(head[j]);
-        }
+        if (block != nullptr)
+            delete block;
     }
-
-    // free the base array
-    POV_FREE(head);
-    head = NULL;
 }
 
 
@@ -1592,22 +1524,13 @@ void ShootingDirection::compute()
 
 void PhotonMap::swapPhotons(int a, int b)
 {
-    int ai,aj,bi,bj;
     Photon tmp;
+    Photon& phA = GetPhoton(a);
+    Photon& phB = GetPhoton(b);
 
-    // !!!!!!!!!!! warning
-    // This code does the same function as the macro PHOTON_AMF
-    // It is done here separatly instead of using the macro for
-    // speed reasons (to avoid duplicate operations).  If the
-    // macro is changed, this MUST ALSO BE CHANGED!
-    ai = a & PHOTON_BLOCK_MASK;
-    aj = a >> PHOTON_BLOCK_POWER;
-    bi = b & PHOTON_BLOCK_MASK;
-    bj = b >> PHOTON_BLOCK_POWER;
-
-    tmp = this->head[aj][ai];
-    this->head[aj][ai] = this->head[bj][bi];
-    this->head[bj][bi] = tmp;
+    tmp = phA;
+    phA = phB;
+    phB = tmp;
 }
 
 /*****************************************************************************
@@ -1635,14 +1558,14 @@ void PhotonMap::insertSort(int start, int end, int d)
     for(k=end-1; k>=start; k--)
     {
         j=k+1;
-        tmp = PHOTON_AMF(this->head, k);
-        while ( (tmp.Loc[d] > PHOTON_AMF(this->head,j).Loc[d]) )
+        tmp = GetPhoton(k);
+        while (tmp.Loc[d] > GetPhoton(j).Loc[d])
         {
-            PHOTON_AMF(this->head,j-1) = PHOTON_AMF(this->head,j);
+            GetPhoton(j-1) = GetPhoton(j);
             j++;
             if (j>end) break;
         }
-        PHOTON_AMF(this->head,j-1) = tmp;
+        GetPhoton(j-1) = tmp;
     }
 }
 
@@ -1673,18 +1596,18 @@ void PhotonMap::quickSortRec(int left, int right, int d)
     if(left<right)
     {
         swapPhotons(((left+right)>>1), left+1);
-        if(PHOTON_AMF(this->head,left+1).Loc[d] > PHOTON_AMF(this->head,right).Loc[d])
+        if (GetPhoton(left+1).Loc[d] > GetPhoton(right).Loc[d])
             swapPhotons(left+1,right);
-        if(PHOTON_AMF(this->head,left).Loc[d] > PHOTON_AMF(this->head,right).Loc[d])
+        if (GetPhoton(left).Loc[d] > GetPhoton(right).Loc[d])
             swapPhotons(left,right);
-        if(PHOTON_AMF(this->head,left+1).Loc[d] > PHOTON_AMF(this->head,left).Loc[d])
+        if (GetPhoton(left+1).Loc[d] > GetPhoton(left).Loc[d])
             swapPhotons(left+1,left);
 
         j=left+1; k=right;
         while(j<=k)
         {
-            for(j++; ((j<=right)&&(PHOTON_AMF(this->head,j).Loc[d]<PHOTON_AMF(this->head,left).Loc[d])); j++) { }
-            for(k--; ((k>=left)&&(PHOTON_AMF(this->head,k).Loc[d]>PHOTON_AMF(this->head,left).Loc[d])); k--) { }
+            for (j++; (j <= right) && (GetPhoton(j).Loc[d] < GetPhoton(left).Loc[d]); j++) { }
+            for (k--; (k >= left) && (GetPhoton(k).Loc[d] > GetPhoton(left).Loc[d]); k--) { }
 
             if(j<k)
                 swapPhotons(j,k);
@@ -1723,7 +1646,7 @@ void PhotonMap::quickSortRec(int left, int right, int d)
 
   Postconditions:
     the photon at the midpoint (mid) is the median of the photons
-    when sorted on dimention d.
+    when sorted on dimension d.
 ******************************************************************************/
 void PhotonMap::halfSortRec(int left, int right, int d, int mid)
 {
@@ -1731,18 +1654,18 @@ void PhotonMap::halfSortRec(int left, int right, int d, int mid)
     if(left<right)
     {
         swapPhotons(((left+right)>>1), left+1);
-        if(PHOTON_AMF(this->head,left+1).Loc[d] > PHOTON_AMF(this->head,right).Loc[d])
+        if (GetPhoton(left+1).Loc[d] > GetPhoton(right).Loc[d])
             swapPhotons(left+1,right);
-        if(PHOTON_AMF(this->head,left).Loc[d] > PHOTON_AMF(this->head,right).Loc[d])
+        if (GetPhoton(left).Loc[d] > GetPhoton(right).Loc[d])
             swapPhotons(left,right);
-        if(PHOTON_AMF(this->head,left+1).Loc[d] > PHOTON_AMF(this->head,left).Loc[d])
+        if (GetPhoton(left+1).Loc[d] > GetPhoton(left).Loc[d])
             swapPhotons(left+1,left);
 
         j=left+1; k=right;
         while(j<=k)
         {
-            for(j++; ((j<=right)&&(PHOTON_AMF(this->head,j).Loc[d]<PHOTON_AMF(this->head,left).Loc[d])); j++) { }
-            for(k--; ((k>=left)&&(PHOTON_AMF(this->head,k).Loc[d]>PHOTON_AMF(this->head,left).Loc[d])); k--) { }
+            for (j++; (j <= right) && (GetPhoton(j).Loc[d] < GetPhoton(left).Loc[d]); j++) { }
+            for (k--; (k >= left) && (GetPhoton(k).Loc[d] > GetPhoton(left).Loc[d]); k--) { }
 
             if(j<k)
                 swapPhotons(j,k);
@@ -1771,7 +1694,7 @@ void PhotonMap::halfSortRec(int left, int right, int d, int mid)
 
   sortAndSubdivide
 
-  Finds the dimension with the greates range, sorts the photons on that
+  Finds the dimension with the greatest range, sorts the photons on that
   dimension.  Then it recurses on the left and right halves (keeping
   the median photon as a pivot).  This produces a balanced kd-tree.
 
@@ -1788,13 +1711,13 @@ void PhotonMap::sortAndSubdivide(int start, int end, int /*sorted*/)
 {
     int i,j;             // counters
     PhotonVector3d min,max; // min/max vectors for finding range
-    int DimToUse;        // which dimesion has the greatest range
+    int DimToUse;        // which dimension has the greatest range
     int mid;             // index of median (middle)
     int len;             // length of the array we're sorting
 
     if (end==start)
     {
-        PHOTON_AMF(this->head, start).info = 0;
+        GetPhoton(start).info = 0;
         return;
     }
 
@@ -1809,7 +1732,7 @@ void PhotonMap::sortAndSubdivide(int start, int end, int /*sorted*/)
     {
         for(j=X; j<=Z; j++)
         {
-            Photon *ph = &(PHOTON_AMF(this->head,i));
+            Photon *ph = &GetPhoton(i);
 
             if (ph->Loc[j] < min[j])
                 min[j]=ph->Loc[j];
@@ -1843,7 +1766,7 @@ void PhotonMap::sortAndSubdivide(int start, int end, int /*sorted*/)
     }
 
     // set DimToUse for the midpoint
-    PHOTON_AMF(this->head, mid).info = DimToUse;
+    GetPhoton(mid).info = DimToUse;
 
     // now recurse to continue building the kd-tree
     sortAndSubdivide(start, mid - 1, DimToUse);
@@ -1869,7 +1792,7 @@ void PhotonMap::sortAndSubdivide(int start, int end, int /*sorted*/)
 void PhotonMap::buildTree()
 {
 //  Send_Progress("Sorting photons", PROGRESS_SORTING_PHOTONS);
-    sortAndSubdivide(0,this->numPhotons-1,X+Y+Z/*this is not X, Y, or Z*/);
+    sortAndSubdivide(0, numPhotons-1, X+Y+Z /* this is not X, Y, or Z */);
 }
 
 /*****************************************************************************
@@ -1883,13 +1806,13 @@ void PhotonMap::buildTree()
   Preconditions:
     photon memory initialized
     'map' points to an already-built (and sorted) photon map
-    'mediaMap' is true if 'map' contians media photons, and false if
+    'mediaMap' is true if 'map' contains media photons, and false if
          'map' contains surface photons
 
   Postconditions:
     gather gather options are set for this map
 ******************************************************************************/
-void PhotonMap::setGatherOptions(ScenePhotonSettings &photonSettings, int mediaMap)
+void PhotonMap::setGatherOptions(ScenePhotonSettings &photonSettings, bool mediaMap)
 {
     DBL r;
     DBL density;
@@ -1904,7 +1827,7 @@ void PhotonMap::setGatherOptions(ScenePhotonSettings &photonSettings, int mediaM
 
     // if user did not set minimum gather radius,
     // then we should calculate it
-    if (this->minGatherRad <= 0.0)
+    if (minGatherRad <= 0.0)
     {
         // TODO FIXME - lots of magic numbers here!
 
@@ -1912,19 +1835,19 @@ void PhotonMap::setGatherOptions(ScenePhotonSettings &photonSettings, int mediaM
         maxd=avgd=sum=sum2=0.0;
 
         // use 5% of photons, min 100, max 10000
-        numToSample = this->numPhotons/20;
+        numToSample = numPhotons/20;
         if (numToSample>1000) numToSample = 1000;
         if (numToSample<100) numToSample = 100;
 
         for(i=0; i<numToSample; i++)
         {
-            j = std::rand() % this->numPhotons;
+            j = std::rand() % numPhotons;
 
-            Point = Vector3d((PHOTON_AMF(this->head, j)).Loc);
+            Point = Vector3d(GetPhoton(j).Loc);
 
             // TODO FIXME (this allocates then frees memory each time around the loop)
             PhotonGatherer gatherer(this, photonSettings);
-            n=gatherer.gatherPhotons(&Point, 10000000.0, &r, NULL, false);
+            n = gatherer.gatherPhotons(&Point, 10000000.0, &r, nullptr, false);
 
             // sometimes, if we gather all (100) photons at a single point, the radius will
             // be zero, which will lead to an infinite density, which will mess up all the
@@ -1967,11 +1890,11 @@ void PhotonMap::setGatherOptions(ScenePhotonSettings &photonSettings, int mediaM
         greaterThan = 0;
         for(i=0; i<numToSample; i++)
         {
-            j = std::rand() % this->numPhotons;
+            j = std::rand() % numPhotons;
 
-            Point = Vector3d((PHOTON_AMF(this->head, j)).Loc);
+            Point = Vector3d(GetPhoton(j).Loc);
 
-            n=gatherPhotons(&Point, 10000000.0, &r, NULL, false, map);
+            n = gatherPhotons(&Point, 10000000.0, &r, nullptr, false, map);
 
             if(mediaMap)
                 density = 3.0 * n / (4.0*M_PI*r*r*r); // should that be 4/3?
@@ -1988,22 +1911,22 @@ void PhotonMap::setGatherOptions(ScenePhotonSettings &photonSettings, int mediaM
 
         if(mediaMap)
             // TODO FIXME - what's that 0.3333 back there? Is that supposed to be 1/3?
-            this->minGatherRad = pow(3.0 * photonSettings.maxGatherCount / (density*M_PI*4.0), 0.3333);
+            minGatherRad = pow(3.0 * photonSettings.maxGatherCount / (density*M_PI*4.0), 0.3333);
         else
-            this->minGatherRad = sqrt(photonSettings.maxGatherCount / (density*M_PI));
+            minGatherRad = sqrt(photonSettings.maxGatherCount / (density*M_PI));
 
         //povwin::WIN32_DEBUG_FILE_OUTPUT("photonSettings.maxGatherCount %d\n",photonSettings.maxGatherCount);
-        //povwin::WIN32_DEBUG_FILE_OUTPUT("this->minGatherRad %lf\n",this->minGatherRad);
+        //povwin::WIN32_DEBUG_FILE_OUTPUT("minGatherRad %lf\n",minGatherRad);
 
         lessThan = 0;
         for(i=0; i<numToSample; i++)
         {
-            j = std::rand() % this->numPhotons;
+            j = std::rand() % numPhotons;
 
-            Point = Vector3d((PHOTON_AMF(this->head, j)).Loc);
+            Point = Vector3d(GetPhoton(j).Loc);
 
             PhotonGatherer gatherer(this, photonSettings);
-            n=gatherer.gatherPhotons(&Point, this->minGatherRad, &r, NULL, false);
+            n = gatherer.gatherPhotons(&Point, minGatherRad, &r, nullptr, false);
 
             if(r>0)
             {
@@ -2026,10 +1949,10 @@ void PhotonMap::setGatherOptions(ScenePhotonSettings &photonSettings, int mediaM
         //povwin::WIN32_DEBUG_FILE_OUTPUT("lessThan %d\n",lessThan);
         //povwin::WIN32_DEBUG_FILE_OUTPUT("numToSample %d\n",numToSample);
 
-        //povwin::WIN32_DEBUG_FILE_OUTPUT("this->minGatherRad %lf\n",this->minGatherRad);
+        //povwin::WIN32_DEBUG_FILE_OUTPUT("minGatherRad %lf\n",minGatherRad);
         // the 30.0 is a bit of a fudge-factor.
-        this->minGatherRad*=(1.0+20.0*((DBL)lessThan/(numToSample)));
-        //povwin::WIN32_DEBUG_FILE_OUTPUT("this->minGatherRad %lf\n",this->minGatherRad);
+        minGatherRad *= (1.0 + 20.0 * ((DBL)lessThan / (DBL)numToSample));
+        //povwin::WIN32_DEBUG_FILE_OUTPUT("minGatherRad %lf\n",minGatherRad);
 
     }
 
@@ -2037,20 +1960,53 @@ void PhotonMap::setGatherOptions(ScenePhotonSettings &photonSettings, int mediaM
     // POV to take shortcuts which will improve speed at the expensive of
     // quality.  Alternatively, the user could tell POV to use a bigger
     // radius to improve quality.
-    this->minGatherRad *= this->minGatherRadMult;
-    //povwin::WIN32_DEBUG_FILE_OUTPUT("this->minGatherRad %lf\n",this->minGatherRad);
+    minGatherRad *= minGatherRadMult;
+    //povwin::WIN32_DEBUG_FILE_OUTPUT("minGatherRad %lf\n",minGatherRad);
 
     if(mediaMap)
     {
         // double the radius if it is a media map
         // TODO CLARIFY - why?
-        this->minGatherRad *= 2;
+        minGatherRad *= 2;
     }
 
     // always do this! - use 6 times the area
-    this->gatherRadStep = this->minGatherRad*2;
+    gatherRadStep = minGatherRad * 2;
 
     // somehow we could automatically determine the number of steps
+}
+
+
+//******************************************************************************
+
+Photon& PhotonMap::GetPhoton(unsigned int photonId)
+{
+    return (*mBlockList[GetBlockId(photonId)])[GetIndexInBlock(photonId)];
+}
+
+const Photon& PhotonMap::GetPhoton(unsigned int photonId) const
+{
+    return GetPhoton(GetBlockId(photonId), GetIndexInBlock(photonId));
+}
+
+unsigned int PhotonMap::GetBlockId(unsigned int photonId)
+{
+    return photonId >> PHOTON_BLOCK_POWER;
+}
+
+unsigned int PhotonMap::GetIndexInBlock(unsigned int photonId)
+{
+    return photonId & PHOTON_BLOCK_MASK;
+}
+
+Photon& PhotonMap::GetPhoton(unsigned int blockId, unsigned int indexInBlock)
+{
+    return (*mBlockList[blockId])[indexInBlock];
+}
+
+const Photon& PhotonMap::GetPhoton(unsigned int blockId, unsigned int indexInBlock) const
+{
+    return (*mBlockList[blockId])[indexInBlock];
 }
 
 
@@ -2170,7 +2126,7 @@ static void PQDelMax()
 #endif
 
 // -------------- heap implementation -----------------
-// this is from Sejwick (spelling?)
+// this is from Sedgewick
 #if (PRI_QUE == HEAP)
 
 void PhotonGatherer::PQInsert(Photon *photon, DBL d)
@@ -2261,7 +2217,7 @@ void PhotonGatherer::FullPQInsert(Photon *photon, DBL d)
 
   Postconditions:
     photons within the range of start..end are added to the priority
-    queue (photons may be delted from the queue to make room for photons
+    queue (photons may be deleted from the queue to make room for photons
     of lower priority)
 
 ******************************************************************************/
@@ -2278,7 +2234,7 @@ void PhotonGatherer::gatherPhotonsRec(int start, int end)
 
     // find midpoint
     mid = (end+start)>>1;
-    photon = &(PHOTON_AMF(map->head, mid));
+    photon = &map->GetPhoton(mid);
 
     DimToUse = photon->info;// & PH_MASK_XYZ;
 
@@ -2294,11 +2250,11 @@ void PhotonGatherer::gatherPhotonsRec(int start, int end)
 
         ptToPhoton = Vector3d(photon->Loc) - *pt_s;
 
-        // find euclidian distance (squared)
+        // find euclidean distance (squared)
         dSqr = ptToPhoton.lengthSqr();
 
         // now fix this distance so that we gather using an ellipsoid
-        // alligned with the surface normal instead of a sphere.  This
+        // aligned with the surface normal instead of a sphere.  This
         // minimizes false bleeding of photons at sharp corners
 
         // dmax_s is square of radius of major axis
@@ -2383,7 +2339,7 @@ void PhotonGatherer::gatherPhotonsRec(int start, int end)
 
   gathers photons from the global photon map
 
-  Preconditons:
+  Preconditions:
 
     renderer->sceneData->photonSettings.photonGatherList and renderer->sceneData->photonSettings.photonDistances
       are allocated and are each maxGatherCount in length
@@ -2395,7 +2351,7 @@ void PhotonGatherer::gatherPhotonsRec(int start, int end)
 
   Postconditions:
 
-    *r is radius actually used for gathereing (maximum value is 'Size')
+    *r is radius actually used for gathering (maximum value is 'Size')
     renderer->sceneData->photonSettings.photonGatherList and renderer->sceneData->photonSettings.photonDistances
       contain the gathered photons
     returns number of photons gathered
@@ -2473,7 +2429,7 @@ DBL PhotonGatherer::gatherPhotonsAdaptive(const Vector3d* pt, const Vector3d* no
 
         // save out the current set in case we want to revert
         GatheredPhotons savedGatheredPhotons(photonSettings.maxGatherCount);
-        savedGatheredPhotons.swapWith(this->gatheredPhotons);
+        savedGatheredPhotons.swapWith(gatheredPhotons);
 
         // increase the size
         Size+=map->gatherRadStep;
@@ -2520,7 +2476,7 @@ DBL PhotonGatherer::gatherPhotonsAdaptive(const Vector3d* pt, const Vector3d* no
         else
         {
             // put the old gathered photons back
-            savedGatheredPhotons.swapWith(this->gatheredPhotons);
+            savedGatheredPhotons.swapWith(gatheredPhotons);
             // we're done - break out of the loop
             break;
         }
@@ -2633,32 +2589,31 @@ void GatheredPhotons::swapWith(GatheredPhotons& toCopy)
 GatheredPhotons::GatheredPhotons(int maxGatherCount)
 {
     numFound = 0;
-    photonGatherList = reinterpret_cast<Photon**>(POV_MALLOC(sizeof(Photon *)*maxGatherCount, "Photon Map Info"));
-    photonDistances = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL)*maxGatherCount, "Photon Map Info"));
+    photonGatherList = new Photon*[maxGatherCount];
+    photonDistances = new DBL[maxGatherCount];
 }
 
 GatheredPhotons::~GatheredPhotons()
 {
-    if(photonGatherList)
-        POV_FREE(photonGatherList);
-    photonGatherList = NULL;
+    if (photonGatherList != nullptr)
+        delete[] photonGatherList;
 
-    if(photonDistances)
-        POV_FREE(photonDistances);
-    photonDistances = NULL;
+    if (photonDistances != nullptr)
+        delete[] photonDistances;
 }
 
 
 
 int LightTargetCombo::computeMergedFlags()
 {
-    if(target)
+    if (target != nullptr)
     {
         return light->Flags | target->Flags;
     }
     else
     {
-        return light->Flags = PH_RFR_ON_FLAG | PH_RFL_ON_FLAG; //light->Flags;
+        light->Flags = PH_RFR_ON_FLAG | PH_RFL_ON_FLAG;
+        return light->Flags;
     }
 }
 

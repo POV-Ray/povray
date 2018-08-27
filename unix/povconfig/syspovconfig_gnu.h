@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,7 +41,10 @@
 
 #include <unistd.h>
 
-// lseek64 is natively supported on GNU/Linux systems.
+// GNU/Linux provides large file support via the `lseek64` function,
+// with file offsets having type `off64_t`.
+#define POV_LSEEK(handle,offset,whence) lseek64(handle,offset,whence)
+#define POV_OFF_T off64_t
 
 #if defined(_POSIX_V6_LPBIG_OFFBIG) || defined(_POSIX_V6_LP64_OFF64)
     // long is at least 64 bits.

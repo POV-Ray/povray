@@ -1,12 +1,21 @@
-This directory contains the source code (or subsets thereof) of all the
+/**
+
+@defgroup PovLibraries 3rd Party Libraries
+@brief Source code for 3rd party libraries used by POV-Ray.
+
+@{
+
+@dir
+@brief Source code of @ref PovLibraries.
+
+This directory contains the source code (or relevant subsets thereof) of all the
 3rd party libraries required or recommended to build POV-Ray from scratch.
 
--------------------------------------------------------------------------------
-NOTE: The presence of this directory should _by no means_ be understood as a
-recommendation to use these particular versions of the libraries. To the
-contrary, on most platforms it is highly recommended to use up-to-date versions
-of the libraries instead.
--------------------------------------------------------------------------------
+@attention
+    The presence of this directory should _by no means_ be understood as a
+    recommendation to use these particular versions of the libraries. To the
+    contrary, on most platforms it is highly recommended to use up-to-date versions
+    of the libraries instead.
 
 Originally dating back to pre-Internet times when obtaining 3rd party libraries
 was non-trivial for everyone, the only reason for this directory's continued
@@ -20,3 +29,7 @@ problem was to set up our own custom build processes for these libraries, using
 the same tools as POV-Ray's own build process. However, this approach requires
 the use of well-defined versions of those libraries, which is exactly what this
 directory continues to provide.
+
+@}
+
+*/

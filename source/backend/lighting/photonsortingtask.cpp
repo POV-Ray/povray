@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -63,7 +63,7 @@ namespace pov
 {
 
 /*
-    If you pass a NULL for the "strategy" parameter, then this will
+    If you pass a nullptr for the "strategy" parameter, then this will
     load the photon map from a file.
     Otherwise, it will:
       1) merge
@@ -107,7 +107,7 @@ void PhotonSortingTask::Run()
 
     Cooperate();
 
-    if(strategy!=NULL)
+    if (strategy != nullptr)
     {
         delete strategy;
         sortPhotonMap();
@@ -115,7 +115,7 @@ void PhotonSortingTask::Run()
     else
     {
         if (!this->load())
-            messageFactory.Error(POV_EXCEPTION_STRING("Failed to load photon map from disk"), "Could not load photon map (%s)",GetSceneData()->photonSettings.fileName);
+            messageFactory.Error(POV_EXCEPTION_STRING("Failed to load photon map from disk"), "Could not load photon map (%s)",GetSceneData()->photonSettings.fileName.c_str());
 
         // set photon options automatically
         if (GetSceneData()->surfacePhotonMap.numPhotons>0)
@@ -193,8 +193,8 @@ void PhotonSortingTask::sortPhotonMap()
 #endif
         GetSceneData()->mediaPhotonMap.numPhotons > 0)
     {
-        /* should we load the photon map now that it is built? */
-        if (GetSceneData()->photonSettings.fileName && !GetSceneData()->photonSettings.loadFile)
+        /* should we save the photon map now that it is built? */
+        if (!GetSceneData()->photonSettings.fileName.empty() && !GetSceneData()->photonSettings.loadFile)
         {
             /* status bar for user */
 //          Send_Progress("Saving Photon Maps", PROGRESS_SAVING_PHOTON_MAPS);
@@ -204,7 +204,7 @@ void PhotonSortingTask::sortPhotonMap()
     }
     else
     {
-        if (GetSceneData()->photonSettings.fileName && !GetSceneData()->photonSettings.loadFile)
+        if (!GetSceneData()->photonSettings.fileName.empty() && !GetSceneData()->photonSettings.loadFile)
             messageFactory.Warning(kWarningGeneral,"Could not save photon map - no photons!");
     }
 }
@@ -220,10 +220,10 @@ void PhotonSortingTask::sortPhotonMap()
     photonSettings.fileName contains the filename to save
 
   Postconditions:
-    Returns 1 if success, 0 if failure.
+    Returns true if success, false if failure.
     If success, the photon map has been written to the file.
 */
-int PhotonSortingTask::save()
+bool PhotonSortingTask::save()
 {
     Photon *ph;
     FILE *f;
@@ -231,24 +231,25 @@ int PhotonSortingTask::save()
     size_t err;
     int numph;
 
-    f = fopen(GetSceneData()->photonSettings.fileName, "wb");
-    if (!f) return 0;
+    f = fopen(GetSceneData()->photonSettings.fileName.c_str(), "wb");
+    if (!f)
+        return false;
 
     /* caustic photons */
     numph = GetSceneData()->surfacePhotonMap.numPhotons;
     fwrite(&numph, sizeof(numph),1,f);
-    if (numph>0 && GetSceneData()->surfacePhotonMap.head)
+    if ((numph > 0) && !GetSceneData()->surfacePhotonMap.mBlockList.empty())
     {
         for(i=0; i<numph; i++)
         {
-            ph = &(PHOTON_AMF(GetSceneData()->surfacePhotonMap.head, i));
+            ph = &GetSceneData()->surfacePhotonMap.GetPhoton(i);
             err = fwrite(ph, sizeof(Photon), 1, f);
 
             if (err<=0)
             {
                 /* fwrite returned an error! */
                 fclose(f);
-                return 0;
+                return false;
             }
         }
     }
@@ -261,18 +262,18 @@ int PhotonSortingTask::save()
     /* global photons */
     numph = globalPhotonMap.numPhotons;
     fwrite(&numph, sizeof(numph),1,f);
-    if (numph>0 && globalPhotonMap.head)
+    if ((numph > 0) && !globalPhotonMap.mBlockList.empty())
     {
         for(i=0; i<numph; i++)
         {
-            ph = &(PHOTON_AMF(globalPhotonMap.head, i));
+            ph = &globalPhotonMap.GetPhoton(i);
             err = fwrite(ph, sizeof(Photon), 1, f);
 
             if (err<=0)
             {
                 /* fwrite returned an error! */
                 fclose(f);
-                return 0;
+                return false;
             }
         }
     }
@@ -285,18 +286,18 @@ int PhotonSortingTask::save()
     /* media photons */
     numph = GetSceneData()->mediaPhotonMap.numPhotons;
     fwrite(&numph, sizeof(numph),1,f);
-    if (numph>0 && GetSceneData()->mediaPhotonMap.head)
+    if ((numph > 0) && !GetSceneData()->mediaPhotonMap.mBlockList.empty())
     {
         for(i=0; i<numph; i++)
         {
-            ph = &(PHOTON_AMF(GetSceneData()->mediaPhotonMap.head, i));
+            ph = &GetSceneData()->mediaPhotonMap.GetPhoton(i);
             err = fwrite(ph, sizeof(Photon), 1, f);
 
             if (err<=0)
             {
                 /* fwrite returned an error! */
                 fclose(f);
-                return 0;
+                return false;
             }
         }
     }
@@ -319,11 +320,11 @@ int PhotonSortingTask::save()
     renderer->sceneData->photonSettings.fileName contains the filename to load
 
   Postconditions:
-    Returns 1 if success, 0 if failure.
+    Returns true if success, false if failure.
     If success, the photon map has been loaded from the file.
     If failure then the render should stop with an error
 */
-int PhotonSortingTask::load()
+bool PhotonSortingTask::load()
 {
     int i;
     size_t err;
@@ -331,12 +332,13 @@ int PhotonSortingTask::load()
     FILE *f;
     int numph;
 
-    if (!GetSceneData()->photonSettings.photonsEnabled) return 0;
+    if (!GetSceneData()->photonSettings.photonsEnabled) return false;
 
-    messageFactory.Warning(kWarningGeneral,"Starting the load of photon file %s\n",GetSceneData()->photonSettings.fileName);
+    messageFactory.Warning(kWarningGeneral,"Starting the load of photon file %s\n",GetSceneData()->photonSettings.fileName.c_str());
 
-    f = fopen(GetSceneData()->photonSettings.fileName, "rb");
-    if (!f) return 0;
+    f = fopen(GetSceneData()->photonSettings.fileName.c_str(), "rb");
+    if (!f)
+        return false;
 
     fread(&numph, sizeof(numph),1,f);
 
@@ -349,7 +351,7 @@ int PhotonSortingTask::load()
         {
             /* fread returned an error! */
             fclose(f);
-            return 0;
+            return false;
         }
     }
 
@@ -368,7 +370,7 @@ int PhotonSortingTask::load()
             {
                 /* fread returned an error! */
                 fclose(f);
-                return 0;
+                return false;
             }
         }
 #endif
@@ -384,7 +386,7 @@ int PhotonSortingTask::load()
             {
                 /* fread returned an error! */
                 fclose(f);
-                return 0;
+                return false;
             }
         }
 

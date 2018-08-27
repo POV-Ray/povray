@@ -1,12 +1,12 @@
 /**
 
 @namespace pov
-Code for the actual render engine (back-end).
+@brief Code for the actual render engine (back-end).
 
 @namespace pov_base
-Code shared between back-end and front-end.
+@brief Code shared between back-end and front-end.
 
 @namespace pov_frontend
-Code for the render front-end.
+@brief Code for the render front-end.
 
 */

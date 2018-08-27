@@ -1,2 +1,6 @@
-/// @dir
-/// Source code for the Unix UI, and project and auxiliary files for building the Unix version.
+/**
+
+@dir
+@brief Source code for the Unix UI, and project and auxiliary files for building the Unix version.
+
+*/

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -71,8 +71,6 @@ class PhotonShootingTask : public RenderTask
         void Finish();
 
         void SendProgress();
-        int save();
-        int load();
 
         void ShootPhotonsAtObject(LightTargetCombo& combo);
         DBL computeAttenuation(const LightSource* Light, const Ray& ray, DBL dist_of_initial_from_center);

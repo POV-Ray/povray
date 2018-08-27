@@ -1,7 +1,21 @@
 /**
 
+@defgroup PovFrontend POV-Ray Frond-End Module
+@ingroup PovSource
+@brief User-side coordination.
+
+This module is mainly concerned with interfacing with the user, as well as assembling the rendered result image.
+
+This module has the dual role of providing high-level control of the rendering process as well as
+assembling the computed image data into an actual result image file.
+
+The front-end module depends on the @ref PovBase and @ref PovMS.
+
+@{
+
 @dir
-@ingroup PovFrontend
-Source code files for the render front-end.
+@brief Source code files for the @ref PovFrontend.
+
+@}
 
 */

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,6 +39,10 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ standard header files
+#include <string>
+
+// POV-Ray header files (core module)
 #include "core/material/media.h"
 #include "core/render/trace.h"
 
@@ -82,9 +86,8 @@ class ScenePhotonSettings
             autoStopPercent = 1.0;  // disabled by default
 
             // these are used for saving or loading the photon map
-            // note: save and load are mutually exclusive - there are three states: save, load, neither
-            fileName = NULL;
-            saveFile = false;
+            // note: save and load are mutually exclusive - there are three states: save, load, neither;
+            // save is indicated by a non-empty fileName with loadFile set to false.
             loadFile = false;
 
             #ifdef GLOBAL_PHOTONS
@@ -96,20 +99,10 @@ class ScenePhotonSettings
             mediaSpacingFactor = 0;
             maxMediaSteps = 0;  // disabled by default
 
-            // refleciton blur settings
+            // reflection blur settings
             // to be used with the reflection blur patch
             //photonReflectionBlur = false;
         }
-        ~ScenePhotonSettings()
-        {
-            if ( fileName )
-            {
-                POV_FREE(fileName);
-                fileName=NULL;
-            }
-        }
-
-
 
         bool photonsEnabled;
 
@@ -135,9 +128,9 @@ class ScenePhotonSettings
         DBL autoStopPercent;
 
         // these are used for saving or loading the photon map
-        // note: save and load are mutually exclusive - there are three states: save, load, neither
-        char* fileName;
-        bool saveFile;
+        // note: save and load are mutually exclusive - there are three states: save, load, neither;
+        // save is indicated by a non-empty fileName with loadFile set to false.
+        std::string fileName;
         bool loadFile;
 
         #ifdef GLOBAL_PHOTONS
@@ -151,7 +144,7 @@ class ScenePhotonSettings
         DBL mediaSpacingFactor;
         int maxMediaSteps;
 
-        // refleciton blur settings
+        // reflection blur settings
         // to be used with the reflection blur patch
         //bool photonReflectionBlur;
 };
@@ -176,25 +169,22 @@ struct Photon
     signed char theta, phi; /* incoming direction */
 };
 
-typedef Photon* PhotonBlock;
-
 /* ------------------------------------------------------ */
 /* photon map */
 /* ------------------------------------------------------ */
 
-/* this is for photon block allocation and array mapping functions */
-extern const int PHOTON_BLOCK_POWER;
-extern const int PHOTON_BLOCK_SIZE;
-extern const int PHOTON_BLOCK_MASK;
-extern const int INITIAL_BASE_ARRAY_SIZE;
-
 class PhotonMap
 {
-    public:
-        Photon **head;
-        int numBlocks;        /* number of blocks in base array */
-        int numPhotons;       /* total number of photons used */
 
+    private:
+
+        class PhotonBlock;
+
+    public:
+
+        std::vector<PhotonBlock*> mBlockList;
+
+        int numPhotons;         /* total number of photons used */
         DBL minGatherRad;       /* minimum gather radius */
         DBL minGatherRadMult;   /* minimum gather radius multiplier (for speed adjustments) */
         DBL gatherRadStep;      /* step size for gather expansion */
@@ -210,48 +200,58 @@ class PhotonMap
         void sortAndSubdivide(int start, int end, int /*sorted*/);
         void buildTree();
 
-        void setGatherOptions(ScenePhotonSettings& photonSettings, int mediaMap);
+        void setGatherOptions(ScenePhotonSettings& photonSettings, bool mediaMap);
 
         Photon* AllocatePhoton();
 
         void mergeMap(PhotonMap* map);
+
+        Photon& GetPhoton(unsigned int photonId);
+        const Photon& GetPhoton(unsigned int photonId) const;
+
+    protected:
+
+        /* ------------------------------------------------------ */
+        /*
+          Photon array mapping function
+
+          This converts a one-dimensional index into a two-dimensional address
+          in the photon array.
+
+          Photon memory looks like this:
+
+            # -> **********
+            # -> **********  <- blocks of photons
+            # -> **********
+            # -> /
+            # -> /
+            :
+            ^
+            |
+            Base array.
+
+          The base array (which is dynamically resized as needed) contains pointers
+          to blocks of photons.  Blocks of photons (of fixed size of a power of two)
+          are allocated as needed.
+
+          This mapping function converts a one-dimensional index and into a two-
+          dimensional address consisting of a block index and an offset within
+          that block.
+
+          Note that, while this data structure allows easy allocation of photons,
+          it does not easily permit deallocation of photons.  Once photons are placed
+          into the photon map, they are not removed.
+        */
+
+        static unsigned int GetBlockId(unsigned int photonId);
+        static unsigned int GetIndexInBlock(unsigned int photonId);
+
+        Photon& GetPhoton(unsigned int blockId, unsigned int indexInBlock);
+        const Photon& GetPhoton(unsigned int blockId, unsigned int indexInBlock) const;
 };
 
 
-/* ------------------------------------------------------ */
-/*
-  Photon array mapping function
-
-  This converts a one-dimensional index into a two-dimensional address
-  in the photon array.
-
-  Photon memory looks like this:
-
-    # -> **********
-    # -> **********  <- blocks of photons
-    # -> **********
-    # -> /
-    # -> /
-    :
-    ^
-    |
-    Base array.
-
-  The base array (which is dynamically resized as needed) contians pointers
-  to blocks of photons.  Blocks of photons (of fixed size of a power of two)
-  are allocated as needed.
-
-  This mapping function converts a one-dimensional index and into a two-
-  dimensional address consisting of a block index and an offset within
-  that block.
-
-  Note that, while this data structure allows easy allocation of photons,
-  it does not easily permit deallocation of photons.  Once photons are placed
-  into the photon map, they are not removed.
-*/
-// if this is changed, you must also change swapPhotons() and
-// allocatePhoton, both in photons.c
-#define PHOTON_AMF(map, idx)   map[(idx)>>PHOTON_BLOCK_POWER][(idx) & PHOTON_BLOCK_MASK]
+typedef Photon* PhotonPtr;
 
 
 /* ------------------------------------------------------ */
@@ -283,7 +283,7 @@ class PhotonGatherer
         int TargetNum_s; // how many to gather
         const Vector3d *pt_s;       // point around which we are gathering
         const Vector3d *norm_s;     // surface normal
-        DBL flattenFactor; // amount to flatten the spher to make it
+        DBL flattenFactor; // amount to flatten the sphere to make it
                            // an ellipsoid when gathering photons
                            // zero = no flatten, one = regular
         bool gathered;
@@ -319,7 +319,7 @@ class PhotonMediaFunction : public MediaFunction
 class PhotonTrace : public Trace
 {
     public:
-        PhotonTrace(shared_ptr<SceneData> sd, TraceThreadData *td, unsigned int mtl, DBL adcb, const QualityFlags& qf, Trace::CooperateFunctor& cf);
+        PhotonTrace(shared_ptr<SceneData> sd, TraceThreadData *td, const QualityFlags& qf, Trace::CooperateFunctor& cf);
         ~PhotonTrace();
 
         virtual DBL TraceRay(Ray& ray, MathColour& colour, ColourChannel&, COLC weight, bool continuedRay, DBL maxDepth = 0.0);
@@ -334,7 +334,7 @@ class PhotonTrace : public Trace
         void addSurfacePhoton(const Vector3d& Point, const Vector3d& Origin, const MathColour& LightCol);
 };
 
-// foward declaration
+// forward declaration
 class LightTargetCombo;
 
 /* ------------------------------------------------------ */

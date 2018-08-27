@@ -921,11 +921,11 @@ void Ovus::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
 
     if ( (P[Y] > EPSILON) && (P[Y] < (VerticalSpherePosition - EPSILON) ) )
     {
-    // when on the spindle, the range 0.25 to 0.75 is used 
+    // when on the spindle, the range 0.25 to 0.75 is used
     // Verbatim from C-Lipka:
     // Dividing at 1/4 and 3/4 has the advantage of the division being exactly at a pixel boundary
     // if the texture is an image 2^N by 2^M pixels in size, which is common for image textures
-    // originally designed for mesh-based renderers. It also happens to work for 20N by 20M pixels, 
+    // originally designed for mesh-based renderers. It also happens to work for 20N by 20M pixels,
     // which is common for image textures with "arbitrary" sizes.
         phi = 0.75-0.5*(P[Y])/(VerticalSpherePosition);
     }

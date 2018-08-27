@@ -29,7 +29,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -693,18 +693,18 @@ public:
     typedef typename VectorType::const_reverse_iterator const_reverse_iterator;
 
     PooledSimpleVector() :
-        mpVector(mPool.alloc())
+        mpVector(GetPool().alloc())
     {}
 
     PooledSimpleVector(const PooledSimpleVector& o) :
-        mpVector(mPool.alloc())
+        mpVector(GetPool().alloc())
     {
         *mpVector = *o.mpVector;
     }
 
     ~PooledSimpleVector()
     {
-        mPool.release(mpVector);
+        GetPool().release(mpVector);
     }
 
     inline PooledSimpleVector& operator=(const PooledSimpleVector& o)
@@ -759,12 +759,21 @@ public:
 
 private:
 
-    static thread_local PoolType mPool;
+    /// Get thread-local vector pool instance.
+    ///
+    /// @note
+    ///     This construct is deliberate; while it would seem natural to use a straightforward
+    ///     `static thread_local` class member variable instead, in template classes that seems to
+    ///     lead to runtime errors with certain compilers (seen e.g. with XCode 9.3).
+    ///
+    static inline PoolType& GetPool()
+    {
+        static thread_local PoolType pool(SIZE_HINT);
+        return pool;
+    }
+
     VectorType* mpVector;
 };
-
-template<typename T, size_t S>
-thread_local typename PooledSimpleVector<T, S>::PoolType PooledSimpleVector<T, S>::mPool(S);
 
 /// @}
 ///

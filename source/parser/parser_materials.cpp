@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -51,6 +51,7 @@
 #include "core/material/texture.h"
 #include "core/material/warp.h"
 #include "core/math/matrix.h"
+#include "core/scene/atmosphere.h"
 #include "core/scene/object.h"
 #include "core/scene/scenedata.h"
 #include "core/scene/tracethreaddata.h"
@@ -66,8 +67,10 @@
 // this must be the last file included
 #include "base/povdebug.h"
 
-namespace pov
+namespace pov_parser
 {
+
+using namespace pov;
 
 /*****************************************************************************
 * Local preprocessor defines

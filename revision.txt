@@ -35,6 +35,362 @@ Notes:
 POV-Ray v3.8.0-???
 ------------------------------------------------------------------------------
 
+Commit d8b8ecfe on 2018-04-07 by Christoph Lipka
+
+    Fold v3.8.0 branch back into master branch for now.
+
+Commit af431c4d on 2018-01-18 by Christoph Lipka
+
+    Eliminate C-style memory allocations from photons code.
+
+    Also do some code cleanup along the way.
+
+Commit be480147 on 2018-01-18 by Christoph Lipka
+
+    Eliminate C-style memory allocations from height field code.
+
+Commit 88171b5e on 2018-01-07 by Christoph Lipka
+
+    Eliminate C-style memory allocations from TrueType code.
+
+Commit 9c671746 on 2018-01-06 by Christoph Lipka
+
+    Merge branch 'release/v3.8.0'
+
+Commit b3038c26 on 2017-12-03 by Christoph Lipka
+
+    Merge branch 'release/v3.8.0'
+
+Commit 56cbef48 on 2017-10-12 by Christoph Lipka
+
+    Update ISSUE_TEMPLATE.md
+
+Commit 04e1a546 on 2017-10-12 by Christoph Lipka
+
+    Update ISSUE_TEMPLATE.md
+
+Commit 54474e8b on 2017-09-20 by Christoph Lipka
+
+    [ci skip] Add GitHub issue template.
+
+Commit 5410fd42 on 2017-06-24 by Christoph Lipka
+
+    Minor updates to compile-time config.
+
+Commit 1c69d04f on 2017-06-24 by Christoph Lipka
+
+    Minor code cleanup in VFE.
+
+Commit 4be26aba on 2017-06-23 by Christoph Lipka
+
+    Minor code change to `polynomialsolver.cpp`
+
+Commit eb885ded on 2017-06-20 by Christoph Lipka
+
+    Merge branch 'release/v3.7.1'
+
+Commit cd135029 on 2017-06-20 by Christoph Lipka
+
+    Merge branch 'release/v3.7.1'
+
+Commit 815a84a6 on 2017-05-22 by Bernhard M. Wiedemann
+
+    Improve reproducibility of Unix builds. (#296)
+
+    This commit enforces alphabetical ordering of code units (`.cpp` files)
+    in the linkage process, making sure that builds produce bit-identical
+    binaries regardless of the physical ordering of the files in the file
+    system (on otherwise identical build environments).
+
+Commit 041e9b02 on 2017-05-15 by William F. Pokorny (wfpokorny)
+
+    [ci skip] Removing comment related to long gone FRAND() macro. (#264)
+
+Commit 35894e56 on 2017-05-14 by Christoph Lipka
+
+    Merge branch 'release/v3.7.1'
+
+Commit 4a7564ae on 2017-05-07 by Christoph Lipka
+
+    Merge branch 'release/v3.7.1'
+
+Commit 9ceb3efd on 2017-05-07 by Christoph Lipka
+
+    Merge branch 'release/v3.7.1'
+
+Commit e9532897 on 2017-05-07 by William F. Pokorny (wfpokorny)
+
+    Improving performance of gatherPhotonsRec function. (#280)
+
+Commit 1e3b586b on 2017-04-02 by Christoph Lipka
+
+    Merge branch 'release/v3.7.1'
+
+Commit b0084bef on 2017-02-12 by Christoph Lipka
+
+    Merge branch 'release/v3.7.1'
+
+Commit 71c1415e on 2017-01-27 by Christoph Lipka
+
+    Merge branch 'release/v3.7.1'
+
+Commit d6e8257d on 2017-01-16 by Christoph Lipka
+
+    Merge branch 'release/v3.7.1'
+
+Commit 837a5c92 on 2017-01-08 by Christoph Lipka
+
+    Merge branch 'release/v3.7.1'
+
+Commit 283f7bf3 on 2017-01-01 by Christoph Lipka
+
+    Update README.md
+
+Commit 09fc31df on 2017-01-01 by Christoph Lipka
+
+    Prepare for 3.7.2 development phase.
+
+------------------------------------------------------------------------------
+POV-Ray v3.8.0-alpha.9606898
+------------------------------------------------------------------------------
+
+Commit 589cc9a8 on 2018-04-07 by Christoph Lipka
+
+    [ci skip] Fix issue in AppVeyor config for autobuild branches.
+
+Commit 083ffa4a on 2018-01-18 by Christoph Lipka
+
+    Change AppVeyor config file to work for all v3.8 branches.
+
+Commit 5b99fdc9 on 2018-01-18 by Christoph Lipka
+
+    Fix GitHub issue #319.
+
+Commit 9248849e on 2018-01-18 by Christoph Lipka
+
+    Clean up use of `snprintf`/`vsnprintf` to use C++11 standard
+    functions. (#343)
+
+    Also replace `FILE_NAME_LENGTH` macro along the way in hope to clarify
+    the code, and eliminate `MAX_PATH` from all but the Windows-specific code.
+
+------------------------------------------------------------------------------
+POV-Ray v3.8.0-alpha.9475849
+------------------------------------------------------------------------------
+
+Commit 26e2d47a on 2018-01-06 by Christoph Lipka
+
+    Improve parsing speed of skipped conditional blocks.
+
+Commit 3600d856 on 2018-01-05 by Christoph Lipka
+
+    Fix block pattern density list parsing issue.
+
+Commit 2d23e49e on 2018-01-05 by Christoph Lipka
+
+    Fix GitHub issue #342 for v3.8 branch.
+
+Commit d418768f on 2018-01-05 by Christoph Lipka
+
+    Change `unix/prebuild.sh` to allow running it from the main directory.
+
+Commit 8f4ba8ab on 2018-01-01 by Christoph Lipka
+
+    Fix configure script failing to use -lboost_system with Boost 1.66.
+
+------------------------------------------------------------------------------
+POV-Ray v3.8.0-alpha.9436902
+------------------------------------------------------------------------------
+
+Commit 21fc7673 on 2017-12-05 by Christoph Lipka
+
+    Drop unused `steps` keyword.
+
+Commit bb85b4fd on 2017-11-18 by Christoph Lipka
+
+    Update benchmark scene for v3.8.
+
+Commit 3dc2808f on 2017-11-18 by Christoph Lipka
+
+    Re-sync inbuilt benchmark scene with distributed copy.
+
+Commit 3d6f5b1e on 2017-11-18 by William F. Pokorny (wfpokorny)
+
+    [ci skip] Adding /unix/config/ar-lib to .gitignore. (#337)
+
+Commit 4e82cde6 on 2017-11-18 by Christoph Lipka
+
+    Prepare to re-sync inbuilt benchmark scene with distributed copy.
+
+Commit accc779d on 2017-11-10 by Christoph Lipka
+
+    Eliminate `FixedSimpleVector`.
+
+Commit 33ecddad on 2017-11-09 by Christoph Lipka
+
+    Improve doxygen documentation of normally-undefined macros.
+
+Commit f002c45a on 2017-11-07 by Christoph Lipka
+
+    Fix crash in debug version when `+GI`/`Create_Ini` option is used.
+
+Commit c612c60a on 2017-11-06 by Christoph Lipka
+
+    Fix an academic flaw in JPEG file handling code.
+
+Commit 8406fe65 on 2017-11-06 by Christoph Lipka
+
+    Fix more missing includes, which caused errors building the Unix version
+    on Mac OS.
+
+Commit f232ce8b on 2017-11-06 by Christoph Lipka
+
+    Fix errors building the Unix version on Mac OS.
+
+Commit f123f796 on 2017-11-06 by Christoph Lipka
+
+    Eliminate Autoconf warnings and bump required Autoconf version to 2.68.
+
+Commit 48dd5bb6 on 2017-11-06 by Christoph Lipka
+
+    Fix some instances of missing namespace qualifiers.
+
+Commit 4a3a143b on 2017-11-06 by Christoph Lipka
+
+    Fix a few macro names not complying with C++ standard (reserved for
+    compiler use).
+
+------------------------------------------------------------------------------
+POV-Ray v3.8.0-alpha.9387404
+------------------------------------------------------------------------------
+
+Commit 42c96b9d on 2017-11-06 by Christoph Lipka
+
+    Fix bug in prism that could cause sides to become invisible when using
+    `conic_sweep` with orthographic camera.
+
+Commit 4de4b3d7 on 2017-10-30 by Christoph Lipka
+
+    Change default pigment to white.
+
+Commit 61d1d1f4 on 2017-09-27 by Christoph Lipka
+
+    Fix potential crash in ovus parsing.
+
+Commit e7aac79d on 2017-09-26 by Christoph Lipka
+
+    Fix some `interior_texture` bugs (issue #65 and subsequent discussion).
+
+    - Fix `prism` primitive `bezier_spline` sides.
+    - Fix `prism` primitive bottom.
+    - Fix `text` primitive sides as suggested by Grimbert Jérôme
+      <LeForgeron@users.noreply.github.com>.
+
+Commit 7cab5202 on 2017-09-23 by Christoph Lipka
+
+    Fix Unix build error due to issue in `tools/unix/get-source-version.sh`.
+
+Commit 16378dcb on 2017-09-23 by Christoph Lipka
+
+    Drop `unix/VERSION` from the repository.
+
+Commit 1a2df0ea on 2017-09-23 by Christoph Lipka
+
+    A few updates to Git pre-commit hook; please copy to `.git/hooks`.
+
+Commit 53d20a88 on 2017-09-23 by Christoph Lipka
+
+    Minor changes to version info macro framework.
+
+Commit 497a5071 on 2017-09-23 by Christoph Lipka
+
+    Front-end now completely relies on back-end to provide version info.
+
+Commit 24f03c19 on 2017-09-23 by Christoph Lipka
+
+    Codify canonical format for referencing POV-Ray version numbers (see
+    `source-doc/versioning.md`).
+
+Commit f68e3ac8 on 2017-09-23 by Christoph Lipka
+
+    Drop `boost/tr1` module from the boost library subset bundled with
+    POV-Ray.
+
+Commit f4901fb7 on 2017-09-23 by Christoph Lipka
+
+    Eliminate use of C++ `register` keyword and fix a few data types along
+    the way.
+
+------------------------------------------------------------------------------
+POV-Ray v3.8.0-alpha.9322209
+------------------------------------------------------------------------------
+
+Commit 12fbab3e on 2017-09-21 by Christoph Lipka
+
+    Change camera `right` default length to output image aspect ratio.
+
+Commit 17e3f645 on 2017-09-20 by Christoph Lipka
+
+    Modify doxygen invocation scripts to not rely on `unix/VERSION` for
+    version info.
+
+Commit 844dae60 on 2017-09-20 by Christoph Lipka
+
+    Minor beautification of previous commits.
+
+Commit e39f5af2 on 2017-09-20 by Grimbert Jérôme
+
+    Extension of ovus (#306)
+
+    - allow the center of the top sphere to not be on the top of the bottom
+      sphere (via "distance xxx")
+    - allow the radius of the torus spindle to be manually specified (via
+      "radius xxx")
+    - allow precision of the root solver to be tuned (via "precision xxx")
+    - change of UV-Mapping to be similar to the uv-mapping of cone & cylinder
+
+Commit 0358da00 on 2017-09-20 by Grimbert Jérôme
+
+    Change ambient default to 0.0 (#305)
+
+    When version is explicitly set to 3.8 or greater, either in the option or
+    as the first statement of the scene, the default ambient finish is set to
+    0.0 (instead of 0.1 which is problematic with gamma handling rgb vs srgb)
+
+Commit 7d225a07 on 2017-09-17 by Christoph Lipka
+
+    Fix bug in Windows version info macros.
+
+------------------------------------------------------------------------------
+POV-Ray v3.8.0-alpha.9309453
+------------------------------------------------------------------------------
+
+Commit d850f922 on 2017-09-12 by Christoph Lipka
+
+    Add Windows scripts to extract version information from `base/version.h`.
+
+Commit 5cdb3f76 on 2017-09-10 by Christoph Lipka
+
+    Update POV-Ray's mechanism to inherit settings from older versions
+    on Windows.
+
+Commit bbb4a357 on 2017-09-10 by Christoph Lipka
+
+    Add Unix command-line option to print short version number.
+
+    Specifying `--generation` as a command-line parameter will cause POV-Ray
+    for Unix to print its "generation" and beta status (if applicable)
+    to standard output, then exit. For example, for v3.8.1 this would be
+    `3.8`; for a beta version of that release, it would be `3.8-beta`.
+
+Commit 8bc48810 on 2017-09-10 by Christoph Lipka
+
+    Update some more version numbers thoughout the repo.
+
+Commit 03e27c66 on 2017-09-10 by Christoph Lipka
+
+    Update docs.
+
 Commit 1dbca0ba on 2017-09-06 by Christoph Lipka
 
     Remove dependency on `boost::tr1` to fix issue #317.
@@ -120,7 +476,7 @@ Commit 9808f53a on 2017-06-24 by William F. Pokorny (wfpokorny)
     Update list of required packages for Unix builds. ( #294)
 
 ------------------------------------------------------------------------------
-POV-Ray v3.7.1-rc.1
+POV-Ray v3.7.1-rc.1  (officially retracted)
 ------------------------------------------------------------------------------
 
 Commit e3c1738c on 2017-06-22 by Christoph Lipka

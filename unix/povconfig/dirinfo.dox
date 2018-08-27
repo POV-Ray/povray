@@ -1,2 +1,7 @@
-/// @dir
-/// Platform-specific source code required to adapt POV-Ray to the Unix platform.
+/**
+
+@dir
+@ingroup PovConfig
+@brief Platform-specific source code required to adapt POV-Ray to the Unix platform.
+
+*/

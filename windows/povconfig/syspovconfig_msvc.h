@@ -53,9 +53,6 @@
 #include <direct.h>
 
 #pragma auto_inline(on)
-#pragma warning(disable : 4018) /* signed/unsigned mismatch */
-#pragma warning(disable : 4305) /* truncation from 'type1' to 'type2' (mostly double to float) */
-#pragma warning(disable : 4244) /* possible loss of data (converting ints to shorts) */
 
 #ifdef __INTEL_COMPILER
 
@@ -92,6 +89,10 @@
 
   #pragma inline_recursion(on)
   #pragma inline_depth(255)
+
+  #pragma warning(disable : 4018) /* signed/unsigned mismatch */
+  #pragma warning(disable : 4305) /* truncation from 'type1' to 'type2' (mostly double to float) */
+  #pragma warning(disable : 4244) /* possible loss of data (converting ints to shorts) */
 
   #if _MSC_VER >= 1400 && _MSC_VER < 1500 && !defined (_WIN64)
     // MS Visual C++ 2005 (aka 8.0), compiling for 32 bit target

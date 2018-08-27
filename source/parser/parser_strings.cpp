@@ -50,8 +50,10 @@
 // this must be the last file included
 #include "base/povdebug.h"
 
-namespace pov
+namespace pov_parser
 {
+
+using namespace pov;
 
 /*****************************************************************************
  *
@@ -170,6 +172,30 @@ UCS2 *Parser::Parse_String(bool pathname, bool require)
     END_EXPECT
 
     return New;
+}
+
+
+//****************************************************************************
+
+
+std::string Parser::Parse_ASCIIString(bool pathname, bool require)
+{
+    UCS2 *cstr = Parse_String(pathname, require);
+    std::string ret(UCS2toASCIIString(cstr));
+    POV_FREE(cstr);
+    return ret;
+}
+
+
+//****************************************************************************
+
+
+UCS2String Parser::Parse_UCS2String(bool pathname, bool require)
+{
+    UCS2 *cstr = Parse_String(pathname, require);
+    UCS2String ret(cstr);
+    POV_FREE(cstr);
+    return ret;
 }
 
 

@@ -1,7 +1,23 @@
 /**
 
+@defgroup PovBackend POV-Ray Back-End Module
+@ingroup PovSource
+@brief Render thread coordination.
+
+This module is mainly concerned with setting up and coordinating the @ref PovParser and @ref PovCore
+threads involved in rendering a scene, and interfacing them to a -- possibly remote --
+@ref PovFrontend instance via the @ref PovMS.
+
+@todo
+    The exact line between the back-end module and the @ref PovCore has not been finalized yet.
+
+The back-end module depends on the @ref PovBase, @ref PovCore, @ref PovParser and @ref PovMS.
+
+@{
+
 @dir
-@ingroup PovBackend
-Source code files for the render back-end.
+@brief Source code files for the @ref PovBackend.
+
+@}
 
 */

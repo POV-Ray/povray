@@ -55,10 +55,11 @@
 // this must be the last file included
 #include "base/povdebug.h"
 
-namespace pov
+namespace pov_parser
 {
 
 using namespace pov_base;
+using namespace pov;
 
 /*****************************************************************************
 * Local preprocessor defines
@@ -1478,6 +1479,11 @@ void Parser::Read_Symbol()
                             a = reinterpret_cast<POV_ARRAY *>(*(Token.DataPtr));
                             j = 0;
 
+                            if (a == nullptr)
+                                // This happens in e.g. `#declare Foo[A][B]=...` when `Foo` is an
+                                // array of arrays and `Foo[A]` is uninitialized.
+                                Error("Attempt to access uninitialized nested array.");
+
                             for (i=0; i <= a->Dims; i++)
                             {
                                 Parse_Square_Begin();
@@ -1506,6 +1512,11 @@ void Parser::Read_Symbol()
 
                             if (!LValue_Ok && !Inside_Ifdef)
                             {
+                                // Note that this does not (and must not) trigger in e.g.
+                                // `#declare Foo[A][B]=...` when `Foo` is an array of arrays and
+                                // `Foo[A]` is uninitialized, because until now we've only seen
+                                // `#declare Foo[A]`, which is no reason for concern as it may
+                                // just as well be part of `#declare Foo[A]=...` which is fine.
                                 if (a->DataPtrs[j] == NULL)
                                     Error("Attempt to access uninitialized array element.");
                             }
@@ -1915,7 +1926,7 @@ void Parser::Parse_Directive(int After_Hash)
     char *ts;
     Macro *PMac=NULL;
     COND_TYPE Curr_Type = Cond_Stack[CS_Index].Cond_Type;
-    POV_LONG Hash_Loc = Input_File->In_File->tellg().offset;
+    POV_OFF_T Hash_Loc = Input_File->In_File->tellg().offset;
 
     if (Curr_Type == INVOKING_MACRO_COND)
     {
@@ -2307,7 +2318,7 @@ void Parser::Parse_Directive(int After_Hash)
                         {
                             PMac->Macro_End=Hash_Loc;
                             ITextStream::FilePos pos = Input_File->In_File->tellg();
-                            POV_LONG macroLength = pos.offset - PMac->Macro_File_Pos.offset;
+                            POV_OFF_T macroLength = pos.offset - PMac->Macro_File_Pos.offset;
                             if (macroLength <= MaxCachedMacroSize)
                             {
                                 PMac->CacheSize = macroLength;

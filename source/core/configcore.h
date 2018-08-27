@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -290,6 +290,15 @@
     #define POV_PATTERN_DEBUG POV_CORE_DEBUG
 #endif
 
+/// @def POV_PHOTONS_DEBUG
+/// Enable run-time sanity checks for photons.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_PHOTONS_DEBUG
+    #define POV_PHOTONS_DEBUG POV_CORE_DEBUG
+#endif
+
 /// @def POV_PIGMENT_DEBUG
 /// Enable run-time sanity checks for pigment handling.
 ///
@@ -371,6 +380,12 @@
     #define POV_PATTERN_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
     #define POV_PATTERN_ASSERT(expr) POV_ASSERT_DISABLE(expr)
+#endif
+
+#if POV_PHOTONS_DEBUG
+    #define POV_PHOTONS_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_PHOTONS_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #if POV_PIGMENT_DEBUG

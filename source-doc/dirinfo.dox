@@ -1,0 +1,17 @@
+/**
+
+@dir
+@brief Auxiliary information for developers and contributors.
+
+This directory contains miscellaneous information aimed at POV-Ray
+developers and potential contributors. The information is provided in
+Doxygen-flavoured markdown files to allow for reasonably easy reading and
+editing of the raw files, while at the same time allowing for easy inclusion
+of the information in auto-generated source code documentation.
+
+In addition, this directory also serves as a home for some odss & ends of
+the source code documentation proper, which don't seem to properly fit
+in any particular source code file. Such bits and pieces reside in
+Doxygen-style `.dox` files.
+
+*/

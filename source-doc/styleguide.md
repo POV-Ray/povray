@@ -35,6 +35,12 @@ POV-Ray is being developed with portability high in mind. In practice and at pre
           - _Boolean Preprocessor Constants_: The expressions in `#``if` or `#``elif` preprocessor statements _must not_
             contain boolean constants (`true` or `false`) after macro expansion. The integer constants `0` and `1`,
             respectively, should be used instead. [MS Visual Studio 2013 and earlier]
+          - _Large Integer Literals_: Integer literals specified using decimal notation should not
+            exceed a magnitude of 2147483647, unless carrying a `u` and/or `ll` suffix.
+            [MS Visual Studio 2015]
+          - _Static Thread-Local Template Members_: Template classes _must not_ have thread-local
+            static member variables. See the @ref PooledSimpleVector template class for a viable
+            workaround. [XCode 8 and later, apparently still unresolved as of 2018-04-08]
 
   - Source code should use the new features of C++11 with caution, as even some major compiler
     brands still have not achieved full compliance yet. The following constructs can be considered
@@ -43,6 +49,7 @@ POV-Ray is being developed with portability high in mind. In practice and at pre
       - Features "borrowed" from ISO/IEC 9899:1990 (aka C90, aka C89).
       - Features "borrowed" from ISO/IEC TR 19768:2007 (aka C++ Technical Report 1, aka TR1).
       - `decltype(v)`, with `v` being a simple variable or class member (as opposed to a more complex expression)
+      - Range-based for loops (most notably the `for (auto&& i : v)` idiom to iterate over a vector).
     @note
         Other C++11 features will be added to the above list at the discretion of the dev team, or
         upon request if a reasonable case can be made in their favour. Note however that at present
@@ -84,7 +91,8 @@ transitioning existing code to these coventions:
         finalthing();
 
   - Lines should be at most 120 characters long, to allow for sufficiently comfortable side-by-side viewing of code
-    changes on a single display.
+    changes on a single display. New lines of code should be limited to 100 characters, to provide
+    additional spare space for later minor modifications.
 
   - When breaking parameter lists or expressions, the next line is indented to wherever the broken parameter list or
     (sub-)expression starts, e.g.:
@@ -157,6 +165,11 @@ scheme:
   - Method names (both public and protected) should generally use `MixedCase` as well. However, methods that simply
     return a reference to a member variable may be named with `camelCase` instead.
   - Parameter and variable names should use `camelCase`.
+  - As an exception, underscores can be used to separate components of a name representing
+    distinct concepts if this improves legibility; for example we're currently making use of such
+    patterns for enums, where the first component often serves as a kind of namespace to avoid
+    name collisions with other enums (note however that this particular problem is now better dealt
+    with by using C++11 scoped enumerations, i.e. `enum class`).
 
 Parameter and variable names might carry one or more additional prefixes. These should all be lowercase; e.g.
 `mpCamelCase`:
@@ -245,6 +258,11 @@ When using smart pointers, instead of the type suffix `Ptr` the following suffix
   - `IPtr` to denote an intrusive pointer type
   - `TPtr` to denote a regular pointer type used as a temporary reference
 
+To test whether a smart pointer is (non-)null, do not unnecessarily clutter your code by invoking
+`.get()`, but do explicitly compare with `nullptr` (rather than rely on automatic conversion to
+`bool`) to make it obvious that you're dealing with pointer data. Never compare smart pointers
+with `NULL`, as that would lead to compile errors on some (perfectly C++11 compliant) compilers.
+
 
 Miscellaneous Coding Rules
 ==========================
@@ -261,7 +279,8 @@ Miscellaneous Coding Rules
     (Please use this exact spelling, to facilitate automatic code analysis.)
 
   - **For Loops**: Keep `for` loops simple; don't do anything that requires the use of the comma operator, and don't
-    mess with the loop counter inside the loop.
+    mess with the loop counter inside the loop. Do make use of C++11 ranged for loops (using the
+    `for (auto&& item : container)` idiom) wherever applicable.
 
   - **Const**: Make liberal use of the `const` qualifier where possible, especially in parameter declarations.
 
@@ -285,6 +304,33 @@ Miscellaneous Coding Rules
   - **Optimization**: Do not over-optimize your code. While we do want POV-Ray to be fast, we also want it to be
     reasonably maintainable, and modern compilers generally do a good enough job at automatic optimization that you can
     focus on keeping your code robust and easy to understand.
+
+  - **Booleans**: Do not use `int` types or integer literals when dealing with boolean (yes/no,
+    on/off) information, as this gives the false impression that you're dealing with numbers.
+    Use the `bool` type and the `true` and `false` constants instead. (Exception: In preprocessor
+    conditional statements, `1` and `0` _must_ be used in lieu of `true` and `false`.)
+
+  - **Boolean Tests**: When testing whether a boolean expression is true or false, simply use the
+    boolean expression as-is, or its negation (using the unary `!` operator). If you think you need
+    to explicitly compare a variable or function result with `false` for clarity, chances are your
+    variable or function name is poorly chosen. Comparing with `true` is right out, as it may cause
+    unexpected results if the expression is not a genuine `bool`.
+
+  - **Null Pointer Constant**: Do not use `NULL`, as it is not guaranteed to expand to a genuine
+    pointer expression. Use the C++11 `nullptr` constant instead.
+
+  - **Null Pointer Tests**: To test whether a pointer expression is null, explicitly compare the
+    expression with `nullptr` to make it obvious that you're dealing with pointer data. 
+
+  - **Zero Tests**: To test whether an integer value is null, explicitly compare the expression
+    with `0` to make it obvious that you're dealing with integer data.
+
+  - **Object Validity Tests**: To test whether a particular object is in a "good" state
+    (e.g. a stream is open and ready to read), explicitly invoke a corresponding member function
+    to make it obvious what you're doing, rather than making use of implicit conversions to `bool`
+    or the unary `!` operator. (Exceptions can be made for cases where invoking a method returns
+    a reference to the object itself, and using the function result as if it was a `bool`
+    has the effect of testing whether the method invocation was successful.)
 
 
 Code Documentation
@@ -381,12 +427,13 @@ tools. The following can be freely used:
 Legacy Coding Style
 ===================
 
-Sometimes you may run across legacy code that violates the above rules. The following should give
+Sometimes you may run across legacy code that violates the above rules. The following guidelines should give
 you an idea of how to proceed:
 
   - If you're going to touch a file just for the sake of fixing legacy coding style, please go all
     the way and overhaul the entire file.
   - If you're going to touch a file for minor code changes, please adapt to the file's existing
-    coding style, or go all the way and overhaul the entire file.
+    coding style (unless the file's style is a hodgepodge already, in which case please lean towards
+    the above rules), or go all the way and overhaul the entire file.
   - If you're going to touch a file for larger code changes, please overhaul the coding style of the
     entire respective section (e.g. function, class definition etc.)

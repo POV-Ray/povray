@@ -58,6 +58,11 @@ using namespace pov_base;
 using namespace pov_frontend;
 using boost::format;
 
+static int Allow_File_Read(const UCS2 *Filename, const unsigned int FileType);
+static int Allow_File_Write(const UCS2 *Filename, const unsigned int FileType);
+static FILE *vfeFOpen(const UCS2String& name, const char *mode);
+static bool vfeRemove(const UCS2String& name);
+
 ////////////////////////////////////////////////////////////////////////////////////////
 //
 // class POVMSMessageDetails
@@ -1376,19 +1381,19 @@ bool VirtualFrontEnd::Paused (void)
 //
 ////////////////////////////////////////////////////////////////////////////////////////
 
-int Allow_File_Write (const unsigned short *Filename, const unsigned int FileType)
+int Allow_File_Write (const UCS2 *Filename, const unsigned int FileType)
 {
   if (strcmp(UCS2toASCIIString(Filename).c_str(), "stdout") == 0 || strcmp(UCS2toASCIIString(Filename).c_str(), "stderr") == 0)
     return true;
   return (vfeSession::GetSessionFromThreadID()->TestAccessAllowed(Filename, true));
 }
 
-int Allow_File_Read (const unsigned short *Filename, const unsigned int FileType)
+int Allow_File_Read (const UCS2 *Filename, const unsigned int FileType)
 {
   return (vfeSession::GetSessionFromThreadID()->TestAccessAllowed(Filename, false));
 }
 
-FILE *vfeFOpen (const std::basic_string<unsigned short>& name, const char *mode)
+FILE *vfeFOpen (const UCS2String& name, const char *mode)
 {
   return (fopen (UCS2toASCIIString (name).c_str(), mode)) ;
 }
