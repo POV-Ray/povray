@@ -49,6 +49,7 @@ sphere { C, S texture { T } }
 #end
 #end
 
+
 // macro MeshEdge
 // Put a cylinder along each edge of each face
 // 1st argument: a mesh

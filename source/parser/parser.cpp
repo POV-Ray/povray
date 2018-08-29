@@ -93,6 +93,7 @@
 #include "core/shape/plane.h"
 #include "core/shape/polynomial.h"
 #include "core/shape/polygon.h"
+#include "core/shape/polyline.h"
 #include "core/shape/prism.h"
 #include "core/shape/quadric.h"
 #include "core/shape/rationalbezierpatch.h"
@@ -1410,6 +1411,7 @@ void Parser::Parse_Camera (Camera& Cam)
     MATRIX Local_Matrix;
     TRANSFORM Local_Trans;
     bool only_mods = false;
+    bool early_exit = false;
 
     Parse_Begin ();
 
@@ -1420,11 +1422,44 @@ void Parser::Parse_Camera (Camera& Cam)
                 only_mods = true;
         END_CASE
 
+		CASE (GRID_TOKEN)
+         Cam.Type = GRID_CAMERA;
+         Parse_Vector(tempv);
+         Cam.GridSize[X] = tempv[X];
+         Cam.GridSize[Y] = tempv[Y];
+         if ((Cam.GridSize[X] == 0)||(Cam.GridSize[Y] == 0))
+         {
+           Error("Grid size of camera may not be 0");
+         }
+         Cam.Cameras.reserve(Cam.GridSize[X]*Cam.GridSize[Y]);
+         for(size_t c=0;c<(Cam.GridSize[X]*Cam.GridSize[Y]);++c)
+         {
+            EXPECT
+               CASE (CAMERA_ID_TOKEN)
+               Cam.Cameras.push_back( *reinterpret_cast<Camera *>(Token.Data));
+                  EXIT
+               END_CASE
+
+               OTHERWISE
+                  Error("Expected camera identifier");
+                  EXIT
+               END_CASE
+            END_EXPECT
+         }
+         early_exit = true;
+			EXIT
+
+		END_CASE
         OTHERWISE
             UNGET
         END_CASE
     END_EXPECT
 
+    if(early_exit)
+    {
+        Parse_End ();
+        return;
+    }
     Camera& New = Cam;
 
     if ((sceneData->EffectiveLanguageVersion() >= 350) && (only_mods == true))
@@ -1512,18 +1547,124 @@ void Parser::Parse_Camera (Camera& Cam)
         New.Focal_Point = Vector3d(HUGE_VAL);
         old_angle       = New.Angle;
         New.Angle       = HUGE_VAL;
+        New.Parallaxe   = 0.0;
+        New.Eye_Distance= 1.0;
 
         EXPECT
             CASE (PERSPECTIVE_TOKEN)
                 New.Type = PERSPECTIVE_CAMERA;
             END_CASE
 
+            CASE (TETRA_TOKEN)
+                New.Type = PROJ_TETRA_CAMERA;
+            END_CASE
+
+            CASE (CUBE_TOKEN)
+                New.Type = PROJ_CUBE_CAMERA;
+            END_CASE
+
+            CASE (OCTA_TOKEN)
+                New.Type = PROJ_OCTA_CAMERA;
+            END_CASE
+
+            CASE (ICOSA_TOKEN)
+                New.Type = PROJ_ICOSA_CAMERA;
+            END_CASE
+
             CASE (ORTHOGRAPHIC_TOKEN)
                 New.Type = ORTHOGRAPHIC_CAMERA;
             END_CASE
 
+            CASE (PLATECARREE_TOKEN)
+                New.Type = PROJ_PLATECARREE_CAMERA;
+            END_CASE
+
+            CASE (MERCATOR_TOKEN)
+                New.Type = PROJ_MERCATOR_CAMERA;
+            END_CASE
+
+            CASE (LAMBERTAZIMUTHAL_TOKEN)
+                New.Type = PROJ_LAMBERT_AZI_CAMERA;
+            END_CASE
+
+            CASE (VAN_DER_GRINTEN_TOKEN)
+                New.Type = PROJ_VAN_DER_GRINTEN_CAMERA;
+            END_CASE
+
+            CASE (LAMBERTCYLINDRICAL_TOKEN)
+                New.Type = PROJ_LAMBERT_CYL_CAMERA;
+            END_CASE
+
+            CASE (BEHRMANN_TOKEN)
+                New.Type = PROJ_BEHRMANN_CAMERA;
+            END_CASE
+
+            CASE (SMYTH_CRASTER_TOKEN)
+                New.Type = PROJ_CRASTER_CAMERA;
+            END_CASE
+
+            CASE (EDWARDS_TOKEN)
+                New.Type = PROJ_EDWARDS_CAMERA;
+            END_CASE
+
+            CASE (HOBO_DYER_TOKEN)
+                New.Type = PROJ_HOBO_DYER_CAMERA;
+            END_CASE
+
+            CASE (PETERS_TOKEN)
+                New.Type = PROJ_PETERS_CAMERA;
+            END_CASE
+
+            CASE (GALL_TOKEN)
+                New.Type = PROJ_GALL_CAMERA;
+            END_CASE
+
+            CASE (BALTHASART_TOKEN)
+                New.Type = PROJ_BALTHASART_CAMERA;
+            END_CASE
+
+            CASE (MOLLWEIDE_TOKEN)
+                New.Type = PROJ_MOLLWEIDE_CAMERA;
+            END_CASE
+
+            CASE (AITOFF_HAMMER_TOKEN)
+                New.Type = PROJ_AITOFF_CAMERA;
+            END_CASE
+
+            CASE (ECKERT4_TOKEN)
+                New.Type = PROJ_ECKERT4_CAMERA;
+            END_CASE
+
+            CASE (ECKERT6_TOKEN)
+                New.Type = PROJ_ECKERT6_CAMERA;
+            END_CASE
+
+            CASE (MILLERCYLINDRICAL_TOKEN)
+                New.Type = PROJ_MILLER_CAMERA;
+            END_CASE
+
+            CASE (STEREO_TOKEN)
+                New.Type = STEREOSCOPIC_CAMERA;
+            END_CASE
+
             CASE (FISHEYE_TOKEN)
                 New.Type = FISHEYE_CAMERA;
+            END_CASE
+
+            CASE (FISHEYE_ORTHOGRAPHIC_TOKEN)
+                New.Type = FISHEYE_ORTHOGRAPHIC_CAMERA;
+            END_CASE
+
+            CASE (FISHEYE_EQUISOLIDANGLE_TOKEN)
+                New.Type = FISHEYE_EQUISOLIDANGLE_CAMERA;
+            END_CASE
+
+            CASE (FISHEYE_STEREOGRAPHIC_TOKEN)
+                New.Type = FISHEYE_STEREOGRAPHIC_CAMERA;
+            END_CASE
+
+            CASE (OMNI_DIRECTIONAL_STEREO_TOKEN)
+                New.Type = OMNI_DIRECTIONAL_STEREO_CAMERA;
             END_CASE
 
             CASE (ULTRA_WIDE_ANGLE_TOKEN)
@@ -1582,6 +1723,13 @@ void Parser::Parse_Camera (Camera& Cam)
 
                     CASE5(ORTHOGRAPHIC_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
                     CASE4(SPHERICAL_TOKEN, CYLINDER_TOKEN, MESH_CAMERA_TOKEN, USER_DEFINED_TOKEN)
+                    CASE3( MERCATOR_TOKEN, PLATECARREE_TOKEN, LAMBERTAZIMUTHAL_TOKEN)
+                    CASE5(	VAN_DER_GRINTEN_TOKEN, LAMBERTCYLINDRICAL_TOKEN, BEHRMANN_TOKEN, SMYTH_CRASTER_TOKEN, EDWARDS_TOKEN)
+                    CASE5(	HOBO_DYER_TOKEN, PETERS_TOKEN, GALL_TOKEN, BALTHASART_TOKEN, MOLLWEIDE_TOKEN)
+                    CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
+                    CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
+                    CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_CAMERA )
+                    CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                         Expectation_Error("perspective camera modifier");
                     END_CASE
 
@@ -1602,6 +1750,13 @@ void Parser::Parse_Camera (Camera& Cam)
 
                     CASE5(PERSPECTIVE_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
                     CASE4(SPHERICAL_TOKEN, CYLINDER_TOKEN, MESH_CAMERA_TOKEN, USER_DEFINED_TOKEN)
+                    CASE3( MERCATOR_TOKEN, PLATECARREE_TOKEN, LAMBERTAZIMUTHAL_TOKEN)
+                    CASE5(	VAN_DER_GRINTEN_TOKEN, LAMBERTCYLINDRICAL_TOKEN, BEHRMANN_TOKEN, SMYTH_CRASTER_TOKEN, EDWARDS_TOKEN)
+                    CASE5(	HOBO_DYER_TOKEN, PETERS_TOKEN, GALL_TOKEN, BALTHASART_TOKEN, MOLLWEIDE_TOKEN)
+                    CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
+                    CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
+                    CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_CAMERA )
+                    CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                         Expectation_Error("orthographic camera modifier");
                     END_CASE
 
@@ -1613,6 +1768,9 @@ void Parser::Parse_Camera (Camera& Cam)
                 END_EXPECT
                 break;
             case FISHEYE_CAMERA:
+            case FISHEYE_ORTHOGRAPHIC_CAMERA:
+            case FISHEYE_EQUISOLIDANGLE_CAMERA:
+            case FISHEYE_STEREOGRAPHIC_CAMERA:
                 EXPECT
                     CASE (ANGLE_TOKEN)
                         New.Angle = Parse_Float();
@@ -1622,6 +1780,13 @@ void Parser::Parse_Camera (Camera& Cam)
 
                     CASE5(PERSPECTIVE_TOKEN, ORTHOGRAPHIC_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
                     CASE4(SPHERICAL_TOKEN, CYLINDER_TOKEN, MESH_CAMERA_TOKEN, USER_DEFINED_TOKEN)
+                    CASE3( MERCATOR_TOKEN, PLATECARREE_TOKEN, LAMBERTAZIMUTHAL_TOKEN)
+                    CASE5(	VAN_DER_GRINTEN_TOKEN, LAMBERTCYLINDRICAL_TOKEN, BEHRMANN_TOKEN, SMYTH_CRASTER_TOKEN, EDWARDS_TOKEN)
+                    CASE5(	HOBO_DYER_TOKEN, PETERS_TOKEN, GALL_TOKEN, BALTHASART_TOKEN, MOLLWEIDE_TOKEN)
+                    CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
+                    CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
+                    CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_CAMERA )
+                    CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                         Expectation_Error("fisheye camera modifier");
                     END_CASE
 
@@ -1642,6 +1807,13 @@ void Parser::Parse_Camera (Camera& Cam)
 
                     CASE5(PERSPECTIVE_TOKEN, ORTHOGRAPHIC_TOKEN, FISHEYE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
                     CASE4(SPHERICAL_TOKEN, CYLINDER_TOKEN, MESH_CAMERA_TOKEN, USER_DEFINED_TOKEN)
+                    CASE3( MERCATOR_TOKEN, PLATECARREE_TOKEN, LAMBERTAZIMUTHAL_TOKEN)
+                    CASE5(	VAN_DER_GRINTEN_TOKEN, LAMBERTCYLINDRICAL_TOKEN, BEHRMANN_TOKEN, SMYTH_CRASTER_TOKEN, EDWARDS_TOKEN)
+                    CASE5(	HOBO_DYER_TOKEN, PETERS_TOKEN, GALL_TOKEN, BALTHASART_TOKEN, MOLLWEIDE_TOKEN)
+                    CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
+                    CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
+                    CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_CAMERA )
+                    CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                         Expectation_Error("ultra_wide_angle camera modifier");
                     END_CASE
 
@@ -1662,6 +1834,13 @@ void Parser::Parse_Camera (Camera& Cam)
 
                     CASE5(PERSPECTIVE_TOKEN, ORTHOGRAPHIC_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, PANORAMIC_TOKEN)
                     CASE4(SPHERICAL_TOKEN, CYLINDER_TOKEN, MESH_CAMERA_TOKEN, USER_DEFINED_TOKEN)
+                    CASE3( MERCATOR_TOKEN, PLATECARREE_TOKEN, LAMBERTAZIMUTHAL_TOKEN)
+                    CASE5(	VAN_DER_GRINTEN_TOKEN, LAMBERTCYLINDRICAL_TOKEN, BEHRMANN_TOKEN, SMYTH_CRASTER_TOKEN, EDWARDS_TOKEN)
+                    CASE5(	HOBO_DYER_TOKEN, PETERS_TOKEN, GALL_TOKEN, BALTHASART_TOKEN, MOLLWEIDE_TOKEN)
+                    CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
+                    CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
+                    CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_CAMERA )
+                    CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                         Expectation_Error("omnimax camera modifier");
                     END_CASE
 
@@ -1682,6 +1861,13 @@ void Parser::Parse_Camera (Camera& Cam)
 
                     CASE5(PERSPECTIVE_TOKEN, ORTHOGRAPHIC_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN)
                     CASE4(SPHERICAL_TOKEN, CYLINDER_TOKEN, MESH_CAMERA_TOKEN, USER_DEFINED_TOKEN)
+                    CASE3( MERCATOR_TOKEN, PLATECARREE_TOKEN, LAMBERTAZIMUTHAL_TOKEN)
+                    CASE5(	VAN_DER_GRINTEN_TOKEN, LAMBERTCYLINDRICAL_TOKEN, BEHRMANN_TOKEN, SMYTH_CRASTER_TOKEN, EDWARDS_TOKEN)
+                    CASE5(	HOBO_DYER_TOKEN, PETERS_TOKEN, GALL_TOKEN, BALTHASART_TOKEN, MOLLWEIDE_TOKEN)
+                    CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
+                    CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
+                    CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_CAMERA )
+                    CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                         Expectation_Error("panoramic camera modifier");
                     END_CASE
 
@@ -1705,6 +1891,13 @@ void Parser::Parse_Camera (Camera& Cam)
 
                     CASE6(PERSPECTIVE_TOKEN, ORTHOGRAPHIC_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
                     CASE3(SPHERICAL_TOKEN, MESH_CAMERA_TOKEN, USER_DEFINED_TOKEN)
+                    CASE3( MERCATOR_TOKEN, PLATECARREE_TOKEN, LAMBERTAZIMUTHAL_TOKEN)
+                    CASE5(	VAN_DER_GRINTEN_TOKEN, LAMBERTCYLINDRICAL_TOKEN, BEHRMANN_TOKEN, SMYTH_CRASTER_TOKEN, EDWARDS_TOKEN)
+                    CASE5(	HOBO_DYER_TOKEN, PETERS_TOKEN, GALL_TOKEN, BALTHASART_TOKEN, MOLLWEIDE_TOKEN)
+                    CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
+                    CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
+                    CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_CAMERA )
+                    CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                         Expectation_Error("cylinder camera modifier");
                     END_CASE
 
@@ -1729,6 +1922,13 @@ void Parser::Parse_Camera (Camera& Cam)
 
                     CASE6(PERSPECTIVE_TOKEN, ORTHOGRAPHIC_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
                     CASE3(CYLINDER_TOKEN, MESH_CAMERA_TOKEN, USER_DEFINED_TOKEN)
+                    CASE3( MERCATOR_TOKEN, PLATECARREE_TOKEN, LAMBERTAZIMUTHAL_TOKEN)
+                    CASE5(	VAN_DER_GRINTEN_TOKEN, LAMBERTCYLINDRICAL_TOKEN, BEHRMANN_TOKEN, SMYTH_CRASTER_TOKEN, EDWARDS_TOKEN)
+                    CASE5(	HOBO_DYER_TOKEN, PETERS_TOKEN, GALL_TOKEN, BALTHASART_TOKEN, MOLLWEIDE_TOKEN)
+                    CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
+                    CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
+                    CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_CAMERA )
+                    CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                         Expectation_Error("spherical camera modifier");
                     END_CASE
 
@@ -1743,6 +1943,13 @@ void Parser::Parse_Camera (Camera& Cam)
                 EXPECT
                     CASE6(PERSPECTIVE_TOKEN, ORTHOGRAPHIC_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
                     CASE3(SPHERICAL_TOKEN, CYLINDER_TOKEN, USER_DEFINED_TOKEN)
+                    CASE3( MERCATOR_TOKEN, PLATECARREE_TOKEN, LAMBERTAZIMUTHAL_TOKEN)
+                    CASE5(	VAN_DER_GRINTEN_TOKEN, LAMBERTCYLINDRICAL_TOKEN, BEHRMANN_TOKEN, SMYTH_CRASTER_TOKEN, EDWARDS_TOKEN)
+                    CASE5(	HOBO_DYER_TOKEN, PETERS_TOKEN, GALL_TOKEN, BALTHASART_TOKEN, MOLLWEIDE_TOKEN)
+                    CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
+                    CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
+                    CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_CAMERA )
+                    CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                         Expectation_Error("mesh camera modifier");
                     END_CASE
 
@@ -1758,7 +1965,115 @@ void Parser::Parse_Camera (Camera& Cam)
                     CASE (ANGLE_TOKEN)
                     CASE6(PERSPECTIVE_TOKEN, ORTHOGRAPHIC_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
                     CASE3(SPHERICAL_TOKEN, CYLINDER_TOKEN, MESH_CAMERA_TOKEN)
+                    CASE3( MERCATOR_TOKEN, PLATECARREE_TOKEN, LAMBERTAZIMUTHAL_TOKEN)
+                    CASE5(	VAN_DER_GRINTEN_TOKEN, LAMBERTCYLINDRICAL_TOKEN, BEHRMANN_TOKEN, SMYTH_CRASTER_TOKEN, EDWARDS_TOKEN)
+                    CASE5(	HOBO_DYER_TOKEN, PETERS_TOKEN, GALL_TOKEN, BALTHASART_TOKEN, MOLLWEIDE_TOKEN)
+                    CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
+                    CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
+                    CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_CAMERA )
+                    CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                         Expectation_Error("user-defined camera modifier");
+                    END_CASE
+
+                    OTHERWISE
+                        UNGET
+                        if(Parse_Camera_Mods(New) == false)
+                            EXIT
+                    END_CASE
+                END_EXPECT
+                break;
+            case PROJ_MERCATOR_CAMERA:
+            case PROJ_PLATECARREE_CAMERA:
+            case PROJ_LAMBERT_AZI_CAMERA:
+            case PROJ_VAN_DER_GRINTEN_CAMERA:
+            case PROJ_LAMBERT_CYL_CAMERA:
+            case PROJ_BEHRMANN_CAMERA:
+            case PROJ_CRASTER_CAMERA:
+            case PROJ_EDWARDS_CAMERA:
+            case PROJ_HOBO_DYER_CAMERA:
+            case PROJ_PETERS_CAMERA:
+            case PROJ_GALL_CAMERA:
+            case PROJ_BALTHASART_CAMERA:
+            case PROJ_MOLLWEIDE_CAMERA:
+            case PROJ_AITOFF_CAMERA:
+            case PROJ_ECKERT4_CAMERA:
+            case PROJ_ECKERT6_CAMERA:
+            case PROJ_MILLER_CAMERA:
+            case PROJ_TETRA_CAMERA:
+            case PROJ_CUBE_CAMERA:
+            case PROJ_OCTA_CAMERA:
+            case PROJ_ICOSA_CAMERA:
+                    EXPECT
+                        CASE6(PERSPECTIVE_TOKEN, ORTHOGRAPHIC_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
+                        CASE4(SPHERICAL_TOKEN, CYLINDER_TOKEN, MESH_CAMERA_TOKEN, USER_DEFINED_TOKEN)
+                        CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_CAMERA )
+                        CASE3(PLATECARREE_TOKEN,LAMBERTAZIMUTHAL_TOKEN, MERCATOR_TOKEN)
+                        CASE5(	VAN_DER_GRINTEN_TOKEN, LAMBERTCYLINDRICAL_TOKEN, BEHRMANN_TOKEN, SMYTH_CRASTER_TOKEN, EDWARDS_TOKEN)
+                        CASE5(	HOBO_DYER_TOKEN, PETERS_TOKEN, GALL_TOKEN, BALTHASART_TOKEN, MOLLWEIDE_TOKEN)
+                        CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
+                        CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
+                        CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
+                            Expectation_Error("camera modifier, not another camera type");
+                        END_CASE
+
+                        OTHERWISE
+                        UNGET
+                        if(Parse_Camera_Mods(New) == false)
+                            EXIT
+                        END_CASE
+                    END_EXPECT
+                    break;
+            case STEREOSCOPIC_CAMERA:
+                    EXPECT
+                    CASE (ANGLE_TOKEN)
+                        New.Angle = Parse_Float();
+                    if (New.Angle < 0.0)
+                        Error("Negative viewing angle.");
+                    END_CASE
+                    CASE (PARALLAXE_TOKEN)
+                        New.Parallaxe = Parse_Float();
+                    END_CASE
+                    CASE (DISTANCE_TOKEN)
+                        New.Eye_Distance = Parse_Float();
+                    END_CASE
+
+                    CASE5(ORTHOGRAPHIC_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
+                    CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_CAMERA )
+                    CASE5(PERSPECTIVE_TOKEN, SPHERICAL_TOKEN, CYLINDER_TOKEN, MERCATOR_TOKEN, PLATECARREE_TOKEN)
+                    CASE2( MESH_CAMERA_TOKEN, USER_DEFINED_TOKEN )
+                    CASE(LAMBERTAZIMUTHAL_TOKEN)
+                    CASE5(	VAN_DER_GRINTEN_TOKEN, LAMBERTCYLINDRICAL_TOKEN, BEHRMANN_TOKEN, SMYTH_CRASTER_TOKEN, EDWARDS_TOKEN)
+                    CASE5(	HOBO_DYER_TOKEN, PETERS_TOKEN, GALL_TOKEN, BALTHASART_TOKEN, MOLLWEIDE_TOKEN)
+                    CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
+                    CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
+                    CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
+                        Expectation_Error("stereo camera modifier");
+                    END_CASE
+
+                    OTHERWISE
+                    UNGET
+                    if(Parse_Camera_Mods(New) == false)
+                        EXIT
+                    END_CASE
+                    END_EXPECT
+                    break;
+            case OMNI_DIRECTIONAL_STEREO_CAMERA:
+                EXPECT
+                    CASE (DISTANCE_TOKEN)
+                        New.Eye_Distance = Parse_Float();
+                    END_CASE
+
+                    CASE5(ORTHOGRAPHIC_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
+                    CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_CAMERA )
+                    CASE5(PERSPECTIVE_TOKEN, SPHERICAL_TOKEN, CYLINDER_TOKEN, MERCATOR_TOKEN, PLATECARREE_TOKEN)
+                    CASE2( MESH_CAMERA_TOKEN, USER_DEFINED_TOKEN )
+                    CASE(LAMBERTAZIMUTHAL_TOKEN)
+                    CASE5(	VAN_DER_GRINTEN_TOKEN, LAMBERTCYLINDRICAL_TOKEN, BEHRMANN_TOKEN, SMYTH_CRASTER_TOKEN, EDWARDS_TOKEN)
+                    CASE5(	HOBO_DYER_TOKEN, PETERS_TOKEN, GALL_TOKEN, BALTHASART_TOKEN, MOLLWEIDE_TOKEN)
+                    CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
+                    CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
+                    CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
+                        Expectation_Error("omni_directional_stereo camera modifier");
                     END_CASE
 
                     OTHERWISE
@@ -1789,7 +2104,7 @@ void Parser::Parse_Camera (Camera& Cam)
         // apply "angle"
         if (New.Angle != HUGE_VAL)
         {
-            if ((New.Type == PERSPECTIVE_CAMERA) || (New.Type == ORTHOGRAPHIC_CAMERA))
+            if ((New.Type == PERSPECTIVE_CAMERA) || (New.Type == ORTHOGRAPHIC_CAMERA) || (New.Type == STEREOSCOPIC_CAMERA))
             {
                 if (New.Angle >= 180.0)
                     Error("Viewing angle has to be smaller than 180 degrees.");
@@ -1811,7 +2126,37 @@ void Parser::Parse_Camera (Camera& Cam)
         // apply "look_at"
         if (New.Look_At[X] != HUGE_VAL)
         {
-            Direction_Length = New.Direction.length();
+            if (
+                    (New.Type == PROJ_MERCATOR_CAMERA )
+                    ||(New.Type == PROJ_PLATECARREE_CAMERA )
+                    ||(New.Type == PROJ_LAMBERT_AZI_CAMERA )
+                    ||(New.Type == PROJ_VAN_DER_GRINTEN_CAMERA )
+                    ||(New.Type == PROJ_LAMBERT_CYL_CAMERA )
+                    ||(New.Type == PROJ_BEHRMANN_CAMERA )
+                    ||(New.Type == PROJ_CRASTER_CAMERA )
+                    ||(New.Type == PROJ_EDWARDS_CAMERA )
+                    ||(New.Type == PROJ_HOBO_DYER_CAMERA )
+                    ||(New.Type == PROJ_PETERS_CAMERA )
+                    ||(New.Type == PROJ_GALL_CAMERA )
+                    ||(New.Type == PROJ_BALTHASART_CAMERA )
+                    ||(New.Type == PROJ_MOLLWEIDE_CAMERA )
+                    ||(New.Type == PROJ_AITOFF_CAMERA )
+                    ||(New.Type == PROJ_ECKERT4_CAMERA )
+                    ||(New.Type == PROJ_ECKERT6_CAMERA )
+                    ||(New.Type == PROJ_MILLER_CAMERA )
+                    ||(New.Type == PROJ_TETRA_CAMERA )
+                    ||(New.Type == PROJ_ICOSA_CAMERA )
+                    ||(New.Type == PROJ_CUBE_CAMERA )
+                    ||(New.Type == PROJ_OCTA_CAMERA )
+                    )
+                    { // look_at define the new center of the world
+                        tempv = New.Look_At- New.Location;
+                        Direction_Length = tempv.length();
+                    }
+            else
+            {
+                Direction_Length = New.Direction.length();
+            }
             Up_Length        = New.Up.length();
             Right_Length     = New.Right.length();
             tempv            = cross(New.Up, New.Direction);
@@ -1930,6 +2275,13 @@ void Parser::Parse_Camera (Camera& Cam)
             END_CASE
 
             CASE2 (MESH_CAMERA_TOKEN, USER_DEFINED_TOKEN)
+            CASE3( MERCATOR_TOKEN, PLATECARREE_TOKEN, LAMBERTAZIMUTHAL_TOKEN)
+            CASE5(	VAN_DER_GRINTEN_TOKEN, LAMBERTCYLINDRICAL_TOKEN, BEHRMANN_TOKEN, SMYTH_CRASTER_TOKEN, EDWARDS_TOKEN)
+            CASE5(	HOBO_DYER_TOKEN, PETERS_TOKEN, GALL_TOKEN, BALTHASART_TOKEN, MOLLWEIDE_TOKEN)
+            CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
+            CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
+            CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_CAMERA )
+            CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                 Error("This camera type not supported for language version < v3.5");
             END_CASE
 
@@ -3878,6 +4230,128 @@ void Parser::Parse_Mesh1 (Mesh* Object)
     Object->Create_Mesh_Hash_Tables();
 
     EXPECT
+        CASE(GTS_LOAD_TOKEN)
+          Parse_Load_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(KEEP_TOKEN)
+          Parse_Select_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(CUBICLE_TOKEN)
+          Parse_Cubicle_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(CRISTAL_TOKEN)
+          Parse_Cristal_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(BOURKE_TOKEN)
+          Parse_Bourke_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(HELLER_TOKEN)
+          Parse_Heller_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(ROLL_TOKEN)
+          Parse_Roll_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(BEND_TOKEN)
+          Parse_Bend_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(MOVE_TOKEN)
+          Parse_Move_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(WARP_TOKEN)
+          Parse_Warp_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(SCREW_TOKEN)
+          Parse_Screw_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(SMOOTH_TOKEN)
+          Parse_Smooth_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(DISPLACE_TOKEN)
+          Parse_Displace_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+    
+        CASE(TESSELATE_TOKEN)
+          Parse_Tesselation_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+        CASE(TESSEL_TOKEN)
+          Parse_Tessel_In_Mesh(Object,
+                                    &Triangles, &Textures, &Vertices, &Normals, 
+                                    fully_textured, &max_triangles, &max_textures,
+                                    &max_vertices, &max_normals, 
+                                    &number_of_triangles, &number_of_textures,
+                                    &number_of_vertices, &number_of_normals);
+        END_CASE
+
         CASE(TRIANGLE_TOKEN)
             Parse_Begin();
 
@@ -6600,7 +7074,6 @@ ObjectPtr Parser::Parse_TrueType ()
     DBL depth;
     Vector3d offset;
     int builtin_font = 0;
-    TRANSFORM Local_Trans;
 
     if((sceneData->EffectiveLanguageVersion() < 350) && (sceneData->stringEncoding == kStringEncoding_ASCII))
     {
@@ -6657,11 +7130,6 @@ ObjectPtr Parser::Parse_TrueType ()
 
     /**** Compute_TTF_BBox(Object); */
     Object->Compute_BBox();
-
-    /* This tiny rotation should fix cracks in text that lies along an axis */
-    offset = Vector3d(0.001, 0.001, 0.001); // TODO - try to find a different solution to this hack
-    Compute_Rotation_Transform(&Local_Trans, offset);
-    Rotate_Object (reinterpret_cast<ObjectPtr>(Object), offset, &Local_Trans);
 
     /* Get any rotate/translate or texturing stuff */
     Object = Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
@@ -6877,6 +7345,10 @@ ObjectPtr Parser::Parse_Object ()
 
         /* Parse prism primitive. [DB 8/94] */
 
+        CASE (POLYLINE_TOKEN)
+            Object = Parse_Polyline();
+        END_CASE
+
         CASE (PRISM_TOKEN)
             Object = Parse_Prism();
         END_CASE
@@ -6964,6 +7436,74 @@ ObjectPtr Parser::Parse_Object ()
 
         CASE (LIGHT_SOURCE_TOKEN)
             Object = Parse_Light_Source ();
+        END_CASE
+
+        CASE (GTS_LOAD_TOKEN)
+            Object = Parse_Gts_Load();
+        END_CASE
+
+        CASE (STL_LOAD_TOKEN)
+            Object = Parse_Stl_Load();
+        END_CASE
+
+        CASE (KEEP_TOKEN)
+            Object = Parse_Select();
+        END_CASE
+
+        CASE (CUBICLE_TOKEN)
+            Object = Parse_Cubicle();
+        END_CASE
+
+        CASE (CRISTAL_TOKEN)
+            Object = Parse_Cristal();
+        END_CASE
+
+        CASE (BOURKE_TOKEN)
+            Object = Parse_Bourke();
+        END_CASE
+
+        CASE (HELLER_TOKEN)
+            Object = Parse_Heller();
+        END_CASE
+
+        CASE (ROLL_TOKEN)
+            Object = Parse_Roll();
+        END_CASE
+
+        CASE (BEND_TOKEN)
+            Object = Parse_Bend();
+        END_CASE
+
+        CASE (MOVE_TOKEN)
+            Object = Parse_Move_Object();
+        END_CASE
+
+        CASE (WARP_TOKEN)
+            Object = Parse_Warp_Object();
+        END_CASE
+
+        CASE (SCREW_TOKEN)
+            Object = Parse_Screw();
+        END_CASE
+
+        CASE (SMOOTH_TOKEN)
+            Object = Parse_Smooth();
+        END_CASE
+
+        CASE (DISPLACE_TOKEN)
+            Object = Parse_Displace();
+        END_CASE
+
+        CASE (PLANET_TOKEN)
+            Object = Parse_Planet();
+        END_CASE
+
+        CASE (TESSELATE_TOKEN)
+            Object = Parse_Tesselation();
+        END_CASE
+
+        CASE (TESSEL_TOKEN)
+            Object = Parse_Tessel();
         END_CASE
 
         CASE (OBJECT_TOKEN)
@@ -7249,6 +7789,15 @@ void Parser::Parse_Frame ()
             CASE (GLOBAL_SETTINGS_TOKEN)
                 Parse_Global_Settings();
             END_CASE
+
+            CASE (GTS_SAVE_TOKEN)
+                Parse_Gts_Save();
+            END_CASE
+
+            CASE (STL_SAVE_TOKEN)
+                Parse_Stl_Save();
+            END_CASE
+
 
             OTHERWISE
                 UNGET
@@ -11327,4 +11876,168 @@ void Parser::SignalProgress(POV_LONG elapsedTime, POV_LONG tokenCount)
     RenderBackend::SendSceneOutput(backendSceneData->sceneId, backendSceneData->frontendAddress, kPOVMsgIdent_Progress, obj);
 }
 
+/*****************************************************************************
+*
+* FUNCTION
+*
+*   Parse_Polyline
+*
+* INPUT
+*
+* OUTPUT
+*
+* RETURNS
+*
+*   ObjectPtr  -
+*
+* AUTHOR
+*
+*   Jérôme Grimbert
+*
+* DESCRIPTION
+*
+*   -
+*
+* CHANGES
+*
+*   Jun 2018 : Creation.
+*
+******************************************************************************/
+
+ObjectPtr Parser::Parse_Polyline()
+{
+    int i, count;
+    bool closed = false;
+    bool more = true;
+    Polyline *Object;
+    std::vector<Vector3d> Points;
+    std::vector<bool> Range;
+    Vector3d P;
+    Vector3d Local_Vector;
+
+    Parse_Begin();
+
+    if ((Object = dynamic_cast<Polyline *>(Parse_Object_Id())) != NULL)
+    {
+        return(dynamic_cast<ObjectPtr>(Object));
+    }
+
+    Object = new Polyline();
+    
+    while(more)
+    {
+       more = Allow_Vector(P);
+       if (more)
+       {
+         Points.push_back(P);
+         // NB we allow for a trailing comma at the end of the list,
+         // to facilitate auto-generation of lists.
+         Parse_Comma();
+       }
+    }
+
+    EXPECT
+      CASE(RANGE_TOKEN)
+        GET(LEFT_CURLY_TOKEN)
+        while(Allow_Vector(Local_Vector))
+        {
+          ssize_t idx1 = std::min(Local_Vector[0], Local_Vector[1]);
+          ssize_t idx2 = std::max(Local_Vector[0], Local_Vector[1]);
+          if ((idx1>=0)&&(idx2>=0))
+          {
+            if (Range.size() < idx2+1)
+            {
+              Range.resize( idx2+1, false );
+            }
+
+            for(size_t i = idx1;i<=idx2;++i)
+            {
+              Range[i] = true;
+            }
+          }
+          else
+          {
+            Error("invalid value for range (only positive values are expected)");
+          }
+          Parse_Comma();
+        }
+        GET(RIGHT_CURLY_TOKEN)
+        EXIT
+      END_CASE
+
+      OTHERWISE
+        UNGET
+        EXIT
+      END_CASE
+    END_EXPECT
+
+      
+
+    /* Check for closed polygons. */
+
+    P = Points[0];
+    count = 1;
+
+    for (i = 1; i < Points.size(); i++)
+    {
+        closed = false;
+
+        if ((fabs(P[X] - Points[i][X]) < EPSILON) &&
+            (fabs(P[Y] - Points[i][Y]) < EPSILON) &&
+            (fabs(P[Z] - Points[i][Z]) < EPSILON))
+        {
+            // force almost-identical vertices to be /exactly/ identical,
+            // to make processing easier later
+            Points[i] = P;
+            if ( count < 3 )
+            {
+              Error("elements of closed Polyline needs at least three points.");
+            }
+
+            i++;
+
+            if (i < Points.size())
+            {
+                P = Points[i];
+                count = 1;
+            }
+
+            closed = true;
+        }
+        else
+        {
+          ++count;
+        }
+    }
+
+    if (!closed)
+    {
+        Warning("Polyline not closed. Closing it.");
+        if ( count < 3 )
+        {
+          Error("elements of closed Polyline needs at least three points.");
+        }
+        Points.push_back(P);
+    }
+
+    more = false;
+    for(const auto& check: Range )
+    {
+      more |= check;
+    }
+    if (!more)
+    {
+        Warning("Polyline has no selected range.");
+    }
+
+    Object->Compute_Polyline(Points, Range);
+    if (Test_Flag(Object, DEGENERATE_FLAG))
+    {
+        Warning("Degenerated polyline, won't be rendered.");
+    }
+
+    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+
+    return(reinterpret_cast<ObjectPtr>(Object));
+}
 }

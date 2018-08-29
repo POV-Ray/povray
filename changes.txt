@@ -79,6 +79,10 @@ Reported via GitHub:
 
 Reported via the Newsgroups:
 
+  - <web.5b8350d429c104f2458c7afe0@news.povray.org>
+    (2018-08-27, povray.advanced-users, "Re: It gets even weirder.")
+    Trying to `#declare Foo[A][B]=...` with `Foo` being an array of arrays and
+    `Foo[A]` not yet initialized causes a hard crash instead of a parse error.
   - <web.59fefd5f68f4d962ca73ee9d0@news.povray.org>
     (2017-11-05, povray.newusers, "orthographic camera and conic_sweep object")
     Sides of a `conic_sweep` prism become invisible when viewed head-on using

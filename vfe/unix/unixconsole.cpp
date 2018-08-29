@@ -527,10 +527,17 @@ int main (int argc, char **argv)
             opts.AddCommand (*argv);
     }
 
+    // display all queued messages in console queue, allow to keep future error message at the end of the flow
+    // otherwise the error get displayed before the copyright and in verbose mode the scroll
+    // is big enough to loose the interesting part (and nobody looks back that much for error reports)
+    PrintStatus(session);
     // set all options and start rendering
     if (session->SetOptions(opts) != vfeNoError)
     {
-        fprintf(stderr,"\nProblem with option setting\n");
+        // display error line and other details
+        PrintStatus(session);
+        // the last line of PrintStatus might ends with \r, so print an extra \n to have a clear empty line
+        fprintf(stderr,"\n\nProblem with option setting\n");
         for(int loony=0;loony<argc_copy;loony++)
         {
             fprintf(stderr,"%s%c",argv_copy[loony],loony+1<argc_copy?' ':'\n');
