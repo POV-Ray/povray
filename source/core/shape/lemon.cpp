@@ -877,4 +877,89 @@ void Lemon::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
 
 }
 
+// UVMeshable part
+
+void Lemon::evalVertex( Vector3d& r, const DBL u, const DBL v )const
+{
+  if (v<0.25)
+  {
+    DBL cov = v*4.0;
+    r = Vector3d( apex_radius*cov * cos( u * TWO_M_PI ), apex_radius*cov * sin( u * TWO_M_PI ), 1.0 );
+  }
+  else if(v>0.75)
+  {
+    DBL cov = (1.0-v)*4.0;
+    r = Vector3d( base_radius*cov * cos( u * TWO_M_PI ), base_radius*cov* sin( u * TWO_M_PI ), 0.0 );
+  }
+  else
+  {
+    DBL av = 1.0-(v-0.25)*2.0;
+    /*
+     * Invariant to solve:
+     * Sqr(radius - HorizontlaPosition) = Sqr( inner_radius)-Sqr(av-VerticalPosition)
+     * With radius the smaller of the two solutions
+     *
+     * just remember HorizontalPosition is negative or null, so smaller is +sqrt(...)
+     */
+    DBL radius = HorizontalPosition + sqrt(Sqr(inner_radius)-Sqr(av-VerticalPosition));
+    r = Vector3d( radius * cos( u * TWO_M_PI ), radius * sin( u * TWO_M_PI ), av );
+  }
+  
+  if (Trans)
+  {
+    MTransPoint( r, r, Trans );
+  }
+}
+void Lemon::evalNormal( Vector3d& r, const DBL u, const DBL v )const
+{
+  if (v<0.25)
+  {
+    r = Vector3d(0.0,0.0,-1.0);
+  }
+  else if (v>0.75)
+  {
+    r = Vector3d(0.0,0.0,1.0);
+  }
+  else
+  {
+    DBL av = 1.0-(v-0.25)*2.0;
+    /*
+     *
+     * curvature is known and constant: inner_radius, only the center is moving verticaly
+     */
+    r = Vector3d( inner_radius * cos( u * TWO_M_PI ), inner_radius * sin( u * TWO_M_PI ), av-VerticalPosition );
+  }
+  if (Trans)
+  {
+    MTransNormal( r, r, Trans );
+  }
+  r.normalize();
+
+}
+void Lemon::minUV( Vector2d& r )const
+{
+  if (Test_Flag(this, CLOSED_FLAG))
+  {
+    r[U] = 0.0;
+    r[V] = 0.0;
+  }
+  else
+  {
+    r[U] = 0.0;
+    r[V] = 0.25;
+  }
+}
+void Lemon::maxUV( Vector2d& r )const
+{
+  if (Test_Flag(this, CLOSED_FLAG))
+  {
+    r[U] = 1.0;
+    r[V] = 1.0;
+  }
+  else
+  {
+    r[U] = 1.0;
+    r[V] = 0.75;
+  }
+}
 }

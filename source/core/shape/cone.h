@@ -40,6 +40,7 @@
 #include "core/configcore.h"
 
 #include "core/scene/object.h"
+#include "core/shape/uvmeshable.h"
 
 namespace pov
 {
@@ -62,7 +63,7 @@ namespace pov
 ///
 //******************************************************************************
 
-class Cone : public ObjectBase
+class Cone : public ObjectBase, public UVMeshable
 {
         struct CONE_INT
         {
@@ -95,6 +96,11 @@ class Cone : public ObjectBase
 
         void Compute_Cone_Data();
         void Compute_Cylinder_Data();
+
+        virtual void evalVertex( Vector3d& r, const DBL u, const DBL v )const;
+        virtual void evalNormal( Vector3d& r, const DBL u, const DBL v )const;
+        virtual void minUV( Vector2d& r )const;
+        virtual void maxUV( Vector2d& r )const;
     protected:
         int Intersect(const BasicRay& ray, CONE_INT *Intersection, TraceThreadData *Thread) const;
         void CalcUV(const Vector3d& IPoint, Vector2d& Result) const;

@@ -788,4 +788,35 @@ bool Sphere::Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector
     return true;
 }
 
+// UVMeshable part
+
+void Sphere::evalVertex( Vector3d& r, const DBL u, const DBL v )const
+{
+  DBL lat = -M_PI*(0.5-v);
+  r = Vector3d( Radius * cos( lat )*cos( u * TWO_M_PI ), Radius * sin( lat ) , Radius * cos( lat )*sin( u * TWO_M_PI ) );
+  r += Center;
+  if (Trans)
+  {
+    MTransPoint( r, r, Trans );
+  }
+}
+void Sphere::evalNormal( Vector3d& r, const DBL u, const DBL v )const
+{
+  r = Vector3d( cos( v * M_PI )*cos( u * TWO_M_PI ), sin( v * M_PI ) , cos( v * M_PI )*sin( u * TWO_M_PI ) );
+  if (Trans)
+  {
+    MTransNormal( r, r, Trans );
+    r.normalize();
+  }
+}
+void Sphere::minUV( Vector2d& r )const
+{
+  r[U] = 0.0;
+  r[V] = 0.0;
+}
+void Sphere::maxUV( Vector2d& r )const
+{
+  r[U] = 1.0;
+  r[V] = 1.0;
+}
 }
