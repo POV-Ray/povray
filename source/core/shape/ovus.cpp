@@ -985,4 +985,109 @@ void Ovus::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
 
 }
 
+// UVMeshable part
+
+void Ovus::evalVertex( Vector3d& r, const DBL u, const DBL v )const
+{
+  DBL y;
+  if ( v < 0.25)
+  {// below 0
+    DBL t = 4.0*Sqr(asin(4.0*v))/Sqr(M_PI);
+    y = -BottomRadius*(1.0-t);
+  }
+  else if (v > 0.75)
+  {
+    DBL cov = 1.0-v;
+    DBL t = 4.0*Sqr(asin(4.0*cov))/Sqr(M_PI);
+    y = VerticalSpherePosition+TopRadius*(1.0-t);
+  }
+  else
+  {
+    y = (v-0.25)*2.0*VerticalSpherePosition;
+  }
+  /* now compute which part the point is on
+   * - bottom sphere
+   * - connecting sphere
+   * - top sphere
+   */
+  if ( y < BottomVertical)
+  { // bottom sphere
+    // abs to avoid sqrt returning -nan
+    DBL adjustedRadius =  sqrt( fabs(Sqr(BottomRadius)- Sqr(y)));
+    r = Vector3d( adjustedRadius * cos(u*TWO_M_PI), y, adjustedRadius*sin(u*TWO_M_PI));
+  }
+  else if ( y > TopVertical )
+  { // top sphere
+    // abs to avoid sqrt returning -nan
+    DBL adjustedRadius = sqrt( fabs(Sqr(TopRadius)- Sqr(y-VerticalSpherePosition)));
+    r = Vector3d( adjustedRadius * cos(u*TWO_M_PI), y, adjustedRadius*sin(u*TWO_M_PI));
+  }
+  else
+  { // connecting sphere
+    // abs to avoid sqrt returning -nan
+    DBL adjustedRadius =  sqrt(fabs(Sqr(ConnectingRadius)-Sqr(y-VerticalPosition)))- HorizontalPosition;
+    r = Vector3d( adjustedRadius * cos( u * TWO_M_PI ), y, adjustedRadius * sin( u * TWO_M_PI ) );
+  }
+  if (Trans)
+  {
+    MTransPoint( r, r, Trans );
+  }
+}
+void Ovus::evalNormal( Vector3d& r, const DBL u, const DBL v )const
+{
+  DBL y;
+  if ( v < 0.25)
+  {// below 0
+    DBL t = 4.0*Sqr(asin(4.0*v))/Sqr(M_PI);
+    y = -BottomRadius*(1.0-t);
+  }
+  else if (v > 0.75)
+  {
+    DBL cov = 1.0-v;
+    DBL t = 4.0*Sqr(asin(4.0*cov))/Sqr(M_PI);
+    y = VerticalSpherePosition+TopRadius*(1.0-t);
+  }
+  else
+  {
+    y = (v-0.25)*2.0*VerticalSpherePosition;
+  }
+  /* now compute which part the point is on
+   * - bottom sphere
+   * - connecting sphere
+   * - top sphere
+   */
+  if ( y < BottomVertical)
+  { // bottom sphere
+    DBL adjustedRadius =  sqrt(fabs( Sqr(BottomRadius)- Sqr(y)));
+    r = Vector3d( adjustedRadius * cos(u*TWO_M_PI), y, adjustedRadius*sin(u*TWO_M_PI));
+  }
+  else if ( y > TopVertical )
+  { // top sphere
+    DBL adjustedRadius = sqrt( fabs(Sqr(TopRadius)- Sqr(y-VerticalSpherePosition)));
+    r = Vector3d( adjustedRadius * cos(u*TWO_M_PI), y-VerticalSpherePosition, adjustedRadius*sin(u*TWO_M_PI));
+  }
+  else
+  { // connecting sphere
+     /*
+     *
+     * curvature is known and constant: only the center is moving verticaly
+     */
+    r = Vector3d( ConnectingRadius * cos( u * TWO_M_PI ), y-VerticalPosition, ConnectingRadius * sin( u * TWO_M_PI ) );
+  }
+  if (Trans)
+  {
+    MTransNormal( r, r, Trans );
+  }
+  r.normalize();
+}
+void Ovus::minUV( Vector2d& r )const
+{
+  r[U] = 0.0;
+  r[V] = 0.0;
+}
+void Ovus::maxUV( Vector2d& r )const
+{
+  r[U] = 1.0;
+  r[V] = 1.0;
+}
 }
