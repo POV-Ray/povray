@@ -18,8 +18,8 @@
 // 2nd argument: radius of spheres
 // 3rd argument: texture of spheres
 #macro MeshVertex( M, R, T )
-#for(Vertex_index, 0, get_vertex_count(M))
-  sphere{ get_vertex( M, Vertex_index ), R texture { T } }
+#for(Vertex_index, 1, get_vertex_count(M))
+  sphere{ get_vertex( M, Vertex_index -1 ), R texture { T } }
 #end
 #end
 
@@ -37,11 +37,18 @@
 #local P3 = get_vertex( M, Vertex_indices.z );
 #local C = (P1+P2+P3)/3;
 sphere { C, S texture { T } }
+#if( vlength(P1 -C)>0)
   cylinder { P1, C, R texture { T }}
+#end
+#if( vlength(P2 -C)>0)
   cylinder { P2, C, R texture { T }}
+#end
+#if( vlength(P3 -C)>0)
   cylinder { P3, C, R texture { T }}
 #end
 #end
+#end
+
 
 // macro MeshEdge
 // Put a cylinder along each edge of each face
@@ -54,9 +61,15 @@ sphere { C, S texture { T } }
 #local P1 = get_vertex( M, Vertex_indices.x );
 #local P2 = get_vertex( M, Vertex_indices.y );
 #local P3 = get_vertex( M, Vertex_indices.z );
+#if( vlength(P1 -P2)>0)
   cylinder { P1, P2, R texture { T }}
+#end
+#if( vlength(P3 -P2)>0)
   cylinder { P2, P3, R texture { T }}
+#end
+#if( vlength(P3 -P1)>0)
   cylinder { P3, P1, R texture { T }}
+#end
 #end
 #end
 
