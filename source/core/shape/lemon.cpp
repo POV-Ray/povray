@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -754,6 +754,8 @@ void Lemon::Compute_BBox()
 }
 
 
+#ifdef POV_ENABLE_LEMON_UV
+
 /*****************************************************************************
 *
 * FUNCTION
@@ -877,6 +879,8 @@ void Lemon::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
 
 }
 
+#endif // POV_ENABLE_LEMON_UV
+
 // UVMeshable part
 
 void Lemon::evalVertex( Vector3d& r, const DBL u, const DBL v )const
@@ -962,4 +966,5 @@ void Lemon::maxUV( Vector2d& r )const
     r[V] = 0.75;
   }
 }
+
 }

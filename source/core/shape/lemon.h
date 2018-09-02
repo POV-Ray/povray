@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -83,7 +83,13 @@ class Lemon : public ObjectBase, public UVMeshable
         virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
         virtual bool Inside(const Vector3d&, TraceThreadData *) const;
         virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+#ifdef POV_ENABLE_LEMON_UV
+        /// @attention
+        ///     UV mapping of this primitive should not be enabled until the primary
+        ///     parameterization has been amended so that users have full control over the
+        ///     primitive's  orientation, rather than just the axis of rotational symmetry.
         virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
+#endif // POV_ENABLE_LEMON_UV
         virtual void Translate(const Vector3d&, const TRANSFORM *);
         virtual void Rotate(const Vector3d&, const TRANSFORM *);
         virtual void Scale(const Vector3d&, const TRANSFORM *);
@@ -106,7 +112,9 @@ class Lemon : public ObjectBase, public UVMeshable
         virtual void maxUV( Vector2d& r )const;
     protected:
         int Intersect(const Vector3d& P, const Vector3d& D, LEMON_INT *Intersection, TraceThreadData *Thread) const;
+#ifdef POV_ENABLE_LEMON_UV
         void CalcUV(const Vector3d& IPoint, Vector2d& Result) const;
+#endif // POV_ENABLE_LEMON_UV
 };
 
 /// @}
