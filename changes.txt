@@ -54,6 +54,8 @@ Changed Behaviour
   - Token counting in conditional blocks (e.g. in `#if ... #end`) has changed.
     Whenever such a block is skipped, the token count is now incremented only
     by directives (stuff that begins with `#`).
+  - UV mapping of cylinder, cone and lemon primitives has been disabled again
+    for now, due to their orientation being poorly defined.
 
 New Features
 ------------
