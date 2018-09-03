@@ -198,7 +198,7 @@
 /// @note
 ///     Some algorithms use @ref SMALL_TOLERANCE instead.
 ///
-#define MIN_ISECT_DEPTH 1.0e-4
+#define MIN_ISECT_DEPTH 0.0
 
 /// @}
 ///

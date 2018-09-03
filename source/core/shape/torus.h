@@ -40,6 +40,7 @@
 #include "core/configcore.h"
 
 #include "core/scene/object.h"
+#include "core/shape/uvmeshable.h"
 
 namespace pov
 {
@@ -66,7 +67,7 @@ namespace pov
 ///
 //******************************************************************************
 
-class Torus : public ObjectBase
+class Torus : public ObjectBase, public UVMeshable
 {
     public:
         DBL MajorRadius, MinorRadius;
@@ -85,6 +86,11 @@ class Torus : public ObjectBase
         virtual void Scale(const Vector3d&, const TRANSFORM *);
         virtual void Transform(const TRANSFORM *);
         virtual void Compute_BBox();
+
+        virtual void evalVertex( Vector3d& r, const DBL u, const DBL v )const;
+        virtual void evalNormal( Vector3d& r, const DBL u, const DBL v )const;
+        virtual void minUV( Vector2d& r )const;
+        virtual void maxUV( Vector2d& r )const;
     protected:
         int Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Thread) const;
         bool Test_Thick_Cylinder(const Vector3d& P, const Vector3d& D, DBL h1, DBL h2, DBL r1, DBL r2) const;

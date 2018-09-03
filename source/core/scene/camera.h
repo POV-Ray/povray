@@ -44,6 +44,7 @@
 
 namespace pov
 {
+class TracePixelCameraData;
 
 //##############################################################################
 ///
@@ -58,19 +59,49 @@ namespace pov
 
 // Available camera types. [DB 8/94]
 
-#define PERSPECTIVE_CAMERA      1
-#define ORTHOGRAPHIC_CAMERA     2
-#define FISHEYE_CAMERA          3
-#define ULTRA_WIDE_ANGLE_CAMERA 4
-#define OMNIMAX_CAMERA          5
-#define PANORAMIC_CAMERA        6
-#define CYL_1_CAMERA            7
-#define CYL_2_CAMERA            8
-#define CYL_3_CAMERA            9
-#define CYL_4_CAMERA           10
-#define SPHERICAL_CAMERA       11
-#define MESH_CAMERA            12
-#define USER_DEFINED_CAMERA    13
+enum CameraType
+{
+     PERSPECTIVE_CAMERA,
+     ORTHOGRAPHIC_CAMERA,
+     FISHEYE_CAMERA,
+     ULTRA_WIDE_ANGLE_CAMERA,
+     OMNIMAX_CAMERA,
+     PANORAMIC_CAMERA,
+     CYL_1_CAMERA,
+     CYL_2_CAMERA,
+     CYL_3_CAMERA,
+     CYL_4_CAMERA,
+     SPHERICAL_CAMERA,
+     MESH_CAMERA,
+     USER_DEFINED_CAMERA,
+     PROJ_TETRA_CAMERA,
+     PROJ_CUBE_CAMERA,
+     PROJ_OCTA_CAMERA,
+     PROJ_ICOSA_CAMERA,
+     PROJ_MERCATOR_CAMERA,
+     PROJ_LAMBERT_CYL_CAMERA,
+     PROJ_BEHRMANN_CAMERA,
+     PROJ_CRASTER_CAMERA,
+     PROJ_EDWARDS_CAMERA,
+     PROJ_HOBO_DYER_CAMERA,
+     PROJ_PETERS_CAMERA,
+     PROJ_GALL_CAMERA,
+     PROJ_BALTHASART_CAMERA,
+     PROJ_AITOFF_CAMERA,
+     PROJ_MOLLWEIDE_CAMERA,
+     PROJ_LAMBERT_AZI_CAMERA,
+     PROJ_VAN_DER_GRINTEN_CAMERA,
+     PROJ_PLATECARREE_CAMERA,
+     PROJ_ECKERT4_CAMERA,
+     PROJ_ECKERT6_CAMERA,
+     PROJ_MILLER_CAMERA,
+     STEREOSCOPIC_CAMERA,
+     FISHEYE_ORTHOGRAPHIC_CAMERA,
+     FISHEYE_EQUISOLIDANGLE_CAMERA,
+     FISHEYE_STEREOGRAPHIC_CAMERA,
+     OMNI_DIRECTIONAL_STEREO_CAMERA,
+     GRID_CAMERA
+};
 
 /*****************************************************************************
 * Global typedefs
@@ -91,16 +122,22 @@ public:
     int Blur_Samples_Min;           // Minimum number of blur samples to take regardless of confidence settings.
     DBL Confidence;                 // Probability for confidence test.
     DBL Variance;                   // Max. variance for confidence test.
-    int Type;                       // Camera type.
+    CameraType Type;                // Camera type.
     DBL Angle;                      // Viewing angle.
     DBL H_Angle;                    // Spherical horizontal viewing angle
     DBL V_Angle;                    // Spherical verticle viewing angle
     TNORMAL *Tnormal;               // Primary ray pertubation.
     TRANSFORM *Trans;               // Used only to record the user's input
     PIGMENT *Bokeh;                 // Pigment to use for the bokeh
+    DBL Eye_Distance;               // for Stereoscopic camera
+    DBL Parallaxe;                  // for Stereoscopic camera
+    // the following declarations are used for the grid camera
+    unsigned int GridSize[2];// division of picture in part
+    vector<Camera> Cameras;// list of camera as sub-part, recursive
+    mutable vector<TracePixelCameraData> TracePixels;
+
     GenericScalarFunctionPtr Location_Fn[3];  // [USER_DEFINED_CAMERA] Set of functions defining the ray's origin for each screen position.
     GenericScalarFunctionPtr Direction_Fn[3]; // [USER_DEFINED_CAMERA] Set of functions defining the ray's direction for each screen position.
-
     // the following declarations are used for the mesh camera
     unsigned int Face_Distribution_Method;  // how to associate a pixel to a face within a mesh
     unsigned int Rays_Per_Pixel;            // cast this many rays per pixel; never less than 1

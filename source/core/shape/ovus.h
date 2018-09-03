@@ -42,6 +42,7 @@
 #include "core/configcore.h"
 
 #include "core/scene/object.h"
+#include "core/shape/uvmeshable.h"
 
 namespace pov
 {
@@ -64,7 +65,7 @@ namespace pov
 ///
 //******************************************************************************
 
-class Ovus : public ObjectBase
+class Ovus : public ObjectBase, public UVMeshable
 {
     public:
 
@@ -103,6 +104,10 @@ class Ovus : public ObjectBase
         /// precision for root solver
         DBL RootTolerance;
 
+        virtual void evalVertex( Vector3d& r, const DBL u, const DBL v )const;
+        virtual void evalNormal( Vector3d& r, const DBL u, const DBL v )const;
+        virtual void minUV( Vector2d& r )const;
+        virtual void maxUV( Vector2d& r )const;
     private:
         void CalcUV(const Vector3d& IPoint, Vector2d& Result) const;
         void Intersect_Ovus_Spheres(const Vector3d&, const Vector3d&,
