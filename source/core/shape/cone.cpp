@@ -607,6 +607,8 @@ Cone::Cone() : ObjectBase(CONE_OBJECT)
 {
     apex = Vector3d(0.0, 0.0, 1.0);
     base = Vector3d(0.0, 0.0, 0.0);
+    uref = Vector3d(1.0, 0.0, 0.0);
+    vInverted = false;
 
     apex_radius = 1.0;
     base_radius = 0.0;
@@ -770,6 +772,7 @@ void Cone::Compute_Cone_Data()
         base_radius = apex_radius;
         apex_radius = tmpf;
         axis.invert();
+        vInverted =~vInverted;
     }
     /* apex & base are different, yet, it might looks like a cylinder */
     tmpf = base_radius * len / (apex_radius - base_radius);
@@ -927,7 +930,6 @@ void Cone::Compute_BBox()
 
 
 
-#ifdef POV_ENABLE_CONE_UV
 
 /*****************************************************************************
 *
@@ -990,8 +992,17 @@ void Cone::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData 
 void Cone::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
 {
     DBL len, x, y;
-    DBL phi, theta;
+    DBL phi, theta, thetaref;
     Vector3d P;
+    Vector3d D, Axis;
+
+    // compute u origin vector as cross(cross( axis, uref), axis), with axis = apex-base
+    Axis = apex-base;
+    D = cross( cross( Axis, uref), Axis );
+    thetaref = atan2( D[Y], D[X] );
+    // Transform the point into the lemon space.
+    MInvTransPoint(P, IPoint, Trans);
+
 
     // Transform the ray into the cone space.
     MInvTransPoint(P, IPoint, Trans);
@@ -1042,17 +1053,19 @@ void Cone::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
                 theta = TWO_M_PI - theta;
         }
 
-        theta /= TWO_M_PI; // This will be from 0 to 1
+        theta -= thetaref;
+        theta += 2.0*TWO_M_PI;// to be positive
+        theta /= TWO_M_PI;
+        theta -= int(theta);
     }
     else
         // This point is at one of the poles. Any value of xcoord will be ok...
         theta = 0;
 
-    Result[U] = theta;
-    Result[V] = phi;
+    Result[U] = vInverted?(1-0-theta):theta;
+    Result[V] = vInverted?(1.0-phi):phi;
 
 }
 
-#endif // POV_ENABLE_CONE_UV
 
 }

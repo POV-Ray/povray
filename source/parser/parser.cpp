@@ -2373,6 +2373,16 @@ ObjectPtr Parser::Parse_Cone ()
         END_CASE
     END_EXPECT
 
+    EXPECT_ONE
+        CASE(UV_MAPPING_TOKEN)
+          Parse_Vector(Object->uref);
+        END_CASE
+
+        OTHERWISE
+            UNGET
+        END_CASE
+    END_EXPECT
+
     /* Compute run-time values for the cone */
     Object->Compute_Cone_Data();
 
@@ -2422,6 +2432,16 @@ ObjectPtr Parser::Parse_Cylinder ()
     EXPECT_ONE
         CASE(OPEN_TOKEN)
             Clear_Flag(Object, CLOSED_FLAG);
+        END_CASE
+
+        OTHERWISE
+            UNGET
+        END_CASE
+    END_EXPECT
+
+    EXPECT_ONE
+        CASE(UV_MAPPING_TOKEN)
+          Parse_Vector(Object->uref);
         END_CASE
 
         OTHERWISE
@@ -2480,6 +2500,16 @@ ObjectPtr Parser::Parse_Disc ()
         CASE_FLOAT
             tmpf = Parse_Float();
             Object->iradius2 = tmpf * tmpf;
+        END_CASE
+
+        OTHERWISE
+            UNGET
+        END_CASE
+    END_EXPECT
+
+    EXPECT_ONE
+        CASE(UV_MAPPING_TOKEN)
+          Parse_Vector(Object->uref);
         END_CASE
 
         OTHERWISE
@@ -3196,6 +3226,16 @@ ObjectPtr Parser::Parse_Lemon ()
     EXPECT_ONE
         CASE(OPEN_TOKEN)
             Clear_Flag(Object, CLOSED_FLAG);
+        END_CASE
+
+        OTHERWISE
+            UNGET
+        END_CASE
+    END_EXPECT
+
+    EXPECT_ONE
+        CASE(UV_MAPPING_TOKEN)
+          Parse_Vector(Object->uref);
         END_CASE
 
         OTHERWISE

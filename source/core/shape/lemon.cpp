@@ -536,6 +536,7 @@ Lemon::Lemon() : ObjectBase(LEMON_OBJECT)
 {
     apex = Vector3d(0.0, 0.0, 1.0);
     base = Vector3d(0.0, 0.0, 0.0);
+    uref = Vector3d(1.0, 0.0, 0.0);
 
     apex_radius = 0.0;
     base_radius = 0.0;
@@ -754,7 +755,6 @@ void Lemon::Compute_BBox()
 }
 
 
-#ifdef POV_ENABLE_LEMON_UV
 
 /*****************************************************************************
 *
@@ -811,10 +811,15 @@ void Lemon::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData
 void Lemon::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
 {
     DBL len, x, y, z;
-    DBL phi, theta;
+    DBL phi, theta, thetaref;
     Vector3d P;
+    Vector3d D, Axis;
 
-    // Transform the ray into the lemon space.
+    // compute u origin vector as cross(cross( axis, uref), axis), with axis = apex-base
+    Axis = apex-base;
+    D = cross( cross( Axis, uref), Axis );
+    thetaref = atan2( D[Y], D[X] );
+    // Transform the point into the lemon space.
     MInvTransPoint(P, IPoint, Trans);
 
     // the center of UV coordinate is <0, 0, 1/2>
@@ -867,8 +872,10 @@ void Lemon::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
             if (y < 0.0)
                 theta = TWO_M_PI - theta;
         }
-
-        theta /= TWO_M_PI; // This will be from 0 to 1
+        theta -= thetaref;
+        theta += 2.0*TWO_M_PI;// to be positive
+        theta /= TWO_M_PI;
+        theta -= int(theta);
     }
     else
         // This point is at one of the poles. Any value of xcoord will be ok...
@@ -879,6 +886,5 @@ void Lemon::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
 
 }
 
-#endif // POV_ENABLE_LEMON_UV
 
 }
