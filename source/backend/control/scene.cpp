@@ -58,9 +58,9 @@ namespace pov
 Scene::Scene(POVMSAddress backendAddr, POVMSAddress frontendAddr, RenderBackend::SceneId sid) :
     sceneData(new BackendSceneData()),
     stopRequsted(false),
-    parserControlThread(NULL)
+    parserControlThread(nullptr)
 {
-    sceneData->tree = NULL;
+    sceneData->tree = nullptr;
     sceneData->sceneId = sid;
     sceneData->backendAddress = backendAddr;
     sceneData->frontendAddress = frontendAddr;
@@ -71,7 +71,7 @@ Scene::~Scene()
     stopRequsted = true; // NOTE: Order is important here, set this before stopping the queue!
     parserTasks.Stop();
 
-    if(parserControlThread != NULL)
+    if (parserControlThread != nullptr)
         parserControlThread->join();
     delete parserControlThread;
 
@@ -83,7 +83,7 @@ Scene::~Scene()
 void Scene::StartParser(POVMS_Object& parseOptions)
 {
     // A scene can only be parsed once
-    if(parserControlThread == NULL)
+    if (parserControlThread == nullptr)
         parserControlThread = Task::NewBoostThread(boost::bind(&Scene::ParserControlThread, this), POV_THREAD_STACK_SIZE);
     else
         return;

@@ -317,8 +317,8 @@ class POVMS_MessageReceiver
 
                 MemberHandlerOO()
                 {
-                    classptr = NULL;
-                    handlerptr = NULL;
+                    classptr = nullptr;
+                    handlerptr = nullptr;
                 }
 
                 MemberHandlerOO(T *cptr, MemberHandlerPtr hptr)
@@ -329,7 +329,7 @@ class POVMS_MessageReceiver
 
                 void Call(POVMS_Message& msg, POVMS_Message& result, int mode)
                 {
-                    if((classptr != NULL) && (handlerptr != NULL))
+                    if ((classptr != nullptr) && (handlerptr != nullptr))
                         (classptr->*handlerptr)(msg, result, mode);
                     else
                         throw POV_EXCEPTION_CODE(pov_base::kNullPointerErr);
@@ -346,8 +346,8 @@ class POVMS_MessageReceiver
 
                 MemberHandler()
                 {
-                    classptr = NULL;
-                    handlerptr = NULL;
+                    classptr = nullptr;
+                    handlerptr = nullptr;
                 }
 
                 MemberHandler(T *cptr, MemberHandlerPtr hptr)
@@ -358,7 +358,7 @@ class POVMS_MessageReceiver
 
                 void Call(POVMSObjectPtr msg, POVMSObjectPtr result, int mode)
                 {
-                    if((classptr != NULL) && (handlerptr != NULL))
+                    if ((classptr != nullptr) && (handlerptr != nullptr))
                         (classptr->*handlerptr)(msg, result, mode);
                     else
                         throw POV_EXCEPTION_CODE(pov_base::kNullPointerErr);
@@ -375,8 +375,8 @@ class POVMS_MessageReceiver
 
                 FunctionHandlerOO()
                 {
-                    handlerptr = NULL;
-                    privatedata = NULL;
+                    handlerptr = nullptr;
+                    privatedata = nullptr;
                 }
 
                 FunctionHandlerOO(FunctionHandlerPtr hptr, void *pptr)
@@ -387,7 +387,7 @@ class POVMS_MessageReceiver
 
                 void Call(POVMS_Message& msg, POVMS_Message& result, int mode)
                 {
-                    if(handlerptr != NULL)
+                    if (handlerptr != nullptr)
                         handlerptr(msg, result, mode, privatedata);
                     else
                         throw POV_EXCEPTION_CODE(pov_base::kNullPointerErr);
@@ -404,8 +404,8 @@ class POVMS_MessageReceiver
 
                 FunctionHandler()
                 {
-                    handlerptr = NULL;
-                    privatedata = NULL;
+                    handlerptr = nullptr;
+                    privatedata = nullptr;
                 }
 
                 FunctionHandler(FunctionHandlerPtr hptr, void *pptr)
@@ -416,7 +416,7 @@ class POVMS_MessageReceiver
 
                 void Call(POVMSObjectPtr msg, POVMSObjectPtr result, int mode)
                 {
-                    if(handlerptr != NULL)
+                    if (handlerptr != nullptr)
                         handlerptr(msg, result, mode, privatedata);
                     else
                         throw POV_EXCEPTION_CODE(pov_base::kNullPointerErr);
@@ -431,42 +431,42 @@ class POVMS_MessageReceiver
 
         template<class T> void InstallFront(POVMSType hclass, POVMSType hid, T *cptr, typename MemberHandlerOO<T>::MemberHandlerPtr hptr)
         {
-            AddNodeFront(hclass, hid, new MemberHandlerOO<T>(cptr, hptr), NULL);
+            AddNodeFront(hclass, hid, new MemberHandlerOO<T>(cptr, hptr), nullptr);
         }
 
         template<class T> void InstallFront(POVMSType hclass, POVMSType hid, T *cptr, typename MemberHandler<T>::MemberHandlerPtr hptr)
         {
-            AddNodeFront(hclass, hid, NULL, new MemberHandler<T>(cptr, hptr));
+            AddNodeFront(hclass, hid, nullptr, new MemberHandler<T>(cptr, hptr));
         }
 
         void InstallFront(POVMSType hclass, POVMSType hid, FunctionHandlerOO::FunctionHandlerPtr hptr, void *pptr)
         {
-            AddNodeFront(hclass, hid, new FunctionHandlerOO(hptr, pptr), NULL);
+            AddNodeFront(hclass, hid, new FunctionHandlerOO(hptr, pptr), nullptr);
         }
 
         void InstallFront(POVMSType hclass, POVMSType hid, FunctionHandler::FunctionHandlerPtr hptr, void *pptr)
         {
-            AddNodeFront(hclass, hid, NULL, new FunctionHandler(hptr, pptr));
+            AddNodeFront(hclass, hid, nullptr, new FunctionHandler(hptr, pptr));
         }
 
         template<class T> void InstallBack(POVMSType hclass, POVMSType hid, T *cptr, typename MemberHandlerOO<T>::MemberHandlerPtr hptr)
         {
-            AddNodeBack(hclass, hid, new MemberHandlerOO<T>(cptr, hptr), NULL);
+            AddNodeBack(hclass, hid, new MemberHandlerOO<T>(cptr, hptr), nullptr);
         }
 
         template<class T> void InstallBack(POVMSType hclass, POVMSType hid, T *cptr, typename MemberHandler<T>::MemberHandlerPtr hptr)
         {
-            AddNodeBack(hclass, hid, NULL, new MemberHandler<T>(cptr, hptr));
+            AddNodeBack(hclass, hid, nullptr, new MemberHandler<T>(cptr, hptr));
         }
 
         void InstallBack(POVMSType hclass, POVMSType hid, FunctionHandlerOO::FunctionHandlerPtr hptr, void *pptr)
         {
-            AddNodeBack(hclass, hid, new FunctionHandlerOO(hptr, pptr), NULL);
+            AddNodeBack(hclass, hid, new FunctionHandlerOO(hptr, pptr), nullptr);
         }
 
         void InstallBack(POVMSType hclass, POVMSType hid, FunctionHandler::FunctionHandlerPtr hptr, void *pptr)
         {
-            AddNodeBack(hclass, hid, NULL, new FunctionHandler(hptr, pptr));
+            AddNodeBack(hclass, hid, nullptr, new FunctionHandler(hptr, pptr));
         }
 
         void Remove(POVMSType hclass, POVMSType hid);

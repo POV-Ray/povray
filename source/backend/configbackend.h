@@ -99,10 +99,10 @@ static_assert(
 ///
 /// @param[in]  ts  Null-terminated byte sequence to convert.
 /// @param[out] as  Number of UCS2 characters in result.
-/// @return         Converted null-terminated UCS2 character sequence, or `NULL` if conversion is not supported.
+/// @return         Converted null-terminated UCS2 character sequence, or `nullptr` if conversion is not supported.
 ///
 #ifndef POV_CONVERT_TEXT_TO_UCS2
-    #define POV_CONVERT_TEXT_TO_UCS2(ts, as) (NULL)
+    #define POV_CONVERT_TEXT_TO_UCS2(ts, as) (nullptr)
 #endif
 
 //******************************************************************************

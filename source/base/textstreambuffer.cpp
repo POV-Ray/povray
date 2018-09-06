@@ -62,7 +62,7 @@ TextStreamBuffer::TextStreamBuffer(size_t buffersize, unsigned int wrapwidth)
     wrap = wrapwidth;
     curline = 0;
     buffer = new char[bsize];
-    if(buffer == NULL)
+    if (buffer == nullptr)
         throw POV_EXCEPTION_CODE(kOutOfMemoryErr);
 }
 
@@ -72,9 +72,9 @@ TextStreamBuffer::~TextStreamBuffer()
     bsize = 0;
     wrap = 0;
     curline = 0;
-    if(buffer != NULL)
+    if (buffer != nullptr)
         delete[] buffer;
-    buffer = NULL;
+    buffer = nullptr;
 }
 
 void TextStreamBuffer::printf(const char *format, ...)
@@ -113,7 +113,7 @@ void TextStreamBuffer::printfile(const char *filename, POV_OFF_T offset, POV_LON
 {
     FILE *file = fopen(filename, "r");
 
-    if(file != NULL)
+    if (file != nullptr)
     {
         fseek(file, offset, SEEK_SET);
         printfile(file, lines);
@@ -123,7 +123,7 @@ void TextStreamBuffer::printfile(const char *filename, POV_OFF_T offset, POV_LON
 
 void TextStreamBuffer::printfile(FILE *file, POV_LONG lines)
 {
-    if(file != NULL)
+    if (file != nullptr)
     {
         bool stopposset = (lines < 0); // only if walking backwards stop at current position
         POV_OFF_T stoppos = (POV_OFF_T)(ftell(file));

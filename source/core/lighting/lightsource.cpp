@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -195,7 +195,7 @@ void LightSource::Translate(const Vector3d& Vector, const TRANSFORM *tr)
     if(!children.empty())
         Translate_Object(children[0], Vector, tr);
 
-    if(Projected_Through_Object != NULL )
+    if (Projected_Through_Object != nullptr)
         Translate_Object(Projected_Through_Object, Vector, tr);
 }
 
@@ -314,7 +314,7 @@ void LightSource::Transform(const TRANSFORM *tr)
     if(!children.empty())
         Transform_Object(children[0], tr);
 
-    if(Projected_Through_Object != NULL)
+    if (Projected_Through_Object != nullptr)
         Transform_Object(Projected_Through_Object, tr);
 }
 
@@ -366,7 +366,7 @@ LightSource::LightSource() : CompoundObject(LIGHT_OBJECT)
     Fade_Distance = 0.0;
     Fade_Power    = 0.0;
 
-    Projected_Through_Object= NULL;
+    Projected_Through_Object = nullptr;
 
     Light_Type = POINT_SOURCE;
 

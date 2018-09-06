@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -969,7 +969,7 @@ Prism::Prism() : ObjectBase(PRISM_OBJECT)
     Spline_Type = LINEAR_SPLINE;
     Sweep_Type  = LINEAR_SWEEP;
 
-    Spline = NULL;
+    Spline = nullptr;
 
     Set_Flag(this, CLOSED_FLAG);
 }
@@ -1376,7 +1376,7 @@ void Prism::Compute_Prism(Vector2d *P, TraceThreadData *Thread)
 
     /* Allocate Object->Number segments. */
 
-    if (Spline == NULL)
+    if (Spline == nullptr)
     {
         Spline = reinterpret_cast<PRISM_SPLINE *>(POV_MALLOC(sizeof(PRISM_SPLINE), "spline segments of prism"));
         Spline->References = 1;

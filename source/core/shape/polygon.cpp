@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -455,7 +455,7 @@ void Polygon::Transform(const TRANSFORM *tr)
 {
     Vector3d N;
 
-    if(Trans == NULL)
+    if (Trans == nullptr)
         Trans = Create_Transform();
 
     Compose_Transforms(Trans, tr);
@@ -504,7 +504,7 @@ Polygon::Polygon() : NonsolidObject(POLYGON_OBJECT)
 
     S_Normal = Vector3d(0.0, 0.0, 1.0);
 
-    Data = NULL;
+    Data = nullptr;
 }
 
 
@@ -642,7 +642,7 @@ void Polygon::Compute_Polygon(int number, Vector3d *points)
 
     /* Create polygon data. */
 
-    if (Data == NULL)
+    if (Data == nullptr)
     {
         Data = reinterpret_cast<POLYGON_DATA *>(POV_MALLOC(sizeof(POLYGON_DATA), "polygon points"));
 

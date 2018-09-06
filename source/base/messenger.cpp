@@ -178,7 +178,7 @@ void GenericMessenger::PossibleErrorAt(const UCS2 *filename, POV_LONG line, POV_
     SendMessage(kMessageClass_PossibleError, kWarningNone, localvsbuffer, filename, line, column, offset);
 }
 
-// filename defaults to NULL, and line, column, and offset default to -1
+// filename defaults to `nullptr`, and line, column, and offset default to -1
 std::string GenericMessenger::SendError(const char *format, va_list arglist, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset)
 {
     char localvsbuffer[1024];

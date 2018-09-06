@@ -12,7 +12,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -136,7 +136,7 @@ void BBoxPriorityQueue::Clear()
 
 void Destroy_BBox_Tree(BBOX_TREE *Node)
 {
-    if(Node != NULL)
+    if (Node != nullptr)
     {
         if(Node->Entries > 0)
         {
@@ -146,7 +146,7 @@ void Destroy_BBox_Tree(BBOX_TREE *Node)
             POV_FREE(Node->Node);
 
             Node->Entries = 0;
-            Node->Node = NULL;
+            Node->Node = nullptr;
         }
 
         POV_FREE(Node);
@@ -159,7 +159,7 @@ void Recompute_BBox(BoundingBox *bbox, const TRANSFORM *trans)
     Vector3d lower_left, lengths, corner;
     Vector3d mins, maxs;
 
-    if(trans == NULL)
+    if (trans == nullptr)
         return;
 
     lower_left = Vector3d(bbox->lowerLeft);
@@ -203,7 +203,7 @@ void Recompute_Inverse_BBox(BoundingBox *bbox, const TRANSFORM *trans)
     Vector3d lower_left, lengths, corner;
     Vector3d mins, maxs;
 
-    if(trans == NULL)
+    if (trans == nullptr)
         return;
 
     lower_left = Vector3d(bbox->lowerLeft);
@@ -330,12 +330,12 @@ void Build_Bounding_Slabs(BBOX_TREE **Root, vector<ObjectPtr>& objects, unsigned
                 numberOfLightSources++;
             }
             else
-                Temp = NULL;
+                Temp = nullptr;
         }
         else
             Temp = (*i);
 
-        if(Temp != NULL)
+        if (Temp != nullptr)
         {
             if(Test_Flag(Temp, INFINITE_FLAG))
                 numberOfInfiniteObjects++;
@@ -348,13 +348,13 @@ void Build_Bounding_Slabs(BBOX_TREE **Root, vector<ObjectPtr>& objects, unsigned
     if(numberOfFiniteObjects + numberOfInfiniteObjects < 1)
         return;
 
-    // This is a resonable guess at the number of finites needed.
+    // This is a reasonable guess at the number of finites needed.
     // This array will be reallocated as needed if it isn't.
     maxfinitecount = 2 * numberOfFiniteObjects;
 
     // Now allocate an array to hold references to these finites and
     // any new composite objects we may generate.
-    Finite = Infinite = NULL;
+    Finite = Infinite = nullptr;
 
     if(numberOfFiniteObjects > 0)
         Finite = new BBOX_TREE* [maxfinitecount];
@@ -380,12 +380,12 @@ void Build_Bounding_Slabs(BBOX_TREE **Root, vector<ObjectPtr>& objects, unsigned
             if((reinterpret_cast<LightSource *>(*i))->children.size() > 0)
                 Temp = (reinterpret_cast<LightSource *>(*i))->children[0];
             else
-                Temp = NULL;
+                Temp = nullptr;
         }
         else
             Temp = (*i);
 
-        if(Temp != NULL)
+        if (Temp != nullptr)
         {
             // Add object to the appropriate list.
             if(Test_Flag(Temp, INFINITE_FLAG))
@@ -410,10 +410,10 @@ void Build_Bounding_Slabs(BBOX_TREE **Root, vector<ObjectPtr>& objects, unsigned
     Build_BBox_Tree(Root, numberOfFiniteObjects, Finite, numberOfInfiniteObjects, Infinite, maxfinitecount);
 
     // Get rid of the Finite and Infinite arrays and just use Root.
-    if(Finite != NULL)
+    if (Finite != nullptr)
         delete[] Finite;
 
-    if(Infinite != NULL)
+    if (Infinite != nullptr)
         delete[] Infinite;
 }
 
@@ -429,7 +429,7 @@ bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const
 
     // Start with an empty priority queue.
     pqueue.Clear();
-    New_Intersection.Object = NULL;
+    New_Intersection.Object = nullptr;
     found = false;
 
     // Check top node.
@@ -482,7 +482,7 @@ bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const
 
     // Start with an empty priority queue.
     pqueue.Clear();
-    New_Intersection.Object = NULL;
+    New_Intersection.Object = nullptr;
     found = false;
 
     // Check top node.
@@ -649,7 +649,7 @@ BBOX_TREE *create_bbox_node(int size)
     if(size)
         New->Node = reinterpret_cast<BBOX_TREE **>(POV_MALLOC(size*sizeof(BBOX_TREE *), "bounding box node"));
     else
-        New->Node = NULL;
+        New->Node = nullptr;
 
     return (New);
 }

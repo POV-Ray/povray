@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -64,13 +64,13 @@ Task::Task(ThreadData *td, const boost::function1<void, Exception&>& f) :
     paused(false),
     done(false),
     failed(kNoError),
-    timer(NULL),
+    timer(nullptr),
     realTime(-1),
     cpuTime(-1),
-    taskThread(NULL),
-    povmsContext(NULL)
+    taskThread(nullptr),
+    povmsContext(nullptr)
 {
-    if (td == NULL)
+    if (td == nullptr)
         throw POV_EXCEPTION_STRING("Internal error: TaskData is NULL in Task constructor");
 }
 
@@ -78,8 +78,8 @@ Task::~Task()
 {
     Stop();
 
-    // NOTE: Freeing taskData is the responsiblity of the task creator!
-    taskData = NULL;
+    // NOTE: Freeing taskData is the responsibility of the task creator!
+    taskData = nullptr;
 }
 
 int Task::FailureCode(int defval)
@@ -102,7 +102,7 @@ POV_LONG Task::ConsumedCPUTime() const
 
 void Task::Start(const boost::function0<void>& completion)
 {
-    if((done == false) && (taskThread == NULL))
+    if ((done == false) && (taskThread == nullptr))
         taskThread = NewBoostThread(boost::bind(&Task::TaskThread, this, completion), POV_THREAD_STACK_SIZE);
 }
 
@@ -115,11 +115,11 @@ void Task::Stop()
 {
     stopRequested = true;
 
-    if(taskThread != NULL)
+    if (taskThread != nullptr)
     {
         taskThread->join();
         delete taskThread;
-        taskThread = NULL;
+        taskThread = nullptr;
     }
 }
 
@@ -135,13 +135,13 @@ void Task::Resume()
 
 POV_LONG Task::ElapsedRealTime() const
 {
-    POV_TASK_ASSERT(timer != NULL);
+    POV_TASK_ASSERT(timer != nullptr);
     return timer->ElapsedRealTime();
 }
 
 POV_LONG Task::ElapsedThreadCPUTime() const
 {
-    POV_TASK_ASSERT(timer != NULL);
+    POV_TASK_ASSERT(timer != nullptr);
     return timer->ElapsedThreadCPUTime();
 }
 
@@ -152,7 +152,7 @@ void Task::TaskThread(const boost::function0<void>& completion)
     if((result = POVMS_OpenContext(&povmsContext)) != kNoErr)
     {
         failed = result;
-        timer = NULL;
+        timer = nullptr;
         done = true;
         return;
     }
@@ -240,7 +240,7 @@ void Task::TaskThread(const boost::function0<void>& completion)
         FatalErrorHandler(POV_EXCEPTION_STRING("An unknown error occured finishing a task!"));
     }
 
-    timer = NULL;
+    timer = nullptr;
     done = true;
 
     Cleanup();

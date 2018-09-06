@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -369,74 +369,74 @@ class Intersection
         /// @}
 
         Intersection() :
-            Depth(BOUND_HUGE), Object(NULL), Csg(NULL),
-            d1(0.0), Pointer(NULL), i1(0), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
+            Depth(BOUND_HUGE), Object(nullptr), Csg(nullptr),
+            d1(0.0), Pointer(nullptr), i1(0), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
         Intersection(DBL d, const Vector3d& v, ObjectPtr o) :
-            Depth(d), IPoint(v), Iuv(v), Object(o), Csg(NULL),
-            d1(0.0), Pointer(NULL), i1(0), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
+            Depth(d), IPoint(v), Iuv(v), Object(o), Csg(nullptr),
+            d1(0.0), Pointer(nullptr), i1(0), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
         Intersection(DBL d, const Vector3d& v, const Vector3d& n, ObjectPtr o) :
-            Depth(d), IPoint(v), INormal(n), Iuv(v), Object(o), Csg(NULL),
-            d1(0.0), Pointer(NULL), i1(0), i2(0), haveNormal(true), haveLocalIPoint(false), b1(false)
+            Depth(d), IPoint(v), INormal(n), Iuv(v), Object(o), Csg(nullptr),
+            d1(0.0), Pointer(nullptr), i1(0), i2(0), haveNormal(true), haveLocalIPoint(false), b1(false)
         {}
 
         Intersection(DBL d, const Vector3d& v, const Vector2d& uv, ObjectPtr o) :
-            Depth(d), IPoint(v), Iuv(uv), Object(o), Csg(NULL),
-            d1(0.0), Pointer(NULL), i1(0), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
+            Depth(d), IPoint(v), Iuv(uv), Object(o), Csg(nullptr),
+            d1(0.0), Pointer(nullptr), i1(0), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
         Intersection(DBL d, const Vector3d& v, const Vector3d& n, const Vector2d& uv, ObjectPtr o) :
-            Depth(d), IPoint(v), INormal(n), Iuv(uv), Object(o), Csg(NULL),
-            d1(0.0), Pointer(NULL), i1(0), i2(0), haveNormal(true), haveLocalIPoint(false), b1(false)
+            Depth(d), IPoint(v), INormal(n), Iuv(uv), Object(o), Csg(nullptr),
+            d1(0.0), Pointer(nullptr), i1(0), i2(0), haveNormal(true), haveLocalIPoint(false), b1(false)
         {}
 
         Intersection(DBL d, const Vector3d& v, ObjectPtr o, const void *a) :
-            Depth(d), IPoint(v), Iuv(v), Object(o), Csg(NULL),
+            Depth(d), IPoint(v), Iuv(v), Object(o), Csg(nullptr),
             d1(0.0), Pointer(a), i1(0), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
         Intersection(DBL d, const Vector3d& v, const Vector2d& uv, ObjectPtr o, const void *a) :
-            Depth(d), IPoint(v), Iuv(uv), Object(o), Csg(NULL),
+            Depth(d), IPoint(v), Iuv(uv), Object(o), Csg(nullptr),
             d1(0.0), Pointer(a), i1(0), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
         /// @todo Why does this not set Iuv=IPoint, as other constructors do?
         Intersection(DBL d, const Vector3d& v, ObjectPtr o, int a) :
-            Depth(d), IPoint(v), Object(o), Csg(NULL),
-            d1(0.0), Pointer(NULL), i1(a), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
+            Depth(d), IPoint(v), Object(o), Csg(nullptr),
+            d1(0.0), Pointer(nullptr), i1(a), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
         /// @todo Why does this not set Iuv=IPoint, as other constructors do?
         Intersection(DBL d, const Vector3d& v, ObjectPtr o, DBL a) :
-            Depth(d), IPoint(v), Object(o), Csg(NULL),
-            d1(a), Pointer(NULL), i1(0), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
+            Depth(d), IPoint(v), Object(o), Csg(nullptr),
+            d1(a), Pointer(nullptr), i1(0), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
         /// @todo Why does this not set Iuv=IPoint, as other constructors do?
         Intersection(DBL d, const Vector3d& v, ObjectPtr o, int a, int b) :
-            Depth(d), IPoint(v), Object(o), Csg(NULL),
-            d1(0.0), Pointer(NULL), i1(a), i2(b), haveNormal(false), haveLocalIPoint(false), b1(false)
+            Depth(d), IPoint(v), Object(o), Csg(nullptr),
+            d1(0.0), Pointer(nullptr), i1(a), i2(b), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
         /// @todo Why does this not set Iuv=IPoint, as other constructors do?
         Intersection(DBL d, const Vector3d& v, ObjectPtr o, int a, DBL b) :
-            Depth(d), IPoint(v), Object(o), Csg(NULL),
-            d1(b), Pointer(NULL), i1(a), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
+            Depth(d), IPoint(v), Object(o), Csg(nullptr),
+            d1(b), Pointer(nullptr), i1(a), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
         /// @todo Why does this not set Iuv=IPoint, as other constructors do?
         Intersection(DBL d, const Vector3d& v, ObjectPtr o, int a, int b, DBL c) :
-            Depth(d), IPoint(v), Object(o), Csg(NULL),
-            d1(c), Pointer(NULL), i1(a), i2(b), haveNormal(false), haveLocalIPoint(false), b1(false)
+            Depth(d), IPoint(v), Object(o), Csg(nullptr),
+            d1(c), Pointer(nullptr), i1(a), i2(b), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
         /// @todo Why does this not set Iuv=IPoint, as other constructors do?
         Intersection(DBL d, const Vector3d& v, ObjectPtr o, const Vector3d& lv, bool a) :
-            Depth(d), IPoint(v), Object(o), Csg(NULL),
-            LocalIPoint(lv), d1(0.0), Pointer(NULL), i1(0), i2(0), haveNormal(false), haveLocalIPoint(true), b1(a)
+            Depth(d), IPoint(v), Object(o), Csg(nullptr),
+            LocalIPoint(lv), d1(0.0), Pointer(nullptr), i1(0), i2(0), haveNormal(false), haveLocalIPoint(true), b1(a)
         {}
 
         ~Intersection() { }
@@ -628,7 +628,7 @@ public:
     virtual void PushArgument(GenericFunctionContextPtr pContext, ARG_T arg) = 0;
     virtual RETURN_T Execute(GenericFunctionContextPtr pContext) = 0;
     virtual GenericCustomFunction* Clone() const = 0;
-    virtual const SourceInfo* GetSourceInfo() const { return NULL; }
+    virtual const SourceInfo* GetSourceInfo() const { return nullptr; }
 };
 
 typedef GenericCustomFunction<double, double> GenericScalarFunction;
@@ -641,8 +641,8 @@ public:
     inline GenericCustomFunctionInstance(GenericCustomFunction<RETURN_T,ARG_T>* pFn, TraceThreadData* pThreadData) :
         mpFunction(pFn), mpContext(pFn->AcquireContext(pThreadData)), mReInit(true)
     {
-        POV_ASSERT(mpFunction != NULL);
-        POV_ASSERT(mpContext  != NULL);
+        POV_ASSERT(mpFunction != nullptr);
+        POV_ASSERT(mpContext  != nullptr);
     }
 
     inline ~GenericCustomFunctionInstance()

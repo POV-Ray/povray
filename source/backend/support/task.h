@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -64,7 +64,7 @@ class Task
         virtual ~Task();
 
         inline bool IsPaused() { return !done && paused; }
-        inline bool IsRunning() { return !done && !paused && !stopRequested && (taskThread != NULL); }
+        inline bool IsRunning() { return !done && !paused && !stopRequested && (taskThread != nullptr); }
         inline bool IsDone() { return done; }
         inline bool Failed() { return done && (failed != kNoError); }
 
@@ -142,7 +142,7 @@ class Task
         volatile bool done;
         /// failed code
         volatile int failed;
-        // pointer to timer or NULL
+        // pointer to timer or `nullptr`
         Timer *timer;
         // real time spend in task
         POV_LONG realTime;

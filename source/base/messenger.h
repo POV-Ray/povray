@@ -102,7 +102,7 @@ class GenericMessenger
     protected:
 
         virtual void SendMessage(MessageClass mc, WarningLevel level, const char *text,
-                                 const UCS2 *filename = NULL, POV_LONG line = -1, POV_LONG column = -1, POV_OFF_T offset = -1) = 0;
+                                 const UCS2 *filename = nullptr, POV_LONG line = -1, POV_LONG column = -1, POV_OFF_T offset = -1) = 0;
 
     private:
 
@@ -111,7 +111,7 @@ class GenericMessenger
 
         void CleanupString(char *str);
         std::string SendError(const char *format, va_list arglist,
-                              const UCS2 *filename = NULL, POV_LONG line = -1, POV_LONG column = -1, POV_OFF_T offset = -1);
+                              const UCS2 *filename = nullptr, POV_LONG line = -1, POV_LONG column = -1, POV_OFF_T offset = -1);
 };
 
 /// @}

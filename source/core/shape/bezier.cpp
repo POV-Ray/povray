@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -93,7 +93,7 @@ BEZIER_NODE *BicubicPatch::create_new_bezier_node()
 {
     BEZIER_NODE *Node = reinterpret_cast<BEZIER_NODE *>(POV_MALLOC(sizeof(BEZIER_NODE), "bezier node"));
 
-    Node->Data_Ptr = NULL;
+    Node->Data_Ptr = nullptr;
 
     return (Node);
 }
@@ -774,7 +774,7 @@ void BicubicPatch::Precompute_Patch_Values()
 
     if (Patch_Type == 1)
     {
-        if (Node_Tree != NULL)
+        if (Node_Tree != nullptr)
         {
             bezier_tree_deleter(Node_Tree);
         }
@@ -1918,8 +1918,8 @@ BicubicPatch::BicubicPatch() : NonsolidObject(BICUBIC_PATCH_OBJECT)
     Flatness_Value = 0.0;
     accuracy = 0.01;
 
-    Node_Tree = NULL;
-    Weights = NULL;
+    Node_Tree = nullptr;
+    Weights = nullptr;
 
     /*
      * NOTE: Control_Points[4][4] is initialized in Parse_Bicubic_Patch.
@@ -1975,7 +1975,7 @@ ObjectPtr BicubicPatch::Copy()
     New->U_Steps = U_Steps;
     New->V_Steps = V_Steps;
 
-    if (Weights != NULL)
+    if (Weights != nullptr)
     {
         New->Weights = reinterpret_cast<BEZIER_WEIGHTS *>(POV_MALLOC( sizeof(BEZIER_WEIGHTS),"bicubic patch" ));
         POV_MEMCPY( New->Weights, Weights, sizeof(BEZIER_WEIGHTS) );
@@ -2034,13 +2034,13 @@ BicubicPatch::~BicubicPatch()
 {
     if (Patch_Type == 1)
     {
-        if (Node_Tree != NULL)
+        if (Node_Tree != nullptr)
         {
             bezier_tree_deleter(Node_Tree);
         }
     }
 
-    if (Weights != NULL)
+    if (Weights != nullptr)
         POV_FREE(Weights);
 }
 

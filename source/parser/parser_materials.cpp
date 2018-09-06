@@ -76,7 +76,7 @@ using namespace pov;
 * Local preprocessor defines
 ******************************************************************************/
 
-#define ADD_TNORMAL if (Tnormal == NULL) {if ((Default_Texture->Tnormal) != NULL) \
+#define ADD_TNORMAL if (Tnormal == nullptr) {if ((Default_Texture->Tnormal) != nullptr) \
     Tnormal = Copy_Tnormal ((Default_Texture->Tnormal)); else Tnormal = Create_Tnormal ();\
     Texture->Tnormal=Tnormal;};
 
@@ -191,9 +191,9 @@ void Parser::Make_Pattern_Image(ImageData *image, FUNCTION_PTR fn, int token)
 
 ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
 {
-    ImageData *image = NULL;
+    ImageData *image = nullptr;
     Vector3d Local_Vector;
-    char *Name = NULL;
+    char *Name = nullptr;
     int token_id;
     int filetype = NO_FILE;
     UCS2String ign;
@@ -227,7 +227,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
                 Found_Instead_Error("Missing { after", "expression");
             Unget_Token();
 
-            fnPtr = Parse_DeclareFunction(&token_id, NULL, false);
+            fnPtr = Parse_DeclareFunction(&token_id, nullptr, false);
             Make_Pattern_Image(image, fnPtr, token_id);
         END_CASE
 
@@ -356,7 +356,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
         END_CASE
     END_EXPECT
 
-    if(Name != NULL)
+    if (Name != nullptr)
     {
         if(!(filetype & Legal))
             Error("File type not supported here.");
@@ -487,7 +487,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
         POV_FREE(Name);
     }
 
-    if(image->data == NULL)
+    if (image->data == nullptr)
         Error("Cannot read image.");
 
     image->iwidth = image->data->GetWidth();
@@ -856,7 +856,7 @@ PatternPtr Parser::ParseDensityFilePattern()
     GET(DF3_TOKEN);
     pattern->densityFile->Data->Name = Parse_C_String(true);
     IStream *dfile = Locate_File(ASCIItoUCS2String(pattern->densityFile->Data->Name).c_str(), POV_File_Data_DF3, dummy, true);
-    if(dfile == NULL)
+    if (dfile == nullptr)
         Error("Cannot read media density file.");
     Read_Density_File(dfile, pattern->densityFile);
     return pattern;
@@ -1957,7 +1957,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
 
         CASE (FREQUENCY_TOKEN)
             pContinuousPattern = dynamic_cast<ContinuousPattern*>(New->pattern.get());
-            if (pContinuousPattern != NULL)
+            if (pContinuousPattern != nullptr)
                 pContinuousPattern->waveFrequency = Parse_Float();
             else
             {
@@ -1968,7 +1968,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
 
         CASE (RAMP_WAVE_TOKEN)
             pContinuousPattern = dynamic_cast<ContinuousPattern*>(New->pattern.get());
-            if (pContinuousPattern != NULL)
+            if (pContinuousPattern != nullptr)
                 pContinuousPattern->waveType = kWaveType_Ramp;
             else
                 Warning("ramp_wave has no effect on discrete patterns");
@@ -1976,7 +1976,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
 
         CASE (TRIANGLE_WAVE_TOKEN)
             pContinuousPattern = dynamic_cast<ContinuousPattern*>(New->pattern.get());
-            if (pContinuousPattern != NULL)
+            if (pContinuousPattern != nullptr)
                 pContinuousPattern->waveType = kWaveType_Triangle;
             else
                 Warning("triangle_wave has no effect on discrete patterns");
@@ -1984,7 +1984,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
 
         CASE (SINE_WAVE_TOKEN)
             pContinuousPattern = dynamic_cast<ContinuousPattern*>(New->pattern.get());
-            if (pContinuousPattern != NULL)
+            if (pContinuousPattern != nullptr)
                 pContinuousPattern->waveType = kWaveType_Sine;
             else
                 Warning("sine_wave has no effect on discrete patterns");
@@ -1992,7 +1992,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
 
         CASE (SCALLOP_WAVE_TOKEN)
             pContinuousPattern = dynamic_cast<ContinuousPattern*>(New->pattern.get());
-            if (pContinuousPattern != NULL)
+            if (pContinuousPattern != nullptr)
                 pContinuousPattern->waveType = kWaveType_Scallop;
             else
                 Warning("scallop_wave has no effect on discrete patterns");
@@ -2000,7 +2000,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
 
         CASE (CUBIC_WAVE_TOKEN)
             pContinuousPattern = dynamic_cast<ContinuousPattern*>(New->pattern.get());
-            if (pContinuousPattern != NULL)
+            if (pContinuousPattern != nullptr)
                 pContinuousPattern->waveType = kWaveType_Cubic;
             else
                 Warning("cubic_wave has no effect on discrete patterns");
@@ -2008,7 +2008,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
 
         CASE (POLY_WAVE_TOKEN)
             pContinuousPattern = dynamic_cast<ContinuousPattern*>(New->pattern.get());
-            if (pContinuousPattern != NULL)
+            if (pContinuousPattern != nullptr)
             {
                 pContinuousPattern->waveType = kWaveType_Poly;
                 pContinuousPattern->waveExponent  = Allow_Float(pContinuousPattern->waveExponent);
@@ -2022,7 +2022,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
 
         CASE (PHASE_TOKEN)
             pContinuousPattern = dynamic_cast<ContinuousPattern*>(New->pattern.get());
-            if (pContinuousPattern != NULL)
+            if (pContinuousPattern != nullptr)
                 pContinuousPattern->wavePhase = Parse_Float();
             else
             {
@@ -2152,13 +2152,13 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
     END_EXPECT
 
-    if ((New->Type==AVERAGE_PATTERN) && (New->Blend_Map==NULL))
+    if ((New->Type == AVERAGE_PATTERN) && (New->Blend_Map == nullptr))
     {
         Error("Average must have map.");
     }
 
-    if ((TPat_Type==kBlendMapType_Texture) && (New->Type!=PLAIN_PATTERN) &&
-        (New->Blend_Map==NULL))
+    if ((TPat_Type == kBlendMapType_Texture) && (New->Type != PLAIN_PATTERN) &&
+        (New->Blend_Map == nullptr))
     {
         Error("Patterned texture must have texture_map.");
     }
@@ -2204,9 +2204,9 @@ void Parser::Parse_Tnormal (TNORMAL **Tnormal_Ptr)
         END_CASE
     END_EXPECT    /* End [tnormal_id] */
 
-    if (*Tnormal_Ptr == NULL)
+    if (*Tnormal_Ptr == nullptr)
     {
-        if ((Default_Texture->Tnormal) != NULL)
+        if (Default_Texture->Tnormal != nullptr)
         {
             *Tnormal_Ptr = Copy_Tnormal ((Default_Texture->Tnormal));
         }
@@ -2733,66 +2733,66 @@ TEXTURE *Parser::Parse_Texture ()
                 EXIT
             END_CASE
         END_EXPECT
-        }
-        else
-        {
-            /* Here it is not a PLAIN_PATTERN texture and since default textures
-               must be plain then this was a texture identifier that was a special
-               texture.  Allow transforms.  The "if(!Modified_Pnf)..." below
-               will always fail if we came here.  So we return after the
-               transforms. */
-            Parse_Texture_Transform(Texture);
-        }
+    }
+    else
+    {
+        /* Here it is not a PLAIN_PATTERN texture and since default textures
+           must be plain then this was a texture identifier that was a special
+           texture.  Allow transforms.  The "if(!Modified_Pnf)..." below
+           will always fail if we came here.  So we return after the
+           transforms. */
+        Parse_Texture_Transform(Texture);
+    }
 
-        /* If we've modified the default texture with a p,n, or f then this
-           has to stay a PLAIN_PATTERN pnf texture.  We won't allow
-           a texture_map or pattern.  Therefore quit now.
-         */
+    /* If we've modified the default texture with a p,n, or f then this
+       has to stay a PLAIN_PATTERN pnf texture.  We won't allow
+       a texture_map or pattern.  Therefore quit now.
+     */
 
-        if (!Modified_Pnf)
-        {
-            /* At this point we've either got a texture statement that had
-               no p, n or f.  Nor any texture identifier.  Its probably
-               a patterned texture_map texture. */
+    if (!Modified_Pnf)
+    {
+        /* At this point we've either got a texture statement that had
+           no p, n or f.  Nor any texture identifier.  Its probably
+           a patterned texture_map texture. */
 
-            EXPECT_ONE
-                CASE (TILES_TOKEN)
-                    Destroy_Textures (Texture);
-                    Texture = Parse_Tiles();
-                    if (Texture->Blend_Map->Blend_Map_Entries[1].Vals == NULL)
-                        Error("First texture missing from tiles");
-                    Parse_Texture_Transform(Texture);
-                END_CASE
+        EXPECT_ONE
+            CASE (TILES_TOKEN)
+                Destroy_Textures (Texture);
+                Texture = Parse_Tiles();
+                if (Texture->Blend_Map->Blend_Map_Entries[1].Vals == nullptr)
+                    Error("First texture missing from tiles");
+                Parse_Texture_Transform(Texture);
+            END_CASE
 
-                CASE (MATERIAL_MAP_TOKEN)
-                    Destroy_Textures (Texture);
-                    Texture = Parse_Material_Map ();
-                    Parse_Texture_Transform(Texture);
-                END_CASE
+            CASE (MATERIAL_MAP_TOKEN)
+                Destroy_Textures (Texture);
+                Texture = Parse_Material_Map ();
+                Parse_Texture_Transform(Texture);
+            END_CASE
 
-                OTHERWISE
-                    UNGET
-                    Destroy_Pigment(Texture->Pigment);
-                    Destroy_Tnormal(Texture->Tnormal);
-                    if (Texture->Finish)
-                        delete Texture->Finish;
-                    Texture->Pigment = NULL;
-                    Texture->Tnormal = NULL;
-                    Texture->Finish  = NULL;
-                    Parse_Pattern<TextureBlendMap>(Texture,kBlendMapType_Texture);
-                    /* if following is true, parsed "texture{}" so restore
-                       default texture.
-                     */
-                    if (Texture->Type <= PLAIN_PATTERN)
-                    {
-                        Destroy_Textures(Texture);
-                        Texture = Copy_Textures (Default_Texture);
-                    }
-                END_CASE
-            END_EXPECT
-        }
+            OTHERWISE
+                UNGET
+                Destroy_Pigment(Texture->Pigment);
+                Destroy_Tnormal(Texture->Tnormal);
+                if (Texture->Finish)
+                    delete Texture->Finish;
+                Texture->Pigment = nullptr;
+                Texture->Tnormal = nullptr;
+                Texture->Finish  = nullptr;
+                Parse_Pattern<TextureBlendMap>(Texture,kBlendMapType_Texture);
+                /* if following is true, parsed "texture{}" so restore
+                   default texture.
+                 */
+                if (Texture->Type <= PLAIN_PATTERN)
+                {
+                    Destroy_Textures(Texture);
+                    Texture = Copy_Textures (Default_Texture);
+                }
+            END_CASE
+        END_EXPECT
+    }
 
-        return (Texture);
+    return (Texture);
 }
 
 
@@ -2828,17 +2828,17 @@ TEXTURE *Parser::Parse_Tiles()
     Destroy_Tnormal(Texture->Tnormal);
     if (Texture->Finish)
         delete Texture->Finish;
-    Texture->Pigment = NULL;
-    Texture->Tnormal = NULL;
-    Texture->Finish  = NULL;
+    Texture->Pigment = nullptr;
+    Texture->Tnormal = nullptr;
+    Texture->Finish  = nullptr;
     Texture->Type = GENERIC_PATTERN;
     Texture->pattern = PatternPtr(new CheckerPattern());
 
     Texture->Blend_Map = Create_Blend_Map<TextureBlendMap> (kBlendMapType_Texture);
     Texture->Blend_Map->Blend_Map_Entries.resize(2);
-    Texture->Blend_Map->Blend_Map_Entries[0].Vals=NULL;
+    Texture->Blend_Map->Blend_Map_Entries[0].Vals = nullptr;
     Texture->Blend_Map->Blend_Map_Entries[0].value=0.0;
-    Texture->Blend_Map->Blend_Map_Entries[1].Vals=NULL;
+    Texture->Blend_Map->Blend_Map_Entries[1].Vals = nullptr;
     Texture->Blend_Map->Blend_Map_Entries[1].value=1.0;
 
     /* Note first tile is 1, 2nd tile is 0 to keep compatible with old tiles */
@@ -2912,9 +2912,9 @@ TEXTURE *Parser::Parse_Material_Map()
     Destroy_Tnormal(Texture->Tnormal);
     if (Texture->Finish)
         delete Texture->Finish;
-    Texture->Pigment = NULL;
-    Texture->Tnormal = NULL;
-    Texture->Finish  = NULL;
+    Texture->Pigment = nullptr;
+    Texture->Tnormal = nullptr;
+    Texture->Finish  = nullptr;
     Texture->Type = BITMAP_PATTERN;
 
     shared_ptr<ImagePattern> pattern(new ImagePattern()); // TODO REVIEW - other use cases set waveFrequency to 0.0
@@ -3018,7 +3018,7 @@ TEXTURE *Parser::Parse_Vers1_Texture ()
     EXPECT_ONE                      /* Look for texture_body */
         CASE (TILES_TOKEN)
             Texture = Parse_Tiles();
-            if (Texture->Blend_Map->Blend_Map_Entries[1].Vals == NULL)
+            if (Texture->Blend_Map->Blend_Map_Entries[1].Vals == nullptr)
                 Error("First texture missing from tiles");
         END_CASE
 
@@ -3293,7 +3293,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                     Warn_State(Token.Token_Id, NORMAL_TOKEN);
                     ADD_TNORMAL
                     pContinuousPattern = dynamic_cast<ContinuousPattern*>(Tnormal->pattern.get());
-                    if (pContinuousPattern != NULL)
+                    if (pContinuousPattern != nullptr)
                         pContinuousPattern->waveFrequency = Parse_Float();
                     else
                     {
@@ -3307,7 +3307,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                     Warn_State(Token.Token_Id, NORMAL_TOKEN);
                     ADD_TNORMAL
                     pContinuousPattern = dynamic_cast<ContinuousPattern*>(Tnormal->pattern.get());
-                    if (pContinuousPattern != NULL)
+                    if (pContinuousPattern != nullptr)
                         pContinuousPattern->wavePhase = Parse_Float();
                     else
                     {
@@ -3763,7 +3763,7 @@ void Parser::Parse_Interior(InteriorPtr& interior)
 
     EXPECT_ONE
         CASE(INTERIOR_ID_TOKEN)
-            if(Token.Data != NULL)
+            if (Token.Data != nullptr)
                 interior = InteriorPtr(new Interior(**reinterpret_cast<InteriorPtr *>(Token.Data)));
             else
                 interior = InteriorPtr(new Interior());
@@ -3962,13 +3962,13 @@ FOG *Parser::Parse_Fog()
         END_CASE
 
         CASE (TURBULENCE_TOKEN)
-            if (Fog->Turb == NULL)
+            if (Fog->Turb == nullptr)
                 Fog->Turb = new TurbulenceWarp();
             Parse_Vector(Fog->Turb->Turbulence);
         END_CASE
 
         CASE (OCTAVES_TOKEN)
-            if (Fog->Turb == NULL)
+            if (Fog->Turb == nullptr)
                 Fog->Turb = new TurbulenceWarp();
             Fog->Turb->Octaves = (int)Parse_Float();
             if(Fog->Turb->Octaves < 1)
@@ -3978,13 +3978,13 @@ FOG *Parser::Parse_Fog()
         END_CASE
 
         CASE (OMEGA_TOKEN)
-            if (Fog->Turb == NULL)
+            if (Fog->Turb == nullptr)
                 Fog->Turb = new TurbulenceWarp();
             Fog->Turb->Omega = Parse_Float();
         END_CASE
 
         CASE (LAMBDA_TOKEN)
-            if (Fog->Turb == NULL)
+            if (Fog->Turb == nullptr)
                 Fog->Turb = new TurbulenceWarp();
             Fog->Turb->Lambda = Parse_Float();
         END_CASE
@@ -4399,7 +4399,7 @@ void Parser::Check_BH_Parameters (BlackHoleWarp *bh)
 *
 * OUTPUT
 *
-*   Warps_Ptr : If *Warps_Ptr is NULL, a classic turb warp
+*   Warps_Ptr : If *Warps_Ptr is `nullptr`, a classic turb warp
 *   is created and a pointer to it is stored
 *
 * RETURNS
@@ -4426,7 +4426,7 @@ void Parser::Check_BH_Parameters (BlackHoleWarp *bh)
 
 ClassicTurbulence *Parser::Check_Turb (WarpList& warps, bool patternHandlesTurbulence)
 {
-    ClassicTurbulence* turb = NULL;
+    ClassicTurbulence* turb = nullptr;
     if (!warps.empty())
         turb = dynamic_cast<ClassicTurbulence*>(warps.front());
     if (!turb)
@@ -4462,7 +4462,7 @@ ClassicTurbulence *Parser::Check_Turb (WarpList& warps, bool patternHandlesTurbu
 
 void Parser::Parse_Warp (WarpList& warps)
 {
-    GenericWarp *New = NULL;
+    GenericWarp *New = nullptr;
     TurbulenceWarp *Turb;
     RepeatWarp *Repeat;
     BlackHoleWarp *Black_Hole;
@@ -4691,7 +4691,7 @@ void Parser::Parse_Warp (WarpList& warps)
         END_CASE
     END_EXPECT
 
-    if (New==NULL)
+    if (New == nullptr)
     {
         Error("Empty warp statement.");
     }
@@ -4720,7 +4720,7 @@ void Parser::Parse_Material(MATERIAL *Material)
             Int_Texture = Copy_Textures(Temp->Interior_Texture);
             Link_Textures(&(Material->Texture),Texture);
             Link_Textures(&(Material->Interior_Texture),Int_Texture);
-            if (Temp->interior != NULL)
+            if (Temp->interior != nullptr)
                 Material->interior = InteriorPtr(new Interior(*(Temp->interior)));
             else
                 Material->interior.reset();
@@ -4754,7 +4754,7 @@ void Parser::Parse_Material(MATERIAL *Material)
             Parse_Vector (Local_Vector);
             Compute_Translation_Transform(&Local_Trans, Local_Vector);
             Transform_Textures (Material->Texture, &Local_Trans);
-            if(Material->interior!= NULL)
+            if (Material->interior!= nullptr)
                 Material->interior->Transform(&Local_Trans);
         END_CASE
 
@@ -4762,7 +4762,7 @@ void Parser::Parse_Material(MATERIAL *Material)
             Parse_Vector (Local_Vector);
             Compute_Rotation_Transform(&Local_Trans, Local_Vector);
             Transform_Textures (Material->Texture, &Local_Trans);
-            if(Material->interior!= NULL)
+            if (Material->interior!= nullptr)
                 Material->interior->Transform(&Local_Trans);
         END_CASE
 
@@ -4770,7 +4770,7 @@ void Parser::Parse_Material(MATERIAL *Material)
             Parse_Scale_Vector (Local_Vector);
             Compute_Scaling_Transform(&Local_Trans, Local_Vector);
             Transform_Textures (Material->Texture, &Local_Trans);
-            if(Material->interior!= NULL)
+            if (Material->interior!= nullptr)
                 Material->interior->Transform(&Local_Trans);
         END_CASE
 
@@ -4778,14 +4778,14 @@ void Parser::Parse_Material(MATERIAL *Material)
             Parse_Matrix(Local_Matrix);
             Compute_Matrix_Transform(&Local_Trans, Local_Matrix);
             Transform_Textures (Material->Texture, &Local_Trans);
-            if(Material->interior!= NULL)
+            if (Material->interior!= nullptr)
                 Material->interior->Transform(&Local_Trans);
         END_CASE
 
         CASE (TRANSFORM_TOKEN)
             Parse_Transform(&Local_Trans);
             Transform_Textures (Material->Texture, &Local_Trans);
-            if(Material->interior!= NULL)
+            if (Material->interior!= nullptr)
                 Material->interior->Transform(&Local_Trans);
         END_CASE
 
@@ -5311,7 +5311,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 
         CASE (FREQUENCY_TOKEN)
             pContinuousPattern = dynamic_cast<ContinuousPattern*>(New->pattern.get());
-            if (pContinuousPattern != NULL)
+            if (pContinuousPattern != nullptr)
                 pContinuousPattern->waveFrequency = Parse_Float();
             else
             {
@@ -5322,7 +5322,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 
         CASE (RAMP_WAVE_TOKEN)
             pContinuousPattern = dynamic_cast<ContinuousPattern*>(New->pattern.get());
-            if (pContinuousPattern != NULL)
+            if (pContinuousPattern != nullptr)
                 pContinuousPattern->waveType = kWaveType_Ramp;
             else
                 Warning("ramp_wave has no effect on discrete patterns");
@@ -5330,7 +5330,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 
         CASE (TRIANGLE_WAVE_TOKEN)
             pContinuousPattern = dynamic_cast<ContinuousPattern*>(New->pattern.get());
-            if (pContinuousPattern != NULL)
+            if (pContinuousPattern != nullptr)
                 pContinuousPattern->waveType = kWaveType_Triangle;
             else
                 Warning("triangle_wave has no effect on discrete patterns");
@@ -5338,7 +5338,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 
         CASE (SINE_WAVE_TOKEN)
             pContinuousPattern = dynamic_cast<ContinuousPattern*>(New->pattern.get());
-            if (pContinuousPattern != NULL)
+            if (pContinuousPattern != nullptr)
                 pContinuousPattern->waveType = kWaveType_Sine;
             else
                 Warning("sine_wave has no effect on discrete patterns");
@@ -5346,7 +5346,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 
         CASE (SCALLOP_WAVE_TOKEN)
             pContinuousPattern = dynamic_cast<ContinuousPattern*>(New->pattern.get());
-            if (pContinuousPattern != NULL)
+            if (pContinuousPattern != nullptr)
                 pContinuousPattern->waveType = kWaveType_Scallop;
             else
                 Warning("scallop_wave has no effect on discrete patterns");
@@ -5354,7 +5354,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 
         CASE (CUBIC_WAVE_TOKEN)
             pContinuousPattern = dynamic_cast<ContinuousPattern*>(New->pattern.get());
-            if (pContinuousPattern != NULL)
+            if (pContinuousPattern != nullptr)
                 pContinuousPattern->waveType = kWaveType_Cubic;
             else
                 Warning("cubic_wave has no effect on discrete patterns");
@@ -5362,7 +5362,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 
         CASE (POLY_WAVE_TOKEN)
             pContinuousPattern = dynamic_cast<ContinuousPattern*>(New->pattern.get());
-            if (pContinuousPattern != NULL)
+            if (pContinuousPattern != nullptr)
             {
                 pContinuousPattern->waveType = kWaveType_Poly;
                 pContinuousPattern->waveExponent  = Allow_Float(pContinuousPattern->waveExponent);
@@ -5376,7 +5376,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 
         CASE (PHASE_TOKEN)
             pContinuousPattern = dynamic_cast<ContinuousPattern*>(New->pattern.get());
-            if (pContinuousPattern != NULL)
+            if (pContinuousPattern != nullptr)
                 pContinuousPattern->wavePhase = Parse_Float();
             else
             {

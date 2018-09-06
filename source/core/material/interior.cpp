@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -163,8 +163,8 @@ MATERIAL *Create_Material()
 
     New = new MATERIAL;
 
-    New->Texture  = NULL;
-    New->Interior_Texture  = NULL;
+    New->Texture  = nullptr;
+    New->Interior_Texture  = nullptr;
     New->interior.reset();
 
     return(New);
@@ -174,7 +174,7 @@ MATERIAL *Copy_Material(const MATERIAL *Old)
 {
     MATERIAL *New;
 
-    if (Old != NULL)
+    if (Old != nullptr)
     {
         New = Create_Material();
 
@@ -182,20 +182,20 @@ MATERIAL *Copy_Material(const MATERIAL *Old)
 
         New->Texture  = Copy_Textures(Old->Texture);
         New->Interior_Texture  = Copy_Textures(Old->Interior_Texture);
-        if (Old->interior != NULL)
+        if (Old->interior != nullptr)
             New->interior = InteriorPtr(new Interior(*(Old->interior)));
 
         return(New);
     }
     else
     {
-        return(NULL);
+        return nullptr;
     }
 }
 
 void Destroy_Material(MATERIAL *Material)
 {
-    if (Material != NULL)
+    if (Material != nullptr)
     {
         Destroy_Textures(Material->Texture);
         Destroy_Textures(Material->Interior_Texture);

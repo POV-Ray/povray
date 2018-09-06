@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -964,14 +964,14 @@ TRANSFORM *Create_Transform()
 TRANSFORM *Copy_Transform (const TRANSFORM*Old)
 {
     TRANSFORM *New;
-    if (Old != NULL)
+    if (Old != nullptr)
     {
         New  = Create_Transform ();
         *New = *Old;
     }
     else
     {
-        New = NULL;
+        New = nullptr;
     }
 
     return (New);
@@ -1005,7 +1005,7 @@ TRANSFORM *Copy_Transform (const TRANSFORM*Old)
 
 void Destroy_Transform (TRANSFORM *Trans)
 {
-    if(Trans != NULL)
+    if (Trans != nullptr)
         delete Trans;
 }
 

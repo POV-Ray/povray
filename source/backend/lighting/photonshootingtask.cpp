@@ -329,7 +329,7 @@ void PhotonShootingTask::ShootPhotonsAtObject(LightTargetCombo& combo)
                         /* try to intersect ray with projected-through ObjectPtr */
                         Intersection Intersect;
 
-                        Intersect.Object = NULL;
+                        Intersect.Object = nullptr;
                         if ( trace.FindIntersection(combo.light->Projected_Through_Object, Intersect, ray) )
                         {
                             /* we must recompute the media containers (new start point) */

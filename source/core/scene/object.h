@@ -191,7 +191,7 @@ class ObjectBase
         /// Construct object from scratch.
         ObjectBase(int t) :
             Type(t),
-            Texture(NULL), Interior_Texture(NULL), interior(), Trans(NULL),
+            Texture(nullptr), Interior_Texture(nullptr), interior(), Trans(nullptr),
             Ph_Density(0), RadiosityImportance(0.0), RadiosityImportanceSet(false), Flags(0)
         {
             Make_BBox(BBox, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
@@ -212,10 +212,10 @@ class ObjectBase
         {
             if (transplant)
             {
-                o.Texture = NULL;
-                o.Interior_Texture = NULL;
+                o.Texture = nullptr;
+                o.Interior_Texture = nullptr;
                 o.interior.reset();
-                o.Trans = NULL;
+                o.Trans = nullptr;
                 o.Bound.clear();
                 o.Clip.clear();
                 o.LLights.clear();

@@ -91,9 +91,9 @@ FNCode::FNCode(Parser *pa, FunctionCode *f, bool is_local, const char *n)
     unsigned int i = 0;
 
 #if (DEBUG_FLOATFUNCTION == 1)
-    asm_input = NULL;
-    asm_output = NULL;
-    asm_error = NULL;
+    asm_input = nullptr;
+    asm_output = nullptr;
+    asm_error = nullptr;
 #endif
 
     max_program_size = 0;
@@ -107,7 +107,7 @@ FNCode::FNCode(Parser *pa, FunctionCode *f, bool is_local, const char *n)
 
     function = f;
 
-    function->program = NULL;
+    function->program = nullptr;
     function->program_size = 0;
     function->return_size = 0; // zero implies return in register r0
     function->parameter_cnt = 0;
@@ -115,16 +115,16 @@ FNCode::FNCode(Parser *pa, FunctionCode *f, bool is_local, const char *n)
     for(i = 0; i < MAX_FUNCTION_PARAMETER_LIST; i++)
     {
         function->localvar_pos[i] = 0;
-        function->localvar[i] = NULL;
-        function->parameter[i] = NULL;
+        function->localvar[i] = nullptr;
+        function->parameter[i] = nullptr;
     }
 
-    if(n != NULL)
+    if (n != nullptr)
         function->sourceInfo.name = POV_STRDUP(n);
     else
         function->sourceInfo.name = POV_STRDUP("");
     function->sourceInfo.filename = parser->UCS2_strdup(parser->Token.FileHandle->name());
-    if(parser->Token.FileHandle != NULL)
+    if (parser->Token.FileHandle != nullptr)
         function->sourceInfo.filepos = parser->Token.FileHandle->tellg();
     else
     {
@@ -133,9 +133,9 @@ FNCode::FNCode(Parser *pa, FunctionCode *f, bool is_local, const char *n)
     }
     function->sourceInfo.col = parser->Token.Token_Col_No;
     function->flags = 0;
-    function->private_copy_method = NULL;
-    function->private_destroy_method = NULL;
-    function->private_data = NULL;
+    function->private_copy_method = nullptr;
+    function->private_destroy_method = nullptr;
+    function->private_data = nullptr;
 
     if(is_local == true)
         function->flags |= FN_LOCAL_FLAG;
@@ -246,23 +246,23 @@ void FNCode::Compile(ExprNode *expression)
     function->program = reinterpret_cast<Instruction *>(POV_MALLOC(sizeof(Instruction) * max_program_size, "fn: program"));
 
 #if (DEBUG_FLOATFUNCTION == 1)
-    if(asm_input != NULL)
+    if (asm_input != nullptr)
     {
-        asm_error = NULL;
+        asm_error = nullptr;
         if(assemble(asm_input) < 0)
         {
             POV_FREE(asm_input);
-            asm_input = NULL;
+            asm_input = nullptr;
             Error("Assembler Error: %s", asm_error);
         }
-        else if(asm_error != NULL)
+        else if (asm_error != nullptr)
         {
             POV_FREE(asm_input);
-            asm_input = NULL;
+            asm_input = nullptr;
             Expectation_Error("valid function expression");
         }
         POV_FREE(asm_input);
-        asm_input = NULL;
+        asm_input = nullptr;
     }
     else // this is intentional [trf]
 #endif
@@ -326,23 +326,23 @@ void FNCode::Compile(ExprNode *expression)
     function->program = reinterpret_cast<Instruction *>(POV_REALLOC(function->program, sizeof(Instruction) * function->program_size, "fn: program"));
 
 #if (DEBUG_FLOATFUNCTION == 1)
-    if(asm_output != NULL)
+    if (asm_output != nullptr)
     {
-        asm_error = NULL;
+        asm_error = nullptr;
         if(disassemble(asm_output) < 0)
         {
             POV_FREE(asm_output);
-            asm_output = NULL;
+            asm_output = nullptr;
             Error("Disassembler Error: %s", asm_error);
         }
-        else if(asm_error != NULL)
+        else if (asm_error != nullptr)
         {
             POV_FREE(asm_output);
-            asm_output = NULL;
+            asm_output = nullptr;
             Expectation_Error("valid function expression");
         }
         POV_FREE(asm_output);
-        asm_output = NULL;
+        asm_output = nullptr;
     }
 #endif
 }
@@ -382,17 +382,17 @@ void FNCode_Copy(FunctionCode *f, FunctionCode *fnew)
 {
     int i;
 
-    if(f->program != NULL)
+    if (f->program != nullptr)
     {
         fnew->program = reinterpret_cast<Instruction *>(POV_MALLOC(sizeof(Instruction) * f->program_size, "fn: program"));
         POV_MEMCPY(fnew->program, f->program, sizeof(Instruction) * f->program_size);
     }
-    if(f->name != NULL)
+    if (f->name != nullptr)
     {
         fnew->name = reinterpret_cast<char *>(POV_MALLOC((UCS2_strlen(f->name) + 1) * sizeof(UCS2), "fn: name"));
         UCS2_strcpy(fnew->name, f->name);
     }
-    if(f->filename != NULL)
+    if (f->filename != nullptr)
     {
         fnew->filename = reinterpret_cast<char *>(POV_MALLOC(strlen(f->filename) + 1, "fn: scene file name"));
         strcpy(fnew->filename, f->filename);
@@ -412,12 +412,12 @@ void FNCode_Copy(FunctionCode *f, FunctionCode *fnew)
 
     fnew->private_copy_method = f->private_copy_method;
     fnew->private_destroy_method = f->private_destroy_method;
-    if(f->private_data != NULL)
+    if (f->private_data != nullptr)
     {
-        if(f->private_copy_method != NULL)
+        if (f->private_copy_method != nullptr)
             fnew->private_data = f->private_copy_method(f->private_data);
         else
-            fnew->private_data = NULL;
+            fnew->private_data = nullptr;
     }
 }
 */
@@ -456,13 +456,13 @@ void FNCode::SetFlag(unsigned int flag, char *str)
 {
     if(flag == 1)
     {
-        if(asm_input != NULL)
+        if (asm_input != nullptr)
             POV_FREE(asm_input);
         asm_input = POV_STRDUP(str);
     }
     else if(flag == 2)
     {
-        if(asm_output != NULL)
+        if (asm_output != nullptr)
             POV_FREE(asm_output);
         asm_output = POV_STRDUP(str);
     }
@@ -500,16 +500,16 @@ void FNCode::SetFlag(unsigned int flag, char *str)
 
 void FNCode::compile_recursive(ExprNode *expr)
 {
-    POV_PARSER_ASSERT(expr != NULL);
+    POV_PARSER_ASSERT(expr != nullptr);
 
     unsigned int local_k = 0;
 
     if(expr->op <= OP_LEFTMOST)
         local_k = compile_push_result();
 
-    for(ExprNode *i = expr; i != NULL; i = i->next)
+    for (ExprNode *i = expr; i != nullptr; i = i->next)
     {
-        if(i->child != NULL)
+        if (i->child != nullptr)
         {
             if(i->child->op == OP_CONSTANT)
             {
@@ -830,7 +830,7 @@ void FNCode::compile_call(ExprNode *expr, FUNCTION fn, int token, char *name)
     unsigned int k = 0;
     int op_state = 1;
 
-    if(expr == NULL)
+    if (expr == nullptr)
         parser->Error("Invalid number of parameters: At least one parameter expected!");
 
     switch(token)
@@ -957,12 +957,12 @@ void FNCode::compile_call(ExprNode *expr, FUNCTION fn, int token, char *name)
             if(domain_check != 0)
                 compile_instruction(domain_check, 0, 0, 0);
             compile_instruction(OPCODE_SYS1, 0, 0, k);
-            if(expr->next != NULL)
+            if (expr->next != nullptr)
                 parser->Error("Invalid number of parameters for '%s': Only one parameter expected!", name);
             break;
         case 2: // two parameters
             // first evaluate right parameter
-            if(expr->next == NULL)
+            if (expr->next == nullptr)
                 parser->Error("Invalid number of parameters for '%s': Two parameters expected!", name);
             compile_recursive(expr->next->child);
             if(domain_check_2nd != 0)
@@ -978,28 +978,28 @@ void FNCode::compile_call(ExprNode *expr, FUNCTION fn, int token, char *name)
             compile_instruction(OPCODE_MOVE, 5, 1, 0);
             compile_pop_result(local_k);
             // make sure there are not more than 2 parameters
-            if(expr->next->next != NULL)
+            if (expr->next->next != nullptr)
                 parser->Error("Invalid number of parameters for '%s': Only two parameters expected!", name);
             compile_instruction(OPCODE_SYS2, 0, 0, k);
             break;
         case 3: // radians
             compile_recursive(expr->child);
             compile_instruction(OPCODE_MULI, 0, 0, functionVM->AddConstant(M_PI / 180.0));
-            if(expr->next != NULL)
+            if (expr->next != nullptr)
                 parser->Error("Invalid number of parameters for '%s': Only one parameter expected!", name);
             break;
         case 4: // degrees
             compile_recursive(expr->child);
             compile_instruction(OPCODE_MULI, 0, 0, functionVM->AddConstant(180.0 / M_PI));
-            if(expr->next != NULL)
+            if (expr->next != nullptr)
                 parser->Error("Invalid number of parameters for '%s': Only one parameter expected!", name);
             break;
         case 5: // min
             compile_recursive(expr->child);
-            if(expr->next == NULL)
+            if (expr->next == nullptr)
                 parser->Error("Invalid number of parameters for '%s': At least two parameters expected!", name);
             // compare all parameters, searching for minimum
-            for(expr = expr->next; expr != NULL; expr = expr->next)
+            for (expr = expr->next; expr != nullptr; expr = expr->next)
             {
                 // temporary storage of last minimum in r5
                 local_k = compile_push_result();
@@ -1016,10 +1016,10 @@ void FNCode::compile_call(ExprNode *expr, FUNCTION fn, int token, char *name)
             break;
         case 6: // max
             compile_recursive(expr->child);
-            if(expr->next == NULL)
+            if (expr->next == nullptr)
                 parser->Error("Invalid number of parameters for '%s': At least two parameters expected!", name);
             // compare all parameters, searching for maximum
-            for(expr = expr->next; expr != NULL; expr = expr->next)
+            for (expr = expr->next; expr != nullptr; expr = expr->next)
             {
                 // temporary storage of last maximum in r5
                 local_k = compile_push_result();
@@ -1037,7 +1037,7 @@ void FNCode::compile_call(ExprNode *expr, FUNCTION fn, int token, char *name)
         case 7: // abs
             compile_recursive(expr->child);
             compile_instruction(OPCODE_ABS, 0, 0, 0);
-            if(expr->next != NULL)
+            if (expr->next != nullptr)
                 parser->Error("Invalid number of parameters for '%s': Only one parameter expected!", name);
             break;
         case 8: // select
@@ -1051,7 +1051,7 @@ void FNCode::compile_call(ExprNode *expr, FUNCTION fn, int token, char *name)
             break;
         case 11: // pow
             // first evaluate right parameter
-            if(expr->next == NULL)
+            if (expr->next == nullptr)
                 parser->Error("Invalid number of parameters for '%s': Two parameters expected!", name);
             compile_recursive(expr->next->child);
             // temporary storage of right parameter in r5
@@ -1065,14 +1065,14 @@ void FNCode::compile_call(ExprNode *expr, FUNCTION fn, int token, char *name)
             // check domain error (if r0 and r1 are zero)
             compile_instruction(OPCODE_XDZ, 0, 1, 0);
             // make sure there are not more than 2 parameters
-            if(expr->next->next != NULL)
+            if (expr->next->next != nullptr)
                 parser->Error("Invalid number of parameters for '%s': Only two parameters expected!", name);
             compile_instruction(OPCODE_SYS2, 0, 0, k);
             break;
         case 12: // sqr
             compile_recursive(expr->child);
             compile_instruction(OPCODE_MUL, 0, 0, 0);
-            if(expr->next != NULL)
+            if (expr->next != nullptr)
                 parser->Error("Invalid number of parameters for '%s': Only one parameter expected!", name);
             break;
         case 13: // sum
@@ -1122,13 +1122,13 @@ void FNCode::compile_select(ExprNode *expr)
     unsigned int all_end;
     bool have_fourth = false;
 
-    if(expr->next == NULL) // second
+    if (expr->next == nullptr) // second
         parser->Error("Invalid number of parameters: Three or four parameters expected!");
-    if(expr->next->next == NULL) // third
+    if (expr->next->next == nullptr) // third
         parser->Error("Invalid number of parameters: Three or four parameters expected!");
-    if(expr->next->next->next != NULL) // fourth
+    if (expr->next->next->next != nullptr) // fourth
     {
-        if(expr->next->next->next->next != NULL) // fifth
+        if (expr->next->next->next->next != nullptr) // fifth
             parser->Error("Invalid number of parameters: Only three or four parameters expected!");
         have_fourth = true;
     }
@@ -1206,13 +1206,13 @@ void FNCode::compile_seq_op(ExprNode *expr, unsigned int op, DBL neutral)
     unsigned int var_sp;
     unsigned int r5_content;
 
-    if(expr->next == NULL) // second
+    if (expr->next == nullptr) // second
         parser->Error("Invalid number of parameters: Four parameters expected!");
-    if(expr->next->next == NULL) // third
+    if (expr->next->next == nullptr) // third
         parser->Error("Invalid number of parameters: Four parameters expected!");
-    if(expr->next->next->next == NULL) // fourth
+    if (expr->next->next->next == nullptr) // fourth
         parser->Error("Invalid number of parameters: Four parameters expected!");
-    if(expr->next->next->next->next != NULL) // fifth
+    if (expr->next->next->next->next != nullptr) // fifth
         parser->Error("Invalid number of parameters: Only four parameters expected!");
 
     // create a local variable, the sum and its limit on the stack
@@ -1299,7 +1299,7 @@ void FNCode::compile_seq_op(ExprNode *expr, unsigned int op, DBL neutral)
     // remove the local variable, the sum and its limit from the stack
     function->localvar_cnt--;
     function->localvar_pos[function->localvar_cnt] = 0;
-    function->localvar[function->localvar_cnt] = NULL;
+    function->localvar[function->localvar_cnt] = nullptr;
 
     level = old_level;
     // restore r5 content
@@ -1339,8 +1339,8 @@ void FNCode::compile_seq_op(ExprNode *expr, unsigned int op, DBL neutral)
 
 void FNCode::compile_float_function_call(ExprNode *expr, FUNCTION fn, char *name)
 {
-    FunctionCode *f = NULL;
-    ExprNode *i = NULL;
+    FunctionCode *f = nullptr;
+    ExprNode *i = nullptr;
     unsigned int cur_p = 0;
     unsigned int local_k = 0;
     unsigned int old_sp = 0;
@@ -1418,7 +1418,7 @@ void FNCode::compile_float_function_call(ExprNode *expr, FUNCTION fn, char *name
     max_stack_size = (unsigned int)max((int)stack_pointer, (int)max_stack_size);
 
     // determine all the parameters
-    for(i = expr, cur_p = 0; i != NULL; i = i->next, cur_p++)
+    for (i = expr, cur_p = 0; i != nullptr; i = i->next, cur_p++)
     {
         // compile the parameter expression
         compile_recursive(i->child);
@@ -1494,8 +1494,8 @@ void FNCode::compile_float_function_call(ExprNode *expr, FUNCTION fn, char *name
 
 void FNCode::compile_vector_function_call(ExprNode *expr, FUNCTION fn, char *name)
 {
-    FunctionCode *f = NULL;
-    ExprNode *i = NULL;
+    FunctionCode *f = nullptr;
+    ExprNode *i = nullptr;
     unsigned int cur_p = 0;
     unsigned int local_k = 0;
     unsigned int old_sp = 0;
@@ -1576,7 +1576,7 @@ void FNCode::compile_vector_function_call(ExprNode *expr, FUNCTION fn, char *nam
     max_stack_size = (unsigned int)max((int)stack_pointer, (int)max_stack_size);
 
     // determine all the parameters
-    for(i = expr, cur_p = 0; i != NULL; i = i->next, cur_p++)
+    for (i = expr, cur_p = 0; i != nullptr; i = i->next, cur_p++)
     {
         // compile the parameter expression
         compile_recursive(i->child);
@@ -2114,7 +2114,7 @@ int FNCode::disassemble(char *filename)
     else
     {
         f = fopen(filename, "w");
-        if(f == NULL)
+        if (f == nullptr)
         {
             asm_error = "Cannot open disassembler output file.";
             return 1;
@@ -2170,7 +2170,7 @@ void FNCode::disassemble_instruction(FILE *f, Instruction& i)
     program_op = GET_OP(i);
     program_k = GET_K(i);
 
-    for(ii = 0; POVFPU_Opcodes[ii].name != NULL; ii++)
+    for (ii = 0; POVFPU_Opcodes[ii].name != nullptr; ii++)
     {
         op = POVFPU_Opcodes[ii].code;
         switch(POVFPU_Opcodes[ii].type)

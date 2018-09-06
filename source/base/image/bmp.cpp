@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -524,7 +524,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     unsigned file_depth, file_colors;
     unsigned data_location, planes, compression;
     unsigned info;
-    Image *image = NULL ;
+    Image *image = nullptr;
 
     // BMP files used to have no clearly defined gamma by default, but a Microsoft recommendation exists to assume sRGB.
     // Since ~1995, a header extension (BITMAPV4HEADER) with gamma metadata exists, which could be used if present.

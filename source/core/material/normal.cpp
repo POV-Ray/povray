@@ -17,7 +17,7 @@
 /// ----------------------------------------------------------------------------
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -126,7 +126,7 @@ static void ripples (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& n
     Vector3d point;
 
     RipplesPattern* pPat = dynamic_cast<RipplesPattern*>(Tnormal->pattern.get());
-    if (pPat == NULL)
+    if (pPat == nullptr)
         throw POV_EXCEPTION_STRING("Invalid pattern type.");
 
     for (i = 0; i < Thread->numberOfWaves; i++)
@@ -176,7 +176,7 @@ static void waves (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& nor
     Vector3d point;
 
     WavesPattern* pPat = dynamic_cast<WavesPattern*>(Tnormal->pattern.get());
-    if (pPat == NULL)
+    if (pPat == nullptr)
         throw POV_EXCEPTION_STRING("Invalid pattern type.");
 
     for (i = 0; i < Thread->numberOfWaves; i++)
@@ -635,7 +635,7 @@ TNORMAL *Copy_Tnormal (TNORMAL *Old)
 {
     TNORMAL *New;
 
-    if (Old != NULL)
+    if (Old != nullptr)
     {
         New = Create_Tnormal();
 
@@ -647,7 +647,7 @@ TNORMAL *Copy_Tnormal (TNORMAL *Old)
     }
     else
     {
-        New = NULL;
+        New = nullptr;
     }
 
     return (New);
@@ -679,7 +679,7 @@ TNORMAL *Copy_Tnormal (TNORMAL *Old)
 
 void Destroy_Tnormal(TNORMAL *Tnormal)
 {
-    if (Tnormal != NULL)
+    if (Tnormal != nullptr)
         delete Tnormal;
 }
 
@@ -711,7 +711,7 @@ void Post_Tnormal (TNORMAL *Tnormal)
 {
     GenericNormalBlendMapPtr Map;
 
-    if (Tnormal != NULL)
+    if (Tnormal != nullptr)
     {
         if (Tnormal->Flags & POST_DONE)
         {
@@ -725,7 +725,7 @@ void Post_Tnormal (TNORMAL *Tnormal)
 
         Tnormal->Flags |= POST_DONE;
 
-        if ((Map = Tnormal->Blend_Map) != NULL)
+        if ((Map = Tnormal->Blend_Map) != nullptr)
         {
             Map->Post((Tnormal->Flags & DONT_SCALE_BUMPS_FLAG) != 0);
         }
@@ -780,7 +780,7 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
     int i;
     shared_ptr<NormalBlendMap> Blend_Map;
 
-    if (Tnormal==NULL)
+    if (Tnormal == nullptr)
     {
         return;
     }
@@ -788,7 +788,7 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
     /* If normal_map present, use it and return */
 
     Blend_Map = dynamic_pointer_cast<NormalBlendMap>(Tnormal->Blend_Map);
-    if (Blend_Map != NULL)
+    if (Blend_Map != nullptr)
     {
         if (Tnormal->Type == UV_MAP_PATTERN)
         {
@@ -923,7 +923,7 @@ static DBL Do_Slope_Map (DBL value, const SlopeBlendMap *Blend_Map)
     DBL prevWeight, curWeight;
     const SlopeBlendMapEntry *Prev, *Cur;
 
-    if (Blend_Map == NULL)
+    if (Blend_Map == nullptr)
     {
         return(value);
     }
