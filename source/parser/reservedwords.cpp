@@ -580,6 +580,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { UTF8_TOKEN,                   "utf8" },
     { UV_INDICES_TOKEN,             "uv_indices" },
     { UV_MAPPING_TOKEN,             "uv_mapping" },
+    { UV_REFERENCE_TOKEN,           "uv_reference" },
     { UV_VECTORS_TOKEN,             "uv_vectors" },
 
     { V_TOKEN,                      "v" },
