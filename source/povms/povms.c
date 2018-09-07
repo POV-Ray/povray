@@ -68,8 +68,23 @@ using namespace pov_base;
     #define POVMS_ASSERT(c,s) POVMS_AssertFunction(c, s, __FILE__, __LINE__)
 #endif
 
-static const unsigned char kPOVMSStreamFalse    = 0x00;
-static const unsigned char kPOVMSStreamTrue     = 0xFF;
+static const int kPOVMSMagicSize                            = 8;
+static const int kPOVMSQueueMagic                           = 0x12345678;
+
+static const unsigned char kPOVMSStreamFalse                = 0x00;
+static const unsigned char kPOVMSStreamTrue                 = 0xFF;
+
+#define kPOVMSStreamIntSize     4   // size of an integer number in stream
+#define kPOVMSStreamLongSize    8   // size of a long integer number in stream
+#define kPOVMSStreamFloatSize   4   // size of a floating-point number in stream
+#define kPOVMSStreamTypeSize    4   // size of a type code in stream
+#define kPOVMSStreamUCS2Size    2   // size of a UCS2 character in stream
+
+enum {
+    kPOVMSAddress_Sys           = 1,
+    kPOVMSAddress_TCPIPv4       = 4,
+    kPOVMSAddress_TCPIPv6       = 6
+};
 
 typedef struct POVMS_Sys_QueueNode_Default POVMS_Sys_QueueNode_Default;
 typedef struct POVMS_Sys_QueueDataNode_Default POVMS_Sys_QueueDataNode_Default;
@@ -174,12 +189,12 @@ struct POVMS_Sys_QueueNode_Default
 
     struct POVMSMemoryTraceHeader
     {
-        char magichead[8];
+        char magichead[kPOVMSMagicSize];
         POVMSMemoryTraceHeader *last;
         POVMSMemoryTraceHeader *next;
         int line;
         int size;
-        char magictrail[8];
+        char magictrail[kPOVMSMagicSize];
     };
 #endif
 
@@ -219,11 +234,11 @@ struct POVMSContextData
 
 struct
 {
-    int int_write[4],   int_read[4];
-    int long_write[8],  long_read[8];
-    int float_write[4], float_read[4];
-    int type_write[4],  type_read[4];
-    int ucs2_write[2],  ucs2_read[2];
+    int int_write[kPOVMSStreamIntSize],     int_read[kPOVMSStreamIntSize];
+    int long_write[kPOVMSStreamLongSize],   long_read[kPOVMSStreamLongSize];
+    int float_write[kPOVMSStreamFloatSize], float_read[kPOVMSStreamFloatSize];
+    int type_write[kPOVMSStreamTypeSize],   type_read[kPOVMSStreamTypeSize];
+    int ucs2_write[kPOVMSStreamUCS2Size],   ucs2_read[kPOVMSStreamUCS2Size];
 } POVMSStreamOrderTables;
 
 
@@ -529,7 +544,7 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMS_ProcessMessages(POVMSContext contextr
     POVMSInt totalsize = 0;
     POVMSInt datasize = 0;
     POVMSInt version = 0;
-    char header[8];
+    char header[kPOVMSMagicSize];
     POVMSResult err = kNoErr;
     int maxsize = 0;
 
@@ -551,7 +566,7 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMS_ProcessMessages(POVMSContext contextr
         result.size = 0;
         result.root = NULL;
 
-        datasize += POVMSStream_ReadString(header, stream, 8, &maxsize);               // header       8 byte
+        datasize += POVMSStream_ReadString(header, stream, kPOVMSMagicSize, &maxsize); // header       8 byte
         if(!((header[0] == 'P') && (header[1] == 'O') && (header[2] == 'V') && (header[3] == 'R') &&
              (header[4] == 'A') && (header[5] == 'Y') && (header[6] == 'M') && (header[7] == 'S')))
             err = kCannotHandleDataErr;
@@ -759,9 +774,12 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMS_Send(POVMSContext contextref, POVMSOb
         else
             objectcnt = 1;
 
-        totalsize = 8 + 4 + 4 + 4 + 4 + 4 + msgsize;
+        totalsize =         kPOVMSMagicSize     // header
+                  +     5 * kPOVMSStreamIntSize // version, total size, flags, object count, objects size
+                  +         msgsize;            // message
         if(result != NULL)
-            totalsize = totalsize + 4 + resultsize;
+            totalsize +=    kPOVMSStreamIntSize // result object size
+                       +    resultsize;         // result
         maxsize = totalsize;
 
         POVMSStream *stream = (POVMSStream *)POVMS_Sys_Malloc(totalsize);
@@ -1004,6 +1022,14 @@ POVMSReceiveHandlerNode *POVMS_FindReceiveHandlerNode(POVMSContextData *context,
 *
 ******************************************************************************/
 
+#ifdef __cplusplus
+static_assert(kPOVMSStreamIntSize   == sizeof(POVMSInt),       "Unexpected type size. POVMSStream_Init (and possibly other code portions) may not work properly.");
+static_assert(kPOVMSStreamLongSize  == sizeof(POVMSLong),      "Unexpected type size. POVMSStream_Init (and possibly other code portions) may not work properly.");
+static_assert(kPOVMSStreamFloatSize == sizeof(POVMSIEEEFloat), "Unexpected type size. POVMSStream_Init (and possibly other code portions) may not work properly.");
+static_assert(kPOVMSStreamTypeSize  == sizeof(POVMSType),      "Unexpected type size. POVMSStream_Init (and possibly other code portions) may not work properly.");
+static_assert(kPOVMSStreamUCS2Size  == sizeof(POVMSUCS2),      "Unexpected type size. POVMSStream_Init (and possibly other code portions) may not work properly.");
+#endif
+
 void POVMSStream_Init()
 {
 #ifndef POVMS_NO_ORDERED_STREAM_DATA
@@ -1029,33 +1055,33 @@ void POVMSStream_Init()
     stream[6] = 7;
     stream[7] = 8;
 
-    POVMSStream_BuildOrderTable((POVMSStream *)&data_int, stream, POVMSStreamOrderTables.int_write, 4);
-    POVMSStream_BuildOrderTable(stream, (POVMSStream *)&data_int, POVMSStreamOrderTables.int_read, 4);
+    POVMSStream_BuildOrderTable((POVMSStream *)&data_int, stream, POVMSStreamOrderTables.int_write, kPOVMSStreamIntSize);
+    POVMSStream_BuildOrderTable(stream, (POVMSStream *)&data_int, POVMSStreamOrderTables.int_read, kPOVMSStreamIntSize);
 
-    POVMSStream_BuildOrderTable((POVMSStream *)&data_long, stream, POVMSStreamOrderTables.long_write, 8);
-    POVMSStream_BuildOrderTable(stream, (POVMSStream *)&data_long, POVMSStreamOrderTables.long_read, 8);
+    POVMSStream_BuildOrderTable((POVMSStream *)&data_long, stream, POVMSStreamOrderTables.long_write, kPOVMSStreamLongSize);
+    POVMSStream_BuildOrderTable(stream, (POVMSStream *)&data_long, POVMSStreamOrderTables.long_read, kPOVMSStreamLongSize);
 
     stream[0] = 0x44;
     stream[1] = 0x66;
     stream[2] = 0x33;
     stream[3] = 0x55;
 
-    POVMSStream_BuildOrderTable((POVMSStream *)&data_ieeefloat, stream, POVMSStreamOrderTables.float_write, 4);
-    POVMSStream_BuildOrderTable(stream, (POVMSStream *)&data_ieeefloat, POVMSStreamOrderTables.float_read, 4);
+    POVMSStream_BuildOrderTable((POVMSStream *)&data_ieeefloat, stream, POVMSStreamOrderTables.float_write, kPOVMSStreamFloatSize);
+    POVMSStream_BuildOrderTable(stream, (POVMSStream *)&data_ieeefloat, POVMSStreamOrderTables.float_read, kPOVMSStreamFloatSize);
 
     stream[0] = 0x31;
     stream[1] = 0x32;
     stream[2] = 0x33;
     stream[3] = 0x34;
 
-    POVMSStream_BuildOrderTable((POVMSStream *)&data_type, stream, POVMSStreamOrderTables.type_write, 4);
-    POVMSStream_BuildOrderTable(stream, (POVMSStream *)&data_type, POVMSStreamOrderTables.type_read, 4);
+    POVMSStream_BuildOrderTable((POVMSStream *)&data_type, stream, POVMSStreamOrderTables.type_write, kPOVMSStreamTypeSize);
+    POVMSStream_BuildOrderTable(stream, (POVMSStream *)&data_type, POVMSStreamOrderTables.type_read, kPOVMSStreamTypeSize);
 
     stream[0] = 1;
     stream[1] = 2;
 
-    POVMSStream_BuildOrderTable((POVMSStream *)&data_ucs2, stream, POVMSStreamOrderTables.ucs2_write, 2);
-    POVMSStream_BuildOrderTable(stream, (POVMSStream *)&data_ucs2, POVMSStreamOrderTables.ucs2_read, 2);
+    POVMSStream_BuildOrderTable((POVMSStream *)&data_ucs2, stream, POVMSStreamOrderTables.ucs2_write, kPOVMSStreamUCS2Size);
+    POVMSStream_BuildOrderTable(stream, (POVMSStream *)&data_ucs2, POVMSStreamOrderTables.ucs2_read, kPOVMSStreamUCS2Size);
 #else
     // WARNING: The setup below makes cross-platform communication impossible! [trf]
 
@@ -1208,11 +1234,11 @@ POVMS_EXPORT int POVMS_CDECL POVMSStream_ReadUCS2String(POVMSUCS2 *data, POVMSSt
         return 0;
 
     for(i = 0; i < datasize; i++)
-        POVMSStream_ReadDataOrdered(&stream[i * 2], (POVMSStream *)(&data[i]), POVMSStreamOrderTables.ucs2_read, 2);
+        POVMSStream_ReadDataOrdered(&stream[i * kPOVMSStreamUCS2Size], (POVMSStream *)(&data[i]), POVMSStreamOrderTables.ucs2_read, kPOVMSStreamUCS2Size);
 
-    *maxstreamsize -= (datasize * 2);
+    *maxstreamsize -= (datasize * kPOVMSStreamUCS2Size);
 
-    return (datasize * 2);
+    return (datasize * kPOVMSStreamUCS2Size);
 }
 
 
@@ -1234,14 +1260,14 @@ POVMS_EXPORT int POVMS_CDECL POVMSStream_ReadInt(POVMSInt *data, POVMSStream *st
     if(data == NULL)
         return 0;
 
-    if(*maxstreamsize < 4)
+    if(*maxstreamsize < kPOVMSStreamIntSize)
         return 0;
 
-    POVMSStream_ReadDataOrdered(stream, (POVMSStream *)data, POVMSStreamOrderTables.int_read, 4);
+    POVMSStream_ReadDataOrdered(stream, (POVMSStream *)data, POVMSStreamOrderTables.int_read, kPOVMSStreamIntSize);
 
-    *maxstreamsize -= 4;
+    *maxstreamsize -= kPOVMSStreamIntSize;
 
-    return 4;
+    return kPOVMSStreamIntSize;
 }
 
 
@@ -1263,14 +1289,14 @@ POVMS_EXPORT int POVMS_CDECL POVMSStream_ReadLong(POVMSLong *data, POVMSStream *
     if(data == NULL)
         return 0;
 
-    if(*maxstreamsize < 8)
+    if(*maxstreamsize < kPOVMSStreamLongSize)
         return 0;
 
-    POVMSStream_ReadDataOrdered(stream, (POVMSStream *)data, POVMSStreamOrderTables.long_read, 8);
+    POVMSStream_ReadDataOrdered(stream, (POVMSStream *)data, POVMSStreamOrderTables.long_read, kPOVMSStreamLongSize);
 
-    *maxstreamsize -= 8;
+    *maxstreamsize -= kPOVMSStreamLongSize;
 
-    return 8;
+    return kPOVMSStreamLongSize;
 }
 
 
@@ -1294,16 +1320,16 @@ POVMS_EXPORT int POVMS_CDECL POVMSStream_ReadFloat(POVMSFloat *data, POVMSStream
     if(data == NULL)
         return 0;
 
-    if(*maxstreamsize < 4)
+    if(*maxstreamsize < kPOVMSStreamFloatSize)
         return 0;
 
-    POVMSStream_ReadDataOrdered(stream, (POVMSStream *)(&ieee_data), POVMSStreamOrderTables.float_read, 4);
+    POVMSStream_ReadDataOrdered(stream, (POVMSStream *)(&ieee_data), POVMSStreamOrderTables.float_read, kPOVMSStreamFloatSize);
 
     POVMSIEEEFloatToPOVMSFloat(ieee_data, *data);
 
-    *maxstreamsize -= 4;
+    *maxstreamsize -= kPOVMSStreamFloatSize;
 
-    return 4;
+    return kPOVMSStreamFloatSize;
 }
 
 
@@ -1327,14 +1353,14 @@ POVMS_EXPORT int POVMS_CDECL POVMSStream_ReadType(POVMSType *data, POVMSStream *
 
     *data = kPOVMSType_Null;
 
-    if(*maxstreamsize < 4)
+    if(*maxstreamsize < kPOVMSStreamTypeSize)
         return 0;
 
-    POVMSStream_ReadDataOrdered(stream, (POVMSStream *)data, POVMSStreamOrderTables.type_read, 4);
+    POVMSStream_ReadDataOrdered(stream, (POVMSStream *)data, POVMSStreamOrderTables.type_read, kPOVMSStreamTypeSize);
 
-    *maxstreamsize -= 4;
+    *maxstreamsize -= kPOVMSStreamTypeSize;
 
-    return 4;
+    return kPOVMSStreamTypeSize;
 }
 
 
@@ -1388,14 +1414,14 @@ POVMS_EXPORT int POVMS_CDECL POVMSStream_Read(struct POVMSData *data, POVMSStrea
         case kPOVMSType_CString:
             data->ptr = (void *)POVMS_Sys_Malloc(data->size + 1);
             ret += POVMSStream_ReadString((char *)(data->ptr), stream + ret, data->size, maxstreamsize);
-            ((char *)(data->ptr))[data->size] = 0;
+            ((char *)(data->ptr))[data->size] = '\0';
             data->size++;
             break;
         case kPOVMSType_UCS2String:
-            data->ptr = (void *)POVMS_Sys_Malloc(data->size + 2);
-            ret += POVMSStream_ReadUCS2String((POVMSUCS2 *)(data->ptr), stream + ret, data->size / 2, maxstreamsize);
-            ((POVMSUCS2 *)(data->ptr))[data->size / 2] = 0;
-            data->size += 2;
+            data->ptr = (void *)POVMS_Sys_Malloc(data->size + sizeof(POVMSUCS2));
+            ret += POVMSStream_ReadUCS2String((POVMSUCS2 *)(data->ptr), stream + ret, data->size / sizeof(POVMSUCS2), maxstreamsize);
+            ((POVMSUCS2 *)(data->ptr))[data->size / sizeof(POVMSUCS2)] = '\0';
+            data->size += sizeof(POVMSUCS2);
             break;
         case kPOVMSType_Int:
             data->size = sizeof(POVMSInt);
@@ -1571,11 +1597,11 @@ POVMS_EXPORT int POVMS_CDECL POVMSStream_WriteUCS2String(const POVMSUCS2 *data, 
         return 0;
 
     for(i = 0; i < len; i++)
-        POVMSStream_WriteDataOrdered(reinterpret_cast<const POVMSStream *>(&data[i]), &stream[i * 2], POVMSStreamOrderTables.ucs2_write, 2);
+        POVMSStream_WriteDataOrdered(reinterpret_cast<const POVMSStream *>(&data[i]), &stream[i * kPOVMSStreamUCS2Size], POVMSStreamOrderTables.ucs2_write, kPOVMSStreamUCS2Size);
 
-    *maxstreamsize -= (len * 2);
+    *maxstreamsize -= (len * kPOVMSStreamUCS2Size);
 
-    return (len * 2);
+    return (len * kPOVMSStreamUCS2Size);
 }
 
 
@@ -1594,14 +1620,14 @@ POVMS_EXPORT int POVMS_CDECL POVMSStream_WriteUCS2String(const POVMSUCS2 *data, 
 
 POVMS_EXPORT int POVMS_CDECL POVMSStream_WriteInt(POVMSInt data, POVMSStream *stream, int *maxstreamsize)
 {
-    if(*maxstreamsize < 4)
+    if (*maxstreamsize < kPOVMSStreamIntSize)
         return 0;
 
-    POVMSStream_WriteDataOrdered((POVMSStream *)(&data), stream, POVMSStreamOrderTables.int_write, 4);
+    POVMSStream_WriteDataOrdered((POVMSStream *)(&data), stream, POVMSStreamOrderTables.int_write, kPOVMSStreamIntSize);
 
-    *maxstreamsize -= 4;
+    *maxstreamsize -= kPOVMSStreamIntSize;
 
-    return 4;
+    return kPOVMSStreamIntSize;
 }
 
 
@@ -1620,14 +1646,14 @@ POVMS_EXPORT int POVMS_CDECL POVMSStream_WriteInt(POVMSInt data, POVMSStream *st
 
 POVMS_EXPORT int POVMS_CDECL POVMSStream_WriteLong(POVMSLong data, POVMSStream *stream, int *maxstreamsize)
 {
-    if(*maxstreamsize < 8)
+    if(*maxstreamsize < kPOVMSStreamLongSize)
         return 0;
 
-    POVMSStream_WriteDataOrdered((POVMSStream *)(&data), stream, POVMSStreamOrderTables.long_write, 8);
+    POVMSStream_WriteDataOrdered((POVMSStream *)(&data), stream, POVMSStreamOrderTables.long_write, kPOVMSStreamLongSize);
 
-    *maxstreamsize -= 8;
+    *maxstreamsize -= kPOVMSStreamLongSize;
 
-    return 8;
+    return kPOVMSStreamLongSize;
 }
 
 
@@ -1648,16 +1674,16 @@ POVMS_EXPORT int POVMS_CDECL POVMSStream_WriteFloat(POVMSFloat data, POVMSStream
 {
     POVMSIEEEFloat ieee_data;
 
-    if(*maxstreamsize < 4)
+    if(*maxstreamsize < kPOVMSStreamFloatSize)
         return 0;
 
     POVMSFloatToPOVMSIEEEFloat(data, ieee_data);
 
-    POVMSStream_WriteDataOrdered((POVMSStream *)(&ieee_data), stream, POVMSStreamOrderTables.float_write, 4);
+    POVMSStream_WriteDataOrdered((POVMSStream *)(&ieee_data), stream, POVMSStreamOrderTables.float_write, kPOVMSStreamFloatSize);
 
-    *maxstreamsize -= 4;
+    *maxstreamsize -= kPOVMSStreamFloatSize;
 
-    return 4;
+    return kPOVMSStreamFloatSize;
 }
 
 
@@ -1676,14 +1702,14 @@ POVMS_EXPORT int POVMS_CDECL POVMSStream_WriteFloat(POVMSFloat data, POVMSStream
 
 POVMS_EXPORT int POVMS_CDECL POVMSStream_WriteType(POVMSType data, POVMSStream *stream, int *maxstreamsize)
 {
-    if(*maxstreamsize < 4)
+    if(*maxstreamsize < kPOVMSStreamTypeSize)
         return 0;
 
-    POVMSStream_WriteDataOrdered((POVMSStream *)(&data), stream, POVMSStreamOrderTables.type_write, 4);
+    POVMSStream_WriteDataOrdered((POVMSStream *)(&data), stream, POVMSStreamOrderTables.type_write, kPOVMSStreamTypeSize);
 
-    *maxstreamsize -= 4;
+    *maxstreamsize -= kPOVMSStreamTypeSize;
 
-    return 4;
+    return kPOVMSStreamTypeSize;
 }
 
 
@@ -1732,19 +1758,19 @@ POVMS_EXPORT int POVMS_CDECL POVMSStream_Write(struct POVMSData *data, POVMSStre
             ret += POVMSStream_WriteString((char *)(data->ptr), stream + ret, maxstreamsize);
             break;
         case kPOVMSType_UCS2String:
-            ret += POVMSStream_WriteInt(data->size - 2, stream + ret, maxstreamsize);
+            ret += POVMSStream_WriteInt(data->size - sizeof(POVMSUCS2), stream + ret, maxstreamsize);
             ret += POVMSStream_WriteUCS2String((POVMSUCS2 *)(data->ptr), stream + ret, maxstreamsize);
             break;
         case kPOVMSType_Int:
-            ret += POVMSStream_WriteInt(4, stream + ret, maxstreamsize);
+            ret += POVMSStream_WriteInt(kPOVMSStreamIntSize, stream + ret, maxstreamsize);
             ret += POVMSStream_WriteInt(*((POVMSInt *)(data->ptr)), stream + ret, maxstreamsize);
             break;
         case kPOVMSType_Long:
-            ret += POVMSStream_WriteInt(8, stream + ret, maxstreamsize);
+            ret += POVMSStream_WriteInt(kPOVMSStreamLongSize, stream + ret, maxstreamsize);
             ret += POVMSStream_WriteLong(*((POVMSLong *)(data->ptr)), stream + ret, maxstreamsize);
             break;
         case kPOVMSType_Float:
-            ret += POVMSStream_WriteInt(4, stream + ret, maxstreamsize);
+            ret += POVMSStream_WriteInt(kPOVMSStreamFloatSize, stream + ret, maxstreamsize);
             ret += POVMSStream_WriteFloat(*((POVMSFloat *)(data->ptr)), stream + ret, maxstreamsize);
             break;
         case kPOVMSType_Bool:
@@ -1753,30 +1779,30 @@ POVMS_EXPORT int POVMS_CDECL POVMSStream_Write(struct POVMSData *data, POVMSStre
             ret += 1;
             break;
         case kPOVMSType_Type:
-            ret += POVMSStream_WriteInt(4, stream + ret, maxstreamsize);
+            ret += POVMSStream_WriteInt(kPOVMSStreamTypeSize, stream + ret, maxstreamsize);
             ret += POVMSStream_WriteType(*((POVMSType *)(data->ptr)), stream + ret, maxstreamsize);
             break;
         case kPOVMSType_Void:
             ret += POVMSStream_WriteInt(0, stream + ret, maxstreamsize);
             break;
         case kPOVMSType_VectorInt:
-            ret += POVMSStream_WriteInt(data->size / 4, stream + ret, maxstreamsize);
-            for(int i = 0; i < data->size / 4; i++)
+            ret += POVMSStream_WriteInt(data->size / kPOVMSStreamIntSize, stream + ret, maxstreamsize);
+            for(int i = 0; i < data->size / kPOVMSStreamIntSize; i++)
                 ret += POVMSStream_WriteInt(((POVMSInt *)(data->ptr))[i], stream + ret, maxstreamsize);
             break;
         case kPOVMSType_VectorLong:
-            ret += POVMSStream_WriteInt(data->size / 8, stream + ret, maxstreamsize);
-            for(int i = 0; i < data->size / 8; i++)
+            ret += POVMSStream_WriteInt(data->size / kPOVMSStreamLongSize, stream + ret, maxstreamsize);
+            for(int i = 0; i < data->size / kPOVMSStreamLongSize; i++)
                 ret += POVMSStream_WriteLong(((POVMSLong *)(data->ptr))[i], stream + ret, maxstreamsize);
             break;
         case kPOVMSType_VectorFloat:
-            ret += POVMSStream_WriteInt(data->size / 4, stream + ret, maxstreamsize);
-            for(int i = 0; i < data->size / 4; i++)
+            ret += POVMSStream_WriteInt(data->size / kPOVMSStreamFloatSize, stream + ret, maxstreamsize);
+            for(int i = 0; i < data->size / kPOVMSStreamFloatSize; i++)
                 ret += POVMSStream_WriteFloat(((POVMSFloat *)(data->ptr))[i], stream + ret, maxstreamsize);
             break;
         case kPOVMSType_VectorType:
-            ret += POVMSStream_WriteInt(data->size / 4, stream + ret, maxstreamsize);
-            for(int i = 0; i < data->size / 4; i++)
+            ret += POVMSStream_WriteInt(data->size / kPOVMSStreamTypeSize, stream + ret, maxstreamsize);
+            for(int i = 0; i < data->size / kPOVMSStreamTypeSize; i++)
                 ret += POVMSStream_WriteType(((POVMSType *)(data->ptr))[i], stream + ret, maxstreamsize);
             break;
         case kPOVMSType_Address:
@@ -1816,7 +1842,7 @@ POVMS_EXPORT int POVMS_CDECL POVMSStream_Size(struct POVMSData *data)
     if(data == NULL)
         return 0;
 
-    ret += 8;
+    ret += kPOVMSStreamTypeSize + kPOVMSStreamIntSize; // type and size
 
     switch(data->type)
     {
@@ -1825,7 +1851,7 @@ POVMS_EXPORT int POVMS_CDECL POVMSStream_Size(struct POVMSData *data)
         case kPOVMSType_ResultObject:
             for(cur = data->root; (cur != NULL) && (ret > 0); cur = cur->next)
             {
-                ret += 4;
+                ret += kPOVMSStreamTypeSize;
                 ret += POVMSStream_Size(&(cur->data));
             }
             break;
@@ -1837,37 +1863,37 @@ POVMS_EXPORT int POVMS_CDECL POVMSStream_Size(struct POVMSData *data)
             ret += (int)POVMS_Sys_Strlen((char *)(data->ptr));
             break;
         case kPOVMSType_UCS2String:
-            ret += (int)POVMS_Sys_UCS2Strlen((POVMSUCS2 *)(data->ptr)) * 2;
+            ret += (int)POVMS_Sys_UCS2Strlen((POVMSUCS2 *)(data->ptr)) * kPOVMSStreamUCS2Size;
             break;
         case kPOVMSType_Int:
-            ret += 4;
+            ret += kPOVMSStreamIntSize;
             break;
         case kPOVMSType_Long:
-            ret += 8;
+            ret += kPOVMSStreamLongSize;
             break;
         case kPOVMSType_Float:
-            ret += 4;
+            ret += kPOVMSStreamFloatSize;
             break;
         case kPOVMSType_Bool:
             ret += 1;
             break;
         case kPOVMSType_Type:
-            ret += 4;
+            ret += kPOVMSStreamTypeSize;
             break;
         case kPOVMSType_Void:
             ret += 0;
             break;
         case kPOVMSType_VectorInt:
-            ret += data->size / sizeof(POVMSInt) * 4;
+            ret += data->size / sizeof(POVMSInt) * kPOVMSStreamIntSize;
             break;
         case kPOVMSType_VectorLong:
-            ret += data->size / sizeof(POVMSLong) * 8;
+            ret += data->size / sizeof(POVMSLong) * kPOVMSStreamLongSize;
             break;
         case kPOVMSType_VectorFloat:
-            ret += data->size / sizeof(POVMSFloat) * 4;
+            ret += data->size / sizeof(POVMSFloat) * kPOVMSStreamFloatSize;
             break;
         case kPOVMSType_VectorType:
-            ret += data->size / sizeof(POVMSType) * 4;
+            ret += data->size / sizeof(POVMSType) * kPOVMSStreamTypeSize;
             break;
         case kPOVMSType_Address:
             ret += POVMS_Sys_AddressToStreamSize(*((POVMSAddress *)(data->ptr)));
@@ -1961,7 +1987,7 @@ POVMSResult POVMSStream_Dump(FILE *file, POVMSStream *stream, int datasize)
 
 POVMS_EXPORT POVMSResult POVMS_CDECL POVMSStream_CheckMessageHeader(POVMSStream *stream, int streamsize, int *totalsize)
 {
-    char header[8];
+    char header[kPOVMSMagicSize];
     int version = 0;
     POVMSResult err = kNoErr;
 
@@ -1974,16 +2000,16 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMSStream_CheckMessageHeader(POVMSStream 
     {
         int datasize = 0;
 
-        datasize = POVMSStream_ReadString(header, stream, 8, &streamsize);             // header       8 byte
+        datasize = POVMSStream_ReadString(header, stream, kPOVMSMagicSize, &streamsize);    // header       8 byte
         if(!((header[0] == 'P') && (header[1] == 'O') && (header[2] == 'V') && (header[3] == 'R') &&
              (header[4] == 'A') && (header[5] == 'Y') && (header[6] == 'M') && (header[7] == 'S')))
             err = kCannotHandleDataErr;
 
-        datasize += POVMSStream_ReadInt(&version, stream + datasize, &streamsize);     // version      4 byte
+        datasize += POVMSStream_ReadInt(&version, stream + datasize, &streamsize);          // version      4 byte
         if(version != POVMS_VERSION)
             err = kVersionErr;
 
-        datasize += POVMSStream_ReadInt(totalsize, stream + datasize, &streamsize);    // total size   4 byte
+        datasize += POVMSStream_ReadInt(totalsize, stream + datasize, &streamsize);         // total size   4 byte
         if(*totalsize < 16)
             err = kInvalidDataSizeErr;
     }
@@ -4147,7 +4173,7 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMSUtil_GetUCS2String(POVMSObjectPtr obje
     if(maxlen == NULL)
         return kParamErr;
 
-    *maxlen *= 2;
+    *maxlen *= sizeof(POVMSUCS2);
 
     err = POVMSObject_Get(object, &attr, key);
     if(err == kNoErr)
@@ -4158,7 +4184,7 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMSUtil_GetUCS2String(POVMSObjectPtr obje
             err = temp_err;
     }
 
-    *maxlen /= 2;
+    *maxlen /= sizeof(POVMSUCS2);
 
     return err;
 }
@@ -4430,7 +4456,7 @@ unsigned int POVMS_Sys_UCS2Strlen_Default(const POVMSUCS2 *s)
     if(s == NULL)
         return 0;
 
-    while(*s != 0)
+    while(*s != '\0')
     {
         len++;
         s++;
@@ -4461,7 +4487,7 @@ POVMS_Sys_QueueNode_Default *POVMS_Sys_QueueOpen_Default()
     if(ptr == NULL)
         return NULL;
 
-    ptr->magic = 0x12345678;
+    ptr->magic = kPOVMSQueueMagic;
     ptr->entries = 0;
     ptr->first = NULL;
     ptr->last = NULL;
@@ -4506,7 +4532,7 @@ void *POVMS_Sys_QueueReceive_Default(POVMS_Sys_QueueNode_Default *q, int *l, POV
     if(ptr == NULL)
         return NULL;
 
-    if(ptr->magic != 0x12345678)
+    if(ptr->magic != kPOVMSQueueMagic)
         return NULL;
 
     if(ptr->entries <= 0)
@@ -4540,7 +4566,7 @@ POVMSQueueResult POVMS_Sys_QueueSend_Default(POVMS_Sys_QueueNode_Default *q, voi
     if(ptr == NULL)
         return kPOVMSQueueNullPointerErr;
 
-    if(ptr->magic != 0x12345678)
+    if(ptr->magic != kPOVMSQueueMagic)
         return kPOVMSQueueBadMagicErr;
 
     node = (POVMS_Sys_QueueDataNode_Default *)POVMS_Sys_Malloc(sizeof(POVMS_Sys_QueueDataNode_Default));
@@ -4570,8 +4596,33 @@ int POVMS_Sys_AddressFromStream_Default(POVMSAddress *a, POVMSStream *s, int z)
     // default value in case decoding fails
     *a = POVMSInvalidAddress;
 
-    // system specific address (byte code 1)
-    if((z >= (2 + sizeof(POVMSAddress))) && (*s == 1))
+    // Stream representation of address data is a list of addresses [*].
+    // The first byte of each address is a type ID (kPOVMSAddress_*).
+    // Addresses are sorted in the order presented below.
+    // Each type of address is optional, but occurs at most once.
+    //
+    // NOTE: The above is inferred from the implementation as of v3.7.0.
+    // Support for multiple addresses may be unintentional.
+    //
+    // Layout for the individual address types is as follows:
+    //
+    // kPOVMSAddress_Sys (system-specific address):
+    //  1 byte      ID
+    //  1 byte      size of payload (N)
+    //  N bytes     payload (system-specific)
+    //
+    // kPOVMSAddress_TCPIPv4 (IPv4 address and TCP port)
+    //
+    //  1 byte      ID
+    //  6 bytes     payload (unknown layout; possibly IP address followed by port, using big endian order)
+    //
+    // kPOVMSAddress_TCPIPv4 (IPv4 address and TCP port)
+    //
+    //  1 byte      ID
+    //  10 bytes    payload (unknown layout; possibly IP address followed by port, using big endian order)
+
+    // system specific address
+    if((z >= (2 + sizeof(POVMSAddress))) && (*s == kPOVMSAddress_Sys))
     {
         s++;
         if(*s == sizeof(POVMSAddress))
@@ -4584,23 +4635,23 @@ int POVMS_Sys_AddressFromStream_Default(POVMSAddress *a, POVMSStream *s, int z)
 
         z -= (s - b);
     }
-    else if((z >= 2) && (*s == 1))
+    else if((z >= 2) && (*s == kPOVMSAddress_Sys))
     {
         // skip over unknown system specific address size
         s += *s;
         z -= (s - b);
     }
 
-    // IPv4 address and TCP port (byte code 4)
-    if((z >= 7) && (*s == 4))
+    // IPv4 address and TCP port
+    if((z >= 7) && (*s == kPOVMSAddress_TCPIPv4))
     {
         // skip
         s += 7;
         z -= 7;
     }
 
-    // IPv6 address and TCP port (byte code 6)
-    if((z >= 11) && (*s == 6))
+    // IPv6 address and TCP port
+    if((z >= 11) && (*s == kPOVMSAddress_TCPIPv6))
     {
         // skip
         s += 11;
@@ -4623,7 +4674,7 @@ int POVMS_Sys_AddressToStream_Default(POVMSAddress a, POVMSStream *s, int *z)
         return 0;
 
     // write system specific address
-    *s = 1;
+    *s = kPOVMSAddress_Sys;
     s++;
     *s = sizeof(POVMSAddress);
     s++;
@@ -4654,7 +4705,7 @@ POVMSMemoryTraceHeader *gPOVMSMemoryTraceRootPointer = NULL;
 
 void *POVMS_Sys_Trace_Malloc(size_t size, int line)
 {
-    POVMSMemoryTraceHeader *ptr = (POVMSMemoryTraceHeader *)malloc(size + sizeof(POVMSMemoryTraceHeader) + (sizeof(char) * 8));
+    POVMSMemoryTraceHeader *ptr = (POVMSMemoryTraceHeader *)malloc(size + sizeof(POVMSMemoryTraceHeader) + kPOVMSMagicSize);
 
     POVMS_Sys_Trace_Set_Guard(&(ptr->magichead[0]));
     POVMS_Sys_Trace_Set_Guard(&(ptr->magictrail[0]));
@@ -4681,7 +4732,7 @@ void *POVMS_Sys_Trace_Realloc(void *iptr, size_t size, int line)
             printf("POVMS damaged memory block header detected in line %d\n", line);
     }
 
-    POVMSMemoryTraceHeader *ptr = (POVMSMemoryTraceHeader *)realloc((void *)iptr, size + sizeof(POVMSMemoryTraceHeader) + (sizeof(char) * 8));
+    POVMSMemoryTraceHeader *ptr = (POVMSMemoryTraceHeader *)realloc((void *)iptr, size + sizeof(POVMSMemoryTraceHeader) + kPOVMSMagicSize);
 
     POVMS_Sys_Trace_Set_Guard(&(ptr->magichead[0]));
     POVMS_Sys_Trace_Set_Guard(&(ptr->magictrail[0]));
