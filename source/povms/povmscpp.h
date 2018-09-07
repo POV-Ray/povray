@@ -488,7 +488,7 @@ class POVMS_MessageReceiver
         POVMS_MessageReceiver(const POVMS_MessageReceiver&); // no copies allowed
         POVMS_MessageReceiver& operator=(const POVMS_MessageReceiver&); // no copy assignments allowed
 
-        static int ReceiveHandler(POVMSObjectPtr msg, POVMSObjectPtr result, int mode, void *privatedataptr);
+        static POVMSResult ReceiveHandler(POVMSObjectPtr msg, POVMSObjectPtr result, int mode, void *privatedataptr);
 
         void AddNodeFront(POVMSType hclass, POVMSType hid, HandlerOO *hooptr, Handler *hptr);
         void AddNodeBack(POVMSType hclass, POVMSType hid, HandlerOO *hooptr, Handler *hptr);

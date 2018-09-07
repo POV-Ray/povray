@@ -1695,13 +1695,13 @@ void POVMS_MessageReceiver::Remove(POVMSType hclass, POVMSType hid)
     }
 }
 
-int POVMS_MessageReceiver::ReceiveHandler(POVMSObjectPtr msg, POVMSObjectPtr result, int mode, void *privatedataptr)
+POVMSResult POVMS_MessageReceiver::ReceiveHandler(POVMSObjectPtr msg, POVMSObjectPtr result, int mode, void *privatedataptr)
 {
     POVMS_MessageReceiver *self = (POVMS_MessageReceiver *)privatedataptr;
     HandlerNode *nodeptr = NULL;
     POVMSType hclass = kPOVMSType_Null;
     POVMSType hid = kPOVMSType_Null;
-    int err = pov_base::kNoErr;
+    POVMSResult err = pov_base::kNoErr;
 
     if(self == NULL)
         err = pov_base::kParamErr;
