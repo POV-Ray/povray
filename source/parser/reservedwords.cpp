@@ -669,6 +669,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { UV_MAX_EXTENT_TOKEN,          "uv_max" },
     { UV_MIN_EXTENT_TOKEN,          "uv_min" },
     { UV_NORMAL_TOKEN,              "uv_normal" },
+    { UV_REFERENCE_TOKEN,           "uv_reference" },
     { UV_VECTORS_TOKEN,             "uv_vectors" },
     { UV_VERTEX_TOKEN,              "uv_vertex" },
 

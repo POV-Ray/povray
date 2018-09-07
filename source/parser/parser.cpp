@@ -2729,7 +2729,7 @@ ObjectPtr Parser::Parse_Cone ()
     END_EXPECT
 
     EXPECT_ONE
-        CASE(UV_MAPPING_TOKEN)
+        CASE(UV_REFERENCE_TOKEN)
           Parse_Vector(Object->uref);
         END_CASE
 
@@ -2795,7 +2795,7 @@ ObjectPtr Parser::Parse_Cylinder ()
     END_EXPECT
 
     EXPECT_ONE
-        CASE(UV_MAPPING_TOKEN)
+        CASE(UV_REFERENCE_TOKEN)
           Parse_Vector(Object->uref);
         END_CASE
 
@@ -2863,7 +2863,7 @@ ObjectPtr Parser::Parse_Disc ()
     END_EXPECT
 
     EXPECT_ONE
-        CASE(UV_MAPPING_TOKEN)
+        CASE(UV_REFERENCE_TOKEN)
           Parse_Vector(Object->uref);
         END_CASE
 
@@ -3589,7 +3589,7 @@ ObjectPtr Parser::Parse_Lemon ()
     END_EXPECT
 
     EXPECT_ONE
-        CASE(UV_MAPPING_TOKEN)
+        CASE(UV_REFERENCE_TOKEN)
           Parse_Vector(Object->uref);
         END_CASE
 
