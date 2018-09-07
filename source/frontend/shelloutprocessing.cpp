@@ -547,6 +547,10 @@ bool ShelloutProcessing::PostProcessEvent(void)
                     }
                     cancelReturn = ret;
                     return true;
+
+                default:
+                    // Do nothing special.
+                    break;
             }
         }
     }

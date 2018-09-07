@@ -42,9 +42,6 @@
 namespace pov_base
 {
 
-template class GenericColour<ColourChannel>;
-template class GenericColour<PreciseColourChannel>;
-
 #if (NUM_COLOUR_CHANNELS == 3)
 
     // Approximate dominant wavelengths of primary hues.
@@ -52,13 +49,16 @@ template class GenericColour<PreciseColourChannel>;
     // These are user-adjustable with the irid_wavelength keyword.
     // Red = 700 nm  Grn = 520 nm Blu = 480 nm
     // Divided by 1000 gives: rwl = 0.70;  gwl = 0.52;  bwl = 0.48;
-    template<> const MathColour MathColour::mkDefaultWavelengths = MathColour(RGBColour(0.70, 0.52, 0.48));
-    template<> const PreciseMathColour PreciseMathColour::mkDefaultWavelengths = PreciseMathColour(PreciseRGBColour(0.70, 0.52, 0.48));
+    template<typename T>
+    const GenericColour<T> GenericColour<T>::mkDefaultWavelengths = GenericColour<T>(GenericRGBColour<T>(0.70, 0.52, 0.48));
 
 #else
 
     #error "TODO!"
 
 #endif
+
+template class GenericColour<ColourChannel>;
+template class GenericColour<PreciseColourChannel>;
 
 }

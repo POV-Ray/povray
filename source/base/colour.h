@@ -1788,11 +1788,11 @@ inline GenericColour<T> Sqrt(const GenericColour<T>& a) { return a.Sqrt(); }
 template<typename T>
 inline GenericColour<T> Cos(const GenericColour<T>& a) { return a.Cos(); }
 
-extern template class GenericColour<ColourChannel>;
-extern template class GenericColour<PreciseColourChannel>;
-
 typedef GenericColour<ColourChannel>         MathColour;        ///< Standard precision colour.
 typedef GenericColour<PreciseColourChannel>  PreciseMathColour; ///< High precision colour.
+
+extern template class GenericColour<ColourChannel>;
+extern template class GenericColour<PreciseColourChannel>;
 
 
 /// Generic template class to hold and manipulate a colour plus transparency information.
