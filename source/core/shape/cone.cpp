@@ -1067,5 +1067,87 @@ void Cone::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
 
 }
 
+// UVMeshable part
+
+void Cone::evalVertex( Vector3d& r, const DBL u, const DBL v )const
+{
+  if (v<0.25)
+  {
+    DBL cov = v*4.0;
+    r = Vector3d( cov * cos( u * TWO_M_PI ), cov * sin( u * TWO_M_PI ), 1.0 );
+  }
+  else if(v>0.75)
+  {
+    DBL cov = (1.0-v)*4.0;
+    r = Vector3d( base_radius/apex_radius*cov * cos( u * TWO_M_PI ), base_radius/apex_radius*cov* sin( u * TWO_M_PI ), dist);
+  }
+  else
+  {
+    DBL av = (v-0.25)*2.0;
+    DBL radius = (1.0-av)+base_radius*av/apex_radius;
+    r = Vector3d( radius * cos( u * TWO_M_PI ), radius * sin( u * TWO_M_PI ), 1.0*(1.0-av)+(av*dist) );
+  }
+  
+  if (Trans)
+  {
+    MTransPoint( r, r, Trans );
+  }
+}
+void Cone::evalNormal( Vector3d& r, const DBL u, const DBL v )const
+{
+  if (v<0.25)
+  {
+    r = Vector3d(0.0,0.0,-1.0);
+  }
+  else if (v>0.75)
+  {
+    r = Vector3d(0.0,0.0,1.0);
+  }
+  else
+  {
+    DBL av = (v-0.25)*2;
+    DBL radius = (1.0-av)+base_radius*av/apex_radius;
+    r = Vector3d( radius * cos( u * TWO_M_PI ), radius * sin( u * TWO_M_PI ), 1.0*(1.0-av)+(av*dist) );
+    if ( Test_Flag(this, CYLINDER_FLAG))
+    {
+      r[Z] = 0;
+    }
+    else
+    {
+      r[Z] *= -1;
+    }
+  }
+  if (Trans)
+  {
+    MTransNormal( r, r, Trans );
+  }
+  r.normalize();
+}
+void Cone::minUV( Vector2d& r )const
+{
+  if (Test_Flag(this, CLOSED_FLAG))
+  {
+    r[U] = 0.0;
+    r[V] = 0.0;
+  }
+  else
+  {
+    r[U] = 0.0;
+    r[V] = 0.25;
+  }
+}
+void Cone::maxUV( Vector2d& r )const
+{
+  if (Test_Flag(this, CLOSED_FLAG))
+  {
+    r[U] = 1.0;
+    r[V] = 1.0;
+  }
+  else
+  {
+    r[U] = 1.0;
+    r[V] = 0.75;
+  }
+}
 
 }

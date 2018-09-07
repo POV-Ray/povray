@@ -40,6 +40,7 @@
 #include "core/configcore.h"
 
 #include "core/scene/object.h"
+#include "core/shape/uvmeshable.h"
 
 namespace pov
 {
@@ -62,7 +63,7 @@ namespace pov
 ///
 //******************************************************************************
 
-class Sphere : public ObjectBase
+class Sphere : public ObjectBase, public UVMeshable
 {
     public:
         Vector3d Center;
@@ -86,6 +87,10 @@ class Sphere : public ObjectBase
 
         static bool Intersect(const BasicRay& ray, const Vector3d& Center, DBL Radius2, DBL *Depth1, DBL  *Depth2);
 
+        virtual void evalVertex( Vector3d& r, const DBL u, const DBL v )const;
+        virtual void evalNormal( Vector3d& r, const DBL u, const DBL v )const;
+        virtual void minUV( Vector2d& r )const;
+        virtual void maxUV( Vector2d& r )const;
     private:
 
         /// Ellipsoid mode flag.

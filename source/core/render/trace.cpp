@@ -366,7 +366,7 @@ bool Trace::FindIntersection(ObjectPtr object, Intersection& isect, const Ray& r
             {
                 tmpDepth = depthstack->top().Depth;
                 // TODO FIXME - This was SMALL_TOLERANCE, but that's too rough for some scenes [cjc] need to check what it was in the old code [trf]
-                if(tmpDepth < closest && (ray.IsSubsurfaceRay() || tmpDepth >= MIN_ISECT_DEPTH))
+                if(tmpDepth < closest && (ray.IsSubsurfaceRay() || tmpDepth > MIN_ISECT_DEPTH))
                 {
                     isect = depthstack->top();
                     closest = tmpDepth;
@@ -419,7 +419,7 @@ bool Trace::FindIntersection(ObjectPtr object, Intersection& isect, const Ray& r
             {
                 tmpDepth = depthstack->top().Depth;
                 // TODO FIXME - This was SMALL_TOLERANCE, but that's too rough for some scenes [cjc] need to check what it was in the old code [trf]
-                if(tmpDepth < closest && (ray.IsSubsurfaceRay() || tmpDepth >= MIN_ISECT_DEPTH) && postcondition(ray, object, tmpDepth))
+                if(tmpDepth < closest && (ray.IsSubsurfaceRay() || tmpDepth > MIN_ISECT_DEPTH) && postcondition(ray, object, tmpDepth))
                 {
                     isect = depthstack->top();
                     closest = tmpDepth;
