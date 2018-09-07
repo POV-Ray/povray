@@ -135,8 +135,39 @@
 
 /// @def POVMSBool
 /// POVMS data type representing boolean (true or false) values.
+///
+/// @note
+///     It is recommended to use `bool` if available (C99 with `<stdbool.h>` included, or C++),
+///     or `int` otherwise.
+/// @note
+///     This type is used for the API only. Internally, boolean values are stored differently.
+///
 #ifndef POVMSBool
     #define POVMSBool           int
+#endif
+
+/// @def POVMSTrue
+/// POVMS data value representing a boolean true value.
+///
+/// @note
+///     The value must test true in an `if()` statement or other conditionals.
+/// @note
+///     This type is used for the API only. Internally, boolean values are stored differently.
+///
+#ifndef POVMSTrue
+    #define POVMSTrue           1
+#endif
+
+/// @def POVMSFalse
+/// POVMS data value representing a boolean false value.
+///
+/// @note
+///     The value must test false in an `if()` statement or other conditionals.
+/// @note
+///     This type is used for the API only. Internally, boolean values are stored differently.
+///
+#ifndef POVMSFalse
+    #define POVMSFalse          0
 #endif
 
 /// @def POVMSUCS2

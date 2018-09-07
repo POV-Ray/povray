@@ -68,6 +68,9 @@ using namespace pov_base;
     #define POVMS_ASSERT(c,s) POVMS_AssertFunction(c, s, __FILE__, __LINE__)
 #endif
 
+static const unsigned char kPOVMSStreamFalse    = 0x00;
+static const unsigned char kPOVMSStreamTrue     = 0xFF;
+
 typedef struct POVMS_Sys_QueueNode_Default POVMS_Sys_QueueNode_Default;
 typedef struct POVMS_Sys_QueueDataNode_Default POVMS_Sys_QueueDataNode_Default;
 
@@ -228,7 +231,7 @@ struct
 * Local functions
 ******************************************************************************/
 
-int POVMS_AssertFunction       (int cond, const char *str, const char *filename, int line);
+POVMSBool POVMS_AssertFunction       (POVMSBool cond, const char *str, const char *filename, int line);
 
 POVMSReceiveHandlerNode *POVMS_AddReceiveHandlerNode  (POVMSContextData *context);
 POVMSResult POVMS_RemoveReceiveHandlerNode            (POVMSContextData *context, POVMSReceiveHandlerNode *thn);
@@ -258,7 +261,7 @@ POVMSAddress POVMS_Sys_QueueToAddress_Default                 (POVMS_Sys_QueueNo
 POVMS_Sys_QueueNode_Default *POVMS_Sys_AddressToQueue_Default (POVMSAddress a);
 POVMS_Sys_QueueNode_Default *POVMS_Sys_QueueOpen_Default      ();
 void POVMS_Sys_QueueClose_Default                             (POVMS_Sys_QueueNode_Default *q);
-void *POVMS_Sys_QueueReceive_Default                          (POVMS_Sys_QueueNode_Default *q, int *l, bool blocking, bool yielding);
+void *POVMS_Sys_QueueReceive_Default                          (POVMS_Sys_QueueNode_Default *q, int *l, POVMSBool blocking, POVMSBool yielding);
 POVMSQueueResult POVMS_Sys_QueueSend_Default                  (POVMS_Sys_QueueNode_Default *q, void *p, int l);
 int POVMS_Sys_AddressFromStream_Default                       (POVMSAddress *a, POVMSStream *s, int z);
 int POVMS_Sys_AddressToStream_Default                         (POVMSAddress a, POVMSStream *s, int *z);
@@ -303,7 +306,7 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMS_OpenContext(POVMSContext *contextrefp
     *contextrefptr = NULL;
 
     context = (POVMSContextData *)POVMS_Sys_Malloc(sizeof(POVMSContextData));
-    if(POVMS_ASSERT(context != NULL, "POVMS_Open_Context failed, out of memory") == false)
+    if (!POVMS_ASSERT(context != NULL, "POVMS_Open_Context failed, out of memory"))
         return kMemFullErr;
 
     context->receivehandlerroot = NULL;
@@ -313,7 +316,7 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMS_OpenContext(POVMSContext *contextrefp
     context->resultid = 0;
     context->nextsequenceid = 1;
 
-    context->valid = true;
+    context->valid = POVMSTrue;
 
     *contextrefptr = (POVMSContext)context;
 
@@ -343,10 +346,10 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMS_CloseContext(POVMSContext contextref)
 
     if(contextref == NULL)
         return kParamErr;
-    if(context->valid == false)
+    if (!context->valid)
         return kInvalidContextErr;
 
-    context->valid = false;
+    context->valid = POVMSFalse;
 
     POVMS_Sys_QueueClose(context->queue);
     context->queue = NULL;
@@ -381,7 +384,7 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMS_GetContextAddress(POVMSContext contex
 
     if(contextref == NULL)
         return kParamErr;
-    if(context->valid == false)
+    if (!context->valid)
         return kInvalidContextErr;
     if(addrptr == NULL)
         return kParamErr;
@@ -406,15 +409,15 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMS_GetContextAddress(POVMSContext contex
 *
 ******************************************************************************/
 
-int POVMS_AssertFunction(int cond, const char *str, const char *filename, int line)
+POVMSBool POVMS_AssertFunction(POVMSBool cond, const char *str, const char *filename, int line)
 {
-    if(cond == false)
+    if (!cond)
     {
         POVMS_ASSERT_OUTPUT(str,filename,line);
-        return false;
+        return POVMSFalse;
     }
 
-    return true;
+    return POVMSTrue;
 }
 
 
@@ -445,7 +448,7 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMS_InstallReceiver(POVMSContext contextr
 
     if(contextref == NULL)
         return kParamErr;
-    if(context->valid == false)
+    if (!context->valid)
         return kInvalidContextErr;
     if(hfunc == NULL)
         return kParamErr;
@@ -486,7 +489,7 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMS_RemoveReceiver(POVMSContext contextre
 
     if(contextref == NULL)
         return kParamErr;
-    if(context->valid == false)
+    if (!context->valid)
         return kInvalidContextErr;
 
     if(err == kNoErr)
@@ -532,7 +535,7 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMS_ProcessMessages(POVMSContext contextr
 
     if(contextref == NULL)
         return kParamErr;
-    if(context->valid == false)
+    if (!context->valid)
         return kInvalidContextErr;
     if((context->result.type != kPOVMSType_Null) && (context->resultid != 0))
         return kOutOfSyncErr;
@@ -728,7 +731,7 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMS_Send(POVMSContext contextref, POVMSOb
         {
             if(err == kNoErr)
             {
-                if(POVMS_ASSERT(context->thread == POVMS_Sys_GetCurrentThread(), "POVMS_Send context not valid for this thread") == false)
+                if (!POVMS_ASSERT(context->thread == POVMS_Sys_GetCurrentThread(), "POVMS_Send context not valid for this thread"))
                     err = kInvalidContextErr;
             }
 
@@ -791,7 +794,7 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMS_Send(POVMSContext contextref, POVMSOb
                 context->resultid = resultid;
 
                 while((context->resultid == resultid) && ((POVMS_Sys_Timer() - t) < maxtime))
-                    (void)POVMS_ProcessMessages(context, true, true);
+                    (void)POVMS_ProcessMessages(context, POVMSTrue, POVMSTrue);
 
                 if(context->resultid == 0)
                 {
@@ -909,7 +912,7 @@ POVMSReceiveHandlerNode *POVMS_AddReceiveHandlerNode(POVMSContextData *context)
     POVMS_LOG_OUTPUT("POVMS_AddReceiveHandlerNode");
 
     out = (POVMSReceiveHandlerNode *)POVMS_Sys_Malloc(sizeof(POVMSReceiveHandlerNode));
-    if(POVMS_ASSERT(out != NULL, "POVMS_AddReceiveHandlerNode failed, out of memory") == false)
+    if (!POVMS_ASSERT(out != NULL, "POVMS_AddReceiveHandlerNode failed, out of memory"))
         return NULL;
 
     out->last = NULL;
@@ -2519,7 +2522,7 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMSObject_Set(POVMSObjectPtr object, POVM
     else
     {
         in = (POVMSNode *)POVMS_Sys_Malloc(sizeof(POVMSNode));
-        if(POVMS_ASSERT(in != NULL, "POVMSObject_Set failed, out of memory") == false)
+        if (!POVMS_ASSERT(in != NULL, "POVMSObject_Set failed, out of memory"))
             err = kOutOfMemoryErr;
         else
         {
@@ -2865,7 +2868,7 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMSObject_DumpAttr(FILE *file, POVMSAttri
             fprintf(file, "%f\n", (float)*((POVMSFloat *)(attr->ptr)));
             break;
         case kPOVMSType_Bool:
-            if((*((unsigned char *)(attr->ptr))) != 0x00)
+            if ((*((unsigned char *)(attr->ptr))) != kPOVMSStreamFalse)
                 fprintf(file, "true\n");
             else
                 fprintf(file, "false\n");
@@ -3100,7 +3103,7 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMSAttr_Copy(POVMSAttributePtr sourceattr
         if(sourceattr->ptr != NULL)
         {
             destattr->ptr =(void *)POVMS_Sys_Malloc(sourceattr->size);
-            if(POVMS_ASSERT(destattr->ptr != NULL, "POVMSAttr_Copy failed, out of memory") == false)
+            if (!POVMS_ASSERT(destattr->ptr != NULL, "POVMSAttr_Copy failed, out of memory"))
                 return kMemFullErr;
 
             POVMS_Sys_Memmove(destattr->ptr, sourceattr->ptr, sourceattr->size);
@@ -3190,7 +3193,7 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMSAttr_Set(POVMSAttributePtr attr, POVMS
     if (datasize > 0)
     {
         attr->ptr = (void *)POVMS_Sys_Malloc(datasize);
-        if (POVMS_ASSERT(attr->ptr != NULL, "POVMSAttr_Set failed, out of memory") == false)
+        if (!POVMS_ASSERT(attr->ptr != NULL, "POVMSAttr_Set failed, out of memory"))
             return kMemFullErr;
 
         //if(attr->type == kPOVMSType_Address)
@@ -3365,7 +3368,7 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMSAttrList_Copy(POVMSAttributeListPtr so
         if(sourcelist->ptr != NULL)
         {
             destlist->ptr = (void *)POVMS_Sys_Malloc(sizeof(POVMSData) * sourcelist->size);
-            if(POVMS_ASSERT(destlist->ptr != NULL, "POVMSAttrList_Copy failed, out of memory") == false)
+            if (!POVMS_ASSERT(destlist->ptr != NULL, "POVMSAttrList_Copy failed, out of memory"))
                 return kOutOfMemoryErr;
         }
 
@@ -3421,7 +3424,7 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMSAttrList_Append(POVMSAttributeListPtr 
         return kNoErr;
 
     temp_items = (POVMSData *)POVMS_Sys_Realloc((void *)(attr->items), sizeof(POVMSData) * (attr->size + 1));
-    if(POVMS_ASSERT(temp_items != NULL, "POVMSAttrList_Append failed, out of memory") == false)
+    if (!POVMS_ASSERT(temp_items != NULL, "POVMSAttrList_Append failed, out of memory"))
     {
         err = kOutOfMemoryErr;
     }
@@ -3464,7 +3467,7 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMSAttrList_AppendN(POVMSAttributeListPtr
         return kNoErr;
 
     temp_items = (POVMSData *)POVMS_Sys_Realloc((void *)(attr->items), sizeof(POVMSData) * (attr->size + cnt));
-    if(POVMS_ASSERT(temp_items != NULL, "POVMSAttrList_Append failed, out of memory") == false)
+    if (!POVMS_ASSERT(temp_items != NULL, "POVMSAttrList_Append failed, out of memory"))
     {
         err = kNoErr;
     }
@@ -3637,7 +3640,7 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMSAttrList_RemoveNth(POVMSAttributeListP
         if(attr->size < index)
             POVMS_Sys_Memmove((void *)(&(attr->items[index - 1])), (void *)(&(attr->items[index])), sizeof(POVMSData) * (attr->size - index));
         temp_items = (POVMSData *)POVMS_Sys_Realloc((void *)(attr->items), sizeof(POVMSData) * (attr->size - 1));
-        if(POVMS_ASSERT(temp_items != NULL, "POVMSAttrList_RemoveNth failed, out of memory") == false)
+        if (!POVMS_ASSERT(temp_items != NULL, "POVMSAttrList_RemoveNth failed, out of memory"))
             err = kOutOfMemoryErr;
         else
             attr->items = temp_items;
@@ -3917,10 +3920,7 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMSUtil_SetBool(POVMSObjectPtr object, PO
     if(object == NULL)
         return kParamErr;
 
-    if(boolvalue == false)
-        c = 0x00;
-    else
-        c = 0xFF;
+    c = (boolvalue ? kPOVMSStreamTrue : kPOVMSStreamFalse);
 
     err = POVMSAttr_New(&attr);
     if(err == kNoErr)
@@ -4302,7 +4302,7 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMSUtil_GetBool(POVMSObjectPtr object, PO
     POVMSAttribute attr;
     int l = sizeof(unsigned char);
     POVMSResult err, temp_err;
-    unsigned char c = 0x00;
+    unsigned char c = kPOVMSStreamFalse;
 
     POVMS_LOG_OUTPUT("POVMSUtil_GetBool");
 
@@ -4318,10 +4318,10 @@ POVMS_EXPORT POVMSResult POVMS_CDECL POVMSUtil_GetBool(POVMSObjectPtr object, PO
             err = temp_err;
     }
 
-    if(c == 0x00)
-        *boolvalue = false;
+    if (c == kPOVMSStreamFalse)
+        *boolvalue = POVMSFalse;
     else
-        *boolvalue = true;
+        *boolvalue = POVMSTrue;
 
     return err;
 }
@@ -4492,7 +4492,7 @@ void POVMS_Sys_QueueClose_Default(POVMS_Sys_QueueNode_Default *q)
     }
 }
 
-void *POVMS_Sys_QueueReceive_Default(POVMS_Sys_QueueNode_Default *q, int *l, bool, bool)
+void *POVMS_Sys_QueueReceive_Default(POVMS_Sys_QueueNode_Default *q, int *l, POVMSBool blocking, POVMSBool yielding)
 {
     POVMS_Sys_QueueNode_Default *ptr = (POVMS_Sys_QueueNode_Default *)q;
     POVMS_Sys_QueueDataNode_Default *node = NULL;
