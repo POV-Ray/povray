@@ -132,6 +132,7 @@ class SphereSweep : public ObjectBase
         int             Num_Segments;           /* Number of tubular segments    */
         SPHSWEEP_SEG    *Segment;               /* Tubular segments              */
         DBL             Depth_Tolerance;        /* Preferred depth tolerance     */
+        Vector3d        uref;/**< direction of origin of u in uv_mapping */
 
         SphereSweep();
         virtual ~SphereSweep();

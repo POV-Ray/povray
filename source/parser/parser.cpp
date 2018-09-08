@@ -6845,12 +6845,18 @@ ObjectPtr Parser::Parse_Sphere_Sweep()
         Parse_Comma();
     }
 
-    EXPECT_ONE
+    EXPECT
         CASE(TOLERANCE_TOKEN)
             Object->Depth_Tolerance = Parse_Float();
         END_CASE
+
+        CASE(UV_REFERENCE_TOKEN)
+          Parse_Vector(Object->uref);
+        END_CASE
+
         OTHERWISE
             UNGET
+            EXIT
         END_CASE
     END_EXPECT
 
