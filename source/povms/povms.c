@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -4111,7 +4111,11 @@ POVMS_EXPORT int POVMS_CDECL POVMSUtil_GetUCS2StringLength(POVMSObjectPtr object
     {
         ret = POVMSAttr_Type(&attr, &attr_type);
         if((ret == kNoErr) && (attr_type == kPOVMSType_UCS2String))
-            ret = POVMSAttr_Size(&attr, len) / 2;
+        {
+            ret = POVMSAttr_Size(&attr, len);
+            if (ret == kNoErr)
+                *len /= sizeof(POVMSUCS2);
+        }
         else if((ret == kNoErr) && (attr_type != kPOVMSType_UCS2String))
             ret = kDataTypeErr;
         temp_ret = POVMSAttr_Delete(&attr);
