@@ -1206,6 +1206,7 @@ SphereSweep::SphereSweep() : ObjectBase(SPHERE_SWEEP_OBJECT)
     Depth_Tolerance = DEPTH_TOLERANCE;
 
     Trans = NULL;
+    uref = Vector3d( 1.0, 0.0, 0.0);
 }
 
 
@@ -1713,9 +1714,9 @@ void SphereSweep::Compute()
           }
         }
         else
-        { // make a random choice... sort of : perpendicular to +x, or +y when going along x
-          Vector3d foo(1.0,0.0,0.0);
-          Vector3d bar(0.0,1.0,0.0);
+        { // listen to user to make a choice...
+          Vector3d foo(uref);
+          Vector3d bar(uref[Y], uref[Z], uref[X]);
           DBL lenv0;
           if (tmplength>0.0)
           {
