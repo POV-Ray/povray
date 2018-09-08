@@ -6860,11 +6860,11 @@ ObjectPtr Parser::Parse_Sphere_Sweep()
         END_CASE
     END_EXPECT
 
+    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
+    // transformation are needed for uv_reference update
     Object->Compute();
 
     Object->Compute_BBox();
-
-    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
 
     return (reinterpret_cast<ObjectPtr>(Object));
 }
