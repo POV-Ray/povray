@@ -588,11 +588,14 @@ ObjectPtr Polygon::Copy()
 
 Polygon::~Polygon()
 {
-    if (--(Data->References) == 0)
+    if (Data != nullptr)
     {
-        POV_FREE (Data->Points);
-
-        POV_FREE (Data);
+        if (--(Data->References) == 0)
+        {
+            if (Data->Points != nullptr)
+                delete[] Data->Points;
+            delete Data;
+        }
     }
 }
 
@@ -644,13 +647,13 @@ void Polygon::Compute_Polygon(int number, Vector3d *points)
 
     if (Data == nullptr)
     {
-        Data = reinterpret_cast<POLYGON_DATA *>(POV_MALLOC(sizeof(POLYGON_DATA), "polygon points"));
+        Data = new POLYGON_DATA;
 
         Data->References = 1;
 
         Data->Number = number;
 
-        Data->Points = reinterpret_cast<Vector2d *>(POV_MALLOC(number*sizeof(Vector2d), "polygon points"));
+        Data->Points = new Vector2d[number];
     }
     else
     {
