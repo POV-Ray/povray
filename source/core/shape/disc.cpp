@@ -592,7 +592,7 @@ void Disc::evalVertex( Vector3d& r, const DBL u, const DBL v )const
 {
   DBL iradius = sqrt(iradius2);
   DBL oradius = sqrt(oradius2);
-  r = Vector3d( ((oradius-iradius)*v+iradius)*cos( u * TWO_M_PI ), 0.0, ((oradius-iradius)*v+iradius)*sin( u * TWO_M_PI ));
+  r = Vector3d( ((oradius-iradius)*v+iradius)*cos( u * TWO_M_PI ), ((oradius-iradius)*v+iradius)*sin( u * TWO_M_PI ), 0.0 );
 
   if (Trans)
   {
