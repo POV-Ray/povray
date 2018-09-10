@@ -40,6 +40,8 @@
 #include "core/configcore.h"
 
 #include "core/scene/object.h"
+#include "core/shape/uvmeshable.h"
+
 
 namespace pov
 {
@@ -62,7 +64,7 @@ namespace pov
 ///
 //******************************************************************************
 
-class Disc : public ObjectBase
+class Disc : public ObjectBase, public UVMeshable
 {
     public:
         Vector3d center;  ///< Center of the disc.
@@ -87,6 +89,12 @@ class Disc : public ObjectBase
         virtual void Compute_BBox();
 
         void Compute_Disc();
+
+        virtual void evalVertex( Vector3d& r, const DBL u, const DBL v )const;
+        virtual void evalNormal( Vector3d& r, const DBL u, const DBL v )const;
+        virtual void minUV( Vector2d& r )const;
+        virtual void maxUV( Vector2d& r )const;
+
     protected:
         bool Intersect(const BasicRay& ray, DBL *Depth) const;
 };
