@@ -2728,6 +2728,16 @@ ObjectPtr Parser::Parse_Cone ()
         END_CASE
     END_EXPECT
 
+    EXPECT_ONE
+        CASE(UV_REFERENCE_TOKEN)
+          Parse_Vector(Object->uref);
+        END_CASE
+
+        OTHERWISE
+            UNGET
+        END_CASE
+    END_EXPECT
+
     /* Compute run-time values for the cone */
     Object->Compute_Cone_Data();
 
@@ -2777,6 +2787,16 @@ ObjectPtr Parser::Parse_Cylinder ()
     EXPECT_ONE
         CASE(OPEN_TOKEN)
             Clear_Flag(Object, CLOSED_FLAG);
+        END_CASE
+
+        OTHERWISE
+            UNGET
+        END_CASE
+    END_EXPECT
+
+    EXPECT_ONE
+        CASE(UV_REFERENCE_TOKEN)
+          Parse_Vector(Object->uref);
         END_CASE
 
         OTHERWISE
@@ -2835,6 +2855,16 @@ ObjectPtr Parser::Parse_Disc ()
         CASE_FLOAT
             tmpf = Parse_Float();
             Object->iradius2 = tmpf * tmpf;
+        END_CASE
+
+        OTHERWISE
+            UNGET
+        END_CASE
+    END_EXPECT
+
+    EXPECT_ONE
+        CASE(UV_REFERENCE_TOKEN)
+          Parse_Vector(Object->uref);
         END_CASE
 
         OTHERWISE
@@ -3551,6 +3581,16 @@ ObjectPtr Parser::Parse_Lemon ()
     EXPECT_ONE
         CASE(OPEN_TOKEN)
             Clear_Flag(Object, CLOSED_FLAG);
+        END_CASE
+
+        OTHERWISE
+            UNGET
+        END_CASE
+    END_EXPECT
+
+    EXPECT_ONE
+        CASE(UV_REFERENCE_TOKEN)
+          Parse_Vector(Object->uref);
         END_CASE
 
         OTHERWISE
@@ -6805,20 +6845,26 @@ ObjectPtr Parser::Parse_Sphere_Sweep()
         Parse_Comma();
     }
 
-    EXPECT_ONE
+    EXPECT
         CASE(TOLERANCE_TOKEN)
             Object->Depth_Tolerance = Parse_Float();
         END_CASE
+
+        CASE(UV_REFERENCE_TOKEN)
+          Parse_Vector(Object->uref);
+        END_CASE
+
         OTHERWISE
             UNGET
+            EXIT
         END_CASE
     END_EXPECT
 
+    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
+    // transformation are needed for uv_reference update
     Object->Compute();
 
     Object->Compute_BBox();
-
-    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
 
     return (reinterpret_cast<ObjectPtr>(Object));
 }

@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -99,6 +99,8 @@ class Lemon : public ObjectBase, public UVMeshable
         DBL inner_radius;       /* Radius of the inner circle */
         DBL HorizontalPosition; /* horizontal position of the center of the inner circle */
         DBL VerticalPosition;   /* vertical position of the center of the inner circle */
+        Vector3d uref; ///< direction for origin of u in uv_mapping
+
 
         virtual void evalVertex( Vector3d& r, const DBL u, const DBL v )const;
         virtual void evalNormal( Vector3d& r, const DBL u, const DBL v )const;

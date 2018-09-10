@@ -61,6 +61,10 @@ namespace pov_parser
 using namespace pov_base;
 using namespace pov;
 
+#if POV_DEBUG
+unsigned int gBreakpointCounter = 0;
+#endif
+
 /*****************************************************************************
 * Local preprocessor defines
 ******************************************************************************/
@@ -125,6 +129,10 @@ void Parser::Initialize_Tokenizer()
     for(c = Echo_getc(); c > 127; c = Echo_getc())
         sceneData->stringEncoding = kStringEncoding_UTF8; // switch to UTF-8 automatically [trf]
     Echo_ungetc(c);
+
+#if POV_DEBUG
+    gBreakpointCounter = 0;
+#endif
 }
 
 
@@ -2806,8 +2814,15 @@ void Parser::Parse_Directive(int After_Hash)
 
 #if POV_DEBUG
         CASE(BREAKPOINT_TOKEN)
-            // This statement does nothing, except allow you to set a debug breakpoint here
-            // so that you can effectively trigger the debugger via an SDL command.
+            Parsing_Directive = false;
+            if (Skipping)
+            {
+                UNGET
+            }
+            else
+            {
+                Parse_Breakpoint();
+            }
             EXIT
         END_CASE
 #endif
@@ -2833,6 +2848,24 @@ void Parser::Parse_Directive(int After_Hash)
         Token.is_dictionary_elem = false;
     }
 }
+
+#if POV_DEBUG
+void Parser::Parse_Breakpoint()
+{
+    // This function is invoked in debug builds whenever the `#breakpoint` directive is encountered
+    // in a scene or include file.
+    // Control flow is honored, e.g. `#if(0) #breakpoint #else #breakpoint #end` will trigger this
+    // function only on the second `#breakpoint` directive.
+
+    // To use the `#breakpoint` directive to immediately break program execution, place an
+    // unconditional breakpoint here.
+
+    // To use the `#breakpoint` directive to prime a breakpoint elsewhere, make that breakpoint
+    // conditional, testing for `gBreakpointCounter > 0`.
+
+    ++gBreakpointCounter;
+}
+#endif
 
 
 /*****************************************************************************
