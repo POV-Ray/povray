@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -70,8 +70,9 @@ class Disc : public ObjectBase, public UVMeshable
         Vector3d center;  ///< Center of the disc.
         Vector3d normal;  ///< Direction perpendicular to the disc (plane normal).
         DBL d;            ///< The constant part of the plane equation.
-        DBL iradius2;     ///< Distance from center to inner circle of the disc.
-        DBL oradius2;     ///< Distance from center to outer circle of the disc.
+        DBL iradius2;     ///< squared Distance from center to inner circle of the disc.
+        DBL oradius2;     ///< squared Distance from center to outer circle of the disc.
+        Vector3d uref;    ///< direction for the origin of u in uvmapping
 
         Disc();
         virtual ~Disc();
@@ -81,7 +82,7 @@ class Disc : public ObjectBase, public UVMeshable
         virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
         virtual bool Inside(const Vector3d&, TraceThreadData *) const;
         virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
-        // virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const; // TODO FIXME - why is there no UV-mapping for this object?
+        virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
         virtual void Translate(const Vector3d&, const TRANSFORM *);
         virtual void Rotate(const Vector3d&, const TRANSFORM *);
         virtual void Scale(const Vector3d&, const TRANSFORM *);
@@ -96,7 +97,7 @@ class Disc : public ObjectBase, public UVMeshable
         virtual void maxUV( Vector2d& r )const;
 
     protected:
-        bool Intersect(const BasicRay& ray, DBL *Depth) const;
+        bool Intersect(const BasicRay& ray, DBL *Depth, DBL&u, DBL&v) const;
 };
 
 /// @}

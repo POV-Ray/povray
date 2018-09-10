@@ -92,8 +92,8 @@ struct Sphere_Sweep_Sphere_Struct
 {
     Vector3d    Center;
     DBL         Radius;
-    DBL         Uvalue;
-    Vector3d    Vbase[2];
+    DBL         Vvalue;
+    Vector3d    Ubase[2];
 };
 
 /* One segment of the sphere sweep */
@@ -105,8 +105,8 @@ struct Sphere_Sweep_Segment_Struct
     int           Num_Coefs;                      /* Number of coefficients        */
     Vector3d      Center_Coef[SPH_SWP_MAX_COEFS]; /* Coefs of center polynomial    */
     DBL           Radius_Coef[SPH_SWP_MAX_COEFS]; /* Coefs of radius polynomial    */
-    DBL           Uvalue[2];                      /* U value at each ends */
-    Vector3d      Vbase[4];                       /* base of V space, at each ends */
+    DBL           Vvalue[2];                      /* V value at each ends */
+    Vector3d      Ubase[4];                       /* base of U space, at each ends */
 
 };
 
@@ -117,7 +117,7 @@ struct Sphere_Sweep_Intersection_Structure
     Vector3d    Point;      // Intersection point
     Vector3d    Normal;     // Normal at intersection point
     Vector2d    uv;
-    Vector3d    Vbase[2];
+    Vector3d    Ubase[2];
 };
 
 /* The complete object */
@@ -132,6 +132,7 @@ class SphereSweep : public ObjectBase
         int             Num_Segments;           /* Number of tubular segments    */
         SPHSWEEP_SEG    *Segment;               /* Tubular segments              */
         DBL             Depth_Tolerance;        /* Preferred depth tolerance     */
+        Vector3d        uref;/**< direction of origin of u in uv_mapping */
 
         SphereSweep();
         virtual ~SphereSweep();

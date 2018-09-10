@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -76,6 +76,8 @@ class Cone : public ObjectBase, public UVMeshable
         DBL apex_radius;    ///< Radius of the cone at the top.
         DBL base_radius;    ///< Radius of the cone at the bottom.
         DBL dist;           ///< Distance to end of cone in canonical coords.
+        Vector3d uref; ///< direction for origin of u in uv_mapping
+        bool vInverted;///< the v of uv-mapping is inverted
 
         Cone();
         virtual ~Cone();
