@@ -102,6 +102,9 @@ Reported via the Newsgroups:
 Reported by Coverity static code analysis:
 
    - CID 986462,986463 (Wrapper object use after free)
+   - CID 967358-967362 (Uninitialized scalar variable)
+   - CID 1372618 (Uninitialized scalar variable)
+   - CID 1372630-1372632 (Uninitialized scalar variable)
 
 Miscellaneous:
 
