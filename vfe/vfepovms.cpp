@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -100,8 +100,8 @@ SysQNode::SysQNode (void)
 {
   m_Sanity = 0xEDFEEFBE ;
   m_Count = 0 ;
-  m_First = NULL ;
-  m_Last = NULL ;
+  m_First = nullptr;
+  m_Last = nullptr;
   m_ID = QueueID++ ;
 }
 
@@ -113,9 +113,9 @@ SysQNode::~SysQNode ()
   if (m_Count > 0)
   {
     DataNode *current = m_First ;
-    DataNode *next = NULL ;
+    DataNode *next = nullptr;
 
-    while (current != NULL)
+    while (current != nullptr)
     {
       next = current->Next ;
       POVMS_Sys_Free (current) ;
@@ -130,18 +130,18 @@ int SysQNode::Send (void *pData, int Len)
   if (m_Sanity == 0xEDFEEFBE)
   {
     DataNode *dNode = reinterpret_cast<DataNode *>(POVMS_Sys_Malloc (sizeof (DataNode))) ;
-    if (dNode == NULL)
+    if (dNode == nullptr)
       return (-3) ;
 
     dNode->Data = pData ;
     dNode->Len = Len ;
-    dNode->Next = NULL ;
+    dNode->Next = nullptr;
 
     boost::mutex::scoped_lock lock (m_EventMutex) ;
 
-    if (m_Last != NULL)
+    if (m_Last != nullptr)
       m_Last->Next = dNode ;
-    if (m_First == NULL)
+    if (m_First == nullptr)
       m_First = dNode ;
     m_Last = dNode ;
     m_Count++ ;
@@ -164,7 +164,7 @@ void *SysQNode::Receive (int *pLen, bool Blocking)
   if (m_Count == 0)
   {
     if (Blocking == false)
-      return (NULL);
+      return nullptr;
 
     // TODO: have a shorter wait but loop, and check for system shutdown
     // TODO FIXME - boost::xtime has been deprecated since boost 1.34.
@@ -174,20 +174,20 @@ void *SysQNode::Receive (int *pLen, bool Blocking)
     m_Event.timed_wait (lock, t);
 
     if (m_Count == 0)
-      return (NULL) ;
+      return nullptr;
   }
 
   DataNode *dNode = m_First ;
-  if (dNode == NULL)
+  if (dNode == nullptr)
     throw vfeInvalidDataError("NULL data node in SysQNode::Receive");
 
   void *dPtr = dNode->Data ;
   *pLen = dNode->Len ;
   if (dNode == m_Last)
-    m_Last = NULL ;
+    m_Last = nullptr;
   m_First = dNode->Next ;
   m_Count-- ;
-  assert (m_Count != 0 || (m_First == NULL && m_Last == NULL)) ;
+  assert ((m_Count != 0) || ((m_First == nullptr) && (m_Last == nullptr)));
   POVMS_Sys_Free (dNode) ;
   return (dPtr) ;
 }
@@ -228,21 +228,21 @@ void vfe_POVMS_Sys_QueueClose (SysQNode *SysQ)
 
 int vfe_POVMS_Sys_QueueSend (SysQNode *SysQ, void *pData, int Len)
 {
-  if (SysQ == NULL)
+  if (SysQ == nullptr)
     return (-1) ;
   return (SysQ->Send (pData, Len)) ;
 }
 
 void *vfe_POVMS_Sys_QueueReceive (SysQNode *SysQ, int *pLen, bool Blocking, bool Yielding)
 {
-  if (pLen == NULL)
-    return (NULL) ;
+  if (pLen == nullptr)
+    return nullptr;
   *pLen = 0 ;
-  if (SysQ == NULL)
+  if (SysQ == nullptr)
   {
     if (Yielding)
       Delay (1) ;
-    return (NULL) ;
+    return nullptr;
   }
   return (SysQ->Receive (pLen, Blocking)) ;
 }

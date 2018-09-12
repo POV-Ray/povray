@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -1183,7 +1183,7 @@ void Complex_ASin(Complex *target, const Complex *source, const Complex *)
     tempz2.x = -source->y; tempz2.y = source->x;
     tempz1.x += tempz2.x;  tempz1.y += tempz2.y;
 
-    Complex_Ln( &tempz1, &tempz1, NULL);
+    Complex_Ln( &tempz1, &tempz1);
     target->x = tempz1.y;  target->y = -tempz1.x;
 } /* End Complex_ASin() */
 
@@ -1198,7 +1198,7 @@ void Complex_ACos(Complex *target, const Complex *source, const Complex *)
 
     temp.x += source->x; temp.y += source->y;
 
-    Complex_Ln(&temp, &temp, NULL);
+    Complex_Ln(&temp, &temp);
     target->x = temp.y;  target->y = -temp.x;
 } /* End Complex_ACos() */
 
@@ -1210,7 +1210,7 @@ void Complex_ASinh(Complex *target, const Complex *source, const Complex *)
     temp.x += 1;
     Complex_Sqrt (&temp, &temp);
     temp.x += source->x; temp.y += source->y;
-    Complex_Ln(target, &temp, NULL);
+    Complex_Ln(target, &temp);
 } /* End Complex_ASinh */
 
 /* rz=Arccosh(z)=Log(z+sqrt(z*z-1)} */
@@ -1221,7 +1221,7 @@ void Complex_ACosh (Complex *target, const Complex *source, const Complex *)
     tempz.x -= 1;
     Complex_Sqrt (&tempz, &tempz);
     tempz.x = source->x + tempz.x; tempz.y = source->y + tempz.y;
-    Complex_Ln (target, &tempz, NULL);
+    Complex_Ln (target, &tempz);
 } /* End Complex_ACosh() */
 
 /* rz=Arctanh(z)=1/2*Log{(1+z)/(1-z)} */
@@ -1252,7 +1252,7 @@ void Complex_ATanh(Complex *target, const Complex *source, const Complex *)
             temp0.x = 1 + source->x; temp0.y = source->y;
             temp1.x = 1 - source->x; temp1.y = -source->y;
             Complex_Div(&temp2, &temp0, &temp1);
-            Complex_Ln(&temp2, &temp2, NULL);
+            Complex_Ln(&temp2, &temp2);
             target->x = .5 * temp2.x; target->y = .5 * temp2.y;
             return;
         }
@@ -1271,7 +1271,7 @@ void Complex_ATan(Complex *target, const Complex *source, const Complex *)
     }
     else if( source->x == 0.0 && source->y != 0.0){
         temp0.x = source->y;  temp0.y = 0.0;
-        Complex_ATanh(&temp0, &temp0, NULL);
+        Complex_ATanh(&temp0, &temp0, nullptr);
         target->x = -temp0.y; target->y = temp0.x;
     }
     else if( source->x != 0.0 && source->y != 0.0)
@@ -1281,7 +1281,7 @@ void Complex_ATan(Complex *target, const Complex *source, const Complex *)
         temp2.x = 1 + temp0.x; temp2.y = temp0.y;
 
         Complex_Div(&temp3, &temp1, &temp2);
-        Complex_Ln(&temp3, &temp3, NULL);
+        Complex_Ln(&temp3, &temp3);
         target->x = -temp3.y * .5; target->y = .5 * temp3.x;
     }
 } /* End Complex_ATanz() */
@@ -1326,7 +1326,7 @@ void Complex_Pwr (Complex *target, const Complex *source1, const Complex *source
         return;
     }
 
-    Complex_Ln (&cLog, source1, NULL);
+    Complex_Ln (&cLog, source1);
     Complex_Mult (&t, &cLog, source2);
 
     if(t.x < -690)

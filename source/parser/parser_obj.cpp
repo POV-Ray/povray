@@ -173,8 +173,8 @@ void Parser::Parse_Obj (Mesh* mesh)
     UCS2 *fileName;
     char *s;
     UCS2String ign;
-    IStream *stream = NULL;
-    pov_base::ITextStream *textStream = NULL;
+    IStream *stream = nullptr;
+    pov_base::ITextStream *textStream = nullptr;
     char wordBuffer [kMaxObjBufferSize];
     std::string materialPrefix;
     std::string materialSuffix;
@@ -371,10 +371,10 @@ void Parser::Parse_Obj (Mesh* mesh)
                     if (materialId == materialList.size())
                     {
                         material.mtlName = wordBuffer;
-                        material.texture = NULL;
+                        material.texture = nullptr;
                         std::string identifier = materialPrefix + std::string(wordBuffer) + materialSuffix;
                         SYM_ENTRY *symbol = Find_Symbol (identifier.c_str());
-                        if (symbol == NULL)
+                        if (symbol == nullptr)
                             Error ("No matching texture for obj file material '%s': Identifier '%s' not found.", wordBuffer, identifier.c_str());
                         else if (symbol->Token_Number == TEXTURE_ID_TOKEN)
                             material.texture = Copy_Textures(reinterpret_cast<TEXTURE *>(symbol->Data));
@@ -445,11 +445,11 @@ void Parser::Parse_Obj (Mesh* mesh)
     size_t smoothFaces = faceList.size();
     faceList.insert (faceList.end(), flatFaceList.begin(), flatFaceList.end());
 
-    MeshVector *vertexArray = NULL;
-    MeshVector *normalArray = NULL;
-    MeshUVVector *uvArray = NULL;
-    TEXTURE **textureArray = NULL;
-    MESH_TRIANGLE *triangleArray = NULL;
+    MeshVector *vertexArray = nullptr;
+    MeshVector *normalArray = nullptr;
+    MeshUVVector *uvArray = nullptr;
+    TEXTURE **textureArray = nullptr;
+    MESH_TRIANGLE *triangleArray = nullptr;
 
     if (vertexList.empty())
         Error ("No vertices in obj file.");
@@ -547,7 +547,7 @@ void Parser::Parse_Obj (Mesh* mesh)
 
     mesh->Data = reinterpret_cast<MESH_DATA *>(POV_MALLOC(sizeof(MESH_DATA), "triangle mesh data"));
     mesh->Data->References = 1;
-    mesh->Data->Tree = NULL;
+    mesh->Data->Tree = nullptr;
 
     mesh->has_inside_vector = insideVector.IsNearNull (EPSILON);
     if (mesh->has_inside_vector)

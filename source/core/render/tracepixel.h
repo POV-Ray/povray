@@ -71,7 +71,7 @@ class TracePixel;
 class TracePixelCameraData
 {
     public:
-        TracePixelCameraData(TraceThreadData *td, bool pt):focalBlurData(NULL),threadDataC(td),precomputeContainingInteriors(pt){}
+        TracePixelCameraData(TraceThreadData *td, bool pt):focalBlurData(nullptr),threadDataC(td),precomputeContainingInteriors(pt){}
         // Focal blur data
         class FocalBlurData
         {

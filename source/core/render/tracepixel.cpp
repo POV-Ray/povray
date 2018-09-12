@@ -13,7 +13,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -182,7 +182,7 @@ inline int PseudoRandom(int v)
 
 bool HasInteriorPointObjectCondition::operator()(const Vector3d& point, ConstObjectPtr object) const
 {
-    return object->interior != NULL;
+    return object->interior != nullptr;
 }
 
 bool ContainingInteriorsPointObjectCondition::operator()(const Vector3d& point, ConstObjectPtr object) const
@@ -202,21 +202,21 @@ TracePixel::TracePixel(shared_ptr<SceneData> sd, const Camera* cam, TraceThreadD
 {
     for (unsigned int i = 0; i < 3; ++i)
     {
-        mpCameraLocationFn[i] = NULL;
-        mpCameraDirectionFn[i] = NULL;
+        mpCameraLocationFn[i] = nullptr;
+        mpCameraDirectionFn[i] = nullptr;
     }
-    SetupCamera((cam == NULL) ? sceneData->parsedCamera : *cam);
+    SetupCamera((cam == nullptr) ? sd->parsedCamera : *cam);
 }
 
 TracePixel::~TracePixel()
 {
-    if(focalBlurData != NULL)
+    if (focalBlurData != nullptr)
         delete focalBlurData;
     for (unsigned int i = 0; i < 3; ++i)
     {
-        if (mpCameraLocationFn[i] != NULL)
+        if (mpCameraLocationFn[i] != nullptr)
             delete mpCameraLocationFn[i];
-        if (mpCameraDirectionFn[i] != NULL)
+        if (mpCameraDirectionFn[i] != nullptr)
             delete mpCameraDirectionFn[i];
     }
 }
@@ -292,13 +292,13 @@ void TracePixelCameraData::SetupCamera(const Camera& cam)
             normalise = true;
             for (unsigned int i = 0; i < 3; ++i)
             {
-                if(mpCameraLocationFn[i] != NULL)
+                if (mpCameraLocationFn[i] != nullptr)
                     delete mpCameraLocationFn[i];
-                if(camera.Location_Fn[i] != NULL)
+                if (camera.Location_Fn[i] != nullptr)
                     mpCameraLocationFn[i] = new GenericScalarFunctionInstance(camera.Location_Fn[i], threadDataC);
-                if(mpCameraDirectionFn[i] != NULL)
+                if (mpCameraDirectionFn[i] != nullptr)
                     delete mpCameraDirectionFn[i];
-                if(camera.Direction_Fn[i] != NULL)
+                if (camera.Direction_Fn[i] != nullptr)
                     mpCameraDirectionFn[i] = new GenericScalarFunctionInstance(camera.Direction_Fn[i], threadDataC);
             }
             break;
@@ -314,10 +314,10 @@ void TracePixelCameraData::SetupCamera(const Camera& cam)
         cameraDirection.normalize();
     }
 
-    if(focalBlurData != NULL)
+    if (focalBlurData != nullptr)
     {
         delete focalBlurData;
-        focalBlurData = NULL;
+        focalBlurData = nullptr;
     }
 
     // TODO: there is little point in calculating the grid separately for each thread.
@@ -1149,11 +1149,11 @@ bool TracePixelCameraData::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DB
 
             for (unsigned int i = 0; i < 3; ++i)
             {
-                if (camera.Location_Fn[i] != NULL)
+                if (camera.Location_Fn[i] != nullptr)
                     cameraLocation[i] = mpCameraLocationFn[i]->Evaluate(x0, y0);
                 if (!IsFinite(cameraLocation[i]))
                     return false;
-                if (camera.Direction_Fn[i] != NULL)
+                if (camera.Direction_Fn[i] != nullptr)
                     cameraDirection[i] = mpCameraDirectionFn[i]->Evaluate(x0, y0);
                 if (!IsFinite(cameraDirection[i]))
                     return false;
@@ -1519,11 +1519,11 @@ bool TracePixelCameraData::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DB
             throw POV_EXCEPTION_STRING("Unknown camera type in CreateCameraRay().");
     }
 
-    if(camera.Tnormal != NULL)
+    if (camera.Tnormal != nullptr)
     {
         ray.Direction.normalize();
         V1 = Vector3d(x0, y0, 0.0);
-        Perturb_Normal(ray.Direction, camera.Tnormal, V1, NULL, NULL, threadDataC);
+        Perturb_Normal(ray.Direction, camera.Tnormal, V1, nullptr, nullptr, threadDataC);
     }
 
     ray.Direction.normalize();
@@ -1542,20 +1542,20 @@ void TracePixel::InitRayContainerState(Ray& ray, bool compute)
         {
             HasInteriorPointObjectCondition precond;
             ContainingInteriorsPointObjectCondition postcond(containingInteriors);
-            BSPInsideCondFunctor ifn(ray.Origin, sceneData->objects, threadData, precond, postcond);
+            BSPInsideCondFunctor ifn(ray.Origin, sceneData->objects, threadDataC, precond, postcond);
 
             mailbox.clear();
             (*sceneData->tree)(ray.Origin, ifn, mailbox);
 
             // test infinite objects
             for(vector<ObjectPtr>::iterator object = sceneData->objects.begin() + sceneData->numberOfFiniteObjects; object != sceneData->objects.end(); object++)
-                if(((*object)->interior != NULL) && Inside_BBox(ray.Origin, (*object)->BBox) && (*object)->Inside(ray.Origin, threadData))
+                if (((*object)->interior != nullptr) && Inside_BBox(ray.Origin, (*object)->BBox) && (*object)->Inside(ray.Origin, threadDataC))
                     containingInteriors.push_back((*object)->interior.get());
         }
-        else if((sceneData->boundingMethod == 0) || (sceneData->boundingSlabs == NULL))
+        else if ((sceneData->boundingMethod == 0) || (sceneData->boundingSlabs == nullptr))
         {
             for(vector<ObjectPtr>::iterator object = sceneData->objects.begin(); object != sceneData->objects.end(); object++)
-                if(((*object)->interior != NULL) && Inside_BBox(ray.Origin, (*object)->BBox) && (*object)->Inside(ray.Origin, threadData))
+                if (((*object)->interior != nullptr) && Inside_BBox(ray.Origin, (*object)->BBox) && (*object)->Inside(ray.Origin, threadDataC))
                     containingInteriors.push_back((*object)->interior.get());
         }
         else
@@ -1599,7 +1599,7 @@ void TracePixel::InitRayContainerStateTree(Ray& ray, BBOX_TREE *node)
     {
         /* This is a leaf so test contained object. */
         ObjectPtr object = ObjectPtr(node->Node);
-        if((object->interior != NULL) && object->Inside(ray.Origin, threadData))
+        if ((object->interior != nullptr) && object->Inside(ray.Origin, threadDataC))
             containingInteriors.push_back(object->interior.get());
     }
     else
@@ -1637,7 +1637,7 @@ void TracePixel::TraceRayWithFocalBlur(RGBTColour& colour, DBL x, DBL y, DBL wid
         // Trace number of rays given by the list Current_Number_Of_Samples[].
         max_s = 4;
 
-        if(focalBlurData->Current_Number_Of_Samples != NULL)
+        if (focalBlurData->Current_Number_Of_Samples != nullptr)
         {
             if(focalBlurData->Current_Number_Of_Samples[level] > 0)
             {
@@ -1759,7 +1759,7 @@ TracePixel::FocalBlurData::FocalBlurData(const Camera& camera, TraceThreadData* 
 
     if (camera.Bokeh)
     {
-        Current_Number_Of_Samples = NULL;
+        Current_Number_Of_Samples = nullptr;
         Max_Jitter = 0.5 / sqrt((DBL)camera.Blur_Samples);
 
         double weightSum = 0.0;
@@ -1777,7 +1777,7 @@ TracePixel::FocalBlurData::FocalBlurData(const Camera& camera, TraceThreadData* 
             do
             {
                 v = (*vgen)();
-                Compute_Pigment(c, camera.Bokeh, Vector3d(v.x() + 0.5, v.y() + 0.5, 0.0), NULL, NULL, threadData);
+                Compute_Pigment(c, camera.Bokeh, Vector3d(v.x() + 0.5, v.y() + 0.5, 0.0), nullptr, nullptr, threadData);
                 weight = c.colour().Greyscale();
                 weightSum += weight;
                 weightMax = max(weightMax, weight);
@@ -1801,7 +1801,7 @@ TracePixel::FocalBlurData::FocalBlurData(const Camera& camera, TraceThreadData* 
         // Default is 4x4 standard grid.
         const Vector2d *Standard_Sample_Grid = Grid1;
         int Standard_Sample_Grid_Size = 4;
-        Current_Number_Of_Samples = NULL;
+        Current_Number_Of_Samples = nullptr;
 
         // Check for 37 samples hexgrid.
         if(camera.Blur_Samples >= HexGrid4Size)
@@ -1894,7 +1894,7 @@ TracePixel::FocalBlurData::FocalBlurData(const Camera& camera, TraceThreadData* 
         }
     }
 
-    // Calculate vectors perpendicular to the current ray
+    // Calculate vectors perpendicular to the optical axis
     // We're making a "+" (crosshair) on the film plane.
 
     // XPerp = vector perpendicular to y/z plane

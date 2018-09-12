@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -159,7 +159,7 @@ CPUVendorInfo gCPUVendorInfo[] = {
     { kCPUVendor_VM,            "VMwareVMware" },   // VMWare
     { kCPUVendor_VM,            "XenVMMXenVMM" },   // Xen HVM
     // End of list.
-    { kCPUVendor_Unrecognized,  NULL }
+    { kCPUVendor_Unrecognized,  nullptr }
 };
 
 struct CPUIDInfo
@@ -197,7 +197,7 @@ CPUIDInfo::CPUIDInfo() :
     std::memcpy(vendor + 4, &info[CPUID_EDX], 4);
     std::memcpy(vendor + 8, &info[CPUID_ECX], 4);
     vendor[12] = '\0';
-    for (CPUVendorInfo* p = gCPUVendorInfo; p->cpuidString != NULL; ++p)
+    for (CPUVendorInfo* p = gCPUVendorInfo; p->cpuidString != nullptr; ++p)
     {
         if (strcmp(vendor, p->cpuidString) == 0)
         {

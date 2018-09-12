@@ -14,7 +14,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -104,8 +104,8 @@ POV_JPEG_Write_Buffer::POV_JPEG_Write_Buffer()
     memset(&jsrc, 0, sizeof(jsrc));
     memset(&jdest, 0, sizeof(jdest));
     memset(&cinfo, 0, sizeof(cinfo));
-    row_pointer[0] = NULL;
-    file = NULL;
+    row_pointer[0] = nullptr;
+    file = nullptr;
     row_stride = 0;
 }
 
@@ -133,8 +133,8 @@ POV_JPEG_Read_Buffer::POV_JPEG_Read_Buffer()
     memset(&jsrc, 0, sizeof(jsrc));
     memset(&jdest, 0, sizeof(jdest));
     memset(&cinfo, 0, sizeof(cinfo));
-    row_pointer[0] = NULL;
-    file = NULL;
+    row_pointer[0] = nullptr;
+    file = nullptr;
     row_stride = 0;
 }
 

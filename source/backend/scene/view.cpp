@@ -91,7 +91,7 @@ ViewData::ViewData(shared_ptr<BackendSceneData> sd) :
     blockHeight(8),
     blockSize(DEFAULT_BLOCK_SIZE),
     realTimeRaytracing(false),
-    rtrData(NULL),
+    rtrData(nullptr),
     renderArea(0, 0, 159, 119),
     radiosityCache(sd->radiositySettings),
     sceneData(sd),
@@ -651,7 +651,7 @@ View::View(shared_ptr<BackendSceneData> sd, unsigned int width, unsigned int hei
     viewData(sd),
     stopRequsted(false),
     mailbox(0),
-    renderControlThread(NULL)
+    renderControlThread(nullptr)
 {
     viewData.viewId = vid;
     viewData.width = width;
@@ -758,7 +758,7 @@ void View::StartRender(POVMS_Object& renderOptions)
     bool highReproducibility = false;
     shared_ptr<ViewData::BlockIdSet> blockskiplist(new ViewData::BlockIdSet());
 
-    if(renderControlThread == NULL)
+    if (renderControlThread == nullptr)
         renderControlThread = Task::NewBoostThread(boost::bind(&View::RenderControlThread, this), POV_THREAD_STACK_SIZE);
 
     viewData.qualityFlags = QualityFlags(clip(renderOptions.TryGetInt(kPOVAttrib_Quality, 9), 0, 9));
@@ -1051,7 +1051,7 @@ void View::StartRender(POVMS_Object& renderOptions)
 
             // when we pass a null parameter for the "strategy" (last parameter),
             // then this will LOAD the photon map
-            viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new PhotonSortingTask(&viewData, surfaceMaps, mediaMaps, NULL))));
+            viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new PhotonSortingTask(&viewData, surfaceMaps, mediaMaps, nullptr))));
             // wait for photons to finish
             renderTasks.AppendSync();
         }
@@ -1554,7 +1554,7 @@ const Camera *RTRData::CompletedFrame()
                 obj.SetInt(kPOVAttrib_PixelsCompleted, numPixelsCompleted);
                 RenderBackend::SendViewOutput(viewData.GetViewId(), viewData.GetSceneData()->frontendAddress, kPOVMsgIdent_Progress, obj);
 
-                return(ca ? &cameras[numRTRframes % cameras.size()] : NULL);
+                return (ca ? &cameras[numRTRframes % cameras.size()] : nullptr);
             }
             catch(pov_base::Exception&)
             {
@@ -1578,7 +1578,7 @@ const Camera *RTRData::CompletedFrame()
     if (!event.timed_wait(lock, t))
         numRenderThreadsCompleted--;
 
-    return(ca ? &cameras[numRTRframes % cameras.size()] : NULL);
+    return (ca ? &cameras[numRTRframes % cameras.size()] : nullptr);
 }
 
 }

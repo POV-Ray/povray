@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -433,16 +433,18 @@ bool TranscodingGammaCurve::Matches(const GammaCurvePtr& p) const
 
 SimpleGammaCurvePtr GetGammaCurve(GammaTypeId type, float param)
 {
+    SimpleGammaCurvePtr gamma;
     switch (type)
     {
-        case kPOVList_GammaType_Neutral:    return NeutralGammaCurve::Get();
-        case kPOVList_GammaType_PowerLaw:   return PowerLawGammaCurve::GetByDecodingGamma(param);
-        case kPOVList_GammaType_SRGB:       return SRGBGammaCurve::Get();
-        case kPOVList_GammaType_BT709:      return BT709GammaCurve::Get();
-        case kPOVList_GammaType_BT1361:     return BT1361GammaCurve::Get();
-        case kPOVList_GammaType_BT2020:     return BT2020GammaCurve::Get();
-        default:                            POV_ASSERT (false);
+        case kPOVList_GammaType_Neutral:    gamma = NeutralGammaCurve::Get();                       break;
+        case kPOVList_GammaType_PowerLaw:   gamma = PowerLawGammaCurve::GetByDecodingGamma(param);  break;
+        case kPOVList_GammaType_SRGB:       gamma = SRGBGammaCurve::Get();                          break;
+        case kPOVList_GammaType_BT709:      gamma = BT709GammaCurve::Get();                         break;
+        case kPOVList_GammaType_BT1361:     gamma = BT1361GammaCurve::Get();                        break;
+        case kPOVList_GammaType_BT2020:     gamma = BT2020GammaCurve::Get();                        break;
+        default:                            POV_COLOURSPACE_ASSERT(false);                          break;
     }
+    return gamma;
 }
 
 }

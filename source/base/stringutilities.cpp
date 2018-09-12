@@ -54,7 +54,7 @@ UCS2String ASCIItoUCS2String(const char *s)
     UCS2String r;
     unsigned char ch;
 
-    if(s != NULL)
+    if (s != nullptr)
     {
         while(*s != 0)
         {

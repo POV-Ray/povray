@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -53,7 +53,7 @@ POVMSUCS2String POVMS_ASCIItoUCS2String(const char *s)
     POVMSUCS2String r;
     unsigned char ch;
 
-    if(s != NULL)
+    if (s != nullptr)
     {
         while(*s != 0)
         {
@@ -97,10 +97,10 @@ POVMS_Container::POVMS_Container()
 {
     data.type = kPOVMSType_Null;
     data.size = 0;
-    data.ptr = NULL;
+    data.ptr = nullptr;
 }
 
-POVMS_Container::~POVMS_Container()
+POVMS_Container::~POVMS_Container() noexcept(false)
 {
     // do nothing for now
 }
@@ -124,7 +124,7 @@ void POVMS_Container::DetachData()
 {
     data.type = kPOVMSType_Null;
     data.size = 0;
-    data.ptr = NULL;
+    data.ptr = nullptr;
 }
 
 
@@ -333,7 +333,7 @@ POVMS_Attribute::POVMS_Attribute(const POVMS_Attribute& source)
         throw POV_EXCEPTION_CODE(err);
 }
 
-POVMS_Attribute::~POVMS_Attribute()
+POVMS_Attribute::~POVMS_Attribute() noexcept(false)
 {
     int err;
 
@@ -599,7 +599,7 @@ POVMS_List::POVMS_List(const POVMS_List& source)
         throw POV_EXCEPTION_CODE(err);
 }
 
-POVMS_List::~POVMS_List()
+POVMS_List::~POVMS_List() noexcept(false)
 {
     int err;
 
@@ -806,7 +806,7 @@ POVMS_Object::POVMS_Object(POVMSObject& convert)
 
 POVMS_Object::POVMS_Object(POVMSObjectPtr convert)
 {
-    if(convert != NULL)
+    if (convert != nullptr)
         data = *convert;
 }
 
@@ -822,7 +822,7 @@ POVMS_Object::POVMS_Object(const POVMS_Object& source)
     }
 }
 
-POVMS_Object::~POVMS_Object()
+POVMS_Object::~POVMS_Object() noexcept(false)
 {
     int err;
 
@@ -1321,8 +1321,8 @@ POVMSType POVMS_Object::TryGetType(POVMSType key, POVMSType alt)
 void POVMS_Object::Read(InputStream& stream, bool continued, bool headeronly)
 {
     POVMSStream headerstream[16];
-    POVMSStream *objectstream = NULL;
-    POVMSStream *compressedstream = NULL;
+    POVMSStream *objectstream = nullptr;
+    POVMSStream *compressedstream = nullptr;
     int err = pov_base::kNoErr;
     int maxheadersize = 0;
     int datasize = 0;
@@ -1412,20 +1412,20 @@ void POVMS_Object::Read(InputStream& stream, bool continued, bool headeronly)
                 throw POV_EXCEPTION_CODE(pov_base::kCannotHandleDataErr);
         }
 
-        if(objectstream != NULL)
+        if (objectstream != nullptr)
             delete[] objectstream;
-        objectstream = NULL;
+        objectstream = nullptr;
 
-        if(compressedstream != NULL)
+        if (compressedstream != nullptr)
             delete[] compressedstream;
-        compressedstream = NULL;
+        compressedstream = nullptr;
     }
     catch(...)
     {
-        if(objectstream != NULL)
+        if (objectstream != nullptr)
             delete[] objectstream;
 
-        if(compressedstream != NULL)
+        if (compressedstream != nullptr)
             delete[] compressedstream;
 
         throw;
@@ -1436,8 +1436,8 @@ void POVMS_Object::Write(OutputStream& stream, bool append, bool compress)
 {
     POVMSType encoding = kPOVMSRawStreamEncoding;
     POVMSStream headerstream[16];
-    POVMSStream *objectstream = NULL;
-    POVMSStream *compressedstream = NULL;
+    POVMSStream *objectstream = nullptr;
+    POVMSStream *compressedstream = nullptr;
     int maxheadersize = 0;
     int maxobjectsize = 0;
     int objectsize = 0;
@@ -1504,20 +1504,20 @@ void POVMS_Object::Write(OutputStream& stream, bool append, bool compress)
                 throw POV_EXCEPTION_CODE(pov_base::kFileDataErr);
         }
 
-        if(objectstream != NULL)
+        if (objectstream != nullptr)
             delete[] objectstream;
-        objectstream = NULL;
+        objectstream = nullptr;
 
-        if(compressedstream != NULL)
+        if (compressedstream != nullptr)
             delete[] compressedstream;
-        compressedstream = NULL;
+        compressedstream = nullptr;
     }
     catch(...)
     {
-        if(objectstream != NULL)
+        if (objectstream != nullptr)
             delete[] objectstream;
 
-        if(compressedstream != NULL)
+        if (compressedstream != nullptr)
             delete[] compressedstream;
 
         throw;
@@ -1669,23 +1669,23 @@ void POVMS_Message::SetDestinationAddress(POVMSAddress addr)
 POVMS_MessageReceiver::POVMS_MessageReceiver(POVMSContext contextref)
 {
     context = contextref;
-    receivers = NULL;
+    receivers = nullptr;
 }
 
 POVMS_MessageReceiver::~POVMS_MessageReceiver()
 {
-    while(receivers != NULL)
+    while(receivers != nullptr)
         RemoveNode(receivers);
 
-    receivers = NULL;
-    context = NULL;
+    receivers = nullptr;
+    context = nullptr;
 }
 
 void POVMS_MessageReceiver::Remove(POVMSType hclass, POVMSType hid)
 {
-    HandlerNode *nodeptr = NULL;
+    HandlerNode *nodeptr = nullptr;
 
-    for(nodeptr = receivers; nodeptr != NULL; nodeptr = nodeptr->next)
+    for(nodeptr = receivers; nodeptr != nullptr; nodeptr = nodeptr->next)
     {
         if((nodeptr->hclass == hclass) && ((nodeptr->hid == hid) || (hid == kPOVMSType_WildCard)))
         {
@@ -1695,25 +1695,25 @@ void POVMS_MessageReceiver::Remove(POVMSType hclass, POVMSType hid)
     }
 }
 
-int POVMS_MessageReceiver::ReceiveHandler(POVMSObjectPtr msg, POVMSObjectPtr result, int mode, void *privatedataptr)
+POVMSResult POVMS_MessageReceiver::ReceiveHandler(POVMSObjectPtr msg, POVMSObjectPtr result, int mode, void *privatedataptr)
 {
     POVMS_MessageReceiver *self = (POVMS_MessageReceiver *)privatedataptr;
-    HandlerNode *nodeptr = NULL;
+    HandlerNode *nodeptr = nullptr;
     POVMSType hclass = kPOVMSType_Null;
     POVMSType hid = kPOVMSType_Null;
-    int err = pov_base::kNoErr;
+    POVMSResult err = pov_base::kNoErr;
 
-    if(self == NULL)
+    if (self == nullptr)
         err = pov_base::kParamErr;
     if(err == pov_base::kNoErr)
         err = POVMSMsg_GetMessageClass(msg, &hclass);
     if(err == pov_base::kNoErr)
         err = POVMSUtil_GetType(msg, kPOVMSMessageIdentID, &hid);
-    for(nodeptr = self->receivers; nodeptr != NULL && err == pov_base::kNoErr; nodeptr = nodeptr->next)
+    for (nodeptr = self->receivers; nodeptr != nullptr && err == pov_base::kNoErr; nodeptr = nodeptr->next)
     {
         if((nodeptr->hclass == hclass) && ((nodeptr->hid == hid) || (nodeptr->hid == kPOVMSType_WildCard)))
         {
-            if(nodeptr->handleroo != NULL)
+            if (nodeptr->handleroo != nullptr)
             {
                 POVMS_Message result_obj(result);
                 POVMS_Message msg_obj(msg);
@@ -1737,10 +1737,10 @@ int POVMS_MessageReceiver::ReceiveHandler(POVMSObjectPtr msg, POVMSObjectPtr res
 
                 msg_obj.DetachData();
 
-                if((result != NULL) && (result_obj.IsNull() == false))
+                if ((result != nullptr) && (result_obj.IsNull() == false))
                     *result = result_obj();
             }
-            else if(nodeptr->handler != NULL)
+            else if (nodeptr->handler != nullptr)
                 nodeptr->handler->Call(msg, result, mode);
             else
                 err = pov_base::kNullPointerErr;
@@ -1755,8 +1755,8 @@ void POVMS_MessageReceiver::AddNodeFront(POVMSType hclass, POVMSType hid, Handle
     HandlerNode *nodeptr = new HandlerNode;
     int err = pov_base::kNoErr;
 
-    nodeptr->last = NULL;
-    nodeptr->next = NULL;
+    nodeptr->last = nullptr;
+    nodeptr->next = nullptr;
     nodeptr->hclass = hclass;
     nodeptr->hid = hid;
     nodeptr->handleroo = hooptr;
@@ -1766,9 +1766,9 @@ void POVMS_MessageReceiver::AddNodeFront(POVMSType hclass, POVMSType hid, Handle
     if(err != pov_base::kNoErr)
         throw POV_EXCEPTION_CODE(err);
 
-    nodeptr->last = NULL;
+    nodeptr->last = nullptr;
     nodeptr->next = receivers;
-    if(nodeptr->next != NULL)
+    if (nodeptr->next != nullptr)
         nodeptr->next->last = nodeptr;
     receivers = nodeptr;
 }
@@ -1776,11 +1776,11 @@ void POVMS_MessageReceiver::AddNodeFront(POVMSType hclass, POVMSType hid, Handle
 void POVMS_MessageReceiver::AddNodeBack(POVMSType hclass, POVMSType hid, HandlerOO *hooptr, Handler *hptr)
 {
     HandlerNode *nodeptr = new HandlerNode;
-    HandlerNode *iptr = NULL;
+    HandlerNode *iptr = nullptr;
     int err = pov_base::kNoErr;
 
-    nodeptr->last = NULL;
-    nodeptr->next = NULL;
+    nodeptr->last = nullptr;
+    nodeptr->next = nullptr;
     nodeptr->hclass = hclass;
     nodeptr->hid = hid;
     nodeptr->handleroo = hooptr;
@@ -1790,41 +1790,41 @@ void POVMS_MessageReceiver::AddNodeBack(POVMSType hclass, POVMSType hid, Handler
     if(err != pov_base::kNoErr)
         throw POV_EXCEPTION_CODE(err);
 
-    if(receivers == NULL)
+    if (receivers == nullptr)
     {
-        nodeptr->last = NULL;
-        nodeptr->next = NULL;
-        if(nodeptr->next != NULL)
+        nodeptr->last = nullptr;
+        nodeptr->next = nullptr;
+        if (nodeptr->next != nullptr)
             nodeptr->next->last = nodeptr;
         receivers = nodeptr;
     }
     else
     {
         iptr = receivers;
-        while(iptr->next != NULL)
+        while (iptr->next != nullptr)
             iptr = iptr->next;
         nodeptr->last = iptr;
-        nodeptr->next = NULL;
+        nodeptr->next = nullptr;
         iptr->next = nodeptr;
     }
 }
 
 void POVMS_MessageReceiver::RemoveNode(HandlerNode *nodeptr)
 {
-    if(nodeptr != NULL)
+    if (nodeptr != nullptr)
     {
         (void)POVMS_RemoveReceiver(context, nodeptr->hclass, nodeptr->hid);
 
-        if(nodeptr->last != NULL)
+        if (nodeptr->last != nullptr)
             nodeptr->last->next = nodeptr->next;
-        if(nodeptr->next != NULL)
+        if (nodeptr->next != nullptr)
             nodeptr->next->last = nodeptr->last;
         if(receivers == nodeptr)
             receivers = nodeptr->next;
 
-        if(nodeptr->handleroo != NULL)
+        if (nodeptr->handleroo != nullptr)
             delete nodeptr->handleroo;
-        if(nodeptr->handler != NULL)
+        if (nodeptr->handler != nullptr)
             delete nodeptr->handler;
 
         delete nodeptr;
@@ -1853,7 +1853,7 @@ void POVMS_SendMessage(POVMS_Message& msg)
 {
     int err;
 
-    err = POVMS_Send(NULL, &msg.data, NULL, kPOVMSSendMode_NoReply);
+    err = POVMS_Send(nullptr, &msg.data, nullptr, kPOVMSSendMode_NoReply);
 
     if(err != pov_base::kNoErr)
         throw POV_EXCEPTION_CODE(err);
@@ -1880,10 +1880,10 @@ void POVMS_SendMessage(POVMSContext contextref, POVMS_Message& msg, POVMS_Messag
 {
     int err;
 
-    if(result != NULL)
+    if (result != nullptr)
         err = POVMS_Send(contextref, &msg.data, &result->data, mode);
     else
-        err = POVMS_Send(contextref, &msg.data, NULL, mode);
+        err = POVMS_Send(contextref, &msg.data, nullptr, mode);
 
     if(err != pov_base::kNoErr)
         throw POV_EXCEPTION_CODE(err);

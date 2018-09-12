@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -75,8 +75,8 @@ namespace pov_frontend
         m_valid = false;
         m_display_scaled = false;
         m_display_scale = 1.;
-        m_screen = NULL;
-        m_display = NULL;
+        m_screen = nullptr;
+        m_display = nullptr;
     }
 
     UnixSDLDisplay::~UnixSDLDisplay()
@@ -97,7 +97,7 @@ namespace pov_frontend
     bool UnixSDLDisplay::TakeOver(UnixDisplay *display)
     {
         UnixSDLDisplay *p = dynamic_cast<UnixSDLDisplay *>(display);
-        if (p == NULL)
+        if (p == nullptr)
             return false;
         if ((GetWidth() != p->GetWidth()) || (GetHeight() != p->GetHeight()))
             return false;
@@ -175,9 +175,9 @@ namespace pov_frontend
             if (UxSession->GetUnixOptions()->isOptionSet("display", "scaled"))
             // determine maximum display area (wrong and ugly)
             {
-                SDL_Rect **modes = SDL_ListModes(NULL, SDL_FULLSCREEN);
+                SDL_Rect **modes = SDL_ListModes(nullptr, SDL_FULLSCREEN);
                 // [JG] about testing vs ...(-1), have a look at SDL_ListModes API (the return is very ugly).
-                if ((modes != NULL)&&(reinterpret_cast<SDL_Rect**>(-1) != modes))
+                if ((modes != nullptr) && (reinterpret_cast<SDL_Rect**>(-1) != modes))
                 {
                     width = min(modes[0]->w - 10, width);
                     height = min(modes[0]->h - 80, height);
@@ -194,7 +194,7 @@ namespace pov_frontend
 
             // Initialize the display
             m_screen = SDL_SetVideoMode(width, height, desired_bpp, video_flags);
-            if ( m_screen == NULL )
+            if (m_screen == nullptr)
             {
                 fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n", width, height, desired_bpp, SDL_GetError());
                 return;
@@ -202,7 +202,7 @@ namespace pov_frontend
 
             SDL_Surface *temp = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
 
-            if ( temp == NULL )
+            if (temp == nullptr)
             {
                 fprintf(stderr, "Couldn't create render display surface: %s\n", SDL_GetError());
                 return;
@@ -211,7 +211,7 @@ namespace pov_frontend
             m_display = SDL_DisplayFormat(temp);
             SDL_FreeSurface(temp);
 
-            if ( m_display == NULL )
+            if (m_display == nullptr)
             {
                 fprintf(stderr, "Couldn't convert to optimized surface for repeated blitting: %s\n", SDL_GetError());
                 return;

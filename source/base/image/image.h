@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -221,14 +221,14 @@ class Image
             /// @{
 
             /// Gamma to encode for.
-            /// Set this to `NULL` to use the file format specific default.
+            /// Set this to `nullptr` to use the file format specific default.
             /// @note
             ///     This setting is ignored with file formats that mandate linear encoding or a
             ///     specific encoding gamma.
             SimpleGammaCurvePtr encodingGamma;
 
             /// Working colour space gamma to encode from.
-            /// Set to `NULL` or a neutral gamma curve to indicate linear working colour space.
+            /// Set to `nullptr` or a neutral gamma curve to indicate linear working colour space.
             SimpleGammaCurvePtr workingGamma;
 
             /// @}

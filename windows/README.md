@@ -104,6 +104,12 @@ Build Steps
     `#error` directive afterwards to proceed with the build. Note that
     if you do not do this you will get compile errors.
 
+    Note: If you are building in a Git local workspace, we recommend you run
+    `git update-index --skip-workspace source/base/build.h`. This will keep
+    your changes to the file from being included in a commit, or overwritten
+    in a pull or reset, while still allowing you to pull non-conflicting
+    updates to the file).
+
     By default, the GUI project is built, and the Console project is
     excluded. If you wish to generate a simple console version of
     POV-Ray, please modify the configuration as needed, edit

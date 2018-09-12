@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -1056,7 +1056,7 @@ static int difficult_coeffs(int n, DBL *x)
 * DESCRIPTION
 *
 *   Test to see if any coeffs are more than 6 orders of magnitude
-*   larger than the smallest (function from POV 1.0) [DB 8/94].
+*   larger than the smallest (function from POV-Ray v1.0) [DB 8/94].
 *
 * CHANGES
 *
@@ -1555,7 +1555,7 @@ static int polysolve(int order, const DBL *Coeffs, DBL *roots)
 *
 *   WARNING: This function can only be used for polynomials if small roots
 *   (i.e. |x| < epsilon) are not needed. This is the case for ray/object
-*   intersection tests because only intersecions with t > 0 are valid.
+*   intersection tests because only intersections with t > 0 are valid.
 *
 *   NOTE: Only one root at x = 0 will be eliminated.
 *

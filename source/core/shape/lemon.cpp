@@ -501,7 +501,7 @@ void Lemon::Scale(const Vector3d&, const TRANSFORM *tr)
 
 void Lemon::Transform(const TRANSFORM *tr)
 {
-    if(Trans == NULL)
+    if(Trans == nullptr)
         Trans = Create_Transform();
 
     Compose_Transforms(Trans, tr);
