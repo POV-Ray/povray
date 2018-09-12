@@ -14,7 +14,7 @@
 /// ----------------------------------------------------------------------------
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -152,7 +152,7 @@ PIGMENT *Copy_Pigment (PIGMENT *Old)
 {
     PIGMENT *New;
 
-    if (Old != NULL)
+    if (Old != nullptr)
     {
         New = Create_Pigment ();
 
@@ -164,7 +164,7 @@ PIGMENT *Copy_Pigment (PIGMENT *Old)
     }
     else
     {
-        New = NULL;
+        New = nullptr;
     }
 
     return (New);
@@ -206,7 +206,7 @@ void Copy_Pigments (vector<PIGMENT*>& New, const vector<PIGMENT*>& Old)
 
 void Destroy_Pigment (PIGMENT *Pigment)
 {
-    if (Pigment != NULL)
+    if (Pigment != nullptr)
         delete Pigment;
 }
 
@@ -238,14 +238,14 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
 {
     bool hasFilter;
 
-    if (Pigment == NULL)
+    if (Pigment == nullptr)
     {
         throw POV_EXCEPTION_STRING("Missing pigment");
     }
 
     if (Pigment->Flags & POST_DONE)
     {
-        if ((pHasFilter != NULL) && (Pigment->Flags & HAS_FILTER))
+        if ((pHasFilter != nullptr) && (Pigment->Flags & HAS_FILTER))
             *pHasFilter = true;
         return;
     }
@@ -274,7 +274,7 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
 
         default:
 
-            if (Pigment->Blend_Map == NULL)
+            if (Pigment->Blend_Map == nullptr)
             {
                 switch (Pigment->Type)
                 {
@@ -311,7 +311,7 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
 
     GenericPigmentBlendMap* Map = Pigment->Blend_Map.get();
 
-    if (Map != NULL)
+    if (Map != nullptr)
     {
         Map->Post(hasFilter);
     }
@@ -319,7 +319,7 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
     if (hasFilter)
     {
         Pigment->Flags |= HAS_FILTER;
-        if (pHasFilter != NULL)
+        if (pHasFilter != nullptr)
             *pHasFilter = true;
     }
 }
@@ -422,7 +422,7 @@ bool Compute_Pigment (TransColour& colour, const PIGMENT *Pigment, const Vector3
                 break;
 
             case UV_MAP_PATTERN:
-                if(Intersect == NULL)
+                if (Intersect == nullptr)
                     throw POV_EXCEPTION_STRING("The 'uv_mapping' pattern cannot be used as part of a pigment function!");
 
                 Colour_Found = Pigment->Blend_Map->ComputeUVMapped(colour, Intersect, ray, Thread);
@@ -644,7 +644,7 @@ void Evaluate_Density_Pigment(vector<PIGMENT*>& Density, const Vector3d& p, Math
     {
         lc.Clear();
 
-        Compute_Pigment(lc, *i, p, NULL, NULL, ttd);
+        Compute_Pigment(lc, *i, p, nullptr, nullptr, ttd);
 
         c *= lc.colour();
     }

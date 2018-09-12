@@ -13,7 +13,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -323,11 +323,11 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     unsigned int          width;
     unsigned int          height;
     Messages              messages;
-    Image                 *image = NULL;
+    Image                 *image = nullptr;
 
-    if ((r_png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, (png_voidp)(&messages), png_pov_err, png_pov_warn)) == NULL)
+    if ((r_png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, (png_voidp)(&messages), png_pov_err, png_pov_warn)) == nullptr)
         throw POV_EXCEPTION(kOutOfMemoryErr, "Cannot allocate PNG data structures");
-    if ((r_info_ptr = png_create_info_struct(r_png_ptr)) == NULL)
+    if ((r_info_ptr = png_create_info_struct(r_png_ptr)) == nullptr)
         throw POV_EXCEPTION(kOutOfMemoryErr, "Cannot allocate PNG data structures");
 
     // set up the input control
@@ -395,7 +395,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
         bool has_alpha = png_get_valid(r_png_ptr, r_info_ptr, PNG_INFO_tRNS);
         png_bytep trans;
         int num_trans;
-        png_get_tRNS(r_png_ptr, r_info_ptr, &trans, &num_trans, NULL);
+        png_get_tRNS(r_png_ptr, r_info_ptr, &trans, &num_trans, nullptr);
 
         for(int index = 0; index < cmap_len; index++)
         {
@@ -429,7 +429,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
         bool has_alpha = png_get_valid(r_png_ptr, r_info_ptr, PNG_INFO_tRNS);
         png_bytep trans;
         int num_trans;
-        png_get_tRNS(r_png_ptr, r_info_ptr, &trans, &num_trans, NULL);
+        png_get_tRNS(r_png_ptr, r_info_ptr, &trans, &num_trans, nullptr);
 
         for(int index = 0; index < cmap_len; index++)
         {
@@ -467,7 +467,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     }
     else
     {
-        png_destroy_read_struct(&r_png_ptr, &r_info_ptr, (png_infopp)NULL);
+        png_destroy_read_struct(&r_png_ptr, &r_info_ptr, nullptr);
         throw POV_EXCEPTION(kFileDataErr, "Unsupported color type in PNG image") ;
     }
 
@@ -475,7 +475,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
 
     if (ReadPNGUpdateInfo(r_png_ptr, r_info_ptr) == false)
     {
-        png_destroy_read_struct(&r_png_ptr, &r_info_ptr, (png_infopp)NULL);
+        png_destroy_read_struct(&r_png_ptr, &r_info_ptr, nullptr);
         if (messages.error.length() > 0)
             throw POV_EXCEPTION(kFileDataErr, messages.error.c_str());
         throw POV_EXCEPTION(kFileDataErr, "Cannot read PNG image.");
@@ -496,7 +496,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
         for(int row = 0; row < height; row++)
             delete[] row_ptrs [row] ;
         delete[] row_ptrs;
-        png_destroy_read_struct(&r_png_ptr, &r_info_ptr, (png_infopp)NULL);
+        png_destroy_read_struct(&r_png_ptr, &r_info_ptr, nullptr);
         if (messages.error.length() > 0)
             throw POV_EXCEPTION(kFileDataErr, messages.error.c_str());
         throw POV_EXCEPTION(kFileDataErr, "Cannot read PNG image.");
@@ -504,7 +504,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
 
     // We must copy all the values because PNG supplies RGBRGB, but POV-Ray
     // stores RGB components in separate arrays
-    if (image == NULL) // image will only be NULL at this point if the file is not a color-mapped type
+    if (image == nullptr) // image will only be `nullptr` at this point if the file is not a color-mapped type
     {
         bool has_alpha = (color_type & PNG_COLOR_MASK_ALPHA) != 0 ;
 
@@ -657,7 +657,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     delete[] row_ptrs;
 
     // clean up after the read, and free any memory allocated
-    png_destroy_read_struct(&r_png_ptr, &r_info_ptr, (png_infopp)NULL);
+    png_destroy_read_struct(&r_png_ptr, &r_info_ptr, nullptr);
 
     if (messages.error.length() > 0)
         throw POV_EXCEPTION(kFileDataErr, messages.error.c_str());
@@ -683,8 +683,8 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
     unsigned int    maxValue;
     unsigned int    hiShift;
     unsigned int    loShift;
-    png_info        *info_ptr = NULL;
-    png_struct      *png_ptr  = NULL;
+    png_info        *info_ptr = nullptr;
+    png_struct      *png_ptr  = nullptr;
     Messages        messages;
     GammaCurvePtr   gamma;
     Metadata        meta;
@@ -710,9 +710,9 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
 
     maxValue = (1<<bpcc)-1;
 
-    if ((png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, (png_voidp)(&messages), png_pov_err, png_pov_warn)) == NULL)
+    if ((png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, (png_voidp)(&messages), png_pov_err, png_pov_warn)) == nullptr)
         throw POV_EXCEPTION(kOutOfMemoryErr, "Cannot allocate PNG data structures");
-    if ((info_ptr = png_create_info_struct(png_ptr)) == NULL)
+    if ((info_ptr = png_create_info_struct(png_ptr)) == nullptr)
         throw POV_EXCEPTION(kOutOfMemoryErr, "Cannot allocate PNG data structures");
 
     if (setjmp(png_jmpbuf(png_ptr)))

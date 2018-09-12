@@ -78,7 +78,7 @@ IStream::~IStream()
 {
 }
 
-IFileStream::IFileStream(const UCS2String& name) : IStream(name), f(NULL)
+IFileStream::IFileStream(const UCS2String& name) : IStream(name), f(nullptr)
 {
     if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdin") == 0)
     {
@@ -87,18 +87,18 @@ IFileStream::IFileStream(const UCS2String& name) : IStream(name), f(NULL)
     else if((pov_stricmp(UCS2toASCIIString(name).c_str(), "stdout") == 0) ||
             (pov_stricmp(UCS2toASCIIString(name).c_str(), "stderr") == 0))
     {
-        f = NULL;
+        f = nullptr;
     }
     else
     {
         f = PlatformBase::GetInstance().OpenLocalFile (name, "rb");
     }
-    fail = (f == NULL);
+    fail = (f == nullptr);
 }
 
 IFileStream::~IFileStream()
 {
-    if(f != NULL)
+    if (f != nullptr)
     {
         if (f != stdout && f != stderr && f != stdin)
             fclose(f);
@@ -190,7 +190,7 @@ IMemStream::~IMemStream()
 {
 }
 
-OStream::OStream(const UCS2String& name, unsigned int Flags) : IOBase(name), f(NULL)
+OStream::OStream(const UCS2String& name, unsigned int Flags) : IOBase(name), f(nullptr)
 {
     const char* mode;
 
@@ -210,29 +210,29 @@ OStream::OStream(const UCS2String& name, unsigned int Flags) : IOBase(name), f(N
 
     if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdin") == 0)
     {
-        f = NULL;
+        f = nullptr;
     }
     else if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdout") == 0)
     {
         if((Flags & append) != 0)
-            f = NULL;
+            f = nullptr;
         else
             f = stdout;
     }
     else if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stderr") == 0)
     {
         if((Flags & append) != 0)
-            f = NULL;
+            f = nullptr;
         else
             f = stdout;
     }
     else
     {
         f = PlatformBase::GetInstance().OpenLocalFile (name, mode);
-        if (f == NULL)
+        if (f == nullptr)
         {
             if((Flags & append) == 0)
-                f = NULL;
+                f = nullptr;
             else
             {
                 // to maintain traditional POV +c(continue) mode compatibility, if
@@ -243,7 +243,7 @@ OStream::OStream(const UCS2String& name, unsigned int Flags) : IOBase(name), f(N
             }
         }
 
-        if (f != NULL)
+        if (f != nullptr)
         {
             fail = false;
 
@@ -252,18 +252,18 @@ OStream::OStream(const UCS2String& name, unsigned int Flags) : IOBase(name), f(N
                 if(!seekg(0, seek_end))
                 {
                     fclose(f);
-                    f = NULL;
+                    f = nullptr;
                 }
             }
         }
     }
 
-    fail = (f == NULL);
+    fail = (f == nullptr);
 }
 
 OStream::~OStream()
 {
-    if(f != NULL)
+    if (f != nullptr)
     {
         if (f != stdout && f != stderr && f != stdin)
             fclose(f);
@@ -272,7 +272,7 @@ OStream::~OStream()
 
 OStream& OStream::flush()
 {
-    if(f != NULL)
+    if (f != nullptr)
         fflush(f);
     return *this;
 }
@@ -363,7 +363,7 @@ bool CheckIfFileExists(const Path& p)
 {
     FILE *tempf = PlatformBase::GetInstance().OpenLocalFile (p().c_str(), "r");
 
-    if(tempf != NULL)
+    if (tempf != nullptr)
         fclose(tempf);
     else
         return false;
@@ -376,7 +376,7 @@ POV_OFF_T GetFileLength(const Path& p)
     FILE *tempf = PlatformBase::GetInstance().OpenLocalFile (p().c_str(), "rb");
     POV_OFF_T result = -1;
 
-    if(tempf != NULL)
+    if (tempf != nullptr)
     {
         fseek(tempf, 0, SEEK_END);
         result = ftell(tempf);

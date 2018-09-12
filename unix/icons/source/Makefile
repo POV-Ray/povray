@@ -1,5 +1,5 @@
 ### Makefile --- 
-#   Makefile for POV-Ray 3.6 for UNIX icons
+#   Makefile for POV-Ray v3.6 for UNIX icons
 
 ## Author: chris_hormann@gmx.de
 ## Version: $Id: Makefile,v 0.0 2004/05/12 16:21:28 chris Exp $

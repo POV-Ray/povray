@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -97,7 +97,7 @@ void ImageMessageHandler::DrawPixelSet(const SceneData& sd, const ViewData& vd, 
         throw POV_EXCEPTION(kInvalidDataSizeErr, "Number of pixel colors and pixel positions does not match!");
 
     GammaCurvePtr gamma;
-    if (vd.display != NULL)
+    if (vd.display != nullptr)
         gamma = vd.display->GetGamma();
 
     for(int i = 0, ii = 0; (i < pixelcolors.size()) && (ii < pixelpositions.size()); i += 5, ii += 2)
@@ -109,7 +109,7 @@ void ImageMessageHandler::DrawPixelSet(const SceneData& sd, const ViewData& vd, 
         Display::RGBA8 rgba;
         float dither = GetDitherOffset(x, y);
 
-        if(vd.display != NULL)
+        if (vd.display != nullptr)
         {
             // TODO ALPHA - display may profit from receiving the data in its original, premultiplied form
             // Premultiplied alpha was good for the math, but the display expects non-premultiplied alpha, so fix this if possible.
@@ -123,18 +123,18 @@ void ImageMessageHandler::DrawPixelSet(const SceneData& sd, const ViewData& vd, 
 
         if(psize == 1)
         {
-            if(vd.display != NULL)
+            if (vd.display != nullptr)
                 vd.display->DrawPixel(x, y, rgba);
 
-            if(final && (vd.image != NULL) && (x < vd.image->GetWidth()) && (y < vd.image->GetHeight()))
+            if (final && (vd.image != nullptr) && (x < vd.image->GetWidth()) && (y < vd.image->GetHeight()))
                 vd.image->SetRGBTValue(x, y, col);
         }
         else
         {
-            if(vd.display != NULL)
+            if (vd.display != nullptr)
                 vd.display->DrawFilledRectangle(x, y, x + psize - 1, y + psize - 1, rgba);
 
-            if(final && (vd.image != NULL))
+            if (final && (vd.image != nullptr))
             {
                 for(unsigned int py = 0; (py < psize) && (y + py < vd.image->GetHeight()); py++)
                 {
@@ -145,7 +145,7 @@ void ImageMessageHandler::DrawPixelSet(const SceneData& sd, const ViewData& vd, 
         }
     }
 
-    if(final && (vd.imageBackup != NULL))
+    if (final && (vd.imageBackup != nullptr))
     {
         msg.Write(*vd.imageBackup);
         vd.imageBackup->flush();
@@ -170,7 +170,7 @@ void ImageMessageHandler::DrawPixelBlockSet(const SceneData& sd, const ViewData&
 
     GammaCurvePtr gamma;
 
-    if (vd.display != NULL)
+    if (vd.display != nullptr)
         gamma = vd.display->GetGamma();
 
     for(i = 0; i < rect.GetArea() *  5; i += 5)
@@ -182,7 +182,7 @@ void ImageMessageHandler::DrawPixelBlockSet(const SceneData& sd, const ViewData&
         unsigned int y(rect.top  + (i/5) / rect.GetWidth());
         float dither = GetDitherOffset(x, y);
 
-        if(vd.display != NULL)
+        if (vd.display != nullptr)
         {
             // TODO ALPHA - display may profit from receiving the data in its original, premultiplied form
             // Premultiplied alpha was good for the math, but the display expects non-premultiplied alpha, so fix this if possible.
@@ -198,7 +198,7 @@ void ImageMessageHandler::DrawPixelBlockSet(const SceneData& sd, const ViewData&
         rgbas.push_back(rgba);
     }
 
-    if(vd.display != NULL)
+    if (vd.display != nullptr)
     {
         if(psize == 1)
             vd.display->DrawPixelBlock(rect.left, rect.top, rect.right, rect.bottom, &rgbas[0]);
@@ -212,7 +212,7 @@ void ImageMessageHandler::DrawPixelBlockSet(const SceneData& sd, const ViewData&
         }
     }
 
-    if(final && (vd.image != NULL))
+    if (final && (vd.image != nullptr))
     {
         for(unsigned int y = rect.top, i = 0; y <= rect.bottom; y += psize)
         {
@@ -227,7 +227,7 @@ void ImageMessageHandler::DrawPixelBlockSet(const SceneData& sd, const ViewData&
         }
     }
 
-    if(final && (vd.imageBackup != NULL))
+    if (final && (vd.imageBackup != nullptr))
     {
         msg.Write(*vd.imageBackup);
         vd.imageBackup->flush();

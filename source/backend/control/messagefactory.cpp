@@ -70,7 +70,7 @@ void MessageFactory::SendMessage(MessageClass mc, WarningLevel level, const char
 
     (void)POVMSObject_New(&msg, kPOVObjectClass_ControlData);
 
-    if (filename != NULL)
+    if (filename != nullptr)
         (void)POVMSUtil_SetUCS2String(&msg, kPOVAttrib_FileName, filename);
     if (line != -1)
         (void)POVMSUtil_SetLong(&msg, kPOVAttrib_Line, line);
@@ -126,7 +126,7 @@ void MessageFactory::SendMessage(MessageClass mc, WarningLevel level, const char
     (void)POVMSMsg_SetSourceAddress(&msg, sourceAddress);
     (void)POVMSMsg_SetDestinationAddress(&msg, destinationAddress);
 
-    (void)POVMS_Send(NULL, &msg, NULL, kPOVMSSendMode_NoReply);
+    (void)POVMS_Send(nullptr, &msg, nullptr, kPOVMSSendMode_NoReply);
 }
 
 }

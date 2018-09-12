@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -242,9 +242,9 @@ void Camera::Init()
     V_Angle = 180;
 
     /* Do not perturb primary rays by default. [DB 7/94] */
-    Tnormal = NULL;
+    Tnormal = nullptr;
 
-    Bokeh = NULL; // no user-defined bokeh by default
+    Bokeh = nullptr; // no user-defined bokeh by default
     Eye_Distance = 0;
     Parallaxe = 0;
 
@@ -259,8 +259,8 @@ void Camera::Init()
 
     for (unsigned int i = 0; i < 3; ++i)
     {
-        Location_Fn[i]  = NULL;
-        Direction_Fn[i] = NULL;
+        Location_Fn[i]  = nullptr;
+        Direction_Fn[i] = nullptr;
     }
 }
 
@@ -344,16 +344,16 @@ Camera& Camera::operator=(const Camera& src)
     H_Angle = src.H_Angle;
     V_Angle = src.V_Angle;
 
-    if (Tnormal != NULL)
+    if (Tnormal != nullptr)
         Destroy_Tnormal(Tnormal);
-    Tnormal = src.Tnormal ? Copy_Tnormal(src.Tnormal) : NULL;
-    if (Trans != NULL)
+    Tnormal = (src.Tnormal ? Copy_Tnormal(src.Tnormal) : nullptr);
+    if (Trans != nullptr)
         Destroy_Transform(Trans);
-    Trans = src.Trans ? Copy_Transform(src.Trans) : NULL;
+    Trans = (src.Trans ? Copy_Transform(src.Trans) : nullptr);
 
-    if (Bokeh != NULL)
+    if (Bokeh != nullptr)
         Destroy_Pigment(Bokeh);
-    Bokeh = src.Bokeh ? Copy_Pigment(src.Bokeh) : NULL;
+    Bokeh = (src.Bokeh ? Copy_Pigment(src.Bokeh) : nullptr);
 
     Eye_Distance = src.Eye_Distance;
     Parallaxe = src.Parallaxe; 
@@ -380,17 +380,17 @@ Camera& Camera::operator=(const Camera& src)
 
     for (unsigned int i = 0; i < 3; ++i)
     {
-        if (Location_Fn[i] != NULL)
+        if (Location_Fn[i] != nullptr)
             delete Location_Fn[i];
-        if (src.Location_Fn[i] == NULL)
-            Location_Fn[i] = NULL;
+        if (src.Location_Fn[i] == nullptr)
+            Location_Fn[i] = nullptr;
         else
             Location_Fn[i] = src.Location_Fn[i]->Clone();
 
-        if (Direction_Fn[i] != NULL)
+        if (Direction_Fn[i] != nullptr)
             delete Direction_Fn[i];
-        if (src.Direction_Fn[i] == NULL)
-            Direction_Fn[i] = NULL;
+        if (src.Direction_Fn[i] == nullptr)
+            Direction_Fn[i] = nullptr;
         else
             Direction_Fn[i] = src.Direction_Fn[i]->Clone();
 
@@ -401,13 +401,13 @@ Camera& Camera::operator=(const Camera& src)
 
 Camera::Camera(const Camera& src)
 {
-    Tnormal = NULL;
-    Trans = NULL;
-    Bokeh = NULL;
+    Tnormal = nullptr;
+    Trans = nullptr;
+    Bokeh = nullptr;
     for (unsigned int i = 0; i < 3; ++i)
     {
-        Location_Fn[i]  = NULL;
-        Direction_Fn[i] = NULL;
+        Location_Fn[i]  = nullptr;
+        Direction_Fn[i] = nullptr;
     }
     operator=(src);
 }
@@ -448,9 +448,9 @@ Camera::~Camera()
     Meshes.clear();
     for (unsigned int i = 0; i < 3; ++i)
     {
-        if (Location_Fn[i] != NULL)
+        if (Location_Fn[i] != nullptr)
             delete Location_Fn[i];
-        if (Direction_Fn[i] != NULL)
+        if (Direction_Fn[i] != nullptr)
             delete Direction_Fn[i];
     }
 }

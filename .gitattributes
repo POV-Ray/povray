@@ -1,3 +1,14 @@
+# Override language auto-detection on GitHub.
 libraries/*             linguist-vendored
 distribution/**/*.inc   linguist-language=POV-Ray
+distribution/platform-specific/windows/Insert?Menu/*.txt linguist-language=POV-Ray
 **/*.pov                linguist-language=POV-Ray
+**/*.h                  linguist-language=C++
+source/povms/povms.h    linguist-language=C
+libraries/**/*.h        linguist-language=C
+libraries/boost/*.h     linguist-language=C++
+libraries/ilmbase/*.h   linguist-language=C++
+libraries/openexr/*.h   linguist-language=C++
+
+# Do not auto-merge version number file.
+source/base/version.h   -merge

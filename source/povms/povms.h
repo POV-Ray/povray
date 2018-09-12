@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -53,6 +53,19 @@
 /*****************************************************************************
 * Global preprocessor defines
 ******************************************************************************/
+
+/// @def POVMS_NULLPTR
+/// Value representing a null pointer.
+///
+/// This macro is defined as `nullptr` if available, or `NULL` otherwise.
+///
+#if defined(__cplusplus) && ((__cplusplus >= 201103L) || POV_CPP11_SUPPORTED)
+    // C++11 or later have the unambiguous `nullptr`, so use it.
+    #define POVMS_NULLPTR nullptr
+#else
+    // C, as well as earlier C++, do not have `nullptr`, so fall back to using `NULL`.
+    #define POVMS_NULLPTR NULL
+#endif
 
 /// @def POVMS_ASSERT_OUTPUT(s,f,l)
 ///
@@ -135,8 +148,39 @@
 
 /// @def POVMSBool
 /// POVMS data type representing boolean (true or false) values.
+///
+/// @note
+///     It is recommended to use `bool` if available (C99 with `<stdbool.h>` included, or C++),
+///     or `int` otherwise.
+/// @note
+///     This type is used for the API only. Internally, boolean values are stored differently.
+///
 #ifndef POVMSBool
     #define POVMSBool           int
+#endif
+
+/// @def POVMSTrue
+/// POVMS data value representing a boolean true value.
+///
+/// @note
+///     The value must test true in an `if()` statement or other conditionals.
+/// @note
+///     This type is used for the API only. Internally, boolean values are stored differently.
+///
+#ifndef POVMSTrue
+    #define POVMSTrue           1
+#endif
+
+/// @def POVMSFalse
+/// POVMS data value representing a boolean false value.
+///
+/// @note
+///     The value must test false in an `if()` statement or other conditionals.
+/// @note
+///     This type is used for the API only. Internally, boolean values are stored differently.
+///
+#ifndef POVMSFalse
+    #define POVMSFalse          0
 #endif
 
 /// @def POVMSUCS2
@@ -220,7 +264,20 @@
 ///
 #ifndef POVMSAddress
     #define POVMSAddress        void *
-    #define POVMSInvalidAddress NULL
+    #define POVMSInvalidAddress POVMS_NULLPTR
+#endif
+
+/// @def POVMSResult
+/// POVMS result type.
+///
+/// This type should be either `int` or an `enum`.
+///
+#ifndef POVMSResult
+    #define POVMSResult         int
+#endif
+
+#ifndef POVMSQueueResult
+    #define POVMSQueueResult    int
 #endif
 
 /* Note: Use POVMS_EXPORT if you need a special export keyword
@@ -293,6 +350,13 @@ enum
     kPOVMSType_VectorType       = 'VTYP',
 };
 
+enum {
+    kPOVMSQueueNoErr            = 0,
+    kPOVMSQueueNullPointerErr   = -1,
+    kPOVMSQueueBadMagicErr      = -2,
+    kPOVMSQueueOutOfMemoryErr   = -3
+};
+
 typedef void * POVMSContext;
 
 typedef struct POVMSData POVMSObject;
@@ -344,100 +408,100 @@ enum
 ******************************************************************************/
 
 // POVMS context functions
-POVMS_EXPORT int POVMS_CDECL POVMS_OpenContext      (POVMSContext *contextrefptr);
-POVMS_EXPORT int POVMS_CDECL POVMS_CloseContext     (POVMSContext contextref);
-POVMS_EXPORT int POVMS_CDECL POVMS_GetContextAddress(POVMSContext contextref, POVMSAddress *addrptr);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMS_OpenContext      (POVMSContext *contextrefptr);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMS_CloseContext     (POVMSContext contextref);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMS_GetContextAddress(POVMSContext contextref, POVMSAddress *addrptr);
 
 // Message receive handler functions
-POVMS_EXPORT int POVMS_CDECL POVMS_InstallReceiver  (POVMSContext contextref, int (*hfunc)(POVMSObjectPtr, POVMSObjectPtr, int, void *), POVMSType hclass, POVMSType hid, void *hpd);
-POVMS_EXPORT int POVMS_CDECL POVMS_RemoveReceiver   (POVMSContext contextref, POVMSType hclass, POVMSType hid);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMS_InstallReceiver  (POVMSContext contextref, POVMSResult (*hfunc)(POVMSObjectPtr, POVMSObjectPtr, int, void *), POVMSType hclass, POVMSType hid, void *hpd);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMS_RemoveReceiver   (POVMSContext contextref, POVMSType hclass, POVMSType hid);
 
 // Message receive functions
-POVMS_EXPORT int POVMS_CDECL POVMS_ProcessMessages  (POVMSContext contextref, POVMSBool blocking, POVMSBool yielding);
-POVMS_EXPORT int POVMS_CDECL POVMS_Receive          (POVMSContext contextref, POVMSObjectPtr msg, POVMSObjectPtr result, int mode);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMS_ProcessMessages  (POVMSContext contextref, POVMSBool blocking, POVMSBool yielding);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMS_Receive          (POVMSContext contextref, POVMSObjectPtr msg, POVMSObjectPtr result, int mode);
 
 // Message send functions
-POVMS_EXPORT int POVMS_CDECL POVMS_Send             (POVMSContext contextref, POVMSObjectPtr msg, POVMSObjectPtr result, int mode);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMS_Send             (POVMSContext contextref, POVMSObjectPtr msg, POVMSObjectPtr result, int mode);
 
 // Message data functions
-POVMS_EXPORT int POVMS_CDECL POVMSMsg_SetupMessage          (POVMSObjectPtr object, POVMSType msgclass, POVMSType msgid);
-POVMS_EXPORT int POVMS_CDECL POVMSMsg_GetMessageClass       (POVMSObjectPtr object, POVMSType *msgclass);
-POVMS_EXPORT int POVMS_CDECL POVMSMsg_SetMessageClass       (POVMSObjectPtr object, POVMSType msgclass);
-POVMS_EXPORT int POVMS_CDECL POVMSMsg_GetMessageIdentifier  (POVMSObjectPtr object, POVMSType *msgid);
-POVMS_EXPORT int POVMS_CDECL POVMSMsg_SetMessageIdentifier  (POVMSObjectPtr object, POVMSType msgid);
-POVMS_EXPORT int POVMS_CDECL POVMSMsg_GetSourceAddress      (POVMSObjectPtr object, POVMSAddress *value);
-POVMS_EXPORT int POVMS_CDECL POVMSMsg_SetSourceAddress      (POVMSObjectPtr object, POVMSAddress value);
-POVMS_EXPORT int POVMS_CDECL POVMSMsg_GetDestinationAddress (POVMSObjectPtr object, POVMSAddress *value);
-POVMS_EXPORT int POVMS_CDECL POVMSMsg_SetDestinationAddress (POVMSObjectPtr object, POVMSAddress value);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSMsg_SetupMessage          (POVMSObjectPtr object, POVMSType msgclass, POVMSType msgid);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSMsg_GetMessageClass       (POVMSObjectPtr object, POVMSType *msgclass);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSMsg_SetMessageClass       (POVMSObjectPtr object, POVMSType msgclass);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSMsg_GetMessageIdentifier  (POVMSObjectPtr object, POVMSType *msgid);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSMsg_SetMessageIdentifier  (POVMSObjectPtr object, POVMSType msgid);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSMsg_GetSourceAddress      (POVMSObjectPtr object, POVMSAddress *value);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSMsg_SetSourceAddress      (POVMSObjectPtr object, POVMSAddress value);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSMsg_GetDestinationAddress (POVMSObjectPtr object, POVMSAddress *value);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSMsg_SetDestinationAddress (POVMSObjectPtr object, POVMSAddress value);
 
 // Object functions
-POVMS_EXPORT int POVMS_CDECL POVMSObject_New        (POVMSObjectPtr object, POVMSType objclass);
-POVMS_EXPORT int POVMS_CDECL POVMSObject_Delete     (POVMSObjectPtr object);
-POVMS_EXPORT int POVMS_CDECL POVMSObject_Copy       (POVMSObjectPtr sourceobject, POVMSObjectPtr destobject);
-POVMS_EXPORT int POVMS_CDECL POVMSObject_Merge      (POVMSObjectPtr sourceobject, POVMSObjectPtr destobject);
-POVMS_EXPORT int POVMS_CDECL POVMSObject_Get        (POVMSObjectPtr object, POVMSAttributePtr attr, POVMSType key);
-POVMS_EXPORT int POVMS_CDECL POVMSObject_Set        (POVMSObjectPtr object, POVMSAttributePtr attr, POVMSType key);
-POVMS_EXPORT int POVMS_CDECL POVMSObject_Remove     (POVMSObjectPtr object, POVMSType key);
-POVMS_EXPORT int POVMS_CDECL POVMSObject_Exist      (POVMSObjectPtr object, POVMSType key);
-POVMS_EXPORT int POVMS_CDECL POVMSObject_Count      (POVMSObjectPtr object, int  *cnt);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSObject_New        (POVMSObjectPtr object, POVMSType objclass);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSObject_Delete     (POVMSObjectPtr object);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSObject_Copy       (POVMSObjectPtr sourceobject, POVMSObjectPtr destobject);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSObject_Merge      (POVMSObjectPtr sourceobject, POVMSObjectPtr destobject);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSObject_Get        (POVMSObjectPtr object, POVMSAttributePtr attr, POVMSType key);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSObject_Set        (POVMSObjectPtr object, POVMSAttributePtr attr, POVMSType key);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSObject_Remove     (POVMSObjectPtr object, POVMSType key);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSObject_Exist      (POVMSObjectPtr object, POVMSType key);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSObject_Count      (POVMSObjectPtr object, int  *cnt);
 
 #ifndef POVMS_NO_DUMP_SUPPORT
 // Object debug functions
-POVMS_EXPORT int POVMS_CDECL POVMSObject_Dump       (FILE *file, POVMSObjectPtr object);
-POVMS_EXPORT int POVMS_CDECL POVMSObject_DumpAttr   (FILE *file, POVMSAttributePtr attr);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSObject_Dump       (FILE *file, POVMSObjectPtr object);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSObject_DumpAttr   (FILE *file, POVMSAttributePtr attr);
 #endif
 
 // Object streaming functions
-POVMS_EXPORT int POVMS_CDECL POVMSObjectStream_Size (POVMSObjectPtr object, int *streamsize);
-POVMS_EXPORT int POVMS_CDECL POVMSObjectStream_Read (POVMSObjectPtr object, POVMSStream *stream, int *maxstreamsize);
-POVMS_EXPORT int POVMS_CDECL POVMSObjectStream_Write(POVMSObjectPtr object, POVMSStream *stream, int *maxstreamsize);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSObjectStream_Size (POVMSObjectPtr object, int *streamsize);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSObjectStream_Read (POVMSObjectPtr object, POVMSStream *stream, int *maxstreamsize);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSObjectStream_Write(POVMSObjectPtr object, POVMSStream *stream, int *maxstreamsize);
 
 // Attribute functions
-POVMS_EXPORT int POVMS_CDECL POVMSAttr_New          (POVMSAttributePtr attr);
-POVMS_EXPORT int POVMS_CDECL POVMSAttr_Delete       (POVMSAttributePtr attr);
-POVMS_EXPORT int POVMS_CDECL POVMSAttr_Copy         (POVMSAttributePtr sourceattr, POVMSAttributePtr destattr);
-POVMS_EXPORT int POVMS_CDECL POVMSAttr_Get          (POVMSAttributePtr attr, POVMSType type, void *data, int *maxdatasize);
-POVMS_EXPORT int POVMS_CDECL POVMSAttr_Set          (POVMSAttributePtr attr, POVMSType type, const void *data, int datasize);
-POVMS_EXPORT int POVMS_CDECL POVMSAttr_Size         (POVMSAttributePtr attr, int *size);
-POVMS_EXPORT int POVMS_CDECL POVMSAttr_Type         (POVMSAttributePtr attr, POVMSType *type);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSAttr_New          (POVMSAttributePtr attr);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSAttr_Delete       (POVMSAttributePtr attr);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSAttr_Copy         (POVMSAttributePtr sourceattr, POVMSAttributePtr destattr);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSAttr_Get          (POVMSAttributePtr attr, POVMSType type, void *data, int *maxdatasize);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSAttr_Set          (POVMSAttributePtr attr, POVMSType type, const void *data, int datasize);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSAttr_Size         (POVMSAttributePtr attr, int *size);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSAttr_Type         (POVMSAttributePtr attr, POVMSType *type);
 
 // Attribute list functions
-POVMS_EXPORT int POVMS_CDECL POVMSAttrList_New      (POVMSAttributeListPtr attr);
-POVMS_EXPORT int POVMS_CDECL POVMSAttrList_Delete   (POVMSAttributeListPtr attr);
-POVMS_EXPORT int POVMS_CDECL POVMSAttrList_Copy     (POVMSAttributeListPtr sourcelist, POVMSAttributeListPtr destlist);
-POVMS_EXPORT int POVMS_CDECL POVMSAttrList_Append   (POVMSAttributeListPtr attr, POVMSAttributePtr item);
-POVMS_EXPORT int POVMS_CDECL POVMSAttrList_AppendN  (POVMSAttributeListPtr attr, int cnt, POVMSAttributePtr item);
-POVMS_EXPORT int POVMS_CDECL POVMSAttrList_Remove   (POVMSAttributeListPtr attr);
-POVMS_EXPORT int POVMS_CDECL POVMSAttrList_GetNth   (POVMSAttributeListPtr attr, int index, POVMSAttributePtr item);
-POVMS_EXPORT int POVMS_CDECL POVMSAttrList_SetNth   (POVMSAttributeListPtr attr, int index, POVMSAttributePtr item);
-POVMS_EXPORT int POVMS_CDECL POVMSAttrList_RemoveNth(POVMSAttributeListPtr attr, int index);
-POVMS_EXPORT int POVMS_CDECL POVMSAttrList_Clear    (POVMSAttributeListPtr attr);
-POVMS_EXPORT int POVMS_CDECL POVMSAttrList_Count    (POVMSAttributeListPtr attr, int *cnt);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSAttrList_New      (POVMSAttributeListPtr attr);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSAttrList_Delete   (POVMSAttributeListPtr attr);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSAttrList_Copy     (POVMSAttributeListPtr sourcelist, POVMSAttributeListPtr destlist);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSAttrList_Append   (POVMSAttributeListPtr attr, POVMSAttributePtr item);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSAttrList_AppendN  (POVMSAttributeListPtr attr, int cnt, POVMSAttributePtr item);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSAttrList_Remove   (POVMSAttributeListPtr attr);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSAttrList_GetNth   (POVMSAttributeListPtr attr, int index, POVMSAttributePtr item);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSAttrList_SetNth   (POVMSAttributeListPtr attr, int index, POVMSAttributePtr item);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSAttrList_RemoveNth(POVMSAttributeListPtr attr, int index);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSAttrList_Clear    (POVMSAttributeListPtr attr);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSAttrList_Count    (POVMSAttributeListPtr attr, int *cnt);
 
 // Utility functions
-POVMS_EXPORT int POVMS_CDECL POVMSUtil_SetString    (POVMSObjectPtr object, POVMSType key, const char *str); // Note: Strings may not contain \0 character codes!
-POVMS_EXPORT int POVMS_CDECL POVMSUtil_SetUCS2String(POVMSObjectPtr object, POVMSType key, const POVMSUCS2 *str); // Note: Strings may not contain \0 character codes!
-POVMS_EXPORT int POVMS_CDECL POVMSUtil_SetInt       (POVMSObjectPtr object, POVMSType key, POVMSInt value);
-POVMS_EXPORT int POVMS_CDECL POVMSUtil_SetLong      (POVMSObjectPtr object, POVMSType key, POVMSLong value);
-POVMS_EXPORT int POVMS_CDECL POVMSUtil_SetFloat     (POVMSObjectPtr object, POVMSType key, POVMSFloat value);
-POVMS_EXPORT int POVMS_CDECL POVMSUtil_SetBool      (POVMSObjectPtr object, POVMSType key, POVMSBool boolvalue);
-POVMS_EXPORT int POVMS_CDECL POVMSUtil_SetType      (POVMSObjectPtr object, POVMSType key, POVMSType typevalue);
-POVMS_EXPORT int POVMS_CDECL POVMSUtil_SetVoid      (POVMSObjectPtr object, POVMSType key);
-POVMS_EXPORT int POVMS_CDECL POVMSUtil_GetStringLength(POVMSObjectPtr object, POVMSType key, int *len); // Note: Includes trailing \0 character code!
-POVMS_EXPORT int POVMS_CDECL POVMSUtil_GetString    (POVMSObjectPtr object, POVMSType key, char *str, int *maxlen);
-POVMS_EXPORT int POVMS_CDECL POVMSUtil_GetUCS2StringLength(POVMSObjectPtr object, POVMSType key, int *len); // Note: Includes trailing \0 character code!
-POVMS_EXPORT int POVMS_CDECL POVMSUtil_GetUCS2String(POVMSObjectPtr object, POVMSType key, POVMSUCS2 *str, int *maxlen);
-POVMS_EXPORT int POVMS_CDECL POVMSUtil_GetInt       (POVMSObjectPtr object, POVMSType key, POVMSInt *value);
-POVMS_EXPORT int POVMS_CDECL POVMSUtil_GetLong      (POVMSObjectPtr object, POVMSType key, POVMSLong *value);
-POVMS_EXPORT int POVMS_CDECL POVMSUtil_GetFloat     (POVMSObjectPtr object, POVMSType key, POVMSFloat *value);
-POVMS_EXPORT int POVMS_CDECL POVMSUtil_GetBool      (POVMSObjectPtr object, POVMSType key, POVMSBool *boolvalue);
-POVMS_EXPORT int POVMS_CDECL POVMSUtil_GetType      (POVMSObjectPtr object, POVMSType key, POVMSType *typevalue);
-POVMS_EXPORT int POVMS_CDECL POVMSUtil_TempAlloc    (void **ptr, int datasize);
-POVMS_EXPORT int POVMS_CDECL POVMSUtil_TempFree     (void *ptr);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSUtil_SetString    (POVMSObjectPtr object, POVMSType key, const char *str); // Note: Strings may not contain \0 character codes!
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSUtil_SetUCS2String(POVMSObjectPtr object, POVMSType key, const POVMSUCS2 *str); // Note: Strings may not contain \0 character codes!
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSUtil_SetInt       (POVMSObjectPtr object, POVMSType key, POVMSInt value);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSUtil_SetLong      (POVMSObjectPtr object, POVMSType key, POVMSLong value);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSUtil_SetFloat     (POVMSObjectPtr object, POVMSType key, POVMSFloat value);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSUtil_SetBool      (POVMSObjectPtr object, POVMSType key, POVMSBool boolvalue);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSUtil_SetType      (POVMSObjectPtr object, POVMSType key, POVMSType typevalue);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSUtil_SetVoid      (POVMSObjectPtr object, POVMSType key);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSUtil_GetStringLength(POVMSObjectPtr object, POVMSType key, int *len); // Note: Includes trailing \0 character code!
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSUtil_GetString    (POVMSObjectPtr object, POVMSType key, char *str, int *maxlen);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSUtil_GetUCS2StringLength(POVMSObjectPtr object, POVMSType key, int *len); // Note: Includes trailing \0 character code!
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSUtil_GetUCS2String(POVMSObjectPtr object, POVMSType key, POVMSUCS2 *str, int *maxlen);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSUtil_GetInt       (POVMSObjectPtr object, POVMSType key, POVMSInt *value);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSUtil_GetLong      (POVMSObjectPtr object, POVMSType key, POVMSLong *value);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSUtil_GetFloat     (POVMSObjectPtr object, POVMSType key, POVMSFloat *value);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSUtil_GetBool      (POVMSObjectPtr object, POVMSType key, POVMSBool *boolvalue);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSUtil_GetType      (POVMSObjectPtr object, POVMSType key, POVMSType *typevalue);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSUtil_TempAlloc    (void **ptr, int datasize);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSUtil_TempFree     (void *ptr);
 
 // Memory debug functions
 #ifdef _DEBUG_POVMS_TRACE_MEMORY_
-POVMS_EXPORT int POVMS_TraceDump                    ();
+POVMS_EXPORT POVMSResult POVMS_TraceDump                    ();
 #endif
 
 #endif /* POVMS_H */
@@ -472,6 +536,6 @@ POVMS_EXPORT int POVMS_CDECL POVMSStream_Write              (struct POVMSData *d
 
 // Stream utility functions
 POVMS_EXPORT int POVMS_CDECL POVMSStream_Size               (struct POVMSData *data);
-POVMS_EXPORT int POVMS_CDECL POVMSStream_CheckMessageHeader (POVMSStream *stream, int streamsize, int *totalsize);
+POVMS_EXPORT POVMSResult POVMS_CDECL POVMSStream_CheckMessageHeader(POVMSStream *stream, int streamsize, int *totalsize);
 
 #endif

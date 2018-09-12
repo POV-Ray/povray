@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -1306,11 +1306,11 @@ ImageData::ImageData() :
     width(0.0), height(0.0),
     Offset(0.0, 0.0),
     AllFilter(0.0), AllTransmit(0.0),
-    Object(NULL),
-    data(NULL)
+    Object(nullptr),
+    data(nullptr)
 #ifdef POV_VIDCAP_IMPL
     // beta-test feature
-    ,VidCap(NULL)
+    ,VidCap(nullptr)
 #endif
 {}
 
@@ -1344,7 +1344,7 @@ ImageData::ImageData() :
 
 ImageData *Copy_Image(ImageData *Old)
 {
-    if(Old != NULL)
+    if (Old != nullptr)
         Old->References++;
 
     return (Old);
@@ -1380,7 +1380,7 @@ ImageData *Copy_Image(ImageData *Old)
 
 void Destroy_Image(ImageData *image)
 {
-    if((image == NULL) || (--(image->References) > 0))
+    if ((image == nullptr) || (--(image->References) > 0))
         return;
 
     delete image;
@@ -1390,11 +1390,11 @@ ImageData::~ImageData()
 {
 #ifdef POV_VIDCAP_IMPL
     // beta-test feature
-    if(VidCap != NULL)
+    if (VidCap != nullptr)
         delete VidCap;
 #endif
 
-    if(data != NULL)
+    if (data != nullptr)
         delete data;
 }
 

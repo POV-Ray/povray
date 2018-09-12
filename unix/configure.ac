@@ -30,7 +30,7 @@
 #
 ##############################################################################
 
-# configure.ac for the source distribution of POV-Ray 3.8 for UNIX
+# configure.ac for the source distribution of POV-Ray v3.8 for UNIX
 # Report bugs via https://github.com/POV-Ray/povray/issues
 #
 # Based on configure.ac from POV-Ray v3.7
@@ -109,7 +109,7 @@ AX_ARG_WITH([--with-libsdl],        [DIR], [use the SDL library (in directory DI
 AX_ARG_WITH([--with-libmkl],        [DIR], [use the Intel(R) Math Kernel Library (in directory DIR)])
 AX_ARG_WITH([--with-openexr],       [DIR], [use the OpenEXR library (in directory DIR)]) 
 
-AC_ARG_VAR([COMPILED_BY], [customize the "unofficial version" message (required argument)])
+AC_ARG_VAR([COMPILED_BY], [customize the "unofficial version" message])
 AC_ARG_VAR([NON_REDISTRIBUTABLE_BUILD], [see the installation documentation])
 AC_ARG_VAR([C99_COMPATIBLE_RADIOSITY], [adapt radiosity code to non-IEEE 754 floating point, requires ISO C99 compiler and library (see octree.cpp for details)])
 
@@ -122,29 +122,7 @@ rm -f ./povray.ini
 
 # Instruction message.
 if test x"$COMPILED_BY" = x""; then
-  echo "
-Welcome to the $PACKAGE_NAME $PACKAGE_VERSION configure script.
-
-This script will prepare the source distribution of $PACKAGE_NAME $PACKAGE_VERSION for Unix
-for compilation on this machine.  Compiling the program yourself means
-that the POV-Ray Team(tm) is not responsible for supporting this
-version, no matter if it is the unmodified official POV-Ray source code
-or a customized version.  Refer to the POV-Ray source license conditions
-that come with this package.
-
-In order to start configuration, you have to provide a valid contact
-information that will be included in the executable and displayed
-whenever POV-Ray (or a modified version of it) is started.  In case
-you intend to distribute this binary, this information will help users
-to contact the appropriate maintainers.  To start configuring $PACKAGE_NAME
-type in the following command with your own contact information:
-
-./configure COMPILED_BY=\"your name <email@address>\"
-
-Please consult the INSTALL file for additional configuration and
-installation instructions.
-"
-  exit 1
+  COMPILED_BY="$USER <no contact address>"
 fi
 
 pov_no_distrib="${NON_REDISTRIBUTABLE_BUILD:-no}"
@@ -1226,7 +1204,7 @@ AC_RUN_IFELSE([
       ],[
         AC_MSG_RESULT([yes])
         AC_DEFINE([HAVE_INF],           [],[infinite floating point values are supported])
-        AC_DEFINE([HAVE_EMULATED_ISINF],[],[infinities can be identified by them comparing non-equal to themselves])
+        AC_DEFINE([HAVE_EMULATED_ISINF],[],[infinities can be identified by comparison to the maximum value])
       ],[
         # although double and float support infinite values, they are no use to us as we can't properly test for them,
         # so we're not setting HAVE_INF.

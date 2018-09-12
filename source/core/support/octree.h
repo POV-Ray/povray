@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -136,7 +136,7 @@ struct ot_node_struct
     OT_BLOCK *Values;
     OT_NODE  *Kids[8];
 
-    ot_node_struct() : Id(), Values(NULL) { for(unsigned int i = 0; i < 8; i ++) { Kids[i] = NULL; } }
+    ot_node_struct() : Id(), Values(nullptr) { for (unsigned int i = 0; i < 8; i ++) { Kids[i] = nullptr; } }
 };
 
 // These are informations the octree reader needs to know

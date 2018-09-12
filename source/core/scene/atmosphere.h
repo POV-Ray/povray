@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -88,7 +88,7 @@ struct Fog_Struct
 
 struct Rainbow_Struct
 {
-    Rainbow_Struct() : Pigment(NULL), Next(NULL) {}
+    Rainbow_Struct() : Pigment(nullptr), Next(nullptr) {}
     ~Rainbow_Struct() { if (Pigment) delete Pigment; }
     DBL Distance;
     DBL Jitter;
@@ -102,7 +102,7 @@ struct Rainbow_Struct
 
 struct Skysphere_Struct
 {
-    Skysphere_Struct() : Trans(NULL) {}
+    Skysphere_Struct() : Trans(nullptr) {}
     ~Skysphere_Struct();
     MathColour        Emission; ///< Brightness adjustment.
     vector<PIGMENT *> Pigments; ///< Pigment(s) to use.

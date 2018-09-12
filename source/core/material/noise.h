@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -142,15 +142,15 @@ struct OptimizedNoiseInfo
     const bool* enabled;
 
     /// Pointer to a function testing whether the optimized implementation is supported.
-    /// A value of `NULL` indicates universal support.
+    /// A value of `nullptr` indicates universal support.
     bool(*supported)();
 
     /// Pointer to a function testing for additional auto-selection constraints.
-    /// A value of `NULL` indicates the absence of such constraints.
+    /// A value of `nullptr` indicates the absence of such constraints.
     bool(*recommended)();
 
     /// Pointer to the initialization function.
-    /// A value of `NULL` indicates that initialization is not required.
+    /// A value of `nullptr` indicates that initialization is not required.
     void(*init)();
 };
 
@@ -158,7 +158,7 @@ struct OptimizedNoiseInfo
 ///
 /// This table contains a list of all available optimized noise generator implementations, sorted
 /// by descending order of preference. The end of the table is indicated by an entry with the
-/// `name` field set to `NULL`.
+/// `name` field set to `nullptr`.
 ///
 /// @note
 ///     The non-optimized portable default noise generator implementation should _not_ be included

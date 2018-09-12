@@ -104,7 +104,7 @@ char *Parser::Parse_C_String(bool pathname)
 
 UCS2 *Parser::Parse_String(bool pathname, bool require)
 {
-    UCS2 *New = NULL;
+    UCS2 *New = nullptr;
     int len = 0;
 
     EXPECT
@@ -660,7 +660,7 @@ UCS2 *Parser::Parse_CameraType(bool )
 
 UCS2 *Parser::Parse_Datetime(bool pathname)
 {
-    char *FormatStr = NULL;
+    char *FormatStr = nullptr;
     bool CallFree;
     int vlen = 0;
     char val[PARSE_NOW_VAL_LENGTH + 1]; // Arbitrary size, usually a date format string is far less
@@ -704,7 +704,7 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
     {
         std::tm t = boost::posix_time::to_tm(boost::posix_time::from_time_t(timestamp));
         // TODO FIXME - we should either have this locale setting globally, or avoid it completely; in either case it shouldn't be *here*.
-        setlocale(LC_TIME,""); // Get the local prefered format
+        setlocale(LC_TIME,""); // Get the local preferred format
         vlen = strftime(val, PARSE_NOW_VAL_LENGTH, FormatStr, &t);
     }
     catch (pov_base::Exception& e)
@@ -719,7 +719,7 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
     }
     if (vlen == PARSE_NOW_VAL_LENGTH) // on error: max for libc 4.4.1 & before
         vlen = 0; // return an empty string on error (content of val[] is undefined)
-    val[vlen]='\0'; // whatever, that operation is now safe (and superflous except for error)
+    val[vlen]='\0'; // whatever, that operation is now safe (and superfluous except for error)
 
     if (CallFree)
     {
@@ -866,14 +866,14 @@ UCS2 *Parser::Parse_Strlwr(bool pathname)
 
 UCS2 *Parser::String_To_UCS2(const char *str)
 {
-    UCS2 *char_string = NULL;
-    UCS2 *char_array = NULL;
+    UCS2 *char_string = nullptr;
+    UCS2 *char_array = nullptr;
     int char_array_size = 0;
     int utf8arraysize = 0;
-    unsigned char *utf8array = NULL;
+    unsigned char *utf8array = nullptr;
     int index_in = 0;
     int index_out = 0;
-    char *dummy_ptr = NULL;
+    char *dummy_ptr = nullptr;
     int i = 0;
 
     if(strlen(str) == 0)
@@ -909,7 +909,7 @@ UCS2 *Parser::String_To_UCS2(const char *str)
             break;
         case kStringEncoding_System:
             char_array = POV_CONVERT_TEXT_TO_UCS2(reinterpret_cast<const unsigned char *>(str), &char_array_size);
-            if(char_array == NULL)
+            if (char_array == nullptr)
                 Error("Cannot convert system specific text format to Unicode.");
             break;
         default:
@@ -917,7 +917,7 @@ UCS2 *Parser::String_To_UCS2(const char *str)
             break;
     }
 
-    if(char_array == NULL)
+    if (char_array == nullptr)
         Error("Cannot convert text to UCS2 format.");
 
     char_string = reinterpret_cast<UCS2 *>(POV_MALLOC((char_array_size + 1) * sizeof(UCS2), "UCS2 String"));
@@ -927,7 +927,7 @@ UCS2 *Parser::String_To_UCS2(const char *str)
     char_string[index_out] = 0;
     index_out++;
 
-    if(char_array != NULL)
+    if (char_array != nullptr)
         POV_FREE(char_array);
 
     return char_string;
@@ -938,15 +938,15 @@ UCS2 *Parser::String_To_UCS2(const char *str)
 
 UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
 {
-    UCS2 *char_string = NULL;
-    UCS2 *char_array = NULL;
+    UCS2 *char_string = nullptr;
+    UCS2 *char_array = nullptr;
     int char_array_size = 0;
     int utf8arraysize = 0;
-    unsigned char *utf8array = NULL;
+    unsigned char *utf8array = nullptr;
     int index_in = 0;
     int index_out = 0;
     char buffer[8];
-    char *dummy_ptr = NULL;
+    char *dummy_ptr = nullptr;
     int i = 0;
 
     if(strlen(str) == 0)
@@ -982,7 +982,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
             break;
         case kStringEncoding_System:
             char_array = POV_CONVERT_TEXT_TO_UCS2(reinterpret_cast<const unsigned char *>(str), &char_array_size);
-            if(char_array == NULL)
+            if (char_array == nullptr)
                 Error("Cannot convert system specific text format to Unicode.");
             break;
         default:
@@ -990,7 +990,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
             break;
     }
 
-    if(char_array == NULL)
+    if (char_array == nullptr)
         Error("Cannot convert text to UCS2 format.");
 
     char_string = reinterpret_cast<UCS2 *>(POV_MALLOC((char_array_size + 1) * sizeof(UCS2), "UCS2 String"));
@@ -1059,7 +1059,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
                 default:
                     char_string[index_out] = char_array[index_in];
                     POV_FREE(char_array);
-                    char_array = NULL;
+                    char_array = nullptr;
                     Error( "Illegal escape sequence in string." );
                     break;
             }
@@ -1069,15 +1069,15 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
             if ((char_array[index_in] == '\\') && pathname)
             {
                 // Historically, escape sequences were ignored when parsing for a filename.
-                // As of POV-Ray 3.8, this has been changed.
+                // As of POV-Ray v3.8, this has been changed.
 
 #if POV_BACKSLASH_IS_PATH_SEPARATOR
                 Warning("Backslash encountered while parsing for a filename."
-                        " In legacy (pre-3.8) scenes, this is NOT interpreted as the start of an escape sequence."
+                        " In legacy (pre-v3.8) scenes, this is NOT interpreted as the start of an escape sequence."
                         " However, for future compatibility it is recommended to use a forward slash as path separator instead.");
 #else
                 Warning("Backslash encountered while parsing for a filename."
-                        " In legacy (pre-3.8) scenes, this is NOT interpreted as the start of an escape sequence.");
+                        " In legacy (pre-v3.8) scenes, this is NOT interpreted as the start of an escape sequence.");
 #endif
             }
 
@@ -1090,7 +1090,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
 
     char_string = reinterpret_cast<UCS2 *>(POV_REALLOC(char_string, index_out * sizeof(UCS2), "UCS2 String"));
 
-    if(char_array != NULL)
+    if (char_array != nullptr)
         POV_FREE(char_array);
 
     return char_string;
@@ -1176,12 +1176,12 @@ UCS2 *Parser::Convert_UTF8_To_UCS2(const unsigned char *text_array, int *char_ar
     *char_array_size = len;
 
     if (len == 0)
-        return NULL;
+        return nullptr;
 
     size_t size = (len+1)*sizeof(UCS2);
 
     UCS2 *char_array = reinterpret_cast<UCS2 *>(POV_MALLOC(size, "Character Array"));
-    if(char_array == NULL)
+    if (char_array == nullptr)
         throw POV_EXCEPTION_CODE(kOutOfMemoryErr);
 
     memcpy(char_array, s.c_str(), size);

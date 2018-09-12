@@ -1016,7 +1016,7 @@ void ProcessKernTable(TrueTypeFont *ffile, int kern_table_offset)
     /* Read in the number of kerning tables */
 
     kern_table->nTables = READUSHORT(ffile->fp);
-    kern_table->tables = NULL;      /*<==[esp] added (in case nTables is zero)*/
+    kern_table->tables = nullptr;      /*<==[esp] added (in case nTables is zero)*/
 
 #ifdef TTF_DEBUG
     Debug_Info("\nKerning table:\n", kern_table_offset);
@@ -1052,7 +1052,7 @@ void ProcessKernTable(TrueTypeFont *ffile, int kern_table_offset)
                              " Override" : "" ));
 #endif
 
-        kern_table->tables[i].kern_pairs = NULL;   /*<==[esp] added*/
+        kern_table->tables[i].kern_pairs = nullptr;/*<==[esp] added*/
         kern_table->tables[i].nPairs = 0;          /*<==[esp] added*/
 
         if ((kern_table->tables[i].coverage >> 8) == 0)
@@ -2203,7 +2203,7 @@ GlyphPtr ConvertOutlineToGlyph(TrueTypeFont *ffile, const GlyphOutline *ttglyph)
     }
     else
     {
-        glyph->contours = NULL;
+        glyph->contours = nullptr;
     }
 
     /* Copy sizing information about this glyph */
@@ -2905,7 +2905,7 @@ TrueType::TrueType() : ObjectBase(TTF_OBJECT)
 
     Trans = Create_Transform();
 
-    glyph = NULL;
+    glyph = nullptr;
     depth = 1.0;
 
     /* Default bounds */
@@ -2982,7 +2982,7 @@ TrueTypeFont::TrueTypeFont(const UCS2String& fn, IStream* fp, StringEncoding te)
     filename(fn),
     fp(fp),
     textEncoding(te),
-    info(NULL)
+    info(nullptr)
 {
     ProcessFontFile(this);
 }
@@ -3002,18 +3002,18 @@ TrueTypeInfo::TrueTypeInfo() :
     numGlyphs(0),
     unitsPerEm(0),
     indexToLocFormat(0),
-    loca_table(NULL),
+    loca_table(nullptr),
     numberOfHMetrics(0),
-    hmtx_table(NULL),
+    hmtx_table(nullptr),
     glyphIDoffset(0),
     segCount(0),
     searchRange(0),
     entrySelector(0),
     rangeShift(0),
-    startCount(NULL),
-    endCount(NULL),
-    idDelta(NULL),
-    idRangeOffset(NULL)
+    startCount(nullptr),
+    endCount(nullptr),
+    idDelta(nullptr),
+    idRangeOffset(nullptr)
 {
     for (int i = 0; i < 4; i ++)
     {
@@ -3022,7 +3022,7 @@ TrueTypeInfo::TrueTypeInfo() :
     }
 
     kerning_tables.nTables = 0;
-    kerning_tables.tables = NULL;
+    kerning_tables.tables = nullptr;
 }
 
 TrueTypeInfo::~TrueTypeInfo()
