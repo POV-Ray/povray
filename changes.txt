@@ -99,6 +99,10 @@ Reported via the Newsgroups:
     Trying to `#declare Foo[A][B]=...` with `Foo` being an array of arrays and
     `Foo[A]` not yet initialized causes a hard crash instead of a parse error.
 
+Reported by Coverity static code analysis:
+
+   - CID 986462,986463 (Wrapper object use after free)
+
 Miscellaneous:
 
   - Fix `interior_texture` for text objects (as mentioned in GitHub issue #65)
