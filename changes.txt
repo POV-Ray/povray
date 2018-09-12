@@ -56,6 +56,8 @@ Changed Behaviour
     by directives (stuff that begins with `#`).
   - UV mapping of cylinder, cone and lemon primitives has been disabled again
     for now, due to their orientation being poorly defined.
+  - An age-old bug in the inbuilt `f_enneper` isosurface function has been
+    fixed; the function now results in the originally intended shape.
 
 New Features
 ------------
@@ -103,6 +105,7 @@ Reported by Coverity static code analysis:
   
   - CID 986462,986463 (Wrapper object use after free)
   - CID 967358-967362 (Uninitialized scalar variable)
+  - CID 1372542-1372544 (Result is not floating-point)
   - CID 1372618 (Uninitialized scalar variable)
   - CID 1372629 (Uninitialized pointer read)
   - CID 1372630-1372632 (Uninitialized scalar variable)
