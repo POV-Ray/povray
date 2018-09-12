@@ -10179,7 +10179,7 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
         }
     }
 
-    // Test wether the object is finite or infinite. [DB 9/94]
+    // Test whether the object is finite or infinite. [DB 9/94]
     // CJC TODO FIXME: see if this can be improved, and/or if it is appropriate for all bounding systems
 
     BOUNDS_VOLUME(Volume, Object->BBox);
@@ -10191,24 +10191,8 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
 
     // Test if the object is opaque or not. [DB 8/94]
 
-    if ((dynamic_cast<Blob *>(Object) == nullptr) && // FIXME
-        (dynamic_cast<Mesh *>(Object) == nullptr) && // FIXME
-        (Test_Opacity(Object->Texture)) &&
-        ((Object->Interior_Texture == nullptr) ||
-         Test_Opacity(Object->Interior_Texture)))
-    {
+    if (Object->IsOpaque())
         Set_Flag(Object, OPAQUE_FLAG);
-    }
-    else
-    {
-        // Objects with multiple textures have to be handled separately.
-
-        if (dynamic_cast<Blob *>(Object) != nullptr) // FIXME
-            (dynamic_cast<Blob *>(Object))->Test_Blob_Opacity();
-
-        if (dynamic_cast<Mesh *>(Object) != nullptr) // FIXME
-            (dynamic_cast<Mesh *>(Object))->Test_Mesh_Opacity();
-    }
 }
 
 /*****************************************************************************

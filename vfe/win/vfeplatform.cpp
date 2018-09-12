@@ -336,7 +336,7 @@ namespace vfePlatform
       return (true);
 
     // remove filename from buf
-    *s = nullptr;
+    *s = '\0';
 
     // check our temp dir; if it's within that, both read and write are permitted.
     if (_stricmp(m_TempPathString.c_str(), buf) == 0)

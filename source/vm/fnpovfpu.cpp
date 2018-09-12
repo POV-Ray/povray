@@ -1194,7 +1194,7 @@ DBL POVFPU_RunDefault(FPUContext *context, FUNCTION fn)
     StackFrame *pstack = context->pstackbase;
     DBL *dblstack = context->dblstackbase;
     unsigned int maxdblstacksize = context->maxdblstacksize;
-    DBL r0, r1, r2, r3, r4, r5, r6, r7;
+    DBL r0 = 0.0, r1 = 0.0, r2 = 0.0, r3 = 0.0, r4 = 0.0, r5 = 0.0, r6 = 0.0, r7 = 0.0;
     Instruction *program = nullptr;
     unsigned int k = 0;
     unsigned int pc = 0;

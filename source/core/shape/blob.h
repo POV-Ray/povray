@@ -155,14 +155,13 @@ class Blob : public ObjectBase
         virtual void Scale(const Vector3d&, const TRANSFORM *);
         virtual void Transform(const TRANSFORM *);
         virtual void Compute_BBox();
+        virtual bool IsOpaque() const override;
 
         void Determine_Textures(Intersection *, bool, WeightedTextureVector&, TraceThreadData *);
 
         Blob_List_Struct *Create_Blob_List_Element();
         void Create_Blob_Element_Texture_List(Blob_List_Struct *BlobList, int npoints);
         int Make_Blob(DBL threshold, Blob_List_Struct *bloblist, int npoints, TraceThreadData *Thread);
-
-        void Test_Blob_Opacity();
 
         static void Translate_Blob_Element(Blob_Element *Element, const Vector3d& Vector);
         static void Rotate_Blob_Element(Blob_Element *Element, const Vector3d& Vector);

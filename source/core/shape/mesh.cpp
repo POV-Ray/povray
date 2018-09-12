@@ -2201,32 +2201,23 @@ bool Mesh::Degenerate(const Vector3d& P1, const Vector3d& P2, const Vector3d& P3
 *
 ******************************************************************************/
 
-void Mesh::Test_Mesh_Opacity()
+bool Mesh::IsOpaque() const
 {
-    MeshIndex i;
-
-    /* Initialize opacity flag to the opacity of the object's texture. */
-
-    if ((Texture == nullptr) || (Test_Opacity(Texture)))
-    {
-        Set_Flag(this, OPAQUE_FLAG);
-    }
-
     if (Test_Flag(this, MULTITEXTURE_FLAG))
     {
-        for (i = 0; i < Number_Of_Textures; i++)
+        for (MeshIndex i = 0; i < Number_Of_Textures; i++)
         {
-            if (Textures[i] != nullptr)
-            {
-                /* If component's texture isn't opaque the mesh is neither. */
-
-                if (!Test_Opacity(Textures[i]))
-                {
-                    Clear_Flag(this, OPAQUE_FLAG);
-                }
-            }
+            // If component's texture isn't opaque the mesh is neither.
+            if ((Textures[i] != nullptr) && !Test_Opacity(Textures[i]))
+                return false;
         }
     }
+
+    // Otherwise it's a question of whether the common texture is opaque or not.
+    // TODO FIXME - other objects report as non-opaque if Texture == nullptr.
+    // TODO FIXME - other objects report as non-opaque if Interior_Texture present and non-opaque.
+    // What we probably really want here is `return ObjectBase::IsOpaque()`.
+    return (Texture == nullptr) || Test_Opacity(Texture);
 }
 
 

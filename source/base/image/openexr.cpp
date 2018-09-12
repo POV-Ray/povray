@@ -90,8 +90,6 @@ class POV_EXR_OStream : public Imf::OStream
         POV_EXR_OStream(pov_base::OStream& pov_stream) : Imf::OStream(UCS2toASCIIString(pov_stream.Name()).c_str()), os(pov_stream) { }
         virtual ~POV_EXR_OStream() { }
 
-        const char *fileName() const { return UCS2toASCIIString(os.Name()).c_str(); }
-
         void write(const char *c, int n)
         {
             if(os.write(c, n) == false)
@@ -130,7 +128,6 @@ class POV_EXR_IStream : public Imf::IStream
 
         virtual ~POV_EXR_IStream() { }
 
-        const char *fileName(void) const { return UCS2toASCIIString(is.Name()).c_str(); }
         void clear(void) { is.clearstate(); }
 
         bool read(char *c, int n)
