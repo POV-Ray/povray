@@ -588,6 +588,40 @@ void Disc::Compute_BBox()
     Recompute_BBox(&BBox, Trans);
 }
 
+void Disc::evalVertex( Vector3d& r, const DBL u, const DBL v )const
+{
+  DBL iradius = sqrt(iradius2);
+  DBL oradius = sqrt(oradius2);
+  r = Vector3d( ((oradius-iradius)*v+iradius)*cos( u * TWO_M_PI ), ((oradius-iradius)*v+iradius)*sin( u * TWO_M_PI ), 0.0 );
+
+  if (Trans)
+  {
+    MTransPoint( r, r, Trans );
+  }
+}
+
+void Disc::evalNormal( Vector3d& r, const DBL , const DBL )const
+{
+  r = normal;
+  if (Trans)
+  {
+    MTransNormal( r, r, Trans );
+    r.normalize();
+  }
+}
+
+void Disc::minUV( Vector2d& r )const
+{
+  r[U] = 0.0;
+  r[V] = 0.0;
+}
+
+void Disc::maxUV( Vector2d& r )const
+{
+  r[U] = 1.0;
+  r[V] = 1.0;
+}
+  
 void Disc::UVCoord(Vector2d& result, const Intersection *inter, TraceThreadData *) const
 {
   Vector2d uv( inter->Iuv);
@@ -607,7 +641,6 @@ void Disc::UVCoord(Vector2d& result, const Intersection *inter, TraceThreadData 
   // v = 0 for iradius2, 1 for oradius2, and linear interpolation along that
   len = Sqr(uv[U])+Sqr(uv[V]);
   result[V] = (sqrt(len)-sqrt(iradius2))/(sqrt(oradius2)-sqrt(iradius2));
-  
 }
 
 }
