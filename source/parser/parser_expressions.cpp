@@ -3184,6 +3184,7 @@ shared_ptr<MAP_T> Parser::Parse_Blend_List (int Count, ColourBlendMapConstPtr De
             END_EXPECT
             break;
 
+            // TODO - what about kBlendMapType_Slope ?!
     }
 
     if ((Blend_Type==kBlendMapType_Normal) && (i==0))

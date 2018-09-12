@@ -10390,7 +10390,7 @@ void Parser::Warn_Compat(bool definite, const char *syn)
     }
 
     Warning("%s\n"
-            "  Use of this syntax %s backwards compatable with earlier versions of POV-Ray.\n"
+            "  Use of this syntax %s backwards compatible with earlier versions of POV-Ray.\n"
             "  The #version directive or +MV switch will not help.",
             syn, text);
 }

@@ -1204,7 +1204,7 @@ AC_RUN_IFELSE([
       ],[
         AC_MSG_RESULT([yes])
         AC_DEFINE([HAVE_INF],           [],[infinite floating point values are supported])
-        AC_DEFINE([HAVE_EMULATED_ISINF],[],[infinities can be identified by them comparing non-equal to themselves])
+        AC_DEFINE([HAVE_EMULATED_ISINF],[],[infinities can be identified by comparison to the maximum value])
       ],[
         # although double and float support infinite values, they are no use to us as we can't properly test for them,
         # so we're not setting HAVE_INF.

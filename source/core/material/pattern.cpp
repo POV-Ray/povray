@@ -14,7 +14,7 @@
 /// ----------------------------------------------------------------------------
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -6525,7 +6525,7 @@ DBL HexagonPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsecti
 
     /* Avoid mirroring across x-axis. */
 
-    z = z < 0.0 ? 5.196152424 - fabs(z) : z;
+    z = z < 0.0 ? 5.196152424 - fabs(z) : z;    /// TODO FIXME - magic number! Use an aptly named const instead.
 
     /* Scale point to make calcs easier. */
 
@@ -8201,7 +8201,7 @@ DBL RipplesPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 *
 * RETURNS
 *
-*   DBL value in the range 0.0 to 1.0, 0.0 if normal is NULL
+*   DBL value in the range 0.0 to 1.0, 0.0 if intersection struct is `nullptr`
 *
 * AUTHOR
 *
@@ -8271,7 +8271,7 @@ DBL SlopePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
         return value1; /* no altitude defined */
     }
 
-    /* Calculate projection of Epoint along altitude vector */
+    /* Calculate projection of EPoint along altitude vector */
     if (altitudeAxis > 0)
         /* short case 1: altitude vector in x, y or z direction */
         value2 = EPoint[altitudeAxis - 1];
@@ -8279,7 +8279,7 @@ DBL SlopePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
         /* short case 2: altitude vector in negative x, y or z direction */
         value2 = -EPoint[-altitudeAxis - 1];
     else
-        /* projection of Epoint along altitude vector */
+        /* projection of EPoint along altitude vector */
         value2 = dot(EPoint, altitudeDirection);
 
     if (0.0 != altitudeModWidth)
