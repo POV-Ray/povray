@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -95,7 +95,7 @@ namespace pov
 #define HIERARCHY_FLAG            0x00000400L ///< Object can have a bounding hierarchy.
 #define HOLLOW_FLAG               0x00000800L ///< Object is hollow (atmosphere inside).
 #define HOLLOW_SET_FLAG           0x00001000L ///< Hollow explicitly set in scene file.
-#define UV_FLAG                   0x00002000L ///< Object uses UV mapping.
+#define UV_FLAG                   0x00002000L ///< Object uses UV mapping. Set if `uv_mapping` is specified on an object itself.
 #define DOUBLE_ILLUMINATE_FLAG    0x00004000L ///< Illuminate both sides of the surface.
 #define NO_IMAGE_FLAG             0x00008000L ///< Object doesn't catch camera rays.
 #define NO_REFLECTION_FLAG        0x00010000L ///< Object doesn't catch reflection rays.

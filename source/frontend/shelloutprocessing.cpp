@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -439,6 +439,10 @@ bool ShelloutProcessing::PostProcessEvent(void)
                         cancelParameters = sh->Parameters();
                         cancelOutput = LastShelloutResult();
                         return true;
+
+                    default:
+                        // Do nothing special.
+                        break;
                 }
             }
 
@@ -464,6 +468,10 @@ bool ShelloutProcessing::PostProcessEvent(void)
                                 skipCallouts = true;
 
                             return true;
+
+                        default:
+                            // Do nothing special.
+                            break;
                     }
                     break;
 
@@ -495,6 +503,10 @@ bool ShelloutProcessing::PostProcessEvent(void)
                                 skipReason = str(boost::format("skip frame %1%") % (frameNo + 1));
                             }
                             break;
+
+                        default:
+                            // Do nothing special.
+                            break;
                     }
                     break;
 
@@ -510,6 +522,10 @@ bool ShelloutProcessing::PostProcessEvent(void)
                             cancelParameters = skipParameters = sh->Parameters();
                             cancelOutput = skipOutput = LastShelloutResult();
                             cancelReason = skipReason = "skip all remaining frames";
+                            break;
+
+                        default:
+                            // Do nothing special.
                             break;
                     }
                     break;
@@ -531,6 +547,10 @@ bool ShelloutProcessing::PostProcessEvent(void)
                     }
                     cancelReturn = ret;
                     return true;
+
+                default:
+                    // Do nothing special.
+                    break;
             }
         }
     }

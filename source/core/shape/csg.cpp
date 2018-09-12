@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -66,7 +66,7 @@ namespace pov
 inline bool Test_Ray_Flags(const Ray& ray, ConstObjectPtr obj)
 {
     // CJC 2005 if ray is primary ray ignore NO_IMAGE_FLAG to support the trace() SDL function
-    // TODO FIXME - I uess it would be better to have the trace() function use a different ray type [CLi]
+    // TODO FIXME - I guess it would be better to have the trace() function use a different ray type [CLi]
     return ( ( !ray.IsPhotonRay() &&
                (!Test_Flag(obj, NO_IMAGE_FLAG) || ray.IsImageRay() == false || ray.IsPrimaryRay() == true) &&
                (!Test_Flag(obj, NO_REFLECTION_FLAG) || ray.IsReflectionRay() == false) &&

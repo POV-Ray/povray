@@ -139,11 +139,11 @@ UCS2 *Parser::Parse_String(bool pathname, bool require)
                     {
 #if POV_BACKSLASH_IS_PATH_SEPARATOR
                         Warning("Backslash encountered while parsing for a filename."
-                                " In legacy (pre-3.8) scenes, this is NOT interpreted as the start of an escape sequence."
+                                " In legacy (pre-v3.8) scenes, this is NOT interpreted as the start of an escape sequence."
                                 " However, for future compatibility it is recommended to use a forward slash as path separator instead.");
 #else
                         Warning("Backslash encountered while parsing for a filename."
-                                " In legacy (pre-3.8) scenes, this is NOT interpreted as the start of an escape sequence.");
+                                " In legacy (pre-v3.8) scenes, this is NOT interpreted as the start of an escape sequence.");
 #endif
                     }
                     pString = &stringValue->GetFileName();

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -744,13 +744,8 @@ Quadric::~Quadric()
 
 void Quadric::Compute_BBox()
 {
-    Vector3d pOne;
-    Vector3d mOne;
-
-    pOne = Vector3d( 1.0,  1.0,  1.0);
-    mOne = Vector3d(-1.0, -1.0, -1.0);
-
-    Compute_BBox(mOne, pOne);
+    Vector3d clipMin(-1.0), clipMax(1.0);
+    Compute_BBox(clipMin, clipMax);
 }
 
 void Quadric::Compute_BBox(Vector3d& ClipMin, Vector3d& ClipMax)

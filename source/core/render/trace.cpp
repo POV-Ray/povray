@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -622,6 +622,11 @@ void Trace::ComputeOneTextureColour(MathColour& resultColour, ColourChannel& res
                 ComputeAverageTextureColours(resultColour, resultTransm, texture, warps, tpoint, rawnormal, ray, weight, isect, shadowflag, photonPass);
                 break;
             case UV_MAP_PATTERN:
+                // TODO FIXME
+                //  I think we have a serious problem here regarding bump mapping:
+                //  The UV vector doesn't contain any information about the (local) *orientation* of U and V in our XYZ co-ordinate system!
+                //  This causes slopes do be applied in the wrong directions.
+
                 // Don't bother warping, simply get the UV vect of the intersection
                 isect.Object->UVCoord(uvcoords, &isect, threadData);
                 tpoint = Vector3d(uvcoords[U], uvcoords[V], 0.0);
@@ -2334,6 +2339,11 @@ void Trace::ComputeShadowColour(const LightSource &lightsource, Intersection& is
     // now switch to UV mapping if we need to
     if(Test_Flag(isect.Object, UV_FLAG))
     {
+        // TODO FIXME
+        //  I think we have a serious problem here regarding bump mapping:
+        //  The UV vector doesn't contain any information about the (local) *orientation* of U and V in our XYZ co-ordinate system!
+        //  This causes slopes do be applied in the wrong directions.
+
         // get the UV vect of the intersection
         isect.Object->UVCoord(uv_Coords, &isect, threadData);
         // save the normal and UV coords into Intersection

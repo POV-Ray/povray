@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -67,7 +67,7 @@ class POVMS_Container
         friend class POVMS_MessageReceiver;
     public:
         POVMS_Container();
-        virtual ~POVMS_Container();
+        virtual ~POVMS_Container() noexcept(false);
 
         POVMSType Type() const;
         size_t Size() const;
@@ -95,7 +95,7 @@ class POVMS_Attribute : public POVMS_Container
         POVMS_Attribute(std::vector<POVMSType>& value);
         POVMS_Attribute(POVMSAttribute& convert);
         POVMS_Attribute(const POVMS_Attribute& source);
-        virtual ~POVMS_Attribute();
+        virtual ~POVMS_Attribute() noexcept(false);
 
         POVMS_Attribute& operator=(const POVMS_Attribute& source);
 
@@ -128,7 +128,7 @@ class POVMS_List : public POVMS_Container
         POVMS_List();
         POVMS_List(POVMSAttributeList& convert);
         POVMS_List(const POVMS_List& source);
-        virtual ~POVMS_List();
+        virtual ~POVMS_List() noexcept(false);
 
         POVMS_List& operator=(const POVMS_List& source);
 
@@ -196,7 +196,7 @@ class POVMS_Object : public POVMS_Container
         POVMS_Object(POVMSObject& convert);
         POVMS_Object(POVMSObjectPtr convert);
         POVMS_Object(const POVMS_Object& source);
-        ~POVMS_Object();
+        ~POVMS_Object() noexcept(false);
 
         POVMS_Object& operator=(const POVMS_Object& source);
 
@@ -488,7 +488,7 @@ class POVMS_MessageReceiver
         POVMS_MessageReceiver(const POVMS_MessageReceiver&); // no copies allowed
         POVMS_MessageReceiver& operator=(const POVMS_MessageReceiver&); // no copy assignments allowed
 
-        static int ReceiveHandler(POVMSObjectPtr msg, POVMSObjectPtr result, int mode, void *privatedataptr);
+        static POVMSResult ReceiveHandler(POVMSObjectPtr msg, POVMSObjectPtr result, int mode, void *privatedataptr);
 
         void AddNodeFront(POVMSType hclass, POVMSType hid, HandlerOO *hooptr, Handler *hptr);
         void AddNodeBack(POVMSType hclass, POVMSType hid, HandlerOO *hooptr, Handler *hptr);

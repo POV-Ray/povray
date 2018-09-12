@@ -2641,7 +2641,7 @@ void LightTargetCombo::computeAnglesAndDeltas(shared_ptr<SceneData> sceneData)
     if(light->Parallel)
     {
         // OK, here we fake things a bit for parallel lights.  Theta is not really theta.
-        // It really represents the radius... but why re-code an entire loop.  For POV 4.0
+        // It really represents the radius... but why re-code an entire loop.  For POV-Ray v4.0
         // this should be re-written as an abstract class with polymorphism.
         dtheta = photonSpread;
     }

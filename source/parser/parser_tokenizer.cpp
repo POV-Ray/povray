@@ -66,6 +66,10 @@ namespace pov_parser
 using namespace pov_base;
 using namespace pov;
 
+#if POV_DEBUG
+unsigned int gBreakpointCounter = 0;
+#endif
+
 /*****************************************************************************
 * Local preprocessor defines
 ******************************************************************************/
@@ -117,6 +121,10 @@ void Parser::Initialize_Tokenizer()
     init_sym_tables();
     Max_Trace_Level = MAX_TRACE_LEVEL_DEFAULT;
     Had_Max_Trace_Level = false;
+
+#if POV_DEBUG
+    gBreakpointCounter = 0;
+#endif
 
     CheckFileSignature();
 }
@@ -552,6 +560,11 @@ void Parser::Read_Symbol(const RawToken& rawToken)
                             a = reinterpret_cast<POV_ARRAY *>(*(mToken.DataPtr));
                             j = 0;
 
+                            if (a == nullptr)
+                                // This happens in e.g. `#declare Foo[A][B]=...` when `Foo` is an
+                                // array of arrays and `Foo[A]` is uninitialized.
+                                Error("Attempt to access uninitialized nested array.");
+
                             for (i=0; i <= a->Dims; i++)
                             {
                                 Parse_Square_Begin();
@@ -580,6 +593,11 @@ void Parser::Read_Symbol(const RawToken& rawToken)
 
                             if (!LValue_Ok && !Inside_Ifdef)
                             {
+                                // Note that this does not (and must not) trigger in e.g.
+                                // `#declare Foo[A][B]=...` when `Foo` is an array of arrays and
+                                // `Foo[A]` is uninitialized, because until now we've only seen
+                                // `#declare Foo[A]`, which is no reason for concern as it may
+                                // just as well be part of `#declare Foo[A]=...` which is fine.
                                 if (a->DataPtrs[j] == nullptr)
                                     Error("Attempt to access uninitialized array element.");
                             }
@@ -1796,8 +1814,15 @@ void Parser::Parse_Directive(int After_Hash)
 
 #if POV_DEBUG
         CASE(BREAKPOINT_TOKEN)
-            // This statement does nothing, except allow you to set a debug breakpoint here
-            // so that you can effectively trigger the debugger via an SDL command.
+            Parsing_Directive = false;
+            if (Skipping)
+            {
+                UNGET
+            }
+            else
+            {
+                Parse_Breakpoint();
+            }
             EXIT
         END_CASE
 #endif
@@ -1823,6 +1848,24 @@ void Parser::Parse_Directive(int After_Hash)
         mToken.is_dictionary_elem = false;
     }
 }
+
+#if POV_DEBUG
+void Parser::Parse_Breakpoint()
+{
+    // This function is invoked in debug builds whenever the `#breakpoint` directive is encountered
+    // in a scene or include file.
+    // Control flow is honored, e.g. `#if(0) #breakpoint #else #breakpoint #end` will trigger this
+    // function only on the second `#breakpoint` directive.
+
+    // To use the `#breakpoint` directive to immediately break program execution, place an
+    // unconditional breakpoint here.
+
+    // To use the `#breakpoint` directive to prime a breakpoint elsewhere, make that breakpoint
+    // conditional, testing for `gBreakpointCounter > 0`.
+
+    ++gBreakpointCounter;
+}
+#endif
 
 
 /*****************************************************************************

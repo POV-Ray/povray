@@ -753,6 +753,8 @@ void Lemon::Compute_BBox()
 }
 
 
+#ifdef POV_ENABLE_LEMON_UV
+
 /*****************************************************************************
 *
 * FUNCTION
@@ -875,5 +877,7 @@ void Lemon::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
     Result[V] = phi;
 
 }
+
+#endif // POV_ENABLE_LEMON_UV
 
 }

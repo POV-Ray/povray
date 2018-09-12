@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -890,7 +890,7 @@ bool HypercomplexFunctionFractalRules::Iterate(const Vector3d& IPoint, const Fra
 
     x = IterStack[X][0] = IPoint[X];
     y = IterStack[Y][0] = IPoint[Y];
-    z = IterStack[Z][0] = IPoint[Y];
+    z = IterStack[Z][0] = IPoint[Z];
     w = IterStack[W][0] = (HCompl->SliceDist
                          - HCompl->Slice[X]*x
                          - HCompl->Slice[Y]*y

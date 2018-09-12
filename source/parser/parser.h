@@ -415,6 +415,9 @@ class Parser : public SceneTask
         void Get_Token (void);
         void Unget_Token (void);
         void Parse_Directive (int After_Hash);
+#if POV_DEBUG
+        void Parse_Breakpoint();
+#endif
         void Open_Include (void);
         void IncludeHeader(const UCS2String& temp);
         void pre_init_tokenizer (void);

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -100,7 +100,7 @@ POVMS_Container::POVMS_Container()
     data.ptr = NULL;
 }
 
-POVMS_Container::~POVMS_Container()
+POVMS_Container::~POVMS_Container() noexcept(false)
 {
     // do nothing for now
 }
@@ -333,7 +333,7 @@ POVMS_Attribute::POVMS_Attribute(const POVMS_Attribute& source)
         throw POV_EXCEPTION_CODE(err);
 }
 
-POVMS_Attribute::~POVMS_Attribute()
+POVMS_Attribute::~POVMS_Attribute() noexcept(false)
 {
     int err;
 
@@ -599,7 +599,7 @@ POVMS_List::POVMS_List(const POVMS_List& source)
         throw POV_EXCEPTION_CODE(err);
 }
 
-POVMS_List::~POVMS_List()
+POVMS_List::~POVMS_List() noexcept(false)
 {
     int err;
 
@@ -822,7 +822,7 @@ POVMS_Object::POVMS_Object(const POVMS_Object& source)
     }
 }
 
-POVMS_Object::~POVMS_Object()
+POVMS_Object::~POVMS_Object() noexcept(false)
 {
     int err;
 
@@ -1695,13 +1695,13 @@ void POVMS_MessageReceiver::Remove(POVMSType hclass, POVMSType hid)
     }
 }
 
-int POVMS_MessageReceiver::ReceiveHandler(POVMSObjectPtr msg, POVMSObjectPtr result, int mode, void *privatedataptr)
+POVMSResult POVMS_MessageReceiver::ReceiveHandler(POVMSObjectPtr msg, POVMSObjectPtr result, int mode, void *privatedataptr)
 {
     POVMS_MessageReceiver *self = (POVMS_MessageReceiver *)privatedataptr;
     HandlerNode *nodeptr = NULL;
     POVMSType hclass = kPOVMSType_Null;
     POVMSType hid = kPOVMSType_Null;
-    int err = pov_base::kNoErr;
+    POVMSResult err = pov_base::kNoErr;
 
     if(self == NULL)
         err = pov_base::kParamErr;

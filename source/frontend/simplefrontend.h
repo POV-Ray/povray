@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -365,9 +365,12 @@ State SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::Process()
                     state = kRendering;
 
                     return kRendering;
-            }
 
-            return kParsing;
+                default:
+                    return state;
+            }
+            POV_FRONTEND_ASSERT(false); // All cases of the preceding switch should return.
+
         case kRendering:
             switch(renderFrontend.GetViewState(viewId))
             {
@@ -408,9 +411,12 @@ State SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::Process()
                         state = kDone;
                         return kDone;
                     }
-            }
 
-            return kRendering;
+                default:
+                    return state;
+            }
+            POV_FRONTEND_ASSERT(false); // All cases of the preceding switch should return.
+
         case kStopping:
             if(renderFrontend.GetSceneState(sceneId) == SceneData::Scene_Ready || renderFrontend.GetSceneState(sceneId) == SceneData::Scene_Failed)
             {
@@ -433,9 +439,11 @@ State SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::Process()
             state = kReady;
 
             return kReady;
-    }
 
-    return state;
+        default:
+            return state;
+    }
+    POV_FRONTEND_ASSERT(false); // All cases of the preceding switch should return.
 }
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
