@@ -2638,30 +2638,23 @@ int Blob::Make_Blob(DBL threshold, Blob_List_Struct *BlobList, int npoints, Trac
 *
 ******************************************************************************/
 
-void Blob::Test_Blob_Opacity()
+bool Blob::IsOpaque() const
 {
-    /* Initialize opacity flag to the opacity of the object's texture. */
-
-    if ((Texture == nullptr) || (Test_Opacity(Texture)))
-    {
-        Set_Flag(this, OPAQUE_FLAG);
-    }
-
     if (Test_Flag(this, MULTITEXTURE_FLAG))
     {
-        for (vector<TEXTURE*>::iterator i = Element_Texture.begin(); i != Element_Texture.end(); ++i)
+        for (auto&& elementTexture : Element_Texture)
         {
-            if (*i != nullptr)
-            {
-                /* If component's texture isn't opaque the blob is neither. */
-
-                if (!Test_Opacity(*i))
-                {
-                    Clear_Flag(this, OPAQUE_FLAG);
-                }
-            }
+            // If component's texture isn't opaque the blob is neither.
+            if ((elementTexture != nullptr) && !Test_Opacity(elementTexture))
+                return false;
         }
     }
+
+    // Otherwise it's a question of whether the common texture is opaque or not.
+    // TODO FIXME - other objects report as non-opaque if Texture == nullptr.
+    // TODO FIXME - other objects report as non-opaque if Interior_Texture present and non-opaque.
+    // What we probably really want here is `return ObjectBase::IsOpaque()`.
+    return (Texture == nullptr) || Test_Opacity(Texture);
 }
 
 
