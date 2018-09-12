@@ -768,7 +768,7 @@ Lathe::Lathe() : ObjectBase(LATHE_OBJECT)
 
     Number = 0;
 
-    Spline = NULL;
+    Spline = nullptr;
 
     Radius1 = 0.0;
     Radius2 = 0.0;
@@ -996,7 +996,7 @@ void Lathe::Compute_Lathe(Vector2d *P, TraceThreadData *Thread)
 
     /* Allocate segments. */
 
-    if (Spline == NULL)
+    if (Spline == nullptr)
     {
         Spline = new LATHE_SPLINE;
 

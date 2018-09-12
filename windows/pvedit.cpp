@@ -57,7 +57,7 @@ namespace pov_frontend
 namespace povwin
 {
 
-using namespace pov;
+using namespace pov_parser;
 
 HINSTANCE               hLibPovEdit ;
 

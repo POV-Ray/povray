@@ -628,7 +628,7 @@ void Destroy_Bounding_Sphere_Hierarchy(BSPHERE_TREE *Node)
 {
     short i;
 
-    if (Node != NULL)
+    if (Node != nullptr)
     {
         if (Node->Entries > 0)
         {

@@ -40,8 +40,10 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "parser/configparser.h"
 
-namespace pov
+namespace pov_parser
 {
+
+using namespace pov;
 
 typedef struct Reserved_Word_Struct RESERVED_WORD;
 typedef int TOKEN;

@@ -95,7 +95,7 @@ namespace pov
 #define HIERARCHY_FLAG            0x00000400L ///< Object can have a bounding hierarchy.
 #define HOLLOW_FLAG               0x00000800L ///< Object is hollow (atmosphere inside).
 #define HOLLOW_SET_FLAG           0x00001000L ///< Hollow explicitly set in scene file.
-#define UV_FLAG                   0x00002000L ///< Object uses UV mapping.
+#define UV_FLAG                   0x00002000L ///< Object uses UV mapping. Set if `uv_mapping` is specified on an object itself.
 #define DOUBLE_ILLUMINATE_FLAG    0x00004000L ///< Illuminate both sides of the surface.
 #define NO_IMAGE_FLAG             0x00008000L ///< Object doesn't catch camera rays.
 #define NO_REFLECTION_FLAG        0x00010000L ///< Object doesn't catch reflection rays.
@@ -191,7 +191,7 @@ class ObjectBase
         /// Construct object from scratch.
         ObjectBase(int t) :
             Type(t),
-            Texture(NULL), Interior_Texture(NULL), interior(), Trans(NULL),
+            Texture(nullptr), Interior_Texture(nullptr), interior(), Trans(nullptr),
             Ph_Density(0), RadiosityImportance(0.0), RadiosityImportanceSet(false), Flags(0)
         {
             Make_BBox(BBox, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
@@ -212,10 +212,10 @@ class ObjectBase
         {
             if (transplant)
             {
-                o.Texture = NULL;
-                o.Interior_Texture = NULL;
+                o.Texture = nullptr;
+                o.Interior_Texture = nullptr;
                 o.interior.reset();
-                o.Trans = NULL;
+                o.Trans = nullptr;
                 o.Bound.clear();
                 o.Clip.clear();
                 o.LLights.clear();

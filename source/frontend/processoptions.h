@@ -90,9 +90,16 @@ class ProcessOptions
         static bool IsTrue(const char *);
         static bool IsFalse(const char *);
 
+        /// @todo This should be in the POVMS module.
+        /// @note The attribute will be encoded as UCS2 with a trailing NUL byte.
         static int POVMSAttr_GetUTF8String(POVMSAttributePtr attr, POVMSType type, UTF8String& s);
+        /// @todo This should be in the POVMS module.
+        /// @note The attribute must be encoded as UCS2 with a trailing NUL byte.
         static int POVMSAttr_SetUTF8String(POVMSAttributePtr, POVMSType, const char *);
+        /// @todo This should be in the POVMS module.
+        /// @note The attribute will be encoded as UCS2 with a trailing NUL byte.
         static int POVMSUtil_SetUTF8String(POVMSObjectPtr, POVMSType, const char *);
+
         static size_t ConvertUTF16ToUTF8(const UTF16 *source, UTF8String& dest);
         static size_t ConvertUCS2ToUTF8(const UCS2 *source, UTF8String& dest);
     protected:

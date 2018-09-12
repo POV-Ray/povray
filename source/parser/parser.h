@@ -4,7 +4,7 @@
 ///
 /// Declarations related to the parser.
 ///
-//// This header file is included by virtually all parser C++ files in POV-Ray.
+/// This header file is included by virtually all parser C++ files in POV-Ray.
 ///
 /// @copyright
 /// @parblock
@@ -41,20 +41,18 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "parser/configparser.h"
 
+#include <string>
+
 #include "base/image/image.h"
 #include "base/messenger.h"
 #include "base/stringutilities.h"
 #include "base/textstream.h"
 #include "base/textstreambuffer.h"
 
+#include "core/material/blendmap.h"
 #include "core/material/pigment.h"
 #include "core/material/warp.h"
-#include "core/math/matrix.h"
-#include "core/math/vector.h"
-#include "core/scene/atmosphere.h"
 #include "core/scene/camera.h"
-#include "core/shape/blob.h"
-#include "core/shape/truetype.h"
 
 #include "parser/fncode.h"
 #include "parser/reservedwords.h"
@@ -64,7 +62,26 @@
 namespace pov
 {
 
+class Blob_Element;
+struct ContainedByShape;
+struct Fog_Struct;
+struct GenericSpline;
+class ImageData;
+class Mesh;
+struct PavementPattern;
+struct Rainbow_Struct;
+class SceneData;
+struct Skysphere_Struct;
+struct TilingPattern;
+struct TrueTypeFont;
+
+}
+
+namespace pov_parser
+{
+
 using namespace pov_base;
+using namespace pov;
 
 const int MAX_BRACES = 200;
 
@@ -105,16 +122,6 @@ struct Sym_Table_Entry
     bool deprecatedShown : 1;
     SymTableEntryRefCount ref_count; ///< normally 1, but may be greater when passing symbols out of macros
 };
-
-class FPUContext;
-class ImageData;
-struct GenericSpline;
-struct ClassicTurbulence; // full declaration in core/material/warp.h
-struct BlackHoleWarp; // full declaration in core/material/warp.h
-class Mesh;
-class SceneData;
-struct PavementPattern;
-struct TilingPattern;
 
 /*****************************************************************************
 * Global preprocessor defines
@@ -274,7 +281,7 @@ class Parser : public SceneTask
             UCS2 *Macro_Filename;
             pov_base::ITextStream::FilePos Macro_File_Pos;
             int Macro_File_Col;
-            POV_LONG Macro_End; ///< The position _after_ the `#` in the terminating `#end` directive.
+            POV_OFF_T Macro_End; ///< The position _after_ the `#` in the terminating `#end` directive.
             vector<MacroParameter> parameters;
             unsigned char *Cache;
             size_t CacheSize;
@@ -355,8 +362,8 @@ class Parser : public SceneTask
         void Test_Redefine(TOKEN Previous, TOKEN *NumberPtr, void *Data, bool allow_redefine = true);
         void Expectation_Error(const char *);
         void *Copy_Identifier(void *Data, int Type);
-        TRANSFORM *Parse_Transform(TRANSFORM *Trans = NULL);
-        TRANSFORM *Parse_Transform_Block(TRANSFORM *New = NULL);
+        TRANSFORM *Parse_Transform(TRANSFORM *Trans = nullptr);
+        TRANSFORM *Parse_Transform_Block(TRANSFORM *New = nullptr);
         char *Get_Reserved_Words (const char *additional_words);
 
         void SendFatalError(Exception& e);
@@ -389,6 +396,9 @@ class Parser : public SceneTask
         void Where_Error (POVMSObjectPtr msg);
         void Where_Warning (POVMSObjectPtr msg);
         void Parse_Directive (int After_Hash);
+#if POV_DEBUG
+        void Parse_Breakpoint();
+#endif
         void Open_Include (void);
         void IncludeHeader(const UCS2String& temp);
         void pre_init_tokenizer (void);
@@ -415,9 +425,9 @@ class Parser : public SceneTask
         void Parse_Interior (InteriorPtr&);
         void Parse_Media_Density_Pattern (PIGMENT **);
         void Parse_Media_Density_Pattern (vector<PIGMENT*>&);
-        FOG *Parse_Fog (void);
-        RAINBOW *Parse_Rainbow (void);
-        SKYSPHERE *Parse_Skysphere (void);
+        Fog_Struct *Parse_Fog (void);
+        Rainbow_Struct *Parse_Rainbow (void);
+        Skysphere_Struct *Parse_Skysphere(void);
         ImageData *Parse_Image (int LegalTypes, bool GammaCorrect = false);
         SimpleGammaCurvePtr Parse_Gamma (void);
         void Parse_Material(MATERIAL *);
@@ -445,22 +455,22 @@ class Parser : public SceneTask
         DBL Allow_Float (DBL defval);
 
         /// Parses a FLOAT as an integer value.
-        int Parse_Int(const char* parameterName = NULL);
+        int Parse_Int(const char* parameterName = nullptr);
 
         /// Parses a FLOAT as an integer value with a given minimum.
-        int Parse_Int_With_Minimum(int minValue, const char* parameterName = NULL);
+        int Parse_Int_With_Minimum(int minValue, const char* parameterName = nullptr);
 
         /// Parses a FLOAT as an integer value with a given range.
-        int Parse_Int_With_Range(int minValue, int maxValue, const char* parameterName = NULL);
+        int Parse_Int_With_Range(int minValue, int maxValue, const char* parameterName = nullptr);
 
         /// Parses a FLOAT as a boolean value.
-        bool Parse_Bool(const char* parameterName = NULL);
+        bool Parse_Bool(const char* parameterName = nullptr);
 
         int Allow_Vector (Vector3d& Vect);
         void Parse_UV_Vect (Vector2d& UV_Vect);
         void Parse_Vector (Vector3d& Vector);
         void Parse_Vector4D (VECTOR_4D Vector);
-        int Parse_Unknown_Vector (EXPRESS& Express, bool allow_identifier = false, bool *had_identifier = NULL);
+        int Parse_Unknown_Vector(EXPRESS& Express, bool allow_identifier = false, bool *had_identifier = nullptr);
         void Parse_Scale_Vector (Vector3d& Vector);
         DBL Parse_Float_Param (void);
         void Parse_Float_Param2 (DBL *Val1, DBL *Val2);
@@ -479,6 +489,8 @@ class Parser : public SceneTask
         // parsestr.h/parsestr.cpp
         char *Parse_C_String(bool pathname = false);
         UCS2 *Parse_String(bool pathname = false, bool require = true);
+        std::string Parse_ASCIIString(bool pathname = false, bool require = true);
+        UCS2String Parse_UCS2String(bool pathname = false, bool require = true);
 
         UCS2 *String_Literal_To_UCS2(const char *str, bool pathname = false);
         UCS2 *String_To_UCS2(const char *str);
@@ -731,7 +743,7 @@ class Parser : public SceneTask
         void Break (void);
 
         int get_hash_value (const char *s);
-        inline void Write_Token (TOKEN Token_Id, int col, SYM_TABLE *table = NULL);
+        inline void Write_Token(TOKEN Token_Id, int col, SYM_TABLE *table = nullptr);
         void Destroy_Table (int index);
         void init_sym_tables (void);
         void Add_Sym_Table ();

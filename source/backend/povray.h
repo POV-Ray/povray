@@ -53,10 +53,10 @@
  *  This function does essential initialisation that is required before
  *  POV-Ray can be used. It also starts the main render thread that
  *  receives and processes all messages received from the frontend.
- *  @param  addr  If not NULL, backend address on return.
+ *  @param  addr  If not `nullptr`, backend address on return.
  *  @return       Pointer to the thread resource created.
  */
-boost::thread *povray_init(const boost::function0<void>& threadExit, POVMSAddress *addr = NULL);
+boost::thread *povray_init(const boost::function0<void>& threadExit, POVMSAddress *addr = nullptr);
 
 /**
  *  This function shuts down the main render thread and after it has

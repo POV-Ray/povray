@@ -68,8 +68,8 @@ class PhotonSortingTask : public RenderTask
         void SendProgress();
 
         void sortPhotonMap();
-        int save();
-        int load();
+        bool save();
+        bool load();
     private:
         class CooperateFunction : public Trace::CooperateFunctor
         {

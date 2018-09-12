@@ -53,7 +53,6 @@ namespace pov
 
 using namespace pov_base;
 
-class Parser;
 class View;
 
 /// Class governing the rendering of a scene.

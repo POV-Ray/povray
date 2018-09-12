@@ -104,7 +104,7 @@ class HypercomplexReciprocalFractalRules : public HypercomplexBaseFractalRules
 };
 
 void Complex_Exp (Complex *target, const Complex *source, const Complex *);
-void Complex_Ln (Complex *target, const Complex *source, const Complex *);
+void Complex_Ln (Complex *target, const Complex *source, const Complex * = nullptr);
 void Complex_Sin (Complex *target, const Complex *source, const Complex *);
 void Complex_ASin (Complex *target, const Complex *source, const Complex *);
 void Complex_Sinh (Complex *target, const Complex *source, const Complex *);

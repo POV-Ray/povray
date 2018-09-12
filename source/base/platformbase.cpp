@@ -48,7 +48,7 @@ namespace pov_base
 //******************************************************************************
 
 /// Platform specific function interface self reference pointer
-PlatformBase *PlatformBase::self = NULL;
+PlatformBase *PlatformBase::self = nullptr;
 
 //******************************************************************************
 
@@ -74,7 +74,7 @@ UCS2String DefaultPlatformBase::CreateTemporaryFile()
     sprintf(buffer, "/tmp/pov%08x.dat", cnt);
 
     FILE *f = fopen(buffer, "wb");
-    if (f != NULL)
+    if (f != nullptr)
         fclose(f);
 
     return UCS2String(ASCIItoUCS2String(buffer));

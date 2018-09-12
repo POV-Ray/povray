@@ -118,7 +118,7 @@ class Ray;
 
 inline void Destroy_Float(DBL *x)
 {
-    if(x != NULL)
+    if (x != nullptr)
         delete x;
 }
 

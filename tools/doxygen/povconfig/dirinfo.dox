@@ -1,2 +1,7 @@
-/// @dir
-/// Platform-specific source code required to adapt POV-Ray to run on a particular platform (Doxygen stubs).
+/**
+
+@dir
+@ingroup PovConfig
+@brief Platform-specific source code required to adapt POV-Ray to run on a particular platform (Doxygen stubs).
+
+*/

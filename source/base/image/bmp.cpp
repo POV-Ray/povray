@@ -524,7 +524,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     unsigned file_depth, file_colors;
     unsigned data_location, planes, compression;
     unsigned info;
-    Image *image = NULL ;
+    Image *image = nullptr;
 
     // BMP files used to have no clearly defined gamma by default, but a Microsoft recommendation exists to assume sRGB.
     // Since ~1995, a header extension (BITMAPV4HEADER) with gamma metadata exists, which could be used if present.

@@ -1306,11 +1306,11 @@ ImageData::ImageData() :
     width(0.0), height(0.0),
     Offset(0.0, 0.0),
     AllFilter(0.0), AllTransmit(0.0),
-    Object(NULL),
-    data(NULL)
+    Object(nullptr),
+    data(nullptr)
 #ifdef POV_VIDCAP_IMPL
     // beta-test feature
-    ,VidCap(NULL)
+    ,VidCap(nullptr)
 #endif
 {}
 
@@ -1344,7 +1344,7 @@ ImageData::ImageData() :
 
 ImageData *Copy_Image(ImageData *Old)
 {
-    if(Old != NULL)
+    if (Old != nullptr)
         Old->References++;
 
     return (Old);
@@ -1380,7 +1380,7 @@ ImageData *Copy_Image(ImageData *Old)
 
 void Destroy_Image(ImageData *image)
 {
-    if((image == NULL) || (--(image->References) > 0))
+    if ((image == nullptr) || (--(image->References) > 0))
         return;
 
     delete image;
@@ -1390,11 +1390,11 @@ ImageData::~ImageData()
 {
 #ifdef POV_VIDCAP_IMPL
     // beta-test feature
-    if(VidCap != NULL)
+    if (VidCap != nullptr)
         delete VidCap;
 #endif
 
-    if(data != NULL)
+    if (data != nullptr)
         delete data;
 }
 

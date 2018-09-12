@@ -231,7 +231,7 @@ class RadiosityCache
             boost::mutex blockMutex;  // lock this when adding blocks to any node of the tree
 #endif
 
-            Octree() : root(NULL) {}
+            Octree() : root(nullptr) {}
         };
 
         vector<BlockPool*> blockPools;  // block pools ready to be re-used

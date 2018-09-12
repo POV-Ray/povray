@@ -102,7 +102,7 @@ int main(int argc, char **argv)
     using namespace pov_base;
     using namespace pov_frontend;
 
-    POVMSContext frontendContext = NULL;
+    POVMSContext frontendContext = nullptr;
 
     DefaultPlatformBase platformbase;
     POVMSAddress backendAddress = POVMSInvalidAddress;

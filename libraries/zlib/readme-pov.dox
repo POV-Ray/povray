@@ -1,0 +1,16 @@
+/**
+
+@dir
+@ingroup PovLibraries
+@brief Source code of _zlib_ 3rd party compression library.
+
+This directory contains a copy of the zlib 1.2.7 source distribution,
+and is part of the POV-Ray source distribution package.
+
+The latest official zlib source distribution package can be obtained via
+<https://zlib.net>. Older versions may be found at the _libpng_ download site,
+accessible via <http://www.libpng.org/pub/png/libpng.html>.
+
+See `README` file in this directory for licensing information.
+
+*/

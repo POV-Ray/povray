@@ -221,14 +221,14 @@ class Image
             /// @{
 
             /// Gamma to encode for.
-            /// Set this to `NULL` to use the file format specific default.
+            /// Set this to `nullptr` to use the file format specific default.
             /// @note
             ///     This setting is ignored with file formats that mandate linear encoding or a
             ///     specific encoding gamma.
             SimpleGammaCurvePtr encodingGamma;
 
             /// Working colour space gamma to encode from.
-            /// Set to `NULL` or a neutral gamma curve to indicate linear working colour space.
+            /// Set to `nullptr` or a neutral gamma curve to indicate linear working colour space.
             SimpleGammaCurvePtr workingGamma;
 
             /// @}

@@ -116,7 +116,7 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
     Thread->Stats()[Ray_Par_Bound_Tests_Succeeded]++;
     Thread->Stats()[Ray_Parametric_Tests]++;
 
-    if (Trans != NULL)
+    if (Trans != nullptr)
     {
         MInvTransPoint(P, ray.Origin, Trans);
         MInvTransDirection(D, ray.Direction, Trans);
@@ -146,7 +146,7 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
     SectorNum[0] = 1;
 
     MaxPrecompX = MaxPrecompY = MaxPrecompZ = 0;
-    if (PData != NULL)
+    if (PData != nullptr)
     {
         if (((PData->flags) & OK_X) != 0)
             MaxPrecompX = 1 << (PData->depth);
@@ -464,7 +464,7 @@ void Parametric::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *
     RV[Z] += aFn[Z].Evaluate(uv_vect);
 
     Result = cross(RU, RV);
-    if (Trans != NULL)
+    if (Trans != nullptr)
         MTransNormal(Result, Result, Trans);
     Result.normalize();
 }
@@ -497,7 +497,7 @@ void Parametric::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *
 void Parametric::Compute_BBox()
 {
     container->ComputeBBox(BBox);
-    if(Trans != NULL)
+    if (Trans != nullptr)
     {
         Recompute_BBox(&BBox, Trans);
     }
@@ -620,7 +620,7 @@ void Parametric::Scale(const Vector3d&, const TRANSFORM* tr)
 
 void Parametric::Transform(const TRANSFORM* tr)
 {
-    if(Trans == NULL)
+    if (Trans == nullptr)
         Trans = Create_Transform();
     Compose_Transforms(Trans, tr);
     Compute_BBox();
@@ -734,12 +734,12 @@ Parametric::Parametric() : NonsolidObject(PARAMETRIC_OBJECT)
 
     Trans = Create_Transform();
 
-    Function[0] = NULL;
-    Function[1] = NULL;
-    Function[2] = NULL;
+    Function[0] = nullptr;
+    Function[1] = nullptr;
+    Function[2] = nullptr;
     accuracy = 0.001;
     max_gradient = 1;
-    PData = NULL;
+    PData = nullptr;
 }
 
 
@@ -893,7 +893,7 @@ void Parametric::Precompute_Parametric_Values(char flags, int depth, TraceThread
     nmb = 1 << depth;
 
     PData = reinterpret_cast<PRECOMP_PAR_DATA *>(POV_MALLOC(sizeof(PRECOMP_PAR_DATA), es));
-    if (PData == NULL)
+    if (PData == nullptr)
         throw POV_EXCEPTION_STRING("Cannot allocate memory for parametric precomputation data.");
     PData->flags = flags;
     PData->depth = depth;
@@ -914,7 +914,7 @@ void Parametric::Precompute_Parametric_Values(char flags, int depth, TraceThread
         PData->Low[2] = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * nmb, es));
         Last = PData->Hi[2] = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * nmb, es));
     }
-    if (Last == NULL)
+    if (Last == nullptr)
         throw POV_EXCEPTION_STRING("Cannot allocate memory for parametric precomputation data.");
 
     PrecompLastDepth = 1 << (depth - 1);
@@ -953,8 +953,8 @@ void Parametric::Precompute_Parametric_Values(char flags, int depth, TraceThread
 
 PRECOMP_PAR_DATA* Parametric::Copy_PrecompParVal()
 {
-    if (PData == NULL)
-        return NULL;
+    if (PData == nullptr)
+        return nullptr;
 
     (PData->use)++;
 
@@ -988,7 +988,7 @@ PRECOMP_PAR_DATA* Parametric::Copy_PrecompParVal()
 
 void Parametric::Destroy_PrecompParVal()
 {
-    if (PData == NULL)
+    if (PData == nullptr)
         return;
 
     PData->use--;

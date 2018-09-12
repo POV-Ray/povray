@@ -315,7 +315,7 @@ class GammaCurve
 #endif
 
         /// Constructor.
-        GammaCurve() : lookupTable8(NULL), lookupTable16(NULL) {}
+        GammaCurve() : lookupTable8(nullptr), lookupTable16(nullptr) {}
 
         /// Destructor.
         virtual ~GammaCurve() { if (lookupTable8) delete[] lookupTable8; if (lookupTable16) delete[] lookupTable16; }

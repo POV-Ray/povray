@@ -171,7 +171,7 @@ Image *Read(IStream *file, const Image::ReadOptions& options)
     float exposure = 1.0;
     unsigned int width;
     unsigned int height;
-    Image *image = NULL;
+    Image *image = nullptr;
     Image::ImageDataType imagetype = options.itype;
 
     // Radiance HDR files store linear color values by default, so never convert unless the user overrides
@@ -193,7 +193,7 @@ Image *Read(IStream *file, const Image::ReadOptions& options)
         // TODO: what do we do with exposure?
         if(strncmp(line, "EXPOSURE", 8) == 0)
         {
-            if((s = strchr(line, '=')) != NULL)
+            if ((s = strchr(line, '=')) != nullptr)
             {
                 if(sscanf(s + 1, "%f", &e) == 1)
                     exposure *= e;

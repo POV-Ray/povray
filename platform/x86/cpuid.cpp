@@ -159,7 +159,7 @@ CPUVendorInfo gCPUVendorInfo[] = {
     { kCPUVendor_VM,            "VMwareVMware" },   // VMWare
     { kCPUVendor_VM,            "XenVMMXenVMM" },   // Xen HVM
     // End of list.
-    { kCPUVendor_Unrecognized,  NULL }
+    { kCPUVendor_Unrecognized,  nullptr }
 };
 
 struct CPUIDInfo
@@ -197,7 +197,7 @@ CPUIDInfo::CPUIDInfo() :
     std::memcpy(vendor + 4, &info[CPUID_EDX], 4);
     std::memcpy(vendor + 8, &info[CPUID_ECX], 4);
     vendor[12] = '\0';
-    for (CPUVendorInfo* p = gCPUVendorInfo; p->cpuidString != NULL; ++p)
+    for (CPUVendorInfo* p = gCPUVendorInfo; p->cpuidString != nullptr; ++p)
     {
         if (strcmp(vendor, p->cpuidString) == 0)
         {

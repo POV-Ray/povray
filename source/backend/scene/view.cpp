@@ -91,7 +91,7 @@ ViewData::ViewData(shared_ptr<BackendSceneData> sd) :
     blockHeight(8),
     blockSize(DEFAULT_BLOCK_SIZE),
     realTimeRaytracing(false),
-    rtrData(NULL),
+    rtrData(nullptr),
     renderArea(0, 0, 159, 119),
     radiosityCache(sd->radiositySettings),
     sceneData(sd),
@@ -101,7 +101,7 @@ ViewData::ViewData(shared_ptr<BackendSceneData> sd) :
 
 ViewData::~ViewData()
 {
-    if (rtrData != NULL)
+    if (rtrData != nullptr)
         delete rtrData;
 }
 
@@ -577,7 +577,7 @@ View::View(shared_ptr<BackendSceneData> sd, unsigned int width, unsigned int hei
     viewData(sd),
     stopRequsted(false),
     mailbox(0),
-    renderControlThread(NULL)
+    renderControlThread(nullptr)
 {
     viewData.viewId = vid;
     viewData.width = width;
@@ -594,7 +594,7 @@ View::~View()
     stopRequsted = true; // NOTE: Order is important here, set this before stopping the queue!
     renderTasks.Stop();
 
-    if(renderControlThread != NULL)
+    if (renderControlThread != nullptr)
         renderControlThread->join();
     delete renderControlThread;
 
@@ -626,7 +626,7 @@ bool View::CheckCameraHollowObject(const Vector3d& point, const BBOX_TREE *node)
         // This is a leaf so test contained object.
         TraceThreadData threadData(viewData.GetSceneData());
         ObjectPtr object = reinterpret_cast<ObjectPtr>(node->Node);
-        if((object->interior != NULL) && (object->Inside(point, &threadData)))
+        if ((object->interior != nullptr) && (object->Inside(point, &threadData)))
             return true;
     }
 
@@ -650,14 +650,14 @@ bool View::CheckCameraHollowObject(const Vector3d& point)
 
         // test infinite objects
         for(vector<ObjectPtr>::iterator object = sd->objects.begin() + sd->numberOfFiniteObjects; object != sd->objects.end(); object++)
-            if(((*object)->interior != NULL) && Inside_BBox(point, (*object)->BBox) && (*object)->Inside(point, &threadData))
+            if (((*object)->interior != nullptr) && Inside_BBox(point, (*object)->BBox) && (*object)->Inside(point, &threadData))
                 return true;
     }
-    else if((sd->boundingMethod == 0) || (sd->boundingSlabs == NULL))
+    else if ((sd->boundingMethod == 0) || (sd->boundingSlabs == nullptr))
     {
         TraceThreadData threadData(sd); // TODO: avoid the need to construct threadData
         for(vector<ObjectPtr>::const_iterator object = viewData.GetSceneData()->objects.begin(); object != viewData.GetSceneData()->objects.end(); object++)
-            if((*object)->interior != NULL)
+            if ((*object)->interior != nullptr)
                 if((*object)->Inside(point, &threadData))
                     return true;
     }
@@ -684,7 +684,7 @@ void View::StartRender(POVMS_Object& renderOptions)
     bool highReproducibility = false;
     shared_ptr<ViewData::BlockIdSet> blockskiplist(new ViewData::BlockIdSet());
 
-    if(renderControlThread == NULL)
+    if (renderControlThread == nullptr)
         renderControlThread = Task::NewBoostThread(boost::bind(&View::RenderControlThread, this), POV_THREAD_STACK_SIZE);
 
     viewData.qualityFlags = QualityFlags(clip(renderOptions.TryGetInt(kPOVAttrib_Quality, 9), 0, 9));
@@ -970,14 +970,14 @@ void View::StartRender(POVMS_Object& renderOptions)
     */
     if(viewData.GetSceneData()->photonSettings.photonsEnabled)
     {
-        if (viewData.GetSceneData()->photonSettings.fileName && viewData.GetSceneData()->photonSettings.loadFile)
+        if (!viewData.GetSceneData()->photonSettings.fileName.empty() && viewData.GetSceneData()->photonSettings.loadFile)
         {
             vector<PhotonMap*> surfaceMaps;
             vector<PhotonMap*> mediaMaps;
 
             // when we pass a null parameter for the "strategy" (last parameter),
             // then this will LOAD the photon map
-            viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new PhotonSortingTask(&viewData, surfaceMaps, mediaMaps, NULL))));
+            viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new PhotonSortingTask(&viewData, surfaceMaps, mediaMaps, nullptr))));
             // wait for photons to finish
             renderTasks.AppendSync();
         }
@@ -1172,7 +1172,7 @@ void View::GetStatistics(POVMS_Object& renderStats)
     // object intersection stats
     POVMS_List isectStats;
 
-    for(size_t index = 0; intersection_stats[index].infotext != NULL; index++)
+    for (size_t index = 0; intersection_stats[index].infotext != nullptr; index++)
     {
         POVMS_Object isectStat(kPOVObjectClass_IsectStat);
 
@@ -1480,7 +1480,7 @@ const Camera *RTRData::CompletedFrame()
                 obj.SetInt(kPOVAttrib_PixelsCompleted, numPixelsCompleted);
                 RenderBackend::SendViewOutput(viewData.GetViewId(), viewData.GetSceneData()->frontendAddress, kPOVMsgIdent_Progress, obj);
 
-                return(ca ? &cameras[numRTRframes % cameras.size()] : NULL);
+                return (ca ? &cameras[numRTRframes % cameras.size()] : nullptr);
             }
             catch(pov_base::Exception&)
             {
@@ -1504,7 +1504,7 @@ const Camera *RTRData::CompletedFrame()
     if (!event.timed_wait(lock, t))
         numRenderThreadsCompleted--;
 
-    return(ca ? &cameras[numRTRframes % cameras.size()] : NULL);
+    return (ca ? &cameras[numRTRframes % cameras.size()] : nullptr);
 }
 
 }

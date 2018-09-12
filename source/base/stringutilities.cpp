@@ -54,7 +54,7 @@ UCS2String ASCIItoUCS2String(const char *s)
     UCS2String r;
     unsigned char ch;
 
-    if(s != NULL)
+    if (s != nullptr)
     {
         while(*s != 0)
         {
@@ -323,7 +323,7 @@ const char *pov_tsprintf(const char *format,...)
     static char pov_tsprintf_buffer[1024];
 
     va_start(marker, format);
-    vsnprintf(pov_tsprintf_buffer, 1023, format, marker);
+    std::vsnprintf(pov_tsprintf_buffer, sizeof(pov_tsprintf_buffer), format, marker);
     va_end(marker);
 
     return pov_tsprintf_buffer;

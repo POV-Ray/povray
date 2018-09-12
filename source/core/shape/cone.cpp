@@ -927,6 +927,8 @@ void Cone::Compute_BBox()
 
 
 
+#ifdef POV_ENABLE_CONE_UV
+
 /*****************************************************************************
 *
 * FUNCTION
@@ -1051,5 +1053,6 @@ void Cone::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
 
 }
 
+#endif // POV_ENABLE_CONE_UV
 
 }

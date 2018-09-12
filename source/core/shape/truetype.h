@@ -58,7 +58,6 @@ namespace pov
 /// @{
 
 class CSG;
-class Parser;
 
 using pov_base::IStream;
 
@@ -85,10 +84,10 @@ struct TrueTypeInfo;
 
 struct TrueTypeFont
 {
-    TrueTypeFont(UCS2* fn, IStream* fp, StringEncoding te);
+    TrueTypeFont(const UCS2String& fn, IStream* fp, StringEncoding te);
     ~TrueTypeFont();
 
-    UCS2*           filename;
+    UCS2String      filename;
     IStream*        fp;
     StringEncoding  textEncoding;
     TrueTypeInfo*   info;
@@ -114,7 +113,7 @@ class TrueType : public ObjectBase
         virtual void Transform(const TRANSFORM *);
         virtual void Compute_BBox();
 
-        static void ProcessNewTTF(CSG *Object, TrueTypeFont* font, const UCS2 *text_string, DBL depth, const Vector3d& offset, Parser *parser);
+        static void ProcessNewTTF(CSG *Object, TrueTypeFont* font, const UCS2 *text_string, DBL depth, const Vector3d& offset);
     protected:
         bool Inside_Glyph(double x, double y, const GlyphStruct* glyph) const;
         int solve_quad(double *x, double *y, double mindist, DBL maxdist) const;

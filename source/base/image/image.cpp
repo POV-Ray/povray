@@ -3060,23 +3060,23 @@ class FileBackedPixelContainer
             m_Blocksize = bs;
             m_Buffer.resize(m_Blocksize);
             // write extra data to create the big file and help 3rd party reader
-            POV_LONG pos;
-            // NB: The following use of SafeUnsignedProduct also safeguards later coputations of
+            POV_OFF_T pos;
+            // NB: The following use of SafeUnsignedProduct also safeguards later computations of
             // pixel positions within the file, as long as x and y coordinates are sane
-            pos = SafeUnsignedProduct<POV_LONG>(m_Width, m_Height);
+            pos = SafeUnsignedProduct<POV_OFF_T>(m_Width, m_Height);
             if ( pos% m_Blocksize)
             { /* issue: the block would overlap the end of file */
                 pos /= m_Blocksize;
                 pos++;
-                pos = SafeUnsignedProduct<POV_LONG>(pos, m_Blocksize);
+                pos = SafeUnsignedProduct<POV_OFF_T>(pos, m_Blocksize);
             }
             /* else fine case: the boundary of block match the boundary of pixels in file */
-            pos = SafeUnsignedProduct<POV_LONG>(pos, sizeof(pixel_type));
+            pos = SafeUnsignedProduct<POV_OFF_T>(pos, sizeof(pixel_type));
             size_type meta[3];
             meta[0] = sizeof(pixel_type);
             meta[1] = m_Width;
             meta[2] = m_Height;
-            if (lseek64(m_File, pos, SEEK_SET) != pos)
+            if (POV_LSEEK(m_File, pos, SEEK_SET) != pos)
                 throw POV_EXCEPTION(kFileDataErr, "Intermediate image storage backing file write/seek failed at creation.");
             if (write(m_File, &meta[0], (int) sizeof(size_type)*3) != (sizeof(size_type)*3))
                 throw POV_EXCEPTION(kFileDataErr, "Intermediate image storage backing file write failed at creation.");
@@ -3094,9 +3094,9 @@ class FileBackedPixelContainer
             {
                 // if shutdown has been delayed, by the time we reach here, the platform base
                 // may no longer be valid (see crashdump #77 for an example of this). we need
-                // to take the address of the reference to see if it's now NULL before we use it.
+                // to take the address of the reference to see if it's now `nullptr` before we use it.
                 PlatformBase *pb(&PlatformBase::GetInstance());
-                if (pb != NULL)
+                if (pb != nullptr)
                     pb->DeleteTemporaryFile(m_Path);
             }
         }
@@ -3197,7 +3197,7 @@ class FileBackedPixelContainer
         int                 m_File;
         bool                m_Dirty;
         size_type           m_Blocksize;
-        POV_LONG            m_CurrentBlock;
+        POV_OFF_T           m_CurrentBlock;
         size_type           m_Width;
         size_type           m_Height;
         size_type           m_xPos;
@@ -3232,7 +3232,7 @@ class FileBackedPixelContainer
 
         void ReadPixel(size_type x, size_type y, pixel_type& pixel)
         {
-            POV_LONG pos, block = (y * (POV_LONG)(m_Width) + x) / m_Blocksize;
+            POV_OFF_T pos, block = (y * (POV_OFF_T)(m_Width) + x) / m_Blocksize;
 
             if (block != m_CurrentBlock) {
                 WriteCurrentBlock();
@@ -3247,7 +3247,7 @@ class FileBackedPixelContainer
 #endif
                 pos = block * sizeof(pixel_type) * m_Blocksize;
                 int chunk = sizeof(pixel_type) * m_Blocksize;
-                if (lseek64(m_File, pos, SEEK_SET) != pos)
+                if (POV_LSEEK(m_File, pos, SEEK_SET) != pos)
                     throw POV_EXCEPTION(kFileDataErr, "Intermediate image storage backing file read/seek failed.");
                 int bytes = read(m_File, &m_Buffer[0], chunk);
                 if (bytes != (sizeof(pixel_type) * m_Blocksize))
@@ -3255,23 +3255,23 @@ class FileBackedPixelContainer
                 m_CurrentBlock = block;
             }
             POV_IMAGE_ASSERT (m_Blocksize != 0);
-            memcpy(&pixel, m_Buffer[(y * (POV_LONG)(m_Width) + x) % m_Blocksize], sizeof(pixel));
+            memcpy(&pixel, m_Buffer[(y * (POV_OFF_T)(m_Width) + x) % m_Blocksize], sizeof(pixel));
         }
 #if 0
         bool BlockCommitted(size_type x, size_type y)
         {
-            POV_LONG block = (y * POV_LONG(m_Width) + x) / m_Blocksize;
+            POV_OFF_T block = (y * POV_OFF_T(m_Width) + x) / m_Blocksize;
 
             return(m_Committed[block]);
         }
 #endif
         void WriteCurrentBlock()
         {
-            POV_LONG pos;
+            POV_OFF_T pos;
 
             if (m_Dirty) {
                 pos = m_CurrentBlock * sizeof(pixel_type) * m_Blocksize;
-                if (lseek64(m_File, pos, SEEK_SET) != pos)
+                if (POV_LSEEK(m_File, pos, SEEK_SET) != pos)
                     throw POV_EXCEPTION(kFileDataErr, "Intermediate image storage backing file write/seek failed.");
                 if (write(m_File, &m_Buffer[0], (int) sizeof(pixel_type) * m_Blocksize) != (sizeof(pixel_type) * m_Blocksize))
                     throw POV_EXCEPTION(kFileDataErr, "Intermediate image storage backing file write failed.");
@@ -3285,7 +3285,7 @@ class FileBackedPixelContainer
             pixel_type dummy;
 
             ReadPixel(x, y, dummy);
-            memcpy(m_Buffer[(y * (POV_LONG)(m_Width) + x) % m_Blocksize], &pixel, sizeof(pixel));
+            memcpy(m_Buffer[(y * (POV_OFF_T)(m_Width) + x) % m_Blocksize], &pixel, sizeof(pixel));
             m_Dirty = true;
         }
 
@@ -3926,7 +3926,7 @@ file format.  You must either use an official POV-Ray binary or recompile \
 the POV-Ray sources on a system providing you with the OpenEXR library \
 to make use of this facility.  Alternatively, you may use any of the \
 following built-in formats: HDR.");
-            return NULL;
+            return nullptr;
 #endif
 
         case PNG:
@@ -3939,7 +3939,7 @@ file format.  You must either use an official POV-Ray binary or recompile \
 the POV-Ray sources on a system providing you with the libPNG library \
 to make use of this facility.  Alternatively, you may use any of the \
 following built-in formats: GIF, TGA, IFF, PGM, PPM, BMP.");
-            return NULL;
+            return nullptr;
 #endif
 
         case GIF:
@@ -3961,7 +3961,7 @@ file format.  You must either use an official POV-Ray binary or recompile \
 the POV-Ray sources on a system providing you with the libJPEG library \
 to make use of this facility.  Alternatively, you may use any of the \
 following built-in formats: GIF, TGA, IFF, PGM, PPM, BMP.");
-            return NULL;
+            return nullptr;
 #endif
 
         case IFF:
@@ -3986,16 +3986,16 @@ file format.  You must either use an official POV-Ray binary or recompile \
 the POV-Ray sources on a system providing you with the libTIFF library \
 to make use of this facility.  Alternatively, you may use any of the \
 following built-in formats: GIF, TGA, IFF, PGM, PPM, BMP.");
-            return NULL;
+            return nullptr;
 #endif
 
         case SYS:
             throw POV_EXCEPTION(kCannotOpenFileErr, "This platform has not defined a SYS file type");
-            return (NULL);
+            return nullptr;
 
         default :
             throw POV_EXCEPTION(kParamErr, "Invalid file type");
-            return (NULL);
+            return nullptr;
     }
 }
 
@@ -4004,7 +4004,7 @@ void Image::Write(ImageFileType type, OStream *file, const Image *image, const W
     if (image->GetWidth() == 0 || image->GetHeight() == 0)
         throw POV_EXCEPTION(kParamErr, "Invalid image size for output");
 
-    if (file == NULL)
+    if (file == nullptr)
         throw POV_EXCEPTION(kCannotOpenFileErr, "Invalid image file");
 
 #ifdef POV_SYS_IMAGE_TYPE

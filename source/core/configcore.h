@@ -290,6 +290,15 @@
     #define POV_PATTERN_DEBUG POV_CORE_DEBUG
 #endif
 
+/// @def POV_PHOTONS_DEBUG
+/// Enable run-time sanity checks for photons.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_PHOTONS_DEBUG
+    #define POV_PHOTONS_DEBUG POV_CORE_DEBUG
+#endif
+
 /// @def POV_PIGMENT_DEBUG
 /// Enable run-time sanity checks for pigment handling.
 ///
@@ -371,6 +380,12 @@
     #define POV_PATTERN_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
     #define POV_PATTERN_ASSERT(expr) POV_ASSERT_DISABLE(expr)
+#endif
+
+#if POV_PHOTONS_DEBUG
+    #define POV_PHOTONS_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_PHOTONS_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #if POV_PIGMENT_DEBUG

@@ -95,8 +95,8 @@ namespace pov_frontend
     inline UnixDisplay *GetRenderWindow (void)
     {
         Display *p = gDisplay.get();
-        if (p == NULL)
-            return NULL;
+        if (p == nullptr)
+            return nullptr;
         return dynamic_cast<UnixDisplay *>(p) ;
     }
 }

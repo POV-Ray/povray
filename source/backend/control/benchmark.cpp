@@ -53,7 +53,7 @@ bool Write_Benchmark_File (const char *Scene_File_Name, const char *INI_File_Nam
 {
     FILE        *outF ;
 
-    if ((outF = fopen (Scene_File_Name, "wt")) == NULL)
+    if ((outF = fopen (Scene_File_Name, "wt")) == nullptr)
         return (false) ;
     if (fputs (Benchmark_File, outF) == EOF)
     {
@@ -61,7 +61,7 @@ bool Write_Benchmark_File (const char *Scene_File_Name, const char *INI_File_Nam
         return (false) ;
     }
     fclose (outF) ;
-    if ((outF = fopen (INI_File_Name, "wt")) == NULL)
+    if ((outF = fopen (INI_File_Name, "wt")) == nullptr)
         return (false) ;
     if (fputs (Benchmark_Options, outF) == EOF)
     {

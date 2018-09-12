@@ -107,10 +107,10 @@ int main (int argc, char **argv)
           DISCLAIMER_MESSAGE_1 "\n"
           DISCLAIMER_MESSAGE_2 "\n\n");
 
-  if (session->Initialize(NULL, NULL) != vfeNoError)
+  if (session->Initialize(nullptr, nullptr) != vfeNoError)
     ErrorExit(session);
 
-  if ((s = std::getenv ("POVINC")) != NULL)
+  if ((s = std::getenv ("POVINC")) != nullptr)
     opts.AddLibraryPath (s);
   while (*++argv)
     opts.AddCommand (*argv);

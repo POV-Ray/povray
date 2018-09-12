@@ -154,7 +154,7 @@ class Animation
         Animation(FileType aftype, CodecType codec, OStream *file, unsigned int w, unsigned int h, const WriteOptions& options);
 
         Image *ReadFrame(IStream *file);
-        POV_LONG WriteFrame(OStream *file, const Image *image);
+        POV_OFF_T WriteFrame(OStream *file, const Image *image);
 
         void ComputeBlurMask(const Image& image, Image& mask);
         void GetBlurredPixel(const Image& image, unsigned int x, unsigned int y, float& red, float& green, float& blue);

@@ -72,7 +72,7 @@ class ITextStream
     public:
         struct FilePos
         {
-            POV_LONG offset;
+            POV_OFF_T offset;
             POV_LONG lineno;
         };
 
@@ -140,7 +140,7 @@ class IMemTextStream : public ITextStream
         /// @param[in]  data        Underlying memory buffer to read from.
         /// @param[in]  size        Size of underlying memory buffer.
         /// @param[in]  formalStart File position of buffer start as known to the user.
-        IMemTextStream(const UCS2 *formalName, unsigned char* data, size_t size, const FilePos& formalStart);
+        IMemTextStream(const UCS2 *formalName, const unsigned char* data, size_t size, const FilePos& formalStart);
 
         virtual ~IMemTextStream();
 
@@ -156,7 +156,7 @@ class IMemTextStream : public ITextStream
         /// Formal name of the file, e.g. to be displayed in error messages.
         virtual const UCS2 *name() const { return filename.c_str(); };
     private:
-        unsigned char* buffer;
+        const unsigned char* buffer;
         size_t bufferoffset;
         size_t maxbufferoffset;
         POV_ULONG mFormalStart;

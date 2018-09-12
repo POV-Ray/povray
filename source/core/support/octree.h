@@ -136,7 +136,7 @@ struct ot_node_struct
     OT_BLOCK *Values;
     OT_NODE  *Kids[8];
 
-    ot_node_struct() : Id(), Values(NULL) { for(unsigned int i = 0; i < 8; i ++) { Kids[i] = NULL; } }
+    ot_node_struct() : Id(), Values(nullptr) { for (unsigned int i = 0; i < 8; i ++) { Kids[i] = nullptr; } }
 };
 
 // These are informations the octree reader needs to know

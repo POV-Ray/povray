@@ -95,7 +95,7 @@ inline void Assign_Vector_4D(VECTOR_4D d, const VECTOR_4D s)
 
 inline void Destroy_Vector_4D(VECTOR_4D *x)
 {
-    if(x != NULL)
+    if (x != nullptr)
         POV_FREE(x);
 }
 

@@ -275,7 +275,7 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
         }
     }
 
-    POV_LONG curpos;
+    POV_OFF_T curpos;
     Targa_extension ext;
     Targa_footer foo;
 

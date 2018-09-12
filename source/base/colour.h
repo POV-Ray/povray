@@ -1791,6 +1791,9 @@ inline GenericColour<T> Cos(const GenericColour<T>& a) { return a.Cos(); }
 typedef GenericColour<ColourChannel>         MathColour;        ///< Standard precision colour.
 typedef GenericColour<PreciseColourChannel>  PreciseMathColour; ///< High precision colour.
 
+extern template class GenericColour<ColourChannel>;
+extern template class GenericColour<PreciseColourChannel>;
+
 
 /// Generic template class to hold and manipulate a colour plus transparency information.
 ///

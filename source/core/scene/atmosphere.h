@@ -88,7 +88,7 @@ struct Fog_Struct
 
 struct Rainbow_Struct
 {
-    Rainbow_Struct() : Pigment(NULL), Next(NULL) {}
+    Rainbow_Struct() : Pigment(nullptr), Next(nullptr) {}
     ~Rainbow_Struct() { if (Pigment) delete Pigment; }
     DBL Distance;
     DBL Jitter;
@@ -102,7 +102,7 @@ struct Rainbow_Struct
 
 struct Skysphere_Struct
 {
-    Skysphere_Struct() : Trans(NULL) {}
+    Skysphere_Struct() : Trans(nullptr) {}
     ~Skysphere_Struct();
     MathColour        Emission; ///< Brightness adjustment.
     vector<PIGMENT *> Pigments; ///< Pigment(s) to use.

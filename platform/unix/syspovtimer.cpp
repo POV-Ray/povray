@@ -76,7 +76,7 @@ void Delay(unsigned int msec)
     timespec ts;
     ts.tv_sec = msec / 1000;
     ts.tv_nsec = (POV_ULONG) (1000000) * (msec % 1000);
-    nanosleep(&ts, NULL);
+    nanosleep(&ts, nullptr);
 #elif defined(HAVE_USLEEP)
     POV_ASSERT(msec < 1000); // On some systems, usleep() does not support sleeping for 1 second or more.
     usleep (msec * (useconds_t)1000);
@@ -126,7 +126,7 @@ static inline bool GettimeofdayMillisec(POV_ULONG& result)
 {
 #if defined(HAVE_GETTIMEOFDAY)
     struct timeval tv;  // seconds + microseconds since
-    bool success = (gettimeofday(&tv, NULL) == 0);
+    bool success = (gettimeofday(&tv, nullptr) == 0);
     if (success)
         result = static_cast<POV_ULONG>(tv.tv_sec)  *1000
                + static_cast<POV_ULONG>(tv.tv_usec) /1000;

@@ -119,8 +119,8 @@ class Metadata
         int getSec() const;
 
     protected:
-        boost::gregorian::date              date;
-        boost::posix_time::time_duration    time;
+
+        boost::posix_time::ptime mTimestamp;
 };
 
 /// @}

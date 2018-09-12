@@ -38,6 +38,7 @@
 
 // C++ variants of standard C header files
 #include <cstdarg>
+#include <cstdio>
 #include <cstdlib>
 
 // Standard C++ header files
@@ -60,11 +61,11 @@ ITextStream::~ITextStream()
 
 IBufferedTextStream::IBufferedTextStream(const UCS2 *sname, unsigned int stype)
 {
-    if(sname == NULL)
+    if (sname == nullptr)
         throw POV_EXCEPTION_CODE(kParamErr);
 
     stream = NewIStream(sname, stype);
-    if(stream == NULL)
+    if (stream == nullptr)
         throw POV_EXCEPTION(kCannotOpenFileErr, string("Cannot open file '") + UCS2toASCIIString(sname) + "' for input.");
 
     filename = UCS2String(sname);
@@ -83,9 +84,9 @@ IBufferedTextStream::IBufferedTextStream(const UCS2 *sname, unsigned int stype)
 
 IBufferedTextStream::IBufferedTextStream(const UCS2 *sname, IStream *sstream, POV_LONG initialLine)
 {
-    if(sname == NULL)
+    if (sname == nullptr)
         throw POV_EXCEPTION_CODE(kParamErr);
-    if(sstream == NULL)
+    if (sstream == nullptr)
         throw POV_EXCEPTION_CODE(kParamErr);
 
     stream = sstream;
@@ -107,7 +108,7 @@ IBufferedTextStream::IBufferedTextStream(const UCS2 *sname, IStream *sstream, PO
 IBufferedTextStream::~IBufferedTextStream()
 {
     delete stream;
-    stream = NULL;
+    stream = nullptr;
 }
 
 int IBufferedTextStream::getchar()
@@ -277,11 +278,11 @@ void IBufferedTextStream::RefillBuffer()
         curpos = stream->tellg() ;
 }
 
-IMemTextStream::IMemTextStream(const UCS2 *formalName, unsigned char* data, size_t size, const FilePos& formalStart)
+IMemTextStream::IMemTextStream(const UCS2 *formalName, const unsigned char* data, size_t size, const FilePos& formalStart)
 {
-    if(formalName == NULL)
+    if (formalName == nullptr)
         throw POV_EXCEPTION_CODE(kParamErr);
-    if(data == NULL)
+    if (data == nullptr)
         throw POV_EXCEPTION_CODE(kParamErr);
 
     buffer = data;
@@ -421,11 +422,11 @@ bool IMemTextStream::ReadRaw(unsigned char* buf, size_t size)
 
 OTextStream::OTextStream(const UCS2 *sname, unsigned int stype, bool append)
 {
-    if(sname == NULL)
+    if (sname == nullptr)
         throw POV_EXCEPTION_CODE(kParamErr);
 
     stream = NewOStream(sname, stype, append);
-    if(stream == NULL)
+    if (stream == nullptr)
         throw POV_EXCEPTION(kCannotOpenFileErr, string("Cannot open file '") + UCS2toASCIIString(sname) + "' for output.");
 
     filename = UCS2String(sname);
@@ -433,9 +434,9 @@ OTextStream::OTextStream(const UCS2 *sname, unsigned int stype, bool append)
 
 OTextStream::OTextStream(const UCS2 *sname, OStream *sstream)
 {
-    if(sname == NULL)
+    if (sname == nullptr)
         throw POV_EXCEPTION_CODE(kParamErr);
-    if(sstream == NULL)
+    if (sstream == nullptr)
         throw POV_EXCEPTION_CODE(kParamErr);
 
     stream = sstream;
@@ -445,7 +446,7 @@ OTextStream::OTextStream(const UCS2 *sname, OStream *sstream)
 OTextStream::~OTextStream()
 {
     delete stream;
-    stream = NULL;
+    stream = nullptr;
 }
 
 void OTextStream::putchar(int chr)
@@ -472,14 +473,14 @@ void OTextStream::printf(const char *format, ...)
     char buffer[1024];
 
     va_start(marker, format);
-    vsnprintf(buffer, 1023, format, marker);
+    std::vsnprintf(buffer, sizeof(buffer), format, marker);
     va_end(marker);
 
 #ifdef POV_NEW_LINE_STRING
     char *s1 = buffer ;
     char *s2 ;
 
-    while ((s2 = strchr (s1, '\n')) != NULL)
+    while ((s2 = strchr (s1, '\n')) != nullptr)
     {
         *s2++ = '\0' ;
         stream->printf("%s" POV_NEW_LINE_STRING, s1);

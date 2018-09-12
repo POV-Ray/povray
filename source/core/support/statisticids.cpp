@@ -163,7 +163,7 @@ const INTERSECTION_STATS_INFO intersection_stats[kPOVList_Stat_Last] =
       "Light Buffer" },
     { kPOVList_Stat_VistaBufferTest,    VBuffer_Tests, VBuffer_Tests_Succeeded,
       "Vista Buffer" },
-    { kPOVList_Stat_Last, MaxIntStat, MaxIntStat, NULL }
+    { kPOVList_Stat_Last, MaxIntStat, MaxIntStat, nullptr }
 };
 
 }

@@ -1,0 +1,23 @@
+/**
+
+@dir
+@brief Files and directories to be distributed as-is to the end-user.
+
+This directory is designated to bundle all files which are to be distributed
+as-is to POV-Ray end users.
+
+@note
+    Generally, the contents of this directory are to be distributed to end-users
+    of _all_ _incarnations_ of POV-Ray. Files to be included only with one
+    particular incarnation (e.g. POV-Ray for Windows) should reside in aptly
+    named subdirectories of the @ref distribution/platform-specific directory.
+
+@attention
+    The build processes for the individual incarnations of POV-Ray are set up to
+    automatically include all files in the currently existing subdirectories,
+    as well as any relevant files in this directory itself. However, new
+    subdirectories, or new files in this directory, are _not_ automatically
+    included, and therefore require updates to the build processes of _all_
+    incarnations.
+
+*/

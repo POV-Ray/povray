@@ -67,7 +67,8 @@ void PhotonShootingStrategy::start()
 PhotonShootingUnit* PhotonShootingStrategy::getNextUnit()
 {
     boost::mutex::scoped_lock lock(nextUnitMutex);
-    if(iter == units.end()) return NULL;
+    if (iter == units.end())
+        return nullptr;
     PhotonShootingUnit* unit = *iter;
     iter++;
     return unit;

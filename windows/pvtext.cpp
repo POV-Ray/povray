@@ -1038,7 +1038,7 @@ void draw_ordinary_listbox (DRAWITEMSTRUCT *d, bool fitpath)
   int         dividerStep ;
   int         width ;
   int         length ;
-  char        str [MAX_PATH] ;
+  char        str [MAX_PATH] ; // TODO FIXME - this isn't safe
   RECT        rect ;
   HPEN        hpen1 ;
   HPEN        hpen2 ;

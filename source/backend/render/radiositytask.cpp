@@ -104,7 +104,7 @@ void RadiosityTask::Run()
             if (pInfo)
             {
                 delete pInfo;
-                pInfo = NULL;
+                pInfo = nullptr;
             }
             pBlockInfo = new RadiosityBlockInfo();
         }
@@ -236,7 +236,7 @@ void RadiosityTask::Run()
             // no more passes please
             progressWeight = 1.0 - pBlockInfo->completion;
             delete pBlockInfo;
-            pBlockInfo = NULL;
+            pBlockInfo = nullptr;
         }
 
         GetViewDataPtr()->AfterTile();

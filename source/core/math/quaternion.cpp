@@ -5,7 +5,7 @@
 /// Implementation of Quaternion algebra julia fractals.
 ///
 /// @author Pascal Massimino (original code)
-/// @author Tim Wegner (revisions and updates for POV-Ray 3.x)
+/// @author Tim Wegner (revisions and updates for POV-Ray v3.x)
 ///
 /// @copyright
 /// @parblock

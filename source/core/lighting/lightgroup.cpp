@@ -90,7 +90,7 @@ void Promote_Local_Lights(CSG *Object)
 {
     vector<LightSource *> lights;
 
-    if(Object == NULL)
+    if (Object == nullptr)
         return;
 
     // find all light sources in the light group and connect them to form a list
@@ -166,7 +166,7 @@ void Promote_Local_Lights(CSG *Object)
 
 void Promote_Local_Lights_Recursive(CompoundObject *Object, vector<LightSource *>& Lights)
 {
-    ObjectPtr curObject = NULL;
+    ObjectPtr curObject = nullptr;
 
     for(vector<ObjectPtr>::iterator curObject = Object->children.begin();
         curObject != Object->children.end();

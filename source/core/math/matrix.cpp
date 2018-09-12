@@ -964,14 +964,14 @@ TRANSFORM *Create_Transform()
 TRANSFORM *Copy_Transform (const TRANSFORM*Old)
 {
     TRANSFORM *New;
-    if (Old != NULL)
+    if (Old != nullptr)
     {
         New  = Create_Transform ();
         *New = *Old;
     }
     else
     {
-        New = NULL;
+        New = nullptr;
     }
 
     return (New);
@@ -1005,7 +1005,7 @@ TRANSFORM *Copy_Transform (const TRANSFORM*Old)
 
 void Destroy_Transform (TRANSFORM *Trans)
 {
-    if(Trans != NULL)
+    if (Trans != nullptr)
         delete Trans;
 }
 

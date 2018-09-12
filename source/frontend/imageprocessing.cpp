@@ -185,7 +185,7 @@ UCS2String ImageProcessing::WriteImage(POVMS_Object& ropts, POVMSInt frame, int 
             filename = GetOutputFilename(ropts, frame, digits);
 
         boost::scoped_ptr<OStream> imagefile(NewOStream(filename.c_str(), filetype, false)); // TODO - check file permissions somehow without macro [ttrf]
-        if(imagefile == NULL)
+        if (imagefile == nullptr)
             throw POV_EXCEPTION_CODE(kCannotOpenFileErr);
 
         Image::Write(imagetype, imagefile.get(), image.get(), wopts);

@@ -81,7 +81,7 @@
 /// Third numerical component of official source code version ("revision") as integer.
 /// Increment this field (and set all subsequent fields to zero) to indicate new features,
 /// or complex bugfixes that require thorough testing.
-#define POV_RAY_REVISION_INT        1
+#define POV_RAY_REVISION_INT        0
 
 /// Fourth numerical component of official source code version ("maintenance patch level") as integer.
 /// Increment this field to indicate simple bugfixes.

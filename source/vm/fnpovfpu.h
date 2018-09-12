@@ -249,7 +249,7 @@ extern const Sys2 POVFPU_Sys2Table[];
 extern const unsigned int POVFPU_Sys1TableSize;
 extern const unsigned int POVFPU_Sys2TableSize;
 
-void POVFPU_Exception(FPUContext *context, FUNCTION fn, const char *msg = NULL);
+void POVFPU_Exception(FPUContext *context, FUNCTION fn, const char *msg = nullptr);
 DBL POVFPU_RunDefault(FPUContext *context, FUNCTION k);
 
 void FNCode_Delete(FunctionCode *);

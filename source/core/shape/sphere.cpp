@@ -458,7 +458,7 @@ void Sphere::Rotate(const Vector3d&, const TRANSFORM *tr)
     }
     else
     {
-        if (Trans == NULL)
+        if (Trans == nullptr)
             Trans = Create_Transform();
         Compose_Transforms(Trans, tr);
 
@@ -732,7 +732,7 @@ void Sphere::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadDat
     else
     {
         New_Point = Inter->IPoint - Center;
-        if (Trans != NULL)
+        if (Trans != nullptr)
             MInvTransPoint(New_Point, New_Point, Trans);
     }
     x = New_Point[X];

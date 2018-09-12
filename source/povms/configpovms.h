@@ -74,6 +74,14 @@
     #define POVMSBool               bool
 #endif
 
+#ifndef POVMSTrue
+    #define POVMSTrue               true
+#endif
+
+#ifndef POVMSFalse
+    #define POVMSFalse              false
+#endif
+
 #ifndef POVMSUCS2
     #define POVMSUCS2               UCS2
 #endif

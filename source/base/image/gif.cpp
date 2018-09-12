@@ -68,7 +68,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options, bool IsPOTFile)
     int                             data ;
     int                             width;
     int                             height;
-    Image                           *image = NULL;
+    Image                           *image = nullptr;
     unsigned char                   buffer[256];
     vector<Image::RGBAMapEntry>     colormap ;
     int                             alphaIdx = -1; // assume no transparency color

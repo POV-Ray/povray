@@ -118,7 +118,7 @@ struct LightSourceEntry
     LightSource *light;
 
     LightSourceEntry() :
-        s0(0.0), s1(0.0), light(NULL) { }
+        s0(0.0), s1(0.0), light(nullptr) { }
     LightSourceEntry(LightSource *nlight) :
         s0(0.0), s1(0.0), light(nlight) { }
     LightSourceEntry(double ns0, double ns1, LightSource *nlight) :

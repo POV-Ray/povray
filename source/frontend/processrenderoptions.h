@@ -81,7 +81,7 @@ class ProcessRenderOptions : public ProcessOptions
             int         internalId;         // e.g. kPOVList_GammaType_*
         };
 
-        int ParseFileType(char, POVMSType, int*, bool* pHas16BitGreyscale = NULL);
+        int ParseFileType(char, POVMSType, int*, bool* pHas16BitGreyscale = nullptr);
         char UnparseFileType(int);
         int ParseGammaType(char*, int*);
         const char* UnparseGammaType(int);

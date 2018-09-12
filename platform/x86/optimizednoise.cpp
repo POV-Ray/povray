@@ -92,8 +92,8 @@ OptimizedNoiseInfo gaOptimizedNoiseInfo[] = {
         AVXFMA4DNoise,              // dNoise,
         &kAVXFMA4NoiseEnabled,      // enabled,
         AVXFMA4Supported,           // supported,
-        NULL,                       // recommended,
-        NULL                        // init
+        nullptr,                    // recommended,
+        nullptr                     // init
     },
 #endif
 #ifdef TRY_OPTIMIZED_NOISE_AVX
@@ -116,12 +116,12 @@ OptimizedNoiseInfo gaOptimizedNoiseInfo[] = {
         AVXPortableDNoise,          // dNoise,
         &kAVXPortableNoiseEnabled,  // enabled,
         AVXSupported,               // supported,
-        NULL,                       // recommended,
-        NULL                        // init
+        nullptr,                    // recommended,
+        nullptr                     // init
     },
 #endif
     // End-of-list entry.
-    { NULL }
+    { nullptr }
 };
 
 }

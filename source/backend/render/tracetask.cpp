@@ -296,7 +296,7 @@ void TraceTask::Run()
         {
             const Camera *camera = GetViewData()->GetRTRData()->CompletedFrame();
             Cooperate();
-            if(camera != NULL)
+            if (camera != nullptr)
                 trace.SetupCamera(*camera);
         }
     } while(forever);

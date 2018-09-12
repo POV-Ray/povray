@@ -118,7 +118,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     int                             colourmap_size = 0;
     int                             width = -1;
     int                             height = -1;
-    Image                           *image = NULL;
+    Image                           *image = nullptr;
     CHUNK_HEADER                    Chunk_Header;
     unsigned int                    r;
     unsigned int                    g;

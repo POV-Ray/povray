@@ -166,7 +166,7 @@ Image *Read(IStream *file, const Image::ReadOptions& options)
 {
     unsigned int width;
     unsigned int height;
-    Image  *image = NULL;
+    Image *image = nullptr;
 
     // OpenEXR files store linear color values by default, so never convert unless the user overrides
     // (e.g. to handle a non-compliant file).

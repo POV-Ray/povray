@@ -265,14 +265,14 @@ static void InitTextureTable()
 
 void Free_Noise_Tables()
 {
-    if (sintab != NULL)
+    if (sintab != nullptr)
     {
         delete[] sintab;
-        sintab = NULL;
+        sintab = nullptr;
 
 #ifdef DYNAMIC_HASHTABLE
         delete[] hashTable;
-        hashTable = NULL;
+        hashTable = nullptr;
 #endif
     }
 }
@@ -668,20 +668,20 @@ OptimizedNoiseInfo gPortableNoiseInfo = {
     "portable",     // info,
     PortableNoise,  // noise,
     PortableDNoise, // dNoise,
-    NULL,           // enabled,
-    NULL,           // supported,
-    NULL,           // recommended,
-    NULL            // init
+    nullptr,        // enabled,
+    nullptr,        // supported,
+    nullptr,        // recommended,
+    nullptr         // init
 };
 
 const OptimizedNoiseInfo* GetRecommendedOptimizedNoise()
 {
-    for (const OptimizedNoiseInfo* p = gaOptimizedNoiseInfo; p->name != NULL; ++p)
+    for (const OptimizedNoiseInfo* p = gaOptimizedNoiseInfo; p->name != nullptr; ++p)
     {
-        if ((p->enabled == NULL) || *p->enabled)
+        if ((p->enabled == nullptr) || *p->enabled)
         {
             POV_CORE_ASSERT(p->supported);
-            if (p->supported() && ((p->recommended == NULL) || p->recommended()))
+            if (p->supported() && ((p->recommended == nullptr) || p->recommended()))
                 return p;
         }
     }
@@ -692,9 +692,9 @@ const OptimizedNoiseInfo* GetRecommendedOptimizedNoise()
 
 const OptimizedNoiseInfo* GetOptimizedNoise(std::string name)
 {
-    for (const OptimizedNoiseInfo* p = gaOptimizedNoiseInfo; p->name != NULL; ++p)
+    for (const OptimizedNoiseInfo* p = gaOptimizedNoiseInfo; p->name != nullptr; ++p)
     {
-        if ((p->enabled == NULL) || *p->enabled)
+        if ((p->enabled == nullptr) || *p->enabled)
         {
             POV_CORE_ASSERT(p->supported);
             if (p->name == name)

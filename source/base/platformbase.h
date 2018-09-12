@@ -70,7 +70,7 @@ class PlatformBase
 public:
 
     PlatformBase() { POV_ASSERT(!self); self = this; };
-    virtual ~PlatformBase() { self = NULL; };
+    virtual ~PlatformBase() { self = nullptr; };
 
     virtual UCS2String GetTemporaryPath() = 0;
     virtual UCS2String CreateTemporaryFile() = 0;

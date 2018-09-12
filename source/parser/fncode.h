@@ -48,6 +48,15 @@
 namespace pov
 {
 
+class FunctionVM;
+
+}
+
+namespace pov_parser
+{
+
+using namespace pov;
+
 #ifndef DEBUG_FLOATFUNCTION
     #define DEBUG_FLOATFUNCTION 0
 #endif
@@ -88,7 +97,6 @@ enum
 };
 
 class Parser;
-class FunctionVM;
 
 void FNCode_Copy(FunctionCode *, FunctionCode *);
 

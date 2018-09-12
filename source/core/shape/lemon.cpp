@@ -501,7 +501,7 @@ void Lemon::Scale(const Vector3d&, const TRANSFORM *tr)
 
 void Lemon::Transform(const TRANSFORM *tr)
 {
-    if(Trans == NULL)
+    if(Trans == nullptr)
         Trans = Create_Transform();
 
     Compose_Transforms(Trans, tr);
@@ -754,6 +754,8 @@ void Lemon::Compute_BBox()
 }
 
 
+#ifdef POV_ENABLE_LEMON_UV
+
 /*****************************************************************************
 *
 * FUNCTION
@@ -876,5 +878,7 @@ void Lemon::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
     Result[V] = phi;
 
 }
+
+#endif // POV_ENABLE_LEMON_UV
 
 }

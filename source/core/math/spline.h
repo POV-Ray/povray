@@ -47,8 +47,12 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+#include "base/types.h"
+
 namespace pov
 {
+
+using namespace pov_base;
 
 //##############################################################################
 ///
@@ -56,8 +60,6 @@ namespace pov
 /// @ingroup PovCoreMath
 ///
 /// @{
-
-typedef DBL EXPRESS[5];
 
 struct SplineEntry
 {

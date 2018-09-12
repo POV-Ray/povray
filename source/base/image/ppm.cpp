@@ -296,7 +296,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     POV_UINT32          width;
     POV_UINT32          height;
     POV_UINT32          maxval;
-    Image               *image = NULL;
+    Image               *image = nullptr;
     unsigned char       magicNumber[2];
 
     bool                isMonochrome;

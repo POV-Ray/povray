@@ -191,7 +191,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
         Tiff_Read, Tiff_Write, Tiff_Seek, Tiff_Close,
         Tiff_Size, Tiff_Map, Tiff_Unmap);
     if (!tif)
-        return (NULL) ;
+        return nullptr;
 
     // Get basic information about the image
     TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &width);

@@ -106,12 +106,12 @@ public:
 
     SimpleVector()
     {
-        m_First = m_Last = m_End = NULL;
+        m_First = m_Last = m_End = nullptr;
     }
 
     SimpleVector(size_type nItems, const ContainerType& InitialVal)
     {
-        m_First = m_Last = m_End = NULL;
+        m_First = m_Last = m_End = nullptr;
         if (nItems)
             allocate (nItems, InitialVal);
     }
@@ -125,13 +125,13 @@ public:
                 *m_Last++ = *p++;
         }
         else
-            m_First = m_Last = m_End = NULL;
+            m_First = m_Last = m_End = nullptr;
     }
 
     ~SimpleVector()
     {
         // we don't call destructors, even if they exist
-        if (m_First != NULL)
+        if (m_First != nullptr)
             deallocate ();
     }
 
@@ -139,7 +139,7 @@ public:
     {
         if (RHS.size() > capacity())
         {
-            if (m_First != NULL)
+            if (m_First != nullptr)
                 deallocate ();
             allocate (RHS.size());
         }
@@ -309,7 +309,7 @@ public:
                 p [i] = m_First [i];
             for (size_type i = Index + 1 ; i < c ; i++)
                 p [i] = m_First [i];
-            if (m_First != NULL)
+            if (m_First != nullptr)
                 alloc.deallocate (m_First, n);
             m_First = p;
             m_End = m_First + nc;
@@ -357,7 +357,7 @@ public:
             size_type n = size();
             for (size_type i = 0; i < n; ++i)
                 p[i] = m_First[i];
-            if (m_First != NULL)
+            if (m_First != nullptr)
                 alloc.deallocate(m_First, c);
             m_First = p;
             m_End = m_First + nItems;
@@ -693,18 +693,18 @@ public:
     typedef typename VectorType::const_reverse_iterator const_reverse_iterator;
 
     PooledSimpleVector() :
-        mpVector(mPool.alloc())
+        mpVector(GetPool().alloc())
     {}
 
     PooledSimpleVector(const PooledSimpleVector& o) :
-        mpVector(mPool.alloc())
+        mpVector(GetPool().alloc())
     {
         *mpVector = *o.mpVector;
     }
 
     ~PooledSimpleVector()
     {
-        mPool.release(mpVector);
+        GetPool().release(mpVector);
     }
 
     inline PooledSimpleVector& operator=(const PooledSimpleVector& o)
@@ -759,12 +759,21 @@ public:
 
 private:
 
-    static thread_local PoolType mPool;
+    /// Get thread-local vector pool instance.
+    ///
+    /// @note
+    ///     This construct is deliberate; while it would seem natural to use a straightforward
+    ///     `static thread_local` class member variable instead, in template classes that seems to
+    ///     lead to runtime errors with certain compilers (seen e.g. with XCode 9.3).
+    ///
+    static inline PoolType& GetPool()
+    {
+        static thread_local PoolType pool(SIZE_HINT);
+        return pool;
+    }
+
     VectorType* mpVector;
 };
-
-template<typename T, size_t S>
-thread_local typename PooledSimpleVector<T, S>::PoolType PooledSimpleVector<T, S>::mPool(S);
 
 /// @}
 ///
