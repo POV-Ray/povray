@@ -1137,7 +1137,7 @@ void Insert_Spline_Entry(GenericSpline * sp, DBL p, const EXPRESS& v)
         fresh.par = p;
         for(k=0; k<5; k++)
             fresh.vec[k] = v[k];
-        SplineEntryList::const_iterator pos = sp->SplineEntries.begin();
+        SplineEntryList::iterator pos = sp->SplineEntries.begin();
         pos += i;
         sp->SplineEntries.insert( pos, fresh );
         /*
@@ -1194,12 +1194,12 @@ void Insert_Spline_Entry(GenericSpline * sp, DBL p, const EXPRESS& v, const Spli
         fresh.par = p;
         for(k=0; k<5; k++)
             fresh.vec[k] = v[k];
-        SplineEntryList::const_iterator pos = sp->SplineEntries.begin();
+        SplineEntryList::iterator pos = sp->SplineEntries.begin();
         pos += i;
         sp->SplineEntries.insert( pos, fresh );
         if ( ssp)
         {
-            SplineFreedomList::const_iterator posf = ssp->node.begin();
+            SplineFreedomList::iterator posf = ssp->node.begin();
             posf += i;
             ssp->node.insert( posf, f );
         }
@@ -1248,13 +1248,13 @@ void Insert_Spline_Entry(GenericSpline * sp, DBL p, const EXPRESS& v, const Spli
         fresh.par = p;
         for(k=0; k<5; k++)
             fresh.vec[k] = v[k];
-        SplineEntryList::const_iterator pos = sp->SplineEntries.begin();
+        SplineEntryList::iterator pos = sp->SplineEntries.begin();
         pos += i;
         sp->SplineEntries.insert( pos, fresh );
         if (tsp)
         {
-            SplineTcbParamList::const_iterator posi = tsp->in.begin();
-            SplineTcbParamList::const_iterator poso = tsp->out.begin();
+            SplineTcbParamList::iterator posi = tsp->in.begin();
+            SplineTcbParamList::iterator poso = tsp->out.begin();
             posi += i;
             poso += i;
             tsp->in.insert( posi, intcb );
