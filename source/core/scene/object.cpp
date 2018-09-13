@@ -928,6 +928,12 @@ bool ObjectBase::Intersect_BBox(BBoxDirection variant, const BBoxVector3d& origi
     return false; // unreachable
 }
 
+bool ObjectBase::IsOpaque() const
+{
+    return Test_Opacity(Texture) &&
+           ((Interior_Texture == nullptr) || Test_Opacity(Interior_Texture));
+}
+
 void ContainedByBox::ComputeBBox(BoundingBox& rBbox) const
 {
     rBbox.lowerLeft = BBoxVector3d(corner1);

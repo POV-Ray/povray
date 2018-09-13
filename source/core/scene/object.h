@@ -263,6 +263,20 @@ class ObjectBase
         ///
         virtual void DispatchShutdownMessages(GenericMessenger& messenger) {};
 
+        /// Test texture for opacity.
+        ///
+        /// This method will be called by the parser as part of object post-processing,
+        /// to test whether the object's material is guaranteed to be fully opaque.
+        ///
+        /// The default implementation reports the object as opaque if if has a texture that is
+        /// guaranteed to be opaque (as determined by @ref Test_Opacity()), and it has either no
+        /// explicit interior texture or that texture is also guaranteed to be opaque.
+        ///
+        /// Primitives with innate textures (such as blob or mesh) must override this method, and
+        /// return false if any of their innate textures is potentially non-opaque.
+        ///
+        virtual bool IsOpaque() const;
+
     protected:
         explicit ObjectBase(const ObjectBase&) { }
 };

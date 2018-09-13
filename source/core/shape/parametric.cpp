@@ -884,7 +884,6 @@ void Parametric::Precomp_Par_Int(int depth, DBL umin, DBL vmin, DBL umax, DBL vm
 
 void Parametric::Precompute_Parametric_Values(char flags, int depth, TraceThreadData *Thread)
 {
-    DBL * Last;
     const char* es = "precompute";
     int nmb;
 
@@ -892,30 +891,26 @@ void Parametric::Precompute_Parametric_Values(char flags, int depth, TraceThread
         throw POV_EXCEPTION_STRING("Precompute: invalid depth");
     nmb = 1 << depth;
 
-    PData = reinterpret_cast<PRECOMP_PAR_DATA *>(POV_MALLOC(sizeof(PRECOMP_PAR_DATA), es));
-    if (PData == nullptr)
-        throw POV_EXCEPTION_STRING("Cannot allocate memory for parametric precomputation data.");
+    PData = new PRECOMP_PAR_DATA;
     PData->flags = flags;
     PData->depth = depth;
     PData->use = 1;
 
     if (flags & OK_X)
     {
-        PData->Low[0] = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * nmb, es));
-        Last = PData->Hi[0] = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * nmb, es));
+        PData->Low[0] = new DBL[nmb];
+        PData->Hi[0] = new DBL[nmb];
     }
     if (flags & OK_Y)
     {
-        PData->Low[1] = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * nmb, es));
-        Last = PData->Hi[1] = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * nmb, es));
+        PData->Low[1] = new DBL[nmb];
+        PData->Hi[1] = new DBL[nmb];
     }
     if (flags & OK_Z)
     {
-        PData->Low[2] = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * nmb, es));
-        Last = PData->Hi[2] = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * nmb, es));
+        PData->Low[2] = new DBL[nmb];
+        PData->Hi[2] = new DBL[nmb];
     }
-    if (Last == nullptr)
-        throw POV_EXCEPTION_STRING("Cannot allocate memory for parametric precomputation data.");
 
     PrecompLastDepth = 1 << (depth - 1);
     std::array<GenericScalarFunctionInstance,3> aFn = {
@@ -996,20 +991,20 @@ void Parametric::Destroy_PrecompParVal()
     {
         if (PData->flags & OK_X)
         {
-            POV_FREE(PData->Low[0]);
-            POV_FREE(PData->Hi[0]);
+            delete[] PData->Low[0];
+            delete[] PData->Hi[0];
         }
         if (PData->flags & OK_Y)
         {
-            POV_FREE(PData->Low[1]);
-            POV_FREE(PData->Hi[1]);
+            delete[] PData->Low[1];
+            delete[] PData->Hi[1];
         }
         if (PData->flags & OK_Z)
         {
-            POV_FREE(PData->Low[2]);
-            POV_FREE(PData->Hi[2]);
+            delete[] PData->Low[2];
+            delete[] PData->Hi[2];
         }
-        POV_FREE(PData);
+        delete PData;
     }
 }
 
