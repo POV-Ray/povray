@@ -65,6 +65,12 @@ New Features
   - The `ovus` primitive has been extended in multiple ways. See the
     documentation (currently being maintained on <http://wiki.povray.org>) for
     details.
+  - Anti-aliasing now supports a new mode 3, which can actually serve as a
+    generic oversampling mechanism not only suited to perform edge
+    anti-aliasing, but also to successtully suppress moire patterns as well as
+    reduce image noise from stochastic mechanisms (e.g. jittered area lights,
+    subsurface light transport or micronormals). The mathematical background
+    and parameterization is similar to that of adaptive focal blur.
 
 Performance Improvements
 ------------------------

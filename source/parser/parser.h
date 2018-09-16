@@ -312,7 +312,7 @@ class Parser : public SceneTask
         };
 
         // constructor
-        Parser(shared_ptr<BackendSceneData> sd, bool useclock, DBL clock);
+        Parser(shared_ptr<BackendSceneData> sd, bool useclock, DBL clock, size_t seed);
 
         ~Parser();
 

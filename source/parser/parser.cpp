@@ -145,8 +145,8 @@ const DBL INFINITE_VOLUME = BOUND_HUGE;
 *
 ******************************************************************************/
 
-Parser::Parser(shared_ptr<BackendSceneData> sd, bool useclk, DBL clk) :
-    SceneTask(new TraceThreadData(sd), boost::bind(&Parser::SendFatalError, this, _1), "Parse", sd),
+Parser::Parser(shared_ptr<BackendSceneData> sd, bool useclk, DBL clk, size_t seed) :
+    SceneTask(new TraceThreadData(sd, seed), boost::bind(&Parser::SendFatalError, this, _1), "Parse", sd),
     backendSceneData(sd),
     sceneData(sd),
     clockValue(clk),
