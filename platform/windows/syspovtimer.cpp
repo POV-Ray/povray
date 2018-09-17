@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -65,7 +65,7 @@ Timer::Timer () :
     // TODO - sources on the internet indicate that GetThreadTimes() and GetProcessTimes() have been
     //        around as early as NT 3.1. Is there a reason we're only making use of it in NT 4.0 and
     //        later Windows versions?
-    mThreadHandle (NULL),
+    mThreadHandle (nullptr),
     mCPUTimeSupported (WindowsVersionDetector().IsNTVersion (4,0))
 {
     if (mCPUTimeSupported)
@@ -74,7 +74,7 @@ Timer::Timer () :
                               &mThreadHandle, 0, TRUE, DUPLICATE_SAME_ACCESS))
         {
             POV_ASSERT (false);
-            mThreadHandle = NULL;
+            mThreadHandle = nullptr;
         }
     }
     Reset ();
@@ -82,7 +82,7 @@ Timer::Timer () :
 
 Timer::~Timer ()
 {
-    if (mThreadHandle != NULL)
+    if (mThreadHandle != nullptr)
         CloseHandle (mThreadHandle);
 }
 

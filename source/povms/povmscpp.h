@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -67,7 +67,7 @@ class POVMS_Container
         friend class POVMS_MessageReceiver;
     public:
         POVMS_Container();
-        virtual ~POVMS_Container();
+        virtual ~POVMS_Container() noexcept(false);
 
         POVMSType Type() const;
         size_t Size() const;
@@ -95,7 +95,7 @@ class POVMS_Attribute : public POVMS_Container
         POVMS_Attribute(std::vector<POVMSType>& value);
         POVMS_Attribute(POVMSAttribute& convert);
         POVMS_Attribute(const POVMS_Attribute& source);
-        virtual ~POVMS_Attribute();
+        virtual ~POVMS_Attribute() noexcept(false);
 
         POVMS_Attribute& operator=(const POVMS_Attribute& source);
 
@@ -128,7 +128,7 @@ class POVMS_List : public POVMS_Container
         POVMS_List();
         POVMS_List(POVMSAttributeList& convert);
         POVMS_List(const POVMS_List& source);
-        virtual ~POVMS_List();
+        virtual ~POVMS_List() noexcept(false);
 
         POVMS_List& operator=(const POVMS_List& source);
 
@@ -196,7 +196,7 @@ class POVMS_Object : public POVMS_Container
         POVMS_Object(POVMSObject& convert);
         POVMS_Object(POVMSObjectPtr convert);
         POVMS_Object(const POVMS_Object& source);
-        ~POVMS_Object();
+        ~POVMS_Object() noexcept(false);
 
         POVMS_Object& operator=(const POVMS_Object& source);
 
@@ -317,8 +317,8 @@ class POVMS_MessageReceiver
 
                 MemberHandlerOO()
                 {
-                    classptr = NULL;
-                    handlerptr = NULL;
+                    classptr = nullptr;
+                    handlerptr = nullptr;
                 }
 
                 MemberHandlerOO(T *cptr, MemberHandlerPtr hptr)
@@ -329,7 +329,7 @@ class POVMS_MessageReceiver
 
                 void Call(POVMS_Message& msg, POVMS_Message& result, int mode)
                 {
-                    if((classptr != NULL) && (handlerptr != NULL))
+                    if ((classptr != nullptr) && (handlerptr != nullptr))
                         (classptr->*handlerptr)(msg, result, mode);
                     else
                         throw POV_EXCEPTION_CODE(pov_base::kNullPointerErr);
@@ -346,8 +346,8 @@ class POVMS_MessageReceiver
 
                 MemberHandler()
                 {
-                    classptr = NULL;
-                    handlerptr = NULL;
+                    classptr = nullptr;
+                    handlerptr = nullptr;
                 }
 
                 MemberHandler(T *cptr, MemberHandlerPtr hptr)
@@ -358,7 +358,7 @@ class POVMS_MessageReceiver
 
                 void Call(POVMSObjectPtr msg, POVMSObjectPtr result, int mode)
                 {
-                    if((classptr != NULL) && (handlerptr != NULL))
+                    if ((classptr != nullptr) && (handlerptr != nullptr))
                         (classptr->*handlerptr)(msg, result, mode);
                     else
                         throw POV_EXCEPTION_CODE(pov_base::kNullPointerErr);
@@ -375,8 +375,8 @@ class POVMS_MessageReceiver
 
                 FunctionHandlerOO()
                 {
-                    handlerptr = NULL;
-                    privatedata = NULL;
+                    handlerptr = nullptr;
+                    privatedata = nullptr;
                 }
 
                 FunctionHandlerOO(FunctionHandlerPtr hptr, void *pptr)
@@ -387,7 +387,7 @@ class POVMS_MessageReceiver
 
                 void Call(POVMS_Message& msg, POVMS_Message& result, int mode)
                 {
-                    if(handlerptr != NULL)
+                    if (handlerptr != nullptr)
                         handlerptr(msg, result, mode, privatedata);
                     else
                         throw POV_EXCEPTION_CODE(pov_base::kNullPointerErr);
@@ -404,8 +404,8 @@ class POVMS_MessageReceiver
 
                 FunctionHandler()
                 {
-                    handlerptr = NULL;
-                    privatedata = NULL;
+                    handlerptr = nullptr;
+                    privatedata = nullptr;
                 }
 
                 FunctionHandler(FunctionHandlerPtr hptr, void *pptr)
@@ -416,7 +416,7 @@ class POVMS_MessageReceiver
 
                 void Call(POVMSObjectPtr msg, POVMSObjectPtr result, int mode)
                 {
-                    if(handlerptr != NULL)
+                    if (handlerptr != nullptr)
                         handlerptr(msg, result, mode, privatedata);
                     else
                         throw POV_EXCEPTION_CODE(pov_base::kNullPointerErr);
@@ -431,42 +431,42 @@ class POVMS_MessageReceiver
 
         template<class T> void InstallFront(POVMSType hclass, POVMSType hid, T *cptr, typename MemberHandlerOO<T>::MemberHandlerPtr hptr)
         {
-            AddNodeFront(hclass, hid, new MemberHandlerOO<T>(cptr, hptr), NULL);
+            AddNodeFront(hclass, hid, new MemberHandlerOO<T>(cptr, hptr), nullptr);
         }
 
         template<class T> void InstallFront(POVMSType hclass, POVMSType hid, T *cptr, typename MemberHandler<T>::MemberHandlerPtr hptr)
         {
-            AddNodeFront(hclass, hid, NULL, new MemberHandler<T>(cptr, hptr));
+            AddNodeFront(hclass, hid, nullptr, new MemberHandler<T>(cptr, hptr));
         }
 
         void InstallFront(POVMSType hclass, POVMSType hid, FunctionHandlerOO::FunctionHandlerPtr hptr, void *pptr)
         {
-            AddNodeFront(hclass, hid, new FunctionHandlerOO(hptr, pptr), NULL);
+            AddNodeFront(hclass, hid, new FunctionHandlerOO(hptr, pptr), nullptr);
         }
 
         void InstallFront(POVMSType hclass, POVMSType hid, FunctionHandler::FunctionHandlerPtr hptr, void *pptr)
         {
-            AddNodeFront(hclass, hid, NULL, new FunctionHandler(hptr, pptr));
+            AddNodeFront(hclass, hid, nullptr, new FunctionHandler(hptr, pptr));
         }
 
         template<class T> void InstallBack(POVMSType hclass, POVMSType hid, T *cptr, typename MemberHandlerOO<T>::MemberHandlerPtr hptr)
         {
-            AddNodeBack(hclass, hid, new MemberHandlerOO<T>(cptr, hptr), NULL);
+            AddNodeBack(hclass, hid, new MemberHandlerOO<T>(cptr, hptr), nullptr);
         }
 
         template<class T> void InstallBack(POVMSType hclass, POVMSType hid, T *cptr, typename MemberHandler<T>::MemberHandlerPtr hptr)
         {
-            AddNodeBack(hclass, hid, NULL, new MemberHandler<T>(cptr, hptr));
+            AddNodeBack(hclass, hid, nullptr, new MemberHandler<T>(cptr, hptr));
         }
 
         void InstallBack(POVMSType hclass, POVMSType hid, FunctionHandlerOO::FunctionHandlerPtr hptr, void *pptr)
         {
-            AddNodeBack(hclass, hid, new FunctionHandlerOO(hptr, pptr), NULL);
+            AddNodeBack(hclass, hid, new FunctionHandlerOO(hptr, pptr), nullptr);
         }
 
         void InstallBack(POVMSType hclass, POVMSType hid, FunctionHandler::FunctionHandlerPtr hptr, void *pptr)
         {
-            AddNodeBack(hclass, hid, NULL, new FunctionHandler(hptr, pptr));
+            AddNodeBack(hclass, hid, nullptr, new FunctionHandler(hptr, pptr));
         }
 
         void Remove(POVMSType hclass, POVMSType hid);
@@ -488,7 +488,7 @@ class POVMS_MessageReceiver
         POVMS_MessageReceiver(const POVMS_MessageReceiver&); // no copies allowed
         POVMS_MessageReceiver& operator=(const POVMS_MessageReceiver&); // no copy assignments allowed
 
-        static int ReceiveHandler(POVMSObjectPtr msg, POVMSObjectPtr result, int mode, void *privatedataptr);
+        static POVMSResult ReceiveHandler(POVMSObjectPtr msg, POVMSObjectPtr result, int mode, void *privatedataptr);
 
         void AddNodeFront(POVMSType hclass, POVMSType hid, HandlerOO *hooptr, Handler *hptr);
         void AddNodeBack(POVMSType hclass, POVMSType hid, HandlerOO *hooptr, Handler *hptr);

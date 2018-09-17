@@ -72,7 +72,12 @@ ver_version_h_minor=`sed -n 's/^[ ]*#define [ ]*POV_RAY_MINOR_VERSION_INT [ ]*\(
 ver_version_h_revision=`sed -n 's/^[ ]*#define [ ]*POV_RAY_REVISION_INT [ ]*\([0-9]*\)/\1/p' "$versionfile"`
 ver_version_h_patchlevel=`sed -n 's/^[ ]*#define [ ]*POV_RAY_PATCHLEVEL_INT [ ]*\([0-9]*\)/\1/p' "$versionfile"`
 ver_version_h_prerelease=`sed -n 's/^[ ]*#define [ ]*POV_RAY_PRERELEASE [ ]*"\([^"]*\)".*$/\1/p' "$versionfile"`
-ver_VERSION=`cat unix/VERSION`
+if [ -f unix/VERSION ]
+then
+  ver_VERSION=`cat unix/VERSION`
+else
+  ver_VERSION=""
+fi
 
 if [ x"$ver_povray_h" != x"" ]
 then
@@ -80,7 +85,7 @@ then
   ver_version_h="$ver_povray_h"
 else
   ver_version_h_3="$ver_version_h_major.$ver_version_h_minor.$ver_version_h_revision"
-  if [ $ver_version_h_patchlevel -gt 0 ]
+  if [ x"$ver_version_h_patchlevel" != x"" ] && [ $ver_version_h_patchlevel -gt 0 ]
   then
     ver_version_h="$ver_version_h_3.$ver_version_h_patchlevel"
   else

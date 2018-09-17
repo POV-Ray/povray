@@ -63,8 +63,8 @@
 namespace pov
 {
 
-PhotonShootingTask::PhotonShootingTask(ViewData *vd, PhotonShootingStrategy* strategy) :
-    RenderTask(vd, "Photon"),
+PhotonShootingTask::PhotonShootingTask(ViewData *vd, PhotonShootingStrategy* strategy, size_t seed) :
+    RenderTask(vd, seed, "Photon"),
     trace(vd->GetSceneData(), GetViewDataPtr(), vd->GetQualityFeatureFlags(), cooperate),
     rands(0.0, 1.0, 32768),
     randgen(&rands),
@@ -329,7 +329,7 @@ void PhotonShootingTask::ShootPhotonsAtObject(LightTargetCombo& combo)
                         /* try to intersect ray with projected-through ObjectPtr */
                         Intersection Intersect;
 
-                        Intersect.Object = NULL;
+                        Intersect.Object = nullptr;
                         if ( trace.FindIntersection(combo.light->Projected_Through_Object, Intersect, ray) )
                         {
                             /* we must recompute the media containers (new start point) */

@@ -35,6 +35,8 @@
 
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/math/common_factor.hpp>
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -91,7 +93,7 @@ ViewData::ViewData(shared_ptr<BackendSceneData> sd) :
     blockHeight(8),
     blockSize(DEFAULT_BLOCK_SIZE),
     realTimeRaytracing(false),
-    rtrData(NULL),
+    rtrData(nullptr),
     renderArea(0, 0, 159, 119),
     radiosityCache(sd->radiositySettings),
     sceneData(sd),
@@ -577,7 +579,7 @@ View::View(shared_ptr<BackendSceneData> sd, unsigned int width, unsigned int hei
     viewData(sd),
     stopRequsted(false),
     mailbox(0),
-    renderControlThread(NULL)
+    renderControlThread(nullptr)
 {
     viewData.viewId = vid;
     viewData.width = width;
@@ -623,8 +625,9 @@ bool View::CheckCameraHollowObject(const Vector3d& point, const BBOX_TREE *node)
     }
     else
     {
+        size_t seed = 0; // TODO
         // This is a leaf so test contained object.
-        TraceThreadData threadData(viewData.GetSceneData());
+        TraceThreadData threadData(viewData.GetSceneData(), seed); // TODO: avoid the need to construct threadData
         ObjectPtr object = reinterpret_cast<ObjectPtr>(node->Node);
         if ((object->interior != nullptr) && (object->Inside(point, &threadData)))
             return true;
@@ -635,13 +638,14 @@ bool View::CheckCameraHollowObject(const Vector3d& point, const BBOX_TREE *node)
 
 bool View::CheckCameraHollowObject(const Vector3d& point)
 {
+    size_t seed = 0; // TODO
     shared_ptr<BackendSceneData>& sd = viewData.GetSceneData();
 
     if(sd->boundingMethod == 2)
     {
         HasInteriorPointObjectCondition precond;
         TruePointObjectCondition postcond;
-        TraceThreadData threadData(sd); // TODO: avoid the need to construct threadData
+        TraceThreadData threadData(sd, seed); // TODO: avoid the need to construct threadData
         BSPInsideCondFunctor ifn(point, sd->objects, &threadData, precond, postcond);
 
         mailbox.clear();
@@ -655,7 +659,7 @@ bool View::CheckCameraHollowObject(const Vector3d& point)
     }
     else if ((sd->boundingMethod == 0) || (sd->boundingSlabs == nullptr))
     {
-        TraceThreadData threadData(sd); // TODO: avoid the need to construct threadData
+        TraceThreadData threadData(sd, seed); // TODO: avoid the need to construct threadData
         for(vector<ObjectPtr>::const_iterator object = viewData.GetSceneData()->objects.begin(); object != viewData.GetSceneData()->objects.end(); object++)
             if ((*object)->interior != nullptr)
                 if((*object)->Inside(point, &threadData))
@@ -675,6 +679,7 @@ void View::StartRender(POVMS_Object& renderOptions)
     DBL jitterscale = 1.0;
     bool jitter = false;
     DBL aathreshold = 0.3;
+    DBL aaconfidence = 0.9;
     unsigned int aadepth = 3;
     DBL aaGammaValue = 1.0;
     GammaCurvePtr aaGammaCurve;
@@ -682,18 +687,20 @@ void View::StartRender(POVMS_Object& renderOptions)
     unsigned int previewendsize = 0;
     unsigned int nextblock = 0;
     bool highReproducibility = false;
+    size_t seed = 0;
     shared_ptr<ViewData::BlockIdSet> blockskiplist(new ViewData::BlockIdSet());
 
-    if(renderControlThread == NULL)
+    if (renderControlThread == nullptr)
         renderControlThread = Task::NewBoostThread(boost::bind(&View::RenderControlThread, this), POV_THREAD_STACK_SIZE);
 
     viewData.qualityFlags = QualityFlags(clip(renderOptions.TryGetInt(kPOVAttrib_Quality, 9), 0, 9));
 
     if(renderOptions.TryGetBool(kPOVAttrib_Antialias, false) == true)
-        tracingmethod = clip(renderOptions.TryGetInt(kPOVAttrib_SamplingMethod, 1), 0, 2);
+        tracingmethod = clip(renderOptions.TryGetInt(kPOVAttrib_SamplingMethod, 1), 0, 3); // TODO FIXME - magic number in clip
 
     aadepth = clip((unsigned int)renderOptions.TryGetInt(kPOVAttrib_AntialiasDepth, 3), 1u, 9u);
     aathreshold = clip(renderOptions.TryGetFloat(kPOVAttrib_AntialiasThreshold, 0.3f), 0.0f, 1.0f);
+    aaconfidence = clip(renderOptions.TryGetFloat(kPOVAttrib_AntialiasConfidence, 0.9f), 0.0f, 1.0f);
     if(renderOptions.TryGetBool(kPOVAttrib_Jitter, true) == true)
         jitterscale = clip(renderOptions.TryGetFloat(kPOVAttrib_JitterAmount, 1.0f), 0.0f, 1.0f);
     else
@@ -710,6 +717,14 @@ void View::StartRender(POVMS_Object& renderOptions)
         previewendsize = 1;
 
     highReproducibility = renderOptions.TryGetBool(kPOVAttrib_HighReproducibility, false);
+
+    seed = renderOptions.TryGetInt(kPOVAttrib_StochasticSeed, 0);
+    if (seed == 0)
+    {
+        boost::posix_time::ptime now = boost::posix_time::second_clock::universal_time();
+        boost::posix_time::ptime base = boost::posix_time::ptime(boost::gregorian::date(1970, 1, 1));
+        seed = (now - base).total_seconds();
+    }
 
     // TODO FIXME - [CLi] handle loading, storing (and later optionally deleting) of radiosity cache file for trace abort & continue feature
     // TODO FIXME - [CLi] if high reproducibility is a demand, timing of writing samples to disk is an issue regarding abort & continue
@@ -977,7 +992,9 @@ void View::StartRender(POVMS_Object& renderOptions)
 
             // when we pass a null parameter for the "strategy" (last parameter),
             // then this will LOAD the photon map
-            viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new PhotonSortingTask(&viewData, surfaceMaps, mediaMaps, NULL))));
+            viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new PhotonSortingTask(
+                &viewData, surfaceMaps, mediaMaps, nullptr, seed
+                ))));
             // wait for photons to finish
             renderTasks.AppendSync();
         }
@@ -985,11 +1002,15 @@ void View::StartRender(POVMS_Object& renderOptions)
         {
             PhotonShootingStrategy* strategy = new PhotonShootingStrategy();
 
-            viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new PhotonEstimationTask(&viewData))));
+            viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new PhotonEstimationTask(
+                &viewData, seed
+                ))));
             // wait for photons to finish
             renderTasks.AppendSync();
 
-            viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new PhotonStrategyTask(&viewData, strategy))));
+            viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new PhotonStrategyTask(
+                &viewData, strategy, seed
+                ))));
             // wait for photons to finish
             renderTasks.AppendSync();
 
@@ -998,7 +1019,7 @@ void View::StartRender(POVMS_Object& renderOptions)
 
             for(int i = 0; i < maxRenderThreads; i++)
             {
-                PhotonShootingTask* task = new PhotonShootingTask(&viewData, strategy);
+                PhotonShootingTask* task = new PhotonShootingTask(&viewData, strategy, seed);
                 surfaceMaps.push_back(task->getSurfacePhotonMap());
                 mediaMaps.push_back(task->getMediaPhotonMap());
                 viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(task)));
@@ -1007,7 +1028,9 @@ void View::StartRender(POVMS_Object& renderOptions)
             renderTasks.AppendSync();
 
             // this merges the maps, sorts, computes gather options, and then cleans up memory
-            viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new PhotonSortingTask(&viewData, surfaceMaps, mediaMaps, strategy))));
+            viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new PhotonSortingTask(
+                &viewData, surfaceMaps, mediaMaps, strategy, seed
+                ))));
             // wait for photons to finish
             renderTasks.AppendSync();
 
@@ -1052,7 +1075,9 @@ void View::StartRender(POVMS_Object& renderOptions)
 
                 // do render one pretrace step with current pretrace size
                 for(int i = 0; i < actualThreads; i++)
-                    viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new RadiosityTask(&viewData, actualSize, actualSize, step, 1, nominalThreads))));
+                    viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new RadiosityTask(
+                        &viewData, actualSize, actualSize, step, 1, nominalThreads, seed
+                        ))));
 
                 // wait for previous pretrace step to finish
                 renderTasks.AppendSync();
@@ -1071,7 +1096,9 @@ void View::StartRender(POVMS_Object& renderOptions)
         {
             // do render all pretrace steps
             for(int i = 0; i < maxRenderThreads; i++)
-                viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new RadiosityTask(&viewData, startSize, endSize, RadiosityFunction::PRETRACE_FIRST, steps, 0))));
+                viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new RadiosityTask(
+                    &viewData, startSize, endSize, RadiosityFunction::PRETRACE_FIRST, steps, 0, seed
+                    ))));
 
             // wait for pretrace to finish
             renderTasks.AppendSync();
@@ -1095,7 +1122,10 @@ void View::StartRender(POVMS_Object& renderOptions)
 
         // do render with mosaic preview start size
         for(int i = 0; i < maxRenderThreads; i++)
-            viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new TraceTask(&viewData, 0, jitterscale, aathreshold, aadepth, aaGammaCurve, previewstartsize, false, previewIsFinalPass, highReproducibility))));
+            viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new TraceTask(
+                &viewData, 0, jitterscale, aathreshold, aaconfidence, aadepth, aaGammaCurve,
+                previewstartsize, false, previewIsFinalPass, highReproducibility, seed
+                ))));
 
         for(unsigned int step = (previewstartsize >> 1); step >= previewendsize; step >>= 1)
         {
@@ -1110,7 +1140,10 @@ void View::StartRender(POVMS_Object& renderOptions)
 
             // do render with current mosaic preview size
             for(int i = 0; i < maxRenderThreads; i++)
-                viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new TraceTask(&viewData, 0, jitterscale, aathreshold, aadepth, aaGammaCurve, step, true, previewIsFinalPass, highReproducibility))));
+                viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new TraceTask(
+                    &viewData, 0, jitterscale, aathreshold, aaconfidence, aadepth, aaGammaCurve,
+                    step, true, previewIsFinalPass, highReproducibility, seed
+                    ))));
         }
 
         if (!previewIsFinalPass)
@@ -1125,14 +1158,20 @@ void View::StartRender(POVMS_Object& renderOptions)
             renderTasks.AppendSync();
 
             for(int i = 0; i < maxRenderThreads; i++)
-                viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new TraceTask(&viewData, tracingmethod, jitterscale, aathreshold, aadepth, aaGammaCurve, 0, false, true, highReproducibility))));
+                viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new TraceTask(
+                    &viewData, tracingmethod, jitterscale, aathreshold, aaconfidence, aadepth, aaGammaCurve,
+                    0, false, true, highReproducibility, seed
+                    ))));
         }
     }
     // do render without mosaic preview
     else
     {
         for(int i = 0; i < maxRenderThreads; i++)
-            viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new TraceTask(&viewData, tracingmethod, jitterscale, aathreshold, aadepth, aaGammaCurve, 0, false, true, highReproducibility))));
+            viewThreadData.push_back(dynamic_cast<ViewThreadData *>(renderTasks.AppendTask(new TraceTask(
+                &viewData, tracingmethod, jitterscale, aathreshold, aaconfidence, aadepth, aaGammaCurve,
+                0, false, true, highReproducibility, seed
+                ))));
     }
 
     // wait for render to finish
@@ -1480,7 +1519,7 @@ const Camera *RTRData::CompletedFrame()
                 obj.SetInt(kPOVAttrib_PixelsCompleted, numPixelsCompleted);
                 RenderBackend::SendViewOutput(viewData.GetViewId(), viewData.GetSceneData()->frontendAddress, kPOVMsgIdent_Progress, obj);
 
-                return(ca ? &cameras[numRTRframes % cameras.size()] : NULL);
+                return (ca ? &cameras[numRTRframes % cameras.size()] : nullptr);
             }
             catch(pov_base::Exception&)
             {
@@ -1504,7 +1543,7 @@ const Camera *RTRData::CompletedFrame()
     if (!event.timed_wait(lock, t))
         numRenderThreadsCompleted--;
 
-    return(ca ? &cameras[numRTRframes % cameras.size()] : NULL);
+    return (ca ? &cameras[numRTRframes % cameras.size()] : nullptr);
 }
 
 }

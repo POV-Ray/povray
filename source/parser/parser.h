@@ -104,8 +104,7 @@ typedef unsigned short SymTableEntryRefCount;
 
 // Special symbol tables
 enum {
-    SYM_TABLE_RESERVED = 0,        // reserved words
-    SYM_TABLE_GLOBAL,              // identifiers declared using #declare (or #local in top-level file), #function, #macro, etc.
+    SYM_TABLE_GLOBAL = 0,       ///< Identifiers declared using #declare (or #local in top-level file), #function, #macro, etc.
 };
 
 /// Structure holding information about a symbol
@@ -333,7 +332,7 @@ class Parser : public SceneTask
         };
 
         // constructor
-        Parser(shared_ptr<BackendSceneData> sd, bool useclock, DBL clock);
+        Parser(shared_ptr<BackendSceneData> sd, bool useclock, DBL clock, size_t seed);
 
         ~Parser();
 
@@ -415,6 +414,9 @@ class Parser : public SceneTask
         void Get_Token (void);
         void Unget_Token (void);
         void Parse_Directive (int After_Hash);
+#if POV_DEBUG
+        void Parse_Breakpoint();
+#endif
         void Open_Include (void);
         void IncludeHeader(const UCS2String& temp);
         void pre_init_tokenizer (void);
@@ -487,7 +489,7 @@ class Parser : public SceneTask
         void Parse_UV_Vect (Vector2d& UV_Vect);
         void Parse_Vector (Vector3d& Vector);
         void Parse_Vector4D (VECTOR_4D Vector);
-        int Parse_Unknown_Vector (EXPRESS& Express, bool allow_identifier = false, bool *had_identifier = nullptr);
+        int Parse_Unknown_Vector(EXPRESS& Express, bool allow_identifier = false, bool *had_identifier = nullptr);
         void Parse_Scale_Vector (Vector3d& Vector);
         DBL Parse_Float_Param (void);
         void Parse_Float_Param2 (DBL *Val1, DBL *Val2);
@@ -508,7 +510,7 @@ class Parser : public SceneTask
         std::string Parse_ASCIIString(bool pathname = false, bool require = true);
         UCS2String Parse_UCS2String(bool pathname = false, bool require = true);
 
-        UCS2 *String_Literal_To_UCS2(const char *str, bool pathname = false);
+        UCS2 *String_Literal_To_UCS2(const char *str);
         UCS2 *String_To_UCS2(const char *str);
         char *UCS2_To_String(const UCS2 *str);
 

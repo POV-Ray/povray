@@ -106,12 +106,12 @@ public:
 
     SimpleVector()
     {
-        m_First = m_Last = m_End = NULL;
+        m_First = m_Last = m_End = nullptr;
     }
 
     SimpleVector(size_type nItems, const ContainerType& InitialVal)
     {
-        m_First = m_Last = m_End = NULL;
+        m_First = m_Last = m_End = nullptr;
         if (nItems)
             allocate (nItems, InitialVal);
     }
@@ -125,13 +125,13 @@ public:
                 *m_Last++ = *p++;
         }
         else
-            m_First = m_Last = m_End = NULL;
+            m_First = m_Last = m_End = nullptr;
     }
 
     ~SimpleVector()
     {
         // we don't call destructors, even if they exist
-        if (m_First != NULL)
+        if (m_First != nullptr)
             deallocate ();
     }
 
@@ -139,7 +139,7 @@ public:
     {
         if (RHS.size() > capacity())
         {
-            if (m_First != NULL)
+            if (m_First != nullptr)
                 deallocate ();
             allocate (RHS.size());
         }
@@ -309,7 +309,7 @@ public:
                 p [i] = m_First [i];
             for (size_type i = Index + 1 ; i < c ; i++)
                 p [i] = m_First [i];
-            if (m_First != NULL)
+            if (m_First != nullptr)
                 alloc.deallocate (m_First, n);
             m_First = p;
             m_End = m_First + nc;
@@ -357,7 +357,7 @@ public:
             size_type n = size();
             for (size_type i = 0; i < n; ++i)
                 p[i] = m_First[i];
-            if (m_First != NULL)
+            if (m_First != nullptr)
                 alloc.deallocate(m_First, c);
             m_First = p;
             m_End = m_First + nItems;

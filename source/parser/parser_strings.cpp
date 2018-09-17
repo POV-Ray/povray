@@ -139,11 +139,11 @@ UCS2 *Parser::Parse_String(bool pathname, bool require)
                     {
 #if POV_BACKSLASH_IS_PATH_SEPARATOR
                         Warning("Backslash encountered while parsing for a filename."
-                                " In legacy (pre-3.8) scenes, this is NOT interpreted as the start of an escape sequence."
+                                " In legacy (pre-v3.8) scenes, this is NOT interpreted as the start of an escape sequence."
                                 " However, for future compatibility it is recommended to use a forward slash as path separator instead.");
 #else
                         Warning("Backslash encountered while parsing for a filename."
-                                " In legacy (pre-3.8) scenes, this is NOT interpreted as the start of an escape sequence.");
+                                " In legacy (pre-v3.8) scenes, this is NOT interpreted as the start of an escape sequence.");
 #endif
                     }
                     pString = &stringValue->GetFileName();
@@ -565,7 +565,7 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
     {
         std::tm t = boost::posix_time::to_tm(boost::posix_time::from_time_t(timestamp));
         // TODO FIXME - we should either have this locale setting globally, or avoid it completely; in either case it shouldn't be *here*.
-        setlocale(LC_TIME,""); // Get the local prefered format
+        setlocale(LC_TIME,""); // Get the local preferred format
         vlen = strftime(val, PARSE_NOW_VAL_LENGTH, FormatStr, &t);
     }
     catch (pov_base::Exception& e)
@@ -580,7 +580,7 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
     }
     if (vlen == PARSE_NOW_VAL_LENGTH) // on error: max for libc 4.4.1 & before
         vlen = 0; // return an empty string on error (content of val[] is undefined)
-    val[vlen]='\0'; // whatever, that operation is now safe (and superflous except for error)
+    val[vlen]='\0'; // whatever, that operation is now safe (and superfluous except for error)
 
     if (CallFree)
     {
@@ -745,41 +745,22 @@ UCS2 *Parser::String_To_UCS2(const char *str)
         return char_string;
     }
 
-    switch(sceneData->stringEncoding)
+    char_array_size = (int)strlen(str);
+    char_array = reinterpret_cast<UCS2 *>(POV_MALLOC(char_array_size * sizeof(UCS2), "Character Array"));
+    for(i = 0; i < char_array_size; i++)
     {
-        case kStringEncoding_ASCII:
-            char_array_size = (int)strlen(str);
-            char_array = reinterpret_cast<UCS2 *>(POV_MALLOC(char_array_size * sizeof(UCS2), "Character Array"));
-            for(i = 0; i < char_array_size; i++)
+        if(sceneData->EffectiveLanguageVersion() < 350)
+            char_array[i] = (unsigned char)(str[i]);
+        else
+        {
+            char_array[i] = str[i] & 0x007F;
+            if(char_array[i] != str[i])
             {
-                if(sceneData->EffectiveLanguageVersion() < 350)
-                    char_array[i] = (unsigned char)(str[i]);
-                else
-                {
-                    char_array[i] = str[i] & 0x007F;
-                    if(char_array[i] != str[i])
-                    {
-                        char_array[i] = ' ';
-                        PossibleError("Non-ASCII character has been replaced by space character.");
-                    }
-                }
+                char_array[i] = ' ';
+                PossibleError("Unexpected non-ASCII character has been replaced by space character.");
             }
-            break;
-        case kStringEncoding_UTF8:
-            char_array = Convert_UTF8_To_UCS2(reinterpret_cast<const unsigned char *>(str), &char_array_size);
-            break;
-        case kStringEncoding_System:
-            char_array = POV_CONVERT_TEXT_TO_UCS2(reinterpret_cast<const unsigned char *>(str), &char_array_size);
-            if(char_array == nullptr)
-                Error("Cannot convert system specific text format to Unicode.");
-            break;
-        default:
-            Error("Unsupported text encoding format.");
-            break;
+        }
     }
-
-    if(char_array == nullptr)
-        Error("Cannot convert text to UCS2 format.");
 
     char_string = reinterpret_cast<UCS2 *>(POV_MALLOC((char_array_size + 1) * sizeof(UCS2), "UCS2 String"));
     for(index_in = 0, index_out = 0; index_in < char_array_size; index_in++, index_out++)
@@ -788,7 +769,7 @@ UCS2 *Parser::String_To_UCS2(const char *str)
     char_string[index_out] = 0;
     index_out++;
 
-    if(char_array != nullptr)
+    if (char_array != nullptr)
         POV_FREE(char_array);
 
     return char_string;
@@ -797,7 +778,7 @@ UCS2 *Parser::String_To_UCS2(const char *str)
 
 /*****************************************************************************/
 
-UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
+UCS2 *Parser::String_Literal_To_UCS2(const char *str)
 {
     UCS2 *char_string = nullptr;
     UCS2 *char_array = nullptr;
@@ -818,59 +799,28 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
         return char_string;
     }
 
-    switch(sceneData->stringEncoding)
+    char_array_size = (int)strlen(str);
+    char_array = reinterpret_cast<UCS2 *>(POV_MALLOC(char_array_size * sizeof(UCS2), "Character Array"));
+    for(i = 0; i < char_array_size; i++)
     {
-        case kStringEncoding_ASCII:
-            char_array_size = (int)strlen(str);
-            char_array = reinterpret_cast<UCS2 *>(POV_MALLOC(char_array_size * sizeof(UCS2), "Character Array"));
-            for(i = 0; i < char_array_size; i++)
+        if(sceneData->EffectiveLanguageVersion() < 350)
+            char_array[i] = (unsigned char)(str[i]);
+        else
+        {
+            char_array[i] = str[i] & 0x007F;
+            if(char_array[i] != str[i])
             {
-                if(sceneData->EffectiveLanguageVersion() < 350)
-                    char_array[i] = (unsigned char)(str[i]);
-                else
-                {
-                    char_array[i] = str[i] & 0x007F;
-                    if(char_array[i] != str[i])
-                    {
-                        char_array[i] = ' ';
-                        PossibleError("Non-ASCII character has been replaced by space character.");
-                    }
-                }
+                char_array[i] = ' ';
+                PossibleError("Unexpected non-ASCII character has been replaced by space character.");
             }
-            break;
-        case kStringEncoding_UTF8:
-            char_array = Convert_UTF8_To_UCS2(reinterpret_cast<const unsigned char *>(str), &char_array_size);
-            break;
-        case kStringEncoding_System:
-            char_array = POV_CONVERT_TEXT_TO_UCS2(reinterpret_cast<const unsigned char *>(str), &char_array_size);
-            if(char_array == nullptr)
-                Error("Cannot convert system specific text format to Unicode.");
-            break;
-        default:
-            Error("Unsupported text encoding format.");
-            break;
+        }
     }
-
-    if(char_array == nullptr)
-        Error("Cannot convert text to UCS2 format.");
 
     char_string = reinterpret_cast<UCS2 *>(POV_MALLOC((char_array_size + 1) * sizeof(UCS2), "UCS2 String"));
     for(index_in = 0, index_out = 0; index_in < char_array_size; index_in++, index_out++)
     {
-        if((char_array[index_in] == '\\') && (sceneData->EffectiveLanguageVersion() >= 380 || !pathname))
+        if(char_array[index_in] == '\\')
         {
-            // Historically, escape sequences were ignored when parsing for a filename.
-            // As of POV-Ray v3.8, this has been changed.
-
-#if POV_BACKSLASH_IS_PATH_SEPARATOR
-            if (pathname)
-            {
-                Warning("Backslash encountered while parsing for a filename."
-                        " As of POV-Ray v3.8, this is interpreted as an escape sequence just like in any other string literal."
-                        " If this is supposed to be a path separator, use a forward slash instead.");
-            }
-#endif
-
             index_in++;
 
             switch(char_array[index_in])
@@ -926,24 +876,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
             }
         }
         else
-        {
-            if ((char_array[index_in] == '\\') && pathname)
-            {
-                // Historically, escape sequences were ignored when parsing for a filename.
-                // As of POV-Ray 3.8, this has been changed.
-
-#if POV_BACKSLASH_IS_PATH_SEPARATOR
-                Warning("Backslash encountered while parsing for a filename."
-                        " In legacy (pre-3.8) scenes, this is NOT interpreted as the start of an escape sequence."
-                        " However, for future compatibility it is recommended to use a forward slash as path separator instead.");
-#else
-                Warning("Backslash encountered while parsing for a filename."
-                        " In legacy (pre-3.8) scenes, this is NOT interpreted as the start of an escape sequence.");
-#endif
-            }
-
             char_string[index_out] = char_array[index_in];
-        }
     }
 
     char_string[index_out] = 0;
@@ -951,7 +884,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
 
     char_string = reinterpret_cast<UCS2 *>(POV_REALLOC(char_string, index_out * sizeof(UCS2), "UCS2 String"));
 
-    if(char_array != nullptr)
+    if (char_array != nullptr)
         POV_FREE(char_array);
 
     return char_string;
@@ -1042,7 +975,7 @@ UCS2 *Parser::Convert_UTF8_To_UCS2(const unsigned char *text_array, int *char_ar
     size_t size = (len+1)*sizeof(UCS2);
 
     UCS2 *char_array = reinterpret_cast<UCS2 *>(POV_MALLOC(size, "Character Array"));
-    if(char_array == nullptr)
+    if (char_array == nullptr)
         throw POV_EXCEPTION_CODE(kOutOfMemoryErr);
 
     memcpy(char_array, s.c_str(), size);

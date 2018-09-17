@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -48,6 +48,7 @@
 #include "core/bounding/boundingcylinder.h"
 #include "core/bounding/bsptree.h"
 #include "core/material/pattern.h"
+#include "core/math/randomsequence.h"
 #include "core/shape/mesh.h"
 #include "core/support/statistics.h"
 
@@ -78,8 +79,10 @@ class TraceThreadData : public ThreadData
     public:
 
         /// Create thread local data.
-        /// @param  sd  Scene data defining scene attributes.
-        TraceThreadData(shared_ptr<SceneData> sd);
+        /// @param  sd      Scene data defining scene attributes.
+        /// @param  seed    Seed for the stochastic random number generator;
+        ///                 should be unique for each render.
+        TraceThreadData(shared_ptr<SceneData> sd, size_t seed);
 
         /// Destructor.
         ~TraceThreadData();
@@ -105,6 +108,10 @@ class TraceThreadData : public ThreadData
         int Facets_Last_Seed;
         int Facets_CVC;
         Vector3d Facets_Cube[81];
+
+        /// Common random number generator for all stochastic stuff
+        SeedableDoubleGeneratorPtr stochasticRandomGenerator;
+        size_t stochasticRandomSeedBase;
 
         // TODO FIXME - thread-local copy of lightsources. we need this
         // because various parts of the lighting code seem to make changes

@@ -1132,7 +1132,7 @@ void POVFPU_Exception(FPUContext *context, FUNCTION fn, const char *msg)
 
     if(!functions[fn].fn.sourceInfo.name.empty())
     {
-        if(msg != nullptr)
+        if (msg != nullptr)
 ;// TODO MESSAGE            ErrorAt(functions[fn].fn.sourceInfo,
 //                  "Runtime error detected in function '%s'. %s", functions[fn].fn.name, msg);
         else
@@ -1144,7 +1144,7 @@ void POVFPU_Exception(FPUContext *context, FUNCTION fn, const char *msg)
     }
     else
     {
-        if(msg != nullptr)
+        if (msg != nullptr)
 ;// TODO MESSAGE            ErrorAt(functions[fn].fn.sourceInfo,
 //                  "Runtime error detected in function. %s", msg);
         else
@@ -1194,7 +1194,7 @@ DBL POVFPU_RunDefault(FPUContext *context, FUNCTION fn)
     StackFrame *pstack = context->pstackbase;
     DBL *dblstack = context->dblstackbase;
     unsigned int maxdblstacksize = context->maxdblstacksize;
-    DBL r0, r1, r2, r3, r4, r5, r6, r7;
+    DBL r0 = 0.0, r1 = 0.0, r2 = 0.0, r3 = 0.0, r4 = 0.0, r5 = 0.0, r6 = 0.0, r7 = 0.0;
     Instruction *program = nullptr;
     unsigned int k = 0;
     unsigned int pc = 0;
@@ -1496,14 +1496,14 @@ void FNCode_Delete(FunctionCode *f)
 {
     int i;
 
-    if(f->program != nullptr)
+    if (f->program != nullptr)
     {
         POV_FREE(f->program);
         f->program = nullptr;
     }
     for(i = 0; i < f->parameter_cnt; i++)
     {
-        if(f->parameter[i] != nullptr)
+        if (f->parameter[i] != nullptr)
         {
             POV_FREE(f->parameter[i]);
             f->parameter[i] = nullptr;
@@ -1511,15 +1511,15 @@ void FNCode_Delete(FunctionCode *f)
     }
     for(i = 0; i < f->localvar_cnt; i++)
     {
-        if(f->localvar[i] != nullptr)
+        if (f->localvar[i] != nullptr)
         {
             POV_FREE(f->localvar[i]);
             f->localvar[i] = nullptr;
         }
     }
-    if(f->private_data != nullptr)
+    if (f->private_data != nullptr)
     {
-        if(f->private_destroy_method != nullptr)
+        if (f->private_destroy_method != nullptr)
             f->private_destroy_method(f->private_data);
         else
             POV_FREE(f->private_data);
@@ -1544,7 +1544,7 @@ FUNCTION_PTR FunctionVM::CopyFunction(FUNCTION_PTR pK)
 
 void FunctionVM::DestroyFunction(FUNCTION_PTR pK)
 {
-    if(pK != nullptr)
+    if (pK != nullptr)
     {
         RemoveFunction(*pK);
         POV_FREE(pK);

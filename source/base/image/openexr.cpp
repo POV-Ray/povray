@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -90,8 +90,6 @@ class POV_EXR_OStream : public Imf::OStream
         POV_EXR_OStream(pov_base::OStream& pov_stream) : Imf::OStream(UCS2toASCIIString(pov_stream.Name()).c_str()), os(pov_stream) { }
         virtual ~POV_EXR_OStream() { }
 
-        const char *fileName() const { return UCS2toASCIIString(os.Name()).c_str(); }
-
         void write(const char *c, int n)
         {
             if(os.write(c, n) == false)
@@ -130,7 +128,6 @@ class POV_EXR_IStream : public Imf::IStream
 
         virtual ~POV_EXR_IStream() { }
 
-        const char *fileName(void) const { return UCS2toASCIIString(is.Name()).c_str(); }
         void clear(void) { is.clearstate(); }
 
         bool read(char *c, int n)
@@ -166,7 +163,7 @@ Image *Read(IStream *file, const Image::ReadOptions& options)
 {
     unsigned int width;
     unsigned int height;
-    Image  *image = NULL;
+    Image *image = nullptr;
 
     // OpenEXR files store linear color values by default, so never convert unless the user overrides
     // (e.g. to handle a non-compliant file).

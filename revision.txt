@@ -35,6 +35,182 @@ Notes:
 POV-Ray v3.8.0-???
 ------------------------------------------------------------------------------
 
+Commit 915abb22 on 2018-09-12 by Christoph Lipka
+
+    Fix uninitialized variables in photons code discovered by static code
+    analysis (CID 1372618, CID 1372630-1372632).
+    Also placate static code analysis about a few others in user function
+    VM code (CID 967358-967362).
+
+Commit 65bd3196 on 2018-09-12 by Christoph Lipka
+
+    Fix bug in OpenEXR file handling code found by static code analysis
+    (CID 986462 and 986463).
+
+Commit 7de830ce on 2018-09-12 by Christoph Lipka
+
+    Eliminate C-style memory allocation in parametric.
+
+Commit 7fa6bb53 on 2018-09-12 by Christoph Lipka
+
+    Refactor flagging of opaque objects during parser post-processing.
+
+Commit 6fdadbde on 2018-09-12 by Christoph Lipka
+
+    [windows] Fix error in recent commit 917a8763 that broke the build.
+
+Commit 24700edb on 2018-09-12 by Christoph Lipka
+
+    Eliminate C-style memory allocation in polygon.
+
+Commit 917a8763 on 2018-09-12 by Christoph Lipka
+
+    Get rid of C-style `NULL` throughout the code in favour of the less
+    ambiguous C++11-style `nullptr`.
+
+Commit 72cf1a73 on 2018-09-12 by Christoph Lipka
+
+    Replace more magic constants in POVMS.
+
+Commit aa0b48d7 on 2018-09-12 by Christoph Lipka
+
+    Clean up use of boolean values in POVMS.
+
+Commit 49873bf9 on 2018-09-12 by Christoph Lipka
+
+    Improve code clarity with regards to POVMS return values, fixing a few
+    bugs along the way.
+
+Commit dfda62b7 on 2018-09-12 by Christoph Lipka
+
+    Minor update to stack size configuration.
+
+Commit 72862c76 on 2018-09-12 by Christoph Lipka
+
+    Minor code simplification in quadrics code.
+
+Commit 7bde9196 on 2018-09-12 by Christoph Lipka
+
+    Update various comments and a few text strings.
+
+Commit 344ed893 on 2018-09-11 by Christoph Lipka
+
+    Update to `.gitattribute`; most notably, prevent auto-merging of
+    `source/base/version.h`.
+
+Commit 8a43226e on 2018-09-11 by Christoph Lipka
+
+    Minor update to `source/base/build.h` and related docs.
+
+Commit 96489d42 on 2018-09-09 by Christoph Lipka
+
+    [unix] Make `.configure` script `COMPILED_BY` parameter optional,
+    defaulting to login name.
+
+Commit 63580949 on 2018-09-09 by Christoph Lipka
+
+    Fix bug introduced with commit 1d120c90.
+
+Commit 0984776b on 2018-09-09 by Christoph Lipka
+
+    Update git pre-commit hook. Please copy `tools/git/hooks/pre-commit`
+    to `.git/hooks/`.
+
+Commit 2843d762 on 2018-09-08 by Christoph Lipka
+
+    Fix blatant coding error in POVMS UCS2 string handling.
+
+Commit 264fa229 on 2018-09-07 by Christoph Lipka
+
+    Fix clang build error introduced with previous commit, and silence a
+    few more clang warnings.
+
+Commit 1d120c90 on 2018-09-07 by Christoph Lipka
+
+    Silence some clang warnings.
+
+Commit f09a7b4f on 2018-09-02 by Christoph Lipka
+
+    Disable new UV mappings of cylinder, cone and lemon primitives for now.
+
+Commit d20c6d42 on 2018-08-27 by Christoph Lipka
+
+    Improve `#breakpoint` debugging aid.
+    Also update changelog.
+
+------------------------------------------------------------------------------
+POV-Ray v3.8.0-alpha.9811560
+------------------------------------------------------------------------------
+
+Commit c42e14e7 on 2018-08-27 by Christoph Lipka
+
+    Fix hard crash in `#declare Foo[A][B]=...` if `Foo` is an array of
+    arrays and `Foo[A]` is uninitialized.
+
+Commit 669144e1 on 2018-06-17 by Christoph Lipka
+
+    Fix bug in legacy `version` setting.
+
+Commit ecad9eb1 on 2018-05-27 by Grimbert Jérôme
+
+    Correct (historical) typo for Julia fractal with hypercomplex (#359)
+
+    a small typo, a huge impact on rendered fractal (where .y component was
+    used also as .z, ignoring the provided .z )
+
+Commit 851a509b on 2018-05-22 by Christoph Lipka
+
+    Merge remote-tracking branch 'origin/master'
+
+Commit d825eccf on 2018-05-22 by Christoph Lipka
+
+    Update maintenance status in README.md
+
+Commit e561dfb2 on 2018-05-22 by Christoph Lipka
+
+    Fix another build error on Windows.
+
+Commit cb744d84 on 2018-05-22 by Christoph Lipka
+
+    Check in a file that accidently didn't make it into ef3c54f8.
+
+Commit d6cee867 on 2018-05-21 by Christoph Lipka
+
+    [ci skip] Bring unit test project back to life.
+
+Commit ef3c54f8 on 2018-05-04 by Christoph Lipka
+
+    Eliminate use of `POV_LONG` in the role as 64-bit file offset, and
+    redirect references to `lseek64` via an obvious macro.
+
+Commit 8ef36699 on 2018-05-04 by Christoph Lipka
+
+    Move parser code into dedicated namespace.
+
+Commit 06a120de on 2018-05-02 by Alec Perkins
+
+    Fix typo in README.md (#356)
+
+Commit 576077ed on 2018-05-01 by Christoph Lipka
+
+    [ci skip] Some source documentation work.
+
+Commit bf0e4bf8 on 2018-04-08 by Christoph Lipka
+
+    Some updates to the coding styleguide.
+
+Commit a1ae5d69 on 2018-04-08 by Christoph Lipka
+
+    Work around thread_local-related compiler bug on Mac OS X.
+
+Commit f4ca05e0 on 2018-04-07 by Christoph Lipka
+
+    Eliminate build error in photons code.
+
+Commit 1c131b77 on 2018-04-07 by Christoph Lipka
+
+    Update revision.txt.
+
 Commit d8b8ecfe on 2018-04-07 by Christoph Lipka
 
     Fold v3.8.0 branch back into master branch for now.
@@ -932,7 +1108,7 @@ Commit 481db071 on 2017-01-09 by Christoph Lipka
 
     - Beta now _does_ use the "v3.7-beta" registry key instead of "v3.7".
     - Beta now only copies v3.6 registry data if no existing v3.7 proper
-    installation is found.
+      installation is found.
 
 Commit b6532d07 on 2017-01-09 by Christoph Lipka
 

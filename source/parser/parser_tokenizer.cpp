@@ -66,6 +66,10 @@ namespace pov_parser
 using namespace pov_base;
 using namespace pov;
 
+#if POV_DEBUG
+unsigned int gBreakpointCounter = 0;
+#endif
+
 /*****************************************************************************
 * Local preprocessor defines
 ******************************************************************************/
@@ -117,6 +121,10 @@ void Parser::Initialize_Tokenizer()
     init_sym_tables();
     Max_Trace_Level = MAX_TRACE_LEVEL_DEFAULT;
     Had_Max_Trace_Level = false;
+
+#if POV_DEBUG
+    gBreakpointCounter = 0;
+#endif
 
     CheckFileSignature();
 }
@@ -181,7 +189,7 @@ void Parser::pre_init_tokenizer ()
     token_count = 0;
     Current_Token_Count = 0;
 
-    // make sure these are nullptr otherwise cleanup() will crash if we terminate early
+    // make sure these are `nullptr` otherwise cleanup() will crash if we terminate early
     Default_Texture = nullptr;
 
     Skipping            = false;
@@ -349,7 +357,14 @@ void Parser::Get_Token ()
                 break;
 
             default:
-                Write_Token(mToken.raw);
+                if (parseRawIdentifiers || (mToken.raw.isPseudoIdentifier && (!Parsing_Directive || Inside_Ifdef)))
+                    Read_Symbol(mToken.raw);
+                else
+                {
+                    if (mToken.raw.isReservedWord && Inside_Ifdef)
+                        Warning("Trying to test whether a reserved keyword is defined. Test result may not be what you expect.");
+                    Write_Token(mToken.raw);
+                }
                 break;
         }
     }
@@ -440,27 +455,26 @@ void Parser::Read_Symbol(const RawToken& rawToken)
     RawToken nextRawToken;
     bool haveNextRawToken;
 
-    /* If its a reserved keyword, write it and return */
-    if ( (Temp_Entry = Find_Symbol(SYM_TABLE_RESERVED, rawToken.lexeme.text.c_str())) != nullptr)
+    if (rawToken.isReservedWord && !parseRawIdentifiers)
     {
-        POV_PARSER_ASSERT(false);
+        // Normally, this function shouldn't be called with reserved words.
+        // Exceptions are a few keywords that behave like identifiers in certain contexts,
+        // such as `global` and `local` which may behave like dictionaries.
+        POV_PARSER_ASSERT(rawToken.isPseudoIdentifier);
 
-        if (!Parsing_Directive && (Temp_Entry->Token_Number == LOCAL_TOKEN))
+        if (rawToken.id == LOCAL_TOKEN)
         {
+            POV_PARSER_ASSERT(!Parsing_Directive || Inside_Ifdef);
             pseudoDictionary = Table_Index;
         }
-        else if (!Parsing_Directive && (Temp_Entry->Token_Number == GLOBAL_TOKEN))
+        else if (rawToken.id == GLOBAL_TOKEN)
         {
+            POV_PARSER_ASSERT(!Parsing_Directive || Inside_Ifdef);
             pseudoDictionary = SYM_TABLE_GLOBAL;
-        }
-        else if (Inside_Ifdef)
-        {
-            Warning("Tried to test whether a reserved keyword is defined. Test result may not be what you expect.");
         }
         else
         {
-            Write_Token (Temp_Entry->Token_Number, rawToken);
-            return;
+            POV_PARSER_ASSERT(false);
         }
     }
 
@@ -481,11 +495,12 @@ void Parser::Read_Symbol(const RawToken& rawToken)
         {
             /* Search tables from newest to oldest */
             int firstIndex = Table_Index;
-            int lastIndex  = SYM_TABLE_RESERVED+1; // index SYM_TABLE_RESERVED is reserved for reserved words, not identifiers
+            int lastIndex  = SYM_TABLE_GLOBAL;
             for (Local_Index = firstIndex; Local_Index >= lastIndex; Local_Index--)
             {
                 /* See if it's a previously declared identifier. */
-                if ((Temp_Entry = Find_Symbol(Local_Index, rawToken.lexeme.text.c_str())) != nullptr)
+                Temp_Entry = Find_Symbol(Local_Index, rawToken.lexeme.text.c_str());
+                if (Temp_Entry != nullptr)
                 {
                     if (Temp_Entry->deprecated && !Temp_Entry->deprecatedShown)
                     {
@@ -552,6 +567,11 @@ void Parser::Read_Symbol(const RawToken& rawToken)
                             a = reinterpret_cast<POV_ARRAY *>(*(mToken.DataPtr));
                             j = 0;
 
+                            if (a == nullptr)
+                                // This happens in e.g. `#declare Foo[A][B]=...` when `Foo` is an
+                                // array of arrays and `Foo[A]` is uninitialized.
+                                Error("Attempt to access uninitialized nested array.");
+
                             for (i=0; i <= a->Dims; i++)
                             {
                                 Parse_Square_Begin();
@@ -580,6 +600,11 @@ void Parser::Read_Symbol(const RawToken& rawToken)
 
                             if (!LValue_Ok && !Inside_Ifdef)
                             {
+                                // Note that this does not (and must not) trigger in e.g.
+                                // `#declare Foo[A][B]=...` when `Foo` is an array of arrays and
+                                // `Foo[A]` is uninitialized, because until now we've only seen
+                                // `#declare Foo[A]`, which is no reason for concern as it may
+                                // just as well be part of `#declare Foo[A]=...` which is fine.
                                 if (a->DataPtrs[j] == nullptr)
                                     Error("Attempt to access uninitialized array element.");
                             }
@@ -608,11 +633,19 @@ void Parser::Read_Symbol(const RawToken& rawToken)
                                 table = Tables [pseudoDictionary];
                                 pseudoDictionary = -1;
 
-                                if (!haveNextRawToken || (nextRawToken.lexeme.category != Lexeme::kOther) ||
+                                if (!haveNextRawToken ||
+                                    (nextRawToken.lexeme.category != Lexeme::kOther) ||
                                     ((nextRawToken.lexeme.text != "[") && (nextRawToken.lexeme.text != ".")))
                                 {
-                                    Get_Token(); // ensures the error is reported at the right token
-                                    Expectation_Error("'[' or '.'");
+                                    if (Inside_Ifdef)
+                                    {
+                                        Warning("Trying to test whether a reserved keyword is defined. Test result may not be what you expect.");
+                                    }
+                                    else
+                                    {
+                                        Get_Token(); // ensures the error is reported at the right token
+                                        Expectation_Error("'[' or '.'");
+                                    }
                                 }
                             }
                             else
@@ -922,7 +955,7 @@ void Parser::Parse_Directive(int After_Hash)
     DBL Value, Value2;
     int Flag;
     char *ts;
-    Macro *PMac=nullptr;
+    Macro *PMac = nullptr;
     COND_TYPE Curr_Type = Cond_Stack.back().Cond_Type;
     LexemePosition hashPosition = mToken.raw.lexeme.position;
 
@@ -1796,8 +1829,15 @@ void Parser::Parse_Directive(int After_Hash)
 
 #if POV_DEBUG
         CASE(BREAKPOINT_TOKEN)
-            // This statement does nothing, except allow you to set a debug breakpoint here
-            // so that you can effectively trigger the debugger via an SDL command.
+            Parsing_Directive = false;
+            if (Skipping)
+            {
+                UNGET
+            }
+            else
+            {
+                Parse_Breakpoint();
+            }
             EXIT
         END_CASE
 #endif
@@ -1823,6 +1863,24 @@ void Parser::Parse_Directive(int After_Hash)
         mToken.is_dictionary_elem = false;
     }
 }
+
+#if POV_DEBUG
+void Parser::Parse_Breakpoint()
+{
+    // This function is invoked in debug builds whenever the `#breakpoint` directive is encountered
+    // in a scene or include file.
+    // Control flow is honored, e.g. `#if(0) #breakpoint #else #breakpoint #end` will trigger this
+    // function only on the second `#breakpoint` directive.
+
+    // To use the `#breakpoint` directive to immediately break program execution, place an
+    // unconditional breakpoint here.
+
+    // To use the `#breakpoint` directive to prime a breakpoint elsewhere, make that breakpoint
+    // conditional, testing for `gBreakpointCounter > 0`.
+
+    ++gBreakpointCounter;
+}
+#endif
 
 
 /*****************************************************************************
@@ -2034,14 +2092,7 @@ void Parser::init_sym_tables()
 {
     int i;
 
-    Add_Sym_Table();
-
-    for (i = 0; Reserved_Words[i].Token_Name != nullptr; i++)
-    {
-        Add_Symbol(SYM_TABLE_RESERVED,Reserved_Words[i].Token_Name,Reserved_Words[i].Token_Number);
-    }
-
-    Add_Sym_Table();
+    Add_Sym_Table(); // global symbols
 }
 
 Parser::SYM_TABLE *Parser::Create_Sym_Table (bool copyNames)
@@ -2188,7 +2239,7 @@ SYM_ENTRY *Parser::Destroy_Entry (SYM_ENTRY *Entry, bool destroyName)
 {
     SYM_ENTRY *Next;
 
-    if(Entry == nullptr)
+    if (Entry == nullptr)
         return nullptr;
 
     // always unhook the entry from hash table (if it is still member of one)
@@ -2244,7 +2295,7 @@ SYM_ENTRY *Parser::Add_Symbol (int Index,const char *Name,TokenId Number)
 {
     SYM_ENTRY *New;
 
-    New = Create_Entry (Name, Number, (Index != SYM_TABLE_RESERVED));
+    New = Create_Entry(Name, Number, true);
     Add_Entry(Index,New);
 
     return(New);
@@ -2298,7 +2349,7 @@ void Parser::Remove_Symbol (SYM_TABLE *table, const char *Name, bool is_array_el
 {
     if(is_array_elem == true)
     {
-        if(DataPtr == nullptr)
+        if (DataPtr == nullptr)
             Error("Invalid array element!");
 
         if(ttype == FLOAT_FUNCT_TOKEN)
@@ -2355,7 +2406,7 @@ void Parser::Check_Macro_Vers(void)
 Parser::Macro *Parser::Parse_Macro()
 {
     Macro *New;
-    SYM_ENTRY *Table_Entry=nullptr;
+    SYM_ENTRY *Table_Entry = nullptr;
     bool Old_Ok = Ok_To_Declare;
     MacroParameter newParameter;
 
@@ -2369,7 +2420,7 @@ Parser::Macro *Parser::Parse_Macro()
         END_CASE
 
         CASE (MACRO_ID_TOKEN)
-            Remove_Symbol(SYM_TABLE_GLOBAL,mToken.raw.lexeme.text.c_str(),false,nullptr,0);
+            Remove_Symbol(SYM_TABLE_GLOBAL, mToken.raw.lexeme.text.c_str(), false, nullptr, 0);
             Table_Entry = Add_Symbol (SYM_TABLE_GLOBAL,mToken.raw.lexeme.text.c_str(),TEMPORARY_MACRO_ID_TOKEN);
         END_CASE
 
@@ -2468,12 +2519,12 @@ Parser::Macro *Parser::Parse_Macro()
 void Parser::Invoke_Macro()
 {
     Macro *PMac=reinterpret_cast<Macro *>(mToken.Data);
-    SYM_ENTRY **Table_Entries=nullptr;
+    SYM_ENTRY **Table_Entries = nullptr;
     int i,Local_Index;
 
     Inc_CS_Index();
 
-    if(PMac == nullptr)
+    if (PMac == nullptr)
     {
         if (mToken.DataPtr != nullptr)
             PMac = reinterpret_cast<Macro*>(*(mToken.DataPtr));
@@ -2575,7 +2626,7 @@ void Parser::Invoke_Macro()
         else
         {
             is = Locate_File (PMac->source.sourceName, POV_File_Text_Macro, ign, true);
-            if(is == nullptr)
+            if (is == nullptr)
                 Error ("Cannot open macro file '%s'.", UCS2toASCIIString(PMac->source.sourceName).c_str());
         }
         mTokenizer.SetInputStream(is);
@@ -2891,23 +2942,23 @@ void Parser::Parse_Fopen(void)
 
         CASE(WRITE_TOKEN)
             wfile = CreateFile(fileName.c_str(), POV_File_Text_User, false);
-            if(wfile != nullptr)
+            if (wfile != nullptr)
                 New->Out_File = std::make_shared<OTextStream>(fileName.c_str(), wfile);
             else
                 New->Out_File = nullptr;
 
-            if(New->Out_File == nullptr)
+            if (New->Out_File == nullptr)
                 Error ("Cannot open user file %s (write).", UCS2toASCIIString(fileName).c_str());
         END_CASE
 
         CASE(APPEND_TOKEN)
             wfile = CreateFile(fileName.c_str(), POV_File_Text_User, true);
-            if(wfile != nullptr)
+            if (wfile != nullptr)
                 New->Out_File = std::make_shared<OTextStream>(fileName.c_str(), wfile);
             else
                 New->Out_File = nullptr;
 
-            if(New->Out_File == nullptr)
+            if (New->Out_File == nullptr)
                 Error ("Cannot open user file %s (append).", UCS2toASCIIString(fileName).c_str());
         END_CASE
 
@@ -2933,7 +2984,7 @@ void Parser::Parse_Fclose(void)
             Got_EOF=false;
             Data->inTokenizer = nullptr;
             Data->Out_File = nullptr;
-            Remove_Symbol (SYM_TABLE_GLOBAL,mToken.raw.lexeme.text.c_str(),false,nullptr,0);
+            Remove_Symbol(SYM_TABLE_GLOBAL, mToken.raw.lexeme.text.c_str(), false, nullptr, 0);
         END_CASE
 
         OTHERWISE
@@ -2959,7 +3010,7 @@ void Parser::Parse_Read()
     if (User_File->busyParsing)
         Error ("Can't nest directives accessing the same file.");
     File_Id=POV_STRDUP(mToken.raw.lexeme.text.c_str());
-    if(User_File->inTokenizer == nullptr)
+    if (User_File->inTokenizer == nullptr)
         Error("Cannot read from file %s because the file is open for writing only.", UCS2toASCIIString(UCS2String(User_File->Out_File->name())).c_str());
 
     // Safeguard against accidental nesting of other file access directives inside the `#fopen`
@@ -3038,7 +3089,7 @@ void Parser::Parse_Read()
     {
         Got_EOF=false;
         User_File->inTokenizer = nullptr;
-        Remove_Symbol (SYM_TABLE_GLOBAL,File_Id,false,nullptr,0);
+        Remove_Symbol(SYM_TABLE_GLOBAL, File_Id, false, nullptr, 0);
     }
     POV_FREE(File_Id);
 }
@@ -3052,7 +3103,7 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File, TokenId Previous, TokenId *Nu
     DBL val = 0.0;
     bool ungetToken = false;
 
-    if(User_File->inTokenizer == nullptr)
+    if (User_File->inTokenizer == nullptr)
         Error("Cannot read from file '%s' because the file is open for writing only.", UCS2toASCIIString(UCS2String(User_File->Out_File->name())).c_str());
 
     if (User_File->ReadNextToken())
@@ -3182,7 +3233,7 @@ void Parser::Parse_Write(void)
     User_File=reinterpret_cast<DATA_FILE *>(mToken.Data);
     if (User_File->busyParsing)
         Error ("Can't nest directives accessing the same file.");
-    if(User_File->Out_File == nullptr)
+    if (User_File->Out_File == nullptr)
         Error("Cannot write to file %s because the file is open for reading only.", UCS2toASCIIString(User_File->inTokenizer->GetSourceName()).c_str());
 
     // Safeguard against accidental nesting of other file access directives inside the `#fopen`
@@ -3516,7 +3567,7 @@ void Parser::IncludeHeader(const UCS2String& formalFileName)
     maIncludeStack.push_back(mTokenizer.GetHotBookmark());
 
     shared_ptr<IStream> is = Locate_File (formalFileName.c_str(),POV_File_Text_INC,actualFileName,true);
-    if(is == nullptr)
+    if (is == nullptr)
         Error ("Cannot open include file %s.", UCS2toASCIIString(formalFileName).c_str());
 
     mTokenizer.SetInputStream(is);

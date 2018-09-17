@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -446,7 +446,7 @@ bool Sor::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
     int i;
     DBL r0, r;
     Vector3d P;
-    SOR_SPLINE_ENTRY *Entry=NULL;
+    SOR_SPLINE_ENTRY *Entry = nullptr;
 
     /* Transform the point into the surface of revolution space. */
 
@@ -764,7 +764,7 @@ Sor::Sor() : ObjectBase(SOR_OBJECT)
 {
     Trans = Create_Transform();
 
-    Spline = NULL;
+    Spline = nullptr;
 
     Radius2             = 0.0;
     Base_Radius_Squared = 0.0;
@@ -962,7 +962,7 @@ void Sor::Compute_Sor(Vector2d *P, TraceThreadData *Thread)
 
     /* Allocate Number segments. */
 
-    if (Spline == NULL)
+    if (Spline == nullptr)
     {
         Spline = new SOR_SPLINE;
 

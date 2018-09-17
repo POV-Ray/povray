@@ -603,8 +603,8 @@ VirtualFrontEnd::VirtualFrontEnd(vfeSession& session, POVMSContext ctx, POVMSAdd
   backendAddress = addr ;
   state = kReady ;
   m_PostPauseState = kReady;
-  consoleResult = nullptr ;
-  displayResult = nullptr ;
+  consoleResult = nullptr;
+  displayResult = nullptr;
   m_PauseRequested = m_PausedAfterFrame = false;
   renderFrontend.ConnectToBackend(backendAddress, msg, result, console);
 }
@@ -802,6 +802,10 @@ bool VirtualFrontEnd::Stop()
           state = kStopping;
         }
         result = true;
+        break;
+
+      default:
+        // Do nothing special.
         break;
     }
   }
@@ -1141,16 +1145,22 @@ State VirtualFrontEnd::Process()
           }
 
           // now we display the render window, if enabled
-          shared_ptr<Display> display(GetDisplay());
-          if (display != nullptr)
           {
-            vfeDisplay *disp = dynamic_cast<vfeDisplay *>(display.get());
-            if (disp != nullptr)
-              disp->Show () ;
+            shared_ptr<Display> display(GetDisplay());
+            if (display != nullptr)
+            {
+              vfeDisplay *disp = dynamic_cast<vfeDisplay *>(display.get());
+              if (disp != nullptr)
+                disp->Show () ;
+            }
           }
           return state = kRendering;
+
+        default:
+          // Do nothing special.
+          return state;
       }
-      return kParsing;
+      POV_ASSERT(false); // All cases of the preceding switch should return.
 
     case kRendering:
     case kPausedRendering:
@@ -1326,7 +1336,11 @@ State VirtualFrontEnd::Process()
 
     case kDone:
       return state = kReady;
+
+    default:
+      return state;
   }
+  POV_ASSERT(false); // All cases of the preceding switch should return.
 
   return state;
 }

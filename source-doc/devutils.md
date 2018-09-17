@@ -19,6 +19,11 @@ Git Utilities
         The newly generated `revision.txt` is _not_ intended to be committed as-is, but rather merged with the
         previous version manually.
 
+  - `git update-index --skip-workspace FILENAME`: Use this git command for any file that you have to
+    change in your workspace but don't want to include in any commits nor have it overwritten
+    during a reset (e.g. `source/base/build.h`, which must be edited in a Windows build environment
+    to placate the `BUILT_BY` mechanism).
+
 
 Visual Studio 2010 Utilities
 ============================

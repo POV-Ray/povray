@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -55,8 +55,9 @@ namespace pov
 
 using namespace pov_base;
 
-RadiosityTask::RadiosityTask(ViewData *vd, DBL ptsz, DBL ptesz, unsigned int pts, unsigned int ptsc, unsigned int nt) :
-    RenderTask(vd, "Radiosity", vd->GetViewId()),
+RadiosityTask::RadiosityTask(ViewData *vd, DBL ptsz, DBL ptesz, unsigned int pts, unsigned int ptsc, unsigned int nt,
+                             size_t seed) :
+    RenderTask(vd, seed, "Radiosity", vd->GetViewId()),
     trace(vd->GetSceneData(), &vd->GetCamera(), GetViewDataPtr(), vd->GetSceneData()->parsedMaxTraceLevel, vd->GetSceneData()->parsedAdcBailout,
           vd->GetQualityFeatureFlags(), cooperate, media, radiosity, !vd->GetSceneData()->radiositySettings.vainPretrace),
     cooperate(*this),
@@ -104,7 +105,7 @@ void RadiosityTask::Run()
             if (pInfo)
             {
                 delete pInfo;
-                pInfo = NULL;
+                pInfo = nullptr;
             }
             pBlockInfo = new RadiosityBlockInfo();
         }
@@ -236,7 +237,7 @@ void RadiosityTask::Run()
             // no more passes please
             progressWeight = 1.0 - pBlockInfo->completion;
             delete pBlockInfo;
-            pBlockInfo = NULL;
+            pBlockInfo = nullptr;
         }
 
         GetViewDataPtr()->AfterTile();

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -85,7 +85,7 @@ using namespace pov_base;
    the specifications provided in this table. The first element is the
    INI-file keyword, the second element is the POVMS object attribute
    key, the third is the attribute type. Entries with a POVMS attribute
-   key of 0 are superceded options that will generate a warning that the
+   key of 0 are obsolete options that will generate a warning that the
    option no longer is supported and will generate an error in a later
    (unspecified) version of POV.
 */
@@ -93,10 +93,11 @@ struct ProcessOptions::INI_Parser_Table RenderOptions_INI_Table[] =
 {
     { "All_Console",         kPOVAttrib_AllConsole,         kPOVMSType_Bool },
     { "All_File",            kPOVAttrib_AllFile,            kPOVMSType_UCS2String },
-    { "Antialias_Depth",     kPOVAttrib_AntialiasDepth,     kPOVMSType_Int },
     { "Antialias",           kPOVAttrib_Antialias,          kPOVMSType_Bool },
-    { "Antialias_Threshold", kPOVAttrib_AntialiasThreshold, kPOVMSType_Float },
+    { "Antialias_Confidence",kPOVAttrib_AntialiasConfidence,kPOVMSType_Float },
+    { "Antialias_Depth",     kPOVAttrib_AntialiasDepth,     kPOVMSType_Int },
     { "Antialias_Gamma",     kPOVAttrib_AntialiasGamma,     kPOVMSType_Float },
+    { "Antialias_Threshold", kPOVAttrib_AntialiasThreshold, kPOVMSType_Float },
     { "Append_File",         kPOVAttrib_AppendConsoleFiles, kPOVMSType_Bool },
 
     { "Bits_Per_Color",      kPOVAttrib_BitsPerColor,       kPOVMSType_Int,         kINIOptFlag_SuppressWrite },
@@ -205,6 +206,7 @@ struct ProcessOptions::INI_Parser_Table RenderOptions_INI_Table[] =
     { "Start_Row",           kPOVAttrib_Top,                kPOVMSType_Float },
     { "Statistic_Console",   kPOVAttrib_StatisticsConsole,  kPOVMSType_Bool },
     { "Statistic_File",      kPOVAttrib_StatisticsFile,     kPOVMSType_UCS2String },
+    { "Stochastic_Seed",     kPOVAttrib_StochasticSeed,     kPOVMSType_Int },
     { "Subset_End_Frame",    kPOVAttrib_SubsetEndFrame,     kPOVMSType_Float },
     { "Subset_Start_Frame",  kPOVAttrib_SubsetStartFrame,   kPOVMSType_Float },
 
@@ -225,7 +227,7 @@ struct ProcessOptions::INI_Parser_Table RenderOptions_INI_Table[] =
     { "Width",               kPOVAttrib_Width,              kPOVMSType_Int },
     { "Work_Threads",        kPOVAttrib_MaxRenderThreads,   kPOVMSType_Int },
 
-    { NULL, 0, 0 }
+    { nullptr, 0, 0 }
 };
 
 /*
@@ -246,6 +248,7 @@ struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
 {
     //       Parameter setting              Parameter type          Boolean setting
 
+    { "AC",  kPOVAttrib_AntialiasConfidence,kPOVMSType_Float,       kNoParameter },
     { "AG",  kPOVAttrib_AntialiasGamma,     kPOVMSType_Float,       kNoParameter },
     { "AM",  kPOVAttrib_SamplingMethod,     kPOVMSType_Int,         kNoParameter },
     { "A",   kPOVAttrib_AntialiasThreshold, kPOVMSType_Float,       kPOVAttrib_Antialias,           kCmdOptFlag_Optional },
@@ -318,6 +321,7 @@ struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
     { "SF",  kPOVAttrib_SubsetStartFrame,   kPOVMSType_Int,         kNoParameter },
     { "SP",  kPOVAttrib_PreviewStartSize,   kPOVMSType_Int,         kNoParameter },
     { "SR",  kPOVAttrib_Top,                kPOVMSType_Float,       kNoParameter },
+    { "SS",  kPOVAttrib_StochasticSeed,     kPOVMSType_Int,         kNoParameter },
     { "STP", kPOVAttrib_FrameStep,          kPOVMSType_Int,         kNoParameter },
     { "SU",  kNoParameter,                  kNoParameter,           kPOVAttrib_SplitUnions },
 
@@ -339,7 +343,7 @@ struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
 
     { "X",   kPOVAttrib_TestAbortCount,     kUseSpecialHandler,     kPOVAttrib_TestAbort,           kCmdOptFlag_Optional },
 
-    { NULL }
+    { nullptr }
 };
 
 // TODO FIXME - The following are hacks of some sort, no idea what they are good for. They certainly use wrong types and probably contain other mistakes [trf]
@@ -443,18 +447,18 @@ int ProcessRenderOptions::ReadSpecialOptionHandler(INI_Parser_Table *option, cha
                 err = POVMSObject_New(&decobj, kPOVMSType_WildCard);
             if(err == kNoErr)
             {
-                char *ptr = NULL;
+                char *ptr = nullptr;
 
                 err = POVMSUtil_SetString(&decobj, kPOVAttrib_Identifier, strtok(param, "="));
                 if(err == kNoErr)
                 {
-                    ptr = strtok(NULL, "");
-                    if(ptr == NULL)
+                    ptr = strtok(nullptr, "");
+                    if (ptr == nullptr)
                         err = kParseErr;
                 }
                 if(err == kNoErr)
                 {
-                    if(strchr(ptr, '"') != NULL)
+                    if (strchr(ptr, '"') != nullptr)
                     {
                         ptr = strchr(ptr, '"') + 1;
                         strtok(ptr, "\"");
@@ -830,7 +834,7 @@ int ProcessRenderOptions::ProcessUnknownString(char *str, POVMSObjectPtr obj)
     int state = 0; // INI file
     int err = kNoErr;
 
-    if(str == NULL)
+    if (str == nullptr)
     {
         ParseError("Expected filename, nothing was found.");
         return kParamErr;
@@ -842,7 +846,7 @@ int ProcessRenderOptions::ProcessUnknownString(char *str, POVMSObjectPtr obj)
     if(state == 0)
     {
         char *ptr = strrchr(str, '.');
-        if(ptr != NULL)
+        if (ptr != nullptr)
         {
             if(pov_stricmp(ptr, ".pov") == 0)
                 state = 1; // POV file
@@ -947,12 +951,12 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
     int ll;
     POVMSAttribute attr, item;
     const char *xstr = strrchr(filename, '.');
-    bool hasextension = ((xstr != NULL) && (strlen(xstr) <= 4)); // TODO FIXME - we shouldn't rely on extensions being at most 1+3 chars long
+    bool hasextension = ((xstr != nullptr) && (strlen(xstr) <= 4)); // TODO FIXME - we shouldn't rely on extensions being at most 1+3 chars long
 
     // TODO - the following statement may need reviewing; before it was changed from a macro to a PlatformBase call,
     //        it carried a comment "TODO FIXME - Remove dependency on this macro!!! [trf]".
     if (!PlatformBase::GetInstance().AllowLocalFileAccess (ASCIItoUCS2String(filename),stype, false))
-        return NULL;
+        return nullptr;
 
     for(i = 0; i < POV_FILE_EXTENSIONS_PER_TYPE; i++)
     {
@@ -982,12 +986,12 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
     }
 
     if(POVMSObject_Get(obj, &attr, kPOVAttrib_LibraryPath) != 0)
-        return NULL;
+        return nullptr;
 
     if(POVMSAttrList_Count(&attr, &cnt) != 0)
     {
         (void)POVMSAttrList_Delete(&attr);
-        return NULL;
+        return nullptr;
     }
 
     for (i = 1; i <= cnt; i++)
@@ -1045,7 +1049,7 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
     else
         ParseError("Could not find file '%s'", filename);
 
-    return NULL;
+    return nullptr;
 }
 
 // TODO - the following code might need reviewing, according to trf
@@ -1092,7 +1096,7 @@ struct ProcessRenderOptions::Parameter_Code_Table GammaTypeTable[] =
     { "SRGB",       kPOVList_GammaType_SRGB },
 
     // end-of-list marker
-    { NULL,         0 }
+    { nullptr,      0 }
 };
 
 /* Supported dither types */
@@ -1108,7 +1112,7 @@ struct ProcessRenderOptions::Parameter_Code_Table DitherMethodTable[] =
     { "FS",     kPOVList_DitherMethod_FloydSteinberg },
 
     // end-of-list marker
-    { NULL,     0 }
+    { nullptr,  0 }
 };
 
 int ProcessRenderOptions::ParseFileType(char code, POVMSType attribute, int* pInternalId, bool* pHas16BitGreyscale)
@@ -1120,7 +1124,7 @@ int ProcessRenderOptions::ParseFileType(char code, POVMSType attribute, int* pIn
         if ( (toupper(code) == FileTypeTable[i].code) &&
              ((FileTypeTable[i].attribute == 0) || (FileTypeTable[i].attribute == attribute )) )
         {
-            if (pHas16BitGreyscale != NULL)
+            if (pHas16BitGreyscale != nullptr)
                 *pHas16BitGreyscale = FileTypeTable[i].has16BitGrayscale;
             *pInternalId = FileTypeTable[i].internalId;
             break;
@@ -1173,7 +1177,7 @@ int ProcessRenderOptions::ParseParameterCode(const ProcessRenderOptions::Paramet
 {
     for (int i = 0; code[i] != '\0'; i ++)
         code[i] = toupper(code[i]);
-    for (int i = 0; codeTable[i].code != NULL; i ++)
+    for (int i = 0; codeTable[i].code != nullptr; i ++)
     {
         if ( strcmp(code, codeTable[i].code) == 0 )
         {
@@ -1186,10 +1190,10 @@ int ProcessRenderOptions::ParseParameterCode(const ProcessRenderOptions::Paramet
 
 const char* ProcessRenderOptions::UnparseParameterCode(const ProcessRenderOptions::Parameter_Code_Table* codeTable, int internalId)
 {
-    for (int i = 0; codeTable[i].code != NULL; i ++)
+    for (int i = 0; codeTable[i].code != nullptr; i ++)
         if (internalId == codeTable[i].internalId)
             return codeTable[i].code;
-    return NULL;
+    return nullptr;
 }
 
 }
