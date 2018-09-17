@@ -357,7 +357,14 @@ void Parser::Get_Token ()
                 break;
 
             default:
-                Write_Token(mToken.raw);
+                if (parseRawIdentifiers || (mToken.raw.isPseudoIdentifier && (!Parsing_Directive || Inside_Ifdef)))
+                    Read_Symbol(mToken.raw);
+                else
+                {
+                    if (mToken.raw.isReservedWord && Inside_Ifdef)
+                        Warning("Trying to test whether a reserved keyword is defined. Test result may not be what you expect.");
+                    Write_Token(mToken.raw);
+                }
                 break;
         }
     }
@@ -448,28 +455,26 @@ void Parser::Read_Symbol(const RawToken& rawToken)
     RawToken nextRawToken;
     bool haveNextRawToken;
 
-    /* If its a reserved keyword, write it and return */
-    Temp_Entry = Find_Symbol(SYM_TABLE_RESERVED, rawToken.lexeme.text.c_str());
-    if (Temp_Entry != nullptr)
+    if (rawToken.isReservedWord && !parseRawIdentifiers)
     {
-        POV_PARSER_ASSERT(false);
+        // Normally, this function shouldn't be called with reserved words.
+        // Exceptions are a few keywords that behave like identifiers in certain contexts,
+        // such as `global` and `local` which may behave like dictionaries.
+        POV_PARSER_ASSERT(rawToken.isPseudoIdentifier);
 
-        if (!Parsing_Directive && (Temp_Entry->Token_Number == LOCAL_TOKEN))
+        if (rawToken.id == LOCAL_TOKEN)
         {
+            POV_PARSER_ASSERT(!Parsing_Directive || Inside_Ifdef);
             pseudoDictionary = Table_Index;
         }
-        else if (!Parsing_Directive && (Temp_Entry->Token_Number == GLOBAL_TOKEN))
+        else if (rawToken.id == GLOBAL_TOKEN)
         {
+            POV_PARSER_ASSERT(!Parsing_Directive || Inside_Ifdef);
             pseudoDictionary = SYM_TABLE_GLOBAL;
-        }
-        else if (Inside_Ifdef)
-        {
-            Warning("Tried to test whether a reserved keyword is defined. Test result may not be what you expect.");
         }
         else
         {
-            Write_Token (Temp_Entry->Token_Number, rawToken);
-            return;
+            POV_PARSER_ASSERT(false);
         }
     }
 
@@ -490,7 +495,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
         {
             /* Search tables from newest to oldest */
             int firstIndex = Table_Index;
-            int lastIndex  = SYM_TABLE_RESERVED+1; // index SYM_TABLE_RESERVED is reserved for reserved words, not identifiers
+            int lastIndex  = SYM_TABLE_GLOBAL;
             for (Local_Index = firstIndex; Local_Index >= lastIndex; Local_Index--)
             {
                 /* See if it's a previously declared identifier. */
@@ -628,11 +633,19 @@ void Parser::Read_Symbol(const RawToken& rawToken)
                                 table = Tables [pseudoDictionary];
                                 pseudoDictionary = -1;
 
-                                if (!haveNextRawToken || (nextRawToken.lexeme.category != Lexeme::kOther) ||
+                                if (!haveNextRawToken ||
+                                    (nextRawToken.lexeme.category != Lexeme::kOther) ||
                                     ((nextRawToken.lexeme.text != "[") && (nextRawToken.lexeme.text != ".")))
                                 {
-                                    Get_Token(); // ensures the error is reported at the right token
-                                    Expectation_Error("'[' or '.'");
+                                    if (Inside_Ifdef)
+                                    {
+                                        Warning("Trying to test whether a reserved keyword is defined. Test result may not be what you expect.");
+                                    }
+                                    else
+                                    {
+                                        Get_Token(); // ensures the error is reported at the right token
+                                        Expectation_Error("'[' or '.'");
+                                    }
                                 }
                             }
                             else
@@ -2079,14 +2092,7 @@ void Parser::init_sym_tables()
 {
     int i;
 
-    Add_Sym_Table();
-
-    for (i = 0; Reserved_Words[i].Token_Name != nullptr; i++)
-    {
-        Add_Symbol(SYM_TABLE_RESERVED,Reserved_Words[i].Token_Name,Reserved_Words[i].Token_Number);
-    }
-
-    Add_Sym_Table();
+    Add_Sym_Table(); // global symbols
 }
 
 Parser::SYM_TABLE *Parser::Create_Sym_Table (bool copyNames)
@@ -2289,7 +2295,7 @@ SYM_ENTRY *Parser::Add_Symbol (int Index,const char *Name,TokenId Number)
 {
     SYM_ENTRY *New;
 
-    New = Create_Entry (Name, Number, (Index != SYM_TABLE_RESERVED));
+    New = Create_Entry(Name, Number, true);
     Add_Entry(Index,New);
 
     return(New);

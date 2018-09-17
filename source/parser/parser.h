@@ -104,8 +104,7 @@ typedef unsigned short SymTableEntryRefCount;
 
 // Special symbol tables
 enum {
-    SYM_TABLE_RESERVED = 0,        // reserved words
-    SYM_TABLE_GLOBAL,              // identifiers declared using #declare (or #local in top-level file), #function, #macro, etc.
+    SYM_TABLE_GLOBAL = 0,       ///< Identifiers declared using #declare (or #local in top-level file), #function, #macro, etc.
 };
 
 /// Structure holding information about a symbol

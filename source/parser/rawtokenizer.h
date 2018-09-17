@@ -146,6 +146,14 @@ struct RawToken
     /// _cooked tokenizer_ to carry the value of the identifier.
     ConstValuePtr value;
 
+    /// Whether the token is a reserved word.
+    /// @note
+    ///     This flag is _not_ set for operators.
+    bool isReservedWord : 1;
+
+    /// Whether the token is a keyword with identifier-like properties.
+    bool isPseudoIdentifier : 1;
+
     /// Helper function to get the token ID.
     /// For identifiers, this function returns @ref IDENTIFIER_TOKEN. For all
     /// other tokens, this function returns @ref id as a @ref TokenId value.
@@ -230,6 +238,8 @@ private:
     {
         int     id;
         TokenId expressionId;
+        bool    isReservedWord     : 1;
+        bool    isPseudoIdentifier : 1;
         KnownWordInfo();
     };
 

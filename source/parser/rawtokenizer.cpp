@@ -79,7 +79,10 @@ TokenId RawToken::GetTokenId() const
 //******************************************************************************
 
 RawTokenizer::KnownWordInfo::KnownWordInfo() :
-    id(int(NOT_A_TOKEN))
+    id(int(NOT_A_TOKEN)),
+    expressionId(NOT_A_TOKEN),
+    isReservedWord(false),
+    isPseudoIdentifier(false)
 {}
 
 //******************************************************************************
@@ -93,8 +96,11 @@ RawTokenizer::RawTokenizer() :
             continue;
         if (strchr(i->Token_Name, ' ') != nullptr)
             continue;
-        mKnownWords[i->Token_Name].id = i->Token_Number;
-        mKnownWords[i->Token_Name].expressionId = GetExpressionId(i->Token_Number);
+        KnownWordInfo& knownWord = mKnownWords[i->Token_Name];
+        knownWord.id = i->Token_Number;
+        knownWord.expressionId = GetExpressionId(i->Token_Number);
+        knownWord.isReservedWord = true;
+        knownWord.isPseudoIdentifier = ((knownWord.id == GLOBAL_TOKEN) || (knownWord.id == LOCAL_TOKEN));
     }
 }
 
@@ -142,6 +148,8 @@ bool RawTokenizer::GetNextDirective(RawToken& token)
     token.id = TokenId::HASH_TOKEN;
     token.expressionId = TokenId::HASH_TOKEN;
     token.value = nullptr;
+    token.isReservedWord = false;
+    token.isPseudoIdentifier = false;
 
     return true;
 }
@@ -160,6 +168,8 @@ bool RawTokenizer::ProcessWordLexeme(RawToken& token)
     token.id = i.id;
     token.expressionId = i.expressionId;
     token.value = nullptr;
+    token.isReservedWord = i.isReservedWord;
+    token.isPseudoIdentifier = i.isPseudoIdentifier;
 
     return true;
 }
@@ -173,6 +183,9 @@ bool RawTokenizer::ProcessFloatLiteralLexeme(RawToken& token)
 
     if (sscanf(token.lexeme.text.c_str(), POV_DBL_FORMAT_STRING, &token.floatValue) == 0)
         return false;
+
+    token.isReservedWord = false;
+    token.isPseudoIdentifier = false;
 
     return true;
 }
@@ -292,6 +305,8 @@ bool RawTokenizer::ProcessStringLiteralLexeme(RawToken& token)
     }
 
     token.value = pValue;
+    token.isReservedWord = false;
+    token.isPseudoIdentifier = false;
 
     return true;
 }
@@ -386,6 +401,8 @@ bool RawTokenizer::ProcessOtherLexeme(RawToken& token)
     token.id = int(tokenId);
     token.expressionId = GetExpressionId(tokenId);
     token.value = nullptr;
+    token.isReservedWord = false;
+    token.isPseudoIdentifier = false;
 
     return true;
 }
@@ -405,6 +422,8 @@ bool RawTokenizer::ProcessSignatureLexeme(RawToken& token)
     token.id = int(tokenId);
     token.expressionId = GetExpressionId(tokenId);
     token.value = nullptr;
+    token.isReservedWord = false;
+    token.isPseudoIdentifier = false;
 
     return true;
 }

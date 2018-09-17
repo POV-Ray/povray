@@ -58,6 +58,9 @@ Changed Behaviour
     for now, due to their orientation being poorly defined.
   - An age-old bug in the inbuilt `f_enneper` isosurface function has been
     fixed; the function now results in the originally intended shape.
+  - The `defined()` pseudo-function now returns `true` (while printing a
+    warning) if applied to reserved words. The `#ifdef` and `#ifndef` directives
+    also behave accordingly.
 
 New Features
 ------------
