@@ -43,6 +43,8 @@
 #include <boost/format.hpp>
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
+#include <boost/interprocess/file_mapping.hpp>
+#include <boost/interprocess/mapped_region.hpp>
 
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
@@ -212,8 +214,10 @@ namespace vfe
 
     protected:
       vfeSession *m_Session;
-      vector<RGBA8> m_Pixels;
+      void *m_Buffer;
       bool m_VisibleOnCreation;
+      boost::interprocess::file_mapping  *m_FileMapping;
+      boost::interprocess::mapped_region *m_MappedRegion;
   };
 
   class VirtualFrontEnd

@@ -37,6 +37,8 @@
 
 #include "backend/frame.h"
 #include "vfe.h"
+#include <iostream>
+#include <fstream>
 
 // this must be the last file included
 #include "syspovdebug.h"
@@ -50,21 +52,58 @@
 namespace vfe
 {
 
+struct vfeDisplayBufferHeader
+{
+  uint32_t Version;
+  uint32_t Width;
+  uint32_t Height;
+  uint32_t PixelsWritten;
+  uint32_t PixelsRead;
+};
+
 vfeDisplay::vfeDisplay(unsigned int w, unsigned int h, GammaCurvePtr gamma, vfeSession* session, bool visible) :
   Display(w, h, gamma),
   m_Session(session),
-  m_VisibleOnCreation(visible)
+  m_VisibleOnCreation(visible),
+  m_Buffer(NULL),
+  m_FileMapping(NULL),
+  m_MappedRegion(NULL)
 {
 }
 
 vfeDisplay::~vfeDisplay()
 {
+  Clear();
 }
 
 void vfeDisplay::Initialise()
 {
-  m_Pixels.clear();
-  m_Pixels.resize(GetWidth() * GetHeight());
+  POVMSUCS2String SharedMemoryName = m_Session->GetOptions().GetOptions().TryGetUCS2String(kPOVAttrib_SharedMemory, "");
+  const size_t AllocSize = GetWidth() * GetHeight() * sizeof(RGBA8) + sizeof(vfeDisplayBufferHeader);
+
+  if (SharedMemoryName.empty())
+    m_Buffer = malloc(AllocSize);
+  else
+  {
+    std::string FileName = UCS2toASCIIString(SharedMemoryName);
+    std::filebuf fbuf;
+    fbuf.open(FileName, std::ios_base::in | std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
+    fbuf.pubseekoff(AllocSize, std::ios_base::beg);
+    fbuf.sputc(0);
+    fbuf.close();
+	  
+    m_FileMapping = new boost::interprocess::file_mapping(FileName.c_str(), boost::interprocess::read_write);
+    m_MappedRegion = new boost::interprocess::mapped_region(*m_FileMapping, boost::interprocess::read_write);
+
+	m_Buffer = m_MappedRegion->get_address();
+
+    vfeDisplayBufferHeader* Header = (vfeDisplayBufferHeader*)m_Buffer;
+    Header->Version = 1;
+    Header->Width = GetWidth();
+    Header->Height = GetHeight();
+    Header->PixelsWritten = 0;
+    Header->PixelsRead = 0;
+  }
 }
 
 void vfeDisplay::Close()
@@ -82,7 +121,10 @@ void vfeDisplay::Hide()
 void vfeDisplay::DrawPixel(unsigned int x, unsigned int y, const RGBA8& colour)
 {
   assert (x < GetWidth() && y < GetHeight());
-  m_Pixels[y * GetHeight() + x] = colour;
+  vfeDisplayBufferHeader* Header = (vfeDisplayBufferHeader*)m_Buffer;
+  RGBA8* Pixels = (RGBA8*)(Header + 1);
+  Pixels[y * GetWidth() + x] = colour;
+  Header->PixelsWritten++;
 }
 
 void vfeDisplay::DrawRectangleFrame(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8& colour)
@@ -102,7 +144,16 @@ void vfeDisplay::DrawPixelBlock(unsigned int x1, unsigned int y1, unsigned int x
 
 void vfeDisplay::Clear()
 {
-  m_Pixels.clear();
+  if (!m_FileMapping)
+    free(m_Buffer);
+  else
+  {
+    delete m_MappedRegion;
+    m_MappedRegion = NULL;
+    delete m_FileMapping;
+    m_FileMapping = NULL;
+  }
+  m_Buffer = NULL;
 }
 
 }

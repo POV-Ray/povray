@@ -56,13 +56,13 @@ namespace pov_frontend
             UnixTextDisplay(unsigned int w, unsigned int h, GammaCurvePtr gamma, vfeSession *session, bool visible) :
                 UnixDisplay(w, h, gamma, session, visible) {};
             virtual ~UnixTextDisplay() {} ;
-            void Initialise() {};
-            void Close() {};
+			void Initialise();
+			void Close() {};
             void Show() {};
             void Hide() {};
             bool TakeOver(UnixDisplay *display) { return false; };
-            void DrawPixel(unsigned int x, unsigned int y, const RGBA8& colour);
-            bool HandleEvents() { return false; };
+			void DrawPixel(unsigned int x, unsigned int y, const RGBA8& colour);
+			bool HandleEvents() { return false; };
             void UpdateScreen(bool Force = false) {};
             void PauseWhenDoneNotifyStart() {};
             bool PauseWhenDoneResumeIsRequested() { return true; };

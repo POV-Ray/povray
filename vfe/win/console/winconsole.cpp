@@ -113,7 +113,7 @@ int main (int argc, char **argv)
   if ((s = std::getenv ("POVINC")) != nullptr)
     opts.AddLibraryPath (s);
   while (*++argv)
-    opts.AddCommand (*argv);
+    opts.AddCommand(*argv);
 
   if (session->SetOptions(opts) != vfeNoError)
     ErrorExit(session);
