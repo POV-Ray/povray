@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -134,7 +134,7 @@ bool Plane::Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Thread) 
 
     Thread->Stats()[Ray_Plane_Tests]++;
 
-    if (Trans == NULL)
+    if (Trans == nullptr)
     {
         NormalDotDirection = dot(Normal_Vector, ray.Direction);
 
@@ -206,7 +206,7 @@ bool Plane::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
     DBL Temp;
     Vector3d P;
 
-    if(Trans == NULL)
+    if (Trans == nullptr)
     {
         Temp = dot(IPoint, Normal_Vector);
     }
@@ -252,7 +252,7 @@ void Plane::Normal(Vector3d& Result, Intersection *, TraceThreadData *) const
 {
     Result = Normal_Vector;
 
-    if(Trans != NULL)
+    if (Trans != nullptr)
     {
         MTransNormal(Result, Result, Trans);
 
@@ -290,7 +290,7 @@ void Plane::Normal(Vector3d& Result, Intersection *, TraceThreadData *) const
 
 void Plane::Translate(const Vector3d& Vector, const TRANSFORM *tr)
 {
-    if(Trans == NULL)
+    if (Trans == nullptr)
     {
         Distance -= dot(Normal_Vector, Vector);
 
@@ -332,7 +332,7 @@ void Plane::Translate(const Vector3d& Vector, const TRANSFORM *tr)
 
 void Plane::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
-    if(Trans == NULL)
+    if (Trans == nullptr)
     {
         MTransDirection(Normal_Vector, Normal_Vector, tr);
 
@@ -376,7 +376,7 @@ void Plane::Scale(const Vector3d& Vector, const TRANSFORM *tr)
 {
     DBL Length;
 
-    if(Trans == NULL)
+    if (Trans == nullptr)
     {
         Normal_Vector /= Vector;
 
@@ -460,7 +460,7 @@ ObjectPtr Plane::Invert()
 
 void Plane::Transform(const TRANSFORM *tr)
 {
-    if(Trans == NULL)
+    if (Trans == nullptr)
         Trans = Create_Transform();
 
     Compose_Transforms(Trans, tr);
@@ -502,7 +502,7 @@ Plane::Plane() : ObjectBase(PLANE_OBJECT)
 
     Distance = 0.0;
 
-    Trans = NULL;
+    Trans = nullptr;
 }
 
 

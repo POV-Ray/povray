@@ -191,7 +191,7 @@ class ObjectBase
         /// Construct object from scratch.
         ObjectBase(int t) :
             Type(t),
-            Texture(NULL), Interior_Texture(NULL), interior(), Trans(NULL),
+            Texture(nullptr), Interior_Texture(nullptr), interior(), Trans(nullptr),
             Ph_Density(0), RadiosityImportance(0.0), RadiosityImportanceSet(false), Flags(0)
         {
             Make_BBox(BBox, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
@@ -212,10 +212,10 @@ class ObjectBase
         {
             if (transplant)
             {
-                o.Texture = NULL;
-                o.Interior_Texture = NULL;
+                o.Texture = nullptr;
+                o.Interior_Texture = nullptr;
                 o.interior.reset();
-                o.Trans = NULL;
+                o.Trans = nullptr;
                 o.Bound.clear();
                 o.Clip.clear();
                 o.LLights.clear();
@@ -262,6 +262,20 @@ class ObjectBase
         /// the place to do that anymore since a scene may persist between views).
         ///
         virtual void DispatchShutdownMessages(GenericMessenger& messenger) {};
+
+        /// Test texture for opacity.
+        ///
+        /// This method will be called by the parser as part of object post-processing,
+        /// to test whether the object's material is guaranteed to be fully opaque.
+        ///
+        /// The default implementation reports the object as opaque if if has a texture that is
+        /// guaranteed to be opaque (as determined by @ref Test_Opacity()), and it has either no
+        /// explicit interior texture or that texture is also guaranteed to be opaque.
+        ///
+        /// Primitives with innate textures (such as blob or mesh) must override this method, and
+        /// return false if any of their innate textures is potentially non-opaque.
+        ///
+        virtual bool IsOpaque() const;
 
     protected:
         explicit ObjectBase(const ObjectBase&) { }

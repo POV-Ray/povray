@@ -765,7 +765,7 @@ void Quadric::Compute_BBox(Vector3d& ClipMin, Vector3d& ClipMax)
             ObjectPtr p = *it;
             if (Test_Flag(p, INVERTED_FLAG) == false)
             {
-                if (dynamic_cast<Plane *> (p) != NULL)
+                if (dynamic_cast<Plane *> (p) != nullptr)
                     Compute_Plane_Min_Max(dynamic_cast<Plane *> (p), TmpMin, TmpMax);
                 else
                     Make_min_max_from_BBox(TmpMin, TmpMax, p->BBox);
@@ -1412,7 +1412,7 @@ void Quadric::Compute_Plane_Min_Max(const Plane *plane, Vector3d& Min, Vector3d&
     DBL d;
     Vector3d P, N;
 
-    if (plane->Trans == NULL)
+    if (plane->Trans == nullptr)
     {
         N = plane->Normal_Vector;
 

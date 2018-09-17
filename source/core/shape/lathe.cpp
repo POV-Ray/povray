@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -768,7 +768,7 @@ Lathe::Lathe() : ObjectBase(LATHE_OBJECT)
 
     Number = 0;
 
-    Spline = NULL;
+    Spline = nullptr;
 
     Radius1 = 0.0;
     Radius2 = 0.0;
@@ -996,7 +996,7 @@ void Lathe::Compute_Lathe(Vector2d *P, TraceThreadData *Thread)
 
     /* Allocate segments. */
 
-    if (Spline == NULL)
+    if (Spline == nullptr)
     {
         Spline = new LATHE_SPLINE;
 

@@ -530,7 +530,13 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
                 doDiffuse = 0;
                 threadData->passThruPrev = true;
             }
-            // else die
+            else
+            {
+                // die
+                doReflection = 0;
+                doRefraction = 0;
+                doDiffuse = 0;
+            }
         }
         else
         {
@@ -571,7 +577,7 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
         }
 #endif // PT_AMPLIFY_BUG
 
-        ColourChannel dummyTransm;
+        ColourChannel dummyTransm = 0.0; // Shouldn't matter, but placates static code analysis.
         TraceRay(NRay, CurLightCol, dummyTransm, (float)New_Weight, true);
 
 #ifndef PT_AMPLIFY_BUG

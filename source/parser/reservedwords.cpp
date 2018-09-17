@@ -730,7 +730,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { UTF8_SIGNATURE_TOKEN,         "UTF-8 signature BOM" },
 
     //------------------------------------------------------------------------------
-    // End of list, marked by TokenId TOKEN_COUNT_ and nullptr token string.
+    // End of list, marked by TokenId TOKEN_COUNT_ and `nullptr` token string.
 
     { TOKEN_COUNT_,                 nullptr }
 };

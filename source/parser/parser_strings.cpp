@@ -769,7 +769,7 @@ UCS2 *Parser::String_To_UCS2(const char *str)
     char_string[index_out] = 0;
     index_out++;
 
-    if(char_array != nullptr)
+    if (char_array != nullptr)
         POV_FREE(char_array);
 
     return char_string;
@@ -884,7 +884,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str)
 
     char_string = reinterpret_cast<UCS2 *>(POV_REALLOC(char_string, index_out * sizeof(UCS2), "UCS2 String"));
 
-    if(char_array != nullptr)
+    if (char_array != nullptr)
         POV_FREE(char_array);
 
     return char_string;
@@ -975,7 +975,7 @@ UCS2 *Parser::Convert_UTF8_To_UCS2(const unsigned char *text_array, int *char_ar
     size_t size = (len+1)*sizeof(UCS2);
 
     UCS2 *char_array = reinterpret_cast<UCS2 *>(POV_MALLOC(size, "Character Array"));
-    if(char_array == nullptr)
+    if (char_array == nullptr)
         throw POV_EXCEPTION_CODE(kOutOfMemoryErr);
 
     memcpy(char_array, s.c_str(), size);

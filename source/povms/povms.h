@@ -54,6 +54,19 @@
 * Global preprocessor defines
 ******************************************************************************/
 
+/// @def POVMS_NULLPTR
+/// Value representing a null pointer.
+///
+/// This macro is defined as `nullptr` if available, or `NULL` otherwise.
+///
+#if defined(__cplusplus) && ((__cplusplus >= 201103L) || POV_CPP11_SUPPORTED)
+    // C++11 or later have the unambiguous `nullptr`, so use it.
+    #define POVMS_NULLPTR nullptr
+#else
+    // C, as well as earlier C++, do not have `nullptr`, so fall back to using `NULL`.
+    #define POVMS_NULLPTR NULL
+#endif
+
 /// @def POVMS_ASSERT_OUTPUT(s,f,l)
 ///
 /// Fatal error message output.
@@ -251,7 +264,7 @@
 ///
 #ifndef POVMSAddress
     #define POVMSAddress        void *
-    #define POVMSInvalidAddress NULL
+    #define POVMSInvalidAddress POVMS_NULLPTR
 #endif
 
 /// @def POVMSResult

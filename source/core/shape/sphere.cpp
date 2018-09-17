@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -458,7 +458,7 @@ void Sphere::Rotate(const Vector3d&, const TRANSFORM *tr)
     }
     else
     {
-        if (Trans == NULL)
+        if (Trans == nullptr)
             Trans = Create_Transform();
         Compose_Transforms(Trans, tr);
 
@@ -732,7 +732,7 @@ void Sphere::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadDat
     else
     {
         New_Point = Inter->IPoint - Center;
-        if (Trans != NULL)
+        if (Trans != nullptr)
             MInvTransPoint(New_Point, New_Point, Trans);
     }
     x = New_Point[X];

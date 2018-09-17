@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -61,7 +61,9 @@ namespace pov
 class TraceTask : public RenderTask
 {
     public:
-        TraceTask(ViewData *vd, unsigned int tm, DBL js, DBL aat, unsigned int aad, pov_base::GammaCurvePtr& aag, unsigned int ps, bool psc, bool contributesToImage, bool hr);
+        TraceTask(ViewData *vd, unsigned int tm, DBL js,
+                  DBL aat, DBL aac, unsigned int aad, pov_base::GammaCurvePtr& aag,
+                  unsigned int ps, bool psc, bool contributesToImage, bool hr, size_t seed);
         virtual ~TraceTask();
 
         virtual void Run();
@@ -97,6 +99,7 @@ class TraceTask : public RenderTask
         unsigned int tracingMethod;
         DBL jitterScale;
         DBL aaThreshold;
+        DBL aaConfidence;
         unsigned int aaDepth;
         unsigned int previewSize;
         bool previewSkipCorner;
@@ -117,6 +120,7 @@ class TraceTask : public RenderTask
         void SimpleSamplingM0P();
         void NonAdaptiveSupersamplingM1();
         void AdaptiveSupersamplingM2();
+        void StochasticSupersamplingM3();
 
         void NonAdaptiveSupersamplingForOnePixel(DBL x, DBL y, RGBTColour& leftcol, RGBTColour& topcol, RGBTColour& curcol, bool& sampleleft, bool& sampletop, bool& samplecurrent);
         void SupersampleOnePixel(DBL x, DBL y, RGBTColour& col);

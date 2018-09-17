@@ -333,7 +333,7 @@ class Parser : public SceneTask
         };
 
         // constructor
-        Parser(shared_ptr<BackendSceneData> sd, bool useclock, DBL clock);
+        Parser(shared_ptr<BackendSceneData> sd, bool useclock, DBL clock, size_t seed);
 
         ~Parser();
 
@@ -490,7 +490,7 @@ class Parser : public SceneTask
         void Parse_UV_Vect (Vector2d& UV_Vect);
         void Parse_Vector (Vector3d& Vector);
         void Parse_Vector4D (VECTOR_4D Vector);
-        int Parse_Unknown_Vector (EXPRESS& Express, bool allow_identifier = false, bool *had_identifier = nullptr);
+        int Parse_Unknown_Vector(EXPRESS& Express, bool allow_identifier = false, bool *had_identifier = nullptr);
         void Parse_Scale_Vector (Vector3d& Vector);
         DBL Parse_Float_Param (void);
         void Parse_Float_Param2 (DBL *Val1, DBL *Val2);

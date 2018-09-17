@@ -214,7 +214,7 @@ namespace vfePlatform
 #ifdef HAVE_GETTIMEOFDAY
         {
             struct timeval tv;  // seconds + microseconds since the Epoch (1970-01-01)
-            if (gettimeofday(&tv, NULL) == 0)
+            if (gettimeofday(&tv, nullptr) == 0)
                 timestamp = (POV_LONG) (1000)*tv.tv_sec + tv.tv_usec/1000;
         }
 #endif

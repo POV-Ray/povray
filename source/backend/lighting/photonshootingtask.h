@@ -63,7 +63,7 @@ class PhotonShootingTask : public RenderTask
         RandomDoubleSequence rands;
         RandomDoubleSequence::Generator randgen;
 
-        PhotonShootingTask(ViewData *vd, PhotonShootingStrategy* strategy);
+        PhotonShootingTask(ViewData *vd, PhotonShootingStrategy* strategy, size_t seed);
         ~PhotonShootingTask();
 
         void Run();

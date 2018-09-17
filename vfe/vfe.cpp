@@ -603,8 +603,8 @@ VirtualFrontEnd::VirtualFrontEnd(vfeSession& session, POVMSContext ctx, POVMSAdd
   backendAddress = addr ;
   state = kReady ;
   m_PostPauseState = kReady;
-  consoleResult = nullptr ;
-  displayResult = nullptr ;
+  consoleResult = nullptr;
+  displayResult = nullptr;
   m_PauseRequested = m_PausedAfterFrame = false;
   renderFrontend.ConnectToBackend(backendAddress, msg, result, console);
 }
@@ -1150,7 +1150,7 @@ State VirtualFrontEnd::Process()
             if (display != nullptr)
             {
               vfeDisplay *disp = dynamic_cast<vfeDisplay *>(display.get());
-              if (disp != NULL)
+              if (disp != nullptr)
                 disp->Show () ;
             }
           }

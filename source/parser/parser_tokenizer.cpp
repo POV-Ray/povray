@@ -189,7 +189,7 @@ void Parser::pre_init_tokenizer ()
     token_count = 0;
     Current_Token_Count = 0;
 
-    // make sure these are nullptr otherwise cleanup() will crash if we terminate early
+    // make sure these are `nullptr` otherwise cleanup() will crash if we terminate early
     Default_Texture = nullptr;
 
     Skipping            = false;
@@ -449,7 +449,8 @@ void Parser::Read_Symbol(const RawToken& rawToken)
     bool haveNextRawToken;
 
     /* If its a reserved keyword, write it and return */
-    if ( (Temp_Entry = Find_Symbol(SYM_TABLE_RESERVED, rawToken.lexeme.text.c_str())) != nullptr)
+    Temp_Entry = Find_Symbol(SYM_TABLE_RESERVED, rawToken.lexeme.text.c_str());
+    if (Temp_Entry != nullptr)
     {
         POV_PARSER_ASSERT(false);
 
@@ -493,7 +494,8 @@ void Parser::Read_Symbol(const RawToken& rawToken)
             for (Local_Index = firstIndex; Local_Index >= lastIndex; Local_Index--)
             {
                 /* See if it's a previously declared identifier. */
-                if ((Temp_Entry = Find_Symbol(Local_Index, rawToken.lexeme.text.c_str())) != nullptr)
+                Temp_Entry = Find_Symbol(Local_Index, rawToken.lexeme.text.c_str());
+                if (Temp_Entry != nullptr)
                 {
                     if (Temp_Entry->deprecated && !Temp_Entry->deprecatedShown)
                     {
@@ -940,7 +942,7 @@ void Parser::Parse_Directive(int After_Hash)
     DBL Value, Value2;
     int Flag;
     char *ts;
-    Macro *PMac=nullptr;
+    Macro *PMac = nullptr;
     COND_TYPE Curr_Type = Cond_Stack.back().Cond_Type;
     LexemePosition hashPosition = mToken.raw.lexeme.position;
 
@@ -2231,7 +2233,7 @@ SYM_ENTRY *Parser::Destroy_Entry (SYM_ENTRY *Entry, bool destroyName)
 {
     SYM_ENTRY *Next;
 
-    if(Entry == nullptr)
+    if (Entry == nullptr)
         return nullptr;
 
     // always unhook the entry from hash table (if it is still member of one)
@@ -2341,7 +2343,7 @@ void Parser::Remove_Symbol (SYM_TABLE *table, const char *Name, bool is_array_el
 {
     if(is_array_elem == true)
     {
-        if(DataPtr == nullptr)
+        if (DataPtr == nullptr)
             Error("Invalid array element!");
 
         if(ttype == FLOAT_FUNCT_TOKEN)
@@ -2398,7 +2400,7 @@ void Parser::Check_Macro_Vers(void)
 Parser::Macro *Parser::Parse_Macro()
 {
     Macro *New;
-    SYM_ENTRY *Table_Entry=nullptr;
+    SYM_ENTRY *Table_Entry = nullptr;
     bool Old_Ok = Ok_To_Declare;
     MacroParameter newParameter;
 
@@ -2412,7 +2414,7 @@ Parser::Macro *Parser::Parse_Macro()
         END_CASE
 
         CASE (MACRO_ID_TOKEN)
-            Remove_Symbol(SYM_TABLE_GLOBAL,mToken.raw.lexeme.text.c_str(),false,nullptr,0);
+            Remove_Symbol(SYM_TABLE_GLOBAL, mToken.raw.lexeme.text.c_str(), false, nullptr, 0);
             Table_Entry = Add_Symbol (SYM_TABLE_GLOBAL,mToken.raw.lexeme.text.c_str(),TEMPORARY_MACRO_ID_TOKEN);
         END_CASE
 
@@ -2511,12 +2513,12 @@ Parser::Macro *Parser::Parse_Macro()
 void Parser::Invoke_Macro()
 {
     Macro *PMac=reinterpret_cast<Macro *>(mToken.Data);
-    SYM_ENTRY **Table_Entries=nullptr;
+    SYM_ENTRY **Table_Entries = nullptr;
     int i,Local_Index;
 
     Inc_CS_Index();
 
-    if(PMac == nullptr)
+    if (PMac == nullptr)
     {
         if (mToken.DataPtr != nullptr)
             PMac = reinterpret_cast<Macro*>(*(mToken.DataPtr));
@@ -2618,7 +2620,7 @@ void Parser::Invoke_Macro()
         else
         {
             is = Locate_File (PMac->source.sourceName, POV_File_Text_Macro, ign, true);
-            if(is == nullptr)
+            if (is == nullptr)
                 Error ("Cannot open macro file '%s'.", UCS2toASCIIString(PMac->source.sourceName).c_str());
         }
         mTokenizer.SetInputStream(is);
@@ -2934,23 +2936,23 @@ void Parser::Parse_Fopen(void)
 
         CASE(WRITE_TOKEN)
             wfile = CreateFile(fileName.c_str(), POV_File_Text_User, false);
-            if(wfile != nullptr)
+            if (wfile != nullptr)
                 New->Out_File = std::make_shared<OTextStream>(fileName.c_str(), wfile);
             else
                 New->Out_File = nullptr;
 
-            if(New->Out_File == nullptr)
+            if (New->Out_File == nullptr)
                 Error ("Cannot open user file %s (write).", UCS2toASCIIString(fileName).c_str());
         END_CASE
 
         CASE(APPEND_TOKEN)
             wfile = CreateFile(fileName.c_str(), POV_File_Text_User, true);
-            if(wfile != nullptr)
+            if (wfile != nullptr)
                 New->Out_File = std::make_shared<OTextStream>(fileName.c_str(), wfile);
             else
                 New->Out_File = nullptr;
 
-            if(New->Out_File == nullptr)
+            if (New->Out_File == nullptr)
                 Error ("Cannot open user file %s (append).", UCS2toASCIIString(fileName).c_str());
         END_CASE
 
@@ -2976,7 +2978,7 @@ void Parser::Parse_Fclose(void)
             Got_EOF=false;
             Data->inTokenizer = nullptr;
             Data->Out_File = nullptr;
-            Remove_Symbol (SYM_TABLE_GLOBAL,mToken.raw.lexeme.text.c_str(),false,nullptr,0);
+            Remove_Symbol(SYM_TABLE_GLOBAL, mToken.raw.lexeme.text.c_str(), false, nullptr, 0);
         END_CASE
 
         OTHERWISE
@@ -3002,7 +3004,7 @@ void Parser::Parse_Read()
     if (User_File->busyParsing)
         Error ("Can't nest directives accessing the same file.");
     File_Id=POV_STRDUP(mToken.raw.lexeme.text.c_str());
-    if(User_File->inTokenizer == nullptr)
+    if (User_File->inTokenizer == nullptr)
         Error("Cannot read from file %s because the file is open for writing only.", UCS2toASCIIString(UCS2String(User_File->Out_File->name())).c_str());
 
     // Safeguard against accidental nesting of other file access directives inside the `#fopen`
@@ -3081,7 +3083,7 @@ void Parser::Parse_Read()
     {
         Got_EOF=false;
         User_File->inTokenizer = nullptr;
-        Remove_Symbol (SYM_TABLE_GLOBAL,File_Id,false,nullptr,0);
+        Remove_Symbol(SYM_TABLE_GLOBAL, File_Id, false, nullptr, 0);
     }
     POV_FREE(File_Id);
 }
@@ -3095,7 +3097,7 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File, TokenId Previous, TokenId *Nu
     DBL val = 0.0;
     bool ungetToken = false;
 
-    if(User_File->inTokenizer == nullptr)
+    if (User_File->inTokenizer == nullptr)
         Error("Cannot read from file '%s' because the file is open for writing only.", UCS2toASCIIString(UCS2String(User_File->Out_File->name())).c_str());
 
     if (User_File->ReadNextToken())
@@ -3225,7 +3227,7 @@ void Parser::Parse_Write(void)
     User_File=reinterpret_cast<DATA_FILE *>(mToken.Data);
     if (User_File->busyParsing)
         Error ("Can't nest directives accessing the same file.");
-    if(User_File->Out_File == nullptr)
+    if (User_File->Out_File == nullptr)
         Error("Cannot write to file %s because the file is open for reading only.", UCS2toASCIIString(User_File->inTokenizer->GetSourceName()).c_str());
 
     // Safeguard against accidental nesting of other file access directives inside the `#fopen`
@@ -3559,7 +3561,7 @@ void Parser::IncludeHeader(const UCS2String& formalFileName)
     maIncludeStack.push_back(mTokenizer.GetHotBookmark());
 
     shared_ptr<IStream> is = Locate_File (formalFileName.c_str(),POV_File_Text_INC,actualFileName,true);
-    if(is == nullptr)
+    if (is == nullptr)
         Error ("Cannot open include file %s.", UCS2toASCIIString(formalFileName).c_str());
 
     mTokenizer.SetInputStream(is);

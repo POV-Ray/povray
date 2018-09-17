@@ -356,7 +356,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
         END_CASE
     END_EXPECT
 
-    if(Name != nullptr)
+    if (Name != nullptr)
     {
         if(!(filetype & Legal))
             Error("File type not supported here.");
@@ -487,7 +487,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
         POV_FREE(Name);
     }
 
-    if(image->data == nullptr)
+    if (image->data == nullptr)
         Error("Cannot read image.");
 
     image->iwidth = image->data->GetWidth();
@@ -856,7 +856,7 @@ PatternPtr Parser::ParseDensityFilePattern()
     GET(DF3_TOKEN);
     pattern->densityFile->Data->Name = Parse_C_String(true);
     shared_ptr<IStream> dfile = Locate_File(ASCIItoUCS2String(pattern->densityFile->Data->Name).c_str(), POV_File_Data_DF3, dummy, true);
-    if(dfile == nullptr)
+    if (dfile == nullptr)
         Error("Cannot read media density file.");
     Read_Density_File(dfile.get(), pattern->densityFile);
     return pattern;
@@ -2152,12 +2152,12 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
     END_EXPECT
 
-    if ((New->Type==AVERAGE_PATTERN) && (New->Blend_Map==nullptr))
+    if ((New->Type == AVERAGE_PATTERN) && (New->Blend_Map == nullptr))
     {
         Error("Average must have map.");
     }
 
-    if ((TPat_Type==kBlendMapType_Texture) && (New->Type!=PLAIN_PATTERN) &&
+    if ((TPat_Type == kBlendMapType_Texture) && (New->Type != PLAIN_PATTERN) &&
         (New->Blend_Map==nullptr))
     {
         Error("Patterned texture must have texture_map.");
@@ -2206,7 +2206,7 @@ void Parser::Parse_Tnormal (TNORMAL **Tnormal_Ptr)
 
     if (*Tnormal_Ptr == nullptr)
     {
-        if ((Default_Texture->Tnormal) != nullptr)
+        if (Default_Texture->Tnormal != nullptr)
         {
             *Tnormal_Ptr = Copy_Tnormal ((Default_Texture->Tnormal));
         }
@@ -2733,66 +2733,66 @@ TEXTURE *Parser::Parse_Texture ()
                 EXIT
             END_CASE
         END_EXPECT
-        }
-        else
-        {
-            /* Here it is not a PLAIN_PATTERN texture and since default textures
-               must be plain then this was a texture identifier that was a special
-               texture.  Allow transforms.  The "if(!Modified_Pnf)..." below
-               will always fail if we came here.  So we return after the
-               transforms. */
-            Parse_Texture_Transform(Texture);
-        }
+    }
+    else
+    {
+        /* Here it is not a PLAIN_PATTERN texture and since default textures
+           must be plain then this was a texture identifier that was a special
+           texture.  Allow transforms.  The "if(!Modified_Pnf)..." below
+           will always fail if we came here.  So we return after the
+           transforms. */
+        Parse_Texture_Transform(Texture);
+    }
 
-        /* If we've modified the default texture with a p,n, or f then this
-           has to stay a PLAIN_PATTERN pnf texture.  We won't allow
-           a texture_map or pattern.  Therefore quit now.
-         */
+    /* If we've modified the default texture with a p,n, or f then this
+       has to stay a PLAIN_PATTERN pnf texture.  We won't allow
+       a texture_map or pattern.  Therefore quit now.
+     */
 
-        if (!Modified_Pnf)
-        {
-            /* At this point we've either got a texture statement that had
-               no p, n or f.  Nor any texture identifier.  Its probably
-               a patterned texture_map texture. */
+    if (!Modified_Pnf)
+    {
+        /* At this point we've either got a texture statement that had
+           no p, n or f.  Nor any texture identifier.  Its probably
+           a patterned texture_map texture. */
 
-            EXPECT_ONE
-                CASE (TILES_TOKEN)
-                    Destroy_Textures (Texture);
-                    Texture = Parse_Tiles();
-                    if (Texture->Blend_Map->Blend_Map_Entries[1].Vals == nullptr)
-                        Error("First texture missing from tiles");
-                    Parse_Texture_Transform(Texture);
-                END_CASE
+        EXPECT_ONE
+            CASE (TILES_TOKEN)
+                Destroy_Textures (Texture);
+                Texture = Parse_Tiles();
+                if (Texture->Blend_Map->Blend_Map_Entries[1].Vals == nullptr)
+                    Error("First texture missing from tiles");
+                Parse_Texture_Transform(Texture);
+            END_CASE
 
-                CASE (MATERIAL_MAP_TOKEN)
-                    Destroy_Textures (Texture);
-                    Texture = Parse_Material_Map ();
-                    Parse_Texture_Transform(Texture);
-                END_CASE
+            CASE (MATERIAL_MAP_TOKEN)
+                Destroy_Textures (Texture);
+                Texture = Parse_Material_Map ();
+                Parse_Texture_Transform(Texture);
+            END_CASE
 
-                OTHERWISE
-                    UNGET
-                    Destroy_Pigment(Texture->Pigment);
-                    Destroy_Tnormal(Texture->Tnormal);
-                    if (Texture->Finish)
-                        delete Texture->Finish;
-                    Texture->Pigment = nullptr;
-                    Texture->Tnormal = nullptr;
-                    Texture->Finish  = nullptr;
-                    Parse_Pattern<TextureBlendMap>(Texture,kBlendMapType_Texture);
-                    /* if following is true, parsed "texture{}" so restore
-                       default texture.
-                     */
-                    if (Texture->Type <= PLAIN_PATTERN)
-                    {
-                        Destroy_Textures(Texture);
-                        Texture = Copy_Textures (Default_Texture);
-                    }
-                END_CASE
-            END_EXPECT
-        }
+            OTHERWISE
+                UNGET
+                Destroy_Pigment(Texture->Pigment);
+                Destroy_Tnormal(Texture->Tnormal);
+                if (Texture->Finish)
+                    delete Texture->Finish;
+                Texture->Pigment = nullptr;
+                Texture->Tnormal = nullptr;
+                Texture->Finish  = nullptr;
+                Parse_Pattern<TextureBlendMap>(Texture,kBlendMapType_Texture);
+                /* if following is true, parsed "texture{}" so restore
+                   default texture.
+                 */
+                if (Texture->Type <= PLAIN_PATTERN)
+                {
+                    Destroy_Textures(Texture);
+                    Texture = Copy_Textures (Default_Texture);
+                }
+            END_CASE
+        END_EXPECT
+    }
 
-        return (Texture);
+    return (Texture);
 }
 
 
@@ -2836,9 +2836,9 @@ TEXTURE *Parser::Parse_Tiles()
 
     Texture->Blend_Map = Create_Blend_Map<TextureBlendMap> (kBlendMapType_Texture);
     Texture->Blend_Map->Blend_Map_Entries.resize(2);
-    Texture->Blend_Map->Blend_Map_Entries[0].Vals=nullptr;
+    Texture->Blend_Map->Blend_Map_Entries[0].Vals = nullptr;
     Texture->Blend_Map->Blend_Map_Entries[0].value=0.0;
-    Texture->Blend_Map->Blend_Map_Entries[1].Vals=nullptr;
+    Texture->Blend_Map->Blend_Map_Entries[1].Vals = nullptr;
     Texture->Blend_Map->Blend_Map_Entries[1].value=1.0;
 
     /* Note first tile is 1, 2nd tile is 0 to keep compatible with old tiles */
@@ -3763,7 +3763,7 @@ void Parser::Parse_Interior(InteriorPtr& interior)
 
     EXPECT_ONE
         CASE(INTERIOR_ID_TOKEN)
-            if(mToken.Data != nullptr)
+            if (mToken.Data != nullptr)
                 interior = InteriorPtr(new Interior(**reinterpret_cast<InteriorPtr *>(mToken.Data)));
             else
                 interior = InteriorPtr(new Interior());
@@ -4399,7 +4399,7 @@ void Parser::Check_BH_Parameters (BlackHoleWarp *bh)
 *
 * OUTPUT
 *
-*   Warps_Ptr : If *Warps_Ptr is nullptr, a classic turb warp
+*   Warps_Ptr : If *Warps_Ptr is `nullptr`, a classic turb warp
 *   is created and a pointer to it is stored
 *
 * RETURNS
@@ -4691,7 +4691,7 @@ void Parser::Parse_Warp (WarpList& warps)
         END_CASE
     END_EXPECT
 
-    if (New==nullptr)
+    if (New == nullptr)
     {
         Error("Empty warp statement.");
     }
@@ -4754,7 +4754,7 @@ void Parser::Parse_Material(MATERIAL *Material)
             Parse_Vector (Local_Vector);
             Compute_Translation_Transform(&Local_Trans, Local_Vector);
             Transform_Textures (Material->Texture, &Local_Trans);
-            if(Material->interior!= nullptr)
+            if (Material->interior!= nullptr)
                 Material->interior->Transform(&Local_Trans);
         END_CASE
 
@@ -4762,7 +4762,7 @@ void Parser::Parse_Material(MATERIAL *Material)
             Parse_Vector (Local_Vector);
             Compute_Rotation_Transform(&Local_Trans, Local_Vector);
             Transform_Textures (Material->Texture, &Local_Trans);
-            if(Material->interior!= nullptr)
+            if (Material->interior!= nullptr)
                 Material->interior->Transform(&Local_Trans);
         END_CASE
 
@@ -4770,7 +4770,7 @@ void Parser::Parse_Material(MATERIAL *Material)
             Parse_Scale_Vector (Local_Vector);
             Compute_Scaling_Transform(&Local_Trans, Local_Vector);
             Transform_Textures (Material->Texture, &Local_Trans);
-            if(Material->interior!= nullptr)
+            if (Material->interior!= nullptr)
                 Material->interior->Transform(&Local_Trans);
         END_CASE
 
@@ -4778,14 +4778,14 @@ void Parser::Parse_Material(MATERIAL *Material)
             Parse_Matrix(Local_Matrix);
             Compute_Matrix_Transform(&Local_Trans, Local_Matrix);
             Transform_Textures (Material->Texture, &Local_Trans);
-            if(Material->interior!= nullptr)
+            if (Material->interior!= nullptr)
                 Material->interior->Transform(&Local_Trans);
         END_CASE
 
         CASE (TRANSFORM_TOKEN)
             Parse_Transform(&Local_Trans);
             Transform_Textures (Material->Texture, &Local_Trans);
-            if(Material->interior!= nullptr)
+            if (Material->interior!= nullptr)
                 Material->interior->Transform(&Local_Trans);
         END_CASE
 

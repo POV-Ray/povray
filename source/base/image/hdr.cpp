@@ -13,7 +13,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -171,7 +171,7 @@ Image *Read(IStream *file, const Image::ReadOptions& options)
     float exposure = 1.0;
     unsigned int width;
     unsigned int height;
-    Image *image = NULL;
+    Image *image = nullptr;
     Image::ImageDataType imagetype = options.itype;
 
     // Radiance HDR files store linear color values by default, so never convert unless the user overrides
@@ -193,7 +193,7 @@ Image *Read(IStream *file, const Image::ReadOptions& options)
         // TODO: what do we do with exposure?
         if(strncmp(line, "EXPOSURE", 8) == 0)
         {
-            if((s = strchr(line, '=')) != NULL)
+            if ((s = strchr(line, '=')) != nullptr)
             {
                 if(sscanf(s + 1, "%f", &e) == 1)
                     exposure *= e;

@@ -60,12 +60,12 @@ ProcessOptions::~ProcessOptions()
 
 int ProcessOptions::ParseFile(const char *filespec, POVMSObjectPtr obj)
 {
-    ITextStream *file = NULL;
-    const char *currentsection = NULL;
-    char *sectionname = NULL;
-    char *filename = NULL;
+    ITextStream *file = nullptr;
+    const char *currentsection = nullptr;
+    char *sectionname = nullptr;
+    char *filename = nullptr;
     int err = kNoErr;
-    POVMSObjectPtr section = NULL;
+    POVMSObjectPtr section = nullptr;
     int currentline = 1;
 
     // split the INI files specification into filename and optional section name
@@ -73,7 +73,7 @@ int ProcessOptions::ParseFile(const char *filespec, POVMSObjectPtr obj)
     if(err == kNoErr)
     {
         file = OpenFileForRead(filename, obj);
-        if(file == NULL)
+        if (file == nullptr)
         {
             // all errors here are non-fatal, the calling code has to decide if an error is fatal
             ParseError("Cannot open INI file '%s'.", filename);
@@ -99,26 +99,26 @@ int ProcessOptions::ParseFile(const char *filespec, POVMSObjectPtr obj)
             if(token == '[')
             {
                 // free old section name, if any
-                if(currentsection != NULL)
+                if (currentsection != nullptr)
                     delete[] currentsection;
 
                 // read until the section name end marker
                 currentsection = Parse_INI_String(file, ']');
 
                 // if the user specified a section name, compare the two and enable reading
-                if((sectionname != NULL) && (currentsection != NULL))
+                if ((sectionname != nullptr) && (currentsection != nullptr))
                 {
                     if(pov_stricmp(currentsection, sectionname) == 0)
                         section = obj; // named section matches specified section name, apply options
                     else
-                        section = NULL; // named section does not match specified section name, ignore options
+                        section = nullptr; // named section does not match specified section name, ignore options
                 }
                 // if there was no user specified section name, ignore all named sections
                 else
-                    section = NULL; // no section name was specified, ignore options in named section
+                    section = nullptr; // no section name was specified, ignore options in named section
             }
             // skip lines that do not belong to the desired sections
-            else if(section == NULL)
+            else if (section == nullptr)
             {
                 currentline += Parse_INI_Skip_Line(file);
             }
@@ -173,7 +173,7 @@ int ProcessOptions::ParseFile(const char *filespec, POVMSObjectPtr obj)
                 // if nothing else was appropriate, assume it is some other kind of string requiring special attention
                 if(err == kFalseErr)
                 {
-                    char *plainstring = NULL;
+                    char *plainstring = nullptr;
 
                     if((token != '\"') && (token != '\''))
                     {
@@ -181,9 +181,9 @@ int ProcessOptions::ParseFile(const char *filespec, POVMSObjectPtr obj)
                         plainstring = Parse_INI_String(file, -2, true);
 
                         // see if it is probably a standard INI file entry which wasn't recognised
-                        if(plainstring != NULL)
+                        if (plainstring != nullptr)
                         {
-                            if(strchr(plainstring, '=') != NULL)
+                            if (strchr(plainstring, '=') != nullptr)
                                 err = kParseErr;
                         }
                     }
@@ -193,7 +193,7 @@ int ProcessOptions::ParseFile(const char *filespec, POVMSObjectPtr obj)
                     if(err == kFalseErr)
                         err = ProcessUnknownString(plainstring, obj);
 
-                    if(plainstring != NULL)
+                    if (plainstring != nullptr)
                         delete[] plainstring;
                 }
             }
@@ -202,7 +202,7 @@ int ProcessOptions::ParseFile(const char *filespec, POVMSObjectPtr obj)
         // all errors here are non-fatal, the calling code has to decide if an error is fatal
         if(err != kNoErr)
         {
-            if(currentsection != NULL)
+            if (currentsection != nullptr)
             {
                 ParseErrorAt(file,
                              "Cannot continue to process INI file '%s' due to a parse error in line %d section '%s'.\n"
@@ -220,17 +220,17 @@ int ProcessOptions::ParseFile(const char *filespec, POVMSObjectPtr obj)
             }
         }
 
-        if(currentsection != NULL)
+        if (currentsection != nullptr)
             delete[] currentsection;
     }
 
-    if(filename != NULL)
+    if (filename != nullptr)
         delete[] filename;
 
-    if(sectionname != NULL)
+    if (sectionname != nullptr)
         delete[] sectionname;
 
-    if(file != NULL)
+    if (file != nullptr)
         delete file;
 
     return err;
@@ -287,7 +287,7 @@ int ProcessOptions::ParseString(const char *commandline, POVMSObjectPtr obj, boo
         if(err == kFalseErr)
         {
             int chr = *commandline;
-            char *plainstring = NULL;
+            char *plainstring = nullptr;
 
             if((chr == '\"') || (chr == '\''))
             {
@@ -303,7 +303,7 @@ int ProcessOptions::ParseString(const char *commandline, POVMSObjectPtr obj, boo
                 plainstring = Parse_CL_String(commandline, -2);
 
                 // check if it is probably a standard INI file entry which wasn't recognised
-                if((plainstring != NULL) && (strchr(plainstring, '=') != NULL))
+                if ((plainstring != nullptr) && (strchr(plainstring, '=') != nullptr))
                 {
                     err = kParseErr;
                     commandline = oldcmdline; // so it will be printed
@@ -315,7 +315,7 @@ int ProcessOptions::ParseString(const char *commandline, POVMSObjectPtr obj, boo
             if(err == kFalseErr)
                 err = ProcessUnknownString(plainstring, obj);
 
-            if(plainstring != NULL)
+            if (plainstring != nullptr)
                 delete[] plainstring;
         }
     }
@@ -346,7 +346,7 @@ int ProcessOptions::WriteFile(OTextStream *ini_file, POVMSObjectPtr obj)
     struct INI_Parser_Table *table = parse_ini_table;
 
     // find the keyword
-    while(table->keyword != NULL)
+    while (table->keyword != nullptr)
     {
         if((table->flags & kINIOptFlag_SuppressWrite) == 0)
             Output_INI_Option(table, obj, ini_file);
@@ -365,7 +365,7 @@ int ProcessOptions::WriteFile(const char *filename, POVMSObjectPtr obj)
         return kCannotOpenFileErr;
 
     ini_file = OpenFileForWrite(filename, obj);
-    if(ini_file == NULL)
+    if (ini_file == nullptr)
         return kCannotOpenFileErr;
     err = WriteFile (ini_file, obj);
     delete ini_file;
@@ -653,7 +653,7 @@ int ProcessOptions::Parse_INI_Specification(const char *filespec, char *&filenam
     const char *sectionpos = strchr(filespec, '[');
 
     // if there is no section string, this is the whole filename
-    if(sectionpos == NULL)
+    if (sectionpos == nullptr)
     {
         filename = new char[strlen(filespec) + 1];
         strcpy(filename, filespec);
@@ -664,7 +664,7 @@ int ProcessOptions::Parse_INI_Specification(const char *filespec, char *&filenam
         const char *sectionend = strchr(filespec, ']');
 
         // if there was no section end, this file specification is invalid
-        if(sectionend == NULL)
+        if (sectionend == nullptr)
             return kParamErr;
         // if there valid section specification, use it
         else
@@ -753,21 +753,21 @@ int ProcessOptions::Parse_INI_Skip_Line(ITextStream *file)
 int ProcessOptions::Parse_INI_Option(ITextStream *file, POVMSObjectPtr obj)
 {
     struct INI_Parser_Table *table = parse_ini_table;
-    char *value = NULL;
-    char *key = NULL;
+    char *value = nullptr;
+    char *key = nullptr;
     int chr = 0;
     int err = kNoErr;
 
     // read the key string
     key = Parse_INI_String(file);
-    if(key == NULL)
+    if (key == nullptr)
     {
         ParseErrorAt(file, "Expected key in INI file, no key was found.");
         return kParseErr;
     }
 
     // find the keyword
-    while(table->keyword != NULL)
+    while (table->keyword != nullptr)
     {
         if(pov_stricmp(table->keyword, key) == 0)
             break;
@@ -775,7 +775,7 @@ int ProcessOptions::Parse_INI_Option(ITextStream *file, POVMSObjectPtr obj)
     }
 
     // return if no valid keyword has been found
-    if(table->keyword == NULL)
+    if (table->keyword == nullptr)
     {
         ParseErrorAt(file, "Unknown key '%s' in INI file.", key);
         delete[] key;
@@ -784,7 +784,7 @@ int ProcessOptions::Parse_INI_Option(ITextStream *file, POVMSObjectPtr obj)
     else
     {
         delete[] key;
-        key = NULL;
+        key = nullptr;
     }
 
     // skip any spaces
@@ -824,7 +824,7 @@ int ProcessOptions::Parse_INI_Option(ITextStream *file, POVMSObjectPtr obj)
         }
     }
 
-    if(value == NULL)
+    if (value == nullptr)
     {
         ParseErrorAt(file, "Expected value in INI file, no value was found.");
         return kParseErr;
@@ -836,7 +836,7 @@ int ProcessOptions::Parse_INI_Option(ITextStream *file, POVMSObjectPtr obj)
         err = Process_INI_Option(table, value, obj);
 
     delete[] value;
-    value = NULL;
+    value = nullptr;
 
     // skip any spaces
     (void)Parse_INI_Skip_Space(file, false);
@@ -862,7 +862,7 @@ int ProcessOptions::Parse_INI_Option(ITextStream *file, POVMSObjectPtr obj)
                 value = Parse_INI_String(file, -2);
             }
 
-            if(value == NULL)
+            if (value == nullptr)
             {
                 ParseErrorAt(file, "Expected value in INI file, no value was found.");
                 return kParseErr;
@@ -870,7 +870,7 @@ int ProcessOptions::Parse_INI_Option(ITextStream *file, POVMSObjectPtr obj)
 
             err = Process_INI_Option(table, value, obj);
             delete[] value;
-            value = NULL;
+            value = nullptr;
 
             // skip any spaces
             (void)Parse_INI_Skip_Space(file, false);
@@ -893,14 +893,14 @@ int ProcessOptions::Parse_INI_Option(ITextStream *file, POVMSObjectPtr obj)
 int ProcessOptions::Parse_INI_Switch(ITextStream *file, int token, POVMSObjectPtr obj)
 {
     struct Cmd_Parser_Table *table = parse_cmd_table;
-    char *value = NULL;
-    char *key = NULL;
+    char *value = nullptr;
+    char *key = nullptr;
     int err = kNoErr;
     int chr = 0;
 
     // read the switch string
     key = Parse_INI_String(file);
-    if(key == NULL)
+    if (key == nullptr)
     {
         ParseErrorAt(file, "Expected command-line switch in INI file, no command-line switch was found.");
         err = kParseErr;
@@ -912,14 +912,14 @@ int ProcessOptions::Parse_INI_Switch(ITextStream *file, int token, POVMSObjectPt
         if((chr == '\"') || (chr == '\''))
         {
             value = Parse_INI_String(file, chr);
-            if(value == NULL)
+            if (value == nullptr)
                 ParseErrorAt(file, "Expected command-line switch in INI file to be followed by quoted parameter.");
         }
         else
             file->ungetchar(chr);
 
         // find the command-line switch
-        while(table->command != NULL)
+        while (table->command != nullptr)
         {
             char *srcptr = key;
             const char *dstptr = table->command;
@@ -935,13 +935,13 @@ int ProcessOptions::Parse_INI_Switch(ITextStream *file, int token, POVMSObjectPt
             if((*dstptr) == 0)
             {
                 // if there was a quoted value string and the switch string is longer, this is an unknown switch
-                if((value != NULL) && (*srcptr != 0))
+                if ((value != nullptr) && (*srcptr != 0))
                 {
-                    table = NULL;
+                    table = nullptr;
                     break;
                 }
                 // if there was a quoted value string and the switch matches, use the value string as parameter
-                else if((value != NULL) && (*srcptr == 0))
+                else if ((value != nullptr) && (*srcptr == 0))
                     srcptr = value;
 
                 // only if a parameter is expected allow it, and vice versa
@@ -960,11 +960,11 @@ int ProcessOptions::Parse_INI_Switch(ITextStream *file, int token, POVMSObjectPt
         }
 
         // if there was no successful match so far, see if it is a system specific switch
-        if((table == NULL) || (table->command == NULL))
+        if ((table == nullptr) || (table->command == nullptr))
         {
             if(ProcessUnknownSwitch(key, value, obj) == false)
             {
-                if(value != NULL)
+                if (value != nullptr)
                     ParseErrorAt(file, "Unknown switch '%s' with value '%s' in INI file.", key, value);
                 else
                     ParseErrorAt(file, "Unknown switch '%s' in INI file.", key);
@@ -975,9 +975,9 @@ int ProcessOptions::Parse_INI_Switch(ITextStream *file, int token, POVMSObjectPt
         }
     }
 
-    if(key != NULL)
+    if (key != nullptr)
         delete[] key;
-    if(value != NULL)
+    if (value != nullptr)
         delete[] value;
 
     return err;
@@ -1117,7 +1117,7 @@ bool ProcessOptions::Parse_INI_String_Smartmode(ITextStream *file)
     ITextStream::FilePos backtrackpos = file->tellg();
     bool result = false; // false - end string here, true - continue parsing string
     struct INI_Parser_Table *table = parse_ini_table;
-    char *key = NULL;
+    char *key = nullptr;
 
     (void)Parse_INI_Skip_Space(file, false);
 
@@ -1152,10 +1152,10 @@ bool ProcessOptions::Parse_INI_String_Smartmode(ITextStream *file)
         default:
             // read the key string
             key = Parse_INI_String(file);
-            if(key != NULL)
+            if (key != nullptr)
             {
                 // find the keyword
-                while(table->keyword != NULL)
+                while (table->keyword != nullptr)
                 {
                     if(pov_stricmp(table->keyword, key) == 0)
                         break;
@@ -1163,7 +1163,7 @@ bool ProcessOptions::Parse_INI_String_Smartmode(ITextStream *file)
                 }
 
                 // if no valid keyword has been found
-                if(table->keyword == NULL)
+                if (table->keyword == nullptr)
                 {
                     result = true; // return true, this is most likely an unquoted path
                     ParseErrorAt(file,
@@ -1173,7 +1173,7 @@ bool ProcessOptions::Parse_INI_String_Smartmode(ITextStream *file)
                 }
 
                 delete[] key;
-                key = NULL;
+                key = nullptr;
             }
             break; // return false, unless the code above did not find a valid keyword
     }
@@ -1198,8 +1198,8 @@ void ProcessOptions::Parse_CL_Skip_Space(const char *&commandline)
 int ProcessOptions::Parse_CL_Switch(const char *&commandline, int token, POVMSObjectPtr obj, bool singleswitch)
 {
     struct Cmd_Parser_Table *table = parse_cmd_table;
-    char *value = NULL;
-    char *key = NULL;
+    char *value = nullptr;
+    char *key = nullptr;
     int err = kNoErr;
     int chr = 0;
 
@@ -1208,7 +1208,7 @@ int ProcessOptions::Parse_CL_Switch(const char *&commandline, int token, POVMSOb
         key = Parse_CL_String(commandline);
     else
         key = Parse_CL_String(commandline, 0);
-    if(key == NULL)
+    if (key == nullptr)
     {
         ParseError("Expected command-line switch on command-line, no command-line switch was found.");
         err = kParseErr;
@@ -1221,14 +1221,14 @@ int ProcessOptions::Parse_CL_Switch(const char *&commandline, int token, POVMSOb
         if((chr == '\"') || (chr == '\''))
         {
             value = Parse_CL_String(commandline, chr);
-            if(value == NULL)
+            if (value == nullptr)
                 ParseError("Expected command-line switch on command-line to be followed by quoted parameter.");
         }
         else
             commandline--;
 
         // find the command-line switch
-        while(table->command != NULL)
+        while (table->command != nullptr)
         {
             char *srcptr = key;
             const char *dstptr = table->command;
@@ -1244,13 +1244,13 @@ int ProcessOptions::Parse_CL_Switch(const char *&commandline, int token, POVMSOb
             if((*dstptr) == 0)
             {
                 // if there was a quoted value string and the switch string is longer, this is an unknown switch
-                if((value != NULL) && (*srcptr != 0))
+                if ((value != nullptr) && (*srcptr != 0))
                 {
-                    table = NULL;
+                    table = nullptr;
                     break;
                 }
                 // if there was a quoted value string and the switch matches, use the value string as parameter
-                else if((value != NULL) && (*srcptr == 0))
+                else if ((value != nullptr) && (*srcptr == 0))
                     srcptr = value;
 
                 // only if a parameter is expected allow it, and vice versa
@@ -1269,11 +1269,11 @@ int ProcessOptions::Parse_CL_Switch(const char *&commandline, int token, POVMSOb
         }
 
         // if there was no successful match so far, see if it is a system specific switch
-        if((table == NULL) || (table->command == NULL))
+        if ((table == nullptr) || (table->command == nullptr))
         {
             if(ProcessUnknownSwitch(key, value, obj) == false)
             {
-                if(value != NULL)
+                if (value != nullptr)
                     ParseError("Unknown switch '%s' with value '%s' on command-line.", key, value);
                 else
                     ParseError("Unknown switch '%s' on command-line.", key);
@@ -1284,9 +1284,9 @@ int ProcessOptions::Parse_CL_Switch(const char *&commandline, int token, POVMSOb
         }
     }
 
-    if(key != NULL)
+    if (key != nullptr)
         delete[] key;
-    if(value != NULL)
+    if (value != nullptr)
         delete[] value;
 
     return err;
@@ -1295,21 +1295,21 @@ int ProcessOptions::Parse_CL_Switch(const char *&commandline, int token, POVMSOb
 int ProcessOptions::Parse_CL_Option(const char *&commandline, POVMSObjectPtr obj, bool singleswitch)
 {
     struct INI_Parser_Table *table = parse_ini_table;
-    char *value = NULL;
-    char *key = NULL;
+    char *value = nullptr;
+    char *key = nullptr;
     char chr = 0;
     int err = kNoErr;
 
     // read the key string
     key = Parse_CL_String(commandline);
-    if(key == NULL)
+    if (key == nullptr)
     {
         ParseError("Expected INI file key on command-line, no key was found.");
         return kParseErr;
     }
 
     // find the keyword
-    while(table->keyword != NULL)
+    while (table->keyword != nullptr)
     {
         if(pov_stricmp(table->keyword, key) == 0)
             break;
@@ -1317,7 +1317,7 @@ int ProcessOptions::Parse_CL_Option(const char *&commandline, POVMSObjectPtr obj
     }
 
     // return false if no valid keyword has been found
-    if(table->keyword == NULL)
+    if (table->keyword == nullptr)
     {
         delete[] key;
         return kParseErr;
@@ -1325,7 +1325,7 @@ int ProcessOptions::Parse_CL_Option(const char *&commandline, POVMSObjectPtr obj
     else
     {
         delete[] key;
-        key = NULL;
+        key = nullptr;
     }
 
     // expect the equal sign
@@ -1347,7 +1347,7 @@ int ProcessOptions::Parse_CL_Option(const char *&commandline, POVMSObjectPtr obj
     else
         value = Parse_CL_String(commandline, 0);
 
-    if(value == NULL)
+    if (value == nullptr)
     {
         ParseError("Expected value on command-line, no value was found.");
         return kParseErr;
@@ -1355,7 +1355,7 @@ int ProcessOptions::Parse_CL_Option(const char *&commandline, POVMSObjectPtr obj
 
     err = Process_INI_Option(table, value, obj);
     delete[] value;
-    value = NULL;
+    value = nullptr;
 
     return err;
 }

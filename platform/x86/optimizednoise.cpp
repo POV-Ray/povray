@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -92,8 +92,8 @@ OptimizedNoiseInfo gaOptimizedNoiseInfo[] = {
         AVXFMA4DNoise,              // dNoise,
         &kAVXFMA4NoiseEnabled,      // enabled,
         AVXFMA4Supported,           // supported,
-        NULL,                       // recommended,
-        NULL                        // init
+        nullptr,                    // recommended,
+        nullptr                     // init
     },
 #endif
 #ifdef TRY_OPTIMIZED_NOISE_AVX
@@ -116,12 +116,12 @@ OptimizedNoiseInfo gaOptimizedNoiseInfo[] = {
         AVXPortableDNoise,          // dNoise,
         &kAVXPortableNoiseEnabled,  // enabled,
         AVXSupported,               // supported,
-        NULL,                       // recommended,
-        NULL                        // init
+        nullptr,                    // recommended,
+        nullptr                     // init
     },
 #endif
     // End-of-list entry.
-    { NULL }
+    { nullptr }
 };
 
 }

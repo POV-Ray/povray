@@ -3094,9 +3094,9 @@ class FileBackedPixelContainer
             {
                 // if shutdown has been delayed, by the time we reach here, the platform base
                 // may no longer be valid (see crashdump #77 for an example of this). we need
-                // to take the address of the reference to see if it's now NULL before we use it.
+                // to take the address of the reference to see if it's now `nullptr` before we use it.
                 PlatformBase *pb(&PlatformBase::GetInstance());
-                if (pb != NULL)
+                if (pb != nullptr)
                     pb->DeleteTemporaryFile(m_Path);
             }
         }
@@ -3926,7 +3926,7 @@ file format.  You must either use an official POV-Ray binary or recompile \
 the POV-Ray sources on a system providing you with the OpenEXR library \
 to make use of this facility.  Alternatively, you may use any of the \
 following built-in formats: HDR.");
-            return NULL;
+            return nullptr;
 #endif
 
         case PNG:
@@ -3939,7 +3939,7 @@ file format.  You must either use an official POV-Ray binary or recompile \
 the POV-Ray sources on a system providing you with the libPNG library \
 to make use of this facility.  Alternatively, you may use any of the \
 following built-in formats: GIF, TGA, IFF, PGM, PPM, BMP.");
-            return NULL;
+            return nullptr;
 #endif
 
         case GIF:
@@ -3961,7 +3961,7 @@ file format.  You must either use an official POV-Ray binary or recompile \
 the POV-Ray sources on a system providing you with the libJPEG library \
 to make use of this facility.  Alternatively, you may use any of the \
 following built-in formats: GIF, TGA, IFF, PGM, PPM, BMP.");
-            return NULL;
+            return nullptr;
 #endif
 
         case IFF:
@@ -3986,16 +3986,16 @@ file format.  You must either use an official POV-Ray binary or recompile \
 the POV-Ray sources on a system providing you with the libTIFF library \
 to make use of this facility.  Alternatively, you may use any of the \
 following built-in formats: GIF, TGA, IFF, PGM, PPM, BMP.");
-            return NULL;
+            return nullptr;
 #endif
 
         case SYS:
             throw POV_EXCEPTION(kCannotOpenFileErr, "This platform has not defined a SYS file type");
-            return (NULL);
+            return nullptr;
 
         default :
             throw POV_EXCEPTION(kParamErr, "Invalid file type");
-            return (NULL);
+            return nullptr;
     }
 }
 
@@ -4004,7 +4004,7 @@ void Image::Write(ImageFileType type, OStream *file, const Image *image, const W
     if (image->GetWidth() == 0 || image->GetHeight() == 0)
         throw POV_EXCEPTION(kParamErr, "Invalid image size for output");
 
-    if (file == NULL)
+    if (file == nullptr)
         throw POV_EXCEPTION(kCannotOpenFileErr, "Invalid image file");
 
 #ifdef POV_SYS_IMAGE_TYPE

@@ -808,7 +808,8 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
                     Local_C_String=Parse_C_String();
 
-                    Val = ((f=Locate_File(UCS2String(ASCIItoUCS2String(Local_C_String)),POV_File_Text_User,ign,false)) == nullptr) ? 0.0 : 1.0;
+                    f = Locate_File(UCS2String(ASCIItoUCS2String(Local_C_String)), POV_File_Text_User, ign, false);
+                    Val = (f == nullptr) ? 0.0 : 1.0;
                     f = nullptr;
 
                     POV_FREE(Local_C_String);
@@ -1790,7 +1791,7 @@ void Parser::Parse_Rel_Term (EXPRESS& Express,int *Terms)
     Ok_To_Declare=true;
 
     UCS2 *Local_String = Parse_String(false, false);
-    if(Local_String != nullptr)
+    if (Local_String != nullptr)
     {
             *Terms = 1;
             Express[0] = Parse_Rel_String_Term(Local_String);
@@ -2338,7 +2339,7 @@ int Parser::Parse_Unknown_Vector(EXPRESS& Express, bool allow_identifier, bool *
     else
         Parse_Rel_Factor(Express,&Terms);
 
-    if(had_identifier != nullptr)
+    if (had_identifier != nullptr)
         *had_identifier = Identifier_In_Call;
 
     Allow_Identifier_In_Call = old_allow_id;
@@ -2777,7 +2778,7 @@ void Parser::Parse_BlendMapData<PigmentBlendMapData> (BlendMapTypeId Blend_Type,
             break;
 
         case kBlendMapType_Density:
-            rData=nullptr;
+            rData = nullptr;
             Parse_Media_Density_Pattern (&(rData));
             break;
 
@@ -2994,7 +2995,7 @@ void Parser::Parse_BlendListData<PigmentBlendMapData> (BlendMapTypeId Blend_Type
             break;
 
         case kBlendMapType_Density:
-            rData=nullptr;
+            rData = nullptr;
             Parse_Media_Density_Pattern (&(rData));
             break;
 
@@ -3044,7 +3045,7 @@ void Parser::Parse_BlendListData_Default<PigmentBlendMapData> (const ColourBlend
             break;
 
         case kBlendMapType_Density:
-            rData=nullptr;
+            rData = nullptr;
             break;
 
         default:

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -137,8 +137,8 @@ class BSPProgress : public BSPTree::Progress
         BSPProgress();
 };
 
-BoundingTask::BoundingTask(shared_ptr<BackendSceneData> sd, unsigned int bt) :
-    SceneTask(new TraceThreadData(dynamic_pointer_cast<SceneData>(sd)), boost::bind(&BoundingTask::SendFatalError, this, _1), "Bounding", sd),
+BoundingTask::BoundingTask(shared_ptr<BackendSceneData> sd, unsigned int bt, size_t seed) :
+    SceneTask(new TraceThreadData(dynamic_pointer_cast<SceneData>(sd), seed), boost::bind(&BoundingTask::SendFatalError, this, _1), "Bounding", sd),
     sceneData(sd),
     boundingThreshold(bt)
 {

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -97,7 +97,7 @@ BSPTree::~BSPTree()
 }
 
 #if BSP_WRITETREE
-static FILE *gFile = NULL;
+static FILE *gFile = nullptr;
 #endif
 
 bool BSPTree::operator()(const BasicRay& ray, Intersect& isect, Mailbox& mailbox, double maxdist)
@@ -110,7 +110,7 @@ bool BSPTree::operator()(const BasicRay& ray, Intersect& isect, Mailbox& mailbox
     int ignore1, ignore2;
     unsigned int tstackpos = 0;
 
-    if(Box::Intersect(ray, NULL, bmin, bmax, &rentry, &rexit, &ignore1, &ignore2) == false)
+    if (Box::Intersect(ray, nullptr, bmin, bmax, &rentry, &rexit, &ignore1, &ignore2) == false)
         return false; // no objects hit
 
     unsigned int inode = 0;
@@ -292,7 +292,7 @@ void BSPTree::build(const Progress& progress, const Objects& objects,
 #if BSP_WRITEBOUNDS
     FILE *bb = fopen(string(tempstr + ".bounds").c_str(), "w");
 
-    if(bb != NULL)
+    if (bb != nullptr)
         fprintf(bb, "%d\n", objects.size());
 #endif
 
@@ -310,7 +310,7 @@ void BSPTree::build(const Progress& progress, const Objects& objects,
         indices[i] = i;
 
 #if BSP_WRITEBOUNDS
-        if(bb != NULL)
+        if (bb != nullptr)
             fprintf(bb, "%f %f %f %f %f %f\n",
                     objects.GetMin(X, i), objects.GetMin(Y, i), objects.GetMin(Z, i),
                     objects.GetMax(X, i), objects.GetMax(Y, i), objects.GetMax(Z, i));
@@ -318,7 +318,7 @@ void BSPTree::build(const Progress& progress, const Objects& objects,
     }
 
 #if BSP_WRITEBOUNDS
-    if(bb != NULL)
+    if (bb != nullptr)
     {
         fprintf(bb, "%f %f %f %f %f %f\n",
                 bbox.pmin[X], bbox.pmin[Y], bbox.pmin[Z], bbox.pmax[X], bbox.pmax[Y], bbox.pmax[Z]);
@@ -334,7 +334,7 @@ void BSPTree::build(const Progress& progress, const Objects& objects,
 #if BSP_WRITETREE
     gFile = fopen(string(tempstr + ".tree").c_str(), "w");
 
-    if(gFile != NULL)
+    if (gFile != nullptr)
     {
         fprintf(gFile, "> %f %f %f %f %f %f\n", bbox.pmin[X], bbox.pmin[Y], bbox.pmin[Z], bbox.pmax[X], bbox.pmax[Y], bbox.pmax[Z]);
         fprintf(gFile, "T %d\n", objects.size());
@@ -346,7 +346,7 @@ void BSPTree::build(const Progress& progress, const Objects& objects,
 
 #if BSP_READNODES
     FILE *infile = fopen(string(tempstr + ".nodes").c_str(), "r");
-    if(infile == NULL)
+    if (infile == nullptr)
         throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot open BSP nodes file (BSP_READNODES == true, tree generation disabled)");
     try
     {
@@ -355,7 +355,7 @@ void BSPTree::build(const Progress& progress, const Objects& objects,
     catch(pov_base::Exception& e)
     {
 #if BSP_WRITETREE
-        if (gFile != NULL)
+        if (gFile != nullptr)
             fclose (gFile);
 #endif
         if ((e.codevalid() != false) && (e.code() == kFileDataErr))
@@ -364,7 +364,7 @@ void BSPTree::build(const Progress& progress, const Objects& objects,
             char str[1024];
             long pos = ftell(infile);
             fseek(infile, 0, SEEK_SET);
-            while (fgets(str, sizeof(str) - 1, infile) != NULL)
+            while (fgets(str, sizeof(str) - 1, infile) != nullptr)
             {
                 line++;
                 if (ftell(infile) >= pos)
@@ -385,7 +385,7 @@ void BSPTree::build(const Progress& progress, const Objects& objects,
 #endif
 
 #if BSP_WRITETREE
-    if(gFile != NULL)
+    if (gFile != nullptr)
     {
         fflush(gFile);
         fclose(gFile);
@@ -450,7 +450,7 @@ void BSPTree::BuildRecursive(const Progress& progress, const Objects& objects, u
     }
 
 #if BSP_WRITETREE
-    if(gFile != NULL)
+    if (gFile != nullptr)
         fprintf(gFile, "%*s", (maxDepth - maxlevel) * 2, "");
 #endif
 
@@ -460,7 +460,7 @@ void BSPTree::BuildRecursive(const Progress& progress, const Objects& objects, u
     if(cnt == 0)
     {
 #if BSP_WRITETREE
-        if(gFile != NULL)
+        if (gFile != nullptr)
             fprintf(gFile, "*\n");
 #endif
 
@@ -634,7 +634,7 @@ void BSPTree::BuildRecursive(const Progress& progress, const Objects& objects, u
         sort(splits[bestaxis].begin() + bestsplit, splits[bestaxis].begin() + bestscnt, ci);
 
 #if BSP_WRITETREE
-        if(gFile != NULL)
+        if (gFile != nullptr)
         {
             fprintf(gFile, "| %c = %g ", (int)('x' + bestaxis), bestplane);
             fprintf(gFile, "[%g,%g,%g -> %g,%g,%g]\n",
@@ -684,7 +684,7 @@ void BSPTree::SetObjectNode(unsigned int inode, unsigned int indexbegin, unsigne
     unsigned int count = indexend - indexbegin;
 
 #if BSP_WRITETREE
-    if(gFile != NULL)
+    if (gFile != nullptr)
     {
         fprintf(gFile, "# (%d) ", count);
         for(unsigned int i = indexbegin; i < indexend; i++)
@@ -742,7 +742,7 @@ char *BSPTree::GetLine(char *str, int len, FILE *infile)
 {
     char *s;
 
-    while((s = fgets(str, len, infile)) != NULL)
+    while ((s = fgets(str, len, infile)) != nullptr)
     {
         while(isspace(*s))
             s++;
@@ -753,7 +753,7 @@ char *BSPTree::GetLine(char *str, int len, FILE *infile)
         if(*++s != '/')
             throw POV_EXCEPTION(kFileDataErr, "Invalid character in node file");
     }
-    if(s == NULL)
+    if (s == nullptr)
         throw POV_EXCEPTION(kFileDataErr, "Unexpected EOF in node file");
     return s;
 }
@@ -822,7 +822,7 @@ void BSPTree::ReadRecursive(const Progress& progress, FILE *infile, unsigned int
             throw POV_EXCEPTION(kFileDataErr, "Expected axis and plane whilst reading node file");
 
 #if BSP_WRITETREE
-        if(gFile != NULL)
+        if (gFile != nullptr)
             fprintf(gFile, "%*s| %c = %g\n", level * 2, "", 'x' + bestaxis, bestplane);
 #endif
 
@@ -856,7 +856,7 @@ void BSPTree::ReadRecursive(const Progress& progress, FILE *infile, unsigned int
         if (cnt == 0)
         {
 #if BSP_WRITETREE
-            if(gFile != NULL)
+            if (gFile != nullptr)
                 fprintf(gFile, "%*s*\n", level * 2, "");
 #endif
             nodes[inode].type = Node::Object;
@@ -884,7 +884,7 @@ void BSPTree::ReadRecursive(const Progress& progress, FILE *infile, unsigned int
         fscanf(infile, "\n");
 
 #if BSP_WRITETREE
-        if(gFile != NULL)
+        if (gFile != nullptr)
             fprintf(gFile, "%*s", level * 2, "");
 #endif
 

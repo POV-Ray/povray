@@ -163,7 +163,12 @@
     // 2. y scale (inverse) 
     // 3. z scale (inverse)
 
-#declare f_enneper = function { internal(18) }
+#if (Functions_Inc_Temp < 3.8)
+    #declare deprecated once "f_enneper was broken prior to v3.8; results will most likely differ."
+             f_enneper = function { internal(18) }
+#else
+    #declare f_enneper = function { internal(18) }
+#end
 // Parameters: x, y, z
     // One extra parameter required: 
     // 1. Field strength
