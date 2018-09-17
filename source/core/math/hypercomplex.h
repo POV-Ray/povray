@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -104,7 +104,7 @@ class HypercomplexReciprocalFractalRules : public HypercomplexBaseFractalRules
 };
 
 void Complex_Exp (Complex *target, const Complex *source, const Complex *);
-void Complex_Ln (Complex *target, const Complex *source, const Complex *);
+void Complex_Ln (Complex *target, const Complex *source, const Complex * = nullptr);
 void Complex_Sin (Complex *target, const Complex *source, const Complex *);
 void Complex_ASin (Complex *target, const Complex *source, const Complex *);
 void Complex_Sinh (Complex *target, const Complex *source, const Complex *);

@@ -16,7 +16,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -69,14 +69,14 @@ POV_xALLOC functions also take a message as the last parameter and
 automatically call MAError(msg) if the allocation fails. That means that
 instead of writing
 
-  if ((New = malloc(sizeof(*New))) == NULL)
+    if ((New = malloc(sizeof(*New))) == nullptr)
     {
-    MAError ("new object");
+        MAError ("new object");
     }
 
 you'd just use
 
-  New = POV_MALLOC (sizeof(*New), "new object");
+    New = POV_MALLOC (sizeof(*New), "new object");
 
 This also expands the function of the macros to include error checking and
 memory tracking.
@@ -207,7 +207,7 @@ number of calls to malloc/free and some other statistics.
 
 #if defined(MEM_RECLAIM)
     static int poolno = 0; // GLOBAL VARIABLE
-    static MEMNODE *memlist = NULL; // GLOBAL VARIABLE
+    static MEMNODE *memlist = nullptr; // GLOBAL VARIABLE
 #endif
 
 #if !defined(MEM_PREFILL_STRING)
@@ -274,7 +274,7 @@ void mem_init()
 #if defined(MEM_RECLAIM)
     num_nodes = 0;
     poolno = 0;
-    memlist = NULL;
+    memlist = nullptr;
 #endif
 #if defined(MEM_GUARD)
     mem_guard_string_len = std::strlen(mem_guard_string);
@@ -293,7 +293,7 @@ static int mem_check_tag(MEMNODE *node)
 {
     int isOK = false;
 
-    if (node != NULL)
+    if (node != nullptr)
         if (node->tag == MEMTAG_VALUE)
             isOK = true;
     return isOK;
@@ -327,7 +327,7 @@ void *pov_malloc(size_t size, const char *file, int line, const char *msg)
 
     block = reinterpret_cast<void *>(MALLOC(totalsize));
 
-    if (block == NULL)
+    if (block == nullptr)
         throw std::bad_alloc();; // TODO FIXME !!! // Parser::MAError(msg, (int)size);
 
 #if defined(MEM_HEADER)
@@ -395,9 +395,9 @@ void *pov_realloc(void *ptr, size_t size, const char *file, int line, const char
     {
         if (ptr)
             pov_free(ptr, file, line);
-        return NULL;
+        return nullptr;
     }
-    else if (ptr == NULL)
+    else if (ptr == nullptr)
         return pov_malloc(size, file, line, msg);
 
     block = reinterpret_cast<void *>(reinterpret_cast<char *>(ptr) - NODESIZE - MEM_GUARD_SIZE);
@@ -451,7 +451,7 @@ void *pov_realloc(void *ptr, size_t size, const char *file, int line, const char
 
     block = reinterpret_cast<void *>(REALLOC(block, NODESIZE + (MEM_GUARD_SIZE * 2) + size));
 
-    if (block == NULL)
+    if (block == nullptr)
         throw std::bad_alloc(); // TODO FIXME !!! // Parser::MAError(msg, (int)size);
 
 #if defined(MEM_PREFILL)
@@ -486,13 +486,13 @@ void *pov_realloc(void *ptr, size_t size, const char *file, int line, const char
 #endif
 
 #if defined(MEM_RECLAIM)
-    if (prev == NULL)
+    if (prev == nullptr)
         memlist = node;
     else
         prev->next = node;
-    if (node->next != NULL)
+    if (node->next != nullptr)
         node->next->prev = node;
-    if (next != NULL)
+    if (next != nullptr)
         next->prev = node;
 #endif
 
@@ -515,8 +515,8 @@ void pov_free(void *ptr, const char *file, int line)
     size_t i;
 #endif
 
-    if (ptr == NULL)
-        throw pov_base::Exception(NULL, file, (unsigned int)line, "Attempt to free NULL pointer.");
+    if (ptr == nullptr)
+        throw pov_base::Exception(nullptr, file, (unsigned int)line, "Attempt to free NULL pointer.");
 
     block = reinterpret_cast<void *>(reinterpret_cast<char *>(ptr) - NODESIZE - MEM_GUARD_SIZE);
 
@@ -585,7 +585,7 @@ void pov_free(void *ptr, const char *file, int line)
 void mem_release_all()
 {
 #if defined(MEM_RECLAIM)
-    OStream *f = NULL;
+    OStream *f = nullptr;
     MEMNODE *p, *tmp;
     size_t totsize;
 
@@ -595,11 +595,11 @@ void mem_release_all()
     totsize = 0;
 
 #if defined(MEM_TRACE)
-    if (p != NULL)
+    if (p != nullptr)
         f = New_OStream(MEM_LOG_FNAME, POV_File_Data_LOG, true);
 #endif
 
-    while (p != NULL)
+    while (p != nullptr)
     {
 #if defined(MEM_TRACE)
 
@@ -615,7 +615,7 @@ void mem_release_all()
             leak_msg = true;
         }
 
-        if (f != NULL)
+        if (f != nullptr)
             f->printf("File:%13s  Line:%4d  Size:%lu\n", p->file, p->line, (unsigned long)(p->size - NODESIZE - (MEM_GUARD_SIZE * 2)));
 #endif
 
@@ -625,14 +625,14 @@ void mem_release_all()
         FREE(tmp);
     }
 
-    if (f != NULL)
+    if (f != nullptr)
         delete f;
 
 //  if (totsize > 0)
 //      Debug_Info("\n%lu bytes reclaimed\n", totsize);
 
     poolno = 0;
-    memlist = NULL;
+    memlist = nullptr;
 #endif
 }
 
@@ -648,19 +648,19 @@ static void add_node(MEMNODE *node)
         Debug_Info("add_node(): Memory pointer corrupt!\n");
 #endif /* MEM_TAG */
 
-    if (memlist == NULL)
+    if (memlist == nullptr)
     {
         memlist = node;
         node->poolno = poolno;
-        node->prev = NULL;
-        node->next = NULL;
+        node->prev = nullptr;
+        node->next = nullptr;
         num_nodes = 0;
     }
     else
     {
         memlist->prev = node;
         node->poolno = poolno;
-        node->prev = NULL;
+        node->prev = nullptr;
         node->next = memlist;
         memlist = node;
     }
@@ -669,7 +669,7 @@ static void add_node(MEMNODE *node)
 
 
 /****************************************************************************/
-/* Detatches a node from the 'allocated' list but doesn't free it */
+/* Detaches a node from the 'allocated' list but doesn't free it */
 static void remove_node(MEMNODE *node)
 {
 
@@ -679,10 +679,10 @@ static void remove_node(MEMNODE *node)
 #endif /* MEM_TAG */
 
     num_nodes--;
-    if (node->prev != NULL)
+    if (node->prev != nullptr)
         node->prev->next = node->next;
 
-    if (node->next != NULL)
+    if (node->next != nullptr)
         node->next->prev = node->prev;
 
     if (memlist == node)
@@ -698,8 +698,8 @@ static void remove_node(MEMNODE *node)
         memlist = node->next;
     }
 
-    node->prev = NULL;
-    node->next = NULL;
+    node->prev = nullptr;
+    node->next = nullptr;
 }
 
 #endif /* MEM_RECLAIM */

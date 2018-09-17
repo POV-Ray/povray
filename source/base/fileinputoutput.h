@@ -151,8 +151,8 @@ class IFileStream : public IStream
 
         virtual bool eof() const { return(fail ? true : feof(f) != 0); }
         virtual bool seekg(POV_OFF_T pos, unsigned int whence = seek_set);
-        virtual POV_OFF_T tellg() const { return(f == NULL ? -1 : ftell(f)); }
-        virtual bool clearstate() { if(f != NULL) fail = false; return !fail; }
+        virtual POV_OFF_T tellg() const { return(f == nullptr ? -1 : ftell(f)); }
+        virtual bool clearstate() { if (f != nullptr) fail = false; return !fail; }
 
         virtual bool read(void *buffer, size_t count);
         virtual bool getline(char *s, size_t buflen);
@@ -204,8 +204,8 @@ class OStream : public IOBase
         ~OStream();
 
         virtual bool seekg(POV_OFF_T pos, unsigned int whence = seek_set);
-        virtual POV_OFF_T tellg() const { return(f == NULL ? -1 : ftell(f)); }
-        inline bool clearstate() { if(f != NULL) fail = false; return !fail; }
+        virtual POV_OFF_T tellg() const { return(f == nullptr ? -1 : ftell(f)); }
+        inline bool clearstate() { if (f != nullptr) fail = false; return !fail; }
         virtual bool eof() const { return(fail ? true : feof(f) != 0); }
 
         bool write(const void *buffer, size_t count);

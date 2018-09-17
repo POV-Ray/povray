@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -95,7 +95,7 @@ namespace pov
 #define HIERARCHY_FLAG            0x00000400L ///< Object can have a bounding hierarchy.
 #define HOLLOW_FLAG               0x00000800L ///< Object is hollow (atmosphere inside).
 #define HOLLOW_SET_FLAG           0x00001000L ///< Hollow explicitly set in scene file.
-#define UV_FLAG                   0x00002000L ///< Object uses UV mapping.
+#define UV_FLAG                   0x00002000L ///< Object uses UV mapping. Set if `uv_mapping` is specified on an object itself.
 #define DOUBLE_ILLUMINATE_FLAG    0x00004000L ///< Illuminate both sides of the surface.
 #define NO_IMAGE_FLAG             0x00008000L ///< Object doesn't catch camera rays.
 #define NO_REFLECTION_FLAG        0x00010000L ///< Object doesn't catch reflection rays.
@@ -191,7 +191,7 @@ class ObjectBase
         /// Construct object from scratch.
         ObjectBase(int t) :
             Type(t),
-            Texture(NULL), Interior_Texture(NULL), interior(), Trans(NULL),
+            Texture(nullptr), Interior_Texture(nullptr), interior(), Trans(nullptr),
             Ph_Density(0), RadiosityImportance(0.0), RadiosityImportanceSet(false), Flags(0)
         {
             Make_BBox(BBox, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
@@ -212,10 +212,10 @@ class ObjectBase
         {
             if (transplant)
             {
-                o.Texture = NULL;
-                o.Interior_Texture = NULL;
+                o.Texture = nullptr;
+                o.Interior_Texture = nullptr;
                 o.interior.reset();
-                o.Trans = NULL;
+                o.Trans = nullptr;
                 o.Bound.clear();
                 o.Clip.clear();
                 o.LLights.clear();
@@ -262,6 +262,20 @@ class ObjectBase
         /// the place to do that anymore since a scene may persist between views).
         ///
         virtual void DispatchShutdownMessages(GenericMessenger& messenger) {};
+
+        /// Test texture for opacity.
+        ///
+        /// This method will be called by the parser as part of object post-processing,
+        /// to test whether the object's material is guaranteed to be fully opaque.
+        ///
+        /// The default implementation reports the object as opaque if if has a texture that is
+        /// guaranteed to be opaque (as determined by @ref Test_Opacity()), and it has either no
+        /// explicit interior texture or that texture is also guaranteed to be opaque.
+        ///
+        /// Primitives with innate textures (such as blob or mesh) must override this method, and
+        /// return false if any of their innate textures is potentially non-opaque.
+        ///
+        virtual bool IsOpaque() const;
 
     protected:
         explicit ObjectBase(const ObjectBase&) { }

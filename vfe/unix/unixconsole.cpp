@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -154,7 +154,7 @@ static vfeDisplay *UnixDisplayCreator (unsigned int width, unsigned int height, 
     {
 #ifdef HAVE_LIBSDL
         case DISP_MODE_SDL:
-            if (display != NULL && display->GetWidth() == width && display->GetHeight() == height)
+            if (display != nullptr && display->GetWidth() == width && display->GetHeight() == height)
             {
                 UnixDisplay *p = new UnixSDLDisplay (width, height, gamma, session, false) ;
                 if (p->TakeOver (display))
@@ -168,7 +168,7 @@ static vfeDisplay *UnixDisplayCreator (unsigned int width, unsigned int height, 
             return new UnixTextDisplay (width, height, gamma, session, visible) ;
             break;
         default:
-            return NULL;
+            return nullptr;
     }
 }
 
@@ -206,7 +206,7 @@ static void PrintStatusChanged (vfeSession *session, State force = kUnknown)
             break;
         case kRendering:
 #ifdef HAVE_LIBSDL
-            if ((gDisplay != NULL) && (gDisplayMode == DISP_MODE_SDL))
+            if ((gDisplay != nullptr) && (gDisplayMode == DISP_MODE_SDL))
             {
                 fprintf (stderr, "==== [Rendering... Press p to pause, q to quit] ============================\n");
             }
@@ -220,7 +220,7 @@ static void PrintStatusChanged (vfeSession *session, State force = kUnknown)
             break;
         case kPausedRendering:
 #ifdef HAVE_LIBSDL
-            if ((gDisplay != NULL) && (gDisplayMode == DISP_MODE_SDL))
+            if ((gDisplay != nullptr) && (gDisplayMode == DISP_MODE_SDL))
             {
                 fprintf (stderr, "==== [Paused... Press p to resume] =========================================\n");
             }
@@ -231,6 +231,9 @@ static void PrintStatusChanged (vfeSession *session, State force = kUnknown)
 #else
             fprintf (stderr, "==== [Paused...] ===========================================================\n");
 #endif
+            break;
+        default:
+            // Do nothing special.
             break;
     }
 }
@@ -360,7 +363,7 @@ Press <Enter> to continue or <Ctrl-C> to abort.\n\
         struct timeval tv = {0,0};  // no timeout
         FD_ZERO(&readset);
         FD_SET(STDIN_FILENO, &readset);
-        if (select(STDIN_FILENO+1, &readset, NULL, NULL, &tv) < 0)
+        if (select(STDIN_FILENO+1, &readset, nullptr, nullptr, &tv) < 0)
             break;
         if (FD_ISSET(STDIN_FILENO, &readset))  // user input is available
         {
@@ -433,13 +436,13 @@ int main (int argc, char **argv)
     sigaddset(&sigset, SIGCHLD);
 #endif
 
-    pthread_sigmask(SIG_BLOCK, &sigset, NULL);
+    pthread_sigmask(SIG_BLOCK, &sigset, nullptr);
 
     // create the signal handling thread
     sigthread = new boost::thread(SignalHandler);
 
     session = new vfeUnixSession();
-    if (session->Initialize(NULL, NULL) != vfeNoError)
+    if (session->Initialize(nullptr, nullptr) != vfeNoError)
         ErrorExit(session);
 
     // display mode registration
@@ -521,7 +524,7 @@ int main (int argc, char **argv)
         char *s = std::getenv ("POVINC");
         session->SetDisplayCreator(UnixDisplayCreator);
         session->GetUnixOptions()->Process_povray_ini(opts);
-        if (s != NULL)
+        if (s != nullptr)
             opts.AddLibraryPath (s);
         while (*++argv)
             opts.AddCommand (*argv);
@@ -562,7 +565,7 @@ int main (int argc, char **argv)
         if (flags & stBackendStateChanged)
             PrintStatusChanged (session);
 
-        if (GetRenderWindow() != NULL)
+        if (GetRenderWindow() != nullptr)
         {
             // early exit
             if (GetRenderWindow()->HandleEvents())
@@ -588,7 +591,7 @@ int main (int argc, char **argv)
     }
 
     // pause when done for single or last frame of an animation
-    if (session->Failed() == false && GetRenderWindow() != NULL && session->GetBoolOption("Pause_When_Done", false))
+    if (session->Failed() == false && GetRenderWindow() != nullptr && session->GetBoolOption("Pause_When_Done", false))
     {
         PrintStatusChanged(session, kPausedRendering);
         PauseWhenDone(session);

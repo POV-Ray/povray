@@ -80,7 +80,7 @@ for:
       $env:pov_release_type = ($env:pov_build_type).ToLower() + ' release'
       $env:pov_build_title = $env:pov_build_type + ' build'
       $env:pov_build_message += '**Note:** This is a binary-only ' + $env:pov_release_type + '; to install, copy the '
-      $env:pov_build_message += 'binary into an existing POV-Ray 3.7 installation. (Make sure to backup the original '
+      $env:pov_build_message += 'binary into an existing POV-Ray v3.7 installation. (Make sure to backup the original '
       $env:pov_build_message += 'binary first.)'
       $env:pov_build_message += "`n`n"
       $env:pov_build_message += 'These binaries require Windows Vista or higher, due to limitations of our automated '

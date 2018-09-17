@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -218,6 +218,45 @@ void RandomDoubleSequence::Generator::SetSeed(size_t seedindex)
 
 
 /**********************************************************************************
+*  Random Distribution Functions
+*********************************************************************************/
+
+
+Vector2d Uniform2dOnSquare(SequentialDoubleGeneratorPtr source)
+{
+    double x = (*source)();
+    double y = (*source)();
+    return Vector2d((*source)(), (*source)());
+}
+
+Vector2d Uniform2dOnDisc(SequentialDoubleGeneratorPtr source)
+{
+    double r = sqrt((*source)());
+    double theta = (*source)() * 2*M_PI;
+    double x = r * cos(theta);
+    double y = r * sin(theta);
+    return Vector2d(x, y);
+}
+
+Vector3d Uniform3dOnSphere(SequentialDoubleGeneratorPtr source)
+{
+    double x = (*source)() * 2 - 1.0;
+    double r = sqrt(1 - x*x);
+    double theta = (*source)() * 2*M_PI;
+    double y = r * cos(theta);
+    double z = r * sin(theta);
+    return Vector3d(x, y, z);
+}
+
+Vector3d CosWeighted3dOnHemisphere(SequentialDoubleGeneratorPtr source)
+{
+    Vector2d v = Uniform2dOnDisc(source);
+    double y = sqrt (1 - v.lengthSqr());
+    return Vector3d(v.x(), y, v.y());
+}
+
+
+/**********************************************************************************
  *  Local Types : Abstract Generators
  *********************************************************************************/
 
@@ -251,7 +290,7 @@ class HybridNumberGenerator : public SeedableNumberGenerator<Type>, public Index
  *  Template class representing a generator for uniformly distributed numbers in a given range.
  */
 template<class Type, class BoostGenerator, class UniformType, size_t CYCLE_LENGTH = 0>
-class UniformRandomNumberGenerator : public SequentialNumberGenerator<Type>
+class UniformRandomNumberGenerator : public SeedableNumberGenerator<Type>
 {
     public:
 
@@ -265,6 +304,7 @@ class UniformRandomNumberGenerator : public SequentialNumberGenerator<Type>
         UniformRandomNumberGenerator(Type minval, Type maxval);
         virtual Type operator()();
         virtual size_t CycleLength() const;
+        virtual void Seed(size_t seed) override;
 
     protected:
         variate_generator<BoostGenerator, UniformType> generator;
@@ -634,6 +674,12 @@ size_t UniformRandomNumberGenerator<Type,BoostGenerator,UniformType,CYCLE_LENGTH
         return CYCLE_LENGTH;
 }
 
+template<class Type, class BoostGenerator, class UniformType, size_t CYCLE_LENGTH>
+void UniformRandomNumberGenerator<Type, BoostGenerator, UniformType, CYCLE_LENGTH>::Seed(size_t seed)
+{
+    generator.engine().seed((uint32_t)seed);
+}
+
 
 /**********************************************************************************
  *  HaltonGenerator implementation
@@ -945,10 +991,10 @@ SeedableDoubleGeneratorPtr GetRandomDoubleGenerator(double minval, double maxval
     return generator;
 }
 
-SequentialDoubleGeneratorPtr GetRandomDoubleGenerator(double minval, double maxval)
+SeedableDoubleGeneratorPtr GetRandomDoubleGenerator(double minval, double maxval)
 {
     Mt19937DoubleGenerator::ParameterStruct param(minval, maxval);
-    SequentialDoubleGeneratorPtr generator(new Mt19937DoubleGenerator(param));
+    SeedableDoubleGeneratorPtr generator(new Mt19937DoubleGenerator(param));
     (void)(*generator)(); // legacy fix
     return generator;
 }

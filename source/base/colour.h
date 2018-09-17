@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -1228,6 +1228,14 @@ inline T ColourDistanceRGBT (const GenericRGBTColour<T>& a, const GenericRGBTCol
 template<typename T>
 inline GenericRGBTColour<T> Sqr(const GenericRGBTColour<T>& a) { return a * a; }
 
+/// @relates GenericRGBTColour
+template<typename T>
+inline GenericRGBTColour<T> Sqrt(const GenericRGBTColour<T>& a)
+{
+    return GenericRGBTColour<T>(Sqrt(a.rgb()),
+                                sqrt(a.transm()));
+}
+
 typedef GenericRGBTColour<ColourChannel>        RGBTColour;         ///< Standard precision RGBxT colour.
 typedef GenericRGBTColour<PreciseColourChannel> PreciseRGBTColour;  ///< High precision RGBxT colour.
 
@@ -1790,6 +1798,9 @@ inline GenericColour<T> Cos(const GenericColour<T>& a) { return a.Cos(); }
 
 typedef GenericColour<ColourChannel>         MathColour;        ///< Standard precision colour.
 typedef GenericColour<PreciseColourChannel>  PreciseMathColour; ///< High precision colour.
+
+extern template class GenericColour<ColourChannel>;
+extern template class GenericColour<PreciseColourChannel>;
 
 
 /// Generic template class to hold and manipulate a colour plus transparency information.

@@ -13,7 +13,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -177,7 +177,7 @@ bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
 
     Thread->Stats()[Ray_Sphere_Sweep_Tests]++;
 
-    if(Trans == NULL)
+    if (Trans == nullptr)
     {
         New_Ray.Origin = ray.Origin;
         New_Ray.Direction = ray.Direction;
@@ -233,7 +233,7 @@ bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
         for (i = 0; i < Num_Isect; i++)
         {
             // Was the ray transformed?
-            if (Trans != NULL)
+            if (Trans != nullptr)
             {
                 // Yes, invert the transformation
                 Isect[i].t /= len;
@@ -746,7 +746,7 @@ bool SphereSweep::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 
     inside = false;
 
-    if(Trans == NULL)
+    if (Trans == nullptr)
         New_Point = IPoint;
     else
         MInvTransPoint(New_Point, IPoint, Trans);
@@ -954,8 +954,8 @@ ObjectPtr SphereSweep::Copy()
     Destroy_Transform(New->Trans);
     *New = *this;
 
-    New->Segment = NULL;
-    New->Sphere = NULL;
+    New->Segment = nullptr;
+    New->Sphere = nullptr;
     New->Interpolation = Interpolation;
 
     New->Num_Modeling_Spheres = Num_Modeling_Spheres;
@@ -1008,7 +1008,7 @@ ObjectPtr SphereSweep::Copy()
 
 void SphereSweep::Translate(const Vector3d& Vector, const TRANSFORM *tr)
 {
-    if(Trans == NULL)
+    if (Trans == nullptr)
     {
         for(int i = 0; i < Num_Modeling_Spheres; i++)
             Modeling_Sphere[i].Center += Vector;
@@ -1055,7 +1055,7 @@ void SphereSweep::Translate(const Vector3d& Vector, const TRANSFORM *tr)
 
 void SphereSweep::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
-    if(Trans == NULL)
+    if (Trans == nullptr)
     {
         for (int i = 0; i < Num_Modeling_Spheres; i++)
             MTransPoint(Modeling_Sphere[i].Center, Modeling_Sphere[i].Center, tr);
@@ -1104,11 +1104,11 @@ void SphereSweep::Scale(const Vector3d& Vector, const TRANSFORM *tr)
 {
     if((Vector[X] != Vector[Y]) || (Vector[X] != Vector[Z]))
     {
-        if(Trans == NULL)
+        if (Trans == nullptr)
             Trans = Create_Transform();
     }
 
-    if(Trans == NULL)
+    if (Trans == nullptr)
     {
         for(int i = 0; i < Num_Modeling_Spheres; i++)
         {
@@ -1161,17 +1161,17 @@ SphereSweep::SphereSweep() : ObjectBase(SPHERE_SWEEP_OBJECT)
     Interpolation = -1;
 
     Num_Modeling_Spheres = 0;
-    Modeling_Sphere = NULL;
+    Modeling_Sphere = nullptr;
 
     Num_Spheres = 0;
-    Sphere = NULL;
+    Sphere = nullptr;
 
     Num_Segments = 0;
-    Segment = NULL;
+    Segment = nullptr;
 
     Depth_Tolerance = DEPTH_TOLERANCE;
 
-    Trans = NULL;
+    Trans = nullptr;
 }
 
 
@@ -1210,7 +1210,7 @@ SphereSweep::SphereSweep() : ObjectBase(SPHERE_SWEEP_OBJECT)
 
 void SphereSweep::Transform(const TRANSFORM *tr)
 {
-    if(Trans == NULL)
+    if (Trans == nullptr)
         Trans = Create_Transform();
 
     Compose_Transforms(Trans, tr);
@@ -1340,7 +1340,7 @@ void SphereSweep::Compute_BBox()
 
     Make_BBox_from_min_max(BBox, mins, maxs);
 
-    if(Trans != NULL)
+    if (Trans != nullptr)
         Recompute_BBox(&BBox, Trans);
 }
 
@@ -1391,7 +1391,7 @@ void SphereSweep::Compute()
     {
         case LINEAR_SPHERE_SWEEP:
             // Allocate memory if necessary
-            if(Segment == NULL)
+            if (Segment == nullptr)
             {
                 Num_Segments = Num_Modeling_Spheres - 1;
                 size = Num_Segments * sizeof(SPHSWEEP_SEG);
@@ -1423,7 +1423,7 @@ void SphereSweep::Compute()
             break;
         case CATMULL_ROM_SPLINE_SPHERE_SWEEP:
             // Allocate memory if necessary
-            if(Segment == NULL)
+            if (Segment == nullptr)
             {
                 Num_Segments = Num_Modeling_Spheres - 3;
                 size = Num_Segments * sizeof(SPHSWEEP_SEG);
@@ -1466,7 +1466,7 @@ void SphereSweep::Compute()
             break;
         case B_SPLINE_SPHERE_SWEEP:
             // Allocate memory if necessary
-            if(Segment == NULL)
+            if (Segment == nullptr)
             {
                 Num_Segments = Num_Modeling_Spheres - 3;
                 size = Num_Segments * sizeof(SPHSWEEP_SEG);
@@ -1583,7 +1583,7 @@ void SphereSweep::Compute()
     // Calculate single spheres
 
     // Allocate memory if necessary
-    if(Sphere == NULL)
+    if (Sphere == nullptr)
     {
         Num_Spheres = Num_Segments + 1;
         size = Num_Spheres * sizeof(SPHSWEEP_SPH);

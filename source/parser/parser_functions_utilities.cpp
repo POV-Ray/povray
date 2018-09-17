@@ -85,12 +85,12 @@ using namespace pov;
 FUNCTION_PTR Parser::Parse_Function(void)
 {
     FUNCTION_PTR ptr = (FUNCTION_PTR)POV_MALLOC(sizeof(FUNCTION), "Function ID");
-    ExprNode *expression = NULL;
+    ExprNode *expression = nullptr;
     FunctionCode function;
 
     Parse_Begin();
 
-    FNCode f(this, &function, false, NULL);
+    FNCode f(this, &function, false, nullptr);
 
     expression = FNSyntax_ParseExpression();
     f.Compile(expression);
@@ -135,10 +135,10 @@ FUNCTION_PTR Parser::Parse_Function(void)
 FUNCTION_PTR Parser::Parse_FunctionContent(void)
 {
     FUNCTION_PTR ptr = (FUNCTION_PTR)POV_MALLOC(sizeof(FUNCTION), "Function ID");
-    ExprNode *expression = NULL;
+    ExprNode *expression = nullptr;
     FunctionCode function;
 
-    FNCode f(this, &function, false, NULL);
+    FNCode f(this, &function, false, nullptr);
 
     expression = FNSyntax_ParseExpression();
     f.Compile(expression);
@@ -171,7 +171,7 @@ void Parser::Parse_FunctionOrContentList(GenericScalarFunctionPtr* apFn, unsigne
     {
         if (!mandatory && (Peek_Token(RIGHT_CURLY_TOKEN) || Parse_Comma()))
         {
-            apFn[i] = NULL;
+            apFn[i] = nullptr;
             continue;
         }
         apFn[i] = new FunctionVM::CustomFunction(fnVMContext->functionvm.get(), Parse_FunctionOrContent());
@@ -213,7 +213,7 @@ void Parser::Parse_FunctionOrContentList(GenericScalarFunctionPtr* apFn, unsigne
 FUNCTION_PTR Parser::Parse_DeclareFunction(int *token_id, const char *fn_name, bool is_local)
 {
     FUNCTION_PTR ptr = (FUNCTION_PTR)POV_MALLOC(sizeof(FUNCTION), "Function ID");
-    ExprNode *expression = NULL;
+    ExprNode *expression = nullptr;
     FunctionCode function;
 
     // default type is float function

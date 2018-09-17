@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -107,10 +107,10 @@ int main (int argc, char **argv)
           DISCLAIMER_MESSAGE_1 "\n"
           DISCLAIMER_MESSAGE_2 "\n\n");
 
-  if (session->Initialize(NULL, NULL) != vfeNoError)
+  if (session->Initialize(nullptr, nullptr) != vfeNoError)
     ErrorExit(session);
 
-  if ((s = std::getenv ("POVINC")) != NULL)
+  if ((s = std::getenv ("POVINC")) != nullptr)
     opts.AddLibraryPath (s);
   while (*++argv)
     opts.AddCommand (*argv);

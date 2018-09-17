@@ -58,7 +58,8 @@ class PhotonSortingTask : public RenderTask
         vector<PhotonMap*> mediaMaps;
         PhotonShootingStrategy* strategy;
 
-        PhotonSortingTask(ViewData *vd, const vector<PhotonMap*>& surfaceMaps, const vector<PhotonMap*>& mediaMaps, PhotonShootingStrategy* strategy);
+        PhotonSortingTask(ViewData *vd, const vector<PhotonMap*>& surfaceMaps, const vector<PhotonMap*>& mediaMaps,
+                          PhotonShootingStrategy* strategy, size_t seed);
         ~PhotonSortingTask();
 
         void Run();

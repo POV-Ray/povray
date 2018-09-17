@@ -58,9 +58,9 @@ namespace pov
 Scene::Scene(POVMSAddress backendAddr, POVMSAddress frontendAddr, RenderBackend::SceneId sid) :
     sceneData(new BackendSceneData()),
     stopRequsted(false),
-    parserControlThread(NULL)
+    parserControlThread(nullptr)
 {
-    sceneData->tree = NULL;
+    sceneData->tree = nullptr;
     sceneData->sceneId = sid;
     sceneData->backendAddress = backendAddr;
     sceneData->frontendAddress = frontendAddr;
@@ -71,7 +71,7 @@ Scene::~Scene()
     stopRequsted = true; // NOTE: Order is important here, set this before stopping the queue!
     parserTasks.Stop();
 
-    if(parserControlThread != NULL)
+    if (parserControlThread != nullptr)
         parserControlThread->join();
     delete parserControlThread;
 
@@ -82,8 +82,10 @@ Scene::~Scene()
 
 void Scene::StartParser(POVMS_Object& parseOptions)
 {
+    size_t seed = 0; // TODO
+
     // A scene can only be parsed once
-    if(parserControlThread == NULL)
+    if (parserControlThread == nullptr)
         parserControlThread = Task::NewBoostThread(boost::bind(&Scene::ParserControlThread, this), POV_THREAD_STACK_SIZE);
     else
         return;
@@ -160,7 +162,9 @@ void Scene::StartParser(POVMS_Object& parseOptions)
     }
 
     // do parsing
-    sceneThreadData.push_back(dynamic_cast<TraceThreadData *>(parserTasks.AppendTask(new pov_parser::Parser(sceneData, bool(parseOptions.Exist(kPOVAttrib_Clock)), parseOptions.TryGetFloat(kPOVAttrib_Clock, 0.0)))));
+    sceneThreadData.push_back(dynamic_cast<TraceThreadData *>(parserTasks.AppendTask(new pov_parser::Parser(
+        sceneData, bool(parseOptions.Exist(kPOVAttrib_Clock)), parseOptions.TryGetFloat(kPOVAttrib_Clock, 0.0), seed
+        ))));
 
     // wait for parsing
     parserTasks.AppendSync();
@@ -169,8 +173,9 @@ void Scene::StartParser(POVMS_Object& parseOptions)
     // because it also generates object statistics
     sceneThreadData.push_back(dynamic_cast<TraceThreadData *>(parserTasks.AppendTask(new BoundingTask(
         sceneData,
-        clip<int>(parseOptions.TryGetInt(kPOVAttrib_BoundingThreshold, DEFAULT_AUTO_BOUNDINGTHRESHOLD),1,SIGNED16_MAX))
-        )));
+        clip<int>(parseOptions.TryGetInt(kPOVAttrib_BoundingThreshold, DEFAULT_AUTO_BOUNDINGTHRESHOLD),1,SIGNED16_MAX),
+        seed
+        ))));
 
     // wait for bounding
     parserTasks.AppendSync();

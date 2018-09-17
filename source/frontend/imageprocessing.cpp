@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -185,7 +185,7 @@ UCS2String ImageProcessing::WriteImage(POVMS_Object& ropts, POVMSInt frame, int 
             filename = GetOutputFilename(ropts, frame, digits);
 
         boost::scoped_ptr<OStream> imagefile(NewOStream(filename.c_str(), filetype, false)); // TODO - check file permissions somehow without macro [ttrf]
-        if(imagefile == NULL)
+        if (imagefile == nullptr)
             throw POV_EXCEPTION_CODE(kCannotOpenFileErr);
 
         Image::Write(imagetype, imagefile.get(), image.get(), wopts);

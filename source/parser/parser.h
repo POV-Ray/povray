@@ -312,7 +312,7 @@ class Parser : public SceneTask
         };
 
         // constructor
-        Parser(shared_ptr<BackendSceneData> sd, bool useclock, DBL clock);
+        Parser(shared_ptr<BackendSceneData> sd, bool useclock, DBL clock, size_t seed);
 
         ~Parser();
 
@@ -362,8 +362,8 @@ class Parser : public SceneTask
         void Test_Redefine(TOKEN Previous, TOKEN *NumberPtr, void *Data, bool allow_redefine = true);
         void Expectation_Error(const char *);
         void *Copy_Identifier(void *Data, int Type);
-        TRANSFORM *Parse_Transform(TRANSFORM *Trans = NULL);
-        TRANSFORM *Parse_Transform_Block(TRANSFORM *New = NULL);
+        TRANSFORM *Parse_Transform(TRANSFORM *Trans = nullptr);
+        TRANSFORM *Parse_Transform_Block(TRANSFORM *New = nullptr);
         char *Get_Reserved_Words (const char *additional_words);
 
         void SendFatalError(Exception& e);
@@ -396,6 +396,9 @@ class Parser : public SceneTask
         void Where_Error (POVMSObjectPtr msg);
         void Where_Warning (POVMSObjectPtr msg);
         void Parse_Directive (int After_Hash);
+#if POV_DEBUG
+        void Parse_Breakpoint();
+#endif
         void Open_Include (void);
         void IncludeHeader(const UCS2String& temp);
         void pre_init_tokenizer (void);
@@ -452,22 +455,22 @@ class Parser : public SceneTask
         DBL Allow_Float (DBL defval);
 
         /// Parses a FLOAT as an integer value.
-        int Parse_Int(const char* parameterName = NULL);
+        int Parse_Int(const char* parameterName = nullptr);
 
         /// Parses a FLOAT as an integer value with a given minimum.
-        int Parse_Int_With_Minimum(int minValue, const char* parameterName = NULL);
+        int Parse_Int_With_Minimum(int minValue, const char* parameterName = nullptr);
 
         /// Parses a FLOAT as an integer value with a given range.
-        int Parse_Int_With_Range(int minValue, int maxValue, const char* parameterName = NULL);
+        int Parse_Int_With_Range(int minValue, int maxValue, const char* parameterName = nullptr);
 
         /// Parses a FLOAT as a boolean value.
-        bool Parse_Bool(const char* parameterName = NULL);
+        bool Parse_Bool(const char* parameterName = nullptr);
 
         int Allow_Vector (Vector3d& Vect);
         void Parse_UV_Vect (Vector2d& UV_Vect);
         void Parse_Vector (Vector3d& Vector);
         void Parse_Vector4D (VECTOR_4D Vector);
-        int Parse_Unknown_Vector (EXPRESS& Express, bool allow_identifier = false, bool *had_identifier = NULL);
+        int Parse_Unknown_Vector(EXPRESS& Express, bool allow_identifier = false, bool *had_identifier = nullptr);
         void Parse_Scale_Vector (Vector3d& Vector);
         DBL Parse_Float_Param (void);
         void Parse_Float_Param2 (DBL *Val1, DBL *Val2);
@@ -740,7 +743,7 @@ class Parser : public SceneTask
         void Break (void);
 
         int get_hash_value (const char *s);
-        inline void Write_Token (TOKEN Token_Id, int col, SYM_TABLE *table = NULL);
+        inline void Write_Token(TOKEN Token_Id, int col, SYM_TABLE *table = nullptr);
         void Destroy_Table (int index);
         void init_sym_tables (void);
         void Add_Sym_Table ();

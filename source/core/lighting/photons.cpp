@@ -530,7 +530,13 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
                 doDiffuse = 0;
                 threadData->passThruPrev = true;
             }
-            // else die
+            else
+            {
+                // die
+                doReflection = 0;
+                doRefraction = 0;
+                doDiffuse = 0;
+            }
         }
         else
         {
@@ -571,7 +577,7 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
         }
 #endif // PT_AMPLIFY_BUG
 
-        ColourChannel dummyTransm;
+        ColourChannel dummyTransm = 0.0; // Shouldn't matter, but placates static code analysis.
         TraceRay(NRay, CurLightCol, dummyTransm, (float)New_Weight, true);
 
 #ifndef PT_AMPLIFY_BUG
@@ -2641,7 +2647,7 @@ void LightTargetCombo::computeAnglesAndDeltas(shared_ptr<SceneData> sceneData)
     if(light->Parallel)
     {
         // OK, here we fake things a bit for parallel lights.  Theta is not really theta.
-        // It really represents the radius... but why re-code an entire loop.  For POV 4.0
+        // It really represents the radius... but why re-code an entire loop.  For POV-Ray v4.0
         // this should be re-written as an abstract class with polymorphism.
         dtheta = photonSpread;
     }

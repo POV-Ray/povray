@@ -561,7 +561,7 @@
 #endif
 
 #ifndef POV_FREE
-    #define POV_FREE(ptr)               do { pov_base::pov_free (static_cast<void *>(ptr), __FILE__, __LINE__); (ptr) = NULL; } while(false)
+    #define POV_FREE(ptr)               do { pov_base::pov_free (static_cast<void *>(ptr), __FILE__, __LINE__); (ptr) = nullptr; } while(false)
 #endif
 
 #ifndef POV_MEM_INIT

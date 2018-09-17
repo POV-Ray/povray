@@ -74,7 +74,7 @@ void WriteN(OStream *file, size_t cnt, POV_INT8 data);
 void *ReadFileHeader(IStream *file, float& lengthinseconds, unsigned int& lengthinframes, Animation::CodecType& codec, unsigned int& w, unsigned int& h, const Animation::ReadOptions& options, vector<string>& warnings)
 {
     throw POV_EXCEPTION(kCannotHandleDataErr, "Reading QuickTime movie files is not supported (yet)!");
-    return NULL;
+    return nullptr;
 }
 
 void PreReadFrame(IStream *file, unsigned int frame, POV_OFF_T& bytes, Animation::CodecType& codec, const Animation::ReadOptions& options, vector<string>& warnings, void *state)
@@ -118,7 +118,7 @@ void *WriteFileHeader(OStream *file, Animation::CodecType& codec, unsigned int w
             pd.alphachannel = false;
             break;
         default:
-            return NULL; // error - cannot handle format
+            return nullptr; // error - cannot handle format
     }
 
     if(pd.alphachannel != options.alphachannel)
@@ -149,7 +149,7 @@ void *WriteFileHeader(OStream *file, Animation::CodecType& codec, unsigned int w
 
     // NOTE: This allocation occurs at the end such that there cannot be a memory leak
     // should any of the previous operations fail. If and only if this function returns
-    // a state other than NULL shall it be assumed to have been successful!
+    // a state other than `nullptr` shall it be assumed to have been successful!
     return reinterpret_cast<void *>(new PrivateData(pd));
 }
 
@@ -157,7 +157,7 @@ void PreWriteFrame(OStream *, const Animation::WriteOptions&, vector<string>&, v
 {
     PrivateData *pd = reinterpret_cast<PrivateData *>(state);
 
-    if(pd == NULL)
+    if (pd == nullptr)
         throw POV_EXCEPTION_CODE(kNullPointerErr);
 
     // there really is nothing to do here [trf]
@@ -167,7 +167,7 @@ void PostWriteFrame(OStream *file, POV_OFF_T bytes, const Animation::WriteOption
 {
     PrivateData *pd = reinterpret_cast<PrivateData *>(state);
 
-    if(pd == NULL)
+    if (pd == nullptr)
         throw POV_EXCEPTION_CODE(kNullPointerErr);
 
     // update mdat size
@@ -188,7 +188,7 @@ void FinishWriteFile(OStream *file, const Animation::WriteOptions& options, vect
 {
     PrivateData *pd = reinterpret_cast<PrivateData *>(state);
 
-    if(pd == NULL)
+    if (pd == nullptr)
         throw POV_EXCEPTION_CODE(kNullPointerErr);
 
     POV_OFF_T stsz_size = 20 + (pd->imagesizes.size() * 4);

@@ -71,8 +71,10 @@ namespace pov
       3) compute gather options
       4) clean up memory (delete the non-merged maps and delete the strategy)
 */
-PhotonSortingTask::PhotonSortingTask(ViewData *vd, const vector<PhotonMap*>& surfaceMaps, const vector<PhotonMap*>& mediaMaps, PhotonShootingStrategy* strategy) :
-    RenderTask(vd, "Photon"),
+PhotonSortingTask::PhotonSortingTask(ViewData *vd, const vector<PhotonMap*>& surfaceMaps,
+                                     const vector<PhotonMap*>& mediaMaps, PhotonShootingStrategy* strategy,
+                                     size_t seed) :
+    RenderTask(vd, seed, "Photon"),
     surfaceMaps(surfaceMaps),
     mediaMaps(mediaMaps),
     strategy(strategy),

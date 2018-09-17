@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -171,7 +171,7 @@ IStream *BackendSceneData::ReadFile(POVMSContext ctx, const UCS2String& origname
         UCS2String tempname = PlatformBase::GetInstance().CreateTemporaryFile();
         OStream *tempfile = NewOStream(tempname.c_str(), stype, false);
 
-        if(tempfile == NULL)
+        if (tempfile == nullptr)
         {
             PlatformBase::GetInstance().DeleteTemporaryFile(tempname);
             throw POV_EXCEPTION_CODE(kCannotOpenFileErr);
@@ -196,7 +196,7 @@ IStream *BackendSceneData::ReadFile(POVMSContext ctx, const UCS2String& origname
     }
 
     // file not found
-    return NULL;
+    return nullptr;
 #else
     return NewIStream(filename.c_str(), stype);
 #endif
@@ -242,7 +242,7 @@ IStream *BackendSceneData::ReadFile(POVMSContext ctx, const UCS2String& filename
         UCS2String tempname = PlatformBase::GetInstance().CreateTemporaryFile();
         OStream *tempfile = NewOStream(tempname.c_str(), stype, false);
 
-        if(tempfile == NULL)
+        if (tempfile == nullptr)
         {
             PlatformBase::GetInstance().DeleteTemporaryFile(tempname);
             throw POV_EXCEPTION_CODE(kCannotOpenFileErr);
@@ -267,7 +267,7 @@ IStream *BackendSceneData::ReadFile(POVMSContext ctx, const UCS2String& filename
     }
 
     // file not found
-    return NULL;
+    return nullptr;
 }
 */
 OStream *BackendSceneData::CreateFile(POVMSContext ctx, const UCS2String& filename, unsigned int stype, bool append)
@@ -287,8 +287,8 @@ OStream *BackendSceneData::CreateFile(POVMSContext ctx, const UCS2String& filena
     OStream *tempfile = NewOStream(tempname.c_str(), stype, append);
 
     // failed to open file
-    if(tempfile == NULL)
-        return NULL;
+    if (tempfile == nullptr)
+        return nullptr;
 
     // add the temporary file to the map
     scene2TempFiles[scenefile] = tempname;
@@ -298,8 +298,8 @@ OStream *BackendSceneData::CreateFile(POVMSContext ctx, const UCS2String& filena
     // until someone has time to finish it.
 
     OStream *tempfile = NewOStream(scenefile.c_str(), stype, append);
-    if (tempfile == NULL)
-        return NULL;
+    if (tempfile == nullptr)
+        return nullptr;
 #endif
 
     // let the frontend know that a new file was created

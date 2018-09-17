@@ -254,12 +254,12 @@ void Parser::Parse_Trace(Vector3d& Res)
         END_CASE
 
         OTHERWISE
-            Object = NULL;
+            Object = nullptr;
             UNGET
         END_CASE
     END_EXPECT
 
-    if (Object == NULL)
+    if (Object == nullptr)
         Error ("Object identifier expected.");
 
     Parse_Comma();
@@ -339,12 +339,12 @@ int Parser::Parse_Inside()
         END_CASE
 
         OTHERWISE
-            Object = NULL;
+            Object = nullptr;
             UNGET
         END_CASE
     END_EXPECT
 
-    if (Object == NULL)
+    if (Object == nullptr)
         Error ("Object identifier expected.");
     if((Object->Type & PATCH_OBJECT) == PATCH_OBJECT)
         Error ("Solid object identifier expected.");
@@ -435,7 +435,7 @@ bool Parser::Parse_Call()
 DBL Parser::Parse_Function_Call()
 {
     FUNCTION_PTR fp = (FUNCTION_PTR )Token.Data;
-    if (fp == NULL)
+    if (fp == nullptr)
         // may happen if a #declare or #local inside a function declaration references the function
         Error("Illegal attempt to evaluate a function being currently declared; did you miss a closing brace?");
 
@@ -504,7 +504,7 @@ DBL Parser::Parse_Function_Call()
 void Parser::Parse_Vector_Function_Call(EXPRESS& Express, int *Terms)
 {
     FUNCTION_PTR fp = (FUNCTION_PTR )Token.Data;
-    if (fp == NULL)
+    if (fp == nullptr)
         // may happen if a #declare or #local inside a function declaration references the function
         Error("Illegal attempt to evaluate a function being currently declared; did you miss a closing brace?");
 
@@ -623,7 +623,7 @@ void Parser::Parse_Spline_Call(EXPRESS& Express, int *Terms)
         Parse_Paren_End();
         Get_Spline_Val(spline, Val, Express, Terms);
         Destroy_Spline(spline);
-        spline = NULL;
+        spline = nullptr;
     }
     else
     {
@@ -808,8 +808,9 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
                     Local_C_String=Parse_C_String();
 
-                    Val = ((f=Locate_File(UCS2String(ASCIItoUCS2String(Local_C_String)),POV_File_Text_User,ign,false))==NULL) ? 0.0 : 1.0;
-                    if (f != NULL)
+                    f = Locate_File(UCS2String(ASCIItoUCS2String(Local_C_String)), POV_File_Text_User, ign, false);
+                    Val = (f == nullptr) ? 0.0 : 1.0;
+                    if (f != nullptr)
                         delete f;
 
                     POV_FREE(Local_C_String);
@@ -1205,7 +1206,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                         END_CASE
 
                         OTHERWISE
-                            Object = NULL;
+                            Object = nullptr;
                             Vect = Vector3d(0.0,0.0,0.0);
                             UNGET
                         END_CASE
@@ -1244,7 +1245,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                         END_CASE
 
                         OTHERWISE
-                            Object = NULL;
+                            Object = nullptr;
                             Vect = Vector3d(0.0,0.0,0.0);
                             UNGET
                         END_CASE
@@ -1704,7 +1705,7 @@ void Parser::Parse_Rel_Factor (EXPRESS& Express,int *Terms)
 DBL Parser::Parse_Rel_String_Term (const UCS2 *lhs)
 {
     int Val;
-    UCS2 *rhs = NULL;
+    UCS2 *rhs = nullptr;
 
     EXPECT_ONE
         CASE (LEFT_ANGLE_TOKEN)
@@ -1791,7 +1792,7 @@ void Parser::Parse_Rel_Term (EXPRESS& Express,int *Terms)
     Ok_To_Declare=true;
 
     UCS2 *Local_String = Parse_String(false, false);
-    if(Local_String != NULL)
+    if (Local_String != nullptr)
     {
             *Terms = 1;
             Express[0] = Parse_Rel_String_Term(Local_String);
@@ -2020,8 +2021,8 @@ int Parser::Parse_Int(const char* parameterName)
     if (fabs(value - rawValue) >= EPSILON)
     {
         Warning("%s%sExpected integer; rounding down fractional value %lf to %i.",
-                (parameterName != NULL ? parameterName : ""),
-                (parameterName != NULL ? ": " : ""),
+                (parameterName != nullptr ? parameterName : ""),
+                (parameterName != nullptr ? ": " : ""),
                 rawValue,
                 value);
     }
@@ -2034,8 +2035,8 @@ int Parser::Parse_Int_With_Minimum(int minValue, const char* parameterName)
     if (value < minValue)
     {
         Error("%s%sExpected at least %i, but found %i instead.",
-              (parameterName != NULL ? parameterName : ""),
-              (parameterName != NULL ? ": " : ""),
+              (parameterName != nullptr ? parameterName : ""),
+              (parameterName != nullptr ? ": " : ""),
               minValue,
               value);
     }
@@ -2048,8 +2049,8 @@ int Parser::Parse_Int_With_Range(int minValue, int maxValue, const char* paramet
     if ((value < minValue) || (value > maxValue))
     {
         Error("%s%sExpected at %s %i, but found %i instead.",
-              (parameterName != NULL ? parameterName : ""),
-              (parameterName != NULL ? ": " : ""),
+              (parameterName != nullptr ? parameterName : ""),
+              (parameterName != nullptr ? ": " : ""),
               (value < minValue ? "least" : "most"),
               minValue,
               value);
@@ -2065,8 +2066,8 @@ bool Parser::Parse_Bool(const char* parameterName)
     if (fabs(intValue - rawValue) >= EPSILON)
     {
         Warning("%s%sExpected boolean; interpreting fractional value %lf as '%s'.",
-                (parameterName != NULL ? parameterName : ""),
-                (parameterName != NULL ? ": " : ""),
+                (parameterName != nullptr ? parameterName : ""),
+                (parameterName != nullptr ? ": " : ""),
                 rawValue,
                 (value ? "on" : "off"));
     }
@@ -2339,7 +2340,7 @@ int Parser::Parse_Unknown_Vector(EXPRESS& Express, bool allow_identifier, bool *
     else
         Parse_Rel_Factor(Express,&Terms);
 
-    if(had_identifier != NULL)
+    if (had_identifier != nullptr)
         *had_identifier = Identifier_In_Call;
 
     Allow_Identifier_In_Call = old_allow_id;
@@ -2778,7 +2779,7 @@ void Parser::Parse_BlendMapData<PigmentBlendMapData> (BlendMapTypeId Blend_Type,
             break;
 
         case kBlendMapType_Density:
-            rData=NULL;
+            rData = nullptr;
             Parse_Media_Density_Pattern (&(rData));
             break;
 
@@ -2904,7 +2905,7 @@ shared_ptr<MAP_T> Parser::Parse_Blend_Map (BlendMapTypeId Blend_Type,int Pat_Typ
                     if (pigmentBlendMap)
                     {
                         pigmentBlendMap->blendMode = blendMode;
-                        if (blendGamma == NULL)
+                        if (blendGamma == nullptr)
                             blendGamma = PowerLawGammaCurve::GetByDecodingGamma(2.5);
                         pigmentBlendMap->blendGamma = GammaCurvePtr(TranscodingGammaCurve::Get(sceneData->workingGamma, blendGamma));
                     }
@@ -2995,7 +2996,7 @@ void Parser::Parse_BlendListData<PigmentBlendMapData> (BlendMapTypeId Blend_Type
             break;
 
         case kBlendMapType_Density:
-            rData=NULL;
+            rData = nullptr;
             Parse_Media_Density_Pattern (&(rData));
             break;
 
@@ -3045,7 +3046,7 @@ void Parser::Parse_BlendListData_Default<PigmentBlendMapData> (const ColourBlend
             break;
 
         case kBlendMapType_Density:
-            rData=NULL;
+            rData = nullptr;
             break;
 
         default:
@@ -3184,6 +3185,7 @@ shared_ptr<MAP_T> Parser::Parse_Blend_List (int Count, ColourBlendMapConstPtr De
             END_EXPECT
             break;
 
+            // TODO - what about kBlendMapType_Slope ?!
     }
 
     if ((Blend_Type==kBlendMapType_Normal) && (i==0))
@@ -3482,7 +3484,7 @@ ColourBlendMapPtr Parser::Parse_Colour_Map<ColourBlendMap> ()
                     New = ColourBlendMapPtr (new ColourBlendMap);
                     New->Set(tempList);
                     New->blendMode = blendMode;
-                    if (blendGamma == NULL)
+                    if (blendGamma == nullptr)
                         blendGamma = PowerLawGammaCurve::GetByDecodingGamma(2.5);
                     New->blendGamma = GammaCurvePtr(TranscodingGammaCurve::Get(sceneData->workingGamma, blendGamma));
                     EXIT
@@ -3577,8 +3579,8 @@ TextureBlendMapPtr Parser::Parse_Colour_Map<TextureBlendMap> ()
 
 GenericSpline *Parser::Parse_Spline()
 {
-    GenericSpline * Old = NULL;
-    GenericSpline * New = NULL;
+    GenericSpline * Old = nullptr;
+    GenericSpline * New = nullptr;
     bool keepOld = false;
     int i = 0;
     EXPRESS Express;
@@ -3864,7 +3866,7 @@ void Parser::Init_Random_Generators()
 {
     Number_Of_Random_Generators = 0;
 
-    next_rand = NULL;
+    next_rand = nullptr;
 }
 
 
@@ -3895,12 +3897,12 @@ void Parser::Init_Random_Generators()
 
 void Parser::Destroy_Random_Generators()
 {
-    if (next_rand != NULL)
+    if (next_rand != nullptr)
     {
         POV_FREE(next_rand);
     }
 
-    next_rand = NULL;
+    next_rand = nullptr;
 
     Number_Of_Random_Generators = 0;
 }

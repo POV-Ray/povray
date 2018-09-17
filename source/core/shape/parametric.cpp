@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -116,7 +116,7 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
     Thread->Stats()[Ray_Par_Bound_Tests_Succeeded]++;
     Thread->Stats()[Ray_Parametric_Tests]++;
 
-    if (Trans != NULL)
+    if (Trans != nullptr)
     {
         MInvTransPoint(P, ray.Origin, Trans);
         MInvTransDirection(D, ray.Direction, Trans);
@@ -146,7 +146,7 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
     SectorNum[0] = 1;
 
     MaxPrecompX = MaxPrecompY = MaxPrecompZ = 0;
-    if (PData != NULL)
+    if (PData != nullptr)
     {
         if (((PData->flags) & OK_X) != 0)
             MaxPrecompX = 1 << (PData->depth);
@@ -464,7 +464,7 @@ void Parametric::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *
     RV[Z] += aFn[Z].Evaluate(uv_vect);
 
     Result = cross(RU, RV);
-    if (Trans != NULL)
+    if (Trans != nullptr)
         MTransNormal(Result, Result, Trans);
     Result.normalize();
 }
@@ -497,7 +497,7 @@ void Parametric::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *
 void Parametric::Compute_BBox()
 {
     container->ComputeBBox(BBox);
-    if(Trans != NULL)
+    if (Trans != nullptr)
     {
         Recompute_BBox(&BBox, Trans);
     }
@@ -620,7 +620,7 @@ void Parametric::Scale(const Vector3d&, const TRANSFORM* tr)
 
 void Parametric::Transform(const TRANSFORM* tr)
 {
-    if(Trans == NULL)
+    if (Trans == nullptr)
         Trans = Create_Transform();
     Compose_Transforms(Trans, tr);
     Compute_BBox();
@@ -734,12 +734,12 @@ Parametric::Parametric() : NonsolidObject(PARAMETRIC_OBJECT)
 
     Trans = Create_Transform();
 
-    Function[0] = NULL;
-    Function[1] = NULL;
-    Function[2] = NULL;
+    Function[0] = nullptr;
+    Function[1] = nullptr;
+    Function[2] = nullptr;
     accuracy = 0.001;
     max_gradient = 1;
-    PData = NULL;
+    PData = nullptr;
 }
 
 
@@ -884,7 +884,6 @@ void Parametric::Precomp_Par_Int(int depth, DBL umin, DBL vmin, DBL umax, DBL vm
 
 void Parametric::Precompute_Parametric_Values(char flags, int depth, TraceThreadData *Thread)
 {
-    DBL * Last;
     const char* es = "precompute";
     int nmb;
 
@@ -892,30 +891,26 @@ void Parametric::Precompute_Parametric_Values(char flags, int depth, TraceThread
         throw POV_EXCEPTION_STRING("Precompute: invalid depth");
     nmb = 1 << depth;
 
-    PData = reinterpret_cast<PRECOMP_PAR_DATA *>(POV_MALLOC(sizeof(PRECOMP_PAR_DATA), es));
-    if (PData == NULL)
-        throw POV_EXCEPTION_STRING("Cannot allocate memory for parametric precomputation data.");
+    PData = new PRECOMP_PAR_DATA;
     PData->flags = flags;
     PData->depth = depth;
     PData->use = 1;
 
     if (flags & OK_X)
     {
-        PData->Low[0] = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * nmb, es));
-        Last = PData->Hi[0] = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * nmb, es));
+        PData->Low[0] = new DBL[nmb];
+        PData->Hi[0] = new DBL[nmb];
     }
     if (flags & OK_Y)
     {
-        PData->Low[1] = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * nmb, es));
-        Last = PData->Hi[1] = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * nmb, es));
+        PData->Low[1] = new DBL[nmb];
+        PData->Hi[1] = new DBL[nmb];
     }
     if (flags & OK_Z)
     {
-        PData->Low[2] = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * nmb, es));
-        Last = PData->Hi[2] = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * nmb, es));
+        PData->Low[2] = new DBL[nmb];
+        PData->Hi[2] = new DBL[nmb];
     }
-    if (Last == NULL)
-        throw POV_EXCEPTION_STRING("Cannot allocate memory for parametric precomputation data.");
 
     PrecompLastDepth = 1 << (depth - 1);
     std::array<GenericScalarFunctionInstance,3> aFn = {
@@ -953,8 +948,8 @@ void Parametric::Precompute_Parametric_Values(char flags, int depth, TraceThread
 
 PRECOMP_PAR_DATA* Parametric::Copy_PrecompParVal()
 {
-    if (PData == NULL)
-        return NULL;
+    if (PData == nullptr)
+        return nullptr;
 
     (PData->use)++;
 
@@ -988,7 +983,7 @@ PRECOMP_PAR_DATA* Parametric::Copy_PrecompParVal()
 
 void Parametric::Destroy_PrecompParVal()
 {
-    if (PData == NULL)
+    if (PData == nullptr)
         return;
 
     PData->use--;
@@ -996,20 +991,20 @@ void Parametric::Destroy_PrecompParVal()
     {
         if (PData->flags & OK_X)
         {
-            POV_FREE(PData->Low[0]);
-            POV_FREE(PData->Hi[0]);
+            delete[] PData->Low[0];
+            delete[] PData->Hi[0];
         }
         if (PData->flags & OK_Y)
         {
-            POV_FREE(PData->Low[1]);
-            POV_FREE(PData->Hi[1]);
+            delete[] PData->Low[1];
+            delete[] PData->Hi[1];
         }
         if (PData->flags & OK_Z)
         {
-            POV_FREE(PData->Low[2]);
-            POV_FREE(PData->Hi[2]);
+            delete[] PData->Low[2];
+            delete[] PData->Hi[2];
         }
-        POV_FREE(PData);
+        delete PData;
     }
 }
 

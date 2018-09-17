@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -133,7 +133,7 @@ PIGMENT *Create_Pigment();
 PIGMENT *Copy_Pigment(PIGMENT *Old);
 void Copy_Pigments (vector<PIGMENT*>& New, const vector<PIGMENT*>& Old);
 void Destroy_Pigment(PIGMENT *Pigment);
-void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter = NULL);
+void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter = nullptr);
 bool Compute_Pigment(TransColour& colour, const PIGMENT *Pigment, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
 void Evaluate_Density_Pigment(vector<PIGMENT*>& Density, const Vector3d& p, MathColour& c, TraceThreadData *ttd);
 

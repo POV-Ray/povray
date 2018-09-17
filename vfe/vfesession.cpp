@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -43,11 +43,11 @@
 #include "vfe.h"
 #include "backend/povray.h"
 
-static POVMSContext POVMS_Output_Context = NULL;
+static POVMSContext POVMS_Output_Context = nullptr;
 
 namespace pov
 {
-  static volatile POVMSContext POVMS_GUI_Context = NULL ;
+  static volatile POVMSContext POVMS_GUI_Context = nullptr;
   static volatile POVMSAddress RenderThreadAddr = POVMSInvalidAddress ;
   static volatile POVMSAddress GUIThreadAddr = POVMSInvalidAddress ;
 }
@@ -56,13 +56,13 @@ namespace vfe
 {
 
 bool vfeSession::m_Initialized = false;
-vfeSession *vfeSession::m_CurrentSessionTemporaryHack = NULL;
+vfeSession *vfeSession::m_CurrentSessionTemporaryHack = nullptr;
 
 vfeSession::vfeSession(int id)
 {
   m_Id = id ;
-  m_Frontend = NULL;
-  m_BackendThread = m_WorkerThread = NULL;
+  m_Frontend = nullptr;
+  m_BackendThread = m_WorkerThread = nullptr;
   m_WorkerThreadShutdownRequest = false;
   m_HadCriticalError = false;
   m_CurrentSessionTemporaryHack = this;
@@ -86,7 +86,7 @@ vfeSession::~vfeSession()
 {
   // note: shouldn't delete m_Frontend here since it will cause a POVMS context error
   m_Initialized = false;
-  m_CurrentSessionTemporaryHack = NULL;
+  m_CurrentSessionTemporaryHack = nullptr;
 }
 
 // Clears many of the internal state information held by VFE regarding
@@ -497,7 +497,7 @@ bool vfeSession::GetNextConsoleMessage (MessageBase& Message)
 
 bool vfeSession::ProcessFrontend (void)
 {
-  if (m_Frontend == NULL)
+  if (m_Frontend == nullptr)
     return (false);
   m_Frontend->Process () ;
   if (m_Frontend->GetState () == m_BackendState)
@@ -543,10 +543,10 @@ const char *vfeSession::GetBackendStateName (void) const
 
 // Returns a copy of the shared pointer containing the current instance
 // of a pov_frontend::Display-derived render preview instance, which may
-// be NULL.
+// be `nullptr`.
 shared_ptr<Display> vfeSession::GetDisplay() const
 {
-  if (m_Frontend == NULL)
+  if (m_Frontend == nullptr)
     return (shared_ptr<Display>());
   return m_Frontend->GetDisplay();
 }
@@ -555,7 +555,7 @@ void vfeSession::BackendThreadNotify()
 {
   m_BackendThreadExited = true;
   pov::RenderThreadAddr = POVMSInvalidAddress;
-  if (m_Frontend != NULL)
+  if (m_Frontend != nullptr)
     m_Frontend->InvalidateBackend();
 }
 
@@ -588,8 +588,8 @@ void vfeSession::WorkerThread()
   m_Console = shared_ptr<vfeConsole> (new vfeConsole(this, m_ConsoleWidth)) ;
 
   POVMS_Object obj ;
-  m_Frontend = new VirtualFrontEnd (*this, POVMS_Output_Context, (POVMSAddress) pov::RenderThreadAddr, obj, NULL, m_Console) ;
-  if (m_Frontend == NULL)
+  m_Frontend = new VirtualFrontEnd (*this, POVMS_Output_Context, (POVMSAddress) pov::RenderThreadAddr, obj, nullptr, m_Console);
+  if (m_Frontend == nullptr)
     throw POV_EXCEPTION_STRING ("Worker thread failed to create frontend");
   m_BackendState = m_Frontend->GetState();
   m_InitializeEvent.notify_all ();
@@ -700,13 +700,13 @@ void vfeSession::WorkerThread()
   try
   {
     delete m_Frontend;
-    m_Frontend = NULL;
+    m_Frontend = nullptr;
     WorkerThreadShutdown();
     m_Initialized = false;
-    m_BackendThread = NULL;
+    m_BackendThread = nullptr;
     povray_terminate();
     POVMS_CloseContext (POVMS_Output_Context);
-    m_CurrentSessionTemporaryHack = NULL;
+    m_CurrentSessionTemporaryHack = nullptr;
     m_WorkerThreadExited = true;
     m_ShutdownEvent.notify_all ();
   }
@@ -732,7 +732,7 @@ void vfeSession::WorkerThread()
 // global variable.
 vfeSession *vfeSession::GetSessionFromThreadID()
 {
-  if (m_CurrentSessionTemporaryHack == NULL)
+  if (m_CurrentSessionTemporaryHack == nullptr)
     throw vfeCriticalError("connection to backend has been terminated");
   return m_CurrentSessionTemporaryHack ;
 }
@@ -745,7 +745,7 @@ vfeDisplay *vfeSession::DefaultDisplayCreator (unsigned int width, unsigned int 
 // If a VFE implementation has provided the address of a display creator
 // function via vfeSession::SetDisplayCreator(), this method will call it
 // with the width, height, gamma factor, and default visibility flag (false
-// if not specified). Otherwise it will return NULL. It is used when the
+// if not specified). Otherwise it will return `nullptr`. It is used when the
 // core POV-Ray code requests that a render preview window be created.
 // If a display instance is returned, it is expected to conform to the
 // definition of the pov_frontend::Display class, but will typically be
@@ -764,7 +764,7 @@ vfeDisplay *vfeSession::CreateDisplay (unsigned int width, unsigned int height, 
 // period of time). It is not mandatory to implement the forced feature.
 void vfeSession::Shutdown(bool forced)
 {
-  if (m_Initialized == false || m_WorkerThread == NULL)
+  if ((m_Initialized == false) || (m_WorkerThread == nullptr))
     return ;
 
   // TODO: implement forced if possible (may need to be platform-specific)
@@ -772,10 +772,10 @@ void vfeSession::Shutdown(bool forced)
   NotifyEvent(stShutdown);
   m_WorkerThread->join();
   delete m_WorkerThread;
-  m_WorkerThread = NULL;
+  m_WorkerThread = nullptr;
 }
 
-// Returns a string giving a short english description of the error code
+// Returns a string giving a short English description of the error code
 // supplied as the only parameter. If no parameter is supplied, the default
 // value (-1) instructs the method to instead use the value of m_LastError.
 const char *vfeSession::GetErrorString(int code) const
@@ -1030,7 +1030,7 @@ void vfeSession::NotifyEvent(vfeStatusFlags Status)
 
 // Used to set up a session with a POV backend. Accepts two
 // parameters - a destination (vfeDestInfo) and authorization
-// (vfeAuthInfo), both pointers. Currently these must be NULL.
+// (vfeAuthInfo), both pointers. Currently these must be `nullptr`.
 //
 // Intialize() will call the Reset() method, and then create
 // the session's worker thread, at which time it will wait on
@@ -1052,8 +1052,8 @@ int vfeSession::Initialize(vfeDestInfo *Dest, vfeAuthInfo *Auth)
 {
   boost::mutex::scoped_lock lock (m_InitializeMutex);
 
-  // params must be NULL in this version
-  if (Dest != NULL || Auth != NULL)
+  // params must be `nullptr` in this version
+  if ((Dest != nullptr) || (Auth != nullptr))
     return (m_LastError = vfeInvalidParameter);
 
   // only one session at once permitted in this version
@@ -1091,7 +1091,7 @@ int vfeSession::Initialize(vfeDestInfo *Dest, vfeAuthInfo *Auth)
   {
     m_WorkerThread->join();
     delete m_WorkerThread;
-    m_WorkerThread = NULL;
+    m_WorkerThread = nullptr;
     return (m_LastError);
   }
 

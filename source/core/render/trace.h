@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -118,7 +118,7 @@ struct LightSourceEntry
     LightSource *light;
 
     LightSourceEntry() :
-        s0(0.0), s1(0.0), light(NULL) { }
+        s0(0.0), s1(0.0), light(nullptr) { }
     LightSourceEntry(LightSource *nlight) :
         s0(0.0), s1(0.0), light(nlight) { }
     LightSourceEntry(double ns0, double ns1, LightSource *nlight) :

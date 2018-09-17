@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -134,7 +134,7 @@ bool Fractal::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 
     /* Get into Fractal's world. */
 
-    if (Trans != NULL)
+    if (Trans != nullptr)
     {
         MInvTransDirection(Direction, ray.Direction, Trans);
         LenSqr = Direction.lengthSqr();
@@ -282,7 +282,7 @@ bool Fractal::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
             }
         }
 
-        if (Trans != NULL)
+        if (Trans != nullptr)
         {
             MTransPoint(Real_Pt, IPoint, Trans);
             Normal_Calc(this, F_Normal, Thread->Fractal_IStack);
@@ -350,7 +350,7 @@ bool Fractal::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
     bool Result;
     Vector3d New_Point;
 
-    if (Trans != NULL)
+    if (Trans != nullptr)
     {
         MInvTransPoint(New_Point, IPoint, Trans);
 
@@ -514,7 +514,7 @@ void Fractal::Scale(const Vector3d&, const TRANSFORM *tr)
 
 void Fractal::Transform(const TRANSFORM *tr)
 {
-    if(Trans == NULL)
+    if (Trans == nullptr)
         Trans = Create_Transform();
 
     Compose_Transforms(Trans, tr);
@@ -610,7 +610,7 @@ void Fractal::Compute_BBox()
 
 Fractal::Fractal() : ObjectBase(BASIC_OBJECT)
 {
-    Trans = NULL;
+    Trans = nullptr;
 
     Center = Vector3d(0.0, 0.0, 0.0);
 
@@ -865,10 +865,10 @@ void Fractal::Free_Iteration_Stack(DBL **IStack)
 {
     for (int i = 0 ; i < 4 ; i++)
     {
-        if (IStack [i] != NULL)
+        if (IStack [i] != nullptr)
         {
             POV_FREE (IStack [i]) ;
-            IStack [i] = NULL ;
+            IStack [i] = nullptr;
         }
     }
 }

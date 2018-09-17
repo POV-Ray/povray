@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -66,7 +66,7 @@ namespace pov
 inline bool Test_Ray_Flags(const Ray& ray, ConstObjectPtr obj)
 {
     // CJC 2005 if ray is primary ray ignore NO_IMAGE_FLAG to support the trace() SDL function
-    // TODO FIXME - I uess it would be better to have the trace() function use a different ray type [CLi]
+    // TODO FIXME - I guess it would be better to have the trace() function use a different ray type [CLi]
     return ( ( !ray.IsPhotonRay() &&
                (!Test_Flag(obj, NO_IMAGE_FLAG) || ray.IsImageRay() == false || ray.IsPrimaryRay() == true) &&
                (!Test_Flag(obj, NO_REFLECTION_FLAG) || ray.IsReflectionRay() == false) &&
@@ -860,7 +860,7 @@ void CSG::Compute_BBox()
     DBL Old_Volume, New_Volume;
     Vector3d NewMin, NewMax, TmpMin, TmpMax, Min, Max;
 
-    if(dynamic_cast<CSGIntersection *>(this) != NULL) // FIXME
+    if (dynamic_cast<CSGIntersection *>(this) != nullptr) // FIXME
     {
         /*
          * Calculate the bounding box of a CSG intersection
@@ -878,12 +878,12 @@ void CSG::Compute_BBox()
         {
             /* Inverted objects and height fields mustn't be considered */
 
-            if(!Test_Flag((*Current_Sib), INVERTED_FLAG) && (dynamic_cast<HField *>(*Current_Sib) == NULL)) // FIXME
+            if (!Test_Flag((*Current_Sib), INVERTED_FLAG) && (dynamic_cast<HField *>(*Current_Sib) == nullptr)) // FIXME
             {
                 /* We store quadrics since they'll be processed last, to benefit from confining them to a certain range */
-                if(dynamic_cast<Quadric *>(*Current_Sib) == NULL) // FIXME
+                if (dynamic_cast<Quadric *>(*Current_Sib) == nullptr) // FIXME
                 {
-                    if(dynamic_cast<Plane *>(*Current_Sib) != NULL) // FIXME
+                    if (dynamic_cast<Plane *>(*Current_Sib) != nullptr) // FIXME
                         Quadric::Compute_Plane_Min_Max(dynamic_cast<Plane *>(*Current_Sib), TmpMin, TmpMax);
                     else
                         Make_min_max_from_BBox(TmpMin, TmpMax, (*Current_Sib)->BBox);
@@ -992,7 +992,7 @@ void CSG::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextur
             {
                 if(children[0]->Type & IS_COMPOUND_OBJECT)
                     children[0]->Determine_Textures(isect, hitinside, textures, threaddata);
-                else if(children[0]->Texture != NULL)
+                else if (children[0]->Texture != nullptr)
                     textures.push_back(WeightedTexture(1.0, children[0]->Texture));
             }
         }
@@ -1006,7 +1006,7 @@ void CSG::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextur
                 {
                     if((*Current_Sib)->Type & IS_COMPOUND_OBJECT)
                         (*Current_Sib)->Determine_Textures(isect, hitinside, textures, threaddata);
-                    else if((*Current_Sib)->Texture != NULL)
+                    else if ((*Current_Sib)->Texture != nullptr)
                         textures.push_back(WeightedTexture(1.0, (*Current_Sib)->Texture));
                 }
             }

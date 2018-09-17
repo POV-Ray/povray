@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -70,7 +70,7 @@ namespace vfePlatform
       throw vfeException("Could not get temp dir from Windows API");
     strcat (str, "povwin\\");
     // if we fail to creat our temp dir, just use the default one
-    if (CreateDirectory(str, NULL) == 0 && GetLastError() != ERROR_ALREADY_EXISTS)
+    if ((CreateDirectory(str, nullptr) == 0) && (GetLastError() != ERROR_ALREADY_EXISTS))
       GetTempPath (sizeof (str), str);
     m_TempPath = Path(str);
     m_TempPathString = str;
@@ -195,7 +195,7 @@ namespace vfePlatform
   // you would probably display the message immediately.
   void vfeWinSession::NotifyCriticalError (const char *message, const char *filename, int line)
   {
-    MessageBox (NULL, message, "POV-Ray Critical Error", MB_ICONERROR | MB_OK) ;
+    MessageBox (nullptr, message, "POV-Ray Critical Error", MB_ICONERROR | MB_OK) ;
   }
 
   ////////////////////////////////////////////////////////////////////////
@@ -308,7 +308,7 @@ namespace vfePlatform
       returnOK = true;
 
     int n = GetFullPathName (UCS2toASCIIString(file()).c_str(), sizeof (buf), buf, &s);
-    if ((n == 0) || (n > sizeof(buf)) || (s == NULL) || (s == buf))
+    if ((n == 0) || (n > sizeof(buf)) || (s == nullptr) || (s == buf))
     {
       if (returnOK == true)
         return (true);
@@ -336,7 +336,7 @@ namespace vfePlatform
       return (true);
 
     // remove filename from buf
-    *s = NULL;
+    *s = '\0';
 
     // check our temp dir; if it's within that, both read and write are permitted.
     if (_stricmp(m_TempPathString.c_str(), buf) == 0)
@@ -386,7 +386,7 @@ namespace vfePlatform
     // is not yet known, use the current working directory.
     if (m_InputFilename.empty() == true)
     {
-      if (_getcwd (buf, sizeof (buf) - 2) == NULL)
+      if (_getcwd (buf, sizeof (buf) - 2) == nullptr)
       {
         // TODO: issue appropriate error message
         return (false) ;
@@ -394,7 +394,7 @@ namespace vfePlatform
     }
     else
       n = GetFullPathName (UCS2toASCIIString(m_InputFilename).c_str(), sizeof (buf), buf, &s);
-    if ((n == 0) || (n > sizeof(buf)) || (s == NULL) || (s == buf))
+    if ((n == 0) || (n > sizeof(buf)) || (s == nullptr) || (s == buf))
     {
       // TODO: issue appropriate error message
       return (false) ;
@@ -402,7 +402,7 @@ namespace vfePlatform
 
     // get the containing directory. we have to ensure that we don't test for file access here
     // as the source filename may be incomplete (e.g. 'c:\temp\test' for c:\temp\test.pov).
-    _splitpath(buf, drive, dir, NULL, NULL);
+    _splitpath(buf, drive, dir, nullptr, nullptr);
     sprintf(buf, "%s%s", drive, dir);
     n = GetLongPathName (buf, buf, sizeof (buf)) ;
     if ((n == 0) || (n > sizeof(buf)))
@@ -428,7 +428,7 @@ namespace vfePlatform
   {
     m_ProcessRunning = false;
     m_ProcessId = m_LastError = m_ExitCode = 0;
-    m_ProcessHandle = m_ThreadHandle = NULL;
+    m_ProcessHandle = m_ThreadHandle = nullptr;
 
     // we need to re-init the actions so they will call our instance of ExtractCommand
     // this isn't necessary on platforms that don't implement a custom ExtractCommand
@@ -515,7 +515,7 @@ namespace vfePlatform
 
     shared_ptr<char> buf(new char[params.size() + 1]);
     strcpy(buf.get(), params.c_str());
-    if ((m_ProcessRunning = CreateProcess(cmd.c_str(), buf.get(), NULL, NULL, false, 0, NULL, NULL, &startupInfo, &procInfo)))
+    if ((m_ProcessRunning = CreateProcess(cmd.c_str(), buf.get(), nullptr, nullptr, false, 0, nullptr, nullptr, &startupInfo, &procInfo)))
     {
       m_ProcessHandle = procInfo.hProcess;
       m_ThreadHandle = procInfo.hThread;
@@ -569,12 +569,12 @@ namespace vfePlatform
 
       output = "Error: failed to run command '" + m_Command + "' - ";
       FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-                     NULL,
+                     nullptr,
                      m_LastError,
                      MAKELANGID (LANG_ENGLISH, SUBLANG_ENGLISH_US),
                      reinterpret_cast<char *>(&buffer),
                      0,
-                     NULL);
+                     nullptr);
       output += buffer;
       LocalFree (buffer);
       return 1;

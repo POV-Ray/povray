@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -145,7 +145,7 @@ bool Poly::Set_Coeff(const unsigned int x, const unsigned int y, const unsigned 
         return false;
     }
     /* pos = binomials[a+2][3]+binomials[b+1][2]+binomials[c][1];
-     * rewriten to stay in bound (max is "Order", not Order+2)
+     * rewritten to stay in bound (max is "Order", not Order+2)
      */
     pos =
         // binomials[a+2][3]
@@ -157,14 +157,14 @@ bool Poly::Set_Coeff(const unsigned int x, const unsigned int y, const unsigned 
         +binomials[b][1]+binomials[b][2]
         +binomials[c][1];
     /* It's magic
-     * Nah... a is the tetraedric sum to jump to get to the power of x index (first entry)
+     * Nah... a is the tetrahedral sum to jump to get to the power of x index (first entry)
      * b is then the triangular sum to add to get to the power of y index (also first entry)
      * and c is the linear sum to add to get to the power of z index (that the one we want)
-   *
+     *
      * Notice that binomials[c][1] == c, but the formula would loose its magic use of
      * pascal triangle everywhere.
-     * triangular sum are in the third ([2] column)
-     * tetraedric sum are in the fourth ([3] column)
+     * triangular sums are in the third ([2] column)
+     * tetrahedral sums are in the fourth ([3] column)
      *
      * (and yes, the 0 at the start of each column is useful)
      */

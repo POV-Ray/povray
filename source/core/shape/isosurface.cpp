@@ -12,7 +12,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -141,7 +141,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
         if(Depth1 < 0.0)
             Depth1 = 0.0;
 
-        if(Trans != NULL)
+        if (Trans != nullptr)
         {
             MInvTransPoint(Plocal, ray.Origin, Trans);
             MInvTransDirection(Dlocal, ray.Direction, Trans);
@@ -243,7 +243,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
         if(IFound)
             Thread->Stats()[Ray_IsoSurface_Tests_Succeeded]++;
 
-        Thread->isosurfaceData->pFn = NULL;
+        Thread->isosurfaceData->pFn = nullptr;
     }
 
     if(eval == true)
@@ -287,7 +287,7 @@ bool IsoSurface::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
     Vector3d New_Point;
 
     /* Transform the point into box space. */
-    if(Trans != NULL)
+    if (Trans != nullptr)
         MInvTransPoint(New_Point, IPoint, Trans);
     else
         New_Point = IPoint;
@@ -308,7 +308,7 @@ double IsoSurface::GetPotential (const Vector3d& globalPoint, bool subtractThres
 {
     Vector3d localPoint;
 
-    if (Trans != NULL)
+    if (Trans != nullptr)
         MInvTransPoint (localPoint, globalPoint, Trans);
     else
         localPoint = globalPoint;
@@ -365,7 +365,7 @@ void IsoSurface::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *
         GenericScalarFunctionInstance fn(Function, Thread);
 
         /* Transform the point into the isosurface space */
-        if(Trans != NULL)
+        if (Trans != nullptr)
             MInvTransPoint(New_Point, Inter->IPoint, Trans);
         else
             New_Point = Inter->IPoint;
@@ -390,7 +390,7 @@ void IsoSurface::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *
         Result.normalize();
 
         /* Transform the point into the boxes space. */
-        if(Trans != NULL)
+        if (Trans != nullptr)
         {
             MTransNormal(Result, Result, Trans);
 
@@ -531,7 +531,7 @@ void IsoSurface::Scale(const Vector3d&, const TRANSFORM* tr)
 
 void IsoSurface::Transform(const TRANSFORM* tr)
 {
-    if(Trans == NULL)
+    if(Trans == nullptr)
         Trans = Create_Transform();
 
     Compose_Transforms(Trans, tr);
@@ -577,7 +577,7 @@ IsoSurface::IsoSurface() :
 
     Trans = Create_Transform();
 
-    Function = NULL;
+    Function = nullptr;
     accuracy = 0.001;
     max_trace = 1;
 
@@ -717,7 +717,7 @@ void IsoSurface::DispatchShutdownMessages(GenericMessenger& messenger)
 
     const SourceInfo* fnInfo = Function->GetSourceInfo();
 
-    if (fnInfo != NULL)
+    if (fnInfo != nullptr)
     {
         if (eval == false)
         {
@@ -796,7 +796,7 @@ void IsoSurface::DispatchShutdownMessages(GenericMessenger& messenger)
 void IsoSurface::Compute_BBox()
 {
     container->ComputeBBox(BBox);
-    if(Trans != NULL)
+    if (Trans != nullptr)
     {
         Recompute_BBox(&BBox, Trans);
     }

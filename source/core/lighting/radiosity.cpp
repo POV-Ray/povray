@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -299,7 +299,7 @@ RadiosityFunction::RadiosityFunction(shared_ptr<SceneData> sd, TraceThreadData *
     topLevelQueryCount(0),
     topLevelReuse(0.0),
     tileId(0),
-    cacheBlockPool(NULL),
+    cacheBlockPool(nullptr),
     settings(rs),
     recursionSettings(rs.GetRecursionSettings(ft))
 {
@@ -309,10 +309,10 @@ RadiosityFunction::RadiosityFunction(shared_ptr<SceneData> sd, TraceThreadData *
 
 RadiosityFunction::~RadiosityFunction()
 {
-    if (cacheBlockPool != NULL) // shouldn't happen normally, but does happen when render is aborted
+    if (cacheBlockPool != nullptr) // shouldn't happen normally, but does happen when render is aborted
     {
         radiosityCache.ReleaseBlockPool(cacheBlockPool);
-        cacheBlockPool = NULL;
+        cacheBlockPool = nullptr;
     }
 
     delete[] recursionSettings;
@@ -361,7 +361,7 @@ void RadiosityFunction::BeforeTile(int id, unsigned int pts)
     for (unsigned int depth = 0; depth < settings.recursionLimit; depth ++)
         recursionParameters[depth].directionGenerator.Reset(settings.directionPoolSize);
 
-    POV_RADIOSITY_ASSERT(cacheBlockPool == NULL);
+    POV_RADIOSITY_ASSERT(cacheBlockPool == nullptr);
     cacheBlockPool = radiosityCache.AcquireBlockPool();
 }
 
@@ -369,7 +369,7 @@ void RadiosityFunction::AfterTile()
 {
     // release block pool, just in case this happens to be the last tile for this thread
     radiosityCache.ReleaseBlockPool(cacheBlockPool);
-    cacheBlockPool = NULL;
+    cacheBlockPool = nullptr;
 }
 
 void RadiosityFunction::ComputeAmbient(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, DBL brilliance, MathColour& ambient_colour, DBL weight, TraceTicket& ticket)
@@ -882,7 +882,7 @@ bool RadiosityFunction::SampleDirectionGenerator::GetDirection(Vector3d& directi
 RadiosityCache::RadiosityCache(const SceneRadiositySettings& radset) :
     ra_reuse_count(0),
     ra_gather_count(0),
-    ot_fd(NULL),
+    ot_fd(nullptr),
     Gather_Total_Count(0),
     recursionSettings(radset.GetRecursionSettings(true)) // be prepared for the main render
 {
@@ -900,7 +900,7 @@ bool RadiosityCache::Load(const Path& inputFile)
 {
     bool ok = false;
     IStream* fd = NewIStream(inputFile, POV_File_Data_RCA);
-    if(fd != NULL)
+    if (fd != nullptr)
     {
         BlockPool* pool = AcquireBlockPool();
 
@@ -975,7 +975,7 @@ bool RadiosityCache::Load(const Path& inputFile)
 
                         line_num++;
 
-                        AddBlock(pool, NULL, point, normal, 1.0 /* TODO FIXME - brilliance */, to_nearest, dx, dy, dz, illuminance, harmonic_mean, nearest, 1.0 /* TODO FIXME - quality */, depth, PRETRACE_STEP_LOADED, 0);
+                        AddBlock(pool, nullptr, point, normal, 1.0 /* TODO FIXME - brilliance */, to_nearest, dx, dy, dz, illuminance, harmonic_mean, nearest, 1.0 /* TODO FIXME - quality */, depth, PRETRACE_STEP_LOADED, 0);
                         goodreads++;
                     }
                     break;
@@ -1039,11 +1039,11 @@ RadiosityCache::~RadiosityCache()
         boost::mutex::scoped_lock lock(fileMutex);
 #endif
         // finish up cache file
-        if(ot_fd != NULL)
+        if (ot_fd != nullptr)
         {
             // close cache file
             delete ot_fd;
-            ot_fd = NULL;
+            ot_fd = nullptr;
         }
     }
 
@@ -1052,7 +1052,7 @@ RadiosityCache::~RadiosityCache()
         boost::mutex::scoped_lock lockTree(octree.treeMutex);
         boost::mutex::scoped_lock lockBlock(octree.blockMutex);
 #endif
-        if (octree.root != NULL)
+        if (octree.root != nullptr)
             ot_free_tree(&octree.root);
     }
 
@@ -1105,9 +1105,9 @@ void RadiosityCache::ReleaseBlockPool(RadiosityCache::BlockPool* pool)
 
 ot_block_struct *RadiosityCache::BlockPool::NewBlock()
 {
-    ot_block_struct *block = NULL;
+    ot_block_struct *block = nullptr;
 
-    if(head == NULL || nextFreeBlock >= BLOCK_POOL_UNIT_SIZE)
+    if (head == nullptr || nextFreeBlock >= BLOCK_POOL_UNIT_SIZE)
     {
         head = new PoolUnit(head);
         nextFreeBlock = 0;
@@ -1121,8 +1121,8 @@ ot_block_struct *RadiosityCache::BlockPool::NewBlock()
 }
 
 RadiosityCache::BlockPool::BlockPool() :
-    head(NULL),
-    savedHead(NULL),
+    head(nullptr),
+    savedHead(nullptr),
     nextFreeBlock(0),
     nextUnsavedBlock(0)
 {
@@ -1131,10 +1131,10 @@ RadiosityCache::BlockPool::BlockPool() :
 
 void RadiosityCache::BlockPool::Save(OStream* fd)
 {
-    if (fd != NULL)
+    if (fd != nullptr)
     {
         PoolUnit* unit = head;
-        while (unit != NULL && unit != savedHead)
+        while ((unit != nullptr) && (unit != savedHead))
         {
             unsigned int from = 0;
             unsigned int to   = BLOCK_POOL_UNIT_SIZE;
@@ -1154,7 +1154,7 @@ void RadiosityCache::BlockPool::Save(OStream* fd)
     }
     // no else; if we're not writing to a file, still pretend we saved so the destructor doesn't assert
 
-    if (head != NULL)
+    if (head != nullptr)
     {
         // update the variables indicating how far we have saved
         savedHead = head->next; // the head is incomplete, so it cannot be saved completely...
@@ -1162,7 +1162,7 @@ void RadiosityCache::BlockPool::Save(OStream* fd)
     }
     else
     {
-        POV_RADIOSITY_ASSERT(savedHead == NULL);
+        POV_RADIOSITY_ASSERT(savedHead == nullptr);
         POV_RADIOSITY_ASSERT(nextUnsavedBlock == 0);
     }
 }
@@ -1170,9 +1170,9 @@ void RadiosityCache::BlockPool::Save(OStream* fd)
 RadiosityCache::BlockPool::~BlockPool()
 {
     // require that block has been saved by now
-    POV_RADIOSITY_ASSERT(head == NULL || ((savedHead == head->next) && (nextUnsavedBlock == nextFreeBlock)));
+    POV_RADIOSITY_ASSERT((head == nullptr) || ((savedHead == head->next) && (nextUnsavedBlock == nextFreeBlock)));
 
-    while(head != NULL)
+    while (head != nullptr)
     {
         PoolUnit *b = head;
         head = head->next;
@@ -1210,7 +1210,7 @@ void RadiosityCache::AddBlock(BlockPool* pool, RenderStatistics* stats, const Ve
     block->TileId = OT_TILE(tileId);
     block->Point = point;
     block->S_Normal = normal;
-    block->next = NULL;
+    block->next = nullptr;
 
     // figure out the block id
     ot_index_sphere(point, harmonicMeanDistance * recSettings.octreeAddressFactor, &id);
@@ -1237,9 +1237,9 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
 #endif
 
     // If there is no root yet, create one.  This is a first-time-through
-    if (octree.root == NULL)
+    if (octree.root == nullptr)
     {
-        // CLi moved C99_COMPATIBLE_RADIOSITY check from ot_newroot() to ot_ins() NULL root handling section
+        // CLi moved C99_COMPATIBLE_RADIOSITY check from ot_newroot() to ot_ins() `nullptr` root handling section
         // (no need to do this again and again for every new node inserted)
 #if(C99_COMPATIBLE_RADIOSITY == 0)
         if((sizeof(int) != 4) || (sizeof(float) != 4))
@@ -1259,11 +1259,12 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
 
         // Now that we have exclusive write access, make sure we REALLY don't have a root
         // (some other thread might have created it just as we were waiting to get the lock)
-        if (octree.root == NULL)
+        if (octree.root == nullptr)
         {
             octree.root = new ot_node_struct;
 #ifdef OCTREE_PERFORMANCE_DEBUG
-            if (stats != NULL) (*stats)[Radiosity_OctreeNodes]++;
+            if (stats != nullptr)
+                (*stats)[Radiosity_OctreeNodes]++;
 #endif
 
 #ifdef RADSTATS
@@ -1380,7 +1381,7 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
 
         index = dx + dy + dz;
 
-        if (this_node->Kids[index] == NULL)
+        if (this_node->Kids[index] == nullptr)
         {
             // Next level down doesn't exist yet, so create it
 
@@ -1391,11 +1392,12 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
 #endif
 
             // We may have acquired the lock just now, so some other task may have changed the root since last time we looked
-            if (this_node->Kids[index] == NULL)
+            if (this_node->Kids[index] == nullptr)
             {
                 temp_node = new ot_node_struct;
 #ifdef OCTREE_PERFORMANCE_DEBUG
-                if (stats!= NULL) (*stats)[Radiosity_OctreeNodes]++;
+                if (stats!= nullptr)
+                    (*stats)[Radiosity_OctreeNodes]++;
 #endif
 
 #ifdef RADSTATS
@@ -1458,7 +1460,7 @@ void RadiosityCache::InsertBlock(ot_node_struct *node, ot_block_struct *block)
 
 DBL RadiosityCache::FindReusableBlock(RenderStatistics& stats, DBL errorbound, const Vector3d& ipoint, const Vector3d& snormal, DBL brilliance, MathColour& illuminance, int recursionDepth, int pretraceStep, int tileId)
 {
-    if(octree.root != NULL)
+    if (octree.root != nullptr)
     {
         WT_AVG gather;
 

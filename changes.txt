@@ -37,13 +37,6 @@ This version is still under active development, and not finalized yet.
 NOTE: This release cycle has been redesignated v3.8.0. There will not be a
 v3.7.1 release proper.
 
-Performance Improvements
-------------------------
-
-  - Significantly improved parsing speed of skipped conditional blocks (e.g. in
-    `#if(false) ... #end`), especially for blocks containing few directives
-    (stuff that begins with `#`).
-
 Changed Behaviour
 -----------------
 
@@ -61,6 +54,30 @@ Changed Behaviour
   - Token counting in conditional blocks (e.g. in `#if ... #end`) has changed.
     Whenever such a block is skipped, the token count is now incremented only
     by directives (stuff that begins with `#`).
+  - UV mapping of cylinder, cone and lemon primitives has been disabled again
+    for now, due to their orientation being poorly defined.
+  - An age-old bug in the inbuilt `f_enneper` isosurface function has been
+    fixed; the function now results in the originally intended shape.
+
+New Features
+------------
+
+  - The `ovus` primitive has been extended in multiple ways. See the
+    documentation (currently being maintained on <http://wiki.povray.org>) for
+    details.
+  - Anti-aliasing now supports a new mode 3, which can actually serve as a
+    generic oversampling mechanism not only suited to perform edge
+    anti-aliasing, but also to successtully suppress moire patterns as well as
+    reduce image noise from stochastic mechanisms (e.g. jittered area lights,
+    subsurface light transport or micronormals). The mathematical background
+    and parameterization is similar to that of adaptive focal blur.
+
+Performance Improvements
+------------------------
+
+  - Significantly improved parsing speed of skipped conditional blocks (e.g. in
+    `#if(false) ... #end`), especially for blocks containing few directives
+    (stuff that begins with `#`).
 
 Fixed or Mitigated Bugs
 -----------------------
@@ -79,37 +96,68 @@ Reported via GitHub:
 
 Reported via the Newsgroups:
 
-  - <web.5b8350d429c104f2458c7afe0@news.povray.org>
-    (2018-08-27, povray.advanced-users, "Re: It gets even weirder.")
-    Trying to `#declare Foo[A][B]=...` with `Foo` being an array of arrays and
-    `Foo[A]` not yet initialized causes a hard crash instead of a parse error.
   - <web.59fefd5f68f4d962ca73ee9d0@news.povray.org>
     (2017-11-05, povray.newusers, "orthographic camera and conic_sweep object")
     Sides of a `conic_sweep` prism become invisible when viewed head-on using
     an orthographic camera.
   - <5a4f8ddc$1@news.povray.org>
     (2018-01-05, povray.beta-test, "3.8.0 block pattern, density list parsing issue.")
+  - <web.5b8350d429c104f2458c7afe0@news.povray.org>
+    (2018-08-27, povray.advanced-users, "Re: It gets even weirder.")
+    Trying to `#declare Foo[A][B]=...` with `Foo` being an array of arrays and
+    `Foo[A]` not yet initialized causes a hard crash instead of a parse error.
+
+Reported by Coverity static code analysis:
+  
+  - CID 986462,986463 (Wrapper object use after free)
+  - CID 967358-967362 (Uninitialized scalar variable)
+  - CID 1372542-1372544 (Result is not floating-point)
+  - CID 1372618 (Uninitialized scalar variable)
+  - CID 1372629 (Uninitialized pointer read)
+  - CID 1372630-1372632 (Uninitialized scalar variable)
 
 Miscellaneous:
 
   - Fix `interior_texture` for text objects (as mentioned in GitHub issue #65)
   - Eliminated use of deprecated C++ `register` keyword (except in 3rd party
     libraries bundled with the POV-Ray source code).
+  - Fix long-standing bug in Julia fractal primitive using hypercomplex numbers.
 
-Other Noteworthy
-----------------
+Development Related
+-------------------
 
-  - The source code now requires a C++11-compliant compiler.
-  - The Unix build process now officially requires Autoconf 2.68 or later.
-  - Added `--generation` command-line switch to POV-Ray for Unix, which will
-    cause POV-Ray to print its abbreviated version number to standard output.
+  - When compiled in debug mode, a new directive `#breakpoint` is now available,
+    intended for triggering an unconditional breakpoint from the scene file, or
+    priming a conditional breakpoint. See `Parser::Parse_Breakpoint()` in
+    `source/parser/parser_tokenizer.cpp` for more details.
+  - When compiled in debug mode, POV-Ray for Windows will now make do with
+    the release version of the editor DLLs if it can't find the debug version.
+  - A new version of the Git pre-commit hook is available; please, copy
+    `pre-commit` from `tools/git/hooks/` to `.git/hooks/` in your local
+    repository.
   - To simplify version number housekeeping, the file `unix/VERSION` is now
     created on the fly by the `unix/prebuild.sh` script, and has been dropped
     from the repository. To retrieve version information from the source
     package, use one of the new `get-source-version.*` scripts provided in
     `tools/unix/` and `tools/windows/`, respectively.
+  - To simplify creating reproducible builds, the Unix build process has been
+    amended to compile and link source files in a well-defined order.
+
+Other Noteworthy
+----------------
+
+  - During alpha development phase, POV-Ray v3.8.0-alpha for Windows will
+    piggypack on an existing v3.7 installation to allow for raw binary
+    distribution.
+  - The source code now requires a C++11-compliant compiler.
+  - The Unix build process now officially requires Autoconf 2.68 or later.
+  - Added `--generation` command-line switch to POV-Ray for Unix, which will
+    cause POV-Ray to print its abbreviated version number to standard output.
   - The `unix/prebuild.sh` script can now be run from the main directory; it is
     no longer necessary to change to the unix directory first.
+  - The `./configure` script can now be run without the `COMPILED_BY=...`
+    option. In this case it defaults to `$USER <no contact address>`, where
+    `$USER` is your login name.
 
 
 Changes between 3.7.1-beta.9 and 3.7.1-rc.1

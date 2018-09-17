@@ -56,7 +56,7 @@ namespace pov_base
 Animation::Animation(FileType aftype, IStream *file, const ReadOptions& options) :
     fileType(aftype),
     inFile(file),
-    outFile(NULL),
+    outFile(nullptr),
     readOptions(options)
 {
     float seconds = 0.0f;
@@ -81,7 +81,7 @@ Animation::Animation(FileType aftype, IStream *file, const ReadOptions& options)
             break;
     }
 
-    if(state == NULL)
+    if (state == nullptr)
         throw POV_EXCEPTION(kCannotHandleDataErr, "Cannot read animation file header in the specified format!");
 
     frameDuration = seconds / float(totalFrames);
@@ -89,7 +89,7 @@ Animation::Animation(FileType aftype, IStream *file, const ReadOptions& options)
 
 Animation::Animation(FileType aftype, CodecType c, OStream *file, unsigned int w, unsigned int h, const WriteOptions& options) :
     fileType(aftype),
-    inFile(NULL),
+    inFile(nullptr),
     outFile(file),
     width(w),
     height(h),
@@ -119,7 +119,7 @@ Animation::Animation(FileType aftype, CodecType c, OStream *file, unsigned int w
             break;
     }
 
-    if(state == NULL)
+    if (state == nullptr)
         throw POV_EXCEPTION(kCannotHandleDataErr, "Cannot write animation file with the specified format and codec!");
 
     // TODO FIXME - build blur matrix (this code only builds an identity matrix)
@@ -133,7 +133,7 @@ Animation::Animation(FileType aftype, CodecType c, OStream *file, unsigned int w
 
 Animation::~Animation()
 {
-    if(outFile != NULL)
+    if (outFile != nullptr)
     {
         switch(fileType)
         {
@@ -153,7 +153,7 @@ Animation::~Animation()
                 break;
         }
     }
-    else if(inFile != NULL)
+    else if (inFile != nullptr)
     {
         switch(fileType)
         {
@@ -174,7 +174,7 @@ Animation::~Animation()
         }
     }
 
-    state = NULL;
+    state = nullptr;
 }
 
 Animation *Animation::Open(FileType aftype, IStream *file, const ReadOptions& options) // reading only
@@ -258,7 +258,7 @@ void Animation::ClearWarnings()
 Image *Animation::ReadFrame(IStream *file)
 {
     POV_OFF_T bytes = 0;
-    Image *image = NULL;
+    Image *image = nullptr;
     Image::ReadOptions options;
 
     options.defaultGamma = PowerLawGammaCurve::GetByDecodingGamma(readOptions.gamma);
