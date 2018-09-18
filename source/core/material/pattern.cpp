@@ -9287,8 +9287,6 @@ void Read_Density_File(IStream *file, DENSITY_FILE *df)
         }
         else
             throw POV_EXCEPTION_STRING("Invalid density file size");
-
-        delete file;
     }
 }
 
