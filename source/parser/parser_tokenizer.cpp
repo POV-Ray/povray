@@ -2539,12 +2539,8 @@ void Parser::Parse_Directive(int After_Hash)
                                           "'#version version;'.");
                             }
 
-                            if (!sceneData->languageVersionLate && !sceneData->languageVersionSet)
-                            {
-                                // Got `#version` as the first statement of the file.
-                                // Initialize various defaults depending on language version specified.
-                                InitDefaults(sceneData->languageVersion);
-                            }
+                            // Initialize various defaults depending on language version specified.
+                            InitDefaults(sceneData->languageVersion);
 
                             // NB: This must be set _after_ parsing the value, in order for the `#version version`
                             // idiom to work properly, but _before_ any of the following code querying

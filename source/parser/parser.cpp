@@ -197,6 +197,9 @@ void Parser::Run()
         Default_Texture->Tnormal = nullptr;
         Default_Texture->Finish  = Create_Finish();
 
+        defaultsVersion = DefaultsVersion::kLegacy;
+        defaultsModified = false;
+
         // Initialize various defaults depending on language version as per command line / INI settings.
         InitDefaults(sceneData->EffectiveLanguageVersion());
 
@@ -356,7 +359,7 @@ void Parser::Run()
     // TODO FIXME - review whole if-statement and line after it below [trf]
     // we set this before resetting languageVersion since there's nothing to
     // be gained from disabling the defaulting of the noise generator to
-    // something other than compatibilty mode.
+    // something other than compatibility mode.
     if (sceneData->explicitNoiseGenerator == false)
         sceneData->noiseGenerator = (sceneData->EffectiveLanguageVersion() < 350 ?
                                      kNoiseGen_Original : kNoiseGen_RangeCorrected);
@@ -540,24 +543,53 @@ void Parser::InitDefaults(int version)
     MathColour pigmentColour;
     double ambientLevel;
     double rightLength;
+    DefaultsVersion newDefaults;
+
     if (version >= 380)
-    {
-        pigmentType = PLAIN_PATTERN;
-        pigmentColour = MathColour(1.0);
-        ambientLevel = 0.0;
-        rightLength = sceneData->aspectRatio;
-    }
+        newDefaults = DefaultsVersion::k380;
     else
+        newDefaults = DefaultsVersion::kLegacy;
+
+    if (newDefaults == defaultsVersion)
+        // nothing to change
+        return;
+
+    if (defaultsModified)
     {
-        pigmentType = NO_PATTERN;
-        pigmentColour = MathColour(0.0);
-        ambientLevel = 0.1;
-        rightLength = 1.33;
+        // Don't override defaults if they've already been modified by the user.
+        Warning("Scene language version changed after a 'default' statement. "
+                "The changes in defaults normally associated with the language "
+                "version change are not applied.");
+        return;
     }
+
+    switch (newDefaults)
+    {
+        case DefaultsVersion::k380:
+            pigmentType = PLAIN_PATTERN;
+            pigmentColour = MathColour(1.0);
+            ambientLevel = 0.0;
+            rightLength = sceneData->aspectRatio;
+            break;
+
+        case DefaultsVersion::kLegacy:
+            pigmentType = NO_PATTERN;
+            pigmentColour = MathColour(0.0);
+            ambientLevel = 0.1;
+            rightLength = 1.33;
+            break;
+
+        default:
+            POV_PARSER_ASSERT(false);
+            break;
+    }
+
     Default_Texture->Pigment->Type = pigmentType;
     Default_Texture->Pigment->colour = TransColour(pigmentColour, 0.0, 0.0);
     Default_Texture->Finish->Ambient = MathColour(ambientLevel);
     Default_Camera.Right = Vector3d(rightLength, 0.0, 0.0);
+
+    defaultsVersion = newDefaults;
 }
 
 
@@ -6868,6 +6900,8 @@ void Parser::Parse_Default ()
 
     Not_In_Default = false;
     Parse_Begin();
+
+    defaultsModified = true;
 
     EXPECT
         CASE (TEXTURE_TOKEN)

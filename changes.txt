@@ -43,12 +43,15 @@ Changed Behaviour
   - Any new behaviour formerly activated by `#version 3.71` now requires
     `#version 3.8` (or higher); specifying `#version 3.71` will trigger a
     corresponding warning.
-  - Some defaults have been changed (requires `#version 3.8` as the _very first_
-    statement of the scene, or a corresponding command line / INI setting):
+  - Some defaults have been changed (requires `#version 3.8` or a corresponding
+    command line / INI setting):
       - The pigment now defaults to plain white.
       - `ambient` now defaults to 0.0 instead of 0.1.
       - The camera `right` vector length now defaults to the output image aspect
         ratio (presuming square pixels) instead of 1.33.
+    Switching back and forth between defaults via `#version` is possible until
+    the first `default` statement is encountered; after that, `#version` will
+    cause a warning instead of changing defaults.
   - Minor changes have been made to the benchmark scene. New benchmark version
     is 2.03.
   - Token counting in conditional blocks (e.g. in `#if ... #end`) has changed.
