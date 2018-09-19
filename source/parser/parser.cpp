@@ -843,8 +843,7 @@ ObjectPtr Parser::Parse_Bicubic_Patch ()
         for (j=0;j<4;j++)
         {
             Parse_Vector(Object->Control_Points[i][j]);
-            if(!((i == 3) && (j == 3)))
-                Parse_Comma();
+            Parse_Comma();
         }
     }
 
@@ -8133,14 +8132,12 @@ void Parser::Parse_Matrix(MATRIX Matrix)
 
     Parse_Angle_Begin();
 
-    Matrix[0][0] = Parse_Float();
     for (i = 0; i < 4; i++)
     {
-        for (j = !i ? 1 : 0; j < 3; j++)
+        for (j = 0; j < 3; j++)
         {
-            Parse_Comma();
-
             Matrix[i][j] = Parse_Float();
+            Parse_Comma();
         }
 
         Matrix[i][3] = (i != 3 ? 0.0 : 1.0);

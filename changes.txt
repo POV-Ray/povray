@@ -71,6 +71,10 @@ New Features
     reduce image noise from stochastic mechanisms (e.g. jittered area lights,
     subsurface light transport or micronormals). The mathematical background
     and parameterization is similar to that of adaptive focal blur.
+  - The `bicubic_patch` primitive now allows for a trailing comma at the end of
+    the list of control points.
+  - The `matrix` syntax now allows allows for a trailing comma at the end of
+    the list of coefficients.
 
 Performance Improvements
 ------------------------
