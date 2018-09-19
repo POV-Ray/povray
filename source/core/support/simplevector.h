@@ -627,6 +627,9 @@ public:
     {
         if (initialPoolSize != 0)
             mPool.reserve(initialPoolSize);
+#ifdef POV_CORE_DEBUG
+        mAllocCount = 0;
+#endif
     }
 
     ~VectorPool()
