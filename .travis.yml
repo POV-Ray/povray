@@ -47,7 +47,7 @@ addons:
     notification_email: coverity-scan@lipka-koeln.de
     build_command_prepend: "unix/prebuild.sh ; ./configure"
     build_command: "make"
-    branch_pattern: coverity_scan
+    branch_pattern: coverity_scan|autobuild/*
 
 script:
 - true
