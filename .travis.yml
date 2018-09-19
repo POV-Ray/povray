@@ -47,7 +47,11 @@ addons:
     notification_email: coverity-scan@lipka-koeln.de
     build_command_prepend: "unix/prebuild.sh ; ./configure"
     build_command: "make"
-    branch_pattern: (coverity_scan|autobuild*)
+    # Instead of using pattern matching to choose which branches to run Coverity Scan on
+    # (which turns out more difficult than expected), we simply use different .travis.yml files.
+    # We need to do that anyway, because normally we also run osx/clang, which doesn't sit well
+    # with Covertiy Scan.
+    branch_pattern: "*"
 
 script:
 - true
