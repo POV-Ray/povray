@@ -338,11 +338,14 @@ void Scanner::SetInputStream(SourcePtr stream)
 
 bool Scanner::SetInputStream(SourcePtr stream, const Bookmark& bookmark)
 {
+    bool seekOk;
+
     if ((mpSource == stream) && (bookmark.offset >= mBase) &&
         ((bookmark.offset - mBase) < (mpBufferEnd - maBuffer)))
     {
         // Bookmark is already loaded in the buffer.
         // Just advance/rewind the next character accordingly.
+        seekOk = true;
         mpNextChar = maBuffer + (bookmark.offset - mBase);
     }
     else
@@ -353,11 +356,12 @@ bool Scanner::SetInputStream(SourcePtr stream, const Bookmark& bookmark)
         mpSource = stream;
 
         // Refill the buffer.
-        mEndOfStream = !mpSource->seekg(bookmark.offset);
+        seekOk = mpSource->seekg(bookmark.offset);
         mBase = mpSource->tellg();
         mpBufferEnd = maBuffer;
         mpNextChar = maBuffer;
-        if (!mEndOfStream)
+        mEndOfStream = !seekOk;
+        if (seekOk)
             RefillBuffer();
     }
 
@@ -370,7 +374,7 @@ bool Scanner::SetInputStream(SourcePtr stream, const Bookmark& bookmark)
     mNominalEndOfLine = bookmark.nominalEndOfLine;
     mAllowNestedBlockComments = bookmark.allowNestedBlockComments;
 
-    return !mEndOfStream;
+    return seekOk;
 }
 
 void pov_parser::Scanner::SetStringEncoding(StringEncoding encoding)

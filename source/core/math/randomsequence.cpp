@@ -226,7 +226,7 @@ Vector2d Uniform2dOnSquare(SequentialDoubleGeneratorPtr source)
 {
     double x = (*source)();
     double y = (*source)();
-    return Vector2d((*source)(), (*source)());
+    return Vector2d(x, y);
 }
 
 Vector2d Uniform2dOnDisc(SequentialDoubleGeneratorPtr source)
