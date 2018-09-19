@@ -629,6 +629,20 @@ public:
             mPool.reserve(initialPoolSize);
     }
 
+    ~VectorPool()
+    {
+        for (auto&& p : mPool)
+        {
+            delete p;
+#ifdef POV_CORE_DEBUG
+            --mAllocCount;
+#endif
+        }
+#ifdef POV_CORE_DEBUG
+        POV_CORE_ASSERT(mAllocCount == 0);
+#endif
+    }
+
     VectorPool(const VectorPool&) = delete;
     VectorPool& operator=(VectorPool&) = delete;
 
@@ -638,6 +652,9 @@ public:
         if (mPool.empty())
         {
             p = new VECTOR_T();
+#ifdef POV_CORE_DEBUG
+            ++mAllocCount;
+#endif
         }
         else
         {
@@ -660,6 +677,9 @@ private:
 
     vector<VECTOR_T*> mPool;
     size_t mSizeHint;
+#ifdef POV_CORE_DEBUG
+    size_t mAllocCount;
+#endif
 };
 
 //******************************************************************************
