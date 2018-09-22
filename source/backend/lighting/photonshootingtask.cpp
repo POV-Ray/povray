@@ -63,8 +63,8 @@
 namespace pov
 {
 
-PhotonShootingTask::PhotonShootingTask(ViewData *vd, PhotonShootingStrategy* strategy) :
-    RenderTask(vd, "Photon"),
+PhotonShootingTask::PhotonShootingTask(ViewData *vd, PhotonShootingStrategy* strategy, size_t seed) :
+    RenderTask(vd, seed, "Photon"),
     trace(vd->GetSceneData(), GetViewDataPtr(), vd->GetQualityFeatureFlags(), cooperate),
     rands(0.0, 1.0, 32768),
     randgen(&rands),

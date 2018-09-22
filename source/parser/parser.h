@@ -313,7 +313,7 @@ class Parser : public SceneTask
         };
 
         // constructor
-        Parser(shared_ptr<BackendSceneData> sd, bool useclock, DBL clock);
+        Parser(shared_ptr<BackendSceneData> sd, bool useclock, DBL clock, size_t seed);
 
         ~Parser();
 
@@ -750,6 +750,14 @@ class Parser : public SceneTask
 
         // parstxtr.h/parstxtr.cpp
         TEXTURE *Default_Texture;
+
+        enum class DefaultsVersion : char
+        {
+            kLegacy,    ///< Pre-v3.8 defaults.
+            k380,       ///< v3.8.0 defaults.
+        };
+        DefaultsVersion defaultsVersion;    ///< Language version active before the first `default` statement.
+        bool defaultsModified   : 1;        ///< Whether a `default` statement has been encountered.
 
         // express.h/express.cpp
         short Have_Vector;

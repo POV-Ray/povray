@@ -50,7 +50,11 @@
 namespace pov
 {
 
-TraceThreadData::TraceThreadData(shared_ptr<SceneData> sd): sceneData(sd), qualityFlags(9)
+TraceThreadData::TraceThreadData(shared_ptr<SceneData> sd, size_t seed) :
+    sceneData(sd),
+    qualityFlags(9),
+    stochasticRandomGenerator(GetRandomDoubleGenerator(0.0,1.0)),
+    stochasticRandomSeedBase(seed)
 {
     for(int i = 0; i < 4; i++)
         Fractal_IStack[i] = nullptr;
@@ -79,6 +83,8 @@ TraceThreadData::TraceThreadData(shared_ptr<SceneData> sd): sceneData(sd), quali
     timeType = kUnknownTime;
     cpuTime = 0;
     realTime = 0;
+
+    stochasticRandomGenerator->Seed(stochasticRandomSeedBase);
 
     for(vector<LightSource *>::iterator it = sceneData->lightSources.begin(); it != sceneData->lightSources.end(); it++)
         lightSources.push_back(static_cast<LightSource *> (Copy_Object(*it)));

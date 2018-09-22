@@ -85,7 +85,7 @@ using namespace pov_base;
    the specifications provided in this table. The first element is the
    INI-file keyword, the second element is the POVMS object attribute
    key, the third is the attribute type. Entries with a POVMS attribute
-   key of 0 are superceded options that will generate a warning that the
+   key of 0 are obsolete options that will generate a warning that the
    option no longer is supported and will generate an error in a later
    (unspecified) version of POV.
 */
@@ -93,10 +93,11 @@ struct ProcessOptions::INI_Parser_Table RenderOptions_INI_Table[] =
 {
     { "All_Console",         kPOVAttrib_AllConsole,         kPOVMSType_Bool },
     { "All_File",            kPOVAttrib_AllFile,            kPOVMSType_UCS2String },
-    { "Antialias_Depth",     kPOVAttrib_AntialiasDepth,     kPOVMSType_Int },
     { "Antialias",           kPOVAttrib_Antialias,          kPOVMSType_Bool },
-    { "Antialias_Threshold", kPOVAttrib_AntialiasThreshold, kPOVMSType_Float },
+    { "Antialias_Confidence",kPOVAttrib_AntialiasConfidence,kPOVMSType_Float },
+    { "Antialias_Depth",     kPOVAttrib_AntialiasDepth,     kPOVMSType_Int },
     { "Antialias_Gamma",     kPOVAttrib_AntialiasGamma,     kPOVMSType_Float },
+    { "Antialias_Threshold", kPOVAttrib_AntialiasThreshold, kPOVMSType_Float },
     { "Append_File",         kPOVAttrib_AppendConsoleFiles, kPOVMSType_Bool },
 
     { "Bits_Per_Color",      kPOVAttrib_BitsPerColor,       kPOVMSType_Int,         kINIOptFlag_SuppressWrite },
@@ -205,6 +206,7 @@ struct ProcessOptions::INI_Parser_Table RenderOptions_INI_Table[] =
     { "Start_Row",           kPOVAttrib_Top,                kPOVMSType_Float },
     { "Statistic_Console",   kPOVAttrib_StatisticsConsole,  kPOVMSType_Bool },
     { "Statistic_File",      kPOVAttrib_StatisticsFile,     kPOVMSType_UCS2String },
+    { "Stochastic_Seed",     kPOVAttrib_StochasticSeed,     kPOVMSType_Int },
     { "Subset_End_Frame",    kPOVAttrib_SubsetEndFrame,     kPOVMSType_Float },
     { "Subset_Start_Frame",  kPOVAttrib_SubsetStartFrame,   kPOVMSType_Float },
 
@@ -246,6 +248,7 @@ struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
 {
     //       Parameter setting              Parameter type          Boolean setting
 
+    { "AC",  kPOVAttrib_AntialiasConfidence,kPOVMSType_Float,       kNoParameter },
     { "AG",  kPOVAttrib_AntialiasGamma,     kPOVMSType_Float,       kNoParameter },
     { "AM",  kPOVAttrib_SamplingMethod,     kPOVMSType_Int,         kNoParameter },
     { "A",   kPOVAttrib_AntialiasThreshold, kPOVMSType_Float,       kPOVAttrib_Antialias,           kCmdOptFlag_Optional },
@@ -318,6 +321,7 @@ struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
     { "SF",  kPOVAttrib_SubsetStartFrame,   kPOVMSType_Int,         kNoParameter },
     { "SP",  kPOVAttrib_PreviewStartSize,   kPOVMSType_Int,         kNoParameter },
     { "SR",  kPOVAttrib_Top,                kPOVMSType_Float,       kNoParameter },
+    { "SS",  kPOVAttrib_StochasticSeed,     kPOVMSType_Int,         kNoParameter },
     { "STP", kPOVAttrib_FrameStep,          kPOVMSType_Int,         kNoParameter },
     { "SU",  kNoParameter,                  kNoParameter,           kPOVAttrib_SplitUnions },
 

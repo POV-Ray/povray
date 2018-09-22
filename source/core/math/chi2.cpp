@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -239,7 +239,6 @@ static DBL polevl (DBL x, const DBL * coef, int N);
 static DBL p1evl (DBL x, const DBL * coef, int N);
 static DBL igamc (DBL a, DBL x);
 static DBL igam (DBL a, DBL x);
-static DBL ndtri (DBL y0);
 
 
 
@@ -874,7 +873,7 @@ done:
  *
  */
 
-static DBL ndtri(DBL y0)
+DBL ndtri(DBL y0)
 {
     DBL x, y, z, y2, x0, x1;
     int code;

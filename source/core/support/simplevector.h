@@ -616,6 +616,12 @@ private:
 
 /// Helper class for @ref PooledSimpleVector
 ///
+/// @attention
+///     During thread cleanup, vectors handed out by one instance of this class
+///     (via the @ref alloc() method) may happen to be returned to a different
+///     instance (via the @ref release() method). The implementation must handle
+///     such cases gracefully.
+///
 template<class VECTOR_T>
 class VectorPool
 {
@@ -627,6 +633,12 @@ public:
     {
         if (initialPoolSize != 0)
             mPool.reserve(initialPoolSize);
+    }
+
+    ~VectorPool()
+    {
+        for (auto&& p : mPool)
+            delete p;
     }
 
     VectorPool(const VectorPool&) = delete;
