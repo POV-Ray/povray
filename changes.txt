@@ -43,12 +43,15 @@ Changed Behaviour
   - Any new behaviour formerly activated by `#version 3.71` now requires
     `#version 3.8` (or higher); specifying `#version 3.71` will trigger a
     corresponding warning.
-  - Some defaults have been changed (requires `#version 3.8` as the _very first_
-    statement of the scene, or a corresponding command line / INI setting):
+  - Some defaults have been changed (requires `#version 3.8` or a corresponding
+    command line / INI setting):
       - The pigment now defaults to plain white.
       - `ambient` now defaults to 0.0 instead of 0.1.
       - The camera `right` vector length now defaults to the output image aspect
         ratio (presuming square pixels) instead of 1.33.
+    Switching back and forth between defaults via `#version` is possible until
+    the first `default` statement is encountered; after that, `#version` will
+    cause a warning instead of changing defaults.
   - Minor changes have been made to the benchmark scene. New benchmark version
     is 2.03.
   - Token counting in conditional blocks (e.g. in `#if ... #end`) has changed.
@@ -58,6 +61,11 @@ Changed Behaviour
     for now, due to their orientation being poorly defined.
   - An age-old bug in the inbuilt `f_enneper` isosurface function has been
     fixed; the function now results in the originally intended shape.
+  - Contrary to earlier claims and intentions, v3.7.1-beta.1 failed to lift the
+    requirement that array elements must be of the same type. It has been
+    decided to not fix the change to work as originally intended, and instead
+    only allow type mixing if the array has explicitly been declared as
+    `mixed`. See the documentation for details.
 
 New Features
 ------------
@@ -71,6 +79,10 @@ New Features
     reduce image noise from stochastic mechanisms (e.g. jittered area lights,
     subsurface light transport or micronormals). The mathematical background
     and parameterization is similar to that of adaptive focal blur.
+  - The `bicubic_patch` primitive now allows for a trailing comma at the end of
+    the list of control points.
+  - The `matrix` syntax now allows allows for a trailing comma at the end of
+    the list of coefficients.
 
 Performance Improvements
 ------------------------

@@ -197,6 +197,9 @@ void Parser::Run()
         Default_Texture->Tnormal = nullptr;
         Default_Texture->Finish  = Create_Finish();
 
+        defaultsVersion = DefaultsVersion::kLegacy;
+        defaultsModified = false;
+
         // Initialize various defaults depending on language version as per command line / INI settings.
         InitDefaults(sceneData->EffectiveLanguageVersion());
 
@@ -356,7 +359,7 @@ void Parser::Run()
     // TODO FIXME - review whole if-statement and line after it below [trf]
     // we set this before resetting languageVersion since there's nothing to
     // be gained from disabling the defaulting of the noise generator to
-    // something other than compatibilty mode.
+    // something other than compatibility mode.
     if (sceneData->explicitNoiseGenerator == false)
         sceneData->noiseGenerator = (sceneData->EffectiveLanguageVersion() < 350 ?
                                      kNoiseGen_Original : kNoiseGen_RangeCorrected);
@@ -540,24 +543,53 @@ void Parser::InitDefaults(int version)
     MathColour pigmentColour;
     double ambientLevel;
     double rightLength;
+    DefaultsVersion newDefaults;
+
     if (version >= 380)
-    {
-        pigmentType = PLAIN_PATTERN;
-        pigmentColour = MathColour(1.0);
-        ambientLevel = 0.0;
-        rightLength = sceneData->aspectRatio;
-    }
+        newDefaults = DefaultsVersion::k380;
     else
+        newDefaults = DefaultsVersion::kLegacy;
+
+    if (newDefaults == defaultsVersion)
+        // nothing to change
+        return;
+
+    if (defaultsModified)
     {
-        pigmentType = NO_PATTERN;
-        pigmentColour = MathColour(0.0);
-        ambientLevel = 0.1;
-        rightLength = 1.33;
+        // Don't override defaults if they've already been modified by the user.
+        Warning("Scene language version changed after a 'default' statement. "
+                "The changes in defaults normally associated with the language "
+                "version change are not applied.");
+        return;
     }
+
+    switch (newDefaults)
+    {
+        case DefaultsVersion::k380:
+            pigmentType = PLAIN_PATTERN;
+            pigmentColour = MathColour(1.0);
+            ambientLevel = 0.0;
+            rightLength = sceneData->aspectRatio;
+            break;
+
+        case DefaultsVersion::kLegacy:
+            pigmentType = NO_PATTERN;
+            pigmentColour = MathColour(0.0);
+            ambientLevel = 0.1;
+            rightLength = 1.33;
+            break;
+
+        default:
+            POV_PARSER_ASSERT(false);
+            break;
+    }
+
     Default_Texture->Pigment->Type = pigmentType;
     Default_Texture->Pigment->colour = TransColour(pigmentColour, 0.0, 0.0);
     Default_Texture->Finish->Ambient = MathColour(ambientLevel);
     Default_Camera.Right = Vector3d(rightLength, 0.0, 0.0);
+
+    defaultsVersion = newDefaults;
 }
 
 
@@ -843,8 +875,7 @@ ObjectPtr Parser::Parse_Bicubic_Patch ()
         for (j=0;j<4;j++)
         {
             Parse_Vector(Object->Control_Points[i][j]);
-            if(!((i == 3) && (j == 3)))
-                Parse_Comma();
+            Parse_Comma();
         }
     }
 
@@ -6870,6 +6901,8 @@ void Parser::Parse_Default ()
     Not_In_Default = false;
     Parse_Begin();
 
+    defaultsModified = true;
+
     EXPECT
         CASE (TEXTURE_TOKEN)
             Local_Texture = Default_Texture;
@@ -8133,14 +8166,12 @@ void Parser::Parse_Matrix(MATRIX Matrix)
 
     Parse_Angle_Begin();
 
-    Matrix[0][0] = Parse_Float();
     for (i = 0; i < 4; i++)
     {
-        for (j = !i ? 1 : 0; j < 3; j++)
+        for (j = 0; j < 3; j++)
         {
-            Parse_Comma();
-
             Matrix[i][j] = Parse_Float();
+            Parse_Comma();
         }
 
         Matrix[i][3] = (i != 3 ? 0.0 : 1.0);
@@ -8470,6 +8501,18 @@ bool Parser::Parse_Comma (void)
 
 //******************************************************************************
 
+bool Parser::AllowToken(TOKEN tokenId)
+{
+    Get_Token();
+    bool tokenMatches = ((Token.Token_Id == tokenId) ||
+                         (Token.Function_Id == tokenId));
+    if (!tokenMatches)
+        Unget_Token();
+    return tokenMatches;
+}
+
+//******************************************************************************
+
 bool Parser::Peek_Token (TOKEN tokenId)
 {
     Get_Token();
@@ -8712,33 +8755,42 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             CASE (IDENTIFIER_TOKEN)
                 POV_PARSER_ASSERT(!Token.is_array_elem || Token.is_mixed_array_elem);
                 allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==IDENTIFIER_TOKEN
-                if (Token.is_array_elem || Token.is_dictionary_elem)
+                if (Token.is_array_elem)
                 {
-                    if (is_local && (Token.context != Table_Index))
-                        Error ("Cannot use '#local' to assign a non-local array or dictionary element.");
-                    Temp_Entry = Add_Symbol (Token.table, Token.Token_String, IDENTIFIER_TOKEN);
+                    numberPtr = Token.NumberPtr;
+                    dataPtr   = Token.DataPtr;
+                    Previous  = Token.Token_Id;
                 }
                 else
-                    Temp_Entry = Add_Symbol (Local_Index, Token.Token_String, IDENTIFIER_TOKEN);
-                numberPtr = &(Temp_Entry->Token_Number);
-                dataPtr = &(Temp_Entry->Data);
-                Previous = Token.Token_Id;
-                if (deprecated)
                 {
-                    Temp_Entry->deprecated = true;;
-                    if (deprecated_once)
-                        Temp_Entry->deprecatedOnce = true;
-                    if (deprecation_message != nullptr)
+                    if (Token.is_dictionary_elem)
                     {
-                        UCS2String str(deprecation_message);
-                        POV_FREE(deprecation_message);
-                        Temp_Entry->Deprecation_Message = POV_STRDUP(UCS2toASCIIString(str).c_str());
+                        if (is_local && (Token.context != Table_Index))
+                            Error("Cannot use '#local' to assign a non-local array or dictionary element.");
+                        Temp_Entry = Add_Symbol(Token.table, Token.Token_String, IDENTIFIER_TOKEN);
                     }
                     else
+                        Temp_Entry = Add_Symbol(Local_Index, Token.Token_String, IDENTIFIER_TOKEN);
+                    numberPtr = &(Temp_Entry->Token_Number);
+                    dataPtr = &(Temp_Entry->Data);
+                    Previous = Token.Token_Id;
+                    if (deprecated)
                     {
-                        char str[256];
-                        sprintf(str, "Identifier '%.128s' was declared deprecated.", Token.Token_String);
-                        Temp_Entry->Deprecation_Message = POV_STRDUP(str);
+                        Temp_Entry->deprecated = true;;
+                        if (deprecated_once)
+                            Temp_Entry->deprecatedOnce = true;
+                        if (deprecation_message != nullptr)
+                        {
+                            UCS2String str(deprecation_message);
+                            POV_FREE(deprecation_message);
+                            Temp_Entry->Deprecation_Message = POV_STRDUP(UCS2toASCIIString(str).c_str());
+                        }
+                        else
+                        {
+                            char str[256];
+                            sprintf(str, "Identifier '%.128s' was declared deprecated.", Token.Token_String);
+                            Temp_Entry->Deprecation_Message = POV_STRDUP(str);
+                        }
                     }
                 }
             END_CASE
@@ -8921,14 +8973,16 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             (rvalue->Token_Number != ARRAY_ID_TOKEN))
             Expectation_Error("array RValue");
         POV_ARRAY *a = reinterpret_cast<POV_ARRAY *>(rvalue->Data);
-        if (lvalues.size() > a->DataPtrs.size())
+        if (a->maxDim != 0)
+            Error ("cannot bulk-assign from multi-dimensional array");
+        if (lvalues.size() > a->Sizes[0])
             Error ("array size mismatch");
         if (a->DataPtrs.empty())
             Error ("cannot assign from uninitialized array");
 
         for (int i = 0; i < lvalues.size(); ++i)
         {
-            if (a->DataPtrs[i] == nullptr)
+            if (!a->HasElement(i))
                 Error ("cannot assign from partially uninitialized array");
 
             numberPtr = lvalues[i].numberPtr;
@@ -8937,9 +8991,9 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             Temp_Entry = lvalues[i].symEntry;
             allow_redefine = lvalues[i].allowRedefine;
 
-            *numberPtr = a->Type;
+            *numberPtr = a->ElementType(i);
             Test_Redefine(Previous, numberPtr, *dataPtr, allow_redefine);
-            *dataPtr = Copy_Identifier(a->DataPtrs[i], a->Type);
+            *dataPtr = Copy_Identifier(a->DataPtrs[i], a->ElementType(i));
         }
 
         Destroy_Entry (rvalue, false);
@@ -9578,16 +9632,8 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
             break;
         case ARRAY_ID_TOKEN:
             a = reinterpret_cast<POV_ARRAY *>(Data);
-            if(!a->DataPtrs.empty())
-            {
-                for(i=0; i<a->DataPtrs.size(); i++)
-                {
-                    if (a->Types.empty())
-                        Destroy_Ident_Data (a->DataPtrs[i], a->Type);
-                    else
-                        Destroy_Ident_Data (a->DataPtrs[i], a->Types[i]);
-                }
-            }
+            for (i = 0; i < a->DataPtrs.size(); ++i)
+                Destroy_Ident_Data(a->DataPtrs[i], a->ElementType(i));
             delete a;
             break;
         case DICTIONARY_ID_TOKEN:
@@ -10548,7 +10594,7 @@ void Parser::Set_CSG_Tree_Flag(ObjectPtr Object, unsigned int f, int val)
 
 void *Parser::Copy_Identifier (void *Data, int Type)
 {
-    int i;
+    size_t i;
     POV_ARRAY *a, *na;
     Vector3d *vp;
     DBL *dp;
@@ -10652,23 +10698,19 @@ void *Parser::Copy_Identifier (void *Data, int Type)
         case ARRAY_ID_TOKEN:
             a = reinterpret_cast<POV_ARRAY *>(Data);
             na = new POV_ARRAY;
-            na->Dims = a->Dims;
-            na->Type = a->Type;
+            na->maxDim = a->maxDim;
+            na->Type_ = a->Type_;
             na->resizable = a->resizable;
-            for (i = 0; i < 5; ++i)
+            na->mixedType = a->mixedType;
+            for (i = 0; i < POV_ARRAY::kMaxDimensions; ++i)
             {
                 na->Sizes[i] = a->Sizes[i];
                 na->Mags[i] = a->Mags[i];
             }
             na->DataPtrs.resize(a->DataPtrs.size());
-            na->Types = a->Types;
             for (i=0; i<a->DataPtrs.size(); i++)
-            {
-                if (a->Types.empty())
-                    na->DataPtrs[i] = reinterpret_cast<void *>(Copy_Identifier (a->DataPtrs[i],a->Type));
-                else
-                    na->DataPtrs[i] = reinterpret_cast<void *>(Copy_Identifier (a->DataPtrs[i], a->Types[i]));
-            }
+                na->DataPtrs[i] = reinterpret_cast<void *>(Copy_Identifier(a->DataPtrs[i], a->ElementType(i)));
+            na->Types = a->Types;
             New = reinterpret_cast<void *>(na);
             break;
         case DICTIONARY_ID_TOKEN:
@@ -11165,6 +11207,86 @@ void Parser::SignalProgress(POV_LONG elapsedTime, POV_LONG tokenCount)
     obj.SetLong(kPOVAttrib_RealTime, elapsedTime);
     obj.SetLong(kPOVAttrib_CurrentTokenCount, tokenCount);
     RenderBackend::SendSceneOutput(backendSceneData->sceneId, backendSceneData->frontendAddress, kPOVMsgIdent_Progress, obj);
+}
+
+/*****************************************************************************/
+
+bool Parser::POV_ARRAY::IsInitialized() const
+{
+    POV_PARSER_ASSERT(resizable || !DataPtrs.empty());
+    return !DataPtrs.empty();
+}
+
+bool Parser::POV_ARRAY::HasElement(size_t i) const
+{
+    return ((i < DataPtrs.size()) && (DataPtrs[i] != nullptr));
+}
+
+const int& Parser::POV_ARRAY::ElementType(size_t i) const
+{
+    POV_PARSER_ASSERT(i < DataPtrs.size());
+    return (mixedType ? Types[i] : Type_);
+}
+
+int& Parser::POV_ARRAY::ElementType(size_t i)
+{
+    POV_PARSER_ASSERT(i < DataPtrs.size());
+    return (mixedType ? Types[i] : Type_);
+}
+
+size_t Parser::POV_ARRAY::GetLinearSize() const
+{
+    POV_PARSER_ASSERT(!resizable || ((maxDim == 0) && (Sizes[0] == DataPtrs.size())));
+    POV_PARSER_ASSERT(!mixedType || (Types.size() == DataPtrs.size()));
+    return DataPtrs.size();
+}
+
+void Parser::POV_ARRAY::Grow()
+{
+    POV_PARSER_ASSERT(resizable && (maxDim == 0));
+    ++Sizes[0];
+    DataPtrs.push_back(nullptr);
+    POV_PARSER_ASSERT(DataPtrs.size() == Sizes[0]);
+    if (mixedType)
+    {
+        Types.push_back(IDENTIFIER_TOKEN);
+        POV_PARSER_ASSERT(Types.size() == Sizes[0]);
+    }
+}
+
+void Parser::POV_ARRAY::GrowBy(size_t delta)
+{
+    POV_PARSER_ASSERT(resizable && (maxDim == 0));
+    Sizes[0] += delta;
+    DataPtrs.insert(DataPtrs.end(), delta, nullptr);
+    if (mixedType)
+    {
+        Types.insert(Types.end(), delta, IDENTIFIER_TOKEN);
+        POV_PARSER_ASSERT(Types.size() == Sizes[0]);
+    }
+}
+
+void Parser::POV_ARRAY::GrowTo(size_t delta)
+{
+    POV_PARSER_ASSERT(resizable && (maxDim == 0));
+    POV_PARSER_ASSERT(delta > Sizes[0]);
+    GrowBy(delta - Sizes[0]);
+}
+
+void Parser::POV_ARRAY::Shrink()
+{
+    POV_PARSER_ASSERT(resizable && (maxDim == 0));
+    POV_PARSER_ASSERT(Sizes[0] > 0);
+    --Sizes[0];
+    POV_PARSER_ASSERT(DataPtrs.back() == nullptr);
+    DataPtrs.pop_back();
+    POV_PARSER_ASSERT(DataPtrs.size() == Sizes[0]);
+    if (mixedType)
+    {
+        POV_PARSER_ASSERT(Types.back() == IDENTIFIER_TOKEN);
+        Types.pop_back();
+        POV_PARSER_ASSERT(Types.size() == Sizes[0]);
+    }
 }
 
 }
