@@ -61,6 +61,11 @@ Changed Behaviour
     for now, due to their orientation being poorly defined.
   - An age-old bug in the inbuilt `f_enneper` isosurface function has been
     fixed; the function now results in the originally intended shape.
+  - Contrary to earlier claims and intentions, v3.7.1-beta.1 failed to lift the
+    requirement that array elements must be of the same type. It has been
+    decided to not fix the change to work as originally intended, and instead
+    only allow type mixing if the array has explicitly been declared as
+    `mixed`. See the documentation for details.
 
 New Features
 ------------

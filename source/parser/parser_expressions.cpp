@@ -1089,7 +1089,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     Parse_Paren_Begin();
                     GET(ARRAY_ID_TOKEN)
                     a = reinterpret_cast<POV_ARRAY *>(*(Token.DataPtr));
-                    Val = a->Dims+1;
+                    Val = a->maxDim + 1;
                     Parse_Paren_End();
                     break;
 
@@ -1098,9 +1098,12 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     GET(ARRAY_ID_TOKEN)
                     Parse_Comma();
                     a = reinterpret_cast<POV_ARRAY *>(*(Token.DataPtr));
-                    i = (int)Parse_Float()-1.0;
-                    if ((i < 0) || (i > a->Dims))
+                    i = (int)Parse_Float()-1;
+                    if ((i < 0) || (i > a->maxDim))
+                    {
+                        Warning("Querying size of dimension %d in %d-dimensional array.", i + 1, a->maxDim + 1);
                         Val = 0.0;
+                    }
                     else
                         Val = a->Sizes[i];
                     Parse_Paren_End();
