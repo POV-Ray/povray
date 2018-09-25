@@ -47,6 +47,7 @@
 
 #include "frontend/console.h"
 #include "frontend/processoptions.h"
+#include "frontend/processrenderoptions.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -1160,17 +1161,7 @@ void OutputOptions(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
             {
                 i = kPOVList_DitherMethod_FloydSteinberg;
                 (void)POVMSUtil_GetInt(msg, kPOVAttrib_DitherMethod, &i);
-                switch(i)
-                {
-                    // TODO FIXME - for easier maintenance, this should probably be part of the DitherMethodTable.
-                    case kPOVList_DitherMethod_Bayer2x2:        t = "2x2 Bayer pattern";                break;
-                    case kPOVList_DitherMethod_Bayer3x3:        t = "3x3 Bayer pattern";                break;
-                    case kPOVList_DitherMethod_Bayer4x4:        t = "4x4 Bayer pattern";                break;
-                    case kPOVList_DitherMethod_Diffusion1D:     t = "simple 1-D error diffusion";       break;
-                    case kPOVList_DitherMethod_Diffusion2D:     t = "simple 2-D error diffusion";       break;
-                    case kPOVList_DitherMethod_FloydSteinberg:  t = "Floyd-Steinberg error diffusion";  break;
-                    default:                                    t = "(unknown)";                        break;
-                }
+                t = ProcessRenderOptions::GetDitherMethodText(i);
                 tsb->printf("  Dithering............%s\n", t);
             }
             else
@@ -1196,17 +1187,10 @@ void OutputOptions(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
             case kPOVList_GammaType_PowerLaw:
                 tsb->printf("  Graphic display......On  (gamma: %g)\n", (float)f);
                 break;
-            case kPOVList_GammaType_SRGB:
-                tsb->printf("  Graphic display......On  (gamma: sRGB)\n");
-                break;
-            case kPOVList_GammaType_BT709:
-                tsb->printf("  Graphic display......On  (gamma: ITU-R BT.709)\n");
-                break;
-            case kPOVList_GammaType_BT2020:
-                tsb->printf("  Graphic display......On  (gamma: ITU-R BT.2020)\n");
-                break;
             default:
-                throw POV_EXCEPTION_STRING("Unknown gamma mode in OutputOptions()");
+                t = ProcessRenderOptions::GetGammaTypeText(i);
+                tsb->printf("  Graphic display......On  (gamma: %s)\n", t);
+                break;
         }
     }
     else

@@ -66,6 +66,8 @@ Changed Behaviour
     decided to not fix the change to work as originally intended, and instead
     only allow type mixing if the array has explicitly been declared as
     `mixed`. See the documentation for details.
+  - The dithering implementation has been modified, and may produce slightly
+    different results for otherwise identical scenes.
 
 New Features
 ------------

@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -57,11 +57,19 @@ namespace pov_base
 
 class Image;
 
+//*****************************************************************************
+///
+/// @name Dithering
+///
+/// The following types and functions provide dithering functionality.
+///
+/// @{
+
 enum DitherMethodId
 {
     kPOVList_DitherMethod_None,
     kPOVList_DitherMethod_Diffusion1D,
-    kPOVList_DitherMethod_Diffusion2D,
+    kPOVList_DitherMethod_SierraLite,
     kPOVList_DitherMethod_FloydSteinberg,
     kPOVList_DitherMethod_Bayer2x2,
     kPOVList_DitherMethod_Bayer3x3,
@@ -126,14 +134,6 @@ class DitherStrategy
 
 typedef shared_ptr<DitherStrategy> DitherStrategySPtr;
 
-//*****************************************************************************
-///
-/// @name Dithering
-///
-/// The following functions provide dithering functionality.
-///
-/// @{
-
 /// Factory function to get a dithering algorithm and state.
 DitherStrategySPtr GetDitherStrategy(DitherMethodId method, unsigned int imageWidth);
 
@@ -142,7 +142,7 @@ DitherStrategySPtr GetNoOpDitherStrategy();
 
 /// Function providing simple stateless dithering.
 ///
-/// This function is provided as a fallback from the `DitherStrategy` mechanism to provide basic
+/// This function is provided as a fallback from the @ref DitherStrategy mechanism to provide basic
 /// dithering functionality in cases where stateful operation is impractical, such as the render
 /// preview.
 ///
@@ -202,10 +202,28 @@ inline float IntDecode(const GammaCurvePtr& g, unsigned int x, unsigned int max)
 ///
 /// @{
 
-/// Linear encoding function.
+/// Linear encoding function rounding down.
 ///
 /// This function maps a floating-point value in the range 0..1 linearly to an integer value
-/// in the range 0..max.
+/// in the range 0..max, rounding down.
+///
+/// @note
+///     Floating-point values outside the range 0..1 are clipped, mapping them to 0 or max,
+///     respectively.
+///
+/// @param[in]      x       Value to encode.
+/// @param[in]      max     Encoded value representing 1.0.
+/// @param[in]      qOff    Offset to add before quantization.
+///
+inline unsigned int IntEncodeDown(float x, unsigned int max, float qOff = 0.0f)
+{
+    return (unsigned int)clip(floor(x * float(max) + qOff), 0.0f, float(max));
+}
+
+/// Linear encoding function rounding to nearest.
+///
+/// This function maps a floating-point value in the range 0..1 linearly to an integer value
+/// in the range 0..max, rounding to the nearest value.
 ///
 /// @note
 ///     Floating-point values outside the range 0..1 are clipped, mapping them to 0 or max,
@@ -217,7 +235,7 @@ inline float IntDecode(const GammaCurvePtr& g, unsigned int x, unsigned int max)
 ///
 inline unsigned int IntEncode(float x, unsigned int max, float qOff = 0.0f)
 {
-    return (unsigned int)clip(floor(x * float(max) + qOff + 0.5f), 0.0f, float(max));
+    return IntEncodeDown(x, max, qOff + 0.5f);
 }
 
 /// Linear encoding function.
@@ -232,12 +250,13 @@ inline unsigned int IntEncode(float x, unsigned int max, float qOff = 0.0f)
 /// @param[in]      x       Value to encode.
 /// @param[in]      max     Encoded value representing 1.0.
 /// @param[in]      qOff    Offset to add before quantization.
-/// @param[out]     err     Quantization error (including effects due to adding qOff).
+/// @param[in,out]  err     Quantization error (including effects due to adding qOff).
 ///
 inline unsigned int IntEncode(float x, unsigned int max, float qOff, float& err)
 {
-    unsigned int v = IntEncode(x, max, qOff);
-    err = clip(x, 0.0f, 1.0f) - IntDecode(v, max);
+    float xEff = clip(x, 0.0f, 1.0f) + err;
+    unsigned int v = IntEncode(xEff, max, qOff);
+    err = xEff - IntDecode(v, max);
     return v;
 }
 
@@ -247,8 +266,47 @@ inline unsigned int IntEncode(float x, unsigned int max, float qOff, float& err)
 /// in the range 0..max.
 ///
 /// @note
-///     Floating-point values outside the range 0..1 (after applying the transfer function)
-///     are clipped, mapping them to 0 or max, respectively.
+///     Floating-point values outside the range 0..1 are clipped, mapping them to 0 or max,
+///     respectively.
+/// @note
+///     The transfer function is presumed to map values 0 and 1 to the respective value itself.
+///
+/// @param[in]      g       Transfer function (gamma curve) to use.
+/// @param[in]      x       Value to encode.
+/// @param[in]      max     Encoded value representing 1.0.
+/// @param[in]      qOff    Offset to add before quantization.
+/// @param[in,out]  err     Quantization error (including effects due to adding qOff).
+///
+inline unsigned int IntEncode(const GammaCurvePtr& g, float x, unsigned int max, float qOff, float& err)
+{
+    if (GammaCurve::IsNeutral(g))
+        return IntEncode(x, max, qOff, err);
+
+    float xEff = clip(x, 0.0f, 1.0f) + err;
+    unsigned int v = IntEncodeDown(GammaCurve::Encode(g, xEff), max, qOff);
+    err = xEff - IntDecode(g, v, max);
+    if (v < max)
+    {
+        float errUp = xEff - IntDecode(g, v + 1, qOff);
+        if (fabs(errUp) <= fabs(err))
+        {
+            ++v;
+            err = errUp;
+        }
+    }
+    return v;
+}
+
+/// Generic encoding function.
+///
+/// This function maps a floating-point value in the range 0..1 to an integer value
+/// in the range 0..max.
+///
+/// @note
+///     Floating-point values outside the range 0..1 are clipped, mapping them to 0 or max,
+///     respectively.
+/// @note
+///     The transfer function is presumed to map values 0 and 1 to the respective value itself.
 ///
 /// @param[in]      g       Transfer function (gamma curve) to use.
 /// @param[in]      x       Value to encode.
@@ -257,29 +315,8 @@ inline unsigned int IntEncode(float x, unsigned int max, float qOff, float& err)
 ///
 inline unsigned int IntEncode(const GammaCurvePtr& g, float x, unsigned int max, float qOff = 0.0f)
 {
-    return IntEncode(GammaCurve::Encode(g, x), max, qOff);
-}
-
-/// Generic encoding function.
-///
-/// This function maps a floating-point value in the range 0..1 to an integer value
-/// in the range 0..max.
-///
-/// @note
-///     Floating-point values outside the range 0..1 (after applying the transfer function)
-///     are clipped, mapping them to 0 or max, respectively.
-///
-/// @param[in]      g       Transfer function (gamma curve) to use.
-/// @param[in]      x       Value to encode.
-/// @param[in]      max     Encoded value representing 1.0.
-/// @param[in]      qOff    Offset to add before quantization.
-/// @param[out]     err     Quantization error (including effects due to adding qOff).
-///
-inline unsigned int IntEncode(const GammaCurvePtr& g, float x, unsigned int max, float qOff, float& err)
-{
-    unsigned int v = IntEncode(g, x, max, qOff);
-    err = clip(x, 0.0f, 1.0f) - IntDecode(g, v, max);
-    return v;
+    float err = 0.0f;
+    return IntEncode(g, x, max, qOff, err);
 }
 
 /// @}

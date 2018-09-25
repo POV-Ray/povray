@@ -346,7 +346,6 @@ struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
     { nullptr }
 };
 
-// TODO FIXME - The following are hacks of some sort, no idea what they are good for. They certainly use wrong types and probably contain other mistakes [trf]
 extern struct ProcessRenderOptions::Parameter_Code_Table DitherMethodTable[];
 
 ProcessRenderOptions::ProcessRenderOptions() : ProcessOptions(RenderOptions_INI_Table, RenderOptions_Cmd_Table)
@@ -1076,7 +1075,7 @@ struct ProcessRenderOptions::Output_FileType_Table FileTypeTable[] =
 #endif // POV_SYS_IMAGE_TYPE
 
     //  [1] Alpha support for BMP uses an unofficial extension to the BMP file format, which is not recognized by
-    //      most image pocessing software.
+    //      most image processing software.
 
     //  [2] While OpenEXR does support greyscale output at >8 bits, the variants currently supported by POV-Ray
     //      use 16-bit floating-point values with 10 bit mantissa, which might be insufficient for various purposes
@@ -1091,12 +1090,12 @@ struct ProcessRenderOptions::Parameter_Code_Table GammaTypeTable[] =
 {
 
     // code,        internalId,
-    { "BT709",      kPOVList_GammaType_BT709 },
-    { "BT2020",     kPOVList_GammaType_BT2020 },
-    { "SRGB",       kPOVList_GammaType_SRGB },
+    { "BT709",      kPOVList_GammaType_BT709,           "ITU-R BT.709 transfer function" },
+    { "BT2020",     kPOVList_GammaType_BT2020,          "ITU-R BT.2020 transfer function" },
+    { "SRGB",       kPOVList_GammaType_SRGB,            "sRGB transfer function" },
 
     // end-of-list marker
-    { nullptr,      0 }
+    { nullptr,      0,                                  "(unknown)" }
 };
 
 /* Supported dither types */
@@ -1104,15 +1103,15 @@ struct ProcessRenderOptions::Parameter_Code_Table DitherMethodTable[] =
 {
 
     // code,    internalId,
-    { "B2",     kPOVList_DitherMethod_Bayer2x2 },
-    { "B3",     kPOVList_DitherMethod_Bayer3x3 },
-    { "B4",     kPOVList_DitherMethod_Bayer4x4 },
-    { "D1",     kPOVList_DitherMethod_Diffusion1D },
-    { "D2",     kPOVList_DitherMethod_Diffusion2D },
-    { "FS",     kPOVList_DitherMethod_FloydSteinberg },
+    { "B2",     kPOVList_DitherMethod_Bayer2x2,         "2x2 Bayer pattern" },
+    { "B3",     kPOVList_DitherMethod_Bayer3x3,         "3x3 Bayer pattern" },
+    { "B4",     kPOVList_DitherMethod_Bayer4x4,         "4x4 Bayer pattern" },
+    { "D1",     kPOVList_DitherMethod_Diffusion1D,      "Simple 1-D error diffusion" },
+    { "D2",     kPOVList_DitherMethod_SierraLite,       "Simple 2-D error diffusion (Sierra Lite)" },
+    { "FS",     kPOVList_DitherMethod_FloydSteinberg,   "Floyd-Steinberg error diffusion" },
 
     // end-of-list marker
-    { nullptr,  0 }
+    { nullptr,  0,                                      "(unknown)" }
 };
 
 int ProcessRenderOptions::ParseFileType(char code, POVMSType attribute, int* pInternalId, bool* pHas16BitGreyscale)
@@ -1173,6 +1172,16 @@ const char* ProcessRenderOptions::UnparseGammaType(int gammaType)
     return UnparseParameterCode(GammaTypeTable, gammaType);
 }
 
+const char* ProcessRenderOptions::GetGammaTypeText(int gammaType)
+{
+    return GetParameterCodeText(GammaTypeTable, gammaType);
+}
+
+const char* ProcessRenderOptions::GetDitherMethodText(int ditherMethod)
+{
+    return GetParameterCodeText(DitherMethodTable, ditherMethod);
+}
+
 int ProcessRenderOptions::ParseParameterCode(const ProcessRenderOptions::Parameter_Code_Table* codeTable, char* code, int* pInternalId)
 {
     for (int i = 0; code[i] != '\0'; i ++)
@@ -1194,6 +1203,15 @@ const char* ProcessRenderOptions::UnparseParameterCode(const ProcessRenderOption
         if (internalId == codeTable[i].internalId)
             return codeTable[i].code;
     return nullptr;
+}
+
+const char* ProcessRenderOptions::GetParameterCodeText(const ProcessRenderOptions::Parameter_Code_Table* codeTable, int internalId)
+{
+    int i;
+    for (i = 0; codeTable[i].code != nullptr; i++)
+        if (internalId == codeTable[i].internalId)
+            break;
+    return codeTable[i].text;
 }
 
 }

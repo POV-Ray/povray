@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,6 +36,9 @@
 
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/image/encoding.h"
+
+// Standard C++ header files
+#include <algorithm>
 
 // POV-Ray base header files
 #include "base/image/image.h"
@@ -75,62 +78,89 @@ static const BayerMatrix BayerMatrices[MaxBayerMatrixSize+1] =
 
 /*******************************************************************************/
 
-/// Class representing "no-op" dithering rules.
+/// "no-op" dithering strategy.
+///
+/// This stateless dithering strategy serves as a placeholder when dithering
+/// is not desired.
+///
 class NoDither : public DitherStrategy
 {
     public:
-        virtual void GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt);
+        virtual void GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt) override;
 };
 
-/// Class representing bayer dithering rules, generating a regular pattern.
+/// Bayer ordered dithering strategy.
+///
+/// This stateless dithering strategy varies the quantization threshold for
+/// each pixel based on a repeating pattern as proposed by B.E. Bayer in 1973.
+///
 class BayerDither : public DitherStrategy
 {
     public:
         BayerDither(unsigned int mxSize);
-        virtual void GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt);
+        virtual void GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt) override;
         static inline float GetOffset(unsigned int x, unsigned int y, unsigned int ms) { return BayerMatrices[ms][x%ms][y%ms]; }
     protected:
         unsigned int matrixSize;
 };
 
-/// Class representing simple 1D error diffusion dithering rules, carrying over the error from one pixel to the next.
+/// Simple 1D error diffusion dithering strategy.
+///
+/// This stateful dithering strategy implements the simplest error diffusion
+/// dithering filter possible, propagating all of the quantization error to the
+/// next pixel.
+///
 class DiffusionDither1D : public DitherStrategy
 {
     public:
-        virtual void GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt);
-        virtual void SetError(unsigned int x, unsigned int y, const ColourOffset& err);
+        virtual void GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt) override;
+        virtual void SetError(unsigned int x, unsigned int y, const ColourOffset& err) override;
     protected:
         ColourOffset lastErr;
 };
 
-/// Class representing simple 2D error diffusion dithering rules, carrying over the error from one pixel to the right, as well as the two pixels below.
-/// @note   This implementation uses an additional 2-line pixel buffer to avoid manipulating the original image.
-class DiffusionDither2D : public DitherStrategy
+/// Sierra Lite error diffusion dithering strategy.
+///
+/// This stateful dithering strategy implements the error diffusion dithering
+/// filter proposed by F. Sierra in 1990 as "Filter Lite" (aka "Sierra Lite"
+/// or "Sierra-2-4A"), distributing the quantization error non-uniformly between
+/// the pixel on the right and the pixels to the bottom left and straight below.
+///
+/// @note   This implementation uses an additional 1-line pixel buffer to avoid manipulating the original image.
+///
+class SierraLiteDither : public DitherStrategy
 {
     public:
-        DiffusionDither2D(unsigned int width);
-        virtual ~DiffusionDither2D();
-        virtual void GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt);
-        virtual void SetError(unsigned int x, unsigned int y, const ColourOffset& err);
+        SierraLiteDither(unsigned int width);
+        virtual ~SierraLiteDither();
+        virtual void GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt) override;
+        virtual void SetError(unsigned int x, unsigned int y, const ColourOffset& err) override;
     protected:
         unsigned int imageWidth;
-        ColourOffset* nextRowOffset;
-        ColourOffset* thisRowOffset;
+        ColourOffset* maErr;
 };
 
-/// Class representing Floyd-Steinberg dithering rules, carrying over the error from one pixel to the right, as well as the three pixels below.
-/// @note   This implementation uses an additional 2-line pixel buffer to avoid manipulating the original image.
+/// Floyd-Steinberg error diffusion dithering strategy.
+///
+/// This stateful dithering strategy implements the error diffusion dithering
+/// filter proposed by R.W. Floyd and L. Steinberg in 1976.
+///
+/// The Floyd-Steinberg filter distributes the error non-uniformly among the
+/// pixel on the right as well as the three pixels below.
+///
+/// @note   This implementation uses an additional 1-line pixel buffer to avoid manipulating the original image.
+///
 class FloydSteinbergDither : public DitherStrategy
 {
     public:
         FloydSteinbergDither(unsigned int width);
         virtual ~FloydSteinbergDither();
-        virtual void GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt);
-        virtual void SetError(unsigned int x, unsigned int y, const ColourOffset& err);
+        virtual void GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt) override;
+        virtual void SetError(unsigned int x, unsigned int y, const ColourOffset& err) override;
     protected:
         unsigned int imageWidth;
-        ColourOffset* nextRowOffset;
-        ColourOffset* thisRowOffset;
+        ColourOffset* maErr;
+        ColourOffset mErrX;
 };
 
 /*******************************************************************************/
@@ -159,7 +189,11 @@ void BayerDither::GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin
 
 void DiffusionDither1D::GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt)
 {
-    offLin = lastErr; lastErr.clear(); offQnt.clear();
+    if (x == 0)
+        offLin.clear();
+    else
+        offLin = lastErr;
+    offQnt.clear();
 }
 
 void DiffusionDither1D::SetError(unsigned int x, unsigned int y, const ColourOffset& err)
@@ -169,77 +203,97 @@ void DiffusionDither1D::SetError(unsigned int x, unsigned int y, const ColourOff
 
 /*******************************************************************************/
 
-DiffusionDither2D::DiffusionDither2D(unsigned int width) :
+SierraLiteDither::SierraLiteDither(unsigned int width) :
     imageWidth(width),
-    thisRowOffset(new ColourOffset[width+1]),
-    nextRowOffset(new ColourOffset[width+1])
+    maErr(new ColourOffset[width+2])
+{}
+
+SierraLiteDither::~SierraLiteDither()
 {
-    ;
+    delete[] maErr;
 }
 
-DiffusionDither2D::~DiffusionDither2D()
+void SierraLiteDither::GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt)
 {
-    delete[] thisRowOffset;
-    delete[] nextRowOffset;
-}
-
-void DiffusionDither2D::GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt)
-{
-    offLin = thisRowOffset[x];
+    offLin = maErr[x+1];
     offQnt.clear();
 }
 
-void DiffusionDither2D::SetError(unsigned int x, unsigned int y, const ColourOffset& err)
+void SierraLiteDither::SetError(unsigned int x, unsigned int y, const ColourOffset& err)
 {
-    if (x == 0)
-    {
-        ColourOffset* tmp = nextRowOffset;
-        nextRowOffset = thisRowOffset;
-        thisRowOffset = tmp;
-        for (unsigned int i = 0; i < imageWidth+1; i ++)
-            nextRowOffset[i].clear();
-    }
-    thisRowOffset[x+1] += err * (2/4.0); // pixel to the right
-    nextRowOffset[x]   += err * (1/4.0); // pixel below
-    nextRowOffset[x+1] += err * (1/4.0); // pixel below right
+    // NB: We're storing the propagated error for both the current and the next
+    // line in a single-line buffer, using the following scheme upon entering
+    // this function:
+    //
+    //     | Offset to x    |-1 | 0 | 1 | 2 | 3 |
+    //     |----------------|---|---|---|---|---|
+    //     | Current row    |   |   |(B)| B | B |
+    //     | Next row       | B | B |   |   |   |
+    //
+    // and the following scheme upon leaving this function:
+    //
+    //     | Offset to x    |-1 | 0 | 1 | 2 | 3 |
+    //     |----------------|---|---|---|---|---|
+    //     | Current row    |   |   |( )| B | B |
+    //     | Next row       | B | B | B |   |   |
+    //
+    // where "()" marks the current pixel, and "B" indicates that the error is
+    // stored in the buffer at the corresponding offset. Empty cells indicate
+    // that the corresponding error is not stored anywhere.
+
+    maErr[x+2] += err * (2/4.0); // pixel to the right
+    maErr[x]   += err * (1/4.0); // pixel below left
+    maErr[x+1]  = err * (1/4.0); // pixel below (overwritten instead of added to)
 }
 
 /*******************************************************************************/
 
 FloydSteinbergDither::FloydSteinbergDither(unsigned int width) :
     imageWidth(width),
-    thisRowOffset(new ColourOffset[width+2]),
-    nextRowOffset(new ColourOffset[width+2])
-{
-    ;
-}
+    maErr(new ColourOffset[width+2])
+{}
 
 FloydSteinbergDither::~FloydSteinbergDither()
 {
-    delete[] thisRowOffset;
-    delete[] nextRowOffset;
+    delete[] maErr;
 }
 
 void FloydSteinbergDither::GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt)
 {
-    offLin = thisRowOffset[x+1];
+    if (x == 0)
+        mErrX.clear();
+    offLin = maErr[x+1];
     offQnt.clear();
 }
 
 void FloydSteinbergDither::SetError(unsigned int x, unsigned int y, const ColourOffset& err)
 {
-    if (x == 0)
-    {
-        ColourOffset* tmp = nextRowOffset;
-        nextRowOffset = thisRowOffset;
-        thisRowOffset = tmp;
-        for (unsigned int i = 0; i < imageWidth+2; i ++)
-            nextRowOffset[i].clear();
-    }
-    thisRowOffset[x+2] += err * (7/16.0); // pixel to the right
-    nextRowOffset[x]   += err * (3/16.0); // pixel below left
-    nextRowOffset[x+1] += err * (5/16.0); // pixel below
-    nextRowOffset[x+2] += err * (1/16.0); // pixel below right
+    // NB: We're storing the propagated error for both the current and the next
+    // line in a single-line buffer, using the following scheme upon entering
+    // this function:
+    //
+    //     | Offset to x    |-1 | 0 | 1 | 2 | 3 |
+    //     |----------------|---|---|---|---|---|
+    //     | Current row    |   |   |(B)| B | B |
+    //     | Next row       | B | B | X |   |   |
+    //
+    // and the following scheme upon leaving this function:
+    //
+    //     | Offset to x    |-1 | 0 | 1 | 2 | 3 |
+    //     |----------------|---|---|---|---|---|
+    //     | Current row    |   |   |( )| B | B |
+    //     | Next row       | B | B | B | X |   |
+    //
+    // where "()" marks the current pixel, "B" indicates that the error is
+    // stored in the buffer at the corresponding offset, and "X" indicates that
+    // the error is stored in `mErrX`. Empty cells indicate that the
+    // corresponding error is not stored anywhere.
+
+    maErr[x+1] = mErrX;
+    maErr[x+2] += err * (7/16.0); // pixel to the right
+    maErr[x]   += err * (3/16.0); // pixel below left
+    maErr[x+1] += err * (5/16.0); // pixel below
+    mErrX       = err * (1/16.0); // pixel below right (overwritten instead of added to)
 }
 
 /*******************************************************************************/
@@ -250,7 +304,7 @@ DitherStrategySPtr GetDitherStrategy(DitherMethodId method, unsigned int imageWi
     {
         case kPOVList_DitherMethod_None:            return DitherStrategySPtr(new NoDither());
         case kPOVList_DitherMethod_Diffusion1D:     return DitherStrategySPtr(new DiffusionDither1D());
-        case kPOVList_DitherMethod_Diffusion2D:     return DitherStrategySPtr(new DiffusionDither2D(imageWidth));
+        case kPOVList_DitherMethod_SierraLite:      return DitherStrategySPtr(new SierraLiteDither(imageWidth));
         case kPOVList_DitherMethod_FloydSteinberg:  return DitherStrategySPtr(new FloydSteinbergDither(imageWidth));
         case kPOVList_DitherMethod_Bayer2x2:        return DitherStrategySPtr(new BayerDither(2));
         case kPOVList_DitherMethod_Bayer3x3:        return DitherStrategySPtr(new BayerDither(3));
@@ -443,7 +497,7 @@ unsigned int GetEncodedGrayValue(const Image* img, unsigned int x, unsigned int 
     }
     DitherStrategy::ColourOffset linOff, encOff;
     dh.GetOffset(x,y,linOff,encOff);
-    unsigned int iGray = IntEncode(g,fGray+linOff.gray,max,encOff.gray,linOff.gray);
+    unsigned int iGray = IntEncode(g, fGray, max, encOff.gray, linOff.gray);
     dh.SetError(x,y,linOff);
     return iGray;
 }
@@ -488,8 +542,8 @@ void GetEncodedGrayAValue(const Image* img, unsigned int x, unsigned int y, cons
     // else no need to worry about premultiplication
     DitherStrategy::ColourOffset linOff, encOff;
     dh.GetOffset(x,y,linOff,encOff);
-    gray  = IntEncode(g, fGray + linOff.gray,  max, encOff.gray,  linOff.gray);
-    alpha = IntEncode(fAlpha   + linOff.alpha, max, encOff.alpha, linOff.alpha);
+    gray  = IntEncode(g, fGray,  max, encOff.gray,  linOff.gray);
+    alpha = IntEncode(   fAlpha, max, encOff.alpha, linOff.alpha);
     dh.SetError(x,y,linOff);
 }
 void GetEncodedRGBValue(const Image* img, unsigned int x, unsigned int y, const GammaCurvePtr& g, unsigned int max, unsigned int& red, unsigned int& green, unsigned int& blue, DitherStrategy& dh)
@@ -509,9 +563,9 @@ void GetEncodedRGBValue(const Image* img, unsigned int x, unsigned int y, const 
     }
     DitherStrategy::ColourOffset linOff, encOff;
     dh.GetOffset(x,y,linOff,encOff);
-    red   = IntEncode(g,fRed   + linOff.red,   max, encOff.red,   linOff.red);
-    green = IntEncode(g,fGreen + linOff.green, max, encOff.green, linOff.green);
-    blue  = IntEncode(g,fBlue  + linOff.blue,  max, encOff.blue,  linOff.blue);
+    red   = IntEncode(g, fRed,   max, encOff.red,   linOff.red);
+    green = IntEncode(g, fGreen, max, encOff.green, linOff.green);
+    blue  = IntEncode(g, fBlue,  max, encOff.blue,  linOff.blue);
     dh.SetError(x,y,linOff);
 }
 void GetEncodedRGBAValue(const Image* img, unsigned int x, unsigned int y, const GammaCurvePtr& g, unsigned int max, unsigned int& red, unsigned int& green, unsigned int& blue, unsigned int& alpha, DitherStrategy& dh, bool premul)
@@ -562,10 +616,10 @@ void GetEncodedRGBAValue(const Image* img, unsigned int x, unsigned int y, const
     // else no need to worry about premultiplication
     DitherStrategy::ColourOffset linOff, encOff;
     dh.GetOffset(x,y,linOff,encOff);
-    red   = IntEncode(g,fRed   + linOff.red,   max, encOff.red,   linOff.red);
-    green = IntEncode(g,fGreen + linOff.green, max, encOff.green, linOff.green);
-    blue  = IntEncode(g,fBlue  + linOff.blue,  max, encOff.blue,  linOff.blue);
-    alpha = IntEncode(fAlpha   + linOff.alpha, max, encOff.alpha, linOff.alpha);
+    red   = IntEncode(g, fRed,   max, encOff.red,   linOff.red);
+    green = IntEncode(g, fGreen, max, encOff.green, linOff.green);
+    blue  = IntEncode(g, fBlue,  max, encOff.blue,  linOff.blue);
+    alpha = IntEncode(   fAlpha, max, encOff.alpha, linOff.alpha);
     dh.SetError(x,y,linOff);
 }
 
