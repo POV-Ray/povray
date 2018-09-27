@@ -19,9 +19,16 @@ Procedure
 =========
 
 
-Invoke the following command from the root directory of the POV-Ray source package:
+From the root of the POV-Ray source package, change to the `tools/meta-make`
+directory, and invoke the following command:
 
-    tools/meta-make/meta-make.sh
+    make
+
+This will re-create all outdated converted files.
+
+To re-create all converted files unconditionally, use:
+
+    make clean all
 
 
 Output
