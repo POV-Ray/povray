@@ -36,15 +36,20 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/renderfrontend.h"
 
-#include <boost/scoped_ptr.hpp>
+// Standard C++ header files
+#include <memory>
 
+// POV-Ray header files (base module)
 #include "base/platformbase.h"
 #include "base/textstream.h"
 #include "base/textstreambuffer.h"
+#include "base/image/dither.h"
 #include "base/image/encoding.h"
 
+// POV-Ray header files (POVMS module)
 #include "povms/povmsid.h"
 
+// POV-Ray header files (frontend module)
 #include "frontend/console.h"
 #include "frontend/processoptions.h"
 #include "frontend/processrenderoptions.h"
@@ -645,7 +650,7 @@ void RenderFrontendBase::ContinueBackup(POVMS_Object& ropts, ViewData& vd, ViewI
     vd.imageBackup.reset();
     MakeBackupPath(ropts, vd, outputpath);
 
-    boost::scoped_ptr<IStream> inbuffer(new IFileStream(vd.imageBackupFile().c_str()));
+    std::unique_ptr<IStream> inbuffer(new IFileStream(vd.imageBackupFile().c_str()));
 
     size_t pos = sizeof(Backup_File_Header);
 
@@ -1159,7 +1164,7 @@ void OutputOptions(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
             (void)POVMSUtil_GetBool(msg, kPOVAttrib_Dither, &b);
             if (b)
             {
-                i = kPOVList_DitherMethod_FloydSteinberg;
+                i = int(DitherMethodId::kBlueNoise);
                 (void)POVMSUtil_GetInt(msg, kPOVAttrib_DitherMethod, &i);
                 t = ProcessRenderOptions::GetDitherMethodText(i);
                 tsb->printf("  Dithering............%s\n", t);

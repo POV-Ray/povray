@@ -13,6 +13,7 @@ packages installed (or a compatible environment):
 
   - `bash`
   - `libfox-1.6-dev` (we expect other versions to work as well)
+  - `python`, `python-numpy`, `python-scipy`, `python-matplotlib`, `python-pypng`
 
 
 Procedure
@@ -24,11 +25,13 @@ directory, and invoke the following command:
 
     make
 
-This will re-create all outdated converted files.
+This will re-create all missing or outdated generated files.
 
 To re-create all converted files unconditionally, use:
 
     make clean all
+
+Note that some files may take a while to re-create.
 
 
 Output
@@ -38,6 +41,7 @@ The following files will be re-created:
 
 | Generated File                                    | Generated From                                            |
 |:--------------------------------------------------|:----------------------------------------------------------|
+| `source/base/data/bluenoise*.cpp`/`.h`            | `tools/meta-make/bluenoise/metagen-bluenoise.py`          |
 | `source/base/font/crystal.cpp`/`.h`               | `distribution/include/crystal.ttf`                        |
 | `source/base/font/cyrvetic.cpp`/`.h`              | `distribution/include/cyrvetic.ttf`                       |
 | `source/base/font/povlogo.cpp`/`.h`               | `distribution/include/povlogo.ttf`                        |

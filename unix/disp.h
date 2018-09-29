@@ -41,8 +41,6 @@
 
 #include "vfe.h"
 
-#include <boost/shared_ptr.hpp>
-
 namespace pov_frontend
 {
     using namespace vfe;
@@ -52,8 +50,8 @@ namespace pov_frontend
     class UnixDisplay : public vfeDisplay
     {
         public:
-            UnixDisplay(unsigned int w, unsigned int h, GammaCurvePtr gamma, vfeSession *session, bool visible) :
-                vfeDisplay(w, h, gamma, session, visible) {};
+            UnixDisplay(unsigned int w, unsigned int h, vfeSession *session, bool visible) :
+                vfeDisplay(w, h, session, visible) {};
             virtual ~UnixDisplay() {} ;
             virtual void Initialise() = 0;
             virtual void Close() = 0;

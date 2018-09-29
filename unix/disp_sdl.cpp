@@ -69,8 +69,8 @@ namespace pov_frontend
         return true;
     }
 
-    UnixSDLDisplay::UnixSDLDisplay(unsigned int w, unsigned int h, GammaCurvePtr gamma, vfeSession *session, bool visible) :
-        UnixDisplay(w, h, gamma, session, visible)
+    UnixSDLDisplay::UnixSDLDisplay(unsigned int w, unsigned int h, vfeSession *session, bool visible) :
+        UnixDisplay(w, h, session, visible)
     {
         m_valid = false;
         m_display_scaled = false;

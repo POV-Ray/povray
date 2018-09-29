@@ -1,36 +1,95 @@
-include         = ../../distribution/include
-scenes          = ../../distribution/scenes
-backend         = ../../source/backend
-base            = ../../source/base
-reswrap_header  = reswrap-header.cpp
-reswrap_sh      = ./reswrap.sh
+#*************************************************************************************
+# Location of Stuff
+
+# Location of everything
+rootdir         = ../..
+
+# Location of generated source files
+fontsrc         = $(rootdir)/source/base/font
+scenesrc        = $(rootdir)/source/backend/control
+bluenoisesrc    = $(rootdir)/source/base/data
+
+# Location of input files
+include         = $(rootdir)/distribution/include
+scenes          = $(rootdir)/distribution/scenes
+
+# Location of tools
+metamake        = $(rootdir)/tools/meta-make
+reswrap_header  = $(metamake)/reswrap-header.cpp
+reswrap_sh      = $(metamake)/reswrap.sh
+metagen_header  = $(metamake)/metagen-header.cpp
+metagen_sh      = $(metamake)/metagen.sh
+
+#*************************************************************************************
+# What to Generate
 
 FONTS           = crystal cyrvetic povlogo timrom
 BENCHMARK       = benchmark_pov benchmark_ini
+BLUENOISE       = bluenoise64a
 
-all: $(FONTS) $(BENCHMARK)
+#-------------------------------------------------------------------------------------
+# Generation Parameters
+
+# File              Identifier     Seed Size [Slices]
+bluenoise64a_opts = kBlueNoise64a  4711 64
+
+#-------------------------------------------------------------------------------------
+# Files to Generate
+
+FONTFILES      = $(foreach font,$(FONTS),$(addprefix $(fontsrc)/$(font),.cpp .h))
+BENCHMARKFILES = $(foreach scene,$(BENCHMARK),$(addprefix $(scenesrc)/$(scene),.cpp .h))
+BLUENOISEFILES = $(foreach noise,$(BLUENOISE),$(addprefix $(bluenoisesrc)/$(noise),.cpp .h))
+
+ALLFILES       = $(FONTFILES) $(BENCHMARKFILES) $(BLUENOISEFILES)
+
+#*************************************************************************************
+# Rules
+
+.PHONY: all
+all: $(ALLFILES)
 
 .PHONY: clean
 clean: 
-	-for name in $(FONTS); do \
-		rm "$(base)/font/$${name}.cpp" "$(base)/font/$${name}.h"; \
-	done
-	-for name in $(BENCHMARK); do \
-		rm "$(backend)/control/$${name}.cpp" "$(backend)/control/$${name}.h"; \
-	done
+	-rm $(ALLFILES)
 
-$(FONTS): %: $(base)/font/%.cpp $(base)/font/%.h
+#-------------------------------------------------------------------------------------
+# Fonts
 
-$(base)/font/%.cpp: $(include)/%.ttf $(reswrap_header)
+vpath %.ttf $(include)
+
+$(fontsrc)/%.cpp: %.ttf $(reswrap_header)
 	$(reswrap_sh) "$@" "$<" "pov_base" "font_$(*F)" "-z"
 
-$(base)/font/%.h: $(include)/%.ttf $(reswrap_header)
+$(fontsrc)/%.h: %.ttf $(reswrap_header)
 	$(reswrap_sh) "$@" "$<" "pov_base" "font_$(*F)" "-z"
 
-$(BENCHMARK): benchmark_%: ../../source/backend/control/benchmark_%.cpp ../../source/backend/control/benchmark_%.h
+#-------------------------------------------------------------------------------------
+# Scenes
 
-$(backend)/control/benchmark_ini.%: $(scenes)/advanced/benchmark/benchmark.ini $(reswrap_header)
+vpath %.ini $(scenes)
+vpath %.pov $(scenes)
+
+$(scenesrc)/benchmark_ini.%: advanced/benchmark/benchmark.ini $(reswrap_header)
 	$(reswrap_sh) "$@" "$<" "pov" "Benchmark_Options" "-m -ta -c 120"
 
-$(backend)/control/benchmark_pov.%: $(scenes)/advanced/benchmark/benchmark.pov $(reswrap_header)
+$(scenesrc)/benchmark_pov.%: advanced/benchmark/benchmark.pov $(reswrap_header)
 	$(reswrap_sh) "$@" "$<" "pov" "Benchmark_File" "-m -ta -c 120"
+
+#-------------------------------------------------------------------------------------
+# Blue Noise Patterns
+
+$(BLUENOISEFILES): GENOPTS = $($(basename $(@F))_opts)
+$(BLUENOISEFILES): NAME    = $(word 1, $(GENOPTS))
+$(BLUENOISEFILES): SEED    = $(word 2, $(GENOPTS))
+$(BLUENOISEFILES): SIZE    = $(word 3, $(GENOPTS))
+$(BLUENOISEFILES): SLICES  = $(word 4, $(GENOPTS))
+
+define metagen_bluenoise =
+$(metagen_sh) "$@" "Blue noise pattern data" "python $(metamake)/bluenoise/metagen-bluenoise.py"
+endef
+
+$(BLUENOISEFILES): %: $(metagen_header)
+	$(metagen_bluenoise) "-l -npov_base -r$(SEED) $(NAME) $(SIZE) $(SIZE) $(SLICES)" "-h"
+
+#*************************************************************************************
+# End of File

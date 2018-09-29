@@ -48,6 +48,9 @@
 namespace pov_base
 {
 
+class DitherStrategy;
+class Image;
+
 //##############################################################################
 ///
 /// @defgroup PovBaseImageEncoding Basic Colour Encoding and Decoding
@@ -55,107 +58,6 @@ namespace pov_base
 ///
 /// @{
 
-class Image;
-
-//*****************************************************************************
-///
-/// @name Dithering
-///
-/// The following types and functions provide dithering functionality.
-///
-/// @{
-
-enum DitherMethodId
-{
-    kPOVList_DitherMethod_None,
-    kPOVList_DitherMethod_Diffusion1D,
-    kPOVList_DitherMethod_SierraLite,
-    kPOVList_DitherMethod_FloydSteinberg,
-    kPOVList_DitherMethod_Bayer2x2,
-    kPOVList_DitherMethod_Bayer3x3,
-    kPOVList_DitherMethod_Bayer4x4,
-};
-
-/// Abstract class representing a dithering algorithm and state.
-///
-/// @note
-///     The interface is designed to be used in quantization of a single complete image, with the
-///     image processed line by line and pixel by pixel, starting at (x=0,y=0). Failure to adhere
-///     to this processing order may lead to undefined behaviour in stateful dithering algorithms.
-///
-class DitherStrategy
-{
-    public:
-
-        /// Represents an offset to a colour.
-        struct ColourOffset
-        {
-            union { float red, gray; };  float green, blue, alpha;
-            ColourOffset() : red(0.0f), green(0.0f), blue(0.0f), alpha(0.0f) { }
-            ColourOffset(float r, float g, float b, float a) : red(r), green(g), blue(b), alpha(a) { }
-            void clear() { red = 0.0f; green = 0.0f; blue = 0.0f; alpha = 0.0f; }
-            void setAll(float v) { red = v; green = v; blue = v; alpha = v; }
-            void setRGB(RGBColour& v) { red = v.red(); green = v.green(); blue = v.blue(); alpha = 0.0; }
-            RGBColour getRGB() { return RGBColour(red, green, blue); }
-            ColourOffset operator*(float b) const { return ColourOffset(red*b, green*b, blue*b, alpha*b); }
-            ColourOffset operator+(const ColourOffset& b) const { return ColourOffset(red+b.red, green+b.green, blue+b.blue, alpha+b.alpha); }
-            void operator+=(const ColourOffset& b) { red+=b.red; green+=b.green; blue+=b.blue; alpha+=b.alpha; }
-        };
-
-        virtual ~DitherStrategy() {}
-
-        /// Queries a colour offset from the algorithm.
-        ///
-        /// This function computes an offset to be added to the colour of a given pixel, based on
-        /// the pixel location and/or the algorithm's state.
-        ///
-        /// @param[in]  x       X coordinate of the pixel (may or may not be relevant to the algorithm).
-        /// @param[in]  y       Y coordinate of the pixel (may or may not be relevant to the algorithm).
-        /// @param[out] offLin  Linear offset to add before any encoding steps.
-        ///                     This is typically based on carried-over quantization errors from neighboring pixels, as
-        ///                     used in stateful dither algorithms.
-        /// @param[out] offQnt  Offset to add right before quantization (even after scaling).
-        ///                     This is typically more or less random noise in the range [-0.5, 0.5], as used in
-        ///                     stateless dither algorithms.
-        ///
-        virtual void GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt) = 0;
-
-        /// Reports the actual quantization error to the algorithm.
-        ///
-        /// This function feeds back the actual quantization error to the algorithm, allowing a
-        /// stateful algorithm to update its state accordingly.
-        ///
-        /// @param[in]  x       X coordinate of the pixel (may or may not be relevant to the algorithm).
-        /// @param[in]  y       Y coordinate of the pixel (may or may not be relevant to the algorithm).
-        /// @param[in]  err     Linear quantization error (may or may not be relevant to the algorithm).
-        ///
-        virtual void SetError(unsigned int x, unsigned int y, const ColourOffset& err) {}
-};
-
-typedef shared_ptr<DitherStrategy> DitherStrategySPtr;
-
-/// Factory function to get a dithering algorithm and state.
-DitherStrategySPtr GetDitherStrategy(DitherMethodId method, unsigned int imageWidth);
-
-/// Factory function to get a no-op dithering algorithm.
-DitherStrategySPtr GetNoOpDitherStrategy();
-
-/// Function providing simple stateless dithering.
-///
-/// This function is provided as a fallback from the @ref DitherStrategy mechanism to provide basic
-/// dithering functionality in cases where stateful operation is impractical, such as the render
-/// preview.
-///
-/// The current implementation is based on 4x4 Bayer dithering.
-///
-/// @param[in]  x   Image x coordinate.
-/// @param[in]  y   Image y coordinate.
-/// @return         Offset to add right before quantization (even after scaling).
-///
-float GetDitherOffset(unsigned int x, unsigned int y);
-
-/// @}
-///
 //*****************************************************************************
 ///
 /// @name Basic Decoding
@@ -283,17 +185,21 @@ inline unsigned int IntEncode(const GammaCurvePtr& g, float x, unsigned int max,
         return IntEncode(x, max, qOff, err);
 
     float xEff = clip(x, 0.0f, 1.0f) + err;
-    unsigned int v = IntEncodeDown(GammaCurve::Encode(g, xEff), max, qOff);
-    err = xEff - IntDecode(g, v, max);
-    if (v < max)
+    unsigned int v = IntEncodeDown(GammaCurve::Encode(g, xEff), max);
+    float decoded = IntDecode(g, v, max);
+    if (v >= max)
     {
-        float errUp = xEff - IntDecode(g, v + 1, qOff);
-        if (fabs(errUp) <= fabs(err))
-        {
-            ++v;
-            err = errUp;
-        }
+        err = xEff - decoded;
+        return v;
     }
+    float decodedUp = IntDecode(g, v + 1, max);
+    float threshold = (0.5 - qOff) * decoded + (0.5 + qOff) * decodedUp;
+    if (xEff > threshold)
+    {
+        decoded = decodedUp;
+        ++v;
+    }
+    err = xEff - decoded;
     return v;
 }
 

@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -82,7 +82,7 @@ static vfeWinSession    *gSession;
 // Whenever the core POV code wants to create an output window, the below code
 // will therefore be executed.
 //////////////////////////////////////////////////////////////////////////////
-vfeDisplay *WinDisplayCreator (unsigned int width, unsigned int height, GammaCurvePtr gamma, vfeSession *session, bool visible)
+vfeDisplay *WinDisplayCreator (unsigned int width, unsigned int height, vfeSession *session, bool visible)
 {
   // we attempt to minimize 'flashing' of the window (destroy followed by a re-create)
   // by checking to see if the previous window (if any) had the same dimensions. if it
@@ -92,7 +92,7 @@ vfeDisplay *WinDisplayCreator (unsigned int width, unsigned int height, GammaCur
   if (display != NULL && display->GetWidth() == width && display->GetHeight() == height)
   {
     WinDisplay *p ;
-      p = new WinLegacyDisplay (width, height, gamma, session, false) ;
+    p = new WinLegacyDisplay (width, height, session, false);
     if (p->TakeOver (display))
     {
       bool anim = gSession->RenderingAnimation();
@@ -105,7 +105,7 @@ vfeDisplay *WinDisplayCreator (unsigned int width, unsigned int height, GammaCur
     }
     delete p;
   }
-    return new WinLegacyDisplay (width, height, gamma, session, visible) ;
+  return new WinLegacyDisplay (width, height, session, visible);
 }
 
 //////////////////////////////////////////////////////////////////////////////

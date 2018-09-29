@@ -36,10 +36,14 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/imageprocessing.h"
 
-#include <boost/scoped_ptr.hpp>
+// Standard C++ header files
+#include <memory>
 
+// POV-Ray header files (base module)
+#include "base/image/dither.h"
 #include "base/image/image.h"
 
+// POV-Ray header files (POVMS module)
 #include "povms/povmsid.h"
 
 // this must be the last file included
@@ -104,7 +108,7 @@ UCS2String ImageProcessing::WriteImage(POVMS_Object& ropts, POVMSInt frame, int 
         Image::ImageFileType imagetype = Image::SYS;
         unsigned int filetype = POV_File_Image_System;
 
-        wopts.bitsPerChannel = clip(ropts.TryGetInt(kPOVAttrib_BitsPerColor, 8), 5, 16);
+        wopts.bitsPerChannel = clip(ropts.TryGetInt(kPOVAttrib_BitsPerColor, 8), 1, 16);
         wopts.alphaMode = (ropts.TryGetBool(kPOVAttrib_OutputAlpha, false) ? Image::kAlphaMode_Default : Image::kAlphaMode_None );
         wopts.compression = (ropts.Exist(kPOVAttrib_Compression) ? clip(ropts.GetInt(kPOVAttrib_Compression), 0, 255) : -1);
         wopts.grayscale = ropts.TryGetBool(kPOVAttrib_GrayscaleOutput, false);
@@ -173,9 +177,9 @@ UCS2String ImageProcessing::WriteImage(POVMS_Object& ropts, POVMSInt frame, int 
         wopts.workingGamma = GetGammaCurve(gammaType, gamma);
 
         bool dither = ropts.TryGetBool(kPOVAttrib_Dither, false);
-        DitherMethodId ditherMethod = kPOVList_DitherMethod_None;
+        DitherMethodId ditherMethod = DitherMethodId::kNone;
         if (dither)
-            ditherMethod = (DitherMethodId)ropts.TryGetInt(kPOVAttrib_DitherMethod, kPOVList_DitherMethod_FloydSteinberg);
+            ditherMethod = ropts.TryGetEnum(kPOVAttrib_DitherMethod, DitherMethodId::kBlueNoise);
         wopts.ditherStrategy = GetDitherStrategy(ditherMethod, image->GetWidth());
 
         // in theory this should always return a filename since the frontend code
@@ -184,7 +188,7 @@ UCS2String ImageProcessing::WriteImage(POVMS_Object& ropts, POVMSInt frame, int 
         if(filename.empty() == true)
             filename = GetOutputFilename(ropts, frame, digits);
 
-        boost::scoped_ptr<OStream> imagefile(NewOStream(filename.c_str(), filetype, false)); // TODO - check file permissions somehow without macro [ttrf]
+        std::unique_ptr<OStream> imagefile(NewOStream(filename.c_str(), filetype, false)); // TODO - check file permissions somehow without macro [ttrf]
         if (imagefile == nullptr)
             throw POV_EXCEPTION_CODE(kCannotOpenFileErr);
 

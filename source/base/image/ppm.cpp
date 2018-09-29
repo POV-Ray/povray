@@ -9,7 +9,7 @@
 /// according to Netpbm specs (http://netpbm.sourceforge.net/doc/):
 ///
 /// For input, both ASCII ("plain") and binary ("raw") formats (magic numbers
-/// `P2`/`P3` and `P5`/`P6`, respectively), are supported.
+/// `P2`/`P3` and `P5`/`P6`, respectively) are supported.
 ///
 /// For outout we write binary ("raw") PPM files (magic number `P6`), unless
 /// `Greyscale_Output=on` is specified in which case we write binary PGM files
@@ -104,10 +104,8 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
     plainFormat = (options.compression == 0);
 #endif
 
-    if (bpcc == 0)
+    if (bpcc <= 0)
         bpcc = image->GetMaxIntValue() == 65535 ? 16 : 8 ;
-    else if (bpcc < 5)
-        bpcc = 5 ;
     else if (bpcc > 16)
         bpcc = 16 ;
 
@@ -115,11 +113,9 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
 
     // do we want 16 bit grayscale (PGM) output ?
     // TODO - the check for image container type is here to mimick old code; do we still need it?
-    if (image->GetImageDataType () == Image::Gray_Int16 || image->GetImageDataType () == Image::GrayA_Int16 || options.grayscale)
+    if (image->IsGrayscale() || options.grayscale)
     {
-        grayscale   = true;
-        bpcc        = 16;
-        gamma.reset(); // TODO - this is here to mimick old code, which never did gamma correction for greyscale output; do we want to change that?
+        grayscale = true;
         if (plainFormat)
             file->printf("P2\n");
         else
@@ -400,5 +396,5 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
 
 } // end of namespace Netpbm
 
-}
+} // end of namespace pov_base
 

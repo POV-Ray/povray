@@ -43,6 +43,7 @@
 #include "base/fileutil.h"
 #include "base/platformbase.h"
 #include "base/image/colourspace.h"
+#include "base/image/dither.h"
 #include "base/image/encoding.h"
 
 // POV-Ray header files (POVMS module)
@@ -576,25 +577,22 @@ int ProcessRenderOptions::ReadSpecialSwitchHandler(Cmd_Parser_Table *option, cha
                 err = POVMSUtil_SetInt(obj, option->key, intval);
                 file_type = *param++;
             }
+            if ((err == kNoErr) && (tolower(*param) == 'g'))
+            {
+                if(!has16BitGrayscale)
+                {
+                    ParseError("Grayscale not currently supported with output file format '%c'.", file_type);
+                    err = kParamErr;
+                }
+                else
+                {
+                    err = POVMSUtil_SetBool(obj, kPOVAttrib_GrayscaleOutput, true);
+                    ++param;
+                }
+            }
             if ((err == kNoErr) && (*param > ' '))
             {
-                if (tolower(*param) == 'g')
-                {
-                    if(!has16BitGrayscale)
-                    {
-                        ParseError("Grayscale not currently supported with output file format '%c'.", file_type);
-                        err = kParamErr;
-                    }
-                    else
-                    {
-                        if ((err = POVMSUtil_SetBool(obj, kPOVAttrib_GrayscaleOutput, true)) == kNoErr && *++param > ' ')
-                        {
-                            ParseError("Unexpected '%s' following grayscale flag in +F%c option.", param, file_type);
-                            err = kParamErr;
-                        }
-                    }
-                }
-                else if (isdigit(*param) != 0)
+                if (isdigit(*param) != 0)
                 {
                     if (sscanf(param, "%d%n", &intval, &intval2) == 1)
                     {
@@ -1103,12 +1101,20 @@ struct ProcessRenderOptions::Parameter_Code_Table DitherMethodTable[] =
 {
 
     // code,    internalId,
-    { "B2",     kPOVList_DitherMethod_Bayer2x2,         "2x2 Bayer pattern" },
-    { "B3",     kPOVList_DitherMethod_Bayer3x3,         "3x3 Bayer pattern" },
-    { "B4",     kPOVList_DitherMethod_Bayer4x4,         "4x4 Bayer pattern" },
-    { "D1",     kPOVList_DitherMethod_Diffusion1D,      "Simple 1-D error diffusion" },
-    { "D2",     kPOVList_DitherMethod_SierraLite,       "Simple 2-D error diffusion (Sierra Lite)" },
-    { "FS",     kPOVList_DitherMethod_FloydSteinberg,   "Floyd-Steinberg error diffusion" },
+    { "AT",     int(DitherMethodId::kAtkinson),         "Atkinson error diffusion" },
+    { "B2",     int(DitherMethodId::kBayer2x2),         "2x2 Bayer pattern" },
+    { "B3",     int(DitherMethodId::kBayer3x3),         "3x3 Bayer pattern" },
+    { "B4",     int(DitherMethodId::kBayer4x4),         "4x4 Bayer pattern" },
+    { "BK",     int(DitherMethodId::kBurkes),           "Burkes error diffusion" },
+    { "BNX",    int(DitherMethodId::kBlueNoiseX),       "Blue noise pattern (inverted for Red/Blue)" },
+    { "BN",     int(DitherMethodId::kBlueNoise),        "Blue noise pattern" },
+    { "D1",     int(DitherMethodId::kDiffusion1D),      "Simple 1-D error diffusion" },
+    { "D2",     int(DitherMethodId::kSierraLite),       "Simple 2-D error diffusion (Sierra Lite)" },
+    { "FS",     int(DitherMethodId::kFloydSteinberg),   "Floyd-Steinberg error diffusion" },
+    { "JN",     int(DitherMethodId::kJarvisJudiceNinke),"Jarvis-Judice-Ninke error diffusion" },
+    { "S2",     int(DitherMethodId::kSierra2),          "Two-row Sierra error diffusion" },
+    { "S3",     int(DitherMethodId::kSierra3),          "Sierra error diffusion" },
+    { "ST",     int(DitherMethodId::kStucki),           "Stucki error diffusion" },
 
     // end-of-list marker
     { nullptr,  0,                                      "(unknown)" }
