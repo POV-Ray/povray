@@ -85,7 +85,7 @@ class SimpleFrontend
     public:
         SimpleFrontend(POVMSContext ctx, POVMSAddress addr, POVMS_Object& msg,
                        boost::function<Console *()> cfn,
-                       boost::function<Display *(unsigned int, unsigned int, GammaCurvePtr)> dfn,
+                       boost::function<Display *(unsigned int, unsigned int)> dfn,
                        POVMS_Object *result = nullptr, shared_ptr<Console> console = shared_ptr<Console>());
         ~SimpleFrontend();
 
@@ -112,13 +112,13 @@ class SimpleFrontend
         shared_ptr<AnimationProcessing> animationProcessing;
         shared_ptr<ShelloutProcessing> shelloutProcessing;
         boost::function<Console *()> createConsole;
-        boost::function<Display *(unsigned int, unsigned int, GammaCurvePtr)> createDisplay;
+        boost::function<Display *(unsigned int, unsigned int)> createDisplay;
 };
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
 SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::SimpleFrontend(POVMSContext ctx, POVMSAddress addr, POVMS_Object& msg,
                                                                         boost::function<Console *()> cfn,
-                                                                        boost::function<Display *(unsigned int, unsigned int, GammaCurvePtr)> dfn,
+                                                                        boost::function<Display *(unsigned int, unsigned int)> dfn,
                                                                         POVMS_Object *result, shared_ptr<Console> console) :
     renderFrontend(ctx),
     backendAddress(addr),

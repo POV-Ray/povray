@@ -25,6 +25,12 @@
     <Filter Include="Base source\Font">
       <UniqueIdentifier>{9f44d3c5-81d8-4017-a1b7-5a6f9a139e28}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Base Headers\Data">
+      <UniqueIdentifier>{32531c25-b41d-42b5-88a0-77de8a8daa8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base source\Data">
+      <UniqueIdentifier>{b3ceef1f-ae95-40ac-b0b3-904569e9595b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\base\fileinputoutput.cpp">
@@ -131,6 +137,12 @@
     </ClCompile>
     <ClCompile Include="..\..\source\base\pov_mem.cpp">
       <Filter>Base source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\data\bluenoise64a.cpp">
+      <Filter>Base source\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\image\dither.cpp">
+      <Filter>Base source\Image</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -265,6 +277,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\base\version_info.h">
       <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\data\bluenoise64a.h">
+      <Filter>Base Headers\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\image\dither.h">
+      <Filter>Base Headers\Image</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -51,8 +51,8 @@ namespace pov_frontend
   class WinDisplay : public vfeDisplay
   {
     public:
-      WinDisplay(unsigned int w, unsigned int h, GammaCurvePtr gamma, vfeSession *session, bool visible) :
-          vfeDisplay(w, h, gamma, session, visible), m_Handle (NULL) {};
+      WinDisplay(unsigned int w, unsigned int h, vfeSession *session, bool visible) :
+          vfeDisplay(w, h, session, visible), m_Handle (NULL) {};
       virtual ~WinDisplay() {} ;
       virtual bool CreateRenderWindow (void) = 0;
       virtual void Close() = 0;
@@ -73,7 +73,7 @@ namespace pov_frontend
   class WinLegacyDisplay : public WinDisplay
   {
     public:
-      WinLegacyDisplay(unsigned int w, unsigned int h, GammaCurvePtr gamma, vfeSession *session, bool visible);
+      WinLegacyDisplay(unsigned int w, unsigned int h, vfeSession *session, bool visible);
       virtual ~WinLegacyDisplay();
 
       void Initialise();

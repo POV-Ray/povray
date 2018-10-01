@@ -45,10 +45,11 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-// POV-Ray base header files
+// POV-Ray header files (base module)
 #include "base/platformbase.h"
 #include "base/safemath.h"
 #include "base/image/bmp.h"
+#include "base/image/dither.h"
 #include "base/image/gif.h"
 #include "base/image/hdr.h"
 #include "base/image/iff.h"
@@ -77,6 +78,16 @@ namespace pov_base
 {
 
 using std::allocator;
+
+Image::WriteOptions::WriteOptions() :
+    ditherStrategy(GetNoOpDitherStrategy()),
+    offset_x(0),
+    offset_y(0),
+    alphaMode(kAlphaMode_None),
+    bitsPerChannel(8),
+    compression(-1),
+    grayscale(false)
+{}
 
 template<class Allocator = allocator<bool> >
 class BitMapImage : public Image

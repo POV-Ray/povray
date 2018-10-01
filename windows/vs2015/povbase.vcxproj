@@ -386,12 +386,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\base\colour.cpp" />
+    <ClCompile Include="..\..\source\base\data\bluenoise64a.cpp" />
     <ClCompile Include="..\..\source\base\fileinputoutput.cpp" />
     <ClCompile Include="..\..\source\base\fileutil.cpp" />
     <ClCompile Include="..\..\source\base\font\crystal.cpp" />
     <ClCompile Include="..\..\source\base\font\cyrvetic.cpp" />
     <ClCompile Include="..\..\source\base\font\povlogo.cpp" />
     <ClCompile Include="..\..\source\base\font\timrom.cpp" />
+    <ClCompile Include="..\..\source\base\image\dither.cpp" />
     <ClCompile Include="..\..\source\base\image\metadata.cpp" />
     <ClCompile Include="..\..\source\base\mathutil.cpp" />
     <ClCompile Include="..\..\source\base\messenger.cpp" />
@@ -446,12 +448,14 @@
     <ClInclude Include="..\..\source\base\build.h" />
     <ClInclude Include="..\..\source\base\colour.h" />
     <ClInclude Include="..\..\source\base\configbase.h" />
+    <ClInclude Include="..\..\source\base\data\bluenoise64a.h" />
     <ClInclude Include="..\..\source\base\fileinputoutput.h" />
     <ClInclude Include="..\..\source\base\fileutil.h" />
     <ClInclude Include="..\..\source\base\font\crystal.h" />
     <ClInclude Include="..\..\source\base\font\cyrvetic.h" />
     <ClInclude Include="..\..\source\base\font\povlogo.h" />
     <ClInclude Include="..\..\source\base\font\timrom.h" />
+    <ClInclude Include="..\..\source\base\image\dither.h" />
     <ClInclude Include="..\..\source\base\mathutil.h" />
     <ClInclude Include="..\..\source\base\messenger.h" />
     <ClInclude Include="..\..\source\base\path.h" />

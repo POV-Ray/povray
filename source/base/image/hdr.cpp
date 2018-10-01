@@ -42,15 +42,13 @@
 #include "base/image/hdr.h"
 
 // Standard C++ header files
+#include <memory>
 #include <string>
 
-// Boost header files
-#include <boost/scoped_ptr.hpp>
-#include <boost/scoped_array.hpp>
-
-// POV-Ray base header files
+// POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
 #include "base/types.h"
+#include "base/image/dither.h"
 #include "base/image/metadata.h"
 
 // this must be the last file included
@@ -210,7 +208,7 @@ Image *Read(IStream *file, const Image::ReadOptions& options)
     image = Image::Create(width, height, imagetype);
     // NB: HDR files don't use alpha, so premultiplied vs. non-premultiplied is not an issue
 
-    boost::scoped_array<unsigned char> scanline(new unsigned char[4 * width]);
+    std::unique_ptr<unsigned char[]> scanline(new unsigned char[4 * width]);
     for(int row = 0; row < height; row++)
     {
         // determine scanline type
@@ -318,7 +316,7 @@ void Write(OStream *file, const Image *image, const Image::WriteOptions& options
     file->printf("\n");
     file->printf("-Y %d +X %d\n", height, width);
 
-    boost::scoped_array<RGBE> scanline(new RGBE[width]);
+    std::unique_ptr<RGBE[]> scanline(new RGBE[width]);
 
     for(int row = 0; row < height; row++)
     {
