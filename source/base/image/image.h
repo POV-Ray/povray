@@ -48,6 +48,9 @@
 namespace pov_base
 {
 
+class DitherStrategy;
+using DitherStrategySPtr = shared_ptr<DitherStrategy>;
+
 //##############################################################################
 ///
 /// @defgroup PovBaseImage Image Handling
@@ -287,15 +290,7 @@ class Image
             ///     in POV-Ray.
             bool grayscale : 1;
 
-            WriteOptions() :
-                ditherStrategy(GetNoOpDitherStrategy()),
-                offset_x(0),
-                offset_y(0),
-                alphaMode(kAlphaMode_None),
-                bitsPerChannel(8),
-                compression(-1),
-                grayscale(false)
-            {}
+            WriteOptions();
 
             inline bool AlphaIsEnabled() const
             {

@@ -44,8 +44,6 @@
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
 
-#include "base/image/colourspace.h"
-
 #include "frontend/simplefrontend.h"
 
 namespace pov_frontend
@@ -358,7 +356,7 @@ namespace vfe
 
     public:
       // Our DisplayCreator functor - see vfeSession::SetDisplayCreator().
-      typedef boost::function<vfeDisplay *(unsigned int, unsigned int, GammaCurvePtr, vfeSession *session, bool)> DisplayCreator;
+      typedef boost::function<vfeDisplay *(unsigned int, unsigned int, vfeSession *session, bool)> DisplayCreator;
       typedef enum
       {
         mUnclassified = 0,
@@ -542,7 +540,7 @@ namespace vfe
       // window be created. The display instance returned is expected to conform
       // to the definition of the pov_frontend::Display class (but it typically
       // a platform-specific derivative of that.)
-      virtual vfeDisplay *CreateDisplay(unsigned int width, unsigned int height, GammaCurvePtr gamma, bool visible = false);
+      virtual vfeDisplay *CreateDisplay(unsigned int width, unsigned int height, bool visible = false);
 
       // Used by VFE implementations to allow their own custom pov_frontend::Display
       // derived render preview window class to be created when the main POV-Ray code
@@ -1258,7 +1256,7 @@ namespace vfe
       static vfeSession *m_CurrentSessionTemporaryHack;
       shared_ptr<Console> m_Console;
 
-      virtual vfeDisplay *DefaultDisplayCreator (unsigned int width, unsigned int height, GammaCurvePtr gamma, vfeSession *session, bool visible);
+      virtual vfeDisplay *DefaultDisplayCreator (unsigned int width, unsigned int height, vfeSession *session, bool visible);
       DisplayCreator m_DisplayCreator;
 
       int m_MaxStatusMessages;
