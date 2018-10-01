@@ -78,7 +78,7 @@ vfeSession::vfeSession(int id)
   m_RequestFlag = rqNoRequest;
   m_RequestResult = 0;
   m_StartTime = 0;
-  m_DisplayCreator = boost::bind(&vfe::vfeSession::DefaultDisplayCreator, this, _1, _2, _3, _4, _5);
+  m_DisplayCreator = boost::bind(&vfe::vfeSession::DefaultDisplayCreator, this, _1, _2, _3, _4);
   Reset();
 }
 
@@ -737,9 +737,9 @@ vfeSession *vfeSession::GetSessionFromThreadID()
   return m_CurrentSessionTemporaryHack ;
 }
 
-vfeDisplay *vfeSession::DefaultDisplayCreator (unsigned int width, unsigned int height, GammaCurvePtr gamma, vfeSession *session, bool visible)
+vfeDisplay *vfeSession::DefaultDisplayCreator (unsigned int width, unsigned int height, vfeSession *session, bool visible)
 {
-  return new vfeDisplay (width, height, gamma, session, visible) ;
+  return new vfeDisplay (width, height, session, visible) ;
 }
 
 // If a VFE implementation has provided the address of a display creator
@@ -750,9 +750,9 @@ vfeDisplay *vfeSession::DefaultDisplayCreator (unsigned int width, unsigned int 
 // If a display instance is returned, it is expected to conform to the
 // definition of the pov_frontend::Display class, but will typically be
 // a platform-specific derivative of that.
-vfeDisplay *vfeSession::CreateDisplay (unsigned int width, unsigned int height, GammaCurvePtr gamma, bool visible)
+vfeDisplay *vfeSession::CreateDisplay (unsigned int width, unsigned int height, bool visible)
 {
-  return m_DisplayCreator (width, height, gamma, this, visible);
+  return m_DisplayCreator (width, height, this, visible);
 }
 
 // This method causes a shutdown of the vfeSession instance. Specifically

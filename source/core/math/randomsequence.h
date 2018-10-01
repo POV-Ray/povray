@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -195,6 +195,51 @@ typedef shared_ptr<IndexedNumberGenerator<double> const>    IndexedDoubleGenerat
 typedef shared_ptr<IndexedNumberGenerator<Vector3d> const>  IndexedVectorGeneratorPtr;
 typedef shared_ptr<IndexedNumberGenerator<Vector2d> const>  IndexedVector2dGeneratorPtr;
 
+/**
+*  @}
+*
+***************************************************************************************************************
+*
+*  @name Random Distribution Functions
+*
+*  The following global functions provide various distributions from a single uniform random number source.
+*
+*  @{
+*/
+
+/**
+*  Gets a random point on the unit square with uniform distribution.
+*
+*  @param[in]  source          A generator for double-precision random numbers uniformly distributed in the range [0..1)
+*  @return                     A random point on the unit square.
+*/
+Vector2d Uniform2dOnSquare(SequentialDoubleGeneratorPtr source);
+
+/**
+*  Gets a random point on the unit disc with uniform distribution.
+*
+*  @param[in]  source          A generator for double-precision random numbers uniformly distributed in the range [0..1)
+*  @return                     A random point on the unit disc.
+*/
+Vector2d Uniform2dOnDisc(SequentialDoubleGeneratorPtr source);
+
+/**
+*  Gets a random point on the unit sphere surface with uniform distribution.
+*
+*  @param[in]  source          A generator for double-precision random numbers uniformly distributed in the range [0..1)
+*  @return                     A random point on the unit sphere surface.
+*/
+Vector3d Uniform3dOnSphere(SequentialDoubleGeneratorPtr source);
+
+/**
+*  Gets a random point on the unit hemisphere with cos-weighted distribution.
+*  @note       The hemisphere is oriented towards positive Y.
+*
+*  @param[in]  source          A generator for double-precision random numbers uniformly distributed in the range [0..1)
+*  @return                     A random point on the unit hemisphere.
+*/
+Vector3d CosWeighted3dOnHemisphere(SequentialDoubleGeneratorPtr source);
+
 /// @}
 ///
 //******************************************************************************
@@ -236,7 +281,7 @@ SeedableDoubleGeneratorPtr GetRandomDoubleGenerator(double minval, double maxval
 /// @param[in]  count           Number of values to provide.
 /// @return                     A shared pointer to a corresponding number generator.
 ///
-SequentialDoubleGeneratorPtr GetRandomDoubleGenerator(double minval, double maxval);
+SeedableDoubleGeneratorPtr GetRandomDoubleGenerator(double minval, double maxval);
 
 /// Gets a source for floating-point pseudo-random numbers satisfying the given properties.
 /// The object returned is intended for access by index.

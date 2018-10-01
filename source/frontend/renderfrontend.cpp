@@ -36,17 +36,23 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/renderfrontend.h"
 
-#include <boost/scoped_ptr.hpp>
+// Standard C++ header files
+#include <memory>
 
+// POV-Ray header files (base module)
 #include "base/platformbase.h"
 #include "base/textstream.h"
 #include "base/textstreambuffer.h"
+#include "base/image/dither.h"
 #include "base/image/encoding.h"
 
+// POV-Ray header files (POVMS module)
 #include "povms/povmsid.h"
 
+// POV-Ray header files (frontend module)
 #include "frontend/console.h"
 #include "frontend/processoptions.h"
+#include "frontend/processrenderoptions.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -644,7 +650,7 @@ void RenderFrontendBase::ContinueBackup(POVMS_Object& ropts, ViewData& vd, ViewI
     vd.imageBackup.reset();
     MakeBackupPath(ropts, vd, outputpath);
 
-    boost::scoped_ptr<IStream> inbuffer(new IFileStream(vd.imageBackupFile().c_str()));
+    std::unique_ptr<IStream> inbuffer(new IFileStream(vd.imageBackupFile().c_str()));
 
     size_t pos = sizeof(Backup_File_Header);
 
@@ -1016,8 +1022,8 @@ void RenderOptions(POVMS_Object& obj, TextStreamBuffer *tsb)
     {
         int method = 0;
         if(obj.TryGetBool(kPOVAttrib_Antialias, false) == true)
-            method = clip(obj.TryGetInt(kPOVAttrib_SamplingMethod, 1), 0, 2);
-        int depth = clip(obj.TryGetInt(kPOVAttrib_AntialiasDepth, 3), 1, 9);
+            method = clip(obj.TryGetInt(kPOVAttrib_SamplingMethod, 1), 0, 3); // TODO FIXME - magic number in clip
+        int depth = clip(obj.TryGetInt(kPOVAttrib_AntialiasDepth, 3), 1, 9); // TODO FIXME - magic number in clip
         float threshold = clip(obj.TryGetFloat(kPOVAttrib_AntialiasThreshold, 0.3f), 0.0f, 1.0f);
         float aagamma = obj.TryGetFloat(kPOVAttrib_AntialiasGamma, 2.5f);
         float jitter = 0.0f;
@@ -1158,19 +1164,9 @@ void OutputOptions(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
             (void)POVMSUtil_GetBool(msg, kPOVAttrib_Dither, &b);
             if (b)
             {
-                i = kPOVList_DitherMethod_FloydSteinberg;
+                i = int(DitherMethodId::kBlueNoise);
                 (void)POVMSUtil_GetInt(msg, kPOVAttrib_DitherMethod, &i);
-                switch(i)
-                {
-                    // TODO FIXME - for easier maintenance, this should probably be part of the DitherMethodTable.
-                    case kPOVList_DitherMethod_Bayer2x2:        t = "2x2 Bayer pattern";                break;
-                    case kPOVList_DitherMethod_Bayer3x3:        t = "3x3 Bayer pattern";                break;
-                    case kPOVList_DitherMethod_Bayer4x4:        t = "4x4 Bayer pattern";                break;
-                    case kPOVList_DitherMethod_Diffusion1D:     t = "simple 1-D error diffusion";       break;
-                    case kPOVList_DitherMethod_Diffusion2D:     t = "simple 2-D error diffusion";       break;
-                    case kPOVList_DitherMethod_FloydSteinberg:  t = "Floyd-Steinberg error diffusion";  break;
-                    default:                                    t = "(unknown)";                        break;
-                }
+                t = ProcessRenderOptions::GetDitherMethodText(i);
                 tsb->printf("  Dithering............%s\n", t);
             }
             else
@@ -1196,17 +1192,10 @@ void OutputOptions(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
             case kPOVList_GammaType_PowerLaw:
                 tsb->printf("  Graphic display......On  (gamma: %g)\n", (float)f);
                 break;
-            case kPOVList_GammaType_SRGB:
-                tsb->printf("  Graphic display......On  (gamma: sRGB)\n");
-                break;
-            case kPOVList_GammaType_BT709:
-                tsb->printf("  Graphic display......On  (gamma: ITU-R BT.709)\n");
-                break;
-            case kPOVList_GammaType_BT2020:
-                tsb->printf("  Graphic display......On  (gamma: ITU-R BT.2020)\n");
-                break;
             default:
-                throw POV_EXCEPTION_STRING("Unknown gamma mode in OutputOptions()");
+                t = ProcessRenderOptions::GetGammaTypeText(i);
+                tsb->printf("  Graphic display......On  (gamma: %s)\n", t);
+                break;
         }
     }
     else

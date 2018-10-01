@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -49,7 +49,6 @@
 
 #include "base/platformbase.h"
 #include "base/timer.h"
-#include "base/image/colourspace.h"
 
 #include "frontend/console.h"
 #include "frontend/display.h"
@@ -197,7 +196,7 @@ namespace vfe
   class vfeDisplay : public Display
   {
     public:
-      vfeDisplay(unsigned int width, unsigned int height, GammaCurvePtr gamma, vfeSession *session, bool visible = false);
+      vfeDisplay(unsigned int width, unsigned int height, vfeSession *session, bool visible = false);
       virtual ~vfeDisplay();
 
       virtual void Initialise();
@@ -240,8 +239,8 @@ namespace vfe
     protected:
       virtual Console *CreateConsole()
         { return new vfeConsole(m_Session, m_Session->GetConsoleWidth()); }
-      virtual Display *CreateDisplay(unsigned int width, unsigned int height, GammaCurvePtr gamma)
-        { return m_Session->CreateDisplay(width, height, gamma) ; }
+      virtual Display *CreateDisplay(unsigned int width, unsigned int height)
+        { return m_Session->CreateDisplay(width, height) ; }
       bool HandleShelloutCancel();
 
       RenderFrontend<vfeParserMessageHandler,FileMessageHandler,vfeRenderMessageHandler,ImageMessageHandler> renderFrontend;

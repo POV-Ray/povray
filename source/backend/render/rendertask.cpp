@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -57,8 +57,8 @@ namespace pov
 
 using namespace pov_base;
 
-RenderTask::RenderTask(ViewData *vd, const char* sn, RenderBackend::ViewId vid) :
-    SceneTask(new ViewThreadData(vd), boost::bind(&RenderTask::SendFatalError, this, _1), sn, vd->GetSceneData(), vid),
+RenderTask::RenderTask(ViewData *vd, size_t seed, const char* sn, RenderBackend::ViewId vid) :
+    SceneTask(new ViewThreadData(vd, seed), boost::bind(&RenderTask::SendFatalError, this, _1), sn, vd->GetSceneData(), vid),
     viewData(vd)
 {
 }

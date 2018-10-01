@@ -46,7 +46,6 @@
 
 #include "base/path.h"
 #include "base/platformbase.h"
-#include "base/image/colourspace.h"
 #include "base/image/image.h"
 
 #include "frontend/console.h"
@@ -143,6 +142,8 @@ struct ViewData
     mutable shared_ptr<Image> image;
     mutable shared_ptr<Display> display;
     mutable shared_ptr<OStream> imageBackup;
+    GammaCurvePtr displayGamma;
+    bool greyscaleDisplay;
 
     Path imageBackupFile;
 };
@@ -286,7 +287,7 @@ class RenderFrontend : public RenderFrontendBase
         void ResumeParser(SceneId sid);
         void StopParser(SceneId sid);
 
-        ViewId CreateView(SceneId sid, POVMS_Object& obj, shared_ptr<ImageProcessing>& imageProcessing, boost::function<Display *(unsigned int, unsigned int, GammaCurvePtr)> fn);
+        ViewId CreateView(SceneId sid, POVMS_Object& obj, shared_ptr<ImageProcessing>& imageProcessing, boost::function<Display *(unsigned int, unsigned int)> fn);
         void CloseView(ViewId vid);
 
         ViewData::ViewState GetViewState(ViewId vid);
@@ -435,7 +436,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::StopParser(SceneId
 }
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
-RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::CreateView(SceneId sid, POVMS_Object& obj, shared_ptr<ImageProcessing>& imageProcessing, boost::function<Display *(unsigned int,unsigned int,GammaCurvePtr)> fn)
+RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::CreateView(SceneId sid, POVMS_Object& obj, shared_ptr<ImageProcessing>& imageProcessing, boost::function<Display *(unsigned int,unsigned int)> fn)
 {
     typename SceneHandlerMap::iterator shi(scenehandler.find(sid));
 
@@ -522,6 +523,9 @@ RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_M
                 default:
                     throw POV_EXCEPTION_STRING("Unknown gamma handling mode in CreateView()");
             }
+            vh.data.displayGamma = gamma;
+
+            vh.data.greyscaleDisplay = obj.TryGetBool(kPOVAttrib_GrayscaleOutput, false);
 
             vh.data.state = ViewData::View_Invalid;
 
@@ -544,7 +548,7 @@ RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_M
             }
 
             if(obj.TryGetBool(kPOVAttrib_Display, true) == true)
-                vh.data.display = shared_ptr<Display>(fn(width, height, gamma));
+                vh.data.display = shared_ptr<Display>(fn(width, height));
 
             viewhandler[vid] = vh;
             view2scene[vid] = sid;

@@ -42,7 +42,6 @@
 #include "frontend/configfrontend.h"
 
 #include "base/timer.h"
-#include "base/image/colourspace.h"
 
 #include "backend/povray.h"
 
@@ -72,23 +71,23 @@ class DefaultConsole : public pov_frontend::Console
 class DefaultDisplay : public pov_frontend::Display
 {
     public:
-        DefaultDisplay(unsigned int w, unsigned int h, pov_base::GammaCurvePtr g) : Display(w, h, g) { }
+        DefaultDisplay(unsigned int w, unsigned int h) : Display(w, h) { }
         ~DefaultDisplay() { }
         void Initialise() { }
         void DrawPixel(unsigned int, unsigned int, const RGBA8&) { }
 };
 
 pov_frontend::Console *CreateDefaultConsole();
-pov_frontend::Display *CreateDefaultDisplay(unsigned int w, unsigned int h, pov_base::GammaCurvePtr gf);
+pov_frontend::Display *CreateDefaultDisplay(unsigned int w, unsigned int h);
 
 pov_frontend::Console *CreateDefaultConsole()
 {
     return new DefaultConsole();
 }
 
-pov_frontend::Display *CreateDefaultDisplay(unsigned int w, unsigned int h, pov_base::GammaCurvePtr gf)
+pov_frontend::Display *CreateDefaultDisplay(unsigned int w, unsigned int h)
 {
-    return new DefaultDisplay(w, h, gf);
+    return new DefaultDisplay(w, h);
 }
 
 void BackendExitCallback()
@@ -125,7 +124,7 @@ int main(int argc, char **argv)
         POVMS_Object backendMessage;
         SimpleFrontend<ParserMessageHandler, FileMessageHandler, RenderMessageHandler, ImageMessageHandler>
                        frontend(frontendContext, backendAddress, backendMessage,
-                       boost::bind(CreateDefaultConsole), boost::bind(CreateDefaultDisplay, _1, _2, _3));
+                       boost::bind(CreateDefaultConsole), boost::bind(CreateDefaultDisplay, _1, _2));
 
         // Print help screens
         if(argc == 1)

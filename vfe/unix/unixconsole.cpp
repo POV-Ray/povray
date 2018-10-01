@@ -37,9 +37,6 @@
 #include <csignal>
 #include <cstdlib>
 
-// Boost header files
-#include <boost/shared_ptr.hpp>
-
 // Other library header files
 #include <termios.h>
 #include <unistd.h>
@@ -147,7 +144,7 @@ static void ProcessSignal (void)
     gSignalNumber = 0;
 }
 
-static vfeDisplay *UnixDisplayCreator (unsigned int width, unsigned int height, GammaCurvePtr gamma, vfeSession *session, bool visible)
+static vfeDisplay *UnixDisplayCreator (unsigned int width, unsigned int height, vfeSession *session, bool visible)
 {
     UnixDisplay *display = GetRenderWindow () ;
     switch (gDisplayMode)
@@ -156,16 +153,16 @@ static vfeDisplay *UnixDisplayCreator (unsigned int width, unsigned int height, 
         case DISP_MODE_SDL:
             if (display != nullptr && display->GetWidth() == width && display->GetHeight() == height)
             {
-                UnixDisplay *p = new UnixSDLDisplay (width, height, gamma, session, false) ;
+                UnixDisplay *p = new UnixSDLDisplay (width, height, session, false) ;
                 if (p->TakeOver (display))
                     return p;
                 delete p;
             }
-            return new UnixSDLDisplay (width, height, gamma, session, visible) ;
+            return new UnixSDLDisplay (width, height, session, visible) ;
             break;
 #endif
         case DISP_MODE_TEXT:
-            return new UnixTextDisplay (width, height, gamma, session, visible) ;
+            return new UnixTextDisplay (width, height, session, visible) ;
             break;
         default:
             return nullptr;

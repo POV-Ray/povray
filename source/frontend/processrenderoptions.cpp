@@ -43,6 +43,7 @@
 #include "base/fileutil.h"
 #include "base/platformbase.h"
 #include "base/image/colourspace.h"
+#include "base/image/dither.h"
 #include "base/image/encoding.h"
 
 // POV-Ray header files (POVMS module)
@@ -85,7 +86,7 @@ using namespace pov_base;
    the specifications provided in this table. The first element is the
    INI-file keyword, the second element is the POVMS object attribute
    key, the third is the attribute type. Entries with a POVMS attribute
-   key of 0 are superceded options that will generate a warning that the
+   key of 0 are obsolete options that will generate a warning that the
    option no longer is supported and will generate an error in a later
    (unspecified) version of POV.
 */
@@ -93,10 +94,11 @@ struct ProcessOptions::INI_Parser_Table RenderOptions_INI_Table[] =
 {
     { "All_Console",         kPOVAttrib_AllConsole,         kPOVMSType_Bool },
     { "All_File",            kPOVAttrib_AllFile,            kPOVMSType_UCS2String },
-    { "Antialias_Depth",     kPOVAttrib_AntialiasDepth,     kPOVMSType_Int },
     { "Antialias",           kPOVAttrib_Antialias,          kPOVMSType_Bool },
-    { "Antialias_Threshold", kPOVAttrib_AntialiasThreshold, kPOVMSType_Float },
+    { "Antialias_Confidence",kPOVAttrib_AntialiasConfidence,kPOVMSType_Float },
+    { "Antialias_Depth",     kPOVAttrib_AntialiasDepth,     kPOVMSType_Int },
     { "Antialias_Gamma",     kPOVAttrib_AntialiasGamma,     kPOVMSType_Float },
+    { "Antialias_Threshold", kPOVAttrib_AntialiasThreshold, kPOVMSType_Float },
     { "Append_File",         kPOVAttrib_AppendConsoleFiles, kPOVMSType_Bool },
 
     { "Bits_Per_Color",      kPOVAttrib_BitsPerColor,       kPOVMSType_Int,         kINIOptFlag_SuppressWrite },
@@ -205,6 +207,7 @@ struct ProcessOptions::INI_Parser_Table RenderOptions_INI_Table[] =
     { "Start_Row",           kPOVAttrib_Top,                kPOVMSType_Float },
     { "Statistic_Console",   kPOVAttrib_StatisticsConsole,  kPOVMSType_Bool },
     { "Statistic_File",      kPOVAttrib_StatisticsFile,     kPOVMSType_UCS2String },
+    { "Stochastic_Seed",     kPOVAttrib_StochasticSeed,     kPOVMSType_Int },
     { "Subset_End_Frame",    kPOVAttrib_SubsetEndFrame,     kPOVMSType_Float },
     { "Subset_Start_Frame",  kPOVAttrib_SubsetStartFrame,   kPOVMSType_Float },
 
@@ -246,6 +249,7 @@ struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
 {
     //       Parameter setting              Parameter type          Boolean setting
 
+    { "AC",  kPOVAttrib_AntialiasConfidence,kPOVMSType_Float,       kNoParameter },
     { "AG",  kPOVAttrib_AntialiasGamma,     kPOVMSType_Float,       kNoParameter },
     { "AM",  kPOVAttrib_SamplingMethod,     kPOVMSType_Int,         kNoParameter },
     { "A",   kPOVAttrib_AntialiasThreshold, kPOVMSType_Float,       kPOVAttrib_Antialias,           kCmdOptFlag_Optional },
@@ -318,6 +322,7 @@ struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
     { "SF",  kPOVAttrib_SubsetStartFrame,   kPOVMSType_Int,         kNoParameter },
     { "SP",  kPOVAttrib_PreviewStartSize,   kPOVMSType_Int,         kNoParameter },
     { "SR",  kPOVAttrib_Top,                kPOVMSType_Float,       kNoParameter },
+    { "SS",  kPOVAttrib_StochasticSeed,     kPOVMSType_Int,         kNoParameter },
     { "STP", kPOVAttrib_FrameStep,          kPOVMSType_Int,         kNoParameter },
     { "SU",  kNoParameter,                  kNoParameter,           kPOVAttrib_SplitUnions },
 
@@ -342,7 +347,6 @@ struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
     { nullptr }
 };
 
-// TODO FIXME - The following are hacks of some sort, no idea what they are good for. They certainly use wrong types and probably contain other mistakes [trf]
 extern struct ProcessRenderOptions::Parameter_Code_Table DitherMethodTable[];
 
 ProcessRenderOptions::ProcessRenderOptions() : ProcessOptions(RenderOptions_INI_Table, RenderOptions_Cmd_Table)
@@ -573,25 +577,22 @@ int ProcessRenderOptions::ReadSpecialSwitchHandler(Cmd_Parser_Table *option, cha
                 err = POVMSUtil_SetInt(obj, option->key, intval);
                 file_type = *param++;
             }
+            if ((err == kNoErr) && (tolower(*param) == 'g'))
+            {
+                if(!has16BitGrayscale)
+                {
+                    ParseError("Grayscale not currently supported with output file format '%c'.", file_type);
+                    err = kParamErr;
+                }
+                else
+                {
+                    err = POVMSUtil_SetBool(obj, kPOVAttrib_GrayscaleOutput, true);
+                    ++param;
+                }
+            }
             if ((err == kNoErr) && (*param > ' '))
             {
-                if (tolower(*param) == 'g')
-                {
-                    if(!has16BitGrayscale)
-                    {
-                        ParseError("Grayscale not currently supported with output file format '%c'.", file_type);
-                        err = kParamErr;
-                    }
-                    else
-                    {
-                        if ((err = POVMSUtil_SetBool(obj, kPOVAttrib_GrayscaleOutput, true)) == kNoErr && *++param > ' ')
-                        {
-                            ParseError("Unexpected '%s' following grayscale flag in +F%c option.", param, file_type);
-                            err = kParamErr;
-                        }
-                    }
-                }
-                else if (isdigit(*param) != 0)
+                if (isdigit(*param) != 0)
                 {
                     if (sscanf(param, "%d%n", &intval, &intval2) == 1)
                     {
@@ -1072,7 +1073,7 @@ struct ProcessRenderOptions::Output_FileType_Table FileTypeTable[] =
 #endif // POV_SYS_IMAGE_TYPE
 
     //  [1] Alpha support for BMP uses an unofficial extension to the BMP file format, which is not recognized by
-    //      most image pocessing software.
+    //      most image processing software.
 
     //  [2] While OpenEXR does support greyscale output at >8 bits, the variants currently supported by POV-Ray
     //      use 16-bit floating-point values with 10 bit mantissa, which might be insufficient for various purposes
@@ -1087,12 +1088,12 @@ struct ProcessRenderOptions::Parameter_Code_Table GammaTypeTable[] =
 {
 
     // code,        internalId,
-    { "BT709",      kPOVList_GammaType_BT709 },
-    { "BT2020",     kPOVList_GammaType_BT2020 },
-    { "SRGB",       kPOVList_GammaType_SRGB },
+    { "BT709",      kPOVList_GammaType_BT709,           "ITU-R BT.709 transfer function" },
+    { "BT2020",     kPOVList_GammaType_BT2020,          "ITU-R BT.2020 transfer function" },
+    { "SRGB",       kPOVList_GammaType_SRGB,            "sRGB transfer function" },
 
     // end-of-list marker
-    { nullptr,      0 }
+    { nullptr,      0,                                  "(unknown)" }
 };
 
 /* Supported dither types */
@@ -1100,15 +1101,23 @@ struct ProcessRenderOptions::Parameter_Code_Table DitherMethodTable[] =
 {
 
     // code,    internalId,
-    { "B2",     kPOVList_DitherMethod_Bayer2x2 },
-    { "B3",     kPOVList_DitherMethod_Bayer3x3 },
-    { "B4",     kPOVList_DitherMethod_Bayer4x4 },
-    { "D1",     kPOVList_DitherMethod_Diffusion1D },
-    { "D2",     kPOVList_DitherMethod_Diffusion2D },
-    { "FS",     kPOVList_DitherMethod_FloydSteinberg },
+    { "AT",     int(DitherMethodId::kAtkinson),         "Atkinson error diffusion" },
+    { "B2",     int(DitherMethodId::kBayer2x2),         "2x2 Bayer pattern" },
+    { "B3",     int(DitherMethodId::kBayer3x3),         "3x3 Bayer pattern" },
+    { "B4",     int(DitherMethodId::kBayer4x4),         "4x4 Bayer pattern" },
+    { "BK",     int(DitherMethodId::kBurkes),           "Burkes error diffusion" },
+    { "BNX",    int(DitherMethodId::kBlueNoiseX),       "Blue noise pattern (inverted for Red/Blue)" },
+    { "BN",     int(DitherMethodId::kBlueNoise),        "Blue noise pattern" },
+    { "D1",     int(DitherMethodId::kDiffusion1D),      "Simple 1-D error diffusion" },
+    { "D2",     int(DitherMethodId::kSierraLite),       "Simple 2-D error diffusion (Sierra Lite)" },
+    { "FS",     int(DitherMethodId::kFloydSteinberg),   "Floyd-Steinberg error diffusion" },
+    { "JN",     int(DitherMethodId::kJarvisJudiceNinke),"Jarvis-Judice-Ninke error diffusion" },
+    { "S2",     int(DitherMethodId::kSierra2),          "Two-row Sierra error diffusion" },
+    { "S3",     int(DitherMethodId::kSierra3),          "Sierra error diffusion" },
+    { "ST",     int(DitherMethodId::kStucki),           "Stucki error diffusion" },
 
     // end-of-list marker
-    { nullptr,  0 }
+    { nullptr,  0,                                      "(unknown)" }
 };
 
 int ProcessRenderOptions::ParseFileType(char code, POVMSType attribute, int* pInternalId, bool* pHas16BitGreyscale)
@@ -1169,6 +1178,16 @@ const char* ProcessRenderOptions::UnparseGammaType(int gammaType)
     return UnparseParameterCode(GammaTypeTable, gammaType);
 }
 
+const char* ProcessRenderOptions::GetGammaTypeText(int gammaType)
+{
+    return GetParameterCodeText(GammaTypeTable, gammaType);
+}
+
+const char* ProcessRenderOptions::GetDitherMethodText(int ditherMethod)
+{
+    return GetParameterCodeText(DitherMethodTable, ditherMethod);
+}
+
 int ProcessRenderOptions::ParseParameterCode(const ProcessRenderOptions::Parameter_Code_Table* codeTable, char* code, int* pInternalId)
 {
     for (int i = 0; code[i] != '\0'; i ++)
@@ -1190,6 +1209,15 @@ const char* ProcessRenderOptions::UnparseParameterCode(const ProcessRenderOption
         if (internalId == codeTable[i].internalId)
             return codeTable[i].code;
     return nullptr;
+}
+
+const char* ProcessRenderOptions::GetParameterCodeText(const ProcessRenderOptions::Parameter_Code_Table* codeTable, int internalId)
+{
+    int i;
+    for (i = 0; codeTable[i].code != nullptr; i++)
+        if (internalId == codeTable[i].internalId)
+            break;
+    return codeTable[i].text;
 }
 
 }

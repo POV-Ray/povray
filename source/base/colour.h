@@ -1228,6 +1228,14 @@ inline T ColourDistanceRGBT (const GenericRGBTColour<T>& a, const GenericRGBTCol
 template<typename T>
 inline GenericRGBTColour<T> Sqr(const GenericRGBTColour<T>& a) { return a * a; }
 
+/// @relates GenericRGBTColour
+template<typename T>
+inline GenericRGBTColour<T> Sqrt(const GenericRGBTColour<T>& a)
+{
+    return GenericRGBTColour<T>(Sqrt(a.rgb()),
+                                sqrt(a.transm()));
+}
+
 typedef GenericRGBTColour<ColourChannel>        RGBTColour;         ///< Standard precision RGBxT colour.
 typedef GenericRGBTColour<PreciseColourChannel> PreciseRGBTColour;  ///< High precision RGBxT colour.
 
