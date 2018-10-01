@@ -315,6 +315,7 @@ DiffusionDither::~DiffusionDither()
 {
     for (unsigned int i = 0; i < mMatrix.Rows(); ++i)
         delete[] maaErrorBuffer[i];
+    delete[] maaErrorBuffer;
 }
 
 void DiffusionDither::GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt)
