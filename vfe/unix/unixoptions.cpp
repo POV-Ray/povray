@@ -67,6 +67,7 @@ namespace vfePlatform
         UnixOptionsProcessor::Option_Info("general", "version", "off", false, "--version|-version|--V", "", "display program version"),
         UnixOptionsProcessor::Option_Info("general", "generation", "off", false, "--generation", "", "display program generation (short version number)"),
         UnixOptionsProcessor::Option_Info("general", "benchmark", "off", false, "--benchmark|-benchmark", "", "run the standard POV-Ray benchmark"),
+        UnixOptionsProcessor::Option_Info("display", "window", "-1", true, "--preview|-y", "POV_PREVIEW", "choice of handler for preview"),
         UnixOptionsProcessor::Option_Info("", "", "", false, "", "", "") // has to be last
     };
 
