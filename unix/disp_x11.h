@@ -118,9 +118,6 @@ namespace pov_frontend
             uint_least8_t rs, gs, bs;
             /// for mixing colors in scaled down display
             vector<unsigned char> m_PxCount;
-            // handle errors
-            static int HandleXError( ::Display *ErrorDisplay, XErrorEvent *ErrorEvent);
-            static int HandleXIOError( ::Display *ErrorDisplay );
     };
 }
 

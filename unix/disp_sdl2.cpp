@@ -196,11 +196,11 @@ namespace pov_frontend
 
         boost::format f;
         if (m_display_scaled)
-            f = boost::format(PACKAGE_NAME " " VERSION_BASE " SDL2 display (scaled at %.0f%%) %s")
+            f = boost::format(PACKAGE_NAME " " VERSION_BASE " SDL2 (scaled at %.0f%%) %s")
                 % (m_display_scale*100)
                 % (paused ? " [paused]" : "");
         else
-            f = boost::format(PACKAGE_NAME " " VERSION_BASE " SDL2 display %s")
+            f = boost::format(PACKAGE_NAME " " VERSION_BASE " SDL2 %s")
                 % (paused ? " [paused]" : "");
 		SDL_SetWindowTitle(m_window, f.str().c_str());
     }
@@ -273,6 +273,23 @@ namespace pov_frontend
          * default background is pitch black
          */
         SDL_FillRect(m_screen, NULL, (Uint32)0x00000000);
+        RGBA8 colour;
+        colour.red = 255;
+        colour.green = 255;
+        colour.blue = 255;
+        colour.alpha = 0;
+
+        for(int i=0;i<height;++i)
+        {
+          for(int j = 0;j<width;++j)
+          {
+            if ((i^j)&4)
+            {
+              SetPixel( i,j, colour);
+            }
+          }
+        }
+
 
         if ((width == GetWidth()) && (height == GetHeight()))
         {

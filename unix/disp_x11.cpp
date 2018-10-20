@@ -65,8 +65,6 @@ namespace pov_frontend
     static char theCLASS[] =     "Povray" ;     /* Should begin with a capital */
     static char theNAME[] =      "povray" ;     /* for the property */
     static char theICONNAME[] =  "POV-Ray";     /* short name for the icon */
-    static Atom          WM_PROTOCOLS;         /* a window manager protocol msg */
-    static Atom          WM_DELETE_WINDOW;     /* if window manager kills app */
 
     extern shared_ptr<Display> gDisplay;
 
@@ -204,11 +202,11 @@ namespace pov_frontend
 
         boost::format f;
         if (m_display_scaled)
-            f = boost::format(PACKAGE_NAME " " VERSION_BASE " X11 display (scaled at %.0f%%) %s")
+            f = boost::format(PACKAGE_NAME " " VERSION_BASE " X11 (scaled at %.0f%%) %s")
                 % (m_display_scale*100)
                 % (paused ? " [paused]" : "");
         else
-            f = boost::format(PACKAGE_NAME " " VERSION_BASE " X11 display %s")
+            f = boost::format(PACKAGE_NAME " " VERSION_BASE " X11 %s")
                 % (paused ? " [paused]" : "");
         XStoreName(theDisplay, theWindow, f.str().c_str());
     }
@@ -224,8 +222,6 @@ namespace pov_frontend
             Visual *theVisual;
             unsigned long        theWindowMask;
 
-            XSetErrorHandler(&HandleXError);
-            XSetIOErrorHandler(&HandleXIOError);
             int theScreen = DefaultScreen(theDisplay);
             int width = GetWidth();
             int height = GetHeight();
@@ -264,10 +260,10 @@ namespace pov_frontend
             XSetWindowAttributes theWindowAttributes;
 
             theWindowAttributes.backing_store    = WhenMapped;
-            theWindowAttributes.background_pixel = BlackPixel(theDisplay, theScreen);
+            theWindowAttributes.background_pixel = WhitePixel(theDisplay, theScreen);
             theWindowAttributes.border_pixel     = BlackPixel(theDisplay, theScreen);
             theWindowAttributes.colormap         = theColormap;
-            theWindowAttributes.event_mask       = ExposureMask;
+            theWindowAttributes.event_mask       = NoEventMask;
             theWindowMask = CWBackingStore | CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
 #ifdef USE_CURSOR
             if ((theCursor = XCreateFontCursor(theDisplay, XC_watch)) != (Cursor)None)
@@ -380,16 +376,12 @@ namespace pov_frontend
              * handling input for this window.
              */
 
-            XSelectInput(theDisplay, theWindow,(ButtonPressMask | KeyPressMask | ExposureMask | StructureNotifyMask));
+            XSelectInput(theDisplay, theWindow,
+                (
+                 ButtonPressMask | 
+                 KeyPressMask | 
+                 StructureNotifyMask));
 
-            /*
-             * This tells the window manager that we want to know if the window is
-             * being killed so we can catch it and do an orderly shutdown.
-             */
-            WM_DELETE_WINDOW = XInternAtom(theDisplay, "WM_DELETE_WINDOW", False);
-            WM_PROTOCOLS = XInternAtom(theDisplay, "WM_PROTOCOLS", False);
-
-            XSetWMProtocols(theDisplay, theWindow, &WM_DELETE_WINDOW, 1);
             /*
              * Now, could we please see the window on the screen?  Until now, we have
              * dealt with a window which has been created but has not appeared on the
@@ -406,19 +398,40 @@ namespace pov_frontend
 
             theImage->data = (char *)calloc(1, size);
             XInitImage( theImage );
-            // get the shift
-            switch( theImage->byte_order )
+            // get the shift for each component
+            rs=0;
+            gs=0;
+            bs=0;
+            unsigned long m = theImage->red_mask;
+            while(!(m&1))
             {
-                case LSBFirst:
-                    rs = 16;
-                    gs = 8;
-                    bs = 0;
-                    break;
-                case MSBFirst:
-                    rs = 0;
-                    gs = 8;
-                    bs = 16;
-                    break;
+              ++rs;
+              m>>=1;
+            }
+            m = theImage->green_mask;
+            while(!(m&1))
+            {
+              ++gs;
+              m>>=1;
+            }
+            m = theImage->blue_mask;
+            while(!(m&1))
+            {
+              ++bs;
+              m>>=1;
+            }
+            // set initial pattern
+            unsigned long c;
+            c = (1ULL<<theDepth)-1;
+            for(int i=0;i<height;++i)
+            {
+              for(int j = 0;j<width;++j)
+              {
+                if ((i^j)&4)
+                {
+                  XPutPixel( theImage, i,j, c);
+                }
+              }
             }
 
             XPutImage(theDisplay, theWindow, theGC, theImage, 0, 0, 0, 0, width, height);
@@ -633,7 +646,7 @@ namespace pov_frontend
     {
         if (!m_valid)
             return;
-        fprintf(stderr, "Press p, q, enter or click the display to continue...");
+        fprintf(stderr, "Press p, q, enter or press button 1 over displayed image to continue...");
         SetCaption(true);
     }
 
@@ -653,7 +666,11 @@ namespace pov_frontend
         XEvent event;
         bool do_quit = false;
 
-        while (XCheckMaskEvent(theDisplay, (ButtonPressMask |KeyPressMask|StructureNotifyMask|ExposureMask), &event))
+        while (XCheckMaskEvent(theDisplay, (
+                ButtonPressMask |
+                KeyPressMask|
+                StructureNotifyMask
+                ), &event))
         {
             switch (event.type)
             {
@@ -673,10 +690,10 @@ namespace pov_frontend
                     }
                     break;
                 case ButtonPress:
-                    switch( event.xbutton.button )
+                    // button 1 was not pressed (state) and the event is about button1 : so it get pressed now
+                    if ((!( event.xbutton.state & Button1Mask )) &&( event.xbutton.button == Button1))
                     {
-                        case Button1:
-                            do_quit = true;
+                        do_quit = true;
                     }
                     break;
                 case MapNotify:
@@ -685,9 +702,6 @@ namespace pov_frontend
                     }
                 case DestroyNotify:
                     do_quit=true;
-                    break;
-                case Expose:
-                    XPutImage( theDisplay, theWindow, theGC, theImage, event.xexpose.x, event.xexpose.y, event.xexpose.x, event.xexpose.y, event.xexpose.width, event.xexpose.height);
                     break;
             }
         }
@@ -704,7 +718,10 @@ namespace pov_frontend
 
         bool do_quit = false;
 
-        while (XCheckMaskEvent(theDisplay, ButtonPressMask|ExposureMask|KeyPressMask|StructureNotifyMask, &event))
+        // consum all requested events, including button press, even for doing nothing
+        while (XCheckMaskEvent(theDisplay, 
+              ButtonPressMask| 
+              KeyPressMask|StructureNotifyMask, &event))
         {
             switch (event.type)
             {
@@ -746,9 +763,6 @@ namespace pov_frontend
                 case DestroyNotify:
                     do_quit=true;
                     break;
-                case Expose:
-                    XPutImage( theDisplay, theWindow, theGC, theImage, event.xexpose.x, event.xexpose.y, event.xexpose.x, event.xexpose.y, event.xexpose.width, event.xexpose.height);
-                    break;
             }
             if (do_quit)
                 break;
@@ -756,30 +770,6 @@ namespace pov_frontend
 
         return do_quit;
     }
-
-    int UnixX11Display::HandleXError( ::Display *ErrorDisplay, XErrorEvent *ErrorEvent)
-    {
-        char message[130];
-
-        XGetErrorText(ErrorDisplay, ErrorEvent->error_code, message, 125);
-        std::cerr << "\nX error: " << message << std::endl;
-
-        return (true);  /* Return value is needed, but is actually ignored */
-    }
-
-    int UnixX11Display::HandleXIOError( ::Display *ErrorDisplay )
-    {
-        UnixX11Display *p = dynamic_cast<UnixX11Display *>( GetRenderWindow ());
-
-        if (p)
-            p->theDisplay = NULL;
-
-        std::cerr << "\nFatal X Windows error on " << XDisplayName(NULL) << std::endl;
-
-        return (true);  /* Return value is needed, but is actually ignored */
-    }
-
-
 }
 
 #endif /* X_DISPLAY_MISSING */
