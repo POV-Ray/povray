@@ -45,12 +45,11 @@
 #include <algorithm>
 
 #ifdef HAVE_LIBXPM
-# include <X11/xpm.h>
-# include "xpovicon.xpm" /* This is the color POV icon */
-# include "xbgmap.xpm"   /* This is the white/gray checker background */
+#include <X11/xpm.h>
+#include "xpovicon.xpm" /* This is the color POV icon */
 #else
-# include "xpovicon.xbm" /* This is the black & white POV icon */
-# include "xpovmask.xbm" /* This is the transparency mask for the icon */
+#include "xpovicon.xbm" /* This is the black & white POV icon */
+#include "xpovmask.xbm" /* This is the transparency mask for the icon */
 #endif
 
 
