@@ -513,51 +513,46 @@ int main (int argc, char **argv)
       /* tricky part, -1 is choose the top available (oh, the personal taste...)
        * for more direct choice, degrade to DISP_MODE_NODE when not available
        */
-      int choice = session->GetUnixOptions()->QueryOptionInt("display","window", -1);
-      switch(choice)
+      string choice = session->GetUnixOptions()->QueryOptionString("display","window");
+#ifndef X_DISPLAY_MISSING
+      if (choice == "x11")
       {
-        case -1:
-#ifdef HAVE_LIBSDL2
-          gDisplayMode = DISP_MODE_SDL2;
-#else
-#ifdef HAVE_LIBSDL
-          gDisplayMode = DISP_MODE_SDL;
-#else
-#ifndef X_DISPLAY_MISSING
           gDisplayMode = DISP_MODE_X11;
-#else
-          gDisplayMode = DISP_MODE_TEXT;
-#endif 
-#endif 
-#endif 
-          break;
-
-#ifndef X_DISPLAY_MISSING
-        case DISP_MODE_X11:
-          gDisplayMode = DISP_MODE_X11;
-          break;
-#endif
-#ifdef HAVE_LIBSDL2
-        case DISP_MODE_SDL2:
-        case DISP_MODE_SDL:
-          gDisplayMode = DISP_MODE_SDL2;
-          break;
-#endif 
-#ifdef HAVE_LIBSDL
-        case DISP_MODE_SDL2:
-        case DISP_MODE_SDL:
-          gDisplayMode = DISP_MODE_SDL;
-          break;
-#endif 
-        case DISP_MODE_TEXT:
-          gDisplayMode = DISP_MODE_TEXT;
-          break;
-        default:
-          gDisplayMode = DISP_MODE_NONE;
-          break;
-
       }
-
+      else if (choice == "sdl")
+      {
+#ifdef HAVE_LIBSDL2
+          gDisplayMode = DISP_MODE_SDL2;
+#else
+#ifdef HAVE_LIBSDL
+          gDisplayMode = DISP_MODE_SDL;
+#else
+          gDisplayMode = DISP_MODE_TEXT;
+#endif 
+#endif 
+      }
+      else
+#endif
+      if (choice == "text")
+      {
+          gDisplayMode = DISP_MODE_TEXT;
+      }
+      else
+      {
+#ifdef HAVE_LIBSDL2
+          gDisplayMode = DISP_MODE_SDL2;
+#else
+#ifdef HAVE_LIBSDL
+          gDisplayMode = DISP_MODE_SDL;
+#else
+#ifndef X_DISPLAY_MISSING
+          gDisplayMode = DISP_MODE_X11;
+#else
+          gDisplayMode = DISP_MODE_TEXT;
+#endif 
+#endif 
+#endif 
+      }
     }
     if (session->GetUnixOptions()->isOptionSet("general", "help"))
     {

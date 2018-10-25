@@ -285,7 +285,7 @@ namespace pov_frontend
           {
             if ((i^j)&4)
             {
-              SetPixel( i,j, colour);
+              SetPixel( j,i, colour);
             }
           }
         }

@@ -428,7 +428,7 @@ namespace pov_frontend
               {
                 if ((i^j)&4)
                 {
-                  XPutPixel( theImage, i,j, c);
+                  XPutPixel( theImage, j,i, c);
                 }
               }
             }
