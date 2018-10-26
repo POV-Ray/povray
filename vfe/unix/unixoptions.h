@@ -198,14 +198,16 @@ namespace vfePlatform
             }
 
             /// compares sections (for sorting)
+            // [JG] was reversed in previous versions, must return true when (*this) < other
+            // order is per Section then per Name
             bool operator<(Option_Info const& other) const
             {
                 if (to_lower_copy(other.Section) < to_lower_copy(Section))
-                    return true;
+                    return false;
                 if (to_lower_copy(other.Section) == to_lower_copy(Section))
                     if (to_lower_copy(other.Name) < to_lower_copy(Name))
-                        return true;
-                return false;
+                        return false;
+                return true;
             }
         };
 
