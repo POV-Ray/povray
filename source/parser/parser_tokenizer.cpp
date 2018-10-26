@@ -1551,6 +1551,7 @@ void Parser::Read_Symbol()
                             c = Echo_getc();
                             Echo_ungetc(c);
 
+                            SYM_TABLE* parentTable = table;
                             if (pseudoDictionary >= 0)
                             {
                                 table = Tables [pseudoDictionary];
@@ -1600,6 +1601,7 @@ void Parser::Read_Symbol()
                             else
                             {
                                 breakLoop = true;
+                                table = parentTable;
                                 break;
                             }
 

@@ -315,6 +315,7 @@ DiffusionDither::~DiffusionDither()
 {
     for (unsigned int i = 0; i < mMatrix.Rows(); ++i)
         delete[] maaErrorBuffer[i];
+    delete[] maaErrorBuffer;
 }
 
 void DiffusionDither::GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt)
@@ -396,21 +397,21 @@ DitherStrategySPtr GetDitherStrategy(DitherMethodId method, unsigned int imageWi
     DitherStrategySPtr s;
     switch (method)
     {
-        case DitherMethodId::kNone:             s = std::make_shared<NoDither> ();
-        case DitherMethodId::kDiffusion1D:      s = std::make_shared<DiffusionDither1D> ();
-        case DitherMethodId::kSierraLite:       s = std::make_shared<SierraLiteDither> (imageWidth);
-        case DitherMethodId::kFloydSteinberg:   s = std::make_shared<FloydSteinbergDither> (imageWidth);
-        case DitherMethodId::kBayer2x2:         s = std::make_shared<OrderedDither> (BayerMatrix2, imageWidth);
-        case DitherMethodId::kBayer3x3:         s = std::make_shared<OrderedDither> (BayerMatrix3, imageWidth);
-        case DitherMethodId::kBayer4x4:         s = std::make_shared<OrderedDither> (BayerMatrix4, imageWidth);
-        case DitherMethodId::kBlueNoise:        s = std::make_shared<OrderedDither> (BlueNoise64a, imageWidth);
-        case DitherMethodId::kBlueNoiseX:       s = std::make_shared<OrderedDither> (BlueNoise64a, imageWidth, true);
-        case DitherMethodId::kAtkinson:         s = std::make_shared<DiffusionDither> (AtkinsonMatrix, imageWidth);
-        case DitherMethodId::kBurkes:           s = std::make_shared<DiffusionDither> (BurkesMatrix, imageWidth);
-        case DitherMethodId::kJarvisJudiceNinke:s = std::make_shared<DiffusionDither> (JarvisJudiceNinkeMatrix, imageWidth);
-        case DitherMethodId::kSierra3:          s = std::make_shared<DiffusionDither> (Sierra3Matrix, imageWidth);
-        case DitherMethodId::kSierra2:          s = std::make_shared<DiffusionDither> (Sierra2Matrix, imageWidth);
-        case DitherMethodId::kStucki:           s = std::make_shared<DiffusionDither> (StuckiMatrix, imageWidth);
+        case DitherMethodId::kNone:             s = std::make_shared<NoDither> ();                                          break;
+        case DitherMethodId::kDiffusion1D:      s = std::make_shared<DiffusionDither1D> ();                                 break;
+        case DitherMethodId::kSierraLite:       s = std::make_shared<SierraLiteDither> (imageWidth);                        break;
+        case DitherMethodId::kFloydSteinberg:   s = std::make_shared<FloydSteinbergDither> (imageWidth);                    break;
+        case DitherMethodId::kBayer2x2:         s = std::make_shared<OrderedDither> (BayerMatrix2, imageWidth);             break;
+        case DitherMethodId::kBayer3x3:         s = std::make_shared<OrderedDither> (BayerMatrix3, imageWidth);             break;
+        case DitherMethodId::kBayer4x4:         s = std::make_shared<OrderedDither> (BayerMatrix4, imageWidth);             break;
+        case DitherMethodId::kBlueNoise:        s = std::make_shared<OrderedDither> (BlueNoise64a, imageWidth);             break;
+        case DitherMethodId::kBlueNoiseX:       s = std::make_shared<OrderedDither> (BlueNoise64a, imageWidth, true);       break;
+        case DitherMethodId::kAtkinson:         s = std::make_shared<DiffusionDither> (AtkinsonMatrix, imageWidth);         break;
+        case DitherMethodId::kBurkes:           s = std::make_shared<DiffusionDither> (BurkesMatrix, imageWidth);           break;
+        case DitherMethodId::kJarvisJudiceNinke:s = std::make_shared<DiffusionDither> (JarvisJudiceNinkeMatrix, imageWidth);break;
+        case DitherMethodId::kSierra3:          s = std::make_shared<DiffusionDither> (Sierra3Matrix, imageWidth);          break;
+        case DitherMethodId::kSierra2:          s = std::make_shared<DiffusionDither> (Sierra2Matrix, imageWidth);          break;
+        case DitherMethodId::kStucki:           s = std::make_shared<DiffusionDither> (StuckiMatrix, imageWidth);           break;
     }
     return s;
 }
