@@ -544,7 +544,7 @@ HEIGHT_FIELD:
     [OBJECT_MODIFIER...]
     }
 HF_TYPE:
-  exr | gif | hdr | iff | jpeg | pgm | png | pot | ppm | sys | tga | tiff
+  exr | gif | hdr | jpeg | pgm | png | pot | ppm | sys | tga | tiff
 GAMMA:
   Float_Value | srgb | bt709 | bt2020
 HF_FUNCTION:
@@ -1148,7 +1148,9 @@ It is a line tangent to the curve at point 1. The greater the distance between 1
 <p>You should note that the number of spline segments, i. e. curves between two points, depends on the spline type used. For linear splines you get n-1 segments connecting the points P[i], i=1,...,n. A quadratic spline gives you n-2 segments because the last point is only used for determining the slope, as explained above (thus you will need at least three points to define a
 quadratic spline). The same holds for cubic splines where you get n-3 segments with the first and last point used only for slope calculations (thus needing at least four points). The bezier spline requires 4 points per segment, creating n/4 segments.</p>
 <p>If you want to get a closed quadratic and cubic spline with smooth transitions at the end points you have to make sure that in the cubic case P[n-1] = P[2] (to get a closed curve), P[n] = P[3] and P[n-2] = P[1] (to smooth the transition). In the quadratic case P[n-1] = P[1] (to close the curve) and P[n] = P[2].</p>
-<p>The surface normal determination for lathes depends upon the order in which the splines points are specified.  The following code will render with the color Red on the outside and the color Blue on the inside.</p>
+<p>The surface normal determination for lathes depends upon the order in which the splines points are specified. For <code>interior_texture</code> to work as expected, the outline of the underlying 2D shape must be specified in counter-clockwise order, except for holes which must be specified in clockwise order, and they must not self-intersect.</p>
+
+<p>The following code will render with the color Red on the outside and the color Blue on the inside.</p>
 <pre>
 #declare Lathe_InitialOrder = lathe {
     bezier_spline
@@ -1469,7 +1471,9 @@ prism {
 <p>The <code>bezier_spline</code> is an alternate kind of cubic spline. Points 1 and 4 specify the end points of a segment and points 2 and 3 are control points which specify the slope at the endpoints. Points 2 and 3 do not actually lie on the spline. They adjust the slope of the spline. If you draw an imaginary line between point 1 and 2, it represents the slope at point 1. It is a line tangent to the curve at point 1. The greater the distance between 1 and 2, the flatter the curve. With a short tangent the spline can bend more. The same holds true for control point 3 and endpoint 4. If you want the spline to be smooth between segments, point 3 and 4 on one segment and point 1 and 2 on the next segment must form a straight line and point 4 of one segment must be the same as point one on the next segment.</p>
 <p>By default linear sweeping is used to create the prism, that is, the prism's walls are perpendicular to the x-z plane. The size of the curve does not change during the sweep. You can also use <code>conic_sweep</code> that leads to a prism with cone-like walls by scaling the curve down during the sweep.</p>
 <p>Like cylinders the prism is normally closed. You can remove the caps on the prism by using the <code>open</code> keyword. If you do, you should not use it in CSG operations, because the result may not be as expected.</p>
-<p>The surface normal determination for prism sides depends upon the order in which the splines points are specified.  Prism ends have normals which face outward at one end and inward at the other end.  The following code will render sides with the color Red on the outside and the color Blue on the inside.</p>
+<p>The surface normal determination for prism sides depends upon the order in which the splines points are specified.  Prism ends have normals which face outward at one end and inward at the other end. For <code>interior_texture</code> to work as expected, the outline of the underlying 2D shape must be specified in counter-clockwise order, except for holes which must be specified in clockwise order, and they must not self-intersect.</p>
+
+<p>The following code will render sides with the color Red on the outside and the color Blue on the inside.</p>
 <pre>
 #declare Prism_InitialOrder = prism {
     linear_spline
@@ -1492,7 +1496,6 @@ prism {
 }
 </pre>
 <p>The actual normal determination is more complicated for complex splines. If the surface normal is important to the visual result, it is best to check how the prism is being rendered by testing with substantially different inside and outside textures.</p>
-<p>There is presently a inconsistency with the bezier spline mode of the prism in that the point order with respect to side surface normals is reversed from all other prism spline types. The behavior of the bezier spline prism will likely be aligned with the other spline types in a later release. Further end behavior may be made consistent for all spline types.</p>
 <p>If additional accuracy is required you can add the <code><a href="r3_5.html#r3_5_1_5_11">sturm</a></code> object modifier.</p>
 <p>For an explanation of the spline concept read the description for the <a href="r3_5.html#r3_5_1_1_8">Lathe</a> object.</p>
 <p>See also the tutorials on <a href="t2_3.html#t2_3_1_1">Lathe</a> and <a href="t2_3.html#t2_3_1_3">Prism</a> objects.</p></div>

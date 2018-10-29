@@ -872,6 +872,7 @@ an easier means of doing the same thing).
 <code><a href="r3_3.html#r3_3_1_5_4">min</a></code><br>
 <code><a href="r3_3.html#r3_3_1_6_5">min_extent</a></code><br>
 <code><a href="r3_4.html#r3_4_3_3_3_10">minimum_reuse</a></code><br>
+<code><a href="r3_3.html#r3_3_1_10">mixed</a></code><br>
 <code><a href="r3_6.html#r3_6_1_3_3_4">mm_per_unit</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">mod</a></code><br>
 <code><a href="r3_6.html#r3_6_2_5">mortar</a></code><br>
@@ -3059,9 +3060,9 @@ parameter names.</p>
 <a name="r3_3_1_8_4"></a>
 <div class="content-level-h5" contains="Declaring User-Defined Vector Functions" id="r3_3_1_8_4">
 <h5>3.3.1.8.4 Declaring User-Defined Vector Functions</h5>
-<p>Right now you may only declare vector functions using one of the special
-function types. Supported types are <code>transform</code> and
-<code>spline</code> functions. For example:</p>
+<p>Right now you may only declare vector functions using one of the special function types. Supported types are <code>transform</code> and
+<code>spline</code> functions.</p>
+<p>For example:</p>
 
 <pre>
 #declare foo = function {
@@ -3084,13 +3085,9 @@ function types. Supported types are <code>transform</code> and
 
 #declare myvector2 = foo2(0.7);
 </pre>
-<p>Function splines take the vector size into account. That is, a function
-containing a spline with five components will also return a five component
-vector (aka a color), a function containing a spline with two components will
-only return a two component vector and so on.</p> 
+<p>Function transforms return a three component vector, while function splines take the vector size into account. That is, a function containing a spline with five components will also return a five component vector (aka a color), a function containing a spline with two components will only return a two component vector and so on.</p> 
 
-<p class="Note"><strong>Note:</strong> The number of parameters of special
-function types is determined automatically, so you do not need to specify
+<p class="Note"><strong>Note:</strong> The number of parameters of special function types is determined automatically, so you do not need to specify
 parameter names.</p>
 
 </div>
@@ -3460,7 +3457,7 @@ STRING_BUILT-IN_IDENT:
 <a name="r3_3_1_10"></a>
 <div class="content-level-h4" contains="Array" id="r3_3_1_10">
 <h4>3.3.1.10 Array</h4>
-<p>You may declare arrays of identifiers with up to five dimensions. Any item that can be declared as an identifier can be declared in an array. Consequential to the improvements with the classic <code>array</code> container topology, a <font class="New">New</font> feature in version 3.8 extended functionality to allow the creation of <code>dictionary</code> container types. Dictionaries can be used for mapping string keys to arbitrary-type values.</p>
+<p>You may declare arrays of identifiers with up to five dimensions. Any item that can be declared as an identifier can be declared in an array. Consequential to the improvements with the classic <code>array</code> container topology, two <font class="New">New</font> features in version 3.8 extended functionality to allow the creation of <code>dictionary</code> container types. Additionally arrays now support a mixed-type declaration. Dictionaries can be used for mapping string keys to arbitrary-type values. The mixed-type declaration allows the array to hold elements of different types.</p>
 
 </div>
 <a name="r3_3_1_10_1"></a>
@@ -3470,8 +3467,8 @@ STRING_BUILT-IN_IDENT:
 
 <pre>
 ARRAY_DECLARATION:
-  #declare IDENTIFIER = array[ INT ][[ INT ]]..[ARRAY_INITIALIZER] |
-  #local IDENTIFIER = array[ INT ][[ INT ]]..[ARRAY_INITIALIZER]
+  #declare IDENTIFIER = array [mixed] [[ INT ]]..[ARRAY_INITIALIZER] |
+  #local IDENTIFIER = array [mixed] [[ INT ]]..[ARRAY_INITIALIZER]
 ARRAY_INITIALIZER:
   {ARRAY_ITEM, [ARRAY_ITEM, ]... }
 ARRAY_ITEM:
@@ -3483,7 +3480,7 @@ DICTIONARY_DECLARATION:
 DICTIONARY_INITIALIZER:
   {DICTIONARY_ITEM, [DICTIONARY_ITEM, ]... }
 DICTIONARY_ITEM:
-  ["STRING"]: DICTIONARY_ENTRY | .STRING_IDENTIFIER: DICTIONARY_ENTRY
+  [ STRING ] : DICTIONARY_ENTRY | .STRING_IDENTIFIER: DICTIONARY_ENTRY
 DICTIONARY_ENTRY:
   Any valid array entry
 </pre>
@@ -3500,7 +3497,7 @@ DICTIONARY_ENTRY:
 #declare MyArray = array[10]
 </pre>
 
-<p>It declares an uninitialized array of ten elements. The elements are referenced as <code>MyArray[0]</code> through <code>MyArray[9]</code>. As yet, the type of the elements are undetermined. Once you have initialized any element of the array, all other elements can only be defined as that type. Any attempt to reference an uninitialized element results in an error. More below:</p>
+<p>It declares an uninitialized array of ten elements. The elements are referenced as <code>MyArray[0]</code> through <code>MyArray[9]</code>. As yet, the type of the elements are undetermined. Once you have initialized any element of the array, all other elements can only be defined as that type. <font class="New">New</font> in version 3.8 this behavior can be over-ridden by using the <code>mixed</code> keyword in the array declaration allowing mixed-type elements. Irregardless of whether the array elements have mixed-types or not, any attempt to reference an uninitialized element results in an error. More below:</p>
 
 <pre>
 #declare MyArray = array[10]
@@ -3588,6 +3585,13 @@ elements in the same array. See <a href="r3_3.html#r3_3_2_2_2">#declare vs. #loc
 // declare a local and un-define any global variable of same name
 #declare local.Foo = 4711;
 #undef global.Foo;
+
+// mixed-type array declaration
+#declare Foo = array mixed[3];
+#declare Foo[0] = 42;
+#declare Foo[1] = "Fnord";
+#declare Foo[2] = sphere { &lt;0,0,0&gt;, 1 }
+
 </pre>
 
 </div>
@@ -4418,18 +4422,28 @@ sphere { &lt;0,0,0&gt;, 1 texture {} } // Default texture applied
 <div class="content-level-h4" contains="Version Directive" id="r3_3_2_5">
 <h4>3.3.2.5 Version Directive</h4>
 
-<p>As POV-Ray has evolved from version 1.0 through 3.8 we have made every effort to maintain some amount of backwards compatibility with earlier versions. Some old or obsolete features can be handled directly without any special consideration by the user. Some old or obsolete features can no longer be handled at all. However <em>some</em> old features can still be
-used if you warn POV-Ray that this is an older scene. The <code>#version</code> directive can be used to switch version compatibility to different setting several times throughout a scene file. The syntax is:</p>
+<p>Since POV-Ray has evolved over the years from version 1.0 through 3.8 we have made every effort to maintain some amount of backwards compatibility with earlier versions. Some old or obsolete features can be handled directly without any special consideration by the user. Some old or obsolete features can no longer be handled at all. However <em>some</em> old features can still be used if you alert POV-Ray that this is an older scene. The <code>#version</code> directive can be used to switch version compatibility or change default settings several times throughout a scene file.</p>
+
+<p>The syntax is:</p>
+
 <pre>
 VERSION_DIRECTIVE: 
   #version FLOAT;
 </pre>
-<p class="Note"><strong>Note:</strong> There should be a semi-colon after the float expression in a <code>#version</code> directive. This semi-colon is introduced in POV-Ray version 3.1. If omitted, it generates a warning and some macros may not work
-properly.</p>
-<p>Additionally you may use the <code>Version=</code><em>n.n</em> option or the <code>+MV</code><em>n.n</em> switch to establish the <em>initial</em> setting. See <a href="r3_2.html#r3_2_5_4">Language Version</a> for details. For example, one feature introduced in 2.0 that was incompatible with any 1.0 scene files is the parsing of float expressions. Using <code>#version 1.0</code> turns off expression parsing as well as many warning messages so that nearly all 1.0 files will still work.</p>
-<p class="Note"><strong>Note:</strong> Some obsolete or re-designed features <em>are totally unavailable in the current version of POV-Ray REGARDLESS OF THE VERSION SETTING.</em> Details on these features are noted throughout this documentation.</p>
-<p>The built-in float identifier <code>version</code> contains the current setting of the version compatibility option. See
-Float Expressions: <a href="r3_3.html#r3_3_1_5_6">Built-in Variables</a>. Together with the built-in <code>version</code> identifier the <code>#version</code> directive allows you to save and restore the previous values of this compatibility setting. The new <code>#local</code> identifier option is especially useful here. For example, suppose <code>mystuff.inc</code> is in version 3.5 format. At the top of the file you could put:</p>
+
+<p>There must be a semi-colon after the float expression in a <code>#version</code> directive. If omitted a warning is generated and some macros may not work properly. Additionally you may use the <code>Version=</code><em>n.n</em> option or the <code>+MV</code><em>n.n</em> switch to establish the <em>initial</em> setting. For example, the parsing of float expressions was introduced in version 2.0 and it was incompatible with <em>any</em> version 1.0 scene file. Using <code>#version 1.0</code> turns off expression parsing as well as many warning messages so that nearly all 1.0 files will still work. Some obsolete or re-designed features <em>are totally unavailable in the current version of POV-Ray REGARDLESS OF THE VERSION SETTING.</em> Details on these features are noted throughout this documentation.</p>
+
+<p>As of version 3.7 the following <em>requirement</em> has been implemented. In order to obtain full version 3.7 functionality you <em>MUST</em> specify the <code>#version 3.7;</code> directive in your scene file. Prior to a <code>#version</code> directive appearing the version defaults to 3.62. Additionally, if the first <code>#version</code> directive appears after any other declaration, or a <code>#version</code> directive does not appear at all a post-parse warning is issued. A <font class="Change">Change</font> as of POV-Ray 3.8 now makes it an outright error to use <code>#version 3.8;</code> or higher in a main scene file that does not start with a <code>#version</code> directive.</p>
+
+<p>New defaults require that the language version is explicitly set to 3.8 or higher via the <code>#version</code> directive the <code>Version=</code>n.n INI setting or the <code>+MV</code>n.n command-line option. Otherwise POV-Ray will fall back to legacy defaults for backwards compatibility.</p>
+
+<p>If you do need to do some processing before you decide on a version compatibility option start your scene with the following
+construct:</p>
+<pre>
+  #version version;
+</pre>
+
+<p>The built-in float identifier <code>version</code> contains the current setting of the version compatibility option. See Float Expressions: <a href="r3_3.html#r3_3_1_5_6">Built-in Variables</a>. Together with the built-in <code>version</code> identifier and the <code>#version</code> directive will allow you to save and restore the previous values of this compatibility setting. The <code>#local</code> identifier option is especially useful here. For example the include file <code>mystuff.inc</code> is in version 3.5 format, so at the top of that file you would include:</p>
 <pre>
   #local Temp_Vers = version;  // Save previous value
   #version 3.5;                // Change to 3.5 mode
@@ -4437,24 +4451,35 @@ Float Expressions: <a href="r3_3.html#r3_3_1_5_6">Built-in Variables</a>. Togeth
   #version Temp_Vers;          // Restore previous version
 </pre>
 
-<p>As of version 3.7, there has been a <em>requirement</em> implemented. In order to obtain full version 3.7
-functionality, you <em>MUST</em> specify the <code>#version 3.7</code> directive in your scene file. Prior to a
-<code>#version</code> directive appearing, the version defaults to 3.62. Additionally, if the first <code>#version</code>
-appears after any other declaration, or a <code>#version</code> directive does not appear at all,
-a post-parse warning is issued, and a <font class="Change">Change</font> as of POV-Ray 3.8 or later it is now considered an outright error to use
-<code>#version 3.8</code> or higher in a main scene file that does not start with a <code>#version</code> directive.</p>
+<p class="Note"><strong>Note:</strong> In version 3.7, if the version compatibility option was left at its default, the <code>version</code> identifier evaluated to the actual POV-Ray version number, instead of matching the defaulted version compatibility setting of 3.62. This would cause problems with include files using the above construct, as it would inadvertently switch the compatibility setting from 3.62 to 3.7. This has been fixed by a <font class="Change">Change</font> in version 3.8, where the <code>version</code> identifier matches the version compatibility option default in such a situation. There is still one exception to this rule: If the scene starts with a <code>#version</code> directive, and the <code>version</code> identifier is used in that directive, it will default to the actual POV-Ray version number in that very first statement, so that the <code>#version version;</code> idiom can still be used.</p>
 
-<p>If you do need to do some processing before you decide on a version compatibility option, start your scene with the following
-construct:</p>
+<p>As previously mentioned the <code>#version</code> directive can be used to switch back and forth between the defaults as long as no explicit <code>#default</code> directive statement is specified. However, as soon as the first <code>#default</code> directive is encountered, any subsequent <code>#version</code> directives that would normally affect the defaults will instead just generate a warning.</p>
+
+<p>Consider the following examples in their entirety:</p>
+
 <pre>
-  #version version;
+  #version 3.7;
+  #declare LegacyTexture = texture { ... }
 </pre>
-Note that unless the version compatibility option has explicitly been set by the INI file option <code>Version=</code><em>n.n</em>
-or by the <code>+MV</code><em>n.n</em> command-line switch, <code>version</code> evaluates to the actual POV-Ray software version
-when used inside the first <code>#version</code> statement, even in version 3.8 or later where it evaluates to the effective
-version compatibility option anywhere else.
 
-<p class="Warning"><strong>Warning:</strong> The version directive and command-line setting no longer provide compatibility with most rendering bugs in versions prior to POV-Ray 3.5. However, compatibility with the scene language is provided for scenes as old as POV-Ray 1.0 just as in all previous versions of POV-Ray. Nevertheless, we strongly recommend you update scenes at least to POV-Ray 3.5 syntax if you plan to use them in future versions of POV-Ray.</p></div>
+<p>The <code>#version</code> directive switches to the version 3.7 defaults. If <em>LegacyTexture</em> does not explicitly specify an ambient value it will be set to a value of 0.1</p>
+
+<pre>
+  #version 3.8;
+  #declare ModernTexture = texture { ... }
+  #default { pigment { color rgb &lt;1,0,0&gt; } }
+</pre>
+
+<p>The <code>#version</code> directive switches to the version 3.8 defaults. If <em>ModernTexture</em> does not explicitly specify an ambient value, it will be set to a value of zero.</p>
+
+<pre>
+  #version 3.7;
+  #declare OtherTexture = texture { ... }
+</pre>
+
+<p>The <code>#version</code> directive just generates a warning because the earlier <code>#default</code> directive has <em>locked</em> the version 3.8 defaults overriding the pigment in the process. If <em>OtherTexture</em> does not explicitly specify an ambient value, it will also have an ambient value of zero.</p>
+
+<p class="Note"><strong>Note:</strong> The version directive and command-line setting no longer provides compatibility with most rendering bugs in versions prior to POV-Ray 3.5. However, compatibility with the scene language is provided for scenes as old as POV-Ray 1.0 just as in all previous versions of POV-Ray. Nevertheless, we strongly recommend you update scenes at least to POV-Ray 3.7 syntax if you plan to use them in future versions of POV-Ray.</p></div>
 
 <a name="r3_3_2_6"></a>
 <div class="content-level-h4" contains="Conditional Directives" id="r3_3_2_6">

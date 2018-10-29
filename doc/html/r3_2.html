@@ -174,19 +174,37 @@
   <td><div class="divh3"><a title="3.2.8.6" href="#r3_2_8_6">BSP Bounding</a></div></td>
 </tr>
 <tr>
-  <td><div class="divh3"><a title="3.2.8.7" href="#r3_2_8_7">Anti-Aliasing Options</a></div></td>
+  <td><div class="divh3"><a title="3.2.8.7" href="#r3_2_8_7">Stochastic Seed</a></div></td>
 </tr>
 <tr>
-  <td><div class="divh3"><a title="3.2.8.8" href="#r3_2_8_8">Radiosity Options</a></div></td>
+  <td><div class="divh3"><a title="3.2.8.8" href="#r3_2_8_8">Anti-Aliasing Options</a></div></td>
 </tr>
 <tr>
-  <td><div class="divh4"><a title="3.2.8.8.1" href="#r3_2_8_8_1">Radiosity High Reproducibility</a></div></td>
+  <td><div class="divh4"><a title="3.2.8.8.1" href="#r3_2_8_8_1">Sampling Methods Synopsis</a></div></td>
 </tr>
 <tr>
-  <td><div class="divh4"><a title="3.2.8.8.2" href="#r3_2_8_8_2">Radiosity Load and Save</a></div></td>
+  <td><div class="divh4"><a title="3.2.8.8.2" href="#r3_2_8_8_2">Sampling Method 1</a></div></td>
 </tr>
 <tr>
-  <td><div class="divh4"><a title="3.2.8.8.3" href="#r3_2_8_8_3">Radiosity Vain Pretrace</a></div></td>
+  <td><div class="divh4"><a title="3.2.8.8.3" href="#r3_2_8_8_3">Sampling Method 2</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.2.8.8.4" href="#r3_2_8_8_4">Sampling Method 3</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.2.8.8.5" href="#r3_2_8_8_5">Common Properties</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.8.9" href="#r3_2_8_9">Radiosity Options</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.2.8.9.1" href="#r3_2_8_9_1">Radiosity High Reproducibility</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.2.8.9.2" href="#r3_2_8_9_2">Radiosity Load and Save</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.2.8.9.3" href="#r3_2_8_9_3">Radiosity Vain Pretrace</a></div></td>
 </tr>
 <tr>
   <td><div class="divh1">&nbsp;</div></td>
@@ -1282,6 +1300,8 @@ Output_to_File=off</code> or <code>-F</code>.</p>
 <a name="r3_2_4_1"></a>
 <div class="content-level-h4" contains="Output File Type" id="r3_2_4_1">
 <h4>3.2.4.1 Output File Type</h4>
+<p>There has been a <font class="Change">Change</font> as of version 3.7 regarding the default output file type. For all supported platforms the default is now PNG.</p>
+
 <table width="100%" class="option-list">
 <tr>
 <td width="30%"><code>Output_File_Type=</code>x</td>
@@ -1296,6 +1316,26 @@ Output_to_File=off</code> or <code>-F</code>.</p>
 <tr>
 <td><code>-F</code>xn</td>
 <td>Sets file output off; but in future use format x, depth n</td>
+</tr>
+
+<tr>
+<td><code>Grayscale_Output=</code>bool</td>
+<td>Sets grayscale output on/off (PNG and PPM only)</td>
+</tr>
+
+<tr>
+<td><code>Greyscale_Output=</code>bool</td>
+<td>Same as <code>Grayscale_Output=</code>bool</td>
+</tr>
+
+<tr>
+<td><code>+F</code>x<code>g</code>n</td>
+<td>Sets file output on; sets format x, sets grayscale if applicable, depth n</td>
+</tr>
+
+<tr>
+<td><code>-F</code>x<code>g</code>n</td>
+<td>Sets file output off; but in future use format x, sets grayscale if applicable, depth n</td>
 </tr>
 
 <tr>
@@ -1315,7 +1355,7 @@ Output_to_File=off</code> or <code>-F</code>.</p>
 
 <tr>
 <td><code>Bits_Per_Color=</code>n</td>
-<td>Sets file output bits/color to n</td>
+<td>Sets file output bits/color to n. A <font class="Change">Change</font> in version 3.8 allows values ranging from 1 to 16.</td>
 </tr>
 
 <tr>
@@ -1324,125 +1364,105 @@ Output_to_File=off</code> or <code>-F</code>.</p>
 </tr>
 </table>
 
-<p class="Note"><strong>Note:</strong> As of version 3.7 the default output file type for all supported platforms is PNG. You may select one of several different file types by using <code>Output_File_Type=</code><em>x</em> or <code>+F</code><em>x</em> where <em>x</em> is one of the following:</p>
+<p>You may select one of several different file types by using <code>Output_File_Type=</code><em>x</em> or <code>+F</code><em>x</em> where <em>x</em> is one of the following:</p>
 <table width="100%" class="option-list">
 <tr>
-<td width="30%"><code>.. B</code></td>
+<td width="30%"><code>B</code> or <code>b</code></td>
 <td width="70%">Universal <strong>B</strong>itmap image file format</td>
 </tr>
 <tr>
-<td width="30%"><code>.. C</code></td>
+<td width="30%"><code>C</code> or <code>c</code></td>
 <td width="70%"><strong>C</strong>ompressed Targa-24 format (RLE, run length
 encoded)</td>
 </tr>
 
 <tr>
-<td width="30%"><code>.. E</code></td>
+<td width="30%"><code>E</code> or <code>e</code></td>
 <td width="70%">Open<strong>E</strong>XR High Dynamic-Range format</td>
 </tr>
 
 <tr>
-<td width="30%"><code>.. H</code></td>
+<td width="30%"><code>H</code> or <code>h</code></td>
 
 <td width="70%">Radiance <strong>H</strong>igh Dynamic-Range format</td>
 </tr>
 
 <tr>
-<td width="30%"><code>.. J</code></td>
+<td width="30%"><code>J</code> or <code>j</code></td>
 <td width="70%"><strong>J</strong>PEG format (Note: This format is not loss-free and will generate compression artifacts)</td>
 </tr>
 
 <tr>
-<td><code>.. N</code></td>
-<td>P<strong>N</strong>G (portable network graphics) format</td>
+<td width="30%"><code>N</code> or <code>n</code></td>
+<td width="70%">P<strong>N</strong>G (portable network graphics) format</td>
 </tr>
 
 <tr>
-<td><code>.. P</code></td>
-<td>Unix <strong>P</strong>PM format</td>
+<td width="30%"><code>P</code> or <code>p</code></td>
+<td width="70%">Unix <strong>P</strong>PM format</td>
 </tr>
 
 <tr>
-<td><code>.. S</code></td>
-<td><strong>S</strong>ystem-specific format: See the notation at the end of this section.</td>
+<td width="30%"><code>S</code> or <code>s</code></td>
+<td width="70%"><strong>S</strong>ystem-specific format: See the notation at the end of this section.</td>
 </tr>
 
 <tr>
-<td><code>.. T</code></td>
-<td>Uncompressed <strong>T</strong>arga-24 format</td>
+<td width="30%"><code>T</code> or <code>t</code></td>
+<td width="70%">Uncompressed <strong>T</strong>arga-24 format</td>
 </tr>
 </table>
-<p>
-<font class="New">New</font> as of version 3.8, instead of <code>Output_File_Type=C</code> you can also use <code>Output_File_Type=T Compression=1</code> to choose RLE-encoded Targa format.
-</p>
-<p>
-PNG is an image format designed not only to replace GIF, but to improve on its shortcomings. PNG offers the highest compression available without loss for high quality applications, such as ray-tracing.
-</p>
-<p>
-<font class="New">New</font> Prior to version 3.8, PPM output always created the compact <em>raw</em> (binary) format. The <code>Compression=0</code> ini setting can now be used to select the <em>plain</em> (ASCII) format instead.
-</p>
-<p>
-The system specific format depends on the platform used and is covered in the appropriate system specific documentation.
-</p>
-<p>
-JPEG is particularly good at achieving high compression rates with photographic or photorealistic images, making it one of the most frequently used formats on the Internet. However, it is not loss-free. Images generated with this option will always contain compression artifacts (image defects). If you need to keep a high-quality image you should render using one of the loss-free formats. 
-</p>
+
+<p>Grayscale output can be used to generate heightfields for use in other POV-Ray scenes, by using <code>Grayscale_Output=true</code> as an INI option, or <code>+Fxg</code> for output type <em>x</em> as a command-line option. For example, <code>+Fng</code> for PNG and <code>+Fpg</code> for PPM (technically PGM) grayscale output. By default this option is off.</p>
+
+<p>With <code>Grayscale_Output=true</code>, the output file will be in the form of a grayscale image that can be used to generate heightfields, as the height at any point is dependent on the brightness of the pixel. The brightness of a pixel is calculated in the same way that color images are converted to grayscale images:<em><code> height = 0.3 * red + 0.59 * green + 0.11 * blue</code></em>.</p>
+
+<p>Previously, the grayscale PPM (technically PGM) output file format always used linear output. A <font class="Change">Change</font> in v3.8 will match that of the regular non-grayscale PPM format. That is <code>File_Gamma</code> will be honored if specified, otherwise the ITU-R BT.709 gamma transfer function will be applied.</p>
+
+<p>In previous versions PPM output always created the compact <em>raw</em> (binary) format. A <font class="Change">Change</font> in version 3.8 now allows the use of <em>INI</em> setting <code>Compression=0</code> to select the <em>plain</em> (ASCII) format instead. The system specific format depends on the platform used and is covered in the appropriate system specific documentation.</p>
+
+<p>See also: <a href="r3_5.html#r3_5_1_1_5">Height Field</a> for a description of how POV-Ray heightfields are stored for each file type.</p>
+
+<p>Previously, specifying a bit-depth for grayscale file output was simply ignored and the bit-depth was forced to 16 bits per channel. A <font class="Change">Change</font> in version 3.8 now allows for a bit-depth setting.</p>
+
+<p>It should also be noted that with <em>previous</em> versions setting the <code>Grayscale_Output=true</code> INI option would <em>not</em> cause the preview display, if used, to be grayscale. A <font class="Change">Change</font> in version 3.8 <em>now</em> shows a grayscale image on the preview display as well.</p>
+
+<p>Currently PNG, and PPM are the only file formats that support grayscale output.</p>
+
+<p>Last but not least, when choosing output file options it may be helpful to consider the following:</p>
+
+<p>PNG is an image format designed not only to replace GIF, but to improve on its shortcomings. PNG offers the highest compression available without loss for high quality applications, such as ray-tracing. In addition to support for variable bit-depths, alpha channel, and grayscale formats, PNG files also store the <code>File_Gamma</code> value so the image displays properly on all systems.</p>
+
+<p>JPEG is particularly good at achieving high compression rates with photographic or photorealistic images, making it one of the most frequently used formats on the Internet. However, it is not loss-free. Images generated with this option will always contain compression artifacts (image defects). If you need to keep a high-quality image you should render using one of the loss-free formats.</p>
+
 <p class="Note"><strong>Note:</strong> Chroma sub-sampling has been disabled in JPEG output, and there has been a reduction in the default quality setting.</p>
-<p>
-The JPEG compression quality can be controlled using the <code>Compression</code> ini file option which, if set, needs to be an integer between 0 and 100. If values of 0 or 1 are specified then the default compression quality setting of 85% is used. Otherwise the value specified (2-100) is used as the compression quality setting. A value of 2 produces the smallest file (maximum compression), but looks terrible. A value of 100 produces the largest file (least compression) but can still contain some compression artifacts. Values lower than 0 are clipped to 0. Values greater than 100 are clipped to 100.
-</p>
-<p>
-Most of these formats output 24 bits per pixel with 8 bits for each of red,
-green and blue data. PNG and PPM allow you to optionally specify the output bit
-depth from 5 to 16 bits for each of the red, green, and blue colors, giving
-from 15 to 48 bits of color information per pixel. The default output depth
-for all formats is 8 bits/color (16 million possible colors), but this may be
-changed for PNG and PPM format files by setting <code>Bits_Per_Color=</code><em>n</em>
-or by specifying <code>+FN</code><em>n</em> or <code>+FP</code><em>n</em>, 
-where n is the desired bit depth.</p>
-<p>
-Specifying a smaller color depth like 5 bits/color (32768 colors) may be
-enough for people with 8- or 16-bit (256 or 65536 color) displays, and will
-improve compression of the PNG file. Higher bit depths like 10 or 12 may be
-useful for video or publishing applications, and 16 bits/color is good for
-grayscale height field output (See section <a href="r3_5.html#r3_5_1_1_5">Height Field</a> for
-details on height fields).</p>
-<p>
-Targa format also allows 8 bits of alpha transparency data to be output,
-while PNG format allows 5 to 16 bits of alpha transparency data, depending on
-the color bit depth as specified above. You may turn this option on with
-<code> Output_Alpha=on</code> or <code>+UA</code>. The default is off or
-<code> -UA</code>. </p>
-<p>The alpha channel stores a transparency value for each pixel, just like
-there is also stored a value for red green and blue light for each pixel. In
-POV-Ray, when the alpha channel is turned on, all areas of the image
-where the background is partly or fully visible will be partly or fully
-transparent. Refractions of the background will also be transparent, but not
-reflections. Also anti-aliasing is taken into account</p>
-<p>The philosophy of the alpha channel feature in POV-Ray is that the
-background color should not be present in the color of the image when the
-alpha channel is used. Instead, the amount of visible background is kept in
-the alpha and *only* in the alpha channel. That ensures that images look
-correct when viewed with the alpha channel.</p>
-<p>See section <a href="r3_6.html#r3_6_2_6_4">Using the Alpha Channel</a> for
-further details on using transparency in imagemaps in your scene.</p>
+
+<p>The JPEG compression quality can be controlled using the <code>Compression</code> ini file option which, if set, needs to be an integer between 0 and 100. If values of 0 or 1 are specified then the default compression quality setting of 85% is used. Otherwise the value specified (2-100) is used as the compression quality setting. A value of 2 produces the smallest file (maximum compression), but looks terrible. A value of 100 produces the largest file (least compression) but can still contain some compression artifacts. Values lower than 0 are clipped to 0. Values greater than 100 are clipped to 100.</p>
+
+<p>Most of these formats output 24 bits per pixel with 8 bits for each of red, green and blue data. PNG and PPM allow you to optionally specify the output bit depth from 1 to 16 bits for each of the red, green, and blue colors, giving from 15 to 48 bits of color information per pixel. The default output depth for all formats is 8 bits/color (16 million possible colors), but this may be changed for PNG and PPM format files by setting <code>Bits_Per_Color=</code><em>n</em> or by specifying <code>+FN</code><em>n</em> or <code>+FP</code><em>n</em>, where n is the desired bit depth.</p>
+
+<p>Specifying a smaller color depth like 5 bits/color (32768 colors) may be enough for people with 8- or 16-bit (256 or 65536 color) displays, and will improve compression of the PNG file. Higher bit depths like 10 or 12 may be useful for video or publishing applications, and 16 bits/color is good for grayscale height field output (See section <a href="r3_5.html#r3_5_1_1_5">Height Field</a> for details on height fields).</p>
+
+<p>Targa format also allows 8 bits of alpha transparency data to be output, while PNG format allows 5 to 16 bits of alpha transparency data, depending on the color bit depth as specified above. You may turn this option on with <code> Output_Alpha=on</code> or <code>+UA</code>. The default is off or <code> -UA</code>. <font class="New">New</font> as of version 3.8, instead of <code>Output_File_Type=C</code> you can also use <code>Output_File_Type=T Compression=1</code> to choose RLE-encoded Targa format.</p>
+
+<p>The alpha channel stores a transparency value for each pixel, just like there is also stored a value for red green and blue light for each pixel. In POV-Ray, when the alpha channel is turned on, all areas of the image where the background is partly or fully visible will be partly or fully transparent. Refractions of the background will also be transparent, but not reflections. Also anti-aliasing is taken into account.</p>
+
+<p>The philosophy of the alpha channel feature in POV-Ray is that the background color should not be present in the color of the image when the
+alpha channel is used. Instead, the amount of visible background is kept in the alpha and *only* in the alpha channel. That ensures that images look correct when viewed with the alpha channel.</p>
+
+<p>See section <a href="r3_6.html#r3_6_2_6_4">Using the Alpha Channel</a> for further details on using transparency in imagemaps in your scene.</p>
 
 <p class="Note"><strong>Note:</strong> In version 3.7 alpha handling for image file output has changed. Effectively, the background <em>now requires</em> a <code>filter</code> or <code>transmit</code> value in order for alpha transparency to work properly.</p>
 
 <p>Previous versions of POV-Ray always wrote associated alpha for output, this has been changed on a per-file-format basis as follows:</p>
 <ul>
-<li> PNG will use straight alpha as per specification.</li>
-<li> OpenEXR will use associated alpha as per specifications.</li>
-<li> TGA and BMP 32-bit RGBA will use straight alpha, retaining file input compatibility for now, until a final decision has been made on these formats.</li>
+ <li> PNG will use straight alpha as per specification.</li>
+ <li> OpenEXR will use associated alpha as per specifications.</li>
+ <li> TGA and BMP 32-bit RGBA will use straight alpha, retaining file input compatibility for now, until a final decision has been made on these formats.</li>
 </ul>
-<p>
-In addition to support for variable bit-depths, alpha channel, and grayscale
-formats, PNG files also store the <code>File_Gamma</code> value so the
-image displays properly on all systems.
-The <code>hf_gray_16</code> global setting, as described in section 
-<a href="r3_4.html#r3_4_1_4">HF_Gray_16</a> will also affect the 
-type of data written to the output file.</p>
+
 <p>The <a href="http://radsite.lbl.gov/radiance/HOME.html">Radiance</a> Synthetic Imaging System or <em>.hdr</em> image format was originally developed to aid lighting designers and architects by predicting the light levels and appearance of a space prior to construction. The <a href="http://www.openexr.com/index.html">OpenEXR</a> or <em>.exr</em> image file format was developed by Industrial Light & Magic&trade; for use in computer imaging applications.</p>
+
 <p>Most image formats now include metadata (BMP is a notable exception). This metadata contains the POV-Ray version, render date/time (GMT), platform (e.g. x86_64-pc-win), and compiler used to build the POV-Ray executable.</p>
 <p class="Note"><strong>Note:</strong> System-specific or  type &quot;s&quot; output file format is being retained for legacy support reasons. Windows and Unix mapping remains the same,  BMP and TGA respectively, however on Macintosh it has been changed to PNG, and a warning is issued when type &quot;s&quot; is used.</p>
 
@@ -1523,15 +1543,34 @@ output file.</p>
 </tr>
 </table>
 
+<p>Ordered dithering algorithms:</p>
 <ul>
-<li><code>B2</code>..<code>B4</code>: Bayer pattern dithering using 2x2, 3x3 or 4x4 patterns, respectively</li>
-<li><code>D1</code>: Simple 1-dimensional error diffusion dithering</li>
-<li><code>D2</code>: Simple 2-dimensional error diffusion dithering (needs extra memory for 2 pixel rows)</li>
-<li><code>FS</code>: Floyd-Steinberg error diffusion dithering (needs extra memory for 2 pixel rows)</li>
+  <li><code>B2</code>..<code>B4</code>: Bayer pattern dithering using 2x2, 3x3 or 4x4 patterns, respectively</li>
+  <li><code>BN</code>: Blue noise pattern dithering using a 64x64 pattern. <font class="New">New</font> in version 3.8</li>
+  <li><code>BNX</code>: same as BN but using the pattern's inverse for the R and B channels. <font class="New">New</font> in version 3.8</li>
 </ul>
 
-<p>The default is <code>-THfs</code> i.e: dithering is off, with Floyd-Steinberg being the default if only  <code>+TH</code> is specified.</p>
+<p>Error diffusion dithering algorithms:</p>
+<ul>
+  <li><code>AT</code>: Atkinson error diffusion dithering. <font class="New">New</font> in version 3.8</li>
+  <li><code>BK</code>: Burkes error diffusion dithering. <font class="New">New</font> in version 3.8</li>
+  <li><code>D1</code>: Simple 1-dimensional error diffusion dithering</li>
+  <li><code>D2</code>: Sierra Lite error diffusion dithering</li>
+  <li><code>FS</code>: Floyd-Steinberg error diffusion dithering</li>
+  <li><code>JN</code>: Jarvis-Judice-Ninke error diffusion dithering. <font class="New">New</font> in version 3.8</li>
+  <li><code>S2</code>: Two-Row Sierra error diffusion dithering. <font class="New">New</font> in version 3.8</li>
+  <li><code>S3</code>: Three-Row Sierra error diffusion dithering. <font class="New">New</font> in version 3.8</li>
+  <li><code>ST</code>: Stucki error diffusion dithering. <font class="New">New</font> in version 3.8</li>
+</ul>
 
+<p>As always file output dithering is off by default, however a <font class="Change">Change</font> in version 3.8 now sets the default dithering method <em>from</em> <code>FS</code> <em>to</em> <code>BN</code> if only <code>+TH</code> is specified.</p>
+
+<p>In version 3.7 the display preview window used Bayer 4x4 dithering. A <font class="Change">Change</font> in version 3.8 has switched that to the recently added blue noise pattern.</p>
+
+<p><font class="New">New</font> in version 3.8 dithering is now fully supported for Radiance HDR output files.</p>
+
+<p><font class="New">New</font> in version 3.8 file output dithering is now fully gamma-aware. The overall apparent brightness of the resulting image is faithfully reproduced.</p>
+ 
 <p>Dithering works for all file formats except JPEG (where dithering would be counter-productive) and OpenEXR (which provides sufficient precision to make dithering obsolete). These file formats simply ignore the setting.</p>
 
 <p class="Note"><strong>Note:</strong> While dithering does help to reduce color banding, it may instead lead to artifacts in prints, due to interference with the printing device's own dithering algorithms; in that case, choosing a different dither method may help.</p>
@@ -1622,8 +1661,8 @@ global_settings {
     radiosity {
     ...
     }
-#end
-}
+  #end
+  }
 </pre>
 </div>
 <a name="r3_2_5_2"></a>
@@ -1698,24 +1737,7 @@ Multiple uses of this option switch do not override previous settings. If you sp
 </tr>
 </table>
 
-<p>As POV-Ray has evolved from version 1.0 through to today we have made every
-effort to maintain some amount of backwards compatibility with earlier
-versions. Some old or obsolete features can be handled directly without any
-special consideration by the user. Some old or obsolete features can no
-longer be handled at all. However <em>some</em> old features can still be
-used if you warn POV-Ray that this is an older scene. In the POV-Ray scene
-language you can use the <code>#version</code> directive to switch version
-compatibility to different settings. See section <a href="r3_3.html#r3_3_2_5">The #version Directive</a>
-for more details about the language version directive.
-Additionally you may use the <code>Version=</code><em>n.n</em> option or the
-<code>+MV</code><em>n.n</em> switch to establish the <em>initial</em>
-setting. For example one feature introduced in 2.0 that was incompatible with
-any 1.0 scene files is the parsing of float expressions. Setting <code>
-Version=1.0</code> or using <code>+MV1.0</code> turns off expression parsing
-as well as many warning messages so that nearly all 1.0 files will still
-work. Naturally the default setting for this option is the current version number.</p>
-
-<p class="Warning">The version directive and command-line setting no longer provide compatibility with most rendering bugs in versions prior to POV-Ray 3.5. However, compatibility with the scene language is provided for scenes as old as POV-Ray 1.0 just as in all previous versions of POV-Ray. Nevertheless, we strongly recommend you update scenes at least to POV-Ray 3.5 syntax if you plan to use them in future versions of POV-Ray.</p></div>
+<p>See also: <a href="r3_3.html#r3_3_2_5">Version Directive</a></p></div>
 
 <a name="r3_2_6"></a>
 <div class="content-level-h3" contains="Shell Command Options" id="r3_2_6">
@@ -3109,7 +3131,7 @@ specify <code>Split_Unions=on</code> or use <code> +SU</code>. The default is
   BSP_IsectCost=150.0
   BSP_MissChance=0.2
 </pre>
-<p>The values shown above are the default. You can also get the defaults if you use a value of 0 for any of the above, or of course just by not specifying the option at all. For an explanation of what the values mean you may refer to Ray Tracing News <a href="http://tog.acm.org/resources/RTNews/html/rtnv17n1.html#art8">article</a> by Eric Haines.</p>
+<p>The values shown above are the default. You can also get the defaults if you use a value of 0 for any of the above, or of course just by not specifying the option at all. For an explanation of what the values mean you may refer to Ray Tracing News <a href="http://www.realtimerendering.com/resources/RTNews/html/rtnv17n1.html#art8">article</a> by Eric Haines.</p>
 <p>See the distribution file <code>~scenes/bsp/Tango.pov</code> for a good example of a scene that benefits from the BSP bounding.</p>
 <p>Tango.pov rendered at 800x600, no AA</p>
 <ul>
@@ -3119,8 +3141,29 @@ specify <code>Split_Unions=on</code> or use <code> +SU</code>. The default is
 
 </div>
 <a name="r3_2_8_7"></a>
-<div class="content-level-h4" contains="Anti-Aliasing Options" id="r3_2_8_7">
-<h4>3.2.8.7 Anti-Aliasing Options</h4>
+<div class="content-level-h4" contains="Stochastic Seed" id="r3_2_8_7">
+<h4>3.2.8.7 Stochastic Seed</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Stochastic_Seed=</code>n</td>
+<td width="70%">Sets a value for the stochastic seed <font class="New">New</font> in version 3.8</td>
+</tr>
+
+<tr>
+<td><code>+SS</code>n</td>
+<td>Same as <code>Stochastic_Seed=</code>n</td>
+</tr>
+</table>
+<p>By default some stochastic mechanisms in POV-Ray intentionally give different results for each render, with the intent that multiple renders can be averaged to get a higher-quality image. To this end, the corresponding pseudo-random number generators are seeded with a value
+derived from the current date and time.</p>
+<p>If the <code>Stochastic_Seed=</code>n or <code>+SS</code>n option is specified, the seed will instead be derived from the specified value, allowing to produce exactly the same output each time by specifying that same value. Alternatively, the mechanism may be co-opted to prevent separate renders started at the same time from producing identical results, by explicitly specifying different values.</p>
+<p class="Note"><strong>Note:</strong> Even if the seed is set identically, other factors may cause differences in the result. For example the render block size <code>+BS</code>n or the render pattern <code>+RP</code>n options. Results may also differ between versions of POV-Ray.</p>
+<p>Presently anti-aliasing sampling method 3 is the only feature that is sensitive to the stochastic seed setting.</p>
+
+</div>
+<a name="r3_2_8_8"></a>
+<div class="content-level-h4" contains="Anti-Aliasing Options" id="r3_2_8_8">
+<h4>3.2.8.8 Anti-Aliasing Options</h4>
 <table width="100%" class="option-list">
 <tr>
 <td width="30%"><code>Antialias=</code>bool</td>
@@ -3139,8 +3182,7 @@ specify <code>Split_Unions=on</code> or use <code> +SU</code>. The default is
 
 <tr>
 <td><code>Sampling_Method=</code>n</td>
-<td>Sets aa-sampling method (only <code>1</code> or <code>2</code> are
-valid)</td>
+<td>Sets aa-sampling method (either <code>1</code>, <code>2</code> or <code>3</code> the later is <font class="New">New</font> in version 3.8 )</td>
 </tr>
 
 <tr>
@@ -3195,6 +3237,16 @@ set off</td>
 </tr>
 
 <tr>
+<td><code>Antialias_Confidence=</code>n.n</td>
+<td>Sets method <code>3</code> <em>confidence</em> to n.n <font class="New">New</font> in version 3.8</td>
+</tr>
+
+<tr>
+<td><code>+AC</code>n.n</td>
+<td>Same as <code>Antialias_Confidence=</code>n.n <font class="New">New</font> in version 3.8</td>
+</tr>
+
+<tr>
 <td><code>Antialias_Depth=</code>n</td>
 <td>Sets aa-depth (1 &lt;= n &lt;= 9)</td>
 </tr>
@@ -3216,19 +3268,38 @@ set off</td>
 </table>
 
 <p>The ray-tracing process is in effect a discrete, digital sampling of the image with typically one sample per pixel. Such sampling can introduce a variety of errors. This includes a jagged, stair-step appearance in sloping or curved lines, a broken look for thin lines, moir&eacute; patterns of interference and lost detail or missing objects, which are so small they reside between adjacent pixels. The effect that is responsible for those errors is called <em>aliasing</em>.</p>
-<p>Anti-aliasing is any technique used to help eliminate such errors or to reduce the negative impact they have on the image. In general, anti-aliasing makes the ray-traced image look <em> smoother</em>. The <code>Antialias=on</code> option or <code>+A</code> switch turns on POV-Ray's anti-aliasing system.</p>
+<p>Anti-aliasing is any technique used to help eliminate such errors or to reduce the negative impact they have on the image. In general, anti-aliasing makes the ray-traced image look <em> smoother</em>. The <code>Antialias=on</code> option or <code>+A</code> option turns on POV-Ray's anti-aliasing system.</p>
 <p>When anti-aliasing is turned on, POV-Ray attempts to reduce the errors by shooting more than one viewing ray into each pixel and averaging the results to determine the pixel's apparent color. This technique is called super-sampling and can improve the appearance of the final image but it drastically increases the time required to render a scene since many more calculations have to be done.</p>
-<p>POV-Ray gives you the option to use one of two alternate super-sampling methods. The <code> Sampling_Method=</code><em>n</em> option or <code>+AM</code><em>n</em> switch selects either type <code>1</code> or type <code>2</code>. Selecting one of those methods does not turn anti-aliasing on. This has to be done by using the <code>+A</code> command line switch or <code>Antialias=on</code> option.</p>
-<p>Type 1 is an adaptive, non-recursive, super-sampling method. It is <em>adaptive</em> because not every pixel is super-sampled. Type 2 is an adaptive and recursive super-sampling method. It is <em>recursive</em> because the pixel is sub-divided and sub-sub-divided recursively. The <em>adaptive</em> nature of type 2 is the variable depth of recursion.</p>
-<p>In the default, non-recursive method (<code>+AM1</code>), POV-Ray initially traces one ray per pixel. If the color of a pixel differs from its neighbors (to the left or above) by at least the set threshold value then the pixel is super-sampled by shooting a given, fixed number of additional rays. The default threshold is 0.3 but it may be changed using the <code>Antialias_Threshold=</code><em>n.n</em> option. When the switches are used, the threshold may optionally follow the <code>+A</code>. For example <code>+A0.1</code> turns anti-aliasing on and sets the threshold to 0.1.</p>
+<p>POV-Ray gives you the option to use one of three sampling methods. Two alternate super-sampling methods and one over-sampling method. The <code>Sampling_Method=</code><em>n</em> option or <code>+AM</code><em>n</em> option selects either type <code>1</code>, type <code>2</code> or type <code>3</code>. Selecting one of those methods does not turn on anti-aliasing. This has to be done by using the <code>+A</code> command line option or <code>Antialias=on</code> option.</p>
+
+</div>
+<a name="r3_2_8_8_1"></a>
+<div class="content-level-h5" contains="Sampling Methods Synopsis" id="r3_2_8_8_1">
+<h5>3.2.8.8.1 Sampling Methods Synopsis</h5>
+<ul>
+  <li>Type 1: an adaptive non-recursive super-sampling method. It is <em>adaptive</em> because not every pixel is super-sampled</li>
+  <li>Type 2: an adaptive <em>and</em> recursive super-sampling method. It is <em>recursive</em> because the pixel is sub-divided recursively. The <em>adaptive</em> nature of type 2 is the variable recursion depth</li>
+  <li>Type 3: an adaptive non-recursive stochastic oversampling method. The <em>adaptive</em> nature of type 3 is <em>confidence</em> and <em>threshold</em></li>
+</ul>
+
+</div>
+<a name="r3_2_8_8_2"></a>
+<div class="content-level-h5" contains="Sampling Method 1" id="r3_2_8_8_2">
+<h5>3.2.8.8.2 Sampling Method 1</h5>
+<p><code>+AM1</code> is an adaptive non-recursive method. If anti-aliasing is enabled it is the default. POV-Ray initially traces one ray per pixel. If the color of a pixel differs from its neighbors (to the left or above) by at least the set threshold value then the pixel is super-sampled by shooting a given, fixed number of additional rays. The default threshold is 0.3 but it may be changed using the <code>Antialias_Threshold=</code><em>n.n</em> option. When the switches are used, the threshold may optionally follow the <code>+A</code>. For example <code>+A0.1</code> turns anti-aliasing on and sets the threshold to 0.1.</p>
 <p>The threshold comparison is computed as follows. If r1, g1, b1 and r2, g2, b2 are the rgb components of two pixels then the difference between pixels is computed by</p>
 <pre>
 diff = abs(r1-r2) + abs(g1-g2) + abs(b1-b2)
 </pre>
 <p>If this difference is greater than the threshold then both pixels are super-sampled. The rgb values are in the range from 0.0 to 1.0 thus the most two pixels can differ is 3.0. If the anti-aliasing threshold is 0.0 then every pixel is super-sampled. If the threshold is 3.0 then no anti-aliasing is done. Lower threshold means more anti-aliasing and less speed. Use anti-aliasing for your final version of a picture, not the rough draft. The lower the contrast, the lower the threshold should be. Higher contrast pictures can get away with higher tolerance values. Good values seem to be around 0.2 to 0.4.</p>
 <p>When using the non-recursive method, the default number of super-samples is nine per pixel, located on a 3*3 grid. The <code>
-Antialias_Depth=</code><em>n</em> option or <code> +R</code><em>n</em> switch controls the number of rows and columns of samples taken for a super-sampled pixel. For example <code>+R4</code> would give 4*4=16 samples per pixel.</p>
-<p>The second, adaptive, recursive super-sampling method starts by tracing four rays at the corners of each pixel. If the resulting colors differ more than the threshold amount additional samples will be taken. This is done recursively, i.e. the pixel is divided into four sub-pixels that are separately traced and tested for further subdivision. The advantage of this method is the reduced number of rays that have to be traced. Samples that are common among adjacent pixels and sub-pixels are stored and reused to avoid re-tracing of rays. The recursive character of this method makes the super-sampling concentrate on those parts of the pixel that are more likely to need super-sampling (see figure below).</p>
+Antialias_Depth=</code><em>n</em> option or <code>+R</code><em>n</em> option controls the number of rows and columns of samples taken for a super-sampled pixel. For example <code>+R4</code> would give 4*4=16 samples per pixel.</p>
+
+</div>
+<a name="r3_2_8_8_3"></a>
+<div class="content-level-h5" contains="Sampling Method 2" id="r3_2_8_8_3">
+<h5>3.2.8.8.3 Sampling Method 2</h5>
+<p><code>+AM2</code> is an adaptive, recursive super-sampling method. It starts by tracing four rays at the corners of each pixel. If the resulting colors differ more than the threshold amount additional samples will be taken. This is done recursively, i.e. the pixel is divided into four sub-pixels that are separately traced and tested for further subdivision. The advantage of this method is the reduced number of rays that have to be traced. Samples that are common among adjacent pixels and sub-pixels are stored and reused to avoid re-tracing of rays. The recursive character of this method makes the super-sampling concentrate on those parts of the pixel that are more likely to need super-sampling (see figure below).</p>
 
 <table class="centered" width="622px" cellpadding="0" cellspacing="10">
   <tr>
@@ -3241,7 +3312,7 @@ Antialias_Depth=</code><em>n</em> option or <code> +R</code><em>n</em> switch co
   </tr>
 </table>
 
-<p>The maximum number of subdivisions is specified by the <code>Antialias_Depth=</code><em>n</em> option or <code>+R</code><em>n</em> switch. This is different from the adaptive, non-recursive method where the total number of super-samples is specified. A maximum number of <em>n</em> subdivisions results in a maximum number of samples per pixel that is given by the following table. Where the first column represents anti-alias depth or <code>+R</code><em>n</em> option. The second column is the number of additional samples per super-sampled pixel for the non-recursive method <code>+AM1</code>. Lastly the third column is the maximum number of samples per super-sampled pixel for the recursive method <code>+AM2</code>.</p>
+<p>The maximum number of subdivisions is specified by the <code>Antialias_Depth=</code><em>n</em> option or <code>+R</code><em>n</em> option. This is different from the adaptive, non-recursive method where the total number of super-samples is specified. A maximum number of <em>n</em> subdivisions results in a maximum number of samples per pixel that is given by the following table. Where the first column represents anti-alias depth or <code>+R</code><em>n</em> option. The second column is the number of additional samples per super-sampled pixel for the non-recursive method <code>+AM1</code>. Lastly the third column is the maximum number of samples per super-sampled pixel for the recursive method <code>+AM2</code>.</p>
 
 <table width="50%">
 <tr>
@@ -3299,28 +3370,50 @@ Antialias_Depth=</code><em>n</em> option or <code> +R</code><em>n</em> switch co
 </tr>
 </table>
 
-<p class="Note"><strong>Note:</strong> The maximum number of samples in the recursive case is hardly ever reached for a given pixel. If the recursive method is used with no anti-aliasing each pixel will be the average of the rays traced at its corners. In most cases a recursion level of three is sufficient.</p>
-<p>Another way to reduce aliasing artifacts is to introduce noise into the sampling process. This is called <em>jittering</em> and works because the human visual system is much more forgiving to noise than it is to regular patterns. The location of the super-samples is jittered or wiggled a tiny amount when anti-aliasing is used. Jittering is used by default but it may be turned off with the <code>Jitter=off</code> option or <code>-J</code> switch. The amount of jittering can be set with the <code>Jitter_Amount=</code><em>n.n</em> option. When using switches the jitter scale may be specified after the <code>+J</code><em>n.n</em> switch. For example <code>+J0.5</code> uses half the normal jitter. The default amount of 1.0 is the maximum jitter which will insure that all super-samples remain inside the original pixel. </p>
+<p class="Note"><strong>Note:</strong> The maximum number of samples in the recursive case is hardly ever reached for a given pixel. If the recursive method is used and the anti-aliasing threshold is not reached, each pixel will be the average of the rays traced at its corners. In others words, you get the average of those four pixels with no further sub-sampling. In most cases a recursion level of three is sufficient.</p>
+
+</div>
+<a name="r3_2_8_8_4"></a>
+<div class="content-level-h5" contains="Sampling Method 3" id="r3_2_8_8_4">
+<h5>3.2.8.8.4 Sampling Method 3</h5>
+<p><code>+AM3</code> is <font class="New">New</font> in version 3.8 and it's an adaptive, non-recursive stochastic oversampling method. This method repeatedly iterates over the pixels to be rendered, jittering each ray randomly within the pixel on each pass, while keeping track of statistical parameters such as average color and mean deviation. On subsequent passes, the algorithm ceases to over-sample pixels where the
+statistical parameters for the pixel itself and its immediate four neighbors indicate that the result is <em>probably</em> good enough.</p>
+<p>What constitutes <em>probably</em> good enough is determined by a <em>confidence</em> parameter specified by the <code>Antialias_Confidence=</code>n.n or <code>+AC</code>n.n option, as well as a <em>threshold</em> parameter specified by the <code>Antialias_Threshold=</code>n.n or <code>+A</code>n.n option.</p>
+<p>The <em>threshold</em> determines what absolute sampling error (i.e. difference between the computed pixel color and the theoretically correct one) you consider acceptable, while the <em>confidence</em> specifies how sure you want to be that a pixel that <em>seems</em> acceptable actually <em>is</em> acceptable. In effect, this determines how many pixels in the resulting image <em>will</em> indeed be acceptable. For example, if you specify a confidence of 0.95, then you can expect approximately 95% of all pixels to be within the threshold, as compared to a theoretically correct image. Of the remaining ones, many will be off by slightly more than the threshold, while only few will be significantly off. Extreme outlines are possible but extremely unlikely.</p>
+<p>Recommended values are a <em>threshold</em> of 0.3 or lower, and a <em>confidence</em> of 0.9 or higher. They are the defaults.</p>
+<p>The total number of rays shot per pixel is limited by the <code>Antialias_Depth=</code>n or <code>+R</code>n parameter. As with the other methods the parameter is limited to the range from 1 to 9, with the actual maximum number of rays per pixel being 4<sup>n</sup>.</p>
+<p>By default, the sub-pixel jittering is different for each render, thus giving slightly different results, with the intent that multiple renders can be averaged to get a higher-quality image. Conversely you can produce exactly the same output each time. See also: <a href="r3_2.html#r3_2_8_7">Stochastic Seed</a></p>
+<p class="Note"><strong>Note:</strong> The jitter sequence is also affected by the actual image content, and will thus always differ between the frames of an animation.</p>
+<p>Since oversampling method 3 is a very generic adaptive oversampling algorithm, its performance in pure edge anti-aliasing is generally inferior to the other methods, however it is ideally suited to suppress random image noise created by other stochastic mechanisms, such as
+jittered area lights, subsurface light transport, or micro-normals based blurred reflections. It has also proven well-suited for eliminating moir&eacute; patterns.</p>
+
+</div>
+<a name="r3_2_8_8_5"></a>
+<div class="content-level-h5" contains="Common Properties" id="r3_2_8_8_5">
+<h5>3.2.8.8.5 Common Properties</h5>
+<p>Another way to reduce anti-aliasing artifacts is to introduce noise into the sampling process. This is called <em>jittering</em> and works because the human visual system is much more forgiving to noise than it is to regular patterns. It is <em>inherent</em> to anti-aliasing method 3 because it <em>always</em> uses a constant amount of jitter. When using one of the other methods the location of the super-samples is also jittered or wiggled a tiny amount by default. Alternately it may be turned off with the <code>Jitter=off</code> option or <code>-J</code> option. The amount of jittering can be set with the <code>Jitter_Amount=</code>n.n option. When using those options the jitter scale may be specified after the <code>+J</code>n.n option. For example <code>+J0.5</code> uses half the normal jitter. The default amount of 1.0 is the maximum jitter which will insure that all super-samples remain inside the original pixel. </p>
 <p class="Note"><strong>Note:</strong> The jittering noise is random and non-repeatable so you should avoid using jitter in animation sequences as the anti-aliased pixels will vary and flicker annoyingly from frame to frame.</p>
 <p>If anti-aliasing is not used one sample per pixel is taken regardless of the super-sampling method specified.</p>
-<p>As the human eye is more sensitive to absolute brightness differences at a low overall brigtness than at higher ones, super-sampling based on linear light intensity differences would yield either poor anti-aliasing in darker regions, or unnecessary super-sampling in brighter regions of the image. To avoid this, POV-Ray compares ''gamma-adjusted'' values instead. (Note that this only affects the comparison operation; the averaging of the super-samples is done in whatever <em>working color space</em> is specified in the scene file via the <code>assumed_gamma</code> keyword.) The <code>Antialias_Gamma=</code><em>n.n</em> command line option or <code>+AG</code><em>n.n</em> sets the gamma to apply before comparison, defaulting to 2.5. Note that the value is actually the inverse of the gamma applied, in order to use the same value range as the display and file gamma settings. Neutral behavior can be achieved using <code>Antialias_Gamma=1.0</code></p>
+<p>As the human eye is more sensitive to absolute brightness differences at a low overall brigtness than at higher ones, super-sampling based on linear light intensity differences would yield either poor anti-aliasing in darker regions, or unnecessary super-sampling in brighter regions of the image. To avoid this, POV-Ray compares <em>gamma-adjusted</em> values instead.</p>
+<p class="Note"><strong>Note:</strong> This only affects the comparison operation. The averaging of the super-samples is done in whatever <em>working color space</em> is specified in the scene file via the <code>assumed_gamma</code> keyword.</p>
+<p>The <code>Antialias_Gamma=</code>n.n command line option or <code>+AG</code>n.n sets the gamma to apply before comparison. The default is 2.5. This value is actually the inverse of the gamma applied, in order to use the same value range as the display and file gamma settings. If the image contains an alpha channel, that channel will <em>also</em> be considered in the comparisons, like the color channels, except that unlike the other channels it is <em>not</em> subject to <code>Antialias_Gamma</code>. Neutral behavior can be achieved using <code>Antialias_Gamma=1.0</code></p>
 <p class="Note"><strong>Note:</strong> The <code><a href="r3_4.html#r3_4_2_2_3">mesh_camera</a></code> feature added in version 3.7 also makes extreme super-sampling possible.  See the distribution file <code>~scenes/camera/mesh_camera/ess/README.txt</code> for additional information.</p>
 
 </div>
-<a name="r3_2_8_8"></a>
-<div class="content-level-h4" contains="Radiosity Options" id="r3_2_8_8">
-<h4>3.2.8.8 Radiosity Options</h4>
+<a name="r3_2_8_9"></a>
+<div class="content-level-h4" contains="Radiosity Options" id="r3_2_8_9">
+<h4>3.2.8.9 Radiosity Options</h4>
 </div>
-<a name="r3_2_8_8_1"></a>
-<div class="content-level-h5" contains="Radiosity High Reproducibility" id="r3_2_8_8_1">
-<h5>3.2.8.8.1 Radiosity High Reproducibility</h5>
+<a name="r3_2_8_9_1"></a>
+<div class="content-level-h5" contains="Radiosity High Reproducibility" id="r3_2_8_9_1">
+<h5>3.2.8.9.1 Radiosity High Reproducibility</h5>
 <p>As of version 3.7 a new radiosity mode has been introduced. When specifying <code>High_Reproducibility</code> or <code>+HR</code> on the command line, POV-Ray will spend extra effort to make sure renders are deterministic despite SMP. Currently radiosity is the only code to use this flag; in <code>+HR</code> mode, radiosity pretrace starts out with fewer threads, and some extra rules are imposed on sample re-use that may cause surplus samples to be gathered.</p>
 <p class="Note"><strong>Note:</strong> The <em>high reproducibility</em> mode is not intended for use with radiosity alone, and it will need more work to guarantee the same improved reproducibility in other features. Even though it works well with radiosity, this addition is still <em>experimental</em>.</p>
 
 </div>
-<a name="r3_2_8_8_2"></a>
-<div class="content-level-h5" contains="Radiosity Load and Save" id="r3_2_8_8_2">
-<h5>3.2.8.8.2 Radiosity Load and Save</h5>
+<a name="r3_2_8_9_2"></a>
+<div class="content-level-h5" contains="Radiosity Load and Save" id="r3_2_8_9_2">
+<h5>3.2.8.9.2 Radiosity Load and Save</h5>
 <p>The following .ini / command line parameters are recognized:</p>
 <pre>
 Radiosity_File_Name=&quot;&lt;name&gt;&quot;	or +RF&quot;&lt;name&gt;&quot;	to set the cache file name
@@ -3332,9 +3425,9 @@ Radiosity_To_File=&lt;on/off&gt;	or +RFO	to enable writing new samples to the ra
 <p>New samples gathered are written whenever an SMP block is completed. Tests indicate that this is almost neutral regarding performance, compared to operation with radiosity file output disabled.</p>
 
 </div>
-<a name="r3_2_8_8_3"></a>
-<div class="content-level-h5" contains="Radiosity Vain Pretrace" id="r3_2_8_8_3">
-<h5>3.2.8.8.3 Radiosity Vain Pretrace</h5>
+<a name="r3_2_8_9_3"></a>
+<div class="content-level-h5" contains="Radiosity Vain Pretrace" id="r3_2_8_9_3">
+<h5>3.2.8.9.3 Radiosity Vain Pretrace</h5>
 <p>Also new as of version 3.7 an option has been added to speed up radiosity pretrace:</p>
 <p>As some computations don't contribute to the generation of radiosity samples, they can safely be skipped during radiosity pretrace to gain some speed if the pretrace's other role as a coarse preview is not required.</p>
 <p>The following .ini file/command line options control whether pretrace performs all computations so it can double-feature as a coarse preview  (vain pretrace):</p>
