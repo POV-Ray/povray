@@ -325,6 +325,69 @@ void Parser::Parse_Trace(Vector3d& Res)
 *
 ******************************************************************************/
 
+void Parser::Parse_TraceUVMap(Vector3d& Res)
+{
+    ObjectPtr Object;
+    Intersection intersect;
+    TraceTicket ticket(1, 0.0);
+    Ray ray(ticket);
+    Vector2d UVVector;
+
+    Parse_Paren_Begin();
+
+    EXPECT_ONE
+        CASE (OBJECT_ID_TOKEN)
+            Object = reinterpret_cast<ObjectPtr>(Token.Data);
+        END_CASE
+
+        OTHERWISE
+            Object = nullptr;
+            UNGET
+        END_CASE
+    END_EXPECT
+
+    if (Object == nullptr)
+        Error ("Object identifier expected.");
+
+    Parse_Comma();
+
+    Parse_Vector(ray.Origin);
+    Parse_Comma();
+    Parse_Vector(ray.Direction);
+    ray.Direction.normalize();
+
+    if ( Find_Intersection( &intersect, Object, ray, GetParserDataPtr()) )
+    {
+        intersect.Object->UVCoord( UVVector, &intersect, GetParserDataPtr());
+        Res[X] = UVVector[X];
+        Res[Y] = UVVector[Y];
+        Res[Z] = 0;
+    }
+    else
+    {
+        Res[X]=Res[Y]=Res[Z]=0;
+    }
+
+    Parse_Paren_End();
+}
+/*****************************************************************************
+*
+* FUNCTION
+*
+* INPUT
+*
+* OUTPUT
+*
+* RETURNS
+*
+* AUTHOR
+*
+* DESCRIPTION
+*
+* CHANGES
+*
+******************************************************************************/
+
 int Parser::Parse_Inside()
 {
     ObjectPtr Object;
@@ -1197,6 +1260,10 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
                 case TRACE_TOKEN:
                     Parse_Trace( Vect );
+                    break;
+
+                case TRACEUVMAP_TOKEN:
+                    Parse_TraceUVMap( Vect );
                     break;
 
                 case MIN_EXTENT_TOKEN:
