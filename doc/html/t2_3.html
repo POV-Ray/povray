@@ -4501,11 +4501,8 @@ restriction was removed so that all patterns listed in section <a href="r3_6.htm
 <a name="t2_3_5_1"></a>
 <div class="content-level-h4" contains="Pigments" id="t2_3_5_1">
 <h4>2.3.5.1 Pigments</h4>
-<p>Every surface must have a color. In POV-Ray this color is called a <code><a href="r3_6.html#r3_6_1_1">pigment</a></code>.
-It does not have to be a single color. It can be a color pattern, a color
-list or even an image map. Pigments can also be layered one on top of the next
-so long as the uppermost layers are at least partially transparent so the ones
-beneath can show through. Let's play around with some of these kinds of
+<p>Every surface must have a color. In POV-Ray this color is called a <code><a href="r3_6.html#r3_6_1_1">pigment</a></code>. It does not have to be a single color. It can be a <a href="t2_3.html#t2_3_5_1_2">color pattern</a>, a <a href="t2_3.html#t2_3_5_1_1">color list</a> or even an <a href="r3_6.html#r3_6_2_6_1">image map</a>. Pigments can also be layered one on top of the next so long as the uppermost layers are at least partially transparent so the ones beneath can show through. See also: <a href="t2_3.html#t2_3_5_1_4">Using Transparent Pigments and Layered Textures</a></p>
+<p>Let's play around with some of these kinds of
 pigments.</p>
 <p>
 We create a file called <code>texdemo.pov</code> and edit it as
@@ -8938,7 +8935,7 @@ or an <a href="r3_2.html#r3_2_5_1">INI-file constant</a> and an <code>#if</code>
 
 <p>If average to good quality radiosity will work for your scene, then it's probably a good idea to spend the time to find the <em>sweet spot</em> that strikes the best balance between quality and speed.  Especially <code>recursion_limit</code> should be kept as low as possible. Sometimes <code>1</code> is sufficient, if not <code>2</code> or <code>3</code> should often be enough.</p>
 
-<p>With high quality settings, radiosity data can take quite a lot of memory. Apart from that the other scene data is also used much more intensively than in a conventional scene. Therefore insufficient memory and swapping can slow down things even more. Here's a few <a href="r3_2.html#r3_2_8_8">radiosity options</a> that might help.</p>
+<p>With high quality settings, radiosity data can take quite a lot of memory. Apart from that the other scene data is also used much more intensively than in a conventional scene. Therefore insufficient memory and swapping can slow down things even more. Here's a few <a href="r3_2.html#r3_2_8_9">radiosity options</a> that might help.</p>
 
 <p>Finally the scene geometry and textures are important too. Objects not visible in the camera usually only increase parsing time and memory use, but in a radiosity scene, also objects behind the camera can slow down the rendering process. See the section <a href="r3_4.html#r3_4_3_3_4">Configuring Radiosity</a> for some helpful hints.</p>
 

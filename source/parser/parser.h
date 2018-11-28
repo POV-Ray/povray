@@ -287,13 +287,24 @@ class Parser : public SceneTask
 
         struct POV_ARRAY
         {
-            int Dims;
-            TokenId Type;
-            int Sizes[5];
-            int Mags[5];
+            static const int kMaxDimensions = 5;
+            int maxDim;                             ///< Index of highest dimension.
+            TokenId Type_;
+            int Sizes[kMaxDimensions];
+            size_t Mags[kMaxDimensions];
             vector<void*> DataPtrs;
             vector<TokenId> Types;
-            bool resizable;
+            bool resizable : 1;
+            bool mixedType : 1;
+            bool IsInitialized() const;
+            bool HasElement(size_t i) const;
+            const TokenId& ElementType(size_t i) const;
+            TokenId& ElementType(size_t i);
+            size_t GetLinearSize() const;
+            void Grow();
+            void GrowBy(size_t delta);
+            void GrowTo(size_t delta);
+            void Shrink();
         };
 
         struct POV_PARAM
@@ -357,6 +368,7 @@ class Parser : public SceneTask
         inline bool Parse_Square_Begin (bool mandatory = true) { return Parse_Begin(LEFT_SQUARE_TOKEN, mandatory); }
         inline void Parse_Square_End (void) { Parse_End(LEFT_SQUARE_TOKEN, RIGHT_SQUARE_TOKEN); }
         bool Parse_Comma (void);
+        bool AllowToken(TokenId tokenId);
         bool Peek_Token (TokenId tokenId);
         void Parse_Semi_Colon (bool force_semicolon);
         void Destroy_Frame (void);
@@ -640,6 +652,14 @@ class Parser : public SceneTask
         // parstxtr.h/parstxtr.cpp
         TEXTURE *Default_Texture;
 
+        enum class DefaultsVersion : char
+        {
+            kLegacy,    ///< Pre-v3.8 defaults.
+            k380,       ///< v3.8.0 defaults.
+        };
+        DefaultsVersion defaultsVersion;    ///< Language version active before the first `default` statement.
+        bool defaultsModified   : 1;        ///< Whether a `default` statement has been encountered.
+
         // express.h/express.cpp
         short Have_Vector;
         unsigned int Number_Of_Random_Generators;
@@ -752,7 +772,7 @@ class Parser : public SceneTask
         void Return_From_Macro(void);
         void Add_Entry (SYM_TABLE *table, SYM_ENTRY *Table_Entry);
         void Add_Entry (int Index,SYM_ENTRY *Table_Entry);
-        void Parse_Initalizer (int Sub, int Base, POV_ARRAY *a);
+        void Parse_Initalizer (int Sub, size_t Base, POV_ARRAY *a);
 
         void Parse_Fopen(void);
         void Parse_Fclose(void);

@@ -252,6 +252,8 @@ class POVMS_Object : public POVMS_Container
         POVMSUCS2String TryGetUCS2String(POVMSType key, const char *alt);
         POVMSUCS2String TryGetUCS2String(POVMSType key, const POVMSUCS2String& alt);
         POVMSInt TryGetInt(POVMSType key, POVMSInt alt);
+        template<typename T> T TryGetEnum(POVMSType key, T alt)
+            { return static_cast<T>(TryGetInt(key, static_cast<int>(alt))); }
         POVMSLong TryGetLong(POVMSType key, POVMSLong alt);
         POVMSFloat TryGetFloat(POVMSType key, POVMSFloat alt);
         POVMSBool TryGetBool(POVMSType key, POVMSBool alt);

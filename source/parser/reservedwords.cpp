@@ -341,6 +341,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { MIN_TOKEN,                    "min" },
     { MIN_EXTENT_TOKEN,             "min_extent" },
     { MINIMUM_REUSE_TOKEN,          "minimum_reuse" },
+    { MIXED_TOKEN,                  "mixed" },
     { MM_PER_UNIT_TOKEN,            "mm_per_unit" },
     { MOD_TOKEN,                    "mod" },
     { MORTAR_TOKEN,                 "mortar" },

@@ -1096,7 +1096,7 @@ State VirtualFrontEnd::Process()
             // case.
             return state;
           }
-          try { viewId = renderFrontend.CreateView(sceneId, options, imageProcessing, boost::bind(&vfe::VirtualFrontEnd::CreateDisplay, this, _1, _2, _3)); }
+          try { viewId = renderFrontend.CreateView(sceneId, options, imageProcessing, boost::bind(&vfe::VirtualFrontEnd::CreateDisplay, this, _1, _2)); }
           catch(pov_base::Exception& e)
           {
             m_Session->SetFailed();

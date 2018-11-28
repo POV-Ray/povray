@@ -444,7 +444,9 @@ void Parser::Unget_Token ()
 
 void Parser::Read_Symbol(const RawToken& rawToken)
 {
-    int Local_Index,i,j,k;
+    int Local_Index, i;
+    size_t j;
+    int k;
     POV_ARRAY *a;
     SYM_ENTRY *Temp_Entry;
     POV_PARAM *Par;
@@ -572,7 +574,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
                                 // array of arrays and `Foo[A]` is uninitialized.
                                 Error("Attempt to access uninitialized nested array.");
 
-                            for (i=0; i <= a->Dims; i++)
+                            for (i=0; i <= a->maxDim; i++)
                             {
                                 Parse_Square_Begin();
                                 val=Parse_Float();
@@ -587,9 +589,9 @@ void Parser::Read_Symbol(const RawToken& rawToken)
                                 {
                                     if (a->resizable)
                                     {
-                                        POV_PARSER_ASSERT (a->Dims == 0);
-                                        a->DataPtrs.resize (k+1);
-                                        a->Sizes[0] = a->DataPtrs.size();
+                                        POV_PARSER_ASSERT (a->maxDim == 0);
+                                        if (a->DataPtrs.size() <= k)
+                                            a->GrowTo(k + 1);
                                     }
                                     else
                                         Error("Array subscript out of range");
@@ -605,16 +607,13 @@ void Parser::Read_Symbol(const RawToken& rawToken)
                                 // `Foo[A]` is uninitialized, because until now we've only seen
                                 // `#declare Foo[A]`, which is no reason for concern as it may
                                 // just as well be part of `#declare Foo[A]=...` which is fine.
-                                if (a->DataPtrs[j] == nullptr)
+                                if (!a->HasElement(j))
                                     Error("Attempt to access uninitialized array element.");
                             }
 
                             mToken.DataPtr = &(a->DataPtrs[j]);
-                            mToken.is_mixed_array_elem = !a->Types.empty();
-                            if (mToken.is_mixed_array_elem)
-                                mToken.NumberPtr = &(a->Types[j]);
-                            else
-                                mToken.NumberPtr = &(a->Type);
+                            mToken.is_mixed_array_elem = a->mixedType;
+                            mToken.NumberPtr = &(a->ElementType(j));
                             mToken.Token_Id = *mToken.NumberPtr;
                             mToken.is_array_elem = true;
                             mToken.is_dictionary_elem = false;
@@ -628,6 +627,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
 
                             haveNextRawToken = PeekRawToken(nextRawToken);
 
+                            SYM_TABLE* parentTable = table;
                             if (pseudoDictionary >= 0)
                             {
                                 table = Tables [pseudoDictionary];
@@ -687,6 +687,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
                             else
                             {
                                 breakLoop = true;
+                                table = parentTable;
                                 break;
                             }
 
@@ -1552,12 +1553,8 @@ void Parser::Parse_Directive(int After_Hash)
                                           "'#version version;'.");
                             }
 
-                            if (!sceneData->languageVersionLate && !sceneData->languageVersionSet)
-                            {
-                                // Got `#version` as the first statement of the file.
-                                // Initialize various defaults depending on language version specified.
-                                InitDefaults(sceneData->languageVersion);
-                            }
+                            // Initialize various defaults depending on language version specified.
+                            InitDefaults(sceneData->languageVersion);
 
                             // NB: This must be set _after_ parsing the value, in order for the `#version version`
                             // idiom to work properly, but _before_ any of the following code querying
@@ -2693,10 +2690,12 @@ Parser::Macro::~Macro()
 Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
 {
     POV_ARRAY *New;
-    int i,j;
+    int i;
+    size_t j;
 
     New = new POV_ARRAY;
     New->resizable = false;
+    New->mixedType = AllowToken(MIXED_TOKEN);
 
     i=0;
     j=1;
@@ -2705,7 +2704,7 @@ Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
 
     while (Parse_Square_Begin(false))
     {
-        if (i>4)
+        if (i >= POV_ARRAY::kMaxDimensions)
         {
             Error("Too many array dimensions");
         }
@@ -2722,18 +2721,24 @@ Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
         // new syntax: Dynamically sized one-dimensional array
         New->Sizes[0] = 0;
         New->resizable = true;
-        New->Dims     = 0;
+        New->maxDim     = 0;
     }
     else
     {
-        New->Dims     = i-1;
-        New->DataPtrs.resize (j);
+        New->maxDim     = i-1;
+        New->DataPtrs.reserve(j);
+        New->DataPtrs.assign(j, nullptr);
+        if (New->mixedType)
+        {
+            New->Types.reserve(j);
+            New->Types.assign(j, IDENTIFIER_TOKEN);
+        }
     }
-    New->Type = EMPTY_ARRAY_TOKEN;
+    New->Type_ = EMPTY_ARRAY_TOKEN;
 
     j = 1;
 
-    for(i = New->Dims; i>=0; i--)
+    for(i = New->maxDim; i>=0; i--)
     {
         New->Mags[i] = j;
         j *= New->Sizes[i];
@@ -2821,7 +2826,7 @@ Parser::SYM_TABLE *Parser::Parse_Dictionary_Declare()
 
 };
 
-void Parser::Parse_Initalizer (int Sub, int Base, POV_ARRAY *a)
+void Parser::Parse_Initalizer (int Sub, size_t Base, POV_ARRAY *a)
 {
     int i;
     bool optional = false;
@@ -2837,7 +2842,7 @@ void Parser::Parse_Initalizer (int Sub, int Base, POV_ARRAY *a)
     END_EXPECT
 
     Parse_Begin();
-    if (Sub < a->Dims)
+    if (Sub < a->maxDim)
     {
         for(i=0; i < a->Sizes[Sub]; i++)
         {
@@ -2851,14 +2856,12 @@ void Parser::Parse_Initalizer (int Sub, int Base, POV_ARRAY *a)
         for(i=0; !finalParameter; i++)
         {
             if (a->resizable)
-            {
-                a->DataPtrs.push_back (nullptr);
-                a->Sizes[Sub] = a->DataPtrs.size();
-            }
+                a->Grow();
             else
                 finalParameter = (i == (a->Sizes[Sub]-1));
 
-            if (!Parse_RValue (a->Type, &(a->Type), &(a->DataPtrs[Base+i]), nullptr, false, false, true, false, true, MAX_NUMBER_OF_TABLES))
+            if (!Parse_RValue (a->ElementType(Base+i), &(a->ElementType(Base+i)), &(a->DataPtrs[Base+i]),
+                               nullptr, false, false, true, false, true, MAX_NUMBER_OF_TABLES))
             {
                 EXPECT_ONE
                     CASE (IDENTIFIER_TOKEN)
@@ -2871,9 +2874,8 @@ void Parser::Parse_Initalizer (int Sub, int Base, POV_ARRAY *a)
                         if (a->resizable)
                         {
                             finalParameter = true;
-                            POV_PARSER_ASSERT (a->DataPtrs.back() == nullptr);
-                            a->DataPtrs.pop_back();
-                            a->Sizes[Sub] = a->DataPtrs.size();
+                            // We reserved one element too many.
+                            a->Shrink();
                         }
                         else
                         {

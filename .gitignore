@@ -222,6 +222,13 @@ $RECYCLE.BIN/
 # Files created by make in various subdirectories
 .dirstamp
 
+# ===========================
+# POV-Ray meta-build detritus
+# ===========================
+
+# Byte-compiled python modules
+*.pyc
+
 # =====================
 # POV-Ray Miscellaneous
 # =====================
