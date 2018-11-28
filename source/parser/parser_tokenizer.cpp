@@ -627,6 +627,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
 
                             haveNextRawToken = PeekRawToken(nextRawToken);
 
+                            SYM_TABLE* parentTable = table;
                             if (pseudoDictionary >= 0)
                             {
                                 table = Tables [pseudoDictionary];
@@ -686,6 +687,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
                             else
                             {
                                 breakLoop = true;
+                                table = parentTable;
                                 break;
                             }
 
@@ -2870,8 +2872,11 @@ void Parser::Parse_Initalizer (int Sub, size_t Base, POV_ARRAY *a)
 
                     CASE (RIGHT_CURLY_TOKEN)
                         if (a->resizable)
+                        {
+                            finalParameter = true;
                             // We reserved one element too many.
                             a->Shrink();
+                        }
                         else
                         {
                             if (!(finalParameter && properlyDelimited))

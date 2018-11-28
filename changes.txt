@@ -69,6 +69,14 @@ Changed Behaviour
   - The `defined()` pseudo-function now returns `true` (while printing a
     warning) if applied to reserved words. The `#ifdef` and `#ifndef` directives
     also behave accordingly.
+  - The dithering implementation has been modified, and may produce slightly
+    different results for otherwise identical scenes.
+  - The PGM (greyscale variant of PPM) output gamma handling now matches that
+    of regular PPM, honoring `File_Gamma` defaulting to ITU-R BT.709. To get
+    linear greyscale output, explicitly specify `File_Gamma=1.0`.
+  - Greyscale output no longer automatically forces bit depth to 16 bpc. To get
+    16 bpp greyscale output, explicitly specify `Bits_Per_Color=16`.
+  - Preview now reflects greyscale setting.
 
 New Features
 ------------
@@ -86,6 +94,13 @@ New Features
     the list of control points.
   - The `matrix` syntax now allows allows for a trailing comma at the end of
     the list of coefficients.
+  - File formats supporting variable bit depths (PNG and PPM/PGM) now allow for
+    bit depths as low as 1 bit per colour channel. (1-bit greyscale PPM/PGM will
+    still be written as PGM, not PBM.)
+  - Command-line option `+F` now allows specifying both the `G` greyscale flag
+    and the bit depth.
+  - Support for blue noise dithering has been added, plus a couple more error
+    diffusion dithering filters.
 
 Performance Improvements
 ------------------------

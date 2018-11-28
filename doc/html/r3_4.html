@@ -493,17 +493,7 @@ used is: <em>Ambient = Finish_Ambient * Global_Ambient</em>.</p>
 <a name="r3_4_1_4"></a>
 <div class="content-level-h4" contains="HF_Gray_16" id="r3_4_1_4">
 <h4>3.4.1.4 HF_Gray_16</h4>
-<p class="Note"><strong>Note:</strong> In version 3.7 the <code>hf_gray_16</code> keyword in the <code>global_settings</code> block has been deprecated. If encountered, it has no effect on the output type and will additionally generate a warning message.</p>
-
-<p>However grayscale output can still be used to generate heightfields for use in other POV-Ray scenes, and now should be specified by using <code>Grayscale_Output=true</code> as an INI option, or <code>+Fxg</code> (for output type 'x') as a command-line option. For example, <code>+Fng</code> for PNG and <code>+Fpg</code> for PPM (effectively PGM) grayscale output. By default this option is off.</p>
-
-<p>With <code>Grayscale_Output=true</code>, the <strong>output file</strong> will be in the form of a grayscale image that can be used to generate heightfields, because the height at any point is dependent on the brightness of the pixel. The brightness of a pixel is calculated in the same way that color images are converted to grayscale images:<em><code> height = 0.3 * red + 0.59 * green + 0.11 * blue</code></em>.</p>
-
-<p>It should also be noted that setting the <code>Grayscale_Output=true</code> INI option will <strong>NOT</strong> cause the preview display, if used, to be grayscale rather than color. See the section <a href="r3_5.html#r3_5_1_1_5">Height Field</a> for a description of how POV-Ray heightfields are stored for each file type.</p>
-
-<p class="Note"><strong>Note:</strong> Grayscale output implies the maximum bit-depth the format supports is 16, it is not valid to specify bits per color channel with 'g' (e.g. <code>+Fng16</code> is not allowed, and nor for that matter is <code>+Fn16g</code>). If bits per channel is provided via an INI option, it is ignored.</p>
-
-<p>Currently PNG, and PPM are the only file formats that support grayscale output.</p>
+<p>A <font class="Change">Change</font> as of version 3.7 has deprecated the <code>hf_gray_16</code> keyword in the <code>global_settings</code> block. If encountered, it has no effect on the output type and will additionally generate a warning message. Grayscale output can still be used to generate heightfields for use in other POV-Ray scenes. See: <a href="r3_2.html#r3_2_4_1">Output File Type</a> for details.</p>
 
 </div>
 <a name="r3_4_1_5"></a>
@@ -899,6 +889,7 @@ determines how many units high the image is. For example if you have <code>up
 visible. All viewing rays are perpendicular to the y-axis. For type 2 and 4,
 the cylinder lies along the <code>right</code> vector. Viewing rays for type
 4 are perpendicular to the <code>right</code> vector.</p>
+<p>See Also: <a href="r3_4.html#r3_4_2_1_6">Aspect Ratio</a></p>
 <p class="Note"><strong>Note:</strong> The <code>up</code>, <code>right</code>, and <code>direction</code> vectors should always remain perpendicular to each other or the image will be distorted. If this is not the case a warning message will be printed. The vista buffer will not work for non-perpendicular camera vectors.</p>
 
 </div>
@@ -907,7 +898,7 @@ the cylinder lies along the <code>right</code> vector. Viewing rays for type
 <h5>3.4.2.1.6 Aspect Ratio</h5>
 <p>Together the <code>right</code> <em>(width)</em> and <code>up</code> <em>(height)</em> vectors define the <em>aspect ratio</em> of the resulting image.</p>
 
-<p>A <font class="Change">Change</font> in version 3.8 redefines how the <code>right</code> vector default is derived. Previously a fixed value, it is now a calculated value that is based on the image width and height specified at render time. As usual, the image width and height can be specified from either the pull down menu available in <em>GUI</em> versions <em>ONLY</em> or the <code>+Wn</code> and <code>+Hn</code> command-line options available to <em>ALL</em> versions. This behavior is conditional upon the <em>last</em> effective <code>#version</code> directive before the camera definition. The default <code>up</code> vector remains as <code>&lt;0,1,0&gt;</code>.</p>
+<p>A <font class="Change">Change</font> in version 3.8 redefines how the <code>right</code> vector default is derived. The default setting is now <code>right &lt;image_width/image_height,0,0&gt;</code> as opposed to the <code>right &lt;1.33,0,0&gt;</code> value used in previous versions. Requires <code>#version 3.8;</code> or equivalent INI setting or command-line option. See also: <a href="r3_3.html#r3_3_2_5">Version Directive</a>. As usual, the image width and height can be specified from either the pull down menu available in <em>GUI</em> versions <em>ONLY</em> or the <code>+Wn</code> and <code>+Hn</code> command-line options available to <em>ALL</em> versions. The default <code>up</code> vector remains as <code>&lt;0,1,0&gt;</code>.</p>
 
 <p>To retain legacy behavior see the example below:</p>
 
@@ -2419,7 +2410,7 @@ terms, it changes S only). The default value is 0.0</p>
 <a name="r3_4_3_3_4"></a>
 <div class="content-level-h5" contains="Configuring Radiosity" id="r3_4_3_3_4">
 <h5>3.4.3.3.4 Configuring Radiosity</h5>
-<p>The following parameters deal with configuring radiosity and how it interacts with other features. See also these additional command line <a href="r3_2.html#r3_2_8_8">options</a> for more control.</p>
+<p>The following parameters deal with configuring radiosity and how it interacts with other features. See also these additional command line <a href="r3_2.html#r3_2_8_9">options</a> for more control.</p>
 
 </div>
 <a name="r3_4_3_3_4_1"></a>
@@ -2459,7 +2450,7 @@ default { radiosity { importance DEFAULT_IMPORTANCE } }
 <div class="content-level-h6" contains="Save and Load Radiosity Data" id="r3_4_3_3_4_5">
 <h6>3.4.3.3.4.5 Save and Load Radiosity Data</h6>
 <p>In general, it is not a good idea to save and load radiosity data if scene objects are moving. Even after the data is loaded, more samples may be taken during the final rendering phase, particularly if you've specified <code>always_sample on</code>.</p>
-<p class="Note"><strong>Note:</strong> The method to load and save radiosity data has been changed to a command line option. See section <a href="r3_2.html#r3_2_8_8_2">radiosity load and save</a> for more details.</p>
+<p class="Note"><strong>Note:</strong> The method to load and save radiosity data has been changed to a command line option. See section <a href="r3_2.html#r3_2_8_9_2">radiosity load and save</a> for more details.</p>
 
 </div>
 <a name="r3_4_3_3_4_6"></a>

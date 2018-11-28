@@ -572,6 +572,9 @@ and <a href="r3_6.html#r3_6_1_6">Layered Textures</a> which are made up of plain
 
 
 <p>The color or pattern of colors for an object is defined by a <code>pigment</code> statement. All plain textures must have a pigment. If you do not specify one the default pigment is used. The color you define is the way you want the object to look if fully illuminated. You pick the basic color inherent in the object and POV-Ray brightens or darkens it depending on the lighting in the scene. The parameter is called <code>pigment</code> because we are defining the basic color the object actually is rather than how it looks.</p>
+
+<p>In version 3.8 there has been a <font class="Change">Change</font> to the <code>pigment</code> default setting. The default setting is now <code>rgb &lt;1,1,1&gt;</code> as opposed to the <code>rgb &lt;0,0,0&gt;</code> value used in previous versions. Requires <code>#version 3.8;</code> or equivalent INI setting or command-line option. See also: <a href="r3_3.html#r3_3_2_5">Version Directive</a>.</p>
+
 <p>The syntax for pigment is:</p>
 <pre>
 PIGMENT:
@@ -1046,7 +1049,7 @@ and <a href="r3_6.html#r3_6_1_2_3_3">Use_Color</a> below.</p>
 BUMP_MAP:
   normal {
     bump_map {
-      BITMAP_TYPE &quot;bitmap.ext&quot; [gamma GAMMA] [premultiplied BOOL]
+      [BITMAP_TYPE] &quot;filename&quot; [gamma GAMMA] [premultiplied BOOL]
       [BUMP_MAP_MODs...]
       }
   [NORMAL_MODFIERS...]
@@ -1060,7 +1063,7 @@ BUMP_MAP_MODS:
   use_colour | bump_size Value
 </pre>
 
-<p>After the required <em>BITMAP_TYPE</em> keyword is a string expression containing the name of a bitmapped bump file of the specified type. Several optional modifiers may follow the file specification. The modifiers are described below.</p>
+<p>After the optional <em>BITMAP_TYPE</em> keyword is a string expression containing the name of a bitmapped bump file of the specified type. Several optional modifiers may follow the file specification. The modifiers are described below.</p>
 <p class="Note"><strong>Note:</strong> Earlier versions of POV-Ray allowed some modifiers before the <em>BITMAP_TYPE</em> but that syntax is being phased out in favor of the syntax described here.</p>
 <p>Filenames specified in the <code>bump_map</code> statements will be searched for in the home (current) directory first and, if not found, will then be searched for in directories specified by any <code>+L</code> or <code>Library_Path</code> options active. This would facilitate keeping all your bump maps files in a separate sub-directory and giving a <code>Library_Path</code> option to specify where your library of bump maps are. See <a href="r3_2.html#r3_2_5_3">Library Paths</a> for details.</p>
 <p>By default, the bump pattern is mapped onto the x-y-plane. The bump pattern is <em>projected</em> onto the object as though there were a slide projector somewhere in the -z-direction. The pattern exactly fills the square area from (x,y) coordinates (0,0) to (1,1) regardless of the pattern's original size in pixels. If you would like to change this default you may translate, rotate or scale the pigment or texture to map it onto the object's surface as desired. If you would like to change this default orientation you may translate, rotate or scale the pigment or texture to map it onto the object's surface as desired.</p>
@@ -1232,7 +1235,7 @@ finish { ambient rgb &lt;0.3,0.1,0.1&gt; } //a pink ambient
 
 <p class="Note"><strong>Note:</strong> Specular reflected indirect illumination like a flashlight shining in a mirror cannot modeled by either ambient light or radiosity. Use <a href="r3_4.html#r3_4_3_4">photons</a> instead.</p>
 
-<p>There has been an important <font class="Change">Change</font> in version 3.8 regarding the default <code>ambient</code> setting. When <code><a href="r3_3.html#r3_3_2_5">#version</a></code> is set as <em>either</em> the first statement of the scene file or via <a href="r3_2.html#r3_2_5_4">command-line option</a> and the version is 3.8 or greater the default setting is now <code>ambient 0</code> as opposed to the <code>ambient 0.1</code> value used in previous versions.</p>
+<p>In version 3.8 there has been a <font class="Change">Change</font> to the <code>ambient</code> default setting. The default setting is now <code>ambient 0</code> as opposed to the <code>ambient 0.1</code> value used in previous versions. Requires <code>#version 3.8;</code> or equivalent INI setting or command-line option. See also: <a href="r3_3.html#r3_3_2_5">Version Directive</a>.</p>
 
 </div>
 <a name="r3_6_1_3_2"></a>
@@ -1623,7 +1626,7 @@ PATTERNED_TEXTURE:
     } |
   texture {
     material_map {
-      BITMAP_TYPE &quot;bitmap.ext&quot;
+      [BITMAP_TYPE] &quot;filename&quot;
       [BITMAP_MODS...] TEXTURE... [TRANSFORMATIONS...]
       }
     }
@@ -1774,7 +1777,7 @@ textures.</p>
 MATERIAL_MAP:
   texture {
     material_map {
-      BITMAP_TYPE &quot;bitmap.ext&quot;
+      [BITMAP_TYPE] &quot;filename&quot;
       [BITMAP_MODS...] TEXTURE... [TRANSFORMATIONS...]
       }
     }
@@ -1784,9 +1787,7 @@ BITMAP_MOD:
   map_type Type | once | interpolate Type
 </pre>
 
-<p>After the required <em>BITMAP_TYPE</em> keyword is a string expression
-containing the name of a bitmapped material file of the specified type.
-Several optional modifiers may follow the file specification. The modifiers
+<p>After the optional <em>BITMAP_TYPE</em> keyword is a string expression containing the name of a bitmapped material file of the specified type. Several optional modifiers may follow the file specification. The modifiers
 are described below.</p>
 <p class="Note"><strong>Note:</strong> Earlier versions of POV-Ray allowed some modifiers before the <em>BITMAP_TYPE</em> but that syntax is being phased out in favor of the syntax described here.</p>
 <p>
@@ -1794,7 +1795,7 @@ Filenames specified in the <code>material_map</code> statements will be
 searched for in the home (current) directory first and, if not found, will
 then be searched for in directories specified by any <code>+L</code> or
 <code>Library_Path</code> options active. This would facilitate keeping all
-your material maps files in a separate subdirectory and giving a <code>
+your material maps files in a separate sub-directory and giving a <code>
 Library_Path</code> option to specify where your library of material maps
 are. See the section <a href="r3_2.html#r3_2_5_3">Library Paths</a> for details.</p>
 <p>
@@ -4414,7 +4415,7 @@ TEXTURE:
 
 IMAGE_PATTERN:
   image_pattern {
-    BITMAP_TYPE &quot;bitmap.ext&quot; [gamma GAMMA] [premultiplied BOOL]
+    [BITMAP_TYPE] &quot;filename&quot; [gamma GAMMA] [premultiplied BOOL]
     [IMAGE_MAP_MODS...]
     }
 BITMAP_TYPE:
@@ -4440,7 +4441,7 @@ texture {
   }
 </pre>
 
-<p class="Note"><strong>Note:</strong> This pattern uses an image to get the gray values. If you want exactly the same possibilities but need to get gray values from a pigment, you can use the <a href="r3_6.html#r3_6_1_1_3">pigment_pattern</a>.</p>
+<p class="Note"><strong>Note:</strong> This pattern uses an image to get the gray values. If you want exactly the same possibilities but need to get gray values from a pigment, you can use the <code><a href="r3_6.html#r3_6_2_1_19">pigment_pattern</a></code>.</p>
 <p>While POV-Ray will normally interpret the image pattern input file as a container of linear data irregardless of file type, this can be overridden for any individual image pattern input file by specifying <code>gamma</code> GAMMA immediately after the file name. For example:</p>
 <pre>
 image_pattern {
@@ -4528,7 +4529,8 @@ pigment {
   }
 </pre>
 
-<p>The pattern is similar to <code>image_map</code> in that it directly specifies <em>colors</em> rather than using a <code><a href="r3_6.html#r3_6_1_1_2">Color Map</a></code> or <code><a href="r3_6.html#r3_6_1_1_3">Pigment Map</a></code>.</div>
+<p>The pattern is similar to <code><a href="r3_6.html#r3_6_2_6">image_map</a></code> in that it directly specifies <em>colors</em> rather than using a <code><a href="r3_6.html#r3_6_1_1_2">color_map</a></code> or <code><a href="r3_6.html#r3_6_1_1_3">pigment_map</a></code>.</p>
+<p>The user defined pattern functionality also extends to density blocks, of course using only the red, green and blue function values. See also: <a href="r3_7.html#r3_7_2_4">Density</a></p></div>
 
 <a name="r3_6_2_5"></a>
 <div class="content-level-h4" contains="Pattern Modifiers" id="r3_6_2_5">
@@ -5371,7 +5373,7 @@ agate, marble, spiral1, spiral2, and wood textures.</p></div>
 IMAGE_MAP:
  pigment {
    image_map {
-     [BITMAP_TYPE] &quot;bitmap[.ext]&quot; [gamma GAMMA] [premultiplied BOOL]
+     [BITMAP_TYPE] &quot;filename&quot; [gamma GAMMA] [premultiplied BOOL]
      [IMAGE_MAP_MODS...]
      }
  [PIGMENT_MODFIERS...]

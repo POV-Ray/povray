@@ -335,11 +335,12 @@ file, and by using the shape or material name in your scene.</p>
 </ol>
 <p><strong>Language Basics and Directives</strong></p>
 <ol>
+  <li>Important behavior changes concerning the: <a href="r3_3.html#r3_3_2_5">Version Directive</a></li> 
   <li><a href="r3_3.html#r3_3_1_3">Identifiers</a> are no longer limited to just 40 characters in length</li> 
   <li>Support for <code>tau</code> as a <a href="r3_3.html#r3_3_1_5_5">Built-in Constant</a> has been added</li>
   <li>The <code>macro</code> directive has been extended. See <a href="r3_3.html#r3_3_2_8_6">Optional Parameters</a> for details</li>
   <li>A <em>cached macro</em> mechanism has been implemented. See: <a href="r3_3.html#r3_3_2_8_7">Macro Caching</a> for more information</li>
-  <li>Improved <code>array</code> functionality allows the creation of <a href="r3_3.html#r3_3_1_10">dictionary</a> container types</li>
+  <li>Arrays now allow the creation of <code>dictionary</code> container types and <code>mixed</code> type elements. See: <a href="r3_3.html#r3_3_1_10">Array</a> </li>
   <li>The addition of a <code><a href="r3_2.html#r3_2_2_5">Create_Continue_Trace_Log</a></code> option allows for greater resource control</li>
   <li>The <a href="r3_3.html#r3_3_2_2">Declare and Local Directives</a> have been extended to support <em>tuple-style</em> assignments</li>
   <li>All instances of <code>gray</code> in keywords or INI file options can now alternatively be spelled <code>grey</code></li>
@@ -363,7 +364,10 @@ file, and by using the shape or material name in your scene.</p>
 </ol>
 <p><strong>Images and Image Related</strong></p>
 <ol>
-  <li>The default <code>up</code> vector has changed. See: <a href="r3_4.html#r3_4_2_1_6">Aspect Ratio</a></li>
+  <li>A new <a href="r3_2.html#r3_2_8_8">anti-aliasing</a> method has been implemented.</li>
+  <li>Several changes to grayscale file output handling. See: <a href="r3_2.html#r3_2_4_1">Output File Type</a></li>
+  <li>A few changes and several additions to <a href="r3_2.html#r3_2_4_4">output file dithering</a></li>
+  <li>The default <code>up</code> and <code>right</code> vectors have changed. See: <a href="r3_4.html#r3_4_2_1_6">Aspect Ratio</a></li>
   <li>The <code>max_extent</code> <a href="r3_3.html#r3_3_1_6_5">function</a> has been extended</li>
   <li>Two gamma handling specifications have been added for:</li>
     <ol type="a">
@@ -375,7 +379,6 @@ file, and by using the shape or material name in your scene.</p>
       <li>bump map <a href="r3_6.html#r3_6_1_2_3_1">input</a> file</li>
     </ol>
   <li>The <code><a href="r3_6.html#r3_6_2_7_2">map_type</a></code> keyword now supports the <em>angular map projection</em> for use with light probes</li>
-  <li>Dithering is now fully supported for Radiance HDR output files</li>
   <li>Default <a href="r3_2.html#r3_2_4_5">gamma handling</a> of <em>NetPBM</em> (PPM/PGM) output files now complies with the official <em>NetBPM</em> standard</li>
   <li>The <em>compression</em> setting now affects more file types. See: <a href="r3_2.html#r3_2_4_1">Output File Type</a></li>
   <li>The <a href="r3_6.html#r3_6_2_6">interaction</a> of <code>transmit all</code> and <code>filter all</code> with an image's alpha channel has been changed</li> 
@@ -404,7 +407,7 @@ file, and by using the shape or material name in your scene.</p>
 <li>mandatory <code><a href="r3_4.html#r3_4_1_3">assumed_gamma</a></code></li>
 <li>the <code><a href="r3_3.html#r3_3_1_7_2">srgb</a></code> keyword and its kin can be used to specify gamma pre-corrected colors</li>
 <li>a <code><a href="r3_2.html#r3_2_4_5">File_Gamma</a></code> feature has been added</li>
-<li>an <code><a href="r3_2.html#r3_2_8_7">Antialias_Gamma</a></code> feature has been added</li>
+<li>an <code><a href="r3_2.html#r3_2_8_8">Antialias_Gamma</a></code> feature has been added</li>
 <li>lastly you can also change the input file <code><a href="r3_6.html#r3_6_2_6_2">gamma</a></code> for individual input files</li>
 </ol>
 <li>Make sure to review the <em>Images and Image Related</em> category below for <em>important</em> changes and additions.</li>
@@ -416,8 +419,8 @@ file, and by using the shape or material name in your scene.</p>
 <li>a revised <a href="t2_3.html#t2_3_8">radiosity</a> tutorial</li>
 <li>the <em>new</em> <code><a href="r3_4.html#r3_4_3_3_3_9">maximum_reuse</a></code> parameter</li>
 <li>adaptive pretrace mode added to the <code> <a href="r3_4.html#r3_4_3_3_3_11">nearest_count</a></code> parameter</li>
-<li>the <a href="r3_2.html#r3_2_8_8_2">loading and saving</a> of radiosity data has changed</li>
-<li>new command line <a href="r3_2.html#r3_2_8_8">options</a> can help to further customize radiosity features</li>
+<li>the <a href="r3_2.html#r3_2_8_9_2">loading and saving</a> of radiosity data has changed</li>
+<li>new command line <a href="r3_2.html#r3_2_8_9">options</a> can help to further customize radiosity features</li>
 </ol>
 <li>The <a href="r3_5.html#r3_5_1_1_10">ovus</a> object was added, along with support for <code><a href="r3_6.html#r3_6_1_7">uv_mapping</a></code></li>
 <li>Raised max order of the <code><a href="r3_5.html#r3_5_1_3_2">poly</a></code>, <code><a href="r3_5.html#r3_5_1_3_3">cubic</a></code> and <code><a href="r3_5.html#r3_5_1_3_4">quartic</a></code> objects. Alternate syntax is also available.</li>

@@ -11220,13 +11220,13 @@ bool Parser::POV_ARRAY::HasElement(size_t i) const
 
 const TokenId& Parser::POV_ARRAY::ElementType(size_t i) const
 {
-    POV_PARSER_ASSERT(i < DataPtrs.size());
+    POV_PARSER_ASSERT(resizable || (i < DataPtrs.size()));
     return (mixedType ? Types[i] : Type_);
 }
 
 TokenId& Parser::POV_ARRAY::ElementType(size_t i)
 {
-    POV_PARSER_ASSERT(i < DataPtrs.size());
+    POV_PARSER_ASSERT(resizable || (i < DataPtrs.size()));
     return (mixedType ? Types[i] : Type_);
 }
 
