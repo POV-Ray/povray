@@ -120,9 +120,9 @@ FNCode::FNCode(Parser *pa, FunctionCode *f, bool is_local, const char *n)
     }
 
     if (n != nullptr)
-        function->sourceInfo.name = POV_STRDUP(n);
+        function->sourceInfo.name = n;
     else
-        function->sourceInfo.name = POV_STRDUP("");
+        function->sourceInfo.name = "";
     function->sourceInfo.fileName = parser->UCS2_strdup(parser->mToken.sourceFile->Name());
     function->sourceInfo.position = parser->mToken.raw.lexeme.position;
     function->flags = 0;
