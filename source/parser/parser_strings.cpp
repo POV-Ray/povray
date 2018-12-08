@@ -203,9 +203,9 @@ UCS2 *Parser::Parse_String(bool pathname, bool require)
         END_CASE
 
         CASE(STRING_ID_TOKEN)
-            len = UCS2_strlen(reinterpret_cast<UCS2 *>(mToken.Data)) + 1;
+            len = UCS2_strlen(CurrentTokenDataPtr<UCS2*>()) + 1;
             New = reinterpret_cast<UCS2 *>(POV_MALLOC(len * sizeof(UCS2), "UCS2 String"));
-            POV_MEMCPY(reinterpret_cast<void *>(New), reinterpret_cast<void *>(mToken.Data), len * sizeof(UCS2));
+            POV_MEMCPY(reinterpret_cast<void *>(New), CurrentTokenDataPtr<void*>(), len * sizeof(UCS2));
             EXIT
         END_CASE
 

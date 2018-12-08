@@ -305,7 +305,7 @@ void Parser::Get_Token ()
     mToken.is_mixed_array_elem = false;
     mToken.is_dictionary_elem = false;
 
-    while (mToken.Token_Id == END_OF_FILE_TOKEN)
+    while (CurrentTokenId() == END_OF_FILE_TOKEN)
     {
         bool fastForwardToDirective = (Skipping && !Parsing_Directive);
 
@@ -513,7 +513,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
                     if ((Temp_Entry->Token_Number==MACRO_ID_TOKEN) && (!Inside_Ifdef))
                     {
                         mToken.Data = Temp_Entry->Data;
-                        if (Ok_To_Declare)
+                        if (IsOkToDeclare())
                         {
                             Invoke_Macro();
                         }
@@ -668,7 +668,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
                                 if (mToken.Token_Id != IDENTIFIER_TOKEN)
                                     Expectation_Error ("dictionary element identifier");
 
-                                Temp_Entry = Find_Symbol (table, mToken.raw.lexeme.text.c_str());
+                                Temp_Entry = Find_Symbol (table, CurrentTokenText().c_str());
                             }
                             else if (haveNextRawToken && (nextRawToken.lexeme.category == Lexeme::kOther) && (nextRawToken.lexeme.text == "["))
                             {
@@ -716,7 +716,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
                             if (dictIndex)
                                 POV_FREE(dictIndex);
 
-                            Par             = reinterpret_cast<POV_PARAM *>(Temp_Entry->Data);
+                            Par              = reinterpret_cast<POV_PARAM *>(Temp_Entry->Data);
                             mToken.Token_Id  = *(Par->NumberPtr);
                             mToken.is_array_elem = false;
                             mToken.is_mixed_array_elem = false;
@@ -748,7 +748,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
 
 inline void Parser::Write_Token(const RawToken& rawToken, SYM_TABLE *table)
 {
-    POV_PARSER_ASSERT(mToken.sourceFile == mTokenizer.GetSource());
+    POV_EXPERIMENTAL_ASSERT(mToken.sourceFile == mTokenizer.GetSource());
     mToken.raw            = rawToken;
     mToken.Data           = nullptr;
     mToken.Token_Id       = rawToken.expressionId;
@@ -758,7 +758,7 @@ inline void Parser::Write_Token(const RawToken& rawToken, SYM_TABLE *table)
 
 inline void Parser::Write_Token(TokenId Token_Id, const RawToken& rawToken, SYM_TABLE *table)
 {
-    POV_PARSER_ASSERT(mToken.sourceFile == mTokenizer.GetSource());
+    POV_EXPERIMENTAL_ASSERT(mToken.sourceFile == mTokenizer.GetSource());
     mToken.raw            = rawToken;
     mToken.Data           = nullptr;
     mToken.Token_Id       = Conversion_Util_Table[Token_Id];
@@ -766,6 +766,89 @@ inline void Parser::Write_Token(TokenId Token_Id, const RawToken& rawToken, SYM_
     mToken.table          = table;
 }
 
+
+//******************************************************************************
+
+TokenId Parser::CurrentTokenId() const
+{
+    return mToken.Token_Id;
+}
+
+TokenId Parser::CurrentTokenFunctionId() const
+{
+    return mToken.Function_Id;
+}
+
+const UTF8String& Parser::CurrentTokenText() const
+{
+    return mToken.raw.lexeme.text;
+}
+
+const MessageContext& Parser::CurrentTokenMessageContext() const
+{
+    return mToken;
+}
+
+bool Parser::CurrentTokenIsArrayElement() const
+{
+    return mToken.is_array_elem;
+}
+
+bool Parser::CurrentTokenIsHomogenousArrayElement() const
+{
+    return (mToken.is_array_elem && !mToken.is_mixed_array_elem);
+}
+
+bool Parser::CurrentTokenIsDictionaryElement() const
+{
+    return mToken.is_dictionary_elem;
+}
+
+bool Parser::CurrentTokenIsContainerElement() const
+{
+    return (mToken.is_array_elem || mToken.is_dictionary_elem);
+}
+
+void Parser::SetOkToDeclare(bool ok)
+{
+    Ok_To_Declare = ok;
+}
+
+bool Parser::IsOkToDeclare() const
+{
+    return Ok_To_Declare;
+}
+
+bool Parser::HaveCurrentTokenData() const
+{
+    return (mToken.Data != nullptr);
+}
+
+bool Parser::HaveCurrentFile() const
+{
+    return mToken.sourceFile != nullptr;
+}
+
+const UCS2* Parser::CurrentFileName() const
+{
+    POV_PARSER_ASSERT(mToken.sourceFile != nullptr);
+    return mToken.sourceFile->Name();
+}
+
+const LexemePosition& Parser::CurrentFilePosition() const
+{
+    return mToken.raw.lexeme.position;
+}
+
+bool Parser::HaveCurrentMessageContext() const
+{
+    return mToken.sourceFile != nullptr;
+}
+
+const MessageContext& Parser::CurrentMessageContext() const
+{
+    return mToken;
+}
 
 /*****************************************************************************
 *
@@ -958,7 +1041,7 @@ void Parser::Parse_Directive(int After_Hash)
     char *ts;
     Macro *PMac = nullptr;
     COND_TYPE Curr_Type = Cond_Stack.back().Cond_Type;
-    LexemePosition hashPosition = mToken.raw.lexeme.position;
+    LexemePosition hashPosition = CurrentFilePosition();
 
     if (Curr_Type == INVOKING_MACRO_COND)
     {
@@ -979,7 +1062,7 @@ void Parser::Parse_Directive(int After_Hash)
         }
     }
 
-    if (!Ok_To_Declare)
+    if (!IsOkToDeclare())
     {
         if (After_Hash)
         {
@@ -1228,7 +1311,7 @@ void Parser::Parse_Directive(int After_Hash)
                         if (!Cond_Stack.back().Switch_Case_Ok_Flag)
                             Error("#switch not followed by #case or #range.");
 
-                        if (mToken.Token_Id==CASE_TOKEN)
+                        if (CurrentTokenId() == CASE_TOKEN)
                         {
                             Value=Parse_Cond_Param();
                             Flag = (fabs(Value-Cond_Stack.back().Switch_Value)<EPSILON);
@@ -1272,7 +1355,7 @@ void Parser::Parse_Directive(int After_Hash)
             {
                 case CASE_TRUE_COND:
                 case CASE_FALSE_COND:
-                    if (mToken.Token_Id==CASE_TOKEN)
+                    if (CurrentTokenId() == CASE_TOKEN)
                     {
                         Value=Parse_Cond_Param();
                         Flag = (fabs(Value-Cond_Stack.back().Switch_Value)<EPSILON);
@@ -1341,11 +1424,11 @@ void Parser::Parse_Directive(int After_Hash)
                     {
                         if ((PMac=Cond_Stack.back().PMac) != nullptr)
                         {
-                            if (PMac->source.sourceName != mTokenizer.GetSourceName())
+                            if (PMac->source.sourceName != CurrentFileName())
                                 Error("#macro did not end in file where it started.");
 
                             PMac->endPosition = hashPosition;
-                            POV_OFF_T macroLength = mToken.raw.lexeme.position - PMac->source;
+                            POV_OFF_T macroLength = CurrentFilePosition() - PMac->source;
                             /// @todo Re-enable cached macros.
                             if (macroLength <= MaxCachedMacroSize)
                             {
@@ -1443,11 +1526,11 @@ void Parser::Parse_Directive(int After_Hash)
             }
             else
             {
-                Parse_Declare(mToken.Token_Id == LOCAL_TOKEN, After_Hash);
+                Parse_Declare(CurrentTokenId() == LOCAL_TOKEN, After_Hash);
                 Curr_Type = Cond_Stack.back().Cond_Type;
                 if (mToken.Unget_Token)
                 {
-                    switch (mToken.Token_Id)
+                    switch (CurrentTokenId())
                     {
                         case HASH_TOKEN:
                             mToken.Unget_Token=false;
@@ -1504,13 +1587,14 @@ void Parser::Parse_Directive(int After_Hash)
             }
             else
             {
-                switch(mToken.Function_Id)
+                switch(CurrentTokenFunctionId())
                 {
                     case VERSION_TOKEN:
                         {
                             if (sceneData->languageVersionSet == false && token_count > 1)
                                 sceneData->languageVersionLate = true;
-                            Ok_To_Declare = false;
+                            POV_EXPERIMENTAL_ASSERT(IsOkToDeclare());
+                            SetOkToDeclare(false);
                             bool wasParsingVersionDirective = parsingVersionDirective;
                             parsingVersionDirective = true;
                             EXPECT_ONE
@@ -1590,10 +1674,10 @@ void Parser::Parse_Directive(int After_Hash)
                                 Error("Your scene file requires POV-Ray version %g or later!\n", (DBL)(sceneData->EffectiveLanguageVersion() / 100.0));
                             }
 
-                            Ok_To_Declare = true;
+                            SetOkToDeclare(true);
                             parsingVersionDirective = wasParsingVersionDirective;
                             Curr_Type = Cond_Stack.back().Cond_Type;
-                            if (mToken.Unget_Token && (mToken.Token_Id==HASH_TOKEN))
+                            if (mToken.Unget_Token && (CurrentTokenId() == HASH_TOKEN))
                             {
                                 mToken.Unget_Token=false;
                                 Parsing_Directive = true;
@@ -1660,6 +1744,8 @@ void Parser::Parse_Directive(int After_Hash)
         CASE(STATISTICS_TOKEN)
             Warning("#render and #statistics streams are no longer available.\nRedirecting output to #debug stream.");
             // Intentional, redirect output to debug stream.
+            // FALLTHROUGH
+        FALLTHROUGH_CASE
         CASE(DEBUG_TOKEN)
             Parsing_Directive = false;
             if (Skipping)
@@ -1740,14 +1826,15 @@ void Parser::Parse_Directive(int After_Hash)
             }
             else
             {
-                Ok_To_Declare = false;
+                POV_EXPERIMENTAL_ASSERT(IsOkToDeclare());
+                SetOkToDeclare(false);
                 EXPECT_ONE
                     CASE (IDENTIFIER_TOKEN)
                         Warning("Attempt to undef unknown identifier");
                     END_CASE
 
                     CASE (FILE_ID_TOKEN)
-                        if (reinterpret_cast<DATA_FILE *>(mToken.Data)->busyParsing)
+                        if (CurrentTokenDataPtr<DATA_FILE*>()->busyParsing)
                             Error("Can't undefine a file identifier inside a file directive that accesses it.");
                         else
                             PossibleError("Undefining an open file identifier. Use '#fclose' instead.");
@@ -1762,17 +1849,17 @@ void Parser::Parse_Directive(int After_Hash)
                     CASE4 (DENSITY_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_MAP_ID_TOKEN, UV_ID_TOKEN)
                     CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
                     CASE3 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN, DICTIONARY_ID_TOKEN)
-                        Remove_Symbol (mToken.table, mToken.raw.lexeme.text.c_str(), mToken.is_array_elem, mToken.DataPtr, mToken.Token_Id);
+                        Remove_Symbol (mToken.table, CurrentTokenText().c_str(), mToken.is_array_elem, mToken.DataPtr, CurrentTokenId());
                         if (mToken.is_mixed_array_elem)
                             *mToken.NumberPtr = IDENTIFIER_TOKEN;
                     END_CASE
 
                     CASE2 (VECTOR_FUNCT_TOKEN, FLOAT_FUNCT_TOKEN)
-                        switch(mToken.Function_Id)
+                        switch(CurrentTokenFunctionId())
                         {
                             case VECTOR_ID_TOKEN:
                             case FLOAT_ID_TOKEN:
-                                Remove_Symbol (mToken.table, mToken.raw.lexeme.text.c_str(), mToken.is_array_elem, mToken.DataPtr, mToken.Token_Id);
+                                Remove_Symbol (mToken.table, CurrentTokenText().c_str(), mToken.is_array_elem, mToken.DataPtr, CurrentTokenId());
                                 if (mToken.is_mixed_array_elem)
                                     *mToken.NumberPtr = IDENTIFIER_TOKEN;
                                 break;
@@ -1787,7 +1874,7 @@ void Parser::Parse_Directive(int After_Hash)
                         Parse_Error(IDENTIFIER_TOKEN);
                     END_CASE
                 END_EXPECT
-                Ok_To_Declare = true;
+                SetOkToDeclare(true);
             }
             EXIT
         END_CASE
@@ -1944,7 +2031,7 @@ void Parser::Skip_Tokens(COND_TYPE cond)
 
     Skipping=Prev_Skip;
 
-    if (mToken.Token_Id==HASH_TOKEN)
+    if (CurrentTokenId() == HASH_TOKEN)
     {
         mToken.Token_Id=END_OF_FILE_TOKEN;
         mToken.is_array_elem = false;
@@ -2008,7 +2095,7 @@ void Parser::Break()
 
     Skipping=Prev_Skip;
 
-    if (mToken.Token_Id==HASH_TOKEN)
+    if (CurrentTokenId() == HASH_TOKEN)
     {
         mToken.Token_Id=END_OF_FILE_TOKEN;
         mToken.is_array_elem = false;
@@ -2087,8 +2174,6 @@ int Parser::get_hash_value(const char *s)
 
 void Parser::init_sym_tables()
 {
-    int i;
-
     Add_Sym_Table(); // global symbols
 }
 
@@ -2404,21 +2489,21 @@ Parser::Macro *Parser::Parse_Macro()
 {
     Macro *New;
     SYM_ENTRY *Table_Entry = nullptr;
-    bool Old_Ok = Ok_To_Declare;
+    bool oldOkToDeclare = IsOkToDeclare();
     MacroParameter newParameter;
 
     Check_Macro_Vers();
 
-    Ok_To_Declare = false;
+    SetOkToDeclare(false);
 
     EXPECT_ONE
         CASE (IDENTIFIER_TOKEN)
-            Table_Entry = Add_Symbol (SYM_TABLE_GLOBAL,mToken.raw.lexeme.text.c_str(),TEMPORARY_MACRO_ID_TOKEN);
+            Table_Entry = Add_Symbol (SYM_TABLE_GLOBAL, CurrentTokenText().c_str(), TEMPORARY_MACRO_ID_TOKEN);
         END_CASE
 
         CASE (MACRO_ID_TOKEN)
-            Remove_Symbol(SYM_TABLE_GLOBAL, mToken.raw.lexeme.text.c_str(), false, nullptr, 0);
-            Table_Entry = Add_Symbol (SYM_TABLE_GLOBAL,mToken.raw.lexeme.text.c_str(),TEMPORARY_MACRO_ID_TOKEN);
+            Remove_Symbol(SYM_TABLE_GLOBAL, CurrentTokenText().c_str(), false, nullptr, 0);
+            Table_Entry = Add_Symbol (SYM_TABLE_GLOBAL, CurrentTokenText().c_str(), TEMPORARY_MACRO_ID_TOKEN);
         END_CASE
 
         OTHERWISE
@@ -2426,7 +2511,7 @@ Parser::Macro *Parser::Parse_Macro()
         END_CASE
     END_EXPECT
 
-    New = new Macro(mToken.raw.lexeme.text.c_str());
+    New = new Macro(CurrentTokenText().c_str());
 
     Table_Entry->Data=reinterpret_cast<void *>(New);
 
@@ -2460,18 +2545,18 @@ Parser::Macro *Parser::Parse_Macro()
         CASE4 (DENSITY_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_MAP_ID_TOKEN, UV_ID_TOKEN)
         CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
         CASE3 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN, DICTIONARY_ID_TOKEN)
-            newParameter.name = POV_STRDUP(mToken.raw.lexeme.text.c_str());
+            newParameter.name = POV_STRDUP(CurrentTokenText().c_str());
             New->parameters.push_back(newParameter);
             Parse_Comma();
             newParameter.optional = false;
         END_CASE
 
         CASE2 (VECTOR_FUNCT_TOKEN, FLOAT_FUNCT_TOKEN)
-            switch(mToken.Function_Id)
+            switch(CurrentTokenFunctionId())
             {
                 case VECTOR_ID_TOKEN:
                 case FLOAT_ID_TOKEN:
-                    newParameter.name = POV_STRDUP(mToken.raw.lexeme.text.c_str());
+                    newParameter.name = POV_STRDUP(CurrentTokenText().c_str());
                     New->parameters.push_back(newParameter);
                     Parse_Comma();
                     newParameter.optional = false;
@@ -2499,7 +2584,7 @@ Parser::Macro *Parser::Parse_Macro()
         END_CASE
     END_EXPECT
 
-    Ok_To_Declare = Old_Ok;
+    SetOkToDeclare(oldOkToDeclare);
 
     Table_Entry->Token_Number = MACRO_ID_TOKEN;
 
@@ -2515,7 +2600,7 @@ Parser::Macro *Parser::Parse_Macro()
 
 void Parser::Invoke_Macro()
 {
-    Macro *PMac=reinterpret_cast<Macro *>(mToken.Data);
+    Macro *PMac = CurrentTokenDataPtr<Macro*>();
     SYM_ENTRY **Table_Entries = nullptr;
     int i,Local_Index;
 
@@ -2700,7 +2785,8 @@ Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
     i=0;
     j=1;
 
-    Ok_To_Declare = false;
+    POV_EXPERIMENTAL_ASSERT(IsOkToDeclare());
+    SetOkToDeclare(false);
 
     while (Parse_Square_Begin(false))
     {
@@ -2760,7 +2846,7 @@ Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
         END_CASE
     END_EXPECT
 
-    Ok_To_Declare = true;
+    SetOkToDeclare(true);
     return(New);
 };
 
@@ -2774,7 +2860,7 @@ Parser::SYM_TABLE *Parser::Parse_Dictionary_Declare()
 
     newDictionary = Create_Sym_Table (true);
 
-    // TODO REVIEW - maybe we need `Ok_To_Declare = false`?
+    // TODO REVIEW - maybe we need `SetOkToDeclare(false)`?
 
     if (!Parse_Begin (false))
         return newDictionary;
@@ -2785,9 +2871,9 @@ Parser::SYM_TABLE *Parser::Parse_Dictionary_Declare()
             parseRawIdentifiers = true;
             Get_Token();
             parseRawIdentifiers = oldParseRawIdentifiers;
-            if (mToken.Token_Id != IDENTIFIER_TOKEN)
+            if (CurrentTokenId() != IDENTIFIER_TOKEN)
                 Expectation_Error ("dictionary element identifier");
-            newEntry = Add_Symbol (newDictionary, mToken.raw.lexeme.text.c_str(), IDENTIFIER_TOKEN);
+            newEntry = Add_Symbol (newDictionary, CurrentTokenText().c_str(), IDENTIFIER_TOKEN);
 
             GET (COLON_TOKEN);
 
@@ -2925,7 +3011,7 @@ void Parser::Parse_Fopen(void)
     New->busyParsing = true;
 
     GET(IDENTIFIER_TOKEN)
-    Entry = Add_Symbol (SYM_TABLE_GLOBAL,mToken.raw.lexeme.text.c_str(),FILE_ID_TOKEN);
+    Entry = Add_Symbol (SYM_TABLE_GLOBAL, CurrentTokenText().c_str(), FILE_ID_TOKEN);
     Entry->Data=reinterpret_cast<void *>(New);
 
     asciiFileName = Parse_C_String(true);
@@ -2978,7 +3064,7 @@ void Parser::Parse_Fclose(void)
 
     EXPECT_ONE
         CASE(FILE_ID_TOKEN)
-            Data=reinterpret_cast<DATA_FILE *>(mToken.Data);
+            Data = CurrentTokenDataPtr<DATA_FILE*>();
             if (Data->busyParsing)
                 Error ("Can't nest directives accessing the same file.");
             // NB no need to set Data->busyParsing, as we're not reading any tokens where the
@@ -2986,7 +3072,7 @@ void Parser::Parse_Fclose(void)
             Got_EOF=false;
             Data->inTokenizer = nullptr;
             Data->Out_File = nullptr;
-            Remove_Symbol(SYM_TABLE_GLOBAL, mToken.raw.lexeme.text.c_str(), false, nullptr, 0);
+            Remove_Symbol(SYM_TABLE_GLOBAL, CurrentTokenText().c_str(), false, nullptr, 0);
         END_CASE
 
         OTHERWISE
@@ -3008,10 +3094,10 @@ void Parser::Parse_Read()
     Parse_Paren_Begin();
 
     GET(FILE_ID_TOKEN)
-    User_File=reinterpret_cast<DATA_FILE *>(mToken.Data);
+    User_File = CurrentTokenDataPtr<DATA_FILE*>();
     if (User_File->busyParsing)
         Error ("Can't nest directives accessing the same file.");
-    File_Id=POV_STRDUP(mToken.raw.lexeme.text.c_str());
+    File_Id = POV_STRDUP(CurrentTokenText().c_str());
     if (User_File->inTokenizer == nullptr)
         Error("Cannot read from file %s because the file is open for writing only.", UCS2toASCIIString(UCS2String(User_File->Out_File->name())).c_str());
 
@@ -3027,8 +3113,8 @@ void Parser::Parse_Read()
         CASE (IDENTIFIER_TOKEN)
             if (!End_File)
             {
-                Temp_Entry = Add_Symbol (SYM_TABLE_GLOBAL,mToken.raw.lexeme.text.c_str(),IDENTIFIER_TOKEN);
-                End_File=Parse_Read_Value (User_File,mToken.Token_Id, &(Temp_Entry->Token_Number), &(Temp_Entry->Data));
+                Temp_Entry = Add_Symbol (SYM_TABLE_GLOBAL, CurrentTokenText().c_str(), IDENTIFIER_TOKEN);
+                End_File = Parse_Read_Value (User_File, CurrentTokenId(), &(Temp_Entry->Token_Number), &(Temp_Entry->Data));
                 mToken.is_array_elem = false;
                 mToken.is_mixed_array_elem = false;
                 mToken.is_dictionary_elem = false;
@@ -3039,7 +3125,7 @@ void Parser::Parse_Read()
         CASE (STRING_ID_TOKEN)
             if (!End_File)
             {
-                End_File=Parse_Read_Value (User_File,mToken.Token_Id,mToken.NumberPtr,mToken.DataPtr);
+                End_File = Parse_Read_Value (User_File, CurrentTokenId(), mToken.NumberPtr, mToken.DataPtr);
                 mToken.is_array_elem = false;
                 mToken.is_mixed_array_elem = false;
                 mToken.is_dictionary_elem = false;
@@ -3048,13 +3134,13 @@ void Parser::Parse_Read()
         END_CASE
 
         CASE2 (VECTOR_FUNCT_TOKEN,FLOAT_FUNCT_TOKEN)
-            switch(mToken.Function_Id)
+            switch(CurrentTokenFunctionId())
             {
                 case VECTOR_ID_TOKEN:
                 case FLOAT_ID_TOKEN:
                     if (!End_File)
                     {
-                        End_File=Parse_Read_Value (User_File,mToken.Function_Id,mToken.NumberPtr,mToken.DataPtr);
+                        End_File = Parse_Read_Value (User_File, CurrentTokenFunctionId(), mToken.NumberPtr, mToken.DataPtr);
                         Parse_Comma(); /* Scene file comma between 2 idents */
                     }
                     break;
@@ -3232,7 +3318,7 @@ void Parser::Parse_Write(void)
 
     GET(FILE_ID_TOKEN)
 
-    User_File=reinterpret_cast<DATA_FILE *>(mToken.Data);
+    User_File = CurrentTokenDataPtr<DATA_FILE*>();
     if (User_File->busyParsing)
         Error ("Can't nest directives accessing the same file.");
     if (User_File->Out_File == nullptr)
@@ -3252,7 +3338,7 @@ void Parser::Parse_Write(void)
                 POV_INT32 val_max;
                 int  num_bytes;
                 bool big_endian = false;
-                switch (mToken.Token_Id)
+                switch (CurrentTokenId())
                 {
                     case SINT8_TOKEN:    val_min = SIGNED8_MIN;  val_max = SIGNED8_MAX;    num_bytes = 1; break;
                     case UINT8_TOKEN:    val_min = 0;            val_max = UNSIGNED8_MAX;  num_bytes = 1; break;
@@ -3264,7 +3350,7 @@ void Parser::Parse_Write(void)
                     case SINT32LE_TOKEN: val_min = SIGNED32_MIN; val_max = SIGNED32_MAX;   num_bytes = 4; big_endian = false; break;
                 }
                 EXPECT
-                    CASE_VECTOR
+                    CASE_VECTOR_UNGET
                         Terms = Parse_Unknown_Vector (Express);
                         if ((Terms >= 1) && (Terms <= 5))
                         {
@@ -3318,7 +3404,7 @@ void Parser::Parse_Write(void)
             POV_FREE(temp);
         END_CASE
 
-        CASE_VECTOR
+        CASE_VECTOR_UNGET
             Terms = Parse_Unknown_Vector (Express);
             switch (Terms)
             {
@@ -3367,16 +3453,16 @@ void Parser::Parse_Write(void)
 
 DBL Parser::Parse_Cond_Param(void)
 {
-    bool Old_Ok = Ok_To_Declare;
+    bool oldOkToDeclare = IsOkToDeclare();
     bool Old_Sk = Skipping;
     DBL Val;
 
-    Ok_To_Declare = false;
+    SetOkToDeclare(false);
     Skipping      = false;
 
     Val=Parse_Float_Param();
 
-    Ok_To_Declare = Old_Ok;
+    SetOkToDeclare(oldOkToDeclare);
     Skipping      = Old_Sk;
 
     return(Val);
@@ -3384,15 +3470,15 @@ DBL Parser::Parse_Cond_Param(void)
 
 void Parser::Parse_Cond_Param2(DBL *V1,DBL *V2)
 {
-    bool Old_Ok = Ok_To_Declare;
+    bool oldOkToDeclare = IsOkToDeclare();
     bool Old_Sk = Skipping;
 
-    Ok_To_Declare = false;
+    SetOkToDeclare(false);
     Skipping      = false;
 
     Parse_Float_Param2(V1,V2);
 
-    Ok_To_Declare = Old_Ok;
+    SetOkToDeclare(oldOkToDeclare);
     Skipping      = Old_Sk;
 }
 
@@ -3414,7 +3500,7 @@ bool Parser::Parse_Ifdef_Param ()
     if (mToken.is_array_elem)
         retval = (*mToken.DataPtr != nullptr);
     else
-        retval = (mToken.Token_Id != IDENTIFIER_TOKEN);
+        retval = (CurrentTokenId() != IDENTIFIER_TOKEN);
 
     Parse_Paren_End();
 
@@ -3432,24 +3518,24 @@ int Parser::Parse_For_Param (UTF8String& identifierName, DBL* EndPtr, DBL* StepP
 
     EXPECT_ONE
         CASE (IDENTIFIER_TOKEN)
-            POV_PARSER_ASSERT(!mToken.is_array_elem);
-            if (mToken.is_dictionary_elem)
+            POV_PARSER_ASSERT(!mToken.is_array_elem); // Array elements should be tagged as the respective array type
+            if (CurrentTokenIsContainerElement())
                 Error("#for loop variable must not be an array or dictionary element");
-            Temp_Entry = Add_Symbol (Table_Index,mToken.raw.lexeme.text.c_str(),IDENTIFIER_TOKEN);
+            Temp_Entry = Add_Symbol (Table_Index, CurrentTokenText().c_str(), IDENTIFIER_TOKEN);
             mToken.NumberPtr = &(Temp_Entry->Token_Number);
             mToken.DataPtr = &(Temp_Entry->Data);
-            Previous = mToken.Token_Id;
+            Previous = CurrentTokenId();
         END_CASE
 
         CASE3 (FILE_ID_TOKEN, MACRO_ID_TOKEN, PARAMETER_ID_TOKEN)
             // TODO - We should allow assignment if the identifier is non-local.
-            if (mToken.is_array_elem || mToken.is_dictionary_elem)
+            if (CurrentTokenIsContainerElement())
                 Error("#for loop variable must not be an array or dictionary element");
             Parse_Error(IDENTIFIER_TOKEN);
         END_CASE
 
         CASE2 (FUNCT_ID_TOKEN, VECTFUNCT_ID_TOKEN)
-            if (mToken.is_array_elem || mToken.is_dictionary_elem)
+            if (CurrentTokenIsContainerElement())
                 Error("#for loop variable must not be an array or dictionary element");
             Error("Redeclaring functions is not allowed - #undef the function first!");
         END_CASE
@@ -3462,44 +3548,44 @@ int Parser::Parse_For_Param (UTF8String& identifierName, DBL* EndPtr, DBL* StepP
         CASE4 (DENSITY_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_MAP_ID_TOKEN, UV_ID_TOKEN)
         CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
         CASE3 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN, DICTIONARY_ID_TOKEN)
-            if (mToken.is_array_elem || mToken.is_dictionary_elem)
+            if (CurrentTokenIsContainerElement())
                 Error("#for loop variable must not be an array or dictionary element");
             if (mToken.context != Table_Index)
             {
-                Temp_Entry = Add_Symbol (Table_Index,mToken.raw.lexeme.text.c_str(),IDENTIFIER_TOKEN);
+                Temp_Entry = Add_Symbol (Table_Index, CurrentTokenText().c_str(), IDENTIFIER_TOKEN);
                 mToken.NumberPtr = &(Temp_Entry->Token_Number);
                 mToken.DataPtr   = &(Temp_Entry->Data);
                 Previous        = IDENTIFIER_TOKEN;
             }
             else
             {
-                Previous        = mToken.Token_Id;
+                Previous        = CurrentTokenId();
             }
         END_CASE
 
         CASE (EMPTY_ARRAY_TOKEN)
-            POV_PARSER_ASSERT (mToken.is_array_elem && !mToken.is_mixed_array_elem);
+            POV_PARSER_ASSERT (CurrentTokenIsHomogenousArrayElement());
             Error("#for loop variable must not be an array element");
-            Previous = mToken.Token_Id;
+            Previous = CurrentTokenId();
         END_CASE
 
         CASE2 (VECTOR_FUNCT_TOKEN, FLOAT_FUNCT_TOKEN)
-            if (mToken.is_array_elem || mToken.is_dictionary_elem)
+            if (CurrentTokenIsContainerElement())
                 Error("#for loop variable must not be an array or dictionary element");
-            switch(mToken.Function_Id)
+            switch(CurrentTokenFunctionId())
             {
                 case VECTOR_ID_TOKEN:
                 case FLOAT_ID_TOKEN:
                     if (mToken.context != Table_Index)
                     {
-                        Temp_Entry = Add_Symbol (Table_Index,mToken.raw.lexeme.text.c_str(),IDENTIFIER_TOKEN);
+                        Temp_Entry = Add_Symbol (Table_Index, CurrentTokenText().c_str(), IDENTIFIER_TOKEN);
                         mToken.NumberPtr = &(Temp_Entry->Token_Number);
                         mToken.DataPtr   = &(Temp_Entry->Data);
                         Previous        = IDENTIFIER_TOKEN;
                     }
                     else
                     {
-                        Previous        = mToken.Function_Id;
+                        Previous        = CurrentTokenFunctionId();
                     }
                     break;
 
@@ -3510,7 +3596,7 @@ int Parser::Parse_For_Param (UTF8String& identifierName, DBL* EndPtr, DBL* StepP
         END_CASE
 
         OTHERWISE
-            if (mToken.is_array_elem || mToken.is_dictionary_elem)
+            if (CurrentTokenIsContainerElement())
                 Error("#for loop variable must not be an array or dictionary element");
             Parse_Error(IDENTIFIER_TOKEN);
         END_CASE
@@ -3523,7 +3609,7 @@ int Parser::Parse_For_Param (UTF8String& identifierName, DBL* EndPtr, DBL* StepP
     *mToken.DataPtr   = reinterpret_cast<void *>(Create_Float());
     DBL* CurrentPtr = (reinterpret_cast<DBL *>(*mToken.DataPtr));
 
-    identifierName = mToken.raw.lexeme.text;
+    identifierName = CurrentTokenText();
 
     Parse_Comma();
     *CurrentPtr = Parse_Float();

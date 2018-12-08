@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -102,7 +102,7 @@ template<typename MAP_T>
 shared_ptr<MAP_T> Create_Blend_Map (BlendMapTypeId type);
 
 template<typename MAP_T>
-shared_ptr<MAP_T> Copy_Blend_Map (shared_ptr<MAP_T>& Old);
+shared_ptr<MAP_T> Copy_Blend_Map (const shared_ptr<MAP_T>& Old);
 
 /// @}
 ///

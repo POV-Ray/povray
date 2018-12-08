@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -159,17 +159,17 @@ TextureBlendMapPtr Create_Blend_Map<TextureBlendMap> (BlendMapTypeId type)
 ******************************************************************************/
 
 template<typename MAP_T>
-shared_ptr<MAP_T> Copy_Blend_Map (shared_ptr<MAP_T>& Old)
+shared_ptr<MAP_T> Copy_Blend_Map (const shared_ptr<MAP_T>& Old)
 {
     return shared_ptr<MAP_T>(Old);
 }
 
-template ColourBlendMapPtr          Copy_Blend_Map (ColourBlendMapPtr& Old);
-template PigmentBlendMapPtr         Copy_Blend_Map (PigmentBlendMapPtr& Old);
-template GenericNormalBlendMapPtr   Copy_Blend_Map (GenericNormalBlendMapPtr& Old);
-template SlopeBlendMapPtr           Copy_Blend_Map (SlopeBlendMapPtr& Old);
-template NormalBlendMapPtr          Copy_Blend_Map (NormalBlendMapPtr& Old);
-template TextureBlendMapPtr         Copy_Blend_Map (TextureBlendMapPtr& Old);
+template ColourBlendMapPtr          Copy_Blend_Map (const ColourBlendMapPtr& Old);
+template PigmentBlendMapPtr         Copy_Blend_Map (const PigmentBlendMapPtr& Old);
+template GenericNormalBlendMapPtr   Copy_Blend_Map (const GenericNormalBlendMapPtr& Old);
+template SlopeBlendMapPtr           Copy_Blend_Map (const SlopeBlendMapPtr& Old);
+template NormalBlendMapPtr          Copy_Blend_Map (const NormalBlendMapPtr& Old);
+template TextureBlendMapPtr         Copy_Blend_Map (const TextureBlendMapPtr& Old);
 
 
 /*****************************************************************************

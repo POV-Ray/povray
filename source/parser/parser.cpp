@@ -291,14 +291,14 @@ void Parser::Run()
     {
         try
         {
-            if (mToken.sourceFile != nullptr)
+            if (HaveCurrentFile())
             {
                 // take a (local) copy of error location prior to freeing token data
                 // NB error_filename has been pre-allocated for strings up to POV_FILENAME_BUFFER_CHARS
-                error_filename = mToken.sourceFile->Name();
-                error_line = mToken.raw.lexeme.position.line;
-                error_col = mToken.raw.lexeme.position.column;
-                error_pos = mToken.raw.lexeme.position.offset;
+                error_filename = CurrentFileName();
+                error_line = CurrentFilePosition().line;
+                error_col = CurrentFilePosition().column;
+                error_pos = CurrentFilePosition().offset;
             }
 
             // free up some memory before proceeding with error notification.
@@ -729,7 +729,7 @@ bool Parser::Parse_Begin (TokenId tokenId, bool mandatory)
 {
     Get_Token();
 
-    if(mToken.Token_Id == tokenId)
+    if(CurrentTokenId() == tokenId)
     {
         maBraceStack.emplace_back(mToken);
         return true;
@@ -768,7 +768,7 @@ void Parser::Parse_End(TokenId openTokenId, TokenId expectTokenId)
 {
     Get_Token();
 
-    if(mToken.Token_Id == expectTokenId)
+    if(CurrentTokenId() == expectTokenId)
     {
         POV_PARSER_ASSERT(!maBraceStack.empty());
         POV_PARSER_ASSERT(openTokenId == maBraceStack.back().openToken);
@@ -777,7 +777,7 @@ void Parser::Parse_End(TokenId openTokenId, TokenId expectTokenId)
     }
 
     ErrorInfo(maBraceStack.back(), "Unmatched %s", Get_Token_String(maBraceStack.back().openToken));
-    Error("No matching %s, %s found instead", Get_Token_String(expectTokenId), Get_Token_String(mToken.Token_Id));
+    Error("No matching %s, %s found instead", Get_Token_String(expectTokenId), Get_Token_String(CurrentTokenId()));
 }
 
 /*****************************************************************************
@@ -814,7 +814,7 @@ ObjectPtr Parser::Parse_Bicubic_Patch ()
     Object = new BicubicPatch();
 
     EXPECT
-        CASE_FLOAT
+        CASE_FLOAT_UNGET
             VersionWarning(150, "Should use keywords for bicubic parameters.");
             Object->Patch_Type = (int)Parse_Float();
             if (Object->Patch_Type == 2 ||
@@ -1310,7 +1310,7 @@ void Parser::Parse_Mesh_Camera (Camera& Cam)
     END_EXPECT
 
     ALLOW(SMOOTH_TOKEN);
-    Cam.Smooth = mToken.Token_Id == SMOOTH_TOKEN;
+    Cam.Smooth = (CurrentTokenId() == SMOOTH_TOKEN);
     if (Cam.Smooth && Cam.Face_Distribution_Method != 3)
         Error("Smooth can only be used with distribution method #3");
 
@@ -1456,7 +1456,7 @@ void Parser::Parse_Camera (Camera& Cam)
 
     EXPECT_ONE
         CASE (CAMERA_ID_TOKEN)
-            Cam = *reinterpret_cast<Camera *>(mToken.Data);
+            Cam = CurrentTokenData<Camera>();
             if (sceneData->EffectiveLanguageVersion() >= 350)
                 only_mods = true;
         END_CASE
@@ -2525,7 +2525,7 @@ ObjectPtr Parser::Parse_Disc ()
     Object->oradius2 = tmpf * tmpf;
 
     EXPECT_ONE
-        CASE_FLOAT
+        CASE_FLOAT_UNGET
             tmpf = Parse_Float();
             Object->iradius2 = tmpf * tmpf;
         END_CASE
@@ -2653,7 +2653,7 @@ ObjectPtr Parser::Parse_Isosurface()
     Object = new IsoSurface();
 
     Get_Token();
-    if(mToken.Token_Id != FUNCTION_TOKEN)
+    if(CurrentTokenId() != FUNCTION_TOKEN)
         Parse_Error(FUNCTION_TOKEN);
 
     Object->Function = new FunctionVM::CustomFunction(fnVMContext->functionvm.get(), Parse_Function());
@@ -2889,7 +2889,7 @@ ObjectPtr Parser::Parse_Julia_Fractal ()
         END_CASE
 
         CASE(FLOAT_FUNCT_TOKEN)
-            switch(mToken.Function_Id)
+            switch(CurrentTokenFunctionId())
             {
                 case EXP_TOKEN:
                     Object->Sub_Type = EXP_STYPE;
@@ -3257,7 +3257,7 @@ ObjectPtr Parser::Parse_Lemon ()
     END_EXPECT
 
     /* Compute run-time values for the lemon */
-    Object->Compute_Lemon_Data(messageFactory, mToken);
+    Object->Compute_Lemon_Data(messageFactory, CurrentTokenMessageContext());
 
     Object->Compute_BBox();
     ptr = reinterpret_cast<ObjectPtr>(Object);
@@ -4462,7 +4462,7 @@ void Parser::Parse_Mesh2 (Mesh* Object)
                 {
                     /*
                     GET(TEXTURE_ID_TOKEN)
-                    Textures[i] = Copy_Texture_Pointer((reinterpret_cast<EXTURE *>(mToken.Data));
+                    Textures[i] = Copy_Texture_Pointer(CurrentTokenDataPtr<TEXTURE*>());
                     */
                     GET(TEXTURE_TOKEN);
                     Parse_Begin();
@@ -4541,7 +4541,7 @@ void Parser::Parse_Mesh2 (Mesh* Object)
 
         /* look for a texture index */
         EXPECT_ONE
-            CASE_FLOAT
+            CASE_FLOAT_UNGET
                 Triangles[i].Texture = Parse_Float(); Parse_Comma();
                 if (Triangles[i].Texture >= number_of_textures ||
                     Triangles[i].Texture < 0)
@@ -4556,7 +4556,7 @@ void Parser::Parse_Mesh2 (Mesh* Object)
         END_EXPECT
         /* look for a texture index */
         EXPECT_ONE
-            CASE_FLOAT
+            CASE_FLOAT_UNGET
                 Triangles[i].Texture2 = Parse_Float(); Parse_Comma();
                 if (Triangles[i].Texture2 >= number_of_textures ||
                     Triangles[i].Texture2 < 0)
@@ -4570,7 +4570,7 @@ void Parser::Parse_Mesh2 (Mesh* Object)
         END_EXPECT
         /* look for a texture index */
         EXPECT_ONE
-            CASE_FLOAT
+            CASE_FLOAT_UNGET
                 Triangles[i].Texture3 = Parse_Float(); Parse_Comma();
                 if (Triangles[i].Texture3 >= number_of_textures ||
                     Triangles[i].Texture3 < 0)
@@ -4919,7 +4919,7 @@ TEXTURE *Parser::Parse_Mesh_Texture (TEXTURE **t2, TEXTURE **t3)
 
             GET(TEXTURE_ID_TOKEN);
 
-            Texture = reinterpret_cast<TEXTURE *>(mToken.Data);
+            Texture = CurrentTokenDataPtr<TEXTURE*>();
 
             Parse_End();
         END_CASE
@@ -4929,17 +4929,17 @@ TEXTURE *Parser::Parse_Mesh_Texture (TEXTURE **t2, TEXTURE **t3)
             Parse_Begin();
 
             GET(TEXTURE_ID_TOKEN);
-            Texture = reinterpret_cast<TEXTURE *>(mToken.Data);
+            Texture = CurrentTokenDataPtr<TEXTURE*>();
 
             Parse_Comma();
 
             GET(TEXTURE_ID_TOKEN);
-            *t2 = reinterpret_cast<TEXTURE *>(mToken.Data);
+            *t2 = CurrentTokenDataPtr<TEXTURE*>();
 
             Parse_Comma();
 
             GET(TEXTURE_ID_TOKEN);
-            *t3 = reinterpret_cast<TEXTURE *>(mToken.Data);
+            *t3 = CurrentTokenDataPtr<TEXTURE*>();
 
             Parse_End();
             EXIT
@@ -5192,7 +5192,7 @@ ObjectPtr Parser::Parse_Parametric(void)
 
             EXPECT_ONE
                 CASE(VECTOR_FUNCT_TOKEN)
-                    if(mToken.Function_Id != X_TOKEN)
+                    if(CurrentTokenFunctionId() != X_TOKEN)
                     {
                         UNGET
                     }
@@ -5209,7 +5209,7 @@ ObjectPtr Parser::Parse_Parametric(void)
 
             EXPECT_ONE
                 CASE(VECTOR_FUNCT_TOKEN)
-                    if(mToken.Function_Id != Y_TOKEN)
+                    if(CurrentTokenFunctionId() != Y_TOKEN)
                     {
                         UNGET
                     }
@@ -5226,7 +5226,7 @@ ObjectPtr Parser::Parse_Parametric(void)
 
             EXPECT_ONE
                 CASE(VECTOR_FUNCT_TOKEN)
-                    if(mToken.Function_Id != Z_TOKEN)
+                    if(CurrentTokenFunctionId() != Z_TOKEN)
                     {
                         UNGET
                     }
@@ -6806,7 +6806,7 @@ ObjectPtr Parser::Parse_Object ()
         END_CASE
 
         CASE (OBJECT_ID_TOKEN)
-            Object = Copy_Object(reinterpret_cast<ObjectPtr>(mToken.Data));
+            Object = Copy_Object(CurrentTokenDataPtr<ObjectPtr>());
         END_CASE
 
         CASE (UNION_TOKEN)
@@ -7095,7 +7095,7 @@ void Parser::Parse_Frame ()
         END_CASE
 
         CASE (FLOAT_FUNCT_TOKEN)
-            switch(mToken.Function_Id)
+            switch(CurrentTokenFunctionId())
             {
                 case VERSION_TOKEN:
                     UNGET
@@ -7782,7 +7782,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
             Set_Flag(Object, CUTAWAY_TEXTURES_FLAG);
         END_CASE
 
-        CASE_COLOUR
+        CASE_COLOUR_UNGET
             Parse_Colour (Local_Colour);
             if (sceneData->EffectiveLanguageVersion() < 150)
             {
@@ -8211,7 +8211,7 @@ void Parser::Parse_Matrix(MATRIX Matrix)
 TRANSFORM *Parser::Parse_Transform(TRANSFORM *Trans)
 {
     Get_Token();
-    if(mToken.Token_Id == TRANSFORM_ID_TOKEN)
+    if(CurrentTokenId() == TRANSFORM_ID_TOKEN)
     {
         /* using old "transform TRANS_IDENT" syntax */
         if (Trans == nullptr)
@@ -8221,7 +8221,7 @@ TRANSFORM *Parser::Parse_Transform(TRANSFORM *Trans)
             MIdentity (Trans->matrix);
             MIdentity (Trans->inverse);
         }
-        Compose_Transforms(Trans, reinterpret_cast<TRANSFORM *>(mToken.Data));
+        Compose_Transforms(Trans, CurrentTokenDataPtr<TRANSFORM*>());
     }
     else
     {
@@ -8271,7 +8271,7 @@ TRANSFORM *Parser::Parse_Transform_Block(TRANSFORM *New)
         END_CASE
 
         CASE(TRANSFORM_ID_TOKEN)
-            Compose_Transforms(New, reinterpret_cast<TRANSFORM *>(mToken.Data));
+            Compose_Transforms(New, CurrentTokenDataPtr<TRANSFORM*>());
         END_CASE
 
         CASE (TRANSFORM_TOKEN)
@@ -8487,7 +8487,7 @@ int Parser::Parse_Three_UVCoords(Vector2d& UV1, Vector2d& UV2, Vector2d& UV3)
 bool Parser::Parse_Comma (void)
 {
     Get_Token();
-    if (mToken.Token_Id != COMMA_TOKEN)
+    if (CurrentTokenId() != COMMA_TOKEN)
     {
         UNGET
         return false;
@@ -8501,8 +8501,8 @@ bool Parser::Parse_Comma (void)
 bool Parser::AllowToken(TokenId tokenId)
 {
     Get_Token();
-    bool tokenMatches = ((mToken.Token_Id    == tokenId) ||
-                         (mToken.Function_Id == tokenId));
+    bool tokenMatches = ((CurrentTokenId()         == tokenId) ||
+                         (CurrentTokenFunctionId() == tokenId));
     if (!tokenMatches)
         Unget_Token();
     return tokenMatches;
@@ -8513,8 +8513,8 @@ bool Parser::AllowToken(TokenId tokenId)
 bool Parser::Peek_Token (TokenId tokenId)
 {
     Get_Token();
-    bool tokenMatches = ((mToken.Token_Id    == tokenId) ||
-                         (mToken.Function_Id == tokenId));
+    bool tokenMatches = ((CurrentTokenId()         == tokenId) ||
+                         (CurrentTokenFunctionId() == tokenId));
     Unget_Token();
     return tokenMatches;
 }
@@ -8541,7 +8541,7 @@ bool Parser::Peek_Token (TokenId tokenId)
 void Parser::Parse_Semi_Colon (bool force_semicolon)
 {
     Get_Token();
-    if (mToken.Token_Id != SEMI_COLON_TOKEN)
+    if (CurrentTokenId() != SEMI_COLON_TOKEN)
     {
         UNGET
         if ((sceneData->EffectiveLanguageVersion() >= 350) && (force_semicolon == true))
@@ -8619,7 +8619,7 @@ ObjectPtr Parser::Parse_Object_Id ()
     EXPECT_ONE
         CASE (OBJECT_ID_TOKEN)
             Warn_State(OBJECT_ID_TOKEN, OBJECT_TOKEN);
-            Object = Copy_Object(reinterpret_cast<ObjectPtr>(mToken.Data));
+            Object = Copy_Object(CurrentTokenDataPtr<ObjectPtr>());
             Object = Parse_Object_Mods (Object);
         END_CASE
 
@@ -8668,7 +8668,8 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
     void** dataPtr = nullptr;
     bool optional = false;
 
-    Ok_To_Declare = false;
+    POV_EXPERIMENTAL_ASSERT(IsOkToDeclare());
+    SetOkToDeclare(false);
 
     if ((sceneData->EffectiveLanguageVersion() >= 350) && (after_hash == false))
     {
@@ -8730,7 +8731,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             CASE (DEPRECATED_TOKEN)
                 deprecated = true;
                 ALLOW(ONCE_TOKEN);
-                if (mToken.Token_Id == ONCE_TOKEN)
+                if (CurrentTokenId() == ONCE_TOKEN)
                     deprecated_once = true;
                 deprecation_message = Parse_String(false, false);
             END_CASE
@@ -8750,27 +8751,27 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
 
         EXPECT_ONE
             CASE (IDENTIFIER_TOKEN)
-                POV_PARSER_ASSERT(!mToken.is_array_elem || mToken.is_mixed_array_elem);
+                POV_PARSER_ASSERT(!CurrentTokenIsHomogenousArrayElement());
                 allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==IDENTIFIER_TOKEN
-                if (mToken.is_array_elem)
+                if (CurrentTokenIsArrayElement())
                 {
                     numberPtr = mToken.NumberPtr;
                     dataPtr   = mToken.DataPtr;
-                    Previous  = mToken.Token_Id;
+                    Previous  = CurrentTokenId();
                 }
                 else
                 {
-                    if (mToken.is_dictionary_elem)
+                    if (CurrentTokenIsDictionaryElement())
                     {
                         if (is_local && (mToken.context != Table_Index))
                             Error("Cannot use '#local' to assign a non-local array or dictionary element.");
-                        Temp_Entry = Add_Symbol (mToken.table, mToken.raw.lexeme.text.c_str(), IDENTIFIER_TOKEN);
+                        Temp_Entry = Add_Symbol (mToken.table, CurrentTokenText().c_str(), IDENTIFIER_TOKEN);
                     }
                     else
-                        Temp_Entry = Add_Symbol (Local_Index, mToken.raw.lexeme.text.c_str(), IDENTIFIER_TOKEN);
+                        Temp_Entry = Add_Symbol (Local_Index, CurrentTokenText().c_str(), IDENTIFIER_TOKEN);
                     numberPtr = &(Temp_Entry->Token_Number);
                     dataPtr = &(Temp_Entry->Data);
-                    Previous = mToken.Token_Id;
+                    Previous = CurrentTokenId();
                     if (deprecated)
                     {
                         Temp_Entry->deprecated = true;;
@@ -8785,7 +8786,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                         else
                         {
                             char str[256];
-                            sprintf(str, "Identifier '%.128s' was declared deprecated.", mToken.raw.lexeme.text.c_str());
+                            sprintf(str, "Identifier '%.128s' was declared deprecated.", CurrentTokenText().c_str());
                             Temp_Entry->Deprecation_Message = POV_STRDUP(str);
                         }
                     }
@@ -8815,20 +8816,20 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             CASE3 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN, DICTIONARY_ID_TOKEN)
                 if (is_local && (mToken.context != Table_Index))
                 {
-                    if (mToken.is_array_elem || mToken.is_dictionary_elem)
+                    if (CurrentTokenIsContainerElement())
                         Error ("Cannot use '#local' to assign a non-local array or dictionary element.");
                     allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==IDENTIFIER_TOKEN
-                    Temp_Entry = Add_Symbol (Local_Index,mToken.raw.lexeme.text.c_str(),IDENTIFIER_TOKEN);
+                    Temp_Entry = Add_Symbol (Local_Index, CurrentTokenText().c_str(), IDENTIFIER_TOKEN);
                     numberPtr = &(Temp_Entry->Token_Number);
                     dataPtr   = &(Temp_Entry->Data);
                     Previous  = IDENTIFIER_TOKEN;
                 }
                 else
                 {
-                    allow_redefine = !mToken.is_array_elem || mToken.is_mixed_array_elem;
+                    allow_redefine = !CurrentTokenIsHomogenousArrayElement();
                     numberPtr = mToken.NumberPtr;
                     dataPtr   = mToken.DataPtr;
-                    Previous  = mToken.Token_Id;
+                    Previous  = CurrentTokenId();
                 }
             END_CASE
 
@@ -8837,30 +8838,30 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                 allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==EMPTY_ARRAY_TOKEN
                 numberPtr = mToken.NumberPtr;
                 dataPtr   = mToken.DataPtr;
-                Previous  = mToken.Token_Id;
+                Previous  = CurrentTokenId();
             END_CASE
 
             CASE2 (VECTOR_FUNCT_TOKEN, FLOAT_FUNCT_TOKEN)
-                switch(mToken.Function_Id)
+                switch(CurrentTokenFunctionId())
                 {
                     case VECTOR_ID_TOKEN:
                     case FLOAT_ID_TOKEN:
                         if (is_local && (mToken.context != Table_Index))
                         {
-                            if (mToken.is_array_elem || mToken.is_dictionary_elem)
+                            if (CurrentTokenIsContainerElement())
                                 Error("Cannot use '#local' to assign a non-local array or dictionary element.");
                             allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==IDENTIFIER_TOKEN
-                            Temp_Entry = Add_Symbol (Local_Index,mToken.raw.lexeme.text.c_str(),IDENTIFIER_TOKEN);
+                            Temp_Entry = Add_Symbol (Local_Index, CurrentTokenText().c_str(), IDENTIFIER_TOKEN);
                             numberPtr = &(Temp_Entry->Token_Number);
                             dataPtr   = &(Temp_Entry->Data);
                             Previous  = IDENTIFIER_TOKEN;
                         }
                         else
                         {
-                            allow_redefine  = !mToken.is_array_elem || mToken.is_mixed_array_elem;
+                            allow_redefine  = !CurrentTokenIsHomogenousArrayElement();
                             numberPtr = mToken.NumberPtr;
                             dataPtr   = mToken.DataPtr;
-                            Previous  = mToken.Function_Id;
+                            Previous  = CurrentTokenFunctionId();
                         }
                         break;
 
@@ -8941,7 +8942,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
     LValue_Ok = false;
 
     GET (EQUALS_TOKEN)
-    Ok_To_Declare = true;
+    SetOkToDeclare(true);
 
     if (lvectorDeclare)
     {
@@ -9063,9 +9064,10 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
 
     if ( after_hash )
     {
-        Ok_To_Declare = false;
+        POV_EXPERIMENTAL_ASSERT(IsOkToDeclare());
+        SetOkToDeclare(false);
         ALLOW( SEMI_COLON_TOKEN );
-        Ok_To_Declare = true;
+        SetOkToDeclare(true);
     }
 }
 
@@ -9100,7 +9102,7 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
     POV_PARAM *New_Par;
     bool Found=true;
     int Temp_Count=3000000; // TODO FIXME - magic value!
-    bool Old_Ok=Ok_To_Declare;
+    bool oldOkToDeclare = IsOkToDeclare();
     int Terms;
     bool function_identifier;
     bool callable_identifier;
@@ -9149,17 +9151,16 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
             }
         END_CASE
 
-        CASE_COLOUR
-            if((mToken.Token_Id != COLOUR_ID_TOKEN) || (sceneData->EffectiveLanguageVersion() < 350))
+        CASE_COLOUR_UNGET
+            if((CurrentTokenId() != COLOUR_ID_TOKEN) || (sceneData->EffectiveLanguageVersion() < 350))
             {
                 Local_Colour  = Create_Colour();
-                Ok_To_Declare = false;
+                SetOkToDeclare(false);
                 Parse_Colour (*Local_Colour);
                 if (SemiFlag)
                 {
                     Parse_Semi_Colon(true);
                 }
-                Ok_To_Declare = true;
                 *NumberPtr    = COLOUR_ID_TOKEN;
                 Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
                 *DataPtr      = reinterpret_cast<void *>(Local_Colour);
@@ -9168,19 +9169,22 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
             // intentional to allow color dot expressions as macro parameters if #version is 3.5 or higher [trf]
             // FALLTHROUGH
 
-        CASE_VECTOR
+        CASE_VECTOR_UNGET
             // It seems very few people understand what is going on here, so let me try to
-            // explain it. All comments below are mine and they are based on how I think it
+            // explain it. All comments below [1] are mine [2] and they are based on how I think it
             // works and understand it. As I didn't write most of the code I cannot really
             // tell for sure, so if anybody finds incorrect comments please let me know!
             // BTW, when saying #declare it always implies "or #local" :-)
 
+            // [1] That's most certainly no longer true. [CLi]
+            // [2] Who is "me" anyway? [CLi]
+
             // determine the type of the first identifier
-            function_identifier = (mToken.Token_Id==FUNCT_ID_TOKEN) || (mToken.Token_Id==VECTFUNCT_ID_TOKEN);
-            callable_identifier = (mToken.Token_Id==FUNCT_ID_TOKEN) || (mToken.Token_Id==VECTFUNCT_ID_TOKEN) || (mToken.Token_Id==SPLINE_ID_TOKEN);
+            function_identifier = (CurrentTokenId()==FUNCT_ID_TOKEN) || (CurrentTokenId()==VECTFUNCT_ID_TOKEN);
+            callable_identifier = (CurrentTokenId()==FUNCT_ID_TOKEN) || (CurrentTokenId()==VECTFUNCT_ID_TOKEN) || (CurrentTokenId()==SPLINE_ID_TOKEN);
 
             // don't allow #declares from here
-            Ok_To_Declare = false;
+            SetOkToDeclare(false);
 
             // if what follows could be a function/spline call or
             // is a macro parameter taking a float, vector or ids
@@ -9188,9 +9192,9 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
             // found between now and the time when the function
             // Parse_Unknown_Vector returns
             if (callable_identifier || (ParFlag &&
-                (((mToken.Token_Id==FLOAT_FUNCT_TOKEN) && (mToken.Function_Id==FLOAT_ID_TOKEN)) ||
-                 ((mToken.Token_Id==VECTOR_FUNCT_TOKEN) &&  (mToken.Function_Id==VECTOR_ID_TOKEN)) ||
-                 (mToken.Token_Id==VECTOR_4D_ID_TOKEN) || (mToken.Token_Id==UV_ID_TOKEN) || (mToken.Token_Id==COLOUR_ID_TOKEN))))
+                (((CurrentTokenId()==FLOAT_FUNCT_TOKEN) && (CurrentTokenFunctionId()==FLOAT_ID_TOKEN)) ||
+                 ((CurrentTokenId()==VECTOR_FUNCT_TOKEN) &&  (CurrentTokenFunctionId()==VECTOR_ID_TOKEN)) ||
+                 (CurrentTokenId()==VECTOR_4D_ID_TOKEN) || (CurrentTokenId()==UV_ID_TOKEN) || (CurrentTokenId()==COLOUR_ID_TOKEN))))
             {
                 Temp_Count = token_count;
             }
@@ -9202,10 +9206,10 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
             // so we claim dibs on it until we're done.
             // TODO - this is a bit hackish; ideally, if the Token is a symbol we should have it store the SYM_ENTRY pointer,
             // so we don't need to look it up again via name.
-            if ((mToken.Token_Id==FUNCT_ID_TOKEN) || (mToken.Token_Id==VECTFUNCT_ID_TOKEN) || (mToken.Token_Id==SPLINE_ID_TOKEN) ||
-                (mToken.Token_Id==UV_ID_TOKEN) || (mToken.Token_Id==VECTOR_4D_ID_TOKEN) || (mToken.Token_Id==COLOUR_ID_TOKEN))
+            if ((CurrentTokenId()==FUNCT_ID_TOKEN) || (CurrentTokenId()==VECTFUNCT_ID_TOKEN) || (CurrentTokenId()==SPLINE_ID_TOKEN) ||
+                (CurrentTokenId()==UV_ID_TOKEN) || (CurrentTokenId()==VECTOR_4D_ID_TOKEN) || (CurrentTokenId()==COLOUR_ID_TOKEN))
             {
-                symbol_entry = Find_Symbol (mToken.table, mToken.raw.lexeme.text.c_str());
+                symbol_entry = Find_Symbol (mToken.table, CurrentTokenText().c_str());
                 if (symbol_entry)
                 {
                     symbol_entry_table = mToken.table;
@@ -9294,9 +9298,6 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
             }
             if (symbol_entry)
                 Release_Entry_Reference (symbol_entry_table, symbol_entry);
-
-            // allow #declares again
-            Ok_To_Declare = true;
         END_CASE
 
         CASE (PIGMENT_TOKEN)
@@ -9341,7 +9342,7 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
             Parse_End ();
             Temp_Texture = nullptr;
             Link_Textures(&Temp_Texture, Local_Texture);
-            Ok_To_Declare = false;
+            SetOkToDeclare(false);
             EXPECT
                 CASE (TEXTURE_TOKEN)
                     Parse_Begin ();
@@ -9359,7 +9360,6 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
             *NumberPtr    = TEXTURE_ID_TOKEN;
             Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
             *DataPtr      = reinterpret_cast<void *>(Temp_Texture);
-            Ok_To_Declare = true;
         END_CASE
 
         CASE (COLOUR_MAP_TOKEN)
@@ -9533,7 +9533,7 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
 
     END_EXPECT
 
-    Ok_To_Declare=Old_Ok;
+    SetOkToDeclare(oldOkToDeclare);
     parseOptionalRValue = oldParseOptionalRVaue;
     return(Found);
 }
@@ -9831,25 +9831,25 @@ void Parser::Found_Instead_Error(const char *exstr, const char *extokstr)
 {
     const char *found;
 
-    switch(mToken.Token_Id)
+    switch(CurrentTokenId())
     {
         case IDENTIFIER_TOKEN:
-            Error("%s '%s', undeclared identifier '%s' found instead", exstr, extokstr, mToken.raw.lexeme.text.c_str());
+            Error("%s '%s', undeclared identifier '%s' found instead", exstr, extokstr, CurrentTokenText().c_str());
             break;
         case VECTOR_FUNCT_TOKEN:
-            found = Get_Token_String(mToken.Function_Id);
+            found = Get_Token_String(CurrentTokenFunctionId());
             Error("%s '%s', vector function '%s' found instead", exstr, extokstr, found);
             break;
         case FLOAT_FUNCT_TOKEN:
-            found = Get_Token_String(mToken.Function_Id);
+            found = Get_Token_String(CurrentTokenFunctionId());
             Error("%s '%s', float function '%s' found instead", exstr, extokstr, found);
             break;
         case COLOUR_KEY_TOKEN:
-            found = Get_Token_String(mToken.Function_Id);
+            found = Get_Token_String(CurrentTokenFunctionId());
             Error("%s '%s', color keyword '%s' found instead", exstr, extokstr, found);
             break;
         default:
-            found = Get_Token_String(mToken.Token_Id);
+            found = Get_Token_String(CurrentTokenId());
             Error("%s '%s', %s found instead", exstr, extokstr, found);
     }
 }
@@ -10471,7 +10471,7 @@ void Parser::Warn_Compat(bool definite, const char *syn)
 void Parser::Global_Setting_Warn()
 {
     if (sceneData->EffectiveLanguageVersion() >= 300)
-        PossibleError("'%s' should be in 'global_settings{...}' statement.", mToken.raw.lexeme.text.c_str());
+        PossibleError("'%s' should be in 'global_settings{...}' statement.", CurrentTokenText().c_str());
 }
 
 /*****************************************************************************
@@ -10829,8 +10829,8 @@ void Parser::Warning(WarningLevel level, const char *format,...)
     std::vsnprintf(localvsbuffer, sizeof(localvsbuffer), format, marker);
     va_end(marker);
 
-    if (mToken.sourceFile != nullptr)
-        messageFactory.WarningAt(level, mToken, "%s", localvsbuffer);
+    if (HaveCurrentMessageContext())
+        messageFactory.WarningAt(level, CurrentMessageContext(), "%s", localvsbuffer);
     else
         messageFactory.Warning(level, "%s", localvsbuffer);
 }
@@ -10859,8 +10859,8 @@ void Parser::PossibleError(const char *format,...)
     std::vsnprintf(localvsbuffer, sizeof(localvsbuffer), format, marker);
     va_end(marker);
 
-    if (mToken.sourceFile != nullptr)
-        messageFactory.PossibleErrorAt(mToken, "%s", localvsbuffer);
+    if (HaveCurrentMessageContext())
+        messageFactory.PossibleErrorAt(CurrentMessageContext(), "%s", localvsbuffer);
     else
         messageFactory.PossibleError("%s", localvsbuffer);
 }
@@ -10878,8 +10878,8 @@ void Parser::Error(const char *format,...)
     std::vsnprintf(localvsbuffer, sizeof(localvsbuffer), format, marker);
     va_end(marker);
 
-    if (mToken.sourceFile != nullptr)
-        messageFactory.ErrorAt(POV_EXCEPTION(kParseErr, localvsbuffer), mToken, "%s", localvsbuffer);
+    if (HaveCurrentMessageContext())
+        messageFactory.ErrorAt(POV_EXCEPTION(kParseErr, localvsbuffer), CurrentMessageContext(), "%s", localvsbuffer);
     else
         messageFactory.Error(POV_EXCEPTION(kParseErr, localvsbuffer), "%s", localvsbuffer);
 }

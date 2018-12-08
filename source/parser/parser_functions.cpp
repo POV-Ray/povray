@@ -392,62 +392,62 @@ TokenId Parser::expr_get_token()
 {
     Get_Token();
 
-    if(mToken.Function_Id == X_TOKEN)
+    if(CurrentTokenFunctionId() == X_TOKEN)
         return FLOAT_ID_TOKEN;
-    else if(mToken.Function_Id == Y_TOKEN)
+    else if(CurrentTokenFunctionId() == Y_TOKEN)
         return FLOAT_ID_TOKEN;
-    else if(mToken.Function_Id == Z_TOKEN)
+    else if(CurrentTokenFunctionId() == Z_TOKEN)
         return FLOAT_ID_TOKEN;
-    else if(mToken.Function_Id == U_TOKEN)
+    else if(CurrentTokenFunctionId() == U_TOKEN)
         return FLOAT_ID_TOKEN;
-    else if(mToken.Function_Id == V_TOKEN)
+    else if(CurrentTokenFunctionId() == V_TOKEN)
         return FLOAT_ID_TOKEN;
-    else if(mToken.Function_Id == IDENTIFIER_TOKEN)
+    else if(CurrentTokenFunctionId() == IDENTIFIER_TOKEN)
         return FLOAT_ID_TOKEN;
-    else if(mToken.Function_Id == CLOCK_TOKEN)
+    else if(CurrentTokenFunctionId() == CLOCK_TOKEN)
     {
         mToken.Token_Float = clockValue;
         return FLOAT_TOKEN;
     }
-    else if(mToken.Function_Id == PI_TOKEN)
+    else if(CurrentTokenFunctionId() == PI_TOKEN)
     {
         mToken.Token_Float = M_PI;
         return FLOAT_TOKEN;
     }
-    else if(mToken.Function_Id == TAU_TOKEN)
+    else if(CurrentTokenFunctionId() == TAU_TOKEN)
     {
         mToken.Token_Float = M_TAU;
         return FLOAT_TOKEN;
     }
-    else if(mToken.Function_Id == RED_TOKEN)
+    else if(CurrentTokenFunctionId() == RED_TOKEN)
         return RED_TOKEN;
-    else if(mToken.Function_Id == GREEN_TOKEN)
+    else if(CurrentTokenFunctionId() == GREEN_TOKEN)
         return GREEN_TOKEN;
-    else if(mToken.Function_Id == BLUE_TOKEN)
+    else if(CurrentTokenFunctionId() == BLUE_TOKEN)
         return BLUE_TOKEN;
-    else if(mToken.Function_Id == FILTER_TOKEN)
+    else if(CurrentTokenFunctionId() == FILTER_TOKEN)
         return FILTER_TOKEN;
-    else if(mToken.Function_Id == TRANSMIT_TOKEN)
+    else if(CurrentTokenFunctionId() == TRANSMIT_TOKEN)
         return TRANSMIT_TOKEN;
-    else if(mToken.Function_Id == T_TOKEN)
+    else if(CurrentTokenFunctionId() == T_TOKEN)
         return T_TOKEN;
-    else if(mToken.Function_Id == GRAY_TOKEN)
+    else if(CurrentTokenFunctionId() == GRAY_TOKEN)
         return GRAY_TOKEN;
 
-    if(mToken.Token_Id == FLOAT_FUNCT_TOKEN)
+    if(CurrentTokenId() == FLOAT_FUNCT_TOKEN)
     {
-        if(mToken.Function_Id == FLOAT_TOKEN)
+        if(CurrentTokenFunctionId() == FLOAT_TOKEN)
             return FLOAT_TOKEN;
-        else if(mToken.Function_Id == FLOAT_ID_TOKEN)
+        else if(CurrentTokenFunctionId() == FLOAT_ID_TOKEN)
         {
-            mToken.Token_Float = *(reinterpret_cast<DBL *>(mToken.Data));
+            mToken.Token_Float = CurrentTokenData<DBL>();
             return FLOAT_TOKEN;
         }
 
         return FUNCT_ID_TOKEN;
     }
 
-    return mToken.Token_Id;
+    return CurrentTokenId();
 }
 
 
@@ -675,15 +675,15 @@ bool Parser::expr_call(ExprNode *&current, int stage, int op)
 
     node = new_expr_node(stage, op);
 
-    if (mToken.Data != nullptr)
+    if (HaveCurrentTokenData())
     {
-        node->call.fn = *((FUNCTION_PTR)mToken.Data);
+        node->call.fn = *CurrentTokenDataPtr<FUNCTION_PTR>();
         (void)mpFunctionVM->GetFunctionAndReference(node->call.fn);
     }
     else
         node->call.fn = 0;
-    node->call.token = mToken.Function_Id;
-    node->call.name = POV_STRDUP(mToken.raw.lexeme.text.c_str());
+    node->call.token = CurrentTokenFunctionId();
+    node->call.name = POV_STRDUP(CurrentTokenText().c_str());
     while (current->child != nullptr)
         current = current->child;
 
@@ -702,7 +702,7 @@ bool Parser::expr_call(ExprNode *&current, int stage, int op)
         node = node->next;
     }
 
-    if(mToken.Token_Id != RIGHT_PAREN_TOKEN)
+    if(CurrentTokenId() != RIGHT_PAREN_TOKEN)
         Expectation_Error(")");
 
     return true;
@@ -760,7 +760,7 @@ bool Parser::expr_put(ExprNode *&current, int stage, int op)
     }
     else
     {
-        node->variable = POV_STRDUP(mToken.raw.lexeme.text.c_str());
+        node->variable = POV_STRDUP(CurrentTokenText().c_str());
     }
 
     current->child = node;
