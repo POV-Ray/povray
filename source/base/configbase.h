@@ -1067,14 +1067,11 @@ static_assert(
 /// This macro evaluates the specified expression, and halts execution (in debug builds) or throws
 /// an exception (in release builds) if the expression does not hold true.
 /// @attention
-///     This macro is intended for special builds only, and will deliberately trigger a
-///     compile-time error if used in a final release build.
+///     This macro is intended for special builds only, and should _never_ be used in mainline versions!
 #if POV_DEBUG
     #define POV_EXPERIMENTAL_ASSERT(expr) POV_ASSERT_HARD(expr)
-#elif defined(POV_RAY_PRERELEASE)
-    #define POV_EXPERIMENTAL_ASSERT(expr) POV_ASSERT_SOFT(expr)
 #else
-    #define POV_EXPERIMENTAL_ASSERT(expr) static_assert(, "POV_EXPERIMENTAL_ASSERT() used in final release")
+    #define POV_EXPERIMENTAL_ASSERT(expr) POV_ASSERT_SOFT(expr)
 #endif
 
 #if POV_COLOURSPACE_DEBUG
