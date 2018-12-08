@@ -225,12 +225,12 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(TokenId *token_id, const char *fn_nam
     Parse_Begin();
 
     Get_Token();
-    if(mToken.Token_Id == INTERNAL_TOKEN)
+    if(CurrentTokenId() == INTERNAL_TOKEN)
     {
         Parse_Paren_Begin();
 
         Get_Token();
-        if(mToken.Function_Id != FLOAT_TOKEN)
+        if(CurrentTokenFunctionId() != FLOAT_TOKEN)
             Expectation_Error("internal function identifier");
         expression = FNSyntax_GetTrapExpression((unsigned int)(mToken.Token_Float));
 
@@ -238,7 +238,7 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(TokenId *token_id, const char *fn_nam
 
         Parse_Paren_End();
     }
-    else if(mToken.Token_Id == TRANSFORM_TOKEN)
+    else if(CurrentTokenId() == TRANSFORM_TOKEN)
     {
         if(function.parameter_cnt != 0)
             Error("Function parameters for transform functions are not allowed.");
@@ -255,7 +255,7 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(TokenId *token_id, const char *fn_nam
         // function type is vector function
         *token_id = VECTFUNCT_ID_TOKEN;
     }
-    else if(mToken.Token_Id == SPLINE_TOKEN)
+    else if(CurrentTokenId() == SPLINE_TOKEN)
     {
         if(function.parameter_cnt != 0)
             Error("Function parameters for spline functions are not allowed.");
@@ -276,7 +276,7 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(TokenId *token_id, const char *fn_nam
         // function type is vector function
         *token_id = VECTFUNCT_ID_TOKEN;
     }
-    else if(mToken.Token_Id == PIGMENT_TOKEN)
+    else if(CurrentTokenId() == PIGMENT_TOKEN)
     {
         if(function.parameter_cnt != 0)
             Error("Function parameters for pigment functions are not allowed.");
@@ -297,7 +297,7 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(TokenId *token_id, const char *fn_nam
         // function type is vector function
         *token_id = VECTFUNCT_ID_TOKEN;
     }
-    else if(mToken.Token_Id == PATTERN_TOKEN)
+    else if(CurrentTokenId() == PATTERN_TOKEN)
     {
         if(function.parameter_cnt != 0)
             Error("Function parameters for pattern functions are not allowed.");
@@ -313,19 +313,19 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(TokenId *token_id, const char *fn_nam
         Parse_End();
         Post_Pigment(reinterpret_cast<PIGMENT *>(function.private_data));
     }
-    else if(mToken.Token_Id == STRING_LITERAL_TOKEN)
+    else if(CurrentTokenId() == STRING_LITERAL_TOKEN)
     {
 #if (DEBUG_FLOATFUNCTION == 1)
-        f.SetFlag(2, mToken.raw.lexeme.text.c_str());
+        f.SetFlag(2, CurrentTokenText().c_str());
 #endif
         Get_Token();
-        if(mToken.Token_Id == COMMA_TOKEN)
+        if(CurrentTokenId() == COMMA_TOKEN)
         {
             Get_Token();
-            if(mToken.Token_Id != STRING_LITERAL_TOKEN)
+            if(CurrentTokenId() != STRING_LITERAL_TOKEN)
                 Expectation_Error("valid function expression");
 #if (DEBUG_FLOATFUNCTION == 1)
-            f.SetFlag(1, mToken.raw.lexeme.text.c_str());
+            f.SetFlag(1, CurrentTokenText().c_str());
 #endif
         }
         else

@@ -204,7 +204,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
     if(Legal & GRAD_FILE)
     {
         EXPECT
-            CASE_VECTOR
+            CASE_VECTOR_UNGET
                 VersionWarning(150, "Old style orientation vector or map type not supported. Ignoring value.");
                 Parse_Vector(Local_Vector);
             END_CASE
@@ -223,7 +223,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
             image->height = (SNGL)int(Parse_Float() + 0.5);
 
             Get_Token();
-            if(mToken.Token_Id != LEFT_CURLY_TOKEN)
+            if (CurrentTokenId() != LEFT_CURLY_TOKEN)
                 Found_Instead_Error("Missing { after", "expression");
             Unget_Token();
 
@@ -1058,7 +1058,7 @@ PatternPtr Parser::ParseSlopePattern()
 
     EXPECT_ONE
         /* simple syntax */
-        CASE_EXPRESS
+        CASE_EXPRESS_UNGET
             Parse_Vector (pattern->slopeDirection);
         END_CASE
 
@@ -1292,7 +1292,7 @@ void Parser::Parse_Pigment (PIGMENT **Pigment_Ptr)
     EXPECT_ONE            /* Look for [pigment_id] */
         CASE (PIGMENT_ID_TOKEN)
             Destroy_Pigment(*Pigment_Ptr);
-            *Pigment_Ptr = Copy_Pigment (reinterpret_cast<PIGMENT *>(mToken.Data));
+            *Pigment_Ptr = Copy_Pigment (CurrentTokenDataPtr<PIGMENT*>());
         END_CASE
 
         OTHERWISE
@@ -1464,7 +1464,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             New->pattern = PatternPtr(new CracklePattern());
         END_CASE
 
-        CASE_COLOUR
+        CASE_COLOUR_UNGET
             if ((TPat_Type != kBlendMapType_Pigment) && (TPat_Type != kBlendMapType_Density))
                 Only_In("color","pigment or density");
             New->Type = PLAIN_PATTERN;
@@ -2196,7 +2196,7 @@ void Parser::Parse_Tnormal (TNORMAL **Tnormal_Ptr)
     EXPECT_ONE            /* Look for [tnormal_id] */
         CASE (NORMAL_ID_TOKEN)
             Destroy_Tnormal(*Tnormal_Ptr);
-            *Tnormal_Ptr = Copy_Tnormal (reinterpret_cast<TNORMAL *>(mToken.Data));
+            *Tnormal_Ptr = Copy_Tnormal (CurrentTokenDataPtr<TNORMAL*>());
         END_CASE
 
         OTHERWISE
@@ -2260,7 +2260,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
         CASE (FINISH_ID_TOKEN)
             if (*Finish_Ptr)
                 delete *Finish_Ptr;
-            *Finish_Ptr = Copy_Finish (reinterpret_cast<FINISH *>(mToken.Data));
+            *Finish_Ptr = Copy_Finish (CurrentTokenDataPtr<FINISH*>());
         END_CASE
 
         OTHERWISE
@@ -2316,7 +2316,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
             bool found_second_color = false;
             EXPECT_ONE
                 /* old syntax */
-                CASE_EXPRESS
+                CASE_EXPRESS_UNGET
                     Parse_Colour(New->Reflection_Max);
                     New->Reflection_Min = New->Reflection_Max;
                     New->Reflection_Falloff = 1;
@@ -2334,7 +2334,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
 
                     /* look for a second color */
                     EXPECT_ONE
-                        CASE_EXPRESS
+                        CASE_EXPRESS_UNGET
                             Parse_Colour(New->Reflection_Max);
                             found_second_color = true;
                         END_CASE
@@ -2428,7 +2428,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
         CASE (METALLIC_TOKEN)
             New->Metallic = 1.0;
             EXPECT_ONE
-                CASE_FLOAT
+                CASE_FLOAT_UNGET
                     New->Metallic = Parse_Float();
                 END_CASE
 
@@ -2616,7 +2616,7 @@ TEXTURE *Parser::Parse_Texture ()
 
     EXPECT_ONE               /* First allow a texture identifier */
         CASE (TEXTURE_ID_TOKEN)
-            Texture = Copy_Textures(reinterpret_cast<TEXTURE *>(mToken.Data));
+            Texture = Copy_Textures(CurrentTokenDataPtr<TEXTURE*>());
             Modified_Pnf = true;
         END_CASE
 
@@ -2639,24 +2639,24 @@ TEXTURE *Parser::Parse_Texture ()
     {
         EXPECT   /* Look for [pnf_ids] */
             CASE (PIGMENT_ID_TOKEN)
-                Warn_State(mToken.Token_Id, PIGMENT_TOKEN);
+                Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
                 Destroy_Pigment(Texture->Pigment);
-                Texture->Pigment = Copy_Pigment (reinterpret_cast<PIGMENT *>(mToken.Data));
+                Texture->Pigment = Copy_Pigment (CurrentTokenDataPtr<PIGMENT*>());
                 Modified_Pnf = true;
             END_CASE
 
             CASE (NORMAL_ID_TOKEN)
-                Warn_State(mToken.Token_Id, NORMAL_TOKEN);
+                Warn_State(CurrentTokenId(), NORMAL_TOKEN);
                 Destroy_Tnormal(Texture->Tnormal);
-                Texture->Tnormal = Copy_Tnormal (reinterpret_cast<TNORMAL *>(mToken.Data));
+                Texture->Tnormal = Copy_Tnormal (CurrentTokenDataPtr<TNORMAL*>());
                 Modified_Pnf = true;
             END_CASE
 
             CASE (FINISH_ID_TOKEN)
-                Warn_State(mToken.Token_Id, FINISH_TOKEN);
+                Warn_State(CurrentTokenId(), FINISH_TOKEN);
                 if (Texture->Finish)
                     delete Texture->Finish;
-                Texture->Finish = Copy_Finish (reinterpret_cast<FINISH *>(mToken.Data));
+                Texture->Finish = Copy_Finish (CurrentTokenDataPtr<FINISH*>());
                 Modified_Pnf = true;
             END_CASE
 
@@ -3027,7 +3027,7 @@ TEXTURE *Parser::Parse_Vers1_Texture ()
         END_CASE
 
         CASE (TEXTURE_ID_TOKEN)
-            Texture = Copy_Textures(reinterpret_cast<TEXTURE *>(mToken.Data));
+            Texture = Copy_Textures(CurrentTokenDataPtr<TEXTURE*>());
         END_CASE
 
         OTHERWISE
@@ -3042,18 +3042,18 @@ TEXTURE *Parser::Parse_Vers1_Texture ()
             EXPECT   /* Look for [pnf_ids] */
                 CASE (PIGMENT_ID_TOKEN)
                     Destroy_Pigment(Texture->Pigment);
-                    Texture->Pigment = Copy_Pigment (reinterpret_cast<PIGMENT *>(mToken.Data));
+                    Texture->Pigment = Copy_Pigment (CurrentTokenDataPtr<PIGMENT*>());
                 END_CASE
 
                 CASE (NORMAL_ID_TOKEN)
                     Destroy_Tnormal(Texture->Tnormal);
-                    Texture->Tnormal = Copy_Tnormal (reinterpret_cast<TNORMAL *>(mToken.Data));
+                    Texture->Tnormal = Copy_Tnormal (CurrentTokenDataPtr<TNORMAL*>());
                 END_CASE
 
                 CASE (FINISH_ID_TOKEN)
                     if (Texture->Finish)
                         delete Texture->Finish;
-                    Texture->Finish = Copy_Finish (reinterpret_cast<FINISH *>(mToken.Data));
+                    Texture->Finish = Copy_Finish (CurrentTokenDataPtr<FINISH*>());
                 END_CASE
 
                 OTHERWISE
@@ -3088,64 +3088,64 @@ PIGMENT STUFF OUTSIDE PIGMENT{}
 NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 ***********************************************************************/
                 CASE (AGATE_TOKEN)
-                    Warn_State(mToken.Token_Id, PIGMENT_TOKEN);
+                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new AgatePattern());
                     Check_Turb(Pigment->pattern->warps, Pigment->pattern->HasSpecialTurbulenceHandling()); // agate needs Octaves, Lambda etc., and handles the pattern itself
                 END_CASE
 
                 CASE (BOZO_TOKEN)
-                    Warn_State(mToken.Token_Id, PIGMENT_TOKEN);
+                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new BozoPattern());
                 END_CASE
 
                 CASE (GRANITE_TOKEN)
-                    Warn_State(mToken.Token_Id, PIGMENT_TOKEN);
+                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new GranitePattern());
                 END_CASE
 
                 CASE (LEOPARD_TOKEN)
-                    Warn_State(mToken.Token_Id, PIGMENT_TOKEN);
+                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new LeopardPattern());
                 END_CASE
 
                 CASE (MARBLE_TOKEN)
-                    Warn_State(mToken.Token_Id, PIGMENT_TOKEN);
+                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new MarblePattern());
                     // TODO REVIEW - proper syntax sets waveType
                 END_CASE
 
                 CASE (MANDEL_TOKEN)
-                    Warn_State(mToken.Token_Id, PIGMENT_TOKEN);
+                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = ParseMandelPattern();
                 END_CASE
 
                 CASE (ONION_TOKEN)
-                    Warn_State(mToken.Token_Id, PIGMENT_TOKEN);
+                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new OnionPattern());
                 END_CASE
 
                 CASE (SPOTTED_TOKEN)
-                    Warn_State(mToken.Token_Id, PIGMENT_TOKEN);
+                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new SpottedPattern());
                 END_CASE
 
                 CASE (WOOD_TOKEN)
-                    Warn_State(mToken.Token_Id, PIGMENT_TOKEN);
+                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new WoodPattern());
                 END_CASE
 
                 CASE (GRADIENT_TOKEN)
                     {
-                        Warn_State(mToken.Token_Id, PIGMENT_TOKEN);
+                        Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
                         Pigment->Type = GENERIC_PATTERN;
                         shared_ptr<GradientPattern> pattern(new GradientPattern());
                         Parse_Vector (Local_Vector);
@@ -3155,43 +3155,43 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                     }
                 END_CASE
 
-                CASE_COLOUR
-                    Warn_State(mToken.Token_Id, PIGMENT_TOKEN);
+                CASE_COLOUR_UNGET
+                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
                     Pigment->Type = PLAIN_PATTERN;
                     Pigment->pattern = PatternPtr(new PlainPattern());
                     Parse_Colour (Pigment->colour);
                 END_CASE
 
                 CASE (CHECKER_TOKEN)
-                    Warn_State(mToken.Token_Id, PIGMENT_TOKEN);
+                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new CheckerPattern());
                     Pigment->Blend_Map = Parse_Blend_List<ColourBlendMap>(2,Pigment->pattern->GetDefaultBlendMap(),kBlendMapType_Colour);
                 END_CASE
 
                 CASE (HEXAGON_TOKEN)
-                    Warn_State(mToken.Token_Id, PIGMENT_TOKEN);
+                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new HexagonPattern());
                     Pigment->Blend_Map = Parse_Blend_List<ColourBlendMap>(3,Pigment->pattern->GetDefaultBlendMap(),kBlendMapType_Colour);
                 END_CASE
 
                 CASE (SQUARE_TOKEN)
-                    Warn_State(mToken.Token_Id, PIGMENT_TOKEN);
+                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new SquarePattern());
                     Pigment->Blend_Map = Parse_Blend_List<ColourBlendMap>(4,Pigment->pattern->GetDefaultBlendMap(),kBlendMapType_Colour);
                 END_CASE
 
                 CASE (TRIANGULAR_TOKEN)
-                    Warn_State(mToken.Token_Id, PIGMENT_TOKEN);
+                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new TriangularPattern());
                     Pigment->Blend_Map = Parse_Blend_List<ColourBlendMap>(6,Pigment->pattern->GetDefaultBlendMap(),kBlendMapType_Colour);
                 END_CASE
 
                 CASE (IMAGE_MAP_TOKEN)
-                    Warn_State(mToken.Token_Id, PIGMENT_TOKEN);
+                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
                     Pigment->Type = IMAGE_MAP_PATTERN;
                     Pigment->pattern = PatternPtr(new ColourImagePattern());
                     Parse_Image_Map (Pigment);
@@ -3203,14 +3203,14 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (COLOUR_MAP_TOKEN)
-                    Warn_State(mToken.Token_Id, PIGMENT_TOKEN);
+                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
                     if (!Pigment->pattern->CanMap())
                         VersionWarning(150, "Cannot use color map with this pigment type.");
                     Pigment->Blend_Map = Parse_Colour_Map<ColourBlendMap> ();
                 END_CASE
 
                 CASE (QUICK_COLOUR_TOKEN)
-                    Warn_State(mToken.Token_Id, PIGMENT_TOKEN);
+                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
                     Parse_Colour (Pigment->Quick_Colour);
                 END_CASE
 
@@ -3238,7 +3238,7 @@ TNORMAL STUFF OUTSIDE NORMAL{}
 NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 ***********************************************************************/
                 CASE (BUMPS_TOKEN)
-                    Warn_State(mToken.Token_Id, NORMAL_TOKEN);
+                    Warn_State(CurrentTokenId(), NORMAL_TOKEN);
                     ADD_TNORMAL
                     Tnormal->Type = BUMPS_PATTERN;
                     Tnormal->pattern = PatternPtr(new BumpsPattern());
@@ -3246,7 +3246,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (DENTS_TOKEN)
-                    Warn_State(mToken.Token_Id, NORMAL_TOKEN);
+                    Warn_State(CurrentTokenId(), NORMAL_TOKEN);
                     ADD_TNORMAL
                     Tnormal->Type = DENTS_PATTERN;
                     Tnormal->pattern = PatternPtr(new DentsPattern());
@@ -3254,7 +3254,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (RIPPLES_TOKEN)
-                    Warn_State(mToken.Token_Id, NORMAL_TOKEN);
+                    Warn_State(CurrentTokenId(), NORMAL_TOKEN);
                     ADD_TNORMAL
                     Tnormal->Type = RIPPLES_PATTERN;
                     Tnormal->pattern = PatternPtr(new RipplesPattern());
@@ -3262,7 +3262,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (WAVES_TOKEN)
-                    Warn_State(mToken.Token_Id, NORMAL_TOKEN);
+                    Warn_State(CurrentTokenId(), NORMAL_TOKEN);
                     ADD_TNORMAL
                     Tnormal->Type = WAVES_PATTERN;
                     Tnormal->pattern = PatternPtr(new WavesPattern());
@@ -3270,7 +3270,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (WRINKLES_TOKEN)
-                    Warn_State(mToken.Token_Id, NORMAL_TOKEN);
+                    Warn_State(CurrentTokenId(), NORMAL_TOKEN);
                     ADD_TNORMAL
                     Tnormal->Type = WRINKLES_PATTERN;
                     Tnormal->pattern = PatternPtr(new WrinklesPattern());
@@ -3279,7 +3279,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 
                 CASE (BUMP_MAP_TOKEN)
                     {
-                        Warn_State(mToken.Token_Id, NORMAL_TOKEN);
+                        Warn_State(CurrentTokenId(), NORMAL_TOKEN);
                         ADD_TNORMAL
                         Tnormal->Type = BITMAP_PATTERN;
                         shared_ptr<ImagePattern> pattern(new ImagePattern());
@@ -3290,7 +3290,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (FREQUENCY_TOKEN)
-                    Warn_State(mToken.Token_Id, NORMAL_TOKEN);
+                    Warn_State(CurrentTokenId(), NORMAL_TOKEN);
                     ADD_TNORMAL
                     pContinuousPattern = dynamic_cast<ContinuousPattern*>(Tnormal->pattern.get());
                     if (pContinuousPattern != nullptr)
@@ -3304,7 +3304,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (PHASE_TOKEN)
-                    Warn_State(mToken.Token_Id, NORMAL_TOKEN);
+                    Warn_State(CurrentTokenId(), NORMAL_TOKEN);
                     ADD_TNORMAL
                     pContinuousPattern = dynamic_cast<ContinuousPattern*>(Tnormal->pattern.get());
                     if (pContinuousPattern != nullptr)
@@ -3323,44 +3323,44 @@ FINISH STUFF OUTSIDE FINISH{}
 NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 ***********************************************************************/
                 CASE (AMBIENT_TOKEN)
-                    Warn_State(mToken.Token_Id, FINISH_TOKEN);
+                    Warn_State(CurrentTokenId(), FINISH_TOKEN);
                     Finish->Ambient = MathColour(Parse_Float ());
                 END_CASE
 
                 CASE (BRILLIANCE_TOKEN)
-                    Warn_State(mToken.Token_Id, FINISH_TOKEN);
+                    Warn_State(CurrentTokenId(), FINISH_TOKEN);
                     Finish->Brilliance = Parse_Float ();
                 END_CASE
 
                 CASE (DIFFUSE_TOKEN)
-                    Warn_State(mToken.Token_Id, FINISH_TOKEN);
+                    Warn_State(CurrentTokenId(), FINISH_TOKEN);
                     Finish->Diffuse = Parse_Float ();
                 END_CASE
 
                 CASE (REFLECTION_TOKEN)
-                    Warn_State(mToken.Token_Id, FINISH_TOKEN);
+                    Warn_State(CurrentTokenId(), FINISH_TOKEN);
                     Finish->Reflection_Max = MathColour(Parse_Float ());
                     Finish->Reflection_Min = Finish->Reflection_Max;
                     Finish->Reflection_Falloff = 1;
                 END_CASE
 
                 CASE (PHONG_TOKEN)
-                    Warn_State(mToken.Token_Id, FINISH_TOKEN);
+                    Warn_State(CurrentTokenId(), FINISH_TOKEN);
                     Finish->Phong = Parse_Float ();
                 END_CASE
 
                 CASE (PHONG_SIZE_TOKEN)
-                    Warn_State(mToken.Token_Id, FINISH_TOKEN);
+                    Warn_State(CurrentTokenId(), FINISH_TOKEN);
                     Finish->Phong_Size = Parse_Float ();
                 END_CASE
 
                 CASE (SPECULAR_TOKEN)
-                    Warn_State(mToken.Token_Id, FINISH_TOKEN);
+                    Warn_State(CurrentTokenId(), FINISH_TOKEN);
                     Finish->Specular = Parse_Float ();
                 END_CASE
 
                 CASE (ROUGHNESS_TOKEN)
-                    Warn_State(mToken.Token_Id, FINISH_TOKEN);
+                    Warn_State(CurrentTokenId(), FINISH_TOKEN);
                     Finish->Roughness = Parse_Float ();
                     if (Finish->Roughness != 0.0)
                         Finish->Roughness = 1.0/Finish->Roughness; /* CEY 12/92 */
@@ -3369,28 +3369,28 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (METALLIC_TOKEN)
-                    Warn_State(mToken.Token_Id, FINISH_TOKEN);
+                    Warn_State(CurrentTokenId(), FINISH_TOKEN);
                     Finish->Metallic = 1.0;
                 END_CASE
 
                 CASE (CRAND_TOKEN)
-                    Warn_State(mToken.Token_Id, FINISH_TOKEN);
+                    Warn_State(CurrentTokenId(), FINISH_TOKEN);
                     Finish->Crand = Parse_Float();
                 END_CASE
 
-                CASE_FLOAT
+                CASE_FLOAT_UNGET
                     Finish->Crand = Parse_Float();
                     VersionWarning(150, "Should use crand keyword in finish statement.");
                 END_CASE
 
                 CASE (IOR_TOKEN)
-                    Warn_State(mToken.Token_Id, INTERIOR_TOKEN);
+                    Warn_State(CurrentTokenId(), INTERIOR_TOKEN);
                     Finish->Temp_IOR = Parse_Float();
                     Warn_Compat(false, "Index of refraction value should be specified in 'interior{...}' statement.");
                 END_CASE
 
                 CASE (REFRACTION_TOKEN)
-                    Warn_State(mToken.Token_Id, INTERIOR_TOKEN);
+                    Warn_State(CurrentTokenId(), INTERIOR_TOKEN);
                     Finish->Temp_Refract = Parse_Float();
                     Warn_Compat(false, "Refraction value unnecessary to turn on refraction.\nTo attenuate, the fade_power and fade_distance keywords should be specified in 'interior{...}' statement.");
                 END_CASE
@@ -3426,7 +3426,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 CASE (TEXTURE_ID_TOKEN)
                     Warning("Texture identifier overwriting previous values.");
                     Destroy_Textures(Texture);
-                    Texture = Copy_Textures(reinterpret_cast<TEXTURE *>(mToken.Data));
+                    Texture = Copy_Textures(CurrentTokenDataPtr<TEXTURE*>());
                     Pigment = Texture->Pigment;
                     Tnormal = Texture->Tnormal;
                     Finish  = Texture->Finish;
@@ -3559,7 +3559,7 @@ void Parser::Parse_Media(vector<Media>& medialist)
 
     EXPECT_ONE
         CASE(MEDIA_ID_TOKEN)
-            IMediaObj = *(reinterpret_cast<Media *>(mToken.Data));
+            IMediaObj = CurrentTokenData<Media>();
         END_CASE
 
         OTHERWISE
@@ -3763,8 +3763,8 @@ void Parser::Parse_Interior(InteriorPtr& interior)
 
     EXPECT_ONE
         CASE(INTERIOR_ID_TOKEN)
-            if (mToken.Data != nullptr)
-                interior = InteriorPtr(new Interior(**reinterpret_cast<InteriorPtr *>(mToken.Data)));
+            if (HaveCurrentTokenData())
+                interior = InteriorPtr(new Interior(*CurrentTokenData<InteriorPtr>()));
             else
                 interior = InteriorPtr(new Interior());
         END_CASE
@@ -3856,7 +3856,7 @@ void Parser::Parse_Media_Density_Pattern(PIGMENT** Density)
 {
     EXPECT_ONE
         CASE (DENSITY_ID_TOKEN)
-            *Density = Copy_Pigment (reinterpret_cast<PIGMENT *>(mToken.Data));
+            *Density = Copy_Pigment (CurrentTokenDataPtr<PIGMENT*>());
         END_CASE
 
         OTHERWISE
@@ -3914,7 +3914,7 @@ FOG *Parser::Parse_Fog()
 
     EXPECT_ONE
         CASE(FOG_ID_TOKEN)
-            Fog = Copy_Fog (reinterpret_cast<FOG *>(mToken.Data));
+            Fog = Copy_Fog (CurrentTokenDataPtr<FOG*>());
         END_CASE
 
         OTHERWISE
@@ -3924,7 +3924,7 @@ FOG *Parser::Parse_Fog()
     END_EXPECT
 
     EXPECT
-        CASE_COLOUR
+        CASE_COLOUR_UNGET
             Parse_Colour(Fog->colour);
         END_CASE
 
@@ -3932,7 +3932,7 @@ FOG *Parser::Parse_Fog()
             Fog->Distance = Parse_Float();
         END_CASE
 
-        CASE_FLOAT
+        CASE_FLOAT_UNGET
             VersionWarning(150, "Should use distance keyword.");
             Fog->Distance = Parse_Float();
         END_CASE
@@ -4079,7 +4079,7 @@ RAINBOW *Parser::Parse_Rainbow()
 
     EXPECT_ONE
         CASE(RAINBOW_ID_TOKEN)
-            Rainbow = Copy_Rainbow (reinterpret_cast<RAINBOW *>(mToken.Data));
+            Rainbow = Copy_Rainbow (CurrentTokenDataPtr<RAINBOW*>());
         END_CASE
 
         OTHERWISE
@@ -4257,7 +4257,7 @@ SKYSPHERE *Parser::Parse_Skysphere()
 
     EXPECT_ONE
         CASE(SKYSPHERE_ID_TOKEN)
-            Skysphere = Copy_Skysphere(reinterpret_cast<SKYSPHERE *>(mToken.Data));
+            Skysphere = Copy_Skysphere(CurrentTokenDataPtr<SKYSPHERE*>());
         END_CASE
 
         OTHERWISE
@@ -4715,7 +4715,7 @@ void Parser::Parse_Material(MATERIAL *Material)
 
     EXPECT_ONE
         CASE(MATERIAL_ID_TOKEN)
-            Temp = reinterpret_cast<MATERIAL *>(mToken.Data);
+            Temp = CurrentTokenDataPtr<MATERIAL*>();
             Texture = Copy_Textures(Temp->Texture);
             Int_Texture = Copy_Textures(Temp->Interior_Texture);
             Link_Textures(&(Material->Texture),Texture);

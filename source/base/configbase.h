@@ -1051,10 +1051,30 @@ static_assert(
     #define POV_BACKSLASH_IS_PATH_SEPARATOR 0
 #endif
 
+/// @def POV_ASSERT
+/// Assert a condition that should hold true by design.
+/// In debug builds, this macro evaluates the specified expression, and halts execution if the
+/// expression does not hold true.
+/// In release builds, this macro evaluates to an empty statement.
 #if POV_DEBUG
     #define POV_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
     #define POV_ASSERT(expr) POV_ASSERT_DISABLE(expr)
+#endif
+
+/// @def POV_EXPERIMENTAL_ASSERT
+/// Assert a condition that is expected to hold true by current understanding of the code.
+/// This macro evaluates the specified expression, and halts execution (in debug builds) or throws
+/// an exception (in release builds) if the expression does not hold true.
+/// @attention
+///     This macro is intended for special builds only, and will deliberately trigger a
+///     compile-time error if used in a final release build.
+#if POV_DEBUG
+    #define POV_EXPERIMENTAL_ASSERT(expr) POV_ASSERT_HARD(expr)
+#elif defined(POV_RAY_PRERELEASE)
+    #define POV_EXPERIMENTAL_ASSERT(expr) POV_ASSERT_SOFT(expr)
+#else
+    #define POV_EXPERIMENTAL_ASSERT(expr) static_assert(, "POV_EXPERIMENTAL_ASSERT() used in final release")
 #endif
 
 #if POV_COLOURSPACE_DEBUG

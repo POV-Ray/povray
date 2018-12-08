@@ -123,8 +123,8 @@ FNCode::FNCode(Parser *pa, FunctionCode *f, bool is_local, const char *n)
         function->sourceInfo.name = n;
     else
         function->sourceInfo.name = "";
-    function->sourceInfo.fileName = parser->UCS2_strdup(parser->mToken.sourceFile->Name());
-    function->sourceInfo.position = parser->mToken.raw.lexeme.position;
+    function->sourceInfo.fileName = parser->CurrentFileName();
+    function->sourceInfo.position = parser->CurrentFilePosition();
     function->flags = 0;
     function->private_copy_method = nullptr;
     function->private_destroy_method = nullptr;
@@ -166,20 +166,20 @@ FNCode::FNCode(Parser *pa, FunctionCode *f, bool is_local, const char *n)
 void FNCode::Parameter()
 {
     parser->Get_Token();
-    if(parser->mToken.Token_Id == LEFT_PAREN_TOKEN)
+    if(parser->CurrentTokenId() == LEFT_PAREN_TOKEN)
     {
         for(function->parameter_cnt = 0;
-            ((parser->mToken.Token_Id != RIGHT_PAREN_TOKEN) || (function->parameter_cnt == 0)) && (function->parameter_cnt < MAX_FUNCTION_PARAMETER_LIST);
+            ((parser->CurrentTokenId() != RIGHT_PAREN_TOKEN) || (function->parameter_cnt == 0)) && (function->parameter_cnt < MAX_FUNCTION_PARAMETER_LIST);
             function->parameter_cnt++)
         {
             parser->Get_Token();
 
-            if((parser->mToken.Function_Id != IDENTIFIER_TOKEN) && (parser->mToken.Function_Id != X_TOKEN) &&
-               (parser->mToken.Function_Id != Y_TOKEN) && (parser->mToken.Function_Id != Z_TOKEN) &&
-               (parser->mToken.Function_Id != U_TOKEN) && (parser->mToken.Function_Id != V_TOKEN))
+            if((parser->CurrentTokenFunctionId() != IDENTIFIER_TOKEN) && (parser->CurrentTokenFunctionId() != X_TOKEN) &&
+               (parser->CurrentTokenFunctionId() != Y_TOKEN) && (parser->CurrentTokenFunctionId() != Z_TOKEN) &&
+               (parser->CurrentTokenFunctionId() != U_TOKEN) && (parser->CurrentTokenFunctionId() != V_TOKEN))
                 parser->Expectation_Error("parameter identifier");
 
-            function->parameter[function->parameter_cnt] = POV_STRDUP(parser->mToken.raw.lexeme.text.c_str());
+            function->parameter[function->parameter_cnt] = POV_STRDUP(parser->CurrentTokenText().c_str());
 
             parser->Parse_Comma();
         }

@@ -128,43 +128,64 @@ struct Sym_Table_Entry
 /* Here we create our own little language for doing the parsing.  It
   makes the code easier to read. */
 
-#define EXPECT { int Exit_Flag; Exit_Flag = false; \
-    while (!Exit_Flag) {Get_Token();  switch (mToken.Token_Id) {
-#define EXPECT_ONE { int Exit_Flag; Exit_Flag = false; \
-    {Get_Token();  switch (mToken.Token_Id) {
-#define CASE(x) case x:
-#define CASE2(x, y) case x: case y:
-#define CASE3(x, y, z) case x: case y: case z:
-#define CASE4(w, x, y, z) case w: case x: case y: case z:
-#define CASE5(v, w, x, y, z) case v: case w: case x: case y: case z:
+#define GET(x)      Get_Token(); \
+                    if (CurrentTokenId() != x) \
+                        Parse_Error (x);
+
+#define ALLOW(x)    Get_Token(); \
+                    if (CurrentTokenId() != x) \
+                        Unget_Token();
+
+#define UNGET       Unget_Token();
+
+#define EXPECT      { \
+                        int Exit_Flag; \
+                        Exit_Flag = false; \
+                        while (!Exit_Flag) \
+                        { \
+                            Get_Token(); \
+                            switch (CurrentTokenId()) \
+                            {
+
+#define EXPECT_ONE  { \
+                        int Exit_Flag; \
+                        Exit_Flag = false; \
+                        { \
+                            Get_Token(); \
+                            switch (CurrentTokenId()) \
+                            {
+
+#define CASE(x)                 case x:
+#define CASE2(x, y)             case x: case y:
+#define CASE3(x, y, z)          case x: case y: case z:
+#define CASE4(w, x, y, z)       case w: case x: case y: case z:
+#define CASE5(v, w, x, y, z)    case v: case w: case x: case y: case z:
 #define CASE6(u, v, w, x, y, z) case u: case v: case w: case x: case y: case z:
-#define END_CASE break;
-#define EXIT Exit_Flag = true;
-#define OTHERWISE default:
-#define END_EXPECT } } }
-#define GET(x) Get_Token(); if (mToken.Token_Id != x) Parse_Error (x);
-#define ALLOW(x) Get_Token(); if (mToken.Token_Id != x) Unget_Token();
-#define UNGET Unget_Token();
+#define OTHERWISE               default:
 
-#define CASE_FLOAT CASE2 (LEFT_PAREN_TOKEN,FLOAT_FUNCT_TOKEN)\
-    CASE4 (PLUS_TOKEN,DASH_TOKEN,FUNCT_ID_TOKEN,EXCLAMATION_TOKEN) \
-    UNGET
+#define CASE_FLOAT_RAW          CASE2 (LEFT_PAREN_TOKEN,FLOAT_FUNCT_TOKEN) \
+                                CASE4 (PLUS_TOKEN,DASH_TOKEN,FUNCT_ID_TOKEN,EXCLAMATION_TOKEN)
 
-#define CASE_VECTOR CASE3 (VECTFUNCT_ID_TOKEN,VECTOR_FUNCT_TOKEN,LEFT_ANGLE_TOKEN) \
-    CASE5 (U_TOKEN,V_TOKEN,UV_ID_TOKEN,VECTOR_4D_ID_TOKEN,SPLINE_ID_TOKEN) \
-    CASE_FLOAT /* NOTE this has an UNGET in it! */
+#define CASE_VECTOR_RAW         CASE3 (VECTFUNCT_ID_TOKEN,VECTOR_FUNCT_TOKEN,LEFT_ANGLE_TOKEN) \
+                                CASE5 (U_TOKEN,V_TOKEN,UV_ID_TOKEN,VECTOR_4D_ID_TOKEN,SPLINE_ID_TOKEN) \
+                                CASE_FLOAT_RAW
 
-#define CASE_COLOUR CASE3 (COLOUR_TOKEN,COLOUR_KEY_TOKEN,COLOUR_ID_TOKEN) \
-    UNGET
+#define CASE_COLOUR_RAW         CASE3 (COLOUR_TOKEN,COLOUR_KEY_TOKEN,COLOUR_ID_TOKEN)
 
-/*
-CASE_EXPRESS is a CASE_COLOUR w/o an UNGET and a CASE_VECTOR (w/unget)
+#define CASE_EXPRESS_RAW        CASE_VECTOR_RAW CASE_COLOUR_RAW
 
-   NOTE: you cannot use CASE_VECTOR followed by CASE_COLOUR or vice-versa, because
-         they both contain an UNGET which will cause problems!
-*/
-#define CASE_EXPRESS CASE3 (COLOUR_TOKEN,COLOUR_KEY_TOKEN,COLOUR_ID_TOKEN) \
-    CASE_VECTOR /* NOTE this has an UNGET in it! */
+#define CASE_FLOAT_UNGET        CASE_FLOAT_RAW      UNGET
+#define CASE_VECTOR_UNGET       CASE_VECTOR_RAW     UNGET
+#define CASE_COLOUR_UNGET       CASE_COLOUR_RAW     UNGET
+#define CASE_EXPRESS_UNGET      CASE_EXPRESS_RAW    UNGET
+
+#define END_CASE                    break;
+#define FALLTHROUGH_CASE            // FALLTHROUGH
+#define EXIT                        Exit_Flag = true;
+
+#define END_EXPECT          } \
+                        } \
+                    }
 
 
 struct ExperimentalFlags
@@ -425,6 +446,27 @@ class Parser : public SceneTask
         // tokenize.h/tokenize.cpp
         void Get_Token (void);
         void Unget_Token (void);
+
+        TokenId CurrentTokenId() const;
+        TokenId CurrentTokenFunctionId() const;
+        const UTF8String& CurrentTokenText() const;
+        const MessageContext& CurrentTokenMessageContext() const;
+        bool CurrentTokenIsArrayElement() const;
+        bool CurrentTokenIsHomogenousArrayElement() const;
+        bool CurrentTokenIsDictionaryElement() const;
+        bool CurrentTokenIsContainerElement() const;
+        void SetOkToDeclare(bool ok);
+        bool IsOkToDeclare() const;
+
+        bool HaveCurrentTokenData() const;
+        template<typename T> const T& CurrentTokenData() const { return *reinterpret_cast<T*>(mToken.Data); }
+        template<typename PTR_T> const PTR_T CurrentTokenDataPtr() const { return reinterpret_cast<PTR_T>(mToken.Data); }
+
+        bool HaveCurrentFile() const;
+        const UCS2* CurrentFileName() const;
+        const LexemePosition& CurrentFilePosition() const;
+        bool HaveCurrentMessageContext() const;
+        const MessageContext& CurrentMessageContext() const;
         void Parse_Directive (int After_Hash);
 #if POV_DEBUG
         void Parse_Breakpoint();
