@@ -106,10 +106,27 @@
 ///
 /// @{
 
+/// @def POV_PARSER_ASSERT
+/// Assert a condition that should hold true by design.
+/// In debug builds, this macro evaluates the specified expression, and halts execution if the
+/// expression does not hold true.
+/// In release builds, this macro evaluates to an empty statement.
 #if POV_PARSER_DEBUG
     #define POV_PARSER_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_PARSER_ASSERT(expr) POV_ASSERT_DISABLE(expr)
+    #define POV_PARSER_ASSERT(expr) POV_ASSERT_SOFT(expr) // POV_ASSERT_DISABLE(expr)
+#endif
+
+/// @def POV_PARSER_PANIC
+/// Indicates code paths that should never be reached.
+/// In debug builds, this macro halts execution.
+/// In release builds, this macro throws an exception to allow the application to fail gracefully.
+/// In static code analysis, this macro may be used to inform the analysis tool that the code branch
+/// is expected to be dead.
+#if POV_PARSER_DEBUG
+    #define POV_PARSER_PANIC()      POV_ASSERT_HARD(false)
+#else
+    #define POV_PARSER_PANIC()      POV_ASSERT_SOFT(false)
 #endif
 
 /// @}

@@ -9151,9 +9151,10 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
             }
         END_CASE
 
-        CASE_COLOUR_UNGET
+        CASE_COLOUR_RAW // no UNGET here
             if((CurrentTokenId() != COLOUR_ID_TOKEN) || (sceneData->EffectiveLanguageVersion() < 350))
             {
+                UNGET
                 Local_Colour  = Create_Colour();
                 SetOkToDeclare(false);
                 Parse_Colour (*Local_Colour);
@@ -9168,6 +9169,7 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
             }
             // intentional to allow color dot expressions as macro parameters if #version is 3.5 or higher [trf]
             // FALLTHROUGH
+        FALLTHROUGH_CASE
 
         CASE_VECTOR_UNGET
             // It seems very few people understand what is going on here, so let me try to

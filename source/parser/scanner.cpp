@@ -382,10 +382,10 @@ void pov_parser::Scanner::SetStringEncoding(StringEncoding encoding)
     mStringEncoding = encoding;
     switch (mStringEncoding)
     {
-        case kStringEncoding_ASCII:         mpStringEncodingImpl = ASCIISourceEncoding::Instance(); break;
-        case kStringEncoding_UTF8:          mpStringEncodingImpl = nullptr;                         break;
-        case kStringEncoding_System:        mpStringEncodingImpl = Windows1252Encoding::Instance(); break; /// @todo Fix system-specific encoding.
-        default: POV_PARSER_ASSERT(false);  mpStringEncodingImpl = ASCIISourceEncoding::Instance(); break;
+        case kStringEncoding_ASCII:     mpStringEncodingImpl = ASCIISourceEncoding::Instance(); break;
+        case kStringEncoding_UTF8:      mpStringEncodingImpl = nullptr;                         break;
+        case kStringEncoding_System:    mpStringEncodingImpl = Windows1252Encoding::Instance(); break; /// @todo Fix system-specific encoding.
+        default:                        POV_PARSER_PANIC();                                     break;
     }
 }
 
@@ -562,7 +562,7 @@ bool Scanner::GetNextFloatLiteralLexeme(Lexeme& lexeme)
     lexeme.category = Lexeme::kFloatLiteral;
 
     if (!GetNextFloatLiteralDigits(lexeme))
-        POV_PARSER_ASSERT(false);
+        POV_PARSER_PANIC();
     if (mEndOfStream)
         return true;
 
@@ -596,7 +596,7 @@ bool Scanner::GetNextFloatLiteralOrDotLexeme(Lexeme& lexeme)
 
         // Read fractional part.
         if (!GetNextFloatLiteralDigits(lexeme))
-            POV_PARSER_ASSERT(false);
+            POV_PARSER_PANIC();
         if (mEndOfStream)
             return true;
 

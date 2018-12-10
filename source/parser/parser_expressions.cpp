@@ -291,7 +291,7 @@ void Parser::Parse_Trace(Vector3d& Res)
             /* All of these functions return a VECTOR result */
             if(mToken.Function_Id == VECTOR_ID_TOKEN)
             {
-                (*reinterpret_cast<Vector3d *>(mToken.Data)) = Local_Normal;
+                SetCurrentTokenData(Local_Normal);
             }
             else
             {
@@ -2666,7 +2666,6 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
         END_CASE
 
         CASE_VECTOR_UNGET
-            UNGET
             if (startedParsing)
             {
                 EXIT
@@ -2790,7 +2789,7 @@ void Parser::Parse_BlendMapData<PigmentBlendMapData> (BlendMapTypeId Blend_Type,
             break;
 
         default:
-            POV_PARSER_ASSERT(false);
+            POV_PARSER_PANIC();
             break;
     }
 }

@@ -261,11 +261,12 @@ class Parser : public SceneTask
             TokenId Function_Id;                            ///< token type ID, in case Token_Id is an identifier ID
             int context;                                    ///< context the token is local to (i.e., table index)
             DBL Token_Float;                                ///< token value (if it is a float literal)
-            bool Unget_Token, End_Of_File;
             void *Data;                                     ///< reference to token value (if it is a non-float identifier)
             TokenId *NumberPtr;
             void **DataPtr;
             SYM_TABLE *table;                               ///< table or dictionary the token references an element of
+            bool Unget_Token            : 1;                ///< `true` if @ref Get_Token() must re-issue this token.
+            bool End_Of_File            : 1;
             bool is_array_elem          : 1;                ///< true if token is actually an array element reference
             bool is_mixed_array_elem    : 1;                ///< true if token is actually a mixed-type array element reference
             bool is_dictionary_elem     : 1;                ///< true if token is actually a dictionary element reference
@@ -451,6 +452,10 @@ class Parser : public SceneTask
         TokenId CurrentTokenFunctionId() const;
         const UTF8String& CurrentTokenText() const;
         const MessageContext& CurrentTokenMessageContext() const;
+        void InitCurrentToken();
+        void InvalidateCurrentToken();
+        void StopSkipping();
+        bool IsEndOfSkip() const;
         bool CurrentTokenIsArrayElement() const;
         bool CurrentTokenIsHomogenousArrayElement() const;
         bool CurrentTokenIsDictionaryElement() const;
@@ -461,12 +466,18 @@ class Parser : public SceneTask
         bool HaveCurrentTokenData() const;
         template<typename T> const T& CurrentTokenData() const { return *reinterpret_cast<T*>(mToken.Data); }
         template<typename PTR_T> const PTR_T CurrentTokenDataPtr() const { return reinterpret_cast<PTR_T>(mToken.Data); }
+        template<typename T> void SetCurrentTokenData(const T& val) { *reinterpret_cast<T*>(mToken.Data) = val; }
 
         bool HaveCurrentFile() const;
         const UCS2* CurrentFileName() const;
         const LexemePosition& CurrentFilePosition() const;
         bool HaveCurrentMessageContext() const;
         const MessageContext& CurrentMessageContext() const;
+        void SetInputStream(const shared_ptr<IStream>& stream);
+        RawTokenizer::HotBookmark GetHotBookmark() const;
+        bool GoToBookmark(const RawTokenizer::HotBookmark& bookmark);
+
+        bool IsEndOfInvokedMacro() const;
         void Parse_Directive (int After_Hash);
 #if POV_DEBUG
         void Parse_Breakpoint();
@@ -630,19 +641,19 @@ class Parser : public SceneTask
         // tokenize.h/tokenize.cpp
         typedef enum cond_type
         {
-            ROOT_COND=0,            ///< no conditionals, loops or macros pending
-            BUSY_COND,              ///< busy parsing the actual conditional or loop statement
-            WHILE_COND,             ///< executing a `#while` loop body
-            FOR_COND,               ///< executing a `#for` loop body
-            IF_TRUE_COND,           ///< executing an `#if` body
-            IF_FALSE_COND,          ///< skipping an `#if` body to execute any `#else` or `#elseif` body
-            ELSE_COND,              ///< executing an '#else` body
-            SWITCH_COND,            ///< executing a `#switch` body
-            CASE_TRUE_COND,         ///< executing a `#case` or `#range` body
-            CASE_FALSE_COND,        ///< skipping a `#case` or `#range` body to execute a later one
-            SKIP_TIL_END_COND,      ///< skipping a conditional or loop body until a matching `#end`
-            INVOKING_MACRO_COND,    ///< executing a `#macro` body
-            DECLARING_MACRO_COND    ///< skipping a `#macro` body during its declaration
+            ROOT_COND=0,            ///< No conditionals, loops or macros pending.
+            BUSY_COND,              ///< Incomplete conditional, busy parsing the actual conditional or loop statement.
+            WHILE_COND,             ///< Executing a `#while` loop body.
+            FOR_COND,               ///< Executing a `#for` loop body.
+            IF_TRUE_COND,           ///< Executing an `#if` (or `#elseif`) body.
+            IF_FALSE_COND,          ///< Skipping an `#if` (or `#elseif`) body to execute an `#else` (or `#elseif`) body (if present).
+            ELSE_COND,              ///< Executing an '#else` body.
+            SWITCH_COND,            ///< Executing a `#switch` body, expecting a `#case` (or `#range`).
+            CASE_TRUE_COND,         ///< executing a `#case` (or `#range`) body.
+            CASE_FALSE_COND,        ///< Skipping a `#case` (or `#range`) body to execute a later one (if present).
+            SKIP_TIL_END_COND,      ///< Skipping a conditional or loop body until a matching `#end`.
+            INVOKING_MACRO_COND,    ///< Executing a `#macro` body.
+            DECLARING_MACRO_COND    ///< Skipping a `#macro` body during its declaration.
         } COND_TYPE;
 
         struct SYM_TABLE

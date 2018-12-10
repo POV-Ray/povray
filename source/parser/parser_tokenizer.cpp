@@ -105,8 +105,7 @@ void Parser::Initialize_Tokenizer()
     if (rfile == nullptr)
         Error("Cannot open input file.");
 
-    mTokenizer.SetInputStream(rfile);
-    mToken.sourceFile = mTokenizer.GetSource();
+    SetInputStream(rfile);
 
     mHavePendingRawToken = false;
 
@@ -145,7 +144,7 @@ void Parser::CheckFileSignature()
             switch (signature.id)
             {
                 case UTF8_SIGNATURE_TOKEN:  /* sceneData->stringEncoding = kStringEncoding_UTF8; */ break;
-                default:                    POV_PARSER_ASSERT(false);                               break;
+                default:                    POV_PARSER_PANIC();                                     break;
             }
         }
         else
@@ -176,14 +175,7 @@ void Parser::pre_init_tokenizer ()
 {
     int i;
 
-    /// @todo Shouldn't these be initialized to -1?
-    mToken.raw.lexeme.position.line = 0;
-    mToken.raw.lexeme.position.offset = 0;
-    mToken.raw.lexeme.position.column = 0;
-    mToken.raw.lexeme.text.clear();
-    mToken.Unget_Token   = false;
-    mToken.End_Of_File   = false;
-    mToken.Data = nullptr;
+    InitCurrentToken();
 
     line_count = 10;
     token_count = 0;
@@ -300,10 +292,7 @@ void Parser::Get_Token ()
         return;
     }
 
-    mToken.Token_Id = END_OF_FILE_TOKEN;
-    mToken.is_array_elem = false;
-    mToken.is_mixed_array_elem = false;
-    mToken.is_dictionary_elem = false;
+    InvalidateCurrentToken();
 
     while (CurrentTokenId() == END_OF_FILE_TOKEN)
     {
@@ -316,10 +305,7 @@ void Parser::Get_Token ()
                 if (Cond_Stack.size() != 1)
                     Error("End of file reached but #end expected.");
 
-                mToken.Token_Id = END_OF_FILE_TOKEN;
-                mToken.is_array_elem = false;
-                mToken.is_mixed_array_elem = false;
-                mToken.is_dictionary_elem = false;
+                InvalidateCurrentToken();
                 mToken.End_Of_File = true;
                 return;
             }
@@ -330,9 +316,8 @@ void Parser::Get_Token ()
 
             Destroy_Table(Table_Index--);
 
-            mTokenizer.GoToBookmark(maIncludeStack.back());
+            GoToBookmark(maIncludeStack.back()); // TODO handle errors
             maIncludeStack.pop_back();
-            mToken.sourceFile = mTokenizer.GetSource();
 
             continue;
         }
@@ -353,7 +338,16 @@ void Parser::Get_Token ()
                 break;
 
             case HASH_TOKEN:
-                Parse_Directive(true);
+                if (IsEndOfInvokedMacro())
+                {
+                    // The `#end` (or, more precisely, the `#`) of any macro currently being
+                    // executed gets special treatment.
+                    Return_From_Macro();
+                    InvalidateCurrentToken();
+                }
+                else
+                    // Start of a regular directive.
+                    Parse_Directive(true);
                 break;
 
             default:
@@ -476,7 +470,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
         }
         else
         {
-            POV_PARSER_ASSERT(false);
+            POV_PARSER_PANIC();
         }
     }
 
@@ -789,6 +783,41 @@ const MessageContext& Parser::CurrentTokenMessageContext() const
     return mToken;
 }
 
+void Parser::InitCurrentToken()
+{
+    /// @todo Shouldn't these be initialized to -1?
+    mToken.raw.lexeme.position.line     = 0;
+    mToken.raw.lexeme.position.offset   = 0;
+    mToken.raw.lexeme.position.column   = 0;
+    mToken.raw.lexeme.text.clear();
+
+    mToken.Unget_Token                  = false;
+    mToken.End_Of_File                  = false;
+    mToken.Data                         = nullptr;
+}
+
+void Parser::InvalidateCurrentToken()
+{
+    POV_EXPERIMENTAL_ASSERT(!mToken.Unget_Token);
+    mToken.Token_Id = END_OF_FILE_TOKEN;
+    mToken.is_array_elem        = false;
+    mToken.is_mixed_array_elem  = false;
+    mToken.is_dictionary_elem   = false;
+}
+
+void Parser::StopSkipping()
+{
+    mToken.Token_Id             = HASH_TOKEN; // TODO FIXME
+    mToken.is_array_elem        = false;
+    mToken.is_mixed_array_elem  = false;
+    mToken.is_dictionary_elem   = false;
+}
+
+bool Parser::IsEndOfSkip() const
+{
+    return (mToken.Token_Id == HASH_TOKEN); // TODO FIXME
+}
+
 bool Parser::CurrentTokenIsArrayElement() const
 {
     return mToken.is_array_elem;
@@ -848,6 +877,26 @@ bool Parser::HaveCurrentMessageContext() const
 const MessageContext& Parser::CurrentMessageContext() const
 {
     return mToken;
+}
+
+void Parser::SetInputStream(const shared_ptr<IStream>& stream)
+{
+    mTokenizer.SetInputStream(stream);
+    mToken.sourceFile = mTokenizer.GetSource();
+}
+
+RawTokenizer::HotBookmark Parser::GetHotBookmark() const
+{
+    return mTokenizer.GetHotBookmark();
+}
+
+bool Parser::GoToBookmark(const RawTokenizer::HotBookmark& bookmark)
+{
+    if (!mTokenizer.GoToBookmark(bookmark))
+        // In case of failure, don't update current token information. Required for proper error reporting.
+        return false;
+    mToken.sourceFile = mTokenizer.GetSource();
+    return true;
 }
 
 /*****************************************************************************
@@ -1034,6 +1083,16 @@ void Parser::UngetRawToken(const RawToken& rawToken)
 *
 ******************************************************************************/
 
+bool Parser::IsEndOfInvokedMacro() const
+{
+    if (Cond_Stack.empty() || (Cond_Stack.back().Cond_Type != INVOKING_MACRO_COND))
+        return false;
+
+    POV_PARSER_ASSERT(Cond_Stack.back().PMac != nullptr);
+    return (Cond_Stack.back().PMac->endPosition == CurrentFilePosition()) &&
+           (Cond_Stack.back().PMac->source.sourceName == mTokenizer.GetSourceName());
+}
+
 void Parser::Parse_Directive(int After_Hash)
 {
     DBL Value, Value2;
@@ -1043,30 +1102,15 @@ void Parser::Parse_Directive(int After_Hash)
     COND_TYPE Curr_Type = Cond_Stack.back().Cond_Type;
     LexemePosition hashPosition = CurrentFilePosition();
 
-    if (Curr_Type == INVOKING_MACRO_COND)
-    {
-        POV_PARSER_ASSERT(Cond_Stack.back().PMac != nullptr);
-        if ((Cond_Stack.back().PMac->endPosition == hashPosition) &&
-            (Cond_Stack.back().PMac->source.sourceName == mTokenizer.GetSourceName()))
-        {
-            Return_From_Macro();
-            Cond_Stack.pop_back();
-            if (Cond_Stack.empty())
-                Error("Mis-matched '#end'.");
-            mToken.Token_Id = END_OF_FILE_TOKEN;
-            mToken.is_array_elem = false;
-            mToken.is_mixed_array_elem = false;
-            mToken.is_dictionary_elem = false;
-
-            return;
-        }
-    }
-
     if (!IsOkToDeclare())
     {
+        // Directives aren't allowed here.
+        // Re-issue the current token to trigger an expectation error downstream.
         if (After_Hash)
         {
-            mToken.Token_Id=HASH_TOKEN;
+            // Hash tokens normally never get processed into high-level tokens,
+            // so we need to construct one now.
+            mToken.Token_Id = HASH_TOKEN;
             mToken.is_array_elem = false;
             mToken.is_mixed_array_elem = false;
             mToken.is_dictionary_elem = false;
@@ -1165,7 +1209,7 @@ void Parser::Parse_Directive(int After_Hash)
             }
             else
             {
-                Cond_Stack.back().returnToBookmark = mTokenizer.GetHotBookmark();
+                Cond_Stack.back().returnToBookmark = GetHotBookmark();
 
                 Value=Parse_Cond_Param();
 
@@ -1198,7 +1242,7 @@ void Parser::Parse_Directive(int After_Hash)
                 {
                     // execute loop
                     Cond_Stack.back().Cond_Type = FOR_COND;
-                    Cond_Stack.back().returnToBookmark = mTokenizer.GetHotBookmark();
+                    Cond_Stack.back().returnToBookmark = GetHotBookmark();
                     Cond_Stack.back().For_Loop_End = End;
                     Cond_Stack.back().For_Loop_Step = Step;
                 }
@@ -1224,10 +1268,7 @@ void Parser::Parse_Directive(int After_Hash)
 
                 case IF_FALSE_COND:
                     Cond_Stack.back().Cond_Type = ELSE_COND;
-                    mToken.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
-                    mToken.is_array_elem = false;
-                    mToken.is_mixed_array_elem = false;
-                    mToken.is_dictionary_elem = false;
+                    StopSkipping();
                     UNGET
                     break;
 
@@ -1239,10 +1280,7 @@ void Parser::Parse_Directive(int After_Hash)
                     Cond_Stack.back().Cond_Type = CASE_TRUE_COND;
                     if (Skipping)
                     {
-                        mToken.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
-                        mToken.is_array_elem = false;
-                        mToken.is_mixed_array_elem = false;
-                        mToken.is_dictionary_elem = false;
+                        StopSkipping();
                         UNGET
                     }
                     break;
@@ -1267,10 +1305,7 @@ void Parser::Parse_Directive(int After_Hash)
                     if (fabs(Value)>EPSILON)
                     {
                         Cond_Stack.back().Cond_Type=IF_TRUE_COND;
-                        mToken.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
-                        mToken.is_array_elem = false;
-                        mToken.is_mixed_array_elem = false;
-                        mToken.is_dictionary_elem = false;
+                        StopSkipping();
                         UNGET
                     }
                     else
@@ -1372,10 +1407,7 @@ void Parser::Parse_Directive(int After_Hash)
                         Cond_Stack.back().Cond_Type=CASE_TRUE_COND;
                         if (Skipping)
                         {
-                            mToken.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
-                            mToken.is_array_elem = false;
-                            mToken.is_mixed_array_elem = false;
-                            mToken.is_dictionary_elem = false;
+                            StopSkipping();
                             UNGET
                         }
                     }
@@ -1400,19 +1432,12 @@ void Parser::Parse_Directive(int After_Hash)
             switch (Curr_Type)
             {
                 case INVOKING_MACRO_COND:
-                    POV_PARSER_ASSERT(false); // We should have identified the macro's proper `#end` at the beginning of this function.
-                    Return_From_Macro();
-                    Cond_Stack.pop_back();
-                    if (Cond_Stack.empty())
-                        Error("Mis-matched '#end'.");
+                    POV_PARSER_PANIC(); // The macro's proper `#end` should have been handled separately by the caller.
                     break;
 
                 case IF_FALSE_COND:
-                    mToken.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
-                    mToken.is_array_elem = false;
-                    mToken.is_mixed_array_elem = false;
-                    mToken.is_dictionary_elem = false;
-                    UNGET
+                    StopSkipping();
+                    UNGET // TODO FIXME
                     // FALLTHROUGH
                 case IF_TRUE_COND:
                 case ELSE_COND:
@@ -1434,14 +1459,14 @@ void Parser::Parse_Directive(int After_Hash)
                             {
                                 PMac->CacheSize = macroLength;
                                 PMac->Cache = new unsigned char[PMac->CacheSize];
-                                RawTokenizer::HotBookmark pos = mTokenizer.GetHotBookmark();
+                                RawTokenizer::HotBookmark pos = GetHotBookmark();
                                 mTokenizer.GoToBookmark(PMac->source);
                                 if (!mTokenizer.GetRaw(PMac->Cache, PMac->CacheSize))
                                 {
                                     delete[] PMac->Cache;
                                     PMac->Cache = nullptr;
                                 }
-                                mTokenizer.GoToBookmark(pos);
+                                GoToBookmark(pos); // TODO handle errors
                             }
                         }
                     }
@@ -1450,10 +1475,7 @@ void Parser::Parse_Directive(int After_Hash)
                         Error("Mis-matched '#end'.");
                     if (Skipping)
                     {
-                        mToken.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
-                        mToken.is_array_elem = false;
-                        mToken.is_mixed_array_elem = false;
-                        mToken.is_dictionary_elem = false;
+                        StopSkipping();
                         UNGET
                     }
                     break;
@@ -1465,7 +1487,7 @@ void Parser::Parse_Directive(int After_Hash)
                     }
 
                     Got_EOF=false;
-                    if (!mTokenizer.GoToBookmark(Cond_Stack.back().returnToBookmark))
+                    if (!GoToBookmark(Cond_Stack.back().returnToBookmark))
                     {
                         Error("Unable to seek in input file for #while directive.");
                     }
@@ -1486,7 +1508,7 @@ void Parser::Parse_Directive(int After_Hash)
                     }
 
                     Got_EOF=false;
-                    if (!mTokenizer.GoToBookmark(Cond_Stack.back().returnToBookmark))
+                    if (!GoToBookmark(Cond_Stack.back().returnToBookmark))
                     {
                         Error("Unable to seek in input file for #for directive.");
                     }
@@ -1627,7 +1649,7 @@ void Parser::Parse_Directive(int After_Hash)
                                 // As of POV-Ray v3.8, we no longer tolerate violation of that rule if the main scene
                                 // file claims to be compatible with POV-Ray v3.8 anywhere further down the road.
                                 // (We need to be more lax with include files though, as they may just as well be
-                                // standard include files that happens to have been updated since the scene was
+                                // standard include files that happen to have been updated since the scene was
                                 // originally designed.)
 
                                 if (maIncludeStack.empty())
@@ -1941,10 +1963,7 @@ void Parser::Parse_Directive(int After_Hash)
     }
     else
     {
-        mToken.Token_Id = END_OF_FILE_TOKEN;
-        mToken.is_array_elem = false;
-        mToken.is_mixed_array_elem = false;
-        mToken.is_dictionary_elem = false;
+        InvalidateCurrentToken();
     }
 }
 
@@ -2031,13 +2050,10 @@ void Parser::Skip_Tokens(COND_TYPE cond)
 
     Skipping=Prev_Skip;
 
-    if (CurrentTokenId() == HASH_TOKEN)
+    if (IsEndOfSkip())
     {
-        mToken.Token_Id=END_OF_FILE_TOKEN;
-        mToken.is_array_elem = false;
-        mToken.is_mixed_array_elem = false;
-        mToken.is_dictionary_elem = false;
-        mToken.Unget_Token=false;
+        InvalidateCurrentToken();
+        mToken.Unget_Token = false;
     }
     else
     {
@@ -2070,6 +2086,7 @@ void Parser::Break()
 
     Skipping=true;
 
+    // Skip to the end of any non-break-able blocks, e.g. `#if` blocks.
     while ( (Cond_Stack.size() > 1) &&
             (Cond_Stack.back().Cond_Type != WHILE_COND) &&
             (Cond_Stack.back().Cond_Type != FOR_COND) &&
@@ -2079,6 +2096,7 @@ void Parser::Break()
         Get_Token();
     }
 
+    // We should now be immediately in a break-able block.
     if (Cond_Stack.size() == 1)
         Error ("Invalid context for #break");
 
@@ -2086,7 +2104,6 @@ void Parser::Break()
     {
         Skipping=Prev_Skip;
         Return_From_Macro();
-        Cond_Stack.pop_back();
         return;
     }
 
@@ -2095,18 +2112,7 @@ void Parser::Break()
 
     Skipping=Prev_Skip;
 
-    if (CurrentTokenId() == HASH_TOKEN)
-    {
-        mToken.Token_Id=END_OF_FILE_TOKEN;
-        mToken.is_array_elem = false;
-        mToken.is_mixed_array_elem = false;
-        mToken.is_dictionary_elem = false;
-        mToken.Unget_Token=false;
-    }
-    else
-    {
-        UNGET
-    }
+    POV_EXPERIMENTAL_ASSERT(!IsEndOfSkip());
 }
 
 
@@ -2677,7 +2683,7 @@ void Parser::Invoke_Macro()
 
     Cond_Stack.back().Cond_Type = INVOKING_MACRO_COND;
 
-    Cond_Stack.back().returnToBookmark   = mTokenizer.GetHotBookmark();
+    Cond_Stack.back().returnToBookmark   = GetHotBookmark();
     Cond_Stack.back().PMac               = PMac;
 
     /* Gotta have new symbol table in case #local is used */
@@ -2726,10 +2732,8 @@ void Parser::Invoke_Macro()
     }
 
     mToken.sourceFile = mTokenizer.GetSource();
-    mToken.Token_Id = END_OF_FILE_TOKEN;
-    mToken.is_array_elem = false;
-    mToken.is_mixed_array_elem = false;
-    mToken.is_dictionary_elem = false;
+
+    InvalidateCurrentToken();
 
     Check_Macro_Vers();
 
@@ -2741,15 +2745,18 @@ void Parser::Return_From_Macro()
 
     Got_EOF=false;
 
-    if (!mTokenizer.GoToBookmark(Cond_Stack.back().returnToBookmark))
+    if (!GoToBookmark(Cond_Stack.back().returnToBookmark))
     {
         ErrorInfo(mToken, "Returning from macro.");
         Error(Cond_Stack.back().returnToBookmark, "Unable to file seek in return from macro.");
     }
-    mToken.sourceFile = mTokenizer.GetSource();
 
     // Always destroy macro locals
     Destroy_Table(Table_Index--);
+
+    Cond_Stack.pop_back();
+    if (Cond_Stack.empty())
+        Error("Mis-matched '#end'.");
 }
 
 Parser::Macro::Macro(const char *s) :
@@ -3203,7 +3210,7 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File, TokenId Previous, TokenId *Nu
             case FLOAT_TOKEN:
                 User_File->UnReadToken();
                 if (!Parse_Read_Float_Value(val, User_File))
-                    POV_PARSER_ASSERT(false);
+                    POV_PARSER_PANIC();
                 *NumberPtr = FLOAT_ID_TOKEN;
                 Test_Redefine(Previous,NumberPtr,*DataPtr);
                 *DataPtr   = reinterpret_cast<void *>(Create_Float());
@@ -3256,7 +3263,7 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File, TokenId Previous, TokenId *Nu
                         break;
 
                     default:
-                        POV_PARSER_ASSERT(false);
+                        POV_PARSER_PANIC();
                         break;
                 }
                 break;
@@ -3658,15 +3665,11 @@ void Parser::IncludeHeader(const UCS2String& formalFileName)
     if (is == nullptr)
         Error ("Cannot open include file %s.", UCS2toASCIIString(formalFileName).c_str());
 
-    mTokenizer.SetInputStream(is);
+    SetInputStream(is);
 
     Add_Sym_Table();
 
-    mToken.sourceFile = mTokenizer.GetSource();
-    mToken.Token_Id = END_OF_FILE_TOKEN;
-    mToken.is_array_elem = false;
-    mToken.is_mixed_array_elem = false;
-    mToken.is_dictionary_elem = false;
+    InvalidateCurrentToken();
 
     CheckFileSignature();
 }
