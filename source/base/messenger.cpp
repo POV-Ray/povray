@@ -102,7 +102,7 @@ void GenericMessenger::InfoAt(const MessageContext& context, const char *format,
     SendMessage(kMessageClass_Info, level, localvsbuffer, context);
 }
 
-void GenericMessenger::InfoAt(const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...)
+void GenericMessenger::InfoAt(const UCS2String& filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...)
 {
     WarningLevel level = kWarningGeneral;
     if(warningLevel < level)
@@ -160,7 +160,7 @@ void GenericMessenger::WarningAt(WarningLevel level, const MessageContext& conte
     SendMessage(kMessageClass_Warning, level, localvsbuffer, context);
 }
 
-void GenericMessenger::WarningAt(WarningLevel level, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...)
+void GenericMessenger::WarningAt(WarningLevel level, const UCS2String& filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...)
 {
     if(warningLevel < level)
         return;
@@ -217,7 +217,7 @@ void GenericMessenger::PossibleErrorAt(const MessageContext& context, const char
     SendMessage(kMessageClass_PossibleError, kWarningNone, localvsbuffer, context);
 }
 
-void GenericMessenger::PossibleErrorAt(const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...)
+void GenericMessenger::PossibleErrorAt(const UCS2String& filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...)
 {
     if(warningLevel == 0)
         return;
@@ -238,7 +238,7 @@ void GenericMessenger::PossibleErrorAt(const UCS2 *filename, POV_LONG line, POV_
 
 void GenericMessenger::SendMessage(MessageClass mc, WarningLevel level, const char *text, const MessageContext& context)
 {
-    SendMessage(mc, level, text, context.GetFileName().c_str(), context.GetLine(), context.GetColumn(), context.GetOffset());
+    SendMessage(mc, level, text, context.GetFileName(), context.GetLine(), context.GetColumn(), context.GetOffset());
 }
 
 std::string GenericMessenger::SendError(const char *format, va_list arglist, const MessageContext& context)
@@ -255,7 +255,7 @@ std::string GenericMessenger::SendError(const char *format, va_list arglist, con
 }
 
 // filename defaults to `nullptr`, and line, column, and offset default to -1
-std::string GenericMessenger::SendError(const char *format, va_list arglist, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset)
+std::string GenericMessenger::SendError(const char *format, va_list arglist, const UCS2String& filename, POV_LONG line, POV_LONG column, POV_OFF_T offset)
 {
     char localvsbuffer[1024];
 
@@ -365,7 +365,7 @@ void GenericMessenger::ErrorAt(Exception& ex, const MessageContext& context, con
     throw ex;
 }
 
-void GenericMessenger::ErrorAt(const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...)
+void GenericMessenger::ErrorAt(const UCS2String& filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...)
 {
     va_list marker;
 
@@ -380,7 +380,7 @@ void GenericMessenger::ErrorAt(const UCS2 *filename, POV_LONG line, POV_LONG col
     throw ex;
 }
 
-void GenericMessenger::ErrorAt(const Exception& ex, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...)
+void GenericMessenger::ErrorAt(const Exception& ex, const UCS2String& filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...)
 {
     va_list marker;
 
@@ -396,7 +396,7 @@ void GenericMessenger::ErrorAt(const Exception& ex, const UCS2 *filename, POV_LO
     throw local_ex;
 }
 
-void GenericMessenger::ErrorAt(Exception& ex, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...)
+void GenericMessenger::ErrorAt(Exception& ex, const UCS2String& filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...)
 {
     va_list marker;
 

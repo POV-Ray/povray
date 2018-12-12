@@ -308,7 +308,7 @@ void Parser::Run()
             Destroy_Random_Generators();
 
             if (error_line != -1)
-                messageFactory.ErrorAt(POV_EXCEPTION_CODE(kOutOfMemoryErr), error_filename.c_str(), error_line, error_col, error_pos, "Out of memory.");
+                messageFactory.ErrorAt(POV_EXCEPTION_CODE(kOutOfMemoryErr), error_filename, error_line, error_col, error_pos, "Out of memory.");
             else
                 Error("Out of memory.");
         }
