@@ -111,7 +111,7 @@ enum {
 struct Sym_Table_Entry
 {
     SYM_ENTRY *next;            ///< Reference to next symbol with same hash
-    char *Token_Name;           ///< Symbol name
+    UTF8String name;            ///< Symbol name
     char *Deprecation_Message;  ///< Warning to print if the symbol is deprecated
     void *Data;                 ///< Reference to the symbol value
     TokenId Token_Number;       ///< Unique ID of this symbol
@@ -488,15 +488,15 @@ class Parser : public SceneTask
         void Initialize_Tokenizer (void);
         void Terminate_Tokenizer (void);
         void CheckFileSignature();
-        SYM_ENTRY *Add_Symbol (SYM_TABLE *table, const char *Name,TokenId Number);
-        SYM_ENTRY *Add_Symbol (int Index,const char *Name,TokenId Number);
+        SYM_ENTRY *Add_Symbol (SYM_TABLE *table, const UTF8String& Name, TokenId Number);
+        SYM_ENTRY *Add_Symbol (int Index, const UTF8String& Name, TokenId Number);
         POV_ARRAY *Parse_Array_Declare (void);
         SYM_TABLE *Parse_Dictionary_Declare();
-        SYM_ENTRY *Create_Entry (const char *Name, TokenId Number, bool copyName);
+        SYM_ENTRY *Create_Entry (const UTF8String& Name, TokenId Number);
         SYM_ENTRY *Copy_Entry (const SYM_ENTRY *);
         void Acquire_Entry_Reference (SYM_ENTRY *Entry);
         void Release_Entry_Reference (SYM_TABLE *table, SYM_ENTRY *Entry);
-        SYM_ENTRY *Destroy_Entry (SYM_ENTRY *Entry, bool destroyName);
+        SYM_ENTRY *Destroy_Entry (SYM_ENTRY *Entry);
         bool Parse_Ifdef_Param ();
         int Parse_For_Param (UTF8String&, DBL*, DBL*);
 
@@ -571,11 +571,11 @@ class Parser : public SceneTask
 
         // parsestr.h/parsestr.cpp
         char *Parse_C_String(bool pathname = false);
+        void ParseString(UTF8String& s, bool pathname = false);
         UCS2 *Parse_String(bool pathname = false, bool require = true);
         std::string Parse_ASCIIString(bool pathname = false, bool require = true);
-        UCS2String Parse_UCS2String(bool pathname = false, bool require = true);
 
-        UCS2 *String_Literal_To_UCS2(const char *str);
+        UCS2 *String_Literal_To_UCS2(const std::string& str);
         UCS2 *String_To_UCS2(const char *str);
         char *UCS2_To_String(const UCS2 *str);
 
@@ -659,7 +659,6 @@ class Parser : public SceneTask
         struct SYM_TABLE
         {
             SYM_ENTRY *Table[SYM_TABLE_SIZE];
-            bool namesAreCopies;
         };
 
         SYM_TABLE *Tables[MAX_NUMBER_OF_TABLES];
@@ -815,7 +814,7 @@ class Parser : public SceneTask
         void Destroy_Table (int index);
         void init_sym_tables (void);
         void Add_Sym_Table ();
-        SYM_TABLE *Create_Sym_Table (bool copyNames);
+        SYM_TABLE *Create_Sym_Table();
         void Destroy_Sym_Table (SYM_TABLE *);
         SYM_TABLE *Copy_Sym_Table (const SYM_TABLE *);
         void Remove_Symbol (SYM_TABLE *table, const char *Name, bool is_array_elem, void **DataPtr, int ttype);

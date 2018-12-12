@@ -2183,10 +2183,9 @@ void Parser::init_sym_tables()
     Add_Sym_Table(); // global symbols
 }
 
-Parser::SYM_TABLE *Parser::Create_Sym_Table (bool copyNames)
+Parser::SYM_TABLE *Parser::Create_Sym_Table()
 {
     SYM_TABLE *New = reinterpret_cast<SYM_TABLE *>(POV_MALLOC(sizeof(SYM_TABLE),"symbol table"));
-    New->namesAreCopies = copyNames;
 
     for (int i = 0; i < SYM_TABLE_SIZE; i++)
     {
@@ -2204,7 +2203,7 @@ void Parser::Add_Sym_Table()
         Error("Too many nested symbol tables");
     }
 
-    Tables[Table_Index] = Create_Sym_Table (Table_Index != 0);
+    Tables[Table_Index] = Create_Sym_Table();
 }
 
 void Parser::Destroy_Sym_Table (Parser::SYM_TABLE *Table)
@@ -2217,7 +2216,7 @@ void Parser::Destroy_Sym_Table (Parser::SYM_TABLE *Table)
 
         while(Entry)
         {
-            Entry = Destroy_Entry (Entry, Table->namesAreCopies);
+            Entry = Destroy_Entry (Entry);
         }
 
         Table->Table[i] = nullptr;
@@ -2234,7 +2233,7 @@ void Parser::Destroy_Table(int index)
 
 Parser::SYM_TABLE *Parser::Copy_Sym_Table (const Parser::SYM_TABLE *table)
 {
-    SYM_TABLE *newTable = Create_Sym_Table (true);
+    SYM_TABLE *newTable = Create_Sym_Table();
     SYM_ENTRY *Entry, *newEntry;
 
     for(int i = SYM_TABLE_SIZE - 1; i >= 0; i--)
@@ -2253,11 +2252,11 @@ Parser::SYM_TABLE *Parser::Copy_Sym_Table (const Parser::SYM_TABLE *table)
     return newTable;
 }
 
-SYM_ENTRY *Parser::Create_Entry (const char *Name, TokenId Number, bool copyName)
+SYM_ENTRY *Parser::Create_Entry (const UTF8String& Name, TokenId Number)
 {
     SYM_ENTRY *New;
 
-    New = reinterpret_cast<SYM_ENTRY *>(POV_MALLOC(sizeof(SYM_ENTRY), "symbol table entry"));
+    New = new SYM_ENTRY();
 
     New->Token_Number        = Number;
     New->Data                = nullptr;
@@ -2266,10 +2265,7 @@ SYM_ENTRY *Parser::Create_Entry (const char *Name, TokenId Number, bool copyName
     New->deprecatedShown     = false;
     New->Deprecation_Message = nullptr;
     New->ref_count           = 1;
-    if (copyName)
-        New->Token_Name = POV_STRDUP(Name);
-    else
-        New->Token_Name = const_cast<char*>(Name);
+    New->name                = Name;
 
     return(New);
 }
@@ -2278,7 +2274,7 @@ SYM_ENTRY *Parser::Copy_Entry (const SYM_ENTRY *oldEntry)
 {
     SYM_ENTRY *newEntry;
 
-    newEntry = reinterpret_cast<SYM_ENTRY *>(POV_MALLOC(sizeof(SYM_ENTRY), "symbol table entry"));
+    newEntry = new SYM_ENTRY();
 
     newEntry->Token_Number        = oldEntry->Token_Number;
     newEntry->Data                = Copy_Identifier (oldEntry->Data, oldEntry->Token_Number);
@@ -2287,7 +2283,7 @@ SYM_ENTRY *Parser::Copy_Entry (const SYM_ENTRY *oldEntry)
     newEntry->deprecatedShown     = false;
     newEntry->Deprecation_Message = nullptr;
     newEntry->ref_count           = 1;
-    newEntry->Token_Name          = POV_STRDUP (oldEntry->Token_Name);
+    newEntry->name                = oldEntry->name;
 
     return newEntry;
 }
@@ -2311,19 +2307,15 @@ void Parser::Release_Entry_Reference (SYM_TABLE *table, SYM_ENTRY *Entry)
 
     if (Entry->ref_count == 0)
     {
-        if (table->namesAreCopies) // NB reserved words reference hard-coded token names in code segment, rather than allocated on heap
-        {
-            POV_FREE(Entry->Token_Name);
-            Destroy_Ident_Data (Entry->Data, Entry->Token_Number); // TODO - shouldn't this be outside the if() block?
-        }
+        Destroy_Ident_Data (Entry->Data, Entry->Token_Number);
         if (Entry->Deprecation_Message != nullptr)
             POV_FREE(Entry->Deprecation_Message);
 
-        POV_FREE(Entry);
+        delete Entry;
     }
 }
 
-SYM_ENTRY *Parser::Destroy_Entry (SYM_ENTRY *Entry, bool destroyName)
+SYM_ENTRY *Parser::Destroy_Entry (SYM_ENTRY *Entry)
 {
     SYM_ENTRY *Next;
 
@@ -2340,15 +2332,11 @@ SYM_ENTRY *Parser::Destroy_Entry (SYM_ENTRY *Entry, bool destroyName)
 
     if (Entry->ref_count == 0)
     {
-        if (destroyName) // NB reserved words reference hard-coded token names in code segment, rather than allocated on heap
-        {
-            POV_FREE(Entry->Token_Name);
-            Destroy_Ident_Data (Entry->Data, Entry->Token_Number); // TODO - shouldn't this be outside the if() block?
-        }
+        Destroy_Ident_Data (Entry->Data, Entry->Token_Number);
         if (Entry->Deprecation_Message != nullptr)
             POV_FREE(Entry->Deprecation_Message);
 
-        POV_FREE(Entry);
+        delete Entry;
     }
 
     return Next;
@@ -2357,7 +2345,7 @@ SYM_ENTRY *Parser::Destroy_Entry (SYM_ENTRY *Entry, bool destroyName)
 
 void Parser::Add_Entry (SYM_TABLE *table, SYM_ENTRY *Table_Entry)
 {
-    int i = get_hash_value(Table_Entry->Token_Name);
+    int i = get_hash_value(Table_Entry->name.c_str());
 
     Table_Entry->next       = table->Table[i];
     table->Table[i] = Table_Entry;
@@ -2369,21 +2357,21 @@ void Parser::Add_Entry (int Index,SYM_ENTRY *Table_Entry)
 }
 
 
-SYM_ENTRY *Parser::Add_Symbol (SYM_TABLE *table, const char *Name, TokenId Number)
+SYM_ENTRY *Parser::Add_Symbol (SYM_TABLE *table, const UTF8String& Name, TokenId Number)
 {
     SYM_ENTRY *New;
 
-    New = Create_Entry (Name, Number, table->namesAreCopies);
+    New = Create_Entry (Name, Number);
     Add_Entry (table, New);
 
     return(New);
 }
 
-SYM_ENTRY *Parser::Add_Symbol (int Index,const char *Name,TokenId Number)
+SYM_ENTRY *Parser::Add_Symbol (int Index, const UTF8String& Name, TokenId Number)
 {
     SYM_ENTRY *New;
 
-    New = Create_Entry(Name, Number, true);
+    New = Create_Entry(Name, Number);
     Add_Entry(Index,New);
 
     return(New);
@@ -2398,7 +2386,7 @@ SYM_ENTRY *Parser::Find_Symbol (const SYM_TABLE *table, const char *Name, int ha
 
     while (Entry)
     {
-        if (strcmp(Name, Entry->Token_Name) == 0)
+        if (strcmp(Name, Entry->name.c_str()) == 0)
         {
             return(Entry);
         }
@@ -2462,10 +2450,10 @@ void Parser::Remove_Symbol (SYM_TABLE *table, const char *Name, bool is_array_el
 
         while (Entry)
         {
-            if (strcmp(Name, Entry->Token_Name) == 0)
+            if (strcmp(Name, Entry->name.c_str()) == 0)
             {
                 *EntryPtr = Entry->next;
-                Destroy_Entry (Entry, table->namesAreCopies);
+                Destroy_Entry (Entry);
                 return;
             }
 
@@ -2504,12 +2492,12 @@ Parser::Macro *Parser::Parse_Macro()
 
     EXPECT_ONE
         CASE (IDENTIFIER_TOKEN)
-            Table_Entry = Add_Symbol (SYM_TABLE_GLOBAL, CurrentTokenText().c_str(), TEMPORARY_MACRO_ID_TOKEN);
+            Table_Entry = Add_Symbol (SYM_TABLE_GLOBAL, CurrentTokenText(), TEMPORARY_MACRO_ID_TOKEN);
         END_CASE
 
         CASE (MACRO_ID_TOKEN)
             Remove_Symbol(SYM_TABLE_GLOBAL, CurrentTokenText().c_str(), false, nullptr, 0);
-            Table_Entry = Add_Symbol (SYM_TABLE_GLOBAL, CurrentTokenText().c_str(), TEMPORARY_MACRO_ID_TOKEN);
+            Table_Entry = Add_Symbol (SYM_TABLE_GLOBAL, CurrentTokenText(), TEMPORARY_MACRO_ID_TOKEN);
         END_CASE
 
         OTHERWISE
@@ -2640,7 +2628,7 @@ void Parser::Invoke_Macro()
         for (i=0; i<PMac->parameters.size(); i++)
         {
             bool finalParameter = (i == PMac->parameters.size()-1);
-            Table_Entries[i] = Create_Entry (PMac->parameters[i].name, IDENTIFIER_TOKEN, true);
+            Table_Entries[i] = Create_Entry (PMac->parameters[i].name, IDENTIFIER_TOKEN);
             if (!Parse_RValue(IDENTIFIER_TOKEN, &(Table_Entries[i]->Token_Number), &(Table_Entries[i]->Data), nullptr, true, false, true, true, true, Local_Index))
             {
                 EXPECT_ONE
@@ -2672,7 +2660,7 @@ void Parser::Invoke_Macro()
                     END_CASE
                 END_EXPECT
 
-                Destroy_Entry (Table_Entries[i], true);
+                Destroy_Entry (Table_Entries[i]);
                 Table_Entries[i] = nullptr;
             }
             properlyDelimited = Parse_Comma();
@@ -2863,9 +2851,9 @@ Parser::SYM_TABLE *Parser::Parse_Dictionary_Declare()
     SYM_TABLE *newDictionary;
     SYM_ENTRY *newEntry;
     bool oldParseRawIdentifiers;
-    char *dictIndex;
+    UTF8String dictIndex;
 
-    newDictionary = Create_Sym_Table (true);
+    newDictionary = Create_Sym_Table();
 
     // TODO REVIEW - maybe we need `SetOkToDeclare(false)`?
 
@@ -2880,7 +2868,7 @@ Parser::SYM_TABLE *Parser::Parse_Dictionary_Declare()
             parseRawIdentifiers = oldParseRawIdentifiers;
             if (CurrentTokenId() != IDENTIFIER_TOKEN)
                 Expectation_Error ("dictionary element identifier");
-            newEntry = Add_Symbol (newDictionary, CurrentTokenText().c_str(), IDENTIFIER_TOKEN);
+            newEntry = Add_Symbol (newDictionary, CurrentTokenText(), IDENTIFIER_TOKEN);
 
             GET (COLON_TOKEN);
 
@@ -2893,10 +2881,8 @@ Parser::SYM_TABLE *Parser::Parse_Dictionary_Declare()
         CASE (LEFT_SQUARE_TOKEN)
             UNGET
             Parse_Square_Begin();
-            dictIndex = Parse_C_String();
+            ParseString(dictIndex);
             newEntry = Add_Symbol (newDictionary, dictIndex, IDENTIFIER_TOKEN);
-            POV_PARSER_ASSERT (newDictionary->namesAreCopies);
-            POV_FREE (dictIndex);
             Parse_Square_End();
 
             GET (COLON_TOKEN);
@@ -3018,7 +3004,7 @@ void Parser::Parse_Fopen(void)
     New->busyParsing = true;
 
     GET(IDENTIFIER_TOKEN)
-    Entry = Add_Symbol (SYM_TABLE_GLOBAL, CurrentTokenText().c_str(), FILE_ID_TOKEN);
+    Entry = Add_Symbol (SYM_TABLE_GLOBAL, CurrentTokenText(), FILE_ID_TOKEN);
     Entry->Data=reinterpret_cast<void *>(New);
 
     asciiFileName = Parse_C_String(true);
@@ -3120,7 +3106,7 @@ void Parser::Parse_Read()
         CASE (IDENTIFIER_TOKEN)
             if (!End_File)
             {
-                Temp_Entry = Add_Symbol (SYM_TABLE_GLOBAL, CurrentTokenText().c_str(), IDENTIFIER_TOKEN);
+                Temp_Entry = Add_Symbol (SYM_TABLE_GLOBAL, CurrentTokenText(), IDENTIFIER_TOKEN);
                 End_File = Parse_Read_Value (User_File, CurrentTokenId(), &(Temp_Entry->Token_Number), &(Temp_Entry->Data));
                 mToken.is_array_elem = false;
                 mToken.is_mixed_array_elem = false;
@@ -3528,7 +3514,7 @@ int Parser::Parse_For_Param (UTF8String& identifierName, DBL* EndPtr, DBL* StepP
             POV_PARSER_ASSERT(!mToken.is_array_elem); // Array elements should be tagged as the respective array type
             if (CurrentTokenIsContainerElement())
                 Error("#for loop variable must not be an array or dictionary element");
-            Temp_Entry = Add_Symbol (Table_Index, CurrentTokenText().c_str(), IDENTIFIER_TOKEN);
+            Temp_Entry = Add_Symbol (Table_Index, CurrentTokenText(), IDENTIFIER_TOKEN);
             mToken.NumberPtr = &(Temp_Entry->Token_Number);
             mToken.DataPtr = &(Temp_Entry->Data);
             Previous = CurrentTokenId();
@@ -3559,7 +3545,7 @@ int Parser::Parse_For_Param (UTF8String& identifierName, DBL* EndPtr, DBL* StepP
                 Error("#for loop variable must not be an array or dictionary element");
             if (mToken.context != Table_Index)
             {
-                Temp_Entry = Add_Symbol (Table_Index, CurrentTokenText().c_str(), IDENTIFIER_TOKEN);
+                Temp_Entry = Add_Symbol (Table_Index, CurrentTokenText(), IDENTIFIER_TOKEN);
                 mToken.NumberPtr = &(Temp_Entry->Token_Number);
                 mToken.DataPtr   = &(Temp_Entry->Data);
                 Previous        = IDENTIFIER_TOKEN;
@@ -3585,7 +3571,7 @@ int Parser::Parse_For_Param (UTF8String& identifierName, DBL* EndPtr, DBL* StepP
                 case FLOAT_ID_TOKEN:
                     if (mToken.context != Table_Index)
                     {
-                        Temp_Entry = Add_Symbol (Table_Index, CurrentTokenText().c_str(), IDENTIFIER_TOKEN);
+                        Temp_Entry = Add_Symbol (Table_Index, CurrentTokenText(), IDENTIFIER_TOKEN);
                         mToken.NumberPtr = &(Temp_Entry->Token_Number);
                         mToken.DataPtr   = &(Temp_Entry->Data);
                         Previous        = IDENTIFIER_TOKEN;

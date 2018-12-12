@@ -220,12 +220,12 @@ void Parser::Run()
                     if(i->second[0] == '\"')
                     {
                         string tmp(i->second, 1, i->second.length() - 2);
-                        Temp_Entry = Add_Symbol(SYM_TABLE_GLOBAL, const_cast<char *>(i->first.c_str()), STRING_ID_TOKEN);
-                        Temp_Entry->Data = String_Literal_To_UCS2(const_cast<char *>(tmp.c_str()));
+                        Temp_Entry = Add_Symbol(SYM_TABLE_GLOBAL, i->first, STRING_ID_TOKEN);
+                        Temp_Entry->Data = String_Literal_To_UCS2(tmp);
                     }
                     else
                     {
-                        Temp_Entry = Add_Symbol(SYM_TABLE_GLOBAL, const_cast<char *>(i->first.c_str()), FLOAT_ID_TOKEN);
+                        Temp_Entry = Add_Symbol(SYM_TABLE_GLOBAL, i->first, FLOAT_ID_TOKEN);
                         Temp_Entry->Data = Create_Float();
                         *(reinterpret_cast<DBL *>(Temp_Entry->Data)) = std::atof(i->second.c_str());
                     }
@@ -8765,10 +8765,10 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                     {
                         if (is_local && (mToken.context != Table_Index))
                             Error("Cannot use '#local' to assign a non-local array or dictionary element.");
-                        Temp_Entry = Add_Symbol (mToken.table, CurrentTokenText().c_str(), IDENTIFIER_TOKEN);
+                        Temp_Entry = Add_Symbol (mToken.table, CurrentTokenText(), IDENTIFIER_TOKEN);
                     }
                     else
-                        Temp_Entry = Add_Symbol (Local_Index, CurrentTokenText().c_str(), IDENTIFIER_TOKEN);
+                        Temp_Entry = Add_Symbol (Local_Index, CurrentTokenText(), IDENTIFIER_TOKEN);
                     numberPtr = &(Temp_Entry->Token_Number);
                     dataPtr = &(Temp_Entry->Data);
                     Previous = CurrentTokenId();
@@ -8819,7 +8819,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                     if (CurrentTokenIsContainerElement())
                         Error ("Cannot use '#local' to assign a non-local array or dictionary element.");
                     allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==IDENTIFIER_TOKEN
-                    Temp_Entry = Add_Symbol (Local_Index, CurrentTokenText().c_str(), IDENTIFIER_TOKEN);
+                    Temp_Entry = Add_Symbol (Local_Index, CurrentTokenText(), IDENTIFIER_TOKEN);
                     numberPtr = &(Temp_Entry->Token_Number);
                     dataPtr   = &(Temp_Entry->Data);
                     Previous  = IDENTIFIER_TOKEN;
@@ -8851,7 +8851,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                             if (CurrentTokenIsContainerElement())
                                 Error("Cannot use '#local' to assign a non-local array or dictionary element.");
                             allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==IDENTIFIER_TOKEN
-                            Temp_Entry = Add_Symbol (Local_Index, CurrentTokenText().c_str(), IDENTIFIER_TOKEN);
+                            Temp_Entry = Add_Symbol (Local_Index, CurrentTokenText(), IDENTIFIER_TOKEN);
                             numberPtr = &(Temp_Entry->Token_Number);
                             dataPtr   = &(Temp_Entry->Data);
                             Previous  = IDENTIFIER_TOKEN;
@@ -8879,7 +8879,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                     // the resulting value.
                     // We do this by assigning the resulting value to a dummy symbol entry.
                     allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous=IDENTIFIER_TOKEN
-                    Temp_Entry = Create_Entry ("", DUMMY_SYMBOL_TOKEN, false);
+                    Temp_Entry = Create_Entry ("", DUMMY_SYMBOL_TOKEN);
                     numberPtr = &(Temp_Entry->Token_Number);
                     dataPtr = &(Temp_Entry->Data);
                     optional = true;
@@ -8966,7 +8966,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
     }
     else if (larrayDeclare)
     {
-        SYM_ENTRY *rvalue = Create_Entry ("", DUMMY_SYMBOL_TOKEN, false);
+        SYM_ENTRY *rvalue = Create_Entry ("", DUMMY_SYMBOL_TOKEN);
         if (!Parse_RValue (IDENTIFIER_TOKEN, &(rvalue->Token_Number), &(rvalue->Data), nullptr, false, false, true, true, false, MAX_NUMBER_OF_TABLES) ||
             (rvalue->Token_Number != ARRAY_ID_TOKEN))
             Expectation_Error("array RValue");
@@ -8994,7 +8994,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             *dataPtr = Copy_Identifier(a->DataPtrs[i], a->ElementType(i));
         }
 
-        Destroy_Entry (rvalue, false);
+        Destroy_Entry (rvalue);
     }
     else
     {
@@ -9059,7 +9059,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
     for (vector<LValue>::iterator i = lvalues.begin(); i != lvalues.end(); ++i)
     {
         if ((i->symEntry != nullptr) && (i->symEntry->Token_Number == DUMMY_SYMBOL_TOKEN))
-            Destroy_Entry (i->symEntry, false);
+            Destroy_Entry (i->symEntry);
     }
 
     if ( after_hash )
@@ -9484,7 +9484,7 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
             // anyway. However, allowing such code now would cause problems
             // implementing recursive functions in future versions!
             if (sym != nullptr)
-                Temp_Data  = reinterpret_cast<void *>(Parse_DeclareFunction(NumberPtr, sym->Token_Name, is_local));
+                Temp_Data  = reinterpret_cast<void *>(Parse_DeclareFunction(NumberPtr, sym->name.c_str(), is_local));
             else
                 Temp_Data  = reinterpret_cast<void *>(Parse_DeclareFunction(NumberPtr, nullptr, is_local));
             Test_Redefine(Previous, NumberPtr, *DataPtr, false);
