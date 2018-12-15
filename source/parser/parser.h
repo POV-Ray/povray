@@ -84,18 +84,8 @@ namespace pov_parser
 using namespace pov_base;
 using namespace pov;
 
-const int MAX_BRACES = 200;
-
 const int MAX_NUMBER_OF_TABLES = 100;
 const int TOKEN_OVERFLOW_RESET_COUNT = 2500;
-const int MAX_PARAMETER_LIST = 56;
-
-const int COND_STACK_SIZE = 200;
-
-// needs to be a power of two
-const int MAX_STRING_LEN_FAST = 256;
-// this needs to be usable as bit mask, so keep it MAX_STRING_LEN_FAST - 1
-const int MAX_STRING_LEN_MASK = (MAX_STRING_LEN_FAST - 1);
 
 const int SYM_TABLE_SIZE = 257;
 
