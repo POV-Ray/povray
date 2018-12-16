@@ -1534,7 +1534,7 @@ FUNCTION_PTR FunctionVM::CopyFunction(FUNCTION_PTR pK)
     if (pK == nullptr)
         return nullptr;
 
-    FUNCTION_PTR ptr = (FUNCTION_PTR)POV_MALLOC(sizeof(FUNCTION), "Function ID");
+    FUNCTION_PTR ptr = new FUNCTION;
 
     GetFunctionAndReference(*pK); // increase the reference count
     *ptr = *pK;
@@ -1547,7 +1547,7 @@ void FunctionVM::DestroyFunction(FUNCTION_PTR pK)
     if (pK != nullptr)
     {
         RemoveFunction(*pK);
-        POV_FREE(pK);
+        delete pK;
     }
 }
 

@@ -116,6 +116,15 @@ struct InvalidEscapeSequenceException : TokenizerException
                                    const UTF8String::const_iterator& otb, const UTF8String::const_iterator& ote);
 };
 
-}
+//------------------------------------------------------------------------------
+
+// Base class for miscellaneous things that can be assigned to a symbol.
+struct Assignable
+{
+    virtual ~Assignable() {}
+    virtual Assignable* Clone() const = 0;
+};
+
+} // end of namespace
 
 #endif // POVRAY_PARSER_PARSERTYPES_H

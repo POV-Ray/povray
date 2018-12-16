@@ -197,7 +197,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
     TokenId token_id;
     int filetype = NO_FILE;
     UCS2String ign;
-    pov::FUNCTION_PTR fnPtr;
+    FUNCTION_PTR fnPtr;
 
     image = Create_Image();
 

@@ -133,7 +133,7 @@ bool RawTokenizer::GetNextToken(RawToken& token)
         case Lexeme::kStringLiteral:    if (ProcessStringLiteralLexeme(token))  return true;
         case Lexeme::kOther:            if (ProcessOtherLexeme(token))          return true;
         case Lexeme::kUTF8SignatureBOM: if (ProcessSignatureLexeme(token))      return true;
-        default:                        POV_PARSER_ASSERT(false);               return true;
+        default:                        POV_PARSER_PANIC();                     return true;
     }
 }
 
@@ -383,7 +383,7 @@ bool RawTokenizer::ProcessOtherLexeme(RawToken& token)
             case '~':   tokenId = TILDE_TOKEN;          break;
             // 0x7F should have been rejected as non-printable.
             // 0x80 through 0xFF should have been rejected as non-ASCII.
-            default:    POV_PARSER_ASSERT(false);       return false;
+            default:    POV_PARSER_PANIC();             break;
         }
     }
     else if (token.lexeme.text == "!=")
@@ -393,10 +393,7 @@ bool RawTokenizer::ProcessOtherLexeme(RawToken& token)
     else if (token.lexeme.text == ">=")
         tokenId = REL_GE_TOKEN;
     else
-    {
-        POV_PARSER_ASSERT(false); // Should not have been produced by scanner.
-        return false;
-    }
+        POV_PARSER_PANIC(); // Should not have been produced by scanner.
 
     token.id = int(tokenId);
     token.expressionId = GetExpressionId(tokenId);
@@ -416,7 +413,7 @@ bool RawTokenizer::ProcessSignatureLexeme(RawToken& token)
     switch (token.lexeme.category)
     {
         case Lexeme::kUTF8SignatureBOM: tokenId = UTF8_SIGNATURE_TOKEN; break;
-        default:                        POV_PARSER_ASSERT(false);       return false;
+        default:                        POV_PARSER_PANIC();             break;
     }
 
     token.id = int(tokenId);

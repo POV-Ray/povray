@@ -44,6 +44,9 @@
 // Boost header files
 #include <boost/date_time/posix_time/posix_time.hpp>
 
+// POV-Ray header files (base module)
+#include "base/stringutilities.h"
+
 // POV-Ray header files (core module)
 #include "core/scene/scenedata.h"
 
@@ -81,6 +84,18 @@ char *Parser::Parse_C_String(bool pathname)
     POV_FREE(str);
 
     return New;
+}
+
+void Parser::ParseString(UTF8String& s, bool pathname)
+{
+    /// @todo Add support for non-ASCII strings.
+
+    UCS2 *str = Parse_String(pathname);
+    char *New = UCS2_To_String(str);
+
+    s = New;
+
+    POV_FREE(str);
 }
 
 
@@ -231,18 +246,6 @@ std::string Parser::Parse_ASCIIString(bool pathname, bool require)
 {
     UCS2 *cstr = Parse_String(pathname, require);
     std::string ret(UCS2toASCIIString(cstr));
-    POV_FREE(cstr);
-    return ret;
-}
-
-
-//****************************************************************************
-
-
-UCS2String Parser::Parse_UCS2String(bool pathname, bool require)
-{
-    UCS2 *cstr = Parse_String(pathname, require);
-    UCS2String ret(cstr);
     POV_FREE(cstr);
     return ret;
 }
@@ -778,11 +781,11 @@ UCS2 *Parser::String_To_UCS2(const char *str)
 
 /*****************************************************************************/
 
-UCS2 *Parser::String_Literal_To_UCS2(const char *str)
+UCS2 *Parser::String_Literal_To_UCS2(const std::string& str)
 {
     UCS2 *char_string = nullptr;
     UCS2 *char_array = nullptr;
-    int char_array_size = 0;
+    std::string::size_type char_array_size = 0;
     int utf8arraysize = 0;
     unsigned char *utf8array = nullptr;
     int index_in = 0;
@@ -791,7 +794,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str)
     char *dummy_ptr = nullptr;
     int i = 0;
 
-    if(strlen(str) == 0)
+    if(str.length() == 0)
     {
         char_string = reinterpret_cast<UCS2 *>(POV_MALLOC(sizeof(UCS2), "UCS2 String"));
         char_string[0] = 0;
@@ -799,7 +802,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str)
         return char_string;
     }
 
-    char_array_size = (int)strlen(str);
+    char_array_size = str.length();
     char_array = reinterpret_cast<UCS2 *>(POV_MALLOC(char_array_size * sizeof(UCS2), "Character Array"));
     for(i = 0; i < char_array_size; i++)
     {
@@ -1014,34 +1017,6 @@ UCS2 *Parser::UCS2_strcat(UCS2 *s1, const UCS2 *s2)
     UCS2_strcpy(&s1[l1], s2);
 
     return s1;
-}
-
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- * CHANGES
- *
-******************************************************************************/
-
-int Parser::UCS2_strlen(const UCS2 *str)
-{
-    int i;
-
-    for(i = 0; *str != 0; str++, i++) { }
-
-    return i;
 }
 
 

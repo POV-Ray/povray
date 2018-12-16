@@ -63,15 +63,15 @@ MessageFactory::~MessageFactory()
 {}
 
 void MessageFactory::SendMessage(MessageClass mc, WarningLevel level, const char *text,
-                                 const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset)
+                                 const UCS2String& filename, POV_LONG line, POV_LONG column, POV_OFF_T offset)
 {
     POVMSObject msg;
     unsigned int msgIdent;
 
     (void)POVMSObject_New(&msg, kPOVObjectClass_ControlData);
 
-    if (filename != nullptr)
-        (void)POVMSUtil_SetUCS2String(&msg, kPOVAttrib_FileName, filename);
+    if (!filename.empty())
+        (void)POVMSUtil_SetUCS2String(&msg, kPOVAttrib_FileName, filename.c_str());
     if (line != -1)
         (void)POVMSUtil_SetLong(&msg, kPOVAttrib_Line, line);
     if (column != -1)

@@ -43,6 +43,9 @@
 #include <cstring>
 #include <algorithm>
 
+// POV-Ray header files (base module)
+#include "base/stringutilities.h"
+
 #include "core/scene/scenedata.h"
 
 #include "vm/fnintern.h"

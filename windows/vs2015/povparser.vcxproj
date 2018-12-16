@@ -420,6 +420,7 @@
     </ClCompile>
     <ClCompile Include="..\..\source\parser\scanner.cpp" />
     <ClCompile Include="..\..\source\parser\rawtokenizer.cpp" />
+    <ClCompile Include="..\..\source\parser\symboltable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\parser\fncode.h" />
@@ -430,6 +431,7 @@
     <ClInclude Include="..\..\source\parser\precomp.h" />
     <ClInclude Include="..\..\source\parser\scanner.h" />
     <ClInclude Include="..\..\source\parser\rawtokenizer.h" />
+    <ClInclude Include="..\..\source\parser\symboltable.h" />
     <ClInclude Include="..\povconfig\syspovconfigparser.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -49,6 +49,7 @@
 // POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
 #include "base/mathutil.h"
+#include "base/stringutilities.h"
 
 // POV-Ray header files (core module)
 #include "core/material/blendmap.h"
@@ -291,7 +292,7 @@ void Parser::Parse_Trace(Vector3d& Res)
             /* All of these functions return a VECTOR result */
             if(mToken.Function_Id == VECTOR_ID_TOKEN)
             {
-                (*reinterpret_cast<Vector3d *>(mToken.Data)) = Local_Normal;
+                SetCurrentTokenData(Local_Normal);
             }
             else
             {
@@ -434,7 +435,7 @@ bool Parser::Parse_Call()
 
 DBL Parser::Parse_Function_Call()
 {
-    FUNCTION_PTR fp = CurrentTokenDataPtr<FUNCTION_PTR>();
+    FUNCTION_PTR fp = CurrentTokenDataPtr<AssignableFunction*>()->fn;
     if (fp == nullptr)
         // may happen if a #declare or #local inside a function declaration references the function
         Error("Illegal attempt to evaluate a function being currently declared; did you miss a closing brace?");
@@ -503,7 +504,7 @@ DBL Parser::Parse_Function_Call()
 
 void Parser::Parse_Vector_Function_Call(EXPRESS& Express, int *Terms)
 {
-    FUNCTION_PTR fp = CurrentTokenDataPtr<FUNCTION_PTR>();
+    FUNCTION_PTR fp = CurrentTokenDataPtr<AssignableFunction*>()->fn;
     if (fp == nullptr)
         // may happen if a #declare or #local inside a function declaration references the function
         Error("Illegal attempt to evaluate a function being currently declared; did you miss a closing brace?");
@@ -2666,7 +2667,6 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
         END_CASE
 
         CASE_VECTOR_UNGET
-            UNGET
             if (startedParsing)
             {
                 EXIT
@@ -2790,7 +2790,7 @@ void Parser::Parse_BlendMapData<PigmentBlendMapData> (BlendMapTypeId Blend_Type,
             break;
 
         default:
-            POV_PARSER_ASSERT(false);
+            POV_PARSER_PANIC();
             break;
     }
 }

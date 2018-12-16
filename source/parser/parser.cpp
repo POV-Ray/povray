@@ -220,12 +220,12 @@ void Parser::Run()
                     if(i->second[0] == '\"')
                     {
                         string tmp(i->second, 1, i->second.length() - 2);
-                        Temp_Entry = Add_Symbol(SYM_TABLE_GLOBAL, const_cast<char *>(i->first.c_str()), STRING_ID_TOKEN);
-                        Temp_Entry->Data = String_Literal_To_UCS2(const_cast<char *>(tmp.c_str()));
+                        Temp_Entry = mSymbolStack.GetGlobalTable()->Add_Symbol(i->first, STRING_ID_TOKEN);
+                        Temp_Entry->Data = String_Literal_To_UCS2(tmp);
                     }
                     else
                     {
-                        Temp_Entry = Add_Symbol(SYM_TABLE_GLOBAL, const_cast<char *>(i->first.c_str()), FLOAT_ID_TOKEN);
+                        Temp_Entry = mSymbolStack.GetGlobalTable()->Add_Symbol(i->first, FLOAT_ID_TOKEN);
                         Temp_Entry->Data = Create_Float();
                         *(reinterpret_cast<DBL *>(Temp_Entry->Data)) = std::atof(i->second.c_str());
                     }
@@ -308,7 +308,7 @@ void Parser::Run()
             Destroy_Random_Generators();
 
             if (error_line != -1)
-                messageFactory.ErrorAt(POV_EXCEPTION_CODE(kOutOfMemoryErr), error_filename.c_str(), error_line, error_col, error_pos, "Out of memory.");
+                messageFactory.ErrorAt(POV_EXCEPTION_CODE(kOutOfMemoryErr), error_filename, error_line, error_col, error_pos, "Out of memory.");
             else
                 Error("Out of memory.");
         }
@@ -8679,11 +8679,11 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
 
     if (is_local)
     {
-        Local_Index=Table_Index;
+        Local_Index = mSymbolStack.GetLocalTableIndex();
     }
     else
     {
-        Local_Index = SYM_TABLE_GLOBAL;
+        Local_Index = mSymbolStack.GetGlobalTableIndex();
     }
 
     LValue_Ok = true;
@@ -8763,12 +8763,12 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                 {
                     if (CurrentTokenIsDictionaryElement())
                     {
-                        if (is_local && (mToken.context != Table_Index))
+                        if (is_local && !mSymbolStack.IsLocalTableIndex(mToken.context))
                             Error("Cannot use '#local' to assign a non-local array or dictionary element.");
-                        Temp_Entry = Add_Symbol (mToken.table, CurrentTokenText().c_str(), IDENTIFIER_TOKEN);
+                        Temp_Entry = mToken.table->Add_Symbol (CurrentTokenText(), IDENTIFIER_TOKEN);
                     }
                     else
-                        Temp_Entry = Add_Symbol (Local_Index, CurrentTokenText().c_str(), IDENTIFIER_TOKEN);
+                        Temp_Entry = mSymbolStack.Add_Symbol (Local_Index, CurrentTokenText(), IDENTIFIER_TOKEN);
                     numberPtr = &(Temp_Entry->Token_Number);
                     dataPtr = &(Temp_Entry->Data);
                     Previous = CurrentTokenId();
@@ -8814,12 +8814,12 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             CASE4 (DENSITY_MAP_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_ID_TOKEN, UV_ID_TOKEN)
             CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
             CASE3 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN, DICTIONARY_ID_TOKEN)
-                if (is_local && (mToken.context != Table_Index))
+                if (is_local && !mSymbolStack.IsLocalTableIndex(mToken.context))
                 {
                     if (CurrentTokenIsContainerElement())
                         Error ("Cannot use '#local' to assign a non-local array or dictionary element.");
                     allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==IDENTIFIER_TOKEN
-                    Temp_Entry = Add_Symbol (Local_Index, CurrentTokenText().c_str(), IDENTIFIER_TOKEN);
+                    Temp_Entry = mSymbolStack.Add_Symbol (Local_Index, CurrentTokenText(), IDENTIFIER_TOKEN);
                     numberPtr = &(Temp_Entry->Token_Number);
                     dataPtr   = &(Temp_Entry->Data);
                     Previous  = IDENTIFIER_TOKEN;
@@ -8846,12 +8846,12 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                 {
                     case VECTOR_ID_TOKEN:
                     case FLOAT_ID_TOKEN:
-                        if (is_local && (mToken.context != Table_Index))
+                        if (is_local && !mSymbolStack.IsLocalTableIndex(mToken.context))
                         {
                             if (CurrentTokenIsContainerElement())
                                 Error("Cannot use '#local' to assign a non-local array or dictionary element.");
                             allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==IDENTIFIER_TOKEN
-                            Temp_Entry = Add_Symbol (Local_Index, CurrentTokenText().c_str(), IDENTIFIER_TOKEN);
+                            Temp_Entry = mSymbolStack.Add_Symbol (Local_Index, CurrentTokenText(), IDENTIFIER_TOKEN);
                             numberPtr = &(Temp_Entry->Token_Number);
                             dataPtr   = &(Temp_Entry->Data);
                             Previous  = IDENTIFIER_TOKEN;
@@ -8879,7 +8879,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                     // the resulting value.
                     // We do this by assigning the resulting value to a dummy symbol entry.
                     allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous=IDENTIFIER_TOKEN
-                    Temp_Entry = Create_Entry ("", DUMMY_SYMBOL_TOKEN, false);
+                    Temp_Entry = SymbolTable::Create_Entry ("", DUMMY_SYMBOL_TOKEN);
                     numberPtr = &(Temp_Entry->Token_Number);
                     dataPtr = &(Temp_Entry->Data);
                     optional = true;
@@ -8966,7 +8966,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
     }
     else if (larrayDeclare)
     {
-        SYM_ENTRY *rvalue = Create_Entry ("", DUMMY_SYMBOL_TOKEN, false);
+        SYM_ENTRY *rvalue = SymbolTable::Create_Entry ("", DUMMY_SYMBOL_TOKEN);
         if (!Parse_RValue (IDENTIFIER_TOKEN, &(rvalue->Token_Number), &(rvalue->Data), nullptr, false, false, true, true, false, MAX_NUMBER_OF_TABLES) ||
             (rvalue->Token_Number != ARRAY_ID_TOKEN))
             Expectation_Error("array RValue");
@@ -8991,10 +8991,10 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
 
             *numberPtr = a->ElementType(i);
             Test_Redefine(Previous, numberPtr, *dataPtr, allow_redefine);
-            *dataPtr = Copy_Identifier(a->DataPtrs[i], a->ElementType(i));
+            *dataPtr = SymbolTable::Copy_Identifier(a->DataPtrs[i], a->ElementType(i));
         }
 
-        Destroy_Entry (rvalue, false);
+        SymbolTable::Destroy_Entry (rvalue);
     }
     else
     {
@@ -9059,7 +9059,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
     for (vector<LValue>::iterator i = lvalues.begin(); i != lvalues.end(); ++i)
     {
         if ((i->symEntry != nullptr) && (i->symEntry->Token_Number == DUMMY_SYMBOL_TOKEN))
-            Destroy_Entry (i->symEntry, false);
+            SymbolTable::Destroy_Entry (i->symEntry);
     }
 
     if ( after_hash )
@@ -9108,7 +9108,7 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
     bool callable_identifier;
     bool had_callable_identifier;
     SYM_ENTRY* symbol_entry;
-    SYM_TABLE* symbol_entry_table;
+    SymbolTable* symbol_entry_table;
 
     bool oldParseOptionalRVaue = parseOptionalRValue;
     parseOptionalRValue = allowUndefined;
@@ -9132,7 +9132,7 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
             else
             {
                 // pass by value
-                Temp_Data  = reinterpret_cast<void *>(Copy_Identifier(reinterpret_cast<void *>(*mToken.DataPtr),*mToken.NumberPtr));
+                Temp_Data  = SymbolTable::Copy_Identifier(*mToken.DataPtr, *mToken.NumberPtr);
                 *NumberPtr = *mToken.NumberPtr;
                 Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
                 *DataPtr   = Temp_Data;
@@ -9151,9 +9151,10 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
             }
         END_CASE
 
-        CASE_COLOUR_UNGET
+        CASE_COLOUR_RAW // no UNGET here
             if((CurrentTokenId() != COLOUR_ID_TOKEN) || (sceneData->EffectiveLanguageVersion() < 350))
             {
+                UNGET
                 Local_Colour  = Create_Colour();
                 SetOkToDeclare(false);
                 Parse_Colour (*Local_Colour);
@@ -9168,6 +9169,7 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
             }
             // intentional to allow color dot expressions as macro parameters if #version is 3.5 or higher [trf]
             // FALLTHROUGH
+        FALLTHROUGH_CASE
 
         CASE_VECTOR_UNGET
             // It seems very few people understand what is going on here, so let me try to
@@ -9209,7 +9211,7 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
             if ((CurrentTokenId()==FUNCT_ID_TOKEN) || (CurrentTokenId()==VECTFUNCT_ID_TOKEN) || (CurrentTokenId()==SPLINE_ID_TOKEN) ||
                 (CurrentTokenId()==UV_ID_TOKEN) || (CurrentTokenId()==VECTOR_4D_ID_TOKEN) || (CurrentTokenId()==COLOUR_ID_TOKEN))
             {
-                symbol_entry = Find_Symbol (mToken.table, CurrentTokenText().c_str());
+                symbol_entry = mToken.table->Find_Symbol (CurrentTokenText().c_str());
                 if (symbol_entry)
                 {
                     symbol_entry_table = mToken.table;
@@ -9242,7 +9244,7 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
                 if(!(ParFlag) || (ParFlag && function_identifier))
                 {
                     // pass by value
-                    Temp_Data  = reinterpret_cast<void *>(Copy_Identifier(reinterpret_cast<void *>(*mToken.DataPtr),*mToken.NumberPtr));
+                    Temp_Data  = SymbolTable::Copy_Identifier(*mToken.DataPtr, *mToken.NumberPtr);
                     *NumberPtr = *mToken.NumberPtr;
                     Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
                     *DataPtr   = Temp_Data;
@@ -9482,9 +9484,13 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
             // anyway. However, allowing such code now would cause problems
             // implementing recursive functions in future versions!
             if (sym != nullptr)
-                Temp_Data  = reinterpret_cast<void *>(Parse_DeclareFunction(NumberPtr, sym->Token_Name, is_local));
+                Temp_Data  = reinterpret_cast<void *>(new AssignableFunction(
+                    Parse_DeclareFunction(NumberPtr, sym->name.c_str(), is_local),
+                    mpFunctionVM));
             else
-                Temp_Data  = reinterpret_cast<void *>(Parse_DeclareFunction(NumberPtr, nullptr, is_local));
+                Temp_Data  = reinterpret_cast<void *>(new AssignableFunction(
+                    Parse_DeclareFunction(NumberPtr, nullptr, is_local),
+                    mpFunctionVM));
             Test_Redefine(Previous, NumberPtr, *DataPtr, false);
             *DataPtr   = Temp_Data;
         END_CASE
@@ -9537,124 +9543,6 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
     parseOptionalRValue = oldParseOptionalRVaue;
     return(Found);
 }
-
-void Parser::Destroy_Ident_Data(void *Data, int Type)
-{
-    int i;
-    POV_ARRAY *a;
-
-    if (Data == nullptr)
-        return;
-
-    switch(Type)
-    {
-        case COLOUR_ID_TOKEN:
-            delete reinterpret_cast<RGBFTColour *>(Data);
-            break;
-        case VECTOR_ID_TOKEN:
-            delete reinterpret_cast<Vector3d *>(Data);
-            break;
-        case UV_ID_TOKEN:
-            delete reinterpret_cast<Vector2d *>(Data);
-            break;
-        case VECTOR_4D_ID_TOKEN:
-            Destroy_Vector_4D(reinterpret_cast<VECTOR_4D *>(Data));
-            break;
-        case FLOAT_ID_TOKEN:
-            Destroy_Float(reinterpret_cast<DBL *>(Data));
-            break;
-        case PIGMENT_ID_TOKEN:
-        case DENSITY_ID_TOKEN:
-            delete reinterpret_cast<PIGMENT *>(Data);
-            break;
-        case NORMAL_ID_TOKEN:
-            delete reinterpret_cast<TNORMAL *>(Data);
-            break;
-        case FINISH_ID_TOKEN:
-            delete reinterpret_cast<FINISH *>(Data);
-            break;
-        case MEDIA_ID_TOKEN:
-            delete reinterpret_cast<Media *>(Data);
-            break;
-        case INTERIOR_ID_TOKEN:
-            delete reinterpret_cast<InteriorPtr *>(Data);
-            break;
-        case MATERIAL_ID_TOKEN:
-            Destroy_Material(reinterpret_cast<MATERIAL *>(Data));
-            break;
-        case TEXTURE_ID_TOKEN:
-            Destroy_Textures(reinterpret_cast<TEXTURE *>(Data));
-            break;
-        case OBJECT_ID_TOKEN:
-            Destroy_Object(reinterpret_cast<ObjectPtr>(Data));
-            break;
-        case COLOUR_MAP_ID_TOKEN:
-            delete reinterpret_cast<ColourBlendMapPtr *>(Data);
-            break;
-        case PIGMENT_MAP_ID_TOKEN:
-        case DENSITY_MAP_ID_TOKEN:
-            delete reinterpret_cast<PigmentBlendMapPtr *>(Data);
-            break;
-        case SLOPE_MAP_ID_TOKEN:
-            delete reinterpret_cast<SlopeBlendMapPtr *>(Data);
-            break;
-        case NORMAL_MAP_ID_TOKEN:
-            delete reinterpret_cast<NormalBlendMapPtr *>(Data);
-            break;
-        case TEXTURE_MAP_ID_TOKEN:
-            delete reinterpret_cast<TextureBlendMapPtr *>(Data);
-            break;
-        case TRANSFORM_ID_TOKEN:
-            Destroy_Transform(reinterpret_cast<TRANSFORM *>(Data));
-            break;
-        case CAMERA_ID_TOKEN:
-            delete reinterpret_cast<Camera *>(Data);
-            break;
-        case RAINBOW_ID_TOKEN:
-            delete reinterpret_cast<RAINBOW *>(Data);
-            break;
-        case FOG_ID_TOKEN:
-            delete reinterpret_cast<FOG *>(Data);
-            break;
-        case SKYSPHERE_ID_TOKEN:
-            delete reinterpret_cast<SKYSPHERE *>(Data);
-            break;
-        case MACRO_ID_TOKEN:
-        case TEMPORARY_MACRO_ID_TOKEN:
-            delete reinterpret_cast<Macro *>(Data);
-            break;
-        case STRING_ID_TOKEN:
-            POV_FREE(Data);
-            break;
-        case ARRAY_ID_TOKEN:
-            a = reinterpret_cast<POV_ARRAY *>(Data);
-            for (i = 0; i < a->DataPtrs.size(); ++i)
-                Destroy_Ident_Data(a->DataPtrs[i], a->ElementType(i));
-            delete a;
-            break;
-        case DICTIONARY_ID_TOKEN:
-            Destroy_Sym_Table (reinterpret_cast<SYM_TABLE *>(Data));
-            break;
-        case PARAMETER_ID_TOKEN:
-            POV_FREE(Data);
-            break;
-        case FILE_ID_TOKEN:
-            delete reinterpret_cast<DATA_FILE *>(Data);
-            break;
-        case FUNCT_ID_TOKEN:
-        case VECTFUNCT_ID_TOKEN:
-            fnVMContext->functionvm->DestroyFunction((FUNCTION_PTR)Data);
-            break;
-        case SPLINE_ID_TOKEN:
-            Destroy_Spline(reinterpret_cast<GenericSpline *>(Data));
-            break;
-        default:
-            Error("Do not know how to free memory for identifier type %d", Type);
-    }
-}
-
-
-
 
 
 /*****************************************************************************
@@ -9763,13 +9651,13 @@ void Parser::Test_Redefine(TokenId Previous, TokenId *NumberPtr, void *Data, boo
     /* NK 1998 - allow user to redefine all identifiers! */
     if( allow_redefine)
     {
-        Destroy_Ident_Data(Data, Previous);
+        SymbolTable::Destroy_Ident_Data(Data, Previous);
     }
     else
     {
         if (Previous == *NumberPtr)
         {
-            Destroy_Ident_Data(Data,*NumberPtr);
+            SymbolTable::Destroy_Ident_Data(Data,*NumberPtr);
         }
         else
         {
@@ -10572,163 +10460,6 @@ void Parser::Set_CSG_Tree_Flag(ObjectPtr Object, unsigned int f, int val)
 *
 ******************************************************************************/
 
-void *Parser::Copy_Identifier (void *Data, int Type)
-{
-    size_t i;
-    POV_ARRAY *a, *na;
-    Vector3d *vp;
-    DBL *dp;
-    Vector2d *uvp;
-    VECTOR_4D *v4p;
-    int len;
-    void *New = nullptr;
-
-    if (Data == nullptr)
-    {
-        return nullptr;
-    }
-
-    switch (Type)
-    {
-        case COLOUR_ID_TOKEN:
-            New = reinterpret_cast<void *>(Copy_Colour(reinterpret_cast<RGBFTColour *>(Data)));
-            break;
-        case VECTOR_ID_TOKEN:
-            vp = new Vector3d();
-            *vp = *(reinterpret_cast<Vector3d *>(Data));
-            New=vp;
-            break;
-        case UV_ID_TOKEN:
-            uvp = new Vector2d();
-            *uvp = *(reinterpret_cast<Vector2d *>(Data));
-            New=uvp;
-            break;
-        case VECTOR_4D_ID_TOKEN:
-            v4p = Create_Vector_4D();
-            Assign_Vector_4D((*v4p),(*(reinterpret_cast<VECTOR_4D *>(Data))));
-            New=v4p;
-            break;
-        case FLOAT_ID_TOKEN:
-            dp = Create_Float();
-            *dp = *(reinterpret_cast<DBL *>(Data));
-            New = dp;
-            break;
-        case PIGMENT_ID_TOKEN:
-        case DENSITY_ID_TOKEN:
-            New = reinterpret_cast<void *>(Copy_Pigment(reinterpret_cast<PIGMENT *>(Data)));
-            break;
-        case NORMAL_ID_TOKEN:
-            New = reinterpret_cast<void *>(Copy_Tnormal(reinterpret_cast<TNORMAL *>(Data)));
-            break;
-        case FINISH_ID_TOKEN:
-            New = reinterpret_cast<void *>(Copy_Finish(reinterpret_cast<FINISH *>(Data)));
-            break;
-        case MEDIA_ID_TOKEN:
-            New = reinterpret_cast<void *>(new Media(*(reinterpret_cast<Media *>(Data))));
-            break;
-        case INTERIOR_ID_TOKEN:
-            New = reinterpret_cast<void *>(new Interior(*(reinterpret_cast<Interior *>(Data))));
-            break;
-        case MATERIAL_ID_TOKEN:
-            New = reinterpret_cast<void *>(Copy_Material(reinterpret_cast<MATERIAL *>(Data)));
-            break;
-        case TEXTURE_ID_TOKEN:
-            New = reinterpret_cast<void *>(Copy_Textures(reinterpret_cast<TEXTURE *>(Data)));
-            break;
-        case OBJECT_ID_TOKEN:
-            New = reinterpret_cast<void *>(Copy_Object(reinterpret_cast<ObjectPtr>(Data)));
-            break;
-        case COLOUR_MAP_ID_TOKEN:
-            New = reinterpret_cast<void *>(new ColourBlendMapPtr(Copy_Blend_Map(*(reinterpret_cast<ColourBlendMapPtr *>(Data)))));
-            break;
-        case PIGMENT_MAP_ID_TOKEN:
-        case DENSITY_MAP_ID_TOKEN:
-            New = reinterpret_cast<void *>(new PigmentBlendMapPtr(Copy_Blend_Map(*(reinterpret_cast<PigmentBlendMapPtr *>(Data)))));
-            break;
-        case SLOPE_MAP_ID_TOKEN:
-            New = reinterpret_cast<void *>(new SlopeBlendMapPtr(Copy_Blend_Map(*(reinterpret_cast<SlopeBlendMapPtr *>(Data)))));
-            break;
-        case NORMAL_MAP_ID_TOKEN:
-            New = reinterpret_cast<void *>(new NormalBlendMapPtr(Copy_Blend_Map(*(reinterpret_cast<NormalBlendMapPtr *>(Data)))));
-            break;
-        case TEXTURE_MAP_ID_TOKEN:
-            New = reinterpret_cast<void *>(new TextureBlendMapPtr(Copy_Blend_Map(*(reinterpret_cast<TextureBlendMapPtr *>(Data)))));
-            break;
-        case TRANSFORM_ID_TOKEN:
-            New = reinterpret_cast<void *>(Copy_Transform(reinterpret_cast<TRANSFORM *>(Data)));
-            break;
-        case CAMERA_ID_TOKEN:
-            New = reinterpret_cast<void *>(new Camera(*reinterpret_cast<Camera *>(Data)));
-            break;
-        case RAINBOW_ID_TOKEN:
-            New = reinterpret_cast<void *>(Copy_Rainbow(reinterpret_cast<RAINBOW *>(Data)));
-            break;
-        case FOG_ID_TOKEN:
-            New = reinterpret_cast<void *>(Copy_Fog(reinterpret_cast<FOG *>(Data)));
-            break;
-        case SKYSPHERE_ID_TOKEN:
-            New = reinterpret_cast<void *>(Copy_Skysphere(reinterpret_cast<SKYSPHERE *>(Data)));
-            break;
-        case STRING_ID_TOKEN:
-            //New = reinterpret_cast<void *>(POV_STRDUP(reinterpret_cast<char *>(Data)));
-            len = UCS2_strlen(reinterpret_cast<UCS2 *>(Data)) + 1;
-            New = reinterpret_cast<UCS2 *>(POV_MALLOC(len * sizeof(UCS2), "UCS2 String"));
-            POV_MEMCPY(reinterpret_cast<void *>(New), reinterpret_cast<void *>(Data), len * sizeof(UCS2));
-            break;
-        case ARRAY_ID_TOKEN:
-            a = reinterpret_cast<POV_ARRAY *>(Data);
-            na = new POV_ARRAY;
-            na->maxDim = a->maxDim;
-            na->Type_ = a->Type_;
-            na->resizable = a->resizable;
-            na->mixedType = a->mixedType;
-            for (i = 0; i < POV_ARRAY::kMaxDimensions; ++i)
-            {
-                na->Sizes[i] = a->Sizes[i];
-                na->Mags[i] = a->Mags[i];
-            }
-            na->DataPtrs.resize(a->DataPtrs.size());
-            for (i=0; i<a->DataPtrs.size(); i++)
-                na->DataPtrs[i] = reinterpret_cast<void *>(Copy_Identifier(a->DataPtrs[i], a->ElementType(i)));
-            na->Types = a->Types;
-            New = reinterpret_cast<void *>(na);
-            break;
-        case DICTIONARY_ID_TOKEN:
-            New = reinterpret_cast<void *>(Copy_Sym_Table (reinterpret_cast<SYM_TABLE *>(Data)));
-            break;
-        case FUNCT_ID_TOKEN:
-        case VECTFUNCT_ID_TOKEN:
-            New = reinterpret_cast<void *>(fnVMContext->functionvm->CopyFunction((FUNCTION_PTR )Data));
-            break;
-        case SPLINE_ID_TOKEN:
-            New = reinterpret_cast<void *>(Copy_Spline((GenericSpline *)Data));
-            break;
-        default:
-            Error("Cannot copy identifier");
-    }
-    return(New);
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
-
 /* NK layers - 1999 June 10 - for backwards compatibility with layered textures */
 void Parser::Convert_Filter_To_Transmit(PIGMENT *Pigment)
 {
@@ -11189,14 +10920,6 @@ RGBFTColour *Parser::Create_Colour ()
 
 /*****************************************************************************/
 
-RGBFTColour *Parser::Copy_Colour (const RGBFTColour* Old)
-{
-    if (Old != nullptr)
-        return new RGBFTColour(*Old);
-    else
-        return nullptr;
-}
-
 void Parser::SignalProgress(POV_LONG elapsedTime, POV_LONG tokenCount)
 {
     POVMS_Object obj(kPOVObjectClass_ParserProgress);
@@ -11285,4 +11008,34 @@ void Parser::POV_ARRAY::Shrink()
     }
 }
 
+Parser::POV_ARRAY::POV_ARRAY(const POV_ARRAY& obj)
+{
+    maxDim = obj.maxDim;
+    Type_ = obj.Type_;
+    resizable = obj.resizable;
+    mixedType = obj.mixedType;
+    for (int i = 0; i < POV_ARRAY::kMaxDimensions; ++i)
+    {
+        Sizes[i] = obj.Sizes[i];
+        Mags[i] = obj.Mags[i];
+    }
+    DataPtrs.resize(obj.DataPtrs.size());
+    for (int i = 0; i < obj.DataPtrs.size(); i++)
+        DataPtrs[i] = SymbolTable::Copy_Identifier(obj.DataPtrs[i], obj.ElementType(i));
+    Types = obj.Types;
 }
+
+Parser::POV_ARRAY::~POV_ARRAY()
+{
+    for (int i = 0; i < this->DataPtrs.size(); ++i)
+        SymbolTable::Destroy_Ident_Data(this->DataPtrs[i], this->ElementType(i));
+}
+
+Parser::POV_ARRAY* Parser::POV_ARRAY::Clone() const
+{
+    return new POV_ARRAY(*this);
+}
+
+/*****************************************************************************/
+
+} // end of namespace
