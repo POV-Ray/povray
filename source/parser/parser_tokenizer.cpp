@@ -190,7 +190,7 @@ void Parser::pre_init_tokenizer ()
     Parsing_Directive   = false;
     parseRawIdentifiers = false;
     parseOptionalRValue = false;
-    Table_Index         = -1;
+    POV_EXPERIMENTAL_ASSERT(mSymbolStack.GetLocalTableIndex() == -1);
 
     // TODO - on modern machines it may be faster to do the comparisons for each token
     //        than to access the conversion table.
@@ -236,11 +236,7 @@ void Parser::pre_init_tokenizer ()
 
 void Parser::Terminate_Tokenizer()
 {
-    while(Table_Index >= 0)
-    {
-        Destroy_Table(Table_Index--);
-    }
-
+    mSymbolStack.Clear();
     maIncludeStack.clear();
 
     Got_EOF = false;
@@ -314,7 +310,7 @@ void Parser::Get_Token ()
 
             Got_EOF=false;
 
-            Destroy_Table(Table_Index--);
+            mSymbolStack.PopTable();
 
             GoToBookmark(maIncludeStack.back()); // TODO handle errors
             maIncludeStack.pop_back();
@@ -445,7 +441,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
     SYM_ENTRY *Temp_Entry;
     POV_PARAM *Par;
     DBL val;
-    SYM_TABLE *table = nullptr;
+    SymbolTable* table = nullptr;
     char *dictIndex = nullptr;
     int pseudoDictionary = -1;
     RawToken nextRawToken;
@@ -461,12 +457,12 @@ void Parser::Read_Symbol(const RawToken& rawToken)
         if (rawToken.id == LOCAL_TOKEN)
         {
             POV_PARSER_ASSERT(!Parsing_Directive || Inside_Ifdef);
-            pseudoDictionary = Table_Index;
+            pseudoDictionary = mSymbolStack.GetLocalTableIndex();
         }
         else if (rawToken.id == GLOBAL_TOKEN)
         {
             POV_PARSER_ASSERT(!Parsing_Directive || Inside_Ifdef);
-            pseudoDictionary = SYM_TABLE_GLOBAL;
+            pseudoDictionary = mSymbolStack.GetGlobalTableIndex();
         }
         else
         {
@@ -489,54 +485,46 @@ void Parser::Read_Symbol(const RawToken& rawToken)
         }
         else
         {
-            /* Search tables from newest to oldest */
-            int firstIndex = Table_Index;
-            int lastIndex  = SYM_TABLE_GLOBAL;
-            for (Local_Index = firstIndex; Local_Index >= lastIndex; Local_Index--)
+            /* See if it's a previously declared identifier. */
+            Temp_Entry = mSymbolStack.Find_Symbol(rawToken.lexeme.text.c_str(), &Local_Index);
+            if (Temp_Entry != nullptr)
             {
-                /* See if it's a previously declared identifier. */
-                Temp_Entry = Find_Symbol(Local_Index, rawToken.lexeme.text.c_str());
-                if (Temp_Entry != nullptr)
+                if (Temp_Entry->deprecated && !Temp_Entry->deprecatedShown)
                 {
-                    if (Temp_Entry->deprecated && !Temp_Entry->deprecatedShown)
-                    {
-                        Temp_Entry->deprecatedShown = Temp_Entry->deprecatedOnce;
-                        Warning("%s", Temp_Entry->Deprecation_Message);
-                    }
-
-                    if ((Temp_Entry->Token_Number==MACRO_ID_TOKEN) && (!Inside_Ifdef))
-                    {
-                        mToken.Data = Temp_Entry->Data;
-                        if (IsOkToDeclare())
-                        {
-                            Invoke_Macro();
-                        }
-                        else
-                        {
-                            mToken.Token_Id=MACRO_ID_TOKEN;
-                            mToken.is_array_elem = false;
-                            mToken.is_mixed_array_elem = false;
-                            mToken.is_dictionary_elem = false;
-                            mToken.NumberPtr = &(Temp_Entry->Token_Number);
-                            mToken.DataPtr   = &(Temp_Entry->Data);
-                            Write_Token (mToken.Token_Id, rawToken, Tables[Local_Index]);
-
-                            mToken.context = Local_Index;
-                        }
-                        return;
-                    }
-
-                    mToken.Token_Id  =   Temp_Entry->Token_Number;
-                    mToken.is_array_elem = false;
-                    mToken.is_mixed_array_elem = false;
-                    mToken.is_dictionary_elem = false;
-                    mToken.NumberPtr = &(Temp_Entry->Token_Number);
-                    mToken.DataPtr   = &(Temp_Entry->Data);
-
-                    table = Tables[Local_Index];
-
-                    break;
+                    Temp_Entry->deprecatedShown = Temp_Entry->deprecatedOnce;
+                    Warning("%s", Temp_Entry->Deprecation_Message);
                 }
+
+                if ((Temp_Entry->Token_Number==MACRO_ID_TOKEN) && (!Inside_Ifdef))
+                {
+                    mToken.Data = Temp_Entry->Data;
+                    if (IsOkToDeclare())
+                    {
+                        Invoke_Macro();
+                    }
+                    else
+                    {
+                        mToken.Token_Id=MACRO_ID_TOKEN;
+                        mToken.is_array_elem = false;
+                        mToken.is_mixed_array_elem = false;
+                        mToken.is_dictionary_elem = false;
+                        mToken.NumberPtr = &(Temp_Entry->Token_Number);
+                        mToken.DataPtr   = &(Temp_Entry->Data);
+                        Write_Token (mToken.Token_Id, rawToken, mSymbolStack.GetTable(Local_Index));
+
+                        mToken.context = Local_Index;
+                    }
+                    return;
+                }
+
+                mToken.Token_Id  =   Temp_Entry->Token_Number;
+                mToken.is_array_elem = false;
+                mToken.is_mixed_array_elem = false;
+                mToken.is_dictionary_elem = false;
+                mToken.NumberPtr = &(Temp_Entry->Token_Number);
+                mToken.DataPtr   = &(Temp_Entry->Data);
+
+                table = mSymbolStack.GetTable(Local_Index);
             }
         }
 
@@ -621,10 +609,10 @@ void Parser::Read_Symbol(const RawToken& rawToken)
 
                             haveNextRawToken = PeekRawToken(nextRawToken);
 
-                            SYM_TABLE* parentTable = table;
+                            SymbolTable* parentTable = table;
                             if (pseudoDictionary >= 0)
                             {
-                                table = Tables [pseudoDictionary];
+                                table = mSymbolStack.GetTable(pseudoDictionary);
                                 pseudoDictionary = -1;
 
                                 if (!haveNextRawToken ||
@@ -643,7 +631,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
                                 }
                             }
                             else
-                                table = reinterpret_cast<SYM_TABLE *>(*(mToken.DataPtr));
+                                table = reinterpret_cast<SymbolTable*>(*(mToken.DataPtr));
 
                             if (haveNextRawToken && (nextRawToken.lexeme.category == Lexeme::kOther) && (nextRawToken.lexeme.text == "."))
                             {
@@ -662,7 +650,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
                                 if (mToken.Token_Id != IDENTIFIER_TOKEN)
                                     Expectation_Error ("dictionary element identifier");
 
-                                Temp_Entry = Find_Symbol (table, CurrentTokenText().c_str());
+                                Temp_Entry = table->Find_Symbol (CurrentTokenText().c_str());
                             }
                             else if (haveNextRawToken && (nextRawToken.lexeme.category == Lexeme::kOther) && (nextRawToken.lexeme.text == "["))
                             {
@@ -676,7 +664,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
                                 dictIndex = Parse_C_String();
                                 Parse_Square_End();
 
-                                Temp_Entry = Find_Symbol (table, dictIndex);
+                                Temp_Entry = table->Find_Symbol (dictIndex);
                             }
                             else
                             {
@@ -740,7 +728,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
     Write_Token (IDENTIFIER_TOKEN, rawToken);
 }
 
-inline void Parser::Write_Token(const RawToken& rawToken, SYM_TABLE *table)
+inline void Parser::Write_Token(const RawToken& rawToken, SymbolTable* table)
 {
     POV_EXPERIMENTAL_ASSERT(mToken.sourceFile == mTokenizer.GetSource());
     mToken.raw            = rawToken;
@@ -750,7 +738,7 @@ inline void Parser::Write_Token(const RawToken& rawToken, SYM_TABLE *table)
     mToken.table          = table;
 }
 
-inline void Parser::Write_Token(TokenId Token_Id, const RawToken& rawToken, SYM_TABLE *table)
+inline void Parser::Write_Token(TokenId Token_Id, const RawToken& rawToken, SymbolTable* table)
 {
     POV_EXPERIMENTAL_ASSERT(mToken.sourceFile == mTokenizer.GetSource());
     mToken.raw            = rawToken;
@@ -1514,7 +1502,7 @@ void Parser::Parse_Directive(int After_Hash)
                     }
 
                     {
-                        SYM_ENTRY* Entry = Find_Symbol(Table_Index, Cond_Stack.back().Loop_Identifier.c_str());
+                        SYM_ENTRY* Entry = mSymbolStack.GetLocalTable()->Find_Symbol(Cond_Stack.back().Loop_Identifier.c_str());
                         if ((Entry == nullptr) || (Entry->Token_Number != FLOAT_ID_TOKEN))
                             Error ("#for loop variable must remain defined and numerical during loop.");
 
@@ -1871,7 +1859,7 @@ void Parser::Parse_Directive(int After_Hash)
                     CASE4 (DENSITY_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_MAP_ID_TOKEN, UV_ID_TOKEN)
                     CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
                     CASE3 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN, DICTIONARY_ID_TOKEN)
-                        Remove_Symbol (mToken.table, CurrentTokenText().c_str(), mToken.is_array_elem, mToken.DataPtr, CurrentTokenId());
+                        mToken.table->Remove_Symbol (CurrentTokenText().c_str(), mToken.is_array_elem, mToken.DataPtr, CurrentTokenId());
                         if (mToken.is_mixed_array_elem)
                             *mToken.NumberPtr = IDENTIFIER_TOKEN;
                     END_CASE
@@ -1881,7 +1869,7 @@ void Parser::Parse_Directive(int After_Hash)
                         {
                             case VECTOR_ID_TOKEN:
                             case FLOAT_ID_TOKEN:
-                                Remove_Symbol (mToken.table, CurrentTokenText().c_str(), mToken.is_array_elem, mToken.DataPtr, CurrentTokenId());
+                                mToken.table->Remove_Symbol (CurrentTokenText().c_str(), mToken.is_array_elem, mToken.DataPtr, CurrentTokenId());
                                 if (mToken.is_mixed_array_elem)
                                     *mToken.NumberPtr = IDENTIFIER_TOKEN;
                                 break;
@@ -2120,46 +2108,6 @@ void Parser::Break()
 *
 * FUNCTION
 *
-*   get_hash_value
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   Dieter Bayer
-*
-* DESCRIPTION
-*
-*   Calculate hash value for a given string.
-*
-* CHANGES
-*
-*   Apr 1996 : Creation.
-*
-******************************************************************************/
-
-int Parser::get_hash_value(const char *s)
-{
-    unsigned int i = 0;
-
-    while (*s)
-    {
-        i = (i << 1) ^ *s++;
-    }
-
-    return((int)(i % SYM_TABLE_SIZE));
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
 *   init_sym_tables
 *
 * INPUT
@@ -2180,112 +2128,7 @@ int Parser::get_hash_value(const char *s)
 
 void Parser::init_sym_tables()
 {
-    Add_Sym_Table(); // global symbols
-}
-
-Parser::SYM_TABLE *Parser::Create_Sym_Table()
-{
-    SYM_TABLE *New = reinterpret_cast<SYM_TABLE *>(POV_MALLOC(sizeof(SYM_TABLE),"symbol table"));
-
-    for (int i = 0; i < SYM_TABLE_SIZE; i++)
-    {
-        New->Table[i] = nullptr;
-    }
-
-    return New;
-}
-
-void Parser::Add_Sym_Table()
-{
-    if ((++Table_Index)==MAX_NUMBER_OF_TABLES)
-    {
-        Table_Index--;
-        Error("Too many nested symbol tables");
-    }
-
-    Tables[Table_Index] = Create_Sym_Table();
-}
-
-void Parser::Destroy_Sym_Table (Parser::SYM_TABLE *Table)
-{
-    SYM_ENTRY *Entry;
-
-    for(int i = SYM_TABLE_SIZE - 1; i >= 0; i--)
-    {
-        Entry = Table->Table[i];
-
-        while(Entry)
-        {
-            Entry = Destroy_Entry (Entry);
-        }
-
-        Table->Table[i] = nullptr;
-    }
-
-    POV_FREE(Table);
-
-}
-
-void Parser::Destroy_Table(int index)
-{
-    Destroy_Sym_Table (Tables[index]);
-}
-
-Parser::SYM_TABLE *Parser::Copy_Sym_Table (const Parser::SYM_TABLE *table)
-{
-    SYM_TABLE *newTable = Create_Sym_Table();
-    SYM_ENTRY *Entry, *newEntry;
-
-    for(int i = SYM_TABLE_SIZE - 1; i >= 0; i--)
-    {
-        Entry = table->Table[i];
-
-        while(Entry)
-        {
-            newEntry = Copy_Entry (Entry);
-            newEntry->next = newTable->Table[i];
-            newTable->Table[i] = newEntry;
-            Entry = Entry->next;
-        }
-    }
-
-    return newTable;
-}
-
-SYM_ENTRY *Parser::Create_Entry (const UTF8String& Name, TokenId Number)
-{
-    SYM_ENTRY *New;
-
-    New = new SYM_ENTRY();
-
-    New->Token_Number        = Number;
-    New->Data                = nullptr;
-    New->deprecated          = false;
-    New->deprecatedOnce      = false;
-    New->deprecatedShown     = false;
-    New->Deprecation_Message = nullptr;
-    New->ref_count           = 1;
-    New->name                = Name;
-
-    return(New);
-}
-
-SYM_ENTRY *Parser::Copy_Entry (const SYM_ENTRY *oldEntry)
-{
-    SYM_ENTRY *newEntry;
-
-    newEntry = new SYM_ENTRY();
-
-    newEntry->Token_Number        = oldEntry->Token_Number;
-    newEntry->Data                = Copy_Identifier (oldEntry->Data, oldEntry->Token_Number);
-    newEntry->deprecated          = false;
-    newEntry->deprecatedOnce      = false;
-    newEntry->deprecatedShown     = false;
-    newEntry->Deprecation_Message = nullptr;
-    newEntry->ref_count           = 1;
-    newEntry->name                = oldEntry->name;
-
-    return newEntry;
+    mSymbolStack.PushTable(); // global symbols
 }
 
 void Parser::Acquire_Entry_Reference (SYM_ENTRY *Entry)
@@ -2297,7 +2140,7 @@ void Parser::Acquire_Entry_Reference (SYM_ENTRY *Entry)
     Entry->ref_count ++;
 }
 
-void Parser::Release_Entry_Reference (SYM_TABLE *table, SYM_ENTRY *Entry)
+void Parser::Release_Entry_Reference (SymbolTable* table, SYM_ENTRY *Entry)
 {
     if (Entry == nullptr)
         return;
@@ -2307,167 +2150,12 @@ void Parser::Release_Entry_Reference (SYM_TABLE *table, SYM_ENTRY *Entry)
 
     if (Entry->ref_count == 0)
     {
-        Destroy_Ident_Data (Entry->Data, Entry->Token_Number);
+        SymbolTable::Destroy_Ident_Data (Entry->Data, Entry->Token_Number);
         if (Entry->Deprecation_Message != nullptr)
             POV_FREE(Entry->Deprecation_Message);
 
         delete Entry;
     }
-}
-
-SYM_ENTRY *Parser::Destroy_Entry (SYM_ENTRY *Entry)
-{
-    SYM_ENTRY *Next;
-
-    if (Entry == nullptr)
-        return nullptr;
-
-    // always unhook the entry from hash table (if it is still member of one)
-    Next = Entry->next;
-    Entry->next = nullptr;
-
-    if (Entry->ref_count <= 0)
-        Error("Internal error: Symbol reference counter underflow");
-    Entry->ref_count --;
-
-    if (Entry->ref_count == 0)
-    {
-        Destroy_Ident_Data (Entry->Data, Entry->Token_Number);
-        if (Entry->Deprecation_Message != nullptr)
-            POV_FREE(Entry->Deprecation_Message);
-
-        delete Entry;
-    }
-
-    return Next;
-}
-
-
-void Parser::Add_Entry (SYM_TABLE *table, SYM_ENTRY *Table_Entry)
-{
-    int i = get_hash_value(Table_Entry->name.c_str());
-
-    Table_Entry->next       = table->Table[i];
-    table->Table[i] = Table_Entry;
-}
-
-void Parser::Add_Entry (int Index,SYM_ENTRY *Table_Entry)
-{
-    Add_Entry (Tables[Index], Table_Entry);
-}
-
-
-SYM_ENTRY *Parser::Add_Symbol (SYM_TABLE *table, const UTF8String& Name, TokenId Number)
-{
-    SYM_ENTRY *New;
-
-    New = Create_Entry (Name, Number);
-    Add_Entry (table, New);
-
-    return(New);
-}
-
-SYM_ENTRY *Parser::Add_Symbol (int Index, const UTF8String& Name, TokenId Number)
-{
-    SYM_ENTRY *New;
-
-    New = Create_Entry(Name, Number);
-    Add_Entry(Index,New);
-
-    return(New);
-}
-
-
-SYM_ENTRY *Parser::Find_Symbol (const SYM_TABLE *table, const char *Name, int hash)
-{
-    SYM_ENTRY *Entry;
-
-    Entry = table->Table[hash];
-
-    while (Entry)
-    {
-        if (strcmp(Name, Entry->name.c_str()) == 0)
-        {
-            return(Entry);
-        }
-
-        Entry = Entry->next;
-    }
-
-    return(Entry);
-}
-
-SYM_ENTRY *Parser::Find_Symbol (const SYM_TABLE *table, const char *name)
-{
-    return Find_Symbol (table, name, get_hash_value (name));
-}
-
-SYM_ENTRY *Parser::Find_Symbol (int index, const char *name)
-{
-    return Find_Symbol (Tables[index], name, get_hash_value(name));
-}
-
-SYM_ENTRY *Parser::Find_Symbol (const char *name)
-{
-    SYM_ENTRY *entry;
-    int hash = get_hash_value (name);
-    for (int index = Table_Index; index > 0; --index)
-    {
-        entry = Find_Symbol (Tables[index], name, hash);
-        if (entry)
-            return entry;
-    }
-    return nullptr;
-}
-
-
-void Parser::Remove_Symbol (SYM_TABLE *table, const char *Name, bool is_array_elem, void **DataPtr, int ttype)
-{
-    if(is_array_elem == true)
-    {
-        if (DataPtr == nullptr)
-            Error("Invalid array element!");
-
-        if(ttype == FLOAT_FUNCT_TOKEN)
-            ttype = FLOAT_ID_TOKEN;
-        else if(ttype == VECTOR_FUNCT_TOKEN)
-            ttype = VECTOR_ID_TOKEN;
-        else if(ttype == COLOUR_KEY_TOKEN)
-            ttype = COLOUR_ID_TOKEN;
-
-        Destroy_Ident_Data (*DataPtr, ttype);
-        *DataPtr = nullptr;
-    }
-    else
-    {
-        SYM_ENTRY *Entry;
-        SYM_ENTRY **EntryPtr;
-
-        int i = get_hash_value(Name);
-
-        EntryPtr = &(table->Table[i]);
-        Entry    = *EntryPtr;
-
-        while (Entry)
-        {
-            if (strcmp(Name, Entry->name.c_str()) == 0)
-            {
-                *EntryPtr = Entry->next;
-                Destroy_Entry (Entry);
-                return;
-            }
-
-            EntryPtr = &(Entry->next);
-            Entry    = *EntryPtr;
-        }
-
-        Error("Tried to free undefined symbol");
-    }
-}
-
-void Parser::Remove_Symbol (int Index, const char *Name, bool is_array_elem, void **DataPtr, int ttype)
-{
-    return Remove_Symbol (Tables[Index], Name, is_array_elem, DataPtr, ttype);
 }
 
 void Parser::Check_Macro_Vers(void)
@@ -2492,12 +2180,12 @@ Parser::Macro *Parser::Parse_Macro()
 
     EXPECT_ONE
         CASE (IDENTIFIER_TOKEN)
-            Table_Entry = Add_Symbol (SYM_TABLE_GLOBAL, CurrentTokenText(), TEMPORARY_MACRO_ID_TOKEN);
+            Table_Entry = mSymbolStack.GetGlobalTable()->Add_Symbol (CurrentTokenText(), TEMPORARY_MACRO_ID_TOKEN);
         END_CASE
 
         CASE (MACRO_ID_TOKEN)
-            Remove_Symbol(SYM_TABLE_GLOBAL, CurrentTokenText().c_str(), false, nullptr, 0);
-            Table_Entry = Add_Symbol (SYM_TABLE_GLOBAL, CurrentTokenText(), TEMPORARY_MACRO_ID_TOKEN);
+            mSymbolStack.GetGlobalTable()->Remove_Symbol(CurrentTokenText().c_str(), false, nullptr, 0);
+            Table_Entry = mSymbolStack.GetGlobalTable()->Add_Symbol (CurrentTokenText(), TEMPORARY_MACRO_ID_TOKEN);
         END_CASE
 
         OTHERWISE
@@ -2620,7 +2308,7 @@ void Parser::Invoke_Macro()
            or adding entries.  Otherwise recursion won't always work.
          */
 
-        Local_Index = Table_Index;
+        Local_Index = mSymbolStack.GetLocalTableIndex();
 
         bool properlyDelimited; // true if we found the previous parameter properly delimited with a comma
 
@@ -2628,7 +2316,7 @@ void Parser::Invoke_Macro()
         for (i=0; i<PMac->parameters.size(); i++)
         {
             bool finalParameter = (i == PMac->parameters.size()-1);
-            Table_Entries[i] = Create_Entry (PMac->parameters[i].name, IDENTIFIER_TOKEN);
+            Table_Entries[i] = SymbolTable::Create_Entry (PMac->parameters[i].name, IDENTIFIER_TOKEN);
             if (!Parse_RValue(IDENTIFIER_TOKEN, &(Table_Entries[i]->Token_Number), &(Table_Entries[i]->Data), nullptr, true, false, true, true, true, Local_Index))
             {
                 EXPECT_ONE
@@ -2660,7 +2348,7 @@ void Parser::Invoke_Macro()
                     END_CASE
                 END_EXPECT
 
-                Destroy_Entry (Table_Entries[i]);
+                SymbolTable::Destroy_Entry (Table_Entries[i]);
                 Table_Entries[i] = nullptr;
             }
             properlyDelimited = Parse_Comma();
@@ -2675,14 +2363,14 @@ void Parser::Invoke_Macro()
     Cond_Stack.back().PMac               = PMac;
 
     /* Gotta have new symbol table in case #local is used */
-    Add_Sym_Table();
+    mSymbolStack.PushTable();
 
     if (PMac->parameters.size() > 0)
     {
         for (i=0; i<PMac->parameters.size(); i++)
         {
             if (Table_Entries[i] != nullptr)
-                Add_Entry(Table_Index,Table_Entries[i]);
+                mSymbolStack.GetLocalTable()->Add_Entry(Table_Entries[i]);
         }
 
         POV_FREE(Table_Entries);
@@ -2740,7 +2428,7 @@ void Parser::Return_From_Macro()
     }
 
     // Always destroy macro locals
-    Destroy_Table(Table_Index--);
+    mSymbolStack.PopTable();
 
     Cond_Stack.pop_back();
     if (Cond_Stack.empty())
@@ -2846,14 +2534,14 @@ Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
 };
 
 
-Parser::SYM_TABLE *Parser::Parse_Dictionary_Declare()
+SymbolTable* Parser::Parse_Dictionary_Declare()
 {
-    SYM_TABLE *newDictionary;
+    SymbolTable* newDictionary;
     SYM_ENTRY *newEntry;
     bool oldParseRawIdentifiers;
     UTF8String dictIndex;
 
-    newDictionary = Create_Sym_Table();
+    newDictionary = new SymbolTable();
 
     // TODO REVIEW - maybe we need `SetOkToDeclare(false)`?
 
@@ -2868,7 +2556,7 @@ Parser::SYM_TABLE *Parser::Parse_Dictionary_Declare()
             parseRawIdentifiers = oldParseRawIdentifiers;
             if (CurrentTokenId() != IDENTIFIER_TOKEN)
                 Expectation_Error ("dictionary element identifier");
-            newEntry = Add_Symbol (newDictionary, CurrentTokenText(), IDENTIFIER_TOKEN);
+            newEntry = newDictionary->Add_Symbol (CurrentTokenText(), IDENTIFIER_TOKEN);
 
             GET (COLON_TOKEN);
 
@@ -2882,7 +2570,7 @@ Parser::SYM_TABLE *Parser::Parse_Dictionary_Declare()
             UNGET
             Parse_Square_Begin();
             ParseString(dictIndex);
-            newEntry = Add_Symbol (newDictionary, dictIndex, IDENTIFIER_TOKEN);
+            newEntry = newDictionary->Add_Symbol (dictIndex, IDENTIFIER_TOKEN);
             Parse_Square_End();
 
             GET (COLON_TOKEN);
@@ -3004,7 +2692,7 @@ void Parser::Parse_Fopen(void)
     New->busyParsing = true;
 
     GET(IDENTIFIER_TOKEN)
-    Entry = Add_Symbol (SYM_TABLE_GLOBAL, CurrentTokenText(), FILE_ID_TOKEN);
+    Entry = mSymbolStack.GetGlobalTable()->Add_Symbol (CurrentTokenText(), FILE_ID_TOKEN);
     Entry->Data=reinterpret_cast<void *>(New);
 
     asciiFileName = Parse_C_String(true);
@@ -3065,7 +2753,7 @@ void Parser::Parse_Fclose(void)
             Got_EOF=false;
             Data->inTokenizer = nullptr;
             Data->Out_File = nullptr;
-            Remove_Symbol(SYM_TABLE_GLOBAL, CurrentTokenText().c_str(), false, nullptr, 0);
+            mSymbolStack.GetGlobalTable()->Remove_Symbol(CurrentTokenText().c_str(), false, nullptr, 0);
         END_CASE
 
         OTHERWISE
@@ -3106,7 +2794,7 @@ void Parser::Parse_Read()
         CASE (IDENTIFIER_TOKEN)
             if (!End_File)
             {
-                Temp_Entry = Add_Symbol (SYM_TABLE_GLOBAL, CurrentTokenText(), IDENTIFIER_TOKEN);
+                Temp_Entry = mSymbolStack.GetGlobalTable()->Add_Symbol (CurrentTokenText(), IDENTIFIER_TOKEN);
                 End_File = Parse_Read_Value (User_File, CurrentTokenId(), &(Temp_Entry->Token_Number), &(Temp_Entry->Data));
                 mToken.is_array_elem = false;
                 mToken.is_mixed_array_elem = false;
@@ -3170,7 +2858,7 @@ void Parser::Parse_Read()
     {
         Got_EOF=false;
         User_File->inTokenizer = nullptr;
-        Remove_Symbol(SYM_TABLE_GLOBAL, File_Id, false, nullptr, 0);
+        mSymbolStack.GetGlobalTable()->Remove_Symbol(File_Id, false, nullptr, 0);
     }
     POV_FREE(File_Id);
 }
@@ -3514,7 +3202,7 @@ int Parser::Parse_For_Param (UTF8String& identifierName, DBL* EndPtr, DBL* StepP
             POV_PARSER_ASSERT(!mToken.is_array_elem); // Array elements should be tagged as the respective array type
             if (CurrentTokenIsContainerElement())
                 Error("#for loop variable must not be an array or dictionary element");
-            Temp_Entry = Add_Symbol (Table_Index, CurrentTokenText(), IDENTIFIER_TOKEN);
+            Temp_Entry = mSymbolStack.GetLocalTable()->Add_Symbol (CurrentTokenText(), IDENTIFIER_TOKEN);
             mToken.NumberPtr = &(Temp_Entry->Token_Number);
             mToken.DataPtr = &(Temp_Entry->Data);
             Previous = CurrentTokenId();
@@ -3541,17 +3229,21 @@ int Parser::Parse_For_Param (UTF8String& identifierName, DBL* EndPtr, DBL* StepP
         CASE4 (DENSITY_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_MAP_ID_TOKEN, UV_ID_TOKEN)
         CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
         CASE3 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN, DICTIONARY_ID_TOKEN)
+            // A symbol with this name exists (and it is not a function).
             if (CurrentTokenIsContainerElement())
                 Error("#for loop variable must not be an array or dictionary element");
-            if (mToken.context != Table_Index)
+            if (!mSymbolStack.IsLocalTableIndex(mToken.context))
             {
-                Temp_Entry = Add_Symbol (Table_Index, CurrentTokenText(), IDENTIFIER_TOKEN);
+                // A symbol with this name exists, but it is not local.
+                // Create an additional local symbol.
+                Temp_Entry = mSymbolStack.GetLocalTable()->Add_Symbol (CurrentTokenText(), IDENTIFIER_TOKEN);
                 mToken.NumberPtr = &(Temp_Entry->Token_Number);
                 mToken.DataPtr   = &(Temp_Entry->Data);
                 Previous        = IDENTIFIER_TOKEN;
             }
             else
             {
+                // A local symbol with this name exists. Overwrite it.
                 Previous        = CurrentTokenId();
             }
         END_CASE
@@ -3563,21 +3255,25 @@ int Parser::Parse_For_Param (UTF8String& identifierName, DBL* EndPtr, DBL* StepP
         END_CASE
 
         CASE2 (VECTOR_FUNCT_TOKEN, FLOAT_FUNCT_TOKEN)
+            // A symbol with this name exists (and it is a function).
             if (CurrentTokenIsContainerElement())
                 Error("#for loop variable must not be an array or dictionary element");
             switch(CurrentTokenFunctionId())
             {
                 case VECTOR_ID_TOKEN:
                 case FLOAT_ID_TOKEN:
-                    if (mToken.context != Table_Index)
+                    if (!mSymbolStack.IsLocalTableIndex(mToken.context))
                     {
-                        Temp_Entry = Add_Symbol (Table_Index, CurrentTokenText(), IDENTIFIER_TOKEN);
+                        // A symbol with this name exists, but it is not local.
+                        // Create an additional local symbol.
+                        Temp_Entry = mSymbolStack.GetLocalTable()->Add_Symbol (CurrentTokenText(), IDENTIFIER_TOKEN);
                         mToken.NumberPtr = &(Temp_Entry->Token_Number);
                         mToken.DataPtr   = &(Temp_Entry->Data);
                         Previous        = IDENTIFIER_TOKEN;
                     }
                     else
                     {
+                        // A local symbol with this name exists. Overwrite it.
                         Previous        = CurrentTokenFunctionId();
                     }
                     break;
@@ -3653,7 +3349,7 @@ void Parser::IncludeHeader(const UCS2String& formalFileName)
 
     SetInputStream(is);
 
-    Add_Sym_Table();
+    mSymbolStack.PushTable();
 
     InvalidateCurrentToken();
 

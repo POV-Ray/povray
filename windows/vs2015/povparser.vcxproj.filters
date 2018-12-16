@@ -40,6 +40,9 @@
     <ClInclude Include="..\..\source\parser\rawtokenizer.h">
       <Filter>Parser Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\parser\symboltable.h">
+      <Filter>Parser Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\parser\parser.cpp">
@@ -82,6 +85,9 @@
       <Filter>Parser Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\parser\parsertypes.cpp">
+      <Filter>Parser Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\parser\symboltable.cpp">
       <Filter>Parser Source</Filter>
     </ClCompile>
   </ItemGroup>

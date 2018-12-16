@@ -44,6 +44,9 @@
 // Boost header files
 #include <boost/date_time/posix_time/posix_time.hpp>
 
+// POV-Ray header files (base module)
+#include "base/stringutilities.h"
+
 // POV-Ray header files (core module)
 #include "core/scene/scenedata.h"
 
@@ -1014,34 +1017,6 @@ UCS2 *Parser::UCS2_strcat(UCS2 *s1, const UCS2 *s2)
     UCS2_strcpy(&s1[l1], s2);
 
     return s1;
-}
-
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- * CHANGES
- *
-******************************************************************************/
-
-int Parser::UCS2_strlen(const UCS2 *str)
-{
-    int i;
-
-    for(i = 0; *str != 0; str++, i++) { }
-
-    return i;
 }
 
 

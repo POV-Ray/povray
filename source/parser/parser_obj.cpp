@@ -369,7 +369,7 @@ void Parser::Parse_Obj (Mesh* mesh)
                         material.mtlName = wordBuffer;
                         material.texture = nullptr;
                         std::string identifier = materialPrefix + std::string(wordBuffer) + materialSuffix;
-                        SYM_ENTRY *symbol = Find_Symbol (identifier.c_str());
+                        SYM_ENTRY *symbol = mSymbolStack.Find_Symbol (identifier.c_str());
                         if (symbol == nullptr)
                             Error ("No matching texture for obj file material '%s': Identifier '%s' not found.", wordBuffer, identifier.c_str());
                         else if (symbol->Token_Number == TEXTURE_ID_TOKEN)

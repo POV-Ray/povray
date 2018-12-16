@@ -677,7 +677,7 @@ bool Parser::expr_call(ExprNode *&current, int stage, int op)
 
     if (HaveCurrentTokenData())
     {
-        node->call.fn = *CurrentTokenDataPtr<FUNCTION_PTR>();
+        node->call.fn = *CurrentTokenDataPtr<AssignableFunction*>()->fn;
         (void)mpFunctionVM->GetFunctionAndReference(node->call.fn);
     }
     else

@@ -267,6 +267,16 @@ const char *pov_tsprintf(const char *format,...)
 
 //******************************************************************************
 
+std::size_t UCS2_strlen(const UCS2* str)
+{
+    const UCS2* end = str;
+    while (*end != u'\0')
+        ++end;
+    return (end - str);
+}
+
+//******************************************************************************
+
 namespace UCS
 {
 

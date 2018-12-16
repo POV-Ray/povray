@@ -39,6 +39,14 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
 
+// C++ variants of C standard header files
+#include <cstring>
+
+// C++ standard header files
+// Boost header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
 #include "base/types.h"
 
 namespace pov_base
@@ -58,6 +66,8 @@ UCS2String UTF8toUCS2String(const UTF8String& s);
 
 int pov_stricmp(const char *, const char *);
 const char *pov_tsprintf(const char *, ...);
+
+std::size_t UCS2_strlen(const UCS2* str);
 
 //******************************************************************************
 

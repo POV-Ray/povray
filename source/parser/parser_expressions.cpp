@@ -49,6 +49,7 @@
 // POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
 #include "base/mathutil.h"
+#include "base/stringutilities.h"
 
 // POV-Ray header files (core module)
 #include "core/material/blendmap.h"
@@ -434,7 +435,7 @@ bool Parser::Parse_Call()
 
 DBL Parser::Parse_Function_Call()
 {
-    FUNCTION_PTR fp = CurrentTokenDataPtr<FUNCTION_PTR>();
+    FUNCTION_PTR fp = CurrentTokenDataPtr<AssignableFunction*>()->fn;
     if (fp == nullptr)
         // may happen if a #declare or #local inside a function declaration references the function
         Error("Illegal attempt to evaluate a function being currently declared; did you miss a closing brace?");
@@ -503,7 +504,7 @@ DBL Parser::Parse_Function_Call()
 
 void Parser::Parse_Vector_Function_Call(EXPRESS& Express, int *Terms)
 {
-    FUNCTION_PTR fp = CurrentTokenDataPtr<FUNCTION_PTR>();
+    FUNCTION_PTR fp = CurrentTokenDataPtr<AssignableFunction*>()->fn;
     if (fp == nullptr)
         // may happen if a #declare or #local inside a function declaration references the function
         Error("Illegal attempt to evaluate a function being currently declared; did you miss a closing brace?");

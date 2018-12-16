@@ -57,6 +57,7 @@
 #include "parser/fncode.h"
 #include "parser/reservedwords.h"
 #include "parser/rawtokenizer.h"
+#include "parser/symboltable.h"
 
 #include "backend/support/task.h"
 
@@ -84,32 +85,7 @@ namespace pov_parser
 using namespace pov_base;
 using namespace pov;
 
-const int MAX_NUMBER_OF_TABLES = 100;
 const int TOKEN_OVERFLOW_RESET_COUNT = 2500;
-
-const int SYM_TABLE_SIZE = 257;
-
-typedef struct Sym_Table_Entry SYM_ENTRY;
-typedef unsigned short SymTableEntryRefCount;
-
-// Special symbol tables
-enum {
-    SYM_TABLE_GLOBAL = 0,       ///< Identifiers declared using #declare (or #local in top-level file), #function, #macro, etc.
-};
-
-/// Structure holding information about a symbol
-struct Sym_Table_Entry
-{
-    SYM_ENTRY *next;            ///< Reference to next symbol with same hash
-    UTF8String name;            ///< Symbol name
-    char *Deprecation_Message;  ///< Warning to print if the symbol is deprecated
-    void *Data;                 ///< Reference to the symbol value
-    TokenId Token_Number;       ///< Unique ID of this symbol
-    bool deprecated      : 1;
-    bool deprecatedOnce  : 1;
-    bool deprecatedShown : 1;
-    SymTableEntryRefCount ref_count; ///< normally 1, but may be greater when passing symbols out of macros
-};
 
 /*****************************************************************************
 * Global preprocessor defines
@@ -220,10 +196,6 @@ struct BetaFlags
 
 class Parser : public SceneTask
 {
-    private:
-
-        struct SYM_TABLE;
-
     public:
 
         class DebugTextStreamBuffer : public TextStreamBuffer
@@ -254,7 +226,7 @@ class Parser : public SceneTask
             void *Data;                                     ///< reference to token value (if it is a non-float identifier)
             TokenId *NumberPtr;
             void **DataPtr;
-            SYM_TABLE *table;                               ///< table or dictionary the token references an element of
+            SymbolTable* table;                             ///< table or dictionary the token references an element of
             bool Unget_Token            : 1;                ///< `true` if @ref Get_Token() must re-issue this token.
             bool End_Of_File            : 1;
             bool is_array_elem          : 1;                ///< true if token is actually an array element reference
@@ -285,10 +257,11 @@ class Parser : public SceneTask
             bool    optional;
         };
 
-        struct Macro
+        struct Macro : public Assignable
         {
             Macro(const char *);
-            ~Macro();
+            virtual ~Macro();
+            virtual Macro* Clone() const override { POV_PARSER_PANIC(); return nullptr; }
             char *Macro_Name;
             RawTokenizer::ColdBookmark source;
             LexemePosition endPosition; ///< The position _after_ the `#` in the terminating `#end` directive.
@@ -297,7 +270,7 @@ class Parser : public SceneTask
             size_t CacheSize;
         };
 
-        struct POV_ARRAY
+        struct POV_ARRAY : public Assignable
         {
             static const int kMaxDimensions = 5;
             int maxDim;                             ///< Index of highest dimension.
@@ -317,6 +290,10 @@ class Parser : public SceneTask
             void GrowBy(size_t delta);
             void GrowTo(size_t delta);
             void Shrink();
+            POV_ARRAY() = default;
+            POV_ARRAY(const POV_ARRAY& obj);
+            virtual ~POV_ARRAY();
+            virtual POV_ARRAY* Clone() const override;
         };
 
         struct POV_PARAM
@@ -325,7 +302,7 @@ class Parser : public SceneTask
             void **DataPtr;
         };
 
-        struct DATA_FILE
+        struct DATA_FILE : public Assignable
         {
             shared_ptr<RawTokenizer>    inTokenizer;
             RawToken                    inToken;
@@ -352,6 +329,18 @@ class Parser : public SceneTask
             }
 
             DATA_FILE() : inUngetToken(false), busyParsing(false) {}
+            virtual DATA_FILE* Clone() const override { POV_PARSER_PANIC(); return nullptr; }
+        };
+
+        /// @todo Refactor code to use @ref FunctionVM::CustomFunction instead.
+        struct AssignableFunction : public Assignable
+        {
+            FUNCTION_PTR                fn;
+            intrusive_ptr<FunctionVM>   vm;
+            AssignableFunction(const AssignableFunction& obj) : fn(obj.vm->CopyFunction(obj.fn)), vm(obj.vm) {}
+            AssignableFunction(FUNCTION_PTR fn, intrusive_ptr<FunctionVM> vm) : fn(fn), vm(vm) {}
+            virtual ~AssignableFunction() { vm->DestroyFunction(fn); }
+            virtual AssignableFunction* Clone() const override { return new AssignableFunction(*this); }
         };
 
         // constructor
@@ -399,13 +388,11 @@ class Parser : public SceneTask
         void Parse_Default (void);
         void Parse_Declare (bool is_local, bool after_hash);
         void Parse_Matrix (MATRIX Matrix);
-        void Destroy_Ident_Data (void *Data, int Type);
         bool PassParameterByReference (int oldTableIndex);
         bool Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr, SYM_ENTRY *sym, bool ParFlag, bool SemiFlag, bool is_local, bool allow_redefine, bool allowUndefined, int old_table_index);
         const char *Get_Token_String (TokenId Token_Id);
         void Test_Redefine(TokenId Previous, TokenId *NumberPtr, void *Data, bool allow_redefine = true);
         void Expectation_Error(const char *);
-        void *Copy_Identifier(void *Data, int Type);
         TRANSFORM *Parse_Transform(TRANSFORM *Trans = nullptr);
         TRANSFORM *Parse_Transform_Block(TRANSFORM *New = nullptr);
         char *Get_Reserved_Words (const char *additional_words);
@@ -478,15 +465,10 @@ class Parser : public SceneTask
         void Initialize_Tokenizer (void);
         void Terminate_Tokenizer (void);
         void CheckFileSignature();
-        SYM_ENTRY *Add_Symbol (SYM_TABLE *table, const UTF8String& Name, TokenId Number);
-        SYM_ENTRY *Add_Symbol (int Index, const UTF8String& Name, TokenId Number);
         POV_ARRAY *Parse_Array_Declare (void);
-        SYM_TABLE *Parse_Dictionary_Declare();
-        SYM_ENTRY *Create_Entry (const UTF8String& Name, TokenId Number);
-        SYM_ENTRY *Copy_Entry (const SYM_ENTRY *);
+        SymbolTable* Parse_Dictionary_Declare();
         void Acquire_Entry_Reference (SYM_ENTRY *Entry);
-        void Release_Entry_Reference (SYM_TABLE *table, SYM_ENTRY *Entry);
-        SYM_ENTRY *Destroy_Entry (SYM_ENTRY *Entry);
+        void Release_Entry_Reference (SymbolTable* table, SYM_ENTRY *Entry);
         bool Parse_Ifdef_Param ();
         int Parse_For_Param (UTF8String&, DBL*, DBL*);
 
@@ -570,7 +552,6 @@ class Parser : public SceneTask
         char *UCS2_To_String(const UCS2 *str);
 
         static UCS2 *UCS2_strcat(UCS2 *s1, const UCS2 *s2);
-        static int UCS2_strlen(const UCS2 *str);
         static int UCS2_strcmp(const UCS2 *s1, const UCS2 *s2);
         static void UCS2_strcpy(UCS2 *s1, const UCS2 *s2);
         static void UCS2_strncpy(UCS2 *s1, const UCS2 *s2, int n);
@@ -646,14 +627,7 @@ class Parser : public SceneTask
             DECLARING_MACRO_COND    ///< Skipping a `#macro` body during its declaration.
         } COND_TYPE;
 
-        struct SYM_TABLE
-        {
-            SYM_ENTRY *Table[SYM_TABLE_SIZE];
-        };
-
-        SYM_TABLE *Tables[MAX_NUMBER_OF_TABLES];
-
-        int Table_Index;
+        SymbolStack mSymbolStack;
 
         POV_LONG last_progress;
 
@@ -791,29 +765,15 @@ class Parser : public SceneTask
         bool GetRawToken(RawToken& rawToken, bool fastForwardToDirective);
         bool PeekRawToken(RawToken& rawToken);
         void Read_Symbol(const RawToken& rawToken);
-        SYM_ENTRY *Find_Symbol (const SYM_TABLE *table, const char *s, int hash);
-        SYM_ENTRY *Find_Symbol (const SYM_TABLE *table, const char *s);
-        SYM_ENTRY *Find_Symbol (int index, const char *s);
-        SYM_ENTRY *Find_Symbol (const char *s);
         void Skip_Tokens (COND_TYPE cond);
         void Break (void);
 
-        int get_hash_value (const char *s);
-        inline void Write_Token(const RawToken& rawToken, SYM_TABLE *table = nullptr);
-        inline void Write_Token(TokenId Token_Id, const RawToken& rawToken, SYM_TABLE *table = nullptr);
-        void Destroy_Table (int index);
+        inline void Write_Token(const RawToken& rawToken, SymbolTable* table = nullptr);
+        inline void Write_Token(TokenId Token_Id, const RawToken& rawToken, SymbolTable* table = nullptr);
         void init_sym_tables (void);
-        void Add_Sym_Table ();
-        SYM_TABLE *Create_Sym_Table();
-        void Destroy_Sym_Table (SYM_TABLE *);
-        SYM_TABLE *Copy_Sym_Table (const SYM_TABLE *);
-        void Remove_Symbol (SYM_TABLE *table, const char *Name, bool is_array_elem, void **DataPtr, int ttype);
-        void Remove_Symbol (int Index, const char *Name, bool is_array_elem, void **DataPtr, int ttype);
         Macro *Parse_Macro(void);
         void Invoke_Macro(void);
         void Return_From_Macro(void);
-        void Add_Entry (SYM_TABLE *table, SYM_ENTRY *Table_Entry);
-        void Add_Entry (int Index,SYM_ENTRY *Table_Entry);
         void Parse_Initalizer (int Sub, size_t Base, POV_ARRAY *a);
 
         void Parse_Fopen(void);
@@ -922,7 +882,6 @@ class Parser : public SceneTask
 
         // TODO - obsolete
         RGBFTColour *Create_Colour (void);
-        RGBFTColour *Copy_Colour (const RGBFTColour* Old);
 };
 
 }
