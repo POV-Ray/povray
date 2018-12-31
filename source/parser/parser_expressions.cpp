@@ -245,6 +245,8 @@ void Parser::Parse_Trace(Vector3d& Res)
     TraceTicket ticket(1, 0.0);
     Ray ray(ticket);
     Vector3d Local_Normal;
+    Vector3d Local_UV;
+    Vector2d UVVector;
 
     Parse_Paren_Begin();
 
@@ -276,6 +278,10 @@ void Parser::Parse_Trace(Vector3d& Res)
         Res = intersect.IPoint;
 
         intersect.Object->Normal( Local_Normal, &intersect, GetParserDataPtr());
+        intersect.Object->UVCoord( UVVector, &intersect, GetParserDataPtr());
+        Local_UV[X] = UVVector[X];
+        Local_UV[Y] = UVVector[Y];
+        Local_UV[Z] = 0;
 
         if (Test_Flag(intersect.Object,INVERTED_FLAG))
             Local_Normal.invert();
@@ -284,6 +290,7 @@ void Parser::Parse_Trace(Vector3d& Res)
     {
         Res[X]=Res[Y]=Res[Z]=0;
         Local_Normal = Vector3d(0.0, 0.0, 0.0);
+        Local_UV = Vector3d(0.0, 0.0, 0.0);
     }
 
     EXPECT_ONE
@@ -292,6 +299,26 @@ void Parser::Parse_Trace(Vector3d& Res)
             if(Token.Function_Id == VECTOR_ID_TOKEN)
             {
                 (*reinterpret_cast<Vector3d *>(Token.Data)) = Local_Normal;
+                /* 2018-12-31, extension: allow UV vector after normal */
+                if ( Parse_Comma() )
+                {
+                    EXPECT_ONE
+                        CASE (VECTOR_FUNCT_TOKEN)
+                        if(Token.Function_Id == VECTOR_ID_TOKEN)
+                        {
+                            (*reinterpret_cast<Vector3d *>(Token.Data)) = Local_UV;
+                        }
+                        else
+                        {
+                            UNGET
+                        }
+                        END_CASE
+
+                        OTHERWISE
+                            UNGET
+                        END_CASE
+                    END_EXPECT
+                }
             }
             else
             {
@@ -325,7 +352,7 @@ void Parser::Parse_Trace(Vector3d& Res)
 *
 ******************************************************************************/
 
-void Parser::Parse_TraceUVMap(Vector3d& Res)
+void Parser::Parse_TraceUV(Vector3d& Res)
 {
     ObjectPtr Object;
     Intersection intersect;
@@ -1262,8 +1289,8 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     Parse_Trace( Vect );
                     break;
 
-                case TRACEUVMAP_TOKEN:
-                    Parse_TraceUVMap( Vect );
+                case TRACEUV_TOKEN:
+                    Parse_TraceUV( Vect );
                     break;
 
                 case MIN_EXTENT_TOKEN:
