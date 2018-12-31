@@ -196,11 +196,9 @@ TracePixel::TracePixel(shared_ptr<SceneData> sd, const Camera* cam, TraceThreadD
                        CooperateFunctor& cf, MediaFunctor& mf, RadiosityFunctor& af, bool pt) :
                        Trace(sd, td, qf, cf, mf, af),
                        sceneData(sd),
-                       threadData(td),
-                       focalBlurData(nullptr),
+                       TracePixelCameraData(td,pt),
                        maxTraceLevel(mtl),
-                       adcBailout(adcb),
-                       pretrace(pt)
+                       adcBailout(adcb)
 {
     for (unsigned int i = 0; i < 3; ++i)
     {
@@ -223,12 +221,12 @@ TracePixel::~TracePixel()
     }
 }
 
-void TracePixel::SetupCamera(const Camera& cam)
+void TracePixelCameraData::SetupCamera(const Camera& cam)
 {
     bool normalise = false;
     camera = cam;
     useFocalBlur = false;
-    precomputeContainingInteriors = true;
+    //precomputeContainingInteriors = true;
     cameraDirection = camera.Direction;
     cameraRight = camera.Right;
     cameraUp =  camera.Up;
@@ -236,9 +234,18 @@ void TracePixel::SetupCamera(const Camera& cam)
     aspectRatio = 4.0 / 3.0;
     cameraLengthRight = cameraRight.length();
     cameraLengthUp = cameraUp.length();
+    cameraLengthDirection = cameraDirection.length();
 
     switch(camera.Type)
     {
+        case GRID_CAMERA:
+            camera.TracePixels.reserve( camera.GridSize[X]*camera.GridSize[Y] );
+            for(size_t c = 0;c<(camera.GridSize[X]*camera.GridSize[Y]);++c)
+            {
+                camera.TracePixels.push_back(*this);
+                camera.TracePixels[c].SetupCamera( camera.Cameras[c] );
+            }
+            break;
         case CYL_1_CAMERA:
         case CYL_3_CAMERA:
             aspectRatio = cameraLengthUp;
@@ -255,8 +262,31 @@ void TracePixel::SetupCamera(const Camera& cam)
             break;
         case OMNIMAX_CAMERA:
         case FISHEYE_CAMERA:
+        case FISHEYE_ORTHOGRAPHIC_CAMERA:
+        case FISHEYE_EQUISOLIDANGLE_CAMERA:
+        case FISHEYE_STEREOGRAPHIC_CAMERA:
             aspectRatio = cameraLengthRight / cameraLengthUp;
             normalise = true;
+            break;
+        case PROJ_PLATECARREE_CAMERA:
+        case PROJ_MERCATOR_CAMERA:
+        case PROJ_LAMBERT_AZI_CAMERA:
+        case PROJ_VAN_DER_GRINTEN_CAMERA:
+        case PROJ_LAMBERT_CYL_CAMERA:
+        case PROJ_BEHRMANN_CAMERA:
+        case PROJ_CRASTER_CAMERA:
+        case PROJ_EDWARDS_CAMERA:
+        case PROJ_HOBO_DYER_CAMERA:
+        case PROJ_PETERS_CAMERA:
+        case PROJ_GALL_CAMERA:
+        case PROJ_BALTHASART_CAMERA:
+        case PROJ_MOLLWEIDE_CAMERA:
+        case PROJ_AITOFF_CAMERA:
+        case PROJ_ECKERT4_CAMERA:
+        case PROJ_ECKERT6_CAMERA:
+        case PROJ_MILLER_CAMERA:
+            aspectRatio = cameraLengthRight / cameraLengthUp;
+            normalise = false;
             break;
         case USER_DEFINED_CAMERA:
             normalise = true;
@@ -265,11 +295,11 @@ void TracePixel::SetupCamera(const Camera& cam)
                 if (mpCameraLocationFn[i] != nullptr)
                     delete mpCameraLocationFn[i];
                 if (camera.Location_Fn[i] != nullptr)
-                    mpCameraLocationFn[i] = new GenericScalarFunctionInstance(camera.Location_Fn[i], threadData);
+                    mpCameraLocationFn[i] = new GenericScalarFunctionInstance(camera.Location_Fn[i], threadDataC);
                 if (mpCameraDirectionFn[i] != nullptr)
                     delete mpCameraDirectionFn[i];
                 if (camera.Direction_Fn[i] != nullptr)
-                    mpCameraDirectionFn[i] = new GenericScalarFunctionInstance(camera.Direction_Fn[i], threadData);
+                    mpCameraDirectionFn[i] = new GenericScalarFunctionInstance(camera.Direction_Fn[i], threadDataC);
             }
             break;
         default:
@@ -296,7 +326,7 @@ void TracePixel::SetupCamera(const Camera& cam)
     // (Possibly we could store it in the view).
     useFocalBlur = ((camera.Aperture != 0.0) && (camera.Blur_Samples > 0));
     if(useFocalBlur == true)
-        focalBlurData = new FocalBlurData(camera, threadData);
+        focalBlurData = new FocalBlurData(camera, threadDataC);
 }
 
 void TracePixel::operator()(DBL x, DBL y, DBL width, DBL height, RGBTColour& colour)
@@ -310,7 +340,7 @@ void TracePixel::operator()(DBL x, DBL y, DBL width, DBL height, RGBTColour& col
             TraceTicket ticket(maxTraceLevel, adcBailout, sceneData->outputAlpha);
             Ray ray(ticket);
 
-            if (CreateCameraRay(ray, x, y, width, height, rayno) == true)
+            if (CreateCameraRay(ray, x, y, width, height, rayno, *this) == true)
             {
                 MathColour col;
                 ColourChannel transm = 0.0;
@@ -329,21 +359,48 @@ void TracePixel::operator()(DBL x, DBL y, DBL width, DBL height, RGBTColour& col
         TraceRayWithFocalBlur(colour, x, y, width, height);
 }
 
-bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, size_t ray_number)
+bool TracePixelCameraData::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, size_t ray_number, TracePixel& parent)
 {
     DBL x0 = 0.0, y0 = 0.0;
     DBL cx, sx, cy, sy, ty, rad, phi;
     Vector3d V1;
+    Vector3d V2;
     TRANSFORM Trans;
 
     // Set ray flags
-    ray.SetFlags(Ray::PrimaryRay, false, false, false, false, pretrace);
+    ray.SetFlags(Ray::PrimaryRay, false, false, false, false, precomputeContainingInteriors);
 
     // Create primary ray according to the camera used.
     ray.Origin = cameraLocation;
 
     switch(camera.Type)
     {
+        case GRID_CAMERA:
+            {
+                x0 = x / width;//from 0 to 1
+                y0 = y / height;//from 0 to 1
+                unsigned int i,j;
+                i = x0*camera.GridSize[X];
+                i = std::min( camera.GridSize[X]-1, i);// from 0 to X-1
+                j = y0*camera.GridSize[Y];
+                j = std::min( camera.GridSize[Y]-1, j);// from 0 to Y-1
+                x0 *= width;
+                y0 *= height;
+                x0 -= 0.5;
+                y0 += 0.5;
+                x0 *= camera.GridSize[X];
+                y0 *= camera.GridSize[Y];
+                x0 -= i*width;
+                y0 -= j*height;
+                unsigned int w = i+j*camera.GridSize[X];
+                bool r = camera.TracePixels[w].CreateCameraRay(ray, x0, y0, width, height, ray_number, parent);
+                if (r) 
+                {
+                    ray.Direction.normalize();
+                }
+                return r;
+            }
+ 
         // Perspective projection (Pinhole camera; POV standard).
         case PERSPECTIVE_CAMERA:
             // Convert the x coordinate to be a DBL from -0.5 to 0.5.
@@ -359,9 +416,80 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             if(useFocalBlur)
                 JitterCameraRay(ray, x, y, ray_number);
 
-            InitRayContainerState(ray, useFocalBlur);
+            parent.InitRayContainerState(ray, useFocalBlur);
             break;
 
+        // Stereoscopic projection: two perspective cameras, one for left, the other for right
+        case STEREOSCOPIC_CAMERA:
+            // Convert the x coordinate to be a DBL from -0.5 to 0.5, twice.
+            x0 = 2.0 * x / width - 1.0;// first -1.0 to 1.0
+            if (x0 < 0)
+            {// left eye
+                x0 +=0.5;
+                ray.Origin += -camera.Eye_Distance/cameraLengthRight/2.0 *cameraRight;
+                Compute_Axis_Rotation_Transform(&Trans, cameraUp, camera.Parallaxe/cameraLengthUp);
+            }
+            else
+            {// right eye
+                x0 -=0.5;
+                ray.Origin += camera.Eye_Distance/cameraLengthRight/2.0 *cameraRight;
+                Compute_Axis_Rotation_Transform(&Trans, cameraUp, -camera.Parallaxe/cameraLengthUp);
+            }
+            MTransPoint(V1,cameraDirection,&Trans);
+
+            // Convert the y coordinate to be a DBL from -0.5 to 0.5.
+            y0 = ((height - 1) - y) / height - 0.5;
+            // Create primary ray.
+            ray.Direction = V1 + x0/2.0 *cameraRight + y0 *cameraUp;
+
+            // Do focal blurring (by Dan Farmer).
+            if(useFocalBlur)
+            {
+                JitterCameraRay(ray, x, y, ray_number);
+            }
+            parent.InitRayContainerState(ray, useFocalBlur);
+            break;
+        // omni directional stereo camera
+        case OMNI_DIRECTIONAL_STEREO_CAMERA:
+            // convert the x coordinate to be a DBL from -pi to pi
+            x0 = x / width * TWO_M_PI - M_PI ;
+            y0 = y / height;
+            if ( y0 < 0.5 ) //left eye
+            {
+                y0 = M_PI_2 - y0 * TWO_M_PI;
+                V2 = cameraRight * -camera.Eye_Distance/cameraLengthRight/2.0;
+            }
+            else if (y0 > 0.5 ) // right eye
+            {
+                y0 = 3.0 * M_PI_2 - y0 * TWO_M_PI;
+                V2 = cameraRight * camera.Eye_Distance/cameraLengthRight/2.0;
+            }
+            else
+            { // neither eye, ignore
+                return false;
+            }
+            // y0 in pi/2 to -pi/2 range
+
+            // find latitude for y in 3D space
+            Compute_Axis_Rotation_Transform(&Trans, cameraRight, -y0);
+            MTransPoint (V1, cameraDirection, &Trans);
+
+            // Now take V1 and find longitude based on x
+            Compute_Axis_Rotation_Transform(&Trans, cameraUp, x0);
+
+            // Create primary ray.
+            MTransPoint(ray.Direction, V1, &Trans);
+            // rotate head, in horizontal plane
+            MTransPoint(V1, V2, &Trans);
+            ray.Origin += V1;
+
+            // Do focal blurring (by Dan Farmer).
+            if(useFocalBlur)
+            {
+                JitterCameraRay(ray, x, y, ray_number);
+            }
+            parent.InitRayContainerState(ray, useFocalBlur);
+            break;
         // Orthographic projection.
         case ORTHOGRAPHIC_CAMERA:
             // Convert the x coordinate to be a DBL from -0.5 to 0.5.
@@ -378,7 +506,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             if(useFocalBlur)
                 JitterCameraRay(ray, x, y, ray_number);
 
-            InitRayContainerState(ray, true);
+            parent.InitRayContainerState(ray, true);
             break;
 
         // Fisheye camera.
@@ -422,7 +550,147 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             if(useFocalBlur)
                 JitterCameraRay(ray, x, y, ray_number);
 
-            InitRayContainerState(ray, useFocalBlur);
+            parent.InitRayContainerState(ray, useFocalBlur);
+            break;
+
+        // Fisheye camera. equidistant r = F.sin(theta)
+        case FISHEYE_ORTHOGRAPHIC_CAMERA:
+            // Convert the x coordinate to be a DBL from -1.0 to 1.0.
+            x0 = 2.0 * x / width - 1.0;
+
+            // Convert the y coordinate to be a DBL from -1.0 to 1.0.
+            y0 = 2.0 * ((height - 1) - y) / height - 1.0;
+
+            // This code would do what Warp wants
+            x0 *= cameraLengthRight;
+            y0 *= cameraLengthUp;
+
+            rad = sqrt(x0 * x0 + y0 * y0);
+
+            // If the pixel lies outside the unit circle no ray is traced.
+
+            if(rad > 1.0)
+                return false;
+
+            if(rad == 0.0)
+                phi = 0.0;
+            else if(x0 < 0.0)
+                phi = M_PI - asin(y0 / rad);
+            else
+                phi = asin(y0 / rad);
+
+            // Get spherical coordinates.
+            x0 = phi;
+
+            // Set vertical angle to half viewing angle.
+            // from book: r = F.sin(theta) (aka F.sin(y0))
+            // so y0 = asin( rad );
+            // for max 180° angle 
+            y0 = asin(rad) * camera.Angle / 180.0;
+
+            // Create primary ray.
+            cx = cos(x0);  sx = sin(x0);
+            cy = cos(y0);  sy = sin(y0);
+
+            ray.Direction = cx * sy *cameraRight+ sx * sy *cameraUp+ cy *cameraDirection;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            parent.InitRayContainerState(ray, useFocalBlur);
+            break;
+
+        // Fisheye camera, equisolid angle r = F.2.sin(theta/2)
+        case FISHEYE_EQUISOLIDANGLE_CAMERA:
+            // Convert the x coordinate to be a DBL from -1.0 to 1.0.
+            x0 = 2.0 * x / width - 1.0;
+
+            // Convert the y coordinate to be a DBL from -1.0 to 1.0.
+            y0 = 2.0 * ((height - 1) - y) / height - 1.0;
+
+            // This code would do what Warp wants
+            x0 *= cameraLengthRight;
+            y0 *= cameraLengthUp;
+
+            rad = sqrt(x0 * x0 + y0 * y0);
+
+            // If the pixel lies outside the unit circle no ray is traced.
+
+            if(rad > 1.0)
+                return false;
+
+            if(rad == 0.0)
+                phi = 0.0;
+            else if(x0 < 0.0)
+                phi = M_PI - asin(y0 / rad);
+            else
+                phi = asin(y0 / rad);
+
+            // Get spherical coordinates.
+            x0 = phi;
+
+            // from book: r = F.2.sin(theta/2) 
+            // for max 180° angle , just inverse the previous function
+            // but adjust the range 0-1 to 0-sqrt(2) first
+            y0 = 2.0*asin(.5*rad*sqrt(2)) * camera.Angle / 180.0;
+
+            // Create primary ray.
+            cx = cos(x0);  sx = sin(x0);
+            cy = cos(y0);  sy = sin(y0);
+
+            ray.Direction = cx * sy *cameraRight+ sx * sy *cameraUp+ cy *cameraDirection;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            parent.InitRayContainerState(ray, useFocalBlur);
+            break;
+
+        // Fisheye camera. stereographic, r = F.2.tan(theta/2)
+        case FISHEYE_STEREOGRAPHIC_CAMERA:
+            // Convert the x coordinate to be a DBL from -1.0 to 1.0.
+            x0 = 2.0 * x / width - 1.0;
+
+            // Convert the y coordinate to be a DBL from -1.0 to 1.0.
+            y0 = 2.0 * ((height - 1) - y) / height - 1.0;
+
+            // This code would do what Warp wants
+            x0 *= cameraLengthRight;
+            y0 *= cameraLengthUp;
+
+            rad = sqrt(x0 * x0 + y0 * y0);
+
+            // If the pixel lies outside the unit circle no ray is traced.
+
+            if(rad > 1.0)
+                return false;
+
+            if(rad == 0.0)
+                phi = 0.0;
+            else if(x0 < 0.0)
+                phi = M_PI - asin(y0 / rad);
+            else
+                phi = asin(y0 / rad);
+
+            // Get spherical coordinates.
+            x0 = phi;
+
+            // from book: r = F.2.tan(theta/2) 
+            // for max 180° angle , just inverse the previous function
+            // but adjust the range 0-1 to 0-2 first, then simplify 0.5*2*rad to rad
+            // (adjustment due to rad=1 for theta = pi/2, so r = 2Ftan(pi/4) = 2F )
+            y0 = 2.0*atan(rad) * camera.Angle / 180.0;
+
+            // Create primary ray.
+            cx = cos(x0);  sx = sin(x0);
+            cy = cos(y0);  sy = sin(y0);
+
+            ray.Direction = cx * sy *cameraRight+ sx * sy *cameraUp+ cy *cameraDirection;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            parent.InitRayContainerState(ray, useFocalBlur);
             break;
 
         // Omnimax camera.
@@ -478,7 +746,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             if(useFocalBlur)
                 JitterCameraRay(ray, x, y, ray_number);
 
-            InitRayContainerState(ray, useFocalBlur);
+            parent.InitRayContainerState(ray, useFocalBlur);
             break;
 
         // Panoramic camera from Graphic Gems III.
@@ -512,7 +780,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             if(useFocalBlur)
                 JitterCameraRay(ray, x, y, ray_number);
 
-            InitRayContainerState(ray, useFocalBlur);
+            parent.InitRayContainerState(ray, useFocalBlur);
             break;
 
         // Ultra wide angle camera written by Dan Farmer.
@@ -537,7 +805,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             if(useFocalBlur)
                 JitterCameraRay(ray, x, y, ray_number);
 
-            InitRayContainerState(ray, useFocalBlur);
+            parent.InitRayContainerState(ray, useFocalBlur);
             break;
 
         // Cylinder camera 1. Axis in "up" direction
@@ -560,7 +828,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             if(useFocalBlur)
                 JitterCameraRay(ray, x, y, ray_number);
 
-            InitRayContainerState(ray, useFocalBlur);
+            parent.InitRayContainerState(ray, useFocalBlur);
             break;
 
         // Cylinder camera 2. Axis in "right" direction
@@ -582,7 +850,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             if(useFocalBlur)
                 JitterCameraRay(ray, x, y, ray_number);
 
-            InitRayContainerState(ray, useFocalBlur);
+            parent.InitRayContainerState(ray, useFocalBlur);
             break;
 
         // Cylinder camera 3. Axis in "up" direction, orthogonal in "right"
@@ -607,7 +875,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             if(useFocalBlur)
                 JitterCameraRay(ray, x, y, ray_number);
 
-            InitRayContainerState(ray, true);
+            parent.InitRayContainerState(ray, useFocalBlur);
             break;
 
         // Cylinder camera 4. Axis in "right" direction, orthogonal in "up"
@@ -632,7 +900,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             if(useFocalBlur)
                 JitterCameraRay(ray, x, y, ray_number);
 
-            InitRayContainerState(ray, true);
+            parent.InitRayContainerState(ray, useFocalBlur);
             break;
 
         // spherical camera: x is horizontal, y vertical, V_Angle - vertical FOV, H_Angle - horizontal FOV
@@ -660,7 +928,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             if(useFocalBlur)
                 JitterCameraRay(ray, x, y, ray_number);
 
-            InitRayContainerState(ray, useFocalBlur);
+            parent.InitRayContainerState(ray, useFocalBlur);
             break;
 
         case MESH_CAMERA:
@@ -715,7 +983,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
                 }
 
                 // we're done
-                InitRayContainerState(ray, true);
+                parent.InitRayContainerState(ray, true);
             }
             else if (camera.Face_Distribution_Method == 1)
             {
@@ -757,7 +1025,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
                             MTransPoint (ray.Origin, ray.Origin, mesh->Trans);
                             MTransNormal (ray.Direction, ray.Direction, mesh->Trans);
                         }
-                        InitRayContainerState(ray, true);
+                        parent.InitRayContainerState(ray, true);
                         break;
                     }
                 }
@@ -792,7 +1060,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
                     MTransPoint (ray.Origin, ray.Origin, mesh->Trans);
                     MTransNormal (ray.Direction, ray.Direction, mesh->Trans);
                 }
-                InitRayContainerState(ray, true);
+                parent.InitRayContainerState(ray, true);
             }
             else if (camera.Face_Distribution_Method == 3)
             {
@@ -868,7 +1136,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
                     MTransPoint (ray.Origin, ray.Origin, mesh->Trans);
                     MTransNormal (ray.Direction, ray.Direction, mesh->Trans);
                 }
-                InitRayContainerState(ray, true);
+                parent.InitRayContainerState(ray, true);
             }
             break;
 
@@ -898,7 +1166,353 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             if(useFocalBlur)
                 JitterCameraRay(ray, x, y, ray_number);
 
-            InitRayContainerState(ray, true);
+            parent.InitRayContainerState(ray, useFocalBlur);
+            break;
+
+        case PROJ_TETRA_CAMERA:
+            // Convert the x coordinate to be a DBL from 0.0 to 1.0
+            x0 = x / width ;
+
+            // Convert the y coordinate to be a DBL from 0.0 to 1.0
+            y0 = y / height ;
+
+            if (!ProjectionTetraCameraRay(ray,x0,y0))
+                return false;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            parent.InitRayContainerState(ray,useFocalBlur);
+            break;
+
+        case PROJ_CUBE_CAMERA:
+            // Convert the x coordinate to be a DBL from 0.0 to 1.0
+            x0 = x / width ;
+
+            // Convert the y coordinate to be a DBL from 0.0 to 1.0
+            y0 = y / height ;
+
+            if (!ProjectionCubeCameraRay(ray,x0,y0))
+                return false;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            parent.InitRayContainerState(ray,useFocalBlur);
+            break;
+
+        case PROJ_OCTA_CAMERA:
+            // Convert the x coordinate to be a DBL from 0.0 to 1.0
+            x0 = x / width ;
+
+            // Convert the y coordinate to be a DBL from 0.0 to 1.0
+            y0 = y / height ;
+
+            if (!ProjectionOctaCameraRay(ray,x0,y0))
+                return false;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            parent.InitRayContainerState(ray,useFocalBlur);
+            break;
+
+        case PROJ_ICOSA_CAMERA:
+            // Convert the x coordinate to be a DBL from 0.0 to 1.0
+            x0 = x / width ;
+
+            // Convert the y coordinate to be a DBL from 0.0 to 1.0
+            y0 = y / height ;
+
+            if (!ProjectionIcosaCameraRay(ray,x0,y0))
+                return false;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            parent.InitRayContainerState(ray,useFocalBlur);
+            break;
+
+        case PROJ_PLATECARREE_CAMERA:
+            // Convert the x coordinate to be a DBL from 0.0 to 1.0
+            x0 = x / width ;
+
+            // Convert the y coordinate to be a DBL from 0.0 to 1.0
+            y0 = ((height - 1) - y) / height ;
+
+            if (!ProjectionPlateCarreeCameraRay(ray,x0,y0))
+                return false;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            parent.InitRayContainerState(ray,useFocalBlur);
+            break;
+
+        case PROJ_MERCATOR_CAMERA:
+            // Convert the x coordinate to be a DBL from 0.0 to 1.0
+            x0 = x / width ;
+
+            // Convert the y coordinate to be a DBL from 0.0 to 1.0
+            y0 = ((height - 1) - y) / height ;
+
+            if (!ProjectionMercatorCameraRay(ray,x0,y0))
+                return false;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            parent.InitRayContainerState(ray,useFocalBlur);
+            break;
+
+        case PROJ_LAMBERT_AZI_CAMERA:
+            // Convert the x coordinate to be a DBL from -2.0 to 2.0
+            x0 = 4.0*(x / width)-2.0 ;
+
+            // Convert the y coordinate to be a DBL from -2.0 to 2.0
+            y0 = 4.0*(((height - 1) - y) / height) -2.0 ;
+
+            if (!ProjectionLambertAzimuthalCameraRay(ray,x0,y0))
+                return false;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            parent.InitRayContainerState(ray,useFocalBlur);
+            break;
+
+
+        case PROJ_LAMBERT_CYL_CAMERA:
+            cx = 1.0 ; 
+            // Convert the x coordinate to be a DBL from -1.0 to 1.0
+            x0 = 2.0*(x / width)-1.0 ;
+
+            // Convert the y coordinate to be a DBL from -1.0 to 1.0
+            y0 = 2.0*(((height - 1) - y) / height) -1.0 ;
+
+            if (!ProjectionEqualAreaCameraRay(ray,x0,y0,cx))
+                return false;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            parent.InitRayContainerState(ray,useFocalBlur);
+            break;
+
+        case PROJ_BEHRMANN_CAMERA:
+            cx = cos(30.0 * M_PI_180 );
+            // Convert the x coordinate to be a DBL from -1.0 to 1.0
+            x0 = 2.0*(x / width)-1.0 ;
+
+            // Convert the y coordinate to be a DBL from -1.0 to 1.0
+            y0 = 2.0*(((height - 1) - y) / height) -1.0 ;
+
+            if (!ProjectionEqualAreaCameraRay(ray,x0,y0,cx))
+                return false;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            parent.InitRayContainerState(ray,useFocalBlur);
+            break;
+
+        case PROJ_CRASTER_CAMERA: /* 37°04' , 37*60= 2220 */
+            cx = cos(2224.0/60.0 * M_PI_180 );
+            // Convert the x coordinate to be a DBL from -1.0 to 1.0
+            x0 = 2.0*(x / width)-1.0 ;
+
+            // Convert the y coordinate to be a DBL from -1.0 to 1.0
+            y0 = 2.0*(((height - 1) - y) / height) -1.0 ;
+
+            if (!ProjectionEqualAreaCameraRay(ray,x0,y0,cx))
+                return false;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            parent.InitRayContainerState(ray,useFocalBlur);
+            break;
+
+        case PROJ_EDWARDS_CAMERA: /* 37°24' */
+            cx = cos(37.4 * M_PI_180 );
+            // Convert the x coordinate to be a DBL from -1.0 to 1.0
+            x0 = 2.0*(x / width)-1.0 ;
+
+            // Convert the y coordinate to be a DBL from -1.0 to 1.0
+            y0 = 2.0*(((height - 1) - y) / height) -1.0 ;
+
+            if (!ProjectionEqualAreaCameraRay(ray,x0,y0,cx))
+                return false;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            parent.InitRayContainerState(ray,useFocalBlur);
+            break;
+
+        case PROJ_HOBO_DYER_CAMERA: /* 37°30' */
+            cx = cos(37.5 * M_PI_180 );
+            // Convert the x coordinate to be a DBL from -1.0 to 1.0
+            x0 = 2.0*(x / width)-1.0 ;
+
+            // Convert the y coordinate to be a DBL from -1.0 to 1.0
+            y0 = 2.0*(((height - 1) - y) / height) -1.0 ;
+
+            if (!ProjectionEqualAreaCameraRay(ray,x0,y0,cx))
+                return false;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            parent.InitRayContainerState(ray,useFocalBlur);
+            break;
+
+        case PROJ_PETERS_CAMERA:
+            cx = cos(44.138 * M_PI_180 );
+            // Convert the x coordinate to be a DBL from -1.0 to 1.0
+            x0 = 2.0*(x / width)-1.0 ;
+
+            // Convert the y coordinate to be a DBL from -1.0 to 1.0
+            y0 = 2.0*(((height - 1) - y) / height) -1.0 ;
+
+            if (!ProjectionEqualAreaCameraRay(ray,x0,y0,cx))
+                return false;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            parent.InitRayContainerState(ray,useFocalBlur);
+            break;
+
+        case PROJ_GALL_CAMERA:
+            cx = cos(45.0 * M_PI_180 );
+            // Convert the x coordinate to be a DBL from -1.0 to 1.0
+            x0 = 2.0*(x / width)-1.0 ;
+
+            // Convert the y coordinate to be a DBL from -1.0 to 1.0
+            y0 = 2.0*(((height - 1) - y) / height) -1.0 ;
+
+            if (!ProjectionEqualAreaCameraRay(ray,x0,y0,cx))
+                return false;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            parent.InitRayContainerState(ray,useFocalBlur);
+            break;
+
+        case PROJ_BALTHASART_CAMERA:
+            cx = cos(50.0 * M_PI_180 );
+            // Convert the x coordinate to be a DBL from -1.0 to 1.0
+            x0 = 2.0*(x / width)-1.0 ;
+
+            // Convert the y coordinate to be a DBL from -1.0 to 1.0
+            y0 = 2.0*(((height - 1) - y) / height) -1.0 ;
+
+            if (!ProjectionEqualAreaCameraRay(ray,x0,y0,cx))
+                return false;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            parent.InitRayContainerState(ray,useFocalBlur);
+            break;
+
+
+        case PROJ_VAN_DER_GRINTEN_CAMERA:
+            // Convert the x coordinate to be a DBL from -1.0 to 1.0
+            x0 = 2.0*(x / width)-1.0 ;
+
+            // Convert the y coordinate to be a DBL from -1.0 to 1.0
+            y0 = 2.0*(((height - 1) - y) / height) -1.0 ;
+
+            if (!ProjectionVanDerGrintenCameraRay(ray,x0,y0))
+                return false;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            parent.InitRayContainerState(ray,useFocalBlur);
+            break;
+
+        case PROJ_MOLLWEIDE_CAMERA:
+            // Convert the x coordinate to be a DBL from -1.0 to 1.0
+            x0 = 2.0*(x / width)-1.0 ;
+
+            // Convert the y coordinate to be a DBL from -1.0 to 1.0
+            y0 = 2.0*(((height - 1) - y) / height) -1.0 ;
+
+            if (!ProjectionMollweideCameraRay(ray,x0,y0))
+                return false;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            parent.InitRayContainerState(ray,useFocalBlur);
+            break;
+
+        case PROJ_AITOFF_CAMERA:
+            // Convert the x coordinate to be a DBL from -1.0 to 1.0
+            x0 = 2.0*(x / width)-1.0 ;
+
+            // Convert the y coordinate to be a DBL from -1.0 to 1.0
+            y0 = 2.0*(((height - 1) - y) / height) -1.0 ;
+
+            if (!ProjectionAitoffHammerCameraRay(ray,x0,y0))
+                return false;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            parent.InitRayContainerState(ray,useFocalBlur);
+            break;
+
+        case PROJ_ECKERT4_CAMERA:
+            // Convert the x coordinate to be a DBL from -1.0 to 1.0
+            x0 = 2.0*(x / width)-1.0 ;
+
+            // Convert the y coordinate to be a DBL from -1.0 to 1.0
+            y0 = 2.0*(((height - 1) - y) / height) -1.0 ;
+
+            if (!ProjectionEckert4CameraRay(ray,x0,y0))
+                return false;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            parent.InitRayContainerState(ray,useFocalBlur);
+            break;
+
+        case PROJ_ECKERT6_CAMERA:
+            // Convert the x coordinate to be a DBL from -1.0 to 1.0
+            x0 = 2.0*(x / width)-1.0 ;
+
+            // Convert the y coordinate to be a DBL from -1.0 to 1.0
+            y0 = 2.0*(((height - 1) - y) / height) -1.0 ;
+
+            if (!ProjectionEckert6CameraRay(ray,x0,y0))
+                return false;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            parent.InitRayContainerState(ray,useFocalBlur);
+            break;
+
+        case PROJ_MILLER_CAMERA:
+            // Convert the x coordinate to be a DBL from -1.0 to 1.0
+            x0 = 2.0*(x / width)-1.0 ;
+
+            // Convert the y coordinate to be a DBL from -1.0 to 1.0
+            y0 = 2.0*(((height - 1) - y) / height) -1.0 ;
+
+            if (!ProjectionMillerCameraRay(ray,x0,y0))
+                return false;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            parent.InitRayContainerState(ray,useFocalBlur);
             break;
 
         default:
@@ -909,7 +1523,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
     {
         ray.Direction.normalize();
         V1 = Vector3d(x0, y0, 0.0);
-        Perturb_Normal(ray.Direction, camera.Tnormal, V1, nullptr, nullptr, threadData);
+        Perturb_Normal(ray.Direction, camera.Tnormal, V1, nullptr, nullptr, threadDataC);
     }
 
     ray.Direction.normalize();
@@ -928,20 +1542,20 @@ void TracePixel::InitRayContainerState(Ray& ray, bool compute)
         {
             HasInteriorPointObjectCondition precond;
             ContainingInteriorsPointObjectCondition postcond(containingInteriors);
-            BSPInsideCondFunctor ifn(ray.Origin, sceneData->objects, threadData, precond, postcond);
+            BSPInsideCondFunctor ifn(ray.Origin, sceneData->objects, threadDataC, precond, postcond);
 
             mailbox.clear();
             (*sceneData->tree)(ray.Origin, ifn, mailbox);
 
             // test infinite objects
             for(vector<ObjectPtr>::iterator object = sceneData->objects.begin() + sceneData->numberOfFiniteObjects; object != sceneData->objects.end(); object++)
-                if (((*object)->interior != nullptr) && Inside_BBox(ray.Origin, (*object)->BBox) && (*object)->Inside(ray.Origin, threadData))
+                if (((*object)->interior != nullptr) && Inside_BBox(ray.Origin, (*object)->BBox) && (*object)->Inside(ray.Origin, threadDataC))
                     containingInteriors.push_back((*object)->interior.get());
         }
         else if ((sceneData->boundingMethod == 0) || (sceneData->boundingSlabs == nullptr))
         {
             for(vector<ObjectPtr>::iterator object = sceneData->objects.begin(); object != sceneData->objects.end(); object++)
-                if (((*object)->interior != nullptr) && Inside_BBox(ray.Origin, (*object)->BBox) && (*object)->Inside(ray.Origin, threadData))
+                if (((*object)->interior != nullptr) && Inside_BBox(ray.Origin, (*object)->BBox) && (*object)->Inside(ray.Origin, threadDataC))
                     containingInteriors.push_back((*object)->interior.get());
         }
         else
@@ -985,7 +1599,7 @@ void TracePixel::InitRayContainerStateTree(Ray& ray, BBOX_TREE *node)
     {
         /* This is a leaf so test contained object. */
         ObjectPtr object = ObjectPtr(node->Node);
-        if ((object->interior != nullptr) && object->Inside(ray.Origin, threadData))
+        if ((object->interior != nullptr) && object->Inside(ray.Origin, threadDataC))
             containingInteriors.push_back(object->interior.get());
     }
     else
@@ -1051,7 +1665,7 @@ void TracePixel::TraceRayWithFocalBlur(RGBTColour& colour, DBL x, DBL y, DBL wid
             ray.ClearInteriors();
 
             // Create and trace ray.
-            if(CreateCameraRay(ray, x + dx, y + dy, width, height, nr))
+            if(CreateCameraRay(ray, x + dx, y + dy, width, height, nr, *this))
             {
                 // Increase_Counter(stats[Number_Of_Samples]);
 
@@ -1093,7 +1707,7 @@ void TracePixel::TraceRayWithFocalBlur(RGBTColour& colour, DBL x, DBL y, DBL wid
     colour /= (DBL)nr;
 }
 
-void TracePixel::JitterCameraRay(Ray& ray, DBL x, DBL y, size_t ray_number)
+void TracePixelCameraData::JitterCameraRay(Ray& ray, DBL x, DBL y, size_t ray_number)
 {
     DBL xjit, yjit, xlen, ylen, r;
     Vector3d temp_xperp, temp_yperp, deflection;

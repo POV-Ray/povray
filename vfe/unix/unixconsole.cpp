@@ -49,6 +49,8 @@
 #include "disp.h"
 #include "disp_text.h"
 #include "disp_sdl.h"
+#include "disp_sdl2.h"
+#include "disp_x11.h"
 
 // from directory "source"
 #include "backend/povray.h"
@@ -66,7 +68,9 @@ enum DispMode
 {
     DISP_MODE_NONE,
     DISP_MODE_TEXT,
-    DISP_MODE_SDL
+    DISP_MODE_X11,
+    DISP_MODE_SDL,
+    DISP_MODE_SDL2
 };
 
 static DispMode gDisplayMode;
@@ -149,7 +153,32 @@ static vfeDisplay *UnixDisplayCreator (unsigned int width, unsigned int height, 
     UnixDisplay *display = GetRenderWindow () ;
     switch (gDisplayMode)
     {
+#ifndef X_DISPLAY_MISSING
+        case DISP_MODE_X11:
+            if (display != nullptr && display->GetWidth() == width && display->GetHeight() == height)
+            {
+                UnixDisplay *p = new UnixX11Display (width, height, session, false) ;
+                if (p->TakeOver (display))
+                    return p;
+                delete p;
+            }
+            return new UnixX11Display (width, height, session, visible) ;
+            break;
+#ifdef HAVE_LIBSDL2
+        case DISP_MODE_SDL2:
+        case DISP_MODE_SDL:
+            if (display != nullptr && display->GetWidth() == width && display->GetHeight() == height)
+            {
+                UnixDisplay *p = new UnixSDL2Display (width, height, session, false) ;
+                if (p->TakeOver (display))
+                    return p;
+                delete p;
+            }
+            return new UnixSDL2Display (width, height, session, visible) ;
+            break;
+#endif
 #ifdef HAVE_LIBSDL
+        case DISP_MODE_SDL2:
         case DISP_MODE_SDL:
             if (display != nullptr && display->GetWidth() == width && display->GetHeight() == height)
             {
@@ -160,6 +189,7 @@ static vfeDisplay *UnixDisplayCreator (unsigned int width, unsigned int height, 
             }
             return new UnixSDLDisplay (width, height, session, visible) ;
             break;
+#endif
 #endif
         case DISP_MODE_TEXT:
             return new UnixTextDisplay (width, height, session, visible) ;
@@ -202,8 +232,13 @@ static void PrintStatusChanged (vfeSession *session, State force = kUnknown)
             fprintf (stderr, "==== [Parsing...] ==========================================================\n");
             break;
         case kRendering:
-#ifdef HAVE_LIBSDL
-            if ((gDisplay != nullptr) && (gDisplayMode == DISP_MODE_SDL))
+#ifndef X_DISPLAY_MISSING
+            if ((gDisplay != nullptr) && 
+                (
+                 (gDisplayMode == DISP_MODE_X11)
+                || (gDisplayMode == DISP_MODE_SDL)
+                || (gDisplayMode == DISP_MODE_SDL2)
+                ))
             {
                 fprintf (stderr, "==== [Rendering... Press p to pause, q to quit] ============================\n");
             }
@@ -216,8 +251,13 @@ static void PrintStatusChanged (vfeSession *session, State force = kUnknown)
 #endif
             break;
         case kPausedRendering:
-#ifdef HAVE_LIBSDL
-            if ((gDisplay != nullptr) && (gDisplayMode == DISP_MODE_SDL))
+#ifndef X_DISPLAY_MISSING
+            if ((gDisplay != nullptr) && 
+                (
+                 (gDisplayMode == DISP_MODE_X11)
+                || (gDisplayMode == DISP_MODE_SDL)
+                || (gDisplayMode == DISP_MODE_SDL2)
+                ))
             {
                 fprintf (stderr, "==== [Paused... Press p to resume] =========================================\n");
             }
@@ -443,15 +483,16 @@ int main (int argc, char **argv)
         ErrorExit(session);
 
     // display mode registration
-#ifdef HAVE_LIBSDL
-    if (UnixSDLDisplay::Register(session))
-        gDisplayMode = DISP_MODE_SDL;
-    else
+#ifndef X_DISPLAY_MISSING
+    UnixX11Display::Register(session);
+#ifdef HAVE_LIBSDL2
+    UnixSDL2Display::Register(session);
 #endif
-    if (UnixTextDisplay::Register(session))
-        gDisplayMode = DISP_MODE_TEXT;
-    else
-        gDisplayMode = DISP_MODE_NONE;
+#ifdef HAVE_LIBSDL
+    UnixSDLDisplay::Register(session);
+#endif
+#endif
+    UnixTextDisplay::Register(session);
 
     // default number of work threads: number of CPUs or 4
     int nthreads = 1;
@@ -468,6 +509,51 @@ int main (int argc, char **argv)
 
     // process command-line options
     session->GetUnixOptions()->ProcessOptions(&argc, &argv);
+    {
+      /* tricky part, -1 is choose the top available (oh, the personal taste...)
+       * for more direct choice, degrade to DISP_MODE_NODE when not available
+       */
+      string choice = session->GetUnixOptions()->QueryOptionString("display","window");
+#ifndef X_DISPLAY_MISSING
+      if (choice == "x11")
+      {
+          gDisplayMode = DISP_MODE_X11;
+      }
+      else if (choice == "sdl")
+      {
+#ifdef HAVE_LIBSDL2
+          gDisplayMode = DISP_MODE_SDL2;
+#else
+#ifdef HAVE_LIBSDL
+          gDisplayMode = DISP_MODE_SDL;
+#else
+          gDisplayMode = DISP_MODE_TEXT;
+#endif 
+#endif 
+      }
+      else
+#endif
+      if (choice == "text")
+      {
+          gDisplayMode = DISP_MODE_TEXT;
+      }
+      else
+      {
+#ifdef HAVE_LIBSDL2
+          gDisplayMode = DISP_MODE_SDL2;
+#else
+#ifdef HAVE_LIBSDL
+          gDisplayMode = DISP_MODE_SDL;
+#else
+#ifndef X_DISPLAY_MISSING
+          gDisplayMode = DISP_MODE_X11;
+#else
+          gDisplayMode = DISP_MODE_TEXT;
+#endif 
+#endif 
+#endif 
+      }
+    }
     if (session->GetUnixOptions()->isOptionSet("general", "help"))
     {
         session->Shutdown() ;
@@ -527,10 +613,17 @@ int main (int argc, char **argv)
             opts.AddCommand (*argv);
     }
 
+    // display all queued messages in console queue, allow to keep future error message at the end of the flow
+    // otherwise the error get displayed before the copyright and in verbose mode the scroll
+    // is big enough to loose the interesting part (and nobody looks back that much for error reports)
+    PrintStatus(session);
     // set all options and start rendering
     if (session->SetOptions(opts) != vfeNoError)
     {
-        fprintf(stderr,"\nProblem with option setting\n");
+        // display error line and other details
+        PrintStatus(session);
+        // the last line of PrintStatus might ends with \r, so print an extra \n to have a clear empty line
+        fprintf(stderr,"\n\nProblem with option setting\n");
         for(int loony=0;loony<argc_copy;loony++)
         {
             fprintf(stderr,"%s%c",argv_copy[loony],loony+1<argc_copy?' ':'\n');

@@ -67,6 +67,7 @@ namespace vfePlatform
         UnixOptionsProcessor::Option_Info("general", "version", "off", false, "--version|-version|--V", "", "display program version"),
         UnixOptionsProcessor::Option_Info("general", "generation", "off", false, "--generation", "", "display program generation (short version number)"),
         UnixOptionsProcessor::Option_Info("general", "benchmark", "off", false, "--benchmark|-benchmark", "", "run the standard POV-Ray benchmark"),
+        UnixOptionsProcessor::Option_Info("display", "window", "", true, "--preview|-y", "POV_PREVIEW", "choice of handler for preview (x11, sdl, text)"),
         UnixOptionsProcessor::Option_Info("", "", "", false, "", "", "") // has to be last
     };
 
@@ -170,8 +171,8 @@ namespace vfePlatform
     {
         // TODO -- GNU/Linux customs would be to print to stdout (among other differences).
 
-        cerr << endl;
-        cerr << "Platform specific command line options:" << endl;
+        std::cout << endl;
+        std::cout << "Platform specific command line options:" << endl;
 
         string section("");
         bool section_new = false;
@@ -187,14 +188,33 @@ namespace vfePlatform
             {
                 if (section_new)
                 {
-                    cerr << endl;
-                    cerr << "  '" << section << "' options:" << endl << endl;
+                    std::cout << endl;
+                    std::cout << "  '" << section << "' options:" << endl << endl;
                     section_new = false;
                 }
-                cerr << "    " << boost::format("%1% %|32t|%2%") % (*iter).CmdOption % (*iter).Comment << endl;
+                std::cout << "    " << boost::format("%1% %|32t|%2%") % (*iter).CmdOption % (*iter).Comment << endl;
+                if (!((*iter).EnvVariable.empty()))
+                {
+                std::cout << "      also via $" << (*iter).EnvVariable << endl;
+                }
+                std::cout << "    " << boost::format(" %|32t|(%1%=%2%)") % (*iter).Name % iter->Value << endl;
+            }
+            else
+            {
+                if (section_new)
+                {
+                    std::cout << endl;
+                    std::cout << "  '" << section << "' options:" << endl << endl;
+                    section_new = false;
+                }
+                if (!((*iter).EnvVariable.empty()))
+                {
+                std::cout << "    $" << boost::format("%1% %|31t|%2%") % (*iter).EnvVariable % (*iter).Comment << endl;
+                std::cout << "    " << boost::format(" %|32t|(%1%=%2%)") % (*iter).Name % iter->Value << endl;
+                }
             }
         }
-        cerr << endl;
+        std::cout << endl;
     }
 
     void UnixOptionsProcessor::Register(const Option_Info options[])

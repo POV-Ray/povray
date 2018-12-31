@@ -40,6 +40,8 @@
 #include "core/configcore.h"
 
 #include "core/scene/object.h"
+#include "core/shape/uvmeshable.h"
+
 
 namespace pov
 {
@@ -62,14 +64,15 @@ namespace pov
 ///
 //******************************************************************************
 
-class Disc : public ObjectBase
+class Disc : public ObjectBase, public UVMeshable
 {
     public:
         Vector3d center;  ///< Center of the disc.
         Vector3d normal;  ///< Direction perpendicular to the disc (plane normal).
         DBL d;            ///< The constant part of the plane equation.
-        DBL iradius2;     ///< Distance from center to inner circle of the disc.
-        DBL oradius2;     ///< Distance from center to outer circle of the disc.
+        DBL iradius2;     ///< squared Distance from center to inner circle of the disc.
+        DBL oradius2;     ///< squared Distance from center to outer circle of the disc.
+        Vector3d uref;    ///< direction for the origin of u in uvmapping
 
         Disc();
         virtual ~Disc();
@@ -79,10 +82,7 @@ class Disc : public ObjectBase
         virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
         virtual bool Inside(const Vector3d&, TraceThreadData *) const;
         virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
-        // NOTE: UV mapping of this primitive should not be implemented without also amending
-        // the primary parameterization so that users have full control over the primitive's
-        // orientation, rather than just the normal vector.
-        // virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
+        virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
         virtual void Translate(const Vector3d&, const TRANSFORM *);
         virtual void Rotate(const Vector3d&, const TRANSFORM *);
         virtual void Scale(const Vector3d&, const TRANSFORM *);
@@ -90,8 +90,14 @@ class Disc : public ObjectBase
         virtual void Compute_BBox();
 
         void Compute_Disc();
+
+        virtual void evalVertex( Vector3d& r, const DBL u, const DBL v )const;
+        virtual void evalNormal( Vector3d& r, const DBL u, const DBL v )const;
+        virtual void minUV( Vector2d& r )const;
+        virtual void maxUV( Vector2d& r )const;
+
     protected:
-        bool Intersect(const BasicRay& ray, DBL *Depth) const;
+        bool Intersect(const BasicRay& ray, DBL *Depth, DBL&u, DBL&v) const;
 };
 
 /// @}

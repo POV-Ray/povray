@@ -40,6 +40,7 @@
 #include "core/material/pigment.h"
 #include "core/math/matrix.h"
 #include "core/scene/object.h"
+#include "core/render/tracepixel.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -244,6 +245,8 @@ void Camera::Init()
     Tnormal = nullptr;
 
     Bokeh = nullptr; // no user-defined bokeh by default
+    Eye_Distance = 0;
+    Parallaxe = 0;
 
     Trans = Create_Transform();
 
@@ -251,6 +254,8 @@ void Camera::Init()
     Face_Distribution_Method = 0;
     Smooth = false;
     Max_Ray_Distance = 0.0;
+    GridSize[X] = 0;
+    GridSize[Y] = 0;
 
     for (unsigned int i = 0; i < 3; ++i)
     {
@@ -349,6 +354,13 @@ Camera& Camera::operator=(const Camera& src)
     if (Bokeh != nullptr)
         Destroy_Pigment(Bokeh);
     Bokeh = (src.Bokeh ? Copy_Pigment(src.Bokeh) : nullptr);
+
+    Eye_Distance = src.Eye_Distance;
+    Parallaxe = src.Parallaxe; 
+    GridSize[X] = src.GridSize[X];
+    GridSize[Y] = src.GridSize[Y];
+    Cameras = src.Cameras;
+
 
     for (std::vector<ObjectPtr>::iterator it = Meshes.begin(); it != Meshes.end(); it++)
         Destroy_Object(*it);

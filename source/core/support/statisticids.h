@@ -79,6 +79,7 @@ enum
     kPOVList_Stat_MeshTest,
     kPOVList_Stat_PlaneTest,
     kPOVList_Stat_PolygonTest,
+    kPOVList_Stat_PolylineTest,
     kPOVList_Stat_PrismTest,
     kPOVList_Stat_PrismBdTest,
     kPOVList_Stat_ParametricTest,
@@ -102,6 +103,7 @@ enum
     kPOVList_Stat_RBezierTest,
     kPOVList_Stat_OvusTest,
     kPOVList_Stat_LemonTest,
+    kPOVList_Stat_RationalTest,
     kPOVList_Stat_Last
 };
 
@@ -174,6 +176,8 @@ typedef enum INTSTATS
     Ray_Plane_Tests_Succeeded,
     Ray_Polygon_Tests,
     Ray_Polygon_Tests_Succeeded,
+    Ray_Polyline_Tests,
+    Ray_Polyline_Tests_Succeeded,
     Ray_Prism_Tests,
     Ray_Prism_Tests_Succeeded,
     Prism_Bound_Tests,
@@ -186,6 +190,8 @@ typedef enum INTSTATS
     Ray_Quadric_Tests_Succeeded,
     Ray_Poly_Tests,
     Ray_Poly_Tests_Succeeded,
+    Ray_Rational_Bezier_Patch_Tests,
+    Ray_Rational_Bezier_Patch_Tests_Succeeded,
     Ray_Sphere_Tests,
     Ray_Sphere_Tests_Succeeded,
     Ray_Sphere_Sweep_Tests,

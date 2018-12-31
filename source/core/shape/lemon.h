@@ -43,6 +43,7 @@
 
 #include "core/coretypes.h"
 #include "core/scene/object.h"
+#include "core/shape/uvmeshable.h"
 
 namespace pov
 {
@@ -65,7 +66,7 @@ namespace pov
 ///
 //******************************************************************************
 
-class Lemon : public ObjectBase
+class Lemon : public ObjectBase, public UVMeshable
 {
     private:
         struct LEMON_INT
@@ -82,13 +83,7 @@ class Lemon : public ObjectBase
         virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
         virtual bool Inside(const Vector3d&, TraceThreadData *) const;
         virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
-#ifdef POV_ENABLE_LEMON_UV
-        /// @attention
-        ///     UV mapping of this primitive should not be enabled until the primary
-        ///     parameterization has been amended so that users have full control over the
-        ///     primitive's  orientation, rather than just the axis of rotational symmetry.
         virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
-#endif // POV_ENABLE_LEMON_UV
         virtual void Translate(const Vector3d&, const TRANSFORM *);
         virtual void Rotate(const Vector3d&, const TRANSFORM *);
         virtual void Scale(const Vector3d&, const TRANSFORM *);
@@ -104,11 +99,16 @@ class Lemon : public ObjectBase
         DBL inner_radius;       /* Radius of the inner circle */
         DBL HorizontalPosition; /* horizontal position of the center of the inner circle */
         DBL VerticalPosition;   /* vertical position of the center of the inner circle */
+        Vector3d uref; ///< direction for origin of u in uv_mapping
+
+
+        virtual void evalVertex( Vector3d& r, const DBL u, const DBL v )const;
+        virtual void evalNormal( Vector3d& r, const DBL u, const DBL v )const;
+        virtual void minUV( Vector2d& r )const;
+        virtual void maxUV( Vector2d& r )const;
     protected:
         int Intersect(const Vector3d& P, const Vector3d& D, LEMON_INT *Intersection, TraceThreadData *Thread) const;
-#ifdef POV_ENABLE_LEMON_UV
         void CalcUV(const Vector3d& IPoint, Vector2d& Result) const;
-#endif // POV_ENABLE_LEMON_UV
 };
 
 /// @}

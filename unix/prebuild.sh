@@ -432,6 +432,8 @@ bin_PROGRAMS = povray
 povray_SOURCES = \\
   disp.h \\
   disp_sdl.cpp disp_sdl.h \\
+  disp_sdl2.cpp disp_sdl2.h \\
+  disp_x11.cpp disp_x11.h \\
   disp_text.cpp disp_text.h
 
 cppflags_platformcpu =

@@ -1130,4 +1130,39 @@ void Torus::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
     Result[V] = v;
 }
 
+// UVMeshable part
+
+void Torus::evalVertex( Vector3d& r, const DBL u, const DBL v )const
+{
+  DBL lat = -TWO_M_PI*(0.5-v);
+  DBL lon = TWO_M_PI*(0.5-u);
+  r = Vector3d( (MajorRadius+MinorRadius * cos( lat ))*cos( lon ), MinorRadius * sin( lat ) , (MajorRadius+MinorRadius * cos( lat ))*sin( lon ) );
+  if (Trans)
+  {
+    MTransPoint( r, r, Trans );
+  }
+}
+void Torus::evalNormal( Vector3d& r, const DBL u, const DBL v )const
+{
+  DBL lat = -TWO_M_PI*(0.5-v);
+  DBL lon = TWO_M_PI*(0.5-u);
+  r = Vector3d( (MajorRadius+MinorRadius * cos( lat ))*cos( lon ), MinorRadius * sin( lat ) , (MajorRadius+MinorRadius * cos( lat ))*sin( lon ) );
+  Vector3d m( MajorRadius*cos( lon ), 0 , MajorRadius*sin( lon ) );
+  r -= m;
+  if (Trans)
+  {
+    MTransNormal( r, r, Trans );
+  }
+  r.normalize();
+}
+void Torus::minUV( Vector2d& r )const
+{
+  r[U] = 0.0;
+  r[V] = 0.0;
+}
+void Torus::maxUV( Vector2d& r )const
+{
+  r[U] = 1.0;
+  r[V] = 1.0;
+}
 }

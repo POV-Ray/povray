@@ -65,10 +65,36 @@ struct SplineEntry
 {
     DBL par;      // Parameter
     EXPRESS vec;  // Value at the parameter
+};
+struct SplineCoeff
+{
     DBL coeff[5]; // Interpolating coefficients at the parameter
 };
 
+struct SplineCoeffFour
+{
+    DBL coeff[5][4]; // Interpolating coefficients at the parameter
+};
+
+struct SplineTcbParam
+{
+  DBL tension;
+  DBL bias;
+  DBL continuity;
+  SplineTcbParam():tension(0.0),bias(0.0), continuity(0.0){}
+};
+
+struct SplineFreedom
+{
+  DBL freedom_degree;
+  SplineFreedom():freedom_degree(0.0){}
+};
+
 typedef vector<SplineEntry> SplineEntryList;
+typedef vector<SplineCoeff> SplineCoeffList;
+typedef vector<SplineCoeffFour> SplineCoeffFourList;
+typedef vector<SplineTcbParam> SplineTcbParamList;
+typedef vector<SplineFreedom> SplineFreedomList;
 
 typedef int SplineRefCount;
 
@@ -86,6 +112,15 @@ struct GenericSpline
     virtual GenericSpline* Clone() const = 0;
     void AcquireReference();
     void ReleaseReference();
+    // indicate to the parser which additional parameters to collect
+    enum class Extension
+    {
+      None,
+      TCB,
+      GlobalFreedom,
+      Freedom
+    };
+    virtual Extension Extended()const{ return Extension::None;}
 };
 
 struct LinearSpline : public GenericSpline
@@ -110,6 +145,9 @@ struct NaturalSpline : public GenericSpline
     NaturalSpline(const GenericSpline& o);
     virtual void Get(DBL p, EXPRESS& v);
     virtual GenericSpline* Clone() const { return new NaturalSpline(*this); }
+private:
+    SplineCoeffList SplinePreComputed;
+    void Precompute();
 };
 
 struct CatmullRomSpline : public GenericSpline
@@ -120,7 +158,90 @@ struct CatmullRomSpline : public GenericSpline
     virtual GenericSpline* Clone() const { return new CatmullRomSpline(*this); }
 };
 
+struct SorSpline: public GenericSpline
+{
+    SorSpline();
+    SorSpline(const GenericSpline& o);
+    virtual void Get(DBL p, EXPRESS& v);
+    virtual GenericSpline* Clone() const { return new SorSpline(*this); }
+private:
+    SplineCoeffFourList SplinePreComputed;
+    void Precompute();
+    DBL interpolate(int i, int k, DBL p)const;
+};
 
+struct AkimaSpline: public GenericSpline
+{
+    AkimaSpline();
+    AkimaSpline(const GenericSpline& o);
+    virtual void Get(DBL p, EXPRESS& v);
+    virtual GenericSpline* Clone() const { return new AkimaSpline(*this); }
+private:
+    SplineCoeffFourList SplinePreComputed;
+    void Precompute();
+    DBL interpolate(int i, int k, DBL p)const;
+};
+
+struct TcbSpline: public GenericSpline
+{
+    TcbSpline();
+    TcbSpline(const GenericSpline& o);
+    virtual void Get(DBL p, EXPRESS& v);
+    virtual GenericSpline* Clone() const { return new TcbSpline(*this); }
+    SplineTcbParamList in,out;
+    virtual Extension Extended()const{ return Extension::TCB;}
+private:
+    SplineCoeffList SplinePreComputedIn;
+    SplineCoeffList SplinePreComputedOut;
+    void Precompute();
+    DBL interpolate(int i, int k, DBL p)const;
+};
+
+/* abstract common class for ExtendedXSpline and GeneralXSpline */
+struct XSpline: public GenericSpline
+{
+    XSpline();
+    XSpline( const GenericSpline& o );
+    virtual void Get(DBL p, EXPRESS& v);
+    virtual GenericSpline* Clone() const =0;
+    SplineFreedomList node;
+    virtual Extension Extended()const{ return Extension::Freedom;}
+protected:
+    virtual DBL interpolate(int i, int k, DBL p, int N)const=0;
+};
+
+struct BasicXSpline: public GenericSpline
+{
+    BasicXSpline();
+    BasicXSpline( const GenericSpline& o );
+    virtual void Get(DBL p, EXPRESS& v);
+    virtual GenericSpline* Clone() const { return new BasicXSpline(*this); }
+    SplineFreedom freedom;
+    virtual Extension Extended()const{ return Extension::GlobalFreedom;}
+private:
+    DBL interpolate( int i, int k, DBL p, DBL fd)const;
+
+};
+
+struct ExtendedXSpline: public XSpline
+{
+    ExtendedXSpline();
+    ExtendedXSpline( const GenericSpline& o );
+    virtual GenericSpline* Clone() const { return new ExtendedXSpline(*this); }
+protected:
+    virtual DBL interpolate(int i, int k, DBL p, int N)const;
+};
+
+
+struct GeneralXSpline: public XSpline
+{
+    GeneralXSpline();
+    GeneralXSpline( const GenericSpline& o );
+    virtual GenericSpline* Clone() const { return new GeneralXSpline(*this); }
+protected:
+    virtual DBL interpolate(int i, int k, DBL p, int N)const;
+
+};
 // TODO FIXME - Some of the following are higher-level functions and should be moved to the parser, others should be made part of the class.
 
 GenericSpline* Copy_Spline(const GenericSpline* Old);
@@ -128,6 +249,8 @@ void Acquire_Spline_Reference(GenericSpline* sp);
 void Release_Spline_Reference(GenericSpline* sp);
 void Destroy_Spline(GenericSpline* sp);
 void Insert_Spline_Entry(GenericSpline* sp, DBL p, const EXPRESS& v);
+void Insert_Spline_Entry(GenericSpline* sp, DBL p, const EXPRESS& v, const SplineTcbParam& in, const SplineTcbParam& out);
+void Insert_Spline_Entry(GenericSpline* sp, DBL p, const EXPRESS& v, const SplineFreedom& freedom );
 DBL Get_Spline_Val(GenericSpline* sp, DBL p, EXPRESS& v, int *Terms);
 
 /// @}

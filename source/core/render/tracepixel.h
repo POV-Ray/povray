@@ -67,49 +67,35 @@ struct ContainingInteriorsPointObjectCondition : public PointObjectCondition
     RayInteriorVector &containingInteriors;
 };
 
-class TracePixel : public Trace
+class TracePixel;
+class TracePixelCameraData
 {
     public:
-        TracePixel(shared_ptr<SceneData> sd, const Camera* cam, TraceThreadData *td, unsigned int mtl, DBL adcb, const QualityFlags& qf,
-                   CooperateFunctor& cf, MediaFunctor& mf, RadiosityFunctor& af, bool pt = false);
-        virtual ~TracePixel();
-        void SetupCamera(const Camera& cam);
-
-        /// Trace a pixel or sub-pixel.
-        /// @param[in]  x       X-coordinate of the (sub-)pixel's center, typically ranging from 0.5 (left) to width-0.5 (right).
-        /// @param[in]  y       Y-coordinate of the (sub-)pixel's center, typically ranging from 0.5 (top) to height-0.5 (bottom).
-        /// @param[in]  width   Horizontal size of the image in pixels.
-        /// @param[in]  height  Vertical size of the image in pixels.
-        /// @param[out] colour  Computed colour of the (sub-)pixel.
-        void operator()(DBL x, DBL y, DBL width, DBL height, RGBTColour& colour);
-    private:
+        TracePixelCameraData(TraceThreadData *td, bool pt):focalBlurData(nullptr),threadDataC(td),precomputeContainingInteriors(pt){}
         // Focal blur data
         class FocalBlurData
         {
-        public:
-            FocalBlurData(const Camera& camera, TraceThreadData* threadData);
-            ~FocalBlurData();
+            public:
+                FocalBlurData(const Camera& camera, TraceThreadData* threadData);
+                ~FocalBlurData();
 
-            // Direction to focal plane.
-            DBL Focal_Distance;
-            // Array of threshold for confidence test.
-            DBL *Sample_Threshold;
-            // Array giving number of samples to take before next confidence test.
-            const int *Current_Number_Of_Samples;
-            // Array of sample locations.
-            Vector2d *Sample_Grid;
-            // Maximum amount of jitter to use.
-            DBL Max_Jitter;
-            // Vectors in the viewing plane.
-            Vector3d XPerp, YPerp;
+                // Direction to focal plane. 
+                DBL Focal_Distance;
+                // Array of threshold for confidence test. 
+                DBL *Sample_Threshold;
+                // Array giving number of samples to take before next confidence test. 
+                const int *Current_Number_Of_Samples;
+                // Array of sample locations. 
+                Vector2d *Sample_Grid;
+                // Maximum amount of jitter to use. 
+                DBL Max_Jitter;
+                // Vectors in the viewing plane. 
+                Vector3d XPerp, YPerp;
 
         };
 
         bool useFocalBlur;
         FocalBlurData *focalBlurData;
-
-        bool precomputeContainingInteriors;
-        RayInteriorVector containingInteriors;
 
         Vector3d cameraDirection;
         Vector3d cameraRight;
@@ -119,33 +105,85 @@ class TracePixel : public Trace
         DBL cameraLengthRight;
         /// length of current camera's 'up' vector prior to normalisation
         DBL cameraLengthUp;
+        /// length of current camera's 'direction' vector prior to normalisation
+        DBL cameraLengthDirection;
         /// aspect ratio for current camera
         DBL aspectRatio;
+        /// thread data
+        TraceThreadData *threadDataC;
         /// camera
         Camera camera;
+        /// whether this is just a pretrace, allowing some computations to be skipped
+        bool precomputeContainingInteriors;
+        /// Thread-local instances of user-defined camera functions
+        GenericScalarFunctionInstancePtr mpCameraLocationFn[3];
+        GenericScalarFunctionInstancePtr mpCameraDirectionFn[3];
+        void SetupCamera(const Camera& cam);
+        bool CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, size_t ray_number, TracePixel& p);
+        void JitterCameraRay(Ray& ray, DBL x, DBL y, size_t ray_number);
+
+        // Additional map projection camera in tracepixel_*.cpp
+        bool ProjectionTetraCameraRay(Ray& ray, DBL x,DBL y);
+        bool ProjectionCubeCameraRay(Ray& ray, DBL x,DBL y);
+        bool ProjectionOctaCameraRay(Ray& ray, DBL x,DBL y);
+        bool ProjectionIcosaCameraRay(Ray& ray, DBL x,DBL y);
+        bool ProjectionMercatorCameraRay(Ray& ray, DBL x,DBL y);
+        bool ProjectionPlateCarreeCameraRay(Ray& ray, DBL x,DBL y);
+        bool ProjectionLambertAzimuthalCameraRay(Ray& ray, DBL x,DBL y);
+
+        bool ProjectionEqualAreaCameraRay(Ray& ray, DBL x,DBL y, DBL cos_t);
+
+        bool ProjectionMollweideCameraRay(Ray& ray, DBL x,DBL y);
+        bool ProjectionAitoffHammerCameraRay(Ray& ray, DBL x,DBL y);
+        bool ProjectionVanDerGrintenCameraRay(Ray& ray, DBL x,DBL y);
+        bool ProjectionEckert4CameraRay(Ray& ray, DBL x,DBL y);
+        bool ProjectionEckert6CameraRay(Ray& ray, DBL x,DBL y);
+        bool ProjectionMillerCameraRay(Ray& ray, DBL x,DBL y);
+        void weight_in_triangle(Ray& ray, const DBL x,const DBL y,
+                const Vector2d a,
+                const Vector2d b,
+                const Vector2d c,
+                const Vector2d na,
+                const Vector2d nb,
+                const Vector2d nc);
+        void weight_in_rectriangle(Ray& ray, const DBL x,const DBL y,
+                const Vector2d a,
+                const Vector2d b,
+                const Vector2d c,
+                const Vector2d na,
+                const Vector2d nb,
+                const Vector2d nc);
+};
+
+class TracePixel : public Trace,
+                   public TracePixelCameraData
+{
+    public:
+        TracePixel(shared_ptr<SceneData> sd, const Camera* cam, TraceThreadData *td, unsigned int mtl, DBL adcb, const QualityFlags& qf,
+                   CooperateFunctor& cf, MediaFunctor& mf, RadiosityFunctor& af, bool pt = false);
+        virtual ~TracePixel();
+
+        /// Trace a pixel or sub-pixel.
+        /// @param[in]  x       X-coordinate of the (sub-)pixel's center, typically ranging from 0.5 (left) to width-0.5 (right).
+        /// @param[in]  y       Y-coordinate of the (sub-)pixel's center, typically ranging from 0.5 (top) to height-0.5 (bottom).
+        /// @param[in]  width   Horizontal size of the image in pixels.
+        /// @param[in]  height  Vertical size of the image in pixels.
+        /// @param[out] colour  Computed colour of the (sub-)pixel.
+        void operator()(DBL x, DBL y, DBL width, DBL height, RGBTColour& colour);
+        void InitRayContainerState(Ray& ray, bool compute = false);
+    private:
+        RayInteriorVector containingInteriors;
         /// scene data
         shared_ptr<SceneData> sceneData;
-        /// thread data
-        TraceThreadData *threadData;
-
         /// maximum trace recursion level allowed
         unsigned int maxTraceLevel;
         /// adc bailout
         DBL adcBailout;
-        /// whether this is just a pretrace, allowing some computations to be skipped
-        bool pretrace;
 
-        /// Thread-local instances of user-defined camera functions
-        GenericScalarFunctionInstancePtr mpCameraLocationFn[3];
-        GenericScalarFunctionInstancePtr mpCameraDirectionFn[3];
 
-        bool CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, size_t ray_number);
-
-        void InitRayContainerState(Ray& ray, bool compute = false);
         void InitRayContainerStateTree(Ray& ray, BBOX_TREE *node);
 
         void TraceRayWithFocalBlur(RGBTColour& colour, DBL x, DBL y, DBL width, DBL height);
-        void JitterCameraRay(Ray& ray, DBL x, DBL y, size_t ray_number);
 };
 
 /// @}

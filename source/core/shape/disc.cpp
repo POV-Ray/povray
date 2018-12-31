@@ -80,20 +80,21 @@ const DBL DEPTH_TOLERANCE = 1.0e-6;
 bool Disc::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
     int Intersection_Found;
+    Vector2d uv;
     DBL Depth;
     Vector3d IPoint;
 
     Intersection_Found = false;
 
     Thread->Stats()[Ray_Disc_Tests]++;
-    if (Intersect(ray, &Depth))
+    if (Intersect(ray, &Depth, uv[0], uv[1]))
     {
         Thread->Stats()[Ray_Disc_Tests_Succeeded]++;
         IPoint = ray.Evaluate(Depth);
 
         if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
         {
-            Depth_Stack->push(Intersection(Depth,IPoint,this));
+            Depth_Stack->push(Intersection(Depth,IPoint, uv, this));
             Intersection_Found = true;
         }
     }
@@ -129,9 +130,9 @@ bool Disc::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 *
 ******************************************************************************/
 
-bool Disc::Intersect(const BasicRay& ray, DBL *Depth) const
+bool Disc::Intersect(const BasicRay& ray, DBL *Depth, DBL&u, DBL&v) const
 {
-    DBL t, u, v, r2, len;
+    DBL t, r2, len;
     Vector3d P, D;
 
     /* Transform the point into the discs space */
@@ -426,6 +427,7 @@ Disc::Disc() : ObjectBase(DISC_OBJECT)
     oradius2 = 1.0;
 
     d = 0.0;
+    uref = Vector3d(1.0, 0.0, 0.0);
 
     Trans = Create_Transform();
 
@@ -584,6 +586,61 @@ void Disc::Compute_BBox()
     Make_BBox(BBox, -rad, -rad, -SMALL_TOLERANCE, 2.0*rad, 2.0*rad, 2.0*SMALL_TOLERANCE);
 
     Recompute_BBox(&BBox, Trans);
+}
+
+void Disc::evalVertex( Vector3d& r, const DBL u, const DBL v )const
+{
+  DBL iradius = sqrt(iradius2);
+  DBL oradius = sqrt(oradius2);
+  r = Vector3d( ((oradius-iradius)*v+iradius)*cos( u * TWO_M_PI ), ((oradius-iradius)*v+iradius)*sin( u * TWO_M_PI ), 0.0 );
+
+  if (Trans)
+  {
+    MTransPoint( r, r, Trans );
+  }
+}
+
+void Disc::evalNormal( Vector3d& r, const DBL , const DBL )const
+{
+  r = normal;
+  if (Trans)
+  {
+    MTransNormal( r, r, Trans );
+    r.normalize();
+  }
+}
+
+void Disc::minUV( Vector2d& r )const
+{
+  r[U] = 0.0;
+  r[V] = 0.0;
+}
+
+void Disc::maxUV( Vector2d& r )const
+{
+  r[U] = 1.0;
+  r[V] = 1.0;
+}
+  
+void Disc::UVCoord(Vector2d& result, const Intersection *inter, TraceThreadData *) const
+{
+  Vector2d uv( inter->Iuv);
+  Vector3d D;
+  DBL len;
+  DBL theta,thetaref;
+  // u = 0 for matching half-plane with normal and uref, then use normal for orientation
+  // Back to disc space
+  // compute u origin vector as cross( cross( n, uref), n)
+  D = cross ( cross( normal, uref), normal );
+  theta = atan2( uv[V], uv[U]);
+  thetaref = atan2( D[Y], D[X]);
+  theta -= thetaref;
+  theta += 2.0*TWO_M_PI;// to always be positive
+  theta /= TWO_M_PI;
+  result[U] = theta-int(theta);// from 0 to 1, never reaching 1
+  // v = 0 for iradius2, 1 for oradius2, and linear interpolation along that
+  len = Sqr(uv[U])+Sqr(uv[V]);
+  result[V] = (sqrt(len)-sqrt(iradius2))/(sqrt(oradius2)-sqrt(iradius2));
 }
 
 }
