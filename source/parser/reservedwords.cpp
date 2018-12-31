@@ -637,6 +637,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { TOROIDAL_TOKEN,               "toroidal" },
     { TORUS_TOKEN,                  "torus" },
     { TRACE_TOKEN,                  "trace" },
+    { TRACEUV_TOKEN,                "trace_uv" },
     { TRANSFORM_TOKEN,              "transform" },
     { TRANSLATE_TOKEN,              "translate" },
     { TRANSLUCENCY_TOKEN,           "translucency" },

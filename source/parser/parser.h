@@ -952,6 +952,7 @@ class Parser : public SceneTask
         void Parse_Vector_Param (Vector3d& Vector);
         void Parse_Vector_Param2 (Vector3d& Vect1, Vector3d& Vect2);
         void Parse_Trace(Vector3d& Res);
+        void Parse_TraceUV(Vector3d& Res);
         void Parse_UV_Vertex(Vector3d& Res);
         void Parse_UV_Normal(Vector3d& Res);
         void Parse_UV_Min(Vector3d& Res);
