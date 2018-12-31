@@ -3931,8 +3931,11 @@ void Parser::Parse_Initalizer (int Sub, size_t Base, POV_ARRAY *a)
 
                     CASE (RIGHT_CURLY_TOKEN)
                         if (a->resizable)
+                        {
+                            finalParameter = true;
                             // We reserved one element too many.
                             a->Shrink();
+                        }
                         else
                         {
                             if (!(finalParameter && properlyDelimited))
