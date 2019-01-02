@@ -7075,12 +7075,14 @@ void Parser::Parse_Frame ()
         CASE (DECLARE_TOKEN)
             UNGET
             VersionWarning(295,"Should have '#' before 'declare'.");
+            POV_EXPERIMENTAL_ASSERT(IsOkToDeclare());
             Parse_Directive (false);
         END_CASE
 
         CASE (INCLUDE_TOKEN)
             UNGET
             VersionWarning(295,"Should have '#' before 'include'.");
+            POV_EXPERIMENTAL_ASSERT(IsOkToDeclare());
             Parse_Directive (false);
         END_CASE
 
@@ -7090,6 +7092,7 @@ void Parser::Parse_Frame ()
                 case VERSION_TOKEN:
                     UNGET
                     VersionWarning(295,"Should have '#' before 'version'.");
+                    POV_EXPERIMENTAL_ASSERT(IsOkToDeclare());
                     Parse_Directive (false);
                     break;
 

@@ -1383,6 +1383,7 @@ void Parser::Parse_Directive(int After_Hash)
 
                     if(Flag && (Curr_Type==CASE_FALSE_COND))
                     {
+                        POV_EXPERIMENTAL_ASSERT(Skipping);
                         Cond_Stack.back().Cond_Type=CASE_TRUE_COND;
                         if (Skipping)
                         {
