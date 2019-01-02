@@ -14,7 +14,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -177,7 +177,6 @@ void Parser::pre_init_tokenizer ()
 
     InitCurrentToken();
 
-    line_count = 10;
     token_count = 0;
     Current_Token_Count = 0;
 
@@ -365,15 +364,7 @@ void Parser::Get_Token ()
     if(token_count > TOKEN_OVERFLOW_RESET_COUNT) // NEVER, ever change the operator here! Other code using token_count depends on it!!! [trf]
     {
         token_count = 0;
-
-        if((ElapsedRealTime() - last_progress) > 1000) // update progress at most every second
-        {
-            SignalProgress(ElapsedRealTime(), Current_Token_Count);
-
-            Cooperate();
-
-            last_progress = ElapsedRealTime();
-        }
+        mProgressReporter.ReportProgress(Current_Token_Count);
     }
 }
 

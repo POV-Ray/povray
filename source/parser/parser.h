@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -55,11 +55,10 @@
 #include "core/scene/camera.h"
 
 #include "parser/fncode.h"
+#include "parser/parsertypes.h"
 #include "parser/reservedwords.h"
 #include "parser/rawtokenizer.h"
 #include "parser/symboltable.h"
-
-#include "backend/support/task.h"
 
 namespace pov
 {
@@ -194,9 +193,25 @@ struct BetaFlags
 * Global typedefs
 ******************************************************************************/
 
-class Parser : public SceneTask
+class Parser
 {
     public:
+
+        using Options = ParserOptions;
+
+        struct FileResolver
+        {
+            virtual ~FileResolver() {}
+            virtual UCS2String FindFile(UCS2String parsedFileName, unsigned int fileType) = 0;
+            virtual IStream* ReadFile(const UCS2String& parsedFileName, const UCS2String& foundFileName, unsigned int fileType) = 0;
+            virtual OStream* CreateFile(const UCS2String& parsedFileName, unsigned int fileType, bool append) = 0;
+        };
+
+        struct ProgressReporter
+        {
+            virtual ~ProgressReporter() {}
+            virtual void ReportProgress(POV_LONG tokenCount) = 0;
+        };
 
         class DebugTextStreamBuffer : public TextStreamBuffer
         {
@@ -209,8 +224,6 @@ class Parser : public SceneTask
 
                 GenericMessenger& mMessenger;
         };
-
-        DebugTextStreamBuffer Debug_Message_Buffer;
 
         // tokenize.h/tokenize.cpp
 
@@ -248,8 +261,6 @@ class Parser : public SceneTask
             bool         allowRedefine : 1;
             bool         optional      : 1;
         };
-
-        Token_Struct mToken;
 
         struct MacroParameter
         {
@@ -344,16 +355,25 @@ class Parser : public SceneTask
         };
 
         // constructor
-        Parser(shared_ptr<BackendSceneData> sd, bool useclock, DBL clock, size_t seed);
+        Parser(shared_ptr<SceneData> sd, const Options& opts,
+               GenericMessenger& mf, FileResolver& fnr, ProgressReporter& pr, TraceThreadData& td);
 
         ~Parser();
 
+        /// Called when the parser thread is started.
+        /// @todo Obsolete, move content to end of constructor.
         void Run();
-        void Stopped();
-        void Finish();
-        void Cleanup(void);
 
-        inline TraceThreadData *GetParserDataPtr() { return reinterpret_cast<TraceThreadData *>(GetDataPtr()); }
+        /// Called when the parser thread is closing down.
+        /// @todo Obsolete, move content to start of destructor.
+        void Finish();
+
+        /// Internal; called to clean up.
+        /// @note This is _not_ an override of Task::Cleanup().
+        /// @todo Refactor class to move content to destructor.
+        void Cleanup();
+
+        inline TraceThreadData *GetParserDataPtr() { return &mThreadData; }
 
         // parse.h/parse.cpp
         void Parse_Error (TokenId Token_Id);
@@ -568,10 +588,18 @@ class Parser : public SceneTask
         bool expr_ret(ExprNode *&current, int stage, int op);
         bool expr_err(ExprNode *&current, int stage, int op);
 
-        shared_ptr<BackendSceneData> backendSceneData; // TODO FIXME HACK - make private again once Locate_Filename is fixed [trf]
         shared_ptr<SceneData> sceneData;
 
     private:
+
+        GenericMessenger&   mMessageFactory;
+        FileResolver&       mFileResolver;
+        ProgressReporter&   mProgressReporter;
+        TraceThreadData&    mThreadData;
+
+        DebugTextStreamBuffer Debug_Message_Buffer;
+
+        Token_Struct        mToken;
 
         struct BraceStackEntry : LexemePosition, MessageContext
         {
@@ -629,13 +657,9 @@ class Parser : public SceneTask
 
         SymbolStack mSymbolStack;
 
-        POV_LONG last_progress;
-
         POV_LONG Current_Token_Count; // This variable really counts tokens! [trf]
 
         int token_count; // WARNING: This variable has very little to do with counting tokens! [trf]
-
-        int line_count;
 
         vector<RawTokenizer::HotBookmark> maIncludeStack;
 
@@ -757,8 +781,6 @@ class Parser : public SceneTask
 
         ObjectPtr Parse_Sphere_Sweep(void);
         int Parse_Three_UVCoords(Vector2d& UV1, Vector2d& UV2, Vector2d& UV3);
-
-        void SignalProgress(POV_LONG elapsedTime, POV_LONG tokenCount);
 
         // tokenize.h/tokenize.cpp
         void UngetRawToken(const RawToken& rawToken);

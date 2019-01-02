@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -74,6 +74,7 @@
 #include "core/math/vector.h"
 #include "core/scene/atmosphere.h"
 #include "core/scene/object.h"
+#include "core/scene/scenedata.h"
 #include "core/scene/tracethreaddata.h"
 #include "core/shape/bezier.h"
 #include "core/shape/blob.h"
@@ -106,9 +107,6 @@
 
 // POV-Ray header files (VM module)
 #include "vm/fnpovfpu.h"
-
-// POV-Ray header files (backend module)
-#include "backend/scene/backendscenedata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -145,21 +143,22 @@ const DBL INFINITE_VOLUME = BOUND_HUGE;
 *
 ******************************************************************************/
 
-Parser::Parser(shared_ptr<BackendSceneData> sd, bool useclk, DBL clk, size_t seed) :
-    SceneTask(new TraceThreadData(sd, seed), boost::bind(&Parser::SendFatalError, this, _1), "Parse", sd),
-    backendSceneData(sd),
+Parser::Parser(shared_ptr<SceneData> sd, const Options& opts,
+               GenericMessenger& mf, FileResolver& fr, ProgressReporter& pr, TraceThreadData& td) :
     sceneData(sd),
-    clockValue(clk),
-    useClock(useclk),
+    clockValue(opts.clock),
+    useClock(opts.useClock),
+    mMessageFactory(mf),
+    mFileResolver(fr),
+    mProgressReporter(pr),
+    mThreadData(td),
+    Debug_Message_Buffer(mf),
     mpFunctionVM(new FunctionVM),
     fnVMContext(new FPUContext(mpFunctionVM.get(), GetParserDataPtr())),
     Destroying_Frame(false),
-    last_progress(0),
     Current_Token_Count(0),
     token_count(0),
-    line_count(10),
-    next_rand(nullptr),
-    Debug_Message_Buffer(messageFactory)
+    next_rand(nullptr)
 {
     pre_init_tokenizer();
     if (sceneData->realTimeRaytracing)
@@ -308,7 +307,7 @@ void Parser::Run()
             Destroy_Random_Generators();
 
             if (error_line != -1)
-                messageFactory.ErrorAt(POV_EXCEPTION_CODE(kOutOfMemoryErr), error_filename, error_line, error_col, error_pos, "Out of memory.");
+                mMessageFactory.ErrorAt(POV_EXCEPTION_CODE(kOutOfMemoryErr), error_filename, error_line, error_col, error_pos, "Out of memory.");
             else
                 Error("Out of memory.");
         }
@@ -508,18 +507,9 @@ void Parser::Cleanup()
     Destroy_Random_Generators();
 }
 
-void Parser::Stopped()
-{
-    RenderBackend::SendSceneFailedResult(backendSceneData->sceneId, kUserAbortErr, backendSceneData->frontendAddress);
-}
-
 void Parser::Finish()
 {
     Cleanup();
-
-    GetParserDataPtr()->timeType = TraceThreadData::kParseTime;
-    GetParserDataPtr()->realTime = ConsumedRealTime();
-    GetParserDataPtr()->cpuTime = ConsumedCPUTime();
 }
 
 
@@ -3257,7 +3247,7 @@ ObjectPtr Parser::Parse_Lemon ()
     END_EXPECT
 
     /* Compute run-time values for the lemon */
-    Object->Compute_Lemon_Data(messageFactory, CurrentTokenMessageContext());
+    Object->Compute_Lemon_Data(mMessageFactory, CurrentTokenMessageContext());
 
     Object->Compute_BBox();
     ptr = reinterpret_cast<ObjectPtr>(Object);
@@ -10561,9 +10551,9 @@ void Parser::Warning(WarningLevel level, const char *format,...)
     va_end(marker);
 
     if (HaveCurrentMessageContext())
-        messageFactory.WarningAt(level, CurrentMessageContext(), "%s", localvsbuffer);
+        mMessageFactory.WarningAt(level, CurrentMessageContext(), "%s", localvsbuffer);
     else
-        messageFactory.Warning(level, "%s", localvsbuffer);
+        mMessageFactory.Warning(level, "%s", localvsbuffer);
 }
 
 void Parser::VersionWarning(unsigned int sinceVersion, const char *format,...)
@@ -10591,9 +10581,9 @@ void Parser::PossibleError(const char *format,...)
     va_end(marker);
 
     if (HaveCurrentMessageContext())
-        messageFactory.PossibleErrorAt(CurrentMessageContext(), "%s", localvsbuffer);
+        mMessageFactory.PossibleErrorAt(CurrentMessageContext(), "%s", localvsbuffer);
     else
-        messageFactory.PossibleError("%s", localvsbuffer);
+        mMessageFactory.PossibleError("%s", localvsbuffer);
 }
 
 void Parser::Error(const char *format,...)
@@ -10610,9 +10600,9 @@ void Parser::Error(const char *format,...)
     va_end(marker);
 
     if (HaveCurrentMessageContext())
-        messageFactory.ErrorAt(POV_EXCEPTION(kParseErr, localvsbuffer), CurrentMessageContext(), "%s", localvsbuffer);
+        mMessageFactory.ErrorAt(POV_EXCEPTION(kParseErr, localvsbuffer), CurrentMessageContext(), "%s", localvsbuffer);
     else
-        messageFactory.Error(POV_EXCEPTION(kParseErr, localvsbuffer), "%s", localvsbuffer);
+        mMessageFactory.Error(POV_EXCEPTION(kParseErr, localvsbuffer), "%s", localvsbuffer);
 }
 
 void Parser::Error(const MessageContext& loc, const char *format, ...)
@@ -10628,7 +10618,7 @@ void Parser::Error(const MessageContext& loc, const char *format, ...)
     std::vsnprintf(localvsbuffer, sizeof(localvsbuffer), format, marker);
     va_end(marker);
 
-    messageFactory.ErrorAt(POV_EXCEPTION(kParseErr, localvsbuffer), loc, "%s", localvsbuffer);
+    mMessageFactory.ErrorAt(POV_EXCEPTION(kParseErr, localvsbuffer), loc, "%s", localvsbuffer);
 }
 
 void Parser::ErrorInfo(const MessageContext& loc, const char *format,...)
@@ -10640,7 +10630,7 @@ void Parser::ErrorInfo(const MessageContext& loc, const char *format,...)
     std::vsnprintf(localvsbuffer, sizeof(localvsbuffer), format, marker);
     va_end(marker);
 
-    messageFactory.PossibleErrorAt(loc, "%s", localvsbuffer);
+    mMessageFactory.PossibleErrorAt(loc, "%s", localvsbuffer);
 }
 
 int Parser::Debug_Info(const char *format,...)
@@ -10775,7 +10765,7 @@ void Parser::CheckPassThru(ObjectPtr o, int flag)
 shared_ptr<IStream> Parser::Locate_File(const UCS2String& filename, unsigned int stype, UCS2String& buffer, bool err_flag)
 {
     UCS2String fn(filename);
-    UCS2String foundfile(backendSceneData->FindFile(GetPOVMSContext(), fn, stype));
+    UCS2String foundfile(mFileResolver.FindFile(fn, stype));
 
     if(foundfile.empty() == true)
     {
@@ -10797,7 +10787,7 @@ shared_ptr<IStream> Parser::Locate_File(const UCS2String& filename, unsigned int
     }
 
     // ReadFile will store both fn and foundfile in the cache for next time round
-    shared_ptr<IStream> result(backendSceneData->ReadFile(GetPOVMSContext(), fn, foundfile.c_str(), stype));
+    shared_ptr<IStream> result(mFileResolver.ReadFile(fn, foundfile.c_str(), stype));
 
     if ((result == nullptr) && (err_flag == true))
         PossibleError("Cannot open file '%s'.", UCS2toASCIIString(foundfile).c_str());
@@ -10809,7 +10799,7 @@ shared_ptr<IStream> Parser::Locate_File(const UCS2String& filename, unsigned int
 /* TODO FIXME - code above should not be there, this is how it should work but this has bugs [trf]
 shared_ptr<IStream> Parser::Locate_File(const UCS2String& filename, unsigned int stype, UCS2String& buffer, bool err_flag)
 {
-    UCS2String foundfile(backendSceneData->FindFile(GetPOVMSContext(), filename, stype));
+    UCS2String foundfile(mFileResolver.FindFile(filename, stype));
 
     if(foundfile.empty() == true)
     {
@@ -10819,7 +10809,7 @@ shared_ptr<IStream> Parser::Locate_File(const UCS2String& filename, unsigned int
         return nullptr;
     }
 
-    shared_ptr<IStream> result(backendSceneData->ReadFile(GetPOVMSContext(), foundfile.c_str(), stype));
+    shared_ptr<IStream> result(mFileResolver.ReadFile(foundfile.c_str(), stype));
 
     if ((result == nullptr) && (err_flag == true))
         PossibleError("Cannot open file '%s'.", UCS2toASCIIString(foundfile).c_str());
@@ -10834,7 +10824,7 @@ shared_ptr<IStream> Parser::Locate_File(const UCS2String& filename, unsigned int
 
 OStream *Parser::CreateFile(const UCS2String& filename, unsigned int stype, bool append)
 {
-    return backendSceneData->CreateFile(GetPOVMSContext(), filename, stype, append);
+    return mFileResolver.CreateFile(filename, stype, append);
 }
 
 /*****************************************************************************/
@@ -10916,16 +10906,6 @@ Image *Parser::Read_Image(int filetype, const UCS2 *filename, const Image::ReadO
 RGBFTColour *Parser::Create_Colour ()
 {
     return new RGBFTColour();
-}
-
-/*****************************************************************************/
-
-void Parser::SignalProgress(POV_LONG elapsedTime, POV_LONG tokenCount)
-{
-    POVMS_Object obj(kPOVObjectClass_ParserProgress);
-    obj.SetLong(kPOVAttrib_RealTime, elapsedTime);
-    obj.SetLong(kPOVAttrib_CurrentTokenCount, tokenCount);
-    RenderBackend::SendSceneOutput(backendSceneData->sceneId, backendSceneData->frontendAddress, kPOVMsgIdent_Progress, obj);
 }
 
 /*****************************************************************************/
