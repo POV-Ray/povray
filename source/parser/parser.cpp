@@ -9205,7 +9205,7 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
                 if (symbol_entry)
                 {
                     symbol_entry_table = mToken.table;
-                    Acquire_Entry_Reference(symbol_entry);
+                    SymbolTable::Acquire_Entry_Reference(symbol_entry);
                 }
             }
             else
@@ -9289,7 +9289,7 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
                 }
             }
             if (symbol_entry)
-                Release_Entry_Reference (symbol_entry_table, symbol_entry);
+                SymbolTable::Release_Entry_Reference (symbol_entry);
         END_CASE
 
         CASE (PIGMENT_TOKEN)

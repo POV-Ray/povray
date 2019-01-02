@@ -487,8 +487,6 @@ class Parser
         void CheckFileSignature();
         POV_ARRAY *Parse_Array_Declare (void);
         SymbolTable* Parse_Dictionary_Declare();
-        void Acquire_Entry_Reference (SYM_ENTRY *Entry);
-        void Release_Entry_Reference (SymbolTable* table, SYM_ENTRY *Entry);
         bool Parse_Ifdef_Param ();
         int Parse_For_Param (UTF8String&, DBL*, DBL*);
 

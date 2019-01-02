@@ -2122,33 +2122,6 @@ void Parser::init_sym_tables()
     mSymbolStack.PushTable(); // global symbols
 }
 
-void Parser::Acquire_Entry_Reference (SYM_ENTRY *Entry)
-{
-    if (Entry == nullptr)
-        return;
-    if (Entry->ref_count >= std::numeric_limits<SymTableEntryRefCount>::max())
-        Error("Too many unresolved references to symbol");
-    Entry->ref_count ++;
-}
-
-void Parser::Release_Entry_Reference (SymbolTable* table, SYM_ENTRY *Entry)
-{
-    if (Entry == nullptr)
-        return;
-    if (Entry->ref_count <= 0)
-        Error("Internal error: Symbol reference counter underflow");
-    Entry->ref_count --;
-
-    if (Entry->ref_count == 0)
-    {
-        SymbolTable::Destroy_Ident_Data (Entry->Data, Entry->Token_Number);
-        if (Entry->Deprecation_Message != nullptr)
-            POV_FREE(Entry->Deprecation_Message);
-
-        delete Entry;
-    }
-}
-
 void Parser::Check_Macro_Vers(void)
 {
     if (sceneData->EffectiveLanguageVersion() < 310)
