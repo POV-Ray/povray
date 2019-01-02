@@ -156,8 +156,8 @@ Parser::Parser(shared_ptr<SceneData> sd, const Options& opts,
     mpFunctionVM(new FunctionVM),
     fnVMContext(new FPUContext(mpFunctionVM.get(), GetParserDataPtr())),
     Destroying_Frame(false),
-    Current_Token_Count(0),
-    token_count(0),
+    mTokenCount(0),
+    mTokensSinceLastProgressReport(0),
     next_rand(nullptr)
 {
     pre_init_tokenizer();
@@ -9188,7 +9188,7 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
                  ((CurrentTokenId()==VECTOR_FUNCT_TOKEN) &&  (CurrentTokenFunctionId()==VECTOR_ID_TOKEN)) ||
                  (CurrentTokenId()==VECTOR_4D_ID_TOKEN) || (CurrentTokenId()==UV_ID_TOKEN) || (CurrentTokenId()==COLOUR_ID_TOKEN))))
             {
-                Temp_Count = token_count;
+                Temp_Count = mTokenCount;
             }
 
             // assume no callable identifier (that is a function or spline identifier) has been found
@@ -9221,17 +9221,17 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
                 Parse_Semi_Colon(true);
 
             // get the number of tokens found
-            Temp_Count -= token_count;
+            Temp_Count = mTokenCount - Temp_Count;
 
-            // no tokens have been found or a function call had no parameters in parenthesis
-            if (!((Temp_Count==-1) || (Temp_Count==TOKEN_OVERFLOW_RESET_COUNT)) && had_callable_identifier)
+            if ((Temp_Count != 1) && had_callable_identifier)
+                // no tokens have been found or a function call had no parameters in parenthesis
                 Error("Identifier expected, incomplete function call or spline call found instead.");
 
-            // only one identifier token has been found so pass it by reference
-            if (((Temp_Count==-1) || (Temp_Count==TOKEN_OVERFLOW_RESET_COUNT)) && PassParameterByReference (old_table_index))
+            if ((Temp_Count == 1) && PassParameterByReference (old_table_index))
             {
+                // only one identifier token has been found so pass it by reference
                 // It is important that functions are passed by value and not by reference! [trf]
-                if(!(ParFlag) || (ParFlag && function_identifier))
+                if(!ParFlag || function_identifier)
                 {
                     // pass by value
                     Temp_Data  = SymbolTable::Copy_Identifier(*mToken.DataPtr, *mToken.NumberPtr);

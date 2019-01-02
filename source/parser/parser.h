@@ -655,9 +655,8 @@ class Parser
 
         SymbolStack mSymbolStack;
 
-        POV_LONG Current_Token_Count; // This variable really counts tokens! [trf]
-
-        int token_count; // WARNING: This variable has very little to do with counting tokens! [trf]
+        POV_LONG    mTokenCount;
+        int         mTokensSinceLastProgressReport;
 
         vector<RawTokenizer::HotBookmark> maIncludeStack;
 

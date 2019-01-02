@@ -177,8 +177,8 @@ void Parser::pre_init_tokenizer ()
 
     InitCurrentToken();
 
-    token_count = 0;
-    Current_Token_Count = 0;
+    mTokensSinceLastProgressReport = 0;
+    mTokenCount = 0;
 
     // make sure these are `nullptr` otherwise cleanup() will crash if we terminate early
     Default_Texture = nullptr;
@@ -358,13 +358,13 @@ void Parser::Get_Token ()
         }
     }
 
-    Current_Token_Count++;
-    token_count++;
+    mTokenCount++;
+    mTokensSinceLastProgressReport++;
 
-    if(token_count > TOKEN_OVERFLOW_RESET_COUNT) // NEVER, ever change the operator here! Other code using token_count depends on it!!! [trf]
+    if (mTokensSinceLastProgressReport > TOKEN_OVERFLOW_RESET_COUNT)
     {
-        token_count = 0;
-        mProgressReporter.ReportProgress(Current_Token_Count);
+        mTokensSinceLastProgressReport = 0;
+        mProgressReporter.ReportProgress(mTokenCount);
     }
 }
 
@@ -1592,7 +1592,8 @@ void Parser::Parse_Directive(int After_Hash)
                 {
                     case VERSION_TOKEN:
                         {
-                            if (sceneData->languageVersionSet == false && token_count > 1)
+                            // TODO FIXME - this won't work as expected if `Include_Header` INI option is used.
+                            if (!sceneData->languageVersionSet && (mTokenCount > 1))
                                 sceneData->languageVersionLate = true;
                             POV_EXPERIMENTAL_ASSERT(IsOkToDeclare());
                             SetOkToDeclare(false);
