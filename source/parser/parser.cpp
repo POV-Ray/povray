@@ -7073,27 +7073,24 @@ void Parser::Parse_Frame ()
         END_CASE
 
         CASE (DECLARE_TOKEN)
-            UNGET
             VersionWarning(295,"Should have '#' before 'declare'.");
             POV_EXPERIMENTAL_ASSERT(IsOkToDeclare());
-            Parse_Directive (false);
+            Parse_Declare(false, false);
         END_CASE
 
         CASE (INCLUDE_TOKEN)
-            UNGET
             VersionWarning(295,"Should have '#' before 'include'.");
             POV_EXPERIMENTAL_ASSERT(IsOkToDeclare());
-            Parse_Directive (false);
+            Open_Include();
         END_CASE
 
         CASE (FLOAT_FUNCT_TOKEN)
             switch(CurrentTokenFunctionId())
             {
                 case VERSION_TOKEN:
-                    UNGET
                     VersionWarning(295,"Should have '#' before 'version'.");
                     POV_EXPERIMENTAL_ASSERT(IsOkToDeclare());
-                    Parse_Directive (false);
+                    Parse_Version();
                     break;
 
                 default:
@@ -9220,8 +9217,12 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
             Terms = Parse_Unknown_Vector (Local_Express, true, &had_callable_identifier);
 
             // if in a #declare force a semicolon at the end
+            // (but don't "eat" it yet, `Parse_Declare` will take care of that)
             if (SemiFlag)
+            {
                 Parse_Semi_Colon(true);
+                UNGET
+            }
 
             // get the number of tokens found
             Temp_Count = mTokenCount - Temp_Count;

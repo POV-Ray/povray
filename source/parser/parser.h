@@ -240,7 +240,8 @@ class Parser
             TokenId *NumberPtr;
             void **DataPtr;
             SymbolTable* table;                             ///< table or dictionary the token references an element of
-            bool Unget_Token            : 1;                ///< `true` if @ref Get_Token() must re-issue this token.
+            bool Unget_Token            : 1;                ///< `true` if @ref Get_Token() must re-issue this token as-is.
+            bool ungetRaw               : 1;                ///< `true` if @ref Get_Token() must re-evaluate this token from raw.
             bool End_Of_File            : 1;
             bool is_array_elem          : 1;                ///< true if token is actually an array element reference
             bool is_mixed_array_elem    : 1;                ///< true if token is actually a mixed-type array element reference
@@ -475,10 +476,11 @@ class Parser
         bool GoToBookmark(const RawTokenizer::HotBookmark& bookmark);
 
         bool IsEndOfInvokedMacro() const;
-        void Parse_Directive (int After_Hash);
+        void Parse_Directive();
 #if POV_DEBUG
         void Parse_Breakpoint();
 #endif
+        void Parse_Version();
         void Open_Include (void);
         void IncludeHeader(const UCS2String& temp);
         void pre_init_tokenizer (void);

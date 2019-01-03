@@ -317,45 +317,62 @@ void Parser::Get_Token ()
             continue;
         }
 
-        switch (mToken.raw.GetTokenId())
+        do
         {
-            case IDENTIFIER_TOKEN:
-                Read_Symbol(mToken.raw);
-                break;
-
-            case FLOAT_TOKEN:
-                mToken.Token_Float = mToken.raw.floatValue;
-                Write_Token(mToken.raw);
-                break;
-
-            case STRING_LITERAL_TOKEN:
-                Write_Token(mToken.raw);
-                break;
-
-            case HASH_TOKEN:
-                if (IsEndOfInvokedMacro())
-                {
-                    // The `#end` (or, more precisely, the `#`) of any macro currently being
-                    // executed gets special treatment.
-                    Return_From_Macro();
-                    InvalidateCurrentToken();
-                }
-                else
-                    // Start of a regular directive.
-                    Parse_Directive(true);
-                break;
-
-            default:
-                if (parseRawIdentifiers || (mToken.raw.isPseudoIdentifier && (!Parsing_Directive || Inside_Ifdef)))
+            mToken.ungetRaw = false;
+            switch (mToken.raw.GetTokenId())
+            {
+                case IDENTIFIER_TOKEN:
                     Read_Symbol(mToken.raw);
-                else
-                {
-                    if (mToken.raw.isReservedWord && Inside_Ifdef)
-                        Warning("Trying to test whether a reserved keyword is defined. Test result may not be what you expect.");
+                    break;
+
+                case FLOAT_TOKEN:
+                    mToken.Token_Float = mToken.raw.floatValue;
                     Write_Token(mToken.raw);
-                }
-                break;
+                    break;
+
+                case STRING_LITERAL_TOKEN:
+                    Write_Token(mToken.raw);
+                    break;
+
+                case HASH_TOKEN:
+                    if (IsEndOfInvokedMacro())
+                    {
+                        // The `#end` (or, more precisely, the `#`) of any macro currently being
+                        // executed gets special treatment.
+                        Return_From_Macro();
+                        InvalidateCurrentToken();
+                    }
+                    else if (!IsOkToDeclare())
+                    {
+                        // Directives aren't allowed here.
+                        // Re-issue the hash token to trigger an expectation error downstream.
+                        // Hash tokens normally never get processed into high-level tokens,
+                        // so we need to construct one now.
+                        mToken.Token_Id = HASH_TOKEN;
+                        mToken.is_array_elem = false;
+                        mToken.is_mixed_array_elem = false;
+                        mToken.is_dictionary_elem = false;
+                        mToken.Unget_Token = false;
+                    }
+                    else
+                        // Start of a regular directive in a proper place.
+                        Parse_Directive();
+                    break;
+
+                default:
+                    if (parseRawIdentifiers || (mToken.raw.isPseudoIdentifier && (!Parsing_Directive || Inside_Ifdef)))
+                        Read_Symbol(mToken.raw);
+                    else
+                    {
+                        if (mToken.raw.isReservedWord && Inside_Ifdef)
+                            Warning("Trying to test whether a reserved keyword is defined. Test result may not be what you expect.");
+                        Write_Token(mToken.raw);
+                    }
+                    break;
+            }
         }
+        while (mToken.ungetRaw);
     }
 
     mTokenCount++;
@@ -395,8 +412,8 @@ void Parser::Get_Token ()
 void Parser::Unget_Token ()
 {
     mToken.Unget_Token = true;
+    mToken.ungetRaw = false;
 }
-
 
 
 /*****************************************************************************
@@ -778,7 +795,7 @@ void Parser::InitCurrentToken()
 void Parser::InvalidateCurrentToken()
 {
     POV_EXPERIMENTAL_ASSERT(!mToken.Unget_Token);
-    mToken.Token_Id = END_OF_FILE_TOKEN;
+    mToken.Token_Id             = END_OF_FILE_TOKEN;
     mToken.is_array_elem        = false;
     mToken.is_mixed_array_elem  = false;
     mToken.is_dictionary_elem   = false;
@@ -1072,7 +1089,7 @@ bool Parser::IsEndOfInvokedMacro() const
            (Cond_Stack.back().PMac->source.sourceName == mTokenizer.GetSourceName());
 }
 
-void Parser::Parse_Directive(int After_Hash)
+void Parser::Parse_Directive()
 {
     DBL Value, Value2;
     int Flag;
@@ -1081,27 +1098,9 @@ void Parser::Parse_Directive(int After_Hash)
     COND_TYPE Curr_Type = Cond_Stack.back().Cond_Type;
     LexemePosition hashPosition = CurrentFilePosition();
 
-    if (!IsOkToDeclare())
-    {
-        // Directives aren't allowed here.
-        // Re-issue the current token to trigger an expectation error downstream.
-        if (After_Hash)
-        {
-            // Hash tokens normally never get processed into high-level tokens,
-            // so we need to construct one now.
-            mToken.Token_Id = HASH_TOKEN;
-            mToken.is_array_elem = false;
-            mToken.is_mixed_array_elem = false;
-            mToken.is_dictionary_elem = false;
-        }
-        mToken.Unget_Token = false;
-
-        return;
-    }
-
     Parsing_Directive = true;
 
-    EXPECT  // we're normally running this loop only once, but a few directives cause it to be looped
+    EXPECT_ONE
 
         CASE(IFDEF_TOKEN)
             Parsing_Directive = false;
@@ -1124,7 +1123,6 @@ void Parser::Parse_Directive(int After_Hash)
                     Skip_Tokens(IF_FALSE_COND);
                 }
             }
-            EXIT
         END_CASE
 
         CASE(IFNDEF_TOKEN)
@@ -1148,7 +1146,6 @@ void Parser::Parse_Directive(int After_Hash)
                     Cond_Stack.back().Cond_Type=IF_TRUE_COND;
                 }
             }
-            EXIT
         END_CASE
 
         CASE(IF_TOKEN)
@@ -1174,7 +1171,6 @@ void Parser::Parse_Directive(int After_Hash)
                     Skip_Tokens(IF_FALSE_COND);
                 }
             }
-            EXIT
         END_CASE
 
         CASE(WHILE_TOKEN)
@@ -1202,7 +1198,6 @@ void Parser::Parse_Directive(int After_Hash)
                     Skip_Tokens(SKIP_TIL_END_COND);
                 }
             }
-            EXIT
         END_CASE
 
         CASE(FOR_TOKEN)
@@ -1233,7 +1228,6 @@ void Parser::Parse_Directive(int After_Hash)
                     // need to do some cleanup otherwise deferred via the Cond_Stack
                 }
             }
-            EXIT
         END_CASE
 
         CASE(ELSE_TOKEN)
@@ -1266,8 +1260,8 @@ void Parser::Parse_Directive(int After_Hash)
 
                 default:
                     Error("Mis-matched '#else'.");
+                    break;
             }
-            EXIT
         END_CASE
 
         CASE(ELSEIF_TOKEN)
@@ -1298,8 +1292,8 @@ void Parser::Parse_Directive(int After_Hash)
 
                 default:
                     Error("Mis-matched '#elseif'.");
+                    break;
             }
-            EXIT
         END_CASE
 
         CASE(SWITCH_TOKEN)
@@ -1353,14 +1347,12 @@ void Parser::Parse_Directive(int After_Hash)
                     END_CASE
                 END_EXPECT
             }
-            EXIT
         END_CASE
 
         CASE(BREAK_TOKEN)
             Parsing_Directive = false;
             if (!Skipping)
                 Break();
-            EXIT
         END_CASE
 
         CASE2(CASE_TOKEN,RANGE_TOKEN)
@@ -1403,8 +1395,8 @@ void Parser::Parse_Directive(int After_Hash)
 
                 default:
                     Error("Mis-matched '#case' or '#range'.");
+                    break;
             }
-            EXIT
         END_CASE
 
         CASE(END_TOKEN)
@@ -1515,8 +1507,8 @@ void Parser::Parse_Directive(int After_Hash)
 
                 default:
                     Error("Mis-matched '#end'.");
+                    break;
             }
-            EXIT
         END_CASE
 
         CASE2 (DECLARE_TOKEN,LOCAL_TOKEN)
@@ -1524,32 +1516,22 @@ void Parser::Parse_Directive(int After_Hash)
             if (Skipping)
             {
                 UNGET
-                EXIT
             }
             else
             {
-                Parse_Declare(CurrentTokenId() == LOCAL_TOKEN, After_Hash);
-                Curr_Type = Cond_Stack.back().Cond_Type;
+                Parse_Declare(CurrentTokenId() == LOCAL_TOKEN, true);
                 if (mToken.Unget_Token)
                 {
                     switch (CurrentTokenId())
                     {
                         case HASH_TOKEN:
-                            mToken.Unget_Token=false;
-                            Parsing_Directive = true;
-                            break;
-
                         case MACRO_ID_TOKEN:
-                            Parsing_Directive = true;
+                            mToken.Unget_Token = false;
+                            mToken.ungetRaw = true;
                             break;
-
                         default:
-                            EXIT
+                            break;
                     }
-                }
-                else
-                {
-                    EXIT
                 }
             }
         END_CASE
@@ -1564,7 +1546,6 @@ void Parser::Parse_Directive(int After_Hash)
             {
                 Parse_Default();
             }
-            EXIT
         END_CASE
 
         CASE (INCLUDE_TOKEN)
@@ -1577,7 +1558,6 @@ void Parser::Parse_Directive(int After_Hash)
             {
                 Open_Include();
             }
-            EXIT
         END_CASE
 
         CASE (FLOAT_FUNCT_TOKEN)
@@ -1585,110 +1565,17 @@ void Parser::Parse_Directive(int After_Hash)
             if (Skipping)
             {
                 UNGET
-                EXIT
             }
             else
             {
                 switch(CurrentTokenFunctionId())
                 {
                     case VERSION_TOKEN:
+                        Parse_Version();
+                        if (mToken.Unget_Token && (CurrentTokenId() == HASH_TOKEN))
                         {
-                            // TODO FIXME - this won't work as expected if `Include_Header` INI option is used.
-                            if (!sceneData->languageVersionSet && (mTokenCount > 1))
-                                sceneData->languageVersionLate = true;
-                            POV_EXPERIMENTAL_ASSERT(IsOkToDeclare());
-                            SetOkToDeclare(false);
-                            bool wasParsingVersionDirective = parsingVersionDirective;
-                            parsingVersionDirective = true;
-                            EXPECT_ONE
-                                CASE (UNOFFICIAL_TOKEN)
-#if POV_RAY_IS_OFFICIAL
-                                    Get_Token();
-                                    Error("This file was created for an unofficial version and\ncannot work as-is with this official version.");
-#else
-                                    // PATCH AUTHORS - you should not enable any extra features unless the
-                                    // 'unofficial' keyword is set in the scene file.
-#endif
-                                END_CASE
-                                OTHERWISE
-                                    Unget_Token();
-                                END_CASE
-                            END_EXPECT
-
-                            sceneData->languageVersion = (int)(Parse_Float() * 100 + 0.5);
-
-                            if (sceneData->languageVersion == 371)
-                            {
-                                Warning("The version of POV-Ray originally developed as v3.7.1 was ultimately "
-                                        "released as v3.8.0; '#version 3.71' will probably not work as expected. "
-                                        "Use '#version 3.8' instead.");
-                            }
-
-                            if ((sceneData->languageVersionLate) && (sceneData->languageVersion >= 380))
-                            {
-                                // As of POV-Ray v3.7, all scene files are supposed to begin with a `#version` directive.
-                                // As of POV-Ray v3.8, we no longer tolerate violation of that rule if the main scene
-                                // file claims to be compatible with POV-Ray v3.8 anywhere further down the road.
-                                // (We need to be more lax with include files though, as they may just as well be
-                                // standard include files that happen to have been updated since the scene was
-                                // originally designed.)
-
-                                if (maIncludeStack.empty())
-                                    Error("As of POV-Ray v3.7, the '#version' directive must be the first non-comment "
-                                          "statement in the scene file. To indicate that your scene will dynamically "
-                                          "adapt to whatever POV-Ray version is actually used, start your scene with "
-                                          "'#version version;'.");
-                            }
-
-                            // Initialize various defaults depending on language version specified.
-                            InitDefaults(sceneData->languageVersion);
-
-                            // NB: This must be set _after_ parsing the value, in order for the `#version version`
-                            // idiom to work properly, but _before_ any of the following code querying
-                            // `sceneData->EffectiveLanguageVersion()`.
-                            sceneData->languageVersionSet = true;
-
-                            if (sceneData->explicitNoiseGenerator == false)
-                                sceneData->noiseGenerator = (sceneData->EffectiveLanguageVersion() < 350 ?
-                                                             kNoiseGen_Original : kNoiseGen_RangeCorrected);
-                            // [CLi] if assumed_gamma is not specified in a pre-v3.7 scene, gammaMode defaults to kPOVList_GammaMode_None;
-                            // this is enforced later anyway after parsing, but we may need this information /now/ during parsing already
-                            switch (sceneData->gammaMode)
-                            {
-                                case kPOVList_GammaMode_None:
-                                case kPOVList_GammaMode_AssumedGamma37Implied:
-                                    if (sceneData->EffectiveLanguageVersion() < 370)
-                                        sceneData->gammaMode = kPOVList_GammaMode_None;
-                                    else
-                                        sceneData->gammaMode = kPOVList_GammaMode_AssumedGamma37Implied;
-                                    break;
-                                case kPOVList_GammaMode_AssumedGamma36:
-                                case kPOVList_GammaMode_AssumedGamma37:
-                                    if (sceneData->EffectiveLanguageVersion() < 370)
-                                        sceneData->gammaMode = kPOVList_GammaMode_AssumedGamma36;
-                                    else
-                                        sceneData->gammaMode = kPOVList_GammaMode_AssumedGamma37;
-                                    break;
-                            }
-                            Parse_Semi_Colon(false);
-
-                            if (sceneData->EffectiveLanguageVersion() > POV_RAY_VERSION_INT)
-                            {
-                                Error("Your scene file requires POV-Ray version %g or later!\n", (DBL)(sceneData->EffectiveLanguageVersion() / 100.0));
-                            }
-
-                            SetOkToDeclare(true);
-                            parsingVersionDirective = wasParsingVersionDirective;
-                            Curr_Type = Cond_Stack.back().Cond_Type;
-                            if (mToken.Unget_Token && (CurrentTokenId() == HASH_TOKEN))
-                            {
-                                mToken.Unget_Token=false;
-                                Parsing_Directive = true;
-                            }
-                            else
-                            {
-                                EXIT
-                            }
+                            mToken.Unget_Token = false;
+                            mToken.ungetRaw = true;
                         }
                         break;
 
@@ -1717,7 +1604,6 @@ void Parser::Parse_Directive(int After_Hash)
                 Warning("%s", ts);
                 POV_FREE(ts);
             }
-            EXIT
         END_CASE
 
         CASE(ERROR_TOKEN)
@@ -1737,7 +1623,6 @@ void Parser::Parse_Directive(int After_Hash)
                 Error("Parse halted by #error directive: %s", ts);
                 POV_FREE(ts);
             }
-            EXIT
         END_CASE
 
 /* Note: The new message driven output system does not support
@@ -1766,7 +1651,6 @@ void Parser::Parse_Directive(int After_Hash)
                 Debug_Info("%s", ts);
                 POV_FREE(ts);
             }
-            EXIT
         END_CASE
 
         CASE(FOPEN_TOKEN)
@@ -1779,7 +1663,6 @@ void Parser::Parse_Directive(int After_Hash)
             {
                 Parse_Fopen();
             }
-            EXIT
         END_CASE
 
         CASE(FCLOSE_TOKEN)
@@ -1792,7 +1675,6 @@ void Parser::Parse_Directive(int After_Hash)
             {
                 Parse_Fclose();
             }
-            EXIT
         END_CASE
 
         CASE(READ_TOKEN)
@@ -1805,7 +1687,6 @@ void Parser::Parse_Directive(int After_Hash)
             {
                 Parse_Read();
             }
-            EXIT
         END_CASE
 
         CASE(WRITE_TOKEN)
@@ -1818,7 +1699,6 @@ void Parser::Parse_Directive(int After_Hash)
             {
                 Parse_Write();
             }
-            EXIT
         END_CASE
 
         CASE(UNDEF_TOKEN)
@@ -1879,20 +1759,6 @@ void Parser::Parse_Directive(int After_Hash)
                 END_EXPECT
                 SetOkToDeclare(true);
             }
-            EXIT
-        END_CASE
-
-        CASE (MACRO_ID_TOKEN)
-            Parsing_Directive = false;
-            if (Skipping)
-            {
-                UNGET
-            }
-            else
-            {
-                Invoke_Macro();
-            }
-            EXIT
         END_CASE
 
         CASE (MACRO_TOKEN)
@@ -1911,7 +1777,6 @@ void Parser::Parse_Directive(int After_Hash)
             Cond_Stack.back().Cond_Type = DECLARING_MACRO_COND;
             Cond_Stack.back().PMac      = PMac;
             Skip_Tokens(DECLARING_MACRO_COND);
-            EXIT
         END_CASE
 
 #if POV_DEBUG
@@ -1925,28 +1790,33 @@ void Parser::Parse_Directive(int After_Hash)
             {
                 Parse_Breakpoint();
             }
-            EXIT
         END_CASE
 #endif
 
         OTHERWISE
             Parsing_Directive = false;
             UNGET
-            EXIT
         END_CASE
     END_EXPECT
 
     Parsing_Directive = false;
 
+    // Parse_Directive is called in a context where the token is yet to be processed anyway,
+    // so the unget flag needs special care.
     if (mToken.Unget_Token)
     {
+        // The token is yet to be processed anyway. Having the unget flag set here
+        // would only confuse the parser later.
         mToken.Unget_Token = false;
     }
-    else
+    else if (!mToken.ungetRaw)
     {
+        // The current token is to be swallowed, so we currently don't have a valid token at all.
         InvalidateCurrentToken();
     }
 }
+
+/*****************************************************************************/
 
 #if POV_DEBUG
 void Parser::Parse_Breakpoint()
@@ -1966,6 +1836,97 @@ void Parser::Parse_Breakpoint()
 }
 #endif
 
+/*****************************************************************************/
+
+void Parser::Parse_Version()
+{
+    // TODO FIXME - this won't work as expected if `Include_Header` INI option is used.
+    if (!sceneData->languageVersionSet && (mTokenCount > 1))
+        sceneData->languageVersionLate = true;
+    POV_EXPERIMENTAL_ASSERT(IsOkToDeclare());
+    SetOkToDeclare(false);
+    bool wasParsingVersionDirective = parsingVersionDirective;
+    parsingVersionDirective = true;
+    EXPECT_ONE
+        CASE(UNOFFICIAL_TOKEN)
+#if POV_RAY_IS_OFFICIAL
+            Get_Token();
+            Error("This file was created for an unofficial version and\ncannot work as-is with this official version.");
+#else
+            // PATCH AUTHORS - you should not enable any extra features unless the
+            // 'unofficial' keyword is set in the scene file.
+#endif
+        END_CASE
+        OTHERWISE
+            Unget_Token();
+        END_CASE
+    END_EXPECT
+
+    sceneData->languageVersion = (int)(Parse_Float() * 100 + 0.5);
+
+    if (sceneData->languageVersion == 371)
+    {
+        Warning("The version of POV-Ray originally developed as v3.7.1 was ultimately "
+                "released as v3.8.0; '#version 3.71' will probably not work as expected. "
+                "Use '#version 3.8' instead.");
+    }
+
+    if ((sceneData->languageVersionLate) && (sceneData->languageVersion >= 380))
+    {
+        // As of POV-Ray v3.7, all scene files are supposed to begin with a `#version` directive.
+        // As of POV-Ray v3.8, we no longer tolerate violation of that rule if the main scene
+        // file claims to be compatible with POV-Ray v3.8 anywhere further down the road.
+        // (We need to be more lax with include files though, as they may just as well be
+        // standard include files that happen to have been updated since the scene was
+        // originally designed.)
+
+        if (maIncludeStack.empty())
+            Error("As of POV-Ray v3.7, the '#version' directive must be the first non-comment "
+                    "statement in the scene file. To indicate that your scene will dynamically "
+                    "adapt to whatever POV-Ray version is actually used, start your scene with "
+                    "'#version version;'.");
+    }
+
+    // Initialize various defaults depending on language version specified.
+    InitDefaults(sceneData->languageVersion);
+
+    // NB: This must be set _after_ parsing the value, in order for the `#version version`
+    // idiom to work properly, but _before_ any of the following code querying
+    // `sceneData->EffectiveLanguageVersion()`.
+    sceneData->languageVersionSet = true;
+
+    if (sceneData->explicitNoiseGenerator == false)
+        sceneData->noiseGenerator = (sceneData->EffectiveLanguageVersion() < 350 ?
+                                        kNoiseGen_Original : kNoiseGen_RangeCorrected);
+    // [CLi] if assumed_gamma is not specified in a pre-v3.7 scene, gammaMode defaults to kPOVList_GammaMode_None;
+    // this is enforced later anyway after parsing, but we may need this information /now/ during parsing already
+    switch (sceneData->gammaMode)
+    {
+        case kPOVList_GammaMode_None:
+        case kPOVList_GammaMode_AssumedGamma37Implied:
+            if (sceneData->EffectiveLanguageVersion() < 370)
+                sceneData->gammaMode = kPOVList_GammaMode_None;
+            else
+                sceneData->gammaMode = kPOVList_GammaMode_AssumedGamma37Implied;
+            break;
+        case kPOVList_GammaMode_AssumedGamma36:
+        case kPOVList_GammaMode_AssumedGamma37:
+            if (sceneData->EffectiveLanguageVersion() < 370)
+                sceneData->gammaMode = kPOVList_GammaMode_AssumedGamma36;
+            else
+                sceneData->gammaMode = kPOVList_GammaMode_AssumedGamma37;
+            break;
+    }
+    Parse_Semi_Colon(false);
+
+    if (sceneData->EffectiveLanguageVersion() > POV_RAY_VERSION_INT)
+    {
+        Error("Your scene file requires POV-Ray version %g or later!\n", (DBL)(sceneData->EffectiveLanguageVersion() / 100.0));
+    }
+
+    SetOkToDeclare(true);
+    parsingVersionDirective = wasParsingVersionDirective;
+}
 
 /*****************************************************************************
 *
@@ -2019,17 +1980,17 @@ void Parser::Open_Include()
 
 void Parser::Skip_Tokens(COND_TYPE cond)
 {
-    int Temp      = Cond_Stack.size();
-    int Prev_Skip = Skipping;
+    int Temp       = Cond_Stack.size();
+    bool Prev_Skip = Skipping;
 
-    Skipping=true;
+    Skipping = true;
 
     while ((Cond_Stack.size() > Temp) || ((Cond_Stack.size() == Temp) && (Cond_Stack.back().Cond_Type == cond)))
     {
         Get_Token();
     }
 
-    Skipping=Prev_Skip;
+    Skipping = Prev_Skip;
 
     if (IsEndOfSkip())
     {
