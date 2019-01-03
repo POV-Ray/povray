@@ -184,7 +184,7 @@
 #declare ( iorPolycarbonate                 , optional dispPolycarbonate                 ) = ( iorPC   , dispPC   );
 #declare ( iorPolymethylmethacrylate        , optional dispPolymethylmethacrylate        ) = ( iorPMMA , dispPMMA );
 #declare ( iorPolystyrene                   , optional dispPolystyrene                   ) = ( iorPS   , dispPS   );
-#declare ( iorPolyvinylchloride             , optional dispPolyvinylchloride             ) = ( iorPVP  , dispPVP  );
+#declare ( iorPolyvinylchloride             , optional dispPolyvinylchloride             ) = ( iorPVC  , dispPVC  );
 #declare ( iorPolyvinylpyrrolidone          , optional dispPolyvinylpyrrolidone          ) = ( iorPVP  , dispPVP  );
 
 // Plastics Trademarks
