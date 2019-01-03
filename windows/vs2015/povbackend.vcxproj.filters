@@ -111,6 +111,9 @@
     <ClCompile Include="..\..\source\backend\control\benchmark_pov.cpp">
       <Filter>Backend Source\Control</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\backend\control\parsertask.cpp">
+      <Filter>Backend Source\Control</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\backend\configbackend.h">
@@ -186,6 +189,9 @@
       <Filter>Backend Headers\Control</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\backend\control\benchmark_pov.h">
+      <Filter>Backend Headers\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\control\parsertask.h">
       <Filter>Backend Headers\Control</Filter>
     </ClInclude>
   </ItemGroup>

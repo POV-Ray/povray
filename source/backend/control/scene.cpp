@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,11 +40,12 @@
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
+#include "backend/control/parsertask.h"
 #include "backend/control/scene.h"
 
 #include "core/scene/tracethreaddata.h"
 
-#include "parser/parser.h"
+#include "parser/parsertypes.h"
 
 #include "backend/bounding/boundingtask.h"
 #include "backend/scene/view.h"
@@ -162,8 +163,8 @@ void Scene::StartParser(POVMS_Object& parseOptions)
     }
 
     // do parsing
-    sceneThreadData.push_back(dynamic_cast<TraceThreadData *>(parserTasks.AppendTask(new pov_parser::Parser(
-        sceneData, bool(parseOptions.Exist(kPOVAttrib_Clock)), parseOptions.TryGetFloat(kPOVAttrib_Clock, 0.0), seed
+    sceneThreadData.push_back(dynamic_cast<TraceThreadData *>(parserTasks.AppendTask(new pov_parser::ParserTask(
+        sceneData, pov_parser::ParserOptions(bool(parseOptions.Exist(kPOVAttrib_Clock)), parseOptions.TryGetFloat(kPOVAttrib_Clock, 0.0), seed)
         ))));
 
     // wait for parsing

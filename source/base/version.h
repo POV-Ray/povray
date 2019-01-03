@@ -12,7 +12,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -66,7 +66,7 @@
 /// @{
 
 /// Copyright string.
-#define POV_RAY_COPYRIGHT           "Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd."
+#define POV_RAY_COPYRIGHT           "Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd."
 
 /// First numerical component of official source code version ("major version") as integer.
 /// Increment this field (and set all subsequent fields to zero) to indicate a groundbreaking
@@ -100,7 +100,7 @@
 /// where `N` is a serial number starting at 1 in each phase, `TIME` is the number of minutes
 /// since 2000-01-01 00:00, and `FEATURE` is an arbitrary alphanumeric moniker for a particular
 /// experimental feature.
-#define POV_RAY_PRERELEASE          "x.tokenizer.9971030"
+#define POV_RAY_PRERELEASE          "x.tokenizer.9996595"
 
 #if defined(DOXYGEN) && !defined(POV_RAY_PRERELEASE)
     // Work around doxygen being unable to document undefined macros.

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -113,6 +113,9 @@ struct SymbolTable
     SYM_ENTRY *Add_Symbol(const UTF8String& Name, TokenId Number);
     SYM_ENTRY* Find_Symbol(const char* s) const;
     void Remove_Symbol(const char *Name, bool is_array_elem, void **DataPtr, int ttype);
+
+    static void Acquire_Entry_Reference(SYM_ENTRY *Entry);
+    static void Release_Entry_Reference(SYM_ENTRY *Entry);
 
 protected:
 

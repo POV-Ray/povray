@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -56,9 +56,6 @@
 #include "core/scene/atmosphere.h"
 #include "core/scene/camera.h"
 #include "core/scene/object.h"
-
-// POV-Ray header files (backend module)
-#include "backend/frame.h"
 
 // POV-Ray header files (parser module)
 //  (none at the moment)
@@ -468,6 +465,33 @@ void SymbolTable::Remove_Symbol(const char *Name, bool is_array_elem, void **Dat
         }
 
         POV_PARSER_PANIC();
+    }
+}
+
+void SymbolTable::Acquire_Entry_Reference(SYM_ENTRY *Entry)
+{
+    if (Entry == nullptr)
+        return;
+    if (Entry->ref_count >= std::numeric_limits<SymTableEntryRefCount>::max())
+        throw POV_EXCEPTION_STRING("Too many unresolved references to symbol");
+    Entry->ref_count++;
+}
+
+void SymbolTable::Release_Entry_Reference(SYM_ENTRY *Entry)
+{
+    if (Entry == nullptr)
+        return;
+    if (Entry->ref_count <= 0)
+        throw POV_EXCEPTION_STRING("Internal error: Symbol reference counter underflow");
+    Entry->ref_count--;
+
+    if (Entry->ref_count == 0)
+    {
+        Destroy_Ident_Data(Entry->Data, Entry->Token_Number);
+        if (Entry->Deprecation_Message != nullptr)
+            POV_FREE(Entry->Deprecation_Message);
+
+        delete Entry;
     }
 }
 
