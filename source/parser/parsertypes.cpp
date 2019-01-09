@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -70,8 +70,8 @@ POV_OFF_T LexemePosition::operator-(const LexemePosition& o) const
 
 //******************************************************************************
 
-TokenizerException::TokenizerException(const ConstSourcePtr & os, const LexemePosition & op) :
-    offendingStreamName(os->Name()),
+TokenizerException::TokenizerException(const UCS2String& osn, const LexemePosition & op) :
+    offendingStreamName(osn),
     offendingPosition(op)
 {}
 
@@ -95,29 +95,36 @@ POV_OFF_T TokenizerException::GetOffset() const
     return offendingPosition.offset;
 }
 
-IncompleteCommentException::IncompleteCommentException(const ConstSourcePtr& os, const LexemePosition& op) :
-    TokenizerException(os, op)
+IncompleteCommentException::IncompleteCommentException(const UCS2String& osn, const LexemePosition& op) :
+    TokenizerException(osn, op)
 {}
 
-IncompleteStringLiteralException::IncompleteStringLiteralException(const ConstSourcePtr& os, const LexemePosition& op) :
-    TokenizerException(os, op)
+IncompleteStringLiteralException::IncompleteStringLiteralException(const UCS2String& osn, const LexemePosition& op) :
+    TokenizerException(osn, op)
 {}
 
-InvalidCharacterException::InvalidCharacterException(const ConstSourcePtr& os, const LexemePosition& op, UCS4 oc) :
-    TokenizerException(os, op),
+InvalidEncodingException::InvalidEncodingException(const UCS2String& osn, const LexemePosition& op,
+                                                   const char* encodingName, const char* details) :
+    TokenizerException(osn, op),
+    encodingName(encodingName),
+    details(details)
+{}
+
+InvalidCharacterException::InvalidCharacterException(const UCS2String& osn, const LexemePosition& op, UCS4 oc) :
+    TokenizerException(osn, op),
     offendingCharacter(oc)
 {}
 
-InvalidEscapeSequenceException::InvalidEscapeSequenceException(const ConstSourcePtr& os, const LexemePosition& op,
+InvalidEscapeSequenceException::InvalidEscapeSequenceException(const UCS2String& osn, const LexemePosition& op,
                                                                const UTF8String& ot) :
-    TokenizerException(os, op),
+    TokenizerException(osn, op),
     offendingText(ot)
 {}
 
-InvalidEscapeSequenceException::InvalidEscapeSequenceException(const ConstSourcePtr& os, const LexemePosition& op,
+InvalidEscapeSequenceException::InvalidEscapeSequenceException(const UCS2String& osn, const LexemePosition& op,
                                                                const UTF8String::const_iterator& otb,
                                                                const UTF8String::const_iterator& ote) :
-    TokenizerException(os, op),
+    TokenizerException(osn, op),
     offendingText(otb, ote)
 {}
 

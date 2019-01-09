@@ -292,11 +292,44 @@ struct POVRect
     unsigned int GetHeight() const { return (bottom - top + 1); }
 };
 
-enum StringEncoding
+/// Legacy (v3.5) `charset` setting.
+enum LegacyCharset
 {
-    kStringEncoding_ASCII  = 0,
-    kStringEncoding_UTF8   = 1,
-    kStringEncoding_System = 2
+    kUnspecified,   ///< Global settings `charset` not specified.
+    kASCII,         ///< Global settings `charset ascii` specified.
+    kUTF8,          ///< Global settings `charset utf8` specified.
+    kSystem,        ///< Global settings `charset sys` specified.
+};
+
+/// Value identifying a character set.
+///
+/// Each value of this type represents a particular set of characters and associated mapping of
+/// those characters to _code points_.
+///
+/// @note
+///     The values of this type do _not_ identify any particular character _encoding_, i.e. a
+///     scheme of representing streams of characters as a byte stream. For example, all of
+///     UTF-8, UTF-16LE, UTF-16BE, UTF-32LE and UTF-32BE are encoding schemes for the UCS-4
+///     character set.
+///
+/// @note
+///     The numeric values chosen for the individual character sets are generally based on Windows
+///     code page numbers. If you add more character sets, please stick to this scheme wherever
+///     applicable, or use negative values.
+///
+enum class CharsetID
+{
+    kUndefined      = 0,        ///< Special value representing undefined character set.
+
+    kUCS2           = 1200,     ///< UCS-2 (16-bit subset of UCS) aka Basic Multilingual Plane (BMP).
+    kWindows1251    = 1251,     ///< Windows code page 1251 (Cyrillic).
+    kWindows1252    = 1252,     ///< Windows code page 1252 (Western) aka [incorrectly] ANSI.
+    kMacOSRoman     = 10000,    ///< Mac OS Roman (as used on classic Mac OS).
+    kUCS4           = 12000,    ///< UCS-4 (full set of UCS) aka [not entirely correctly] Unicode.
+    kLatin1         = 28591,    ///< ISO-8859-1 aka Latin-1.
+
+    kLegacySymbols  = -1,       ///< Special value representing legacy remapping for Microsoft symbol fonts,
+                                ///< remapping U+0000-U+00FF to U+F000-U+F0FF.
 };
 
 /// Type holding an @glossary{UTF8}-encoded string of characters.

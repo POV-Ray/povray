@@ -263,6 +263,13 @@ void Parser::Run()
         {
             Error(e, "Unterminated string literal in input file.");
         }
+        catch (const InvalidEncodingException& e)
+        {
+            if (e.details == nullptr)
+                Error(e, "Invalid byte sequence in %s input file.", e.encodingName);
+            else
+                Error(e, "Invalid byte sequence in %s input file (%s).", e.encodingName, e.details);
+        }
         catch (const InvalidCharacterException& e)
         {
             if (e.offendingCharacter <= 0x100u)
@@ -6494,13 +6501,33 @@ ObjectPtr Parser::Parse_TrueType ()
     Vector3d offset;
     int builtin_font = 0;
     TRANSFORM Local_Trans;
+    POV_UINT32 cmap;
+    CharsetID charset;
+    LegacyCharset legacyCharset;
 
-    if((sceneData->EffectiveLanguageVersion() < 350) && (sceneData->stringEncoding == kStringEncoding_ASCII))
+#if 0
+    if((sceneData->EffectiveLanguageVersion() < 350) && ((sceneData->legacyCharset == LegacyCharset::kUnspecified) ||
+                                                         (sceneData->legacyCharset == LegacyCharset::kASCII)))
     {
         PossibleError("Text may not be displayed as expected.\n"
                       "Please refer to the user manual regarding changes\n"
                       "in POV-Ray v3.5 and later.");
     }
+#endif
+
+    if (sceneData->EffectiveLanguageVersion() < 380)
+    {
+        if (sceneData->legacyCharset == LegacyCharset::kUnspecified)
+            sceneData->legacyCharset = LegacyCharset::kASCII;
+        else
+            legacyCharset = sceneData->legacyCharset;
+
+        PossibleError("Text may not be displayed as expected.\n"
+                      "Please refer to the user manual regarding changes "
+                      "in POV-Ray v3.8 and later.");
+    }
+    else
+        legacyCharset = LegacyCharset::kUnspecified;
 
     Parse_Begin ();
 
@@ -6520,6 +6547,31 @@ ObjectPtr Parser::Parse_TrueType ()
         END_CASE
     END_EXPECT
 
+    cmap = TrueTypeFont::kAnyCMAP;
+    charset = CharsetID::kUndefined;
+    EXPECT_ONE
+        CASE(CMAP_TOKEN)
+            Parse_Begin();
+            cmap =  POV_UINT16(Parse_Float()) << 16;
+            Parse_Comma();
+            cmap += POV_UINT16(Parse_Float());
+            charset = CharsetID::kUCS4;
+            EXPECT_ONE
+                CASE(CHARSET_TOKEN)
+                    charset = CharsetID(POV_UINT16(Parse_Float()));
+                    if (Charset::Get(charset) == nullptr)
+                        Error("Unknown character set %i", int(charset));
+                END_CASE
+                OTHERWISE
+                    UNGET
+                END_CASE
+            END_EXPECT
+            Parse_End();
+        END_CASE
+        OTHERWISE
+            UNGET
+        END_CASE
+    END_EXPECT
 
     /*** Object = Create_TTF(); */
     Parse_Comma();
@@ -6535,7 +6587,7 @@ ObjectPtr Parser::Parse_TrueType ()
     Parse_Vector(offset);
 
     /* Open the font file */
-    TrueTypeFont* font = OpenFontFile(filename, builtin_font);
+    TrueTypeFont* font = OpenFontFile(filename, builtin_font, cmap, charset, legacyCharset);
 
     /* Process all this good info */
     Object = new CSGUnion();
@@ -6578,7 +6630,7 @@ ObjectPtr Parser::Parse_TrueType ()
 *
 * AUTHOR
 *
-*   Alexander Ennzmann
+*   Alexander Enzmann
 *
 * DESCRIPTION
 *
@@ -6589,25 +6641,28 @@ ObjectPtr Parser::Parse_TrueType ()
 *   Added support for builtin fonts - Oct 2012 [JG]
 *
 ******************************************************************************/
-TrueTypeFont *Parser::OpenFontFile(const char *asciifn, const int font_id)
+TrueTypeFont *Parser::OpenFontFile(const char *asciifn, const int font_id, POV_UINT32 cmap, CharsetID charset,
+                                   LegacyCharset legacyCharset)
 {
     TrueTypeFont *font = nullptr;
     UCS2String ign;
     UCS2String formalFilename;
 
-    if (asciifn)
+    if (asciifn != nullptr)
     {
         formalFilename = ASCIItoUCS2String(asciifn);
 
-        /* First look to see if we have already opened this font */
+        // First look to see if we have already opened this font (with the same character mapping).
 
-        for(vector<TrueTypeFont*>::iterator iFont = sceneData->TTFonts.begin(); iFont != sceneData->TTFonts.end(); ++iFont)
-            if(formalFilename == (*iFont)->filename)
+        for (vector<TrueTypeFont*>::iterator iFont = sceneData->TTFonts.begin(); iFont != sceneData->TTFonts.end(); ++iFont)
+        {
+            if ((formalFilename == (*iFont)->filename) && (cmap == (*iFont)->cmap) && (charset == (*iFont)->charset) &&
+                (legacyCharset == (*iFont)->legacyCharset))
             {
                 font = *iFont;
                 break;
             }
-
+        }
     }
     if (font != nullptr)
     {
@@ -6648,7 +6703,7 @@ TrueTypeFont *Parser::OpenFontFile(const char *asciifn, const int font_id)
             file = shared_ptr<IStream>(Internal_Font_File(font_id));
         }
 
-        font = new TrueTypeFont(formalFilename, file, sceneData->stringEncoding);
+        font = new TrueTypeFont(formalFilename, file, cmap, charset, legacyCharset);
 
         sceneData->TTFonts.push_back(font);
     }
@@ -7176,18 +7231,29 @@ void Parser::Parse_Global_Settings()
         END_CASE
 
         CASE (CHARSET_TOKEN)
+            Warning("Encountered 'charset' global setting. As of POV-Ray v3.8, this mechanism "
+                    "of specifying character encoding is no longer supported, and future versions "
+                    "may treat the presence of the setting as an error.");
             EXPECT_ONE
                 CASE (ASCII_TOKEN)
-                    sceneData->stringEncoding = kStringEncoding_ASCII;
-                    mTokenizer.SetStringEncoding(kStringEncoding_ASCII);
+                    sceneData->legacyCharset = LegacyCharset::kASCII;
+                    if ((sceneData->EffectiveLanguageVersion() >= 350) &&
+                        (sceneData->EffectiveLanguageVersion() <  380))
+                    {
+                        Warning("Encountered 'charset ascii' in a v3.5 or later legacy scene. "
+                                "Behaviour with respect to non-ASCII characters (either encoded as "
+                                "extended ASCII or using '\\uXXXX' notation) differs from previous "
+                                "versions.");
+                    }
                 END_CASE
                 CASE (UTF8_TOKEN)
-                    sceneData->stringEncoding = kStringEncoding_UTF8;
-                    mTokenizer.SetStringEncoding(kStringEncoding_UTF8);
+                    sceneData->legacyCharset = LegacyCharset::kUTF8;
                 END_CASE
                 CASE (SYS_TOKEN)
-                    sceneData->stringEncoding = kStringEncoding_System;
-                    mTokenizer.SetStringEncoding(kStringEncoding_System);
+                    sceneData->legacyCharset = LegacyCharset::kSystem;
+                    Warning("Encountered 'charset sys'. Behaviour with respect to non-ASCII "
+                            "characters (either encoded as extended ASCII or using '\\uXXXX' "
+                            "notation) differs from previous versions.");
                 END_CASE
                 OTHERWISE
                     Expectation_Error ("charset type");

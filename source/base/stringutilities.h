@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -242,12 +242,29 @@ bool IsUCSLowSurrogate(UCS4 character);
 /// @return                     `true` if the code point qualifies as a UCS scalar value.
 bool IsUCSScalarValue(UCS4 character);
 
-} // namespace UCS
+} // end of namespace UCS
+
+//******************************************************************************
+
+struct Charset
+{
+    virtual ~Charset();
+
+    /// @pre The supplied value shall be a valid non-surrogate code point.
+    /// @return Whether the character can be represented in the character set.
+    virtual bool Encode(POV_UINT32& result, UCS4 character) const = 0;
+
+    /// @pre The supplied value shall be a valid character.
+    /// @return Whether the character can be represented in UCS-4.
+    virtual bool Decode(UCS4& result, POV_UINT32 character) const = 0;
+
+    static const Charset* Get(CharsetID charset);
+};
 
 /// @}
 ///
 //##############################################################################
 
-}
+} // end of namespace pov_base
 
 #endif // POVRAY_BASE_STRINGUTILITIES_H

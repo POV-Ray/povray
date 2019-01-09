@@ -231,7 +231,7 @@ class Parser
         struct Token_Struct : MessageContext
         {
             RawToken raw;
-            ConstSourcePtr sourceFile;
+            ConstStreamPtr sourceFile;
             TokenId Token_Id;                               ///< reserved token (or token group) ID, or unique identifier ID
             TokenId Function_Id;                            ///< token type ID, in case Token_Id is an identifier ID
             int context;                                    ///< context the token is local to (i.e., table index)
@@ -472,7 +472,7 @@ class Parser
         bool HaveCurrentMessageContext() const;
         const MessageContext& CurrentMessageContext() const;
         void SetInputStream(const shared_ptr<IStream>& stream);
-        RawTokenizer::HotBookmark GetHotBookmark() const;
+        RawTokenizer::HotBookmark GetHotBookmark();
         bool GoToBookmark(const RawTokenizer::HotBookmark& bookmark);
 
         bool IsEndOfInvokedMacro() const;
@@ -604,7 +604,7 @@ class Parser
         struct BraceStackEntry : LexemePosition, MessageContext
         {
             TokenId         openToken;
-            ConstSourcePtr  file;
+            ConstStreamPtr  file;
             BraceStackEntry(const Token_Struct& token) : LexemePosition(token.raw.lexeme.position), openToken(token.Token_Id), file(token.sourceFile) {}
             virtual UCS2String GetFileName() const override { return file->Name(); }
             virtual POV_LONG GetLine() const override { return line; }
@@ -756,7 +756,8 @@ class Parser
         ObjectPtr Parse_TrueType(void);
         void Parse_Blob_Element_Mods(Blob_Element *Element);
 
-        TrueTypeFont *OpenFontFile(const char *asciifn, const int font_id);
+        TrueTypeFont *OpenFontFile(const char *asciifn, int font_id, POV_UINT32 cmap, CharsetID charset,
+                                   LegacyCharset legacyCharset);
 
         void Parse_Mesh_Camera (Camera& Cam);
         void Parse_User_Defined_Camera (Camera& Cam);

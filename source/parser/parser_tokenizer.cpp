@@ -140,11 +140,10 @@ void Parser::CheckFileSignature()
         if (signature.expressionId == SIGNATURE_FUNCT_TOKEN)
         {
             // Found a signature. Switch to the corresponding encoding automatically.
-            ///@todo Still need to work on the mechanism to handle string encoding.
             switch (signature.id)
             {
-                case UTF8_SIGNATURE_TOKEN:  /* sceneData->stringEncoding = kStringEncoding_UTF8; */ break;
-                default:                    POV_PARSER_PANIC();                                     break;
+                case UTF8_SIGNATURE_TOKEN:  mTokenizer.SetStringEncoding(CharacterEncodingID::kUTF8);   break;
+                default:                    POV_PARSER_PANIC();                                         break;
             }
         }
         else
@@ -738,7 +737,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
 
 inline void Parser::Write_Token(const RawToken& rawToken, SymbolTable* table)
 {
-    POV_EXPERIMENTAL_ASSERT(mToken.sourceFile == mTokenizer.GetSource());
+    POV_EXPERIMENTAL_ASSERT(mToken.sourceFile == mTokenizer.GetInputStream());
     mToken.raw            = rawToken;
     mToken.Data           = nullptr;
     mToken.Token_Id       = rawToken.expressionId;
@@ -748,7 +747,7 @@ inline void Parser::Write_Token(const RawToken& rawToken, SymbolTable* table)
 
 inline void Parser::Write_Token(TokenId Token_Id, const RawToken& rawToken, SymbolTable* table)
 {
-    POV_EXPERIMENTAL_ASSERT(mToken.sourceFile == mTokenizer.GetSource());
+    POV_EXPERIMENTAL_ASSERT(mToken.sourceFile == mTokenizer.GetInputStream());
     mToken.raw            = rawToken;
     mToken.Data           = nullptr;
     mToken.Token_Id       = Conversion_Util_Table[Token_Id];
@@ -878,10 +877,10 @@ const MessageContext& Parser::CurrentMessageContext() const
 void Parser::SetInputStream(const shared_ptr<IStream>& stream)
 {
     mTokenizer.SetInputStream(stream);
-    mToken.sourceFile = mTokenizer.GetSource();
+    mToken.sourceFile = mTokenizer.GetInputStream();
 }
 
-RawTokenizer::HotBookmark Parser::GetHotBookmark() const
+RawTokenizer::HotBookmark Parser::GetHotBookmark()
 {
     return mTokenizer.GetHotBookmark();
 }
@@ -891,7 +890,7 @@ bool Parser::GoToBookmark(const RawTokenizer::HotBookmark& bookmark)
     if (!mTokenizer.GoToBookmark(bookmark))
         // In case of failure, don't update current token information. Required for proper error reporting.
         return false;
-    mToken.sourceFile = mTokenizer.GetSource();
+    mToken.sourceFile = mTokenizer.GetInputStream();
     return true;
 }
 
@@ -1086,7 +1085,7 @@ bool Parser::IsEndOfInvokedMacro() const
 
     POV_PARSER_ASSERT(Cond_Stack.back().PMac != nullptr);
     return (Cond_Stack.back().PMac->endPosition == CurrentFilePosition()) &&
-           (Cond_Stack.back().PMac->source.sourceName == mTokenizer.GetSourceName());
+           (Cond_Stack.back().PMac->source.fileName == mTokenizer.GetInputStreamName());
 }
 
 void Parser::Parse_Directive()
@@ -1421,7 +1420,7 @@ void Parser::Parse_Directive()
                     {
                         if ((PMac=Cond_Stack.back().PMac) != nullptr)
                         {
-                            if (PMac->source.sourceName != CurrentFileName())
+                            if (PMac->source.fileName != CurrentFileName())
                                 Error("#macro did not end in file where it started.");
 
                             PMac->endPosition = hashPosition;
@@ -1453,7 +1452,7 @@ void Parser::Parse_Directive()
                     break;
 
                 case WHILE_COND:
-                    if (Cond_Stack.back().returnToBookmark.pSource != mTokenizer.GetSource())
+                    if (Cond_Stack.back().returnToBookmark.pStream != mTokenizer.GetInputStream())
                     {
                         Error("#while loop did not end in file where it started.");
                     }
@@ -1474,7 +1473,7 @@ void Parser::Parse_Directive()
                     break;
 
                 case FOR_COND:
-                    if (Cond_Stack.back().returnToBookmark.pSource != mTokenizer.GetSource())
+                    if (Cond_Stack.back().returnToBookmark.pStream != mTokenizer.GetInputStream())
                     {
                         Error("#for loop did not end in file where it started.");
                     }
@@ -2303,7 +2302,7 @@ void Parser::Invoke_Macro()
         POV_FREE(Table_Entries);
     }
 
-    if ((PMac->Cache != nullptr) || (PMac->source.sourceName != mTokenizer.GetSourceName()))
+    if ((PMac->Cache != nullptr) || (PMac->source.fileName != mTokenizer.GetInputStreamName()))
     {
         UCS2String ign;
         /* Not in same file */
@@ -2312,13 +2311,13 @@ void Parser::Invoke_Macro()
         shared_ptr<IStream> is;
         if (PMac->Cache)
         {
-            is = std::make_shared<IMemStream>(Cond_Stack.back().PMac->Cache, PMac->CacheSize, PMac->source.sourceName, PMac->source.offset);
+            is = std::make_shared<IMemStream>(Cond_Stack.back().PMac->Cache, PMac->CacheSize, PMac->source.fileName, PMac->source.offset);
         }
         else
         {
-            is = Locate_File (PMac->source.sourceName, POV_File_Text_Macro, ign, true);
+            is = Locate_File (PMac->source.fileName, POV_File_Text_Macro, ign, true);
             if (is == nullptr)
-                Error ("Cannot open macro file '%s'.", UCS2toASCIIString(PMac->source.sourceName).c_str());
+                Error ("Cannot open macro file '%s'.", UCS2toASCIIString(PMac->source.fileName).c_str());
         }
         mTokenizer.SetInputStream(is);
     }
@@ -2334,7 +2333,7 @@ void Parser::Invoke_Macro()
         Error(PMac->source, "Unable to file seek in macro invocation.");
     }
 
-    mToken.sourceFile = mTokenizer.GetSource();
+    mToken.sourceFile = mTokenizer.GetInputStream();
 
     InvalidateCurrentToken();
 
@@ -2823,17 +2822,17 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File, TokenId Previous, TokenId *Nu
                 while (Parse_Read_Float_Value(val, User_File))
                 {
                     if (numComponents == 5)
-                        Error(SourceInfo(User_File->inTokenizer->GetSourceName(), User_File->inToken.lexeme.position), "Too many components in vector.");
+                        Error(SourceInfo(User_File->inTokenizer->GetInputStreamName(), User_File->inToken.lexeme.position), "Too many components in vector.");
                     Express[numComponents++] = val;
                     if (!User_File->ReadNextToken())
-                        Error(SourceInfo(User_File->inTokenizer->GetSourceName(), User_File->inToken.lexeme.position), "Incomplete vector.");
+                        Error(SourceInfo(User_File->inTokenizer->GetInputStreamName(), User_File->inToken.lexeme.position), "Incomplete vector.");
                     if (User_File->inToken.GetTokenId() != COMMA_TOKEN)
                         User_File->UnReadToken();
                 }
                 if (!User_File->ReadNextToken() || (User_File->inToken.GetTokenId() != RIGHT_ANGLE_TOKEN))
-                    Error(SourceInfo(User_File->inTokenizer->GetSourceName(), User_File->inToken.lexeme.position), "Expected vector component or '>'.");
+                    Error(SourceInfo(User_File->inTokenizer->GetInputStreamName(), User_File->inToken.lexeme.position), "Expected vector component or '>'.");
                 if (numComponents < 2)
-                    Error(SourceInfo(User_File->inTokenizer->GetSourceName(), User_File->inToken.lexeme.position), "Not enough components in vector.");
+                    Error(SourceInfo(User_File->inTokenizer->GetInputStreamName(), User_File->inToken.lexeme.position), "Not enough components in vector.");
 
                 switch (numComponents)
                 {
@@ -2877,7 +2876,7 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File, TokenId Previous, TokenId *Nu
                 break;
 
             default:
-                Error(SourceInfo(User_File->inTokenizer->GetSourceName(), User_File->inToken.lexeme.position), "Expected float, vector, or string literal");
+                Error(SourceInfo(User_File->inTokenizer->GetInputStreamName(), User_File->inToken.lexeme.position), "Expected float, vector, or string literal");
                 break;
         }
 
@@ -2903,7 +2902,7 @@ bool Parser::Parse_Read_Float_Value(DBL& val, DATA_FILE* User_File)
             // FALLTHROUGH
         case PLUS_TOKEN:
             if (!User_File->ReadNextToken() || (User_File->inToken.GetTokenId() != FLOAT_TOKEN))
-                Error(SourceInfo(User_File->inTokenizer->GetSourceName(), User_File->inToken.lexeme.position), "Expected float literal");
+                Error(SourceInfo(User_File->inTokenizer->GetInputStreamName(), User_File->inToken.lexeme.position), "Expected float literal");
             // FALLTHROUGH
         case FLOAT_TOKEN:
             val = sign * User_File->inToken.floatValue;
@@ -2930,7 +2929,7 @@ void Parser::Parse_Write(void)
     if (User_File->busyParsing)
         Error ("Can't nest directives accessing the same file.");
     if (User_File->Out_File == nullptr)
-        Error("Cannot write to file %s because the file is open for reading only.", UCS2toASCIIString(User_File->inTokenizer->GetSourceName()).c_str());
+        Error("Cannot write to file %s because the file is open for reading only.", UCS2toASCIIString(User_File->inTokenizer->GetInputStreamName()).c_str());
 
     // Safeguard against accidental nesting of other file access directives inside the `#fopen`
     // directive (or the user forgetting portions of the directive).

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -104,14 +104,14 @@ RawTokenizer::RawTokenizer() :
     }
 }
 
-void RawTokenizer::SetInputStream(SourcePtr source)
+void RawTokenizer::SetInputStream(StreamPtr pStream)
 {
-    mScanner.SetInputStream(source);
+    mScanner.SetInputStream(pStream);
 }
 
-void RawTokenizer::SetStringEncoding(StringEncoding encoding)
+void RawTokenizer::SetStringEncoding(CharacterEncodingID encoding)
 {
-    mScanner.SetStringEncoding(encoding);
+    mScanner.SetCharacterEncoding(encoding);
 }
 
 void pov_parser::RawTokenizer::SetNestedBlockComments(bool allow)
@@ -282,7 +282,7 @@ bool RawTokenizer::ProcessStringLiteralLexeme(RawToken& token)
 
                 if (isInvalid && (pAmbiguousValue->invalidEscapeSequence == nullptr))
                     pAmbiguousValue->invalidEscapeSequence = new AmbiguousStringValue::InvalidEscapeSequenceInfo(
-                        mScanner.GetSource(), token.lexeme.position, escapeSequenceBegin, escapeSequenceEnd);
+                        mScanner.GetInputStream(), token.lexeme.position, escapeSequenceBegin, escapeSequenceEnd);
             }
             else
             {
@@ -448,17 +448,17 @@ bool RawTokenizer::GetRaw(unsigned char* buffer, size_t size)
 
 //------------------------------------------------------------------------------
 
-pov_parser::ConstSourcePtr RawTokenizer::GetSource() const
+pov_parser::ConstStreamPtr RawTokenizer::GetInputStream() const
 {
-    return mScanner.GetSource();
+    return mScanner.GetInputStream();
 }
 
-pov_base::UCS2String RawTokenizer::GetSourceName() const
+pov_base::UCS2String RawTokenizer::GetInputStreamName() const
 {
-    return mScanner.GetSourceName();
+    return mScanner.GetInputStreamName();
 }
 
-pov_parser::RawTokenizer::HotBookmark RawTokenizer::GetHotBookmark() const
+pov_parser::RawTokenizer::HotBookmark RawTokenizer::GetHotBookmark()
 {
     return mScanner.GetHotBookmark();
 }

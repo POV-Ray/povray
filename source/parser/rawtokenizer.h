@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -86,13 +86,13 @@ struct AmbiguousStringValue : StringValue
 {
     struct InvalidEscapeSequenceInfo
     {
-        ConstSourcePtr source;
+        ConstStreamPtr stream;
         LexemePosition position;
         UTF8String text;
-        InvalidEscapeSequenceInfo(ConstSourcePtr s, LexemePosition p, UTF8String t) : source(s), position(p), text(t) {}
-        InvalidEscapeSequenceInfo(ConstSourcePtr s, LexemePosition p, const UTF8String::const_iterator& b, const UTF8String::const_iterator& e) :
-            source(s), position(p), text(b, e) {}
-        void Throw() const { throw InvalidEscapeSequenceException(source, position, text); }
+        InvalidEscapeSequenceInfo(ConstStreamPtr s, LexemePosition p, UTF8String t) : stream(s), position(p), text(t) {}
+        InvalidEscapeSequenceInfo(ConstStreamPtr s, LexemePosition p, const UTF8String::const_iterator& b, const UTF8String::const_iterator& e) :
+            stream(s), position(p), text(b, e) {}
+        void Throw() const { throw InvalidEscapeSequenceException(stream->Name(), position, text); }
     };
 
     UCS2String data;
@@ -193,10 +193,10 @@ public:
     /// Set or change the input stream.
     /// @note
     ///     The input stream must already be opened.
-    void SetInputStream(SourcePtr source);
+    void SetInputStream(StreamPtr pStream);
 
     /// Change encoding setting.
-    void SetStringEncoding(StringEncoding encoding);
+    void SetStringEncoding(CharacterEncodingID encoding);
 
     /// Change the behaviour with regards to nested block comments.
     void SetNestedBlockComments(bool allow);
@@ -214,14 +214,14 @@ public:
     ///     testing of the envisioned token-level macro caching.
     bool GetRaw(unsigned char* buffer, size_t size);
 
-    /// Get current source for comparison.
-    ConstSourcePtr GetSource() const;
+    /// Get current stream for comparison.
+    ConstStreamPtr GetInputStream() const;
 
-    /// Get current source name for comparison.
-    UCS2String GetSourceName() const;
+    /// Get current stream name for comparison.
+    UCS2String GetInputStreamName() const;
 
     /// Bookmark current stream and position for later rewinding.
-    HotBookmark GetHotBookmark() const;
+    HotBookmark GetHotBookmark();
 
     /// Bookmark current stream position for later rewinding.
     ColdBookmark GetColdBookmark() const;

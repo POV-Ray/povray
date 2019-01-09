@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,6 +39,7 @@
 #include "core/shape/truetype.h"
 
 #include <map>
+#include <vector>
 
 #include "base/fileinputoutput.h"
 
@@ -123,6 +124,8 @@ typedef POV_UINT16  uFWord;
 typedef int Fixed;
 #endif
 
+using GlyphIndex = POV_UINT32;
+
 typedef struct
 {
     Fixed version;                /* 0x10000 (1.0) */
@@ -186,7 +189,7 @@ typedef struct
 {
     USHORT format;
     USHORT length;
-    USHORT version;
+    USHORT language;
 } sfnt_mappingTable;
 
 typedef struct
@@ -249,12 +252,11 @@ typedef struct
 /* Contour information for a single glyph */
 struct GlyphStruct
 {
-    GlyphHeader header;           /* Count and sizing information about this
-                                   * glyph */
-    USHORT glyph_index;           /* Internal glyph index for this character */
+    GlyphHeader header;           /* Count and sizing information about this glyph */
+    GlyphIndex glyph_index;       /* Internal glyph index for this character */
     Contour *contours;            /* Array of outline contours */
     USHORT unitsPerEm;            /* Max units character */
-    USHORT myMetrics;             /* Which glyph index this is for metrics */
+    GlyphIndex myMetrics;         /* Which glyph index this is for metrics */
 };
 
 typedef struct KernData_struct
@@ -265,7 +267,7 @@ typedef struct KernData_struct
 
 /*
  * [esp] There's already a "KernTable" on the Mac... renamed to TTKernTable for
- * now in memorium to its author.
+ * now in memoriam to its author.
  */
 
 typedef struct KernStruct
@@ -290,17 +292,46 @@ typedef struct longHorMertric
 
 typedef std::map<USHORT, GlyphPtr> GlyphPtrMap;
 
+struct CMAPSelector
+{
+    CMAPSelector() = default;
+    CMAPSelector(USHORT pid, USHORT sid, CharsetID cs);
+    CMAPSelector(POV_UINT32 cmap, CharsetID cs);
+
+    USHORT platformID;
+    USHORT specificID;
+    const Charset* pConvertToCharset;
+};
+
+struct CMAPInfo
+{
+    virtual ~CMAPInfo() {}
+};
+
+using CMAPInfoPtr = CMAPInfo*;
+
+struct CMAP4Info : public CMAPInfo
+{
+    CMAP4Info();
+    virtual ~CMAP4Info() override;
+
+    ULONG glyphIDoffset;              /* Offset for Type 4 encoding tables */
+    USHORT segCount, searchRange,     /* Counts for Type 4 encoding tables */
+           entrySelector, rangeShift;
+    USHORT *startCount, *endCount,    /* Type 4 (MS) encoding tables */
+           *idDelta, *idRangeOffset;
+};
+
 struct TrueTypeInfo
 {
     TrueTypeInfo();
     ~TrueTypeInfo();
 
-    USHORT platformID[4];             /* Character encoding search order */
-    USHORT specificID[4];
+    std::vector<CMAPSelector> cmapSelector; /// Character encoding search order.
     ULONG cmap_table_offset;          /* File locations for these tables */
     ULONG glyf_table_offset;
     USHORT numGlyphs;                 /* How many symbols in this file */
-    USHORT unitsPerEm;                /* The "resoultion" of this font */
+    USHORT unitsPerEm;                /* The "resolution" of this font */
     SHORT indexToLocFormat;           /* 0 - short format, 1 - long format */
     ULONG *loca_table;                /* Mapping from characters to glyphs */
     GlyphPtrMap glyphsByChar;         /* Cached info for this font */
@@ -308,11 +339,7 @@ struct TrueTypeInfo
     KernTables kerning_tables;        /* Kerning info for this font */
     USHORT numberOfHMetrics;          /* The number of explicit spacings */
     longHorMetric *hmtx_table;        /* Horizontal spacing info */
-    ULONG glyphIDoffset;              /* Offset for Type 4 encoding tables */
-    USHORT segCount, searchRange,     /* Counts for Type 4 encoding tables */
-           entrySelector, rangeShift;
-    USHORT *startCount, *endCount,    /* Type 4 (MS) encoding tables */
-           *idDelta, *idRangeOffset;
+    vector<CMAPInfo*> cmapInfo;
 };
 
 /*****************************************************************************
@@ -348,13 +375,23 @@ void ProcessMaxpTable(TrueTypeFont *ffile, int maxp_table_offset);
 void ProcessKernTable(TrueTypeFont *ffile, int kern_table_offset);
 void ProcessHheaTable(TrueTypeFont *ffile, int hhea_table_offset);
 void ProcessHmtxTable(TrueTypeFont *ffile, int hmtx_table_offset);
-GlyphPtr ProcessCharacter(TrueTypeFont *ffile, unsigned int search_char, unsigned int *glyph_index);
-USHORT ProcessCharMap(TrueTypeFont *ffile, unsigned int search_char);
-USHORT ProcessFormat0Glyph(TrueTypeFont *ffile, unsigned int search_char);
-USHORT ProcessFormat4Glyph(TrueTypeFont *ffile, unsigned int search_char);
-USHORT ProcessFormat6Glyph(TrueTypeFont *ffile, unsigned int search_char);
-GlyphPtr ExtractGlyphInfo(TrueTypeFont *ffile, unsigned int glyph_index, unsigned int c);
-GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index, unsigned int c);
+GlyphPtr ProcessCharacter(TrueTypeFont *ffile, UCS4 search_char, GlyphIndex *glyph_index);
+GlyphIndex ProcessCharMap(TrueTypeFont *ffile, UCS4 search_char);
+
+/// @pre The glyph index shall be 0.
+/// @pre If the return value is `false`, the glyph index shall be 0.
+bool ProcessFormat0Glyph(TrueTypeFont *ffile, GlyphIndex& glyphIndex, POV_UINT32 search_codepoint);
+
+/// @pre The glyph index shall be 0.
+/// @pre If the return value is `false`, the glyph index shall be 0.
+bool ProcessFormat4Glyph(TrueTypeFont *ffile, GlyphIndex& glyphIndex, int cmapId, POV_UINT32 search_codepoint);
+
+/// @pre The glyph index shall be 0.
+/// @pre If the return value is `false`, the glyph index shall be 0.
+bool ProcessFormat6Glyph(TrueTypeFont *ffile, GlyphIndex& glyphIndex, POV_UINT32 search_codepoint);
+
+GlyphPtr ExtractGlyphInfo(TrueTypeFont *ffile, GlyphIndex glyph_index, UCS4 c);
+GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, GlyphIndex glyph_index, UCS4 c);
 GlyphPtr ConvertOutlineToGlyph(TrueTypeFont *ffile, const GlyphOutline *ttglyph);
 
 SHORT readSHORT(IStream& infile, int line, const char *file)
@@ -439,7 +476,7 @@ static int compare_tag4(const BYTE *ttf_tag, const BYTE *known_tag)
 *
 * AUTHOR
 *
-*   Alexander Ennzmann
+*   Alexander Enzmann
 *
 * DESCRIPTION
 *
@@ -460,7 +497,7 @@ void TrueType::ProcessNewTTF(CSG *Object, TrueTypeFont *ffile, const UCS2 *text_
     TTKernTable *table;
     USHORT coverage;
     unsigned int search_char;
-    unsigned int glyph_index, last_index = 0;
+    GlyphIndex glyph_index, last_index = 0;
     FWord kern_value_x, kern_value_min_x;
     FWord kern_value_y, kern_value_min_y;
     int i, j, k;
@@ -471,11 +508,6 @@ void TrueType::ProcessNewTTF(CSG *Object, TrueTypeFont *ffile, const UCS2 *text_
 
     for (i = 0; text_string[i] != 0; i++)
     {
-        /*
-         * We need to make sure (for now) that this is only the lower 8 bits,
-         * so we don't have all the high bits set if converted from a signed
-         * char to an unsigned short.
-         */
         search_char = (unsigned int)(text_string[i]);
 
 #ifdef TTF_DEBUG
@@ -684,7 +716,7 @@ void TrueType::ProcessNewTTF(CSG *Object, TrueTypeFont *ffile, const UCS2 *text_
 *
 * AUTHOR
 *
-*   Alexander Ennzmann
+*   Alexander Enzmann
 *
 * DESCRIPTION
 *
@@ -693,7 +725,7 @@ void TrueType::ProcessNewTTF(CSG *Object, TrueTypeFont *ffile, const UCS2 *text_
 *
 * CHANGES
 *
-*   Added tests for reading manditory tables/validity checks - Jan 1996 [AED]
+*   Added tests for reading mandatory tables/validity checks - Jan 1996 [AED]
 *   Reordered table parsing to avoid lots of file seeking - Jan 1996 [AED]
 *
 *   Added builtin fonts when fontfilename is nullptr - Oct 2012 [JG]
@@ -719,46 +751,64 @@ void ProcessFontFile(TrueTypeFont* ffile)
 
     ffile->info = new TrueTypeInfo;
 
-    /*
-        * For Microsoft encodings 3, 1 is for Unicode
-        *                         3, 0 is for Non-Unicode (ie symbols)
-        * For Macintosh encodings 1, 0 is for Roman character set
-        * For Unicode encodings   0, 3 is for Unicode
-        */
-    switch(ffile->textEncoding)
+    auto& cs = ffile->info->cmapSelector;
+
+    if (ffile->cmap == TrueTypeFont::kAnyCMAP)
     {
-        /// @todo Add support for alternative Unicode encoding IDs.
-        case kStringEncoding_ASCII:
-            /// @todo Why this order of preference?
-            // first choice
-            ffile->info->platformID[0] = 1; // Macintosh
-            ffile->info->specificID[0] = 0; // Roman
-            // second choice
-            ffile->info->platformID[1] = 3; // Windows
-            ffile->info->specificID[1] = 1; // Unicode BMP
-            // third choice
-            ffile->info->platformID[2] = 0; // Unicode
-            ffile->info->specificID[2] = 3; // Unicode 2.0+, BMP only
-            // fourth choice
-            ffile->info->platformID[3] = 3; // Windows
-            ffile->info->specificID[3] = 0; // Symbol
-            break;
-        case kStringEncoding_UTF8:
-        case kStringEncoding_System:
-            // first choice
-            ffile->info->platformID[0] = 0; // Unicode
-            ffile->info->specificID[0] = 3; // Unicode 2.0+, BMP only
-            // second choice
-            ffile->info->platformID[1] = 3; // Windows
-            ffile->info->specificID[1] = 1; // Unicode BMP
-            // third choice
-            /// @todo If this is what we get, we should probably do some character re-mapping.
-            ffile->info->platformID[2] = 1; // Macintosh
-            ffile->info->specificID[2] = 0; // Roman
-            // fourth choice
-            ffile->info->platformID[3] = 3; // Windows
-            ffile->info->specificID[3] = 0; // Symbol
-            break;
+        // Legacy (v3.7 and earlier) CMAP selection mode.
+        switch (ffile->legacyCharset)
+        {
+                // Choices in descending order of preference    // platformID   platformSpecificID  (as per Apple TrueType reference manual)
+
+            case LegacyCharset::kUnspecified:
+                // v3.8 CMAP selection preference
+                cs.emplace_back(0, 4,  CharsetID::kUCS4);       // Unicode      Unicode 2.0 or later semantics (non-BMP characters allowed)
+                cs.emplace_back(3, 10, CharsetID::kUCS4);       // Microsoft    Unicode UCS-4
+                cs.emplace_back(0, 3,  CharsetID::kUCS2);       // Unicode      Unicode 2.0 or later semantics (BMP only)
+                cs.emplace_back(3, 1,  CharsetID::kUCS2);       // Microsoft    Unicode BMP-only (UCS-2)
+                cs.emplace_back(1, 0,  CharsetID::kMacOSRoman); // Macintosh    [Roman]
+                cs.emplace_back(3, 0,  CharsetID::kUndefined);  // Microsoft    Symbol
+                /* Defined in the TrueType reference manual but not supported by POV-Ray:
+                cs.emplace_back(0, 0,  CharsetID::kUCS2);       // Unicode      Default Semantics
+                cs.emplace_back(0, 1,  CharsetID::kUCS2);       // Unicode      Version 1.1 semantics
+                cs.emplace_back(0, 2,  CharsetID::kUCS2);       // Unicode      ISO 10646 1993 semantics (deprecated)
+                cs.emplace_back(0, 5,  CharsetID::kUCS4);       // Unicode      Unicode Variation Sequences
+                cs.emplace_back(0, 6,  CharsetID::kUCS4);       // Unicode      Full Unicode coverage (used with type 13.0 cmaps by OpenType)
+                cs.emplace_back(1, *,  *);                      // Macintosh    [non-Roman QuickDraw scripts]
+                cs.emplace_back(3, 2,  ?);                      // Microsoft    Shift-JIS
+                cs.emplace_back(3, 3,  ?);                      // Microsoft    PRC
+                cs.emplace_back(3, 4,  ?);                      // Microsoft    BigFive
+                cs.emplace_back(3, 5,  ?);                      // Microsoft    Wansung [according to MS docs; Johab according to Apple docs]
+                cs.emplace_back(3, 6,  ?);                      // Microsoft    Johab [according to MS docs; N/A according to Apple docs]
+                */
+                break;
+
+            case LegacyCharset::kASCII:
+                // v3.7 (and earlier) `charset ascii` CMAP selection preference
+                cs.emplace_back(1, 0, CharsetID::kUndefined);  // Macintosh    [Roman]
+                cs.emplace_back(3, 1, CharsetID::kUndefined);  // Microsoft    Unicode BMP-only (UCS-2)
+                cs.emplace_back(0, 3, CharsetID::kUndefined);  // Unicode      Unicode 2.0 or later semantics (BMP only)
+                cs.emplace_back(3, 0, CharsetID::kUndefined);  // Microsoft    Symbol
+                break;
+
+            case LegacyCharset::kUTF8:
+            case LegacyCharset::kSystem:
+                // v3.7 (and earlier) `charset utf8` or `charset sys` CMAP selection preference
+                cs.emplace_back(0, 3, CharsetID::kUndefined);  // Unicode      Unicode 2.0 or later semantics (BMP only)
+                cs.emplace_back(3, 1, CharsetID::kUndefined);  // Microsoft    Unicode BMP-only (UCS-2)
+                cs.emplace_back(1, 0, CharsetID::kUndefined);  // Macintosh    [Roman]
+                cs.emplace_back(3, 0, CharsetID::kUndefined);  // Microsoft    Symbol
+                break;
+
+            default:
+                POV_CORE_ASSERT(false);
+                break;
+        }
+    }
+    else
+    {
+        // CMAP selection overridden by user.
+        cs.emplace_back(ffile->cmap, ffile->charset);
     }
 
     /*
@@ -1207,7 +1257,7 @@ void ProcessHmtxTable (TrueTypeFont *ffile, int hmtx_table_offset)
 *
 ******************************************************************************/
 
-GlyphPtr ProcessCharacter(TrueTypeFont *ffile, unsigned int search_char, unsigned int *glyph_index)
+GlyphPtr ProcessCharacter(TrueTypeFont *ffile, UCS4 search_char, GlyphIndex *glyph_index)
 {
     GlyphPtrMap::iterator iGlyph;
 
@@ -1271,16 +1321,14 @@ GlyphPtr ProcessCharacter(TrueTypeFont *ffile, unsigned int search_char, unsigne
 *
 * DESCRIPTION
 *
-*   Find the character mapping for 'search_char'.  We should really know
-*   which character set we are using (ie ISO 8859-1, Mac, Unicode, etc).
-*   Search char should really be a USHORT to handle double byte systems.
+*   Find the character mapping for 'search_char'.
 *
 * CHANGES
 *
 *   961120  esp  Added check to allow Macintosh encodings to pass
 *
 ******************************************************************************/
-USHORT ProcessCharMap(TrueTypeFont *ffile, unsigned int search_char)
+GlyphIndex ProcessCharMap(TrueTypeFont *ffile, UCS4 search_char)
 {
     int initial_table_offset;
     int old_table_offset;
@@ -1288,11 +1336,15 @@ USHORT ProcessCharMap(TrueTypeFont *ffile, unsigned int search_char)
     sfnt_platformEntry cmapEntry;
     sfnt_mappingTable encodingTable;
     int i, j, table_count;
+    GlyphIndex glyphIndex = 0; // Glyph 0 is the official fallback glyph.
 
     /* Move to the start of the character map, skipping the 2 byte version */
     ffile->file->seekg (ffile->info->cmap_table_offset + 2);
 
     table_count = READUSHORT(*ffile->file);
+
+    if (ffile->info->cmapInfo.size() < table_count)
+        ffile->info->cmapInfo.resize(table_count);
 
     #ifdef TTF_DEBUG
     Debug_Info("table_count=%d\n", table_count);
@@ -1305,7 +1357,7 @@ USHORT ProcessCharMap(TrueTypeFont *ffile, unsigned int search_char)
 
     initial_table_offset = ffile->file->tellg (); /* Save the initial position */
 
-    for(j = 0; j <= 3; j++)
+    for(j = 0; j <= ffile->info->cmapSelector.size(); ++j)
     {
         ffile->file->seekg(initial_table_offset); /* Always start new search at the initial position */
 
@@ -1325,7 +1377,8 @@ USHORT ProcessCharMap(TrueTypeFont *ffile, unsigned int search_char)
              * Check if this is the encoding table we want to use.
              * The search is done according to user preference.
              */
-            if ( ffile->info->platformID[j] != cmapEntry.platformID ) /* [JAC 01/99] */
+            if ((ffile->info->cmapSelector[j].platformID != cmapEntry.platformID) ||
+                (ffile->info->cmapSelector[j].specificID != cmapEntry.specificID))
             {
                 continue;
             }
@@ -1337,13 +1390,37 @@ USHORT ProcessCharMap(TrueTypeFont *ffile, unsigned int search_char)
             ffile->file->seekg (ffile->info->cmap_table_offset + entry_offset);
 
             encodingTable.format = READUSHORT(*ffile->file);
+            // TODO FIXME - formats 8.0, 10.0, 12.0 and 13.0 differ in the following fields
             encodingTable.length = READUSHORT(*ffile->file);
-            encodingTable.version = READUSHORT(*ffile->file);
+            encodingTable.language = READUSHORT(*ffile->file);
+
+            if ((cmapEntry.platformID == 1) &&
+                (encodingTable.language != 0))
+            {
+                // We currently don't support language-specific Macintosh encodings.
+                ffile->file->seekg(old_table_offset);
+                continue;
+            }
 
             #ifdef TTF_DEBUG
-            Debug_Info("Encoding table, format: %u, length: %u, version: %u\n",
-                       encodingTable.format, encodingTable.length, encodingTable.version);
+            Debug_Info("Encoding table, format: %u, length: %u, language: %u\n",
+                       encodingTable.format, encodingTable.length, encodingTable.language);
             #endif
+
+            /// @todo Implement support for Format 12.0 cmap tables.
+            /// @todo Implement support for Format 2, 8.0, 10.0, 13.0 and 14 cmap tables (optional).
+
+            POV_UINT32 search_codepoint;
+            if (ffile->info->cmapSelector[j].pConvertToCharset == nullptr)
+                search_codepoint = search_char;
+            else
+            {
+                if (!ffile->info->cmapSelector[j].pConvertToCharset->Encode(search_codepoint, search_char))
+                {
+                    ffile->file->seekg(old_table_offset);
+                    continue;
+                }
+            }
 
             if (encodingTable.format == 0)
             {
@@ -1355,9 +1432,10 @@ USHORT ProcessCharMap(TrueTypeFont *ffile, unsigned int search_char)
                 Debug_Info("Apple standard index mapping\n");
                 #endif
 
-                return(ProcessFormat0Glyph(ffile, search_char));
+                if (ProcessFormat0Glyph(ffile, glyphIndex, search_codepoint))
+                    return glyphIndex;
             }
-            #if 0  /* Want to get the rest of these working first */
+#if 0  /* Want to get the rest of these working first */
             else if (encodingTable.format == 2)
             {
                 /* Used for multi-byte character encoding (Chinese, Japanese, etc) */
@@ -1365,9 +1443,10 @@ USHORT ProcessCharMap(TrueTypeFont *ffile, unsigned int search_char)
                 Debug_Info("High-byte index mapping\n");
                 #endif
 
-                return(ProcessFormat2Glyph(ffile, search_char));
+                if (ProcessFormat2Glyph(ffile, glyphIndex, search_codepoint))
+                    return glyphIndex;
             }
-            #endif
+#endif
             else if (encodingTable.format == 4)
             {
                 /* Microsoft UGL encoding */
@@ -1375,7 +1454,33 @@ USHORT ProcessCharMap(TrueTypeFont *ffile, unsigned int search_char)
                 Debug_Info("Microsoft standard index mapping\n");
                 #endif
 
-                return(ProcessFormat4Glyph(ffile, search_char));
+                if (ProcessFormat4Glyph(ffile, glyphIndex, i, search_codepoint))
+                    return glyphIndex;
+                else if (ffile->legacyCharset != LegacyCharset::kUnspecified)
+                {
+                    // In v3.5 compatibility mode, we also try locating the original raw character
+                    // in the U+F000 through U+F0FF subrange of the Unicode Private Use Area, which is
+                    // the Unicode-conformant mapping recommended by Microsoft for legacy symbol
+                    // character sets originally used as 8-bit "custom code page" character sets
+                    // (e.g. Webdings).
+                    // (NB: We feel that this "custom code page" mode of using symbol character sets
+                    // is very much outdated and should be strongly discouraged, which is why we cease
+                    // support except for legacy scenes.)
+
+                    // To really mimick v3.5 behaviour, first we need to convert from Unicode back to
+                    // the original encoded value.
+                    // We presume that the original character encoding was auto-detected and wasn't
+                    // UTF-8, in which case Windows-1252 will have been presumed. (It should also work
+                    // for UTF-8 because the 8-bit subset of UCS matches Latin-1, to which Windows-1252
+                    // is an extension except for C1 control characters.)
+                    POV_UINT32 rawCodepoint;
+                    if (Charset::Get(CharsetID::kWindows1252)->Encode(rawCodepoint, search_char))
+                    {
+                        // Now map the original code to the U+F000-U+F0FF range and try to look it up.
+                        if (ProcessFormat4Glyph(ffile, glyphIndex, i, 0xF000 + rawCodepoint))
+                            return glyphIndex;
+                    }
+                }
             }
             else if (encodingTable.format == 6)
             {
@@ -1383,7 +1488,8 @@ USHORT ProcessCharMap(TrueTypeFont *ffile, unsigned int search_char)
                 Debug_Info("Trimmed table mapping\n");
                 #endif
 
-                return(ProcessFormat6Glyph(ffile, search_char));
+                if (ProcessFormat6Glyph(ffile, glyphIndex, search_codepoint))
+                    return glyphIndex;
             }
             #ifdef TTF_DEBUG
             else
@@ -1425,7 +1531,7 @@ USHORT ProcessCharMap(TrueTypeFont *ffile, unsigned int search_char)
 * DESCRIPTION
 *
 * This handles the Apple standard index mapping for glyphs.
-* The file pointer must be pointing immediately after the version entry in the
+* The file pointer must be pointing immediately after the language entry in the
 * encoding table for the next two functions to work.
 *
 * CHANGES
@@ -1433,11 +1539,14 @@ USHORT ProcessCharMap(TrueTypeFont *ffile, unsigned int search_char)
 *   -
 *
 ******************************************************************************/
-USHORT ProcessFormat0Glyph(TrueTypeFont *ffile, unsigned int search_char)
+bool ProcessFormat0Glyph(TrueTypeFont *ffile, GlyphIndex& glyphIndex, POV_UINT32 search_codepoint)
 {
     BYTE temp_index;
 
-    ffile->file->seekg ((int)search_char, IOBase::seek_cur);
+    if (search_codepoint > 0xFFu)
+        return false;
+
+    ffile->file->seekg ((int)search_codepoint, IOBase::seek_cur);
 
     /// @compat
     /// This piece of code relies on BYTE having the same size as char.
@@ -1446,7 +1555,8 @@ USHORT ProcessFormat0Glyph(TrueTypeFont *ffile, unsigned int search_char)
         throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file.");
     }
 
-    return (USHORT)(temp_index);
+    glyphIndex = temp_index;
+    return (glyphIndex != 0);
 }
 
 /*****************************************************************************
@@ -1474,72 +1584,80 @@ USHORT ProcessFormat0Glyph(TrueTypeFont *ffile, unsigned int search_char)
 *   Mar 26, 1996: Cache segment info rather than read each time.  [AED]
 *
 ******************************************************************************/
-USHORT ProcessFormat4Glyph(TrueTypeFont *ffile, unsigned int search_char)
+bool ProcessFormat4Glyph(TrueTypeFont *ffile, GlyphIndex& glyphIndex, int cmapId, POV_UINT32 search_codepoint)
 {
     int i;
-    unsigned int glyph_index = 0;  /* Set the glyph index to "not present" */
+
+    if (search_codepoint > 0xFFFFu)
+        return false;
 
     /*
      * If this is the first time we are here, read all of the segment headers,
      * and save them for later calls to this function, rather than seeking and
      * mallocing for each character
      */
-    if (ffile->info->segCount == 0)
-    {
-        USHORT temp16;
 
-        ffile->info->segCount = READUSHORT(*ffile->file) >> 1;
-        ffile->info->searchRange = READUSHORT(*ffile->file);
-        ffile->info->entrySelector = READUSHORT(*ffile->file);
-        ffile->info->rangeShift = READUSHORT(*ffile->file);
+    CMAP4Info* cmap4Info = dynamic_cast<CMAP4Info*>(ffile->info->cmapInfo[cmapId]);
+
+    if (cmap4Info == nullptr)
+    {
+        POV_CORE_ASSERT(ffile->info->cmapInfo[cmapId] == nullptr);
+
+        cmap4Info = new CMAP4Info();
+
+        cmap4Info->segCount = READUSHORT(*ffile->file) >> 1;
+        cmap4Info->searchRange = READUSHORT(*ffile->file);
+        cmap4Info->entrySelector = READUSHORT(*ffile->file);
+        cmap4Info->rangeShift = READUSHORT(*ffile->file);
 
         /* Now allocate and read in the segment arrays */
 
-        ffile->info->endCount = new USHORT[ffile->info->segCount];
-        ffile->info->startCount = new USHORT[ffile->info->segCount];
-        ffile->info->idDelta = new USHORT[ffile->info->segCount];
-        ffile->info->idRangeOffset = new USHORT[ffile->info->segCount];
+        cmap4Info->endCount = new USHORT[cmap4Info->segCount];
+        cmap4Info->startCount = new USHORT[cmap4Info->segCount];
+        cmap4Info->idDelta = new USHORT[cmap4Info->segCount];
+        cmap4Info->idRangeOffset = new USHORT[cmap4Info->segCount];
 
-        for (i = 0; i < ffile->info->segCount; i++)
+        for (i = 0; i < cmap4Info->segCount; i++)
         {
-            ffile->info->endCount[i] = READUSHORT(*ffile->file);
+            cmap4Info->endCount[i] = READUSHORT(*ffile->file);
         }
 
-        temp16 = READUSHORT(*ffile->file);  /* Skip over 'reservedPad' */
+        (void)READUSHORT(*ffile->file);  /* Skip over 'reservedPad' */
 
-        for (i = 0; i < ffile->info->segCount; i++)
+        for (i = 0; i < cmap4Info->segCount; i++)
         {
-            ffile->info->startCount[i] = READUSHORT(*ffile->file);
+            cmap4Info->startCount[i] = READUSHORT(*ffile->file);
         }
 
-        for (i = 0; i < ffile->info->segCount; i++)
+        for (i = 0; i < cmap4Info->segCount; i++)
         {
-            ffile->info->idDelta[i] = READUSHORT(*ffile->file);
+            cmap4Info->idDelta[i] = READUSHORT(*ffile->file);
         }
 
         /* location of start of idRangeOffset */
-        ffile->info->glyphIDoffset = ffile->file->tellg ();
+        cmap4Info->glyphIDoffset = ffile->file->tellg ();
 
-        for (i = 0; i < ffile->info->segCount; i++)
+        for (i = 0; i < cmap4Info->segCount; i++)
         {
-            ffile->info->idRangeOffset[i] = READUSHORT(*ffile->file);
+            cmap4Info->idRangeOffset[i] = READUSHORT(*ffile->file);
         }
+
+        ffile->info->cmapInfo[cmapId] = cmap4Info;
     }
 
     /* Search the segments for our character */
 
-glyph_search:
-    for (i = 0; i < ffile->info->segCount; i++)
+    for (i = 0; i < cmap4Info->segCount; i++)
     {
-        if (search_char <= ffile->info->endCount[i])
+        if (search_codepoint <= cmap4Info->endCount[i])
         {
-            if (search_char >= ffile->info->startCount[i])
+            if (search_codepoint >= cmap4Info->startCount[i])
             {
                 /* Found correct range for this character */
 
-                if (ffile->info->idRangeOffset[i] == 0)
+                if (cmap4Info->idRangeOffset[i] == 0)
                 {
-                    glyph_index = search_char + ffile->info->idDelta[i];
+                    glyphIndex = search_codepoint + cmap4Info->idDelta[i];
                 }
                 else
                 {
@@ -1550,37 +1668,20 @@ glyph_search:
                      *
                      * (glyphIDoffset + i*2 + idRangeOffset[i]) == &idRangeOffset[i]
                      */
-                    ffile->file->seekg (ffile->info->glyphIDoffset + 2*i + ffile->info->idRangeOffset[i]+
-                                     2*(search_char - ffile->info->startCount[i]));
+                    ffile->file->seekg (cmap4Info->glyphIDoffset + 2*i + cmap4Info->idRangeOffset[i]+
+                                        2*(search_codepoint - cmap4Info->startCount[i]));
 
-                    glyph_index = READUSHORT(*ffile->file);
+                    glyphIndex = READUSHORT(*ffile->file);
 
-                    if (glyph_index != 0)
-                        glyph_index = glyph_index + ffile->info->idDelta[i];
+                    if (glyphIndex != 0)
+                        glyphIndex += cmap4Info->idDelta[i];
                 }
             }
             break;
         }
     }
 
-    /*
-     * If we haven't found the character yet, and this is the first time to
-     * search the tables, try looking in the Unicode user space, since this
-     * is the location Microsoft recommends for symbol characters like those
-     * in wingdings and dingbats.
-     */
-    if (glyph_index == 0 && search_char < 0x100)
-    {
-        search_char += 0xF000;
-#ifdef TTF_DEBUG
-        Debug_Info("Looking for glyph in Unicode user space (0x%X)\n", search_char);
-#endif
-        goto glyph_search;
-    }
-
-    /* Deallocate the memory we used for the segment arrays */
-
-    return glyph_index;
+    return (glyphIndex != 0);
 }
 
 /*****************************************************************************
@@ -1608,23 +1709,23 @@ glyph_search:
 *   -
 *
 ******************************************************************************/
-USHORT ProcessFormat6Glyph(TrueTypeFont *ffile, unsigned int search_char)
+bool ProcessFormat6Glyph(TrueTypeFont *ffile, GlyphIndex& glyphIndex, POV_UINT32 search_codepoint)
 {
     USHORT firstCode, entryCount;
-    USHORT glyph_index;
+
+    if (search_codepoint > 0xFFFFu)
+        return false;
 
     firstCode = READUSHORT(*ffile->file);
     entryCount = READUSHORT(*ffile->file);
 
-    if (search_char >= firstCode && search_char < firstCode + entryCount)
+    if (search_codepoint >= firstCode && search_codepoint < firstCode + entryCount)
     {
-        ffile->file->seekg (((int)(search_char - firstCode))*2, IOBase::seek_cur);
-        glyph_index = READUSHORT(*ffile->file);
+        ffile->file->seekg(((int)(search_codepoint - firstCode)) * 2, IOBase::seek_cur);
+        glyphIndex = READUSHORT(*ffile->file);
     }
-    else
-        glyph_index = 0;
 
-    return glyph_index;
+    return (glyphIndex != 0);
 }
 
 
@@ -1653,7 +1754,7 @@ USHORT ProcessFormat6Glyph(TrueTypeFont *ffile, unsigned int search_char)
 *   -
 *
 ******************************************************************************/
-GlyphPtr ExtractGlyphInfo(TrueTypeFont *ffile, unsigned int glyph_index, unsigned int c)
+GlyphPtr ExtractGlyphInfo(TrueTypeFont *ffile, GlyphIndex glyph_index, UCS4 c)
 {
     GlyphOutline *ttglyph;
     GlyphPtr glyph;
@@ -1769,7 +1870,7 @@ GlyphPtr ExtractGlyphInfo(TrueTypeFont *ffile, unsigned int glyph_index, unsigne
 * DESCRIPTION
 *
 *   Read the contour information for a specific glyph.  This has to be a
-*   separate routine from ExtractGlyphInfo because we call it recurisvely
+*   separate routine from ExtractGlyphInfo because we call it recursively
 *   for multiple component glyphs.
 *
 * CHANGES
@@ -1777,7 +1878,7 @@ GlyphPtr ExtractGlyphInfo(TrueTypeFont *ffile, unsigned int glyph_index, unsigne
 *   -
 *
 ******************************************************************************/
-GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index, unsigned int c)
+GlyphOutline * ExtractGlyphOutline(TrueTypeFont *ffile, GlyphIndex glyph_index, UCS4 c)
 {
     int i;
     USHORT n;
@@ -2977,10 +3078,13 @@ void TrueType::Compute_BBox()
 }
 
 
-TrueTypeFont::TrueTypeFont(const UCS2String& fn, const shared_ptr<IStream>& f, StringEncoding te) :
+TrueTypeFont::TrueTypeFont(const UCS2String& fn, const shared_ptr<IStream>& f,
+                           POV_UINT32 cm, CharsetID cs, LegacyCharset scs) :
     filename(fn),
     file(f),
-    textEncoding(te),
+    cmap(cm),
+    charset(cs),
+    legacyCharset(scs),
     info(nullptr)
 {
     ProcessFontFile(this);
@@ -2994,15 +3098,15 @@ TrueTypeFont::~TrueTypeFont()
         delete info;
 }
 
-TrueTypeInfo::TrueTypeInfo() :
-    cmap_table_offset(0),
-    glyf_table_offset(0),
-    numGlyphs(0),
-    unitsPerEm(0),
-    indexToLocFormat(0),
-    loca_table(nullptr),
-    numberOfHMetrics(0),
-    hmtx_table(nullptr),
+CMAPSelector::CMAPSelector(USHORT pid, USHORT sid, CharsetID cs) :
+    platformID(pid), specificID(sid), pConvertToCharset(Charset::Get(cs))
+{}
+
+CMAPSelector::CMAPSelector(POV_UINT32 cmap, CharsetID cs) :
+    platformID(cmap >> 16), specificID(cmap & 0xFFFFu), pConvertToCharset(Charset::Get(cs))
+{}
+
+CMAP4Info::CMAP4Info() :
     glyphIDoffset(0),
     segCount(0),
     searchRange(0),
@@ -3012,13 +3116,33 @@ TrueTypeInfo::TrueTypeInfo() :
     endCount(nullptr),
     idDelta(nullptr),
     idRangeOffset(nullptr)
-{
-    for (int i = 0; i < 4; i ++)
-    {
-        platformID[i] = 0;
-        specificID[i] = 0;
-    }
+{}
 
+CMAP4Info::~CMAP4Info()
+{
+    if (endCount != nullptr)
+        delete[] endCount;
+
+    if (startCount != nullptr)
+        delete[] startCount;
+
+    if (idDelta != nullptr)
+        delete[] idDelta;
+
+    if (idRangeOffset != nullptr)
+        delete[] idRangeOffset;
+}
+
+TrueTypeInfo::TrueTypeInfo() :
+    cmap_table_offset(0),
+    glyf_table_offset(0),
+    numGlyphs(0),
+    unitsPerEm(0),
+    indexToLocFormat(0),
+    loca_table(nullptr),
+    numberOfHMetrics(0),
+    hmtx_table(nullptr)
+{
     kerning_tables.nTables = 0;
     kerning_tables.tables = nullptr;
 }
@@ -3049,17 +3173,9 @@ TrueTypeInfo::~TrueTypeInfo()
     if (hmtx_table != nullptr)
         delete[] hmtx_table;
 
-    if (endCount != nullptr)
-        delete[] endCount;
-
-    if (startCount != nullptr)
-        delete[] startCount;
-
-    if (idDelta != nullptr)
-        delete[] idDelta;
-
-    if (idRangeOffset != nullptr)
-        delete[] idRangeOffset;
+    for (std::vector<CMAPInfo*>::iterator i = cmapInfo.begin(); i != cmapInfo.end(); ++i)
+        if (*i != nullptr)
+            delete *i;
 }
 
 }

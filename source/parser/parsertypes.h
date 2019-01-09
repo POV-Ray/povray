@@ -65,8 +65,8 @@ enum TokenId : int;
 
 //------------------------------------------------------------------------------
 
-using SourcePtr = shared_ptr<pov_base::IStream>;
-using ConstSourcePtr = shared_ptr<const pov_base::IStream>;
+using StreamPtr = shared_ptr<pov_base::IStream>;
+using ConstStreamPtr = shared_ptr<const pov_base::IStream>;
 
 //------------------------------------------------------------------------------
 
@@ -74,17 +74,31 @@ struct LexemePosition : pov::SourcePosition
 {
     LexemePosition();
     bool operator==(const LexemePosition& o) const;
+    bool operator!=(const LexemePosition& o) const { return !(*this == o); }
     POV_OFF_T operator-(const LexemePosition& o) const;
 };
 
 //------------------------------------------------------------------------------
 
+/// Error detected by the _scanner_ or _raw tokenizer_ stage of the parser.
+///
+/// This type serves as the base class for all exceptions thrown by @ref Scanner
+/// or @ref RawTokenizer, indicating a malformed scene file.
+///
+/// Exceptions of this type carry information about the location of the error
+/// (file name, binary offset, line and column), exposed as public data members.
+/// For convenience, access to this information is also provided via the
+/// @ref MessageContext interface.
+///
 struct TokenizerException : std::exception, MessageContext
 {
-    UCS2String      offendingStreamName;
-    LexemePosition  offendingPosition;
+    /// Name of the stream in which the error was encountered.
+    UCS2String offendingStreamName;
 
-    TokenizerException(const ConstSourcePtr& os, const LexemePosition& op);
+    /// Location at which the error was encountered.
+    LexemePosition offendingPosition;
+
+    TokenizerException(const UCS2String& osn, const LexemePosition& op);
 
     virtual UCS2String GetFileName() const override;
     virtual POV_LONG GetLine() const override;
@@ -92,33 +106,85 @@ struct TokenizerException : std::exception, MessageContext
     virtual POV_OFF_T GetOffset() const override;
 };
 
+/// Missing end-of-comment marker in block comment.
+///
+/// This exception is thrown by @ref Scanner (and passed on by
+/// @ref RawTokenizer) to indicate that a "C-style" block comment start sequence
+/// (`/*`) was encountered without a matching end sequence (`*/`), implying a
+/// broken comment or a comment nesting error.
+///
 struct IncompleteCommentException : TokenizerException
 {
-    IncompleteCommentException(const ConstSourcePtr& os, const LexemePosition& op);
+    IncompleteCommentException(const UCS2String& osn, const LexemePosition& op);
 };
 
+/// Missing end-of-string marker in string literal.
+///
+/// This exception is thrown by @ref Scanner (and passed on by
+/// @ref RawTokenizer) to indicate that an unbalanced double quote (`"`) was
+/// encountered, implying a broken string literal.
+///
 struct IncompleteStringLiteralException : TokenizerException
 {
-    IncompleteStringLiteralException(const ConstSourcePtr& os, const LexemePosition& op);
+    IncompleteStringLiteralException(const UCS2String& osn, const LexemePosition& op);
 };
 
+/// Invalid encoding in input file.
+///
+/// This exception is thrown by @ref Scanner (and passed on by
+/// @ref RawTokenizer) to indicate that an octet or octet sequence encountered
+/// in the data stream does not conform to the expected character encoding
+/// scheme, implying a broken or malformed file.
+///
+struct InvalidEncodingException : TokenizerException
+{
+    /// Descriptive name of the expected encoding scheme.
+    const char* encodingName;
+
+    /// Brief description on the nature of the encoding scheme violation.
+    /// May be `nullptr` to indicate that no further information is available
+    /// or necessary.
+    const char* details;
+
+    InvalidEncodingException(const UCS2String& osn, const LexemePosition& op, const char* encodingName, const char* details = nullptr);
+};
+
+/// Invalid character in input file.
+///
+/// This exception is thrown by @ref Scanner (and passed on by
+/// @ref RawTokenizer) to indicate that an unexpected ASCII control character
+/// or non-ASCII character was encountered outside a string literal or comment.
+///
 struct InvalidCharacterException : TokenizerException
 {
+    /// UCS code point corresponding to the unexpected character.
     UCS4 offendingCharacter;
-    InvalidCharacterException(const ConstSourcePtr& os, const LexemePosition& op, UCS4 oc);
+
+    InvalidCharacterException(const UCS2String& osn, const LexemePosition& op, UCS4 oc);
 };
 
+/// Invalid escape sequence in string literal.
+///
+/// This exception is thrown by @ref AmbiguousStringValue (as created by
+/// @ref RawTokenizer) to indicate that an unexpected sequence of characters was
+/// encountered after a string literal escape character (`\`) while trying to
+/// evaluate the literal in a non-filename context, implying a broken string
+/// literal, malformed escape sequence or failure to properly escape a literal
+/// backslash character.
+///
 struct InvalidEscapeSequenceException : TokenizerException
 {
+    /// Offending escape sequence, including leading escape character.
     UTF8String offendingText;
-    InvalidEscapeSequenceException(const ConstSourcePtr& os, const LexemePosition& op, const UTF8String& ot);
-    InvalidEscapeSequenceException(const ConstSourcePtr& os, const LexemePosition& op,
+
+    InvalidEscapeSequenceException(const UCS2String& osn, const LexemePosition& op, const UTF8String& ot);
+    InvalidEscapeSequenceException(const UCS2String& osn, const LexemePosition& op,
                                    const UTF8String::const_iterator& otb, const UTF8String::const_iterator& ote);
 };
 
 //------------------------------------------------------------------------------
 
-// Base class for miscellaneous things that can be assigned to a symbol.
+/// Base class for miscellaneous things that can be assigned to a symbol.
 struct Assignable
 {
     virtual ~Assignable() {}
@@ -133,6 +199,25 @@ struct ParserOptions
     DBL     clock;
     size_t  randomSeed;
     ParserOptions(bool uc, DBL c, size_t rs) : useClock(uc), clock(c), randomSeed(rs) {}
+};
+
+//------------------------------------------------------------------------------
+
+/// Value identifying a character encoding scheme.
+///
+/// Each value of this type represents a particular scheme for encoding
+/// sequences of characters as sequences of octets.
+///
+enum class CharacterEncodingID
+{
+    kAutoDetect,    ///< Auto-detect (UTF-8 or Windows-1252 or compatible).
+
+    kASCII,         ///< Strict ASCII.
+    kLatin1,        ///< Strict ISO-8859-1 aka Latin-1.
+    kMacOSRoman,    ///< Mac OS Roman (as used on classic Mac OS).
+    kWindows1252,   ///< Windows code page 1252 aka [incorrectly] ANSI.
+
+    kUTF8,          ///< Strict UTF-8.
 };
 
 //------------------------------------------------------------------------------
