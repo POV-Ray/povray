@@ -176,10 +176,8 @@ Parser::~Parser()
 /* Parse the file. */
 void Parser::Run()
 {
-    int         error_line = -1;
-    int         error_col = -1;
-    UCS2String  error_filename(POV_FILENAME_BUFFER_CHARS, 0); // Pre-claim some memory, so we can handle an out-of-memory error.
-    POV_OFF_T   error_pos = -1;
+    SourceInfo errorInfo(UCS2String(POV_FILENAME_BUFFER_CHARS, 0), // Pre-claim some memory, so we can handle an out-of-memory error.
+                         SourcePosition(-1,-1,-1));
 
     // Outer try/catch block to handle out-of-memory conditions
     // occurring during regular error handling.
@@ -301,10 +299,8 @@ void Parser::Run()
             {
                 // take a (local) copy of error location prior to freeing token data
                 // NB error_filename has been pre-allocated for strings up to POV_FILENAME_BUFFER_CHARS
-                error_filename = CurrentFileName();
-                error_line = CurrentFilePosition().line;
-                error_col = CurrentFilePosition().column;
-                error_pos = CurrentFilePosition().offset;
+                errorInfo.fileName = CurrentFileName();
+                errorInfo.position = CurrentFilePosition();
             }
 
             // free up some memory before proceeding with error notification.
@@ -313,8 +309,8 @@ void Parser::Run()
             Default_Texture = nullptr;
             Destroy_Random_Generators();
 
-            if (error_line != -1)
-                mMessageFactory.ErrorAt(POV_EXCEPTION_CODE(kOutOfMemoryErr), error_filename, error_line, error_col, error_pos, "Out of memory.");
+            if (errorInfo.position.line != -1)
+                mMessageFactory.ErrorAt(POV_EXCEPTION_CODE(kOutOfMemoryErr), errorInfo, "Out of memory.");
             else
                 Error("Out of memory.");
         }
