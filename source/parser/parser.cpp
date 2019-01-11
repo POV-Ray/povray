@@ -769,7 +769,15 @@ void Parser::Parse_End(TokenId openTokenId, TokenId expectTokenId)
     {
         POV_PARSER_ASSERT(!maBraceStack.empty());
         POV_PARSER_ASSERT(openTokenId == maBraceStack.back().openToken);
+
+        if (!maIncludeStack.empty() && (maBraceStack.size() <= maIncludeStack.back().braceStackSize))
+        {
+            BraceStackEntry& braceStackEntry = maBraceStack.back();
+            // Include file has closed more braces/parentheses/etc. than it has opened.
+            Warning("Unbalanced %s in include file", Get_Token_String(CurrentTokenId()));
+        }
         maBraceStack.pop_back();
+
         return;
     }
 
@@ -10611,6 +10619,18 @@ void Parser::Warning(const char *format,...)
     Warning(kWarningGeneral, localvsbuffer);
 }
 
+void Parser::Warning(const MessageContext& loc, const char *format, ...)
+{
+    va_list marker;
+    char localvsbuffer[1024];
+
+    va_start(marker, format);
+    std::vsnprintf(localvsbuffer, sizeof(localvsbuffer), format, marker);
+    va_end(marker);
+
+    Warning(kWarningGeneral, loc, localvsbuffer);
+}
+
 void Parser::Warning(WarningLevel level, const char *format,...)
 {
     POV_PARSER_ASSERT(level >= kWarningGeneral);
@@ -10626,6 +10646,20 @@ void Parser::Warning(WarningLevel level, const char *format,...)
         mMessageFactory.WarningAt(level, CurrentMessageContext(), "%s", localvsbuffer);
     else
         mMessageFactory.Warning(level, "%s", localvsbuffer);
+}
+
+void Parser::Warning(WarningLevel level, const MessageContext& loc, const char *format, ...)
+{
+    POV_PARSER_ASSERT(level >= kWarningGeneral);
+
+    va_list marker;
+    char localvsbuffer[1024];
+
+    va_start(marker, format);
+    std::vsnprintf(localvsbuffer, sizeof(localvsbuffer), format, marker);
+    va_end(marker);
+
+    mMessageFactory.WarningAt(level, loc, "%s", localvsbuffer);
 }
 
 void Parser::VersionWarning(unsigned int sinceVersion, const char *format,...)

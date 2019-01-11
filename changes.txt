@@ -105,6 +105,9 @@ New Features
     and the bit depth.
   - Support for blue noise dithering has been added, plus a couple more error
     diffusion dithering filters.
+  - The parser now checks for proper balancing of `#end` directives, braces,
+    parentheses etc. within each include file, and will report any imbalance
+    via warnings or, in case of `#end`, outright errors.
 
 Performance Improvements
 ------------------------

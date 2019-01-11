@@ -294,8 +294,12 @@ void Parser::Get_Token ()
 
         if (!GetRawToken(mToken.raw, fastForwardToDirective))
         {
+            // End of current token stream reached.
+
             if (maIncludeStack.empty())
             {
+                // Not in an include file, i.e. end of main scene file reached.
+
                 if (Cond_Stack.size() != 1)
                     Error("End of file reached but #end expected.");
 
@@ -305,12 +309,24 @@ void Parser::Get_Token ()
             }
 
             // Returning from an include file.
+            // NB: End of macro is marked by `#end` rather than EOF, so it won't take us here.
 
             Got_EOF=false;
 
             mSymbolStack.PopTable();
 
-            GoToBookmark(maIncludeStack.back()); // TODO handle errors
+            if (Cond_Stack.size() != maIncludeStack.back().condStackSize)
+                Error("Unbalanced #end directives in include file.");
+            if (maBraceStack.size() > maIncludeStack.back().braceStackSize)
+            {
+                // Include file has opened more braces/parentheses/etc. than it has closed.
+                for (size_t i = maIncludeStack.back().braceStackSize; i < maBraceStack.size(); ++i)
+                {
+                    BraceStackEntry& braceStackEntry = maBraceStack[i];
+                    Warning(braceStackEntry, "Unbalanced %s in include file", Get_Token_String(braceStackEntry.openToken));
+                }
+            }
+            GoToBookmark(maIncludeStack.back().returnToBookmark); // TODO handle errors
             maIncludeStack.pop_back();
 
             continue;
@@ -1881,9 +1897,9 @@ void Parser::Parse_Version()
 
         if (maIncludeStack.empty())
             Error("As of POV-Ray v3.7, the '#version' directive must be the first non-comment "
-                    "statement in the scene file. To indicate that your scene will dynamically "
-                    "adapt to whatever POV-Ray version is actually used, start your scene with "
-                    "'#version version;'.");
+                  "statement in the scene file. To indicate that your scene will dynamically "
+                  "adapt to whatever POV-Ray version is actually used, start your scene with "
+                  "'#version version;'.");
     }
 
     // Initialize various defaults depending on language version specified.
@@ -1896,7 +1912,7 @@ void Parser::Parse_Version()
 
     if (sceneData->explicitNoiseGenerator == false)
         sceneData->noiseGenerator = (sceneData->EffectiveLanguageVersion() < 350 ?
-                                        kNoiseGen_Original : kNoiseGen_RangeCorrected);
+                                     kNoiseGen_Original : kNoiseGen_RangeCorrected);
     // [CLi] if assumed_gamma is not specified in a pre-v3.7 scene, gammaMode defaults to kPOVList_GammaMode_None;
     // this is enforced later anyway after parsing, but we may need this information /now/ during parsing already
     switch (sceneData->gammaMode)
@@ -1979,7 +1995,7 @@ void Parser::Open_Include()
 
 void Parser::Skip_Tokens(COND_TYPE cond)
 {
-    int Temp       = Cond_Stack.size();
+    auto Temp      = Cond_Stack.size();
     bool Prev_Skip = Skipping;
 
     Skipping = true;
@@ -3267,7 +3283,7 @@ void Parser::IncludeHeader(const UCS2String& formalFileName)
     if (formalFileName.empty())
         return;
 
-    maIncludeStack.push_back(mTokenizer.GetHotBookmark());
+    maIncludeStack.emplace_back(mTokenizer.GetHotBookmark(), int(Cond_Stack.size()), int(maBraceStack.size()));
 
     shared_ptr<IStream> is = Locate_File (formalFileName.c_str(),POV_File_Text_INC,actualFileName,true);
     if (is == nullptr)
