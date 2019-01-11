@@ -6551,6 +6551,8 @@ ObjectPtr Parser::Parse_TrueType ()
     charset = CharsetID::kUndefined;
     EXPECT_ONE
         CASE(CMAP_TOKEN)
+            Warning("Text primitive 'cmap' extension is experimental and may be "
+                    "subject to future changes.");
             Parse_Begin();
             cmap =  POV_UINT16(Parse_Float()) << 16;
             Parse_Comma();
