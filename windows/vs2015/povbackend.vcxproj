@@ -406,6 +406,7 @@
     <ClCompile Include="..\..\source\backend\povray.cpp" />
     <ClCompile Include="..\..\source\backend\control\benchmark.cpp" />
     <ClCompile Include="..\..\source\backend\control\messagefactory.cpp" />
+    <ClCompile Include="..\..\source\backend\control\parsertask.cpp" />
     <ClCompile Include="..\..\source\backend\control\renderbackend.cpp" />
     <ClCompile Include="..\..\source\backend\control\scene.cpp" />
     <ClCompile Include="..\..\source\backend\render\radiositytask.cpp" />
@@ -439,6 +440,7 @@
     <ClInclude Include="..\..\source\backend\povray.h" />
     <ClInclude Include="..\..\source\backend\control\benchmark.h" />
     <ClInclude Include="..\..\source\backend\control\messagefactory.h" />
+    <ClInclude Include="..\..\source\backend\control\parsertask.h" />
     <ClInclude Include="..\..\source\backend\control\renderbackend.h" />
     <ClInclude Include="..\..\source\backend\control\scene.h" />
     <ClInclude Include="..\..\source\backend\render\radiositytask.h" />

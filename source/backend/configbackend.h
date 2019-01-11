@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -94,7 +94,7 @@ static_assert(
 /// @note
 ///     The macro is responsible for creating a sufficiently large result buffer, using @ref POV_MALLOC().
 /// @note
-///     The result must be a genuine UCS2 string. UCS4/Unicode characters outside the Base Multilingual Plane
+///     The result must be a genuine UCS2 string. UCS4/Unicode characters outside the Basic Multilingual Plane
 ///     are not supported.
 ///
 /// @param[in]  ts  Null-terminated byte sequence to convert.

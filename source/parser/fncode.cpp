@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -42,6 +42,9 @@
 #include <cstdlib>
 #include <cstring>
 #include <algorithm>
+
+// POV-Ray header files (base module)
+#include "base/stringutilities.h"
 
 #include "core/scene/scenedata.h"
 
@@ -120,18 +123,11 @@ FNCode::FNCode(Parser *pa, FunctionCode *f, bool is_local, const char *n)
     }
 
     if (n != nullptr)
-        function->sourceInfo.name = POV_STRDUP(n);
+        function->sourceInfo.name = n;
     else
-        function->sourceInfo.name = POV_STRDUP("");
-    function->sourceInfo.filename = parser->UCS2_strdup(parser->Token.FileHandle->name());
-    if (parser->Token.FileHandle != nullptr)
-        function->sourceInfo.filepos = parser->Token.FileHandle->tellg();
-    else
-    {
-        function->sourceInfo.filepos.lineno = 0;
-        function->sourceInfo.filepos.offset = 0;
-    }
-    function->sourceInfo.col = parser->Token.Token_Col_No;
+        function->sourceInfo.name = "";
+    function->sourceInfo.fileName = parser->CurrentFileName();
+    function->sourceInfo.position = parser->CurrentFilePosition();
     function->flags = 0;
     function->private_copy_method = nullptr;
     function->private_destroy_method = nullptr;
@@ -173,20 +169,20 @@ FNCode::FNCode(Parser *pa, FunctionCode *f, bool is_local, const char *n)
 void FNCode::Parameter()
 {
     parser->Get_Token();
-    if(parser->Token.Token_Id == LEFT_PAREN_TOKEN)
+    if(parser->CurrentTokenId() == LEFT_PAREN_TOKEN)
     {
         for(function->parameter_cnt = 0;
-            ((parser->Token.Token_Id != RIGHT_PAREN_TOKEN) || (function->parameter_cnt == 0)) && (function->parameter_cnt < MAX_FUNCTION_PARAMETER_LIST);
+            ((parser->CurrentTokenId() != RIGHT_PAREN_TOKEN) || (function->parameter_cnt == 0)) && (function->parameter_cnt < MAX_FUNCTION_PARAMETER_LIST);
             function->parameter_cnt++)
         {
             parser->Get_Token();
 
-            if((parser->Token.Function_Id != IDENTIFIER_TOKEN) && (parser->Token.Function_Id != X_TOKEN) &&
-               (parser->Token.Function_Id != Y_TOKEN) && (parser->Token.Function_Id != Z_TOKEN) &&
-               (parser->Token.Function_Id != U_TOKEN) && (parser->Token.Function_Id != V_TOKEN))
+            if((parser->CurrentTokenFunctionId() != IDENTIFIER_TOKEN) && (parser->CurrentTokenFunctionId() != X_TOKEN) &&
+               (parser->CurrentTokenFunctionId() != Y_TOKEN) && (parser->CurrentTokenFunctionId() != Z_TOKEN) &&
+               (parser->CurrentTokenFunctionId() != U_TOKEN) && (parser->CurrentTokenFunctionId() != V_TOKEN))
                 parser->Expectation_Error("parameter identifier");
 
-            function->parameter[function->parameter_cnt] = POV_STRDUP(parser->Token.Token_String);
+            function->parameter[function->parameter_cnt] = POV_STRDUP(parser->CurrentTokenText().c_str());
 
             parser->Parse_Comma();
         }
@@ -1380,7 +1376,7 @@ void FNCode::compile_float_function_call(ExprNode *expr, FUNCTION fn, char *name
     // |     Parameters     |
     // +--------------------+ <= Parameter Stack Pointer (parameter_stack_pointer)
 
-    if(strcmp(name, function->sourceInfo.name) == 0)
+    if(strcmp(name, function->sourceInfo.name.c_str()) == 0)
     {
 //      Warning("Recursive function call may have unexpected side effects or not\n"
 //              "work as expected! Make sure the recursion is not infinite!!!");
@@ -1538,7 +1534,7 @@ void FNCode::compile_vector_function_call(ExprNode *expr, FUNCTION fn, char *nam
     // |     Parameters     |
     // +--------------------+ <= Parameter Stack Pointer (parameter_stack_pointer)
 
-    if(strcmp(name, function->sourceInfo.name) == 0)
+    if(strcmp(name, function->sourceInfo.name.c_str()) == 0)
     {
 //      Warning("Recursive function call may have unexpected side effects or not\n"
 //              "work as expected! Make sure the recursion is not infinite!!!");

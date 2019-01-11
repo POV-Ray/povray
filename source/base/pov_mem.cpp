@@ -16,7 +16,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -721,10 +721,10 @@ char *pov_strdup(const char *s)
 /* A memmove routine for those systems that don't have one                  */
 /****************************************************************************/
 
-void *pov_memmove (void *dest, void  *src, size_t length)
+void *pov_memmove (void *dest, const void  *src, size_t length)
 {
-    char *csrc =reinterpret_cast<char *>(src);
-    char *cdest=reinterpret_cast<char *>(dest);
+    const char *csrc = reinterpret_cast<const char *>(src);
+    char *cdest = reinterpret_cast<char *>(dest);
 
     if (csrc < cdest && csrc + length >= cdest)
     {

@@ -66,6 +66,9 @@ Changed Behaviour
     decided to not fix the change to work as originally intended, and instead
     only allow type mixing if the array has explicitly been declared as
     `mixed`. See the documentation for details.
+  - The `defined()` pseudo-function now returns `true` (while printing a
+    warning) if applied to reserved words. The `#ifdef` and `#ifndef` directives
+    also behave accordingly.
   - The dithering implementation has been modified, and may produce slightly
     different results for otherwise identical scenes.
   - The PGM (greyscale variant of PPM) output gamma handling now matches that
@@ -74,6 +77,10 @@ Changed Behaviour
   - Greyscale output no longer automatically forces bit depth to 16 bpc. To get
     16 bpp greyscale output, explicitly specify `Bits_Per_Color=16`.
   - Preview now reflects greyscale setting.
+  - The `charset` global setting has been deprecated and may no longer work as
+    expected. Input files conforming to ASCII, UTF-8, Latin-1 or Windows-1252
+    encoding will instead be auto-detected, while other encodings are currently
+    unsupported.
 
 New Features
 ------------

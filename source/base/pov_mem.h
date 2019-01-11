@@ -13,7 +13,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -58,7 +58,7 @@ void *pov_malloc (size_t size, const char *file, int line, const char *msg);
 void *pov_realloc (void *ptr, size_t size, const char *file, int line, const char *msg);
 void pov_free (void *ptr, const char *file, int line);
 char *pov_strdup (const char *s);
-void *pov_memmove (void *dest, void *src, size_t length);
+void *pov_memmove (void *dest, const void *src, size_t length);
 
 /// @}
 ///

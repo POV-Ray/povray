@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,6 +41,7 @@
 #include <stack>
 
 #include "base/colour.h"
+#include "base/messenger.h"
 #include "base/types.h"
 #include "base/textstream.h"
 
@@ -609,12 +610,34 @@ inline void intrusive_ptr_release(GenericFunctionContextFactory* f) { if (!(--f-
 typedef intrusive_ptr<GenericFunctionContextFactory>    GenericFunctionContextFactoryIPtr;
 typedef GenericFunctionContextFactory*                  GenericFunctionContextFactoryTPtr;
 
-struct SourceInfo
+struct SourcePosition
 {
-    char*                           name;
-    UCS2*                           filename;
-    pov_base::ITextStream::FilePos  filepos;
-    int                             col;
+    POV_LONG    line;
+    POV_LONG    column;
+    POV_OFF_T   offset;
+    SourcePosition() = default;
+    SourcePosition(const SourcePosition&) = default;
+    SourcePosition(POV_LONG l, POV_LONG c, POV_OFF_T o) : line(l), column(c), offset(o) {}
+};
+
+struct SourceInfo : MessageContext
+{
+    UCS2String      fileName;
+    SourcePosition  position;
+    SourceInfo() = default;
+    SourceInfo(const MessageContext& o) : fileName(o.GetFileName()), position(o.GetLine(), o.GetColumn(), o.GetOffset()) {}
+    SourceInfo(const UCS2String& fn, SourcePosition& p) : fileName(fn), position(p) {}
+    virtual UCS2String GetFileName() const override { return fileName; }
+    virtual POV_LONG GetLine() const override { return position.line; }
+    virtual POV_LONG GetColumn() const override { return position.column; }
+    virtual POV_OFF_T GetOffset() const override { return position.offset; }
+};
+
+struct CustomFunctionSourceInfo : SourceInfo
+{
+    UTF8String  name;
+    CustomFunctionSourceInfo() = default;
+    CustomFunctionSourceInfo(const UTF8String& n, const MessageContext& o) : name(n), SourceInfo(o) {}
 };
 
 template<typename RETURN_T, typename ARG_T>
@@ -628,7 +651,7 @@ public:
     virtual void PushArgument(GenericFunctionContextPtr pContext, ARG_T arg) = 0;
     virtual RETURN_T Execute(GenericFunctionContextPtr pContext) = 0;
     virtual GenericCustomFunction* Clone() const = 0;
-    virtual const SourceInfo* GetSourceInfo() const { return nullptr; }
+    virtual const CustomFunctionSourceInfo* GetSourceInfo() const { return nullptr; }
 };
 
 typedef GenericCustomFunction<double, double> GenericScalarFunction;

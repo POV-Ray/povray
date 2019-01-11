@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -107,7 +107,7 @@ POVMSMessageDetails::POVMSMessageDetails (POVMS_Object& Obj)
   if (POVMSUtil_GetLong (msg, kPOVAttrib_Line, &ll) == kNoErr)
     Line = POVMSInt(ll) ;
   if (POVMSUtil_GetLong (msg, kPOVAttrib_Column, &ll) == kNoErr)
-    Col = POVMSInt(ll + 1) ;
+    Col = POVMSInt(ll) ;
   if(POVMSUtil_GetLong(msg, kPOVAttrib_FilePosition, &ll) == kNoErr)
     Offset = ll ;
   l = sizeof (buffer) ;
