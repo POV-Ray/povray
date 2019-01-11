@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -145,6 +145,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { CLIPPED_BY_TOKEN,             "clipped_by" },
     { CLOCK_TOKEN,                  "clock" },
     { CLOCK_ON_TOKEN,               "clock_on" },
+    { CMAP_TOKEN,                   "cmap" },
     { COLLECT_TOKEN,                "collect" },
     { COLOUR_TOKEN,                 "colour" },
     { COLOUR_MAP_TOKEN,             "colour_map" },
@@ -673,6 +674,7 @@ const RESERVED_WORD Reserved_Words[] = {
 
     { COLOUR_KEY_TOKEN,             "color keyword" },
     { FLOAT_FUNCT_TOKEN,            "float function" },
+    { SIGNATURE_FUNCT_TOKEN,        "signature function" },
     { VECTOR_FUNCT_TOKEN,           "vector function" },
 
     //------------------------------------------------------------------------------
@@ -727,11 +729,12 @@ const RESERVED_WORD Reserved_Words[] = {
     { END_OF_FILE_TOKEN,            "End of File" },
     { FLOAT_TOKEN,                  "float constant" },
     { STRING_LITERAL_TOKEN,         "string literal" },
+    { UTF8_SIGNATURE_TOKEN,         "UTF-8 signature BOM" },
 
     //------------------------------------------------------------------------------
-    // End of list, marked by `nullptr` token string.
+    // End of list, marked by TokenId TOKEN_COUNT_ and `nullptr` token string.
 
-    { TOKEN_COUNT,                  nullptr }
+    { TOKEN_COUNT_,                 nullptr }
 };
 
 } // end of pov namespace

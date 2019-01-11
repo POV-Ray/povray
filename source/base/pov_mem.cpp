@@ -721,10 +721,10 @@ char *pov_strdup(const char *s)
 /* A memmove routine for those systems that don't have one                  */
 /****************************************************************************/
 
-void *pov_memmove (void *dest, void  *src, size_t length)
+void *pov_memmove (void *dest, const void  *src, size_t length)
 {
-    char *csrc =reinterpret_cast<char *>(src);
-    char *cdest=reinterpret_cast<char *>(dest);
+    const char *csrc = reinterpret_cast<const char *>(src);
+    char *cdest = reinterpret_cast<char *>(dest);
 
     if (csrc < cdest && csrc + length >= cdest)
     {

@@ -173,7 +173,7 @@ void Parser::Parse_Obj (Mesh* mesh)
     UCS2 *fileName;
     char *s;
     UCS2String ign;
-    IStream *stream = nullptr;
+    shared_ptr<IStream> stream;
     pov_base::ITextStream *textStream = nullptr;
     char wordBuffer [kMaxObjBufferSize];
     std::string materialPrefix;
@@ -262,12 +262,8 @@ void Parser::Parse_Obj (Mesh* mesh)
     // open obj file
 
     stream = Locate_File (fileName, POV_File_Text_OBJ, ign, true);
-    if (stream)
-    {
-        textStream = new IBufferedTextStream (fileName, stream);
-        if (!textStream)
-            delete stream;
-    }
+    if (stream != nullptr)
+        textStream = new IBufferedTextStream (fileName, stream.get());
     if (!textStream)
         Error ("Cannot open obj file %s.", UCS2toASCIIString(fileName).c_str());
 
@@ -373,7 +369,7 @@ void Parser::Parse_Obj (Mesh* mesh)
                         material.mtlName = wordBuffer;
                         material.texture = nullptr;
                         std::string identifier = materialPrefix + std::string(wordBuffer) + materialSuffix;
-                        SYM_ENTRY *symbol = Find_Symbol (identifier.c_str());
+                        SYM_ENTRY *symbol = mSymbolStack.Find_Symbol (identifier.c_str());
                         if (symbol == nullptr)
                             Error ("No matching texture for obj file material '%s': Identifier '%s' not found.", wordBuffer, identifier.c_str());
                         else if (symbol->Token_Number == TEXTURE_ID_TOKEN)

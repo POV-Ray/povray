@@ -60,7 +60,7 @@ using namespace pov;
 struct ExprParserTableEntry
 {
     int stage;
-    TOKEN token;
+    TokenId token;
     bool (Parser::*operation)(ExprNode *&, int, int);
     int next;
     int op;
@@ -112,10 +112,10 @@ const ExprParserTableEntry expr_parser_table[] =
     { 35, RIGHT_PAREN_TOKEN, &Parser::expr_ret,  -1, OP_NONE     }, // 12
     { 35, RIGHT_CURLY_TOKEN, &Parser::expr_ret,  -1, OP_NONE     }, // 13
     { 35, COMMA_TOKEN,       &Parser::expr_ret,  -1, OP_NONE     }, // 14
-    { 35, TOKEN_COUNT,       &Parser::expr_err,  -1, OP_NONE     }, // 15
+    { 35, TOKEN_COUNT_,      &Parser::expr_err,  -1, OP_NONE     }, // 15
     // vector/color member access
     { 45, PERIOD_TOKEN,      &Parser::expr_grow, 60, OP_DOT      }, // 16
-    { 45, TOKEN_COUNT,       &Parser::expr_err,  -1, OP_NONE     }, // 17
+    { 45, TOKEN_COUNT_,      &Parser::expr_err,  -1, OP_NONE     }, // 17
     // unary plus, unary minus, (logical not - disabled)
     { 40, PLUS_TOKEN,        &Parser::expr_noop, 50, OP_NONE     }, // 18
     { 40, DASH_TOKEN,        &Parser::expr_grow, 50, OP_NEG      }, // 19
@@ -126,10 +126,10 @@ const ExprParserTableEntry expr_parser_table[] =
     { 50, FUNCT_ID_TOKEN,    &Parser::expr_call,  5, OP_CALL     }, // 23
     { 50, VECTFUNCT_ID_TOKEN,&Parser::expr_call, 45, OP_CALL     }, // 24
     { 50, LEFT_PAREN_TOKEN,  &Parser::expr_new,  55, OP_FIRST    }, // 25
-    { 50, TOKEN_COUNT,       &Parser::expr_err,  -1, OP_NONE     }, // 26
+    { 50, TOKEN_COUNT_,      &Parser::expr_err,  -1, OP_NONE     }, // 26
     // (expression)
     { 55, RIGHT_PAREN_TOKEN, &Parser::expr_noop,  5, OP_NONE     }, // 27
-    { 55, TOKEN_COUNT,       &Parser::expr_err,  -1, OP_NONE     }, // 28
+    { 55, TOKEN_COUNT_,      &Parser::expr_err,  -1, OP_NONE     }, // 28
     // vector/color members
     { 60, FLOAT_ID_TOKEN,    &Parser::expr_put,   5, OP_MEMBER   }, // 29
     { 60, T_TOKEN,           &Parser::expr_put,   5, OP_MEMBER   }, // 30
@@ -139,7 +139,7 @@ const ExprParserTableEntry expr_parser_table[] =
     { 60, FILTER_TOKEN,      &Parser::expr_put,   5, OP_MEMBER   }, // 34
     { 60, TRANSMIT_TOKEN,    &Parser::expr_put,   5, OP_MEMBER   }, // 35
     { 60, GRAY_TOKEN,        &Parser::expr_put,   5, OP_MEMBER   }, // 36
-    { 60, TOKEN_COUNT,       &Parser::expr_err,  -1, OP_NONE     }  // 37
+    { 60, TOKEN_COUNT_,      &Parser::expr_err,  -1, OP_NONE     }  // 37
 };
 
 // parse_expr has to start with first unary operator [trf]
@@ -319,7 +319,7 @@ ExprNode *Parser::parse_expr()
 {
     ExprNode *current = nullptr;
     ExprNode *node = nullptr;
-    TOKEN token;
+    TokenId token;
     int start_index;
     int i;
 
@@ -372,7 +372,7 @@ ExprNode *Parser::parse_expr()
 *
 * RETURNS
 *
-*   TOKEN - simplified token from Get_Token
+*   TokenId - simplified token from Get_Token
 *
 * AUTHOR
 *
@@ -388,66 +388,66 @@ ExprNode *Parser::parse_expr()
 *
 ******************************************************************************/
 
-TOKEN Parser::expr_get_token()
+TokenId Parser::expr_get_token()
 {
     Get_Token();
 
-    if(Token.Function_Id == X_TOKEN)
+    if(CurrentTokenFunctionId() == X_TOKEN)
         return FLOAT_ID_TOKEN;
-    else if(Token.Function_Id == Y_TOKEN)
+    else if(CurrentTokenFunctionId() == Y_TOKEN)
         return FLOAT_ID_TOKEN;
-    else if(Token.Function_Id == Z_TOKEN)
+    else if(CurrentTokenFunctionId() == Z_TOKEN)
         return FLOAT_ID_TOKEN;
-    else if(Token.Function_Id == U_TOKEN)
+    else if(CurrentTokenFunctionId() == U_TOKEN)
         return FLOAT_ID_TOKEN;
-    else if(Token.Function_Id == V_TOKEN)
+    else if(CurrentTokenFunctionId() == V_TOKEN)
         return FLOAT_ID_TOKEN;
-    else if(Token.Function_Id == IDENTIFIER_TOKEN)
+    else if(CurrentTokenFunctionId() == IDENTIFIER_TOKEN)
         return FLOAT_ID_TOKEN;
-    else if(Token.Function_Id == CLOCK_TOKEN)
+    else if(CurrentTokenFunctionId() == CLOCK_TOKEN)
     {
-        Token.Token_Float = clockValue;
+        mToken.Token_Float = clockValue;
         return FLOAT_TOKEN;
     }
-    else if(Token.Function_Id == PI_TOKEN)
+    else if(CurrentTokenFunctionId() == PI_TOKEN)
     {
-        Token.Token_Float = M_PI;
+        mToken.Token_Float = M_PI;
         return FLOAT_TOKEN;
     }
-    else if(Token.Function_Id == TAU_TOKEN)
+    else if(CurrentTokenFunctionId() == TAU_TOKEN)
     {
-        Token.Token_Float = M_TAU;
+        mToken.Token_Float = M_TAU;
         return FLOAT_TOKEN;
     }
-    else if(Token.Function_Id == RED_TOKEN)
+    else if(CurrentTokenFunctionId() == RED_TOKEN)
         return RED_TOKEN;
-    else if(Token.Function_Id == GREEN_TOKEN)
+    else if(CurrentTokenFunctionId() == GREEN_TOKEN)
         return GREEN_TOKEN;
-    else if(Token.Function_Id == BLUE_TOKEN)
+    else if(CurrentTokenFunctionId() == BLUE_TOKEN)
         return BLUE_TOKEN;
-    else if(Token.Function_Id == FILTER_TOKEN)
+    else if(CurrentTokenFunctionId() == FILTER_TOKEN)
         return FILTER_TOKEN;
-    else if(Token.Function_Id == TRANSMIT_TOKEN)
+    else if(CurrentTokenFunctionId() == TRANSMIT_TOKEN)
         return TRANSMIT_TOKEN;
-    else if(Token.Function_Id == T_TOKEN)
+    else if(CurrentTokenFunctionId() == T_TOKEN)
         return T_TOKEN;
-    else if(Token.Function_Id == GRAY_TOKEN)
+    else if(CurrentTokenFunctionId() == GRAY_TOKEN)
         return GRAY_TOKEN;
 
-    if(Token.Token_Id == FLOAT_FUNCT_TOKEN)
+    if(CurrentTokenId() == FLOAT_FUNCT_TOKEN)
     {
-        if(Token.Function_Id == FLOAT_TOKEN)
+        if(CurrentTokenFunctionId() == FLOAT_TOKEN)
             return FLOAT_TOKEN;
-        else if(Token.Function_Id == FLOAT_ID_TOKEN)
+        else if(CurrentTokenFunctionId() == FLOAT_ID_TOKEN)
         {
-            Token.Token_Float = *(reinterpret_cast<DBL *>(Token.Data));
+            mToken.Token_Float = CurrentTokenData<DBL>();
             return FLOAT_TOKEN;
         }
 
         return FUNCT_ID_TOKEN;
     }
 
-    return Token.Token_Id;
+    return CurrentTokenId();
 }
 
 
@@ -675,15 +675,15 @@ bool Parser::expr_call(ExprNode *&current, int stage, int op)
 
     node = new_expr_node(stage, op);
 
-    if (Token.Data != nullptr)
+    if (HaveCurrentTokenData())
     {
-        node->call.fn = *((FUNCTION_PTR)Token.Data);
+        node->call.fn = *CurrentTokenDataPtr<AssignableFunction*>()->fn;
         (void)mpFunctionVM->GetFunctionAndReference(node->call.fn);
     }
     else
         node->call.fn = 0;
-    node->call.token = Token.Function_Id;
-    node->call.name = POV_STRDUP(Token.Token_String);
+    node->call.token = CurrentTokenFunctionId();
+    node->call.name = POV_STRDUP(CurrentTokenText().c_str());
     while (current->child != nullptr)
         current = current->child;
 
@@ -702,7 +702,7 @@ bool Parser::expr_call(ExprNode *&current, int stage, int op)
         node = node->next;
     }
 
-    if(Token.Token_Id != RIGHT_PAREN_TOKEN)
+    if(CurrentTokenId() != RIGHT_PAREN_TOKEN)
         Expectation_Error(")");
 
     return true;
@@ -756,11 +756,11 @@ bool Parser::expr_put(ExprNode *&current, int stage, int op)
 
     if(op == OP_CONSTANT)
     {
-        node->number = Token.Token_Float;
+        node->number = mToken.Token_Float;
     }
     else
     {
-        node->variable = POV_STRDUP(Token.Token_String);
+        node->variable = POV_STRDUP(CurrentTokenText().c_str());
     }
 
     current->child = node;

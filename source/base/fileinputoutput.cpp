@@ -119,16 +119,27 @@ bool IFileStream::UnRead_Byte(int c)
 // However, the macintosh code seems to need it to be called seekg, so it is ...
 bool IFileStream::seekg(POV_OFF_T pos, unsigned int whence)
 {
-    if(!fail)
-        fail = fseek(f, pos, whence) != 0;
+    fail = fseek(f, pos, whence) != 0;
     return !fail;
 }
 
-bool IFileStream::read(void *buffer, size_t count)
+bool IFileStream::read(void *buffer, size_t exactCount)
 {
-    if(!fail && count > 0)
-        fail = fread(buffer, count, 1, f) != 1;
+    if(!fail && exactCount > 0)
+        fail = fread(buffer, exactCount, 1, f) != 1;
     return !fail;
+}
+
+size_t IFileStream::readUpTo(void *buffer, size_t maxCount)
+{
+    if (!fail && maxCount > 0)
+    {
+        size_t count = fread(buffer, 1, maxCount, f);
+        fail = (count == 0);
+        return count;
+    }
+    else
+        return 0;
 }
 
 int IFileStream::Read_Byte()
@@ -386,7 +397,7 @@ POV_OFF_T GetFileLength(const Path& p)
     return result;
 }
 
-bool IMemStream::read(void *buffer, size_t maxCount)
+bool IMemStream::read(void *buffer, size_t exactCount)
 {
     size_t count = 0;
 
@@ -395,7 +406,7 @@ bool IMemStream::read(void *buffer, size_t maxCount)
 
     unsigned char* p = reinterpret_cast<unsigned char*>(buffer);
 
-    if (maxCount == 0)
+    if (exactCount == 0)
         return true;
 
     // read from unget buffer first
@@ -403,19 +414,49 @@ bool IMemStream::read(void *buffer, size_t maxCount)
     {
         *(p++) = (unsigned char)mUngetBuffer;
         mUngetBuffer = EOF;
-        if (++count == maxCount)
+        if (++count == exactCount)
             return true;
     }
 
-    size_t copyFromBuffer = min(maxCount-count, size-pos);
+    size_t copyFromBuffer = min(exactCount-count, size-pos);
     memcpy(p, &(start[pos]), copyFromBuffer);
     count += copyFromBuffer;
     pos += copyFromBuffer;
-    if (count == maxCount)
+    if (count == exactCount)
         return true;
 
     fail = true;
     return false;
+}
+
+size_t IMemStream::readUpTo(void *buffer, size_t maxCount)
+{
+    size_t count = 0;
+
+    if (fail)
+        return count;
+
+    unsigned char* p = reinterpret_cast<unsigned char*>(buffer);
+
+    if (maxCount == 0)
+        return count;
+
+    // read from unget buffer first
+    if (mUngetBuffer != EOF)
+    {
+        *(p++) = (unsigned char)mUngetBuffer;
+        mUngetBuffer = EOF;
+        if (++count == maxCount)
+            return count;
+    }
+
+    size_t copyFromBuffer = min(maxCount - count, size - pos);
+    memcpy(p, &(start[pos]), copyFromBuffer);
+    count += copyFromBuffer;
+    pos += copyFromBuffer;
+
+    fail = (count == 0);
+    return count;
 }
 
 int IMemStream::Read_Byte()
@@ -470,37 +511,35 @@ POV_OFF_T IMemStream::tellg() const
 
 bool IMemStream::seekg(POV_OFF_T posi, unsigned int whence)
 {
-    if(!fail)
-    {
-        // Any seek operation renders the unget buffer's content obsolete.
-        mUngetBuffer = EOF;
+    // Any seek operation renders the end-of-file status and unget buffer's content obsolete.
+    fail = false;
+    mUngetBuffer = EOF;
 
-        switch(whence)
-        {
-            case seek_set:
-                if (posi < formalStart)
-                    fail = true;
-                else if (posi - formalStart <= size)
-                    pos = posi - formalStart;
-                else
-                    fail = true;
-                break;
-            case seek_cur:
-                if ((posi <= size) && (pos <= size-posi))
-                    pos += posi;
-                else
-                    fail = true;
-                break;
-            case seek_end:
-                if (posi <= size)
-                    pos = size - posi;
-                else
-                    fail = true;
-                break;
-            default:
-                POV_ASSERT(false);
-                break;
-        }
+    switch(whence)
+    {
+        case seek_set:
+            if (posi < formalStart)
+                fail = true;
+            else if (posi - formalStart <= size)
+                pos = posi - formalStart;
+            else
+                fail = true;
+            break;
+        case seek_cur:
+            if ((posi <= size) && (pos <= size-posi))
+                pos += posi;
+            else
+                fail = true;
+            break;
+        case seek_end:
+            if (posi <= size)
+                pos = size - posi;
+            else
+                fail = true;
+            break;
+        default:
+            POV_ASSERT(false);
+            break;
     }
     return !fail;
 }

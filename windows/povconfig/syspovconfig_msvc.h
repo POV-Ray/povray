@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -151,6 +151,10 @@
     #define POV_COMPILER_VER                  "msvc14"
     #define METADATA_COMPILER_STRING          "msvc 14"
     #define POV_CPP11_SUPPORTED               1
+    #ifndef DEBUG
+      // Suppress erroneous warning about `string` having different alignment in base and parser.
+      #pragma warning(disable : 4742) // 'var' has different alignment in 'file1' and 'file2': number and number
+    #endif
   #else
     #error "Please update syspovconfig_msvc.h to include this version of MSVC"
   #endif
@@ -163,7 +167,7 @@
   #if defined(_M_X64)
     #define METADATA_PLATFORM_STRING        "x86_64-pc-win"
   #else
-    #error "Please update msvc.h to include this 64-bit architecture"
+    #error "Please update syspovconfig_msvc.h to include this 64-bit architecture"
   #endif
 #elif defined _WIN32
   #if !defined(METADATA_X86_FPU_STRING)
@@ -175,10 +179,10 @@
       #elif (_M_IX86_FP == 2)
         #define METADATA_X86_FPU_STRING     "-sse2"
       #else
-        #error "Please update msvc.h to include this x86 FPU generation"
+        #error "Please update syspovconfig_msvc.h to include this x86 FPU generation"
       #endif
     #else
-      #error "Please update msvc.h to detect x86 FPU generation for your compiler"
+      #error "Please update syspovconfig_msvc.h to detect x86 FPU generation for your compiler"
     #endif
   #endif
   #if defined(_M_IX86)
@@ -193,10 +197,10 @@
     #elif (_M_IX86 == 700)
       #define METADATA_PLATFORM_STRING      "i786-pc-win" METADATA_X86_FPU_STRING
     #else
-      #error "Please update msvc.h to include this x86 CPU generation"
+      #error "Please update syspovconfig_msvc.h to include this x86 CPU generation"
     #endif
   #else
-    #error "Please update msvc.h to include this 32-bit architecture"
+    #error "Please update syspovconfig_msvc.h to include this 32-bit architecture"
   #endif
 #endif
 

@@ -1130,13 +1130,13 @@ void POVFPU_Exception(FPUContext *context, FUNCTION fn, const char *msg)
 {
     vector<FunctionEntry>& functions(context->functionvm->functions);
 
-    if (functions[fn].fn.sourceInfo.name != nullptr)
+    if(!functions[fn].fn.sourceInfo.name.empty())
     {
         if (msg != nullptr)
-;// TODO MESSAGE            ErrorAt(functions[fn].fn.filename, functions[fn].fn.filepos.lineno, functions[fn].fn.filepos.offset,
+;// TODO MESSAGE            ErrorAt(functions[fn].fn.sourceInfo,
 //                  "Runtime error detected in function '%s'. %s", functions[fn].fn.name, msg);
         else
-;// TODO MESSAGE            ErrorAt(functions[fn].fn.filename, functions[fn].fn.filepos.lineno, functions[fn].fn.filepos.offset,
+;// TODO MESSAGE            ErrorAt(functions[fn].fn.sourceInfo,
 //                  "Floating-point exception detected in function '%s'. "
 //                  "Your function either attempted a division by zero, used a function outside its "
 //                  "domain or called an internal function with invalid parameters.",
@@ -1145,10 +1145,10 @@ void POVFPU_Exception(FPUContext *context, FUNCTION fn, const char *msg)
     else
     {
         if (msg != nullptr)
-;// TODO MESSAGE            ErrorAt(functions[fn].fn.filename, functions[fn].fn.filepos.lineno, functions[fn].fn.filepos.offset,
+;// TODO MESSAGE            ErrorAt(functions[fn].fn.sourceInfo,
 //                  "Runtime error detected in function. %s", msg);
         else
-;// TODO MESSAGE            ErrorAt(functions[fn].fn.filename, functions[fn].fn.filepos.lineno, functions[fn].fn.filepos.offset,
+;// TODO MESSAGE            ErrorAt(functions[fn].fn.sourceInfo,
 //                  "Floating-point exception detected in unnamed function. "
 //                  "Your function either attempted a division by zero, used a function outside its "
 //                  "domain or called an internal function with invalid parameters.");
@@ -1501,16 +1501,6 @@ void FNCode_Delete(FunctionCode *f)
         POV_FREE(f->program);
         f->program = nullptr;
     }
-    if (f->sourceInfo.name != nullptr)
-    {
-        POV_FREE(f->sourceInfo.name);
-        f->sourceInfo.name = nullptr;
-    }
-    if (f->sourceInfo.filename != nullptr)
-    {
-        POV_FREE(f->sourceInfo.filename);
-        f->sourceInfo.filename = nullptr;
-    }
     for(i = 0; i < f->parameter_cnt; i++)
     {
         if (f->parameter[i] != nullptr)
@@ -1544,7 +1534,7 @@ FUNCTION_PTR FunctionVM::CopyFunction(FUNCTION_PTR pK)
     if (pK == nullptr)
         return nullptr;
 
-    FUNCTION_PTR ptr = (FUNCTION_PTR)POV_MALLOC(sizeof(FUNCTION), "Function ID");
+    FUNCTION_PTR ptr = new FUNCTION;
 
     GetFunctionAndReference(*pK); // increase the reference count
     *ptr = *pK;
@@ -1557,7 +1547,7 @@ void FunctionVM::DestroyFunction(FUNCTION_PTR pK)
     if (pK != nullptr)
     {
         RemoveFunction(*pK);
-        POV_FREE(pK);
+        delete pK;
     }
 }
 
@@ -1616,7 +1606,7 @@ GenericScalarFunctionPtr FunctionVM::CustomFunction::Clone() const
     return new CustomFunction(mpVm.get(), mpVm->CopyFunction(mpFn));
 }
 
-const SourceInfo* FunctionVM::CustomFunction::GetSourceInfo() const
+const CustomFunctionSourceInfo* FunctionVM::CustomFunction::GetSourceInfo() const
 {
     return &(mpVm->GetFunction(*mpFn)->sourceInfo);
 }

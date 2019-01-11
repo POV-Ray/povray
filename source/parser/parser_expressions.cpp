@@ -49,6 +49,7 @@
 // POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
 #include "base/mathutil.h"
+#include "base/stringutilities.h"
 
 // POV-Ray header files (core module)
 #include "core/material/blendmap.h"
@@ -250,7 +251,7 @@ void Parser::Parse_Trace(Vector3d& Res)
 
     EXPECT_ONE
         CASE (OBJECT_ID_TOKEN)
-            Object = reinterpret_cast<ObjectPtr>(Token.Data);
+            Object = CurrentTokenDataPtr<ObjectPtr>();
         END_CASE
 
         OTHERWISE
@@ -289,9 +290,9 @@ void Parser::Parse_Trace(Vector3d& Res)
     EXPECT_ONE
         CASE (VECTOR_FUNCT_TOKEN)
             /* All of these functions return a VECTOR result */
-            if(Token.Function_Id == VECTOR_ID_TOKEN)
+            if(mToken.Function_Id == VECTOR_ID_TOKEN)
             {
-                (*reinterpret_cast<Vector3d *>(Token.Data)) = Local_Normal;
+                SetCurrentTokenData(Local_Normal);
             }
             else
             {
@@ -335,7 +336,7 @@ int Parser::Parse_Inside()
 
     EXPECT_ONE
         CASE (OBJECT_ID_TOKEN)
-            Object = reinterpret_cast<ObjectPtr>(Token.Data);
+            Object = CurrentTokenDataPtr<ObjectPtr>();
         END_CASE
 
         OTHERWISE
@@ -425,7 +426,7 @@ bool Parser::Parse_Call()
 * DESCRIPTION
 *
 *   NOTE: Function Parse_RValue in parse.cpp depends on this function to be
-*   able to only use Token.Data of the current token in order to have a kind
+*   able to only use mToken.Data of the current token in order to have a kind
 *   of two token look-ahead in Parse_RValue! [trf]
 *
 * CHANGES
@@ -434,7 +435,7 @@ bool Parser::Parse_Call()
 
 DBL Parser::Parse_Function_Call()
 {
-    FUNCTION_PTR fp = (FUNCTION_PTR )Token.Data;
+    FUNCTION_PTR fp = CurrentTokenDataPtr<AssignableFunction*>()->fn;
     if (fp == nullptr)
         // may happen if a #declare or #local inside a function declaration references the function
         Error("Illegal attempt to evaluate a function being currently declared; did you miss a closing brace?");
@@ -494,7 +495,7 @@ DBL Parser::Parse_Function_Call()
 * DESCRIPTION
 *
 *   NOTE: Function Parse_RValue in parse.cpp depends on this function to be
-*   able to only use Token.Data of the current token in order to have a kind
+*   able to only use mToken.Data of the current token in order to have a kind
 *   of two token look-ahead in Parse_RValue! [trf]
 *
 * CHANGES
@@ -503,7 +504,7 @@ DBL Parser::Parse_Function_Call()
 
 void Parser::Parse_Vector_Function_Call(EXPRESS& Express, int *Terms)
 {
-    FUNCTION_PTR fp = (FUNCTION_PTR )Token.Data;
+    FUNCTION_PTR fp = CurrentTokenDataPtr<AssignableFunction*>()->fn;
     if (fp == nullptr)
         // may happen if a #declare or #local inside a function declaration references the function
         Error("Illegal attempt to evaluate a function being currently declared; did you miss a closing brace?");
@@ -566,7 +567,7 @@ void Parser::Parse_Vector_Function_Call(EXPRESS& Express, int *Terms)
 * DESCRIPTION
 *
 *   NOTE: Function Parse_RValue in parse.cpp depends on this function to be
-*   able to only use Token.Data of the current token in order to have a kind
+*   able to only use mToken.Data of the current token in order to have a kind
 *   of two token look-ahead in Parse_RValue! [trf]
 *
 * CHANGES
@@ -575,7 +576,7 @@ void Parser::Parse_Vector_Function_Call(EXPRESS& Express, int *Terms)
 
 void Parser::Parse_Spline_Call(EXPRESS& Express, int *Terms)
 {
-    GenericSpline *spline = reinterpret_cast<GenericSpline *>(Token.Data);
+    GenericSpline *spline = CurrentTokenDataPtr<GenericSpline*>();
     DBL Val;
 
     // NB while parsing the call parameters, the parser may drop out of the current scope (macro or include file)
@@ -592,7 +593,7 @@ void Parser::Parse_Spline_Call(EXPRESS& Express, int *Terms)
     Val=Parse_Float();
     Get_Token();
 
-    if(Token.Token_Id == COMMA_TOKEN)
+    if (CurrentTokenId() == COMMA_TOKEN)
     {
         /*If there is a second parameter, make a copy of the spline
         with a new type and evaluate that.*/
@@ -601,7 +602,7 @@ void Parser::Parse_Spline_Call(EXPRESS& Express, int *Terms)
         Release_Spline_Reference(spline);
 
         Get_Token();
-        switch(Token.Token_Id)
+        switch (CurrentTokenId())
         {
             case LINEAR_SPLINE_TOKEN:
                 spline = new LinearSpline(*spline);
@@ -666,13 +667,13 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
     UCS2 *Local_String, *Local_String2;
     char *Local_C_String;
     UCS2String ign;
-    IStream *f;
+    shared_ptr<IStream> f;
     POV_ARRAY *a;
-    bool Old_Ok=Ok_To_Declare;
+    bool oldOkToDeclare = IsOkToDeclare();
     DBL greater_val, less_val, equal_val;
     PIGMENT *Pigment; // JN2007: Image map dimensions
 
-    Ok_To_Declare=true;
+    SetOkToDeclare(true);
 
     EXPECT
         CASE (PLUS_TOKEN)
@@ -687,7 +688,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
     EXPECT_ONE
         CASE (FLOAT_FUNCT_TOKEN)
             /* All of these functions return a DBL result */
-            switch(Token.Function_Id)
+            switch(mToken.Function_Id)
             {
                 case ABS_TOKEN:
                     Val = Parse_Float_Param();
@@ -810,8 +811,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
                     f = Locate_File(UCS2String(ASCIItoUCS2String(Local_C_String)), POV_File_Text_User, ign, false);
                     Val = (f == nullptr) ? 0.0 : 1.0;
-                    if (f != nullptr)
-                        delete f;
+                    f = nullptr;
 
                     POV_FREE(Local_C_String);
 
@@ -819,11 +819,11 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     break;
 
                 case FLOAT_ID_TOKEN:
-                    Val = *(reinterpret_cast<DBL *>(Token.Data));
+                    Val = CurrentTokenData<DBL>();
                     break;
 
                 case FLOAT_TOKEN:
-                    Val = Token.Token_Float;
+                    Val = mToken.Token_Float;
                     break;
 
                 case FLOOR_TOKEN:
@@ -1088,7 +1088,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                 case DIMENSIONS_TOKEN:
                     Parse_Paren_Begin();
                     GET(ARRAY_ID_TOKEN)
-                    a = reinterpret_cast<POV_ARRAY *>(*(Token.DataPtr));
+                    a = reinterpret_cast<POV_ARRAY *>(*(mToken.DataPtr));
                     Val = a->maxDim + 1;
                     Parse_Paren_End();
                     break;
@@ -1097,7 +1097,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     Parse_Paren_Begin();
                     GET(ARRAY_ID_TOKEN)
                     Parse_Comma();
-                    a = reinterpret_cast<POV_ARRAY *>(*(Token.DataPtr));
+                    a = reinterpret_cast<POV_ARRAY *>(*(mToken.DataPtr));
                     i = (int)Parse_Float()-1;
                     if ((i < 0) || (i > a->maxDim))
                     {
@@ -1124,7 +1124,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
         CASE (VECTOR_FUNCT_TOKEN)
             /* All of these functions return a VECTOR result */
-            switch(Token.Function_Id)
+            switch(mToken.Function_Id)
             {
                 case VAXIS_ROTATE_TOKEN:
                     Parse_Paren_Begin();
@@ -1144,7 +1144,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     break;
 
                 case VECTOR_ID_TOKEN:
-                    Vect = *reinterpret_cast<Vector3d *>(Token.Data);
+                    Vect = CurrentTokenData<Vector3d>();
                     break;
 
                 case VNORMALIZE_TOKEN:
@@ -1203,7 +1203,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     Parse_Paren_Begin();
                     EXPECT_ONE
                         CASE (OBJECT_ID_TOKEN)
-                            Object = reinterpret_cast<ObjectPtr>(Token.Data);
+                            Object = CurrentTokenDataPtr<ObjectPtr>();
                             if ( Object )
                                 Vect = Vector3d(Object->BBox.lowerLeft);
                         END_CASE
@@ -1221,14 +1221,14 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     Parse_Paren_Begin();
                     EXPECT_ONE
                         CASE (OBJECT_ID_TOKEN)
-                            Object = reinterpret_cast<ObjectPtr>(Token.Data);
+                            Object = CurrentTokenDataPtr<ObjectPtr>();
                             if ( Object )
                                 Vect = Vector3d(Object->BBox.lowerLeft+Object->BBox.size);
                         END_CASE
 
                         // JN2007: Image map dimensions:
                         CASE4 (DENSITY_ID_TOKEN,NORMAL_ID_TOKEN,PIGMENT_ID_TOKEN,TEXTURE_ID_TOKEN)
-                            Pigment = reinterpret_cast<PIGMENT *>(Token.Data);
+                            Pigment = CurrentTokenDataPtr<PIGMENT*>();
                             if (const ImagePatternImpl *pattern = dynamic_cast<ImagePatternImpl*>(Pigment->pattern.get()))
                             {
                                 Vect[X] = pattern->pImage->iwidth;
@@ -1284,19 +1284,19 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
         CASE (COLOUR_ID_TOKEN)
             *Terms=5;
-            (*reinterpret_cast<RGBFTColour *>(Token.Data)).Get(Express, *Terms);
+            CurrentTokenData<RGBFTColour>().Get(Express, *Terms);
         END_CASE
 
         CASE (UV_ID_TOKEN)
             *Terms=2;
             for (i=0; i<2; i++)
-                Express[i]=(DBL)(  (*reinterpret_cast<Vector2d *>(Token.Data))[i]  );
+                Express[i] = CurrentTokenData<Vector2d>()[i];
         END_CASE
 
         CASE (VECTOR_4D_ID_TOKEN)
             *Terms=4;
             for (i=0; i<4; i++)
-                Express[i]=(DBL)(  (reinterpret_cast<DBL *>(Token.Data))[i]  );
+                Express[i] = CurrentTokenDataPtr<DBL*>()[i];
         END_CASE
 
         CASE (T_TOKEN)
@@ -1320,19 +1320,23 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
         END_CASE
 
         CASE (DASH_TOKEN)
-            Ok_To_Declare=Old_Ok;
+            POV_EXPERIMENTAL_ASSERT(IsOkToDeclare());
+            SetOkToDeclare(oldOkToDeclare);
             Parse_Num_Factor(Express,Terms);
-            Old_Ok=Ok_To_Declare;
-            Ok_To_Declare=true;
+            POV_EXPERIMENTAL_ASSERT(oldOkToDeclare == IsOkToDeclare());
+            oldOkToDeclare = IsOkToDeclare();
+            SetOkToDeclare(true);
             for (i=0; i<*Terms; i++)
                 Express[i]=-Express[i];
         END_CASE
 
         CASE (EXCLAMATION_TOKEN)
-            Ok_To_Declare=Old_Ok;
+            POV_EXPERIMENTAL_ASSERT(IsOkToDeclare());
+            SetOkToDeclare(oldOkToDeclare);
             Parse_Num_Factor(Express,Terms);
-            Old_Ok=Ok_To_Declare;
-            Ok_To_Declare=true;
+            POV_EXPERIMENTAL_ASSERT(oldOkToDeclare == IsOkToDeclare());
+            oldOkToDeclare = IsOkToDeclare();
+            SetOkToDeclare(true);
             for (i=0; i<*Terms; i++)
                 Express[i] = ftrue(Express[i])?0.0:1.0;
         END_CASE
@@ -1358,17 +1362,17 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
             *Terms=2;
 
             EXPECT_ONE
-                CASE_EXPRESS
+                CASE_EXPRESS_UNGET
                     /* If a 3rd float is found, parse it. */
                     Express[2] = Parse_Float(); Parse_Comma();
                     *Terms=3;
                     EXPECT_ONE
-                        CASE_EXPRESS
+                        CASE_EXPRESS_UNGET
                             /* If a 4th float is found, parse it. */
                             Express[3] = Parse_Float(); Parse_Comma();
                             *Terms=4;
                             EXPECT_ONE
-                                CASE_EXPRESS
+                                CASE_EXPRESS_UNGET
                                     /* If a 5th float is found, parse it. */
                                     Express[4] = Parse_Float();
                                     *Terms=5;
@@ -1403,14 +1407,14 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
         END_CASE
     END_EXPECT
 
-    Ok_To_Declare=Old_Ok;
+    SetOkToDeclare(oldOkToDeclare);
 
     /* Parse VECTOR.x or COLOR.red type things */
     EXPECT_ONE
         CASE(PERIOD_TOKEN)
             EXPECT_ONE
                 CASE (VECTOR_FUNCT_TOKEN)
-                    switch(Token.Function_Id)
+                    switch(mToken.Function_Id)
                     {
                         case X_TOKEN:
                             i=X;
@@ -1430,7 +1434,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                 END_CASE
 
                 CASE (COLOUR_KEY_TOKEN)
-                    switch(Token.Function_Id)
+                    switch(mToken.Function_Id)
                     {
                         case RED_TOKEN:
                             i=pRED;
@@ -1791,8 +1795,8 @@ void Parser::Parse_Rel_Term (EXPRESS& Express,int *Terms)
     EXPRESS Local_Express;
     int Local_Terms;
 
-    bool old_Ok_To_Declare = Ok_To_Declare;
-    Ok_To_Declare=true;
+    bool oldOkToDeclare = IsOkToDeclare();
+    SetOkToDeclare(true);
 
     UCS2 *Local_String = Parse_String(false, false);
     if (Local_String != nullptr)
@@ -1800,10 +1804,10 @@ void Parser::Parse_Rel_Term (EXPRESS& Express,int *Terms)
             *Terms = 1;
             Express[0] = Parse_Rel_String_Term(Local_String);
             POV_FREE(Local_String);
-            Ok_To_Declare = old_Ok_To_Declare;
+            SetOkToDeclare(oldOkToDeclare);
             return;
     }
-    Ok_To_Declare = old_Ok_To_Declare;
+    SetOkToDeclare(oldOkToDeclare);
 
     Parse_Rel_Factor(Express,Terms);
 
@@ -2102,7 +2106,7 @@ DBL Parser::Allow_Float (DBL defval)
     DBL retval;
 
     EXPECT_ONE
-        CASE_EXPRESS
+        CASE_EXPRESS_UNGET
             retval = Parse_Float();
         END_CASE
 
@@ -2139,7 +2143,7 @@ int Parser::Allow_Vector (Vector3d& Vect)
     int retval;
 
     EXPECT_ONE
-        CASE_EXPRESS
+        CASE_EXPRESS_UNGET
             Parse_Vector(Vect);
             retval = true;
         END_CASE
@@ -2433,7 +2437,7 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
 
     EXPECT
         CASE (COLOUR_KEY_TOKEN)
-            switch(Token.Function_Id)
+            switch(mToken.Function_Id)
             {
                 case ALPHA_TOKEN:
                     VersionWarning(155, "Keyword ALPHA discontinued. Use FILTER instead.");
@@ -2662,8 +2666,7 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
             }
         END_CASE
 
-        CASE_VECTOR
-            UNGET
+        CASE_VECTOR_UNGET
             if (startedParsing)
             {
                 EXIT
@@ -2674,7 +2677,7 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
                 // five value color vector. Any single float will be promoted to the full
                 // 'tgtTerms' value. This usually results in filter and trasmit values >0,
                 // which caused shadow artifacts back to at least version v3.6.1.
-                if ((Token.Token_Id==FLOAT_FUNCT_TOKEN) || (Token.Token_Id==FUNCT_ID_TOKEN))
+                if ((CurrentTokenId() == FLOAT_FUNCT_TOKEN) || (CurrentTokenId() == FUNCT_ID_TOKEN))
                     sawFloatOrFloatFnct = true;
                 else
                     sawFloatOrFloatFnct = false;
@@ -2787,7 +2790,7 @@ void Parser::Parse_BlendMapData<PigmentBlendMapData> (BlendMapTypeId Blend_Type,
             break;
 
         default:
-            POV_PARSER_ASSERT(false);
+            POV_PARSER_PANIC();
             break;
     }
 }
@@ -2817,10 +2820,12 @@ void Parser::Parse_BlendMapData<TexturePtr> (BlendMapTypeId Blend_Type, TextureP
 template<typename MAP_T>
 shared_ptr<MAP_T> Parser::Parse_Blend_Map (BlendMapTypeId Blend_Type,int Pat_Type)
 {
-    shared_ptr<MAP_T>       New;
-    GenericPigmentBlendMapPtr pigmentBlendMap;
-    typename MAP_T::Entry   Temp_Ent;
-    typename MAP_T::Vector  tempList;
+    using MAP_PTR_T = shared_ptr<MAP_T>;
+
+    MAP_PTR_T                   New;
+    GenericPigmentBlendMapPtr   pigmentBlendMap;
+    typename MAP_T::Entry       Temp_Ent;
+    typename MAP_T::Vector      tempList;
     bool old_allow_id = Allow_Identifier_In_Call;
     Allow_Identifier_In_Call = false;
     int blendMode = 0;
@@ -2831,7 +2836,7 @@ shared_ptr<MAP_T> Parser::Parse_Blend_Map (BlendMapTypeId Blend_Type,int Pat_Typ
     EXPECT
         CASE2 (COLOUR_MAP_ID_TOKEN, PIGMENT_MAP_ID_TOKEN)
         CASE3 (NORMAL_MAP_ID_TOKEN, TEXTURE_MAP_ID_TOKEN, SLOPE_MAP_ID_TOKEN)
-            New = Copy_Blend_Map (*(reinterpret_cast<shared_ptr<MAP_T> *> (Token.Data)));
+            New = Copy_Blend_Map (CurrentTokenData<MAP_PTR_T>());
             if (Blend_Type != New->Type)
             {
                 Error("Wrong identifier type");
@@ -3083,7 +3088,9 @@ void Parser::Parse_BlendListData_Default<TexturePtr> (const ColourBlendMapData& 
 template<typename MAP_T>
 shared_ptr<MAP_T> Parser::Parse_Blend_List (int Count, ColourBlendMapConstPtr Def_Map, BlendMapTypeId Blend_Type)
 {
-    shared_ptr<MAP_T>       New;
+    using MAP_PTR_T = shared_ptr<MAP_T>;
+
+    MAP_PTR_T               New;
     typename MAP_T::Vector  tempList;
     int i;
     bool old_allow_id = Allow_Identifier_In_Call;
@@ -3097,7 +3104,7 @@ shared_ptr<MAP_T> Parser::Parse_Blend_List (int Count, ColourBlendMapConstPtr De
     {
         case kBlendMapType_Colour:
             EXPECT
-                CASE_EXPRESS
+                CASE_EXPRESS_UNGET
                     Parse_BlendListData(Blend_Type,tempList[i].Vals);
                     Parse_Comma ();
                     tempList[i].value = (SNGL)i;
@@ -3193,7 +3200,7 @@ shared_ptr<MAP_T> Parser::Parse_Blend_List (int Count, ColourBlendMapConstPtr De
 
     if ((Blend_Type==kBlendMapType_Normal) && (i==0))
     {
-        return shared_ptr<MAP_T>(); // empty pointer
+        return MAP_PTR_T(); // empty pointer
     }
 
     while (i < Count)
@@ -3296,10 +3303,13 @@ template TextureBlendMapPtr Parser::Parse_Blend_List<TextureBlendMap>   (int Cou
 template<typename MAP_T>
 shared_ptr<MAP_T> Parser::Parse_Item_Into_Blend_List (BlendMapTypeId Blend_Type)
 {
-    shared_ptr<MAP_T>       New;
+    using MAP_PTR_T = shared_ptr<MAP_T>;
+
+    MAP_PTR_T               New;
     typename MAP_T::Entry   Temp_Ent;
     typename MAP_T::Vector  tempList;
-    BlendMapTypeId Type;
+    BlendMapTypeId          Type;
+
     bool old_allow_id = Allow_Identifier_In_Call;
     Allow_Identifier_In_Call = false;
 
@@ -3399,7 +3409,7 @@ ColourBlendMapPtr Parser::Parse_Colour_Map<ColourBlendMap> ()
 
     EXPECT
         CASE (COLOUR_MAP_ID_TOKEN)
-            New = *(reinterpret_cast<ColourBlendMapPtr *>(Token.Data));
+            New = CurrentTokenData<ColourBlendMapPtr>();
             EXIT
         END_CASE
 
@@ -3429,7 +3439,7 @@ ColourBlendMapPtr Parser::Parse_Colour_Map<ColourBlendMap> ()
                         /* After [ must be a float. If 2nd thing found is another
                            float then this is an old style color_map.
                          */
-                        CASE_FLOAT
+                        CASE_FLOAT_UNGET
                             Parse_Express(Express,&Terms);
                             if (Terms==1)
                             {
@@ -3453,7 +3463,7 @@ ColourBlendMapPtr Parser::Parse_Colour_Map<ColourBlendMap> ()
                                     Error("Illegal expression syntax in color_map.");
                         END_CASE
 
-                        CASE_COLOUR
+                        CASE_COLOUR_UNGET
                             Parse_Colour (Temp_Ent.Vals);
                             tempList.push_back(Temp_Ent);
                         END_CASE
@@ -3597,7 +3607,7 @@ GenericSpline *Parser::Parse_Spline()
     /*Check for spline identifier*/
     EXPECT_ONE
         CASE(SPLINE_ID_TOKEN)
-            Old = reinterpret_cast<GenericSpline *>(Token.Data);
+            Old = CurrentTokenDataPtr<GenericSpline*>();
             i = Old->SplineEntries.size();
             MaxTerms = Old->Terms;
             keepOld = true;
@@ -3669,7 +3679,7 @@ GenericSpline *Parser::Parse_Spline()
     }
 
     EXPECT
-        CASE_FLOAT
+        CASE_FLOAT_UNGET
             /* Entry has the form float,vector */
             par = Parse_Float();
             Parse_Comma();
@@ -3908,43 +3918,6 @@ void Parser::Destroy_Random_Generators()
     next_rand = nullptr;
 
     Number_Of_Random_Generators = 0;
-}
-
-DBL Parser::Parse_Signed_Float(void)
-{
-    DBL Sign=1.0;
-    DBL Val=0.0;
-    bool old_allow_id = Allow_Identifier_In_Call;
-    Allow_Identifier_In_Call = false;
-
-    EXPECT
-        CASE (PLUS_TOKEN)
-        END_CASE
-
-        CASE (DASH_TOKEN)
-            Sign=-1.0;
-            Get_Token();
-            // FALLTHROUGH
-        CASE (FLOAT_FUNCT_TOKEN)
-            if (Token.Function_Id==FLOAT_TOKEN)
-            {
-                Val = Sign * Token.Token_Float;
-                EXIT
-            }
-            else
-            {
-                Parse_Error(FLOAT_TOKEN);
-            }
-        END_CASE
-
-        OTHERWISE
-            Parse_Error(FLOAT_TOKEN);
-        END_CASE
-    END_EXPECT
-
-    Allow_Identifier_In_Call = old_allow_id;
-
-    return(Val);
 }
 
 }

@@ -613,7 +613,7 @@ ObjectPtr Lemon::Copy()
 *
 ******************************************************************************/
 
-void Lemon::Compute_Lemon_Data(GenericMessenger& messenger, pov_base::ITextStream *FileHandle, pov_base::ITextStream::FilePos & Token_File_Pos, int Token_Col_No )
+void Lemon::Compute_Lemon_Data(GenericMessenger& messenger, const MessageContext& context)
 {
     DBL len;
     Vector3d axis;
@@ -665,8 +665,7 @@ void Lemon::Compute_Lemon_Data(GenericMessenger& messenger, pov_base::ITextStrea
     if (inner_radius < low )
     {
         inner_radius = low;
-        messenger.WarningAt(kWarningGeneral, FileHandle->name(), Token_File_Pos.lineno,
-                            Token_Col_No, FileHandle->tellg().offset,
+        messenger.WarningAt(kWarningGeneral, context,
                             "Inner (last) radius of lemon is too small. Minimal would be %g. Value has been adjusted.",
                             inner_radius * len);
     }

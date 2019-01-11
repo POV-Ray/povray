@@ -107,7 +107,7 @@ POVMSMessageDetails::POVMSMessageDetails (POVMS_Object& Obj)
   if (POVMSUtil_GetLong (msg, kPOVAttrib_Line, &ll) == kNoErr)
     Line = POVMSInt(ll) ;
   if (POVMSUtil_GetLong (msg, kPOVAttrib_Column, &ll) == kNoErr)
-    Col = POVMSInt(ll + 1) ;
+    Col = POVMSInt(ll) ;
   if(POVMSUtil_GetLong(msg, kPOVAttrib_FilePosition, &ll) == kNoErr)
     Offset = ll ;
   l = sizeof (buffer) ;

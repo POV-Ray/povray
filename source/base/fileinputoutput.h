@@ -122,7 +122,8 @@ class IStream : public IOBase
         IStream(const UCS2String& name);
         virtual ~IStream();
 
-        virtual bool read(void *buffer, size_t count) = 0;
+        virtual bool read(void *buffer, size_t exactCount) = 0;
+        virtual size_t readUpTo(void *buffer, size_t maxCount) = 0;
 
         virtual int Read_Byte() = 0;
         inline bool Read_Byte(char& c) { c =(char) Read_Byte(); return !fail; }
@@ -154,7 +155,8 @@ class IFileStream : public IStream
         virtual POV_OFF_T tellg() const { return(f == nullptr ? -1 : ftell(f)); }
         virtual bool clearstate() { if (f != nullptr) fail = false; return !fail; }
 
-        virtual bool read(void *buffer, size_t count);
+        virtual bool read(void *buffer, size_t exactCount);
+        virtual size_t readUpTo(void *buffer, size_t maxCount);
         virtual bool getline(char *s, size_t buflen);
         virtual int Read_Byte();
 
@@ -182,7 +184,8 @@ class IMemStream : public IStream
         virtual bool UnRead_Byte(int c);
         virtual bool getline(char *s, size_t buflen);
         virtual POV_OFF_T tellg() const;
-        virtual bool read(void *buffer, size_t count);
+        virtual bool read(void *buffer, size_t exactCount);
+        virtual size_t readUpTo(void *buffer, size_t count);
         virtual bool seekg(POV_OFF_T pos, unsigned int whence = seek_set);
         virtual bool clearstate() { fail = false; return true; }
 

@@ -114,7 +114,7 @@ struct ExprNode
         struct
         {
             char *name;
-            TOKEN token;
+            TokenId token;
             FUNCTION fn;
         } call;
         unsigned int trap;

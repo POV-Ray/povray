@@ -38,6 +38,8 @@
 
 #include "base/configbase.h"
 
+#include "base/types.h"
+
 namespace pov_base
 {
 
@@ -71,6 +73,17 @@ enum WarningLevel
     kWarningLanguage =  6
 };
 
+/// @relates GenericMessenger
+class MessageContext
+{
+public:
+    virtual ~MessageContext() {}
+    virtual UCS2String GetFileName() const = 0;
+    virtual POV_LONG GetLine() const = 0;
+    virtual POV_LONG GetColumn() const = 0;
+    virtual POV_OFF_T GetOffset() const = 0;
+};
+
 /// Abstract class providing an interface to report textual messages to the user.
 class GenericMessenger
 {
@@ -82,27 +95,33 @@ class GenericMessenger
         void UserDebug(const char *text);
 
         void Info(const char *format,...);
-        void InfoAt(const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...);
+        void InfoAt(const MessageContext& context, const char *format, ...);
+        void InfoAt(const UCS2String& filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...);
 
         void Warning(WarningLevel level, const char *format,...);
-        void WarningAt(WarningLevel level, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...);
+        void WarningAt(WarningLevel level, const MessageContext& context, const char *format, ...);
+        void WarningAt(WarningLevel level, const UCS2String& filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...);
 
         void PossibleError(const char *format,...);
-        void PossibleErrorAt(const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...);
+        void PossibleErrorAt(const MessageContext& context, const char *format, ...);
+        void PossibleErrorAt(const UCS2String& filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...);
 
         void Error(const char *format,...);
         void Error(const Exception& ex, const char *format,...);
         void Error(Exception& ex, const char *format,...);
-        void ErrorAt(const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...);
-        void ErrorAt(const Exception& ex, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...);
-        void ErrorAt(Exception& ex, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...);
+        void ErrorAt(const MessageContext& context, const char *format, ...);
+        void ErrorAt(const Exception& ex, const MessageContext& context, const char *format, ...);
+        void ErrorAt(Exception& ex, const MessageContext& context, const char *format, ...);
+        void ErrorAt(const UCS2String& filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...);
+        void ErrorAt(const Exception& ex, const UCS2String& filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...);
+        void ErrorAt(Exception& ex, const UCS2String& filename, POV_LONG line, POV_LONG column, POV_OFF_T offset, const char *format, ...);
 
         void SetWarningLevel(unsigned int Val) { warningLevel = Val ; } // TODO FIXME - not here, not this way
 
     protected:
 
         virtual void SendMessage(MessageClass mc, WarningLevel level, const char *text,
-                                 const UCS2 *filename = nullptr, POV_LONG line = -1, POV_LONG column = -1, POV_OFF_T offset = -1) = 0;
+                                 const UCS2String& filename = u"", POV_LONG line = -1, POV_LONG column = -1, POV_OFF_T offset = -1) = 0;
 
     private:
 
@@ -110,8 +129,10 @@ class GenericMessenger
         const char *stageName;
 
         void CleanupString(char *str);
+        void SendMessage(MessageClass mc, WarningLevel level, const char *text, const MessageContext& context);
+        std::string SendError(const char *format, va_list arglist, const MessageContext& context);
         std::string SendError(const char *format, va_list arglist,
-                              const UCS2 *filename = nullptr, POV_LONG line = -1, POV_LONG column = -1, POV_OFF_T offset = -1);
+                              const UCS2String& filename = u"", POV_LONG line = -1, POV_LONG column = -1, POV_OFF_T offset = -1);
 };
 
 /// @}
