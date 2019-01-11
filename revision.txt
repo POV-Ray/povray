@@ -35,6 +35,167 @@ Notes:
 POV-Ray v3.8.0-???
 ------------------------------------------------------------------------------
 
+Commit c341c943 on 2019-01-11 by Christoph Lipka
+
+    Merge branch 'refactor/tokenizer'
+
+Commit 21241276 on 2019-01-11 by Christoph Lipka
+
+    [parser] Earmark text primitive `cmap` extension as experimental.
+
+Commit 90afa652 on 2019-01-11 by Christoph Lipka
+
+    Parser code cleanup, comments and character encoding changes.
+    Also changes to TrueType handling code related to character mapping.
+
+Commit 99ce66ab on 2019-01-03 by Christoph Lipka
+
+    [parser] Eliminate loop from `Parse_Directive()`.
+
+Commit f0b7ee29 on 2019-01-02 by Christoph Lipka
+
+    [parser] Add more experimental assertions.
+
+Commit 83ff9486 on 2019-01-02 by Christoph Lipka
+
+    [parser] Eliminate some potential issues related to token counting.
+
+Commit c89f597a on 2019-01-02 by Christoph Lipka
+
+    [parser] More refactoring related to symbol tables.
+
+Commit 72433b2f on 2019-01-02 by Christoph Lipka
+
+    Pull task management out of Parser module.
+
+Commit 143614db on 2018-12-16 by Christoph Lipka
+
+    [parser] Move symbol table handling into separate class.
+
+Commit 73726447 on 2018-12-15 by Christoph Lipka
+
+    [parser] Remove some obsolete constants.
+
+Commit a659aac9 on 2018-12-12 by Christoph Lipka
+
+    [base] Change some string parameters from C-style to C++-style.
+
+Commit 8c5cf5e7 on 2018-12-12 by Christoph Lipka
+
+    [parser] Change some C-style strings to C++-style strings.
+
+Commit d806f661 on 2018-12-11 by Christoph Lipka
+
+    [parser] More miscellaneous refactoring.
+
+Commit 7d8dc2db on 2018-12-09 by Christoph Lipka
+
+    [parser] Fix build error introduced with previous commit.
+
+Commit 7c85b488 on 2018-12-08 by Christoph Lipka
+
+    [parser] Miscellaneous refactoring.
+
+Commit 4eb65137 on 2018-12-08 by Christoph Lipka
+
+    [parser] Fix a memory leak.
+
+Commit 8e2d4495 on 2018-11-28 by Christoph Lipka
+
+    Merge branch 'master' into refactor/tokenizer
+
+Commit 063e6a9e on 2018-09-23 by Christoph Lipka
+
+    Merge branch 'master' into refactor/tokenizer
+
+Commit 730c137d on 2018-09-19 by Christoph Lipka
+
+    Merge branch 'master' into refactor/tokenizer
+
+Commit 7361007d on 2018-09-19 by Christoph Lipka
+
+    [parser] Fix parse error when a macro invocation is immediately followed
+    by the end of file.
+
+Commit d4e74268 on 2018-09-18 by Christoph Lipka
+
+    Fix crash trying to read a density file.
+
+Commit c661589c on 2018-09-17 by Christoph Lipka
+
+    [parser] Clean up behaviour regarding dictionaries and `#ifdef`.
+
+Commit 06f9a321 on 2018-09-17 by Christoph Lipka
+
+    Merge branch 'master' into refactor/tokenizer
+
+Commit 33b5edc9 on 2018-09-12 by Christoph Lipka
+
+    Merge branch 'master' into refactor/tokenizer
+
+Commit aa871435 on 2018-06-02 by Christoph Lipka
+
+    Trim obsolete code from string handling in parser.
+
+    - `String_Literal_To_UCS2` was found to only be called in contexts
+      where string encoding is inevitably set to ASCII, and with `pathname`
+      parameter set to `false`.
+    - `String_To_UCS2` was found to only be called with pure ASCII strings,
+      except potentially when parsing the `datetime()` function (first
+      introduced in v3.7) with `#version` set to a pre-v3.5 version.
+
+Commit db025cfd on 2018-06-01 by Christoph Lipka
+
+    Re-implement support for UTF-8 encoded source files with signature BOM.
+
+Commit fa25626c on 2018-06-01 by Christoph Lipka
+
+    Minor cleanup of parser code.
+
+Commit ac88d0e7 on 2018-05-31 by Christoph Lipka
+
+    Re-enable `#read` statement.
+
+Commit 9a2cd33e on 2018-05-31 by Christoph Lipka
+
+    Minor refactoring of `#for` loop code.
+
+Commit a5e8ee62 on 2018-05-24 by Christoph Lipka
+
+    Re-enable version-dependent handlng of backslashes in file name literals.
+
+Commit af7e2a8e on 2018-05-23 by Christoph Lipka
+
+    Improve scanner performance.
+
+Commit eae2d4c6 on 2018-05-23 by Christoph Lipka
+
+    Re-enable macro caching.
+
+Commit 8e915f7d on 2018-05-23 by Christoph Lipka
+
+    Fix scanner/tokenizer errors getting reported as "unknown error".
+
+Commit 51e3aaa2 on 2018-05-22 by Christoph Lipka
+
+    Merge branch 'master' into refactor/tokenizer
+
+Commit e3036cb9 on 2018-05-22 by Christoph Lipka
+
+    Fix another build error on clang/Mac.
+
+Commit 4e414697 on 2018-05-22 by Christoph Lipka
+
+    Fix build errors in previous commit.
+
+Commit e53e181e on 2018-05-22 by Christoph Lipka
+
+    Redesign parser scanner/tokenizer stage.
+
+Commit 85db57d9 on 2019-01-11 by Christoph Lipka
+
+    [ci skip] Update change log.
+
 Commit 851c3e3d on 2019-01-03 by Christoph Lipka
 
     [ci skip] Fix bug in `ior.inc`.
