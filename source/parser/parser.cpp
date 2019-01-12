@@ -6522,7 +6522,7 @@ ObjectPtr Parser::Parse_TrueType ()
     if (sceneData->EffectiveLanguageVersion() < 380)
     {
         if (sceneData->legacyCharset == LegacyCharset::kUnspecified)
-            sceneData->legacyCharset = LegacyCharset::kASCII;
+            legacyCharset = LegacyCharset::kASCII;
         else
             legacyCharset = sceneData->legacyCharset;
 
