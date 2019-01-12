@@ -675,6 +675,7 @@ bool Scanner::BufferedSource::SetInputStream(StreamPtr pStream, POV_OFF_T pos)
         // Just advance/rewind the current buffer position accordingly.
         mBuffer.AdvanceTo(pos - mBase);
         POV_PARSER_ASSERT(!mBuffer.IsExhausted());
+        mExhausted = false;
         return true;
     }
     else
