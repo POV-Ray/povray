@@ -421,7 +421,9 @@ class Parser
         void SendFatalError(Exception& e);
 
         void Warning(const char *format,...);
+        void Warning(const MessageContext& loc, const char *format, ...);
         void Warning(WarningLevel level, const char *format,...);
+        void Warning(WarningLevel level, const MessageContext& loc, const char *format, ...);
         void VersionWarning(unsigned int sinceVersion, const char *format,...);
         void PossibleError(const char *format,...);
         void Error(const char *format,...);
@@ -660,7 +662,17 @@ class Parser
         POV_LONG    mTokenCount;
         int         mTokensSinceLastProgressReport;
 
-        vector<RawTokenizer::HotBookmark> maIncludeStack;
+        struct IncludeStackEntry
+        {
+            RawTokenizer::HotBookmark   returnToBookmark;
+            int                         condStackSize;
+            int                         braceStackSize;
+
+            IncludeStackEntry(const RawTokenizer::HotBookmark& rtb, int css, int bss) :
+                returnToBookmark(rtb), condStackSize(css), braceStackSize(bss)
+            {}
+        };
+        vector<IncludeStackEntry> maIncludeStack;
 
         struct CS_ENTRY
         {

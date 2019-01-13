@@ -176,10 +176,8 @@ Parser::~Parser()
 /* Parse the file. */
 void Parser::Run()
 {
-    int         error_line = -1;
-    int         error_col = -1;
-    UCS2String  error_filename(POV_FILENAME_BUFFER_CHARS, 0); // Pre-claim some memory, so we can handle an out-of-memory error.
-    POV_OFF_T   error_pos = -1;
+    SourceInfo errorInfo(UCS2String(POV_FILENAME_BUFFER_CHARS, 0), // Pre-claim some memory, so we can handle an out-of-memory error.
+                         SourcePosition(-1,-1,-1));
 
     // Outer try/catch block to handle out-of-memory conditions
     // occurring during regular error handling.
@@ -301,10 +299,8 @@ void Parser::Run()
             {
                 // take a (local) copy of error location prior to freeing token data
                 // NB error_filename has been pre-allocated for strings up to POV_FILENAME_BUFFER_CHARS
-                error_filename = CurrentFileName();
-                error_line = CurrentFilePosition().line;
-                error_col = CurrentFilePosition().column;
-                error_pos = CurrentFilePosition().offset;
+                errorInfo.fileName = CurrentFileName();
+                errorInfo.position = CurrentFilePosition();
             }
 
             // free up some memory before proceeding with error notification.
@@ -313,8 +309,8 @@ void Parser::Run()
             Default_Texture = nullptr;
             Destroy_Random_Generators();
 
-            if (error_line != -1)
-                mMessageFactory.ErrorAt(POV_EXCEPTION_CODE(kOutOfMemoryErr), error_filename, error_line, error_col, error_pos, "Out of memory.");
+            if (errorInfo.position.line != -1)
+                mMessageFactory.ErrorAt(POV_EXCEPTION_CODE(kOutOfMemoryErr), errorInfo, "Out of memory.");
             else
                 Error("Out of memory.");
         }
@@ -769,7 +765,15 @@ void Parser::Parse_End(TokenId openTokenId, TokenId expectTokenId)
     {
         POV_PARSER_ASSERT(!maBraceStack.empty());
         POV_PARSER_ASSERT(openTokenId == maBraceStack.back().openToken);
+
+        if (!maIncludeStack.empty() && (maBraceStack.size() <= maIncludeStack.back().braceStackSize))
+        {
+            BraceStackEntry& braceStackEntry = maBraceStack.back();
+            // Include file has closed more braces/parentheses/etc. than it has opened.
+            Warning("Unbalanced %s in include file", Get_Token_String(CurrentTokenId()));
+        }
         maBraceStack.pop_back();
+
         return;
     }
 
@@ -6518,7 +6522,7 @@ ObjectPtr Parser::Parse_TrueType ()
     if (sceneData->EffectiveLanguageVersion() < 380)
     {
         if (sceneData->legacyCharset == LegacyCharset::kUnspecified)
-            sceneData->legacyCharset = LegacyCharset::kASCII;
+            legacyCharset = LegacyCharset::kASCII;
         else
             legacyCharset = sceneData->legacyCharset;
 
@@ -10611,6 +10615,18 @@ void Parser::Warning(const char *format,...)
     Warning(kWarningGeneral, localvsbuffer);
 }
 
+void Parser::Warning(const MessageContext& loc, const char *format, ...)
+{
+    va_list marker;
+    char localvsbuffer[1024];
+
+    va_start(marker, format);
+    std::vsnprintf(localvsbuffer, sizeof(localvsbuffer), format, marker);
+    va_end(marker);
+
+    Warning(kWarningGeneral, loc, localvsbuffer);
+}
+
 void Parser::Warning(WarningLevel level, const char *format,...)
 {
     POV_PARSER_ASSERT(level >= kWarningGeneral);
@@ -10626,6 +10642,20 @@ void Parser::Warning(WarningLevel level, const char *format,...)
         mMessageFactory.WarningAt(level, CurrentMessageContext(), "%s", localvsbuffer);
     else
         mMessageFactory.Warning(level, "%s", localvsbuffer);
+}
+
+void Parser::Warning(WarningLevel level, const MessageContext& loc, const char *format, ...)
+{
+    POV_PARSER_ASSERT(level >= kWarningGeneral);
+
+    va_list marker;
+    char localvsbuffer[1024];
+
+    va_start(marker, format);
+    std::vsnprintf(localvsbuffer, sizeof(localvsbuffer), format, marker);
+    va_end(marker);
+
+    mMessageFactory.WarningAt(level, loc, "%s", localvsbuffer);
 }
 
 void Parser::VersionWarning(unsigned int sinceVersion, const char *format,...)

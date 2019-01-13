@@ -626,7 +626,7 @@ struct SourceInfo : MessageContext
     SourcePosition  position;
     SourceInfo() = default;
     SourceInfo(const MessageContext& o) : fileName(o.GetFileName()), position(o.GetLine(), o.GetColumn(), o.GetOffset()) {}
-    SourceInfo(const UCS2String& fn, SourcePosition& p) : fileName(fn), position(p) {}
+    SourceInfo(const UCS2String& fn, const SourcePosition& p) : fileName(fn), position(p) {}
     virtual UCS2String GetFileName() const override { return fileName; }
     virtual POV_LONG GetLine() const override { return position.line; }
     virtual POV_LONG GetColumn() const override { return position.column; }
