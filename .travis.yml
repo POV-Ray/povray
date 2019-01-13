@@ -25,6 +25,7 @@ addons:
     - libboost-dev
     - libboost-date-time-dev
     - libboost-thread-dev
+    - libfreetype6-dev
     - libjpeg8-dev
     - libopenexr-dev
     - libpng12-dev
