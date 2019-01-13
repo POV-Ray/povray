@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,88 +33,60 @@
 ///
 //******************************************************************************
 
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
-
-#include <cstdlib>
-
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "backend/povray.h"
 
+// C++ variants of C standard header files
+#include <cstdlib>
+
+// C++ standard header files
+#include <string>
+#include <vector>
+
+// Boost header files
+#include <boost/thread.hpp>
+#include <boost/bind.hpp>
+#include <boost/version.hpp>
+
+// other 3rd party library headers
+#ifndef LIBJPEG_MISSING
+#include <jpeglib.h>
+#endif
+#ifndef OPENEXR_MISSING
+#include <IlmBaseConfig.h>
+#include <OpenEXRConfig.h>
+#endif
+#ifndef LIBPNG_MISSING
+#include <png.h>
+#endif
+#ifndef LIBTIFF_MISSING
+#include <tiffio.h>
+#endif
+#ifndef LIBZ_MISSING
+#include <zlib.h>
+#endif
+
+// POV-Ray header files (base module)
+#include "base/pov_err.h"
+#include "base/pov_mem.h"
+#include "base/stringutilities.h"
+#include "base/timer.h"
+
+// POV-Ray header files (core module)
+#include "core/material/noise.h"
+#include "core/material/pattern.h"
+
+// POV-Ray header files (backend module)
+#include "backend/control/renderbackend.h"
+#include "backend/support/task.h"
+
+// POV-Ray header files (povms module)
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
 #include "povms/povmsutil.h"
 
-#include "base/platformbase.h"
-#include "base/pov_err.h"
-#include "base/timer.h"
-#include "base/types.h"
-
-#include "core/material/noise.h"
-#include "core/material/pattern.h"
-
-#include "backend/control/renderbackend.h"
-#include "backend/support/task.h"
-
 #ifdef POV_CPUINFO_H
 #include POV_CPUINFO_H
-#endif
-
-#ifndef DONT_SHOW_IMAGE_LIB_VERSIONS
-    // these are needed for copyright notices and version numbers
-    #ifndef LIBZ_MISSING
-        #include <zlib.h>
-    #endif
-    #ifndef LIBPNG_MISSING
-        #include <png.h>
-    #endif
-    #ifndef LIBJPEG_MISSING
-        #include <jpeglib.h>
-        #ifndef JPEG_LIB_VERSION_MAJOR
-            #define JPEG_LIB_VERSION_MAJOR (JPEG_LIB_VERSION / 10)
-        #endif
-        #ifndef JPEG_LIB_VERSION_MINOR
-            // This is known to erroneously identify versions 8a and 8b as version 8,
-            // but we'll live with that.
-            #define JPEG_LIB_VERSION_MINOR (JPEG_LIB_VERSION % 10)
-        #endif
-    #endif
-    #ifndef LIBTIFF_MISSING
-        extern "C"
-        {
-            #ifndef __STDC__
-            #define __STDC__        (1) // TODO - this is an ugly hack; check if it is really necessary
-            #define UNDEF__STDC__
-            #endif
-            #ifndef AVOID_WIN32_FILEIO
-            #define AVOID_WIN32_FILEIO // this stops the tiff headers from pulling in windows.h on win32/64
-            #endif
-            #include <tiffio.h>
-            #ifdef UNDEF__STDC__
-            #undef __STDC__
-            #undef UNDEF__STDC__
-            #endif
-        }
-    #endif
-    #ifndef OPENEXR_MISSING
-        #include <IlmBaseConfig.h>
-        #include <OpenEXRConfig.h>
-        // NOTE:
-        //  Versions of OpenEXR and IlmImf prior to 1.7.1 do not seem to have a way to get the version number,
-        //  nor do the official hard-coded Windows config headers.
-        #ifndef ILMBASE_PACKAGE_STRING
-            #define ILMBASE_PACKAGE_STRING "IlmBase"
-        #endif
-        #ifndef OPENEXR_PACKAGE_STRING
-            #define OPENEXR_PACKAGE_STRING "OpenEXR"
-        #endif
-    #endif
-
-    // get boost version number. it isn't an image library but there's little point
-    // in creating an entire new classification for it right now.
-    #include <boost/version.hpp>
-
 #endif
 
 // this must be the last file included
@@ -367,124 +339,81 @@ void BuildInitInfo(POVMSObjectPtr msg)
 
     if(err == kNoErr)
         err = POVMSAttrList_New(&attrlist);
-#ifndef DONT_SHOW_IMAGE_LIB_VERSIONS
+#ifndef DONT_SHOW_IMAGE_LIB_VERSIONS // TODO - This preprocessor flag has become a misnomer.
 
-#ifndef LIBZ_MISSING
-    // ZLib library version and copyright notice
-    if(err == kNoErr)
-    {
-        err = POVMSAttr_New(&attr);
-        if(err == kNoErr)
-        {
-            ExtractLibraryVersion(zlibVersion(), buffer);
+    std::vector<std::string> libVersions;
 
-            const char *tempstr = pov_tsprintf("ZLib %s, Copyright 1995-2012 Jean-loup Gailly and Mark Adler", buffer);
-
-            err = POVMSAttr_Set(&attr, kPOVMSType_CString, reinterpret_cast<const void *>(tempstr), (int) strlen(tempstr) + 1);
-            if(err == kNoErr)
-                err = POVMSAttrList_Append(&attrlist, &attr);
-            else
-                err = POVMSAttr_Delete(&attr);
-        }
-    }
-#endif  // LIBZ_MISSING
-
-#ifndef LIBPNG_MISSING
-    // LibPNG library version and copyright notice
-    if(err == kNoErr)
-    {
-        err = POVMSAttr_New(&attr);
-        if(err == kNoErr)
-        {
-            ExtractLibraryVersion(png_get_libpng_ver(nullptr), buffer);
-
-            // TODO FIXME - shouldn't we use png_get_copyright() instead of png_get_libpng_ver() and a hard-coded string?
-            const char *tempstr = pov_tsprintf("LibPNG %s, Copyright 1998-2012 Glenn Randers-Pehrson", buffer);
-
-            err = POVMSAttr_Set(&attr, kPOVMSType_CString, reinterpret_cast<const void *>(tempstr), (int) strlen(tempstr) + 1);
-            if(err == kNoErr)
-                err = POVMSAttrList_Append(&attrlist, &attr);
-            else
-                err = POVMSAttr_Delete(&attr);
-        }
-    }
-#endif  // LIBPNG_MISSING
+    // boost library version and copyright notice
+    libVersions.emplace_back(pov_tsprintf("Boost %d.%d, http://www.boost.org/",
+                                          BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000));
 
 #ifndef LIBJPEG_MISSING
     // LibJPEG library version and copyright notice
-    if(err == kNoErr)
-    {
-        err = POVMSAttr_New(&attr);
-        if(err == kNoErr)
-        {
-            const char minorStr[2] = { JPEG_LIB_VERSION_MINOR ? 'a'+JPEG_LIB_VERSION_MINOR-1 : '\0', '\0' };
-            const char *tempstr = pov_tsprintf("LibJPEG %i%s, Copyright 1991-2016 Thomas G. Lane, Guido Vollbeding",
-                                               JPEG_LIB_VERSION_MAJOR, minorStr);
-
-            err = POVMSAttr_Set(&attr, kPOVMSType_CString, reinterpret_cast<const void *>(tempstr), (int) strlen(tempstr) + 1);
-            if(err == kNoErr)
-                err = POVMSAttrList_Append(&attrlist, &attr);
-            else
-                err = POVMSAttr_Delete(&attr);
-        }
-    }
+    #ifndef JPEG_LIB_VERSION_MAJOR
+        #define JPEG_LIB_VERSION_MAJOR (JPEG_LIB_VERSION / 10)
+    #endif
+    #ifndef JPEG_LIB_VERSION_MINOR
+        // This is known to erroneously identify versions 8a and 8b as version 8,
+        // but we'll live with that.
+        #define JPEG_LIB_VERSION_MINOR (JPEG_LIB_VERSION % 10)
+    #endif
+    const char jpegMinorStr[2] = { (JPEG_LIB_VERSION_MINOR != 0) ? 'a' + JPEG_LIB_VERSION_MINOR - 1 : '\0', '\0' };
+    libVersions.emplace_back(pov_tsprintf("LibJPEG %i%s, Copyright 1991-2016 Thomas G. Lane, Guido Vollbeding",
+                                          JPEG_LIB_VERSION_MAJOR, jpegMinorStr));
 #endif  // LIBJPEG_MISSING
-
-#ifndef LIBTIFF_MISSING
-    // LibTIFF library version and copyright notice
-    if(err == kNoErr)
-    {
-        err = POVMSAttr_New(&attr);
-        if(err == kNoErr)
-        {
-            ExtractLibraryVersion(TIFFGetVersion(), buffer);
-
-            // TODO FIXME - shouldn't we use the complete TIFFGetVersion() string instead of extracting just the version number and hard-coding the copyright info here?
-            const char *tempstr = pov_tsprintf("LibTIFF %s, Copyright 1988-1997 Sam Leffler, 1991-1997 SGI", buffer);
-
-            err = POVMSAttr_Set(&attr, kPOVMSType_CString, reinterpret_cast<const void *>(tempstr), (int) strlen(tempstr) + 1);
-            if(err == kNoErr)
-                err = POVMSAttrList_Append(&attrlist, &attr);
-            else
-                err = POVMSAttr_Delete(&attr);
-        }
-    }
-#endif  // LIBTIFF_MISSING
-
-    // boost library version and copyright notice
-    if(err == kNoErr)
-    {
-        err = POVMSAttr_New(&attr);
-        if(err == kNoErr)
-        {
-            const char *tempstr = pov_tsprintf("Boost %d.%d, http://www.boost.org/",
-                BOOST_VERSION / 100000,
-                BOOST_VERSION / 100 % 1000);
-
-            err = POVMSAttr_Set(&attr, kPOVMSType_CString, reinterpret_cast<const void *>(tempstr), (int) strlen(tempstr) + 1);
-            if(err == kNoErr)
-                err = POVMSAttrList_Append(&attrlist, &attr);
-            else
-                err = POVMSAttr_Delete(&attr);
-        }
-    }
 
 #ifndef OPENEXR_MISSING
     // OpenEXR and related libraries version and copyright notice
-    if(err == kNoErr)
+    // NOTE:
+    //  OpenEXR and IlmImf prior to 1.7.1 do not seem to have a way to get the version number,
+    //  nor do the official hard-coded Windows config headers.
+    #ifndef ILMBASE_PACKAGE_STRING
+        #define ILMBASE_PACKAGE_STRING "IlmBase"
+    #endif
+    #ifndef OPENEXR_PACKAGE_STRING
+        #define OPENEXR_PACKAGE_STRING "OpenEXR"
+    #endif
+    libVersions.emplace_back(OPENEXR_PACKAGE_STRING " and " ILMBASE_PACKAGE_STRING ", Copyright (c) 2002-2011 Industrial Light & Magic.");
+#endif  // OPENEXR_MISSING
+
+#ifndef LIBPNG_MISSING
+    // LibPNG library version and copyright notice
+    ExtractLibraryVersion(png_get_libpng_ver(nullptr), buffer);
+    // TODO FIXME - shouldn't we use png_get_copyright() instead of png_get_libpng_ver() and a hard-coded string?
+    libVersions.emplace_back(pov_tsprintf("LibPNG %s, Copyright 1998-2012 Glenn Randers-Pehrson",
+                                          buffer));
+#endif  // LIBPNG_MISSING
+
+#ifndef LIBTIFF_MISSING
+    // LibTIFF library version and copyright notice
+    ExtractLibraryVersion(TIFFGetVersion(), buffer);
+    // TODO FIXME - shouldn't we use the complete TIFFGetVersion() string instead of extracting just the version number and hard-coding the copyright info here?
+    libVersions.emplace_back(pov_tsprintf("LibTIFF %s, Copyright 1988-1997 Sam Leffler, 1991-1997 SGI",
+                                          buffer));
+#endif  // LIBTIFF_MISSING
+
+#ifndef LIBZ_MISSING
+    // ZLib library version and copyright notice
+    ExtractLibraryVersion(zlibVersion(), buffer);
+    libVersions.emplace_back(pov_tsprintf("ZLib %s, Copyright 1995-2012 Jean-loup Gailly and Mark Adler",
+                                          buffer));
+#endif  // LIBZ_MISSING
+
+    for (const auto& s : libVersions)
     {
-        err = POVMSAttr_New(&attr);
-        if(err == kNoErr)
+        if (err == kNoErr)
         {
-            const char *tempstr = OPENEXR_PACKAGE_STRING " and " ILMBASE_PACKAGE_STRING ", Copyright (c) 2002-2011 Industrial Light & Magic.";
-            err = POVMSAttr_Set(&attr, kPOVMSType_CString, reinterpret_cast<const void *>(tempstr), (int) strlen(tempstr) + 1);
-            if(err == kNoErr)
-                err = POVMSAttrList_Append(&attrlist, &attr);
-            else
-                err = POVMSAttr_Delete(&attr);
+            err = POVMSAttr_New(&attr);
+            if (err == kNoErr)
+            {
+                err = POVMSAttr_Set(&attr, kPOVMSType_CString, reinterpret_cast<const void *>(s.c_str()), s.size() + 1);
+                if (err == kNoErr)
+                    err = POVMSAttrList_Append(&attrlist, &attr);
+                else
+                    err = POVMSAttr_Delete(&attr);
+            }
         }
     }
-#endif  // OPENEXR_MISSING
 
 #endif  // DONT_SHOW_IMAGE_LIB_VERSIONS
     if(err == kNoErr)

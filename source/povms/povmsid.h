@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -282,7 +282,7 @@ enum
     kPOVAttrib_PrimaryDevs           = 'Prim',
     kPOVAttrib_AssistingDevs         = 'Asst',
     kPOVAttrib_ContributingDevs      = 'Cont',
-    kPOVAttrib_ImageLibVersions      = 'ILVe',
+    kPOVAttrib_ImageLibVersions      = 'ILVe', // TODO - This attribute has become a misnomer.
     kPOVAttrib_Optimizations         = 'Opti',
     kPOVAttrib_CPUInfo               = 'CPUI',
     kPOVAttrib_CPUInfoDetails        = 'CPUD',

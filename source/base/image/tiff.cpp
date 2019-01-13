@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -45,16 +45,7 @@
 #include <boost/scoped_array.hpp>
 
 // Other 3rd party header files
-extern "C"
-{
-#ifndef __STDC__
-#define __STDC__ (1) // TODO - this is an ugly hack; check if it is really necessary
-#endif
-#ifndef AVOID_WIN32_FILEIO
-#define AVOID_WIN32_FILEIO // this stops the tiff headers from pulling in windows.h on win32/64
-#endif
 #include <tiffio.h>
-}
 
 // this must be the last file included other than tiffio.h
 #include "base/povdebug.h"
