@@ -587,6 +587,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\libraries\freetype\builds\windows\vc2010\freetype.vcxproj">
+      <Project>{78b079bd-9fc7-4b9e-b4a6-96da0f00248b}</Project>
+    </ProjectReference>
     <ProjectReference Include="boost_system.vcxproj">
       <Project>{d870a978-8130-4d1d-9fb2-3ee2028d2c50}</Project>
     </ProjectReference>

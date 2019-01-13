@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 14.0.23107.0
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Image Libraries", "Image Libraries", "{4178148C-8A0C-4EB0-ACD9-0E09676F2700}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Miscellaneous Libraries", "Miscellaneous Libraries", "{4178148C-8A0C-4EB0-ACD9-0E09676F2700}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Generic POV-Ray", "Generic POV-Ray", "{5319B36D-2906-4EAF-B623-B7C04F3CC2AD}"
 EndProject
@@ -65,6 +65,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "boost_system", "boost_system.vcxproj", "{D870A978-8130-4D1D-9FB2-3EE2028D2C50}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "povvm", "povvm.vcxproj", "{E7A73E97-7106-4D4A-98BA-AA43FBD19DB4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "freetype", "..\..\libraries\freetype\builds\windows\vc2010\freetype.vcxproj", "{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -424,6 +426,20 @@ Global
 		{E7A73E97-7106-4D4A-98BA-AA43FBD19DB4}.Release-SSE2|Win32.ActiveCfg = Release-SSE2|Win32
 		{E7A73E97-7106-4D4A-98BA-AA43FBD19DB4}.Release-SSE2|Win32.Build.0 = Release-SSE2|Win32
 		{E7A73E97-7106-4D4A-98BA-AA43FBD19DB4}.Release-SSE2|x64.ActiveCfg = Release|x64
+		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug|Win32.ActiveCfg = Debug Static|Win32
+		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug|Win32.Build.0 = Debug Static|Win32
+		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug|x64.ActiveCfg = Debug Static|x64
+		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug|x64.Build.0 = Debug Static|x64
+		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release|Win32.ActiveCfg = Release Static|Win32
+		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release|Win32.Build.0 = Release Static|Win32
+		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release|x64.ActiveCfg = Release Static|x64
+		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release|x64.Build.0 = Release Static|x64
+		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release-AVX|Win32.ActiveCfg = Release Static|Win32
+		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release-AVX|x64.ActiveCfg = Release Static|x64
+		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release-AVX|x64.Build.0 = Release Static|x64
+		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release-SSE2|Win32.ActiveCfg = Release Static|Win32
+		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release-SSE2|Win32.Build.0 = Release Static|Win32
+		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release-SSE2|x64.ActiveCfg = Release Static|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -455,5 +471,6 @@ Global
 		{0C227B07-1830-4C5B-8D4E-2DEFFFD2792D} = {5319B36D-2906-4EAF-B623-B7C04F3CC2AD}
 		{D870A978-8130-4D1D-9FB2-3EE2028D2C50} = {31AFDB3C-8769-49DF-9C9E-2013E194D983}
 		{E7A73E97-7106-4D4A-98BA-AA43FBD19DB4} = {5319B36D-2906-4EAF-B623-B7C04F3CC2AD}
+		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B} = {4178148C-8A0C-4EB0-ACD9-0E09676F2700}
 	EndGlobalSection
 EndGlobal
