@@ -1,0 +1,15 @@
+/**
+
+@dir
+@ingroup PovLibraries
+@brief Source code of _FreeType_ 3rd party font engine library.
+
+This directory contains a copy of the FreeType 2.9.1 source distribution,
+and is part of the POV-Ray source distribution package.
+
+Official FreeType source distribution packages can be obtained via
+<https://www.freetype.org/>.
+
+See `LICENSE.txt` file in the `docs` subdirectory for licensing information.
+
+*/
