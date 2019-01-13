@@ -49,6 +49,10 @@
 #include <boost/version.hpp>
 
 // other 3rd party library headers
+#ifndef LIBFREETYPE_MISSING
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#endif
 #ifndef LIBJPEG_MISSING
 #include <jpeglib.h>
 #endif
@@ -346,6 +350,17 @@ void BuildInitInfo(POVMSObjectPtr msg)
     // boost library version and copyright notice
     libVersions.emplace_back(pov_tsprintf("Boost %d.%d, http://www.boost.org/",
                                           BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000));
+
+#ifndef LIBFREETYPE_MISSING
+    // FreeType library version and copyright notice
+    FT_Library ftLib;
+    FT_Init_FreeType(&ftLib);
+    FT_Int ftMajor = 0, ftMinor = 0, ftPatch = 0;
+    FT_Library_Version(ftLib, &ftMajor, &ftMinor, &ftPatch);
+    FT_Done_FreeType(ftLib);
+    libVersions.emplace_back(pov_tsprintf("FreeType %d.%d.%d, http://www.freetype.org/",
+                                          int(ftMajor), int(ftMinor), int(ftPatch)));
+#endif  // LIBFREETYPE_MISSING
 
 #ifndef LIBJPEG_MISSING
     // LibJPEG library version and copyright notice
