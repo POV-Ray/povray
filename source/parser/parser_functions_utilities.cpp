@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -84,7 +84,7 @@ using namespace pov;
 
 FUNCTION_PTR Parser::Parse_Function(void)
 {
-    FUNCTION_PTR ptr = (FUNCTION_PTR)POV_MALLOC(sizeof(FUNCTION), "Function ID");
+    FUNCTION_PTR ptr = new FUNCTION;
     ExprNode *expression = nullptr;
     FunctionCode function;
 
@@ -134,7 +134,7 @@ FUNCTION_PTR Parser::Parse_Function(void)
 
 FUNCTION_PTR Parser::Parse_FunctionContent(void)
 {
-    FUNCTION_PTR ptr = (FUNCTION_PTR)POV_MALLOC(sizeof(FUNCTION), "Function ID");
+    FUNCTION_PTR ptr = new FUNCTION;
     ExprNode *expression = nullptr;
     FunctionCode function;
 
@@ -212,7 +212,7 @@ void Parser::Parse_FunctionOrContentList(GenericScalarFunctionPtr* apFn, unsigne
 
 FUNCTION_PTR Parser::Parse_DeclareFunction(TokenId *token_id, const char *fn_name, bool is_local)
 {
-    FUNCTION_PTR ptr = (FUNCTION_PTR)POV_MALLOC(sizeof(FUNCTION), "Function ID");
+    FUNCTION_PTR ptr = new FUNCTION;
     ExprNode *expression = nullptr;
     FunctionCode function;
 
