@@ -84,7 +84,7 @@ using namespace pov;
 
 FUNCTION_PTR Parser::Parse_Function(void)
 {
-    FUNCTION_PTR ptr = (FUNCTION_PTR)POV_MALLOC(sizeof(FUNCTION), "Function ID");
+    FUNCTION_PTR ptr = new FUNCTION;
     ExprNode *expression = nullptr;
     FunctionCode function;
 
@@ -134,7 +134,7 @@ FUNCTION_PTR Parser::Parse_Function(void)
 
 FUNCTION_PTR Parser::Parse_FunctionContent(void)
 {
-    FUNCTION_PTR ptr = (FUNCTION_PTR)POV_MALLOC(sizeof(FUNCTION), "Function ID");
+    FUNCTION_PTR ptr = new FUNCTION;
     ExprNode *expression = nullptr;
     FunctionCode function;
 
@@ -212,7 +212,7 @@ void Parser::Parse_FunctionOrContentList(GenericScalarFunctionPtr* apFn, unsigne
 
 FUNCTION_PTR Parser::Parse_DeclareFunction(TokenId *token_id, const char *fn_name, bool is_local)
 {
-    FUNCTION_PTR ptr = (FUNCTION_PTR)POV_MALLOC(sizeof(FUNCTION), "Function ID");
+    FUNCTION_PTR ptr = new FUNCTION;
     ExprNode *expression = nullptr;
     FunctionCode function;
 

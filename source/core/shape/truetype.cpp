@@ -1657,7 +1657,7 @@ bool ProcessFormat4Glyph(TrueTypeFont *ffile, GlyphIndex& glyphIndex, int cmapId
 
                 if (cmap4Info->idRangeOffset[i] == 0)
                 {
-                    glyphIndex = search_codepoint + cmap4Info->idDelta[i];
+                    glyphIndex = (search_codepoint + cmap4Info->idDelta[i]) & 0xFFFF;
                 }
                 else
                 {
@@ -1674,7 +1674,7 @@ bool ProcessFormat4Glyph(TrueTypeFont *ffile, GlyphIndex& glyphIndex, int cmapId
                     glyphIndex = READUSHORT(*ffile->file);
 
                     if (glyphIndex != 0)
-                        glyphIndex += cmap4Info->idDelta[i];
+                        glyphIndex = (glyphIndex + cmap4Info->idDelta[i]) & 0xFFFF;
                 }
             }
             break;
