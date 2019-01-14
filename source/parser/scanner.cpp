@@ -701,14 +701,11 @@ UCS2String Scanner::BufferedSource::GetInputStreamName() const
 bool Scanner::BufferedSource::SeekAndRefill(POV_OFF_T pos)
 {
     mBuffer.Clear();
-    if (mBase != pos)
-    {
-        bool seekOk = mpStream->seekg(pos);
-        mBase = mpStream->tellg();
-        POV_PARSER_ASSERT((mBase == pos) || !seekOk);
-        if (!seekOk)
-            return false; // TODO - Maybe report issue via an exception.
-    }
+    bool seekOk = mpStream->seekg(pos);
+    mBase = mpStream->tellg();
+    POV_PARSER_ASSERT((mBase == pos) || !seekOk);
+    if (!seekOk)
+        return false; // TODO - Maybe report issue via an exception.
     mExhausted = false;
     (void)RefillBuffer();
     return true;
