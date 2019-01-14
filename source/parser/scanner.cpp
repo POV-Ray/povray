@@ -518,14 +518,14 @@ protected:
 static inline bool IsASCIIEndOfLine(Scanner::Character c)
 {
     return ((c == 0x0A) ||  // ASCII LF ("New Line")
-        (c == 0x0D));   // ASCII CR ("Carriage Return")
+            (c == 0x0D));   // ASCII CR ("Carriage Return")
 }
 
 /// Test whether character qualifies as ASCII whitespace.
 static inline bool IsASCIIWhitespace(Scanner::Character c)
 {
     return ((c == 0x09) ||  // ASCII HT ("Tab")
-        (c == 0x0A) ||  // ASCII LF ("New Line")
+            (c == 0x0A) ||  // ASCII LF ("New Line")
             (c == 0x0D) ||  // ASCII CR ("Carriage Return")
             (c == 0x1A) ||  // DOS EOF character
             (c == 0x20));   // ASCII SP ("Space")
@@ -548,7 +548,7 @@ static bool IsDecimalDigit(Scanner::Character c)
 static bool IsASCIIIdentifierChar1(Scanner::Character c)
 {
     return (((c >= 'a') && (c <= 'z')) ||
-        ((c >= 'A') && (c <= 'Z')) ||
+            ((c >= 'A') && (c <= 'Z')) ||
             (c == '_'));
 }
 
@@ -556,7 +556,7 @@ static bool IsASCIIIdentifierChar1(Scanner::Character c)
 static bool IsASCIIIdentifierChar2(Scanner::Character c)
 {
     return IsASCIIIdentifierChar1(c) ||
-        IsDecimalDigit(c);
+           IsDecimalDigit(c);
 }
 
 //******************************************************************************
