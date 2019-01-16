@@ -53,6 +53,7 @@
 // POV-Ray header files (base module)
 #include "base/fileutil.h"
 #include "base/types.h"
+#include "base/font/timrom.h" // TODO
 
 // POV-Ray header files (core module)
 #include "core/bounding/boundingcylinder.h"
@@ -101,9 +102,11 @@
 #include "core/shape/superellipsoid.h"
 #include "core/shape/torus.h"
 #include "core/shape/triangle.h"
-#include "core/shape/truetype.h"
 #include "core/support/imageutil.h"
 #include "core/support/octree.h"
+
+// POV-Ray header files (parser module)
+#include "font.h"
 
 // POV-Ray header files (VM module)
 #include "vm/fnpovfpu.h"
@@ -6498,13 +6501,18 @@ ObjectPtr Parser::Parse_Triangle()
 
 ObjectPtr Parser::Parse_TrueType ()
 {
+#ifdef LIBFREETYPE_MISSING
+    Error("This unofficial POV-Ray binary was built without support for text primitives. "
+          "You must either use an official POV-Ray binary or recompile the POV-Ray sources "
+          "on a system providing you with the FreeType library to make use of this facility. ");
+#endif
+
     ObjectPtr Object;
     char *filename = nullptr;
     UCS2 *text_string;
     DBL depth;
     Vector3d offset;
     int builtin_font = 0;
-    TRANSFORM Local_Trans;
     POV_UINT32 cmap;
     CharsetID charset;
     LegacyCharset legacyCharset;
@@ -6535,9 +6543,9 @@ ObjectPtr Parser::Parse_TrueType ()
 
     Parse_Begin ();
 
-    Object = reinterpret_cast<ObjectPtr>(Parse_Object_Id());
+    Object = reinterpret_cast<Prism*>(Parse_Object_Id());
     if (Object != nullptr)
-        return (reinterpret_cast<ObjectPtr>(Object));
+        return(reinterpret_cast<ObjectPtr>(Object));
 
     EXPECT_ONE
         CASE(TTF_TOKEN)
@@ -6551,7 +6559,7 @@ ObjectPtr Parser::Parse_TrueType ()
         END_CASE
     END_EXPECT
 
-    cmap = TrueTypeFont::kAnyCMAP;
+    cmap = FontEngine::kAnyCMAP;
     charset = CharsetID::kUndefined;
     EXPECT_ONE
         CASE(CMAP_TOKEN)
@@ -6592,33 +6600,64 @@ ObjectPtr Parser::Parse_TrueType ()
     /* Get the offset vector */
     Parse_Vector(offset);
 
-    /* Open the font file */
-    TrueTypeFont* font = OpenFontFile(filename, builtin_font, cmap, charset, legacyCharset);
+    // TODO - Keep FontEngine and FontFace objects around to improve performance.
 
-    /* Process all this good info */
-    Object = new CSGUnion();
-    TrueType::ProcessNewTTF(reinterpret_cast<CSG *>(Object), font, text_string, depth, offset);
-    if (filename)
+    FontEnginePtr fontEngine = std::make_shared<FontEngine>();
+
+    FontFacePtr fontFace;
+
+    // TODO FIXME - Should use Locate_File mechanism
+    if (filename == nullptr)
+        fontFace = std::make_shared<FontFace>(fontEngine, font_timrom, sizeof(font_timrom));
+    else
+        fontFace = std::make_shared<FontFace>(fontEngine, mFileResolver.FindFile(ASCIItoUCS2String(filename), POV_File_Font_TTF));
+
+    if (fabs(offset.z()) > EPSILON)
+        Warning("Text primitive offset in Z dimension ignored.");
+
+    auto shapedGlyphs = fontFace->GetShapedGlyphs(text_string, Vector2d(offset.x(), offset.y()));
+
+    std::vector<Prism*> prisms;
+
+    for (auto& glyph : shapedGlyphs)
     {
-        /* Free up the filename  */
-        POV_FREE (filename);
+        auto controlPoints = fontFace->GetCubicBezierOutline(glyph);
+
+        for (size_t i = 0; i < controlPoints.size() / 2; ++i)
+            std::swap(controlPoints[i], controlPoints[controlPoints.size() - i - 1]);
+
+        Prism* prism = new Prism();
+        prism->Spline_Type = BEZIER_SPLINE;
+        prism->Height1 = -depth;
+        prism->Height2 = 0;
+        prism->Number = controlPoints.size();
+        prism->Compute_Prism(controlPoints.data(), GetParserDataPtr());
+        prism->Compute_BBox();
+        prisms.push_back(prism);
     }
 
-    /* Free up the text string memory */
-    POV_FREE (text_string);
+    if (prisms.size() == 1)
+        Object = prisms.front();
+    else
+    {
+        CSGUnion* csg = new CSGUnion(); // TODO - In some cases users may want a merge.
+        for (auto& prism : prisms)
+            Link(prism, csg->children);
+        Object = csg;
+    }
 
-    /**** Compute_TTF_BBox(Object); */
-    Object->Compute_BBox();
+    /* Compute bounding box. */
 
-    /* This tiny rotation should fix cracks in text that lies along an axis */
-    offset = Vector3d(0.001, 0.001, 0.001); // TODO - try to find a different solution to this hack
-    Compute_Rotation_Transform(&Local_Trans, offset);
-    Rotate_Object (reinterpret_cast<ObjectPtr>(Object), offset, &Local_Trans);
+    TRANSFORM trans;
+    Vector3d rotation(-90,0,0);
+    Compute_Rotation_Transform(&trans, rotation);
+    Object->Rotate(rotation, &trans);
 
-    /* Get any rotate/translate or texturing stuff */
-    Object = Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+    /* Parse object's modifiers. */
 
-    return (reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
+
+    return(reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -6647,6 +6686,7 @@ ObjectPtr Parser::Parse_TrueType ()
 *   Added support for builtin fonts - Oct 2012 [JG]
 *
 ******************************************************************************/
+#if 0
 TrueTypeFont *Parser::OpenFontFile(const char *asciifn, const int font_id, POV_UINT32 cmap, CharsetID charset,
                                    LegacyCharset legacyCharset)
 {
@@ -6716,7 +6756,7 @@ TrueTypeFont *Parser::OpenFontFile(const char *asciifn, const int font_id, POV_U
 
     return font;
 }
-
+#endif
 
 /*****************************************************************************
 *
@@ -10230,7 +10270,6 @@ void Parser::Link_To_Frame(ObjectPtr Object)
             (dynamic_cast<CSGIntersection *>(Object) == nullptr) && // FIXME
             (dynamic_cast<CSGMerge *>(Object) == nullptr)        && // FIXME
             (dynamic_cast<Poly *>(Object) == nullptr)            && // FIXME
-            (dynamic_cast<TrueType *>(Object) == nullptr)        && // FIXME
             ((dynamic_cast<Quadric *>(Object) == nullptr) || (dynamic_cast<Quadric *>(Object)->Automatic_Bounds)))
         {
             /* Destroy only, if bounding object is not used as clipping object. */
@@ -10877,6 +10916,7 @@ shared_ptr<IStream> Parser::Locate_File(const UCS2String& filename, unsigned int
         return nullptr;
     }
 
+    // TODO FIXME - the following will not work as expected if the file path happens to have dots.
     if(fn.find('.') == UCS2String::npos)
     {
         // the passed-in filename didn't have an extension, but a file has been found,

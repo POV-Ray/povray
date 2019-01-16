@@ -45,6 +45,7 @@
 #include "core/material/pattern.h"
 #include "core/material/noise.h"
 #include "core/scene/atmosphere.h"
+#include "core/scene/object.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -120,8 +121,6 @@ SceneData::~SceneData()
     }
     if (boundingSlabs != nullptr)
         Destroy_BBox_Tree(boundingSlabs);
-    for (vector<TrueTypeFont*>::iterator i = TTFonts.begin(); i != TTFonts.end(); ++i)
-        delete *i;
     // TODO: perhaps ObjectBase::~ObjectBase would be a better place
     //       to handle cleanup of individual objects ?
     Destroy_Object(objects);

@@ -768,8 +768,10 @@ class Parser
         ObjectPtr Parse_TrueType(void);
         void Parse_Blob_Element_Mods(Blob_Element *Element);
 
+#if 0
         TrueTypeFont *OpenFontFile(const char *asciifn, int font_id, POV_UINT32 cmap, CharsetID charset,
                                    LegacyCharset legacyCharset);
+#endif
 
         void Parse_Mesh_Camera (Camera& Cam);
         void Parse_User_Defined_Camera (Camera& Cam);

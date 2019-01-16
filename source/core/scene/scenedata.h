@@ -45,7 +45,6 @@
 
 #include "core/lighting/radiosity.h"
 #include "core/scene/camera.h"
-#include "core/shape/truetype.h"
 
 namespace pov
 {
@@ -187,10 +186,6 @@ class SceneData
         PhotonMap mediaPhotonMap;
 
         ScenePhotonSettings photonSettings; // TODO FIXME - is modified! [trf]
-
-        // TODO - decide if we want to keep this here
-        // (we can't move it to the parser though, as part of the data needs to survive into rendering)
-        vector<TrueTypeFont*> TTFonts;
 
         // name of the parsed file
         UCS2String inputFile; // TODO - handle differently
