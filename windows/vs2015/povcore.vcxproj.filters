@@ -155,9 +155,6 @@
     <ClCompile Include="..\..\source\core\shape\superellipsoid.cpp">
       <Filter>Core Source\Shape</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\core\shape\truetype.cpp">
-      <Filter>Core Source\Shape</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\core\shape\disc.cpp">
       <Filter>Core Source\Shape</Filter>
     </ClCompile>
@@ -300,9 +297,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\core\material\pigment.h">
       <Filter>Core Headers\Material</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\core\shape\truetype.h">
-      <Filter>Core Headers\Shape</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\core\shape\blob.h">
       <Filter>Core Headers\Shape</Filter>

@@ -462,7 +462,6 @@
     <ClCompile Include="..\..\source\core\shape\superellipsoid.cpp" />
     <ClCompile Include="..\..\source\core\shape\torus.cpp" />
     <ClCompile Include="..\..\source\core\shape\triangle.cpp" />
-    <ClCompile Include="..\..\source\core\shape\truetype.cpp" />
     <ClCompile Include="..\..\source\core\support\imageutil.cpp" />
     <ClCompile Include="..\..\source\core\support\octree.cpp" />
     <ClCompile Include="..\..\source\core\support\statisticids.cpp" />
@@ -543,7 +542,6 @@
     <ClInclude Include="..\..\source\core\shape\superellipsoid.h" />
     <ClInclude Include="..\..\source\core\shape\torus.h" />
     <ClInclude Include="..\..\source\core\shape\triangle.h" />
-    <ClInclude Include="..\..\source\core\shape\truetype.h" />
     <ClInclude Include="..\..\source\core\support\imageutil.h" />
     <ClInclude Include="..\..\source\core\support\octree.h" />
     <ClInclude Include="..\..\source\core\support\simplevector.h" />
