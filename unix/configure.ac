@@ -69,6 +69,7 @@ m4_include([unix/config/ax_check_libjpeg.m4])
 m4_include([unix/config/ax_check_libsdl.m4])
 m4_include([unix/config/ax_check_libtiff.m4])
 m4_include([unix/config/ax_check_openexr.m4])
+m4_include([unix/config/ax_check_libfreetype.m4])
 m4_include([unix/config/ax_compare_version.m4])
 m4_include([unix/config/ax_compiler_vendor.m4])
 m4_include([unix/config/ax_compiler_version.m4])
@@ -86,6 +87,7 @@ required_libjpeg_version="6b"
 required_libtiff_version="3.6.1"
 required_libsdl_version="1.2"
 required_openexr_version="1.2"
+required_libfreetype_version="2.4.0"
 
 # Supported options.
 # AX_ARG_ENABLE([--enable-avx2],             [enable AVX2 features and compiler optmization])
@@ -108,6 +110,7 @@ AX_ARG_WITH([--with-libtiff],       [DIR], [use the TIFF library (in directory D
 AX_ARG_WITH([--with-libsdl],        [DIR], [use the SDL library (in directory DIR)])
 AX_ARG_WITH([--with-libmkl],        [DIR], [use the Intel(R) Math Kernel Library (in directory DIR)])
 AX_ARG_WITH([--with-openexr],       [DIR], [use the OpenEXR library (in directory DIR)]) 
+AX_ARG_WITH([--with-libfreetype],   [DIR], [use the FreeType library (in directory DIR)]) 
 
 AC_ARG_VAR([COMPILED_BY], [customize the "unofficial version" message])
 AC_ARG_VAR([NON_REDISTRIBUTABLE_BUILD], [see the installation documentation])
@@ -450,6 +453,30 @@ fi
 if test x"$pov_libopenexr" != x"ok"; then
   AC_MSG_WARN([all program features using the OpenEXR library are disabled])
   AC_DEFINE([OPENEXR_MISSING], [], [Don't use OpenEXR.])
+fi
+
+# libfreetype; required library for distributable builds
+AC_MSG_CHECKING([whether to use the FreeType library])
+if test x"$pov_no_distrib" = x"yes" && test x"$with_libfreetype" = x"no"; then
+  AC_MSG_RESULT([no (NON DISTRIBUTABLE BUILD)])
+  AC_MSG_WARN([all program features using the FreeType library are disabled])
+  AC_DEFINE([LIBFREETYPE_MISSING], [], [Don't use libfreetype.])
+else
+  if test x"$with_libfreetype" = x"no"; then
+    AC_MSG_ERROR([disabling support for FreeType requires NON_REDISTRIBUTABLE_BUILD=yes])
+  fi
+  AC_MSG_RESULT([yes])
+  AX_CHECK_LIBFREETYPE([$required_libfreetype_version], [$with_libpng])
+  if test x"$ax_check_libfreetype" != x"ok"; then
+    AC_MSG_ERROR([cannot find a suitable FreeType library])
+  else
+    pov_libfreetype=ok
+  fi
+fi
+if test x"$pov_libfreetype" == x"ok"; then
+  pov_textprimitive_msg=enabled
+else
+  pov_textprimitive_msg=disabled
 fi
 
 # Unix-specific display libraries.
@@ -1317,6 +1344,7 @@ fi
 AC_MSG_RESULT([Built-in features:
   I/O restrictions:          ${pov_io_msg}
   X Window display:          ${pov_xwin_msg}
+  Text primitive:            ${pov_textprimitive_msg}
   Supported image formats:   $pov_img_fmt_builtin $pov_img_fmt_enabled
   Unsupported image formats: $pov_img_fmt_disabled
 

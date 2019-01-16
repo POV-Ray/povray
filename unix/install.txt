@@ -114,17 +114,20 @@ the development packages (header files in particular).
 - Boost version 1.38 or above
   http://www.boost.org
 
-- Zlib version 1.2.1 or above
-  http://www.zlib.net
-
-- LibPNG version 1.2.5 or above
-  http://www.libpng.org
+- FreeType version 2.4 or above
+  http://www.freetype.org
 
 - LibJPEG version 6b or above
   http://www.ijg.org
 
+- LibPNG version 1.2.5 or above
+  http://www.libpng.org
+
 - LibTIFF version 3.6.1 or above
   http://www.libtiff.org
+
+- Zlib version 1.2.1 or above
+  http://www.zlib.net
 
 
 2.3 Optional libraries
@@ -367,12 +370,16 @@ Additional POV-Ray specific options are:
     must be used together with NON_REDISTRIBUTABLE_BUILD (described below)
     in order to disable all POV-Ray features requiring this library.
 
---with-libpng=DIR or --without-libpng
-    requests to find the PNG library in the DIR directory.  Further details
+--with-libfreetype=DIR or --without-libfreetype
+    requests to find the FreeType library in the DIR directory.  Further details
     are given in the related --with-zlib option above.
 
 --with-libjpeg=DIR or --without-libjpeg
     requests to find the JPEG library in the DIR directory.  Further details
+    are given in the related --with-zlib option above.
+
+--with-libpng=DIR or --without-libpng
+    requests to find the PNG library in the DIR directory.  Further details
     are given in the related --with-zlib option above.
 
 --with-libtiff=DIR or --without-libtiff 

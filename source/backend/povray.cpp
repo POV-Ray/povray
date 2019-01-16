@@ -61,6 +61,7 @@
 #include <OpenEXRConfig.h>
 #endif
 #ifndef LIBPNG_MISSING
+#define PNG_SKIP_SETJMP_CHECK // Required for libpng < 1.6.
 #include <png.h>
 #endif
 #ifndef LIBTIFF_MISSING

@@ -12,17 +12,18 @@ Dependencies
 ============
 
 By default POV-Ray will attempt to build using system-supplied libraries for
-boost, zlib, libpng, libjpeg, libtiff, and openexr. We recommend you have the
+boost, FreeType, LibJPEG, OpenEXR, LibPNG, LibTIFF and ZLib. We recommend you have the
 following packages pre-installed:
 
     libboost-dev
     libboost-date-time-dev
     libboost-thread-dev
-    libz-dev
-    libpng-dev
+    libfreetype6-dev
     libjpeg-dev
-    libtiff-dev
     libopenexr-dev
+    libpng-dev
+    libtiff-dev
+    libz-dev
 
 To enable the render preview display also pre-install:
 

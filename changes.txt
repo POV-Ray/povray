@@ -179,6 +179,9 @@ Development Related
     `tools/unix/` and `tools/windows/`, respectively.
   - To simplify creating reproducible builds, the Unix build process has been
     amended to compile and link source files in a well-defined order.
+  - POV-Ray now requires the FreeType 2 library by default. It is still possible
+    to build POV-Ray without this library, but such builds will not support the
+    `text` primitive, and must be earmarked as non-redistributable.
 
 Other Noteworthy
 ----------------
