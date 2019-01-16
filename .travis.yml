@@ -31,6 +31,9 @@ addons:
     - libpng12-dev
     - libtiff4-dev
     - zlib1g-dev
+  homebrew:
+    packages:
+    - freetype
 
 install:
 - unix/prebuild.sh
