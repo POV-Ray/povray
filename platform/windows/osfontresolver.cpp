@@ -72,15 +72,9 @@ FontReferencePtr WindowsFontResolver::GetFont(const UCS2String& name, FontStyle 
     if (hdc == nullptr)
         ; // TODO throw tantrum
 
-    int     weight;
-    bool    italic;
-    switch (style)
-    {
-        case pov_parser::kRegular:      weight = 400; italic = false; break;
-        case pov_parser::kBold:         weight = 700; italic = false; break;
-        case pov_parser::kItalic:       weight = 400; italic = true;  break;
-        case pov_parser::kBoldItalic:   weight = 700; italic = true;  break;
-    }
+    bool bold   = ((style & FontStyle::kBold)   != FontStyle::kRegular);
+    bool italic = ((style & FontStyle::kItalic) != FontStyle::kRegular);
+    int  weight = (bold ? 700 : 400);
 
     HFONT fontHandle = CreateFontW(
         0,                      // cHeight

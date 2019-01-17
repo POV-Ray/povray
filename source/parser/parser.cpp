@@ -6522,6 +6522,7 @@ ObjectPtr Parser::Parse_TrueType ()
     POV_UINT32 cmap;
     CharsetID charset;
     LegacyCharset legacyCharset;
+    FontStyle style;
 
 #if 0
     if((sceneData->EffectiveLanguageVersion() < 350) && ((sceneData->legacyCharset == LegacyCharset::kUnspecified) ||
@@ -6569,7 +6570,20 @@ ObjectPtr Parser::Parse_TrueType ()
         END_CASE
         CASE(SYS_TOKEN)
             fontName = Parse_String();
-            font = mFontResolver.GetFont(fontName, FontStyle::kRegular);
+            style = FontStyle::kRegular;
+            EXPECT
+                CASE(BOLD_TOKEN)
+                    style |= FontStyle::kBold;
+                END_CASE
+                CASE(ITALIC_TOKEN)
+                    style |= FontStyle::kItalic;
+                END_CASE
+                OTHERWISE
+                    UNGET
+                    EXIT
+                END_CASE
+            END_EXPECT
+            font = mFontResolver.GetFont(fontName, style);
         END_CASE
         OTHERWISE
             Expectation_Error ("ttf or internal");

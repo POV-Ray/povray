@@ -229,13 +229,19 @@ enum class CharacterEncodingID
 class FontReference;
 using FontReferencePtr = std::shared_ptr<FontReference>;
 
-enum FontStyle
+enum class FontStyle
 {
     kRegular    = 0x00,
     kBold       = 0x01,
     kItalic     = 0x02,
     kBoldItalic = 0x03
 };
+
+inline FontStyle operator|(FontStyle a, FontStyle b) { return EnumOr(a, b); }
+inline FontStyle operator&(FontStyle a, FontStyle b) { return EnumAnd(a, b); }
+inline FontStyle operator~(FontStyle a) { return EnumNot(a); }
+inline FontStyle& operator|=(FontStyle& a, FontStyle b) { a = a | b; return a; }
+inline FontStyle& operator&=(FontStyle& a, FontStyle b) { a = a & b; return a; }
 
 class FontResolver
 {

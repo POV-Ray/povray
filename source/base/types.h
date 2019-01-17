@@ -41,6 +41,7 @@
 #include <algorithm>
 #include <limits>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include "base/pov_mem.h"
@@ -404,6 +405,36 @@ class ThreadData
     public:
         virtual ~ThreadData() { }
 };
+
+//------------------------------------------------------------------------------
+
+/// Cast enum to underlying type.
+template<typename T>
+inline typename std::underlying_type<T>::type underlying_cast(T value)
+{
+    return static_cast<typename std::underlying_type<T>::type>(value);
+}
+
+/// Apply bitwise OR to scoped enum.
+template<typename T>
+inline T EnumOr(T a, T b)
+{
+    return static_cast<T>(underlying_cast(a) | underlying_cast(b));
+}
+
+/// Apply bitwise AND to scoped enum.
+template<typename T>
+inline T EnumAnd(T a, T b)
+{
+    return static_cast<T>(underlying_cast(a) & underlying_cast(b));
+}
+
+/// Apply bitwise NOT to scoped enum.
+template<typename T>
+inline T EnumNot(T a)
+{
+    return static_cast<T>(~underlying_cast(a));
+}
 
 /// @}
 ///
