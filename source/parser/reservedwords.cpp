@@ -114,6 +114,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { BLUR_SAMPLES_TOKEN,           "blur_samples" },
     { BMP_TOKEN,                    "bmp" },
     { BOKEH_TOKEN,                  "bokeh" },
+    { BOLD_TOKEN,                   "bold" },
     { BOUNDED_BY_TOKEN,             "bounded_by" },
     { BOX_TOKEN,                    "box" },
     { BOXED_TOKEN,                  "boxed" },
@@ -288,6 +289,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { IRID_TOKEN,                   "irid" },
     { IRID_WAVELENGTH_TOKEN,        "irid_wavelength" },
     { ISOSURFACE_TOKEN,             "isosurface" },
+    { ITALIC_TOKEN,                 "italic" },
 
     { JITTER_TOKEN,                 "jitter" },
     { JPEG_TOKEN,                   "jpeg" },

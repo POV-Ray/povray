@@ -596,6 +596,7 @@ class Parser
 
         GenericMessenger&   mMessageFactory;
         FileResolver&       mFileResolver;
+        FontResolver&       mFontResolver;
         ProgressReporter&   mProgressReporter;
         TraceThreadData&    mThreadData;
 

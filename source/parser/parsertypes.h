@@ -40,7 +40,11 @@
 #include "parser/configparser.h"
 
 // C++ variants of C standard header files
+//  (none at the moment)
+
 // C++ standard header files
+#include <memory>
+
 // Boost header files
 //  (none at the moment)
 
@@ -218,6 +222,32 @@ enum class CharacterEncodingID
     kWindows1252,   ///< Windows code page 1252 aka [incorrectly] ANSI.
 
     kUTF8,          ///< Strict UTF-8.
+};
+
+//------------------------------------------------------------------------------
+
+class FontReference;
+using FontReferencePtr = std::shared_ptr<FontReference>;
+
+enum class FontStyle
+{
+    kRegular    = 0x00,
+    kBold       = 0x01,
+    kItalic     = 0x02,
+    kBoldItalic = 0x03
+};
+
+inline FontStyle operator|(FontStyle a, FontStyle b) { return EnumOr(a, b); }
+inline FontStyle operator&(FontStyle a, FontStyle b) { return EnumAnd(a, b); }
+inline FontStyle operator~(FontStyle a) { return EnumNot(a); }
+inline FontStyle& operator|=(FontStyle& a, FontStyle b) { a = a | b; return a; }
+inline FontStyle& operator&=(FontStyle& a, FontStyle b) { a = a & b; return a; }
+
+class FontResolver
+{
+public:
+    virtual ~FontResolver();
+    virtual FontReferencePtr GetFont(const UCS2String& name, FontStyle style) = 0;
 };
 
 //------------------------------------------------------------------------------

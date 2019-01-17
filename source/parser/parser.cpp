@@ -111,6 +111,9 @@
 // POV-Ray header files (VM module)
 #include "vm/fnpovfpu.h"
 
+// POV-Ray header files (platform module)
+#include "osfontresolver.h"
+
 // this must be the last file included
 #include "base/povdebug.h"
 
@@ -153,6 +156,7 @@ Parser::Parser(shared_ptr<SceneData> sd, const Options& opts,
     useClock(opts.useClock),
     mMessageFactory(mf),
     mFileResolver(fr),
+    mFontResolver(OSGetFontResolver()),
     mProgressReporter(pr),
     mThreadData(td),
     Debug_Message_Buffer(mf),
@@ -6509,6 +6513,8 @@ ObjectPtr Parser::Parse_TrueType ()
 
     ObjectPtr Object;
     char *filename = nullptr;
+    std::string localFilename;
+    UCS2* fontName;
     UCS2 *text_string;
     DBL depth;
     Vector3d offset;
@@ -6516,6 +6522,7 @@ ObjectPtr Parser::Parse_TrueType ()
     POV_UINT32 cmap;
     CharsetID charset;
     LegacyCharset legacyCharset;
+    FontStyle style;
 
 #if 0
     if((sceneData->EffectiveLanguageVersion() < 350) && ((sceneData->legacyCharset == LegacyCharset::kUnspecified) ||
@@ -6547,17 +6554,47 @@ ObjectPtr Parser::Parse_TrueType ()
     if (Object != nullptr)
         return(reinterpret_cast<ObjectPtr>(Object));
 
+    // TODO - Keep FontReference objects around to improve performance.
+    FontReferencePtr font;
+
     EXPECT_ONE
         CASE(TTF_TOKEN)
             filename = Parse_C_String(true);
+            // TODO FIXME - Should use Locate_File mechanism
+            localFilename = UCS2toASCIIString(mFileResolver.FindFile(ASCIItoUCS2String(filename), POV_File_Font_TTF));
+            font = std::make_shared<NamedFontFileASCII>(localFilename);
         END_CASE
         CASE(INTERNAL_TOKEN)
             builtin_font = (int)Parse_Float();
+            font = std::make_shared<BufferedFontFile>(font_timrom, sizeof(font_timrom), BufferedFontFile::Mode::kPermanent); // TODO FIXME
+        END_CASE
+        CASE(SYS_TOKEN)
+            fontName = Parse_String();
+            style = FontStyle::kRegular;
+            EXPECT
+                CASE(BOLD_TOKEN)
+                    style |= FontStyle::kBold;
+                END_CASE
+                CASE(ITALIC_TOKEN)
+                    style |= FontStyle::kItalic;
+                END_CASE
+                OTHERWISE
+                    UNGET
+                    EXIT
+                END_CASE
+            END_EXPECT
+            font = mFontResolver.GetFont(fontName, style);
         END_CASE
         OTHERWISE
             Expectation_Error ("ttf or internal");
         END_CASE
     END_EXPECT
+
+    // TODO - Keep FontEngine object around to improve performance.
+    FontEnginePtr fontEngine = std::make_shared<FontEngine>();
+
+    // TODO - Keep FontFace objects around to improve performance.
+    FontFacePtr fontFace = std::make_shared<FontFace>(fontEngine, font);
 
     cmap = FontEngine::kAnyCMAP;
     charset = CharsetID::kUndefined;
@@ -6599,18 +6636,6 @@ ObjectPtr Parser::Parse_TrueType ()
 
     /* Get the offset vector */
     Parse_Vector(offset);
-
-    // TODO - Keep FontEngine and FontFace objects around to improve performance.
-
-    FontEnginePtr fontEngine = std::make_shared<FontEngine>();
-
-    FontFacePtr fontFace;
-
-    // TODO FIXME - Should use Locate_File mechanism
-    if (filename == nullptr)
-        fontFace = std::make_shared<FontFace>(fontEngine, font_timrom, sizeof(font_timrom));
-    else
-        fontFace = std::make_shared<FontFace>(fontEngine, mFileResolver.FindFile(ASCIItoUCS2String(filename), POV_File_Font_TTF));
 
     if (fabs(offset.z()) > EPSILON)
         Warning("Text primitive offset in Z dimension ignored.");

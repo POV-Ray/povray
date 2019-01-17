@@ -61,6 +61,46 @@ namespace pov_parser
 
 //******************************************************************************
 
+FontReference::~FontReference()
+{}
+
+//------------------------------------------------------------------------------
+
+NamedFontFileASCII::NamedFontFileASCII(const std::string& name) :
+    mName(name)
+{}
+
+FT_Error NamedFontFileASCII::NewFace(FT_Library library, FT_Face* face)
+{
+    return FT_New_Face(library, mName.c_str(), 0, face);
+}
+
+//------------------------------------------------------------------------------
+
+BufferedFontFile::BufferedFontFile(const void* buffer, size_t size, Mode mode) :
+    mpData(reinterpret_cast<const unsigned char*>((mode == Mode::kCopy) ? std::memcpy(new unsigned char[size], buffer, size) : buffer)),
+    mSize(size),
+    mDelete(mode == Mode::kTransferOwnership)
+{}
+
+BufferedFontFile::~BufferedFontFile()
+{
+    if (mDelete && (mpData != nullptr))
+        delete[] mpData;
+}
+
+FT_Error BufferedFontFile::NewFace(FT_Library library, FT_Face* face)
+{
+    return FT_New_Memory_Face(library, reinterpret_cast<const FT_Byte*>(mpData), mSize, 0, face);
+}
+
+//------------------------------------------------------------------------------
+
+FontResolver::~FontResolver()
+{}
+
+//******************************************************************************
+
 FontEngine::FontEngine() :
     mFTLibrary(nullptr)
 {
@@ -80,13 +120,11 @@ FontEngine::~FontEngine()
 
 //******************************************************************************
 
-FontFace::FontFace(const FontEnginePtr& pEngine, const void* data, size_t size) :
+FontFace::FontFace(const FontEnginePtr& pEngine, const FontReferencePtr& pFontRef) :
     mpEngine(pEngine),
     mFTFace(nullptr)
 {
-    FT_Error error = FT_New_Memory_Face(mpEngine->mFTLibrary,
-                                        reinterpret_cast<const FT_Byte*>(data), size, 0,
-                                        &mFTFace);
+    FT_Error error = pFontRef->NewFace(mpEngine->mFTLibrary, &mFTFace);
     if (error != FT_Err_Ok)
     {
         mFTFace = nullptr;
@@ -95,29 +133,6 @@ FontFace::FontFace(const FontEnginePtr& pEngine, const void* data, size_t size) 
     else
     {
         error = FT_Set_Char_Size(mFTFace, mFTFace->units_per_EM, mFTFace->units_per_EM, 0, 0);
-        if (error != FT_Err_Ok)
-            ; // TODO throw tantrum
-        mScalingFactor = 1.0 / mFTFace->units_per_EM;
-    }
-}
-
-FontFace::FontFace(const FontEnginePtr& pEngine, const UCS2String& fileName) :
-    mpEngine(pEngine),
-    mFTFace(nullptr)
-{
-    // TODO FIXME - Handle UCS strings properly.
-    std::string asciiFileName = UCS2toASCIIString(fileName);
-    FT_Error error = FT_New_Face(mpEngine->mFTLibrary,
-                                 asciiFileName.c_str(), 0,
-                                 &mFTFace);
-    if (error != FT_Err_Ok)
-    {
-        mFTFace = nullptr;
-        // TODO throw tantrum
-    }
-    else
-    {
-        error = FT_Set_Char_Size(mFTFace, mFTFace->units_per_EM, mFTFace->units_per_EM, 72, 72);
         if (error != FT_Err_Ok)
             ; // TODO throw tantrum
         mScalingFactor = 1.0 / mFTFace->units_per_EM;
