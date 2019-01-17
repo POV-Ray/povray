@@ -7,7 +7,7 @@
 # ---------------------------------------------------------------------------
 #
 # Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-# Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+# Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 #
 # POV-Ray is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -1294,6 +1294,7 @@ test x"$pov_img_fmt_disabled" = x"" && pov_img_fmt_disabled="-"
 
 AC_DEFINE_UNQUOTED([BUILTIN_IO_RESTRICTIONS], ["$pov_io_msg"], [I/O restrictions.])
 AC_DEFINE_UNQUOTED([BUILTIN_XWIN_DISPLAY], ["$pov_xwin_msg"], [X Window display.])
+AC_DEFINE_UNQUOTED([BUILTIN_TEXT_PRIMITIVE], ["$pov_textprimitive_msg"], [Text primitive.])
 AC_DEFINE_UNQUOTED([BUILTIN_IMG_FORMATS], ["$pov_img_fmt_builtin $pov_img_fmt_enabled"], [Supported image formats.])
 AC_DEFINE_UNQUOTED([MISSING_IMG_FORMATS], ["$pov_img_fmt_disabled"], [Unsupported image formats.])
 

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -251,9 +251,10 @@ static void PrintVersion(void)
         "Built-in features:\n"
         "  I/O restrictions:          %s\n"
         "  X Window display:          %s\n"
+        "  Text primitive:            %s\n"
         "  Supported image formats:   %s\n"
         "  Unsupported image formats: %s\n\n",
-        BUILTIN_IO_RESTRICTIONS, BUILTIN_XWIN_DISPLAY, BUILTIN_IMG_FORMATS, MISSING_IMG_FORMATS
+        BUILTIN_IO_RESTRICTIONS, BUILTIN_XWIN_DISPLAY, BUILTIN_TEXT_PRIMITIVE, BUILTIN_IMG_FORMATS, MISSING_IMG_FORMATS
     );
     fprintf(stderr,
         "Compilation settings:\n"
