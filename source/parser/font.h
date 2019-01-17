@@ -62,7 +62,7 @@
 #include "core/math/vector.h"
 
 // POV-Ray header files (parser module)
-//  (none at the moment)
+#include "parser/parsertypes.h"
 
 namespace pov_parser
 {
@@ -72,9 +72,40 @@ using namespace pov_base;
 
 //------------------------------------------------------------------------------
 
+class FontReference
+{
+public:
+    virtual ~FontReference();
+    virtual FT_Error NewFace(FT_Library library, FT_Face* face) = 0;
+};
+
+class NamedFontFileASCII final : public FontReference
+{
+public:
+    NamedFontFileASCII(const std::string& name);
+    virtual FT_Error NewFace(FT_Library library, FT_Face* face) override;
+protected:
+    std::string mName;
+};
+
+class BufferedFontFile final : public FontReference
+{
+public:
+    enum Mode { kPermanent, kCopy, kTransferOwnership };
+    BufferedFontFile(const void* buffer, size_t size, Mode mode);
+    virtual ~BufferedFontFile() override;
+    virtual FT_Error NewFace(FT_Library library, FT_Face* face) override;
+protected:
+    const unsigned char*    mpData;
+    size_t                  mSize;
+    bool                    mDelete;
+};
+
+//------------------------------------------------------------------------------
+
 using GlyphIndex = POV_UINT32;
 
-struct ShapedGlyph
+struct ShapedGlyph final
 {
     UCS4        codePoint;
     GlyphIndex  glyphIndex;
@@ -111,8 +142,7 @@ public:
 
     class GlyphOutlineProcessor;
 
-    FontFace(const FontEnginePtr& pEngine, const void* data, size_t size);
-    FontFace(const FontEnginePtr& pEngine, const UCS2String& fileName);
+    FontFace(const FontEnginePtr& pEngine, const FontReferencePtr& pFontRef);
     ~FontFace();
 
     ShapedGlyphList GetShapedGlyphs(const UCS2String& text, const Vector2d& advance);
@@ -120,9 +150,10 @@ public:
 
 protected:
 
-    FontEnginePtr   mpEngine;
-    FT_Face         mFTFace;
-    DBL             mScalingFactor;
+    FontEnginePtr       mpEngine;
+    FontReferencePtr    mpFontRef;
+    FT_Face             mFTFace;
+    DBL                 mScalingFactor;
 
     Vector2d GetKerning(const GlyphIndex g1, const GlyphIndex g2);
     Vector2d GetAdvance(const GlyphIndex g);

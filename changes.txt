@@ -108,6 +108,9 @@ New Features
   - The parser now checks for proper balancing of `#end` directives, braces,
     parentheses etc. within each include file, and will report any imbalance
     via warnings or, in case of `#end`, outright errors.
+  - The `text` object now supports file formats other than TrueType.
+  - The `text` syntax has been extended to specify installed fonts without
+    knowing their actual file name or location (currently Windows only).
 
 Performance Improvements
 ------------------------
