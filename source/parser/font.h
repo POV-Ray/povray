@@ -72,6 +72,16 @@ using namespace pov_base;
 
 //------------------------------------------------------------------------------
 
+struct FontProcessingException : std::exception
+{
+    FontProcessingException(FT_Error ftErr);
+    virtual const char* what() const override;
+protected:
+    FT_Error mFreeTypeError;
+};
+
+//------------------------------------------------------------------------------
+
 class FontReference
 {
 public:

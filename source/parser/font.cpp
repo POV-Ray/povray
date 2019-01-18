@@ -61,6 +61,23 @@ namespace pov_parser
 
 //******************************************************************************
 
+FontProcessingException::FontProcessingException(FT_Error ftErr) :
+    mFreeTypeError(ftErr)
+{}
+
+const char* FontProcessingException::what() const
+{
+    #undef FTERRORS_H_
+    #define FT_ERROR_START_LIST     switch(mFreeTypeError) {
+    #define FT_ERRORDEF(e,v,s)          case v: return s;
+    #define FT_ERROR_END_LIST       };
+    #include FT_ERRORS_H
+
+    return "(unknown error code)";
+}
+
+//******************************************************************************
+
 FontReference::~FontReference()
 {}
 
@@ -108,7 +125,7 @@ FontEngine::FontEngine() :
     if (error != FT_Err_Ok)
     {
         mFTLibrary = nullptr;
-        // TODO throw tantrum
+        throw FontProcessingException(error);
     }
 }
 
@@ -128,13 +145,13 @@ FontFace::FontFace(const FontEnginePtr& pEngine, const FontReferencePtr& pFontRe
     if (error != FT_Err_Ok)
     {
         mFTFace = nullptr;
-        // TODO throw tantrum
+        throw FontProcessingException(error);
     }
     else
     {
         error = FT_Set_Char_Size(mFTFace, mFTFace->units_per_EM, mFTFace->units_per_EM, 0, 0);
         if (error != FT_Err_Ok)
-            ; // TODO throw tantrum
+            throw FontProcessingException(error);
         mScalingFactor = 1.0 / mFTFace->units_per_EM;
     }
 }
@@ -152,7 +169,7 @@ Vector2d FontFace::GetKerning(const GlyphIndex g1, const GlyphIndex g2)
         FT_Vector kerningOffset;
         FT_Error error = FT_Get_Kerning(mFTFace, g1, g2, FT_KERNING_UNFITTED, &kerningOffset);
         if (error != FT_Err_Ok)
-            ; // TODO throw tantrum
+            throw FontProcessingException(error);
         return Vector2d(kerningOffset.x * mScalingFactor, 0);
     }
     else
@@ -163,7 +180,7 @@ Vector2d FontFace::GetAdvance(const GlyphIndex g)
 {
     FT_Error error = FT_Load_Glyph(mFTFace, g, FT_LOAD_NO_BITMAP | FT_LOAD_NO_HINTING | FT_LOAD_NO_RECURSE);
     if (error != FT_Err_Ok)
-        ; // TODO throw tantrum
+        throw FontProcessingException(error);
     return Vector2d(mFTFace->glyph->linearHoriAdvance * mScalingFactor / 1024.0, 0);
 }
 
@@ -321,9 +338,9 @@ OutlineControlPoints FontFace::GetCubicBezierOutline(const ShapedGlyph& glyph)
 
     FT_Error error = FT_Load_Glyph(mFTFace, glyph.glyphIndex, FT_LOAD_NO_BITMAP | FT_LOAD_NO_HINTING);
     if (error != FT_Err_Ok)
-        ; // TODO throw tantrum
+        throw FontProcessingException(error);
     if (mFTFace->glyph->format != FT_GLYPH_FORMAT_OUTLINE)
-        ; // TODO throw tantrum
+        throw FontProcessingException(FT_Err_Invalid_Outline); // TODO Maybe use a dedicated exception.
     FT_Outline& outline = mFTFace->glyph->outline;
 
     FT_Outline_Funcs ftFuncs;
@@ -333,9 +350,10 @@ OutlineControlPoints FontFace::GetCubicBezierOutline(const ShapedGlyph& glyph)
     ftFuncs.cubic_to = CubicTo;
     ftFuncs.shift = 0;
     ftFuncs.delta = 0;
+
     error = FT_Outline_Decompose(&outline, &ftFuncs, &outlineProcessor);
     if (error != FT_Err_Ok)
-        ; // TODO throw tantrum
+        throw FontProcessingException(error);
 
     return controlPoints;
 }

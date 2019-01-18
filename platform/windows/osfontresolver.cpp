@@ -66,49 +66,51 @@ FontReferencePtr WindowsFontResolver::GetFont(const UCS2String& name, FontStyle 
         // Too long to be a valid system font name.
         return nullptr;
 
-    char* buffer = nullptr;
+    FontReferencePtr result = nullptr;
 
     HDC hdc = CreateCompatibleDC(nullptr);
-    if (hdc == nullptr)
-        ; // TODO throw tantrum
-
-    bool bold   = ((style & FontStyle::kBold)   != FontStyle::kRegular);
-    bool italic = ((style & FontStyle::kItalic) != FontStyle::kRegular);
-    int  weight = (bold ? 700 : 400);
-
-    HFONT fontHandle = CreateFontW(
-        0,                      // cHeight
-        0,                      // cWidth
-        0,                      // cEscapement
-        0,                      // cOrientation
-        (int)weight,            // cWeight
-        (DWORD)italic,          // bItalic
-        FALSE,                  // bUnderline
-        FALSE,                  // bStrikeOut
-        DEFAULT_CHARSET,        // iCharSet
-        OUT_DEFAULT_PRECIS,     // iOutPrecision
-        CLIP_DEFAULT_PRECIS,    // iClipPrecision
-        DEFAULT_QUALITY,        // iQuality
-        DEFAULT_PITCH | FF_DONTCARE, // iPitchAndFamily
-        (LPCWSTR)name.c_str()   // pszFaceName
-    );
-
-    SelectObject(hdc, fontHandle);
-    auto size = ::GetFontData(hdc, 0, 0, nullptr, 0);
-
-    if (size == 0)
-        return nullptr;
-
-    buffer = new char[size];
-    if (GetFontData(hdc, 0, 0, buffer, size) != size)
+    if (hdc != nullptr)
     {
-        delete[] buffer;
-        return nullptr;
+        bool bold   = ((style & FontStyle::kBold)   != FontStyle::kRegular);
+        bool italic = ((style & FontStyle::kItalic) != FontStyle::kRegular);
+        int  weight = (bold ? 700 : 400);
+
+        HFONT fontHandle = CreateFontW(
+            0,                      // cHeight
+            0,                      // cWidth
+            0,                      // cEscapement
+            0,                      // cOrientation
+            (int)weight,            // cWeight
+            (DWORD)italic,          // bItalic
+            FALSE,                  // bUnderline
+            FALSE,                  // bStrikeOut
+            DEFAULT_CHARSET,        // iCharSet
+            OUT_DEFAULT_PRECIS,     // iOutPrecision
+            CLIP_DEFAULT_PRECIS,    // iClipPrecision
+            DEFAULT_QUALITY,        // iQuality
+            DEFAULT_PITCH | FF_DONTCARE, // iPitchAndFamily
+            (LPCWSTR)name.c_str()   // pszFaceName
+        );
+
+        if (fontHandle != nullptr)
+        {
+            SelectObject(hdc, fontHandle);
+            auto size = ::GetFontData(hdc, 0, 0, nullptr, 0);
+            if (size != 0)
+            {
+                auto buffer = new char[size];
+                if (GetFontData(hdc, 0, 0, buffer, size) == size)
+                    result = std::make_shared<BufferedFontFile>(buffer, size, BufferedFontFile::Mode::kTransferOwnership);
+                else
+                    delete[] buffer;
+            }
+            DeleteObject(fontHandle);
+        }
+
+        DeleteDC(hdc);
     }
 
-    DeleteDC(hdc);
-
-    return std::make_shared<BufferedFontFile>(buffer, size, BufferedFontFile::Mode::kTransferOwnership);
+    return result;
 }
 
 FontResolver& OSGetFontResolver()

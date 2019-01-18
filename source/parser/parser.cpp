@@ -6583,82 +6583,98 @@ ObjectPtr Parser::Parse_TrueType ()
                     EXIT
                 END_CASE
             END_EXPECT
-            font = mFontResolver.GetFont(fontName, style);
+            try
+            {
+                font = mFontResolver.GetFont(fontName, style);
+                if (font == nullptr)
+                    Error("Failed to load system font '%s'.", UCS2toASCIIString(fontName));
+            }
+            catch (FontProcessingException& e)
+            {
+                Error("Failed to load system font '%s' (%s).", UCS2toASCIIString(fontName), e.what());
+            }
         END_CASE
         OTHERWISE
             Expectation_Error ("ttf or internal");
         END_CASE
     END_EXPECT
 
-    // TODO - Keep FontEngine object around to improve performance.
-    FontEnginePtr fontEngine = std::make_shared<FontEngine>();
-
-    // TODO - Keep FontFace objects around to improve performance.
-    FontFacePtr fontFace = std::make_shared<FontFace>(fontEngine, font);
-
-    cmap = FontEngine::kAnyCMAP;
-    charset = CharsetID::kUndefined;
-    EXPECT_ONE
-        CASE(CMAP_TOKEN)
-            Warning("Text primitive 'cmap' extension is experimental and may be "
-                    "subject to future changes.");
-            Parse_Begin();
-            cmap =  POV_UINT16(Parse_Float()) << 16;
-            Parse_Comma();
-            cmap += POV_UINT16(Parse_Float());
-            charset = CharsetID::kUCS4;
-            EXPECT_ONE
-                CASE(CHARSET_TOKEN)
-                    charset = CharsetID(POV_UINT16(Parse_Float()));
-                    if (Charset::Get(charset) == nullptr)
-                        Error("Unknown character set %i", int(charset));
-                END_CASE
-                OTHERWISE
-                    UNGET
-                END_CASE
-            END_EXPECT
-            Parse_End();
-        END_CASE
-        OTHERWISE
-            UNGET
-        END_CASE
-    END_EXPECT
-
-    /*** Object = Create_TTF(); */
-    Parse_Comma();
-
-    /* Parse the text string to be rendered */
-    text_string = Parse_String();
-    Parse_Comma();
-
-    /* Get the extrusion depth */
-    depth = Parse_Float(); Parse_Comma ();
-
-    /* Get the offset vector */
-    Parse_Vector(offset);
-
-    if (fabs(offset.z()) > EPSILON)
-        Warning("Text primitive offset in Z dimension ignored.");
-
-    auto shapedGlyphs = fontFace->GetShapedGlyphs(text_string, Vector2d(offset.x(), offset.y()));
-
     std::vector<Prism*> prisms;
 
-    for (auto& glyph : shapedGlyphs)
+    try
     {
-        auto controlPoints = fontFace->GetCubicBezierOutline(glyph);
+        // TODO - Keep FontEngine object around to improve performance.
+        FontEnginePtr fontEngine = std::make_shared<FontEngine>();
 
-        for (size_t i = 0; i < controlPoints.size() / 2; ++i)
-            std::swap(controlPoints[i], controlPoints[controlPoints.size() - i - 1]);
+        // TODO - Keep FontFace objects around to improve performance.
+        FontFacePtr fontFace = std::make_shared<FontFace>(fontEngine, font);
 
-        Prism* prism = new Prism();
-        prism->Spline_Type = BEZIER_SPLINE;
-        prism->Height1 = -depth;
-        prism->Height2 = 0;
-        prism->Number = controlPoints.size();
-        prism->Compute_Prism(controlPoints.data(), GetParserDataPtr());
-        prism->Compute_BBox();
-        prisms.push_back(prism);
+        cmap = FontEngine::kAnyCMAP;
+        charset = CharsetID::kUndefined;
+        EXPECT_ONE
+            CASE(CMAP_TOKEN)
+                Warning("Text primitive 'cmap' extension is experimental and may be "
+                        "subject to future changes.");
+                Parse_Begin();
+                cmap =  POV_UINT16(Parse_Float()) << 16;
+                Parse_Comma();
+                cmap += POV_UINT16(Parse_Float());
+                charset = CharsetID::kUCS4;
+                EXPECT_ONE
+                    CASE(CHARSET_TOKEN)
+                        charset = CharsetID(POV_UINT16(Parse_Float()));
+                        if (Charset::Get(charset) == nullptr)
+                            Error("Unknown character set %i", int(charset));
+                    END_CASE
+                    OTHERWISE
+                        UNGET
+                    END_CASE
+                END_EXPECT
+                Parse_End();
+            END_CASE
+            OTHERWISE
+                UNGET
+            END_CASE
+        END_EXPECT
+
+        /*** Object = Create_TTF(); */
+        Parse_Comma();
+
+        /* Parse the text string to be rendered */
+        text_string = Parse_String();
+        Parse_Comma();
+
+        /* Get the extrusion depth */
+        depth = Parse_Float(); Parse_Comma ();
+
+        /* Get the offset vector */
+        Parse_Vector(offset);
+
+        if (fabs(offset.z()) > EPSILON)
+            Warning("Text primitive offset in Z dimension ignored.");
+
+        auto shapedGlyphs = fontFace->GetShapedGlyphs(text_string, Vector2d(offset.x(), offset.y()));
+
+        for (auto& glyph : shapedGlyphs)
+        {
+            auto controlPoints = fontFace->GetCubicBezierOutline(glyph);
+
+            for (size_t i = 0; i < controlPoints.size() / 2; ++i)
+                std::swap(controlPoints[i], controlPoints[controlPoints.size() - i - 1]);
+
+            Prism* prism = new Prism();
+            prism->Spline_Type = BEZIER_SPLINE;
+            prism->Height1 = -depth;
+            prism->Height2 = 0;
+            prism->Number = controlPoints.size();
+            prism->Compute_Prism(controlPoints.data(), GetParserDataPtr());
+            prism->Compute_BBox();
+            prisms.push_back(prism);
+        }
+    }
+    catch (FontProcessingException& e)
+    {
+        Error("Failed to create text object (%s).", e.what());
     }
 
     if (prisms.size() == 1)
