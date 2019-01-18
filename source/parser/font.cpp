@@ -65,7 +65,7 @@ FontProcessingException::FontProcessingException(FT_Error ftErr) :
     mFreeTypeError(ftErr)
 {}
 
-const char* FontProcessingException::what() const
+const char* FontProcessingException::what() const noexcept
 {
     #undef FTERRORS_H_
     #define FT_ERROR_START_LIST     switch(mFreeTypeError) {
