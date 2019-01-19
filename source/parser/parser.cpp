@@ -6587,11 +6587,11 @@ ObjectPtr Parser::Parse_TrueType ()
             {
                 font = mFontResolver.GetFont(fontName, style);
                 if (font == nullptr)
-                    Error("Failed to load system font '%s'.", UCS2toASCIIString(fontName));
+                    Error("Failed to load system font '%s'.", UCS2toASCIIString(fontName).c_str());
             }
             catch (FontProcessingException& e)
             {
-                Error("Failed to load system font '%s' (%s).", UCS2toASCIIString(fontName), e.what());
+                Error("Failed to load system font '%s' (%s).", UCS2toASCIIString(fontName).c_str(), e.what());
             }
         END_CASE
         OTHERWISE
