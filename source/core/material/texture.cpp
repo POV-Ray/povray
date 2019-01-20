@@ -239,9 +239,13 @@ FINISH *Create_Finish()
 #endif
     New->DiffuseAlbedoAdjust        = 1.0;
     New->DiffuseAlbedoAdjustRad     = 1.0;
+#if POV_EXPERIMENTAL_LOMMEL_SEELIGER
     New->LommelSeeligerWeight       = 0.0;
+#endif
+#if POV_EXPERIMENTAL_OREN_NAYAR
     New->OrenNayarA                 = 1.0;
     New->OrenNayarB                 = 0.0;
+#endif
     New->Phong                      = 0.0;
     New->Phong_Size                 = 40.0;
     New->Specular                   = 0.0;

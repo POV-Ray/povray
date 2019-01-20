@@ -114,6 +114,8 @@ struct Finish_Struct
 #endif
     SNGL DiffuseAlbedoAdjust, DiffuseAlbedoAdjustRad;
 
+#if POV_EXPERIMENTAL_LOMMEL_SEELIGER
+
     /// How much of the diffuse contribution should be computed using the Lommel-Seeliger model.
     ///
     /// By default, POV-Ray uses a Lambertian-based diffuse reflectivity model. While this model is useful for
@@ -121,6 +123,10 @@ struct Finish_Struct
     /// being the Lommel-Seeliger model. In astronomy, a weighted average of the Lambertian and Lommel-Seeliger models
     /// is frequently used.
     SNGL LommelSeeligerWeight;
+
+#endif
+
+#if POV_EXPERIMENTAL_OREN_NAYAR
 
     /// @name Oren-Nayar diffuse model parameters.
     ///
@@ -136,6 +142,8 @@ struct Finish_Struct
 
     /// Factor B of the simplified Oren-Nayar model, defaulting to 0.0 for the Lambertian model.
     SNGL OrenNayarB;
+
+#endif
 
     /// @}
 
@@ -155,6 +163,8 @@ struct Finish_Struct
     bool UseSubsurface;     // whether to use subsurface light transport
     bool AlphaKnockout;     // whether pigment alpha knocks out finish effects
 
+#if POV_EXPERIMENTAL_OREN_NAYAR
+
     void SetOrenNayarSigma(double sigma)
     {
         SetOrenNayarSigmaSqr(sigma*sigma);
@@ -164,6 +174,8 @@ struct Finish_Struct
         OrenNayarA = 1.0 - 0.50 * sigmaSqr / (sigmaSqr + 0.57);
         OrenNayarB =       0.45 * sigmaSqr / (sigmaSqr + 0.09);
     }
+
+#endif
 };
 
 

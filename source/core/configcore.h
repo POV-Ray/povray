@@ -53,6 +53,20 @@
 ///
 /// @{
 
+/// @def POV_EXPERIMENTAL_LOMMEL_SEELIGER
+/// Whether experimental Lommel-Seeliger diffuse reflection should be enabled.
+///
+#ifndef POV_EXPERIMENTAL_LOMMEL_SEELIGER
+#define POV_EXPERIMENTAL_LOMMEL_SEELIGER 1
+#endif
+
+/// @def POV_EXPERIMENTAL_OREN_NAYAR
+/// Whether experimental Oren-Nayar diffuse reflection should be enabled.
+///
+#ifndef POV_EXPERIMENTAL_OREN_NAYAR
+#define POV_EXPERIMENTAL_OREN_NAYAR 1
+#endif
+
 //******************************************************************************
 ///
 /// @name PooledSimpleVector Sizes

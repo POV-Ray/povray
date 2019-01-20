@@ -2313,17 +2313,21 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
                 mExperimentalFlags.backsideIllumination = true;
         END_CASE
 
+#if POV_EXPERIMENTAL_LOMMEL_SEELIGER
         CASE (LOMMEL_SEELIGER_TOKEN)
             New->LommelSeeligerWeight = Parse_Float ();
             mExperimentalFlags.lommelSeeliger = true;
         END_CASE
+#endif
 
+#if POV_EXPERIMENTAL_OREN_NAYAR
         CASE (OREN_NAYAR_TOKEN)
             New->SetOrenNayarSigma(Parse_Float ());
             mExperimentalFlags.orenNayar = true;
             PossibleError("Parameterization of the Oren-Nayar diffuse model has not been finalized yet."
                           " Expect future versions of POV-Ray to render this scene differently without warning.");
         END_CASE
+#endif
 
         CASE (REFLECTION_TOKEN)
         {
@@ -2542,14 +2546,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
     END_EXPECT    /* End of finish_mods */
 #endif
 
-    if ((New->OrenNayarA != 1.0) || (New->OrenNayarB != 0.0))
-    {
-        if (New->Fresnel)
-            PossibleError("Finish-level 'fresnel' keyword found in combination with the Oren-Nayar diffuse model."
-                          " The interaction of these features has not been finalized yet, and is known to be bogus."
-                          " Expect future versions of POV-Ray to render this scene differently without warning.");
-    }
-
+#if POV_EXPERIMENTAL_LOMMEL_SEELIGER
     if (New->LommelSeeligerWeight != 0.0)
     {
         if (New->Fresnel)
@@ -2557,6 +2554,17 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
                           " The interaction of these features has not been finalized yet, and is known to be bogus."
                           " Expect future versions of POV-Ray to render this scene differently without warning.");
     }
+#endif
+
+#if POV_EXPERIMENTAL_OREN_NAYAR
+    if ((New->OrenNayarA != 1.0) || (New->OrenNayarB != 0.0))
+    {
+        if (New->Fresnel)
+            PossibleError("Finish-level 'fresnel' keyword found in combination with the Oren-Nayar diffuse model."
+                          " The interaction of these features has not been finalized yet, and is known to be bogus."
+                          " Expect future versions of POV-Ray to render this scene differently without warning.");
+    }
+#endif
 
     if ((sceneData->EffectiveLanguageVersion() >= 370) && ambientSet)
     {
@@ -2584,15 +2592,19 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
     // so that a user-specified value of 1.0 corresponds to a
     // backscattering of 100% of the incoming light
     double EffectiveBihemisphericalReflectance = 2.0 / (New->Brilliance + 1.0);
+#if POV_EXPERIMENTAL_OREN_NAYAR
     if (New->OrenNayarA != 1.0)
         EffectiveBihemisphericalReflectance *= New->OrenNayarA;
     if (New->OrenNayarB != 0.0)
         EffectiveBihemisphericalReflectance += New->OrenNayarB * (2.0/3.0 - (64.0/45.0)*(1.0/M_PI));
+#endif
+#if POV_EXPERIMENTAL_LOMMEL_SEELIGER
     if (New->LommelSeeligerWeight != 0.0)
     {
         EffectiveBihemisphericalReflectance *= (1.0 - New->LommelSeeligerWeight);
         EffectiveBihemisphericalReflectance += New->LommelSeeligerWeight * ((8.0 * (1.0-log(2.0))) / 3.0);
     }
+#endif
     if (diffuseAdjust)
     {
         New->DiffuseAlbedoAdjust    = 1.0 / EffectiveBihemisphericalReflectance;

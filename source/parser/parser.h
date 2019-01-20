@@ -157,10 +157,14 @@ struct ExperimentalFlags
 {
     bool    backsideIllumination    : 1;
     bool    functionHf              : 1;
+#if POV_EXPERIMENTAL_LOMMEL_SEELIGER
     bool    lommelSeeliger          : 1;
+#endif
     bool    meshCamera              : 1;
     bool    objImport               : 1;
+#if POV_EXPERIMENTAL_OREN_NAYAR
     bool    orenNayar               : 1;
+#endif
     bool    slopeAltitude           : 1;
     bool    spline                  : 1;
     bool    subsurface              : 1;
@@ -170,10 +174,14 @@ struct ExperimentalFlags
     ExperimentalFlags() :
         backsideIllumination(false),
         functionHf(false),
+#if POV_EXPERIMENTAL_LOMMEL_SEELIGER
         lommelSeeliger(false),
+#endif
         meshCamera(false),
         objImport(false),
+#if POV_EXPERIMENTAL_OREN_NAYAR
         orenNayar(false),
+#endif
         slopeAltitude(false),
         spline(false),
         subsurface(false),

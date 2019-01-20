@@ -307,7 +307,9 @@ const RESERVED_WORD Reserved_Words[] = {
     { LOCAL_TOKEN,                  "local" },
     { LOCATION_TOKEN,               "location" },
     { LOG_TOKEN,                    "log" },
+#if POV_EXPERIMENTAL_LOMMEL_SEELIGER
     { LOMMEL_SEELIGER_TOKEN,        "lommel_seeliger "},
+#endif
     { LOOK_AT_TOKEN,                "look_at" },
     { LOOKS_LIKE_TOKEN,             "looks_like" },
     { LOW_ERROR_FACTOR_TOKEN,       "low_error_factor" },
@@ -380,7 +382,9 @@ const RESERVED_WORD Reserved_Words[] = {
     { ONION_TOKEN,                  "onion" },
     { OPEN_TOKEN,                   "open" },
     { OPTIONAL_TOKEN,               "optional" },
+#if POV_EXPERIMENTAL_OREN_NAYAR
     { OREN_NAYAR_TOKEN,             "oren_nayar "},
+#endif
     { ORIENT_TOKEN,                 "orient" },
     { ORIENTATION_TOKEN,            "orientation" },
     { ORTHOGRAPHIC_TOKEN,           "orthographic" },

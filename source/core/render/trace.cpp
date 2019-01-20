@@ -2444,9 +2444,17 @@ void Trace::ComputeDiffuseColour(const FINISH *finish, const Vector3d& lightDire
     else
         intensity = cos_in;
 
-    if (finish->Fresnel || (finish->LommelSeeligerWeight != 0.0) || (finish->OrenNayarB != 0.0))
+    bool needCosOut = finish->Fresnel;
+#if POV_EXPERIMENTAL_LOMMEL_SEELIGER
+    needCosOut = needCosOut || (finish->LommelSeeligerWeight != 0.0);
+#endif
+#if POV_EXPERIMENTAL_OREN_NAYAR
+    needCosOut = needCosOut || (finish->OrenNayarB != 0.0);
+#endif
+    if (needCosOut)
         cos_out = fabs(dot(layer_normal, eyeDirection));
 
+#if POV_EXPERIMENTAL_OREN_NAYAR
     if (finish->OrenNayarA != 1.0)
         intensity *= finish->OrenNayarA;
     if (finish->OrenNayarB != 0.0)
@@ -2460,12 +2468,15 @@ void Trace::ComputeDiffuseColour(const FINISH *finish, const Vector3d& lightDire
         double beta  = min(theta_in, theta_out);
         intensity += finish->OrenNayarB * cos_in * max(0.0,cos_phi) * sin(alpha) * tan(beta);
     }
+#endif
 
+#if POV_EXPERIMENTAL_LOMMEL_SEELIGER
     if (finish->LommelSeeligerWeight != 0.0)
     {
         intensity *= (1.0 - finish->LommelSeeligerWeight);
         intensity += finish->LommelSeeligerWeight * cos_in / (cos_in + cos_out);
     }
+#endif
 
     intensity *= diffuse * attenuation;
 

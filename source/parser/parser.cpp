@@ -341,10 +341,14 @@ void Parser::Run()
 
     if(mExperimentalFlags.backsideIllumination) featureList.push_back("backside illumination");
     if(mExperimentalFlags.functionHf)           featureList.push_back("function '.hf'");
+#if POV_EXPERIMENTAL_LOMMEL_SEELIGER
     if(mExperimentalFlags.lommelSeeliger)       featureList.push_back("Lommel-Seeliger diffuse model");
+#endif
     if(mExperimentalFlags.meshCamera)           featureList.push_back("mesh camera");
     if(mExperimentalFlags.objImport)            featureList.push_back("wavefront obj import");
+#if POV_EXPERIMENTAL_OREN_NAYAR
     if(mExperimentalFlags.orenNayar)            featureList.push_back("Oren-Nayar diffuse model");
+#endif
     if(mExperimentalFlags.slopeAltitude)        featureList.push_back("slope pattern altitude");
     if(mExperimentalFlags.spline)               featureList.push_back("spline");
     if(mExperimentalFlags.subsurface)           featureList.push_back("subsurface light transport");
