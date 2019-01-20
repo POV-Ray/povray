@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,9 +40,13 @@
 #pragma warning(disable : 4267)
 #endif
 
-#include "backend/frame.h"
-#include "backend/povray.h"
 #include "vfe.h"
+
+#include <cstdarg>
+#include <cstdio>
+
+#include "frontend/animationprocessing.h"
+#include "frontend/imageprocessing.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -51,7 +55,13 @@ namespace vfe
 {
 
 using namespace pov_base;
+using namespace pov_frontend;
 using boost::format;
+
+static int Allow_File_Read(const UCS2 *Filename, const unsigned int FileType);
+static int Allow_File_Write(const UCS2 *Filename, const unsigned int FileType);
+static FILE *vfeFOpen(const UCS2String& name, const char *mode);
+static bool vfeRemove(const UCS2String& name);
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -97,7 +107,7 @@ POVMSMessageDetails::POVMSMessageDetails (POVMS_Object& Obj)
   if (POVMSUtil_GetLong (msg, kPOVAttrib_Line, &ll) == kNoErr)
     Line = POVMSInt(ll) ;
   if (POVMSUtil_GetLong (msg, kPOVAttrib_Column, &ll) == kNoErr)
-    Col = POVMSInt(ll + 1) ;
+    Col = POVMSInt(ll) ;
   if(POVMSUtil_GetLong(msg, kPOVAttrib_FilePosition, &ll) == kNoErr)
     Offset = ll ;
   l = sizeof (buffer) ;
@@ -191,7 +201,7 @@ void vfeConsole::BufferOutput(const char *str, unsigned int chars, vfeSession::M
   if (sLen > sizeof (rawBuffer) - bLen - 1)
     sLen = sizeof (rawBuffer) - bLen - 1 ;
   strncat (rawBuffer, str, sLen) ;
-  if ((s = strrchr (rawBuffer, '\n')) != NULL)
+  if ((s = strrchr (rawBuffer, '\n')) != nullptr)
   {
     *s++ = '\0' ;
     m_Session->AppendStreamMessage (mType, rawBuffer) ;
@@ -229,16 +239,6 @@ vfePlatformBase::~vfePlatformBase()
 {
 }
 
-IStream *vfePlatformBase::CreateIStream(const unsigned int stype)
-{
-  return (new IStream (stype)) ;
-}
-
-OStream *vfePlatformBase::CreateOStream(const unsigned int stype)
-{
-  return (new OStream (stype)) ;
-}
-
 UCS2String vfePlatformBase::GetTemporaryPath(void)
 {
   return m_Session->GetTemporaryPath();
@@ -257,6 +257,24 @@ void vfePlatformBase::DeleteTemporaryFile(const UCS2String& filename)
 bool vfePlatformBase::ReadFileFromURL(OStream *file, const UCS2String& url, const UCS2String& referrer)
 {
   return false;
+}
+
+FILE* vfePlatformBase::OpenLocalFile (const UCS2String& name, const char *mode)
+{
+  return vfeFOpen (name, mode);
+}
+
+void vfePlatformBase::DeleteLocalFile (const UCS2String& name)
+{
+  vfeRemove (name);
+}
+
+bool vfePlatformBase::AllowLocalFileAccess (const UCS2String& name, const unsigned int fileType, bool write)
+{
+    if (write)
+        return Allow_File_Write (name.c_str(), fileType);
+    else
+        return Allow_File_Read (name.c_str(), fileType);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -516,11 +534,6 @@ int vfeProcessRenderOptions::WriteSpecialOptionHandler(INI_Parser_Table *Table, 
   return ProcessRenderOptions::WriteSpecialOptionHandler (Table, Obj, S);
 }
 
-bool vfeProcessRenderOptions::WriteOptionFilter(INI_Parser_Table *Table)
-{
-  return ProcessRenderOptions::WriteOptionFilter (Table);
-}
-
 int vfeProcessRenderOptions::ProcessUnknownString(char *String, POVMSObjectPtr Obj)
 {
   return ProcessRenderOptions::ProcessUnknownString (String, Obj);
@@ -542,7 +555,7 @@ void vfeProcessRenderOptions::ParseError(const char *format, ...)
   va_list marker;
 
   va_start(marker, format);
-  vsnprintf(str, sizeof(str)-2, format, marker);
+  std::vsnprintf(str, sizeof(str), format, marker);
   va_end(marker);
 
   m_Session->AppendStatusMessage (str);
@@ -556,7 +569,7 @@ void vfeProcessRenderOptions::ParseErrorAt(ITextStream *file, const char *format
   va_list marker;
 
   va_start(marker, format);
-  vsnprintf(str, sizeof(str)-2, format, marker);
+  std::vsnprintf(str, sizeof(str), format, marker);
   va_end(marker);
 
   m_Session->AppendStatusMessage (str);
@@ -570,7 +583,7 @@ void vfeProcessRenderOptions::WriteError(const char *format, ...)
   va_list marker;
 
   va_start(marker, format);
-  vsnprintf(str, sizeof(str)-2, format, marker);
+  std::vsnprintf(str, sizeof(str), format, marker);
   va_end(marker);
 
   m_Session->AppendStatusMessage (str);
@@ -590,8 +603,8 @@ VirtualFrontEnd::VirtualFrontEnd(vfeSession& session, POVMSContext ctx, POVMSAdd
   backendAddress = addr ;
   state = kReady ;
   m_PostPauseState = kReady;
-  consoleResult = NULL ;
-  displayResult = NULL ;
+  consoleResult = nullptr;
+  displayResult = nullptr;
   m_PauseRequested = m_PausedAfterFrame = false;
   renderFrontend.ConnectToBackend(backendAddress, msg, result, console);
 }
@@ -790,6 +803,10 @@ bool VirtualFrontEnd::Stop()
         }
         result = true;
         break;
+
+      default:
+        // Do nothing special.
+        break;
     }
   }
   catch (pov_base::Exception& e)
@@ -918,7 +935,7 @@ State VirtualFrontEnd::Process()
       try
       {
         m_Session->SetSucceeded (false);
-        if (animationProcessing != NULL)
+        if (animationProcessing != nullptr)
         {
           shelloutProcessing->SetFrameClock(animationProcessing->GetNominalFrameNumber(), animationProcessing->GetClockValue());
           if (shelloutProcessing->SkipNextFrame() == false)
@@ -1005,7 +1022,7 @@ State VirtualFrontEnd::Process()
         string str(shelloutProcessing->GetSkipMessage());
         m_Session->AppendStatusMessage (str) ;
         m_Session->AppendStreamMessage (vfeSession::mInformation, str.c_str()) ;
-        if ((animationProcessing != NULL) && (animationProcessing->MoreFrames() == true))
+        if ((animationProcessing != nullptr) && (animationProcessing->MoreFrames() == true))
         {
           animationProcessing->ComputeNextFrame();
           m_Session->SetPixelsRendered(0, m_Session->GetTotalPixels());
@@ -1079,7 +1096,7 @@ State VirtualFrontEnd::Process()
             // case.
             return state;
           }
-          try { viewId = renderFrontend.CreateView(sceneId, options, imageProcessing, boost::bind(&vfe::VirtualFrontEnd::CreateDisplay, this, _1, _2, _3)); }
+          try { viewId = renderFrontend.CreateView(sceneId, options, imageProcessing, boost::bind(&vfe::VirtualFrontEnd::CreateDisplay, this, _1, _2)); }
           catch(pov_base::Exception& e)
           {
             m_Session->SetFailed();
@@ -1107,7 +1124,7 @@ State VirtualFrontEnd::Process()
               try { renderFrontend.CloseScene(sceneId); }
               catch (pov_base::Exception&) { /* Ignore any error here! */ }
 
-              if ((animationProcessing != NULL) && (animationProcessing->MoreFrames() == true))
+              if ((animationProcessing != nullptr) && (animationProcessing->MoreFrames() == true))
               {
                 animationProcessing->ComputeNextFrame();
                 m_Session->SetPixelsRendered(0, m_Session->GetTotalPixels());
@@ -1128,16 +1145,22 @@ State VirtualFrontEnd::Process()
           }
 
           // now we display the render window, if enabled
-          shared_ptr<Display> display(GetDisplay());
-          if (display != NULL)
           {
-            vfeDisplay *disp = dynamic_cast<vfeDisplay *>(display.get());
-            if (disp != NULL)
-              disp->Show () ;
+            shared_ptr<Display> display(GetDisplay());
+            if (display != nullptr)
+            {
+              vfeDisplay *disp = dynamic_cast<vfeDisplay *>(display.get());
+              if (disp != nullptr)
+                disp->Show () ;
+            }
           }
           return state = kRendering;
+
+        default:
+          // Do nothing special.
+          return state;
       }
-      return kParsing;
+      POV_ASSERT(false); // All cases of the preceding switch should return.
 
     case kRendering:
     case kPausedRendering:
@@ -1161,7 +1184,7 @@ State VirtualFrontEnd::Process()
           }
           try
           {
-            if (animationProcessing != NULL)
+            if (animationProcessing != nullptr)
             {
               if (m_Session->OutputToFileSet())
                 m_Session->AdviseOutputFilename (imageProcessing->WriteImage(options, animationProcessing->GetNominalFrameNumber(), animationProcessing->GetFrameNumberDigits()));
@@ -1210,7 +1233,7 @@ State VirtualFrontEnd::Process()
     case kPostFrameShellout:
       if (shelloutProcessing->ShelloutRunning() || HandleShelloutCancel())
         return state;
-      if ((animationProcessing == NULL) || animationProcessing->MoreFrames() == false)
+      if ((animationProcessing == nullptr) || animationProcessing->MoreFrames() == false)
       {
         m_Session->SetSucceeded (true);
         if (m_PauseRequested)
@@ -1313,7 +1336,11 @@ State VirtualFrontEnd::Process()
 
     case kDone:
       return state = kReady;
+
+    default:
+      return state;
   }
+  POV_ASSERT(false); // All cases of the preceding switch should return.
 
   return state;
 }
@@ -1368,38 +1395,26 @@ bool VirtualFrontEnd::Paused (void)
 //
 ////////////////////////////////////////////////////////////////////////////////////////
 
-int Allow_File_Write (const char *Filename, const unsigned int FileType)
-{
-  if (strcmp(Filename, "stdout") == 0 || strcmp(Filename, "stderr") == 0)
-    return true;
-  return (vfeSession::GetSessionFromThreadID()->TestAccessAllowed(Filename, true));
-}
-
-int Allow_File_Write (const unsigned short *Filename, const unsigned int FileType)
+int Allow_File_Write (const UCS2 *Filename, const unsigned int FileType)
 {
   if (strcmp(UCS2toASCIIString(Filename).c_str(), "stdout") == 0 || strcmp(UCS2toASCIIString(Filename).c_str(), "stderr") == 0)
     return true;
   return (vfeSession::GetSessionFromThreadID()->TestAccessAllowed(Filename, true));
 }
 
-int Allow_File_Read (const char *Filename, const unsigned int FileType)
+int Allow_File_Read (const UCS2 *Filename, const unsigned int FileType)
 {
   return (vfeSession::GetSessionFromThreadID()->TestAccessAllowed(Filename, false));
 }
 
-int Allow_File_Read (const unsigned short *Filename, const unsigned int FileType)
-{
-  return (vfeSession::GetSessionFromThreadID()->TestAccessAllowed(Filename, false));
-}
-
-FILE *vfeFOpen (const std::basic_string<unsigned short>& name, const char *mode)
+FILE *vfeFOpen (const UCS2String& name, const char *mode)
 {
   return (fopen (UCS2toASCIIString (name).c_str(), mode)) ;
 }
 
 bool vfeRemove(const UCS2String& Filename)
 {
-  return (DELETE_FILE (UCS2toASCIIString (Filename).c_str()) == 0);
+  return (POV_DELETE_FILE (UCS2toASCIIString (Filename).c_str()) == 0);
 }
 
 }

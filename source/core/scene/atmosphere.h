@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,6 +44,13 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreSceneAtmosphere Atmospheric Effects and Sky Spheres
+/// @ingroup PovCore
+///
+/// @{
+
 /*****************************************************************************
 * Global preprocessor defines
 ******************************************************************************/
@@ -66,8 +73,8 @@ struct TurbulenceWarp; // full declaration in core/material/warp.h
 
 struct Fog_Struct
 {
-    Fog_Struct() : Turb(NULL), Next(NULL) {}
-    ~Fog_Struct() { if (Turb) POV_FREE(Turb); }
+    Fog_Struct();
+    ~Fog_Struct();
     int Type;
     DBL Distance;
     DBL Alt;
@@ -81,7 +88,7 @@ struct Fog_Struct
 
 struct Rainbow_Struct
 {
-    Rainbow_Struct() : Pigment(NULL), Next(NULL) {}
+    Rainbow_Struct() : Pigment(nullptr), Next(nullptr) {}
     ~Rainbow_Struct() { if (Pigment) delete Pigment; }
     DBL Distance;
     DBL Jitter;
@@ -95,7 +102,7 @@ struct Rainbow_Struct
 
 struct Skysphere_Struct
 {
-    Skysphere_Struct() : Trans(NULL) {}
+    Skysphere_Struct() : Trans(nullptr) {}
     ~Skysphere_Struct();
     MathColour        Emission; ///< Brightness adjustment.
     vector<PIGMENT *> Pigments; ///< Pigment(s) to use.
@@ -121,6 +128,10 @@ void Scale_Skysphere (SKYSPHERE *Skysphere, const Vector3d& Vector);
 void Rotate_Skysphere (SKYSPHERE *Skysphere, const Vector3d& Vector);
 void Translate_Skysphere (SKYSPHERE *Skysphere, const Vector3d& Vector);
 void Transform_Skysphere (SKYSPHERE *Skysphere, const TRANSFORM *Trans);
+
+/// @}
+///
+//##############################################################################
 
 }
 

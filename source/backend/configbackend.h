@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,86 +41,68 @@
 #include "base/configbase.h"
 #include "syspovconfigbackend.h"
 
-/*
- * Platform name default.
- */
+//##############################################################################
+///
+/// @defgroup PovBackendConfig Back-End Compile-Time Configuration
+/// @ingroup PovBackend
+/// @ingroup PovConfig
+///
+/// @{
+
+/// @def POVRAY_PLATFORM_NAME
+/// Platform name string.
+///
 #ifndef POVRAY_PLATFORM_NAME
     #define POVRAY_PLATFORM_NAME "Unknown Platform"
 #endif
 
-/*
- * To allow GUI platforms like the Mac to access a command line and provide
- * a command line only interface (for debugging) a different call to an
- * internal function of the standard library is required. This macro takes
- * both argc and argv and is expected to return argc.
- */
-#ifndef GETCOMMANDLINE
-    #define GETCOMMANDLINE(ac,av) ac
+/// @def POV_USE_DEFAULT_TASK_INITIALIZE
+/// Whether to use a default implementation for task thread initialization.
+///
+/// Define as non-zero to use a default implementation for the @ref pov::Task::Initialize() method, or zero if the
+/// platform provides its own implementation.
+///
+#ifndef POV_USE_DEFAULT_TASK_INITIALIZE
+    #define POV_USE_DEFAULT_TASK_INITIALIZE 1
 #endif
 
-#ifndef CONFIG_MATH       // Macro for setting up any special FP options
-    #define CONFIG_MATH
+/// @def POV_USE_DEFAULT_TASK_CLEANUP
+/// Whether to use a default implementation for task thread cleanup.
+///
+/// Define as non-zero to use a default implementation for the @ref pov::Task::Cleanup() method, or zero if the
+/// platform provides its own implementation.
+///
+#ifndef POV_USE_DEFAULT_TASK_CLEANUP
+    #define POV_USE_DEFAULT_TASK_CLEANUP 1
 #endif
 
-/* Specify number of source file lines printed before error line, their maximum length and
- * the error marker text that is appended to mark the error
- */
-#ifndef POV_NUM_ECHO_LINES
-    #define POV_NUM_ECHO_LINES 5
+/// @def POV_THREAD_STACK_SIZE
+/// Default thread stack size.
+///
+#ifndef POV_THREAD_STACK_SIZE
+    #define POV_THREAD_STACK_SIZE (2 * 1024 * 1024) // 2 MiB
 #endif
 
-#ifndef POV_ERROR_MARKER_TEXT
-    #define POV_ERROR_MARKER_TEXT " <----ERROR\n"
-#endif
+static_assert(
+    POV_THREAD_STACK_SIZE >= 1024 * 1024,
+    "Unreasonably small thread stack size. Proceed at your own risk."
+);
 
-#ifndef POV_WHERE_ERROR
-    #define POV_WHERE_ERROR(fn,ln,cl,ts)
-#endif
-
-#ifndef DBL_FORMAT_STRING
-    #define DBL_FORMAT_STRING "%lf"
-#endif
-
-// Some implementations of scanf return 0 on failure rather than EOF
-#ifndef SCANF_EOF
-    #define SCANF_EOF EOF
-#endif
-
-#ifndef POV_SYS_THREAD_STARTUP
-    #define POV_SYS_THREAD_STARTUP
-#endif
-
-#ifndef POV_SYS_THREAD_CLEANUP
-    #define POV_SYS_THREAD_CLEANUP
-#endif
-
-#ifndef NEW_LINE_STRING
-    // NEW_LINE_STRING remains undefined, optimizing the code for "\n" as used internally
-#endif
-
-// If compiler version is undefined, then make it 'u' for unknown
-#ifndef COMPILER_VER
-    #define COMPILER_VER ".u"
-#endif
-
-#ifndef POV_PARSE_PATH_STRING
-    #error "A valid POV_PARSE_PATH_STRING macro is required!"
-#endif
-
-
-/*
- * Font related macros [trf]
- */
+/// @def POV_CONVERT_TEXT_TO_UCS2
+/// Convert text from system-specific format to UCS2.
+///
+/// @note
+///     The macro is responsible for creating a sufficiently large result buffer, using @ref POV_MALLOC().
+/// @note
+///     The result must be a genuine UCS2 string. UCS4/Unicode characters outside the Basic Multilingual Plane
+///     are not supported.
+///
+/// @param[in]  ts  Null-terminated byte sequence to convert.
+/// @param[out] as  Number of UCS2 characters in result.
+/// @return         Converted null-terminated UCS2 character sequence, or `nullptr` if conversion is not supported.
+///
 #ifndef POV_CONVERT_TEXT_TO_UCS2
-    #define POV_CONVERT_TEXT_TO_UCS2(ts, tsl, as) (NULL)
-#endif
-
-#ifndef POV_ALLOW_FILE_READ
-    #define POV_ALLOW_FILE_READ(f,t) (1)
-#endif
-
-#ifndef POV_ALLOW_FILE_WRITE
-    #define POV_ALLOW_FILE_WRITE(f,t) (1)
+    #define POV_CONVERT_TEXT_TO_UCS2(ts, as) (nullptr)
 #endif
 
 //******************************************************************************
@@ -134,17 +116,20 @@
 /// zero value will disable them.
 ///
 /// It is recommended that system-specific configurations leave these settings undefined in release
-/// builds, in which case they will default to @ref POV_DEBUG unless noted otherwise.
+/// builds, in which case they will default to @ref POV_BACKEND_DEBUG unless noted otherwise.
 ///
 /// @{
 
-/// @def POV_RTR_DEBUG
-/// Enable run-time sanity checks for real-time rendering.
+/// @def POV_BACKEND_DEBUG
+/// Default setting for enabling or disabling @ref PovBackend debugging aids.
 ///
-/// Define as non-zero integer to enable, or zero to disable.
+/// This setting specifies the default for all debugging switches throughout the entire module
+/// that are not explicitly enabled or disabled by system-specific configurations.
 ///
-#ifndef POV_RTR_DEBUG
-    #define POV_RTR_DEBUG POV_DEBUG
+/// If left undefined by system-specific configurations, this setting defaults to @ref POV_DEBUG.
+///
+#ifndef POV_BACKEND_DEBUG
+    #define POV_BACKEND_DEBUG POV_DEBUG
 #endif
 
 /// @def POV_TASK_DEBUG
@@ -153,7 +138,7 @@
 /// Define as non-zero integer to enable, or zero to disable.
 ///
 #ifndef POV_TASK_DEBUG
-    #define POV_TASK_DEBUG POV_DEBUG
+    #define POV_TASK_DEBUG POV_BACKEND_DEBUG
 #endif
 
 /// @}
@@ -167,16 +152,16 @@
 ///
 /// @{
 
-#if POV_RTR_DEBUG
-    #define POV_RTR_ASSERT(expr) POV_ASSERT_HARD(expr)
+#if POV_BACKEND_DEBUG
+    #define POV_BACKEND_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_RTR_ASSERT(expr) NO_OP
+    #define POV_BACKEND_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #if POV_TASK_DEBUG
     #define POV_TASK_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_TASK_ASSERT(expr) NO_OP
+    #define POV_TASK_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 /// @def HAVE_BOOST_THREAD_ATTRIBUTES
@@ -192,6 +177,8 @@
 ///
 //******************************************************************************
 
-#include "syspovprotobackend.h"
+/// @}
+///
+//##############################################################################
 
 #endif // POVRAY_BACKEND_CONFIGBACKEND_H

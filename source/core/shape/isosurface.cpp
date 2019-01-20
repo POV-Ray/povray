@@ -4,14 +4,15 @@
 ///
 /// Implementation of the isosurface geometric primitive.
 ///
-/// @author R.Suzuki (original code)
-/// @author Thorsten Froehlich (porting to POV-Ray 3.5)
+/// @author D.Skarda, T.Bily (original code)
+/// @author R.Suzuki (modifications)
+/// @author Thorsten Froehlich (porting to POV-Ray v3.5)
 ///
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,6 +42,8 @@
 
 #include <algorithm>
 
+#include "base/messenger.h"
+
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
@@ -54,6 +57,34 @@ namespace pov
 /*****************************************************************************
 * Local preprocessor defines
 ******************************************************************************/
+
+struct ISO_Max_Gradient
+{
+    DBL max_gradient, gradient;
+    DBL eval_max, eval_cnt, eval_gradient_sum, eval_var;
+    bool reported;
+
+    ISO_Max_Gradient() :
+        max_gradient(0.0),
+        gradient(0.0),
+        eval_max(0.0),
+        eval_cnt(0.0),
+        eval_gradient_sum(0.0),
+        eval_var(0.0),
+        reported(false),
+        mRefCounter(0)
+    {}
+
+    bool IsShared() const { return mRefCounter > 1; }
+
+private:
+    mutable size_t mRefCounter;
+    friend void intrusive_ptr_add_ref(ISO_Max_Gradient* f);
+    friend void intrusive_ptr_release(ISO_Max_Gradient* f);
+};
+
+inline void intrusive_ptr_add_ref(ISO_Max_Gradient* f) { ++f->mRefCounter; }
+inline void intrusive_ptr_release(ISO_Max_Gradient* f) { if (!(--f->mRefCounter)) delete f; }
 
 
 /*****************************************************************************
@@ -110,7 +141,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
         if(Depth1 < 0.0)
             Depth1 = 0.0;
 
-        if(Trans != NULL)
+        if (Trans != nullptr)
         {
             MInvTransPoint(Plocal, ray.Origin, Trans);
             MInvTransDirection(Dlocal, ray.Direction, Trans);
@@ -126,7 +157,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
         if(closed != false)
         {
             VTmp = Plocal + Depth1 * Dlocal;
-            tmp = fn.Evaluate(VTmp);
+            tmp = EvaluatePolarized (fn, VTmp);
             if(Depth1 > accuracy)
             {
                 if(tmp < 0.0)                   /* The ray hits the bounding shape */
@@ -147,12 +178,12 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
                 {
                     Depth1 = accuracy * 5.0;
                     VTmp = Plocal + Depth1 * Dlocal;
-                    if(fn.Evaluate(VTmp) < 0)
+                    if (IsInside (fn, VTmp))
                         Thread->isosurfaceData->Inv3 = -1;
                     /* Change the sign of the function (IPoint is in the bounding shpae.)*/
                 }
                 VTmp = Plocal + Depth2 * Dlocal;
-                if(fn.Evaluate(VTmp) < 0.0)
+                if (IsInside (fn, VTmp))
                 {
                     IPoint = ray.Evaluate(Depth2);
                     if(Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
@@ -178,11 +209,11 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
         {
             /* IPoint is on the isosurface */
             VTmp = Plocal + tmin * Dlocal;
-            if(fabs(fn.Evaluate(VTmp)) < (maxg * accuracy * 4.0))
+            if (EvaluateAbs (fn, VTmp) < (maxg * accuracy * 4.0))
             {
                 tmin = accuracy * 5.0;
                 VTmp = Plocal + tmin * Dlocal;
-                if(fn.Evaluate(VTmp) < 0)
+                if (IsInside (fn, VTmp))
                     Thread->isosurfaceData->Inv3 = -1;
                 /* change the sign and go into the isosurface */
             }
@@ -211,6 +242,8 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 
         if(IFound)
             Thread->Stats()[Ray_IsoSurface_Tests_Succeeded]++;
+
+        Thread->isosurfaceData->pFn = nullptr;
     }
 
     if(eval == true)
@@ -254,7 +287,7 @@ bool IsoSurface::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
     Vector3d New_Point;
 
     /* Transform the point into box space. */
-    if(Trans != NULL)
+    if (Trans != nullptr)
         MInvTransPoint(New_Point, IPoint, Trans);
     else
         New_Point = IPoint;
@@ -262,13 +295,33 @@ bool IsoSurface::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
     if(!container->Inside(New_Point))
         return (Test_Flag(this, INVERTED_FLAG));
 
-    if(GenericScalarFunctionInstance(Function, Thread).Evaluate(New_Point) > 0)
+    GenericScalarFunctionInstance fn(Function, Thread);
+    if (!IsInside (fn, New_Point))
         return (Test_Flag(this, INVERTED_FLAG));
 
     /* Inside the box. */
     return (!Test_Flag(this, INVERTED_FLAG));
 }
 
+
+double IsoSurface::GetPotential (const Vector3d& globalPoint, bool subtractThreshold, TraceThreadData *pThread) const
+{
+    Vector3d localPoint;
+
+    if (Trans != nullptr)
+        MInvTransPoint (localPoint, globalPoint, Trans);
+    else
+        localPoint = globalPoint;
+
+    double potential = GenericScalarFunctionInstance(Function, pThread).Evaluate (localPoint);
+    if (subtractThreshold)
+        potential -= threshold;
+
+    if (Test_Flag (this, INVERTED_FLAG))
+        return -potential;
+    else
+        return  potential;
+}
 
 
 /*****************************************************************************
@@ -312,7 +365,7 @@ void IsoSurface::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *
         GenericScalarFunctionInstance fn(Function, Thread);
 
         /* Transform the point into the isosurface space */
-        if(Trans != NULL)
+        if (Trans != nullptr)
             MInvTransPoint(New_Point, Inter->IPoint, Trans);
         else
             New_Point = Inter->IPoint;
@@ -337,12 +390,15 @@ void IsoSurface::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *
         Result.normalize();
 
         /* Transform the point into the boxes space. */
-        if(Trans != NULL)
+        if (Trans != nullptr)
         {
             MTransNormal(Result, Result, Trans);
 
             Result.normalize();
         }
+
+        if (positivePolarity)
+            Result.invert();
     }
 }
 
@@ -475,7 +531,7 @@ void IsoSurface::Scale(const Vector3d&, const TRANSFORM* tr)
 
 void IsoSurface::Transform(const TRANSFORM* tr)
 {
-    if(Trans == NULL)
+    if(Trans == nullptr)
         Trans = Create_Transform();
 
     Compose_Transforms(Trans, tr);
@@ -511,7 +567,9 @@ void IsoSurface::Transform(const TRANSFORM* tr)
 *
 ******************************************************************************/
 
-IsoSurface::IsoSurface() : ObjectBase(ISOSURFACE_OBJECT)
+IsoSurface::IsoSurface() :
+    ObjectBase(ISOSURFACE_OBJECT),
+    positivePolarity(false)
 {
     container = shared_ptr<ContainedByShape>(new ContainedByBox());
 
@@ -519,7 +577,7 @@ IsoSurface::IsoSurface() : ObjectBase(ISOSURFACE_OBJECT)
 
     Trans = Create_Transform();
 
-    Function = NULL;
+    Function = nullptr;
     accuracy = 0.001;
     max_trace = 1;
 
@@ -528,19 +586,12 @@ IsoSurface::IsoSurface() : ObjectBase(ISOSURFACE_OBJECT)
     eval_param[2] = 0.0; // 0.99; // not necessary
     eval = false;
     closed = true;
-    isCopy = false;
 
     max_gradient = 1.1;
     gradient = 0.0;
     threshold = 0.0;
 
-    mginfo = reinterpret_cast<ISO_Max_Gradient *>(POV_MALLOC(sizeof(ISO_Max_Gradient), "isosurface max_gradient info"));
-    mginfo->refcnt = 1;
-    mginfo->max_gradient = 0.0;
-    mginfo->gradient = 0.0; // not really necessary yet [trf]
-    mginfo->eval_max = 0.0;
-    mginfo->eval_cnt = 0.0;
-    mginfo->eval_gradient_sum = 0.0;
+    mginfo = intrusive_ptr<ISO_Max_Gradient>(new ISO_Max_Gradient());
 }
 
 
@@ -581,10 +632,8 @@ ObjectPtr IsoSurface::Copy()
     New->Trans = Copy_Transform(Trans);
 
     New->mginfo = mginfo;
-    New->mginfo->refcnt++;
 
-    // mark it as copy for use by max_gradient warning code
-    New->isCopy = true;
+    New->positivePolarity = positivePolarity;
 
     New->container = shared_ptr<ContainedByShape>(container->Copy());
 
@@ -620,8 +669,6 @@ ObjectPtr IsoSurface::Copy()
 
 IsoSurface::~IsoSurface()
 {
-    if(--mginfo->refcnt == 0)
-        POV_FREE(mginfo);
     delete Function;
 }
 
@@ -652,7 +699,7 @@ IsoSurface::~IsoSurface()
 *
 ******************************************************************************/
 
-void IsoSurface::DispatchShutdownMessages(CoreMessenger& messenger)
+void IsoSurface::DispatchShutdownMessages(GenericMessenger& messenger)
 {
     // TODO FIXME - works around nasty gcc (found using 4.0.1) bug failing to honor casting
     // away of volatile on pass by value on template argument lookup [trf]
@@ -661,60 +708,63 @@ void IsoSurface::DispatchShutdownMessages(CoreMessenger& messenger)
     mginfo->gradient = max(gradient, mginfo->gradient);
     mginfo->max_gradient = max((DBL)temp_max_gradient, mginfo->max_gradient);
 
-    if (isCopy == false)
+    if (mginfo->IsShared())
     {
-        const FunctionSourceInfo* fnInfo = Function->GetSourceInfo();
+        // Other instances shall take care of reporting the max gradient.
+        mginfo.reset();
+        return;
+    }
 
-        if (fnInfo != NULL)
+    const CustomFunctionSourceInfo* fnInfo = Function->GetSourceInfo();
+
+    if (fnInfo != nullptr)
+    {
+        if (eval == false)
         {
-            if (eval == false)
+            // Only show the warning if necessary!
+            // BTW, not being too picky here is a feature and not a bug ;-)  [trf]
+            if ((mginfo->gradient > EPSILON) && (mginfo->max_gradient > EPSILON))
             {
-                // Only show the warning if necessary!
-                // BTW, not being too picky here is a feature and not a bug ;-)  [trf]
-                if ((mginfo->gradient > EPSILON) && (mginfo->max_gradient > EPSILON))
-                {
-                    DBL diff = mginfo->max_gradient - mginfo->gradient;
-                    DBL prop = fabs(mginfo->max_gradient / mginfo->gradient);
+                DBL diff = mginfo->max_gradient - mginfo->gradient;
+                DBL prop = fabs(mginfo->max_gradient / mginfo->gradient);
 
-                    if (((prop <= 0.9) && (diff <= -0.5)) || (((prop <= 0.95) || (diff <= -0.1)) && (mginfo->max_gradient < 10.0)))
-                    {
-                        messenger.CoreMessageAt(kCoreMessageClass_Warning, fnInfo->filename, fnInfo->filepos.lineno, 0, fnInfo->filepos.offset,
-                                                 "The maximum gradient found was %0.3f, but max_gradient of the\n"
-                                                 "isosurface was set to %0.3f. The isosurface may contain holes!\n"
-                                                 "Adjust max_gradient to get a proper rendering of the isosurface.",
-                                                 (float)(mginfo->gradient),
-                                                 (float)(mginfo->max_gradient));
-                    }
-                    else if ((diff >= 10.0) || ((prop >= 1.1) && (diff >= 0.5)))
-                    {
-                        messenger.CoreMessageAt(kCoreMessageClass_Warning, fnInfo->filename, fnInfo->filepos.lineno, 0, fnInfo->filepos.offset,
-                                                 "The maximum gradient found was %0.3f, but max_gradient of\n"
-                                                 "the isosurface was set to %0.3f. Adjust max_gradient to\n"
-                                                 "get a faster rendering of the isosurface.",
-                                                 (float)(mginfo->gradient),
-                                                 (float)(mginfo->max_gradient));
-                    }
+                if (((prop <= 0.9) && (diff <= -0.5)) || (((prop <= 0.95) || (diff <= -0.1)) && (mginfo->max_gradient < 10.0)))
+                {
+                    messenger.WarningAt(kWarningGeneral, *fnInfo,
+                                        "The maximum gradient found was %0.3f, but max_gradient of the\n"
+                                        "isosurface was set to %0.3f. The isosurface may contain holes!\n"
+                                        "Adjust max_gradient to get a proper rendering of the isosurface.",
+                                        (float)(mginfo->gradient),
+                                        (float)(mginfo->max_gradient));
                 }
-            }
-            else
-            {
-                DBL diff = (mginfo->eval_max / max(mginfo->eval_max - mginfo->eval_var, EPSILON));
-
-                if ((eval_param[0] > mginfo->eval_max) || (eval_param[1] > diff))
+                else if ((diff >= 10.0) || ((prop >= 1.1) && (diff >= 0.5)))
                 {
-                    mginfo->eval_cnt = max(mginfo->eval_cnt, 1.0); // make sure it won't be zero
-
-                    messenger.CoreMessageAt(kCoreMessageClass_Info, fnInfo->filename, fnInfo->filepos.lineno, 0, fnInfo->filepos.offset,
-                                             "Evaluate found a maximum gradient of %0.3f and an average\n"
-                                             "gradient of %0.3f. The maximum gradient variation was %0.3f.\n",
-                                             (float)(mginfo->eval_max),
-                                             (float)(mginfo->eval_gradient_sum / mginfo->eval_cnt),
-                                             (float)(mginfo->eval_var));
+                    messenger.WarningAt(kWarningGeneral, *fnInfo,
+                                        "The maximum gradient found was %0.3f, but max_gradient of\n"
+                                        "the isosurface was set to %0.3f. Adjust max_gradient to\n"
+                                        "get a faster rendering of the isosurface.",
+                                        (float)(mginfo->gradient),
+                                        (float)(mginfo->max_gradient));
                 }
             }
         }
-    }
+        else
+        {
+            DBL diff = (mginfo->eval_max / max(mginfo->eval_max - mginfo->eval_var, EPSILON));
 
+            if ((eval_param[0] > mginfo->eval_max) || (eval_param[1] > diff))
+            {
+                mginfo->eval_cnt = max(mginfo->eval_cnt, 1.0); // make sure it won't be zero
+
+                messenger.InfoAt(*fnInfo,
+                                    "Evaluate found a maximum gradient of %0.3f and an average\n"
+                                    "gradient of %0.3f. The maximum gradient variation was %0.3f.\n",
+                                    (float)(mginfo->eval_max),
+                                    (float)(mginfo->eval_gradient_sum / mginfo->eval_cnt),
+                                    (float)(mginfo->eval_var));
+            }
+        }
+    }
 }
 
 /*****************************************************************************
@@ -746,7 +796,7 @@ void IsoSurface::DispatchShutdownMessages(CoreMessenger& messenger)
 void IsoSurface::Compute_BBox()
 {
     container->ComputeBBox(BBox);
-    if(Trans != NULL)
+    if (Trans != nullptr)
     {
         Recompute_BBox(&BBox, Trans);
     }
@@ -962,7 +1012,31 @@ DBL IsoSurface::Float_Function(ISO_ThreadData& itd, DBL t) const
 
     VTmp = itd.Pglobal + t * itd.Dglobal;
 
-    return ((DBL)itd.Inv3 * (itd.pFn->Evaluate(VTmp) - threshold));
+    return ((DBL)itd.Inv3 * EvaluatePolarized (*itd.pFn, VTmp));
+}
+
+
+/*****************************************************************************/
+
+DBL IsoSurface::EvaluateAbs (GenericScalarFunctionInstance& fn, Vector3d& p) const
+{
+    return fabs (threshold - fn.Evaluate (p));
+}
+
+DBL IsoSurface::EvaluatePolarized (GenericScalarFunctionInstance& fn, Vector3d& p) const
+{
+    if (positivePolarity)
+        return threshold - fn.Evaluate (p);
+    else
+        return fn.Evaluate (p) - threshold;
+}
+
+bool IsoSurface::IsInside (GenericScalarFunctionInstance& fn, Vector3d& p) const
+{
+    if (positivePolarity)
+        return threshold < fn.Evaluate (p);
+    else
+        return fn.Evaluate (p) < threshold;
 }
 
 }

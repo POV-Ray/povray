@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,9 +38,9 @@
 
 #include <vector>
 
+#include "core/bounding/bsptree.h"
 #include "core/lighting/radiosity.h"
 #include "core/scene/camera.h"
-#include "core/support/bsptree.h"
 
 #include "backend/support/taskqueue.h"
 
@@ -128,7 +128,7 @@ class ViewData
          *  @param  rect            Rectangle to render.
          *  @param  serial          Rectangle serial number.
          *  @param  blockInfo       Additional information about the rectangle.
-         *                          NULL if the block is being dispatched for the first time.
+         *                          `nullptr` if the block is being dispatched for the first time.
          *  @param  stride          Avoid-Busy stride. If this value is non-zero, any blocks following a busy block
          *                          with an offset of a multiple of this value will not be dispatched until the busy block
          *                          has been completed.
@@ -144,14 +144,17 @@ class ViewData
          *  @param  serial          Serial number of rectangle just completed.
          *  @param  pixels          Pixels of completed rectangle.
          *  @param  size            Size of each pixel (width and height).
-         *  @param  final           Mark the block as completely rendered for continue-trace.
+         *  @param  relevant        Mark the block as relevant for the final image for continue-trace.
+         *  @param  complete        Mark the block as completely rendered for continue-trace.
          *  @param  completion      Approximate contribution of current pass to completion of this rectangle.
-         *  @param  blockInfo       Pointer to additional information about the rectangle. If this value is non-NULL,
+         *  @param  blockInfo       Pointer to additional information about the rectangle. If this value is non-`nullptr`,
          *                          the rectangle will be scheduled to be re-dispatched for another pass, and the
          *                          data passed to whichever rendering thread the rectangle will be re-dispatched to.
-         *                          If this value is NULL, the rectangle will not be re-dispatched.
+         *                          If this value is `nullptr`, the rectangle will not be re-dispatched.
          */
-        void CompletedRectangle(const POVRect& rect, unsigned int serial, const vector<RGBTColour>& pixels, unsigned int size, bool final, float completion = 1.0, BlockInfo* blockInfo = NULL);
+        void CompletedRectangle(const POVRect& rect, unsigned int serial, const vector<RGBTColour>& pixels,
+                                unsigned int size, bool relevant, bool complete, float completion = 1.0,
+                                BlockInfo* blockInfo = nullptr);
 
         /**
          *  Called to (fully or partially) complete rendering of a specific sub-rectangle of the view.
@@ -162,14 +165,17 @@ class ViewData
          *  @param  positions       Pixel positions within rectangle.
          *  @param  colors          Pixel colors for each pixel position.
          *  @param  size            Size of each pixel (width and height).
-         *  @param  final           Mark the block as completely rendered for continue-trace.
+         *  @param  relevant        Mark the block as relevant for the final image for continue-trace.
+         *  @param  complete        Mark the block as completely rendered for continue-trace.
          *  @param  completion      Approximate contribution of current pass to completion of this rectangle.
-         *  @param  blockInfo       Pointer to additional information about the rectangle. If this value is non-NULL,
+         *  @param  blockInfo       Pointer to additional information about the rectangle. If this value is non-`nullptr`,
          *                          the rectangle will be scheduled to be re-dispatched for another pass, and the
          *                          data passed to whichever rendering thread the rectangle will be re-dispatched to.
-         *                          If this value is NULL, the rectangle will not be re-dispatched.
+         *                          If this value is `nullptr`, the rectangle will not be re-dispatched.
          */
-        void CompletedRectangle(const POVRect& rect, unsigned int serial, const vector<Vector2d>& positions, const vector<RGBTColour>& colors, unsigned int size, bool final, float completion = 1.0, BlockInfo* blockInfo = NULL);
+        void CompletedRectangle(const POVRect& rect, unsigned int serial, const vector<Vector2d>& positions,
+                                const vector<RGBTColour>& colors, unsigned int size, bool relevant, bool complete,
+                                float completion = 1.0, BlockInfo* blockInfo = nullptr);
 
         /**
          *  Called to (fully or partially) complete rendering of a specific sub-rectangle of the view without updating pixel data.
@@ -177,12 +183,12 @@ class ViewData
          *  @param  rect            Rectangle just completed.
          *  @param  serial          Serial number of rectangle just completed.
          *  @param  completion      Approximate contribution of current pass to completion of this rectangle.
-         *  @param  blockInfo       Pointer to additional information about the rectangle. If this value is non-NULL,
+         *  @param  blockInfo       Pointer to additional information about the rectangle. If this value is non-`nullptr`,
          *                          the rectangle will be scheduled to be re-dispatched for another pass, and the
          *                          data passed to whichever rendering thread the rectangle will be re-dispatched to.
-         *                          If this value is NULL, the rectangle will not be re-dispatched.
+         *                          If this value is `nullptr`, the rectangle will not be re-dispatched.
          */
-        void CompletedRectangle(const POVRect& rect, unsigned int serial, float completion = 1.0, BlockInfo* blockInfo = NULL);
+        void CompletedRectangle(const POVRect& rect, unsigned int serial, float completion = 1.0, BlockInfo* blockInfo = nullptr);
 
         /**
          *  Set the blocks not to generate with GetNextRectangle because they have
@@ -260,7 +266,7 @@ class ViewData
 
         /**
          *  Return a pointer to the real-time raytracing data
-         *  @return                 pointer to instance of class RTRData, or NULL if RTR is not enabled
+         *  @return                 pointer to instance of class RTRData, or `nullptr` if RTR is not enabled
          */
         RTRData *GetRTRData() { return rtrData; }
 

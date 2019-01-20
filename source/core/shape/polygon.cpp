@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -455,7 +455,7 @@ void Polygon::Transform(const TRANSFORM *tr)
 {
     Vector3d N;
 
-    if(Trans == NULL)
+    if (Trans == nullptr)
         Trans = Create_Transform();
 
     Compose_Transforms(Trans, tr);
@@ -504,7 +504,7 @@ Polygon::Polygon() : NonsolidObject(POLYGON_OBJECT)
 
     S_Normal = Vector3d(0.0, 0.0, 1.0);
 
-    Data = NULL;
+    Data = nullptr;
 }
 
 
@@ -588,11 +588,14 @@ ObjectPtr Polygon::Copy()
 
 Polygon::~Polygon()
 {
-    if (--(Data->References) == 0)
+    if (Data != nullptr)
     {
-        POV_FREE (Data->Points);
-
-        POV_FREE (Data);
+        if (--(Data->References) == 0)
+        {
+            if (Data->Points != nullptr)
+                delete[] Data->Points;
+            delete Data;
+        }
     }
 }
 
@@ -642,15 +645,15 @@ void Polygon::Compute_Polygon(int number, Vector3d *points)
 
     /* Create polygon data. */
 
-    if (Data == NULL)
+    if (Data == nullptr)
     {
-        Data = reinterpret_cast<POLYGON_DATA *>(POV_MALLOC(sizeof(POLYGON_DATA), "polygon points"));
+        Data = new POLYGON_DATA;
 
         Data->References = 1;
 
         Data->Number = number;
 
-        Data->Points = reinterpret_cast<Vector2d *>(POV_MALLOC(number*sizeof(Vector2d), "polygon points"));
+        Data->Points = new Vector2d[number];
     }
     else
     {
@@ -894,9 +897,10 @@ void Polygon::Compute_BBox()
 
 bool Polygon::in_polygon(int number, Vector2d *points, DBL u, DBL  v)
 {
-    register int i, yflag0, yflag1, inside_flag;
-    register DBL ty, tx;
-    register const DBL *vtx0, *vtx1, *first;
+    int i, yflag0, yflag1;
+    bool inside_flag;
+    DBL ty, tx;
+    const DBL *vtx0, *vtx1, *first;
 
     tx = u;
     ty = v;

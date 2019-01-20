@@ -8,8 +8,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,6 +44,13 @@
 
 namespace pov
 {
+
+//##############################################################################
+///
+/// @defgroup PovCoreSupportStatistics Render Statistics
+/// @ingroup PovCore
+///
+/// @{
 
 // Add new stats ONLY at the end!!!
 enum
@@ -94,6 +101,7 @@ enum
     kPOVList_Stat_VistaBufferTest,
     kPOVList_Stat_RBezierTest,
     kPOVList_Stat_OvusTest,
+    kPOVList_Stat_LemonTest,
     kPOVList_Stat_Last
 };
 
@@ -156,6 +164,8 @@ typedef enum INTSTATS
     Ray_Lathe_Tests_Succeeded,
     Lathe_Bound_Tests,
     Lathe_Bound_Tests_Succeeded,
+    Ray_Lemon_Tests,
+    Ray_Lemon_Tests_Succeeded,
     Ray_Mesh_Tests,
     Ray_Mesh_Tests_Succeeded,
     Ray_Ovus_Tests,
@@ -236,16 +246,6 @@ typedef enum INTSTATS
     totalQueueResizes,
     Polynomials_Tested,
     Roots_Eliminated,
-
-#if defined(MEM_STATS)
-    MemStat_Smallest_Alloc,
-    MemStat_Largest_Alloc,
-    MemStat_Largest_Mem_Usage,
-#if (MEM_STATS>=2)
-    MemStat_Total_Allocs,
-    MemStat_Total_Frees,
-#endif
-#endif
 
     /* NK phmap */
     Number_Of_Photons_Shot,
@@ -341,6 +341,10 @@ typedef struct intersection_stats_info
 } INTERSECTION_STATS_INFO;
 
 extern const INTERSECTION_STATS_INFO intersection_stats[];
+
+/// @}
+///
+//##############################################################################
 
 }
 

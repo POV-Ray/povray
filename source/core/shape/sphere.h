@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,16 +44,23 @@
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
+
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
 
 #define SPHERE_OBJECT (BASIC_OBJECT)
 
-
-/*****************************************************************************
-* Global typedefs
-******************************************************************************/
+/// @}
+///
+//******************************************************************************
 
 class Sphere : public ObjectBase
 {
@@ -78,10 +85,27 @@ class Sphere : public ObjectBase
         virtual bool Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector3d&, BBoxScalar) const;
 
         static bool Intersect(const BasicRay& ray, const Vector3d& Center, DBL Radius2, DBL *Depth1, DBL  *Depth2);
+
     private:
-        bool Do_Ellipsoid; // TODO - parser needs to take care of this
-        TRANSFORM *UV_Trans;
+
+        /// Ellipsoid mode flag.
+        ///
+        /// A value of `false` indicates that the primitive is in _spherical_ mode, while a value of `true` indicates
+        /// _ellipsoidal_ mode.
+        ///
+        /// **Spherical mode** uses the @ref Center and @ref Radius members to track all transformations to the
+        /// primitive, while the @ref Trans member only tracks rotations and is used exclusively for UV mapping.
+        /// If a transformation cannot be tracked in this manner, the primitive is switched to _ellipsoidal mode_.
+        ///
+        /// **Ellipsoidal mode** uses the @ref Trans member to track center, radius and all transformations, while the
+        /// @ref Center is pegged to the coordinate origin and the @radius to unity.
+        ///
+        bool Do_Ellipsoid;
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

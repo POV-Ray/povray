@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,7 +36,11 @@
 #ifndef POVRAY_FRONTEND_PROCESSRENDEROPTIONS_H
 #define POVRAY_FRONTEND_PROCESSRENDEROPTIONS_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
 #include "frontend/configfrontend.h"
+
+#include "povms/povmscpp.h"
+
 #include "frontend/processoptions.h"
 
 namespace pov_frontend
@@ -53,7 +57,6 @@ class ProcessRenderOptions : public ProcessOptions
         virtual int ReadSpecialOptionHandler(INI_Parser_Table *, char *, POVMSObjectPtr);
         virtual int ReadSpecialSwitchHandler(Cmd_Parser_Table *, char *, POVMSObjectPtr, bool);
         virtual int WriteSpecialOptionHandler(INI_Parser_Table *, POVMSObjectPtr, OTextStream *);
-        virtual bool WriteOptionFilter(INI_Parser_Table *);
         virtual int ProcessUnknownString(char *, POVMSObjectPtr);
 
         virtual ITextStream *OpenFileForRead(const char *, POVMSObjectPtr);
@@ -76,14 +79,18 @@ class ProcessRenderOptions : public ProcessOptions
         {
             const char* code;               // code used in INI and command line options
             int         internalId;         // e.g. kPOVList_GammaType_*
+            const char* text;               // human-readable text
         };
 
-        int ParseFileType(char, POVMSType, int*, bool* pHas16BitGreyscale = NULL);
-        char UnparseFileType(int);
+        int ParseFileType(char, POVMSType, int*, bool* pHas16BitGreyscale = nullptr);
+        static char UnparseFileType(int);
         int ParseGammaType(char*, int*);
-        const char* UnparseGammaType(int);
-        int ParseParameterCode(const ProcessRenderOptions::Parameter_Code_Table* codeTable, char* code, int* pInternalId);
-        const char* UnparseParameterCode(const ProcessRenderOptions::Parameter_Code_Table* codeTable, int internalId);
+        static const char* UnparseGammaType(int);
+        static const char* GetGammaTypeText(int);
+        static const char* GetDitherMethodText(int);
+        static int ParseParameterCode(const ProcessRenderOptions::Parameter_Code_Table* codeTable, char* code, int* pInternalId);
+        static const char* UnparseParameterCode(const ProcessRenderOptions::Parameter_Code_Table* codeTable, int internalId);
+        static const char* GetParameterCodeText(const ProcessRenderOptions::Parameter_Code_Table* codeTable, int internalId);
 };
 
 }

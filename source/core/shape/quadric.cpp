@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -111,7 +111,7 @@ bool Quadric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 {
     DBL Depth1, Depth2;
     Vector3d IPoint;
-    register int Intersection_Found;
+    bool Intersection_Found;
 
     Intersection_Found = false;
 
@@ -176,7 +176,7 @@ bool Quadric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 
 bool Quadric::Intersect(const BasicRay& ray, DBL *Depth1, DBL *Depth2) const
 {
-    register DBL a, b, c, d;
+    DBL a, b, c, d;
 
     a = Xd * (QA * Xd + QB * Yd + QC * Zd) +
         Yd * (QE * Yd + QF * Zd) +
@@ -710,7 +710,7 @@ Quadric::~Quadric()
 *
 * INPUT
 *
-*   Quadric - Qaudric object
+*   Quadric - Quadric object
 *
 * OUTPUT
 *
@@ -737,20 +737,15 @@ Quadric::~Quadric()
 *
 *   May 1994 : Creation.
 *
-*   Sep 1994 : Added support of hyperpoloids. Improved bounding of
+*   Sep 1994 : Added support of hyperboloids. Improved bounding of
 *              quadrics used in CSG intersections. [DB]
 *
 ******************************************************************************/
 
 void Quadric::Compute_BBox()
 {
-    Vector3d pOne;
-    Vector3d mOne;
-
-    pOne = Vector3d( 1.0,  1.0,  1.0);
-    mOne = Vector3d(-1.0, -1.0, -1.0);
-
-    Compute_BBox(mOne, pOne);
+    Vector3d clipMin(-1.0), clipMax(1.0);
+    Compute_BBox(clipMin, clipMax);
 }
 
 void Quadric::Compute_BBox(Vector3d& ClipMin, Vector3d& ClipMax)
@@ -770,7 +765,7 @@ void Quadric::Compute_BBox(Vector3d& ClipMin, Vector3d& ClipMax)
             ObjectPtr p = *it;
             if (Test_Flag(p, INVERTED_FLAG) == false)
             {
-                if (dynamic_cast<Plane *> (p) != NULL)
+                if (dynamic_cast<Plane *> (p) != nullptr)
                     Compute_Plane_Min_Max(dynamic_cast<Plane *> (p), TmpMin, TmpMax);
                 else
                     Make_min_max_from_BBox(TmpMin, TmpMax, p->BBox);
@@ -837,7 +832,7 @@ void Quadric::Compute_BBox(Vector3d& ClipMin, Vector3d& ClipMax)
         {
             if (D != 0.0)
             {
-             T1[X] = J / (2.0 * D);
+             T1[X] = -J / (2.0 * D);
             }
             else
             {
@@ -853,7 +848,7 @@ void Quadric::Compute_BBox(Vector3d& ClipMin, Vector3d& ClipMax)
         {
             if (G != 0.0)
             {
-                T1[Y] = J / (2.0 * G);
+                T1[Y] = -J / (2.0 * G);
             }
             else
             {
@@ -869,7 +864,7 @@ void Quadric::Compute_BBox(Vector3d& ClipMin, Vector3d& ClipMax)
         {
             if (I != 0.0)
             {
-                T1[Z] = J / (2.0 * I);
+                T1[Z] = -J / (2.0 * I);
             }
             else
             {
@@ -882,7 +877,7 @@ void Quadric::Compute_BBox(Vector3d& ClipMin, Vector3d& ClipMax)
         D += A * T1[X];
         G += E * T1[Y];
         I += H * T1[Z];
-        J -= T1[X]*(A*T1[X] + 2.0*D) + T1[Y]*(E*T1[Y] + 2.0*G) + T1[Z]*(H*T1[Z] + 2.0*I);
+        J -= T1[X]*(A*T1[X] - 2.0*D) + T1[Y]*(E*T1[Y] - 2.0*G) + T1[Z]*(H*T1[Z] - 2.0*I);
     }
     else
     {
@@ -898,6 +893,9 @@ void Quadric::Compute_BBox(Vector3d& ClipMin, Vector3d& ClipMax)
 
     ClipMin -= T1;
     ClipMax -= T1;
+
+    // TODO FIXME - The following code disregards inside/outside information.
+    //              This is a huge problem in CSG intersection bounding box computations.
 
     /* We want A to be non-negative. */
 
@@ -1414,7 +1412,7 @@ void Quadric::Compute_Plane_Min_Max(const Plane *plane, Vector3d& Min, Vector3d&
     DBL d;
     Vector3d P, N;
 
-    if (plane->Trans == NULL)
+    if (plane->Trans == nullptr)
     {
         N = plane->Normal_Vector;
 

@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,6 +39,7 @@
 #include "syspovconfig.h"
 
 // C++ variants of C standard headers
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #ifdef HAVE_TIME_H
@@ -145,9 +146,10 @@ namespace vfePlatform
     // name to one that it can use.
     UCS2String vfeUnixSession::CreateTemporaryFile(void) const
     {
-        char str [FILE_NAME_LENGTH] = "";
-        snprintf(str, FILE_NAME_LENGTH, "%spov%d", m_OptionsProc->GetTemporaryPath().c_str(), getpid ());
-        DELETE_FILE (str);
+        // TODO FIXME - This allows only one temporary file per process!
+        char str [POV_FILENAME_BUFFER_CHARS+1] = "";
+        std::snprintf(str, sizeof(str), "%spov%d", m_OptionsProc->GetTemporaryPath().c_str(), getpid ());
+        POV_DELETE_FILE (str);
 
         return ASCIItoUCS2String (str);
     }
@@ -158,7 +160,7 @@ namespace vfePlatform
     // example doesn't do that but it's not a bad idea to add.
     void vfeUnixSession::DeleteTemporaryFile(const UCS2String& filename) const
     {
-        DELETE_FILE (UCS2toASCIIString (filename).c_str());
+        POV_DELETE_FILE (UCS2toASCIIString (filename).c_str());
     }
 
     //////////////////////////////////////////////////////////////
@@ -212,7 +214,7 @@ namespace vfePlatform
 #ifdef HAVE_GETTIMEOFDAY
         {
             struct timeval tv;  // seconds + microseconds since the Epoch (1970-01-01)
-            if (gettimeofday(&tv, NULL) == 0)
+            if (gettimeofday(&tv, nullptr) == 0)
                 timestamp = (POV_LONG) (1000)*tv.tv_sec + tv.tv_usec/1000;
         }
 #endif
@@ -371,7 +373,7 @@ namespace vfePlatform
             throw POV_EXCEPTION(kParamErr, "Background execution of shellout commands not currently supported");
 
         m_ProcessRunning = true;
-        int result = system(command.c_str());
+        int result = std::system(command.c_str());
         m_ProcessRunning = false;
         if (result == -1)
         {

@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -53,6 +53,13 @@
 
 namespace pov_base
 {
+
+//##############################################################################
+///
+/// @defgroup PovBaseImageColourspace Colour Space Management
+/// @ingroup PovBaseImage
+///
+/// @{
 
 class GammaCurve;
 class SimpleGammaCurve;
@@ -308,7 +315,7 @@ class GammaCurve
 #endif
 
         /// Constructor.
-        GammaCurve() : lookupTable8(NULL), lookupTable16(NULL) {}
+        GammaCurve() : lookupTable8(nullptr), lookupTable16(nullptr) {}
 
         /// Destructor.
         virtual ~GammaCurve() { if (lookupTable8) delete[] lookupTable8; if (lookupTable16) delete[] lookupTable16; }
@@ -463,35 +470,60 @@ class SRGBGammaCurve : public UniqueGammaCurve
 
 /// Class representing the ITU-R BT.709 transfer function.
 ///
+/// @remark The ITU-R BT.709 transfer function is identical to that defined in ITU-R BT.601.
+///
 /// @note   This class does _not_ account for the "black digital count" and "white digital count" being defined
 ///         as 16/255 and 235/255, respectively.
 ///
-class ITURBT709GammaCurve : public GammaCurve // TODO we could make this a UniqueGammaCurve if we assign it a type ID
+class BT709GammaCurve : public UniqueGammaCurve
 {
     public:
-        static GammaCurvePtr Get();
+        static SimpleGammaCurvePtr Get();
         virtual float Encode(float x) const;
         virtual float Decode(float x) const;
         virtual float ApproximateDecodingGamma() const;
+        virtual int GetTypeId() const;
     private:
-        static GammaCurvePtr instance;
-        ITURBT709GammaCurve();
+        static SimpleGammaCurvePtr instance;
+        BT709GammaCurve();
 };
 
-/// Class representing the Rec1361 transfer function.
+/// Class representing the ITU-R BT.1361 transfer function.
 ///
 /// This transfer function is a wide-gamut extension to that specified in ITU-R BT.709.
 ///
-class Rec1361GammaCurve : public GammaCurve // TODO we could make this a UniqueGammaCurve if we assign it a type ID
+class BT1361GammaCurve : public UniqueGammaCurve
 {
     public:
-        static GammaCurvePtr Get();
+        static SimpleGammaCurvePtr Get();
         virtual float Encode(float x) const;
         virtual float Decode(float x) const;
         virtual float ApproximateDecodingGamma() const;
+        virtual int GetTypeId() const;
     private:
-        static GammaCurvePtr instance;
-        Rec1361GammaCurve();
+        static SimpleGammaCurvePtr instance;
+        BT1361GammaCurve();
+};
+
+/// Class representing the ITU-R BT.2020 transfer function.
+///
+/// @remark The ITU-R BT.2020 transfer function is essentially identical to that defined in ITU-R BT.601 and BT.709,
+///         albeit using more precise constants.
+///
+/// @note   This class does _not_ account for the "black digital count" and "white digital count" being defined
+///         as 16/255 and 235/255, respectively.
+///
+class BT2020GammaCurve : public UniqueGammaCurve
+{
+    public:
+        static SimpleGammaCurvePtr Get();
+        virtual float Encode(float x) const;
+        virtual float Decode(float x) const;
+        virtual float ApproximateDecodingGamma() const;
+        virtual int GetTypeId() const;
+    private:
+        static SimpleGammaCurvePtr instance;
+        BT2020GammaCurve();
 };
 
 /// Class representing a classic constant-gamma (power-law) gamma encoding curve.
@@ -531,7 +563,7 @@ class ScaledGammaCurve : public GammaCurve
 
 /// Class representing a transformation between different (non-linear) "gamma spaces".
 ///
-/// @note   This class is only required for backward compatibility with POV-Ray 3.6.
+/// @note   This class is only required for backward compatibility with POV-Ray v3.6.
 ///
 class TranscodingGammaCurve : public GammaCurve
 {
@@ -553,7 +585,10 @@ enum GammaTypeId
     kPOVList_GammaType_Unknown,
     kPOVList_GammaType_Neutral,
     kPOVList_GammaType_PowerLaw,
-    kPOVList_GammaType_SRGB
+    kPOVList_GammaType_SRGB,
+    kPOVList_GammaType_BT709,
+    kPOVList_GammaType_BT1361,  ///< Currently not exposed to the user.
+    kPOVList_GammaType_BT2020
 };
 
 /// Generic transfer function factory.
@@ -562,6 +597,10 @@ enum GammaTypeId
 /// @param  param   parameter for parameterized transfer function (e.g. gamma of power-law function)
 ///
 SimpleGammaCurvePtr GetGammaCurve(GammaTypeId typeId, float param);
+
+/// @}
+///
+//##############################################################################
 
 }
 

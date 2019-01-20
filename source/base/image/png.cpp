@@ -12,8 +12,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -43,12 +43,11 @@
 
 #ifndef LIBPNG_MISSING
 
+// C++ standard headers
 #include <string>
+#include <memory>
 
-// Boost header files
-#include <boost/scoped_ptr.hpp>
-#include <boost/scoped_array.hpp>
-
+// other 3rd party library headers
 #include <png.h>
 
 // POV-Ray base header files
@@ -323,11 +322,11 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     unsigned int          width;
     unsigned int          height;
     Messages              messages;
-    Image                 *image = NULL;
+    Image                 *image = nullptr;
 
-    if ((r_png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, (png_voidp)(&messages), png_pov_err, png_pov_warn)) == NULL)
+    if ((r_png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, (png_voidp)(&messages), png_pov_err, png_pov_warn)) == nullptr)
         throw POV_EXCEPTION(kOutOfMemoryErr, "Cannot allocate PNG data structures");
-    if ((r_info_ptr = png_create_info_struct(r_png_ptr)) == NULL)
+    if ((r_info_ptr = png_create_info_struct(r_png_ptr)) == nullptr)
         throw POV_EXCEPTION(kOutOfMemoryErr, "Cannot allocate PNG data structures");
 
     // set up the input control
@@ -395,7 +394,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
         bool has_alpha = png_get_valid(r_png_ptr, r_info_ptr, PNG_INFO_tRNS);
         png_bytep trans;
         int num_trans;
-        png_get_tRNS(r_png_ptr, r_info_ptr, &trans, &num_trans, NULL);
+        png_get_tRNS(r_png_ptr, r_info_ptr, &trans, &num_trans, nullptr);
 
         for(int index = 0; index < cmap_len; index++)
         {
@@ -429,7 +428,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
         bool has_alpha = png_get_valid(r_png_ptr, r_info_ptr, PNG_INFO_tRNS);
         png_bytep trans;
         int num_trans;
-        png_get_tRNS(r_png_ptr, r_info_ptr, &trans, &num_trans, NULL);
+        png_get_tRNS(r_png_ptr, r_info_ptr, &trans, &num_trans, nullptr);
 
         for(int index = 0; index < cmap_len; index++)
         {
@@ -467,7 +466,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     }
     else
     {
-        png_destroy_read_struct(&r_png_ptr, &r_info_ptr, (png_infopp)NULL);
+        png_destroy_read_struct(&r_png_ptr, &r_info_ptr, nullptr);
         throw POV_EXCEPTION(kFileDataErr, "Unsupported color type in PNG image") ;
     }
 
@@ -475,7 +474,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
 
     if (ReadPNGUpdateInfo(r_png_ptr, r_info_ptr) == false)
     {
-        png_destroy_read_struct(&r_png_ptr, &r_info_ptr, (png_infopp)NULL);
+        png_destroy_read_struct(&r_png_ptr, &r_info_ptr, nullptr);
         if (messages.error.length() > 0)
             throw POV_EXCEPTION(kFileDataErr, messages.error.c_str());
         throw POV_EXCEPTION(kFileDataErr, "Cannot read PNG image.");
@@ -496,7 +495,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
         for(int row = 0; row < height; row++)
             delete[] row_ptrs [row] ;
         delete[] row_ptrs;
-        png_destroy_read_struct(&r_png_ptr, &r_info_ptr, (png_infopp)NULL);
+        png_destroy_read_struct(&r_png_ptr, &r_info_ptr, nullptr);
         if (messages.error.length() > 0)
             throw POV_EXCEPTION(kFileDataErr, messages.error.c_str());
         throw POV_EXCEPTION(kFileDataErr, "Cannot read PNG image.");
@@ -504,7 +503,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
 
     // We must copy all the values because PNG supplies RGBRGB, but POV-Ray
     // stores RGB components in separate arrays
-    if (image == NULL) // image will only be NULL at this point if the file is not a color-mapped type
+    if (image == nullptr) // image will only be `nullptr` at this point if the file is not a color-mapped type
     {
         bool has_alpha = (color_type & PNG_COLOR_MASK_ALPHA) != 0 ;
 
@@ -657,7 +656,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     delete[] row_ptrs;
 
     // clean up after the read, and free any memory allocated
-    png_destroy_read_struct(&r_png_ptr, &r_info_ptr, (png_infopp)NULL);
+    png_destroy_read_struct(&r_png_ptr, &r_info_ptr, nullptr);
 
     if (messages.error.length() > 0)
         throw POV_EXCEPTION(kFileDataErr, messages.error.c_str());
@@ -666,58 +665,53 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     return (image) ;
 }
 
+void SetChannelValue(png_bytep& p, unsigned int v, unsigned int bpcc)
+{
+    if (bpcc > 8)
+        *(p++) = ((v >> 8) & 0xFF);
+    *(p++) = (v & 0xFF);
+}
+
 void Write (OStream *file, const Image *image, const Image::WriteOptions& options)
 {
-    int             himask;
     int             png_stride;
     int             width = image->GetWidth() ;
     int             height = image->GetHeight() ;
-    int             j;
-    int             bpcc = options.bpcc;
-    bool            use_alpha = image->HasTransparency() && options.alphachannel;
-    unsigned int    color;
+    int             bpcc = options.bitsPerChannel;
+    bool            use_alpha = image->HasTransparency() && options.AlphaIsEnabled();
+    unsigned int    octetDepth = ((bpcc + 7) / 8);
+    unsigned int    bitDepth = 8 * octetDepth;
     unsigned int    alpha;
     unsigned int    r;
     unsigned int    g;
     unsigned int    b;
     unsigned int    maxValue;
-    unsigned int    hiShift;
-    unsigned int    loShift;
-    png_info        *info_ptr = NULL;
-    png_struct      *png_ptr  = NULL;
+    unsigned int    mult;
+    unsigned int    shift;
+    png_info        *info_ptr = nullptr;
+    png_struct      *png_ptr  = nullptr;
     Messages        messages;
     GammaCurvePtr   gamma;
     Metadata        meta;
-    DitherHandler*  dither = options.dither.get();
+    DitherStrategy& dither = *options.ditherStrategy;
 
-    if (options.encodingGamma)
-        gamma = TranscodingGammaCurve::Get(options.workingGamma, options.encodingGamma);
-    else
-        // PNG/W3C recommends to use sRGB color space
-        gamma = TranscodingGammaCurve::Get(options.workingGamma, SRGBGammaCurve::Get());
+    // PNG/W3C recommends to use sRGB color space
+    gamma = options.GetTranscodingGammaCurve(SRGBGammaCurve::Get());
 
     // PNG is specified to use non-premultiplied alpha, so that's the way we do it unless the user overrides
     // (e.g. to handle a non-compliant file).
-    bool premul = false;
-    if (options.premultiplyOverride)
-        premul = options.premultiply;
+    bool premul = options.AlphaIsPremultiplied(false);
 
-    if (bpcc == 0)
+    if (bpcc <= 0)
         bpcc = image->GetMaxIntValue() == 65535 ? 16 : 8 ;
-    else if (bpcc < 5)
-        bpcc = 5 ;
     else if (bpcc > 16)
         bpcc = 16 ;
 
-    // special case: if options.grayscale is set, we enforce 16bpp irregardless of other settings
-    if (options.grayscale)
-        bpcc = 16;
-
     maxValue = (1<<bpcc)-1;
 
-    if ((png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, (png_voidp)(&messages), png_pov_err, png_pov_warn)) == NULL)
+    if ((png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, (png_voidp)(&messages), png_pov_err, png_pov_warn)) == nullptr)
         throw POV_EXCEPTION(kOutOfMemoryErr, "Cannot allocate PNG data structures");
-    if ((info_ptr = png_create_info_struct(png_ptr)) == NULL)
+    if ((info_ptr = png_create_info_struct(png_ptr)) == nullptr)
         throw POV_EXCEPTION(kOutOfMemoryErr, "Cannot allocate PNG data structures");
 
     if (setjmp(png_jmpbuf(png_ptr)))
@@ -735,7 +729,7 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
     // Fill in the relevant image information
     png_set_IHDR(png_ptr, info_ptr,
                  width, height,
-                 8 * ((bpcc + 7) / 8), // bit_depth
+                 bitDepth,
                  (use_color ? PNG_COLOR_MASK_COLOR : 0) | (use_alpha ? PNG_COLOR_MASK_ALPHA : 0), // color_type
                  PNG_INTERLACE_NONE,
                  PNG_COMPRESSION_TYPE_DEFAULT,
@@ -764,7 +758,8 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
 #endif // PNG_WRITE_gAMA_SUPPORTED
 
 #if defined(PNG_WRITE_oFFs_SUPPORTED)
-    png_set_oFFs(png_ptr, info_ptr, options.offset_x, options.offset_y, PNG_OFFSET_PIXEL);
+    if ((options.offset_x != 0) || (options.offset_y != 0))
+        png_set_oFFs(png_ptr, info_ptr, options.offset_x, options.offset_y, PNG_OFFSET_PIXEL);
 #endif // PNG_WRITE_oFFs_SUPPORTED
 
 #if defined(PNG_WRITE_tIME_SUPPORTED)
@@ -801,200 +796,43 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
     png_stride = use_color ? 3 : 1;
     if (use_alpha)
         png_stride++;
-    png_stride *= (bpcc + 7) / 8;
+    png_stride *= octetDepth;
 
-    boost::scoped_array<png_byte> row_ptr (new png_byte [width*png_stride]);
+    std::unique_ptr<png_byte[]> row_ptr(new png_byte[width*png_stride]);
+
+    int repeat = (bitDepth + bpcc - 1) / bpcc;
+    shift = (bpcc * repeat) - bitDepth;
+    mult = 0x01;
+    for (int i = 1; i < repeat; ++i)
+        mult = (mult << bpcc) | 0x01;
 
     for (int row = 0 ; row < height ; row++)
     {
-        /*
-        * We must copy all the values because PNG expects RGBRGB bytes, but
-        * POV-Ray stores RGB components in separate arrays as floats.  In
-        * order to use the full scale values at the lower bit depth, PNG
-        * recommends filling the low-order bits with a copy of the high-order
-        * bits.  However, studies have shown that filling the low order bits
-        * with constant bits significantly improves compression, which we're
-        * doing here.  Note that since the true bit depth is stored in the
-        * sBIT chunk, the extra packed bits are not important.
-        */
-
-        switch (bpcc)
+        auto p = row_ptr.get();
+        for (int col = 0; col < width; ++col)
         {
-            case 5:
-            case 6:
-            case 7:
-                // Handle shifting for arbitrary output bit depth
-                hiShift = 8 - bpcc;
-                loShift = 2*bpcc - 8;
-                if (use_color)
-                {
-                    for (int col = j = 0; col < width; col++, j += png_stride)
-                    {
-                        if (use_alpha)
-                        {
-                            GetEncodedRGBAValue (image, col, row, gamma, maxValue, r, g, b, alpha, *dither, premul);
-                            row_ptr[j + 3] = alpha << hiShift;
-                            row_ptr[j + 3] |= alpha >> loShift;
-                        }
-                        else
-                            GetEncodedRGBValue (image, col, row, gamma, maxValue, r, g, b, *dither);
+            if (use_color && use_alpha)
+                GetEncodedRGBAValue(image, col, row, gamma, maxValue, r, g, b, alpha, dither, premul);
+            else if (use_color)
+                GetEncodedRGBValue(image, col, row, gamma, maxValue, r, g, b, dither);
+            else if (use_alpha)
+                GetEncodedGrayAValue(image, col, row, gamma, maxValue, g, alpha, dither, premul);
+            else
+                g = GetEncodedGrayValue(image, col, row, gamma, maxValue, dither);
 
-                        row_ptr[j] = r << hiShift;
-                        row_ptr[j] |= r >> loShift;
+            if (use_color)
+            {
+                SetChannelValue(p, (r * mult) >> shift, bpcc);
+                SetChannelValue(p, (g * mult) >> shift, bpcc);
+                SetChannelValue(p, (b * mult) >> shift, bpcc);
+            }
+            else
+            {
+                SetChannelValue(p, (g * mult) >> shift, bpcc);
+            }
 
-                        row_ptr[j+1] = g << hiShift;
-                        row_ptr[j+1] |= g >> loShift;
-
-                        row_ptr[j+2] = b << hiShift;
-                        row_ptr[j+2] |= b >> loShift;
-                    }
-                }
-                else
-                {
-                    for (int col = j = 0; col < width; col++, j += png_stride)
-                    {
-                        if (use_alpha)
-                        {
-                            GetEncodedGrayAValue (image, col, row, gamma, maxValue, color, alpha, *dither, premul);
-                            row_ptr[j + 1] = alpha << hiShift;
-                            row_ptr[j + 1] |= alpha >> loShift;
-                        }
-                        else
-                            color = GetEncodedGrayValue (image, col, row, gamma, maxValue, *dither) ;
-
-                        // Use left-bit replication (LBR) for bit depths < 8
-                        row_ptr[j] = color << hiShift;
-                        row_ptr[j] |= color >> loShift;
-                    }
-                }
-                break;
-
-            case 8:
-                if (use_color)
-                {
-                    for (int col = j = 0; col < width; col++, j += png_stride)
-                    {
-                        if (use_alpha)
-                        {
-                            GetEncodedRGBAValue (image, col, row, gamma, maxValue, r, g, b, alpha, *dither, premul);
-                            row_ptr[j + 3] = alpha;
-                        }
-                        else
-                            GetEncodedRGBValue (image, col, row, gamma, maxValue, r, g, b, *dither) ;
-                        row_ptr[j] = r;
-                        row_ptr[j + 1] = g;
-                        row_ptr[j + 2] = b;
-                    }
-                }
-                else
-                {
-                    for (int col = j = 0; col < width; col++, j += png_stride)
-                    {
-                        if (use_alpha)
-                        {
-                            GetEncodedGrayAValue (image, col, row, gamma, maxValue, color, alpha, *dither, premul);
-                            row_ptr[j + 1] = alpha;
-                        }
-                        else
-                            color = GetEncodedGrayValue (image, col, row, gamma, maxValue, *dither) ;
-                        row_ptr[j] = color;
-                    }
-                }
-                break;
-
-            case 16:
-                if (use_color)
-                {
-                    for (int col = j = 0; col < width; col++, j += png_stride)
-                    {
-                        if (use_alpha)
-                        {
-                            GetEncodedRGBAValue (image, col, row, gamma, maxValue, r, g, b, alpha, *dither, premul);
-                            row_ptr[j+6] = alpha >> 8;
-                            row_ptr[j+7] = alpha & 0xff;
-                        }
-                        else
-                            GetEncodedRGBValue (image, col, row, gamma, maxValue, r, g, b, *dither) ;
-
-                        row_ptr[j] = r >> 8;
-                        row_ptr[j + 1] = r & 0xFF;
-
-                        row_ptr[j + 2] = g >> 8;
-                        row_ptr[j + 3] = g & 0xFF;
-
-                        row_ptr[j + 4] = b >> 8;
-                        row_ptr[j + 5] = b & 0xFF;
-                    }
-                }
-                else
-                {
-                    for (int col = j = 0; col < width; col++, j += png_stride)
-                    {
-                        if (use_alpha)
-                        {
-                            GetEncodedGrayAValue (image, col, row, gamma, maxValue, color, alpha, *dither, premul);
-                            row_ptr[j+2] = alpha >> 8;
-                            row_ptr[j+3] = alpha & 0xff;
-                        }
-                        else
-                            color = GetEncodedGrayValue (image, col, row, gamma, maxValue, *dither) ;
-                        row_ptr[j] = color >> 8;
-                        row_ptr[j+1] = color & 0xff;
-                    }
-                }
-                break;
-
-            default:  // bpcc 9 - 15
-                // Handle shifting for arbitrary output bit depth
-                hiShift = 16 - bpcc;
-                loShift = 2*bpcc - 16;
-                himask = 0xFF ^ ((1 << hiShift) - 1);
-                if (use_color)
-                {
-                    for (int col = j = 0; col < width; col++, j += png_stride)
-                    {
-                        if (use_alpha)
-                        {
-                            GetEncodedRGBAValue (image, col, row, gamma, maxValue, r, g, b, alpha, *dither, premul);
-                            row_ptr[j + 6] = alpha >> (8 - hiShift);
-                            row_ptr[j + 7] = alpha << hiShift;
-                            row_ptr[j + 7] |= alpha >> loShift;
-                        }
-                        else
-                            GetEncodedRGBValue (image, col, row, gamma, maxValue, r, g, b, *dither) ;
-
-                        row_ptr[j] = r >> (8 - hiShift);
-                        row_ptr[j + 1] = r << hiShift;
-                        row_ptr[j + 1] |= r >> loShift;
-
-                        row_ptr[j + 2] = g >> (8 - hiShift);
-                        row_ptr[j + 3] = g << hiShift;
-                        row_ptr[j + 3] |= g >> loShift;
-
-                        row_ptr[j + 4] = b >> (8 - hiShift);
-                        row_ptr[j + 5] = b << hiShift;
-                        row_ptr[j + 5] |= b >> loShift;
-                    }
-                }
-                else
-                {
-                    for (int col = j = 0; col < width; col++, j += png_stride)
-                    {
-                        if (use_alpha)
-                        {
-                            GetEncodedGrayAValue (image, col, row, gamma, maxValue, color, alpha, *dither, premul);
-                            row_ptr[j + 2] = alpha >> (8 - hiShift);
-                            row_ptr[j + 3] = alpha << hiShift;
-                            row_ptr[j + 3] |= alpha >> loShift;
-                        }
-                        else
-                            color = GetEncodedGrayValue (image, col, row, gamma, maxValue, *dither) ;
-
-                        row_ptr[j] = color >> (8 - hiShift);
-                        row_ptr[j + 1] = color << hiShift;
-                        row_ptr[j + 1] |= color >> loShift;
-                    }
-                }
+            if (use_alpha)
+                SetChannelValue(p, (alpha * mult) >> shift, bpcc);
         }
 
         if (setjmp(png_jmpbuf(png_ptr)))
@@ -1019,6 +857,6 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
 
 } // end of namespace Png
 
-}
+} // end of namespace pov_base
 
 #endif  // LIBPNG_MISSING

@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,9 +44,17 @@
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
+
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
 
 #define TORUS_OBJECT (STURM_OK_OBJECT)
 
@@ -54,18 +62,9 @@ namespace pov
 
 #define TORUS_EXTRA_STATS 1
 
-
-
-/*****************************************************************************
-* Global typedefs
-******************************************************************************/
-
-/*
- * Torus structure.
- *
- *   R : Major radius
- *   r : Minor radius
- */
+/// @}
+///
+//******************************************************************************
 
 class Torus : public ObjectBase
 {
@@ -139,6 +138,10 @@ class SpindleTorus : public Torus
 
         DBL mSpindleTipYSqr;
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

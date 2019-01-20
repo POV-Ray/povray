@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -47,6 +47,15 @@
 
 namespace pov
 {
+
+class FunctionVM;
+
+}
+
+namespace pov_parser
+{
+
+using namespace pov;
 
 #ifndef DEBUG_FLOATFUNCTION
     #define DEBUG_FLOATFUNCTION 0
@@ -88,7 +97,6 @@ enum
 };
 
 class Parser;
-class FunctionVM;
 
 void FNCode_Copy(FunctionCode *, FunctionCode *);
 
@@ -106,7 +114,7 @@ struct ExprNode
         struct
         {
             char *name;
-            TOKEN token;
+            TokenId token;
             FUNCTION fn;
         } call;
         unsigned int trap;
@@ -121,11 +129,15 @@ class FNCode
 
         void Parameter();
         void Compile(ExprNode *);
+
+#if (DEBUG_FLOATFUNCTION == 1)
         void SetFlag(unsigned int, char *);
+#endif
+
     private:
         FunctionCode *function;
         Parser *parser;
-        FunctionVM *functionVM;
+        intrusive_ptr<FunctionVM> functionVM;
 
         unsigned int max_program_size;
         unsigned int max_stack_size;

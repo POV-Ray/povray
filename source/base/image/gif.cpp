@@ -8,8 +8,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -68,7 +68,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options, bool IsPOTFile)
     int                             data ;
     int                             width;
     int                             height;
-    Image                           *image = NULL;
+    Image                           *image = nullptr;
     unsigned char                   buffer[256];
     vector<Image::RGBAMapEntry>     colormap ;
     int                             alphaIdx = -1; // assume no transparency color
@@ -125,8 +125,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options, bool IsPOTFile)
         {
             case EOF:
                 throw POV_EXCEPTION(kFileDataErr, "Unexpected EOF reading GIF file");
-                finished = true;
-                break ;
+                break;
 
             case ';': /* End of the GIF dataset. */
                 finished = true;

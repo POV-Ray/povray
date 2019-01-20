@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,12 +41,19 @@
 
 #include <vector>
 
+#include "core/bounding/bsptree.h"
 #include "core/math/randomsequence.h"
 #include "core/render/ray.h"
-#include "core/support/bsptree.h"
 
 namespace pov
 {
+
+//##############################################################################
+///
+/// @defgroup PovCoreRender Ray Tracing
+/// @ingroup PovCore
+///
+/// @{
 
 typedef struct Fog_Struct FOG;
 class PhotonGatherer;
@@ -111,7 +118,7 @@ struct LightSourceEntry
     LightSource *light;
 
     LightSourceEntry() :
-        s0(0.0), s1(0.0), light(NULL) { }
+        s0(0.0), s1(0.0), light(nullptr) { }
     LightSourceEntry(LightSource *nlight) :
         s0(0.0), s1(0.0), light(nlight) { }
     LightSourceEntry(double ns0, double ns1, LightSource *nlight) :
@@ -121,11 +128,11 @@ struct LightSourceEntry
 };
 
 // TODO: these sizes will need tweaking.
-typedef FixedSimpleVector<Media *, MEDIA_VECTOR_SIZE> MediaVector; // TODO FIXME - cannot allow this to be fixed size [trf]
-typedef FixedSimpleVector<MediaInterval, MEDIA_INTERVAL_VECTOR_SIZE> MediaIntervalVector; // TODO FIXME - cannot allow this to be fixed size [trf]
-typedef FixedSimpleVector<LitInterval, LIT_INTERVAL_VECTOR_SIZE> LitIntervalVector; // TODO FIXME - cannot allow this to be fixed size [trf]
-typedef FixedSimpleVector<LightSourceIntersectionEntry, LIGHT_INTERSECTION_VECTOR_SIZE> LightSourceIntersectionVector; // TODO FIXME - cannot allow this to be fixed size [trf]
-typedef FixedSimpleVector<LightSourceEntry, LIGHTSOURCE_VECTOR_SIZE> LightSourceEntryVector; // TODO FIXME - cannot allow this to be fixed size [trf]
+typedef PooledSimpleVector<Media *, MEDIA_VECTOR_SIZE> MediaVector;
+typedef PooledSimpleVector<MediaInterval, MEDIA_INTERVAL_VECTOR_SIZE> MediaIntervalVector;
+typedef PooledSimpleVector<LitInterval, LIT_INTERVAL_VECTOR_SIZE> LitIntervalVector;
+typedef PooledSimpleVector<LightSourceIntersectionEntry, LIGHT_INTERSECTION_VECTOR_SIZE> LightSourceIntersectionVector;
+typedef PooledSimpleVector<LightSourceEntry, LIGHTSOURCE_VECTOR_SIZE> LightSourceEntryVector;
 
 
 struct TraceTicket
@@ -175,6 +182,8 @@ class Trace
 {
     public:
 
+        /// @todo This interface might also come in hand at other places,
+        /// so we should pull it out of the @ref Trace class.
         class CooperateFunctor
         {
             public:
@@ -196,6 +205,7 @@ class Trace
                 virtual bool CheckRadiosityTraceLevel(const TraceTicket& ticket) { return false; }
         };
 
+        /// @todo TraceThreadData already holds a reference to SceneData.
         Trace(shared_ptr<SceneData> sd, TraceThreadData *td, const QualityFlags& qf,
               CooperateFunctor& cf, MediaFunctor& mf, RadiosityFunctor& af);
 
@@ -726,6 +736,17 @@ class Trace
         /// Compute fresnel-based reflectivity.
         void ComputeFresnel(MathColour& colour, const MathColour& rMax, const MathColour& rMin, double cos_angle, double relativeIor);
 
+        /// Compute Fresnel reflectance term.
+        ///
+        /// This function computes the reflectance term _R_ of the Fresnel equations for the special
+        /// case of a dielectric material and unpolarized light. The transmittance term _T_ can
+        /// trivially be computed as _T=1-R_.
+        ///
+        /// @param[in]      cosTi           Cosine of angle between incident ray and surface normal.
+        /// @param[in]      n               Relative refractive index of the material entered.
+        ///
+        static double FresnelR(double cosTi, double n);
+
         /// Compute Sky & Background Colour.
         ///
         /// @remark         The computed colour _overwrites_ any value passed in `colour` and `transm`.
@@ -796,6 +817,10 @@ class Trace
     ///
 
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -50,6 +50,18 @@
 
 namespace pov_base
 {
+
+//##############################################################################
+///
+/// @defgroup PovBaseAnimation Animations
+/// @ingroup PovBase
+///
+/// @todo
+///     Is this related to real-time rendering, or just output to video file formats?
+/// @todo
+///     This module is currently unused and presumably out of sync with the rest of the codebase.
+///
+/// @{
 
 class Animation
 {
@@ -142,7 +154,7 @@ class Animation
         Animation(FileType aftype, CodecType codec, OStream *file, unsigned int w, unsigned int h, const WriteOptions& options);
 
         Image *ReadFrame(IStream *file);
-        POV_LONG WriteFrame(OStream *file, const Image *image);
+        POV_OFF_T WriteFrame(OStream *file, const Image *image);
 
         void ComputeBlurMask(const Image& image, Image& mask);
         void GetBlurredPixel(const Image& image, unsigned int x, unsigned int y, float& red, float& green, float& blue);
@@ -158,6 +170,10 @@ class Animation
         /// not available
         Animation& operator=(Animation&);
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

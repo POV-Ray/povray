@@ -1,10 +1,11 @@
 ===============================================================================
-POV-Ray 3.7 for UNIX/Linux - INSTALL file
+POV-Ray v3.8 for UNIX/Linux - INSTALL file
 
 Compiling and installing POV-Ray for Unix from sources.
 
-Please report bugs via our bugtracker at http://bugs.povray.org/ or to our forum
-at news://news.povray.org/povray.unix/ or http://news.povray.org/povray.unix/
+Please report bugs via our GitHub issue tracker at
+https://github.com/POV-Ray/povray/issues or to our forum at
+news://news.povray.org/povray.unix/ or http://news.povray.org/povray.unix/
 ===============================================================================
 
 +----------------------------------------------------------------------------+
@@ -39,7 +40,7 @@ usual 'configure' and 'make' commands.  For a system-wide installation:
   make check
   sudo make install
 
-The COMPILED_BY argument to 'configure' is mandatory and must be filled
+The COMPILED_BY argument to 'configure' should be filled
 with your name and/or organization so that the generated binary can be
 differentiated from official POV-Ray builds.
 
@@ -53,13 +54,14 @@ are listed in section 3.
 The last command in the example above installs POV-Ray under system-wide
 directories and needs root privileges.  Installing as non-privileged user is
 also possible; see section 3.1.  By default (i.e. as root), 'make install'
-installs the following components:
+installs the following components (X.Y representing the first two fields of
+the version number, e.g. for v3.8.1 this would be 3.8):
   povray binary (executable)              in /usr/local/bin
-  data files (e.g. includes, scene files) in /usr/local/share/povray-3.7
-  documentation (text and html)           in /usr/local/share/doc/povray-3.7
-  configuration files (e.g. povray.conf)  in /usr/local/etc/povray/3.7
+  data files (e.g. includes, scene files) in /usr/local/share/povray-X.Y
+  documentation (text and html)           in /usr/local/share/doc/povray-X.Y
+  configuration files (e.g. povray.conf)  in /usr/local/etc/povray/X.Y
 
-The configuration files are also copied under the $HOME/.povray/3.7 directory
+The configuration files are also copied under the $HOME/.povray/X.Y directory
 of the user (or root) who is doing the installation.  For further details
 regarding those files, please read the instructions in README.unix and in
 chapter 1 of the documentation.
@@ -79,21 +81,23 @@ libraries.
 
 The build system must have:
 
-- a modern C++ compiler which supports C++ templates and follows the ISO C++
-  standard as much as possible; for instance, the GNU GCC 4.x series and the
-  Intel C++ compiler version 9.x or above.  They are available at:
-  http://www.gnu.org/software/gcc
-  http://www.intel.com/software/products/compilers
+- a modern C++ compiler which complies with the ISO C++11 standard as much as
+  possible; for instance, the GNU GCC 5.x series, the Clang++ compiler version
+  3.3 or above, and the Intel C++ compiler version 15.x or above.  They are
+  available at:
+  https://www.gnu.org/software/gcc/
+  https://clang.llvm.org/
+  https://software.intel.com/en-us/intel-compilers
 
 - a working 'make' utility.  We strongly recommand to use GNU Make version 3.79
   or above.  Most GNU/Linux distribution should come with it.  Other platforms
   should install it before running configure.  GNU make can be found at:
-  http://www.gnu.org/software/make
+  https://www.gnu.org/software/make/
 
 - in the unlikely case you don't have a Bourne-compatible shell installed
   on your system or that the shell fails running POV-Ray's configure, it is
   recommanded to install GNU bash first.  Download it at:
-  http://www.gnu.org/software/bash
+  https://www.gnu.org/software/bash/
 
 
 2.2 Required support libraries
@@ -136,11 +140,21 @@ recommanded to generate a fully-featured POV-Ray executable.
   http://www.libsdl.org
 
 
-2.3 Compatibility issues
+2.4 Compatibility issues
     ====================
 
-- Boost version 1.46 has been reported to be unstable on the Raspberry Pi 2. We recommend using Boost version 1.50 on
-  this platform.
+- Boost version 1.46 has been reported to be unstable on the Raspberry Pi 2.
+  We recommend using Boost version 1.50 on this platform.
+
+- Clang 3.4 using standard headers from gcc 4.6 is known to fail when using the
+  default configure settings, reporting errors in a gcc header file named
+  "math-finite.h" related to an identifier named "__extern_always_inline". Other
+  version combinations may be affected as well. To work around this issue, use
+  the configure option "CXXFLAGS=-fno-fast-math".
+
+- When configured with "--disable-optimiz", linkage may fail in some cases,
+  reporting undefined references related to "boost::gregorian::greg_month". To
+  work around this issue, use the configure option "LDFLAGS=-lboost_date_time".
 
 
 ====================================================
@@ -169,7 +183,7 @@ Configure POV-Ray for building and installing in standard directories:
 
 Here, these commands are run in the source directory of POV-Ray (but this is
 not required, see section 3.1.3 below).  Note that the COMPILED_BY argument
-is mandatory.  The 'check' target for 'make' may be omitted (no test render
+is highly recommended. The 'check' target for 'make' may be omitted (no test render
 is performed) in particular when building POV-Ray in batch.
 
 The top Makefile generated by configure supports the following targets:
@@ -458,10 +472,11 @@ Additional POV-Ray specific options are:
     risk.
 
 COMPILED_BY="your name <email@address>"
-    this option is required when configuring the source package.  Please
-    provide with a valid contact information that will be included in the
+    this option is highly recommended when configuring the source package.
+    Please provide a valid contact information that will be included in the
     executable and displayed whenever POV-Ray (or a modified version) is
-    started.
+    started.  If not specified, this option will default to your login
+	name and "<no contact address>".
 
 NON_REDISTRIBUTABLE_BUILD=yes
     this option must be used in case one needs to build POV-Ray without

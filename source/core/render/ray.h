@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -46,9 +46,15 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @addtogroup PovCoreRender
+///
+/// @{
+
 class Interior;
 
-typedef FixedSimpleVector<Interior *, RAYINTERIOR_VECTOR_SIZE> RayInteriorVector;
+typedef PooledSimpleVector<Interior *, RAYINTERIOR_VECTOR_SIZE> RayInteriorVector;
 
 class Ray : public BasicRay
 {
@@ -83,7 +89,7 @@ class Ray : public BasicRay
         void SetFlags(RayType rt, const Ray& other);
 
         bool IsPrimaryRay() const { return primaryRay; }
-        bool IsImageRay() const { return primaryRay || (refractionRay && !reflectionRay); }
+        bool IsImageRay() const { return primaryRay || (refractionRay && !reflectionRay && !radiosityRay); }
         bool IsReflectionRay() const { return reflectionRay; }
         bool IsRefractionRay() const { return refractionRay; }
         bool IsSubsurfaceRay() const { return subsurfaceRay; }
@@ -116,6 +122,10 @@ class Ray : public BasicRay
         bool hollowRay : 1;
         bool pretraceRay : 1;
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

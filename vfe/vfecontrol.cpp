@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -50,12 +50,12 @@ namespace pov_frontend
   extern struct ProcessRenderOptions::Output_FileType_Table FileTypeTable[];
 }
 
-static struct pov_base::ProcessOptions::INI_Parser_Table *GetPT(const char *OptionName)
+static struct pov_frontend::ProcessOptions::INI_Parser_Table *GetPT(const char *OptionName)
 {
-  for (struct pov_base::ProcessOptions::INI_Parser_Table *op = pov_frontend::RenderOptions_INI_Table; op->keyword != NULL; op++)
+  for (struct pov_frontend::ProcessOptions::INI_Parser_Table *op = pov_frontend::RenderOptions_INI_Table; op->keyword != nullptr; op++)
     if (strcmp(op->keyword, OptionName) == 0)
       return op;
-  return NULL;
+  return nullptr;
 }
 
 /***************************************************************************************/
@@ -93,7 +93,7 @@ bool vfeSession::ProcessCancelRender (void)
         // TODO FIXME
         // char str [256] ;
         // sprintf (str, "Failed to send stop rendering message (%s)", e.what()) ;
-        // MessageBox (NULL, str, "POVMS error", MB_OK | MB_ICONEXCLAMATION) ;
+        // MessageBox (nullptr, str, "POVMS error", MB_OK | MB_ICONEXCLAMATION) ;
         Delay (100) ;
         return (m_Frontend->GetState () == kReady);
       }
@@ -103,9 +103,9 @@ bool vfeSession::ProcessCancelRender (void)
   {
     if (m_Frontend->GetState () == kReady)
     {
-      // we possibly have an anamolous situation
+      // we possibly have an anomalous situation
       // TODO FIXME
-      // MessageBox (NULL, "Warning: had to force state to stopped", "Cancel Render", MB_OK | MB_ICONEXCLAMATION) ;
+      // MessageBox (nullptr, "Warning: had to force state to stopped", "Cancel Render", MB_OK | MB_ICONEXCLAMATION) ;
       RenderStopped();
     }
   }
@@ -211,7 +211,7 @@ void vfeSession::RenderStopped (void)
 int vfeSession::SetOptions (vfeRenderOptions& opts)
 {
   int                     err;
-  UCS2                    str [MAX_PATH];
+  UCS2                    str[POV_FILENAME_BUFFER_CHARS+1]; // TODO FIXME - use a C++ style string instead.
   POVMSObject             obj;
   vfeProcessRenderOptions options(this);
 
@@ -360,6 +360,16 @@ int vfeSession::SetOptions (vfeRenderOptions& opts)
       AppendErrorMessage ("Grayscale output not currently supported with selected output file type.") ;
       return (m_LastError = vfeUnsupportedOptionCombination);
     }
+    if (oft == kPOVList_FileType_PPM)
+    {
+        if (!ropts.Exist(kPOVAttrib_FileGammaType))
+        {
+            AppendWarningMessage ("Warning: Output image gamma not specified for Netpbm (PGM/PPM) file; POV-Ray will default to the\n"
+                                  "official standard, but competing de-facto standards exist. To get rid of this warning,\n"
+                                  "explicitly specify \"File_Gamma=bt709\". If the results do not match your expectations, try\n"
+                                  "\"File_Gamma=srgb\" or \"File_Gamma=1.0\".");
+        }
+    }
     if (ropts.TryGetBool(kPOVAttrib_OutputAlpha, false) && !hasAlpha)
     {
       AppendWarningMessage ("Warning: Alpha channel output currently not (or not officially) supported with selected output file type.") ;
@@ -372,9 +382,12 @@ int vfeSession::SetOptions (vfeRenderOptions& opts)
   if ((ropts.TryGetInt(kPOVAttrib_DisplayGammaType, DEFAULT_DISPLAY_GAMMA_TYPE) == kPOVList_GammaType_PowerLaw) &&
       (ropts.TryGetFloat(kPOVAttrib_DisplayGamma, DEFAULT_DISPLAY_GAMMA) < 0.001f))
     return (m_LastError = vfeDisplayGammaTooSmall);
-  if ((ropts.TryGetInt(kPOVAttrib_FileGammaType, DEFAULT_FILE_GAMMA_TYPE) == kPOVList_GammaType_PowerLaw) &&
-      (ropts.TryGetFloat(kPOVAttrib_FileGamma, DEFAULT_FILE_GAMMA) < 0.001f))
-    return (m_LastError = vfeFileGammaTooSmall);
+  if (ropts.Exist(kPOVAttrib_FileGammaType))
+  {
+    if ((ropts.GetInt(kPOVAttrib_FileGammaType) == kPOVList_GammaType_PowerLaw) &&
+        (ropts.GetFloat(kPOVAttrib_FileGamma) < 0.001f))
+      return (m_LastError = vfeFileGammaTooSmall);
+  }
 
   n = sizeof (str) ;
   if ((err = POVMSUtil_GetUCS2String (&obj, kPOVAttrib_CreateIni, str, &n)) == kNoErr && str [0] != 0)
@@ -391,7 +404,7 @@ int vfeSession::SetOptions (vfeRenderOptions& opts)
 bool vfeSession::OptionPresent(const char *OptionName)
 {
   struct ProcessOptions::INI_Parser_Table *op = GetPT(OptionName);
-  if (op == NULL)
+  if (op == nullptr)
     throw POV_EXCEPTION_STRING("Invalid option");
 
   if (m_OptionsSet == false)
@@ -403,7 +416,7 @@ bool vfeSession::OptionPresent(const char *OptionName)
 bool vfeSession::GetBoolOption(const char *OptionName, bool DefaultVal)
 {
   struct ProcessOptions::INI_Parser_Table *op = GetPT(OptionName);
-  if (op == NULL)
+  if (op == nullptr)
     throw POV_EXCEPTION_STRING("Invalid option");
   if (m_OptionsSet == false)
     throw POV_EXCEPTION_STRING("Options not set");
@@ -414,7 +427,7 @@ bool vfeSession::GetBoolOption(const char *OptionName, bool DefaultVal)
 int vfeSession::GetIntOption(const char *OptionName, int DefaultVal)
 {
   struct ProcessOptions::INI_Parser_Table *op = GetPT(OptionName);
-  if (op == NULL)
+  if (op == nullptr)
     throw POV_EXCEPTION_STRING("Invalid option");
   if (m_OptionsSet == false)
     throw POV_EXCEPTION_STRING("Options not set");
@@ -425,7 +438,7 @@ int vfeSession::GetIntOption(const char *OptionName, int DefaultVal)
 float vfeSession::GetFloatOption(const char *OptionName, float DefaultVal)
 {
   struct ProcessOptions::INI_Parser_Table *op = GetPT(OptionName);
-  if (op == NULL)
+  if (op == nullptr)
     throw POV_EXCEPTION_STRING("Invalid option");
   if (m_OptionsSet == false)
     throw POV_EXCEPTION_STRING("Options not set");
@@ -436,7 +449,7 @@ float vfeSession::GetFloatOption(const char *OptionName, float DefaultVal)
 std::string vfeSession::GetStringOption(const char *OptionName, const char *DefaultVal)
 {
   struct ProcessOptions::INI_Parser_Table *op = GetPT(OptionName);
-  if (op == NULL)
+  if (op == nullptr)
     throw POV_EXCEPTION_STRING("Invalid option");
   if (m_OptionsSet == false)
     throw POV_EXCEPTION_STRING("Options not set");
@@ -447,7 +460,7 @@ std::string vfeSession::GetStringOption(const char *OptionName, const char *Defa
 UCS2String vfeSession::GetUCS2StringOption(const char *OptionName, const UCS2String& DefaultVal)
 {
   struct ProcessOptions::INI_Parser_Table *op = GetPT(OptionName);
-  if (op == NULL)
+  if (op == nullptr)
     throw POV_EXCEPTION_STRING("Invalid option");
   if (m_OptionsSet == false)
     throw POV_EXCEPTION_STRING("Options not set");
@@ -496,7 +509,7 @@ int vfeSession::StartRender()
   }
   catch (std::exception& e)
   {
-    if (dynamic_cast<pov_base::Exception *> (&e) != NULL)
+    if (dynamic_cast<pov_base::Exception *> (&e) != nullptr)
       m_RenderErrorCode = dynamic_cast<pov_base::Exception *> (&e)->code() ;
     if (m_RenderErrorCode == 0)
       m_RenderErrorCode = -1 ;

@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -42,6 +42,13 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreMathJitter Pseudorandom Jitter
+/// @ingroup PovCoreMath
+///
+/// @{
+
 #ifdef DYNAMIC_HASHTABLE
 extern unsigned short *hashTable; // GLOBAL VARIABLE
 #else
@@ -71,6 +78,10 @@ inline void Jitter2d(DBL x, DBL y, DBL& jx, DBL& jy)
     jx = JitterTable[int(hashTable[int(hashTable[(int(x * 1021.0) & 0xfff)] ^ int(y * 1019.0)) & 0xfff]) & 0xff]; // Note that 1019 and 1021 are prime! [trf]
     jy = JitterTable[int(hashTable[int(hashTable[(int(x * 1019.0) & 0xfff)] ^ int(y * 1021.0)) & 0xfff]) & 0xff]; // Note that 1019 and 1021 are prime! [trf]
 }
+
+/// @}
+///
+//##############################################################################
 
 }
 

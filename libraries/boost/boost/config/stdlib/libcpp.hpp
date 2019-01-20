@@ -53,19 +53,35 @@
 #  define BOOST_NO_CXX11_HDR_FUNCTIONAL
 #  define BOOST_NO_CXX11_STD_ALIGN
 #  define BOOST_NO_CXX11_ADDRESSOF
-#endif
-
+#  define BOOST_NO_CXX11_HDR_ATOMIC
+#  define BOOST_NO_CXX11_ATOMIC_SMART_PTR
+#  define BOOST_NO_CXX11_HDR_CHRONO
+#  define BOOST_NO_CXX11_HDR_TYPE_TRAITS
+#  define BOOST_NO_CXX11_HDR_FUTURE
+#elif _LIBCPP_VERSION < 3700
 //
 // These appear to be unusable/incomplete so far:
 //
-#  define BOOST_NO_CXX11_HDR_CHRONO
-#  define BOOST_NO_CXX11_HDR_FUTURE
-#  define BOOST_NO_CXX11_HDR_TYPE_TRAITS
-#  define BOOST_NO_CXX11_ATOMIC_SMART_PTR
 #  define BOOST_NO_CXX11_HDR_ATOMIC
+#  define BOOST_NO_CXX11_ATOMIC_SMART_PTR
+#  define BOOST_NO_CXX11_HDR_CHRONO
+#  define BOOST_NO_CXX11_HDR_TYPE_TRAITS
+#  define BOOST_NO_CXX11_HDR_FUTURE
+#endif
 
+
+#if _LIBCPP_VERSION < 3700
 // libc++ uses a non-standard messages_base
 #define BOOST_NO_STD_MESSAGES
+#endif
+
+#if (_LIBCPP_VERSION <= 1101) && !defined(BOOST_NO_CXX11_THREAD_LOCAL)
+// This is a bit of a sledgehammer, because really it's just libc++abi that has no
+// support for thread_local, leading to linker errors such as
+// "undefined reference to `__cxa_thread_atexit'".  It is fixed in the
+// most recent releases of libc++abi though...
+#  define BOOST_NO_CXX11_THREAD_LOCAL
+#endif
 
 #if defined(__has_include)
 #if !__has_include(<shared_mutex>)

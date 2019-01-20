@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,20 +33,26 @@
 ///
 //******************************************************************************
 
-#include <boost/scoped_ptr.hpp>
-
-// configfrontend.h must always be the first POV file included within frontend *.cpp files
-#include "frontend/configfrontend.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/renderfrontend.h"
 
-#include "povms/povmscpp.h"
+// Standard C++ header files
+#include <memory>
+
+// POV-Ray header files (base module)
+#include "base/platformbase.h"
+#include "base/textstream.h"
+#include "base/textstreambuffer.h"
+#include "base/image/dither.h"
+#include "base/image/encoding.h"
+
+// POV-Ray header files (POVMS module)
 #include "povms/povmsid.h"
 
-#include "base/fileinputoutput.h"
-#include "base/platformbase.h"
-#include "base/types.h"
-
+// POV-Ray header files (frontend module)
+#include "frontend/console.h"
 #include "frontend/processoptions.h"
+#include "frontend/processrenderoptions.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -161,10 +167,10 @@ void RenderFrontendBase::ConnectToBackend(POVMSAddress backendaddress, POVMS_Obj
 
     backendaddresses.insert(backendaddress);
 
-    if(resultobj != NULL)
+    if(resultobj != nullptr)
         *resultobj = result;
 
-    if(console != NULL)
+    if(console != nullptr)
         Message2Console::InitInfo(result, console.get());
 }
 
@@ -308,13 +314,8 @@ RenderFrontendBase::SceneId RenderFrontendBase::CreateScene(SceneData& shd, POVM
                 UCS2String str = lp.GetUCS2String();
                 if (str.empty() == true)
                     continue;
-#ifndef POV_FILE_SEPARATOR_2
-                if (*str.rbegin() != POV_FILE_SEPARATOR)
-                    str += POV_FILE_SEPARATOR;
-#else
-                if (*str.rbegin() != POV_FILE_SEPARATOR && *str.rbegin() != POV_FILE_SEPARATOR_2)
-                    str += POV_FILE_SEPARATOR;
-#endif
+                if (!POV_IS_PATH_SEPARATOR(*str.rbegin()))
+                    str += POV_PATH_SEPARATOR;
                 shd.searchpaths.push_back(Path(str));
             }
         }
@@ -360,7 +361,7 @@ void RenderFrontendBase::StartParser(SceneData& shd, SceneId sid, POVMS_Object& 
     msg.SetDestinationAddress(sid.GetAddress());
     msg.SetInt(kPOVAttrib_SceneId, sid.GetIdentifier());
 
-    POVMS_SendMessage(context, msg, NULL, kPOVMSSendMode_NoReply);
+    POVMS_SendMessage(context, msg, nullptr, kPOVMSSendMode_NoReply);
 
     shd.state = SceneData::Scene_Parsing;
 }
@@ -488,7 +489,7 @@ void RenderFrontendBase::StartRender(ViewData& vhd, ViewId vid, POVMS_Object& ob
     msg.SetDestinationAddress(vid.GetAddress());
     msg.SetInt(kPOVAttrib_ViewId, vid.GetIdentifier());
 
-    POVMS_SendMessage(context, msg, NULL, kPOVMSSendMode_NoReply);
+    POVMS_SendMessage(context, msg, nullptr, kPOVMSSendMode_NoReply);
 
     vhd.state = ViewData::View_Rendering;
 }
@@ -607,14 +608,14 @@ void RenderFrontendBase::NewBackup(POVMS_Object& ropts, ViewData& vd, const Path
     vd.imageBackup.reset();
 
     MakeBackupPath(ropts, vd, outputpath);
-    if(POV_ALLOW_FILE_WRITE(vd.imageBackupFile().c_str(), POV_File_Data_Backup) == false)
+    if (!pov_base::PlatformBase::GetInstance().AllowLocalFileAccess (vd.imageBackupFile(), POV_File_Data_Backup, true))
         throw POV_EXCEPTION(kCannotOpenFileErr, "Permission denied to create render state output file.");
-    vd.imageBackup = shared_ptr<OStream>(POV_PLATFORM_BASE.CreateOStream(POV_File_Data_Backup));
-    if(vd.imageBackup != NULL)
+    vd.imageBackup = shared_ptr<OStream>(new OStream(vd.imageBackupFile().c_str()));
+    if(vd.imageBackup != nullptr)
     {
         Backup_File_Header hdr;
 
-        if(vd.imageBackup->open(vd.imageBackupFile().c_str()) == false)
+        if(!*vd.imageBackup)
             throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot create render state output file.");
         memcpy(hdr.sig, RENDER_STATE_SIG, sizeof(hdr.sig));
         memcpy(hdr.ver, RENDER_STATE_VER, sizeof(hdr.ver));
@@ -630,7 +631,7 @@ void RenderFrontendBase::NewBackup(POVMS_Object& ropts, ViewData& vd, const Path
             // we do this test even if the file doesn't exist as we need to write there
             // eventually anyhow. might as well test if before the render starts ...
             if(CheckIfFileExists(filename.c_str()))
-                POV_UCS2_REMOVE(filename.c_str());
+                PlatformBase::GetInstance().DeleteLocalFile (filename.c_str());
         }
     }
     else
@@ -649,15 +650,15 @@ void RenderFrontendBase::ContinueBackup(POVMS_Object& ropts, ViewData& vd, ViewI
     vd.imageBackup.reset();
     MakeBackupPath(ropts, vd, outputpath);
 
-    boost::scoped_ptr<IStream> inbuffer(POV_PLATFORM_BASE.CreateIStream(POV_File_Data_Backup));
+    std::unique_ptr<IStream> inbuffer(new IFileStream(vd.imageBackupFile().c_str()));
 
     size_t pos = sizeof(Backup_File_Header);
 
-    if(inbuffer != NULL)
+    if (inbuffer != nullptr)
     {
         Backup_File_Header hdr;
 
-        if(inbuffer->open(vd.imageBackupFile().c_str()) == true)
+        if(*inbuffer)
         {
             // IOBase::eof() only is based on feof() and will only return
             // true if we have attempted to read past the end of the file.
@@ -668,7 +669,7 @@ void RenderFrontendBase::ContinueBackup(POVMS_Object& ropts, ViewData& vd, ViewI
             // since they are generally useful. therefore we explicitly check
             // for the end of the file.
             inbuffer->seekg (0, IOBase::seek_end);
-            POV_LONG end = inbuffer->tellg();
+            POV_OFF_T end = inbuffer->tellg();
             inbuffer->seekg (0, IOBase::seek_set);
 
             if (inbuffer->read (&hdr, sizeof (hdr)) == false)
@@ -724,14 +725,14 @@ void RenderFrontendBase::ContinueBackup(POVMS_Object& ropts, ViewData& vd, ViewI
     // if there isn't going to be an output file, we don't write to the state file
     if(outputToFile == true)
     {
-        vd.imageBackup = shared_ptr<OStream>(POV_PLATFORM_BASE.CreateOStream(POV_File_Data_Backup));
-        if(vd.imageBackup != NULL)
+        vd.imageBackup = shared_ptr<OStream>(new OStream(vd.imageBackupFile().c_str(), IOBase::append));
+        if(vd.imageBackup != nullptr)
         {
-            if(vd.imageBackup->open(vd.imageBackupFile().c_str(), IOBase::append) == false)
+            if(!*vd.imageBackup)
                 throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot append to state output file.");
 
             vd.imageBackup->seekg(0, IOBase::seek_end);
-            vd.imageBackup->seekg(min((POV_LONG)pos, vd.imageBackup->tellg()), IOBase::seek_set);
+            vd.imageBackup->seekg(min((POV_OFF_T)pos, vd.imageBackup->tellg()), IOBase::seek_set);
         }
         else
             throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot create state output file stream.");
@@ -752,6 +753,7 @@ void InitInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
     int h, i, j;
     int cnt;
     int l;
+    std::string generation;
 
     l = 1024;
     charbuf[0] = 0;
@@ -760,12 +762,17 @@ void InitInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
 
     l = 1024;
     charbuf[0] = 0;
+    if (POVMSUtil_GetString(msg, kPOVAttrib_CoreVersion, charbuf, &l) == kNoErr)
+        generation = charbuf;
+
+    l = 1024;
+    charbuf[0] = 0;
     if(POVMSUtil_GetString(msg, kPOVAttrib_EnglishText, charbuf, &l) == kNoErr)
         tsb->printf("%s\n", charbuf);
 
     tsb->printf("\n");
 
-    tsb->printf("Primary POV-Ray 3.7 Architects/Developers: (Alphabetically)\n");
+    tsb->printf("Primary %s Architects/Developers: (Alphabetically)\n", generation.c_str());
     if(POVMSObject_Get(msg, &attrlist, kPOVAttrib_PrimaryDevs) == kNoErr)
     {
         cnt = 0;
@@ -854,7 +861,6 @@ void InitInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
     tsb->printf("\n");
     tsb->printf("Other contributors are listed in the documentation.\n");
 
-    tsb->printf("\n");
     if(POVMSObject_Get(msg, &attrlist, kPOVAttrib_ImageLibVersions) == kNoErr)
     {
         cnt = 0;
@@ -863,6 +869,7 @@ void InitInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
         {
             if(cnt > 0)
             {
+                tsb->printf("\n");
                 tsb->printf("Support libraries used by POV-Ray:\n");
 
                 for(i = 1; i <= cnt; i++)
@@ -872,6 +879,54 @@ void InitInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
                         l = 1023;
                         charbuf[0] = 0;
                         if(POVMSAttr_Get(&item, kPOVMSType_CString, charbuf, &l) == kNoErr)
+                            tsb->printf("  %s\n", charbuf);
+
+                        (void)POVMSAttr_Delete(&item);
+                    }
+                }
+            }
+        }
+
+        (void)POVMSAttrList_Delete(&attrlist);
+    }
+
+    l = 1024;
+    charbuf[0] = 0;
+    std::string cpuInfo;
+    if (POVMSUtil_GetString(msg, kPOVAttrib_CPUInfo, charbuf, &l) == kNoErr)
+        cpuInfo = charbuf;
+#if POV_CPUINFO_DEBUG
+    l = 1024;
+    std::string cpuDetails;
+    if (POVMSUtil_GetString(msg, kPOVAttrib_CPUInfoDetails, charbuf, &l) == kNoErr)
+        cpuDetails = charbuf;
+#endif
+
+    if (POVMSObject_Get(msg, &attrlist, kPOVAttrib_Optimizations) == kNoErr)
+    {
+        cnt = 0;
+
+        if (POVMSAttrList_Count(&attrlist, &cnt) == kNoErr)
+        {
+            if (cnt > 0)
+            {
+                tsb->printf("\n");
+                tsb->printf("Dynamic optimizations:\n");
+
+                if (!cpuInfo.empty())
+                    tsb->printf("  CPU detected: %s\n", cpuInfo.c_str());
+#if POV_CPUINFO_DEBUG
+                if (!cpuDetails.empty())
+                    tsb->printf("  CPU details: %s\n", cpuDetails.c_str());
+#endif
+
+                for (i = 1; i <= cnt; i++)
+                {
+                    if (POVMSAttrList_GetNth(&attrlist, i, &item) == kNoErr)
+                    {
+                        l = 1023;
+                        charbuf[0] = 0;
+                        if (POVMSAttr_Get(&item, kPOVMSType_CString, charbuf, &l) == kNoErr)
                             tsb->printf("  %s\n", charbuf);
 
                         (void)POVMSAttr_Delete(&item);
@@ -948,7 +1003,8 @@ void RenderOptions(POVMS_Object& obj, TextStreamBuffer *tsb)
     tsb->printf("  Quality: %2d\n", clip(obj.TryGetInt(kPOVAttrib_Quality, 9), 0, 9));
 
     if(obj.TryGetBool (kPOVAttrib_Bounding, true))
-        tsb->printf("  Bounding boxes.......On   Bounding threshold: %d\n", obj.TryGetInt (kPOVAttrib_BoundingThreshold, 3));
+        tsb->printf("  Bounding boxes.......On   Bounding threshold: %d\n",
+                    clip<int>(obj.TryGetInt(kPOVAttrib_BoundingThreshold,DEFAULT_AUTO_BOUNDINGTHRESHOLD),1,SIGNED16_MAX));
     else
         tsb->printf("  Bounding boxes.......Off\n");
 
@@ -966,8 +1022,8 @@ void RenderOptions(POVMS_Object& obj, TextStreamBuffer *tsb)
     {
         int method = 0;
         if(obj.TryGetBool(kPOVAttrib_Antialias, false) == true)
-            method = clip(obj.TryGetInt(kPOVAttrib_SamplingMethod, 1), 0, 2);
-        int depth = clip(obj.TryGetInt(kPOVAttrib_AntialiasDepth, 3), 1, 9);
+            method = clip(obj.TryGetInt(kPOVAttrib_SamplingMethod, 1), 0, 3); // TODO FIXME - magic number in clip
+        int depth = clip(obj.TryGetInt(kPOVAttrib_AntialiasDepth, 3), 1, 9); // TODO FIXME - magic number in clip
         float threshold = clip(obj.TryGetFloat(kPOVAttrib_AntialiasThreshold, 0.3f), 0.0f, 1.0f);
         float aagamma = obj.TryGetFloat(kPOVAttrib_AntialiasGamma, 2.5f);
         float jitter = 0.0f;
@@ -1002,8 +1058,10 @@ void OutputOptions(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
 
     tsb->printf("Image Output Options\n");
 
-    (void)POVMSUtil_GetInt(msg, kPOVAttrib_Width, &i);
-    (void)POVMSUtil_GetInt(msg, kPOVAttrib_Height, &i2);
+    if (POVMSUtil_GetInt(msg, kPOVAttrib_Width, &i) != kNoErr)
+        i = 160;
+    if (POVMSUtil_GetInt(msg, kPOVAttrib_Height, &i2) != kNoErr)
+        i2 = 120;
     if (POVMSUtil_GetFloat(msg, kPOVAttrib_StartRow, &f) != kNoErr)
         f = 0.0;
     if (POVMSUtil_GetFloat(msg, kPOVAttrib_EndRow, &f2) != kNoErr)
@@ -1106,19 +1164,9 @@ void OutputOptions(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
             (void)POVMSUtil_GetBool(msg, kPOVAttrib_Dither, &b);
             if (b)
             {
-                i = kPOVList_DitherMethod_FloydSteinberg;
+                i = int(DitherMethodId::kBlueNoise);
                 (void)POVMSUtil_GetInt(msg, kPOVAttrib_DitherMethod, &i);
-                switch(i)
-                {
-                    // TODO FIXME - for easier maintenance, this should probably be part of the DitherMethodTable.
-                    case kPOVList_DitherMethod_Bayer2x2:        t = "2x2 Bayer pattern";                break;
-                    case kPOVList_DitherMethod_Bayer3x3:        t = "3x3 Bayer pattern";                break;
-                    case kPOVList_DitherMethod_Bayer4x4:        t = "4x4 Bayer pattern";                break;
-                    case kPOVList_DitherMethod_Diffusion1D:     t = "simple 1-D error diffusion";       break;
-                    case kPOVList_DitherMethod_Diffusion2D:     t = "simple 2-D error diffusion";       break;
-                    case kPOVList_DitherMethod_FloydSteinberg:  t = "Floyd-Steinberg error diffusion";  break;
-                    default:                                    t = "(unknown)";                        break;
-                }
+                t = ProcessRenderOptions::GetDitherMethodText(i);
                 tsb->printf("  Dithering............%s\n", t);
             }
             else
@@ -1144,11 +1192,10 @@ void OutputOptions(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
             case kPOVList_GammaType_PowerLaw:
                 tsb->printf("  Graphic display......On  (gamma: %g)\n", (float)f);
                 break;
-            case kPOVList_GammaType_SRGB:
-                tsb->printf("  Graphic display......On  (gamma: sRGB)\n");
-                break;
             default:
-                throw POV_EXCEPTION_STRING("Unknown gamma mode in OutputOptions()");
+                t = ProcessRenderOptions::GetGammaTypeText(i);
+                tsb->printf("  Graphic display......On  (gamma: %s)\n", t);
+                break;
         }
     }
     else
@@ -1170,37 +1217,37 @@ void OutputOptions(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
     tsb->printf("Information Output Options\n");
 
     tsb->printf("  All Streams to console.........%s", GetOptionSwitchString(msg, kPOVAttrib_AllConsole, true));
-//  if(streamnames[ALL_STREAM] != NULL)
+//  if (streamnames[ALL_STREAM] != nullptr)
 //      tsb->printf("  and file %s\n", streamnames[ALL_STREAM]);
 //  else
         tsb->printf("\n");
 
     tsb->printf("  Debug Stream to console........%s", GetOptionSwitchString(msg, kPOVAttrib_DebugConsole, true));
-//  if(streamnames[DEBUG_STREAM] != NULL)
+//  if (streamnames[DEBUG_STREAM] != nullptr)
 //      tsb->printf("  and file %s\n", streamnames[DEBUG_STREAM]);
 //  else
         tsb->printf("\n");
 
     tsb->printf("  Fatal Stream to console........%s", GetOptionSwitchString(msg, kPOVAttrib_FatalConsole, true));
-//  if(streamnames[FATAL_STREAM] != NULL)
+//  if (streamnames[FATAL_STREAM] != nullptr)
 //      tsb->printf("  and file %s\n", streamnames[FATAL_STREAM]);
 //  else
         tsb->printf("\n");
 
     tsb->printf("  Render Stream to console.......%s", GetOptionSwitchString(msg, kPOVAttrib_RenderConsole, true));
-//  if(streamnames[RENDER_STREAM] != NULL)
+//  if (streamnames[RENDER_STREAM] != nullptr)
 //      tsb->printf("  and file %s\n", streamnames[RENDER_STREAM]);
 //  else
         tsb->printf("\n");
 
     tsb->printf("  Statistics Stream to console...%s", GetOptionSwitchString(msg, kPOVAttrib_StatisticsConsole, true));
-//  if(streamnames[STATISTIC_STREAM] != NULL)
+//  if (streamnames[STATISTIC_STREAM] != nullptr)
 //      tsb->printf("  and file %s\n", streamnames[STATISTIC_STREAM]);
 //  else
         tsb->printf("\n");
 
     tsb->printf("  Warning Stream to console......%s", GetOptionSwitchString(msg, kPOVAttrib_WarningConsole, true));
-//  if(streamnames[WARNING_STREAM] != NULL)
+//  if (streamnames[WARNING_STREAM] != nullptr)
 //      tsb->printf("  and file %s\n", streamnames[WARNING_STREAM]);
 //  else
         tsb->printf("\n");

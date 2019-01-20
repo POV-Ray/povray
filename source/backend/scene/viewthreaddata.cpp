@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,8 +39,6 @@
 #include "backend/frame.h"
 #include "backend/scene/viewthreaddata.h"
 
-#include "vm/fnpovfpu.h"
-
 #include "backend/scene/backendscenedata.h"
 #include "backend/scene/view.h"
 
@@ -50,8 +48,8 @@
 namespace pov
 {
 
-ViewThreadData::ViewThreadData(ViewData *vd) :
-    TraceThreadData(dynamic_pointer_cast<SceneData>(vd->GetSceneData())),
+ViewThreadData::ViewThreadData(ViewData *vd, size_t seed) :
+    TraceThreadData(dynamic_pointer_cast<SceneData>(vd->GetSceneData()), seed),
     viewData(vd)
 {
 }

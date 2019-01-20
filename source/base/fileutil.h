@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -46,6 +46,13 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @defgroup PovBaseFileutil File-Related Utilities
+/// @ingroup PovBase
+///
+/// @{
+
 class IMemStream;
 class IStream;
 
@@ -78,7 +85,11 @@ extern POV_File_Extensions gPOV_File_Extensions[];
 extern const int gFile_Type_To_Mask[];
 
 int InferFileTypeFromExt(const pov_base::UCS2String& ext);
-IMemStream *Internal_Font_File(const int font_id, UCS2String& buffer);
+IMemStream *Internal_Font_File(int font_id);
+
+/// @}
+///
+//##############################################################################
 
 }
 

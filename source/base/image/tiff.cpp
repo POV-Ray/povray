@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -48,7 +48,7 @@
 extern "C"
 {
 #ifndef __STDC__
-#define __STDC__ (1) // TODO - check if this is really necessary
+#define __STDC__ (1) // TODO - this is an ugly hack; check if it is really necessary
 #endif
 #ifndef AVOID_WIN32_FILEIO
 #define AVOID_WIN32_FILEIO // this stops the tiff headers from pulling in windows.h on win32/64
@@ -191,7 +191,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
         Tiff_Read, Tiff_Write, Tiff_Seek, Tiff_Close,
         Tiff_Size, Tiff_Map, Tiff_Unmap);
     if (!tif)
-        return (NULL) ;
+        return nullptr;
 
     // Get basic information about the image
     TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &width);

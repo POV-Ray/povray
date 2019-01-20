@@ -10,8 +10,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,23 +36,23 @@
 ///
 //******************************************************************************
 
-// configparser.h must always be the first POV file included in the parser (pulls in platform config)
-#include "parser/configparser.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
 #include "core/material/pigment.h"
 #include "core/math/matrix.h"
 #include "core/math/spline.h"
+#include "core/scene/scenedata.h"
 
 #include "vm/fnpovfpu.h"
-
-#include "backend/scene/backendscenedata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
-namespace pov
+namespace pov_parser
 {
+
+using namespace pov;
 
 /*****************************************************************************
 *
@@ -84,13 +84,13 @@ namespace pov
 
 FUNCTION_PTR Parser::Parse_Function(void)
 {
-    FUNCTION_PTR ptr = (FUNCTION_PTR)POV_MALLOC(sizeof(FUNCTION), "Function ID");
-    ExprNode *expression = NULL;
+    FUNCTION_PTR ptr = new FUNCTION;
+    ExprNode *expression = nullptr;
     FunctionCode function;
 
     Parse_Begin();
 
-    FNCode f(this, &function, false, NULL);
+    FNCode f(this, &function, false, nullptr);
 
     expression = FNSyntax_ParseExpression();
     f.Compile(expression);
@@ -98,7 +98,7 @@ FUNCTION_PTR Parser::Parse_Function(void)
 
     Parse_End();
 
-    *ptr = dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->AddFunction(&function);
+    *ptr = mpFunctionVM->AddFunction(&function);
 
     return ptr;
 }
@@ -134,17 +134,17 @@ FUNCTION_PTR Parser::Parse_Function(void)
 
 FUNCTION_PTR Parser::Parse_FunctionContent(void)
 {
-    FUNCTION_PTR ptr = (FUNCTION_PTR)POV_MALLOC(sizeof(FUNCTION), "Function ID");
-    ExprNode *expression = NULL;
+    FUNCTION_PTR ptr = new FUNCTION;
+    ExprNode *expression = nullptr;
     FunctionCode function;
 
-    FNCode f(this, &function, false, NULL);
+    FNCode f(this, &function, false, nullptr);
 
     expression = FNSyntax_ParseExpression();
     f.Compile(expression);
     FNSyntax_DeleteExpression(expression);
 
-    *ptr = dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->AddFunction(&function);
+    *ptr = mpFunctionVM->AddFunction(&function);
 
     return ptr;
 }
@@ -152,26 +152,31 @@ FUNCTION_PTR Parser::Parse_FunctionContent(void)
 
 FUNCTION_PTR Parser::Parse_FunctionOrContent(void)
 {
-    EXPECT
+    FUNCTION_PTR result;
+    EXPECT_ONE
         CASE(FUNCTION_TOKEN)
-            return Parse_Function();
-            EXIT
+            result = Parse_Function();
         END_CASE
         OTHERWISE
-            return Parse_FunctionContent();
-            EXIT
+            result = Parse_FunctionContent();
         END_CASE
     END_EXPECT
+    return result;
 }
 
 
-void Parser::Parse_FunctionOrContentList(GenericScalarFunctionPtr* apFn, unsigned int count)
+void Parser::Parse_FunctionOrContentList(GenericScalarFunctionPtr* apFn, unsigned int count, bool mandatory)
 {
     for (unsigned int i = 0; i < count; ++i)
     {
-        if (i > 0)
+        if (!mandatory && (Peek_Token(RIGHT_CURLY_TOKEN) || Parse_Comma()))
+        {
+            apFn[i] = nullptr;
+            continue;
+        }
+        apFn[i] = new FunctionVM::CustomFunction(fnVMContext->functionvm.get(), Parse_FunctionOrContent());
+        if (i < count-1)
             Parse_Comma();
-        apFn[i] = new FunctionVM::CustomFunction(fnVMContext->functionvm, Parse_FunctionOrContent());
     }
 }
 
@@ -205,10 +210,10 @@ void Parser::Parse_FunctionOrContentList(GenericScalarFunctionPtr* apFn, unsigne
 *
 ******************************************************************************/
 
-FUNCTION_PTR Parser::Parse_DeclareFunction(int *token_id, const char *fn_name, bool is_local)
+FUNCTION_PTR Parser::Parse_DeclareFunction(TokenId *token_id, const char *fn_name, bool is_local)
 {
-    FUNCTION_PTR ptr = (FUNCTION_PTR)POV_MALLOC(sizeof(FUNCTION), "Function ID");
-    ExprNode *expression = NULL;
+    FUNCTION_PTR ptr = new FUNCTION;
+    ExprNode *expression = nullptr;
     FunctionCode function;
 
     // default type is float function
@@ -220,20 +225,20 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(int *token_id, const char *fn_name, b
     Parse_Begin();
 
     Get_Token();
-    if(Token.Token_Id == INTERNAL_TOKEN)
+    if(CurrentTokenId() == INTERNAL_TOKEN)
     {
-        GET(LEFT_PAREN_TOKEN);
+        Parse_Paren_Begin();
 
         Get_Token();
-        if(Token.Function_Id != FLOAT_TOKEN)
+        if(CurrentTokenFunctionId() != FLOAT_TOKEN)
             Expectation_Error("internal function identifier");
-        expression = FNSyntax_GetTrapExpression((unsigned int)(Token.Token_Float));
+        expression = FNSyntax_GetTrapExpression((unsigned int)(mToken.Token_Float));
 
         function.flags = FN_INLINE_FLAG;
 
-        GET(RIGHT_PAREN_TOKEN);
+        Parse_Paren_End();
     }
-    else if(Token.Token_Id == TRANSFORM_TOKEN)
+    else if(CurrentTokenId() == TRANSFORM_TOKEN)
     {
         if(function.parameter_cnt != 0)
             Error("Function parameters for transform functions are not allowed.");
@@ -250,7 +255,7 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(int *token_id, const char *fn_name, b
         // function type is vector function
         *token_id = VECTFUNCT_ID_TOKEN;
     }
-    else if(Token.Token_Id == SPLINE_TOKEN)
+    else if(CurrentTokenId() == SPLINE_TOKEN)
     {
         if(function.parameter_cnt != 0)
             Error("Function parameters for spline functions are not allowed.");
@@ -271,7 +276,7 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(int *token_id, const char *fn_name, b
         // function type is vector function
         *token_id = VECTFUNCT_ID_TOKEN;
     }
-    else if(Token.Token_Id == PIGMENT_TOKEN)
+    else if(CurrentTokenId() == PIGMENT_TOKEN)
     {
         if(function.parameter_cnt != 0)
             Error("Function parameters for pigment functions are not allowed.");
@@ -292,7 +297,7 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(int *token_id, const char *fn_name, b
         // function type is vector function
         *token_id = VECTFUNCT_ID_TOKEN;
     }
-    else if(Token.Token_Id == PATTERN_TOKEN)
+    else if(CurrentTokenId() == PATTERN_TOKEN)
     {
         if(function.parameter_cnt != 0)
             Error("Function parameters for pattern functions are not allowed.");
@@ -308,16 +313,20 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(int *token_id, const char *fn_name, b
         Parse_End();
         Post_Pigment(reinterpret_cast<PIGMENT *>(function.private_data));
     }
-    else if(Token.Token_Id == STRING_LITERAL_TOKEN)
+    else if(CurrentTokenId() == STRING_LITERAL_TOKEN)
     {
-        f.SetFlag(2, Token.Token_String);
+#if (DEBUG_FLOATFUNCTION == 1)
+        f.SetFlag(2, CurrentTokenText().c_str());
+#endif
         Get_Token();
-        if(Token.Token_Id == COMMA_TOKEN)
+        if(CurrentTokenId() == COMMA_TOKEN)
         {
             Get_Token();
-            if(Token.Token_Id != STRING_LITERAL_TOKEN)
+            if(CurrentTokenId() != STRING_LITERAL_TOKEN)
                 Expectation_Error("valid function expression");
-            f.SetFlag(1, Token.Token_String);
+#if (DEBUG_FLOATFUNCTION == 1)
+            f.SetFlag(1, CurrentTokenText().c_str());
+#endif
         }
         else
         {
@@ -336,9 +345,14 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(int *token_id, const char *fn_name, b
 
     Parse_End();
 
-    *ptr = dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->AddFunction(&function);
+    *ptr = mpFunctionVM->AddFunction(&function);
 
     return ptr;
+}
+
+intrusive_ptr<FunctionVM> Parser::GetFunctionVM() const
+{
+    return mpFunctionVM;
 }
 
 }

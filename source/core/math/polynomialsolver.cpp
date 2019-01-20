@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -605,7 +605,7 @@ static int sbisect(int np, const polynomial *sseq, DBL min_value, DBL  max_value
 
 static DBL polyeval(DBL x, int n, const DBL *Coeffs)
 {
-    register int i;
+    int i;
     DBL val;
 
     val = Coeffs[n];
@@ -1056,7 +1056,7 @@ static int difficult_coeffs(int n, DBL *x)
 * DESCRIPTION
 *
 *   Test to see if any coeffs are more than 6 orders of magnitude
-*   larger than the smallest (function from POV 1.0) [DB 8/94].
+*   larger than the smallest (function from POV-Ray v1.0) [DB 8/94].
 *
 * CHANGES
 *
@@ -1555,7 +1555,7 @@ static int polysolve(int order, const DBL *Coeffs, DBL *roots)
 *
 *   WARNING: This function can only be used for polynomials if small roots
 *   (i.e. |x| < epsilon) are not needed. This is the case for ray/object
-*   intersection tests because only intersecions with t > 0 are valid.
+*   intersection tests because only intersections with t > 0 are valid.
 *
 *   NOTE: Only one root at x = 0 will be eliminated.
 *
@@ -1590,7 +1590,7 @@ int Solve_Polynomial(int n, const DBL *c0, DBL *r, int sturm, DBL epsilon, Rende
 
     i = 0;
 
-    while ((fabs(c0[i]) < SMALL_ENOUGH) && (i < n))
+    while ((i < n) && (fabs(c0[i]) < SMALL_ENOUGH))
     {
         i++;
     }
@@ -1705,6 +1705,8 @@ int Solve_Polynomial(int n, const DBL *c0, DBL *r, int sturm, DBL epsilon, Rende
                     stats[Roots_Eliminated]++;
 
                     roots = polysolve(n-1, c, r);
+
+                    break;
                 }
             }
 

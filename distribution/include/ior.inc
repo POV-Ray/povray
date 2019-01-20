@@ -2,14 +2,14 @@
 // To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/ or send a
 // letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
 
-//    Persistence of Vision Ray Tracer version 3.7 Include File
+//    Persistence of Vision Ray Tracer version 3.8 Include File
 //    File: ior.inc
-//    Last updated: 2015-06-24
+//    Last updated: 2017-07-02
 //    Description: This file contains constants for ior and dispersion of various materials.
 
 #ifndef(Ior_Inc_Temp)
 #declare Ior_Inc_Temp=version;
-#version 3.71;
+#version 3.8;
 
 #ifdef(View_POV_Include_Stack)
 #debug "including ior.inc\n"
@@ -81,27 +81,27 @@
 // from refractive index n (nD) and nominal dispersion disp (nG-nB)
 #macro IorData_n_disp (n, optional disp)
   #local iorResult = n;
-  #ifdef(local(disp))
+  #ifdef(local.disp)
     #local dispResult = 1+disp/(n-disp/2);
   #end
-  ( iorResult , local(dispResult) )
+  ( iorResult , local.dispResult )
 #end
 
 // from typical refractive index range n1 to n2 (nD) and typical nominal dispersion disp1 to disp2 (nG-nB)
 #macro IorData_n_disp_Range (n1, optional n2, optional disp1, optional disp2)
-  #ifdef(local(n2))
+  #ifdef(local.n2)
     #local n = Average(n1,n2);
   #else
     #local n = n1;
   #end
-  #ifdef(local(disp1))
-    #ifdef(local(disp2))
+  #ifdef(local.disp1)
+    #ifdef(local.disp2)
       #local disp = Average(disp1,disp2);
     #else
       #local disp = disp1;
     #end
   #end
-  IorData_n_disp(n, local(disp))
+  IorData_n_disp(n, local.disp)
 #end
 
 // from refractive indices at Fraunhofer lines G, D and B
@@ -184,7 +184,7 @@
 #declare ( iorPolycarbonate                 , optional dispPolycarbonate                 ) = ( iorPC   , dispPC   );
 #declare ( iorPolymethylmethacrylate        , optional dispPolymethylmethacrylate        ) = ( iorPMMA , dispPMMA );
 #declare ( iorPolystyrene                   , optional dispPolystyrene                   ) = ( iorPS   , dispPS   );
-#declare ( iorPolyvinylchloride             , optional dispPolyvinylchloride             ) = ( iorPVP  , dispPVP  );
+#declare ( iorPolyvinylchloride             , optional dispPolyvinylchloride             ) = ( iorPVC  , dispPVC  );
 #declare ( iorPolyvinylpyrrolidone          , optional dispPolyvinylpyrrolidone          ) = ( iorPVP  , dispPVP  );
 
 // Plastics Trademarks

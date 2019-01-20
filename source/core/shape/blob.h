@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -45,11 +45,23 @@
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
 
-#define BLOB_OBJECT (STURM_OK_OBJECT+HIERARCHY_OK_OBJECT)
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
+
+#define BLOB_OBJECT (STURM_OK_OBJECT+HIERARCHY_OK_OBJECT+POTENTIAL_OBJECT)
+
+/// @}
+///
+//******************************************************************************
 
 // TODO - the following values probably don't have to be all discrete bits, except for BLOB_ENTER_EXIT_FLAG
 #define BLOB_ENTER_EXIT_FLAG      1 // internal use only
@@ -136,20 +148,20 @@ class Blob : public ObjectBase
 
         virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
         virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+        virtual double GetPotential (const Vector3d&, bool subtractThreshold, TraceThreadData *) const;
         virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
         virtual void Translate(const Vector3d&, const TRANSFORM *);
         virtual void Rotate(const Vector3d&, const TRANSFORM *);
         virtual void Scale(const Vector3d&, const TRANSFORM *);
         virtual void Transform(const TRANSFORM *);
         virtual void Compute_BBox();
+        virtual bool IsOpaque() const override;
 
         void Determine_Textures(Intersection *, bool, WeightedTextureVector&, TraceThreadData *);
 
         Blob_List_Struct *Create_Blob_List_Element();
         void Create_Blob_Element_Texture_List(Blob_List_Struct *BlobList, int npoints);
         int Make_Blob(DBL threshold, Blob_List_Struct *bloblist, int npoints, TraceThreadData *Thread);
-
-        void Test_Blob_Opacity();
 
         static void Translate_Blob_Element(Blob_Element *Element, const Vector3d& Vector);
         static void Rotate_Blob_Element(Blob_Element *Element, const Vector3d& Vector);
@@ -178,6 +190,10 @@ class Blob : public ObjectBase
 
         void getLocalIPoint(Vector3d& lip, Intersection *isect) const;
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

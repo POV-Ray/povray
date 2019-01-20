@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,8 +41,13 @@
 #include "core/configcore.h"
 #include "syspovconfigvm.h"
 
-namespace pov
-{
+//##############################################################################
+///
+/// @defgroup PovVMConfig VM Compile-Time Configuration
+/// @ingroup PovVM
+/// @ingroup PovConfig
+///
+/// @{
 
 // Adjust to match floating-point parameter(s) of functions in math.h/cmath
 #ifndef SYS_MATH_PARAM
@@ -81,6 +86,54 @@ namespace pov
     #define SYS_FUNCTION_ENTRY
 #endif // SYS_FUNCTIONS
 
-}
+
+//******************************************************************************
+///
+/// @name Debug Settings.
+///
+/// The following settings enable or disable certain debugging aids, such as run-time sanity checks
+/// or additional log output.
+///
+/// Unless noted otherwise, a non-zero integer will enable the respective debugging aids, while a
+/// zero value will disable them.
+///
+/// It is recommended that system-specific configurations leave these settings undefined in release
+/// builds, in which case they will default to @ref POV_DEBUG unless noted otherwise.
+///
+/// @{
+
+/// @def POV_VM_DEBUG
+/// Enable run-time sanity checks for the @ref PovVM.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_VM_DEBUG
+    #define POV_VM_DEBUG POV_DEBUG
+#endif
+
+/// @}
+///
+//******************************************************************************
+///
+/// @name Non-Configurable Macros
+///
+/// The following macros are configured automatically at compile-time; they cannot be overridden by
+/// system-specific configuration.
+///
+/// @{
+
+#if POV_VM_DEBUG
+    #define POV_VM_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_VM_ASSERT(expr) POV_ASSERT_DISABLE(expr)
+#endif
+
+/// @}
+///
+//******************************************************************************
+
+/// @}
+///
+//##############################################################################
 
 #endif // POVRAY_VM_CONFIGVM_H

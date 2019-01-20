@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,13 +33,11 @@
 ///
 //******************************************************************************
 
-// C++ variants of C standard headers
+// C++ variants of C standard header files
 #include <csignal>
+#include <cstdlib>
 
-// boost headers
-#include <boost/shared_ptr.hpp>
-
-// other library headers
+// Other library header files
 #include <termios.h>
 #include <unistd.h>
 #include <sys/select.h>
@@ -146,33 +144,36 @@ static void ProcessSignal (void)
     gSignalNumber = 0;
 }
 
-static vfeDisplay *UnixDisplayCreator (unsigned int width, unsigned int height, GammaCurvePtr gamma, vfeSession *session, bool visible)
+static vfeDisplay *UnixDisplayCreator (unsigned int width, unsigned int height, vfeSession *session, bool visible)
 {
     UnixDisplay *display = GetRenderWindow () ;
     switch (gDisplayMode)
     {
 #ifdef HAVE_LIBSDL
         case DISP_MODE_SDL:
-            if (display != NULL && display->GetWidth() == width && display->GetHeight() == height)
+            if (display != nullptr && display->GetWidth() == width && display->GetHeight() == height)
             {
-                UnixDisplay *p = new UnixSDLDisplay (width, height, gamma, session, false) ;
+                UnixDisplay *p = new UnixSDLDisplay (width, height, session, false) ;
                 if (p->TakeOver (display))
                     return p;
                 delete p;
             }
-            return new UnixSDLDisplay (width, height, gamma, session, visible) ;
+            return new UnixSDLDisplay (width, height, session, visible) ;
             break;
 #endif
         case DISP_MODE_TEXT:
-            return new UnixTextDisplay (width, height, gamma, session, visible) ;
+            return new UnixTextDisplay (width, height, session, visible) ;
             break;
         default:
-            return NULL;
+            return nullptr;
     }
 }
 
 static void PrintStatus (vfeSession *session)
 {
+    // TODO -- when invoked while processing "--help" command-line switch,
+    //         GNU/Linux customs would be to print to stdout (among other differences).
+
     string str;
     vfeSession::MessageType type;
     static vfeSession::MessageType lastType = vfeSession::mUnclassified;
@@ -201,16 +202,43 @@ static void PrintStatusChanged (vfeSession *session, State force = kUnknown)
             fprintf (stderr, "==== [Parsing...] ==========================================================\n");
             break;
         case kRendering:
+#ifdef HAVE_LIBSDL
+            if ((gDisplay != nullptr) && (gDisplayMode == DISP_MODE_SDL))
+            {
+                fprintf (stderr, "==== [Rendering... Press p to pause, q to quit] ============================\n");
+            }
+            else
+            {
+                fprintf (stderr, "==== [Rendering...] ========================================================\n");
+            }
+#else
             fprintf (stderr, "==== [Rendering...] ========================================================\n");
+#endif
             break;
         case kPausedRendering:
-            fprintf (stderr, "==== [Paused] ==============================================================\n");
+#ifdef HAVE_LIBSDL
+            if ((gDisplay != nullptr) && (gDisplayMode == DISP_MODE_SDL))
+            {
+                fprintf (stderr, "==== [Paused... Press p to resume] =========================================\n");
+            }
+            else
+            {
+                fprintf (stderr, "==== [Paused...] ===========================================================\n");
+            }
+#else
+            fprintf (stderr, "==== [Paused...] ===========================================================\n");
+#endif
+            break;
+        default:
+            // Do nothing special.
             break;
     }
 }
 
 static void PrintVersion(void)
 {
+    // TODO -- GNU/Linux customs would be to print to stdout (among other differences).
+
     fprintf(stderr,
         "%s %s\n\n"
         "%s\n%s\n%s\n"
@@ -238,12 +266,17 @@ static void PrintVersion(void)
     );
 }
 
+static void PrintGeneration(void)
+{
+    fprintf(stdout, "%s\n", POV_RAY_GENERATION POV_RAY_BETA_SUFFIX);
+}
+
 static void ErrorExit(vfeSession *session)
 {
     fprintf(stderr, "%s\n", session->GetErrorString());
     session->Shutdown();
     delete session;
-    exit(RETURN_ERROR);
+    std::exit(RETURN_ERROR);
 }
 
 static void CancelRender(vfeSession *session)
@@ -281,7 +314,7 @@ static ReturnValue PrepareBenchmark(vfeSession *session, vfeRenderOptions& opts,
         if (boost::starts_with(s, "+wt") || boost::starts_with(s, "-wt"))
         {
             s.erase(0, 3);
-            int n = atoi(s.c_str());
+            int n = std::atoi(s.c_str());
             if (n)
                 opts.SetThreadCount(n);
             else
@@ -297,7 +330,7 @@ static ReturnValue PrepareBenchmark(vfeSession *session, vfeRenderOptions& opts,
 
     int benchversion = pov::Get_Benchmark_Version();
     fprintf(stderr, "\
-%s %s%s\n\n\
+%s %s\n\n\
 Entering the standard POV-Ray %s benchmark version %x.%02x.\n\n\
 This built-in benchmark requires POV-Ray to be installed on your system\n\
 before running it.  There will be neither display nor file output, and\n\
@@ -308,7 +341,7 @@ with the Unix 'time' command (e.g. 'time povray -benchmark').\n\n\
 The benchmark will run using %d render thread(s).\n\
 Press <Enter> to continue or <Ctrl-C> to abort.\n\
 ",
-        PACKAGE_NAME, POV_RAY_VERSION, COMPILER_VER,
+        PACKAGE_NAME, POV_RAY_VERSION_INFO,
         VERSION_BASE, benchversion / 256, benchversion % 256,
         opts.GetThreadCount()
     );
@@ -327,7 +360,7 @@ Press <Enter> to continue or <Ctrl-C> to abort.\n\
         struct timeval tv = {0,0};  // no timeout
         FD_ZERO(&readset);
         FD_SET(STDIN_FILENO, &readset);
-        if (select(STDIN_FILENO+1, &readset, NULL, NULL, &tv) < 0)
+        if (select(STDIN_FILENO+1, &readset, nullptr, nullptr, &tv) < 0)
             break;
         if (FD_ISSET(STDIN_FILENO, &readset))  // user input is available
         {
@@ -400,13 +433,13 @@ int main (int argc, char **argv)
     sigaddset(&sigset, SIGCHLD);
 #endif
 
-    pthread_sigmask(SIG_BLOCK, &sigset, NULL);
+    pthread_sigmask(SIG_BLOCK, &sigset, nullptr);
 
     // create the signal handling thread
     sigthread = new boost::thread(SignalHandler);
 
     session = new vfeUnixSession();
-    if (session->Initialize(NULL, NULL) != vfeNoError)
+    if (session->Initialize(nullptr, nullptr) != vfeNoError)
         ErrorExit(session);
 
     // display mode registration
@@ -453,6 +486,14 @@ int main (int argc, char **argv)
         delete session;
         return RETURN_OK;
     }
+    else if (session->GetUnixOptions()->isOptionSet("general", "generation"))
+    {
+        session->Shutdown();
+        PrintGeneration();
+        delete sigthread;
+        delete session;
+        return RETURN_OK;
+    }
     else if (session->GetUnixOptions()->isOptionSet("general", "benchmark"))
     {
         retval = PrepareBenchmark(session, opts, bench_ini_name, bench_pov_name, argc, argv);
@@ -477,10 +518,10 @@ int main (int argc, char **argv)
     }
     else
     {
-        char *s = getenv ("POVINC");
+        char *s = std::getenv ("POVINC");
         session->SetDisplayCreator(UnixDisplayCreator);
         session->GetUnixOptions()->Process_povray_ini(opts);
-        if (s != NULL)
+        if (s != nullptr)
             opts.AddLibraryPath (s);
         while (*++argv)
             opts.AddCommand (*argv);
@@ -521,7 +562,7 @@ int main (int argc, char **argv)
         if (flags & stBackendStateChanged)
             PrintStatusChanged (session);
 
-        if (GetRenderWindow() != NULL)
+        if (GetRenderWindow() != nullptr)
         {
             // early exit
             if (GetRenderWindow()->HandleEvents())
@@ -547,7 +588,7 @@ int main (int argc, char **argv)
     }
 
     // pause when done for single or last frame of an animation
-    if (session->Failed() == false && GetRenderWindow() != NULL && session->GetBoolOption("Pause_When_Done", false))
+    if (session->Failed() == false && GetRenderWindow() != nullptr && session->GetBoolOption("Pause_When_Done", false))
     {
         PrintStatusChanged(session, kPausedRendering);
         PauseWhenDone(session);

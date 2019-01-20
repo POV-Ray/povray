@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -46,16 +46,23 @@
 namespace pov
 {
 
-/*****************************************************************************
- * Global preprocessor defines
- ******************************************************************************/
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
+
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
 
 #define OVUS_OBJECT (STURM_OK_OBJECT)
 
-
-/*****************************************************************************
- * Global typedefs
- ******************************************************************************/
+/// @}
+///
+//******************************************************************************
 
 class Ovus : public ObjectBase
 {
@@ -89,8 +96,12 @@ class Ovus : public ObjectBase
         DBL BottomVertical;
         /// highest vertical for the connecting surface (computed)
         DBL TopVertical;
-        /// Radius of the connecting surface (computed)
+        /// Radius of the connecting surface (computed, or provided in SDL)
         DBL ConnectingRadius;
+        /// vertical position of center of top sphere (computed or provided in SDL)
+        DBL VerticalSpherePosition;
+        /// precision for root solver
+        DBL RootTolerance;
 
     private:
         void CalcUV(const Vector3d& IPoint, Vector2d& Result) const;
@@ -100,6 +111,10 @@ class Ovus : public ObjectBase
                                     TraceThreadData *Thread) const;
 
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

@@ -49,7 +49,7 @@ Additional command line options that can be used are:
               files will get lost.  This has to be called by the 
               same user who installed POV-Ray.  Uninstall of older
               versions of POV-Ray is not supported (and is not 
-              required to install POV-Ray 3.6).
+              required to install this version of POV-Ray).
   test      : run a short test render to check if installation was
               successful.  This should be run as a normal user and
               not as root.

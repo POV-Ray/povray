@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,23 +33,19 @@
 ///
 //******************************************************************************
 
-#include <cstdarg>
-#include <cctype>
-
-// configfrontend.h must always be the first POV file included in frontend sources (pulls in platform config)
-#include "frontend/configfrontend.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/processoptions.h"
 
-#include "povms/povmscpp.h"
-#include "povms/povmsid.h"
+#include <cstdio>
 
-#include "base/pov_err.h"
-#include "base/stringutilities.h"
+#include "base/platformbase.h"
+
+#include "povms/povmsid.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
-namespace pov_base
+namespace pov_frontend
 {
 
 ProcessOptions::ProcessOptions(INI_Parser_Table *pit, Cmd_Parser_Table *pct)
@@ -64,12 +60,12 @@ ProcessOptions::~ProcessOptions()
 
 int ProcessOptions::ParseFile(const char *filespec, POVMSObjectPtr obj)
 {
-    ITextStream *file = NULL;
-    const char *currentsection = NULL;
-    char *sectionname = NULL;
-    char *filename = NULL;
+    ITextStream *file = nullptr;
+    const char *currentsection = nullptr;
+    char *sectionname = nullptr;
+    char *filename = nullptr;
     int err = kNoErr;
-    POVMSObjectPtr section = NULL;
+    POVMSObjectPtr section = nullptr;
     int currentline = 1;
 
     // split the INI files specification into filename and optional section name
@@ -77,7 +73,7 @@ int ProcessOptions::ParseFile(const char *filespec, POVMSObjectPtr obj)
     if(err == kNoErr)
     {
         file = OpenFileForRead(filename, obj);
-        if(file == NULL)
+        if (file == nullptr)
         {
             // all errors here are non-fatal, the calling code has to decide if an error is fatal
             ParseError("Cannot open INI file '%s'.", filename);
@@ -103,26 +99,26 @@ int ProcessOptions::ParseFile(const char *filespec, POVMSObjectPtr obj)
             if(token == '[')
             {
                 // free old section name, if any
-                if(currentsection != NULL)
+                if (currentsection != nullptr)
                     delete[] currentsection;
 
                 // read until the section name end marker
                 currentsection = Parse_INI_String(file, ']');
 
                 // if the user specified a section name, compare the two and enable reading
-                if((sectionname != NULL) && (currentsection != NULL))
+                if ((sectionname != nullptr) && (currentsection != nullptr))
                 {
                     if(pov_stricmp(currentsection, sectionname) == 0)
                         section = obj; // named section matches specified section name, apply options
                     else
-                        section = NULL; // named section does not match specified section name, ignore options
+                        section = nullptr; // named section does not match specified section name, ignore options
                 }
                 // if there was no user specified section name, ignore all named sections
                 else
-                    section = NULL; // no section name was specified, ignore options in named section
+                    section = nullptr; // no section name was specified, ignore options in named section
             }
             // skip lines that do not belong to the desired sections
-            else if(section == NULL)
+            else if (section == nullptr)
             {
                 currentline += Parse_INI_Skip_Line(file);
             }
@@ -142,10 +138,10 @@ int ProcessOptions::ParseFile(const char *filespec, POVMSObjectPtr obj)
                     // POV-Ray-style INI file with command-line switch
                     case '+':
                     case '-':
-                    // POV-Ray-style INI file with system specific command-line switch on some systems (i.e. Windos)
-                    #if(FILENAME_SEPARATOR != '/')
+#if (POV_SLASH_IS_SWITCH_CHARACTER)
+                    // POV-Ray-style INI file with system specific command-line switch on some systems (e.g. Windos)
                     case '/':
-                    #endif
+#endif
                         err = Parse_INI_Switch(file, token, section);
                         break;
                     // INI file comment
@@ -177,7 +173,7 @@ int ProcessOptions::ParseFile(const char *filespec, POVMSObjectPtr obj)
                 // if nothing else was appropriate, assume it is some other kind of string requiring special attention
                 if(err == kFalseErr)
                 {
-                    char *plainstring = NULL;
+                    char *plainstring = nullptr;
 
                     if((token != '\"') && (token != '\''))
                     {
@@ -185,9 +181,9 @@ int ProcessOptions::ParseFile(const char *filespec, POVMSObjectPtr obj)
                         plainstring = Parse_INI_String(file, -2, true);
 
                         // see if it is probably a standard INI file entry which wasn't recognised
-                        if(plainstring != NULL)
+                        if (plainstring != nullptr)
                         {
-                            if(strchr(plainstring, '=') != NULL)
+                            if (strchr(plainstring, '=') != nullptr)
                                 err = kParseErr;
                         }
                     }
@@ -197,7 +193,7 @@ int ProcessOptions::ParseFile(const char *filespec, POVMSObjectPtr obj)
                     if(err == kFalseErr)
                         err = ProcessUnknownString(plainstring, obj);
 
-                    if(plainstring != NULL)
+                    if (plainstring != nullptr)
                         delete[] plainstring;
                 }
             }
@@ -206,7 +202,7 @@ int ProcessOptions::ParseFile(const char *filespec, POVMSObjectPtr obj)
         // all errors here are non-fatal, the calling code has to decide if an error is fatal
         if(err != kNoErr)
         {
-            if(currentsection != NULL)
+            if (currentsection != nullptr)
             {
                 ParseErrorAt(file,
                              "Cannot continue to process INI file '%s' due to a parse error in line %d section '%s'.\n"
@@ -224,17 +220,17 @@ int ProcessOptions::ParseFile(const char *filespec, POVMSObjectPtr obj)
             }
         }
 
-        if(currentsection != NULL)
+        if (currentsection != nullptr)
             delete[] currentsection;
     }
 
-    if(filename != NULL)
+    if (filename != nullptr)
         delete[] filename;
 
-    if(sectionname != NULL)
+    if (sectionname != nullptr)
         delete[] sectionname;
 
-    if(file != NULL)
+    if (file != nullptr)
         delete file;
 
     return err;
@@ -263,10 +259,10 @@ int ProcessOptions::ParseString(const char *commandline, POVMSObjectPtr obj, boo
             // switch
             case '+':
             case '-':
-            // system specific switch on some systems (i.e. Windos)
-            #if(FILENAME_SEPARATOR != '/')
+#if (POV_SLASH_IS_SWITCH_CHARACTER)
+            // POV-Ray-style INI file with system specific command-line switch on some systems (e.g. Windos)
             case '/':
-            #endif
+#endif
                 commandline++;
                 err = Parse_CL_Switch(commandline, *(commandline - 1), obj, singleswitch);
                 break;
@@ -291,7 +287,7 @@ int ProcessOptions::ParseString(const char *commandline, POVMSObjectPtr obj, boo
         if(err == kFalseErr)
         {
             int chr = *commandline;
-            char *plainstring = NULL;
+            char *plainstring = nullptr;
 
             if((chr == '\"') || (chr == '\''))
             {
@@ -307,7 +303,7 @@ int ProcessOptions::ParseString(const char *commandline, POVMSObjectPtr obj, boo
                 plainstring = Parse_CL_String(commandline, -2);
 
                 // check if it is probably a standard INI file entry which wasn't recognised
-                if((plainstring != NULL) && (strchr(plainstring, '=') != NULL))
+                if ((plainstring != nullptr) && (strchr(plainstring, '=') != nullptr))
                 {
                     err = kParseErr;
                     commandline = oldcmdline; // so it will be printed
@@ -319,7 +315,7 @@ int ProcessOptions::ParseString(const char *commandline, POVMSObjectPtr obj, boo
             if(err == kFalseErr)
                 err = ProcessUnknownString(plainstring, obj);
 
-            if(plainstring != NULL)
+            if (plainstring != nullptr)
                 delete[] plainstring;
         }
     }
@@ -350,9 +346,9 @@ int ProcessOptions::WriteFile(OTextStream *ini_file, POVMSObjectPtr obj)
     struct INI_Parser_Table *table = parse_ini_table;
 
     // find the keyword
-    while(table->keyword != NULL)
+    while (table->keyword != nullptr)
     {
-        if(WriteOptionFilter(table) == true)
+        if((table->flags & kINIOptFlag_SuppressWrite) == 0)
             Output_INI_Option(table, obj, ini_file);
         table++;
     }
@@ -365,11 +361,11 @@ int ProcessOptions::WriteFile(const char *filename, POVMSObjectPtr obj)
     OTextStream *ini_file;
     int err = kNoErr;
 
-    if(!POV_ALLOW_FILE_WRITE(filename, POV_File_Text_INI))
+    if(!pov_base::PlatformBase::GetInstance().AllowLocalFileAccess (ASCIItoUCS2String(filename), POV_File_Text_INI, true))
         return kCannotOpenFileErr;
 
     ini_file = OpenFileForWrite(filename, obj);
-    if(ini_file == NULL)
+    if (ini_file == nullptr)
         return kCannotOpenFileErr;
     err = WriteFile (ini_file, obj);
     delete ini_file;
@@ -405,28 +401,25 @@ bool ProcessOptions::Matches(const char *v1, const char *v2)
 
 int ProcessOptions::POVMSAttr_SetUTF8String(POVMSAttributePtr attr, POVMSType type, const char *s)
 {
-    UCS2 *ustr = new UCS2[strlen(s) + 1];
-    size_t len = ConvertUTF8ToUCS2(s, ustr);
-    int err = POVMSAttr_Set(attr, type, (void *)ustr, (int(len) * 2) + 2);
-
-    delete[] ustr;
-
-    return err;
+    UCS2String ustr = UTF8toUCS2String(UTF8String(s));
+    size_t len = ustr.length();
+    return POVMSAttr_Set(attr, type, (void *)ustr.c_str(), (int(len) * 2) + 2);
 }
 
-int ProcessOptions::POVMSAttr_GetUTF8String(POVMSAttributePtr attr, POVMSType type, char *s, int *maxdatasize)
+int ProcessOptions::POVMSAttr_GetUTF8String(POVMSAttributePtr attr, POVMSType type, UTF8String& s)
 {
     int ulen = 0;
     int err = POVMSAttr_Size(attr, &ulen);
-    UCS2 *ustr = new UCS2[ulen / 2 + 1];
+    UCS2 *ustr = new UCS2[ulen / 2];
 
     if(err == kNoErr)
         err = POVMSAttr_Get(attr, type, (void *)ustr, &ulen);
 
     if(err == kNoErr)
-        *maxdatasize = ConvertUCS2ToUTF8(ustr, s);
-    else
-        *maxdatasize = 0;
+    {
+        POV_FRONTEND_ASSERT(ustr[ulen / 2 - 1] == '\0');
+        ConvertUCS2ToUTF8(ustr, s);
+    }
 
     delete[] ustr;
 
@@ -435,126 +428,84 @@ int ProcessOptions::POVMSAttr_GetUTF8String(POVMSAttributePtr attr, POVMSType ty
 
 int ProcessOptions::POVMSUtil_SetUTF8String(POVMSObjectPtr object, POVMSType key, const char *s)
 {
-    UCS2 *ustr = new UCS2[strlen(s) + 1];
-    size_t len = ConvertUTF8ToUCS2(s, ustr);
-    int err = POVMSUtil_SetUCS2String(object, key, ustr);
-
-    delete[] ustr;
-
-    return err;
+    UCS2String ustr = UTF8toUCS2String(UTF8String(s));
+    return POVMSUtil_SetUCS2String(object, key, ustr.c_str());
 }
 
-const unsigned char gUTF8SequenceArray[256] =
+size_t ProcessOptions::ConvertUTF16ToUTF8(const UTF16 *char_array, UTF8String& s)
 {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-    3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5
-};
-
-const unsigned int gUTF8Offsets[6] =
-{
-    0x00000000UL,
-    0x00003080UL,
-    0x000E2080UL,
-    0x03C82080UL,
-    0xFA082080UL,
-    0x82082080UL
-};
-
-// Note that this is duplicate code, but cleaning up all the string handling is beyond the scope of POV-Ray 3.7 :-( [trf]
-size_t ProcessOptions::ConvertUTF8ToUCS2(const char *text_array, UCS2 *char_array)
-{
+    int i, len;
     UCS4 chr;
-    int i, j, k, seqlen;
-    int text_array_size = strlen(text_array);
 
-    for(i = 0, k = 0; i < text_array_size; k++, i++)
-    {
-        seqlen = gUTF8SequenceArray[text_array[i]];
-        chr = 0;
-        for(j = seqlen; j > 0; j--)
-        {
-            chr += text_array[i];
-            chr <<= 6;
-            i++;
-        }
-
-        chr += text_array[i];
-        chr -= gUTF8Offsets[seqlen];
-
-        if(chr <= 0x0000FFFFUL)
-            char_array[k] = chr;
-        else
-            char_array[k] = 0x0000FFFDUL;
-    }
-
-    char_array[k] = 0;
-
-    return k;
-}
-
-size_t ProcessOptions::ConvertUCS2ToUTF8(const UCS2 *char_array, char *text_array)
-{
-    int i, k, len;
-    unsigned int chr;
-
-    for(len = 0, i = 0; char_array[i] != 0; i++)
-    {
-        if(char_array[i] < 0x00000080)
-            len += 1;
-        else if(char_array[i] < 0x00000800)
-            len += 2;
-        else
-            len += 3;
-    }
-
-    for(i = 0, k = 0; (char_array[i] != 0) && (k < len); i++)
+    for (len = 0, i = 0; char_array[i] != '\0'; ++i)
     {
         chr = char_array[i];
-
-        if(chr < 0x00000080)
+        if ((chr >= 0xD800u) && (chr < 0xDBFFu) && (char_array[i+1] >= 0xDC00u) && (char_array[i+1] <= 0xDFFFu))
         {
-            text_array[k] = char(chr);
-            k++;
+            // surrogate pair
+            ++i;
+            chr = ((chr & 0x3FF) << 10) | (char_array[i] & 0x3FF);
         }
-        else if (chr < 0x00000800)
+        // no need to map lonely surrogates to 0xFFFD here, as it doesn't change the UTF-8 encoding length.
+
+        if (chr < 0x0080u)
+            len += 1;
+        else if (chr < 0x0800u)
+            len += 2;
+        else if (chr < 0x10000u)
+            len += 3;
+        else
+            len += 4;
+    }
+
+    s.reserve(len);
+
+    for (i = 0; char_array[i] != 0; ++i)
+    {
+        chr = char_array[i];
+        if ((chr >= 0xD800u) && (chr < 0xDBFFu) && (char_array[i+1] >= 0xDC00u) && (char_array[i+1] <= 0xDFFFu))
         {
-            text_array[k] = ((chr >> 6) | 0xC0);
-            k++;
-            text_array[k] = ((chr | 0x80) & 0xBF);
-            k++;
+            // surrogate pair
+            ++i;
+            chr = ((chr & 0x3FF) << 10) | (char_array[i] & 0x3FF);
+        }
+        else if ((chr >= 0xD800u) && (chr < 0xDBFFu))
+            // unmatched surrogate; can't represent in well-formed UTF-8.
+            chr = 0xFFFDu;
+
+        if(chr < 0x0080u)
+        {
+            s.push_back(char(chr));
+        }
+        else if (chr < 0x0800u)
+        {
+            s.push_back(char((chr >> 6) | 0xC0));
+            s.push_back(char((chr & 0x3F) | 0x80));
+        }
+        else if (chr < 0x10000u)
+        {
+            s.push_back(char((chr >> 12) | 0xE0));
+            s.push_back(char(((chr >> 6) & 0x3F) | 0x80));
+            s.push_back(char((chr & 0x3F) | 0x80));
         }
         else
         {
-            if(chr >= 0x00010000)
-                chr = (unsigned int)0x0000FFFDUL;
-
-            text_array[k] = ((chr >> 12) | 0xE0);
-            k++;
-            text_array[k] = (((chr >> 6) | 0x80) & 0xBF);
-            k++;
-            text_array[k] = ((chr | 0x80) & 0xBF);
-            k++;
+            s.push_back(char((chr >> 18) | 0xF0));
+            s.push_back(char(((chr >> 12) & 0x3F) | 0x80));
+            s.push_back(char(((chr >> 6) & 0x3F) | 0x80));
+            s.push_back(char((chr & 0x3F) | 0x80));
         }
     }
-
-    text_array[k] = 0;
 
     return size_t(len);
 }
+
+size_t ProcessOptions::ConvertUCS2ToUTF8(const UCS2 *char_array, UTF8String& s)
+{
+    // UCS2 is effectively a subset of UTF16.
+    return ConvertUTF16ToUTF8(reinterpret_cast<const UTF16*>(char_array), s);
+}
+
 
 int ProcessOptions::ReadSpecialOptionHandler(INI_Parser_Table *, char *, POVMSObjectPtr)
 {
@@ -572,12 +523,6 @@ int ProcessOptions::WriteSpecialOptionHandler(INI_Parser_Table *, POVMSObjectPtr
 {
     // do nothing by default
     return kNoErr;
-}
-
-bool ProcessOptions::WriteOptionFilter(INI_Parser_Table *)
-{
-    // filter nothing out by default
-    return true;
 }
 
 bool ProcessOptions::ProcessUnknownSwitch(char *, char *, POVMSObjectPtr)
@@ -598,7 +543,7 @@ void ProcessOptions::ParseError(const char *format, ...)
     char error_buffer[1024];
 
     va_start(marker, format);
-    vsnprintf(error_buffer, 1023, format, marker);
+    std::vsnprintf(error_buffer, sizeof(error_buffer), format, marker);
     va_end(marker);
 
     fprintf(stderr, "%s\n", error_buffer);
@@ -610,7 +555,7 @@ void ProcessOptions::ParseErrorAt(ITextStream *file, const char *format, ...)
     char error_buffer[1024];
 
     va_start(marker, format);
-    vsnprintf(error_buffer, 1023, format, marker);
+    std::vsnprintf(error_buffer, sizeof(error_buffer), format, marker);
     va_end(marker);
 
     fprintf(stderr, "%s\nFile '%s' at line '%u'", error_buffer, UCS2toASCIIString(file->name()).c_str(), (unsigned int) file->line());
@@ -622,7 +567,7 @@ void ProcessOptions::WriteError(const char *format, ...)
     char error_buffer[1024];
 
     va_start(marker, format);
-    vsnprintf(error_buffer, 1023, format, marker);
+    std::vsnprintf(error_buffer, sizeof(error_buffer), format, marker);
     va_end(marker);
 
     fprintf(stderr, "%s\n", error_buffer);
@@ -683,11 +628,9 @@ int ProcessOptions::Output_INI_Option(INI_Parser_Table *option, POVMSObjectPtr o
             err = POVMSAttr_Size(&item, &l);
             if(l > 0)
             {
-                bufptr = new char[l * 3];
-                bufptr[0] = 0;
-                if(POVMSAttr_GetUTF8String(&item, kPOVMSType_UCS2String, bufptr, &l) == 0)
-                    file->printf("%s=\"%s\"\n", option->keyword, bufptr);
-                delete[] bufptr;
+                UTF8String buf;
+                if (POVMSAttr_GetUTF8String(&item, kPOVMSType_UCS2String, buf) == 0)
+                    file->printf("%s=\"%s\"\n", option->keyword, buf.c_str());
             }
             (void)POVMSAttr_Delete(&item);
             break;
@@ -710,7 +653,7 @@ int ProcessOptions::Parse_INI_Specification(const char *filespec, char *&filenam
     const char *sectionpos = strchr(filespec, '[');
 
     // if there is no section string, this is the whole filename
-    if(sectionpos == NULL)
+    if (sectionpos == nullptr)
     {
         filename = new char[strlen(filespec) + 1];
         strcpy(filename, filespec);
@@ -721,7 +664,7 @@ int ProcessOptions::Parse_INI_Specification(const char *filespec, char *&filenam
         const char *sectionend = strchr(filespec, ']');
 
         // if there was no section end, this file specification is invalid
-        if(sectionend == NULL)
+        if (sectionend == nullptr)
             return kParamErr;
         // if there valid section specification, use it
         else
@@ -810,21 +753,21 @@ int ProcessOptions::Parse_INI_Skip_Line(ITextStream *file)
 int ProcessOptions::Parse_INI_Option(ITextStream *file, POVMSObjectPtr obj)
 {
     struct INI_Parser_Table *table = parse_ini_table;
-    char *value = NULL;
-    char *key = NULL;
+    char *value = nullptr;
+    char *key = nullptr;
     int chr = 0;
     int err = kNoErr;
 
     // read the key string
     key = Parse_INI_String(file);
-    if(key == NULL)
+    if (key == nullptr)
     {
         ParseErrorAt(file, "Expected key in INI file, no key was found.");
         return kParseErr;
     }
 
     // find the keyword
-    while(table->keyword != NULL)
+    while (table->keyword != nullptr)
     {
         if(pov_stricmp(table->keyword, key) == 0)
             break;
@@ -832,7 +775,7 @@ int ProcessOptions::Parse_INI_Option(ITextStream *file, POVMSObjectPtr obj)
     }
 
     // return if no valid keyword has been found
-    if(table->keyword == NULL)
+    if (table->keyword == nullptr)
     {
         ParseErrorAt(file, "Unknown key '%s' in INI file.", key);
         delete[] key;
@@ -841,7 +784,7 @@ int ProcessOptions::Parse_INI_Option(ITextStream *file, POVMSObjectPtr obj)
     else
     {
         delete[] key;
-        key = NULL;
+        key = nullptr;
     }
 
     // skip any spaces
@@ -881,7 +824,7 @@ int ProcessOptions::Parse_INI_Option(ITextStream *file, POVMSObjectPtr obj)
         }
     }
 
-    if(value == NULL)
+    if (value == nullptr)
     {
         ParseErrorAt(file, "Expected value in INI file, no value was found.");
         return kParseErr;
@@ -893,7 +836,7 @@ int ProcessOptions::Parse_INI_Option(ITextStream *file, POVMSObjectPtr obj)
         err = Process_INI_Option(table, value, obj);
 
     delete[] value;
-    value = NULL;
+    value = nullptr;
 
     // skip any spaces
     (void)Parse_INI_Skip_Space(file, false);
@@ -919,7 +862,7 @@ int ProcessOptions::Parse_INI_Option(ITextStream *file, POVMSObjectPtr obj)
                 value = Parse_INI_String(file, -2);
             }
 
-            if(value == NULL)
+            if (value == nullptr)
             {
                 ParseErrorAt(file, "Expected value in INI file, no value was found.");
                 return kParseErr;
@@ -927,7 +870,7 @@ int ProcessOptions::Parse_INI_Option(ITextStream *file, POVMSObjectPtr obj)
 
             err = Process_INI_Option(table, value, obj);
             delete[] value;
-            value = NULL;
+            value = nullptr;
 
             // skip any spaces
             (void)Parse_INI_Skip_Space(file, false);
@@ -950,33 +893,33 @@ int ProcessOptions::Parse_INI_Option(ITextStream *file, POVMSObjectPtr obj)
 int ProcessOptions::Parse_INI_Switch(ITextStream *file, int token, POVMSObjectPtr obj)
 {
     struct Cmd_Parser_Table *table = parse_cmd_table;
-    char *value = NULL;
-    char *key = NULL;
+    char *value = nullptr;
+    char *key = nullptr;
     int err = kNoErr;
     int chr = 0;
 
     // read the switch string
     key = Parse_INI_String(file);
-    if(key == NULL)
+    if (key == nullptr)
     {
         ParseErrorAt(file, "Expected command-line switch in INI file, no command-line switch was found.");
         err = kParseErr;
     }
     else
     {
-        // if there is a quoted string directory following the switch, parse it matching quotes
+        // if there is a quoted string directly following the switch, parse it, matching quotes
         chr = file->getchar();
         if((chr == '\"') || (chr == '\''))
         {
             value = Parse_INI_String(file, chr);
-            if(value == NULL)
+            if (value == nullptr)
                 ParseErrorAt(file, "Expected command-line switch in INI file to be followed by quoted parameter.");
         }
         else
             file->ungetchar(chr);
 
         // find the command-line switch
-        while(table->command != NULL)
+        while (table->command != nullptr)
         {
             char *srcptr = key;
             const char *dstptr = table->command;
@@ -992,31 +935,36 @@ int ProcessOptions::Parse_INI_Switch(ITextStream *file, int token, POVMSObjectPt
             if((*dstptr) == 0)
             {
                 // if there was a quoted value string and the switch string is longer, this is an unknown switch
-                if((value != NULL) && (*srcptr != 0))
+                if ((value != nullptr) && (*srcptr != 0))
                 {
-                    table = NULL;
+                    table = nullptr;
                     break;
                 }
                 // if there was a quoted value string and the switch matches, use the value string as parameter
-                else if((value != NULL) && (*srcptr == 0))
+                else if ((value != nullptr) && (*srcptr == 0))
                     srcptr = value;
 
-                // only if a paremeter is expected allow it, and vice versa
-                if(((*srcptr > ' ') && (table->type != kPOVMSType_Null)) || ((*srcptr <= ' ') && (table->type == kPOVMSType_Null)))
+                // only if a parameter is expected allow it, and vice versa
+                if ((table->flags & kCmdOptFlag_Optional) ||
+                    ((*srcptr >  ' ') && (table->type != kPOVMSType_Null)) ||
+                    ((*srcptr <= ' ') && (table->type == kPOVMSType_Null)))
                 {
                     err = Process_Switch(table, srcptr, obj, (token != '-'));
-                    break;
                 }
+
+                // We're aborting the search now either way, because due how the table is supposed to be sorted,
+                // if the switch would match another entry we should have encountered that one earlier.
+                break;
             }
             table++;
         }
 
-        // if there was no sucessful match so far, see if it is a system specific switch
-        if((table == NULL) || (table->command == NULL))
+        // if there was no successful match so far, see if it is a system specific switch
+        if ((table == nullptr) || (table->command == nullptr))
         {
             if(ProcessUnknownSwitch(key, value, obj) == false)
             {
-                if(value != NULL)
+                if (value != nullptr)
                     ParseErrorAt(file, "Unknown switch '%s' with value '%s' in INI file.", key, value);
                 else
                     ParseErrorAt(file, "Unknown switch '%s' in INI file.", key);
@@ -1027,9 +975,9 @@ int ProcessOptions::Parse_INI_Switch(ITextStream *file, int token, POVMSObjectPt
         }
     }
 
-    if(key != NULL)
+    if (key != nullptr)
         delete[] key;
-    if(value != NULL)
+    if (value != nullptr)
         delete[] value;
 
     return err;
@@ -1169,7 +1117,7 @@ bool ProcessOptions::Parse_INI_String_Smartmode(ITextStream *file)
     ITextStream::FilePos backtrackpos = file->tellg();
     bool result = false; // false - end string here, true - continue parsing string
     struct INI_Parser_Table *table = parse_ini_table;
-    char *key = NULL;
+    char *key = nullptr;
 
     (void)Parse_INI_Skip_Space(file, false);
 
@@ -1192,10 +1140,10 @@ bool ProcessOptions::Parse_INI_String_Smartmode(ITextStream *file)
         // POV-Ray-style INI file with command-line switch
         case '+':
         case '-':
-        // POV-Ray-style INI file with system specific command-line switch on some systems (i.e. Windos)
-        #if(FILENAME_SEPARATOR != '/')
+#if (POV_SLASH_IS_SWITCH_CHARACTER)
+        // POV-Ray-style INI file with system specific command-line switch on some systems (e.g. Windos)
         case '/':
-        #endif
+#endif
             if(isalpha(file->getchar()))
                 break; // return false, this is most likely a command-line
             else
@@ -1204,10 +1152,10 @@ bool ProcessOptions::Parse_INI_String_Smartmode(ITextStream *file)
         default:
             // read the key string
             key = Parse_INI_String(file);
-            if(key != NULL)
+            if (key != nullptr)
             {
                 // find the keyword
-                while(table->keyword != NULL)
+                while (table->keyword != nullptr)
                 {
                     if(pov_stricmp(table->keyword, key) == 0)
                         break;
@@ -1215,7 +1163,7 @@ bool ProcessOptions::Parse_INI_String_Smartmode(ITextStream *file)
                 }
 
                 // if no valid keyword has been found
-                if(table->keyword == NULL)
+                if (table->keyword == nullptr)
                 {
                     result = true; // return true, this is most likely an unquoted path
                     ParseErrorAt(file,
@@ -1225,7 +1173,7 @@ bool ProcessOptions::Parse_INI_String_Smartmode(ITextStream *file)
                 }
 
                 delete[] key;
-                key = NULL;
+                key = nullptr;
             }
             break; // return false, unless the code above did not find a valid keyword
     }
@@ -1250,8 +1198,8 @@ void ProcessOptions::Parse_CL_Skip_Space(const char *&commandline)
 int ProcessOptions::Parse_CL_Switch(const char *&commandline, int token, POVMSObjectPtr obj, bool singleswitch)
 {
     struct Cmd_Parser_Table *table = parse_cmd_table;
-    char *value = NULL;
-    char *key = NULL;
+    char *value = nullptr;
+    char *key = nullptr;
     int err = kNoErr;
     int chr = 0;
 
@@ -1260,27 +1208,27 @@ int ProcessOptions::Parse_CL_Switch(const char *&commandline, int token, POVMSOb
         key = Parse_CL_String(commandline);
     else
         key = Parse_CL_String(commandline, 0);
-    if(key == NULL)
+    if (key == nullptr)
     {
         ParseError("Expected command-line switch on command-line, no command-line switch was found.");
         err = kParseErr;
     }
     else
     {
-        // if there is a quoted string directly following the switch, parse its matching quotes
+        // if there is a quoted string directly following the switch, parse it, matching quotes
         chr = *commandline;
         commandline++;
         if((chr == '\"') || (chr == '\''))
         {
             value = Parse_CL_String(commandline, chr);
-            if(value == NULL)
+            if (value == nullptr)
                 ParseError("Expected command-line switch on command-line to be followed by quoted parameter.");
         }
         else
             commandline--;
 
         // find the command-line switch
-        while(table->command != NULL)
+        while (table->command != nullptr)
         {
             char *srcptr = key;
             const char *dstptr = table->command;
@@ -1296,31 +1244,36 @@ int ProcessOptions::Parse_CL_Switch(const char *&commandline, int token, POVMSOb
             if((*dstptr) == 0)
             {
                 // if there was a quoted value string and the switch string is longer, this is an unknown switch
-                if((value != NULL) && (*srcptr != 0))
+                if ((value != nullptr) && (*srcptr != 0))
                 {
-                    table = NULL;
+                    table = nullptr;
                     break;
                 }
                 // if there was a quoted value string and the switch matches, use the value string as parameter
-                else if((value != NULL) && (*srcptr == 0))
+                else if ((value != nullptr) && (*srcptr == 0))
                     srcptr = value;
 
-                // only if a paremeter is expected allow it, and vice versa
-                if(((*srcptr > ' ') && (table->type != kPOVMSType_Null)) || ((*srcptr <= ' ') && (table->type == kPOVMSType_Null)))
+                // only if a parameter is expected allow it, and vice versa
+                if ((table->flags & kCmdOptFlag_Optional) ||
+                    ((*srcptr >  ' ') && (table->type != kPOVMSType_Null)) ||
+                    ((*srcptr <= ' ') && (table->type == kPOVMSType_Null)))
                 {
                     err = Process_Switch(table, srcptr, obj, (token != '-'));
-                    break;
                 }
+
+                // We're aborting the search now either way, because due how the table is supposed to be sorted,
+                // if the switch would match another entry we should have encountered that one earlier.
+                break;
             }
             table++;
         }
 
         // if there was no successful match so far, see if it is a system specific switch
-        if((table == NULL) || (table->command == NULL))
+        if ((table == nullptr) || (table->command == nullptr))
         {
             if(ProcessUnknownSwitch(key, value, obj) == false)
             {
-                if(value != NULL)
+                if (value != nullptr)
                     ParseError("Unknown switch '%s' with value '%s' on command-line.", key, value);
                 else
                     ParseError("Unknown switch '%s' on command-line.", key);
@@ -1331,9 +1284,9 @@ int ProcessOptions::Parse_CL_Switch(const char *&commandline, int token, POVMSOb
         }
     }
 
-    if(key != NULL)
+    if (key != nullptr)
         delete[] key;
-    if(value != NULL)
+    if (value != nullptr)
         delete[] value;
 
     return err;
@@ -1342,21 +1295,21 @@ int ProcessOptions::Parse_CL_Switch(const char *&commandline, int token, POVMSOb
 int ProcessOptions::Parse_CL_Option(const char *&commandline, POVMSObjectPtr obj, bool singleswitch)
 {
     struct INI_Parser_Table *table = parse_ini_table;
-    char *value = NULL;
-    char *key = NULL;
+    char *value = nullptr;
+    char *key = nullptr;
     char chr = 0;
     int err = kNoErr;
 
     // read the key string
     key = Parse_CL_String(commandline);
-    if(key == NULL)
+    if (key == nullptr)
     {
         ParseError("Expected INI file key on command-line, no key was found.");
         return kParseErr;
     }
 
     // find the keyword
-    while(table->keyword != NULL)
+    while (table->keyword != nullptr)
     {
         if(pov_stricmp(table->keyword, key) == 0)
             break;
@@ -1364,7 +1317,7 @@ int ProcessOptions::Parse_CL_Option(const char *&commandline, POVMSObjectPtr obj
     }
 
     // return false if no valid keyword has been found
-    if(table->keyword == NULL)
+    if (table->keyword == nullptr)
     {
         delete[] key;
         return kParseErr;
@@ -1372,7 +1325,7 @@ int ProcessOptions::Parse_CL_Option(const char *&commandline, POVMSObjectPtr obj
     else
     {
         delete[] key;
-        key = NULL;
+        key = nullptr;
     }
 
     // expect the equal sign
@@ -1394,7 +1347,7 @@ int ProcessOptions::Parse_CL_Option(const char *&commandline, POVMSObjectPtr obj
     else
         value = Parse_CL_String(commandline, 0);
 
-    if(value == NULL)
+    if (value == nullptr)
     {
         ParseError("Expected value on command-line, no value was found.");
         return kParseErr;
@@ -1402,7 +1355,7 @@ int ProcessOptions::Parse_CL_Option(const char *&commandline, POVMSObjectPtr obj
 
     err = Process_INI_Option(table, value, obj);
     delete[] value;
-    value = NULL;
+    value = nullptr;
 
     return err;
 }
@@ -1497,6 +1450,10 @@ int ProcessOptions::Process_Switch(Cmd_Parser_Table *option, char *param, POVMSO
         if(err != kNoErr)
             return err;
     }
+
+    // If parameter is optional and none is specified by the user, we're done.
+    if ((option->flags & kCmdOptFlag_Optional) && (*param < ' '))
+        return err;
 
     switch(option->type)
     {

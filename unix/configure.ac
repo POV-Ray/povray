@@ -1,11 +1,13 @@
 ##############################################################################
-#               configure.ac
+#
+# configure.ac
 #
 # Process this file with autoconf to produce the configure script.
 #
 # ---------------------------------------------------------------------------
-# Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-# Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
+#
+# Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+# Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 #
 # POV-Ray is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -19,30 +21,28 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 #---------------------------------------------------------------------------
+#
 # POV-Ray is based on the popular DKB raytracer version 2.12.
 # DKBTrace was originally written by David K. Buck.
 # DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
-#---------------------------------------------------------------------------
-# $File: N/A $
-# $Revision: N/A $
-# $Change: N/A $
-# $DateTime: N/A $
-# $Author: N/A $
-# $Log$
+#
 ##############################################################################
 
-# configure.ac for the source distribution of POV-Ray 3.7 for UNIX
+# configure.ac for the source distribution of POV-Ray v3.8 for UNIX
+# Report bugs via https://github.com/POV-Ray/povray/issues
+#
+# Based on configure.ac from POV-Ray v3.7
 # Written by Nicolas Calimet <nicolas.calimet@povray.org>
-# Report bugs via http://bugs.povray.org/
-# Based on configure.ac from POV-Ray 3.6
+# Based on configure.ac from POV-Ray v3.6
 
 # Required autoconf version.
-AC_PREREQ(2.59)
+AC_PREREQ(2.68)
 
 # Inits.
 
-# The file VERSION must contain only the version string MAJOR.MINOR(.PATCHLEVEL)
+# The file VERSION must contain only the version string MAJOR.MINOR.REVISION(.PATCHLEVEL)(-PRERELEASE)
 AC_INIT([POV-Ray], m4_normalize(m4_include([VERSION])), [unix-bugreports-2011@povray.org], [povray])
 
 # VERSION_BASE is then defined as MAJOR.MINOR
@@ -54,12 +54,16 @@ AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_SRCDIR([unix/disp_text.cpp])
 
 # Additional autoconf macros.
-m4_include([unix/config/acx_pthread.m4])
+# Those required by other macros go first.
+m4_include([unix/config/ax_require_defined.m4])
+# The remainder we're sorting alphabetically.
+m4_include([unix/config/ax_pthread.m4])
 m4_include([unix/config/ax_arg_enable.m4])
 m4_include([unix/config/ax_arg_with.m4])
 m4_include([unix/config/ax_boost_base.m4])
 m4_include([unix/config/ax_boost_thread.m4])
 m4_include([unix/config/ax_test_compiler_flags.m4])
+m4_include([unix/config/ax_check_compile_flag.m4])
 m4_include([unix/config/ax_check_lib.m4])
 m4_include([unix/config/ax_check_libjpeg.m4])
 m4_include([unix/config/ax_check_libsdl.m4])
@@ -68,6 +72,7 @@ m4_include([unix/config/ax_check_openexr.m4])
 m4_include([unix/config/ax_compare_version.m4])
 m4_include([unix/config/ax_compiler_vendor.m4])
 m4_include([unix/config/ax_compiler_version.m4])
+m4_include([unix/config/ax_cxx_compile_stdcxx.m4])
 m4_include([unix/config/ax_fix_incorrect_path.m4])
 m4_include([unix/config/ax_prog_ld_static.m4])
 m4_include([unix/config/ax_x86_arch.m4])
@@ -83,6 +88,7 @@ required_libsdl_version="1.2"
 required_openexr_version="1.2"
 
 # Supported options.
+# AX_ARG_ENABLE([--enable-avx2],             [enable AVX2 features and compiler optmization])
 AX_ARG_ENABLE([--enable-watch-cursor],     [enable a watch cursor over the display while rendering (X Window only)])
 AX_ARG_ENABLE([--enable-debug],            [enable compiler debugging mode])
 AX_ARG_ENABLE([--enable-profile],          [enable program execution profiling])
@@ -103,7 +109,7 @@ AX_ARG_WITH([--with-libsdl],        [DIR], [use the SDL library (in directory DI
 AX_ARG_WITH([--with-libmkl],        [DIR], [use the Intel(R) Math Kernel Library (in directory DIR)])
 AX_ARG_WITH([--with-openexr],       [DIR], [use the OpenEXR library (in directory DIR)]) 
 
-AC_ARG_VAR([COMPILED_BY], [customize the "unofficial version" message (required argument)])
+AC_ARG_VAR([COMPILED_BY], [customize the "unofficial version" message])
 AC_ARG_VAR([NON_REDISTRIBUTABLE_BUILD], [see the installation documentation])
 AC_ARG_VAR([C99_COMPATIBLE_RADIOSITY], [adapt radiosity code to non-IEEE 754 floating point, requires ISO C99 compiler and library (see octree.cpp for details)])
 
@@ -116,29 +122,7 @@ rm -f ./povray.ini
 
 # Instruction message.
 if test x"$COMPILED_BY" = x""; then
-  echo "
-Welcome to the $PACKAGE_NAME $PACKAGE_VERSION configure script.
-
-This script will prepare the source distribution of $PACKAGE_NAME $PACKAGE_VERSION for Unix
-for compilation on this machine.  Compiling the program yourself means
-that the POV-Ray Team(tm) is not responsible for supporting this
-version, no matter if it is the unmodified official POV-Ray source code
-or a customized version.  Refer to the POV-Ray source license conditions
-that come with this package.
-
-In order to start configuration, you have to provide a valid contact
-information that will be included in the executable and displayed
-whenever POV-Ray (or a modified version of it) is started.  In case
-you intend to distribute this binary, this information will help users
-to contact the appropriate maintainers.  To start configuring $PACKAGE_NAME
-type in the following command with your own contact information:
-
-./configure COMPILED_BY=\"your name <email@address>\"
-
-Please consult the INSTALL file for additional configuration and
-installation instructions.
-"
-  exit 1
+  COMPILED_BY="$USER <no contact address>"
 fi
 
 pov_no_distrib="${NON_REDISTRIBUTABLE_BUILD:-no}"
@@ -172,6 +156,8 @@ AM_MAINTAINER_MODE
 AX_FIX_INCORRECT_PATH(C_INCLUDE_PATH, ".", [pov_warn_path="$pov_warn_path C_INCLUDE_PATH"])
 AX_FIX_INCORRECT_PATH(CPLUS_INCLUDE_PATH, ".", [pov_warn_path="$pov_warn_path CPLUS_INCLUDE_PATH"])
 
+AM_PROG_AR
+
 
 ###############################################################################
 
@@ -203,6 +189,7 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM],
   ]
 )
 AC_PROG_CXXCPP
+AX_CXX_COMPILE_STDCXX(11)
 
 AX_COMPILER_VENDOR
 AX_COMPILER_VERSION
@@ -217,14 +204,28 @@ pov_built_for="$host"  # default
 AC_DEFINE_UNQUOTED([BUILD_ARCH], ["$build"], [Build architecture.])
 AC_DEFINE_UNQUOTED([COMPILER_VENDOR], ["$pov_compiler_vendor"], [Compiler vendor.])
 AC_DEFINE_UNQUOTED([COMPILER_VERSION], ["$pov_compiler_version"], [Compiler version.])
-AC_DEFINE_UNQUOTED([COMPILER_VER], [" ($pov_compiler_version @ $build)"], [Compiler version (processed).])
-
+AC_DEFINE_UNQUOTED([POV_COMPILER_INFO], ["$pov_compiler_version @ $build"], [Compiler version (processed).])
 
 
 # Not necessary when AM_MAINTAINER_MODE is called above.
 ###AC_PROG_MAKE_SET
 
 AC_PROG_RANLIB
+
+
+AC_MSG_CHECKING([for stat format option])
+echo "trying stat --format='%u,%g' ." >>config.log
+if stat --format='%u,%g' . >>config.log 2>>config.log && test x`stat --format=Foo .` = x"Foo"; then
+  stat_format="--format="
+else
+  echo "trying stat --f '%u,%g' ." >>config.log
+  if stat -f '%u,%g' . >>config.log 2>>config.log && test x`stat -f Foo .` = x"Foo"; then
+    stat_format="-f "
+  else
+    AC_MSG_FAILURE([stat command does not behave as required])
+  fi
+fi
+AC_MSG_RESULT([$stat_format])
 
 
 ###############################################################################
@@ -292,7 +293,7 @@ if test ! `$CXX -v < /dev/null 2> /dev/null`; then
 fi
 
 # Posix threads
-ACX_PTHREAD
+AX_PTHREAD
 CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"  # append
 LIBS="$LIBS $PTHREAD_CFLAGS $PTHREAD_LIBS"  # append
 
@@ -314,18 +315,21 @@ for extralib in '' '-lboost_system'
 do
   LIBS=$SAVED_LIBS
   LIBS="$LIBS $extralib"
-AC_RUN_IFELSE(
-  [AC_LANG_PROGRAM([[
-#include <boost/thread/thread.hpp>
-    ]],
-    [[boost::defer_lock_t(); return 0;]])],
-  [
+  AC_RUN_IFELSE([
+    AC_LANG_PROGRAM([[
+      #include <boost/thread/thread.hpp>
+    ]],[[
+      boost::mutex m;
+      boost::defer_lock_t();
+      return 0;
+    ]])
+  ],[
     AC_MSG_RESULT([yes])
     BOOST_THREAD_LIB="$BOOST_THREAD_LIB $extralib"
     boost_thread_links=1
-  ],,
-  [AC_MSG_RESULT([cross-compiling])]  # FIXME
-)
+  ],,[
+    AC_MSG_RESULT([cross-compiling])  # FIXME
+  ])
   if test $boost_thread_links = '1'; then
     break
   fi
@@ -409,9 +413,6 @@ else
   if test x"$ax_check_libjpeg" != x"ok"; then
     AC_MSG_ERROR([cannot find a suitable JPEG library])
   else
-    # create jversion.h in builddir
-    test -d "./source" || mkdir ./source
-    echo "#define JVERSION \"${ax_check_libjpeg_version}\"" > ./source/jversion.h
     pov_libjpeg=ok
   fi
 fi
@@ -511,6 +512,16 @@ else
     fi
   fi
 
+#  AM_CONDITIONAL([BUILD_AVX2], [test x$enable_avx2 = xyes])
+#  if test x"$enable_avx2" = x"yes"; then
+#    AC_MSG_RESULT([yes])
+#    AC_DEFINE([ENABLE_AVX2], [],[Enable AVX2 features and compiler optimization])
+#
+#    CXXFLAGS="$CXXFLAGS -mavx2 -mfma"  # append
+#  else
+#    AC_MSG_RESULT([no])
+#  fi
+
   ### Note from Warp <warp@tag.povray.org> :
   # Using "-static" for static linking in Solaris causes a linkage error.
   # For some reason the X libraries in Solaris are not designed for static
@@ -580,23 +591,6 @@ AC_LANG_POP([C])
 #AC_FUNC_STRFTIME  # FIXME
 #AC_FUNC_VPRINTF   # FIXME
 
-# vsnprintf <stdarg.h> (C99)
-AC_CHECK_FUNC([vsnprintf],
-  [],
-  [AC_MSG_ERROR([
-*** This system does not provide the C99 vsnprintf() function which
-*** is required to compile $PACKAGE_NAME.  You should consider updating
-*** your C library as it is too old.  Alternatively you might install
-*** a specific library implementing the (v)snprintf family of functions.
-*** Searching the web should give you appropriate pointers.
-***
-*** In case you want to try compiling $PACKAGE_NAME while your system lacks
-*** this function (meaning that compilation *will* fail unless you provide
-*** a replacement function), try the --disable-vsnprintf-check option.
-])
-  ]
-)
-
 # getcwd or its equivalent with getenv <unistd.h>
 AC_LANG_PUSH([C])
 AC_CHECK_FUNCS([getcwd],
@@ -640,11 +634,22 @@ fi
 # nanosleep <time.h>
 AC_CHECK_FUNCS([nanosleep])
 
-# clock_gettime <time.h>
-AC_CHECK_FUNCS([clock_gettime])
+# usleep and related <unistd.h>
+AC_CHECK_FUNCS([usleep])
+AC_CHECK_TYPES([useconds_t])
 
-# getrusage <sys/resource.h>
+# clock_gettime and related <time.h>
+AC_CHECK_FUNCS([clock_gettime])
+AC_CHECK_DECLS([CLOCK_MONOTONIC, CLOCK_REALTIME, CLOCK_PROCESS_CPUTIME_ID, CLOCK_THREAD_CPUTIME_ID],
+  [], [], [[#include <time.h>]]
+)
+AC_CHECK_TYPES([clockid_t], [], [], [[#include <time.h>]])
+
+# getrusage and related <sys/resource.h>
 AC_CHECK_FUNCS([getrusage])
+AC_CHECK_DECLS([RUSAGE_SELF, RUSAGE_THREAD, RUSAGE_LWP],
+  [], [], [[#include <sys/resource.h>]]
+)
 
 # gettimeofday <sys/time.h>
 AC_CHECK_FUNCS([gettimeofday])
@@ -956,6 +961,24 @@ fi
 
 AC_DEFINE_UNQUOTED([BUILT_FOR], ["$pov_built_for"], [Host platform.])
 
+case "$pov_built_for" in
+  i?86-* | x86_64-*)
+    pov_cpu='x86'
+    AC_DEFINE([BUILD_X86], [], [Build for x86 or x86-64 architecture])
+    AX_CHECK_COMPILE_FLAG([-mavx],  [pov_avx='-mavx'],   [pov_avx=''])
+    AX_CHECK_COMPILE_FLAG([-mavx2], [pov_avx2='-mavx2'], [pov_avx2=''])
+    AX_CHECK_COMPILE_FLAG([-mfma],  [pov_fma3='-mfma'],  [pov_fma3=''])
+    AX_CHECK_COMPILE_FLAG([-mfma4], [pov_fma4='-mfma4'], [pov_fma4=''])
+    ;;
+  *)
+    pov_cpu=''
+    ;;
+esac
+AM_CONDITIONAL([BUILD_x86], [test x"$pov_cpu" = x"x86"])
+AM_CONDITIONAL([BUILD_x86avx], [test x"$pov_avx" != x""])
+AM_CONDITIONAL([BUILD_x86avxfma4], [test x"$pov_avx" != x"" -a x"$pov_fma4" != x"" ])
+AM_CONDITIONAL([BUILD_x86avx2fma3], [test x"$pov_avx2" != x"" -a x"$pov_fma3" != x"" ])
+
 
 # Add flags specified at the command line.
 CXXFLAGS=`echo $CXXFLAGS $pov_save_cxxflags`
@@ -1181,7 +1204,7 @@ AC_RUN_IFELSE([
       ],[
         AC_MSG_RESULT([yes])
         AC_DEFINE([HAVE_INF],           [],[infinite floating point values are supported])
-        AC_DEFINE([HAVE_EMULATED_ISINF],[],[infinities can be identified by them comparing non-equal to themselves])
+        AC_DEFINE([HAVE_EMULATED_ISINF],[],[infinities can be identified by comparison to the maximum value])
       ],[
         # although double and float support infinite values, they are no use to us as we can't properly test for them,
         # so we're not setting HAVE_INF.
@@ -1212,6 +1235,7 @@ AC_CONFIG_FILES([\
   Makefile \
   source/Makefile \
   vfe/Makefile \
+  platform/Makefile \
   unix/Makefile \
 ])
 
@@ -1246,8 +1270,8 @@ AC_DEFINE_UNQUOTED([BUILTIN_XWIN_DISPLAY], ["$pov_xwin_msg"], [X Window display.
 AC_DEFINE_UNQUOTED([BUILTIN_IMG_FORMATS], ["$pov_img_fmt_builtin $pov_img_fmt_enabled"], [Supported image formats.])
 AC_DEFINE_UNQUOTED([MISSING_IMG_FORMATS], ["$pov_img_fmt_disabled"], [Unsupported image formats.])
 
-povowner=`stat --format=%u ${HOME} || stat -f %u ${HOME}`
-povgroup=`stat --format=%g ${HOME} || stat -f %g ${HOME}`
+povowner=`stat ${stat_format}%u ${HOME}`
+povgroup=`stat ${stat_format}%g ${HOME}`
 AC_SUBST([povowner])
 AC_SUBST([povgroup])
 
@@ -1302,6 +1326,7 @@ Compilation settings:
   Compiler vendor:     $pov_compiler_vendor
   Compiler version:    $pov_compiler_version
   Compiler flags:      $CXXFLAGS
+  Libraries:           $LIBS
 
 Type 'make check' to build the program and run a test render.
 Type 'make install' to install $PACKAGE_NAME on your system.

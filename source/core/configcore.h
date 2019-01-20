@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,20 +38,31 @@
 #ifndef POVRAY_CORE_CONFIGCORE_H
 #define POVRAY_CORE_CONFIGCORE_H
 
+// Pull in other compile-time config header files first
 #include "base/configbase.h"
 #include "syspovconfigcore.h"
 
-namespace pov
-{
+// C++ variants of C standard header files
+#include <cstdlib>
+
+//##############################################################################
+///
+/// @defgroup PovCoreConfig Core Compile-Time Configuration
+/// @ingroup PovCore
+/// @ingroup PovConfig
+///
+/// @{
 
 //******************************************************************************
 ///
-/// @name FixedSimpleVector Sizes
+/// @name PooledSimpleVector Sizes
+///
+/// These defines affect the initial size of some types based on @ref pov::PooledSimpleVector.
+///
+/// @todo
+///     These sizes may need tweaking.
+///
 /// @{
-///
-/// These defines affect the maximum size of some types based on @ref pov::FixedSimpleVector.
-///
-/// @todo these sizes will need tweaking.
 
 #ifndef MEDIA_VECTOR_SIZE
 #define MEDIA_VECTOR_SIZE               256
@@ -66,7 +77,7 @@ namespace pov
 #endif
 
 #ifndef LIGHT_INTERSECTION_VECTOR_SIZE
-#define LIGHT_INTERSECTION_VECTOR_SIZE  512
+#define LIGHT_INTERSECTION_VECTOR_SIZE  512 // TODO - I think this should be LIGHTSOURCE_VECTOR_SIZE*2 [CLi]
 #endif
 
 #ifndef LIGHTSOURCE_VECTOR_SIZE
@@ -81,64 +92,139 @@ namespace pov
 #define RAYINTERIOR_VECTOR_SIZE         512
 #endif
 
+/// @def POV_VECTOR_POOL_SIZE
+/// Initial size of @ref PooledSimpleVector pools.
+#ifndef POV_VECTOR_POOL_SIZE
+#define POV_VECTOR_POOL_SIZE            16
+#endif
+
+/// @def POV_SIMPLE_VECTOR
+/// Vector type optimized for performance.
+/// May be either `std::vector`, `pov::SimpleVector`, or a compatible template.
+#ifndef POV_SIMPLE_VECTOR
+#define POV_SIMPLE_VECTOR               pov::SimpleVector
+#endif
+
 /// @}
 ///
 //******************************************************************************
 
-// Default for Max_Trace_Level
+/// @def MAX_TRACE_LEVEL_DEFAULT
+/// Default for Max_Trace_Level.
+///
 #ifndef MAX_TRACE_LEVEL_DEFAULT
     #define MAX_TRACE_LEVEL_DEFAULT 5
 #endif
 
-// Upper bound for max_trace_level specified by the user
+/// @def MAX_TRACE_LEVEL_LIMIT
+/// Upper bound for max_trace_level specified by the user.
+///
 #ifndef MAX_TRACE_LEVEL_LIMIT
     #define MAX_TRACE_LEVEL_LIMIT 256
 #endif
 
-// Various numerical constants that are used in the calculations
-#ifndef EPSILON     // A small value used to see if a value is nearly zero
+//******************************************************************************
+///
+/// @name Various Numerical Constants
+///
+/// Various numerical constants that are used in the calculations.
+///
+/// @note
+///     The ideal values for these constants depend on the numerical precision
+///     of floating-point maths. The default values were chosen under the
+///     presumption that double-precision IEEE format is used.
+///
+/// @todo
+///     The algorithms using these constants need thorough reviewing. Ideally,
+///     adaptive comparisons should be used that take into account the absolute
+///     magnitude of the scene dimensions.
+///
+/// @{
+
+/// @def EPSILON
+/// A small value used to see if a value is nearly zero.
+///
+#ifndef EPSILON
     #define EPSILON 1.0e-10
 #endif
 
-#ifndef HUGE_VAL    // A very large value, can be considered infinity
+/// @def HUGE_VAL
+/// A very large value, can be considered infinity.
+///
+/// @deprecated
+///     New code portions should use proper infinities or the corresponding
+///     data types' `std::numeric_limits<>::max()` instead.
+///
+#ifndef HUGE_VAL
     #define HUGE_VAL 1.0e+17
 #endif
 
-/*
- * If the width of a bounding box in one dimension is greater than
- * the critical length, the bounding box should be set to infinite.
- */
-
+/// @def CRITICAL_LENGTH
+/// Bounding box critical length.
+///
+/// If the width of a bounding box in one dimension is greater than
+/// the critical length, the bounding box should be set to infinite.
+///
 #ifndef CRITICAL_LENGTH
     #define CRITICAL_LENGTH 1.0e+6
 #endif
 
+/// @def BOUND_HUGE
+/// Maximum lengths of a bounding box.
+///
+/// If the width of a bounding box in one dimension is greater than
+/// the critical length, the bounding box should be set to infinite.
+///
 #ifndef BOUND_HUGE  // Maximum lengths of a bounding box.
     #define BOUND_HUGE 2.0e+10
 #endif
 
-/*
- * These values determine the minimum and maximum distances
- * that qualify as ray-object intersections.
- */
-
-//#define SMALL_TOLERANCE 1.0e-6 // TODO FIXME #define SMALL_TOLERANCE 0.001
-//#define MAX_DISTANCE 1.0e+10 // TODO FIXME #define MAX_DISTANCE 1.0e7
+/// @def SMALL_TOLERANCE
+/// Minimum distance that qualifies as ray-object intersection.
+///
+/// @note
+///     Some algorithms use @ref MIN_ISECT_DEPTH instead.
+///
 #define SMALL_TOLERANCE 0.001
+
+/// @def MAX_DISTANCE
+/// Maximum distance that qualifies as ray-object intersection.
+///
 #define MAX_DISTANCE 1.0e7
 
+/// @def MIN_ISECT_DEPTH
+/// Minimum distance that qualifies as ray-object intersection.
+///
+/// @note
+///     Some algorithms use @ref SMALL_TOLERANCE instead.
+///
 #define MIN_ISECT_DEPTH 1.0e-4
 
-#ifndef INLINE_NOISE
-    #define INLINE_NOISE
-#endif
-
-#ifndef USE_FASTER_NOISE
-    #define USE_FASTER_NOISE 0
-#endif
+/// @}
+///
+//******************************************************************************
 
 #ifndef QSORT
-    #define QSORT(a,b,c,d) qsort((a),(b),(c),(d))
+    #define QSORT(a,b,c,d) std::qsort((a),(b),(c),(d))
+#endif
+
+/// @def TRY_OPTIMIZED_NOISE
+/// Whether the platform provides dynamic optimized noise.
+///
+/// Define if the platform provides one or more alternative optimized implementations of the noise
+/// generator, to be dispatched dynamically at run-time. Leave undefined otherwise.
+///
+/// @note
+///     If this macro is defined, the platform must implement the function
+///     @ref pov::TryOptimizedNoise() as declared in @ref core/material/texture.h.
+///
+#ifndef TRY_OPTIMIZED_NOISE
+    // leave undefined
+    #ifdef DOXYGEN
+        // Doxygen cannot document undefined macros; also, we want to force declaration of the
+        // TryOptimizedNoise() function.
+        #define TRY_OPTIMIZED_NOISE
+    #endif
 #endif
 
 //******************************************************************************
@@ -152,9 +238,39 @@ namespace pov
 /// zero value will disable them.
 ///
 /// It is recommended that system-specific configurations leave these settings undefined in release
-/// builds, in which case they will default to @ref POV_DEBUG unless noted otherwise.
+/// builds, in which case they will default to @ref POV_CORE_DEBUG unless noted otherwise.
 ///
 /// @{
+
+/// @def POV_BOMB_ON_ERROR
+/// Fail hard on all errors, allowing a debugger to kick in.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+/// If left undefined by system-specific configurations, this setting defaults to `0`.
+///
+/// @attention
+///     This setting is _strictly_ for debugging purposes only, and should _never ever_ be enabled
+///     in a release build!
+///
+/// @note
+///     At present, this is not yet supported by all error conditions.
+///
+#ifndef POV_BOMB_ON_ERROR
+    #define POV_BOMB_ON_ERROR 0
+#endif
+
+/// @def POV_CORE_DEBUG
+/// Default setting for enabling or disabling @ref PovCore debugging aids.
+///
+/// This setting specifies the default for all debugging switches throughout the entire module
+/// that are not explicitly enabled or disabled by system-specific configurations.
+///
+/// If left undefined by system-specific configurations, this setting defaults to @ref POV_DEBUG.
+///
+#ifndef POV_CORE_DEBUG
+    #define POV_CORE_DEBUG POV_DEBUG
+#endif
 
 /// @def POV_BLEND_MAP_DEBUG
 /// Enable run-time sanity checks for blend maps.
@@ -162,16 +278,7 @@ namespace pov
 /// Define as non-zero integer to enable, or zero to disable.
 ///
 #ifndef POV_BLEND_MAP_DEBUG
-    #define POV_BLEND_MAP_DEBUG POV_DEBUG
-#endif
-
-/// @def POV_SHAPE_DEBUG
-/// Enable run-time sanity checks for geometric shapes.
-///
-/// Define as non-zero integer to enable, or zero to disable.
-///
-#ifndef POV_SHAPE_DEBUG
-    #define POV_SHAPE_DEBUG POV_DEBUG
+    #define POV_BLEND_MAP_DEBUG POV_CORE_DEBUG
 #endif
 
 /// @def POV_PATTERN_DEBUG
@@ -180,7 +287,25 @@ namespace pov
 /// Define as non-zero integer to enable, or zero to disable.
 ///
 #ifndef POV_PATTERN_DEBUG
-    #define POV_PATTERN_DEBUG POV_DEBUG
+    #define POV_PATTERN_DEBUG POV_CORE_DEBUG
+#endif
+
+/// @def POV_PHOTONS_DEBUG
+/// Enable run-time sanity checks for photons.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_PHOTONS_DEBUG
+    #define POV_PHOTONS_DEBUG POV_CORE_DEBUG
+#endif
+
+/// @def POV_PIGMENT_DEBUG
+/// Enable run-time sanity checks for pigment handling.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_PIGMENT_DEBUG
+    #define POV_PIGMENT_DEBUG POV_CORE_DEBUG
 #endif
 
 /// @def POV_RADIOSITY_DEBUG
@@ -189,7 +314,7 @@ namespace pov
 /// Define as non-zero integer to enable, or zero to disable.
 ///
 #ifndef POV_RADIOSITY_DEBUG
-    #define POV_RADIOSITY_DEBUG POV_DEBUG
+    #define POV_RADIOSITY_DEBUG POV_CORE_DEBUG
 #endif
 
 /// @def POV_RANDOMSEQUENCE_DEBUG
@@ -198,7 +323,7 @@ namespace pov
 /// Define as non-zero integer to enable, or zero to disable.
 ///
 #ifndef POV_RANDOMSEQUENCE_DEBUG
-    #define POV_RANDOMSEQUENCE_DEBUG POV_DEBUG
+    #define POV_RANDOMSEQUENCE_DEBUG POV_CORE_DEBUG
 #endif
 
 /// @def POV_REFPOOL_DEBUG
@@ -207,7 +332,16 @@ namespace pov
 /// Define as non-zero integer to enable, or zero to disable.
 ///
 #ifndef POV_REFPOOL_DEBUG
-    #define POV_REFPOOL_DEBUG POV_DEBUG
+    #define POV_REFPOOL_DEBUG POV_CORE_DEBUG
+#endif
+
+/// @def POV_SHAPE_DEBUG
+/// Enable run-time sanity checks for geometric shapes.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_SHAPE_DEBUG
+    #define POV_SHAPE_DEBUG POV_CORE_DEBUG
 #endif
 
 /// @def POV_SUBSURFACE_DEBUG
@@ -216,7 +350,7 @@ namespace pov
 /// Define as non-zero integer to enable, or zero to disable.
 ///
 #ifndef POV_SUBSURFACE_DEBUG
-    #define POV_SUBSURFACE_DEBUG POV_DEBUG
+    #define POV_SUBSURFACE_DEBUG POV_CORE_DEBUG
 #endif
 
 /// @}
@@ -230,52 +364,72 @@ namespace pov
 ///
 /// @{
 
+#if POV_CORE_DEBUG
+    #define POV_CORE_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_CORE_ASSERT(expr) POV_ASSERT_DISABLE(expr)
+#endif
+
 #if POV_BLEND_MAP_DEBUG
     #define POV_BLEND_MAP_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_BLEND_MAP_ASSERT(expr) NO_OP
-#endif
-
-#if POV_SHAPE_DEBUG
-    #define POV_SHAPE_ASSERT(expr) POV_ASSERT_HARD(expr)
-#else
-    #define POV_SHAPE_ASSERT(expr) NO_OP
+    #define POV_BLEND_MAP_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #if POV_PATTERN_DEBUG
     #define POV_PATTERN_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_PATTERN_ASSERT(expr) NO_OP
+    #define POV_PATTERN_ASSERT(expr) POV_ASSERT_DISABLE(expr)
+#endif
+
+#if POV_PHOTONS_DEBUG
+    #define POV_PHOTONS_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_PHOTONS_ASSERT(expr) POV_ASSERT_DISABLE(expr)
+#endif
+
+#if POV_PIGMENT_DEBUG
+    #define POV_PIGMENT_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_PIGMENT_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #if POV_RADIOSITY_DEBUG
     #define POV_RADIOSITY_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_RADIOSITY_ASSERT(expr) NO_OP
+    #define POV_RADIOSITY_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #if POV_RANDOMSEQUENCE_DEBUG
     #define POV_RANDOMSEQUENCE_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_RANDOMSEQUENCE_ASSERT(expr) NO_OP
+    #define POV_RANDOMSEQUENCE_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #if POV_REFPOOL_DEBUG
     #define POV_REFPOOL_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_REFPOOL_ASSERT(expr) NO_OP
+    #define POV_REFPOOL_ASSERT(expr) POV_ASSERT_DISABLE(expr)
+#endif
+
+#if POV_SHAPE_DEBUG
+    #define POV_SHAPE_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_SHAPE_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #if POV_SUBSURFACE_DEBUG
     #define POV_SUBSURFACE_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_SUBSURFACE_ASSERT(expr) NO_OP
+    #define POV_SUBSURFACE_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 /// @}
 ///
 //******************************************************************************
 
-}
+/// @}
+///
+//##############################################################################
 
 #endif // POVRAY_CORE_CONFIGCORE_H

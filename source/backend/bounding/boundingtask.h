@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -50,7 +50,7 @@ class TraceThreadData;
 class BoundingTask : public SceneTask
 {
     public:
-        BoundingTask(shared_ptr<BackendSceneData> sd, unsigned int bt);
+        BoundingTask(shared_ptr<BackendSceneData> sd, unsigned int bt, size_t seed);
         virtual ~BoundingTask();
 
         virtual void Run();

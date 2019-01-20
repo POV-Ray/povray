@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,6 +38,7 @@
 
 // C++ variants of standard C header files
 #include <cstdarg>
+#include <cstdio>
 #include <cstdlib>
 
 // Standard C++ header files
@@ -49,60 +50,68 @@
 namespace pov_base
 {
 
-ITextStream::ITextStream(const UCS2 *sname, unsigned int stype)
+ITextStream::ITextStream() :
+    lineno(1)
 {
-    if(sname == NULL)
-        throw POV_EXCEPTION_CODE(kParamErr);
-
-    stream = NewIStream(sname, stype);
-    if(stream == NULL)
-        throw POV_EXCEPTION(kCannotOpenFileErr, string("Cannot open file '") + UCS2toASCIIString(sname) + "' for input.");
-
-    filename = UCS2String(sname);
-    lineno = 1;
-    bufferoffset = 0;
-    maxbufferoffset = 0;
-    filelength = 0;
-    ungetbuffer = EOF;
-    curpos = 0 ;
-
-    stream->seekg(0, IOBase::seek_end);
-    filelength = stream->tellg();
-    stream->seekg(0, IOBase::seek_set);
-
-    RefillBuffer();
-}
-
-ITextStream::ITextStream(const UCS2 *sname, IStream *sstream)
-{
-    if(sname == NULL)
-        throw POV_EXCEPTION_CODE(kParamErr);
-    if(sstream == NULL)
-        throw POV_EXCEPTION_CODE(kParamErr);
-
-    stream = sstream;
-    filename = UCS2String(sname);
-    lineno = 1;
-    bufferoffset = 0;
-    maxbufferoffset = 0;
-    filelength = 0;
-    ungetbuffer = EOF;
-    curpos = 0 ;
-
-    stream->seekg(0, IOBase::seek_end);
-    filelength = stream->tellg();
-    stream->seekg(0, IOBase::seek_set);
-
-    RefillBuffer();
 }
 
 ITextStream::~ITextStream()
 {
-    delete stream;
-    stream = NULL;
 }
 
-int ITextStream::getchar()
+IBufferedTextStream::IBufferedTextStream(const UCS2 *sname, unsigned int stype)
+{
+    if (sname == nullptr)
+        throw POV_EXCEPTION_CODE(kParamErr);
+
+    stream = NewIStream(sname, stype);
+    if (stream == nullptr)
+        throw POV_EXCEPTION(kCannotOpenFileErr, string("Cannot open file '") + UCS2toASCIIString(sname) + "' for input.");
+
+    filename = UCS2String(sname);
+    bufferoffset = 0;
+    maxbufferoffset = 0;
+    filelength = 0;
+    ungetbuffer = EOF;
+    curpos = 0 ;
+
+    stream->seekg(0, IOBase::seek_end);
+    filelength = stream->tellg();
+    stream->seekg(0, IOBase::seek_set);
+
+    RefillBuffer();
+}
+
+IBufferedTextStream::IBufferedTextStream(const UCS2 *sname, IStream *sstream, POV_LONG initialLine)
+{
+    if (sname == nullptr)
+        throw POV_EXCEPTION_CODE(kParamErr);
+    if (sstream == nullptr)
+        throw POV_EXCEPTION_CODE(kParamErr);
+
+    stream = sstream;
+    filename = UCS2String(sname);
+    lineno = initialLine;
+    bufferoffset = 0;
+    maxbufferoffset = 0;
+    filelength = 0;
+    ungetbuffer = EOF;
+    curpos = stream->tellg();
+
+    stream->seekg(0, IOBase::seek_end);
+    filelength = stream->tellg();
+    stream->seekg(curpos, IOBase::seek_set);
+
+    RefillBuffer();
+}
+
+IBufferedTextStream::~IBufferedTextStream()
+{
+    delete stream;
+    stream = nullptr;
+}
+
+int IBufferedTextStream::getchar()
 {
     int chr = 0;
 
@@ -146,27 +155,28 @@ int ITextStream::getchar()
     return chr;
 }
 
-void ITextStream::ungetchar(int chr)
+void IBufferedTextStream::ungetchar(int chr)
 {
     ungetbuffer = chr;
     if(chr == '\n')
         lineno--;
 }
 
-bool ITextStream::eof() const
+bool IBufferedTextStream::eof() const
 {
     if(ungetbuffer != EOF)
         return false;
     if(bufferoffset >= maxbufferoffset)
+        // NB this relies on RefillBuffer being called by each read operation that exhausts the buffer
         return true;
     return stream->eof();
 }
 
-bool ITextStream::seekg(ITextStream::FilePos fp)
+bool IBufferedTextStream::seekg(ITextStream::FilePos fp)
 {
     bool result = true;
 
-    if((fp.offset < curpos) && ((curpos - fp.offset) < maxbufferoffset))
+    if((fp.offset < curpos) && ((curpos - fp.offset) <= maxbufferoffset))
     {
         bufferoffset = maxbufferoffset - (curpos - fp.offset);
         lineno = fp.lineno;
@@ -194,7 +204,7 @@ bool ITextStream::seekg(ITextStream::FilePos fp)
     return result;
 }
 
-ITextStream::FilePos ITextStream::tellg() const
+ITextStream::FilePos IBufferedTextStream::tellg() const
 {
     FilePos fp;
 
@@ -207,7 +217,51 @@ ITextStream::FilePos ITextStream::tellg() const
     return fp;
 }
 
-void ITextStream::RefillBuffer()
+bool IBufferedTextStream::ReadRaw(unsigned char* buf, size_t size)
+{
+    unsigned char* p = buf;
+    size_t remain = size;
+
+    if (remain == 0)
+        return true;
+
+    // read from unget buffer first
+    if (ungetbuffer != EOF)
+    {
+        *(p++) = (unsigned char)ungetbuffer;
+        ungetbuffer = EOF;
+        if (--remain == 0)
+            return true;
+    }
+
+    // next read from the regular buffer
+    if (bufferoffset < maxbufferoffset)
+    {
+        size_t copyFromBuffer = min(remain, size_t(maxbufferoffset - bufferoffset));
+        memcpy(p, &(buffer[bufferoffset]), copyFromBuffer);
+        remain -= copyFromBuffer;
+        bufferoffset += copyFromBuffer;
+        p += copyFromBuffer;
+        if (remain == 0)
+            return true;
+    }
+
+    // if all buffers are depleted, read directly from stream
+    if (*stream)
+    {
+        if (stream->read(p, remain))
+        {
+            curpos += remain;
+            return true;
+        }
+        else
+            curpos = stream->tellg();
+    }
+
+    return false;
+}
+
+void IBufferedTextStream::RefillBuffer()
 {
     if(bufferoffset < maxbufferoffset)
     {
@@ -218,20 +272,161 @@ void ITextStream::RefillBuffer()
     maxbufferoffset = min((POV_ULONG)ITEXTSTREAM_BUFFER_SIZE, filelength - curpos);
     bufferoffset = 0;
 
-    stream->read(buffer, maxbufferoffset);
-    if (*stream)
+    if (stream->read(buffer, maxbufferoffset))
         curpos += maxbufferoffset ;
     else
         curpos = stream->tellg() ;
 }
 
+IMemTextStream::IMemTextStream(const UCS2 *formalName, const unsigned char* data, size_t size, const FilePos& formalStart)
+{
+    if (formalName == nullptr)
+        throw POV_EXCEPTION_CODE(kParamErr);
+    if (data == nullptr)
+        throw POV_EXCEPTION_CODE(kParamErr);
+
+    buffer = data;
+    filename = UCS2String(formalName);
+    lineno = formalStart.lineno;
+    bufferoffset = 0;
+    maxbufferoffset = size;
+    ungetbuffer = EOF;
+    mFormalStart = formalStart.offset;
+    fail = false;
+}
+
+IMemTextStream::~IMemTextStream()
+{
+}
+
+int IMemTextStream::getchar()
+{
+    int chr = 0;
+
+    if(ungetbuffer != EOF)
+    {
+        chr = ungetbuffer;
+        ungetbuffer = EOF;
+    }
+    else
+    {
+        if(bufferoffset >= maxbufferoffset)
+        {
+            chr = EOF;
+            fail = true;
+        }
+        else
+        {
+            chr = buffer[bufferoffset];
+            bufferoffset++;
+        }
+    }
+
+    if(chr == 10)
+    {
+        if((bufferoffset < maxbufferoffset) && (buffer[bufferoffset] == 13))
+            bufferoffset++;
+        chr = '\n';
+        lineno++;
+    }
+    else if(chr == 13)
+    {
+        if((bufferoffset < maxbufferoffset) && (buffer[bufferoffset] == 10))
+            bufferoffset++;
+        chr = '\n';
+        lineno++;
+    }
+
+    return chr;
+}
+
+void IMemTextStream::ungetchar(int chr)
+{
+    ungetbuffer = chr;
+    if(chr == '\n')
+        lineno--;
+}
+
+bool IMemTextStream::eof() const
+{
+    if(ungetbuffer != EOF)
+        return false;
+    return fail;
+}
+
+bool IMemTextStream::seekg(ITextStream::FilePos fp)
+{
+    fail = false;
+
+    if((fp.offset < mFormalStart + maxbufferoffset) && (mFormalStart <= fp.offset))
+    {
+        bufferoffset = fp.offset - mFormalStart;
+        lineno = fp.lineno;
+        ungetbuffer = EOF;
+    }
+    else
+    {
+        fail = true;
+    }
+
+    return !fail;
+}
+
+ITextStream::FilePos IMemTextStream::tellg() const
+{
+    FilePos fp;
+
+    fp.lineno = lineno;
+    fp.offset = mFormalStart + bufferoffset;
+
+    if(ungetbuffer != EOF)
+        fp.offset--;
+
+    return fp;
+}
+
+bool IMemTextStream::ReadRaw(unsigned char* buf, size_t size)
+{
+    if (fail)
+        return false;
+
+    unsigned char* p = buf;
+    size_t remain = size;
+
+    if (remain == 0)
+        return true;
+
+    // read from unget buffer first
+    if (ungetbuffer != EOF)
+    {
+        *(p++) = (unsigned char)ungetbuffer;
+        ungetbuffer = EOF;
+        if (--remain == 0)
+            return true;
+    }
+
+    // next read from the regular buffer
+    if (bufferoffset < maxbufferoffset)
+    {
+        size_t copyFromBuffer = min(remain, size_t(maxbufferoffset - bufferoffset));
+        memcpy(p, &(buffer[bufferoffset]), copyFromBuffer);
+        remain -= copyFromBuffer;
+        bufferoffset += copyFromBuffer;
+        p += copyFromBuffer;
+        if (remain == 0)
+            return true;
+    }
+
+    return false;
+}
+
 OTextStream::OTextStream(const UCS2 *sname, unsigned int stype, bool append)
 {
-    if(sname == NULL)
+    if (sname == nullptr)
         throw POV_EXCEPTION_CODE(kParamErr);
 
     stream = NewOStream(sname, stype, append);
-    if(stream == NULL)
+    if (stream == nullptr)
         throw POV_EXCEPTION(kCannotOpenFileErr, string("Cannot open file '") + UCS2toASCIIString(sname) + "' for output.");
 
     filename = UCS2String(sname);
@@ -239,9 +434,9 @@ OTextStream::OTextStream(const UCS2 *sname, unsigned int stype, bool append)
 
 OTextStream::OTextStream(const UCS2 *sname, OStream *sstream)
 {
-    if(sname == NULL)
+    if (sname == nullptr)
         throw POV_EXCEPTION_CODE(kParamErr);
-    if(sstream == NULL)
+    if (sstream == nullptr)
         throw POV_EXCEPTION_CODE(kParamErr);
 
     stream = sstream;
@@ -251,15 +446,15 @@ OTextStream::OTextStream(const UCS2 *sname, OStream *sstream)
 OTextStream::~OTextStream()
 {
     delete stream;
-    stream = NULL;
+    stream = nullptr;
 }
 
 void OTextStream::putchar(int chr)
 {
-#ifdef NEW_LINE_STRING
+#ifdef POV_NEW_LINE_STRING
     if (chr == '\n')
     {
-        for (char* c = NEW_LINE_STRING; c != '\0'; ++c)
+        for (char* c = POV_NEW_LINE_STRING; c != '\0'; ++c)
             stream->Write_Byte(*c);
     }
 #endif
@@ -278,17 +473,17 @@ void OTextStream::printf(const char *format, ...)
     char buffer[1024];
 
     va_start(marker, format);
-    vsnprintf(buffer, 1023, format, marker);
+    std::vsnprintf(buffer, sizeof(buffer), format, marker);
     va_end(marker);
 
-#ifdef NEW_LINE_STRING
+#ifdef POV_NEW_LINE_STRING
     char *s1 = buffer ;
     char *s2 ;
 
-    while ((s2 = strchr (s1, '\n')) != NULL)
+    while ((s2 = strchr (s1, '\n')) != nullptr)
     {
         *s2++ = '\0' ;
-        stream->printf("%s" NEW_LINE_STRING, s1);
+        stream->printf("%s" POV_NEW_LINE_STRING, s1);
         s1 = s2 ;
     }
     if (*s1)

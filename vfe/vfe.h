@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -35,8 +35,8 @@
 ///
 //******************************************************************************
 
-#ifndef __VFE_H__
-#define __VFE_H__
+#ifndef POVRAY_VFE_VFE_H
+#define POVRAY_VFE_VFE_H
 
 #include <cassert>
 
@@ -49,11 +49,15 @@
 
 #include "base/platformbase.h"
 #include "base/timer.h"
-#include "base/image/colourspace.h"
 
 #include "frontend/console.h"
-#include "frontend/simplefrontend.h"
+#include "frontend/display.h"
+#include "frontend/filemessagehandler.h"
+#include "frontend/imagemessagehandler.h"
+#include "frontend/parsermessagehandler.h"
 #include "frontend/processrenderoptions.h"
+#include "frontend/rendermessagehandler.h"
+#include "frontend/renderfrontend.h"
 
 #include "syspovconfigfrontend.h"
 #include "vfeplatform.h"
@@ -121,13 +125,13 @@ namespace vfe
       vfePlatformBase(vfeSession& session);
       virtual ~vfePlatformBase();
 
-      virtual pov_base::IStream *CreateIStream(const unsigned int stype);
-      virtual pov_base::OStream *CreateOStream(const unsigned int stype);
-
       virtual UCS2String GetTemporaryPath(void);
       virtual UCS2String CreateTemporaryFile(void);
       virtual void DeleteTemporaryFile(const UCS2String& filename);
       virtual bool ReadFileFromURL(OStream *file, const UCS2String& url, const UCS2String& referrer = UCS2String());
+      virtual FILE* OpenLocalFile (const UCS2String& name, const char *mode);
+      virtual void DeleteLocalFile (const UCS2String& name);
+      virtual bool AllowLocalFileAccess (const UCS2String& name, const unsigned int fileType, bool write);
 
     protected:
       vfeSession* m_Session;
@@ -178,7 +182,6 @@ namespace vfe
       virtual int ReadSpecialOptionHandler(INI_Parser_Table *, char *, POVMSObjectPtr);
       virtual int ReadSpecialSwitchHandler(Cmd_Parser_Table *, char *, POVMSObjectPtr, bool);
       virtual int WriteSpecialOptionHandler(INI_Parser_Table *, POVMSObjectPtr, OTextStream *);
-      virtual bool WriteOptionFilter(INI_Parser_Table *);
       virtual int ProcessUnknownString(char *, POVMSObjectPtr);
       virtual ITextStream *OpenFileForRead(const char *, POVMSObjectPtr);
       virtual OTextStream *OpenFileForWrite(const char *, POVMSObjectPtr);
@@ -193,7 +196,7 @@ namespace vfe
   class vfeDisplay : public Display
   {
     public:
-      vfeDisplay(unsigned int width, unsigned int height, GammaCurvePtr gamma, vfeSession *session, bool visible = false);
+      vfeDisplay(unsigned int width, unsigned int height, vfeSession *session, bool visible = false);
       virtual ~vfeDisplay();
 
       virtual void Initialise();
@@ -236,8 +239,8 @@ namespace vfe
     protected:
       virtual Console *CreateConsole()
         { return new vfeConsole(m_Session, m_Session->GetConsoleWidth()); }
-      virtual Display *CreateDisplay(unsigned int width, unsigned int height, GammaCurvePtr gamma)
-        { return m_Session->CreateDisplay(width, height, gamma) ; }
+      virtual Display *CreateDisplay(unsigned int width, unsigned int height)
+        { return m_Session->CreateDisplay(width, height) ; }
       bool HandleShelloutCancel();
 
       RenderFrontend<vfeParserMessageHandler,FileMessageHandler,vfeRenderMessageHandler,ImageMessageHandler> renderFrontend;
@@ -259,4 +262,4 @@ namespace vfe
   };
 }
 
-#endif
+#endif // POVRAY_VFE_VFE_H

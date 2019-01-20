@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,17 +44,23 @@
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
+
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
 
 #define DISC_OBJECT            (BASIC_OBJECT)
 
-
-
-/*****************************************************************************
-* Global typedefs
-******************************************************************************/
+/// @}
+///
+//******************************************************************************
 
 class Disc : public ObjectBase
 {
@@ -73,7 +79,10 @@ class Disc : public ObjectBase
         virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
         virtual bool Inside(const Vector3d&, TraceThreadData *) const;
         virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
-        // virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const; // TODO FIXME - why is there no UV-mapping for this object?
+        // NOTE: UV mapping of this primitive should not be implemented without also amending
+        // the primary parameterization so that users have full control over the primitive's
+        // orientation, rather than just the normal vector.
+        // virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
         virtual void Translate(const Vector3d&, const TRANSFORM *);
         virtual void Rotate(const Vector3d&, const TRANSFORM *);
         virtual void Scale(const Vector3d&, const TRANSFORM *);
@@ -84,6 +93,10 @@ class Disc : public ObjectBase
     protected:
         bool Intersect(const BasicRay& ray, DBL *Depth) const;
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

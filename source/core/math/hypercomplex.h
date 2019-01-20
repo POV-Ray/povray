@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -45,21 +45,12 @@
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
-
-/*****************************************************************************
-* Global typedefs
-******************************************************************************/
-
-/*****************************************************************************
-* Global variables
-******************************************************************************/
-
-/*****************************************************************************
-* Global functions
-******************************************************************************/
+//##############################################################################
+///
+/// @defgroup PovCoreMathHypercomplex Hypercomplex Numbers
+/// @ingroup PovCoreMath
+///
+/// @{
 
 struct Complex;
 
@@ -113,7 +104,7 @@ class HypercomplexReciprocalFractalRules : public HypercomplexBaseFractalRules
 };
 
 void Complex_Exp (Complex *target, const Complex *source, const Complex *);
-void Complex_Ln (Complex *target, const Complex *source, const Complex *);
+void Complex_Ln (Complex *target, const Complex *source, const Complex * = nullptr);
 void Complex_Sin (Complex *target, const Complex *source, const Complex *);
 void Complex_ASin (Complex *target, const Complex *source, const Complex *);
 void Complex_Sinh (Complex *target, const Complex *source, const Complex *);
@@ -130,6 +121,10 @@ void Complex_Sqrt (Complex *target, const Complex *source, const Complex *);
 void Complex_Pwr (Complex *target, const Complex *source1, const Complex *source2);
 void Complex_Mult (Complex *target, const Complex *source1, const Complex *source2);
 void Complex_Div (Complex *target, const Complex *source1, const Complex *source2);
+
+/// @}
+///
+//##############################################################################
 
 }
 

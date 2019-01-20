@@ -1,23 +1,23 @@
+env:
+  global:
+   # Required for clang.
+   - CXXFLAGS="-fno-fast-math"
+
 branches:
   except:
   - /^v[0-9]/
 
-os:
-- linux
-# - osx
-
 language: cpp
 
-compiler:
-- gcc
-- clang
-
 matrix:
-  allow_failures:
+  include:
+  - os: linux
+    compiler: gcc
   - os: osx
-  - compiler: clang
+    compiler: clang
 
 sudo: false
+dist: trusty
 
 addons:
   apt:
@@ -32,9 +32,7 @@ addons:
     - zlib1g-dev
 
 install:
-- cd unix
-- ./prebuild.sh
-- cd ..
+- unix/prebuild.sh
 - ./configure COMPILED_BY="Travis CI" --prefix="$(pwd)/build"
 - make check
 - make install

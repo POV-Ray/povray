@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -45,24 +45,20 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-// POV-Ray base header files
+// POV-Ray header files (base module)
 #include "base/platformbase.h"
 #include "base/safemath.h"
 #include "base/image/bmp.h"
+#include "base/image/dither.h"
 #include "base/image/gif.h"
 #include "base/image/hdr.h"
 #include "base/image/iff.h"
 #include "base/image/jpeg_pov.h"
 #include "base/image/openexr.h"
-#include "base/image/pgm.h"
 #include "base/image/png_pov.h"
 #include "base/image/ppm.h"
 #include "base/image/targa.h"
 #include "base/image/tiff_pov.h"
-
-#ifdef USE_SYSPROTO
-#include "syspovprotobase.h"
-#endif
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -82,6 +78,16 @@ namespace pov_base
 {
 
 using std::allocator;
+
+Image::WriteOptions::WriteOptions() :
+    ditherStrategy(GetNoOpDitherStrategy()),
+    offset_x(0),
+    offset_y(0),
+    alphaMode(kAlphaMode_None),
+    bitsPerChannel(8),
+    compression(-1),
+    grayscale(false)
+{}
 
 template<class Allocator = allocator<bool> >
 class BitMapImage : public Image
@@ -3058,30 +3064,30 @@ class FileBackedPixelContainer
         };
 
         FileBackedPixelContainer(size_type width, size_type height, size_type bs):
-            m_File(-1), m_Width(width), m_Height(height), m_xPos(0), m_yPos(0), m_Dirty(false), m_Path(POV_PLATFORM_BASE.CreateTemporaryFile())
+            m_File(-1), m_Width(width), m_Height(height), m_xPos(0), m_yPos(0), m_Dirty(false), m_Path(PlatformBase::GetInstance().CreateTemporaryFile())
         {
             if ((m_File = open(UCS2toASCIIString(m_Path).c_str(), O_CREAT | O_RDWR | O_TRUNC, S_IRUSR | S_IWUSR)) == -1)
                 throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot open backing file for intermediate image storage.");
             m_Blocksize = bs;
             m_Buffer.resize(m_Blocksize);
             // write extra data to create the big file and help 3rd party reader
-            POV_LONG pos;
-            // NB: The following use of SafeUnsignedProduct also safeguards later coputations of
+            POV_OFF_T pos;
+            // NB: The following use of SafeUnsignedProduct also safeguards later computations of
             // pixel positions within the file, as long as x and y coordinates are sane
-            pos = SafeUnsignedProduct<POV_LONG>(m_Width, m_Height);
+            pos = SafeUnsignedProduct<POV_OFF_T>(m_Width, m_Height);
             if ( pos% m_Blocksize)
             { /* issue: the block would overlap the end of file */
                 pos /= m_Blocksize;
                 pos++;
-                pos = SafeUnsignedProduct<POV_LONG>(pos, m_Blocksize);
+                pos = SafeUnsignedProduct<POV_OFF_T>(pos, m_Blocksize);
             }
             /* else fine case: the boundary of block match the boundary of pixels in file */
-            pos = SafeUnsignedProduct<POV_LONG>(pos, sizeof(pixel_type));
+            pos = SafeUnsignedProduct<POV_OFF_T>(pos, sizeof(pixel_type));
             size_type meta[3];
             meta[0] = sizeof(pixel_type);
             meta[1] = m_Width;
             meta[2] = m_Height;
-            if (lseek64(m_File, pos, SEEK_SET) != pos)
+            if (POV_LSEEK(m_File, pos, SEEK_SET) != pos)
                 throw POV_EXCEPTION(kFileDataErr, "Intermediate image storage backing file write/seek failed at creation.");
             if (write(m_File, &meta[0], (int) sizeof(size_type)*3) != (sizeof(size_type)*3))
                 throw POV_EXCEPTION(kFileDataErr, "Intermediate image storage backing file write failed at creation.");
@@ -3099,9 +3105,9 @@ class FileBackedPixelContainer
             {
                 // if shutdown has been delayed, by the time we reach here, the platform base
                 // may no longer be valid (see crashdump #77 for an example of this). we need
-                // to take the address of the reference to see if it's now NULL before we use it.
-                PlatformBase *pb(&POV_PLATFORM_BASE);
-                if (pb != NULL)
+                // to take the address of the reference to see if it's now `nullptr` before we use it.
+                PlatformBase *pb(&PlatformBase::GetInstance());
+                if (pb != nullptr)
                     pb->DeleteTemporaryFile(m_Path);
             }
         }
@@ -3202,7 +3208,7 @@ class FileBackedPixelContainer
         int                 m_File;
         bool                m_Dirty;
         size_type           m_Blocksize;
-        POV_LONG            m_CurrentBlock;
+        POV_OFF_T           m_CurrentBlock;
         size_type           m_Width;
         size_type           m_Height;
         size_type           m_xPos;
@@ -3237,7 +3243,7 @@ class FileBackedPixelContainer
 
         void ReadPixel(size_type x, size_type y, pixel_type& pixel)
         {
-            POV_LONG pos, block = (y * (POV_LONG)(m_Width) + x) / m_Blocksize;
+            POV_OFF_T pos, block = (y * (POV_OFF_T)(m_Width) + x) / m_Blocksize;
 
             if (block != m_CurrentBlock) {
                 WriteCurrentBlock();
@@ -3252,30 +3258,31 @@ class FileBackedPixelContainer
 #endif
                 pos = block * sizeof(pixel_type) * m_Blocksize;
                 int chunk = sizeof(pixel_type) * m_Blocksize;
-                if (lseek64(m_File, pos, SEEK_SET) != pos)
+                if (POV_LSEEK(m_File, pos, SEEK_SET) != pos)
                     throw POV_EXCEPTION(kFileDataErr, "Intermediate image storage backing file read/seek failed.");
                 int bytes = read(m_File, &m_Buffer[0], chunk);
                 if (bytes != (sizeof(pixel_type) * m_Blocksize))
                     throw POV_EXCEPTION(kFileDataErr, "Intermediate image storage backing file read failed.");
                 m_CurrentBlock = block;
             }
-            memcpy(&pixel, m_Buffer[(y * (POV_LONG)(m_Width) + x) % m_Blocksize], sizeof(pixel));
+            POV_IMAGE_ASSERT (m_Blocksize != 0);
+            memcpy(&pixel, m_Buffer[(y * (POV_OFF_T)(m_Width) + x) % m_Blocksize], sizeof(pixel));
         }
 #if 0
         bool BlockCommitted(size_type x, size_type y)
         {
-            POV_LONG block = (y * POV_LONG(m_Width) + x) / m_Blocksize;
+            POV_OFF_T block = (y * POV_OFF_T(m_Width) + x) / m_Blocksize;
 
             return(m_Committed[block]);
         }
 #endif
         void WriteCurrentBlock()
         {
-            POV_LONG pos;
+            POV_OFF_T pos;
 
             if (m_Dirty) {
                 pos = m_CurrentBlock * sizeof(pixel_type) * m_Blocksize;
-                if (lseek64(m_File, pos, SEEK_SET) != pos)
+                if (POV_LSEEK(m_File, pos, SEEK_SET) != pos)
                     throw POV_EXCEPTION(kFileDataErr, "Intermediate image storage backing file write/seek failed.");
                 if (write(m_File, &m_Buffer[0], (int) sizeof(pixel_type) * m_Blocksize) != (sizeof(pixel_type) * m_Blocksize))
                     throw POV_EXCEPTION(kFileDataErr, "Intermediate image storage backing file write failed.");
@@ -3289,7 +3296,7 @@ class FileBackedPixelContainer
             pixel_type dummy;
 
             ReadPixel(x, y, dummy);
-            memcpy(m_Buffer[(y * (POV_LONG)(m_Width) + x) % m_Blocksize], &pixel, sizeof(pixel));
+            memcpy(m_Buffer[(y * (POV_OFF_T)(m_Width) + x) % m_Blocksize], &pixel, sizeof(pixel));
             m_Dirty = true;
         }
 
@@ -3557,6 +3564,70 @@ void RGBFTMap2RGBAMap(const vector<Image::RGBFTMapEntry>& m, vector<Image::RGBAM
 
     for(vector<Image::RGBFTMapEntry>::const_iterator i(m.begin()); i != m.end(); i++)
         n.push_back(Image::RGBAMapEntry(i->red, i->green, i->blue, RGBFTColour::FTtoA(i->filter, i->transm)));
+}
+
+Image::ImageDataType Image::GetImageDataType (ImageChannelDataType channelType, ImageChannelLayout layout)
+{
+    switch (layout)
+    {
+    case kImageChannelLayout_Gray:
+        switch (channelType)
+        {
+        case kImageChannelDataType_Int8:    return Image::Gray_Int8;
+        case kImageChannelDataType_Int16:   return Image::Gray_Int16;
+        case kImageChannelDataType_Gamma8:  return Image::Gray_Gamma8;
+        case kImageChannelDataType_Gamma16: return Image::Gray_Gamma16;
+        default:
+            POV_IMAGE_ASSERT(false);
+            break;
+        }
+        break;
+
+    case kImageChannelLayout_GrayA:
+        switch (channelType)
+        {
+        case kImageChannelDataType_Int8:    return Image::GrayA_Int8;
+        case kImageChannelDataType_Int16:   return Image::GrayA_Int16;
+        case kImageChannelDataType_Gamma8:  return Image::GrayA_Gamma8;
+        case kImageChannelDataType_Gamma16: return Image::GrayA_Gamma16;
+        default:
+            POV_IMAGE_ASSERT(false);
+            break;
+        }
+        break;
+
+    case kImageChannelLayout_RGB:
+        switch (channelType)
+        {
+        case kImageChannelDataType_Int8:    return Image::RGB_Int8;
+        case kImageChannelDataType_Int16:   return Image::RGB_Int16;
+        case kImageChannelDataType_Gamma8:  return Image::RGB_Gamma8;
+        case kImageChannelDataType_Gamma16: return Image::RGB_Gamma16;
+        default:
+            POV_IMAGE_ASSERT(false);
+            break;
+        }
+        break;
+
+    case kImageChannelLayout_RGBA:
+        switch (channelType)
+        {
+        case kImageChannelDataType_Int8:    return Image::RGBA_Int8;
+        case kImageChannelDataType_Int16:   return Image::RGBA_Int16;
+        case kImageChannelDataType_Gamma8:  return Image::RGBA_Gamma8;
+        case kImageChannelDataType_Gamma16: return Image::RGBA_Gamma16;
+        default:
+            POV_IMAGE_ASSERT(false);
+            break;
+        }
+        break;
+
+    default:
+        POV_IMAGE_ASSERT(false);
+        break;
+    }
+
+    return Image::Undefined;
 }
 
 Image *Image::Create(unsigned int w, unsigned int h, ImageDataType t, unsigned int maxRAMmbHint, unsigned int pixelsPerBlockHint)
@@ -3846,9 +3917,9 @@ Image *Image::Create(unsigned int w, unsigned int h, ImageDataType t, const vect
 
 Image *Image::Read(ImageFileType type, IStream *file, const ReadOptions& options)
 {
-    #ifdef SYS_TO_STANDARD
+    #ifdef POV_SYS_IMAGE_TYPE
         if (type == SYS)
-            type = SYS_TO_STANDARD ;
+            type = POV_SYS_IMAGE_TYPE;
     #endif
 
     switch (type)
@@ -3866,7 +3937,7 @@ file format.  You must either use an official POV-Ray binary or recompile \
 the POV-Ray sources on a system providing you with the OpenEXR library \
 to make use of this facility.  Alternatively, you may use any of the \
 following built-in formats: HDR.");
-            return NULL;
+            return nullptr;
 #endif
 
         case PNG:
@@ -3879,7 +3950,7 @@ file format.  You must either use an official POV-Ray binary or recompile \
 the POV-Ray sources on a system providing you with the libPNG library \
 to make use of this facility.  Alternatively, you may use any of the \
 following built-in formats: GIF, TGA, IFF, PGM, PPM, BMP.");
-            return NULL;
+            return nullptr;
 #endif
 
         case GIF:
@@ -3901,17 +3972,17 @@ file format.  You must either use an official POV-Ray binary or recompile \
 the POV-Ray sources on a system providing you with the libJPEG library \
 to make use of this facility.  Alternatively, you may use any of the \
 following built-in formats: GIF, TGA, IFF, PGM, PPM, BMP.");
-            return NULL;
+            return nullptr;
 #endif
 
         case IFF:
             return (Iff::Read(file, options));
 
         case PGM:
-            return (Pgm::Read(file, options));
+            return (Netpbm::Read(file, options));
 
         case PPM:
-            return (Ppm::Read(file, options));
+            return (Netpbm::Read(file, options));
 
         case BMP:
             return (Bmp::Read(file, options));
@@ -3926,16 +3997,16 @@ file format.  You must either use an official POV-Ray binary or recompile \
 the POV-Ray sources on a system providing you with the libTIFF library \
 to make use of this facility.  Alternatively, you may use any of the \
 following built-in formats: GIF, TGA, IFF, PGM, PPM, BMP.");
-            return NULL;
+            return nullptr;
 #endif
 
         case SYS:
             throw POV_EXCEPTION(kCannotOpenFileErr, "This platform has not defined a SYS file type");
-            return (NULL);
+            return nullptr;
 
         default :
             throw POV_EXCEPTION(kParamErr, "Invalid file type");
-            return (NULL);
+            return nullptr;
     }
 }
 
@@ -3944,12 +4015,12 @@ void Image::Write(ImageFileType type, OStream *file, const Image *image, const W
     if (image->GetWidth() == 0 || image->GetHeight() == 0)
         throw POV_EXCEPTION(kParamErr, "Invalid image size for output");
 
-    if (file == NULL)
+    if (file == nullptr)
         throw POV_EXCEPTION(kCannotOpenFileErr, "Invalid image file");
 
-#ifdef SYS_TO_STANDARD
+#ifdef POV_SYS_IMAGE_TYPE
     if (type == SYS)
-        type = SYS_TO_STANDARD ;
+        type = POV_SYS_IMAGE_TYPE;
 #endif
 
     switch (type)
@@ -4001,7 +4072,7 @@ following built-in formats: TGA, PPM, BMP.");
             break;
 
         case PPM:
-            Ppm::Write(file, image, options);
+            Netpbm::Write(file, image, options);
             break;
 
         case BMP:

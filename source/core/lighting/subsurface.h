@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -46,6 +46,13 @@
 
 namespace pov
 {
+
+//##############################################################################
+///
+/// @defgroup PovCoreLightingSubsurface Subsurface Scattering
+/// @ingroup PovCore
+///
+/// @{
 
 using boost::flyweights::flyweight;
 using boost::flyweights::key_value;
@@ -88,6 +95,10 @@ inline double FresnelDiffuseReflectance(double eta)
         return ( (1.0-1.0/eta) + 3*pow(1.0-1.0/eta,4.5) ) / 4.0;
 #endif
 }
+
+/// @}
+///
+//##############################################################################
 
 } // end of namespace
 

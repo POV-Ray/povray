@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,12 +40,19 @@
 
 #include <algorithm>
 #include <limits>
+#include <string>
 #include <vector>
 
-#include "pov_mem.h"
+#include "base/pov_mem.h"
 
 namespace pov_base
 {
+
+//##############################################################################
+///
+/// @addtogroup PovBase
+///
+/// @{
 
 /// A macro wrapping a sequence of statements into a single one.
 ///
@@ -187,6 +194,20 @@ namespace pov_base
 /// @}
 ///
 //******************************************************************************
+///
+/// @name Image Stuff
+/// @{
+
+// Image types.
+
+#define IMAGE_FILE    GIF_FILE+SYS_FILE+TGA_FILE+PGM_FILE+PPM_FILE+PNG_FILE+JPEG_FILE+TIFF_FILE+BMP_FILE+EXR_FILE+HDR_FILE+IFF_FILE+GRAD_FILE
+#define NORMAL_FILE   GIF_FILE+SYS_FILE+TGA_FILE+PGM_FILE+PPM_FILE+PNG_FILE+JPEG_FILE+TIFF_FILE+BMP_FILE+EXR_FILE+HDR_FILE+IFF_FILE+GRAD_FILE
+#define MATERIAL_FILE GIF_FILE+SYS_FILE+TGA_FILE+PGM_FILE+PPM_FILE+PNG_FILE+JPEG_FILE+TIFF_FILE+BMP_FILE+EXR_FILE+HDR_FILE+IFF_FILE+GRAD_FILE
+#define HF_FILE       GIF_FILE+SYS_FILE+TGA_FILE+PGM_FILE+PPM_FILE+PNG_FILE+JPEG_FILE+TIFF_FILE+BMP_FILE+EXR_FILE+HDR_FILE+POT_FILE
+
+/// @}
+///
+//******************************************************************************
 
 /// A macro that does nothing.
 ///
@@ -212,7 +233,15 @@ namespace pov_base
 /// A macro that tests an expression and, if it evaluates false, causes a hard crash to generate a
 /// core dump or break to a debugger.
 ///
-#define POV_ASSERT_HARD(expr) assert( expr )
+#define POV_ASSERT_HARD(expr) assert(expr)
+
+/// A macro that does nothing, but is mapped to standard `assert()` during static code analysis.
+///
+#ifdef STATIC_CODE_ANALYSIS
+    #define POV_ASSERT_DISABLE(expr) assert(expr)
+#else
+    #define POV_ASSERT_DISABLE(expr) NO_OP
+#endif
 
 // from <algorithm>; we don't want to always type the namespace for these.
 using std::min;
@@ -263,32 +292,122 @@ struct POVRect
     unsigned int GetHeight() const { return (bottom - top + 1); }
 };
 
-class GenericSetting
+/// Legacy (v3.5) `charset` setting.
+enum LegacyCharset
 {
-    public:
-        explicit GenericSetting(bool set = false): set(set) {}
-        void Unset() { set = false; }
-        bool isSet() const { return set; }
-    protected:
-        bool set;
+    kUnspecified,   ///< Global settings `charset` not specified.
+    kASCII,         ///< Global settings `charset ascii` specified.
+    kUTF8,          ///< Global settings `charset utf8` specified.
+    kSystem,        ///< Global settings `charset sys` specified.
 };
 
-class FloatSetting : public GenericSetting
+/// Value identifying a character set.
+///
+/// Each value of this type represents a particular set of characters and associated mapping of
+/// those characters to _code points_.
+///
+/// @note
+///     The values of this type do _not_ identify any particular character _encoding_, i.e. a
+///     scheme of representing streams of characters as a byte stream. For example, all of
+///     UTF-8, UTF-16LE, UTF-16BE, UTF-32LE and UTF-32BE are encoding schemes for the UCS-4
+///     character set.
+///
+/// @note
+///     The numeric values chosen for the individual character sets are generally based on Windows
+///     code page numbers. If you add more character sets, please stick to this scheme wherever
+///     applicable, or use negative values.
+///
+enum class CharsetID
 {
-    public:
-        explicit FloatSetting(double data = 0.0, bool set = false): data(data), GenericSetting(set) {}
-        double operator=(double b)          { data = b; set = true; return data; }
-        operator double() const             { return data; }
-        double operator()(double def) const { if (set) return data; else return def; }
-    private:
-        double  data;
+    kUndefined      = 0,        ///< Special value representing undefined character set.
+
+    kUCS2           = 1200,     ///< UCS-2 (16-bit subset of UCS) aka Basic Multilingual Plane (BMP).
+    kWindows1251    = 1251,     ///< Windows code page 1251 (Cyrillic).
+    kWindows1252    = 1252,     ///< Windows code page 1252 (Western) aka [incorrectly] ANSI.
+    kMacOSRoman     = 10000,    ///< Mac OS Roman (as used on classic Mac OS).
+    kUCS4           = 12000,    ///< UCS-4 (full set of UCS) aka [not entirely correctly] Unicode.
+    kLatin1         = 28591,    ///< ISO-8859-1 aka Latin-1.
+
+    kLegacySymbols  = -1,       ///< Special value representing legacy remapping for Microsoft symbol fonts,
+                                ///< remapping U+0000-U+00FF to U+F000-U+F0FF.
 };
 
-enum StringEncoding {
-    kStringEncoding_ASCII  = 0,
-    kStringEncoding_UTF8   = 1,
-    kStringEncoding_System = 2
+/// Type holding an @glossary{UTF8}-encoded string of characters.
+///
+/// @todo
+///     Aliasing this as `std::string` may not be ideal, as it creates ambiguity
+///     with the use of that same type for ASCII strings. On the other hand,
+///     if we use `std::basic_string<unsigned char>`, it isn't compatible with
+///     the C++11 `u8"..."` UTF-8 string literal notation, which is of type
+///     `const char[]`.
+///
+using UTF8String = std::string;
+
+/// Type holding an @glossary{UCS2}-encoded string of characters.
+///
+/// @todo
+///     UCS-2 is a poor choice for internal string representation, as it cannot
+///     encode the full UCS/Unicode character set; we should use either UTF-8
+///     (the best space saver for the strings to be expected), or UTF-32
+///     (allowing easiest processing). We shouldn't use UTF-16, as it needs
+///     about just as much special processing as UTF-8 (but people tend to
+///     forget that, confusing UTF-16 with UCS-2), and for the expected typical
+///     ASCII-heavy use it is less memory-efficient than UTF-8.
+///
+using UCS2String = std::basic_string<UCS2>;
+
+enum GammaMode
+{
+    /**
+     *  No gamma handling.
+     *  This model is based on the (wrong) presumption that image file pixel values are proportional to
+     *  physical light intensities.
+     *  This is the default for POV-Ray v3.6 and earlier.
+     */
+    kPOVList_GammaMode_None,
+    /**
+     *  Explicit assumed_gamma-based gamma handling model, v3.6 variant.
+     *  This model is based on the (wrong) presumption that render engine maths works equally well with
+     *  both linear and gamma-encoded light intensity values.
+     *  Using assumed_gamma=1.0 gives physically realistic results.
+     *  Input image files without implicit or explicit gamma information will be presumed to match assumed_gamma,
+     *  i.e. they will not be gamma corrected.
+     *  This is the mode used by POV-Ray v3.6 and earlier if assumed_gamma is specified.
+     */
+    kPOVList_GammaMode_AssumedGamma36,
+    /**
+     *  Explicit assumed_gamma-based gamma handling model, v3.7 variant.
+     *  This model is based on the (wrong) presumption that render engine maths works equally well with
+     *  both linear and gamma-encoded light intensity values.
+     *  Using assumed_gamma=1.0 gives physically realistic results.
+     *  Input image files without implicit or explicit gamma information will be presumed to match official
+     *  recommendations for the respective file format; files for which no official recommendations exists
+     *  will be presumed to match assumed_gamma.
+     *  This is the mode used by POV-Ray v3.7 and later if assumed_gamma is specified.
+     */
+    kPOVList_GammaMode_AssumedGamma37,
+    /**
+     *  Implicit assumed_gamma-based gamma handling model, v3.7 variant.
+     *  This model is functionally identical to kPOVList_GammaMode_AssumedGamma37 except that it also serves as a marker
+     *  that assumed_gamma has not been set explicitly.
+     *  This is the default for POV-Ray v3.7 and later.
+     */
+    kPOVList_GammaMode_AssumedGamma37Implied,
 };
+
+/// Common base class for all thread-specific data.
+///
+/// This class is used as the base for all thread-specific data to allow for safe dynamic casting.
+///
+class ThreadData
+{
+    public:
+        virtual ~ThreadData() { }
+};
+
+/// @}
+///
+//##############################################################################
 
 }
 

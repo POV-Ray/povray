@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,16 +33,10 @@
 ///
 //******************************************************************************
 
-#include <sstream>
-
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/rendermessagehandler.h"
 
-#include "base/types.h"
-#include "frontend/configfrontend.h"
 #include "frontend/renderfrontend.h"
-#include "frontend/filemessagehandler.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -63,7 +57,7 @@ void RenderMessageHandler::HandleMessage(const SceneData& sd, const ViewData&, P
     if(ident != kPOVMsgIdent_Progress)
     {
         sd.console->flush();
-        if(sd.streams[STATUS_STREAM] != NULL)
+        if (sd.streams[STATUS_STREAM] != nullptr)
             sd.streams[STATUS_STREAM]->flush();
     }
 
@@ -71,19 +65,19 @@ void RenderMessageHandler::HandleMessage(const SceneData& sd, const ViewData&, P
     {
         case kPOVMsgIdent_RenderOptions:
             Options(sd.console.get(), obj, sd.consoleoutput[RENDER_STREAM]);
-            if(sd.streams[RENDER_STREAM].get() != NULL)
+            if (sd.streams[RENDER_STREAM].get() != nullptr)
                 Message2Console::RenderOptions(obj, sd.streams[RENDER_STREAM].get());
-            if(sd.streams[ALL_STREAM].get() != NULL)
+            if (sd.streams[ALL_STREAM].get() != nullptr)
                 Message2Console::RenderOptions(obj, sd.streams[ALL_STREAM].get());
             break;
         case kPOVMsgIdent_RenderStatistics:
             Statistics(sd.console.get(), obj, sd.consoleoutput[STATISTIC_STREAM]);
-            if(sd.streams[STATISTIC_STREAM].get() != NULL)
+            if (sd.streams[STATISTIC_STREAM].get() != nullptr)
             {
                 Message2Console::RenderStatistics(obj, sd.streams[STATISTIC_STREAM].get());
                 Message2Console::RenderTime(obj, sd.streams[STATISTIC_STREAM].get());
             }
-            if(sd.streams[ALL_STREAM].get() != NULL)
+            if (sd.streams[ALL_STREAM].get() != nullptr)
             {
                 Message2Console::RenderStatistics(obj, sd.streams[ALL_STREAM].get());
                 Message2Console::RenderTime(obj, sd.streams[ALL_STREAM].get());
@@ -91,28 +85,28 @@ void RenderMessageHandler::HandleMessage(const SceneData& sd, const ViewData&, P
             break;
         case kPOVMsgIdent_Progress:
             Progress(sd.console.get(), obj, sd.verbose);
-//          if(sd.streams[ALL_STREAM].get() != NULL)
+//          if (sd.streams[ALL_STREAM].get() != nullptr)
 //              Message2Console::Progress(obj, sd.streams[ALL_STREAM]);
             break;
         case kPOVMsgIdent_Warning:
             Warning(sd.console.get(), obj, sd.consoleoutput[WARNING_STREAM]);
-            if(sd.streams[WARNING_STREAM].get() != NULL)
+            if (sd.streams[WARNING_STREAM].get() != nullptr)
                 Message2Console::Warning(obj, sd.streams[WARNING_STREAM].get());
-            if(sd.streams[ALL_STREAM].get() != NULL)
+            if (sd.streams[ALL_STREAM].get() != nullptr)
                 Message2Console::Warning(obj, sd.streams[ALL_STREAM].get());
             break;
         case kPOVMsgIdent_Error:
             Error(sd.console.get(), obj, sd.consoleoutput[WARNING_STREAM]);
-            if(sd.streams[WARNING_STREAM].get() != NULL)
+            if (sd.streams[WARNING_STREAM].get() != nullptr)
                 Message2Console::Error(obj, sd.streams[WARNING_STREAM].get());
-            if(sd.streams[ALL_STREAM].get() != NULL)
+            if (sd.streams[ALL_STREAM].get() != nullptr)
                 Message2Console::Error(obj, sd.streams[ALL_STREAM].get());
             break;
         case kPOVMsgIdent_FatalError:
             FatalError(sd.console.get(), obj, sd.consoleoutput[FATAL_STREAM]);
-            if(sd.streams[FATAL_STREAM].get() != NULL)
+            if (sd.streams[FATAL_STREAM].get() != nullptr)
                 Message2Console::FatalError(obj, sd.streams[FATAL_STREAM].get());
-            if(sd.streams[ALL_STREAM].get() != NULL)
+            if (sd.streams[ALL_STREAM].get() != nullptr)
                 Message2Console::FatalError(obj, sd.streams[ALL_STREAM].get());
             break;
     }

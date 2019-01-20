@@ -2,14 +2,14 @@
 ///
 /// @file base/image/ppm.h
 ///
-/// Declarations related to NetPBM Portable Pixmap/Graymap (PPM/PGM) image
+/// Declarations related to Netpbm Portable Pixmap/Graymap (PPM/PGM) image
 /// file handling.
 ///
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -46,12 +46,21 @@
 namespace pov_base
 {
 
-
-namespace Ppm
+namespace Netpbm
 {
+
+//##############################################################################
+///
+/// @addtogroup PovBaseImage
+///
+/// @{
 
 void Write(OStream *file, const Image *image, const Image::WriteOptions& options);
 Image *Read(IStream *file, const Image::ReadOptions& options);
+
+/// @}
+///
+//##############################################################################
 
 }
 

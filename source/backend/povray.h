@@ -13,8 +13,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -45,18 +45,18 @@
 #include <boost/thread.hpp>
 #include <boost/function.hpp>
 
-#include "povms/povmscpp.h"
+#include "base/version_info.h"
 
-#include "base/version.h"
+#include "povms/povmscpp.h"
 
 /**
  *  This function does essential initialisation that is required before
  *  POV-Ray can be used. It also starts the main render thread that
  *  receives and processes all messages received from the frontend.
- *  @param  addr  If not NULL, backend address on return.
+ *  @param  addr  If not `nullptr`, backend address on return.
  *  @return       Pointer to the thread resource created.
  */
-boost::thread *povray_init(const boost::function0<void>& threadExit, POVMSAddress *addr = NULL);
+boost::thread *povray_init(const boost::function0<void>& threadExit, POVMSAddress *addr = nullptr);
 
 /**
  *  This function shuts down the main render thread and after it has
@@ -76,9 +76,9 @@ bool povray_terminated();
 
 // POV-Ray version and copyright message macros
 
-#if POV_RAY_IS_OFFICIAL == 1
+#if POV_RAY_IS_OFFICIAL
 
-#if POV_RAY_IS_AUTOBUILD == 1
+#if POV_RAY_IS_AUTOBUILD
 #define DISTRIBUTION_MESSAGE_1 "This is an official automated build authorized by the POV-Ray Team."
 #else // POV_RAY_IS_AUTOBUILD
 #define DISTRIBUTION_MESSAGE_1 "This is an official version prepared by the POV-Ray Team."
@@ -86,9 +86,9 @@ bool povray_terminated();
 #define DISTRIBUTION_MESSAGE_2 " See the documentation on how to contact the authors or visit us"
 #define DISTRIBUTION_MESSAGE_3 " on the internet at http://www.povray.org/\n"
 
-#elif POV_RAY_IS_SEMI_OFFICIAL == 1
+#elif POV_RAY_IS_SEMI_OFFICIAL
 
-#if POV_RAY_IS_AUTOBUILD == 1
+#if POV_RAY_IS_AUTOBUILD
 #define DISTRIBUTION_MESSAGE_1 "This is an automated development build authorized by:"
 #else // POV_RAY_IS_AUTOBUILD
 #define DISTRIBUTION_MESSAGE_1 "This is a development version compiled by:"
@@ -107,10 +107,17 @@ bool povray_terminated();
 #define DISCLAIMER_MESSAGE_1 "This is free software; see the source for copying conditions.  There is NO"
 #define DISCLAIMER_MESSAGE_2 "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."
 
-#if (POV_RAY_IS_OFFICIAL == 1) && (POV_RAY_IS_AUTOBUILD != 1)
-#define POV_RAY_HAS_OFFICIAL_FEATURES 1
+#if POV_RAY_IS_OFFICIAL && !POV_RAY_IS_AUTOBUILD
+    #ifndef POV_RAY_HAS_CRASHDUMP_UPLOAD
+        #define POV_RAY_HAS_CRASHDUMP_UPLOAD 0
+    #endif
+    #ifndef POV_RAY_HAS_UPDATE_CHECK
+        #define POV_RAY_HAS_UPDATE_CHECK 0
+    #endif
 #else
-#define POV_RAY_HAS_OFFICIAL_FEATURES 0
+    // auto-builds or manual unofficial builds never have these fancy features
+    #define POV_RAY_HAS_CRASHDUMP_UPLOAD 0
+    #define POV_RAY_HAS_UPDATE_CHECK 0
 #endif
 
 #endif // POVRAY_BACKEND_POVRAY_H

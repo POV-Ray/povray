@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -45,19 +45,25 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
+
 class Plane;
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
 
 #define QUADRIC_OBJECT (BASIC_OBJECT)
 
-
-
-/*****************************************************************************
-* Global typedefs
-******************************************************************************/
+/// @}
+///
+//******************************************************************************
 
 class Quadric : public ObjectBase
 {
@@ -90,6 +96,10 @@ class Quadric : public ObjectBase
         void Quadric_To_Matrix(MATRIX Matrix) const;
         void Matrix_To_Quadric(const MATRIX Matrix);
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -45,6 +45,12 @@
 // POV-Ray base header files
 #include "base/path.h"
 
+// All the builtin fonts must be declared here
+#include "base/font/crystal.h"
+#include "base/font/cyrvetic.h"
+#include "base/font/povlogo.h"
+#include "base/font/timrom.h"
+
 // this must be the last file included
 #include "base/povdebug.h"
 
@@ -77,6 +83,7 @@ POV_File_Restrictions gPOV_File_Restrictions[POV_File_Count] =
     { true,  false, false, false }, // POV_File_Text_INC
     { true,  false, false, false }, // POV_File_Text_INI
     { true,  true,  false, false }, // POV_File_Text_CSV
+    { true,  true,  false, false }, // POV_File_Text_OBJ
     { true,  false, false, false }, // POV_File_Text_Stream
     { true,  true,  false, false }, // POV_File_Text_User
     { true,  true,  true,  false }, // POV_File_Data_DF3
@@ -122,6 +129,7 @@ POV_File_Extensions gPOV_File_Extensions[POV_File_Count] =
     {{ ".inc",  ".INC",  "",      ""      }}, // POV_File_Text_INC
     {{ ".ini",  ".INI",  "",      ""      }}, // POV_File_Text_INI
     {{ ".csv",  ".CSV",  "",      ""      }}, // POV_File_Text_CSV
+    {{ ".obj",  ".OBJ",  "",      ""      }}, // POV_File_Text_OBJ
     {{ ".txt",  ".TXT",  "",      ""      }}, // POV_File_Text_Stream
     {{ "",      "",      "",      ""      }}, // POV_File_Text_User
     {{ ".df3",  ".DF3",  "",      ""      }}, // POV_File_Data_DF3
@@ -151,6 +159,7 @@ const int gFile_Type_To_Mask [POV_File_Count] =
     NO_FILE,   // POV_File_Text_INC
     NO_FILE,   // POV_File_Text_INI
     NO_FILE,   // POV_File_Text_CSV
+    NO_FILE,   // POV_File_Text_OBJ
     NO_FILE,   // POV_File_Text_Stream
     NO_FILE,   // POV_File_Text_User
     NO_FILE,   // POV_File_Data_DF3
@@ -209,9 +218,25 @@ int InferFileTypeFromExt(const UCS2String& ext)
 *
 ******************************************************************************/
 
-IMemStream *Internal_Font_File(const int font_id, UCS2String& buffer)
+/*
+ * Default to povlogo.ttf (0)
+ * 1 : TimeRoman (timrom.ttf), Serif
+ * 2 : Cyrvetita (cyrvetic.ttf), Sans-Serif
+ * 3 : Crystal (crystal.ttf), monospace sans serif
+ *
+ * To add a font, check first its license
+ */
+IMemStream *Internal_Font_File(int font_id)
 {
-    return new IMemStream(font_id);
+    switch(font_id)
+    {
+        case 1:     return new IMemStream(&font_timrom[0],   sizeof(font_timrom),   "timrom.ttf");
+        case 2:     return new IMemStream(&font_cyrvetic[0], sizeof(font_cyrvetic), "cyrvetic.ttf");
+        case 3:     return new IMemStream(&font_crystal[0],  sizeof(font_crystal),  "crystal.ttf");
+        default:    return new IMemStream(&font_povlogo[0],  sizeof(font_povlogo),  "povlogo.ttf");
+    }
 }
+
+//******************************************************************************
 
 }

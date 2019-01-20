@@ -10,8 +10,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,5 +40,9 @@
 #define POVRAY_WINDOWS_SYSPOVCONFIGBACKEND_H
 
 #include "syspovconfig.h"
+
+// On the Windows platform, we're doing some special mojo at thread startup.
+#define POV_USE_DEFAULT_TASK_INITIALIZE 0
+#define POV_USE_DEFAULT_TASK_CLEANUP    0
 
 #endif // POVRAY_WINDOWS_SYSPOVCONFIGBACKEND_H

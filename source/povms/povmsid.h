@@ -8,8 +8,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -276,12 +276,16 @@ enum
 
     // backend init
     kPOVAttrib_CoreVersion           = 'Core',
+    kPOVAttrib_CoreGeneration        = 'CorG',
     kPOVAttrib_PlatformName          = 'Plat',
     kPOVAttrib_Official              = 'Offi',
     kPOVAttrib_PrimaryDevs           = 'Prim',
     kPOVAttrib_AssistingDevs         = 'Asst',
     kPOVAttrib_ContributingDevs      = 'Cont',
     kPOVAttrib_ImageLibVersions      = 'ILVe',
+    kPOVAttrib_Optimizations         = 'Opti',
+    kPOVAttrib_CPUInfo               = 'CPUI',
+    kPOVAttrib_CPUInfoDetails        = 'CPUD',
 
     // options handled by frontend
     kPOVAttrib_TestAbort             = 'TstA', // currently not supported by code
@@ -381,6 +385,7 @@ enum
     kPOVAttrib_Antialias             = 'Anti',
     kPOVAttrib_SamplingMethod        = 'AASM',
     kPOVAttrib_AntialiasThreshold    = 'AATh',
+    kPOVAttrib_AntialiasConfidence   = 'AACo',
     kPOVAttrib_AntialiasDepth        = 'AADe',
     kPOVAttrib_Jitter                = 'AAJi',
     kPOVAttrib_JitterAmount          = 'AAJA',
@@ -388,6 +393,7 @@ enum
     kPOVAttrib_AntialiasGammaType    = 'AAGT', // currently not supported by code
     kPOVAttrib_Quality               = 'Qual',
     kPOVAttrib_HighReproducibility   = 'HRep',
+    kPOVAttrib_StochasticSeed        = 'Seed',
 
     kPOVAttrib_Bounding              = 'Boun',
     kPOVAttrib_BoundingMethod        = 'BdMe',
@@ -601,7 +607,7 @@ enum
     // bounding progress
     kPOVAttrib_CurrentNodeCount      = 'CNCo',
 
-    /// photon progress
+    // photon progress
     kPOVAttrib_CurrentPhotonCount    = 'CPCo',
 
     // render progress
@@ -609,12 +615,13 @@ enum
     kPOVAttrib_PixelsCompleted       = 'PCom',
 
     // render pixel data/control
-    kPOVAttrib_PixelId               = 'PiId',
+    kPOVAttrib_PixelId               = 'PiId',  ///< (Int) ID of render block; only set if rendered to completion.
     kPOVAttrib_PixelSize             = 'PiSi',
     kPOVAttrib_PixelBlock            = 'PBlo',
     kPOVAttrib_PixelColors           = 'PCol',
     kPOVAttrib_PixelPositions        = 'PPos',
     kPOVAttrib_PixelSkipList         = 'PSLi',
+    kPOVAttrib_PixelFinal            = 'PFin',  ///< (Void) Set if pixel data is relevant for final image.
 
     // scene/view error reporting and TBD
     kPOVAttrib_CurrentLine           = 'CurL',
@@ -646,54 +653,6 @@ enum
     kPOVAttrib_EndRow                = kPOVAttrib_Bottom
 };
 
-// Add new progress messages ONLY at the end!!!
-enum
-{
-    kPOVList_Prog_CreatingBoundingSlabs = 1,
-    kPOVList_Prog_CreatingVistaBuffer,
-    kPOVList_Prog_CreatingLightBuffers,
-    kPOVList_Prog_BuildingPhotonMaps,
-    kPOVList_Prog_LoadingPhotonMaps,
-    kPOVList_Prog_SavingPhotonMaps,
-    kPOVList_Prog_SortingPhotons,
-    kPOVList_Prog_ReclaimingMemory,
-    kPOVList_Prog_WritingINIFile,
-    kPOVList_Prog_WritingHistogramFile,
-    kPOVList_Prog_PerformingShelloutCommand,
-    kPOVList_Prog_ResumingInterruptedTrace,
-    kPOVList_Prog_ProcessingFrame,
-    kPOVList_Prog_Parsing,
-    kPOVList_Prog_Displaying,
-    kPOVList_Prog_Rendering,
-    kPOVList_Prog_DoneTracing,
-    kPOVList_Prog_AbortingRender,
-    kPOVList_Prog_UserAbort
-};
-
-// TODO FIXME - make this enum obsolete
-enum
-{
-    PROGRESS_CREATING_BOUNDING_SLABS = kPOVList_Prog_CreatingBoundingSlabs,
-    PROGRESS_CREATING_VISTA_BUFFER = kPOVList_Prog_CreatingVistaBuffer,
-    PROGRESS_CREATE_LIGHT_BUFFERS = kPOVList_Prog_CreatingLightBuffers,
-    PROGRESS_BUILDING_PHOTON_MAPS = kPOVList_Prog_BuildingPhotonMaps,
-    PROGRESS_LOADING_PHOTON_MAPS = kPOVList_Prog_LoadingPhotonMaps,
-    PROGRESS_SAVING_PHOTON_MAPS = kPOVList_Prog_SavingPhotonMaps,
-    PROGRESS_SORTING_PHOTONS = kPOVList_Prog_SortingPhotons,
-    PROGRESS_RECLAIMING_MEMORY = kPOVList_Prog_ReclaimingMemory,
-    PROGRESS_WRITE_INI_FILE = kPOVList_Prog_WritingINIFile,
-    PROGRESS_WRITE_HISTOGRAM_FILE = kPOVList_Prog_WritingHistogramFile,
-    PROGRESS_PERFORMING_SHELLOUT_COMMAND = kPOVList_Prog_PerformingShelloutCommand,
-    PROGRESS_RESUMING_INTERRUPTED_TRACE = kPOVList_Prog_ResumingInterruptedTrace,
-    PROGRESS_PROCESSING_FRAME = kPOVList_Prog_ProcessingFrame,
-    PROGRESS_PARSING = kPOVList_Prog_Parsing,
-    PROGRESS_DISPLAYING = kPOVList_Prog_Displaying,
-    PROGRESS_RENDERING = kPOVList_Prog_Rendering,
-    PROGRESS_DONE_TRACING = kPOVList_Prog_DoneTracing,
-    PROGRESS_ABORTING_RENDER = kPOVList_Prog_AbortingRender,
-    PROGRESS_USER_ABORT = kPOVList_Prog_UserAbort
-};
-
 enum
 {
     kPOVList_FileType_Unknown,
@@ -707,45 +666,6 @@ enum
     kPOVList_FileType_RadianceHDR,
     kPOVList_FileType_System,
     kPOVList_FileType_CSV, // used for histogram file
-};
-
-enum
-{
-    /**
-     *  No gamma handling.
-     *  This model is based on the (wrong) presumption that image file pixel values are proportional to
-     *  physical light intensities.
-     *  This is the default for POV-Ray 3.6 and earlier.
-     */
-    kPOVList_GammaMode_None,
-    /**
-     *  Explicit assumed_gamma-based gamma handling model, 3.6 variant.
-     *  This model is based on the (wrong) presumption that render engine maths works equally well with
-     *  both linear and gamma-encoded light intensity values.
-     *  Using assumed_gamma=1.0 gives physically realistic results.
-     *  Input image files without implicit or explicit gamma information will be presumed to match assumed_gamma,
-     *  i.e. they will not be gamma corrected.
-     *  This is the mode used by POV-Ray 3.6 if assumed_gamma is specified.
-     */
-    kPOVList_GammaMode_AssumedGamma36,
-    /**
-     *  Explicit assumed_gamma-based gamma handling model, 3.7 variant.
-     *  This model is based on the (wrong) presumption that render engine maths works equally well with
-     *  both linear and gamma-encoded light intensity values.
-     *  Using assumed_gamma=1.0 gives physically realistic results.
-     *  Input image files without implicit or explicit gamma information will be presumed to match official
-     *  recommendations for the respective file format; files for which no official recommendations exists
-     *  will be presumed to match assumed_gamma.
-     *  This is the mode used by POV-Ray 3.7 if assumed_gamma is specified.
-     */
-    kPOVList_GammaMode_AssumedGamma37,
-    /**
-     *  Implicit assumed_gamma-based gamma handling model, 3.7 variant.
-     *  This model is functionally idential to kPOVList_GammaMode_AssumedGamma37 except that it also serves as a marker
-     *  that assumed_gamma has not been set explicitly.
-     *  This is the default for POV-Ray 3.7 and later.
-     */
-    kPOVList_GammaMode_AssumedGamma37Implied,
 };
 
 #endif // POVMSID_H

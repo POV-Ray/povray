@@ -8,8 +8,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,31 +37,44 @@
 #ifndef PROCESSOPTIONS_H
 #define PROCESSOPTIONS_H
 
-#include "base/configbase.h"
-
-#include "povms/povmscpp.h"
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "frontend/configfrontend.h"
 
 #include "base/textstream.h"
 
-namespace pov_base
+#include "povms/povmscpp.h"
+
+namespace pov_frontend
 {
+
+using namespace pov_base;
+
+enum {
+    kINIOptFlag_SuppressWrite   = 0x0001,   ///< Suppress when writing complete list of options
+};
+
+enum {
+    kCmdOptFlag_Optional        = 0x0001,   ///< Parameter is optional
+};
 
 class ProcessOptions
 {
     public:
         struct INI_Parser_Table
         {
-            const char *keyword;
-            POVMSType key;
-            POVMSType type;
+            const char  *keyword;
+            POVMSType   key;
+            POVMSType   type;
+            int         flags;
         };
 
         struct Cmd_Parser_Table
         {
-            const char *command;
-            POVMSType key;
-            POVMSType type;
-            POVMSType is_switch;
+            const char  *command;
+            POVMSType   key;
+            POVMSType   type;
+            POVMSType   is_switch;
+            int         flags;
         };
 
         ProcessOptions(INI_Parser_Table *, Cmd_Parser_Table *);
@@ -77,16 +90,22 @@ class ProcessOptions
         static bool IsTrue(const char *);
         static bool IsFalse(const char *);
 
-        static int POVMSAttr_GetUTF8String(POVMSAttributePtr, POVMSType, char *, int *);
+        /// @todo This should be in the POVMS module.
+        /// @note The attribute will be encoded as UCS2 with a trailing NUL byte.
+        static int POVMSAttr_GetUTF8String(POVMSAttributePtr attr, POVMSType type, UTF8String& s);
+        /// @todo This should be in the POVMS module.
+        /// @note The attribute must be encoded as UCS2 with a trailing NUL byte.
         static int POVMSAttr_SetUTF8String(POVMSAttributePtr, POVMSType, const char *);
+        /// @todo This should be in the POVMS module.
+        /// @note The attribute will be encoded as UCS2 with a trailing NUL byte.
         static int POVMSUtil_SetUTF8String(POVMSObjectPtr, POVMSType, const char *);
-        static size_t ConvertUTF8ToUCS2(const char *, UCS2 *);
-        static size_t ConvertUCS2ToUTF8(const UCS2 *, char *);
+
+        static size_t ConvertUTF16ToUTF8(const UTF16 *source, UTF8String& dest);
+        static size_t ConvertUCS2ToUTF8(const UCS2 *source, UTF8String& dest);
     protected:
         virtual int ReadSpecialOptionHandler(INI_Parser_Table *, char *, POVMSObjectPtr);
         virtual int ReadSpecialSwitchHandler(Cmd_Parser_Table *, char *, POVMSObjectPtr, bool);
         virtual int WriteSpecialOptionHandler(INI_Parser_Table *, POVMSObjectPtr, OTextStream *);
-        virtual bool WriteOptionFilter(INI_Parser_Table *);
         virtual bool ProcessUnknownSwitch(char *, char *, POVMSObjectPtr);
         virtual int ProcessUnknownString(char *, POVMSObjectPtr);
 

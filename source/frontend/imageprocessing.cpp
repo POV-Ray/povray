@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,17 +33,18 @@
 ///
 //******************************************************************************
 
-#include <string>
-#include <cctype>
-
-#include <boost/scoped_ptr.hpp>
-
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
-#include "base/types.h"
-#include "base/image/encoding.h"
-
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/imageprocessing.h"
+
+// Standard C++ header files
+#include <memory>
+
+// POV-Ray header files (base module)
+#include "base/image/dither.h"
+#include "base/image/image.h"
+
+// POV-Ray header files (POVMS module)
+#include "povms/povmsid.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -107,9 +108,9 @@ UCS2String ImageProcessing::WriteImage(POVMS_Object& ropts, POVMSInt frame, int 
         Image::ImageFileType imagetype = Image::SYS;
         unsigned int filetype = POV_File_Image_System;
 
-        wopts.bpcc = clip(ropts.TryGetInt(kPOVAttrib_BitsPerColor, 8), 5, 16);
-        wopts.alphachannel = ropts.TryGetBool(kPOVAttrib_OutputAlpha, false);
-        wopts.compress = clip(ropts.TryGetInt(kPOVAttrib_Compression, 0), 0, 255);
+        wopts.bitsPerChannel = clip(ropts.TryGetInt(kPOVAttrib_BitsPerColor, 8), 1, 16);
+        wopts.alphaMode = (ropts.TryGetBool(kPOVAttrib_OutputAlpha, false) ? Image::kAlphaMode_Default : Image::kAlphaMode_None );
+        wopts.compression = (ropts.Exist(kPOVAttrib_Compression) ? clip(ropts.GetInt(kPOVAttrib_Compression), 0, 255) : -1);
         wopts.grayscale = ropts.TryGetBool(kPOVAttrib_GrayscaleOutput, false);
 
         switch(ropts.TryGetInt(kPOVAttrib_OutputFileType, DEFAULT_OUTPUT_FORMAT))
@@ -117,12 +118,13 @@ UCS2String ImageProcessing::WriteImage(POVMS_Object& ropts, POVMSInt frame, int 
             case kPOVList_FileType_Targa:
                 imagetype = Image::TGA;
                 filetype = POV_File_Image_Targa;
-                wopts.compress = 0;
                 break;
             case kPOVList_FileType_CompressedTarga:
+                // TODO - this file type is obsolete, as Targa compression can now
+                // be controlled using the `Compression` INI setting.
                 imagetype = Image::TGA;
                 filetype = POV_File_Image_Targa;
-                wopts.compress = 1;
+                wopts.compression = 1;
                 break;
             case kPOVList_FileType_PNG:
                 imagetype = Image::PNG;
@@ -131,7 +133,6 @@ UCS2String ImageProcessing::WriteImage(POVMS_Object& ropts, POVMSInt frame, int 
             case kPOVList_FileType_JPEG:
                 imagetype = Image::JPEG;
                 filetype = POV_File_Image_JPEG;
-                wopts.compress = clip(int(wopts.compress), 0, 100);
                 break;
             case kPOVList_FileType_PPM:
                 imagetype = Image::PPM;
@@ -157,19 +158,29 @@ UCS2String ImageProcessing::WriteImage(POVMS_Object& ropts, POVMSInt frame, int 
                 throw POV_EXCEPTION_STRING("Invalid file type for output");
         }
 
-        GammaTypeId gammaType = (GammaTypeId)ropts.TryGetInt(kPOVAttrib_FileGammaType, DEFAULT_FILE_GAMMA_TYPE);
-        float gamma = ropts.TryGetFloat(kPOVAttrib_FileGamma, DEFAULT_FILE_GAMMA);
-        wopts.encodingGamma = GetGammaCurve(gammaType, gamma);
+        GammaTypeId gammaType;
+        float gamma;
+        if (ropts.Exist(kPOVAttrib_FileGammaType))
+        {
+            gammaType = (GammaTypeId)ropts.GetInt(kPOVAttrib_FileGammaType);
+            gamma = ropts.GetFloat(kPOVAttrib_FileGamma);
+            wopts.encodingGamma = GetGammaCurve(gammaType, gamma);
+        }
+        else
+        {
+            // if user didn't explicitly specify File_Gamma, use the file format specific default.
+            wopts.encodingGamma.reset();
+        }
         // NB: RenderFrontend<...>::CreateView should have dealt with kPOVAttrib_LegacyGammaMode already and updated kPOVAttrib_WorkingGammaType and kPOVAttrib_WorkingGamma to fit.
         gammaType = (GammaTypeId)ropts.TryGetInt(kPOVAttrib_WorkingGammaType, DEFAULT_WORKING_GAMMA_TYPE);
         gamma = ropts.TryGetFloat(kPOVAttrib_WorkingGamma, DEFAULT_WORKING_GAMMA);
         wopts.workingGamma = GetGammaCurve(gammaType, gamma);
 
         bool dither = ropts.TryGetBool(kPOVAttrib_Dither, false);
-        DitherMethodId ditherMethod = kPOVList_DitherMethod_None;
+        DitherMethodId ditherMethod = DitherMethodId::kNone;
         if (dither)
-            ditherMethod = (DitherMethodId)ropts.TryGetInt(kPOVAttrib_DitherMethod, kPOVList_DitherMethod_FloydSteinberg);
-        wopts.dither = GetDitherHandler(ditherMethod, image->GetWidth());
+            ditherMethod = ropts.TryGetEnum(kPOVAttrib_DitherMethod, DitherMethodId::kBlueNoise);
+        wopts.ditherStrategy = GetDitherStrategy(ditherMethod, image->GetWidth());
 
         // in theory this should always return a filename since the frontend code
         // sets it via a call to GetOutputFilename() before the render starts.
@@ -177,8 +188,8 @@ UCS2String ImageProcessing::WriteImage(POVMS_Object& ropts, POVMSInt frame, int 
         if(filename.empty() == true)
             filename = GetOutputFilename(ropts, frame, digits);
 
-        boost::scoped_ptr<OStream> imagefile(NewOStream(filename.c_str(), filetype, false)); // TODO - check file permissions somehow without macro [ttrf]
-        if(imagefile == NULL)
+        std::unique_ptr<OStream> imagefile(NewOStream(filename.c_str(), filetype, false)); // TODO - check file permissions somehow without macro [ttrf]
+        if (imagefile == nullptr)
             throw POV_EXCEPTION_CODE(kCannotOpenFileErr);
 
         Image::Write(imagetype, imagefile.get(), image.get(), wopts);
@@ -254,10 +265,10 @@ UCS2String ImageProcessing::GetOutputFilename(POVMS_Object& ropts, POVMSInt fram
             imagetype = Image::HDR;
             break;
 
-#ifdef SYS_TO_STANDARD
+#ifdef POV_SYS_IMAGE_TYPE
         case kPOVList_FileType_System:
-            ext = ASCIItoUCS2String(POV_SYS_FILE_EXTENSION);
-            imagetype = Image::SYS_TO_STANDARD;
+            ext = ASCIItoUCS2String(POV_SYS_IMAGE_EXTENSION);
+            imagetype = Image::POV_SYS_IMAGE_TYPE;
             break;
 #endif
 

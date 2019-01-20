@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,18 +44,24 @@
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
+
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
 
 #define TRIANGLE_OBJECT        (PATCH_OBJECT)
 #define SMOOTH_TRIANGLE_OBJECT (PATCH_OBJECT)
-/* NK 1998 double_illuminate - removed +DOUBLE_ILLUMINATE from smooth_triangle */
 
-
-/*****************************************************************************
-* Global typedefs
-******************************************************************************/
+/// @}
+///
+//******************************************************************************
 
 class Triangle : public NonsolidObject
 {
@@ -65,6 +71,7 @@ class Triangle : public NonsolidObject
         DBL             Distance;
         unsigned int    Dominant_Axis:2;
         unsigned int    vAxis:2;  /* used only for smooth triangles */
+        bool            mPointOrderSwapped:1; ///< Whether ordering of points had been swapped
 
         Triangle();
         Triangle(int t);
@@ -110,6 +117,10 @@ class SmoothTriangle : public Triangle
     protected:
         bool Compute_Smooth_Triangle();
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

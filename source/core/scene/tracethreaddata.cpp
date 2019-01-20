@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,6 +38,7 @@
 
 #include <limits>
 
+#include "core/material/noise.h"
 #include "core/scene/scenedata.h"
 #include "core/shape/blob.h"
 #include "core/shape/fractal.h"
@@ -49,20 +50,24 @@
 namespace pov
 {
 
-TraceThreadData::TraceThreadData(shared_ptr<SceneData> sd): sceneData(sd), qualityFlags(9)
+TraceThreadData::TraceThreadData(shared_ptr<SceneData> sd, size_t seed) :
+    sceneData(sd),
+    qualityFlags(9),
+    stochasticRandomGenerator(GetRandomDoubleGenerator(0.0,1.0)),
+    stochasticRandomSeedBase(seed)
 {
     for(int i = 0; i < 4; i++)
-        Fractal_IStack[i] = NULL;
+        Fractal_IStack[i] = nullptr;
     Fractal::Allocate_Iteration_Stack(Fractal_IStack, sceneData->Fractal_Iteration_Stack_Length);
     Max_Blob_Queue_Size = 1;
     Blob_Coefficient_Count = sceneData->Max_Blob_Components * 5;
     Blob_Interval_Count = sceneData->Max_Blob_Components * 2;
-    Blob_Queue = reinterpret_cast<void **>(POV_MALLOC(sizeof(void **), "Blob Queue"));
+    Blob_Queue = reinterpret_cast<void **>(POV_MALLOC(sizeof(void *), "Blob Queue"));
     Blob_Coefficients = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * Blob_Coefficient_Count, "Blob Coefficients"));
     Blob_Intervals = new Blob_Interval_Struct [Blob_Interval_Count];
     isosurfaceData = reinterpret_cast<ISO_ThreadData *>(POV_MALLOC(sizeof(ISO_ThreadData), "Isosurface Data"));
-    isosurfaceData->pFn = NULL;
-    isosurfaceData->current = NULL;
+    isosurfaceData->pFn = nullptr;
+    isosurfaceData->current = nullptr;
     isosurfaceData->cache = false;
     isosurfaceData->Inv3 = 1;
     isosurfaceData->fmax = 0.0;
@@ -79,12 +84,14 @@ TraceThreadData::TraceThreadData(shared_ptr<SceneData> sd): sceneData(sd), quali
     cpuTime = 0;
     realTime = 0;
 
+    stochasticRandomGenerator->Seed(stochasticRandomSeedBase);
+
     for(vector<LightSource *>::iterator it = sceneData->lightSources.begin(); it != sceneData->lightSources.end(); it++)
         lightSources.push_back(static_cast<LightSource *> (Copy_Object(*it)));
 
     // all of these are for photons
-    LightSource *photonLight = NULL;
-    ObjectPtr photonObject = NULL;
+    LightSource *photonLight = nullptr;
+    ObjectPtr photonObject = nullptr;
     litObjectIgnoresPhotons = false;
     hitObject = false;    // did we hit the target object? (for autostop)
     photonSpread = 0.0; // photon spread (in radians)
@@ -113,7 +120,7 @@ TraceThreadData::TraceThreadData(shared_ptr<SceneData> sd): sceneData(sd), quali
 
 TraceThreadData::~TraceThreadData()
 {
-    for(vector<FPUContext*>::iterator i = fpuContextPool.begin(); i != fpuContextPool.end(); ++i)
+    for(vector<GenericFunctionContext*>::iterator i = functionContextPool.begin(); i != functionContextPool.end(); ++i)
         delete *i;
 
     POV_FREE(Blob_Coefficients);

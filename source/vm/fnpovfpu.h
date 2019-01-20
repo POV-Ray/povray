@@ -10,8 +10,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -127,7 +127,7 @@ struct FunctionCode
     unsigned int localvar_pos[MAX_FUNCTION_PARAMETER_LIST];
     char *localvar[MAX_FUNCTION_PARAMETER_LIST];
     char *parameter[MAX_FUNCTION_PARAMETER_LIST];
-    FunctionSourceInfo sourceInfo;
+    CustomFunctionSourceInfo sourceInfo;
     unsigned int flags;
     FNCODE_PRIVATE_COPY_METHOD private_copy_method;
     FNCODE_PRIVATE_DESTROY_METHOD private_destroy_method;
@@ -137,28 +137,20 @@ struct FunctionCode
 typedef unsigned int FUNCTION;
 typedef FUNCTION * FUNCTION_PTR;
 
-// WARNING: Do not change this structure without notice!!!
-// Platform specific code may depend on the exact layout and size! [trf]
 struct FunctionEntry
 {
-    union {
-        FunctionCode fn;            // valid if reference_count != 0
-        FUNCTION next_unreferenced; // valid if reference_count == 0
-    };
+    FunctionCode fn;            // valid if reference_count != 0
+    FUNCTION next_unreferenced; // valid if reference_count == 0
     unsigned int reference_count;
     SYS_FUNCTION_ENTRY
 };
 
-// WARNING: Do not change this structure without notice!!!
-// Platform specific code may depend on the exact layout and size! [trf]
 struct StackFrame
 {
     unsigned int pc;
     FUNCTION fn;
 };
 
-// WARNING: Do not change this structure without notice!!!
-// Platform specific code may depend on the exact layout and size! [trf]
 class FPUContext : public GenericFunctionContext
 {
     public:
@@ -168,7 +160,7 @@ class FPUContext : public GenericFunctionContext
         StackFrame *pstackbase;
         DBL *dblstackbase;
         unsigned int maxdblstacksize;
-        FunctionVM *functionvm;
+        intrusive_ptr<FunctionVM> functionvm;
         TraceThreadData *threaddata;
         #if (SYS_FUNCTIONS == 1)
         DBL *dblstack;
@@ -249,7 +241,7 @@ extern const Sys2 POVFPU_Sys2Table[];
 extern const unsigned int POVFPU_Sys1TableSize;
 extern const unsigned int POVFPU_Sys2TableSize;
 
-void POVFPU_Exception(FPUContext *context, FUNCTION fn, const char *msg = NULL);
+void POVFPU_Exception(FPUContext *context, FUNCTION fn, const char *msg = nullptr);
 DBL POVFPU_RunDefault(FPUContext *context, FUNCTION k);
 
 void FNCode_Delete(FunctionCode *);
@@ -258,6 +250,7 @@ class FunctionVM : public GenericFunctionContextFactory
 {
         friend void POVFPU_Exception(FPUContext *, FUNCTION, const char *);
         friend DBL POVFPU_RunDefault(FPUContext *, FUNCTION);
+
     public:
 
         class CustomFunction : public GenericScalarFunction
@@ -271,10 +264,11 @@ class FunctionVM : public GenericFunctionContextFactory
                 virtual void PushArgument(GenericFunctionContextPtr pContext, DBL arg);
                 virtual DBL Execute(GenericFunctionContextPtr pContext);
                 virtual GenericScalarFunctionPtr Clone() const;
-                virtual const FunctionSourceInfo* GetSourceInfo() const;
+                virtual const CustomFunctionSourceInfo* GetSourceInfo() const;
             protected:
-                FunctionVM *mpVm;
+                intrusive_ptr<FunctionVM> mpVm;
                 FUNCTION_PTR mpFn;
+                static inline FPUContext* GetFPUContextPtr(GenericFunctionContextPtr pContext);
         };
 
         FunctionVM();

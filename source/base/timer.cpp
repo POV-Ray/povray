@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -50,50 +50,7 @@
 namespace pov_base
 {
 
-#ifndef POV_TIMER
-
-TimerDefault::TimerDefault(bool tctime) :
-    threadCPUTimeOnly(tctime)
-{
-    Reset();
-}
-
-TimerDefault::~TimerDefault()
-{
-}
-
-POV_LONG TimerDefault::ElapsedRealTime() const
-{
-    boost::xtime t;
-    boost::xtime_get(&t, POV_TIME_UTC);
-    POV_LONG tt = (POV_LONG)(t.sec) * (POV_LONG)(1000000000) + (POV_LONG)(t.nsec);
-    POV_LONG st = (POV_LONG)(realTimeStart.sec) * (POV_LONG)(1000000000) + (POV_LONG)(realTimeStart.nsec);
-    return ((tt - st) / (POV_LONG)(1000000));
-}
-
-POV_LONG TimerDefault::ElapsedCPUTime() const
-{
-    boost::xtime t;
-    boost::xtime_get(&t, POV_TIME_UTC);
-    POV_LONG tt = (POV_LONG)(t.sec) * (POV_LONG)(1000000000) + (POV_LONG)(t.nsec);
-    POV_LONG st = (POV_LONG)(cpuTimeStart.sec) * (POV_LONG)(1000000000) + (POV_LONG)(cpuTimeStart.nsec);
-    return ((tt - st) / (POV_LONG)(1000000));
-}
-
-bool TimerDefault::HasValidCPUTime() const
-{
-    return false;
-}
-
-void TimerDefault::Reset()
-{
-    boost::xtime_get(&realTimeStart, POV_TIME_UTC);
-    boost::xtime_get(&cpuTimeStart, POV_TIME_UTC);
-}
-
-#endif // POV_TIMER
-
-#if POV_MULTITHREADED && !defined(POV_DELAY_IMPLEMENTED)
+#if POV_MULTITHREADED && POV_USE_DEFAULT_DELAY
 
 void Delay(unsigned int msec)
 {
@@ -105,6 +62,33 @@ void Delay(unsigned int msec)
     boost::thread::sleep(t);
 }
 
-#endif // POV_MULTITHREADED && !defined(POV_DELAY_IMPLEMENTED)
+#endif // POV_MULTITHREADED && POV_USE_DEFAULT_DELAY
+
+#if POV_USE_DEFAULT_TIMER
+
+Timer::Timer()
+{
+    Reset();
+}
+
+Timer::~Timer()
+{
+}
+
+POV_LONG Timer::ElapsedRealTime() const
+{
+    boost::xtime t;
+    boost::xtime_get(&t, POV_TIME_UTC);
+    POV_LONG tt = (POV_LONG)(t.sec) * (POV_LONG)(1000000000) + (POV_LONG)(t.nsec);
+    POV_LONG st = (POV_LONG)(mRealTimeStart.sec) * (POV_LONG)(1000000000) + (POV_LONG)(mRealTimeStart.nsec);
+    return ((tt - st) / (POV_LONG)(1000000));
+}
+
+void Timer::Reset()
+{
+    boost::xtime_get(&mRealTimeStart, POV_TIME_UTC);
+}
+
+#endif // POV_USE_DEFAULT_TIMER
 
 }

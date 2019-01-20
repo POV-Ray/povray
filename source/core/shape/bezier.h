@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,18 +44,23 @@
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
+
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
 
 #define BICUBIC_PATCH_OBJECT (PATCH_OBJECT)
-/* NK 1998 double_illuminate - removed +DOUBLE_ILLUMINATE from bicubic_patch */
 
-#define BEZIER_INTERIOR_NODE 0
-#define BEZIER_LEAF_NODE 1
-
-#define MAX_PATCH_TYPE 2
-
+/// @}
+///
+//******************************************************************************
 
 
 /*****************************************************************************
@@ -141,6 +146,10 @@ class BicubicPatch : public NonsolidObject
         static bool subpatch_normal(const Vector3d& v1, const Vector3d& v2, const Vector3d& v3, Vector3d& Result, DBL *d);
         static void Compute_Texture_UV(const Vector2d& p, const Vector2d st[4], Vector2d& t);
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

@@ -8,8 +8,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -113,6 +113,8 @@ const INTERSECTION_STATS_INFO intersection_stats[kPOVList_Stat_Last] =
       "Lathe" },
     { kPOVList_Stat_LatheBdTest,        Lathe_Bound_Tests, Lathe_Bound_Tests_Succeeded,
       "Lathe Bound" },
+    { kPOVList_Stat_LemonTest,          Ray_Lemon_Tests, Ray_Lemon_Tests_Succeeded,
+      "Lemon" },
     { kPOVList_Stat_MeshTest,           Ray_Mesh_Tests, Ray_Mesh_Tests_Succeeded,
       "Mesh" },
     { kPOVList_Stat_OvusTest,           Ray_Ovus_Tests, Ray_Ovus_Tests_Succeeded,
@@ -161,7 +163,7 @@ const INTERSECTION_STATS_INFO intersection_stats[kPOVList_Stat_Last] =
       "Light Buffer" },
     { kPOVList_Stat_VistaBufferTest,    VBuffer_Tests, VBuffer_Tests_Succeeded,
       "Vista Buffer" },
-    { kPOVList_Stat_Last, MaxIntStat, MaxIntStat, NULL }
+    { kPOVList_Stat_Last, MaxIntStat, MaxIntStat, nullptr }
 };
 
 }

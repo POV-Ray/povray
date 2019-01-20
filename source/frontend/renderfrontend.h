@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,35 +36,34 @@
 #ifndef POVRAY_FRONTEND_RENDERFRONTEND_H
 #define POVRAY_FRONTEND_RENDERFRONTEND_H
 
-#include <list>
-#include <map>
-#include <set>
-#include <string>
-#include <vector>
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "frontend/configfrontend.h"
 
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <set>
 
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
 
 #include "base/path.h"
-#include "base/stringutilities.h"
-#include "base/textstreambuffer.h"
-#include "base/types.h"
-#include "base/image/colourspace.h"
+#include "base/platformbase.h"
 #include "base/image/image.h"
 
-#include "frontend/configfrontend.h"
 #include "frontend/console.h"
-#include "frontend/display.h"
 #include "frontend/imageprocessing.h"
+
+namespace pov_base
+{
+class TextStreamBuffer;
+class Image;
+class OStream;
+}
 
 namespace pov_frontend
 {
 
 using namespace pov_base;
+
+class Display;
 
 enum
 {
@@ -143,21 +142,11 @@ struct ViewData
     mutable shared_ptr<Image> image;
     mutable shared_ptr<Display> display;
     mutable shared_ptr<OStream> imageBackup;
+    GammaCurvePtr displayGamma;
+    bool greyscaleDisplay;
 
     Path imageBackupFile;
 };
-
-}
-
-#include "frontend/parsermessagehandler.h"
-#include "frontend/filemessagehandler.h"
-#include "frontend/rendermessagehandler.h"
-#include "frontend/imagemessagehandler.h"
-
-namespace pov_frontend
-{
-
-using namespace pov_base;
 
 namespace Message2Console
 {
@@ -298,7 +287,7 @@ class RenderFrontend : public RenderFrontendBase
         void ResumeParser(SceneId sid);
         void StopParser(SceneId sid);
 
-        ViewId CreateView(SceneId sid, POVMS_Object& obj, shared_ptr<ImageProcessing>& imageProcessing, boost::function<Display *(unsigned int, unsigned int, GammaCurvePtr)> fn);
+        ViewId CreateView(SceneId sid, POVMS_Object& obj, shared_ptr<ImageProcessing>& imageProcessing, boost::function<Display *(unsigned int, unsigned int)> fn);
         void CloseView(ViewId vid);
 
         ViewData::ViewState GetViewState(ViewId vid);
@@ -447,7 +436,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::StopParser(SceneId
 }
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
-RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::CreateView(SceneId sid, POVMS_Object& obj, shared_ptr<ImageProcessing>& imageProcessing, boost::function<Display *(unsigned int,unsigned int,GammaCurvePtr)> fn)
+RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::CreateView(SceneId sid, POVMS_Object& obj, shared_ptr<ImageProcessing>& imageProcessing, boost::function<Display *(unsigned int,unsigned int)> fn)
 {
     typename SceneHandlerMap::iterator shi(scenehandler.find(sid));
 
@@ -473,13 +462,13 @@ RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_M
             switch (shi->second.data.backwardCompatibilityData.legacyGammaMode)
             {
                 case kPOVList_GammaMode_None:
-                    // The scene didn't explicitly set assumed_gamma, and it ended up with a #version of less than 3.7,
+                    // The scene didn't explicitly set assumed_gamma, and it ended up with a #version of less than v3.7,
                     // which normally means no gamma correction is done whatsoever.
 
-                    if(obj.TryGetFloat(kPOVAttrib_Version, 0.0f) >= 3.7f)
+                    if(obj.TryGetFloat(kPOVAttrib_Version, 0.0f) >= 3.7f) // v3.7.0
                     {
-                        // INI file or command line specify a version of 3.7 or greater, which we take to imply that
-                        // output gamma handling should follow the 3.7 model.
+                        // INI file or command line specify a version of v3.7 or greater, which we take to imply that
+                        // output gamma handling should follow the v3.7 model.
 
                         shi->second.data.backwardCompatibilityData.legacyGammaMode = kPOVList_GammaMode_AssumedGamma37Implied;
                         shi->second.data.backwardCompatibilityData.workingGammaType = DEFAULT_WORKING_GAMMA_TYPE;
@@ -488,8 +477,8 @@ RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_M
                                                          "Warning: A version of 3.7 or greater was specified in an INI file or on the\n"
                                                          "command-line, but the scene finished parsing with a #version of 3.6x or\n"
                                                          "earlier and without assumed_gamma set. Output gamma correction is being turned\n"
-                                                         "on as per the 3.7 default using an assumed_gamma default of " DEFAULT_WORKING_GAMMA_TEXT ",\n"
-                                                         "rather than left off (which was the 3.6x and earlier default), because the INI\n"
+                                                         "on as per the v3.7 default using an assumed_gamma default of " DEFAULT_WORKING_GAMMA_TEXT ",\n"
+                                                         "rather than left off (which was the v3.6.x and earlier default), because the INI\n"
                                                          "file or command-line specified version directive takes precedence.");
                     }
                     break;
@@ -497,8 +486,8 @@ RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_M
                 case kPOVList_GammaMode_AssumedGamma36:
                 case kPOVList_GammaMode_AssumedGamma37:
                 case kPOVList_GammaMode_AssumedGamma37Implied:
-                    // The scene explicitly set assumed_gamma, and/or ended up with a #version of 3.7 or higher,
-                    // which normally means output gamma handling should follow the 3.6 / 3.7 assumed_gamma model
+                    // The scene explicitly set assumed_gamma, and/or ended up with a #version of v3.7 or higher,
+                    // which normally means output gamma handling should follow the v3.6 / v3.7 assumed_gamma model
                     // (which differs only in input image gamma handling, which is irrelevant here).
                     break;
 
@@ -534,6 +523,9 @@ RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_M
                 default:
                     throw POV_EXCEPTION_STRING("Unknown gamma handling mode in CreateView()");
             }
+            vh.data.displayGamma = gamma;
+
+            vh.data.greyscaleDisplay = obj.TryGetBool(kPOVAttrib_GrayscaleOutput, false);
 
             vh.data.state = ViewData::View_Invalid;
 
@@ -541,10 +533,10 @@ RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_M
 
             if(obj.TryGetBool(kPOVAttrib_OutputToFile, true))
             {
-                if (imageProcessing == NULL)
+                if (imageProcessing == nullptr)
                     throw POV_EXCEPTION(kNullPointerErr, "Internal error: output to file is set, but no ImageProcessing object supplied");
                 shared_ptr<Image> img(imageProcessing->GetImage());
-                if(img != NULL)
+                if (img != nullptr)
                 {
                     if((img->GetWidth() != width) || (img->GetHeight() != height))
                         throw POV_EXCEPTION_STRING("Invalid partial rendered image. Image size does not match!");
@@ -556,13 +548,13 @@ RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_M
             }
 
             if(obj.TryGetBool(kPOVAttrib_Display, true) == true)
-                vh.data.display = shared_ptr<Display>(fn(width, height, gamma));
+                vh.data.display = shared_ptr<Display>(fn(width, height));
 
             viewhandler[vid] = vh;
             view2scene[vid] = sid;
             scene2views[sid].insert(vid);
 
-            if(viewhandler[vid].data.display != NULL)
+            if (viewhandler[vid].data.display != nullptr)
                 viewhandler[vid].data.display->Initialise();
 
             shi->second.data.state = SceneData::Scene_Viewing;
@@ -666,7 +658,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::StartRender(ViewId
             {
                 // TODO: we need to check to see if the image file is of an appropriate
                 //       size and format. if so we must skip the entire render.
-                //       this will more or less duplicate the pre-3.7 behaviour, except
+                //       this will more or less duplicate the pre-v3.7 behaviour, except
                 //       that those versions would first load the image and then display
                 //       it if +d was set. I am not sure if it's important to replicate
                 //       this behaviour, however from a user's point of view it might be
@@ -803,10 +795,10 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::HandleRenderMessag
             vhi->second.data.state = ViewData::View_Rendered;
 
             // close the state file if it's open
-            if(vhi->second.data.imageBackup != NULL)
+            if (vhi->second.data.imageBackup != nullptr)
             {
                 vhi->second.data.imageBackup.reset();
-                POV_UCS2_REMOVE(vhi->second.data.imageBackupFile().c_str());
+                PlatformBase::GetInstance().DeleteLocalFile (vhi->second.data.imageBackupFile().c_str());
             }
         }
         else if(ident == kPOVMsgIdent_Failed)
@@ -817,7 +809,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::HandleRenderMessag
             vhi->second.data.state = ViewData::View_Failed;
 
             // close the state file if it's open
-            if(vhi->second.data.imageBackup != NULL)
+            if (vhi->second.data.imageBackup != nullptr)
                 vhi->second.data.imageBackup.reset();
         }
         else

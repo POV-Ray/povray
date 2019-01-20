@@ -28,8 +28,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -64,8 +64,17 @@
 
 #include "base/pov_err.h"
 
+#include "core/coretypes.h"
+
 namespace pov
 {
+
+//##############################################################################
+///
+/// @defgroup PovCoreSupportSimplevector Fast Data Containers
+/// @ingroup PovCore
+///
+/// @{
 
 ////////////////////////////////////////////////////////////////////////////
 // Works like std::vector in some ways, but very limited and not at all as
@@ -91,18 +100,18 @@ public:
     typedef const ContainerType& const_reference;
     typedef const ContainerType *const_iterator;
     typedef ContainerType *iterator;
-    typedef Allocator allocator;
+    typedef Allocator allocator_type;
     typedef std::reverse_iterator<iterator> reverse_iterator;
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
     SimpleVector()
     {
-        m_First = m_Last = m_End = NULL;
+        m_First = m_Last = m_End = nullptr;
     }
 
     SimpleVector(size_type nItems, const ContainerType& InitialVal)
     {
-        m_First = m_Last = m_End = NULL;
+        m_First = m_Last = m_End = nullptr;
         if (nItems)
             allocate (nItems, InitialVal);
     }
@@ -116,13 +125,13 @@ public:
                 *m_Last++ = *p++;
         }
         else
-            m_First = m_Last = m_End = NULL;
+            m_First = m_Last = m_End = nullptr;
     }
 
     ~SimpleVector()
     {
         // we don't call destructors, even if they exist
-        if (m_First != NULL)
+        if (m_First != nullptr)
             deallocate ();
     }
 
@@ -130,7 +139,7 @@ public:
     {
         if (RHS.size() > capacity())
         {
-            if (m_First != NULL)
+            if (m_First != nullptr)
                 deallocate ();
             allocate (RHS.size());
         }
@@ -155,12 +164,22 @@ public:
         return (m_First);
     }
 
+    const_iterator cbegin() const
+    {
+        return (m_First);
+    }
+
     iterator end()
     {
         return (m_Last);
     }
 
     const_iterator end() const
+    {
+        return (m_Last);
+    }
+
+    const_iterator cend() const
     {
         return (m_Last);
     }
@@ -175,12 +194,22 @@ public:
         return (const_reverse_iterator (m_Last));
     }
 
+    const_reverse_iterator crbegin() const
+    {
+        return (const_reverse_iterator (m_Last));
+    }
+
     reverse_iterator rend()
     {
         return (reverse_iterator (m_First));
     }
 
     const_reverse_iterator rend() const
+    {
+        return (const_reverse_iterator (m_First));
+    }
+
+    const_reverse_iterator crend() const
     {
         return (const_reverse_iterator (m_First));
     }
@@ -280,7 +309,7 @@ public:
                 p [i] = m_First [i];
             for (size_type i = Index + 1 ; i < c ; i++)
                 p [i] = m_First [i];
-            if (m_First != NULL)
+            if (m_First != nullptr)
                 alloc.deallocate (m_First, n);
             m_First = p;
             m_End = m_First + nc;
@@ -319,6 +348,23 @@ public:
         m_Last = m_First;
     }
 
+    void reserve(size_type nItems)
+    {
+        size_type c = capacity();
+        if (c < nItems)
+        {
+            pointer p = alloc.allocate(nItems);
+            size_type n = size();
+            for (size_type i = 0; i < n; ++i)
+                p[i] = m_First[i];
+            if (m_First != nullptr)
+                alloc.deallocate(m_First, c);
+            m_First = p;
+            m_End = m_First + nItems;
+            m_Last = m_First + c;
+        }
+    }
+
 private:
     void allocate (size_type nItems)
     {
@@ -339,7 +385,7 @@ private:
         alloc.deallocate (m_First, m_End - m_First);
     }
 
-    allocator alloc;
+    allocator_type alloc;
     pointer m_First;
     pointer m_End;
     pointer m_Last;
@@ -565,6 +611,185 @@ private:
     const pointer m_End;
     pointer m_Last;
 };
+
+//******************************************************************************
+
+/// Helper class for @ref PooledSimpleVector
+///
+/// @attention
+///     During thread cleanup, vectors handed out by one instance of this class
+///     (via the @ref alloc() method) may happen to be returned to a different
+///     instance (via the @ref release() method). The implementation must handle
+///     such cases gracefully.
+///
+template<class VECTOR_T>
+class VectorPool
+{
+public:
+
+    VectorPool(size_t sizeHint = 0, size_t initialPoolSize = POV_VECTOR_POOL_SIZE) :
+        mPool(),
+        mSizeHint(sizeHint)
+    {
+        if (initialPoolSize != 0)
+            mPool.reserve(initialPoolSize);
+    }
+
+    ~VectorPool()
+    {
+        for (auto&& p : mPool)
+            delete p;
+    }
+
+    VectorPool(const VectorPool&) = delete;
+    VectorPool& operator=(VectorPool&) = delete;
+
+    VECTOR_T *alloc()
+    {
+        VECTOR_T* p;
+        if (mPool.empty())
+        {
+            p = new VECTOR_T();
+        }
+        else
+        {
+            p = mPool.back();
+            mPool.pop_back();
+        }
+        p->clear();
+        if (mSizeHint != 0)
+            p->reserve(mSizeHint);
+        return p;
+    }
+
+    void release(VECTOR_T* p)
+    {
+        mSizeHint = p->capacity();
+        mPool.push_back(p);
+    }
+
+private:
+
+    vector<VECTOR_T*> mPool;
+    size_t mSizeHint;
+};
+
+//******************************************************************************
+
+/// Wrapper for simple vector allocated using a thread-local object pool.
+///
+/// @attention
+///     This class does __not__ run destructors on contained objects.
+///     This is intentional as we currently do not store any objects in it that
+///     require this functionality.
+///
+template<typename ELEMENT_T, size_t SIZE_HINT>
+class PooledSimpleVector
+{
+public:
+
+    typedef POV_SIMPLE_VECTOR<ELEMENT_T>                VectorType;
+    typedef VectorPool<VectorType>                      PoolType;
+
+    typedef typename VectorType::value_type             value_type;
+    typedef typename VectorType::allocator_type         allocator_type;
+    typedef typename VectorType::size_type              size_type;
+    typedef typename VectorType::difference_type        difference_type;
+    typedef typename VectorType::reference              reference;
+    typedef typename VectorType::const_reference        const_reference;
+    typedef typename VectorType::pointer                pointer;
+    typedef typename VectorType::const_pointer          const_pointer;
+    typedef typename VectorType::iterator               iterator;
+    typedef typename VectorType::const_iterator         const_iterator;
+    typedef typename VectorType::reverse_iterator       reverse_iterator;
+    typedef typename VectorType::const_reverse_iterator const_reverse_iterator;
+
+    PooledSimpleVector() :
+        mpVector(GetPool().alloc())
+    {}
+
+    PooledSimpleVector(const PooledSimpleVector& o) :
+        mpVector(GetPool().alloc())
+    {
+        *mpVector = *o.mpVector;
+    }
+
+    ~PooledSimpleVector()
+    {
+        GetPool().release(mpVector);
+    }
+
+    inline PooledSimpleVector& operator=(const PooledSimpleVector& o)
+    {
+        *mpVector = *o.mpVector;
+    }
+
+    // assign() not supported
+    // get_allocator() not supported
+
+    inline reference at(size_type i)                        { return mpVector->at(i); }
+    inline const_reference at(size_type i) const            { return mpVector->at(i); }
+    inline reference operator[](size_type i)                { return (*mpVector)[i]; }
+    inline const_reference operator[](size_type i) const    { return (*mpVector)[i]; }
+    inline reference front()                                { return mpVector->front(); }
+    inline const_reference front() const                    { return mpVector->front(); }
+    inline reference back()                                 { return mpVector->back(); }
+    inline const_reference back() const                     { return mpVector->back(); }
+    // data() not supported
+
+    inline iterator begin()                                 { return mpVector->begin(); }
+    inline const_iterator begin() const                     { return mpVector->begin(); }
+    inline const_iterator cbegin() const                    { return mpVector->cbegin(); }
+    inline iterator end()                                   { return mpVector->end(); }
+    inline const_iterator end() const                       { return mpVector->end(); }
+    inline const_iterator cend() const                      { return mpVector->cend(); }
+    inline reverse_iterator rbegin()                        { return mpVector->rbegin(); }
+    inline const_reverse_iterator rbegin() const            { return mpVector->rbegin(); }
+    inline const_reverse_iterator crbegin() const           { return mpVector->crbegin(); }
+    inline reverse_iterator rend()                          { return mpVector->rend(); }
+    inline const_reverse_iterator rend() const              { return mpVector->rend(); }
+    inline const_reverse_iterator crend() const             { return mpVector->crend(); }
+
+    inline bool empty() const                               { return mpVector->empty(); }
+    inline size_type size() const                           { return mpVector->size(); }
+    inline size_type max_size() const                       { return mpVector->max_size(); }
+    inline void reserve(size_type n)                        { mpVector->reserve(n); }
+    inline size_type capacity() const                       { return mpVector->capacity(); }
+
+    inline void clear()                                     { mpVector->clear(); }
+    inline iterator insert(iterator i, const_reference v)   { return mpVector->insert(i, v); }
+    // other overloads of insert() not supported
+    // emplace() not supported
+    inline iterator erase(iterator i)                       { return mpVector->erase(i); }
+    // other overloads of erase() not supported
+    inline void push_back(const_reference v)                { mpVector->push_back(v); }
+    // other overloads of push_back() not supported
+    // emplace_back() not supported
+    inline void pop_back()                                  { mpVector->pop_back(); }
+    // resize() not supported
+    // swap() not supported
+
+private:
+
+    /// Get thread-local vector pool instance.
+    ///
+    /// @note
+    ///     This construct is deliberate; while it would seem natural to use a straightforward
+    ///     `static thread_local` class member variable instead, in template classes that seems to
+    ///     lead to runtime errors with certain compilers (seen e.g. with XCode 9.3).
+    ///
+    static inline PoolType& GetPool()
+    {
+        static thread_local PoolType pool(SIZE_HINT);
+        return pool;
+    }
+
+    VectorType* mpVector;
+};
+
+/// @}
+///
+//##############################################################################
 
 }
 

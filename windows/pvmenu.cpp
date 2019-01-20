@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -171,7 +171,8 @@ void init_menus (void)
     RemoveMenu (hPopupMenus, CM_RENDERPRIORITY_BACKGROUND, MF_BYCOMMAND);
   }
 
-#if POV_RAY_HAS_OFFICIAL_FEATURES != 1
+#if !POV_RAY_HAS_UPDATE_CHECK
+  // remove update check related menu items
   n = find_menuitem(hOptionsMenu, "&Update Checks") ;
   assert(n != -1) ;
   RemoveMenu (hOptionsMenu, n, MF_BYPOSITION);

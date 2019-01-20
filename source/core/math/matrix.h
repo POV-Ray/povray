@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -45,12 +45,12 @@
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
-
-
-
+//##############################################################################
+///
+/// @defgroup PovCoreMathMatrix Transformation Matrices
+/// @ingroup PovCoreMath
+///
+/// @{
 
 /*****************************************************************************
 * Global typedefs
@@ -66,13 +66,6 @@ struct Transform_Struct
     MATRIX matrix;
     MATRIX inverse;
 };
-
-
-/*****************************************************************************
-* Global variables
-******************************************************************************/
-
-
 
 
 /*****************************************************************************
@@ -119,6 +112,10 @@ void Destroy_Transform (TRANSFORM *Trans);
 DBL *Create_Float (void);
 void MInvers (MATRIX r, const MATRIX m);
 int MInvers3(const Matrix3x3& inM, Matrix3x3& outM);
+
+/// @}
+///
+//##############################################################################
 
 }
 

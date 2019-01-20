@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -924,5 +924,135 @@ void Cone::Compute_BBox()
 
     Recompute_BBox(&BBox, Trans);
 }
+
+
+
+#ifdef POV_ENABLE_CONE_UV
+
+/*****************************************************************************
+*
+* FUNCTION
+*
+*   Cone_UVCoord
+*
+* INPUT
+*
+* OUTPUT
+*
+* RETURNS
+*
+* AUTHOR
+*
+*   Jerome Grimbert
+*
+* DESCRIPTION
+*
+*   -
+*
+* CHANGES
+*
+*   -
+*
+******************************************************************************/
+
+void Cone::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
+{
+    CalcUV(Inter->IPoint, Result);
+}
+
+
+/*****************************************************************************
+*
+* FUNCTION
+*
+*   CalcUV
+*
+* INPUT
+*
+* OUTPUT
+*
+* RETURNS
+*
+* AUTHOR
+*
+*   Jerome Grimbert
+*
+* DESCRIPTION
+*
+*   Calculate the u/v coordinate of a point on an cone/cylinder (inspired by lemon)
+*
+* CHANGES
+*
+*   -
+*
+******************************************************************************/
+
+void Cone::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
+{
+    DBL len, x, y;
+    DBL phi, theta;
+    Vector3d P;
+
+    // Transform the ray into the cone space.
+    MInvTransPoint(P, IPoint, Trans);
+
+    // the center of UV coordinate is the <0,0> point
+    x = P[X];
+    y = P[Y];
+
+    // Determine its angle from the point (1, 0, 0) in the x-y plane.
+    len = x * x + y * y;
+
+    if ((P[Z]>(dist+EPSILON))&&(P[Z]<(1.0-EPSILON)))
+    {
+        // when not on a face, the range 0.25 to 0.75 is used (just plain magic 25% for face, no other reason, but it makes C-Lipka happy)
+        phi = 0.75-0.5*(P[Z]-dist)/(1.0-dist);
+    }
+    else if (P[Z]>(dist+EPSILON))
+    {
+        // the radii are changed (apex_radius is 1.0 for len)
+        // aka P[Z] is 1, use the apex_radius, from 75% to 100% (at the very center)
+        phi = (sqrt(len)/4.0);
+    }
+    else
+    {
+        // aka P[Z] is dist, use the base_radius, from 0% (at the very center) to 25%
+        phi = 1.0;
+        if (base_radius)
+        {
+            phi = 1.0-(sqrt(len)*apex_radius/(base_radius*4.0));
+        }
+    }
+
+
+    if (len > EPSILON)
+    {
+        len = sqrt(len);
+        if (y == 0.0)
+        {
+            if (x > 0)
+                theta = 0.0;
+            else
+                theta = M_PI;
+        }
+        else
+        {
+            theta = acos(x / len);
+            if (y < 0.0)
+                theta = TWO_M_PI - theta;
+        }
+
+        theta /= TWO_M_PI; // This will be from 0 to 1
+    }
+    else
+        // This point is at one of the poles. Any value of xcoord will be ok...
+        theta = 0;
+
+    Result[U] = theta;
+    Result[V] = phi;
+
+}
+
+#endif // POV_ENABLE_CONE_UV
 
 }

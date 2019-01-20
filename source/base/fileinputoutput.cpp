@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,6 +38,7 @@
 
 // C++ variants of standard C header files
 #include <cstdarg>
+#include <cstdio>
 #include <cstdlib>
 
 // Standard C++ header files
@@ -47,161 +48,29 @@
 #include "base/platformbase.h"
 #include "base/pov_err.h"
 
-// All the builtin fonts must be declared here
-#include "base/font/crystal.h"
-#include "base/font/cyrvetic.h"
-#include "base/font/povlogo.h"
-#include "base/font/timrom.h"
-
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov_base
 {
 
-IOBase::IOBase(unsigned int dir, unsigned int type)
+IOBase::IOBase() : filename(), fail(true)
 {
-    filetype = type;
-    direction = dir;
-    fail = true;
-    f = NULL;
+}
+
+IOBase::IOBase(const UCS2String& name) : filename(name), fail(true)
+{
 }
 
 IOBase::~IOBase()
 {
-    close();
 }
 
-bool IOBase::open(const UCS2String& name, unsigned int Flags /* = 0 */)
+IStream::IStream() : IOBase()
 {
-    char mode[8];
-
-    close();
-    filename = name;
-
-    if((Flags & append) == 0)
-    {
-        switch(direction)
-        {
-            case input:
-                strcpy(mode, "r");
-                break;
-            case output:
-                strcpy(mode, "w");
-                break;
-            case io:
-                strcpy(mode, "w+");
-                break;
-            default:
-                return false;
-        }
-    }
-    else
-    {
-        // we cannot use append mode here, since "a" mode is totally incompatible with any
-        // output file format that requires in-place updates(i.e. writing to any location
-        // other than the end of the file). BMP files are in this category. In theory, "r+"
-        // can do anything "a" can do(with appropriate use of seek()) so append mode should
-        // not be needed.
-        strcpy(mode, "r+");
-    }
-
-    strcat(mode, "b");
-
-    f = NULL;
-    if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdin") == 0)
-    {
-        if(direction != input ||(Flags & append) != 0)
-            return false;
-        f = stdin;
-    }
-    else if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdout") == 0)
-    {
-        if(direction != output ||(Flags & append) != 0)
-            return false;
-        f = stdout;
-    }
-    else if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stderr") == 0)
-    {
-        if(direction != output ||(Flags & append) != 0)
-            return false;
-        f = stderr;
-    }
-    else
-    {
-        if((f = POV_UCS2_FOPEN(name, mode)) == NULL)
-        {
-            if((Flags & append) == 0)
-                return false;
-
-            // to maintain traditional POV +c(continue) mode compatibility, if
-            // the open for append of an existing file fails, we allow a new file
-            // to be created.
-            mode [0] = 'w';
-            if((f = POV_UCS2_FOPEN(name, mode)) == NULL)
-                return false;
-        }
-    }
-    fail = false;
-
-    if((Flags & append) != 0)
-    {
-        if(!seekg(0, seek_end))
-        {
-            close();
-            return false;
-        }
-    }
-
-    return true;
 }
 
-bool IOBase::close(void)
-{
-    if(f != NULL)
-    {
-        if (f != stdout && f != stderr && f != stdin)
-            fclose(f);
-        f = NULL;
-    }
-    fail = true;
-    return true;
-}
-
-IOBase& IOBase::flush(void)
-{
-    if(f != NULL)
-        fflush(f);
-    return *this;
-}
-
-IOBase& IOBase::read(void *buffer, size_t count)
-{
-    if(!fail && count > 0)
-        fail = fread(buffer, count, 1, f) != 1;
-    return *this;
-}
-
-IOBase& IOBase::write(const void *buffer, size_t count)
-{
-    if(!fail && count > 0)
-        fail = fwrite(buffer, count, 1, f) != 1;
-    return *this;
-}
-
-// Strictly speaking, this should -not- be called seekg, since 'seekg'(an iostreams
-// term) applies only to an input stream, and therefore the use of this name here
-// implies that only the input stream will be affected on streams opened for I/O
-//(which is not the case with fseek, since fseek moves the pointer for output too).
-// However, the macintosh code seems to need it to be called seekg, so it is ...
-IOBase& IOBase::seekg(POV_LONG pos, unsigned int whence /* = seek_set */)
-{
-    if(!fail)
-        fail = fseek(f, pos, whence) != 0;
-    return *this;
-}
-
-IStream::IStream(const unsigned int stype) : IOBase(input, stype)
+IStream::IStream(const UCS2String& name) : IOBase(name)
 {
 }
 
@@ -209,28 +78,76 @@ IStream::~IStream()
 {
 }
 
-int IStream::Read_Short(void)
+IFileStream::IFileStream(const UCS2String& name) : IStream(name), f(nullptr)
 {
-    short result;
-    read(&result, sizeof(short));
-    return result;
+    if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdin") == 0)
+    {
+        f = stdin;
+    }
+    else if((pov_stricmp(UCS2toASCIIString(name).c_str(), "stdout") == 0) ||
+            (pov_stricmp(UCS2toASCIIString(name).c_str(), "stderr") == 0))
+    {
+        f = nullptr;
+    }
+    else
+    {
+        f = PlatformBase::GetInstance().OpenLocalFile (name, "rb");
+    }
+    fail = (f == nullptr);
 }
 
-int IStream::Read_Int(void)
+IFileStream::~IFileStream()
 {
-    int result;
-    read(&result, sizeof(int));
-    return result;
+    if (f != nullptr)
+    {
+        if (f != stdout && f != stderr && f != stdin)
+            fclose(f);
+    }
 }
 
-IStream& IStream::UnRead_Byte(int c)
+bool IFileStream::UnRead_Byte(int c)
 {
     if(!fail)
         fail = ungetc(c, f) != c;
-    return *this;
+    return !fail;
 }
 
-IStream& IStream::getline(char *s, size_t buflen)
+// Strictly speaking, this should -not- be called seekg, since 'seekg'(an iostreams
+// term) applies only to an input stream, and therefore the use of this name here
+// implies that only the input stream will be affected on streams opened for I/O
+// (which is not the case with fseek, since fseek moves the pointer for output too).
+// However, the macintosh code seems to need it to be called seekg, so it is ...
+bool IFileStream::seekg(POV_OFF_T pos, unsigned int whence)
+{
+    fail = fseek(f, pos, whence) != 0;
+    return !fail;
+}
+
+bool IFileStream::read(void *buffer, size_t exactCount)
+{
+    if(!fail && exactCount > 0)
+        fail = fread(buffer, exactCount, 1, f) != 1;
+    return !fail;
+}
+
+size_t IFileStream::readUpTo(void *buffer, size_t maxCount)
+{
+    if (!fail && maxCount > 0)
+    {
+        size_t count = fread(buffer, 1, maxCount, f);
+        fail = (count == 0);
+        return count;
+    }
+    else
+        return 0;
+}
+
+int IFileStream::Read_Byte()
+{
+    return(fail ? EOF : fgetc(f));
+}
+
+bool IFileStream::getline(char *s, size_t buflen)
 {
     int chr = 0;
 
@@ -265,53 +182,129 @@ IStream& IStream::getline(char *s, size_t buflen)
         *s = 0;
     }
 
-    return *this;
+    return !fail;
 }
 
-/*
- * Default to povlogo.ttf (0)
- * 1 : TimeRoman (timrom.ttf), Serif
- * 2 : Cyrvetita (cyrvetic.ttf), Sans-Serif
- * 3 : Crystal (crystal.ttf), monospace sans serif
- *
- * To add a font, check first its license
- */
-IMemStream::IMemStream(const int font_id):IStream(POV_File_Font_TTF)
+IMemStream::IMemStream(const unsigned char* data, size_t size, const char* formalName, POV_OFF_T formalStart) :
+    IStream(ASCIItoUCS2String(formalName)), size(size), pos(0), formalStart(formalStart), start(data), mUngetBuffer(EOF)
 {
-    switch(font_id)
-    {
-        case 1:
-            start = &font_timrom[0];
-            size = sizeof(font_timrom);
-            break;
-        case 2:
-            start = &font_cyrvetic[0];
-            size = sizeof(font_cyrvetic);
-            break;
-        case 3:
-            start = &font_crystal[0];
-            size = sizeof(font_crystal);
-            break;
-        default:
-            start = &font_povlogo[0];
-            size = sizeof(font_povlogo);
-            break;
-    }
-    pos = 0;
-    fail= false;
+    fail = false;
+}
+
+IMemStream::IMemStream(const unsigned char* data, size_t size, const UCS2String& formalName, POV_OFF_T formalStart) :
+    IStream(formalName), size(size), pos(0), formalStart(formalStart), start(data), mUngetBuffer(EOF)
+{
+    fail = false;
 }
 
 IMemStream::~IMemStream()
 {
-// [jg] more to do here  (?)
 }
 
-OStream::OStream(const unsigned int stype) : IOBase(output, stype)
+OStream::OStream(const UCS2String& name, unsigned int Flags) : IOBase(name), f(nullptr)
 {
+    const char* mode;
+
+    if((Flags & append) == 0)
+    {
+        mode = "wb";
+    }
+    else
+    {
+        // we cannot use append mode here, since "a" mode is totally incompatible with any
+        // output file format that requires in-place updates(i.e. writing to any location
+        // other than the end of the file). BMP files are in this category. In theory, "r+"
+        // can do anything "a" can do(with appropriate use of seek()) so append mode should
+        // not be needed.
+        mode = "r+b";
+    }
+
+    if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdin") == 0)
+    {
+        f = nullptr;
+    }
+    else if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdout") == 0)
+    {
+        if((Flags & append) != 0)
+            f = nullptr;
+        else
+            f = stdout;
+    }
+    else if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stderr") == 0)
+    {
+        if((Flags & append) != 0)
+            f = nullptr;
+        else
+            f = stdout;
+    }
+    else
+    {
+        f = PlatformBase::GetInstance().OpenLocalFile (name, mode);
+        if (f == nullptr)
+        {
+            if((Flags & append) == 0)
+                f = nullptr;
+            else
+            {
+                // to maintain traditional POV +c(continue) mode compatibility, if
+                // the open for append of an existing file fails, we allow a new file
+                // to be created.
+                mode = "wb";
+                f = PlatformBase::GetInstance().OpenLocalFile (name, mode);
+            }
+        }
+
+        if (f != nullptr)
+        {
+            fail = false;
+
+            if((Flags & append) != 0)
+            {
+                if(!seekg(0, seek_end))
+                {
+                    fclose(f);
+                    f = nullptr;
+                }
+            }
+        }
+    }
+
+    fail = (f == nullptr);
 }
 
 OStream::~OStream()
 {
+    if (f != nullptr)
+    {
+        if (f != stdout && f != stderr && f != stdin)
+            fclose(f);
+    }
+}
+
+OStream& OStream::flush()
+{
+    if (f != nullptr)
+        fflush(f);
+    return *this;
+}
+
+// Strictly speaking, this should -not- be called seekg, since 'seekg'(an iostreams
+// term) applies only to an input stream, and therefore the use of this name here
+// implies that only the input stream will be affected on streams opened for I/O
+// (which is not the case with fseek, since fseek moves the pointer for output too).
+// However, the macintosh code seems to need it to be called seekg, so it is ...
+bool OStream::seekg(POV_OFF_T pos, unsigned int whence /* = seek_set */)
+{
+    if(!fail)
+        fail = fseek(f, pos, whence) != 0;
+    return !fail;
+}
+
+bool OStream::write(const void *buffer, size_t count)
+{
+    if(!fail && count > 0)
+        fail = fwrite(buffer, count, 1, f) != 1;
+    return !fail;
 }
 
 void OStream::printf(const char *format, ...)
@@ -320,54 +313,41 @@ void OStream::printf(const char *format, ...)
     char buffer[1024];
 
     va_start(marker, format);
-    vsnprintf(buffer, 1023, format, marker);
+    std::vsnprintf(buffer, sizeof(buffer), format, marker);
     va_end(marker);
 
-    *this << buffer;
+    write(reinterpret_cast<const void *>(buffer), strlen(buffer));
 }
 
-IStream *NewIStream(const Path& p, const unsigned int stype)
+IStream *NewIStream(const Path& p, unsigned int stype)
 {
-    std::auto_ptr<IStream> istreamptr(POV_PLATFORM_BASE.CreateIStream(stype));
-
-    if(istreamptr.get() == NULL)
-        return NULL;
-
-    if (POV_ALLOW_FILE_READ(p().c_str(), stype) == false) // TODO FIXME - this is handled by the frontend, but that code isn't completely there yet [trf]
+    if (!PlatformBase::GetInstance().AllowLocalFileAccess(p(), stype, false))
     {
         string str ("IO Restrictions prohibit read access to '") ;
         str += UCS2toASCIIString(p());
         str += "'";
         throw POV_EXCEPTION(kCannotOpenFileErr, str);
     }
-    if(istreamptr->open(p().c_str()) == 0)
-        return NULL;
 
-    return istreamptr.release();
+    return new IFileStream(p().c_str());
 }
 
-OStream *NewOStream(const Path& p, const unsigned int stype, const bool sappend)
+OStream *NewOStream(const Path& p, unsigned int stype, bool sappend)
 {
-    std::auto_ptr<OStream> ostreamptr(POV_PLATFORM_BASE.CreateOStream(stype));
     unsigned int Flags = IOBase::none;
-
-    if(ostreamptr.get() == NULL)
-        return NULL;
 
     if(sappend)
         Flags |= IOBase::append;
 
-    if (POV_ALLOW_FILE_WRITE(p().c_str(), stype) == false) // TODO FIXME - this is handled by the frontend, but that code isn't completely there yet [trf]
+    if (!PlatformBase::GetInstance().AllowLocalFileAccess(p(), stype, true))
     {
         string str ("IO Restrictions prohibit write access to '") ;
         str += UCS2toASCIIString(p());
         str += "'";
         throw POV_EXCEPTION(kCannotOpenFileErr, str);
     }
-    if(ostreamptr->open(p().c_str(), Flags) == 0)
-        return NULL;
 
-    return ostreamptr.release();
+    return new OStream(p().c_str(), Flags);
 }
 
 UCS2String GetFileExtension(const Path& p)
@@ -392,9 +372,9 @@ UCS2String GetFileName(const Path& p)
 
 bool CheckIfFileExists(const Path& p)
 {
-    FILE *tempf = POV_UCS2_FOPEN(p().c_str(), "r");
+    FILE *tempf = PlatformBase::GetInstance().OpenLocalFile (p().c_str(), "r");
 
-    if(tempf != NULL)
+    if (tempf != nullptr)
         fclose(tempf);
     else
         return false;
@@ -402,12 +382,12 @@ bool CheckIfFileExists(const Path& p)
     return true;
 }
 
-POV_LONG GetFileLength(const Path& p)
+POV_OFF_T GetFileLength(const Path& p)
 {
-    FILE *tempf = POV_UCS2_FOPEN(p().c_str(), "rb");
-    POV_LONG result = -1;
+    FILE *tempf = PlatformBase::GetInstance().OpenLocalFile (p().c_str(), "rb");
+    POV_OFF_T result = -1;
 
-    if(tempf != NULL)
+    if (tempf != nullptr)
     {
         fseek(tempf, 0, SEEK_END);
         result = ftell(tempf);
@@ -417,18 +397,66 @@ POV_LONG GetFileLength(const Path& p)
     return result;
 }
 
-IOBase& IMemStream::read(void *buffer, size_t count)
+bool IMemStream::read(void *buffer, size_t exactCount)
 {
-    if ((!fail)&&(pos+count<= size))
+    size_t count = 0;
+
+    if (fail)
+        return false;
+
+    unsigned char* p = reinterpret_cast<unsigned char*>(buffer);
+
+    if (exactCount == 0)
+        return true;
+
+    // read from unget buffer first
+    if (mUngetBuffer != EOF)
     {
-        memcpy(buffer,&start[pos],count);
-        pos+= count;
+        *(p++) = (unsigned char)mUngetBuffer;
+        mUngetBuffer = EOF;
+        if (++count == exactCount)
+            return true;
     }
-    else
+
+    size_t copyFromBuffer = min(exactCount-count, size-pos);
+    memcpy(p, &(start[pos]), copyFromBuffer);
+    count += copyFromBuffer;
+    pos += copyFromBuffer;
+    if (count == exactCount)
+        return true;
+
+    fail = true;
+    return false;
+}
+
+size_t IMemStream::readUpTo(void *buffer, size_t maxCount)
+{
+    size_t count = 0;
+
+    if (fail)
+        return count;
+
+    unsigned char* p = reinterpret_cast<unsigned char*>(buffer);
+
+    if (maxCount == 0)
+        return count;
+
+    // read from unget buffer first
+    if (mUngetBuffer != EOF)
     {
-        fail = true;
+        *(p++) = (unsigned char)mUngetBuffer;
+        mUngetBuffer = EOF;
+        if (++count == maxCount)
+            return count;
     }
-    return *this;
+
+    size_t copyFromBuffer = min(maxCount - count, size - pos);
+    memcpy(p, &(start[pos]), copyFromBuffer);
+    count += copyFromBuffer;
+    pos += copyFromBuffer;
+
+    fail = (count == 0);
+    return count;
 }
 
 int IMemStream::Read_Byte()
@@ -438,60 +466,82 @@ int IMemStream::Read_Byte()
     {
         v = EOF;
     }
+    else if (mUngetBuffer != EOF)
+    {
+        v = mUngetBuffer;
+        mUngetBuffer = EOF;
+    }
     else
     {
-        v = start[pos++];
-        fail = !(pos<size);
+        if (pos < size)
+            v = start[pos++];
+        else
+        {
+            fail = true;
+            v = EOF;
+        }
     }
     return v;
 }
 
-IStream& IMemStream::UnRead_Byte(int c)
+bool IMemStream::UnRead_Byte(int c)
 {
-    pos--;
-    fail = !(pos<size);
-    return *this;
+    if (fail)
+        return false;
+
+    mUngetBuffer = c;
+
+    return true;
 }
 
-IStream& IMemStream::getline(char *s,size_t buflen)
+bool IMemStream::getline(char *s,size_t buflen)
 {
-    // Not needed for font
-    return *this;
+    // Not needed for inbuilt fonts or scene file caching
+    POV_FILE_ASSERT(false);
+    return !fail;
 }
 
-POV_LONG IMemStream::tellg()
+POV_OFF_T IMemStream::tellg() const
 {
-  return pos;
+    size_t physicalPos = pos;
+    if (mUngetBuffer != EOF)
+        ++physicalPos;
+    return formalStart + physicalPos;
 }
 
-IOBase& IMemStream::seekg(POV_LONG posi, unsigned int whence)
+bool IMemStream::seekg(POV_OFF_T posi, unsigned int whence)
 {
+    // Any seek operation renders the end-of-file status and unget buffer's content obsolete.
+    fail = false;
+    mUngetBuffer = EOF;
+
     switch(whence)
     {
         case seek_set:
-            pos = posi;
+            if (posi < formalStart)
+                fail = true;
+            else if (posi - formalStart <= size)
+                pos = posi - formalStart;
+            else
+                fail = true;
             break;
         case seek_cur:
-            pos += posi;
+            if ((posi <= size) && (pos <= size-posi))
+                pos += posi;
+            else
+                fail = true;
             break;
         case seek_end:
-            pos = size - posi;
+            if (posi <= size)
+                pos = size - posi;
+            else
+                fail = true;
+            break;
+        default:
+            POV_ASSERT(false);
             break;
     }
-    fail = !(pos<size);
-    return *this;
-}
-
-bool IMemStream::open(const UCS2String &name, unsigned int Flags)
-{
-    // Not needed for font
-    return true;
-}
-
-bool IMemStream::close()
-{
-    // Not needed for font
-    return true;
+    return !fail;
 }
 
 }

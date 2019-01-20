@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,8 +37,10 @@
 #include "core/math/randomsequence.h"
 
 #include <cassert>
-#include <stdexcept>
+
+#include <limits>
 #include <map>
+#include <stdexcept>
 
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
@@ -49,6 +51,7 @@
 #endif
 
 #include "core/coretypes.h"
+#include "core/math/randcosweighted.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -62,10 +65,6 @@ using boost::uniform_int;
 using boost::uniform_real;
 using boost::variate_generator;
 using boost::mt19937;
-
-#ifndef SIZE_MAX
-#define SIZE_MAX ((size_t)-1)
-#endif
 
 #define PRIME_TABLE_COUNT 25
 unsigned int primeTable[PRIME_TABLE_COUNT] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97 };
@@ -219,6 +218,45 @@ void RandomDoubleSequence::Generator::SetSeed(size_t seedindex)
 
 
 /**********************************************************************************
+*  Random Distribution Functions
+*********************************************************************************/
+
+
+Vector2d Uniform2dOnSquare(SequentialDoubleGeneratorPtr source)
+{
+    double x = (*source)();
+    double y = (*source)();
+    return Vector2d(x, y);
+}
+
+Vector2d Uniform2dOnDisc(SequentialDoubleGeneratorPtr source)
+{
+    double r = sqrt((*source)());
+    double theta = (*source)() * 2*M_PI;
+    double x = r * cos(theta);
+    double y = r * sin(theta);
+    return Vector2d(x, y);
+}
+
+Vector3d Uniform3dOnSphere(SequentialDoubleGeneratorPtr source)
+{
+    double x = (*source)() * 2 - 1.0;
+    double r = sqrt(1 - x*x);
+    double theta = (*source)() * 2*M_PI;
+    double y = r * cos(theta);
+    double z = r * sin(theta);
+    return Vector3d(x, y, z);
+}
+
+Vector3d CosWeighted3dOnHemisphere(SequentialDoubleGeneratorPtr source)
+{
+    Vector2d v = Uniform2dOnDisc(source);
+    double y = sqrt (1 - v.lengthSqr());
+    return Vector3d(v.x(), y, v.y());
+}
+
+
+/**********************************************************************************
  *  Local Types : Abstract Generators
  *********************************************************************************/
 
@@ -251,8 +289,8 @@ class HybridNumberGenerator : public SeedableNumberGenerator<Type>, public Index
 /**
  *  Template class representing a generator for uniformly distributed numbers in a given range.
  */
-template<class Type, class BoostGenerator, class UniformType, size_t CYCLE_LENGTH = SIZE_MAX>
-class UniformRandomNumberGenerator : public SequentialNumberGenerator<Type>
+template<class Type, class BoostGenerator, class UniformType, size_t CYCLE_LENGTH = 0>
+class UniformRandomNumberGenerator : public SeedableNumberGenerator<Type>
 {
     public:
 
@@ -266,6 +304,7 @@ class UniformRandomNumberGenerator : public SequentialNumberGenerator<Type>
         UniformRandomNumberGenerator(Type minval, Type maxval);
         virtual Type operator()();
         virtual size_t CycleLength() const;
+        virtual void Seed(size_t seed) override;
 
     protected:
         variate_generator<BoostGenerator, UniformType> generator;
@@ -319,7 +358,7 @@ class LegacyCosWeightedDirectionGenerator : public HybridNumberGenerator<Vector3
 {
     public:
 
-        static const int NumEntries = 1600;
+        static const int NumEntries = kRandCosWeightedCount;
 
         struct ParameterStruct
         {
@@ -626,7 +665,19 @@ Type UniformRandomNumberGenerator<Type,BoostGenerator,UniformType,CYCLE_LENGTH>:
 template<class Type, class BoostGenerator, class UniformType, size_t CYCLE_LENGTH>
 size_t UniformRandomNumberGenerator<Type,BoostGenerator,UniformType,CYCLE_LENGTH>::CycleLength() const
 {
-    return CYCLE_LENGTH;
+    if (CYCLE_LENGTH == 0)
+        // SIZE_MAX is not mandatory in C++03, and std::numeric_limits<size_t>::max() can't be used
+        // as a template parameter, so to indicate an "unknown or pretty huge" cycle length we're
+        // using a template parameter value of 0 instead to convey that information.
+        return std::numeric_limits<size_t>::max();
+    else
+        return CYCLE_LENGTH;
+}
+
+template<class Type, class BoostGenerator, class UniformType, size_t CYCLE_LENGTH>
+void UniformRandomNumberGenerator<Type, BoostGenerator, UniformType, CYCLE_LENGTH>::Seed(size_t seed)
+{
+    generator.engine().seed((uint32_t)seed);
 }
 
 
@@ -728,9 +779,9 @@ shared_ptr<vector<Type> const> NumberSequenceFactory<Type>::operator()(size_t co
         size_t newCount = count;
         if (masterSequence->size() > newCount / 2)
         {
-            // make sure to pre-compute at least twice the already-computed size, so we don't waste too much space with
-            if (masterSequence->size() > SIZE_MAX / 2) // play it safe (though that'll have us run out of memory anyway)
-                newCount = SIZE_MAX;
+            // make sure to pre-compute at least twice the already-computed size
+            if (masterSequence->size() > std::numeric_limits<size_t>::max() / 2) // play it safe (though that'll have us run out of memory anyway)
+                newCount = std::numeric_limits<size_t>::max();
             else
                 newCount = masterSequence->size() * 2;
         }
@@ -781,8 +832,6 @@ shared_ptr<NumberSequenceFactory<ValueType> > NumberSequenceMetaFactory<ValueTyp
  *  LegacyCosWeightedDirectionGenerator implementation
  *********************************************************************************/
 
-extern BYTE_XYZ rad_samples[]; // defined in rad_data.cpp
-
 bool LegacyCosWeightedDirectionGenerator::ParameterStruct::operator< (const ParameterStruct& other) const
 {
     return false; // all instances are equal
@@ -794,7 +843,7 @@ LegacyCosWeightedDirectionGenerator::LegacyCosWeightedDirectionGenerator(const P
 Vector3d LegacyCosWeightedDirectionGenerator::operator[](size_t i) const
 {
     Vector3d result;
-    VUnpack(result, &(rad_samples[i % NumEntries]));
+    VUnpack(result, &(kaRandCosWeighted[i % NumEntries]));
     return result;
 }
 
@@ -942,10 +991,10 @@ SeedableDoubleGeneratorPtr GetRandomDoubleGenerator(double minval, double maxval
     return generator;
 }
 
-SequentialDoubleGeneratorPtr GetRandomDoubleGenerator(double minval, double maxval)
+SeedableDoubleGeneratorPtr GetRandomDoubleGenerator(double minval, double maxval)
 {
     Mt19937DoubleGenerator::ParameterStruct param(minval, maxval);
-    SequentialDoubleGeneratorPtr generator(new Mt19937DoubleGenerator(param));
+    SeedableDoubleGeneratorPtr generator(new Mt19937DoubleGenerator(param));
     (void)(*generator)(); // legacy fix
     return generator;
 }

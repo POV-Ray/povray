@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,59 +33,30 @@
 ///
 //******************************************************************************
 
-#include <cstdlib>
-#include <cctype>
-
-#include <boost/date_time/posix_time/posix_time.hpp>
-
-// configparser.h must always be the first POV file included in the parser (pulls in platform config)
-#include "parser/configparser.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
-#include "pov_mem.h" // TODO
+// C++ variants of C standard header files
+#include <cctype>
+#include <cstdio>
+#include <cstdlib>
 
-#include "backend/scene/backendscenedata.h"
+// Boost header files
+#include <boost/date_time/posix_time/posix_time.hpp>
+
+// POV-Ray header files (base module)
+#include "base/stringutilities.h"
+
+// POV-Ray header files (core module)
+#include "core/scene/scenedata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
-namespace pov
+namespace pov_parser
 {
 
-/*****************************************************************************
-* Local variables
-******************************************************************************/
-
-const unsigned char gUTF8SequenceArray[256] =
-{
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-    3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5
-};
-
-const unsigned int gUTF8Offsets[6] =
-{
-    0x00000000UL,
-    0x00003080UL,
-    0x000E2080UL,
-    0x03C82080UL,
-    0xFA082080UL,
-    0x82082080UL
-};
-
+using namespace pov;
 
 /*****************************************************************************
  *
@@ -115,6 +86,18 @@ char *Parser::Parse_C_String(bool pathname)
     return New;
 }
 
+void Parser::ParseString(UTF8String& s, bool pathname)
+{
+    /// @todo Add support for non-ASCII strings.
+
+    UCS2 *str = Parse_String(pathname);
+    char *New = UCS2_To_String(str);
+
+    s = New;
+
+    POV_FREE(str);
+}
+
 
 /*****************************************************************************
  *
@@ -136,12 +119,61 @@ char *Parser::Parse_C_String(bool pathname)
 
 UCS2 *Parser::Parse_String(bool pathname, bool require)
 {
-    UCS2 *New = NULL;
+    UCS2 *New = nullptr;
     int len = 0;
+    const UCS2String* pString;
+    const StringValue* stringValue = nullptr;
 
     EXPECT
         CASE(STRING_LITERAL_TOKEN)
-            New = String_Literal_To_UCS2(Token.Token_String, pathname);
+            /// @todo Add back support for non-ASCII string encodings.
+            stringValue = dynamic_cast<const StringValue*>(mToken.raw.value.get());
+            POV_PARSER_ASSERT(stringValue != nullptr);
+
+            if (pathname)
+            {
+                // Historically, escape sequences were ignored when parsing for a filename.
+                // As of POV-Ray v3.8, this has been changed.
+
+                if (sceneData->EffectiveLanguageVersion() >= 380)
+                {
+                    if (stringValue->IsAmbiguous())
+                    {
+#if POV_BACKSLASH_IS_PATH_SEPARATOR
+                        Warning("Backslash encountered while parsing for a filename."
+                                " As of POV-Ray v3.8, this is interpreted as an escape sequence just like in any other string literal."
+                                " If this is supposed to be a path separator, use a forward slash instead.");
+#endif
+
+                    }
+                    pString = &stringValue->GetData();
+                }
+                else
+                {
+                    if (stringValue->IsAmbiguous())
+                    {
+#if POV_BACKSLASH_IS_PATH_SEPARATOR
+                        Warning("Backslash encountered while parsing for a filename."
+                                " In legacy (pre-v3.8) scenes, this is NOT interpreted as the start of an escape sequence."
+                                " However, for future compatibility it is recommended to use a forward slash as path separator instead.");
+#else
+                        Warning("Backslash encountered while parsing for a filename."
+                                " In legacy (pre-v3.8) scenes, this is NOT interpreted as the start of an escape sequence.");
+#endif
+                    }
+                    pString = &stringValue->GetFileName();
+                }
+            }
+            else
+            {
+                pString = &stringValue->GetData();
+            }
+
+            len = pString->size() + 1;
+            New = reinterpret_cast<UCS2 *>(POV_MALLOC(len * sizeof(UCS2), "UCS2 String"));
+            POV_MEMCPY(reinterpret_cast<void *>(New),
+                        reinterpret_cast<const void *>(pString->c_str()),
+                        len * sizeof(UCS2));
             EXIT
         END_CASE
 
@@ -186,9 +218,9 @@ UCS2 *Parser::Parse_String(bool pathname, bool require)
         END_CASE
 
         CASE(STRING_ID_TOKEN)
-            len = UCS2_strlen(reinterpret_cast<UCS2 *>(Token.Data)) + 1;
+            len = UCS2_strlen(CurrentTokenDataPtr<UCS2*>()) + 1;
             New = reinterpret_cast<UCS2 *>(POV_MALLOC(len * sizeof(UCS2), "UCS2 String"));
-            POV_MEMMOVE(reinterpret_cast<void *>(New), reinterpret_cast<void *>(Token.Data), len * sizeof(UCS2));
+            POV_MEMCPY(reinterpret_cast<void *>(New), CurrentTokenDataPtr<void*>(), len * sizeof(UCS2));
             EXIT
         END_CASE
 
@@ -204,6 +236,18 @@ UCS2 *Parser::Parse_String(bool pathname, bool require)
     END_EXPECT
 
     return New;
+}
+
+
+//****************************************************************************
+
+
+std::string Parser::Parse_ASCIIString(bool pathname, bool require)
+{
+    UCS2 *cstr = Parse_String(pathname, require);
+    std::string ret(UCS2toASCIIString(cstr));
+    POV_FREE(cstr);
+    return ret;
 }
 
 
@@ -233,13 +277,13 @@ UCS2 *Parser::Parse_Str(bool pathname)
     DBL val;
     int l, d;
 
-    GET(LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
     val = Parse_Float();
     Parse_Comma();
     l = (int)Parse_Float();
     Parse_Comma();
     d = (int)Parse_Float();
-    GET(RIGHT_PAREN_TOKEN);
+    Parse_Paren_End();
 
     p = temp3;
     *p++ = '%';
@@ -261,13 +305,13 @@ UCS2 *Parser::Parse_Str(bool pathname)
     // TODO: consider changing to %g rather than %f for large numbers (e.g.
     // anything over 1e+64 for example). for now, we will only use %g if the
     // snprintf filled the buffer.
-    // NB test for < 0 is because stupid windows _snprintf can return negative values.
-    if (((l = snprintf(temp4, sizeof(temp4) - 1, temp3, val)) >= sizeof(temp4) - 1) || (l < 0))
+    // NB `snprintf` may report errors via a negative return value.
+    if (((l = std::snprintf(temp4, sizeof(temp4), temp3, val)) >= sizeof(temp4)) || (l < 0))
     {
         *p = 'g';
 
         // it should not be possible to overflow with %g. but just in case ...
-        if (((l = snprintf(temp4, sizeof(temp4) - 1, temp3, val)) >= sizeof(temp4) - 1) || (l < 0))
+        if (((l = std::snprintf(temp4, sizeof(temp4), temp3, val)) >= sizeof(temp4)) || (l < 0))
             strcpy(temp4, "<invalid>");
     }
 
@@ -306,7 +350,7 @@ UCS2 *Parser::Parse_VStr(bool pathname)
     UCS2 *str2;
     UCS2 *New;
 
-    GET(LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
 
     vl = (int)Parse_Float();
     Parse_Comma();
@@ -326,7 +370,7 @@ UCS2 *Parser::Parse_VStr(bool pathname)
     Parse_Comma();
     d = (int)Parse_Float();
 
-    GET(RIGHT_PAREN_TOKEN);
+    Parse_Paren_End();
 
     p = temp3;
     *(p++) = '%';
@@ -397,12 +441,13 @@ UCS2 *Parser::Parse_Concat(bool pathname)
     UCS2 *str;
     UCS2 *New;
 
-    GET(LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
 
     New = Parse_String();
 
     EXPECT
         CASE(RIGHT_PAREN_TOKEN)
+            UNGET
             EXIT
         END_CASE
 
@@ -414,6 +459,8 @@ UCS2 *Parser::Parse_Concat(bool pathname)
             POV_FREE(str);
         END_CASE
     END_EXPECT
+
+    Parse_Paren_End();
 
     return New;
 }
@@ -477,20 +524,21 @@ UCS2 *Parser::Parse_Chr(bool /*pathname*/)
 
 UCS2 *Parser::Parse_Datetime(bool pathname)
 {
-    char *FormatStr = NULL;
+    char *FormatStr = nullptr;
     bool CallFree;
     int vlen = 0;
     char val[PARSE_NOW_VAL_LENGTH + 1]; // Arbitrary size, usually a date format string is far less
 
-    GET(LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
+
     std::time_t timestamp = floor((Parse_Float() + (365*30+7)) * 24*60*60 + 0.5);
     Parse_Comma();
-    EXPECT
+    EXPECT_ONE
         CASE(RIGHT_PAREN_TOKEN)
+            UNGET
             CallFree = false;
             // we use GMT as some platforms (e.g. windows) have different ideas of what to print when handling '%z'.
             FormatStr = (char *)"%Y-%m-%d %H:%M:%SZ";
-            EXIT
         END_CASE
 
         OTHERWISE
@@ -507,10 +555,10 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
                 POV_FREE(FormatStr);
                 Error("Format string too long.");
             }
-            GET(RIGHT_PAREN_TOKEN);
-            EXIT
         END_CASE
     END_EXPECT
+
+    Parse_Paren_End();
 
     // NB don't wrap only the call to strftime() in the try, because visual C++ will, in release mode,
     // optimize the try/catch away since it doesn't believe that the RTL can throw exceptions. since
@@ -520,7 +568,7 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
     {
         std::tm t = boost::posix_time::to_tm(boost::posix_time::from_time_t(timestamp));
         // TODO FIXME - we should either have this locale setting globally, or avoid it completely; in either case it shouldn't be *here*.
-        setlocale(LC_TIME,""); // Get the local prefered format
+        setlocale(LC_TIME,""); // Get the local preferred format
         vlen = strftime(val, PARSE_NOW_VAL_LENGTH, FormatStr, &t);
     }
     catch (pov_base::Exception& e)
@@ -535,7 +583,7 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
     }
     if (vlen == PARSE_NOW_VAL_LENGTH) // on error: max for libc 4.4.1 & before
         vlen = 0; // return an empty string on error (content of val[] is undefined)
-    val[vlen]='\0'; // whatever, that operation is now safe (and superflous except for error)
+    val[vlen]='\0'; // whatever, that operation is now safe (and superfluous except for error)
 
     if (CallFree)
     {
@@ -573,7 +621,7 @@ UCS2 *Parser::Parse_Substr(bool pathname)
     UCS2 *New;
     int l, d;
 
-    GET(LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
 
     str = Parse_String(pathname);
     Parse_Comma();
@@ -581,7 +629,7 @@ UCS2 *Parser::Parse_Substr(bool pathname)
     Parse_Comma();
     d = (int)Parse_Float();
 
-    GET(RIGHT_PAREN_TOKEN);
+    Parse_Paren_End();
 
     if(((l + d - 1) > UCS2_strlen(str)) || (l < 0) || (d < 0))
         Error("Illegal parameters in substr.");
@@ -618,12 +666,12 @@ UCS2 *Parser::Parse_Strupr(bool pathname)
 {
     UCS2 *New;
 
-    GET(LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
 
     New = Parse_String(pathname);
     UCS2_strupr(New);
 
-    GET(RIGHT_PAREN_TOKEN);
+    Parse_Paren_End();
 
     return New;
 }
@@ -651,12 +699,12 @@ UCS2 *Parser::Parse_Strlwr(bool pathname)
 {
     UCS2 *New;
 
-    GET(LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
 
     New = Parse_String(pathname);
     UCS2_strlwr(New);
 
-    GET(RIGHT_PAREN_TOKEN);
+    Parse_Paren_End();
 
     return New;
 }
@@ -682,14 +730,14 @@ UCS2 *Parser::Parse_Strlwr(bool pathname)
 
 UCS2 *Parser::String_To_UCS2(const char *str)
 {
-    UCS2 *char_string = NULL;
-    UCS2 *char_array = NULL;
+    UCS2 *char_string = nullptr;
+    UCS2 *char_array = nullptr;
     int char_array_size = 0;
     int utf8arraysize = 0;
-    unsigned char *utf8array = NULL;
+    unsigned char *utf8array = nullptr;
     int index_in = 0;
     int index_out = 0;
-    char *dummy_ptr = NULL;
+    char *dummy_ptr = nullptr;
     int i = 0;
 
     if(strlen(str) == 0)
@@ -700,41 +748,22 @@ UCS2 *Parser::String_To_UCS2(const char *str)
         return char_string;
     }
 
-    switch(sceneData->stringEncoding)
+    char_array_size = (int)strlen(str);
+    char_array = reinterpret_cast<UCS2 *>(POV_MALLOC(char_array_size * sizeof(UCS2), "Character Array"));
+    for(i = 0; i < char_array_size; i++)
     {
-        case kStringEncoding_ASCII:
-            char_array_size = (int)strlen(str);
-            char_array = reinterpret_cast<UCS2 *>(POV_MALLOC(char_array_size * sizeof(UCS2), "Character Array"));
-            for(i = 0; i < char_array_size; i++)
+        if(sceneData->EffectiveLanguageVersion() < 350)
+            char_array[i] = (unsigned char)(str[i]);
+        else
+        {
+            char_array[i] = str[i] & 0x007F;
+            if(char_array[i] != str[i])
             {
-                if(sceneData->EffectiveLanguageVersion() < 350)
-                    char_array[i] = (unsigned char)(str[i]);
-                else
-                {
-                    char_array[i] = str[i] & 0x007F;
-                    if(char_array[i] != str[i])
-                    {
-                        char_array[i] = ' ';
-                        PossibleError("Non-ASCII character has been replaced by space character.");
-                    }
-                }
+                char_array[i] = ' ';
+                PossibleError("Unexpected non-ASCII character has been replaced by space character.");
             }
-            break;
-        case kStringEncoding_UTF8:
-            char_array = Convert_UTF8_To_UCS2(reinterpret_cast<const unsigned char *>(str), (int)strlen(str), &char_array_size);
-            break;
-        case kStringEncoding_System:
-            char_array = POV_CONVERT_TEXT_TO_UCS2(reinterpret_cast<const unsigned char *>(str), strlen(str), &char_array_size);
-            if(char_array == NULL)
-                Error("Cannot convert system specific text format to Unicode.");
-            break;
-        default:
-            Error("Unsupported text encoding format.");
-            break;
+        }
     }
-
-    if(char_array == NULL)
-        Error("Cannot convert text to UCS2 format.");
 
     char_string = reinterpret_cast<UCS2 *>(POV_MALLOC((char_array_size + 1) * sizeof(UCS2), "UCS2 String"));
     for(index_in = 0, index_out = 0; index_in < char_array_size; index_in++, index_out++)
@@ -743,7 +772,7 @@ UCS2 *Parser::String_To_UCS2(const char *str)
     char_string[index_out] = 0;
     index_out++;
 
-    if(char_array != NULL)
+    if (char_array != nullptr)
         POV_FREE(char_array);
 
     return char_string;
@@ -752,20 +781,20 @@ UCS2 *Parser::String_To_UCS2(const char *str)
 
 /*****************************************************************************/
 
-UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
+UCS2 *Parser::String_Literal_To_UCS2(const std::string& str)
 {
-    UCS2 *char_string = NULL;
-    UCS2 *char_array = NULL;
-    int char_array_size = 0;
+    UCS2 *char_string = nullptr;
+    UCS2 *char_array = nullptr;
+    std::string::size_type char_array_size = 0;
     int utf8arraysize = 0;
-    unsigned char *utf8array = NULL;
+    unsigned char *utf8array = nullptr;
     int index_in = 0;
     int index_out = 0;
     char buffer[8];
-    char *dummy_ptr = NULL;
+    char *dummy_ptr = nullptr;
     int i = 0;
 
-    if(strlen(str) == 0)
+    if(str.length() == 0)
     {
         char_string = reinterpret_cast<UCS2 *>(POV_MALLOC(sizeof(UCS2), "UCS2 String"));
         char_string[0] = 0;
@@ -773,59 +802,28 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
         return char_string;
     }
 
-    switch(sceneData->stringEncoding)
+    char_array_size = str.length();
+    char_array = reinterpret_cast<UCS2 *>(POV_MALLOC(char_array_size * sizeof(UCS2), "Character Array"));
+    for(i = 0; i < char_array_size; i++)
     {
-        case kStringEncoding_ASCII:
-            char_array_size = (int)strlen(str);
-            char_array = reinterpret_cast<UCS2 *>(POV_MALLOC(char_array_size * sizeof(UCS2), "Character Array"));
-            for(i = 0; i < char_array_size; i++)
+        if(sceneData->EffectiveLanguageVersion() < 350)
+            char_array[i] = (unsigned char)(str[i]);
+        else
+        {
+            char_array[i] = str[i] & 0x007F;
+            if(char_array[i] != str[i])
             {
-                if(sceneData->EffectiveLanguageVersion() < 350)
-                    char_array[i] = (unsigned char)(str[i]);
-                else
-                {
-                    char_array[i] = str[i] & 0x007F;
-                    if(char_array[i] != str[i])
-                    {
-                        char_array[i] = ' ';
-                        PossibleError("Non-ASCII character has been replaced by space character.");
-                    }
-                }
+                char_array[i] = ' ';
+                PossibleError("Unexpected non-ASCII character has been replaced by space character.");
             }
-            break;
-        case kStringEncoding_UTF8:
-            char_array = Convert_UTF8_To_UCS2(reinterpret_cast<const unsigned char *>(str), (int)strlen(str), &char_array_size);
-            break;
-        case kStringEncoding_System:
-            char_array = POV_CONVERT_TEXT_TO_UCS2(reinterpret_cast<const unsigned char *>(str), strlen(str), &char_array_size);
-            if(char_array == NULL)
-                Error("Cannot convert system specific text format to Unicode.");
-            break;
-        default:
-            Error("Unsupported text encoding format.");
-            break;
+        }
     }
-
-    if(char_array == NULL)
-        Error("Cannot convert text to UCS2 format.");
 
     char_string = reinterpret_cast<UCS2 *>(POV_MALLOC((char_array_size + 1) * sizeof(UCS2), "UCS2 String"));
     for(index_in = 0, index_out = 0; index_in < char_array_size; index_in++, index_out++)
     {
-        if((char_array[index_in] == '\\') && (sceneData->EffectiveLanguageVersion() >= 371 || !pathname))
+        if(char_array[index_in] == '\\')
         {
-            // Historically, escape sequences were ignored when parsing for a filename.
-            // As of POV-Ray 3.71, this has been changed.
-
-#if (FILENAME_SEPARATOR == '\\')
-            if (pathname)
-            {
-                Warning("Backslash encountered while parsing for a filename."
-                        " As of version 3.71, this is interpreted as an escape sequence just like in any other string literal."
-                        " If this is supposed to be a path separator, use a forward slash instead.");
-            }
-#endif
-
             index_in++;
 
             switch(char_array[index_in])
@@ -870,36 +868,18 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
                     buffer[3] = char_array[++index_in];
                     buffer[4] = 0;
 
-                    char_string[index_out] = (UCS2)strtoul(buffer, &dummy_ptr, 16);
+                    char_string[index_out] = (UCS2)std::strtoul(buffer, &dummy_ptr, 16);
                     break;
                 default:
                     char_string[index_out] = char_array[index_in];
-                    if ( char_array )
-                        POV_FREE(char_array);
-                    char_array = NULL;
+                    POV_FREE(char_array);
+                    char_array = nullptr;
                     Error( "Illegal escape sequence in string." );
                     break;
             }
         }
         else
-        {
-            if ((char_array[index_in] == '\\') && pathname)
-            {
-                // Historically, escape sequences were ignored when parsing for a filename.
-                // As of POV-Ray 3.71, this has been changed.
-
-#if (FILENAME_SEPARATOR == '\\')
-                Warning("Backslash encountered while parsing for a filename."
-                        " In legacy (pre-3.71) scenes, this is NOT interpreted as the start of an escape sequence."
-                        " However, for future compatibility it is recommended to use a forward slash as path separator instead.");
-#else
-                Warning("Backslash encountered while parsing for a filename."
-                        " In legacy (pre-3.71) scenes, this is NOT interpreted as the start of an escape sequence.");
-#endif
-            }
-
             char_string[index_out] = char_array[index_in];
-        }
     }
 
     char_string[index_out] = 0;
@@ -907,7 +887,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
 
     char_string = reinterpret_cast<UCS2 *>(POV_REALLOC(char_string, index_out * sizeof(UCS2), "UCS2 String"));
 
-    if(char_array != NULL)
+    if (char_array != nullptr)
         POV_FREE(char_array);
 
     return char_string;
@@ -957,70 +937,6 @@ char *Parser::UCS2_To_String(const UCS2 *str)
 *
 * FUNCTION
 *
-*   Convert_UTF8_To_UCS4
-*
-* INPUT
-*
-*   Array of bytes, length of this sequence
-*
-* OUTPUT
-*
-*   Size of the array of UCS4s returned
-*
-* RETURNS
-*
-*   Array of UCS4s (allocated with POV_MALLOC)
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-*   Converts UTF8 to UCS4 characters.
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-UCS4 *Parser::Convert_UTF8_To_UCS4(const unsigned char *text_array, int text_array_size, int *char_array_size)
-{
-    UCS4 *char_array = NULL;
-    UCS4 chr;
-    int i, j, k, seqlen;
-
-    if((text_array == NULL) || (text_array_size == 0) || (char_array_size == NULL))
-        return NULL;
-
-    char_array = reinterpret_cast<UCS4 *>(POV_MALLOC(text_array_size * sizeof(UCS4), "Character Array"));
-    if(char_array == NULL)
-        throw POV_EXCEPTION_CODE(kOutOfMemoryErr);
-
-    for(i = 0, k = 0; i < text_array_size; k++, i++)
-    {
-        seqlen = gUTF8SequenceArray[text_array[i]];
-        chr = 0;
-        for(j = seqlen; j > 0; j--)
-        {
-            chr += text_array[i];
-            chr <<= 6;
-            i++;
-        }
-        chr += text_array[i];
-
-        char_array[k] = chr - gUTF8Offsets[seqlen];
-    }
-
-    char_array = reinterpret_cast<UCS4 *>(POV_REALLOC(char_array, k * sizeof(UCS4), "Character Array"));
-    *char_array_size = k;
-
-    return char_array;
-}
-
-/*****************************************************************************
-*
-* FUNCTION
-*
 *   Convert_UTF8_To_UCS2
 *
 * INPUT
@@ -1047,41 +963,25 @@ UCS4 *Parser::Convert_UTF8_To_UCS4(const unsigned char *text_array, int text_arr
 *
 ******************************************************************************/
 
-UCS2 *Parser::Convert_UTF8_To_UCS2(const unsigned char *text_array, int text_array_size, int *char_array_size)
+UCS2 *Parser::Convert_UTF8_To_UCS2(const unsigned char *text_array, int *char_array_size)
 {
-    UCS2 *char_array = NULL;
-    UCS4 chr;
-    int i, j, k, seqlen;
+    POV_PARSER_ASSERT(text_array);
+    POV_PARSER_ASSERT(char_array_size);
 
-    if((text_array == NULL) || (text_array_size == 0) || (char_array_size == NULL))
-        return NULL;
+    UCS2String s = UTF8toUCS2String(UTF8String(reinterpret_cast<const char*>(text_array)));
+    UCS2String::size_type len = s.length();
+    *char_array_size = len;
 
-    char_array = reinterpret_cast<UCS2 *>(POV_MALLOC(text_array_size * sizeof(UCS2), "Character Array"));
-    if(char_array == NULL)
+    if (len == 0)
+        return nullptr;
+
+    size_t size = (len+1)*sizeof(UCS2);
+
+    UCS2 *char_array = reinterpret_cast<UCS2 *>(POV_MALLOC(size, "Character Array"));
+    if (char_array == nullptr)
         throw POV_EXCEPTION_CODE(kOutOfMemoryErr);
 
-    for(i = 0, k = 0; i < text_array_size; k++, i++)
-    {
-        seqlen = gUTF8SequenceArray[text_array[i]];
-        chr = 0;
-        for(j = seqlen; j > 0; j--)
-        {
-            chr += text_array[i];
-            chr <<= 6;
-            i++;
-        }
-
-        chr += text_array[i];
-        chr -= gUTF8Offsets[seqlen];
-
-        if(chr <= 0x0000FFFFUL)
-            char_array[k] = chr;
-        else
-            char_array[k] = 0x0000FFFDUL;
-    }
-
-    char_array = reinterpret_cast<UCS2 *>(POV_REALLOC(char_array, k * sizeof(UCS2), "Character Array"));
-    *char_array_size = k;
+    memcpy(char_array, s.c_str(), size);
 
     return char_array;
 }
@@ -1117,34 +1017,6 @@ UCS2 *Parser::UCS2_strcat(UCS2 *s1, const UCS2 *s2)
     UCS2_strcpy(&s1[l1], s2);
 
     return s1;
-}
-
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- * CHANGES
- *
-******************************************************************************/
-
-int Parser::UCS2_strlen(const UCS2 *str)
-{
-    register int i;
-
-    for(i = 0; *str != 0; str++, i++) { }
-
-    return i;
 }
 
 
@@ -1268,7 +1140,7 @@ void Parser::UCS2_strupr(UCS2 *str)
     }
 
     if(err == true)
-        Warning("Non-ASCII charcater in string, strupr may not work as expected.");
+        Warning("Non-ASCII character in string, strupr may not work as expected.");
 }
 
 
@@ -1306,7 +1178,7 @@ void Parser::UCS2_strlwr(UCS2 *str)
     }
 
     if(err == true)
-        Warning("Non-ASCII charcater in string, strlwr may not work as expected.");
+        Warning("Non-ASCII character in string, strlwr may not work as expected.");
 }
 
 UCS2 *Parser::UCS2_strdup(const UCS2 *s)

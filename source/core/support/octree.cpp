@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -107,24 +107,24 @@ namespace pov
 // (note that these don't necessarily catch all possible quirks; they should be quite reliable though)
 #if(C99_COMPATIBLE_RADIOSITY == 0)
     #if( (INT_MAX != SIGNED32_MAX) || (INT_MIN + SIGNED32_MAX != -1) )
-        #error 'int' is not 32 bit or does not use two's complement encoding; try a different C99_COMPATIBLE_RADIOSITY setting in config.h
+        #error "'int' is not 32 bit or does not use two's complement encoding; try a different C99_COMPATIBLE_RADIOSITY setting in config.h"
     #endif
     #if(FLT_RADIX != 2)
-        #error 'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h
+        #error "'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h"
     #endif
     #if(FLT_MANT_DIG != 24)
-        #error 'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h
+        #error "'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h"
     #endif
     #if(FLT_MAX_EXP != 128)
-        #error 'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h
+        #error "'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h"
     #endif
     #if(FLT_MIN_EXP != -125)
-        #error 'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h
+        #error "'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h"
     #endif
 #else
     #if(FLT_RADIX != 2)
         // logb family of functions will not work as expected
-        #error floating point arithmetic uses an uncommon radix; this file will not compile on your machine
+        #error "floating point arithmetic uses an uncommon radix; this file will not compile on your machine"
     #endif
 #endif
 
@@ -256,9 +256,9 @@ void ot_ins(OT_NODE **root_ptr, OT_BLOCK *new_block, const OT_ID *new_id)
 
     // If there is no root yet, create one.  This is a first-time-through
 
-    if (*root_ptr == NULL)
+    if (*root_ptr == nullptr)
     {
-// CLi moved C99_COMPATIBLE_RADIOSITY check from ot_newroot() to ot_ins() NULL root handling section
+// CLi moved C99_COMPATIBLE_RADIOSITY check from ot_newroot() to ot_ins() `nullptr` root handling section
 // (no need to do this again and again for every new node inserted)
 #if(C99_COMPATIBLE_RADIOSITY == 0)
         if((sizeof(int) != 4) || (sizeof(float) != 4))
@@ -345,7 +345,7 @@ void ot_ins(OT_NODE **root_ptr, OT_BLOCK *new_block, const OT_ID *new_id)
 
         index = dx + dy + dz;
 
-        if (this_node->Kids[index] == NULL)
+        if (this_node->Kids[index] == nullptr)
         {
             // Next level down doesn't exist yet, so create it
             temp_node = new OT_NODE;
@@ -483,7 +483,7 @@ void ot_newroot(OT_NODE **root_ptr)
     newroot->Kids[index] = *root_ptr;
     *root_ptr = newroot;
 
-// CLi moved C99_COMPATIBLE_RADIOSITY check from ot_newroot() to ot_ins() NULL root handling section
+// CLi moved C99_COMPATIBLE_RADIOSITY check from ot_newroot() to ot_ins() `nullptr` root handling section
 // (no need to do this again and again for every new node inserted)
 }
 
@@ -567,12 +567,12 @@ bool ot_dist_traverse(OT_NODE *subtree, const Vector3d& point, int bounce_depth,
 
     // First, recurse to the child nodes
     for (i = 0; i < 8 ; i++)
-    {     // for each potential kid
+    {   // for each potential kid
         this_node = subtree->Kids[i];
-        if (this_node != NULL)
-        {   // ...which exists
+        if (this_node != nullptr)
+        {   // ... which exists
             if (ot_point_in_node(point, &this_node->Id))
-            { // ...and in range
+            {   // ... and is in range
                 if(!ot_dist_traverse(this_node, point, bounce_depth, function, handle))
                     return false;
             }
@@ -585,7 +585,7 @@ bool ot_dist_traverse(OT_NODE *subtree, const Vector3d& point, int bounce_depth,
     // if ( ot_point_in_node(point, &subtree->Id) )
     {
         this_block = subtree->Values;
-        while (this_block != NULL)
+        while (this_block != nullptr)
         {
 #ifdef RADSTATS
             if (subtree->Id.Size < 100 || subtree->Id.Size > 140 )
@@ -673,17 +673,17 @@ bool ot_traverse(OT_NODE *subtree, bool (*function)(OT_BLOCK * bl, void * handle
 {
     int i = 0;
     bool oksofar = true;
-    OT_NODE *this_node = NULL;
-    OT_BLOCK *this_block = NULL;
+    OT_NODE *this_node = nullptr;
+    OT_BLOCK *this_block = nullptr;
 
 
     // First, recurse to the child nodes
-    if (subtree!=NULL)
+    if (subtree != nullptr)
     {
         for (i=0; i<8 && oksofar; i++ )     // for each potential kid
         {
             this_node = subtree->Kids[i];
-            if ( this_node != NULL )          // ...which exists
+            if (this_node != nullptr)          // ...which exists
             {
                 oksofar = ot_traverse(this_node, function, handle);
             }
@@ -691,7 +691,7 @@ bool ot_traverse(OT_NODE *subtree, bool (*function)(OT_BLOCK * bl, void * handle
 
         // Now, call the specified routine for each data block hung off this tree node
         this_block = subtree->Values;
-        while ( oksofar  &&  (this_block != NULL) )
+        while (oksofar && (this_block != nullptr))
         {
             oksofar = (*function)(this_block, handle);
             this_block = this_block->next;
@@ -998,7 +998,6 @@ void ot_parent(OT_ID *dad_id, OT_ID  *kid_id)
     // that region, because otherwise we would enter an infinite loop trying to find a common parent.
     // (That doesn't mean that all is well in that region; we're just avoiding a catastrophe.)
 #if 1
-    //  This is the code found in 3.7.0.beta.29;
     //  note that it parents (-2:-1) by (0)
     dad_id->x = (kid_id->x >= 0) ? (kid_id->x >> 1) : (kid_id->x + 1) / 2;
     dad_id->y = (kid_id->y >= 0) ? (kid_id->y >> 1) : (kid_id->y + 1) / 2;
@@ -1080,7 +1079,7 @@ bool ot_save_tree(OT_NODE *root, OStream *fd)
 {
     bool retval = false;
 
-    if(fd != NULL)
+    if (fd != nullptr)
         retval = ot_traverse(root, ot_write_block, reinterpret_cast<void *>(fd));
     else
 ;// TODO MESSAGE    Warning("Bad radiosity cache file handle");
@@ -1129,7 +1128,7 @@ bool ot_write_block(OT_BLOCK *bl, void *fd) // must be passed as void * for comp
 #if (NUM_COLOUR_CHANNELS == 3)
         bl->Illuminance.Red(), bl->Illuminance.Green(), bl->Illuminance.Blue(),
 #else
-        #error TODO!
+        #error "TODO!"
 #endif
         bl->Harmonic_Mean_Distance,
 
@@ -1181,7 +1180,7 @@ bool ot_free_tree(OT_NODE **ppRoot)
 {
     bool all_ok = ot_free_subtree(*ppRoot);
 
-    *ppRoot = NULL;
+    *ppRoot = nullptr;
 
     return all_ok;
 }
@@ -1232,7 +1231,7 @@ bool ot_free_subtree(OT_NODE *subtree)
     for (i = 0; i < 8; i++)   // for each potential kid
     {
         this_node = subtree->Kids[i];
-        if ( this_node != NULL ) {      // ...which exists
+        if (this_node != nullptr) {        // ...which exists
             ot_free_subtree(this_node);
         }
     }
@@ -1293,12 +1292,12 @@ bool ot_read_file(OT_NODE **root, IStream *fd, const OT_READ_PARAM* param, OT_RE
 
     memset(&bl, 0, sizeof(OT_BLOCK));
 
-    if ( fd != NULL )
+    if (fd != nullptr)
     {
         info->Gather_Total.Clear();
         info->Gather_Total_Count = 0;
 
-        while (!(got_eof = fd->getline (line, 99).eof ()) && goodparse)
+        while (!(got_eof = !fd->getline (line, 99)) && goodparse)
         {
             switch ( line[0] )
             {
@@ -1328,7 +1327,7 @@ bool ot_read_file(OT_NODE **root, IStream *fd, const OT_READ_PARAM* param, OT_RE
                                    &bl.Nearest_Distance, to_nearest_string );
                     bl.Illuminance = ToMathColour(tempCol);
 #else
-                    #error TODO!
+                    #error "TODO!"
 #endif
 
                     // TODO FIXME - read Quality and Brilliance
@@ -1353,7 +1352,7 @@ bool ot_read_file(OT_NODE **root, IStream *fd, const OT_READ_PARAM* param, OT_RE
                         line_num++;
 
                         new_block = reinterpret_cast<OT_BLOCK *>(POV_MALLOC(sizeof (OT_BLOCK), "octree node from file"));
-                        if ( new_block != NULL )
+                        if (new_block != nullptr)
                         {
                             POV_MEMCPY(new_block, &bl, sizeof (OT_BLOCK));
 

@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -631,7 +631,7 @@ void write_INI_settings (bool noreset)
   PutHKCU("General", "LastRenderPath", lastRenderPath) ;
   PutHKCU("General", "LastQueuePath", lastQueuePath) ;
   PutHKCU("General", "SecondaryINISection", SecondaryRenderIniFileSection) ;
-  PutHKCU("General", VERSIONVAL, POV_RAY_VERSION COMPILER_VER "." PVENGINE_VER) ;
+  PutHKCU("General", VERSIONVAL, POV_RAY_VERSION) ;
   PutHKCU("Sounds", "RenderCompleteSoundEnabled", render_complete_sound_enabled) ;
   PutHKCU("Sounds", "ParseErrorSoundEnabled", parse_error_sound_enabled) ;
   PutHKCU("Sounds", "RenderErrorSoundEnabled", render_error_sound_enabled) ;

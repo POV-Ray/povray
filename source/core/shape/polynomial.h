@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,13 +44,25 @@
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
+
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
 
 #define POLY_OBJECT    (STURM_OK_OBJECT)
 #define CUBIC_OBJECT   (STURM_OK_OBJECT)
 #define QUARTIC_OBJECT (STURM_OK_OBJECT)
+
+/// @}
+///
+//******************************************************************************
 
 /* Number of coefficients of a three variable polynomial of order x */
 
@@ -95,6 +107,10 @@ class Poly : public ObjectBase
         //static int binomial(int n, int r);
         //static void factor1(int n, int *c, int *s);
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

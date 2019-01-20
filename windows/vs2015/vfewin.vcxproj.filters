@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{ae78b571-886b-451a-902b-86c135070723}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\win">
+      <UniqueIdentifier>{be21a8d0-429f-4f34-9146-6c6ffbd2e7ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{98d92497-1571-433a-a70c-855cc1e912c1}</UniqueIdentifier>
+      <Extensions>*.h</Extensions>
+    </Filter>
+    <Filter Include="Headers\win">
+      <UniqueIdentifier>{672e98ad-14eb-41f9-a038-c63dbcae6770}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\vfe\vfe.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\vfe\vfecontrol.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\vfe\vfedisplay.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\vfe\vfepovms.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\vfe\vfesession.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\vfe\win\vfeplatform.cpp">
+      <Filter>Source\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\vfe\vfeprecomp.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\vfe\vfe.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vfe\vfeconf.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vfe\vfepovms.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vfe\vfesession.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vfe\win\syspovimage.h">
+      <Filter>Headers\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vfe\win\vfeplatform.h">
+      <Filter>Headers\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vfe\vfeprecomp.h" />
+  </ItemGroup>
+</Project>

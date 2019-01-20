@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,6 +41,36 @@
 #include "core/configcore.h"
 #include "syspovconfigparser.h"
 
+//##############################################################################
+///
+/// @defgroup PovParserConfig Parser Compile-Time Configuration
+/// @ingroup PovParser
+/// @ingroup PovConfig
+/// Compile-Time Configuration of the @ref PovParser.
+///
+/// @{
+
+/// @def POV_PARSER_EXPERIMENTAL_BRILLIANCE_OUT
+/// Whether experimental second brilliance parameter should be enabled.
+///
+#ifndef POV_PARSER_EXPERIMENTAL_BRILLIANCE_OUT
+    #define POV_PARSER_EXPERIMENTAL_BRILLIANCE_OUT 0
+#endif
+
+/// @def POV_PARSER_EXPERIMENTAL_OBJ_IMPORT
+/// Whether experimental Wavefront OBJ import should be enabled.
+///
+#ifndef POV_PARSER_EXPERIMENTAL_OBJ_IMPORT
+    #define POV_PARSER_EXPERIMENTAL_OBJ_IMPORT 0
+#endif
+
+/// @def POV_PARSER_MAX_CACHED_MACRO_SIZE
+/// Default size limit for macros to be cached in memory.
+///
+#ifndef POV_PARSER_MAX_CACHED_MACRO_SIZE
+    #define POV_PARSER_MAX_CACHED_MACRO_SIZE 65536
+#endif
+
 //******************************************************************************
 ///
 /// @name Debug Settings.
@@ -57,7 +87,7 @@
 /// @{
 
 /// @def POV_PARSER_DEBUG
-/// Enable run-time sanity checks for the parser.
+/// Enable run-time sanity checks for the @ref PovParser.
 ///
 /// Define as non-zero integer to enable, or zero to disable.
 ///
@@ -76,14 +106,35 @@
 ///
 /// @{
 
+/// @def POV_PARSER_ASSERT
+/// Assert a condition that should hold true by design.
+/// In debug builds, this macro evaluates the specified expression, and halts execution if the
+/// expression does not hold true.
+/// In release builds, this macro evaluates to an empty statement.
 #if POV_PARSER_DEBUG
     #define POV_PARSER_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_PARSER_ASSERT(expr) NO_OP
+    #define POV_PARSER_ASSERT(expr) POV_ASSERT_SOFT(expr) // POV_ASSERT_DISABLE(expr)
+#endif
+
+/// @def POV_PARSER_PANIC
+/// Indicates code paths that should never be reached.
+/// In debug builds, this macro halts execution.
+/// In release builds, this macro throws an exception to allow the application to fail gracefully.
+/// In static code analysis, this macro may be used to inform the analysis tool that the code branch
+/// is expected to be dead.
+#if POV_PARSER_DEBUG
+    #define POV_PARSER_PANIC()      POV_ASSERT_HARD(false)
+#else
+    #define POV_PARSER_PANIC()      POV_ASSERT_SOFT(false)
 #endif
 
 /// @}
 ///
 //******************************************************************************
+
+/// @}
+///
+//##############################################################################
 
 #endif // POVRAY_PARSER_CONFIGPARSER_H

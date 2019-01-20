@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -47,6 +47,7 @@
 
 #include "core/lighting/photons.h" // TODO FIXME - make PhotonGatherer class visible only as a pointer
 #include "core/material/media.h"   // TODO FIXME - make MediaFunction class visible only as a pointer
+#include "core/math/randcosweighted.h"
 #include "core/render/trace.h"     // TODO FIXME - make Trace class visible only as a pointer
 #include "core/support/octree.h"   // TODO FIXME - this should only be included in radiosity.cpp
 #include "core/support/statistics.h"
@@ -59,6 +60,13 @@ class Path;
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreLightingRadiosity Radiosity
+/// @ingroup PovCore
+///
+/// @{
+
 class ViewData;
 
 struct ot_block_struct;
@@ -67,14 +75,16 @@ struct ot_id_struct;
 
 #define RADIOSITY_CACHE_EXTENSION ".rca"
 
-static const unsigned int RADIOSITY_MAX_SAMPLE_DIRECTIONS    = 1600;
+static const unsigned int RADIOSITY_MAX_SAMPLE_DIRECTIONS    = kRandCosWeightedCount;
 // to get some more pseudo-randomness and make use of the full range of all the precomputed sample directions,
-// we start each sample direction sequence at a different index than the previous one; 663 has some nice properties for this:
+// we start each sample direction sequence at a different index than the previous one; 663 has some nice properties
+// for this:
 // - it is fairly large stride, only giving "overlap" of consecutive samples at high sample counts
-// - it has no divisors in common with 1600, so that any consecutive 1600 samples will start at a different index
+// - it has no divisors in common with 1600 (kRandCosWeightedCount), so that any consecutive 1600 samples will start at
+//   a different index
 // - it gives the highest possible number of "secondary strides", those being -274, 115, -44, -17, -7 and 3
 
-// settings as effective for a particular bounce depth during a particuar trace step
+// settings as effective for a particular bounce depth during a particular trace step
 struct RadiosityRecursionSettings
 {
     // true "tweakables"
@@ -221,7 +231,7 @@ class RadiosityCache
             boost::mutex blockMutex;  // lock this when adding blocks to any node of the tree
 #endif
 
-            Octree() : root(NULL) {}
+            Octree() : root(nullptr) {}
         };
 
         vector<BlockPool*> blockPools;  // block pools ready to be re-used
@@ -262,7 +272,7 @@ class RadiosityFunction : public Trace::RadiosityFunctor
         //      rs      - the radiosity settings as parsed from the scene file
         //      rc      - the radiosity cache to retrieve previously computed samples from, and store newly computed samples in
         //      cf      - the cooperate functor (whatever that is - some thing that handles inter-thread communication?)
-        //      pts     - number of the current pretrace step (PRETRACE_FIRST to PRETRACE_MAX, or FINAL_TRACE for main render)
+        //      ft      - whether this is the final trace (i.e. not a radiosity pretrace step)
         //      camera  - position of the camera
         RadiosityFunction(shared_ptr<SceneData> sd, TraceThreadData *td,
                           const SceneRadiositySettings& rs, RadiosityCache& rc, Trace::CooperateFunctor& cf, bool ft, const Vector3d& camera);
@@ -270,11 +280,11 @@ class RadiosityFunction : public Trace::RadiosityFunctor
 
         // looks up the ambient value for a certain point
         //      ipoint          - point on the surface
-        //      raw_normal      - the geometry raw norml at this pont
-        //      layer_normal    - texture-pertubed normal
+        //      raw_normal      - the geometry raw normal at this point
+        //      layer_normal    - texture-perturbed normal
         //      brilliance      - brilliance
         //      ambient_colour  - (output) the ambient color at this point
-        //      weight          - the base "weight" of the traced ray (used to compare againgst ADC bailout)
+        //      weight          - the base "weight" of the traced ray (used to compare against ADC bailout)
         virtual void ComputeAmbient(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, DBL brilliance, MathColour& ambient_colour, DBL weight, TraceTicket& ticket);
 
         // checks whether the specified recursion depth is still within the configured limits
@@ -352,6 +362,10 @@ class RadiosityFunction : public Trace::RadiosityFunctor
 
         double GatherLight(const Vector3d& IPoint, const Vector3d& Raw_Normal, const Vector3d& LayNormal, DBL brilliance, MathColour& Illuminance, TraceTicket& ticket);
 };
+
+/// @}
+///
+//##############################################################################
 
 } // end of namespace
 

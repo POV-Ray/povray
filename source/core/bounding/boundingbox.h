@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,6 +44,13 @@
 
 namespace pov
 {
+
+//##############################################################################
+///
+/// @defgroup PovCoreBoundingBox Bounding Boxes
+/// @ingroup PovCoreBounding
+///
+/// @{
 
 class Intersection;
 class Ray;
@@ -159,10 +166,10 @@ typedef const BBOX_TREE* ConstBBoxTreePtr;
 
 struct BBox_Tree_Struct
 {
-    short Infinite;   // Flag if node is infinite
-    short Entries;    // Number of sub-nodes in this node
-    BoundingBox BBox; // Bounding box of this node
     BBOX_TREE **Node; // If node: children; if leaf: element
+    BoundingBox BBox; // Bounding box of this node
+    short Entries;    // Number of sub-nodes in this node
+    bool Infinite;    // Flag if node is infinite
 };
 
 typedef bool VECTORB[3];
@@ -170,8 +177,8 @@ typedef bool VECTORB[3];
 class Rayinfo
 {
     public:
-        BBoxVector3d slab_num;
-        BBoxVector3d slab_den;
+        BBoxVector3d origin;        ///< Ray's origin.
+        BBoxVector3d invDirection;  ///< Per-dimension inverse of the ray's direction.
         VECTORB nonzero;
         VECTORB positive;
 
@@ -179,25 +186,25 @@ class Rayinfo
         {
             DBL t;
 
-            slab_num[X] = ray.Origin[X];
-            slab_num[Y] = ray.Origin[Y];
-            slab_num[Z] = ray.Origin[Z];
+            origin[X] = ray.Origin[X];
+            origin[Y] = ray.Origin[Y];
+            origin[Z] = ray.Origin[Z];
 
             if((nonzero[X] = ((t = ray.Direction[X]) != 0.0)) != 0)
             {
-                slab_den[X] = 1.0 / t;
+                invDirection[X] = 1.0 / t;
                 positive[X] = (ray.Direction[X] > 0.0);
             }
 
             if((nonzero[Y] = ((t = ray.Direction[Y]) != 0.0)) != 0)
             {
-                slab_den[Y] = 1.0 / t;
+                invDirection[Y] = 1.0 / t;
                 positive[Y] = (ray.Direction[Y] > 0.0);
             }
 
             if((nonzero[Z] = ((t = ray.Direction[Z]) != 0.0)) != 0)
             {
-                slab_den[Z] = 1.0 / t;
+                invDirection[Z] = 1.0 / t;
                 positive[Z] = (ray.Direction[Z] > 0.0);
             }
         }
@@ -215,10 +222,6 @@ enum BBoxDirection
     BBOX_DIR_X1Y1Z1 = 7
 };
 
-
-/*****************************************************************************
-* Global functions
-******************************************************************************/
 
 /// Container for BBox subtrees prioritized by depth (distance to ray origin).
 ///
@@ -261,11 +264,15 @@ class BBoxPriorityQueue
         vector<Qelem> mQueue;
 };
 
+
+/*****************************************************************************
+* Global functions
+******************************************************************************/
+
 void Build_BBox_Tree(BBOX_TREE **Root, size_t numOfFiniteObjects, BBOX_TREE **&Finite, size_t numOfInfiniteObjects, BBOX_TREE **Infinite, size_t& maxfinitecount);
 void Build_Bounding_Slabs(BBOX_TREE **Root, vector<ObjectPtr>& objects, unsigned int& numberOfFiniteObjects, unsigned int& numberOfInfiniteObjects, unsigned int& numberOfLightSources);
 
 void Recompute_BBox(BoundingBox *bbox, const TRANSFORM *trans);
-void Recompute_Inverse_BBox(BoundingBox *bbox, const TRANSFORM *trans);
 bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const Ray& ray, Intersection *Best_Intersection, TraceThreadData *Thread);
 bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const Ray& ray, Intersection *Best_Intersection, const RayObjectCondition& precondition, const RayObjectCondition& postcondition, TraceThreadData *Thread);
 void Check_And_Enqueue(BBoxPriorityQueue& Queue, const BBOX_TREE *Node, const BoundingBox *BBox, const Rayinfo *rayinfo, RenderStatistics& Stats);
@@ -281,6 +288,10 @@ inline void BOUNDS_VOLUME(DBL& a, const BoundingBox& b)
 {
     a = b.size[X] * b.size[Y] * b.size[Z];
 }
+
+/// @}
+///
+//##############################################################################
 
 }
 

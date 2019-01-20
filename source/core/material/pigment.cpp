@@ -13,8 +13,8 @@
 ///
 /// ----------------------------------------------------------------------------
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -152,20 +152,19 @@ PIGMENT *Copy_Pigment (PIGMENT *Old)
 {
     PIGMENT *New;
 
-    if (Old != NULL)
+    if (Old != nullptr)
     {
         New = Create_Pigment ();
 
         Copy_TPat_Fields (New, Old);
         New->Blend_Map = shared_ptr<GenericPigmentBlendMap> (Old->Blend_Map);
 
-        if (Old->Type == PLAIN_PATTERN)
-            New->colour = Old->colour;
+        New->colour = Old->colour;
         New->Quick_Colour = Old->Quick_Colour;
     }
     else
     {
-        New = NULL;
+        New = nullptr;
     }
 
     return (New);
@@ -207,7 +206,7 @@ void Copy_Pigments (vector<PIGMENT*>& New, const vector<PIGMENT*>& Old)
 
 void Destroy_Pigment (PIGMENT *Pigment)
 {
-    if (Pigment != NULL)
+    if (Pigment != nullptr)
         delete Pigment;
 }
 
@@ -239,14 +238,14 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
 {
     bool hasFilter;
 
-    if (Pigment == NULL)
+    if (Pigment == nullptr)
     {
         throw POV_EXCEPTION_STRING("Missing pigment");
     }
 
     if (Pigment->Flags & POST_DONE)
     {
-        if ((pHasFilter != NULL) && (Pigment->Flags & HAS_FILTER))
+        if ((pHasFilter != nullptr) && (Pigment->Flags & HAS_FILTER))
             *pHasFilter = true;
         return;
     }
@@ -254,8 +253,6 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
     if (Pigment->Type == NO_PATTERN)
     {
         Pigment->Type = PLAIN_PATTERN;
-
-        Pigment->colour.Clear();
 
 ;// TODO MESSAGE    Warning(150, "No pigment type given.");
     }
@@ -270,13 +267,14 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
             break;
 
         case PLAIN_PATTERN:
-        case BITMAP_PATTERN:
+        case IMAGE_MAP_PATTERN:
+        case COLOUR_PATTERN:
 
             break;
 
         default:
 
-            if (Pigment->Blend_Map == NULL)
+            if (Pigment->Blend_Map == nullptr)
             {
                 switch (Pigment->Type)
                 {
@@ -296,7 +294,7 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
             break;
     }
 
-    /* Now we test wether this pigment is opaque or not. [DB 8/94] */
+    // Now we test whether this pigment is opaque or not.
 
     hasFilter = false;
 
@@ -305,17 +303,15 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
         hasFilter = true;
     }
 
-    if ((Pigment->Type == BITMAP_PATTERN) &&
-        (dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage != NULL))
+    if (const ColourPattern* pattern = dynamic_cast<ColourPattern*>(Pigment->pattern.get()))
     {
-        // bitmaps are transparent if they are used only once, or the image is not opaque
-        if ((dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage->Once_Flag) || !is_image_opaque(dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage))
+        if (pattern->HasTransparency())
             hasFilter = true;
     }
 
     GenericPigmentBlendMap* Map = Pigment->Blend_Map.get();
 
-    if (Map != NULL)
+    if (Map != nullptr)
     {
         Map->Post(hasFilter);
     }
@@ -323,7 +319,7 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
     if (hasFilter)
     {
         Pigment->Flags |= HAS_FILTER;
-        if (pHasFilter != NULL)
+        if (pHasFilter != nullptr)
             *pHasFilter = true;
     }
 }
@@ -426,19 +422,21 @@ bool Compute_Pigment (TransColour& colour, const PIGMENT *Pigment, const Vector3
                 break;
 
             case UV_MAP_PATTERN:
-                if(Intersect == NULL)
+                if (Intersect == nullptr)
                     throw POV_EXCEPTION_STRING("The 'uv_mapping' pattern cannot be used as part of a pigment function!");
 
                 Colour_Found = Pigment->Blend_Map->ComputeUVMapped(colour, Intersect, ray, Thread);
                 break;
 
-            case BITMAP_PATTERN:
+            case IMAGE_MAP_PATTERN:
+            case COLOUR_PATTERN:
 
                 Warp_EPoint (TPoint, EPoint, Pigment);
 
                 colour.Clear();
 
-                Colour_Found = image_map (TPoint, Pigment, colour);
+                POV_PATTERN_ASSERT(dynamic_pointer_cast<ColourPattern>(Pigment->pattern));
+                Colour_Found = static_pointer_cast<ColourPattern>(Pigment->pattern)->Evaluate(colour, TPoint, Intersect, ray, Thread);
 
                 break;
 
@@ -646,7 +644,7 @@ void Evaluate_Density_Pigment(vector<PIGMENT*>& Density, const Vector3d& p, Math
     {
         lc.Clear();
 
-        Compute_Pigment(lc, *i, p, NULL, NULL, ttd);
+        Compute_Pigment(lc, *i, p, nullptr, nullptr, ttd);
 
         c *= lc.colour();
     }

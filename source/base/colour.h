@@ -8,8 +8,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -54,6 +54,13 @@
 
 namespace pov_base
 {
+
+//##############################################################################
+///
+/// @defgroup PovBaseColour Colour Data Types
+/// @ingroup PovBase
+///
+/// @{
 
 typedef COLC ColourChannel;
 typedef DBL  PreciseColourChannel;
@@ -411,21 +418,21 @@ class GenericRGBColour
             mColour[BLUE]  = blue;
         }
 
-        inline GenericRGBColour Clipped(T minc, T maxc)
+        inline GenericRGBColour Clipped(T minc, T maxc) const
         {
             return GenericRGBColour(pov_base::clip<T>(mColour[RED],   minc, maxc),
                                     pov_base::clip<T>(mColour[GREEN], minc, maxc),
                                     pov_base::clip<T>(mColour[BLUE],  minc, maxc));
         }
 
-        inline GenericRGBColour ClippedUpper(T maxc)
+        inline GenericRGBColour ClippedUpper(T maxc) const
         {
             return GenericRGBColour(min(mColour[RED],   maxc),
                                     min(mColour[GREEN], maxc),
                                     min(mColour[BLUE],  maxc));
         }
 
-        inline GenericRGBColour ClippedLower(T minc)
+        inline GenericRGBColour ClippedLower(T minc) const
         {
             return GenericRGBColour(max(mColour[RED],   minc),
                                     max(mColour[GREEN], minc),
@@ -578,7 +585,7 @@ class GenericRGBColour
             mColour[BLUE]  = col.mColour[2];
         }
 #else
-        #error TODO!
+        #error "TODO!"
 #endif
 };
 
@@ -1221,6 +1228,14 @@ inline T ColourDistanceRGBT (const GenericRGBTColour<T>& a, const GenericRGBTCol
 template<typename T>
 inline GenericRGBTColour<T> Sqr(const GenericRGBTColour<T>& a) { return a * a; }
 
+/// @relates GenericRGBTColour
+template<typename T>
+inline GenericRGBTColour<T> Sqrt(const GenericRGBTColour<T>& a)
+{
+    return GenericRGBTColour<T>(Sqrt(a.rgb()),
+                                sqrt(a.transm()));
+}
+
 typedef GenericRGBTColour<ColourChannel>        RGBTColour;         ///< Standard precision RGBxT colour.
 typedef GenericRGBTColour<PreciseColourChannel> PreciseRGBTColour;  ///< High precision RGBxT colour.
 
@@ -1535,7 +1550,7 @@ class GenericColour
             mColour[BLUE]  = blue;
         }
 */
-        inline GenericColour Clipped(T minc, T maxc)
+        inline GenericColour Clipped(T minc, T maxc) const
         {
             GenericColour result;
             for (int i = 0; i < channels; i ++)
@@ -1543,7 +1558,7 @@ class GenericColour
             return result;
         }
 
-        inline GenericColour ClippedUpper(T maxc)
+        inline GenericColour ClippedUpper(T maxc) const
         {
             GenericColour result;
             for (int i = 0; i < channels; i ++)
@@ -1551,7 +1566,7 @@ class GenericColour
             return result;
         }
 
-        inline GenericColour ClippedLower(T minc)
+        inline GenericColour ClippedLower(T minc) const
         {
             GenericColour result;
             for (int i = 0; i < channels; i ++)
@@ -1736,7 +1751,7 @@ class GenericColour
             mColour[2] = col.blue();
         }
 #else
-        #error TODO!
+        #error "TODO!"
 #endif
 };
 
@@ -1783,6 +1798,9 @@ inline GenericColour<T> Cos(const GenericColour<T>& a) { return a.Cos(); }
 
 typedef GenericColour<ColourChannel>         MathColour;        ///< Standard precision colour.
 typedef GenericColour<PreciseColourChannel>  PreciseMathColour; ///< High precision colour.
+
+extern template class GenericColour<ColourChannel>;
+extern template class GenericColour<PreciseColourChannel>;
 
 
 /// Generic template class to hold and manipulate a colour plus transparency information.
@@ -1859,7 +1877,7 @@ class GenericTransColour
 
         /// Legacy opacity computation.
         ///
-        /// @deprecated This fomula was used instead of @ref Opacity() in POV-Ray 3.6 and earlier texture computations.
+        /// @deprecated This fomula was used instead of @ref Opacity() in POV-Ray v3.6 and earlier texture computations.
         ///             Do not use it - it is bogus, and we're only keeping it around for compatibility with legacy
         ///             scenes.
         ///
@@ -2232,6 +2250,10 @@ class GenericRGBEColour
 
 typedef GenericRGBEColour<128,false>    RadianceHDRColour;  ///< RGBE format as originally proposed by Greg Ward.
 typedef GenericRGBEColour<250,true>     PhotonColour;       ///< RGBE format as adapted by Nathan Kopp for photon mapping.
+
+/// @}
+///
+//##############################################################################
 
 }
 

@@ -36,7 +36,7 @@ h3.groupheader {
         font-size: 100%;
 }
 
-h1 {
+.textblock h1 {
         border-bottom: 2px solid #879ECB;
         color: #354C7B;
         font-size: 200%;
@@ -47,7 +47,7 @@ h1 {
         width: 100%;
 }
 
-h2 {
+.textblock h2 {
         border-bottom: 1px solid #879ECB;
         color: #354C7B;
         font-size: 150%;
@@ -58,7 +58,7 @@ h2 {
         width: 100%;
 }
 
-h3 {
+.textblock h3 {
         font-size: 100%;
 }
 
@@ -1078,66 +1078,57 @@ dl
         padding: 0 0 0 10px;
 }
 
-/* dl.note, dl.warning, dl.attention, dl.pre, dl.post, dl.invariant, dl.deprecated, dl.todo, dl.test, dl.bug */
 dl.section
 {
         margin-left: 0px;
         padding-left: 0px;
 }
 
-dl.note
+dl.note, dl.warning, dl.attention, dl.pre, dl.post, dl.invariant, dl.deprecated, dl.todo, dl.test, dl.bug
 {
         margin-left:-7px;
         padding-left: 3px;
         border-left:4px solid;
+}
+
+dl.note
+{
         border-color: #D0C000;
 }
 
-dl.warning, dl.attention
+dl.warning
 {
-        margin-left:-7px;
-        padding-left: 3px;
-        border-left:4px solid;
         border-color: #FF0000;
+}
+
+dl.attention
+{
+        border-color: #FF0000;
+        background-color: #FFF0F0;
 }
 
 dl.pre, dl.post, dl.invariant
 {
-        margin-left:-7px;
-        padding-left: 3px;
-        border-left:4px solid;
         border-color: #00D000;
 }
 
 dl.deprecated
 {
-        margin-left:-7px;
-        padding-left: 3px;
-        border-left:4px solid;
         border-color: #505050;
 }
 
 dl.todo
 {
-        margin-left:-7px;
-        padding-left: 3px;
-        border-left:4px solid;
         border-color: #00C0E0;
 }
 
 dl.test
 {
-        margin-left:-7px;
-        padding-left: 3px;
-        border-left:4px solid;
         border-color: #3030E0;
 }
 
 dl.bug
 {
-        margin-left:-7px;
-        padding-left: 3px;
-        border-left:4px solid;
         border-color: #C08050;
 }
 

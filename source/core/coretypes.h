@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,6 +41,7 @@
 #include <stack>
 
 #include "base/colour.h"
+#include "base/messenger.h"
 #include "base/types.h"
 #include "base/textstream.h"
 
@@ -48,6 +49,12 @@
 
 namespace pov
 {
+
+//##############################################################################
+///
+/// @addtogroup PovCore
+///
+/// @{
 
 using namespace pov_base;
 
@@ -87,42 +94,19 @@ inline T Sqr(T a)
     return a * a;
 }
 
-/// @relates CoreMessenger
-enum CoreMessageClass
-{
-    kCoreMessageClass_Debug,    ///< Diagnostic information to help in POV-Ray development.
-    kCoreMessageClass_Info,     ///< Information that is no reason for alarm.
-    kCoreMessageClass_Warning,  ///< Information about a potentially undesired and/or unexpected situation.
-    // we don't have a value for errors, because those are signalled via exceptions.
-};
-
-/// Abstract class representing an object that can pass on messages from the core to the user.
-///
-/// @note
-///     Existing implementations are currently not necessarily thread-safe.
-///
-class CoreMessenger
-{
-public:
-    virtual ~CoreMessenger() {}
-    virtual void CoreMessage(CoreMessageClass mc, const char *format,...) = 0;
-    virtual void CoreMessageAt(CoreMessageClass mc, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...) = 0;
-};
-
 class ObjectBase;
 typedef ObjectBase * ObjectPtr;
 typedef const ObjectBase * ConstObjectPtr;
 
 typedef struct Transform_Struct TRANSFORM;
 
-//******************************************************************************
+/// @}
 ///
-/// @name Blend Map Stuff
+//##############################################################################
+///
+/// @addtogroup PovCoreMaterialPattern
+///
 /// @{
-
-#if 0
-#pragma mark * Blend Map
-#endif
 
 typedef struct Pattern_Struct TPATTERN;
 typedef struct Texture_Struct TEXTURE;
@@ -134,6 +118,11 @@ typedef TEXTURE* TexturePtr;
 
 /// @}
 ///
+//##############################################################################
+///
+/// @addtogroup PovCoreMaterialMedia
+///
+/// @{
 
 class Media
 {
@@ -178,6 +167,14 @@ class Media
         void PostProcess();
 };
 
+/// @}
+///
+//##############################################################################
+///
+/// @addtogroup PovCoreMaterialInterior
+///
+/// @{
+
 class SubsurfaceInterior;
 class Interior
 {
@@ -204,6 +201,14 @@ class Interior
 typedef shared_ptr<Interior> InteriorPtr;
 typedef shared_ptr<const Interior> ConstInteriorPtr;
 
+/// @}
+///
+//##############################################################################
+///
+/// @addtogroup PovCoreMaterialPattern
+///
+/// @{
+
 struct BasicPattern;
 
 typedef shared_ptr<BasicPattern> PatternPtr;
@@ -216,6 +221,14 @@ struct Pattern_Struct
     unsigned short Flags;
     PatternPtr pattern;
 };
+
+/// @}
+///
+//##############################################################################
+///
+/// @addtogroup PovCore
+///
+/// @{
 
 typedef struct Material_Struct MATERIAL;
 
@@ -295,6 +308,14 @@ class ObjectDebugHelper
 
 typedef unsigned short HF_VAL;
 
+/// @}
+///
+//##############################################################################
+///
+/// @addtogroup PovCoreRender
+///
+/// @{
+
 /// Ray-object intersection data.
 ///
 /// This class holds various information on a ray-object intersection.
@@ -307,7 +328,7 @@ class Intersection
         DBL Depth;
         /// Point of the intersection in global coordinate space.
         Vector3d IPoint;
-        /// Unpertubed surface normal at the intersection point.
+        /// Unperturbed surface normal at the intersection point.
         /// @attention This is not necessarily the true geometric surface normal, as it may include fake smoothing.
         /// @note This value is invalid if haveNormal is false.
         /// @todo We should have two distinct vectors: A true geometric one, and a separate one for faked smoothing.
@@ -318,6 +339,8 @@ class Intersection
         Vector2d Iuv;
         /// Intersected object.
         ObjectPtr Object;
+        /// Root-level parent CSG object for cutaway textures.
+        ObjectPtr Csg;
 
         /// @name Object-Specific Auxiliary Data
         /// These members hold information specific to particular object types, typically generated during
@@ -328,6 +351,14 @@ class Intersection
         /// Point of the intersection in local coordinate space (used by Blob and SpindleTorus)
         /// @note This value is invalid in Blob if haveLocalIPoint is false.
         Vector3d LocalIPoint;
+        /// Generic auxiliary float data #1 (used by Prism, Lathe)
+        DBL d1;
+        /// Generic auxiliary pointer data (used by Mesh)
+        const void *Pointer;
+        /// Generic auxiliary integer data #1 (used by Sor, Prism, Isosurface, Lathe, Cones, Boxes)
+        int i1;
+        /// Generic auxiliary integer data #2 (used by Sor, Prism, Isosurface)
+        int i2;
         /// Flag to indicate whether INormal was computed during intersection testing (used by HField)
         /// @note Objects either always or never computing INormal during intersection testing don't use this flag.
         bool haveNormal : 1;
@@ -335,70 +366,78 @@ class Intersection
         bool haveLocalIPoint : 1;
         /// Generic auxiliary boolean data #1 (used by SpindleTorus)
         bool b1 : 1;
-        /// Generic auxiliary integer data #1 (used by Sor, Prism, Isosurface, Lathe, Cones, Boxes)
-        int i1;
-        /// Generic auxiliary integer data #2 (used by Sor, Prism, Isosurface)
-        int i2;
-        /// Generic auxiliary float data #1 (used by Prism, Lathe)
-        DBL d1;
-        /// Generic auxiliary pointer data (used by Mesh)
-        const void *Pointer;
 
         /// @}
 
-        /// Root-level parent CSG object for cutaway textures.
-        ObjectPtr Csg;
-
         Intersection() :
-            Depth(BOUND_HUGE), Object(NULL), Csg(NULL)
+            Depth(BOUND_HUGE), Object(nullptr), Csg(nullptr),
+            d1(0.0), Pointer(nullptr), i1(0), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
         Intersection(DBL d, const Vector3d& v, ObjectPtr o) :
-            Depth(d), Object(o), IPoint(v), Iuv(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+            Depth(d), IPoint(v), Iuv(v), Object(o), Csg(nullptr),
+            d1(0.0), Pointer(nullptr), i1(0), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
         Intersection(DBL d, const Vector3d& v, const Vector3d& n, ObjectPtr o) :
-            Depth(d), Object(o), IPoint(v), Iuv(v), INormal(n), haveNormal(true), haveLocalIPoint(false), Csg(NULL)
+            Depth(d), IPoint(v), INormal(n), Iuv(v), Object(o), Csg(nullptr),
+            d1(0.0), Pointer(nullptr), i1(0), i2(0), haveNormal(true), haveLocalIPoint(false), b1(false)
         {}
 
         Intersection(DBL d, const Vector3d& v, const Vector2d& uv, ObjectPtr o) :
-            Depth(d), Object(o), IPoint(v), Iuv(uv), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+            Depth(d), IPoint(v), Iuv(uv), Object(o), Csg(nullptr),
+            d1(0.0), Pointer(nullptr), i1(0), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
         Intersection(DBL d, const Vector3d& v, const Vector3d& n, const Vector2d& uv, ObjectPtr o) :
-            Depth(d), Object(o), IPoint(v), INormal(n), Iuv(uv), haveNormal(true), haveLocalIPoint(false), Csg(NULL)
+            Depth(d), IPoint(v), INormal(n), Iuv(uv), Object(o), Csg(nullptr),
+            d1(0.0), Pointer(nullptr), i1(0), i2(0), haveNormal(true), haveLocalIPoint(false), b1(false)
         {}
 
         Intersection(DBL d, const Vector3d& v, ObjectPtr o, const void *a) :
-            Depth(d), Object(o), Pointer(a), IPoint(v), Iuv(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+            Depth(d), IPoint(v), Iuv(v), Object(o), Csg(nullptr),
+            d1(0.0), Pointer(a), i1(0), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
         Intersection(DBL d, const Vector3d& v, const Vector2d& uv, ObjectPtr o, const void *a) :
-            Depth(d), Object(o), Pointer(a), IPoint(v), Iuv(uv), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+            Depth(d), IPoint(v), Iuv(uv), Object(o), Csg(nullptr),
+            d1(0.0), Pointer(a), i1(0), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
+        /// @todo Why does this not set Iuv=IPoint, as other constructors do?
         Intersection(DBL d, const Vector3d& v, ObjectPtr o, int a) :
-            Depth(d), Object(o), i1(a), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+            Depth(d), IPoint(v), Object(o), Csg(nullptr),
+            d1(0.0), Pointer(nullptr), i1(a), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
+        /// @todo Why does this not set Iuv=IPoint, as other constructors do?
         Intersection(DBL d, const Vector3d& v, ObjectPtr o, DBL a) :
-            Depth(d), Object(o), d1(a), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+            Depth(d), IPoint(v), Object(o), Csg(nullptr),
+            d1(a), Pointer(nullptr), i1(0), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
+        /// @todo Why does this not set Iuv=IPoint, as other constructors do?
         Intersection(DBL d, const Vector3d& v, ObjectPtr o, int a, int b) :
-            Depth(d), Object(o), i1(a), i2(b), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+            Depth(d), IPoint(v), Object(o), Csg(nullptr),
+            d1(0.0), Pointer(nullptr), i1(a), i2(b), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
+        /// @todo Why does this not set Iuv=IPoint, as other constructors do?
         Intersection(DBL d, const Vector3d& v, ObjectPtr o, int a, DBL b) :
-            Depth(d), Object(o), i1(a), d1(b), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+            Depth(d), IPoint(v), Object(o), Csg(nullptr),
+            d1(b), Pointer(nullptr), i1(a), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
+        /// @todo Why does this not set Iuv=IPoint, as other constructors do?
         Intersection(DBL d, const Vector3d& v, ObjectPtr o, int a, int b, DBL c) :
-            Depth(d), Object(o), i1(a), i2(b), d1(c), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+            Depth(d), IPoint(v), Object(o), Csg(nullptr),
+            d1(c), Pointer(nullptr), i1(a), i2(b), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
+        /// @todo Why does this not set Iuv=IPoint, as other constructors do?
         Intersection(DBL d, const Vector3d& v, ObjectPtr o, const Vector3d& lv, bool a) :
-            Depth(d), Object(o), b1(a), IPoint(v), LocalIPoint(lv), haveNormal(false), haveLocalIPoint(true), Csg(NULL)
+            Depth(d), IPoint(v), Object(o), Csg(nullptr),
+            LocalIPoint(lv), d1(0.0), Pointer(nullptr), i1(0), i2(0), haveNormal(false), haveLocalIPoint(true), b1(a)
         {}
 
         ~Intersection() { }
@@ -453,6 +492,14 @@ struct TruePointObjectCondition : public PointObjectCondition
     virtual bool operator()(const Vector3d&, ConstObjectPtr) const { return true; }
 };
 
+/// @}
+///
+//##############################################################################
+///
+/// @addtogroup PovCore
+///
+/// @{
+
 struct FrameSettings
 {
     DBL Clock_Value;      // May change between frames of an animation
@@ -474,19 +521,13 @@ struct FrameSettings
     bool Odd_Field_Flag;
 };
 
-struct BYTE_XYZ
-{
-    unsigned char x, y, z;
-};
-
-inline void VUnpack(Vector3d& dest_vec, const BYTE_XYZ * pack_vec)
-{
-    dest_vec[X] = ((double)pack_vec->x * (1.0 / 255.0)) * 2.0 - 1.0;
-    dest_vec[Y] = ((double)pack_vec->y * (1.0 / 255.0));
-    dest_vec[Z] = ((double)pack_vec->z * (1.0 / 255.0)) * 2.0 - 1.0;
-
-    dest_vec.normalize(); // already good to about 1%, but we can do better
-}
+/// @}
+///
+//##############################################################################
+///
+/// @addtogroup PovCoreMaterialPattern
+///
+/// @{
 
 class Fractal;
 
@@ -531,6 +572,15 @@ struct QualityFlags
     {}
 };
 
+/// @}
+///
+//##############################################################################
+///
+/// @defgroup PovCoreFunction User-Defined Functions
+/// @ingroup PovCore
+///
+/// @{
+
 class TraceThreadData;
 
 class GenericFunctionContext
@@ -544,15 +594,50 @@ typedef GenericFunctionContext* GenericFunctionContextPtr;
 class GenericFunctionContextFactory
 {
     public:
-        virtual GenericFunctionContextPtr CreateFunctionContext(TraceThreadData* pTd) = 0;
+        GenericFunctionContextFactory() : mRefCounter(0) {}
         virtual ~GenericFunctionContextFactory() {}
+        virtual GenericFunctionContextPtr CreateFunctionContext(TraceThreadData* pTd) = 0;
+
+    private:
+        mutable size_t mRefCounter;
+        friend void intrusive_ptr_add_ref(GenericFunctionContextFactory* f);
+        friend void intrusive_ptr_release(GenericFunctionContextFactory* f);
 };
 
-struct FunctionSourceInfo
+inline void intrusive_ptr_add_ref(GenericFunctionContextFactory* f) { ++f->mRefCounter; }
+inline void intrusive_ptr_release(GenericFunctionContextFactory* f) { if (!(--f->mRefCounter)) delete f; }
+
+typedef intrusive_ptr<GenericFunctionContextFactory>    GenericFunctionContextFactoryIPtr;
+typedef GenericFunctionContextFactory*                  GenericFunctionContextFactoryTPtr;
+
+struct SourcePosition
 {
-    char* name;
-    UCS2* filename;
-    pov_base::ITextStream::FilePos filepos;
+    POV_LONG    line;
+    POV_LONG    column;
+    POV_OFF_T   offset;
+    SourcePosition() = default;
+    SourcePosition(const SourcePosition&) = default;
+    SourcePosition(POV_LONG l, POV_LONG c, POV_OFF_T o) : line(l), column(c), offset(o) {}
+};
+
+struct SourceInfo : MessageContext
+{
+    UCS2String      fileName;
+    SourcePosition  position;
+    SourceInfo() = default;
+    SourceInfo(const MessageContext& o) : fileName(o.GetFileName()), position(o.GetLine(), o.GetColumn(), o.GetOffset()) {}
+    SourceInfo(const UCS2String& fn, const SourcePosition& p) : fileName(fn), position(p) {}
+    virtual UCS2String GetFileName() const override { return fileName; }
+    virtual POV_LONG GetLine() const override { return position.line; }
+    virtual POV_LONG GetColumn() const override { return position.column; }
+    virtual POV_OFF_T GetOffset() const override { return position.offset; }
+};
+
+struct CustomFunctionSourceInfo : SourceInfo
+{
+    UTF8String  name;
+    CustomFunctionSourceInfo() = default;
+    CustomFunctionSourceInfo(const UTF8String& n, const MessageContext& o) : name(n), SourceInfo(o) {}
 };
 
 template<typename RETURN_T, typename ARG_T>
@@ -566,7 +651,7 @@ public:
     virtual void PushArgument(GenericFunctionContextPtr pContext, ARG_T arg) = 0;
     virtual RETURN_T Execute(GenericFunctionContextPtr pContext) = 0;
     virtual GenericCustomFunction* Clone() const = 0;
-    virtual const FunctionSourceInfo* GetSourceInfo() const { return NULL; }
+    virtual const CustomFunctionSourceInfo* GetSourceInfo() const { return nullptr; }
 };
 
 typedef GenericCustomFunction<double, double> GenericScalarFunction;
@@ -579,8 +664,8 @@ public:
     inline GenericCustomFunctionInstance(GenericCustomFunction<RETURN_T,ARG_T>* pFn, TraceThreadData* pThreadData) :
         mpFunction(pFn), mpContext(pFn->AcquireContext(pThreadData)), mReInit(true)
     {
-        POV_ASSERT(mpFunction != NULL);
-        POV_ASSERT(mpContext  != NULL);
+        POV_ASSERT(mpFunction != nullptr);
+        POV_ASSERT(mpContext  != nullptr);
     }
 
     inline ~GenericCustomFunctionInstance()
@@ -650,6 +735,10 @@ private:
 
 typedef GenericCustomFunctionInstance<double, double> GenericScalarFunctionInstance;
 typedef GenericScalarFunctionInstance* GenericScalarFunctionInstancePtr;
+
+/// @}
+///
+//##############################################################################
 
 }
 

@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -51,7 +51,7 @@ class PhotonEstimationTask : public RenderTask
     public:
         DBL photonCountEstimate;
 
-        PhotonEstimationTask(ViewData *vd);
+        PhotonEstimationTask(ViewData *vd, size_t seed);
         ~PhotonEstimationTask();
 
         void Run();

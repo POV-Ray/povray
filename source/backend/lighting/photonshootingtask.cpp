@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -63,10 +63,9 @@
 namespace pov
 {
 
-PhotonShootingTask::PhotonShootingTask(ViewData *vd, PhotonShootingStrategy* strategy) :
-    RenderTask(vd, "Photon"),
-    trace(vd->GetSceneData(), GetViewDataPtr(), vd->GetSceneData()->photonSettings.Max_Trace_Level,
-          vd->GetSceneData()->photonSettings.adcBailout, vd->GetQualityFeatureFlags(), cooperate),
+PhotonShootingTask::PhotonShootingTask(ViewData *vd, PhotonShootingStrategy* strategy, size_t seed) :
+    RenderTask(vd, seed, "Photon"),
+    trace(vd->GetSceneData(), GetViewDataPtr(), vd->GetQualityFeatureFlags(), cooperate),
     rands(0.0, 1.0, 32768),
     randgen(&rands),
     strategy(strategy),
@@ -325,12 +324,12 @@ void PhotonShootingTask::ShootPhotonsAtObject(LightTargetCombo& combo)
                     if (Attenuation<0.00001) continue;
 
                     /* handle the projected_through object if it exists */
-                    if (combo.light->Projected_Through_Object != NULL)
+                    if (combo.light->Projected_Through_Object != nullptr)
                     {
                         /* try to intersect ray with projected-through ObjectPtr */
                         Intersection Intersect;
 
-                        Intersect.Object = NULL;
+                        Intersect.Object = nullptr;
                         if ( trace.FindIntersection(combo.light->Projected_Through_Object, Intersect, ray) )
                         {
                             /* we must recompute the media containers (new start point) */
@@ -360,7 +359,7 @@ void PhotonShootingTask::ShootPhotonsAtObject(LightTargetCombo& combo)
 
                     for(vector<ObjectPtr>::iterator object = GetSceneData()->objects.begin(); object != GetSceneData()->objects.end(); object++)
                     {
-                        if((*object)->Inside(ray.Origin, renderDataPtr) && ((*object)->interior != NULL))
+                        if ((*object)->Inside(ray.Origin, renderDataPtr) && ((*object)->interior != nullptr))
                             ray.AppendInterior((*object)->interior.get());
                     }
 

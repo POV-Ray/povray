@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,17 +44,23 @@
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
+
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
 
 #define CONE_OBJECT (BASIC_OBJECT)
 
-
-
-/*****************************************************************************
-* Global typedefs
-******************************************************************************/
+/// @}
+///
+//******************************************************************************
 
 class Cone : public ObjectBase
 {
@@ -80,7 +86,13 @@ class Cone : public ObjectBase
         virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
         virtual bool Inside(const Vector3d&, TraceThreadData *) const;
         virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
-        // virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const; // TODO FIXME - why is there no UV-mapping for this simple object?
+#ifdef POV_ENABLE_CONE_UV
+        /// @attention
+        ///     UV mapping of this primitive should not be enabled until the primary
+        ///     parameterization has been amended so that users have full control over the
+        ///     primitive's  orientation, rather than just the axis of rotational symmetry.
+        virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
+#endif // POV_ENABLE_CONE_UV
         virtual void Translate(const Vector3d&, const TRANSFORM *);
         virtual void Rotate(const Vector3d&, const TRANSFORM *);
         virtual void Scale(const Vector3d&, const TRANSFORM *);
@@ -91,7 +103,14 @@ class Cone : public ObjectBase
         void Compute_Cylinder_Data();
     protected:
         int Intersect(const BasicRay& ray, CONE_INT *Intersection, TraceThreadData *Thread) const;
+#ifdef POV_ENABLE_CONE_UV
+        void CalcUV(const Vector3d& IPoint, Vector2d& Result) const;
+#endif // POV_ENABLE_CONE_UV
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

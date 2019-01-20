@@ -13,7 +13,7 @@
 
 // This scene makes use of a contrast enhancing filter.
 // For more information, see the demo scene transmitfx.pov
-// located in the folder \scenes\textures\pigments\
+// located in the folder <povray>/scenes/textures/pigments/
 
 // The idea is to create a woodcut look where dark areas are
 // made of thick black stripes and bright areas are made of

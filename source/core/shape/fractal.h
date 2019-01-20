@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -46,6 +46,12 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
+
 /*****************************************************************************
 * Global preprocessor defines
 ******************************************************************************/
@@ -74,12 +80,6 @@ namespace pov
 #define SQR_STYPE         15
 #define CUBE_STYPE        16
 #define RECIPROCAL_STYPE  17
-
-#define Iteration(V,F,IS) ( (F)->Rules->Iterate(V,F,IS) )
-#define Normal_Calc(F,V,IS) ( (F)->Rules->CalcNormal(V,(F)->Num_Iterations,F,IS) )
-#define F_Bound(R,F,dm,dM) ( (F)->Rules->Bound(R,F,dm,dM) )
-#define D_Iteration(V,F,I,D,IS) ( (F)->Rules->Iterate(V,F,I,D,IS) )
-#define Complex_Function(t,s,F) ( (*(this->ComplexFunction))(t,s,&(F)->exponent) )
 
 /*****************************************************************************
 * Global typedefs
@@ -128,9 +128,9 @@ class Fractal : public ObjectBase
         int SetUp_Fractal(void);
 };
 
-/*****************************************************************************
-* Global variables
-******************************************************************************/
+/// @}
+///
+//##############################################################################
 
 }
 

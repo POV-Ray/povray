@@ -12,8 +12,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -42,15 +42,13 @@
 #include "base/image/hdr.h"
 
 // Standard C++ header files
+#include <memory>
 #include <string>
 
-// Boost header files
-#include <boost/scoped_ptr.hpp>
-#include <boost/scoped_array.hpp>
-
-// POV-Ray base header files
+// POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
 #include "base/types.h"
+#include "base/image/dither.h"
 #include "base/image/metadata.h"
 
 // this must be the last file included
@@ -82,29 +80,29 @@ struct Messages
 
 typedef unsigned char RGBE[4]; // red, green, blue, exponent
 
-void GetRGBE(RGBE rgbe, const Image *image, int col, int row, const GammaCurvePtr& gamma, DitherHandler* dither);
+void GetRGBE(RGBE rgbe, const Image *image, int col, int row, const GammaCurvePtr& gamma, DitherStrategy& dither);
 void SetRGBE(const unsigned char *scanline, Image *image, int row, int width, const GammaCurvePtr& gamma);
 void ReadOldLine(unsigned char *scanline, int width, IStream *file);
 
 /*****************************************************************************
 * Code
 ******************************************************************************/
-void GetRGBE(RGBE rgbe, const Image *image, int col, int row, const GammaCurvePtr& gamma, DitherHandler* dh)
+void GetRGBE(RGBE rgbe, const Image *image, int col, int row, const GammaCurvePtr& gamma, DitherStrategy& dh)
 {
-    DitherHandler::OffsetInfo linOff, encOff;
-    dh->getOffset(col,row,linOff,encOff);
+    DitherStrategy::ColourOffset linOff, encOff;
+    dh.GetOffset(col,row,linOff,encOff);
 
     RGBColour rgbColour;
     GetEncodedRGBValue(image, col, row, gamma, rgbColour);
 
     rgbColour += linOff.getRGB();
-    RadianceHDRColour rgbeColour(rgbColour);
+    RadianceHDRColour rgbeColour(rgbColour,encOff.getRGB());
     for (int i = 0; i < 4; i ++)
         rgbe[i] = (*rgbeColour)[i];
 
     rgbColour -= RGBColour(rgbeColour);
     linOff.setRGB(rgbColour);
-    dh->setError(col,row,linOff);
+    dh.SetError(col,row,linOff);
 }
 
 void SetRGBE(const unsigned char *scanline, Image *image, int row, int width, const GammaCurvePtr& gamma)
@@ -132,10 +130,10 @@ void ReadOldLine(unsigned char *scanline, int width, IStream *file)
 
         // NB EOF won't be set at this point even if the last read obtained the
         // final byte in the file (we need to read another byte for that to happen).
-        if(*file == false)
+        if(!*file)
             throw POV_EXCEPTION(kFileDataErr, "Invalid HDR file (unexpected EOF)");
 
-        if(file->Read_Byte(b).eof())
+        if(!file->Read_Byte(b))
             return;
 
         scanline[3] = b;
@@ -171,7 +169,7 @@ Image *Read(IStream *file, const Image::ReadOptions& options)
     float exposure = 1.0;
     unsigned int width;
     unsigned int height;
-    Image *image = NULL;
+    Image *image = nullptr;
     Image::ImageDataType imagetype = options.itype;
 
     // Radiance HDR files store linear color values by default, so never convert unless the user overrides
@@ -193,7 +191,7 @@ Image *Read(IStream *file, const Image::ReadOptions& options)
         // TODO: what do we do with exposure?
         if(strncmp(line, "EXPOSURE", 8) == 0)
         {
-            if((s = strchr(line, '=')) != NULL)
+            if ((s = strchr(line, '=')) != nullptr)
             {
                 if(sscanf(s + 1, "%f", &e) == 1)
                     exposure *= e;
@@ -210,7 +208,7 @@ Image *Read(IStream *file, const Image::ReadOptions& options)
     image = Image::Create(width, height, imagetype);
     // NB: HDR files don't use alpha, so premultiplied vs. non-premultiplied is not an issue
 
-    boost::scoped_array<unsigned char> scanline(new unsigned char[4 * width]);
+    std::unique_ptr<unsigned char[]> scanline(new unsigned char[4 * width]);
     for(int row = 0; row < height; row++)
     {
         // determine scanline type
@@ -296,8 +294,10 @@ void Write(OStream *file, const Image *image, const Image::WriteOptions& options
     int cnt = 1;
     int c2;
     RGBE rgbe;
+
+    // Radiance HDR format mandates that colours are encoded linearly.
     GammaCurvePtr gamma = TranscodingGammaCurve::Get(options.workingGamma, NeutralGammaCurve::Get());
-    DitherHandler* dither = options.dither.get();
+    DitherStrategy& dither = *options.ditherStrategy;
 
     Metadata meta;
     file->printf("#?RADIANCE\n");
@@ -316,7 +316,7 @@ void Write(OStream *file, const Image *image, const Image::WriteOptions& options
     file->printf("\n");
     file->printf("-Y %d +X %d\n", height, width);
 
-    boost::scoped_array<RGBE> scanline(new RGBE[width]);
+    std::unique_ptr<RGBE[]> scanline(new RGBE[width]);
 
     for(int row = 0; row < height; row++)
     {

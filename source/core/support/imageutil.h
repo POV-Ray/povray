@@ -8,8 +8,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -48,6 +48,16 @@
 namespace pov
 {
 
+class ImageData;
+struct ImagePattern;
+
+//##############################################################################
+///
+/// @defgroup PovCoreSupportImageUtil Image Handling Utilities
+/// @ingroup PovCore
+///
+/// @{
+
 using namespace pov_base;
 
 /*****************************************************************************
@@ -65,7 +75,7 @@ enum
     HYPERBOLIC_MAP   = 4,
     TORUS_MAP        = 5,
     PIRIFORM_MAP     = 6,
-    OLD_MAP          = 7
+    ANGULAR_MAP      = 7
 };
 
 // Bit map interpolation types.
@@ -116,15 +126,23 @@ class ImageData
         ~ImageData();
 };
 
-DBL image_pattern(const Vector3d& EPoint, const BasicPattern* pPattern);
-bool image_map(const Vector3d& EPoint, const PIGMENT *Pigment, TransColour& colour);
+typedef ImageData *ImageDataPtr;
+
+DBL image_pattern(const Vector3d& EPoint, const ImagePattern* pPattern); // TODO - move to pattern.cpp
 TEXTURE *material_map(const Vector3d& IPoint, const TEXTURE *Texture);
 void bump_map(const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal);
+void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTColour& colour, int *index); // TODO ALPHA - caller should decide whether to prefer premultiplied or non-premultiplied alpha
+void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTColour& colour, int *index, bool premul);
 HF_VAL image_height_at(const ImageData *image, int x, int y);
 bool is_image_opaque(const ImageData *image);
+int map_pos(const Vector3d& EPoint, const ImageData* pImage, DBL *xcoor, DBL *ycoor);
 ImageData *Copy_Image(ImageData *old);
 ImageData *Create_Image(void);
 void Destroy_Image(ImageData *image);
+
+/// @}
+///
+//##############################################################################
 
 }
 

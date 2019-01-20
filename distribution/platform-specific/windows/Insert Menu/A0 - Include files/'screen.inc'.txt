@@ -4,4 +4,4 @@
 #include "screen.inc"
 
 // read the original include file for details 
-// and the sample in 'scenes\screen.pov.' 
+// and the sample in 'scenes/screen.pov.' 

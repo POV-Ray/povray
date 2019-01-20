@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -42,14 +42,16 @@
 #include "frontend/configfrontend.h"
 
 #include "base/timer.h"
-#include "base/image/colourspace.h"
 
 #include "backend/povray.h"
 
 #include "frontend/console.h"
-#include "frontend/defaultplatformbase.h"
 #include "frontend/display.h"
+#include "frontend/filemessagehandler.h"
+#include "frontend/imagemessagehandler.h"
+#include "frontend/parsermessagehandler.h"
 #include "frontend/processrenderoptions.h"
+#include "frontend/rendermessagehandler.h"
 #include "frontend/simplefrontend.h"
 
 // this must be the last file included
@@ -69,23 +71,23 @@ class DefaultConsole : public pov_frontend::Console
 class DefaultDisplay : public pov_frontend::Display
 {
     public:
-        DefaultDisplay(unsigned int w, unsigned int h, pov_base::GammaCurvePtr g) : Display(w, h, g) { }
+        DefaultDisplay(unsigned int w, unsigned int h) : Display(w, h) { }
         ~DefaultDisplay() { }
         void Initialise() { }
         void DrawPixel(unsigned int, unsigned int, const RGBA8&) { }
 };
 
 pov_frontend::Console *CreateDefaultConsole();
-pov_frontend::Display *CreateDefaultDisplay(unsigned int w, unsigned int h, pov_base::GammaCurvePtr gf);
+pov_frontend::Display *CreateDefaultDisplay(unsigned int w, unsigned int h);
 
 pov_frontend::Console *CreateDefaultConsole()
 {
     return new DefaultConsole();
 }
 
-pov_frontend::Display *CreateDefaultDisplay(unsigned int w, unsigned int h, pov_base::GammaCurvePtr gf)
+pov_frontend::Display *CreateDefaultDisplay(unsigned int w, unsigned int h)
 {
-    return new DefaultDisplay(w, h, gf);
+    return new DefaultDisplay(w, h);
 }
 
 void BackendExitCallback()
@@ -99,7 +101,7 @@ int main(int argc, char **argv)
     using namespace pov_base;
     using namespace pov_frontend;
 
-    POVMSContext frontendContext = NULL;
+    POVMSContext frontendContext = nullptr;
 
     DefaultPlatformBase platformbase;
     POVMSAddress backendAddress = POVMSInvalidAddress;
@@ -107,15 +109,8 @@ int main(int argc, char **argv)
     int ret = 0;
     int i = 0;
 
-    printf("Welcome to POV-Ray 3.7 SMP!\n");
+    printf("Welcome to POV-Ray v" POV_RAY_GENERATION " SMP!\n");
     fflush(stdout);
-
-//  char *nargv[2];
-//  nargv[0] = argv[0];
-//  nargv[1] = "'/Volumes/Iron/Official POV-Ray/POV-Ray 3.7 Source/benchmark.ini'";
-//  nargv[1] = "'/Volumes/Iron/Official POV-Ray/POV-Ray 3.7 Source/object7.ini'";
-//  argc = 2;
-//  argv = nargv;
 
     // Init
     povray_init(boost::bind(&BackendExitCallback), &backendAddress);
@@ -129,7 +124,7 @@ int main(int argc, char **argv)
         POVMS_Object backendMessage;
         SimpleFrontend<ParserMessageHandler, FileMessageHandler, RenderMessageHandler, ImageMessageHandler>
                        frontend(frontendContext, backendAddress, backendMessage,
-                       boost::bind(CreateDefaultConsole), boost::bind(CreateDefaultDisplay, _1, _2, _3));
+                       boost::bind(CreateDefaultConsole), boost::bind(CreateDefaultDisplay, _1, _2));
 
         // Print help screens
         if(argc == 1)

@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -54,8 +54,10 @@ class ViewThreadData : public TraceThreadData
          *  Create thread local data.
          *  @param  vd              View data defining view attributes
          *                          as well as view output.
+         *  @param  seed            Seed for the stochastic random number generator;
+         *                          should be unique for each render unless overridden by the user.
          */
-        ViewThreadData(ViewData *vd);
+        ViewThreadData(ViewData *vd, size_t seed);
 
         /**
          *  Get width of view.

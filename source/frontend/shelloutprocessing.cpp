@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,19 +33,12 @@
 ///
 //******************************************************************************
 
-#include <cctype>
-#include <string>
-#include <boost/format.hpp>
-#include <boost/algorithm/string.hpp>
-
-// configfrontend.h must always be the first POV file included within frontend *.cpp files
-#include "frontend/configfrontend.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/shelloutprocessing.h"
 
-#include "povms/povmscpp.h"
-#include "povms/povmsid.h"
+#include <boost/algorithm/string.hpp>
 
-#include "base/types.h"
+#include "povms/povmsid.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -202,7 +195,7 @@ bool ShelloutProcessing::ExtractCommand(const string& src, string& command, stri
     command.clear();
     parameters.clear();
     string str = boost::trim_copy(src);
-    for (s = str.c_str(); *s; *s++)
+    for (s = str.c_str(); *s != '\0'; s++)
     {
         if (hadEscape)
         {
@@ -446,6 +439,10 @@ bool ShelloutProcessing::PostProcessEvent(void)
                         cancelParameters = sh->Parameters();
                         cancelOutput = LastShelloutResult();
                         return true;
+
+                    default:
+                        // Do nothing special.
+                        break;
                 }
             }
 
@@ -471,6 +468,10 @@ bool ShelloutProcessing::PostProcessEvent(void)
                                 skipCallouts = true;
 
                             return true;
+
+                        default:
+                            // Do nothing special.
+                            break;
                     }
                     break;
 
@@ -502,6 +503,10 @@ bool ShelloutProcessing::PostProcessEvent(void)
                                 skipReason = str(boost::format("skip frame %1%") % (frameNo + 1));
                             }
                             break;
+
+                        default:
+                            // Do nothing special.
+                            break;
                     }
                     break;
 
@@ -517,6 +522,10 @@ bool ShelloutProcessing::PostProcessEvent(void)
                             cancelParameters = skipParameters = sh->Parameters();
                             cancelOutput = skipOutput = LastShelloutResult();
                             cancelReason = skipReason = "skip all remaining frames";
+                            break;
+
+                        default:
+                            // Do nothing special.
                             break;
                     }
                     break;
@@ -538,6 +547,10 @@ bool ShelloutProcessing::PostProcessEvent(void)
                     }
                     cancelReturn = ret;
                     return true;
+
+                default:
+                    // Do nothing special.
+                    break;
             }
         }
     }

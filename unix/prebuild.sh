@@ -1,11 +1,11 @@
 #!/bin/sh
 
 ###############################################################################
-# prebuild.sh script (maintainers only)
+# prebuild.sh script (maintainers only) 
 # Written by Nicolas Calimet and Christoph Hormann
 #
-# This prebuild.sh script prepares the Perforce source tree for building
-# the Unix/Linux version of POV-Ray.  Unlike the former versions, the
+# This prebuild.sh script prepares the source tree for building the
+# Unix/Linux version of POV-Ray.  Unlike the former versions, the
 # prebuild procedure does not change the directory structure, so that
 # the overall layout of the UNIX source distribution remains consistent
 # with the other supported architectures (namely Windows and Macintosh).
@@ -18,7 +18,7 @@
 # (e.g. doc).
 #
 # Running prebuild.sh requires:
-#   1) GNU autoconf >= 2.59 and GNU automake >= 1.9
+#   1) GNU autoconf >= 2.68 and GNU automake >= 1.9
 #   2) perl and m4 (should be on any system, at least Linux is okay)
 #   3) Run from the unix/ directory where the script is located.
 #
@@ -40,25 +40,29 @@
 #
 # Note that the 'clean' and 'doc(s)(clean)' options are mutually exclusive.
 #
-# $File: //depot/povray/smp/unix/prebuild.sh $
-# $Revision: #31 $
-# $Change: 6136 $
-# $DateTime: 2013/11/25 16:36:15 $
-# $Author: clipka $
-# $Log$
 ###############################################################################
+
+# Change to the directory this script resides in
+scriptname=`basename $0`
+olddir=`pwd`
+cd `dirname $0`
 
 umask 022
 
-pov_version_base=`cat ./VERSION | sed 's,\([0-9]*.[0-9]*\).*,\1,g'`
-pov_config_bugreport="POV-Ray Bugtracker http://bugs.povray.org/"
+# Extract version information from `source/base/version.h`
+eval `../tools/unix/get-source-version.sh ../source/base/version.h`
+pov_copyright="$POV_RAY_COPYRIGHT"
+pov_version_base="$POV_RAY_GENERATION"
+pov_version="$POV_RAY_FULL_VERSION"
+
+pov_config_bugreport="POV-Ray issue tracker at https://github.com/POV-Ray/povray/issues"
 
 # documentation
 timestamp=`date +%Y-%m-%d`
 build="./docs_$timestamp"
 builddoc="$build/documentation"
 
-required_autoconf="2.59"
+required_autoconf="2.68"
 required_automake="1.9"
 
 
@@ -66,16 +70,10 @@ required_automake="1.9"
 # Setup
 ###############################################################################
 
-# Prevents running from another directory.
-if test x"`dirname $0`" != x"."; then
-  echo "$0: must ran from POV-Ray's unix/ directory"
-  exit 1
-fi
-
 # Check optional argument.
 case "$1" in
   ""|clean|doc|docs|docclean|docsclean) ;;
-  *) echo "$0: error: unrecognized option '$1'"; exit ;;
+  *) echo "$scriptname: error: unrecognized option '$1'"; cd "$olddir" ; exit ;;
 esac
 
 # Check whether 'cp -u' is supported.
@@ -95,7 +93,8 @@ if test x"$1" = x""; then
     expr $autoconf \>= $required > /dev/null || autoconf=""
   fi
   if test x"$autoconf" = x""; then
-    echo "$0: error: requires autoconf $required_autoconf or above"
+    echo "$scriptname: error: requires autoconf $required_autoconf or above"
+    cd "$olddir"
     exit 1
   fi
 
@@ -107,7 +106,8 @@ if test x"$1" = x""; then
     expr $automake \>= $required > /dev/null || automake=""
   fi
   if test x"$automake" = x""; then
-    echo "$0: error: requires automake $required_automake or above"
+    echo "$scriptname: error: requires automake $required_automake or above"
+    cd "$olddir"
     exit 1
   fi
 fi
@@ -119,7 +119,7 @@ fi
 
 case "$1" in
 
-  # Cleanup all files not in the Perforce repositery
+  # Cleanup all files not in the repository
   clean)
   if test -f ../Makefile; then
     makeclean=`\
@@ -138,7 +138,7 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
     rm -r ../$file 2> /dev/null  &&  echo "Cleanup ../$file"
   done
   # cleanup stuff added by automake
-  for file in config.guess config.sub depcomp install-sh missing
+  for file in config.guess config.sub compile depcomp install-sh missing
   do
     rm config/$file 2> /dev/null  &&  echo "Cleanup config/$file"
   done
@@ -347,6 +347,7 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
   chmod u+rw docs_internal_$timestamp.log
   rm -f      $log_file
 
+  cd "$olddir"
   exit
   ;;
 
@@ -356,7 +357,7 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
   # some shells seem unable to expand properly wildcards in the list entries
   # (e.g. ../distribution/in*/).
   for file in \
-    AUTHORS ChangeLog configure.ac COPYING NEWS README VERSION \
+    AUTHORS ChangeLog configure.ac COPYING NEWS README \
     povray.1 povray.conf \
     scripts \
     ../distribution/ini ../distribution/include ../distribution/scenes
@@ -373,6 +374,10 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
   echo "Create ../INSTALL"
   $cp_u -f install.txt ../INSTALL  ||  echo "INSTALL not copied !"
   chmod -f u+rw ../INSTALL
+
+  # VERSION
+  echo "Create ../VERSION"
+  echo "$pov_version" > ../VERSION  ||  echo "VERSION not created !"
 
   # icons/
   # don't copy the icons/source directory
@@ -418,7 +423,7 @@ case "$1" in
   cat << pbEOF >> $makefile.am
 
 # Makefile.am for the source distribution of POV-Ray $pov_version_base for UNIX
-# Written by $pov_config_bugreport
+# Please report bugs to $pov_config_bugreport
 
 # Programs to build.
 bin_PROGRAMS = povray
@@ -429,20 +434,42 @@ povray_SOURCES = \\
   disp_sdl.cpp disp_sdl.h \\
   disp_text.cpp disp_text.h
 
+cppflags_platformcpu =
+ldadd_platformcpu =
+if BUILD_x86
+cppflags_platformcpu += -I\$(top_srcdir)/platform/x86
+ldadd_platformcpu += \$(top_builddir)/platform/libx86.a
+endif
+if BUILD_x86avx
+ldadd_platformcpu += \$(top_builddir)/platform/libx86avx.a
+endif
+if BUILD_x86avxfma4
+ldadd_platformcpu += \$(top_builddir)/platform/libx86avxfma4.a
+endif
+if BUILD_x86avx2fma3
+ldadd_platformcpu += \$(top_builddir)/platform/libx86avx2fma3.a
+endif
+
 # Include paths for headers.
 AM_CPPFLAGS = \\
   -I\$(top_srcdir)/unix/povconfig \\
   -I\$(top_srcdir) \\
   -I\$(top_srcdir)/source \\
   -I\$(top_builddir)/source \\
+  -I\$(top_srcdir)/platform/unix \\
+  \$(cppflags_platformcpu) \\
   -I\$(top_srcdir)/vfe \\
   -I\$(top_srcdir)/vfe/unix
 
 # Libraries to link with.
 # Beware: order does matter!
+# TODO - Having vfe/libvfe.a twice in this list is a bit of a hackish way to cope with cyclic dependencies.
 LDADD = \\
   \$(top_builddir)/vfe/libvfe.a \\
-  \$(top_builddir)/source/libpovray.a
+  \$(top_builddir)/source/libpovray.a \\
+  \$(top_builddir)/vfe/libvfe.a \\
+  \$(top_builddir)/platform/libplatform.a \\
+  \$(ldadd_platformcpu)
 pbEOF
   ;;
 esac
@@ -561,7 +588,7 @@ case "$1" in
   cat << pbEOF >> $makefile.am
 
 # Makefile.am for the source distribution of POV-Ray $pov_version_base for UNIX
-# Written by $pov_config_bugreport
+# Please report bugs to $pov_config_bugreport
 
 # Directories.
 povlibdir = @datadir@/@PACKAGE@-@VERSION_BASE@
@@ -574,7 +601,7 @@ povowner = @povowner@
 povgroup = @povgroup@
 
 # Directories to build.
-SUBDIRS = source vfe unix
+SUBDIRS = source vfe platform unix
 
 # Additional files to distribute.
 EXTRA_DIST = \\
@@ -584,7 +611,7 @@ EXTRA_DIST = \\
 
 # Additional files to clean with 'make distclean'.
 DISTCLEANFILES = \$(top_builddir)/povray.ini
-CONFIG_CLEAN_FILES = \$(top_builddir)/source/jversion.h
+CONFIG_CLEAN_FILES = 
 
 # Render a test scene for 'make check'.
 # This is meant to run before 'make install'.
@@ -616,7 +643,6 @@ dist-hook:
 	rm -f    \`find \$(distdir) -name "*.h.in~"\`
 	rm -f -r \`find \$(distdir) -name autom4te.cache\`
 	rm -f -r \`find \$(distdir) -name .libs\`
-	rm -f    \$(distdir)/source/jversion.h
 
 # Manage various data files for 'make install'.
 # Creates an install.log file to record created folders and files.
@@ -715,7 +741,7 @@ case "$1" in
 #!/bin/sh -x
 
 # bootstrap for the source distribution of POV-Ray $pov_version_base for UNIX
-# Written by $pov_config_bugreport
+# Please report bugs to $pov_config_bugreport
 # Run this script if configure.ac or any Makefile.am has changed
 
 rm -f config.log config.status
@@ -775,26 +801,33 @@ case "$1" in
   ;;
 
   *)
-  files=`find $dir -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g`
+  files=`find $dir -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g | sort`
 
   echo "Create $makefile.am"
   cat Makefile.header > $makefile.am
   cat << pbEOF >> $makefile.am
 
 # Makefile.am for the source distribution of POV-Ray $pov_version_base for UNIX
-# Written by $pov_config_bugreport
+# Please report bugs to $pov_config_bugreport
 
 # Libraries to build.
 noinst_LIBRARIES = libpovray.a
 
 # Source files.
 libpovray_a_SOURCES = \\
-`echo $files`
+  `echo $files`
+
+cppflags_platformcpu = 
+if BUILD_x86
+cppflags_platformcpu += -I\$(top_srcdir)/platform/x86
+endif
 
 # Include paths for headers.
 AM_CPPFLAGS = \\
   -I\$(top_srcdir)/unix/povconfig \\
   -I\$(top_srcdir) \\
+  -I\$(top_srcdir)/platform/unix \\
+  \$(cppflags_platformcpu) \\
   -I\$(top_srcdir)/unix \\
   -I\$(top_srcdir)/vfe \\
   -I\$(top_srcdir)/vfe/unix
@@ -1306,25 +1339,124 @@ case "$1" in
 
   *)
   # includes the vfe/unix/ files to avoid circular dependencies when linking
-  files=`find $dir $dir/unix -maxdepth 1 -name \*.cpp -or -name \*.h | sed s,"$dir/",,g`
+  files=`find $dir $dir/unix -maxdepth 1 -name \*.cpp -or -name \*.h | sed s,"$dir/",,g | sort`
 
   echo "Create $makefile.am"
   cat Makefile.header > $makefile.am
   cat << pbEOF >> $makefile.am
 
 # Makefile.am for the source distribution of POV-Ray $pov_version_base for UNIX
-# Written by $pov_config_bugreport
+# Please report bugs to $pov_config_bugreport
 
 # Libraries to build.
 noinst_LIBRARIES = libvfe.a
 
 # Source files.
 libvfe_a_SOURCES = \\
-`echo $files`
+  `echo $files`
+
+cppflags_platformcpu = 
+if BUILD_x86
+cppflags_platformcpu += -I\$(top_srcdir)/platform/x86
+endif
 
 # Include paths for headers.
 AM_CPPFLAGS = \\
   -I\$(top_srcdir)/unix/povconfig \\
+  -I\$(top_srcdir)/platform/unix \\
+  \$(cppflags_platformcpu) \\
+  -I\$(top_srcdir)/vfe/unix \\
+  -I\$(top_srcdir)/unix \\
+  -I\$(top_srcdir)/source
+
+# Extra definitions for compiling.
+# They cannot be placed in config.h since they indirectly rely on \$prefix.
+DEFS = \\
+  @DEFS@ \\
+  -DPOVLIBDIR=\"@datadir@/@PACKAGE@-@VERSION_BASE@\" \\
+  -DPOVCONFDIR=\"@sysconfdir@/@PACKAGE@/@VERSION_BASE@\" \\
+  -DPOVCONFDIR_BACKWARD=\"@sysconfdir@\"
+pbEOF
+  ;;
+esac
+
+
+
+
+##### Platform ################################################################
+
+###
+### ../platform/Makefile.am
+###
+
+dir="../platform"
+makefile="$dir/Makefile"
+
+case "$1" in
+  clean)
+  for file in $makefile.am $makefile.in; do
+    rm $file 2> /dev/null  &&  echo "Cleanup $file"
+  done
+  ;;
+
+  doc*)
+  ;;
+
+  *)
+  files=`find $dir/unix -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g | sort`
+  files_x86=`find $dir/x86 -maxdepth 1 -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g | sort`
+  for ext in avx avxfma4 avx2fma3; do
+    files_ext=`find $dir/x86/$ext -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g | sort`
+    eval files_x86$ext='$files_ext'
+  done
+
+  echo "Create $makefile.am"
+  cat Makefile.header > $makefile.am
+  cat << pbEOF >> $makefile.am
+
+# Makefile.am for the source distribution of POV-Ray $pov_version_base for UNIX
+# Please report bugs to $pov_config_bugreport
+
+# Platform-specifics.
+cppflags_platformcpu =
+libraries_platformcpu =
+if BUILD_x86
+cppflags_platformcpu += -I\$(top_srcdir)/platform/x86
+libraries_platformcpu += libx86.a
+libx86_a_SOURCES = `echo $files_x86`
+libx86_a_CXXFLAGS = \$(CXXFLAGS)
+endif
+if BUILD_x86avx
+libraries_platformcpu += libx86avx.a
+libx86avx_a_SOURCES = `echo $files_x86avx`
+libx86avx_a_CXXFLAGS = \$(CXXFLAGS) -mavx
+endif
+if BUILD_x86avxfma4
+libraries_platformcpu += libx86avxfma4.a
+libx86avxfma4_a_SOURCES = `echo $files_x86avxfma4`
+libx86avxfma4_a_CXXFLAGS = \$(CXXFLAGS) -mavx -mfma4
+endif
+if BUILD_x86avx2fma3
+libraries_platformcpu += libx86avx2fma3.a
+libx86avx2fma3_a_SOURCES =  `echo $files_x86avx2fma3`
+libx86avx2fma3_a_CXXFLAGS = \$(CXXFLAGS) -mavx2 -mfma
+endif
+
+# Libraries to build.
+noinst_LIBRARIES = \\
+  libplatform.a \\
+  \$(libraries_platformcpu)
+
+# Source files.
+libplatform_a_SOURCES = \\
+  `echo $files`
+
+# Include paths for headers.
+AM_CPPFLAGS = \\
+  -I\$(top_srcdir)/unix/povconfig \\
+  -I\$(top_srcdir)/platform/unix \\
+  \$(cppflags_platformcpu) \\
+  -I\$(top_srcdir)/vfe \\
   -I\$(top_srcdir)/vfe/unix \\
   -I\$(top_srcdir)/unix \\
   -I\$(top_srcdir)/source
@@ -1396,3 +1528,6 @@ case "$1" in
   done
   ;;
 esac  # boost
+
+
+cd "$olddir"

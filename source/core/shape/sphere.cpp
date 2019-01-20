@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -86,7 +86,7 @@ bool Sphere::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 
     if(Do_Ellipsoid)
     {
-        register int Intersection_Found;
+        bool Intersection_Found;
         DBL Depth1, Depth2, len;
         Vector3d IPoint;
         BasicRay New_Ray;
@@ -100,7 +100,7 @@ bool Sphere::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 
         Intersection_Found = false;
 
-        if(Intersect(New_Ray, Center, Sqr(Radius), &Depth1, &Depth2))
+        if(Intersect(New_Ray, Vector3d(0.0), 1.0, &Depth1, &Depth2))
         {
             Thread->Stats()[Ray_Sphere_Tests_Succeeded]++;
             if((Depth1 > DEPTH_TOLERANCE) && (Depth1 < MAX_DISTANCE))
@@ -132,7 +132,7 @@ bool Sphere::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
     }
     else
     {
-        register int Intersection_Found;
+        bool Intersection_Found;
         DBL Depth1, Depth2;
         Vector3d IPoint;
 
@@ -273,9 +273,7 @@ bool Sphere::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 
         MInvTransPoint(New_Point, IPoint, Trans);
 
-        Origin_To_Center = Center - New_Point;
-
-        OCSquared = Origin_To_Center.lengthSqr();
+        OCSquared = New_Point.lengthSqr();
 
         if (Test_Flag(this, INVERTED_FLAG))
             return(OCSquared > Sqr(Radius));
@@ -328,9 +326,15 @@ void Sphere::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thre
     if(Do_Ellipsoid)
     {
         Vector3d New_Point;
+
         // Transform the point into the sphere's space
         MInvTransPoint(New_Point, Inter->IPoint, Trans);
-        Result = New_Point - Center;
+
+        // Compute the result in the sphere's space
+        // (this is trivial since ellipsoidal mode is based on the unity sphere)
+        Result = New_Point;
+
+        // Transform the result back into regular space
         MTransNormal(Result, Result, Trans);
         Result.normalize();
     }
@@ -375,8 +379,6 @@ ObjectPtr Sphere::Copy()
     *New = *this;
     New->Trans = Copy_Transform(Trans);
 
-    New->UV_Trans = Copy_Transform(UV_Trans);
-
     return(New);
 }
 
@@ -409,19 +411,14 @@ ObjectPtr Sphere::Copy()
 
 void Sphere::Translate(const Vector3d& Vector, const TRANSFORM *tr)
 {
-    if(Trans == NULL)
+    if (Do_Ellipsoid)
     {
-        if(UV_Trans == NULL)
-            UV_Trans = Create_Transform();
-        Compose_Transforms(UV_Trans, tr);
-
-        Center += Vector;
-
-        Compute_BBox();
+        Transform(tr);
     }
     else
     {
-        Transform(tr);
+        Center += Vector;
+        Compute_BBox();
     }
 }
 
@@ -455,19 +452,18 @@ void Sphere::Translate(const Vector3d& Vector, const TRANSFORM *tr)
 
 void Sphere::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
-    if(Trans == NULL)
+    if (Do_Ellipsoid)
     {
-        if (UV_Trans == NULL)
-            UV_Trans = Create_Transform();
-        Compose_Transforms(UV_Trans, tr);
-
-        MTransPoint(Center, Center, tr);
-
-        Compute_BBox();
+        Transform(tr);
     }
     else
     {
-        Transform(tr);
+        if (Trans == nullptr)
+            Trans = Create_Transform();
+        Compose_Transforms(Trans, tr);
+
+        MTransPoint(Center, Center, tr);
+        Compute_BBox();
     }
 }
 
@@ -501,32 +497,17 @@ void Sphere::Rotate(const Vector3d&, const TRANSFORM *tr)
 
 void Sphere::Scale(const Vector3d& Vector, const TRANSFORM *tr)
 {
-    if ((Vector[X] != Vector[Y]) || (Vector[X] != Vector[Z]))
-    {
-        if (Trans == NULL)
-        {
-            // treat sphere as ellipsoid as it's unevenly scaled
-            Do_Ellipsoid = true; // FIXME - parser needs to select sphere or ellipsoid
-            Trans = Create_Transform();
-        }
-    }
-
-    if (Trans == NULL)
-    {
-        if (UV_Trans == NULL)
-            UV_Trans = Create_Transform();
-        Compose_Transforms(UV_Trans, tr);
-
-        Center *= Vector[X];
-
-        Radius *= fabs(Vector[X]);
-
-        Compute_BBox();
-    }
-    else
+    if (Do_Ellipsoid || (Vector[X] != Vector[Y]) || (Vector[X] != Vector[Z]))
     {
         Transform(tr);
     }
+    else
+    {
+        Center *= Vector[X];
+        Radius *= fabs(Vector[X]);
+    }
+
+    Compute_BBox();
 }
 
 
@@ -561,8 +542,7 @@ Sphere::Sphere() :
     ObjectBase(SPHERE_OBJECT),
     Center(0.0, 0.0, 0.0),
     Radius(1.0),
-    UV_Trans(NULL),
-    Do_Ellipsoid(false) // FIXME
+    Do_Ellipsoid(false)
 {}
 
 /*****************************************************************************
@@ -593,14 +573,28 @@ Sphere::Sphere() :
 
 void Sphere::Transform(const TRANSFORM *tr)
 {
-    if (UV_Trans == NULL)
-        UV_Trans = Create_Transform();
-    Compose_Transforms(UV_Trans, tr);
-
-    if(Trans == NULL)
+    // Arbitrary transformations can only be tracked in ellipsoidal mode,
+    // so we need to switch to that mode now if we're still in spherical mode.
+    if (!Do_Ellipsoid)
     {
         Do_Ellipsoid = true;
-        Trans = Create_Transform();
+
+        // We always have a transformation in ellipsoidal mode.
+        if (!Trans)
+            Trans = Create_Transform();
+
+        // Ellipsoidal mode is based on the unity sphere, so we need to convert
+        // center and radius into corresponding transformations.
+
+        TRANSFORM temp;
+
+        Compute_Scaling_Transform(&temp, Vector3d(Radius));
+        Compose_Transforms(Trans, &temp);
+        Radius = 1.0; // not really necessary, but avoids confusion when debugging
+
+        Compute_Translation_Transform(&temp, Center);
+        Compose_Transforms(Trans, &temp);
+        Center = Vector3d(0.0); // not really necessary, but avoids confusion when debugging
     }
 
     Compose_Transforms(Trans, tr);
@@ -648,8 +642,6 @@ Sphere::~Sphere()
     Debug_Info("\t%f // Radius\n", (DBL)Radius);
     Debug_Info("}\n");
 #endif
-
-    Destroy_Transform(UV_Trans);
 }
 
 
@@ -686,11 +678,15 @@ Sphere::~Sphere()
 
 void Sphere::Compute_BBox()
 {
-    Make_BBox(BBox, Center[X] - Radius, Center[Y] - Radius,  Center[Z] - Radius, 2.0 * Radius, 2.0 * Radius, 2.0 * Radius);
-
-    if(Trans != NULL)
+    if(Do_Ellipsoid)
     {
+        // Ellipsoidal mode is based on the unity sphere.
+        Make_BBox(BBox, -1.0,-1.0,-1.0, 2.0,2.0,2.0);
         Recompute_BBox(&BBox, Trans);
+    }
+    else
+    {
+        Make_BBox(BBox, Center[X] - Radius, Center[Y] - Radius,  Center[Z] - Radius, 2.0 * Radius, 2.0 * Radius, 2.0 * Radius);
     }
 }
 
@@ -729,26 +725,19 @@ void Sphere::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadDat
     Vector3d New_Point, New_Center;
 
     /* Transform the point into the sphere's space */
-    if (UV_Trans != NULL)
+    if (Do_Ellipsoid)
     {
-
-        MInvTransPoint(New_Point, Inter->IPoint, UV_Trans);
-
-        if (Trans != NULL)
-            MTransPoint(New_Center, Center, Trans);
-        else
-            New_Center = Center;
-
-        MInvTransPoint(New_Center, New_Center, UV_Trans);
+        MInvTransPoint(New_Point, Inter->IPoint, Trans);
     }
     else
     {
-        New_Point = Inter->IPoint;
-        New_Center = Center;
+        New_Point = Inter->IPoint - Center;
+        if (Trans != nullptr)
+            MInvTransPoint(New_Point, New_Point, Trans);
     }
-    x = New_Point[X]-New_Center[X];
-    y = New_Point[Y]-New_Center[Y];
-    z = New_Point[Z]-New_Center[Z];
+    x = New_Point[X];
+    y = New_Point[Y];
+    z = New_Point[Z];
 
     len = sqrt(x * x + y * y + z * z);
 

@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -35,17 +35,25 @@
 ///
 //******************************************************************************
 
-#ifndef POVMS_CONFIGPOVMS_H
-#define POVMS_CONFIGPOVMS_H
+#ifndef POVRAY_POVMS_CONFIGPOVMS_H
+#define POVRAY_POVMS_CONFIGPOVMS_H
 
 #if !defined(__cplusplus)
     // When compiling as part of the POV-Ray project, povms.c must be compiled as a C++ file,
     // due to potential C++-isms in the base/configbase.h header included via this file.
-    #error povms.c must be compiled as a C++ file when used as part of the POV-Ray project.
+    #error "povms.c must be compiled as a C++ file when used as part of the POV-Ray project."
 #endif
 
 #include "base/configbase.h"
 #include "syspovconfigpovms.h"
+
+//##############################################################################
+///
+/// @defgroup PovMSConfig POVMS Compile-Time Configuration
+/// @ingroup PovMS
+/// @ingroup PovConfig
+///
+/// @{
 
 //******************************************************************************
 // The following override the defaults in povms.h and povms.c, as those are
@@ -66,6 +74,14 @@
     #define POVMSBool               bool
 #endif
 
+#ifndef POVMSTrue
+    #define POVMSTrue               true
+#endif
+
+#ifndef POVMSFalse
+    #define POVMSFalse              false
+#endif
+
 #ifndef POVMSUCS2
     #define POVMSUCS2               UCS2
 #endif
@@ -79,4 +95,8 @@
 
 //******************************************************************************
 
-#endif // POVMS_CONFIGPOVMS_H
+/// @}
+///
+//##############################################################################
+
+#endif // POVRAY_POVMS_CONFIGPOVMS_H

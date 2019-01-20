@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,23 +33,21 @@
 ///
 //******************************************************************************
 
-#include <cctype>
-
-// configfrontend.h must always be the first POV file included within frontend *.cpp files
-#include "frontend/configfrontend.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/processrenderoptions.h"
 
-#include "povms/povmscpp.h"
-#include "povms/povmsid.h"
+// C++ variants of C standard header files
+#include <cstdlib>
 
-#include "base/fileinputoutput.h"
+// POV-Ray header files (base module)
 #include "base/fileutil.h"
-#include "base/pov_err.h"
-#include "base/stringutilities.h"
-#include "base/textstream.h"
-#include "base/types.h"
+#include "base/platformbase.h"
 #include "base/image/colourspace.h"
+#include "base/image/dither.h"
 #include "base/image/encoding.h"
+
+// POV-Ray header files (POVMS module)
+#include "povms/povmsid.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -88,7 +86,7 @@ using namespace pov_base;
    the specifications provided in this table. The first element is the
    INI-file keyword, the second element is the POVMS object attribute
    key, the third is the attribute type. Entries with a POVMS attribute
-   key of 0 are superceded options that will generate a warning that the
+   key of 0 are obsolete options that will generate a warning that the
    option no longer is supported and will generate an error in a later
    (unspecified) version of POV.
 */
@@ -96,13 +94,14 @@ struct ProcessOptions::INI_Parser_Table RenderOptions_INI_Table[] =
 {
     { "All_Console",         kPOVAttrib_AllConsole,         kPOVMSType_Bool },
     { "All_File",            kPOVAttrib_AllFile,            kPOVMSType_UCS2String },
-    { "Antialias_Depth",     kPOVAttrib_AntialiasDepth,     kPOVMSType_Int },
     { "Antialias",           kPOVAttrib_Antialias,          kPOVMSType_Bool },
-    { "Antialias_Threshold", kPOVAttrib_AntialiasThreshold, kPOVMSType_Float },
+    { "Antialias_Confidence",kPOVAttrib_AntialiasConfidence,kPOVMSType_Float },
+    { "Antialias_Depth",     kPOVAttrib_AntialiasDepth,     kPOVMSType_Int },
     { "Antialias_Gamma",     kPOVAttrib_AntialiasGamma,     kPOVMSType_Float },
+    { "Antialias_Threshold", kPOVAttrib_AntialiasThreshold, kPOVMSType_Float },
     { "Append_File",         kPOVAttrib_AppendConsoleFiles, kPOVMSType_Bool },
 
-    { "Bits_Per_Color",      kPOVAttrib_BitsPerColor,       kPOVMSType_Int },
+    { "Bits_Per_Color",      kPOVAttrib_BitsPerColor,       kPOVMSType_Int,         kINIOptFlag_SuppressWrite },
     { "Bits_Per_Colour",     kPOVAttrib_BitsPerColor,       kPOVMSType_Int },
     { "Bounding",            kPOVAttrib_Bounding,           kPOVMSType_Bool },
     { "Bounding_Method",     kPOVAttrib_BoundingMethod,     kPOVMSType_Int },
@@ -147,6 +146,7 @@ struct ProcessOptions::INI_Parser_Table RenderOptions_INI_Table[] =
     { "Frame_Step",          kPOVAttrib_FrameStep,          kPOVMSType_Int },
 
     { "Grayscale_Output",    kPOVAttrib_GrayscaleOutput,    kPOVMSType_Bool },
+    { "Greyscale_Output",    kPOVAttrib_GrayscaleOutput,    kPOVMSType_Bool,        kINIOptFlag_SuppressWrite },
 
     { "Height",              kPOVAttrib_Height,             kPOVMSType_Int },
     { "High_Reproducibility",kPOVAttrib_HighReproducibility,kPOVMSType_Bool },
@@ -207,6 +207,7 @@ struct ProcessOptions::INI_Parser_Table RenderOptions_INI_Table[] =
     { "Start_Row",           kPOVAttrib_Top,                kPOVMSType_Float },
     { "Statistic_Console",   kPOVAttrib_StatisticsConsole,  kPOVMSType_Bool },
     { "Statistic_File",      kPOVAttrib_StatisticsFile,     kPOVMSType_UCS2String },
+    { "Stochastic_Seed",     kPOVAttrib_StochasticSeed,     kPOVMSType_Int },
     { "Subset_End_Frame",    kPOVAttrib_SubsetEndFrame,     kPOVMSType_Float },
     { "Subset_Start_Frame",  kPOVAttrib_SubsetStartFrame,   kPOVMSType_Float },
 
@@ -227,7 +228,7 @@ struct ProcessOptions::INI_Parser_Table RenderOptions_INI_Table[] =
     { "Width",               kPOVAttrib_Width,              kPOVMSType_Int },
     { "Work_Threads",        kPOVAttrib_MaxRenderThreads,   kPOVMSType_Int },
 
-    { NULL, 0, 0 }
+    { nullptr, 0, 0 }
 };
 
 /*
@@ -239,12 +240,19 @@ struct ProcessOptions::INI_Parser_Table RenderOptions_INI_Table[] =
    if the +/- switch is used as boolean parameter if an attribute key is
    provided.
 */
+
+/// @attention
+///     In this table, options **must** be sorted long strings first; e.g., `AM` must be placed
+///     before `A`.
+///
 struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
 {
+    //       Parameter setting              Parameter type          Boolean setting
+
+    { "AC",  kPOVAttrib_AntialiasConfidence,kPOVMSType_Float,       kNoParameter },
     { "AG",  kPOVAttrib_AntialiasGamma,     kPOVMSType_Float,       kNoParameter },
     { "AM",  kPOVAttrib_SamplingMethod,     kPOVMSType_Int,         kNoParameter },
-    { "A0",  kPOVAttrib_AntialiasThreshold, kPOVMSType_Float,       kPOVAttrib_Antialias },
-    { "A",   kNoParameter,                  kNoParameter,           kPOVAttrib_Antialias },
+    { "A",   kPOVAttrib_AntialiasThreshold, kPOVMSType_Float,       kPOVAttrib_Antialias,           kCmdOptFlag_Optional },
 
     { "BM",  kPOVAttrib_BoundingMethod,     kPOVMSType_Int,         kNoParameter },
     { "BS",  kPOVAttrib_RenderBlockSize,    kPOVMSType_Int,         kNoParameter },
@@ -253,8 +261,7 @@ struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
     { "CC",  kNoParameter,                  kNoParameter,           kPOVAttrib_BackupTrace },
     { "C",   kNoParameter,                  kNoParameter,           kPOVAttrib_ContinueTrace },
 
-    { "D",   kPOVAttrib_Display,            kUseSpecialHandler,     kPOVAttrib_Display },
-    { "D",   kNoParameter,                  kNoParameter,           kPOVAttrib_Display },
+    { "D",   kPOVAttrib_Display,            kUseSpecialHandler,     kPOVAttrib_Display,             kCmdOptFlag_Optional },
 
     { "EC",  kPOVAttrib_Right,              kPOVMSType_Float,       kNoParameter },
     { "EF0", kPOVAttrib_SubsetEndFrame,     kPOVMSType_Float,       kNoParameter },
@@ -262,23 +269,16 @@ struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
     { "EP",  kPOVAttrib_PreviewEndSize,     kPOVMSType_Int,         kNoParameter },
     { "ER",  kPOVAttrib_Bottom,             kPOVMSType_Float,       kNoParameter },
 
-    { "F",   kPOVAttrib_OutputFileType,     kUseSpecialHandler,     kPOVAttrib_OutputToFile },
-    { "F",   kNoParameter,                  kNoParameter,           kPOVAttrib_OutputToFile },
+    { "F",   kPOVAttrib_OutputFileType,     kUseSpecialHandler,     kPOVAttrib_OutputToFile,        kCmdOptFlag_Optional },
 
-    { "GA",  kPOVAttrib_AllFile,            kPOVMSType_UCS2String,  kPOVAttrib_AllConsole },
-    { "GA",  kNoParameter,                  kNoParameter,           kPOVAttrib_AllConsole },
-    { "GD",  kPOVAttrib_DebugFile,          kPOVMSType_UCS2String,  kPOVAttrib_DebugConsole },
-    { "GD",  kNoParameter,                  kNoParameter,           kPOVAttrib_DebugConsole },
-    { "GF",  kPOVAttrib_FatalFile,          kPOVMSType_UCS2String,  kPOVAttrib_FatalConsole },
-    { "GF",  kNoParameter,                  kNoParameter,           kPOVAttrib_FatalConsole },
+    { "GA",  kPOVAttrib_AllFile,            kPOVMSType_UCS2String,  kPOVAttrib_AllConsole,          kCmdOptFlag_Optional },
+    { "GD",  kPOVAttrib_DebugFile,          kPOVMSType_UCS2String,  kPOVAttrib_DebugConsole,        kCmdOptFlag_Optional },
+    { "GF",  kPOVAttrib_FatalFile,          kPOVMSType_UCS2String,  kPOVAttrib_FatalConsole,        kCmdOptFlag_Optional },
     { "GI",  kPOVAttrib_CreateIni,          kPOVMSType_UCS2String,  kNoParameter },
     { "GP",  kNoParameter,                  kNoParameter,           kPOVAttrib_AppendConsoleFiles },
-    { "GR",  kPOVAttrib_RenderFile,         kPOVMSType_UCS2String,  kPOVAttrib_RenderConsole },
-    { "GR",  kNoParameter,                  kNoParameter,           kPOVAttrib_RenderConsole },
-    { "GS",  kPOVAttrib_StatisticsFile,     kPOVMSType_UCS2String,  kPOVAttrib_StatisticsConsole },
-    { "GS",  kNoParameter,                  kNoParameter,           kPOVAttrib_StatisticsConsole },
-    { "GW",  kPOVAttrib_WarningFile,        kPOVMSType_UCS2String,  kPOVAttrib_WarningConsole },
-    { "GW",  kNoParameter,                  kNoParameter,           kPOVAttrib_WarningConsole },
+    { "GR",  kPOVAttrib_RenderFile,         kPOVMSType_UCS2String,  kPOVAttrib_RenderConsole,       kCmdOptFlag_Optional },
+    { "GS",  kPOVAttrib_StatisticsFile,     kPOVMSType_UCS2String,  kPOVAttrib_StatisticsConsole,   kCmdOptFlag_Optional },
+    { "GW",  kPOVAttrib_WarningFile,        kPOVMSType_UCS2String,  kPOVAttrib_WarningConsole,      kCmdOptFlag_Optional },
 
     { "HI",  kPOVAttrib_IncludeHeader,      kPOVMSType_UCS2String,  kNoParameter },
     { "HR",  kNoParameter,                  kNoParameter,           kPOVAttrib_HighReproducibility },
@@ -286,8 +286,7 @@ struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
 
     { "I",   kPOVAttrib_InputFile,          kPOVMSType_UCS2String,  kNoParameter },
 
-    { "J",   kPOVAttrib_JitterAmount,       kPOVMSType_Float,       kPOVAttrib_Jitter },
-    { "J",   kNoParameter,                  kNoParameter,           kPOVAttrib_Jitter },
+    { "J",   kPOVAttrib_JitterAmount,       kPOVMSType_Float,       kPOVAttrib_Jitter,              kCmdOptFlag_Optional },
 
     { "KC",  kNoParameter,                  kNoParameter,           kPOVAttrib_CyclicAnimation },
     { "KI",  kPOVAttrib_InitialClock,       kPOVMSType_Float,       kNoParameter },
@@ -299,8 +298,7 @@ struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
 
     { "L",   kPOVAttrib_LibraryPath,        kUseSpecialHandler,     kNoParameter },
 
-    { "MB",  kPOVAttrib_BoundingThreshold,  kPOVMSType_Int,         kPOVAttrib_Bounding },
-    { "MB",  kNoParameter,                  kNoParameter,           kPOVAttrib_Bounding },
+    { "MB",  kPOVAttrib_BoundingThreshold,  kPOVMSType_Int,         kPOVAttrib_Bounding,            kCmdOptFlag_Optional },
     { "MI",  kPOVAttrib_MaxImageBufferMem,  kPOVMSType_Int,         kNoParameter },
     { "MV",  kPOVAttrib_Version,            kPOVMSType_Float,       kNoParameter },
 
@@ -324,11 +322,11 @@ struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
     { "SF",  kPOVAttrib_SubsetStartFrame,   kPOVMSType_Int,         kNoParameter },
     { "SP",  kPOVAttrib_PreviewStartSize,   kPOVMSType_Int,         kNoParameter },
     { "SR",  kPOVAttrib_Top,                kPOVMSType_Float,       kNoParameter },
+    { "SS",  kPOVAttrib_StochasticSeed,     kPOVMSType_Int,         kNoParameter },
     { "STP", kPOVAttrib_FrameStep,          kPOVMSType_Int,         kNoParameter },
     { "SU",  kNoParameter,                  kNoParameter,           kPOVAttrib_SplitUnions },
 
-    { "TH",  kPOVAttrib_DitherMethod,       kUseSpecialHandler,     kPOVAttrib_Dither },
-    { "TH",  kNoParameter,                  kNoParameter,           kPOVAttrib_Dither },
+    { "TH",  kPOVAttrib_DitherMethod,       kUseSpecialHandler,     kPOVAttrib_Dither,              kCmdOptFlag_Optional },
 
     { "UA",  kNoParameter,                  kNoParameter,           kPOVAttrib_OutputAlpha },
     { "UD",  kNoParameter,                  kNoParameter,           kPOVAttrib_DrawVistas },
@@ -344,13 +342,11 @@ struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
     { "WT",  kPOVAttrib_MaxRenderThreads,   kPOVMSType_Int,         kNoParameter },
     { "W",   kPOVAttrib_Width,              kPOVMSType_Int,         kNoParameter },
 
-    { "X",   kPOVAttrib_TestAbortCount,     kUseSpecialHandler,     kPOVAttrib_TestAbort },
-    { "X",   kNoParameter,                  kNoParameter,           kPOVAttrib_TestAbort },
+    { "X",   kPOVAttrib_TestAbortCount,     kUseSpecialHandler,     kPOVAttrib_TestAbort,           kCmdOptFlag_Optional },
 
-    { NULL, 0, 0, 0 }
+    { nullptr }
 };
 
-// TODO FIXME - The following are hacks of some sort, no idea what they are good for. They certainly use wrong types and probably contain other mistakes [trf]
 extern struct ProcessRenderOptions::Parameter_Code_Table DitherMethodTable[];
 
 ProcessRenderOptions::ProcessRenderOptions() : ProcessOptions(RenderOptions_INI_Table, RenderOptions_Cmd_Table)
@@ -364,6 +360,10 @@ ProcessRenderOptions::~ProcessRenderOptions()
 int ProcessRenderOptions::ReadSpecialOptionHandler(INI_Parser_Table *option, char *param, POVMSObjectPtr obj)
 {
     POVMSAttributeList list;
+    POVMSAttribute attr;
+    POVMSObject decobj;
+    POVMSObject cmdobj;
+    POVMSType typeKey;
     double floatval = 0.0;
     int intval = 0;
     int intval2 = 0;
@@ -373,11 +373,14 @@ int ProcessRenderOptions::ReadSpecialOptionHandler(INI_Parser_Table *option, cha
     {
         case kPOVAttrib_Palette:
         case kPOVAttrib_VideoMode:
+
             while(isspace(*param))
                 param++;
             err = POVMSUtil_SetInt(obj, option->key, tolower(*param));
             break;
+
         case kPOVAttrib_DitherMethod:
+
             while(isspace(*param))
                 param++;
             err = ParseParameterCode(DitherMethodTable, param, &intval);
@@ -386,38 +389,32 @@ int ProcessRenderOptions::ReadSpecialOptionHandler(INI_Parser_Table *option, cha
             else
                 ParseError("Unrecognized dither method '%s'.", param);
             break;
+
         case kPOVAttrib_OutputFileType:
+
             while(isspace(*param))
                 param++;
             err = ParseFileType(*param, option->key, &intval);
             if (err == kNoErr)
                 err = POVMSUtil_SetInt(obj, option->key, intval);
             break;
+
         case kPOVAttrib_IncludeIni:
         case kPOVAttrib_LibraryPath:
-            POVMSAttribute attr;
 
+            // parse INI file (recursive)
+            if(option->key == kPOVAttrib_IncludeIni)
+                err = ParseFile(param, obj);
+
+            // create list if it isn't there
             if(err == kNoErr)
             {
-                // parse INI file (recursive)
-                if(option->key == kPOVAttrib_IncludeIni)
-                    err = ParseFile(param, obj);
-
-                // create list if it isn't there
-                if(err == kNoErr)
-                {
-                    if(POVMSObject_Exist(obj, option->key) == kFalseErr)
-                        err = POVMSAttrList_New(&list);
-                    else if(POVMSObject_Exist(obj, option->key) != kNoErr)
-                        err = kObjectAccessErr;
-                    else
-                        err = POVMSObject_Get(obj, &list, option->key);
-                }
-            }
-            else
-            {
-                ParseError("File name or path parameter expected for option '%s', found '%s'.", option->keyword, param);
-                err = kParamErr;
+                if(POVMSObject_Exist(obj, option->key) == kFalseErr)
+                    err = POVMSAttrList_New(&list);
+                else if(POVMSObject_Exist(obj, option->key) != kNoErr)
+                    err = kObjectAccessErr;
+                else
+                    err = POVMSObject_Get(obj, &list, option->key);
             }
 
             // add path or file to list
@@ -434,8 +431,8 @@ int ProcessRenderOptions::ReadSpecialOptionHandler(INI_Parser_Table *option, cha
             if(err == kNoErr)
                 err = POVMSObject_Set(obj, &list, option->key);
             break;
+
         case kPOVAttrib_Declare:
-            POVMSObject decobj;
 
             // create list if it isn't there
             if(POVMSObject_Exist(obj, option->key) == kFalseErr)
@@ -450,25 +447,25 @@ int ProcessRenderOptions::ReadSpecialOptionHandler(INI_Parser_Table *option, cha
                 err = POVMSObject_New(&decobj, kPOVMSType_WildCard);
             if(err == kNoErr)
             {
-                char *ptr = NULL;
+                char *ptr = nullptr;
 
                 err = POVMSUtil_SetString(&decobj, kPOVAttrib_Identifier, strtok(param, "="));
                 if(err == kNoErr)
                 {
-                    ptr = strtok(NULL, "");
-                    if(ptr == NULL)
+                    ptr = strtok(nullptr, "");
+                    if (ptr == nullptr)
                         err = kParseErr;
                 }
                 if(err == kNoErr)
                 {
-                    if(strchr(ptr, '"') != NULL)
+                    if (strchr(ptr, '"') != nullptr)
                     {
                         ptr = strchr(ptr, '"') + 1;
                         strtok(ptr, "\"");
                         err = POVMSUtil_SetString(&decobj, kPOVAttrib_Value, ptr);
                     }
                     else
-                        err = POVMSUtil_SetFloat(&decobj, kPOVAttrib_Value, atof(ptr));
+                        err = POVMSUtil_SetFloat(&decobj, kPOVAttrib_Value, std::atof(ptr));
                 }
                 if(err == kNoErr)
                     err = POVMSAttrList_Append(&list, &decobj);
@@ -478,13 +475,13 @@ int ProcessRenderOptions::ReadSpecialOptionHandler(INI_Parser_Table *option, cha
             if(err == kNoErr)
                 err = POVMSObject_Set(obj, &list, option->key);
             break;
+
         case kPOVAttrib_FatalErrorCommand:
         case kPOVAttrib_PostFrameCommand:
         case kPOVAttrib_PostSceneCommand:
         case kPOVAttrib_PreFrameCommand:
         case kPOVAttrib_PreSceneCommand:
         case kPOVAttrib_UserAbortCommand:
-            POVMSObject cmdobj;
 
             if(POVMSObject_Exist(obj, option->key) == kNoErr)
                 err = POVMSObject_Get(obj, &cmdobj, option->key);
@@ -511,17 +508,18 @@ int ProcessRenderOptions::ReadSpecialOptionHandler(INI_Parser_Table *option, cha
             if(err == kNoErr)
                 err = POVMSObject_Set(obj, &cmdobj, option->key);
             break;
+
         case kPOVAttrib_AntialiasGamma:
         case kPOVAttrib_DisplayGamma:
         case kPOVAttrib_FileGamma:
-            POVMSType typeKey;
+
             switch (option->key)
             {
                 case kPOVAttrib_AntialiasGamma:  typeKey = kPOVAttrib_AntialiasGammaType;    break;
                 case kPOVAttrib_DisplayGamma:    typeKey = kPOVAttrib_DisplayGammaType;      break;
                 case kPOVAttrib_FileGamma:       typeKey = kPOVAttrib_FileGammaType;         break;
             }
-            floatval = atof(param);
+            floatval = std::atof(param);
             if (floatval == 1.0)
                 intval = kPOVList_GammaType_Neutral;
             else if (floatval > 0)
@@ -541,6 +539,8 @@ int ProcessRenderOptions::ReadSpecialOptionHandler(INI_Parser_Table *option, cha
 
 int ProcessRenderOptions::ReadSpecialSwitchHandler(Cmd_Parser_Table *option, char *param, POVMSObjectPtr obj, bool)
 {
+    POVMSAttributeList list;
+    POVMSAttribute attr;
     int intval = 0;
     int intval2 = 0;
     int err = 0;
@@ -551,6 +551,7 @@ int ProcessRenderOptions::ReadSpecialSwitchHandler(Cmd_Parser_Table *option, cha
     switch(option->key)
     {
         case kPOVAttrib_Display:
+
             if(param[0] != '\0')
             {
                 err = POVMSUtil_SetInt(obj, kPOVAttrib_VideoMode, (int)toupper(param[0]));
@@ -558,39 +559,40 @@ int ProcessRenderOptions::ReadSpecialSwitchHandler(Cmd_Parser_Table *option, cha
                     err = POVMSUtil_SetInt(obj, kPOVAttrib_Palette, (int)toupper(param[1]));
             }
             break;
+
         case kPOVAttrib_DitherMethod:
+
             err = ParseParameterCode(DitherMethodTable, param, &intval);
             if (err == kNoErr)
                 err = POVMSUtil_SetInt(obj, option->key, intval);
             else
                 ParseError("Unrecognized dither method '%s'.", param);
             break;
+
         case kPOVAttrib_OutputFileType:
+
             err = ParseFileType(*param, option->key, &intval, &has16BitGrayscale);
             if (err == kNoErr)
             {
                 err = POVMSUtil_SetInt(obj, option->key, intval);
                 file_type = *param++;
             }
+            if ((err == kNoErr) && (tolower(*param) == 'g'))
+            {
+                if(!has16BitGrayscale)
+                {
+                    ParseError("Grayscale not currently supported with output file format '%c'.", file_type);
+                    err = kParamErr;
+                }
+                else
+                {
+                    err = POVMSUtil_SetBool(obj, kPOVAttrib_GrayscaleOutput, true);
+                    ++param;
+                }
+            }
             if ((err == kNoErr) && (*param > ' '))
             {
-                if (tolower(*param) == 'g')
-                {
-                    if(!has16BitGrayscale)
-                    {
-                        ParseError("Grayscale not currently supported with output file format '%c'.", file_type);
-                        err = kParamErr;
-                    }
-                    else
-                    {
-                        if ((err = POVMSUtil_SetBool(obj, kPOVAttrib_GrayscaleOutput, true)) == kNoErr && *++param > ' ')
-                        {
-                            ParseError("Unexpected '%s' following grayscale flag in +F%c option.", param, file_type);
-                            err = kParamErr;
-                        }
-                    }
-                }
-                else if (isdigit(*param) != 0)
+                if (isdigit(*param) != 0)
                 {
                     if (sscanf(param, "%d%n", &intval, &intval2) == 1)
                     {
@@ -617,25 +619,16 @@ int ProcessRenderOptions::ReadSpecialSwitchHandler(Cmd_Parser_Table *option, cha
                 }
             }
             break;
-        case kPOVAttrib_LibraryPath:
-            POVMSAttributeList list;
-            POVMSAttribute attr;
 
-            if(err == kNoErr)
-            {
-                // create list if it isn't there
-                if(POVMSObject_Exist(obj, option->key) == kFalseErr)
-                    err = POVMSAttrList_New(&list);
-                else if(POVMSObject_Exist(obj, option->key) != kNoErr)
-                    err = kObjectAccessErr;
-                else
-                    err = POVMSObject_Get(obj, &list, option->key);
-            }
+        case kPOVAttrib_LibraryPath:
+
+            // create list if it isn't there
+            if(POVMSObject_Exist(obj, option->key) == kFalseErr)
+                err = POVMSAttrList_New(&list);
+            else if(POVMSObject_Exist(obj, option->key) != kNoErr)
+                err = kObjectAccessErr;
             else
-            {
-                ParseError("File name or path parameter expected for switch '%s', found '%s'.", option->command, param);
-                err = kParamErr;
-            }
+                err = POVMSObject_Get(obj, &list, option->key);
 
             // add path or file to list
             if(err == kNoErr)
@@ -651,7 +644,9 @@ int ProcessRenderOptions::ReadSpecialSwitchHandler(Cmd_Parser_Table *option, cha
             if(err == kNoErr)
                 err = POVMSObject_Set(obj, &list, option->key);
             break;
+
         case kPOVAttrib_TestAbortCount:
+
             if((*param) == 0)
                 break;
             if(sscanf(param, "%d", &intval) == 1)
@@ -670,6 +665,8 @@ int ProcessRenderOptions::ReadSpecialSwitchHandler(Cmd_Parser_Table *option, cha
 int ProcessRenderOptions::WriteSpecialOptionHandler(INI_Parser_Table *option, POVMSObjectPtr obj, OTextStream *file)
 {
     POVMSAttributeList list;
+    POVMSObject decobj;
+    POVMSObject cmdobj;
     POVMSFloat floatval;
     POVMSInt intval;
     int err = 0;
@@ -683,6 +680,7 @@ int ProcessRenderOptions::WriteSpecialOptionHandler(INI_Parser_Table *option, PO
     {
         case kPOVAttrib_Palette:
         case kPOVAttrib_VideoMode:
+
             if(POVMSUtil_GetInt(obj, option->key, &intval) == 0)
             {
                 chr = intval;
@@ -690,7 +688,9 @@ int ProcessRenderOptions::WriteSpecialOptionHandler(INI_Parser_Table *option, PO
                     file->printf("%s=%c\n", option->keyword, chr);
             }
             break;
+
         case kPOVAttrib_OutputFileType:
+
             if(POVMSUtil_GetInt(obj, option->key, &intval) == 0)
             {
                 chr = UnparseFileType(intval);
@@ -698,10 +698,12 @@ int ProcessRenderOptions::WriteSpecialOptionHandler(INI_Parser_Table *option, PO
                     file->printf("%s=%c\n", option->keyword, chr);
             }
             break;
+
         case kPOVAttrib_IncludeIni:
+
             break;
+
         case kPOVAttrib_Declare:
-            POVMSObject decobj;
 
             err = POVMSObject_Get(obj, &list, option->key);
             if(err != 0)
@@ -737,7 +739,9 @@ int ProcessRenderOptions::WriteSpecialOptionHandler(INI_Parser_Table *option, PO
                 }
             }
             break;
+
         case kPOVAttrib_LibraryPath:
+
             err = POVMSObject_Get(obj, &list, option->key);
             if(err != 0)
                 break;
@@ -759,23 +763,21 @@ int ProcessRenderOptions::WriteSpecialOptionHandler(INI_Parser_Table *option, PO
                     err = POVMSAttr_Size(&item, &l);
                     if(l > 0)
                     {
-                        bufptr = new char[l * 3];
-                        bufptr[0] = 0;
-                        if(POVMSAttr_GetUTF8String(&item, kPOVMSType_UCS2String, bufptr, &l) == 0)
-                            file->printf("%s=\"%s\"\n", option->keyword, bufptr);
-                        delete[] bufptr;
+                        UTF8String buf;
+                        if(POVMSAttr_GetUTF8String(&item, kPOVMSType_UCS2String, buf) == 0)
+                            file->printf("%s=\"%s\"\n", option->keyword, buf.c_str());
                     }
                     (void)POVMSAttr_Delete(&item);
                 }
             }
             break;
+
         case kPOVAttrib_FatalErrorCommand:
         case kPOVAttrib_PostFrameCommand:
         case kPOVAttrib_PostSceneCommand:
         case kPOVAttrib_PreFrameCommand:
         case kPOVAttrib_PreSceneCommand:
         case kPOVAttrib_UserAbortCommand:
-            POVMSObject cmdobj;
 
             err = POVMSObject_Get(obj, &cmdobj, option->key);
             if(err != 0)
@@ -822,12 +824,6 @@ int ProcessRenderOptions::WriteSpecialOptionHandler(INI_Parser_Table *option, PO
     return err;
 }
 
-bool ProcessRenderOptions::WriteOptionFilter(INI_Parser_Table *table)
-{
-    // So that we don't get both Bits_Per_Color and Bits_Per_Colour in the INI file.
-    return (strcmp(table->keyword, "Bits_Per_Colour") != 0);
-}
-
 int ProcessRenderOptions::ProcessUnknownString(char *str, POVMSObjectPtr obj)
 {
     POVMSAttributeList list;
@@ -835,7 +831,7 @@ int ProcessRenderOptions::ProcessUnknownString(char *str, POVMSObjectPtr obj)
     int state = 0; // INI file
     int err = kNoErr;
 
-    if(str == NULL)
+    if (str == nullptr)
     {
         ParseError("Expected filename, nothing was found.");
         return kParamErr;
@@ -847,7 +843,7 @@ int ProcessRenderOptions::ProcessUnknownString(char *str, POVMSObjectPtr obj)
     if(state == 0)
     {
         char *ptr = strrchr(str, '.');
-        if(ptr != NULL)
+        if (ptr != nullptr)
         {
             if(pov_stricmp(ptr, ".pov") == 0)
                 state = 1; // POV file
@@ -859,12 +855,8 @@ int ProcessRenderOptions::ProcessUnknownString(char *str, POVMSObjectPtr obj)
     {
         if(strlen(str) > 0)
         {
-            if(str[strlen(str) - 1] == POV_FILE_SEPARATOR)
+            if(POV_IS_PATH_SEPARATOR(str[strlen(str) - 1]))
                 state = 2; // library path
-#ifdef POV_FILE_SEPARATOR_2
-            else if(str[strlen(str) - 1] == POV_FILE_SEPARATOR_2)
-                state = 2; // library path
-#endif
         }
     }
 
@@ -949,24 +941,26 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
     // TODO FIXME - use proper C++ strings instead of C character arrays
 
     int i,ii,l[POV_FILE_EXTENSIONS_PER_TYPE];
-    char pathname[1024];
-    char file[1024];
-    char file_x[POV_FILE_EXTENSIONS_PER_TYPE][1024];
+    UTF8String filepath;
+    UTF8String libpath;
+    UTF8String file_x[POV_FILE_EXTENSIONS_PER_TYPE];
     int cnt = 0;
     int ll;
     POVMSAttribute attr, item;
     const char *xstr = strrchr(filename, '.');
-    bool hasextension = ((xstr != NULL) && (strlen(xstr) <= 4)); // TODO FIXME - we shouldn't rely on extensions being at most 1+3 chars long
+    bool hasextension = ((xstr != nullptr) && (strlen(xstr) <= 4)); // TODO FIXME - we shouldn't rely on extensions being at most 1+3 chars long
 
-    if(POV_ALLOW_FILE_READ(ASCIItoUCS2String(filename).c_str(),stype) == 0) // TODO FIXME - Remove dependency on this macro!!! [trf]
-        return NULL;
+    // TODO - the following statement may need reviewing; before it was changed from a macro to a PlatformBase call,
+    //        it carried a comment "TODO FIXME - Remove dependency on this macro!!! [trf]".
+    if (!PlatformBase::GetInstance().AllowLocalFileAccess (ASCIItoUCS2String(filename),stype, false))
+        return nullptr;
 
     for(i = 0; i < POV_FILE_EXTENSIONS_PER_TYPE; i++)
     {
         if((l[i] = strlen(pov_base::gPOV_File_Extensions[stype].ext[i])) > 0)
         {
-            strcpy(file_x[i], filename);
-            strcat(file_x[i], pov_base::gPOV_File_Extensions[stype].ext[i]);
+            file_x[i] = filename;
+            file_x[i] += pov_base::gPOV_File_Extensions[stype].ext[i];
         }
     }
 
@@ -974,7 +968,7 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
 
     if((hasextension == true) && (CheckIfFileExists(filename) == true))
     {
-        return new ITextStream(ASCIItoUCS2String(filename).c_str(), stype);
+        return new IBufferedTextStream(ASCIItoUCS2String(filename).c_str(), stype);
     }
 
     for(i = 0; i < POV_FILE_EXTENSIONS_PER_TYPE; i++)
@@ -983,18 +977,18 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
         {
             if(CheckIfFileExists(file_x[i]) == true)
             {
-                return new ITextStream(ASCIItoUCS2String(file_x[i]).c_str(), stype);
+                return new IBufferedTextStream(UTF8toUCS2String(file_x[i]).c_str(), stype);
             }
         }
     }
 
     if(POVMSObject_Get(obj, &attr, kPOVAttrib_LibraryPath) != 0)
-        return NULL;
+        return nullptr;
 
     if(POVMSAttrList_Count(&attr, &cnt) != 0)
     {
         (void)POVMSAttrList_Delete(&attr);
-        return NULL;
+        return nullptr;
     }
 
     for (i = 1; i <= cnt; i++)
@@ -1013,34 +1007,33 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
             (void)POVMSAttr_Delete(&item);
             continue;
         }
-        if(POVMSAttr_GetUTF8String(&item, kPOVMSType_UCS2String, file, &ll) != 0) // TODO FIXME!!!
+        if(POVMSAttr_GetUTF8String(&item, kPOVMSType_UCS2String, libpath) != 0)
         {
             (void)POVMSAttr_Delete(&item);
             continue;
         }
         (void)POVMSAttr_Delete(&item);
 
-        file[strlen(file)+1] = '\0';
-        file[strlen(file)] = POV_FILE_SEPARATOR;
+        libpath.push_back(POV_PATH_SEPARATOR);
 
-        strcpy(pathname, file);
-        strcat(pathname, filename);
-        if((hasextension == true) && (CheckIfFileExists(pathname) == true))
+        filepath = libpath;
+        filepath += filename;
+        if((hasextension == true) && (CheckIfFileExists(filepath) == true))
         {
             (void)POVMSAttrList_Delete(&attr);
-            return new ITextStream(ASCIItoUCS2String(pathname).c_str(), stype);
+            return new IBufferedTextStream(UTF8toUCS2String(filepath).c_str(), stype);
         }
 
         for(ii = 0; ii < POV_FILE_EXTENSIONS_PER_TYPE; ii++)
         {
             if(l[ii])
             {
-                strcpy(pathname, file);
-                strcat(pathname, file_x[ii]);
-                if(CheckIfFileExists(pathname) == true)
+                filepath = libpath;
+                filepath += file_x[ii];
+                if(CheckIfFileExists(filepath.c_str()) == true)
                 {
                     (void)POVMSAttrList_Delete(&attr);
-                    return new ITextStream(ASCIItoUCS2String(pathname).c_str(), stype);
+                    return new IBufferedTextStream(UTF8toUCS2String(filepath).c_str(), stype);
                 }
             }
         }
@@ -1053,7 +1046,7 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
     else
         ParseError("Could not find file '%s'", filename);
 
-    return NULL;
+    return nullptr;
 }
 
 // TODO - the following code might need reviewing, according to trf
@@ -1075,12 +1068,12 @@ struct ProcessRenderOptions::Output_FileType_Table FileTypeTable[] =
     { 'B',  0,                              kPOVList_FileType_BMP,              false,              false /*[1]*/ },
     { 'E',  0,                              kPOVList_FileType_OpenEXR,          false /*[2]*/,      true },
     { 'H',  0,                              kPOVList_FileType_RadianceHDR,      false,              false },
-#ifdef SYS_TO_STANDARD
+#ifdef POV_SYS_IMAGE_TYPE
     { 'S',  0,                              kPOVList_FileType_System,           SYS_GRAYSCALE_FLAG, SYS_ALPHA_FLAG },
-#endif // SYS_TO_STANDARD
+#endif // POV_SYS_IMAGE_TYPE
 
-    //  [1] Alpha support for BMP uses an inofficial extension to the BMP file format, which is not recognized by
-    //      most image pocessing software.
+    //  [1] Alpha support for BMP uses an unofficial extension to the BMP file format, which is not recognized by
+    //      most image processing software.
 
     //  [2] While OpenEXR does support greyscale output at >8 bits, the variants currently supported by POV-Ray
     //      use 16-bit floating-point values with 10 bit mantissa, which might be insufficient for various purposes
@@ -1094,11 +1087,13 @@ struct ProcessRenderOptions::Output_FileType_Table FileTypeTable[] =
 struct ProcessRenderOptions::Parameter_Code_Table GammaTypeTable[] =
 {
 
-    // code,    internalId,
-    { "SRGB",   kPOVList_GammaType_SRGB },
+    // code,        internalId,
+    { "BT709",      kPOVList_GammaType_BT709,           "ITU-R BT.709 transfer function" },
+    { "BT2020",     kPOVList_GammaType_BT2020,          "ITU-R BT.2020 transfer function" },
+    { "SRGB",       kPOVList_GammaType_SRGB,            "sRGB transfer function" },
 
     // end-of-list marker
-    { NULL,     0 }
+    { nullptr,      0,                                  "(unknown)" }
 };
 
 /* Supported dither types */
@@ -1106,15 +1101,23 @@ struct ProcessRenderOptions::Parameter_Code_Table DitherMethodTable[] =
 {
 
     // code,    internalId,
-    { "B2",     kPOVList_DitherMethod_Bayer2x2 },
-    { "B3",     kPOVList_DitherMethod_Bayer3x3 },
-    { "B4",     kPOVList_DitherMethod_Bayer4x4 },
-    { "D1",     kPOVList_DitherMethod_Diffusion1D },
-    { "D2",     kPOVList_DitherMethod_Diffusion2D },
-    { "FS",     kPOVList_DitherMethod_FloydSteinberg },
+    { "AT",     int(DitherMethodId::kAtkinson),         "Atkinson error diffusion" },
+    { "B2",     int(DitherMethodId::kBayer2x2),         "2x2 Bayer pattern" },
+    { "B3",     int(DitherMethodId::kBayer3x3),         "3x3 Bayer pattern" },
+    { "B4",     int(DitherMethodId::kBayer4x4),         "4x4 Bayer pattern" },
+    { "BK",     int(DitherMethodId::kBurkes),           "Burkes error diffusion" },
+    { "BNX",    int(DitherMethodId::kBlueNoiseX),       "Blue noise pattern (inverted for Red/Blue)" },
+    { "BN",     int(DitherMethodId::kBlueNoise),        "Blue noise pattern" },
+    { "D1",     int(DitherMethodId::kDiffusion1D),      "Simple 1-D error diffusion" },
+    { "D2",     int(DitherMethodId::kSierraLite),       "Simple 2-D error diffusion (Sierra Lite)" },
+    { "FS",     int(DitherMethodId::kFloydSteinberg),   "Floyd-Steinberg error diffusion" },
+    { "JN",     int(DitherMethodId::kJarvisJudiceNinke),"Jarvis-Judice-Ninke error diffusion" },
+    { "S2",     int(DitherMethodId::kSierra2),          "Two-row Sierra error diffusion" },
+    { "S3",     int(DitherMethodId::kSierra3),          "Sierra error diffusion" },
+    { "ST",     int(DitherMethodId::kStucki),           "Stucki error diffusion" },
 
     // end-of-list marker
-    { NULL,     0 }
+    { nullptr,  0,                                      "(unknown)" }
 };
 
 int ProcessRenderOptions::ParseFileType(char code, POVMSType attribute, int* pInternalId, bool* pHas16BitGreyscale)
@@ -1126,7 +1129,7 @@ int ProcessRenderOptions::ParseFileType(char code, POVMSType attribute, int* pIn
         if ( (toupper(code) == FileTypeTable[i].code) &&
              ((FileTypeTable[i].attribute == 0) || (FileTypeTable[i].attribute == attribute )) )
         {
-            if (pHas16BitGreyscale != NULL)
+            if (pHas16BitGreyscale != nullptr)
                 *pHas16BitGreyscale = FileTypeTable[i].has16BitGrayscale;
             *pInternalId = FileTypeTable[i].internalId;
             break;
@@ -1175,11 +1178,21 @@ const char* ProcessRenderOptions::UnparseGammaType(int gammaType)
     return UnparseParameterCode(GammaTypeTable, gammaType);
 }
 
+const char* ProcessRenderOptions::GetGammaTypeText(int gammaType)
+{
+    return GetParameterCodeText(GammaTypeTable, gammaType);
+}
+
+const char* ProcessRenderOptions::GetDitherMethodText(int ditherMethod)
+{
+    return GetParameterCodeText(DitherMethodTable, ditherMethod);
+}
+
 int ProcessRenderOptions::ParseParameterCode(const ProcessRenderOptions::Parameter_Code_Table* codeTable, char* code, int* pInternalId)
 {
     for (int i = 0; code[i] != '\0'; i ++)
         code[i] = toupper(code[i]);
-    for (int i = 0; codeTable[i].code != NULL; i ++)
+    for (int i = 0; codeTable[i].code != nullptr; i ++)
     {
         if ( strcmp(code, codeTable[i].code) == 0 )
         {
@@ -1192,10 +1205,19 @@ int ProcessRenderOptions::ParseParameterCode(const ProcessRenderOptions::Paramet
 
 const char* ProcessRenderOptions::UnparseParameterCode(const ProcessRenderOptions::Parameter_Code_Table* codeTable, int internalId)
 {
-    for (int i = 0; codeTable[i].code != NULL; i ++)
+    for (int i = 0; codeTable[i].code != nullptr; i ++)
         if (internalId == codeTable[i].internalId)
             return codeTable[i].code;
-    return NULL;
+    return nullptr;
+}
+
+const char* ProcessRenderOptions::GetParameterCodeText(const ProcessRenderOptions::Parameter_Code_Table* codeTable, int internalId)
+{
+    int i;
+    for (i = 0; codeTable[i].code != nullptr; i++)
+        if (internalId == codeTable[i].internalId)
+            break;
+    return codeTable[i].text;
 }
 
 }

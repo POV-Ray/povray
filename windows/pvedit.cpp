@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -57,7 +57,7 @@ namespace pov_frontend
 namespace povwin
 {
 
-using namespace pov;
+using namespace pov_parser;
 
 HINSTANCE               hLibPovEdit ;
 
@@ -199,7 +199,7 @@ bool LoadEditorDLL (char *path, bool errorOK)
 #else
       if (MessageBox (main_window,
                       "POV-Ray could not load its internal editor. This is to be expected "
-                      "if you installed the AGPL-licenced distribution, as the editor DLL "
+                      "if you installed the AGPL-licensed distribution, as the editor DLL "
                       "is not included. If you do not wish to use the editor you can turn "
                       "it off (and stop this message appearing) by unchecking 'Use Editor' "
                       "under the 'Other Settings' sub-menu of the Options menu.\n\n"
@@ -207,7 +207,8 @@ bool LoadEditorDLL (char *path, bool errorOK)
                       "you to its download page.",
                       "Could not load internal editor - download it?",
                       MB_ICONQUESTION | MB_YESNO) == IDYES)
-                        ShellExecute (NULL, NULL, "http://www.povray.org/download/wineditdll/" OFFICIAL_VERSION_STRING COMPILER_VER "." PVENGINE_VER, NULL, NULL, SW_SHOWNORMAL) ;
+                        ShellExecute (NULL, NULL, "http://www.povray.org/download/wineditdll/" POV_RAY_VERSION,
+                                      NULL, NULL, SW_SHOWNORMAL) ;
 #endif
     }
     return (false) ;
@@ -257,12 +258,13 @@ bool LoadEditorDLL (char *path, bool errorOK)
   return (true) ;
 }
 
+// TODO FIXME - This is almost identical to Parser::Get_Reserved_Words() in parser/parser_tokenizer.cpp.
 char *Get_Reserved_Words (const char *additional_words)
 {
   int length = 0 ;
   int i ;
 
-  for (i = 0; i < LAST_TOKEN; i++)
+  for (i = 0; Reserved_Words[i].Token_Number != TOKEN_COUNT; i++)
   {
     if (!isalpha (Reserved_Words [i].Token_Name [0]))
       continue ;
@@ -278,7 +280,7 @@ char *Get_Reserved_Words (const char *additional_words)
   strcat (result, "#\n");
   char *s = result + strlen (additional_words) + 2;
 
-  for (i = 0 ; i < LAST_TOKEN ; i++)
+  for (i = 0; Reserved_Words[i].Token_Number != TOKEN_COUNT; i++)
   {
     if (!isalpha (Reserved_Words [i].Token_Name [0]))
       continue ;
@@ -295,11 +297,11 @@ char *Get_INI_Keywords(void)
 {
   int length = 0 ;
 
-  for (struct pov_base::ProcessOptions::INI_Parser_Table *op = pov_frontend::RenderOptions_INI_Table; op->keyword != NULL; op++)
+  for (struct pov_frontend::ProcessOptions::INI_Parser_Table *op = pov_frontend::RenderOptions_INI_Table; op->keyword != NULL; op++)
     length += strlen(op->keyword) + 1;
   char *result = (char *) malloc (++length) ;
   char *s = result;
-  for (struct pov_base::ProcessOptions::INI_Parser_Table *op = pov_frontend::RenderOptions_INI_Table; op->keyword != NULL; op++)
+  for (struct pov_frontend::ProcessOptions::INI_Parser_Table *op = pov_frontend::RenderOptions_INI_Table; op->keyword != NULL; op++)
     s += sprintf (s, "%s\n", op->keyword) ;
   *--s = '\0' ;
   return (result) ;

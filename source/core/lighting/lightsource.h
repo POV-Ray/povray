@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -42,15 +42,27 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreLightingLightsource Light Sources
+/// @ingroup PovCore
+///
+/// @{
+
 class LightSource;
 class Ray;
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
 
 #define LIGHT_OBJECT (IS_COMPOUND_OBJECT+PATCH_OBJECT+LIGHT_SOURCE_OBJECT)
 
+/// @}
+///
+//******************************************************************************
 
 
 /* Light source types. */
@@ -69,6 +81,10 @@ class Ray;
 DBL Attenuate_Light(const LightSource *Light_Source, const Ray &Light_Source_Ray, DBL Distance);
 
 DBL cubic_spline(DBL low,DBL high,DBL pos);
+
+/// @}
+///
+//##############################################################################
 
 }
 

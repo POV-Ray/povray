@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -45,6 +45,13 @@
 
 namespace pov_base
 {
+
+//##############################################################################
+///
+/// @defgroup PovBaseMathutil Mathematical Utilities
+/// @ingroup PovBase
+///
+/// @{
 
 #ifdef NEED_INVHYP
 DBL asinh(DBL x);
@@ -120,12 +127,12 @@ inline T wrap(T val, T upperLimit)
 
 // wrap signed integer value into the range [0..upperLimit);
 // (this is equivalent to the modulus operator for positive values, but not for negative ones)
-template<typename T>
-inline T wrapInt(T val, T upperLimit)
+template<typename T1, typename T2>
+inline T2 wrapInt(T1 val, T2 upperLimit)
 {
-    T tempVal = val % upperLimit;
+    T1 tempVal = val % upperLimit;
 
-    if (tempVal < T(0))
+    if (tempVal < T1(0))
     {
         // For negative values, the modulus operator may return a value in the range [1-upperLimit..-1];
         // transpose such results into the range [1..upperLimit-1].
@@ -135,7 +142,25 @@ inline T wrapInt(T val, T upperLimit)
     // sanity check; this should never kick in, unless wrapInt() has an implementation error.
     POV_MATHUTIL_ASSERT((tempVal >= 0) && (tempVal < upperLimit));
 
-    return tempVal;
+    return (T2)tempVal;
+}
+
+// wrap signed integer value into the range [0..upperLimit);
+// (this is equivalent to the modulus assignment operator for positive values, but not for negative ones)
+template<typename T1, typename T2>
+inline void setWrapInt(T1& val, T2 upperLimit)
+{
+    val %= upperLimit;
+
+    if (val < T1(0))
+    {
+        // For negative values, the modulus operator may return a value in the range [1-upperLimit..-1];
+        // transpose such results into the range [1..upperLimit-1].
+        val += upperLimit;
+    }
+
+    // sanity check; this should never kick in, unless wrapInt() has an implementation error.
+    POV_MATHUTIL_ASSERT((val >= 0) && (val < upperLimit));
 }
 
 // round up/down to a multiple of some value
@@ -143,6 +168,31 @@ template<typename T1, typename T2>
 inline T1 RoundDownToMultiple(T1 x, T2 base) { return x - (x % base); }
 template<typename T1, typename T2>
 inline T1 RoundUpToMultiple(T1 x, T2 base) { return RoundDownToMultiple (x + base - 1, base); }
+
+/// Test whether a value is in a given range.
+///
+/// This function tests whether the specified value is within the specified interval.
+/// The boundaries are considered part of the interval.
+///
+template<typename T1, typename T2>
+inline bool IsInRange (T1 value, T2 min, T2 max)
+{
+    return (min <= value) && (value <= max);
+}
+
+/// Test whether a floating-point value is a proper finite numerical value.
+///
+/// This function tests whether the specified floating-point value is a proper finite
+/// numeric value.
+///
+inline bool IsFinite(double value)
+{
+    return POV_ISFINITE(value);
+}
+
+/// @}
+///
+//##############################################################################
 
 }
 

@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -51,11 +51,15 @@
 #include "base/timer.h"
 #include "base/types.h"
 
+#include "core/material/noise.h"
 #include "core/material/pattern.h"
-#include "core/material/texture.h"
 
 #include "backend/control/renderbackend.h"
 #include "backend/support/task.h"
+
+#ifdef POV_CPUINFO_H
+#include POV_CPUINFO_H
+#endif
 
 #ifndef DONT_SHOW_IMAGE_LIB_VERSIONS
     // these are needed for copyright notices and version numbers
@@ -66,13 +70,21 @@
         #include <png.h>
     #endif
     #ifndef LIBJPEG_MISSING
-        #include <jversion.h>
+        #include <jpeglib.h>
+        #ifndef JPEG_LIB_VERSION_MAJOR
+            #define JPEG_LIB_VERSION_MAJOR (JPEG_LIB_VERSION / 10)
+        #endif
+        #ifndef JPEG_LIB_VERSION_MINOR
+            // This is known to erroneously identify versions 8a and 8b as version 8,
+            // but we'll live with that.
+            #define JPEG_LIB_VERSION_MINOR (JPEG_LIB_VERSION % 10)
+        #endif
     #endif
     #ifndef LIBTIFF_MISSING
         extern "C"
         {
             #ifndef __STDC__
-            #define __STDC__        (1)
+            #define __STDC__        (1) // TODO - this is an ugly hack; check if it is really necessary
             #define UNDEF__STDC__
             #endif
             #ifndef AVOID_WIN32_FILEIO
@@ -112,25 +124,22 @@
     #define POV_VALIDATE_FRONTEND(msg) true
 #endif
 
-/// Platform specific function interface self reference pointer
-pov_base::PlatformBase *pov_base::PlatformBase::self = NULL;
-
 namespace
 {
 
 using namespace pov;
 using namespace pov_base;
 
-/// primary developers
+/// Primary Developers.
 const char *PrimaryDevelopers[] =
 {
     "Chris Cason",
     "Thorsten Froehlich",
     "Christoph Lipka",
-    NULL
+    nullptr
 };
 
-/// assisting developers
+/// Assisting Developers.
 const char *AssistingDevelopers[] =
 {
     "Nicolas Calimet",
@@ -139,10 +148,12 @@ const char *AssistingDevelopers[] =
     "Christoph Hormann",
     "Nathan Kopp",
     "Juha Nieminen",
-    NULL
+    "William F. Pokorny",
+    nullptr
 };
 
-/// contributing developers
+/// Past Contributing Developers.
+/// By convention, current developers are also already included here.
 const char *ContributingDevelopers[] =
 {
     "Steve Anger",
@@ -159,6 +170,7 @@ const char *ContributingDevelopers[] =
     "Dan Farmer",
     "Thorsten Froehlich",
     "Mark Gordon",
+    "Jerome Grimbert",
     "James Holsenback",
     "Christoph Hormann",
     "Mike Hough",
@@ -173,6 +185,7 @@ const char *ContributingDevelopers[] =
     "Douglas Muir",
     "Juha Nieminen",
     "Ron Parker",
+    "William F. Pokorny",
     "Bill Pulver",
     "Eduard Schwan",
     "Wlodzimierz Skiba",
@@ -184,17 +197,17 @@ const char *ContributingDevelopers[] =
     "Timothy Wegner",
     "Drew Wells",
     "Chris Young",
-    NULL   // NULL flags the end of the list
+    nullptr   // `nullptr` flags the end of the list
 };
 
 /// POVMS context to receive messages from the frontend
-volatile POVMSContext POV_RenderContext = NULL;
+volatile POVMSContext POV_RenderContext = nullptr;
 
 /// POVMS address of the currently connected frontend
 volatile POVMSAddress POV_FrontendAddress = POVMSInvalidAddress;
 
 /// Main POV-Ray thread that waits for messages from the frontend
-boost::thread *POV_MainThread = NULL;
+boost::thread *POV_MainThread = nullptr;
 
 /// Flag to mark main POV-Ray thread for termination
 volatile bool POV_TerminateMainThread = false;
@@ -276,13 +289,15 @@ void BuildInitInfo(POVMSObjectPtr msg)
     if(err == kNoErr)
         err = POVMSUtil_SetString(msg, kPOVAttrib_PlatformName, POVRAY_PLATFORM_NAME);
     if(err == kNoErr)
-        err = POVMSUtil_SetFormatString(msg, kPOVAttrib_CoreVersion,
-                                        "Persistence of Vision(tm) Ray Tracer Version %s%s", POV_RAY_VERSION, COMPILER_VER);
+        err = POVMSUtil_SetString(msg, kPOVAttrib_CoreVersion,
+                                        "Persistence of Vision(tm) Ray Tracer Version " POV_RAY_VERSION_INFO);
+    if (err == kNoErr)
+        err = POVMSUtil_SetString(msg, kPOVAttrib_CoreGeneration, "POV-Ray v" POV_RAY_GENERATION);
     if(err == kNoErr)
         err = POVMSUtil_SetString(msg, kPOVAttrib_EnglishText,
                                   DISTRIBUTION_MESSAGE_1 "\n" DISTRIBUTION_MESSAGE_2 "\n" DISTRIBUTION_MESSAGE_3
                                   "\nPOV-Ray is based on DKBTrace 2.12 by David K. Buck & Aaron A. Collins\n" POV_RAY_COPYRIGHT);
-#if POV_RAY_IS_OFFICIAL == 1
+#if POV_RAY_IS_OFFICIAL
     if(err == kNoErr)
         err = POVMSUtil_SetBool(msg, kPOVAttrib_Official, true);
 #else
@@ -294,7 +309,7 @@ void BuildInitInfo(POVMSObjectPtr msg)
         err = POVMSAttrList_New(&attrlist);
     if(err == kNoErr)
     {
-        for(int i = 0; PrimaryDevelopers[i] != NULL; i++)
+        for (int i = 0; PrimaryDevelopers[i] != nullptr; i++)
         {
             err = POVMSAttr_New(&attr);
             if(err == kNoErr)
@@ -314,7 +329,7 @@ void BuildInitInfo(POVMSObjectPtr msg)
         err = POVMSAttrList_New(&attrlist);
     if(err == kNoErr)
     {
-        for(int i = 0; AssistingDevelopers[i] != NULL; i++)
+        for (int i = 0; AssistingDevelopers[i] != nullptr; i++)
         {
             err = POVMSAttr_New(&attr);
             if(err == kNoErr)
@@ -334,7 +349,7 @@ void BuildInitInfo(POVMSObjectPtr msg)
         err = POVMSAttrList_New(&attrlist);
     if(err == kNoErr)
     {
-        for(int i = 0; ContributingDevelopers[i] != NULL; i++)
+        for (int i = 0; ContributingDevelopers[i] != nullptr; i++)
         {
             err = POVMSAttr_New(&attr);
             if(err == kNoErr)
@@ -381,7 +396,7 @@ void BuildInitInfo(POVMSObjectPtr msg)
         err = POVMSAttr_New(&attr);
         if(err == kNoErr)
         {
-            ExtractLibraryVersion(png_get_libpng_ver(NULL), buffer);
+            ExtractLibraryVersion(png_get_libpng_ver(nullptr), buffer);
 
             // TODO FIXME - shouldn't we use png_get_copyright() instead of png_get_libpng_ver() and a hard-coded string?
             const char *tempstr = pov_tsprintf("LibPNG %s, Copyright 1998-2012 Glenn Randers-Pehrson", buffer);
@@ -402,10 +417,9 @@ void BuildInitInfo(POVMSObjectPtr msg)
         err = POVMSAttr_New(&attr);
         if(err == kNoErr)
         {
-            ExtractLibraryVersion(JVERSION, buffer);
-
-            // TODO FIXME - shouldn't we use the JCOPYRIGHT string instead of hard-coding it here?
-            const char *tempstr = pov_tsprintf("LibJPEG %s, Copyright 1991-2013 Thomas G. Lane, Guido Vollbeding", buffer);
+            const char minorStr[2] = { JPEG_LIB_VERSION_MINOR ? 'a'+JPEG_LIB_VERSION_MINOR-1 : '\0', '\0' };
+            const char *tempstr = pov_tsprintf("LibJPEG %i%s, Copyright 1991-2016 Thomas G. Lane, Guido Vollbeding",
+                                               JPEG_LIB_VERSION_MAJOR, minorStr);
 
             err = POVMSAttr_Set(&attr, kPOVMSType_CString, reinterpret_cast<const void *>(tempstr), (int) strlen(tempstr) + 1);
             if(err == kNoErr)
@@ -475,6 +489,39 @@ void BuildInitInfo(POVMSObjectPtr msg)
 #endif  // DONT_SHOW_IMAGE_LIB_VERSIONS
     if(err == kNoErr)
         err = POVMSObject_Set(msg, &attrlist, kPOVAttrib_ImageLibVersions);
+
+#ifdef POV_CPUINFO
+    std::string cpuInfo(POV_CPUINFO);
+    if (err == kNoErr)
+        err = POVMSUtil_SetString(msg, kPOVAttrib_CPUInfo, cpuInfo.c_str());
+#endif
+
+#if POV_CPUINFO_DEBUG && defined(POV_CPUINFO_DETAILS)
+    std::string cpuDetail(POV_CPUINFO_DETAILS);
+    if (err == kNoErr)
+        err = POVMSUtil_SetString(msg, kPOVAttrib_CPUInfoDetails, cpuDetail.c_str());
+#endif
+
+    if (err == kNoErr)
+        err = POVMSAttrList_New(&attrlist);
+    if (err == kNoErr)
+    {
+#ifdef TRY_OPTIMIZED_NOISE
+        const OptimizedNoiseInfo* pNoise = GetRecommendedOptimizedNoise();
+        std::string noiseGenInfo = "Noise generator: " + std::string(pNoise->name) + " (" + ::string(pNoise->info) + ")";
+        err = POVMSAttr_New(&attr);
+        if (err == kNoErr)
+        {
+            err = POVMSAttr_Set(&attr, kPOVMSType_CString, reinterpret_cast<const void *>(noiseGenInfo.c_str()), noiseGenInfo.length() + 1);
+            if (err == kNoErr)
+                err = POVMSAttrList_Append(&attrlist, &attr);
+            else
+                err = POVMSAttr_Delete(&attr);
+        }
+#endif
+    }
+    if (err == kNoErr)
+        err = POVMSObject_Set(msg, &attrlist, kPOVAttrib_Optimizations);
 }
 
 void ExtractLibraryVersion(const char *str, char *buffer)
@@ -500,7 +547,7 @@ void ExtractLibraryVersion(const char *str, char *buffer)
 
 void ExitFunction()
 {
-    if((POV_RenderContext != NULL) && (POV_FrontendAddress != POVMSInvalidAddress))
+    if ((POV_RenderContext != nullptr) && (POV_FrontendAddress != POVMSInvalidAddress))
     {
         POVMSObject msg;
         int err = kNoErr;
@@ -512,7 +559,7 @@ void ExitFunction()
         if(err == kNoErr)
             err = POVMSMsg_SetDestinationAddress(&msg, const_cast<POVMSAddress>(POV_FrontendAddress));
         if(err == kNoErr)
-            err = POVMS_Send(POV_RenderContext, &msg, NULL, kPOVMSSendMode_NoReply);
+            err = POVMS_Send(POV_RenderContext, &msg, nullptr, kPOVMSSendMode_NoReply);
         if(err != 0)
             (void)POVMS_ASSERT_OUTPUT("Sending backend termination notice failed!", __FILE__, __LINE__);
     }
@@ -532,8 +579,8 @@ void MainThreadFunction(const boost::function0<void>& threadExit)
 
                 POV_MEM_INIT();
 
-                if((POVMS_InstallReceiver((POVMSContext)POV_RenderContext, ConnectToFrontend, kPOVMsgClass_BackendControl, kPOVMsgIdent_InitInfo, NULL) != kNoErr) ||
-                    (POVMS_InstallReceiver((POVMSContext)POV_RenderContext, DisconnectFromFrontend, kPOVMsgClass_BackendControl, kPOVMsgIdent_Done, NULL) != kNoErr))
+                if ((POVMS_InstallReceiver((POVMSContext)POV_RenderContext, ConnectToFrontend, kPOVMsgClass_BackendControl, kPOVMsgIdent_InitInfo, nullptr) != kNoErr) ||
+                    (POVMS_InstallReceiver((POVMSContext)POV_RenderContext, DisconnectFromFrontend, kPOVMsgClass_BackendControl, kPOVMsgIdent_Done, nullptr) != kNoErr))
                     (void)POVMS_ASSERT_OUTPUT("Installing POVMS receive handler functions failed in main POV-Ray backend thread.", __FILE__, __LINE__);
 
                 while(POV_TerminateMainThread == false)
@@ -580,17 +627,17 @@ void MainThreadFunction(const boost::function0<void>& threadExit)
     threadExit();
 
     POVMSContext tempcontext = (POVMSContext)POV_RenderContext;
-    POV_RenderContext = NULL;
+    POV_RenderContext = nullptr;
     (void)POVMS_CloseContext(tempcontext);
 }
 
-}
+} // namespace
 
 boost::thread *povray_init(const boost::function0<void>& threadExit, POVMSAddress *addr)
 {
     using namespace pov;
 
-    if(POV_MainThread == NULL)
+    if (POV_MainThread == nullptr)
     {
         POV_TerminateMainThread = false;
         POV_MainThreadTerminated = false;
@@ -598,18 +645,18 @@ boost::thread *povray_init(const boost::function0<void>& threadExit, POVMSAddres
         Initialize_Noise();
         pov::InitializePatternGenerators();
 
-        POV_MainThread = Task::NewBoostThread(boost::bind(&MainThreadFunction, threadExit), 1024 * 64);
+        POV_MainThread = Task::NewBoostThread(boost::bind(&MainThreadFunction, threadExit), POV_THREAD_STACK_SIZE);
 
         // we can't depend on boost::thread::yield here since under windows it is not
         // guaranteed to give up a time slice [see API docs for Sleep(0)]
-        while(POV_RenderContext == NULL)
+        while (POV_RenderContext == nullptr)
         {
             boost::thread::yield();
             pov_base::Delay(50);
         }
     }
 
-    if(addr != NULL)
+    if (addr != nullptr)
     {
         int err = POVMS_GetContextAddress(POV_RenderContext, addr);
         if(err != kNoErr)
@@ -630,17 +677,17 @@ void povray_terminate()
 
     POV_TerminateMainThread = true;
 
-    while(POV_RenderContext != NULL)
+    while (POV_RenderContext != nullptr)
     {
         boost::thread::yield();
         pov_base::Delay(100);
     }
 
-    if(POV_MainThread != NULL)
+    if (POV_MainThread != nullptr)
         POV_MainThread->join();
 
     delete POV_MainThread;
-    POV_MainThread = NULL;
+    POV_MainThread = nullptr;
 
     Free_Noise_Tables(); // TODO FIXME - don't add such calls here!
 }

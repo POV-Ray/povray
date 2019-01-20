@@ -13,8 +13,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,7 +44,8 @@
 
 #ifndef LIBJPEG_MISSING
 
-#include <setjmp.h>
+// C++ variants of standard C header files
+#include <csetjmp>
 
 // Standard C++ header files
 #include <string>
@@ -58,7 +59,8 @@ extern "C"
 #include <jpeglib.h>
 }
 
-// POV-Ray base header files
+// POV-Ray header files (base module)
+#include "base/image/dither.h"
 #include "base/image/metadata.h"
 
 // this must be the last file included
@@ -89,7 +91,7 @@ public:
     struct jpeg_error_mgr jerr;
     jpeg_source_mgr jsrc;
     jpeg_destination_mgr jdest;
-    jmp_buf setjmp_buffer;  // for return to caller
+    std::jmp_buf setjmp_buffer;  // for return to caller
     char buffer[POV_JPEG_BUFFER_SIZE];
     JSAMPROW row_pointer[1];
     int row_stride;
@@ -104,8 +106,8 @@ POV_JPEG_Write_Buffer::POV_JPEG_Write_Buffer()
     memset(&jsrc, 0, sizeof(jsrc));
     memset(&jdest, 0, sizeof(jdest));
     memset(&cinfo, 0, sizeof(cinfo));
-    row_pointer[0] = NULL;
-    file = NULL;
+    row_pointer[0] = nullptr;
+    file = nullptr;
     row_stride = 0;
 }
 
@@ -117,7 +119,7 @@ public:
     struct jpeg_error_mgr jerr;
     jpeg_source_mgr jsrc;
     jpeg_destination_mgr jdest;
-    jmp_buf setjmp_buffer;  // for return to caller
+    std::jmp_buf setjmp_buffer;  // for return to caller
     char buffer[POV_JPEG_BUFFER_SIZE];
     JSAMPROW row_pointer[1];
     int row_stride;
@@ -133,8 +135,8 @@ POV_JPEG_Read_Buffer::POV_JPEG_Read_Buffer()
     memset(&jsrc, 0, sizeof(jsrc));
     memset(&jdest, 0, sizeof(jdest));
     memset(&cinfo, 0, sizeof(cinfo));
-    row_pointer[0] = NULL;
-    file = NULL;
+    row_pointer[0] = nullptr;
+    file = nullptr;
     row_stride = 0;
 }
 
@@ -159,7 +161,7 @@ extern "C"
         (*cinfo->err->output_message)(cinfo);
 
         // Return control to the setjmp point
-        longjmp(myerr->setjmp_buffer, 1);
+        std::longjmp(myerr->setjmp_buffer, 1);
     }
 
     METHODDEF(void) write_error_exit (j_common_ptr cinfo)
@@ -169,7 +171,7 @@ extern "C"
         (*cinfo->err->output_message)(cinfo);
 
         // Return control to the setjmp point
-        longjmp(myerr->setjmp_buffer, 1);
+        std::longjmp(myerr->setjmp_buffer, 1);
     }
 
     METHODDEF(void) read_output_message(j_common_ptr cinfo)
@@ -236,7 +238,7 @@ extern "C"
         {
             num_bytes -= (long) bufptr->jsrc.bytes_in_buffer;
             bufptr->jsrc.bytes_in_buffer = 0;
-            bufptr->file->seekg(num_bytes, POV_SEEK_CUR);
+            bufptr->file->seekg(num_bytes, IOBase::seek_cur);
         }
         else
         {
@@ -355,7 +357,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     }
     image = Image::Create (width, height, imagetype) ;
     // NB: JPEG files don't use alpha, so premultiplied vs. non-premultiplied is not an issue
-    image->TryDeferDecoding(gamma, 255); // try to have gamma adjustment being deferred until image evaluation.
+    image->TryDeferDecoding(gamma, MAXJSAMPLE); // try to have gamma adjustment being deferred until image evaluation.
 
     // JSAMPLEs per row in output buffer
     readbuf.row_stride = readbuf.cinfo.output_width * readbuf.cinfo.output_components;
@@ -377,14 +379,14 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
                 unsigned int r = readbuf.row_pointer[0][col * 3];
                 unsigned int g = readbuf.row_pointer[0][(col * 3) + 1];
                 unsigned int b = readbuf.row_pointer[0][(col * 3) + 2];
-                SetEncodedRGBValue (image, col, row, gamma, 255, r, g, b) ;
+                SetEncodedRGBValue (image, col, row, gamma, MAXJSAMPLE, r, g, b) ;
             }
         }
         else if (readbuf.cinfo.output_components == 1) // 8-bit grayscale image
         {
             for (col = 0; col < width; col++)
             {
-                SetEncodedGrayValue (image, col, row, gamma, 255, (unsigned int) readbuf.row_pointer[0][col]) ;
+                SetEncodedGrayValue (image, col, row, gamma, MAXJSAMPLE, (unsigned int) readbuf.row_pointer[0][col]) ;
             }
         }
     }
@@ -403,18 +405,15 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
 {
     int                         width = image->GetWidth() ;
     int                         height = image->GetHeight() ;
-    int                         quality = options.compress;
+    int                         quality;
     int                         grayscale = image->IsGrayscale();
     POV_JPEG_Write_Buffer       writebuf;
     GammaCurvePtr               gamma;
-    DitherHandlerPtr            dither = GetNoOpDitherHandler(); // dithering doesn't make much sense with JPEG
+    DitherStrategySPtr          dither = GetNoOpDitherStrategy(); // dithering doesn't make much sense with JPEG
 
-    if (options.encodingGamma)
-        gamma = TranscodingGammaCurve::Get(options.workingGamma, options.encodingGamma);
-    else
-        // JPEG files used to have no clearly defined gamma by default, but a W3C recommendation exists for them to use sRGB
-        // unless an ICC profile is present (which we presently don't support).
-        gamma = TranscodingGammaCurve::Get(options.workingGamma, SRGBGammaCurve::Get());
+    // JPEG files used to have no clearly defined gamma by default, but a W3C recommendation exists for them to use sRGB
+    // unless an ICC profile is present (which we presently don't support).
+    gamma = options.GetTranscodingGammaCurve(SRGBGammaCurve::Get());
 
     writebuf.file = file;
 
@@ -464,10 +463,15 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
     // if quality is not specified, we wind the output quality waaaay up (usually needed for raytracing)
     // (This used to be 95% when we still did chroma sub-sampling; without chroma sub-sampling,
     // about the same visual quality and file size is achieved at 85%. - [CLi])
-    if (quality == 0)
+    if (options.compression <= 1)
+        // Negative values indicate default quality; `0` means no compression, but since JPEG is
+        // always lossy we interpret this as "use a reasonably high quality"; and we interpret `1`
+        // as "enable compression", which is the default anyway.
         quality = 85;
-    else if (quality == 1) // this is to catch cases where users use '1' to turn on compression
-        quality = 85;
+    else
+        // Valid values for the JPEG quality setting range from 0 to 100 (though we provide no way
+        // to choose either 0 or 1).
+        quality = clip(int(options.compression), 0, 100);
     jpeg_set_quality(&writebuf.cinfo, quality, TRUE); // quality (range 2 to 100)
 
     if (!grayscale)
@@ -508,7 +512,7 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
             for (int col = 0; col < width; col++)
             {
                 unsigned int r, g, b;
-                GetEncodedRGBValue(image, col, row, gamma, 255, r, g, b, *dither);
+                GetEncodedRGBValue(image, col, row, gamma, MAXJSAMPLE, r, g, b, *dither);
                 *sample++ = (JSAMPLE) r;
                 *sample++ = (JSAMPLE) g;
                 *sample++ = (JSAMPLE) b;
@@ -517,7 +521,7 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
         else if (writebuf.cinfo.input_components == 1) // 8-bit grayscale image
         {
             for (int col = 0; col < width; col++)
-                *sample++ = (JSAMPLE) GetEncodedGrayValue(image, col, row, gamma, 255, *dither);
+                *sample++ = (JSAMPLE) GetEncodedGrayValue(image, col, row, gamma, MAXJSAMPLE, *dither);
         }
         jpeg_write_scanlines(&writebuf.cinfo, writebuf.row_pointer, 1);
     }
@@ -528,6 +532,6 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
 
 } // end of namespace Jpeg
 
-}
+} // end of namespace pov_base
 
 #endif  // LIBJPEG_MISSING

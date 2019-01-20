@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -46,44 +46,49 @@
 
 #include "core/coretypes.h"
 #include "core/bounding/boundingcylinder.h"
+#include "core/bounding/bsptree.h"
 #include "core/material/pattern.h"
+#include "core/math/randomsequence.h"
 #include "core/shape/mesh.h"
 #include "core/support/statistics.h"
-
-#include "backend/support/task.h"
 
 namespace pov
 {
 
+//##############################################################################
+///
+/// @addtogroup PovCore
+///
+/// @{
+
 using namespace pov_base;
 
 class SceneData;
-class FunctionVM;
-class FPUContext;
 struct ISO_ThreadData;
 
 class PhotonMap;
 struct Blob_Interval_Struct;
 
-/**
- *  Class holding parser thread specific data.
- */
-class TraceThreadData : public Task::TaskData
+/// Class holding parser thread specific data.
+class TraceThreadData : public ThreadData
 {
         friend class Scene;
         friend class Trace;
         friend class View; // TODO FIXME - needed only to access TraceThreadData for CheckCameraHollowObject()
-    public:
-        /**
-         *  Create thread local data.
-         *  @param  sd              Scene data defining scene attributes.
-         */
-        TraceThreadData(shared_ptr<SceneData> sd);
 
-        /**
-         *  Get the statistics.
-         *  @return                 Reference to statistic counters.
-         */
+    public:
+
+        /// Create thread local data.
+        /// @param  sd      Scene data defining scene attributes.
+        /// @param  seed    Seed for the stochastic random number generator;
+        ///                 should be unique for each render.
+        TraceThreadData(shared_ptr<SceneData> sd, size_t seed);
+
+        /// Destructor.
+        ~TraceThreadData();
+
+        /// Get the statistics.
+        /// @return     Reference to statistic counters.
         RenderStatistics& Stats(void) { return renderStats; }
 
         DBL *Fractal_IStack[4];
@@ -99,10 +104,14 @@ class TraceThreadData : public Task::TaskData
         vector<BCYL_INT> BCyl_RInt;
         vector<BCYL_INT> BCyl_HInt;
         IStackPool stackPool;
-        vector<FPUContext*> fpuContextPool;
+        vector<GenericFunctionContextPtr> functionContextPool;
         int Facets_Last_Seed;
         int Facets_CVC;
         Vector3d Facets_Cube[81];
+
+        /// Common random number generator for all stochastic stuff
+        SeedableDoubleGeneratorPtr stochasticRandomGenerator;
+        size_t stochasticRandomSeedBase;
 
         // TODO FIXME - thread-local copy of lightsources. we need this
         // because various parts of the lighting code seem to make changes
@@ -133,16 +142,12 @@ class TraceThreadData : public Task::TaskData
         vector<double> waveFrequencies;
         vector<Vector3d> waveSources;
 
-        /**
-         * called after a rectangle is finished
-         * used for crackle cache expiry
-         */
+        /// Called after a rectangle is finished.
+        /// Used for crackle cache expiry.
         void AfterTile();
 
-        /**
-         * used by the crackle pattern to indicate age of cache entries
-         * @return  the index of the current rectangle rendered
-         */
+        /// Used by the crackle pattern to indicate age of cache entries.
+        /// @return     The index of the current rectangle rendered.
         inline size_t ProgressIndex() const { return progress_index; }
 
         enum TimeType
@@ -183,14 +188,11 @@ class TraceThreadData : public Task::TaskData
         size_t CrCache_MaxAge;
         /// current tile index (for crackle cache expiry)
         size_t progress_index;
-
-    public: // TODO FIXME - temporary workaround [trf]
-
-        /**
-         *  Destructor.
-         */
-        ~TraceThreadData();
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

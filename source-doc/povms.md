@@ -1,11 +1,15 @@
-# POVMS Interface {#povms}
+@page povms  POVMS Interface
 
 
-@section strt       Getting Started with POVMS
+Getting Started with POVMS
+==========================
 
-@todo   This section dates back to 2003 and may need an overhaul.
+@todo
+    This section dates back to 2003 and may need an overhaul.
 
-@subsection strt_con    The POVMS Concept
+
+The POVMS Concept
+-----------------
 
 POVMS is a layer below POV-Ray and on top of the host operating system. It abstracts all input and output of POV-Ray.
 That is, rendering options are set using POVMS, and status messages are generated using POVMS. The abstraction allows
@@ -18,9 +22,12 @@ exclusively uses POVMS to control POV-Ray and receive output from POV-Ray.
 Throughout this document, remember that the core concept behind POVMS is a simple asynchronous message driven
 communication. POVMS handles all the abstraction for you. It can even deal with different byte orders automatically.
 
-@subsection strt_que    Message Queue Configuration
 
-@todo   The contents of this sub-section should probably be moved to the `povms.cpp` header file.
+Message Queue Configuration
+---------------------------
+
+@todo
+    The contents of this sub-section should probably be moved to the @ref povms/povms.cpp header file.
 
 Before you can use POVMS, you will need to configure it. This works just like `config.h`/`frame.h` for the rest of the
 POV-Ray code. However, for POVMS you have the option to disconnect `povms.cpp` from the rest of the POV-Ray code if you
@@ -59,9 +66,12 @@ So, if you want e.g. a thread-safe or interprocess message queue, you will have 
   - **unsigned int POVMS_Sys_Timer()**: Returns current time in seconds. It does not have to follow any particular
     timebase as long as time values return increase monotonously.
 
-@subsection strt_sup    Support Function Configuration
 
-@todo   The contents of this sub-section should probably be moved to the `povms.cpp` header file.
+Support Function Configuration
+------------------------------
+
+@todo
+    The contents of this sub-section should probably be moved to the @ref povms/povms.cpp header file.
 
 These low level functions allow building POVMS without a C library. Usually you do not have to override them:
 
@@ -82,7 +92,9 @@ amount of memory around a few kilobytes if memory is full from the perspective o
 
   - **POVMS_Sys_Free(p)**: C-like free function. Defaults to free.
 
-@subsection strt_init   Initializing POVMS
+
+Initializing POVMS
+------------------
 
 The following assumes you are in a multi-thread environment and the render engine core and the GUI are running in two
 different threads. It uses the core POVMS concept of a "context", which is essentially a single POVMS message queue that
@@ -217,7 +229,9 @@ And then you would need a function like:
 
 This is sufficient to let the render engine send all messages to the address specified by FRONTEND_ADDRESS. That is it!
 
-@subsection strt_ctl    Controlling Rendering
+
+Controlling Rendering
+---------------------
 
 Here is the simplest possible way to control rendering. These three functions allow you to set the options that will be
 used, to start rendering the whole image, and to abort rendering. Note that due to the asynchronous way of
@@ -278,7 +292,8 @@ rendering. You are not supposed to shut it down unless you end the application.
     }
 
 
-@section seq        Message Sequences
+Message Sequences
+=================
 
 A simple rendering session might look as follows:
 

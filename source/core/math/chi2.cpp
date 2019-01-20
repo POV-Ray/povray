@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -239,7 +239,6 @@ static DBL polevl (DBL x, const DBL * coef, int N);
 static DBL p1evl (DBL x, const DBL * coef, int N);
 static DBL igamc (DBL a, DBL x);
 static DBL igam (DBL a, DBL x);
-static DBL ndtri (DBL y0);
 
 
 
@@ -289,11 +288,7 @@ DBL chdtri(DBL df, DBL  y)
     DBL x;
 
     if ((y < 0.0) || (y > 1.0) || (df < 1.0))
-    {
         throw POV_EXCEPTION_STRING("Illegal values in chdtri().");
-
-        return (0.0);
-    }
 
     x = igami(0.5 * df, y);
 
@@ -878,7 +873,7 @@ done:
  *
  */
 
-static DBL ndtri(DBL y0)
+DBL ndtri(DBL y0)
 {
     DBL x, y, z, y2, x0, x1;
     int code;

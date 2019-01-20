@@ -15,8 +15,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -47,10 +47,19 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+#include "base/types.h"
+
 namespace pov
 {
 
-typedef DBL EXPRESS[5];
+using namespace pov_base;
+
+//##############################################################################
+///
+/// @defgroup PovCoreMathSpline Splines
+/// @ingroup PovCoreMath
+///
+/// @{
 
 struct SplineEntry
 {
@@ -120,6 +129,10 @@ void Release_Spline_Reference(GenericSpline* sp);
 void Destroy_Spline(GenericSpline* sp);
 void Insert_Spline_Entry(GenericSpline* sp, DBL p, const EXPRESS& v);
 DBL Get_Spline_Val(GenericSpline* sp, DBL p, EXPRESS& v, int *Terms);
+
+/// @}
+///
+//##############################################################################
 
 }
 

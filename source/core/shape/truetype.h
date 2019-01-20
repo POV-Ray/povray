@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -51,17 +51,27 @@ class IStream;
 namespace pov
 {
 
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
+
 class CSG;
-class Parser;
 
 using pov_base::IStream;
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
 
 #define TTF_OBJECT (BASIC_OBJECT)
 
+/// @}
+///
+//******************************************************************************
 
 
 /*****************************************************************************
@@ -74,13 +84,17 @@ struct TrueTypeInfo;
 
 struct TrueTypeFont
 {
-    TrueTypeFont(UCS2* fn, IStream* fp, StringEncoding te);
+    static constexpr POV_UINT32 kAnyCMAP = 0xFFFFFFFFu;
+
+    TrueTypeFont(const UCS2String& fn, const shared_ptr<IStream>& f, POV_UINT32 cm, CharsetID cs, LegacyCharset scs);
     ~TrueTypeFont();
 
-    UCS2*           filename;
-    IStream*        fp;
-    StringEncoding  textEncoding;
-    TrueTypeInfo*   info;
+    UCS2String          filename;
+    shared_ptr<IStream> file;
+    POV_UINT32          cmap;
+    CharsetID           charset;
+    LegacyCharset       legacyCharset;
+    TrueTypeInfo*       info;
 };
 
 class TrueType : public ObjectBase
@@ -103,13 +117,17 @@ class TrueType : public ObjectBase
         virtual void Transform(const TRANSFORM *);
         virtual void Compute_BBox();
 
-        static void ProcessNewTTF(CSG *Object, TrueTypeFont* font, const UCS2 *text_string, DBL depth, const Vector3d& offset, Parser *parser);
+        static void ProcessNewTTF(CSG *Object, TrueTypeFont* font, const UCS2 *text_string, DBL depth, const Vector3d& offset);
     protected:
         bool Inside_Glyph(double x, double y, const GlyphStruct* glyph) const;
         int solve_quad(double *x, double *y, double mindist, DBL maxdist) const;
         void GetZeroOneHits(const GlyphStruct* glyph, const Vector3d& P, const Vector3d& D, DBL glyph_depth, double *t0, double *t1) const;
         bool GlyphIntersect(const Vector3d& P, const Vector3d& D, const GlyphStruct* glyph, DBL glyph_depth, const BasicRay &ray, IStack& Depth_Stack, TraceThreadData *Thread);
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

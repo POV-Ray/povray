@@ -5,13 +5,13 @@
 /// Implementation of radiosity.
 ///
 /// @author Jim McElhiney (original code)
-/// @author Christoph Lipka (revisions and updates for POV-Ray 3.7)
+/// @author Christoph Lipka (revisions and updates for POV-Ray v3.7)
 ///
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -81,8 +81,6 @@ namespace pov
 {
 
 using namespace pov_base;
-
-extern BYTE_XYZ rad_samples[];
 
 // #define RAD_GRADIENT 1 // [CLi] gradient seems to provide no gain at best, and may actually cause artifacts
 // #define SAW_METHOD 1
@@ -179,10 +177,10 @@ RadiosityRecursionSettings* SceneRadiositySettings::GetRecursionSettings(bool fi
         //  The deeper we recurse, the higher the error we can accept; the original paper
         //  by Ward et al. suggests to reduce the number of rays by 50% per bounce, based
         //  on an estimated average reflectivity of 50% throughout the scene; the version
-        //  3.6 code enforced a minimum of 5 rays, possibly for some hidden reason, so we
+        //  v3.6 code enforced a minimum of 5 rays, possibly for some hidden reason, so we
         //  follow this example.
         // Compatibility:
-        //  POV-Ray 3.6 reduced by factor 3 for 1st recursion, and again by factor 2 for
+        //  POV-Ray v3.6 reduced by factor 3 for 1st recursion, and again by factor 2 for
         //  2nd recursion, using that same value for all consecutive recursions; in any
         //  case, at least 5 rays were shot.
 
@@ -195,7 +193,7 @@ RadiosityRecursionSettings* SceneRadiositySettings::GetRecursionSettings(bool fi
         //  The rays picking up deeper bounce samples will be more or less random and
         //  averaged anyway, so we can be lazy about this at deeper bounces.
         // Compatibility:
-        //  POV-Ray 3.6 reduced to 2 for 1st recursion, 1 for all consecutive recursions
+        //  POV-Ray v3.6 reduced to 2 for 1st recursion, 1 for all consecutive recursions
 
         switch (depth)
         {
@@ -211,9 +209,9 @@ RadiosityRecursionSettings* SceneRadiositySettings::GetRecursionSettings(bool fi
         //  The deeper we recurse, the higher the error we can accept; the original paper
         //  from Ward et al. suggests to increase the error bound by 40% per bounce, based
         //  on an estimated average reflectivity of 50% throughout the scene; however, we
-        //  follow the more radical example of POV-Ray 3.6.
+        //  follow the more radical example of POV-Ray v3.6.
         // Compatibility:
-        //  POV-Ray 3.6 increased by factor 2 per recursion
+        //  POV-Ray v3.6 increased by factor 2 per recursion
 
         recSettings[depth].errorBoundFactor = 1.0 * pow(2.0, (double)depth);
 
@@ -225,7 +223,7 @@ RadiosityRecursionSettings* SceneRadiositySettings::GetRecursionSettings(bool fi
         //  arbitrary value. (NOTE: The effect of this *multiplies* with that of
         //  errorBoundFactor!)
         // Compatibility:
-        //  POV-Ray 3.6 increased by factor 2 per recursion
+        //  POV-Ray v3.6 increased by factor 2 per recursion
 
         recSettings[depth].minReuseFactor = minimumReuse * pow(2.0, (double)depth);
         recSettings[depth].maxReuseFactor = maximumReuse * pow(2.0, (double)depth);
@@ -245,7 +243,7 @@ RadiosityRecursionSettings* SceneRadiositySettings::GetRecursionSettings(bool fi
         //  recursion depth, we are going for optimum performance. 8 has proven a good
         //  value in this respect.
         // Compatibility:
-        //  POV-Ray 3.6 used 1 for top-level samples, increasing by factor of 2 [?] per
+        //  POV-Ray v3.6 used 1 for top-level samples, increasing by factor of 2 [?] per
         //  recursion; there is reason to believe that this was unintentional.
 
         if (depth == 0)
@@ -268,7 +266,7 @@ RadiosityRecursionSettings* SceneRadiositySettings::GetRecursionSettings(bool fi
         //  level increment per radiosity recursion, and the basic radiosity brightness
         //  factor.
         // Compatibility:
-        //  POV-Ray 3.6 used the trace level of the primary ray that happened to cause the
+        //  POV-Ray v3.6 used the trace level of the primary ray that happened to cause the
         //  sample to be taken, causing artifacts in scenes with reflective surfaces.
 
         recSettings[depth].traceLevel = int((1.5 * ((double)depth + 1)));
@@ -289,7 +287,7 @@ RadiosityRecursionSettings* SceneRadiositySettings::GetRecursionSettings(bool fi
 RadiosityFunction::RadiosityFunction(shared_ptr<SceneData> sd, TraceThreadData *td, const SceneRadiositySettings& rs,
                                      RadiosityCache& rc, Trace::CooperateFunctor& cf, bool ft, const Vector3d& camera) :
     threadData(td),
-    trace(sd, td, GetRadiosityQualityFlags(rs, QualityFlags(9)), cf, media, *this), // TODO FIXME - we can only use hard-coded Level-9 quality because Radiosity happens to be disabled at lower settings!
+    trace(sd, td, GetRadiosityQualityFlags(rs, QualityFlags(9)), cf, media, *this), // TODO FIXME - the only reason we can safely hard-code level-9 quality here is because radiosity happens to be disabled at lower settings
     media(td, &trace, &photonGatherer),
     photonGatherer(&sd->surfacePhotonMap, sd->photonSettings),
     radiosityCache(rc),
@@ -301,7 +299,7 @@ RadiosityFunction::RadiosityFunction(shared_ptr<SceneData> sd, TraceThreadData *
     topLevelQueryCount(0),
     topLevelReuse(0.0),
     tileId(0),
-    cacheBlockPool(NULL),
+    cacheBlockPool(nullptr),
     settings(rs),
     recursionSettings(rs.GetRecursionSettings(ft))
 {
@@ -311,10 +309,10 @@ RadiosityFunction::RadiosityFunction(shared_ptr<SceneData> sd, TraceThreadData *
 
 RadiosityFunction::~RadiosityFunction()
 {
-    if (cacheBlockPool != NULL) // shouldn't happen normally, but does happen when render is aborted
+    if (cacheBlockPool != nullptr) // shouldn't happen normally, but does happen when render is aborted
     {
         radiosityCache.ReleaseBlockPool(cacheBlockPool);
-        cacheBlockPool = NULL;
+        cacheBlockPool = nullptr;
     }
 
     delete[] recursionSettings;
@@ -335,13 +333,10 @@ void RadiosityFunction::ResetTopLevelStats()
 
 void RadiosityFunction::BeforeTile(int id, unsigned int pts)
 {
-    // TODO - find out why this assertion does not hold true when mosaic pretrace is enabled
-    /*
     if (isFinalTrace)
-        POV_RADIOSITY_ASSERT( pts == FINAL_TRACE );
+        POV_RADIOSITY_ASSERT(pts == FINAL_TRACE);
     else
-        POV_RADIOSITY_ASSERT( (pts >= PRETRACE_FIRST) && (pts <= PRETRACE_MAX) );
-    */
+        POV_RADIOSITY_ASSERT((pts >= PRETRACE_FIRST) && (pts <= PRETRACE_MAX));
 
     // different pretrace step than last tile
     if (pts != pretraceStep)
@@ -366,7 +361,7 @@ void RadiosityFunction::BeforeTile(int id, unsigned int pts)
     for (unsigned int depth = 0; depth < settings.recursionLimit; depth ++)
         recursionParameters[depth].directionGenerator.Reset(settings.directionPoolSize);
 
-    POV_RADIOSITY_ASSERT(cacheBlockPool == NULL);
+    POV_RADIOSITY_ASSERT(cacheBlockPool == nullptr);
     cacheBlockPool = radiosityCache.AcquireBlockPool();
 }
 
@@ -374,7 +369,7 @@ void RadiosityFunction::AfterTile()
 {
     // release block pool, just in case this happens to be the last tile for this thread
     radiosityCache.ReleaseBlockPool(cacheBlockPool);
-    cacheBlockPool = NULL;
+    cacheBlockPool = nullptr;
 }
 
 void RadiosityFunction::ComputeAmbient(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, DBL brilliance, MathColour& ambient_colour, DBL weight, TraceTicket& ticket)
@@ -596,7 +591,9 @@ double RadiosityFunction::GatherLight(const Vector3d& ipoint, const Vector3d& ra
             // this is necessary to fix problems splotchiness caused by very
             // bright objects
             // changed lighting.c to ignore phong/specular if tracing radiosity beam
-            // TODO FIXME - while the following line is required for backward compatibility, we might consider replacing .max() with .weight(), .weightMax() or .weightMaxAbs() for v3.7.x
+            // TODO FIXME - while the following line is required for backward compatibility,
+            //              we might consider replacing .max() with .weight(), .weightMax() or .weightMaxAbs()
+            //              in the future
             ColourChannel max_ill = temp_colour.Max();
 
             if((max_ill > settings.maxSample) && (settings.maxSample > 0.0))
@@ -885,7 +882,7 @@ bool RadiosityFunction::SampleDirectionGenerator::GetDirection(Vector3d& directi
 RadiosityCache::RadiosityCache(const SceneRadiositySettings& radset) :
     ra_reuse_count(0),
     ra_gather_count(0),
-    ot_fd(NULL),
+    ot_fd(nullptr),
     Gather_Total_Count(0),
     recursionSettings(radset.GetRecursionSettings(true)) // be prepared for the main render
 {
@@ -903,7 +900,7 @@ bool RadiosityCache::Load(const Path& inputFile)
 {
     bool ok = false;
     IStream* fd = NewIStream(inputFile, POV_File_Data_RCA);
-    if(fd != NULL)
+    if (fd != nullptr)
     {
         BlockPool* pool = AcquireBlockPool();
 
@@ -919,7 +916,6 @@ bool RadiosityCache::Load(const Path& inputFile)
         double nearest;
         int goodreads = 0;
         int count;
-        bool goodparse = true;
         DBL brightness;
         char normal_string[30], to_nearest_string[30];
         char line[101];
@@ -927,7 +923,7 @@ bool RadiosityCache::Load(const Path& inputFile)
         //info->Gather_Total.clear();
         //info->Gather_Total_Count = 0;
 
-        while (!(got_eof = fd->getline (line, 99).eof ()) && goodparse)
+        while (!(got_eof = !fd->getline (line, 99)))
         {
             switch ( line[0] )
             {
@@ -958,7 +954,7 @@ bool RadiosityCache::Load(const Path& inputFile)
                     );
                     illuminance = ToMathColour(tempCol);
 #else
-                    #error TODO!
+                    #error "TODO!"
 #endif
                     if ( count == 11 )
                     {
@@ -979,7 +975,7 @@ bool RadiosityCache::Load(const Path& inputFile)
 
                         line_num++;
 
-                        AddBlock(pool, NULL, point, normal, 1.0 /* TODO FIXME - brilliance */, to_nearest, dx, dy, dz, illuminance, harmonic_mean, nearest, 1.0 /* TODO FIXME - quality */, depth, PRETRACE_STEP_LOADED, 0);
+                        AddBlock(pool, nullptr, point, normal, 1.0 /* TODO FIXME - brilliance */, to_nearest, dx, dy, dz, illuminance, harmonic_mean, nearest, 1.0 /* TODO FIXME - quality */, depth, PRETRACE_STEP_LOADED, 0);
                         goodreads++;
                     }
                     break;
@@ -993,19 +989,11 @@ bool RadiosityCache::Load(const Path& inputFile)
             } // end switch
         } // end while-reading loop
 
-        if ( !got_eof  || !goodparse )
-        {
-            ;// TODO MESSAGE      PossibleError("Cannot process radiosity cache file at line %d.", (int)line_num);
-            ok = false;
-        }
+        if ( goodreads > 0 )
+            ;// TODO MESSAGE         Debug_Info("Reloaded %d values from radiosity cache file.\n", goodreads);
         else
-        {
-            if ( goodreads > 0 )
-                ;// TODO MESSAGE         Debug_Info("Reloaded %d values from radiosity cache file.\n", goodreads);
-            else
-                ;// TODO MESSAGE         PossibleError("Unable to read any values from the radiosity cache file.");
-            ok = true;
-        }
+            ;// TODO MESSAGE         PossibleError("Unable to read any values from the radiosity cache file.");
+        ok = true;
 
         ReleaseBlockPool(pool);
 
@@ -1051,12 +1039,11 @@ RadiosityCache::~RadiosityCache()
         boost::mutex::scoped_lock lock(fileMutex);
 #endif
         // finish up cache file
-        if(ot_fd != NULL)
+        if (ot_fd != nullptr)
         {
             // close cache file
-            ot_fd->close();
             delete ot_fd;
-            ot_fd = NULL;
+            ot_fd = nullptr;
         }
     }
 
@@ -1065,7 +1052,7 @@ RadiosityCache::~RadiosityCache()
         boost::mutex::scoped_lock lockTree(octree.treeMutex);
         boost::mutex::scoped_lock lockBlock(octree.blockMutex);
 #endif
-        if (octree.root != NULL)
+        if (octree.root != nullptr)
             ot_free_tree(&octree.root);
     }
 
@@ -1118,9 +1105,9 @@ void RadiosityCache::ReleaseBlockPool(RadiosityCache::BlockPool* pool)
 
 ot_block_struct *RadiosityCache::BlockPool::NewBlock()
 {
-    ot_block_struct *block = NULL;
+    ot_block_struct *block = nullptr;
 
-    if(head == NULL || nextFreeBlock >= BLOCK_POOL_UNIT_SIZE)
+    if (head == nullptr || nextFreeBlock >= BLOCK_POOL_UNIT_SIZE)
     {
         head = new PoolUnit(head);
         nextFreeBlock = 0;
@@ -1134,8 +1121,8 @@ ot_block_struct *RadiosityCache::BlockPool::NewBlock()
 }
 
 RadiosityCache::BlockPool::BlockPool() :
-    head(NULL),
-    savedHead(NULL),
+    head(nullptr),
+    savedHead(nullptr),
     nextFreeBlock(0),
     nextUnsavedBlock(0)
 {
@@ -1144,10 +1131,10 @@ RadiosityCache::BlockPool::BlockPool() :
 
 void RadiosityCache::BlockPool::Save(OStream* fd)
 {
-    if (fd != NULL)
+    if (fd != nullptr)
     {
         PoolUnit* unit = head;
-        while (unit != NULL && unit != savedHead)
+        while ((unit != nullptr) && (unit != savedHead))
         {
             unsigned int from = 0;
             unsigned int to   = BLOCK_POOL_UNIT_SIZE;
@@ -1167,7 +1154,7 @@ void RadiosityCache::BlockPool::Save(OStream* fd)
     }
     // no else; if we're not writing to a file, still pretend we saved so the destructor doesn't assert
 
-    if (head != NULL)
+    if (head != nullptr)
     {
         // update the variables indicating how far we have saved
         savedHead = head->next; // the head is incomplete, so it cannot be saved completely...
@@ -1175,7 +1162,7 @@ void RadiosityCache::BlockPool::Save(OStream* fd)
     }
     else
     {
-        POV_RADIOSITY_ASSERT(savedHead == NULL);
+        POV_RADIOSITY_ASSERT(savedHead == nullptr);
         POV_RADIOSITY_ASSERT(nextUnsavedBlock == 0);
     }
 }
@@ -1183,9 +1170,9 @@ void RadiosityCache::BlockPool::Save(OStream* fd)
 RadiosityCache::BlockPool::~BlockPool()
 {
     // require that block has been saved by now
-    POV_RADIOSITY_ASSERT(head == NULL || ((savedHead == head->next) && (nextUnsavedBlock == nextFreeBlock)));
+    POV_RADIOSITY_ASSERT((head == nullptr) || ((savedHead == head->next) && (nextUnsavedBlock == nextFreeBlock)));
 
-    while(head != NULL)
+    while (head != nullptr)
     {
         PoolUnit *b = head;
         head = head->next;
@@ -1223,7 +1210,7 @@ void RadiosityCache::AddBlock(BlockPool* pool, RenderStatistics* stats, const Ve
     block->TileId = OT_TILE(tileId);
     block->Point = point;
     block->S_Normal = normal;
-    block->next = NULL;
+    block->next = nullptr;
 
     // figure out the block id
     ot_index_sphere(point, harmonicMeanDistance * recSettings.octreeAddressFactor, &id);
@@ -1250,9 +1237,9 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
 #endif
 
     // If there is no root yet, create one.  This is a first-time-through
-    if (octree.root == NULL)
+    if (octree.root == nullptr)
     {
-        // CLi moved C99_COMPATIBLE_RADIOSITY check from ot_newroot() to ot_ins() NULL root handling section
+        // CLi moved C99_COMPATIBLE_RADIOSITY check from ot_newroot() to ot_ins() `nullptr` root handling section
         // (no need to do this again and again for every new node inserted)
 #if(C99_COMPATIBLE_RADIOSITY == 0)
         if((sizeof(int) != 4) || (sizeof(float) != 4))
@@ -1272,11 +1259,12 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
 
         // Now that we have exclusive write access, make sure we REALLY don't have a root
         // (some other thread might have created it just as we were waiting to get the lock)
-        if (octree.root == NULL)
+        if (octree.root == nullptr)
         {
             octree.root = new ot_node_struct;
 #ifdef OCTREE_PERFORMANCE_DEBUG
-            if (stats != NULL) (*stats)[Radiosity_OctreeNodes]++;
+            if (stats != nullptr)
+                (*stats)[Radiosity_OctreeNodes]++;
 #endif
 
 #ifdef RADSTATS
@@ -1393,7 +1381,7 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
 
         index = dx + dy + dz;
 
-        if (this_node->Kids[index] == NULL)
+        if (this_node->Kids[index] == nullptr)
         {
             // Next level down doesn't exist yet, so create it
 
@@ -1404,11 +1392,12 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
 #endif
 
             // We may have acquired the lock just now, so some other task may have changed the root since last time we looked
-            if (this_node->Kids[index] == NULL)
+            if (this_node->Kids[index] == nullptr)
             {
                 temp_node = new ot_node_struct;
 #ifdef OCTREE_PERFORMANCE_DEBUG
-                if (stats!= NULL) (*stats)[Radiosity_OctreeNodes]++;
+                if (stats!= nullptr)
+                    (*stats)[Radiosity_OctreeNodes]++;
 #endif
 
 #ifdef RADSTATS
@@ -1471,7 +1460,7 @@ void RadiosityCache::InsertBlock(ot_node_struct *node, ot_block_struct *block)
 
 DBL RadiosityCache::FindReusableBlock(RenderStatistics& stats, DBL errorbound, const Vector3d& ipoint, const Vector3d& snormal, DBL brilliance, MathColour& illuminance, int recursionDepth, int pretraceStep, int tileId)
 {
-    if(octree.root != NULL)
+    if (octree.root != nullptr)
     {
         WT_AVG gather;
 

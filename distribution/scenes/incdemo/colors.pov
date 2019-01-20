@@ -676,22 +676,23 @@ sphere {
   <Col4, Row10, Dist>, Radius
     pigment {Scarlet}
 }
-/*
+
 sphere {
   <Col5, Row10, Dist>, Radius
-    pigment { }
+    pigment {Med_Purple}
 }
 
 sphere {
   <Col6, Row10, Dist>, Radius
-    pigment { }
+    pigment {Light_Purple}
 }
 
 sphere {
   <Col7, Row10, Dist>, Radius
-    pigment { }
+    pigment {Very_Light_Purple}
 }
 
+/*
 sphere {
   <Col8, Row10, Dist>, Radius
     pigment { }

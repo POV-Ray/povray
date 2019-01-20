@@ -54,11 +54,11 @@
 #if (meshcam_file>0)
   // get the file name
   #if (use_distortion=0) 
-    #declare prefix="meshcam-pinhole_"; 
+    #declare Prefix="meshcam-pinhole_"; 
   #else 
-    #declare prefix="meshcam-lens_"; 
+    #declare Prefix="meshcam-lens_"; 
   #end
-  #declare mesh_file=concat(concat(concat(concat(concat(concat(prefix,str(image_width,0,0)),"x"),str(image_height,0,0)),"-angle_"),str(c_angle,0,0)),".inc");
+  #declare mesh_file=concat(concat(concat(concat(concat(concat(Prefix,str(image_width,0,0)),"x"),str(image_height,0,0)),"-angle_"),str(c_angle,0,0)),".inc");
 #else
   // ..wich should be empty to turn the mesh file off
   #declare mesh_file="";

@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -59,6 +59,14 @@ class OStream;
 
 namespace pov
 {
+
+//##############################################################################
+///
+/// @defgroup PovCoreSupportOctree Octree
+/// @ingroup PovCore
+///
+/// @{
+
 using namespace pov_base;
 
 /*****************************************************************************
@@ -128,7 +136,7 @@ struct ot_node_struct
     OT_BLOCK *Values;
     OT_NODE  *Kids[8];
 
-    ot_node_struct() : Id(), Values(NULL) { for(unsigned int i = 0; i < 8; i ++) { Kids[i] = NULL; } }
+    ot_node_struct() : Id(), Values(nullptr) { for (unsigned int i = 0; i < 8; i ++) { Kids[i] = nullptr; } }
 };
 
 // These are informations the octree reader needs to know
@@ -160,6 +168,10 @@ bool ot_free_tree (OT_NODE **root_ptr);
 bool ot_read_file (OT_NODE **root, IStream * fd, const OT_READ_PARAM* param, OT_READ_INFO* info);
 void ot_newroot (OT_NODE **root_ptr);
 void ot_parent (OT_ID *dad, OT_ID *kid);
+
+/// @}
+///
+//##############################################################################
 
 }
 

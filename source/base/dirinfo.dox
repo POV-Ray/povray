@@ -1,2 +1,21 @@
-/// @dir
-/// Source code files shared between back-end and front-end.
+/**
+
+@defgroup PovBase POV-Ray Base Module
+@ingroup PovSource
+@brief Common code shared between otherwise unrelated modules.
+
+This module is a loose collection of miscellaneous utility code that happens to be shared across
+modules that should not interface directly, such as the @ref PovCore and @ref PovFrontend.
+
+The base module is intended to be mostly unaware of multithreading, except that it makes provisions
+for sharing a few of its data structures -- mostly related to performance optimizations -- among
+multiple threads.
+
+@{
+
+@dir
+@brief Source code files for the @ref PovBase.
+
+@}
+
+*/

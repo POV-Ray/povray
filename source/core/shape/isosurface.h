@@ -4,14 +4,15 @@
 ///
 /// Declarations related to the isosurface geometric primitive.
 ///
-/// This module was written by D.Skarda & T.Bily and modified by R.Suzuki.
-/// Ported to POV-Ray 3.5 by Thorsten Froehlich.
+/// @author D.Skarda, T.Bily (original code)
+/// @author R.Suzuki (modifications)
+/// @author Thorsten Froehlich (porting to POV-Ray v3.5)
 ///
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -42,17 +43,32 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+#include <boost/intrusive_ptr.hpp>
+
 #include "core/coretypes.h"
 #include "core/scene/object.h"
 
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
 
-#define ISOSURFACE_OBJECT      (BASIC_OBJECT)
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
+
+#define ISOSURFACE_OBJECT      (BASIC_OBJECT+POTENTIAL_OBJECT)
+
+/// @}
+///
+//******************************************************************************
+
 #define ISOSURFACE_MAXTRACE    10
 
 
@@ -61,18 +77,12 @@ namespace pov
 ******************************************************************************/
 
 class IsoSurface;
-class FPUContext;
 
-class FunctionVM;
+typedef unsigned char IsosurfaceMaxTrace;
 
 struct ISO_Pair { DBL t,f; };
 
-struct ISO_Max_Gradient
-{
-    unsigned int refcnt;
-    DBL max_gradient, gradient;
-    DBL eval_max, eval_cnt, eval_gradient_sum, eval_var;
-};
+struct ISO_Max_Gradient;
 
 struct ISO_ThreadData
 {
@@ -92,15 +102,15 @@ class IsoSurface : public ObjectBase
     public:
 
         GenericScalarFunctionPtr Function;
-        volatile DBL max_gradient; // global in eval
+        volatile DBL max_gradient; // modified during render if `eval` is set
         DBL gradient;
         DBL threshold;
         DBL accuracy;
         DBL eval_param[3];
-        int max_trace;
-        bool closed;
-        bool eval;
-        bool isCopy;
+        IsosurfaceMaxTrace max_trace;
+        bool closed             : 1;
+        bool eval               : 1;
+        bool positivePolarity   : 1; ///< `true` if values above threshold are considered inside, `false` if considered outside.
 
         shared_ptr<ContainedByShape> container;
 
@@ -111,6 +121,7 @@ class IsoSurface : public ObjectBase
 
         virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
         virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+        virtual double GetPotential (const Vector3d&, bool subtractThreshold, TraceThreadData *) const;
         virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
         virtual void Translate(const Vector3d&, const TRANSFORM *);
         virtual void Rotate(const Vector3d&, const TRANSFORM *);
@@ -118,16 +129,25 @@ class IsoSurface : public ObjectBase
         virtual void Transform(const TRANSFORM *);
         virtual void Compute_BBox();
 
-        virtual void DispatchShutdownMessages(CoreMessenger& messenger);
+        virtual void DispatchShutdownMessages(GenericMessenger& messenger);
 
     protected:
         bool Function_Find_Root(ISO_ThreadData& itd, const Vector3d&, const Vector3d&, DBL*, DBL*, DBL& max_gradient, bool in_shadow_test, TraceThreadData* pThreadData);
         bool Function_Find_Root_R(ISO_ThreadData& itd, const ISO_Pair*, const ISO_Pair*, DBL, DBL, DBL, DBL& max_gradient, TraceThreadData* pThreadData);
 
         inline DBL Float_Function(ISO_ThreadData& itd, DBL t) const;
+        inline DBL EvaluateAbs (GenericScalarFunctionInstance& fn, Vector3d& p) const;
+        inline DBL EvaluatePolarized (GenericScalarFunctionInstance& fn, Vector3d& p) const;
+        inline bool IsInside (GenericScalarFunctionInstance& fn, Vector3d& p) const;
+
     private:
-        ISO_Max_Gradient *mginfo; // global, but just a statistic (read: not thread safe but we don't care) [trf]
+
+        intrusive_ptr<ISO_Max_Gradient> mginfo; // global, but just a statistic (read: not thread safe but we don't care) [trf]
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

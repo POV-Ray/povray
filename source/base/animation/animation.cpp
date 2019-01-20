@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -56,7 +56,7 @@ namespace pov_base
 Animation::Animation(FileType aftype, IStream *file, const ReadOptions& options) :
     fileType(aftype),
     inFile(file),
-    outFile(NULL),
+    outFile(nullptr),
     readOptions(options)
 {
     float seconds = 0.0f;
@@ -67,16 +67,21 @@ Animation::Animation(FileType aftype, IStream *file, const ReadOptions& options)
     {
         case AVI:
         //  state = Avi::ReadFileHeader(inFile, seconds, totalFrames, codec, width, height, readOptions, warnings);
+            POV_RTR_ASSERT(false);
             break;
         case MOV:
             state = Moov::ReadFileHeader(inFile, seconds, totalFrames, codec, width, height, readOptions, warnings);
             break;
         case MPEG:
         //  state = Mpeg::ReadFileHeader(inFile, seconds, totalFrames, codec, width, height, readOptions, warnings);
+            POV_RTR_ASSERT(false);
+            break;
+        default:
+            POV_RTR_ASSERT(false);
             break;
     }
 
-    if(state == NULL)
+    if (state == nullptr)
         throw POV_EXCEPTION(kCannotHandleDataErr, "Cannot read animation file header in the specified format!");
 
     frameDuration = seconds / float(totalFrames);
@@ -84,7 +89,7 @@ Animation::Animation(FileType aftype, IStream *file, const ReadOptions& options)
 
 Animation::Animation(FileType aftype, CodecType c, OStream *file, unsigned int w, unsigned int h, const WriteOptions& options) :
     fileType(aftype),
-    inFile(NULL),
+    inFile(nullptr),
     outFile(file),
     width(w),
     height(h),
@@ -100,16 +105,21 @@ Animation::Animation(FileType aftype, CodecType c, OStream *file, unsigned int w
     {
         case AVI:
         //  state = Avi::WriteFileHeader(outFile, codec, width, height, writeOptions, warnings);
+            POV_RTR_ASSERT(false);
             break;
         case MOV:
             state = Moov::WriteFileHeader(outFile, codec, width, height, writeOptions, warnings);
             break;
         case MPEG:
         //  state = Mpeg::WriteFileHeader(outFile, codec, width, height, writeOptions, warnings);
+            POV_RTR_ASSERT(false);
+            break;
+        default:
+            POV_RTR_ASSERT(false);
             break;
     }
 
-    if(state == NULL)
+    if (state == nullptr)
         throw POV_EXCEPTION(kCannotHandleDataErr, "Cannot write animation file with the specified format and codec!");
 
     // TODO FIXME - build blur matrix (this code only builds an identity matrix)
@@ -123,38 +133,48 @@ Animation::Animation(FileType aftype, CodecType c, OStream *file, unsigned int w
 
 Animation::~Animation()
 {
-    if(outFile != NULL)
+    if (outFile != nullptr)
     {
         switch(fileType)
         {
             case AVI:
             //  Avi::FinishWriteFile(outFile, writeOptions, warnings, state);
+                POV_RTR_ASSERT(false);
                 break;
             case MOV:
                 Moov::FinishWriteFile(outFile, writeOptions, warnings, state);
                 break;
             case MPEG:
             //  Mpeg::FinishWriteFile(outFile, writeOptions, warnings, state);
+                POV_RTR_ASSERT(false);
+                break;
+            default:
+                POV_RTR_ASSERT(false);
                 break;
         }
     }
-    else if(inFile != NULL)
+    else if (inFile != nullptr)
     {
         switch(fileType)
         {
             case AVI:
             //  Avi::FinishReadFile(inFile, warnings, state);
+                POV_RTR_ASSERT(false);
                 break;
             case MOV:
                 Moov::FinishReadFile(inFile, warnings, state);
                 break;
             case MPEG:
             //  Mpeg::FinishReadFile(inFile, warnings, state);
+                POV_RTR_ASSERT(false);
+                break;
+            default:
+                POV_RTR_ASSERT(false);
                 break;
         }
     }
 
-    state = NULL;
+    state = nullptr;
 }
 
 Animation *Animation::Open(FileType aftype, IStream *file, const ReadOptions& options) // reading only
@@ -237,8 +257,8 @@ void Animation::ClearWarnings()
 
 Image *Animation::ReadFrame(IStream *file)
 {
-    POV_LONG bytes = 0;
-    Image *image = NULL;
+    POV_OFF_T bytes = 0;
+    Image *image = nullptr;
     Image::ReadOptions options;
 
     options.defaultGamma = PowerLawGammaCurve::GetByDecodingGamma(readOptions.gamma);
@@ -249,13 +269,17 @@ Image *Animation::ReadFrame(IStream *file)
     {
         case AVI:
         //  Avi::PreReadFrame(file, currentFrame, bytes, codec, readOptions, warnings, state);
+            POV_RTR_ASSERT(false);
             break;
         case MOV:
             Moov::PreReadFrame(file, currentFrame, bytes, codec, readOptions, warnings, state);
             break;
+        default:
+            POV_RTR_ASSERT(false);
+            break;
     }
 
-    POV_LONG prepos = file->tellg();
+    POV_OFF_T prepos = file->tellg();
 
     switch(codec)
     {
@@ -271,6 +295,10 @@ Image *Animation::ReadFrame(IStream *file)
         case MPEG1Codec:
         case MPEG2Codec:
         //  image = Mpeg::ReadFrame(file, currentFrame, codec, readOptions, warnings, state);
+            POV_RTR_ASSERT(false);
+            break;
+        default:
+            POV_RTR_ASSERT(false);
             break;
     }
 
@@ -279,28 +307,32 @@ Image *Animation::ReadFrame(IStream *file)
     else if(file->tellg() > (prepos + bytes))
         throw POV_EXCEPTION(kInvalidDataSizeErr, "Frame decompressor read more bytes than expected. The input file may be corrupted!");
 
-    file->seekg(prepos + bytes, SEEK_END);
+    file->seekg(prepos + bytes, IOBase::seek_end);
 
     switch(fileType)
     {
         case AVI:
         //  Avi::PostReadFrame(file, currentFrame, bytes, codec, readOptions, warnings, state);
+            POV_RTR_ASSERT(false);
             break;
         case MOV:
             Moov::PostReadFrame(file, currentFrame, bytes, codec, readOptions, warnings, state);
+            break;
+        default:
+            POV_RTR_ASSERT(false);
             break;
     }
 
     return image;
 }
 
-POV_LONG Animation::WriteFrame(OStream *file, const Image *image)
+POV_OFF_T Animation::WriteFrame(OStream *file, const Image *image)
 {
     Image::WriteOptions options;
 
-    options.bpcc = writeOptions.bpcc;
-    options.alphachannel = writeOptions.alphachannel;
-    options.compress = writeOptions.compress;
+    options.bitsPerChannel = writeOptions.bpcc;
+    options.alphaMode = (writeOptions.alphachannel ? Image::kAlphaMode_Default : Image::kAlphaMode_None);
+    options.compression = writeOptions.compress;
     // options.gamma = writeOptions.gamma;
     options.encodingGamma = PowerLawGammaCurve::GetByEncodingGamma(writeOptions.gamma);
 
@@ -308,13 +340,17 @@ POV_LONG Animation::WriteFrame(OStream *file, const Image *image)
     {
         case AVI:
         //  Avi::PreWriteFrame(file, writeOptions, warnings, state);
+            POV_RTR_ASSERT(false);
             break;
         case MOV:
             Moov::PreWriteFrame(file, writeOptions, warnings, state);
             break;
+        default:
+            POV_RTR_ASSERT(false);
+            break;
     }
 
-    POV_LONG bytes = file->tellg();
+    POV_OFF_T bytes = file->tellg();
 
     switch(codec)
     {
@@ -326,10 +362,15 @@ POV_LONG Animation::WriteFrame(OStream *file, const Image *image)
             break;
         case JPEGCodec:
             // TODO FIXME Jpeg::Write(file, image, options);
+            POV_RTR_ASSERT(false);
             break;
         case MPEG1Codec:
         case MPEG2Codec:
         //  Mpeg::WriteFrame(file, image, codec, writeOptions, warnings, state);
+            POV_RTR_ASSERT(false);
+            break;
+        default:
+            POV_RTR_ASSERT(false);
             break;
     }
 
@@ -339,9 +380,13 @@ POV_LONG Animation::WriteFrame(OStream *file, const Image *image)
     {
         case AVI:
         //  Avi::PostWriteFrame(file, bytes, writeOptions, warnings, state);
+            POV_RTR_ASSERT(false);
             break;
         case MOV:
             Moov::PostWriteFrame(file, bytes, writeOptions, warnings, state);
+            break;
+        default:
+            POV_RTR_ASSERT(false);
             break;
     }
 

@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -96,7 +96,7 @@ static inline unsigned char Read_Safe_Char (IStream& in)
 {
     unsigned char ch;
 
-    in >> ch;
+    ch = in.Read_Byte();
     if (!in)
         throw POV_EXCEPTION(kFileDataErr, "Error reading data from BMP image.") ;
 
@@ -459,30 +459,26 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
     int             width = image->GetWidth();
     int             height = image->GetHeight();
     int             pad = (4 - ((width * 3) % 4)) & 0x03 ;
-    bool            alpha = image->HasTransparency() && options.alphachannel;
+    bool            alpha = image->HasTransparency() && options.AlphaIsEnabled();
     unsigned int    r ;
     unsigned int    g ;
     unsigned int    b ;
     unsigned int    a ;
     GammaCurvePtr   gamma;
-    DitherHandler*  dither = options.dither.get();
+    DitherStrategy& dither = *options.ditherStrategy;
 
-    if (options.encodingGamma)
-        gamma = TranscodingGammaCurve::Get(options.workingGamma, options.encodingGamma);
-    else
-        // BMP files used to have no clearly defined gamma by default, but a Microsoft recommendation exists to assume sRGB.
-        gamma = TranscodingGammaCurve::Get(options.workingGamma, SRGBGammaCurve::Get());
+    // BMP files used to have no clearly defined gamma by default, but a Microsoft recommendation exists to assume sRGB.
+    gamma = options.GetTranscodingGammaCurve(SRGBGammaCurve::Get());
 
     // TODO ALPHA - check if BMP should really keep presuming non-premultiplied alpha
     // We presume non-premultiplied alpha, unless the user overrides
     // (e.g. to handle a non-compliant file).
-    bool premul = false;
-    if (options.premultiplyOverride)
-        premul = options.premultiply;
+    bool premul = options.AlphaIsPremultiplied(false);
 
     int count = (width * (alpha ? 32 : 24) + 31) / 32 * 4 * height;
 
-    *file << 'B' << 'M' ;
+    file->Write_Byte('B');
+    file->Write_Byte('M');
     Write_Long (file, 14 + 40 + count) ;
     Write_Short (file, 0) ;
     Write_Short (file, 0) ;
@@ -504,18 +500,18 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
         for (int x = 0 ; x < width ; x++)
         {
             if (alpha)
-                GetEncodedRGBAValue (image, x, y, gamma, 255, r, g, b, a, *dither, premul);
+                GetEncodedRGBAValue (image, x, y, gamma, 255, r, g, b, a, dither, premul);
             else
-                GetEncodedRGBValue (image, x, y, gamma, 255, r, g, b, *dither) ;
-            *file << (unsigned char) b;
-            *file << (unsigned char) g;
-            *file << (unsigned char) r;
+                GetEncodedRGBValue (image, x, y, gamma, 255, r, g, b, dither) ;
+            file->Write_Byte((unsigned char) b);
+            file->Write_Byte((unsigned char) g);
+            file->Write_Byte((unsigned char) r);
             if (alpha)
-                *file << (unsigned char) a;
+                file->Write_Byte((unsigned char) a);
         }
         if (!alpha)
             for (int i = 0 ; i < pad; i++)
-                *file << (unsigned char) 0 ;
+                file->Write_Byte((unsigned char) 0);
     }
 
     if (!*file)
@@ -528,7 +524,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     unsigned file_depth, file_colors;
     unsigned data_location, planes, compression;
     unsigned info;
-    Image *image = NULL ;
+    Image *image = nullptr;
 
     // BMP files used to have no clearly defined gamma by default, but a Microsoft recommendation exists to assume sRGB.
     // Since ~1995, a header extension (BITMAPV4HEADER) with gamma metadata exists, which could be used if present.

@@ -16,8 +16,8 @@
 ///
 /// ----------------------------------------------------------------------------
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -48,8 +48,8 @@
 #include "base/pov_err.h"
 
 #include "core/material/blendmap.h"
+#include "core/material/noise.h"
 #include "core/material/pigment.h"
-#include "core/material/texture.h"
 #include "core/material/warp.h"
 #include "core/scene/object.h"
 #include "core/scene/tracethreaddata.h"
@@ -121,12 +121,12 @@ static void facets (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& no
 
 static void ripples (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal, const TraceThreadData *Thread)
 {
-    register unsigned int i;
-    register DBL length, scalar, index;
+    unsigned int i;
+    DBL length, scalar, index;
     Vector3d point;
 
     RipplesPattern* pPat = dynamic_cast<RipplesPattern*>(Tnormal->pattern.get());
-    if (pPat == NULL)
+    if (pPat == nullptr)
         throw POV_EXCEPTION_STRING("Invalid pattern type.");
 
     for (i = 0; i < Thread->numberOfWaves; i++)
@@ -171,12 +171,12 @@ static void ripples (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& n
 
 static void waves (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal, const TraceThreadData *Thread)
 {
-    register unsigned int i;
-    register DBL length, scalar, index, sinValue;
+    unsigned int i;
+    DBL length, scalar, index, sinValue;
     Vector3d point;
 
     WavesPattern* pPat = dynamic_cast<WavesPattern*>(Tnormal->pattern.get());
-    if (pPat == NULL)
+    if (pPat == nullptr)
         throw POV_EXCEPTION_STRING("Invalid pattern type.");
 
     for (i = 0; i < Thread->numberOfWaves; i++)
@@ -316,8 +316,8 @@ static void dents (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& nor
 
 static void wrinkles (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal)
 {
-    register int i;
-    register DBL scale = 1.0;
+    int i;
+    DBL scale = 1.0;
     Vector3d result, value, value2;
 
     result = Vector3d(0.0, 0.0, 0.0);
@@ -371,7 +371,10 @@ static void quilted (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& n
 
     t = value.length();
 
-    t = quilt_cubic(t, dynamic_cast<QuiltedPattern*>(Tnormal->pattern.get())->Control0, dynamic_cast<QuiltedPattern*>(Tnormal->pattern.get())->Control1);
+    const QuiltedPattern *pattern = dynamic_cast<QuiltedPattern*>(Tnormal->pattern.get());
+    POV_PATTERN_ASSERT(pattern);
+
+    t = quilt_cubic(t, pattern->Control0, pattern->Control1);
 
     value *= t;
 
@@ -414,15 +417,18 @@ static void facets (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& no
     int      UseUnity;
     DBL      Metric;
 
+    const FacetsPattern *pattern = dynamic_cast<FacetsPattern*>(Tnormal->pattern.get());
+    POV_PATTERN_ASSERT(pattern);
+
     Vector3d *cv = Thread->Facets_Cube;
-    Metric = dynamic_cast<FacetsPattern*>(Tnormal->pattern.get())->facetsMetric;
+    Metric = pattern->facetsMetric;
 
     UseSquare = (Metric == 2 );
     UseUnity  = (Metric == 1 );
 
     normal.normalize();
 
-    if ( dynamic_cast<FacetsPattern*>(Tnormal->pattern.get())->facetsCoords )
+    if (pattern->facetsCoords)
     {
         tv = EPoint;
     }
@@ -431,13 +437,13 @@ static void facets (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& no
         tv = normal;
     }
 
-    if ( dynamic_cast<FacetsPattern*>(Tnormal->pattern.get())->facetsSize < 1e-6 )
+    if (pattern->facetsSize < 1e-6)
     {
         scale = 1e6;
     }
     else
     {
-        scale = 1. / dynamic_cast<FacetsPattern*>(Tnormal->pattern.get())->facetsSize;
+        scale = 1. / pattern->facetsSize;
     }
 
     tv *= scale;
@@ -545,13 +551,13 @@ static void facets (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& no
         }
     }
 
-    if ( dynamic_cast<FacetsPattern*>(Tnormal->pattern.get())->facetsCoords )
+    if (pattern->facetsCoords)
     {
         DNoise( pert, newnormal );
         sum = dot(pert, normal);
         newnormal = normal * sum;
         pert -= newnormal;
-        normal += dynamic_cast<FacetsPattern*>(Tnormal->pattern.get())->facetsCoords * pert;
+        normal += pattern->facetsCoords * pert;
     }
     else
     {
@@ -629,7 +635,7 @@ TNORMAL *Copy_Tnormal (TNORMAL *Old)
 {
     TNORMAL *New;
 
-    if (Old != NULL)
+    if (Old != nullptr)
     {
         New = Create_Tnormal();
 
@@ -641,7 +647,7 @@ TNORMAL *Copy_Tnormal (TNORMAL *Old)
     }
     else
     {
-        New = NULL;
+        New = nullptr;
     }
 
     return (New);
@@ -673,7 +679,7 @@ TNORMAL *Copy_Tnormal (TNORMAL *Old)
 
 void Destroy_Tnormal(TNORMAL *Tnormal)
 {
-    if (Tnormal != NULL)
+    if (Tnormal != nullptr)
         delete Tnormal;
 }
 
@@ -705,7 +711,7 @@ void Post_Tnormal (TNORMAL *Tnormal)
 {
     GenericNormalBlendMapPtr Map;
 
-    if (Tnormal != NULL)
+    if (Tnormal != nullptr)
     {
         if (Tnormal->Flags & POST_DONE)
         {
@@ -719,7 +725,7 @@ void Post_Tnormal (TNORMAL *Tnormal)
 
         Tnormal->Flags |= POST_DONE;
 
-        if ((Map = Tnormal->Blend_Map) != NULL)
+        if ((Map = Tnormal->Blend_Map) != nullptr)
         {
             Map->Post((Tnormal->Flags & DONT_SCALE_BUMPS_FLAG) != 0);
         }
@@ -739,7 +745,6 @@ void NormalBlendMap::Post(bool dontScaleBumps)
         if (dontScaleBumps)
             i->Vals->Flags |= DONT_SCALE_BUMPS_FLAG;
         Post_Tnormal(i->Vals);
-        break;
     }
 }
 
@@ -775,7 +780,7 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
     int i;
     shared_ptr<NormalBlendMap> Blend_Map;
 
-    if (Tnormal==NULL)
+    if (Tnormal == nullptr)
     {
         return;
     }
@@ -783,7 +788,7 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
     /* If normal_map present, use it and return */
 
     Blend_Map = dynamic_pointer_cast<NormalBlendMap>(Tnormal->Blend_Map);
-    if (Blend_Map != NULL)
+    if (Blend_Map != nullptr)
     {
         if (Tnormal->Type == UV_MAP_PATTERN)
         {
@@ -839,7 +844,7 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
 
     /* No normal_map. */
 
-    if (Tnormal->Type <= LAST_NORM_ONLY_PATTERN)
+    if (Tnormal->Type <= LAST_SPECIAL_NORM_PATTERN)
     {
         Warp_Normal(Layer_Normal,Layer_Normal, Tnormal,
                     Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
@@ -887,7 +892,6 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
 
         UnWarp_Normal(Layer_Normal,Layer_Normal,Tnormal,
                       Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
-
     }
 
     if ( Intersection )
@@ -919,7 +923,7 @@ static DBL Do_Slope_Map (DBL value, const SlopeBlendMap *Blend_Map)
     DBL prevWeight, curWeight;
     const SlopeBlendMapEntry *Prev, *Cur;
 
-    if (Blend_Map == NULL)
+    if (Blend_Map == nullptr)
     {
         return(value);
     }
@@ -984,7 +988,7 @@ static DBL Hermite_Cubic(DBL T1, const Vector2d& UV1, const Vector2d& UV2)
 * DESCRIPTION
 *
 * CHANGES
-*    Added intersectin parameter for UV mapping - NK 1998
+*    Added intersection parameter for UV mapping - NK 1998
 *
 ******************************************************************************/
 

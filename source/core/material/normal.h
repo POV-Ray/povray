@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -45,6 +45,13 @@
 
 namespace pov
 {
+
+//##############################################################################
+///
+/// @defgroup PovCoreMaterialNormal Surface Normal Perturbation
+/// @ingroup PovCore
+///
+/// @{
 
 class Intersection;
 class Ray;
@@ -114,6 +121,10 @@ TNORMAL *Copy_Tnormal (TNORMAL *Old);
 void Destroy_Tnormal (TNORMAL *Tnormal);
 void Post_Tnormal (TNORMAL *Tnormal);
 void Perturb_Normal (Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector3d& IPoint, Intersection *Intersection, const Ray *ray, TraceThreadData *Thread);
+
+/// @}
+///
+//##############################################################################
 
 }
 

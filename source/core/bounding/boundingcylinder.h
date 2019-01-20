@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -43,6 +43,13 @@
 
 namespace pov
 {
+
+//##############################################################################
+///
+/// @defgroup PovCoreBoundingCylinder Bounding Cylinders
+/// @ingroup PovCoreBounding
+///
+/// @{
 
 /*****************************************************************************
 * Global preprocessor defines
@@ -85,13 +92,6 @@ struct BCyl_Struct
 };
 
 
-
-/*****************************************************************************
-* Global variables
-******************************************************************************/
-
-
-
 /*****************************************************************************
 * Global functions
 ******************************************************************************/
@@ -100,6 +100,10 @@ BCYL *Create_BCyl (int, const DBL *, const DBL *, const DBL *, const DBL *);
 void Destroy_BCyl (BCYL *);
 
 int Intersect_BCyl (const BCYL *BCyl, vector<BCYL_INT>& Intervals, vector<BCYL_INT>& rint, vector<BCYL_INT>& hint, const Vector3d& P, const Vector3d& D);
+
+/// @}
+///
+//##############################################################################
 
 }
 

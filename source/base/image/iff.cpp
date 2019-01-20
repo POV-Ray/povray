@@ -8,8 +8,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -118,7 +118,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     int                             colourmap_size = 0;
     int                             width = -1;
     int                             height = -1;
-    Image                           *image = NULL;
+    Image                           *image = nullptr;
     CHUNK_HEADER                    Chunk_Header;
     unsigned int                    r;
     unsigned int                    g;

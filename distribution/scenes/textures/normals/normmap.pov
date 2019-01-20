@@ -27,7 +27,7 @@ global_settings { assumed_gamma 1.0 }
 
  #default {
      pigment { White }
-     normal { bump_size 1.5 }
+     normal { bumps bump_size 1.5 }
      finish { phong 0.8 phong_size 200 }
  }
 

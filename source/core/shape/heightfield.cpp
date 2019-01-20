@@ -11,8 +11,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -89,6 +89,31 @@ const DBL HFIELD_OFFSET = 0.001;
 const DBL HFIELD_TOLERANCE = 1.0e-6;
 
 
+//****************************************************************************
+// Local Types
+
+typedef short HF_Normals[3];
+
+struct HFBlock
+{
+    int xmin, xmax;
+    int zmin, zmax;
+    DBL ymin, ymax;
+};
+
+struct HFData
+{
+    int References;
+    int Normals_Height;  /* Needed for Destructor */
+    int max_x, max_z;
+    HF_VAL min_y, max_y;
+    int block_max_x, block_max_z;
+    int block_width_x, block_width_z;
+    HF_VAL **Map;
+    HF_Normals **Normals;
+    HFBlock **Block;
+};
+
 
 /*****************************************************************************
 *
@@ -131,7 +156,7 @@ bool HField::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
     Thread->Stats()[Ray_HField_Box_Tests]++;
 #endif
 
-    if (!Box::Intersect(Temp_Ray,NULL,bounding_corner1,bounding_corner2,&depth1,&depth2,&Side1,&Side2))
+    if (!Box::Intersect(Temp_Ray, nullptr, bounding_corner1, bounding_corner2, &depth1, &depth2, &Side1, &Side2))
     {
         return(false);
     }
@@ -218,6 +243,11 @@ bool HField::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
     px = (int)Test[X];
     pz = (int)Test[Z];
 
+    // This deals with fringe cases that could slip through the above floating-point tests,
+    // and would cause out-of-bounds array accesses (most notably #IND values).
+    px = clip(px, 0, this->Data->max_x - 2);
+    pz = clip(pz, 0, this->Data->max_z - 2);
+
     x = Test[X] - (DBL)px;
     z = Test[Z] - (DBL)pz;
 
@@ -233,14 +263,11 @@ bool HField::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
     }
     else
     {
-        px = (int)ceil(Test[X]);
-        pz = (int)ceil(Test[Z]);
+        y1 = max(Get_Height(px+1, pz+1), water);
+        y2 = max(Get_Height(px,   pz+1), water);
+        y3 = max(Get_Height(px+1, pz),   water);
 
-        y1 = max(Get_Height(px,   pz), water);
-        y2 = max(Get_Height(px-1, pz), water);
-        y3 = max(Get_Height(px,   pz-1), water);
-
-        Local_Origin = Vector3d((DBL)px,y1,(DBL)pz);
+        Local_Origin = Vector3d((DBL)(px+1),y1,(DBL)(pz+1));
 
         H_Normal = Vector3d(y2-y1, 1.0, y3-y1);
     }
@@ -753,11 +780,11 @@ void HField::smooth_height_field(int xsize, int zsize)
 
     Data->Normals_Height = zsize+1;
 
-    Data->Normals = reinterpret_cast<HF_Normals **>(POV_MALLOC((zsize+1)*sizeof(HF_Normals *), "height field normals"));
+    Data->Normals = new HF_Normals*[zsize+1];
 
     for (i = 0; i <= zsize; i++)
     {
-        Data->Normals[i] = reinterpret_cast<HF_Normals *>(POV_MALLOC((xsize+1)*sizeof(HF_Normals), "height field normals"));
+        Data->Normals[i] = new HF_Normals[xsize+1];
     }
 
     /*
@@ -833,11 +860,11 @@ void HField::Compute_HField(const ImageData *image)
 
     /* Allocate memory for map. */
 
-    Data->Map = reinterpret_cast<HF_VAL **>(POV_MALLOC(max_z*sizeof(HF_VAL *), "height field"));
+    Data->Map = new HF_VAL*[max_z];
 
     for (z = 0; z < max_z; z++)
     {
-        Data->Map[z] = reinterpret_cast<HF_VAL *>(POV_MALLOC(max_x*sizeof(HF_VAL), "height field"));
+        Data->Map[z] = new HF_VAL[max_x];
     }
 
     /* Copy map. */
@@ -940,9 +967,9 @@ void HField::build_hfield_blocks()
     {
         /* We don't want a bounding hierarchy. Just use one block. */
 
-        Data->Block = reinterpret_cast<HFIELD_BLOCK **>(POV_MALLOC(sizeof(HFIELD_BLOCK *), "height field blocks"));
+        Data->Block = new HFBlock*[1];
 
-        Data->Block[0] = reinterpret_cast<HFIELD_BLOCK *>(POV_MALLOC(sizeof(HFIELD_BLOCK), "height field blocks"));
+        Data->Block[0] = new HFBlock[1];
 
         Data->Block[0][0].xmin = 0;
         Data->Block[0][0].xmax = Data->max_x;
@@ -967,7 +994,7 @@ void HField::build_hfield_blocks()
 
     /* Allocate memory for blocks. */
 
-    Data->Block = reinterpret_cast<HFIELD_BLOCK **>(POV_MALLOC(nz*sizeof(HFIELD_BLOCK *), "height field blocks"));
+    Data->Block = new HFBlock*[nz];
 
     /* Store block information. */
 
@@ -981,7 +1008,7 @@ void HField::build_hfield_blocks()
 
     for (z = 0; z < nz; z++)
     {
-        Data->Block[z] = reinterpret_cast<HFIELD_BLOCK *>(POV_MALLOC(nx*sizeof(HFIELD_BLOCK), "height field blocks"));
+        Data->Block[z] = new HFBlock[nx];
 
         for (x = 0; x < nx; x++)
         {
@@ -1193,14 +1220,14 @@ HField::HField() : ObjectBase(HFIELD_OBJECT)
 
     /* Allocate height field data. */
 
-    Data = reinterpret_cast<HFIELD_DATA *>(POV_MALLOC(sizeof(HFIELD_DATA), "height field"));
+    Data = new HFData;
 
     Data->References = 1;
 
     Data->Normals_Height = 0;
 
-    Data->Map     = NULL;
-    Data->Normals = NULL;
+    Data->Map     = nullptr;
+    Data->Normals = nullptr;
 
     Data->max_x = 0;
     Data->max_z = 0;
@@ -1247,7 +1274,7 @@ ObjectPtr HField::Copy()
 {
     HField *New = new HField();
 
-    POV_FREE (New->Data);
+    delete New->Data;
 
     /* Copy height field. */
 
@@ -1299,40 +1326,40 @@ HField::~HField()
 
     if (--(Data->References) == 0)
     {
-        if (Data->Map != NULL)
+        if (Data->Map != nullptr)
         {
             for (i = 0; i < Data->max_z+2; i++)
             {
-                if (Data->Map[i] != NULL)
+                if (Data->Map[i] != nullptr)
                 {
-                    POV_FREE (Data->Map[i]);
+                    delete[] Data->Map[i];
                 }
             }
 
-            POV_FREE (Data->Map);
+            delete[] Data->Map;
         }
 
-        if (Data->Normals != NULL)
+        if (Data->Normals != nullptr)
         {
             for (i = 0; i < Data->Normals_Height; i++)
             {
-                POV_FREE (Data->Normals[i]);
+                delete[] Data->Normals[i];
             }
 
-            POV_FREE (Data->Normals);
+            delete[] Data->Normals;
         }
 
-        if (Data->Block != NULL)
+        if (Data->Block != nullptr)
         {
             for (i = 0; i < Data->block_max_z; i++)
             {
-                POV_FREE(Data->Block[i]);
+                delete[] Data->Block[i];
             }
 
-            POV_FREE(Data->Block);
+            delete[] Data->Block;
         }
 
-        POV_FREE (Data);
+        delete Data;
     }
 }
 
@@ -1374,7 +1401,7 @@ void HField::Compute_BBox()
 
     BBox.size = BBoxVector3d(bounding_corner2 - bounding_corner1);
 
-    if (Trans != NULL)
+    if (Trans != nullptr)
     {
         Recompute_BBox(&BBox, Trans);
     }
@@ -1425,7 +1452,7 @@ void HField::Compute_BBox()
 *
 ******************************************************************************/
 
-bool HField::dda_traversal(const BasicRay &ray, const Vector3d& Start, const HFIELD_BLOCK *Block, IStack &HField_Stack, const BasicRay &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread)
+bool HField::dda_traversal(const BasicRay &ray, const Vector3d& Start, const HFBlock *Block, IStack &HField_Stack, const BasicRay &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread)
 {
     const char *dda_msg = "Illegal grid value in dda_traversal().\n"
                           "The height field may contain dark spots. To eliminate them\n"
@@ -1851,7 +1878,7 @@ bool HField::block_traversal(const BasicRay &ray, const Vector3d& Start, IStack 
     DBL k1, k2, dist;
     Vector3d nearP;
     Vector3d farP;
-    HFIELD_BLOCK *Block;
+    HFBlock *Block;
 
     px = Start[X];
     pz = Start[Z];

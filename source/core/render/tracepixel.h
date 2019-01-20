@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -47,6 +47,13 @@
 
 namespace pov
 {
+
+//##############################################################################
+///
+/// @addtogroup PovCoreRender
+/// @ingroup PovCore
+///
+/// @{
 
 struct HasInteriorPointObjectCondition : public PointObjectCondition
 {
@@ -140,6 +147,10 @@ class TracePixel : public Trace
         void TraceRayWithFocalBlur(RGBTColour& colour, DBL x, DBL y, DBL width, DBL height);
         void JitterCameraRay(Ray& ray, DBL x, DBL y, size_t ray_number);
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

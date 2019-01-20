@@ -1,2 +1,18 @@
-/// @dir
-/// Source code files for the povms layer.
+/**
+
+@defgroup PovMS POV-Ray Message-Passing Layer
+@ingroup PovSource
+@brief Message-passing layer between front- and back-end.
+
+This module implements the message-passing interface used between the @ref PovFrontend and @ref PovBackend.
+
+The povms module depends on the @ref PovBase.
+
+@{
+
+@dir
+@brief Source code files for the @ref PovMS.
+
+@}
+
+*/

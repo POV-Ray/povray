@@ -9,8 +9,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -35,14 +35,14 @@
 ///
 //******************************************************************************
 
-#include "base/version.h"
+#include "base/version_info.h"
 
 #include "backend/povray.h"
 
 #include "vfe.h"
 
 #ifndef _CONSOLE
-#error You must define _CONSOLE in vfe\win\syspovconfig.h prior to building the console version, otherwise you will get link errors.
+#error "You must define _CONSOLE in windows/povconfig/syspovconfig.h prior to building the console version, otherwise you will get link errors."
 #endif
 
 using namespace vfe;
@@ -99,7 +99,7 @@ int main (int argc, char **argv)
 
   fprintf(stderr,
           "This is an example of a minimal console build of POV-Ray under Windows.\n\n"
-          "Persistence of Vision(tm) Ray Tracer Version " POV_RAY_VERSION COMPILER_VER SSE2_INCLUDED "." POVRAY_PLATFORM_NAME ".\n"
+          "Persistence of Vision(tm) Ray Tracer Version " POV_RAY_VERSION_INFO ".\n"
           DISTRIBUTION_MESSAGE_1 "\n"
           DISTRIBUTION_MESSAGE_2 "\n"
           DISTRIBUTION_MESSAGE_3 "\n"
@@ -107,10 +107,10 @@ int main (int argc, char **argv)
           DISCLAIMER_MESSAGE_1 "\n"
           DISCLAIMER_MESSAGE_2 "\n\n");
 
-  if (session->Initialize(NULL, NULL) != vfeNoError)
+  if (session->Initialize(nullptr, nullptr) != vfeNoError)
     ErrorExit(session);
 
-  if ((s = getenv ("POVINC")) != NULL)
+  if ((s = std::getenv ("POVINC")) != nullptr)
     opts.AddLibraryPath (s);
   while (*++argv)
     opts.AddCommand (*argv);

@@ -7,8 +7,8 @@
 /// @copyright
 /// @parblock
 ///
-/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -42,23 +42,23 @@
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
+//##############################################################################
+///
+/// @defgroup PovCoreMath Mathematic Utilities
+/// @ingroup PovCore
+///
+/// @{
 
-/*****************************************************************************
-* Global typedefs
-******************************************************************************/
+DBL chdtri(DBL df, DBL x);
 
-/*****************************************************************************
-* Global variables
-******************************************************************************/
+/// Probit function.
+/// Computes the quantile function (inverse of the cumulative distribution function) of the standard
+/// normal distribution, aka "probit function".
+DBL ndtri(DBL y0);
 
-/*****************************************************************************
-* Global functions
-******************************************************************************/
-
-DBL chdtri (DBL df, DBL x);
+/// @}
+///
+//##############################################################################
 
 }
 
