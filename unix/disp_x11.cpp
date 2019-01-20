@@ -44,6 +44,9 @@
 
 #include <algorithm>
 
+// handle I/O errors via setjmp / longjmp
+#include <setjmp.h>
+
 #ifdef HAVE_LIBXPM
 #include <X11/xpm.h>
 #include "xpovicon.xpm" /* This is the color POV icon */
@@ -56,6 +59,26 @@
 // this must be the last file included
 #include "syspovdebug.h"
 
+static ::Display * theDisplay;// to be messed by the error handling routine
+static boost::mutex        x11Mutex;
+
+static int xioErrorHandler( ::Display * disp )
+{
+    fprintf(stderr, "\nX I/O error\n");
+    if (theDisplay)
+    {
+    XFlush(theDisplay);
+    }
+    theDisplay = nullptr;
+    return true;
+}
+static int xErrorHandler( ::Display * disp, XErrorEvent *errorEvent)
+{
+    char message[130];
+    XGetErrorText(disp, errorEvent->error_code, message, 125);
+    fprintf(stderr, "\nX error: %s\n", message);
+    return true;
+}
 
 namespace pov_frontend
 {
@@ -65,8 +88,8 @@ namespace pov_frontend
     static char theNAME[] =      "povray" ;     /* for the property */
     static char theICONNAME[] =  "POV-Ray";     /* short name for the icon */
 
-    extern shared_ptr<Display> gDisplay;
 
+    extern shared_ptr<Display> gDisplay;
     const UnixOptionsProcessor::Option_Info UnixX11Display::Options[] =
     {
         // command line/povray.conf/environment options of this display mode can be added here
@@ -88,8 +111,9 @@ namespace pov_frontend
         m_valid = false;
         m_display_scaled = false;
         m_display_scale = 1.;
-        theDisplay = nullptr;
+        //theDisplay = nullptr;
         theImage = nullptr;
+        theWindow = 0;
     }
 
     UnixX11Display::~UnixX11Display()
@@ -131,8 +155,9 @@ namespace pov_frontend
         // protect against Close(), as the resources are transfered and not copied
         p->m_display_scaled=false;
         p->m_display_scale=1;
-        p->theDisplay = nullptr;
+        // p->theDisplay = nullptr;
         p->theImage = nullptr;
+        p->theWindow = 0;
 
         if (m_display_scaled)
         {
@@ -156,7 +181,7 @@ namespace pov_frontend
             }
 
             XPutImage(theDisplay, theWindow, theGC, theImage, 0, 0, 0, 0,
-                    theImage->width, theImage->height);
+                        theImage->width, theImage->height);
             XFlush(theDisplay);
         }
 
@@ -179,7 +204,7 @@ namespace pov_frontend
             XDestroyImage(theImage);
             theImage = nullptr;
         }
-        if (theDisplay)
+        if (theWindow)
         {
             XDestroyWindow(theDisplay, theWindow);
 #ifdef USE_CURSOR
@@ -189,6 +214,7 @@ namespace pov_frontend
             // as we only have one cursor (it would be the same reported leak if we created
             // and deleted many windows, each with its own cursor)
 #endif
+
             XFreeColormap(theDisplay, theColormap);
             XFreeGC(theDisplay, theGC);
             XCloseDisplay( theDisplay );
@@ -210,7 +236,11 @@ namespace pov_frontend
         else
             f = boost::format(PACKAGE_NAME " " VERSION_BASE " X11 %s")
                 % (paused ? " [paused]" : "");
-        XStoreName(theDisplay, theWindow, f.str().c_str());
+
+        {
+            boost::mutex::scoped_lock lock(x11Mutex);
+            XStoreName(theDisplay, theWindow, f.str().c_str());
+        }
     }
 
     void UnixX11Display::Show()
@@ -220,6 +250,10 @@ namespace pov_frontend
 
         if (!m_valid)
         {
+            XSetErrorHandler(xErrorHandler);
+
+            XSetIOErrorHandler( xioErrorHandler );
+
             theDisplay = XOpenDisplay( NULL );
             Visual *theVisual;
             unsigned long        theWindowMask;
@@ -264,8 +298,8 @@ namespace pov_frontend
             theWindowAttributes.backing_store    = WhenMapped;
             theWindowAttributes.background_pixel = WhitePixel(theDisplay, theScreen);
             theWindowAttributes.border_pixel     = BlackPixel(theDisplay, theScreen);
-            theWindowAttributes.colormap         = theColormap;
             theWindowAttributes.event_mask       = NoEventMask;
+            theWindowAttributes.colormap         = theColormap;
             theWindowMask = CWBackingStore | CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
 #ifdef USE_CURSOR
             if ((theCursor = XCreateFontCursor(theDisplay, XC_watch)) != (Cursor)None)
@@ -343,6 +377,7 @@ namespace pov_frontend
                     break;
             }
 #else
+
             theIcon = XCreateBitmapFromData(theDisplay, theWindow, (char *)xpovicon_bits,
                     xpovicon_width, xpovicon_height);
 
@@ -476,7 +511,10 @@ namespace pov_frontend
         }
         else
         {
-            XPutImage( theDisplay, theWindow, theGC, theImage, 0, 0, 0, 0, theImage->width, theImage->height);
+            {
+                boost::mutex::scoped_lock lock(x11Mutex);
+                XPutImage( theDisplay, theWindow, theGC, theImage, 0, 0, 0, 0, theImage->width, theImage->height);
+            }
             XFlush(theDisplay);
         }
     }
@@ -500,8 +538,11 @@ namespace pov_frontend
         uint_least32_t r, g, b;
         uint_least32_t old = XGetPixel(theImage,ix,iy);
         r = old >>rs;
+        r &= 0x0FF;
         g = old >>gs;
+        g &= 0x0FF;
         b = old >>bs;
+        b &= 0x0FF;
 
         unsigned int ofs = ix + iy * theImage->width;
         r = (r*m_PxCount[ofs] + colour.red  ) / (m_PxCount[ofs]+1);
@@ -521,12 +562,18 @@ namespace pov_frontend
         if (m_display_scaled)
         {
             SetPixelScaled(x, y, colour);
-        XPutImage( theDisplay, theWindow, theGC, theImage, x*m_display_scale, y*m_display_scale, x*m_display_scale, y*m_display_scale, 1, 1 );
+            {
+                boost::mutex::scoped_lock lock(x11Mutex);
+                XPutImage( theDisplay, theWindow, theGC, theImage, x*m_display_scale, y*m_display_scale, x*m_display_scale, y*m_display_scale, 1, 1 );
+            }
         }
         else
         {
             SetPixel(x, y, colour);
-        XPutImage( theDisplay, theWindow, theGC, theImage, x, y, x, y, 1, 1 );
+            {
+                boost::mutex::scoped_lock lock(x11Mutex);
+                XPutImage( theDisplay, theWindow, theGC, theImage, x, y, x, y, 1, 1 );
+            }
         }
 
     }
@@ -554,7 +601,10 @@ namespace pov_frontend
                 SetPixelScaled(ix1, y, colour);
                 SetPixelScaled(ix2, y, colour);
             }
-            XPutImage( theDisplay, theWindow, theGC, theImage, ix1*m_display_scale, iy1*m_display_scale, ix1*m_display_scale, iy1*m_display_scale, (uint_least64_t(ix2*m_display_scale)-uint_least64_t(ix1*m_display_scale)+1), (uint_least64_t(iy2*m_display_scale)-uint_least64_t(iy1*m_display_scale)+1));
+            {
+                boost::mutex::scoped_lock lock(x11Mutex);
+                XPutImage( theDisplay, theWindow, theGC, theImage, ix1*m_display_scale, iy1*m_display_scale, ix1*m_display_scale, iy1*m_display_scale, (uint_least64_t(ix2*m_display_scale)-uint_least64_t(ix1*m_display_scale)+1), (uint_least64_t(iy2*m_display_scale)-uint_least64_t(iy1*m_display_scale)+1));
+            }
         }
         else
         {
@@ -569,7 +619,10 @@ namespace pov_frontend
                 SetPixel(ix1, y, colour);
                 SetPixel(ix2, y, colour);
             }
-            XPutImage( theDisplay, theWindow, theGC, theImage, ix1, iy1, ix1, iy1, (ix2-ix1+1), (iy2-iy1+1));
+            {
+                boost::mutex::scoped_lock lock(x11Mutex);
+                XPutImage( theDisplay, theWindow, theGC, theImage, ix1, iy1, ix1, iy1, (ix2-ix1+1), (iy2-iy1+1));
+            }
         }
     }
 
@@ -592,7 +645,10 @@ namespace pov_frontend
                     SetPixelScaled(x, y, colour);
                 }
             }
-            XPutImage( theDisplay, theWindow, theGC, theImage, ix1*m_display_scale, iy1*m_display_scale, ix1*m_display_scale, iy1*m_display_scale, (uint_least64_t(ix2*m_display_scale)-uint_least64_t(ix1*m_display_scale)+1), (uint_least64_t(iy2*m_display_scale)-uint_least64_t(iy1*m_display_scale)+1));
+            {
+                boost::mutex::scoped_lock lock(x11Mutex);
+                XPutImage( theDisplay, theWindow, theGC, theImage, ix1*m_display_scale, iy1*m_display_scale, ix1*m_display_scale, iy1*m_display_scale, (uint_least64_t(ix2*m_display_scale)-uint_least64_t(ix1*m_display_scale)+1), (uint_least64_t(iy2*m_display_scale)-uint_least64_t(iy1*m_display_scale)+1));
+            }
         }
         else
         {
@@ -604,7 +660,10 @@ namespace pov_frontend
                 }
             }
 
-            XPutImage( theDisplay, theWindow, theGC, theImage, ix1, iy1, ix1, iy1, (ix2-ix1+1), (iy2-iy1+1));
+            {
+                boost::mutex::scoped_lock lock(x11Mutex);
+                XPutImage( theDisplay, theWindow, theGC, theImage, ix1, iy1, ix1, iy1, (ix2-ix1+1), (iy2-iy1+1));
+            }
         }
 
     }
@@ -624,14 +683,20 @@ namespace pov_frontend
             for(unsigned int y = iy1, i = 0; y <= iy2; y++)
                 for(unsigned int x = ix1; x <= ix2; x++, i++)
                     SetPixelScaled(x, y, colour[i]);
-            XPutImage( theDisplay, theWindow, theGC, theImage, ix1*m_display_scale, iy1*m_display_scale, ix1*m_display_scale, iy1*m_display_scale, (uint_least64_t(ix2*m_display_scale)-uint_least64_t(ix1*m_display_scale)+1), (uint_least64_t(iy2*m_display_scale)-uint_least64_t(iy1*m_display_scale)+1));
+            {
+                boost::mutex::scoped_lock lock(x11Mutex);
+                XPutImage( theDisplay, theWindow, theGC, theImage, ix1*m_display_scale, iy1*m_display_scale, ix1*m_display_scale, iy1*m_display_scale, (uint_least64_t(ix2*m_display_scale)-uint_least64_t(ix1*m_display_scale)+1), (uint_least64_t(iy2*m_display_scale)-uint_least64_t(iy1*m_display_scale)+1));
+            }
         }
         else
         {
             for(unsigned int y = y1, i = 0; y <= iy2; y++)
                 for(unsigned int x = ix1; x <= ix2; x++, i++)
                     SetPixel(x, y, colour[i]);
-        XPutImage( theDisplay, theWindow, theGC, theImage, ix1, iy1, ix1, iy1, (ix2-ix1+1), (iy2-iy1+1));
+            {
+                boost::mutex::scoped_lock lock(x11Mutex);
+                XPutImage( theDisplay, theWindow, theGC, theImage, ix1, iy1, ix1, iy1, (ix2-ix1+1), (iy2-iy1+1));
+            }
         }
 
     }
@@ -643,6 +708,7 @@ namespace pov_frontend
 
         if (Force )
         {
+            boost::mutex::scoped_lock lock(x11Mutex);
             XFlush(theDisplay);
         }
     }

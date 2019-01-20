@@ -106,7 +106,7 @@ namespace pov_frontend
             bool m_display_scaled;
             float m_display_scale;
             // X11 specific data
-            ::Display * theDisplay;
+            // ::Display * theDisplay;
             Window    theWindow;
             GC        theGC;
             Colormap  theColormap;
