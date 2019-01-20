@@ -97,10 +97,11 @@
 ///   - `rc.N` to denote and identify a release candidates;
 ///   - `x.FEATURE` to denote an untagged experimental version;
 ///   - `x.FEATURE.N` to denote and identify a tagged experimental version;
+///   - `x.N` to denote and identify a tagged version pooling various experimental features;
 /// where `N` is a serial number starting at 1 in each phase, `TIME` is the number of minutes
 /// since 2000-01-01 00:00, and `FEATURE` is an arbitrary alphanumeric moniker for a particular
 /// experimental feature.
-#define POV_RAY_PRERELEASE          "x.diffuse.10021912"
+#define POV_RAY_PRERELEASE          "x.10021928"
 
 #if defined(DOXYGEN) && !defined(POV_RAY_PRERELEASE)
     // Work around doxygen being unable to document undefined macros.
