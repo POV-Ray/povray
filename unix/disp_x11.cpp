@@ -168,6 +168,7 @@ namespace pov_frontend
         if (!m_valid)
             return;
 
+        XFlush(theDisplay);
         m_PxCount.clear();
         m_valid = false;
 
@@ -176,6 +177,7 @@ namespace pov_frontend
             free(theImage->data);
             theImage->data = NULL;
             XDestroyImage(theImage);
+            theImage = nullptr;
         }
         if (theDisplay)
         {
@@ -190,6 +192,7 @@ namespace pov_frontend
             XFreeColormap(theDisplay, theColormap);
             XFreeGC(theDisplay, theGC);
             XCloseDisplay( theDisplay );
+            theDisplay = nullptr;
         }
 
     }
@@ -518,13 +521,14 @@ namespace pov_frontend
         if (m_display_scaled)
         {
             SetPixelScaled(x, y, colour);
+        XPutImage( theDisplay, theWindow, theGC, theImage, x*m_display_scale, y*m_display_scale, x*m_display_scale, y*m_display_scale, 1, 1 );
         }
         else
         {
             SetPixel(x, y, colour);
+        XPutImage( theDisplay, theWindow, theGC, theImage, x, y, x, y, 1, 1 );
         }
 
-        XPutImage( theDisplay, theWindow, theGC, theImage, x, y, x, y, 1, 1 );
     }
 
     void UnixX11Display::DrawRectangleFrame(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8& colour)
@@ -550,6 +554,7 @@ namespace pov_frontend
                 SetPixelScaled(ix1, y, colour);
                 SetPixelScaled(ix2, y, colour);
             }
+            XPutImage( theDisplay, theWindow, theGC, theImage, ix1*m_display_scale, iy1*m_display_scale, ix1*m_display_scale, iy1*m_display_scale, (uint_least64_t(ix2*m_display_scale)-uint_least64_t(ix1*m_display_scale)+1), (uint_least64_t(iy2*m_display_scale)-uint_least64_t(iy1*m_display_scale)+1));
         }
         else
         {
@@ -564,9 +569,8 @@ namespace pov_frontend
                 SetPixel(ix1, y, colour);
                 SetPixel(ix2, y, colour);
             }
+            XPutImage( theDisplay, theWindow, theGC, theImage, ix1, iy1, ix1, iy1, (ix2-ix1+1), (iy2-iy1+1));
         }
-
-        XPutImage( theDisplay, theWindow, theGC, theImage, ix1, iy1, ix1, iy1, (ix2-ix1+1), (iy2-iy1+1));
     }
 
     void UnixX11Display::DrawFilledRectangle(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8& colour)
@@ -588,6 +592,7 @@ namespace pov_frontend
                     SetPixelScaled(x, y, colour);
                 }
             }
+            XPutImage( theDisplay, theWindow, theGC, theImage, ix1*m_display_scale, iy1*m_display_scale, ix1*m_display_scale, iy1*m_display_scale, (uint_least64_t(ix2*m_display_scale)-uint_least64_t(ix1*m_display_scale)+1), (uint_least64_t(iy2*m_display_scale)-uint_least64_t(iy1*m_display_scale)+1));
         }
         else
         {
@@ -599,9 +604,9 @@ namespace pov_frontend
                 }
             }
 
+            XPutImage( theDisplay, theWindow, theGC, theImage, ix1, iy1, ix1, iy1, (ix2-ix1+1), (iy2-iy1+1));
         }
 
-        XPutImage( theDisplay, theWindow, theGC, theImage, ix1, iy1, ix1, iy1, (ix2-ix1+1), (iy2-iy1+1));
     }
 
     void UnixX11Display::DrawPixelBlock(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8 *colour)
@@ -619,15 +624,16 @@ namespace pov_frontend
             for(unsigned int y = iy1, i = 0; y <= iy2; y++)
                 for(unsigned int x = ix1; x <= ix2; x++, i++)
                     SetPixelScaled(x, y, colour[i]);
+            XPutImage( theDisplay, theWindow, theGC, theImage, ix1*m_display_scale, iy1*m_display_scale, ix1*m_display_scale, iy1*m_display_scale, (uint_least64_t(ix2*m_display_scale)-uint_least64_t(ix1*m_display_scale)+1), (uint_least64_t(iy2*m_display_scale)-uint_least64_t(iy1*m_display_scale)+1));
         }
         else
         {
             for(unsigned int y = y1, i = 0; y <= iy2; y++)
                 for(unsigned int x = ix1; x <= ix2; x++, i++)
                     SetPixel(x, y, colour[i]);
+        XPutImage( theDisplay, theWindow, theGC, theImage, ix1, iy1, ix1, iy1, (ix2-ix1+1), (iy2-iy1+1));
         }
 
-        XPutImage( theDisplay, theWindow, theGC, theImage, ix1, iy1, ix1, iy1, (ix2-ix1+1), (iy2-iy1+1));
     }
 
     void UnixX11Display::UpdateScreen(bool Force = false)

@@ -290,7 +290,6 @@ namespace pov_frontend
           }
         }
 
-
         if ((width == GetWidth()) && (height == GetHeight()))
         {
           m_display_scaled = false;
@@ -432,8 +431,8 @@ namespace pov_frontend
             SDL_UnlockSurface(m_screen);
 
         SDL_Rect rect;
-        rect.x = x;
-        rect.y = y;
+        rect.x = x * m_display_scale;
+        rect.y = y * m_display_scale;
         rect.w = 1;
         rect.h = 1;
         SDL_UpdateWindowSurfaceRects(m_window, &rect, 1);
@@ -485,10 +484,11 @@ namespace pov_frontend
             SDL_UnlockSurface(m_screen);
 
         SDL_Rect rect;
-        rect.x = ix1;
-        rect.y = iy1;
-        rect.w = ix2-ix1+1;
-        rect.h = iy2-iy1+1;
+        rect.x = ix1 * m_display_scale;
+        rect.y = iy1 * m_display_scale;
+        // DO NOT FACTOR *m_display_scale or you will get holes
+        rect.w = uint_least64_t(ix2 * m_display_scale)-uint_least64_t(ix1 * m_display_scale) +1;
+        rect.h = uint_least64_t(iy2 * m_display_scale)-uint_least64_t(iy1 * m_display_scale) +1;
         SDL_UpdateWindowSurfaceRects(m_window, &rect, 1);
     }
 
@@ -551,10 +551,11 @@ namespace pov_frontend
             SDL_UnlockSurface(m_screen);
         
         SDL_Rect rect;
-        rect.x = ix1;
-        rect.y = iy1;
-        rect.w = ix2-ix1+1;
-        rect.h = iy2-iy1+1;
+        rect.x = ix1 * m_display_scale;
+        rect.y = iy1 * m_display_scale;
+        // DO NOT FACTOR *m_display_scale or you will get holes
+        rect.w = uint_least64_t(ix2 * m_display_scale)-uint_least64_t(ix1 * m_display_scale) +1;
+        rect.h = uint_least64_t(iy2 * m_display_scale)-uint_least64_t(iy1 * m_display_scale) +1;
         SDL_UpdateWindowSurfaceRects(m_window, &rect, 1);
     }
 
