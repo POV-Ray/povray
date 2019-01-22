@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -169,17 +169,18 @@ FNCode::FNCode(Parser *pa, FunctionCode *f, bool is_local, const char *n)
 void FNCode::Parameter()
 {
     parser->Get_Token();
-    if(parser->CurrentTokenId() == LEFT_PAREN_TOKEN)
+    if(parser->CurrentTrueTokenId() == LEFT_PAREN_TOKEN)
     {
         for(function->parameter_cnt = 0;
-            ((parser->CurrentTokenId() != RIGHT_PAREN_TOKEN) || (function->parameter_cnt == 0)) && (function->parameter_cnt < MAX_FUNCTION_PARAMETER_LIST);
+            ((parser->CurrentTrueTokenId() != RIGHT_PAREN_TOKEN) || (function->parameter_cnt == 0)) &&
+            (function->parameter_cnt < MAX_FUNCTION_PARAMETER_LIST);
             function->parameter_cnt++)
         {
             parser->Get_Token();
 
-            if((parser->CurrentTokenFunctionId() != IDENTIFIER_TOKEN) && (parser->CurrentTokenFunctionId() != X_TOKEN) &&
-               (parser->CurrentTokenFunctionId() != Y_TOKEN) && (parser->CurrentTokenFunctionId() != Z_TOKEN) &&
-               (parser->CurrentTokenFunctionId() != U_TOKEN) && (parser->CurrentTokenFunctionId() != V_TOKEN))
+            if((parser->CurrentTrueTokenId() != IDENTIFIER_TOKEN) && (parser->CurrentTrueTokenId() != X_TOKEN) &&
+               (parser->CurrentTrueTokenId() != Y_TOKEN) && (parser->CurrentTrueTokenId() != Z_TOKEN) &&
+               (parser->CurrentTrueTokenId() != U_TOKEN) && (parser->CurrentTrueTokenId() != V_TOKEN))
                 parser->Expectation_Error("parameter identifier");
 
             function->parameter[function->parameter_cnt] = POV_STRDUP(parser->CurrentTokenText().c_str());

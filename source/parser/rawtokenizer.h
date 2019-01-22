@@ -124,11 +124,12 @@ struct RawToken
     int id;
 
     /// A numeric ID representing the "expression type" of the token.
-    /// For tokens that may occur at the start of a numeric expression, this is
-    /// @ref FLOAT_FUNC_TOKEN. For tokens that may occur at the start of a
-    /// vector expression, this is @ref VECTOR_FUNC_TOKEN. For tokens that may
+    /// For reserved word tokens (but not operators) that may occur at the start of a numeric expression, this is
+    /// @ref FLOAT_TOKEN_CATEGORY. For reserved word tokens (but not operators) that may occur at the start of a
+    /// vector expression, this is @ref VECTOR_TOKEN_CATEGORY. For reserved word tokens that may
     /// occur at the start of a colour expression, this is
-    /// @ref COLOUR_KEY_TOKEN. For identifiers, this is @ref IDENTIFIER_TOKEN.
+    /// @ref COLOUR_TOKEN_CATEGORY. For identifiers, this is @ref IDENTIFIER_TOKEN.
+    /// For file signature tokens, this is @ref SIGNATURE_TOKEN_CATEGORY.
     /// For other tokens, this is the corresponding value from @ref TokenId.
     TokenId expressionId;
 
@@ -254,8 +255,6 @@ private:
     bool ProcessSignatureLexeme(RawToken& token);
 
     bool ProcessUCSEscapeDigits(UCS4& c, UTF8String::const_iterator& i, UTF8String::const_iterator& escapeSequenceEnd, unsigned int digits);
-
-    TokenId GetExpressionId(TokenId tokenId);
 };
 
 }

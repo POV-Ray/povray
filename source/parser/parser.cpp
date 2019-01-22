@@ -722,7 +722,7 @@ bool Parser::Parse_Begin (TokenId tokenId, bool mandatory)
 {
     Get_Token();
 
-    if(CurrentTokenId() == tokenId)
+    if(CurrentTrueTokenId() == tokenId)
     {
         maBraceStack.emplace_back(mToken);
         return true;
@@ -761,7 +761,7 @@ void Parser::Parse_End(TokenId openTokenId, TokenId expectTokenId)
 {
     Get_Token();
 
-    if(CurrentTokenId() == expectTokenId)
+    if(CurrentTrueTokenId() == expectTokenId)
     {
         POV_PARSER_ASSERT(!maBraceStack.empty());
         POV_PARSER_ASSERT(openTokenId == maBraceStack.back().openToken);
@@ -770,7 +770,7 @@ void Parser::Parse_End(TokenId openTokenId, TokenId expectTokenId)
         {
             BraceStackEntry& braceStackEntry = maBraceStack.back();
             // Include file has closed more braces/parentheses/etc. than it has opened.
-            Warning("Unbalanced %s in include file", Get_Token_String(CurrentTokenId()));
+            Warning("Unbalanced %s in include file", Get_Token_String(CurrentTrueTokenId()));
         }
         maBraceStack.pop_back();
 
@@ -778,7 +778,7 @@ void Parser::Parse_End(TokenId openTokenId, TokenId expectTokenId)
     }
 
     ErrorInfo(maBraceStack.back(), "Unmatched %s", Get_Token_String(maBraceStack.back().openToken));
-    Error("No matching %s, %s found instead", Get_Token_String(expectTokenId), Get_Token_String(CurrentTokenId()));
+    Error("No matching %s, %s found instead", Get_Token_String(expectTokenId), Get_Token_String(CurrentTrueTokenId()));
 }
 
 /*****************************************************************************
@@ -814,7 +814,7 @@ ObjectPtr Parser::Parse_Bicubic_Patch ()
 
     Object = new BicubicPatch();
 
-    EXPECT
+    EXPECT_CAT
         CASE_FLOAT_UNGET
             VersionWarning(150, "Should use keywords for bicubic parameters.");
             Object->Patch_Type = (int)Parse_Float();
@@ -1311,7 +1311,7 @@ void Parser::Parse_Mesh_Camera (Camera& Cam)
     END_EXPECT
 
     ALLOW(SMOOTH_TOKEN);
-    Cam.Smooth = (CurrentTokenId() == SMOOTH_TOKEN);
+    Cam.Smooth = (CurrentTrueTokenId() == SMOOTH_TOKEN);
     if (Cam.Smooth && Cam.Face_Distribution_Method != 3)
         Error("Smooth can only be used with distribution method #3");
 
@@ -1455,17 +1455,12 @@ void Parser::Parse_Camera (Camera& Cam)
 
     Parse_Begin ();
 
-    EXPECT_ONE
-        CASE (CAMERA_ID_TOKEN)
-            Cam = CurrentTokenData<Camera>();
-            if (sceneData->EffectiveLanguageVersion() >= 350)
-                only_mods = true;
-        END_CASE
-
-        OTHERWISE
-            UNGET
-        END_CASE
-    END_EXPECT
+    if (AllowToken(CAMERA_ID_TOKEN))
+    {
+        Cam = CurrentTokenData<Camera>();
+        if (sceneData->EffectiveLanguageVersion() >= 350)
+            only_mods = true;
+    }
 
     Camera& New = Cam;
 
@@ -1634,6 +1629,7 @@ void Parser::Parse_Camera (Camera& Cam)
                     END_CASE
                 END_EXPECT
                 break;
+
             case ORTHOGRAPHIC_CAMERA:
                 EXPECT
                     CASE (ANGLE_TOKEN)
@@ -1654,6 +1650,7 @@ void Parser::Parse_Camera (Camera& Cam)
                     END_CASE
                 END_EXPECT
                 break;
+
             case FISHEYE_CAMERA:
                 EXPECT
                     CASE (ANGLE_TOKEN)
@@ -1674,6 +1671,7 @@ void Parser::Parse_Camera (Camera& Cam)
                     END_CASE
                 END_EXPECT
                 break;
+
             case ULTRA_WIDE_ANGLE_CAMERA:
                 EXPECT
                     CASE (ANGLE_TOKEN)
@@ -1694,6 +1692,7 @@ void Parser::Parse_Camera (Camera& Cam)
                     END_CASE
                 END_EXPECT
                 break;
+
             case OMNIMAX_CAMERA:
                 EXPECT
                     CASE (ANGLE_TOKEN)
@@ -1714,6 +1713,7 @@ void Parser::Parse_Camera (Camera& Cam)
                     END_CASE
                 END_EXPECT
                 break;
+
             case PANORAMIC_CAMERA:
                 EXPECT
                     CASE (ANGLE_TOKEN)
@@ -1734,6 +1734,7 @@ void Parser::Parse_Camera (Camera& Cam)
                     END_CASE
                 END_EXPECT
                 break;
+
             case CYL_1_CAMERA:
             case CYL_2_CAMERA:
             case CYL_3_CAMERA:
@@ -1757,6 +1758,7 @@ void Parser::Parse_Camera (Camera& Cam)
                     END_CASE
                 END_EXPECT
                 break;
+
             case SPHERICAL_CAMERA:
                 EXPECT
                     CASE (ANGLE_TOKEN)
@@ -1781,6 +1783,7 @@ void Parser::Parse_Camera (Camera& Cam)
                     END_CASE
                 END_EXPECT
                 break;
+
             case MESH_CAMERA:
                 EXPECT
                     CASE6(PERSPECTIVE_TOKEN, ORTHOGRAPHIC_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
@@ -1795,6 +1798,7 @@ void Parser::Parse_Camera (Camera& Cam)
                     END_CASE
                 END_EXPECT
                 break;
+
             case USER_DEFINED_CAMERA:
                 EXPECT
                     CASE (ANGLE_TOKEN)
@@ -2410,15 +2414,8 @@ ObjectPtr Parser::Parse_Cone ()
     Parse_Vector(Object->base);  Parse_Comma ();
     Object->base_radius = Parse_Float();
 
-    EXPECT_ONE
-        CASE(OPEN_TOKEN)
-            Clear_Flag(Object, CLOSED_FLAG);
-        END_CASE
-
-        OTHERWISE
-            UNGET
-        END_CASE
-    END_EXPECT
+    if (AllowToken(OPEN_TOKEN))
+        Clear_Flag(Object, CLOSED_FLAG);
 
     /* Compute run-time values for the cone */
     Object->Compute_Cone_Data();
@@ -2467,15 +2464,8 @@ ObjectPtr Parser::Parse_Cylinder ()
     Object->apex_radius = Parse_Float();
     Object->base_radius = Object->apex_radius;
 
-    EXPECT_ONE
-        CASE(OPEN_TOKEN)
-            Clear_Flag(Object, CLOSED_FLAG);
-        END_CASE
-
-        OTHERWISE
-            UNGET
-        END_CASE
-    END_EXPECT
+    if (AllowToken(OPEN_TOKEN))
+        Clear_Flag(Object, CLOSED_FLAG);
 
     Object->Compute_Cylinder_Data();
 
@@ -2525,7 +2515,7 @@ ObjectPtr Parser::Parse_Disc ()
     tmpf = Parse_Float(); Parse_Comma ();
     Object->oradius2 = tmpf * tmpf;
 
-    EXPECT_ONE
+    EXPECT_ONE_CAT
         CASE_FLOAT_UNGET
             tmpf = Parse_Float();
             Object->iradius2 = tmpf * tmpf;
@@ -2653,9 +2643,7 @@ ObjectPtr Parser::Parse_Isosurface()
 
     Object = new IsoSurface();
 
-    Get_Token();
-    if(CurrentTokenId() != FUNCTION_TOKEN)
-        Parse_Error(FUNCTION_TOKEN);
+    GET(FUNCTION_TOKEN);
 
     Object->Function = new FunctionVM::CustomFunction(fnVMContext->functionvm.get(), Parse_Function());
 
@@ -2889,59 +2877,61 @@ ObjectPtr Parser::Parse_Julia_Fractal ()
             Object->Precision = 1.0 / P;
         END_CASE
 
-        CASE(FLOAT_FUNCT_TOKEN)
-            switch(CurrentTokenFunctionId())
-            {
-                case EXP_TOKEN:
-                    Object->Sub_Type = EXP_STYPE;
-                    break;
-                case LN_TOKEN:
-                    Object->Sub_Type = LN_STYPE;
-                    break;
-                case SIN_TOKEN:
-                    Object->Sub_Type = SIN_STYPE;
-                    break;
-                case ASIN_TOKEN:
-                    Object->Sub_Type = ASIN_STYPE;
-                    break;
-                case COS_TOKEN:
-                    Object->Sub_Type = COS_STYPE;
-                    break;
-                case ACOS_TOKEN:
-                    Object->Sub_Type = ACOS_STYPE;
-                    break;
-                case TAN_TOKEN:
-                    Object->Sub_Type = TAN_STYPE;
-                    break;
-                case ATAN_TOKEN:
-                    Object->Sub_Type = ATAN_STYPE;
-                    break;
-                case COSH_TOKEN:
-                    Object->Sub_Type = COSH_STYPE;
-                    break;
-                case SINH_TOKEN:
-                    Object->Sub_Type = SINH_STYPE;
-                    break;
-                case TANH_TOKEN:
-                    Object->Sub_Type = TANH_STYPE;
-                    break;
-                case ATANH_TOKEN:
-                    Object->Sub_Type = ATANH_STYPE;
-                    break;
-                case ACOSH_TOKEN:
-                    Object->Sub_Type = ACOSH_STYPE;
-                    break;
-                case ASINH_TOKEN:
-                    Object->Sub_Type = ASINH_STYPE;
-                    break;
-                default: Expectation_Error ("fractal keyword");
-            }
+        CASE(EXP_TOKEN)
+            Object->Sub_Type = EXP_STYPE;
         END_CASE
 
-        /* if any of the next become supported by the expression parser,
-         * then their handling would need to move above to the FLOAT_FUNCT_TOKEN
-         * case above.
-         */
+        CASE(LN_TOKEN)
+            Object->Sub_Type = LN_STYPE;
+        END_CASE
+
+        CASE(SIN_TOKEN)
+            Object->Sub_Type = SIN_STYPE;
+        END_CASE
+
+        CASE(ASIN_TOKEN)
+            Object->Sub_Type = ASIN_STYPE;
+        END_CASE
+
+        CASE(COS_TOKEN)
+            Object->Sub_Type = COS_STYPE;
+        END_CASE
+
+        CASE(ACOS_TOKEN)
+            Object->Sub_Type = ACOS_STYPE;
+        END_CASE
+
+        CASE(TAN_TOKEN)
+            Object->Sub_Type = TAN_STYPE;
+        END_CASE
+
+        CASE(ATAN_TOKEN)
+            Object->Sub_Type = ATAN_STYPE;
+        END_CASE
+
+        CASE(COSH_TOKEN)
+            Object->Sub_Type = COSH_STYPE;
+        END_CASE
+
+        CASE(SINH_TOKEN)
+            Object->Sub_Type = SINH_STYPE;
+        END_CASE
+
+        CASE(TANH_TOKEN)
+            Object->Sub_Type = TANH_STYPE;
+        END_CASE
+
+        CASE(ATANH_TOKEN)
+            Object->Sub_Type = ATANH_STYPE;
+        END_CASE
+
+        CASE(ACOSH_TOKEN)
+            Object->Sub_Type = ACOSH_STYPE;
+        END_CASE
+
+        CASE(ASINH_TOKEN)
+            Object->Sub_Type = ASINH_STYPE;
+        END_CASE
 
         CASE(SQR_TOKEN)
             Object->Sub_Type = SQR_STYPE;
@@ -3247,15 +3237,8 @@ ObjectPtr Parser::Parse_Lemon ()
         Error("All radii must be positive");
     }
 
-    EXPECT_ONE
-        CASE(OPEN_TOKEN)
-            Clear_Flag(Object, CLOSED_FLAG);
-        END_CASE
-
-        OTHERWISE
-            UNGET
-        END_CASE
-    END_EXPECT
+    if (AllowToken(OPEN_TOKEN))
+        Clear_Flag(Object, CLOSED_FLAG);
 
     /* Compute run-time values for the lemon */
     Object->Compute_Lemon_Data(mMessageFactory, CurrentTokenMessageContext());
@@ -3434,6 +3417,7 @@ ObjectPtr Parser::Parse_Light_Group()
             END_EXPECT
             Parse_End();
         END_CASE
+
         OTHERWISE
             UNGET
             EXIT
@@ -3961,7 +3945,7 @@ void Parser::Parse_Mesh1 (Mesh* Object)
                 Triangles[number_of_triangles].P3 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, P3);
 
                 /* NK 1998 */
-                Parse_Three_UVCoords(UV1,UV2,UV3);
+                (void)Parse_Three_UVCoords(UV1,UV2,UV3);
                 Triangles[number_of_triangles].UV1 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, UV1);
                 Triangles[number_of_triangles].UV2 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, UV2);
                 Triangles[number_of_triangles].UV3 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, UV3);
@@ -3992,7 +3976,7 @@ void Parser::Parse_Mesh1 (Mesh* Object)
                    away.  why?  if not we get a parse error - we should just ignore the
                    degenerate triangle */
                 t2 = t3 = nullptr;
-                Parse_Three_UVCoords(UV1,UV2,UV3);
+                (void)Parse_Three_UVCoords(UV1,UV2,UV3);
                 Parse_Mesh_Texture(&t2,&t3);
             }
 
@@ -4069,7 +4053,7 @@ void Parser::Parse_Mesh1 (Mesh* Object)
                 l2 = D2.lengthSqr();
 
                 /* NK 1998 */
-                Parse_Three_UVCoords(UV1,UV2,UV3);
+                (void)Parse_Three_UVCoords(UV1,UV2,UV3);
                 Triangles[number_of_triangles].UV1 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, UV1);
                 Triangles[number_of_triangles].UV2 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, UV2);
                 Triangles[number_of_triangles].UV3 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, UV3);
@@ -4115,19 +4099,16 @@ void Parser::Parse_Mesh1 (Mesh* Object)
                    away.  why?  if not we get a parse error - we should just ignore the
                    degenerate triangle */
                 t2 = t3 = nullptr;
-                Parse_Three_UVCoords(UV1,UV2,UV3);
+                (void)Parse_Three_UVCoords(UV1,UV2,UV3);
                 Parse_Mesh_Texture(&t2,&t3);
             }
 
             Parse_End();
         END_CASE
 
-        /* NK 1998 */
         CASE(INSIDE_VECTOR_TOKEN)
             Parse_Vector(Inside_Vect);
-
         END_CASE
-        /* NK ---- */
 
         OTHERWISE
             UNGET
@@ -4541,7 +4522,7 @@ void Parser::Parse_Mesh2 (Mesh* Object)
         Triangles[i].P3 = c;
 
         /* look for a texture index */
-        EXPECT_ONE
+        EXPECT_ONE_CAT
             CASE_FLOAT_UNGET
                 Triangles[i].Texture = Parse_Float(); Parse_Comma();
                 if (Triangles[i].Texture >= number_of_textures ||
@@ -4556,7 +4537,7 @@ void Parser::Parse_Mesh2 (Mesh* Object)
             END_CASE
         END_EXPECT
         /* look for a texture index */
-        EXPECT_ONE
+        EXPECT_ONE_CAT
             CASE_FLOAT_UNGET
                 Triangles[i].Texture2 = Parse_Float(); Parse_Comma();
                 if (Triangles[i].Texture2 >= number_of_textures ||
@@ -4570,7 +4551,7 @@ void Parser::Parse_Mesh2 (Mesh* Object)
             END_CASE
         END_EXPECT
         /* look for a texture index */
-        EXPECT_ONE
+        EXPECT_ONE_CAT
             CASE_FLOAT_UNGET
                 Triangles[i].Texture3 = Parse_Float(); Parse_Comma();
                 if (Triangles[i].Texture3 >= number_of_textures ||
@@ -5191,54 +5172,18 @@ ObjectPtr Parser::Parse_Parametric(void)
             PrecompDepth= Parse_Float();
             Parse_Comma();
 
-            EXPECT_ONE
-                CASE(VECTOR_FUNCT_TOKEN)
-                    if(CurrentTokenFunctionId() != X_TOKEN)
-                    {
-                        UNGET
-                    }
-                    else
-                        PrecompFlag |= 1;
-                END_CASE
-
-                OTHERWISE
-                    UNGET
-                END_CASE
-            END_EXPECT
+            if (AllowToken(X_TOKEN))
+                PrecompFlag |= 1;
 
             Parse_Comma();
 
-            EXPECT_ONE
-                CASE(VECTOR_FUNCT_TOKEN)
-                    if(CurrentTokenFunctionId() != Y_TOKEN)
-                    {
-                        UNGET
-                    }
-                    else
-                        PrecompFlag |= 2;
-                END_CASE
-
-                OTHERWISE
-                    UNGET
-                END_CASE
-            END_EXPECT
+            if (AllowToken(Y_TOKEN))
+                PrecompFlag |= 2;
 
             Parse_Comma();
 
-            EXPECT_ONE
-                CASE(VECTOR_FUNCT_TOKEN)
-                    if(CurrentTokenFunctionId() != Z_TOKEN)
-                    {
-                        UNGET
-                    }
-                    else
-                        PrecompFlag |= 4;
-                END_CASE
-
-                OTHERWISE
-                    UNGET
-                END_CASE
-            END_EXPECT
+            if (AllowToken(Z_TOKEN))
+                PrecompFlag |= 4;
         END_CASE
 
         CASE(CONTAINED_BY_TOKEN)
@@ -5698,15 +5643,8 @@ ObjectPtr Parser::Parse_Prism()
 
     /* Closed or not closed that's the question. */
 
-    EXPECT_ONE
-        CASE(OPEN_TOKEN)
-            Clear_Flag(Object, CLOSED_FLAG);
-        END_CASE
-
-        OTHERWISE
-            UNGET
-        END_CASE
-    END_EXPECT
+    if (AllowToken(OPEN_TOKEN))
+        Clear_Flag(Object, CLOSED_FLAG);
 
     /* Check for closed prism. */
 
@@ -6054,15 +5992,8 @@ ObjectPtr Parser::Parse_Sor()
 
     /* Closed or not closed that's the question. */
 
-    EXPECT_ONE
-        CASE(OPEN_TOKEN)
-            Clear_Flag(Object, CLOSED_FLAG);
-        END_CASE
-
-        OTHERWISE
-            UNGET
-        END_CASE
-    END_EXPECT
+    if (AllowToken(OPEN_TOKEN))
+        Clear_Flag(Object, CLOSED_FLAG);
 
     /* There are Number-3 segments! */
 
@@ -6232,14 +6163,8 @@ ObjectPtr Parser::Parse_Sphere_Sweep()
         Parse_Comma();
     }
 
-    EXPECT_ONE
-        CASE(TOLERANCE_TOKEN)
-            Object->Depth_Tolerance = Parse_Float();
-        END_CASE
-        OTHERWISE
-            UNGET
-        END_CASE
-    END_EXPECT
+    if (AllowToken(TOLERANCE_TOKEN))
+        Object->Depth_Tolerance = Parse_Float();
 
     Object->Compute();
 
@@ -6553,31 +6478,23 @@ ObjectPtr Parser::Parse_TrueType ()
 
     cmap = TrueTypeFont::kAnyCMAP;
     charset = CharsetID::kUndefined;
-    EXPECT_ONE
-        CASE(CMAP_TOKEN)
-            Warning("Text primitive 'cmap' extension is experimental and may be "
-                    "subject to future changes.");
-            Parse_Begin();
-            cmap =  POV_UINT16(Parse_Float()) << 16;
-            Parse_Comma();
-            cmap += POV_UINT16(Parse_Float());
-            charset = CharsetID::kUCS4;
-            EXPECT_ONE
-                CASE(CHARSET_TOKEN)
-                    charset = CharsetID(POV_UINT16(Parse_Float()));
-                    if (Charset::Get(charset) == nullptr)
-                        Error("Unknown character set %i", int(charset));
-                END_CASE
-                OTHERWISE
-                    UNGET
-                END_CASE
-            END_EXPECT
-            Parse_End();
-        END_CASE
-        OTHERWISE
-            UNGET
-        END_CASE
-    END_EXPECT
+    if (AllowToken(CMAP_TOKEN))
+    {
+        Warning("Text primitive 'cmap' extension is experimental and may be "
+                "subject to future changes.");
+        Parse_Begin();
+        cmap =  POV_UINT16(Parse_Float()) << 16;
+        Parse_Comma();
+        cmap += POV_UINT16(Parse_Float());
+        charset = CharsetID::kUCS4;
+        if (AllowToken(CHARSET_TOKEN))
+        {
+            charset = CharsetID(POV_UINT16(Parse_Float()));
+            if (Charset::Get(charset) == nullptr)
+                Error("Unknown character set %i", int(charset));
+        }
+        Parse_End();
+    }
 
     /*** Object = Create_TTF(); */
     Parse_Comma();
@@ -7145,20 +7062,10 @@ void Parser::Parse_Frame ()
             Open_Include();
         END_CASE
 
-        CASE (FLOAT_FUNCT_TOKEN)
-            switch(CurrentTokenFunctionId())
-            {
-                case VERSION_TOKEN:
-                    VersionWarning(295,"Should have '#' before 'version'.");
-                    POV_EXPERIMENTAL_ASSERT(IsOkToDeclare());
-                    Parse_Version();
-                    break;
-
-                default:
-                    UNGET
-                    Expectation_Error ("object or directive");
-                    break;
-            }
+        CASE (VERSION_TOKEN)
+            VersionWarning(295,"Should have '#' before 'version'.");
+            POV_EXPERIMENTAL_ASSERT(IsOkToDeclare());
+            Parse_Version();
         END_CASE
 
         CASE (MAX_TRACE_LEVEL_TOKEN)
@@ -7749,7 +7656,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
     TransColour Local_Colour;
     char *s;
 
-    EXPECT
+    EXPECT_CAT
         CASE(UV_MAPPING_TOKEN)
             /* if no texture than allow uv_mapping
                otherwise, warn user */
@@ -7894,18 +7801,14 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
                 if(Object->Clip == Object->Bound)
                     Error ("Cannot add bounds after linking bounds and clips.");
 
-            EXPECT_ONE
-                CASE (CLIPPED_BY_TOKEN)
-                    if(!Object->Bound.empty())
-                        Error ("Cannot link clips with previous bounds.");
-                    Object->Bound = Object->Clip;
-                END_CASE
-
-                OTHERWISE
-                    UNGET
-                    Parse_Bound_Clip(Object->Bound);
-                END_CASE
-            END_EXPECT
+            if (AllowToken(CLIPPED_BY_TOKEN))
+            {
+                if (!Object->Bound.empty())
+                    Error("Cannot link clips with previous bounds.");
+                Object->Bound = Object->Clip;
+            }
+            else
+                Parse_Bound_Clip(Object->Bound);
 
             Parse_End ();
         END_CASE
@@ -7916,28 +7819,26 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
                 if(Object->Clip == Object->Bound)
                     Error ("Cannot add clips after linking bounds and clips.");
 
-            EXPECT_ONE
-                CASE (BOUNDED_BY_TOKEN)
-                    if(!Object->Clip.empty())
-                        Error ("Cannot link bounds with previous clips.");
-                    Object->Clip = Object->Bound;
-                END_CASE
+            if (AllowToken(BOUNDED_BY_TOKEN))
+            {
+                if (!Object->Clip.empty())
+                    Error("Cannot link bounds with previous clips.");
+                Object->Clip = Object->Bound;
+            }
+            else
+            {
+                Parse_Bound_Clip(Object->Clip);
 
-                OTHERWISE
-                    UNGET
-                    Parse_Bound_Clip(Object->Clip);
+                /* Compute quadric bounding box before transformations. [DB 8/94] */
 
-                    /* Compute quadric bounding box before transformations. [DB 8/94] */
+                if (dynamic_cast<Quadric *>(Object) != nullptr)
+                {
+                    Min = Vector3d(-BOUND_HUGE);
+                    Max = Vector3d(BOUND_HUGE);
 
-                    if (dynamic_cast<Quadric *>(Object) != nullptr)
-                    {
-                        Min = Vector3d(-BOUND_HUGE);
-                        Max = Vector3d(BOUND_HUGE);
-
-                        (dynamic_cast<Quadric *>(Object))->Compute_BBox(Min, Max);
-                    }
-                END_CASE
-            END_EXPECT
+                    (dynamic_cast<Quadric *>(Object))->Compute_BBox(Min, Max);
+                }
+            }
 
             Parse_End ();
         END_CASE
@@ -8273,7 +8174,7 @@ void Parser::Parse_Matrix(MATRIX Matrix)
 TRANSFORM *Parser::Parse_Transform(TRANSFORM *Trans)
 {
     Get_Token();
-    if(CurrentTokenId() == TRANSFORM_ID_TOKEN)
+    if(CurrentTrueTokenId() == TRANSFORM_ID_TOKEN)
     {
         /* using old "transform TRANS_IDENT" syntax */
         if (Trans == nullptr)
@@ -8501,30 +8402,22 @@ void Parser::Parse_Bound_Clip(vector<ObjectPtr>& dest, bool notexture)
 *
 ******************************************************************************/
 
-int Parser::Parse_Three_UVCoords(Vector2d& UV1, Vector2d& UV2, Vector2d& UV3)
+bool Parser::Parse_Three_UVCoords(Vector2d& UV1, Vector2d& UV2, Vector2d& UV3)
 {
-    int Return_Value;
-
-    EXPECT_ONE
-        CASE(UV_VECTORS_TOKEN)
-            Parse_UV_Vect(UV1);  Parse_Comma();
-            Parse_UV_Vect(UV2);  Parse_Comma();
-            Parse_UV_Vect(UV3);
-
-            Return_Value = 1;
-        END_CASE
-
-        OTHERWISE
-            UV1[0] = UV1[1] = 0.0;
-            UV2[0] = UV2[1] = 0.0;
-            UV3[0] = UV3[1] = 0.0;
-            Return_Value = 0;
-            UNGET
-        END_CASE
-
-    END_EXPECT
-
-    return(Return_Value);
+    if (AllowToken(UV_VECTORS_TOKEN))
+    {
+        Parse_UV_Vect(UV1);  Parse_Comma();
+        Parse_UV_Vect(UV2);  Parse_Comma();
+        Parse_UV_Vect(UV3);
+        return true;
+    }
+    else
+    {
+        UV1[0] = UV1[1] = 0.0;
+        UV2[0] = UV2[1] = 0.0;
+        UV3[0] = UV3[1] = 0.0;
+        return false;
+    }
 }
 
 
@@ -8549,7 +8442,7 @@ int Parser::Parse_Three_UVCoords(Vector2d& UV1, Vector2d& UV2, Vector2d& UV3)
 bool Parser::Parse_Comma (void)
 {
     Get_Token();
-    if (CurrentTokenId() != COMMA_TOKEN)
+    if (CurrentTrueTokenId() != COMMA_TOKEN)
     {
         UNGET
         return false;
@@ -8563,8 +8456,7 @@ bool Parser::Parse_Comma (void)
 bool Parser::AllowToken(TokenId tokenId)
 {
     Get_Token();
-    bool tokenMatches = ((CurrentTokenId()         == tokenId) ||
-                         (CurrentTokenFunctionId() == tokenId));
+    bool tokenMatches = (CurrentTrueTokenId() == tokenId);
     if (!tokenMatches)
         Unget_Token();
     return tokenMatches;
@@ -8575,8 +8467,7 @@ bool Parser::AllowToken(TokenId tokenId)
 bool Parser::Peek_Token (TokenId tokenId)
 {
     Get_Token();
-    bool tokenMatches = ((CurrentTokenId()         == tokenId) ||
-                         (CurrentTokenFunctionId() == tokenId));
+    bool tokenMatches = (CurrentTrueTokenId() == tokenId);
     Unget_Token();
     return tokenMatches;
 }
@@ -8603,7 +8494,7 @@ bool Parser::Peek_Token (TokenId tokenId)
 void Parser::Parse_Semi_Colon (bool force_semicolon)
 {
     Get_Token();
-    if (CurrentTokenId() != SEMI_COLON_TOKEN)
+    if (CurrentTrueTokenId() != SEMI_COLON_TOKEN)
     {
         UNGET
         if ((sceneData->EffectiveLanguageVersion() >= 350) && (force_semicolon == true))
@@ -8676,20 +8567,14 @@ void Parser::Parse_Coeffs(int order, DBL *Coeffs)
 
 ObjectPtr Parser::Parse_Object_Id ()
 {
-    ObjectPtr Object;
+    ObjectPtr Object = nullptr;
 
-    EXPECT_ONE
-        CASE (OBJECT_ID_TOKEN)
-            Warn_State(OBJECT_ID_TOKEN, OBJECT_TOKEN);
-            Object = Copy_Object(CurrentTokenDataPtr<ObjectPtr>());
-            Object = Parse_Object_Mods (Object);
-        END_CASE
-
-        OTHERWISE
-            Object = nullptr;
-            UNGET
-        END_CASE
-    END_EXPECT
+    if (AllowToken(OBJECT_ID_TOKEN))
+    {
+        Warn_State(OBJECT_TOKEN);
+        Object = Copy_Object(CurrentTokenDataPtr<ObjectPtr>());
+        Object = Parse_Object_Mods(Object);
+    }
 
     return (Object);
 }
@@ -8793,7 +8678,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             CASE (DEPRECATED_TOKEN)
                 deprecated = true;
                 ALLOW(ONCE_TOKEN);
-                if (CurrentTokenId() == ONCE_TOKEN)
+                if (CurrentTrueTokenId() == ONCE_TOKEN)
                     deprecated_once = true;
                 deprecation_message = Parse_String(false, false);
             END_CASE
@@ -8819,7 +8704,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                 {
                     numberPtr = mToken.NumberPtr;
                     dataPtr   = mToken.DataPtr;
-                    Previous  = CurrentTokenId();
+                    Previous  = CurrentTrueTokenId();
                 }
                 else
                 {
@@ -8832,8 +8717,8 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                     else
                         Temp_Entry = mSymbolStack.Add_Symbol (Local_Index, CurrentTokenText(), IDENTIFIER_TOKEN);
                     numberPtr = &(Temp_Entry->Token_Number);
-                    dataPtr = &(Temp_Entry->Data);
-                    Previous = CurrentTokenId();
+                    dataPtr   = &(Temp_Entry->Data);
+                    Previous  = CurrentTrueTokenId();
                     if (deprecated)
                     {
                         Temp_Entry->deprecated = true;;
@@ -8876,6 +8761,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             CASE4 (DENSITY_MAP_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_ID_TOKEN, UV_ID_TOKEN)
             CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
             CASE3 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN, DICTIONARY_ID_TOKEN)
+            CASE2 (VECTOR_ID_TOKEN, FLOAT_ID_TOKEN)
                 if (is_local && !mSymbolStack.IsLocalTableIndex(mToken.context))
                 {
                     if (CurrentTokenIsContainerElement())
@@ -8891,7 +8777,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                     allow_redefine = !CurrentTokenIsHomogenousArrayElement();
                     numberPtr = mToken.NumberPtr;
                     dataPtr   = mToken.DataPtr;
-                    Previous  = CurrentTokenId();
+                    Previous  = CurrentTrueTokenId();
                 }
             END_CASE
 
@@ -8900,37 +8786,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                 allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==EMPTY_ARRAY_TOKEN
                 numberPtr = mToken.NumberPtr;
                 dataPtr   = mToken.DataPtr;
-                Previous  = CurrentTokenId();
-            END_CASE
-
-            CASE2 (VECTOR_FUNCT_TOKEN, FLOAT_FUNCT_TOKEN)
-                switch(CurrentTokenFunctionId())
-                {
-                    case VECTOR_ID_TOKEN:
-                    case FLOAT_ID_TOKEN:
-                        if (is_local && !mSymbolStack.IsLocalTableIndex(mToken.context))
-                        {
-                            if (CurrentTokenIsContainerElement())
-                                Error("Cannot use '#local' to assign a non-local array or dictionary element.");
-                            allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==IDENTIFIER_TOKEN
-                            Temp_Entry = mSymbolStack.Add_Symbol (Local_Index, CurrentTokenText(), IDENTIFIER_TOKEN);
-                            numberPtr = &(Temp_Entry->Token_Number);
-                            dataPtr   = &(Temp_Entry->Data);
-                            Previous  = IDENTIFIER_TOKEN;
-                        }
-                        else
-                        {
-                            allow_redefine  = !CurrentTokenIsHomogenousArrayElement();
-                            numberPtr = mToken.NumberPtr;
-                            dataPtr   = mToken.DataPtr;
-                            Previous  = CurrentTokenFunctionId();
-                        }
-                        break;
-
-                    default:
-                        Parse_Error(IDENTIFIER_TOKEN);
-                        break;
-                }
+                Previous  = CurrentTrueTokenId();
             END_CASE
 
             CASE4 (COMMA_TOKEN, RIGHT_PAREN_TOKEN, RIGHT_ANGLE_TOKEN, RIGHT_CURLY_TOKEN)
@@ -8971,19 +8827,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
         if (lvectorDeclare && (lvalues.size() >= 5))
             more = false;
         else if (tupleDeclare || lvectorDeclare || larrayDeclare)
-        {
-            EXPECT_ONE
-                CASE (COMMA_TOKEN)
-                    more = true;
-                END_CASE
-
-                OTHERWISE
-                    more = false;
-                    UNGET
-                END_CASE
-            END_EXPECT
-
-        }
+            more = AllowToken(COMMA_TOKEN);
         else
             more = false;
     }
@@ -9128,7 +8972,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
     {
         POV_EXPERIMENTAL_ASSERT(IsOkToDeclare());
         SetOkToDeclare(false);
-        ALLOW( SEMI_COLON_TOKEN );
+        ALLOW(SEMI_COLON_TOKEN);
         SetOkToDeclare(true);
     }
 }
@@ -9175,7 +9019,7 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
     bool oldParseOptionalRVaue = parseOptionalRValue;
     parseOptionalRValue = allowUndefined;
 
-    EXPECT_ONE
+    EXPECT_ONE_CAT
         CASE4 (NORMAL_ID_TOKEN, FINISH_ID_TOKEN, TEXTURE_ID_TOKEN, OBJECT_ID_TOKEN)
         CASE4 (COLOUR_MAP_ID_TOKEN, TRANSFORM_ID_TOKEN, CAMERA_ID_TOKEN, PIGMENT_ID_TOKEN)
         CASE4 (SLOPE_MAP_ID_TOKEN,NORMAL_MAP_ID_TOKEN,TEXTURE_MAP_ID_TOKEN,ARRAY_ID_TOKEN)
@@ -9214,7 +9058,7 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
         END_CASE
 
         CASE_COLOUR_RAW // no UNGET here
-            if((CurrentTokenId() != COLOUR_ID_TOKEN) || (sceneData->EffectiveLanguageVersion() < 350))
+            if ((CurrentTrueTokenId() != COLOUR_ID_TOKEN) || (sceneData->EffectiveLanguageVersion() < 350))
             {
                 UNGET
                 Local_Colour  = Create_Colour();
@@ -9244,8 +9088,10 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
             // [2] Who is "me" anyway? [CLi]
 
             // determine the type of the first identifier
-            function_identifier = (CurrentTokenId()==FUNCT_ID_TOKEN) || (CurrentTokenId()==VECTFUNCT_ID_TOKEN);
-            callable_identifier = (CurrentTokenId()==FUNCT_ID_TOKEN) || (CurrentTokenId()==VECTFUNCT_ID_TOKEN) || (CurrentTokenId()==SPLINE_ID_TOKEN);
+            function_identifier = (CurrentTrueTokenId() == FUNCT_ID_TOKEN) ||
+                                  (CurrentTrueTokenId() == VECTFUNCT_ID_TOKEN);
+            callable_identifier = function_identifier ||
+                                  (CurrentTrueTokenId() == SPLINE_ID_TOKEN);
 
             // don't allow #declares from here
             SetOkToDeclare(false);
@@ -9255,10 +9101,11 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
             // of a float, vector or color then count the tokens
             // found between now and the time when the function
             // Parse_Unknown_Vector returns
-            if (callable_identifier || (ParFlag &&
-                (((CurrentTokenId()==FLOAT_FUNCT_TOKEN) && (CurrentTokenFunctionId()==FLOAT_ID_TOKEN)) ||
-                 ((CurrentTokenId()==VECTOR_FUNCT_TOKEN) &&  (CurrentTokenFunctionId()==VECTOR_ID_TOKEN)) ||
-                 (CurrentTokenId()==VECTOR_4D_ID_TOKEN) || (CurrentTokenId()==UV_ID_TOKEN) || (CurrentTokenId()==COLOUR_ID_TOKEN))))
+            if (callable_identifier || (ParFlag && ((CurrentTrueTokenId()==FLOAT_ID_TOKEN)     ||
+                                                    (CurrentTrueTokenId()==VECTOR_ID_TOKEN)    ||
+                                                    (CurrentTrueTokenId()==VECTOR_4D_ID_TOKEN) ||
+                                                    (CurrentTrueTokenId()==UV_ID_TOKEN)        ||
+                                                    (CurrentTrueTokenId()==COLOUR_ID_TOKEN))))
             {
                 Temp_Count = mTokenCount;
             }
@@ -9270,8 +9117,9 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
             // so we claim dibs on it until we're done.
             // TODO - this is a bit hackish; ideally, if the Token is a symbol we should have it store the SYM_ENTRY pointer,
             // so we don't need to look it up again via name.
-            if ((CurrentTokenId()==FUNCT_ID_TOKEN) || (CurrentTokenId()==VECTFUNCT_ID_TOKEN) || (CurrentTokenId()==SPLINE_ID_TOKEN) ||
-                (CurrentTokenId()==UV_ID_TOKEN) || (CurrentTokenId()==VECTOR_4D_ID_TOKEN) || (CurrentTokenId()==COLOUR_ID_TOKEN))
+            if ((CurrentTrueTokenId() == FUNCT_ID_TOKEN)     || (CurrentTrueTokenId() == VECTFUNCT_ID_TOKEN) ||
+                (CurrentTrueTokenId() == SPLINE_ID_TOKEN)    || (CurrentTrueTokenId() == UV_ID_TOKEN)        ||
+                (CurrentTrueTokenId() == VECTOR_4D_ID_TOKEN) || (CurrentTrueTokenId() == COLOUR_ID_TOKEN))
             {
                 symbol_entry = mToken.table->Find_Symbol (CurrentTokenText().c_str());
                 if (symbol_entry)
@@ -9785,25 +9633,25 @@ void Parser::Found_Instead_Error(const char *exstr, const char *extokstr)
 {
     const char *found;
 
-    switch(CurrentTokenId())
+    switch (CurrentCategorizedTokenId())
     {
         case IDENTIFIER_TOKEN:
             Error("%s '%s', undeclared identifier '%s' found instead", exstr, extokstr, CurrentTokenText().c_str());
             break;
-        case VECTOR_FUNCT_TOKEN:
-            found = Get_Token_String(CurrentTokenFunctionId());
+        case VECTOR_TOKEN_CATEGORY:
+            found = Get_Token_String(CurrentTrueTokenId());
             Error("%s '%s', vector function '%s' found instead", exstr, extokstr, found);
             break;
-        case FLOAT_FUNCT_TOKEN:
-            found = Get_Token_String(CurrentTokenFunctionId());
+        case FLOAT_TOKEN_CATEGORY:
+            found = Get_Token_String(CurrentTrueTokenId());
             Error("%s '%s', float function '%s' found instead", exstr, extokstr, found);
             break;
-        case COLOUR_KEY_TOKEN:
-            found = Get_Token_String(CurrentTokenFunctionId());
+        case COLOUR_TOKEN_CATEGORY:
+            found = Get_Token_String(CurrentTrueTokenId());
             Error("%s '%s', color keyword '%s' found instead", exstr, extokstr, found);
             break;
         default:
-            found = Get_Token_String(CurrentTokenId());
+            found = Get_Token_String(CurrentTrueTokenId());
             Error("%s '%s', %s found instead", exstr, extokstr, found);
     }
 }
@@ -9827,7 +9675,7 @@ void Parser::Found_Instead_Error(const char *exstr, const char *extokstr)
 *
 ******************************************************************************/
 
-void Parser::Warn_State(TokenId Token_Id, TokenId Type)
+void Parser::Warn_State(TokenId Type)
 {
     char *str;
 
@@ -9837,7 +9685,7 @@ void Parser::Warn_State(TokenId Token_Id, TokenId Type)
     str = reinterpret_cast<char *>(POV_MALLOC(160, "global setting warning string"));
 
     strcpy(str, "Found '");
-    strcat(str, Get_Token_String (Token_Id));
+    strcat(str, Get_Token_String (CurrentTrueTokenId()));
     strcat(str, "' that should be in '");
     strcat(str, Get_Token_String (Type));
     strcat(str, "' statement.");

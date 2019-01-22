@@ -93,64 +93,66 @@ const int TOKEN_OVERFLOW_RESET_COUNT = 2500;
 /* Here we create our own little language for doing the parsing.  It
   makes the code easier to read. */
 
-#define GET(x)      Get_Token(); \
-                    if (CurrentTokenId() != x) \
-                        Parse_Error (x);
+#define GET(x)          Get_Token(); \
+                        if (CurrentTrueTokenId() != x) \
+                            Parse_Error (x);
 
-#define ALLOW(x)    Get_Token(); \
-                    if (CurrentTokenId() != x) \
-                        Unget_Token();
+#define ALLOW(x)        Get_Token(); \
+                        if (CurrentTrueTokenId() != x) \
+                            Unget_Token();
 
-#define UNGET       Unget_Token();
+#define UNGET           Unget_Token();
 
-#define EXPECT      { \
-                        int Exit_Flag; \
-                        Exit_Flag = false; \
-                        while (!Exit_Flag) \
-                        { \
-                            Get_Token(); \
-                            switch (CurrentTokenId()) \
-                            {
+#define EXPECT          EXPECT_(CurrentTrueTokenId())
+#define EXPECT_CAT      EXPECT_(CurrentCategorizedTokenId())
+#define EXPECT_ONE      EXPECT_ONE_(CurrentTrueTokenId())
+#define EXPECT_ONE_CAT  EXPECT_ONE_(CurrentCategorizedTokenId())
 
-#define EXPECT_ONE  { \
-                        int Exit_Flag; \
-                        Exit_Flag = false; \
-                        { \
-                            Get_Token(); \
-                            switch (CurrentTokenId()) \
-                            {
+#define EXPECT_(x)      { \
+                            bool exitExpect = false; \
+                            while (!exitExpect) \
+                            { \
+                                Get_Token(); \
+                                switch (x) \
+                                {
 
-#define CASE(x)                 case x:
-#define CASE2(x, y)             case x: case y:
-#define CASE3(x, y, z)          case x: case y: case z:
-#define CASE4(w, x, y, z)       case w: case x: case y: case z:
-#define CASE5(v, w, x, y, z)    case v: case w: case x: case y: case z:
-#define CASE6(u, v, w, x, y, z) case u: case v: case w: case x: case y: case z:
-#define OTHERWISE               default:
+#define EXPECT_ONE_(x)  { \
+                            { \
+                                Get_Token(); \
+                                switch (x) \
+                                {
 
-#define CASE_FLOAT_RAW          CASE2 (LEFT_PAREN_TOKEN,FLOAT_FUNCT_TOKEN) \
-                                CASE4 (PLUS_TOKEN,DASH_TOKEN,FUNCT_ID_TOKEN,EXCLAMATION_TOKEN)
+#define CASE(x)                     case x:
+#define CASE2(x, y)                 case x: case y:
+#define CASE3(x, y, z)              case x: case y: case z:
+#define CASE4(w, x, y, z)           case w: case x: case y: case z:
+#define CASE5(v, w, x, y, z)        case v: case w: case x: case y: case z:
+#define CASE6(u, v, w, x, y, z)     case u: case v: case w: case x: case y: case z:
+#define OTHERWISE                   default:
 
-#define CASE_VECTOR_RAW         CASE3 (VECTFUNCT_ID_TOKEN,VECTOR_FUNCT_TOKEN,LEFT_ANGLE_TOKEN) \
-                                CASE5 (U_TOKEN,V_TOKEN,UV_ID_TOKEN,VECTOR_4D_ID_TOKEN,SPLINE_ID_TOKEN) \
-                                CASE_FLOAT_RAW
+#define CASE_FLOAT_RAW              CASE2 (LEFT_PAREN_TOKEN,FLOAT_TOKEN_CATEGORY) \
+                                    CASE4 (PLUS_TOKEN,DASH_TOKEN,FUNCT_ID_TOKEN,EXCLAMATION_TOKEN)
 
-#define CASE_COLOUR_RAW         CASE3 (COLOUR_TOKEN,COLOUR_KEY_TOKEN,COLOUR_ID_TOKEN)
+#define CASE_VECTOR_RAW             CASE3 (VECTFUNCT_ID_TOKEN,VECTOR_TOKEN_CATEGORY,LEFT_ANGLE_TOKEN) \
+                                    CASE5 (U_TOKEN,V_TOKEN,UV_ID_TOKEN,VECTOR_4D_ID_TOKEN,SPLINE_ID_TOKEN) \
+                                    CASE_FLOAT_RAW
 
-#define CASE_EXPRESS_RAW        CASE_VECTOR_RAW CASE_COLOUR_RAW
+#define CASE_COLOUR_RAW             CASE3 (COLOUR_TOKEN,COLOUR_TOKEN_CATEGORY,COLOUR_ID_TOKEN)
 
-#define CASE_FLOAT_UNGET        CASE_FLOAT_RAW      UNGET
-#define CASE_VECTOR_UNGET       CASE_VECTOR_RAW     UNGET
-#define CASE_COLOUR_UNGET       CASE_COLOUR_RAW     UNGET
-#define CASE_EXPRESS_UNGET      CASE_EXPRESS_RAW    UNGET
+#define CASE_EXPRESS_RAW            CASE_VECTOR_RAW CASE_COLOUR_RAW
 
-#define END_CASE                    break;
-#define FALLTHROUGH_CASE            // FALLTHROUGH
-#define EXIT                        Exit_Flag = true;
+#define CASE_FLOAT_UNGET            CASE_FLOAT_RAW      UNGET
+#define CASE_VECTOR_UNGET           CASE_VECTOR_RAW     UNGET
+#define CASE_COLOUR_UNGET           CASE_COLOUR_RAW     UNGET
+#define CASE_EXPRESS_UNGET          CASE_EXPRESS_RAW    UNGET
 
-#define END_EXPECT          } \
-                        } \
-                    }
+#define END_CASE                        break;
+#define FALLTHROUGH_CASE                // FALLTHROUGH
+#define EXIT                            exitExpect = true;
+
+#define END_EXPECT              } \
+                            } \
+                        }
 
 
 struct ExperimentalFlags
@@ -232,25 +234,37 @@ class Parser
         {
             RawToken raw;
             ConstStreamPtr sourceFile;
-            TokenId Token_Id;                               ///< reserved token (or token group) ID, or unique identifier ID
-            TokenId Function_Id;                            ///< token type ID, in case Token_Id is an identifier ID
-            int context;                                    ///< context the token is local to (i.e., table index)
-            DBL Token_Float;                                ///< token value (if it is a float literal)
-            void *Data;                                     ///< reference to token value (if it is a non-float identifier)
+            int context;                        ///< Context the token is local to (i.e., table index).
+            DBL Token_Float;                    ///< Token value (if it is a float literal).
+            void *Data;                         ///< Reference to token value (if it is a non-float identifier).
             TokenId *NumberPtr;
             void **DataPtr;
-            SymbolTable* table;                             ///< table or dictionary the token references an element of
-            bool Unget_Token            : 1;                ///< `true` if @ref Get_Token() must re-issue this token as-is.
-            bool ungetRaw               : 1;                ///< `true` if @ref Get_Token() must re-evaluate this token from raw.
+            SymbolTable* table;                 ///< Table or dictionary the token references an element of.
+            bool Unget_Token            : 1;    ///< `true` if @ref Get_Token() must re-issue this token as-is.
+            bool ungetRaw               : 1;    ///< `true` if @ref Get_Token() must re-evaluate this token from raw.
             bool End_Of_File            : 1;
-            bool is_array_elem          : 1;                ///< true if token is actually an array element reference
-            bool is_mixed_array_elem    : 1;                ///< true if token is actually a mixed-type array element reference
-            bool is_dictionary_elem     : 1;                ///< true if token is actually a dictionary element reference
+            bool is_array_elem          : 1;    ///< `true` if token is an array element reference.
+            bool is_mixed_array_elem    : 1;    ///< `true` if token is a mixed-type array element reference.
+            bool is_dictionary_elem     : 1;    ///< `true` if token is a dictionary element reference.
+
+            void SetTokenId(const RawToken& rawToken);
+            void SetTokenId(TokenId tokenId);
+
+            /// Token ID, or identifier type ID (`XXX_ID_TOKEN`) in case of identifier token.
+            TokenId GetTrueTokenId() const;
+
+            /// Token category if applicable, otherwise equal to @ref mTrueTokenId.
+            TokenId GetCategorizedTokenId() const;
 
             virtual UCS2String GetFileName() const override { return sourceFile->Name(); }
             virtual POV_LONG GetLine() const override { return raw.lexeme.position.line; }
             virtual POV_LONG GetColumn() const override { return raw.lexeme.position.column; }
             virtual POV_OFF_T GetOffset() const override { return raw.lexeme.position.offset; }
+
+        private:
+
+            TokenId mTrueTokenId;               ///< Token ID, or identifier type ID in case of identifier token.
+            TokenId mCategorizedTokenId;        ///< Token category if applicable, otherwise equal to @ref mTrueTokenId.
         };
 
         struct LValue
@@ -395,7 +409,7 @@ class Parser
         void Parse_Semi_Colon (bool force_semicolon);
         void Destroy_Frame (void);
         void MAError (const char *str, long size);
-        void Warn_State (TokenId Token_Id, TokenId Type);
+        void Warn_State (TokenId Type);
         void Only_In (const char *s1,const char *s2);
         void Not_With (const char *s1,const char *s2);
         void Warn_Compat (bool definite, const char *sym);
@@ -416,7 +430,6 @@ class Parser
         void Expectation_Error(const char *);
         TRANSFORM *Parse_Transform(TRANSFORM *Trans = nullptr);
         TRANSFORM *Parse_Transform_Block(TRANSFORM *New = nullptr);
-        char *Get_Reserved_Words (const char *additional_words);
 
         void SendFatalError(Exception& e);
 
@@ -448,8 +461,8 @@ class Parser
         void Get_Token (void);
         void Unget_Token (void);
 
-        TokenId CurrentTokenId() const;
-        TokenId CurrentTokenFunctionId() const;
+        TokenId CurrentCategorizedTokenId() const;
+        TokenId CurrentTrueTokenId() const;
         const UTF8String& CurrentTokenText() const;
         const MessageContext& CurrentTokenMessageContext() const;
         void InitCurrentToken();
@@ -607,7 +620,8 @@ class Parser
         {
             TokenId         openToken;
             ConstStreamPtr  file;
-            BraceStackEntry(const Token_Struct& token) : LexemePosition(token.raw.lexeme.position), openToken(token.Token_Id), file(token.sourceFile) {}
+            BraceStackEntry(const Token_Struct& token) :
+                LexemePosition(token.raw.lexeme.position), openToken(token.GetTrueTokenId()), file(token.sourceFile) {}
             virtual UCS2String GetFileName() const override { return file->Name(); }
             virtual POV_LONG GetLine() const override { return line; }
             virtual POV_LONG GetColumn() const override { return column; }
@@ -693,8 +707,6 @@ class Parser
         bool Skipping, Inside_Ifdef, Inside_MacroDef, Parsing_Directive, parseRawIdentifiers, parseOptionalRValue;
 
         bool Got_EOF; // WARNING: Changes to the use of this variable are very dangerous as it is used in many places assuming certain non-obvious side effects! [trf]
-
-        TokenId Conversion_Util_Table[TOKEN_COUNT];
 
         RawTokenizer    mTokenizer;
         RawToken        mPendingRawToken;
@@ -792,7 +804,7 @@ class Parser
         void ParseContainedBy(shared_ptr<ContainedByShape>& container, ObjectPtr obj);
 
         ObjectPtr Parse_Sphere_Sweep(void);
-        int Parse_Three_UVCoords(Vector2d& UV1, Vector2d& UV2, Vector2d& UV3);
+        bool Parse_Three_UVCoords(Vector2d& UV1, Vector2d& UV2, Vector2d& UV3);
 
         // tokenize.h/tokenize.cpp
         void UngetRawToken(const RawToken& rawToken);

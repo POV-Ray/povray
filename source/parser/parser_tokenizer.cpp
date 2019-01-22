@@ -137,7 +137,7 @@ void Parser::CheckFileSignature()
     RawToken signature;
     if (GetRawToken(signature, false))
     {
-        if (signature.expressionId == SIGNATURE_FUNCT_TOKEN)
+        if (signature.expressionId == SIGNATURE_TOKEN_CATEGORY)
         {
             // Found a signature. Switch to the corresponding encoding automatically.
             switch (signature.id)
@@ -172,8 +172,6 @@ void Parser::CheckFileSignature()
 
 void Parser::pre_init_tokenizer ()
 {
-    int i;
-
     InitCurrentToken();
 
     mTokensSinceLastProgressReport = 0;
@@ -189,25 +187,6 @@ void Parser::pre_init_tokenizer ()
     parseRawIdentifiers = false;
     parseOptionalRValue = false;
     POV_EXPERIMENTAL_ASSERT(mSymbolStack.GetLocalTableIndex() == -1);
-
-    // TODO - on modern machines it may be faster to do the comparisons for each token
-    //        than to access the conversion table.
-    for(i = 0; i < TOKEN_COUNT; i++)
-    {
-        Conversion_Util_Table[i] = TokenId(i);
-        if(i < FLOAT_FUNCT_TOKEN)
-            Conversion_Util_Table[i] = FLOAT_FUNCT_TOKEN;
-        else
-        {
-            if(i < VECTOR_FUNCT_TOKEN)
-                Conversion_Util_Table[i] = VECTOR_FUNCT_TOKEN;
-            else
-            {
-                if(i < COLOUR_KEY_TOKEN)
-                    Conversion_Util_Table[i] = COLOUR_KEY_TOKEN;
-            }
-        }
-    }
 
     // TODO - implement a mechanism to expose to user
     MaxCachedMacroSize = POV_PARSER_MAX_CACHED_MACRO_SIZE;
@@ -288,7 +267,7 @@ void Parser::Get_Token ()
 
     InvalidateCurrentToken();
 
-    while (CurrentTokenId() == END_OF_FILE_TOKEN)
+    while (CurrentTrueTokenId() == END_OF_FILE_TOKEN)
     {
         bool fastForwardToDirective = (Skipping && !Parsing_Directive);
 
@@ -364,7 +343,7 @@ void Parser::Get_Token ()
                         // Re-issue the hash token to trigger an expectation error downstream.
                         // Hash tokens normally never get processed into high-level tokens,
                         // so we need to construct one now.
-                        mToken.Token_Id = HASH_TOKEN;
+                        mToken.SetTokenId(HASH_TOKEN);
                         mToken.is_array_elem = false;
                         mToken.is_mixed_array_elem = false;
                         mToken.is_dictionary_elem = false;
@@ -497,7 +476,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
     {
         if (pseudoDictionary >= 0)
         {
-            mToken.Token_Id = DICTIONARY_ID_TOKEN;
+            mToken.SetTokenId(DICTIONARY_ID_TOKEN);
             mToken.is_array_elem = false;
             mToken.is_mixed_array_elem = false;
             mToken.is_dictionary_elem = false;
@@ -527,20 +506,19 @@ void Parser::Read_Symbol(const RawToken& rawToken)
                     }
                     else
                     {
-                        mToken.Token_Id=MACRO_ID_TOKEN;
                         mToken.is_array_elem = false;
                         mToken.is_mixed_array_elem = false;
                         mToken.is_dictionary_elem = false;
                         mToken.NumberPtr = &(Temp_Entry->Token_Number);
                         mToken.DataPtr   = &(Temp_Entry->Data);
-                        Write_Token (mToken.Token_Id, rawToken, mSymbolStack.GetTable(Local_Index));
+                        Write_Token (MACRO_ID_TOKEN, rawToken, mSymbolStack.GetTable(Local_Index));
 
                         mToken.context = Local_Index;
                     }
                     return;
                 }
 
-                mToken.Token_Id  =   Temp_Entry->Token_Number;
+                mToken.SetTokenId(Temp_Entry->Token_Number);
                 mToken.is_array_elem = false;
                 mToken.is_mixed_array_elem = false;
                 mToken.is_dictionary_elem = false;
@@ -556,7 +534,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
             bool breakLoop = false;
             while (!breakLoop)
             {
-                switch (mToken.Token_Id)
+                switch (mToken.GetTrueTokenId())
                 {
                     case ARRAY_ID_TOKEN:
                         {
@@ -619,7 +597,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
                             mToken.DataPtr = &(a->DataPtrs[j]);
                             mToken.is_mixed_array_elem = a->mixedType;
                             mToken.NumberPtr = &(a->ElementType(j));
-                            mToken.Token_Id = *mToken.NumberPtr;
+                            mToken.SetTokenId(*mToken.NumberPtr);
                             mToken.is_array_elem = true;
                             mToken.is_dictionary_elem = false;
                         }
@@ -670,7 +648,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
                                 Get_Token ();
                                 parseRawIdentifiers = oldParseRawIdentifiers;
 
-                                if (mToken.Token_Id != IDENTIFIER_TOKEN)
+                                if (mToken.GetTrueTokenId() != IDENTIFIER_TOKEN)
                                     Expectation_Error ("dictionary element identifier");
 
                                 Temp_Entry = table->Find_Symbol (CurrentTokenText().c_str());
@@ -698,21 +676,21 @@ void Parser::Read_Symbol(const RawToken& rawToken)
 
                             if (Temp_Entry)
                             {
-                                mToken.Token_Id      = Temp_Entry->Token_Number;
-                                mToken.NumberPtr     = &(Temp_Entry->Token_Number);
-                                mToken.DataPtr       = &(Temp_Entry->Data);
+                                mToken.SetTokenId(Temp_Entry->Token_Number);
+                                mToken.NumberPtr    = &(Temp_Entry->Token_Number);
+                                mToken.DataPtr      = &(Temp_Entry->Data);
                             }
                             else
                             {
                                 if (!LValue_Ok && !Inside_Ifdef && !parseOptionalRValue)
                                     Error ("Attempt to access uninitialized dictionary element.");
-                                mToken.Token_Id  = IDENTIFIER_TOKEN;
-                                mToken.DataPtr   = nullptr;
-                                mToken.NumberPtr = nullptr;
+                                mToken.SetTokenId(IDENTIFIER_TOKEN);
+                                mToken.DataPtr      = nullptr;
+                                mToken.NumberPtr    = nullptr;
                             }
-                            mToken.is_array_elem = false;
-                            mToken.is_mixed_array_elem = false;
-                            mToken.is_dictionary_elem = true;
+                            mToken.is_array_elem        = false;
+                            mToken.is_mixed_array_elem  = false;
+                            mToken.is_dictionary_elem   = true;
                         }
                         break;
 
@@ -721,13 +699,13 @@ void Parser::Read_Symbol(const RawToken& rawToken)
                             if (dictIndex)
                                 POV_FREE(dictIndex);
 
-                            Par              = reinterpret_cast<POV_PARAM *>(Temp_Entry->Data);
-                            mToken.Token_Id  = *(Par->NumberPtr);
-                            mToken.is_array_elem = false;
-                            mToken.is_mixed_array_elem = false;
-                            mToken.is_dictionary_elem = false;
-                            mToken.NumberPtr = Par->NumberPtr;
-                            mToken.DataPtr   = Par->DataPtr;
+                            Par = reinterpret_cast<POV_PARAM *>(Temp_Entry->Data);
+                            mToken.SetTokenId(*(Par->NumberPtr));
+                            mToken.is_array_elem        = false;
+                            mToken.is_mixed_array_elem  = false;
+                            mToken.is_dictionary_elem   = false;
+                            mToken.NumberPtr            = Par->NumberPtr;
+                            mToken.DataPtr              = Par->DataPtr;
                         }
                         break;
 
@@ -737,7 +715,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
                 }
             }
 
-            Write_Token (mToken.Token_Id, rawToken, table);
+            Write_Token (mToken.GetTrueTokenId(), rawToken, table); // TODO - We shouldn't have to re-write the token here.
 
             if (mToken.DataPtr != nullptr)
                 mToken.Data = *(mToken.DataPtr);
@@ -754,34 +732,58 @@ void Parser::Read_Symbol(const RawToken& rawToken)
 inline void Parser::Write_Token(const RawToken& rawToken, SymbolTable* table)
 {
     POV_EXPERIMENTAL_ASSERT(mToken.sourceFile == mTokenizer.GetInputStream());
-    mToken.raw            = rawToken;
-    mToken.Data           = nullptr;
-    mToken.Token_Id       = rawToken.expressionId;
-    mToken.Function_Id    = rawToken.GetTokenId();
-    mToken.table          = table;
+    mToken.raw      = rawToken;
+    mToken.Data     = nullptr;
+    mToken.SetTokenId(rawToken);
+    mToken.table    = table;
 }
 
 inline void Parser::Write_Token(TokenId Token_Id, const RawToken& rawToken, SymbolTable* table)
 {
     POV_EXPERIMENTAL_ASSERT(mToken.sourceFile == mTokenizer.GetInputStream());
-    mToken.raw            = rawToken;
-    mToken.Data           = nullptr;
-    mToken.Token_Id       = Conversion_Util_Table[Token_Id];
-    mToken.Function_Id    = Token_Id;
-    mToken.table          = table;
+    mToken.raw      = rawToken;
+    mToken.Data     = nullptr;
+    mToken.SetTokenId(Token_Id);
+    mToken.table    = table;
 }
 
 
 //******************************************************************************
 
-TokenId Parser::CurrentTokenId() const
+void Parser::Token_Struct::SetTokenId(const RawToken& rawToken)
 {
-    return mToken.Token_Id;
+    mTrueTokenId        = rawToken.GetTokenId();
+    mCategorizedTokenId = rawToken.expressionId;
+    POV_EXPERIMENTAL_ASSERT(mCategorizedTokenId == pov_parser::GetCategorizedTokenId(mTrueTokenId));
 }
 
-TokenId Parser::CurrentTokenFunctionId() const
+void Parser::Token_Struct::SetTokenId(TokenId tokenId)
 {
-    return mToken.Function_Id;
+    mTrueTokenId        = tokenId;
+    mCategorizedTokenId = pov_parser::GetCategorizedTokenId(tokenId);
+}
+
+TokenId Parser::Token_Struct::GetTrueTokenId() const
+{
+    return mTrueTokenId;
+}
+
+TokenId Parser::Token_Struct::GetCategorizedTokenId() const
+{
+    POV_EXPERIMENTAL_ASSERT(mCategorizedTokenId == pov_parser::GetCategorizedTokenId(mTrueTokenId));
+    return mCategorizedTokenId;
+}
+
+//------------------------------------------------------------------------------
+
+TokenId Parser::CurrentCategorizedTokenId() const
+{
+    return mToken.GetCategorizedTokenId();
+}
+
+TokenId Parser::CurrentTrueTokenId() const
+{
+    return mToken.GetTrueTokenId();
 }
 
 const UTF8String& Parser::CurrentTokenText() const
@@ -810,7 +812,7 @@ void Parser::InitCurrentToken()
 void Parser::InvalidateCurrentToken()
 {
     POV_EXPERIMENTAL_ASSERT(!mToken.Unget_Token);
-    mToken.Token_Id             = END_OF_FILE_TOKEN;
+    mToken.SetTokenId(END_OF_FILE_TOKEN);
     mToken.is_array_elem        = false;
     mToken.is_mixed_array_elem  = false;
     mToken.is_dictionary_elem   = false;
@@ -818,7 +820,7 @@ void Parser::InvalidateCurrentToken()
 
 void Parser::StopSkipping()
 {
-    mToken.Token_Id             = HASH_TOKEN; // TODO FIXME
+    mToken.SetTokenId(HASH_TOKEN); // TODO FIXME
     mToken.is_array_elem        = false;
     mToken.is_mixed_array_elem  = false;
     mToken.is_dictionary_elem   = false;
@@ -826,7 +828,7 @@ void Parser::StopSkipping()
 
 bool Parser::IsEndOfSkip() const
 {
-    return (mToken.Token_Id == HASH_TOKEN); // TODO FIXME
+    return (mToken.GetTrueTokenId() == HASH_TOKEN); // TODO FIXME
 }
 
 bool Parser::CurrentTokenIsArrayElement() const
@@ -939,71 +941,6 @@ const char *Parser::Get_Token_String (TokenId Token_Id)
 }
 
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-*   Return a list of keywords seperated with a '\n'. The last keyword does not
-*   have a LF after it. The caller is responsible for freeing the memory. This
-*   function is intended to be used by GUI implementations that need a keyword
-*   list for syntax-coloring edit windows.
-*
-* CHANGES
-*
-******************************************************************************/
-
-char *Parser::Get_Reserved_Words (const char *additional_words)
-{
-    int length = 0;
-    int i;
-
-    // Compute the length required for the buffer.
-
-    for (i = 0; Reserved_Words[i].Token_Name != nullptr; i++)
-    {
-        if (!isalpha (Reserved_Words [i].Token_Name [0]))
-            continue;
-        if (strchr (Reserved_Words [i].Token_Name, ' ') != nullptr)
-            continue;
-        length += (int)strlen (Reserved_Words[i].Token_Name) + 1;
-    }
-    length += (int)strlen (additional_words);
-
-    // Create the buffer.
-
-    char *result = reinterpret_cast<char *>(POV_MALLOC (++length, "Keyword List"));
-
-    // Copy the caller-supplied additional words into the buffer.
-
-    strcpy (result, additional_words);
-    char *s = result + strlen (additional_words);
-
-    // Copy our own keywords into the buffer.
-
-    for (i = 0; Reserved_Words[i].Token_Name != nullptr; i++)
-    {
-        if (!isalpha (Reserved_Words [i].Token_Name [0]))
-            continue;
-        if (strchr (Reserved_Words [i].Token_Name, ' ') != nullptr)
-            continue;
-        s += sprintf (s, "%s\n", Reserved_Words[i].Token_Name);
-    }
-    *--s = '\0';
-
-    return (result);
-}
 
 
 /*****************************************************************************
@@ -1334,7 +1271,7 @@ void Parser::Parse_Directive()
                         if (!Cond_Stack.back().Switch_Case_Ok_Flag)
                             Error("#switch not followed by #case or #range.");
 
-                        if (CurrentTokenId() == CASE_TOKEN)
+                        if (CurrentTrueTokenId() == CASE_TOKEN)
                         {
                             Value=Parse_Cond_Param();
                             Flag = (fabs(Value-Cond_Stack.back().Switch_Value)<EPSILON);
@@ -1376,7 +1313,7 @@ void Parser::Parse_Directive()
             {
                 case CASE_TRUE_COND:
                 case CASE_FALSE_COND:
-                    if (CurrentTokenId() == CASE_TOKEN)
+                    if (CurrentTrueTokenId() == CASE_TOKEN)
                     {
                         Value=Parse_Cond_Param();
                         Flag = (fabs(Value-Cond_Stack.back().Switch_Value)<EPSILON);
@@ -1534,10 +1471,10 @@ void Parser::Parse_Directive()
             }
             else
             {
-                Parse_Declare(CurrentTokenId() == LOCAL_TOKEN, true);
+                Parse_Declare(CurrentTrueTokenId() == LOCAL_TOKEN, true);
                 if (mToken.Unget_Token)
                 {
-                    switch (CurrentTokenId())
+                    switch (CurrentTrueTokenId())
                     {
                         case HASH_TOKEN:
                         case MACRO_ID_TOKEN:
@@ -1575,7 +1512,7 @@ void Parser::Parse_Directive()
             }
         END_CASE
 
-        CASE (FLOAT_FUNCT_TOKEN)
+        CASE (VERSION_TOKEN)
             Parsing_Directive = false;
             if (Skipping)
             {
@@ -1583,21 +1520,11 @@ void Parser::Parse_Directive()
             }
             else
             {
-                switch(CurrentTokenFunctionId())
+                Parse_Version();
+                if (mToken.Unget_Token && (CurrentTrueTokenId() == HASH_TOKEN))
                 {
-                    case VERSION_TOKEN:
-                        Parse_Version();
-                        if (mToken.Unget_Token && (CurrentTokenId() == HASH_TOKEN))
-                        {
-                            mToken.Unget_Token = false;
-                            mToken.ungetRaw = true;
-                        }
-                        break;
-
-                    default:
-                        UNGET
-                        Expectation_Error ("object or directive.");
-                        break;
+                    mToken.Unget_Token = false;
+                    mToken.ungetRaw = true;
                 }
             }
         END_CASE
@@ -1747,25 +1674,10 @@ void Parser::Parse_Directive()
                     CASE4 (DENSITY_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_MAP_ID_TOKEN, UV_ID_TOKEN)
                     CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
                     CASE3 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN, DICTIONARY_ID_TOKEN)
-                        mToken.table->Remove_Symbol (CurrentTokenText().c_str(), mToken.is_array_elem, mToken.DataPtr, CurrentTokenId());
+                    CASE2 (VECTOR_ID_TOKEN, FLOAT_ID_TOKEN)
+                        mToken.table->Remove_Symbol (CurrentTokenText().c_str(), mToken.is_array_elem, mToken.DataPtr, CurrentTrueTokenId());
                         if (mToken.is_mixed_array_elem)
                             *mToken.NumberPtr = IDENTIFIER_TOKEN;
-                    END_CASE
-
-                    CASE2 (VECTOR_FUNCT_TOKEN, FLOAT_FUNCT_TOKEN)
-                        switch(CurrentTokenFunctionId())
-                        {
-                            case VECTOR_ID_TOKEN:
-                            case FLOAT_ID_TOKEN:
-                                mToken.table->Remove_Symbol (CurrentTokenText().c_str(), mToken.is_array_elem, mToken.DataPtr, CurrentTokenId());
-                                if (mToken.is_mixed_array_elem)
-                                    *mToken.NumberPtr = IDENTIFIER_TOKEN;
-                                break;
-
-                            default:
-                                Parse_Error(IDENTIFIER_TOKEN);
-                                break;
-                        }
                     END_CASE
 
                     OTHERWISE
@@ -1862,20 +1774,16 @@ void Parser::Parse_Version()
     SetOkToDeclare(false);
     bool wasParsingVersionDirective = parsingVersionDirective;
     parsingVersionDirective = true;
-    EXPECT_ONE
-        CASE(UNOFFICIAL_TOKEN)
+    if (AllowToken(UNOFFICIAL_TOKEN))
+    {
 #if POV_RAY_IS_OFFICIAL
-            Get_Token();
-            Error("This file was created for an unofficial version and\ncannot work as-is with this official version.");
+        Get_Token();
+        Error("This file was created for an unofficial version and\ncannot work as-is with this official version.");
 #else
-            // PATCH AUTHORS - you should not enable any extra features unless the
-            // 'unofficial' keyword is set in the scene file.
+        // PATCH AUTHORS - you should not enable any extra features unless the
+        // 'unofficial' keyword is set in the scene file.
 #endif
-        END_CASE
-        OTHERWISE
-            Unget_Token();
-        END_CASE
-    END_EXPECT
+    }
 
     sceneData->languageVersion = (int)(Parse_Float() * 100 + 0.5);
 
@@ -2169,27 +2077,11 @@ Parser::Macro *Parser::Parse_Macro()
         CASE4 (DENSITY_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_MAP_ID_TOKEN, UV_ID_TOKEN)
         CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
         CASE3 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN, DICTIONARY_ID_TOKEN)
+        CASE2 (VECTOR_ID_TOKEN, FLOAT_ID_TOKEN)
             newParameter.name = POV_STRDUP(CurrentTokenText().c_str());
             New->parameters.push_back(newParameter);
             Parse_Comma();
             newParameter.optional = false;
-        END_CASE
-
-        CASE2 (VECTOR_FUNCT_TOKEN, FLOAT_FUNCT_TOKEN)
-            switch(CurrentTokenFunctionId())
-            {
-                case VECTOR_ID_TOKEN:
-                case FLOAT_ID_TOKEN:
-                    newParameter.name = POV_STRDUP(CurrentTokenText().c_str());
-                    New->parameters.push_back(newParameter);
-                    Parse_Comma();
-                    newParameter.optional = false;
-                    break;
-
-                default:
-                    Expectation_Error ("identifier");
-                    break;
-            }
         END_CASE
 
         CASE(RIGHT_PAREN_TOKEN)
@@ -2496,7 +2388,7 @@ SymbolTable* Parser::Parse_Dictionary_Declare()
             parseRawIdentifiers = true;
             Get_Token();
             parseRawIdentifiers = oldParseRawIdentifiers;
-            if (CurrentTokenId() != IDENTIFIER_TOKEN)
+            if (CurrentTrueTokenId() != IDENTIFIER_TOKEN)
                 Expectation_Error ("dictionary element identifier");
             newEntry = newDictionary->Add_Symbol (CurrentTokenText(), IDENTIFIER_TOKEN);
 
@@ -2538,17 +2430,8 @@ SymbolTable* Parser::Parse_Dictionary_Declare()
 void Parser::Parse_Initalizer (int Sub, size_t Base, POV_ARRAY *a)
 {
     int i;
-    bool optional = false;
 
-    EXPECT_ONE
-        CASE(OPTIONAL_TOKEN)
-            optional = true;
-        END_CASE
-
-        OTHERWISE
-            UNGET
-        END_CASE
-    END_EXPECT
+    bool optional = AllowToken(OPTIONAL_TOKEN);
 
     Parse_Begin();
     if (Sub < a->maxDim)
@@ -2737,7 +2620,7 @@ void Parser::Parse_Read()
             if (!End_File)
             {
                 Temp_Entry = mSymbolStack.GetGlobalTable()->Add_Symbol (CurrentTokenText(), IDENTIFIER_TOKEN);
-                End_File = Parse_Read_Value (User_File, CurrentTokenId(), &(Temp_Entry->Token_Number), &(Temp_Entry->Data));
+                End_File = Parse_Read_Value (User_File, CurrentTrueTokenId(), &(Temp_Entry->Token_Number), &(Temp_Entry->Data));
                 mToken.is_array_elem = false;
                 mToken.is_mixed_array_elem = false;
                 mToken.is_dictionary_elem = false;
@@ -2748,7 +2631,9 @@ void Parser::Parse_Read()
         CASE (STRING_ID_TOKEN)
             if (!End_File)
             {
-                End_File = Parse_Read_Value (User_File, CurrentTokenId(), mToken.NumberPtr, mToken.DataPtr);
+                End_File = Parse_Read_Value (User_File, CurrentTrueTokenId(), mToken.NumberPtr, mToken.DataPtr);
+                // TODO - Why are we clearing the array/dictionary related flags in this case
+                //        but not in case of VECTOR_ID_TOKEN and FLOAT_ID_TOKEN?
                 mToken.is_array_elem = false;
                 mToken.is_mixed_array_elem = false;
                 mToken.is_dictionary_elem = false;
@@ -2756,21 +2641,13 @@ void Parser::Parse_Read()
             }
         END_CASE
 
-        CASE2 (VECTOR_FUNCT_TOKEN,FLOAT_FUNCT_TOKEN)
-            switch(CurrentTokenFunctionId())
+        CASE2 (VECTOR_ID_TOKEN, FLOAT_ID_TOKEN)
+            if (!End_File)
             {
-                case VECTOR_ID_TOKEN:
-                case FLOAT_ID_TOKEN:
-                    if (!End_File)
-                    {
-                        End_File = Parse_Read_Value (User_File, CurrentTokenFunctionId(), mToken.NumberPtr, mToken.DataPtr);
-                        Parse_Comma(); /* Scene file comma between 2 idents */
-                    }
-                    break;
-
-                default:
-                    Parse_Error(IDENTIFIER_TOKEN);
-                    break;
+                End_File = Parse_Read_Value (User_File, CurrentTrueTokenId(), mToken.NumberPtr, mToken.DataPtr);
+                // TODO - Why are we not clearing the array/dictionary related flags in this case,
+                //        as we do in case of STRING_ID_TOKEN?
+                Parse_Comma(); /* Scene file comma between 2 idents */
             }
         END_CASE
 
@@ -2953,7 +2830,7 @@ void Parser::Parse_Write(void)
 
     Parse_Comma();
 
-    EXPECT
+    EXPECT_CAT
         CASE5 (SINT8_TOKEN,SINT16BE_TOKEN,SINT16LE_TOKEN,SINT32BE_TOKEN,SINT32LE_TOKEN)
         CASE3 (UINT8_TOKEN,UINT16BE_TOKEN,UINT16LE_TOKEN)
             {
@@ -2961,7 +2838,7 @@ void Parser::Parse_Write(void)
                 POV_INT32 val_max;
                 int  num_bytes;
                 bool big_endian = false;
-                switch (CurrentTokenId())
+                switch (CurrentTrueTokenId())
                 {
                     case SINT8_TOKEN:    val_min = SIGNED8_MIN;  val_max = SIGNED8_MAX;    num_bytes = 1; break;
                     case UINT8_TOKEN:    val_min = 0;            val_max = UNSIGNED8_MAX;  num_bytes = 1; break;
@@ -2972,7 +2849,7 @@ void Parser::Parse_Write(void)
                     case SINT32BE_TOKEN: val_min = SIGNED32_MIN; val_max = SIGNED32_MAX;   num_bytes = 4; big_endian = true;  break;
                     case SINT32LE_TOKEN: val_min = SIGNED32_MIN; val_max = SIGNED32_MAX;   num_bytes = 4; big_endian = false; break;
                 }
-                EXPECT
+                EXPECT_CAT
                     CASE_VECTOR_UNGET
                         Terms = Parse_Unknown_Vector (Express);
                         if ((Terms >= 1) && (Terms <= 5))
@@ -3123,7 +3000,7 @@ bool Parser::Parse_Ifdef_Param ()
     if (mToken.is_array_elem)
         retval = (*mToken.DataPtr != nullptr);
     else
-        retval = (CurrentTokenId() != IDENTIFIER_TOKEN);
+        retval = (CurrentTrueTokenId() != IDENTIFIER_TOKEN);
 
     Parse_Paren_End();
 
@@ -3147,7 +3024,7 @@ int Parser::Parse_For_Param (UTF8String& identifierName, DBL* EndPtr, DBL* StepP
             Temp_Entry = mSymbolStack.GetLocalTable()->Add_Symbol (CurrentTokenText(), IDENTIFIER_TOKEN);
             mToken.NumberPtr = &(Temp_Entry->Token_Number);
             mToken.DataPtr = &(Temp_Entry->Data);
-            Previous = CurrentTokenId();
+            Previous = CurrentTrueTokenId();
         END_CASE
 
         CASE3 (FILE_ID_TOKEN, MACRO_ID_TOKEN, PARAMETER_ID_TOKEN)
@@ -3171,6 +3048,7 @@ int Parser::Parse_For_Param (UTF8String& identifierName, DBL* EndPtr, DBL* StepP
         CASE4 (DENSITY_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_MAP_ID_TOKEN, UV_ID_TOKEN)
         CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
         CASE3 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN, DICTIONARY_ID_TOKEN)
+        CASE2 (VECTOR_ID_TOKEN, FLOAT_ID_TOKEN)
             // A symbol with this name exists (and it is not a function).
             if (CurrentTokenIsContainerElement())
                 Error("#for loop variable must not be an array or dictionary element");
@@ -3186,44 +3064,14 @@ int Parser::Parse_For_Param (UTF8String& identifierName, DBL* EndPtr, DBL* StepP
             else
             {
                 // A local symbol with this name exists. Overwrite it.
-                Previous        = CurrentTokenId();
+                Previous        = CurrentTrueTokenId();
             }
         END_CASE
 
         CASE (EMPTY_ARRAY_TOKEN)
             POV_PARSER_ASSERT (CurrentTokenIsHomogenousArrayElement());
             Error("#for loop variable must not be an array element");
-            Previous = CurrentTokenId();
-        END_CASE
-
-        CASE2 (VECTOR_FUNCT_TOKEN, FLOAT_FUNCT_TOKEN)
-            // A symbol with this name exists (and it is a function).
-            if (CurrentTokenIsContainerElement())
-                Error("#for loop variable must not be an array or dictionary element");
-            switch(CurrentTokenFunctionId())
-            {
-                case VECTOR_ID_TOKEN:
-                case FLOAT_ID_TOKEN:
-                    if (!mSymbolStack.IsLocalTableIndex(mToken.context))
-                    {
-                        // A symbol with this name exists, but it is not local.
-                        // Create an additional local symbol.
-                        Temp_Entry = mSymbolStack.GetLocalTable()->Add_Symbol (CurrentTokenText(), IDENTIFIER_TOKEN);
-                        mToken.NumberPtr = &(Temp_Entry->Token_Number);
-                        mToken.DataPtr   = &(Temp_Entry->Data);
-                        Previous        = IDENTIFIER_TOKEN;
-                    }
-                    else
-                    {
-                        // A local symbol with this name exists. Overwrite it.
-                        Previous        = CurrentTokenFunctionId();
-                    }
-                    break;
-
-                default:
-                    Parse_Error(IDENTIFIER_TOKEN);
-                    break;
-            }
+            Previous = CurrentTrueTokenId();
         END_CASE
 
         OTHERWISE

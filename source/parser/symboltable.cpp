@@ -431,12 +431,10 @@ void SymbolTable::Remove_Symbol(const char *Name, bool is_array_elem, void **Dat
     {
         POV_EXPERIMENTAL_ASSERT(DataPtr != nullptr);
 
-        if (ttype == FLOAT_FUNCT_TOKEN)
-            ttype = FLOAT_ID_TOKEN;
-        else if (ttype == VECTOR_FUNCT_TOKEN)
-            ttype = VECTOR_ID_TOKEN;
-        else if (ttype == COLOUR_KEY_TOKEN)
-            ttype = COLOUR_ID_TOKEN;
+        POV_EXPERIMENTAL_ASSERT((ttype != FLOAT_TOKEN_CATEGORY) &&
+                                (ttype != FLOAT_ID_TOKEN) &&
+                                (ttype != VECTOR_TOKEN_CATEGORY) &&
+                                (ttype != COLOUR_TOKEN_CATEGORY));
 
         Destroy_Ident_Data(*DataPtr, ttype);
         *DataPtr = nullptr;

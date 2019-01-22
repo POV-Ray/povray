@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -392,62 +392,42 @@ TokenId Parser::expr_get_token()
 {
     Get_Token();
 
-    if(CurrentTokenFunctionId() == X_TOKEN)
-        return FLOAT_ID_TOKEN;
-    else if(CurrentTokenFunctionId() == Y_TOKEN)
-        return FLOAT_ID_TOKEN;
-    else if(CurrentTokenFunctionId() == Z_TOKEN)
-        return FLOAT_ID_TOKEN;
-    else if(CurrentTokenFunctionId() == U_TOKEN)
-        return FLOAT_ID_TOKEN;
-    else if(CurrentTokenFunctionId() == V_TOKEN)
-        return FLOAT_ID_TOKEN;
-    else if(CurrentTokenFunctionId() == IDENTIFIER_TOKEN)
-        return FLOAT_ID_TOKEN;
-    else if(CurrentTokenFunctionId() == CLOCK_TOKEN)
+    switch (CurrentTrueTokenId())
     {
-        mToken.Token_Float = clockValue;
-        return FLOAT_TOKEN;
-    }
-    else if(CurrentTokenFunctionId() == PI_TOKEN)
-    {
-        mToken.Token_Float = M_PI;
-        return FLOAT_TOKEN;
-    }
-    else if(CurrentTokenFunctionId() == TAU_TOKEN)
-    {
-        mToken.Token_Float = M_TAU;
-        return FLOAT_TOKEN;
-    }
-    else if(CurrentTokenFunctionId() == RED_TOKEN)
-        return RED_TOKEN;
-    else if(CurrentTokenFunctionId() == GREEN_TOKEN)
-        return GREEN_TOKEN;
-    else if(CurrentTokenFunctionId() == BLUE_TOKEN)
-        return BLUE_TOKEN;
-    else if(CurrentTokenFunctionId() == FILTER_TOKEN)
-        return FILTER_TOKEN;
-    else if(CurrentTokenFunctionId() == TRANSMIT_TOKEN)
-        return TRANSMIT_TOKEN;
-    else if(CurrentTokenFunctionId() == T_TOKEN)
-        return T_TOKEN;
-    else if(CurrentTokenFunctionId() == GRAY_TOKEN)
-        return GRAY_TOKEN;
+        case X_TOKEN:
+        case Y_TOKEN:
+        case Z_TOKEN:
+        case U_TOKEN:
+        case V_TOKEN:
+        case IDENTIFIER_TOKEN:
+            return FLOAT_ID_TOKEN;
 
-    if(CurrentTokenId() == FLOAT_FUNCT_TOKEN)
-    {
-        if(CurrentTokenFunctionId() == FLOAT_TOKEN)
+        case CLOCK_TOKEN:
+            mToken.Token_Float = clockValue;
             return FLOAT_TOKEN;
-        else if(CurrentTokenFunctionId() == FLOAT_ID_TOKEN)
-        {
+
+        case PI_TOKEN:
+            mToken.Token_Float = M_PI;
+            return FLOAT_TOKEN;
+
+        case TAU_TOKEN:
+            mToken.Token_Float = M_TAU;
+            return FLOAT_TOKEN;
+
+        case FLOAT_TOKEN:
+            // mToken.Token_Float already set
+            return FLOAT_TOKEN;
+
+        case FLOAT_ID_TOKEN:
             mToken.Token_Float = CurrentTokenData<DBL>();
             return FLOAT_TOKEN;
-        }
 
-        return FUNCT_ID_TOKEN;
+        default:
+            if (CurrentCategorizedTokenId() == FLOAT_TOKEN_CATEGORY)
+                return FUNCT_ID_TOKEN;
+            else
+                return CurrentTrueTokenId();
     }
-
-    return CurrentTokenId();
 }
 
 
@@ -682,7 +662,7 @@ bool Parser::expr_call(ExprNode *&current, int stage, int op)
     }
     else
         node->call.fn = 0;
-    node->call.token = CurrentTokenFunctionId();
+    node->call.token = CurrentTrueTokenId();
     node->call.name = POV_STRDUP(CurrentTokenText().c_str());
     while (current->child != nullptr)
         current = current->child;
@@ -702,7 +682,7 @@ bool Parser::expr_call(ExprNode *&current, int stage, int op)
         node = node->next;
     }
 
-    if(CurrentTokenId() != RIGHT_PAREN_TOKEN)
+    if(CurrentTrueTokenId() != RIGHT_PAREN_TOKEN)
         Expectation_Error(")");
 
     return true;
