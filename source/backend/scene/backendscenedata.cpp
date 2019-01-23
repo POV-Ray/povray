@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -71,7 +71,7 @@ UCS2String BackendSceneData::FindFile(POVMSContext ctx, const UCS2String& filena
         for (size_t i = 0; i < POV_FILE_EXTENSIONS_PER_TYPE; i++)
         {
             if ( ( strlen(gPOV_File_Extensions[stype].ext[i]) > 0 ) &&
-                 ( filename.compare(pos,filename.length()-pos, ASCIItoUCS2String(gPOV_File_Extensions[stype].ext[i])) == 0 ) )
+                 ( filename.compare(pos,filename.length()-pos, SysToUCS2String(gPOV_File_Extensions[stype].ext[i])) == 0 ) )
             {
                 // match
                 tryExactFirst = true;
@@ -90,7 +90,7 @@ UCS2String BackendSceneData::FindFile(POVMSContext ctx, const UCS2String& filena
         if (strlen(gPOV_File_Extensions[stype].ext[i]) > 0)
         {
             UCS2String fn(filename);
-            fn += ASCIItoUCS2String(gPOV_File_Extensions[stype].ext[i]);
+            fn += SysToUCS2String(gPOV_File_Extensions[stype].ext[i]);
             filenames.push_back(fn);
         }
     }

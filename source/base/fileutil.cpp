@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -173,7 +173,7 @@ int InferFileTypeFromExt(const UCS2String& ext)
 {
     // TODO FIXME - better compare in the string domain
 
-    string str = UCS2toASCIIString(ext);
+    string str = UCS2toSysString(ext);
 
     for (int i = 0; i < POV_File_Count; i++)
     {

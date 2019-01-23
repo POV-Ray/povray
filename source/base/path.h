@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -61,15 +61,15 @@ class Path
 {
     public:
 
-        enum Encoding
+        enum class Encoding
         {
-            ASCII,
-            URL
+            kSystem,
+            kURL
         };
 
         Path();
-        Path(const char *p, Encoding e = ASCII);
-        Path(const string& p, Encoding e = ASCII);
+        Path(const char *p, Encoding e = Encoding::kSystem);
+        Path(const std::string& p, Encoding e = Encoding::kSystem);
         Path(const UCS2 *p);
         Path(const UCS2String& p);
 

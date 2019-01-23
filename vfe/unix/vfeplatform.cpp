@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -137,7 +137,7 @@ namespace vfePlatform
     // *nix platforms might want to just return "/tmp/" here.
     UCS2String vfeUnixSession::GetTemporaryPath(void) const
     {
-        return ASCIItoUCS2String (m_OptionsProc->GetTemporaryPath().c_str());
+        return SysToUCS2String(m_OptionsProc->GetTemporaryPath());
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -151,7 +151,7 @@ namespace vfePlatform
         std::snprintf(str, sizeof(str), "%spov%d", m_OptionsProc->GetTemporaryPath().c_str(), getpid ());
         POV_DELETE_FILE (str);
 
-        return ASCIItoUCS2String (str);
+        return SysToUCS2String(str);
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -160,7 +160,7 @@ namespace vfePlatform
     // example doesn't do that but it's not a bad idea to add.
     void vfeUnixSession::DeleteTemporaryFile(const UCS2String& filename) const
     {
-        POV_DELETE_FILE (UCS2toASCIIString (filename).c_str());
+        POV_DELETE_FILE (UCS2toSysString (filename).c_str());
     }
 
     //////////////////////////////////////////////////////////////
@@ -289,7 +289,7 @@ namespace vfePlatform
         if (!m_OptionsProc->isIORestrictionsEnabled(isWrite))
             return true;
 
-        string FullFnm = m_OptionsProc->CanonicalizePath(UCS2toASCIIString(file()));
+        string FullFnm = m_OptionsProc->CanonicalizePath(UCS2toSysString(file()));
         if(FullFnm.length() == 0)
             return false;
 
@@ -302,7 +302,7 @@ namespace vfePlatform
             {
                 if (TestPath(it->GetPath(), fullPath, it->IsRecursive()))
                 {
-                    m_OptionsProc->IORestrictionsError(UCS2toASCIIString(file()), isWrite, false);
+                    m_OptionsProc->IORestrictionsError(UCS2toSysString(file()), isWrite, false);
                     return (false) ;
                 }
             }
@@ -322,7 +322,7 @@ namespace vfePlatform
             if (TestPath(it->GetPath(), fullPath, it->IsRecursive()))
                 return (true) ;
 
-        m_OptionsProc->IORestrictionsError(UCS2toASCIIString(file()), isWrite, true);
+        m_OptionsProc->IORestrictionsError(UCS2toSysString(file()), isWrite, true);
         return (false);
     }
 

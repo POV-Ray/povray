@@ -68,7 +68,7 @@ std::string& ObjectDebugHelper::SimpleDesc(std::string& result)
     result = str;
     if(IsCopy)
         result += "Copy of ";
-    if(Tag == "")
+    if(Tag.empty())
         result += "Unnamed object";
     else
         result += Tag;

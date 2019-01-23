@@ -59,8 +59,11 @@ namespace pov_base
 ///
 /// @{
 
-UCS2String ASCIItoUCS2String(const char *s);
-std::string UCS2toASCIIString(const UCS2String& s);
+UCS2String ASCIItoUCS2String(const std::string& s);
+
+UCS2String SysToUCS2String(const char *s);
+UCS2String SysToUCS2String(const std::string& s);
+std::string UCS2toSysString(const UCS2String& s);
 
 UCS2String UTF8toUCS2String(const UTF8String& s);
 

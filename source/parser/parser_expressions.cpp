@@ -784,7 +784,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
                     Local_C_String=Parse_C_String();
 
-                    f = Locate_File(UCS2String(ASCIItoUCS2String(Local_C_String)), POV_File_Text_User, ign, false);
+                    f = Locate_File(SysToUCS2String(Local_C_String), POV_File_Text_User, ign, false);
                     Val = (f == nullptr) ? 0.0 : 1.0;
                     f = nullptr;
 

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -265,7 +265,7 @@ void Parser::Parse_Obj (Mesh* mesh)
     if (stream != nullptr)
         textStream = new IBufferedTextStream (fileName, stream.get());
     if (!textStream)
-        Error ("Cannot open obj file %s.", UCS2toASCIIString(fileName).c_str());
+        Error ("Cannot open obj file %s.", UCS2toSysString(fileName).c_str());
 
     // mark end of buffer with a non-null character to identify situations where a word may not have fit entirely inside the buffer.
     wordBuffer[kMaxObjBufferSize-1] = '*';
@@ -302,13 +302,13 @@ void Parser::Parse_Obj (Mesh* mesh)
                     while (HasMoreWords (textStream))
                     {
                         if (!ReadFaceVertex (face.vertexList[vertex], wordBuffer, textStream))
-                            Error ("Invalid or unsupported face index data '%s' in obj file %s line %i", wordBuffer, UCS2toASCIIString(fileName).c_str(), (int)textStream->line());
+                            Error ("Invalid or unsupported face index data '%s' in obj file %s line %i", wordBuffer, UCS2toSysString(fileName).c_str(), (int)textStream->line());
                         if (face.vertexList[vertex].vertexId > vertexList.size())
-                            Error ("Vertex index out of range in obj file %s line %i", UCS2toASCIIString(fileName).c_str(), (int)textStream->line());
+                            Error ("Vertex index out of range in obj file %s line %i", UCS2toSysString(fileName).c_str(), (int)textStream->line());
                         if (face.vertexList[vertex].uvId > uvList.size())
-                            Error ("UV index out of range in obj file %s line %i", UCS2toASCIIString(fileName).c_str(), (int)textStream->line());
+                            Error ("UV index out of range in obj file %s line %i", UCS2toSysString(fileName).c_str(), (int)textStream->line());
                         if (face.vertexList[vertex].normalId > normalList.size())
-                            Error ("Normal index out of range in obj file %s line %i", UCS2toASCIIString(fileName).c_str(), (int)textStream->line());
+                            Error ("Normal index out of range in obj file %s line %i", UCS2toSysString(fileName).c_str(), (int)textStream->line());
                         ++haveVertices;
                         if (face.vertexList[vertex].uvId > 0)
                             ++haveUV;
@@ -328,15 +328,15 @@ void Parser::Parse_Obj (Mesh* mesh)
                     }
                     if ((haveVertices > 3) && !havePolygonFaces)
                     {
-                        Warning ("Non-triangular faces found in obj file %s. Faces will only import properly if they are convex and planar.", UCS2toASCIIString(fileName).c_str());
+                        Warning ("Non-triangular faces found in obj file %s. Faces will only import properly if they are convex and planar.", UCS2toSysString(fileName).c_str());
                         havePolygonFaces = true;
                     }
                     if (haveVertices < 3)
-                        Error ("Insufficient number of vertices per face in obj file %s line %i", UCS2toASCIIString(fileName).c_str(), (int)textStream->line());
+                        Error ("Insufficient number of vertices per face in obj file %s line %i", UCS2toSysString(fileName).c_str(), (int)textStream->line());
                     if ((haveUV != 0) && (haveUV != haveVertices))
-                        Error ("Inconsistent use of UV indices in obj file %s line %i", UCS2toASCIIString(fileName).c_str(), (int)textStream->line());
+                        Error ("Inconsistent use of UV indices in obj file %s line %i", UCS2toSysString(fileName).c_str(), (int)textStream->line());
                     if ((haveNormal != 0) && (haveNormal != haveVertices))
-                        Error ("Inconsistent use of normal indices in obj file %s line %i", UCS2toASCIIString(fileName).c_str(), (int)textStream->line());
+                        Error ("Inconsistent use of normal indices in obj file %s line %i", UCS2toSysString(fileName).c_str(), (int)textStream->line());
                     if (haveNormal > 0)
                         faceList.push_back (face);
                     else
@@ -358,7 +358,7 @@ void Parser::Parse_Obj (Mesh* mesh)
                 if (strcmp (wordBuffer, "usemtl") == 0)
                 {
                     if (!ReadWord (wordBuffer, textStream))
-                        Error ("Invalid material name '%s' in obj file %s line %i", wordBuffer, UCS2toASCIIString(fileName).c_str(), (int)textStream->line());
+                        Error ("Invalid material name '%s' in obj file %s line %i", wordBuffer, UCS2toSysString(fileName).c_str(), (int)textStream->line());
                     for (materialId = 0; materialId < materialList.size(); ++materialId)
                     {
                         if (materialList[materialId].mtlName.compare (wordBuffer) == 0)
@@ -391,7 +391,7 @@ void Parser::Parse_Obj (Mesh* mesh)
                 for (int dimension = X; dimension <= Z; ++dimension)
                 {
                     if (!ReadFloat (v3[dimension], wordBuffer, textStream))
-                        Error ("Invalid coordinate value '%s' in obj file %s line %i", wordBuffer, UCS2toASCIIString(fileName).c_str(), (int)textStream->line());
+                        Error ("Invalid coordinate value '%s' in obj file %s line %i", wordBuffer, UCS2toSysString(fileName).c_str(), (int)textStream->line());
                 }
                 vertexList.push_back (v3);
                 break;
@@ -400,7 +400,7 @@ void Parser::Parse_Obj (Mesh* mesh)
                 for (int dimension = X; dimension <= Z; ++dimension)
                 {
                     if (!ReadFloat (v3[dimension], wordBuffer, textStream))
-                        Error ("Invalid coordinate value '%s' in obj file %s line %i", wordBuffer, UCS2toASCIIString(fileName).c_str(), (int)textStream->line());
+                        Error ("Invalid coordinate value '%s' in obj file %s line %i", wordBuffer, UCS2toSysString(fileName).c_str(), (int)textStream->line());
                 }
                 normalList.push_back (v3);
                 break;
@@ -409,7 +409,7 @@ void Parser::Parse_Obj (Mesh* mesh)
                 for (int dimension = X; dimension <= Y; ++dimension)
                 {
                     if (!ReadFloat (v2[dimension], wordBuffer, textStream))
-                        Error ("Invalid coordinate value '%s' in obj file %s line %i", wordBuffer, UCS2toASCIIString(fileName).c_str(), (int)textStream->line());
+                        Error ("Invalid coordinate value '%s' in obj file %s line %i", wordBuffer, UCS2toSysString(fileName).c_str(), (int)textStream->line());
                 }
                 uvList.push_back (v2);
                 break;
@@ -421,18 +421,18 @@ void Parser::Parse_Obj (Mesh* mesh)
 
         if (unsupportedCmd)
         {
-            Warning("Unsupported command '%s' skipped in obj file %s line %i.", wordBuffer, UCS2toASCIIString(fileName).c_str(), (int)textStream->line());
+            Warning("Unsupported command '%s' skipped in obj file %s line %i.", wordBuffer, UCS2toSysString(fileName).c_str(), (int)textStream->line());
             skipLine = true;
         }
 
         if (!skipLine && HasMoreWords (textStream))
-            PossibleError("Unexpected extra data skipped in obj file %s line %i.", UCS2toASCIIString(fileName).c_str(), (int)textStream->line());
+            PossibleError("Unexpected extra data skipped in obj file %s line %i.", UCS2toSysString(fileName).c_str(), (int)textStream->line());
 
         // skip remainder of line
         AdvanceLine (textStream);
 
         if (wordBuffer[kMaxObjBufferSize-1] == '\0')
-            PossibleError("Excessively long data in obj file %s line %i.", UCS2toASCIIString(fileName).c_str(), (int)textStream->line());
+            PossibleError("Excessively long data in obj file %s line %i.", UCS2toSysString(fileName).c_str(), (int)textStream->line());
     }
 
     // close obj file

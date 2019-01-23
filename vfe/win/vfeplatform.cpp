@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -147,7 +147,7 @@ namespace vfePlatform
   // *nix platforms might want to just return "/tmp/" here.
   UCS2String vfeWinSession::GetTemporaryPath(void) const
   {
-    return ASCIItoUCS2String(m_TempPathString.c_str());
+    return SysToUCS2String(m_TempPathString);
   }
 
   /////////////////////////////////////////////////////////////////////////
@@ -161,7 +161,7 @@ namespace vfePlatform
     GetTempFileName (m_TempPathString.c_str(), "pv", 0, str) ;
     remove (str) ;
     m_TempFilenames.push_back(str);
-    return (ASCIItoUCS2String (str)) ;
+    return SysToUCS2String(str);
   }
 
   /////////////////////////////////////////////////////////////////////////
@@ -170,7 +170,7 @@ namespace vfePlatform
   // example doesn't do that but it's not a bad idea to add.
   void vfeWinSession::DeleteTemporaryFile(const UCS2String& filename) const
   {
-    remove (UCS2toASCIIString (filename).c_str());
+    remove (UCS2toSysString (filename).c_str());
   }
 
   //////////////////////////////////////////////////////////////
@@ -255,17 +255,17 @@ namespace vfePlatform
 
   /////////////////////////////////////////////////////////////////////////
   // this really should take the codepage into consideration and not convert
-  // to an ASCII string.
+  // to an ASCII/Latin-1 string.
   bool vfeWinSession::StrCompareIC (const UCS2String& lhs, const UCS2String& rhs) const
   {
-    return (_stricmp (UCS2toASCIIString(lhs).c_str(), UCS2toASCIIString(rhs).c_str()) == 0);
+    return (_stricmp (UCS2toSysString(lhs).c_str(), UCS2toSysString(rhs).c_str()) == 0);
   }
 
   /////////////////////////////////////////////////////////////////////////
   // return true if the path component of file is equal to the path component
   // of path. will also return true if recursive is true and path is a parent
   // of file. does not support relative paths, and will convert UCS2 paths to
-  // ASCII and perform case-insensitive comparisons.
+  // Latin-1 and perform case-insensitive comparisons.
   bool vfeWinSession::TestPath (const Path& path, const Path& file, bool recursive) const
   {
     // we don't support relative paths
@@ -307,7 +307,7 @@ namespace vfePlatform
     if (isWrite == false && GetReadPaths().empty() == true)
       returnOK = true;
 
-    int n = GetFullPathName (UCS2toASCIIString(file()).c_str(), sizeof (buf), buf, &s);
+    int n = GetFullPathName (UCS2toSysString(file()).c_str(), sizeof (buf), buf, &s);
     if ((n == 0) || (n > sizeof(buf)) || (s == nullptr) || (s == buf))
     {
       if (returnOK == true)
@@ -393,7 +393,7 @@ namespace vfePlatform
       }
     }
     else
-      n = GetFullPathName (UCS2toASCIIString(m_InputFilename).c_str(), sizeof (buf), buf, &s);
+      n = GetFullPathName (UCS2toSysString(m_InputFilename).c_str(), sizeof (buf), buf, &s);
     if ((n == 0) || (n > sizeof(buf)) || (s == nullptr) || (s == buf))
     {
       // TODO: issue appropriate error message

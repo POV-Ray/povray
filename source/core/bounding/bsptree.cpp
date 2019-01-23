@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -281,7 +281,7 @@ void BSPTree::build(const Progress& progress, const Objects& objects,
     splits[Z].resize(objects.size() * 2);
 
 #if BSP_WRITEBOUNDS || BSP_READNODES || BSP_WRITETREE
-    string tempstr = UCS2toASCIIString(inputFile);
+    string tempstr = UCS2toSysString(inputFile);
     if (tempstr.empty() == true)
         tempstr = "default";
     string::size_type pos = tempstr.find_last_of('.');
@@ -290,7 +290,7 @@ void BSPTree::build(const Progress& progress, const Objects& objects,
 #endif
 
 #if BSP_WRITEBOUNDS
-    FILE *bb = fopen(string(tempstr + ".bounds").c_str(), "w");
+    FILE *bb = fopen((tempstr + ".bounds").c_str(), "w");
 
     if (bb != nullptr)
         fprintf(bb, "%d\n", objects.size());
@@ -332,7 +332,7 @@ void BSPTree::build(const Progress& progress, const Objects& objects,
     bmax = Vector3d(bbox.pmax[X], bbox.pmax[Y], bbox.pmax[Z]);
 
 #if BSP_WRITETREE
-    gFile = fopen(string(tempstr + ".tree").c_str(), "w");
+    gFile = fopen((tempstr + ".tree").c_str(), "w");
 
     if (gFile != nullptr)
     {
@@ -345,7 +345,7 @@ void BSPTree::build(const Progress& progress, const Objects& objects,
     nodes.push_back(Node());
 
 #if BSP_READNODES
-    FILE *infile = fopen(string(tempstr + ".nodes").c_str(), "r");
+    FILE *infile = fopen((tempstr + ".nodes").c_str(), "r");
     if (infile == nullptr)
         throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot open BSP nodes file (BSP_READNODES == true, tree generation disabled)");
     try

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -3066,7 +3066,7 @@ class FileBackedPixelContainer
         FileBackedPixelContainer(size_type width, size_type height, size_type bs):
             m_File(-1), m_Width(width), m_Height(height), m_xPos(0), m_yPos(0), m_Dirty(false), m_Path(PlatformBase::GetInstance().CreateTemporaryFile())
         {
-            if ((m_File = open(UCS2toASCIIString(m_Path).c_str(), O_CREAT | O_RDWR | O_TRUNC, S_IRUSR | S_IWUSR)) == -1)
+            if ((m_File = open(UCS2toSysString(m_Path).c_str(), O_CREAT | O_RDWR | O_TRUNC, S_IRUSR | S_IWUSR)) == -1)
                 throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot open backing file for intermediate image storage.");
             m_Blocksize = bs;
             m_Buffer.resize(m_Blocksize);

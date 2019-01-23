@@ -6573,7 +6573,7 @@ TrueTypeFont *Parser::OpenFontFile(const char *asciifn, const int font_id, POV_U
 
     if (asciifn != nullptr)
     {
-        formalFilename = ASCIItoUCS2String(asciifn);
+        formalFilename = SysToUCS2String(asciifn);
 
         // First look to see if we have already opened this font (with the same character mapping).
 
@@ -7346,7 +7346,7 @@ void Parser::Parse_Global_Settings()
                         else
                             VersionWarning(100,"Cannot both load and save photon map. Now switching to load mode.");
                     }
-                    sceneData->photonSettings.fileName = Parse_ASCIIString(true);
+                    sceneData->photonSettings.fileName = Parse_SysString(true);
                     sceneData->photonSettings.loadFile = true;
                 END_CASE
 
@@ -7358,7 +7358,7 @@ void Parser::Parse_Global_Settings()
                         else
                             VersionWarning(100,"Cannot both load and save photon map. Now switching to save mode.");
                     }
-                    sceneData->photonSettings.fileName = Parse_ASCIIString(true);
+                    sceneData->photonSettings.fileName = Parse_SysString(true);
                     sceneData->photonSettings.loadFile = false;
                 END_CASE
 
@@ -8728,7 +8728,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                         {
                             UCS2String str(deprecation_message);
                             POV_FREE(deprecation_message);
-                            Temp_Entry->Deprecation_Message = POV_STRDUP(UCS2toASCIIString(str).c_str());
+                            Temp_Entry->Deprecation_Message = POV_STRDUP(UCS2toSysString(str).c_str());
                         }
                         else
                         {
@@ -10720,7 +10720,7 @@ shared_ptr<IStream> Parser::Locate_File(const UCS2String& filename, unsigned int
     if(foundfile.empty() == true)
     {
         if(err_flag == true)
-            PossibleError("Cannot find file '%s', even after trying to append file type extension.", UCS2toASCIIString(fn).c_str());
+            PossibleError("Cannot find file '%s', even after trying to append file type extension.", UCS2toSysString(fn).c_str());
 
         return nullptr;
     }
@@ -10740,7 +10740,7 @@ shared_ptr<IStream> Parser::Locate_File(const UCS2String& filename, unsigned int
     shared_ptr<IStream> result(mFileResolver.ReadFile(fn, foundfile.c_str(), stype));
 
     if ((result == nullptr) && (err_flag == true))
-        PossibleError("Cannot open file '%s'.", UCS2toASCIIString(foundfile).c_str());
+        PossibleError("Cannot open file '%s'.", UCS2toSysString(foundfile).c_str());
 
     buffer = foundfile;
 
@@ -10754,7 +10754,7 @@ shared_ptr<IStream> Parser::Locate_File(const UCS2String& filename, unsigned int
     if(foundfile.empty() == true)
     {
         if(err_flag == true)
-            PossibleError("Cannot find file '%s', even after trying to append file type extension.", UCS2toASCIIString(filename).c_str());
+            PossibleError("Cannot find file '%s', even after trying to append file type extension.", UCS2toSysString(filename).c_str());
 
         return nullptr;
     }
@@ -10762,7 +10762,7 @@ shared_ptr<IStream> Parser::Locate_File(const UCS2String& filename, unsigned int
     shared_ptr<IStream> result(mFileResolver.ReadFile(foundfile.c_str(), stype));
 
     if ((result == nullptr) && (err_flag == true))
-        PossibleError("Cannot open file '%s'.", UCS2toASCIIString(foundfile).c_str());
+        PossibleError("Cannot open file '%s'.", UCS2toSysString(foundfile).c_str());
 
     buffer = foundfile;
 

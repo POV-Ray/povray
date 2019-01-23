@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -97,12 +97,12 @@ POVMSMessageDetails::POVMSMessageDetails (POVMS_Object& Obj)
 
   Line = Col = 0 ;
   Offset = -1 ;
-  ubuffer[0] = 0 ;
+  ubuffer[0] = '\0';
 
   if (POVMSUtil_GetUCS2String (msg, kPOVAttrib_FileName, ubuffer, &l) == kNoErr)
   {
     UCS2File = ubuffer ;
-    File = UCS2toASCIIString (UCS2File);
+    File = UCS2toSysString(UCS2File);
   }
   if (POVMSUtil_GetLong (msg, kPOVAttrib_Line, &ll) == kNoErr)
     Line = POVMSInt(ll) ;
@@ -631,7 +631,7 @@ bool VirtualFrontEnd::Start(POVMS_Object& opts)
   m_PostPauseState = kReady;
 
   Path ip (m_Session->GetInputFilename());
-  shelloutProcessing.reset(m_Session->CreateShelloutProcessing(opts, UCS2toASCIIString(ip.GetFile()), m_Session->GetRenderWidth(), m_Session->GetRenderHeight())) ;
+  shelloutProcessing.reset(m_Session->CreateShelloutProcessing(opts, UCS2toSysString(ip.GetFile()), m_Session->GetRenderWidth(), m_Session->GetRenderHeight())) ;
   shelloutProcessing->SetCancelMessage("Render halted because the %1% shell-out ('%6%') requested POV-Ray to %5%.");
   shelloutProcessing->SetSkipMessage("The %1% shell-out ('%3%') requested POV-Ray to %2%.");
 
@@ -651,7 +651,7 @@ bool VirtualFrontEnd::Start(POVMS_Object& opts)
 
   POVMS_Object input_file_name(kPOVMSType_WildCard);
   input_file_name.SetString(kPOVAttrib_Identifier, "input_file_name");
-  input_file_name.SetString(kPOVAttrib_Value, UCS2toASCIIString(ip.GetFile()).c_str());
+  input_file_name.SetString(kPOVAttrib_Value, UCS2toSysString(ip.GetFile()).c_str());
   declares.Append(input_file_name);
 
   int initialFrame = opts.TryGetInt (kPOVAttrib_InitialFrame, 0) ;
@@ -716,11 +716,11 @@ bool VirtualFrontEnd::Start(POVMS_Object& opts)
       if (imageProcessing->OutputIsStdout() == false && imageProcessing->OutputIsStderr() == false && m_Session->TestAccessAllowed(filename, true) == false)
       {
         string str ("IO Restrictions prohibit write access to '") ;
-        str += UCS2toASCIIString(filename);
+        str += UCS2toSysString(filename);
         str += "'";
         throw POV_EXCEPTION(kCannotOpenFileErr, str);
       }
-      shelloutProcessing->SetOutputFile(UCS2toASCIIString(filename));
+      shelloutProcessing->SetOutputFile(UCS2toSysString(filename));
       m_Session->AdviseOutputFilename (filename);
     }
   }
@@ -954,11 +954,11 @@ State VirtualFrontEnd::Process()
               if (m_Session->TestAccessAllowed(filename, true) == false)
               {
                 string str ("IO Restrictions prohibit write access to '");
-                str += UCS2toASCIIString(filename);
+                str += UCS2toSysString(filename);
                 str += "'";
                 throw POV_EXCEPTION(kCannotOpenFileErr, str);
               }
-              shelloutProcessing->SetOutputFile(UCS2toASCIIString(filename));
+              shelloutProcessing->SetOutputFile(UCS2toSysString(filename));
               m_Session->AdviseOutputFilename (filename);
             }
             m_Session->AppendAnimationStatus (frameId, frame, animationProcessing->GetTotalFramesToRender(), filename);
@@ -1397,7 +1397,7 @@ bool VirtualFrontEnd::Paused (void)
 
 int Allow_File_Write (const UCS2 *Filename, const unsigned int FileType)
 {
-  if (strcmp(UCS2toASCIIString(Filename).c_str(), "stdout") == 0 || strcmp(UCS2toASCIIString(Filename).c_str(), "stderr") == 0)
+  if (strcmp(UCS2toSysString(Filename).c_str(), "stdout") == 0 || strcmp(UCS2toSysString(Filename).c_str(), "stderr") == 0)
     return true;
   return (vfeSession::GetSessionFromThreadID()->TestAccessAllowed(Filename, true));
 }
@@ -1409,12 +1409,12 @@ int Allow_File_Read (const UCS2 *Filename, const unsigned int FileType)
 
 FILE *vfeFOpen (const UCS2String& name, const char *mode)
 {
-  return (fopen (UCS2toASCIIString (name).c_str(), mode)) ;
+  return (fopen (UCS2toSysString (name).c_str(), mode)) ;
 }
 
 bool vfeRemove(const UCS2String& Filename)
 {
-  return (POV_DELETE_FILE (UCS2toASCIIString (Filename).c_str()) == 0);
+  return (POV_DELETE_FILE (UCS2toSysString (Filename).c_str()) == 0);
 }
 
 }

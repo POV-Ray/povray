@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -177,7 +177,7 @@ bool SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::Start(POVMS_Object
     }
 
     Path ip (opts.TryGetString(kPOVAttrib_InputFile, ""));
-    shelloutProcessing.reset(new ShelloutProcessing(opts, UCS2toASCIIString(ip.GetFile()), width, height));
+    shelloutProcessing.reset(new ShelloutProcessing(opts, UCS2toSysString(ip.GetFile()), width, height));
 
     state = kStarting;
 

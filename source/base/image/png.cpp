@@ -197,7 +197,7 @@ extern "C"
         {
             Messages *m = reinterpret_cast<Messages *>(png_get_error_ptr(png_ptr));
             if (m)
-                m->error = string("Cannot read PNG data");
+                m->error = "Cannot read PNG data";
             throw POV_EXCEPTION(kFileDataErr, "Cannot read PNG data");
         }
     }
@@ -231,7 +231,7 @@ extern "C"
         {
             Messages *m = reinterpret_cast<Messages *>(png_get_error_ptr(png_ptr));
             if (m)
-                m->error = string("Cannot write PNG data");
+                m->error = "Cannot write PNG data";
             throw POV_EXCEPTION(kFileDataErr, "Cannot write PNG data");
         }
     }

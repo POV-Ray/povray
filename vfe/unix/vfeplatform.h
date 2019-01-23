@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -110,8 +110,8 @@ namespace vfePlatform
             ///////////////////////////////////////////////////////////////////////
             // return true if the path component of file is equal to the path component
             // of path. will also return true if recursive is true and path is a parent
-            // of file. does not support relative paths, and will convert UCS2 paths to
-            // ASCII and perform case-insensitive comparisons.
+            // of file. does not support relative paths, and will
+            // perform case-sensitive comparisons.
             virtual bool TestPath(const Path& path, const Path& file, bool recursive) const;
 
             ///////////////////////////////////////////////////////////////////////

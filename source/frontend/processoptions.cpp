@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -361,7 +361,7 @@ int ProcessOptions::WriteFile(const char *filename, POVMSObjectPtr obj)
     OTextStream *ini_file;
     int err = kNoErr;
 
-    if(!pov_base::PlatformBase::GetInstance().AllowLocalFileAccess (ASCIItoUCS2String(filename), POV_File_Text_INI, true))
+    if(!pov_base::PlatformBase::GetInstance().AllowLocalFileAccess (SysToUCS2String(filename), POV_File_Text_INI, true))
         return kCannotOpenFileErr;
 
     ini_file = OpenFileForWrite(filename, obj);
@@ -558,7 +558,7 @@ void ProcessOptions::ParseErrorAt(ITextStream *file, const char *format, ...)
     std::vsnprintf(error_buffer, sizeof(error_buffer), format, marker);
     va_end(marker);
 
-    fprintf(stderr, "%s\nFile '%s' at line '%u'", error_buffer, UCS2toASCIIString(file->name()).c_str(), (unsigned int) file->line());
+    fprintf(stderr, "%s\nFile '%s' at line '%u'", error_buffer, UCS2toSysString(file->name()).c_str(), (unsigned int) file->line());
 }
 
 void ProcessOptions::WriteError(const char *format, ...)

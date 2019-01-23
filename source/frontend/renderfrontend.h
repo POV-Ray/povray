@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -622,7 +622,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::StartRender(ViewId
     {
         Path outputpath(obj.TryGetUCS2String(kPOVAttrib_OutputPath, ""));
         UCS2String filename = obj.TryGetUCS2String(kPOVAttrib_OutputFile, "");
-        string fn(UCS2toASCIIString(filename));
+        std::string fn(UCS2toSysString(filename));
         bool to_stdout = fn == "-" || fn == "stdout" || fn == "stderr";
 
         if(obj.TryGetBool(kPOVAttrib_ContinueTrace, false) == true)

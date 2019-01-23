@@ -580,7 +580,7 @@ class Parser
         char *Parse_C_String(bool pathname = false);
         void ParseString(UTF8String& s, bool pathname = false);
         UCS2 *Parse_String(bool pathname = false, bool require = true);
-        std::string Parse_ASCIIString(bool pathname = false, bool require = true);
+        std::string Parse_SysString(bool pathname = false, bool require = true);
 
         UCS2 *String_Literal_To_UCS2(const std::string& str);
         UCS2 *String_To_UCS2(const char *str);

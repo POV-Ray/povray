@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -257,8 +257,8 @@ RenderFrontendBase::SceneId RenderFrontendBase::CreateScene(SceneData& shd, POVM
             if(obj.Exist(gStreamTypeUtilData[i]) == true)
             {
                 shd.streamnames[gStreamNumber[i]] = obj.GetUCS2String(gStreamTypeUtilData[i]);
-                if(ProcessOptions::IsTrue(UCS2toASCIIString(shd.streamnames[gStreamNumber[i]]).c_str()) == true)
-                    shd.streamnames[gStreamNumber[i]] = ASCIItoUCS2String(gStreamDefaultFile[i]);
+                if(ProcessOptions::IsTrue(UCS2toSysString(shd.streamnames[gStreamNumber[i]]).c_str()) == true)
+                    shd.streamnames[gStreamNumber[i]] = SysToUCS2String(gStreamDefaultFile[i]);
             }
         }
 
@@ -600,7 +600,7 @@ void RenderFrontendBase::MakeBackupPath(POVMS_Object& ropts, ViewData& vd, const
     if(vd.imageBackupFile.GetFile().empty() == true)
         vd.imageBackupFile.SetFile(ropts.TryGetUCS2String(kPOVAttrib_InputFile, "object.pov"));
 
-    vd.imageBackupFile.SetFile(GetFileName(Path(vd.imageBackupFile.GetFile())) + ASCIItoUCS2String(".pov-state"));
+    vd.imageBackupFile.SetFile(GetFileName(Path(vd.imageBackupFile.GetFile())) + u".pov-state");
 }
 
 void RenderFrontendBase::NewBackup(POVMS_Object& ropts, ViewData& vd, const Path& outputpath)
@@ -957,9 +957,9 @@ void ParserOptions(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
     ucs2buf[0] = 0;
     (void)POVMSUtil_GetUCS2String(msg, kPOVAttrib_InputFile, ucs2buf, &l);
     if(POVMSUtil_GetFloat(msg, kPOVAttrib_Version, &f) != kNoErr)
-        tsb->printf("  Input file: %s\n", UCS2toASCIIString(ucs2buf).c_str());
+        tsb->printf("  Input file: %s\n", UCS2toSysString(ucs2buf).c_str());
     else
-        tsb->printf("  Input file: %s (compatible to version %1.2f)\n", UCS2toASCIIString(ucs2buf).c_str(), (double)f);
+        tsb->printf("  Input file: %s (compatible to version %1.2f)\n", UCS2toSysString(ucs2buf).c_str(), (double)f);
     tsb->printf("  Remove bounds.......%s\n  Split unions........%s\n",
                   GetOptionSwitchString(msg, kPOVAttrib_RemoveBounds, true),
                   GetOptionSwitchString(msg, kPOVAttrib_SplitUnions, false));
@@ -981,7 +981,7 @@ void ParserOptions(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
                     l = sizeof(ucs2buf);
                     ucs2buf[0] = 0;
                     (void)POVMSAttr_Get(&item, kPOVMSType_UCS2String, ucs2buf, &l);
-                    tsb->printf("    %s\n", UCS2toASCIIString(ucs2buf).c_str());
+                    tsb->printf("    %s\n", UCS2toSysString(ucs2buf).c_str());
 
                     (void)POVMSAttr_Delete(&item);
                 }
@@ -1152,11 +1152,11 @@ void OutputOptions(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
         }
 
         if(outputFormat == kPOVList_FileType_JPEG)
-            tsb->printf("  Output file..........%s, %d bpp, quality %d%s%s %s\n", UCS2toASCIIString(ucs2buf).c_str(), outputQuality, outputCompression, "%", al, t);
+            tsb->printf("  Output file..........%s, %d bpp, quality %d%s%s %s\n", UCS2toSysString(ucs2buf).c_str(), outputQuality, outputCompression, "%", al, t);
         else if (outputGrayscale)
-            tsb->printf("  Output file..........%s, grayscale%s %s\n", UCS2toASCIIString(ucs2buf).c_str(), al, t);
+            tsb->printf("  Output file..........%s, grayscale%s %s\n", UCS2toSysString(ucs2buf).c_str(), al, t);
         else
-            tsb->printf("  Output file..........%s, %d bpp%s %s\n", UCS2toASCIIString(ucs2buf).c_str(), outputQuality, al, t);
+            tsb->printf("  Output file..........%s, %d bpp%s %s\n", UCS2toSysString(ucs2buf).c_str(), outputQuality, al, t);
 
         if ((outputFormat != kPOVList_FileType_JPEG) && (outputFormat != kPOVList_FileType_OpenEXR))
         {
@@ -1766,7 +1766,7 @@ void FileMessage(TextStreamBuffer *tsb, int stream, POVMSObjectPtr msg)
     {
         // TODO FIXME: we ought to support UCS2 string output.
         POVMSUCS2String fn(filename);
-        string asciiFN(UCS2toASCIIString(fn));
+        std::string asciiFN(UCS2toSysString(fn));
 
         if((POVMSUtil_GetLong(msg, kPOVAttrib_Line, &ll) == kNoErr) && ((stream == WARNING_STREAM) || (stream == FATAL_STREAM)))
         {

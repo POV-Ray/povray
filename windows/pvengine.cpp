@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -1882,7 +1882,7 @@ int GetUCS2String(POVMSObjectPtr object, POVMSType key, char *result, int *maxle
   int err = POVMSUtil_GetUCS2String (object, key, str, maxlen) ;
   if (err == kNoErr)
   {
-    string abc = UCS2toASCIIString (str) ;
+    std::string abc = UCS2toSysString (str) ;
     strcpy (result, abc.c_str ()) ;
   }
   delete str ;
@@ -2175,7 +2175,7 @@ bool start_rendering (bool ignore_source_file)
     if (opts.GetOptions().TryGetInt(kPOVAttrib_RenderBlockSize, 32) < 4)
       throw POV_EXCEPTION (kParseErr, "Minimum permitted render block size is 4 (+BS4 or Render_Block_Size=4)") ;
 
-    InputFileName = UCS2toASCIIString (Session.GetInputFilename());
+    InputFileName = UCS2toSysString (Session.GetInputFilename());
     output_to_file = opts.GetOptions().TryGetBool(kPOVAttrib_OutputToFile, true) ;
     render_width = Session.GetRenderWidth();
     render_height = Session.GetRenderHeight();
@@ -2417,7 +2417,7 @@ void render_stopped (void)
     }
     if (!running_demo && !demo_mode && !benchmark_mode && !rendering_insert_menu && !running_benchmark && !was_insert_render)
     {
-      string ofn = UCS2toASCIIString (Session.GetOutputFilename());
+      string ofn = UCS2toSysString (Session.GetOutputFilename());
       if (output_to_file && ofn.size () != 0)
       {
         sprintf (str, "Output -> '%s'", ofn.c_str ()) ;

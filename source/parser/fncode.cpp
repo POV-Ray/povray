@@ -125,7 +125,7 @@ FNCode::FNCode(Parser *pa, FunctionCode *f, bool is_local, const char *n)
     if (n != nullptr)
         function->sourceInfo.name = n;
     else
-        function->sourceInfo.name = "";
+        function->sourceInfo.name.clear();
     function->sourceInfo.fileName = parser->CurrentFileName();
     function->sourceInfo.position = parser->CurrentFilePosition();
     function->flags = 0;
@@ -1700,7 +1700,7 @@ void FNCode::compile_variable(char *name)
     unsigned int i = 0, found = MAX_K;
 
     // first, handle register parameters x,y,z,u and v
-    if(name[1] == 0)
+    if(name[1] == '\0')
     {
         if((name[0] == 'x') || (name[0] == 'u'))
         {

@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -71,7 +71,7 @@ namespace vfe
       IOPath(const Path& path, bool recursive) : m_Path(path), m_Recursive(recursive) {}
 
       // construct an IOPath given a std::string path and a recursion flag.
-      IOPath(const string& path, bool recursive) : m_Path(Path(ASCIItoUCS2String(path.c_str()))), m_Recursive(recursive) {}
+      IOPath(const string& path, bool recursive) : m_Path(Path(SysToUCS2String(path))), m_Recursive(recursive) {}
 
       // construct an IOPath given a UCS2String Path and a recursion flag.
       IOPath(const UCS2String& path, bool recursive) : m_Path(path), m_Recursive(recursive) {}
@@ -150,7 +150,7 @@ namespace vfe
       void ClearLibraryPaths() { m_LibraryPaths.clear(); }
 
       // Add a library path given a std::string.
-      void AddLibraryPath(const string& Path) { m_LibraryPaths.push_back(ASCIItoUCS2String(Path.c_str())); }
+      void AddLibraryPath(const string& Path) { m_LibraryPaths.push_back(SysToUCS2String(Path)); }
 
       // Add a library path given a UCS2String.
       void AddLibraryPath(const UCS2String& Path) { m_LibraryPaths.push_back(Path); }
@@ -171,7 +171,7 @@ namespace vfe
       // Set the source file to be parsed (must be an SDL file, INI not
       // permitted). The file is specified as a std::string full or relative
       // path, with optional extension.
-      void SetSourceFile(const string& File) { m_SourceFile = ASCIItoUCS2String(File.c_str()); }
+      void SetSourceFile(const string& File) { m_SourceFile = SysToUCS2String(File); }
 
       // Returns a const reference to the currently set source file (may be
       // an empty string). Return type is a const reference to a UCS2String.
@@ -183,7 +183,7 @@ namespace vfe
       // Adds the supplied std::string to the list of INI files to be read
       // prior to the start of the render. The files are processed in the
       // order in which they are added to this list.
-      void AddINI(const string& File) { m_IniFiles.push_back(ASCIItoUCS2String(File.c_str())); }
+      void AddINI(const string& File) { m_IniFiles.push_back(SysToUCS2String(File)); }
 
       // Adds the supplied UCS2String to the list of INI files to be read
       // prior to the start of the render. The files are processed in the

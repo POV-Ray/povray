@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -80,12 +80,12 @@ IStream::~IStream()
 
 IFileStream::IFileStream(const UCS2String& name) : IStream(name), f(nullptr)
 {
-    if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdin") == 0)
+    if(pov_stricmp(UCS2toSysString(name).c_str(), "stdin") == 0)
     {
         f = stdin;
     }
-    else if((pov_stricmp(UCS2toASCIIString(name).c_str(), "stdout") == 0) ||
-            (pov_stricmp(UCS2toASCIIString(name).c_str(), "stderr") == 0))
+    else if((pov_stricmp(UCS2toSysString(name).c_str(), "stdout") == 0) ||
+            (pov_stricmp(UCS2toSysString(name).c_str(), "stderr") == 0))
     {
         f = nullptr;
     }
@@ -186,7 +186,7 @@ bool IFileStream::getline(char *s, size_t buflen)
 }
 
 IMemStream::IMemStream(const unsigned char* data, size_t size, const char* formalName, POV_OFF_T formalStart) :
-    IStream(ASCIItoUCS2String(formalName)), size(size), pos(0), formalStart(formalStart), start(data), mUngetBuffer(EOF)
+    IStream(SysToUCS2String(formalName)), size(size), pos(0), formalStart(formalStart), start(data), mUngetBuffer(EOF)
 {
     fail = false;
 }
@@ -219,18 +219,18 @@ OStream::OStream(const UCS2String& name, unsigned int Flags) : IOBase(name), f(n
         mode = "r+b";
     }
 
-    if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdin") == 0)
+    if(pov_stricmp(UCS2toSysString(name).c_str(), "stdin") == 0)
     {
         f = nullptr;
     }
-    else if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdout") == 0)
+    else if(pov_stricmp(UCS2toSysString(name).c_str(), "stdout") == 0)
     {
         if((Flags & append) != 0)
             f = nullptr;
         else
             f = stdout;
     }
-    else if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stderr") == 0)
+    else if(pov_stricmp(UCS2toSysString(name).c_str(), "stderr") == 0)
     {
         if((Flags & append) != 0)
             f = nullptr;
@@ -324,7 +324,7 @@ IStream *NewIStream(const Path& p, unsigned int stype)
     if (!PlatformBase::GetInstance().AllowLocalFileAccess(p(), stype, false))
     {
         string str ("IO Restrictions prohibit read access to '") ;
-        str += UCS2toASCIIString(p());
+        str += UCS2toSysString(p());
         str += "'";
         throw POV_EXCEPTION(kCannotOpenFileErr, str);
     }
@@ -342,7 +342,7 @@ OStream *NewOStream(const Path& p, unsigned int stype, bool sappend)
     if (!PlatformBase::GetInstance().AllowLocalFileAccess(p(), stype, true))
     {
         string str ("IO Restrictions prohibit write access to '") ;
-        str += UCS2toASCIIString(p());
+        str += UCS2toSysString(p());
         str += "'";
         throw POV_EXCEPTION(kCannotOpenFileErr, str);
     }

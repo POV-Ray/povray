@@ -55,14 +55,27 @@
 namespace pov_base
 {
 
-UCS2String ASCIItoUCS2String(const char *s)
+UCS2String ASCIItoUCS2String(const std::string& s)
+{
+    UCS2String r;
+    r.reserve(s.length());
+
+    for(std::size_t i = 0; i < s.length(); i++)
+    {
+        r += (UCS2)(s[i]);
+    }
+
+    return r;
+}
+
+UCS2String SysToUCS2String(const char *s)
 {
     UCS2String r;
     unsigned char ch;
 
     if (s != nullptr)
     {
-        while(*s != 0)
+        while(*s != u'\0')
         {
             ch = *s++;
             r += (UCS2)(ch);
@@ -72,14 +85,27 @@ UCS2String ASCIItoUCS2String(const char *s)
     return r;
 }
 
-std::string UCS2toASCIIString(const UCS2String& s)
+UCS2String SysToUCS2String(const std::string& s)
+{
+    UCS2String r;
+    r.reserve(s.length());
+
+    for(std::size_t i = 0; i < s.length(); i++)
+    {
+        r += (UCS2)(s[i]);
+    }
+
+    return r;
+}
+
+std::string UCS2toSysString(const UCS2String& s)
 {
     std::string r;
     r.reserve(s.length());
 
     for(std::size_t i = 0; i < s.length(); i++)
     {
-        if(s[i] >= 256)
+        if(s[i] > 0xFFu)
             r += ' '; // TODO - according to most encoding conventions, this should be '?'
         else
             r += (char)(s[i]);
@@ -201,7 +227,7 @@ int pov_stricmp(const char *s1, const char *s2)
 {
     char c1, c2;
 
-    while((*s1 != 0) && (*s2 != 0))
+    while((*s1 != '\0') && (*s2 != '\0'))
     {
         c1 = *s1++;
         c2 = *s2++;
@@ -215,9 +241,9 @@ int pov_stricmp(const char *s1, const char *s2)
             return 1;
     }
 
-    if(*s1 == 0)
+    if(*s1 == '\0')
     {
-        if(*s2 == 0)
+        if(*s2 == '\0')
             return 0;
         else
             return -1;

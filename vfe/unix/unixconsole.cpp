@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -372,7 +372,7 @@ Press <Enter> to continue or <Ctrl-C> to abort.\n\
         Delay(20);
     }
 
-    string basename = UCS2toASCIIString(session->CreateTemporaryFile());
+    string basename = UCS2toSysString(session->CreateTemporaryFile());
     ini = basename + ".ini";
     pov = basename + ".pov";
     if (pov::Write_Benchmark_File(pov.c_str(), ini.c_str()))
@@ -393,9 +393,9 @@ Press <Enter> to continue or <Ctrl-C> to abort.\n\
 static void CleanupBenchmark(vfeUnixSession *session, string& ini, string& pov)
 {
     fprintf(stderr, "%s: removing %s\n", PACKAGE, ini.c_str());
-    session->DeleteTemporaryFile(ASCIItoUCS2String(ini.c_str()));
+    session->DeleteTemporaryFile(SysToUCS2String(ini.c_str()));
     fprintf(stderr, "%s: removing %s\n", PACKAGE, pov.c_str());
-    session->DeleteTemporaryFile(ASCIItoUCS2String(pov.c_str()));
+    session->DeleteTemporaryFile(SysToUCS2String(pov.c_str()));
 }
 
 int main (int argc, char **argv)

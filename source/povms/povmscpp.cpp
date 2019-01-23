@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -48,14 +48,14 @@
 const POVMSType kPOVMSRawStreamEncoding = 'RAWS';
 const POVMSType kPOVMSGZipStreamEncoding = 'GZIP';
 
-POVMSUCS2String POVMS_ASCIItoUCS2String(const char *s)
+POVMSUCS2String POVMS_SysToUCS2String(const char *s)
 {
     POVMSUCS2String r;
     unsigned char ch;
 
     if (s != nullptr)
     {
-        while(*s != 0)
+        while(*s != '\0')
         {
             ch = *s++;
             r += (POVMSUCS2)(ch);
@@ -65,13 +65,13 @@ POVMSUCS2String POVMS_ASCIItoUCS2String(const char *s)
     return r;
 }
 
-std::string POVMS_UCS2toASCIIString(const POVMSUCS2String& s)
+std::string POVMS_UCS2toSysString(const POVMSUCS2String& s)
 {
     std::string r;
 
     for(std::size_t i = 0; i < s.length(); i++)
     {
-        if(s[i] >= 256)
+        if(s[i] > 0xFFu)
             r += ' ';
         else
             r += (char)(s[i]);
@@ -1267,7 +1267,7 @@ POVMSUCS2String POVMS_Object::TryGetUCS2String(POVMSType key, const char *alt)
     if(Exist(key) == true)
         return GetUCS2String(key);
 
-    return POVMS_ASCIItoUCS2String(alt);
+    return POVMS_SysToUCS2String(alt);
 }
 
 POVMSUCS2String POVMS_Object::TryGetUCS2String(POVMSType key, const POVMSUCS2String& alt)

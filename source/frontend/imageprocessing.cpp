@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -209,8 +209,8 @@ bool ImageProcessing::OutputIsStdout(POVMS_Object& ropts)
 {
     UCS2String path(ropts.TryGetUCS2String(kPOVAttrib_OutputFile, ""));
 
-    toStdout = path == POVMS_ASCIItoUCS2String("-") || path == POVMS_ASCIItoUCS2String("stdout");
-    toStderr = path == POVMS_ASCIItoUCS2String("stderr");
+    toStdout = (path == u"-") || (path == u"stdout");
+    toStderr = (path == u"stderr");
     return toStdout;
 }
 
@@ -231,43 +231,43 @@ UCS2String ImageProcessing::GetOutputFilename(POVMS_Object& ropts, POVMSInt fram
     {
         case kPOVList_FileType_Targa:
         case kPOVList_FileType_CompressedTarga:
-            ext = ASCIItoUCS2String(".tga");
+            ext = u".tga";
             imagetype = Image::TGA;
             break;
 
         case kPOVList_FileType_PNG:
-            ext = ASCIItoUCS2String(".png");
+            ext = u".png";
             imagetype = Image::PNG;
             break;
 
         case kPOVList_FileType_JPEG:
-            ext = ASCIItoUCS2String(".jpg");
+            ext = u".jpg";
             imagetype = Image::JPEG;
             break;
 
         case kPOVList_FileType_PPM:
-            ext = ASCIItoUCS2String(".ppm"); // TODO FIXME - in case of greyscale output, extension should default to ".pgm"
+            ext = u".ppm"; // TODO FIXME - in case of greyscale output, extension should default to ".pgm"
             imagetype = Image::PPM;
             break;
 
         case kPOVList_FileType_BMP:
-            ext = ASCIItoUCS2String(".bmp");
+            ext = u".bmp";
             imagetype = Image::BMP;
             break;
 
         case kPOVList_FileType_OpenEXR:
-            ext = ASCIItoUCS2String(".exr");
+            ext = u".exr";
             imagetype = Image::EXR;
             break;
 
         case kPOVList_FileType_RadianceHDR:
-            ext = ASCIItoUCS2String(".hdr");
+            ext = u".hdr";
             imagetype = Image::HDR;
             break;
 
 #ifdef POV_SYS_IMAGE_TYPE
         case kPOVList_FileType_System:
-            ext = ASCIItoUCS2String(POV_SYS_IMAGE_EXTENSION);
+            ext = u"" POV_SYS_IMAGE_EXTENSION;
             imagetype = Image::POV_SYS_IMAGE_TYPE;
             break;
 #endif
@@ -290,7 +290,7 @@ UCS2String ImageProcessing::GetOutputFilename(POVMS_Object& ropts, POVMSInt fram
             default:
                 throw POV_EXCEPTION_STRING("Output to STDOUT/STDERR not supported for selected file format");
         }
-        return POVMS_ASCIItoUCS2String(OutputIsStdout() ? "stdout" : "stderr");
+        return (OutputIsStdout() ? u"stdout" : u"stderr");
     }
 
     // we disallow an output filename that consists purely of the default extension
@@ -308,7 +308,7 @@ UCS2String ImageProcessing::GetOutputFilename(POVMS_Object& ropts, POVMSInt fram
 
         // if the input file name ends with '.' or '.anything', we remove it
         UCS2String::size_type pos = filename.find_last_of('.');
-        if(pos != string::npos)
+        if(pos != UCS2String::npos)
             filename.erase(pos);
     }
     else if ((path.HasVolume() == false) && (path.Empty() == false))

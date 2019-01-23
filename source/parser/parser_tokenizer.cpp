@@ -1875,7 +1875,7 @@ void Parser::Open_Include()
     UCS2String formalFileName; // Name the file is known by to the user.
 
     asciiFileName = Parse_C_String(true);
-    formalFileName = ASCIItoUCS2String(asciiFileName);
+    formalFileName = SysToUCS2String(asciiFileName);
     POV_FREE(asciiFileName);
 
     IncludeHeader(formalFileName);
@@ -2225,7 +2225,7 @@ void Parser::Invoke_Macro()
         {
             is = Locate_File (PMac->source.fileName, POV_File_Text_Macro, ign, true);
             if (is == nullptr)
-                Error ("Cannot open macro file '%s'.", UCS2toASCIIString(PMac->source.fileName).c_str());
+                Error ("Cannot open macro file '%s'.", UCS2toSysString(PMac->source.fileName).c_str());
         }
         mTokenizer.SetInputStream(is);
     }
@@ -2521,7 +2521,7 @@ void Parser::Parse_Fopen(void)
     Entry->Data=reinterpret_cast<void *>(New);
 
     asciiFileName = Parse_C_String(true);
-    fileName = ASCIItoUCS2String(asciiFileName);
+    fileName = SysToUCS2String(asciiFileName);
     POV_FREE(asciiFileName);
 
     EXPECT_ONE
@@ -2531,7 +2531,7 @@ void Parser::Parse_Fopen(void)
             if (rfile != nullptr)
                 New->inTokenizer->SetInputStream(rfile);
             else
-                Error ("Cannot open user file %s (read).", UCS2toASCIIString(fileName).c_str());
+                Error ("Cannot open user file %s (read).", UCS2toSysString(fileName).c_str());
         END_CASE
 
         CASE(WRITE_TOKEN)
@@ -2542,7 +2542,7 @@ void Parser::Parse_Fopen(void)
                 New->Out_File = nullptr;
 
             if (New->Out_File == nullptr)
-                Error ("Cannot open user file %s (write).", UCS2toASCIIString(fileName).c_str());
+                Error ("Cannot open user file %s (write).", UCS2toSysString(fileName).c_str());
         END_CASE
 
         CASE(APPEND_TOKEN)
@@ -2553,7 +2553,7 @@ void Parser::Parse_Fopen(void)
                 New->Out_File = nullptr;
 
             if (New->Out_File == nullptr)
-                Error ("Cannot open user file %s (append).", UCS2toASCIIString(fileName).c_str());
+                Error ("Cannot open user file %s (append).", UCS2toSysString(fileName).c_str());
         END_CASE
 
         OTHERWISE
@@ -2605,7 +2605,7 @@ void Parser::Parse_Read()
         Error ("Can't nest directives accessing the same file.");
     File_Id = POV_STRDUP(CurrentTokenText().c_str());
     if (User_File->inTokenizer == nullptr)
-        Error("Cannot read from file %s because the file is open for writing only.", UCS2toASCIIString(UCS2String(User_File->Out_File->name())).c_str());
+        Error("Cannot read from file %s because the file is open for writing only.", UCS2toSysString(UCS2String(User_File->Out_File->name())).c_str());
 
     // Safeguard against accidental nesting of other file access directives inside the `#fopen`
     // directive (or the user forgetting portions of the directive).
@@ -2692,7 +2692,7 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File, TokenId Previous, TokenId *Nu
     bool ungetToken = false;
 
     if (User_File->inTokenizer == nullptr)
-        Error("Cannot read from file '%s' because the file is open for writing only.", UCS2toASCIIString(UCS2String(User_File->Out_File->name())).c_str());
+        Error("Cannot read from file '%s' because the file is open for writing only.", UCS2toSysString(UCS2String(User_File->Out_File->name())).c_str());
 
     if (User_File->ReadNextToken())
     {
@@ -2822,7 +2822,7 @@ void Parser::Parse_Write(void)
     if (User_File->busyParsing)
         Error ("Can't nest directives accessing the same file.");
     if (User_File->Out_File == nullptr)
-        Error("Cannot write to file %s because the file is open for reading only.", UCS2toASCIIString(User_File->inTokenizer->GetInputStreamName()).c_str());
+        Error("Cannot write to file %s because the file is open for reading only.", UCS2toSysString(User_File->inTokenizer->GetInputStreamName()).c_str());
 
     // Safeguard against accidental nesting of other file access directives inside the `#fopen`
     // directive (or the user forgetting portions of the directive).
@@ -3135,7 +3135,7 @@ void Parser::IncludeHeader(const UCS2String& formalFileName)
 
     shared_ptr<IStream> is = Locate_File (formalFileName.c_str(),POV_File_Text_INC,actualFileName,true);
     if (is == nullptr)
-        Error ("Cannot open include file %s.", UCS2toASCIIString(formalFileName).c_str());
+        Error ("Cannot open include file %s.", UCS2toSysString(formalFileName).c_str());
 
     SetInputStream(is);
 

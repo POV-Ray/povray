@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -62,7 +62,7 @@ DefaultPlatformBase::~DefaultPlatformBase()
 
 UCS2String DefaultPlatformBase::GetTemporaryPath()
 {
-    return ASCIItoUCS2String("/tmp/");
+    return u"/tmp/";
 }
 
 UCS2String DefaultPlatformBase::CreateTemporaryFile()
@@ -77,12 +77,12 @@ UCS2String DefaultPlatformBase::CreateTemporaryFile()
     if (f != nullptr)
         fclose(f);
 
-    return UCS2String(ASCIItoUCS2String(buffer));
+    return ASCIItoUCS2String(buffer);
 }
 
 void DefaultPlatformBase::DeleteTemporaryFile(const UCS2String& filename)
 {
-    remove(UCS2toASCIIString(filename).c_str());
+    remove(UCS2toSysString(filename).c_str());
 }
 
 bool DefaultPlatformBase::ReadFileFromURL(OStream *, const UCS2String&, const UCS2String&)
@@ -92,12 +92,12 @@ bool DefaultPlatformBase::ReadFileFromURL(OStream *, const UCS2String&, const UC
 
 FILE* DefaultPlatformBase::OpenLocalFile(const UCS2String& name, const char *mode)
 {
-    return fopen(UCS2toASCIIString(UCS2String(name)).c_str(), mode);
+    return fopen(UCS2toSysString(name).c_str(), mode);
 }
 
 void DefaultPlatformBase::DeleteLocalFile(const UCS2String& name)
 {
-    POV_DELETE_FILE(UCS2toASCIIString(UCS2String(name)).c_str());
+    POV_DELETE_FILE(UCS2toSysString(name).c_str());
 }
 
 bool DefaultPlatformBase::AllowLocalFileAccess(const UCS2String& name, const unsigned int fileType, bool write)

@@ -304,7 +304,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
             {
                 UNGET
                 Name = Parse_C_String(true);
-                UCS2String filename = ASCIItoUCS2String(Name);
+                UCS2String filename = SysToUCS2String(Name);
                 UCS2String ext = GetFileExtension(Path(filename));
 
                 if (ext.empty() == false)
@@ -363,7 +363,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
         if(!(filetype & Legal))
             Error("File type not supported here.");
 
-        UCS2String filename = ASCIItoUCS2String(Name);
+        UCS2String filename = SysToUCS2String(Name);
         Image::ReadOptions options;
 
         switch (sceneData->gammaMode)
@@ -842,7 +842,7 @@ PatternPtr Parser::ParseDensityFilePattern()
     pattern->densityFile = Create_Density_File();
     GET(DF3_TOKEN);
     pattern->densityFile->Data->Name = Parse_C_String(true);
-    shared_ptr<IStream> dfile = Locate_File(ASCIItoUCS2String(pattern->densityFile->Data->Name).c_str(), POV_File_Data_DF3, dummy, true);
+    shared_ptr<IStream> dfile = Locate_File(SysToUCS2String(pattern->densityFile->Data->Name).c_str(), POV_File_Data_DF3, dummy, true);
     if (dfile == nullptr)
         Error("Cannot read media density file.");
     Read_Density_File(dfile.get(), pattern->densityFile);

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -66,7 +66,7 @@ IBufferedTextStream::IBufferedTextStream(const UCS2 *sname, unsigned int stype)
 
     stream = NewIStream(sname, stype);
     if (stream == nullptr)
-        throw POV_EXCEPTION(kCannotOpenFileErr, string("Cannot open file '") + UCS2toASCIIString(sname) + "' for input.");
+        throw POV_EXCEPTION(kCannotOpenFileErr, std::string("Cannot open file '") + UCS2toSysString(sname) + "' for input.");
 
     filename = UCS2String(sname);
     bufferoffset = 0;
@@ -427,7 +427,7 @@ OTextStream::OTextStream(const UCS2 *sname, unsigned int stype, bool append)
 
     stream = NewOStream(sname, stype, append);
     if (stream == nullptr)
-        throw POV_EXCEPTION(kCannotOpenFileErr, string("Cannot open file '") + UCS2toASCIIString(sname) + "' for output.");
+        throw POV_EXCEPTION(kCannotOpenFileErr, std::string("Cannot open file '") + UCS2toSysString(sname) + "' for output.");
 
     filename = UCS2String(sname);
 }

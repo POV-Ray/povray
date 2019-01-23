@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -55,8 +55,8 @@ class POVMS_MessageReceiver;
 
 typedef std::basic_string<POVMSUCS2> POVMSUCS2String;
 
-POVMSUCS2String POVMS_ASCIItoUCS2String(const char *s);
-std::string POVMS_UCS2toASCIIString(const POVMSUCS2String& s);
+POVMSUCS2String POVMS_SysToUCS2String(const char *s);
+std::string POVMS_UCS2toSysString(const POVMSUCS2String& s);
 
 class POVMS_Container
 {

@@ -498,7 +498,7 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
     if (!meta.getComment4().empty())
         comment += meta.getComment4() + "\n";
 
-    const JOCTET *pcom(reinterpret_cast<const JOCTET*>(&comment[0])); /* lack of converter, cast, old-style (bad, go mixing C & C++!) */
+    const JOCTET *pcom(reinterpret_cast<const JOCTET*>(comment.c_str()));
 
     // The comment marker must be here, before the image data
     jpeg_write_marker(&writebuf.cinfo, JPEG_COM, pcom,comment.length());
