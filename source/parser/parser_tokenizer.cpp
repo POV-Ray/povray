@@ -2302,7 +2302,7 @@ Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
     i=0;
     j=1;
 
-    POV_EXPERIMENTAL_ASSERT(IsOkToDeclare());
+    bool oldOkToDeclare = IsOkToDeclare();
     SetOkToDeclare(false);
 
     while (Parse_Square_Begin(false))
@@ -2363,7 +2363,7 @@ Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
         END_CASE
     END_EXPECT
 
-    SetOkToDeclare(true);
+    SetOkToDeclare(oldOkToDeclare);
     return(New);
 };
 
