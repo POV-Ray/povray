@@ -36,15 +36,22 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/imageprocessing.h"
 
-// Standard C++ header files
-#include <memory>
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
 
 // POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
+#include "base/path.h"
+#include "base/image/colourspace.h"
 #include "base/image/dither.h"
 #include "base/image/image.h"
 
 // POV-Ray header files (POVMS module)
 #include "povms/povmsid.h"
+
+// POV-Ray header files (frontend module)
+//  (none at the moment)
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -56,6 +63,8 @@
 namespace pov_frontend
 {
 
+using std::shared_ptr;
+
 enum
 {
     X = 0,
@@ -65,7 +74,7 @@ enum
 
 ImageProcessing::ImageProcessing(unsigned int width, unsigned int height)
 {
-    image = shared_ptr<Image>(Image::Create(width, height, Image::RGBFT_Float));
+    image = shared_ptr<Image>(Image::Create(width, height, ImageDataType::RGBFT_Float));
     toStderr = toStdout = false;
 
     // TODO FIXME - find a better place for this
@@ -79,7 +88,7 @@ ImageProcessing::ImageProcessing(POVMS_Object& ropts)
     unsigned int blockSize(ropts.TryGetInt(kPOVAttrib_RenderBlockSize, 32));
     unsigned int maxBufferMem(ropts.TryGetInt(kPOVAttrib_MaxImageBufferMem, 128)); // number is megabytes
 
-    image = shared_ptr<Image>(Image::Create(width, height, Image::RGBFT_Float, maxBufferMem, blockSize * blockSize));
+    image = shared_ptr<Image>(Image::Create(width, height, ImageDataType::RGBFT_Float, maxBufferMem, blockSize * blockSize));
     toStdout = OutputIsStdout(ropts);
     toStderr = OutputIsStderr(ropts);
 
@@ -104,12 +113,12 @@ UCS2String ImageProcessing::WriteImage(POVMS_Object& ropts, POVMSInt frame, int 
 {
     if(ropts.TryGetBool(kPOVAttrib_OutputToFile, true) == true)
     {
-        Image::WriteOptions wopts;
+        ImageWriteOptions wopts;
         Image::ImageFileType imagetype = Image::SYS;
         unsigned int filetype = POV_File_Image_System;
 
         wopts.bitsPerChannel = clip(ropts.TryGetInt(kPOVAttrib_BitsPerColor, 8), 1, 16);
-        wopts.alphaMode = (ropts.TryGetBool(kPOVAttrib_OutputAlpha, false) ? Image::kAlphaMode_Default : Image::kAlphaMode_None );
+        wopts.alphaMode = (ropts.TryGetBool(kPOVAttrib_OutputAlpha, false) ? ImageAlphaMode::Default : ImageAlphaMode::None );
         wopts.compression = (ropts.Exist(kPOVAttrib_Compression) ? clip(ropts.GetInt(kPOVAttrib_Compression), 0, 255) : -1);
         wopts.grayscale = ropts.TryGetBool(kPOVAttrib_GrayscaleOutput, false);
 
@@ -347,3 +356,4 @@ UCS2String ImageProcessing::GetOutputFilename(POVMS_Object& ropts, POVMSInt fram
 }
 
 }
+// end of namespace pov_frontend

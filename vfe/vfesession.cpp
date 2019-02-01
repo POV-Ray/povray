@@ -51,9 +51,14 @@ namespace pov
   static volatile POVMSAddress RenderThreadAddr = POVMSInvalidAddress ;
   static volatile POVMSAddress GUIThreadAddr = POVMSInvalidAddress ;
 }
+// end of namespace pov
 
 namespace vfe
 {
+
+using std::min;
+using std::max;
+using std::string;
 
 bool vfeSession::m_Initialized = false;
 vfeSession *vfeSession::m_CurrentSessionTemporaryHack = nullptr;
@@ -373,7 +378,7 @@ bool vfeSession::GetNextCombinedMessage (MessageType &Type, string& Message)
 // from the aforementioned queues; whichever is the earliest. Returns false
 // if there is no message to fetch, otherwise will set the message type,
 // filename, line, and column parameters supplied. If the message retrieved
-// did not contain this information, the relevent entry is either set to 0
+// did not contain this information, the relevant entry is either set to 0
 // (line and column) or the empty string (filename). The filename parameter
 // is a UCS2String.
 bool vfeSession::GetNextNonStatusMessage (MessageType &Type, string& Message, UCS2String& File, int& Line, int& Col)
@@ -419,7 +424,7 @@ bool vfeSession::GetNextNonStatusMessage (MessageType &Type, string& Message, UC
 // from the aforementioned queues; whichever is the earliest. Returns false
 // if there is no message to fetch, otherwise will set the message type,
 // filename, line, and column parameters supplied. If the message retrieved
-// did not contain this information, the relevent entry is either set to 0
+// did not contain this information, the relevant entry is either set to 0
 // (line and column) or the empty string (filename). The filename parameter
 // is a std::string.
 bool vfeSession::GetNextNonStatusMessage (MessageType &Type, string& Message, string& File, int& Line, int& Col)
@@ -544,10 +549,10 @@ const char *vfeSession::GetBackendStateName (void) const
 // Returns a copy of the shared pointer containing the current instance
 // of a pov_frontend::Display-derived render preview instance, which may
 // be `nullptr`.
-shared_ptr<Display> vfeSession::GetDisplay() const
+std::shared_ptr<Display> vfeSession::GetDisplay() const
 {
   if (m_Frontend == nullptr)
-    return (shared_ptr<Display>());
+    return (std::shared_ptr<Display>());
   return m_Frontend->GetDisplay();
 }
 
@@ -585,7 +590,7 @@ void vfeSession::WorkerThread()
   m_BackendThread = povray_init (boost::bind(&vfeSession::BackendThreadNotify, this), const_cast<void **>(&pov::RenderThreadAddr)) ;
   POVMS_Output_Context = pov::POVMS_GUI_Context ;
 
-  m_Console = shared_ptr<vfeConsole> (new vfeConsole(this, m_ConsoleWidth)) ;
+  m_Console = std::shared_ptr<vfeConsole> (new vfeConsole(this, m_ConsoleWidth)) ;
 
   POVMS_Object obj ;
   m_Frontend = new VirtualFrontEnd (*this, POVMS_Output_Context, (POVMSAddress) pov::RenderThreadAddr, obj, nullptr, m_Console);
@@ -1101,3 +1106,4 @@ int vfeSession::Initialize(vfeDestInfo *Dest, vfeAuthInfo *Auth)
 }
 
 }
+// end of namespace vfe

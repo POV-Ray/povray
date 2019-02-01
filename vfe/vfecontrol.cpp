@@ -37,6 +37,8 @@
 
 #include <cstring>
 
+#include <list>
+
 #include "vfe.h"
 
 /***************************************************************************************/
@@ -49,6 +51,7 @@ namespace pov_frontend
   extern struct ProcessOptions::INI_Parser_Table RenderOptions_INI_Table[];
   extern struct ProcessRenderOptions::Output_FileType_Table FileTypeTable[];
 }
+// end of namespace pov_frontend
 
 static struct pov_frontend::ProcessOptions::INI_Parser_Table *GetPT(const char *OptionName)
 {
@@ -132,7 +135,7 @@ int vfeSession::CancelRender()
   return (m_LastError = vfeNoError);
 }
 
-bool vfeSession::StopRender(const string& reason)
+bool vfeSession::StopRender(const std::string& reason)
 {
   if (m_Frontend->GetState() <= kReady)
     return true;
@@ -233,7 +236,7 @@ int vfeSession::SetOptions (vfeRenderOptions& opts)
   m_InputFilename = opts.m_SourceFile;
 
   // most likely povray.ini will be the first INI file processed here (as it's included by default)
-  for (vector<UCS2String>::iterator i = opts.m_IniFiles.begin(); i != opts.m_IniFiles.end(); i++)
+  for (std::vector<UCS2String>::iterator i = opts.m_IniFiles.begin(); i != opts.m_IniFiles.end(); i++)
   {
     // we call TestAccessAllowed() here, even though ParseFile() will do it also, since if
     // access is denied, the reason will not be obvious (ParseFile() just returns kCannotOpenFileErr).
@@ -260,7 +263,7 @@ int vfeSession::SetOptions (vfeRenderOptions& opts)
   }
 
   // any source file set on the command-line overrides a source file set another way
-  for (vector<string>::iterator i = opts.m_Commands.begin(); i != opts.m_Commands.end(); i++)
+  for (std::vector<std::string>::iterator i = opts.m_Commands.begin(); i != opts.m_Commands.end(); i++)
   {
     if ((err = options.ParseString (i->c_str(), &obj)) != kNoErr)
       return (m_LastError = vfeFailedToParseCommand) ;
@@ -311,7 +314,7 @@ int vfeSession::SetOptions (vfeRenderOptions& opts)
 
   if (opts.m_LibraryPaths.empty() == false)
   {
-    for (vector<UCS2String>::const_iterator i = opts.m_LibraryPaths.begin(); i != opts.m_LibraryPaths.end(); i++)
+    for (std::vector<UCS2String>::const_iterator i = opts.m_LibraryPaths.begin(); i != opts.m_LibraryPaths.end(); i++)
     {
       Path path(*i);
 
@@ -323,7 +326,7 @@ int vfeSession::SetOptions (vfeRenderOptions& opts)
   if (libpaths.empty() == false)
   {
     POVMS_List pathlist;
-    for (list<Path>::iterator i = libpaths.begin(); i != libpaths.end(); i++)
+    for (std::list<Path>::iterator i = libpaths.begin(); i != libpaths.end(); i++)
     {
       POVMS_Attribute attr((*i)().c_str());
       pathlist.Append(attr);
@@ -532,3 +535,4 @@ int vfeSession::StartRender()
 }
 
 }
+// end of namespace vfe

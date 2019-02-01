@@ -17,7 +17,7 @@
 /// ----------------------------------------------------------------------------
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -45,8 +45,15 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/material/normal.h"
 
-#include "base/pov_err.h"
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
 
+// POV-Ray header files (base module)
+#include "base/pov_err.h"
+#include "base/povassert.h"
+
+// POV-Ray header files (core module)
 #include "core/material/blendmap.h"
 #include "core/material/noise.h"
 #include "core/material/pigment.h"
@@ -778,7 +785,7 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
     Vector3d TPoint,P1;
     DBL value1,Amount;
     int i;
-    shared_ptr<NormalBlendMap> Blend_Map;
+    std::shared_ptr<NormalBlendMap> Blend_Map;
 
     if (Tnormal == nullptr)
     {
@@ -787,7 +794,7 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
 
     /* If normal_map present, use it and return */
 
-    Blend_Map = dynamic_pointer_cast<NormalBlendMap>(Tnormal->Blend_Map);
+    Blend_Map = std::dynamic_pointer_cast<NormalBlendMap>(Tnormal->Blend_Map);
     if (Blend_Map != nullptr)
     {
         if (Tnormal->Type == UV_MAP_PATTERN)
@@ -871,7 +878,7 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
     }
     else
     {
-        shared_ptr<SlopeBlendMap> slopeMap = dynamic_pointer_cast<SlopeBlendMap>(Tnormal->Blend_Map);
+        std::shared_ptr<SlopeBlendMap> slopeMap = std::dynamic_pointer_cast<SlopeBlendMap>(Tnormal->Blend_Map);
 
         Warp_Normal(Layer_Normal,Layer_Normal, Tnormal,
                     Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
@@ -1048,5 +1055,5 @@ void NormalBlendMap::ComputeAverage (const Vector3d& EPoint, Vector3d& normal, I
     normal = V1 / Total;
 }
 
-
 }
+// end of namespace pov

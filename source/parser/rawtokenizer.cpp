@@ -39,7 +39,14 @@
 // C++ variants of C standard header files
 // C++ standard header files
 // Boost header files
+//  (none at the moment)
+
 // POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
+#include "base/povassert.h"
+#include "base/stringutilities.h"
+
+// POV-Ray header files (core module)
 //  (none at the moment)
 
 // POV-Ray header files (parser module)
@@ -64,6 +71,13 @@ static int HexDigitToInt(UTF8String::value_type c)
 static bool IsUCS4ScalarValue(UCS4 c)
 {
     return (c <= 0x10FFFFu) && ((c < 0xD800u) || (c > 0xDFFFu));
+}
+
+//******************************************************************************
+
+void AmbiguousStringValue::InvalidEscapeSequenceInfo::Throw() const
+{
+    throw InvalidEscapeSequenceException(stream->Name(), position, text);
 }
 
 //******************************************************************************
@@ -200,8 +214,8 @@ bool RawTokenizer::ProcessStringLiteralLexeme(RawToken& token)
     token.id = int(STRING_LITERAL_TOKEN);
     token.expressionId = STRING_LITERAL_TOKEN;
 
-    shared_ptr<StringValue> pValue(std::make_shared<StringValue>());
-    shared_ptr<AmbiguousStringValue> pAmbiguousValue;
+    std::shared_ptr<StringValue> pValue(std::make_shared<StringValue>());
+    std::shared_ptr<AmbiguousStringValue> pAmbiguousValue;
     UCS4 c;
 
     pValue->data.reserve(token.lexeme.text.size() - 2);
@@ -467,3 +481,4 @@ bool RawTokenizer::GoToBookmark(const ColdBookmark& bookmark)
 }
 
 }
+// end of namespace pov_parser

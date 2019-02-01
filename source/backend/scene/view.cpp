@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,27 +33,40 @@
 ///
 //******************************************************************************
 
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "backend/scene/view.h"
+
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <algorithm>
+
+// Boost header files
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/math/common_factor.hpp>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/scene/view.h"
-
+// POV-Ray header files (base module)
 #include "base/path.h"
+#include "base/povassert.h"
 #include "base/timer.h"
+#include "base/image/colourspace.h"
 
+// POV-Ray header files (core module)
 #include "core/lighting/photons.h"
 #include "core/lighting/radiosity.h"
 #include "core/math/matrix.h"
 #include "core/support/octree.h"
 
+// POV-Ray header files (POVMS module)
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
 
+// POV-Ray header files (backend module)
+#include "backend/control/messagefactory.h"
 #include "backend/control/renderbackend.h"
 #include "backend/lighting/photonestimationtask.h"
 #include "backend/lighting/photonshootingstrategy.h"
@@ -72,6 +85,11 @@
 
 namespace pov
 {
+
+using std::min;
+using std::max;
+using std::shared_ptr;
+using std::vector;
 
 /// Round up to a power of two.
 inline unsigned int MakePowerOfTwo(unsigned int i)
@@ -1327,7 +1345,7 @@ void View::GetStatistics(POVMS_Object& renderStats)
     renderStats.SetLong(kPOVAttrib_GatherPerformedCnt, stats[Gather_Performed_Count]);
     renderStats.SetLong(kPOVAttrib_GatherExpandedCnt, stats[Gather_Expanded_Count]);
 
-    struct TimeData
+    struct TimeData final
     {
         POV_LONG cpuTime;
         POV_LONG realTime;
@@ -1547,3 +1565,4 @@ const Camera *RTRData::CompletedFrame()
 }
 
 }
+// end of namespace pov

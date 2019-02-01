@@ -36,13 +36,19 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/renderfrontend.h"
 
-// Standard C++ header files
-#include <memory>
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <algorithm>
 
 // POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
 #include "base/platformbase.h"
 #include "base/textstream.h"
 #include "base/textstreambuffer.h"
+#include "base/types.h"
+#include "base/image/colourspace.h"
 #include "base/image/dither.h"
 #include "base/image/encoding.h"
 
@@ -59,6 +65,9 @@
 
 namespace pov_frontend
 {
+
+using std::min;
+using std::max;
 
 const int gStreamTypeUtilDataCount = 6;
 
@@ -101,14 +110,15 @@ void FileMessage(TextStreamBuffer *tsb, int stream, POVMSObjectPtr msg);
 const char *GetOptionSwitchString(POVMSObjectPtr msg, POVMSType key, bool defaultstate);
 
 }
+// end of namespace Message2Console
 
-class FileTextStreamBuffer : public TextStreamBuffer
+class FileTextStreamBuffer final : public TextStreamBuffer
 {
     public:
         FileTextStreamBuffer(const UCS2 *filename, bool append) : stream(filename, POV_File_Text_Stream, append) { }
-        virtual ~FileTextStreamBuffer() { flush(); stream.flush(); }
+        virtual ~FileTextStreamBuffer() override { flush(); stream.flush(); }
     protected:
-        virtual void lineoutput(const char *str, unsigned int chars) { stream.printf("%s\n", string(str, chars).c_str()); stream.flush(); }
+        virtual void lineoutput(const char *str, unsigned int chars) override { stream.printf("%s\n", std::string(str, chars).c_str()); stream.flush(); }
     private:
         OTextStream stream;
 };
@@ -153,7 +163,7 @@ RenderFrontendBase::~RenderFrontendBase()
     // nothing to do
 }
 
-void RenderFrontendBase::ConnectToBackend(POVMSAddress backendaddress, POVMS_Object& obj, POVMS_Object *resultobj, shared_ptr<Console>& console)
+void RenderFrontendBase::ConnectToBackend(POVMSAddress backendaddress, POVMS_Object& obj, POVMS_Object *resultobj, std::shared_ptr<Console>& console)
 {
     POVMS_Message msg(obj, kPOVMsgClass_BackendControl, kPOVMsgIdent_InitInfo);
     POVMS_Message result(kPOVObjectClass_ResultData);
@@ -610,7 +620,7 @@ void RenderFrontendBase::NewBackup(POVMS_Object& ropts, ViewData& vd, const Path
     MakeBackupPath(ropts, vd, outputpath);
     if (!pov_base::PlatformBase::GetInstance().AllowLocalFileAccess (vd.imageBackupFile(), POV_File_Data_Backup, true))
         throw POV_EXCEPTION(kCannotOpenFileErr, "Permission denied to create render state output file.");
-    vd.imageBackup = shared_ptr<OStream>(new OStream(vd.imageBackupFile().c_str()));
+    vd.imageBackup = std::shared_ptr<OStream>(new OStream(vd.imageBackupFile().c_str()));
     if(vd.imageBackup != nullptr)
     {
         Backup_File_Header hdr;
@@ -631,14 +641,14 @@ void RenderFrontendBase::NewBackup(POVMS_Object& ropts, ViewData& vd, const Path
             // we do this test even if the file doesn't exist as we need to write there
             // eventually anyhow. might as well test if before the render starts ...
             if(CheckIfFileExists(filename.c_str()))
-                PlatformBase::GetInstance().DeleteLocalFile (filename.c_str());
+                pov_base::Filesystem::DeleteFile(filename);
         }
     }
     else
         throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot create render state output file.");
 }
 
-void RenderFrontendBase::ContinueBackup(POVMS_Object& ropts, ViewData& vd, ViewId vid, POVMSInt& serial, vector<POVMSInt>& skip, const Path& outputpath)
+void RenderFrontendBase::ContinueBackup(POVMS_Object& ropts, ViewData& vd, ViewId vid, POVMSInt& serial, std::vector<POVMSInt>& skip, const Path& outputpath)
 {
     bool outputToFile = ropts.TryGetBool(kPOVAttrib_OutputToFile, true);
 
@@ -725,7 +735,7 @@ void RenderFrontendBase::ContinueBackup(POVMS_Object& ropts, ViewData& vd, ViewI
     // if there isn't going to be an output file, we don't write to the state file
     if(outputToFile == true)
     {
-        vd.imageBackup = shared_ptr<OStream>(new OStream(vd.imageBackupFile().c_str(), IOBase::append));
+        vd.imageBackup = std::shared_ptr<OStream>(new OStream(vd.imageBackupFile().c_str(), IOBase::append));
         if(vd.imageBackup != nullptr)
         {
             if(!*vd.imageBackup)
@@ -1935,14 +1945,14 @@ void DebugInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
     tsb->printf("%s\n", str.c_str());
 }
 
-string GetProgressTime(POVMS_Object& obj, POVMSType key)
+std::string GetProgressTime(POVMS_Object& obj, POVMSType key)
 {
     int sec = int(obj.TryGetLong(kPOVAttrib_RealTime, 0) / (POV_LONG)(1000));
     char buffer[32];
 
     sprintf(buffer, "%3d:%02d:%02d", int(sec / 3600), int((sec / 60) % 60), int(sec % 60));
 
-    return string(buffer);
+    return std::string(buffer);
 }
 
 void RenderDone(TextStreamBuffer *tsb, POVMSObjectPtr msg)
@@ -2060,5 +2070,7 @@ void Progress(TextStreamBuffer *tsb, POVMSObjectPtr msg)
 }
 
 }
+// end of namespace Message2Console
 
 }
+// end of namespace pov_frontend

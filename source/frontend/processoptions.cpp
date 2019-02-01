@@ -36,11 +36,28 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/processoptions.h"
 
+// C++ variants of C standard header files
+#include <cstdarg>
 #include <cstdio>
 
-#include "base/platformbase.h"
+// C++ standard header files
+//  (none at the moment)
 
+// POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
+#include "base/platformbase.h"
+#include "base/povassert.h"
+#include "base/stringutilities.h"
+#include "base/textstream.h"
+
+// POV-Ray header files (core module)
+//  (none at the moment)
+
+// POV-Ray header files (POVMS module)
 #include "povms/povmsid.h"
+
+// POV-Ray header files (frontend module)
+//  (none at the moment)
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -1498,3 +1515,4 @@ int ProcessOptions::Process_Switch(Cmd_Parser_Table *option, char *param, POVMSO
 }
 
 }
+// end of namespace pov_frontend

@@ -38,10 +38,21 @@
 
 #if POV_PARSER_EXPERIMENTAL_OBJ_IMPORT
 
+// C++ variants of C standard header files
 #include <cctype>
 
+// C++ standard header files
+#include <algorithm>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/material/interior.h"
 #include "core/shape/mesh.h"
+
+// POV-Ray header files (parser module)
+//  (none at the moment)
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -51,25 +62,28 @@ namespace pov_parser
 
 using namespace pov;
 
+using std::max;
+using std::vector;
+
 static const int kMaxObjBufferSize = 1024;
 
 #define PAIR(c1,c2)         ( ((int)(c1)) + (((int)(c2))<<8) )
 #define TRIPLET(c1,c2,c3)   ( ((int)(c1)) + (((int)(c2))<<8) + (((int)(c3))<<16) )
 
-struct FaceVertex
+struct FaceVertex final
 {
     MeshIndex vertexId;
     MeshIndex normalId;
     MeshIndex uvId;
 };
 
-struct FaceData
+struct FaceData final
 {
     FaceVertex vertexList[3];
     MeshIndex materialId;
 };
 
-struct MaterialData
+struct MaterialData final
 {
     std::string mtlName;
     TEXTURE *texture;
@@ -574,5 +588,6 @@ void Parser::Parse_Obj (Mesh* mesh)
 }
 
 }
+// end of namespace pov_parser
 
 #endif // POV_PARSER_EXPERIMENTAL_OBJ_IMPORT

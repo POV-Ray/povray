@@ -38,6 +38,15 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+// POV-Ray header files (core module)
+// POV-Ray header files (parser module)
+//  (none at the moment)
+
 // this must be the last file included
 #include "base/povdebug.h"
 
@@ -751,4 +760,5 @@ TokenId GetCategorizedTokenId(TokenId tokenId)
         return tokenId;
 }
 
-} // end of namespace pov_parser
+}
+// end of namespace pov_parser

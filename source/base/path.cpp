@@ -36,14 +36,22 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/path.h"
 
-// POV-Ray base header files
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
+#include "base/stringutilities.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov_base
 {
+
+using std::string;
+using std::vector;
 
 Path::Path()
 {
@@ -327,3 +335,4 @@ UCS2String Path::URLToUCS2String(const string& p) const
 }
 
 }
+// end of namespace pov_base

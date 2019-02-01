@@ -36,19 +36,28 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "textstream.h"
 
-// C++ variants of standard C header files
+// C++ variants of C standard header files
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
 
-// Standard C++ header files
+// C++ standard header files
 #include <algorithm>
+#include <string>
+
+// POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
+#include "base/path.h"
+#include "base/stringutilities.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov_base
 {
+
+using std::min;
+using std::max;
 
 ITextStream::ITextStream() :
     lineno(1)
@@ -499,3 +508,4 @@ void OTextStream::flush()
 }
 
 }
+// end of namespace pov_base

@@ -388,6 +388,7 @@
     <ClCompile Include="..\..\source\base\colour.cpp" />
     <ClCompile Include="..\..\source\base\data\bluenoise64a.cpp" />
     <ClCompile Include="..\..\source\base\fileinputoutput.cpp" />
+    <ClCompile Include="..\..\source\base\filesystem.cpp" />
     <ClCompile Include="..\..\source\base\fileutil.cpp" />
     <ClCompile Include="..\..\source\base\font\crystal.cpp" />
     <ClCompile Include="..\..\source\base\font\cyrvetic.cpp" />
@@ -445,28 +446,41 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\source\base\povassert.h" />
+    <ClInclude Include="..\..\source\base\base_fwd.h" />
     <ClInclude Include="..\..\source\base\build.h" />
     <ClInclude Include="..\..\source\base\colour.h" />
     <ClInclude Include="..\..\source\base\configbase.h" />
     <ClInclude Include="..\..\source\base\data\bluenoise64a.h" />
     <ClInclude Include="..\..\source\base\fileinputoutput.h" />
+    <ClInclude Include="..\..\source\base\fileinputoutput_fwd.h" />
+    <ClInclude Include="..\..\source\base\filesystem.h" />
+    <ClInclude Include="..\..\source\base\filesystem_fwd.h" />
     <ClInclude Include="..\..\source\base\fileutil.h" />
     <ClInclude Include="..\..\source\base\font\crystal.h" />
     <ClInclude Include="..\..\source\base\font\cyrvetic.h" />
     <ClInclude Include="..\..\source\base\font\povlogo.h" />
     <ClInclude Include="..\..\source\base\font\timrom.h" />
+    <ClInclude Include="..\..\source\base\image\colourspace_fwd.h" />
     <ClInclude Include="..\..\source\base\image\dither.h" />
+    <ClInclude Include="..\..\source\base\image\dither_fwd.h" />
+    <ClInclude Include="..\..\source\base\image\image_fwd.h" />
     <ClInclude Include="..\..\source\base\mathutil.h" />
     <ClInclude Include="..\..\source\base\messenger.h" />
+    <ClInclude Include="..\..\source\base\messenger_fwd.h" />
     <ClInclude Include="..\..\source\base\path.h" />
+    <ClInclude Include="..\..\source\base\path_fwd.h" />
     <ClInclude Include="..\..\source\base\platformbase.h" />
     <ClInclude Include="..\..\source\base\pov_err.h" />
     <ClInclude Include="..\..\source\base\povdebug.h" />
     <ClInclude Include="..\..\source\base\pov_mem.h" />
     <ClInclude Include="..\..\source\base\safemath.h" />
+    <ClInclude Include="..\..\source\base\stringtypes.h" />
     <ClInclude Include="..\..\source\base\stringutilities.h" />
     <ClInclude Include="..\..\source\base\textstream.h" />
     <ClInclude Include="..\..\source\base\textstreambuffer.h" />
+    <ClInclude Include="..\..\source\base\textstreambuffer_fwd.h" />
+    <ClInclude Include="..\..\source\base\textstream_fwd.h" />
     <ClInclude Include="..\..\source\base\timer.h" />
     <ClInclude Include="..\..\source\base\types.h" />
     <ClInclude Include="..\..\source\base\image\bmp.h" />

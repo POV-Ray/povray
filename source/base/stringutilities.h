@@ -43,11 +43,15 @@
 #include <cstring>
 
 // C++ standard header files
+#include <string>
+
 // Boost header files
 //  (none at the moment)
 
 // POV-Ray header files (base module)
-#include "base/types.h"
+#include "base/base_fwd.h"
+#include "base/povassert.h"
+#include "base/stringtypes.h"
 
 namespace pov_base
 {
@@ -71,6 +75,7 @@ int pov_stricmp(const char *, const char *);
 const char *pov_tsprintf(const char *, ...);
 
 std::size_t UCS2_strlen(const UCS2* str);
+int UCS2_strcmp(const UCS2* s1, const UCS2* s2);
 
 //******************************************************************************
 
@@ -268,6 +273,7 @@ struct Charset
 ///
 //##############################################################################
 
-} // end of namespace pov_base
+}
+// end of namespace pov_base
 
 #endif // POVRAY_BASE_STRINGUTILITIES_H

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -100,6 +100,7 @@ extern HPALETTE         hPalBitmap ;
 extern WINDOWPLACEMENT  mainwin_placement ;
 
 }
+// end of namespace povwin
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -112,7 +113,7 @@ namespace pov_frontend
 
 using namespace povwin;
 
-shared_ptr<Display> gDisplay;
+std::shared_ptr<Display> gDisplay;
 
 BitmapInfo WinLegacyDisplay::m_BitmapTemplate;
 
@@ -1251,3 +1252,4 @@ HPALETTE WinLegacyDisplay::CreatePalette (RGBQUAD *rgb, int entries, bool use8bp
 }
 
 }
+// end of namespace pov_frontend

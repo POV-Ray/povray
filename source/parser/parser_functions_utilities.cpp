@@ -39,12 +39,24 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/material/pigment.h"
 #include "core/math/matrix.h"
 #include "core/math/spline.h"
 #include "core/scene/scenedata.h"
 
+// POV-Ray header files (VM module)
 #include "vm/fnpovfpu.h"
+
+// POV-Ray header files (parser module)
+//  (none at the moment)
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -346,9 +358,10 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(TokenId *token_id, const char *fn_nam
     return ptr;
 }
 
-intrusive_ptr<FunctionVM> Parser::GetFunctionVM() const
+boost::intrusive_ptr<FunctionVM> Parser::GetFunctionVM() const
 {
     return mpFunctionVM;
 }
 
 }
+// end of namespace pov_parser

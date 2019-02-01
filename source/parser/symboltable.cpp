@@ -42,6 +42,8 @@
 //  (none at the moment)
 
 // POV-Ray header files (base module)
+#include "base/pov_mem.h"
+#include "base/povassert.h"
 #include "base/stringutilities.h"
 
 // POV-Ray header files (core module)
@@ -661,4 +663,5 @@ SymbolTable& SymbolStack::GetGlobalTable()
 
 //******************************************************************************
 
-} // end of namespace
+}
+// end of namespace pov_parser

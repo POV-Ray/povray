@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,11 +36,14 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/image/colourspace.h"
 
-// Standard C++ header files
-#include <algorithm>
-#include <vector>
+// C++ variants of C standard header files
+//  (none at the moment)
 
-// POV-Ray base header files
+// C++ standard header files
+#include <algorithm>
+
+// POV-Ray header files (base module)
+#include "base/povassert.h"
 #include "base/image/encoding.h"
 
 // this must be the last file included
@@ -49,8 +52,11 @@
 namespace pov_base
 {
 
+using std::min;
+using std::max;
+
 // definitions of static GammaCurve member variables to satisfy the linker
-list<weak_ptr<GammaCurve> > GammaCurve::cache;
+std::list<std::weak_ptr<GammaCurve>> GammaCurve::cache;
 #if POV_MULTITHREADED
 boost::mutex GammaCurve::cacheMutex;
 #endif
@@ -106,7 +112,7 @@ GammaCurvePtr GammaCurve::GetMatching(const GammaCurvePtr& newInstance)
     // Check if we already have created a matching gamma curve object; if so, return that object instead.
     // Also, make sure we get the new object stored (as we're using weak pointers, we may have stale entries;
     // it also won't hurt if we store the new instance, even if we decide to discard it)
-    for(list<weak_ptr<GammaCurve> >::iterator i(cache.begin()); i != cache.end(); i++)
+    for(std::list<std::weak_ptr<GammaCurve>>::iterator i(cache.begin()); i != cache.end(); i++)
     {
         oldInstance = (*i).lock();
         if (!oldInstance)
@@ -301,7 +307,7 @@ SimpleGammaCurvePtr PowerLawGammaCurve::GetByEncodingGamma(float gamma)
 {
     if (IsNeutral(gamma))
         return NeutralGammaCurve::Get();
-    return dynamic_pointer_cast<SimpleGammaCurve>(GetMatching(GammaCurvePtr(new PowerLawGammaCurve(gamma))));
+    return std::dynamic_pointer_cast<SimpleGammaCurve>(GetMatching(GammaCurvePtr(new PowerLawGammaCurve(gamma))));
 }
 SimpleGammaCurvePtr PowerLawGammaCurve::GetByDecodingGamma(float gamma)
 {
@@ -448,3 +454,4 @@ SimpleGammaCurvePtr GetGammaCurve(GammaTypeId type, float param)
 }
 
 }
+// end of namespace pov_base

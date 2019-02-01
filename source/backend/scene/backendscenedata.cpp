@@ -33,18 +33,34 @@
 ///
 //******************************************************************************
 
-#include <sstream>
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "backend/scene/backendscenedata.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <sstream>
+#include <vector>
+
+// Boost header files
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/scene/backendscenedata.h"
-
+// POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
 #include "base/fileutil.h"
+#include "base/path.h"
+#include "base/stringutilities.h"
 
+// POV-Ray header files (core module)
+//  (none at the moment)
+
+// POV-Ray header files (POVMS module)
 #include "povms/povmsid.h"
+
+// POV-Ray header files (backend module)
+//  (none at the moment)
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -58,7 +74,7 @@ BackendSceneData::BackendSceneData() :
 
 UCS2String BackendSceneData::FindFile(POVMSContext ctx, const UCS2String& filename, unsigned int stype)
 {
-    vector<UCS2String> filenames;
+    std::vector<UCS2String> filenames;
     UCS2String foundfile;
     bool tryExactFirst;
 
@@ -100,7 +116,7 @@ UCS2String BackendSceneData::FindFile(POVMSContext ctx, const UCS2String& filena
 
 #ifdef USE_SCENE_FILE_MAPPING
     // see if the file is available locally
-    for(vector<UCS2String>::const_iterator i(filenames.begin()); i != filenames.end(); i++)
+    for(std::vector<UCS2String>::const_iterator i(filenames.begin()); i != filenames.end(); i++)
     {
         FilenameToFilenameMap::iterator ilocalfile(scene2LocalFiles.find(*i));
 
@@ -109,7 +125,7 @@ UCS2String BackendSceneData::FindFile(POVMSContext ctx, const UCS2String& filena
     }
 
     // see if the file is available as temporary file
-    for(vector<UCS2String>::const_iterator i(filenames.begin()); i != filenames.end(); i++)
+    for(std::vector<UCS2String>::const_iterator i(filenames.begin()); i != filenames.end(); i++)
     {
         FilenameToFilenameMap::iterator itempfile(scene2TempFiles.find(*i));
 
@@ -309,3 +325,4 @@ OStream *BackendSceneData::CreateFile(POVMSContext ctx, const UCS2String& filena
 }
 
 }
+// end of namespace pov

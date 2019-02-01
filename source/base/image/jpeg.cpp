@@ -14,7 +14,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,14 +44,12 @@
 
 #ifndef LIBJPEG_MISSING
 
-// C++ variants of standard C header files
+// C++ variants of C standard header files
 #include <csetjmp>
 
-// Standard C++ header files
+// C++ standard header files
+#include <memory>
 #include <string>
-
-// Boost header files
-#include <boost/scoped_array.hpp>
 
 // Other 3rd party header files
 extern "C"
@@ -60,7 +58,11 @@ extern "C"
 }
 
 // POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
+#include "base/image/colourspace.h"
 #include "base/image/dither.h"
+#include "base/image/encoding.h"
+#include "base/image/image.h"
 #include "base/image/metadata.h"
 
 // this must be the last file included
@@ -83,7 +85,7 @@ const int POV_JPEG_BUFFER_SIZE = 1024;
 ******************************************************************************/
 
 // write buffer for JPEG images
-class POV_JPEG_Write_Buffer
+class POV_JPEG_Write_Buffer final
 {
 public:
     POV_JPEG_Write_Buffer();
@@ -96,7 +98,7 @@ public:
     JSAMPROW row_pointer[1];
     int row_stride;
     struct jpeg_compress_struct cinfo;
-    string msg;
+    std::string msg;
     OStream *file;
 } ;
 
@@ -111,7 +113,7 @@ POV_JPEG_Write_Buffer::POV_JPEG_Write_Buffer()
     row_stride = 0;
 }
 
-class POV_JPEG_Read_Buffer
+class POV_JPEG_Read_Buffer final
 {
 public:
     POV_JPEG_Read_Buffer();
@@ -124,7 +126,7 @@ public:
     JSAMPROW row_pointer[1];
     int row_stride;
     struct jpeg_decompress_struct cinfo;
-    string msg;
+    std::string msg;
     IStream *file;
 
 };
@@ -276,7 +278,7 @@ extern "C"
 }
 
 // TODO: handle possible memory leakage if an exception is thrown during a read
-Image *Read (IStream *file, const Image::ReadOptions& options)
+Image *Read (IStream *file, const ImageReadOptions& options)
 {
     int                             width;
     int                             height;
@@ -345,16 +347,9 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     height = readbuf.cinfo.output_height;
     width = readbuf.cinfo.output_width;
 
-    Image::ImageDataType imagetype = options.itype;
-    if (imagetype == Image::Undefined)
-    {
-        if (GammaCurve::IsNeutral(gamma))
-            // No gamma correction required, raw values can be stored "as is".
-            imagetype = readbuf.cinfo.output_components == 1 ? Image::Gray_Int8 : Image::RGB_Int8;
-        else
-            // Gamma correction required; use an image container that will take care of that.
-            imagetype = readbuf.cinfo.output_components == 1 ? Image::Gray_Gamma8 : Image::RGB_Gamma8;
-    }
+    ImageDataType imagetype = options.itype;
+    if (imagetype == ImageDataType::Undefined)
+        imagetype = Image::GetImageDataType(8, (readbuf.cinfo.output_components == 1 ? 1 : 3), false, gamma);
     image = Image::Create (width, height, imagetype) ;
     // NB: JPEG files don't use alpha, so premultiplied vs. non-premultiplied is not an issue
     image->TryDeferDecoding(gamma, MAXJSAMPLE); // try to have gamma adjustment being deferred until image evaluation.
@@ -363,7 +358,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     readbuf.row_stride = readbuf.cinfo.output_width * readbuf.cinfo.output_components;
 
     // Make a one-row-high sample array
-    boost::scoped_array<JSAMPLE> scopedarray (new JSAMPLE [readbuf.row_stride]);
+    std::unique_ptr<JSAMPLE[]> scopedarray (new JSAMPLE [readbuf.row_stride]);
     readbuf.row_pointer[0] = (JSAMPROW) &scopedarray[0] ;
 
     // read image row by row
@@ -401,7 +396,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
 }
 
 // TODO: handle possible memory leakage if an exception is thrown during a write
-void Write (OStream *file, const Image *image, const Image::WriteOptions& options)
+void Write (OStream *file, const Image *image, const ImageWriteOptions& options)
 {
     int                         width = image->GetWidth() ;
     int                         height = image->GetHeight() ;
@@ -457,7 +452,7 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
     writebuf.row_stride = writebuf.cinfo.image_width * writebuf.cinfo.input_components;
 
     // Make a one-row-high sample array
-    boost::scoped_array<JSAMPLE> scopedarray (new JSAMPLE [writebuf.row_stride]);
+    std::unique_ptr<JSAMPLE[]> scopedarray (new JSAMPLE [writebuf.row_stride]);
     writebuf.row_pointer[0] = (JSAMPROW) &scopedarray[0] ;
 
     // if quality is not specified, we wind the output quality waaaay up (usually needed for raytracing)
@@ -487,7 +482,7 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
     // prepare metadata
     Metadata meta;
     /* Line feed is "local" */
-    string comment=string("Render Date: ") + meta.getDateTime() + "\n";
+    std::string comment = std::string("Render Date: ") + meta.getDateTime() + "\n";
     comment += "Software: " + meta.getSoftware() + "\n";
     if (!meta.getComment1().empty())
         comment += meta.getComment1() + "\n";
@@ -530,8 +525,10 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
     jpeg_destroy_compress(&writebuf.cinfo);
 }
 
-} // end of namespace Jpeg
+}
+// end of namespace Jpeg
 
-} // end of namespace pov_base
+}
+// end of namespace pov_base
 
 #endif  // LIBJPEG_MISSING

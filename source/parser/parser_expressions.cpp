@@ -38,6 +38,7 @@
 
 // C++ variants of C standard header files
 #include <cctype>
+#include <cmath>
 #include <cstdlib>
 
 // C++ standard header files
@@ -49,7 +50,9 @@
 // POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
 #include "base/mathutil.h"
+#include "base/pov_mem.h"
 #include "base/stringutilities.h"
+#include "base/image/colourspace.h"
 
 // POV-Ray header files (core module)
 #include "core/material/blendmap.h"
@@ -71,6 +74,9 @@
 // POV-Ray header files (VM module)
 #include "vm/fnpovfpu.h"
 
+// POV-Ray header files (parser module)
+//  (none at the moment)
+
 // this must be the last file included
 #include "base/povdebug.h"
 
@@ -80,30 +86,17 @@ namespace pov_parser
 using namespace pov_base;
 using namespace pov;
 
+using std::min;
+using std::max;
+using std::shared_ptr;
+
 /*****************************************************************************
 * Local preprocessor defines
 ******************************************************************************/
 
 #define FTRUE(f) ((int)(fabs(f)>EPSILON))
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 DBL Parser::Parse_Float_Param()
 {
@@ -131,25 +124,7 @@ DBL Parser::Parse_Float_Param()
     return (Local);
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Float_Param2(DBL *Val1,DBL *Val2)
 {
@@ -165,25 +140,7 @@ void Parser::Parse_Float_Param2(DBL *Val1,DBL *Val2)
     Allow_Identifier_In_Call = old_allow_id;
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Vector_Param(Vector3d& Vector)
 {
@@ -192,25 +149,7 @@ void Parser::Parse_Vector_Param(Vector3d& Vector)
     Parse_Paren_End();
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Vector_Param2(Vector3d& Val1, Vector3d& Val2)
 {
@@ -221,23 +160,7 @@ void Parser::Parse_Vector_Param2(Vector3d& Val1, Vector3d& Val2)
     Parse_Paren_End();
 }
 
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Trace(Vector3d& Res)
 {
@@ -285,23 +208,7 @@ void Parser::Parse_Trace(Vector3d& Res)
     Parse_Paren_End();
 }
 
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 int Parser::Parse_Inside()
 {
@@ -606,23 +513,7 @@ void Parser::Parse_Spline_Call(EXPRESS& Express, int *Terms)
     }
 }
 
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 {
@@ -735,15 +626,15 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     break;
 
                 case ACOSH_TOKEN:
-                    Val = acosh(Parse_Float_Param());
+                    Val = std::acosh(Parse_Float_Param());
                     break;
 
                 case ASINH_TOKEN:
-                    Val = asinh(Parse_Float_Param());
+                    Val = std::asinh(Parse_Float_Param());
                     break;
 
                 case ATANH_TOKEN:
-                    Val = atanh(Parse_Float_Param());
+                    Val = std::atanh(Parse_Float_Param());
                     break;
 
                 case CEIL_TOKEN:
@@ -1445,25 +1336,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
     }
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 /* Promote_Express promotes Express to the requested number of terms.  If
    *Old_Terms==1, then it sets all terms to Express[0].  Otherwise, it pads
@@ -1640,24 +1513,7 @@ void Parser::Parse_Rel_Factor (EXPRESS& Express,int *Terms)
 
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 DBL Parser::Parse_Rel_String_Term (const UCS2 *lhs)
 {
@@ -1721,23 +1577,7 @@ DBL Parser::Parse_Rel_String_Term (const UCS2 *lhs)
     END_EXPECT
 }
 
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Rel_Term (EXPRESS& Express,int *Terms)
 {
@@ -1821,25 +1661,7 @@ void Parser::Parse_Rel_Term (EXPRESS& Express,int *Terms)
 
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Logical (EXPRESS& Express,int *Terms)
 {
@@ -1874,25 +1696,7 @@ void Parser::Parse_Logical (EXPRESS& Express,int *Terms)
 
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Express (EXPRESS& Express,int *Terms)
 {
@@ -1928,25 +1732,7 @@ void Parser::Parse_Express (EXPRESS& Express,int *Terms)
     }
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 DBL Parser::Parse_Float ()
 {
@@ -2028,25 +1814,7 @@ bool Parser::Parse_Bool(const char* parameterName)
     return value;
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 DBL Parser::Allow_Float (DBL defval)
 {
@@ -2066,24 +1834,7 @@ DBL Parser::Allow_Float (DBL defval)
     return (retval);
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 int Parser::Allow_Vector (Vector3d& Vect)
 {
@@ -2104,25 +1855,7 @@ int Parser::Allow_Vector (Vector3d& Vect)
     return (retval);
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Vector (Vector3d& Vector)
 {
@@ -2154,24 +1887,7 @@ void Parser::Parse_Vector (Vector3d& Vector)
     Allow_Identifier_In_Call = old_allow_id;
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Vector4D (VECTOR_4D Vector)
 {
@@ -2203,26 +1919,7 @@ void Parser::Parse_Vector4D (VECTOR_4D Vector)
     Allow_Identifier_In_Call = old_allow_id;
 }
 
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_UV_Vect (Vector2d& UV_Vect)
 {
@@ -2254,25 +1951,7 @@ void Parser::Parse_UV_Vect (Vector2d& UV_Vect)
     Allow_Identifier_In_Call = old_allow_id;
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 int Parser::Parse_Unknown_Vector(EXPRESS& Express, bool allow_identifier, bool *had_identifier)
 {
@@ -2302,24 +1981,7 @@ int Parser::Parse_Unknown_Vector(EXPRESS& Express, bool allow_identifier, bool *
     return(Terms);
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Scale_Vector (Vector3d& Vector)
 {
@@ -2342,25 +2004,7 @@ void Parser::Parse_Scale_Vector (Vector3d& Vector)
     }
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
 {
@@ -2856,7 +2500,7 @@ shared_ptr<MAP_T> Parser::Parse_Blend_Map (BlendMapTypeId Blend_Type,int Pat_Typ
                         Error ("Must have at least one entry in map.");
                     New = Create_Blend_Map<MAP_T> (Blend_Type);
                     New->Set(tempList);
-                    pigmentBlendMap = dynamic_pointer_cast<GenericPigmentBlendMap>(New);
+                    pigmentBlendMap = std::dynamic_pointer_cast<GenericPigmentBlendMap>(New);
                     if (pigmentBlendMap)
                     {
                         pigmentBlendMap->blendMode = blendMode;
@@ -2915,23 +2559,7 @@ template SlopeBlendMapPtr   Parser::Parse_Blend_Map<SlopeBlendMap>      (BlendMa
 template NormalBlendMapPtr  Parser::Parse_Blend_Map<NormalBlendMap>     (BlendMapTypeId Blend_Type,int Pat_Type);
 template TextureBlendMapPtr Parser::Parse_Blend_Map<TextureBlendMap>    (BlendMapTypeId Blend_Type,int Pat_Type);
 
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 template<>
 void Parser::Parse_BlendListData<ColourBlendMapData> (BlendMapTypeId Blend_Type, ColourBlendMapData& rData)
@@ -3346,7 +2974,7 @@ ColourBlendMapPtr Parser::Parse_Colour_Map<ColourBlendMap> ()
     EXPRESS Express;
     int Terms;
     ColourBlendMapEntry Temp_Ent, Temp_Ent_2;
-    vector<ColourBlendMapEntry> tempList;
+    std::vector<ColourBlendMapEntry> tempList;
     bool old_allow_id = Allow_Identifier_In_Call;
     Allow_Identifier_In_Call = false;
     int blendMode = 0;
@@ -3653,25 +3281,7 @@ GenericSpline *Parser::Parse_Spline()
     return New;
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::POV_strupr(char *s)
 {
@@ -3679,29 +3289,11 @@ void Parser::POV_strupr(char *s)
 
     for (i = 0,len = (int)strlen(s); i < len; i++)
     {
-        s[i] = (char)toupper((int)s[i]);
+        s[i] = (char)std::toupper((int)s[i]);
     }
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::POV_strlwr(char *s)
 {
@@ -3709,7 +3301,7 @@ void Parser::POV_strlwr(char *s)
 
     for (i = 0,len = (int)strlen(s); i < len; i++)
     {
-        s[i] = (char)tolower((int)s[i]);
+        s[i] = (char)std::tolower((int)s[i]);
     }
 }
 
@@ -3863,3 +3455,4 @@ void Parser::Destroy_Random_Generators()
 }
 
 }
+// end of namespace pov_parser

@@ -41,6 +41,8 @@ POV-Ray is being developed with portability high in mind. In practice and at pre
           - _Static Thread-Local Template Members_: Template classes _must not_ have thread-local
             static member variables. See the @ref PooledSimpleVector template class for a viable
             workaround. [XCode 8 and later, apparently still unresolved as of 2018-04-08]
+          - `std::floorf(float)`: This function _must not_ be used. Substitute `std::floor(float)`
+            instead. [GCC, apparently all versions as of 2019-02-11]
 
   - Source code should use the new features of C++11 with caution, as even some major compiler
     brands still have not achieved full compliance yet. The following constructs can be considered
@@ -262,6 +264,14 @@ To test whether a smart pointer is (non-)null, do not unnecessarily clutter your
 `.get()`, but do explicitly compare with `nullptr` (rather than rely on automatic conversion to
 `bool`) to make it obvious that you're dealing with pointer data. Never compare smart pointers
 with `NULL`, as that would lead to compile errors on some (perfectly C++11 compliant) compilers.
+
+
+Classes
+=======
+
+  - All classes should be declared `final` unless specifically intended otherwise.
+  - All destructors of polymorphic classes should be declared `virtual`.
+  - All overriding methods (including destructors) should be declared both `virtual` and `override`.
 
 
 Miscellaneous Coding Rules

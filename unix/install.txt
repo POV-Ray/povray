@@ -485,17 +485,15 @@ NON_REDISTRIBUTABLE_BUILD=yes
     options.  Using this option means you acknowledge that the generated
     POV-Ray executable must *not* be redistributed.
 
-C99_COMPATIBLE_RADIOSITY={1,2,3,4}
+C99_COMPATIBLE_RADIOSITY={1,2,3,4,5,6,7,8,9}
     adapts the POV-Ray radiosity code to use non-IEEE 754 floating point
     on machines that do not support this standard.  You must specify one
     of the possible values given above (e.g. C99_COMPATIBLE_RADIOSITY=2).
-    Each value corresponds to the C function 'logbf', 'ilogbf', 'logb',
-    and 'ilogb', respectively, to be used with the C function 'copysign'.
-    This option requires having an ISO C99 compiler and its accompanying
-    C library installed on your machine.  More details are given near the
-    top of the octree.cpp source file.  On platforms where integer ('int')
-    and single-precision floating-point ('float') numbers are not 32-bit,
-    configure will try to determine automatically which function to use.
+    Each value corresponds to a different implementation of certain basic
+    operations. More details are given in the configcore.h
+    source file.  On platforms where integer ('int') and single-precision
+    floating-point ('float') numbers are not 32-bit, configure will try to
+    determine automatically which function to use.
 
 
 =================

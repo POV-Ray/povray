@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,12 +36,29 @@
 #ifndef POVRAY_BACKEND_VIEW_H
 #define POVRAY_BACKEND_VIEW_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "backend/configbackend.h"
+#include "backend/scene/view_fwd.h"
+
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <memory>
 #include <vector>
 
+// POV-Ray header files (base module)
+#include "base/types.h" // TODO - only appears to be pulled in for POVRect - can we avoid this?
+
+// POV-Ray header files (core module)
+#include "core/core_fwd.h"
 #include "core/bounding/bsptree.h"
 #include "core/lighting/radiosity.h"
 #include "core/scene/camera.h"
 
+// POV-Ray header files (backend module)
+#include "backend/control/scene_fwd.h"
+#include "backend/scene/viewthreaddata_fwd.h"
 #include "backend/support/taskqueue.h"
 
 namespace pov
@@ -49,12 +66,7 @@ namespace pov
 
 using namespace pov_base;
 
-class Scene;
-class SceneData;
-class ViewData;
-class ViewThreadData;
-
-class RTRData
+class RTRData final
 {
     public:
         RTRData(ViewData& v, int mrt);
@@ -65,7 +77,7 @@ class RTRData
         /// number of frames rendered in real-time raytracing mode
         unsigned int numRTRframes;
         /// this holds the pixels rendered in real-time-raytracing mode
-        vector<POVMSFloat> rtrPixels;
+        std::vector<POVMSFloat> rtrPixels;
         /// the number of render threads to wait for
         int numRenderThreads;
         /// the number of render threads that have completed the current RTR frame
@@ -89,7 +101,7 @@ class RTRData
  *  such there are no public members but only accessor
  *  methods. Please do not add public data members!!!
  */
-class ViewData
+class ViewData final
 {
         // View needs access to the private view data constructor as well
         // as some private data in order to initialise it properly!
@@ -105,7 +117,7 @@ class ViewData
         class BlockInfo
         {
             public:
-                virtual ~BlockInfo() {} // need to have a virtual member so we can use dynamic_cast
+                virtual ~BlockInfo() {}
         };
 
         /**
@@ -152,7 +164,7 @@ class ViewData
          *                          data passed to whichever rendering thread the rectangle will be re-dispatched to.
          *                          If this value is `nullptr`, the rectangle will not be re-dispatched.
          */
-        void CompletedRectangle(const POVRect& rect, unsigned int serial, const vector<RGBTColour>& pixels,
+        void CompletedRectangle(const POVRect& rect, unsigned int serial, const std::vector<RGBTColour>& pixels,
                                 unsigned int size, bool relevant, bool complete, float completion = 1.0,
                                 BlockInfo* blockInfo = nullptr);
 
@@ -173,8 +185,8 @@ class ViewData
          *                          data passed to whichever rendering thread the rectangle will be re-dispatched to.
          *                          If this value is `nullptr`, the rectangle will not be re-dispatched.
          */
-        void CompletedRectangle(const POVRect& rect, unsigned int serial, const vector<Vector2d>& positions,
-                                const vector<RGBTColour>& colors, unsigned int size, bool relevant, bool complete,
+        void CompletedRectangle(const POVRect& rect, unsigned int serial, const std::vector<Vector2d>& positions,
+                                const std::vector<RGBTColour>& colors, unsigned int size, bool relevant, bool complete,
                                 float completion = 1.0, BlockInfo* blockInfo = nullptr);
 
         /**
@@ -226,7 +238,7 @@ class ViewData
          *  Get the scene data for this view.
          *  @return                 Scene data.
          */
-        inline shared_ptr<BackendSceneData>& GetSceneData() { return sceneData; }
+        inline std::shared_ptr<BackendSceneData>& GetSceneData() { return sceneData; }
 
         /**
          *  Get the view id for this view.
@@ -247,7 +259,7 @@ class ViewData
         void SetHighestTraceLevel(unsigned int htl);
 
         /**
-         *  Get the render qualitiy features to use when rendering this view.
+         *  Get the render quality features to use when rendering this view.
          *  @return                 Quality feature flags.
          */
         const QualityFlags& GetQualityFeatureFlags() const;
@@ -272,7 +284,8 @@ class ViewData
 
     private:
 
-        struct BlockPostponedEntry {
+        struct BlockPostponedEntry final
+        {
             unsigned int blockId;
             unsigned int pass;
             BlockPostponedEntry(unsigned int id, unsigned int p) : blockId(id), pass(p) {}
@@ -317,7 +330,7 @@ class ViewData
         /// list of blocks postponed for some reason
         BlockIdSet blockPostponedList;
         /// list of additional block information
-        vector<BlockInfo*> blockInfoList;
+        std::vector<BlockInfo*> blockInfoList;
         /// area of view to be rendered
         POVRect renderArea;
         /// camera of this view
@@ -325,7 +338,7 @@ class ViewData
         /// generated radiosity data
         RadiosityCache radiosityCache;
         /// scene data
-        shared_ptr<BackendSceneData> sceneData;
+        std::shared_ptr<BackendSceneData> sceneData;
         /// view id
         RenderBackend::ViewId viewId;
 
@@ -349,7 +362,7 @@ class ViewData
          *  Create view data.
          *  @param  sd              Scene data associated with the view data.
          */
-        ViewData(shared_ptr<BackendSceneData> sd);
+        ViewData(std::shared_ptr<BackendSceneData> sd);
 
         /**
          *  Destructor.
@@ -361,7 +374,7 @@ class ViewData
  *  View class representing an view with a specific camera
  *  being rendered.
  */
-class View
+class View final
 {
         // Scene needs access to the private view constructor!
         friend class Scene;
@@ -440,7 +453,7 @@ class View
         /// running and pending render tasks for this view
         TaskQueue renderTasks;
         /// view thread data (i.e. statistics)
-        vector<ViewThreadData *> viewThreadData;
+        std::vector<ViewThreadData *> viewThreadData;
         /// view data
         ViewData viewData;
         /// stop request flag
@@ -450,11 +463,8 @@ class View
         /// BSP tree mailbox
         BSPTree::Mailbox mailbox;
 
-        /// not available
-        View();
-
-        /// not available
-        View(const View&);
+        View() = delete;
+        View(const View&) = delete;
 
         /**
          *  Create an view and associate a scene's data with it.
@@ -464,10 +474,9 @@ class View
          *  @param  vid             Id of this view to include with
          *                          POVMS messages sent to the frontend.
          */
-        explicit View(shared_ptr<BackendSceneData> sd, unsigned int width, unsigned int height, RenderBackend::ViewId vid);
+        explicit View(std::shared_ptr<BackendSceneData> sd, unsigned int width, unsigned int height, RenderBackend::ViewId vid);
 
-        /// not available
-        View& operator=(const View&);
+        View& operator=(const View&) = delete;
 
         /**
          *  Dispatch any shutdown messages appropriate at the end of rendering a view (e.g. max_gradient).
@@ -488,7 +497,7 @@ class View
          *  @param  bsl             Block serial numbers to skip.
          *  @param  fs              First block to start with checking with serial number.
          */
-        void SetNextRectangle(TaskQueue& taskq, shared_ptr<ViewData::BlockIdSet> bsl, unsigned int fs);
+        void SetNextRectangle(TaskQueue& taskq, std::shared_ptr<ViewData::BlockIdSet> bsl, unsigned int fs);
 
         /**
          *  Thread controlling the render task queue.
@@ -505,5 +514,6 @@ class View
 };
 
 }
+// end of namespace pov
 
 #endif // POVRAY_BACKEND_VIEW_H

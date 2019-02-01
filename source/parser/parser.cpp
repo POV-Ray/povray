@@ -48,11 +48,16 @@
 
 // Boost header files
 #include <boost/bind.hpp>
-#include <boost/scoped_ptr.hpp>
 
 // POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
 #include "base/fileutil.h"
+#include "base/path.h"
+#include "base/povassert.h"
+#include "base/stringutilities.h"
 #include "base/types.h"
+#include "base/image/colourspace.h"
+#include "base/image/image.h"
 
 // POV-Ray header files (core module)
 #include "core/bounding/boundingcylinder.h"
@@ -108,6 +113,9 @@
 // POV-Ray header files (VM module)
 #include "vm/fnpovfpu.h"
 
+// POV-Ray header files (parser module)
+//  (none at the moment)
+
 // this must be the last file included
 #include "base/povdebug.h"
 
@@ -115,6 +123,11 @@ namespace pov_parser
 {
 
 using namespace pov;
+
+using std::min;
+using std::max;
+using std::shared_ptr;
+using std::vector;
 
 /*****************************************************************************
 * Local preprocessor defines
@@ -125,23 +138,7 @@ using namespace pov;
 const DBL INFINITE_VOLUME = BOUND_HUGE;
 
 
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 Parser::Parser(shared_ptr<SceneData> sd, const Options& opts,
                GenericMessenger& mf, FileResolver& fr, ProgressReporter& pr, TraceThreadData& td) :
@@ -176,7 +173,7 @@ Parser::~Parser()
 /* Parse the file. */
 void Parser::Run()
 {
-    SourceInfo errorInfo(UCS2String(POV_FILENAME_BUFFER_CHARS, 0), // Pre-claim some memory, so we can handle an out-of-memory error.
+    SourceInfo errorInfo(UCS2String(POV_FILENAME_BUFFER_CHARS, u'\0'), // Pre-claim some memory, so we can handle an out-of-memory error.
                          SourcePosition(-1,-1,-1));
 
     // Outer try/catch block to handle out-of-memory conditions
@@ -216,7 +213,7 @@ void Parser::Run()
 
                     if(i->second[0] == '\"')
                     {
-                        string tmp(i->second, 1, i->second.length() - 2);
+                        std::string tmp(i->second, 1, i->second.length() - 2);
                         Temp_Entry = mSymbolStack.GetGlobalTable()->Add_Symbol(i->first, STRING_ID_TOKEN);
                         Temp_Entry->Data = String_Literal_To_UCS2(tmp);
                     }
@@ -515,24 +512,7 @@ void Parser::Finish()
     Cleanup();
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 /* Set up the fields in the frame to default values. */
 void Parser::Frame_Init()
@@ -551,8 +531,7 @@ void Parser::Frame_Init()
     sceneData->skysphere = nullptr;
 }
 
-
-/****************************************************************************/
+//******************************************************************************
 
 void Parser::InitDefaults(int version)
 {
@@ -619,24 +598,7 @@ void Parser::InitDefaults(int version)
     defaultsVersion = newDefaults;
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Destroy_Frame()
 {
@@ -699,24 +661,7 @@ void Parser::Destroy_Frame()
     }
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 bool Parser::Parse_Begin (TokenId tokenId, bool mandatory)
 {
@@ -738,24 +683,7 @@ bool Parser::Parse_Begin (TokenId tokenId, bool mandatory)
     }
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_End(TokenId openTokenId, TokenId expectTokenId)
 {
@@ -781,23 +709,7 @@ void Parser::Parse_End(TokenId openTokenId, TokenId expectTokenId)
     Error("No matching %s, %s found instead", Get_Token_String(expectTokenId), Get_Token_String(CurrentTrueTokenId()));
 }
 
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 ObjectPtr Parser::Parse_Bicubic_Patch ()
 {
@@ -1219,25 +1131,7 @@ void Parser::Parse_Blob_Element_Mods(Blob_Element *Element)
     Post_Textures(Element->Texture);
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 ObjectPtr Parser::Parse_Box ()
 {
@@ -1425,23 +1319,7 @@ void Parser::Parse_User_Defined_Camera (Camera& Cam)
     END_EXPECT
 }
 
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Camera (Camera& Cam)
 {
@@ -2303,24 +2181,7 @@ bool Parser::Parse_Camera_Mods(Camera& New)
     return true;
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 ObjectPtr Parser::Parse_CSG(int CSG_Type)
 {
@@ -2378,23 +2239,7 @@ ObjectPtr Parser::Parse_CSG(int CSG_Type)
     return (reinterpret_cast<ObjectPtr>(Object));
 }
 
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 ObjectPtr Parser::Parse_Cone ()
 {
@@ -2427,24 +2272,7 @@ ObjectPtr Parser::Parse_Cone ()
     return (reinterpret_cast<ObjectPtr>(Object));
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 ObjectPtr Parser::Parse_Cylinder ()
 {
@@ -2476,24 +2304,7 @@ ObjectPtr Parser::Parse_Cylinder ()
     return (reinterpret_cast<ObjectPtr>(Object));
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 ObjectPtr Parser::Parse_Disc ()
 {
@@ -2537,25 +2348,7 @@ ObjectPtr Parser::Parse_Disc ()
     return (reinterpret_cast<ObjectPtr>(Object));
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 ObjectPtr Parser::Parse_HField ()
 {
@@ -3191,23 +2984,7 @@ ObjectPtr Parser::Parse_Lathe()
     return (reinterpret_cast<ObjectPtr>(Object));
 }
 
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 ObjectPtr Parser::Parse_Lemon ()
 {
@@ -3432,25 +3209,7 @@ ObjectPtr Parser::Parse_Light_Group()
     return (reinterpret_cast<ObjectPtr>(Object));
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 ObjectPtr Parser::Parse_Light_Source ()
 {
@@ -5204,24 +4963,7 @@ ObjectPtr Parser::Parse_Parametric(void)
     return (reinterpret_cast<ObjectPtr>(Object));
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 ObjectPtr Parser::Parse_Plane ()
 {
@@ -5252,25 +4994,7 @@ ObjectPtr Parser::Parse_Plane ()
     return (reinterpret_cast<ObjectPtr>(Object));
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 ObjectPtr Parser::Parse_Poly (int order)
 {
@@ -5300,23 +5024,7 @@ ObjectPtr Parser::Parse_Poly (int order)
     return (reinterpret_cast<ObjectPtr>(Object));
 }
 
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 ObjectPtr Parser::Parse_Polynom ()
 {
@@ -5785,25 +5493,7 @@ ObjectPtr Parser::Parse_Prism()
     return(reinterpret_cast<ObjectPtr>(Object));
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 ObjectPtr Parser::Parse_Quadric ()
 {
@@ -5833,25 +5523,7 @@ ObjectPtr Parser::Parse_Quadric ()
     return (reinterpret_cast<ObjectPtr>(Object));
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 ObjectPtr Parser::Parse_Smooth_Triangle ()
 {
@@ -6027,25 +5699,7 @@ ObjectPtr Parser::Parse_Sor()
     return (reinterpret_cast<ObjectPtr>(Object));
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 ObjectPtr Parser::Parse_Sphere()
 {
@@ -6353,25 +6007,7 @@ ObjectPtr Parser::Parse_Torus()
     return (reinterpret_cast<ObjectPtr>(Object));
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 ObjectPtr Parser::Parse_Triangle()
 {
@@ -6401,25 +6037,7 @@ ObjectPtr Parser::Parse_Triangle()
     return(reinterpret_cast<ObjectPtr>(Object));
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 ObjectPtr Parser::Parse_TrueType ()
 {
@@ -6634,24 +6252,7 @@ TrueTypeFont *Parser::OpenFontFile(const char *asciifn, const int font_id, POV_U
     return font;
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 ObjectPtr Parser::Parse_Object ()
 {
@@ -6849,25 +6450,7 @@ ObjectPtr Parser::Parse_Object ()
     return Object;
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Default ()
 {
@@ -6952,25 +6535,7 @@ void Parser::Parse_Default ()
     Not_In_Default = true;
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Frame ()
 {
@@ -7115,25 +6680,7 @@ void Parser::Parse_Frame ()
     END_EXPECT
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Global_Settings()
 {
@@ -7620,25 +7167,7 @@ void Parser::Parse_Global_Settings()
     Parse_End();
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 // be aware that this method may change the address of Object
 // (this will only happen if Object is CSG and the invert_object keyword is parsed)
@@ -8100,25 +7629,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
     return Object;
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Matrix(MATRIX Matrix)
 {
@@ -8151,25 +7662,7 @@ void Parser::Parse_Matrix(MATRIX Matrix)
     }
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 TRANSFORM *Parser::Parse_Transform(TRANSFORM *Trans)
 {
@@ -8194,23 +7687,8 @@ TRANSFORM *Parser::Parse_Transform(TRANSFORM *Trans)
     }
     return Trans;
 }
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+
+//******************************************************************************
 
 TRANSFORM *Parser::Parse_Transform_Block(TRANSFORM *New)
 {
@@ -8282,25 +7760,7 @@ TRANSFORM *Parser::Parse_Transform_Block(TRANSFORM *New)
     return (New);
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Bound_Clip(vector<ObjectPtr>& dest, bool notexture)
 {
@@ -8420,24 +7880,7 @@ bool Parser::Parse_Three_UVCoords(Vector2d& UV1, Vector2d& UV2, Vector2d& UV3)
     }
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 bool Parser::Parse_Comma (void)
 {
@@ -8472,24 +7915,7 @@ bool Parser::Peek_Token (TokenId tokenId)
     return tokenMatches;
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Semi_Colon (bool force_semicolon)
 {
@@ -8510,25 +7936,7 @@ void Parser::Parse_Semi_Colon (bool force_semicolon)
     }
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Coeffs(int order, DBL *Coeffs)
 {
@@ -8546,24 +7954,7 @@ void Parser::Parse_Coeffs(int order, DBL *Coeffs)
     Parse_Angle_End();
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 ObjectPtr Parser::Parse_Object_Id ()
 {
@@ -8579,24 +7970,7 @@ ObjectPtr Parser::Parse_Object_Id ()
     return (Object);
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Declare(bool is_local, bool after_hash)
 {
@@ -9458,49 +8832,14 @@ bool Parser::Parse_RValue (TokenId Previous, TokenId *NumberPtr, void **DataPtr,
     return(Found);
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Link(ObjectPtr New_Object, vector<ObjectPtr>& Object_List_Root)
 {
     Object_List_Root.push_back(New_Object);
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Link_Textures (TEXTURE **Old_Textures, TEXTURE *New_Textures)
 {
@@ -9586,48 +8925,14 @@ void Parser::Test_Redefine(TokenId Previous, TokenId *NumberPtr, void *Data, boo
     }
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Error(TokenId Token_Id)
 {
     Expectation_Error(Get_Token_String(Token_Id));
 }
 
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Found_Instead_Error(const char *exstr, const char *extokstr)
 {
@@ -9656,24 +8961,7 @@ void Parser::Found_Instead_Error(const char *exstr, const char *extokstr)
     }
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Warn_State(TokenId Type)
 {
@@ -9693,50 +8981,14 @@ void Parser::Warn_State(TokenId Type)
     POV_FREE(str);
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::MAError (const char *, long)
 {
     throw std::bad_alloc();
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
 {
@@ -10179,50 +9431,14 @@ void Parser::Link_To_Frame(ObjectPtr Object)
     Destroy_Object(Object);
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Only_In(const  char *s1, const char *s2)
 {
     Error("Keyword '%s' can only be used in a %s statement.",s1,s2);
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Not_With(const char *s1, const char *s2)
 {
@@ -10354,25 +9570,7 @@ void Parser::Set_CSG_Tree_Flag(ObjectPtr Object, unsigned int f, int val)
     }
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 /* NK layers - 1999 June 10 - for backwards compatibility with layered textures */
 void Parser::Convert_Filter_To_Transmit(PIGMENT *Pigment)
@@ -10418,24 +9616,7 @@ void Parser::Convert_Filter_To_Transmit(GenericPigmentBlendMap *pBlendMap)
         POV_BLEND_MAP_ASSERT(false);
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Expectation_Error(const char *s)
 {
@@ -10770,16 +9951,16 @@ shared_ptr<IStream> Parser::Locate_File(const UCS2String& filename, unsigned int
 }
 */
 
-/*****************************************************************************/
+//******************************************************************************
 
 OStream *Parser::CreateFile(const UCS2String& filename, unsigned int stype, bool append)
 {
     return mFileResolver.CreateFile(filename, stype, append);
 }
 
-/*****************************************************************************/
+//******************************************************************************
 
-Image *Parser::Read_Image(int filetype, const UCS2 *filename, const Image::ReadOptions& options)
+Image *Parser::Read_Image(int filetype, const UCS2 *filename, const ImageReadOptions& options)
 {
     unsigned int stype;
     Image::ImageFileType type;
@@ -10851,14 +10032,14 @@ Image *Parser::Read_Image(int filetype, const UCS2 *filename, const Image::ReadO
     return Image::Read(type, file.get(), options);
 }
 
-/*****************************************************************************/
+//******************************************************************************
 
 RGBFTColour *Parser::Create_Colour ()
 {
     return new RGBFTColour();
 }
 
-/*****************************************************************************/
+//******************************************************************************
 
 bool Parser::POV_ARRAY::IsInitialized() const
 {
@@ -10966,6 +10147,31 @@ Parser::POV_ARRAY* Parser::POV_ARRAY::Clone() const
     return new POV_ARRAY(*this);
 }
 
-/*****************************************************************************/
+//******************************************************************************
 
-} // end of namespace
+Parser::AssignableFunction::AssignableFunction(const AssignableFunction& obj) :
+    fn(obj.vm->CopyFunction(obj.fn)),
+    vm(obj.vm)
+{}
+
+Parser::AssignableFunction::AssignableFunction(FUNCTION_PTR fn, boost::intrusive_ptr<FunctionVM> vm) :
+    fn(fn),
+    vm(vm)
+{}
+
+Parser::AssignableFunction::~AssignableFunction()
+{
+    vm->DestroyFunction(fn);
+}
+
+//******************************************************************************
+
+UCS2String Parser::BraceStackEntry::GetFileName() const
+{
+    return file->Name();
+}
+
+//******************************************************************************
+
+}
+// end of namespace pov_parser

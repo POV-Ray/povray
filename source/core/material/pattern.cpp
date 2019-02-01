@@ -14,7 +14,7 @@
 /// ----------------------------------------------------------------------------
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -42,11 +42,19 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/material/pattern.h"
 
-#include <limits>
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <algorithm>
+#include <limits>
+#include <vector>
 
+// POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
+#include "base/povassert.h"
 
+// POV-Ray header files (core module)
 #include "core/material/blendmap.h"
 #include "core/material/noise.h"
 #include "core/material/pigment.h"
@@ -64,6 +72,9 @@
 
 namespace pov
 {
+
+using std::min;
+using std::max;
 
 /*****************************************************************************
 * Local preprocessor defines
@@ -1068,8 +1079,8 @@ void BlendMap<DATA_T>::Search (DBL value, EntryConstPtr& rpPrev, EntryConstPtr& 
     {
         // TODO - we might use a binary search instead
 
-        typename vector<Entry>::const_iterator iP;
-        typename vector<Entry>::const_iterator iN;
+        typename std::vector<Entry>::const_iterator iP;
+        typename std::vector<Entry>::const_iterator iN;
 
         iP = iN = Blend_Map_Entries.begin();
 
@@ -9378,3 +9389,4 @@ void InitializePatternGenerators(void)
 }
 
 }
+// end of namespace pov

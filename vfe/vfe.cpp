@@ -45,6 +45,10 @@
 #include <cstdarg>
 #include <cstdio>
 
+#include "base/filesystem.h"
+#include "base/povassert.h"
+#include "base/textstream.h"
+
 #include "frontend/animationprocessing.h"
 #include "frontend/imageprocessing.h"
 
@@ -57,11 +61,12 @@ namespace vfe
 using namespace pov_base;
 using namespace pov_frontend;
 using boost::format;
+using std::shared_ptr;
+using std::string;
 
 static int Allow_File_Read(const UCS2 *Filename, const unsigned int FileType);
 static int Allow_File_Write(const UCS2 *Filename, const unsigned int FileType);
 static FILE *vfeFOpen(const UCS2String& name, const char *mode);
-static bool vfeRemove(const UCS2String& name);
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -132,7 +137,7 @@ class ParseWarningDetails : public POVMSMessageDetails
 {
   public:
     ParseWarningDetails (POVMS_Object &Obj) : POVMSMessageDetails (Obj) {} ;
-    virtual ~ParseWarningDetails () {} ;
+    virtual ~ParseWarningDetails () override {} ;
 
   public:
     using POVMSMessageDetails::File ;
@@ -147,7 +152,7 @@ class ParseErrorDetails : public POVMSMessageDetails
 {
   public:
     ParseErrorDetails (POVMS_Object &Obj) : POVMSMessageDetails (Obj) {} ;
-    virtual ~ParseErrorDetails () {} ;
+    virtual ~ParseErrorDetails () override {} ;
 
   public:
     using POVMSMessageDetails::File ;
@@ -262,11 +267,6 @@ bool vfePlatformBase::ReadFileFromURL(OStream *file, const UCS2String& url, cons
 FILE* vfePlatformBase::OpenLocalFile (const UCS2String& name, const char *mode)
 {
   return vfeFOpen (name, mode);
-}
-
-void vfePlatformBase::DeleteLocalFile (const UCS2String& name)
-{
-  vfeRemove (name);
 }
 
 bool vfePlatformBase::AllowLocalFileAccess (const UCS2String& name, const unsigned int fileType, bool write)
@@ -1412,10 +1412,5 @@ FILE *vfeFOpen (const UCS2String& name, const char *mode)
   return (fopen (UCS2toSysString (name).c_str(), mode)) ;
 }
 
-bool vfeRemove(const UCS2String& Filename)
-{
-  return (POV_DELETE_FILE (UCS2toSysString (Filename).c_str()) == 0);
 }
-
-}
-
+// end of namespace vfe

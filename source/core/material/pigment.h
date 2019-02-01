@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,10 +39,20 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
-#include "base/image/colourspace.h"
+// C++ variants of C standard header files
+//  (none at the moment)
 
+// C++ standard header files
+#include <memory>
+#include <vector>
+
+// POV-Ray header files (base module)
+#include "base/image/colourspace_fwd.h"
+
+// POV-Ray header files (core module)
 #include "core/coretypes.h"
 #include "core/material/blendmap.h"
+#include "core/render/ray_fwd.h"
 
 namespace pov
 {
@@ -53,10 +63,6 @@ namespace pov
 /// @ingroup PovCore
 ///
 /// @{
-
-class Intersection;
-class Ray;
-class TraceThreadData;
 
 /// Common interface for pigment-like blend maps.
 ///
@@ -81,49 +87,49 @@ class GenericPigmentBlendMap
 };
 
 /// Colour blend map.
-class ColourBlendMap : public BlendMap<TransColour>, public GenericPigmentBlendMap
+class ColourBlendMap final : public BlendMap<TransColour>, public GenericPigmentBlendMap
 {
     public:
 
         ColourBlendMap();
         ColourBlendMap(int n, const Entry aEntries[]);
 
-        virtual bool Compute(TransColour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
-        virtual void ComputeAverage(TransColour& colour, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
-        virtual bool ComputeUVMapped(TransColour& colour, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
-        virtual void Post(bool& rHasFilter);
+        virtual bool Compute(TransColour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) override;
+        virtual void ComputeAverage(TransColour& colour, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) override;
+        virtual bool ComputeUVMapped(TransColour& colour, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) override;
+        virtual void Post(bool& rHasFilter) override;
 };
 
 /// Pigment blend map.
-class PigmentBlendMap : public BlendMap<PIGMENT*>, public GenericPigmentBlendMap
+class PigmentBlendMap final : public BlendMap<PIGMENT*>, public GenericPigmentBlendMap
 {
     public:
 
         PigmentBlendMap(BlendMapTypeId type);
-        virtual ~PigmentBlendMap();
+        virtual ~PigmentBlendMap() override;
 
-        virtual bool Compute(TransColour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
-        virtual void ComputeAverage(TransColour& colour, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
-        virtual bool ComputeUVMapped(TransColour& colour, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
-        virtual void Post(bool& rHasFilter);
+        virtual bool Compute(TransColour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) override;
+        virtual void ComputeAverage(TransColour& colour, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) override;
+        virtual bool ComputeUVMapped(TransColour& colour, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) override;
+        virtual void Post(bool& rHasFilter) override;
 };
 
-typedef shared_ptr<GenericPigmentBlendMap>          GenericPigmentBlendMapPtr;
-typedef shared_ptr<const GenericPigmentBlendMap>    GenericPigmentBlendMapConstPtr;
+typedef std::shared_ptr<GenericPigmentBlendMap>         GenericPigmentBlendMapPtr;
+typedef std::shared_ptr<const GenericPigmentBlendMap>   GenericPigmentBlendMapConstPtr;
 
-typedef PIGMENT*                                    PigmentBlendMapData;
-typedef BlendMapEntry<PigmentBlendMapData>          PigmentBlendMapEntry;
-typedef shared_ptr<PigmentBlendMap>                 PigmentBlendMapPtr;
-typedef shared_ptr<const PigmentBlendMap>           PigmentBlendMapConstPtr;
+typedef PIGMENT*                                        PigmentBlendMapData;
+typedef BlendMapEntry<PigmentBlendMapData>              PigmentBlendMapEntry;
+typedef std::shared_ptr<PigmentBlendMap>                PigmentBlendMapPtr;
+typedef std::shared_ptr<const PigmentBlendMap>          PigmentBlendMapConstPtr;
 
-typedef TransColour                                 ColourBlendMapData;
-typedef BlendMapEntry<ColourBlendMapData>           ColourBlendMapEntry;
-typedef shared_ptr<ColourBlendMap>                  ColourBlendMapPtr;
-typedef shared_ptr<const ColourBlendMap>            ColourBlendMapConstPtr;
+typedef TransColour                                     ColourBlendMapData;
+typedef BlendMapEntry<ColourBlendMapData>               ColourBlendMapEntry;
+typedef std::shared_ptr<ColourBlendMap>                 ColourBlendMapPtr;
+typedef std::shared_ptr<const ColourBlendMap>           ColourBlendMapConstPtr;
 
-struct Pigment_Struct : public Pattern_Struct
+struct Pigment_Struct final : public Pattern_Struct
 {
-    shared_ptr<GenericPigmentBlendMap> Blend_Map;
+    std::shared_ptr<GenericPigmentBlendMap> Blend_Map;
     TransColour colour;       // may have a filter/transmit component
     TransColour Quick_Colour; // may have a filter/transmit component    // TODO - can't we decide between regular colour and quick_colour at parse time already?
 };
@@ -131,16 +137,17 @@ struct Pigment_Struct : public Pattern_Struct
 
 PIGMENT *Create_Pigment();
 PIGMENT *Copy_Pigment(PIGMENT *Old);
-void Copy_Pigments (vector<PIGMENT*>& New, const vector<PIGMENT*>& Old);
+void Copy_Pigments (std::vector<PIGMENT*>& New, const std::vector<PIGMENT*>& Old);
 void Destroy_Pigment(PIGMENT *Pigment);
 void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter = nullptr);
 bool Compute_Pigment(TransColour& colour, const PIGMENT *Pigment, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
-void Evaluate_Density_Pigment(vector<PIGMENT*>& Density, const Vector3d& p, MathColour& c, TraceThreadData *ttd);
+void Evaluate_Density_Pigment(std::vector<PIGMENT*>& Density, const Vector3d& p, MathColour& c, TraceThreadData *ttd);
 
 /// @}
 ///
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_PIGMENT_H

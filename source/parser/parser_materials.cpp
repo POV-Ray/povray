@@ -36,10 +36,19 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
 #include "base/fileutil.h"
+#include "base/image/colourspace.h"
 #include "base/image/image.h"
 #include "base/path.h"
+#include "base/stringutilities.h"
 
+// POV-Ray header files (core module)
 #include "core/lighting/lightgroup.h"
 #include "core/material/blendmap.h"
 #include "core/material/interior.h"
@@ -58,9 +67,14 @@
 #include "core/shape/isosurface.h"
 #include "core/support/imageutil.h"
 
+// POV-Ray header files (VM module)
 #include "vm/fnpovfpu.h"
 
-#include "povms/povmsid.h"
+// POV-Ray header files (parser module)
+//  (none at the moment)
+
+// POV-Ray header files (POVMS module)
+#include "povms/povmsid.h" // TODO - only here for kPOVList_FileType_XXX
 
 #ifdef SYS_IMAGE_HEADER
 #include SYS_IMAGE_HEADER
@@ -73,6 +87,9 @@ namespace pov_parser
 {
 
 using namespace pov;
+
+using std::shared_ptr;
+using std::vector;
 
 /*****************************************************************************
 * Local preprocessor defines
@@ -115,7 +132,7 @@ void Parser::Make_Pattern_Image(ImageData *image, FUNCTION_PTR fn, int token)
     image->iheight = image->height;
     if(token == FUNCT_ID_TOKEN)
     {
-        image->data =Image::Create(image->iwidth, image->iheight, Image::Gray_Int16);
+        image->data =Image::Create(image->iwidth, image->iheight, ImageDataType::Gray_Int16);
 
         point[Z] = 0;
 
@@ -137,7 +154,7 @@ void Parser::Make_Pattern_Image(ImageData *image, FUNCTION_PTR fn, int token)
     }
     else if((token == VECTFUNCT_ID_TOKEN) && (f->return_size == 5))
     {
-        image->data =Image::Create(image->iwidth, image->iheight, Image::RGBA_Int16); // TODO - we should probably use a HDR format
+        image->data = Image::Create(image->iwidth, image->iheight, ImageDataType::RGBA_Int16); // TODO - we should probably use an HDR format
         image->data->SetPremultiplied(false); // We're storing the data in non-premultiplied alpha format, as this preserves all the data we're getting from the function.
 
         point[Z] = 0;
@@ -364,7 +381,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
             Error("File type not supported here.");
 
         UCS2String filename = SysToUCS2String(Name);
-        Image::ReadOptions options;
+        ImageReadOptions options;
 
         switch (sceneData->gammaMode)
         {
@@ -483,7 +500,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
             image->data = Read_Image(filetype, filename.c_str(), options);
 
         if (!options.warnings.empty())
-            for (vector<string>::iterator it = options.warnings.begin(); it != options.warnings.end(); it++)
+            for (vector<std::string>::iterator it = options.warnings.begin(); it != options.warnings.end(); it++)
                 Warning("%s: %s", Name, it->c_str());
 
         POV_FREE(Name);
@@ -1242,9 +1259,9 @@ void Parser::VerifyTilingPattern(shared_ptr<TilingPattern> pattern)
 
 void Parser::VerifyPattern(PatternPtr basicPattern)
 {
-    if (shared_ptr<PavementPattern> pattern = dynamic_pointer_cast<PavementPattern>(basicPattern))
+    if (shared_ptr<PavementPattern> pattern = std::dynamic_pointer_cast<PavementPattern>(basicPattern))
         VerifyPavementPattern(pattern);
-    else if (shared_ptr<TilingPattern> pattern = dynamic_pointer_cast<TilingPattern>(basicPattern))
+    else if (shared_ptr<TilingPattern> pattern = std::dynamic_pointer_cast<TilingPattern>(basicPattern))
         VerifyTilingPattern(pattern);
 }
 
@@ -5406,3 +5423,4 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 }
 
 }
+// end of namespace pov_parser

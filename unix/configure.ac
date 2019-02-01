@@ -111,7 +111,7 @@ AX_ARG_WITH([--with-openexr],       [DIR], [use the OpenEXR library (in director
 
 AC_ARG_VAR([COMPILED_BY], [customize the "unofficial version" message])
 AC_ARG_VAR([NON_REDISTRIBUTABLE_BUILD], [see the installation documentation])
-AC_ARG_VAR([C99_COMPATIBLE_RADIOSITY], [adapt radiosity code to non-IEEE 754 floating point, requires ISO C99 compiler and library (see octree.cpp for details)])
+AC_ARG_VAR([C99_COMPATIBLE_RADIOSITY], [adapt radiosity code to non-IEEE 754 floating point (see configcore.h for details)])
 
 
 ###############################################################################
@@ -654,47 +654,25 @@ AC_CHECK_DECLS([RUSAGE_SELF, RUSAGE_THREAD, RUSAGE_LWP],
 # gettimeofday <sys/time.h>
 AC_CHECK_FUNCS([gettimeofday])
 
-# asinh and friends (requires libm)
-AC_CHECK_FUNCS([asinh],
-  [],
-  [AC_DEFINE([NEED_INVHYP], [], [Inverse hyperbolic functions.])]
-)
+# (Not checking for `asinh` and friends anymore, as they are mandatory as of C++11. [CLi])
 
-# support for non-IEEE compilers (requires libm)
+# support for non-IEEE compilers
+# TODO FIXME - We should actually check for existence of `int32_t` rather than size of `int` now.
 if test x"$C99_COMPATIBLE_RADIOSITY" != x"" || test x"$ac_cv_sizeof_int" != x"4" || test x"$ac_cv_sizeof_float" != x"4"; then
-  AC_CHECK_FUNCS([copysign],
-    [],
-    [AC_MSG_ERROR([
-*** Cannot find the 'copysign' function required for non-ieee platform
-])]
-  )
+  # (Not checking for `copysign` anymore as we're no longer using it. [CLi])
   if test x"$C99_COMPATIBLE_RADIOSITY" = x""; then  # auto-detection
-    AC_CHECK_FUNCS([ilogbf],
-      [AC_DEFINE([C99_COMPATIBLE_RADIOSITY], [2], [See source/backend/support/octree.cpp for details.])],
-      [AC_CHECK_FUNCS([ilogb],
-         [AC_DEFINE([C99_COMPATIBLE_RADIOSITY], [4], [See source/backend/support/octree.cpp for details.])],
-         [AC_CHECK_FUNCS([logbf],
-            [AC_DEFINE([C99_COMPATIBLE_RADIOSITY], [1], [See source/backend/support/octree.cpp for details.])],
-            [AC_CHECK_FUNCS([logb],
-               [AC_DEFINE([C99_COMPATIBLE_RADIOSITY], [3], [See source/backend/support/octree.cpp for details.])],
-               [AC_MSG_ERROR([
-*** Cannot find a 'logb' or equivalent function required for non-ieee platform
-])]
-             )]
-          )]
-       )]
-    )
-  else  # check value of C99_COMPATIBLE_RADIOSITY and function presence
+    # Simply choose `frexpf`/`ldexpf` variant; C++11 requires their existence,
+    # and they provide maximum portability at good performance.
+    AC_DEFINE([C99_COMPATIBLE_RADIOSITY], [6], [See source/core/configcore.h for details.])
+  else  # check value of C99_COMPATIBLE_RADIOSITY
+    # (Not checking function presence anymore, as they are all mandatory as of C++11. [CLi])
     case "$C99_COMPATIBLE_RADIOSITY" in
-      1) AC_CHECK_FUNCS([logbf],  [], [AC_MSG_ERROR([logbf not found])]) ;;
-      2) AC_CHECK_FUNCS([ilogbf], [], [AC_MSG_ERROR([ilogbf not found])]) ;;
-      3) AC_CHECK_FUNCS([logb],   [], [AC_MSG_ERROR([logb not found])]) ;;
-      4) AC_CHECK_FUNCS([ilogb],  [], [AC_MSG_ERROR([ilogb not found])]) ;;
+      1|2|3|4|5|6|7|8|9) ;;
       *) AC_MSG_ERROR([Unsupported C99_COMPATIBLE_RADIOSITY value]) ;;
     esac
     AC_DEFINE_UNQUOTED([C99_COMPATIBLE_RADIOSITY],
       [$C99_COMPATIBLE_RADIOSITY],
-      [See source/backend/support/octree.cpp for details.]
+      [See source/core/configcore.h for details.]
     )
   fi
 fi
@@ -736,6 +714,7 @@ if test x"$pov_compiler_vendor" = x"gnu"; then
   AX_TEST_COMPILER_FLAGS([-fno-enforce-eh-specs])
   AX_TEST_COMPILER_FLAGS([-Wno-non-template-friend])
 fi
+AX_TEST_COMPILER_FLAGS([-Wsuggest-override])
 
 
 # I/O restrictions.

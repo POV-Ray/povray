@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,11 +39,22 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <memory>
 #include <vector>
 
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
+#include "core/coretypes.h"
 #include "core/bounding/bsptree.h"
 #include "core/math/randomsequence.h"
 #include "core/render/ray.h"
+#include "core/scene/atmosphere_fwd.h"
 
 namespace pov
 {
@@ -55,18 +66,14 @@ namespace pov
 ///
 /// @{
 
-typedef struct Fog_Struct FOG;
 class PhotonGatherer;
-class SceneData;
-class Task;
-class ViewData;
 
-struct NoSomethingFlagRayObjectCondition : public RayObjectCondition
+struct NoSomethingFlagRayObjectCondition final  : public RayObjectCondition
 {
-    virtual bool operator()(const Ray& ray, ConstObjectPtr object, double) const;
+    virtual bool operator()(const Ray& ray, ConstObjectPtr object, double) const override;
 };
 
-struct LitInterval
+struct LitInterval final
 {
     bool lit;
     double s0, s1, ds;
@@ -78,7 +85,7 @@ struct LitInterval
         lit(nlit), s0(ns0), s1(ns1), ds(ns1 - ns0), l0(nl0), l1(nl1) { }
 };
 
-struct MediaInterval
+struct MediaInterval final
 {
     bool lit;
     int samples;
@@ -98,7 +105,7 @@ struct MediaInterval
     bool operator<(const MediaInterval& other) const { return (s0 < other.s0); }
 };
 
-struct LightSourceIntersectionEntry
+struct LightSourceIntersectionEntry final
 {
     double s;
     size_t l;
@@ -112,7 +119,7 @@ struct LightSourceIntersectionEntry
     bool operator<(const LightSourceIntersectionEntry& other) const { return (s < other.s); }
 };
 
-struct LightSourceEntry
+struct LightSourceEntry final
 {
     double s0, s1;
     LightSource *light;
@@ -135,7 +142,7 @@ typedef PooledSimpleVector<LightSourceIntersectionEntry, LIGHT_INTERSECTION_VECT
 typedef PooledSimpleVector<LightSourceEntry, LIGHTSOURCE_VECTOR_SIZE> LightSourceEntryVector;
 
 
-struct TraceTicket
+struct TraceTicket final
 {
     /// trace recursion level
     unsigned int traceLevel;
@@ -187,13 +194,15 @@ class Trace
         class CooperateFunctor
         {
             public:
+                virtual ~CooperateFunctor() {}
                 virtual void operator()() { }
         };
 
         class MediaFunctor
         {
             public:
-                virtual void ComputeMedia(vector<Media>&, const Ray&, Intersection&, MathColour&, ColourChannel&) { }
+                virtual ~MediaFunctor() {}
+                virtual void ComputeMedia(std::vector<Media>&, const Ray&, Intersection&, MathColour&, ColourChannel&) { }
                 virtual void ComputeMedia(const RayInteriorVector&, const Ray&, Intersection&, MathColour&, ColourChannel&) { }
                 virtual void ComputeMedia(MediaVector&, const Ray&, Intersection&, MathColour&, ColourChannel&) { }
         };
@@ -201,12 +210,13 @@ class Trace
         class RadiosityFunctor
         {
             public:
+                virtual ~RadiosityFunctor() {}
                 virtual void ComputeAmbient(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, double brilliance, MathColour& ambient_colour, double weight, TraceTicket& ticket) { }
                 virtual bool CheckRadiosityTraceLevel(const TraceTicket& ticket) { return false; }
         };
 
         /// @todo TraceThreadData already holds a reference to SceneData.
-        Trace(shared_ptr<SceneData> sd, TraceThreadData *td, const QualityFlags& qf,
+        Trace(std::shared_ptr<SceneData> sd, TraceThreadData *td, const QualityFlags& qf,
               CooperateFunctor& cf, MediaFunctor& mf, RadiosityFunctor& af);
 
         virtual ~Trace();
@@ -254,7 +264,7 @@ class Trace
     protected: // TODO FIXME - should be private
 
         /// Structure used to cache reflection information for multi-layered textures.
-        struct WNRX
+        struct WNRX final
         {
             double weight;
             Vector3d normal;
@@ -265,23 +275,23 @@ class Trace
                 weight(w), normal(n), reflec(r), reflex(x) { }
         };
 
-        typedef vector<const TEXTURE *> TextureVectorData;
+        typedef std::vector<const TEXTURE*> TextureVectorData;
         typedef RefPool<TextureVectorData> TextureVectorPool;
-        typedef Ref<TextureVectorData, RefClearContainer<TextureVectorData> > TextureVector;
+        typedef Ref<TextureVectorData, RefClearContainer<TextureVectorData>> TextureVector;
 
-        typedef vector<WNRX> WNRXVectorData;
+        typedef std::vector<WNRX> WNRXVectorData;
         typedef RefPool<WNRXVectorData> WNRXVectorPool;
-        typedef Ref<WNRXVectorData, RefClearContainer<WNRXVectorData> > WNRXVector;
+        typedef Ref<WNRXVectorData, RefClearContainer<WNRXVectorData>> WNRXVector;
 
         /// Structure used to cache shadow test results for complex textures.
-        struct LightColorCache
+        struct LightColorCache final
         {
             bool        tested;
             MathColour  colour;
         };
 
-        typedef vector<LightColorCache> LightColorCacheList;
-        typedef vector<LightColorCacheList> LightColorCacheListList;
+        typedef std::vector<LightColorCache> LightColorCacheList;
+        typedef std::vector<LightColorCacheList> LightColorCacheListList;
 
         /// List (well really vector) of lists of LightColorCaches.
         /// Each list is expected to have as many elements as there are global light sources.
@@ -292,7 +302,7 @@ class Trace
         int lightColorCacheIndex;
 
         /// Scene data.
-        shared_ptr<SceneData> sceneData;
+        std::shared_ptr<SceneData> sceneData;
 
         /// Maximum trace recursion level found.
         unsigned int maxFoundTraceLevel;
@@ -304,7 +314,7 @@ class Trace
         /// BSP tree mailbox.
         BSPTree::Mailbox mailbox;
         /// Area light grid buffer.
-        vector<MathColour> lightGrid;
+        std::vector<MathColour> lightGrid;
         /// Fast stack pool.
         IStackPool stackPool;
         /// Fast texture list pool.
@@ -312,9 +322,9 @@ class Trace
         /// Fast WNRX list pool.
         WNRXVectorPool wnrxPool;
         /// Light source shadow cache for shadow tests of first trace level intersections.
-        vector<ObjectPtr> lightSourceLevel1ShadowCache;
+        std::vector<ObjectPtr> lightSourceLevel1ShadowCache;
         /// Light source shadow cache for shadow tests of higher trace level intersections.
-        vector<ObjectPtr> lightSourceOtherShadowCache;
+        std::vector<ObjectPtr> lightSourceOtherShadowCache;
         /// `crand` random number generator.
         unsigned int crandRandomNumberGenerator;
         /// Pseudo-random number sequence.
@@ -322,11 +332,11 @@ class Trace
         /// Pseudo-random number generator based on random number sequence.
         RandomDoubleSequence::Generator randomNumberGenerator;
         /// Sub-random uniform 3d points on sphere sequence.
-        vector<SequentialVectorGeneratorPtr> ssltUniformDirectionGenerator;
+        std::vector<SequentialVectorGeneratorPtr> ssltUniformDirectionGenerator;
         /// Sub-random uniform numbers sequence.
-        vector<SequentialDoubleGeneratorPtr> ssltUniformNumberGenerator;
+        std::vector<SequentialDoubleGeneratorPtr> ssltUniformNumberGenerator;
         /// Sub-random cos-weighted 3d points on hemisphere sequence.
-        vector<SequentialVectorGeneratorPtr> ssltCosWeightedDirectionGenerator;
+        std::vector<SequentialVectorGeneratorPtr> ssltCosWeightedDirectionGenerator;
         /// Thread data.
         TraceThreadData *threadData;
 
@@ -385,7 +395,7 @@ class Trace
         /// @param[in]      shadowflag      Whether to perform only computations necessary for shadow testing.
         /// @param[in]      photonpass      Whether to deposit photons instead of computing a colour.
         ///
-        void ComputeOneTextureColour(MathColour& resultColour, ColourChannel& resultTransm, const TEXTURE *texture, vector<const TEXTURE *>& warps,
+        void ComputeOneTextureColour(MathColour& resultColour, ColourChannel& resultTransm, const TEXTURE *texture, std::vector<const TEXTURE *>& warps,
                                      const Vector3d& ipoint, const Vector3d& rawnormal, Ray& ray, COLC weight,
                                      Intersection& isect, bool shadowflag, bool photonpass);
 
@@ -411,7 +421,7 @@ class Trace
         /// @param[in]      shadowflag      Whether to perform only computations necessary for shadow testing.
         /// @param[in]      photonpass      Whether to deposit photons instead of computing a colour.
         ///
-        void ComputeAverageTextureColours(MathColour& resultColour, ColourChannel& resultTransm, const TEXTURE *texture, vector<const TEXTURE *>& warps,
+        void ComputeAverageTextureColours(MathColour& resultColour, ColourChannel& resultTransm, const TEXTURE *texture, std::vector<const TEXTURE *>& warps,
                                           const Vector3d& ipoint, const Vector3d& rawnormal, Ray& ray, COLC weight,
                                           Intersection& isect, bool shadowflag, bool photonpass);
 
@@ -438,7 +448,7 @@ class Trace
         /// @param[in]      weight          Importance of this computation.
         /// @param[in]      isect           Intersection information.
         ///
-        virtual void ComputeLightedTexture(MathColour& resultColour, ColourChannel& resultTransm, const TEXTURE *texture, vector<const TEXTURE *>& warps,
+        virtual void ComputeLightedTexture(MathColour& resultColour, ColourChannel& resultTransm, const TEXTURE *texture, std::vector<const TEXTURE *>& warps,
                                            const Vector3d& ipoint, const Vector3d& rawnormal, Ray& ray, COLC weight,
                                            Intersection& isect);
 
@@ -459,7 +469,7 @@ class Trace
         /// @param[in,out]  ray             Ray and associated information.
         /// @param[in]      isect           Intersection information.
         ///
-        void ComputeShadowTexture(MathColour& filtercolour, const TEXTURE *texture, vector<const TEXTURE *>& warps,
+        void ComputeShadowTexture(MathColour& filtercolour, const TEXTURE *texture, std::vector<const TEXTURE *>& warps,
                                   const Vector3d& ipoint, const Vector3d& rawnormal, const Ray& ray,
                                   Intersection& isect);
 
@@ -823,5 +833,6 @@ class Trace
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_TRACE_H

@@ -39,11 +39,24 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
-#include "base/mathutil.h"
+// C++ variants of C standard header files
+#include <cmath>
 
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+#include "base/mathutil.h"
+#include "base/pov_mem.h"
+
+// POV-Ray header files (core module)
 #include "core/scene/scenedata.h"
 
+// POV-Ray header files (VM module)
 #include "vm/fnpovfpu.h"
+
+// POV-Ray header files (parser module)
+//  (none at the moment)
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -57,7 +70,7 @@ using namespace pov;
 * Local typedefs
 ******************************************************************************/
 
-struct ExprParserTableEntry
+struct ExprParserTableEntry final
 {
     int stage;
     TokenId token;
@@ -66,7 +79,7 @@ struct ExprParserTableEntry
     int op;
 };
 
-struct ExprParserErrorEntry
+struct ExprParserErrorEntry final
 {
     int stage;
     const char *expected;
@@ -1187,13 +1200,13 @@ void Parser::optimise_call(ExprNode *node)
             result = tanh(node->child->number);
             break;
         case ASINH_TOKEN:
-            result = asinh(node->child->number);
+            result = std::asinh(node->child->number);
             break;
         case ACOSH_TOKEN:
-            result = acosh(node->child->number);
+            result = std::acosh(node->child->number);
             break;
         case ATANH_TOKEN:
-            result = atanh(node->child->number);
+            result = std::atanh(node->child->number);
             break;
         case ABS_TOKEN:
             result = fabs(node->child->number);
@@ -1491,3 +1504,4 @@ void Parser::dump_expr(FILE *f, ExprNode *node)
 }
 
 }
+// end of namespace pov_parser

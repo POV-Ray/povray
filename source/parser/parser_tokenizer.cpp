@@ -42,18 +42,24 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
-#include <cctype>
+// C++ variants of C standard header files
+//  (none at the moment)
 
+// C++ standard header files
 #include <limits>
-#include <memory>
 
+// POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
 #include "base/stringutilities.h"
+#include "base/textstream.h"
+#include "base/types.h"
 #include "base/version_info.h"
 
+// POV-Ray header files (core module)
 #include "core/material/noise.h"
 #include "core/scene/scenedata.h"
 
+// POV-Ray header files (parser module)
 #include "parser/scanner.h"
 #include "parser/rawtokenizer.h"
 
@@ -66,6 +72,8 @@ namespace pov_parser
 using namespace pov_base;
 using namespace pov;
 
+using std::shared_ptr;
+
 #if POV_DEBUG
 unsigned int gBreakpointCounter = 0;
 #endif
@@ -76,23 +84,7 @@ unsigned int gBreakpointCounter = 0;
 
 #define CALL(x) { if (!(x)) return (false); }
 
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Initialize_Tokenizer()
 {
@@ -128,9 +120,7 @@ void Parser::Initialize_Tokenizer()
     CheckFileSignature();
 }
 
-
 //******************************************************************************
-
 
 void Parser::CheckFileSignature()
 {
@@ -151,24 +141,7 @@ void Parser::CheckFileSignature()
     }
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::pre_init_tokenizer ()
 {
@@ -192,24 +165,7 @@ void Parser::pre_init_tokenizer ()
     MaxCachedMacroSize = POV_PARSER_MAX_CACHED_MACRO_SIZE;
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Terminate_Tokenizer()
 {
@@ -747,7 +703,6 @@ inline void Parser::Write_Token(TokenId Token_Id, const RawToken& rawToken, Symb
     mToken.table    = table;
 }
 
-
 //******************************************************************************
 
 void Parser::Token_Struct::SetTokenId(const RawToken& rawToken)
@@ -772,6 +727,11 @@ TokenId Parser::Token_Struct::GetCategorizedTokenId() const
 {
     POV_EXPERIMENTAL_ASSERT(mCategorizedTokenId == pov_parser::GetCategorizedTokenId(mTrueTokenId));
     return mCategorizedTokenId;
+}
+
+UCS2String Parser::Token_Struct::GetFileName() const
+{
+    return sourceFile->Name();
 }
 
 //------------------------------------------------------------------------------
@@ -912,23 +872,7 @@ bool Parser::GoToBookmark(const RawTokenizer::HotBookmark& bookmark)
     return true;
 }
 
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 const char *Parser::Get_Token_String (TokenId Token_Id)
 {
@@ -940,26 +884,7 @@ const char *Parser::Get_Token_String (TokenId Token_Id)
     return ("");
 }
 
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 bool Parser::GetRawToken(RawToken& rawToken, bool fastForwardToDirective)
 {
@@ -986,24 +911,7 @@ bool Parser::PeekRawToken(RawToken& rawToken)
     return true;
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::UngetRawToken(const RawToken& rawToken)
 {
@@ -1743,7 +1651,7 @@ void Parser::Parse_Directive()
     }
 }
 
-/*****************************************************************************/
+//******************************************************************************
 
 #if POV_DEBUG
 void Parser::Parse_Breakpoint()
@@ -1763,7 +1671,7 @@ void Parser::Parse_Breakpoint()
 }
 #endif
 
-/*****************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Version()
 {
@@ -1851,23 +1759,7 @@ void Parser::Parse_Version()
     parsingVersionDirective = wasParsingVersionDirective;
 }
 
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Open_Include()
 {
@@ -1881,25 +1773,7 @@ void Parser::Open_Include()
     IncludeHeader(formalFileName);
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Skip_Tokens(COND_TYPE cond)
 {
@@ -1926,24 +1800,7 @@ void Parser::Skip_Tokens(COND_TYPE cond)
     }
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Break()
 {
@@ -2764,8 +2621,8 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File, TokenId Previous, TokenId *Nu
             case STRING_LITERAL_TOKEN:
                 *NumberPtr = STRING_ID_TOKEN;
                 Test_Redefine(Previous,NumberPtr,*DataPtr);
-                POV_PARSER_ASSERT(dynamic_pointer_cast<const StringValue>(User_File->inToken.value) != nullptr);
-                *DataPtr   = UCS2_strdup(dynamic_pointer_cast<const StringValue>(User_File->inToken.value)->GetData().c_str());
+                POV_PARSER_ASSERT(std::dynamic_pointer_cast<const StringValue>(User_File->inToken.value) != nullptr);
+                *DataPtr   = UCS2_strdup(std::dynamic_pointer_cast<const StringValue>(User_File->inToken.value)->GetData().c_str());
                 break;
 
             default:
@@ -3106,23 +2963,7 @@ int Parser::Parse_For_Param (UTF8String& identifierName, DBL* EndPtr, DBL* StepP
            ((*StepPtr < 0) && (*CurrentPtr > *EndPtr - EPSILON));
 }
 
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::IncludeHeader(const UCS2String& formalFileName)
 {
@@ -3147,3 +2988,4 @@ void Parser::IncludeHeader(const UCS2String& formalFileName)
 }
 
 }
+// end of namespace pov_parser

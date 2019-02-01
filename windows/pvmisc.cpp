@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -72,6 +72,7 @@ namespace povwin
 
 using std::map;
 using std::endl;
+using std::string;
 
 extern int                                  alert_sound ;
 extern int                                  message_xchar ;
@@ -658,7 +659,7 @@ void write_INI_settings (bool noreset)
 // and never use it.
 //
 // TODO: add replace regex to alter paths from old to new where appropriate
-void cloneOldIni(string oldPath, string newPath)
+void cloneOldIni(const string& oldPath, const string& newPath)
 {
   bool                      keep = false;
   smatch                    what;
@@ -717,7 +718,7 @@ void cloneOldIni(string oldPath, string newPath)
 
 #else
 
-void cloneOldIni(string oldPath, string newPath)
+void cloneOldIni(const string& oldPath, const string& newPath)
 {
   bool                      keep = false;
   size_t                    pos;
@@ -1543,5 +1544,4 @@ bool ShowRestrictionMessage (char *Message, char *Dir)
 }
 
 }
-
-
+// end of namespace povwin

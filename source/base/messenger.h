@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,9 +36,19 @@
 #ifndef POVRAY_BASE_MESSENGER_H
 #define POVRAY_BASE_MESSENGER_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
+#include "base/messenger_fwd.h"
 
-#include "base/types.h"
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <string>
+
+// POV-Ray header files (base module)
+#include "base/base_fwd.h"
+#include "base/stringtypes.h"
 
 namespace pov_base
 {
@@ -48,8 +58,6 @@ namespace pov_base
 /// @addtogroup PovBase
 ///
 /// @{
-
-class Exception;
 
 /// @relates GenericMessenger
 enum MessageClass
@@ -140,5 +148,6 @@ class GenericMessenger
 //##############################################################################
 
 }
+// end of namespace pov_base
 
 #endif // POVRAY_BASE_MESSENGER_H

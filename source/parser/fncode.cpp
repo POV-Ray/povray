@@ -38,19 +38,27 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/fncode.h"
 
+// C++ variants of C standard header files
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+
+// C++ standard header files
 #include <algorithm>
 
 // POV-Ray header files (base module)
+#include "base/pov_mem.h"
+#include "base/povassert.h"
 #include "base/stringutilities.h"
 
+// POV-Ray header files (core module)
 #include "core/scene/scenedata.h"
 
+// POV-Ray header files (VM module)
 #include "vm/fnintern.h"
 #include "vm/fnpovfpu.h"
 
+// POV-Ray header files (parser module)
 #include "parser/parser.h"
 
 // this must be the last header file included
@@ -58,6 +66,9 @@
 
 namespace pov_parser
 {
+
+using std::min;
+using std::max;
 
 using namespace pov;
 
@@ -2236,6 +2247,7 @@ void FNCode::disassemble_instruction(FILE *f, Instruction& i)
 
 #include "fnasm.cpp"
 
-#endif
+#endif // DEBUG_FLOATFUNCTION
 
 }
+// end of namespace pov_parser

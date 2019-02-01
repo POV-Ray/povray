@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,10 +36,12 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/image/dither.h"
 
-// Standard C++ header files
-#include <algorithm>
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
 
 // POV-Ray header files (base module)
+#include "base/povassert.h"
 #include "base/data/bluenoise64a.h"
 
 // this must be the last file included
@@ -58,7 +60,7 @@ void NoDither::GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, C
 
 //*******************************************************************************
 
-class OrderedDither::Pattern
+class OrderedDither::Pattern final
 {
 public:
     template<typename T> Pattern(unsigned int size, const T* raw, unsigned int rank);
@@ -256,7 +258,7 @@ void FloydSteinbergDither::SetError(unsigned int x, unsigned int y, const Colour
 
 //*******************************************************************************
 
-class DiffusionDither::Filter
+class DiffusionDither::Filter final
 {
 public:
     Filter(std::initializer_list<std::initializer_list<int>> raw, int drop = 0);
@@ -426,4 +428,5 @@ ColourChannel GetDitherOffset(unsigned int x, unsigned int y)
     return BlueNoise64a(x, y);
 }
 
-} // end of namespace pov_base
+}
+// end of namespace pov_base

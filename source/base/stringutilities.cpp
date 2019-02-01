@@ -36,7 +36,7 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "stringutilities.h"
 
-// C++ variants of standard C header files
+// C++ variants of C standard header files
 #include <cctype>
 #include <cstdarg>
 #include <cstdio>
@@ -48,6 +48,9 @@
 
 // Boost header files
 //  (none at the moment)
+
+// POV-Ray header files (base module)
+#include "base/types.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -232,8 +235,8 @@ int pov_stricmp(const char *s1, const char *s2)
         c1 = *s1++;
         c2 = *s2++;
 
-        c1 = (char)toupper(c1);
-        c2 = (char)toupper(c2);
+        c1 = (char)std::toupper(c1);
+        c2 = (char)std::toupper(c2);
 
         if(c1 < c2)
             return -1;
@@ -301,6 +304,21 @@ std::size_t UCS2_strlen(const UCS2* str)
     while (*end != u'\0')
         ++end;
     return (end - str);
+}
+
+//------------------------------------------------------------------------------
+
+int UCS2_strcmp(const UCS2 *s1, const UCS2 *s2)
+{
+    UCS2 t1, t2;
+
+    while ((t1 = *s1++) == (t2 = *s2++))
+    {
+        if (t1 == '\0')
+            return 0;
+    }
+
+    return (t1 - t2);
 }
 
 //******************************************************************************
@@ -644,4 +662,5 @@ const Charset* Charset::Get(CharsetID charset)
     }
 }
 
-} // end of namespace pov_base
+}
+// end of namespace pov_base

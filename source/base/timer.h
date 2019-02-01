@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,6 +39,11 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// Boost header files
 #if POV_USE_DEFAULT_TIMER
 #include <boost/thread/xtime.hpp>
 #endif
@@ -46,6 +51,9 @@
 #if !POV_USE_DEFAULT_TIMER || (POV_MULTITHREADED && !POV_USE_DEFAULT_DELAY)
 #include "syspovtimer.h"
 #endif
+
+// POV-Ray header files (base module)
+//  (none at the moment)
 
 namespace pov_base
 {
@@ -105,7 +113,7 @@ void Delay(unsigned int msec);
 ///     Windows), and/or may be limited to timespans in the order of an hour (any system with a
 ///     32-bit `clock_t` and a standard `CLOCKS_PER_SEC` of 1,000,000).
 ///
-class Timer
+class Timer final
 {
     public:
 
@@ -193,5 +201,6 @@ class Timer
 //##############################################################################
 
 }
+// end of namespace pov_base
 
 #endif // POVRAY_BASE_TIMER_H

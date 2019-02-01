@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -43,6 +43,9 @@
 #include <algorithm>
 #include <limits>
 
+// POV-Ray header files (base module)
+#include "base/povassert.h"
+
 // POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/lighting/lightgroup.h"
@@ -70,6 +73,10 @@
 namespace pov
 {
 
+using std::min;
+using std::max;
+using std::vector;
+
 /* ------------------------------------------------------ */
 /* global variables */
 /* ------------------------------------------------------ */
@@ -92,7 +99,7 @@ constexpr int PHOTON_BLOCK_MASK = PHOTON_BLOCK_SIZE - 1;
 
 static_assert(PHOTON_BLOCK_POWER < std::numeric_limits<decltype(PHOTON_BLOCK_SIZE)>::digits, "PHOTON_BLOCK_POWER too large");
 
-class PhotonMap::PhotonBlock
+class PhotonMap::PhotonBlock final
 {
 public:
     inline Photon& operator[](size_t i)
@@ -110,7 +117,7 @@ private:
 
 //******************************************************************************
 
-PhotonTrace::PhotonTrace(shared_ptr<SceneData> sd, TraceThreadData *td, const QualityFlags& qf, Trace::CooperateFunctor& cf) :
+PhotonTrace::PhotonTrace(std::shared_ptr<SceneData> sd, TraceThreadData *td, const QualityFlags& qf, Trace::CooperateFunctor& cf) :
     Trace(sd, td, qf, cf, mediaPhotons, noRadiosity),
     mediaPhotons(sd, td, this, new PhotonGatherer(&sd->mediaPhotonMap, sd->photonSettings))
 {
@@ -932,7 +939,7 @@ void PhotonTrace::addSurfacePhoton(const Vector3d& Point, const Vector3d& Origin
 
 }
 
-PhotonMediaFunction::PhotonMediaFunction(shared_ptr<SceneData> sd, TraceThreadData *td, Trace *t, PhotonGatherer *pg) :
+PhotonMediaFunction::PhotonMediaFunction(std::shared_ptr<SceneData> sd, TraceThreadData *td, Trace *t, PhotonGatherer *pg) :
     MediaFunction(td, t, pg),
     sceneData(sd)
 {
@@ -2624,7 +2631,7 @@ int LightTargetCombo::computeMergedFlags()
 }
 
 
-void LightTargetCombo::computeAnglesAndDeltas(shared_ptr<SceneData> sceneData)
+void LightTargetCombo::computeAnglesAndDeltas(std::shared_ptr<SceneData> sceneData)
 {
     shootingDirection.compute();
 
@@ -2683,5 +2690,5 @@ void LightTargetCombo::computeAnglesAndDeltas(shared_ptr<SceneData> sceneData)
     }
 }
 
-} // end of namespace
-
+}
+// end of namespace pov

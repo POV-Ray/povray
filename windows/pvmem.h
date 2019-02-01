@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,7 +44,7 @@
 namespace povwin
 {
 
-class WinMemStats
+class WinMemStats final
 {
   public:
     WinMemStats() { Clear(); }
@@ -140,7 +140,7 @@ class WinMemStats
 
 typedef WinMemStats PovMemStats;
 
-class WinHeap
+class WinHeap final
 {
   public:
     WinHeap()
@@ -227,7 +227,7 @@ class WinHeap
     CRITICAL_SECTION m_CritSec;
 };
 
-class HeapLock
+class HeapLock final
 {
   public:
     HeapLock(WinHeap *wh) : m_WinHeap(wh) { m_WinHeap->Lock(); }
@@ -236,7 +236,7 @@ class HeapLock
     WinHeap *m_WinHeap;
 };
 
-class WinMemBlock
+class WinMemBlock final
 {
 public:
   __declspec(nothrow) WinMemBlock(const void *data, int line)
@@ -353,10 +353,11 @@ private:
     static const size_t BlockPadding = 0;
 # endif
 
-  WinMemBlock() {} // not available
-  void *operator new (size_t len) {} // not available
+  WinMemBlock() = delete;
+  void *operator new (size_t len) = delete;
 };
 
 }
+// end of namespace povwin
 
 #endif // POVRAY_WINDOWS_PVMEM_H

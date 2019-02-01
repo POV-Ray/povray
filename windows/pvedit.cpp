@@ -53,6 +53,7 @@ namespace pov_frontend
 {
   extern struct ProcessOptions::INI_Parser_Table RenderOptions_INI_Table[];
 }
+// end of namespace pov_frontend
 
 namespace povwin
 {
@@ -311,7 +312,7 @@ char *Get_User_Keywords(const char *DocumentsPath)
   char        str[_MAX_PATH];
   char        *s;
   FILE        *f;
-  string      result;
+  std::string result;
 
   sprintf(str, "%sini\\user-keywords.txt", DocumentsPath);
   if ((f = fopen(str, "rt")) == NULL)
@@ -570,3 +571,4 @@ const char **EditGetWindowList (void)
 }
 
 }
+// end of namespace povwin

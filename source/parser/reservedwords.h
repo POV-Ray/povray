@@ -40,18 +40,26 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "parser/configparser.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+// POV-Ray header files (core module)
+//  (none at the moment)
+
+// POV-Ray header files (parser module)
 #include "parser/parsertypes.h"
 
 namespace pov_parser
 {
 
-typedef struct Reserved_Word_Struct RESERVED_WORD;
-
-struct Reserved_Word_Struct
+struct Reserved_Word_Struct final
 {
     TokenId Token_Number;
     const char *Token_Name;
 };
+using RESERVED_WORD = Reserved_Word_Struct; ///< @deprecated
 
 // Token Definitions for Parser
 enum TokenId : int
@@ -757,6 +765,7 @@ extern const RESERVED_WORD Reserved_Words[];
 
 TokenId GetCategorizedTokenId(TokenId tokenId);
 
-} // end of namespace pov_parser
+}
+// end of namespace pov_parser
 
 #endif // POVRAY_PARSER_RESERVEDWORDS_H

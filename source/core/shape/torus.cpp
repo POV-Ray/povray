@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -48,6 +48,14 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/torus.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/math/matrix.h"
 #include "core/math/polynomialsolver.h"
@@ -1131,3 +1139,4 @@ void Torus::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
 }
 
 }
+// end of namespace pov

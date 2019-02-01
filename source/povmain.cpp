@@ -38,13 +38,18 @@
 
 #include <cstdlib>
 
+#include <string>
+
 // configfrontend.h must always be the first POV file included in frontend sources (pulls in platform config)
 #include "frontend/configfrontend.h"
 
+// POV-Ray header files (base module)
 #include "base/timer.h"
 
+// POV-Ray header files (backend module)
 #include "backend/povray.h"
 
+// POV-Ray header files (frontend module)
 #include "frontend/console.h"
 #include "frontend/display.h"
 #include "frontend/filemessagehandler.h"
@@ -63,18 +68,18 @@ class DefaultConsole : public pov_frontend::Console
 {
     public:
         DefaultConsole() { }
-        ~DefaultConsole() { }
-        void Initialise() { }
-        void Output(const string& str) { std::printf("%s\n", str.c_str()); std::fflush(stdout); }
+        virtual ~DefaultConsole() override { }
+        virtual void Initialise() override { }
+        virtual void Output (const string& str) override { std::printf("%s\n", str.c_str()); std::fflush(stdout); }
 };
 
 class DefaultDisplay : public pov_frontend::Display
 {
     public:
         DefaultDisplay(unsigned int w, unsigned int h) : Display(w, h) { }
-        ~DefaultDisplay() { }
-        void Initialise() { }
-        void DrawPixel(unsigned int, unsigned int, const RGBA8&) { }
+        virtual ~DefaultDisplay() override { }
+        virtual void Initialise() override { }
+        virtual void DrawPixel (unsigned int, unsigned int, const RGBA8&) override { }
 };
 
 pov_frontend::Console *CreateDefaultConsole();

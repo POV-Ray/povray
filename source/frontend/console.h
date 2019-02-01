@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,28 +38,37 @@
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "frontend/configfrontend.h"
+#include "frontend/console_fwd.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <string>
 
+// POV-Ray header files (base module)
 #include "base/textstreambuffer.h"
+
+// POV-Ray header files (POVMS module)
+// POV-Ray header files (frontend module)
+//  (none at the moment)
 
 namespace pov_frontend
 {
 
-using namespace pov_base;
-
-class Console : public TextStreamBuffer
+class Console : public pov_base::TextStreamBuffer
 {
     public:
         Console(unsigned int wrapwidth = 80);
-        virtual ~Console();
+        virtual ~Console() override;
 
         virtual void Initialise() = 0;
-        virtual void Output(const string&) = 0;
+        virtual void Output(const std::string&) = 0;
     private:
-        void lineoutput(const char *str, unsigned int chars);
+        virtual void lineoutput(const char *str, unsigned int chars) override;
 };
 
 }
+// end of namespace pov_frontend
 
 #endif // POVRAY_FRONTEND_CONSOLE_H

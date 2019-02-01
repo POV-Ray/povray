@@ -38,7 +38,7 @@
 // must come first, will pull in "config.h" for HAVE_* macros
 #include "syspovconfig.h"
 
-// C++ variants of C standard headers
+// C++ variants of C standard header files
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -46,7 +46,11 @@
 # include <ctime>
 #endif
 
-// other library headers
+// C++ standard header files
+#include <memory>
+#include <vector>
+
+// other library header files
 #include <pthread.h>
 #ifdef HAVE_SYS_TIME_H
 # include <sys/time.h>
@@ -58,6 +62,9 @@
 // from directory "vfe"
 #include "vfe.h"
 #include "unix/unixoptions.h"
+
+#include "base/filesystem.h"
+#include "syspovfilesystem.h"
 
 namespace vfePlatform
 {
@@ -80,7 +87,8 @@ namespace vfePlatform
     vfeUnixSession::vfeUnixSession(int id) :
         m_LastTimestamp(0), m_TimestampOffset(0), vfeSession(id)
     {
-        m_OptionsProc = shared_ptr<UnixOptionsProcessor>(new UnixOptionsProcessor(this));
+        m_OptionsProc = std::shared_ptr<UnixOptionsProcessor>(new UnixOptionsProcessor(this));
+        pov_base::Filesystem::SetTempFilePath(SysToUCS2String(m_OptionsProc->GetTemporaryPath()));
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -122,7 +130,7 @@ namespace vfePlatform
     // error will occur again (e.g. invalid output path or something), then
     // you may want to call the render cancel API so the user isn't bombarded
     // with an error message for each frame of the render.
-    int vfeUnixSession::RequestNewOutputPath(int CallCount, const string& Reason, const UCS2String& OldPath, UCS2String& NewPath)
+    int vfeUnixSession::RequestNewOutputPath(int CallCount, const std::string& Reason, const UCS2String& OldPath, UCS2String& NewPath)
     {
         // TODO: print warning and cancel?
         return 0;
@@ -146,12 +154,9 @@ namespace vfePlatform
     // name to one that it can use.
     UCS2String vfeUnixSession::CreateTemporaryFile(void) const
     {
-        // TODO FIXME - This allows only one temporary file per process!
-        char str [POV_FILENAME_BUFFER_CHARS+1] = "";
-        std::snprintf(str, sizeof(str), "%spov%d", m_OptionsProc->GetTemporaryPath().c_str(), getpid ());
-        POV_DELETE_FILE (str);
-
-        return SysToUCS2String(str);
+        pov_base::Filesystem::TemporaryFilePtr tempFile(new pov_base::Filesystem::TemporaryFile);
+        m_TempFiles.push_back(tempFile);
+        return tempFile->GetFileName();
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -160,7 +165,7 @@ namespace vfePlatform
     // example doesn't do that but it's not a bad idea to add.
     void vfeUnixSession::DeleteTemporaryFile(const UCS2String& filename) const
     {
-        POV_DELETE_FILE (UCS2toSysString (filename).c_str());
+        pov_base::Filesystem::DeleteFile(filename);
     }
 
     //////////////////////////////////////////////////////////////
@@ -268,8 +273,8 @@ namespace vfePlatform
         if (StrCompare(path.GetVolume(), file.GetVolume()) == false)
             return (false);
 
-        vector<UCS2String> pc = path.GetAllFolders();
-        vector<UCS2String> fc = file.GetAllFolders();
+        std::vector<UCS2String> pc = path.GetAllFolders();
+        std::vector<UCS2String> fc = file.GetAllFolders();
         if (fc.size() < pc.size())
             return (false) ;
         for (int i = 0 ; i < pc.size(); i++)
@@ -289,7 +294,7 @@ namespace vfePlatform
         if (!m_OptionsProc->isIORestrictionsEnabled(isWrite))
             return true;
 
-        string FullFnm = m_OptionsProc->CanonicalizePath(UCS2toSysString(file()));
+        std::string FullFnm = m_OptionsProc->CanonicalizePath(UCS2toSysString(file()));
         if(FullFnm.length() == 0)
             return false;
 
@@ -333,7 +338,7 @@ namespace vfePlatform
     // on the requirements for these methods.
     /////////////////////////////////////////////////////////////////////////////
 
-    UnixShelloutProcessing::UnixShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height): ShelloutProcessing(opts, scene, width, height)
+    UnixShelloutProcessing::UnixShelloutProcessing(POVMS_Object& opts, const std::string& scene, unsigned int width, unsigned int height): ShelloutProcessing(opts, scene, width, height)
     {
         m_ProcessRunning = false;
         m_ProcessId = m_LastError = m_ExitCode = 0;
@@ -346,7 +351,7 @@ namespace vfePlatform
         CollectCommand();
     }
 
-    bool UnixShelloutProcessing::ExecuteCommand(const string& cmd, const string& params)
+    bool UnixShelloutProcessing::ExecuteCommand(const std::string& cmd, const std::string& params)
     {
 #if 0
         if (UnixShelloutProcessing::CommandRunning())
@@ -365,7 +370,7 @@ namespace vfePlatform
         m_Params = params;
         m_ProcessId = m_LastError = m_ExitCode = 0;
 
-        string command = cmd + " " + params;
+        std::string command = cmd + " " + params;
         boost::trim(command);
         if (command.empty())
             throw POV_EXCEPTION(kParamErr, "Empty shellout command");
@@ -420,19 +425,20 @@ namespace vfePlatform
         return m_ExitCode;
     }
 
-    int UnixShelloutProcessing::CollectCommand(string& output)
+    int UnixShelloutProcessing::CollectCommand(std::string& output)
     {
         // TODO: IMPLEMENT IF OUTPUT COLLECTION TO BE SUPPORTED
         return CollectCommand();
     }
 
-    bool UnixShelloutProcessing::CommandPermitted(const string& command, const string& parameters)
+    bool UnixShelloutProcessing::CommandPermitted(const std::string& command, const std::string& parameters)
     {
         // until we get a unix support guy, this is just a hack: use a global
-        string cmd = command + " " + parameters;
+        std::string cmd = command + " " + parameters;
         boost::trim(cmd);
         if (command.empty() || *command.rbegin() == '&')
             return false;
         return gShelloutsPermittedFixThis;
     }
 }
+// end of namespace vfePlatform

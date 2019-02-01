@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -42,7 +42,6 @@
 #include "syspovconfig.h"
 
 #define POV_PATH_SEPARATOR '/'
-#define IFF_SWITCH_CAST (long)
 
 // Our Unix-specific implementation of the Delay() function currently relies on the presence of
 // the nanosleep() or usleep() functions. If we have neither of those, we're falling back to
@@ -67,5 +66,11 @@
 
 // The default Path::ParsePathString() suits our needs perfectly.
 #define POV_USE_DEFAULT_PATH_PARSER 1
+
+// We want to implement a specialized Filesystem::DeleteFile.
+#define POV_USE_DEFAULT_DELETEFILE 0
+
+// We want to implement a specialized Filesystem::LargeFile.
+#define POV_USE_DEFAULT_LARGEFILE 0
 
 #endif // POVRAY_UNIX_SYSPOVCONFIGBASE_H

@@ -36,23 +36,30 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/fileinputoutput.h"
 
-// C++ variants of standard C header files
+// C++ variants of C standard header files
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
 
-// Standard C++ header files
-#include <memory>
+// C++ standard header files
+#include <algorithm>
+#include <string>
 
-// POV-Ray base header files
+// POV-Ray header files (base module)
+#include "base/path.h"
 #include "base/platformbase.h"
+#include "base/povassert.h"
 #include "base/pov_err.h"
+#include "base/stringutilities.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov_base
 {
+
+using std::min;
+using std::max;
 
 IOBase::IOBase() : filename(), fail(true)
 {
@@ -323,7 +330,7 @@ IStream *NewIStream(const Path& p, unsigned int stype)
 {
     if (!PlatformBase::GetInstance().AllowLocalFileAccess(p(), stype, false))
     {
-        string str ("IO Restrictions prohibit read access to '") ;
+        std::string str ("IO Restrictions prohibit read access to '") ;
         str += UCS2toSysString(p());
         str += "'";
         throw POV_EXCEPTION(kCannotOpenFileErr, str);
@@ -341,7 +348,7 @@ OStream *NewOStream(const Path& p, unsigned int stype, bool sappend)
 
     if (!PlatformBase::GetInstance().AllowLocalFileAccess(p(), stype, true))
     {
-        string str ("IO Restrictions prohibit write access to '") ;
+        std::string str ("IO Restrictions prohibit write access to '") ;
         str += UCS2toSysString(p());
         str += "'";
         throw POV_EXCEPTION(kCannotOpenFileErr, str);
@@ -372,7 +379,7 @@ UCS2String GetFileName(const Path& p)
 
 bool CheckIfFileExists(const Path& p)
 {
-    FILE *tempf = PlatformBase::GetInstance().OpenLocalFile (p().c_str(), "r");
+    FILE *tempf = PlatformBase::GetInstance().OpenLocalFile (p(), "r");
 
     if (tempf != nullptr)
         fclose(tempf);
@@ -384,7 +391,7 @@ bool CheckIfFileExists(const Path& p)
 
 POV_OFF_T GetFileLength(const Path& p)
 {
-    FILE *tempf = PlatformBase::GetInstance().OpenLocalFile (p().c_str(), "rb");
+    FILE *tempf = PlatformBase::GetInstance().OpenLocalFile (p(), "rb");
     POV_OFF_T result = -1;
 
     if (tempf != nullptr)
@@ -545,3 +552,4 @@ bool IMemStream::seekg(POV_OFF_T posi, unsigned int whence)
 }
 
 }
+// end of namespace pov_base

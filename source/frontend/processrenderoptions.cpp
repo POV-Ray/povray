@@ -39,15 +39,27 @@
 // C++ variants of C standard header files
 #include <cstdlib>
 
+// C++ standard header files
+//  (none at the moment)
+
 // POV-Ray header files (base module)
 #include "base/fileutil.h"
 #include "base/platformbase.h"
+#include "base/stringutilities.h"
 #include "base/image/colourspace.h"
 #include "base/image/dither.h"
 #include "base/image/encoding.h"
 
+// POV-Ray header files (core module)
+#include "base/fileinputoutput.h"
+#include "base/path.h"
+#include "base/textstream.h"
+
 // POV-Ray header files (POVMS module)
 #include "povms/povmsid.h"
+
+// POV-Ray header files (frontend module)
+//  (none at the moment)
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -1221,3 +1233,4 @@ const char* ProcessRenderOptions::GetParameterCodeText(const ProcessRenderOption
 }
 
 }
+// end of namespace pov_frontend

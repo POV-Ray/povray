@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,27 +33,23 @@
 ///
 //******************************************************************************
 
-#ifndef TEXTSTREAM_H
-#define TEXTSTREAM_H
+#ifndef POVRAY_BASE_TEXTSTREAM_H
+#define POVRAY_BASE_TEXTSTREAM_H
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
+#include "base/textstream_fwd.h"
 
-// C++ variants of standard C header files
+// C++ variants of C standard header files
 #include <cstdio>
 
-// must nuke these since everyone's favourite monopoly's cstdio still defines
-// them for some reason (why not just use inlines like everyone else?)
-#undef  getc
-#undef  putc
-#undef  getchar
-#undef  putchar
+// C++ standard header files
+//  (none at the moment)
 
-// POV-Ray base header files
-#include "base/fileinputoutput.h"
+// POV-Ray header files (base module)
+#include "base/fileinputoutput_fwd.h"
 #include "base/pov_err.h"
-#include "base/stringutilities.h"
-#include "base/types.h"
+#include "base/stringtypes.h"
 
 namespace pov_base
 {
@@ -70,7 +66,7 @@ const int ITEXTSTREAM_BUFFER_SIZE = DEFAULT_ITEXTSTREAM_BUFFER_SIZE;
 class ITextStream
 {
     public:
-        struct FilePos
+        struct FilePos final
         {
             POV_OFF_T offset;
             POV_LONG lineno;
@@ -97,7 +93,7 @@ class ITextStream
         POV_LONG lineno;
 };
 
-class IBufferedTextStream : public ITextStream
+class IBufferedTextStream final : public ITextStream
 {
     public:
         IBufferedTextStream(const UCS2 *, unsigned int);
@@ -107,19 +103,19 @@ class IBufferedTextStream : public ITextStream
         /// @param[in]  initialLine First line number as known to the user.
         IBufferedTextStream(const UCS2 *formalName, IStream *byteStream, POV_LONG initialLine = 1);
 
-        virtual ~IBufferedTextStream();
+        virtual ~IBufferedTextStream() override;
 
-        virtual int getchar();
-        virtual void ungetchar(int);
+        virtual int getchar() override;
+        virtual void ungetchar(int) override;
 
-        virtual bool eof() const;
-        virtual bool seekg(FilePos);
-        virtual FilePos tellg() const;
+        virtual bool eof() const override;
+        virtual bool seekg(FilePos) override;
+        virtual FilePos tellg() const override;
 
-        virtual bool ReadRaw(unsigned char* buf, size_t size);
+        virtual bool ReadRaw(unsigned char* buf, size_t size) override;
 
         /// Formal name of the file, e.g. to be displayed in error messages.
-        virtual const UCS2 *name() const { return filename.c_str(); };
+        virtual const UCS2 *name() const override { return filename.c_str(); };
     private:
         IStream *stream;
         unsigned char buffer[ITEXTSTREAM_BUFFER_SIZE];
@@ -133,7 +129,7 @@ class IBufferedTextStream : public ITextStream
         void RefillBuffer();
 };
 
-class IMemTextStream : public ITextStream
+class IMemTextStream final : public ITextStream
 {
     public:
         /// @param[in]  formalName  Name by which the file is known to the user.
@@ -142,19 +138,19 @@ class IMemTextStream : public ITextStream
         /// @param[in]  formalStart File position of buffer start as known to the user.
         IMemTextStream(const UCS2 *formalName, const unsigned char* data, size_t size, const FilePos& formalStart);
 
-        virtual ~IMemTextStream();
+        virtual ~IMemTextStream() override;
 
-        virtual int getchar();
-        virtual void ungetchar(int);
+        virtual int getchar() override;
+        virtual void ungetchar(int) override;
 
-        virtual bool eof() const;
-        virtual bool seekg(FilePos);
-        virtual FilePos tellg() const;
+        virtual bool eof() const override;
+        virtual bool seekg(FilePos) override;
+        virtual FilePos tellg() const override;
 
-        virtual bool ReadRaw(unsigned char* buf, size_t size);
+        virtual bool ReadRaw(unsigned char* buf, size_t size) override;
 
         /// Formal name of the file, e.g. to be displayed in error messages.
-        virtual const UCS2 *name() const { return filename.c_str(); };
+        virtual const UCS2 *name() const override { return filename.c_str(); };
     private:
         const unsigned char* buffer;
         size_t bufferoffset;
@@ -193,5 +189,6 @@ class OTextStream
 //##############################################################################
 
 }
+// end of namespace pov_base
 
-#endif
+#endif // POVRAY_BASE_TEXTSTREAM_H

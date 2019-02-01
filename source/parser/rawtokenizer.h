@@ -43,10 +43,16 @@
 //  (none at the moment)
 
 // C++ standard header files
+#include <memory>
 #include <unordered_map>
 
 // Boost header files
+//  (none at the moment)
+
 // POV-Ray header files (base module)
+#include "base/stringtypes.h"
+
+// POV-Ray header files (core module)
 //  (none at the moment)
 
 // POV-Ray header files (parser module)
@@ -68,8 +74,8 @@ protected:
     Value() {}
 };
 
-using ValuePtr = shared_ptr<Value>;
-using ConstValuePtr = shared_ptr<const Value>;
+using ValuePtr = std::shared_ptr<Value>;
+using ConstValuePtr = std::shared_ptr<const Value>;
 
 /// Structure representing a string value.
 struct StringValue : Value
@@ -82,9 +88,9 @@ struct StringValue : Value
 };
 
 /// Structure representing a string value with backslashes.
-struct AmbiguousStringValue : StringValue
+struct AmbiguousStringValue final : StringValue
 {
-    struct InvalidEscapeSequenceInfo
+    struct InvalidEscapeSequenceInfo final
     {
         ConstStreamPtr stream;
         LexemePosition position;
@@ -92,7 +98,7 @@ struct AmbiguousStringValue : StringValue
         InvalidEscapeSequenceInfo(ConstStreamPtr s, LexemePosition p, UTF8String t) : stream(s), position(p), text(t) {}
         InvalidEscapeSequenceInfo(ConstStreamPtr s, LexemePosition p, const UTF8String::const_iterator& b, const UTF8String::const_iterator& e) :
             stream(s), position(p), text(b, e) {}
-        void Throw() const { throw InvalidEscapeSequenceException(stream->Name(), position, text); }
+        void Throw() const;
     };
 
     UCS2String data;
@@ -100,7 +106,7 @@ struct AmbiguousStringValue : StringValue
     InvalidEscapeSequenceInfo* invalidEscapeSequence;
     AmbiguousStringValue(const StringValue& o) : data(o.GetData()), fileName(o.GetFileName()), invalidEscapeSequence(nullptr) {}
     AmbiguousStringValue(const AmbiguousStringValue& o) : data(o.data), fileName(o.fileName), invalidEscapeSequence(o.invalidEscapeSequence) {}
-    ~AmbiguousStringValue() { if (invalidEscapeSequence != nullptr) delete invalidEscapeSequence; }
+    virtual ~AmbiguousStringValue() override { if (invalidEscapeSequence != nullptr) delete invalidEscapeSequence; }
     virtual const UCS2String& GetData() const override { if (invalidEscapeSequence != nullptr) invalidEscapeSequence->Throw(); return data; }
     virtual const UCS2String& GetFileName() const override { return fileName; }
     virtual bool IsAmbiguous() const override { return true; }
@@ -110,7 +116,7 @@ struct AmbiguousStringValue : StringValue
 //------------------------------------------------------------------------------
 
 /// Structure representing an individual raw token.
-struct RawToken
+struct RawToken final
 {
     /// The original lexeme from which this raw token was created.
     Lexeme lexeme;
@@ -182,7 +188,7 @@ struct RawToken
 /// In addition, literal lexemes are evaluated, converting their textual
 /// representation into the corresponding internal value representation.
 ///
-class RawTokenizer
+class RawTokenizer final
 {
 public:
 
@@ -235,7 +241,7 @@ public:
 
 private:
 
-    struct KnownWordInfo
+    struct KnownWordInfo final
     {
         int     id;
         TokenId expressionId;
@@ -258,5 +264,6 @@ private:
 };
 
 }
+// end of namespace pov_parser
 
 #endif // POVRAY_PARSER_RAWTOKENIZER_H

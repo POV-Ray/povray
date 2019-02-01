@@ -70,14 +70,16 @@
 #include <crtdbg.h>
 #include <psapi.h>
 #include <dbghelp.h>
+#include <io.h>
 
 // #define DEVELOPMENT
 
+#include <cstdarg>
 #include <cstdlib>
 #include <cstdio>
 #include <tchar.h>
 
-#include <string>
+#include <memory>
 
 #include "pvengine.h"
 #include "resource.h"
@@ -131,8 +133,9 @@ char *WriteDump(struct _EXCEPTION_POINTERS *pExceptionInfo, bool full, long time
 
 namespace pov_frontend
 {
-  extern shared_ptr<Display> gDisplay;
+  extern std::shared_ptr<Display> gDisplay;
 }
+// end of namespace pov_frontend
 
 using namespace pov;
 using namespace pov_frontend;
@@ -166,8 +169,8 @@ bool                    IsExpired;
 bool                    BackendFailedFlag = false;
 bool                    PreventSleep = true;
 char                    DumpMeta[65536];
-string                  ErrorMessage ;
-string                  ErrorFilename ;
+std::string             ErrorMessage ;
+std::string             ErrorFilename ;
 unsigned                ErrorLine ;
 unsigned                ErrorCol ;
 unsigned                render_priority = CM_RENDERPRIORITY_NORMAL ;
@@ -318,7 +321,7 @@ HICON                   ourIcon ;
 HICON                   renderIcon ;
 HFONT                   about_font ;
 HANDLE                  hMainThread ;
-string                  InputFileName ;
+std::string             InputFileName ;
 time_t                  SecondCountStart ;
 time_t                  quit ;
 HBITMAP                 hBmpBackground ;
@@ -370,8 +373,8 @@ CRITICAL_SECTION        critical_section ;
 
 // key is the name of an included file (all lower case).
 // content is the name of the most recent rendered file that caused it to be included.
-map<string, string>     IncludeToSourceMap;
-map<string, bool>       IncludeAlternateDecisionMap;
+map<std::string, std::string> IncludeToSourceMap;
+map<std::string, bool>    IncludeAlternateDecisionMap;
 
 char                    queued_files [MAX_QUEUE] [_MAX_PATH] ;
 char                    dir [_MAX_PATH] ;
@@ -497,12 +500,12 @@ SCROLLKEYS key2scroll [] =
   { -1,       -1,         -1          }
 } ;
 
-string StripFilePath (const string& str)
+std::string StripFilePath (const std::string& str)
 {
-  string::size_type pos  = str.find_last_of ("\\/") ;
-  if (pos == string::npos)
+  std::string::size_type pos  = str.find_last_of ("\\/") ;
+  if (pos == std::string::npos)
     return (str) ;
-  return string (str, pos + 1) ;
+  return std::string(str, pos + 1);
 }
 
 bool StripPathComponent (char *path, int number)
@@ -611,7 +614,7 @@ void SetCaption (LPCSTR str)
 #ifndef DEVELOPMENT
   if (Session.GetBackendState() == kRendering && InputFileName.size () > 0)
   {
-    string filename = StripFilePath (InputFileName) ;
+    std::string filename = StripFilePath (InputFileName) ;
     if (strstr (str, filename.c_str ()) != NULL)
     {
       // if the filename is in the caption already, we're probably rendering
@@ -632,7 +635,7 @@ void SetCaption (LPCSTR str)
 #else
   if (Session.GetBackendState() == kRendering && InputFileName.size () > 0)
   {
-    string filename = StripFilePath (InputFileName) ;
+    std::string filename = StripFilePath (InputFileName) ;
     if (strstr (str, filename.c_str ()) != NULL)
     {
       // if the filename is in the caption already, we're probably rendering
@@ -1371,7 +1374,7 @@ bool inferHome (void)
   return (true) ;
 }
 
-string getHome(const char* ver)
+std::string getHome(const char* ver)
 {
   char        str[_MAX_PATH];
   HKEY        key ;
@@ -1385,7 +1388,7 @@ string getHome(const char* ver)
     {
       RegCloseKey (key) ;
       appendPathSeparator(str);
-      return string(str);
+      return std::string(str);
     }
     RegCloseKey (key) ;
   }
@@ -1395,11 +1398,11 @@ string getHome(const char* ver)
     {
       RegCloseKey (key) ;
       appendPathSeparator(str);
-      return string(str);
+      return std::string(str);
     }
     RegCloseKey (key) ;
   }
-  return string();
+  return std::string();
 }
 
 bool copyEditSettings(const char* ver)
@@ -2417,7 +2420,7 @@ void render_stopped (void)
     }
     if (!running_demo && !demo_mode && !benchmark_mode && !rendering_insert_menu && !running_benchmark && !was_insert_render)
     {
-      string ofn = UCS2toSysString (Session.GetOutputFilename());
+      std::string ofn = UCS2toSysString (Session.GetOutputFilename());
       if (output_to_file && ofn.size () != 0)
       {
         sprintf (str, "Output -> '%s'", ofn.c_str ()) ;
@@ -2494,7 +2497,7 @@ void render_stopped (void)
       FileType ft = get_file_type(it->c_str());
       if (ft < fileFirstImageType || ft > fileLastImageType)
       {
-        pair<map<string, string>::iterator, bool> result = IncludeToSourceMap.insert(pair<string, string> (*it, InputFileName));
+        pair<map<std::string, std::string>::iterator, bool> result = IncludeToSourceMap.insert(pair<std::string, std::string> (*it, InputFileName));
         if (result.second == false)
           result.first->second = InputFileName;
       }
@@ -3869,12 +3872,12 @@ LRESULT CALLBACK PovMainWndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM 
            _strlwr(fn);
 
            // see if we have a previous decision recorded for this file.
-           map<string, bool>::const_iterator altit = IncludeAlternateDecisionMap.find(fn);
+           map<std::string, bool>::const_iterator altit = IncludeAlternateDecisionMap.find(fn);
            if (altit == IncludeAlternateDecisionMap.end() || altit->second == true)
            {
              // either there is no decision recorded, or the decision was 'yes'
              // in either case we need to find the alternate filename
-             map<string, string>::const_iterator it = IncludeToSourceMap.find(fn);
+             map<std::string, std::string>::const_iterator it = IncludeToSourceMap.find(fn);
              if (it != IncludeToSourceMap.end())
              {
                // we've found the alternate filename. do we need to ask the user about it?
@@ -3885,7 +3888,7 @@ LRESULT CALLBACK PovMainWndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM 
                  {
                    case IDYES:
                      // record the decision
-                     IncludeAlternateDecisionMap.insert(pair<string, bool>(fn, true));
+                     IncludeAlternateDecisionMap.insert(pair<std::string, bool>(fn, true));
                      strcpy(source_file_name, it->second.c_str());
                      break;
 
@@ -3896,7 +3899,7 @@ LRESULT CALLBACK PovMainWndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 
                    case IDNO:
                      // record the decision
-                     IncludeAlternateDecisionMap.insert(pair<string, bool>(fn, false));
+                     IncludeAlternateDecisionMap.insert(pair<std::string, bool>(fn, false));
                      break;
 
                    case IDCANCEL:
@@ -5080,6 +5083,7 @@ __int64 LZTimerRawCount (void)
 #endif // #ifdef _MSC_VER
 
 }
+// end of namespace povwin
 
 static void __cdecl newhandler (void)
 {
@@ -5529,10 +5533,10 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
       if (debugging)
         debug_output("no pvengine.ini: seeing if there is a %s ini\n", *oldVer) ;
 
-      string str(getHome(*oldVer));
+      std::string str(getHome(*oldVer));
       if (str.empty() == false)
       {
-        string oldINIpath = str + "ini\\pvengine.ini";
+        std::string oldINIpath = str + "ini\\pvengine.ini";
         if (!fileExists(oldINIpath.c_str()))
           continue;
 

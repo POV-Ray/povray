@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -50,8 +50,17 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/image/gif.h"
 
-// Standard C++ header files
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <vector>
+
+// POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
+#include "base/image/colourspace.h"
+#include "base/image/encoding.h"
+#include "base/image/image.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -63,15 +72,15 @@ namespace Gif
 {
 
 // TODO: make sure we don't leak an image object if we throw an exception.
-Image *Read (IStream *file, const Image::ReadOptions& options, bool IsPOTFile)
+Image *Read (IStream *file, const ImageReadOptions& options, bool IsPOTFile)
 {
-    int                             data ;
-    int                             width;
-    int                             height;
-    Image                           *image = nullptr;
-    unsigned char                   buffer[256];
-    vector<Image::RGBAMapEntry>     colormap ;
-    int                             alphaIdx = -1; // assume no transparency color
+    int                                 data;
+    int                                 width;
+    int                                 height;
+    Image*                              image = nullptr;
+    unsigned char                       buffer[256];
+    std::vector<Image::RGBAMapEntry>    colormap;
+    int                                 alphaIdx = -1; // assume no transparency color
 
     // GIF files used to have no clearly defined gamma by default, but a W3C recommendation exists for them to use sRGB.
     // Anyway, use whatever the user has chosen as default.
@@ -173,7 +182,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options, bool IsPOTFile)
 
                 width  = (int) buffer[4] | ((int) buffer[5] << 8);
                 height = (int) buffer[6] | ((int) buffer[7] << 8);
-                image = Image::Create (width, height, Image::Colour_Map, colormap) ;
+                image = Image::Create (width, height, ImageDataType::Colour_Map, colormap) ;
                 // [CLi] GIF only uses full opacity or full transparency, so premultiplied vs. non-premultiplied alpha is not an issue
 
                 /* Get bytes */
@@ -201,7 +210,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options, bool IsPOTFile)
     if ((width & 0x01) != 0)
         throw POV_EXCEPTION(kFileDataErr, "Invalid width for POT file");
     int newWidth = width / 2 ;
-    Image *newImage = Image::Create (newWidth, height, Image::Gray_Int16) ;
+    Image *newImage = Image::Create (newWidth, height, ImageDataType::Gray_Int16) ;
     for (int y = 0 ; y < height ; y++)
         for (int x = 0 ; x < newWidth ; x++)
             newImage->SetGrayValue (x, y, (unsigned int) image->GetIndexedValue (x, y) << 8 | image->GetIndexedValue (x + newWidth, y)) ;
@@ -211,7 +220,9 @@ Image *Read (IStream *file, const Image::ReadOptions& options, bool IsPOTFile)
     return (newImage) ;
 }
 
-} // end of namespace Gif
+}
+// end of namespace Gif
 
 }
+// end of namespace pov_base
 

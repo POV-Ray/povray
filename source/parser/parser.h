@@ -40,20 +40,40 @@
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "parser/configparser.h"
+#include "parser/parser_fwd.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <memory>
 #include <string>
+#include <vector>
 
-#include "base/image/image.h"
-#include "base/messenger.h"
-#include "base/stringutilities.h"
-#include "base/textstream.h"
+// Boost headers
+#include <boost/intrusive_ptr.hpp>
+
+// POV-Ray header files (base module)
+#include "base/base_fwd.h"
+#include "base/messenger_fwd.h"
+#include "base/povassert.h"
+#include "base/stringtypes.h"
+#include "base/textstream_fwd.h"
 #include "base/textstreambuffer.h"
+#include "base/image/image_fwd.h"
 
+// POV-Ray header files (core module)
+#include "core/core_fwd.h"
 #include "core/material/blendmap.h"
 #include "core/material/pigment.h"
 #include "core/material/warp.h"
+#include "core/scene/atmosphere_fwd.h"
 #include "core/scene/camera.h"
 
+// POV-Ray header files (VM module)
+#include "vm/fnpovfpu_fwd.h"
+
+// POV-Ray header files (parser module)
 #include "parser/fncode.h"
 #include "parser/parsertypes.h"
 #include "parser/reservedwords.h"
@@ -65,18 +85,15 @@ namespace pov
 
 class Blob_Element;
 struct ContainedByShape;
-struct Fog_Struct;
 struct GenericSpline;
 class ImageData;
 class Mesh;
 struct PavementPattern;
-struct Rainbow_Struct;
-class SceneData;
-struct Skysphere_Struct;
 struct TilingPattern;
 struct TrueTypeFont;
 
 }
+// end of namespace pov
 
 namespace pov_parser
 {
@@ -155,7 +172,7 @@ const int TOKEN_OVERFLOW_RESET_COUNT = 2500;
                         }
 
 
-struct ExperimentalFlags
+struct ExperimentalFlags final
 {
     bool    backsideIllumination    : 1;
     bool    functionHf              : 1;
@@ -180,7 +197,7 @@ struct ExperimentalFlags
     {}
 };
 
-struct BetaFlags
+struct BetaFlags final
 {
     bool    realTimeRaytracing  : 1;
     bool    videoCapture        : 1;
@@ -195,34 +212,20 @@ struct BetaFlags
 * Global typedefs
 ******************************************************************************/
 
-class Parser
+class Parser final
 {
     public:
 
         using Options = ParserOptions;
 
-        struct FileResolver
-        {
-            virtual ~FileResolver() {}
-            virtual UCS2String FindFile(UCS2String parsedFileName, unsigned int fileType) = 0;
-            virtual IStream* ReadFile(const UCS2String& parsedFileName, const UCS2String& foundFileName, unsigned int fileType) = 0;
-            virtual OStream* CreateFile(const UCS2String& parsedFileName, unsigned int fileType, bool append) = 0;
-        };
-
-        struct ProgressReporter
-        {
-            virtual ~ProgressReporter() {}
-            virtual void ReportProgress(POV_LONG tokenCount) = 0;
-        };
-
-        class DebugTextStreamBuffer : public TextStreamBuffer
+        class DebugTextStreamBuffer final : public TextStreamBuffer
         {
             public:
                 DebugTextStreamBuffer(GenericMessenger& m);
-                ~DebugTextStreamBuffer();
+                virtual ~DebugTextStreamBuffer() override;
             protected:
-                virtual void lineoutput(const char *str, unsigned int chars);
-                virtual void directoutput(const char *str, unsigned int chars);
+                virtual void lineoutput(const char *str, unsigned int chars) override;
+                virtual void directoutput(const char *str, unsigned int chars) override;
 
                 GenericMessenger& mMessenger;
         };
@@ -230,7 +233,7 @@ class Parser
         // tokenize.h/tokenize.cpp
 
         /// Structure holding information about the current token
-        struct Token_Struct : MessageContext
+        struct Token_Struct final : MessageContext
         {
             RawToken raw;
             ConstStreamPtr sourceFile;
@@ -256,7 +259,7 @@ class Parser
             /// Token category if applicable, otherwise equal to @ref mTrueTokenId.
             TokenId GetCategorizedTokenId() const;
 
-            virtual UCS2String GetFileName() const override { return sourceFile->Name(); }
+            virtual UCS2String GetFileName() const override;
             virtual POV_LONG GetLine() const override { return raw.lexeme.position.line; }
             virtual POV_LONG GetColumn() const override { return raw.lexeme.position.column; }
             virtual POV_OFF_T GetOffset() const override { return raw.lexeme.position.offset; }
@@ -267,7 +270,7 @@ class Parser
             TokenId mCategorizedTokenId;        ///< Token category if applicable, otherwise equal to @ref mTrueTokenId.
         };
 
-        struct LValue
+        struct LValue final
         {
             TokenId*     numberPtr;
             void**       dataPtr;
@@ -277,34 +280,34 @@ class Parser
             bool         optional      : 1;
         };
 
-        struct MacroParameter
+        struct MacroParameter final
         {
             char*   name;
             bool    optional;
         };
 
-        struct Macro : public Assignable
+        struct Macro final : public Assignable
         {
             Macro(const char *);
-            virtual ~Macro();
+            virtual ~Macro() override;
             virtual Macro* Clone() const override { POV_PARSER_PANIC(); return nullptr; }
             char *Macro_Name;
             RawTokenizer::ColdBookmark source;
             LexemePosition endPosition; ///< The position _after_ the `#` in the terminating `#end` directive.
-            vector<MacroParameter> parameters;
+            std::vector<MacroParameter> parameters;
             unsigned char *Cache;
             size_t CacheSize;
         };
 
-        struct POV_ARRAY : public Assignable
+        struct POV_ARRAY final : public Assignable
         {
             static const int kMaxDimensions = 5;
             int maxDim;                             ///< Index of highest dimension.
             TokenId Type_;
             int Sizes[kMaxDimensions];
             size_t Mags[kMaxDimensions];
-            vector<void*> DataPtrs;
-            vector<TokenId> Types;
+            std::vector<void*> DataPtrs;
+            std::vector<TokenId> Types;
             bool resizable : 1;
             bool mixedType : 1;
             bool IsInitialized() const;
@@ -318,21 +321,21 @@ class Parser
             void Shrink();
             POV_ARRAY() = default;
             POV_ARRAY(const POV_ARRAY& obj);
-            virtual ~POV_ARRAY();
+            virtual ~POV_ARRAY() override;
             virtual POV_ARRAY* Clone() const override;
         };
 
-        struct POV_PARAM
+        struct POV_PARAM final
         {
             TokenId *NumberPtr;
             void **DataPtr;
         };
 
-        struct DATA_FILE : public Assignable
+        struct DATA_FILE final : public Assignable
         {
-            shared_ptr<RawTokenizer>    inTokenizer;
-            RawToken                    inToken;
-            shared_ptr<pov_base::OTextStream> Out_File;
+            std::shared_ptr<RawTokenizer>           inTokenizer;
+            RawToken                                inToken;
+            std::shared_ptr<pov_base::OTextStream>  Out_File;
             bool inUngetToken   : 1;
             bool busyParsing    : 1; ///< `true` if parsing a statement related to the file, `false` otherwise.
 
@@ -359,18 +362,18 @@ class Parser
         };
 
         /// @todo Refactor code to use @ref FunctionVM::CustomFunction instead.
-        struct AssignableFunction : public Assignable
+        struct AssignableFunction final : public Assignable
         {
-            FUNCTION_PTR                fn;
-            intrusive_ptr<FunctionVM>   vm;
-            AssignableFunction(const AssignableFunction& obj) : fn(obj.vm->CopyFunction(obj.fn)), vm(obj.vm) {}
-            AssignableFunction(FUNCTION_PTR fn, intrusive_ptr<FunctionVM> vm) : fn(fn), vm(vm) {}
-            virtual ~AssignableFunction() { vm->DestroyFunction(fn); }
+            FUNCTION_PTR                        fn;
+            boost::intrusive_ptr<FunctionVM>    vm;
+            AssignableFunction(const AssignableFunction& obj);
+            AssignableFunction(FUNCTION_PTR fn, boost::intrusive_ptr<FunctionVM> vm);
+            virtual ~AssignableFunction() override;
             virtual AssignableFunction* Clone() const override { return new AssignableFunction(*this); }
         };
 
         // constructor
-        Parser(shared_ptr<SceneData> sd, const Options& opts,
+        Parser(std::shared_ptr<SceneData> sd, const Options& opts,
                GenericMessenger& mf, FileResolver& fnr, ProgressReporter& pr, TraceThreadData& td);
 
         ~Parser();
@@ -419,7 +422,7 @@ class Parser
         ObjectPtr Parse_Object_Mods (ObjectPtr Object);
 
         ObjectPtr Parse_Object (void);
-        void Parse_Bound_Clip (vector<ObjectPtr>& objects, bool notexture = true);
+        void Parse_Bound_Clip (std::vector<ObjectPtr>& objects, bool notexture = true);
         void Parse_Default (void);
         void Parse_Declare (bool is_local, bool after_hash);
         void Parse_Matrix (MATRIX Matrix);
@@ -452,10 +455,10 @@ class Parser
 
         /// @param[in]  formalFileName  Name by which the file is known to the user.
         /// @param[out] actualFileName  Name by which the file is known to the parsing computer.
-        shared_ptr<IStream> Locate_File(const UCS2String& formalFileName, unsigned int stype, UCS2String& actualFileName, bool err_flag = false);
+        std::shared_ptr<IStream> Locate_File(const UCS2String& formalFileName, unsigned int stype, UCS2String& actualFileName, bool err_flag = false);
 
         OStream *CreateFile(const UCS2String& filename, unsigned int stype, bool append);
-        Image *Read_Image(int filetype, const UCS2 *filename, const Image::ReadOptions& options);
+        Image *Read_Image(int filetype, const UCS2 *filename, const ImageReadOptions& options);
 
         // tokenize.h/tokenize.cpp
         void Get_Token (void);
@@ -486,7 +489,7 @@ class Parser
         const LexemePosition& CurrentFilePosition() const;
         bool HaveCurrentMessageContext() const;
         const MessageContext& CurrentMessageContext() const;
-        void SetInputStream(const shared_ptr<IStream>& stream);
+        void SetInputStream(const std::shared_ptr<IStream>& stream);
         RawTokenizer::HotBookmark GetHotBookmark();
         bool GoToBookmark(const RawTokenizer::HotBookmark& bookmark);
 
@@ -512,10 +515,10 @@ class Parser
         void Parse_Pigment (PIGMENT **);
         void Parse_Tnormal (TNORMAL **);
         void Parse_Finish (FINISH **);
-        void Parse_Media (vector<Media>&);
+        void Parse_Media (std::vector<Media>&);
         void Parse_Interior (InteriorPtr&);
         void Parse_Media_Density_Pattern (PIGMENT **);
-        void Parse_Media_Density_Pattern (vector<PIGMENT*>&);
+        void Parse_Media_Density_Pattern (std::vector<PIGMENT*>&);
         Fog_Struct *Parse_Fog (void);
         Rainbow_Struct *Parse_Rainbow (void);
         Skysphere_Struct *Parse_Skysphere(void);
@@ -531,12 +534,12 @@ class Parser
         void Parse_Colour (MathColour& colour);
         void Parse_Wavelengths (MathColour& colour);
         template<typename DATA_T> void Parse_BlendMapData (BlendMapTypeId Blend_Type, DATA_T& rData);
-        template<typename MAP_T> shared_ptr<MAP_T> Parse_Blend_Map (BlendMapTypeId Blend_Type, int Pat_Type);
-        template<typename MAP_T> shared_ptr<MAP_T> Parse_Colour_Map (void);
+        template<typename MAP_T> std::shared_ptr<MAP_T> Parse_Blend_Map (BlendMapTypeId Blend_Type, int Pat_Type);
+        template<typename MAP_T> std::shared_ptr<MAP_T> Parse_Colour_Map (void);
         template<typename DATA_T> void Parse_BlendListData (BlendMapTypeId Blend_Type, DATA_T& rData);
         template<typename DATA_T> void Parse_BlendListData_Default (const ColourBlendMapData& Def_Entry, BlendMapTypeId Blend_Type, DATA_T& rData);
-        template<typename MAP_T> shared_ptr<MAP_T> Parse_Blend_List (int Count, ColourBlendMapConstPtr Def_Map, BlendMapTypeId Blend_Type);
-        template<typename MAP_T> shared_ptr<MAP_T> Parse_Item_Into_Blend_List (BlendMapTypeId Blend_Type);
+        template<typename MAP_T> std::shared_ptr<MAP_T> Parse_Blend_List (int Count, ColourBlendMapConstPtr Def_Map, BlendMapTypeId Blend_Type);
+        template<typename MAP_T> std::shared_ptr<MAP_T> Parse_Item_Into_Blend_List (BlendMapTypeId Blend_Type);
         GenericSpline *Parse_Spline (void);
 
         /// Parses a FLOAT.
@@ -574,7 +577,7 @@ class Parser
         FUNCTION_PTR Parse_FunctionOrContent(void);
         void Parse_FunctionOrContentList(GenericScalarFunctionPtr* apFn, unsigned int count, bool mandatory = true);
         FUNCTION_PTR Parse_DeclareFunction(TokenId *token_id, const char *fn_name, bool is_local);
-        intrusive_ptr<FunctionVM> GetFunctionVM() const;
+        boost::intrusive_ptr<FunctionVM> GetFunctionVM() const;
 
         // parsestr.h/parsestr.cpp
         char *Parse_C_String(bool pathname = false);
@@ -587,7 +590,6 @@ class Parser
         char *UCS2_To_String(const UCS2 *str);
 
         static UCS2 *UCS2_strcat(UCS2 *s1, const UCS2 *s2);
-        static int UCS2_strcmp(const UCS2 *s1, const UCS2 *s2);
         static void UCS2_strcpy(UCS2 *s1, const UCS2 *s2);
         static void UCS2_strncpy(UCS2 *s1, const UCS2 *s2, int n);
         void UCS2_strupr(UCS2 *str); // not static because it may issue a parse warning
@@ -603,7 +605,7 @@ class Parser
         bool expr_ret(ExprNode *&current, int stage, int op);
         bool expr_err(ExprNode *&current, int stage, int op);
 
-        shared_ptr<SceneData> sceneData;
+        std::shared_ptr<SceneData> sceneData;
 
     private:
 
@@ -616,19 +618,19 @@ class Parser
 
         Token_Struct        mToken;
 
-        struct BraceStackEntry : LexemePosition, MessageContext
+        struct BraceStackEntry final : LexemePosition, MessageContext
         {
             TokenId         openToken;
             ConstStreamPtr  file;
             BraceStackEntry(const Token_Struct& token) :
                 LexemePosition(token.raw.lexeme.position), openToken(token.GetTrueTokenId()), file(token.sourceFile) {}
-            virtual UCS2String GetFileName() const override { return file->Name(); }
+            virtual UCS2String GetFileName() const override;
             virtual POV_LONG GetLine() const override { return line; }
             virtual POV_LONG GetColumn() const override { return column; }
             virtual POV_OFF_T GetOffset() const override { return offset; }
         };
 
-        intrusive_ptr<FunctionVM> mpFunctionVM;
+        boost::intrusive_ptr<FunctionVM> mpFunctionVM;
         FPUContext *fnVMContext;
 
         bool Had_Max_Trace_Level;
@@ -648,7 +650,7 @@ class Parser
         /// true if a #version statement is being parsed
         bool parsingVersionDirective;
 
-        vector<BraceStackEntry> maBraceStack;
+        std::vector<BraceStackEntry> maBraceStack;
         bool Destroying_Frame;
 
         Camera Default_Camera;
@@ -676,7 +678,7 @@ class Parser
         POV_LONG    mTokenCount;
         int         mTokensSinceLastProgressReport;
 
-        struct IncludeStackEntry
+        struct IncludeStackEntry final
         {
             RawTokenizer::HotBookmark   returnToBookmark;
             int                         condStackSize;
@@ -686,9 +688,9 @@ class Parser
                 returnToBookmark(rtb), condStackSize(css), braceStackSize(bss)
             {}
         };
-        vector<IncludeStackEntry> maIncludeStack;
+        std::vector<IncludeStackEntry> maIncludeStack;
 
-        struct CS_ENTRY
+        struct CS_ENTRY final
         {
             COND_TYPE Cond_Type;
             DBL Switch_Value;
@@ -703,7 +705,7 @@ class Parser
             ~CS_ENTRY() {}
         };
 
-        vector<CS_ENTRY> Cond_Stack;
+        std::vector<CS_ENTRY> Cond_Stack;
         bool Skipping, Inside_Ifdef, Inside_MacroDef, Parsing_Directive, parseRawIdentifiers, parseOptionalRValue;
 
         bool Got_EOF; // WARNING: Changes to the use of this variable are very dangerous as it is used in many places assuming certain non-obvious side effects! [trf]
@@ -789,7 +791,7 @@ class Parser
         bool Parse_Camera_Mods(Camera& Cam);
         void Parse_Frame();
 
-        void Link(ObjectPtr New_Object, vector<ObjectPtr>& Object_List_Root);
+        void Link(ObjectPtr New_Object, std::vector<ObjectPtr>& Object_List_Root);
         void Link_To_Frame(ObjectPtr Object);
         void Post_Process(ObjectPtr Object, ObjectPtr Parent);
 
@@ -801,7 +803,7 @@ class Parser
 
         ObjectPtr Parse_Isosurface();
         ObjectPtr Parse_Parametric();
-        void ParseContainedBy(shared_ptr<ContainedByShape>& container, ObjectPtr obj);
+        void ParseContainedBy(std::shared_ptr<ContainedByShape>& container, ObjectPtr obj);
 
         ObjectPtr Parse_Sphere_Sweep(void);
         bool Parse_Three_UVCoords(Vector2d& UV1, Vector2d& UV2, Vector2d& UV3);
@@ -844,8 +846,8 @@ class Parser
         PatternPtr ParsePotentialPattern();
         PatternPtr ParseSlopePattern();
         template<typename PATTERN_T> PatternPtr ParseSpiralPattern();
-        void VerifyPavementPattern(shared_ptr<PavementPattern> pattern);
-        void VerifyTilingPattern(shared_ptr<TilingPattern> pattern);
+        void VerifyPavementPattern(std::shared_ptr<PavementPattern> pattern);
+        void VerifyTilingPattern(std::shared_ptr<TilingPattern> pattern);
         void VerifyPattern(PatternPtr pattern);
         void Parse_Bump_Map (TNORMAL *Tnormal);
         void Parse_Image_Map (PIGMENT *Pigment);
@@ -931,5 +933,6 @@ class Parser
 };
 
 }
+// end of namespace pov_parser
 
 #endif // POVRAY_PARSER_PARSE_H

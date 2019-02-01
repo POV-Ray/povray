@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,27 +33,36 @@
 ///
 //******************************************************************************
 
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "backend/povray.h"
+
+// C++ variants of C standard header files
+#include <cstdlib>
+
+// C++ standard header files
+#include <string>
+
+// Boost header files
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 
-#include <cstdlib>
+// POV-Ray header files (base module)
+#include "base/platformbase.h"
+#include "base/pov_err.h"
+#include "base/stringutilities.h"
+#include "base/timer.h"
+#include "base/types.h"
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/povray.h"
+// POV-Ray header files (core module)
+#include "core/material/noise.h"
+#include "core/material/pattern.h"
 
+// POV-Ray header files (POVMS module)
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
 #include "povms/povmsutil.h"
 
-#include "base/platformbase.h"
-#include "base/pov_err.h"
-#include "base/timer.h"
-#include "base/types.h"
-
-#include "core/material/noise.h"
-#include "core/material/pattern.h"
-
+// POV-Ray header files (backend module)
 #include "backend/control/renderbackend.h"
 #include "backend/support/task.h"
 
@@ -508,7 +517,7 @@ void BuildInitInfo(POVMSObjectPtr msg)
     {
 #ifdef TRY_OPTIMIZED_NOISE
         const OptimizedNoiseInfo* pNoise = GetRecommendedOptimizedNoise();
-        std::string noiseGenInfo = "Noise generator: " + std::string(pNoise->name) + " (" + ::string(pNoise->info) + ")";
+        std::string noiseGenInfo = "Noise generator: " + std::string(pNoise->name) + " (" + std::string(pNoise->info) + ")";
         err = POVMSAttr_New(&attr);
         if (err == kNoErr)
         {

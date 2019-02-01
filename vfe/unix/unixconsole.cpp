@@ -37,6 +37,10 @@
 #include <csignal>
 #include <cstdlib>
 
+// C++ standard header files
+#include <memory>
+#include <string>
+
 // Other library header files
 #include <termios.h>
 #include <unistd.h>
@@ -56,8 +60,9 @@
 
 namespace pov_frontend
 {
-    shared_ptr<Display> gDisplay;
+    std::shared_ptr<Display> gDisplay;
 }
+// end of namespace pov_frontend
 
 using namespace vfe;
 using namespace vfePlatform;
@@ -174,7 +179,7 @@ static void PrintStatus (vfeSession *session)
     // TODO -- when invoked while processing "--help" command-line switch,
     //         GNU/Linux customs would be to print to stdout (among other differences).
 
-    string str;
+    std::string str;
     vfeSession::MessageType type;
     static vfeSession::MessageType lastType = vfeSession::mUnclassified;
 
@@ -303,12 +308,12 @@ static void PauseWhenDone(vfeSession *session)
     GetRenderWindow()->PauseWhenDoneNotifyEnd();
 }
 
-static ReturnValue PrepareBenchmark(vfeSession *session, vfeRenderOptions& opts, string& ini, string& pov, int argc, char **argv)
+static ReturnValue PrepareBenchmark(vfeSession *session, vfeRenderOptions& opts, std::string& ini, std::string& pov, int argc, char **argv)
 {
     // parse command-line options
     while (*++argv)
     {
-        string s = string(*argv);
+        std::string s = std::string(*argv);
         boost::to_lower(s);
         // set number of threads to run the benchmark
         if (boost::starts_with(s, "+wt") || boost::starts_with(s, "-wt"))
@@ -372,7 +377,7 @@ Press <Enter> to continue or <Ctrl-C> to abort.\n\
         Delay(20);
     }
 
-    string basename = UCS2toSysString(session->CreateTemporaryFile());
+    std::string basename = UCS2toSysString(session->CreateTemporaryFile());
     ini = basename + ".ini";
     pov = basename + ".pov";
     if (pov::Write_Benchmark_File(pov.c_str(), ini.c_str()))
@@ -390,7 +395,7 @@ Press <Enter> to continue or <Ctrl-C> to abort.\n\
     return RETURN_OK;
 }
 
-static void CleanupBenchmark(vfeUnixSession *session, string& ini, string& pov)
+static void CleanupBenchmark(vfeUnixSession *session, std::string& ini, std::string& pov)
 {
     fprintf(stderr, "%s: removing %s\n", PACKAGE, ini.c_str());
     session->DeleteTemporaryFile(SysToUCS2String(ini.c_str()));
@@ -405,8 +410,8 @@ int main (int argc, char **argv)
     vfeRenderOptions  opts;
     ReturnValue       retval = RETURN_OK;
     bool              running_benchmark = false;
-    string            bench_ini_name;
-    string            bench_pov_name;
+    std::string       bench_ini_name;
+    std::string       bench_pov_name;
     sigset_t          sigset;
     boost::thread    *sigthread;
     char **           argv_copy=argv; /* because argv is updated later */
@@ -512,7 +517,7 @@ int main (int argc, char **argv)
     if (running_benchmark)
     {
         // read only the provided INI file and set minimal lib paths
-        opts.AddLibraryPath(string(POVLIBDIR "/include"));
+        opts.AddLibraryPath(std::string(POVLIBDIR "/include"));
         opts.AddINI(bench_ini_name.c_str());
         opts.SetSourceFile(bench_pov_name.c_str());
     }

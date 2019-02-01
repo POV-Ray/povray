@@ -51,7 +51,8 @@
 //  (none at the moment)
 
 // POV-Ray header files (parser module)
-#include "parser/parser.h"
+#include "parser/parser_fwd.h"
+#include "parser/parsertypes.h"
 
 // POV-Ray header files (backend module)
 #include "backend/support/task.h"
@@ -62,7 +63,7 @@ namespace pov
 using namespace pov_base;
 using namespace pov;
 
-class ParserTask : public SceneTask, public pov_parser::Parser::FileResolver, public pov_parser::Parser::ProgressReporter
+class ParserTask final : public SceneTask, public pov_parser::FileResolver, public pov_parser::ProgressReporter
 {
 public:
 
@@ -77,7 +78,7 @@ public:
     void SendFatalError(Exception& e);
 
     /// @}
-    /// @name @ref Parser::FileResolver related.
+    /// @name @ref pov_parser::FileResolver related.
     /// @{
 
     virtual UCS2String FindFile(UCS2String parsedFileName, unsigned int fileType) override;
@@ -85,7 +86,7 @@ public:
     virtual OStream* CreateFile(const UCS2String& parsedFileName, unsigned int fileType, bool append) override;
 
     /// @}
-    /// @name @ref Parser::ProgressReporter related.
+    /// @name @ref pov_parser::ProgressReporter related.
     /// @{
 
     static constexpr auto kMinProgressReportInterval = 1000;    /// Minimum delay between progress reports (in milliseconds).
@@ -101,6 +102,7 @@ private:
     POV_LONG                            mLastProgressElapsedTime;
 };
 
-} // end of namespace pov
+}
+// end of namespace pov
 
 #endif // POVRAY_BACKEND_PARSERTASK_H

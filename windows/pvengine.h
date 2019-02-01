@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -63,8 +63,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <string>
+
 #include "pvfrontend.h"
-#include "backend/frame.h"
 #include "backend/povray.h"
 
 #include <time.h>
@@ -258,7 +259,7 @@ typedef struct
   ushort      menuBarBorder ;
 } pvncStruct ;
 
-class AutoLock
+class AutoLock final
 {
 public:
   inline AutoLock (CRITICAL_SECTION& CriticalSection) { m_CriticalSection = &CriticalSection ; EnterCriticalSection (m_CriticalSection) ; }
@@ -327,7 +328,7 @@ FileType get_file_type (const char *filename) ;
 bool is_non_primary_file(const char *filename) ;
 void read_INI_settings (void) ;
 void write_INI_settings (bool noreset = false) ;
-void cloneOldIni(const std::string oldPath, const std::string newPath);
+void cloneOldIni(const std::string& oldPath, const std::string& newPath);
 void update_menu_for_render (bool rendering) ;
 void update_queue_status (bool write_files) ;
 void draw_ordinary_listbox (DRAWITEMSTRUCT *d, bool fitpath) ;
@@ -594,6 +595,6 @@ uchar dither8x8 [64] =
 #endif // #if DECLARE_TABLES
 
 }
+// end of namespace povwin
 
 #endif // PVENGINE_H_INCLUDED
-

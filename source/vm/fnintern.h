@@ -12,7 +12,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,28 +37,37 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_BACKEND_FNINTERN_H
-#define POVRAY_BACKEND_FNINTERN_H
+#ifndef POVRAY_VM_FNINTERN_H
+#define POVRAY_VM_FNINTERN_H
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "vm/configvm.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+// POV-Ray header files (core module)
+//  (none at the moment)
+
+// POV-Ray header files (VM module)
+#include "vm/fnpovfpu_fwd.h"
+
 namespace pov
 {
 
-class FPUContext;
-
-typedef struct
+struct Trap final
 {
     DBL (*fn)(FPUContext *ctx, DBL *ptr, unsigned int fn);
     unsigned int parameter_cnt;
-} Trap;
+};
 
-typedef struct
+struct TrapS final
 {
     void (*fn)(FPUContext *ctx, DBL *ptr, unsigned int fn, unsigned int sp);
     unsigned int parameter_cnt;
-} TrapS;
+};
 
 extern const Trap POVFPU_TrapTable[];
 extern const TrapS POVFPU_TrapSTable[];
@@ -67,5 +76,6 @@ extern const unsigned int POVFPU_TrapTableSize;
 extern const unsigned int POVFPU_TrapSTableSize;
 
 }
+// end of namespace pov
 
-#endif // POVRAY_BACKEND_FNINTERN_H
+#endif // POVRAY_VM_FNINTERN_H

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,8 +36,16 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/scene/tracethreaddata.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <limits>
 
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/material/noise.h"
 #include "core/scene/scenedata.h"
 #include "core/shape/blob.h"
@@ -50,7 +58,7 @@
 namespace pov
 {
 
-TraceThreadData::TraceThreadData(shared_ptr<SceneData> sd, size_t seed) :
+TraceThreadData::TraceThreadData(std::shared_ptr<SceneData> sd, size_t seed) :
     sceneData(sd),
     qualityFlags(9),
     stochasticRandomGenerator(GetRandomDoubleGenerator(0.0,1.0)),
@@ -86,7 +94,7 @@ TraceThreadData::TraceThreadData(shared_ptr<SceneData> sd, size_t seed) :
 
     stochasticRandomGenerator->Seed(stochasticRandomSeedBase);
 
-    for(vector<LightSource *>::iterator it = sceneData->lightSources.begin(); it != sceneData->lightSources.end(); it++)
+    for(std::vector<LightSource *>::iterator it = sceneData->lightSources.begin(); it != sceneData->lightSources.end(); it++)
         lightSources.push_back(static_cast<LightSource *> (Copy_Object(*it)));
 
     // all of these are for photons
@@ -120,7 +128,7 @@ TraceThreadData::TraceThreadData(shared_ptr<SceneData> sd, size_t seed) :
 
 TraceThreadData::~TraceThreadData()
 {
-    for(vector<GenericFunctionContext*>::iterator i = functionContextPool.begin(); i != functionContextPool.end(); ++i)
+    for(std::vector<GenericFunctionContext*>::iterator i = functionContextPool.begin(); i != functionContextPool.end(); ++i)
         delete *i;
 
     POV_FREE(Blob_Coefficients);
@@ -130,7 +138,7 @@ TraceThreadData::~TraceThreadData()
     delete surfacePhotonMap;
     delete mediaPhotonMap;
     delete[] Blob_Intervals;
-    for(vector<LightSource *>::iterator it = lightSources.begin(); it != lightSources.end(); it++)
+    for(std::vector<LightSource *>::iterator it = lightSources.begin(); it != lightSources.end(); it++)
         Destroy_Object(*it);
 }
 
@@ -172,3 +180,4 @@ void TraceThreadData::AfterTile()
 }
 
 }
+// end of namespace pov

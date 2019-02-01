@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,6 +39,14 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/math/matrix.h"
 #include "core/scene/object.h"
 
@@ -65,7 +73,7 @@ class Plane;
 ///
 //******************************************************************************
 
-class Quadric : public ObjectBase
+class Quadric final : public ObjectBase
 {
     public:
         Vector3d Square_Terms;
@@ -75,19 +83,19 @@ class Quadric : public ObjectBase
         bool Automatic_Bounds;
 
         Quadric();
-        virtual ~Quadric();
+        virtual ~Quadric() override;
 
-        virtual ObjectPtr Copy();
+        virtual ObjectPtr Copy() override;
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-        virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
-        virtual void Translate(const Vector3d&, const TRANSFORM *);
-        virtual void Rotate(const Vector3d&, const TRANSFORM *);
-        virtual void Scale(const Vector3d&, const TRANSFORM *);
-        virtual void Transform(const TRANSFORM *);
-        virtual ObjectPtr Invert();
-        virtual void Compute_BBox();
+        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) override;
+        virtual bool Inside(const Vector3d&, TraceThreadData *) const override;
+        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const override;
+        virtual void Translate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Rotate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Scale(const Vector3d&, const TRANSFORM *) override;
+        virtual void Transform(const TRANSFORM *) override;
+        virtual ObjectPtr Invert() override;
+        virtual void Compute_BBox() override;
 
         static void Compute_Plane_Min_Max(const Plane *plane, Vector3d& Min, Vector3d& Max);
         void Compute_BBox(Vector3d& ClipMin, Vector3d& ClipMax);
@@ -102,5 +110,6 @@ class Quadric : public ObjectBase
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_QUADRIC_H

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,19 +33,29 @@
 ///
 //******************************************************************************
 
-#include <cassert>
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "backend/support/task.h"
+
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <stdexcept>
 
+// Boost header files
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/support/task.h"
-
+// POV-Ray header files (base module)
+#include "base/povassert.h"
 #include "base/timer.h"
 #include "base/types.h"
 
+// POV-Ray header files (core module)
+// POV-Ray header files (POVMS module)
+//  (none at the moment)
+
+// POV-Ray header files (backend module)
 #include "backend/control/messagefactory.h"
 #include "backend/scene/backendscenedata.h"
 
@@ -270,9 +280,15 @@ void Task::Cleanup ()
 #endif // POV_USE_DEFAULT_TASK_CLEANUP
 
 
-SceneTask::SceneTask(ThreadData *td, const boost::function1<void, Exception&>& f, const char* sn, shared_ptr<BackendSceneData> sd, RenderBackend::ViewId vid) :
+SceneTask::SceneTask(ThreadData *td, const boost::function1<void, Exception&>& f, const char* sn, std::shared_ptr<BackendSceneData> sd, RenderBackend::ViewId vid) :
     Task(td, f),
-    messageFactory(sd->warningLevel, sn, sd->backendAddress, sd->frontendAddress, sd->sceneId, vid)
+    mpMessageFactory(new MessageFactory(sd->warningLevel, sn, sd->backendAddress, sd->frontendAddress, sd->sceneId, vid))
 {}
 
+SceneTask::~SceneTask()
+{
+    delete mpMessageFactory;
 }
+
+}
+// end of namespace pov

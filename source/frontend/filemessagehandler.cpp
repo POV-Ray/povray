@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,8 +36,17 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/filemessagehandler.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
 
+// POV-Ray header files (POVMS module)
+//  (none at the moment)
+
+// POV-Ray header files (frontend module)
 #include "frontend/renderfrontend.h"
 
 // this must be the last file included
@@ -45,6 +54,10 @@
 
 namespace pov_frontend
 {
+
+using namespace pov_base;
+
+using std::list;
 
 FileMessageHandler::FileMessageHandler()
 {
@@ -138,3 +151,4 @@ Path FileMessageHandler::FindFilePath(const list<Path>& lps, const Path& f)
 }
 
 }
+// end of namespace pov_frontend

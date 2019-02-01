@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -63,11 +63,17 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/lighting/radiosity.h"
 
+// C++ variants of C standard header files
 #include <cstring>
+
+// C++ standard header files
 #include <algorithm>
 
+// POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
+#include "base/povassert.h"
 
+// POV-Ray header files (core module)
 #include "core/lighting/photons.h"
 #include "core/render/ray.h"
 #include "core/scene/scenedata.h"
@@ -81,6 +87,9 @@ namespace pov
 {
 
 using namespace pov_base;
+
+using std::min;
+using std::max;
 
 // #define RAD_GRADIENT 1 // [CLi] gradient seems to provide no gain at best, and may actually cause artifacts
 // #define SAW_METHOD 1
@@ -106,7 +115,7 @@ const int PRETRACE_STEP_LOADED = std::numeric_limits<signed char>::max();   // d
 #define BRILLIANCE_EPSILON 1e-5
 
 // structure used to gather weighted average during tree traversal
-struct WT_AVG
+struct WT_AVG final
 {
     MathColour Weights_Times_Illuminances;  // Aggregates during traversal
     DBL Weights;                            // Aggregates during traversal
@@ -152,7 +161,7 @@ inline QualityFlags GetRadiosityQualityFlags(const SceneRadiositySettings& rs, c
 
 static const unsigned int BLOCK_POOL_UNIT_SIZE = 32;
 
-struct RadiosityCache::BlockPool::PoolUnit
+struct RadiosityCache::BlockPool::PoolUnit final
 {
     PoolUnit *next;
     ot_block_struct blocks[BLOCK_POOL_UNIT_SIZE];
@@ -284,7 +293,7 @@ RadiosityRecursionSettings* SceneRadiositySettings::GetRecursionSettings(bool fi
     return recSettings;
 }
 
-RadiosityFunction::RadiosityFunction(shared_ptr<SceneData> sd, TraceThreadData *td, const SceneRadiositySettings& rs,
+RadiosityFunction::RadiosityFunction(std::shared_ptr<SceneData> sd, TraceThreadData *td, const SceneRadiositySettings& rs,
                                      RadiosityCache& rc, Trace::CooperateFunctor& cf, bool ft, const Vector3d& camera) :
     threadData(td),
     trace(sd, td, GetRadiosityQualityFlags(rs, QualityFlags(9)), cf, media, *this), // TODO FIXME - the only reason we can safely hard-code level-9 quality here is because radiosity happens to be disabled at lower settings
@@ -1239,19 +1248,6 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
     // If there is no root yet, create one.  This is a first-time-through
     if (octree.root == nullptr)
     {
-        // CLi moved C99_COMPATIBLE_RADIOSITY check from ot_newroot() to ot_ins() `nullptr` root handling section
-        // (no need to do this again and again for every new node inserted)
-#if(C99_COMPATIBLE_RADIOSITY == 0)
-        if((sizeof(int) != 4) || (sizeof(float) != 4))
-        {
-            throw POV_EXCEPTION_STRING("Radiosity is not available in this unofficial version because\n"
-                "the person who made this unofficial version available did not\n"
-                "properly check for compatibility on your platform.\n"
-                "Look for C99_COMPATIBLE_RADIOSITY in the source code to find\n"
-                "out how to correct this.");
-        }
-#endif
-
         // now is the time to lock the tree for modification
 #if POV_MULTITHREADED
         treeLock.lock();
@@ -1771,4 +1767,5 @@ bool RadiosityCache::AverageNearBlock(ot_block_struct *block, void *void_info)
     return true;
 }
 
-} // end of namespace
+}
+// end of namespace pov

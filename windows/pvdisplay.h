@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,6 +36,8 @@
 #ifndef __PVDISPLAY_H__
 #define __PVDISPLAY_H__
 
+#include <memory>
+
 #include <windows.h>
 
 #include "vfe.h"
@@ -46,18 +48,18 @@ namespace pov_frontend
   using namespace vfe;
   using namespace povwin;
 
-  extern shared_ptr<Display> gDisplay;
+  extern std::shared_ptr<Display> gDisplay;
 
   class WinDisplay : public vfeDisplay
   {
     public:
       WinDisplay(unsigned int w, unsigned int h, vfeSession *session, bool visible) :
           vfeDisplay(w, h, session, visible), m_Handle (NULL) {};
-      virtual ~WinDisplay() {} ;
+      virtual ~WinDisplay() override {} ;
       virtual bool CreateRenderWindow (void) = 0;
-      virtual void Close() = 0;
-      virtual void Show() = 0;
-      virtual void Hide() = 0;
+      virtual void Close() override = 0;
+      virtual void Show() override = 0;
+      virtual void Hide() override = 0;
       virtual bool TakeOver(WinDisplay *display) = 0;
       virtual bool IsVisible() { return (m_Handle != NULL) && (IsWindowVisible (m_Handle)) ; }
       virtual HWND GetHandle() { return m_Handle; }
@@ -70,33 +72,33 @@ namespace pov_frontend
       HWND m_AuxHandle;
   };
 
-  class WinLegacyDisplay : public WinDisplay
+  class WinLegacyDisplay final : public WinDisplay
   {
     public:
       WinLegacyDisplay(unsigned int w, unsigned int h, vfeSession *session, bool visible);
-      virtual ~WinLegacyDisplay();
+      virtual ~WinLegacyDisplay() override;
 
-      void Initialise();
-      void Close();
-      void Show();
-      void Hide();
-      bool TakeOver(WinDisplay *display);
-      void DrawPixel(unsigned int x, unsigned int y, const RGBA8& colour);
-      void DrawRectangleFrame(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8& colour);
-      void DrawFilledRectangle(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8& colour);
-      void DrawPixelBlock(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8 *colour);
-      void Clear();
-      void SetRenderState(bool IsRendering);
-      bool CreateRenderWindow (void);
+      void Initialise() override;
+      void Close() override;
+      void Show() override;
+      void Hide() override;
+      bool TakeOver(WinDisplay *display) override;
+      void DrawPixel(unsigned int x, unsigned int y, const RGBA8& colour) override;
+      void DrawRectangleFrame(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8& colour) override;
+      void DrawFilledRectangle(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8& colour) override;
+      void DrawPixelBlock(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8 *colour) override;
+      void Clear() override;
+      void SetRenderState(bool IsRendering) override;
+      bool CreateRenderWindow (void) override;
       static LRESULT CALLBACK StaticWindowProc (HWND handle, UINT message, WPARAM wParam, LPARAM lParam);
       static HPALETTE CreatePalette (RGBQUAD *rgb, int entries, bool use8bpp);
       BITMAPINFOHEADER& GetBMIH(void) { return m_Bitmap.header; }
       unsigned char *GetBitmapSurface() { return m_BitmapSurface; }
 
     protected:
-      LRESULT WindowProc (UINT message, WPARAM wParam, LPARAM lParam);
+      virtual LRESULT WindowProc (UINT message, WPARAM wParam, LPARAM lParam) override;
       void InvalidatePixelBlock(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2);
-      inline void SetPixel (unsigned int x, unsigned int y, uchar colour);
+      inline void SetPixel (unsigned int x, unsigned int y, unsigned char colour);
       inline void SetPixel (unsigned int x, unsigned int y, const RGBA8 *colour);
       unsigned char *m_BitmapSurface ;
       BitmapInfo m_Bitmap ;
@@ -135,5 +137,6 @@ namespace pov_frontend
     return dynamic_cast<WinDisplay *>(p) ;
   }
 }
+// end of namespace pov_frontend
 
 #endif
