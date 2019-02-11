@@ -438,7 +438,7 @@ struct CharsetUCS4 final : public CharsetUCS4Subset
     }
 };
 
-static const CharsetUCS4 kCharsetUCS4;
+static const auto kCharsetUCS4 = CharsetUCS4();
 
 //------------------------------------------------------------------------------
 
@@ -459,7 +459,7 @@ struct CharsetUCS2 final : public CharsetUCS4Subset
     }
 };
 
-static const CharsetUCS2 kCharsetUCS2;
+static const auto kCharsetUCS2 = CharsetUCS2();
 
 //------------------------------------------------------------------------------
 
@@ -480,7 +480,7 @@ struct CharsetLatin1 final : public CharsetUCS4Subset
     }
 };
 
-static const CharsetLatin1 kCharsetLatin1;
+static const auto kCharsetLatin1 = CharsetLatin1();
 
 //------------------------------------------------------------------------------
 
@@ -501,7 +501,7 @@ struct CharsetASCII final : public CharsetUCS4Subset
     }
 };
 
-static const CharsetASCII kCharsetASCII;
+static const auto kCharsetASCII = CharsetASCII();
 
 //------------------------------------------------------------------------------
 
@@ -512,8 +512,8 @@ struct CharsetExtendedASCII final : public Charset
         int i = 0;
         for (UCS4 c : highCharacters)
             mHighCharacters[i++] = c;
-        while (i < kNumNonASCIICharacters)
-            mHighCharacters[i++] = kFirstNonASCIICharacter + i;
+        for (; i < kNumNonASCIICharacters; ++i)
+            mHighCharacters[i] = kFirstNonASCIICharacter + i;
     }
 
     virtual bool Encode(POV_UINT32& result, UCS4 character) const override

@@ -51,11 +51,20 @@
 #include <memory>
 #include <string>
 
+// Make sure we can later identify whether JPEGlib wants `TRUE` and `FALSE` to be macros.
+#undef TRUE
+#undef FALSE
+
 // Other 3rd party header files
 extern "C"
 {
 #include <jpeglib.h>
 }
+
+// Check whether JPEGlib wants `TRUE` and `FALSE` to be macros.
+#ifdef TRUE
+#define POV_KEEP_BOOLEAN_MACROS
+#endif
 
 // POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
@@ -67,6 +76,13 @@ extern "C"
 
 // this must be the last file included
 #include "base/povdebug.h"
+
+// Work around an issue on Mac OS X, where `TRUE` and `FALSE` are defined
+// _somewhere_, in a manner that is incompatible with JPEGlib.
+#ifndef POV_KEEP_BOOLEAN_MACROS
+#undef TRUE
+#undef FALSE
+#endif
 
 namespace pov_base
 {
