@@ -53,7 +53,6 @@ POV-Ray is being developed with portability high in mind. In practice and at pre
   - While POV-Ray does require boost, we want to keep dependency on it to a minimum. The following are currently
     considered fair game:
       - Flyweights.
-      - Threads.
       - DateTime **except** features that may require linking with the lib (mostly conversions to/from string).
       - SmartPtr intrusive pointers.
       .
@@ -171,6 +170,8 @@ Parameter and variable names might carry one or more additional prefixes. These 
   .
   - Protected or private member variable names should begin with a (possibly additional) `m` prefix.
   - Global variable names should begin with a (possibly additional) `g` prefix.
+  - Global variables with thread-local storage should begin with a (possibly additional) `gt`
+  - prefix.
   - Constants should begin with a `k` prefix. (Does not apply to const parameters.)
   .
 

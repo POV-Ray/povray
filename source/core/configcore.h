@@ -243,7 +243,7 @@
 ///
 /// The available implementations are based on the following primitives:
 ///
-/// | Value | `Pow2Floor`                | `BiasedIntLog2` | `BiasedIntPow2`    |  Bias | Prerequisites                         |
+/// | Value | Pow2Floor                   | BiasedIntLog2 | BiasedIntPow2       |  Bias | Prerequisites                         |
 /// | ----: | :---------------------------- | :-------- | :-------------------- | ----: | :------------------------------------ |
 /// |     0 | `float` bit bashing                                             |||  +127 | `float` must be IEEE 754 "binary32"   |
 /// |     1 | `logbf`, `pow`                | `logbf`   | `int` bit shifting    |     0 | `float` must be radix-2               |

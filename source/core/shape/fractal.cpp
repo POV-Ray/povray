@@ -53,6 +53,7 @@
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
 #include "core/shape/sphere.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

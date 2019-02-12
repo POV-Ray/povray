@@ -44,10 +44,6 @@
 // C++ standard header files
 //  (none at the moment)
 
-// Boost header files
-#include <boost/functional/hash/hash.hpp> // required for crackle
-#include <boost/unordered_map.hpp>
-
 // POV-Ray header files (base module)
 #include "base/fileinputoutput_fwd.h"
 
@@ -1106,77 +1102,6 @@ struct ColourImagePattern final : public ColourPattern, public ImagePatternImpl
     virtual bool Evaluate(TransColour& result, const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const override;
     virtual bool HasTransparency() const override;
 };
-
-
-//******************************************************************************
-// Crackle Pattern Support Types
-
-/// Helper class to implement the crackle cache.
-class CrackleCellCoord final
-{
-public:
-
-    CrackleCellCoord() : mX(0), mY(0), mZ(0), mRepeatX(0), mRepeatY(0), mRepeatZ(0) {}
-    CrackleCellCoord(int x, int y, int z, int rx, int ry, int rz) : mX(x), mY(y), mZ(z), mRepeatX(rx), mRepeatY(ry), mRepeatZ(rz)
-    {
-        WrapCellCoordinate(mX, mRepeatX);
-        WrapCellCoordinate(mY, mRepeatY);
-        WrapCellCoordinate(mZ, mRepeatZ);
-    }
-
-    bool operator==(CrackleCellCoord const& other) const
-    {
-        return mX == other.mX && mY == other.mY && mZ == other.mZ;
-    }
-
-    /// Function to compute a hash value from the coordinates.
-    ///
-    /// @note       This function's name, as well as it being a global function rather than a member, is mandated by
-    ///             boost::unordered_map.
-    ///
-    /// @param[in]  coord   The coordinate.
-    /// @return             The hash.
-    ///
-    friend std::size_t hash_value(CrackleCellCoord const& coord)
-    {
-        std::size_t seed = 0;
-        boost::hash_combine(seed, coord.mX);
-        boost::hash_combine(seed, coord.mY);
-        boost::hash_combine(seed, coord.mZ);
-
-        return seed;
-    }
-
-protected:
-
-    int mX;
-    int mY;
-    int mZ;
-    int mRepeatX;
-    int mRepeatY;
-    int mRepeatZ;
-
-    static inline void WrapCellCoordinate(int& v, int& repeat)
-    {
-        if (!repeat)
-            return;
-        v = wrapInt(v, repeat);
-        if ((v >= 2) && (v < repeat - 2))
-            repeat = 0;
-    }
-};
-
-/// Helper class to implement the crackle cache.
-struct CrackleCacheEntry final
-{
-    /// A kind of timestamp specifying when this particular entry was last used.
-    size_t lastUsed;
-
-    /// The pseudo-random points defining the pattern in this particular subset of 3D space.
-    Vector3d aCellNuclei[81];
-};
-
-typedef boost::unordered_map<CrackleCellCoord, CrackleCacheEntry, boost::hash<CrackleCellCoord>> CrackleCache;
 
 
 //******************************************************************************

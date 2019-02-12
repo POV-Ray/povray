@@ -739,7 +739,7 @@ void *pov_memmove (void *dest, const void  *src, size_t length)
 
         while (length > 0)
         {
-            POV_MEMCPY(cdest + length - size, csrc + length - size, size);
+            std::memcpy(cdest + length - size, csrc + length - size, size);
 
             length -= size;
 
@@ -758,7 +758,7 @@ void *pov_memmove (void *dest, const void  *src, size_t length)
 
         while (length > 0)
         {
-            POV_MEMCPY(new_dest, csrc, length);
+            std::memcpy(new_dest, csrc, length);
 
             new_dest += size;
             csrc += size;
@@ -770,7 +770,7 @@ void *pov_memmove (void *dest, const void  *src, size_t length)
     }
     else
     {
-        POV_MEMCPY(cdest, csrc, length);
+        std::memcpy(cdest, csrc, length);
     }
 
     return cdest;

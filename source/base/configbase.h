@@ -45,9 +45,6 @@
 // C++ standard header files
 //  (none at the moment)
 
-// Boost header files
-#include <boost/version.hpp>
-
 //##############################################################################
 ///
 /// @defgroup PovBaseConfig Base Compile-Time Configuration
@@ -67,7 +64,6 @@
 ///       - `POV_MALLOC`
 ///       - `POV_REALLOC`
 ///       - `POV_FREE`
-///       - `POV_MEMMOVE`
 ///
 /// @{
 
@@ -86,6 +82,7 @@
 #ifndef POV_CPP11_SUPPORTED
     #define POV_CPP11_SUPPORTED (__cplusplus >= 201103L)
 #endif
+
 
 /// @}
 ///
@@ -510,15 +507,6 @@
     #define POV_STRDUP(str)             pov_base::pov_strdup(str)
 #endif
 
-// For those systems that don't have memmove, this can also be pov_memmove
-#ifndef POV_MEMMOVE
-    #define POV_MEMMOVE(dst,src,len)    pov_base::pov_memmove((dst),(src),(len))
-#endif
-
-#ifndef POV_MEMCPY
-    #define POV_MEMCPY(dst,src,len)     std::memcpy((dst),(src),(len))
-#endif
-
 #ifndef POV_MEM_STATS
     #define POV_MEM_STATS                       0
     #define POV_GLOBAL_MEM_STATS(a,f,c,p,s,l)   (false)
@@ -708,17 +696,6 @@
     #define CDECL
 #endif
 
-#ifndef ALIGN16
-    #define ALIGN16
-#endif
-
-#ifndef ALIGN32
-    // leave undefined, allowing code to detect that forced 32-bit alignment isn't supported
-    // The following two lines work around doxygen being unable to document undefined macros.
-    #define ALIGN32 (undefined)
-    #undef ALIGN32
-#endif
-
 #ifndef FORCEINLINE
     #define FORCEINLINE inline
 #endif
@@ -733,18 +710,29 @@
     #define POV_MULTITHREADED 1
 #endif
 
-/// @def POV_USE_DEFAULT_DELAY
-/// Whether to use a default implementation for the millisecond-precision delay function.
+/// @def POV_USE_PLATFORM_DELAY
+/// Whether to use a platform-specific implementation for the millisecond-precision delay function.
 ///
-/// Define as non-zero to use a default implementation for the @ref pov_base::Delay() function, or zero if
+/// Define as zero to use a portable default implementation for the @ref pov_base::Delay() function, or non-zero if
 /// the platform provides its own implementation.
 ///
-/// @note
-///     The default implementation is only provided as a last-ditch resort. Wherever possible,
-///     implementations should provide their own implementation.
+/// The actual value may carry additional semantics based on the platform
+/// family. The following are currently known (but see the respective platform
+/// specific code for authoritative information):
 ///
-#ifndef POV_USE_DEFAULT_DELAY
-    #define POV_USE_DEFAULT_DELAY 1
+/// | Value | Windows       | Unix              |
+/// | ----: | :------------ | :---------------- |
+/// |     0 | `std::this_thread::sleep_for()`   |
+/// |     1 | `Sleep()`     | `nanosleep()`     |
+/// |     2 | ^             | `usleep()`        |
+/// | other | ^             | undefined         |
+///
+#ifndef POV_USE_PLATFORM_DELAY
+    #define POV_USE_PLATFORM_DELAY 0
+#endif
+
+#ifdef POV_USE_DEFAULT_DELAY
+#error "POV_USE_DEFAULT_DELAY has been superseded by POV_USE_PLATFORM_DELAY. Note that the new setting has inverse semantics."
 #endif
 
 /// @def POV_USE_DEFAULT_TIMER
@@ -925,24 +913,6 @@
 /// system-specific configuration.
 ///
 /// @{
-
-/// @def POV_TIME_UTC
-/// Alias for `boost::TIME_UTC` or `boost::TIME_UTC_`, whichever is applicable.
-///
-/// Boost 1.50 changed TIME_UTC to TIME_UTC_ to avoid a clash with C++11, which has
-/// TIME_UTC as a define (in boost it's an enum). To allow compilation with earlier
-/// versions of boost we now use POV_TIME_UTC in the code and define that here.
-///
-#if BOOST_VERSION >= 105000
-    #define POV_TIME_UTC boost::TIME_UTC_
-#else
-    #ifdef TIME_UTC
-        // clash between C++11 and boost detected, need to hard-code
-        #define POV_TIME_UTC 1
-    #else
-        #define POV_TIME_UTC boost::TIME_UTC
-    #endif
-#endif
 
 /// @def POV_BACKSLASH_IS_PATH_SEPARATOR
 /// Whether the system supports the backslash as a separator character.

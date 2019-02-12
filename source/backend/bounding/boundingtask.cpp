@@ -45,7 +45,6 @@
 
 // Boost header files
 #include <boost/bind.hpp>
-#include <boost/thread.hpp>
 
 // POV-Ray header files (base module)
 //  (none at the moment)

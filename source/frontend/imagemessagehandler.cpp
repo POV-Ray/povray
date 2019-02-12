@@ -45,7 +45,6 @@
 // POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
 #include "base/types.h"
-#include "base/image/colourspace.h"
 #include "base/image/dither.h"
 #include "base/image/encoding.h"
 #include "base/image/image.h"

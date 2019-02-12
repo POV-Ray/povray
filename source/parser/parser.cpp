@@ -42,12 +42,10 @@
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
+#include <ctime>
 
 // C++ standard header files
 #include <algorithm>
-
-// Boost header files
-#include <boost/bind.hpp>
 
 // POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
@@ -71,6 +69,7 @@
 #include "core/material/interior.h"
 #include "core/material/noise.h"
 #include "core/material/normal.h"
+#include "core/material/pattern.h"
 #include "core/material/pigment.h"
 #include "core/material/texture.h"
 #include "core/math/matrix.h"
@@ -157,6 +156,18 @@ Parser::Parser(shared_ptr<SceneData> sd, const Options& opts,
     mTokensSinceLastProgressReport(0),
     next_rand(nullptr)
 {
+    std::tm tmY2K;
+    // Field       = Value - Base
+    tmY2K.tm_year  =  2000 - 1900;
+    tmY2K.tm_mon   =     1 -    1;
+    tmY2K.tm_mday  =     1 -    0;
+    tmY2K.tm_hour  =     0;
+    tmY2K.tm_min   =     0;
+    tmY2K.tm_sec   =     0;
+    tmY2K.tm_isdst = false;
+    // `std::mktime()` doesn't need `tmY2K.tm_wday` nor `tmY2K.yday` to be set.
+    mY2K = std::chrono::system_clock::from_time_t(std::mktime(&tmY2K));
+
     pre_init_tokenizer();
     if (sceneData->realTimeRaytracing)
         mBetaFeatureFlags.realTimeRaytracing = true;

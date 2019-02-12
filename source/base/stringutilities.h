@@ -45,9 +45,6 @@
 // C++ standard header files
 #include <string>
 
-// Boost header files
-//  (none at the moment)
-
 // POV-Ray header files (base module)
 #include "base/base_fwd.h"
 #include "base/povassert.h"
@@ -250,7 +247,8 @@ bool IsUCSLowSurrogate(UCS4 character);
 /// @return                     `true` if the code point qualifies as a UCS scalar value.
 bool IsUCSScalarValue(UCS4 character);
 
-} // end of namespace UCS
+}
+// end of namespace UCS
 
 //******************************************************************************
 

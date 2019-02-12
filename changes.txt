@@ -155,7 +155,7 @@ Reported by Coverity static code analysis:
 
 Miscellaneous:
 
-  - Fix `interior_texture` for text objects (as mentioned in GitHub issue #65)
+  - Fix `interior_texture` for text objects (as mentioned in GitHub issue #65).
   - Eliminated use of deprecated C++ `register` keyword (except in 3rd party
     libraries bundled with the POV-Ray source code).
   - Fix long-standing bug in Julia fractal primitive using hypercomplex numbers.
@@ -195,6 +195,7 @@ Other Noteworthy
   - The `./configure` script can now be run without the `COMPILED_BY=...`
     option. In this case it defaults to `$USER <no contact address>`, where
     `$USER` is your login name.
+  - The `boost_thread` and `boost_system` libraries are no longer required.
 
 
 Changes between 3.7.1-beta.9 and 3.7.1-rc.1

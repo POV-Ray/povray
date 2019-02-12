@@ -43,15 +43,13 @@
 #include <algorithm>
 #include <vector>
 
-// Boost header files
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
-
 // POV-Ray header files (base module)
 #include "base/timer.h"
 #include "base/types.h"
 
 // POV-Ray header files (core module)
+#include "core/support/statistics.h"
+
 // POV-Ray header files (POVMS module)
 //  (none at the moment)
 

@@ -36,12 +36,13 @@
 #ifndef POVRAY_CORE_OCTREE_FWD_H
 #define POVRAY_CORE_OCTREE_FWD_H
 
-// C++ standard header files
-#include <limits>
-
 /// @file
 /// @note
-///     This file should not pull in any POV-Ray header whatsoever.
+///     This file should not pull in any headers whatsoever (except other
+///     forward declaration headers or certain select standard headers).
+
+// C++ standard header files
+#include <limits>
 
 namespace pov
 {

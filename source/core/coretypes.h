@@ -599,8 +599,6 @@ class GenericFunctionContext
         virtual ~GenericFunctionContext() {}
 };
 
-typedef GenericFunctionContext* GenericFunctionContextPtr;
-
 class GenericFunctionContextFactory
 {
     public:

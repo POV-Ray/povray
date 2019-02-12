@@ -41,7 +41,6 @@
 //  (none at the moment)
 
 // Boost header files
-#include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 
 // POV-Ray header files (base module)

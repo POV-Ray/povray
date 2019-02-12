@@ -40,6 +40,7 @@
 #include <cctype>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 
 // C++ standard header files
 //  (none at the moment)
@@ -145,7 +146,7 @@ UCS2 *Parser::Parse_String(bool pathname, bool require)
 
             len = pString->size() + 1;
             New = reinterpret_cast<UCS2 *>(POV_MALLOC(len * sizeof(UCS2), "UCS2 String"));
-            POV_MEMCPY(reinterpret_cast<void *>(New),
+            std::memcpy(reinterpret_cast<void *>(New),
                         reinterpret_cast<const void *>(pString->c_str()),
                         len * sizeof(UCS2));
             EXIT
@@ -194,7 +195,7 @@ UCS2 *Parser::Parse_String(bool pathname, bool require)
         CASE(STRING_ID_TOKEN)
             len = UCS2_strlen(CurrentTokenDataPtr<UCS2*>()) + 1;
             New = reinterpret_cast<UCS2 *>(POV_MALLOC(len * sizeof(UCS2), "UCS2 String"));
-            POV_MEMCPY(reinterpret_cast<void *>(New), CurrentTokenDataPtr<void*>(), len * sizeof(UCS2));
+            std::memcpy(reinterpret_cast<void *>(New), CurrentTokenDataPtr<void*>(), len * sizeof(UCS2));
             EXIT
         END_CASE
 

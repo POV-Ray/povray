@@ -51,6 +51,9 @@
 #include <string>
 #include <vector>
 
+// Boost header files
+#include <boost/function.hpp>
+
 // POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
 #include "base/filesystem.h"

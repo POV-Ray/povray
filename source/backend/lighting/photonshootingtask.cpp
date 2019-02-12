@@ -54,6 +54,7 @@
 #include "core/scene/object.h"
 #include "core/shape/csg.h"
 #include "core/support/octree.h"
+#include "core/support/statistics.h"
 
 // POV-Ray header files (POVMS module)
 #include "povms/povmscpp.h"

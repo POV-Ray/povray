@@ -38,6 +38,7 @@
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
+#include "core/support/statistics_fwd.h"
 
 // C++ variants of C standard header files
 #include <cstddef>

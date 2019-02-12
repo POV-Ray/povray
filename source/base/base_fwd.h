@@ -40,6 +40,14 @@
 /// @note
 ///     This file should not pull in any POV-Ray header whatsoever.
 
+// Forward-declare the standard library's thread type, rather than pulling in
+// `<thread>`, and all the other headers it might want in turn.
+namespace std
+{
+class thread;
+}
+// end of namespace std
+
 namespace pov_base
 {
 

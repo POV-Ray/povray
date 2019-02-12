@@ -79,6 +79,7 @@
 #include "core/scene/scenedata.h"
 #include "core/scene/tracethreaddata.h"
 #include "core/support/octree.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -1045,7 +1046,7 @@ RadiosityCache::~RadiosityCache()
 
     { // mutex scope
 #if POV_MULTITHREADED
-        boost::mutex::scoped_lock lock(fileMutex);
+        std::lock_guard<std::mutex> lock(fileMutex);
 #endif
         // finish up cache file
         if (ot_fd != nullptr)
@@ -1058,8 +1059,8 @@ RadiosityCache::~RadiosityCache()
 
     { // mutex scope
 #if POV_MULTITHREADED
-        boost::mutex::scoped_lock lockTree(octree.treeMutex);
-        boost::mutex::scoped_lock lockBlock(octree.blockMutex);
+        std::lock_guard<std::mutex> lockTree(octree.treeMutex);
+        std::lock_guard<std::mutex> lockBlock(octree.blockMutex);
 #endif
         if (octree.root != nullptr)
             ot_free_tree(&octree.root);
@@ -1067,7 +1068,7 @@ RadiosityCache::~RadiosityCache()
 
     { // mutex scope
 #if POV_MULTITHREADED
-        boost::mutex::scoped_lock lock(blockPoolsMutex);
+        std::lock_guard<std::mutex> lock(blockPoolsMutex);
 #endif
         while (!blockPools.empty())
         {
@@ -1083,7 +1084,7 @@ RadiosityCache::~RadiosityCache()
 RadiosityCache::BlockPool* RadiosityCache::AcquireBlockPool()
 {
 #if POV_MULTITHREADED
-    boost::mutex::scoped_lock lock(blockPoolsMutex);
+    std::lock_guard<std::mutex> lock(blockPoolsMutex);
 #endif
     if (blockPools.empty())
         return new BlockPool();
@@ -1099,14 +1100,14 @@ void RadiosityCache::ReleaseBlockPool(RadiosityCache::BlockPool* pool)
 {
     { // mutex scope
 #if POV_MULTITHREADED
-        boost::mutex::scoped_lock lock(fileMutex);
+        std::lock_guard<std::mutex> lock(fileMutex);
 #endif
         pool->Save(ot_fd);
     }
 
     { // mutex scope
 #if POV_MULTITHREADED
-        boost::mutex::scoped_lock lock(blockPoolsMutex);
+        std::lock_guard<std::mutex> lock(blockPoolsMutex);
 #endif
         blockPools.push_back(pool);
     }
@@ -1238,7 +1239,7 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
     ot_id_struct temp_id;
 
 #if POV_MULTITHREADED
-    boost::mutex::scoped_lock treeLock(octree.treeMutex, boost::defer_lock_t()); // we may need to lock this mutex - but not now.
+    std::unique_lock<std::mutex> treeLock(octree.treeMutex, std::defer_lock); // we may need to lock this mutex - but not now.
 #endif
 
 #ifdef RADSTATS
@@ -1420,7 +1421,7 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
 void RadiosityCache::InsertBlock(ot_node_struct *node, ot_block_struct *block)
 {
 #if POV_MULTITHREADED
-    boost::mutex::scoped_lock lock(octree.blockMutex);
+    std::lock_guard<std::mutex> lock(octree.blockMutex);
 #endif
 
     block->next = node->Values;

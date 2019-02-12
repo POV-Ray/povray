@@ -38,8 +38,6 @@
 
 // C++ variants of C standard header files
 // C++ standard header files
-// Boost header files
-//  (none at the moment)
 
 // POV-Ray header files (base module)
 #include "base/fileinputoutput.h"

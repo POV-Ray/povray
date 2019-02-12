@@ -59,7 +59,7 @@
 
 // C++ standard header files
 #include <algorithm>
-#include <exception>
+#include <chrono>
 #include <list>
 #include <map>
 #include <memory>
@@ -71,9 +71,4 @@
 #include <vector>
 
 // Boost header files
-#include <boost/bind.hpp>
 #include <boost/format.hpp>
-#include <boost/function.hpp>
-#if POV_MULTITHREADED
-#include <boost/thread.hpp>
-#endif

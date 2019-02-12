@@ -58,7 +58,6 @@
 #include <cstdlib>
 
 // C++ standard header files
-#include <exception>
 #include <list>
 #include <map>
 #include <memory>
@@ -67,6 +66,7 @@
 #include <stack>
 #include <stdexcept>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include <direct.h>
@@ -87,13 +87,4 @@
 #include <htmlhelp.h>
 
 // Boost header files
-#include <boost/bind.hpp>
 #include <boost/format.hpp>
-#include <boost/function.hpp>
-#include <boost/functional/hash/hash.hpp>
-#if POV_MULTITHREADED
-#include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
-#endif
-#include <boost/unordered_map.hpp>
-

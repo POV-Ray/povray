@@ -92,10 +92,10 @@ static DBL *sintab; // GLOBAL VARIABLE
 #ifdef DYNAMIC_HASHTABLE
 unsigned short *hashTable; // GLOBAL VARIABLE
 #else
-ALIGN16 unsigned short hashTable[8192]; // GLOBAL VARIABLE
+alignas(16) unsigned short hashTable[8192]; // GLOBAL VARIABLE
 #endif
 
-ALIGN16 DBL RTable[267*2] =
+alignas(16) DBL RTable[267*2] =
 {
             -1, 0.0,    0.604974, 0.0,   -0.937102, 0.0,    0.414115, 0.0,    0.576226, 0.0,  -0.0161593, 0.0,
       0.432334, 0.0,    0.103685, 0.0,    0.590539, 0.0,   0.0286412, 0.0,     0.46981, 0.0,    -0.84622, 0.0,

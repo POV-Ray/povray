@@ -98,7 +98,7 @@
 #include "core/shape/blob.h"
 
 // C++ variants of C standard header files
-//  (none at the moment)
+#include <cstring>
 
 // C++ standard header files
 #include <algorithm>
@@ -115,6 +115,7 @@
 #include "core/math/polynomialsolver.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -600,7 +601,7 @@ bool Blob::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 *
 *   Store the points of intersection. Keep track of: whether this is
 *   the start or end point of the hit, which component was pierced
-*   by the ray, and the point along the ray that the hit occured at.
+*   by the ray, and the point along the ray that the hit occurred at.
 *
 * CHANGES
 *
@@ -608,6 +609,7 @@ bool Blob::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 *   Sep 1995 : Changed to allow use of memcpy if memmove isn't available. [AED]
 *   Jul 1996 : Changed to use POV_MEMMOVE, which can be memmove or pov_memmove.
 *   Oct 1996 : Changed to avoid unnecessary compares. [DB]
+*   Feb 2019 : Changed back to use std::memmove again. [CLi]
 *
 ******************************************************************************/
 
@@ -630,7 +632,7 @@ void Blob::insert_hit(const Blob_Element *Element, DBL t0, DBL t1, Blob_Interval
          * bump the rest and insert it here.
          */
 
-        POV_MEMMOVE(&intervals[k+1], &intervals[k], (*cnt-k)*sizeof(Blob_Interval_Struct));
+        std::memmove(&intervals[k+1], &intervals[k], (*cnt-k)*sizeof(Blob_Interval_Struct));
 
         /* We are entering the component. */
 
@@ -650,7 +652,7 @@ void Blob::insert_hit(const Blob_Element *Element, DBL t0, DBL t1, Blob_Interval
 
         if (k < *cnt)
         {
-            POV_MEMMOVE(&intervals[k+1], &intervals[k], (*cnt-k)*sizeof(Blob_Interval_Struct));
+            std::memmove(&intervals[k+1], &intervals[k], (*cnt-k)*sizeof(Blob_Interval_Struct));
 
             /* We are exiting the component. */
 

@@ -41,12 +41,11 @@
 
 // C++ standard header files
 #include <algorithm>
+#include <chrono>
+#include <thread>
 
 // Boost header files
-#include <boost/thread.hpp>
 #include <boost/bind.hpp>
-#include <boost/date_time/gregorian/gregorian.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/math/common_factor.hpp>
 
 // POV-Ray header files (base module)
@@ -237,7 +236,7 @@ void ViewData::getBlockXY(const unsigned int nb, unsigned int &x, unsigned int &
 
 bool ViewData::GetNextRectangle(POVRect& rect, unsigned int& serial)
 {
-    boost::mutex::scoped_lock lock(nextBlockMutex);
+    std::lock_guard<std::mutex> lock(nextBlockMutex);
 
     while(true)
     {
@@ -274,7 +273,7 @@ bool ViewData::GetNextRectangle(POVRect& rect, unsigned int& serial)
 
 bool ViewData::GetNextRectangle(POVRect& rect, unsigned int& serial, BlockInfo*& blockInfo, unsigned int stride)
 {
-    boost::mutex::scoped_lock lock(nextBlockMutex);
+    std::lock_guard<std::mutex> lock(nextBlockMutex);
 
     BlockIdSet newPostponedList;
 
@@ -535,7 +534,7 @@ void ViewData::CompletedRectangle(const POVRect& rect, unsigned int serial, cons
 void ViewData::CompletedRectangle(const POVRect& rect, unsigned int serial, float completion, BlockInfo* blockInfo)
 {
     {
-        boost::mutex::scoped_lock lock(nextBlockMutex);
+        std::lock_guard<std::mutex> lock(nextBlockMutex);
         blockBusyList.erase(serial);
         blockInfoList[serial] = blockInfo;
     }
@@ -578,7 +577,7 @@ void ViewData::SetNextRectangle(const BlockIdSet& bsl, unsigned int fs)
 
 void ViewData::SetHighestTraceLevel(unsigned int htl)
 {
-    boost::mutex::scoped_lock lock(setDataMutex);
+    std::lock_guard<std::mutex> lock(setDataMutex);
 
     highestTraceLevel = max(highestTraceLevel, htl);
 }
@@ -709,7 +708,7 @@ void View::StartRender(POVMS_Object& renderOptions)
     shared_ptr<ViewData::BlockIdSet> blockskiplist(new ViewData::BlockIdSet());
 
     if (renderControlThread == nullptr)
-        renderControlThread = Task::NewBoostThread(boost::bind(&View::RenderControlThread, this), POV_THREAD_STACK_SIZE);
+        renderControlThread = new std::thread(boost::bind(&View::RenderControlThread, this));
 
     viewData.qualityFlags = QualityFlags(clip(renderOptions.TryGetInt(kPOVAttrib_Quality, 9), 0, 9));
 
@@ -738,11 +737,11 @@ void View::StartRender(POVMS_Object& renderOptions)
 
     seed = renderOptions.TryGetInt(kPOVAttrib_StochasticSeed, 0);
     if (seed == 0)
-    {
-        boost::posix_time::ptime now = boost::posix_time::second_clock::universal_time();
-        boost::posix_time::ptime base = boost::posix_time::ptime(boost::gregorian::date(1970, 1, 1));
-        seed = (now - base).total_seconds();
-    }
+        // The following expression returns the number of _ticks_ elapsed since
+        // the system clock's _epoch_, where a _tick_ is the platform-dependent
+        // shortest time interval the system clock can measure, and _epoch_ is a
+        // platform-dependent point in time (usually 1970-01-01 00:00:00).
+        seed = std::chrono::system_clock::now().time_since_epoch().count();
 
     // TODO FIXME - [CLi] handle loading, storing (and later optionally deleting) of radiosity cache file for trace abort & continue feature
     // TODO FIXME - [CLi] if high reproducibility is a demand, timing of writing samples to disk is an issue regarding abort & continue
@@ -1462,7 +1461,7 @@ void View::RenderControlThread()
 
         if(stopRequsted == false)
         {
-            boost::thread::yield();
+            std::this_thread::yield();
             Delay(50);
         }
     }
@@ -1495,14 +1494,14 @@ RTRData::~RTRData()
 // lead to all threads ending up waiting on the condition).
 const Camera *RTRData::CompletedFrame()
 {
-    boost::mutex::scoped_lock lock (counterMutex);
+    std::unique_lock<std::mutex> lock (counterMutex);
 
     vector<Camera>& cameras = viewData.GetSceneData()->cameras;
     bool ca = viewData.GetSceneData()->clocklessAnimation;
 
     if(true) // yes I know it's not needed, but I prefer this over headless code blocks
     {
-        // test >= in case of weirdness due to the timed wait we use with the boost::condition
+        // test >= in case of weirdness due to the timed wait we use with the std::condition_variable
         if (++numRenderThreadsCompleted >= numRenderThreads)
         {
             viewData.SetNextRectangle(ViewData::BlockIdSet(), 0);
@@ -1549,16 +1548,11 @@ const Camera *RTRData::CompletedFrame()
         }
     }
 
-    // TODO FIXME - boost::xtime has been deprecated since boost 1.34.
-    boost::xtime t;
-    boost::xtime_get (&t, POV_TIME_UTC);
-    t.sec += 3;
-
     // this will cause us to wait until the other threads are done.
     // we use a timed lock so that we eventually pick up a render cancel request.
     // if we do exit as a result of a timeout, and there is not a cancel pending,
     // things could get out of whack.
-    if (!event.timed_wait(lock, t))
+    if (event.wait_for(lock, std::chrono::seconds(3)) == std::cv_status::timeout)
         numRenderThreadsCompleted--;
 
     return (ca ? &cameras[numRTRframes % cameras.size()] : nullptr);

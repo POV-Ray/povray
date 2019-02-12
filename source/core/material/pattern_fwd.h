@@ -38,7 +38,8 @@
 
 /// @file
 /// @note
-///     This file should not pull in any POV-Ray header whatsoever.
+///     This file should not pull in any headers whatsoever (except other
+///     forward declaration headers or certain select standard headers).
 
 namespace pov
 {

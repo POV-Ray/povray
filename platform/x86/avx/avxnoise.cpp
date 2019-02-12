@@ -79,7 +79,7 @@ static inline __m256d permute4x64_functional(const __m256d& x, int i)
     const int idx1 = ((i >> 2) & 0x3);
     const int idx2 = ((i >> 4) & 0x3);
     const int idx3 = ((i >> 6) & 0x3);
-    ALIGN32 double p[4];
+    alignas(32) double p[4];
     _mm256_store_pd(p,x);
 
     if (idx0 == idx1 && idx1 == idx2 && idx2 == idx3)
@@ -134,7 +134,7 @@ static inline __m256d permute4x64_functional(const __m256d& x, int i)
 
 extern DBL RTable[];
 
-ALIGN32 static AVXTABLETYPE AVXRTable[267];
+alignas(32) static AVXTABLETYPE AVXRTable[267];
 
 void AVXNoiseInit()
 {

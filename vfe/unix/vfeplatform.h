@@ -40,8 +40,6 @@
 
 #include <memory>
 
-#include <boost/shared_ptr.hpp>
-
 #include "base/path_fwd.h"
 #include "base/stringtypes.h"
 #include "base/filesystem_fwd.h"

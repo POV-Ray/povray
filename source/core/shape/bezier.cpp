@@ -39,18 +39,20 @@
 #include "core/shape/bezier.h"
 
 // C++ variants of C standard header files
-//  (none at the moment)
+#include <cstring>
 
 // C++ standard header files
 #include <algorithm>
 
 // POV-Ray header files (base module)
 #include "base/pov_err.h"
+#include "base/pov_mem.h"
 
 // POV-Ray header files (core module)
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -1987,7 +1989,7 @@ ObjectPtr BicubicPatch::Copy()
     if (Weights != nullptr)
     {
         New->Weights = reinterpret_cast<BEZIER_WEIGHTS *>(POV_MALLOC( sizeof(BEZIER_WEIGHTS),"bicubic patch" ));
-        POV_MEMCPY( New->Weights, Weights, sizeof(BEZIER_WEIGHTS) );
+        std::memcpy( New->Weights, Weights, sizeof(BEZIER_WEIGHTS) );
     }
 
     for (i = 0; i < 4; i++)

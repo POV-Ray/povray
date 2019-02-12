@@ -40,10 +40,6 @@
 // C++ standard header files
 //  (none at the moment)
 
-// Boost header files
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
-
 // POV-Ray header files (base module)
 #include "base/povassert.h"
 

@@ -40,12 +40,11 @@
 #include <cctype>
 #include <cmath>
 #include <cstdlib>
+#include <cstring>
 
 // C++ standard header files
 #include <algorithm>
-
-// Boost header files
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <chrono>
 
 // POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
@@ -975,9 +974,9 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
                 case NOW_TOKEN:
                     {
-                        static boost::posix_time::ptime y2k(boost::gregorian::date(2000,1,1));
-                        boost::posix_time::ptime now(boost::posix_time::microsec_clock::universal_time());
-                        Val = (now-y2k).total_microseconds() * (1.0e-6) / (24*60*60);
+                        auto now = std::chrono::system_clock::now();
+                        using FractionalDays = std::chrono::duration<double, std::ratio<24 * 60 * 60>>;
+                        Val = std::chrono::duration_cast<FractionalDays> (now - mY2K).count();
                     }
                     break;
             }
@@ -1723,7 +1722,7 @@ void Parser::Parse_Express (EXPRESS& Express,int *Terms)
             Chosen = &Local_Express2;
             *Terms = Local_Terms2;
         }
-        POV_MEMCPY(Express, Chosen, sizeof(EXPRESS));
+        std::memcpy(Express, Chosen, sizeof(EXPRESS));
     }
     else
     {

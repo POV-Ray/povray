@@ -46,9 +46,6 @@
 #include <initializer_list>
 #include <memory>
 
-// Boost header files
-//  (none at the moment)
-
 // POV-Ray header files (base module)
 #include "base/messenger_fwd.h"
 #include "base/stringtypes.h"

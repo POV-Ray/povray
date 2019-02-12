@@ -45,9 +45,9 @@
 // C++ standard header files
 #include <memory>
 #include <queue>
+// <thread> not required for `std::thread` because we forward-declare it in `base/base_fwd.h`
 
 // Boost header files
-#include <boost/thread.hpp>
 #include <boost/function.hpp>
 
 // POV-Ray header files (base module)
@@ -86,44 +86,11 @@ class Task
         void Stop();
         void Pause();
         void Resume();
-
-        inline void Cooperate()
-        {
-            if(stopRequested == true)
-                throw StopThreadException();
-            else if(paused == true)
-            {
-                while(paused == true)
-                {
-                    boost::thread::yield();
-                    Delay(100);
-                    if(stopRequested == true)
-                        throw StopThreadException();
-                }
-            }
-        }
+        void Cooperate();
 
         inline ThreadData *GetDataPtr() { return taskData; }
 
         inline POVMSContext GetPOVMSContext() { return povmsContext; }
-
-        /// Start a new thread with a given stack size.
-        template<typename CALLABLE_T>
-        inline static boost::thread* NewBoostThread(CALLABLE_T func, int stackSize)
-        {
-#if HAVE_BOOST_THREAD_ATTRIBUTES
-            // boost 1.50 and later provide an official mechanism to set the stack size.
-            boost::thread::attributes attr;
-            attr.set_stack_size (stackSize);
-            return new boost::thread(attr, func);
-#elif !defined(USE_OFFICIAL_BOOST)
-            // Prior to boost 1.50, for some platforms we used an unofficial hacked version of boost to set the stack size.
-            return new boost::thread(func, stackSize);
-#else
-            // For some platforms the default stack size of older boost versions may suffice.
-            return new boost::thread(func);
-#endif
-        }
 
     protected:
 
@@ -157,7 +124,7 @@ class Task
         // CPU time spend in task
         POV_LONG cpuTime;
         /// task thread
-        boost::thread *taskThread;
+        std::thread *taskThread;
         /// POVMS message receiving context
         POVMSContext povmsContext;
 

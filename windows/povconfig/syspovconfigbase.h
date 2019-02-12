@@ -49,7 +49,8 @@
 #endif
 
 // Windows provides a platform-specific mechanism to let a task wait for a specified time.
-#define POV_USE_DEFAULT_DELAY 0
+// However, the C++11 standard mechanism should be fine.
+#define POV_USE_PLATFORM_DELAY 0
 
 // Windows provides platform-specific mechanisms to measure both wall-clock and CPU time.
 #define POV_USE_DEFAULT_TIMER 0

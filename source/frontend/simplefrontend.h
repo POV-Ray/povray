@@ -45,6 +45,9 @@
 // C++ standard header files
 #include <memory>
 
+// Boost header files
+#include <boost/function.hpp>
+
 // POV-Ray header files (base module)
 #include "base/povassert.h"
 #include "base/stringutilities.h"

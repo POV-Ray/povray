@@ -44,13 +44,13 @@
 
 // POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
+#include "base/mathutil.h"
 #include "base/platformbase.h"
 #include "base/textstream.h"
 #include "base/textstreambuffer.h"
 #include "base/types.h"
 #include "base/image/colourspace.h"
 #include "base/image/dither.h"
-#include "base/image/encoding.h"
 
 // POV-Ray header files (POVMS module)
 #include "povms/povmsid.h"

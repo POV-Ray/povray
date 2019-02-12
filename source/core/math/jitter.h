@@ -60,7 +60,7 @@ namespace pov
 #ifdef DYNAMIC_HASHTABLE
 extern unsigned short *hashTable; // GLOBAL VARIABLE
 #else
-extern ALIGN16 unsigned short hashTable[]; // GLOBAL VARIABLE
+alignas(16) extern unsigned short hashTable[]; // GLOBAL VARIABLE
 #endif
 
 extern const float JitterTable[]; // GLOBAL VARIABLE

@@ -121,7 +121,7 @@ const bool kAVX2FMA3NoiseEnabled = true;
 
 extern DBL RTable[];
 
-ALIGN32 static AVX2TABLETYPE AVX2RTable[267];
+alignas(32) static AVX2TABLETYPE AVX2RTable[267];
 
 void AVX2FMA3NoiseInit()
 {

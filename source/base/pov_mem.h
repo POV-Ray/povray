@@ -46,6 +46,7 @@
 
 // C++ variants of C standard header files
 #include <cstddef>
+#include <cstring>
 
 // C++ standard header files
 //  (none at the moment)

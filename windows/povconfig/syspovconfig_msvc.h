@@ -104,7 +104,6 @@
     // MS Visual C++ 2005 (aka 8.0), compiling for 64 bit target
     #define POV_COMPILER_VER                  "msvc8"
     #define METADATA_COMPILER_STRING          "msvc 8"
-    #define ALIGN16                           __declspec(align(16))
     inline const int& max(const int& _X, const int& _Y) {return (_X < _Y ? _Y : _X); }
     inline const int& min(const int& _X, const int& _Y) {return (_Y < _X ? _Y : _X); }
     inline const unsigned int& max(const unsigned int& _X, const unsigned int& _Y) {return (_X < _Y ? _Y : _X); }
@@ -226,7 +225,6 @@
 #undef ReturnAddress
 #define ReturnAddress()                     _ReturnAddress()
 
-#define ALIGN32                             __declspec(align(32))
 #define MACHINE_INTRINSICS_H                <intrin.h>
 
 #if _MSC_VER >= 1600

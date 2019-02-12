@@ -40,6 +40,7 @@
 //  (none at the moment)
 
 // C++ standard header files
+#include <sstream>
 #include <string>
 
 // POV-Ray header files (base module)

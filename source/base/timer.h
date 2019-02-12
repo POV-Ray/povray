@@ -40,17 +40,13 @@
 #include "base/configbase.h"
 
 // C++ variants of C standard header files
-// C++ standard header files
 //  (none at the moment)
 
-// Boost header files
-#if POV_USE_DEFAULT_TIMER
-#include <boost/thread/xtime.hpp>
-#endif
+// C++ standard header files
+#include <chrono>
 
-#if !POV_USE_DEFAULT_TIMER || (POV_MULTITHREADED && !POV_USE_DEFAULT_DELAY)
-#include "syspovtimer.h"
-#endif
+// NOTE:
+// Another file is included at the end of this file.
 
 // POV-Ray header files (base module)
 //  (none at the moment)
@@ -65,46 +61,77 @@ namespace pov_base
 ///
 /// @{
 
-#if POV_MULTITHREADED && POV_USE_DEFAULT_DELAY
-
 /// Wait for the specified time.
 ///
-/// This function puts the current thread into idle mode for the specified time.
+/// This function puts the current thread into idle mode for the specified time,
+/// give or take.
+///
+/// The default implementation is based on `std::this_thread::sleep_for`, which
+/// should be good enough on most platforms. However, platforms can still
+/// provide their own implementations, by setting @ref POV_USE_PLATFORM_DELAY to
+/// non-zero and providing their own definition.
 ///
 /// @note
-///     This is a default implementation, provided only as a last-ditch resort for platforms that
-///     cannot provide a better implementation.
-///
-/// @todo
-///     The current implementation is based on boost::xtime, which has been deprecated since
-///     boost 1.34.
-///
-/// @attention
-///     Due to possible limitations of platform-specific implementations, this function may only be
-///     called to wait for less than 1 second.
-///
-/// @attention
-///     Due to possible limitations of platform-specific implementations, callers must not rely on
-///     the duration to be exact, or even anywhere close. Most notably, the function may return
-///     prematurely in case the thread receives a signal.
+///     For low values (e.g. below 10 ms, but depending on implementation and
+///     platform) this function may effectively be a no-op.
 ///
 /// @param[in]  msec    Time to wait in milliseconds (0..999).
 ///
 void Delay(unsigned int msec);
 
-#endif // POV_MULTITHREADED && POV_USE_DEFAULT_DELAY
+/// Default Millisecond-precision wall clock timer.
+///
+/// This class provides facilities to measure the elapsed wall clock time
+/// since the object was created or last reset.
+///
+/// @note
+///     This class should not be used directly. Instead, it is intended as a
+///     building block for implementations of the @ref Timer class.
+///
+/// @impl
+///     The current implementation is based on `std::chrono::steady_clock`.
+///
+class DefaultRealTimer final
+{
+public:
+
+    /// Create and start a new timer.
+    DefaultRealTimer();
+
+    /// Report elapsed wall-clock time.
+    ///
+    /// This method reports the actual time in milliseconds that has elapsed
+    /// since the timer's creation or last call to @ref Reset().
+    ///
+    /// @return     Elapsed real time in milliseconds.
+    ///
+    POV_LONG ElapsedTime() const;
+
+    /// Reset the timer.
+    void Reset();
+
+private:
+
+    /// Point in time of construction or last reset.
+    std::chrono::steady_clock::time_point mRealTimeStart;
+};
 
 #if POV_USE_DEFAULT_TIMER
 
 /// Millisecond-precision timer.
 ///
+/// This class provides facilities to measure the elapsed wall clock time, CPU
+/// time used by the current process, and CPU time used by the current thread,
+/// since the object was created or last reset.
+///
+/// It is intended that platforms provide their own implementations, by setting
+/// @ref POV_USE_DEFAULT_TIMER to non-zero, providing their own declaration in
+/// `syspovtimer.h`, and providing their own definition.
+///
 /// @note
-///     This is a default implementation, provided only as a last-ditch resort for platforms that
+///     The default implementation is provided only as a last-ditch resort for platforms that
 ///     cannot provide a better implementation. It can neither guarantee millisecond precision, nor
 ///     does it support measurement of CPU time.
-///
-/// @todo
-///     This implementation is based on boost::xtime, which has been deprecated since 1.34.
 ///
 /// @impl
 ///     Note that to measure per-process CPU time we're not resorting to `clock()` as a default
@@ -119,11 +146,11 @@ class Timer final
 
         /// Create and start a new timer.
         ///
-        Timer();
+        Timer() = default;
 
         /// Destroy the timer.
         ///
-        ~Timer();
+        ~Timer() = default;
 
         /// Report elapsed wall-clock time.
         ///
@@ -132,7 +159,7 @@ class Timer final
         ///
         /// @return     Elapsed real time in milliseconds.
         ///
-        POV_LONG ElapsedRealTime() const;
+        inline POV_LONG ElapsedRealTime() const { return mRealTimer.ElapsedTime(); }
 
         /// Report CPU time consumed by current process.
         ///
@@ -145,7 +172,7 @@ class Timer final
         ///
         /// @return     Elapsed CPU time in milliseconds.
         ///
-        inline POV_LONG ElapsedProcessCPUTime() const { return ElapsedRealTime(); }
+        inline POV_LONG ElapsedProcessCPUTime() const { return mRealTimer.ElapsedTime(); }
 
         /// Report CPU time consumed by current thread.
         ///
@@ -162,11 +189,11 @@ class Timer final
         ///
         /// @return     Elapsed CPU time in milliseconds.
         ///
-        inline POV_LONG ElapsedThreadCPUTime() const { return ElapsedProcessCPUTime(); }
+        inline POV_LONG ElapsedThreadCPUTime() const { return mRealTimer.ElapsedTime(); }
 
         /// Reset the timer.
         ///
-        void Reset();
+        inline void Reset() { mRealTimer.Reset(); }
 
         /// Report whether per-process measurement of CPU time is supported.
         ///
@@ -190,8 +217,8 @@ class Timer final
 
     private:
 
-        /// real time at last reset
-        boost::xtime mRealTimeStart;
+        /// Point in time of construction or last reset.
+        DefaultRealTimer mRealTimer;
 };
 
 #endif // POV_USE_DEFAULT_TIMER
@@ -202,5 +229,10 @@ class Timer final
 
 }
 // end of namespace pov_base
+
+// Need to include this last because it may require definitions from this file.
+#if !POV_USE_DEFAULT_TIMER
+#include "syspovtimer.h"
+#endif
 
 #endif // POVRAY_BASE_TIMER_H

@@ -97,10 +97,10 @@ const int NOISE_MINZ = NOISE_MINX;
 #ifdef DYNAMIC_HASHTABLE
 extern unsigned short *hashTable;
 #else
-extern ALIGN16 unsigned short hashTable[8192];
+alignas(16) extern unsigned short hashTable[8192];
 #endif
 
-extern ALIGN16 DBL RTable[];
+alignas(16) extern DBL RTable[];
 
 
 /*****************************************************************************

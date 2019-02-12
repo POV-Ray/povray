@@ -46,6 +46,7 @@
 //  (none at the moment)
 
 // C++ standard header files
+#include <chrono>
 #include <memory>
 #include <string>
 #include <vector>
@@ -733,6 +734,8 @@ class Parser final
         bool Allow_Identifier_In_Call, Identifier_In_Call;
 
         size_t MaxCachedMacroSize;
+
+        std::chrono::system_clock::time_point mY2K;
 
         // parse.h/parse.cpp
         void Frame_Init(void);

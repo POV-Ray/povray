@@ -41,10 +41,10 @@
 
 // C++ standard header files
 #include <stdexcept>
+#include <thread>
 
 // Boost header files
 #include <boost/bind.hpp>
-#include <boost/thread.hpp>
 
 // POV-Ray header files (base module)
 #include "base/povassert.h"
@@ -113,7 +113,7 @@ POV_LONG Task::ConsumedCPUTime() const
 void Task::Start(const boost::function0<void>& completion)
 {
     if ((done == false) && (taskThread == nullptr))
-        taskThread = NewBoostThread(boost::bind(&Task::TaskThread, this, completion), POV_THREAD_STACK_SIZE);
+        taskThread = new std::thread(boost::bind(&Task::TaskThread, this, completion));
 }
 
 void Task::RequestStop()
@@ -141,6 +141,22 @@ void Task::Pause()
 void Task::Resume()
 {
     paused = false;
+}
+
+void Task::Cooperate()
+{
+    if (stopRequested == true)
+        throw StopThreadException();
+    else if (paused == true)
+    {
+        while (paused == true)
+        {
+            std::this_thread::yield();
+            Delay(100);
+            if (stopRequested == true)
+                throw StopThreadException();
+        }
+    }
 }
 
 POV_LONG Task::ElapsedRealTime() const

@@ -61,7 +61,6 @@ m4_include([unix/config/ax_pthread.m4])
 m4_include([unix/config/ax_arg_enable.m4])
 m4_include([unix/config/ax_arg_with.m4])
 m4_include([unix/config/ax_boost_base.m4])
-m4_include([unix/config/ax_boost_thread.m4])
 m4_include([unix/config/ax_test_compiler_flags.m4])
 m4_include([unix/config/ax_check_compile_flag.m4])
 m4_include([unix/config/ax_check_lib.m4])
@@ -300,44 +299,6 @@ LIBS="$LIBS $PTHREAD_CFLAGS $PTHREAD_LIBS"  # append
 # Boost; required library
 # the following macro stops with error when boost is not found
 AX_BOOST_BASE([$required_libboost_version])
-AX_BOOST_THREAD
-if test x"$ax_cv_boost_thread" != x"yes"; then
-  AC_MSG_ERROR([cannot find a suitable boost thread library])
-else
-  CPPFLAGS="$CPPFLAGS $BOOST_CPPFLAGS"  # append
-  LDFLAGS="$LDFLAGS $BOOST_LDFLAGS"     # append
-  LIBS="$BOOST_THREAD_LIB $LIBS"
-fi
-AC_MSG_CHECKING([whether the boost thread library is usable])
-SAVED_LIBS=$LIBS
-boost_thread_links=0
-for extralib in '' '-lboost_system'
-do
-  LIBS=$SAVED_LIBS
-  LIBS="$LIBS $extralib"
-  AC_RUN_IFELSE([
-    AC_LANG_PROGRAM([[
-      #include <boost/thread/thread.hpp>
-    ]],[[
-      boost::mutex m;
-      boost::defer_lock_t();
-      return 0;
-    ]])
-  ],[
-    AC_MSG_RESULT([yes])
-    BOOST_THREAD_LIB="$BOOST_THREAD_LIB $extralib"
-    boost_thread_links=1
-  ],,[
-    AC_MSG_RESULT([cross-compiling])  # FIXME
-  ])
-  if test $boost_thread_links = '1'; then
-    break
-  fi
-done
-if test $boost_thread_links != '1'; then
-  AC_MSG_RESULT([no])
-  AC_MSG_FAILURE([cannot link with the boost thread library])
-fi
 
 AC_DEFINE([USE_OFFICIAL_BOOST], [], [Use the official Boost libraries.])
 

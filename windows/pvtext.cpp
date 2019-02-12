@@ -358,7 +358,7 @@ void buffer_message (msgtype message_type, const char *s, bool addLF)
       message_type = mHorzLine ;
 
     strcpy (s1 + 1, str_buffer) ;
-    *s1 = (uchar) message_type ;
+    *s1 = (unsigned char) message_type ;
 
     if (lf == CR)
     {
@@ -432,7 +432,7 @@ void add_single_line (msgtype message_type, const char *str)
   }
 
   strcpy (s1 + 1, str) ;
-  *s1 = (uchar) message_type ;
+  *s1 = (unsigned char) message_type ;
 
   if (*next_message)
   {

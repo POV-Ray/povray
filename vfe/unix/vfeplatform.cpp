@@ -50,6 +50,9 @@
 #include <memory>
 #include <vector>
 
+// Boost header files
+#include <boost/algorithm/string.hpp>
+
 // other library header files
 #include <pthread.h>
 #ifdef HAVE_SYS_TIME_H

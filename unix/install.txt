@@ -352,12 +352,6 @@ Additional POV-Ray specific options are:
     requests to find the Boost library in the DIR directory.  Boost 1.38 or
     above is mandatory to build POV-Ray.
 
---with-boost-thread=special-lib
-    requests to find the Boost thread library under the special-lib name, for
-    instance --with-boost-thread=boost_thread-gcc-mt if the thread library is
-    libboost_thread-gcc-mt.a (static form) or libboost_thread-gcc-mt.so*
-    (shared form) under the DIR directory specified by the option above.
-
 --with-zlib=DIR or --without-zlib
     requests to find the ZLIB library in the DIR directory, where DIR is
     for instance /path/lib if ZLIB is /path/lib/libz.a (static form) or

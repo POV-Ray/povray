@@ -40,8 +40,10 @@
 #include "core/configcore.h"
 
 // C++ variants of C standard header files
-// C++ standard header files
 //  (none at the moment)
+
+// C++ standard header files
+#include <memory>
 
 // POV-Ray header files (base module)
 //  (none at the moment)
@@ -194,6 +196,17 @@ private:
         static HASH_TABLE **Vertex_Hash_Table;
         static HASH_TABLE **Normal_Hash_Table;
         static UV_HASH_TABLE **UV_Hash_Table;
+
+        /// Priority queue object.
+        ///
+        /// This object is for temporary use in the intersection and insideness tests;
+        /// the only reason it is not simply a local variable there is that we want to
+        /// avoid the overhead of repeated construction and destruction on the stack.
+        /// Technically we could get the same performance by keeping it local to the
+        /// functions and making it thread-local, but this would mean having one such
+        /// object per function, when it's perfectly safe for them to share one object.
+        ///
+        static thread_local std::unique_ptr<BBoxPriorityQueue> mtpQueue;
 };
 
 /// @}

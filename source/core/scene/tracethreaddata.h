@@ -49,15 +49,16 @@
 
 // POV-Ray header files (base module)
 #include "base/types.h"
+#include "base/colour.h"
 
 // POV-Ray header files (core module)
 #include "core/coretypes.h"
 #include "core/bounding/boundingcylinder.h"
-#include "core/bounding/bsptree.h"
-#include "core/material/pattern.h"
-#include "core/math/randomsequence.h"
-#include "core/shape/mesh.h"
-#include "core/support/statistics.h"
+#include "core/math/randomsequence_fwd.h"
+#include "core/math/vector.h"
+#include "core/scene/scenedata_fwd.h"
+#include "core/support/cracklecache_fwd.h"
+#include "core/support/statistics_fwd.h"
 
 namespace pov
 {
@@ -78,10 +79,6 @@ struct Blob_Interval_Struct;
 /// Class holding parser thread specific data.
 class TraceThreadData : public ThreadData
 {
-        friend class Scene;
-        friend class Trace;
-        friend class View; // TODO FIXME - needed only to access TraceThreadData for CheckCameraHollowObject()
-
     public:
 
         /// Create thread local data.
@@ -95,10 +92,9 @@ class TraceThreadData : public ThreadData
 
         /// Get the statistics.
         /// @return     Reference to statistic counters.
-        RenderStatistics& Stats(void) { return renderStats; }
+        RenderStatistics& Stats(void) { return *mpRenderStats; }
 
         DBL *Fractal_IStack[4];
-        BBoxPriorityQueue Mesh_Queue;
         void **Blob_Queue;
         unsigned int Max_Blob_Queue_Size;
         DBL *Blob_Coefficients;
@@ -141,7 +137,7 @@ class TraceThreadData : public ThreadData
         PhotonMap* surfacePhotonMap;
         PhotonMap* mediaPhotonMap;
 
-        CrackleCache mCrackleCache;
+        CrackleCache* mpCrackleCache;
 
         // data for waves and ripples pattern
         unsigned int numberOfWaves;
@@ -178,7 +174,7 @@ class TraceThreadData : public ThreadData
         /// scene data
         std::shared_ptr<SceneData> sceneData;
         /// render statistics
-        RenderStatistics renderStats;
+        RenderStatistics* mpRenderStats;
 
     private:
 

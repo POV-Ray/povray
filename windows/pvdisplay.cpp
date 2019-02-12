@@ -369,10 +369,11 @@ inline void WinLegacyDisplay::SetPixel (unsigned int x, unsigned int y, const po
     unsigned char *p = m_BitmapSurface + (m_Bitmap.header.biHeight - 1 - y) * m_BytesPerLine + x * 3 ;
     if (pov_frontend::UseAlpha && colour->alpha < 255)
     {
-      uint backColor = (x & 8) == (y & 8) ? (uint) (255 - colour->alpha) * 0xff : (uint) (255 - colour->alpha) * 0xc0 ;
-      *p++ = (unsigned char) (((uint) colour->blue * colour->alpha + backColor) / 255) ;
-      *p++ = (unsigned char) (((uint) colour->green * colour->alpha + backColor) / 255) ;
-      *p++ = (unsigned char) (((uint) colour->red * colour->alpha + backColor) / 255) ;
+      unsigned int backColor = (x & 8) == (y & 8) ? (unsigned int) (255 - colour->alpha) * 0xff :
+                                                    (unsigned int) (255 - colour->alpha) * 0xc0 ;
+      *p++ = (unsigned char) (((unsigned int) colour->blue * colour->alpha + backColor) / 255) ;
+      *p++ = (unsigned char) (((unsigned int) colour->green * colour->alpha + backColor) / 255) ;
+      *p++ = (unsigned char) (((unsigned int) colour->red * colour->alpha + backColor) / 255) ;
     }
     else
     {

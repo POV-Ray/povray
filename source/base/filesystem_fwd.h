@@ -36,12 +36,13 @@
 #ifndef POVRAY_BASE_FILESYSTEM_FWD_H
 #define POVRAY_BASE_FILESYSTEM_FWD_H
 
-// C++ standard header files
-#include <memory>
-
 /// @file
 /// @note
-///     This file should not pull in any POV-Ray header whatsoever.
+///     This file should not pull in any headers whatsoever (except other
+///     forward declaration headers or certain select standard headers).
+
+// C++ standard header files
+#include <memory>
 
 namespace pov_base
 {

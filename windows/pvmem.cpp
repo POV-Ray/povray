@@ -153,7 +153,8 @@ void WinMemStage(bool BeginRender, void *cookie)
     TrackMem = false;
 }
 
-bool WinMemReport(bool global, uint64& allocs, uint64& frees, int64& current, uint64& peak, uint64 &smallest, uint64 &largest)
+bool WinMemReport(bool global, unsigned __int64& allocs, unsigned __int64& frees, __int64& current,
+                  unsigned __int64& peak, unsigned __int64& smallest, unsigned __int64& largest)
 {
   if (!global)
     return false;
@@ -200,7 +201,8 @@ void WinMemThreadCleanup()
   delete lMemStats;
 }
 
-bool WinMemReport(bool global, uint64& allocs, uint64& frees, int64& current, uint64& peak, uint64 &smallest, uint64 &largest)
+bool WinMemReport(bool global, unsigned __int64& allocs, unsigned __int64& frees, __int64& current,
+                  unsigned __int64& peak, unsigned __int64 &smallest, unsigned __int64 &largest)
 {
   HeapLock lock(gHeap);
 

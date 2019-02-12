@@ -45,9 +45,6 @@
 #include <initializer_list>
 #include <limits>
 
-// Boost header files
-//  (none at the moment)
-
 // POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
 #include "base/povassert.h"

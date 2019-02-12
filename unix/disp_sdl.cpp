@@ -43,6 +43,8 @@
 
 #include <algorithm>
 
+#include <boost/format.hpp>
+
 // this must be the last file included
 #include "syspovdebug.h"
 

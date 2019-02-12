@@ -43,13 +43,14 @@
 //  (none at the moment)
 
 // C++ standard header files
+#include <condition_variable>
 #include <list>
 #include <memory>
+#include <mutex>
 #include <queue>
 
 // Boost header files
-#include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
+#include <boost/function.hpp>
 
 // POV-Ray header files (base module)
 //  (none at the moment)
@@ -122,11 +123,11 @@ class TaskQueue final
         /// active task list
         std::list<TaskEntry> activeTasks;
         /// queue mutex
-        boost::recursive_mutex queueMutex;
+        std::recursive_mutex queueMutex;
         /// failed code
         int failed;
         /// wait for data in queue or related operation to be processed
-        boost::condition processCondition;
+        std::condition_variable_any processCondition;
 
         TaskQueue(const TaskQueue&) = delete;
         TaskQueue& operator=(const TaskQueue&) = delete;

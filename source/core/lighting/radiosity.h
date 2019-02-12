@@ -44,12 +44,8 @@
 
 // C++ standard header files
 #include <memory>
+#include <mutex>
 #include <vector>
-
-// Boost header files
-#if POV_MULTITHREADED
-#include <boost/thread.hpp>
-#endif
 
 // POV-Ray header files (base module)
 #include "base/fileinputoutput_fwd.h"
@@ -231,8 +227,8 @@ class RadiosityCache final
         {
             ot_node_struct *root;
 #if POV_MULTITHREADED
-            boost::mutex treeMutex;   // lock this when adding nodes to the tree
-            boost::mutex blockMutex;  // lock this when adding blocks to any node of the tree
+            std::mutex treeMutex;   // lock this when adding nodes to the tree
+            std::mutex blockMutex;  // lock this when adding blocks to any node of the tree
 #endif
 
             Octree() : root(nullptr) {}
@@ -240,14 +236,14 @@ class RadiosityCache final
 
         std::vector<BlockPool*> blockPools;  // block pools ready to be re-used
 #if POV_MULTITHREADED
-        boost::mutex blockPoolsMutex;   // lock this when accessing blockPools
+        std::mutex blockPoolsMutex;   // lock this when accessing blockPools
 #endif
 
         Octree octree;
 
         OStream *ot_fd;
 #if POV_MULTITHREADED
-        boost::mutex fileMutex;         // lock this when accessing ot_fd
+        std::mutex fileMutex;         // lock this when accessing ot_fd
 #endif
 
         RadiosityRecursionSettings* recursionSettings; // dynamically allocated array; use recursion depth as index

@@ -59,10 +59,9 @@
 
 // C++ standard header files
 #include <algorithm>
-#include <exception>
 #include <list>
-#include <map>
 #include <memory>
+#include <mutex>
 #include <new>
 #include <set>
 #include <stack>
@@ -71,12 +70,4 @@
 #include <vector>
 
 // Boost header files
-#include <boost/bind.hpp>
-#include <boost/format.hpp>
-#include <boost/function.hpp>
-#include <boost/functional/hash/hash.hpp>
-#if POV_MULTITHREADED
-#include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
-#endif
-#include <boost/unordered_map.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>

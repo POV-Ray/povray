@@ -108,16 +108,6 @@
 
 /////////////////////////////////////////////////////////////
 
-#ifndef __GENDEFS
-  #define __GENDEFS
-  typedef unsigned char     uchar;
-  typedef unsigned short    ushort;
-  typedef unsigned int      uint;
-  typedef unsigned long     ulong;
-  typedef unsigned __int64  uint64;
-  typedef __int64           int64;
-#endif
-
 #ifdef __INTEL_COMPILER
 // Intel C++ whines about the lack of a return on RDTSC() for each and every file
 // it is included in. VC++ is smarter (or dumber, depending on your point of view).
@@ -140,7 +130,8 @@ namespace povwin
   void win_free(void *p, const void *ptr, int line);
   char *win_strdup(const char *s);
   char *win_strdup(const char *s, const void *ptr, int line);
-  bool WinMemReport(bool global, uint64& allocs, uint64& frees, int64& current, uint64& peak, uint64& smallest, uint64& largest);
+  bool WinMemReport(bool global, unsigned __int64& allocs, unsigned __int64& frees, __int64& current,
+                    unsigned __int64& peak, unsigned __int64& smallest, unsigned __int64& largest);
   void WinMemStage(bool BeginRender, void *cookie = NULL);
 #endif
 
@@ -160,7 +151,6 @@ namespace povwin
 #endif
 
 #define ALTMAIN
-#define LITTLE_ENDIAN
 #define POV_PATH_SEPARATOR                  '\\'
 #define POV_IS_PATH_SEPARATOR(c)            (((c) == POV_PATH_SEPARATOR) || ((c) == '/'))
 #define POV_SLASH_IS_SWITCH_CHARACTER       1 // allow forward slash as a switch character (even despite its use as a path separator!)
@@ -173,10 +163,6 @@ namespace povwin
 #define POV_SYS_IMAGE_EXTENSION             ".bmp"
 #define POV_SYS_IMAGE_TYPE                  BMP
 #define POV_FILENAME_BUFFER_CHARS           (_MAX_PATH-1)   // (NB: _MAX_PATH includes terminating NUL character)
-#define USE_OFFICIAL_BOOST                  1
-
-#define POV_MEMMOVE(dst,src,len)            std::memmove((dst),(src),(len))
-#define POV_MEMCPY(dst,src,len)             std::memcpy((dst),(src),(len))
 
 #ifdef _CONSOLE
 

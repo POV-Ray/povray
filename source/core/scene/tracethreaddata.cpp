@@ -51,6 +51,7 @@
 #include "core/shape/blob.h"
 #include "core/shape/fractal.h"
 #include "core/shape/isosurface.h"
+#include "core/support/cracklecache.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -62,7 +63,9 @@ TraceThreadData::TraceThreadData(std::shared_ptr<SceneData> sd, size_t seed) :
     sceneData(sd),
     qualityFlags(9),
     stochasticRandomGenerator(GetRandomDoubleGenerator(0.0,1.0)),
-    stochasticRandomSeedBase(seed)
+    stochasticRandomSeedBase(seed),
+    mpCrackleCache(new CrackleCache),
+    mpRenderStats(new RenderStatistics)
 {
     for(int i = 0; i < 4; i++)
         Fractal_IStack[i] = nullptr;
@@ -114,14 +117,6 @@ TraceThreadData::TraceThreadData(std::shared_ptr<SceneData> sd, size_t seed) :
     surfacePhotonMap = new PhotonMap();
     mediaPhotonMap = new PhotonMap();
 
-    // advise the crackle cache's unordered_map that we don't mind hash collisions
-    // while this is a very high load factor, the simple fact is that the cost of
-    // allocating memory at render time (each insert into the table requires an alloc
-    // as the container doesn't pre-emptively allocate, unlike e.g. std::vector) is
-    // quite high, particularly when we have multiple threads contending for the heap
-    // lock.
-    mCrackleCache.max_load_factor(50.0);
-
     numberOfWaves = sd->numberOfWaves;
     Initialize_Waves(waveFrequencies, waveSources, numberOfWaves);
 }
@@ -140,43 +135,13 @@ TraceThreadData::~TraceThreadData()
     delete[] Blob_Intervals;
     for(std::vector<LightSource *>::iterator it = lightSources.begin(); it != lightSources.end(); it++)
         Destroy_Object(*it);
+    delete mpCrackleCache;
+    delete mpRenderStats;
 }
 
 void TraceThreadData::AfterTile()
 {
-    CrackleCache::iterator it;
-
-    // this serves as a render block index
-    progress_index++;
-
-    // probably we ought to have a means for the end-user to choose the preferred maximum bytes reserved for the cache
-    // for now, we have hard-coded values. we also do not discard any entries that are from the current block, even if
-    // the cache size is exceeded. also, note that the cache size is per-thread. finally, don't forget that erasing
-    // elements doesn't in and of itself return the freed memory to the heap.
-    if (mCrackleCache.size() * sizeof(CrackleCache::value_type) < 15 * 1024 * 1024)
-        return;
-    while (mCrackleCache.size() * sizeof(CrackleCache::value_type) > 10 * 1024 * 1024)
-    {
-        // search the cache for the oldest entries
-        int oldest = std::numeric_limits<int>::max();
-        for (it = mCrackleCache.begin(); it != mCrackleCache.end(); it++)
-            if (it->second.lastUsed < oldest)
-                oldest = (int) it->second.lastUsed;
-
-        // don't remove any entries from the most recent block
-        if (oldest == progress_index - 1)
-            break;
-
-        for (it = mCrackleCache.begin(); it != mCrackleCache.end(); )
-        {
-            if (it->second.lastUsed == oldest)
-            {
-                it = mCrackleCache.erase(it);
-                continue;
-            }
-            it++;
-        }
-    }
+    mpCrackleCache->Prune();
 }
 
 }

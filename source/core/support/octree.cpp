@@ -61,6 +61,7 @@
 #include <cfloat>
 #include <cmath>
 #include <cstdint>
+#include <cstring>
 
 // C++ standard header files
 #include <algorithm>
@@ -204,7 +205,7 @@ static inline float Pow2Floor(float a)
 /// @f]
 ///
 /// The value of the bias _b_ depends on @ref POV_PORTABLE_RADIOSITY, bit is
-/// the same value as used by @BiasedIntPow2().
+/// the same value as used by @ref BiasedIntPow2().
 ///
 /// @note
 ///     The function signature may differ depending on
@@ -231,11 +232,11 @@ static inline int BiasedIntLog2(float a)
 /// @f]
 ///
 /// The value of the bias _b_ depends on @ref POV_PORTABLE_RADIOSITY, bit is
-/// the same value as used by @BiasedIntLog2().
+/// the same value as used by @ref BiasedIntLog2().
 ///
 /// @note
 ///     The function signature may differ depending on
-///     @ref POV_PORTABLE_BIASEDINTPOW2.
+///     @ref POV_PORTABLE_RADIOSITY.
 ///
 static inline float BiasedIntPow2(int a)
 {
@@ -1580,7 +1581,7 @@ bool ot_read_file(OT_NODE **root, IStream *fd, const OT_READ_PARAM* param, OT_RE
                         new_block = reinterpret_cast<OT_BLOCK *>(POV_MALLOC(sizeof (OT_BLOCK), "octree node from file"));
                         if (new_block != nullptr)
                         {
-                            POV_MEMCPY(new_block, &bl, sizeof (OT_BLOCK));
+                            std::memcpy(new_block, &bl, sizeof (OT_BLOCK));
 
                             ot_index_sphere(bl.Point, bl.Harmonic_Mean_Distance * param->RealErrorBound, &id);
                             ot_ins(root, new_block, &id);

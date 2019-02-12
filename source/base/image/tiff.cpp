@@ -45,9 +45,6 @@
 #include <memory>
 #include <vector>
 
-// Boost header files
-#include <boost/scoped_array.hpp>
-
 // Other 3rd party header files
 extern "C"
 {

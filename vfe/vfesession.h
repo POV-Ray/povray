@@ -39,13 +39,17 @@
 #ifndef POVRAY_VFE_VFESESSION_H
 #define POVRAY_VFE_VFESESSION_H
 
+#include <condition_variable>
 #include <memory>
+#include <mutex>
 #include <queue>
+// <thread> not required for `std::thread` because we forward-declare it in `base/base_fwd.h`
 #include <vector>
 
-#include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
+#include <boost/format.hpp>
+#include <boost/function.hpp>
 
+#include "base/base_fwd.h"
 #include "base/stringutilities.h"
 
 #include "frontend/simplefrontend.h"
@@ -1280,20 +1284,20 @@ namespace vfe
       VirtualFrontEnd *m_Frontend;
       State m_BackendState;
 
-      boost::mutex m_MessageMutex;
-      boost::mutex m_SessionMutex;
-      boost::condition m_SessionEvent;
-      boost::mutex m_InitializeMutex;
-      boost::condition m_InitializeEvent;
-      boost::condition m_ShutdownEvent;
-      boost::thread *m_WorkerThread;
-      boost::thread *m_BackendThread;
+      std::mutex m_MessageMutex;
+      std::mutex m_SessionMutex;
+      std::condition_variable m_SessionEvent;
+      std::mutex m_InitializeMutex;
+      std::condition_variable m_InitializeEvent;
+      std::condition_variable m_ShutdownEvent;
+      std::thread *m_WorkerThread;
+      std::thread *m_BackendThread;
       volatile bool m_WorkerThreadExited;
       volatile bool m_BackendThreadExited;
       volatile bool m_WorkerThreadShutdownRequest;
 
-      boost::mutex m_RequestMutex;
-      boost::condition m_RequestEvent;
+      std::mutex m_RequestMutex;
+      std::condition_variable m_RequestEvent;
       volatile int m_RequestFlag;
       volatile int m_RequestResult;
   } ;

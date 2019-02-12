@@ -56,6 +56,7 @@
 // POV-Ray header files (core module)
 #include "core/material/blendmap.h"
 #include "core/material/noise.h"
+#include "core/material/pattern.h"
 #include "core/material/pigment.h"
 #include "core/material/warp.h"
 #include "core/scene/object.h"

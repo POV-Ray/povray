@@ -246,6 +246,7 @@ Density of instruction set: 916 / 1024 = 0.8945
 
 // POV-Ray header files (core module)
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
 // POV-Ray header files (VM module)
 #include "vm/fnintern.h"

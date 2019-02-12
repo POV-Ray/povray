@@ -46,9 +46,6 @@
 #include <memory>
 #include <unordered_map>
 
-// Boost header files
-//  (none at the moment)
-
 // POV-Ray header files (base module)
 #include "base/stringtypes.h"
 

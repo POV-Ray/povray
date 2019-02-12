@@ -42,7 +42,7 @@
 namespace pov_base
 {
 
-void Delay(unsigned int msec);
+#if !POV_USE_DEFAULT_TIMER
 
 class Timer final
 {
@@ -71,6 +71,8 @@ class Timer final
         POV_ULONG GetThreadTime () const;
         POV_ULONG GetProcessTime () const;
 };
+
+#endif // POV_USE_DEFAULT_TIMER
 
 }
 // end of namespace pov_base

@@ -43,9 +43,6 @@
 #include <algorithm>
 #include <limits>
 
-// Boost header files
-#include <boost/thread.hpp>
-
 // POV-Ray header files (base module)
 #include "base/image/colourspace.h"
 #ifdef PROFILE_INTERSECTIONS
@@ -58,6 +55,7 @@
 #include "core/math/jitter.h"
 #include "core/math/matrix.h"
 #include "core/render/trace.h"
+#include "core/support/statistics.h"
 
 // POV-Ray header files (POVMS module)
 //  (none at the moment)

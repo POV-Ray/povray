@@ -65,7 +65,9 @@
 #include "core/scene/object.h"
 #include "core/scene/scenedata.h"
 #include "core/scene/tracethreaddata.h"
+#include "core/support/cracklecache.h"
 #include "core/support/imageutil.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -5746,7 +5748,7 @@ DBL CheckerPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsecti
 *   neighbours from a set of disjoint points, like the membranes in suds are
 *   to the centres of the bubbles).
 *
-*   All "crackle" specific source code and examples are in the public domain.
+*   The original "crackle" specific source code and examples are in the public domain.
 *
 * CHANGES
 *   Oct 1994    : adapted from pigment by [CY]
@@ -5795,36 +5797,30 @@ DBL CracklePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
     CrackleCacheEntry dummy_entry;
     CrackleCacheEntry* entry = &dummy_entry;
 
-    // search for this hash value in the cache
-    CrackleCache::iterator iter = pThread->mCrackleCache.find(ccoord);
-    if (iter == pThread->mCrackleCache.end())
+    if (pThread->mpCrackleCache->Lookup(entry, ccoord))
     {
-        /*
-         * No, not same unit cube.  Calculate the random points for this new
-         * cube and its 80 neighbours which differ in any axis by 1 or 2.
-         * Why distance of 2?  If there is 1 point in each cube, located
-         * randomly, it is possible for the closest random point to be in the
-         * cube 2 over, or the one two over and one up.  It is NOT possible
-         * for it to be two over and two up.  Picture a 3x3x3 cube with 9 more
-         * cubes glued onto each face.
-         */
+        // Cache hit. `entry` now points to the cached entry.
+        pThread->Stats()[CrackleCache_Tests_Succeeded]++;
+    }
+    else
+    {
+        // Cache miss. `entry` now points to a pristine entry set up in the
+        // cache, or to `dummy_entry` if the cache is too crowded already.
+        // In either case we need to fill in the blanks.
 
-        // generate a new cache entry, but only if the size of the cache is reasonable.
-        // having to re-calculate entries that would have been cache hits had we not
-        // skipped on adding an entry is less expensive than chewing up immense amounts
-        // of RAM and finally hitting the swapfile. unfortunately there's no good way
-        // to tell how much memory is 'too much' for the cache, so we just use a hard-
-        // coded number for now (ideally we should allow the user to configure this).
-        // keep in mind that the cache memory usage is per-thread, so the more threads,
-        // the more RAM. if we don't do the insert, entry will point at a local variable.
-        if (pThread->mCrackleCache.size() * sizeof(CrackleCache::value_type) < 30 * 1024 * 1024)
-        {
-            iter = pThread->mCrackleCache.insert(pThread->mCrackleCache.end(), CrackleCache::value_type(ccoord, CrackleCacheEntry()));
-            entry = &iter->second;
-            entry->lastUsed = pThread->ProgressIndex();
-        }
+        // Calculate the random points for this new
+        // cube and its 80 neighbours which differ in any axis by 1 or 2.
+        // Why distance of 2?  If there is 1 point in each cube, located
+        // randomly, it is possible for the closest random point to be in the
+        // cube 2 over, or the one two over and one up.  It is NOT possible
+        // for it to be two over and two up.  Picture a 3x3x3 cube with 9 more
+        // cubes glued onto each face.
 
-        // see InitializeCrackleCubes() below.
+        // TODO - Note that we're currently re-computing each cell up to 81
+        //        times - once as a main cell and 80 times as a neighbor -
+        //        even in the best case scenario. Wouldn't it be more efficient
+        //        to just cache the individual cells?
+
         int *pc = gaCrackleCubeTable;
         for (int i = 0; i < 81; i++, pc += 3)
         {
@@ -5853,11 +5849,6 @@ DBL CracklePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
             IntPickInCube(cacheX, cacheY, cacheZ, entry->aCellNuclei[i]);
             entry->aCellNuclei[i] += wrappingOffset;
         }
-    }
-    else
-    {
-        pThread->Stats()[CrackleCache_Tests_Succeeded]++;
-        entry = &iter->second;
     }
 
     // Find the 3 points with the 3 shortest distances from the input point.
@@ -8915,6 +8906,7 @@ int PickInCube(const Vector3d& tv, Vector3d& p1)
 ******************************************************************************/
 
 #ifndef HAVE_BOOST_HASH
+// NOTE: Keep this around - we may need it when we get rid of boost::hash.
 static unsigned long int NewHash(long int tvx, long int tvy, long int tvz)
 {
     unsigned long int seed;

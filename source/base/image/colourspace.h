@@ -46,11 +46,7 @@
 // C++ standard header files
 #include <list>
 #include <memory>
-
-// Boost header files
-#if POV_MULTITHREADED
-#include <boost/thread.hpp>
-#endif
+#include <mutex>
 
 // POV-Ray header files (base module)
 #include "base/colour.h"
@@ -306,7 +302,7 @@ class GammaCurve
 
 #if POV_MULTITHREADED
         /// Mutex to guard access to @ref lookupTable8 and @ref lookupTable16.
-        boost::mutex lutMutex;
+        std::mutex lutMutex;
 #endif
 
         /// Constructor.
@@ -341,7 +337,7 @@ class GammaCurve
 
 #if POV_MULTITHREADED
         /// Mutex to guard access to `cache`.
-        static boost::mutex cacheMutex;
+        static std::mutex cacheMutex;
 #endif
 
         /// Function to manage the gamma curve cache.
@@ -570,7 +566,7 @@ class TranscodingGammaCurve final : public GammaCurve
     protected:
         GammaCurvePtr workGamma;
         GammaCurvePtr encGamma;
-        TranscodingGammaCurve();
+        TranscodingGammaCurve() = delete;
         TranscodingGammaCurve(const GammaCurvePtr&, const GammaCurvePtr&);
         virtual bool Matches(const GammaCurvePtr&) const override;
 };

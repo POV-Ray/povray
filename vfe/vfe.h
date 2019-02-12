@@ -41,10 +41,6 @@
 #include <memory>
 #include <vector>
 
-#include <boost/format.hpp>
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
-
 #include "base/platformbase.h"
 #include "base/stringtypes.h"
 #include "base/timer.h"

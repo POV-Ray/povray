@@ -42,9 +42,6 @@
 // C++ standard header files
 #include <sstream>
 
-// Boost header files
-#include <boost/bind.hpp>
-
 // POV-Ray header files (base module)
 #include "base/types.h"
 #include "base/version_info.h"

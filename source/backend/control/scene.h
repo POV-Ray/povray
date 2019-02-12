@@ -45,13 +45,11 @@
 
 // C++ standard header files
 #include <memory>
+// <thread> not required for `std::thread` because we forward-declare it in `base/base_fwd.h`
 #include <vector>
 
-// Boost header files
-#include <boost/thread.hpp>
-
 // POV-Ray header files (base module)
-//  (none at the moment)
+#include "base/base_fwd.h"
 
 // POV-Ray header files (core module)
 #include "core/core_fwd.h"
@@ -190,7 +188,7 @@ class Scene final
         /// stop request flag
         bool stopRequsted;
         /// parser control thread
-        boost::thread *parserControlThread;
+        std::thread *parserControlThread;
 
         /**
          *  Send the parser statistics upon completion of a parsing.

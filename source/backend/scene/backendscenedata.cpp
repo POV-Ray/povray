@@ -43,10 +43,6 @@
 #include <sstream>
 #include <vector>
 
-// Boost header files
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
-
 // POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
 #include "base/fileutil.h"

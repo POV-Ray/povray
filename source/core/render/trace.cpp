@@ -42,9 +42,6 @@
 // C++ standard header files
 #include <algorithm>
 
-// Boost header files
-#include <boost/bind.hpp>
-
 // POV-Ray header files (base module)
 #include "base/povassert.h"
 
@@ -69,6 +66,7 @@
 #include "core/shape/box.h"
 #include "core/shape/csg.h"
 #include "core/support/imageutil.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

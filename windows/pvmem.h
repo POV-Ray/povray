@@ -82,7 +82,8 @@ class WinMemStats final
     {
     }
 
-    void Report(uint64& allocs, uint64& frees, int64& current, uint64& peak, uint64 &smallest, uint64 &largest)
+    void Report(unsigned __int64& allocs, unsigned __int64& frees, __int64& current,
+                unsigned __int64& peak, unsigned __int64& smallest, unsigned __int64& largest)
     {
       allocs = callsToAlloc;
       frees = callsToFree;
@@ -130,12 +131,12 @@ class WinMemStats final
     }
 
   private:
-    volatile int64 currentAllocated;
-    volatile uint64 peakAllocated;
-    volatile uint64 callsToAlloc;
-    volatile uint64 callsToFree;
-    volatile uint64 smallestAlloc;
-    volatile uint64 largestAlloc;
+    volatile __int64 currentAllocated;
+    volatile unsigned __int64 peakAllocated;
+    volatile unsigned __int64 callsToAlloc;
+    volatile unsigned __int64 callsToFree;
+    volatile unsigned __int64 smallestAlloc;
+    volatile unsigned __int64 largestAlloc;
 };
 
 typedef WinMemStats PovMemStats;

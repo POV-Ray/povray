@@ -54,6 +54,7 @@
 #include "core/shape/box.h"
 #include "core/shape/csg.h"
 #include "core/shape/sphere.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

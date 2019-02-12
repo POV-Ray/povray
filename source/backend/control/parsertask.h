@@ -45,7 +45,6 @@
 // C++ standard header files
 #include <memory>
 
-// Boost header files
 // POV-Ray header files (base module)
 // POV-Ray header files (core module)
 //  (none at the moment)

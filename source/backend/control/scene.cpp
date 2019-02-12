@@ -42,9 +42,9 @@
 // C++ standard header files
 #include <algorithm>
 #include <sstream>
+#include <thread>
 
 // Boost header files
-#include <boost/thread.hpp>
 #include <boost/bind.hpp>
 
 // POV-Ray header files (base module)
@@ -106,7 +106,7 @@ void Scene::StartParser(POVMS_Object& parseOptions)
 
     // A scene can only be parsed once
     if (parserControlThread == nullptr)
-        parserControlThread = Task::NewBoostThread(boost::bind(&Scene::ParserControlThread, this), POV_THREAD_STACK_SIZE);
+        parserControlThread = new std::thread(boost::bind(&Scene::ParserControlThread, this));
     else
         return;
 
@@ -274,7 +274,10 @@ void Scene::GetStatistics(POVMS_Object& parserStats)
     for(std::vector<TraceThreadData*>::iterator i(sceneThreadData.begin()); i != sceneThreadData.end(); i++)
     {
         timeData[(*i)->timeType].realTime = max(timeData[(*i)->timeType].realTime, (*i)->realTime);
-        timeData[(*i)->timeType].cpuTime += (*i)->cpuTime;
+        if ((*i)->cpuTime >= 0)
+            timeData[(*i)->timeType].cpuTime += (*i)->cpuTime;
+        else
+            timeData[(*i)->timeType].cpuTime = -1;
         timeData[(*i)->timeType].samples++;
     }
 
@@ -285,7 +288,8 @@ void Scene::GetStatistics(POVMS_Object& parserStats)
             POVMS_Object elapsedTime(kPOVObjectClass_ElapsedTime);
 
             elapsedTime.SetLong(kPOVAttrib_RealTime, timeData[i].realTime);
-            elapsedTime.SetLong(kPOVAttrib_CPUTime, timeData[i].cpuTime);
+            if (timeData[i].cpuTime >= 0)
+                elapsedTime.SetLong(kPOVAttrib_CPUTime, timeData[i].cpuTime);
             elapsedTime.SetInt(kPOVAttrib_TimeSamples, POVMSInt(timeData[i].samples));
 
             switch(i)
@@ -369,7 +373,7 @@ void Scene::ParserControlThread()
 
         if(stopRequsted == false)
         {
-            boost::thread::yield();
+            std::this_thread::yield();
             Delay(10);
         }
     }

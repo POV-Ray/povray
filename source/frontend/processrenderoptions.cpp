@@ -48,7 +48,6 @@
 #include "base/stringutilities.h"
 #include "base/image/colourspace.h"
 #include "base/image/dither.h"
-#include "base/image/encoding.h"
 
 // POV-Ray header files (core module)
 #include "base/fileinputoutput.h"

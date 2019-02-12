@@ -41,9 +41,9 @@
 
 // C++ standard header files
 #include <string>
+#include <thread>
 
 // Boost header files
-#include <boost/thread.hpp>
 #include <boost/bind.hpp>
 
 // POV-Ray header files (base module)
@@ -216,7 +216,7 @@ volatile POVMSContext POV_RenderContext = nullptr;
 volatile POVMSAddress POV_FrontendAddress = POVMSInvalidAddress;
 
 /// Main POV-Ray thread that waits for messages from the frontend
-boost::thread *POV_MainThread = nullptr;
+std::thread *POV_MainThread = nullptr;
 
 /// Flag to mark main POV-Ray thread for termination
 volatile bool POV_TerminateMainThread = false;
@@ -610,7 +610,7 @@ void MainThreadFunction(const boost::function0<void>& threadExit)
                         (void)POVMS_ASSERT_OUTPUT("Unhandled exception in POVMS receive handler in main POV-Ray backend thread.", __FILE__, __LINE__);
                     }
 
-                    boost::thread::yield();
+                    std::this_thread::yield();
                 }
 
                 // close_all(); // TODO FIXME - Remove this call! [trf]
@@ -642,7 +642,7 @@ void MainThreadFunction(const boost::function0<void>& threadExit)
 
 } // namespace
 
-boost::thread *povray_init(const boost::function0<void>& threadExit, POVMSAddress *addr)
+std::thread *povray_init(const boost::function0<void>& threadExit, POVMSAddress *addr)
 {
     using namespace pov;
 
@@ -654,13 +654,13 @@ boost::thread *povray_init(const boost::function0<void>& threadExit, POVMSAddres
         Initialize_Noise();
         pov::InitializePatternGenerators();
 
-        POV_MainThread = Task::NewBoostThread(boost::bind(&MainThreadFunction, threadExit), POV_THREAD_STACK_SIZE);
+        POV_MainThread = new std::thread(boost::bind(&MainThreadFunction, threadExit));
 
-        // we can't depend on boost::thread::yield here since under windows it is not
-        // guaranteed to give up a time slice [see API docs for Sleep(0)]
+        // We can't depend on `std::this_thread::yield()` here since it is not
+        // guaranteed to give up a time slice.
         while (POV_RenderContext == nullptr)
         {
-            boost::thread::yield();
+            std::this_thread::yield();
             pov_base::Delay(50);
         }
     }
@@ -688,7 +688,7 @@ void povray_terminate()
 
     while (POV_RenderContext != nullptr)
     {
-        boost::thread::yield();
+        std::this_thread::yield();
         pov_base::Delay(100);
     }
 

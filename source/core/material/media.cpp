@@ -52,7 +52,9 @@
 #include "core/material/pigment.h"
 #include "core/math/chi2.h"
 #include "core/render/ray.h"
+#include "core/scene/object.h"
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

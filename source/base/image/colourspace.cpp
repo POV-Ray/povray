@@ -57,9 +57,7 @@ using std::max;
 
 // definitions of static GammaCurve member variables to satisfy the linker
 std::list<std::weak_ptr<GammaCurve>> GammaCurve::cache;
-#if POV_MULTITHREADED
-boost::mutex GammaCurve::cacheMutex;
-#endif
+std::mutex GammaCurve::cacheMutex;
 
 // definitions of static GammaCurve-derivatives' member variables to satisfy the linker
 SimpleGammaCurvePtr NeutralGammaCurve::instance;
@@ -77,10 +75,8 @@ float* GammaCurve::GetLookupTable(unsigned int max)
     // Get a reference to the lookup table pointer we're dealing with, so we don't need to duplicate all the remaining code.
     float*& lookupTable = (max == 255 ? lookupTable8 : lookupTable16);
 
-#if POV_MULTITHREADED
     // Make sure we're not racing any other thread that might currently be busy creating the LUT.
-    boost::mutex::scoped_lock lock(lutMutex);
-#endif
+    std::lock_guard<std::mutex> lock(lutMutex);
 
     // Create the LUT if it doesn't exist yet.
     if (!lookupTable)
@@ -102,12 +98,10 @@ GammaCurvePtr GammaCurve::GetMatching(const GammaCurvePtr& newInstance)
     GammaCurvePtr oldInstance;
     bool cached = false;
 
-    // See if we have a matching gamma curve in our chache already
+    // See if we have a matching gamma curve in our cache already
 
-#if POV_MULTITHREADED
     // make sure the cache doesn't get tampered with while we're working on it
-    boost::mutex::scoped_lock lock(cacheMutex);
-#endif
+    std::lock_guard<std::mutex> lock(cacheMutex);
 
     // Check if we already have created a matching gamma curve object; if so, return that object instead.
     // Also, make sure we get the new object stored (as we're using weak pointers, we may have stale entries;

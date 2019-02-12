@@ -45,10 +45,8 @@
 
 // C++ standard header files
 #include <memory>
+#include <mutex>
 #include <vector>
-
-// Boost header files
-#include <boost/thread.hpp>
 
 // POV-Ray header files (base module)
 //  (none at the moment)
@@ -78,7 +76,7 @@ class PhotonShootingStrategy final
 
     private:
         std::vector<PhotonShootingUnit*>::iterator iter;
-        boost::mutex nextUnitMutex;
+        std::mutex nextUnitMutex;
 
 };
 

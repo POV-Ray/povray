@@ -38,8 +38,9 @@
 
 // C++ variants of C standard header files
 // C++ standard header files
+
 // Boost header files
-//  (none at the moment)
+#include <boost/bind.hpp>
 
 // POV-Ray header files (base module)
 #include "base/types.h"

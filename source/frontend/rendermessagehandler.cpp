@@ -37,8 +37,10 @@
 #include "frontend/rendermessagehandler.h"
 
 // C++ variants of C standard header files
-// C++ standard header files
 //  (none at the moment)
+
+// C++ standard header files
+#include <sstream>
 
 // POV-Ray header files (base module)
 // POV-Ray header files (POVMS module)

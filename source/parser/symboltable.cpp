@@ -37,8 +37,9 @@
 #include "parser/symboltable.h"
 
 // C++ variants of C standard header files
+#include <cstring>
+
 // C++ standard header files
-// Boost header files
 //  (none at the moment)
 
 // POV-Ray header files (base module)
@@ -265,7 +266,7 @@ void* SymbolTable::Copy_Identifier(void* Data, int Type)
         case STRING_ID_TOKEN:
             len = UCS2_strlen(reinterpret_cast<UCS2*>(Data)) + 1;
             New = reinterpret_cast<UCS2*>(POV_MALLOC(len * sizeof(UCS2), "UCS2 String"));
-            POV_MEMCPY(reinterpret_cast<void*>(New), reinterpret_cast<void*>(Data), len * sizeof(UCS2));
+            std::memcpy(reinterpret_cast<void*>(New), reinterpret_cast<void*>(Data), len * sizeof(UCS2));
             break;
         case ARRAY_ID_TOKEN:
             New = CloneData<Assignable>(Data);

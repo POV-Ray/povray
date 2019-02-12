@@ -45,9 +45,6 @@
 // C++ standard header files
 #include <memory>
 
-// Boost header files
-//  (none at the moment)
-
 // POV-Ray header files (base module)
 #include "base/stringtypes.h"
 

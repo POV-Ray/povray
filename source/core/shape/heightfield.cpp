@@ -73,6 +73,7 @@
 #include "core/scene/tracethreaddata.h"
 #include "core/shape/box.h"
 #include "core/support/imageutil.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

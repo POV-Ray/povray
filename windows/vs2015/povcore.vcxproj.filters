@@ -275,6 +275,9 @@
     <ClCompile Include="..\..\source\core\math\vector.cpp">
       <Filter>Core Source\Math</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\core\support\cracklecache.cpp">
+      <Filter>Core Source\Support</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\core\configcore.h">
@@ -524,6 +527,24 @@
       <Filter>Core Headers\Material</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\core\support\octree_fwd.h">
+      <Filter>Core Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\scene\scenedata_fwd.h">
+      <Filter>Core Headers\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\support\statistics_fwd.h">
+      <Filter>Core Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\math\randomsequence_fwd.h">
+      <Filter>Core Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\math\vector_fwd.h">
+      <Filter>Core Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\support\cracklecache_fwd.h">
+      <Filter>Core Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\support\cracklecache.h">
       <Filter>Core Headers\Support</Filter>
     </ClInclude>
   </ItemGroup>

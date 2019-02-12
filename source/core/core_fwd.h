@@ -43,6 +43,9 @@
 namespace pov
 {
 
+class GenericFunctionContext;
+typedef GenericFunctionContext* GenericFunctionContextPtr;
+
 class Interior;
 
 class Intersection;

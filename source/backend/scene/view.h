@@ -44,10 +44,14 @@
 //  (none at the moment)
 
 // C++ standard header files
+#include <condition_variable>
 #include <memory>
+#include <mutex>
+// <thread> not required for `std::thread` because we forward-declare it in `base/base_fwd.h`
 #include <vector>
 
 // POV-Ray header files (base module)
+#include "base/base_fwd.h"
 #include "base/types.h" // TODO - only appears to be pulled in for POVRect - can we avoid this?
 
 // POV-Ray header files (core module)
@@ -85,9 +89,9 @@ class RTRData final
 
     private:
         ViewData& viewData;
-        boost::mutex counterMutex;
-        boost::mutex eventMutex;
-        boost::condition event;
+        std::mutex counterMutex;
+        std::mutex eventMutex;
+        std::condition_variable event;
         int width;
         int height;
         unsigned int numPixelsCompleted;
@@ -304,9 +308,9 @@ class ViewData final
         ///         repeating the process until a value is reached that is not found in @ref blockSkipList.
         volatile unsigned int nextBlock;
         /// next block counter mutex
-        boost::mutex nextBlockMutex;
+        std::mutex nextBlockMutex;
         /// set data mutex
-        boost::mutex setDataMutex;
+        std::mutex setDataMutex;
         /// Whether all blocks have been dispatched at least once.
         bool completedFirstPass;
         /// highest reached trace level
@@ -459,7 +463,7 @@ class View final
         /// stop request flag
         bool stopRequsted;
         /// render control thread
-        boost::thread *renderControlThread;
+        std::thread *renderControlThread;
         /// BSP tree mailbox
         BSPTree::Mailbox mailbox;
 

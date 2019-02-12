@@ -42,7 +42,7 @@
 #include "core/render/tracepixel.h"
 
 // C++ variants of C standard header files
-//  (none at the moment)
+#include <cstring>
 
 // C++ standard header files
 #include <vector>
@@ -74,7 +74,7 @@ using std::max;
 #ifdef DYNAMIC_HASHTABLE
 extern unsigned short *hashTable; // GLOBAL VARIABLE
 #else
-extern ALIGN16 unsigned short hashTable[]; // GLOBAL VARIABLE
+alignas(16) extern unsigned short hashTable[]; // GLOBAL VARIABLE
 #endif
 
 const int Grid1Size    = 4;
@@ -1251,7 +1251,7 @@ TracePixel::FocalBlurData::FocalBlurData(const Camera& camera, TraceThreadData* 
             // Allocate temporary grid.
             std::unique_ptr<char[]> Grid_Data (new char [Grid_Size * Grid_Size]);
             char *p = Grid_Data.get();
-            memset(p, 0, Grid_Size * Grid_Size);
+            std::memset(p, 0, Grid_Size * Grid_Size);
             std::vector<char*> Grid(Grid_Size);
             for(int i = 0; i < Grid_Size; i++, p += Grid_Size)
                 Grid[i] = p;

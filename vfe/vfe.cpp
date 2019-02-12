@@ -45,6 +45,9 @@
 #include <cstdarg>
 #include <cstdio>
 
+#include <boost/bind.hpp>
+#include <boost/format.hpp>
+
 #include "base/filesystem.h"
 #include "base/povassert.h"
 #include "base/textstream.h"

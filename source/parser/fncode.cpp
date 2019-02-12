@@ -393,7 +393,7 @@ void FNCode_Copy(FunctionCode *f, FunctionCode *fnew)
     if (f->program != nullptr)
     {
         fnew->program = reinterpret_cast<Instruction *>(POV_MALLOC(sizeof(Instruction) * f->program_size, "fn: program"));
-        POV_MEMCPY(fnew->program, f->program, sizeof(Instruction) * f->program_size);
+        std::memcpy(fnew->program, f->program, sizeof(Instruction) * f->program_size);
     }
     if (f->name != nullptr)
     {

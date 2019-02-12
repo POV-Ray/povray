@@ -80,6 +80,7 @@
 #include <tchar.h>
 
 #include <memory>
+#include <mutex>
 
 #include "pvengine.h"
 #include "resource.h"
@@ -567,7 +568,7 @@ void WIN32_DEBUG_FILE_OUTPUT (const char *format,...)
 {
   va_list               arg_ptr ;
   static FILE           *f ;
-  static boost::mutex   mtx;
+  static std::mutex     mtx;
 
   if (format == NULL)
   {
@@ -586,7 +587,7 @@ void WIN32_DEBUG_FILE_OUTPUT (const char *format,...)
       return ;
   }
 
-  boost::mutex::scoped_lock l(mtx);
+  std::lock_guard<std::mutex> l(mtx);
   fprintf (f, "%u [%d]: ", GetTickCount (), GetCurrentThreadId ()) ;
   va_start (arg_ptr, format) ;
   vfprintf (f, format, arg_ptr) ;
@@ -1713,8 +1714,8 @@ LONG WINAPI ExceptionHandler(struct _EXCEPTION_POINTERS* ExceptionInfo)
   long                        timestamp = _time32(NULL);
   PCONTEXT                    c ;
   static char                 str[2048] ;
-  static boost::mutex         mtx;
-  boost::mutex::scoped_lock   l(mtx);
+  static std::mutex           mtx;
+  std::lock_guard<std::mutex> l(mtx);
 
   c = ExceptionInfo->ContextRecord ;
   const char *desc = GetExceptionDescription(ExceptionInfo->ExceptionRecord->ExceptionCode);
@@ -5067,11 +5068,11 @@ void LZTimerOff (void)
     PerformanceCounter2 = 0 ;
 }
 
-ulong LZTimerCount (void)
+unsigned long LZTimerCount (void)
 {
   if (PerformanceCounter1 == 0 || PerformanceCounter2 < PerformanceCounter1)
     return (0) ;
-  return ((ulong) ((PerformanceCounter2 - PerformanceCounter1) / PerformanceScale)) ;
+  return ((unsigned long) ((PerformanceCounter2 - PerformanceCounter1) / PerformanceScale)) ;
 }
 
 __int64 LZTimerRawCount (void)

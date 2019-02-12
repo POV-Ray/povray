@@ -42,6 +42,7 @@
 // C++ standard header files
 #include <limits>
 #include <map>
+#include <mutex>
 #include <stdexcept>
 
 // Boost header files
@@ -49,9 +50,6 @@
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
-#if POV_MULTITHREADED
-#include <boost/thread.hpp>
-#endif
 
 // POV-Ray header files (base module)
 #include "base/povassert.h"
@@ -499,7 +497,7 @@ class NumberSequenceFactory
         GeneratorPtr        master;
         SequenceConstPtr    masterSequence;
 #if POV_MULTITHREADED
-        boost::mutex        masterMutex;
+        std::mutex          masterMutex;
 #endif
 };
 
@@ -527,7 +525,7 @@ class NumberSequenceMetaFactory
 
         static  FactoryTable*   lookupTable;
 #if POV_MULTITHREADED
-        static  boost::mutex    lookupMutex;
+        static  std::mutex      lookupMutex;
 #endif
 };
 
@@ -774,7 +772,7 @@ template<class Type>
 shared_ptr<vector<Type> const> NumberSequenceFactory<Type>::operator()(size_t count)
 {
 #if POV_MULTITHREADED
-    boost::mutex::scoped_lock lock(masterMutex);
+    std::lock_guard<std::mutex> lock(masterMutex);
 #endif
     if (!masterSequence)
     {
@@ -817,14 +815,14 @@ std::map<typename GeneratorType::ParameterStruct, std::weak_ptr<NumberSequenceFa
 
 #if POV_MULTITHREADED
 template<class ValueType, class GeneratorType>
-boost::mutex NumberSequenceMetaFactory<ValueType, GeneratorType>::lookupMutex;
+std::mutex NumberSequenceMetaFactory<ValueType, GeneratorType>::lookupMutex;
 #endif
 
 template<class ValueType, class GeneratorType>
 shared_ptr<NumberSequenceFactory<ValueType>> NumberSequenceMetaFactory<ValueType, GeneratorType>::GetFactory(const typename GeneratorType::ParameterStruct& param)
 {
 #if POV_MULTITHREADED
-    boost::mutex::scoped_lock lock(lookupMutex);
+    std::lock_guard<std::mutex> lock(lookupMutex);
 #endif
     if (!lookupTable)
         lookupTable = new FactoryTable();
