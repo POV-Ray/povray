@@ -49,13 +49,12 @@
 //  (none at the moment)
 
 // C++ standard header files
-// <thread> not required for `std::thread` because we forward-declare it in `base/base_fwd.h`
+#include <thread>
 
 // Boost header files
 #include <boost/function.hpp>
 
 // POV-Ray header files (base module)
-#include "base/base_fwd.h"
 #include "base/version_info.h"
 
 // POV-Ray header files (backend module)

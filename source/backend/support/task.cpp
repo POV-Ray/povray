@@ -41,7 +41,6 @@
 
 // C++ standard header files
 #include <stdexcept>
-#include <thread>
 
 // Boost header files
 #include <boost/bind.hpp>

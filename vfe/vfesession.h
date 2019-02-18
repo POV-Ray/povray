@@ -43,13 +43,12 @@
 #include <memory>
 #include <mutex>
 #include <queue>
-// <thread> not required for `std::thread` because we forward-declare it in `base/base_fwd.h`
+#include <thread>
 #include <vector>
 
 #include <boost/format.hpp>
 #include <boost/function.hpp>
 
-#include "base/base_fwd.h"
 #include "base/stringutilities.h"
 
 #include "frontend/simplefrontend.h"

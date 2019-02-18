@@ -42,8 +42,6 @@
 
 #include "vfe.h"
 
-#include <thread>
-
 #include <boost/bind.hpp>
 
 #include "backend/povray.h"

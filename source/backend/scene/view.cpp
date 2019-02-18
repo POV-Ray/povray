@@ -42,7 +42,6 @@
 // C++ standard header files
 #include <algorithm>
 #include <chrono>
-#include <thread>
 
 // Boost header files
 #include <boost/bind.hpp>

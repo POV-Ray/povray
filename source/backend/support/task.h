@@ -45,7 +45,7 @@
 // C++ standard header files
 #include <memory>
 #include <queue>
-// <thread> not required for `std::thread` because we forward-declare it in `base/base_fwd.h`
+#include <thread>
 
 // Boost header files
 #include <boost/function.hpp>

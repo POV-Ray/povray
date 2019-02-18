@@ -41,7 +41,6 @@
 
 // C++ standard header files
 #include <string>
-#include <thread>
 
 // Boost header files
 #include <boost/bind.hpp>
