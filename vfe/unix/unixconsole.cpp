@@ -93,7 +93,7 @@ static bool gCancelRender = false;
 // for handling asynchronous (external) signals
 static int gSignalNumber = 0;
 static std::mutex gSignalMutex;
-static bool gTerminateSignalHandler = false;
+static volatile bool gTerminateSignalHandler = false;
 
 
 // TODO FIXME - This way to handle signals seems rather wonky, as it is subject
@@ -114,9 +114,13 @@ static void SignalHandler (void)
     while(!gTerminateSignalHandler)
     {
         // Wait till a signal is caught.
+#ifdef HAVE_SIGTIMEDWAIT
         signum = sigtimedwait(&sigset, nullptr, &timeout);
         if (signum == -1)
             continue; // Error. Presumably timed out; check whether to end the task.
+#else
+        (void)sigwait(&sigset, &signum);
+#endif
 
         // Got a signal.
         std::lock_guard<std::mutex> lock(gSignalMutex);
@@ -423,6 +427,25 @@ static void CleanupBenchmark(vfeUnixSession *session, std::string& ini, std::str
     session->DeleteTemporaryFile(SysToUCS2String(pov.c_str()));
 }
 
+static void TerminateSignalHandler(std::thread* sigthread)
+{
+    gTerminateSignalHandler = true;
+#ifdef HAVE_SIGTIMEDWAIT
+    // `std::thread`s must be `join`ed or `detach`ed before destruction,
+    // otherwise their destructor causes ungraceful termination of the entire
+    // program.
+    sigthread->join();
+#else
+    // `std::thread`s must be `join`ed or `detach`ed before destruction,
+    // otherwise their destructor causes ungraceful termination of the entire
+    // program. `join` is not an option because we can't reliably make the
+    // thread terminate itself, so we must trust the OS that it will kill any
+    // `detach`ed threads when their parent process exits.
+    // TODO - This is a hackish solution.
+    sigthread->detach();
+#endif
+}
+
 int main (int argc, char **argv)
 {
     vfeUnixSession   *session;
@@ -499,8 +522,7 @@ int main (int argc, char **argv)
         PrintStatus (session) ;
         // TODO: general usage display (not yet in core code)
         session->GetUnixOptions()->PrintOptions();
-        gTerminateSignalHandler = true;
-        sigthread->join();
+        TerminateSignalHandler(sigthread);
         delete sigthread;
         delete session;
         return RETURN_OK;
@@ -509,8 +531,7 @@ int main (int argc, char **argv)
     {
         session->Shutdown() ;
         PrintVersion();
-        gTerminateSignalHandler = true;
-        sigthread->join();
+        TerminateSignalHandler(sigthread);
         delete sigthread;
         delete session;
         return RETURN_OK;
@@ -519,8 +540,7 @@ int main (int argc, char **argv)
     {
         session->Shutdown();
         PrintGeneration();
-        gTerminateSignalHandler = true;
-        sigthread->join();
+        TerminateSignalHandler(sigthread);
         delete sigthread;
         delete session;
         return RETURN_OK;
@@ -533,8 +553,7 @@ int main (int argc, char **argv)
         else
         {
             session->Shutdown();
-            gTerminateSignalHandler = true;
-            sigthread->join();
+            TerminateSignalHandler(sigthread);
             delete sigthread;
             delete session;
             return retval;
@@ -578,7 +597,7 @@ int main (int argc, char **argv)
         session->PauseWhenDone(true);
 
     // main render loop
-    session->SetEventMask(stBackendStateChanged);  // immediatly notify this event
+    session->SetEventMask(stBackendStateChanged);  // immediately notify this event
     while (((flags = session->GetStatus(true, 200)) & stRenderShutdown) == 0)
     {
         ProcessSignal();
@@ -635,8 +654,7 @@ int main (int argc, char **argv)
         retval = gCancelRender ? RETURN_USER_ABORT : RETURN_ERROR;
     session->Shutdown();
     PrintStatus (session);
-    gTerminateSignalHandler = true;
-    sigthread->join();
+    TerminateSignalHandler(sigthread);
     delete sigthread;
     delete session;
 
