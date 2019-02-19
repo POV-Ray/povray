@@ -13,7 +13,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,14 +41,19 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/image/hdr.h"
 
-// Standard C++ header files
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <memory>
-#include <string>
 
 // POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
 #include "base/types.h"
+#include "base/image/colourspace.h"
 #include "base/image/dither.h"
+#include "base/image/encoding.h"
+#include "base/image/image.h"
 #include "base/image/metadata.h"
 
 // this must be the last file included
@@ -71,12 +76,6 @@ namespace HDR
 /*****************************************************************************
 * Local typedefs
 ******************************************************************************/
-
-struct Messages
-{
-    vector<string> warnings;
-    string error;
-};
 
 typedef unsigned char RGBE[4]; // red, green, blue, exponent
 
@@ -157,7 +156,7 @@ void ReadOldLine(unsigned char *scanline, int width, IStream *file)
     }
 }
 
-Image *Read(IStream *file, const Image::ReadOptions& options)
+Image *Read(IStream *file, const ImageReadOptions& options)
 {
     char line[2048];
     char *s;
@@ -170,7 +169,7 @@ Image *Read(IStream *file, const Image::ReadOptions& options)
     unsigned int width;
     unsigned int height;
     Image *image = nullptr;
-    Image::ImageDataType imagetype = options.itype;
+    ImageDataType imagetype = options.itype;
 
     // Radiance HDR files store linear color values by default, so never convert unless the user overrides
     // (e.g. to handle a non-compliant file).
@@ -202,8 +201,8 @@ Image *Read(IStream *file, const Image::ReadOptions& options)
     if(sscanf(line, "%2[+-XY] %u %2[+-XY] %u\n", s1, &height, s2, &width) != 4)
         throw POV_EXCEPTION(kFileDataErr, "Bad HDR file header");
 
-    if(imagetype == Image::Undefined)
-        imagetype = Image::RGBFT_Float;
+    if(imagetype == ImageDataType::Undefined)
+        imagetype = ImageDataType::RGBFT_Float; // TODO - A dedicated RGB_Float container would be more space efficient.
 
     image = Image::Create(width, height, imagetype);
     // NB: HDR files don't use alpha, so premultiplied vs. non-premultiplied is not an issue
@@ -287,7 +286,7 @@ Image *Read(IStream *file, const Image::ReadOptions& options)
     return image;
 }
 
-void Write(OStream *file, const Image *image, const Image::WriteOptions& options)
+void Write(OStream *file, const Image *image, const ImageWriteOptions& options)
 {
     int width = image->GetWidth();
     int height = image->GetHeight();
@@ -409,7 +408,8 @@ void Write(OStream *file, const Image *image, const Image::WriteOptions& options
     }
 }
 
-} // end of namespace HDR
+}
+// end of namespace HDR
 
-} // end of namespace pov_base
-
+}
+// end of namespace pov_base

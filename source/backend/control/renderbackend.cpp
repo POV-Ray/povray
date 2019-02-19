@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,15 +33,24 @@
 ///
 //******************************************************************************
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "backend/control/renderbackend.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+#include "base/pov_err.h"
+
+// POV-Ray header files (core module)
+//  (none at the moment)
+
+// POV-Ray header files (POVMS module)
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
 
-#include "base/pov_err.h"
-
+// POV-Ray header files (backend module)
 #include "backend/povray.h"
 #include "backend/control/scene.h"
 #include "backend/scene/view.h"
@@ -107,13 +116,13 @@ void RenderBackend::SendViewOutput(ViewId vid, POVMSAddress addr, POVMSType iden
     POVMS_SendMessage(RenderBackend::context, msg, nullptr, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
 }
 
-void RenderBackend::SendFindFile(POVMSContext ctx, SceneId sid, POVMSAddress addr, const vector<POVMSUCS2String>& filenames, POVMSUCS2String& filename)
+void RenderBackend::SendFindFile(POVMSContext ctx, SceneId sid, POVMSAddress addr, const std::vector<POVMSUCS2String>& filenames, POVMSUCS2String& filename)
 {
     POVMS_Message msg(kPOVObjectClass_FileData, kPOVMsgClass_FileAccess, kPOVMsgIdent_FindFile);
     POVMS_Message result(kPOVObjectClass_FileData, kPOVMsgClass_FileAccess, kPOVMsgIdent_FindFile);
     POVMS_List files;
 
-    for(vector<POVMSUCS2String>::const_iterator i(filenames.begin()); i != filenames.end(); i++)
+    for(std::vector<POVMSUCS2String>::const_iterator i(filenames.begin()); i != filenames.end(); i++)
     {
         POVMS_Attribute attr(i->c_str());
         files.Append(attr);
@@ -304,7 +313,7 @@ void RenderBackend::CreateScene(POVMS_Message& msg, POVMS_Message& result, int)
         if(err != kNoErr)
             throw POV_EXCEPTION_CODE (err);
 
-        shared_ptr<Scene> scene(new Scene(backendAddress, msg.GetSourceAddress(), scenecounter + 1));
+        std::shared_ptr<Scene> scene(new Scene(backendAddress, msg.GetSourceAddress(), scenecounter + 1));
 
         scenecounter++;
 
@@ -387,7 +396,7 @@ void RenderBackend::CreateView(POVMS_Message& msg, POVMS_Message& result, int)
         if(i == scenes.end())
             throw POV_EXCEPTION_CODE(kInvalidIdentifierErr);
 
-        shared_ptr<View> view(i->second->NewView(msg.TryGetInt(kPOVAttrib_Width, 160), msg.TryGetInt(kPOVAttrib_Height, 120), viewcounter + 1));
+        std::shared_ptr<View> view(i->second->NewView(msg.TryGetInt(kPOVAttrib_Width, 160), msg.TryGetInt(kPOVAttrib_Height, 120), viewcounter + 1));
 
         viewcounter++;
 
@@ -785,3 +794,4 @@ void RenderBackend::MakeDoneResult(POVMS_Message& result)
 }
 
 }
+// end of namespace pov

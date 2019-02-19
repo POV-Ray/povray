@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,8 +39,13 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
 
-// POV-Ray base header files
-#include "base/image/image.h"
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+#include "base/fileinputoutput_fwd.h"
+#include "base/image/image_fwd.h"
 
 namespace pov_base
 {
@@ -54,15 +59,17 @@ namespace pov_base
 namespace Bmp
 {
 
-void Write(OStream *file, const Image *image, const Image::WriteOptions& options);
-Image *Read(IStream *file, const Image::ReadOptions& options);
+void Write(OStream *file, const Image *image, const ImageWriteOptions& options);
+Image *Read(IStream *file, const ImageReadOptions& options);
 
 }
+// end of namespace Bmp
 
 /// @}
 ///
 //##############################################################################
 
 }
+// end of namespace pov_base
 
 #endif // POVRAY_BASE_BMP_H

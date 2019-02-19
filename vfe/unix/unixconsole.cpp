@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,6 +37,15 @@
 #include <csignal>
 #include <cstdlib>
 
+// C++ standard header files
+#include <memory>
+#include <mutex>
+#include <string>
+#include <thread>
+
+// Boost library files
+#include <boost/algorithm/string.hpp>
+
 // Other library header files
 #include <termios.h>
 #include <unistd.h>
@@ -56,8 +65,9 @@
 
 namespace pov_frontend
 {
-    shared_ptr<Display> gDisplay;
+    std::shared_ptr<Display> gDisplay;
 }
+// end of namespace pov_frontend
 
 using namespace vfe;
 using namespace vfePlatform;
@@ -82,19 +92,38 @@ static bool gCancelRender = false;
 
 // for handling asynchronous (external) signals
 static int gSignalNumber = 0;
-static boost::mutex gSignalMutex;
+static std::mutex gSignalMutex;
+static volatile bool gTerminateSignalHandler = false;
 
+
+// TODO FIXME - This way to handle signals seems rather wonky, as it is subject
+// to a potential race condition on `gSignalNumber` between `ProcessSignal()`
+// polling the signal and `SignalHandler()` processing the next signal.
+// Wouldn't it be smarter to register proper signal handlers?
 
 static void SignalHandler (void)
 {
-    sigset_t sigset;
-    int      signum;
+    sigset_t  sigset;
+    timespec  timeout;
+    int       signum;
 
-    while(true)
+    sigfillset(&sigset);
+    timeout.tv_sec  = 0;
+    timeout.tv_nsec = 10000000; // 10 ms
+
+    while(!gTerminateSignalHandler)
     {
-        sigfillset(&sigset);
-        sigwait(&sigset, &signum);  // wait till a signal is caught
-        boost::mutex::scoped_lock lock(gSignalMutex);
+        // Wait till a signal is caught.
+#ifdef HAVE_SIGTIMEDWAIT
+        signum = sigtimedwait(&sigset, nullptr, &timeout);
+        if (signum == -1)
+            continue; // Error. Presumably timed out; check whether to end the task.
+#else
+        (void)sigwait(&sigset, &signum);
+#endif
+
+        // Got a signal.
+        std::lock_guard<std::mutex> lock(gSignalMutex);
         gSignalNumber = signum;
     }
 }
@@ -102,7 +131,7 @@ static void SignalHandler (void)
 
 static void ProcessSignal (void)
 {
-    boost::mutex::scoped_lock lock(gSignalMutex);
+    std::lock_guard<std::mutex> lock(gSignalMutex);
 
     switch (gSignalNumber)
     {
@@ -174,7 +203,7 @@ static void PrintStatus (vfeSession *session)
     // TODO -- when invoked while processing "--help" command-line switch,
     //         GNU/Linux customs would be to print to stdout (among other differences).
 
-    string str;
+    std::string str;
     vfeSession::MessageType type;
     static vfeSession::MessageType lastType = vfeSession::mUnclassified;
 
@@ -303,12 +332,12 @@ static void PauseWhenDone(vfeSession *session)
     GetRenderWindow()->PauseWhenDoneNotifyEnd();
 }
 
-static ReturnValue PrepareBenchmark(vfeSession *session, vfeRenderOptions& opts, string& ini, string& pov, int argc, char **argv)
+static ReturnValue PrepareBenchmark(vfeSession *session, vfeRenderOptions& opts, std::string& ini, std::string& pov, int argc, char **argv)
 {
     // parse command-line options
     while (*++argv)
     {
-        string s = string(*argv);
+        std::string s = std::string(*argv);
         boost::to_lower(s);
         // set number of threads to run the benchmark
         if (boost::starts_with(s, "+wt") || boost::starts_with(s, "-wt"))
@@ -372,7 +401,7 @@ Press <Enter> to continue or <Ctrl-C> to abort.\n\
         Delay(20);
     }
 
-    string basename = UCS2toASCIIString(session->CreateTemporaryFile());
+    std::string basename = UCS2toSysString(session->CreateTemporaryFile());
     ini = basename + ".ini";
     pov = basename + ".pov";
     if (pov::Write_Benchmark_File(pov.c_str(), ini.c_str()))
@@ -390,12 +419,31 @@ Press <Enter> to continue or <Ctrl-C> to abort.\n\
     return RETURN_OK;
 }
 
-static void CleanupBenchmark(vfeUnixSession *session, string& ini, string& pov)
+static void CleanupBenchmark(vfeUnixSession *session, std::string& ini, std::string& pov)
 {
     fprintf(stderr, "%s: removing %s\n", PACKAGE, ini.c_str());
-    session->DeleteTemporaryFile(ASCIItoUCS2String(ini.c_str()));
+    session->DeleteTemporaryFile(SysToUCS2String(ini.c_str()));
     fprintf(stderr, "%s: removing %s\n", PACKAGE, pov.c_str());
-    session->DeleteTemporaryFile(ASCIItoUCS2String(pov.c_str()));
+    session->DeleteTemporaryFile(SysToUCS2String(pov.c_str()));
+}
+
+static void TerminateSignalHandler(std::thread* sigthread)
+{
+    gTerminateSignalHandler = true;
+#ifdef HAVE_SIGTIMEDWAIT
+    // `std::thread`s must be `join`ed or `detach`ed before destruction,
+    // otherwise their destructor causes ungraceful termination of the entire
+    // program.
+    sigthread->join();
+#else
+    // `std::thread`s must be `join`ed or `detach`ed before destruction,
+    // otherwise their destructor causes ungraceful termination of the entire
+    // program. `join` is not an option because we can't reliably make the
+    // thread terminate itself, so we must trust the OS that it will kill any
+    // `detach`ed threads when their parent process exits.
+    // TODO - This is a hackish solution.
+    sigthread->detach();
+#endif
 }
 
 int main (int argc, char **argv)
@@ -405,10 +453,10 @@ int main (int argc, char **argv)
     vfeRenderOptions  opts;
     ReturnValue       retval = RETURN_OK;
     bool              running_benchmark = false;
-    string            bench_ini_name;
-    string            bench_pov_name;
+    std::string       bench_ini_name;
+    std::string       bench_pov_name;
     sigset_t          sigset;
-    boost::thread    *sigthread;
+    std::thread*      sigthread;
     char **           argv_copy=argv; /* because argv is updated later */
     int               argc_copy=argc; /* because it might also be updated */
 
@@ -436,7 +484,7 @@ int main (int argc, char **argv)
     pthread_sigmask(SIG_BLOCK, &sigset, nullptr);
 
     // create the signal handling thread
-    sigthread = new boost::thread(SignalHandler);
+    sigthread = new std::thread(SignalHandler);
 
     session = new vfeUnixSession();
     if (session->Initialize(nullptr, nullptr) != vfeNoError)
@@ -474,6 +522,7 @@ int main (int argc, char **argv)
         PrintStatus (session) ;
         // TODO: general usage display (not yet in core code)
         session->GetUnixOptions()->PrintOptions();
+        TerminateSignalHandler(sigthread);
         delete sigthread;
         delete session;
         return RETURN_OK;
@@ -482,6 +531,7 @@ int main (int argc, char **argv)
     {
         session->Shutdown() ;
         PrintVersion();
+        TerminateSignalHandler(sigthread);
         delete sigthread;
         delete session;
         return RETURN_OK;
@@ -490,6 +540,7 @@ int main (int argc, char **argv)
     {
         session->Shutdown();
         PrintGeneration();
+        TerminateSignalHandler(sigthread);
         delete sigthread;
         delete session;
         return RETURN_OK;
@@ -502,6 +553,7 @@ int main (int argc, char **argv)
         else
         {
             session->Shutdown();
+            TerminateSignalHandler(sigthread);
             delete sigthread;
             delete session;
             return retval;
@@ -512,7 +564,7 @@ int main (int argc, char **argv)
     if (running_benchmark)
     {
         // read only the provided INI file and set minimal lib paths
-        opts.AddLibraryPath(string(POVLIBDIR "/include"));
+        opts.AddLibraryPath(std::string(POVLIBDIR "/include"));
         opts.AddINI(bench_ini_name.c_str());
         opts.SetSourceFile(bench_pov_name.c_str());
     }
@@ -545,7 +597,7 @@ int main (int argc, char **argv)
         session->PauseWhenDone(true);
 
     // main render loop
-    session->SetEventMask(stBackendStateChanged);  // immediatly notify this event
+    session->SetEventMask(stBackendStateChanged);  // immediately notify this event
     while (((flags = session->GetStatus(true, 200)) & stRenderShutdown) == 0)
     {
         ProcessSignal();
@@ -602,6 +654,7 @@ int main (int argc, char **argv)
         retval = gCancelRender ? RETURN_USER_ABORT : RETURN_ERROR;
     session->Shutdown();
     PrintStatus (session);
+    TerminateSignalHandler(sigthread);
     delete sigthread;
     delete session;
 

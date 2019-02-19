@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -45,22 +45,28 @@
 ///     absolute minimum when precompiled headers are _not_ used.
 /// @endparblock
 
+#include "base/configbase.h" // only pulled in for POV_MULTITHREADED
+
 #define POVWIN_FILE
 #define _CRT_RAND_S
 #define _WIN32_IE COMMONCTRL_VERSION
 
+// C++ variants of C standard header files
 #include <cassert>
 #include <cctype>
 #include <cmath>
 #include <cstdlib>
-#include <exception>
+
+// C++ standard header files
 #include <list>
 #include <map>
+#include <memory>
 #include <new>
 #include <set>
 #include <stack>
 #include <stdexcept>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include <direct.h>
@@ -80,14 +86,5 @@
 #include <commctrl.h>
 #include <htmlhelp.h>
 
-#include <boost/bind.hpp>
+// Boost header files
 #include <boost/format.hpp>
-#include <boost/function.hpp>
-#include <boost/functional/hash/hash.hpp>
-#include <boost/scoped_array.hpp>
-#include <boost/scoped_ptr.hpp>
-#include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/unordered_map.hpp>
-#include <boost/weak_ptr.hpp>
-

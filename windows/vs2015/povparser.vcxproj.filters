@@ -43,6 +43,9 @@
     <ClInclude Include="..\..\source\parser\symboltable.h">
       <Filter>Parser Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\parser\parser_fwd.h">
+      <Filter>Parser Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\parser\parser.cpp">

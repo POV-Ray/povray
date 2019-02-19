@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,7 +41,7 @@
 *  To understand the relationship between an ot_id (x,y,z,size) and
 *  a place in model space, you have to scale the integer values:
 *  The nominal space occupied is given as follows:
-*      fsize = pow(2,size-127);
+*      fsize = pow(2,size-Pow2Bias);
 *      lox = (float)x *fsize; loy = (float)y * fsize; loz = (float)z * fsize;
 *      hix = lox + fsize;  hiy = loy + fsize;  hiz = loz + fsize;
 *  All elements within this node are guaranteed to stick outside of the
@@ -57,15 +57,23 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/support/octree.h"
 
+// C++ variants of C standard header files
 #include <cfloat>
-#include <climits>
+#include <cmath>
+#include <cstdint>
+#include <cstring>
 
+// C++ standard header files
 #include <algorithm>
+#include <limits>
 
+// POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
 #include "base/mathutil.h"
 #include "base/pov_err.h"
+#include "base/pov_mem.h"
 
+// POV-Ray header files (core module)
 #include "core/colour/spectral.h"
 
 // this must be the last file included
@@ -81,117 +89,372 @@ namespace pov
 #define SAFE_METHOD 1
 // #define OT_DEBUG 1
 
-// WARNING: The default uses POV-Ray's own tricks which only work if
-// "float" is a 32 bit IEEE 754 floating point number!  If your platform
-// does not use 32 bit IEEE 754 floating point numbers, radiosity will
-// be broken!!!  If you have this problem, your only other choice is to
-// use an ISO C99 standard revision compatible compiler and library:
-//
-// Define this to 1 to use ISO C99 functions logbf and copysign.
-// Define this to 2 to use ISO C99 functions ilogbf and copysign.
-// Define this to 3 to use ISO C99 functions logb and copysign.
-// Define this to 4 to use ISO C99 functions ilogb and copysign.
-//
-// You may want to try 1 to 4 as it cannot be generally said which one
-// will be faster, but it is most likely that either 1 or 2 will perform
-// slightly less well than POV-Ray's trick.  In any case, testing all
-// variants (0, 1 to 4) is recommended if possible on your platform!
-//
-// NOTE: Of course you should put the define for C99_COMPATIBLE_RADIOSITY
-// into config.h and *not* mess around with this file!!!
-#ifndef C99_COMPATIBLE_RADIOSITY
-#define C99_COMPATIBLE_RADIOSITY 0
-#endif
+//******************************************************************************
 
 // compiler / target platform sanity checks
 // (note that these don't necessarily catch all possible quirks; they should be quite reliable though)
-#if(C99_COMPATIBLE_RADIOSITY == 0)
-    #if( (INT_MAX != SIGNED32_MAX) || (INT_MIN + SIGNED32_MAX != -1) )
-        #error "'int' is not 32 bit or does not use two's complement encoding; try a different C99_COMPATIBLE_RADIOSITY setting in config.h"
-    #endif
-    #if(FLT_RADIX != 2)
-        #error "'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h"
-    #endif
-    #if(FLT_MANT_DIG != 24)
-        #error "'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h"
-    #endif
-    #if(FLT_MAX_EXP != 128)
-        #error "'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h"
-    #endif
-    #if(FLT_MIN_EXP != -125)
-        #error "'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h"
-    #endif
-#else
-    #if(FLT_RADIX != 2)
-        // logb family of functions will not work as expected
-        #error "floating point arithmetic uses an uncommon radix; this file will not compile on your machine"
-    #endif
+#if (POV_PORTABLE_RADIOSITY == 0)
+
+// Needs IEEE 754 binary32 (aka single precision) floating-point format
+// and an unpadded integer of same size.
+
+// According to the C++11 standard `std::uint32_t` must be exactly 32 bits wide,
+// unpadded and unsigned, _or_ be undefined if the platform does not support
+// such a type. In the latter case, we expect a compile error here complaining
+// about `std::uint32_t`.
+// If that's what you are seeing, do _not_ try to substitute a different type,
+// as it is unlikely to work. Instead, try a different setting for
+// POV_PORTABLE_RADIOSITY.
+
+static_assert(
+    (sizeof(float) == sizeof(std::uint32_t)) &&
+    (std::numeric_limits<float>::radix == 2) &&
+    (std::numeric_limits<float>::digits == 24) &&
+    (std::numeric_limits<float>::min_exponent == -125) &&
+    (std::numeric_limits<float>::max_exponent == 128),
+    "POV_PORTABLE_RADIOSITY setting 0 requires 'float' to conform to IEEE 754 binary32 "
+    "(aka single precision) format, which it doesn't. Try a different setting."
+    );
+
+#elif (POV_PORTABLE_RADIOSITY == 5)
+
+// Needs IEEE 754 binary64 (aka double precision) floating-point format
+// and an unpadded integer of same size.
+
+// According to the C++11 standard `std::uint64_t` must be exactly 32 bits wide,
+// unpadded and unsigned, _or_ be undefined if the platform does not support
+// such a type. In the latter case, we expect a compile error here complaining
+// about `std::uint64_t`.
+// If that's what you are seeing, do _not_ try to substitute a different type,
+// as it is unlikely to work. Instead, try a different setting for
+// POV_PORTABLE_RADIOSITY.
+
+static_assert(
+    (sizeof(double) == sizeof(std::uint64_t)) &&
+    (std::numeric_limits<double>::radix == 2) &&
+    (std::numeric_limits<double>::digits == 53) &&
+    (std::numeric_limits<double>::min_exponent == -1021) &&
+    (std::numeric_limits<double>::max_exponent == 1024),
+    "POV_PORTABLE_RADIOSITY setting 5 requires 'double' to conform to IEEE 754 binary64 "
+    "(aka double precision) format, which it doesn't. Try a different setting."
+    );
+
+#elif (POV_PORTABLE_RADIOSITY == 1) || (POV_PORTABLE_RADIOSITY == 2) || (POV_PORTABLE_RADIOSITY == 7)
+
+// Needs Radix-2 floating-point format.
+
+static_assert(
+    (std::numeric_limits<float>::radix == 2),
+    "POV_PORTABLE_RADIOSITY settings 1, 2 and 7 require 'float' to be a radix-2 type, "
+    "which it isn't. Try a different setting."
+    );
+
+#elif (POV_PORTABLE_RADIOSITY == 3) || (POV_PORTABLE_RADIOSITY == 4) || (POV_PORTABLE_RADIOSITY == 9)
+
+// Needs Radix-2 floating-point format.
+
+static_assert(
+    (std::numeric_limits<double>::radix == 2),
+    "POV_PORTABLE_RADIOSITY settings 3, 4 and 9 requires 'double' to be a radix-2 type, "
+    "which it isn't. Try a different setting."
+    );
+
 #endif
 
-#if(C99_COMPATIBLE_RADIOSITY == 0)
-    // hacks exploiting IEEE standard float encoding properties
-    #define POW2OP_DECLARE() \
-        union { float f; int l; } nodesize_hack; // MUST be float, NOT DBL
-    // This hex operation does a floor to next lower power of 2, by clearing
-    // all of the mantissa bits.  Works only on IEEE single precision floats
-    #define POW2OP_FLOOR(dest,src) \
-        nodesize_hack.f = (float)(src); \
-        nodesize_hack.l &= 0xff800000; \
-        (dest) = (DBL)nodesize_hack.f;
-    // This magic hex operation extracts the exponent, which gives us an
-    // integer number suitable for labelling a range of a power of 2.  In IEEE
-    // format, value = pow(2,exponent-127). Therefore, if our index is, say,
-    // 129, then the item has a maximum extent of (2 to the (129-127)), or
-    // about 4 space units.
-    #define POW2OP_ENCODE(dest,src) \
-        nodesize_hack.f = (float) (src); \
-        (dest) = (nodesize_hack.l & 0x7f800000) >> 23;
-    #define POW2OP_DECODE(dest,src) \
-        nodesize_hack.l = (src) << 23; \
-        (dest) = (DBL) (size).f;
-#elif(C99_COMPATIBLE_RADIOSITY == 1)
-    #define POW2OP_DECLARE() // nothing
-    #define POW2OP_FLOOR(dest,src) \
-        (dest) = pow(2.0, logbf(src)); \
-        (dest) = copysign((dest), (src));
-    #define POW2OP_ENCODE(dest,src) \
-        (dest) = ((int)logbf(src)) + 127;
-    #define POW2OP_DECODE(dest,src) \
-        if( (src) >= 127 ) (dest) = (DBL)(1 << ((src) - 127)); \
-        else (dest) = 1.0 / (DBL)(1 << (127 - (src)));
-#elif(C99_COMPATIBLE_RADIOSITY == 2)
-    #define POW2OP_DECLARE() // nothing
-    #define POW2OP_FLOOR(dest,src) \
-        (dest) = (DBL)(1 << ilogbf(src)); \
-        (dest) = copysign((dest), (src));
-    #define POW2OP_ENCODE(dest,src) \
-        (dest) = ilogbf(src) + 127;
-    #define POW2OP_DECODE(dest,src) \
-        if( (src) >= 127 ) (dest) = (DBL)(1 << ((src) - 127)); \
-        else (dest) = 1.0 / (DBL)(1 << (127 - (src)));
-#elif(C99_COMPATIBLE_RADIOSITY == 3)
-    #define POW2OP_DECLARE() // nothing
-    #define POW2OP_FLOOR(dest,src) \
-        (dest) = pow(2.0, logb(src)); \
-        (dest) = copysign((dest), (src));
-    #define POW2OP_ENCODE(dest,src) \
-        (dest) = ((int)logb(src)) + 127;
-    #define POW2OP_DECODE(dest,src) \
-        if( (src) >= 127 ) (dest) = (DBL)(1 << ((src) - 127)); \
-        else (dest) = 1.0 / (DBL)(1 << (127 - (src)));
+//------------------------------------------------------------------------------
+
+#if (POV_PORTABLE_RADIOSITY == 0)
+
+/// Bias inherent in @ref BiasedLog2() and @ref BiasedPow2().
+static constexpr auto Pow2Bias = 127;
+
+union FloatHack { float f; std::uint32_t i; };
+
+/// Round down to power of 2.
+///
+/// This function rounds a value down to a power of 2:
+///
+/// @f[
+///     f(a) = 2 ^{ \left \lfloor log_2 a \right \rfloor }
+/// @f]
+///
+/// @note
+///     The function signature may differ depending on
+///     @ref POV_PORTABLE_RADIOSITY.
+///
+/// @pre
+///     The parameter value shall be finite and positive.
+///
+static inline float Pow2Floor(float a)
+{
+    FloatHack hack;
+    hack.f = a;
+    // Directly clear all mantissa bits (= 1.0)
+    // while leaving sign and exponent intact.
+    hack.i &= 0xFF800000;
+    return hack.f;
+}
+
+/// Compute biased integer base 2 logarithm.
+///
+/// This function computes the integer part of the base 2 logarithm of the
+/// parameter's magnitude, plus a constant bias:
+///
+/// @f[
+///     f(a) = \left \lfloor log_2 \left | a \right | \right \rfloor + b
+/// @f]
+///
+/// The value of the bias _b_ depends on @ref POV_PORTABLE_RADIOSITY, bit is
+/// the same value as used by @ref BiasedIntPow2().
+///
+/// @note
+///     The function signature may differ depending on
+///     @ref POV_PORTABLE_RADIOSITY.
+///
+/// @pre
+///     The parameter value shall be finite and positive.
+///
+static inline int BiasedIntLog2(float a)
+{
+    FloatHack hack;
+    hack.f = a;
+    // Directly extract the (biased) float exponent as the final result.
+    return (hack.i & 0x7F800000u) >> 23;
+}
+
+/// Compute biased integer power of 2.
+///
+/// This function computes 2 raised to the power of the integer parameter
+/// minus a constant bias:
+///
+/// @f[
+///     f(a) = 2 ^{ a - b }
+/// @f]
+///
+/// The value of the bias _b_ depends on @ref POV_PORTABLE_RADIOSITY, bit is
+/// the same value as used by @ref BiasedIntLog2().
+///
+/// @note
+///     The function signature may differ depending on
+///     @ref POV_PORTABLE_RADIOSITY.
+///
+static inline float BiasedIntPow2(int a)
+{
+    FloatHack hack;
+    // Directly copy `a` into the (biased) float exponent,
+    // while clearing sign and mantissa bits (= positive, 1.0).
+    hack.i = uint32_t(a) << 23;
+    return hack.f;
+}
+
+#elif (POV_PORTABLE_RADIOSITY == 1)
+
+static constexpr auto Pow2Bias = 0;
+
+static inline float Pow2Floor(float a)
+{
+    return std::powf(2.0f, std::logbf(a));
+}
+
+static inline int BiasedIntLog2(float a)
+{
+    return (int)std::logbf(a);
+}
+
+static inline float BiasedIntPow2(int a)
+{
+    if (a >= 0)
+        return float(1 << a);
+    else
+        return 1.0f / float(1 << -a);
+}
+
+#elif (POV_PORTABLE_RADIOSITY == 2)
+
+static constexpr auto Pow2Bias = 0;
+
+static inline float Pow2Floor(float a)
+{
+    return float(1 << std::ilogbf(a));
+}
+
+static inline int BiasedIntLog2(float a)
+{
+    return std::ilogbf(a);
+}
+
+static inline float BiasedIntPow2(int a)
+{
+    if (a >= 0)
+        return float(1 << a);
+    else
+        return 1.0f / float(1 << -a);
+}
+
+#elif (POV_PORTABLE_RADIOSITY == 3)
+
+static constexpr auto Pow2Bias = 0;
+
+static inline double Pow2Floor(double a)
+{
+    return std::pow(2.0, std::logb(a));
+}
+
+static inline int BiasedIntLog2(double a)
+{
+    return (int)std::logb(a);
+}
+
+static inline double BiasedIntPow2(int a)
+{
+    if (a >= 0)
+        return double(1 << a);
+    else
+        return 1.0 / double(1 << -a);
+}
+
+#elif (POV_PORTABLE_RADIOSITY == 4)
+
+static constexpr auto Pow2Bias = 0;
+
+static inline double Pow2Floor(double a)
+{
+    return double(1 << std::ilogb(a));
+}
+
+static inline int BiasedIntLog2(double a)
+{
+    return std::ilogb(a);
+}
+
+static inline double BiasedIntPow2(int a)
+{
+    if (a >= 0)
+        return double(1 << a);
+    else
+        return 1.0 / double(1 << -a);
+}
+
+#elif (POV_PORTABLE_RADIOSITY == 5)
+
+static constexpr auto Pow2Bias = 1023;
+
+union DoubleHack { double f; std::uint64_t i; };
+
+static inline double Pow2Floor(double a)
+{
+    DoubleHack hack;
+    hack.f = a;
+    // Directly clear all mantissa bits (= 1.0)
+    // while leaving sign and exponent intact.
+    hack.i &= 0xFFF0000000000000;
+    return hack.f;
+}
+
+static inline int BiasedIntLog2(double a)
+{
+    DoubleHack hack;
+    hack.f = a;
+    // Directly extract the (biased) float exponent as the final result.
+    return ((hack.i & 0x7FF0000000000000u) >> 52);
+}
+
+static inline double BiasedIntPow2(int a)
+{
+    DoubleHack hack;
+    // Directly copy `a` into the (biased) float exponent,
+    // while clearing sign and mantissa bits (= positive, 1.0).
+    hack.i = uint64_t(a) << 52;
+    return hack.f;
+}
+
+#elif (POV_PORTABLE_RADIOSITY == 6)
+
+static constexpr auto Pow2Bias = 0;
+
+static inline float Pow2Floor(float a)
+{
+    int e;
+    (void)std::frexpf(a, &e);
+    return std::ldexpf(0.5f, e);
+}
+
+static inline int BiasedIntLog2(float a)
+{
+    int e;
+    (void)std::frexpf(a, &e);
+    return e - 1;
+}
+
+static inline float BiasedIntPow2(int a)
+{
+    return std::ldexpf(1.0f, a);
+}
+
+#elif (POV_PORTABLE_RADIOSITY == 7)
+
+static constexpr auto Pow2Bias = 0;
+
+static inline float Pow2Floor(float a)
+{
+    return std::ldexpf(1.0f, std::ilogbf(a));
+}
+
+static inline int BiasedIntLog2(float a)
+{
+    return std::ilogbf(a);
+}
+
+static inline float BiasedIntPow2(int a)
+{
+    return std::ldexpf(1.0f, a);
+}
+
+#elif (POV_PORTABLE_RADIOSITY == 8)
+
+static constexpr auto Pow2Bias = 0;
+
+static inline double Pow2Floor(double a)
+{
+    int e;
+    (void)std::frexp(a, &e);
+    return std::ldexp(0.5, e);
+}
+static inline int BiasedIntLog2(double a)
+{
+    int e;
+    (void)std::frexp(a, &e);
+    return e - 1;
+}
+static inline double BiasedIntPow2(int a)
+{
+    return std::ldexpf(1.0, a);
+}
+
+#elif (POV_PORTABLE_RADIOSITY == 9)
+
+static constexpr auto Pow2Bias = 0;
+
+static inline double Pow2Floor(double a)
+{
+    return std::ldexp(1.0, std::ilogb(a));
+}
+
+static inline int BiasedIntLog2(double a)
+{
+    return std::ilogb(a);
+}
+
+static inline double BiasedIntPow2(int a)
+{
+    return std::ldexp(1.0, a);
+}
+
 #else
-    #define POW2OP_DECLARE() // nothing
-    #define POW2OP_FLOOR(dest,src) \
-        (dest) = (DBL)(1 << ilogb(src)); \
-        (dest) = copysign((dest), (src));
-    #define POW2OP_ENCODE(dest,src) \
-        (dest) = ilogb(src) + 127;
-    #define POW2OP_DECODE(dest,src) \
-        if( (src) >= 127 ) (dest) = (DBL)(1 << ((src) - 127)); \
-        else (dest) = 1.0 / (DBL)(1 << (127 - (src)));
+#error "Unsupported POV_PORTABLE_RADIOSITY setting."
 #endif
 
-
+//******************************************************************************
 
 bool ot_save_node (const Vector3d& point, OT_ID *node);
 bool ot_traverse (OT_NODE *subtree, bool (*function)(OT_BLOCK *block, void * handle1), void * handle2);
@@ -258,19 +521,6 @@ void ot_ins(OT_NODE **root_ptr, OT_BLOCK *new_block, const OT_ID *new_id)
 
     if (*root_ptr == nullptr)
     {
-// CLi moved C99_COMPATIBLE_RADIOSITY check from ot_newroot() to ot_ins() `nullptr` root handling section
-// (no need to do this again and again for every new node inserted)
-#if(C99_COMPATIBLE_RADIOSITY == 0)
-        if((sizeof(int) != 4) || (sizeof(float) != 4))
-        {
-            throw POV_EXCEPTION_STRING("Radiosity is not available in this unofficial version because\n"
-                                       "the person who made this unofficial version available did not\n"
-                                       "properly check for compatibility on your platform.\n"
-                                       "Look for C99_COMPATIBLE_RADIOSITY in the source code to find\n"
-                                       "out how to correct this.");
-        }
-#endif
-
         *root_ptr = new OT_NODE;
 
 #ifdef RADSTATS
@@ -482,9 +732,6 @@ void ot_newroot(OT_NODE **root_ptr)
     index = dx + dy + dz;
     newroot->Kids[index] = *root_ptr;
     *root_ptr = newroot;
-
-// CLi moved C99_COMPATIBLE_RADIOSITY check from ot_newroot() to ot_ins() `nullptr` root handling section
-// (no need to do this again and again for every new node inserted)
 }
 
 
@@ -588,7 +835,7 @@ bool ot_dist_traverse(OT_NODE *subtree, const Vector3d& point, int bounce_depth,
         while (this_block != nullptr)
         {
 #ifdef RADSTATS
-            if (subtree->Id.Size < 100 || subtree->Id.Size > 140 )
+            if ((subtree->Id.Size < Pow2Bias - 27) || (subtree->Id.Size > Pow2Bias + 13))
             {
                 Debug_Info("bounds error, unreasonable size %d\n", subtree->Id.Size);
             }
@@ -739,21 +986,8 @@ inline bool ot_point_in_node(const Vector3d& point, const OT_ID *id)
 {
     DBL sized;
 
-    // sized = 2.0^(size-127)
-#if(C99_COMPATIBLE_RADIOSITY == 0)
-    // speed hack exploiting standard IEEE float binary representation
-    union
-    {
-        float f; // MUST be float, NOT DBL
-        int l;
-    } size;
-    size.l = id->Size << 23;
-    sized = (DBL) size.f;
-#else
-    // can't use speed hack, do it the official way
-    if( id->Size >= 127 ) sized = (DBL)(1 << (id->Size - 127));
-    else sized = 1.0 / (DBL)(1 << (127 - id->Size));
-#endif
+    // sized = 2.0^(size-Pow2Bias)
+    sized = BiasedIntPow2(id->Size);
 
     if (fabs(point.x() + OT_BIAS - ((DBL) id->x + 0.5) * sized) >= sized) return false;
     if (fabs(point.y() + OT_BIAS - ((DBL) id->y + 0.5) * sized) >= sized) return false;
@@ -785,7 +1019,7 @@ inline bool ot_point_in_node(const Vector3d& point, const OT_ID *id)
 *   Return the oct-tree index for an object with the specified bounding
 *   sphere. This is the smallest box in the tree that this object fits in with
 *   a maximum 50% hand-over in any (or all) directions. For example, an object
-*   at (.49, .49, 49) of radius 1 fits in the box (0,0,0) size 127 (length 1).
+*   at (.49, .49, 49) of radius 1 fits in the box (0,0,0) size Pow2Bias (length 1).
 *
 * THREAD SAFETY
 *
@@ -801,6 +1035,9 @@ inline bool ot_point_in_node(const Vector3d& point, const OT_ID *id)
 void ot_index_sphere(const Vector3d& point, DBL radius, OT_ID *id)
 {
     Vector3d min_point, max_point;
+
+    // TODO FIXME - This transformation from center/radius to min/max is a waste of effort,
+    //              as `ot_index_box` will actually convert it back to center/radius anyway.
 
     min_point = point - radius;
     max_point = point + radius;
@@ -845,16 +1082,7 @@ void ot_index_sphere(const Vector3d& point, DBL radius, OT_ID *id)
 *   smallest box in the tree that this object fits in with a maximum 50%
 *   hang-over in any (or all) directions. For example, an object with extent
 *   (-.49, -.49, -49) to (1.49, 1.49, 1.49) is the largest that fits in the
-*   box (0,0,0) with size 127 (length 1).
-*
-*   PORTABILITY WARNING:  this function REQUIRES IEEE single precision floating
-*   point format to work.  This is true of most common systems except VAXen,
-*   Crays, and Alpha AXP in VAX compatibility mode.  Local "float" variables
-*   can NOT be made double precision "double" or "DBL".
-*
-*   NOTE: In general the above note is no longer valid, you can use the
-*   C99_COMPATIBLE_RADIOSITY define explained near the top of this file
-*   to resolve this problem with recent compilers and libraries [trf]
+*   box (0,0,0) with size Pow2Bias (length 1).
 *
 * THREAD SAFETY
 *
@@ -873,10 +1101,9 @@ void ot_index_box(const Vector3d& min_point, const Vector3d& max_point, OT_ID *i
 
     DBL dx, dy, dz, desiredSize;
     DBL bsized, maxord;
-    POW2OP_DECLARE()
 
     // Calculate the absolute minimum required size of the node, assuming it is perfectly centered within the node;
-    // Node size must be a power of 2, and be large enough to accomodate box's biggest dimensions with maximum overhang to all sides
+    // Node size must be a power of 2, and be large enough to accommodate box's biggest dimensions with maximum overhang to all sides
 
     // compute ideal size of the node for a perfect fit without any overhang
     dx = max_point.x() - min_point.x();
@@ -890,7 +1117,7 @@ void ot_index_box(const Vector3d& min_point, const Vector3d& max_point, OT_ID *i
     // compute best-matching power-of-two size for a perfect fit with overhang
     // (Note: theoretically this might pick a size larger than required if desiredSize is already a power of two)
     // desiredSize *= 2.0;
-    POW2OP_FLOOR(bsized,desiredSize)
+    bsized = Pow2Floor(desiredSize);
 
     // avoid divisions by zero
     if(bsized == 0.0)
@@ -919,7 +1146,7 @@ void ot_index_box(const Vector3d& min_point, const Vector3d& max_point, OT_ID *i
     id->x = (int) floor((center[X] + OT_BIAS) / bsized);
     id->y = (int) floor((center[Y] + OT_BIAS) / bsized);
     id->z = (int) floor((center[Z] + OT_BIAS) / bsized);
-    POW2OP_ENCODE(id->Size, bsized)
+    id->Size = BiasedIntLog2(bsized);
 
 #ifdef RADSTATS
     thisloops = 0;
@@ -943,7 +1170,7 @@ void ot_index_box(const Vector3d& min_point, const Vector3d& max_point, OT_ID *i
 #endif
 
 #ifdef OT_DEBUG
-    if (id->Size > 139)
+    if (id->Size > Pow2Bias + 12)
     {
         Debug_Info("unusually large id, maxdel=%.4f, bsized=%.4f, isize=%d\n",
                    maxdel, bsized, id->Size);
@@ -1354,7 +1581,7 @@ bool ot_read_file(OT_NODE **root, IStream *fd, const OT_READ_PARAM* param, OT_RE
                         new_block = reinterpret_cast<OT_BLOCK *>(POV_MALLOC(sizeof (OT_BLOCK), "octree node from file"));
                         if (new_block != nullptr)
                         {
-                            POV_MEMCPY(new_block, &bl, sizeof (OT_BLOCK));
+                            std::memcpy(new_block, &bl, sizeof (OT_BLOCK));
 
                             ot_index_sphere(bl.Point, bl.Harmonic_Mean_Distance * param->RealErrorBound, &id);
                             ot_ins(root, new_block, &id);
@@ -1397,4 +1624,5 @@ bool ot_read_file(OT_NODE **root, IStream *fd, const OT_READ_PARAM* param, OT_RE
     return retval;
 }
 
-} // end of namespace
+}
+// end of namespace pov

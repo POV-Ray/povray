@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -61,11 +61,12 @@ namespace povwin
   extern bool           ErrorNotified;
   extern bool           no_shell_outs;
   extern bool           system_noactive;
-  extern string         ErrorMessage ;
-  extern string         ErrorFilename ;
+  extern std::string    ErrorMessage ;
+  extern std::string    ErrorFilename ;
   extern unsigned       ErrorLine ;
   extern unsigned       ErrorCol ;
 }
+// end of namespace povwin
 
 namespace pov_frontend
 {
@@ -138,7 +139,7 @@ void CreateFrontend (void)
   if (gSession->Initialize(NULL, NULL) != vfeNoError)
   {
     gSession->Shutdown();
-    string str = gSession->GetErrorString();
+    std::string str = gSession->GetErrorString();
     delete gSession;
     gSession = NULL;
     throw POV_EXCEPTION_STRING (str.c_str());
@@ -162,17 +163,17 @@ void SetupFrontend (void)
   if (io_restrictions != 0)
   {
     for (char **dirspec = WriteDirSpecs ; *dirspec != NULL ; dirspec++)
-      gSession->AddWritePath (string (*dirspec), true);
+      gSession->AddWritePath (std::string(*dirspec), true);
     if (io_restrictions > 1)
     {
-      gSession->AddReadPath(string(DocumentsPath), true);
-      gSession->AddReadPath(string(FontPath) + "\\", false);
+      gSession->AddReadPath(std::string(DocumentsPath), true);
+      gSession->AddReadPath(std::string(FontPath) + "\\", false);
       for (char **dirspec = ReadDirSpecs ; *dirspec != NULL ; dirspec++)
-        gSession->AddReadPath (string (*dirspec), true);
+        gSession->AddReadPath (std::string(*dirspec), true);
     }
 
     // allow write to the insert menu directory
-    string str(DocumentsPath);
+    std::string str(DocumentsPath);
     str += "Insert Menu\\";
     gSession->AddWritePath (str, true);
 
@@ -308,9 +309,9 @@ bool ProcessSession (int delay)
     int line;
     int col;
     char str[32];
-    string errormsg;
-    string message;
-    string filename;
+    std::string errormsg;
+    std::string message;
+    std::string filename;
     vfeSession::MessageType type;
 
     while (gSession->GetNextNonStatusMessage (type, message, filename, line, col))
@@ -414,3 +415,4 @@ bool ShelloutsPermitted(void)
 }
 
 }
+// end of namespace pov_frontend

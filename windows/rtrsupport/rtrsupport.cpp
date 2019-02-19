@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -54,11 +54,9 @@ std::string VideoSourceName;
 namespace povwin
 {
 
-using namespace pov;
-
 // this code has been stubbed out: need to re-implement
 
-size_t GetVideoSourceNames(vector<std::string>& result)
+size_t GetVideoSourceNames(std::vector<std::string>& result)
 {
   return 0;
 }
@@ -77,5 +75,6 @@ void NextFrame(void)
 }
 
 }
+// end of namespace povwin
 
 #endif

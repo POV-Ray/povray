@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,6 +39,16 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <vector>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/math/vector.h"
 #include "core/material/normal.h"
 
@@ -76,7 +86,7 @@ namespace pov
 * Global typedefs
 ******************************************************************************/
 
-class Camera
+class Camera final
 {
 public:
     Vector3d Location;
@@ -105,10 +115,10 @@ public:
     unsigned int Face_Distribution_Method;  // how to associate a pixel to a face within a mesh
     unsigned int Rays_Per_Pixel;            // cast this many rays per pixel; never less than 1
     bool Smooth;                            // if true, interpolate normals for dist #3
-    vector<ObjectPtr> Meshes;               // list of the meshes to be used as the camera
-    vector<unsigned int> Mesh_Index;        // used with distribution #1 to keep track of accumulated meshes
-    vector<unsigned int> U_Xref[10];        // used to speed up location of a matching face for distribution #3
-    vector<unsigned int> V_Xref[10];        // used to speed up location of a matching face for distribution #3
+    std::vector<ObjectPtr> Meshes;          // list of the meshes to be used as the camera
+    std::vector<unsigned int> Mesh_Index;   // used with distribution #1 to keep track of accumulated meshes
+    std::vector<unsigned int> U_Xref[10];   // used to speed up location of a matching face for distribution #3
+    std::vector<unsigned int> V_Xref[10];   // used to speed up location of a matching face for distribution #3
     DBL Max_Ray_Distance;                   // if not 0.0, then maximum distance to look along the ray for an intersection
     // end of mesh camera declarations
 
@@ -130,5 +140,6 @@ private:
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_CAMERA_H

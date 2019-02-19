@@ -38,12 +38,22 @@
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
+#include "core/scene/scenedata_fwd.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <map>
+#include <string>
+#include <vector>
 
-#include "base/image/colourspace.h"
+// POV-Ray header files (base module)
+#include "base/image/colourspace_fwd.h"
 
+// POV-Ray header files (core module)
 #include "core/lighting/radiosity.h"
+#include "core/scene/atmosphere_fwd.h"
 #include "core/scene/camera.h"
 #include "core/shape/truetype.h"
 
@@ -59,10 +69,6 @@ namespace pov
 using namespace pov_base;
 
 class BSPTree;
-
-struct Fog_Struct;
-struct Rainbow_Struct;
-struct Skysphere_Struct;
 
 /// Class holding scene specific data.
 ///
@@ -80,17 +86,17 @@ class SceneData
 {
     public:
 
-        typedef std::map<string, string>         DeclaredVariablesMap;
+        typedef std::map<std::string, std::string> DeclaredVariablesMap;
 
         /// Destructor.
-        ~SceneData();
+        virtual ~SceneData();
 
         /// list of all shape objects
-        vector<ObjectPtr> objects;
+        std::vector<ObjectPtr> objects;
         /// list of all global light sources
-        vector<LightSource *> lightSources;
+        std::vector<LightSource*> lightSources;
         /// list of all lights that are part of light groups
-        vector<LightSource *> lightGroupLightSources;
+        std::vector<LightSource*> lightGroupLightSources;
         /// factory generating contexts for legacy VM-based functions in scene
         GenericFunctionContextFactoryIPtr functionContextFactory;
         /// atmosphere index of refraction
@@ -98,7 +104,7 @@ class SceneData
         /// atmosphere dispersion
         DBL atmosphereDispersion;
         /// atmospheric media
-        vector<Media> atmosphere;
+        std::vector<Media> atmosphere;
         /// background color - TODO - allow pattern here (useful for background image maps) [trf]
         TransColour backgroundColour; // may have a filter/transmit component (but filter is ignored)
         /// ambient light in scene
@@ -190,7 +196,7 @@ class SceneData
 
         // TODO - decide if we want to keep this here
         // (we can't move it to the parser though, as part of the data needs to survive into rendering)
-        vector<TrueTypeFont*> TTFonts;
+        std::vector<TrueTypeFont*> TTFonts;
 
         // name of the parsed file
         UCS2String inputFile; // TODO - handle differently
@@ -205,7 +211,7 @@ class SceneData
         DeclaredVariablesMap declaredVariables; // TODO - move to parser
         Camera parsedCamera; // TODO - handle differently or move to parser
         bool clocklessAnimation; // TODO - this is support for an experimental feature and may be changed or removed
-        vector<Camera> cameras; // TODO - this is support for an experimental feature and may be changed or removed
+        std::vector<Camera> cameras; // TODO - this is support for an experimental feature and may be changed or removed
 
         // this is for fractal support
         int Fractal_Iteration_Stack_Length; // TODO - move somewhere else
@@ -252,11 +258,8 @@ class SceneData
 
     private:
 
-        /// not available
-        SceneData(const SceneData&);
-
-        /// not available
-        SceneData& operator=(const SceneData&);
+        SceneData(const SceneData&) = delete;
+        SceneData& operator=(const SceneData&) = delete;
 };
 
 /// @}
@@ -264,5 +267,6 @@ class SceneData
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_SCENEDATA_H

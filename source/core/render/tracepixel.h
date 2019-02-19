@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,8 +39,16 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
-#include <vector>
+// C++ variants of C standard header files
+//  (none at the moment)
 
+// C++ standard header files
+#include <memory>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/render/trace.h"
 #include "core/scene/camera.h"
 #include "core/scene/scenedata.h"
@@ -55,24 +63,24 @@ namespace pov
 ///
 /// @{
 
-struct HasInteriorPointObjectCondition : public PointObjectCondition
+struct HasInteriorPointObjectCondition final : public PointObjectCondition
 {
-    virtual bool operator()(const Vector3d& point, ConstObjectPtr object) const;
+    virtual bool operator()(const Vector3d& point, ConstObjectPtr object) const override;
 };
 
-struct ContainingInteriorsPointObjectCondition : public PointObjectCondition
+struct ContainingInteriorsPointObjectCondition final : public PointObjectCondition
 {
     ContainingInteriorsPointObjectCondition(RayInteriorVector& ci) : containingInteriors(ci) {}
-    virtual bool operator()(const Vector3d& point, ConstObjectPtr object) const;
+    virtual bool operator()(const Vector3d& point, ConstObjectPtr object) const override;
     RayInteriorVector &containingInteriors;
 };
 
-class TracePixel : public Trace
+class TracePixel final : public Trace
 {
     public:
-        TracePixel(shared_ptr<SceneData> sd, const Camera* cam, TraceThreadData *td, unsigned int mtl, DBL adcb, const QualityFlags& qf,
+        TracePixel(std::shared_ptr<SceneData> sd, const Camera* cam, TraceThreadData *td, unsigned int mtl, DBL adcb, const QualityFlags& qf,
                    CooperateFunctor& cf, MediaFunctor& mf, RadiosityFunctor& af, bool pt = false);
-        virtual ~TracePixel();
+        virtual ~TracePixel() override;
         void SetupCamera(const Camera& cam);
 
         /// Trace a pixel or sub-pixel.
@@ -84,7 +92,7 @@ class TracePixel : public Trace
         void operator()(DBL x, DBL y, DBL width, DBL height, RGBTColour& colour);
     private:
         // Focal blur data
-        class FocalBlurData
+        class FocalBlurData final
         {
         public:
             FocalBlurData(const Camera& camera, TraceThreadData* threadData);
@@ -124,7 +132,7 @@ class TracePixel : public Trace
         /// camera
         Camera camera;
         /// scene data
-        shared_ptr<SceneData> sceneData;
+        std::shared_ptr<SceneData> sceneData;
         /// thread data
         TraceThreadData *threadData;
 
@@ -153,5 +161,6 @@ class TracePixel : public Trace
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_TRACEPIXEL_H

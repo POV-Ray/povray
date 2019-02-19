@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,7 +44,7 @@
 namespace povwin
 {
 
-class WinMemStats
+class WinMemStats final
 {
   public:
     WinMemStats() { Clear(); }
@@ -82,7 +82,8 @@ class WinMemStats
     {
     }
 
-    void Report(uint64& allocs, uint64& frees, int64& current, uint64& peak, uint64 &smallest, uint64 &largest)
+    void Report(unsigned __int64& allocs, unsigned __int64& frees, __int64& current,
+                unsigned __int64& peak, unsigned __int64& smallest, unsigned __int64& largest)
     {
       allocs = callsToAlloc;
       frees = callsToFree;
@@ -130,17 +131,17 @@ class WinMemStats
     }
 
   private:
-    volatile int64 currentAllocated;
-    volatile uint64 peakAllocated;
-    volatile uint64 callsToAlloc;
-    volatile uint64 callsToFree;
-    volatile uint64 smallestAlloc;
-    volatile uint64 largestAlloc;
+    volatile __int64 currentAllocated;
+    volatile unsigned __int64 peakAllocated;
+    volatile unsigned __int64 callsToAlloc;
+    volatile unsigned __int64 callsToFree;
+    volatile unsigned __int64 smallestAlloc;
+    volatile unsigned __int64 largestAlloc;
 };
 
 typedef WinMemStats PovMemStats;
 
-class WinHeap
+class WinHeap final
 {
   public:
     WinHeap()
@@ -227,7 +228,7 @@ class WinHeap
     CRITICAL_SECTION m_CritSec;
 };
 
-class HeapLock
+class HeapLock final
 {
   public:
     HeapLock(WinHeap *wh) : m_WinHeap(wh) { m_WinHeap->Lock(); }
@@ -236,7 +237,7 @@ class HeapLock
     WinHeap *m_WinHeap;
 };
 
-class WinMemBlock
+class WinMemBlock final
 {
 public:
   __declspec(nothrow) WinMemBlock(const void *data, int line)
@@ -353,10 +354,11 @@ private:
     static const size_t BlockPadding = 0;
 # endif
 
-  WinMemBlock() {} // not available
-  void *operator new (size_t len) {} // not available
+  WinMemBlock() = delete;
+  void *operator new (size_t len) = delete;
 };
 
 }
+// end of namespace povwin
 
 #endif // POVRAY_WINDOWS_PVMEM_H

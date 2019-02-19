@@ -36,8 +36,14 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/material/blendmap.h"
 
-#include <algorithm>
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
 
+// POV-Ray header files (base module)
+#include "base/povassert.h"
+
+// POV-Ray header files (core module)
 #include "core/material/normal.h"
 #include "core/material/pigment.h"
 #include "core/material/texture.h"
@@ -159,9 +165,9 @@ TextureBlendMapPtr Create_Blend_Map<TextureBlendMap> (BlendMapTypeId type)
 ******************************************************************************/
 
 template<typename MAP_T>
-shared_ptr<MAP_T> Copy_Blend_Map (const shared_ptr<MAP_T>& Old)
+std::shared_ptr<MAP_T> Copy_Blend_Map (const std::shared_ptr<MAP_T>& Old)
 {
-    return shared_ptr<MAP_T>(Old);
+    return std::shared_ptr<MAP_T>(Old);
 }
 
 template ColourBlendMapPtr          Copy_Blend_Map (const ColourBlendMapPtr& Old);
@@ -221,3 +227,4 @@ template void BlendMap<NormalBlendMapData>::Set(const Vector& data);
 template void BlendMap<TexturePtr>::Set(const Vector& data);
 
 }
+// end of namespace pov

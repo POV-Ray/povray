@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,6 +39,14 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/coretypes.h"
 #include "core/math/vector.h"
 
@@ -59,48 +67,48 @@ typedef void (*COMPLEX_FUNCTION_METHOD) (Complex *, const Complex *, const Compl
 class HypercomplexBaseFractalRules : public FractalRules
 {
     public:
-        virtual ~HypercomplexBaseFractalRules() {}
-        virtual bool Bound (const BasicRay&, const Fractal *, DBL *, DBL *) const;
+        virtual ~HypercomplexBaseFractalRules() override {}
+        virtual bool Bound (const BasicRay&, const Fractal *, DBL *, DBL *) const override;
 };
 
-class HypercomplexFractalRules : public HypercomplexBaseFractalRules
+class HypercomplexFractalRules final : public HypercomplexBaseFractalRules
 {
     public:
-        virtual ~HypercomplexFractalRules() {}
-        virtual void CalcNormal (Vector3d&, int, const Fractal *, DBL **) const;
-        virtual bool Iterate (const Vector3d&, const Fractal *, DBL **) const;
-        virtual bool Iterate (const Vector3d&, const Fractal *, const Vector3d&, DBL *, DBL **) const;
+        virtual ~HypercomplexFractalRules() override {}
+        virtual void CalcNormal (Vector3d&, int, const Fractal *, DBL **) const override;
+        virtual bool Iterate (const Vector3d&, const Fractal *, DBL **) const override;
+        virtual bool Iterate (const Vector3d&, const Fractal *, const Vector3d&, DBL *, DBL **) const override;
 };
 
-class HypercomplexFunctionFractalRules : public HypercomplexBaseFractalRules
+class HypercomplexFunctionFractalRules final : public HypercomplexBaseFractalRules
 {
     public:
         HypercomplexFunctionFractalRules(COMPLEX_FUNCTION_METHOD fn) : ComplexFunction(fn) {}
-        virtual ~HypercomplexFunctionFractalRules() {}
-        virtual void CalcNormal (Vector3d&, int, const Fractal *, DBL **) const;
-        virtual bool Iterate (const Vector3d&, const Fractal *, DBL **) const;
-        virtual bool Iterate (const Vector3d&, const Fractal *, const Vector3d&, DBL *, DBL **) const;
+        virtual ~HypercomplexFunctionFractalRules() override {}
+        virtual void CalcNormal (Vector3d&, int, const Fractal *, DBL **) const override;
+        virtual bool Iterate (const Vector3d&, const Fractal *, DBL **) const override;
+        virtual bool Iterate (const Vector3d&, const Fractal *, const Vector3d&, DBL *, DBL **) const override;
     protected:
         COMPLEX_FUNCTION_METHOD ComplexFunction;
         void HFunc(DBL *xr, DBL *yr, DBL *zr, DBL *wr, DBL x, DBL y, DBL z, DBL w, const Fractal * f) const;
 };
 
-class HypercomplexZ3FractalRules : public HypercomplexBaseFractalRules
+class HypercomplexZ3FractalRules final : public HypercomplexBaseFractalRules
 {
     public:
-        virtual ~HypercomplexZ3FractalRules() {}
-        virtual void CalcNormal (Vector3d&, int, const Fractal *, DBL **) const;
-        virtual bool Iterate (const Vector3d&, const Fractal *, DBL **) const;
-        virtual bool Iterate (const Vector3d&, const Fractal *, const Vector3d&, DBL *, DBL **) const;
+        virtual ~HypercomplexZ3FractalRules() override {}
+        virtual void CalcNormal (Vector3d&, int, const Fractal *, DBL **) const override;
+        virtual bool Iterate (const Vector3d&, const Fractal *, DBL **) const override;
+        virtual bool Iterate (const Vector3d&, const Fractal *, const Vector3d&, DBL *, DBL **) const override;
 };
 
-class HypercomplexReciprocalFractalRules : public HypercomplexBaseFractalRules
+class HypercomplexReciprocalFractalRules final : public HypercomplexBaseFractalRules
 {
     public:
-        virtual ~HypercomplexReciprocalFractalRules() {}
-        virtual void CalcNormal (Vector3d&, int, const Fractal *, DBL **) const;
-        virtual bool Iterate (const Vector3d&, const Fractal *, DBL **) const;
-        virtual bool Iterate (const Vector3d&, const Fractal *, const Vector3d&, DBL *, DBL **) const;
+        virtual ~HypercomplexReciprocalFractalRules() override {}
+        virtual void CalcNormal (Vector3d&, int, const Fractal *, DBL **) const override;
+        virtual bool Iterate (const Vector3d&, const Fractal *, DBL **) const override;
+        virtual bool Iterate (const Vector3d&, const Fractal *, const Vector3d&, DBL *, DBL **) const override;
 };
 
 void Complex_Exp (Complex *target, const Complex *source, const Complex *);
@@ -127,5 +135,6 @@ void Complex_Div (Complex *target, const Complex *source1, const Complex *source
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_HYPERCOMPLEX_H

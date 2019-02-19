@@ -414,6 +414,7 @@
     <ClInclude Include="..\..\source\vm\configvm.h" />
     <ClInclude Include="..\..\source\vm\fnintern.h" />
     <ClInclude Include="..\..\source\vm\fnpovfpu.h" />
+    <ClInclude Include="..\..\source\vm\fnpovfpu_fwd.h" />
     <ClInclude Include="..\..\source\vm\precomp.h" />
     <ClInclude Include="..\povconfig\syspovconfigvm.h" />
   </ItemGroup>

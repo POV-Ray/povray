@@ -45,11 +45,11 @@
 // C++ standard header files
 #include <memory>
 
-// Boost header files
-//  (none at the moment)
-
 // POV-Ray header files (base module)
-#include "base/types.h"
+#include "base/stringtypes.h"
+
+// POV-Ray header files (core module)
+//  (none at the moment)
 
 // POV-Ray header files (parser module)
 #include "parser/parsertypes.h"
@@ -65,7 +65,6 @@ using namespace pov_base;
 const int MAX_NUMBER_OF_TABLES = 100;
 const int SYM_TABLE_SIZE = 257;
 
-typedef struct Sym_Table_Entry SYM_ENTRY;
 typedef unsigned short SymTableEntryRefCount;
 
 // Special symbol tables
@@ -75,9 +74,9 @@ enum
 };
 
 /// Structure holding information about a symbol
-struct Sym_Table_Entry
+struct Sym_Table_Entry final
 {
-    SYM_ENTRY *next;            ///< Reference to next symbol with same hash
+    Sym_Table_Entry *next;      ///< Reference to next symbol with same hash
     UTF8String name;            ///< Symbol name
     char *Deprecation_Message;  ///< Warning to print if the symbol is deprecated
     void *Data;                 ///< Reference to the symbol value
@@ -87,10 +86,11 @@ struct Sym_Table_Entry
     bool deprecatedShown : 1;
     SymTableEntryRefCount ref_count; ///< normally 1, but may be greater when passing symbols out of macros
 };
+using SYM_ENTRY = Sym_Table_Entry; ///< @deprecated
 
 //------------------------------------------------------------------------------
 
-struct SymbolTable
+struct SymbolTable final
 {
     SymbolTable();
     SymbolTable(const SymbolTable& obj);
@@ -137,7 +137,7 @@ using SymbolTablePtr = std::shared_ptr<SymbolTable>;
 
 //------------------------------------------------------------------------------
 
-class SymbolStack
+class SymbolStack final
 {
 public:
 
@@ -180,6 +180,7 @@ protected:
     int Table_Index;
 };
 
-} // end of namespace
+}
+// end of namespace pov_parser
 
 #endif // POVRAY_PARSER_SYMBOLTABLE_H

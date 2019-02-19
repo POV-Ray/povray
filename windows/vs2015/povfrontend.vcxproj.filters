@@ -101,5 +101,11 @@
     <ClInclude Include="..\..\source\frontend\precomp.h">
       <Filter>Frontend Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\frontend\renderfrontend_fwd.h">
+      <Filter>Frontend Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\frontend\console_fwd.h">
+      <Filter>Frontend Headers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

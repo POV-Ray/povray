@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -35,12 +35,19 @@
 ///
 //******************************************************************************
 
-#include <algorithm>
-
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "backend/lighting/photonestimationtask.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <memory>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/lighting/lightgroup.h"
 #include "core/lighting/lightsource.h"
@@ -49,10 +56,12 @@
 #include "core/shape/csg.h"
 #include "core/support/octree.h"
 
+// POV-Ray header files (POVMS module)
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
 #include "povms/povmsutil.h"
 
+// POV-Ray header files (backend module)
 #include "backend/scene/backendscenedata.h"
 #include "backend/scene/view.h"
 #include "backend/scene/viewthreaddata.h"
@@ -62,6 +71,8 @@
 
 namespace pov
 {
+
+using std::vector;
 
 PhotonEstimationTask::PhotonEstimationTask(ViewData *vd, size_t seed) :
     RenderTask(vd, seed, "Photon"),
@@ -135,7 +146,7 @@ void PhotonEstimationTask::Finish()
 void PhotonEstimationTask::SearchThroughObjectsEstimatePhotons(vector<ObjectPtr>& Objects, LightSource *Light)
 {
     ViewThreadData *renderDataPtr = GetViewDataPtr();
-    shared_ptr<SceneData> sceneData = GetSceneData();
+    std::shared_ptr<SceneData> sceneData = GetSceneData();
 
     /* check this object and all siblings */
     for(vector<ObjectPtr>::iterator Sib = Objects.begin(); Sib != Objects.end(); Sib++)
@@ -214,3 +225,4 @@ void PhotonEstimationTask::EstimatePhotonsForObjectAndLight(ObjectPtr Object, Li
 }
 
 }
+// end of namespace pov

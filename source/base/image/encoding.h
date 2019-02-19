@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,16 +40,21 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
 
-// POV-Ray base header files
+// C++ variants of C standard header files
+#include <cmath>
+
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+#include "base/colour.h"
 #include "base/mathutil.h"
-#include "base/types.h"
-#include "base/image/colourspace.h"
+#include "base/image/colourspace_fwd.h"
+#include "base/image/dither_fwd.h"
+#include "base/image/image_fwd.h"
 
 namespace pov_base
 {
-
-class DitherStrategy;
-class Image;
 
 //##############################################################################
 ///
@@ -89,10 +94,7 @@ inline float IntDecode(unsigned int x, unsigned int max)
 /// @param[in]  x       Value to decode.
 /// @param      max     Encoded value representing 1.0.
 ///
-inline float IntDecode(const GammaCurvePtr& g, unsigned int x, unsigned int max)
-{
-    return GammaCurve::Decode(g, IntDecode(x, max));
-}
+float IntDecode(const GammaCurvePtr& g, unsigned int x, unsigned int max);
 
 /// @}
 ///
@@ -119,7 +121,9 @@ inline float IntDecode(const GammaCurvePtr& g, unsigned int x, unsigned int max)
 ///
 inline unsigned int IntEncodeDown(float x, unsigned int max, float qOff = 0.0f)
 {
-    return (unsigned int)clip(floor(x * float(max) + qOff), 0.0f, float(max));
+    // NB: Deliberately using `std::floor(float)` instead of `std::floorf(float)`
+    // to work around GCC Bug 89279.
+    return (unsigned int)clip(std::floor(x * float(max) + qOff), 0.0f, float(max));
 }
 
 /// Linear encoding function rounding to nearest.
@@ -179,29 +183,7 @@ inline unsigned int IntEncode(float x, unsigned int max, float qOff, float& err)
 /// @param[in]      qOff    Offset to add before quantization.
 /// @param[in,out]  err     Quantization error (including effects due to adding qOff).
 ///
-inline unsigned int IntEncode(const GammaCurvePtr& g, float x, unsigned int max, float qOff, float& err)
-{
-    if (GammaCurve::IsNeutral(g))
-        return IntEncode(x, max, qOff, err);
-
-    float xEff = clip(x, 0.0f, 1.0f) + err;
-    unsigned int v = IntEncodeDown(GammaCurve::Encode(g, xEff), max);
-    float decoded = IntDecode(g, v, max);
-    if (v >= max)
-    {
-        err = xEff - decoded;
-        return v;
-    }
-    float decodedUp = IntDecode(g, v + 1, max);
-    float threshold = (0.5 - qOff) * decoded + (0.5 + qOff) * decodedUp;
-    if (xEff > threshold)
-    {
-        decoded = decodedUp;
-        ++v;
-    }
-    err = xEff - decoded;
-    return v;
-}
+unsigned int IntEncode(const GammaCurvePtr& g, float x, unsigned int max, float qOff, float& err);
 
 /// Generic encoding function.
 ///
@@ -321,5 +303,6 @@ void GetEncodedRGBValue(const Image* img, unsigned int x, unsigned int y, const 
 //##############################################################################
 
 }
+// end of namespace pov_base
 
 #endif // POVRAY_BASE_IMAGE_ENCODING_H

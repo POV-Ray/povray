@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,9 +39,14 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
 
-#include <assert.h>
+// C++ variants of C standard header files
+//  (none at the moment)
 
-#include "base/types.h"
+// C++ standard header files
+#include <algorithm>
+
+// POV-Ray header files (base module)
+#include "base/povassert.h"
 
 namespace pov_base
 {
@@ -53,17 +58,11 @@ namespace pov_base
 ///
 /// @{
 
-#ifdef NEED_INVHYP
-DBL asinh(DBL x);
-DBL acosh(DBL x);
-DBL atanh(DBL x);
-#endif
-
 // Get minimum/maximum of three values.
 template<typename T>
-inline T max3(T x, T y, T z) { return max(x, max(y, z)); }
+inline T max3(T x, T y, T z) { return std::max(x, std::max(y, z)); }
 template<typename T>
-inline T min3(T x, T y, T z) { return min(x, min(y, z)); }
+inline T min3(T x, T y, T z) { return std::min(x, std::min(y, z)); }
 
 template<typename T>
 inline T clip(T val, T minv, T maxv);
@@ -195,5 +194,6 @@ inline bool IsFinite(double value)
 //##############################################################################
 
 }
+// end of namespace pov_base
 
 #endif // POVRAY_BASE_MATHUTIL_H

@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,12 +38,16 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/fileutil.h"
 
-// C++ variants of standard C header files
+// C++ variants of C standard header files
 #include <cctype>
-#include <cstdarg>
 
-// POV-Ray base header files
+// C++ standard header files
+#include <string>
+
+// POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
 #include "base/path.h"
+#include "base/stringutilities.h"
 
 // All the builtin fonts must be declared here
 #include "base/font/crystal.h"
@@ -59,13 +63,13 @@ namespace pov_base
 
 /*
 // not used right now
-typedef struct
+struct POV_File_Restrictions final
 {
     bool read_local;
     bool read_global;
     bool write_local;
     bool write_global;
-} POV_File_Restrictions;
+};
 
 POV_File_Restrictions gPOV_File_Restrictions[POV_File_Count] =
 {
@@ -173,7 +177,7 @@ int InferFileTypeFromExt(const UCS2String& ext)
 {
     // TODO FIXME - better compare in the string domain
 
-    string str = UCS2toASCIIString(ext);
+    std::string str = UCS2toSysString(ext);
 
     for (int i = 0; i < POV_File_Count; i++)
     {
@@ -226,7 +230,7 @@ int InferFileTypeFromExt(const UCS2String& ext)
  *
  * To add a font, check first its license
  */
-IMemStream *Internal_Font_File(int font_id)
+IStream *Internal_Font_File(int font_id)
 {
     switch(font_id)
     {
@@ -240,3 +244,4 @@ IMemStream *Internal_Font_File(int font_id)
 //******************************************************************************
 
 }
+// end of namespace pov_base

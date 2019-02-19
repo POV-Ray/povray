@@ -27,14 +27,6 @@ environment:
     platform: x64
     bin_dir: bin64
     artifact_suffix: -Win64
-  - configuration: Release-SSE2
-    platform: Win32
-    bin_dir: bin32
-    artifact_suffix: -Win32-sse2
-  - configuration: Release
-    platform: Win32
-    bin_dir: bin32
-    artifact_suffix: -Win32
 
 before_build:
 
@@ -58,6 +50,15 @@ for:
   environment:
     PovBuildDefs:
       secure: dQ/GBBYlkqKDmBEgJfgajfBn58ziSh1JPXsiWtnBL1dE3/s4QZJutGdDtLxiG3eNq0DXMVhDIbGqyPSma9Q9xazlpRZkuU7Gl8rXCw7c03A/oliLoR6q/0Jb+Q9LNH5R/oYiDCHhNP8Cx6OXys4d5A==
+    matrix:
+    - configuration: Release-SSE2
+      platform: Win32
+      bin_dir: bin32
+      artifact_suffix: -Win32-sse2
+    - configuration: Release
+      platform: Win32
+      bin_dir: bin32
+      artifact_suffix: -Win32
 
   after_build:
   - ps: |

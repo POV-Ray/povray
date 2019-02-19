@@ -33,21 +33,36 @@
 ///
 //******************************************************************************
 
-#include <sstream>
-
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
-
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/control/parsertask.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "backend/control/scene.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <algorithm>
+#include <sstream>
+
+// Boost header files
+#include <boost/bind.hpp>
+
+// POV-Ray header files (base module)
+#include "base/image/colourspace.h"
+
+// POV-Ray header files (core module)
 #include "core/scene/tracethreaddata.h"
 
+// POV-Ray header files (POVMS module)
+#include "povms/povmscpp.h"
+#include "povms/povmsid.h"
+
+// POV-Ray header files (parser module)
 #include "parser/parsertypes.h"
 
+// POV-Ray header files (backend module)
 #include "backend/bounding/boundingtask.h"
+#include "backend/control/parsertask.h"
+#include "backend/scene/backendscenedata.h"
 #include "backend/scene/view.h"
 
 // this must be the last file included
@@ -55,6 +70,9 @@
 
 namespace pov
 {
+
+using std::min;
+using std::max;
 
 Scene::Scene(POVMSAddress backendAddr, POVMSAddress frontendAddr, RenderBackend::SceneId sid) :
     sceneData(new BackendSceneData()),
@@ -76,7 +94,7 @@ Scene::~Scene()
         parserControlThread->join();
     delete parserControlThread;
 
-    for(vector<TraceThreadData *>::iterator i(sceneThreadData.begin()); i != sceneThreadData.end(); i++)
+    for(std::vector<TraceThreadData*>::iterator i(sceneThreadData.begin()); i != sceneThreadData.end(); i++)
         delete (*i);
     sceneThreadData.clear();
 }
@@ -87,7 +105,7 @@ void Scene::StartParser(POVMS_Object& parseOptions)
 
     // A scene can only be parsed once
     if (parserControlThread == nullptr)
-        parserControlThread = Task::NewBoostThread(boost::bind(&Scene::ParserControlThread, this), POV_THREAD_STACK_SIZE);
+        parserControlThread = new std::thread(boost::bind(&Scene::ParserControlThread, this));
     else
         return;
 
@@ -163,7 +181,7 @@ void Scene::StartParser(POVMS_Object& parseOptions)
     }
 
     // do parsing
-    sceneThreadData.push_back(dynamic_cast<TraceThreadData *>(parserTasks.AppendTask(new pov_parser::ParserTask(
+    sceneThreadData.push_back(dynamic_cast<TraceThreadData *>(parserTasks.AppendTask(new ParserTask(
         sceneData, pov_parser::ParserOptions(bool(parseOptions.Exist(kPOVAttrib_Clock)), parseOptions.TryGetFloat(kPOVAttrib_Clock, 0.0), seed)
         ))));
 
@@ -223,7 +241,7 @@ bool Scene::Failed()
     return parserTasks.Failed();
 }
 
-shared_ptr<View> Scene::NewView(unsigned int width, unsigned int height, RenderBackend::ViewId vid)
+std::shared_ptr<View> Scene::NewView(unsigned int width, unsigned int height, RenderBackend::ViewId vid)
 {
     if(parserTasks.IsDone() == false)
         throw POV_EXCEPTION_CODE(kNotNowErr);
@@ -231,12 +249,17 @@ shared_ptr<View> Scene::NewView(unsigned int width, unsigned int height, RenderB
     if((parserTasks.IsDone() == false) || (parserTasks.Failed() == true))
         throw POV_EXCEPTION_CODE(kNotNowErr);
 
-    return shared_ptr<View>(new View(sceneData, width, height, vid));
+    return std::shared_ptr<View>(new View(sceneData, width, height, vid));
+}
+
+POVMSAddress Scene::GetFrontendAddress() const
+{
+    return sceneData->frontendAddress;
 }
 
 void Scene::GetStatistics(POVMS_Object& parserStats)
 {
-    struct TimeData
+    struct TimeData final
     {
         POV_LONG cpuTime;
         POV_LONG realTime;
@@ -247,10 +270,13 @@ void Scene::GetStatistics(POVMS_Object& parserStats)
 
     TimeData timeData[TraceThreadData::kMaxTimeType];
 
-    for(vector<TraceThreadData *>::iterator i(sceneThreadData.begin()); i != sceneThreadData.end(); i++)
+    for(std::vector<TraceThreadData*>::iterator i(sceneThreadData.begin()); i != sceneThreadData.end(); i++)
     {
         timeData[(*i)->timeType].realTime = max(timeData[(*i)->timeType].realTime, (*i)->realTime);
-        timeData[(*i)->timeType].cpuTime += (*i)->cpuTime;
+        if ((*i)->cpuTime >= 0)
+            timeData[(*i)->timeType].cpuTime += (*i)->cpuTime;
+        else
+            timeData[(*i)->timeType].cpuTime = -1;
         timeData[(*i)->timeType].samples++;
     }
 
@@ -261,7 +287,8 @@ void Scene::GetStatistics(POVMS_Object& parserStats)
             POVMS_Object elapsedTime(kPOVObjectClass_ElapsedTime);
 
             elapsedTime.SetLong(kPOVAttrib_RealTime, timeData[i].realTime);
-            elapsedTime.SetLong(kPOVAttrib_CPUTime, timeData[i].cpuTime);
+            if (timeData[i].cpuTime >= 0)
+                elapsedTime.SetLong(kPOVAttrib_CPUTime, timeData[i].cpuTime);
             elapsedTime.SetInt(kPOVAttrib_TimeSamples, POVMSInt(timeData[i].samples));
 
             switch(i)
@@ -309,7 +336,7 @@ void Scene::SendStatistics(TaskQueue&)
 
     POVMS_SendMessage(parserStats);
 
-    for(vector<TraceThreadData *>::iterator i(sceneThreadData.begin()); i != sceneThreadData.end(); i++)
+    for(std::vector<TraceThreadData*>::iterator i(sceneThreadData.begin()); i != sceneThreadData.end(); i++)
         delete (*i);
     sceneThreadData.clear();
 }
@@ -345,10 +372,11 @@ void Scene::ParserControlThread()
 
         if(stopRequsted == false)
         {
-            boost::thread::yield();
+            std::this_thread::yield();
             Delay(10);
         }
     }
 }
 
 }
+// end of namespace pov

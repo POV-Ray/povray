@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,11 +36,23 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/bounding/bsptree.h"
 
-#include <vector>
-#include <list>
+// C++ variants of C standard header files
+#if BSP_WRITEBOUNDS || BSP_READNODES || BSP_WRITETREE
+#include <cstdio>
+#endif
 
+// C++ standard header files
+#include <algorithm>
+#include <list>
+#if BSP_WRITEBOUNDS || BSP_READNODES || BSP_WRITETREE
+#include <string>
+#endif
+
+// POV-Ray header files (base module)
+#include "base/stringutilities.h"
 #include "base/pov_err.h"
 
+// POV-Ray header files (core module)
 #include "core/render/ray.h"
 #include "core/shape/box.h"
 
@@ -49,6 +61,10 @@
 
 namespace pov
 {
+
+using std::min;
+using std::max;
+using std::vector;
 
 #ifndef BSP_READNODES
     #define BSP_READNODES     0
@@ -70,6 +86,17 @@ namespace pov
 #define BSP_TOLERANCE       0.00001f
 
 const unsigned int NODE_PROGRESS_INTERVAL = 1000;
+
+//******************************************************************************
+
+void BSPTree::Mailbox::clear()
+{
+    count = 0;
+    // using memset here as std::fill may not be fast with every standard libaray [trf]
+    std::memset(objects.data(), 0, objects.size() * sizeof(unsigned int));
+}
+
+//******************************************************************************
 
 // we allow the values to be set by users to promote experimentation with tree
 // building. at a later date we may remove this facility since using compile-time
@@ -281,16 +308,16 @@ void BSPTree::build(const Progress& progress, const Objects& objects,
     splits[Z].resize(objects.size() * 2);
 
 #if BSP_WRITEBOUNDS || BSP_READNODES || BSP_WRITETREE
-    string tempstr = UCS2toASCIIString(inputFile);
+    std::string tempstr = UCS2toSysString(inputFile);
     if (tempstr.empty() == true)
         tempstr = "default";
-    string::size_type pos = tempstr.find_last_of('.');
-    if (pos != string::npos)
+    std::string::size_type pos = tempstr.find_last_of('.');
+    if (pos != std::string::npos)
         tempstr.erase(pos);
 #endif
 
 #if BSP_WRITEBOUNDS
-    FILE *bb = fopen(string(tempstr + ".bounds").c_str(), "w");
+    FILE *bb = fopen((tempstr + ".bounds").c_str(), "w");
 
     if (bb != nullptr)
         fprintf(bb, "%d\n", objects.size());
@@ -332,7 +359,7 @@ void BSPTree::build(const Progress& progress, const Objects& objects,
     bmax = Vector3d(bbox.pmax[X], bbox.pmax[Y], bbox.pmax[Z]);
 
 #if BSP_WRITETREE
-    gFile = fopen(string(tempstr + ".tree").c_str(), "w");
+    gFile = fopen((tempstr + ".tree").c_str(), "w");
 
     if (gFile != nullptr)
     {
@@ -345,7 +372,7 @@ void BSPTree::build(const Progress& progress, const Objects& objects,
     nodes.push_back(Node());
 
 #if BSP_READNODES
-    FILE *infile = fopen(string(tempstr + ".nodes").c_str(), "r");
+    FILE *infile = fopen((tempstr + ".nodes").c_str(), "r");
     if (infile == nullptr)
         throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot open BSP nodes file (BSP_READNODES == true, tree generation disabled)");
     try
@@ -896,6 +923,7 @@ void BSPTree::ReadRecursive(const Progress& progress, FILE *infile, unsigned int
     }
 }
 
+//******************************************************************************
 
 BSPIntersectFunctor::BSPIntersectFunctor(Intersection& bi, const Ray& r, vector<ObjectPtr>& objs, TraceThreadData *t) :
     found(false),
@@ -933,6 +961,7 @@ bool BSPIntersectFunctor::operator()() const
     return found;
 }
 
+//******************************************************************************
 
 BSPIntersectCondFunctor::BSPIntersectCondFunctor(Intersection& bi, const Ray& r, vector<ObjectPtr>& objs, TraceThreadData *t,
                                                  const RayObjectCondition& prec, const RayObjectCondition& postc) :
@@ -977,6 +1006,7 @@ bool BSPIntersectCondFunctor::operator()() const
     return found;
 }
 
+//******************************************************************************
 
 BSPInsideCondFunctor::BSPInsideCondFunctor(Vector3d o, vector<ObjectPtr>& objs, TraceThreadData *t,
                                            const PointObjectCondition& prec, const PointObjectCondition& postc) :
@@ -1004,4 +1034,7 @@ bool BSPInsideCondFunctor::operator()() const
     return found;
 }
 
+//******************************************************************************
+
 }
+// end of namespace pov

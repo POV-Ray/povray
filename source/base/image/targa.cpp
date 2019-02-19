@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -56,11 +56,19 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/image/targa.h"
 
-// Standard C++ header files
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <string>
 #include <vector>
 
-// POV-Ray base header files
+// POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
 #include "base/types.h"
+#include "base/image/colourspace.h"
+#include "base/image/encoding.h"
+#include "base/image/image.h"
 #include "base/image/metadata.h"
 
 // this must be the last file included
@@ -72,13 +80,16 @@ namespace pov_base
 namespace Targa
 {
 
-typedef struct pix
+using std::vector;
+
+struct pix final
 {
     unsigned int b;
     unsigned int g;
     unsigned int r;
     unsigned int a;
-} Pixel;
+};
+using Pixel = pix;
 
 typedef char Targa_footer[26];
 #define FOO_EXT_OFF 0
@@ -120,7 +131,7 @@ static void PutPix (vector<unsigned char>& line, const pix *pixel, bool opaque)
         line.push_back (pixel->a);
 }
 
-void Write (OStream *file, const Image *image, const Image::WriteOptions& options)
+void Write (OStream *file, const Image *image, const ImageWriteOptions& options)
 {
     pix                     current;
     pix                     next;
@@ -295,10 +306,10 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
     // let's prepare the Extension area, then write Extension then footer
     ext[EXT_SIZE_OFF+1] = (unsigned char) ((495 >> 8) & 0xff);
     ext[EXT_SIZE_OFF] = (unsigned char) (495 & 0xff);
-    string soft = meta.getSoftware().substr(0,EXT_SOFT_DIM-1);
+    std::string soft = meta.getSoftware().substr(0,EXT_SOFT_DIM-1);
     sprintf(&ext[EXT_SOFT_OFF],"%s",soft.c_str());
 
-    string com = meta.getComment1().substr(0,EXT_COMMENT_DIM-1);
+    std::string com = meta.getComment1().substr(0,EXT_COMMENT_DIM-1);
     if (!com.empty())
         sprintf(&ext[EXT_COMMENT_OFF],"%s",com.c_str());
     com = meta.getComment2().substr(0,EXT_COMMENT_DIM-1);
@@ -470,7 +481,7 @@ static void ConvertColor (Image::RGBAMapEntry *pixel, unsigned pixelsize, const 
 *
 ******************************************************************************/
 
-Image *Read (IStream *file, const Image::ReadOptions& options)
+Image *Read (IStream *file, const ImageReadOptions& options)
 {
     int                   temp;
     int                   h;
@@ -560,25 +571,18 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
             ConvertColor (&entry, cmsiz, bytes, gamma);
             colormap.push_back(entry);
         }
-        Image::ImageDataType imagetype = options.itype;
-        if (imagetype == Image::Undefined)
-            imagetype = Image::Colour_Map ;
+        ImageDataType imagetype = options.itype;
+        if (imagetype == ImageDataType::Undefined)
+            imagetype = ImageDataType::Colour_Map ;
         image = Image::Create (width, height, imagetype, colormap) ;
         image->SetPremultiplied(premul); // specify whether the color map data has premultiplied alpha
         gamma.reset(); // gamma has been taken care of by transforming the color table.
     }
     else
     {
-        Image::ImageDataType imagetype = options.itype;
-        if (imagetype == Image::Undefined)
-        {
-            if (GammaCurve::IsNeutral(gamma))
-                // No gamma correction required, raw values can be stored "as is".
-                imagetype = opaque ? Image::RGB_Int8 : Image::RGBA_Int8 ;
-            else
-                // Gamma correction required; use an image container that will take care of that.
-                imagetype = opaque ? Image::RGB_Gamma8 : Image::RGBA_Gamma8 ;
-        }
+        ImageDataType imagetype = options.itype;
+        if (imagetype == ImageDataType::Undefined)
+            imagetype = Image::GetImageDataType(8, 3, !opaque, gamma);
         image = Image::Create (width, height, imagetype) ;
         image->SetPremultiplied(premul); // set desired storage mode regarding alpha premultiplication
         image->TryDeferDecoding(gamma, 255); // try to have gamma adjustment being deferred until image evaluation.
@@ -706,7 +710,8 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     return (image);
 }
 
-} // end of namespace Targa
+}
+// end of namespace Targa
 
 }
-
+// end of namespace pov_base

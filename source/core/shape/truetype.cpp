@@ -38,22 +38,33 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/truetype.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <map>
 #include <vector>
 
+// POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
+#include "base/povassert.h"
+#include "base/stringutilities.h"
 
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
 #include "core/shape/csg.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov
 {
+
+using namespace pov_base;
 
 /*****************************************************************************
 * Local preprocessor defines
@@ -126,32 +137,32 @@ typedef int Fixed;
 
 using GlyphIndex = POV_UINT32;
 
-typedef struct
+struct sfnt_OffsetTable final
 {
     Fixed version;                /* 0x10000 (1.0) */
     USHORT numTables;             /* number of tables */
     USHORT searchRange;           /* (max2 <= numTables)*16 */
     USHORT entrySelector;         /* log2 (max2 <= numTables) */
     USHORT rangeShift;            /* numTables*16-searchRange */
-} sfnt_OffsetTable;
+};
 
-typedef struct
+struct sfnt_TableDirectory final
 {
     BYTE tag[4];
     ULONG checkSum;
     ULONG offset;
     ULONG length;
-} sfnt_TableDirectory;
+};
 
 typedef sfnt_TableDirectory *sfnt_TableDirectoryPtr;
 
-typedef struct
+struct longDateTime final
 {
     ULONG bc;
     ULONG ad;
-} longDateTime;
+};
 
-typedef struct
+struct sfnt_FontHeader final
 {
     Fixed version;                /* for this table, set to 1.0 */
     Fixed fontRevision;           /* For Font Manufacturer */
@@ -174,25 +185,25 @@ typedef struct
     SHORT fontDirectionHint;
     SHORT indexToLocFormat;       /* 0 - short offsets, 1 - long offsets */
     SHORT glyphDataFormat;
-} sfnt_FontHeader;
+};
 
-typedef struct
+struct sfnt_platformEntry final
 {
     USHORT platformID;
     USHORT specificID;
     ULONG offset;
-} sfnt_platformEntry;
+};
 
 typedef sfnt_platformEntry *sfnt_platformEntryPtr;
 
-typedef struct
+struct sfnt_mappingTable final
 {
     USHORT format;
     USHORT length;
     USHORT language;
-} sfnt_mappingTable;
+};
 
-typedef struct
+struct sfnt_HorizHeader final
 {
     Fixed version;
 
@@ -215,9 +226,9 @@ typedef struct
 
     SHORT metricDataFormat;
     USHORT numberOfHMetrics;      /* number of hMetrics in the hmtx table */
-} sfnt_HorizHeader;
+};
 
-struct GlyphHeader
+struct GlyphHeader final
 {
     SHORT numContours;
     SHORT xMin;
@@ -227,7 +238,7 @@ struct GlyphHeader
     GlyphHeader() : numContours(0), xMin(0), yMin(0), xMax(0), yMax(0) {}
 };
 
-struct GlyphOutline
+struct GlyphOutline final
 {
     GlyphHeader header;
     std::vector<USHORT> endPoints;
@@ -240,17 +251,17 @@ struct GlyphOutline
     {}
 };
 
-typedef struct
+struct Contour final
 {
     BYTE inside_flag;             /* 1 if this an inside contour, 0 if outside */
     USHORT count;                 /* Number of points in the contour */
-    vector<BYTE> flags;           /* On/off curve flags */
-    vector<DBL> x, y;             /* Coordinates of control vertices */
-} Contour;
+    std::vector<BYTE> flags;      /* On/off curve flags */
+    std::vector<DBL> x, y;        /* Coordinates of control vertices */
+};
 
 
 /* Contour information for a single glyph */
-struct GlyphStruct
+struct GlyphStruct final
 {
     GlyphHeader header;           /* Count and sizing information about this glyph */
     GlyphIndex glyph_index;       /* Internal glyph index for this character */
@@ -259,40 +270,40 @@ struct GlyphStruct
     GlyphIndex myMetrics;         /* Which glyph index this is for metrics */
 };
 
-typedef struct KernData_struct
+struct KernData final
 {
     USHORT left, right;           /* Glyph index of left/right to kern */
     FWord value;                  /* Delta in FUnits to apply in between */
-} KernData;
+};
 
 /*
  * [esp] There's already a "KernTable" on the Mac... renamed to TTKernTable for
  * now in memoriam to its author.
  */
 
-typedef struct KernStruct
+struct TTKernTable final
 {
     USHORT coverage;              /* Coverage bit field of this subtable */
     USHORT nPairs;                /* # of kerning pairs in this table */
     KernData *kern_pairs;         /* Array of kerning values */
-} TTKernTable;
+};
 
-typedef struct KernTableStruct
+struct KernTables final
 {
     USHORT nTables;               /* # of subtables in the kerning table */
     TTKernTable *tables;
-} KernTables;
+};
 
-typedef struct longHorMertric
+struct longHorMetric final
 {
     uFWord advanceWidth;          /* Total width of a glyph in FUnits */
     FWord lsb;                    /* FUnits to the left of the glyph */
-} longHorMetric;
+};
 
 
 typedef std::map<USHORT, GlyphPtr> GlyphPtrMap;
 
-struct CMAPSelector
+struct CMAPSelector final
 {
     CMAPSelector() = default;
     CMAPSelector(USHORT pid, USHORT sid, CharsetID cs);
@@ -310,7 +321,7 @@ struct CMAPInfo
 
 using CMAPInfoPtr = CMAPInfo*;
 
-struct CMAP4Info : public CMAPInfo
+struct CMAP4Info final : public CMAPInfo
 {
     CMAP4Info();
     virtual ~CMAP4Info() override;
@@ -322,7 +333,7 @@ struct CMAP4Info : public CMAPInfo
            *idDelta, *idRangeOffset;
 };
 
-struct TrueTypeInfo
+struct TrueTypeInfo final
 {
     TrueTypeInfo();
     ~TrueTypeInfo();
@@ -339,7 +350,7 @@ struct TrueTypeInfo
     KernTables kerning_tables;        /* Kerning info for this font */
     USHORT numberOfHMetrics;          /* The number of explicit spacings */
     longHorMetric *hmtx_table;        /* Horizontal spacing info */
-    vector<CMAPInfo*> cmapInfo;
+    std::vector<CMAPInfo*> cmapInfo;
 };
 
 /*****************************************************************************
@@ -3078,7 +3089,7 @@ void TrueType::Compute_BBox()
 }
 
 
-TrueTypeFont::TrueTypeFont(const UCS2String& fn, const shared_ptr<IStream>& f,
+TrueTypeFont::TrueTypeFont(const UCS2String& fn, const std::shared_ptr<IStream>& f,
                            POV_UINT32 cm, CharsetID cs, LegacyCharset scs) :
     filename(fn),
     file(f),
@@ -3179,4 +3190,4 @@ TrueTypeInfo::~TrueTypeInfo()
 }
 
 }
-
+// end of namespace pov

@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,15 +40,16 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
 
-// C++ variants of standard C header files
+// C++ variants of C standard header files
 #include <cmath>
 
-// Standard C++ header files
+// C++ standard header files
+#include <algorithm>
 #include <limits>
 
-// POV-Ray base header files
+// POV-Ray header files (base module)
+#include "base/base_fwd.h"
 #include "base/mathutil.h"
-#include "base/types.h"
 
 #define NUM_COLOUR_CHANNELS 3
 
@@ -119,7 +120,7 @@ const PreciseColourChannel kBlueIntensity  = 0.114;
 /// @tparam T   Floating-point type to use for the individual colour components.
 ///
 template<typename T>
-class GenericRGBColour
+class GenericRGBColour final
 {
     public:
 
@@ -241,11 +242,11 @@ class GenericRGBColour
             /// @remark This used to be implemented differently at different places in the code;
             ///         variations were:
             ///           - `max3(r,g,b)`
-            ///           - `max3(fabs(r),fabs(g),fabs(b))`
-            ///           - `fabs(greyscale)` [1]
-            ///           - `max(0.0,greyscale)`
-            /// @remark [1] A variant of this was `max(0.0,fabs(greyscale))`; note the superfluous
-            ///             `max()`.
+            ///           - `max3(std::fabs(r),std::fabs(g),std::fabs(b))`
+            ///           - `std::fabs(greyscale)` [1]
+            ///           - `std::max(0.0,greyscale)`
+            /// @remark [1] A variant of this was `std::max(0.0,std::fabs(greyscale))`; note the superfluous
+            ///             `std::max()`.
             /// @remark The rationale for choosing the current implementation is as follows:
             ///           - In general, the weight should scale proportionally with the colour
             ///             brightness. [2]
@@ -265,9 +266,9 @@ class GenericRGBColour
             /// @remark For backward compatibility, @ref WeightMax(), @ref WeightMaxAbs(),
             ///         @ref WeightGreyscale() and @ref WeightAbsGreyscale() are provided.
 
-            return (fabs(mColour[RED])   +
-                    fabs(mColour[GREEN]) +
-                    fabs(mColour[BLUE])) / 3.0;
+            return (std::fabs(mColour[RED])   +
+                    std::fabs(mColour[GREEN]) +
+                    std::fabs(mColour[BLUE])) / 3.0;
         }
 
         /// Computes a measure for the weight of the colour based on the magnitude of its greyscale
@@ -278,7 +279,7 @@ class GenericRGBColour
         ///
         inline T WeightAbsGreyscale() const
         {
-            return fabs(Greyscale());
+            return std::fabs(Greyscale());
         }
 
         /// Computes a measure for the weight of the colour based on its greyscale value.
@@ -298,7 +299,7 @@ class GenericRGBColour
         /// greatest value.
         ///
         /// @note       Do _not_ use this function if you absolutely want to know the intensity of
-        ///             the strongest colour channel. For such cases, use @ref max() instead.
+        ///             the strongest colour channel. For such cases, use @ref Max() instead.
         ///
         /// @deprecated Calls to this function should probably be replaced by calls to
         ///             @ref WeightMaxAbs() or @ref Weight() for consistency of colour math.
@@ -338,9 +339,9 @@ class GenericRGBColour
         ///
         inline T MaxAbs() const
         {
-            return max3(fabs(mColour[RED]),
-                        fabs(mColour[GREEN]),
-                        fabs(mColour[BLUE]));
+            return max3(std::fabs(mColour[RED]),
+                        std::fabs(mColour[GREEN]),
+                        std::fabs(mColour[BLUE]));
         }
 
         /// Computes the intensity of the colour channel with the smallest value.
@@ -378,9 +379,9 @@ class GenericRGBColour
 
         inline bool IsNearZero(T epsilon) const
         {
-            return (fabs(mColour[RED])   < epsilon) &&
-                   (fabs(mColour[GREEN]) < epsilon) &&
-                   (fabs(mColour[BLUE])  < epsilon);
+            return (std::fabs(mColour[RED])   < epsilon) &&
+                   (std::fabs(mColour[GREEN]) < epsilon) &&
+                   (std::fabs(mColour[BLUE])  < epsilon);
         }
 
         inline void Clear()
@@ -427,16 +428,16 @@ class GenericRGBColour
 
         inline GenericRGBColour ClippedUpper(T maxc) const
         {
-            return GenericRGBColour(min(mColour[RED],   maxc),
-                                    min(mColour[GREEN], maxc),
-                                    min(mColour[BLUE],  maxc));
+            return GenericRGBColour(std::min(mColour[RED],   maxc),
+                                    std::min(mColour[GREEN], maxc),
+                                    std::min(mColour[BLUE],  maxc));
         }
 
         inline GenericRGBColour ClippedLower(T minc) const
         {
-            return GenericRGBColour(max(mColour[RED],   minc),
-                                    max(mColour[GREEN], minc),
-                                    max(mColour[BLUE],  minc));
+            return GenericRGBColour(std::max(mColour[RED],   minc),
+                                    std::max(mColour[GREEN], minc),
+                                    std::max(mColour[BLUE],  minc));
         }
 
         inline GenericRGBColour operator+(const GenericRGBColour& b) const
@@ -614,9 +615,9 @@ inline GenericRGBColour<T> operator- (double a, const GenericRGBColour<T>& b) { 
 template<typename T>
 inline T ColourDistance (const GenericRGBColour<T>& a, const GenericRGBColour<T>& b)
 {
-    return fabs(a.red()   - b.red())   +
-           fabs(a.green() - b.green()) +
-           fabs(a.blue()  - b.blue());
+    return std::fabs(a.red()   - b.red())   +
+           std::fabs(a.green() - b.green()) +
+           std::fabs(a.blue()  - b.blue());
 }
 
 /// @relates GenericRGBColour
@@ -672,7 +673,7 @@ typedef GenericRGBColour<PreciseColourChannel>  PreciseRGBColour;   ///< High pr
 /// @tparam T   Floating-point type to use for the individual colour components.
 ///
 template<typename T>
-class GenericRGBFTColour
+class GenericRGBFTColour final
 {
     public:
 
@@ -680,8 +681,6 @@ class GenericRGBFTColour
         friend class GenericRGBFTColour;
 
         friend GenericRGBFTColour ToRGBFTColour(const GenericTransColour<T>& col);
-
-        typedef DBL EXPRESS[5];
 
         /// Default constructor.
         inline GenericRGBFTColour() :
@@ -966,7 +965,7 @@ inline GenericRGBFTColour<T> operator- (double a, const GenericRGBFTColour<T>& b
 template<typename T>
 inline T ColourDistanceRGBT (const GenericRGBFTColour<T>& a, const GenericRGBFTColour<T>& b)
 {
-    return ColourDistance(a.rgb(), b.rgb()) + fabs(a.transm() - b.transm());
+    return ColourDistance(a.rgb(), b.rgb()) + std::fabs(a.transm() - b.transm());
 }
 
 typedef GenericRGBFTColour<ColourChannel>           RGBFTColour;        ///< Standard precision RGBFT colour.
@@ -995,7 +994,7 @@ enum
 /// @tparam T   Floating-point type to use for the individual colour components.
 ///
 template<typename T>
-class GenericRGBTColour
+class GenericRGBTColour final
 {
     public:
 
@@ -1069,7 +1068,7 @@ class GenericRGBTColour
         inline bool IsNearZero(T epsilon) const
         {
             return mColour.IsNearZero(epsilon) &&
-                   (fabs(mTransm) < epsilon);
+                   (std::fabs(mTransm) < epsilon);
         }
 
         inline void Clear()
@@ -1221,7 +1220,7 @@ inline GenericRGBTColour<T> operator- (double a, const GenericRGBTColour<T>& b) 
 template<typename T>
 inline T ColourDistanceRGBT (const GenericRGBTColour<T>& a, const GenericRGBTColour<T>& b)
 {
-    return ColourDistance(a.rgb(), b.rgb()) + fabs(a.transm() - b.transm());
+    return ColourDistance(a.rgb(), b.rgb()) + std::fabs(a.transm() - b.transm());
 }
 
 /// @relates GenericRGBTColour
@@ -1245,7 +1244,7 @@ typedef GenericRGBTColour<PreciseColourChannel> PreciseRGBTColour;  ///< High pr
 /// @tparam T   Floating-point type to use for the individual colour channels.
 ///
 template<typename T>
-class GenericColour
+class GenericColour final
 {
     public:
 
@@ -1384,11 +1383,11 @@ class GenericColour
             /// @remark This used to be implemented differently at different places in the code;
             ///         variations were:
             ///           - `max3(r,g,b)`
-            ///           - `max3(fabs(r),fabs(g),fabs(b))`
-            ///           - `fabs(greyscale)` [1]
-            ///           - `max(0.0,greyscale)`
-            /// @remark [1] A variant of this was `max(0.0,fabs(greyscale))`; note the superfluous
-            ///             `max()`.
+            ///           - `max3(std::fabs(r),std::fabs(g),std::fabs(b))`
+            ///           - `std::fabs(greyscale)` [1]
+            ///           - `std::max(0.0,greyscale)`
+            /// @remark [1] A variant of this was `std::max(0.0,std::fabs(greyscale))`; note the superfluous
+            ///             `std::max()`.
             /// @remark The rationale for choosing the current implementation is as follows:
             ///           - In general, the weight should scale proportionally with the colour
             ///             brightness. [2]
@@ -1419,7 +1418,7 @@ class GenericColour
         ///
         inline T WeightAbsGreyscale() const
         {
-            return fabs(Greyscale());
+            return std::fabs(Greyscale());
         }
 
         /// Computes a measure for the weight of the colour based on its greyscale value.
@@ -1439,7 +1438,7 @@ class GenericColour
         /// greatest value.
         ///
         /// @note       Do _not_ use this function if you absolutely want to know the intensity of
-        ///             the strongest colour channel. For such cases, use @ref max() instead.
+        ///             the strongest colour channel. For such cases, use @ref Max() instead.
         ///
         /// @deprecated Calls to this function should probably be replaced by calls to
         ///             @ref WeightMaxAbs() or @ref Weight() for consistency of colour math.
@@ -1465,7 +1464,7 @@ class GenericColour
         {
             T result = 0.0;
             for (int i = 0; i < channels; i ++)
-                result += fabs(mColour[i]);
+                result += std::fabs(mColour[i]);
             return result;
         }
 
@@ -1478,7 +1477,7 @@ class GenericColour
         {
             T result = mColour[0];
             for (int i = 1; i < channels; i ++)
-                result = max(result, mColour[i]);
+                result = std::max(result, mColour[i]);
             return result;
         }
 
@@ -1491,7 +1490,7 @@ class GenericColour
         {
             T result = mColour[0];
             for (int i = 1; i < channels; i ++)
-                result = max(result, fabs(mColour[i]));
+                result = std::max(result, std::fabs(mColour[i]));
             return result;
         }
 
@@ -1501,7 +1500,7 @@ class GenericColour
         {
             T result = mColour[0];
             for (int i = 1; i < channels; i ++)
-                result = min(result, mColour[i]);
+                result = std::min(result, mColour[i]);
             return result;
         }
 
@@ -1522,7 +1521,7 @@ class GenericColour
         {
             bool result = true;
             for (int i = 0; i < channels; i ++)
-                result = result && (fabs(mColour[i]) < epsilon);
+                result = result && (std::fabs(mColour[i]) < epsilon);
             return result;
         }
 
@@ -1562,7 +1561,7 @@ class GenericColour
         {
             GenericColour result;
             for (int i = 0; i < channels; i ++)
-                result.mColour[i] = min(mColour[i], maxc);
+                result.mColour[i] = std::min(mColour[i], maxc);
             return result;
         }
 
@@ -1570,7 +1569,7 @@ class GenericColour
         {
             GenericColour result;
             for (int i = 0; i < channels; i ++)
-                result.mColour[i] = max(mColour[i], minc);
+                result.mColour[i] = std::max(mColour[i], minc);
             return result;
         }
 
@@ -1810,7 +1809,7 @@ extern template class GenericColour<PreciseColourChannel>;
 /// @tparam T   Floating-point type to use for the individual colour components.
 ///
 template<typename T>
-class GenericTransColour
+class GenericTransColour final
 {
     public:
 
@@ -1820,8 +1819,6 @@ class GenericTransColour
         friend class GenericRGBFTColour<T>;
 
         friend GenericTransColour ToTransColour(const GenericRGBFTColour<T>& col);
-
-        typedef DBL EXPRESS[5];
 
         /// Default constructor.
         inline GenericTransColour() :
@@ -2101,7 +2098,7 @@ typedef GenericTransColour<PreciseColourChannel>    PreciseTransColour; ///< Hig
 ///                             Defaults to unsigned char.
 ///
 template<int BIAS, bool QUANTIZE_TO_NEAREST, typename T>
-class GenericRGBEColour
+class GenericRGBEColour final
 {
     public:
 
@@ -2256,5 +2253,6 @@ typedef GenericRGBEColour<250,true>     PhotonColour;       ///< RGBE format as 
 //##############################################################################
 
 }
+// end of namespace pov_base
 
-#endif
+#endif // POVRAY_BASE_COLOUR_H

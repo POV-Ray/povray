@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,11 +36,28 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/processoptions.h"
 
+// C++ variants of C standard header files
+#include <cstdarg>
 #include <cstdio>
 
-#include "base/platformbase.h"
+// C++ standard header files
+//  (none at the moment)
 
+// POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
+#include "base/platformbase.h"
+#include "base/povassert.h"
+#include "base/stringutilities.h"
+#include "base/textstream.h"
+
+// POV-Ray header files (core module)
+//  (none at the moment)
+
+// POV-Ray header files (POVMS module)
 #include "povms/povmsid.h"
+
+// POV-Ray header files (frontend module)
+//  (none at the moment)
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -361,7 +378,7 @@ int ProcessOptions::WriteFile(const char *filename, POVMSObjectPtr obj)
     OTextStream *ini_file;
     int err = kNoErr;
 
-    if(!pov_base::PlatformBase::GetInstance().AllowLocalFileAccess (ASCIItoUCS2String(filename), POV_File_Text_INI, true))
+    if(!pov_base::PlatformBase::GetInstance().AllowLocalFileAccess (SysToUCS2String(filename), POV_File_Text_INI, true))
         return kCannotOpenFileErr;
 
     ini_file = OpenFileForWrite(filename, obj);
@@ -558,7 +575,7 @@ void ProcessOptions::ParseErrorAt(ITextStream *file, const char *format, ...)
     std::vsnprintf(error_buffer, sizeof(error_buffer), format, marker);
     va_end(marker);
 
-    fprintf(stderr, "%s\nFile '%s' at line '%u'", error_buffer, UCS2toASCIIString(file->name()).c_str(), (unsigned int) file->line());
+    fprintf(stderr, "%s\nFile '%s' at line '%u'", error_buffer, UCS2toSysString(file->name()).c_str(), (unsigned int) file->line());
 }
 
 void ProcessOptions::WriteError(const char *format, ...)
@@ -1498,3 +1515,4 @@ int ProcessOptions::Process_Switch(Cmd_Parser_Table *option, char *param, POVMSO
 }
 
 }
+// end of namespace pov_frontend
