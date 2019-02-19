@@ -428,6 +428,7 @@
     <ClInclude Include="..\..\source\parser\font.h" />
     <ClInclude Include="..\..\source\parser\parser.h" />
     <ClInclude Include="..\..\source\parser\parsertypes.h" />
+    <ClInclude Include="..\..\source\parser\parser_fwd.h" />
     <ClInclude Include="..\..\source\parser\reservedwords.h" />
     <ClInclude Include="..\..\source\parser\configparser.h" />
     <ClInclude Include="..\..\source\parser\precomp.h" />

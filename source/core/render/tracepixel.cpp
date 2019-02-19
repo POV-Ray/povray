@@ -13,7 +13,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,10 +41,16 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/render/tracepixel.h"
 
+// C++ variants of C standard header files
+#include <cstring>
+
+// C++ standard header files
 #include <vector>
 
-#include <boost/scoped_array.hpp>
+// POV-Ray header files (base module)
+#include <algorithm>
 
+// POV-Ray header files (core module)
 #include "core/material/normal.h"
 #include "core/material/pigment.h"
 #include "core/math/chi2.h"
@@ -62,10 +68,13 @@
 namespace pov
 {
 
+using std::min;
+using std::max;
+
 #ifdef DYNAMIC_HASHTABLE
 extern unsigned short *hashTable; // GLOBAL VARIABLE
 #else
-extern ALIGN16 unsigned short hashTable[]; // GLOBAL VARIABLE
+alignas(16) extern unsigned short hashTable[]; // GLOBAL VARIABLE
 #endif
 
 const int Grid1Size    = 4;
@@ -192,7 +201,7 @@ bool ContainingInteriorsPointObjectCondition::operator()(const Vector3d& point, 
 }
 
 
-TracePixel::TracePixel(shared_ptr<SceneData> sd, const Camera* cam, TraceThreadData *td, unsigned int mtl, DBL adcb, const QualityFlags& qf,
+TracePixel::TracePixel(std::shared_ptr<SceneData> sd, const Camera* cam, TraceThreadData *td, unsigned int mtl, DBL adcb, const QualityFlags& qf,
                        CooperateFunctor& cf, MediaFunctor& mf, RadiosityFunctor& af, bool pt) :
                        Trace(sd, td, qf, cf, mf, af),
                        sceneData(sd),
@@ -934,13 +943,13 @@ void TracePixel::InitRayContainerState(Ray& ray, bool compute)
             (*sceneData->tree)(ray.Origin, ifn, mailbox);
 
             // test infinite objects
-            for(vector<ObjectPtr>::iterator object = sceneData->objects.begin() + sceneData->numberOfFiniteObjects; object != sceneData->objects.end(); object++)
+            for(std::vector<ObjectPtr>::iterator object = sceneData->objects.begin() + sceneData->numberOfFiniteObjects; object != sceneData->objects.end(); object++)
                 if (((*object)->interior != nullptr) && Inside_BBox(ray.Origin, (*object)->BBox) && (*object)->Inside(ray.Origin, threadData))
                     containingInteriors.push_back((*object)->interior.get());
         }
         else if ((sceneData->boundingMethod == 0) || (sceneData->boundingSlabs == nullptr))
         {
-            for(vector<ObjectPtr>::iterator object = sceneData->objects.begin(); object != sceneData->objects.end(); object++)
+            for(std::vector<ObjectPtr>::iterator object = sceneData->objects.begin(); object != sceneData->objects.end(); object++)
                 if (((*object)->interior != nullptr) && Inside_BBox(ray.Origin, (*object)->BBox) && (*object)->Inside(ray.Origin, threadData))
                     containingInteriors.push_back((*object)->interior.get());
         }
@@ -1240,10 +1249,10 @@ TracePixel::FocalBlurData::FocalBlurData(const Camera& camera, TraceThreadData* 
             int Grid_Size = 2 * (int)ceil(minGridRadius) + 1;
 
             // Allocate temporary grid.
-            boost::scoped_array<char> Grid_Data (new char [Grid_Size * Grid_Size]);
+            std::unique_ptr<char[]> Grid_Data (new char [Grid_Size * Grid_Size]);
             char *p = Grid_Data.get();
-            memset(p, 0, Grid_Size * Grid_Size);
-            vector<char *> Grid(Grid_Size);
+            std::memset(p, 0, Grid_Size * Grid_Size);
+            std::vector<char*> Grid(Grid_Size);
             for(int i = 0; i < Grid_Size; i++, p += Grid_Size)
                 Grid[i] = p;
 
@@ -1302,3 +1311,4 @@ TracePixel::FocalBlurData::~FocalBlurData()
 }
 
 }
+// end of namespace pov

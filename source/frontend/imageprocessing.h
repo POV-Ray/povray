@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,14 +39,21 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "frontend/configfrontend.h"
 
-#include "base/stringutilities.h"
+// C++ variants of C standard header files
+//  (none at the moment)
 
+// C++ standard header files
+#include <memory>
+
+// POV-Ray header files (base module)
+#include "base/stringtypes.h"
+#include "base/image/image_fwd.h"
+
+// POV-Ray header files (POVMS module)
 #include "povms/povmscpp.h"
 
-namespace pov_base
-{
-class Image;
-}
+// POV-Ray header files (frontend module)
+//  (none at the moment)
 
 namespace pov_frontend
 {
@@ -58,12 +65,12 @@ class ImageProcessing
     public:
         ImageProcessing(unsigned int width, unsigned int height);
         ImageProcessing(POVMS_Object& ropts);
-        ImageProcessing(shared_ptr<Image>& img);
+        ImageProcessing(std::shared_ptr<Image>& img);
         virtual ~ImageProcessing();
 
         UCS2String WriteImage(POVMS_Object& ropts, POVMSInt frame = 0, int digits = 0);
 
-        shared_ptr<Image>& GetImage();
+        std::shared_ptr<Image>& GetImage();
 
         UCS2String GetOutputFilename(POVMS_Object& ropts, POVMSInt frame, int digits);
         bool OutputIsStdout(void) { return toStdout; }
@@ -72,16 +79,18 @@ class ImageProcessing
         virtual bool OutputIsStderr(POVMS_Object& ropts);
 
     protected:
-        shared_ptr<Image> image;
+        std::shared_ptr<Image> image;
         bool toStdout;
         bool toStderr;
 
     private:
-        ImageProcessing();
-        ImageProcessing(const ImageProcessing&);
-        ImageProcessing& operator=(const ImageProcessing&);
+
+        ImageProcessing() = delete;
+        ImageProcessing(const ImageProcessing&) = delete;
+        ImageProcessing& operator=(const ImageProcessing&) = delete;
 };
 
 }
+// end of namespace pov_frontend
 
 #endif // POVRAY_FRONTEND_IMAGEPROCESSING_H

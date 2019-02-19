@@ -29,7 +29,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -60,10 +60,16 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+#include <vector>
+
+// C++ standard header files
 #include <stdexcept>
 
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
 
+// POV-Ray header files (core module)
 #include "core/coretypes.h"
 
 namespace pov
@@ -86,8 +92,8 @@ namespace pov
 // This is intentional as we currently do not store any objects in it that
 // require this functionality. // TODO FIXME
 ////////////////////////////////////////////////////////////////////////////
-template<class ContainerType, class Allocator = std::allocator<ContainerType> >
-class SimpleVector
+template<class ContainerType, class Allocator = std::allocator<ContainerType>>
+class SimpleVector final
 {
 public:
     typedef SimpleVector<ContainerType> MyType;
@@ -406,7 +412,7 @@ private:
 // require this functionality.
 ////////////////////////////////////////////////////////////////////////////
 template<class ContainerType, int ElementCount>
-class FixedSimpleVector
+class FixedSimpleVector final
 {
 public:
     typedef FixedSimpleVector<ContainerType, ElementCount> MyType;
@@ -623,7 +629,7 @@ private:
 ///     such cases gracefully.
 ///
 template<class VECTOR_T>
-class VectorPool
+class VectorPool final
 {
 public:
 
@@ -670,7 +676,7 @@ public:
 
 private:
 
-    vector<VECTOR_T*> mPool;
+    std::vector<VECTOR_T*> mPool;
     size_t mSizeHint;
 };
 
@@ -684,7 +690,7 @@ private:
 ///     require this functionality.
 ///
 template<typename ELEMENT_T, size_t SIZE_HINT>
-class PooledSimpleVector
+class PooledSimpleVector final
 {
 public:
 
@@ -792,5 +798,6 @@ private:
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_SIMPLEVECTOR_H

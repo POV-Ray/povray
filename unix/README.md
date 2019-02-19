@@ -17,7 +17,6 @@ following packages pre-installed:
 
     libboost-dev
     libboost-date-time-dev
-    libboost-thread-dev
     libfreetype6-dev
     libjpeg-dev
     libopenexr-dev

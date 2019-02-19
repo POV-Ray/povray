@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,12 +36,16 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/timer.h"
 
-// Boost header files
-#if POV_MULTITHREADED
-#include <boost/thread.hpp>
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#if !POV_USE_PLATFORM_DELAY
+#include <chrono>
+#include <thread>
 #endif
 
-// POV-Ray base header files
+// POV-Ray header files (base module)
 #include "base/types.h"
 
 // this must be the last file included
@@ -50,45 +54,36 @@
 namespace pov_base
 {
 
-#if POV_MULTITHREADED && POV_USE_DEFAULT_DELAY
+//******************************************************************************
+
+#if !POV_USE_PLATFORM_DELAY
 
 void Delay(unsigned int msec)
 {
-    boost::xtime t;
-    boost::xtime_get(&t, POV_TIME_UTC);
-    POV_ULONG ns = (POV_ULONG)(t.sec) * (POV_ULONG)(1000000000) + (POV_ULONG)(t.nsec) + (POV_ULONG)(msec) * (POV_ULONG)(1000000);
-    t.sec = (boost::xtime::xtime_sec_t)(ns / (POV_ULONG)(1000000000));
-    t.nsec = (boost::xtime::xtime_nsec_t)(ns % (POV_ULONG)(1000000000));
-    boost::thread::sleep(t);
+    std::this_thread::sleep_for(std::chrono::milliseconds(msec));
 }
 
-#endif // POV_MULTITHREADED && POV_USE_DEFAULT_DELAY
+#endif // POV_USE_PLATFORM_DELAY
 
-#if POV_USE_DEFAULT_TIMER
+//******************************************************************************
 
-Timer::Timer()
+DefaultRealTimer::DefaultRealTimer()
 {
     Reset();
 }
 
-Timer::~Timer()
+POV_LONG DefaultRealTimer::ElapsedTime() const
 {
+    auto elapsed = std::chrono::steady_clock::now() - mRealTimeStart;
+    return std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
 }
 
-POV_LONG Timer::ElapsedRealTime() const
+void DefaultRealTimer::Reset()
 {
-    boost::xtime t;
-    boost::xtime_get(&t, POV_TIME_UTC);
-    POV_LONG tt = (POV_LONG)(t.sec) * (POV_LONG)(1000000000) + (POV_LONG)(t.nsec);
-    POV_LONG st = (POV_LONG)(mRealTimeStart.sec) * (POV_LONG)(1000000000) + (POV_LONG)(mRealTimeStart.nsec);
-    return ((tt - st) / (POV_LONG)(1000000));
+    mRealTimeStart = std::chrono::steady_clock::now();
 }
 
-void Timer::Reset()
-{
-    boost::xtime_get(&mRealTimeStart, POV_TIME_UTC);
-}
-
-#endif // POV_USE_DEFAULT_TIMER
+//******************************************************************************
 
 }
+// end of namespace pov_base

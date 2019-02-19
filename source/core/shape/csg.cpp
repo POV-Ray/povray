@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,8 +36,17 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/csg.h"
 
-#include <algorithm>
+// C++ variants of C standard header files
+//  (none at the moment)
 
+// C++ standard header files
+#include <algorithm>
+#include <vector>
+
+// POV-Ray header files (base module)
+#include "base/povassert.h"
+
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/lighting/lightgroup.h"
 #include "core/math/matrix.h"
@@ -46,12 +55,17 @@
 #include "core/shape/heightfield.h"
 #include "core/shape/plane.h"
 #include "core/shape/quadric.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov
 {
+
+using std::min;
+using std::max;
+using std::vector;
 
 /*****************************************************************************
 * Global preprocessor defines
@@ -1020,3 +1034,4 @@ void CSG::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextur
 }
 
 }
+// end of namespace pov

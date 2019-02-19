@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -63,30 +63,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <string>
+
 #include "pvfrontend.h"
-#include "backend/frame.h"
 #include "backend/povray.h"
 
 #include <time.h>
 
 #define MAX_MESSAGE               1024
 #define MAX_ARGV                  256
-#define TOOLFILENAME              "PVTOOLS.INI"
 #define MAX_TOOLCMD               32
 #define MAX_TOOLCMDTEXT           128
 #define MAX_TOOLHELPTEXT          128
-#define MIN_EDITOR_VERSION        100
-#define MAX_EDITOR_VERSION        199
 #define MAX_WINDOWS               16
 #define MAX_EDIT_FILES            32
 #define POV_INTERNAL_STREAM       ((FILE *) 1L)
 
-#define LEGACY_OPTION_FILE_SUPPORT
-
 #define EDIT_FILE                 1
 #define RENDER_FILE               2
-
-#define CRASH_REPORTER_EXECUTABLE "SubmitMinidump.exe"
 
 #if POV_RAY_IS_OFFICIAL
   #ifdef _WIN64
@@ -113,14 +107,12 @@
 #endif
 
 #ifdef _WIN64
-  #define BINDIRNAME            "bin64"
   #define INSTALLTIMEKEY        "InstallTime64"
   // NB: We're using the standard editor DLLs regardless of architecture optimization (e.g. AVX)
   #define EDITDLLNAME           "cmedit64.dll"
   #define EDITDLLNAME_DEBUG     "cmedit64d.dll"
   #define VERSIONVAL            POVWIN_BETA_PREFIX "VersionNo64"
 #else
-  #define BINDIRNAME            "bin32"
   #define INSTALLTIMEKEY        "InstallTime32"
   // TODO - use the standard editor DLLs regardless of architecture optimization (e.g. SSE2)
   #ifdef BUILD_SSE2
@@ -136,31 +128,10 @@
 // message definitions used to be here but have been moved to pvedit.h.
 // ----------------------------------------------------------------------
 
-#define NUM_BUTTONS     16
 #define HDIB            HANDLE
 #define SEPARATOR       '\\'
 
 #define DRAWFASTRECT(hdc,lprc) ExtTextOut(hdc,0,0,ETO_OPAQUE,lprc,NULL,0,NULL)
-
-#define RGBBLACK     RGB(0,0,0)
-#define RGBRED       RGB(128,0,0)
-#define RGBGREEN     RGB(0,128,0)
-#define RGBBLUE      RGB(0,0,128)
-
-#define RGBBROWN     RGB(128,128,0)
-#define RGBMAGENTA   RGB(128,0,128)
-#define RGBCYAN      RGB(0,128,128)
-#define RGBLTGRAY    RGB(192,192,192)
-
-#define RGBGRAY      RGB(128,128,128)
-#define RGBLTRED     RGB(255,0,0)
-#define RGBLTGREEN   RGB(0,255,0)
-#define RGBLTBLUE    RGB(0,0,255)
-
-#define RGBYELLOW    RGB(255,255,0)
-#define RGBLTMAGENTA RGB(255,0,255)
-#define RGBLTCYAN    RGB(0,255,255)
-#define RGBWHITE     RGB(255,255,255)
 
 namespace povwin
 {
@@ -226,48 +197,6 @@ typedef struct
   PALETTEENTRY          pe [256] ;
 } LogPal ;
 
-typedef struct
-{
-  bool        ncEnabled ;
-  bool        menuWasUp ;
-  bool        hasCaption ;
-  bool        hasBorder ;
-  bool        hasSizeableBorder ;
-  bool        hasStatusBar ;
-  bool        hasMenuBar ;
-  bool        sysMenuOverride ;
-  bool        isMaxiMinimized ;
-  HWND        hWnd ;
-  HFONT       hMenuBarFont ;
-  HFONT       hStatusBarFont ;
-  HFONT       hSystemFont ;
-  ushort      captionTotal ;
-  ushort      captionInternal ;
-  ushort      captionBorderLeft ;
-  ushort      captionBorderRight ;
-  ushort      captionBorderTop ;
-  ushort      captionBorderBottom ;
-  ushort      borderWidth ;
-  ushort      borderHeight ;
-  ushort      buttonWidth ;
-  ushort      buttonHeight ;
-  ushort      sizing ;
-  ushort      statusBarTotal ;
-  ushort      statusBarBorder ;
-  ushort      menuBarTotal ;
-  ushort      menuBarBorder ;
-} pvncStruct ;
-
-class AutoLock
-{
-public:
-  inline AutoLock (CRITICAL_SECTION& CriticalSection) { m_CriticalSection = &CriticalSection ; EnterCriticalSection (m_CriticalSection) ; }
-  inline ~AutoLock() { LeaveCriticalSection (m_CriticalSection) ; }
-
-private:
-  LPCRITICAL_SECTION m_CriticalSection ;
-};
-
 inline int MulDivNoRound (int value, int mul_by, int div_by)
 {
   return ((int) ((__int64) value * mul_by / div_by)) ;
@@ -296,7 +225,6 @@ void message_printf (const char *format, ...) ;
 void wrapped_printf (const char *format, ...) ;
 void dump_pane_to_clipboard (void) ;
 bool copy_text_to_clipboard(const char *text);
-bool PutPrivateProfileInt (LPCSTR lpszSection, LPCSTR lpszEntry, UINT uiValue, LPCSTR lpszFilename) ;
 void get_logfont (HDC hdc, LOGFONT *lf) ;
 int create_message_font (HDC hdc, LOGFONT *lf) ;
 void status_printf (int nSection, const char *format, ...) ;
@@ -308,10 +236,8 @@ bool hasTrailingPathSeparator (const char *s) ;
 void trimTrailingPathSeparator (char *s) ;
 void validatePath (char *s) ;
 int joinPath (char *out, const char *path, const char *name) ;
-void UpdateTabbedWindow (int current, bool force) ;
 void CalculateClientWindows (bool redraw) ;
 bool start_rendering (bool ignore_source_file) ;
-bool HaveWin95 (void) ;
 void render_stopped (void) ;
 void cancel_render (void) ;
 void SetStatusPanelItemText (int id, LPCSTR format, ...) ;
@@ -327,11 +253,10 @@ FileType get_file_type (const char *filename) ;
 bool is_non_primary_file(const char *filename) ;
 void read_INI_settings (void) ;
 void write_INI_settings (bool noreset = false) ;
-void cloneOldIni(const std::string oldPath, const std::string newPath);
+void cloneOldIni(const std::string& oldPath, const std::string& newPath);
 void update_menu_for_render (bool rendering) ;
 void update_queue_status (bool write_files) ;
 void draw_ordinary_listbox (DRAWITEMSTRUCT *d, bool fitpath) ;
-void fill_statistics_listbox (HWND hlb, int id) ;
 void resize_listbox_dialog (HWND hDlg, int idLb, int chars) ;
 void CenterWindowRelative (HWND hRelativeTo, HWND hTarget, bool bRepaint, bool checkBorders) ;
 void FitWindowInWindow (HWND hRelativeTo, HWND hTarget) ;
@@ -342,20 +267,14 @@ void set_toggles (void) ;
 void load_tool_menu (char *iniFilename) ;
 char *parse_tool_command (char *command) ;
 char *get_elapsed_time (int seconds) ;
-void initialise_statusbar (bool isMaxiMiniMode) ;
-void calculate_statusbar (void) ;
-void paint_statusbar (int nSection) ;
 void extract_ini_sections (char *filename, HWND hwnd) ;
 void extract_ini_sections_ex (char *filename, HWND hwnd) ;
 int select_combo_item_ex (HWND hwnd, char *s) ;
-void paint_rendering_signal (int which_one) ;
 char *get_full_name (char *s) ;
 bool PovInvalidateRect (HWND hWnd, CONST RECT *lpRect, bool bErase) ;
-int load_editors (char *iniFilename) ;
 bool TaskBarAddIcon (HWND hwnd, UINT uID, HICON hicon, LPSTR lpszTip) ;
 bool TaskBarModifyIcon (HWND hwnd, UINT uID, LPSTR lpszTip) ;
 bool TaskBarDeleteIcon (HWND hwnd, UINT uID) ;
-bool TestAccessAllowed (const char *Filename, unsigned int FileType, bool IsWrite) ;
 char *clean (char *s) ;
 bool fileExists (const char *filename) ;
 bool dirExists (const char *filename) ;
@@ -367,8 +286,6 @@ bool PutHKCU(const char *Section, const char *Name, const std::string& Value);
 bool PutHKCU(const char *Section, const char *Name, unsigned Value);
 unsigned GetHKCU(const char *Section, const char *Name, unsigned DefaultValue);
 size_t GetHKCU(const char *Section, const char *Name, const char *DefaultValue, char *Buffer, unsigned MaxLength);
-bool read_legacy_INI_settings (const char *iniFilename, const char *oldHome, const char *newHome);
-void clone_legacy_dir_restrictions (const char *iniFilename, const char *oldHome, const char *newHome);
 
 // file PVFILES.C
 
@@ -389,23 +306,17 @@ void clear_menu (HMENU hMenu) ;
 void build_main_menu (HMENU hMenu, bool have_editor) ;
 void build_editor_menu (HMENU hMenu) ;
 void set_newuser_menus (bool hide) ;
-void swap_renderwin_menu (void) ;
 int find_menuitem (HMENU hMenu, LPCSTR title) ;
 
 // file PVTEXT.C
 
 void write_wrapped_text (HDC hdc, RECT *rect, const char *text) ;
 void tip_of_the_day (HDC hdc, RECT *rect, char *text) ;
-void paint_statusbar (int nSection) ;
 void say_status_message (int section, const char *message) ;
 void handle_menu_select (WPARAM wParam, LPARAM lParam) ;
 char *clean_str (const char *s) ;
 HWND create_toolbar (HWND hwndParent) ;
-HWND create_tabbed_window (HWND hwndParent) ;
-void initialise_tabbed_window (HWND hwnd) ;
-unsigned add_window_to_tab (HWND hwnd, void *editor, char *s) ;
 void resize_windows (unsigned left, unsigned top, unsigned width, unsigned height) ;
-unsigned get_tab_index (HWND hwnd, void *editor) ;
 char *preparse_commandline (char *s) ;
 char *preparse_instance_commandline (char *s) ;
 void add_edit_file (char *file);
@@ -415,11 +326,6 @@ HWND create_rebar (HWND hwndParent) ;
 HWND CreateStatusbar (HWND hwndParent) ;
 void ResizeStatusBar (HWND hwnd) ;
 bool HandleStatusTooltip(NMHDR *nmh);
-
-// file PVPOVMS.CPP
-
-bool WIN_POVMS_Init (void) ;
-void WIN_POVMS_Shutdown (void) ;
 
 // file PVBITMAP.CPP
 
@@ -437,7 +343,6 @@ HDIB      FAR  CopyWindowToDIB (HWND, WORD);
 HPALETTE  FAR  CreateDIBPalette (HDIB hDIB);
 HDIB      FAR  CreateDIB(DWORD, DWORD, WORD);
 WORD      FAR  DestroyDIB (HDIB);
-void      FAR  DIBError (int ErrNo);
 DWORD     FAR  DIBHeight (LPSTR lpDIB);
 WORD      FAR  DIBNumColors (LPSTR lpDIB);
 HBITMAP   FAR  DIBToBitmap (HDIB hDIB, HPALETTE hPal);
@@ -539,7 +444,7 @@ RGBQUAD halftonePal [256] =
 // Division lookup tables.  These tables compute 0-255 divided by 51 and
 // modulo 51.  These tables could approximate gamma correction.
 
-uchar div51 [256] =
+unsigned char div51 [256] =
 {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -554,7 +459,7 @@ uchar div51 [256] =
   4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5
 } ;
 
-uchar mod51 [256] =
+unsigned char mod51 [256] =
 {
   0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
   20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37,
@@ -574,12 +479,12 @@ uchar mod51 [256] =
 
 // Multiplication lookup tables. These compute 0-5 times 6 and 36.
 
-uchar mul6 [6] = {0, 6, 12, 18, 24, 30} ;
-uchar mul36 [6] = {0, 36, 72, 108, 144, 180} ;
+unsigned char mul6 [6] = {0, 6, 12, 18, 24, 30} ;
+unsigned char mul36 [6] = {0, 36, 72, 108, 144, 180} ;
 
 // Ordered 8x8 dither matrix for 8 bit to 2.6 bit halftones.
 
-uchar dither8x8 [64] =
+unsigned char dither8x8 [64] =
 {
    0, 38,  9, 47,  2, 40, 11, 50,
   25, 12, 35, 22, 27, 15, 37, 24,
@@ -594,6 +499,6 @@ uchar dither8x8 [64] =
 #endif // #if DECLARE_TABLES
 
 }
+// end of namespace povwin
 
 #endif // PVENGINE_H_INCLUDED
-

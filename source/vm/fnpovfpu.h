@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,18 +41,29 @@
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "vm/configvm.h"
+#include "vm/fnpovfpu_fwd.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <set>
 #include <vector>
 
-#include "base/textstream.h"
+// Boost header files
+#include <boost/intrusive_ptr.hpp>
 
+// POV-Ray header files (base module)
+#include "base/textstream_fwd.h"
+
+// POV-Ray header files (core module)
 #include "core/coretypes.h"
+
+// POV-Ray header files (VM module)
+//  (none at the moment)
 
 namespace pov
 {
-
-class FunctionVM;
 
 #define MAX_CALL_STACK_SIZE 1024
 #define INITIAL_DBL_STACK_SIZE 256
@@ -134,9 +145,6 @@ struct FunctionCode
     void *private_data;
 };
 
-typedef unsigned int FUNCTION;
-typedef FUNCTION * FUNCTION_PTR;
-
 struct FunctionEntry
 {
     FunctionCode fn;            // valid if reference_count != 0
@@ -155,12 +163,12 @@ class FPUContext : public GenericFunctionContext
 {
     public:
         FPUContext(FunctionVM* pVm, TraceThreadData* pThreadData);
-        virtual ~FPUContext();
+        virtual ~FPUContext() override;
 
         StackFrame *pstackbase;
         DBL *dblstackbase;
         unsigned int maxdblstacksize;
-        intrusive_ptr<FunctionVM> functionvm;
+        boost::intrusive_ptr<FunctionVM> functionvm;
         TraceThreadData *threaddata;
         #if (SYS_FUNCTIONS == 1)
         DBL *dblstack;
@@ -257,22 +265,22 @@ class FunctionVM : public GenericFunctionContextFactory
         {
             public:
                 CustomFunction(FunctionVM* pVm, FUNCTION_PTR pFn);
-                virtual ~CustomFunction();
-                virtual GenericFunctionContextPtr AcquireContext(TraceThreadData* pThreadData);
-                virtual void ReleaseContext(GenericFunctionContextPtr pContext);
-                virtual void InitArguments(GenericFunctionContextPtr pContext);
-                virtual void PushArgument(GenericFunctionContextPtr pContext, DBL arg);
-                virtual DBL Execute(GenericFunctionContextPtr pContext);
-                virtual GenericScalarFunctionPtr Clone() const;
-                virtual const CustomFunctionSourceInfo* GetSourceInfo() const;
+                virtual ~CustomFunction() override;
+                virtual GenericFunctionContextPtr AcquireContext(TraceThreadData* pThreadData) override;
+                virtual void ReleaseContext(GenericFunctionContextPtr pContext) override;
+                virtual void InitArguments(GenericFunctionContextPtr pContext) override;
+                virtual void PushArgument(GenericFunctionContextPtr pContext, DBL arg) override;
+                virtual DBL Execute(GenericFunctionContextPtr pContext) override;
+                virtual GenericScalarFunctionPtr Clone() const override;
+                virtual const CustomFunctionSourceInfo* GetSourceInfo() const override;
             protected:
-                intrusive_ptr<FunctionVM> mpVm;
+                boost::intrusive_ptr<FunctionVM> mpVm;
                 FUNCTION_PTR mpFn;
                 static inline FPUContext* GetFPUContextPtr(GenericFunctionContextPtr pContext);
         };
 
         FunctionVM();
-        virtual ~FunctionVM();
+        virtual ~FunctionVM() override;
 
         void Reset();
 
@@ -290,16 +298,17 @@ class FunctionVM : public GenericFunctionContextFactory
         FUNCTION_PTR CopyFunction(FUNCTION_PTR pK);
         void DestroyFunction(FUNCTION_PTR pK);
 
-        virtual GenericFunctionContextPtr CreateFunctionContext(TraceThreadData* pTd);
+        virtual GenericFunctionContextPtr CreateFunctionContext(TraceThreadData* pTd) override;
 
     private:
 
-        vector<FunctionEntry> functions;
+        std::vector<FunctionEntry> functions;
         FUNCTION nextUnreferenced;
-        vector<DBL> globals;
-        vector<DBL> consts;
+        std::vector<DBL> globals;
+        std::vector<DBL> consts;
 };
 
 }
+// end of namespace pov
 
 #endif // POVRAY_VM_FNPOVFPU_H

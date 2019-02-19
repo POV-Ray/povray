@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,13 +33,21 @@
 ///
 //******************************************************************************
 
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
-
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "backend/support/taskqueue.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+
+// Boost header files
+#include <boost/bind.hpp>
+
+// POV-Ray header files (base module)
+// POV-Ray header files (core module)
+// POV-Ray header files (POVMS module)
+//  (none at the moment)
+
+// POV-Ray header files (backend module)
 #include "backend/support/task.h"
 
 // this must be the last file included
@@ -48,7 +56,8 @@
 namespace pov
 {
 
-using boost::recursive_mutex;
+using std::list;
+using std::shared_ptr;
 
 TaskQueue::TaskQueue() : failed(kNoError)
 {
@@ -61,7 +70,7 @@ TaskQueue::~TaskQueue()
 
 void TaskQueue::Stop()
 {
-    recursive_mutex::scoped_lock lock(queueMutex);
+    std::lock_guard<std::recursive_mutex> lock(queueMutex);
 
     // we pass through this list twice; the first time through only sets the cancel
     // flag, and the second time through waits for the threads to exit. if we only
@@ -83,7 +92,7 @@ void TaskQueue::Stop()
 
 void TaskQueue::Pause()
 {
-    recursive_mutex::scoped_lock lock(queueMutex);
+    std::lock_guard<std::recursive_mutex> lock(queueMutex);
 
     for(list<TaskEntry>::iterator i(activeTasks.begin()); i != activeTasks.end(); i++)
         i->GetTask()->Pause();
@@ -91,7 +100,7 @@ void TaskQueue::Pause()
 
 void TaskQueue::Resume()
 {
-    boost::recursive_mutex::scoped_lock lock(queueMutex);
+    std::lock_guard<std::recursive_mutex> lock(queueMutex);
 
     for(list<TaskEntry>::iterator i(activeTasks.begin()); i != activeTasks.end(); i++)
         i->GetTask()->Resume();
@@ -99,7 +108,7 @@ void TaskQueue::Resume()
 
 bool TaskQueue::IsPaused()
 {
-    boost::recursive_mutex::scoped_lock lock(queueMutex);
+    std::lock_guard<std::recursive_mutex> lock(queueMutex);
 
     bool paused = false;
 
@@ -111,7 +120,7 @@ bool TaskQueue::IsPaused()
 
 bool TaskQueue::IsRunning()
 {
-    boost::recursive_mutex::scoped_lock lock(queueMutex);
+    std::lock_guard<std::recursive_mutex> lock(queueMutex);
 
     bool running = !queuedTasks.empty();
 
@@ -123,7 +132,7 @@ bool TaskQueue::IsRunning()
 
 bool TaskQueue::IsDone()
 {
-    boost::recursive_mutex::scoped_lock lock(queueMutex);
+    std::lock_guard<std::recursive_mutex> lock(queueMutex);
 
     bool done = queuedTasks.empty();
 
@@ -135,14 +144,14 @@ bool TaskQueue::IsDone()
 
 bool TaskQueue::Failed()
 {
-    boost::recursive_mutex::scoped_lock lock(queueMutex);
+    std::lock_guard<std::recursive_mutex> lock(queueMutex);
 
     return (failed != kNoError);
 }
 
 int TaskQueue::FailureCode(int defval)
 {
-    recursive_mutex::scoped_lock lock(queueMutex);
+    std::lock_guard<std::recursive_mutex> lock(queueMutex);
 
     if(failed == kNoError)
         return defval;
@@ -152,7 +161,7 @@ int TaskQueue::FailureCode(int defval)
 
 ThreadData *TaskQueue::AppendTask(Task *task)
 {
-    boost::recursive_mutex::scoped_lock lock(queueMutex);
+    std::lock_guard<std::recursive_mutex> lock(queueMutex);
 
     failed = false;
 
@@ -165,7 +174,7 @@ ThreadData *TaskQueue::AppendTask(Task *task)
 
 void TaskQueue::AppendSync()
 {
-    boost::recursive_mutex::scoped_lock lock(queueMutex);
+    std::lock_guard<std::recursive_mutex> lock(queueMutex);
 
     queuedTasks.push(TaskEntry::kSync);
 
@@ -174,7 +183,7 @@ void TaskQueue::AppendSync()
 
 void TaskQueue::AppendMessage(POVMS_Message& msg)
 {
-    boost::recursive_mutex::scoped_lock lock(queueMutex);
+    std::lock_guard<std::recursive_mutex> lock(queueMutex);
 
     queuedTasks.push(TaskEntry(msg));
 
@@ -183,7 +192,7 @@ void TaskQueue::AppendMessage(POVMS_Message& msg)
 
 void TaskQueue::AppendFunction(const boost::function1<void, TaskQueue&>& fn)
 {
-    boost::recursive_mutex::scoped_lock lock(queueMutex);
+    std::lock_guard<std::recursive_mutex> lock(queueMutex);
 
     queuedTasks.push(TaskEntry(fn));
 
@@ -192,7 +201,7 @@ void TaskQueue::AppendFunction(const boost::function1<void, TaskQueue&>& fn)
 
 bool TaskQueue::Process()
 {
-    boost::recursive_mutex::scoped_lock lock(queueMutex);
+    std::unique_lock<std::recursive_mutex> lock(queueMutex);
 
     for(list<TaskEntry>::iterator i(activeTasks.begin()); i != activeTasks.end();)
     {
@@ -261,3 +270,4 @@ void TaskQueue::Notify()
 }
 
 }
+// end of namespace pov

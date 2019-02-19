@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,18 +38,18 @@
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
+#include "base/image/colourspace_fwd.h"
 
-// Standard C++ header files
-#include <vector>
+// C++ variants of C standard header files
+//  (none at the moment)
 
-// Boost header files
-#if POV_MULTITHREADED
-#include <boost/thread.hpp>
-#endif
+// C++ standard header files
+#include <list>
+#include <memory>
+#include <mutex>
 
-// POV-Ray base header files
+// POV-Ray header files (base module)
 #include "base/colour.h"
-#include "base/types.h"
 
 namespace pov_base
 {
@@ -60,15 +60,6 @@ namespace pov_base
 /// @ingroup PovBaseImage
 ///
 /// @{
-
-class GammaCurve;
-class SimpleGammaCurve;
-
-/// Class holding a shared reference to a gamma curve.
-typedef shared_ptr<GammaCurve> GammaCurvePtr;
-
-/// Class holding a shared reference to a simple gamma curve.
-typedef shared_ptr<SimpleGammaCurve> SimpleGammaCurvePtr;
 
 /// Abstract class representing an encoding gamma curve (or, more generally, transfer function).
 ///
@@ -311,7 +302,7 @@ class GammaCurve
 
 #if POV_MULTITHREADED
         /// Mutex to guard access to @ref lookupTable8 and @ref lookupTable16.
-        boost::mutex lutMutex;
+        std::mutex lutMutex;
 #endif
 
         /// Constructor.
@@ -342,11 +333,11 @@ class GammaCurve
         /// This static member variable caches pointers of gamma curve instances currently in use, forming the basis
         /// of the `GetMatching()` mechanism to avoid duplicate instances.
         ///
-        static list<weak_ptr<GammaCurve> > cache;
+        static std::list<std::weak_ptr<GammaCurve>> cache;
 
 #if POV_MULTITHREADED
         /// Mutex to guard access to `cache`.
-        static boost::mutex cacheMutex;
+        static std::mutex cacheMutex;
 #endif
 
         /// Function to manage the gamma curve cache.
@@ -393,7 +384,7 @@ class SimpleGammaCurve : public GammaCurve
         /// @param[in]  p   Pointer to the gamma curve to compare with.
         /// @return         `true` if the gamma curve will produce the same result as this instance, `false` otherwise.
         ///
-        virtual bool Matches(const GammaCurvePtr& p) const
+        virtual bool Matches(const GammaCurvePtr& p) const override
         {
             SimpleGammaCurve* simpleP = dynamic_cast<SimpleGammaCurve*>(p.get());
             if (simpleP)
@@ -412,7 +403,7 @@ class UniqueGammaCurve : public SimpleGammaCurve
         ///
         /// This function is to be implemented by subclasses to return the type-specific parameter of the gamma curve subclass.
         ///
-        virtual float GetParam() const { return 0.0; }
+        virtual float GetParam() const override { return 0.0; }
 
     protected:
 
@@ -423,7 +414,7 @@ class UniqueGammaCurve : public SimpleGammaCurve
         /// @param[in]  p   Pointer to the gamma curve to compare with.
         /// @return         `true` if the gamma curve will produce the same result as this instance, `false` otherwise.
         ///
-        virtual bool Matches(const GammaCurvePtr& p) const
+        virtual bool Matches(const GammaCurvePtr& p) const override
         {
             UniqueGammaCurve* uniqueP = dynamic_cast<UniqueGammaCurve*>(p.get());
             if (uniqueP)
@@ -434,18 +425,18 @@ class UniqueGammaCurve : public SimpleGammaCurve
 };
 
 /// Class representing a neutral gamma curve.
-class NeutralGammaCurve : public UniqueGammaCurve
+class NeutralGammaCurve final : public UniqueGammaCurve
 {
     public:
         static SimpleGammaCurvePtr Get();
-        virtual float Encode(float x) const;
-        virtual float Decode(float x) const;
-        virtual float ApproximateDecodingGamma() const;
-        virtual int GetTypeId() const;
+        virtual float Encode(float x) const override;
+        virtual float Decode(float x) const override;
+        virtual float ApproximateDecodingGamma() const override;
+        virtual int GetTypeId() const override;
     private:
         static SimpleGammaCurvePtr instance;
-        virtual bool Matches(const GammaCurvePtr&) const;
-        virtual bool IsNeutral() const;
+        virtual bool Matches(const GammaCurvePtr&) const override;
+        virtual bool IsNeutral() const override;
         NeutralGammaCurve();
 };
 
@@ -455,14 +446,14 @@ class NeutralGammaCurve : public UniqueGammaCurve
 ///         having a constant gamma of 1/2.2, the two are not identical. This class represents
 ///         the exact function as specified in IEC 61966-2-1.
 ///
-class SRGBGammaCurve : public UniqueGammaCurve
+class SRGBGammaCurve final : public UniqueGammaCurve
 {
     public:
         static SimpleGammaCurvePtr Get();
-        virtual float Encode(float x) const;
-        virtual float Decode(float x) const;
-        virtual float ApproximateDecodingGamma() const;
-        virtual int GetTypeId() const;
+        virtual float Encode(float x) const override;
+        virtual float Decode(float x) const override;
+        virtual float ApproximateDecodingGamma() const override;
+        virtual int GetTypeId() const override;
     private:
         static SimpleGammaCurvePtr instance;
         SRGBGammaCurve();
@@ -475,14 +466,14 @@ class SRGBGammaCurve : public UniqueGammaCurve
 /// @note   This class does _not_ account for the "black digital count" and "white digital count" being defined
 ///         as 16/255 and 235/255, respectively.
 ///
-class BT709GammaCurve : public UniqueGammaCurve
+class BT709GammaCurve final : public UniqueGammaCurve
 {
     public:
         static SimpleGammaCurvePtr Get();
-        virtual float Encode(float x) const;
-        virtual float Decode(float x) const;
-        virtual float ApproximateDecodingGamma() const;
-        virtual int GetTypeId() const;
+        virtual float Encode(float x) const override;
+        virtual float Decode(float x) const override;
+        virtual float ApproximateDecodingGamma() const override;
+        virtual int GetTypeId() const override;
     private:
         static SimpleGammaCurvePtr instance;
         BT709GammaCurve();
@@ -492,14 +483,14 @@ class BT709GammaCurve : public UniqueGammaCurve
 ///
 /// This transfer function is a wide-gamut extension to that specified in ITU-R BT.709.
 ///
-class BT1361GammaCurve : public UniqueGammaCurve
+class BT1361GammaCurve final : public UniqueGammaCurve
 {
     public:
         static SimpleGammaCurvePtr Get();
-        virtual float Encode(float x) const;
-        virtual float Decode(float x) const;
-        virtual float ApproximateDecodingGamma() const;
-        virtual int GetTypeId() const;
+        virtual float Encode(float x) const override;
+        virtual float Decode(float x) const override;
+        virtual float ApproximateDecodingGamma() const override;
+        virtual int GetTypeId() const override;
     private:
         static SimpleGammaCurvePtr instance;
         BT1361GammaCurve();
@@ -513,51 +504,51 @@ class BT1361GammaCurve : public UniqueGammaCurve
 /// @note   This class does _not_ account for the "black digital count" and "white digital count" being defined
 ///         as 16/255 and 235/255, respectively.
 ///
-class BT2020GammaCurve : public UniqueGammaCurve
+class BT2020GammaCurve final : public UniqueGammaCurve
 {
     public:
         static SimpleGammaCurvePtr Get();
-        virtual float Encode(float x) const;
-        virtual float Decode(float x) const;
-        virtual float ApproximateDecodingGamma() const;
-        virtual int GetTypeId() const;
+        virtual float Encode(float x) const override;
+        virtual float Decode(float x) const override;
+        virtual float ApproximateDecodingGamma() const override;
+        virtual int GetTypeId() const override;
     private:
         static SimpleGammaCurvePtr instance;
         BT2020GammaCurve();
 };
 
 /// Class representing a classic constant-gamma (power-law) gamma encoding curve.
-class PowerLawGammaCurve : public SimpleGammaCurve
+class PowerLawGammaCurve final : public SimpleGammaCurve
 {
     public:
         static SimpleGammaCurvePtr GetByEncodingGamma(float gamma);
         static SimpleGammaCurvePtr GetByDecodingGamma(float gamma);
-        virtual float Encode(float x) const;
-        virtual float Decode(float x) const;
-        virtual float ApproximateDecodingGamma() const;
-        virtual int GetTypeId() const;
-        virtual float GetParam() const;
+        virtual float Encode(float x) const override;
+        virtual float Decode(float x) const override;
+        virtual float ApproximateDecodingGamma() const override;
+        virtual int GetTypeId() const override;
+        virtual float GetParam() const override;
     protected:
         float encGamma;
         PowerLawGammaCurve(float encGamma);
-        virtual bool Matches(const GammaCurvePtr&) const;
+        virtual bool Matches(const GammaCurvePtr&) const override;
         static bool IsNeutral(float gamma);
 };
 
 /// Class representing a scaled-encoding variant of another gamma curves.
-class ScaledGammaCurve : public GammaCurve
+class ScaledGammaCurve final : public GammaCurve
 {
     public:
         static GammaCurvePtr GetByEncoding(const GammaCurvePtr&, float encodingFactor);
         static GammaCurvePtr GetByDecoding(float decodingFactor, const GammaCurvePtr&);
-        virtual float Encode(float x) const;
-        virtual float Decode(float x) const;
-        virtual float ApproximateDecodingGamma() const;
+        virtual float Encode(float x) const override;
+        virtual float Decode(float x) const override;
+        virtual float ApproximateDecodingGamma() const override;
     protected:
         GammaCurvePtr baseGamma;
         float encFactor;
         ScaledGammaCurve(const GammaCurvePtr&, float);
-        virtual bool Matches(const GammaCurvePtr&) const;
+        virtual bool Matches(const GammaCurvePtr&) const override;
         static bool IsNeutral(float factor);
 };
 
@@ -565,22 +556,22 @@ class ScaledGammaCurve : public GammaCurve
 ///
 /// @note   This class is only required for backward compatibility with POV-Ray v3.6.
 ///
-class TranscodingGammaCurve : public GammaCurve
+class TranscodingGammaCurve final : public GammaCurve
 {
     public:
         static GammaCurvePtr Get(const GammaCurvePtr& working, const GammaCurvePtr& encoding);
-        virtual float Encode(float x) const;
-        virtual float Decode(float x) const;
-        virtual float ApproximateDecodingGamma() const;
+        virtual float Encode(float x) const override;
+        virtual float Decode(float x) const override;
+        virtual float ApproximateDecodingGamma() const override;
     protected:
         GammaCurvePtr workGamma;
         GammaCurvePtr encGamma;
-        TranscodingGammaCurve();
+        TranscodingGammaCurve() = delete;
         TranscodingGammaCurve(const GammaCurvePtr&, const GammaCurvePtr&);
-        virtual bool Matches(const GammaCurvePtr&) const;
+        virtual bool Matches(const GammaCurvePtr&) const override;
 };
 
-enum GammaTypeId
+enum GammaTypeId : int
 {
     kPOVList_GammaType_Unknown,
     kPOVList_GammaType_Neutral,
@@ -603,5 +594,6 @@ SimpleGammaCurvePtr GetGammaCurve(GammaTypeId typeId, float param);
 //##############################################################################
 
 }
+// end of namespace pov_base
 
 #endif // POVRAY_BASE_COLOURSPACE_H

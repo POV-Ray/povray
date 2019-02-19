@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,10 +39,17 @@
 #ifndef POVRAY_VFE_VFESESSION_H
 #define POVRAY_VFE_VFESESSION_H
 
+#include <condition_variable>
+#include <memory>
+#include <mutex>
 #include <queue>
+#include <thread>
+#include <vector>
 
-#include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
+#include <boost/format.hpp>
+#include <boost/function.hpp>
+
+#include "base/stringutilities.h"
 
 #include "frontend/simplefrontend.h"
 
@@ -50,6 +57,7 @@ namespace pov_frontend
 {
   class Display;
 }
+// end of namespace pov_frontend
 
 namespace vfe
 {
@@ -71,7 +79,7 @@ namespace vfe
       IOPath(const Path& path, bool recursive) : m_Path(path), m_Recursive(recursive) {}
 
       // construct an IOPath given a std::string path and a recursion flag.
-      IOPath(const string& path, bool recursive) : m_Path(Path(ASCIItoUCS2String(path.c_str()))), m_Recursive(recursive) {}
+      IOPath(const std::string& path, bool recursive) : m_Path(Path(SysToUCS2String(path))), m_Recursive(recursive) {}
 
       // construct an IOPath given a UCS2String Path and a recursion flag.
       IOPath(const UCS2String& path, bool recursive) : m_Path(path), m_Recursive(recursive) {}
@@ -90,9 +98,9 @@ namespace vfe
   } ;
 
   // convenience typedefs.
-  typedef vector<string> StringVector;
-  typedef vector<UCS2String> UCS2StringVector;
-  typedef vector<IOPath> IOPathVector;
+  typedef std::vector<std::string> StringVector;
+  typedef std::vector<UCS2String> UCS2StringVector;
+  typedef std::vector<IOPath> IOPathVector;
 
   class vfeDisplay;
   class VirtualFrontEnd;
@@ -150,7 +158,7 @@ namespace vfe
       void ClearLibraryPaths() { m_LibraryPaths.clear(); }
 
       // Add a library path given a std::string.
-      void AddLibraryPath(const string& Path) { m_LibraryPaths.push_back(ASCIItoUCS2String(Path.c_str())); }
+      void AddLibraryPath(const std::string& Path) { m_LibraryPaths.push_back(SysToUCS2String(Path)); }
 
       // Add a library path given a UCS2String.
       void AddLibraryPath(const UCS2String& Path) { m_LibraryPaths.push_back(Path); }
@@ -171,7 +179,7 @@ namespace vfe
       // Set the source file to be parsed (must be an SDL file, INI not
       // permitted). The file is specified as a std::string full or relative
       // path, with optional extension.
-      void SetSourceFile(const string& File) { m_SourceFile = ASCIItoUCS2String(File.c_str()); }
+      void SetSourceFile(const std::string& File) { m_SourceFile = SysToUCS2String(File); }
 
       // Returns a const reference to the currently set source file (may be
       // an empty string). Return type is a const reference to a UCS2String.
@@ -183,7 +191,7 @@ namespace vfe
       // Adds the supplied std::string to the list of INI files to be read
       // prior to the start of the render. The files are processed in the
       // order in which they are added to this list.
-      void AddINI(const string& File) { m_IniFiles.push_back(ASCIItoUCS2String(File.c_str())); }
+      void AddINI(const std::string& File) { m_IniFiles.push_back(SysToUCS2String(File)); }
 
       // Adds the supplied UCS2String to the list of INI files to be read
       // prior to the start of the render. The files are processed in the
@@ -201,7 +209,7 @@ namespace vfe
       // Sets the number of threads to be used for rendering (and potentially
       // for bounding and similar tasks, if this is supported in the future).
       // Clipped to the range 1..512.
-      void SetThreadCount(int Count) { m_ThreadCount = max(1, min(Count, 512)); }
+      void SetThreadCount(int Count) { m_ThreadCount = std::max(1, std::min(Count, 512)); }
 
       // Gets the number of threads currently set to be used for renders.
       // Defaults to 2.
@@ -215,14 +223,14 @@ namespace vfe
       // order in which they appear in this list. A 'command' in this context
       // is basically anything that could normally appear on the command-line
       // of a POV-Ray console compile.
-      void AddCommand(const string& Command) { m_Commands.push_back(Command); }
+      void AddCommand(const std::string& Command) { m_Commands.push_back(Command); }
 
-      // Returns a const reference to a vector<std::string> containing the
+      // Returns a const reference to a std::vector<std::string> containing the
       // current list of commands as added by AddCommand(), in order first
       // to last.
       const StringVector& GetCommands() const { return m_Commands; }
 
-      // Returns a copy of the vector<std::string> which holds the current
+      // Returns a copy of the std::vector<std::string> which holds the current
       // list of commands as added by AddCommand(), in order first to last.
       StringVector GetCommands() { return m_Commands; }
 
@@ -383,13 +391,13 @@ namespace vfe
         public:
           MessageBase(const vfeSession& session) :
             m_Id(session.GetID()), m_TimeStamp (session.GetTimestamp()), m_Type(mUnclassified) {}
-          MessageBase(const vfeSession& session, MessageType type, string msg = "") :
+          MessageBase(const vfeSession& session, MessageType type, std::string msg = "") :
             m_Id(session.GetID()), m_TimeStamp (session.GetTimestamp()), m_Type(type), m_Message(msg) {}
           virtual ~MessageBase() {}
 
           POV_LONG m_TimeStamp;
           MessageType m_Type;
-          string m_Message;
+          std::string m_Message;
           int m_Id;
       } ;
 
@@ -403,9 +411,9 @@ namespace vfe
         public:
           GenericMessage(const vfeSession& session) :
             MessageBase(session), m_Line(0), m_Col(0) {}
-          GenericMessage(const vfeSession& session, MessageType type, string msg, const UCS2String file = UCS2String(), int line = 0, int col = 0) :
+          GenericMessage(const vfeSession& session, MessageType type, std::string msg, const UCS2String file = UCS2String(), int line = 0, int col = 0) :
             MessageBase (session, type, msg), m_Filename(file), m_Line(line), m_Col(col) {}
-          virtual ~GenericMessage() {}
+          virtual ~GenericMessage() override {}
 
           int m_Line;
           int m_Col;
@@ -429,11 +437,11 @@ namespace vfe
         public:
           StatusMessage(const vfeSession& session) :
             MessageBase(session), m_Delay(0), m_Frame(0), m_TotalFrames(0), m_FrameId(0) {}
-          StatusMessage(const vfeSession& session, string msg, int m_Delay) :
+          StatusMessage(const vfeSession& session, std::string msg, int m_Delay) :
             MessageBase(session, mGenericStatus, msg), m_Delay(m_Delay), m_Frame(0), m_TotalFrames(0), m_FrameId(0) {}
           StatusMessage(const vfeSession& session, const UCS2String& file, int frame, int totalframes, int frameId) :
             MessageBase(session, mAnimationStatus), m_Delay(0), m_Filename(file), m_Frame(frame), m_TotalFrames(totalframes), m_FrameId(frameId) {}
-          virtual ~StatusMessage() {}
+          virtual ~StatusMessage() override {}
 
           int m_Delay;
           int m_Frame;
@@ -528,7 +536,7 @@ namespace vfe
       // Returns a copy of the shared pointer containing the current instance
       // of a pov_frontend::Display-derived render preview instance, which may
       // be `nullptr`.
-      virtual shared_ptr<Display> GetDisplay() const;
+      virtual std::shared_ptr<Display> GetDisplay() const;
 
       // If a VFE implementation has provided a display creator functor via
       // vfeSession::SetDisplayCreator(), this method will call it with the
@@ -912,7 +920,7 @@ namespace vfe
       // any additional meta-information the message may have had, such as the
       // line number of an error. (Note that this does not mean the line number
       // cannot be in the message string; it may very well be).
-      virtual bool GetNextCombinedMessage (MessageType &Type, string& Message);
+      virtual bool GetNextCombinedMessage (MessageType &Type, std::string& Message);
 
       // Gets the next non-status message (meaning generic or console messages)
       // from the aforementioned queues; whichever is the earliest. Returns false
@@ -921,7 +929,7 @@ namespace vfe
       // did not contain this information, the relevent entry is either set to 0
       // (line and column) or the empty string (filename). The filename parameter
       // is a UCS2String.
-      virtual bool GetNextNonStatusMessage (MessageType &Type, string& Message, UCS2String& File, int& Line, int& Col);
+      virtual bool GetNextNonStatusMessage (MessageType &Type, std::string& Message, UCS2String& File, int& Line, int& Col);
 
       // Gets the next non-status message (meaning generic or console messages)
       // from the aforementioned queues; whichever is the earliest. Returns false
@@ -930,14 +938,14 @@ namespace vfe
       // did not contain this information, the relevent entry is either set to 0
       // (line and column) or the empty string (filename). The filename parameter
       // is a std::string.
-      virtual bool GetNextNonStatusMessage (MessageType &Type, string& Message, string& File, int& Line, int& Col);
+      virtual bool GetNextNonStatusMessage (MessageType &Type, std::string& Message, std::string& File, int& Line, int& Col);
 
       // Gets the next non-status message (meaning generic or console messages)
       // from the aforementioned queues; whichever is the earliest. Returns false
       // if there is no message to fetch, otherwise will set the message type
       // and text content parameters supplied. Any additional meta-information
       // that may have been contained in the message is discarded.
-      virtual bool GetNextNonStatusMessage (MessageType &Type, string& Message);
+      virtual bool GetNextNonStatusMessage (MessageType &Type, std::string& Message);
 
       // Returns false if there are no messages in the status message
       // queue, otherwise removes the oldest status message from the
@@ -964,7 +972,7 @@ namespace vfe
       // event notification, as appropriate. Upon receiving either of the above
       // events therefore you may like to simply call this method and place the
       // returned value wherever suitable, overwriting the previous value.2
-      virtual string GetStatusLineMessage() { return m_StatusLineMessage; }
+      virtual std::string GetStatusLineMessage() { return m_StatusLineMessage; }
 
       // Sets the maximum number of status messages that will be stored in the
       // status queue. If this limit is reached, the oldest message will be
@@ -999,7 +1007,7 @@ namespace vfe
 
       // Allows you to manually set the console wrap width.
       // The supplied value is clipped to the range 80-999.
-      virtual void SetConsoleWidth(int width) { m_ConsoleWidth = max(min(999,width),80); }
+      virtual void SetConsoleWidth(int width) { m_ConsoleWidth = std::max(std::min(999,width),80); }
 
       // Return the current console wrap width.
       virtual int GetConsoleWidth(void) { return m_ConsoleWidth; }
@@ -1020,7 +1028,7 @@ namespace vfe
       // Adds the supplied path to the list of allowed read paths, along with
       // the recursive flag (meaning paths under that path are also allowed).
       // The supplied path is a std::string.
-      virtual void AddReadPath(const string& path, bool recursive = true) { m_ReadPaths.push_back(IOPath(path, recursive)); }
+      virtual void AddReadPath(const std::string& path, bool recursive = true) { m_ReadPaths.push_back(IOPath(path, recursive)); }
 
       // Adds the supplied path to the list of allowed read paths.
       // The supplied path is a pre-constructed IOPath instance.
@@ -1039,7 +1047,7 @@ namespace vfe
       // Adds the supplied path to the list of allowed write paths, along with
       // the recursive flag (meaning paths under that path are also allowed).
       // The supplied path is a std::string.
-      virtual void AddWritePath(const string& path, bool recursive = true) { m_WritePaths.push_back(IOPath(path, recursive)); }
+      virtual void AddWritePath(const std::string& path, bool recursive = true) { m_WritePaths.push_back(IOPath(path, recursive)); }
 
       // Adds the supplied path to the list of allowed write paths.
       // The supplied path is a pre-constructed IOPath instance.
@@ -1062,7 +1070,7 @@ namespace vfe
 
       // Adds the supplied path to the list of excluded paths, along with the
       // recursion flag. The supplied path is a std::string.
-      virtual void AddExcludedPath(const string& path, bool recursive = true) { m_ExcludedPaths.push_back(IOPath(path, recursive)); }
+      virtual void AddExcludedPath(const std::string& path, bool recursive = true) { m_ExcludedPaths.push_back(IOPath(path, recursive)); }
 
       // Adds the supplied path to the list of excluded paths, along with the
       // recursion flag. The supplied path is a pre-constructed IOPath instance.
@@ -1102,12 +1110,12 @@ namespace vfe
       // state changs to rendering.
       virtual POV_LONG GetElapsedTime() { return GetTimestamp() - m_StartTime; }
 
-      virtual void AppendErrorMessage (const string& Msg);
-      virtual void AppendWarningMessage (const string& Msg);
-      virtual void AppendStatusMessage (const string& Msg, int RecommendedPause = 0);
+      virtual void AppendErrorMessage (const std::string& Msg);
+      virtual void AppendWarningMessage (const std::string& Msg);
+      virtual void AppendStatusMessage (const std::string& Msg, int RecommendedPause = 0);
       virtual void AppendStatusMessage (const boost::format& fmt, int RecommendedPause = 0);
-      virtual void AppendWarningAndStatusMessage (const string& Msg, int RecommendedPause = 0) { AppendWarningMessage(Msg); AppendStatusMessage(Msg, RecommendedPause); }
-      virtual void AppendErrorAndStatusMessage (const string& Msg, int RecommendedPause = 0) { AppendErrorMessage(Msg); AppendStatusMessage(Msg, RecommendedPause); }
+      virtual void AppendWarningAndStatusMessage (const std::string& Msg, int RecommendedPause = 0) { AppendWarningMessage(Msg); AppendStatusMessage(Msg, RecommendedPause); }
+      virtual void AppendErrorAndStatusMessage (const std::string& Msg, int RecommendedPause = 0) { AppendErrorMessage(Msg); AppendStatusMessage(Msg, RecommendedPause); }
 
       // returns true if a render cancel was requested at some point since the render started.
       virtual bool GetCancelRequested() { return m_RenderCancelRequested | m_RenderCancelled ; }
@@ -1127,8 +1135,8 @@ namespace vfe
 
       virtual void AppendStreamMessage (MessageType type, const char *message, bool chompLF = false);
       virtual void AppendStreamMessage (MessageType type, const boost::format& fmt, bool chompLF = false);
-      virtual void AppendErrorMessage (const string& Msg, const UCS2String& File, int Line = 0, int Col = 0);
-      virtual void AppendWarningMessage (const string& Msg, const UCS2String& File, int Line = 0, int Col = 0);
+      virtual void AppendErrorMessage (const std::string& Msg, const UCS2String& File, int Line = 0, int Col = 0);
+      virtual void AppendWarningMessage (const std::string& Msg, const UCS2String& File, int Line = 0, int Col = 0);
       virtual void AppendAnimationStatus (int FrameId, int SubsetFrame, int SubsetTotal, const UCS2String& Filename);
 
       virtual void SetUsingAlpha() { m_UsingAlpha = true ; }
@@ -1143,7 +1151,7 @@ namespace vfe
 
       virtual bool ProcessFrontend (void);
       virtual bool ProcessCancelRender(void);
-      virtual bool StopRender(const string& reason);
+      virtual bool StopRender(const std::string& reason);
 
       // This method allows your platform code to perform platform-specific actions
       // when a render stops (whether it succeeds or fails). A good example would
@@ -1205,11 +1213,11 @@ namespace vfe
       // NB this method is pure virtual.
       //
       // NOTE: The code to call this method isn't implemented in vfe yet.
-      virtual int RequestNewOutputPath(int CallCount, const string& Reason, const UCS2String& OldPath, UCS2String& NewPath) = 0;
+      virtual int RequestNewOutputPath(int CallCount, const std::string& Reason, const UCS2String& OldPath, UCS2String& NewPath) = 0;
 
       // Create an instance of the frontend ShelloutProcessing class. this handles creating and
       // managing render shellout commands, and typically will need platform-specific implementation.
-      virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height) { return new ShelloutProcessing(opts, scene, width, height); }
+      virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const std::string& scene, unsigned int width, unsigned int height) { return new ShelloutProcessing(opts, scene, width, height); }
 
       struct vfeSessionWorker
       {
@@ -1254,7 +1262,7 @@ namespace vfe
 
       static bool m_Initialized;
       static vfeSession *m_CurrentSessionTemporaryHack;
-      shared_ptr<Console> m_Console;
+      std::shared_ptr<Console> m_Console;
 
       virtual vfeDisplay *DefaultDisplayCreator (unsigned int width, unsigned int height, vfeSession *session, bool visible);
       DisplayCreator m_DisplayCreator;
@@ -1265,7 +1273,7 @@ namespace vfe
       GenericQueue m_MessageQueue;
       StatusQueue m_StatusQueue;
       ConsoleQueue m_ConsoleQueue;
-      string m_StatusLineMessage;
+      std::string m_StatusLineMessage;
       UCS2String m_OutputFilename;
       UCS2String m_InputFilename;
       IOPathVector m_ReadPaths;
@@ -1275,23 +1283,24 @@ namespace vfe
       VirtualFrontEnd *m_Frontend;
       State m_BackendState;
 
-      boost::mutex m_MessageMutex;
-      boost::mutex m_SessionMutex;
-      boost::condition m_SessionEvent;
-      boost::mutex m_InitializeMutex;
-      boost::condition m_InitializeEvent;
-      boost::condition m_ShutdownEvent;
-      boost::thread *m_WorkerThread;
-      boost::thread *m_BackendThread;
+      std::mutex m_MessageMutex;
+      std::mutex m_SessionMutex;
+      std::condition_variable m_SessionEvent;
+      std::mutex m_InitializeMutex;
+      std::condition_variable m_InitializeEvent;
+      std::condition_variable m_ShutdownEvent;
+      std::thread *m_WorkerThread;
+      std::thread *m_BackendThread;
       volatile bool m_WorkerThreadExited;
       volatile bool m_BackendThreadExited;
       volatile bool m_WorkerThreadShutdownRequest;
 
-      boost::mutex m_RequestMutex;
-      boost::condition m_RequestEvent;
+      std::mutex m_RequestMutex;
+      std::condition_variable m_RequestEvent;
       volatile int m_RequestFlag;
       volatile int m_RequestResult;
   } ;
 }
+// end of namespace vfe
 
 #endif // POVRAY_VFE_VFESESSION_H

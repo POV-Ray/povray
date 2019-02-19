@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -231,16 +231,24 @@ Density of instruction set: 916 / 1024 = 0.8945
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "vm/fnpovfpu.h"
 
+// C++ variants of C standard header files
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 
+// C++ standard header files
 #include <algorithm>
 
+// POV-Ray header files (base module)
 #include "base/mathutil.h"
+#include "base/povassert.h"
 
+// POV-Ray header files (core module)
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
+// POV-Ray header files (VM module)
 #include "vm/fnintern.h"
 
 // this must be the last file included
@@ -248,6 +256,10 @@ Density of instruction set: 916 / 1024 = 0.8945
 
 namespace pov
 {
+
+using std::min;
+using std::max;
+using std::vector;
 
 /*****************************************************************************
 * Local preprocessor defines
@@ -477,9 +489,9 @@ const Sys1 POVFPU_Sys1Table[] =
     sinh,           // 6
     cosh,           // 7
     tanh,           // 8
-    asinh,          // 9
-    acosh,          // 10
-    atanh,          // 11
+    std::asinh,     // 9
+    std::acosh,     // 10
+    std::atanh,     // 11
     floor,          // 12
     ceil,           // 13
     sqrt,           // 14
@@ -1650,3 +1662,4 @@ FPUContext::~FPUContext()
 }
 
 }
+// end of namespace pov

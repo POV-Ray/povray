@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,15 +36,22 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/imageprocessing.h"
 
-// Standard C++ header files
-#include <memory>
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
 
 // POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
+#include "base/path.h"
+#include "base/image/colourspace.h"
 #include "base/image/dither.h"
 #include "base/image/image.h"
 
 // POV-Ray header files (POVMS module)
 #include "povms/povmsid.h"
+
+// POV-Ray header files (frontend module)
+//  (none at the moment)
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -56,6 +63,8 @@
 namespace pov_frontend
 {
 
+using std::shared_ptr;
+
 enum
 {
     X = 0,
@@ -65,7 +74,7 @@ enum
 
 ImageProcessing::ImageProcessing(unsigned int width, unsigned int height)
 {
-    image = shared_ptr<Image>(Image::Create(width, height, Image::RGBFT_Float));
+    image = shared_ptr<Image>(Image::Create(width, height, ImageDataType::RGBFT_Float));
     toStderr = toStdout = false;
 
     // TODO FIXME - find a better place for this
@@ -79,7 +88,7 @@ ImageProcessing::ImageProcessing(POVMS_Object& ropts)
     unsigned int blockSize(ropts.TryGetInt(kPOVAttrib_RenderBlockSize, 32));
     unsigned int maxBufferMem(ropts.TryGetInt(kPOVAttrib_MaxImageBufferMem, 128)); // number is megabytes
 
-    image = shared_ptr<Image>(Image::Create(width, height, Image::RGBFT_Float, maxBufferMem, blockSize * blockSize));
+    image = shared_ptr<Image>(Image::Create(width, height, ImageDataType::RGBFT_Float, maxBufferMem, blockSize * blockSize));
     toStdout = OutputIsStdout(ropts);
     toStderr = OutputIsStderr(ropts);
 
@@ -104,12 +113,12 @@ UCS2String ImageProcessing::WriteImage(POVMS_Object& ropts, POVMSInt frame, int 
 {
     if(ropts.TryGetBool(kPOVAttrib_OutputToFile, true) == true)
     {
-        Image::WriteOptions wopts;
+        ImageWriteOptions wopts;
         Image::ImageFileType imagetype = Image::SYS;
         unsigned int filetype = POV_File_Image_System;
 
         wopts.bitsPerChannel = clip(ropts.TryGetInt(kPOVAttrib_BitsPerColor, 8), 1, 16);
-        wopts.alphaMode = (ropts.TryGetBool(kPOVAttrib_OutputAlpha, false) ? Image::kAlphaMode_Default : Image::kAlphaMode_None );
+        wopts.alphaMode = (ropts.TryGetBool(kPOVAttrib_OutputAlpha, false) ? ImageAlphaMode::Default : ImageAlphaMode::None );
         wopts.compression = (ropts.Exist(kPOVAttrib_Compression) ? clip(ropts.GetInt(kPOVAttrib_Compression), 0, 255) : -1);
         wopts.grayscale = ropts.TryGetBool(kPOVAttrib_GrayscaleOutput, false);
 
@@ -209,8 +218,8 @@ bool ImageProcessing::OutputIsStdout(POVMS_Object& ropts)
 {
     UCS2String path(ropts.TryGetUCS2String(kPOVAttrib_OutputFile, ""));
 
-    toStdout = path == POVMS_ASCIItoUCS2String("-") || path == POVMS_ASCIItoUCS2String("stdout");
-    toStderr = path == POVMS_ASCIItoUCS2String("stderr");
+    toStdout = (path == u"-") || (path == u"stdout");
+    toStderr = (path == u"stderr");
     return toStdout;
 }
 
@@ -231,43 +240,43 @@ UCS2String ImageProcessing::GetOutputFilename(POVMS_Object& ropts, POVMSInt fram
     {
         case kPOVList_FileType_Targa:
         case kPOVList_FileType_CompressedTarga:
-            ext = ASCIItoUCS2String(".tga");
+            ext = u".tga";
             imagetype = Image::TGA;
             break;
 
         case kPOVList_FileType_PNG:
-            ext = ASCIItoUCS2String(".png");
+            ext = u".png";
             imagetype = Image::PNG;
             break;
 
         case kPOVList_FileType_JPEG:
-            ext = ASCIItoUCS2String(".jpg");
+            ext = u".jpg";
             imagetype = Image::JPEG;
             break;
 
         case kPOVList_FileType_PPM:
-            ext = ASCIItoUCS2String(".ppm"); // TODO FIXME - in case of greyscale output, extension should default to ".pgm"
+            ext = u".ppm"; // TODO FIXME - in case of greyscale output, extension should default to ".pgm"
             imagetype = Image::PPM;
             break;
 
         case kPOVList_FileType_BMP:
-            ext = ASCIItoUCS2String(".bmp");
+            ext = u".bmp";
             imagetype = Image::BMP;
             break;
 
         case kPOVList_FileType_OpenEXR:
-            ext = ASCIItoUCS2String(".exr");
+            ext = u".exr";
             imagetype = Image::EXR;
             break;
 
         case kPOVList_FileType_RadianceHDR:
-            ext = ASCIItoUCS2String(".hdr");
+            ext = u".hdr";
             imagetype = Image::HDR;
             break;
 
 #ifdef POV_SYS_IMAGE_TYPE
         case kPOVList_FileType_System:
-            ext = ASCIItoUCS2String(POV_SYS_IMAGE_EXTENSION);
+            ext = u"" POV_SYS_IMAGE_EXTENSION;
             imagetype = Image::POV_SYS_IMAGE_TYPE;
             break;
 #endif
@@ -290,7 +299,7 @@ UCS2String ImageProcessing::GetOutputFilename(POVMS_Object& ropts, POVMSInt fram
             default:
                 throw POV_EXCEPTION_STRING("Output to STDOUT/STDERR not supported for selected file format");
         }
-        return POVMS_ASCIItoUCS2String(OutputIsStdout() ? "stdout" : "stderr");
+        return (OutputIsStdout() ? u"stdout" : u"stderr");
     }
 
     // we disallow an output filename that consists purely of the default extension
@@ -308,7 +317,7 @@ UCS2String ImageProcessing::GetOutputFilename(POVMS_Object& ropts, POVMSInt fram
 
         // if the input file name ends with '.' or '.anything', we remove it
         UCS2String::size_type pos = filename.find_last_of('.');
-        if(pos != string::npos)
+        if(pos != UCS2String::npos)
             filename.erase(pos);
     }
     else if ((path.HasVolume() == false) && (path.Empty() == false))
@@ -347,3 +356,4 @@ UCS2String ImageProcessing::GetOutputFilename(POVMS_Object& ropts, POVMSInt fram
 }
 
 }
+// end of namespace pov_frontend

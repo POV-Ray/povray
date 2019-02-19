@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,20 +36,32 @@
 #ifndef POVRAY_BACKEND_RENDERBACKEND_H
 #define POVRAY_BACKEND_RENDERBACKEND_H
 
-#include <map>
-#include <set>
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "backend/configbackend.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <map>
+#include <memory>
+#include <set>
+#include <vector>
+
+// POV-Ray header files (base module)
+#include "base/stringtypes.h"
+
+// POV-Ray header files (POVMS module)
 #include "povms/povmscpp.h"
 
-#include "base/stringutilities.h"
+// POV-Ray header files (backend module)
+#include "backend/control/scene_fwd.h"
+#include "backend/scene/view_fwd.h"
 
 namespace pov
 {
 
 using namespace pov_base;
-
-class Scene;
-class View;
 
 /**
  *  RenderBackend class receives render control messages from the
@@ -57,19 +69,19 @@ class View;
  *  parsing, rendering or other operations are performed as
  *  requested by the frontend.
  */
-class RenderBackend : public POVMS_MessageReceiver
+class RenderBackend final : public POVMS_MessageReceiver
 {
     public:
         typedef POVMSInt SceneId;
         typedef POVMSInt ViewId;
 
         RenderBackend(POVMSContext ctx, bool (*val)(POVMSAddress));
-        ~RenderBackend();
+        virtual ~RenderBackend() override;
 
         static void SendSceneOutput(SceneId sid, POVMSAddress addr, POVMSType ident, POVMS_Object& obj);
         static void SendViewOutput(ViewId vid, POVMSAddress addr, POVMSType ident, POVMS_Object& obj);
 
-        static void SendFindFile(POVMSContext ctx, SceneId sid, POVMSAddress addr, const vector<UCS2String>& filenames, UCS2String& filename);
+        static void SendFindFile(POVMSContext ctx, SceneId sid, POVMSAddress addr, const std::vector<UCS2String>& filenames, UCS2String& filename);
         static void SendReadFile(POVMSContext ctx, SceneId sid, POVMSAddress addr, const UCS2String& filename, UCS2String& localfile, UCS2String& fileurl);
         static void SendCreatedFile(POVMSContext ctx, SceneId sid, POVMSAddress addr, const UCS2String& filename);
 
@@ -113,11 +125,11 @@ class RenderBackend : public POVMS_MessageReceiver
         SceneId scenecounter;
         ViewId viewcounter;
 
-        typedef std::set<ViewId>                        ViewIdSet;
-        typedef std::map<SceneId, shared_ptr<Scene> >   SceneMap;
-        typedef std::map<ViewId,  shared_ptr<View> >    ViewMap;
-        typedef std::map<SceneId, ViewIdSet>            Scene2ViewsMap;
-        typedef std::map<ViewId,  SceneId>              View2SceneMap;
+        typedef std::set<ViewId>                            ViewIdSet;
+        typedef std::map<SceneId, std::shared_ptr<Scene>>   SceneMap;
+        typedef std::map<ViewId,  std::shared_ptr<View>>    ViewMap;
+        typedef std::map<SceneId, ViewIdSet>                Scene2ViewsMap;
+        typedef std::map<ViewId,  SceneId>                  View2SceneMap;
 
         SceneMap        scenes;
         ViewMap         views;
@@ -133,5 +145,6 @@ class RenderBackend : public POVMS_MessageReceiver
 };
 
 }
+// end of namespace pov
 
 #endif // POVRAY_BACKEND_RENDERBACKEND_H

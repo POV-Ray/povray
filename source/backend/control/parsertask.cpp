@@ -38,9 +38,12 @@
 
 // C++ variants of C standard header files
 // C++ standard header files
+
 // Boost header files
+#include <boost/bind.hpp>
+
 // POV-Ray header files (base module)
-//  (none at the moment)
+#include "base/types.h"
 
 // POV-Ray header files (core module)
 #include "core/scene/tracethreaddata.h"
@@ -48,7 +51,12 @@
 // POV-Ray header files (parser module)
 #include "parser/parser.h"
 
+// POV-Ray header files (POVMS module)
+#include "povms/povmscpp.h"
+#include "povms/povmsid.h"
+
 // POV-Ray header files (backend module)
+#include "backend/control/messagefactory.h"
 #include "backend/scene/backendscenedata.h"
 
 // this must be the last file included
@@ -69,7 +77,7 @@ ParserTask::ParserTask(std::shared_ptr<BackendSceneData> sd, const ParserOptions
 
 void ParserTask::Run()
 {
-    mpParser.reset(new Parser(mpBackendSceneData, mOptions, messageFactory, *this, *this, *reinterpret_cast<TraceThreadData *>(GetDataPtr())));
+    mpParser.reset(new Parser(mpBackendSceneData, mOptions, *mpMessageFactory, *this, *this, *reinterpret_cast<TraceThreadData *>(GetDataPtr())));
     mpParser->Run();
 }
 
@@ -126,4 +134,5 @@ void ParserTask::ReportProgress(POV_LONG tokenCount)
     }
 }
 
-} // end of namespace pov
+}
+// end of namespace pov

@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -42,6 +42,8 @@
 #include "disp_sdl.h"
 
 #include <algorithm>
+
+#include <boost/format.hpp>
 
 // this must be the last file included
 #include "syspovdebug.h"
@@ -115,7 +117,7 @@ namespace pov_frontend
             // allocate a new pixel counters, dropping influence of previous picture
             m_PxCount.clear(); // not useful, vector was created empty, just to be sure
             m_PxCount.reserve(width*height); // we need that, and the loop!
-            for(vector<unsigned char>::iterator iter = m_PxCount.begin(); iter != m_PxCount.end(); iter++)
+            for(std::vector<unsigned char>::iterator iter = m_PxCount.begin(); iter != m_PxCount.end(); iter++)
                 (*iter) = 0;
         }
 
@@ -219,7 +221,7 @@ namespace pov_frontend
 
             m_PxCount.clear();
             m_PxCount.reserve(width*height);
-            for(vector<unsigned char>::iterator iter = m_PxCount.begin(); iter != m_PxCount.end(); iter++)
+            for(std::vector<unsigned char>::iterator iter = m_PxCount.begin(); iter != m_PxCount.end(); iter++)
                 (*iter) = 0;
 
             m_update_rect.x = 0;
@@ -516,7 +518,7 @@ namespace pov_frontend
 
     void UnixSDLDisplay::Clear()
     {
-        for(vector<unsigned char>::iterator iter = m_PxCount.begin(); iter != m_PxCount.end(); iter++)
+        for(std::vector<unsigned char>::iterator iter = m_PxCount.begin(); iter != m_PxCount.end(); iter++)
             (*iter) = 0;
 
         m_update_rect.x = 0;
@@ -627,5 +629,6 @@ namespace pov_frontend
     }
 
 }
+// end of namespace pov_frontend
 
 #endif /* HAVE_LIBSDL */

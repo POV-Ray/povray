@@ -433,10 +433,13 @@
     <ClInclude Include="..\..\source\backend\bounding\boundingtask.h" />
     <ClInclude Include="..\..\source\backend\control\benchmark_ini.h" />
     <ClInclude Include="..\..\source\backend\control\benchmark_pov.h" />
+    <ClInclude Include="..\..\source\backend\control\messagefactory_fwd.h" />
+    <ClInclude Include="..\..\source\backend\control\scene_fwd.h" />
+    <ClInclude Include="..\..\source\backend\lighting\photonshootingstrategy_fwd.h" />
     <ClInclude Include="..\..\source\backend\scene\backendscenedata.h" />
+    <ClInclude Include="..\..\source\backend\scene\backendscenedata_fwd.h" />
     <ClInclude Include="..\..\source\backend\scene\viewthreaddata.h" />
     <ClInclude Include="..\..\source\backend\configbackend.h" />
-    <ClInclude Include="..\..\source\backend\frame.h" />
     <ClInclude Include="..\..\source\backend\povray.h" />
     <ClInclude Include="..\..\source\backend\control\benchmark.h" />
     <ClInclude Include="..\..\source\backend\control\messagefactory.h" />
@@ -447,6 +450,8 @@
     <ClInclude Include="..\..\source\backend\render\rendertask.h" />
     <ClInclude Include="..\..\source\backend\render\tracetask.h" />
     <ClInclude Include="..\..\source\backend\scene\view.h" />
+    <ClInclude Include="..\..\source\backend\scene\viewthreaddata_fwd.h" />
+    <ClInclude Include="..\..\source\backend\scene\view_fwd.h" />
     <ClInclude Include="..\..\source\backend\support\task.h" />
     <ClInclude Include="..\..\source\backend\support\taskqueue.h" />
     <ClInclude Include="..\..\source\backend\lighting\photonestimationtask.h" />

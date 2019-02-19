@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,19 +36,28 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "textstream.h"
 
-// C++ variants of standard C header files
+// C++ variants of C standard header files
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
 
-// Standard C++ header files
+// C++ standard header files
 #include <algorithm>
+#include <string>
+
+// POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
+#include "base/path.h"
+#include "base/stringutilities.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov_base
 {
+
+using std::min;
+using std::max;
 
 ITextStream::ITextStream() :
     lineno(1)
@@ -66,7 +75,7 @@ IBufferedTextStream::IBufferedTextStream(const UCS2 *sname, unsigned int stype)
 
     stream = NewIStream(sname, stype);
     if (stream == nullptr)
-        throw POV_EXCEPTION(kCannotOpenFileErr, string("Cannot open file '") + UCS2toASCIIString(sname) + "' for input.");
+        throw POV_EXCEPTION(kCannotOpenFileErr, std::string("Cannot open file '") + UCS2toSysString(sname) + "' for input.");
 
     filename = UCS2String(sname);
     bufferoffset = 0;
@@ -427,7 +436,7 @@ OTextStream::OTextStream(const UCS2 *sname, unsigned int stype, bool append)
 
     stream = NewOStream(sname, stype, append);
     if (stream == nullptr)
-        throw POV_EXCEPTION(kCannotOpenFileErr, string("Cannot open file '") + UCS2toASCIIString(sname) + "' for output.");
+        throw POV_EXCEPTION(kCannotOpenFileErr, std::string("Cannot open file '") + UCS2toSysString(sname) + "' for output.");
 
     filename = UCS2String(sname);
 }
@@ -499,3 +508,4 @@ void OTextStream::flush()
 }
 
 }
+// end of namespace pov_base

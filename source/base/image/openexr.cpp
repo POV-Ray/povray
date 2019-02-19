@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,12 +38,12 @@
 
 #ifndef OPENEXR_MISSING
 
-// Standard C++ header files
-#include <string>
+// C++ variants of C standard header files
+//  (none at the moment)
 
-// Boost header files
-#include <boost/scoped_ptr.hpp>
-#include <boost/scoped_array.hpp>
+// C++ standard header files
+#include <memory>
+#include <string>
 
 // Other 3rd party header files
 #include <ImfRgbaFile.h>
@@ -51,9 +51,13 @@
 #include <ImfMatrixAttribute.h>
 #include <ImfArray.h>
 
-// POV-Ray base header files
+// POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
+#include "base/stringutilities.h"
 #include "base/types.h"
+#include "base/image/colourspace.h"
+#include "base/image/encoding.h"
+#include "base/image/image.h"
 #include "base/image/metadata.h"
 
 // this must be the last file included
@@ -75,28 +79,23 @@ using namespace Imath;
 /*****************************************************************************
 * Local typedefs
 ******************************************************************************/
-struct Messages
-{
-    vector<string> warnings;
-    string error;
-};
 
 ///////////////////////////////////////////
 // class POV_EXR_OStream
 ///////////////////////////////////////////
-class POV_EXR_OStream : public Imf::OStream
+class POV_EXR_OStream final : public Imf::OStream
 {
     public:
-        POV_EXR_OStream(pov_base::OStream& pov_stream) : Imf::OStream(UCS2toASCIIString(pov_stream.Name()).c_str()), os(pov_stream) { }
-        virtual ~POV_EXR_OStream() { }
+        POV_EXR_OStream(pov_base::OStream& pov_stream) : Imf::OStream(UCS2toSysString(pov_stream.Name()).c_str()), os(pov_stream) { }
+        virtual ~POV_EXR_OStream() override { }
 
-        void write(const char *c, int n)
+        virtual void write(const char *c, int n) override
         {
             if(os.write(c, n) == false)
                 throw POV_EXCEPTION(kFileDataErr, "Error while writing EXR output");
         }
 
-        Int64 tellp()
+        virtual Int64 tellp() override
         {
             unsigned long pos = os.tellg();
             if((int) pos == -1)
@@ -104,7 +103,7 @@ class POV_EXR_OStream : public Imf::OStream
             return(pos);
         }
 
-        void seekp(Int64 pos)
+        virtual void seekp(Int64 pos) override
         {
             if(os.seekg((unsigned long)pos) == false)
                 throw POV_EXCEPTION(kFileDataErr, "Error when writing EXR output");
@@ -116,28 +115,28 @@ class POV_EXR_OStream : public Imf::OStream
 ///////////////////////////////////////////
 // class POV_EXR_IStream
 ///////////////////////////////////////////
-class POV_EXR_IStream : public Imf::IStream
+class POV_EXR_IStream final : public Imf::IStream
 {
     public:
-        POV_EXR_IStream(pov_base::IStream& pov_stream) : Imf::IStream(UCS2toASCIIString(pov_stream.Name()).c_str()), is(pov_stream)
+        POV_EXR_IStream(pov_base::IStream& pov_stream) : Imf::IStream(UCS2toSysString(pov_stream.Name()).c_str()), is(pov_stream)
         {
             is.seekg(0, IOBase::seek_end);
             fsize = is.tellg();
             is.seekg(0, IOBase::seek_set);
         }
 
-        virtual ~POV_EXR_IStream() { }
+        virtual ~POV_EXR_IStream() override { }
 
-        void clear(void) { is.clearstate(); }
+        virtual void clear(void) override { is.clearstate(); }
 
-        bool read(char *c, int n)
+        virtual bool read(char *c, int n) override
         {
             if(is.read(c, n) == false)
                 throw POV_EXCEPTION(kFileDataErr, "Error while reading EXR file");
             return (is.tellg() < fsize);
         }
 
-        Int64 tellg()
+        virtual Int64 tellg() override
         {
             unsigned long pos = is.tellg();
             if((int)pos == -1)
@@ -145,7 +144,7 @@ class POV_EXR_IStream : public Imf::IStream
             return pos;
         }
 
-        void seekg(Int64 pos)
+        virtual void seekg(Int64 pos) override
         {
             if(is.seekg((unsigned long)pos) == false)
                 throw POV_EXCEPTION(kFileDataErr, "Error while reading EXR file");
@@ -159,7 +158,7 @@ class POV_EXR_IStream : public Imf::IStream
 * Implementation
 ******************************************************************************/
 
-Image *Read(IStream *file, const Image::ReadOptions& options)
+Image *Read(IStream *file, const ImageReadOptions& options)
 {
     unsigned int width;
     unsigned int height;
@@ -189,7 +188,7 @@ Image *Read(IStream *file, const Image::ReadOptions& options)
         RgbaInputFile rif(is);
         Array2D<Rgba> pixels;
         Box2i dw = rif.dataWindow();
-        Image::ImageDataType imagetype = options.itype;
+        ImageDataType imagetype = options.itype;
 
         width = dw.max.x - dw.min.x + 1;
         height = dw.max.y - dw.min.y + 1;
@@ -197,8 +196,8 @@ Image *Read(IStream *file, const Image::ReadOptions& options)
         rif.setFrameBuffer(&pixels[0][0] - dw.min.x - dw.min.y * width, 1, width);
         rif.readPixels(dw.min.y, dw.max.y);
 
-        if(imagetype == Image::Undefined)
-            imagetype = Image::RGBFT_Float;
+        if(imagetype == ImageDataType::Undefined)
+            imagetype = ImageDataType::RGBFT_Float;
 
         image = Image::Create(width, height, imagetype);
         image->SetPremultiplied(premul); // set desired storage mode regarding alpha premultiplication
@@ -220,14 +219,14 @@ Image *Read(IStream *file, const Image::ReadOptions& options)
     return image;
 }
 
-void Write(OStream *file, const Image *image, const Image::WriteOptions& options)
+void Write(OStream *file, const Image *image, const ImageWriteOptions& options)
 {
     int width = image->GetWidth();
     int height = image->GetHeight();
     bool use_alpha = image->HasTransparency() && options.AlphaIsEnabled();
     float pixelAspect = 1.0;
     Header hdr(width, height, pixelAspect, Imath::V2f(0, 0), 1.0, INCREASING_Y, ZIP_COMPRESSION);
-    boost::scoped_array<Rgba> pixels(new Rgba[width * height]);
+    std::unique_ptr<Rgba[]> pixels(new Rgba[width * height]);
     Rgba *p = pixels.get();
 
     // OpenEXR format mandates that colours are encoded linearly.
@@ -263,7 +262,7 @@ void Write(OStream *file, const Image *image, const Image::WriteOptions& options
                 channels = WRITE_RGB; // write RGB
 
         Metadata meta;
-        string comments;
+        std::string comments;
         if (!meta.getComment1().empty())
             comments += meta.getComment1() + "\n";
         if (!meta.getComment2().empty())
@@ -274,12 +273,12 @@ void Write(OStream *file, const Image *image, const Image::WriteOptions& options
             comments += meta.getComment4() + "\n";
 
         if (!comments.empty())
-            hdr.insert("comments",StringAttribute(comments.c_str()));
+            hdr.insert("comments",StringAttribute(comments));
 
-        string software= meta.getSoftware();
-        string datetime= meta.getDateTime();
-        hdr.insert("software",StringAttribute(software.c_str()));
-        hdr.insert("creation",StringAttribute(datetime.c_str()));
+        std::string software= meta.getSoftware();
+        std::string datetime= meta.getDateTime();
+        hdr.insert("software",StringAttribute(software));
+        hdr.insert("creation",StringAttribute(datetime));
 
         RgbaOutputFile rof(os, hdr, channels);
         rof.setFrameBuffer(pixels.get(), 1, width);
@@ -291,8 +290,10 @@ void Write(OStream *file, const Image *image, const Image::WriteOptions& options
     }
 }
 
-} // end of namespace OpenEXR
+}
+// end of namespace OpenEXR
 
-} // end of namespace pov_base
+}
+// end of namespace pov_base
 
 #endif  // OPENEXR_MISSING

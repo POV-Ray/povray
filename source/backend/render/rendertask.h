@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,25 +36,36 @@
 #ifndef POVRAY_BACKEND_RENDERTASK_H
 #define POVRAY_BACKEND_RENDERTASK_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "backend/configbackend.h"
+
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <memory>
+
+// POV-Ray header files (base module)
+#include "core/core_fwd.h"
+
+// POV-Ray header files (backend module)
+#include "backend/scene/view_fwd.h"
+#include "backend/scene/viewthreaddata_fwd.h"
 #include "backend/support/task.h"
 
 namespace pov
 {
 
-class SceneData;
-class ViewData;
-class ViewThreadData;
-
 class RenderTask : public SceneTask
 {
     public:
         RenderTask(ViewData *vd, size_t seed, const char* sn, RenderBackend::ViewId vid = 0);
-        virtual ~RenderTask();
+        virtual ~RenderTask() override;
     protected:
-        virtual void Run() = 0;
-        virtual void Stopped() = 0;
+        virtual void Run() override = 0;
+        virtual void Stopped() override = 0;
 
-        shared_ptr<BackendSceneData>& GetSceneData();
+        std::shared_ptr<BackendSceneData>& GetSceneData();
         ViewData *GetViewData();
 
         inline ViewThreadData *GetViewDataPtr() { return reinterpret_cast<ViewThreadData *>(GetDataPtr()); }
@@ -66,5 +77,6 @@ class RenderTask : public SceneTask
 };
 
 }
+// end of namespace pov
 
 #endif // POVRAY_BACKEND_RENDERTASK_H

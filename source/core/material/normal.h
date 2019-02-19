@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,9 +39,20 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <memory>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/coretypes.h"
 #include "core/material/blendmap.h"
 #include "core/math/vector.h"
+#include "core/render/ray_fwd.h"
 
 namespace pov
 {
@@ -52,10 +63,6 @@ namespace pov
 /// @ingroup PovCore
 ///
 /// @{
-
-class Intersection;
-class Ray;
-class TraceThreadData;
 
 /// Common interface for normal-like blend maps.
 ///
@@ -73,42 +80,42 @@ class GenericNormalBlendMap
         virtual void ComputeAverage (const Vector3d& EPoint, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread) = 0;
 };
 
-class SlopeBlendMap : public BlendMap<Vector2d>, public GenericNormalBlendMap
+class SlopeBlendMap final : public BlendMap<Vector2d>, public GenericNormalBlendMap
 {
     public:
 
         SlopeBlendMap();
-        virtual ~SlopeBlendMap();
+        virtual ~SlopeBlendMap() override;
 
-        virtual void Post(bool dontScaleBumps);
-        virtual void ComputeAverage (const Vector3d& EPoint, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread);
+        virtual void Post(bool dontScaleBumps) override;
+        virtual void ComputeAverage (const Vector3d& EPoint, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread) override;
 };
 
-class NormalBlendMap : public BlendMap<TNORMAL*>, public GenericNormalBlendMap
+class NormalBlendMap final : public BlendMap<TNORMAL*>, public GenericNormalBlendMap
 {
     public:
 
         NormalBlendMap();
-        virtual ~NormalBlendMap();
+        virtual ~NormalBlendMap() override;
 
-        virtual void Post(bool dontScaleBumps);
-        virtual void ComputeAverage (const Vector3d& EPoint, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread);
+        virtual void Post(bool dontScaleBumps) override;
+        virtual void ComputeAverage (const Vector3d& EPoint, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread) override;
 };
 
-typedef shared_ptr<GenericNormalBlendMap>           GenericNormalBlendMapPtr;
-typedef shared_ptr<const GenericNormalBlendMap>     GenericNormalBlendMapConstPtr;
+typedef std::shared_ptr<GenericNormalBlendMap>          GenericNormalBlendMapPtr;
+typedef std::shared_ptr<const GenericNormalBlendMap>    GenericNormalBlendMapConstPtr;
 
-typedef Vector2d                                    SlopeBlendMapData;
-typedef BlendMapEntry<SlopeBlendMapData>            SlopeBlendMapEntry;
-typedef shared_ptr<SlopeBlendMap>                   SlopeBlendMapPtr;
-typedef shared_ptr<const SlopeBlendMap>             SlopeBlendMapConstPtr;
+typedef Vector2d                                        SlopeBlendMapData;
+typedef BlendMapEntry<SlopeBlendMapData>                SlopeBlendMapEntry;
+typedef std::shared_ptr<SlopeBlendMap>                  SlopeBlendMapPtr;
+typedef std::shared_ptr<const SlopeBlendMap>            SlopeBlendMapConstPtr;
 
-typedef TNORMAL*                                    NormalBlendMapData;
-typedef BlendMapEntry<NormalBlendMapData>           NormalBlendMapEntry;
-typedef shared_ptr<NormalBlendMap>                  NormalBlendMapPtr;
-typedef shared_ptr<const NormalBlendMap>            NormalBlendMapConstPtr;
+typedef TNORMAL*                                        NormalBlendMapData;
+typedef BlendMapEntry<NormalBlendMapData>               NormalBlendMapEntry;
+typedef std::shared_ptr<NormalBlendMap>                 NormalBlendMapPtr;
+typedef std::shared_ptr<const NormalBlendMap>           NormalBlendMapConstPtr;
 
-struct Tnormal_Struct : public Pattern_Struct
+struct Tnormal_Struct final : public Pattern_Struct
 {
     GenericNormalBlendMapPtr Blend_Map;
     SNGL Amount;
@@ -127,5 +134,6 @@ void Perturb_Normal (Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vecto
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_NORMAL_H

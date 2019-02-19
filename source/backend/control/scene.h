@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,16 +36,28 @@
 #ifndef POVRAY_BACKEND_SCENE_H
 #define POVRAY_BACKEND_SCENE_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "backend/configbackend.h"
+#include "backend/control/scene_fwd.h"
+
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <memory>
+#include <thread>
 #include <vector>
-#include <string>
-#include <map>
 
-#include <boost/thread.hpp>
+// POV-Ray header files (base module)
+//  (none at the moment)
 
-#include "core/scene/tracethreaddata.h"
+// POV-Ray header files (core module)
+#include "core/core_fwd.h"
 
+// POV-Ray header files (backend module)
 #include "backend/control/renderbackend.h"
-#include "backend/scene/backendscenedata.h"
+#include "backend/scene/backendscenedata_fwd.h"
+#include "backend/scene/view_fwd.h"
 #include "backend/support/taskqueue.h"
 
 namespace pov
@@ -53,13 +65,11 @@ namespace pov
 
 using namespace pov_base;
 
-class View;
-
 /// Class governing the rendering of a scene.
 ///
 /// @todo   Change the class name into something more expressive.
 ///
-class Scene
+class Scene final
 {
     public:
         /**
@@ -71,7 +81,7 @@ class Scene
          *  each scene,once parsed, many views many be created, and
          *  each view may specify different render quality, size and
          *  camera parameters. This limitation may be lifted in the
-         *  future to better support animationss and for example
+         *  future to better support animations and for example
          *  motion blur, but this can only be supported in POV-Ray
          *  4.0 when all the rendering code is rewritten!
          *  @param  backendAddr     Address of the backend that owns this scene.
@@ -93,7 +103,7 @@ class Scene
          *  The frontend is notified by messages of the state
          *  of parsing and all warnings and errors found.
          *  Options shall be in a kPOVObjectClass_ParserOptions
-         *  POVMS obect, which is created when parsing the INI
+         *  POVMS object, which is created when parsing the INI
          *  file or command line in the frontend.
          *  @param  parseOptions    Options to use for parsing.
          */
@@ -120,7 +130,7 @@ class Scene
 
         /**
          *  Resume parsing that has previously been stopped.
-         *  If parsing is not paussed, no action is taken.
+         *  If parsing is not paused, no action is taken.
          */
         void ResumeParser();
 
@@ -153,13 +163,13 @@ class Scene
          *                          POVMS messages sent to the frontend.
          *  @return                 New view bound to the scene's data.
          */
-        shared_ptr<View> NewView(unsigned int width, unsigned int height, RenderBackend::ViewId vid);
+        std::shared_ptr<View> NewView(unsigned int width, unsigned int height, RenderBackend::ViewId vid);
 
         /**
          *  Get the POVMS frontend address to send messages to the frontend.
          *  @return                 Frontend address.
          */
-        POVMSAddress GetFrontendAddress() const { return sceneData->frontendAddress; }
+        POVMSAddress GetFrontendAddress() const;
 
         /**
          *  Get the current parser statistics for the scene.
@@ -172,13 +182,13 @@ class Scene
         /// running and pending parser tasks for this scene
         TaskQueue parserTasks;
         /// scene thread data (e.g. statistics)
-        vector<TraceThreadData *> sceneThreadData;
+        std::vector<TraceThreadData *> sceneThreadData;
         /// scene data
-        shared_ptr<BackendSceneData> sceneData;
+        std::shared_ptr<BackendSceneData> sceneData;
         /// stop request flag
         bool stopRequsted;
         /// parser control thread
-        boost::thread *parserControlThread;
+        std::thread *parserControlThread;
 
         /**
          *  Send the parser statistics upon completion of a parsing.
@@ -199,5 +209,6 @@ class Scene
 };
 
 }
+// end of namespace pov
 
 #endif // POVRAY_BACKEND_SCENE_H

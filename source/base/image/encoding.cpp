@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,7 +37,14 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/image/encoding.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <algorithm>
+
 // POV-Ray header files (base module)
+#include "base/image/colourspace.h"
 #include "base/image/dither.h"
 #include "base/image/image.h"
 
@@ -46,6 +53,40 @@
 
 namespace pov_base
 {
+
+using std::min;
+using std::max;
+
+//*****************************************************************************
+
+float IntDecode(const GammaCurvePtr& g, unsigned int x, unsigned int max)
+{
+    return GammaCurve::Decode(g, IntDecode(x, max));
+}
+
+unsigned int IntEncode(const GammaCurvePtr& g, float x, unsigned int max, float qOff, float& err)
+{
+    if (GammaCurve::IsNeutral(g))
+        return IntEncode(x, max, qOff, err);
+
+    float xEff = clip(x, 0.0f, 1.0f) + err;
+    unsigned int v = IntEncodeDown(GammaCurve::Encode(g, xEff), max);
+    float decoded = IntDecode(g, v, max);
+    if (v >= max)
+    {
+        err = xEff - decoded;
+        return v;
+    }
+    float decodedUp = IntDecode(g, v + 1, max);
+    float threshold = (0.5 - qOff) * decoded + (0.5 + qOff) * decodedUp;
+    if (xEff > threshold)
+    {
+        decoded = decodedUp;
+        ++v;
+    }
+    err = xEff - decoded;
+    return v;
+}
 
 /*******************************************************************************/
 
@@ -430,3 +471,4 @@ void GetEncodedRGBValue(const Image* img, unsigned int x, unsigned int y, const 
 }
 
 }
+// end of namespace pov_base

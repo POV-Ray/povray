@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,17 +36,30 @@
 #ifndef POVRAY_BACKEND_VIEWTHREADDATA_H
 #define POVRAY_BACKEND_VIEWTHREADDATA_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "backend/configbackend.h"
+#include "backend/scene/viewthreaddata_fwd.h"
+
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/scene/tracethreaddata.h"
+
+// POV-Ray header files (backend module)
+#include "backend/scene/view_fwd.h"
 
 namespace pov
 {
 
-class ViewData;
-
 /**
  *  Class holding render thread specific data.
  */
-class ViewThreadData : public TraceThreadData
+class ViewThreadData final : public TraceThreadData
 {
         friend class Scene;
     public:
@@ -80,21 +93,19 @@ class ViewThreadData : public TraceThreadData
         /// view data
         ViewData *viewData;
     private:
-        /// not available
-        ViewThreadData();
 
-        /// not available
-        ViewThreadData(const ViewThreadData&);
+        ViewThreadData() = delete;
+        ViewThreadData(const ViewThreadData&) = delete;
+        ViewThreadData& operator=(const ViewThreadData&) = delete;
 
-        /// not available
-        ViewThreadData& operator=(const ViewThreadData&);
     public: // TODO FIXME - temporary workaround [trf]
         /**
          *  Destructor.
          */
-        ~ViewThreadData();
+        virtual ~ViewThreadData() override;
 };
 
 }
+// end of namespace pov
 
 #endif // POVRAY_BACKEND_VIEWTHREADDATA_H

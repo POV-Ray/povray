@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,8 +36,13 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "cpuid.h"
 
+// C++ variants of C standard header files
 #include <cstring>
 
+// C++ standard header files
+#include <vector>
+
+// other 3rd party library header files
 #ifdef MACHINE_INTRINSICS_H
 #include MACHINE_INTRINSICS_H
 #endif
@@ -142,7 +147,7 @@ enum CPUVendorId
     kCPUVendor_VM,
 };
 
-struct CPUVendorInfo
+struct CPUVendorInfo final
 {
     CPUVendorId id;
     const char* cpuidString;
@@ -162,7 +167,7 @@ CPUVendorInfo gCPUVendorInfo[] = {
     { kCPUVendor_Unrecognized,  nullptr }
 };
 
-struct CPUIDInfo
+struct CPUIDInfo final
 {
     CPUVendorId vendorId;
     bool        xsave  : 1;
@@ -229,7 +234,7 @@ CPUIDInfo::CPUIDInfo() :
     }
 }
 
-struct OSInfo
+struct OSInfo final
 {
     bool xcr0_sse : 1;
     bool xcr0_avx : 1;
@@ -256,7 +261,7 @@ OSInfo::OSInfo(const CPUIDInfo& cpuinfo) :
 ///     does _not_ depend on the order of member-initializers in the constructor,
 ///     but rather on the _order of declaration_.
 ///
-struct CPUInfo::Data
+struct CPUInfo::Data final
 {
     CPUIDInfo   cpuidInfo;
     OSInfo      osInfo;

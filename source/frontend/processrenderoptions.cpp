@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,15 +39,26 @@
 // C++ variants of C standard header files
 #include <cstdlib>
 
+// C++ standard header files
+//  (none at the moment)
+
 // POV-Ray header files (base module)
 #include "base/fileutil.h"
 #include "base/platformbase.h"
+#include "base/stringutilities.h"
 #include "base/image/colourspace.h"
 #include "base/image/dither.h"
-#include "base/image/encoding.h"
+
+// POV-Ray header files (core module)
+#include "base/fileinputoutput.h"
+#include "base/path.h"
+#include "base/textstream.h"
 
 // POV-Ray header files (POVMS module)
 #include "povms/povmsid.h"
+
+// POV-Ray header files (frontend module)
+//  (none at the moment)
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -932,7 +943,7 @@ ITextStream *ProcessRenderOptions::OpenFileForRead(const char *filename, POVMSOb
 
 OTextStream *ProcessRenderOptions::OpenFileForWrite(const char *filename, POVMSObjectPtr)
 {
-    return new OTextStream(ASCIItoUCS2String(filename).c_str(), pov_base::POV_File_Text_INI);
+    return new OTextStream(SysToUCS2String(filename).c_str(), pov_base::POV_File_Text_INI);
 }
 
 ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsigned int stype, POVMSObjectPtr obj) // TODO FIXME - Use new Path class!
@@ -952,7 +963,7 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
 
     // TODO - the following statement may need reviewing; before it was changed from a macro to a PlatformBase call,
     //        it carried a comment "TODO FIXME - Remove dependency on this macro!!! [trf]".
-    if (!PlatformBase::GetInstance().AllowLocalFileAccess (ASCIItoUCS2String(filename),stype, false))
+    if (!PlatformBase::GetInstance().AllowLocalFileAccess (SysToUCS2String(filename), stype, false))
         return nullptr;
 
     for(i = 0; i < POV_FILE_EXTENSIONS_PER_TYPE; i++)
@@ -968,7 +979,7 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
 
     if((hasextension == true) && (CheckIfFileExists(filename) == true))
     {
-        return new IBufferedTextStream(ASCIItoUCS2String(filename).c_str(), stype);
+        return new IBufferedTextStream(SysToUCS2String(filename).c_str(), stype);
     }
 
     for(i = 0; i < POV_FILE_EXTENSIONS_PER_TYPE; i++)
@@ -1221,3 +1232,4 @@ const char* ProcessRenderOptions::GetParameterCodeText(const ProcessRenderOption
 }
 
 }
+// end of namespace pov_frontend

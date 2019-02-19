@@ -36,10 +36,19 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
 #include "base/fileutil.h"
+#include "base/image/colourspace.h"
 #include "base/image/image.h"
 #include "base/path.h"
+#include "base/stringutilities.h"
 
+// POV-Ray header files (core module)
 #include "core/lighting/lightgroup.h"
 #include "core/material/blendmap.h"
 #include "core/material/interior.h"
@@ -58,9 +67,14 @@
 #include "core/shape/isosurface.h"
 #include "core/support/imageutil.h"
 
+// POV-Ray header files (VM module)
 #include "vm/fnpovfpu.h"
 
-#include "povms/povmsid.h"
+// POV-Ray header files (parser module)
+//  (none at the moment)
+
+// POV-Ray header files (POVMS module)
+#include "povms/povmsid.h" // TODO - only here for kPOVList_FileType_XXX
 
 #ifdef SYS_IMAGE_HEADER
 #include SYS_IMAGE_HEADER
@@ -73,6 +87,9 @@ namespace pov_parser
 {
 
 using namespace pov;
+
+using std::shared_ptr;
+using std::vector;
 
 /*****************************************************************************
 * Local preprocessor defines
@@ -115,7 +132,7 @@ void Parser::Make_Pattern_Image(ImageData *image, FUNCTION_PTR fn, int token)
     image->iheight = image->height;
     if(token == FUNCT_ID_TOKEN)
     {
-        image->data =Image::Create(image->iwidth, image->iheight, Image::Gray_Int16);
+        image->data =Image::Create(image->iwidth, image->iheight, ImageDataType::Gray_Int16);
 
         point[Z] = 0;
 
@@ -137,7 +154,7 @@ void Parser::Make_Pattern_Image(ImageData *image, FUNCTION_PTR fn, int token)
     }
     else if((token == VECTFUNCT_ID_TOKEN) && (f->return_size == 5))
     {
-        image->data =Image::Create(image->iwidth, image->iheight, Image::RGBA_Int16); // TODO - we should probably use a HDR format
+        image->data = Image::Create(image->iwidth, image->iheight, ImageDataType::RGBA_Int16); // TODO - we should probably use an HDR format
         image->data->SetPremultiplied(false); // We're storing the data in non-premultiplied alpha format, as this preserves all the data we're getting from the function.
 
         point[Z] = 0;
@@ -205,7 +222,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
 
     if(Legal & GRAD_FILE)
     {
-        EXPECT
+        EXPECT_CAT
             CASE_VECTOR_UNGET
                 VersionWarning(150, "Old style orientation vector or map type not supported. Ignoring value.");
                 Parse_Vector(Local_Vector);
@@ -225,7 +242,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
             image->height = (SNGL)int(Parse_Float() + 0.5);
 
             Get_Token();
-            if (CurrentTokenId() != LEFT_CURLY_TOKEN)
+            if (CurrentTrueTokenId() != LEFT_CURLY_TOKEN)
                 Found_Instead_Error("Missing { after", "expression");
             Unget_Token();
 
@@ -304,7 +321,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
             {
                 UNGET
                 Name = Parse_C_String(true);
-                UCS2String filename = ASCIItoUCS2String(Name);
+                UCS2String filename = SysToUCS2String(Name);
                 UCS2String ext = GetFileExtension(Path(filename));
 
                 if (ext.empty() == false)
@@ -363,8 +380,8 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
         if(!(filetype & Legal))
             Error("File type not supported here.");
 
-        UCS2String filename = ASCIItoUCS2String(Name);
-        Image::ReadOptions options;
+        UCS2String filename = SysToUCS2String(Name);
+        ImageReadOptions options;
 
         switch (sceneData->gammaMode)
         {
@@ -483,7 +500,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
             image->data = Read_Image(filetype, filename.c_str(), options);
 
         if (!options.warnings.empty())
-            for (vector<string>::iterator it = options.warnings.begin(); it != options.warnings.end(); it++)
+            for (vector<std::string>::iterator it = options.warnings.begin(); it != options.warnings.end(); it++)
                 Warning("%s: %s", Name, it->c_str());
 
         POV_FREE(Name);
@@ -505,12 +522,7 @@ SimpleGammaCurvePtr Parser::Parse_Gamma (void)
 {
     SimpleGammaCurvePtr gamma;
     EXPECT_ONE
-        CASE (COLOUR_KEY_TOKEN)
-            if (mToken.Function_Id != SRGB_TOKEN)
-            {
-                UNGET
-                END_CASE
-            }
+        CASE (SRGB_TOKEN)
             gamma = SRGBGammaCurve::Get();
         END_CASE
         CASE (BT709_TOKEN)
@@ -631,120 +643,110 @@ void Parser::Parse_Image_Map (PIGMENT *Pigment)
             VersionWarning(155, "Keyword ALPHA discontinued. Use FILTER instead.");
             // FALLTHROUGH
 
-        CASE (COLOUR_KEY_TOKEN)
-            switch(mToken.Function_Id)
-            {
-                case FILTER_TOKEN:
-                    EXPECT_ONE
-                        CASE (ALL_TOKEN)
+        CASE (FILTER_TOKEN)
+            EXPECT_ONE
+                CASE (ALL_TOKEN)
+                    {
+                        DBL filter;
+                        filter = Parse_Float();
+                        image->AllFilter = filter;
+                        if (image->data->IsIndexed())
+                        {
+                            if (image->data->HasFilterTransmit() == false)
                             {
-                                DBL filter;
-                                filter = Parse_Float();
-                                image->AllFilter = filter;
-                                if (image->data->IsIndexed())
-                                {
-                                    if (image->data->HasFilterTransmit() == false)
-                                    {
-                                        vector<Image::RGBFTMapEntry> map;
-                                        image->data->GetColourMap (map);
-                                        image->data->SetColourMap (map);
-                                    }
-                                    for(reg = 0; reg < image->data->GetColourMapSize(); reg++)
-                                    {
-                                        float r, g, b, f, t;
-
-                                        image->data->GetRGBFTIndexedValue(reg, r, g, b, f, t);
-                                        image->data->SetRGBFTIndexedValue(reg, r, g, b, filter, t);
-                                    }
-                                }
+                                vector<Image::RGBFTMapEntry> map;
+                                image->data->GetColourMap (map);
+                                image->data->SetColourMap (map);
                             }
-                        END_CASE
-
-                        OTHERWISE
-                            UNGET
-                            reg = (int)(Parse_Float() + 0.01);
-                            if (image->data->IsIndexed() == false)
-                                Not_With ("filter","non color-mapped image");
-                            if ((reg < 0) || (reg >= image->data->GetColourMapSize()))
-                                Error ("FILTER color register value out of range.");
-
-                            Parse_Comma();
+                            for(reg = 0; reg < image->data->GetColourMapSize(); reg++)
                             {
                                 float r, g, b, f, t;
 
-                                if (image->data->HasFilterTransmit() == false)
-                                {
-                                    vector<Image::RGBFTMapEntry> map;
-                                    image->data->GetColourMap (map);
-                                    image->data->SetColourMap (map);
-                                }
                                 image->data->GetRGBFTIndexedValue(reg, r, g, b, f, t);
-                                image->data->SetRGBFTIndexedValue(reg, r, g, b, Parse_Float(), t);
+                                image->data->SetRGBFTIndexedValue(reg, r, g, b, filter, t);
                             }
-                        END_CASE
+                        }
+                    }
+                END_CASE
 
-                    END_EXPECT
-                    Pigment->Flags |= HAS_FILTER;
-                    break;
-
-                case TRANSMIT_TOKEN:
-                    EXPECT_ONE
-                        CASE (ALL_TOKEN)
-                            {
-                                DBL transmit;
-                                transmit = Parse_Float();
-                                image->AllTransmit = transmit;
-                                if (image->data->IsIndexed())
-                                {
-                                    if (image->data->HasFilterTransmit() == false)
-                                    {
-                                        vector<Image::RGBFTMapEntry> map;
-                                        image->data->GetColourMap (map);
-                                        image->data->SetColourMap (map);
-                                    }
-                                    for(reg = 0; reg < image->data->GetColourMapSize(); reg++)
-                                    {
-                                        float r, g, b, f, t;
-
-                                        image->data->GetRGBFTIndexedValue(reg, r, g, b, f, t);
-                                        image->data->SetRGBFTIndexedValue(reg, r, g, b, f, transmit);
-                                    }
-                                }
-                            }
-                        END_CASE
-
-                        OTHERWISE
-                            UNGET
-                            reg = (int)(Parse_Float() + 0.01);
-                            if (image->data->IsIndexed() == false)
-                                Not_With ("transmit","non color-mapped image");
-                            if ((reg < 0) || (reg >= image->data->GetColourMapSize()))
-                                Error ("TRANSMIT color register value out of range.");
-
-                            Parse_Comma();
-                            {
-                                float r, g, b, f, t;
-
-                                if (image->data->HasFilterTransmit() == false)
-                                {
-                                    vector<Image::RGBFTMapEntry> map;
-                                    image->data->GetColourMap (map);
-                                    image->data->SetColourMap (map);
-                                }
-                                image->data->GetRGBFTIndexedValue(reg, r, g, b, f, t);
-                                image->data->SetRGBFTIndexedValue(reg, r, g, b, f, Parse_Float());
-                            }
-                        END_CASE
-
-                    END_EXPECT
-                    Pigment->Flags |= HAS_FILTER;
-                    break;
-
-                default:
+                OTHERWISE
                     UNGET
-                    Expectation_Error ("filter or transmit");
-                    break;
-            }
+                    reg = (int)(Parse_Float() + 0.01);
+                    if (image->data->IsIndexed() == false)
+                        Not_With ("filter","non color-mapped image");
+                    if ((reg < 0) || (reg >= image->data->GetColourMapSize()))
+                        Error ("FILTER color register value out of range.");
+
+                    Parse_Comma();
+                    {
+                        float r, g, b, f, t;
+
+                        if (image->data->HasFilterTransmit() == false)
+                        {
+                            vector<Image::RGBFTMapEntry> map;
+                            image->data->GetColourMap (map);
+                            image->data->SetColourMap (map);
+                        }
+                        image->data->GetRGBFTIndexedValue(reg, r, g, b, f, t);
+                        image->data->SetRGBFTIndexedValue(reg, r, g, b, Parse_Float(), t);
+                    }
+                END_CASE
+
+            END_EXPECT
+            Pigment->Flags |= HAS_FILTER;
+        END_CASE
+
+        CASE (TRANSMIT_TOKEN)
+            EXPECT_ONE
+                CASE (ALL_TOKEN)
+                    {
+                        DBL transmit;
+                        transmit = Parse_Float();
+                        image->AllTransmit = transmit;
+                        if (image->data->IsIndexed())
+                        {
+                            if (image->data->HasFilterTransmit() == false)
+                            {
+                                vector<Image::RGBFTMapEntry> map;
+                                image->data->GetColourMap (map);
+                                image->data->SetColourMap (map);
+                            }
+                            for(reg = 0; reg < image->data->GetColourMapSize(); reg++)
+                            {
+                                float r, g, b, f, t;
+
+                                image->data->GetRGBFTIndexedValue(reg, r, g, b, f, t);
+                                image->data->SetRGBFTIndexedValue(reg, r, g, b, f, transmit);
+                            }
+                        }
+                    }
+                END_CASE
+
+                OTHERWISE
+                    UNGET
+                    reg = (int)(Parse_Float() + 0.01);
+                    if (image->data->IsIndexed() == false)
+                        Not_With ("transmit","non color-mapped image");
+                    if ((reg < 0) || (reg >= image->data->GetColourMapSize()))
+                        Error ("TRANSMIT color register value out of range.");
+
+                    Parse_Comma();
+                    {
+                        float r, g, b, f, t;
+
+                        if (image->data->HasFilterTransmit() == false)
+                        {
+                            vector<Image::RGBFTMapEntry> map;
+                            image->data->GetColourMap (map);
+                            image->data->SetColourMap (map);
+                        }
+                        image->data->GetRGBFTIndexedValue(reg, r, g, b, f, t);
+                        image->data->SetRGBFTIndexedValue(reg, r, g, b, f, Parse_Float());
+                    }
+                END_CASE
+
+            END_EXPECT
+            Pigment->Flags |= HAS_FILTER;
         END_CASE
 
         OTHERWISE
@@ -857,7 +859,7 @@ PatternPtr Parser::ParseDensityFilePattern()
     pattern->densityFile = Create_Density_File();
     GET(DF3_TOKEN);
     pattern->densityFile->Data->Name = Parse_C_String(true);
-    shared_ptr<IStream> dfile = Locate_File(ASCIItoUCS2String(pattern->densityFile->Data->Name).c_str(), POV_File_Data_DF3, dummy, true);
+    shared_ptr<IStream> dfile = Locate_File(SysToUCS2String(pattern->densityFile->Data->Name).c_str(), POV_File_Data_DF3, dummy, true);
     if (dfile == nullptr)
         Error("Cannot read media density file.");
     Read_Density_File(dfile.get(), pattern->densityFile);
@@ -1058,7 +1060,7 @@ PatternPtr Parser::ParseSlopePattern()
 
     shared_ptr<SlopePattern> pattern(new SlopePattern());
 
-    EXPECT_ONE
+    EXPECT_ONE_CAT
         /* simple syntax */
         CASE_EXPRESS_UNGET
             Parse_Vector (pattern->slopeDirection);
@@ -1069,14 +1071,8 @@ PatternPtr Parser::ParseSlopePattern()
             UNGET
             Parse_Begin();
 
-            EXPECT_ONE
-                CASE(POINT_AT_TOKEN)
-                    pattern->pointAt = true;
-                END_CASE
-                OTHERWISE
-                    UNGET
-                END_CASE
-            END_EXPECT
+            if (AllowToken(POINT_AT_TOKEN))
+                pattern->pointAt = true;
 
             /* parse the vector */
             Parse_Vector (pattern->slopeDirection);
@@ -1263,9 +1259,9 @@ void Parser::VerifyTilingPattern(shared_ptr<TilingPattern> pattern)
 
 void Parser::VerifyPattern(PatternPtr basicPattern)
 {
-    if (shared_ptr<PavementPattern> pattern = dynamic_pointer_cast<PavementPattern>(basicPattern))
+    if (shared_ptr<PavementPattern> pattern = std::dynamic_pointer_cast<PavementPattern>(basicPattern))
         VerifyPavementPattern(pattern);
-    else if (shared_ptr<TilingPattern> pattern = dynamic_pointer_cast<TilingPattern>(basicPattern))
+    else if (shared_ptr<TilingPattern> pattern = std::dynamic_pointer_cast<TilingPattern>(basicPattern))
         VerifyTilingPattern(pattern);
 }
 
@@ -1291,16 +1287,11 @@ void Parser::VerifyPattern(PatternPtr basicPattern)
 
 void Parser::Parse_Pigment (PIGMENT **Pigment_Ptr)
 {
-    EXPECT_ONE            /* Look for [pigment_id] */
-        CASE (PIGMENT_ID_TOKEN)
-            Destroy_Pigment(*Pigment_Ptr);
-            *Pigment_Ptr = Copy_Pigment (CurrentTokenDataPtr<PIGMENT*>());
-        END_CASE
-
-        OTHERWISE
-            UNGET
-        END_CASE
-    END_EXPECT    /* End pigment_id */
+    if (AllowToken(PIGMENT_ID_TOKEN))
+    {
+        Destroy_Pigment(*Pigment_Ptr);
+        *Pigment_Ptr = Copy_Pigment(CurrentTokenDataPtr<PIGMENT*>());
+    }
 
     Parse_Pattern<GenericPigmentBlendMap>(*Pigment_Ptr,kBlendMapType_Pigment);
 
@@ -1343,7 +1334,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
     TraceThreadData *Thread = GetParserDataPtr();
     ContinuousPattern* pContinuousPattern;
 
-    EXPECT_ONE
+    EXPECT_ONE_CAT
         CASE (AGATE_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new AgatePattern());
@@ -2195,16 +2186,11 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
 
 void Parser::Parse_Tnormal (TNORMAL **Tnormal_Ptr)
 {
-    EXPECT_ONE            /* Look for [tnormal_id] */
-        CASE (NORMAL_ID_TOKEN)
-            Destroy_Tnormal(*Tnormal_Ptr);
-            *Tnormal_Ptr = Copy_Tnormal (CurrentTokenDataPtr<TNORMAL*>());
-        END_CASE
-
-        OTHERWISE
-            UNGET
-        END_CASE
-    END_EXPECT    /* End [tnormal_id] */
+    if (AllowToken(NORMAL_ID_TOKEN))
+    {
+        Destroy_Tnormal(*Tnormal_Ptr);
+        *Tnormal_Ptr = Copy_Tnormal(CurrentTokenDataPtr<TNORMAL*>());
+    }
 
     if (*Tnormal_Ptr == nullptr)
     {
@@ -2258,17 +2244,12 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
 
     Parse_Begin ();
 
-    EXPECT_ONE        /* Look for zero or one finish_id */
-        CASE (FINISH_ID_TOKEN)
-            if (*Finish_Ptr)
-                delete *Finish_Ptr;
-            *Finish_Ptr = Copy_Finish (CurrentTokenDataPtr<FINISH*>());
-        END_CASE
-
-        OTHERWISE
-            UNGET
-        END_CASE
-    END_EXPECT    /* End finish_id */
+    if (AllowToken(FINISH_ID_TOKEN))
+    {
+        if (*Finish_Ptr)
+            delete *Finish_Ptr;
+        *Finish_Ptr = Copy_Finish(CurrentTokenDataPtr<FINISH*>());
+    }
 
     New = *Finish_Ptr;
 
@@ -2296,16 +2277,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
         END_CASE
 
         CASE (DIFFUSE_TOKEN)
-            EXPECT
-                CASE (ALBEDO_TOKEN)
-                    diffuseAdjust = true;
-                END_CASE
-                OTHERWISE
-                    UNGET
-                    EXIT
-                END_CASE
-            END_EXPECT
-
+            diffuseAdjust = AllowToken(ALBEDO_TOKEN);
             New->Diffuse = Parse_Float ();
             Parse_Comma();
             New->DiffuseBack = Allow_Float(0.0);
@@ -2316,7 +2288,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
         CASE (REFLECTION_TOKEN)
         {
             bool found_second_color = false;
-            EXPECT_ONE
+            EXPECT_ONE_CAT
                 /* old syntax */
                 CASE_EXPRESS_UNGET
                     Parse_Colour(New->Reflection_Max);
@@ -2335,7 +2307,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
                     Parse_Comma();
 
                     /* look for a second color */
-                    EXPECT_ONE
+                    EXPECT_ONE_CAT
                         CASE_EXPRESS_UNGET
                             Parse_Colour(New->Reflection_Max);
                             found_second_color = true;
@@ -2388,16 +2360,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
         END_CASE
 
         CASE (PHONG_TOKEN)
-            EXPECT
-                CASE (ALBEDO_TOKEN)
-                    phongAdjust = true;
-                END_CASE
-                OTHERWISE
-                    UNGET
-                    EXIT
-                END_CASE
-            END_EXPECT
-
+            phongAdjust = AllowToken(ALBEDO_TOKEN);
             New->Phong = Parse_Float ();
         END_CASE
 
@@ -2406,16 +2369,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
         END_CASE
 
         CASE (SPECULAR_TOKEN)
-            EXPECT
-                CASE (ALBEDO_TOKEN)
-                    specularAdjust = true;
-                END_CASE
-                OTHERWISE
-                    UNGET
-                    EXIT
-                END_CASE
-            END_EXPECT
-
+            specularAdjust = AllowToken(ALBEDO_TOKEN);
             New->Specular = Parse_Float ();
         END_CASE
 
@@ -2429,7 +2383,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
 
         CASE (METALLIC_TOKEN)
             New->Metallic = 1.0;
-            EXPECT_ONE
+            EXPECT_ONE_CAT
                 CASE_FLOAT_UNGET
                     New->Metallic = Parse_Float();
                 END_CASE
@@ -2616,22 +2570,18 @@ TEXTURE *Parser::Parse_Texture ()
 
     Modified_Pnf = false;
 
-    EXPECT_ONE               /* First allow a texture identifier */
-        CASE (TEXTURE_ID_TOKEN)
-            Texture = Copy_Textures(CurrentTokenDataPtr<TEXTURE*>());
-            Modified_Pnf = true;
-        END_CASE
+    if (AllowToken(TEXTURE_ID_TOKEN))
+    {
+        Texture = Copy_Textures(CurrentTokenDataPtr<TEXTURE*>());
+        Modified_Pnf = true;
+    }
+    else
+        Texture = Copy_Textures(Default_Texture);
 
-        OTHERWISE
-            UNGET
-            Texture = Copy_Textures (Default_Texture);
-        END_CASE
-    END_EXPECT
-
-    /* If the texture identifer or the default texture was a PLAIN_PATTERN
+    /* If the texture identifier or the default texture was a PLAIN_PATTERN
        then allow its pigment, normal or finish to be overridden by
        pigment identifier, normal identifier and finish identifiers.
-       This is a consession to backwards compatibility so that
+       This is a concession to backwards compatibility so that
        "texture{PIGMENT_IDENTIFIER}" etc. is legal even though it should
        be "texture{pigment{PIGMENT_IDENTIFIER}}"
     */
@@ -2641,21 +2591,21 @@ TEXTURE *Parser::Parse_Texture ()
     {
         EXPECT   /* Look for [pnf_ids] */
             CASE (PIGMENT_ID_TOKEN)
-                Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
+                Warn_State(PIGMENT_TOKEN);
                 Destroy_Pigment(Texture->Pigment);
                 Texture->Pigment = Copy_Pigment (CurrentTokenDataPtr<PIGMENT*>());
                 Modified_Pnf = true;
             END_CASE
 
             CASE (NORMAL_ID_TOKEN)
-                Warn_State(CurrentTokenId(), NORMAL_TOKEN);
+                Warn_State(NORMAL_TOKEN);
                 Destroy_Tnormal(Texture->Tnormal);
                 Texture->Tnormal = Copy_Tnormal (CurrentTokenDataPtr<TNORMAL*>());
                 Modified_Pnf = true;
             END_CASE
 
             CASE (FINISH_ID_TOKEN)
-                Warn_State(CurrentTokenId(), FINISH_TOKEN);
+                Warn_State(FINISH_TOKEN);
                 if (Texture->Finish)
                     delete Texture->Finish;
                 Texture->Finish = Copy_Finish (CurrentTokenDataPtr<FINISH*>());
@@ -3068,7 +3018,7 @@ TEXTURE *Parser::Parse_Vers1_Texture ()
             Tnormal = Texture->Tnormal;
             Finish  = Texture->Finish;
 
-            EXPECT
+            EXPECT_CAT
                 CASE (PIGMENT_TOKEN)
                     Parse_Begin ();
                     Parse_Pigment ( &(Texture->Pigment) );
@@ -3090,64 +3040,64 @@ PIGMENT STUFF OUTSIDE PIGMENT{}
 NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 ***********************************************************************/
                 CASE (AGATE_TOKEN)
-                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
+                    Warn_State(PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new AgatePattern());
                     Check_Turb(Pigment->pattern->warps, Pigment->pattern->HasSpecialTurbulenceHandling()); // agate needs Octaves, Lambda etc., and handles the pattern itself
                 END_CASE
 
                 CASE (BOZO_TOKEN)
-                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
+                    Warn_State(PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new BozoPattern());
                 END_CASE
 
                 CASE (GRANITE_TOKEN)
-                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
+                    Warn_State(PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new GranitePattern());
                 END_CASE
 
                 CASE (LEOPARD_TOKEN)
-                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
+                    Warn_State(PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new LeopardPattern());
                 END_CASE
 
                 CASE (MARBLE_TOKEN)
-                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
+                    Warn_State(PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new MarblePattern());
                     // TODO REVIEW - proper syntax sets waveType
                 END_CASE
 
                 CASE (MANDEL_TOKEN)
-                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
+                    Warn_State(PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = ParseMandelPattern();
                 END_CASE
 
                 CASE (ONION_TOKEN)
-                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
+                    Warn_State(PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new OnionPattern());
                 END_CASE
 
                 CASE (SPOTTED_TOKEN)
-                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
+                    Warn_State(PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new SpottedPattern());
                 END_CASE
 
                 CASE (WOOD_TOKEN)
-                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
+                    Warn_State(PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new WoodPattern());
                 END_CASE
 
                 CASE (GRADIENT_TOKEN)
                     {
-                        Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
+                        Warn_State(PIGMENT_TOKEN);
                         Pigment->Type = GENERIC_PATTERN;
                         shared_ptr<GradientPattern> pattern(new GradientPattern());
                         Parse_Vector (Local_Vector);
@@ -3158,42 +3108,42 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE_COLOUR_UNGET
-                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
+                    Warn_State(PIGMENT_TOKEN);
                     Pigment->Type = PLAIN_PATTERN;
                     Pigment->pattern = PatternPtr(new PlainPattern());
                     Parse_Colour (Pigment->colour);
                 END_CASE
 
                 CASE (CHECKER_TOKEN)
-                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
+                    Warn_State(PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new CheckerPattern());
                     Pigment->Blend_Map = Parse_Blend_List<ColourBlendMap>(2,Pigment->pattern->GetDefaultBlendMap(),kBlendMapType_Colour);
                 END_CASE
 
                 CASE (HEXAGON_TOKEN)
-                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
+                    Warn_State(PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new HexagonPattern());
                     Pigment->Blend_Map = Parse_Blend_List<ColourBlendMap>(3,Pigment->pattern->GetDefaultBlendMap(),kBlendMapType_Colour);
                 END_CASE
 
                 CASE (SQUARE_TOKEN)
-                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
+                    Warn_State(PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new SquarePattern());
                     Pigment->Blend_Map = Parse_Blend_List<ColourBlendMap>(4,Pigment->pattern->GetDefaultBlendMap(),kBlendMapType_Colour);
                 END_CASE
 
                 CASE (TRIANGULAR_TOKEN)
-                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
+                    Warn_State(PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new TriangularPattern());
                     Pigment->Blend_Map = Parse_Blend_List<ColourBlendMap>(6,Pigment->pattern->GetDefaultBlendMap(),kBlendMapType_Colour);
                 END_CASE
 
                 CASE (IMAGE_MAP_TOKEN)
-                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
+                    Warn_State(PIGMENT_TOKEN);
                     Pigment->Type = IMAGE_MAP_PATTERN;
                     Pigment->pattern = PatternPtr(new ColourImagePattern());
                     Parse_Image_Map (Pigment);
@@ -3205,14 +3155,14 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (COLOUR_MAP_TOKEN)
-                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
+                    Warn_State(PIGMENT_TOKEN);
                     if (!Pigment->pattern->CanMap())
                         VersionWarning(150, "Cannot use color map with this pigment type.");
                     Pigment->Blend_Map = Parse_Colour_Map<ColourBlendMap> ();
                 END_CASE
 
                 CASE (QUICK_COLOUR_TOKEN)
-                    Warn_State(CurrentTokenId(), PIGMENT_TOKEN);
+                    Warn_State(PIGMENT_TOKEN);
                     Parse_Colour (Pigment->Quick_Colour);
                 END_CASE
 
@@ -3240,7 +3190,7 @@ TNORMAL STUFF OUTSIDE NORMAL{}
 NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 ***********************************************************************/
                 CASE (BUMPS_TOKEN)
-                    Warn_State(CurrentTokenId(), NORMAL_TOKEN);
+                    Warn_State(NORMAL_TOKEN);
                     ADD_TNORMAL
                     Tnormal->Type = BUMPS_PATTERN;
                     Tnormal->pattern = PatternPtr(new BumpsPattern());
@@ -3248,7 +3198,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (DENTS_TOKEN)
-                    Warn_State(CurrentTokenId(), NORMAL_TOKEN);
+                    Warn_State(NORMAL_TOKEN);
                     ADD_TNORMAL
                     Tnormal->Type = DENTS_PATTERN;
                     Tnormal->pattern = PatternPtr(new DentsPattern());
@@ -3256,7 +3206,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (RIPPLES_TOKEN)
-                    Warn_State(CurrentTokenId(), NORMAL_TOKEN);
+                    Warn_State(NORMAL_TOKEN);
                     ADD_TNORMAL
                     Tnormal->Type = RIPPLES_PATTERN;
                     Tnormal->pattern = PatternPtr(new RipplesPattern());
@@ -3264,7 +3214,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (WAVES_TOKEN)
-                    Warn_State(CurrentTokenId(), NORMAL_TOKEN);
+                    Warn_State(NORMAL_TOKEN);
                     ADD_TNORMAL
                     Tnormal->Type = WAVES_PATTERN;
                     Tnormal->pattern = PatternPtr(new WavesPattern());
@@ -3272,7 +3222,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (WRINKLES_TOKEN)
-                    Warn_State(CurrentTokenId(), NORMAL_TOKEN);
+                    Warn_State(NORMAL_TOKEN);
                     ADD_TNORMAL
                     Tnormal->Type = WRINKLES_PATTERN;
                     Tnormal->pattern = PatternPtr(new WrinklesPattern());
@@ -3281,7 +3231,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 
                 CASE (BUMP_MAP_TOKEN)
                     {
-                        Warn_State(CurrentTokenId(), NORMAL_TOKEN);
+                        Warn_State(NORMAL_TOKEN);
                         ADD_TNORMAL
                         Tnormal->Type = BITMAP_PATTERN;
                         shared_ptr<ImagePattern> pattern(new ImagePattern());
@@ -3292,7 +3242,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (FREQUENCY_TOKEN)
-                    Warn_State(CurrentTokenId(), NORMAL_TOKEN);
+                    Warn_State(NORMAL_TOKEN);
                     ADD_TNORMAL
                     pContinuousPattern = dynamic_cast<ContinuousPattern*>(Tnormal->pattern.get());
                     if (pContinuousPattern != nullptr)
@@ -3306,7 +3256,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (PHASE_TOKEN)
-                    Warn_State(CurrentTokenId(), NORMAL_TOKEN);
+                    Warn_State(NORMAL_TOKEN);
                     ADD_TNORMAL
                     pContinuousPattern = dynamic_cast<ContinuousPattern*>(Tnormal->pattern.get());
                     if (pContinuousPattern != nullptr)
@@ -3325,44 +3275,44 @@ FINISH STUFF OUTSIDE FINISH{}
 NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 ***********************************************************************/
                 CASE (AMBIENT_TOKEN)
-                    Warn_State(CurrentTokenId(), FINISH_TOKEN);
+                    Warn_State(FINISH_TOKEN);
                     Finish->Ambient = MathColour(Parse_Float ());
                 END_CASE
 
                 CASE (BRILLIANCE_TOKEN)
-                    Warn_State(CurrentTokenId(), FINISH_TOKEN);
+                    Warn_State(FINISH_TOKEN);
                     Finish->Brilliance = Parse_Float ();
                 END_CASE
 
                 CASE (DIFFUSE_TOKEN)
-                    Warn_State(CurrentTokenId(), FINISH_TOKEN);
+                    Warn_State(FINISH_TOKEN);
                     Finish->Diffuse = Parse_Float ();
                 END_CASE
 
                 CASE (REFLECTION_TOKEN)
-                    Warn_State(CurrentTokenId(), FINISH_TOKEN);
+                    Warn_State(FINISH_TOKEN);
                     Finish->Reflection_Max = MathColour(Parse_Float ());
                     Finish->Reflection_Min = Finish->Reflection_Max;
                     Finish->Reflection_Falloff = 1;
                 END_CASE
 
                 CASE (PHONG_TOKEN)
-                    Warn_State(CurrentTokenId(), FINISH_TOKEN);
+                    Warn_State(FINISH_TOKEN);
                     Finish->Phong = Parse_Float ();
                 END_CASE
 
                 CASE (PHONG_SIZE_TOKEN)
-                    Warn_State(CurrentTokenId(), FINISH_TOKEN);
+                    Warn_State(FINISH_TOKEN);
                     Finish->Phong_Size = Parse_Float ();
                 END_CASE
 
                 CASE (SPECULAR_TOKEN)
-                    Warn_State(CurrentTokenId(), FINISH_TOKEN);
+                    Warn_State(FINISH_TOKEN);
                     Finish->Specular = Parse_Float ();
                 END_CASE
 
                 CASE (ROUGHNESS_TOKEN)
-                    Warn_State(CurrentTokenId(), FINISH_TOKEN);
+                    Warn_State(FINISH_TOKEN);
                     Finish->Roughness = Parse_Float ();
                     if (Finish->Roughness != 0.0)
                         Finish->Roughness = 1.0/Finish->Roughness; /* CEY 12/92 */
@@ -3371,12 +3321,12 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (METALLIC_TOKEN)
-                    Warn_State(CurrentTokenId(), FINISH_TOKEN);
+                    Warn_State(FINISH_TOKEN);
                     Finish->Metallic = 1.0;
                 END_CASE
 
                 CASE (CRAND_TOKEN)
-                    Warn_State(CurrentTokenId(), FINISH_TOKEN);
+                    Warn_State(FINISH_TOKEN);
                     Finish->Crand = Parse_Float();
                 END_CASE
 
@@ -3386,13 +3336,13 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (IOR_TOKEN)
-                    Warn_State(CurrentTokenId(), INTERIOR_TOKEN);
+                    Warn_State(INTERIOR_TOKEN);
                     Finish->Temp_IOR = Parse_Float();
                     Warn_Compat(false, "Index of refraction value should be specified in 'interior{...}' statement.");
                 END_CASE
 
                 CASE (REFRACTION_TOKEN)
-                    Warn_State(CurrentTokenId(), INTERIOR_TOKEN);
+                    Warn_State(INTERIOR_TOKEN);
                     Finish->Temp_Refract = Parse_Float();
                     Warn_Compat(false, "Refraction value unnecessary to turn on refraction.\nTo attenuate, the fade_power and fade_distance keywords should be specified in 'interior{...}' statement.");
                 END_CASE
@@ -3559,23 +3509,19 @@ void Parser::Parse_Media(vector<Media>& medialist)
 
     Parse_Begin();
 
-    EXPECT_ONE
-        CASE(MEDIA_ID_TOKEN)
-            IMediaObj = CurrentTokenData<Media>();
-        END_CASE
-
-        OTHERWISE
-            UNGET
-            /* as of v3.5, the default media method is now 3 */
-            if(sceneData->EffectiveLanguageVersion() >= 350)
-            {
-                IMedia->Intervals = 1;
-                IMedia->Min_Samples = 10;
-                IMedia->Max_Samples = 10;
-                IMedia->Sample_Method = 3;
-            }
-        END_CASE
-    END_EXPECT
+    if (AllowToken(MEDIA_ID_TOKEN))
+        IMediaObj = CurrentTokenData<Media>();
+    else
+    {
+        /* as of v3.5, the default media method is now 3 */
+        if (sceneData->EffectiveLanguageVersion() >= 350)
+        {
+            IMedia->Intervals = 1;
+            IMedia->Min_Samples = 10;
+            IMedia->Max_Samples = 10;
+            IMedia->Sample_Method = 3;
+        }
+    }
 
     EXPECT
         CASE (INTERVALS_TOKEN)
@@ -3763,18 +3709,13 @@ void Parser::Parse_Interior(InteriorPtr& interior)
 {
     Parse_Begin();
 
-    EXPECT_ONE
-        CASE(INTERIOR_ID_TOKEN)
-            if (HaveCurrentTokenData())
-                interior = InteriorPtr(new Interior(*CurrentTokenData<InteriorPtr>()));
-            else
-                interior = InteriorPtr(new Interior());
-        END_CASE
-
-        OTHERWISE
-            UNGET
-        END_CASE
-    END_EXPECT
+    if (AllowToken(INTERIOR_ID_TOKEN))
+    {
+        if (HaveCurrentTokenData())
+            interior = InteriorPtr(new Interior(*CurrentTokenData<InteriorPtr>()));
+        else
+            interior = InteriorPtr(new Interior());
+    }
 
     if(!interior)
         interior = InteriorPtr(new Interior());
@@ -3856,16 +3797,10 @@ void Parser::Parse_Interior(InteriorPtr& interior)
 
 void Parser::Parse_Media_Density_Pattern(PIGMENT** Density)
 {
-    EXPECT_ONE
-        CASE (DENSITY_ID_TOKEN)
-            *Density = Copy_Pigment (CurrentTokenDataPtr<PIGMENT*>());
-        END_CASE
-
-        OTHERWISE
-            *Density = Create_Pigment();
-            UNGET
-        END_CASE
-    END_EXPECT
+    if (AllowToken(DENSITY_ID_TOKEN))
+        *Density = Copy_Pigment(CurrentTokenDataPtr<PIGMENT*>());
+    else
+        *Density = Create_Pigment();
 
     Parse_Pattern<GenericPigmentBlendMap>(*Density,kBlendMapType_Density);
 }
@@ -3914,18 +3849,12 @@ FOG *Parser::Parse_Fog()
 
     Parse_Begin();
 
-    EXPECT_ONE
-        CASE(FOG_ID_TOKEN)
-            Fog = Copy_Fog (CurrentTokenDataPtr<FOG*>());
-        END_CASE
+    if (AllowToken(FOG_ID_TOKEN))
+        Fog = Copy_Fog(CurrentTokenDataPtr<FOG*>());
+    else
+        Fog = Create_Fog();
 
-        OTHERWISE
-            UNGET
-            Fog = Create_Fog();
-        END_CASE
-    END_EXPECT
-
-    EXPECT
+    EXPECT_CAT
         CASE_COLOUR_UNGET
             Parse_Colour(Fog->colour);
         END_CASE
@@ -4079,16 +4008,10 @@ RAINBOW *Parser::Parse_Rainbow()
 
     Parse_Begin();
 
-    EXPECT_ONE
-        CASE(RAINBOW_ID_TOKEN)
-            Rainbow = Copy_Rainbow (CurrentTokenDataPtr<RAINBOW*>());
-        END_CASE
-
-        OTHERWISE
-            UNGET
-            Rainbow = Create_Rainbow();
-        END_CASE
-    END_EXPECT
+    if (AllowToken(RAINBOW_ID_TOKEN))
+        Rainbow = Copy_Rainbow(CurrentTokenDataPtr<RAINBOW*>());
+    else
+        Rainbow = Create_Rainbow();
 
     EXPECT
         CASE (ANGLE_TOKEN)
@@ -4257,16 +4180,10 @@ SKYSPHERE *Parser::Parse_Skysphere()
 
     Parse_Begin();
 
-    EXPECT_ONE
-        CASE(SKYSPHERE_ID_TOKEN)
-            Skysphere = Copy_Skysphere(CurrentTokenDataPtr<SKYSPHERE*>());
-        END_CASE
-
-        OTHERWISE
-            UNGET
-            Skysphere = Create_Skysphere();
-        END_CASE
-    END_EXPECT
+    if (AllowToken(SKYSPHERE_ID_TOKEN))
+        Skysphere = Copy_Skysphere(CurrentTokenDataPtr<SKYSPHERE*>());
+    else
+        Skysphere = Create_Skysphere();
 
     EXPECT
         CASE (PIGMENT_TOKEN)
@@ -4715,23 +4632,18 @@ void Parser::Parse_Material(MATERIAL *Material)
 
     Parse_Begin();
 
-    EXPECT_ONE
-        CASE(MATERIAL_ID_TOKEN)
-            Temp = CurrentTokenDataPtr<MATERIAL*>();
-            Texture = Copy_Textures(Temp->Texture);
-            Int_Texture = Copy_Textures(Temp->Interior_Texture);
-            Link_Textures(&(Material->Texture),Texture);
-            Link_Textures(&(Material->Interior_Texture),Int_Texture);
-            if (Temp->interior != nullptr)
-                Material->interior = InteriorPtr(new Interior(*(Temp->interior)));
-            else
-                Material->interior.reset();
-        END_CASE
-
-        OTHERWISE
-            UNGET
-        END_CASE
-    END_EXPECT
+    if (AllowToken(MATERIAL_ID_TOKEN))
+    {
+        Temp = CurrentTokenDataPtr<MATERIAL*>();
+        Texture = Copy_Textures(Temp->Texture);
+        Int_Texture = Copy_Textures(Temp->Interior_Texture);
+        Link_Textures(&(Material->Texture), Texture);
+        Link_Textures(&(Material->Interior_Texture), Int_Texture);
+        if (Temp->interior != nullptr)
+            Material->interior = InteriorPtr(new Interior(*(Temp->interior)));
+        else
+            Material->interior.reset();
+    }
 
     EXPECT
         CASE (TEXTURE_TOKEN)
@@ -5511,3 +5423,4 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 }
 
 }
+// end of namespace pov_parser

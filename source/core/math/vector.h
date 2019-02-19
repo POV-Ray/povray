@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,8 +38,17 @@
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
+#include "core/math/vector_fwd.h"
 
-#include "base/types.h"
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <algorithm>
+
+// POV-Ray header files (base module)
+// POV-Ray header files (core module)
+//  (none at the moment)
 
 namespace pov
 {
@@ -65,56 +74,23 @@ enum
     W = 3
 };
 
+//******************************************************************************
+
 typedef DBL VECTOR_4D[4]; ///< @todo       Make this obsolete.
 
-/*****************************************************************************
-* Inline functions
-******************************************************************************/
+VECTOR_4D *Create_Vector_4D ();
 
-inline VECTOR_4D *Create_Vector_4D ()
-{
-    VECTOR_4D *New;
+void Assign_Vector_4D(VECTOR_4D d, const VECTOR_4D s);
 
-    New = reinterpret_cast<VECTOR_4D *>(POV_MALLOC(sizeof (VECTOR_4D), "4d vector"));
-
-    (*New)[0]= 0.0;
-    (*New)[1]= 0.0;
-    (*New)[2]= 0.0;
-    (*New)[3]= 0.0;
-
-    return (New);
-}
-
-inline void Assign_Vector_4D(VECTOR_4D d, const VECTOR_4D s)
-{
-    d[X] = s[X];
-    d[Y] = s[Y];
-    d[Z] = s[Z];
-    d[T] = s[T];
-}
-
-inline void Destroy_Vector_4D(VECTOR_4D *x)
-{
-    if (x != nullptr)
-        POV_FREE(x);
-}
+void Destroy_Vector_4D(VECTOR_4D *x);
 
 // Inverse Scale - Divide Vector by a Scalar
-inline void V4D_InverseScaleEq(VECTOR_4D a, DBL k)
-{
-    DBL tmp = 1.0 / k;
-    a[X] *= tmp;
-    a[Y] *= tmp;
-    a[Z] *= tmp;
-    a[T] *= tmp;
-}
+void V4D_InverseScaleEq(VECTOR_4D a, DBL k);
 
 // Dot Product - Gives Scalar angle (a) between two vectors (b) and (c)
-inline void V4D_Dot(DBL& a, const VECTOR_4D b, const VECTOR_4D c)
-{
-    a = b[X] * c[X] + b[Y] * c[Y] + b[Z] * c[Z] + b[T] * c[T];
-}
+void V4D_Dot(DBL& a, const VECTOR_4D b, const VECTOR_4D c);
 
+//******************************************************************************
 
 template<typename T>
 class GenericVector3d;
@@ -124,7 +100,7 @@ class GenericVector3d;
 /// @tparam T   Floating-point type to use for the individual vector components.
 ///
 template<typename T>
-class GenericVector2d
+class GenericVector2d final
 {
     public:
 
@@ -343,7 +319,7 @@ class GenericVector2d
 /// @tparam T   Floating-point type to use for the individual vector components.
 ///
 template<typename T>
-class GenericVector3d
+class GenericVector3d final
 {
     public:
 
@@ -680,5 +656,6 @@ inline GenericVector3d<T> max(GenericVector3d<T>& a, const GenericVector3d<T>& b
 }
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_VECTOR_H

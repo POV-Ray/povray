@@ -144,6 +144,9 @@
     <ClCompile Include="..\..\source\base\image\dither.cpp">
       <Filter>Base source\Image</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\base\filesystem.cpp">
+      <Filter>Base source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\base\configbase.h">
@@ -283,6 +286,45 @@
     </ClInclude>
     <ClInclude Include="..\..\source\base\image\dither.h">
       <Filter>Base Headers\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\stringtypes.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\base_fwd.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\fileinputoutput_fwd.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\image\image_fwd.h">
+      <Filter>Base Headers\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\textstreambuffer_fwd.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\path_fwd.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\image\dither_fwd.h">
+      <Filter>Base Headers\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\messenger_fwd.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\image\colourspace_fwd.h">
+      <Filter>Base Headers\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\textstream_fwd.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\filesystem.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\filesystem_fwd.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\povassert.h">
+      <Filter>Base Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

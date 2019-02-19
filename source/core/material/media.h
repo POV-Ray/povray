@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,6 +39,16 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <vector>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/render/trace.h"
 
 namespace pov
@@ -62,16 +72,16 @@ enum
     SCATTERING_TYPES                = 5
 };
 
-void Transform_Density(vector<PIGMENT*>& Density, const TRANSFORM *Trans);
+void Transform_Density(std::vector<PIGMENT*>& Density, const TRANSFORM *Trans);
 
 class MediaFunction : public Trace::MediaFunctor
 {
     public:
         MediaFunction(TraceThreadData *td, Trace *t, PhotonGatherer *pg);
 
-        virtual void ComputeMedia(vector<Media>& mediasource, const Ray& ray, Intersection& isect, MathColour& colour, ColourChannel& transm);
-        virtual void ComputeMedia(const RayInteriorVector& mediasource, const Ray& ray, Intersection& isect, MathColour& colour, ColourChannel& transm);
-        virtual void ComputeMedia(MediaVector& medias, const Ray& ray, Intersection& isect, MathColour& colour, ColourChannel& transm);
+        virtual void ComputeMedia(std::vector<Media>& mediasource, const Ray& ray, Intersection& isect, MathColour& colour, ColourChannel& transm) override;
+        virtual void ComputeMedia(const RayInteriorVector& mediasource, const Ray& ray, Intersection& isect, MathColour& colour, ColourChannel& transm) override;
+        virtual void ComputeMedia(MediaVector& medias, const Ray& ray, Intersection& isect, MathColour& colour, ColourChannel& transm) override;
     protected:
         /// pseudo-random number sequence
         RandomDoubleSequence randomNumbers;
@@ -109,5 +119,6 @@ class MediaFunction : public Trace::MediaFunctor
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_MEDIA_H

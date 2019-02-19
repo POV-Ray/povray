@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,8 +36,18 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/colour/spectral.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <algorithm>
+
+// POV-Ray header files (base module)
 #include "base/colour.h"
 #include "base/mathutil.h"
+
+// POV-Ray header files (core module)
+//  (none at the moment)
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -376,7 +386,7 @@ static RGBColour SpectralHueIntegral[SPECTRAL_HUE_TABLE_SIZE] = {
 MathColour SpectralBand::GetHueIntegral(double wavelength)
 {
     double tableOffset = clip((wavelength-SPECTRAL_HUE_TABLE_BASE)/SPECTRAL_HUE_TABLE_STEP, 0.0, SPECTRAL_HUE_TABLE_SIZE-1.0);
-    int tableIndex = min((int)tableOffset, SPECTRAL_HUE_TABLE_SIZE-2);
+    int tableIndex = std::min((int)tableOffset, SPECTRAL_HUE_TABLE_SIZE-2);
     tableOffset -= tableIndex;
     return ToMathColour((1.0-tableOffset) * SpectralHueIntegral[tableIndex] + tableOffset * SpectralHueIntegral[tableIndex+1]);
 }
@@ -384,3 +394,4 @@ MathColour SpectralBand::GetHueIntegral(double wavelength)
 #endif
 
 }
+// end of namespace pov

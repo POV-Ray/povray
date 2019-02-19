@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,7 +38,18 @@
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
+#include "core/bounding/boundingcylinder_fwd.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <vector>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/math/vector.h"
 
 namespace pov
@@ -64,24 +75,22 @@ namespace pov
 * Global typedefs
 ******************************************************************************/
 
-typedef struct BCyl_Struct BCYL;
-typedef struct BCyl_Entry_Struct BCYL_ENTRY;
-typedef struct BCyl_Intersection_Struct BCYL_INT;
-
-struct BCyl_Intersection_Struct
+struct BCyl_Intersection_Struct final
 {
     int n;     /* Number of cylinder hit    */
     DBL d[2];  /* Intersection distance(s)  */
     DBL w[2];  /* Intersection parameter(s) */
 };
+using BCYL_INT = BCyl_Intersection_Struct; ///< @deprecated
 
-struct BCyl_Entry_Struct
+struct BCyl_Entry_Struct final
 {
     short r1, r2;        /* Index of min/max segment radius */
     short h1, h2;        /* Index of min/max segmnet height */
 };
+using BCYL_ENTRY = BCyl_Entry_Struct; ///< @deprecated
 
-struct BCyl_Struct
+struct BCyl_Struct final
 {
     int number;          /* Number of bounding cylinders.       */
     short nradius;       /* Number of different bound-radii.    */
@@ -99,12 +108,13 @@ struct BCyl_Struct
 BCYL *Create_BCyl (int, const DBL *, const DBL *, const DBL *, const DBL *);
 void Destroy_BCyl (BCYL *);
 
-int Intersect_BCyl (const BCYL *BCyl, vector<BCYL_INT>& Intervals, vector<BCYL_INT>& rint, vector<BCYL_INT>& hint, const Vector3d& P, const Vector3d& D);
+int Intersect_BCyl (const BCYL *BCyl, std::vector<BCYL_INT>& Intervals, std::vector<BCYL_INT>& rint, std::vector<BCYL_INT>& hint, const Vector3d& P, const Vector3d& D);
 
 /// @}
 ///
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_BOUNDINGCYLINDER_H

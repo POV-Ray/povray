@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,23 +36,30 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/fileinputoutput.h"
 
-// C++ variants of standard C header files
+// C++ variants of C standard header files
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
 
-// Standard C++ header files
-#include <memory>
+// C++ standard header files
+#include <algorithm>
+#include <string>
 
-// POV-Ray base header files
+// POV-Ray header files (base module)
+#include "base/path.h"
 #include "base/platformbase.h"
+#include "base/povassert.h"
 #include "base/pov_err.h"
+#include "base/stringutilities.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov_base
 {
+
+using std::min;
+using std::max;
 
 IOBase::IOBase() : filename(), fail(true)
 {
@@ -80,12 +87,12 @@ IStream::~IStream()
 
 IFileStream::IFileStream(const UCS2String& name) : IStream(name), f(nullptr)
 {
-    if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdin") == 0)
+    if(pov_stricmp(UCS2toSysString(name).c_str(), "stdin") == 0)
     {
         f = stdin;
     }
-    else if((pov_stricmp(UCS2toASCIIString(name).c_str(), "stdout") == 0) ||
-            (pov_stricmp(UCS2toASCIIString(name).c_str(), "stderr") == 0))
+    else if((pov_stricmp(UCS2toSysString(name).c_str(), "stdout") == 0) ||
+            (pov_stricmp(UCS2toSysString(name).c_str(), "stderr") == 0))
     {
         f = nullptr;
     }
@@ -186,7 +193,7 @@ bool IFileStream::getline(char *s, size_t buflen)
 }
 
 IMemStream::IMemStream(const unsigned char* data, size_t size, const char* formalName, POV_OFF_T formalStart) :
-    IStream(ASCIItoUCS2String(formalName)), size(size), pos(0), formalStart(formalStart), start(data), mUngetBuffer(EOF)
+    IStream(SysToUCS2String(formalName)), size(size), pos(0), formalStart(formalStart), start(data), mUngetBuffer(EOF)
 {
     fail = false;
 }
@@ -219,18 +226,18 @@ OStream::OStream(const UCS2String& name, unsigned int Flags) : IOBase(name), f(n
         mode = "r+b";
     }
 
-    if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdin") == 0)
+    if(pov_stricmp(UCS2toSysString(name).c_str(), "stdin") == 0)
     {
         f = nullptr;
     }
-    else if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdout") == 0)
+    else if(pov_stricmp(UCS2toSysString(name).c_str(), "stdout") == 0)
     {
         if((Flags & append) != 0)
             f = nullptr;
         else
             f = stdout;
     }
-    else if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stderr") == 0)
+    else if(pov_stricmp(UCS2toSysString(name).c_str(), "stderr") == 0)
     {
         if((Flags & append) != 0)
             f = nullptr;
@@ -323,8 +330,8 @@ IStream *NewIStream(const Path& p, unsigned int stype)
 {
     if (!PlatformBase::GetInstance().AllowLocalFileAccess(p(), stype, false))
     {
-        string str ("IO Restrictions prohibit read access to '") ;
-        str += UCS2toASCIIString(p());
+        std::string str ("IO Restrictions prohibit read access to '") ;
+        str += UCS2toSysString(p());
         str += "'";
         throw POV_EXCEPTION(kCannotOpenFileErr, str);
     }
@@ -341,8 +348,8 @@ OStream *NewOStream(const Path& p, unsigned int stype, bool sappend)
 
     if (!PlatformBase::GetInstance().AllowLocalFileAccess(p(), stype, true))
     {
-        string str ("IO Restrictions prohibit write access to '") ;
-        str += UCS2toASCIIString(p());
+        std::string str ("IO Restrictions prohibit write access to '") ;
+        str += UCS2toSysString(p());
         str += "'";
         throw POV_EXCEPTION(kCannotOpenFileErr, str);
     }
@@ -372,7 +379,7 @@ UCS2String GetFileName(const Path& p)
 
 bool CheckIfFileExists(const Path& p)
 {
-    FILE *tempf = PlatformBase::GetInstance().OpenLocalFile (p().c_str(), "r");
+    FILE *tempf = PlatformBase::GetInstance().OpenLocalFile (p(), "r");
 
     if (tempf != nullptr)
         fclose(tempf);
@@ -384,7 +391,7 @@ bool CheckIfFileExists(const Path& p)
 
 POV_OFF_T GetFileLength(const Path& p)
 {
-    FILE *tempf = PlatformBase::GetInstance().OpenLocalFile (p().c_str(), "rb");
+    FILE *tempf = PlatformBase::GetInstance().OpenLocalFile (p(), "rb");
     POV_OFF_T result = -1;
 
     if (tempf != nullptr)
@@ -545,3 +552,4 @@ bool IMemStream::seekg(POV_OFF_T posi, unsigned int whence)
 }
 
 }
+// end of namespace pov_base

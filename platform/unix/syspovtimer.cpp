@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,6 +36,7 @@
 
 #include "syspovtimer.h"
 
+#include <cerrno>
 #include <ctime>
 
 #ifdef HAVE_UNISTD_H
@@ -50,6 +51,7 @@
 #include <sys/time.h>
 #endif
 
+#include "base/povassert.h"
 #include "base/types.h"
 
 // this must be the last file included
@@ -68,24 +70,47 @@ namespace pov_base
 
 //******************************************************************************
 
-#if !POV_USE_DEFAULT_DELAY
+#if (POV_USE_PLATFORM_DELAY == 1)
 
+// NOTE: Even if we decide to discontinue the use of this implementation,
+// we may want to keep it around in case it may turn out to be superior on some
+// exotic systems.
 void Delay(unsigned int msec)
 {
-#if defined(HAVE_NANOSLEEP)
-    timespec ts;
+    timespec ts, remain;
     ts.tv_sec = msec / 1000;
     ts.tv_nsec = (POV_ULONG) (1000000) * (msec % 1000);
-    nanosleep(&ts, nullptr);
-#elif defined(HAVE_USLEEP)
-    POV_ASSERT(msec < 1000); // On some systems, usleep() does not support sleeping for 1 second or more.
-    usleep (msec * (useconds_t)1000);
-#else
-#error "Bad compile-time configuration."
-#endif
+    errno = 0;
+    while ((nanosleep(&ts, &remain) != 0) && (errno == EINTR))
+    {
+        ts = remain;
+        errno = 0;
+    }
 }
 
-#endif // !POV_USE_DEFAULT_DELAY
+#elif (POV_USE_PLATFORM_DELAY == 2)
+
+// ATTENTION: According to the POSIX standard, `usleep()` need not be
+// thread-safe!
+
+// NOTE: Although we're currently not using this implementation, we may want to
+// keep it around in case we find the default implementation wanting on some
+// systems.
+void Delay(unsigned int msec)
+{
+    // According to the POSIX standard, `usleep()` may not support parameter
+    // values of 1 million or higher (corresponding to 1s). We work around this
+    // by simply calling `usleep()` repeatedly until we're good.
+    for (unsigned int sec = 0; sec < (msec/1000); ++sec)
+        usleep((useconds_t)999999); // not exactly 1s, but close enough.
+    usleep ((msec % 1000) * (useconds_t)1000);
+}
+
+#else // POV_USE_PLATFORM_DELAY
+
+#error "Bad compile-time configuration."
+
+#endif // POV_USE_PLATFORM_DELAY
 
 //******************************************************************************
 
@@ -137,9 +162,11 @@ static inline bool GettimeofdayMillisec(POV_ULONG& result)
 }
 
 Timer::Timer () :
+#if !POVUNIX_USE_DEFAULT_REAL_TIMER
     mWallTimeUseClockGettimeMonotonic (false),
     mWallTimeUseClockGettimeRealtime (false),
     mWallTimeUseGettimeofday (false),
+#endif
     mProcessTimeUseGetrusageSelf (false),
     mProcessTimeUseClockGettimeProcess (false),
     mProcessTimeUseFallback (false),
@@ -148,6 +175,7 @@ Timer::Timer () :
     mThreadTimeUseClockGettimeThread (false),
     mThreadTimeUseFallback (false)
 {
+#if !POVUNIX_USE_DEFAULT_REAL_TIMER
     // Figure out which timer source to use for wall clock time.
     bool haveWallTime = false;
 #if defined(HAVE_DECL_CLOCK_MONOTONIC) && HAVE_DECL_CLOCK_MONOTONIC
@@ -164,12 +192,13 @@ Timer::Timer () :
     //        gettimeofday(), and document it here.
     if (!haveWallTime)
         haveWallTime = mWallTimeUseGettimeofday = GettimeofdayMillisec(mWallTimeStart);
-    // FIXME: add fallback, using ftime(), or time() + a counter for ms, or maybe boost::date_time
+    // FIXME: add fallback, using ftime(), or time() + a counter for ms, or maybe std::chrono
     if (!haveWallTime)
     {
         POV_ASSERT(false);
         mWallTimeStart = 0;
     }
+#endif
 
     // Figure out which timer source to use for per-process CPU time.
     bool haveProcessTime = false;
@@ -185,8 +214,12 @@ Timer::Timer () :
 #endif
     if (!haveProcessTime)
     {
+#if POVUNIX_USE_DEFAULT_REAL_TIMER
+        haveProcessTime = mProcessTimeUseFallback = true;
+#else
         haveProcessTime = mProcessTimeUseFallback = haveWallTime;
         mProcessTimeStart = mWallTimeStart;
+#endif
     }
 
     // Figure out which timer source to use for per-thread CPU time.
@@ -211,11 +244,7 @@ Timer::Timer () :
     }
 }
 
-Timer::~Timer ()
-{
-    // nothing to do
-}
-
+#if !POVUNIX_USE_DEFAULT_REAL_TIMER
 POV_ULONG Timer::GetWallTime () const
 {
     POV_ULONG result;
@@ -231,6 +260,7 @@ POV_ULONG Timer::GetWallTime () const
         return (GettimeofdayMillisec(result) ? result : 0);
     return 0;
 }
+#endif
 
 POV_ULONG Timer::GetProcessTime () const
 {
@@ -244,7 +274,11 @@ POV_ULONG Timer::GetProcessTime () const
         return (ClockGettimeMillisec(result, CLOCK_PROCESS_CPUTIME_ID) ? result : 0);
 #endif
     if (mProcessTimeUseFallback)
+#if POVUNIX_USE_DEFAULT_REAL_TIMER
+        return mRealTimer.ElapsedTime();
+#else
         return GetWallTime ();
+#endif
     return 0;
 }
 
@@ -268,10 +302,12 @@ POV_ULONG Timer::GetThreadTime () const
     return 0;
 }
 
+#if !POVUNIX_USE_DEFAULT_REAL_TIMER
 POV_LONG Timer::ElapsedRealTime () const
 {
     return GetWallTime () - mWallTimeStart;
 }
+#endif
 
 POV_LONG Timer::ElapsedProcessCPUTime () const
 {
@@ -285,7 +321,11 @@ POV_LONG Timer::ElapsedThreadCPUTime () const
 
 void Timer::Reset ()
 {
+#if POVUNIX_USE_DEFAULT_REAL_TIMER
+    mRealTimer.Reset();
+#else
     mWallTimeStart    = GetWallTime ();
+#endif
     mProcessTimeStart = GetProcessTime ();
     mThreadTimeStart  = GetThreadTime ();
 }
@@ -305,3 +345,4 @@ bool Timer::HasValidThreadCPUTime () const
 //******************************************************************************
 
 }
+// end of namespace pov_base

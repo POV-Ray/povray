@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -34,15 +34,28 @@
 ///
 //******************************************************************************
 
-#ifndef PROCESSOPTIONS_H
-#define PROCESSOPTIONS_H
+#ifndef POVRAY_FRONTEND_PROCESSOPTIONS_H
+#define POVRAY_FRONTEND_PROCESSOPTIONS_H
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "frontend/configfrontend.h"
 
-#include "base/textstream.h"
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
 
+// POV-Ray header files (base module)
+#include "base/stringtypes.h"
+#include "base/textstream_fwd.h"
+
+// POV-Ray header files (core module)
+//  (none at the moment)
+
+// POV-Ray header files (POVMS module)
 #include "povms/povmscpp.h"
+
+// POV-Ray header files (frontend module)
+//  (none at the moment)
 
 namespace pov_frontend
 {
@@ -60,7 +73,7 @@ enum {
 class ProcessOptions
 {
     public:
-        struct INI_Parser_Table
+        struct INI_Parser_Table final
         {
             const char  *keyword;
             POVMSType   key;
@@ -68,7 +81,7 @@ class ProcessOptions
             int         flags;
         };
 
-        struct Cmd_Parser_Table
+        struct Cmd_Parser_Table final
         {
             const char  *command;
             POVMSType   key;
@@ -78,7 +91,7 @@ class ProcessOptions
         };
 
         ProcessOptions(INI_Parser_Table *, Cmd_Parser_Table *);
-        ~ProcessOptions();
+        virtual ~ProcessOptions();
 
         int ParseFile(const char *, POVMSObjectPtr);
         int ParseString(const char *, POVMSObjectPtr, bool singleswitch = false);
@@ -141,5 +154,6 @@ class ProcessOptions
 };
 
 }
+// end of namespace pov_frontend
 
-#endif
+#endif // POVRAY_FRONTEND_PROCESSOPTIONS_H

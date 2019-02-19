@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,11 +38,18 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/image/bmp.h"
 
-// Standard C++ header files
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <vector>
 
-// POV-Ray base header files
+// POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
 #include "base/types.h"
+#include "base/image/colourspace.h"
+#include "base/image/encoding.h"
+#include "base/image/image.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -454,7 +461,7 @@ static void Read_BMP_8b_RLE(Image *image, IStream& in, unsigned width, unsigned 
 *
 ******************************************************************************/
 
-void Write (OStream *file, const Image *image, const Image::WriteOptions& options)
+void Write (OStream *file, const Image *image, const ImageWriteOptions& options)
 {
     int             width = image->GetWidth();
     int             height = image->GetHeight();
@@ -518,7 +525,7 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
         throw POV_EXCEPTION(kFileDataErr, "Error writing to BMP file") ;
 }
 
-Image *Read (IStream *file, const Image::ReadOptions& options)
+Image *Read (IStream *file, const ImageReadOptions& options)
 {
     unsigned file_width, file_height;
     unsigned file_depth, file_colors;
@@ -592,7 +599,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     if (file_depth < 24)
     {
         int color_map_length = file_colors ? file_colors : 1<<file_depth ;
-        vector<Image::RGBMapEntry> colormap ;
+        std::vector<Image::RGBMapEntry> colormap ;
         Image::RGBMapEntry entry;
 
         for (int i=0; i<color_map_length; i++)
@@ -609,7 +616,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
         if (file->eof ())
             throw POV_EXCEPTION(kFileDataErr, "Unexpected EOF while reading BMP file");
 
-        image = Image::Create (file_width, file_height, Image::Colour_Map, colormap) ;
+        image = Image::Create (file_width, file_height, ImageDataType::Colour_Map, colormap) ;
         image->SetPremultiplied(premul); // specify whether the color map data has premultiplied alpha
 
         switch (file_depth)
@@ -649,17 +656,10 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     }
     else
     {
-        /* includes update from stefan maierhofer for 32bit */
-        Image::ImageDataType imagetype = options.itype ;
-        if (imagetype == Image::Undefined)
-        {
-            if (GammaCurve::IsNeutral(gamma))
-                // No gamma correction required, raw values can be stored "as is".
-                imagetype = has_alpha ? Image::RGBA_Int8 : Image::RGB_Int8 ;
-            else
-                // Gamma correction required; use an image container that will take care of that.
-                imagetype = has_alpha ? Image::RGBA_Gamma8 : Image::RGB_Gamma8 ;
-        }
+        /* includes update from Stefan Maierhofer for 32bit */
+        ImageDataType imagetype = options.itype ;
+        if (imagetype == ImageDataType::Undefined)
+            imagetype = Image::GetImageDataType(8, 3, has_alpha, gamma);
         image = Image::Create (file_width, file_height, imagetype) ;
         image->SetPremultiplied(premul); // set desired storage mode regarding alpha premultiplication
         image->TryDeferDecoding(gamma, 255); // try to have gamma adjustment being deferred until image evaluation.
@@ -687,6 +687,8 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
 
 }
 
-} // end of namespace Bmp
+}
+// end of namespace Bmp
 
 }
+// end of namespace pov_base

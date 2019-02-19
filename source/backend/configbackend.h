@@ -38,6 +38,7 @@
 #ifndef POVRAY_BACKEND_CONFIGBACKEND_H
 #define POVRAY_BACKEND_CONFIGBACKEND_H
 
+// Pull in other compile-time config header files first
 #include "base/configbase.h"
 #include "syspovconfigbackend.h"
 
@@ -74,35 +75,6 @@
 ///
 #ifndef POV_USE_DEFAULT_TASK_CLEANUP
     #define POV_USE_DEFAULT_TASK_CLEANUP 1
-#endif
-
-/// @def POV_THREAD_STACK_SIZE
-/// Default thread stack size.
-///
-#ifndef POV_THREAD_STACK_SIZE
-    #define POV_THREAD_STACK_SIZE (2 * 1024 * 1024) // 2 MiB
-#endif
-
-static_assert(
-    POV_THREAD_STACK_SIZE >= 1024 * 1024,
-    "Unreasonably small thread stack size. Proceed at your own risk."
-);
-
-/// @def POV_CONVERT_TEXT_TO_UCS2
-/// Convert text from system-specific format to UCS2.
-///
-/// @note
-///     The macro is responsible for creating a sufficiently large result buffer, using @ref POV_MALLOC().
-/// @note
-///     The result must be a genuine UCS2 string. UCS4/Unicode characters outside the Basic Multilingual Plane
-///     are not supported.
-///
-/// @param[in]  ts  Null-terminated byte sequence to convert.
-/// @param[out] as  Number of UCS2 characters in result.
-/// @return         Converted null-terminated UCS2 character sequence, or `nullptr` if conversion is not supported.
-///
-#ifndef POV_CONVERT_TEXT_TO_UCS2
-    #define POV_CONVERT_TEXT_TO_UCS2(ts, as) (nullptr)
 #endif
 
 //******************************************************************************
@@ -162,15 +134,6 @@ static_assert(
     #define POV_TASK_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
     #define POV_TASK_ASSERT(expr) POV_ASSERT_DISABLE(expr)
-#endif
-
-/// @def HAVE_BOOST_THREAD_ATTRIBUTES
-/// Whether boost::thread::attributes is available (and can be used to set a thread's stack size).
-///
-#if BOOST_VERSION >= 105000
-    #define HAVE_BOOST_THREAD_ATTRIBUTES 1
-#else
-    #define HAVE_BOOST_THREAD_ATTRIBUTES 0
 #endif
 
 /// @}

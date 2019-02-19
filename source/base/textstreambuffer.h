@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,23 +33,22 @@
 ///
 //******************************************************************************
 
-#ifndef TEXTSTREAMBUFFER_H
-#define TEXTSTREAMBUFFER_H
+#ifndef POVRAY_BASE_TEXTSTREAMBUFFER_H
+#define POVRAY_BASE_TEXTSTREAMBUFFER_H
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
+#include "base/textstreambuffer_fwd.h"
 
-// C++ variants of standard C header files
+// C++ variants of C standard header files
 #include <cctype>
-#include <cstdarg>
 #include <cstdio>
 
-// must nuke these since everyone's favourite monopoly's cstdio still defines
-// them for some reason (why not just use inlines like everyone else?)
-#undef  getc
-#undef  putc
-#undef  getchar
-#undef  putchar
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
 
 namespace pov_base
 {
@@ -93,5 +92,6 @@ class TextStreamBuffer
 //##############################################################################
 
 }
+// end of namespace pov_base
 
-#endif
+#endif // POVRAY_BASE_TEXTSTREAMBUFFER_H

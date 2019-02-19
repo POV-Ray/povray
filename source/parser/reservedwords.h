@@ -40,18 +40,26 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "parser/configparser.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+// POV-Ray header files (core module)
+//  (none at the moment)
+
+// POV-Ray header files (parser module)
 #include "parser/parsertypes.h"
 
 namespace pov_parser
 {
 
-typedef struct Reserved_Word_Struct RESERVED_WORD;
-
-struct Reserved_Word_Struct
+struct Reserved_Word_Struct final
 {
     TokenId Token_Number;
     const char *Token_Name;
 };
+using RESERVED_WORD = Reserved_Word_Struct; ///< @deprecated
 
 // Token Definitions for Parser
 enum TokenId : int
@@ -68,12 +76,12 @@ enum TokenId : int
 
     UTF8_SIGNATURE_TOKEN,
 
-    SIGNATURE_FUNCT_TOKEN, // must be last in this section
+    SIGNATURE_TOKEN_CATEGORY, // must be last in this section
 
     //------------------------------------------------------------------------------
     // Float Tokens.
     //
-    // All tokens that may start a float expression must go here.
+    // All keyword tokens that may start a float expression must go here.
     //
     // Please keep this section neatly sorted by the token identifier name,
     // sorting underscore characters before digits, digits before letters,
@@ -136,18 +144,18 @@ enum TokenId : int
     TANH_TOKEN,
     TAU_TOKEN,
     TRUE_TOKEN,
-    VDOT_TOKEN,
     VAL_TOKEN,
+    VDOT_TOKEN,
     VERSION_TOKEN,
     VLENGTH_TOKEN,
     YES_TOKEN,
 
-    FLOAT_FUNCT_TOKEN, // must be last in this section
+    FLOAT_TOKEN_CATEGORY, // must be last in this section
 
     //------------------------------------------------------------------------------
     // Vector Tokens.
     //
-    // All tokens that may start a vector expression must go here.
+    // All keyword tokens that may start a vector expression must go here.
     //
     // Please keep this section neatly sorted by the token identifier name,
     // sorting underscore characters before digits, digits before letters,
@@ -167,12 +175,12 @@ enum TokenId : int
     Y_TOKEN,
     Z_TOKEN,
 
-    VECTOR_FUNCT_TOKEN, // must be last in this section
+    VECTOR_TOKEN_CATEGORY, // must be last in this section
 
     //------------------------------------------------------------------------------
     // Colour Tokens.
     //
-    // Tokens that may start a colour expression must typically go here.
+    // Keyword tokens that may start a colour expression must typically go here.
     //
     // Please keep this section neatly sorted by the token identifier name,
     // sorting underscore characters before digits, digits before letters,
@@ -200,7 +208,7 @@ enum TokenId : int
     SRGBT_TOKEN,
     TRANSMIT_TOKEN,
 
-    COLOUR_KEY_TOKEN, // must be last in this section
+    COLOUR_TOKEN_CATEGORY, // must be last in this section
 
     //------------------------------------------------------------------------------
     // More Colour Tokens.
@@ -757,6 +765,9 @@ constexpr int TOKEN_COUNT = int(TokenId::TOKEN_COUNT_);
 
 extern const RESERVED_WORD Reserved_Words[];
 
+TokenId GetCategorizedTokenId(TokenId tokenId);
+
 }
+// end of namespace pov_parser
 
 #endif // POVRAY_PARSER_RESERVEDWORDS_H
