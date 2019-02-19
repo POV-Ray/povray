@@ -710,3 +710,4 @@ BOOL CheckGUIExtLoaded (const char *Name)
 }
 
 }
+// end of namespace povwin

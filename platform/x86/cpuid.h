@@ -39,7 +39,13 @@
 
 #include "base/configbase.h"
 
-class CPUInfo
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <string>
+
+class CPUInfo final
 {
 public:
     static bool SupportsSSE2();             ///< Test whether CPU and OS support SSE2.

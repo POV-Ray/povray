@@ -38,6 +38,7 @@
 #ifndef POVRAY_VM_CONFIGVM_H
 #define POVRAY_VM_CONFIGVM_H
 
+// Pull in other compile-time config header files first
 #include "core/configcore.h"
 #include "syspovconfigvm.h"
 

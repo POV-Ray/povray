@@ -36,6 +36,9 @@
 #ifndef __RTRSUPPORT_H__
 #define __RTRSUPPORT_H__
 
+#include <string>
+#include <vector>
+
 namespace povwin
 {
   size_t GetVideoSourceNames(std::vector<std::string>& result);
@@ -43,5 +46,6 @@ namespace povwin
   const std::string& GetVideoSourceName(void);
   void NextFrame(void);
 }
+// end of namespace povwin
 
 #endif

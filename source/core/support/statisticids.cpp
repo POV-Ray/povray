@@ -37,6 +37,14 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/support/statisticids.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+// POV-Ray header files (core module)
+//  (none at the moment)
+
 // this must be the last file included
 #include "base/povdebug.h"
 
@@ -167,3 +175,4 @@ const INTERSECTION_STATS_INFO intersection_stats[kPOVList_Stat_Last] =
 };
 
 }
+// end of namespace pov

@@ -279,3 +279,4 @@ void build_editor_menu (HMENU hMenu)
 }
 
 }
+// end of namespace povwin

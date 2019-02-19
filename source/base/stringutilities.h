@@ -43,11 +43,12 @@
 #include <cstring>
 
 // C++ standard header files
-// Boost header files
-//  (none at the moment)
+#include <string>
 
 // POV-Ray header files (base module)
-#include "base/types.h"
+#include "base/base_fwd.h"
+#include "base/povassert.h"
+#include "base/stringtypes.h"
 
 namespace pov_base
 {
@@ -59,8 +60,11 @@ namespace pov_base
 ///
 /// @{
 
-UCS2String ASCIItoUCS2String(const char *s);
-std::string UCS2toASCIIString(const UCS2String& s);
+UCS2String ASCIItoUCS2String(const std::string& s);
+
+UCS2String SysToUCS2String(const char *s);
+UCS2String SysToUCS2String(const std::string& s);
+std::string UCS2toSysString(const UCS2String& s);
 
 UCS2String UTF8toUCS2String(const UTF8String& s);
 
@@ -68,6 +72,7 @@ int pov_stricmp(const char *, const char *);
 const char *pov_tsprintf(const char *, ...);
 
 std::size_t UCS2_strlen(const UCS2* str);
+int UCS2_strcmp(const UCS2* s1, const UCS2* s2);
 
 //******************************************************************************
 
@@ -242,7 +247,8 @@ bool IsUCSLowSurrogate(UCS4 character);
 /// @return                     `true` if the code point qualifies as a UCS scalar value.
 bool IsUCSScalarValue(UCS4 character);
 
-} // end of namespace UCS
+}
+// end of namespace UCS
 
 //******************************************************************************
 
@@ -265,6 +271,7 @@ struct Charset
 ///
 //##############################################################################
 
-} // end of namespace pov_base
+}
+// end of namespace pov_base
 
 #endif // POVRAY_BASE_STRINGUTILITIES_H

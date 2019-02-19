@@ -38,4 +38,6 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "base/povassert.h"
+
 #endif // POVRAY_TESTS_H

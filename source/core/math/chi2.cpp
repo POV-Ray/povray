@@ -74,7 +74,15 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/math/chi2.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
+
+// POV-Ray header files (core module)
+//  (none at the moment)
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -1029,3 +1037,4 @@ static DBL p1evl(DBL x, const DBL coef[], int N)
 }
 
 }
+// end of namespace pov

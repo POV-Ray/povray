@@ -125,5 +125,6 @@ OptimizedNoiseInfo gaOptimizedNoiseInfo[] = {
 };
 
 }
+// end of namespace pov
 
 #endif // TRY_OPTIMIZED_NOISE

@@ -42,6 +42,7 @@
 #include <string.h>
 
 #include <windows.h>
+#include <io.h>
 
 #include "pvengine.h"
 #include "resource.h"
@@ -210,3 +211,4 @@ char *save_demo_file (char *s1, char *s2)
 }
 
 }
+// end of namespace povwin

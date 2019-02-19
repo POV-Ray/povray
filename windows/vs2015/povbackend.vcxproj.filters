@@ -119,9 +119,6 @@
     <ClInclude Include="..\..\source\backend\configbackend.h">
       <Filter>Backend Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\backend\frame.h">
-      <Filter>Backend Headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\backend\povray.h">
       <Filter>Backend Headers</Filter>
     </ClInclude>
@@ -192,6 +189,24 @@
       <Filter>Backend Headers\Control</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\backend\control\parsertask.h">
+      <Filter>Backend Headers\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\scene\backendscenedata_fwd.h">
+      <Filter>Backend Headers\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\scene\view_fwd.h">
+      <Filter>Backend Headers\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\control\scene_fwd.h">
+      <Filter>Backend Headers\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\scene\viewthreaddata_fwd.h">
+      <Filter>Backend Headers\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\lighting\photonshootingstrategy_fwd.h">
+      <Filter>Backend Headers\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\control\messagefactory_fwd.h">
       <Filter>Backend Headers\Control</Filter>
     </ClInclude>
   </ItemGroup>

@@ -60,3 +60,4 @@ bool WindowsVersionDetector::IsVersion (int major, int minor) const
 }
 
 }
+// end of namespace pov_base

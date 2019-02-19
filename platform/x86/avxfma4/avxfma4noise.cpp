@@ -43,6 +43,8 @@
 #include MACHINE_INTRINSICS_H
 #endif
 
+#include "base/povassert.h"
+
 #include "core/material/noise.h"
 
 /// @file
@@ -417,6 +419,7 @@ void AVXFMA4DNoise(Vector3d& result, const Vector3d& EPoint) { POV_ASSERT(false)
 #endif // DISABLE_OPTIMIZED_NOISE_AVXFMA4
 
 }
+// end of namespace pov
 
 #endif // TRY_OPTIMIZED_NOISE_AVXFMA4
 

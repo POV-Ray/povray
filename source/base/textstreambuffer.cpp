@@ -36,15 +36,15 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/textstreambuffer.h"
 
-// C++ variants of standard C header files
+// C++ variants of C standard header files
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
 
-// Standard C++ header files
+// C++ standard header files
 #include <algorithm>
 
-// POV-Ray base header files
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
 #include "base/stringutilities.h"
 #include "base/types.h"
@@ -54,6 +54,9 @@
 
 namespace pov_base
 {
+
+using std::min;
+using std::max;
 
 TextStreamBuffer::TextStreamBuffer(size_t buffersize, unsigned int wrapwidth)
 {
@@ -332,3 +335,4 @@ void TextStreamBuffer::directflush(const char *str, unsigned int chars)
 }
 
 }
+// end of namespace pov_base

@@ -36,10 +36,16 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/render/trace.h"
 
+// C++ variants of C standard header files
 #include <cfloat>
 
-#include <boost/bind.hpp>
+// C++ standard header files
+#include <algorithm>
 
+// POV-Ray header files (base module)
+#include "base/povassert.h"
+
+// POV-Ray header files (core module)
 #include "core/bounding/bsptree.h"
 #include "core/lighting/lightsource.h"
 #include "core/lighting/radiosity.h"
@@ -60,12 +66,17 @@
 #include "core/shape/box.h"
 #include "core/shape/csg.h"
 #include "core/support/imageutil.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov
 {
+
+using std::min;
+using std::max;
+using std::vector;
 
 #define SHADOW_TOLERANCE 1.0e-3
 
@@ -83,7 +94,7 @@ bool NoSomethingFlagRayObjectCondition::operator()(const Ray& ray, ConstObjectPt
     return true;
 }
 
-Trace::Trace(shared_ptr<SceneData> sd, TraceThreadData *td, const QualityFlags& qf,
+Trace::Trace(std::shared_ptr<SceneData> sd, TraceThreadData *td, const QualityFlags& qf,
              CooperateFunctor& cf, MediaFunctor& mf, RadiosityFunctor& rf) :
     threadData(td),
     sceneData(sd),
@@ -749,7 +760,7 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
     MathColour ambBackCol;
     bool one_colour_found, colour_found;
     bool tir_occured;
-    std::auto_ptr<PhotonGatherer> surfacePhotonGatherer(nullptr); // TODO FIXME - auto_ptr why?  [CLi] why, to auto-destruct it of course! (e.g. in case of exception)
+    std::unique_ptr<PhotonGatherer> surfacePhotonGatherer(nullptr);
 
     double relativeIor;
     ComputeRelativeIOR(ray, isect.Object->interior.get(), relativeIor);
@@ -1927,14 +1938,14 @@ void Trace::TraceShadowRay(const LightSource &lightsource, double depth, Ray& li
 // to link the exe, complaining of an unresolved external.
 //
 // TODO: try moving it back in at some point in the future.
-struct NoShadowFlagRayObjectCondition : public RayObjectCondition
+struct NoShadowFlagRayObjectCondition final : public RayObjectCondition
 {
-    virtual bool operator()(const Ray&, ConstObjectPtr object, double) const { return !Test_Flag(object, NO_SHADOW_FLAG); }
+    virtual bool operator()(const Ray&, ConstObjectPtr object, double) const override { return !Test_Flag(object, NO_SHADOW_FLAG); }
 };
 
-struct SmallToleranceRayObjectCondition : public RayObjectCondition
+struct SmallToleranceRayObjectCondition final  : public RayObjectCondition
 {
-    virtual bool operator()(const Ray&, ConstObjectPtr, double dist) const { return dist > SMALL_TOLERANCE; }
+    virtual bool operator()(const Ray&, ConstObjectPtr, double dist) const override { return dist > SMALL_TOLERANCE; }
 };
 
 void Trace::TracePointLightShadowRay(const LightSource &lightsource, double& lightsourcedepth, Ray& lightsourceray, MathColour& lightcolour)
@@ -3917,4 +3928,5 @@ void Trace::ComputeSubsurfaceScattering(const FINISH *Finish, const MathColour& 
     Eye.GetTicket().subsurfaceRecursionDepth--;
 }
 
-} // end of namespace
+}
+// end of namespace pov

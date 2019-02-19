@@ -39,6 +39,14 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/scene/object.h"
 
 namespace pov
@@ -62,9 +70,9 @@ namespace pov
 ///
 //******************************************************************************
 
-class Cone : public ObjectBase
+class Cone final : public ObjectBase
 {
-        struct CONE_INT
+        struct CONE_INT final
         {
             DBL d;  /* Distance of intersection point               */
             int t;  /* Type of intersection: base/cap plane or side */
@@ -77,27 +85,27 @@ class Cone : public ObjectBase
         DBL dist;           ///< Distance to end of cone in canonical coords.
 
         Cone();
-        virtual ~Cone();
+        virtual ~Cone() override;
 
         void Cylinder();
 
-        virtual ObjectPtr Copy();
+        virtual ObjectPtr Copy() override;
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-        virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) override;
+        virtual bool Inside(const Vector3d&, TraceThreadData *) const override;
+        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const override;
 #ifdef POV_ENABLE_CONE_UV
         /// @attention
         ///     UV mapping of this primitive should not be enabled until the primary
         ///     parameterization has been amended so that users have full control over the
         ///     primitive's  orientation, rather than just the axis of rotational symmetry.
-        virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
+        virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const override;
 #endif // POV_ENABLE_CONE_UV
-        virtual void Translate(const Vector3d&, const TRANSFORM *);
-        virtual void Rotate(const Vector3d&, const TRANSFORM *);
-        virtual void Scale(const Vector3d&, const TRANSFORM *);
-        virtual void Transform(const TRANSFORM *);
-        virtual void Compute_BBox();
+        virtual void Translate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Rotate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Scale(const Vector3d&, const TRANSFORM *) override;
+        virtual void Transform(const TRANSFORM *) override;
+        virtual void Compute_BBox() override;
 
         void Compute_Cone_Data();
         void Compute_Cylinder_Data();
@@ -113,5 +121,6 @@ class Cone : public ObjectBase
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_CONE_H

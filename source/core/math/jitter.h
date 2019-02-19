@@ -39,6 +39,14 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+// POV-Ray header files (core module)
+//  (none at the moment)
+
 namespace pov
 {
 
@@ -52,7 +60,7 @@ namespace pov
 #ifdef DYNAMIC_HASHTABLE
 extern unsigned short *hashTable; // GLOBAL VARIABLE
 #else
-extern ALIGN16 unsigned short hashTable[]; // GLOBAL VARIABLE
+alignas(16) extern unsigned short hashTable[]; // GLOBAL VARIABLE
 #endif
 
 extern const float JitterTable[]; // GLOBAL VARIABLE
@@ -84,5 +92,6 @@ inline void Jitter2d(DBL x, DBL y, DBL& jx, DBL& jy)
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_JITTER_H

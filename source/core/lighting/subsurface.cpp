@@ -36,7 +36,15 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/lighting/subsurface.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
 #include "base/mathutil.h"
+
+// POV-Ray header files (core module)
+//  (none at the moment)
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -111,4 +119,5 @@ PreciseMathColour SubsurfaceInterior::GetReducedAlbedo(const MathColour& diffuse
     return result;
 }
 
-} // end of namespace
+}
+// end of namespace pov

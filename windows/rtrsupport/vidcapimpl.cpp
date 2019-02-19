@@ -66,7 +66,7 @@ VideoCaptureImpl::~VideoCaptureImpl()
 {
 }
 
-Image *VideoCaptureImpl::Init(const char *params, Image::ReadOptions& options, bool doubleBuffer)
+Image *VideoCaptureImpl::Init(const char *params, ImageReadOptions& options, bool doubleBuffer)
 {
   return NULL;
 }
@@ -80,6 +80,7 @@ bool VideoCaptureImpl::WaitFrame(int count, unsigned int timeout)
   return false;
 }
 
-} // end of namespace pov
+}
+// end of namespace pov
 
 #endif

@@ -38,12 +38,12 @@
 
 // C++ variants of C standard header files
 // C++ standard header files
-// Boost header files
-//  (none at the moment)
 
 // POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
+#include "base/povassert.h"
 
+// POV-Ray header files (core module)
 // POV-Ray header files (parser module)
 //  (none at the moment)
 
@@ -129,3 +129,4 @@ InvalidEscapeSequenceException::InvalidEscapeSequenceException(const UCS2String&
 {}
 
 }
+// end of namespace pov_parser

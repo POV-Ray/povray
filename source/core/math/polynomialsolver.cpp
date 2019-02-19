@@ -38,6 +38,14 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/math/polynomialsolver.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/support/statistics.h"
 
 // this must be the last file included
@@ -106,7 +114,7 @@ const DBL RELERROR = 1.0e-12;
 * Local typedefs
 ******************************************************************************/
 
-struct polynomial
+struct polynomial final
 {
     int ord;
     DBL coef[MAX_ORDER+1];
@@ -1721,3 +1729,4 @@ int Solve_Polynomial(int n, const DBL *c0, DBL *r, int sturm, DBL epsilon, Rende
 }
 
 }
+// end of namespace pov

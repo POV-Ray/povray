@@ -38,6 +38,7 @@
 #ifndef POVRAY_FRONTEND_CONFIGFRONTEND_H
 #define POVRAY_FRONTEND_CONFIGFRONTEND_H
 
+// Pull in other compile-time config header files first
 #include "base/configbase.h"
 #include "syspovconfigfrontend.h"
 

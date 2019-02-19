@@ -40,21 +40,21 @@
 #include "parser/configparser.h"
 
 // C++ variants of C standard header files
-// C++ standard header files
-// Boost header files
 //  (none at the moment)
 
+// C++ standard header files
+#include <memory>
+
 // POV-Ray header files (base module)
-#include "base/types.h"
+#include "base/fileinputoutput_fwd.h"
 #include "base/messenger.h"
+#include "base/stringtypes.h"
 
 // POV-Ray header files (core module)
 #include "core/coretypes.h"
 
-namespace pov_base
-{
-class IStream;
-}
+// POV-Ray header files (parser module)
+//  (none at the moment)
 
 namespace pov_parser
 {
@@ -65,8 +65,8 @@ enum TokenId : int;
 
 //------------------------------------------------------------------------------
 
-using StreamPtr = shared_ptr<pov_base::IStream>;
-using ConstStreamPtr = shared_ptr<const pov_base::IStream>;
+using StreamPtr = std::shared_ptr<pov_base::IStream>;
+using ConstStreamPtr = std::shared_ptr<const pov_base::IStream>;
 
 //------------------------------------------------------------------------------
 
@@ -113,7 +113,7 @@ struct TokenizerException : std::exception, MessageContext
 /// (`/*`) was encountered without a matching end sequence (`*/`), implying a
 /// broken comment or a comment nesting error.
 ///
-struct IncompleteCommentException : TokenizerException
+struct IncompleteCommentException final : TokenizerException
 {
     IncompleteCommentException(const UCS2String& osn, const LexemePosition& op);
 };
@@ -124,7 +124,7 @@ struct IncompleteCommentException : TokenizerException
 /// @ref RawTokenizer) to indicate that an unbalanced double quote (`"`) was
 /// encountered, implying a broken string literal.
 ///
-struct IncompleteStringLiteralException : TokenizerException
+struct IncompleteStringLiteralException final : TokenizerException
 {
     IncompleteStringLiteralException(const UCS2String& osn, const LexemePosition& op);
 };
@@ -136,7 +136,7 @@ struct IncompleteStringLiteralException : TokenizerException
 /// in the data stream does not conform to the expected character encoding
 /// scheme, implying a broken or malformed file.
 ///
-struct InvalidEncodingException : TokenizerException
+struct InvalidEncodingException final : TokenizerException
 {
     /// Descriptive name of the expected encoding scheme.
     const char* encodingName;
@@ -155,7 +155,7 @@ struct InvalidEncodingException : TokenizerException
 /// @ref RawTokenizer) to indicate that an unexpected ASCII control character
 /// or non-ASCII character was encountered outside a string literal or comment.
 ///
-struct InvalidCharacterException : TokenizerException
+struct InvalidCharacterException final : TokenizerException
 {
     /// UCS code point corresponding to the unexpected character.
     UCS4 offendingCharacter;
@@ -172,7 +172,7 @@ struct InvalidCharacterException : TokenizerException
 /// literal, malformed escape sequence or failure to properly escape a literal
 /// backslash character.
 ///
-struct InvalidEscapeSequenceException : TokenizerException
+struct InvalidEscapeSequenceException final : TokenizerException
 {
     /// Offending escape sequence, including leading escape character.
     UTF8String offendingText;
@@ -187,13 +187,13 @@ struct InvalidEscapeSequenceException : TokenizerException
 /// Base class for miscellaneous things that can be assigned to a symbol.
 struct Assignable
 {
-    virtual ~Assignable() {}
+    virtual ~Assignable() = default;
     virtual Assignable* Clone() const = 0;
 };
 
 //------------------------------------------------------------------------------
 
-struct ParserOptions
+struct ParserOptions final
 {
     bool    useClock;
     DBL     clock;
@@ -222,6 +222,25 @@ enum class CharacterEncodingID
 
 //------------------------------------------------------------------------------
 
-} // end of namespace
+struct FileResolver
+{
+    virtual ~FileResolver() = default;
+    virtual pov_base::UCS2String FindFile(pov_base::UCS2String parsedFileName, unsigned int fileType) = 0;
+    virtual pov_base::IStream* ReadFile(const pov_base::UCS2String& parsedFileName,
+                                        const pov_base::UCS2String& foundFileName, unsigned int fileType) = 0;
+    virtual pov_base::OStream* CreateFile(const pov_base::UCS2String& parsedFileName,
+                                          unsigned int fileType, bool append) = 0;
+};
+
+struct ProgressReporter
+{
+    virtual ~ProgressReporter() = default;
+    virtual void ReportProgress(POV_LONG tokenCount) = 0;
+};
+
+//------------------------------------------------------------------------------
+
+}
+// end of namespace pov_parser
 
 #endif // POVRAY_PARSER_PARSERTYPES_H

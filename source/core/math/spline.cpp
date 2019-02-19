@@ -44,14 +44,21 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/math/spline.h"
 
+// C++ variants of C standard header files
 #include <cmath>
 #include <cstdio>
 #include <cstring>
 
+// C++ standard header files
 #include <limits>
 
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
+#include "base/povassert.h"
 #include "base/types.h"
+
+// POV-Ray header files (core module)
+//  (none at the moment)
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -853,3 +860,4 @@ DBL Get_Spline_Val(GenericSpline *sp, DBL p, EXPRESS& v, int *Terms)
 }
 
 }
+// end of namespace pov

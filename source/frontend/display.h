@@ -39,13 +39,25 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "frontend/configfrontend.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+// POV-Ray header files (POVMS module)
+// POV-Ray header files (frontend module)
+//  (none at the moment)
+
 namespace pov_frontend
 {
 
 class Display
 {
     public:
-        struct RGBA8 { unsigned char red, green, blue, alpha; };
+        struct RGBA8 final
+        {
+            unsigned char red, green, blue, alpha;
+        };
 
         Display(unsigned int w, unsigned int h);
         virtual ~Display();
@@ -69,10 +81,10 @@ class Display
         /// display height
         unsigned int height;
 
-        /// not available
-        Display();
+        Display() = delete;
 };
 
 }
+// end of namespace pov_frontend
 
 #endif // POVRAY_FRONTEND_DISPLAY_H

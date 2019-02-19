@@ -282,6 +282,6 @@ char *ExternalMenuTip (WPARAM wParam) ;
 BOOL CheckGUIExtLoaded (const char *Name) ;
 
 }
+// end of namespace povwin
 
 #endif // PVGUIEXT_H_INCLUDED
-

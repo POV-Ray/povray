@@ -56,6 +56,7 @@ namespace pov_frontend
     bool MinimizeShellouts(void) { return false; } // TODO
     bool ShelloutsPermitted(void) { return false; } // TODO
 }
+// end of namespace pov_frontend
 
 
 void PrintStatus (vfeSession *session)

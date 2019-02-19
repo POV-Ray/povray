@@ -95,3 +95,4 @@ enum {
 #define RECTHEIGHT(lpRect)    ((lpRect)->bottom - (lpRect)->top)
 
 }
+// end of namespace povwin

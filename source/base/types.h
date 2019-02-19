@@ -36,13 +36,18 @@
 #ifndef POVRAY_BASE_TYPES_H
 #define POVRAY_BASE_TYPES_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
+#include "base/base_fwd.h"
 
-#include <algorithm>
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <limits>
-#include <string>
-#include <vector>
 
+// POV-Ray header files (base module)
+#include "base/pov_err.h"
 #include "base/pov_mem.h"
 
 namespace pov_base
@@ -53,23 +58,6 @@ namespace pov_base
 /// @addtogroup PovBase
 ///
 /// @{
-
-/// A macro wrapping a sequence of statements into a single one.
-///
-/// This macro is intended to be used in the definition of other macros that should behave
-/// syntactically like a single statement, while evaluating to something that would not normally
-/// behave that way.
-///
-/// Example:
-///
-///     #declare FOO(x) SINGLE_STATEMENT( char buf[128]; foo(buf,x); )
-///     ...
-///     if (some_cond)
-///         FOO(a);
-///     else
-///         ...
-///
-#define SINGLE_STATEMENT( block ) do { block } while (false)
 
 //******************************************************************************
 ///
@@ -209,44 +197,6 @@ namespace pov_base
 ///
 //******************************************************************************
 
-/// A macro that does nothing.
-///
-/// This macro is intended to be used in the definition of other macros that should behave
-/// syntactically like a single statement, while evaluating to a no-operation.
-///
-/// Example:
-///
-///     #declare MY_ASSERT(x) NO_OP
-///     ...
-///     if (some_cond)
-///         MY_ASSERT(some_test);
-///     else
-///         ...
-///
-#define NO_OP SINGLE_STATEMENT(;)
-
-/// A macro that tests an expression and, if it evaluates false, throws an exception to allow the
-/// application to fail gracefully.
-///
-#define POV_ASSERT_SOFT(expr) SINGLE_STATEMENT( if(!(expr)) throw POV_EXCEPTION_CODE(kUncategorizedError); )
-
-/// A macro that tests an expression and, if it evaluates false, causes a hard crash to generate a
-/// core dump or break to a debugger.
-///
-#define POV_ASSERT_HARD(expr) assert(expr)
-
-/// A macro that does nothing, but is mapped to standard `assert()` during static code analysis.
-///
-#ifdef STATIC_CODE_ANALYSIS
-    #define POV_ASSERT_DISABLE(expr) assert(expr)
-#else
-    #define POV_ASSERT_DISABLE(expr) NO_OP
-#endif
-
-// from <algorithm>; we don't want to always type the namespace for these.
-using std::min;
-using std::max;
-
 // from <cmath>; we don't want to always type the namespace for these.
 using std::abs;
 using std::acos;
@@ -272,11 +222,7 @@ using std::sqrt;
 using std::tan;
 using std::tanh;
 
-/// 5-dimensional vector type shared between parser and splines.
-/// @todo Make this obsolete.
-typedef DBL EXPRESS[5];
-
-struct POVRect
+struct POVRect final
 {
     unsigned int top;
     unsigned int left;
@@ -293,7 +239,7 @@ struct POVRect
 };
 
 /// Legacy (v3.5) `charset` setting.
-enum LegacyCharset
+enum LegacyCharset : int
 {
     kUnspecified,   ///< Global settings `charset` not specified.
     kASCII,         ///< Global settings `charset ascii` specified.
@@ -317,7 +263,7 @@ enum LegacyCharset
 ///     code page numbers. If you add more character sets, please stick to this scheme wherever
 ///     applicable, or use negative values.
 ///
-enum class CharsetID
+enum class CharsetID : int
 {
     kUndefined      = 0,        ///< Special value representing undefined character set.
 
@@ -331,30 +277,6 @@ enum class CharsetID
     kLegacySymbols  = -1,       ///< Special value representing legacy remapping for Microsoft symbol fonts,
                                 ///< remapping U+0000-U+00FF to U+F000-U+F0FF.
 };
-
-/// Type holding an @glossary{UTF8}-encoded string of characters.
-///
-/// @todo
-///     Aliasing this as `std::string` may not be ideal, as it creates ambiguity
-///     with the use of that same type for ASCII strings. On the other hand,
-///     if we use `std::basic_string<unsigned char>`, it isn't compatible with
-///     the C++11 `u8"..."` UTF-8 string literal notation, which is of type
-///     `const char[]`.
-///
-using UTF8String = std::string;
-
-/// Type holding an @glossary{UCS2}-encoded string of characters.
-///
-/// @todo
-///     UCS-2 is a poor choice for internal string representation, as it cannot
-///     encode the full UCS/Unicode character set; we should use either UTF-8
-///     (the best space saver for the strings to be expected), or UTF-32
-///     (allowing easiest processing). We shouldn't use UTF-16, as it needs
-///     about just as much special processing as UTF-8 (but people tend to
-///     forget that, confusing UTF-16 with UCS-2), and for the expected typical
-///     ASCII-heavy use it is less memory-efficient than UTF-8.
-///
-using UCS2String = std::basic_string<UCS2>;
 
 enum GammaMode
 {
@@ -410,5 +332,6 @@ class ThreadData
 //##############################################################################
 
 }
+// end of namespace pov_base
 
 #endif // POVRAY_BASE_TYPES_H

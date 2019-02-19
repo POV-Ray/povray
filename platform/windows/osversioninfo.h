@@ -43,7 +43,7 @@
 namespace pov_base
 {
 
-class WindowsVersionDetector
+class WindowsVersionDetector final
 {
     public:
 
@@ -74,5 +74,6 @@ class WindowsVersionDetector
 };
 
 }
+// end of namespace pov_base
 
 #endif // POVRAY_WINDOWS_OSVERSIONINFO_H

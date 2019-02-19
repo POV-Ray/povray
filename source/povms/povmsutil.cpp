@@ -74,3 +74,4 @@ int POVMSUtil_SetFormatString(POVMSObjectPtr object, POVMSType key, const char *
 }
 
 }
+// end of namespace pov

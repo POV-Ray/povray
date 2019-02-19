@@ -36,8 +36,14 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/scene/atmosphere.h"
 
-#include <algorithm>
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
 
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/material/pattern.h"
 #include "core/material/warp.h"
 #include "core/material/pigment.h"
@@ -418,7 +424,7 @@ SKYSPHERE *Copy_Skysphere(const SKYSPHERE *Old)
 
     // The standard assignment operator of SKYSPHERE has created a shallow copy of the Pigments vector, but we need a
     // deep copy in case Old gets destroyed.
-    for (vector<PIGMENT*>::iterator i = New->Pigments.begin(); i != New->Pigments.end(); ++ i)
+    for (std::vector<PIGMENT*>::iterator i = New->Pigments.begin(); i != New->Pigments.end(); ++ i)
     {
         *i = Copy_Pigment(*i);
     }
@@ -464,7 +470,7 @@ void Destroy_Skysphere(SKYSPHERE *Skysphere)
 
 Skysphere_Struct::~Skysphere_Struct()
 {
-    for (vector<PIGMENT*>::iterator i = Pigments.begin(); i != Pigments.end(); ++ i)
+    for (std::vector<PIGMENT*>::iterator i = Pigments.begin(); i != Pigments.end(); ++ i)
         delete *i;
     Destroy_Transform(Trans);
 }
@@ -634,3 +640,4 @@ void Transform_Skysphere(SKYSPHERE *Skysphere, const TRANSFORM *Trans)
 }
 
 }
+// end of namespace pov

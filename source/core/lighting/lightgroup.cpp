@@ -36,6 +36,16 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/lighting/lightgroup.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <vector>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/lighting/lightsource.h"
 #include "core/scene/object.h"
 #include "core/shape/csg.h"
@@ -45,6 +55,8 @@
 
 namespace pov
 {
+
+using std::vector;
 
 void Promote_Local_Lights_Recursive(CompoundObject *Object, vector<LightSource *>& Lights);
 
@@ -252,3 +264,4 @@ bool Check_Photon_Light_Group(ConstObjectPtr Object)
 }
 
 }
+// end of namespace pov

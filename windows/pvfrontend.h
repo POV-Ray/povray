@@ -52,5 +52,6 @@ namespace pov_frontend
   bool MinimizeShellouts(void);
   bool ShelloutsPermitted(void);
 }
+// end of namespace pov_frontend
 
 #endif

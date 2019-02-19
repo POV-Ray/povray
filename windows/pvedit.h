@@ -146,6 +146,7 @@ void EditSetKeywords (LPCSTR SDLKeywords, LPCSTR INIKeywords) ;
 const char **EditGetWindowList(void);
 
 }
+// end of namespace povwin
 
 #endif // PVEDIT_H_INCLUDED
 

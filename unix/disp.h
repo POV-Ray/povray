@@ -39,24 +39,27 @@
 #ifndef POVRAY_UNIX_DISP_H
 #define POVRAY_UNIX_DISP_H
 
+#include <memory>
+
 #include "vfe.h"
 
 namespace pov_frontend
 {
     using namespace vfe;
 
-    extern shared_ptr<Display> gDisplay;
+    extern std::shared_ptr<Display> gDisplay;
 
     class UnixDisplay : public vfeDisplay
     {
         public:
             UnixDisplay(unsigned int w, unsigned int h, vfeSession *session, bool visible) :
                 vfeDisplay(w, h, session, visible) {};
-            virtual ~UnixDisplay() {} ;
-            virtual void Initialise() = 0;
-            virtual void Close() = 0;
-            virtual void Show() = 0;
-            virtual void Hide() = 0;
+            virtual ~UnixDisplay() override {} ;
+            virtual void Initialise() override = 0;
+            virtual void Close() override = 0;
+            virtual void Show() override = 0;
+            virtual void Hide() override = 0;
+
             virtual bool TakeOver(UnixDisplay *display) = 0;
 
             /**
@@ -98,5 +101,6 @@ namespace pov_frontend
         return dynamic_cast<UnixDisplay *>(p) ;
     }
 }
+// end of namespace pov_frontend
 
 #endif // POVRAY_UNIX_DISP_H

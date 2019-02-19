@@ -58,6 +58,7 @@ DBL AVXNoise(const Vector3d& EPoint, int noise_generator);
 void AVXDNoise(Vector3d& result, const Vector3d& EPoint);
 
 }
+// end of namespace pov
 
 #endif // TRY_OPTIMIZED_NOISE_AVX
 

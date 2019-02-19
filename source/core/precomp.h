@@ -45,8 +45,9 @@
 ///     absolute minimum when precompiled headers are _not_ used.
 /// @endparblock
 
-#include "base/configbase.h"
+#include "base/configbase.h" // only pulled in for POV_MULTITHREADED
 
+// C++ variants of C standard header files
 #include <cassert>
 #include <cctype>
 #include <cfloat>
@@ -56,8 +57,8 @@
 #include <cstdlib>
 #include <cstring>
 
+// C++ standard header files
 #include <algorithm>
-#include <exception>
 #include <list>
 #include <map>
 #include <memory>
@@ -66,18 +67,8 @@
 #include <stack>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
-#include <boost/bind.hpp>
-#include <boost/format.hpp>
-#include <boost/function.hpp>
-#include <boost/functional/hash/hash.hpp>
+// Boost header files
 #include <boost/intrusive_ptr.hpp>
-#include <boost/scoped_array.hpp>
-#include <boost/scoped_ptr.hpp>
-#if POV_MULTITHREADED
-#include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
-#endif
-#include <boost/unordered_map.hpp>
-

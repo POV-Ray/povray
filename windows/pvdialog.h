@@ -53,5 +53,6 @@ INT_PTR CALLBACK RenderAlternativeFileDialogProc (HWND hDlg, UINT message, WPARA
 void FeatureNotify (const char *labelStr, const char *titleStr, const char *textStr, const char *helpStr, bool checked) ;
 
 }
+// end of namespace povwin
 
 #endif // PVDIALOG_H_INCLUDED

@@ -54,11 +54,9 @@ std::string VideoSourceName;
 namespace povwin
 {
 
-using namespace pov;
-
 // this code has been stubbed out: need to re-implement
 
-size_t GetVideoSourceNames(vector<std::string>& result)
+size_t GetVideoSourceNames(std::vector<std::string>& result)
 {
   return 0;
 }
@@ -77,5 +75,6 @@ void NextFrame(void)
 }
 
 }
+// end of namespace povwin
 
 #endif

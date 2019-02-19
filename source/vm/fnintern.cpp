@@ -40,11 +40,18 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "vm/fnintern.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <algorithm>
 
+// POV-Ray header files (base module)
 #include "base/mathutil.h"
 
+// POV-Ray header files (core module)
 #include "core/material/noise.h"
+#include "core/material/pattern.h"
 #include "core/material/pigment.h"
 #include "core/material/warp.h"
 #include "core/math/matrix.h"
@@ -52,6 +59,7 @@
 #include "core/scene/scenedata.h"
 #include "core/scene/tracethreaddata.h"
 
+// POV-Ray header files (VM module)
 #include "vm/fnpovfpu.h"
 
 // this must be the last file included
@@ -59,6 +67,9 @@
 
 namespace pov
 {
+
+using std::max;
+using std::min;
 
 /*****************************************************************************
 * Local preprocessor defines
@@ -1291,3 +1302,4 @@ void f_spline(FPUContext *ctx, DBL *ptr, unsigned int fn, unsigned int sp) // 2
 }
 
 }
+// end of namespace pov

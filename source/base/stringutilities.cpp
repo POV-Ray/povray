@@ -36,7 +36,7 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "stringutilities.h"
 
-// C++ variants of standard C header files
+// C++ variants of C standard header files
 #include <cctype>
 #include <cstdarg>
 #include <cstdio>
@@ -49,20 +49,36 @@
 // Boost header files
 //  (none at the moment)
 
+// POV-Ray header files (base module)
+#include "base/types.h"
+
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov_base
 {
 
-UCS2String ASCIItoUCS2String(const char *s)
+UCS2String ASCIItoUCS2String(const std::string& s)
+{
+    UCS2String r;
+    r.reserve(s.length());
+
+    for(std::size_t i = 0; i < s.length(); i++)
+    {
+        r += (UCS2)(s[i]);
+    }
+
+    return r;
+}
+
+UCS2String SysToUCS2String(const char *s)
 {
     UCS2String r;
     unsigned char ch;
 
     if (s != nullptr)
     {
-        while(*s != 0)
+        while(*s != u'\0')
         {
             ch = *s++;
             r += (UCS2)(ch);
@@ -72,14 +88,27 @@ UCS2String ASCIItoUCS2String(const char *s)
     return r;
 }
 
-std::string UCS2toASCIIString(const UCS2String& s)
+UCS2String SysToUCS2String(const std::string& s)
+{
+    UCS2String r;
+    r.reserve(s.length());
+
+    for(std::size_t i = 0; i < s.length(); i++)
+    {
+        r += (UCS2)(s[i]);
+    }
+
+    return r;
+}
+
+std::string UCS2toSysString(const UCS2String& s)
 {
     std::string r;
     r.reserve(s.length());
 
     for(std::size_t i = 0; i < s.length(); i++)
     {
-        if(s[i] >= 256)
+        if(s[i] > 0xFFu)
             r += ' '; // TODO - according to most encoding conventions, this should be '?'
         else
             r += (char)(s[i]);
@@ -201,13 +230,13 @@ int pov_stricmp(const char *s1, const char *s2)
 {
     char c1, c2;
 
-    while((*s1 != 0) && (*s2 != 0))
+    while((*s1 != '\0') && (*s2 != '\0'))
     {
         c1 = *s1++;
         c2 = *s2++;
 
-        c1 = (char)toupper(c1);
-        c2 = (char)toupper(c2);
+        c1 = (char)std::toupper(c1);
+        c2 = (char)std::toupper(c2);
 
         if(c1 < c2)
             return -1;
@@ -215,9 +244,9 @@ int pov_stricmp(const char *s1, const char *s2)
             return 1;
     }
 
-    if(*s1 == 0)
+    if(*s1 == '\0')
     {
-        if(*s2 == 0)
+        if(*s2 == '\0')
             return 0;
         else
             return -1;
@@ -275,6 +304,21 @@ std::size_t UCS2_strlen(const UCS2* str)
     while (*end != u'\0')
         ++end;
     return (end - str);
+}
+
+//------------------------------------------------------------------------------
+
+int UCS2_strcmp(const UCS2 *s1, const UCS2 *s2)
+{
+    UCS2 t1, t2;
+
+    while ((t1 = *s1++) == (t2 = *s2++))
+    {
+        if (t1 == '\0')
+            return 0;
+    }
+
+    return (t1 - t2);
 }
 
 //******************************************************************************
@@ -394,7 +438,7 @@ struct CharsetUCS4 final : public CharsetUCS4Subset
     }
 };
 
-static const CharsetUCS4 kCharsetUCS4;
+static const auto kCharsetUCS4 = CharsetUCS4();
 
 //------------------------------------------------------------------------------
 
@@ -415,7 +459,7 @@ struct CharsetUCS2 final : public CharsetUCS4Subset
     }
 };
 
-static const CharsetUCS2 kCharsetUCS2;
+static const auto kCharsetUCS2 = CharsetUCS2();
 
 //------------------------------------------------------------------------------
 
@@ -436,7 +480,7 @@ struct CharsetLatin1 final : public CharsetUCS4Subset
     }
 };
 
-static const CharsetLatin1 kCharsetLatin1;
+static const auto kCharsetLatin1 = CharsetLatin1();
 
 //------------------------------------------------------------------------------
 
@@ -457,7 +501,7 @@ struct CharsetASCII final : public CharsetUCS4Subset
     }
 };
 
-static const CharsetASCII kCharsetASCII;
+static const auto kCharsetASCII = CharsetASCII();
 
 //------------------------------------------------------------------------------
 
@@ -468,8 +512,8 @@ struct CharsetExtendedASCII final : public Charset
         int i = 0;
         for (UCS4 c : highCharacters)
             mHighCharacters[i++] = c;
-        while (i < kNumNonASCIICharacters)
-            mHighCharacters[i++] = kFirstNonASCIICharacter + i;
+        for (; i < kNumNonASCIICharacters; ++i)
+            mHighCharacters[i] = kFirstNonASCIICharacter + i;
     }
 
     virtual bool Encode(POV_UINT32& result, UCS4 character) const override
@@ -618,4 +662,5 @@ const Charset* Charset::Get(CharsetID charset)
     }
 }
 
-} // end of namespace pov_base
+}
+// end of namespace pov_base

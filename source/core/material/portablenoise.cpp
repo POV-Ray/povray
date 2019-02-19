@@ -46,6 +46,14 @@
 #include "core/material/portablenoise.h"
 #endif // PORTABLE_OPTIMIZED_NOISE
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/material/noise.h"
 
 namespace pov
@@ -370,3 +378,4 @@ void PortableDNoise(Vector3d& result, const Vector3d& EPoint)
 }
 
 }
+// end of namespace pov

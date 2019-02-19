@@ -36,13 +36,22 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/console.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+// POV-Ray header files (POVMS module)
+// POV-Ray header files (frontend module)
+//  (none at the moment)
+
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov_frontend
 {
 
-Console::Console(unsigned int wrapwidth) : TextStreamBuffer(1024*8, wrapwidth)
+Console::Console(unsigned int wrapwidth) : pov_base::TextStreamBuffer(1024*8, wrapwidth)
 {
     // nothing to do
 }
@@ -54,7 +63,8 @@ Console::~Console()
 
 void Console::lineoutput(const char *str, unsigned int chars)
 {
-    Output(string(str, chars));
+    Output(std::string(str, chars));
 }
 
 }
+// end of namespace pov_frontend

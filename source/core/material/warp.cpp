@@ -39,8 +39,14 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/material/warp.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
 
+// POV-Ray header files (core module)
 #include "core/material/noise.h"
 #include "core/material/pattern.h"
 #include "core/material/texture.h"
@@ -687,3 +693,4 @@ void Copy_Warps (WarpList& rNew, const WarpList& old)
 }
 
 }
+// end of namespace pov

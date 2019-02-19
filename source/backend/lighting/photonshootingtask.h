@@ -33,26 +33,32 @@
 ///
 //******************************************************************************
 
-#ifndef PHOTONSHOOTINGTASK_H
-#define PHOTONSHOOTINGTASK_H
+#ifndef POVRAY_BACKEND_PHOTONSHOOTINGTASK_H
+#define POVRAY_BACKEND_PHOTONSHOOTINGTASK_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "backend/configbackend.h"
+
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
+#include "core/core_fwd.h"
 #include "core/lighting/photons.h"
 #include "core/render/trace.h"
 
-#include "backend/frame.h"
+// POV-Ray header files (backend module)
+#include "backend/lighting/photonshootingstrategy_fwd.h"
 #include "backend/render/rendertask.h"
 
 namespace pov
 {
 
-using namespace pov_base;
-
-class LightSource;
-class LightTargetCombo;
-class PhotonMap;
-class PhotonShootingStrategy;
-
-class PhotonShootingTask : public RenderTask
+class PhotonShootingTask final : public RenderTask
 {
     public:
         PhotonTrace trace;
@@ -64,11 +70,11 @@ class PhotonShootingTask : public RenderTask
         RandomDoubleSequence::Generator randgen;
 
         PhotonShootingTask(ViewData *vd, PhotonShootingStrategy* strategy, size_t seed);
-        ~PhotonShootingTask();
+        virtual ~PhotonShootingTask() override;
 
-        void Run();
-        void Stopped();
-        void Finish();
+        virtual void Run() override;
+        virtual void Stopped() override;
+        virtual void Finish() override;
 
         void SendProgress();
 
@@ -78,11 +84,11 @@ class PhotonShootingTask : public RenderTask
         PhotonMap* getMediaPhotonMap();
         PhotonMap* getSurfacePhotonMap();
     private:
-        class CooperateFunction : public Trace::CooperateFunctor
+        class CooperateFunction final : public Trace::CooperateFunctor
         {
             public:
                 CooperateFunction(Task& t) : task(t) { }
-                virtual void operator()() { task.Cooperate(); }
+                virtual void operator()() override { task.Cooperate(); }
             private:
                 Task& task;
         };
@@ -93,6 +99,7 @@ class PhotonShootingTask : public RenderTask
         DBL adcBailout;
 };
 
-
 }
-#endif
+// end of namespace pov
+
+#endif // POVRAY_BACKEND_PHOTONSHOOTINGTASK_H

@@ -36,6 +36,15 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/display.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+// POV-Ray header files (POVMS module)
+// POV-Ray header files (frontend module)
+//  (none at the moment)
+
 // this must be the last file included
 #include "base/povdebug.h"
 
@@ -105,3 +114,4 @@ void Display::Clear()
 }
 
 }
+// end of namespace pov_frontend

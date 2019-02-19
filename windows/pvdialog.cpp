@@ -979,3 +979,4 @@ void FeatureNotify (const char *labelStr, const char *titleStr, const char *text
 }
 
 }
+// end of namespace povwin

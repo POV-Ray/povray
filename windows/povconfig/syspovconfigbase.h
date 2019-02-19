@@ -49,12 +49,19 @@
 #endif
 
 // Windows provides a platform-specific mechanism to let a task wait for a specified time.
-#define POV_USE_DEFAULT_DELAY 0
+// However, the C++11 standard mechanism should be fine.
+#define POV_USE_PLATFORM_DELAY 0
 
 // Windows provides platform-specific mechanisms to measure both wall-clock and CPU time.
 #define POV_USE_DEFAULT_TIMER 0
 
 // Windows requires platform-specific parsing of path name strings.
 #define POV_USE_DEFAULT_PATH_PARSER 0
+
+// Windows requires a platform-specific function to delete a file.
+#define POV_USE_DEFAULT_DELETEFILE 0
+
+// Windows gets a platform-specific implementation of large file handling.
+#define POV_USE_DEFAULT_LARGEFILE 0
 
 #endif // POVRAY_WINDOWS_SYSPOVCONFIGBASE_H

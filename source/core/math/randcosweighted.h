@@ -45,6 +45,14 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/coretypes.h"
 
 namespace pov
@@ -66,7 +74,7 @@ namespace pov
 ///
 /// @{
 
-struct BYTE_XYZ
+struct BYTE_XYZ final
 {
     unsigned char x, y, z;
 };
@@ -92,5 +100,6 @@ inline void VUnpack(Vector3d& dest_vec, const BYTE_XYZ * pack_vec)
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_RANDCOSWEIGHTED_H

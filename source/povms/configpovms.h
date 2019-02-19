@@ -44,6 +44,7 @@
     #error "povms.c must be compiled as a C++ file when used as part of the POV-Ray project."
 #endif
 
+// Pull in other compile-time config header files first
 #include "base/configbase.h"
 #include "syspovconfigpovms.h"
 
@@ -83,7 +84,7 @@
 #endif
 
 #ifndef POVMSUCS2
-    #define POVMSUCS2               UCS2
+    #define POVMSUCS2               char16_t
 #endif
 
 #ifndef kDefaultTimeout

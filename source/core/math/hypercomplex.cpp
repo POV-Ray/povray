@@ -38,6 +38,14 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/math/hypercomplex.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/shape/fractal.h" // TODO - Where should hcmplx.h/hcmplx.cpp go? Are they really math? [trf]
 #include "core/shape/sphere.h" // TODO - Move sphere intersection function to math code! [trf]
 
@@ -1338,3 +1346,4 @@ void Complex_Pwr (Complex *target, const Complex *source1, const Complex *source
 }
 
 }
+// end of namespace pov

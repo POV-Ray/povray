@@ -34,12 +34,21 @@
 ///
 //******************************************************************************
 
-#include <cstdio>
-
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "backend/control/benchmark.h"
 
+// C++ variants of C standard header files
+#include <cstdio>
+
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+// POV-Ray header files (core module)
+// POV-Ray header files (POVMS module)
+//  (none at the moment)
+
+// POV-Ray header files (backend module)
 #include "backend/control/benchmark_ini.h"
 #include "backend/control/benchmark_pov.h"
 
@@ -78,4 +87,4 @@ unsigned int Get_Benchmark_Version (void)
 }
 
 }
-
+// end of namespace pov

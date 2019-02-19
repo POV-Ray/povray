@@ -36,11 +36,15 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/messenger.h"
 
-// C++ variants of standard C header files
+// C++ variants of C standard header files
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
 
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
 
 // this must be the last file included
@@ -421,3 +425,4 @@ void GenericMessenger::CleanupString(char *str)
 }
 
 }
+// end of namespace pov_base

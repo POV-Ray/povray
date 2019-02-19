@@ -1831,3 +1831,4 @@ DWORD PASCAL MyWrite(int iFileHandle, VOID *lpBuffer, DWORD dwBytes)
 }
 
 }
+// end of namespace povwin

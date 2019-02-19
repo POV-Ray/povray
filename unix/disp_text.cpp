@@ -65,3 +65,4 @@ namespace pov_frontend
         //fprintf(stderr, "DrawPixel(%d,%d)\n", x, y);
     }
 }
+// end of namespace pov_frontend

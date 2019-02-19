@@ -36,6 +36,14 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/lighting/lightsource.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
 #include "core/scene/object.h"
@@ -657,3 +665,4 @@ void LightSource::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThre
 }
 
 }
+// end of namespace pov

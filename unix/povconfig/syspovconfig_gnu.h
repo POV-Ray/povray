@@ -39,11 +39,12 @@
 #ifndef POVRAY_UNIX_SYSPOVCONFIG_GNU_H
 #define POVRAY_UNIX_SYSPOVCONFIG_GNU_H
 
-#include <unistd.h>
+#include <sys/types.h>  // Pulled in for `off64_t`.
+#include <unistd.h>     // Pulled in for `_POSIX_V6_xxx`.
 
-// GNU/Linux provides large file support via the `lseek64` function,
-// with file offsets having type `off64_t`.
-#define POV_LSEEK(handle,offset,whence) lseek64(handle,offset,whence)
+// GNU/Linux provides large file support on all machines, via the `lseek64`
+// function and `off64_t` type. (Requires `#define _FILE_OFFSET_BITS 64`.)
+#define POVUNIX_LSEEK64(h,o,w) lseek64(h,o,w)
 #define POV_OFF_T off64_t
 
 #if defined(_POSIX_V6_LPBIG_OFFBIG) || defined(_POSIX_V6_LP64_OFF64)
@@ -60,6 +61,5 @@
 #define POV_ULONG unsigned POV_LONG
 
 #define MACHINE_INTRINSICS_H <x86intrin.h>
-#define ALIGN32 __attribute__ ((aligned(32)))
 
 #endif // POVRAY_UNIX_SYSPOVCONFIG_GNU_H

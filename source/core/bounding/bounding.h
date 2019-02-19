@@ -39,6 +39,14 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+// POV-Ray header files (core module)
+//  (none at the moment)
+
 namespace pov
 {
 
@@ -56,5 +64,6 @@ namespace pov
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_BOUNDING_H

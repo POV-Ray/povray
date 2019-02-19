@@ -47,7 +47,7 @@ namespace pov_frontend
     using namespace vfe;
     using namespace vfePlatform;
 
-    class UnixTextDisplay : public UnixDisplay
+    class UnixTextDisplay final : public UnixDisplay
     {
         public:
             static const UnixOptionsProcessor::Option_Info Options[];
@@ -55,19 +55,20 @@ namespace pov_frontend
 
             UnixTextDisplay(unsigned int w, unsigned int h, vfeSession *session, bool visible) :
                 UnixDisplay(w, h, session, visible) {};
-            virtual ~UnixTextDisplay() {} ;
-            void Initialise() {};
-            void Close() {};
-            void Show() {};
-            void Hide() {};
-            bool TakeOver(UnixDisplay *display) { return false; };
-            void DrawPixel(unsigned int x, unsigned int y, const RGBA8& colour);
-            bool HandleEvents() { return false; };
-            void UpdateScreen(bool Force = false) {};
-            void PauseWhenDoneNotifyStart() {};
-            bool PauseWhenDoneResumeIsRequested() { return true; };
-            void PauseWhenDoneNotifyEnd() {};
+            virtual ~UnixTextDisplay() override {} ;
+            virtual void Initialise() override {};
+            virtual void Close() override {};
+            virtual void Show() override {};
+            virtual void Hide() override {};
+            virtual bool TakeOver(UnixDisplay *display) override { return false; };
+            virtual void DrawPixel(unsigned int x, unsigned int y, const RGBA8& colour) override;
+            virtual bool HandleEvents() override { return false; };
+            virtual void UpdateScreen(bool Force = false) override {};
+            virtual void PauseWhenDoneNotifyStart() override {};
+            virtual bool PauseWhenDoneResumeIsRequested() override { return true; };
+            virtual void PauseWhenDoneNotifyEnd() override {};
     };
 }
+// end of namespace pov_frontend
 
 #endif // POVRAY_UNIX_DISP_TEXT_H

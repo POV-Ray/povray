@@ -36,11 +36,19 @@
 #ifndef POVRAY_BACKEND_MESSAGEFACTORY_H
 #define POVRAY_BACKEND_MESSAGEFACTORY_H
 
-#include "povms/povmscpp.h"
-#include "povms/povmsid.h"
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "backend/configbackend.h"
+#include "backend/control/messagefactory_fwd.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+#include "base/stringtypes.h"
 #include "base/messenger.h"
 
+// POV-Ray header files (backend module)
 #include "backend/control/renderbackend.h"
 
 namespace pov
@@ -48,12 +56,12 @@ namespace pov
 
 using namespace pov_base;
 
-class MessageFactory : public GenericMessenger
+class MessageFactory final : public GenericMessenger
 {
     public:
 
         MessageFactory(unsigned int wl, const char *sn, POVMSAddress saddr, POVMSAddress daddr, RenderBackend::SceneId sid, RenderBackend::ViewId vid);
-        virtual ~MessageFactory();
+        virtual ~MessageFactory() override;
 
     private:
 
@@ -67,5 +75,6 @@ class MessageFactory : public GenericMessenger
 };
 
 }
+// end of namespace pov
 
 #endif // POVRAY_BACKEND_MESSAGEFACTORY_H

@@ -36,14 +36,20 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/scene/scenedata.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <sstream>
 
-#include <boost/bind.hpp>
-
+// POV-Ray header files (base module)
+#include "base/types.h"
 #include "base/version_info.h"
+#include "base/image/colourspace.h"
 
-#include "core/material/pattern.h"
+// POV-Ray header files (core module)
 #include "core/material/noise.h"
+#include "core/material/pattern.h"
 #include "core/scene/atmosphere.h"
 
 // this must be the last file included
@@ -120,7 +126,7 @@ SceneData::~SceneData()
     }
     if (boundingSlabs != nullptr)
         Destroy_BBox_Tree(boundingSlabs);
-    for (vector<TrueTypeFont*>::iterator i = TTFonts.begin(); i != TTFonts.end(); ++i)
+    for (std::vector<TrueTypeFont*>::iterator i = TTFonts.begin(); i != TTFonts.end(); ++i)
         delete *i;
     // TODO: perhaps ObjectBase::~ObjectBase would be a better place
     //       to handle cleanup of individual objects ?
@@ -131,3 +137,4 @@ SceneData::~SceneData()
 }
 
 }
+// end of namespace pov

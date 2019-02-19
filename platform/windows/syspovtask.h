@@ -46,5 +46,6 @@ namespace pov
 // Currently there are no Windows-specific declarations.
 
 }
+// end of namespace pov
 
 #endif // POVRAY_WINDOWS_SYSPOVTASK_H

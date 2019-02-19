@@ -50,10 +50,4 @@
 #define POV_USE_DEFAULT_TASK_INITIALIZE 1
 #define POV_USE_DEFAULT_TASK_CLEANUP    1
 
-// Linux machines appear to need more stack storage than the default.
-// Note that we leave this setting configurable via `-DPOV_THREAD_STACK_SIZE=...`.
-#ifndef POV_THREAD_STACK_SIZE
-    #define POV_THREAD_STACK_SIZE (4 * 1024 * 1024) // 4 MiB
-#endif
-
 #endif // POVRAY_UNIX_SYSPOVCONFIGBACKEND_H

@@ -38,6 +38,7 @@
 #ifndef POVRAY_PARSER_CONFIGPARSER_H
 #define POVRAY_PARSER_CONFIGPARSER_H
 
+// Pull in other compile-time config header files first
 #include "core/configcore.h"
 #include "syspovconfigparser.h"
 

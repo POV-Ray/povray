@@ -35,7 +35,6 @@
 ///
 //******************************************************************************
 
-#include "backend/frame.h"
 #include "vfe.h"
 
 // this must be the last file included
@@ -106,3 +105,4 @@ void vfeDisplay::Clear()
 }
 
 }
+// end of namespace vfe

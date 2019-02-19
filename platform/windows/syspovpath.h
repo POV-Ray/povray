@@ -46,5 +46,6 @@ namespace pov_base
 // Currently there are no Windows-specific declarations.
 
 }
+// end of namespace pov_base
 
 #endif // POVRAY_WINDOWS_SYSPOVPATH_H

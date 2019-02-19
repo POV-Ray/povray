@@ -38,8 +38,13 @@
 
 // C++ variants of C standard header files
 // C++ standard header files
-// Boost header files
+
 // POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
+#include "base/povassert.h"
+#include "base/stringutilities.h"
+
+// POV-Ray header files (core module)
 //  (none at the moment)
 
 // POV-Ray header files (parser module)
@@ -64,6 +69,13 @@ static int HexDigitToInt(UTF8String::value_type c)
 static bool IsUCS4ScalarValue(UCS4 c)
 {
     return (c <= 0x10FFFFu) && ((c < 0xD800u) || (c > 0xDFFFu));
+}
+
+//******************************************************************************
+
+void AmbiguousStringValue::InvalidEscapeSequenceInfo::Throw() const
+{
+    throw InvalidEscapeSequenceException(stream->Name(), position, text);
 }
 
 //******************************************************************************
@@ -96,11 +108,11 @@ RawTokenizer::RawTokenizer() :
             continue;
         if (strchr(i->Token_Name, ' ') != nullptr)
             continue;
-        KnownWordInfo& knownWord = mKnownWords[i->Token_Name];
-        knownWord.id = i->Token_Number;
-        knownWord.expressionId = GetExpressionId(i->Token_Number);
-        knownWord.isReservedWord = true;
-        knownWord.isPseudoIdentifier = ((knownWord.id == GLOBAL_TOKEN) || (knownWord.id == LOCAL_TOKEN));
+        KnownWordInfo& knownWord        = mKnownWords[i->Token_Name];
+        knownWord.id                    = i->Token_Number;
+        knownWord.expressionId          = GetCategorizedTokenId(i->Token_Number);
+        knownWord.isReservedWord        = true;
+        knownWord.isPseudoIdentifier    = ((knownWord.id == GLOBAL_TOKEN) || (knownWord.id == LOCAL_TOKEN));
     }
 }
 
@@ -179,7 +191,7 @@ bool RawTokenizer::ProcessFloatLiteralLexeme(RawToken& token)
     POV_PARSER_ASSERT(token.lexeme.category == Lexeme::kFloatLiteral);
 
     token.id = int(FLOAT_TOKEN);
-    token.expressionId = FLOAT_FUNCT_TOKEN;
+    token.expressionId = FLOAT_TOKEN_CATEGORY;
 
     if (sscanf(token.lexeme.text.c_str(), POV_DBL_FORMAT_STRING, &token.floatValue) == 0)
         return false;
@@ -200,8 +212,8 @@ bool RawTokenizer::ProcessStringLiteralLexeme(RawToken& token)
     token.id = int(STRING_LITERAL_TOKEN);
     token.expressionId = STRING_LITERAL_TOKEN;
 
-    shared_ptr<StringValue> pValue(std::make_shared<StringValue>());
-    shared_ptr<AmbiguousStringValue> pAmbiguousValue;
+    std::shared_ptr<StringValue> pValue(std::make_shared<StringValue>());
+    std::shared_ptr<AmbiguousStringValue> pAmbiguousValue;
     UCS4 c;
 
     pValue->data.reserve(token.lexeme.text.size() - 2);
@@ -395,11 +407,13 @@ bool RawTokenizer::ProcessOtherLexeme(RawToken& token)
     else
         POV_PARSER_PANIC(); // Should not have been produced by scanner.
 
-    token.id = int(tokenId);
-    token.expressionId = GetExpressionId(tokenId);
-    token.value = nullptr;
-    token.isReservedWord = false;
-    token.isPseudoIdentifier = false;
+    token.id                    = int(tokenId);
+    token.expressionId          = tokenId;
+    token.value                 = nullptr;
+    token.isReservedWord        = false;
+    token.isPseudoIdentifier    = false;
+
+    POV_EXPERIMENTAL_ASSERT(GetCategorizedTokenId(tokenId) == tokenId);
 
     return true;
 }
@@ -416,27 +430,13 @@ bool RawTokenizer::ProcessSignatureLexeme(RawToken& token)
         default:                        POV_PARSER_PANIC();             break;
     }
 
-    token.id = int(tokenId);
-    token.expressionId = GetExpressionId(tokenId);
-    token.value = nullptr;
-    token.isReservedWord = false;
-    token.isPseudoIdentifier = false;
+    token.id                    = int(tokenId);
+    token.expressionId          = SIGNATURE_TOKEN_CATEGORY;
+    token.value                 = nullptr;
+    token.isReservedWord        = false;
+    token.isPseudoIdentifier    = false;
 
     return true;
-}
-
-TokenId pov_parser::RawTokenizer::GetExpressionId(TokenId tokenId)
-{
-    if (tokenId <= SIGNATURE_FUNCT_TOKEN)
-        return SIGNATURE_FUNCT_TOKEN;
-    else if (tokenId <= FLOAT_FUNCT_TOKEN)
-        return FLOAT_FUNCT_TOKEN;
-    else if (tokenId <= VECTOR_FUNCT_TOKEN)
-        return VECTOR_FUNCT_TOKEN;
-    else if (tokenId <= COLOUR_KEY_TOKEN)
-        return COLOUR_KEY_TOKEN;
-    else
-        return tokenId;
 }
 
 //------------------------------------------------------------------------------
@@ -479,3 +479,4 @@ bool RawTokenizer::GoToBookmark(const ColdBookmark& bookmark)
 }
 
 }
+// end of namespace pov_parser

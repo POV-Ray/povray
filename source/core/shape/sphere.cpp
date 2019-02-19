@@ -36,10 +36,19 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/sphere.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -608,48 +617,6 @@ void Sphere::Transform(const TRANSFORM *tr)
 *
 * FUNCTION
 *
-*   Destroy_Sphere
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   ?
-*
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-Sphere::~Sphere()
-{
-#if(DUMP_OBJECT_DATA == 1)
-    Debug_Info("{ // SPHERE \n");
-    DUMP_OBJECT_FIELDS(this);
-    Debug_Info("\t{ %f, %f, %f }, // Center\n", \
-               (DBL)Center[X],  \
-               (DBL)Center[Y],  \
-               (DBL)Center[Z]); \
-    Debug_Info("\t%f // Radius\n", (DBL)Radius);
-    Debug_Info("}\n");
-#endif
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
 *   Compute_Sphere_BBox
 *
 * INPUT
@@ -789,3 +756,4 @@ bool Sphere::Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector
 }
 
 }
+// end of namespace pov

@@ -98,22 +98,33 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/sor.h"
 
-#include <algorithm>
+// C++ variants of C standard header files
+//  (none at the moment)
 
+// C++ standard header files
+#include <algorithm>
+#include <vector>
+
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
 
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/bounding/boundingcylinder.h"
 #include "core/math/matrix.h"
 #include "core/math/polynomialsolver.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov
 {
+
+using std::min;
+using std::max;
 
 /*****************************************************************************
 * Local preprocessor defines
@@ -336,9 +347,9 @@ bool Sor::Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *T
     }
 
     /* Intersect all cylindrical bounds. */
-    vector<BCYL_INT>& intervals = Thread->BCyl_Intervals;
-    vector<BCYL_INT>& rint = Thread->BCyl_RInt;
-    vector<BCYL_INT>& hint = Thread->BCyl_HInt;
+    std::vector<BCYL_INT>& intervals = Thread->BCyl_Intervals;
+    std::vector<BCYL_INT>& rint = Thread->BCyl_RInt;
+    std::vector<BCYL_INT>& hint = Thread->BCyl_HInt;
 
     if ((cnt = Intersect_BCyl(Spline->BCyl, intervals, rint, hint, P, D)) == 0)
     {
@@ -1302,3 +1313,4 @@ void Sor::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *
 }
 
 }
+// end of namespace pov

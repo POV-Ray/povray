@@ -587,9 +587,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="boost_system.vcxproj">
-      <Project>{d870a978-8130-4d1d-9fb2-3ee2028d2c50}</Project>
-    </ProjectReference>
     <ProjectReference Include="openexr_eLut.vcxproj">
       <Project>{39c65232-04fb-4622-8283-34829739887c}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
@@ -602,9 +599,6 @@
     </ProjectReference>
     <ProjectReference Include="openexr_IlmImf.vcxproj">
       <Project>{7df42126-d237-41d3-9abe-a3acc8bac56e}</Project>
-    </ProjectReference>
-    <ProjectReference Include="boost_thread.vcxproj">
-      <Project>{10b193d4-e27b-4438-a825-bfb3d2b4c74d}</Project>
     </ProjectReference>
     <ProjectReference Include="openexr_Half.vcxproj">
       <Project>{9edb5c0f-bfd0-4a59-bb93-f06a52bb0128}</Project>

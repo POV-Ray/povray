@@ -36,9 +36,15 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/pov_err.h"
 
-// C++ variants of standard C header files
+// C++ variants of C standard header files
 #include <cstdio>
 #include <cstring>
+
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -183,3 +189,4 @@ std::string Exception::lookup_code(int err, const char *file, unsigned int line)
 }
 
 }
+// end of namespace pov_base

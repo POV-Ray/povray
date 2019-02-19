@@ -42,9 +42,9 @@
 namespace pov_base
 {
 
-void Delay(unsigned int msec);
+#if !POV_USE_DEFAULT_TIMER
 
-class Timer
+class Timer final
 {
     public:
         Timer();
@@ -72,6 +72,9 @@ class Timer
         POV_ULONG GetProcessTime () const;
 };
 
+#endif // POV_USE_DEFAULT_TIMER
+
 }
+// end of namespace pov_base
 
 #endif // POVRAY_WINDOWS_SYSPOVTIMER_H

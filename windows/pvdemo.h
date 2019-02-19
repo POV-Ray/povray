@@ -426,3 +426,4 @@ char *povdemo_ini [] =
 } ;
 
 }
+// end of namespace povwin

@@ -33,9 +33,17 @@
 ///
 //******************************************************************************
 
-// Module config header file must be the first file included within POV-Ray unit header files
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/bounding/boundingcylinder.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/coretypes.h"
 
 // this must be the last file included
@@ -43,6 +51,8 @@
 
 namespace pov
 {
+
+using std::vector;
 
 /*****************************************************************************
 * Local preprocessor defines
@@ -711,3 +721,4 @@ void Destroy_BCyl(BCYL *BCyl)
 }
 
 }
+// end of namespace pov

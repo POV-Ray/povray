@@ -36,6 +36,17 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/rendermessagehandler.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <sstream>
+
+// POV-Ray header files (base module)
+// POV-Ray header files (POVMS module)
+//  (none at the moment)
+
+// POV-Ray header files (frontend module)
 #include "frontend/renderfrontend.h"
 
 // this must be the last file included
@@ -192,3 +203,4 @@ void RenderMessageHandler::FatalError(Console *console, POVMS_Object& obj, bool 
 }
 
 }
+// end of namespace pov_frontend

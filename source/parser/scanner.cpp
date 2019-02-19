@@ -45,12 +45,13 @@
 #include <initializer_list>
 #include <limits>
 
-// Boost header files
-//  (none at the moment)
-
 // POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
+#include "base/povassert.h"
+#include "base/stringutilities.h"
 #include "base/textstream.h"
 
+// POV-Ray header files (core module)
 // POV-Ray header files (parser module)
 //  (none at the moment)
 
@@ -557,6 +558,13 @@ static bool IsASCIIIdentifierChar2(Scanner::Character c)
 {
     return IsASCIIIdentifierChar1(c) ||
            IsDecimalDigit(c);
+}
+
+//******************************************************************************
+
+UCS2String Scanner::HotBookmark::GetFileName() const
+{
+    return pStream->Name();
 }
 
 //******************************************************************************
@@ -1469,4 +1477,5 @@ bool Scanner::IsNextCharacterIdentifierChar2() const
 
 //------------------------------------------------------------------------------
 
-} // end of namespace pov_parser
+}
+// end of namespace pov_parser

@@ -37,7 +37,7 @@
 #ifndef POV_POVMSUTIL_H
 #define POV_POVMSUTIL_H
 
-#include "povms/povms.h"
+#include "povms/povms.h" // pulls in config
 
 namespace pov
 {
@@ -48,5 +48,6 @@ int Send_Progress(const char *statusString, int progressState);
 int Send_ProgressUpdate(int progressState, int timeDiff = 1);
 
 }
+// end of namespace pov
 
 #endif // POV_POVMSUTIL_H

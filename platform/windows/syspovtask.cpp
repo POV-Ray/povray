@@ -52,6 +52,7 @@ void WinMemThreadStartup();
 void WinMemThreadCleanup();
 
 }
+// end of namespace povwin
 
 #endif
 
@@ -75,6 +76,7 @@ static unsigned int GetNumberofCPUs (void)
 }
 
 }
+// end of namespace vfeplatform
 
 
 namespace pov
@@ -116,3 +118,4 @@ void Task::Cleanup ()
 //******************************************************************************
 
 }
+// end of namespace pov

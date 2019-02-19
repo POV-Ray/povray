@@ -44,15 +44,15 @@
 
 // C++ standard header files
 #include <initializer_list>
-#include <map>
-
-// Boost header files
-//  (none at the moment)
+#include <memory>
 
 // POV-Ray header files (base module)
-#include "base/messenger.h"
-#include "base/types.h"
-#include "base/textstream.h"
+#include "base/messenger_fwd.h"
+#include "base/stringtypes.h"
+#include "base/textstream_fwd.h"
+
+// POV-Ray header files (core module)
+//  (none at the moment)
 
 // POV-Ray header files (parser module)
 #include "parser/parsertypes.h"
@@ -68,7 +68,7 @@ struct CharacterEncoding;
 
 //******************************************************************************
 
-struct Lexeme
+struct Lexeme final
 {
     enum Category : unsigned char
     {
@@ -116,7 +116,7 @@ struct Lexeme
 ///       - Single octets in the range 0x00 0x7F must always encode the
 ///         corresponding ASCII character.
 ///
-class Scanner
+class Scanner final
 {
 public:
 
@@ -143,18 +143,18 @@ public:
     };
 
     /// Structure representing an open input stream and a rewindable position.
-    struct HotBookmark : Bookmark
+    struct HotBookmark final : Bookmark
     {
         StreamPtr           pStream;
         HotBookmark() = default;
         HotBookmark(const StreamPtr& s, const LexemePosition& lp, CharacterEncodingPtr se, Character neol, bool anbc) :
             Bookmark(lp, se, neol, anbc), pStream(s)
         {}
-        virtual UCS2String GetFileName() const override { return pStream->Name(); }
+        virtual UCS2String GetFileName() const override;
     };
 
     /// Structure representing an input stream name and a rewindable position.
-    struct ColdBookmark : Bookmark
+    struct ColdBookmark final : Bookmark
     {
         UCS2String          fileName;
         ColdBookmark() = default;
@@ -787,5 +787,6 @@ private:
 };
 
 }
+// end of namespace pov_parser
 
 #endif // POVRAY_PARSER_SCANNER_H

@@ -39,14 +39,18 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <memory>
+
+// POV-Ray header files (base module)
+#include "base/fileinputoutput_fwd.h"
+
+// POV-Ray header files (core module)
 #include "core/scene/object.h"
-
-namespace pov_base
-{
-
-class IStream;
-
-}
+#include "core/shape/csg_fwd.h"
 
 namespace pov
 {
@@ -56,10 +60,6 @@ namespace pov
 /// @addtogroup PovCoreShape
 ///
 /// @{
-
-class CSG;
-
-using pov_base::IStream;
 
 //******************************************************************************
 ///
@@ -78,44 +78,45 @@ using pov_base::IStream;
 * Global typedefs
 ******************************************************************************/
 
-typedef struct GlyphStruct *GlyphPtr;
+struct GlyphStruct;
+using GlyphPtr = GlyphStruct*;
 
 struct TrueTypeInfo;
 
-struct TrueTypeFont
+struct TrueTypeFont final
 {
     static constexpr POV_UINT32 kAnyCMAP = 0xFFFFFFFFu;
 
-    TrueTypeFont(const UCS2String& fn, const shared_ptr<IStream>& f, POV_UINT32 cm, CharsetID cs, LegacyCharset scs);
+    TrueTypeFont(const UCS2String& fn, const std::shared_ptr<pov_base::IStream>& f, POV_UINT32 cm, CharsetID cs, LegacyCharset scs);
     ~TrueTypeFont();
 
     UCS2String          filename;
-    shared_ptr<IStream> file;
+    std::shared_ptr<pov_base::IStream> file;
     POV_UINT32          cmap;
     CharsetID           charset;
     LegacyCharset       legacyCharset;
     TrueTypeInfo*       info;
 };
 
-class TrueType : public ObjectBase
+class TrueType final : public ObjectBase
 {
     public:
         GlyphPtr glyph;      /* (GlyphPtr) Pointer to the glyph */
         DBL depth;        /* Amount of extrusion */
 
         TrueType();
-        virtual ~TrueType();
+        virtual ~TrueType() override;
 
-        virtual ObjectPtr Copy();
+        virtual ObjectPtr Copy() override;
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-        virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
-        virtual void Translate(const Vector3d&, const TRANSFORM *);
-        virtual void Rotate(const Vector3d&, const TRANSFORM *);
-        virtual void Scale(const Vector3d&, const TRANSFORM *);
-        virtual void Transform(const TRANSFORM *);
-        virtual void Compute_BBox();
+        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) override;
+        virtual bool Inside(const Vector3d&, TraceThreadData *) const override;
+        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const override;
+        virtual void Translate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Rotate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Scale(const Vector3d&, const TRANSFORM *) override;
+        virtual void Transform(const TRANSFORM *) override;
+        virtual void Compute_BBox() override;
 
         static void ProcessNewTTF(CSG *Object, TrueTypeFont* font, const UCS2 *text_string, DBL depth, const Vector3d& offset);
     protected:
@@ -130,5 +131,6 @@ class TrueType : public ObjectBase
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_TRUETYPE_H

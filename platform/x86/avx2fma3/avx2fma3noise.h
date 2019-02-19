@@ -58,6 +58,7 @@ DBL AVX2FMA3Noise(const Vector3d& EPoint, int noise_generator);
 void AVX2FMA3DNoise(Vector3d& result, const Vector3d& EPoint);
 
 }
+// end of namespace pov
 
 #endif // TRY_OPTIMIZED_NOISE_AVX2FMA3
 

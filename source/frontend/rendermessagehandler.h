@@ -39,14 +39,22 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "frontend/configfrontend.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (POVMS module)
 #include "povms/povmscpp.h"
+
+// POV-Ray header files (frontend module)
+#include "frontend/console_fwd.h"
+#include "frontend/renderfrontend_fwd.h"
 
 namespace pov_frontend
 {
-
-class Console;
-struct SceneData;
-struct ViewData;
 
 class RenderMessageHandler
 {
@@ -65,5 +73,6 @@ class RenderMessageHandler
 };
 
 }
+// end of namespace pov_frontend
 
 #endif // POVRAY_FRONTEND_RENDERMESSAGEHANDLER_H

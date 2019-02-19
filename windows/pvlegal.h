@@ -702,3 +702,4 @@ char povlegal_text [] =
 } ;
 
 }
+// end of namespace povwin

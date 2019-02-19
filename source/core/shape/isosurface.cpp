@@ -40,13 +40,20 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/isosurface.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <algorithm>
 
+// POV-Ray header files (base module)
 #include "base/messenger.h"
 
+// POV-Ray header files (core module)
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -54,11 +61,14 @@
 namespace pov
 {
 
+using std::min;
+using std::max;
+
 /*****************************************************************************
 * Local preprocessor defines
 ******************************************************************************/
 
-struct ISO_Max_Gradient
+struct ISO_Max_Gradient final
 {
     DBL max_gradient, gradient;
     DBL eval_max, eval_cnt, eval_gradient_sum, eval_var;
@@ -571,7 +581,7 @@ IsoSurface::IsoSurface() :
     ObjectBase(ISOSURFACE_OBJECT),
     positivePolarity(false)
 {
-    container = shared_ptr<ContainedByShape>(new ContainedByBox());
+    container = std::shared_ptr<ContainedByShape>(new ContainedByBox());
 
     Make_BBox(BBox, -1.0, -1.0, -1.0, 2.0, 2.0, 2.0);
 
@@ -591,7 +601,7 @@ IsoSurface::IsoSurface() :
     gradient = 0.0;
     threshold = 0.0;
 
-    mginfo = intrusive_ptr<ISO_Max_Gradient>(new ISO_Max_Gradient());
+    mginfo = boost::intrusive_ptr<ISO_Max_Gradient>(new ISO_Max_Gradient());
 }
 
 
@@ -635,7 +645,7 @@ ObjectPtr IsoSurface::Copy()
 
     New->positivePolarity = positivePolarity;
 
-    New->container = shared_ptr<ContainedByShape>(container->Copy());
+    New->container = std::shared_ptr<ContainedByShape>(container->Copy());
 
     return (New);
 }
@@ -1040,4 +1050,4 @@ bool IsoSurface::IsInside (GenericScalarFunctionInstance& fn, Vector3d& p) const
 }
 
 }
-
+// end of namespace pov

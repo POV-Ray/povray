@@ -39,8 +39,13 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
 
-// POV-Ray base header files
-#include "base/image/image.h"
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+#include "base/fileinputoutput_fwd.h"
+#include "base/image/image_fwd.h"
 
 namespace pov_base
 {
@@ -54,14 +59,16 @@ namespace Tiff
 ///
 /// @{
 
-Image *Read(IStream *file, const Image::ReadOptions& options);
+Image *Read(IStream *file, const ImageReadOptions& options);
 
 /// @}
 ///
 //##############################################################################
 
 }
+// end of namespace Tiff
 
 }
+// end of namespace pov_base
 
 #endif // POVRAY_BASE_TIFF_H

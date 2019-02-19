@@ -36,6 +36,14 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/render/ray.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/material/interior.h"
 
 // this must be the last file included
@@ -158,3 +166,4 @@ void Ray::SetFlags(RayType rt, const Ray& other)
 }
 
 }
+// end of namespace pov
