@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,6 +36,17 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/material/interior.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <memory>
+#include <vector>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/lighting/subsurface.h"
 #include "core/material/texture.h"
 
@@ -60,7 +71,7 @@ Interior::Interior()
 
     hollow = false;
 
-    subsurface = shared_ptr<SubsurfaceInterior>();
+    subsurface = std::shared_ptr<SubsurfaceInterior>();
 }
 
 Interior::Interior(const Interior& source)
@@ -74,7 +85,7 @@ Interior::Interior(const Interior& source)
     media = source.media;
     hollow = source.hollow;
     IOR = source.IOR;
-    subsurface = shared_ptr<SubsurfaceInterior>(source.subsurface);
+    subsurface = std::shared_ptr<SubsurfaceInterior>(source.subsurface);
     Caustics = source.Caustics;
 }
 
@@ -84,13 +95,13 @@ Interior::~Interior()
 
 void Interior::Transform(const TRANSFORM *trans)
 {
-    for(vector<Media>::iterator i(media.begin());i != media.end(); i++)
+    for(std::vector<Media>::iterator i(media.begin());i != media.end(); i++)
         i->Transform(trans);
 }
 
 void Interior::PostProcess()
 {
-    for(vector<Media>::iterator i(media.begin());i != media.end(); i++)
+    for(std::vector<Media>::iterator i(media.begin());i != media.end(); i++)
         i->PostProcess();
 }
 
@@ -205,3 +216,4 @@ void Destroy_Material(MATERIAL *Material)
 }
 
 }
+// end of namespace pov

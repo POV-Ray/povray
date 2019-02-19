@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,25 +36,33 @@
 #ifndef POVRAY_BACKEND_TASK_H
 #define POVRAY_BACKEND_TASK_H
 
-#include <queue>
-#include <vector>
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "backend/configbackend.h"
 
-#include <boost/thread.hpp>
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <memory>
+#include <queue>
+#include <thread>
+
+// Boost header files
 #include <boost/function.hpp>
 
-#include "backend/frame.h"
-
-#include "backend/control/messagefactory.h"
-#include "backend/control/renderbackend.h"
+// POV-Ray header files (base module)
+#include "base/base_fwd.h"
 #include "base/timer.h"
+
+// POV-Ray header files (backend module)
+#include "backend/control/messagefactory_fwd.h"
+#include "backend/control/renderbackend.h"
+#include "backend/scene/backendscenedata_fwd.h"
 
 namespace pov
 {
 
 using namespace pov_base;
-
-class BackendSceneData;
-
 
 class Task
 {
@@ -78,48 +86,15 @@ class Task
         void Stop();
         void Pause();
         void Resume();
-
-        inline void Cooperate()
-        {
-            if(stopRequested == true)
-                throw StopThreadException();
-            else if(paused == true)
-            {
-                while(paused == true)
-                {
-                    boost::thread::yield();
-                    Delay(100);
-                    if(stopRequested == true)
-                        throw StopThreadException();
-                }
-            }
-        }
+        void Cooperate();
 
         inline ThreadData *GetDataPtr() { return taskData; }
 
         inline POVMSContext GetPOVMSContext() { return povmsContext; }
 
-        /// Start a new thread with a given stack size.
-        template<typename CALLABLE_T>
-        inline static boost::thread* NewBoostThread(CALLABLE_T func, int stackSize)
-        {
-#if HAVE_BOOST_THREAD_ATTRIBUTES
-            // boost 1.50 and later provide an official mechanism to set the stack size.
-            boost::thread::attributes attr;
-            attr.set_stack_size (stackSize);
-            return new boost::thread(attr, func);
-#elif !defined(USE_OFFICIAL_BOOST)
-            // Prior to boost 1.50, for some platforms we used an unofficial hacked version of boost to set the stack size.
-            return new boost::thread(func, stackSize);
-#else
-            // For some platforms the default stack size of older boost versions may suffice.
-            return new boost::thread(func);
-#endif
-        }
-
     protected:
 
-        struct StopThreadException { };
+        struct StopThreadException final {}; // TODO - consider subclassing from std::exception hierarchy.
 
         virtual void Run() = 0;
         virtual void Stopped() = 0;
@@ -149,7 +124,7 @@ class Task
         // CPU time spend in task
         POV_LONG cpuTime;
         /// task thread
-        boost::thread *taskThread;
+        std::thread *taskThread;
         /// POVMS message receiving context
         POVMSContext povmsContext;
 
@@ -161,14 +136,9 @@ class Task
 
         inline void FatalErrorHandler(Exception& e) { fatalErrorHandler(e); }
 
-        /// not available
-        Task();
-
-        /// not available
-        Task(const Task&);
-
-        /// not available
-        Task& operator=(const Task&);
+        Task() = delete;
+        Task(const Task&) = delete;
+        Task& operator=(const Task&) = delete;
 
         /// Execute the thread.
         void TaskThread(const boost::function0<void>& completion);
@@ -194,12 +164,14 @@ class Task
 class SceneTask : public Task
 {
     public:
-        SceneTask(ThreadData *td, const boost::function1<void, Exception&>& f, const char* sn, shared_ptr<BackendSceneData> sd, RenderBackend::ViewId vid = 0);
+        SceneTask(ThreadData *td, const boost::function1<void, Exception&>& f, const char* sn, std::shared_ptr<BackendSceneData> sd, RenderBackend::ViewId vid = 0);
+        virtual ~SceneTask() override;
 
     protected:
-        MessageFactory messageFactory;
+        MessageFactory* mpMessageFactory;
 };
 
 }
+// end of namespace pov
 
 #endif // POVRAY_BACKEND_TASK_H

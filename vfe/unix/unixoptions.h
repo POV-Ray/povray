@@ -12,7 +12,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -43,7 +43,6 @@
 #include "vfe.h"
 
 #include <list>
-#include <vector>
 #include <iostream>
 #include <string>
 #include <boost/algorithm/string.hpp>
@@ -142,10 +141,10 @@ namespace vfePlatform
         /// permission path for IO restrictions settings
         struct UnixPath
         {
-            string str;
+            std::string str;
             bool descend, writable;
 
-            UnixPath(const string &s, bool desc = false, bool wrt = false) : str(s), descend(desc), writable(wrt) { }
+            UnixPath(const std::string &s, bool desc = false, bool wrt = false) : str(s), descend(desc), writable(wrt) { }
         };
 
         /**
@@ -155,11 +154,11 @@ namespace vfePlatform
         */
         struct Conf_Option
         {
-            string Section;
-            string Name;
-            string Value;
+            std::string Section;
+            std::string Name;
+            std::string Value;
 
-            Conf_Option(const string &Sect, const string &Nm, const string &Val = "") : Section(Sect), Name(Nm), Value(Val) { }
+            Conf_Option(const std::string &Sect, const std::string &Nm, const std::string &Val = "") : Section(Sect), Name(Nm), Value(Val) { }
         };
 
         /**
@@ -174,21 +173,21 @@ namespace vfePlatform
         */
         struct Option_Info
         {
-            string Section;
-            string Name;
-            string Value;
-            string CmdOption;
-            string EnvVariable;
-            string Comment;
+            std::string Section;
+            std::string Name;
+            std::string Value;
+            std::string CmdOption;
+            std::string EnvVariable;
+            std::string Comment;
             bool has_param;
 
-            Option_Info(const string &Sect ,
-                                    const string &Nm,
-                                    const string &Val = "",
-                                    bool par = false,
-                                    const string &Cmd = "",
-                                    const string &Env = "",
-                                    const string &Comm = "")
+            Option_Info(const std::string &Sect ,
+                        const std::string &Nm,
+                        const std::string &Val = "",
+                        bool par = false,
+                        const std::string &Cmd = "",
+                        const std::string &Env = "",
+                        const std::string &Comm = "")
                 : Section(Sect), Name(Nm), Value(Val), has_param(par), CmdOption(Cmd), EnvVariable(Env), Comment(Comm) { }
 
             /// only checks identity of the option, not of the selected value.
@@ -223,7 +222,7 @@ namespace vfePlatform
              Converts a file path to standard form replacing
              relative notations.
         */
-        string CanonicalizePath(const string &path);
+        std::string CanonicalizePath(const std::string &path);
 
         /**
              Finds out the default location for temporary files.
@@ -231,7 +230,7 @@ namespace vfePlatform
 
              @returns temporary path including a trailing slash
         */
-        string GetTemporaryPath(void);
+        std::string GetTemporaryPath(void);
 
         /**
              Finds the value of a certain option from
@@ -249,7 +248,7 @@ namespace vfePlatform
              section and option name and returns it as
              a string.
         */
-        string QueryOptionString(const string &section, const string &name);
+        std::string QueryOptionString(const std::string &section, const std::string &name);
 
         /**
              Finds the value of a certain option via
@@ -257,7 +256,7 @@ namespace vfePlatform
              an int.  If the options value is not convertible
              to int dflt is returned instead.
         */
-        int QueryOptionInt(const string &section, const string &name, const int dflt = 0);
+        int QueryOptionInt(const std::string &section, const std::string &name, const int dflt = 0);
 
         /**
              Finds the value of a certain option via
@@ -265,7 +264,7 @@ namespace vfePlatform
              a float  If the options value is not convertible
              to float dflt is returned instead.
         */
-        float QueryOptionFloat(const string &section, const string &name, const float dflt = 0.0);
+        float QueryOptionFloat(const std::string &section, const std::string &name, const float dflt = 0.0);
 
         /**
              Check if a certain option has been set
@@ -275,7 +274,7 @@ namespace vfePlatform
              @returns true if set, false otherwise
         */
         bool isOptionSet(const Option_Info &option);
-        bool isOptionSet(const string &section, const string &name);
+        bool isOptionSet(const std::string &section, const std::string &name);
 
         /**
              Adds the custom povray.conf options with their values
@@ -315,39 +314,40 @@ namespace vfePlatform
              @param write If write acccess was requested
              @param is_user_setting if denial was due to user setting
         */
-        void IORestrictionsError(const string &fnm, bool write, bool is_user_setting);
+        void IORestrictionsError(const std::string &fnm, bool write, bool is_user_setting);
 
-        bool ShelloutPermitted(const string& command, const string& parameters) const { return m_shellout == SHL_ALLOWED; }
+        bool ShelloutPermitted(const std::string& command, const std::string& parameters) const { return m_shellout == SHL_ALLOWED; }
 
      protected:
         /// list of standard options
         static const Option_Info Standard_Options[];
 
-        string unix_getcwd(void);
-        string basename(const string &path);
-        string dirname(const string &path);
-        string unix_readlink(const string &path);
-        string pre_process_conf_line(const string &input);
-        void add_permitted_path(list<UnixPath> &paths, const string &input, const string &conf_name, unsigned long line_number);
-        void parse_conf_file(std::istream &Stream, const string &conf_name, bool user_mode);
+        std::string unix_getcwd(void);
+        std::string basename(const std::string &path);
+        std::string dirname(const std::string &path);
+        std::string unix_readlink(const std::string &path);
+        std::string pre_process_conf_line(const std::string &input);
+        void add_permitted_path(std::list<UnixPath> &paths, const std::string &input, const std::string &conf_name, unsigned long line_number);
+        void parse_conf_file(std::istream &Stream, const std::string &conf_name, bool user_mode);
         void process_povray_conf(void);
         void remove_arg(int *argc, char *argv[], int index);
-        bool file_exist(const string &name);
+        bool file_exist(const std::string &name);
 
         vfeSession *m_Session;
-        string  m_home;
-        string  m_user_dir;
-        string  m_sysconf;                // system conf filename
-        string  m_userconf;               // user conf filename
-        string  m_conf;                   // selected conf file
-        string  m_sysini, m_sysini_old;   // system ini filename
-        string  m_userini, m_userini_old; // user ini filename
+        std::string  m_home;
+        std::string  m_user_dir;
+        std::string  m_sysconf;                // system conf filename
+        std::string  m_userconf;               // user conf filename
+        std::string  m_conf;                   // selected conf file
+        std::string  m_sysini, m_sysini_old;   // system ini filename
+        std::string  m_userini, m_userini_old; // user ini filename
         FileIO  m_file_io;
         ShellOut m_shellout;
-        list<UnixPath> m_permitted_paths;
-        list<Conf_Option> m_custom_conf_options;
-        list<Option_Info> m_user_options;
+        std::list<UnixPath> m_permitted_paths;
+        std::list<Conf_Option> m_custom_conf_options;
+        std::list<Option_Info> m_user_options;
     };
 }
+// end of namespace vfePlatform
 
 #endif // POVRAY_VFE_UNIX_UNIXOPTIONS_H

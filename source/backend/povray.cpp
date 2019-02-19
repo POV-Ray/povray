@@ -44,7 +44,6 @@
 #include <vector>
 
 // Boost header files
-#include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include <boost/version.hpp>
 
@@ -72,23 +71,24 @@
 #endif
 
 // POV-Ray header files (base module)
+#include "base/platformbase.h"
 #include "base/pov_err.h"
-#include "base/pov_mem.h"
 #include "base/stringutilities.h"
 #include "base/timer.h"
+#include "base/types.h"
 
 // POV-Ray header files (core module)
 #include "core/material/noise.h"
 #include "core/material/pattern.h"
 
-// POV-Ray header files (backend module)
-#include "backend/control/renderbackend.h"
-#include "backend/support/task.h"
-
-// POV-Ray header files (povms module)
+// POV-Ray header files (POVMS module)
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
 #include "povms/povmsutil.h"
+
+// POV-Ray header files (backend module)
+#include "backend/control/renderbackend.h"
+#include "backend/support/task.h"
 
 #ifdef POV_CPUINFO_H
 #include POV_CPUINFO_H
@@ -184,7 +184,7 @@ volatile POVMSContext POV_RenderContext = nullptr;
 volatile POVMSAddress POV_FrontendAddress = POVMSInvalidAddress;
 
 /// Main POV-Ray thread that waits for messages from the frontend
-boost::thread *POV_MainThread = nullptr;
+std::thread *POV_MainThread = nullptr;
 
 /// Flag to mark main POV-Ray thread for termination
 volatile bool POV_TerminateMainThread = false;
@@ -453,7 +453,7 @@ void BuildInitInfo(POVMSObjectPtr msg)
     {
 #ifdef TRY_OPTIMIZED_NOISE
         const OptimizedNoiseInfo* pNoise = GetRecommendedOptimizedNoise();
-        std::string noiseGenInfo = "Noise generator: " + std::string(pNoise->name) + " (" + ::string(pNoise->info) + ")";
+        std::string noiseGenInfo = "Noise generator: " + std::string(pNoise->name) + " (" + std::string(pNoise->info) + ")";
         err = POVMSAttr_New(&attr);
         if (err == kNoErr)
         {
@@ -546,7 +546,7 @@ void MainThreadFunction(const boost::function0<void>& threadExit)
                         (void)POVMS_ASSERT_OUTPUT("Unhandled exception in POVMS receive handler in main POV-Ray backend thread.", __FILE__, __LINE__);
                     }
 
-                    boost::thread::yield();
+                    std::this_thread::yield();
                 }
 
                 // close_all(); // TODO FIXME - Remove this call! [trf]
@@ -578,7 +578,7 @@ void MainThreadFunction(const boost::function0<void>& threadExit)
 
 } // namespace
 
-boost::thread *povray_init(const boost::function0<void>& threadExit, POVMSAddress *addr)
+std::thread *povray_init(const boost::function0<void>& threadExit, POVMSAddress *addr)
 {
     using namespace pov;
 
@@ -590,13 +590,13 @@ boost::thread *povray_init(const boost::function0<void>& threadExit, POVMSAddres
         Initialize_Noise();
         pov::InitializePatternGenerators();
 
-        POV_MainThread = Task::NewBoostThread(boost::bind(&MainThreadFunction, threadExit), POV_THREAD_STACK_SIZE);
+        POV_MainThread = new std::thread(boost::bind(&MainThreadFunction, threadExit));
 
-        // we can't depend on boost::thread::yield here since under windows it is not
-        // guaranteed to give up a time slice [see API docs for Sleep(0)]
+        // We can't depend on `std::this_thread::yield()` here since it is not
+        // guaranteed to give up a time slice.
         while (POV_RenderContext == nullptr)
         {
-            boost::thread::yield();
+            std::this_thread::yield();
             pov_base::Delay(50);
         }
     }
@@ -624,7 +624,7 @@ void povray_terminate()
 
     while (POV_RenderContext != nullptr)
     {
-        boost::thread::yield();
+        std::this_thread::yield();
         pov_base::Delay(100);
     }
 

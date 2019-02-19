@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -42,15 +42,24 @@
 #include "syspovconfig.h"
 
 #define POV_PATH_SEPARATOR '/'
-#define IFF_SWITCH_CAST (long)
 
 // Our Unix-specific implementation of the Delay() function currently relies on the presence of
 // the nanosleep() or usleep() functions. If we have neither of those, we're falling back to
 // POV-Ray's platform-independent default implementation.
-#if defined(HAVE_NANOSLEEP) || defined(HAVE_USLEEP)
-    #define POV_USE_DEFAULT_DELAY 0
-#else
-    #define POV_USE_DEFAULT_DELAY 1
+#ifndef POV_USE_PLATFORM_DELAY // allow for flavour-specific override in `syspovconfig.h`.
+    #if defined(HAVE_NANOSLEEP)
+        // While the default implementation _should_ do exactly what we want,
+        // for now we prefer `nanosleep()` because we presume to have a better
+        // understanding of its limitations and pitfalls.
+        #define POV_USE_PLATFORM_DELAY 1
+    #elif defined(HAVE_USLEEP)
+        // `usleep()` definitely has some unwieldy quirks, so we presume we'll
+        // be better off with the default.
+        #define POV_USE_PLATFORM_DELAY 0 // use 2 for `usleep()`
+    #else
+        // We have no other choice but the default.
+        #define POV_USE_PLATFORM_DELAY 0
+    #endif
 #endif
 
 // Our Unix-specific implementation of the Timer class currently relies on the presence of the
@@ -67,5 +76,11 @@
 
 // The default Path::ParsePathString() suits our needs perfectly.
 #define POV_USE_DEFAULT_PATH_PARSER 1
+
+// We want to implement a specialized Filesystem::DeleteFile.
+#define POV_USE_DEFAULT_DELETEFILE 0
+
+// We want to implement a specialized Filesystem::LargeFile.
+#define POV_USE_DEFAULT_LARGEFILE 0
 
 #endif // POVRAY_UNIX_SYSPOVCONFIGBASE_H

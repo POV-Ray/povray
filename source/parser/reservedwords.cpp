@@ -38,6 +38,15 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+// POV-Ray header files (core module)
+// POV-Ray header files (parser module)
+//  (none at the moment)
+
 // this must be the last file included
 #include "base/povdebug.h"
 
@@ -643,7 +652,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { BACK_SLASH_TOKEN,             "\\" },
     { BAR_TOKEN,                    "|" },
     { COLON_TOKEN,                  ":" },
-    { COMMA_TOKEN,                  ", " }, // TODO REVIEW - is there a reason for the trailing blank?
+    { COMMA_TOKEN,                  "," },
     { DASH_TOKEN,                   "-" },
     { DOLLAR_TOKEN,                 "$" },
     { EQUALS_TOKEN,                 "=" },
@@ -655,7 +664,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { LEFT_PAREN_TOKEN,             "(" },
     { LEFT_SQUARE_TOKEN,            "[" },
     { PERCENT_TOKEN,                "%" },
-    { PERIOD_TOKEN,                 ". (period)" }, // TODO REVIEW - is there a reason for the plaintext?
+    { PERIOD_TOKEN,                 "." },
     { PLUS_TOKEN,                   "+" },
     { QUESTION_TOKEN,               "?" },
     { REL_GE_TOKEN,                 ">=" },
@@ -674,10 +683,10 @@ const RESERVED_WORD Reserved_Words[] = {
     //------------------------------------------------------------------------------
     // Category Pseudo-Tokens.
 
-    { COLOUR_KEY_TOKEN,             "color keyword" },
-    { FLOAT_FUNCT_TOKEN,            "float function" },
-    { SIGNATURE_FUNCT_TOKEN,        "signature function" },
-    { VECTOR_FUNCT_TOKEN,           "vector function" },
+    { COLOUR_TOKEN_CATEGORY,        "colour keyword" },
+    { FLOAT_TOKEN_CATEGORY,         "float function" },
+    { SIGNATURE_TOKEN_CATEGORY,     "file signature" },
+    { VECTOR_TOKEN_CATEGORY,        "vector function" },
 
     //------------------------------------------------------------------------------
     // Identifier Pseudo-Tokens.
@@ -739,4 +748,19 @@ const RESERVED_WORD Reserved_Words[] = {
     { TOKEN_COUNT_,                 nullptr }
 };
 
-} // end of pov namespace
+TokenId GetCategorizedTokenId(TokenId tokenId)
+{
+    if (tokenId <= SIGNATURE_TOKEN_CATEGORY)
+        return SIGNATURE_TOKEN_CATEGORY;
+    else if (tokenId <= FLOAT_TOKEN_CATEGORY)
+        return FLOAT_TOKEN_CATEGORY;
+    else if (tokenId <= VECTOR_TOKEN_CATEGORY)
+        return VECTOR_TOKEN_CATEGORY;
+    else if (tokenId <= COLOUR_TOKEN_CATEGORY)
+        return COLOUR_TOKEN_CATEGORY;
+    else
+        return tokenId;
+}
+
+}
+// end of namespace pov_parser

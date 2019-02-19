@@ -27,6 +27,9 @@
     <ClInclude Include="..\povconfig\syspovconfigvm.h">
       <Filter>VM Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\vm\fnpovfpu_fwd.h">
+      <Filter>VM Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="VM Source">

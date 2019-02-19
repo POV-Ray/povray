@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,6 +39,14 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/math/vector.h"
 
 namespace pov
@@ -55,15 +63,14 @@ namespace pov
 * Global typedefs
 ******************************************************************************/
 
-typedef struct BSphere_Tree_Struct BSPHERE_TREE;
-
-struct BSphere_Tree_Struct
+struct BSphere_Tree_Struct final
 {
     short Entries;       /* Number of components (node if 0)    */
     Vector3d C;          /* Center of bounding sphere           */
     DBL r2;              /* Radius^2 of bounding sphere         */
-    BSPHERE_TREE **Node; /* if node: children; if leaf: element */
+    BSphere_Tree_Struct **Node; /* if node: children; if leaf: element */
 };
+using BSPHERE_TREE = BSphere_Tree_Struct; ///< @deprecated
 
 
 /*****************************************************************************
@@ -78,5 +85,6 @@ void Destroy_Bounding_Sphere_Hierarchy (BSPHERE_TREE *Node);
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_BOUNDINGSPHERE_H

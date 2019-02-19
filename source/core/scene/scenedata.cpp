@@ -36,14 +36,20 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/scene/scenedata.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <sstream>
 
-#include <boost/bind.hpp>
-
+// POV-Ray header files (base module)
+#include "base/types.h"
 #include "base/version_info.h"
+#include "base/image/colourspace.h"
 
-#include "core/material/pattern.h"
+// POV-Ray header files (core module)
 #include "core/material/noise.h"
+#include "core/material/pattern.h"
 #include "core/scene/atmosphere.h"
 #include "core/scene/object.h"
 
@@ -130,3 +136,4 @@ SceneData::~SceneData()
 }
 
 }
+// end of namespace pov

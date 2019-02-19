@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,18 +38,25 @@
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
+#include "base/image/image_fwd.h"
 
-// POV-Ray base header files
-#include "base/fileinputoutput.h"
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <algorithm>
+#include <string>
+#include <vector>
+
+// POV-Ray header files (base module)
+#include "base/colour.h"
+#include "base/fileinputoutput_fwd.h"
 #include "base/pov_err.h"
-#include "base/image/colourspace.h"
-#include "base/image/encoding.h"
+#include "base/image/colourspace_fwd.h"
+#include "base/image/dither_fwd.h"
 
 namespace pov_base
 {
-
-class DitherStrategy;
-using DitherStrategySPtr = shared_ptr<DitherStrategy>;
 
 //##############################################################################
 ///
@@ -57,6 +64,147 @@ using DitherStrategySPtr = shared_ptr<DitherStrategy>;
 /// @ingroup PovBase
 ///
 /// @{
+
+enum class ImageDataType : int
+{
+    Undefined,      ///< Special value indicating that image decoder is free to pick most fitting type.
+    Bit_Map,        ///< Palette-based image with 2 palette entries.
+    Colour_Map,     ///< Palette-based image with up to 256 palette entries.
+    Gray_Int8,      ///< Single-channel (grayscale) image using 8-bit linear encoding.
+    Gray_Int16,     ///< Single-channel (grayscale) image using 16-bit linear encoding.
+    GrayA_Int8,     ///< Dual-channel (grayscale and alpha) image using 8-bit linear encoding.
+    GrayA_Int16,    ///< Dual-channel (grayscale and alpha) image using 16-bit linear encoding.
+    RGB_Int8,       ///< 3-channel (colour) image using 8-bit linear encoding.
+    RGB_Int16,      ///< 3-channel (colour) image using 16-bit linear encoding.
+    RGBA_Int8,      ///< 4-channel (colour and alpha) image using 8-bit linear encoding.
+    RGBA_Int16,     ///< 4-channel (colour and alpha) image using 16-bit linear encoding.
+    RGBFT_Float,    ///< 5-channel (colour, filter and transmit) image using single-precision floating-point encoding.
+    RGB_Gamma8,     ///< 3-channel (colour) image using 8-bit gamma encoding.
+    RGB_Gamma16,    ///< 3-channel (colour) image using 16-bit gamma encoding.
+    RGBA_Gamma8,    ///< 4-channel (colour and alpha) image using 8-bit gamma colour encoding and 8-bit linear alpha encoding.
+    RGBA_Gamma16,   ///< 4-channel (colour and alpha) image using 16-bit gamma colour encoding and 16-bit linear alpha encoding.
+    Gray_Gamma8,    ///< Single-channel (grayscale) image using 8-bit gamma encoding.
+    Gray_Gamma16,   ///< Single-channel (grayscale) image using 16-bit gamma encoding.
+    GrayA_Gamma8,   ///< Dual-channel (grayscale and alpha) image using 8-bit gamma greyscale encoding and 8-bit linear alpha encoding.
+    GrayA_Gamma16,  ///< Dual-channel (grayscale and alpha) image using 16-bit gamma greyscale encoding and 16-bit linear alpha encoding.
+};
+
+/// The mode to use for alpha handling.
+enum class ImageAlphaMode : int
+{
+    None,           ///< Disable alpha channel. @note Not a valid setting for input files.
+    Default,        ///< Use auto-detection or file format specific default.
+    Premultiplied,  ///< Enforce premultiplied mode, aka associated alpha.
+    Straight,       ///< Enforce straight mode, aka unassociated alpha.
+};
+
+struct ImageReadOptions final
+{
+    ImageDataType itype;
+    SimpleGammaCurvePtr defaultGamma;   // the gamma curve to use by default for converting to linear colour space
+    SimpleGammaCurvePtr workingGamma;   // the working colour space gamma
+    bool gammaOverride;                 // whether to apply defaultGamma even if the file indicates a different gamma
+    bool gammacorrect;                  // whether to do any gamma correction at all; if false, raw encoded values are used
+    bool premultipliedOverride;         // whether to override file-format default for alpha premultiplication
+    bool premultiplied;                 // whether to expect premultiplied ("associated") alpha or not ("straight alpha")
+    mutable std::vector<std::string> warnings;
+
+    ImageReadOptions() :
+        itype(ImageDataType::Undefined),
+        gammaOverride(false), gammacorrect(false), premultipliedOverride(false), premultiplied(false)
+    {}
+};
+
+struct ImageWriteOptions final
+{
+    //------------------------------------------------------------------------------
+    /// @name Gamma Handling
+    /// @{
+
+    /// Gamma to encode for.
+    /// Set this to `nullptr` to use the file format specific default.
+    /// @note
+    ///     This setting is ignored with file formats that mandate linear encoding or a
+    ///     specific encoding gamma.
+    SimpleGammaCurvePtr encodingGamma;
+
+    /// Working colour space gamma to encode from.
+    /// Set to `nullptr` or a neutral gamma curve to indicate linear working colour space.
+    SimpleGammaCurvePtr workingGamma;
+
+    /// @}
+    //------------------------------------------------------------------------------
+
+    /// Dithering algorithm.
+    /// Leave this at the default to disable dithering.
+    /// @note
+    ///     This setting is ignored with file formats that are not prone to colour banding
+    ///     artifacts (such as OpenEXR) or do not benefit from dithering (such as JPEG).
+    DitherStrategySPtr ditherStrategy;
+
+    unsigned int offset_x; ///< Currently not actively set.
+    unsigned int offset_y; ///< Currently not actively set.
+
+    /// How to handle image transparency.
+    /// Set this to @ref ImageAlphaMode::None to disable creation of an alpha channel,
+    /// @ref ImageAlphaMode::Default to write an alpha channel using a file format specific
+    /// default mode, @ref ImageAlphaMode::Premultiplied to write an alpha channel using
+    /// premultiplied mode (aka associated alpha), or @ref ImageAlphaMode::Straight to write an
+    /// alpha channel using straight mode (aka unassociated alpha).
+    /// @note
+    ///     This setting is ignored with file formats that do not support transparency, or
+    ///     for which transparency support has not been implemented in POV-Ray.
+    ImageAlphaMode alphaMode;
+
+    /// Bits per colour channel.
+    /// Set this to `0` to use the file format specific default.
+    /// @note
+    ///     This setting is ignored with file formats that mandate a particular bit depth,
+    ///     for which POV-Ray only supports a particular bit depth, or for which bit depth
+    ///     is not applicable (such as JPEG).
+    /// @note
+    ///     The actual bit depth may differ if the file format or POV-Ray's implementation
+    ///     thereof does not support the requested bit depth. In that case, the next higher
+    ///     supported bit depth is used if possible, or the highest supported bit depth
+    ///     otherwise.
+    unsigned char bitsPerChannel;
+
+    /// Whether to use compression.
+    /// Set this to a negative value to use the file format specific default setting, `0`
+    /// to disable, or any higher value to enable. Depending on the file format, such a
+    /// setting may be interpreted as a format specific compression parameter.
+    /// @note
+    ///     Whether a positive value indicates a mode, compression level or quality level
+    ///     is specific to the file format.
+    /// @note
+    ///     This setting is ignored with file formats that never use compression, always
+    ///     use compression, or for which POV-Ray's implementation leaves no choice.
+    signed short compression;
+
+    /// Whether to write a greyscale image.
+    /// @note
+    ///     This setting is ignored with file formats that do not support a dedicated
+    ///     greyscale mode, or for which support of such a mode has not been implemented
+    ///     in POV-Ray.
+    bool grayscale : 1;
+
+    ImageWriteOptions();
+
+    inline bool AlphaIsEnabled() const
+    {
+        return (alphaMode != ImageAlphaMode::None);
+    }
+
+    inline bool AlphaIsPremultiplied(bool defaultToPremultiplied) const
+    {
+        if (defaultToPremultiplied)
+            return (alphaMode != ImageAlphaMode::Straight);
+        else
+            return (alphaMode == ImageAlphaMode::Premultiplied);
+    }
+
+    GammaCurvePtr GetTranscodingGammaCurve(GammaCurvePtr defaultEncodingGamma) const;
+};
 
 /**
  *  Generic image data container.
@@ -75,7 +223,7 @@ using DitherStrategySPtr = shared_ptr<DitherStrategy>;
 class Image
 {
     public:
-        struct RGBMapEntry
+        struct RGBMapEntry final
         {
             float red;
             float green;
@@ -85,7 +233,7 @@ class Image
             RGBMapEntry(float r, float g, float b) : red(r), green(g), blue(b) { }
         };
 
-        struct RGBAMapEntry
+        struct RGBAMapEntry final
         {
             float red;
             float green;
@@ -96,7 +244,7 @@ class Image
             RGBAMapEntry(float r, float g, float b, float a) : red(r), green(g), blue(b), alpha(a) { }
         };
 
-        struct RGBFTMapEntry
+        struct RGBFTMapEntry final
         {
             float red;
             float green;
@@ -114,66 +262,6 @@ class Image
             RGBColourMap,
             RGBAColourMap,
             RGBFTColourMap
-        };
-
-        enum ImageChannelDataType
-        {
-            kImageChannelDataType_Int8,
-            kImageChannelDataType_Int16,
-            kImageChannelDataType_Gamma8,
-            kImageChannelDataType_Gamma16,
-        };
-
-        enum ImageChannelLayout
-        {
-            kImageChannelLayout_Gray,
-            kImageChannelLayout_GrayA,
-            kImageChannelLayout_RGB,
-            kImageChannelLayout_RGBA,
-        };
-
-        enum ImageDataType
-        {
-            /// Value used to indicate that image decoder is free to pick the most fitting type.
-            Undefined,
-            /// Palette-based image with 2 palette entries.
-            Bit_Map,
-            /// Palette-based image with up to 256 palette entries.
-            Colour_Map,
-            /// Single-channel (grayscale) image using 8-bit linear encoding.
-            Gray_Int8,
-            /// Single-channel (grayscale) image using 16-bit linear encoding.
-            Gray_Int16,
-            /// Dual-channel (grayscale and alpha) image using 8-bit linear encoding.
-            GrayA_Int8,
-            /// Dual-channel (grayscale and alpha) image using 16-bit linear encoding.
-            GrayA_Int16,
-            /// 3-channel (colour) image using 8-bit linear encoding.
-            RGB_Int8,
-            /// 3-channel (colour) image using 16-bit linear encoding.
-            RGB_Int16,
-            /// 4-channel (colour and alpha) image using 8-bit linear encoding.
-            RGBA_Int8,
-            /// 4-channel (colour and alpha) image using 16-bit linear encoding.
-            RGBA_Int16,
-            /// 5-channel (colour, filter and transmit) image using single-precision floating-point encoding.
-            RGBFT_Float,
-            /// 3-channel (colour) image using 8-bit gamma encoding.
-            RGB_Gamma8,
-            /// 3-channel (colour) image using 16-bit gamma encoding.
-            RGB_Gamma16,
-            /// 4-channel (colour and alpha) image using 8-bit gamma colour encoding and 8-bit linear alpha encoding.
-            RGBA_Gamma8,
-            /// 4-channel (colour and alpha) image using 16-bit gamma colour encoding and 16-bit linear alpha encoding.
-            RGBA_Gamma16,
-            /// Single-channel (grayscale) image using 8-bit gamma encoding.
-            Gray_Gamma8,
-            /// Single-channel (grayscale) image using 16-bit gamma encoding.
-            Gray_Gamma16,
-            /// Dual-channel (grayscale and alpha) image using 8-bit gamma greyscale encoding and 8-bit linear alpha encoding.
-            GrayA_Gamma8,
-            /// Dual-channel (grayscale and alpha) image using 16-bit gamma greyscale encoding and 16-bit linear alpha encoding.
-            GrayA_Gamma16
         };
 
         /// Image file type identifier.
@@ -194,140 +282,49 @@ class Image
             HDR
         };
 
-        /// The mode to use for alpha handling.
-        enum AlphaMode
-        {
-            kAlphaMode_None,            ///< Disable alpha channel. @note Not a valid setting for input files.
-            kAlphaMode_Default,         ///< Use auto-detection or file format specific default.
-            kAlphaMode_Premultiplied,   ///< Enforce premultiplied mode, aka associated alpha.
-            kAlphaMode_Straight,        ///< Enforce straight mode, aka unassociated alpha.
-        };
-
-        struct ReadOptions
-        {
-            ImageDataType itype;
-            SimpleGammaCurvePtr defaultGamma;   // the gamma curve to use by default for converting to linear colour space
-            SimpleGammaCurvePtr workingGamma;   // the working colour space gamma
-            bool gammaOverride;                 // whether to apply defaultGamma even if the file indicates a different gamma
-            bool gammacorrect;                  // whether to do any gamma correction at all; if false, raw encoded values are used
-            bool premultipliedOverride;         // whether to override file-format default for alpha premultiplication
-            bool premultiplied;                 // whether to expect premultiplied ("associated") alpha or not ("straight alpha")
-            mutable vector<string> warnings;
-
-            ReadOptions() : itype(Undefined), gammaOverride(false), gammacorrect(false), premultipliedOverride(false), premultiplied(false) { }
-        };
-
-        struct WriteOptions
-        {
-            //------------------------------------------------------------------------------
-            /// @name Gamma Handling
-            /// @{
-
-            /// Gamma to encode for.
-            /// Set this to `nullptr` to use the file format specific default.
-            /// @note
-            ///     This setting is ignored with file formats that mandate linear encoding or a
-            ///     specific encoding gamma.
-            SimpleGammaCurvePtr encodingGamma;
-
-            /// Working colour space gamma to encode from.
-            /// Set to `nullptr` or a neutral gamma curve to indicate linear working colour space.
-            SimpleGammaCurvePtr workingGamma;
-
-            /// @}
-            //------------------------------------------------------------------------------
-
-            /// Dithering algorithm.
-            /// Leave this at the default to disable dithering.
-            /// @note
-            ///     This setting is ignored with file formats that are not prone to colour banding
-            ///     artifacts (such as OpenEXR) or do not benefit from dithering (such as JPEG).
-            DitherStrategySPtr ditherStrategy;
-
-            unsigned int offset_x; ///< Currently not actively set.
-            unsigned int offset_y; ///< Currently not actively set.
-
-            /// How to handle image transparency.
-            /// Set this to @ref kAlphaMode_None to disable creation of an alpha channel,
-            /// @ref kAlphaMode_Default to write an alpha channel using a file format specific
-            /// default mode, @ref kAlphaMode_Premultiplied to write an alpha channel using
-            /// premultiplied mode (aka associated alpha), or @ref kAlphaMode_Straight to write an
-            /// alpha channel using straight mode (aka unassociated alpha).
-            /// @note
-            ///     This setting is ignored with file formats that do not support transparency, or
-            ///     for which transparency support has not been implemented in POV-Ray.
-            AlphaMode alphaMode;
-
-            /// Bits per colour channel.
-            /// Set this to `0` to use the file format specific default.
-            /// @note
-            ///     This setting is ignored with file formats that mandate a particular bit depth,
-            ///     for which POV-Ray only supports a particular bit depth, or for which bit depth
-            ///     is not applicable (such as JPEG).
-            /// @note
-            ///     The actual bit depth may differ if the file format or POV-Ray's implementation
-            ///     thereof does not support the requested bit depth. In that case, the next higher
-            ///     supported bit depth is used if possible, or the highest supported bit depth
-            ///     otherwise.
-            unsigned char bitsPerChannel;
-
-            /// Whether to use compression.
-            /// Set this to a negative value to use the file format specific default setting, `0`
-            /// to disable, or any higher value to enable. Depending on the file format, such a
-            /// setting may be interpreted as a format specific compression parameter.
-            /// @note
-            ///     Whether a positive value indicates a mode, compression level or quality level
-            ///     is specific to the file format.
-            /// @note
-            ///     This setting is ignored with file formats that never use compression, always
-            ///     use compression, or for which POV-Ray's implementation leaves no choice.
-            signed short compression;
-
-            /// Whether to write a greyscale image.
-            /// @note
-            ///     This setting is ignored with file formats that do not support a dedicated
-            ///     greyscale mode, or for which support of such a mode has not been implemented
-            ///     in POV-Ray.
-            bool grayscale : 1;
-
-            WriteOptions();
-
-            inline bool AlphaIsEnabled() const
-            {
-                return (alphaMode != Image::kAlphaMode_None);
-            }
-
-            inline bool AlphaIsPremultiplied(bool defaultToPremultiplied) const
-            {
-                if (defaultToPremultiplied)
-                    return (alphaMode != Image::kAlphaMode_Straight);
-                else
-                    return (alphaMode == Image::kAlphaMode_Premultiplied);
-            }
-
-            GammaCurvePtr GetTranscodingGammaCurve(GammaCurvePtr defaultEncodingGamma) const
-            {
-                if (encodingGamma)
-                    return TranscodingGammaCurve::Get(workingGamma, encodingGamma);
-                else
-                    return TranscodingGammaCurve::Get(workingGamma, defaultEncodingGamma);
-            }
-        };
-
         virtual ~Image() { }
 
-        static ImageDataType GetImageDataType (ImageChannelDataType channelType, ImageChannelLayout layout);
+        /// Suggest an image data container satisfying certain constraints.
+        ///
+        /// This method returns an @ref ImageDataType representing a non-paletted, integer-based
+        /// image data container matching the specified constraints.
+        ///
+        /// @note
+        ///     The number of bits per colour channel is taken as a minimum requirement. All other
+        ///     constraints are currently implemented as exact-match requirements.
+        /// @note
+        ///     RGB alpha is not supported yet.
+        ///
+        /// @param  minBitsPerChannel   Minimum number of bits per colour or alpha channel.
+        /// @param  colourChannels      Number of colour channels (1 = greyscale, 3 = RGB).
+        /// @param  alphaChannels       Number of alpha channels (0 = no alpha, 1 = common alpha, 3 = RGB alpha).
+        /// @param  linear              Whether the caller will write linear (as opposed to gamma encoded) data.
+        static ImageDataType GetImageDataType(int minBitsPerChannel, int colourChannels, int alphaChannels, bool linear);
+
+        /// Suggest an image data container satisfying certain constraints.
+        ///
+        /// This method is a convenience function equivalent to calling:
+        ///
+        ///     GetImageDataType(minBitsPerChannel, colourChannels, alpha? 1:0, IsNeutral(gamma));
+        ///
+        /// See @ref GetImageDataType(int,int,int,bool) for more details.
+        ///
+        /// @param  minBitsPerChannel   Minimum number of bits per colour or alpha channel.
+        /// @param  colourChannels      Number of colour channels (1 = greyscale, 3 = RGB).
+        /// @param  alpha               Whether to provide a (common) alpha channel.
+        /// @param  gamma               Encoding gamma of the data to be written.
+        static ImageDataType GetImageDataType(int minBitsPerChannel, int colourChannels, bool alpha, GammaCurvePtr gamma);
 
         static Image *Create(unsigned int w, unsigned int h, ImageDataType t, unsigned int maxRAMmbHint, unsigned int pixelsPerBlockHint);
         static Image *Create(unsigned int w, unsigned int h, ImageDataType t, bool allowFileBacking = false);
-        static Image *Create(unsigned int w, unsigned int h, ImageDataType t, const vector<RGBMapEntry>& m, bool allowFileBacking = false);
-        static Image *Create(unsigned int w, unsigned int h, ImageDataType t, const vector<RGBAMapEntry>& m, bool allowFileBacking = false);
-        static Image *Create(unsigned int w, unsigned int h, ImageDataType t, const vector<RGBFTMapEntry>& m, bool allowFileBacking = false);
+        static Image *Create(unsigned int w, unsigned int h, ImageDataType t, const std::vector<RGBMapEntry>& m, bool allowFileBacking = false);
+        static Image *Create(unsigned int w, unsigned int h, ImageDataType t, const std::vector<RGBAMapEntry>& m, bool allowFileBacking = false);
+        static Image *Create(unsigned int w, unsigned int h, ImageDataType t, const std::vector<RGBFTMapEntry>& m, bool allowFileBacking = false);
 
         // ftype = use this image type, if "Undefined" use best match
-        static Image *Read(ImageFileType ftype, IStream *file, const ReadOptions& options = ReadOptions());
+        static Image *Read(ImageFileType ftype, IStream *file, const ImageReadOptions& options = ImageReadOptions());
 
-        static void Write(ImageFileType ftype, OStream *file, const Image *image, const WriteOptions& options = WriteOptions());
+        static void Write(ImageFileType ftype, OStream *file, const Image *image, const ImageWriteOptions& options = ImageWriteOptions());
 
         unsigned int GetWidth() const { return width; }
         unsigned int GetHeight() const { return height; }
@@ -432,13 +429,13 @@ class Image
 
         unsigned int GetColourMapSize() const;
 
-        void GetColourMap(vector<RGBMapEntry>& m) const;
-        void GetColourMap(vector<RGBAMapEntry>& m) const;
-        void GetColourMap(vector<RGBFTMapEntry>& m) const;
+        void GetColourMap(std::vector<RGBMapEntry>& m) const;
+        void GetColourMap(std::vector<RGBAMapEntry>& m) const;
+        void GetColourMap(std::vector<RGBFTMapEntry>& m) const;
 
-        void SetColourMap(const vector<RGBMapEntry>& m);
-        void SetColourMap(const vector<RGBAMapEntry>& m);
-        void SetColourMap(const vector<RGBFTMapEntry>& m);
+        void SetColourMap(const std::vector<RGBMapEntry>& m);
+        void SetColourMap(const std::vector<RGBAMapEntry>& m);
+        void SetColourMap(const std::vector<RGBFTMapEntry>& m);
 /*
         void CopyTo(unsigned int x, unsigned int y, const Image& srcimage)
         {
@@ -449,7 +446,7 @@ class Image
             // TODO
         }*/
     protected:
-        struct MapEntry
+        struct MapEntry final
         {
             float red;
             float green;
@@ -464,7 +461,7 @@ class Image
             MapEntry(const RGBFTMapEntry& e) : red(e.red), green(e.green), blue(e.blue), filter(e.filter), transm(e.transm) { }
         };
 
-        vector<MapEntry> colormap;
+        std::vector<MapEntry> colormap;
         ColourMapType colormaptype;
         unsigned int width;
         unsigned int height;
@@ -474,26 +471,24 @@ class Image
         Image(unsigned int w, unsigned int h, ImageDataType t) :
             width(w), height(h), type(t), colormaptype(NoColourMap), premultiplied(false) { }
 
-        Image(unsigned int w, unsigned int h, ImageDataType t, const vector<RGBMapEntry>& m) :
-            width(w), height(h), type(t), colormaptype(RGBColourMap), premultiplied(false) { colormap.resize(max(m.size(), sizeof(unsigned char) * 256)); colormap.assign(m.begin(), m.end()); }
+        Image(unsigned int w, unsigned int h, ImageDataType t, const std::vector<RGBMapEntry>& m) :
+            width(w), height(h), type(t), colormaptype(RGBColourMap), premultiplied(false) { colormap.resize(std::max(m.size(), sizeof(unsigned char) * 256)); colormap.assign(m.begin(), m.end()); }
 
-        Image(unsigned int w, unsigned int h, ImageDataType t, const vector<RGBAMapEntry>& m) :
-            width(w), height(h), type(t), colormaptype(RGBAColourMap), premultiplied(false) { colormap.resize(max(m.size(), sizeof(unsigned char) * 256)); colormap.assign(m.begin(), m.end()); }
+        Image(unsigned int w, unsigned int h, ImageDataType t, const std::vector<RGBAMapEntry>& m) :
+            width(w), height(h), type(t), colormaptype(RGBAColourMap), premultiplied(false) { colormap.resize(std::max(m.size(), sizeof(unsigned char) * 256)); colormap.assign(m.begin(), m.end()); }
 
-        Image(unsigned int w, unsigned int h, ImageDataType t, const vector<RGBFTMapEntry>& m) :
-            width(w), height(h), type(t), colormaptype(RGBFTColourMap), premultiplied(false) { colormap.resize(max(m.size(), sizeof(unsigned char) * 256)); colormap.assign(m.begin(), m.end()); }
+        Image(unsigned int w, unsigned int h, ImageDataType t, const std::vector<RGBFTMapEntry>& m) :
+            width(w), height(h), type(t), colormaptype(RGBFTColourMap), premultiplied(false) { colormap.resize(std::max(m.size(), sizeof(unsigned char) * 256)); colormap.assign(m.begin(), m.end()); }
 
         float RGB2Gray(float red, float green, float blue) const
         {
             return RGBColour(red, green, blue).Greyscale();
         }
     private:
-        /// not available
-        Image();
-        /// not available
-        Image(const Image&);
-        /// not available
-        Image& operator=(Image&);
+
+        Image() = delete;
+        Image(const Image&) = delete;
+        Image& operator=(Image&) = delete;
 };
 
 /// @}
@@ -501,5 +496,6 @@ class Image
 //##############################################################################
 
 }
+// end of namespace pov_base
 
 #endif // POVRAY_BASE_IMAGE_H

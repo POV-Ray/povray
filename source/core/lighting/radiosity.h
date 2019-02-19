@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,23 +39,25 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <memory>
+#include <mutex>
 #include <vector>
 
-#if POV_MULTITHREADED
-#include <boost/thread.hpp>
-#endif
+// POV-Ray header files (base module)
+#include "base/fileinputoutput_fwd.h"
+#include "base/path_fwd.h"
 
+// POV-Ray header files (core module)
 #include "core/lighting/photons.h" // TODO FIXME - make PhotonGatherer class visible only as a pointer
 #include "core/material/media.h"   // TODO FIXME - make MediaFunction class visible only as a pointer
 #include "core/math/randcosweighted.h"
 #include "core/render/trace.h"     // TODO FIXME - make Trace class visible only as a pointer
-#include "core/support/octree.h"   // TODO FIXME - this should only be included in radiosity.cpp
+#include "core/support/octree_fwd.h"
 #include "core/support/statistics.h"
-
-namespace pov_base
-{
-class Path;
-}
 
 namespace pov
 {
@@ -66,8 +68,6 @@ namespace pov
 /// @ingroup PovCore
 ///
 /// @{
-
-class ViewData;
 
 struct ot_block_struct;
 struct ot_node_struct;
@@ -85,7 +85,7 @@ static const unsigned int RADIOSITY_MAX_SAMPLE_DIRECTIONS    = kRandCosWeightedC
 // - it gives the highest possible number of "secondary strides", those being -274, 115, -44, -17, -7 and 3
 
 // settings as effective for a particular bounce depth during a particular trace step
-struct RadiosityRecursionSettings
+struct RadiosityRecursionSettings final
 {
     // true "tweakables"
     unsigned int    raysPerSample;          // number of sample rays to shoot per sample
@@ -104,7 +104,7 @@ struct RadiosityRecursionSettings
 
 // settings as specified in the scene file;
 // naming conventions are as per the respective scene file parameter
-class SceneRadiositySettings
+class SceneRadiositySettings final
 {
     public:
 
@@ -168,12 +168,12 @@ class SceneRadiositySettings
         RadiosityRecursionSettings* GetRecursionSettings (bool final) const;
 };
 
-class RadiosityCache
+class RadiosityCache final
 {
 
     public:
 
-        class BlockPool
+        class BlockPool final
         {
             friend class RadiosityCache;
             public:
@@ -223,27 +223,27 @@ class RadiosityCache
 
     private:
 
-        struct Octree
+        struct Octree final
         {
             ot_node_struct *root;
 #if POV_MULTITHREADED
-            boost::mutex treeMutex;   // lock this when adding nodes to the tree
-            boost::mutex blockMutex;  // lock this when adding blocks to any node of the tree
+            std::mutex treeMutex;   // lock this when adding nodes to the tree
+            std::mutex blockMutex;  // lock this when adding blocks to any node of the tree
 #endif
 
             Octree() : root(nullptr) {}
         };
 
-        vector<BlockPool*> blockPools;  // block pools ready to be re-used
+        std::vector<BlockPool*> blockPools;  // block pools ready to be re-used
 #if POV_MULTITHREADED
-        boost::mutex blockPoolsMutex;   // lock this when accessing blockPools
+        std::mutex blockPoolsMutex;   // lock this when accessing blockPools
 #endif
 
         Octree octree;
 
         OStream *ot_fd;
 #if POV_MULTITHREADED
-        boost::mutex fileMutex;         // lock this when accessing ot_fd
+        std::mutex fileMutex;         // lock this when accessing ot_fd
 #endif
 
         RadiosityRecursionSettings* recursionSettings; // dynamically allocated array; use recursion depth as index
@@ -254,16 +254,15 @@ class RadiosityCache
         static bool AverageNearBlock(ot_block_struct *block, void *void_info);
 };
 
-class RadiosityFunction : public Trace::RadiosityFunctor
+class RadiosityFunction final : public Trace::RadiosityFunctor
 {
     public:
 
-        static const unsigned int TILE_MAX          = OT_TILE_MAX;
-        static const unsigned int PRETRACE_INVALID  = OT_PASS_INVALID;
-        static const unsigned int PRETRACE_FIRST    = OT_PASS_FIRST;
-        static const unsigned int PRETRACE_MAX      = OT_PASS_MAX;
-        static const unsigned int FINAL_TRACE       = OT_PASS_FINAL;
-        static const unsigned int DEPTH_MAX         = (OT_DEPTH_MAX < 20 ? OT_DEPTH_MAX : 20);
+        static const unsigned int PRETRACE_INVALID  = kOctreePassInvalid;
+        static const unsigned int PRETRACE_FIRST    = kOctreePassFirst;
+        static const unsigned int PRETRACE_MAX      = kOctreePassMax;
+        static const unsigned int FINAL_TRACE       = kOctreePassFinal;
+        static const unsigned int DEPTH_MAX         = (kOctreeDepthMax < 20 ? kOctreeDepthMax : 20);
         static const unsigned int MAX_NEAREST_COUNT = 20;
 
         // initializes radiosity module from:
@@ -274,9 +273,9 @@ class RadiosityFunction : public Trace::RadiosityFunctor
         //      cf      - the cooperate functor (whatever that is - some thing that handles inter-thread communication?)
         //      ft      - whether this is the final trace (i.e. not a radiosity pretrace step)
         //      camera  - position of the camera
-        RadiosityFunction(shared_ptr<SceneData> sd, TraceThreadData *td,
+        RadiosityFunction(std::shared_ptr<SceneData> sd, TraceThreadData *td,
                           const SceneRadiositySettings& rs, RadiosityCache& rc, Trace::CooperateFunctor& cf, bool ft, const Vector3d& camera);
-        virtual ~RadiosityFunction();
+        virtual ~RadiosityFunction() override;
 
         // looks up the ambient value for a certain point
         //      ipoint          - point on the surface
@@ -285,10 +284,10 @@ class RadiosityFunction : public Trace::RadiosityFunctor
         //      brilliance      - brilliance
         //      ambient_colour  - (output) the ambient color at this point
         //      weight          - the base "weight" of the traced ray (used to compare against ADC bailout)
-        virtual void ComputeAmbient(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, DBL brilliance, MathColour& ambient_colour, DBL weight, TraceTicket& ticket);
+        virtual void ComputeAmbient(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, DBL brilliance, MathColour& ambient_colour, DBL weight, TraceTicket& ticket) override;
 
         // checks whether the specified recursion depth is still within the configured limits
-        virtual bool CheckRadiosityTraceLevel(const TraceTicket& ticket);
+        virtual bool CheckRadiosityTraceLevel(const TraceTicket& ticket) override;
 
         // retrieves top level statistics information to drive pretrace re-iteration
         virtual void GetTopLevelStats(long& queryCount, float& reuse);
@@ -298,7 +297,7 @@ class RadiosityFunction : public Trace::RadiosityFunctor
 
     private:
 
-        class SampleDirectionGenerator
+        class SampleDirectionGenerator final
         {
             public:
                 /// constructor
@@ -329,7 +328,7 @@ class RadiosityFunction : public Trace::RadiosityFunctor
         };
 
         // structure to store precomputed effective parameters for each recursion depth
-        struct RecursionParameters
+        struct RecursionParameters final
         {
             SampleDirectionGenerator directionGenerator;    // sample generator for this recursion depth
             IntStatsIndex statsId;                          // statistics id for per-pass per-recursion statistics
@@ -367,6 +366,7 @@ class RadiosityFunction : public Trace::RadiosityFunctor
 ///
 //##############################################################################
 
-} // end of namespace
+}
+// end of namespace pov
 
 #endif // POVRAY_CORE_RADIOSITY_H

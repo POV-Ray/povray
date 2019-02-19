@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,7 +36,20 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/animationprocessing.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <algorithm>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (POVMS module)
 #include "povms/povmsid.h"
+
+// POV-Ray header files (frontend module)
+//  (none at the moment)
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -49,20 +62,20 @@ AnimationProcessing::AnimationProcessing(POVMS_Object& options) :
 {
     bool cyclic = renderOptions.TryGetBool(kPOVAttrib_CyclicAnimation, false);
 
-    initialFrame = max(renderOptions.TryGetInt(kPOVAttrib_InitialFrame, 1), 0);
+    initialFrame = std::max(renderOptions.TryGetInt(kPOVAttrib_InitialFrame, 1), 0);
     initialClock = renderOptions.TryGetFloat(kPOVAttrib_InitialClock, 0.0);
 
-    finalFrame = max(renderOptions.TryGetInt(kPOVAttrib_FinalFrame, 1), initialFrame);
+    finalFrame = std::max(renderOptions.TryGetInt(kPOVAttrib_FinalFrame, 1), initialFrame);
     finalClock = renderOptions.TryGetFloat(kPOVAttrib_FinalClock, 1.0);
 
-    frameStep = max(renderOptions.TryGetInt(kPOVAttrib_FrameStep, 1), 1);
+    frameStep = std::max(renderOptions.TryGetInt(kPOVAttrib_FrameStep, 1), 1);
 
     if(cyclic == true)
         finalFrame++;
 
     if(renderOptions.Exist(kPOVAttrib_SubsetStartFrame) == true)
     {
-        POVMSFloat subsetStartPercent = max(renderOptions.GetFloat(kPOVAttrib_SubsetStartFrame), POVMSFloat(0.0));
+        POVMSFloat subsetStartPercent = std::max(renderOptions.GetFloat(kPOVAttrib_SubsetStartFrame), POVMSFloat(0.0));
         if((subsetStartPercent == 0.0) || (subsetStartPercent >= 1.0))
             subsetStartFrame = POVMSInt(subsetStartPercent);
         else
@@ -75,7 +88,7 @@ AnimationProcessing::AnimationProcessing(POVMS_Object& options) :
 
     if(options.Exist(kPOVAttrib_SubsetEndFrame) == true)
     {
-        POVMSFloat subsetEndPercent = max(renderOptions.GetFloat(kPOVAttrib_SubsetEndFrame), POVMSFloat(0.0));
+        POVMSFloat subsetEndPercent = std::max(renderOptions.GetFloat(kPOVAttrib_SubsetEndFrame), POVMSFloat(0.0));
         if((subsetEndPercent == 0.0) || (subsetEndPercent >= 1.0))
             subsetEndFrame = POVMSInt(subsetEndPercent);
         else
@@ -218,3 +231,4 @@ int AnimationProcessing::GetFrameNumberDigits()
 }
 
 }
+// end of namespace pov_frontend

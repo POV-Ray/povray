@@ -37,11 +37,14 @@
 #include "parser/symboltable.h"
 
 // C++ variants of C standard header files
+#include <cstring>
+
 // C++ standard header files
-// Boost header files
 //  (none at the moment)
 
 // POV-Ray header files (base module)
+#include "base/pov_mem.h"
+#include "base/povassert.h"
 #include "base/stringutilities.h"
 
 // POV-Ray header files (core module)
@@ -263,7 +266,7 @@ void* SymbolTable::Copy_Identifier(void* Data, int Type)
         case STRING_ID_TOKEN:
             len = UCS2_strlen(reinterpret_cast<UCS2*>(Data)) + 1;
             New = reinterpret_cast<UCS2*>(POV_MALLOC(len * sizeof(UCS2), "UCS2 String"));
-            POV_MEMCPY(reinterpret_cast<void*>(New), reinterpret_cast<void*>(Data), len * sizeof(UCS2));
+            std::memcpy(reinterpret_cast<void*>(New), reinterpret_cast<void*>(Data), len * sizeof(UCS2));
             break;
         case ARRAY_ID_TOKEN:
             New = CloneData<Assignable>(Data);
@@ -431,12 +434,10 @@ void SymbolTable::Remove_Symbol(const char *Name, bool is_array_elem, void **Dat
     {
         POV_EXPERIMENTAL_ASSERT(DataPtr != nullptr);
 
-        if (ttype == FLOAT_FUNCT_TOKEN)
-            ttype = FLOAT_ID_TOKEN;
-        else if (ttype == VECTOR_FUNCT_TOKEN)
-            ttype = VECTOR_ID_TOKEN;
-        else if (ttype == COLOUR_KEY_TOKEN)
-            ttype = COLOUR_ID_TOKEN;
+        POV_EXPERIMENTAL_ASSERT((ttype != FLOAT_TOKEN_CATEGORY) &&
+                                (ttype != FLOAT_ID_TOKEN) &&
+                                (ttype != VECTOR_TOKEN_CATEGORY) &&
+                                (ttype != COLOUR_TOKEN_CATEGORY));
 
         Destroy_Ident_Data(*DataPtr, ttype);
         *DataPtr = nullptr;
@@ -663,4 +664,5 @@ SymbolTable& SymbolStack::GetGlobalTable()
 
 //******************************************************************************
 
-} // end of namespace
+}
+// end of namespace pov_parser

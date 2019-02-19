@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,15 +40,23 @@
 #include <cctype>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
+
+// C++ standard header files
+//  (none at the moment)
 
 // Boost header files
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 // POV-Ray header files (base module)
+#include "base/pov_mem.h"
 #include "base/stringutilities.h"
 
 // POV-Ray header files (core module)
 #include "core/scene/scenedata.h"
+
+// POV-Ray header files (parser module)
+//  (none at the moment)
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -58,23 +66,7 @@ namespace pov_parser
 
 using namespace pov;
 
-/*****************************************************************************
- *
- * FUNCTION
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- * CHANGES
- *
-******************************************************************************/
+//******************************************************************************
 
 char *Parser::Parse_C_String(bool pathname)
 {
@@ -98,24 +90,7 @@ void Parser::ParseString(UTF8String& s, bool pathname)
     POV_FREE(str);
 }
 
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- * CHANGES
- *
-******************************************************************************/
+//******************************************************************************
 
 UCS2 *Parser::Parse_String(bool pathname, bool require)
 {
@@ -171,7 +146,7 @@ UCS2 *Parser::Parse_String(bool pathname, bool require)
 
             len = pString->size() + 1;
             New = reinterpret_cast<UCS2 *>(POV_MALLOC(len * sizeof(UCS2), "UCS2 String"));
-            POV_MEMCPY(reinterpret_cast<void *>(New),
+            std::memcpy(reinterpret_cast<void *>(New),
                         reinterpret_cast<const void *>(pString->c_str()),
                         len * sizeof(UCS2));
             EXIT
@@ -220,7 +195,7 @@ UCS2 *Parser::Parse_String(bool pathname, bool require)
         CASE(STRING_ID_TOKEN)
             len = UCS2_strlen(CurrentTokenDataPtr<UCS2*>()) + 1;
             New = reinterpret_cast<UCS2 *>(POV_MALLOC(len * sizeof(UCS2), "UCS2 String"));
-            POV_MEMCPY(reinterpret_cast<void *>(New), CurrentTokenDataPtr<void*>(), len * sizeof(UCS2));
+            std::memcpy(reinterpret_cast<void *>(New), CurrentTokenDataPtr<void*>(), len * sizeof(UCS2));
             EXIT
         END_CASE
 
@@ -238,36 +213,17 @@ UCS2 *Parser::Parse_String(bool pathname, bool require)
     return New;
 }
 
+//******************************************************************************
 
-//****************************************************************************
-
-
-std::string Parser::Parse_ASCIIString(bool pathname, bool require)
+std::string Parser::Parse_SysString(bool pathname, bool require)
 {
     UCS2 *cstr = Parse_String(pathname, require);
-    std::string ret(UCS2toASCIIString(cstr));
+    std::string ret(UCS2toSysString(cstr));
     POV_FREE(cstr);
     return ret;
 }
 
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- * CHANGES
- *
-******************************************************************************/
+//******************************************************************************
 
 UCS2 *Parser::Parse_Str(bool pathname)
 {
@@ -318,24 +274,7 @@ UCS2 *Parser::Parse_Str(bool pathname)
     return String_To_UCS2(temp4);
 }
 
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- * CHANGES
- *
-******************************************************************************/
+//******************************************************************************
 
 UCS2 *Parser::Parse_VStr(bool pathname)
 {
@@ -417,24 +356,7 @@ UCS2 *Parser::Parse_VStr(bool pathname)
     return New;
 }
 
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- * CHANGES
- *
-******************************************************************************/
+//******************************************************************************
 
 UCS2 *Parser::Parse_Concat(bool pathname)
 {
@@ -465,24 +387,7 @@ UCS2 *Parser::Parse_Concat(bool pathname)
     return New;
 }
 
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- * CHANGES
- *
-******************************************************************************/
+//******************************************************************************
 
 UCS2 *Parser::Parse_Chr(bool /*pathname*/)
 {
@@ -501,24 +406,7 @@ UCS2 *Parser::Parse_Chr(bool /*pathname*/)
     return New;
 }
 
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- * CHANGES
- *
-******************************************************************************/
+//******************************************************************************
 
 #define PARSE_NOW_VAL_LENGTH 200
 
@@ -596,24 +484,7 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
     return String_To_UCS2(val);
 }
 
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- * CHANGES
- *
-******************************************************************************/
+//******************************************************************************
 
 UCS2 *Parser::Parse_Substr(bool pathname)
 {
@@ -643,24 +514,7 @@ UCS2 *Parser::Parse_Substr(bool pathname)
     return New;
 }
 
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- * CHANGES
- *
-******************************************************************************/
+//******************************************************************************
 
 UCS2 *Parser::Parse_Strupr(bool pathname)
 {
@@ -676,24 +530,7 @@ UCS2 *Parser::Parse_Strupr(bool pathname)
     return New;
 }
 
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- * CHANGES
- *
-******************************************************************************/
+//******************************************************************************
 
 UCS2 *Parser::Parse_Strlwr(bool pathname)
 {
@@ -709,24 +546,7 @@ UCS2 *Parser::Parse_Strlwr(bool pathname)
     return New;
 }
 
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- * CHANGES
- *
-******************************************************************************/
+//******************************************************************************
 
 UCS2 *Parser::String_To_UCS2(const char *str)
 {
@@ -778,8 +598,7 @@ UCS2 *Parser::String_To_UCS2(const char *str)
     return char_string;
 }
 
-
-/*****************************************************************************/
+//******************************************************************************
 
 UCS2 *Parser::String_Literal_To_UCS2(const std::string& str)
 {
@@ -893,24 +712,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const std::string& str)
     return char_string;
 }
 
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- * CHANGES
- *
-******************************************************************************/
+//******************************************************************************
 
 char *Parser::UCS2_To_String(const UCS2 *str)
 {
@@ -986,24 +788,7 @@ UCS2 *Parser::Convert_UTF8_To_UCS2(const unsigned char *text_array, int *char_ar
     return char_array;
 }
 
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- * CHANGES
- *
-******************************************************************************/
+//******************************************************************************
 
 UCS2 *Parser::UCS2_strcat(UCS2 *s1, const UCS2 *s2)
 {
@@ -1019,56 +804,7 @@ UCS2 *Parser::UCS2_strcat(UCS2 *s1, const UCS2 *s2)
     return s1;
 }
 
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- * CHANGES
- *
-******************************************************************************/
-
-int Parser::UCS2_strcmp(const UCS2 *s1, const UCS2 *s2)
-{
-    UCS2 t1, t2;
-
-    while((t1 = *s1++) == (t2 = *s2++))
-    {
-        if(t1 == 0)
-            return 0;
-    }
-
-    return (t1 - t2);
-}
-
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- * CHANGES
- *
-******************************************************************************/
+//******************************************************************************
 
 void Parser::UCS2_strcpy(UCS2 *s1, const UCS2 *s2)
 {
@@ -1078,24 +814,7 @@ void Parser::UCS2_strcpy(UCS2 *s1, const UCS2 *s2)
     *s1 = 0;
 }
 
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- * CHANGES
- *
-******************************************************************************/
+//******************************************************************************
 
 void Parser::UCS2_strncpy(UCS2 *s1, const UCS2 *s2, int n)
 {
@@ -1105,24 +824,7 @@ void Parser::UCS2_strncpy(UCS2 *s1, const UCS2 *s2, int n)
     *s1 = 0;
 }
 
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- * CHANGES
- *
-******************************************************************************/
+//******************************************************************************
 
 void Parser::UCS2_strupr(UCS2 *str)
 {
@@ -1143,24 +845,7 @@ void Parser::UCS2_strupr(UCS2 *str)
         Warning("Non-ASCII character in string, strupr may not work as expected.");
 }
 
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- * CHANGES
- *
-******************************************************************************/
+//******************************************************************************
 
 void Parser::UCS2_strlwr(UCS2 *str)
 {
@@ -1185,9 +870,10 @@ UCS2 *Parser::UCS2_strdup(const UCS2 *s)
 {
     UCS2 *New;
 
-    New=reinterpret_cast<UCS2 *>(POV_MALLOC((UCS2_strlen(s)+1) * sizeof(UCS2), UCS2toASCIIString(s).c_str()));
+    New=reinterpret_cast<UCS2 *>(POV_MALLOC((UCS2_strlen(s)+1) * sizeof(UCS2), UCS2toSysString(s).c_str()));
     UCS2_strcpy(New,s);
     return (New);
 }
 
 }
+// end of namespace pov_parser

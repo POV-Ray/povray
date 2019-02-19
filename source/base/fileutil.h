@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,9 +39,13 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
 
-// POV-Ray base header files
-#include "base/fileinputoutput.h"
-#include "base/stringutilities.h"
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+#include "base/fileinputoutput_fwd.h"
+#include "base/stringtypes.h"
 
 namespace pov_base
 {
@@ -52,9 +56,6 @@ namespace pov_base
 /// @ingroup PovBase
 ///
 /// @{
-
-class IMemStream;
-class IStream;
 
 // Legal image file attributes.
 
@@ -76,7 +77,7 @@ class IStream;
 
 #define POV_FILE_EXTENSIONS_PER_TYPE 4
 
-struct POV_File_Extensions
+struct POV_File_Extensions final
 {
     const char *ext[POV_FILE_EXTENSIONS_PER_TYPE];
 };
@@ -85,12 +86,13 @@ extern POV_File_Extensions gPOV_File_Extensions[];
 extern const int gFile_Type_To_Mask[];
 
 int InferFileTypeFromExt(const pov_base::UCS2String& ext);
-IMemStream *Internal_Font_File(int font_id);
+IStream *Internal_Font_File(int font_id);
 
 /// @}
 ///
 //##############################################################################
 
 }
+// end of namespace pov_base
 
 #endif // POVRAY_BASE_FILEUTIL_H

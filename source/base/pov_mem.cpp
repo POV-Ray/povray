@@ -16,7 +16,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,9 +44,14 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/pov_mem.h"
 
+// C++ variants of C standard header files
 #include <cstdlib>
 #include <cstring>
 
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
 
 // this must be the last file included
@@ -54,6 +59,8 @@
 
 namespace pov_base
 {
+
+using std::size_t;
 
 /************************************************************************
 * AUTHOR
@@ -178,7 +185,7 @@ number of calls to malloc/free and some other statistics.
         #define MEM_HEADER_ALIGNMENT sizeof(double)
     #endif
 
-    struct mem_node
+    struct mem_node final
     {
         #ifdef MEM_TAG
             int tag;
@@ -732,7 +739,7 @@ void *pov_memmove (void *dest, const void  *src, size_t length)
 
         while (length > 0)
         {
-            POV_MEMCPY(cdest + length - size, csrc + length - size, size);
+            std::memcpy(cdest + length - size, csrc + length - size, size);
 
             length -= size;
 
@@ -751,7 +758,7 @@ void *pov_memmove (void *dest, const void  *src, size_t length)
 
         while (length > 0)
         {
-            POV_MEMCPY(new_dest, csrc, length);
+            std::memcpy(new_dest, csrc, length);
 
             new_dest += size;
             csrc += size;
@@ -763,10 +770,11 @@ void *pov_memmove (void *dest, const void  *src, size_t length)
     }
     else
     {
-        POV_MEMCPY(cdest, csrc, length);
+        std::memcpy(cdest, csrc, length);
     }
 
     return cdest;
 }
 
 }
+// end of namespace pov_base

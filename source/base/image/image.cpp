@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,20 +36,28 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/image/image.h"
 
-// Standard C++ header files
-#include <algorithm>
-#include <vector>
+// C++ variants of C standard header files
+#include <cstdint>
 
-// Standard POSIX header files
+// C++ standard header files
+//  (none at the moment)
+
+// POSIX standard header files
+// TODO FIXME - Any POSIX-specific stuff should be considered platform-specific.
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
 // POV-Ray header files (base module)
+#include "base/filesystem.h"
 #include "base/platformbase.h"
+#include "base/povassert.h"
 #include "base/safemath.h"
+#include "base/stringutilities.h"
 #include "base/image/bmp.h"
+#include "base/image/colourspace.h"
 #include "base/image/dither.h"
+#include "base/image/encoding.h"
 #include "base/image/gif.h"
 #include "base/image/hdr.h"
 #include "base/image/iff.h"
@@ -78,82 +86,93 @@ namespace pov_base
 {
 
 using std::allocator;
+using std::min;
+using std::max;
+using std::vector;
 
-Image::WriteOptions::WriteOptions() :
+ImageWriteOptions::ImageWriteOptions() :
     ditherStrategy(GetNoOpDitherStrategy()),
     offset_x(0),
     offset_y(0),
-    alphaMode(kAlphaMode_None),
+    alphaMode(ImageAlphaMode::None),
     bitsPerChannel(8),
     compression(-1),
     grayscale(false)
 {}
 
-template<class Allocator = allocator<bool> >
-class BitMapImage : public Image
+GammaCurvePtr ImageWriteOptions::GetTranscodingGammaCurve(GammaCurvePtr defaultEncodingGamma) const
+{
+    if (encodingGamma)
+        return TranscodingGammaCurve::Get(workingGamma, encodingGamma);
+    else
+        return TranscodingGammaCurve::Get(workingGamma, defaultEncodingGamma);
+}
+
+template<class Allocator = allocator<bool>>
+class BitMapImage final : public Image
 {
     public:
         BitMapImage(unsigned int w, unsigned int h) :
-            Image(w, h, Bit_Map) { pixels.resize(SafeUnsignedProduct<size_t>(w, h)); FillBitValue(false); }
+            Image(w, h, ImageDataType::Bit_Map) { pixels.resize(SafeUnsignedProduct<size_t>(w, h)); FillBitValue(false); }
         BitMapImage(unsigned int w, unsigned int h, const vector<RGBMapEntry>& m) :
-            Image(w, h, Bit_Map, m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h)); FillBitValue(false); }
+            Image(w, h, ImageDataType::Bit_Map, m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h)); FillBitValue(false); }
         BitMapImage(unsigned int w, unsigned int h, const vector<RGBAMapEntry>& m) :
-            Image(w, h, Bit_Map, m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h)); FillBitValue(false); }
+            Image(w, h, ImageDataType::Bit_Map, m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h)); FillBitValue(false); }
         BitMapImage(unsigned int w, unsigned int h, const vector<RGBFTMapEntry>& m) :
-            Image(w, h, Bit_Map, m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h)); FillBitValue(false); }
-        ~BitMapImage() { }
+            Image(w, h, ImageDataType::Bit_Map, m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h)); FillBitValue(false); }
+        virtual ~BitMapImage() override { }
 
-        bool IsOpaque() const
+        virtual bool IsOpaque() const override
         {
             return true;
         }
-        bool IsGrayscale() const
+        virtual bool IsGrayscale() const override
         {
             return true;
         }
-        bool IsColour() const
+        virtual bool IsColour() const override
         {
             return false;
         }
-        bool IsFloat() const
+        virtual bool IsFloat() const override
         {
             return false;
         }
-        bool IsInt() const
+        virtual bool IsInt() const override
         {
             return true;
         }
-        bool IsIndexed() const
+        virtual bool IsIndexed() const override
         {
             return false;
         }
-        bool IsGammaEncoded() const
+        virtual bool IsGammaEncoded() const override
         {
             return false;
         }
-        bool HasAlphaChannel() const
+        virtual bool HasAlphaChannel() const override
         {
             return false;
         }
-        bool HasFilterTransmit() const
+        virtual bool HasFilterTransmit() const override
         {
             return false;
         }
-        unsigned int GetMaxIntValue() const
+        virtual unsigned int GetMaxIntValue() const override
         {
             return 1;
         }
-        bool TryDeferDecoding(GammaCurvePtr&, unsigned int)
+        virtual bool TryDeferDecoding(GammaCurvePtr&, unsigned int) override
         {
             return false;
         }
 
-        bool GetBitValue(unsigned int x, unsigned int y) const
+        virtual bool GetBitValue(unsigned int x, unsigned int y) const override
         {
             CHECK_BOUNDS(x, y);
             return pixels[x + y * size_t(width)];
         }
-        float GetGrayValue(unsigned int x, unsigned int y) const
+        virtual float GetGrayValue(unsigned int x, unsigned int y) const override
         {
             CHECK_BOUNDS(x, y);
             if(pixels[x + y * size_t(width)] == true)
@@ -161,143 +180,143 @@ class BitMapImage : public Image
             else
                 return 0.0f;
         }
-        void GetGrayAValue(unsigned int x, unsigned int y, float& gray, float& alpha) const
+        virtual void GetGrayAValue(unsigned int x, unsigned int y, float& gray, float& alpha) const override
         {
             gray = GetGrayValue(x, y);
             alpha = ALPHA_OPAQUE;
         }
-        void GetRGBValue(unsigned int x, unsigned int y, float& red, float& green, float& blue) const
+        virtual void GetRGBValue(unsigned int x, unsigned int y, float& red, float& green, float& blue) const override
         {
             red = green = blue = GetGrayValue(x, y);
         }
-        void GetRGBAValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& alpha) const
+        virtual void GetRGBAValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& alpha) const override
         {
             red = green = blue = GetGrayValue(x, y);
             alpha = ALPHA_OPAQUE;
         }
-        void GetRGBTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& transm) const
+        virtual void GetRGBTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& transm) const override
         {
             red = green = blue = GetGrayValue(x, y);
             transm = FT_OPAQUE;
         }
-        void GetRGBFTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& filter, float& transm) const
+        virtual void GetRGBFTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& filter, float& transm) const override
         {
             red = green = blue = GetGrayValue(x, y);
             filter = transm = FT_OPAQUE;
         }
 
-        void SetBitValue(unsigned int x, unsigned int y, bool bit)
+        virtual void SetBitValue(unsigned int x, unsigned int y, bool bit) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = bit;
         }
-        void SetGrayValue(unsigned int x, unsigned int y, float gray)
+        virtual void SetGrayValue(unsigned int x, unsigned int y, float gray) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = (gray != 0.0f);
         }
-        void SetGrayValue(unsigned int x, unsigned int y, unsigned int gray)
+        virtual void SetGrayValue(unsigned int x, unsigned int y, unsigned int gray) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = (gray != 0);
         }
-        void SetGrayAValue(unsigned int x, unsigned int y, float gray, float)
+        virtual void SetGrayAValue(unsigned int x, unsigned int y, float gray, float) override
         {
             // TODO FIXME - [CLi] This ignores opacity information; other bit-based code doesn't.
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = (gray != 0.0f);
         }
-        void SetGrayAValue(unsigned int x, unsigned int y, unsigned int gray, unsigned int)
+        virtual void SetGrayAValue(unsigned int x, unsigned int y, unsigned int gray, unsigned int) override
         {
             // TODO FIXME - [CLi] This ignores opacity information; other bit-based code doesn't.
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = (gray != 0);
         }
-        void SetRGBValue(unsigned int x, unsigned int y, float red, float green, float blue)
+        virtual void SetRGBValue(unsigned int x, unsigned int y, float red, float green, float blue) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = IS_NONZERO_RGB(red, green, blue);
         }
-        void SetRGBValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue)
+        virtual void SetRGBValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = IS_NONZERO_RGB_INT(red, green, blue);
         }
-        void SetRGBAValue(unsigned int x, unsigned int y, float red, float green, float blue, float)
+        virtual void SetRGBAValue(unsigned int x, unsigned int y, float red, float green, float blue, float) override
         {
             // TODO FIXME - [CLi] This ignores opacity information; other bit-based code doesn't.
             SetRGBValue(x, y, red, green, blue);
         }
-        void SetRGBAValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue, unsigned int)
+        virtual void SetRGBAValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue, unsigned int) override
         {
             // TODO FIXME - [CLi] This ignores opacity information; other bit-based code doesn't.
             SetRGBValue(x, y, red, green, blue);
         }
-        void SetRGBTValue(unsigned int x, unsigned int y, float red, float green, float blue, float transm)
+        virtual void SetRGBTValue(unsigned int x, unsigned int y, float red, float green, float blue, float transm) override
         {
             // TODO FIXME - [CLi] This ignores opacity information; other bit-based code doesn't.
             SetRGBValue(x, y, red, green, blue);
         }
-        void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col)
+        virtual void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col) override
         {
             // TODO FIXME - [CLi] This ignores opacity information; other bit-based code doesn't.
             SetRGBValue(x, y, col.red(), col.green(), col.blue());
         }
-        void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float, float)
+        virtual void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float, float) override
         {
             // TODO FIXME - [CLi] This ignores opacity information; other bit-based code doesn't.
             SetRGBValue(x, y, red, green, blue);
         }
-        void SetRGBFTValue(unsigned int x, unsigned int y, const RGBFTColour& col)
+        virtual void SetRGBFTValue(unsigned int x, unsigned int y, const RGBFTColour& col) override
         {
             // TODO FIXME - [CLi] This ignores opacity information; other bit-based code doesn't.
             SetRGBValue(x, y, col.red(), col.green(), col.blue());
         }
 
-        void FillBitValue(bool bit)
+        virtual void FillBitValue(bool bit) override
         {
             fill(pixels.begin(), pixels.end(), bit);
         }
-        void FillGrayValue(float gray)
+        virtual void FillGrayValue(float gray) override
         {
             FillBitValue(gray != 0.0f);
         }
-        void FillGrayValue(unsigned int gray)
+        virtual void FillGrayValue(unsigned int gray) override
         {
             FillBitValue(gray != 0);
         }
-        void FillGrayAValue(float gray, float)
+        virtual void FillGrayAValue(float gray, float) override
         {
             FillBitValue(gray != 0.0f);
         }
-        void FillGrayAValue(unsigned int gray, unsigned int)
+        virtual void FillGrayAValue(unsigned int gray, unsigned int) override
         {
             FillBitValue(gray != 0);
         }
-        void FillRGBValue(float red, float green, float blue)
+        virtual void FillRGBValue(float red, float green, float blue) override
         {
             FillBitValue(IS_NONZERO_RGB(red, green, blue));
         }
-        void FillRGBValue(unsigned int red, unsigned int green, unsigned int blue)
+        virtual void FillRGBValue(unsigned int red, unsigned int green, unsigned int blue) override
         {
             FillBitValue(IS_NONZERO_RGB_INT(red, green, blue));
         }
-        void FillRGBAValue(float red, float green, float blue, float)
+        virtual void FillRGBAValue(float red, float green, float blue, float) override
         {
             // TODO FIXME - [CLi] This ignores opacity information; other bit-based code doesn't.
             FillRGBValue(red, green, blue);
         }
-        void FillRGBAValue(unsigned int red, unsigned int green, unsigned int blue, unsigned int)
+        virtual void FillRGBAValue(unsigned int red, unsigned int green, unsigned int blue, unsigned int) override
         {
             // TODO FIXME - [CLi] This ignores opacity information; other bit-based code doesn't.
             FillRGBValue(red, green, blue);
         }
-        void FillRGBTValue(float red, float green, float blue, float)
+        virtual void FillRGBTValue(float red, float green, float blue, float) override
         {
             // TODO FIXME - [CLi] This ignores opacity information; other bit-based code doesn't.
             FillRGBValue(red, green, blue);
         }
-        void FillRGBFTValue(float red, float green, float blue, float, float)
+        virtual void FillRGBFTValue(float red, float green, float blue, float, float) override
         {
             // TODO FIXME - [CLi] This ignores opacity information; other bit-based code doesn't.
             FillRGBValue(red, green, blue);
@@ -308,19 +327,19 @@ class BitMapImage : public Image
 
 typedef BitMapImage<> MemoryBitMapImage;
 
-template<class Allocator = allocator<unsigned char> >
-class ColourMapImage : public Image
+template<class Allocator = allocator<unsigned char>>
+class ColourMapImage final : public Image
 {
     public:
         ColourMapImage(unsigned int w, unsigned int h, const vector<RGBMapEntry>& m) :
-            Image(w, h, Colour_Map, m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h)); FillBitValue(false); }
+            Image(w, h, ImageDataType::Colour_Map, m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h)); FillBitValue(false); }
         ColourMapImage(unsigned int w, unsigned int h, const vector<RGBAMapEntry>& m) :
-            Image(w, h, Colour_Map, m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h)); FillBitValue(false); }
+            Image(w, h, ImageDataType::Colour_Map, m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h)); FillBitValue(false); }
         ColourMapImage(unsigned int w, unsigned int h, const vector<RGBFTMapEntry>& m) :
-            Image(w, h, Colour_Map, m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h)); FillBitValue(false); }
-        ~ColourMapImage() { }
+            Image(w, h, ImageDataType::Colour_Map, m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h)); FillBitValue(false); }
+        virtual ~ColourMapImage() override { }
 
-        bool IsOpaque() const
+        virtual bool IsOpaque() const override
         {
             if((colormaptype != RGBAColourMap) && (colormaptype != RGBFTColourMap))
                 return true;
@@ -359,48 +378,48 @@ class ColourMapImage : public Image
 
             return true;
         }
-        bool IsGrayscale() const
+        virtual bool IsGrayscale() const override
         {
             return false;
         }
-        bool IsColour() const
+        virtual bool IsColour() const override
         {
             return true;
         }
-        bool IsFloat() const
+        virtual bool IsFloat() const override
         {
             return false;
         }
-        bool IsInt() const
+        virtual bool IsInt() const override
         {
             return true;
         }
-        bool IsIndexed() const
+        virtual bool IsIndexed() const override
         {
             return true;
         }
-        bool IsGammaEncoded() const
+        virtual bool IsGammaEncoded() const override
         {
             return false;
         }
-        bool HasAlphaChannel() const
+        virtual bool HasAlphaChannel() const override
         {
             return (colormaptype == RGBAColourMap);
         }
-        bool HasFilterTransmit() const
+        virtual bool HasFilterTransmit() const override
         {
             return (colormaptype == RGBFTColourMap);
         }
-        unsigned int GetMaxIntValue() const
+        virtual unsigned int GetMaxIntValue() const override
         {
             return 255;
         }
-        bool TryDeferDecoding(GammaCurvePtr&, unsigned int)
+        virtual bool TryDeferDecoding(GammaCurvePtr&, unsigned int) override
         {
             return false;
         }
 
-        bool GetBitValue(unsigned int x, unsigned int y) const
+        virtual bool GetBitValue(unsigned int x, unsigned int y) const override
         {
             float red, green, blue, filter, transm, alpha;
             switch(colormaptype)
@@ -420,7 +439,7 @@ class ColourMapImage : public Image
                     return false;
             }
         }
-        float GetGrayValue(unsigned int x, unsigned int y) const
+        virtual float GetGrayValue(unsigned int x, unsigned int y) const override
         {
             float red, green, blue, filter, transm, alpha;
             switch(colormaptype)
@@ -438,7 +457,7 @@ class ColourMapImage : public Image
                     return 0.0f;
             }
         }
-        void GetGrayAValue(unsigned int x, unsigned int y, float& gray, float& alpha) const
+        virtual void GetGrayAValue(unsigned int x, unsigned int y, float& gray, float& alpha) const override
         {
             float red, green, blue, filter, transm;
             alpha = ALPHA_OPAQUE; // (unless noted otherwise)
@@ -462,7 +481,7 @@ class ColourMapImage : public Image
                     return;
             }
         }
-        void GetRGBValue(unsigned int x, unsigned int y, float& red, float& green, float& blue) const
+        virtual void GetRGBValue(unsigned int x, unsigned int y, float& red, float& green, float& blue) const override
         {
             CHECK_BOUNDS(x, y);
             MapEntry e(colormap[pixels[x + y * size_t(width)]]);
@@ -470,7 +489,7 @@ class ColourMapImage : public Image
             green = e.green;
             blue = e.blue;
         }
-        void GetRGBAValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& alpha) const
+        virtual void GetRGBAValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& alpha) const override
         {
             CHECK_BOUNDS(x, y);
             MapEntry e(colormap[pixels[x + y * size_t(width)]]);
@@ -490,7 +509,7 @@ class ColourMapImage : public Image
                     return;
             }
         }
-        void GetRGBTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& transm) const
+        virtual void GetRGBTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& transm) const override
         {
             CHECK_BOUNDS(x, y);
             MapEntry e(colormap[pixels[x + y * size_t(width)]]);
@@ -510,7 +529,7 @@ class ColourMapImage : public Image
                     return;
             }
         }
-        void GetRGBFTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& filter, float& transm) const
+        virtual void GetRGBFTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& filter, float& transm) const override
         {
             CHECK_BOUNDS(x, y);
             MapEntry e(colormap[pixels[x + y * size_t(width)]]);
@@ -532,126 +551,126 @@ class ColourMapImage : public Image
                     return;
             }
         }
-        unsigned char GetIndexedValue(unsigned int x, unsigned int y)
+        virtual unsigned char GetIndexedValue(unsigned int x, unsigned int y) override
         {
             CHECK_BOUNDS(x, y);
             return pixels[x + y * size_t(width)];
         }
 
-        void SetBitValue(unsigned int x, unsigned int y, bool bit)
+        virtual void SetBitValue(unsigned int x, unsigned int y, bool bit) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = Bit2Map(bit);
         }
-        void SetGrayValue(unsigned int x, unsigned int y, float gray)
+        virtual void SetGrayValue(unsigned int x, unsigned int y, float gray) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = Gray2Map(gray);
         }
-        void SetGrayValue(unsigned int x, unsigned int y, unsigned int gray)
+        virtual void SetGrayValue(unsigned int x, unsigned int y, unsigned int gray) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = Gray2Map(float(gray) / 255.0);
         }
-        void SetGrayAValue(unsigned int x, unsigned int y, float gray, float alpha)
+        virtual void SetGrayAValue(unsigned int x, unsigned int y, float gray, float alpha) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = GrayA2Map(gray, alpha);
         }
-        void SetGrayAValue(unsigned int x, unsigned int y, unsigned int gray, unsigned int alpha)
+        virtual void SetGrayAValue(unsigned int x, unsigned int y, unsigned int gray, unsigned int alpha) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = GrayA2Map(float(gray) / 255.0, float(alpha) / 255.0);
         }
-        void SetRGBValue(unsigned int x, unsigned int y, float red, float green, float blue)
+        virtual void SetRGBValue(unsigned int x, unsigned int y, float red, float green, float blue) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = RGB2Map(red, green, blue);
         }
-        void SetRGBValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue)
+        virtual void SetRGBValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = RGB2Map(float(red) / 255.0, float(green) / 255.0, float(blue) / 255.0);
         }
-        void SetRGBAValue(unsigned int x, unsigned int y, float red, float green, float blue, float alpha)
+        virtual void SetRGBAValue(unsigned int x, unsigned int y, float red, float green, float blue, float alpha) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = RGBA2Map(red, green, blue, alpha);
         }
-        void SetRGBAValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha)
+        virtual void SetRGBAValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = RGBA2Map(float(red) / 255.0, float(green) / 255.0, float(blue) / 255.0, float(alpha) / 255.0);
         }
-        void SetRGBTValue(unsigned int x, unsigned int y, float red, float green, float blue, float transm)
+        virtual void SetRGBTValue(unsigned int x, unsigned int y, float red, float green, float blue, float transm) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = RGBT2Map(red, green, blue, transm);
         }
-        void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col)
+        virtual void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = RGBA2Map(col.red(), col.green(), col.blue(), col.alpha());
         }
-        void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float filter, float transm)
+        virtual void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float filter, float transm) override
         {
             CHECK_BOUNDS(x, y);
             // [CLi 2009-09] this was dividing by 255 - which I presume to have been a bug.
             pixels[x + y * size_t(width)] = RGBFT2Map(red, green, blue, filter, transm);
         }
-        void SetRGBFTValue(unsigned int x, unsigned int y, const RGBFTColour& col)
+        virtual void SetRGBFTValue(unsigned int x, unsigned int y, const RGBFTColour& col) override
         {
             CHECK_BOUNDS(x, y);
             // [CLi 2009-09] this was dividing by 255 - which I presume to have been a bug.
             pixels[x + y * size_t(width)] = RGBFT2Map(col.red(), col.green(), col.blue(), col.filter(), col.transm());
         }
-        void SetIndexedValue(unsigned int x, unsigned int y, unsigned char index)
+        virtual void SetIndexedValue(unsigned int x, unsigned int y, unsigned char index) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = index;
         }
 
-        void FillBitValue(bool bit)
+        virtual void FillBitValue(bool bit) override
         {
             fill(pixels.begin(), pixels.end(), Bit2Map(bit));
         }
-        void FillGrayValue(float gray)
+        virtual void FillGrayValue(float gray) override
         {
             fill(pixels.begin(), pixels.end(), Gray2Map(gray));
         }
-        void FillGrayValue(unsigned int gray)
+        virtual void FillGrayValue(unsigned int gray) override
         {
             fill(pixels.begin(), pixels.end(), Gray2Map(float(gray) / 255.0));
         }
-        void FillGrayAValue(float gray, float alpha)
+        virtual void FillGrayAValue(float gray, float alpha) override
         {
             fill(pixels.begin(), pixels.end(), GrayA2Map(gray, alpha));
         }
-        void FillGrayAValue(unsigned int gray, unsigned int alpha)
+        virtual void FillGrayAValue(unsigned int gray, unsigned int alpha) override
         {
             fill(pixels.begin(), pixels.end(), GrayA2Map(float(gray) / 255.0, float(alpha) / 255.0));
         }
-        void FillRGBValue(float red, float green, float blue)
+        virtual void FillRGBValue(float red, float green, float blue) override
         {
             fill(pixels.begin(), pixels.end(), RGB2Map(red, green, blue));
         }
-        void FillRGBValue(unsigned int red, unsigned int green, unsigned int blue)
+        virtual void FillRGBValue(unsigned int red, unsigned int green, unsigned int blue) override
         {
             fill(pixels.begin(), pixels.end(), RGB2Map(float(red) / 255.0, float(green) / 255.0, float(blue) / 255.0));
         }
-        void FillRGBAValue(float red, float green, float blue, float alpha)
+        virtual void FillRGBAValue(float red, float green, float blue, float alpha) override
         {
             fill(pixels.begin(), pixels.end(), RGBA2Map(red, green, blue, alpha));
         }
-        void FillRGBAValue(unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha)
+        virtual void FillRGBAValue(unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha) override
         {
             fill(pixels.begin(), pixels.end(), RGBA2Map(float(red) / 255.0, float(green) / 255.0, float(blue) / 255.0, float(alpha) / 255.0));
         }
-        void FillRGBTValue(float red, float green, float blue, float transm)
+        virtual void FillRGBTValue(float red, float green, float blue, float transm) override
         {
             fill(pixels.begin(), pixels.end(), RGBT2Map(red, green, blue, transm));
         }
-        void FillRGBFTValue(float red, float green, float blue, float filter, float transm)
+        virtual void FillRGBFTValue(float red, float green, float blue, float filter, float transm) override
         {
             // [CLi 2009-09] this was dividing by 255 - which I presume to have been a bug.
             fill(pixels.begin(), pixels.end(), RGBFT2Map(red, green, blue, filter, transm));
@@ -811,8 +830,8 @@ class ColourMapImage : public Image
 
 typedef ColourMapImage<> MemoryColourMapImage;
 
-template<typename T, unsigned int TMAX, int IDT, class Allocator = allocator<T> >
-class GrayImage : public Image
+template<typename T, unsigned int TMAX, ImageDataType IDT, class Allocator = allocator<T>>
+class GrayImage final : public Image
 {
     public:
         GrayImage(unsigned int w, unsigned int h) :
@@ -823,198 +842,198 @@ class GrayImage : public Image
             Image(w, h, ImageDataType(IDT), m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h)); FillBitValue(false); }
         GrayImage(unsigned int w, unsigned int h, const vector<RGBFTMapEntry>& m) :
             Image(w, h, ImageDataType(IDT), m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h)); FillBitValue(false); }
-        ~GrayImage() { }
+        virtual ~GrayImage() override { }
 
-        bool IsOpaque() const
+        virtual bool IsOpaque() const override
         {
             return true;
         }
-        bool IsGrayscale() const
+        virtual bool IsGrayscale() const override
         {
             return true;
         }
-        bool IsColour() const
+        virtual bool IsColour() const override
         {
             return false;
         }
-        bool IsFloat() const
+        virtual bool IsFloat() const override
         {
             return false;
         }
-        bool IsInt() const
+        virtual bool IsInt() const override
         {
             return true;
         }
-        bool IsGammaEncoded() const
+        virtual bool IsGammaEncoded() const override
         {
             return false;
         }
-        bool IsIndexed() const
+        virtual bool IsIndexed() const override
         {
             return false;
         }
-        bool HasAlphaChannel() const
+        virtual bool HasAlphaChannel() const override
         {
             return false;
         }
-        bool HasFilterTransmit() const
+        virtual bool HasFilterTransmit() const override
         {
             return false;
         }
-        unsigned int GetMaxIntValue() const
+        virtual unsigned int GetMaxIntValue() const override
         {
             return TMAX;
         }
-        bool TryDeferDecoding(GammaCurvePtr&, unsigned int)
+        virtual bool TryDeferDecoding(GammaCurvePtr&, unsigned int) override
         {
             return false;
         }
 
-        bool GetBitValue(unsigned int x, unsigned int y) const
+        virtual bool GetBitValue(unsigned int x, unsigned int y) const override
         {
             CHECK_BOUNDS(x, y);
             return (pixels[x + y * size_t(width)] != 0);
         }
-        float GetGrayValue(unsigned int x, unsigned int y) const
+        virtual float GetGrayValue(unsigned int x, unsigned int y) const override
         {
             CHECK_BOUNDS(x, y);
             return float(pixels[x + y * size_t(width)]) / float(TMAX);
         }
-        void GetGrayAValue(unsigned int x, unsigned int y, float& gray, float& alpha) const
+        virtual void GetGrayAValue(unsigned int x, unsigned int y, float& gray, float& alpha) const override
         {
             CHECK_BOUNDS(x, y);
             gray = float(pixels[x + y * size_t(width)]) / float(TMAX);
             alpha = ALPHA_OPAQUE;
         }
-        void GetRGBValue(unsigned int x, unsigned int y, float& red, float& green, float& blue) const
+        virtual void GetRGBValue(unsigned int x, unsigned int y, float& red, float& green, float& blue) const override
         {
             red = green = blue = GetGrayValue(x, y);
         }
-        void GetRGBAValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& alpha) const
+        virtual void GetRGBAValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& alpha) const override
         {
             red = green = blue = GetGrayValue(x, y);
             alpha = ALPHA_OPAQUE;
         }
-        void GetRGBTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& transm) const
+        virtual void GetRGBTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& transm) const override
         {
             red = green = blue = GetGrayValue(x, y);
             transm = FT_OPAQUE;
         }
-        void GetRGBFTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& filter, float& transm) const
+        virtual void GetRGBFTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& filter, float& transm) const override
         {
             red = green = blue = GetGrayValue(x, y);
             filter = transm = FT_OPAQUE;
         }
-        unsigned char GetIndexedValue(unsigned int x, unsigned int y)
+        virtual unsigned char GetIndexedValue(unsigned int x, unsigned int y) override
         {
             CHECK_BOUNDS(x, y);
             return (unsigned char)(int(pixels[x + y * size_t(width)]) / ((TMAX + 1) >> 8));
         }
 
-        void SetBitValue(unsigned int x, unsigned int y, bool bit)
+        virtual void SetBitValue(unsigned int x, unsigned int y, bool bit) override
         {
             if(bit == true)
                 SetGrayValue(x, y, TMAX);
             else
                 SetGrayValue(x, y, (unsigned int)0);
         }
-        void SetGrayValue(unsigned int x, unsigned int y, float gray)
+        virtual void SetGrayValue(unsigned int x, unsigned int y, float gray) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = T(gray * float(TMAX));
         }
-        void SetGrayValue(unsigned int x, unsigned int y, unsigned int gray)
+        virtual void SetGrayValue(unsigned int x, unsigned int y, unsigned int gray) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = T(gray);
         }
-        void SetGrayAValue(unsigned int x, unsigned int y, float gray, float)
+        virtual void SetGrayAValue(unsigned int x, unsigned int y, float gray, float) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = T(gray * float(TMAX));
         }
-        void SetGrayAValue(unsigned int x, unsigned int y, unsigned int gray, unsigned int)
+        virtual void SetGrayAValue(unsigned int x, unsigned int y, unsigned int gray, unsigned int) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = T(gray);
         }
-        void SetRGBValue(unsigned int x, unsigned int y, float red, float green, float blue)
+        virtual void SetRGBValue(unsigned int x, unsigned int y, float red, float green, float blue) override
         {
             SetGrayValue(x, y, RGB2Gray(red, green, blue));
         }
-        void SetRGBValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue)
+        virtual void SetRGBValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue) override
         {
             SetGrayValue(x, y, RGB2Gray(float(red) / float(TMAX), float(green) / float(TMAX), float(blue) / float(TMAX)));
         }
-        void SetRGBAValue(unsigned int x, unsigned int y, float red, float green, float blue, float)
+        virtual void SetRGBAValue(unsigned int x, unsigned int y, float red, float green, float blue, float) override
         {
             SetRGBValue(x, y, red, green, blue);
         }
-        void SetRGBAValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue, unsigned int)
+        virtual void SetRGBAValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue, unsigned int) override
         {
             SetRGBValue(x, y, red, green, blue);
         }
-        void SetRGBTValue(unsigned int x, unsigned int y, float red, float green, float blue, float transm)
+        virtual void SetRGBTValue(unsigned int x, unsigned int y, float red, float green, float blue, float transm) override
         {
             SetRGBValue(x, y, red, green, blue);
         }
-        void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col)
+        virtual void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col) override
         {
             SetRGBValue(x, y, col.red(), col.green(), col.blue());
         }
-        void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float, float)
+        virtual void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float, float) override
         {
             SetRGBValue(x, y, red, green, blue);
         }
-        void SetRGBFTValue(unsigned int x, unsigned int y, const RGBFTColour& col)
+        virtual void SetRGBFTValue(unsigned int x, unsigned int y, const RGBFTColour& col) override
         {
             SetRGBValue(x, y, col.red(), col.green(), col.blue());
         }
 
-        void FillBitValue(bool bit)
+        virtual void FillBitValue(bool bit) override
         {
             if(bit == true)
                 FillGrayValue(TMAX);
             else
                 FillGrayValue((unsigned int)0);
         }
-        void FillGrayValue(float gray)
+        virtual void FillGrayValue(float gray) override
         {
             FillGrayValue((unsigned int)(gray * float(TMAX)));
         }
-        void FillGrayValue(unsigned int gray)
+        virtual void FillGrayValue(unsigned int gray) override
         {
             fill(pixels.begin(), pixels.end(), T(gray));
         }
-        void FillGrayAValue(float gray, float)
+        virtual void FillGrayAValue(float gray, float) override
         {
             FillGrayValue(gray);
         }
-        void FillGrayAValue(unsigned int gray, unsigned int)
+        virtual void FillGrayAValue(unsigned int gray, unsigned int) override
         {
             FillGrayValue(gray);
         }
-        void FillRGBValue(float red, float green, float blue)
+        virtual void FillRGBValue(float red, float green, float blue) override
         {
             FillGrayValue(RGB2Gray(red, green, blue));
         }
-        void FillRGBValue(unsigned int red, unsigned int green, unsigned int blue)
+        virtual void FillRGBValue(unsigned int red, unsigned int green, unsigned int blue) override
         {
             FillGrayValue(RGB2Gray(float(red) / float(TMAX), float(green) / float(TMAX), float(blue) / float(TMAX)));
         }
-        void FillRGBAValue(float red, float green, float blue, float)
+        virtual void FillRGBAValue(float red, float green, float blue, float) override
         {
             FillRGBValue(red, green, blue);
         }
-        void FillRGBAValue(unsigned int red, unsigned int green, unsigned int blue, unsigned int)
+        virtual void FillRGBAValue(unsigned int red, unsigned int green, unsigned int blue, unsigned int) override
         {
             FillRGBValue(red, green, blue);
         }
-        void FillRGBTValue(float red, float green, float blue, float)
+        virtual void FillRGBTValue(float red, float green, float blue, float) override
         {
             FillRGBValue(red, green, blue);
         }
-        void FillRGBFTValue(float red, float green, float blue, float, float)
+        virtual void FillRGBFTValue(float red, float green, float blue, float, float) override
         {
             FillRGBValue(red, green, blue);
         }
@@ -1022,12 +1041,12 @@ class GrayImage : public Image
         vector<T, Allocator> pixels;
 };
 
-typedef GrayImage<unsigned char, 255, Image::Gray_Int8> MemoryGray8Image;
+typedef GrayImage<unsigned char, 255, ImageDataType::Gray_Int8> MemoryGray8Image;
 
-typedef GrayImage<unsigned short, 65535, Image::Gray_Int16> MemoryGray16Image;
+typedef GrayImage<unsigned short, 65535, ImageDataType::Gray_Int16> MemoryGray16Image;
 
-template<typename T, unsigned int TMAX, int IDT, class Allocator = allocator<T> >
-class GrayAImage : public Image
+template<typename T, unsigned int TMAX, ImageDataType IDT, class Allocator = allocator<T>>
+class GrayAImage final : public Image
 {
     public:
         GrayAImage(unsigned int w, unsigned int h) :
@@ -1038,9 +1057,9 @@ class GrayAImage : public Image
             Image(w, h, ImageDataType(IDT), m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h, 2u)); FillBitValue(false); }
         GrayAImage(unsigned int w, unsigned int h, const vector<RGBFTMapEntry>& m) :
             Image(w, h, ImageDataType(IDT), m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h, 2u)); FillBitValue(false); }
-        ~GrayAImage() { }
+        virtual ~GrayAImage() override { }
 
-        bool IsOpaque() const
+        virtual bool IsOpaque() const override
         {
             for(typename vector<T, Allocator>::const_iterator i(pixels.begin()); i != pixels.end(); i += 2)
             {
@@ -1050,81 +1069,81 @@ class GrayAImage : public Image
 
             return true;
         }
-        bool IsGrayscale() const
+        virtual bool IsGrayscale() const override
         {
             return true;
         }
-        bool IsColour() const
+        virtual bool IsColour() const override
         {
             return false;
         }
-        bool IsFloat() const
+        virtual bool IsFloat() const override
         {
             return false;
         }
-        bool IsInt() const
+        virtual bool IsInt() const override
         {
             return true;
         }
-        bool IsIndexed() const
+        virtual bool IsIndexed() const override
         {
             return false;
         }
-        bool IsGammaEncoded() const
+        virtual bool IsGammaEncoded() const override
         {
             return false;
         }
-        bool HasAlphaChannel() const
+        virtual bool HasAlphaChannel() const override
         {
             return true;
         }
-        bool HasFilterTransmit() const
+        virtual bool HasFilterTransmit() const override
         {
             return false;
         }
-        unsigned int GetMaxIntValue() const
+        virtual unsigned int GetMaxIntValue() const override
         {
             return TMAX;
         }
-        bool TryDeferDecoding(GammaCurvePtr&, unsigned int)
+        virtual bool TryDeferDecoding(GammaCurvePtr&, unsigned int) override
         {
             return false;
         }
 
-        bool GetBitValue(unsigned int x, unsigned int y) const
+        virtual bool GetBitValue(unsigned int x, unsigned int y) const override
         {
             // TODO FIXME - [CLi] This ignores opacity information; other bit-based code doesn't.
             CHECK_BOUNDS(x, y);
             return (pixels[(x + y * size_t(width)) * 2] != 0);
         }
-        float GetGrayValue(unsigned int x, unsigned int y) const
+        virtual float GetGrayValue(unsigned int x, unsigned int y) const override
         {
             CHECK_BOUNDS(x, y);
             return float(pixels[(x + y * size_t(width)) * 2]) / float(TMAX);
         }
-        void GetGrayAValue(unsigned int x, unsigned int y, float& gray, float& alpha) const
+        virtual void GetGrayAValue(unsigned int x, unsigned int y, float& gray, float& alpha) const override
         {
             CHECK_BOUNDS(x, y);
             gray  = float(pixels[(x + y * size_t(width)) * 2])     / float(TMAX);
             alpha = float(pixels[(x + y * size_t(width)) * 2 + 1]) / float(TMAX);
         }
-        void GetRGBValue(unsigned int x, unsigned int y, float& red, float& green, float& blue) const
+        virtual void GetRGBValue(unsigned int x, unsigned int y, float& red, float& green, float& blue) const override
         {
             red = green = blue = GetGrayValue(x, y);
         }
-        void GetRGBAValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& alpha) const
+        virtual void GetRGBAValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& alpha) const override
         {
             GetGrayAValue(x, y, red, alpha);
             green = blue = red;
         }
-        void GetRGBTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& transm) const
+        virtual void GetRGBTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& transm) const override
         {
             float alpha;
             GetGrayAValue(x, y, red, alpha);
             green = blue = red;
             transm = 1.0 - alpha;
         }
-        void GetRGBFTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& filter, float& transm) const
+        virtual void GetRGBFTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& filter, float& transm) const override
         {
             float alpha;
             GetGrayAValue(x, y, red, alpha);
@@ -1132,83 +1151,83 @@ class GrayAImage : public Image
             RGBFTColour::AtoFT(alpha, filter, transm);
         }
 
-        void SetBitValue(unsigned int x, unsigned int y, bool bit)
+        virtual void SetBitValue(unsigned int x, unsigned int y, bool bit) override
         {
             if(bit == true)
                 SetGrayAValue(x, y, TMAX, ALPHA_OPAQUE_INT(TMAX));
             else
                 SetGrayAValue(x, y, (unsigned int)0, ALPHA_OPAQUE_INT(TMAX));
         }
-        void SetGrayValue(unsigned int x, unsigned int y, float gray)
+        virtual void SetGrayValue(unsigned int x, unsigned int y, float gray) override
         {
             SetGrayAValue(x, y, gray, ALPHA_OPAQUE);
         }
-        void SetGrayValue(unsigned int x, unsigned int y, unsigned int gray)
+        virtual void SetGrayValue(unsigned int x, unsigned int y, unsigned int gray) override
         {
             SetGrayAValue(x, y, gray, ALPHA_OPAQUE_INT(TMAX));
         }
-        void SetGrayAValue(unsigned int x, unsigned int y, float gray, float alpha)
+        virtual void SetGrayAValue(unsigned int x, unsigned int y, float gray, float alpha) override
         {
             CHECK_BOUNDS(x, y);
             pixels[(x + y * size_t(width)) * 2]     = T(gray * float(TMAX));
             pixels[(x + y * size_t(width)) * 2 + 1] = T(alpha * float(TMAX));
         }
-        void SetGrayAValue(unsigned int x, unsigned int y, unsigned int gray, unsigned int alpha)
+        virtual void SetGrayAValue(unsigned int x, unsigned int y, unsigned int gray, unsigned int alpha) override
         {
             CHECK_BOUNDS(x, y);
             pixels[(x + y * size_t(width)) * 2]     = gray;
             pixels[(x + y * size_t(width)) * 2 + 1] = alpha;
         }
-        void SetRGBValue(unsigned int x, unsigned int y, float red, float green, float blue)
+        virtual void SetRGBValue(unsigned int x, unsigned int y, float red, float green, float blue) override
         {
             SetGrayValue(x, y, RGB2Gray(red, green, blue));
         }
-        void SetRGBValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue)
+        virtual void SetRGBValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue) override
         {
             SetGrayValue(x, y, RGB2Gray(float(red) / float(TMAX), float(green) / float(TMAX), float(blue) / float(TMAX)));
         }
-        void SetRGBAValue(unsigned int x, unsigned int y, float red, float green, float blue, float alpha)
+        virtual void SetRGBAValue(unsigned int x, unsigned int y, float red, float green, float blue, float alpha) override
         {
             SetGrayAValue(x, y, RGB2Gray(red, green, blue), alpha);
         }
-        void SetRGBAValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha)
+        virtual void SetRGBAValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha) override
         {
             // TODO FIXME - this unnecessarily converts alpha from int to float, requiring it to be converted back to int
             SetGrayAValue(x, y, RGB2Gray(float(red) / float(TMAX), float(green) / float(TMAX), float(blue) / float(TMAX)), float(alpha) / float(TMAX));
         }
-        void SetRGBTValue(unsigned int x, unsigned int y, float red, float green, float blue, float transm)
+        virtual void SetRGBTValue(unsigned int x, unsigned int y, float red, float green, float blue, float transm) override
         {
             SetGrayAValue(x, y, RGB2Gray(red, green, blue), 1.0 - transm);
         }
-        void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col)
+        virtual void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col) override
         {
             SetGrayAValue(x, y, RGB2Gray(col.red(), col.green(), col.blue()), col.alpha());
         }
-        void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float filter, float transm)
+        virtual void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float filter, float transm) override
         {
             SetGrayAValue(x, y, RGB2Gray(red, green, blue), RGBFTColour::FTtoA(filter, transm));
         }
-        void SetRGBFTValue(unsigned int x, unsigned int y, const RGBFTColour& col)
+        virtual void SetRGBFTValue(unsigned int x, unsigned int y, const RGBFTColour& col) override
         {
             SetGrayAValue(x, y, RGB2Gray(col.red(), col.green(), col.blue()), col.FTtoA());
         }
 
-        void FillBitValue(bool bit)
+        virtual void FillBitValue(bool bit) override
         {
             if(bit == true)
                 FillGrayValue(TMAX);
             else
                 FillGrayValue((unsigned int)0);
         }
-        void FillGrayValue(float gray)
+        virtual void FillGrayValue(float gray) override
         {
             FillGrayValue((unsigned int)(gray * float(TMAX)));
         }
-        void FillGrayValue(unsigned int gray)
+        virtual void FillGrayValue(unsigned int gray) override
         {
             FillGrayAValue(gray, ALPHA_OPAQUE_INT(TMAX));
         }
-        void FillGrayAValue(float gray, float alpha)
+        virtual void FillGrayAValue(float gray, float alpha) override
         {
             // [CLi 2009-09] this was dividing by float(TMAX) - which I presume to have been a bug.
             T g(gray * float(TMAX)), a(alpha * float(TMAX));
@@ -1219,7 +1238,7 @@ class GrayAImage : public Image
                 *i = a;
             }
         }
-        void FillGrayAValue(unsigned int gray, unsigned int alpha)
+        virtual void FillGrayAValue(unsigned int gray, unsigned int alpha) override
         {
             for(typename vector<T, Allocator>::iterator i(pixels.begin()); i != pixels.end(); i++)
             {
@@ -1228,28 +1247,28 @@ class GrayAImage : public Image
                 *i = T(alpha);
             }
         }
-        void FillRGBValue(float red, float green, float blue)
+        virtual void FillRGBValue(float red, float green, float blue) override
         {
             FillGrayValue(RGB2Gray(red, green, blue));
         }
-        void FillRGBValue(unsigned int red, unsigned int green, unsigned int blue)
+        virtual void FillRGBValue(unsigned int red, unsigned int green, unsigned int blue) override
         {
             FillGrayValue(RGB2Gray(float(red) / float(TMAX), float(green) / float(TMAX), float(blue) / float(TMAX)));
         }
-        void FillRGBAValue(float red, float green, float blue, float alpha)
+        virtual void FillRGBAValue(float red, float green, float blue, float alpha) override
         {
             FillGrayAValue(RGB2Gray(red, green, blue), alpha);
         }
-        void FillRGBAValue(unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha)
+        virtual void FillRGBAValue(unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha) override
         {
             // TODO FIXME - this unnecessarily converts alpha from int to float, requiring it to be converted back to int
             FillGrayAValue(RGB2Gray(float(red) / float(TMAX), float(green) / float(TMAX), float(blue) / float(TMAX)), float(alpha) / float(TMAX));
         }
-        void FillRGBTValue(float red, float green, float blue, float transm)
+        virtual void FillRGBTValue(float red, float green, float blue, float transm) override
         {
             FillGrayAValue(RGB2Gray(red, green, blue), 1.0 - transm);
         }
-        void FillRGBFTValue(float red, float green, float blue, float filter, float transm)
+        virtual void FillRGBFTValue(float red, float green, float blue, float filter, float transm) override
         {
             FillGrayAValue(RGB2Gray(red, green, blue), RGBFTColour::FTtoA(filter, transm));
         }
@@ -1257,12 +1276,12 @@ class GrayAImage : public Image
         vector<T, Allocator> pixels;
 };
 
-typedef GrayAImage<unsigned char, 255, Image::GrayA_Int8> MemoryGrayA8Image;
+typedef GrayAImage<unsigned char, 255, ImageDataType::GrayA_Int8> MemoryGrayA8Image;
 
-typedef GrayAImage<unsigned short, 65535, Image::GrayA_Int16> MemoryGrayA16Image;
+typedef GrayAImage<unsigned short, 65535, ImageDataType::GrayA_Int16> MemoryGrayA16Image;
 
-template<typename T, unsigned int TMAX, int IDT, class Allocator = allocator<T> >
-class RGBImage : public Image
+template<typename T, unsigned int TMAX, ImageDataType IDT, class Allocator = allocator<T>>
+class RGBImage final : public Image
 {
     public:
         RGBImage(unsigned int w, unsigned int h) :
@@ -1273,188 +1292,188 @@ class RGBImage : public Image
             Image(w, h, ImageDataType(IDT), m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h, 3u)); FillBitValue(false); }
         RGBImage(unsigned int w, unsigned int h, const vector<RGBFTMapEntry>& m) :
             Image(w, h, ImageDataType(IDT), m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h, 3u)); FillBitValue(false); }
-        ~RGBImage() { }
+        virtual ~RGBImage() override { }
 
-        bool IsOpaque() const
+        virtual bool IsOpaque() const override
         {
             return true;
         }
-        bool IsGrayscale() const
+        virtual bool IsGrayscale() const override
         {
             return false;
         }
-        bool IsColour() const
+        virtual bool IsColour() const override
         {
             return true;
         }
-        bool IsFloat() const
+        virtual bool IsFloat() const override
         {
             return false;
         }
-        bool IsInt() const
+        virtual bool IsInt() const override
         {
             return true;
         }
-        bool IsIndexed() const
+        virtual bool IsIndexed() const override
         {
             return false;
         }
-        bool IsGammaEncoded() const
+        virtual bool IsGammaEncoded() const override
         {
             return false;
         }
-        bool HasAlphaChannel() const
+        virtual bool HasAlphaChannel() const override
         {
             return false;
         }
-        bool HasFilterTransmit() const
+        virtual bool HasFilterTransmit() const override
         {
             return false;
         }
-        unsigned int GetMaxIntValue() const
+        virtual unsigned int GetMaxIntValue() const override
         {
             return TMAX;
         }
-        bool TryDeferDecoding(GammaCurvePtr&, unsigned int)
+        virtual bool TryDeferDecoding(GammaCurvePtr&, unsigned int) override
         {
             return false;
         }
 
-        bool GetBitValue(unsigned int x, unsigned int y) const
+        virtual bool GetBitValue(unsigned int x, unsigned int y) const override
         {
             float red, green, blue;
             GetRGBValue(x, y, red, green, blue);
             return IS_NONZERO_RGB(red, green, blue);
         }
-        float GetGrayValue(unsigned int x, unsigned int y) const
+        virtual float GetGrayValue(unsigned int x, unsigned int y) const override
         {
             float red, green, blue;
             GetRGBValue(x, y, red, green, blue);
             return RGB2Gray(red, green, blue);
         }
-        void GetGrayAValue(unsigned int x, unsigned int y, float& gray, float& alpha) const
+        virtual void GetGrayAValue(unsigned int x, unsigned int y, float& gray, float& alpha) const override
         {
             gray = GetGrayValue(x, y);
             alpha = ALPHA_OPAQUE;
         }
-        void GetRGBValue(unsigned int x, unsigned int y, float& red, float& green, float& blue) const
+        virtual void GetRGBValue(unsigned int x, unsigned int y, float& red, float& green, float& blue) const override
         {
             CHECK_BOUNDS(x, y);
             red   = float(pixels[(x + y * size_t(width)) * 3])     / float(TMAX);
             green = float(pixels[(x + y * size_t(width)) * 3 + 1]) / float(TMAX);
             blue  = float(pixels[(x + y * size_t(width)) * 3 + 2]) / float(TMAX);
         }
-        void GetRGBAValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& alpha) const
+        virtual void GetRGBAValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& alpha) const override
         {
             GetRGBValue(x, y, red, green, blue);
             alpha = ALPHA_OPAQUE;
         }
-        void GetRGBTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& transm) const
+        virtual void GetRGBTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& transm) const override
         {
             GetRGBValue(x, y, red, green, blue);
             transm = FT_OPAQUE;
         }
-        void GetRGBFTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& filter, float& transm) const
+        virtual void GetRGBFTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& filter, float& transm) const override
         {
             GetRGBValue(x, y, red, green, blue);
             filter = transm = FT_OPAQUE;
         }
 
-        void SetBitValue(unsigned int x, unsigned int y, bool bit)
+        virtual void SetBitValue(unsigned int x, unsigned int y, bool bit) override
         {
             if(bit == true)
                 SetGrayValue(x, y, TMAX);
             else
                 SetGrayValue(x, y, (unsigned int)0);
         }
-        void SetGrayValue(unsigned int x, unsigned int y, float gray)
+        virtual void SetGrayValue(unsigned int x, unsigned int y, float gray) override
         {
             SetRGBValue(x, y, gray, gray, gray);
         }
-        void SetGrayValue(unsigned int x, unsigned int y, unsigned int gray)
+        virtual void SetGrayValue(unsigned int x, unsigned int y, unsigned int gray) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width) * 3]     =
             pixels[x + y * size_t(width) * 3 + 1] =
             pixels[x + y * size_t(width) * 3 + 2] = gray;
         }
-        void SetGrayAValue(unsigned int x, unsigned int y, float gray, float)
+        virtual void SetGrayAValue(unsigned int x, unsigned int y, float gray, float) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width) * 3]     =
             pixels[x + y * size_t(width) * 3 + 1] =
             pixels[x + y * size_t(width) * 3 + 2] = T(gray * float(TMAX));
         }
-        void SetGrayAValue(unsigned int x, unsigned int y, unsigned int gray, unsigned int)
+        virtual void SetGrayAValue(unsigned int x, unsigned int y, unsigned int gray, unsigned int) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width) * 3]     =
             pixels[x + y * size_t(width) * 3 + 1] =
             pixels[x + y * size_t(width) * 3 + 2] = gray;
         }
-        void SetRGBValue(unsigned int x, unsigned int y, float red, float green, float blue)
+        virtual void SetRGBValue(unsigned int x, unsigned int y, float red, float green, float blue) override
         {
             CHECK_BOUNDS(x, y);
             pixels[(x + y * size_t(width)) * 3]     = T(red   * float(TMAX));
             pixels[(x + y * size_t(width)) * 3 + 1] = T(green * float(TMAX));
             pixels[(x + y * size_t(width)) * 3 + 2] = T(blue  * float(TMAX));
         }
-        void SetRGBValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue)
+        virtual void SetRGBValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue) override
         {
             CHECK_BOUNDS(x, y);
             pixels[(x + y * size_t(width)) * 3]     = T(red);
             pixels[(x + y * size_t(width)) * 3 + 1] = T(green);
             pixels[(x + y * size_t(width)) * 3 + 2] = T(blue);
         }
-        void SetRGBAValue(unsigned int x, unsigned int y, float red, float green, float blue, float)
+        virtual void SetRGBAValue(unsigned int x, unsigned int y, float red, float green, float blue, float) override
         {
             SetRGBValue(x, y, red, green, blue);
         }
-        void SetRGBAValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue, unsigned int)
+        virtual void SetRGBAValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue, unsigned int) override
         {
             SetRGBValue(x, y, red, green, blue);
         }
-        void SetRGBTValue(unsigned int x, unsigned int y, float red, float green, float blue, float transm)
+        virtual void SetRGBTValue(unsigned int x, unsigned int y, float red, float green, float blue, float transm) override
         {
             SetRGBValue(x, y, red, green, blue);
         }
-        void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col)
+        virtual void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col) override
         {
             SetRGBValue(x, y, col.red(), col.green(), col.blue());
         }
-        void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float, float)
+        virtual void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float, float) override
         {
             SetRGBValue(x, y, red, green, blue);
         }
-        void SetRGBFTValue(unsigned int x, unsigned int y, const RGBFTColour& col)
+        virtual void SetRGBFTValue(unsigned int x, unsigned int y, const RGBFTColour& col) override
         {
             SetRGBValue(x, y, col.red(), col.green(), col.blue());
         }
 
-        void FillBitValue(bool bit)
+        virtual void FillBitValue(bool bit) override
         {
             if(bit == true)
                 FillGrayValue(TMAX);
             else
                 FillGrayValue((unsigned int)0);
         }
-        void FillGrayValue(float gray)
+        virtual void FillGrayValue(float gray) override
         {
             FillGrayValue((unsigned int)(gray * float(TMAX)));
         }
-        void FillGrayValue(unsigned int gray)
+        virtual void FillGrayValue(unsigned int gray) override
         {
             fill(pixels.begin(), pixels.end(), gray);
         }
-        void FillGrayAValue(float gray, float)
+        virtual void FillGrayAValue(float gray, float) override
         {
             FillRGBValue(gray, gray, gray);
         }
-        void FillGrayAValue(unsigned int gray, unsigned int)
+        virtual void FillGrayAValue(unsigned int gray, unsigned int) override
         {
             FillRGBValue(gray, gray, gray);
         }
-        void FillRGBValue(float red, float green, float blue)
+        virtual void FillRGBValue(float red, float green, float blue) override
         {
             // [CLi 2009-09] this was dividing by float(TMAX) - which I presume to have been a bug.
             T r(red * float(TMAX)), g(green * float(TMAX)), b(blue * float(TMAX));
@@ -1467,7 +1486,7 @@ class RGBImage : public Image
                 *i = b;
             }
         }
-        void FillRGBValue(unsigned int red, unsigned int green, unsigned int blue)
+        virtual void FillRGBValue(unsigned int red, unsigned int green, unsigned int blue) override
         {
             for(typename vector<T, Allocator>::iterator i(pixels.begin()); i != pixels.end(); i++)
             {
@@ -1478,19 +1497,19 @@ class RGBImage : public Image
                 *i = T(blue);
             }
         }
-        void FillRGBAValue(float red, float green, float blue, float)
+        virtual void FillRGBAValue(float red, float green, float blue, float) override
         {
             FillRGBValue(red, green, blue);
         }
-        void FillRGBAValue(unsigned int red, unsigned int green, unsigned int blue, unsigned int)
+        virtual void FillRGBAValue(unsigned int red, unsigned int green, unsigned int blue, unsigned int) override
         {
             FillRGBValue(red, green, blue);
         }
-        void FillRGBTValue(float red, float green, float blue, float)
+        virtual void FillRGBTValue(float red, float green, float blue, float) override
         {
             FillRGBValue(red, green, blue);
         }
-        void FillRGBFTValue(float red, float green, float blue, float, float)
+        virtual void FillRGBFTValue(float red, float green, float blue, float, float) override
         {
             FillRGBValue(red, green, blue);
         }
@@ -1498,12 +1517,12 @@ class RGBImage : public Image
         vector<T, Allocator> pixels;
 };
 
-typedef RGBImage<unsigned char, 255, Image::RGB_Int8> MemoryRGB8Image;
+typedef RGBImage<unsigned char, 255, ImageDataType::RGB_Int8> MemoryRGB8Image;
 
-typedef RGBImage<unsigned short, 65535, Image::RGB_Int16> MemoryRGB16Image;
+typedef RGBImage<unsigned short, 65535, ImageDataType::RGB_Int16> MemoryRGB16Image;
 
-template<typename T, unsigned int TMAX, int IDT, class Allocator = allocator<T> >
-class RGBAImage : public Image
+template<typename T, unsigned int TMAX, ImageDataType IDT, class Allocator = allocator<T>>
+class RGBAImage final : public Image
 {
     public:
         RGBAImage(unsigned int w, unsigned int h) :
@@ -1514,9 +1533,9 @@ class RGBAImage : public Image
             Image(w, h, ImageDataType(IDT), m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h, 4u)); FillBitValue(false); }
         RGBAImage(unsigned int w, unsigned int h, const vector<RGBFTMapEntry>& m) :
             Image(w, h, ImageDataType(IDT), m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h, 4u)); FillBitValue(false); }
-        ~RGBAImage() { }
+        virtual ~RGBAImage() override { }
 
-        bool IsOpaque() const
+        virtual bool IsOpaque() const override
         {
             for(typename vector<T, Allocator>::const_iterator i(pixels.begin()); i != pixels.end(); i += 4)
             {
@@ -1526,72 +1545,72 @@ class RGBAImage : public Image
 
             return true;
         }
-        bool IsGrayscale() const
+        virtual bool IsGrayscale() const override
         {
             return false;
         }
-        bool IsColour() const
+        virtual bool IsColour() const override
         {
             return true;
         }
-        bool IsFloat() const
+        virtual bool IsFloat() const override
         {
             return false;
         }
-        bool IsInt() const
+        virtual bool IsInt() const override
         {
             return true;
         }
-        bool IsIndexed() const
+        virtual bool IsIndexed() const override
         {
             return false;
         }
-        bool IsGammaEncoded() const
+        virtual bool IsGammaEncoded() const override
         {
             return false;
         }
-        bool HasAlphaChannel() const
+        virtual bool HasAlphaChannel() const override
         {
             return true;
         }
-        bool HasFilterTransmit() const
+        virtual bool HasFilterTransmit() const override
         {
             return false;
         }
-        unsigned int GetMaxIntValue() const
+        virtual unsigned int GetMaxIntValue() const override
         {
             return TMAX;
         }
-        bool TryDeferDecoding(GammaCurvePtr&, unsigned int)
+        virtual bool TryDeferDecoding(GammaCurvePtr&, unsigned int) override
         {
             return false;
         }
 
-        bool GetBitValue(unsigned int x, unsigned int y) const
+        virtual bool GetBitValue(unsigned int x, unsigned int y) const override
         {
             // TODO FIXME - [CLi] This ignores opacity information; other bit-based code doesn't.
             float red, green, blue, alpha;
             GetRGBAValue(x, y, red, green, blue, alpha);
             return IS_NONZERO_RGB(red, green, blue);
         }
-        float GetGrayValue(unsigned int x, unsigned int y) const
+        virtual float GetGrayValue(unsigned int x, unsigned int y) const override
         {
             float red, green, blue, alpha;
             GetRGBAValue(x, y, red, green, blue, alpha);
             return RGB2Gray(red, green, blue);
         }
-        void GetGrayAValue(unsigned int x, unsigned int y, float& gray, float& alpha) const
+        virtual void GetGrayAValue(unsigned int x, unsigned int y, float& gray, float& alpha) const override
         {
             float red, green, blue;
             GetRGBAValue(x, y, red, green, blue, alpha);
             gray = RGB2Gray(red, green, blue);
         }
-        void GetRGBValue(unsigned int x, unsigned int y, float& red, float& green, float& blue) const
+        virtual void GetRGBValue(unsigned int x, unsigned int y, float& red, float& green, float& blue) const override
         {
             float alpha;
             GetRGBAValue(x, y, red, green, blue, alpha);
         }
-        void GetRGBAValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& alpha) const
+        virtual void GetRGBAValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& alpha) const override
         {
             CHECK_BOUNDS(x, y);
             red   = float(pixels[(x + y * size_t(width)) * 4])     / float(TMAX);
@@ -1599,51 +1618,51 @@ class RGBAImage : public Image
             blue  = float(pixels[(x + y * size_t(width)) * 4 + 2]) / float(TMAX);
             alpha = float(pixels[(x + y * size_t(width)) * 4 + 3]) / float(TMAX);
         }
-        void GetRGBTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& transm) const
+        virtual void GetRGBTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& transm) const override
         {
             float alpha;
             GetRGBAValue(x, y, red, green, blue, alpha);
             transm = 1.0 - alpha;
         }
-        void GetRGBFTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& filter, float& transm) const
+        virtual void GetRGBFTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& filter, float& transm) const override
         {
             float alpha;
             GetRGBAValue(x, y, red, green, blue, alpha);
             RGBFTColour::AtoFT(alpha, filter, transm);
         }
 
-        void SetBitValue(unsigned int x, unsigned int y, bool bit)
+        virtual void SetBitValue(unsigned int x, unsigned int y, bool bit) override
         {
             if(bit == true)
                 SetGrayValue(x, y, TMAX);
             else
                 SetGrayValue(x, y, (unsigned int)0);
         }
-        void SetGrayValue(unsigned int x, unsigned int y, float gray)
+        virtual void SetGrayValue(unsigned int x, unsigned int y, float gray) override
         {
             SetRGBAValue(x, y, gray, gray, gray, ALPHA_OPAQUE);
         }
-        void SetGrayValue(unsigned int x, unsigned int y, unsigned int gray)
+        virtual void SetGrayValue(unsigned int x, unsigned int y, unsigned int gray) override
         {
             SetRGBAValue(x, y, gray, gray, gray, ALPHA_OPAQUE_INT(TMAX));
         }
-        void SetGrayAValue(unsigned int x, unsigned int y, float gray, float alpha)
+        virtual void SetGrayAValue(unsigned int x, unsigned int y, float gray, float alpha) override
         {
             SetRGBAValue(x, y, gray, gray, gray, alpha);
         }
-        void SetGrayAValue(unsigned int x, unsigned int y, unsigned int gray, unsigned int alpha)
+        virtual void SetGrayAValue(unsigned int x, unsigned int y, unsigned int gray, unsigned int alpha) override
         {
             SetRGBAValue(x, y, gray, gray, gray, alpha);
         }
-        void SetRGBValue(unsigned int x, unsigned int y, float red, float green, float blue)
+        virtual void SetRGBValue(unsigned int x, unsigned int y, float red, float green, float blue) override
         {
             SetRGBAValue(x, y, red, green, blue, ALPHA_OPAQUE);
         }
-        void SetRGBValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue)
+        virtual void SetRGBValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue) override
         {
             SetRGBAValue(x, y, red, green, blue, ALPHA_OPAQUE_INT(TMAX));
         }
-        void SetRGBAValue(unsigned int x, unsigned int y, float red, float green, float blue, float alpha)
+        virtual void SetRGBAValue(unsigned int x, unsigned int y, float red, float green, float blue, float alpha) override
         {
             CHECK_BOUNDS(x, y);
             pixels[(x + y * size_t(width)) * 4]     = T(red   * float(TMAX));
@@ -1651,7 +1670,7 @@ class RGBAImage : public Image
             pixels[(x + y * size_t(width)) * 4 + 2] = T(blue  * float(TMAX));
             pixels[(x + y * size_t(width)) * 4 + 3] = T(alpha * float(TMAX));
         }
-        void SetRGBAValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha)
+        virtual void SetRGBAValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha) override
         {
             CHECK_BOUNDS(x, y);
             pixels[(x + y * size_t(width)) * 4]     = T(red);
@@ -1659,11 +1678,11 @@ class RGBAImage : public Image
             pixels[(x + y * size_t(width)) * 4 + 2] = T(blue);
             pixels[(x + y * size_t(width)) * 4 + 3] = T(alpha);
         }
-        void SetRGBTValue(unsigned int x, unsigned int y, float red, float green, float blue, float transm)
+        virtual void SetRGBTValue(unsigned int x, unsigned int y, float red, float green, float blue, float transm) override
         {
             SetRGBAValue(x, y, red, green, blue, 1.0 - transm);
         }
-        void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col)
+        virtual void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col) override
         {
             CHECK_BOUNDS(x, y);
             pixels[(x + y * size_t(width)) * 4]     = T(col.red()   * float(TMAX));
@@ -1671,11 +1690,11 @@ class RGBAImage : public Image
             pixels[(x + y * size_t(width)) * 4 + 2] = T(col.blue()  * float(TMAX));
             pixels[(x + y * size_t(width)) * 4 + 3] = T(col.alpha() * float(TMAX));
         }
-        void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float filter, float transm)
+        virtual void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float filter, float transm) override
         {
             SetRGBAValue(x, y, red, green, blue, RGBFTColour::FTtoA(filter, transm));
         }
-        void SetRGBFTValue(unsigned int x, unsigned int y, const RGBFTColour& col)
+        virtual void SetRGBFTValue(unsigned int x, unsigned int y, const RGBFTColour& col) override
         {
             CHECK_BOUNDS(x, y);
             pixels[(x + y * size_t(width)) * 4]     = T(col.red()   * float(TMAX));
@@ -1684,38 +1703,38 @@ class RGBAImage : public Image
             pixels[(x + y * size_t(width)) * 4 + 3] = T(col.FTtoA() * float(TMAX));
         }
 
-        void FillBitValue(bool bit)
+        virtual void FillBitValue(bool bit) override
         {
             if(bit == true)
                 FillGrayValue(TMAX);
             else
                 FillGrayValue((unsigned int)0);
         }
-        void FillGrayValue(float gray)
+        virtual void FillGrayValue(float gray) override
         {
             FillRGBAValue(gray, gray, gray, ALPHA_OPAQUE);
         }
-        void FillGrayValue(unsigned int gray)
+        virtual void FillGrayValue(unsigned int gray) override
         {
             FillRGBAValue(gray, gray, gray, ALPHA_OPAQUE_INT(TMAX));
         }
-        void FillGrayAValue(float gray, float alpha)
+        virtual void FillGrayAValue(float gray, float alpha) override
         {
             FillRGBAValue(gray, gray, gray, alpha);
         }
-        void FillGrayAValue(unsigned int gray, unsigned int alpha)
+        virtual void FillGrayAValue(unsigned int gray, unsigned int alpha) override
         {
             FillRGBAValue(gray, gray, gray, alpha);
         }
-        void FillRGBValue(float red, float green, float blue)
+        virtual void FillRGBValue(float red, float green, float blue) override
         {
             FillRGBAValue(red, green, blue, ALPHA_OPAQUE);
         }
-        void FillRGBValue(unsigned int red, unsigned int green, unsigned int blue)
+        virtual void FillRGBValue(unsigned int red, unsigned int green, unsigned int blue) override
         {
             FillRGBAValue(red, green, blue, ALPHA_OPAQUE_INT(TMAX));
         }
-        void FillRGBAValue(float red, float green, float blue, float alpha)
+        virtual void FillRGBAValue(float red, float green, float blue, float alpha) override
         {
             // [CLi 2009-09] this was dividing by float(TMAX) - which I presume to have been a bug.
             T r(red * float(TMAX)), g(green * float(TMAX)), b(blue * float(TMAX)), a(alpha * float(TMAX));
@@ -1730,7 +1749,7 @@ class RGBAImage : public Image
                 *i = a;
             }
         }
-        void FillRGBAValue(unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha)
+        virtual void FillRGBAValue(unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha) override
         {
             for(typename vector<T, Allocator>::iterator i(pixels.begin()); i != pixels.end(); i++)
             {
@@ -1743,11 +1762,11 @@ class RGBAImage : public Image
                 *i = T(alpha);
             }
         }
-        void FillRGBTValue(float red, float green, float blue, float transm)
+        virtual void FillRGBTValue(float red, float green, float blue, float transm) override
         {
             FillRGBAValue(red, green, blue, 1.0 - transm);
         }
-        void FillRGBFTValue(float red, float green, float blue, float filter, float transm)
+        virtual void FillRGBFTValue(float red, float green, float blue, float filter, float transm) override
         {
             FillRGBAValue(red, green, blue, RGBFTColour::FTtoA(filter, transm));
         }
@@ -1755,25 +1774,25 @@ class RGBAImage : public Image
         vector<T, Allocator> pixels;
 };
 
-typedef RGBAImage<unsigned char, 255, Image::RGBA_Int8> MemoryRGBA8Image;
+typedef RGBAImage<unsigned char, 255, ImageDataType::RGBA_Int8> MemoryRGBA8Image;
 
-typedef RGBAImage<unsigned short, 65535, Image::RGBA_Int16> MemoryRGBA16Image;
+typedef RGBAImage<unsigned short, 65535, ImageDataType::RGBA_Int16> MemoryRGBA16Image;
 
-template<class PixelContainer = vector<float, allocator<float> > >
-class RGBFTImage : public Image
+template<class PixelContainer = vector<float, allocator<float>>>
+class RGBFTImage final : public Image
 {
     public:
         RGBFTImage(unsigned int w, unsigned int h) :
-            Image(w, h, RGBFT_Float) { pixels.resize(SafeUnsignedProduct<size_t>(w, h, 5u)); FillBitValue(false); }
+            Image(w, h, ImageDataType::RGBFT_Float) { pixels.resize(SafeUnsignedProduct<size_t>(w, h, 5u)); FillBitValue(false); }
         RGBFTImage(unsigned int w, unsigned int h, const vector<RGBMapEntry>& m) :
-            Image(w, h, RGBFT_Float, m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h, 5u)); FillBitValue(false); }
+            Image(w, h, ImageDataType::RGBFT_Float, m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h, 5u)); FillBitValue(false); }
         RGBFTImage(unsigned int w, unsigned int h, const vector<RGBAMapEntry>& m) :
-            Image(w, h, RGBFT_Float, m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h, 5u)); FillBitValue(false); }
+            Image(w, h, ImageDataType::RGBFT_Float, m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h, 5u)); FillBitValue(false); }
         RGBFTImage(unsigned int w, unsigned int h, const vector<RGBFTMapEntry>& m) :
-            Image(w, h, RGBFT_Float, m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h, 5u)); FillBitValue(false); }
-        ~RGBFTImage() { }
+            Image(w, h, ImageDataType::RGBFT_Float, m) { pixels.resize(SafeUnsignedProduct<size_t>(w, h, 5u)); FillBitValue(false); }
+        virtual ~RGBFTImage() override { }
 
-        bool IsOpaque() const
+        virtual bool IsOpaque() const override
         {
             for(typename PixelContainer::const_iterator i(pixels.begin()); i != pixels.end(); i += 5)
             {
@@ -1782,85 +1801,85 @@ class RGBFTImage : public Image
             }
             return true;
         }
-        bool IsGrayscale() const
+        virtual bool IsGrayscale() const override
         {
             return false;
         }
-        bool IsColour() const
+        virtual bool IsColour() const override
         {
             return true;
         }
-        bool IsFloat() const
+        virtual bool IsFloat() const override
         {
             return true;
         }
-        bool IsInt() const
+        virtual bool IsInt() const override
         {
             return false;
         }
-        bool IsIndexed() const
+        virtual bool IsIndexed() const override
         {
             return false;
         }
-        bool IsGammaEncoded() const
+        virtual bool IsGammaEncoded() const override
         {
             return false;
         }
-        bool HasAlphaChannel() const
+        virtual bool HasAlphaChannel() const override
         {
             return false;
         }
-        bool HasFilterTransmit() const
+        virtual bool HasFilterTransmit() const override
         {
             return true;
         }
-        unsigned int GetMaxIntValue() const
+        virtual unsigned int GetMaxIntValue() const override
         {
             return 255;
         }
-        bool TryDeferDecoding(GammaCurvePtr&, unsigned int)
+        virtual bool TryDeferDecoding(GammaCurvePtr&, unsigned int) override
         {
             return false;
         }
 
-        bool GetBitValue(unsigned int x, unsigned int y) const
+        virtual bool GetBitValue(unsigned int x, unsigned int y) const override
         {
             // TODO FIXME - [CLi] This ignores opacity information; other bit-based code doesn't.
             float red, green, blue, filter, transm;
             GetRGBFTValue(x, y, red, green, blue, filter, transm);
             return IS_NONZERO_RGB(red, green, blue);
         }
-        float GetGrayValue(unsigned int x, unsigned int y) const
+        virtual float GetGrayValue(unsigned int x, unsigned int y) const override
         {
             float red, green, blue, filter, transm;
             GetRGBFTValue(x, y, red, green, blue, filter, transm);
             return RGB2Gray(red, green, blue);
         }
-        void GetGrayAValue(unsigned int x, unsigned int y, float& gray, float& alpha) const
+        virtual void GetGrayAValue(unsigned int x, unsigned int y, float& gray, float& alpha) const override
         {
             float red, green, blue, filter, transm;
             GetRGBFTValue(x, y, red, green, blue, filter, transm);
             gray = RGB2Gray(red, green, blue);
             alpha = RGBFTColour::FTtoA(filter, transm);
         }
-        void GetRGBValue(unsigned int x, unsigned int y, float& red, float& green, float& blue) const
+        virtual void GetRGBValue(unsigned int x, unsigned int y, float& red, float& green, float& blue) const override
         {
             float filter, transm;
             GetRGBFTValue(x, y, red, green, blue, filter, transm);
         }
-        void GetRGBAValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& alpha) const
+        virtual void GetRGBAValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& alpha) const override
         {
             float filter, transm;
             GetRGBFTValue(x, y, red, green, blue, filter, transm);
             alpha = RGBFTColour::FTtoA(filter, transm);
         }
-        void GetRGBTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& transm) const
+        virtual void GetRGBTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& transm) const override
         {
             float filter;
             GetRGBFTValue(x, y, red, green, blue, filter, transm);
             transm = 1.0 - RGBFTColour::FTtoA(filter, transm);
         }
-        void GetRGBFTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& filter, float& transm) const
+        virtual void GetRGBFTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& filter, float& transm) const override
         {
             CHECK_BOUNDS(x, y);
             red    = pixels[(x + y * size_t(width)) * 5];
@@ -1870,63 +1889,63 @@ class RGBFTImage : public Image
             transm = pixels[(x + y * size_t(width)) * 5 + 4];
         }
 
-        void SetBitValue(unsigned int x, unsigned int y, bool bit)
+        virtual void SetBitValue(unsigned int x, unsigned int y, bool bit) override
         {
             if(bit == true)
                 SetGrayValue(x, y, 1.0f);
             else
                 SetGrayValue(x, y, 0.0f);
         }
-        void SetGrayValue(unsigned int x, unsigned int y, float gray)
+        virtual void SetGrayValue(unsigned int x, unsigned int y, float gray) override
         {
             SetRGBFTValue(x, y, gray, gray, gray, FT_OPAQUE, FT_OPAQUE);
         }
-        void SetGrayValue(unsigned int x, unsigned int y, unsigned int gray)
+        virtual void SetGrayValue(unsigned int x, unsigned int y, unsigned int gray) override
         {
             SetGrayValue(x, y, float(gray) / 255.0f);
         }
-        void SetGrayAValue(unsigned int x, unsigned int y, float gray, float alpha)
+        virtual void SetGrayAValue(unsigned int x, unsigned int y, float gray, float alpha) override
         {
             float filter, transm;
             RGBFTColour::AtoFT(alpha, filter, transm);
             SetRGBFTValue(x, y, gray, gray, gray, filter, transm);
         }
-        void SetGrayAValue(unsigned int x, unsigned int y, unsigned int gray, unsigned int alpha)
+        virtual void SetGrayAValue(unsigned int x, unsigned int y, unsigned int gray, unsigned int alpha) override
         {
             float c = float(gray) / 255.0f;
             float filter, transm;
             RGBFTColour::AtoFT(float(alpha) / 255.0f, filter, transm);
             SetRGBFTValue(x, y, c, c, c, filter, transm);
         }
-        void SetRGBValue(unsigned int x, unsigned int y, float red, float green, float blue)
+        virtual void SetRGBValue(unsigned int x, unsigned int y, float red, float green, float blue) override
         {
             SetRGBFTValue(x, y, red, green, blue, FT_OPAQUE, FT_OPAQUE);
         }
-        void SetRGBValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue)
+        virtual void SetRGBValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue) override
         {
             SetRGBFTValue(x, y, float(red) / 255.0f, float(green) / 255.0f, float(blue) / 255.0f, FT_OPAQUE, FT_OPAQUE);
         }
-        void SetRGBAValue(unsigned int x, unsigned int y, float red, float green, float blue, float alpha)
+        virtual void SetRGBAValue(unsigned int x, unsigned int y, float red, float green, float blue, float alpha) override
         {
             float filter, transm;
             RGBFTColour::AtoFT(alpha, filter, transm);
             SetRGBFTValue(x, y, red, green, blue, filter, transm);
         }
-        void SetRGBAValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha)
+        virtual void SetRGBAValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha) override
         {
             float filter, transm;
             RGBFTColour::AtoFT(float(alpha) / 255.0f, filter, transm);
             SetRGBFTValue(x, y, float(red) / 255.0f, float(green) / 255.0f, float(blue) / 255.0f, filter, transm);
         }
-        void SetRGBTValue(unsigned int x, unsigned int y, float red, float green, float blue, float transm)
+        virtual void SetRGBTValue(unsigned int x, unsigned int y, float red, float green, float blue, float transm) override
         {
             SetRGBFTValue(x, y, red, green, blue, FT_OPAQUE, transm);
         }
-        void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col)
+        virtual void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col) override
         {
             SetRGBFTValue(x, y, col.red(), col.green(), col.blue(), FT_OPAQUE, col.transm());
         }
-        void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float filter, float transm)
+        virtual void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float filter, float transm) override
         {
             CHECK_BOUNDS(x, y);
             pixels[(x + y * size_t(width)) * 5]     = red;
@@ -1935,7 +1954,7 @@ class RGBFTImage : public Image
             pixels[(x + y * size_t(width)) * 5 + 3] = filter;
             pixels[(x + y * size_t(width)) * 5 + 4] = transm;
         }
-        void SetRGBFTValue(unsigned int x, unsigned int y, const RGBFTColour& col)
+        virtual void SetRGBFTValue(unsigned int x, unsigned int y, const RGBFTColour& col) override
         {
             CHECK_BOUNDS(x, y);
             pixels[(x + y * size_t(width)) * 5]     = col.red();
@@ -1945,56 +1964,56 @@ class RGBFTImage : public Image
             pixels[(x + y * size_t(width)) * 5 + 4] = col.transm();
         }
 
-        void FillBitValue(bool bit)
+        virtual void FillBitValue(bool bit) override
         {
             if(bit == true)
                 FillGrayValue(1.0f);
             else
                 FillGrayValue(0.0f);
         }
-        void FillGrayValue(float gray)
+        virtual void FillGrayValue(float gray) override
         {
             FillRGBFTValue(gray, gray, gray, FT_OPAQUE, FT_OPAQUE);
         }
-        void FillGrayValue(unsigned int gray)
+        virtual void FillGrayValue(unsigned int gray) override
         {
             FillGrayValue(float(gray) / 255.0f);
         }
-        void FillGrayAValue(float gray, float alpha)
+        virtual void FillGrayAValue(float gray, float alpha) override
         {
             float filter, transm;
             RGBFTColour::AtoFT(alpha, filter, transm);
             FillRGBFTValue(gray, gray, gray, filter, transm);
         }
-        void FillGrayAValue(unsigned int gray, unsigned int alpha)
+        virtual void FillGrayAValue(unsigned int gray, unsigned int alpha) override
         {
             FillGrayAValue(float(gray) / 255.0f, float(alpha) / 255.0f);
         }
-        void FillRGBValue(float red, float green, float blue)
+        virtual void FillRGBValue(float red, float green, float blue) override
         {
             FillRGBFTValue(red, green, blue, FT_OPAQUE, FT_OPAQUE);
         }
-        void FillRGBValue(unsigned int red, unsigned int green, unsigned int blue)
+        virtual void FillRGBValue(unsigned int red, unsigned int green, unsigned int blue) override
         {
             FillRGBFTValue(float(red) / 255.0f, float(green) / 255.0f, float(blue) / 255.0f, FT_OPAQUE, FT_OPAQUE);
         }
-        void FillRGBAValue(float red, float green, float blue, float alpha)
+        virtual void FillRGBAValue(float red, float green, float blue, float alpha) override
         {
             float filter, transm;
             RGBFTColour::AtoFT(alpha, filter, transm);
             FillRGBFTValue(red, green, blue, filter, transm);
         }
-        void FillRGBAValue(unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha)
+        virtual void FillRGBAValue(unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha) override
         {
             float filter, transm;
             RGBFTColour::AtoFT(float(alpha) / 255.0f, filter, transm);
             FillRGBFTValue(float(red) / 255.0f, float(green) / 255.0f, float(blue) / 255.0f, filter, transm);
         }
-        void FillRGBTValue(float red, float green, float blue, float transm)
+        virtual void FillRGBTValue(float red, float green, float blue, float transm) override
         {
             FillRGBFTValue(red, green, blue, FT_OPAQUE, transm);
         }
-        void FillRGBFTValue(float red, float green, float blue, float filter, float transm)
+        virtual void FillRGBFTValue(float red, float green, float blue, float filter, float transm) override
         {
             for(typename PixelContainer::iterator i(pixels.begin()); i != pixels.end(); i++)
             {
@@ -2015,8 +2034,8 @@ class RGBFTImage : public Image
 
 typedef RGBFTImage<> MemoryRGBFTImage;
 
-template<typename T, unsigned int TMAX, int IDT, class Allocator = allocator<T> >
-class NonlinearGrayImage : public Image
+template<typename T, unsigned int TMAX, ImageDataType IDT, class Allocator = allocator<T>>
+class NonlinearGrayImage final : public Image
 {
     public:
         NonlinearGrayImage(unsigned int w, unsigned int h) :
@@ -2027,49 +2046,49 @@ class NonlinearGrayImage : public Image
             Image(w, h, ImageDataType(IDT), m), gamma(NeutralGammaCurve::Get()) { gammaLUT = gamma->GetLookupTable(TMAX); pixels.resize(SafeUnsignedProduct<size_t>(w, h)); FillBitValue(false); }
         NonlinearGrayImage(unsigned int w, unsigned int h, const vector<RGBFTMapEntry>& m) :
             Image(w, h, ImageDataType(IDT), m), gamma(NeutralGammaCurve::Get()) { gammaLUT = gamma->GetLookupTable(TMAX); pixels.resize(SafeUnsignedProduct<size_t>(w, h)); FillBitValue(false); }
-        ~NonlinearGrayImage() { }
+        virtual ~NonlinearGrayImage() override { }
 
-        bool IsOpaque() const
+        virtual bool IsOpaque() const override
         {
             return true;
         }
-        bool IsGrayscale() const
+        virtual bool IsGrayscale() const override
         {
             return true;
         }
-        bool IsColour() const
+        virtual bool IsColour() const override
         {
             return false;
         }
-        bool IsFloat() const
+        virtual bool IsFloat() const override
         {
             return false;
         }
-        bool IsInt() const
+        virtual bool IsInt() const override
         {
             return true;
         }
-        bool IsIndexed() const
+        virtual bool IsIndexed() const override
         {
             return false;
         }
-        bool IsGammaEncoded() const
+        virtual bool IsGammaEncoded() const override
         {
             return true;
         }
-        bool HasAlphaChannel() const
+        virtual bool HasAlphaChannel() const override
         {
             return false;
         }
-        bool HasFilterTransmit() const
+        virtual bool HasFilterTransmit() const override
         {
             return false;
         }
-        unsigned int GetMaxIntValue() const
+        virtual unsigned int GetMaxIntValue() const override
         {
             return TMAX;
         }
-        bool TryDeferDecoding(GammaCurvePtr& g, unsigned int max)
+        virtual bool TryDeferDecoding(GammaCurvePtr& g, unsigned int max) override
         {
             if (max != TMAX) return false;
             if (!GammaCurve::IsNeutral(gamma)) return !g;
@@ -2078,151 +2097,151 @@ class NonlinearGrayImage : public Image
             return true;
         }
 
-        bool GetBitValue(unsigned int x, unsigned int y) const
+        virtual bool GetBitValue(unsigned int x, unsigned int y) const override
         {
             CHECK_BOUNDS(x, y);
             return (pixels[x + y * size_t(width)] != 0);
         }
-        float GetGrayValue(unsigned int x, unsigned int y) const
+        virtual float GetGrayValue(unsigned int x, unsigned int y) const override
         {
             CHECK_BOUNDS(x, y);
             return gammaLUT[pixels[x + y * size_t(width)]];
         }
-        void GetGrayAValue(unsigned int x, unsigned int y, float& gray, float& alpha) const
+        virtual void GetGrayAValue(unsigned int x, unsigned int y, float& gray, float& alpha) const override
         {
             CHECK_BOUNDS(x, y);
             gray = gammaLUT[pixels[x + y * size_t(width)]];
             alpha = ALPHA_OPAQUE;
         }
-        void GetRGBValue(unsigned int x, unsigned int y, float& red, float& green, float& blue) const
+        virtual void GetRGBValue(unsigned int x, unsigned int y, float& red, float& green, float& blue) const override
         {
             red = green = blue = GetGrayValue(x, y);
         }
-        void GetRGBAValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& alpha) const
+        virtual void GetRGBAValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& alpha) const override
         {
             red = green = blue = GetGrayValue(x, y);
             alpha = ALPHA_OPAQUE;
         }
-        void GetRGBTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& transm) const
+        virtual void GetRGBTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& transm) const override
         {
             red = green = blue = GetGrayValue(x, y);
             transm = FT_OPAQUE;
         }
-        void GetRGBFTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& filter, float& transm) const
+        virtual void GetRGBFTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& filter, float& transm) const override
         {
             red = green = blue = GetGrayValue(x, y);
             filter = transm = FT_OPAQUE;
         }
-        unsigned char GetIndexedValue(unsigned int x, unsigned int y)
+        virtual unsigned char GetIndexedValue(unsigned int x, unsigned int y) override
         {
             CHECK_BOUNDS(x, y);
             return (unsigned char)(int(pixels[x + y * size_t(width)]) / ((TMAX + 1) >> 8));
         }
 
-        void SetBitValue(unsigned int x, unsigned int y, bool bit)
+        virtual void SetBitValue(unsigned int x, unsigned int y, bool bit) override
         {
             if(bit == true)
                 SetGrayValue(x, y, TMAX);
             else
                 SetGrayValue(x, y, (unsigned int)0);
         }
-        void SetGrayValue(unsigned int x, unsigned int y, float gray)
+        virtual void SetGrayValue(unsigned int x, unsigned int y, float gray) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = IntEncode(gamma, gray, TMAX);
         }
-        void SetGrayValue(unsigned int x, unsigned int y, unsigned int gray)
+        virtual void SetGrayValue(unsigned int x, unsigned int y, unsigned int gray) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = T(gray);
         }
-        void SetGrayAValue(unsigned int x, unsigned int y, float gray, float)
+        virtual void SetGrayAValue(unsigned int x, unsigned int y, float gray, float) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = IntEncode(gamma, gray, TMAX);
         }
-        void SetGrayAValue(unsigned int x, unsigned int y, unsigned int gray, unsigned int)
+        virtual void SetGrayAValue(unsigned int x, unsigned int y, unsigned int gray, unsigned int) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width)] = T(gray);
         }
-        void SetRGBValue(unsigned int x, unsigned int y, float red, float green, float blue)
+        virtual void SetRGBValue(unsigned int x, unsigned int y, float red, float green, float blue) override
         {
             SetGrayValue(x, y, RGB2Gray(red, green, blue));
         }
-        void SetRGBValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue)
+        virtual void SetRGBValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue) override
         {
             SetGrayValue(x, y, RGB2Gray(gammaLUT[red], gammaLUT[green], gammaLUT[blue]));
         }
-        void SetRGBAValue(unsigned int x, unsigned int y, float red, float green, float blue, float)
+        virtual void SetRGBAValue(unsigned int x, unsigned int y, float red, float green, float blue, float) override
         {
             SetRGBValue(x, y, red, green, blue);
         }
-        void SetRGBAValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue, unsigned int)
+        virtual void SetRGBAValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue, unsigned int) override
         {
             SetRGBValue(x, y, red, green, blue);
         }
-        void SetRGBTValue(unsigned int x, unsigned int y, float red, float green, float blue, float transm)
+        virtual void SetRGBTValue(unsigned int x, unsigned int y, float red, float green, float blue, float transm) override
         {
             SetRGBValue(x, y, red, green, blue);
         }
-        void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col)
+        virtual void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col) override
         {
             SetRGBValue(x, y, col.red(), col.green(), col.blue());
         }
-        void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float, float)
+        virtual void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float, float) override
         {
             SetRGBValue(x, y, red, green, blue);
         }
-        void SetRGBFTValue(unsigned int x, unsigned int y, const RGBFTColour& col)
+        virtual void SetRGBFTValue(unsigned int x, unsigned int y, const RGBFTColour& col) override
         {
             SetRGBValue(x, y, col.red(), col.green(), col.blue());
         }
 
-        void FillBitValue(bool bit)
+        virtual void FillBitValue(bool bit) override
         {
             if(bit == true)
                 FillGrayValue(TMAX);
             else
                 FillGrayValue((unsigned int)0);
         }
-        void FillGrayValue(float gray)
+        virtual void FillGrayValue(float gray) override
         {
             FillGrayValue(IntEncode(gamma, gray, TMAX));
         }
-        void FillGrayValue(unsigned int gray)
+        virtual void FillGrayValue(unsigned int gray) override
         {
             fill(pixels.begin(), pixels.end(), T(gray));
         }
-        void FillGrayAValue(float gray, float)
+        virtual void FillGrayAValue(float gray, float) override
         {
             FillGrayValue(gray);
         }
-        void FillGrayAValue(unsigned int gray, unsigned int)
+        virtual void FillGrayAValue(unsigned int gray, unsigned int) override
         {
             FillGrayValue(gray);
         }
-        void FillRGBValue(float red, float green, float blue)
+        virtual void FillRGBValue(float red, float green, float blue) override
         {
             FillGrayValue(RGB2Gray(red, green, blue));
         }
-        void FillRGBValue(unsigned int red, unsigned int green, unsigned int blue)
+        virtual void FillRGBValue(unsigned int red, unsigned int green, unsigned int blue) override
         {
             FillGrayValue(RGB2Gray(gammaLUT[red], gammaLUT[green], gammaLUT[blue]));
         }
-        void FillRGBAValue(float red, float green, float blue, float)
+        virtual void FillRGBAValue(float red, float green, float blue, float) override
         {
             FillRGBValue(red, green, blue);
         }
-        void FillRGBAValue(unsigned int red, unsigned int green, unsigned int blue, unsigned int)
+        virtual void FillRGBAValue(unsigned int red, unsigned int green, unsigned int blue, unsigned int) override
         {
             FillRGBValue(red, green, blue);
         }
-        void FillRGBTValue(float red, float green, float blue, float)
+        virtual void FillRGBTValue(float red, float green, float blue, float) override
         {
             FillRGBValue(red, green, blue);
         }
-        void FillRGBFTValue(float red, float green, float blue, float, float)
+        virtual void FillRGBFTValue(float red, float green, float blue, float, float) override
         {
             FillRGBValue(red, green, blue);
         }
@@ -2232,12 +2251,12 @@ class NonlinearGrayImage : public Image
         const float* gammaLUT;
 };
 
-typedef NonlinearGrayImage<unsigned char, 255, Image::Gray_Gamma8> MemoryNonlinearGray8Image;
+typedef NonlinearGrayImage<unsigned char, 255, ImageDataType::Gray_Gamma8> MemoryNonlinearGray8Image;
 
-typedef NonlinearGrayImage<unsigned short, 65535, Image::Gray_Gamma16> MemoryNonlinearGray16Image;
+typedef NonlinearGrayImage<unsigned short, 65535, ImageDataType::Gray_Gamma16> MemoryNonlinearGray16Image;
 
-template<typename T, unsigned int TMAX, int IDT, class Allocator = allocator<T> >
-class NonlinearGrayAImage : public Image
+template<typename T, unsigned int TMAX, ImageDataType IDT, class Allocator = allocator<T>>
+class NonlinearGrayAImage final : public Image
 {
     public:
         NonlinearGrayAImage(unsigned int w, unsigned int h) :
@@ -2248,9 +2267,9 @@ class NonlinearGrayAImage : public Image
             Image(w, h, ImageDataType(IDT), m), gamma(NeutralGammaCurve::Get()) { gammaLUT = gamma->GetLookupTable(TMAX); pixels.resize(SafeUnsignedProduct<size_t>(w, h, 2u)); FillBitValue(false); }
         NonlinearGrayAImage(unsigned int w, unsigned int h, const vector<RGBFTMapEntry>& m) :
             Image(w, h, ImageDataType(IDT), m), gamma(NeutralGammaCurve::Get()) { gammaLUT = gamma->GetLookupTable(TMAX); pixels.resize(SafeUnsignedProduct<size_t>(w, h, 2u)); FillBitValue(false); }
-        ~NonlinearGrayAImage() { }
+        virtual ~NonlinearGrayAImage() override { }
 
-        bool IsOpaque() const
+        virtual bool IsOpaque() const override
         {
             for(typename vector<T, Allocator>::const_iterator i(pixels.begin()); i != pixels.end(); i += 2)
             {
@@ -2260,43 +2279,43 @@ class NonlinearGrayAImage : public Image
 
             return true;
         }
-        bool IsGrayscale() const
+        virtual bool IsGrayscale() const override
         {
             return true;
         }
-        bool IsColour() const
+        virtual bool IsColour() const override
         {
             return false;
         }
-        bool IsFloat() const
+        virtual bool IsFloat() const override
         {
             return false;
         }
-        bool IsInt() const
+        virtual bool IsInt() const override
         {
             return true;
         }
-        bool IsIndexed() const
+        virtual bool IsIndexed() const override
         {
             return false;
         }
-        bool IsGammaEncoded() const
+        virtual bool IsGammaEncoded() const override
         {
             return true;
         }
-        bool HasAlphaChannel() const
+        virtual bool HasAlphaChannel() const override
         {
             return true;
         }
-        bool HasFilterTransmit() const
+        virtual bool HasFilterTransmit() const override
         {
             return false;
         }
-        unsigned int GetMaxIntValue() const
+        virtual unsigned int GetMaxIntValue() const override
         {
             return TMAX;
         }
-        bool TryDeferDecoding(GammaCurvePtr& g, unsigned int max)
+        virtual bool TryDeferDecoding(GammaCurvePtr& g, unsigned int max) override
         {
             if (max != TMAX) return false;
             if (!GammaCurve::IsNeutral(gamma)) return !g;
@@ -2305,40 +2324,40 @@ class NonlinearGrayAImage : public Image
             return true;
         }
 
-        bool GetBitValue(unsigned int x, unsigned int y) const
+        virtual bool GetBitValue(unsigned int x, unsigned int y) const override
         {
             // TODO FIXME - [CLi] This ignores opacity information; other bit-based code doesn't.
             CHECK_BOUNDS(x, y);
             return (pixels[(x + y * size_t(width)) * 2] != 0);
         }
-        float GetGrayValue(unsigned int x, unsigned int y) const
+        virtual float GetGrayValue(unsigned int x, unsigned int y) const override
         {
             CHECK_BOUNDS(x, y);
             return gammaLUT[pixels[(x + y * size_t(width)) * 2]];
         }
-        void GetGrayAValue(unsigned int x, unsigned int y, float& gray, float& alpha) const
+        virtual void GetGrayAValue(unsigned int x, unsigned int y, float& gray, float& alpha) const override
         {
             CHECK_BOUNDS(x, y);
             gray  = gammaLUT[pixels[(x + y * size_t(width)) * 2]];
             alpha =          pixels[(x + y * size_t(width)) * 2 + 1] / float(TMAX);
         }
-        void GetRGBValue(unsigned int x, unsigned int y, float& red, float& green, float& blue) const
+        virtual void GetRGBValue(unsigned int x, unsigned int y, float& red, float& green, float& blue) const override
         {
             red = green = blue = GetGrayValue(x, y);
         }
-        void GetRGBAValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& alpha) const
+        virtual void GetRGBAValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& alpha) const override
         {
             GetGrayAValue(x, y, red, alpha);
             green = blue = red;
         }
-        void GetRGBTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& transm) const
+        virtual void GetRGBTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& transm) const override
         {
             float alpha;
             GetGrayAValue(x, y, red, alpha);
             green = blue = red;
             transm = 1.0 - alpha;
         }
-        void GetRGBFTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& filter, float& transm) const
+        virtual void GetRGBFTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& filter, float& transm) const override
         {
             float alpha;
             GetGrayAValue(x, y, red, alpha);
@@ -2346,85 +2365,85 @@ class NonlinearGrayAImage : public Image
             RGBFTColour::AtoFT(alpha, filter, transm);
         }
 
-        void SetBitValue(unsigned int x, unsigned int y, bool bit)
+        virtual void SetBitValue(unsigned int x, unsigned int y, bool bit) override
         {
             if(bit == true)
                 SetGrayAValue(x, y, TMAX, ALPHA_OPAQUE_INT(TMAX));
             else
                 SetGrayAValue(x, y, (unsigned int)0, ALPHA_OPAQUE_INT(TMAX));
         }
-        void SetGrayValue(unsigned int x, unsigned int y, float gray)
+        virtual void SetGrayValue(unsigned int x, unsigned int y, float gray) override
         {
             SetGrayAValue(x, y, gray, ALPHA_OPAQUE);
         }
-        void SetGrayValue(unsigned int x, unsigned int y, unsigned int gray)
+        virtual void SetGrayValue(unsigned int x, unsigned int y, unsigned int gray) override
         {
             SetGrayAValue(x, y, gray, ALPHA_OPAQUE_INT(TMAX));
         }
-        void SetGrayAValue(unsigned int x, unsigned int y, float gray, float alpha)
+        virtual void SetGrayAValue(unsigned int x, unsigned int y, float gray, float alpha) override
         {
             CHECK_BOUNDS(x, y);
             pixels[(x + y * size_t(width)) * 2]     = IntEncode(gamma, gray, TMAX);
             pixels[(x + y * size_t(width)) * 2 + 1] = T(alpha * float(TMAX));
         }
-        void SetGrayAValue(unsigned int x, unsigned int y, unsigned int gray, unsigned int alpha)
+        virtual void SetGrayAValue(unsigned int x, unsigned int y, unsigned int gray, unsigned int alpha) override
         {
             CHECK_BOUNDS(x, y);
             pixels[(x + y * size_t(width)) * 2]     = gray;
             pixels[(x + y * size_t(width)) * 2 + 1] = alpha;
         }
-        void SetRGBValue(unsigned int x, unsigned int y, float red, float green, float blue)
+        virtual void SetRGBValue(unsigned int x, unsigned int y, float red, float green, float blue) override
         {
             SetGrayValue(x, y, RGB2Gray(red, green, blue));
         }
-        void SetRGBValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue)
+        virtual void SetRGBValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue) override
         {
             // not really pretty here, but we're doing color math, so we need to decode and re-encode
             SetGrayValue(x, y, RGB2Gray(gammaLUT[red], gammaLUT[green], gammaLUT[blue]));
         }
-        void SetRGBAValue(unsigned int x, unsigned int y, float red, float green, float blue, float alpha)
+        virtual void SetRGBAValue(unsigned int x, unsigned int y, float red, float green, float blue, float alpha) override
         {
             SetGrayAValue(x, y, RGB2Gray(red, green, blue), alpha);
         }
-        void SetRGBAValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha)
+        virtual void SetRGBAValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha) override
         {
             // not really pretty here, but we're doing color math, so we need to decode and re-encode
             // TODO FIXME - this unnecessarily converts alpha from int to float, requiring it to be converted back to int
             SetGrayAValue(x, y, RGB2Gray(gammaLUT[red], gammaLUT[green], gammaLUT[blue]), float(alpha) / float(TMAX));
         }
-        void SetRGBTValue(unsigned int x, unsigned int y, float red, float green, float blue, float transm)
+        virtual void SetRGBTValue(unsigned int x, unsigned int y, float red, float green, float blue, float transm) override
         {
             SetGrayAValue(x, y, RGB2Gray(red, green, blue), 1.0 - transm);
         }
-        void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col)
+        virtual void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col) override
         {
             SetGrayAValue(x, y, RGB2Gray(col.red(), col.green(), col.blue()), col.alpha());
         }
-        void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float filter, float transm)
+        virtual void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float filter, float transm) override
         {
             SetGrayAValue(x, y, RGB2Gray(red, green, blue), RGBFTColour::FTtoA(filter, transm));
         }
-        void SetRGBFTValue(unsigned int x, unsigned int y, const RGBFTColour& col)
+        virtual void SetRGBFTValue(unsigned int x, unsigned int y, const RGBFTColour& col) override
         {
             SetGrayAValue(x, y, RGB2Gray(col.red(), col.green(), col.blue()), col.FTtoA());
         }
 
-        void FillBitValue(bool bit)
+        virtual void FillBitValue(bool bit) override
         {
             if(bit == true)
                 FillGrayValue(TMAX);
             else
                 FillGrayValue((unsigned int)0);
         }
-        void FillGrayValue(float gray)
+        virtual void FillGrayValue(float gray) override
         {
             FillGrayValue(IntEncode(gamma, gray, TMAX));
         }
-        void FillGrayValue(unsigned int gray)
+        virtual void FillGrayValue(unsigned int gray) override
         {
             FillGrayAValue(gray, ALPHA_OPAQUE_INT(TMAX));
         }
-        void FillGrayAValue(float gray, float alpha)
+        virtual void FillGrayAValue(float gray, float alpha) override
         {
             // [CLi 2009-09] this was dividing by float(TMAX) - which I presume to have been a bug.
             T g(IntEncode(gamma, gray, TMAX)), a(IntEncode(alpha, TMAX));
@@ -2435,7 +2454,7 @@ class NonlinearGrayAImage : public Image
                 *i = a;
             }
         }
-        void FillGrayAValue(unsigned int gray, unsigned int alpha)
+        virtual void FillGrayAValue(unsigned int gray, unsigned int alpha) override
         {
             for(typename vector<T, Allocator>::iterator i(pixels.begin()); i != pixels.end(); i++)
             {
@@ -2444,30 +2463,30 @@ class NonlinearGrayAImage : public Image
                 *i = T(alpha);
             }
         }
-        void FillRGBValue(float red, float green, float blue)
+        virtual void FillRGBValue(float red, float green, float blue) override
         {
             FillGrayValue(RGB2Gray(red, green, blue));
         }
-        void FillRGBValue(unsigned int red, unsigned int green, unsigned int blue)
+        virtual void FillRGBValue(unsigned int red, unsigned int green, unsigned int blue) override
         {
             // not really pretty here, but we're doing color math, so we need to decode and re-encode
             FillGrayValue(RGB2Gray(gammaLUT[red], gammaLUT[green], gammaLUT[blue]));
         }
-        void FillRGBAValue(float red, float green, float blue, float alpha)
+        virtual void FillRGBAValue(float red, float green, float blue, float alpha) override
         {
             FillGrayAValue(RGB2Gray(red, green, blue), alpha);
         }
-        void FillRGBAValue(unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha)
+        virtual void FillRGBAValue(unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha) override
         {
             // not really pretty here, but we're doing color math, so we need to decode and re-encode
             // TODO FIXME - this unnecessarily converts alpha from int to float, requiring it to be converted back to int
             FillGrayAValue(RGB2Gray(gammaLUT[red], gammaLUT[green], gammaLUT[blue]), float(alpha) / float(TMAX));
         }
-        void FillRGBTValue(float red, float green, float blue, float transm)
+        virtual void FillRGBTValue(float red, float green, float blue, float transm) override
         {
             FillGrayAValue(RGB2Gray(red, green, blue), 1.0 - transm);
         }
-        void FillRGBFTValue(float red, float green, float blue, float filter, float transm)
+        virtual void FillRGBFTValue(float red, float green, float blue, float filter, float transm) override
         {
             FillGrayAValue(RGB2Gray(red, green, blue), RGBFTColour::FTtoA(filter, transm));
         }
@@ -2477,12 +2496,12 @@ class NonlinearGrayAImage : public Image
         const float* gammaLUT;
 };
 
-typedef NonlinearGrayAImage<unsigned char, 255, Image::GrayA_Gamma8> MemoryNonlinearGrayA8Image;
+typedef NonlinearGrayAImage<unsigned char, 255, ImageDataType::GrayA_Gamma8> MemoryNonlinearGrayA8Image;
 
-typedef NonlinearGrayAImage<unsigned short, 65535, Image::GrayA_Gamma16> MemoryNonlinearGrayA16Image;
+typedef NonlinearGrayAImage<unsigned short, 65535, ImageDataType::GrayA_Gamma16> MemoryNonlinearGrayA16Image;
 
-template<typename T, unsigned int TMAX, int IDT, class Allocator = allocator<T> >
-class NonlinearRGBImage : public Image
+template<typename T, unsigned int TMAX, ImageDataType IDT, class Allocator = allocator<T>>
+class NonlinearRGBImage final : public Image
 {
     public:
         NonlinearRGBImage(unsigned int w, unsigned int h) :
@@ -2493,49 +2512,49 @@ class NonlinearRGBImage : public Image
             Image(w, h, ImageDataType(IDT), m), gamma(NeutralGammaCurve::Get()) { gammaLUT = gamma->GetLookupTable(TMAX); pixels.resize(SafeUnsignedProduct<size_t>(w, h, 3u)); FillBitValue(false); }
         NonlinearRGBImage(unsigned int w, unsigned int h, const vector<RGBFTMapEntry>& m) :
             Image(w, h, ImageDataType(IDT), m), gamma(NeutralGammaCurve::Get()) { gammaLUT = gamma->GetLookupTable(TMAX); pixels.resize(SafeUnsignedProduct<size_t>(w, h, 3u)); FillBitValue(false); }
-        ~NonlinearRGBImage() { }
+        virtual ~NonlinearRGBImage() override { }
 
-        bool IsOpaque() const
+        virtual bool IsOpaque() const override
         {
             return true;
         }
-        bool IsGrayscale() const
+        virtual bool IsGrayscale() const override
         {
             return false;
         }
-        bool IsColour() const
+        virtual bool IsColour() const override
         {
             return true;
         }
-        bool IsFloat() const
+        virtual bool IsFloat() const override
         {
             return false;
         }
-        bool IsInt() const
+        virtual bool IsInt() const override
         {
             return true;
         }
-        bool IsIndexed() const
+        virtual bool IsIndexed() const override
         {
             return false;
         }
-        bool IsGammaEncoded() const
+        virtual bool IsGammaEncoded() const override
         {
             return true;
         }
-        bool HasAlphaChannel() const
+        virtual bool HasAlphaChannel() const override
         {
             return false;
         }
-        bool HasFilterTransmit() const
+        virtual bool HasFilterTransmit() const override
         {
             return false;
         }
-        unsigned int GetMaxIntValue() const
+        virtual unsigned int GetMaxIntValue() const override
         {
             return TMAX;
         }
-        bool TryDeferDecoding(GammaCurvePtr& g, unsigned int max)
+        virtual bool TryDeferDecoding(GammaCurvePtr& g, unsigned int max) override
         {
             if (max != TMAX) return false;
             if (!GammaCurve::IsNeutral(gamma)) return !g;
@@ -2544,141 +2563,141 @@ class NonlinearRGBImage : public Image
             return true;
         }
 
-        bool GetBitValue(unsigned int x, unsigned int y) const
+        virtual bool GetBitValue(unsigned int x, unsigned int y) const override
         {
             float red, green, blue;
             GetRGBValue(x, y, red, green, blue);
             return IS_NONZERO_RGB(red, green, blue);
         }
-        float GetGrayValue(unsigned int x, unsigned int y) const
+        virtual float GetGrayValue(unsigned int x, unsigned int y) const override
         {
             float red, green, blue;
             GetRGBValue(x, y, red, green, blue);
             return RGB2Gray(red, green, blue);
         }
-        void GetGrayAValue(unsigned int x, unsigned int y, float& gray, float& alpha) const
+        virtual void GetGrayAValue(unsigned int x, unsigned int y, float& gray, float& alpha) const override
         {
             gray = GetGrayValue(x, y);
             alpha = ALPHA_OPAQUE;
         }
-        void GetRGBValue(unsigned int x, unsigned int y, float& red, float& green, float& blue) const
+        virtual void GetRGBValue(unsigned int x, unsigned int y, float& red, float& green, float& blue) const override
         {
             CHECK_BOUNDS(x, y);
             red   = gammaLUT[pixels[(x + y * size_t(width)) * 3]];
             green = gammaLUT[pixels[(x + y * size_t(width)) * 3 + 1]];
             blue  = gammaLUT[pixels[(x + y * size_t(width)) * 3 + 2]];
         }
-        void GetRGBAValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& alpha) const
+        virtual void GetRGBAValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& alpha) const override
         {
             GetRGBValue(x, y, red, green, blue);
             alpha = ALPHA_OPAQUE;
         }
-        void GetRGBTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& transm) const
+        virtual void GetRGBTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& transm) const override
         {
             GetRGBValue(x, y, red, green, blue);
             transm = FT_OPAQUE;
         }
-        void GetRGBFTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& filter, float& transm) const
+        virtual void GetRGBFTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& filter, float& transm) const override
         {
             GetRGBValue(x, y, red, green, blue);
             filter = transm = FT_OPAQUE;
         }
 
-        void SetBitValue(unsigned int x, unsigned int y, bool bit)
+        virtual void SetBitValue(unsigned int x, unsigned int y, bool bit) override
         {
             if(bit == true)
                 SetGrayValue(x, y, TMAX);
             else
                 SetGrayValue(x, y, (unsigned int)0);
         }
-        void SetGrayValue(unsigned int x, unsigned int y, float gray)
+        virtual void SetGrayValue(unsigned int x, unsigned int y, float gray) override
         {
             SetRGBValue(x, y, gray, gray, gray);
         }
-        void SetGrayValue(unsigned int x, unsigned int y, unsigned int gray)
+        virtual void SetGrayValue(unsigned int x, unsigned int y, unsigned int gray) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width) * 3]     =
             pixels[x + y * size_t(width) * 3 + 1] =
             pixels[x + y * size_t(width) * 3 + 2] = gray;
         }
-        void SetGrayAValue(unsigned int x, unsigned int y, float gray, float)
+        virtual void SetGrayAValue(unsigned int x, unsigned int y, float gray, float) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width) * 3]     =
             pixels[x + y * size_t(width) * 3 + 1] =
             pixels[x + y * size_t(width) * 3 + 2] = IntEncode(gamma, gray, TMAX);
         }
-        void SetGrayAValue(unsigned int x, unsigned int y, unsigned int gray, unsigned int)
+        virtual void SetGrayAValue(unsigned int x, unsigned int y, unsigned int gray, unsigned int) override
         {
             CHECK_BOUNDS(x, y);
             pixels[x + y * size_t(width) * 3]     =
             pixels[x + y * size_t(width) * 3 + 1] =
             pixels[x + y * size_t(width) * 3 + 2] = gray;
         }
-        void SetRGBValue(unsigned int x, unsigned int y, float red, float green, float blue)
+        virtual void SetRGBValue(unsigned int x, unsigned int y, float red, float green, float blue) override
         {
             CHECK_BOUNDS(x, y);
             pixels[(x + y * size_t(width)) * 3]     = IntEncode(gamma, red,   TMAX);
             pixels[(x + y * size_t(width)) * 3 + 1] = IntEncode(gamma, green, TMAX);
             pixels[(x + y * size_t(width)) * 3 + 2] = IntEncode(gamma, blue,  TMAX);
         }
-        void SetRGBValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue)
+        virtual void SetRGBValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue) override
         {
             CHECK_BOUNDS(x, y);
             pixels[(x + y * size_t(width)) * 3]     = T(red);
             pixels[(x + y * size_t(width)) * 3 + 1] = T(green);
             pixels[(x + y * size_t(width)) * 3 + 2] = T(blue);
         }
-        void SetRGBAValue(unsigned int x, unsigned int y, float red, float green, float blue, float)
+        virtual void SetRGBAValue(unsigned int x, unsigned int y, float red, float green, float blue, float) override
         {
             SetRGBValue(x, y, red, green, blue);
         }
-        void SetRGBAValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue, unsigned int)
+        virtual void SetRGBAValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue, unsigned int) override
         {
             SetRGBValue(x, y, red, green, blue);
         }
-        void SetRGBTValue(unsigned int x, unsigned int y, float red, float green, float blue, float transm)
+        virtual void SetRGBTValue(unsigned int x, unsigned int y, float red, float green, float blue, float transm) override
         {
             SetRGBValue(x, y, red, green, blue);
         }
-        void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col)
+        virtual void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col) override
         {
             SetRGBValue(x, y, col.red(), col.green(), col.blue());
         }
-        void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float, float)
+        virtual void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float, float) override
         {
             SetRGBValue(x, y, red, green, blue);
         }
-        void SetRGBFTValue(unsigned int x, unsigned int y, const RGBFTColour& col)
+        virtual void SetRGBFTValue(unsigned int x, unsigned int y, const RGBFTColour& col) override
         {
             SetRGBValue(x, y, col.red(), col.green(), col.blue());
         }
 
-        void FillBitValue(bool bit)
+        virtual void FillBitValue(bool bit) override
         {
             if(bit == true)
                 FillGrayValue(TMAX);
             else
                 FillGrayValue((unsigned int)0);
         }
-        void FillGrayValue(float gray)
+        virtual void FillGrayValue(float gray) override
         {
             FillGrayValue((unsigned int)(IntEncode(gamma, gray, TMAX)));
         }
-        void FillGrayValue(unsigned int gray)
+        virtual void FillGrayValue(unsigned int gray) override
         {
             fill(pixels.begin(), pixels.end(), gray);
         }
-        void FillGrayAValue(float gray, float)
+        virtual void FillGrayAValue(float gray, float) override
         {
             FillRGBValue(gray, gray, gray);
         }
-        void FillGrayAValue(unsigned int gray, unsigned int)
+        virtual void FillGrayAValue(unsigned int gray, unsigned int) override
         {
             FillRGBValue(gray, gray, gray);
         }
-        void FillRGBValue(float red, float green, float blue)
+        virtual void FillRGBValue(float red, float green, float blue) override
         {
             // [CLi 2009-09] this was dividing by float(TMAX) - which I presume to have been a bug.
             T r(IntEncode(gamma, red, TMAX)), g(IntEncode(gamma, green, TMAX)), b(IntEncode(gamma, blue, TMAX));
@@ -2691,7 +2710,7 @@ class NonlinearRGBImage : public Image
                 *i = b;
             }
         }
-        void FillRGBValue(unsigned int red, unsigned int green, unsigned int blue)
+        virtual void FillRGBValue(unsigned int red, unsigned int green, unsigned int blue) override
         {
             for(typename vector<T, Allocator>::iterator i(pixels.begin()); i != pixels.end(); i++)
             {
@@ -2702,19 +2721,19 @@ class NonlinearRGBImage : public Image
                 *i = T(blue);
             }
         }
-        void FillRGBAValue(float red, float green, float blue, float)
+        virtual void FillRGBAValue(float red, float green, float blue, float) override
         {
             FillRGBValue(red, green, blue);
         }
-        void FillRGBAValue(unsigned int red, unsigned int green, unsigned int blue, unsigned int)
+        virtual void FillRGBAValue(unsigned int red, unsigned int green, unsigned int blue, unsigned int) override
         {
             FillRGBValue(red, green, blue);
         }
-        void FillRGBTValue(float red, float green, float blue, float)
+        virtual void FillRGBTValue(float red, float green, float blue, float) override
         {
             FillRGBValue(red, green, blue);
         }
-        void FillRGBFTValue(float red, float green, float blue, float, float)
+        virtual void FillRGBFTValue(float red, float green, float blue, float, float) override
         {
             FillRGBValue(red, green, blue);
         }
@@ -2724,12 +2743,12 @@ class NonlinearRGBImage : public Image
         const float* gammaLUT;
 };
 
-typedef NonlinearRGBImage<unsigned char, 255, Image::RGB_Gamma8> MemoryNonlinearRGB8Image;
+typedef NonlinearRGBImage<unsigned char, 255, ImageDataType::RGB_Gamma8> MemoryNonlinearRGB8Image;
 
-typedef NonlinearRGBImage<unsigned short, 65535, Image::RGB_Gamma16> MemoryNonlinearRGB16Image;
+typedef NonlinearRGBImage<unsigned short, 65535, ImageDataType::RGB_Gamma16> MemoryNonlinearRGB16Image;
 
-template<typename T, unsigned int TMAX, int IDT, class Allocator = allocator<T> >
-class NonlinearRGBAImage : public Image
+template<typename T, unsigned int TMAX, ImageDataType IDT, class Allocator = allocator<T>>
+class NonlinearRGBAImage final : public Image
 {
     public:
         NonlinearRGBAImage(unsigned int w, unsigned int h) :
@@ -2740,9 +2759,9 @@ class NonlinearRGBAImage : public Image
             Image(w, h, ImageDataType(IDT), m), gamma(NeutralGammaCurve::Get()) { gammaLUT = gamma->GetLookupTable(TMAX); pixels.resize(SafeUnsignedProduct<size_t>(w, h, 4u)); FillBitValue(false); }
         NonlinearRGBAImage(unsigned int w, unsigned int h, const vector<RGBFTMapEntry>& m) :
             Image(w, h, ImageDataType(IDT), m), gamma(NeutralGammaCurve::Get()) { gammaLUT = gamma->GetLookupTable(TMAX); pixels.resize(SafeUnsignedProduct<size_t>(w, h, 4u)); FillBitValue(false); }
-        ~NonlinearRGBAImage() { }
+        virtual ~NonlinearRGBAImage() override { }
 
-        bool IsOpaque() const
+        virtual bool IsOpaque() const override
         {
             for(typename vector<T, Allocator>::const_iterator i(pixels.begin()); i != pixels.end(); i += 4)
             {
@@ -2752,43 +2771,43 @@ class NonlinearRGBAImage : public Image
 
             return true;
         }
-        bool IsGrayscale() const
+        virtual bool IsGrayscale() const override
         {
             return false;
         }
-        bool IsColour() const
+        virtual bool IsColour() const override
         {
             return true;
         }
-        bool IsFloat() const
+        virtual bool IsFloat() const override
         {
             return false;
         }
-        bool IsInt() const
+        virtual bool IsInt() const override
         {
             return true;
         }
-        bool IsIndexed() const
+        virtual bool IsIndexed() const override
         {
             return false;
         }
-        bool IsGammaEncoded() const
+        virtual bool IsGammaEncoded() const override
         {
             return true;
         }
-        bool HasAlphaChannel() const
+        virtual bool HasAlphaChannel() const override
         {
             return true;
         }
-        bool HasFilterTransmit() const
+        virtual bool HasFilterTransmit() const override
         {
             return false;
         }
-        unsigned int GetMaxIntValue() const
+        virtual unsigned int GetMaxIntValue() const override
         {
             return TMAX;
         }
-        bool TryDeferDecoding(GammaCurvePtr& g, unsigned int max)
+        virtual bool TryDeferDecoding(GammaCurvePtr& g, unsigned int max) override
         {
             if (max != TMAX) return false;
             if (!GammaCurve::IsNeutral(gamma)) return !g;
@@ -2797,31 +2816,31 @@ class NonlinearRGBAImage : public Image
             return true;
         }
 
-        bool GetBitValue(unsigned int x, unsigned int y) const
+        virtual bool GetBitValue(unsigned int x, unsigned int y) const override
         {
             // TODO FIXME - [CLi] This ignores opacity information; other bit-based code doesn't.
             float red, green, blue, alpha;
             GetRGBAValue(x, y, red, green, blue, alpha);
             return IS_NONZERO_RGB(red, green, blue);
         }
-        float GetGrayValue(unsigned int x, unsigned int y) const
+        virtual float GetGrayValue(unsigned int x, unsigned int y) const override
         {
             float red, green, blue, alpha;
             GetRGBAValue(x, y, red, green, blue, alpha);
             return RGB2Gray(red, green, blue);
         }
-        void GetGrayAValue(unsigned int x, unsigned int y, float& gray, float& alpha) const
+        virtual void GetGrayAValue(unsigned int x, unsigned int y, float& gray, float& alpha) const override
         {
             float red, green, blue;
             GetRGBAValue(x, y, red, green, blue, alpha);
             gray = RGB2Gray(red, green, blue);
         }
-        void GetRGBValue(unsigned int x, unsigned int y, float& red, float& green, float& blue) const
+        virtual void GetRGBValue(unsigned int x, unsigned int y, float& red, float& green, float& blue) const override
         {
             float alpha;
             GetRGBAValue(x, y, red, green, blue, alpha);
         }
-        void GetRGBAValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& alpha) const
+        virtual void GetRGBAValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& alpha) const override
         {
             CHECK_BOUNDS(x, y);
             red   = gammaLUT[pixels[(x + y * size_t(width)) * 4]];
@@ -2829,51 +2848,51 @@ class NonlinearRGBAImage : public Image
             blue  = gammaLUT[pixels[(x + y * size_t(width)) * 4 + 2]];
             alpha =    float(pixels[(x + y * size_t(width)) * 4 + 3]) / float(TMAX);
         }
-        void GetRGBTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& transm) const
+        virtual void GetRGBTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& transm) const override
         {
             float alpha;
             GetRGBAValue(x, y, red, green, blue, alpha);
             transm = 1.0 - alpha;
         }
-        void GetRGBFTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& filter, float& transm) const
+        virtual void GetRGBFTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& filter, float& transm) const override
         {
             float alpha;
             GetRGBAValue(x, y, red, green, blue, alpha);
             RGBFTColour::AtoFT(alpha, filter, transm);
         }
 
-        void SetBitValue(unsigned int x, unsigned int y, bool bit)
+        virtual void SetBitValue(unsigned int x, unsigned int y, bool bit) override
         {
             if(bit == true)
                 SetGrayValue(x, y, TMAX);
             else
                 SetGrayValue(x, y, (unsigned int)0);
         }
-        void SetGrayValue(unsigned int x, unsigned int y, float gray)
+        virtual void SetGrayValue(unsigned int x, unsigned int y, float gray) override
         {
             SetRGBAValue(x, y, gray, gray, gray, ALPHA_OPAQUE);
         }
-        void SetGrayValue(unsigned int x, unsigned int y, unsigned int gray)
+        virtual void SetGrayValue(unsigned int x, unsigned int y, unsigned int gray) override
         {
             SetRGBAValue(x, y, gray, gray, gray, ALPHA_OPAQUE_INT(TMAX));
         }
-        void SetGrayAValue(unsigned int x, unsigned int y, float gray, float alpha)
+        virtual void SetGrayAValue(unsigned int x, unsigned int y, float gray, float alpha) override
         {
             SetRGBAValue(x, y, gray, gray, gray, alpha);
         }
-        void SetGrayAValue(unsigned int x, unsigned int y, unsigned int gray, unsigned int alpha)
+        virtual void SetGrayAValue(unsigned int x, unsigned int y, unsigned int gray, unsigned int alpha) override
         {
             SetRGBAValue(x, y, gray, gray, gray, alpha);
         }
-        void SetRGBValue(unsigned int x, unsigned int y, float red, float green, float blue)
+        virtual void SetRGBValue(unsigned int x, unsigned int y, float red, float green, float blue) override
         {
             SetRGBAValue(x, y, red, green, blue, ALPHA_OPAQUE);
         }
-        void SetRGBValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue)
+        virtual void SetRGBValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue) override
         {
             SetRGBAValue(x, y, red, green, blue, ALPHA_OPAQUE_INT(TMAX));
         }
-        void SetRGBAValue(unsigned int x, unsigned int y, float red, float green, float blue, float alpha)
+        virtual void SetRGBAValue(unsigned int x, unsigned int y, float red, float green, float blue, float alpha) override
         {
             CHECK_BOUNDS(x, y);
             pixels[(x + y * size_t(width)) * 4]     = T(IntEncode(gamma, red,   TMAX));
@@ -2881,7 +2900,7 @@ class NonlinearRGBAImage : public Image
             pixels[(x + y * size_t(width)) * 4 + 2] = T(IntEncode(gamma, blue,  TMAX));
             pixels[(x + y * size_t(width)) * 4 + 3] = T(IntEncode(       alpha, TMAX));
         }
-        void SetRGBAValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha)
+        virtual void SetRGBAValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha) override
         {
             CHECK_BOUNDS(x, y);
             pixels[(x + y * size_t(width)) * 4]     = T(red);
@@ -2889,11 +2908,11 @@ class NonlinearRGBAImage : public Image
             pixels[(x + y * size_t(width)) * 4 + 2] = T(blue);
             pixels[(x + y * size_t(width)) * 4 + 3] = T(alpha);
         }
-        void SetRGBTValue(unsigned int x, unsigned int y, float red, float green, float blue, float transm)
+        virtual void SetRGBTValue(unsigned int x, unsigned int y, float red, float green, float blue, float transm) override
         {
             SetRGBAValue(x, y, red, green, blue, 1.0 - transm);
         }
-        void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col)
+        virtual void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col) override
         {
             CHECK_BOUNDS(x, y);
             pixels[(x + y * size_t(width)) * 4]     = T(col.red());
@@ -2901,11 +2920,11 @@ class NonlinearRGBAImage : public Image
             pixels[(x + y * size_t(width)) * 4 + 2] = T(col.blue());
             pixels[(x + y * size_t(width)) * 4 + 3] = T(col.alpha());
         }
-        void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float filter, float transm)
+        virtual void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float filter, float transm) override
         {
             SetRGBAValue(x, y, red, green, blue, RGBFTColour::FTtoA(filter, transm));
         }
-        void SetRGBFTValue(unsigned int x, unsigned int y, const RGBFTColour& col)
+        virtual void SetRGBFTValue(unsigned int x, unsigned int y, const RGBFTColour& col) override
         {
             CHECK_BOUNDS(x, y);
             pixels[(x + y * size_t(width)) * 4]     = T(col.red());
@@ -2914,38 +2933,38 @@ class NonlinearRGBAImage : public Image
             pixels[(x + y * size_t(width)) * 4 + 3] = T(col.FTtoA());
         }
 
-        void FillBitValue(bool bit)
+        virtual void FillBitValue(bool bit) override
         {
             if(bit == true)
                 FillGrayValue(TMAX);
             else
                 FillGrayValue((unsigned int)0);
         }
-        void FillGrayValue(float gray)
+        virtual void FillGrayValue(float gray) override
         {
             FillRGBAValue(gray, gray, gray, ALPHA_OPAQUE);
         }
-        void FillGrayValue(unsigned int gray)
+        virtual void FillGrayValue(unsigned int gray) override
         {
             FillRGBAValue(gray, gray, gray, ALPHA_OPAQUE_INT(TMAX));
         }
-        void FillGrayAValue(float gray, float alpha)
+        virtual void FillGrayAValue(float gray, float alpha) override
         {
             FillRGBAValue(gray, gray, gray, alpha);
         }
-        void FillGrayAValue(unsigned int gray, unsigned int alpha)
+        virtual void FillGrayAValue(unsigned int gray, unsigned int alpha) override
         {
             FillRGBAValue(gray, gray, gray, alpha);
         }
-        void FillRGBValue(float red, float green, float blue)
+        virtual void FillRGBValue(float red, float green, float blue) override
         {
             FillRGBAValue(red, green, blue, ALPHA_OPAQUE);
         }
-        void FillRGBValue(unsigned int red, unsigned int green, unsigned int blue)
+        virtual void FillRGBValue(unsigned int red, unsigned int green, unsigned int blue) override
         {
             FillRGBAValue(red, green, blue, ALPHA_OPAQUE_INT(TMAX));
         }
-        void FillRGBAValue(float red, float green, float blue, float alpha)
+        virtual void FillRGBAValue(float red, float green, float blue, float alpha) override
         {
             // [CLi 2009-09] this was dividing by float(TMAX) - which I presume to have been a bug.
             T r(IntEncode(gamma, red, TMAX)), g(IntEncode(gamma, green, TMAX)), b(IntEncode(gamma, blue, TMAX)), a(IntEncode(alpha, TMAX));
@@ -2960,7 +2979,7 @@ class NonlinearRGBAImage : public Image
                 *i = a;
             }
         }
-        void FillRGBAValue(unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha)
+        virtual void FillRGBAValue(unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha) override
         {
             for(typename vector<T, Allocator>::iterator i(pixels.begin()); i != pixels.end(); i++)
             {
@@ -2973,11 +2992,11 @@ class NonlinearRGBAImage : public Image
                 *i = T(alpha);
             }
         }
-        void FillRGBTValue(float red, float green, float blue, float transm)
+        virtual void FillRGBTValue(float red, float green, float blue, float transm) override
         {
             FillRGBAValue(red, green, blue, 1.0 - transm);
         }
-        void FillRGBFTValue(float red, float green, float blue, float filter, float transm)
+        virtual void FillRGBFTValue(float red, float green, float blue, float filter, float transm) override
         {
             FillRGBAValue(red, green, blue, RGBFTColour::FTtoA(filter, transm));
         }
@@ -2987,9 +3006,9 @@ class NonlinearRGBAImage : public Image
         const float* gammaLUT;
 };
 
-typedef NonlinearRGBAImage<unsigned char, 255, Image::RGBA_Gamma8> MemoryNonlinearRGBA8Image;
+typedef NonlinearRGBAImage<unsigned char, 255, ImageDataType::RGBA_Gamma8> MemoryNonlinearRGBA8Image;
 
-typedef NonlinearRGBAImage<unsigned short, 65535, Image::RGBA_Gamma16> MemoryNonlinearRGBA16Image;
+typedef NonlinearRGBAImage<unsigned short, 65535, ImageDataType::RGBA_Gamma16> MemoryNonlinearRGBA16Image;
 
 // sample basic file-based pixel container. not very efficient.
 // it is expected that for performance reasons, platforms will provide their own specific
@@ -3014,7 +3033,7 @@ class FileBackedPixelContainer
             FILTER = 3,
             TRANSM = 4
         };
-        class pixel_type
+        class pixel_type final
         {
             public:
                 pixel_type()
@@ -3064,43 +3083,40 @@ class FileBackedPixelContainer
         };
 
         FileBackedPixelContainer(size_type width, size_type height, size_type bs):
-            m_File(-1), m_Width(width), m_Height(height), m_xPos(0), m_yPos(0), m_Dirty(false), m_Path(PlatformBase::GetInstance().CreateTemporaryFile())
+            m_Width(width), m_Height(height), m_xPos(0), m_yPos(0), m_Dirty(false), m_Path(PlatformBase::GetInstance().CreateTemporaryFile())
         {
-            if ((m_File = open(UCS2toASCIIString(m_Path).c_str(), O_CREAT | O_RDWR | O_TRUNC, S_IRUSR | S_IWUSR)) == -1)
+            if (!m_File.CreateRW(m_Path))
                 throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot open backing file for intermediate image storage.");
             m_Blocksize = bs;
             m_Buffer.resize(m_Blocksize);
             // write extra data to create the big file and help 3rd party reader
-            POV_OFF_T pos;
+            std::int_least64_t pos;
             // NB: The following use of SafeUnsignedProduct also safeguards later computations of
             // pixel positions within the file, as long as x and y coordinates are sane
-            pos = SafeUnsignedProduct<POV_OFF_T>(m_Width, m_Height);
+            pos = SafeUnsignedProduct<std::int_least64_t>(m_Width, m_Height);
             if ( pos% m_Blocksize)
             { /* issue: the block would overlap the end of file */
                 pos /= m_Blocksize;
                 pos++;
-                pos = SafeUnsignedProduct<POV_OFF_T>(pos, m_Blocksize);
+                pos = SafeUnsignedProduct<std::int_least64_t>(pos, m_Blocksize);
             }
             /* else fine case: the boundary of block match the boundary of pixels in file */
-            pos = SafeUnsignedProduct<POV_OFF_T>(pos, sizeof(pixel_type));
+            pos = SafeUnsignedProduct<std::int_least64_t>(pos, sizeof(pixel_type));
             size_type meta[3];
             meta[0] = sizeof(pixel_type);
             meta[1] = m_Width;
             meta[2] = m_Height;
-            if (POV_LSEEK(m_File, pos, SEEK_SET) != pos)
+            if (!m_File.Seek(pos))
                 throw POV_EXCEPTION(kFileDataErr, "Intermediate image storage backing file write/seek failed at creation.");
-            if (write(m_File, &meta[0], (int) sizeof(size_type)*3) != (sizeof(size_type)*3))
+            if (!m_File.Write(meta, sizeof(size_type)*3))
                 throw POV_EXCEPTION(kFileDataErr, "Intermediate image storage backing file write failed at creation.");
             // m_Committed.resize(width * height / m_Blocksize);
         }
 
         virtual ~FileBackedPixelContainer()
         {
-            if (m_File != -1)
-            {
-                Flush();
-                close(m_File);
-            }
+            Flush();
+            m_File.Close();
             if (m_Path.empty() == false)
             {
                 // if shutdown has been delayed, by the time we reach here, the platform base
@@ -3205,10 +3221,10 @@ class FileBackedPixelContainer
         }
 
     protected:
-        int                 m_File;
+        Filesystem::LargeFile m_File;
         bool                m_Dirty;
         size_type           m_Blocksize;
-        POV_OFF_T           m_CurrentBlock;
+        std::int_least64_t  m_CurrentBlock;
         size_type           m_Width;
         size_type           m_Height;
         size_type           m_xPos;
@@ -3243,7 +3259,7 @@ class FileBackedPixelContainer
 
         void ReadPixel(size_type x, size_type y, pixel_type& pixel)
         {
-            POV_OFF_T pos, block = (y * (POV_OFF_T)(m_Width) + x) / m_Blocksize;
+            std::int_least64_t pos, block = (y * (std::int_least64_t)(m_Width) + x) / m_Blocksize;
 
             if (block != m_CurrentBlock) {
                 WriteCurrentBlock();
@@ -3258,33 +3274,33 @@ class FileBackedPixelContainer
 #endif
                 pos = block * sizeof(pixel_type) * m_Blocksize;
                 int chunk = sizeof(pixel_type) * m_Blocksize;
-                if (POV_LSEEK(m_File, pos, SEEK_SET) != pos)
+                if (!m_File.Seek(pos))
                     throw POV_EXCEPTION(kFileDataErr, "Intermediate image storage backing file read/seek failed.");
-                int bytes = read(m_File, &m_Buffer[0], chunk);
+                int bytes = m_File.Read(m_Buffer.data(), chunk);
                 if (bytes != (sizeof(pixel_type) * m_Blocksize))
                     throw POV_EXCEPTION(kFileDataErr, "Intermediate image storage backing file read failed.");
                 m_CurrentBlock = block;
             }
             POV_IMAGE_ASSERT (m_Blocksize != 0);
-            memcpy(&pixel, m_Buffer[(y * (POV_OFF_T)(m_Width) + x) % m_Blocksize], sizeof(pixel));
+            memcpy(&pixel, m_Buffer[(y * (std::int_least64_t)(m_Width) + x) % m_Blocksize], sizeof(pixel));
         }
 #if 0
         bool BlockCommitted(size_type x, size_type y)
         {
-            POV_OFF_T block = (y * POV_OFF_T(m_Width) + x) / m_Blocksize;
+            std::int_least64_t block = (y * std::int_least64_t(m_Width) + x) / m_Blocksize;
 
             return(m_Committed[block]);
         }
 #endif
         void WriteCurrentBlock()
         {
-            POV_OFF_T pos;
+            std::int_least64_t pos;
 
             if (m_Dirty) {
                 pos = m_CurrentBlock * sizeof(pixel_type) * m_Blocksize;
-                if (POV_LSEEK(m_File, pos, SEEK_SET) != pos)
+                if (!m_File.Seek(pos))
                     throw POV_EXCEPTION(kFileDataErr, "Intermediate image storage backing file write/seek failed.");
-                if (write(m_File, &m_Buffer[0], (int) sizeof(pixel_type) * m_Blocksize) != (sizeof(pixel_type) * m_Blocksize))
+                if (!m_File.Write(m_Buffer.data(), sizeof(pixel_type) * m_Blocksize))
                     throw POV_EXCEPTION(kFileDataErr, "Intermediate image storage backing file write failed.");
             //  m_Committed[m_CurrentBlock] = true;
                 m_Dirty = false;
@@ -3296,101 +3312,101 @@ class FileBackedPixelContainer
             pixel_type dummy;
 
             ReadPixel(x, y, dummy);
-            memcpy(m_Buffer[(y * (POV_OFF_T)(m_Width) + x) % m_Blocksize], &pixel, sizeof(pixel));
+            memcpy(m_Buffer[(y * (std::int_least64_t)(m_Width) + x) % m_Blocksize], &pixel, sizeof(pixel));
             m_Dirty = true;
         }
 
     private:
-        // not available
-        FileBackedPixelContainer(void) {}
+
+        FileBackedPixelContainer() = delete;
 };
 
-class FileRGBFTImage : public Image
+class FileRGBFTImage final : public Image
 {
     public:
         typedef FileBackedPixelContainer::pixel_type pixel_type;
 
-        FileRGBFTImage(unsigned int w, unsigned int h, unsigned int bs): Image(w, h, RGBFT_Float), pixels(width, height, bs) { }
-        ~FileRGBFTImage() { }
+        FileRGBFTImage(unsigned int w, unsigned int h, unsigned int bs): Image(w, h, ImageDataType::RGBFT_Float), pixels(width, height, bs) { }
+        virtual ~FileRGBFTImage() override { }
 
-        bool IsGrayscale() const { return false; }
-        bool IsColour() const { return true; }
-        bool IsFloat() const { return true; }
-        bool IsInt() const { return false; }
-        bool IsIndexed() const { return false; }
-        bool IsGammaEncoded() const { return false; }
-        bool HasAlphaChannel() const { return false; }
-        bool HasFilterTransmit() const { return true; }
-        unsigned int GetMaxIntValue() const { return 255; }
+        virtual bool IsGrayscale() const override { return false; }
+        virtual bool IsColour() const override { return true; }
+        virtual bool IsFloat() const override { return true; }
+        virtual bool IsInt() const override { return false; }
+        virtual bool IsIndexed() const override { return false; }
+        virtual bool IsGammaEncoded() const override { return false; }
+        virtual bool HasAlphaChannel() const override { return false; }
+        virtual bool HasFilterTransmit() const override { return true; }
+        virtual unsigned int GetMaxIntValue() const override { return 255; }
         void SetEncodingGamma(GammaCurvePtr gamma) { ; }
-        bool TryDeferDecoding(GammaCurvePtr&, unsigned int) { return false; }
-        bool IsOpaque() const { throw POV_EXCEPTION(kUncategorizedError, "Internal error: IsOpaque() not supported in FileRGBFTImage"); }
-        bool GetBitValue(unsigned int x, unsigned int y) const
+        virtual bool TryDeferDecoding(GammaCurvePtr&, unsigned int) override { return false; }
+        virtual bool IsOpaque() const override { throw POV_EXCEPTION(kUncategorizedError, "Internal error: IsOpaque() not supported in FileRGBFTImage"); }
+        virtual bool GetBitValue(unsigned int x, unsigned int y) const override
         {
             // TODO FIXME - [CLi] This ignores opacity information; other bit-based code doesn't.
             float red, green, blue, filter, transm;
             GetRGBFTValue(x, y, red, green, blue, filter, transm);
             return IS_NONZERO_RGB(red, green, blue);
         }
-        float GetGrayValue(unsigned int x, unsigned int y) const
+        virtual float GetGrayValue(unsigned int x, unsigned int y) const override
         {
             float red, green, blue, filter, transm;
             GetRGBFTValue(x, y, red, green, blue, filter, transm);
             return RGB2Gray(red, green, blue);
         }
-        void GetGrayAValue(unsigned int x, unsigned int y, float& gray, float& alpha) const
+        virtual void GetGrayAValue(unsigned int x, unsigned int y, float& gray, float& alpha) const override
         {
             float red, green, blue, filter, transm;
             GetRGBFTValue(x, y, red, green, blue, filter, transm);
             gray = RGB2Gray(red, green, blue);
             alpha = RGBFTColour::FTtoA(filter, transm);
         }
-        void GetRGBValue(unsigned int x, unsigned int y, float& red, float& green, float& blue) const
+        virtual void GetRGBValue(unsigned int x, unsigned int y, float& red, float& green, float& blue) const override
         {
             float filter, transm;
             GetRGBFTValue(x, y, red, green, blue, filter, transm);
         }
-        void GetRGBAValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& alpha) const
+        virtual void GetRGBAValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& alpha) const override
         {
             float filter, transm;
             GetRGBFTValue(x, y, red, green, blue, filter, transm);
             alpha = RGBFTColour::FTtoA(filter, transm);
         }
-        void GetRGBTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& transm) const
+        virtual void GetRGBTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& transm) const override
         {
             float filter;
             GetRGBFTValue(x, y, red, green, blue, filter, transm);
             transm = 1.0 - RGBFTColour::FTtoA(filter, transm);
         }
-        void GetRGBFTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& filter, float& transm) const
+        virtual void GetRGBFTValue(unsigned int x, unsigned int y, float& red, float& green, float& blue, float& filter, float& transm) const override
         {
             CHECK_BOUNDS(x, y);
             pixels.GetPixel(x, y, red, green, blue, filter, transm);
         }
 
-        void SetBitValue(unsigned int x, unsigned int y, bool bit)
+        virtual void SetBitValue(unsigned int x, unsigned int y, bool bit) override
         {
             if(bit == true)
                 SetGrayValue(x, y, 1.0f);
             else
                 SetGrayValue(x, y, 0.0f);
         }
-        void SetGrayValue(unsigned int x, unsigned int y, float gray)
+        virtual void SetGrayValue(unsigned int x, unsigned int y, float gray) override
         {
             SetRGBFTValue(x, y, gray, gray, gray, FT_OPAQUE, FT_OPAQUE);
         }
-        void SetGrayValue(unsigned int x, unsigned int y, unsigned int gray)
+        virtual void SetGrayValue(unsigned int x, unsigned int y, unsigned int gray) override
         {
             SetGrayValue(x, y, float(gray) / 255.0f);
         }
-        void SetGrayAValue(unsigned int x, unsigned int y, float gray, float alpha)
+        virtual void SetGrayAValue(unsigned int x, unsigned int y, float gray, float alpha) override
         {
             // TODO - should alpha be converted to filter and transm? [trf]
             float filter, transm;
             RGBFTColour::AtoFT(alpha, filter, transm);
             SetRGBFTValue(x, y, gray, gray, gray, filter, transm);
         }
-        void SetGrayAValue(unsigned int x, unsigned int y, unsigned int gray, unsigned int alpha)
+        virtual void SetGrayAValue(unsigned int x, unsigned int y, unsigned int gray, unsigned int alpha) override
         {
             // TODO - should alpha be converted to filter and transm? [trf]
             float c = float(gray) / 255.0f;
@@ -3398,101 +3414,101 @@ class FileRGBFTImage : public Image
             RGBFTColour::AtoFT(float(alpha) / 255.0f, filter, transm);
             SetRGBFTValue(x, y, c, c, c, filter, transm);
         }
-        void SetRGBValue(unsigned int x, unsigned int y, float red, float green, float blue)
+        virtual void SetRGBValue(unsigned int x, unsigned int y, float red, float green, float blue) override
         {
             SetRGBFTValue(x, y, red, green, blue, FT_OPAQUE, FT_OPAQUE);
         }
-        void SetRGBValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue)
+        virtual void SetRGBValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue) override
         {
             SetRGBFTValue(x, y, float(red) / 255.0f, float(green) / 255.0f, float(blue) / 255.0f, FT_OPAQUE, FT_OPAQUE);
         }
-        void SetRGBAValue(unsigned int x, unsigned int y, float red, float green, float blue, float alpha)
+        virtual void SetRGBAValue(unsigned int x, unsigned int y, float red, float green, float blue, float alpha) override
         {
             // TODO - should alpha be converted to filter and transm? [trf]
             float filter, transm;
             RGBFTColour::AtoFT(alpha, filter, transm);
             SetRGBFTValue(x, y, red, green, blue, filter, transm);
         }
-        void SetRGBAValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha)
+        virtual void SetRGBAValue(unsigned int x, unsigned int y, unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha) override
         {
             // TODO - should alpha be converted to filter and transm? [trf]
             float filter, transm;
             RGBFTColour::AtoFT(float(alpha) / 255.0f, filter, transm);
             SetRGBFTValue(x, y, float(red) / 255.0f, float(green) / 255.0f, float(blue) / 255.0f, filter, transm);
         }
-        void SetRGBTValue(unsigned int x, unsigned int y, float red, float green, float blue, float transm)
+        virtual void SetRGBTValue(unsigned int x, unsigned int y, float red, float green, float blue, float transm) override
         {
             SetRGBFTValue(x, y, red, green, blue, FT_OPAQUE, transm);
         }
-        void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col)
+        virtual void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col) override
         {
             SetRGBFTValue(x, y, col.red(), col.green(), col.blue(), FT_OPAQUE, col.transm());
         }
-        void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float filter, float transm)
+        virtual void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float filter, float transm) override
         {
             CHECK_BOUNDS(x, y);
             pixels.SetPixel(x, y, red, green, blue, filter, transm);
         }
-        void SetRGBFTValue(unsigned int x, unsigned int y, const RGBFTColour& col)
+        virtual void SetRGBFTValue(unsigned int x, unsigned int y, const RGBFTColour& col) override
         {
             CHECK_BOUNDS(x, y);
             pixels.SetPixel(x, y, col);
         }
 
-        void FillBitValue(bool bit)
+        virtual void FillBitValue(bool bit) override
         {
             if(bit == true)
                 FillGrayValue(1.0f);
             else
                 FillGrayValue(0.0f);
         }
-        void FillGrayValue(float gray)
+        virtual void FillGrayValue(float gray) override
         {
             FillRGBFTValue(gray, gray, gray, FT_OPAQUE, FT_OPAQUE);
         }
-        void FillGrayValue(unsigned int gray)
+        virtual void FillGrayValue(unsigned int gray) override
         {
             FillGrayValue(float(gray) / 255.0f);
         }
-        void FillGrayAValue(float gray, float alpha)
+        virtual void FillGrayAValue(float gray, float alpha) override
         {
             // TODO - should alpha be converted to filter and transm? [trf]
             float filter, transm;
             RGBFTColour::AtoFT(alpha, filter, transm);
             FillRGBFTValue(gray, gray, gray, filter, transm);
         }
-        void FillGrayAValue(unsigned int gray, unsigned int alpha)
+        virtual void FillGrayAValue(unsigned int gray, unsigned int alpha) override
         {
             // TODO - should alpha be converted to filter and transm? [trf]
             FillGrayAValue(float(gray) / 255.0f, float(alpha) / 255.0f);
         }
-        void FillRGBValue(float red, float green, float blue)
+        virtual void FillRGBValue(float red, float green, float blue) override
         {
             FillRGBFTValue(red, green, blue, FT_OPAQUE, FT_OPAQUE);
         }
-        void FillRGBValue(unsigned int red, unsigned int green, unsigned int blue)
+        virtual void FillRGBValue(unsigned int red, unsigned int green, unsigned int blue) override
         {
             FillRGBFTValue(float(red) / 255.0f, float(green) / 255.0f, float(blue) / 255.0f, FT_OPAQUE, FT_OPAQUE);
         }
-        void FillRGBAValue(float red, float green, float blue, float alpha)
+        virtual void FillRGBAValue(float red, float green, float blue, float alpha) override
         {
             // TODO - should alpha be converted to filter and transm? [trf]
             float filter, transm;
             RGBFTColour::AtoFT(alpha, filter, transm);
             FillRGBFTValue(red, green, blue, filter, transm);
         }
-        void FillRGBAValue(unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha)
+        virtual void FillRGBAValue(unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha) override
         {
             // TODO - should alpha be converted to filter and transm? [trf]
             float filter, transm;
             RGBFTColour::AtoFT(float(alpha) / 255.0f, filter, transm);
             FillRGBFTValue(float(red) / 255.0f, float(green) / 255.0f, float(blue) / 255.0f, filter, transm);
         }
-        void FillRGBTValue(float red, float green, float blue, float transm)
+        virtual void FillRGBTValue(float red, float green, float blue, float transm) override
         {
             FillRGBFTValue(red, green, blue, FT_OPAQUE, transm);
         }
-        void FillRGBFTValue(float red, float green, float blue, float filter, float transm)
+        virtual void FillRGBFTValue(float red, float green, float blue, float filter, float transm) override
         {
             pixels.Fill(red, green, blue, filter, transm);
         }
@@ -3566,68 +3582,40 @@ void RGBFTMap2RGBAMap(const vector<Image::RGBFTMapEntry>& m, vector<Image::RGBAM
         n.push_back(Image::RGBAMapEntry(i->red, i->green, i->blue, RGBFTColour::FTtoA(i->filter, i->transm)));
 }
 
-Image::ImageDataType Image::GetImageDataType (ImageChannelDataType channelType, ImageChannelLayout layout)
+ImageDataType Image::GetImageDataType (int minBitsPerChannel, int colourChannels, int alphaChannels, bool linear)
 {
-    switch (layout)
+    struct { ImageDataType type; int bpc; int cc; int ac; bool lin; } kaImageDataModels[] = {
+        // Note: Entries differing only in bpc must be ordered low-bpc first!
+        { ImageDataType::Gray_Gamma8,     8, 1, 0, false },
+        { ImageDataType::Gray_Gamma16,   16, 1, 0, false },
+        { ImageDataType::Gray_Int8,       8, 1, 0, true },
+        { ImageDataType::Gray_Int16,     16, 1, 0, true },
+        { ImageDataType::GrayA_Gamma8,    8, 1, 1, false },
+        { ImageDataType::GrayA_Gamma16,  16, 1, 1, false },
+        { ImageDataType::GrayA_Int8,      8, 1, 1, true },
+        { ImageDataType::GrayA_Int16,    16, 1, 1, true },
+        { ImageDataType::RGB_Gamma8,      8, 3, 0, false },
+        { ImageDataType::RGB_Gamma16,    16, 3, 0, false },
+        { ImageDataType::RGB_Int8,        8, 3, 0, true },
+        { ImageDataType::RGB_Int16,      16, 3, 0, true },
+        { ImageDataType::RGBA_Gamma8,     8, 3, 1, false },
+        { ImageDataType::RGBA_Gamma16,   16, 3, 1, false },
+        { ImageDataType::RGBA_Int8,       8, 3, 1, true },
+        { ImageDataType::RGBA_Int16,     16, 3, 1, true },
+    };
+    for (auto& model : kaImageDataModels)
     {
-    case kImageChannelLayout_Gray:
-        switch (channelType)
-        {
-        case kImageChannelDataType_Int8:    return Image::Gray_Int8;
-        case kImageChannelDataType_Int16:   return Image::Gray_Int16;
-        case kImageChannelDataType_Gamma8:  return Image::Gray_Gamma8;
-        case kImageChannelDataType_Gamma16: return Image::Gray_Gamma16;
-        default:
-            POV_IMAGE_ASSERT(false);
-            break;
-        }
-        break;
-
-    case kImageChannelLayout_GrayA:
-        switch (channelType)
-        {
-        case kImageChannelDataType_Int8:    return Image::GrayA_Int8;
-        case kImageChannelDataType_Int16:   return Image::GrayA_Int16;
-        case kImageChannelDataType_Gamma8:  return Image::GrayA_Gamma8;
-        case kImageChannelDataType_Gamma16: return Image::GrayA_Gamma16;
-        default:
-            POV_IMAGE_ASSERT(false);
-            break;
-        }
-        break;
-
-    case kImageChannelLayout_RGB:
-        switch (channelType)
-        {
-        case kImageChannelDataType_Int8:    return Image::RGB_Int8;
-        case kImageChannelDataType_Int16:   return Image::RGB_Int16;
-        case kImageChannelDataType_Gamma8:  return Image::RGB_Gamma8;
-        case kImageChannelDataType_Gamma16: return Image::RGB_Gamma16;
-        default:
-            POV_IMAGE_ASSERT(false);
-            break;
-        }
-        break;
-
-    case kImageChannelLayout_RGBA:
-        switch (channelType)
-        {
-        case kImageChannelDataType_Int8:    return Image::RGBA_Int8;
-        case kImageChannelDataType_Int16:   return Image::RGBA_Int16;
-        case kImageChannelDataType_Gamma8:  return Image::RGBA_Gamma8;
-        case kImageChannelDataType_Gamma16: return Image::RGBA_Gamma16;
-        default:
-            POV_IMAGE_ASSERT(false);
-            break;
-        }
-        break;
-
-    default:
-        POV_IMAGE_ASSERT(false);
-        break;
+        if ((model.bpc >= minBitsPerChannel) && (model.cc == colourChannels) &&
+            (model.ac == alphaChannels) && (model.lin == linear))
+            return model.type;
     }
+    POV_IMAGE_ASSERT(false);
+    return ImageDataType::Undefined;
+}
 
-    return Image::Undefined;
+ImageDataType Image::GetImageDataType(int bitsPerChannel, int colourChannels, bool alpha, GammaCurvePtr gamma)
+{
+    return GetImageDataType(bitsPerChannel, colourChannels, (alpha ? 1 : 0), GammaCurve::IsNeutral(gamma));
 }
 
 Image *Image::Create(unsigned int w, unsigned int h, ImageDataType t, unsigned int maxRAMmbHint, unsigned int pixelsPerBlockHint)
@@ -3636,44 +3624,44 @@ Image *Image::Create(unsigned int w, unsigned int h, ImageDataType t, unsigned i
     {
         switch(t)
         {
-            case Bit_Map:
+            case ImageDataType::Bit_Map:
                 return new MemoryBitMapImage(w, h);
-            case Gray_Int8:
+            case ImageDataType::Gray_Int8:
                 return new MemoryGray8Image(w, h);
-            case Gray_Int16:
+            case ImageDataType::Gray_Int16:
                 return new MemoryGray16Image(w, h);
-            case GrayA_Int8:
+            case ImageDataType::GrayA_Int8:
                 return new MemoryGrayA8Image(w, h);
-            case GrayA_Int16:
+            case ImageDataType::GrayA_Int16:
                 return new MemoryGrayA16Image(w, h);
-            case RGB_Int8:
+            case ImageDataType::RGB_Int8:
                 return new MemoryRGB8Image(w, h);
-            case RGB_Int16:
+            case ImageDataType::RGB_Int16:
                 return new MemoryRGB16Image(w, h);
-            case RGBA_Int8:
+            case ImageDataType::RGBA_Int8:
                 return new MemoryRGBA8Image (w, h);
-            case RGBA_Int16:
+            case ImageDataType::RGBA_Int16:
                 return new MemoryRGBA16Image(w, h);
-            case RGBFT_Float:
+            case ImageDataType::RGBFT_Float:
                 if (maxRAMmbHint > 0)
                     if (SafeUnsignedProduct<POV_ULONG>(w, h, sizeof(FileRGBFTImage::pixel_type)) / 1048576 > maxRAMmbHint)
                         return new FileRGBFTImage(w, h, pixelsPerBlockHint);
                 return new MemoryRGBFTImage(w, h);
-            case RGB_Gamma8:
+            case ImageDataType::RGB_Gamma8:
                 return new MemoryNonlinearRGB8Image(w, h);
-            case RGB_Gamma16:
+            case ImageDataType::RGB_Gamma16:
                 return new MemoryNonlinearRGB16Image(w, h);
-            case RGBA_Gamma8:
+            case ImageDataType::RGBA_Gamma8:
                 return new MemoryNonlinearRGBA8Image (w, h);
-            case RGBA_Gamma16:
+            case ImageDataType::RGBA_Gamma16:
                 return new MemoryNonlinearRGBA16Image(w, h);
-            case Gray_Gamma8:
+            case ImageDataType::Gray_Gamma8:
                 return new MemoryNonlinearGray8Image(w, h);
-            case Gray_Gamma16:
+            case ImageDataType::Gray_Gamma16:
                 return new MemoryNonlinearGray16Image(w, h);
-            case GrayA_Gamma8:
+            case ImageDataType::GrayA_Gamma8:
                 return new MemoryNonlinearGrayA8Image(w, h);
-            case GrayA_Gamma16:
+            case ImageDataType::GrayA_Gamma16:
                 return new MemoryNonlinearGrayA16Image(w, h);
             default:
                 throw POV_EXCEPTION_STRING("Undefined image format in Image::Create");
@@ -3691,45 +3679,45 @@ Image *Image::Create(unsigned int w, unsigned int h, ImageDataType t, bool allow
     {
         switch(t)
         {
-            case Bit_Map:
+            case ImageDataType::Bit_Map:
                 return new MemoryBitMapImage(w, h);
-            case Gray_Int8:
+            case ImageDataType::Gray_Int8:
                 return new MemoryGray8Image(w, h);
-            case Gray_Int16:
+            case ImageDataType::Gray_Int16:
                 return new MemoryGray16Image(w, h);
-            case GrayA_Int8:
+            case ImageDataType::GrayA_Int8:
                 return new MemoryGrayA8Image(w, h);
-            case GrayA_Int16:
+            case ImageDataType::GrayA_Int16:
                 return new MemoryGrayA16Image(w, h);
-            case RGB_Int8:
+            case ImageDataType::RGB_Int8:
                 return new MemoryRGB8Image(w, h);
-            case RGB_Int16:
+            case ImageDataType::RGB_Int16:
                 return new MemoryRGB16Image(w, h);
-            case RGBA_Int8:
+            case ImageDataType::RGBA_Int8:
                 return new MemoryRGBA8Image (w, h);
-            case RGBA_Int16:
+            case ImageDataType::RGBA_Int16:
                 return new MemoryRGBA16Image(w, h);
-            case RGBFT_Float:
+            case ImageDataType::RGBFT_Float:
 #ifdef FILE_MAPPED_IMAGE_ALLOCATOR
                 if (allowFileBacking)
-                    return new RGBFTImage<FILE_MAPPED_IMAGE_ALLOCATOR<float> >(w, h);
+                    return new RGBFTImage<FILE_MAPPED_IMAGE_ALLOCATOR<float>>(w, h);
 #endif
                 return new MemoryRGBFTImage(w, h);
-            case RGB_Gamma8:
+            case ImageDataType::RGB_Gamma8:
                 return new MemoryNonlinearRGB8Image(w, h);
-            case RGB_Gamma16:
+            case ImageDataType::RGB_Gamma16:
                 return new MemoryNonlinearRGB16Image(w, h);
-            case RGBA_Gamma8:
+            case ImageDataType::RGBA_Gamma8:
                 return new MemoryNonlinearRGBA8Image (w, h);
-            case RGBA_Gamma16:
+            case ImageDataType::RGBA_Gamma16:
                 return new MemoryNonlinearRGBA16Image(w, h);
-            case Gray_Gamma8:
+            case ImageDataType::Gray_Gamma8:
                 return new MemoryNonlinearGray8Image(w, h);
-            case Gray_Gamma16:
+            case ImageDataType::Gray_Gamma16:
                 return new MemoryNonlinearGray16Image(w, h);
-            case GrayA_Gamma8:
+            case ImageDataType::GrayA_Gamma8:
                 return new MemoryNonlinearGrayA8Image(w, h);
-            case GrayA_Gamma16:
+            case ImageDataType::GrayA_Gamma16:
                 return new MemoryNonlinearGrayA16Image(w, h);
             default:
                 throw POV_EXCEPTION_STRING("Undefined image format in Image::Create");
@@ -3747,47 +3735,47 @@ Image *Image::Create(unsigned int w, unsigned int h, ImageDataType t, const vect
     {
         switch(t)
         {
-            case Bit_Map:
+            case ImageDataType::Bit_Map:
                 return new MemoryBitMapImage(w, h, m);
-            case Colour_Map:
+            case ImageDataType::Colour_Map:
                 return new MemoryColourMapImage(w, h, m);
-            case Gray_Int8:
+            case ImageDataType::Gray_Int8:
                 return new MemoryGray8Image(w, h, m);
-            case Gray_Int16:
+            case ImageDataType::Gray_Int16:
                 return new MemoryGray16Image(w, h, m);
-            case GrayA_Int8:
+            case ImageDataType::GrayA_Int8:
                 return new MemoryGrayA8Image(w, h, m);
-            case GrayA_Int16:
+            case ImageDataType::GrayA_Int16:
                 return new MemoryGrayA16Image(w, h, m);
-            case RGB_Int8:
+            case ImageDataType::RGB_Int8:
                 return new MemoryRGB8Image(w, h, m);
-            case RGB_Int16:
+            case ImageDataType::RGB_Int16:
                 return new MemoryRGB16Image(w, h, m);
-            case RGBA_Int8:
+            case ImageDataType::RGBA_Int8:
                 return new MemoryRGBA8Image (w, h, m);
-            case RGBA_Int16:
+            case ImageDataType::RGBA_Int16:
                 return new MemoryRGBA16Image(w, h, m);
-            case RGBFT_Float:
+            case ImageDataType::RGBFT_Float:
 #ifdef FILE_MAPPED_IMAGE_ALLOCATOR
                 if (allowFileBacking)
-                    return new RGBFTImage<FILE_MAPPED_IMAGE_ALLOCATOR<float> >(w, h, m);
+                    return new RGBFTImage<FILE_MAPPED_IMAGE_ALLOCATOR<float>>(w, h, m);
 #endif
                 return new MemoryRGBFTImage(w, h, m);
-            case RGB_Gamma8:
+            case ImageDataType::RGB_Gamma8:
                 return new MemoryNonlinearRGB8Image(w, h, m);
-            case RGB_Gamma16:
+            case ImageDataType::RGB_Gamma16:
                 return new MemoryNonlinearRGB16Image(w, h, m);
-            case RGBA_Gamma8:
+            case ImageDataType::RGBA_Gamma8:
                 return new MemoryNonlinearRGBA8Image (w, h, m);
-            case RGBA_Gamma16:
+            case ImageDataType::RGBA_Gamma16:
                 return new MemoryNonlinearRGBA16Image(w, h, m);
-            case Gray_Gamma8:
+            case ImageDataType::Gray_Gamma8:
                 return new MemoryNonlinearGray8Image(w, h, m);
-            case Gray_Gamma16:
+            case ImageDataType::Gray_Gamma16:
                 return new MemoryNonlinearGray16Image(w, h, m);
-            case GrayA_Gamma8:
+            case ImageDataType::GrayA_Gamma8:
                 return new MemoryNonlinearGrayA8Image(w, h, m);
-            case GrayA_Gamma16:
+            case ImageDataType::GrayA_Gamma16:
                 return new MemoryNonlinearGrayA16Image(w, h, m);
             default:
                 throw POV_EXCEPTION_STRING("Image::Create Exception TODO"); // TODO FIXME WIP
@@ -3805,47 +3793,47 @@ Image *Image::Create(unsigned int w, unsigned int h, ImageDataType t, const vect
     {
         switch(t)
         {
-            case Bit_Map:
+            case ImageDataType::Bit_Map:
                 return new MemoryBitMapImage(w, h, m);
-            case Colour_Map:
+            case ImageDataType::Colour_Map:
                 return new MemoryColourMapImage(w, h, m);
-            case Gray_Int8:
+            case ImageDataType::Gray_Int8:
                 return new MemoryGray8Image(w, h, m);
-            case Gray_Int16:
+            case ImageDataType::Gray_Int16:
                 return new MemoryGray16Image(w, h, m);
-            case GrayA_Int8:
+            case ImageDataType::GrayA_Int8:
                 return new MemoryGrayA8Image(w, h, m);
-            case GrayA_Int16:
+            case ImageDataType::GrayA_Int16:
                 return new MemoryGrayA16Image(w, h, m);
-            case RGB_Int8:
+            case ImageDataType::RGB_Int8:
                 return new MemoryRGB8Image(w, h, m);
-            case RGB_Int16:
+            case ImageDataType::RGB_Int16:
                 return new MemoryRGB16Image(w, h, m);
-            case RGBA_Int8:
+            case ImageDataType::RGBA_Int8:
                 return new MemoryRGBA8Image (w, h, m);
-            case RGBA_Int16:
+            case ImageDataType::RGBA_Int16:
                 return new MemoryRGBA16Image(w, h, m);
-            case RGBFT_Float:
-#ifdef FILE_MAPPED_RGBFT_IMAGE_ALLOCATOR
+            case ImageDataType::RGBFT_Float:
+#ifdef FILE_MAPPED_IMAGE_ALLOCATOR
                 if (allowFileBacking)
-                    return new RGBFTImage<FILE_MAPPED_RGBFT_IMAGE_ALLOCATOR<float> >(w, h, m);
+                    return new RGBFTImage<FILE_MAPPED_RGBFT_IMAGE_ALLOCATOR<float>>(w, h, m);
 #endif
                 return new MemoryRGBFTImage(w, h, m);
-            case RGB_Gamma8:
+            case ImageDataType::RGB_Gamma8:
                 return new MemoryNonlinearRGB8Image(w, h, m);
-            case RGB_Gamma16:
+            case ImageDataType::RGB_Gamma16:
                 return new MemoryNonlinearRGB16Image(w, h, m);
-            case RGBA_Gamma8:
+            case ImageDataType::RGBA_Gamma8:
                 return new MemoryNonlinearRGBA8Image (w, h, m);
-            case RGBA_Gamma16:
+            case ImageDataType::RGBA_Gamma16:
                 return new MemoryNonlinearRGBA16Image(w, h, m);
-            case Gray_Gamma8:
+            case ImageDataType::Gray_Gamma8:
                 return new MemoryNonlinearGray8Image(w, h, m);
-            case Gray_Gamma16:
+            case ImageDataType::Gray_Gamma16:
                 return new MemoryNonlinearGray16Image(w, h, m);
-            case GrayA_Gamma8:
+            case ImageDataType::GrayA_Gamma8:
                 return new MemoryNonlinearGrayA8Image(w, h, m);
-            case GrayA_Gamma16:
+            case ImageDataType::GrayA_Gamma16:
                 return new MemoryNonlinearGrayA16Image(w, h, m);
             default:
                 throw POV_EXCEPTION_STRING("Image::Create Exception TODO"); // TODO FIXME WIP
@@ -3863,47 +3851,47 @@ Image *Image::Create(unsigned int w, unsigned int h, ImageDataType t, const vect
     {
         switch(t)
         {
-            case Bit_Map:
+            case ImageDataType::Bit_Map:
                 return new MemoryBitMapImage(w, h, m);
-            case Colour_Map:
+            case ImageDataType::Colour_Map:
                 return new MemoryColourMapImage(w, h, m);
-            case Gray_Int8:
+            case ImageDataType::Gray_Int8:
                 return new MemoryGray8Image(w, h, m);
-            case Gray_Int16:
+            case ImageDataType::Gray_Int16:
                 return new MemoryGray16Image(w, h, m);
-            case GrayA_Int8:
+            case ImageDataType::GrayA_Int8:
                 return new MemoryGrayA8Image(w, h, m);
-            case GrayA_Int16:
+            case ImageDataType::GrayA_Int16:
                 return new MemoryGrayA16Image(w, h, m);
-            case RGB_Int8:
+            case ImageDataType::RGB_Int8:
                 return new MemoryRGB8Image(w, h, m);
-            case RGB_Int16:
+            case ImageDataType::RGB_Int16:
                 return new MemoryRGB16Image(w, h, m);
-            case RGBA_Int8:
+            case ImageDataType::RGBA_Int8:
                 return new MemoryRGBA8Image (w, h, m);
-            case RGBA_Int16:
+            case ImageDataType::RGBA_Int16:
                 return new MemoryRGBA16Image(w, h, m);
-            case RGBFT_Float:
+            case ImageDataType::RGBFT_Float:
 #ifdef FILE_MAPPED_IMAGE_ALLOCATOR
                 if (allowFileBacking)
-                    return new RGBFTImage<FILE_MAPPED_IMAGE_ALLOCATOR<float> >(w, h, m);
+                    return new RGBFTImage<FILE_MAPPED_IMAGE_ALLOCATOR<float>>(w, h, m);
 #endif
                 return new MemoryRGBFTImage(w, h, m);
-            case RGB_Gamma8:
+            case ImageDataType::RGB_Gamma8:
                 return new MemoryNonlinearRGB8Image(w, h, m);
-            case RGB_Gamma16:
+            case ImageDataType::RGB_Gamma16:
                 return new MemoryNonlinearRGB16Image(w, h, m);
-            case RGBA_Gamma8:
+            case ImageDataType::RGBA_Gamma8:
                 return new MemoryNonlinearRGBA8Image (w, h, m);
-            case RGBA_Gamma16:
+            case ImageDataType::RGBA_Gamma16:
                 return new MemoryNonlinearRGBA16Image(w, h, m);
-            case Gray_Gamma8:
+            case ImageDataType::Gray_Gamma8:
                 return new MemoryNonlinearGray8Image(w, h, m);
-            case Gray_Gamma16:
+            case ImageDataType::Gray_Gamma16:
                 return new MemoryNonlinearGray16Image(w, h, m);
-            case GrayA_Gamma8:
+            case ImageDataType::GrayA_Gamma8:
                 return new MemoryNonlinearGrayA8Image(w, h, m);
-            case GrayA_Gamma16:
+            case ImageDataType::GrayA_Gamma16:
                 return new MemoryNonlinearGrayA16Image(w, h, m);
             default:
                 throw POV_EXCEPTION_STRING("Image::Create Exception TODO"); // TODO FIXME WIP
@@ -3915,7 +3903,7 @@ Image *Image::Create(unsigned int w, unsigned int h, ImageDataType t, const vect
     }
 }
 
-Image *Image::Read(ImageFileType type, IStream *file, const ReadOptions& options)
+Image *Image::Read(ImageFileType type, IStream *file, const ImageReadOptions& options)
 {
     #ifdef POV_SYS_IMAGE_TYPE
         if (type == SYS)
@@ -4010,7 +3998,7 @@ following built-in formats: GIF, TGA, IFF, PGM, PPM, BMP.");
     }
 }
 
-void Image::Write(ImageFileType type, OStream *file, const Image *image, const WriteOptions& options)
+void Image::Write(ImageFileType type, OStream *file, const Image *image, const ImageWriteOptions& options)
 {
     if (image->GetWidth() == 0 || image->GetHeight() == 0)
         throw POV_EXCEPTION(kParamErr, "Invalid image size for output");
@@ -4425,3 +4413,4 @@ void Image::SetColourMap(const vector<RGBFTMapEntry>& m)
 }
 
 }
+// end of namespace pov_base

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,25 +38,40 @@
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "frontend/configfrontend.h"
+#include "frontend/renderfrontend_fwd.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <list>
+#include <map>
+#include <memory>
 #include <set>
+#include <string>
+#include <vector>
 
+// Boost header files
+#include <boost/function.hpp>
+
+// POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
+#include "base/filesystem.h"
+#include "base/path.h"
+#include "base/platformbase.h"
+#include "base/stringutilities.h"
+#include "base/textstreambuffer_fwd.h"
+#include "base/types.h"
+#include "base/image/colourspace.h"
+#include "base/image/image.h"
+
+// POV-Ray header files (POVMS module)
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
 
-#include "base/path.h"
-#include "base/platformbase.h"
-#include "base/image/image.h"
-
+// POV-Ray header files (frontend module)
 #include "frontend/console.h"
 #include "frontend/imageprocessing.h"
-
-namespace pov_base
-{
-class TextStreamBuffer;
-class Image;
-class OStream;
-}
 
 namespace pov_frontend
 {
@@ -78,7 +93,7 @@ enum
     MAX_STREAMS
 };
 
-struct SceneData
+struct SceneData final
 {
     enum SceneState
     {
@@ -96,24 +111,24 @@ struct SceneData
 
     SceneState state;
 
-    mutable shared_ptr<Console> console;
+    mutable std::shared_ptr<Console> console;
 
-    mutable list<POVMS_Object> readfiles;
-    mutable list<POVMS_Object> createdfiles;
+    mutable std::list<POVMS_Object> readfiles;
+    mutable std::list<POVMS_Object> createdfiles;
 
     Path scenepath;
     Path outputpath;
 
-    list<Path> searchpaths;
+    std::list<Path> searchpaths;
 
-    shared_ptr<TextStreamBuffer> streams[MAX_STREAMS];
+    std::shared_ptr<TextStreamBuffer> streams[MAX_STREAMS];
 
     UCS2String streamnames[MAX_STREAMS];
     bool consoleoutput[MAX_STREAMS];
 
     bool verbose;
 
-    struct
+    struct final
     {
         int legacyGammaMode;
         // TODO FIXME - conversion from working gamma to linear should be moved to back-end
@@ -122,7 +137,7 @@ struct SceneData
     } backwardCompatibilityData;
 };
 
-struct ViewData
+struct ViewData final
 {
     enum ViewState
     {
@@ -139,9 +154,9 @@ struct ViewData
 
     ViewState state;
 
-    mutable shared_ptr<Image> image;
-    mutable shared_ptr<Display> display;
-    mutable shared_ptr<OStream> imageBackup;
+    mutable std::shared_ptr<Image> image;
+    mutable std::shared_ptr<Display> display;
+    mutable std::shared_ptr<OStream> imageBackup;
     GammaCurvePtr displayGamma;
     bool greyscaleDisplay;
 
@@ -168,23 +183,24 @@ void RenderTime(POVMS_Object& cppmsg, TextStreamBuffer *tsb);
 
 void DebugInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb);
 
-string GetProgressTime(POVMS_Object& obj, POVMSType key);
+std::string GetProgressTime(POVMS_Object& obj, POVMSType key);
 
 }
+// end of namespace Message2Console
 
 #define RENDER_STATE_SIG "POV-Ray Render State File\0\0"
 #define RENDER_STATE_VER "0001"
 
-typedef struct
+struct Backup_File_Header final
 {
     unsigned char sig[28];
     unsigned char ver[4];
     unsigned char reserved[480];
-} Backup_File_Header;
+};
 
 class RenderFrontendBase : public POVMS_MessageReceiver
 {
-        class Id
+        class Id final
         {
             public:
                 Id() : address(POVMSInvalidAddress), identifier(0) { }
@@ -212,12 +228,12 @@ class RenderFrontendBase : public POVMS_MessageReceiver
         RenderFrontendBase(POVMSContext);
         virtual ~RenderFrontendBase();
 
-        void ConnectToBackend(POVMSAddress, POVMS_Object&, POVMS_Object *, shared_ptr<Console>&);
+        void ConnectToBackend(POVMSAddress, POVMS_Object&, POVMS_Object *, std::shared_ptr<Console>&);
         void DisconnectFromBackend(POVMSAddress);
 
-        virtual shared_ptr<Console> GetConsole(SceneId) = 0;
-        virtual shared_ptr<Image> GetImage(ViewId) = 0;
-        virtual shared_ptr<Display> GetDisplay(ViewId) = 0;
+        virtual std::shared_ptr<Console> GetConsole(SceneId) = 0;
+        virtual std::shared_ptr<Image> GetImage(ViewId) = 0;
+        virtual std::shared_ptr<Display> GetDisplay(ViewId) = 0;
     protected:
 
         typedef std::set<POVMSAddress> BackendAddressSet;
@@ -248,17 +264,19 @@ class RenderFrontendBase : public POVMS_MessageReceiver
         virtual void HandleRenderMessage(ViewId, POVMSType, POVMS_Object&) = 0;
         virtual void HandleImageMessage(ViewId, POVMSType, POVMS_Object&) = 0;
 
-        virtual void OutputFatalError(const string&, int) = 0;
+        virtual void OutputFatalError(const std::string&, int) = 0;
 
         void MakeBackupPath(POVMS_Object& ropts, ViewData& vd, const Path& outputpath);
         void NewBackup(POVMS_Object& ropts, ViewData& vd, const Path& outputpath);
-        void ContinueBackup(POVMS_Object& ropts, ViewData& vd, ViewId vid, POVMSInt& serial, vector<POVMSInt>& skip, const Path& outputpath);
+        void ContinueBackup(POVMS_Object& ropts, ViewData& vd, ViewId vid, POVMSInt& serial, std::vector<POVMSInt>& skip, const Path& outputpath);
 };
+
+// TODO - Do we really need this to be a template?
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
 class RenderFrontend : public RenderFrontendBase
 {
-        struct SceneHandler
+        struct SceneHandler final
         {
             SceneData data;
 
@@ -266,7 +284,7 @@ class RenderFrontend : public RenderFrontendBase
             FILE_MH file;
         };
 
-        struct ViewHandler
+        struct ViewHandler final
         {
             ViewData data;
 
@@ -275,7 +293,7 @@ class RenderFrontend : public RenderFrontendBase
         };
     public:
         RenderFrontend(POVMSContext ctx);
-        ~RenderFrontend();
+        virtual ~RenderFrontend() override;
 
         SceneId CreateScene(POVMSAddress backendaddress, POVMS_Object& obj, boost::function<Console *()> fn);
         void CloseScene(SceneId sid);
@@ -287,7 +305,7 @@ class RenderFrontend : public RenderFrontendBase
         void ResumeParser(SceneId sid);
         void StopParser(SceneId sid);
 
-        ViewId CreateView(SceneId sid, POVMS_Object& obj, shared_ptr<ImageProcessing>& imageProcessing, boost::function<Display *(unsigned int, unsigned int)> fn);
+        ViewId CreateView(SceneId sid, POVMS_Object& obj, std::shared_ptr<ImageProcessing>& imageProcessing, boost::function<Display *(unsigned int, unsigned int)> fn);
         void CloseView(ViewId vid);
 
         ViewData::ViewState GetViewState(ViewId vid);
@@ -297,15 +315,15 @@ class RenderFrontend : public RenderFrontendBase
         void ResumeRender(ViewId vid);
         void StopRender(ViewId vid);
 
-        virtual shared_ptr<Console> GetConsole(SceneId sid);
-        virtual shared_ptr<Image> GetImage(ViewId vid);
-        virtual shared_ptr<Display> GetDisplay(ViewId vid);
+        virtual std::shared_ptr<Console> GetConsole(SceneId sid) override;
+        virtual std::shared_ptr<Image> GetImage(ViewId vid) override;
+        virtual std::shared_ptr<Display> GetDisplay(ViewId vid) override;
     protected:
-        virtual void HandleParserMessage(SceneId sid, POVMSType ident, POVMS_Object& msg);
-        virtual void HandleFileMessage(SceneId sid, POVMSType ident, POVMS_Object& msg, POVMS_Object& result);
-        virtual void HandleRenderMessage(ViewId vid, POVMSType ident, POVMS_Object& msg);
-        virtual void HandleImageMessage(ViewId vid, POVMSType ident, POVMS_Object& msg);
-        virtual void OutputFatalError(const string& msg, int err);
+        virtual void HandleParserMessage(SceneId sid, POVMSType ident, POVMS_Object& msg) override;
+        virtual void HandleFileMessage(SceneId sid, POVMSType ident, POVMS_Object& msg, POVMS_Object& result) override;
+        virtual void HandleRenderMessage(ViewId vid, POVMSType ident, POVMS_Object& msg) override;
+        virtual void HandleImageMessage(ViewId vid, POVMSType ident, POVMS_Object& msg) override;
+        virtual void OutputFatalError(const std::string& msg, int err) override;
     private:
 
         typedef std::set<ViewId>                ViewIdSet;
@@ -346,7 +364,7 @@ RenderFrontendBase::SceneId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_
 
         sid = RenderFrontendBase::CreateScene(sh.data, backendaddress, obj);
 
-        sh.data.console = shared_ptr<Console>(fn());
+        sh.data.console = std::shared_ptr<Console>(fn());
 
         scenehandler[sid] = sh;
         scene2views[sid] = ViewIdSet();
@@ -436,7 +454,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::StopParser(SceneId
 }
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
-RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::CreateView(SceneId sid, POVMS_Object& obj, shared_ptr<ImageProcessing>& imageProcessing, boost::function<Display *(unsigned int,unsigned int)> fn)
+RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::CreateView(SceneId sid, POVMS_Object& obj, std::shared_ptr<ImageProcessing>& imageProcessing, boost::function<Display *(unsigned int,unsigned int)> fn)
 {
     typename SceneHandlerMap::iterator shi(scenehandler.find(sid));
 
@@ -535,7 +553,7 @@ RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_M
             {
                 if (imageProcessing == nullptr)
                     throw POV_EXCEPTION(kNullPointerErr, "Internal error: output to file is set, but no ImageProcessing object supplied");
-                shared_ptr<Image> img(imageProcessing->GetImage());
+                std::shared_ptr<Image> img(imageProcessing->GetImage());
                 if (img != nullptr)
                 {
                     if((img->GetWidth() != width) || (img->GetHeight() != height))
@@ -544,11 +562,11 @@ RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_M
                     vh.data.image = img;
                 }
                 else
-                    vh.data.image = shared_ptr<Image>(Image::Create(width, height, Image::RGBFT_Float));
+                    vh.data.image = std::shared_ptr<Image>(Image::Create(width, height, ImageDataType::RGBFT_Float));
             }
 
             if(obj.TryGetBool(kPOVAttrib_Display, true) == true)
-                vh.data.display = shared_ptr<Display>(fn(width, height));
+                vh.data.display = std::shared_ptr<Display>(fn(width, height));
 
             viewhandler[vid] = vh;
             view2scene[vid] = sid;
@@ -622,7 +640,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::StartRender(ViewId
     {
         Path outputpath(obj.TryGetUCS2String(kPOVAttrib_OutputPath, ""));
         UCS2String filename = obj.TryGetUCS2String(kPOVAttrib_OutputFile, "");
-        string fn(UCS2toASCIIString(filename));
+        std::string fn(UCS2toSysString(filename));
         bool to_stdout = fn == "-" || fn == "stdout" || fn == "stderr";
 
         if(obj.TryGetBool(kPOVAttrib_ContinueTrace, false) == true)
@@ -639,7 +657,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::StartRender(ViewId
                     try
                     {
                         POVMSInt serial;
-                        vector<POVMSInt> skip;
+                        std::vector<POVMSInt> skip;
 
                         ContinueBackup(obj, vhi->second.data, vid, serial, skip, outputpath);
 
@@ -722,33 +740,33 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::StopRender(ViewId 
 }
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
-shared_ptr<Console> RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetConsole(SceneId sid)
+std::shared_ptr<Console> RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetConsole(SceneId sid)
 {
     typename SceneHandlerMap::iterator shi(scenehandler.find(sid));
     if(shi != scenehandler.end())
         return shi->second.data.console;
     else
-        return shared_ptr<Console>();
+        return std::shared_ptr<Console>();
 }
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
-shared_ptr<Image> RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetImage(ViewId vid)
+std::shared_ptr<Image> RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetImage(ViewId vid)
 {
     typename ViewHandlerMap::iterator vhi(viewhandler.find(vid));
     if(vhi != viewhandler.end())
         return vhi->second.data.image;
     else
-        return shared_ptr<Image>();
+        return std::shared_ptr<Image>();
 }
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
-shared_ptr<Display> RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetDisplay(ViewId vid)
+std::shared_ptr<Display> RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetDisplay(ViewId vid)
 {
     typename ViewHandlerMap::iterator vhi(viewhandler.find(vid));
     if(vhi != viewhandler.end())
         return vhi->second.data.display;
     else
-        return shared_ptr<Display>();
+        return std::shared_ptr<Display>();
 }
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
@@ -764,7 +782,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::HandleParserMessag
         }
         else if(ident == kPOVMsgIdent_Failed)
         {
-            string str("Fatal error in parser: ");
+            std::string str("Fatal error in parser: ");
             str += msg.TryGetString(kPOVAttrib_EnglishText, "Unknown failure!");
             shi->second.data.console->Output(str);
             shi->second.data.state = SceneData::Scene_Failed;
@@ -798,12 +816,12 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::HandleRenderMessag
             if (vhi->second.data.imageBackup != nullptr)
             {
                 vhi->second.data.imageBackup.reset();
-                PlatformBase::GetInstance().DeleteLocalFile (vhi->second.data.imageBackupFile().c_str());
+                pov_base::Filesystem::DeleteFile(vhi->second.data.imageBackupFile());
             }
         }
         else if(ident == kPOVMsgIdent_Failed)
         {
-            string str("Fatal error in renderer: ");
+            std::string str("Fatal error in renderer: ");
             str += msg.TryGetString(kPOVAttrib_EnglishText, "Unknown failure!");
             sceneData.console->Output(str);
             vhi->second.data.state = ViewData::View_Failed;
@@ -826,7 +844,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::HandleImageMessage
 }
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
-void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::OutputFatalError(const string& msg, int err)
+void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::OutputFatalError(const std::string& msg, int err)
 {
     // TODO FIXME  CONSOLE::OutputFatalError(msg, err);
 }
@@ -856,7 +874,9 @@ namespace Message2TSB
     void FileMessage(TextStreamBuffer *, int stream, POVMSObjectPtr);
     const char *GetOptionSwitchString(POVMSObjectPtr, POVMSType, bool defaultstate = false);
 }
+// end of namespace Message2TSB
 
 }
+// end of namespace pov_frontend
 
 #endif // POVRAY_FRONTEND_RENDERFRONTEND_H

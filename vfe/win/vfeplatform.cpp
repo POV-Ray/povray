@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -35,9 +35,14 @@
 ///
 //******************************************************************************
 
+#include <memory>
+
+#include <direct.h>
 #include <windows.h>
 
 #include "vfe.h"
+#include "base/filesystem.h"
+#include "base/stringtypes.h"
 
 #include <boost/algorithm/string.hpp>
 
@@ -46,6 +51,7 @@ namespace pov_frontend
   bool MinimizeShellouts(void);
   bool ShelloutsPermitted(void);
 }
+// end of namespace pov_frontend
 
 namespace vfePlatform
 {
@@ -72,14 +78,7 @@ namespace vfePlatform
     // if we fail to creat our temp dir, just use the default one
     if ((CreateDirectory(str, nullptr) == 0) && (GetLastError() != ERROR_ALREADY_EXISTS))
       GetTempPath (sizeof (str), str);
-    m_TempPath = Path(str);
     m_TempPathString = str;
-  }
-
-  vfeWinSession::~vfeWinSession()
-  {
-    for (vector<string>::const_iterator it = m_TempFilenames.begin(); it != m_TempFilenames.end(); it++)
-      DeleteFile(it->c_str());
   }
 
   void vfeWinSession::Clear(bool Notify)
@@ -132,7 +131,7 @@ namespace vfePlatform
   // error will occur again (e.g. invalid output path or something), then
   // you may want to call the render cancel API so the user isn't bombarded
   // with an error message for each frame of the render.
-  int vfeWinSession::RequestNewOutputPath(int CallCount, const string& Reason, const UCS2String& OldPath, UCS2String& NewPath)
+  int vfeWinSession::RequestNewOutputPath(int CallCount, const std::string& Reason, const UCS2String& OldPath, UCS2String& NewPath)
   {
     // TODO
     return 0;
@@ -145,9 +144,11 @@ namespace vfePlatform
   /////////////////////////////////////////////////////////////////////////
   // return an absolute path including trailing path separator.
   // *nix platforms might want to just return "/tmp/" here.
+  // (NB This implementation actually returns UTF-16.)
   UCS2String vfeWinSession::GetTemporaryPath(void) const
   {
-    return ASCIItoUCS2String(m_TempPathString.c_str());
+//    return m_TempPathString;
+    return SysToUCS2String(m_TempPathString);
   }
 
   /////////////////////////////////////////////////////////////////////////
@@ -156,12 +157,9 @@ namespace vfePlatform
   // name to one that it can use.
   UCS2String vfeWinSession::CreateTemporaryFile(void) const
   {
-    char str [MAX_PATH] = "" ;
-
-    GetTempFileName (m_TempPathString.c_str(), "pv", 0, str) ;
-    remove (str) ;
-    m_TempFilenames.push_back(str);
-    return (ASCIItoUCS2String (str)) ;
+    pov_base::Filesystem::TemporaryFilePtr tempFile(new pov_base::Filesystem::TemporaryFile);
+    m_TempFiles.push_back(tempFile);
+    return tempFile->GetFileName();
   }
 
   /////////////////////////////////////////////////////////////////////////
@@ -170,7 +168,7 @@ namespace vfePlatform
   // example doesn't do that but it's not a bad idea to add.
   void vfeWinSession::DeleteTemporaryFile(const UCS2String& filename) const
   {
-    remove (UCS2toASCIIString (filename).c_str());
+    pov_base::Filesystem::DeleteFile(filename);
   }
 
   //////////////////////////////////////////////////////////////
@@ -255,17 +253,17 @@ namespace vfePlatform
 
   /////////////////////////////////////////////////////////////////////////
   // this really should take the codepage into consideration and not convert
-  // to an ASCII string.
+  // to an ASCII/Latin-1 string.
   bool vfeWinSession::StrCompareIC (const UCS2String& lhs, const UCS2String& rhs) const
   {
-    return (_stricmp (UCS2toASCIIString(lhs).c_str(), UCS2toASCIIString(rhs).c_str()) == 0);
+    return (_stricmp (UCS2toSysString(lhs).c_str(), UCS2toSysString(rhs).c_str()) == 0);
   }
 
   /////////////////////////////////////////////////////////////////////////
   // return true if the path component of file is equal to the path component
   // of path. will also return true if recursive is true and path is a parent
   // of file. does not support relative paths, and will convert UCS2 paths to
-  // ASCII and perform case-insensitive comparisons.
+  // Latin-1 and perform case-insensitive comparisons.
   bool vfeWinSession::TestPath (const Path& path, const Path& file, bool recursive) const
   {
     // we don't support relative paths
@@ -274,8 +272,8 @@ namespace vfePlatform
     if (StrCompareIC(path.GetVolume(), file.GetVolume()) == false)
       return (false);
 
-    vector<UCS2String> pc = path.GetAllFolders();
-    vector<UCS2String> fc = file.GetAllFolders();
+    std::vector<UCS2String> pc = path.GetAllFolders();
+    std::vector<UCS2String> fc = file.GetAllFolders();
     if (fc.size() < pc.size())
       return (false) ;
     for (int i = 0 ; i < pc.size(); i++)
@@ -307,7 +305,7 @@ namespace vfePlatform
     if (isWrite == false && GetReadPaths().empty() == true)
       returnOK = true;
 
-    int n = GetFullPathName (UCS2toASCIIString(file()).c_str(), sizeof (buf), buf, &s);
+    int n = GetFullPathName (UCS2toSysString(file()).c_str(), _MAX_PATH, buf, &s);
     if ((n == 0) || (n > sizeof(buf)) || (s == nullptr) || (s == buf))
     {
       if (returnOK == true)
@@ -318,8 +316,8 @@ namespace vfePlatform
     }
 
     // GetLongPathName is available on win95 due to the inclusion of newapis.h
-    n = GetLongPathName (buf, longbuf, sizeof (longbuf)) ;
-    if ((n > 0) && (n < sizeof(longbuf)))
+    n = GetLongPathName(buf, longbuf, _MAX_PATH) ;
+    if ((n > 0) && (n < _MAX_PATH))
     {
       // we store the filename before doing anything else, since this may be used elsewhere
       // note that we convert it to lower case first
@@ -342,8 +340,8 @@ namespace vfePlatform
     if (_stricmp(m_TempPathString.c_str(), buf) == 0)
       return (true);
 
-    n = GetLongPathName (buf, buf, sizeof (buf)) ;
-    if ((n == 0) || (n > sizeof(buf)))
+    n = GetLongPathName(buf, buf, _MAX_PATH);
+    if ((n == 0) || (n > _MAX_PATH))
     {
       if (GetLastError() != ERROR_PATH_NOT_FOUND)
       {
@@ -386,15 +384,15 @@ namespace vfePlatform
     // is not yet known, use the current working directory.
     if (m_InputFilename.empty() == true)
     {
-      if (_getcwd (buf, sizeof (buf) - 2) == nullptr)
+      if (_getcwd(buf, _MAX_PATH - 2) == nullptr)
       {
         // TODO: issue appropriate error message
         return (false) ;
       }
     }
     else
-      n = GetFullPathName (UCS2toASCIIString(m_InputFilename).c_str(), sizeof (buf), buf, &s);
-    if ((n == 0) || (n > sizeof(buf)) || (s == nullptr) || (s == buf))
+      n = GetFullPathName (UCS2toSysString(m_InputFilename).c_str(), _MAX_PATH, buf, &s);
+    if ((n == 0) || (n > _MAX_PATH) || (s == nullptr) || (s == buf))
     {
       // TODO: issue appropriate error message
       return (false) ;
@@ -404,11 +402,11 @@ namespace vfePlatform
     // as the source filename may be incomplete (e.g. 'c:\temp\test' for c:\temp\test.pov).
     _splitpath(buf, drive, dir, nullptr, nullptr);
     sprintf(buf, "%s%s", drive, dir);
-    n = GetLongPathName (buf, buf, sizeof (buf)) ;
-    if ((n == 0) || (n > sizeof(buf)))
+    n = GetLongPathName(buf, buf, _MAX_PATH) ;
+    if ((n == 0) || (n > _MAX_PATH))
     {
       if (GetLastError() == ERROR_PATH_NOT_FOUND || GetLastError() == ERROR_FILE_NOT_FOUND)
-        throw POV_EXCEPTION(kCannotOpenFileErr, string ("Input folder '") + buf + "' not found; cannot determine I/O permission for write.");
+        throw POV_EXCEPTION(kCannotOpenFileErr, std::string("Input folder '") + buf + "' not found; cannot determine I/O permission for write.");
 
       // TODO: issue appropriate error message
       return (false) ;
@@ -424,7 +422,7 @@ namespace vfePlatform
   /////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////
 
-  WinShelloutProcessing::WinShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height): ShelloutProcessing(opts, scene, width, height)
+  WinShelloutProcessing::WinShelloutProcessing(POVMS_Object& opts, const std::string& scene, unsigned int width, unsigned int height): ShelloutProcessing(opts, scene, width, height)
   {
     m_ProcessRunning = false;
     m_ProcessId = m_LastError = m_ExitCode = 0;
@@ -450,7 +448,7 @@ namespace vfePlatform
   }
 
   // in the windows version of ExtractCommand, we don't treat backslashes in the command itself specially
-  bool WinShelloutProcessing::ExtractCommand(const string& src, string& command, string& parameters) const
+  bool WinShelloutProcessing::ExtractCommand(const std::string& src, std::string& command, std::string& parameters) const
   {
     bool inSQ = false;
     bool inDQ = false;
@@ -459,8 +457,8 @@ namespace vfePlatform
 
     command.clear();
     parameters.clear();
-    string str = boost::trim_copy(src);
-    string tmp = boost::to_lower_copy(str);
+    std::string str = boost::trim_copy(src);
+    std::string tmp = boost::to_lower_copy(str);
 
     for (s = str.c_str(); *s != '\0'; s++)
     {
@@ -489,11 +487,11 @@ namespace vfePlatform
       }
     }
 
-    parameters = boost::trim_copy(string(s));
+    parameters = boost::trim_copy(std::string(s));
     return true;
   }
 
-  bool WinShelloutProcessing::ExecuteCommand(const string& cmd, const string& params)
+  bool WinShelloutProcessing::ExecuteCommand(const std::string& cmd, const std::string& params)
   {
     STARTUPINFO         startupInfo;
     PROCESS_INFORMATION procInfo;
@@ -513,7 +511,7 @@ namespace vfePlatform
     startupInfo.dwFlags = pov_frontend::MinimizeShellouts() ? STARTF_USESHOWWINDOW : 0;
     startupInfo.wShowWindow = SW_SHOWMINNOACTIVE;
 
-    shared_ptr<char> buf(new char[params.size() + 1]);
+    std::shared_ptr<char> buf(new char[params.size() + 1]);
     strcpy(buf.get(), params.c_str());
     if ((m_ProcessRunning = CreateProcess(cmd.c_str(), buf.get(), nullptr, nullptr, false, 0, nullptr, nullptr, &startupInfo, &procInfo)))
     {
@@ -561,7 +559,7 @@ namespace vfePlatform
     return m_ExitCode;
   }
 
-  int WinShelloutProcessing::CollectCommand(string& output)
+  int WinShelloutProcessing::CollectCommand(std::string& output)
   {
     if (m_ProcessRunning == false && m_LastError != 0)
     {
@@ -582,9 +580,10 @@ namespace vfePlatform
     return CollectCommand();
   }
 
-  bool WinShelloutProcessing::CommandPermitted(const string& command, const string& parameters)
+  bool WinShelloutProcessing::CommandPermitted(const std::string& command, const std::string& parameters)
   {
     // this may change during a render, so we check it in real time
     return pov_frontend::ShelloutsPermitted();
   }
 }
+// end of namespace vfePlatform

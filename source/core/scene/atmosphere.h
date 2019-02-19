@@ -2,13 +2,13 @@
 ///
 /// @file core/scene/atmosphere.h
 ///
-/// Declarations related to atmospheric effets and sky spheres.
+/// Declarations related to atmospheric effects and sky spheres.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,7 +38,18 @@
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
+#include "core/scene/atmosphere_fwd.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <vector>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/material/pigment.h"
 
 namespace pov
@@ -65,13 +76,9 @@ namespace pov
 * Global typedefs
 ******************************************************************************/
 
-typedef struct Fog_Struct FOG;
-typedef struct Rainbow_Struct RAINBOW;
-typedef struct Skysphere_Struct SKYSPHERE;
-
 struct TurbulenceWarp; // full declaration in core/material/warp.h
 
-struct Fog_Struct
+struct Fog_Struct final
 {
     Fog_Struct();
     ~Fog_Struct();
@@ -86,7 +93,7 @@ struct Fog_Struct
     FOG *Next;
 };
 
-struct Rainbow_Struct
+struct Rainbow_Struct final
 {
     Rainbow_Struct() : Pigment(nullptr), Next(nullptr) {}
     ~Rainbow_Struct() { if (Pigment) delete Pigment; }
@@ -100,13 +107,13 @@ struct Rainbow_Struct
     RAINBOW *Next;
 };
 
-struct Skysphere_Struct
+struct Skysphere_Struct final
 {
     Skysphere_Struct() : Trans(nullptr) {}
     ~Skysphere_Struct();
-    MathColour        Emission; ///< Brightness adjustment.
-    vector<PIGMENT *> Pigments; ///< Pigment(s) to use.
-    TRANSFORM *       Trans;    ///< Skysphere transformation.
+    MathColour              Emission;   ///< Brightness adjustment.
+    std::vector<PIGMENT*>   Pigments;   ///< Pigment(s) to use.
+    TRANSFORM*              Trans;      ///< Skysphere transformation.
 };
 
 /*****************************************************************************
@@ -134,5 +141,6 @@ void Transform_Skysphere (SKYSPHERE *Skysphere, const TRANSFORM *Trans);
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_ATMOSPHERE_H

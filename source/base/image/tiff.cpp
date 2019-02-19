@@ -38,14 +38,22 @@
 
 #ifndef LIBTIFF_MISSING
 
-// Standard C++ header files
-#include <vector>
+// C++ variants of C standard header files
+//  (none at the moment)
 
-// Boost header files
-#include <boost/scoped_array.hpp>
+// C++ standard header files
+#include <memory>
+#include <vector>
 
 // Other 3rd party header files
 #include <tiffio.h>
+
+// POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
+#include "base/povassert.h"
+#include "base/image/colourspace.h"
+#include "base/image/encoding.h"
+#include "base/image/image.h"
 
 // this must be the last file included other than tiffio.h
 #include "base/povdebug.h"
@@ -148,7 +156,7 @@ static void Tiff_Unmap(thandle_t, tdata_t, toff_t)
 *
 ******************************************************************************/
 
-Image *Read (IStream *file, const Image::ReadOptions& options)
+Image *Read (IStream *file, const ImageReadOptions& options)
 {
     int                   nrow;
     int                   result = 0;
@@ -250,7 +258,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
 
         TIFFGetField(tif, TIFFTAG_COLORMAP, &red, &green, &blue);
 
-        vector<Image::RGBMapEntry> colormap ;
+        std::vector<Image::RGBMapEntry> colormap;
         Image::RGBMapEntry entry;
 
         // I may be mistaken, but it appears that alpha/opacity information doesn't
@@ -279,13 +287,13 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
             }
         }
 
-        Image::ImageDataType imagetype = options.itype;
-        if (imagetype == Image::Undefined)
-            imagetype = Image::Colour_Map;
+        ImageDataType imagetype = options.itype;
+        if (imagetype == ImageDataType::Undefined)
+            imagetype = ImageDataType::Colour_Map;
         image = Image::Create (width, height, imagetype, colormap) ;
         image->SetPremultiplied(premul); // specify whether the color map data has premultiplied alpha
 
-        boost::scoped_array<unsigned char> buf (new unsigned char [TIFFStripSize(tif)]);
+        std::unique_ptr<unsigned char[]> buf (new unsigned char [TIFFStripSize(tif)]);
 
         //read the tiff lines and save them in the image
         //with RGB mode, we have to change the order of the 3 samples RGB <=> BGR
@@ -301,11 +309,11 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     else
     {
         // Allocate the row buffers for the image
-        boost::scoped_array<uint32> buf (new uint32 [width * height]) ;
+        std::unique_ptr<uint32[]> buf (new uint32 [width * height]) ;
 
-        Image::ImageDataType imagetype = options.itype;
-        if (imagetype == Image::Undefined)
-            imagetype = ( GammaCurve::IsNeutral(gamma) ? Image::RGBA_Int8 : Image::RGBA_Gamma8 );
+        ImageDataType imagetype = options.itype;
+        if (imagetype == ImageDataType::Undefined)
+            imagetype = Image::GetImageDataType(8, 3, true, gamma);
         image = Image::Create (width, height, imagetype) ;
         image->SetPremultiplied(premul); // set desired storage mode regarding alpha premultiplication
         image->TryDeferDecoding(gamma, 255); // try to have gamma adjustment being deferred until image evaluation.
@@ -331,8 +339,10 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     return (image) ;
 }
 
-} // end of namespace Tiff
+}
+// end of namespace Tiff
 
 }
+// end of namespace pov_base
 
 #endif  // LIBTIFF_MISSING

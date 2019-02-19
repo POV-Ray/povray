@@ -38,12 +38,13 @@
 
 // C++ variants of C standard header files
 // C++ standard header files
-// Boost header files
-//  (none at the moment)
 
 // POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
+#include "base/povassert.h"
+#include "base/types.h"
 
+// POV-Ray header files (core module)
 // POV-Ray header files (parser module)
 //  (none at the moment)
 
@@ -128,4 +129,15 @@ InvalidEscapeSequenceException::InvalidEscapeSequenceException(const UCS2String&
     offendingText(otb, ote)
 {}
 
+//******************************************************************************
+
+FontStyle operator|(FontStyle a, FontStyle b) { return EnumOr(a, b); }
+FontStyle operator&(FontStyle a, FontStyle b) { return EnumAnd(a, b); }
+FontStyle operator~(FontStyle a) { return EnumNot(a); }
+FontStyle& operator|=(FontStyle& a, FontStyle b) { a = a | b; return a; }
+FontStyle& operator&=(FontStyle& a, FontStyle b) { a = a & b; return a; }
+
+//******************************************************************************
+
 }
+// end of namespace pov_parser

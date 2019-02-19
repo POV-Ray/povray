@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,14 +36,21 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/animation/animation.h"
 
-// Boost header files
-#include <boost/scoped_ptr.hpp>
+// C++ variants of C standard header files
+//  (none at the moment)
 
-// POV-Ray base header files
+// C++ standard header files
+#include <memory>
+
+// POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
+#include "base/povassert.h"
 //#include "base/animation/avi.h"
 #include "base/animation/moov.h"
 //#include "base/animation/mpeg.h"
 #include "base/image/bmp.h"
+#include "base/image/colourspace.h"
+#include "base/image/image.h"
 #include "base/image/jpeg_pov.h"
 #include "base/image/png_pov.h"
 
@@ -191,7 +198,7 @@ void Animation::AppendFrame(Image *image) // writing only - NOTE: This method re
 {
     if(writeOptions.blurradius > 0.0f)
     {
-        boost::scoped_ptr<Image> mask(Image::Create(image->GetWidth(), image->GetHeight(), Image::Bit_Map));
+        std::unique_ptr<Image> mask(Image::Create(image->GetWidth(), image->GetHeight(), ImageDataType::Bit_Map));
         float r, g, b, f, t;
 
         mask->FillBitValue(false);
@@ -245,7 +252,7 @@ void Animation::SetCurrentFrame(unsigned int frame) // reading only
     currentFrame = frame;
 }
 
-const vector<string>& Animation::GetWarnings() const
+const std::vector<std::string>& Animation::GetWarnings() const
 {
     return warnings;
 }
@@ -259,11 +266,11 @@ Image *Animation::ReadFrame(IStream *file)
 {
     POV_OFF_T bytes = 0;
     Image *image = nullptr;
-    Image::ReadOptions options;
+    ImageReadOptions options;
 
     options.defaultGamma = PowerLawGammaCurve::GetByDecodingGamma(readOptions.gamma);
     options.gammacorrect = readOptions.gammacorrect;
-    options.itype = Image::RGBFT_Float;
+    options.itype = ImageDataType::RGBFT_Float;
 
     switch(fileType)
     {
@@ -328,10 +335,10 @@ Image *Animation::ReadFrame(IStream *file)
 
 POV_OFF_T Animation::WriteFrame(OStream *file, const Image *image)
 {
-    Image::WriteOptions options;
+    ImageWriteOptions options;
 
     options.bitsPerChannel = writeOptions.bpcc;
-    options.alphaMode = (writeOptions.alphachannel ? Image::kAlphaMode_Default : Image::kAlphaMode_None);
+    options.alphaMode = (writeOptions.alphachannel ? ImageAlphaMode::Default : ImageAlphaMode::None);
     options.compression = writeOptions.compress;
     // options.gamma = writeOptions.gamma;
     options.encodingGamma = PowerLawGammaCurve::GetByEncodingGamma(writeOptions.gamma);
@@ -432,3 +439,4 @@ void Animation::GetBlurredPixel(const Image& image, unsigned int x, unsigned int
 }
 
 }
+// end of namespace pov_base

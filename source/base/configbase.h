@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,13 +38,12 @@
 #ifndef POVRAY_BASE_CONFIGBASE_H
 #define POVRAY_BASE_CONFIGBASE_H
 
+// Pull in other compile-time config header files first
 #include "syspovconfigbase.h"
 
-#include <cstdint>
-
-#include <limits>
-
-#include <boost/version.hpp>
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
 
 //##############################################################################
 ///
@@ -59,42 +58,12 @@
 /// the corresponding header files and specifying `using NAMESPACE::SYMBOL`. However, alternative
 /// implementations may also be provided unless noted otherwise.
 ///
-/// The following symbols must have the same semantics as those from C++11's `std::` namespace:
-///
-///   - `const_pointer_cast`
-///   - `dynamic_pointer_cast`
-///   - `list`
-///   - `runtime_error` (should be identical to `std::runtime_error`)
-///   - `shared_ptr`
-///   - `static_pointer_cast`
-///   - `string`
-///   - `vector`
-///   - `weak_ptr`
-///
-/// The following symbols must have the same semantics as those from Boost's `boost::` namespace:
-///
-///   - `intrusive_ptr`
-///
-/// @todo
-///     The following POSIX features also need to be present or emulated:
-///       - `O_CREAT`, `O_RDWR`, `O_TRUNC`
-///       - `S_IRUSR`, `S_IWUSR`
-///       - `int open(const char*, int, int)`
-///       - `int close(int)`
-///       - `ssize_t write(int, const void*, size_t)`
-///       - `ssize_t read(int, void*, size_t)`
-///
-/// @todo
-///     The following somewhat obscure macros also need to be defined:
-///       - `IFF_SWITCH_CAST`
-///
 /// @todo
 ///     The following macros currently default to unexpected values; also, the implementations
 ///     they default to are currently not part of the base module:
 ///       - `POV_MALLOC`
 ///       - `POV_REALLOC`
 ///       - `POV_FREE`
-///       - `POV_MEMMOVE`
 ///
 /// @{
 
@@ -113,6 +82,7 @@
 #ifndef POV_CPP11_SUPPORTED
     #define POV_CPP11_SUPPORTED (__cplusplus >= 201103L)
 #endif
+
 
 /// @}
 ///
@@ -355,56 +325,16 @@
     #define COLC float
 #endif
 
-/// @def UCS2
-/// Data type used to represent individual UCS2 characters.
-///
-/// This data type is used to represent characters from the UCS2 character set, i.e. the 16-bit
-/// Basic Multilingual Plane subset of Unicode.
-///
-/// This should be an unsigned character or integer type at least 16 bits wide.
-///
-/// @note
-///     For clarity, this data type should _not_ be used as the base type for UTF-16 encoded
-///     full-fledged Unicode strings. Use @ref UTF16 instead.
-///
-/// @todo
-///     Currently, the actual type must be identical to that of @ref UTF16.
-///
-/// @attention
-///     Some legacy portions of the code may improperly use this type where they should use
-///     @ref UTF16 instead.
-///
-#ifndef UCS2
-    #define UCS2 char16_t
+// The following character types are no longer defined as macros,
+// but instead use aliased or dedicated types.
+#ifdef UCS2
+    #error "Platform-specific configurations should no longer define UCS2 as a macro."
 #endif
-
-/// @def UCS4
-/// Integer data type used to represent UCS4 or full-fledged Unicode characters.
-///
-/// This should be an unsigned character or integer type at least 21 (sic!) bits wide.
-///
-#ifndef UCS4
-    #define UCS4 char32_t
+#ifdef UCS4
+    #error "Platform-specific configurations should no longer define UCS4 as a macro."
 #endif
-
-/// @def UTF16
-/// Integer data type used as the base type to represent UTF-16 encoded Unicode strings.
-/// This should be an unsigned integer type at least 16 bits wide.
-///
-/// @note
-///     For clarity, this data type should _not_ be used to store regular UCS2 characters
-///     (16-bit Basic Multilingual Plane subset of Unicode). For that purpose, use @ref UCS2
-///     instead.
-///
-/// @todo
-///     Currently, the actual type must be identical to that of @ref UCS2.
-///
-/// @attention
-///     Some legacy portions of the code may improperly use @ref UCS2 where they should use this
-///     type instead.
-///
-#ifndef UTF16
-    #define UTF16 UCS2
+#ifdef UTF16
+    #error "Platform-specific configurations should no longer define UTF16 as a macro."
 #endif
 
 /// @def POV_LONG
@@ -575,15 +505,6 @@
 
 #ifndef POV_STRDUP
     #define POV_STRDUP(str)             pov_base::pov_strdup(str)
-#endif
-
-// For those systems that don't have memmove, this can also be pov_memmove
-#ifndef POV_MEMMOVE
-    #define POV_MEMMOVE(dst,src,len)    pov_base::pov_memmove((dst),(src),(len))
-#endif
-
-#ifndef POV_MEMCPY
-    #define POV_MEMCPY(dst,src,len)     std::memcpy((dst),(src),(len))
 #endif
 
 #ifndef POV_MEM_STATS
@@ -775,17 +696,6 @@
     #define CDECL
 #endif
 
-#ifndef ALIGN16
-    #define ALIGN16
-#endif
-
-#ifndef ALIGN32
-    // leave undefined, allowing code to detect that forced 32-bit alignment isn't supported
-    // The following two lines work around doxygen being unable to document undefined macros.
-    #define ALIGN32 (undefined)
-    #undef ALIGN32
-#endif
-
 #ifndef FORCEINLINE
     #define FORCEINLINE inline
 #endif
@@ -800,18 +710,29 @@
     #define POV_MULTITHREADED 1
 #endif
 
-/// @def POV_USE_DEFAULT_DELAY
-/// Whether to use a default implementation for the millisecond-precision delay function.
+/// @def POV_USE_PLATFORM_DELAY
+/// Whether to use a platform-specific implementation for the millisecond-precision delay function.
 ///
-/// Define as non-zero to use a default implementation for the @ref pov_base::Delay() function, or zero if
+/// Define as zero to use a portable default implementation for the @ref pov_base::Delay() function, or non-zero if
 /// the platform provides its own implementation.
 ///
-/// @note
-///     The default implementation is only provided as a last-ditch resort. Wherever possible,
-///     implementations should provide their own implementation.
+/// The actual value may carry additional semantics based on the platform
+/// family. The following are currently known (but see the respective platform
+/// specific code for authoritative information):
 ///
-#ifndef POV_USE_DEFAULT_DELAY
-    #define POV_USE_DEFAULT_DELAY 1
+/// | Value | Windows       | Unix              |
+/// | ----: | :------------ | :---------------- |
+/// |     0 | `std::this_thread::sleep_for()`   |
+/// |     1 | `Sleep()`     | `nanosleep()`     |
+/// |     2 | ^             | `usleep()`        |
+/// | other | ^             | undefined         |
+///
+#ifndef POV_USE_PLATFORM_DELAY
+    #define POV_USE_PLATFORM_DELAY 0
+#endif
+
+#ifdef POV_USE_DEFAULT_DELAY
+#error "POV_USE_DEFAULT_DELAY has been superseded by POV_USE_PLATFORM_DELAY. Note that the new setting has inverse semantics."
 #endif
 
 /// @def POV_USE_DEFAULT_TIMER
@@ -841,75 +762,44 @@
     #define POV_USE_DEFAULT_PATH_PARSER 1
 #endif
 
-/// @def POV_DELETE_FILE
-/// Delete a given file.
+/// @def POV_USE_DEFAULT_DELETEFILE
+/// Whether to use a default implementation to delete a file.
 ///
-/// Define as a single command that erases the specified file from the file system.
+/// Define as non-zero to use a default implementation for the @ref pov_base::Filesystem::DeleteFile() method,
+/// or zero if the platform provides its own implementation.
 ///
 /// @note
-///     There is no default implementation for this macro.
+///     The default implementation is only provided as a last-ditch resort. Wherever possible,
+///     implementations should provide their own implementation.
 ///
-/// @param[in]  name    UTF-8 encoded file name in system-specific format.
-///
-#ifndef POV_DELETE_FILE
-    #ifdef DOXYGEN
-        // just leave undefined when running doxygen
-        // The following two lines work around doxygen being unable to document undefined macros.
-        #define POV_DELETE_FILE(name) (undefined)
-        #undef POV_DELETE_FILE
-    #else
-        #error "No default implementation for POV_DELETE_FILE."
-    #endif
+#ifndef POV_USE_DEFAULT_DELETEFILE
+    #define POV_USE_DEFAULT_DELETEFILE 1
 #endif
 
-/// @def POV_LSEEK(handle,offset,whence)
-/// Seek a particular absolute or relative location in a (large) file.
+/// @def POV_USE_DEFAULT_LARGEFILE
+/// Whether to use a default implementation for large file handling.
 ///
-/// Define this to `lseek64()` (GNU/Linux), `_lseeki64()` (Windows), or an equivalent function
-/// supporting large files (i.e. files significantly larger than 2 GiB).
+/// Define as non-zero to use a default implementation for the @ref pov_base::Filesystem::LargeFile class,
+/// or zero if the platform provides its own implementation.
 ///
 /// @note
-///     If large file support is unavailable, it is technically safe to substitute equivalent
-///     functions taking 32 bit file offsets instead. However, this will limit output file size to
-///     approx. 100 Megapixels.
+///     The current default implementation may or may not actually support large
+///     files, and may provide less than optimal performance.
 ///
-#ifndef POV_LSEEK
-    #ifdef DOXYGEN
-        // just leave undefined when running doxygen
-        // The following two lines work around doxygen being unable to document undefined macros.
-        #define POV_LSEEK(name) (undefined)
-        #undef POV_LSEEK
-    #else
-        #error "No default implementation for POV_LSEEK."
-    #endif
+#ifndef POV_USE_DEFAULT_LARGEFILE
+    #define POV_USE_DEFAULT_LARGEFILE 1
 #endif
 
 /// @def POV_OFF_T
 /// Type representing a particular absolute or relative location in a (large) file.
 ///
-/// Define this to the return type of `lseek64()` (GNU/Linux), `_lseeki64()` (Windows), or
-/// equivalent function used in the definition of @ref POV_LSEEK().
+/// Define this to a signed integer wide enough to hold the maximum file size
+/// supported by the operating system. On most modern systems, this should be
+/// at least 64 bits (including the sign bit).
 ///
 #ifndef POV_OFF_T
-    #ifdef DOXYGEN
-        // just leave undefined when running doxygen
-        // The following two lines work around doxygen being unable to document undefined macros.
-        #define POV_OFF_T (undefined)
-        #undef POV_OFF_T
-    #else
-        #error "No default implementation for POV_OFF_T."
-    #endif
+    #define POV_OFF_T std::int_least64_t
 #endif
-
-static_assert(
-    std::is_same<POV_OFF_T, decltype(POV_LSEEK(0,0,0))>::value,
-    "POV_OFF_T does not match return type of POV_LSEEK()."
-);
-
-static_assert(
-    std::numeric_limits<POV_OFF_T>::max() >= std::numeric_limits<int_least64_t>::max(),
-    "Large files (> 2 GiB) not supported, limiting image size to approx. 100 Megapixels. Proceed at your own risk."
-);
 
 /// @}
 ///
@@ -1024,24 +914,6 @@ static_assert(
 ///
 /// @{
 
-/// @def POV_TIME_UTC
-/// Alias for `boost::TIME_UTC` or `boost::TIME_UTC_`, whichever is applicable.
-///
-/// Boost 1.50 changed TIME_UTC to TIME_UTC_ to avoid a clash with C++11, which has
-/// TIME_UTC as a define (in boost it's an enum). To allow compilation with earlier
-/// versions of boost we now use POV_TIME_UTC in the code and define that here.
-///
-#if BOOST_VERSION >= 105000
-    #define POV_TIME_UTC boost::TIME_UTC_
-#else
-    #ifdef TIME_UTC
-        // clash between C++11 and boost detected, need to hard-code
-        #define POV_TIME_UTC 1
-    #else
-        #define POV_TIME_UTC boost::TIME_UTC
-    #endif
-#endif
-
 /// @def POV_BACKSLASH_IS_PATH_SEPARATOR
 /// Whether the system supports the backslash as a separator character.
 ///
@@ -1123,6 +995,9 @@ static_assert(
 #endif
 
 #define M_TAU TWO_M_PI
+
+#define POVMSAddress        void*
+#define POVMSInvalidAddress nullptr
 
 /// @}
 ///

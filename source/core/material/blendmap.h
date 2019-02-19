@@ -4,13 +4,11 @@
 ///
 /// Declarations related to blend maps.
 ///
-/// @note   `frame.h` contains other colour stuff.
-///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,6 +39,17 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <memory>
+#include <vector>
+
+// POV-Ray header files (base module)
+// POV-Ray header files (core module)
+//  (none at the moment)
+
 namespace pov
 {
 
@@ -64,7 +73,7 @@ enum BlendMapTypeId
 };
 
 template<typename DATA_T>
-struct BlendMapEntry
+struct BlendMapEntry final
 {
     SNGL    value;
     DATA_T  Vals;
@@ -80,7 +89,7 @@ class BlendMap
         typedef BlendMapEntry<DATA_T>   Entry;
         typedef Entry*                  EntryPtr;
         typedef const Entry*            EntryConstPtr;
-        typedef vector<Entry>           Vector;
+        typedef std::vector<Entry>      Vector;
 
         BlendMap(BlendMapTypeId type);
         virtual ~BlendMap() {}
@@ -99,15 +108,16 @@ class BlendMap
 ******************************************************************************/
 
 template<typename MAP_T>
-shared_ptr<MAP_T> Create_Blend_Map (BlendMapTypeId type);
+std::shared_ptr<MAP_T> Create_Blend_Map (BlendMapTypeId type);
 
 template<typename MAP_T>
-shared_ptr<MAP_T> Copy_Blend_Map (const shared_ptr<MAP_T>& Old);
+std::shared_ptr<MAP_T> Copy_Blend_Map (const std::shared_ptr<MAP_T>& Old);
 
 /// @}
 ///
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_BLENDMAP_H

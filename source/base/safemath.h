@@ -24,7 +24,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -55,11 +55,15 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
 
-// Standard C++ header files
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <limits>
 
-// POV-Ray base header files
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
+#include "base/povassert.h"
 
 namespace pov_base
 {
@@ -174,5 +178,6 @@ static inline T SafeSignedProduct(T p1, T p2, T p3 = 1, T p4 = 1)
 //##############################################################################
 
 }
+// end of namespace pov_base
 
 #endif // POVRAY_BASE_SAFEMATH_H

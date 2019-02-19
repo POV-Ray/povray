@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,8 +36,16 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/bounding/boundingsphere.h"
 
+// C++ variants of C standard header files
+#include <cstdlib>
+
+// C++ standard header files
 #include <algorithm>
 
+// POV-Ray header files (base module)
+#include "base/pov_mem.h"
+
+// POV-Ray header files (core module)
 #include "core/coretypes.h"
 
 // this must be the last file included
@@ -45,6 +53,9 @@
 
 namespace pov
 {
+
+using std::min;
+using std::max;
 
 /*****************************************************************************
 * Local preprocessor defines
@@ -428,13 +439,13 @@ static int sort_and_split(BSPHERE_TREE **Root, BSPHERE_TREE ***Elements, int *nE
     switch(Axis)
     {
         case X:
-            QSORT(reinterpret_cast<void *>(*Elements + first), size, sizeof(BSPHERE_TREE *), comp_elements<X>);
+            std::qsort(*Elements + first, size, sizeof(BSPHERE_TREE*), comp_elements<X>);
             break;
         case Y:
-            QSORT(reinterpret_cast<void *>(*Elements + first), size, sizeof(BSPHERE_TREE *), comp_elements<Y>);
+            std::qsort(*Elements + first, size, sizeof(BSPHERE_TREE*), comp_elements<Y>);
             break;
         case Z:
-            QSORT(reinterpret_cast<void *>(*Elements + first), size, sizeof(BSPHERE_TREE *), comp_elements<Z>);
+            std::qsort(*Elements + first, size, sizeof(BSPHERE_TREE*), comp_elements<Z>);
             break;
     }
 
@@ -647,3 +658,4 @@ void Destroy_Bounding_Sphere_Hierarchy(BSPHERE_TREE *Node)
 }
 
 }
+// end of namespace pov

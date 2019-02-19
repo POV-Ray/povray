@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,22 +33,32 @@
 ///
 //******************************************************************************
 
-#include <set>
-
-#include <boost/bind.hpp>
-#include <boost/thread.hpp>
-
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "backend/bounding/boundingtask.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <set>
+#include <vector>
+
+// Boost header files
+#include <boost/bind.hpp>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/bounding/bsptree.h"
 #include "core/math/matrix.h"
 #include "core/scene/object.h"
 #include "core/scene/tracethreaddata.h"
 
+// POV-Ray header files (POVMS module)
 #include "povms/povmsid.h"
 
+// POV-Ray header files (backend module)
 #include "backend/scene/backendscenedata.h"
 #include "backend/support/task.h"
 
@@ -58,7 +68,9 @@
 namespace pov
 {
 
-class SceneObjects : public BSPTree::Objects
+using std::vector;
+
+class SceneObjects final : public BSPTree::Objects
 {
     public:
         vector<ObjectPtr> infinite;
@@ -81,28 +93,28 @@ class SceneObjects : public BSPTree::Objects
             }
         }
 
-        virtual ~SceneObjects()
+        virtual ~SceneObjects() override
         {
             // nothing to do
         }
 
-        virtual unsigned int size() const
+        virtual unsigned int size() const override
         {
             return finite.size();
         }
 
-        virtual float GetMin(unsigned int axis, unsigned int i) const
+        virtual float GetMin(unsigned int axis, unsigned int i) const override
         {
             return finite[i]->BBox.lowerLeft[axis];
         }
 
-        virtual float GetMax(unsigned int axis, unsigned int i) const
+        virtual float GetMax(unsigned int axis, unsigned int i) const override
         {
             return (finite[i]->BBox.lowerLeft[axis] + finite[i]->BBox.size[axis]);
         }
 };
 
-class BSPProgress : public BSPTree::Progress
+class BSPProgress final : public BSPTree::Progress
 {
     public:
         BSPProgress(RenderBackend::SceneId sid, POVMSAddress addr, Task& task) :
@@ -113,7 +125,7 @@ class BSPProgress : public BSPTree::Progress
         {
         }
 
-        virtual void operator()(unsigned int nodes) const
+        virtual void operator()(unsigned int nodes) const override
         {
             if((timer.ElapsedRealTime() - lastProgressTime) > 1000) // update progress at most every second
             {
@@ -134,11 +146,11 @@ class BSPProgress : public BSPTree::Progress
         Timer timer;
         mutable POV_LONG lastProgressTime;
 
-        BSPProgress();
+        BSPProgress() = delete;
 };
 
-BoundingTask::BoundingTask(shared_ptr<BackendSceneData> sd, unsigned int bt, size_t seed) :
-    SceneTask(new TraceThreadData(dynamic_pointer_cast<SceneData>(sd), seed), boost::bind(&BoundingTask::SendFatalError, this, _1), "Bounding", sd),
+BoundingTask::BoundingTask(std::shared_ptr<BackendSceneData> sd, unsigned int bt, size_t seed) :
+    SceneTask(new TraceThreadData(std::dynamic_pointer_cast<SceneData>(sd), seed), boost::bind(&BoundingTask::SendFatalError, this, _1), "Bounding", sd),
     sceneData(sd),
     boundingThreshold(bt)
 {
@@ -225,3 +237,4 @@ void BoundingTask::SendFatalError(Exception& e)
 }
 
 }
+// end of namespace pov

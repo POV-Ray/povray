@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,6 +36,18 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/parsermessagehandler.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <sstream>
+#include <string>
+
+// POV-Ray header files (base module)
+// POV-Ray header files (POVMS module)
+//  (none at the moment)
+
+// POV-Ray header files (frontend module)
 #include "frontend/renderfrontend.h"
 
 // this must be the last file included
@@ -196,9 +208,10 @@ void ParserMessageHandler::DebugInfo(Console *console, POVMS_Object& obj, bool c
     if(conout == true)
     {
         // TODO FIXME HACK
-        string str(obj.GetString(kPOVAttrib_EnglishText));
+        std::string str(obj.GetString(kPOVAttrib_EnglishText));
         console->Output(str);
     }
 }
 
 }
+// end of namespace pov_frontend

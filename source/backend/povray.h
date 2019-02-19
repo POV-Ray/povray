@@ -46,18 +46,19 @@
 #include "backend/configbackend.h"
 
 // C++ variants of C standard header files
-// C++ standard header files
 //  (none at the moment)
 
+// C++ standard header files
+#include <thread>
+
 // Boost header files
-#include <boost/thread.hpp>
 #include <boost/function.hpp>
 
 // POV-Ray header files (base module)
 #include "base/version_info.h"
 
-// POV-Ray header files (povms module)
-#include "povms/povms.h"
+// POV-Ray header files (backend module)
+//  (none at the moment)
 
 /**
  *  This function does essential initialisation that is required before
@@ -66,7 +67,7 @@
  *  @param  addr  If not `nullptr`, backend address on return.
  *  @return       Pointer to the thread resource created.
  */
-boost::thread *povray_init(const boost::function0<void>& threadExit, POVMSAddress *addr = nullptr);
+std::thread *povray_init(const boost::function0<void>& threadExit, POVMSAddress *addr = nullptr);
 
 /**
  *  This function shuts down the main render thread and after it has

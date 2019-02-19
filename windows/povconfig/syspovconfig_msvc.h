@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -46,11 +46,10 @@
 #endif
 
 // C++ variants of C standard header files
-#include <cstdio>
-#include <cstdlib>
+//  (none at the moment)
 
 // Other library header files
-#include <direct.h>
+#include <intrin.h>     // TODO - Required for `_ReturnAddress()`.
 
 #pragma auto_inline(on)
 
@@ -100,11 +99,11 @@
     #define METADATA_COMPILER_STRING          "msvc 8"
     #define NEED_INVHYP
     #define POV_CPP11_SUPPORTED               0
+    #define POV_CPP14_SUPPORTED               0
   #elif _MSC_VER >= 1400 && _MSC_VER < 1500 && defined (_WIN64)
     // MS Visual C++ 2005 (aka 8.0), compiling for 64 bit target
     #define POV_COMPILER_VER                  "msvc8"
     #define METADATA_COMPILER_STRING          "msvc 8"
-    #define ALIGN16                           __declspec(align(16))
     inline const int& max(const int& _X, const int& _Y) {return (_X < _Y ? _Y : _X); }
     inline const int& min(const int& _X, const int& _Y) {return (_Y < _X ? _Y : _X); }
     inline const unsigned int& max(const unsigned int& _X, const unsigned int& _Y) {return (_X < _Y ? _Y : _X); }
@@ -115,12 +114,14 @@
     inline const unsigned long& min(const unsigned long& _X, const unsigned long& _Y) {return (_Y < _X ? _Y : _X); }
     #define NEED_INVHYP
     #define POV_CPP11_SUPPORTED               0
+    #define POV_CPP14_SUPPORTED               0
   #elif _MSC_VER >= 1500 && _MSC_VER < 1600
     // MS Visual C++ 2008 (aka 9.0)
     #define POV_COMPILER_VER                  "msvc9"
     #define METADATA_COMPILER_STRING          "msvc 9"
     #define NEED_INVHYP
     #define POV_CPP11_SUPPORTED               0
+    #define POV_CPP14_SUPPORTED               0
   #elif _MSC_VER >= 1600 && _MSC_VER < 1700
     // MS Visual C++ 2010 (aka 10.0)
     #define POV_COMPILER_VER                  "msvc10"
@@ -130,6 +131,7 @@
     #pragma warning(disable : 4099)
     #define NEED_INVHYP
     #define POV_CPP11_SUPPORTED               0
+    #define POV_CPP14_SUPPORTED               0
   #elif _MSC_VER >= 1700 && _MSC_VER < 1800
     // MS Visual C++ 2012 (aka 11.0)
     #define POV_COMPILER_VER                  "msvc11"
@@ -138,6 +140,7 @@
     // The following settings are just guesswork, and have never been tested:
     #define NEED_INVHYP
     #define POV_CPP11_SUPPORTED               0
+    #define POV_CPP14_SUPPORTED               0
   #elif _MSC_VER >= 1800 && _MSC_VER < 1900
     // MS Visual C++ 2013 (aka 12.0)
     #define POV_COMPILER_VER                  "msvc12"
@@ -145,12 +148,14 @@
     #error "Please update syspovconfig_msvc.h to include this version of MSVC"
     // The following settings are just guesswork, and have never been tested:
     #define POV_CPP11_SUPPORTED               0
+    #define POV_CPP14_SUPPORTED               0
   // NB: The Microsoft Visual Studio developers seem to have skipped internal version number 13 entirely.
   #elif _MSC_VER >= 1900 && _MSC_VER < 2000
     // MS Visual C++ 2015 (aka 14.0)
     #define POV_COMPILER_VER                  "msvc14"
     #define METADATA_COMPILER_STRING          "msvc 14"
     #define POV_CPP11_SUPPORTED               1
+    #define POV_CPP14_SUPPORTED               1
     #ifndef DEBUG
       // Suppress erroneous warning about `string` having different alignment in base and parser.
       #pragma warning(disable : 4742) // 'var' has different alignment in 'file1' and 'file2': number and number
@@ -204,7 +209,6 @@
   #endif
 #endif
 
-#define QSORT(a,b,c,d)                      std::qsort(reinterpret_cast<void *>(a), (size_t) b, (size_t) c, d)
 #define POV_LONG                            signed __int64
 #define POV_ULONG                           unsigned __int64
 #define FORCEINLINE                         __forceinline
@@ -221,7 +225,6 @@
 #undef ReturnAddress
 #define ReturnAddress()                     _ReturnAddress()
 
-#define ALIGN32                             __declspec(align(32))
 #define MACHINE_INTRINSICS_H                <intrin.h>
 
 #if _MSC_VER >= 1600

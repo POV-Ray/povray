@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,14 +39,17 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
 
-// Standard C++ header files
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <string>
 #include <vector>
 
-// POV-Ray base header files
-#include "base/fileinputoutput.h"
+// POV-Ray header files (base module)
+#include "base/fileinputoutput_fwd.h"
 #include "base/pov_err.h"
-#include "base/types.h"
-#include "base/image/image.h"
+#include "base/image/image_fwd.h"
 
 namespace pov_base
 {
@@ -94,7 +97,7 @@ class Animation
             YUV410
         };
 
-        struct ReadOptions
+        struct ReadOptions final
         {
             float gamma;
             bool gammacorrect;
@@ -102,7 +105,7 @@ class Animation
             ReadOptions() : gamma(1.0f), gammacorrect(false) { }
         };
 
-        struct WriteOptions
+        struct WriteOptions final
         {
             ColorEncodingType colorencoding;
             unsigned char compress; // relative quality from 100 best to 0 worst
@@ -134,7 +137,7 @@ class Animation
         unsigned int GetWidth() const { return width; }
         unsigned int GetHeight() const { return height; }
 
-        const vector<string>& GetWarnings() const;
+        const std::vector<std::string>& GetWarnings() const;
         void ClearWarnings();
     protected:
         FileType fileType;
@@ -144,7 +147,7 @@ class Animation
         unsigned int height;
         ReadOptions readOptions;
         WriteOptions writeOptions;
-        vector<string> warnings;
+        std::vector<std::string> warnings;
         CodecType codec;
         unsigned int currentFrame;
         unsigned int totalFrames;
@@ -163,12 +166,9 @@ class Animation
         float blurMatrix[16][16]; // only uses 15 x 15 maximum (16 x 16 for better alignment)
         int blurMatrixRadius;
 
-        /// not available
-        Animation();
-        /// not available
-        Animation(const Animation&);
-        /// not available
-        Animation& operator=(Animation&);
+        Animation() = delete;
+        Animation(const Animation&) = delete;
+        Animation& operator=(Animation&) = delete;
 };
 
 /// @}
@@ -176,5 +176,6 @@ class Animation
 //##############################################################################
 
 }
+// end of namespace pov_base
 
 #endif // POVRAY_BASE_ANIMATION_H

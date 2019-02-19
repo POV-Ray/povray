@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,7 +40,13 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
-#include "base/types.h"
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+// POV-Ray header files (core module)
+//  (none at the moment)
 
 namespace pov
 {
@@ -332,13 +338,14 @@ typedef enum FPSTATS
     MaxFPStat
 } FPStatsIndex;
 
-typedef struct intersection_stats_info
+struct intersection_stats_info final
 {
     int povms_id;
     IntStatsIndex stat_test_id;
     IntStatsIndex stat_suc_id;
     const char *infotext;
-} INTERSECTION_STATS_INFO;
+};
+using INTERSECTION_STATS_INFO = intersection_stats_info; ///< @deprecated
 
 extern const INTERSECTION_STATS_INFO intersection_stats[];
 
@@ -347,5 +354,6 @@ extern const INTERSECTION_STATS_INFO intersection_stats[];
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_STATISTICIDS_H
