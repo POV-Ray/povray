@@ -42,6 +42,7 @@
 #include "disp_sdl.h"
 
 #include <algorithm>
+#include <memory>
 
 #include <boost/format.hpp>
 
@@ -54,7 +55,7 @@ namespace pov_frontend
     using namespace vfe;
     using namespace vfePlatform;
 
-    extern shared_ptr<Display> gDisplay;
+    extern std::shared_ptr<Display> gDisplay;
 
     const UnixOptionsProcessor::Option_Info UnixSDLDisplay::Options[] =
     {
@@ -181,8 +182,8 @@ namespace pov_frontend
                 // [JG] about testing vs ...(-1), have a look at SDL_ListModes API (the return is very ugly).
                 if ((modes != nullptr) && (reinterpret_cast<SDL_Rect**>(-1) != modes))
                 {
-                    width = min(modes[0]->w - 10, width);
-                    height = min(modes[0]->h - 80, height);
+                    width = std::min(modes[0]->w - 10, width);
+                    height = std::min(modes[0]->h - 80, height);
                 }
             }
 
@@ -250,7 +251,7 @@ namespace pov_frontend
                  * The difference is nearly invisible until the values of GetWidth and GetHeight are subtil (such as +W2596 +H1003 on a display of 1920 x 1080)
                  * where in such situation, the computed ratio is not exactly the same as the other.
                  */
-                m_display_scale = min(float(width) / GetWidth(), float(height) / GetHeight());
+                m_display_scale = std::min(float(width) / GetWidth(), float(height) / GetHeight());
             }
 
             SetCaption(false);
@@ -345,10 +346,10 @@ namespace pov_frontend
     {
         unsigned int rx2 = m_update_rect.x + m_update_rect.w;
         unsigned int ry2 = m_update_rect.y + m_update_rect.h;
-        m_update_rect.x = min((unsigned int)m_update_rect.x, x);
-        m_update_rect.y = min((unsigned int)m_update_rect.y, y);
-        rx2 = max(rx2, x);
-        ry2 = max(ry2, y);
+        m_update_rect.x = std::min((unsigned int)m_update_rect.x, x);
+        m_update_rect.y = std::min((unsigned int)m_update_rect.y, y);
+        rx2 = std::max(rx2, x);
+        ry2 = std::max(ry2, y);
         m_update_rect.w = rx2 - m_update_rect.x;
         m_update_rect.h = ry2 - m_update_rect.y;
     }
@@ -357,10 +358,10 @@ namespace pov_frontend
     {
         unsigned int rx2 = m_update_rect.x + m_update_rect.w;
         unsigned int ry2 = m_update_rect.y + m_update_rect.h;
-        m_update_rect.x = min((unsigned int)m_update_rect.x, x1);
-        m_update_rect.y = min((unsigned int)m_update_rect.y, y1);
-        rx2 = max(rx2, x2);
-        ry2 = max(ry2, y2);
+        m_update_rect.x = std::min((unsigned int)m_update_rect.x, x1);
+        m_update_rect.y = std::min((unsigned int)m_update_rect.y, y1);
+        rx2 = std::max(rx2, x2);
+        ry2 = std::max(ry2, y2);
         m_update_rect.w = rx2 - m_update_rect.x;
         m_update_rect.h = ry2 - m_update_rect.y;
     }
@@ -405,10 +406,10 @@ namespace pov_frontend
         if (!m_valid)
             return;
 
-        int ix1 = min(x1, GetWidth()-1);
-        int ix2 = min(x2, GetWidth()-1);
-        int iy1 = min(y1, GetHeight()-1);
-        int iy2 = min(y2, GetHeight()-1);
+        int ix1 = std::min(x1, GetWidth()-1);
+        int ix2 = std::min(x2, GetWidth()-1);
+        int iy1 = std::min(y1, GetHeight()-1);
+        int iy2 = std::min(y2, GetHeight()-1);
 
         if (SDL_MUSTLOCK(m_display) && SDL_LockSurface(m_display) < 0)
             return;
@@ -455,10 +456,10 @@ namespace pov_frontend
         if (!m_valid)
             return;
 
-        unsigned int ix1 = min(x1, GetWidth()-1);
-        unsigned int ix2 = min(x2, GetWidth()-1);
-        unsigned int iy1 = min(y1, GetHeight()-1);
-        unsigned int iy2 = min(y2, GetHeight()-1);
+        unsigned int ix1 = std::min(x1, GetWidth()-1);
+        unsigned int ix2 = std::min(x2, GetWidth()-1);
+        unsigned int iy1 = std::min(y1, GetHeight()-1);
+        unsigned int iy2 = std::min(y2, GetHeight()-1);
 
         if (m_display_scaled)
         {
@@ -487,10 +488,10 @@ namespace pov_frontend
         if (!m_valid)
             return;
 
-        unsigned int ix1 = min(x1, GetWidth()-1);
-        unsigned int ix2 = min(x2, GetWidth()-1);
-        unsigned int iy1 = min(y1, GetHeight()-1);
-        unsigned int iy2 = min(y2, GetHeight()-1);
+        unsigned int ix1 = std::min(x1, GetWidth()-1);
+        unsigned int ix2 = std::min(x2, GetWidth()-1);
+        unsigned int iy1 = std::min(y1, GetHeight()-1);
+        unsigned int iy2 = std::min(y2, GetHeight()-1);
 
         if (SDL_MUSTLOCK(m_display) && SDL_LockSurface(m_display) < 0)
             return;
