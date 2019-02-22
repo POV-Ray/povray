@@ -1025,7 +1025,7 @@ void Box::Compute_BBox()
 *
 ******************************************************************************/
 
-void Box::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
+void Box::UVCoord(Vector2d& Result, const Intersection *Inter) const
 {
     Vector3d P, Box_Diff;
 

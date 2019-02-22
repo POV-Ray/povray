@@ -173,6 +173,7 @@ namespace pov
 class ObjectBase
 {
     public:
+
         int Type; // TODO - make obsolete
         TEXTURE *Texture;
         TEXTURE *Interior_Texture;
@@ -232,13 +233,13 @@ class ObjectBase
         ///
         /// @return True if object parameters are within reasonable limits.
         ///
-        virtual bool Precompute() { return true; };
+        virtual bool Precompute() { return true; }
 
         virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) = 0; // could be "const", if it wasn't for isosurface max_gradient estimation stuff
         virtual double GetPotential (const Vector3d&, bool subtractThreshold, TraceThreadData *) const;
         virtual bool Inside(const Vector3d&, TraceThreadData *) const = 0;
         virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const = 0;
-        virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
+        virtual void UVCoord(Vector2d&, const Intersection *) const;
         virtual void Translate(const Vector3d&, const TRANSFORM *) = 0;
         virtual void Rotate(const Vector3d&, const TRANSFORM *) = 0;
         virtual void Scale(const Vector3d&, const TRANSFORM *) = 0;
@@ -281,6 +282,7 @@ class ObjectBase
         virtual bool IsOpaque() const;
 
     protected:
+
         explicit ObjectBase(const ObjectBase&) { }
 };
 
@@ -340,7 +342,7 @@ class LightSource final : public CompoundObject
         virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) override;
         virtual bool Inside(const Vector3d&, TraceThreadData *) const override;
         virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const override;
-        virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const override;
+        virtual void UVCoord(Vector2d&, const Intersection *) const override;
         virtual void Translate(const Vector3d&, const TRANSFORM *) override;
         virtual void Rotate(const Vector3d&, const TRANSFORM *) override;
         virtual void Scale(const Vector3d&, const TRANSFORM *) override;

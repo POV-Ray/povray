@@ -94,7 +94,7 @@ bool Plane::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
     DBL Depth;
     Vector3d IPoint;
 
-    if (Intersect(ray, &Depth, Thread))
+    if (Intersect(ray, &Depth, Thread->Stats()))
     {
         IPoint = ray.Evaluate(Depth);
 
@@ -136,12 +136,12 @@ bool Plane::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 *
 ******************************************************************************/
 
-bool Plane::Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Thread) const
+bool Plane::Intersect(const BasicRay& ray, DBL *Depth, RenderStatistics& stats) const
 {
     DBL NormalDotOrigin, NormalDotDirection;
     Vector3d P, D;
 
-    Thread->Stats()[Ray_Plane_Tests]++;
+    stats[Ray_Plane_Tests]++;
 
     if (Trans == nullptr)
     {
@@ -173,7 +173,7 @@ bool Plane::Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Thread) 
 
     if ((*Depth >= DEPTH_TOLERANCE) && (*Depth <= MAX_DISTANCE))
     {
-        Thread->Stats()[Ray_Plane_Tests_Succeeded]++;
+        stats[Ray_Plane_Tests_Succeeded]++;
         return (true);
     }
     else

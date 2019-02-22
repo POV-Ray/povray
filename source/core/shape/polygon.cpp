@@ -133,7 +133,7 @@ bool Polygon::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
     DBL Depth;
     Vector3d IPoint;
 
-    if (Intersect(ray, &Depth, Thread))
+    if (Intersect(ray, &Depth, Thread->Stats()))
     {
         IPoint = ray.Evaluate(Depth);
 
@@ -184,7 +184,7 @@ bool Polygon::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 *
 ******************************************************************************/
 
-bool Polygon::Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Thread) const
+bool Polygon::Intersect(const BasicRay& ray, DBL *Depth, RenderStatistics& stats) const
 {
     DBL x, y, len;
     Vector3d p, d;
@@ -194,7 +194,7 @@ bool Polygon::Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Thread
     if (Test_Flag(this, DEGENERATE_FLAG))
         return(false);
 
-    Thread->Stats()[Ray_Polygon_Tests]++;
+    stats[Ray_Polygon_Tests]++;
 
     /* Transform the ray into the polygon space. */
 
@@ -223,7 +223,7 @@ bool Polygon::Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Thread
 
     if (in_polygon(Data->Number, Data->Points, x, y))
     {
-        Thread->Stats()[Ray_Polygon_Tests_Succeeded]++;
+        stats[Ray_Polygon_Tests_Succeeded]++;
 
         *Depth /= len;
 

@@ -71,8 +71,6 @@ namespace pov
 
 using namespace pov_base;
 
-struct ISO_ThreadData;
-
 class PhotonMap;
 struct Blob_Interval_Struct;
 
@@ -101,7 +99,6 @@ class TraceThreadData : public ThreadData
         Blob_Interval_Struct *Blob_Intervals;
         int Blob_Coefficient_Count;
         int Blob_Interval_Count;
-        ISO_ThreadData *isosurfaceData;     ///< @todo We may want to move this data block to the isosurface code as a local variable.
         std::vector<BCYL_INT> BCyl_Intervals;
         std::vector<BCYL_INT> BCyl_RInt;
         std::vector<BCYL_INT> BCyl_HInt;
@@ -182,8 +179,6 @@ class TraceThreadData : public ThreadData
         TraceThreadData(const TraceThreadData&) = delete;
         TraceThreadData& operator=(const TraceThreadData&) = delete;
 
-        /// current number of Tiles to expire crackle cache entries after
-        size_t CrCache_MaxAge;
         /// current tile index (for crackle cache expiry)
         size_t progress_index;
 };

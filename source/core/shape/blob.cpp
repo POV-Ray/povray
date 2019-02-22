@@ -1173,10 +1173,10 @@ int Blob::intersect_sphere(const Blob_Element *Element, const Vector3d& P, const
 *
 ******************************************************************************/
 
-int Blob::intersect_element(const Vector3d& P, const Vector3d& D, const Blob_Element *Element, DBL mindist, DBL *tmin, DBL *tmax, TraceThreadData *Thread)
+int Blob::intersect_element(const Vector3d& P, const Vector3d& D, const Blob_Element *Element, DBL mindist, DBL *tmin, DBL *tmax, RenderStatistics& stats)
 {
 #ifdef BLOB_EXTRA_STATS
-    Thread->Stats()[Blob_Element_Tests]++;
+    stats[Blob_Element_Tests]++;
 #endif
 
     *tmin = BOUND_HUGE;
@@ -1223,7 +1223,7 @@ int Blob::intersect_element(const Vector3d& P, const Vector3d& D, const Blob_Ele
     }
 
 #ifdef BLOB_EXTRA_STATS
-    Thread->Stats()[Blob_Element_Tests_Succeeded]++;
+    stats[Blob_Element_Tests_Succeeded]++;
 #endif
 
     return (true);
@@ -1282,7 +1282,7 @@ int Blob::determine_influences(const Vector3d& P, const Vector3d& D, DBL mindist
 
         for (vector<Blob_Element>::iterator i = Data->Entry.begin(); i != Data->Entry.end(); ++i)
         {
-            if (intersect_element(P, D, &(*i), mindist, &t0, &t1, Thread))
+            if (intersect_element(P, D, &(*i), mindist, &t0, &t1, Thread->Stats()))
             {
                 insert_hit(&(*i), t0, t1, intervals, &cnt);
             }
@@ -1306,7 +1306,7 @@ int Blob::determine_influences(const Vector3d& P, const Vector3d& D, DBL mindist
             {
                 /* Test element. */
 
-                if (intersect_element(P, D, reinterpret_cast<Blob_Element *>(Tree->Node), mindist, &t0, &t1, Thread))
+                if (intersect_element(P, D, reinterpret_cast<Blob_Element *>(Tree->Node), mindist, &t0, &t1, Thread->Stats()))
                 {
                     insert_hit(reinterpret_cast<Blob_Element *>(Tree->Node), t0, t1, intervals, &cnt);
                 }

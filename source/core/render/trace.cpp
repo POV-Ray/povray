@@ -506,7 +506,7 @@ void Trace::ComputeTextureColour(Intersection& isect, MathColour& colour, Colour
         //  This causes slopes do be applied in the wrong directions.
 
         // get the UV vect of the intersection
-        isect.Object->UVCoord(uvcoords, &isect, threadData);
+        isect.Object->UVCoord(uvcoords, &isect);
         // save the normal and UV coords into Intersection
         isect.Iuv = uvcoords;
 
@@ -639,7 +639,7 @@ void Trace::ComputeOneTextureColour(MathColour& resultColour, ColourChannel& res
                 //  This causes slopes do be applied in the wrong directions.
 
                 // Don't bother warping, simply get the UV vect of the intersection
-                isect.Object->UVCoord(uvcoords, &isect, threadData);
+                isect.Object->UVCoord(uvcoords, &isect);
                 tpoint = Vector3d(uvcoords[U], uvcoords[V], 0.0);
                 cur = &(texture->Blend_Map->Blend_Map_Entries[0]);
                 ComputeOneTextureColour(resultColour, resultTransm, cur->Vals, warps, tpoint, rawnormal, ray, weight, isect, shadowflag, photonPass);
@@ -2356,7 +2356,7 @@ void Trace::ComputeShadowColour(const LightSource &lightsource, Intersection& is
         //  This causes slopes do be applied in the wrong directions.
 
         // get the UV vect of the intersection
-        isect.Object->UVCoord(uv_Coords, &isect, threadData);
+        isect.Object->UVCoord(uv_Coords, &isect);
         // save the normal and UV coords into Intersection
         isect.Iuv = uv_Coords;
 

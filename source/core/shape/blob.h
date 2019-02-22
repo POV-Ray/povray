@@ -180,7 +180,7 @@ class Blob final : public ObjectBase
         static void Transform_Blob_Element(Blob_Element *Element, const TRANSFORM *Trans);
     private:
         static void element_normal(Vector3d& Result, const Vector3d& P, const Blob_Element *Element);
-        static int intersect_element(const Vector3d& P, const Vector3d& D, const Blob_Element *Element, DBL mindist, DBL *t0, DBL *t1, TraceThreadData *Thread);
+        static int intersect_element(const Vector3d& P, const Vector3d& D, const Blob_Element *Element, DBL mindist, DBL *t0, DBL *t1, RenderStatistics& stats);
         static void insert_hit(const Blob_Element *Element, DBL t0, DBL t1, Blob_Interval_Struct *intervals, unsigned int *cnt);
         int determine_influences(const Vector3d& P, const Vector3d& D, DBL mindist, Blob_Interval_Struct *intervals, TraceThreadData *Thread) const;
         DBL calculate_field_value(const Vector3d& P, TraceThreadData *Thread) const;

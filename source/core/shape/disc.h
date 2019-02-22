@@ -90,7 +90,7 @@ class Disc final : public ObjectBase
         // NOTE: UV mapping of this primitive should not be implemented without also amending
         // the primary parameterization so that users have full control over the primitive's
         // orientation, rather than just the normal vector.
-        // virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const override;
+        // virtual void UVCoord(Vector2d&, const Intersection *) const override;
         virtual void Translate(const Vector3d&, const TRANSFORM *) override;
         virtual void Rotate(const Vector3d&, const TRANSFORM *) override;
         virtual void Scale(const Vector3d&, const TRANSFORM *) override;

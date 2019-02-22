@@ -658,10 +658,10 @@ DBL Attenuate_Light (const LightSource *Light, const Ray &ray, DBL Distance)
 *
 ******************************************************************************/
 
-void LightSource::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
+void LightSource::UVCoord(Vector2d& Result, const Intersection *Inter) const
 {
     if(!children.empty())
-        children[0]->UVCoord(Result, Inter, Thread);
+        children[0]->UVCoord(Result, Inter);
 }
 
 }

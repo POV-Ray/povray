@@ -803,7 +803,7 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
             Vector2d UV_Coords;
 
             /* Don't bother warping, simply get the UV vect of the intersection */
-            Intersection->Object->UVCoord(UV_Coords, Intersection, Thread);
+            Intersection->Object->UVCoord(UV_Coords, Intersection);
             TPoint[X] = UV_Coords[U];
             TPoint[Y] = UV_Coords[V];
             TPoint[Z] = 0;

@@ -300,7 +300,7 @@ bool Mesh::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
     else
     {
         /* Use the mesh's bounding hierarchy. */
-        inside = inside_bbox_tree(ray, Thread);
+        inside = inside_bbox_tree(ray, Thread->Stats());
     }
 
     if (Test_Flag(this, INVERTED_FLAG))
@@ -2253,7 +2253,7 @@ bool Mesh::IsOpaque() const
 *
 ******************************************************************************/
 
-void Mesh::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *) const
+void Mesh::UVCoord(Vector2d& Result, const Intersection *Inter) const
 {
     DBL w1, w2, w3, t1, t2;
     Vector3d vA, vB;
@@ -2363,7 +2363,7 @@ void Mesh::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData 
 *
 ******************************************************************************/
 
-bool Mesh::inside_bbox_tree(const BasicRay &ray, TraceThreadData *Thread) const
+bool Mesh::inside_bbox_tree(const BasicRay &ray, RenderStatistics& stats) const
 {
     MeshIndex i, found;
     DBL Best, Depth;
@@ -2379,14 +2379,14 @@ bool Mesh::inside_bbox_tree(const BasicRay &ray, TraceThreadData *Thread) const
     Best = BOUND_HUGE;
 
 #ifdef BBOX_EXTRA_STATS
-    Thread->Stats()[totalQueueResets]++;
+    stats[totalQueueResets]++;
 #endif
 
     /* Check top node. */
     Root = Data->Tree;
 
     /* Set the root object infinite to avoid a test. */
-    Check_And_Enqueue(*mtpQueue, Root, &Root->BBox, &rayinfo, Thread->Stats());
+    Check_And_Enqueue(*mtpQueue, Root, &Root->BBox, &rayinfo, stats);
 
     /* Check elements in the priority queue. */
     while (!mtpQueue->IsEmpty())
@@ -2398,7 +2398,7 @@ bool Mesh::inside_bbox_tree(const BasicRay &ray, TraceThreadData *Thread) const
         {
             /* This is a node containing leaves to be checked. */
             for (i = 0; i < Node->Entries; i++)
-                Check_And_Enqueue(*mtpQueue, Node->Node[i], &Node->Node[i]->BBox, &rayinfo, Thread->Stats());
+                Check_And_Enqueue(*mtpQueue, Node->Node[i], &Node->Node[i]->BBox, &rayinfo, stats);
         }
         else
         {

@@ -959,7 +959,7 @@ void Lathe::Compute_BBox()
 *
 ******************************************************************************/
 
-void Lathe::Compute_Lathe(Vector2d *P, TraceThreadData *Thread)
+void Lathe::Compute_Lathe(Vector2d *P, RenderStatistics& stats)
 {
     int i, i1, i2, i3, n, segment, number_of_segments;
     DBL x[4], y[4];
@@ -1164,7 +1164,7 @@ void Lathe::Compute_Lathe(Vector2d *P, TraceThreadData *Thread)
             c[1] = 2.0 * B[X];
             c[2] = C[X];
 
-            n = Solve_Polynomial(2, c, r, false, 0.0, Thread->Stats());
+            n = Solve_Polynomial(2, c, r, false, 0.0, stats);
 
             while (n--)
             {
@@ -1178,7 +1178,7 @@ void Lathe::Compute_Lathe(Vector2d *P, TraceThreadData *Thread)
             c[1] = 2.0 * B[Y];
             c[2] = C[Y];
 
-            n = Solve_Polynomial(2, c, r, false, 0.0, Thread->Stats());
+            n = Solve_Polynomial(2, c, r, false, 0.0, stats);
 
             while (n--)
             {
@@ -1341,7 +1341,7 @@ bool Lathe::test_hit(const BasicRay &ray, IStack& Depth_Stack, DBL d, DBL w, int
 *
 ******************************************************************************/
 
-void Lathe::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *) const
+void Lathe::UVCoord(Vector2d& Result, const Intersection *Inter) const
 {
     DBL len, theta;
     Vector3d P;
