@@ -169,7 +169,7 @@ namespace povwin
 #define POV_MALLOC(size,msg)                std::malloc (size)
 #define POV_REALLOC(ptr,size,msg)           std::realloc ((ptr), (size))
 #define POV_FREE(ptr)                       do { std::free (static_cast<void *>(ptr)); (ptr) = NULL; } while(false)
-#define POV_STRDUP(str)                     std::strdup(str)
+#define POV_STRDUP(str)                     _strdup(str)
 
 #define NO_RTR                              1
 #define MEM_STATS                           0
