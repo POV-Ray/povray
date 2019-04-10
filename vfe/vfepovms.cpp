@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,6 +37,9 @@
 
 #include "vfe.h"
 
+#include <condition_variable>
+#include <mutex>
+
 #include "povms/povmscpp.h"
 
 // this must be the last file included
@@ -57,20 +60,20 @@ class SysQNode
     void *Receive (int *pLen, bool Blocking) ;
 
   private:
-    typedef struct _DataNode
+    struct DataNode final
     {
       unsigned int              Len;
       void                      *Data;
-      _DataNode                 *Next;
-    } DataNode ;
+      DataNode                  *Next;
+    };
 
     unsigned int                m_Sanity ;
     unsigned int                m_Count ;
     unsigned int                m_ID ;
     DataNode                    *m_First ;
     DataNode                    *m_Last ;
-    boost::mutex                m_EventMutex ;
-    boost::condition            m_Event ;
+    std::mutex                  m_EventMutex ;
+    std::condition_variable     m_Event ;
 
     static unsigned int         QueueID ;
 } ;
@@ -109,7 +112,7 @@ SysQNode::~SysQNode ()
 {
   assert (m_Sanity == 0xEDFEEFBE) ;
   m_Event.notify_all ();
-  boost::mutex::scoped_lock lock (m_EventMutex);
+  std::lock_guard<std::mutex> lock (m_EventMutex);
   if (m_Count > 0)
   {
     DataNode *current = m_First ;
@@ -137,7 +140,7 @@ int SysQNode::Send (void *pData, int Len)
     dNode->Len = Len ;
     dNode->Next = nullptr;
 
-    boost::mutex::scoped_lock lock (m_EventMutex) ;
+    std::lock_guard<std::mutex> lock (m_EventMutex) ;
 
     if (m_Last != nullptr)
       m_Last->Next = dNode ;
@@ -155,7 +158,7 @@ int SysQNode::Send (void *pData, int Len)
 
 void *SysQNode::Receive (int *pLen, bool Blocking)
 {
-  boost::mutex::scoped_lock lock (m_EventMutex);
+  std::unique_lock<std::mutex> lock (m_EventMutex);
 
   assert (m_Sanity == 0xEDFEEFBE) ;
   if (m_Sanity != 0xEDFEEFBE)
@@ -167,11 +170,7 @@ void *SysQNode::Receive (int *pLen, bool Blocking)
       return nullptr;
 
     // TODO: have a shorter wait but loop, and check for system shutdown
-    // TODO FIXME - boost::xtime has been deprecated since boost 1.34.
-    boost::xtime t;
-    boost::xtime_get (&t, POV_TIME_UTC);
-    t.nsec += 50000000 ;
-    m_Event.timed_wait (lock, t);
+    m_Event.wait_for (lock, std::chrono::milliseconds(50));
 
     if (m_Count == 0)
       return nullptr;
@@ -253,3 +252,4 @@ POVMS_Sys_Thread_Type POVMS_GetCurrentThread (void)
 }
 
 }
+// end of namespace vfe

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,6 +39,14 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/scene/object.h"
 #include "core/shape/uvmeshable.h"
 
@@ -64,7 +72,7 @@ namespace pov
 ///
 //******************************************************************************
 
-class Disc : public ObjectBase, public UVMeshable
+class Disc final : public ObjectBase, public UVMeshable
 {
     public:
         Vector3d center;  ///< Center of the disc.
@@ -75,26 +83,26 @@ class Disc : public ObjectBase, public UVMeshable
         Vector3d uref;    ///< direction for the origin of u in uvmapping
 
         Disc();
-        virtual ~Disc();
+        virtual ~Disc() override;
 
-        virtual ObjectPtr Copy();
+        virtual ObjectPtr Copy() override;
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-        virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
-        virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
-        virtual void Translate(const Vector3d&, const TRANSFORM *);
-        virtual void Rotate(const Vector3d&, const TRANSFORM *);
-        virtual void Scale(const Vector3d&, const TRANSFORM *);
-        virtual void Transform(const TRANSFORM *);
-        virtual void Compute_BBox();
+        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) override;
+        virtual bool Inside(const Vector3d&, TraceThreadData *) const override;
+        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const override;
+        virtual void UVCoord(Vector2d&, const Intersection *) const override;
+        virtual void Translate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Rotate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Scale(const Vector3d&, const TRANSFORM *) override;
+        virtual void Transform(const TRANSFORM *) override;
+        virtual void Compute_BBox() override;
 
         void Compute_Disc();
 
-        virtual void evalVertex( Vector3d& r, const DBL u, const DBL v )const;
-        virtual void evalNormal( Vector3d& r, const DBL u, const DBL v )const;
-        virtual void minUV( Vector2d& r )const;
-        virtual void maxUV( Vector2d& r )const;
+        virtual void evalVertex( Vector3d& r, const DBL u, const DBL v )const override;
+        virtual void evalNormal( Vector3d& r, const DBL u, const DBL v )const override;
+        virtual void minUV( Vector2d& r )const override;
+        virtual void maxUV( Vector2d& r )const override;
 
     protected:
         bool Intersect(const BasicRay& ray, DBL *Depth, DBL&u, DBL&v) const;
@@ -105,5 +113,6 @@ class Disc : public ObjectBase, public UVMeshable
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_DISC_H

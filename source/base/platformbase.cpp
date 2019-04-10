@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,8 +36,14 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/platformbase.h"
 
-// POV-Ray base header files
-#include "base/types.h"
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+#include "base/filesystem.h"
+#include "base/povassert.h"
+#include "base/stringutilities.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -46,6 +52,23 @@ namespace pov_base
 {
 
 //******************************************************************************
+
+PlatformBase::PlatformBase()
+{
+    POV_ASSERT(self == nullptr);
+    self = this;
+};
+
+PlatformBase::~PlatformBase()
+{
+    self = nullptr;
+};
+
+PlatformBase& PlatformBase::GetInstance()
+{
+    POV_ASSERT(self != nullptr);
+    return *self;
+};
 
 /// Platform specific function interface self reference pointer
 PlatformBase *PlatformBase::self = nullptr;
@@ -62,7 +85,7 @@ DefaultPlatformBase::~DefaultPlatformBase()
 
 UCS2String DefaultPlatformBase::GetTemporaryPath()
 {
-    return ASCIItoUCS2String("/tmp/");
+    return u"/tmp/";
 }
 
 UCS2String DefaultPlatformBase::CreateTemporaryFile()
@@ -77,12 +100,12 @@ UCS2String DefaultPlatformBase::CreateTemporaryFile()
     if (f != nullptr)
         fclose(f);
 
-    return UCS2String(ASCIItoUCS2String(buffer));
+    return ASCIItoUCS2String(buffer);
 }
 
 void DefaultPlatformBase::DeleteTemporaryFile(const UCS2String& filename)
 {
-    remove(UCS2toASCIIString(filename).c_str());
+    (void)pov_base::Filesystem::DeleteFile(filename);
 }
 
 bool DefaultPlatformBase::ReadFileFromURL(OStream *, const UCS2String&, const UCS2String&)
@@ -92,12 +115,7 @@ bool DefaultPlatformBase::ReadFileFromURL(OStream *, const UCS2String&, const UC
 
 FILE* DefaultPlatformBase::OpenLocalFile(const UCS2String& name, const char *mode)
 {
-    return fopen(UCS2toASCIIString(UCS2String(name)).c_str(), mode);
-}
-
-void DefaultPlatformBase::DeleteLocalFile(const UCS2String& name)
-{
-    POV_DELETE_FILE(UCS2toASCIIString(UCS2String(name)).c_str());
+    return fopen(UCS2toSysString(name).c_str(), mode);
 }
 
 bool DefaultPlatformBase::AllowLocalFileAccess(const UCS2String& name, const unsigned int fileType, bool write)
@@ -108,3 +126,4 @@ bool DefaultPlatformBase::AllowLocalFileAccess(const UCS2String& name, const uns
 //******************************************************************************
 
 }
+// end of namespace pov_base

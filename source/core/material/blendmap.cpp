@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,8 +36,14 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/material/blendmap.h"
 
-#include <algorithm>
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
 
+// POV-Ray header files (base module)
+#include "base/povassert.h"
+
+// POV-Ray header files (core module)
 #include "core/material/normal.h"
 #include "core/material/pigment.h"
 #include "core/material/texture.h"
@@ -159,17 +165,17 @@ TextureBlendMapPtr Create_Blend_Map<TextureBlendMap> (BlendMapTypeId type)
 ******************************************************************************/
 
 template<typename MAP_T>
-shared_ptr<MAP_T> Copy_Blend_Map (shared_ptr<MAP_T>& Old)
+std::shared_ptr<MAP_T> Copy_Blend_Map (const std::shared_ptr<MAP_T>& Old)
 {
-    return shared_ptr<MAP_T>(Old);
+    return std::shared_ptr<MAP_T>(Old);
 }
 
-template ColourBlendMapPtr          Copy_Blend_Map (ColourBlendMapPtr& Old);
-template PigmentBlendMapPtr         Copy_Blend_Map (PigmentBlendMapPtr& Old);
-template GenericNormalBlendMapPtr   Copy_Blend_Map (GenericNormalBlendMapPtr& Old);
-template SlopeBlendMapPtr           Copy_Blend_Map (SlopeBlendMapPtr& Old);
-template NormalBlendMapPtr          Copy_Blend_Map (NormalBlendMapPtr& Old);
-template TextureBlendMapPtr         Copy_Blend_Map (TextureBlendMapPtr& Old);
+template ColourBlendMapPtr          Copy_Blend_Map (const ColourBlendMapPtr& Old);
+template PigmentBlendMapPtr         Copy_Blend_Map (const PigmentBlendMapPtr& Old);
+template GenericNormalBlendMapPtr   Copy_Blend_Map (const GenericNormalBlendMapPtr& Old);
+template SlopeBlendMapPtr           Copy_Blend_Map (const SlopeBlendMapPtr& Old);
+template NormalBlendMapPtr          Copy_Blend_Map (const NormalBlendMapPtr& Old);
+template TextureBlendMapPtr         Copy_Blend_Map (const TextureBlendMapPtr& Old);
 
 
 /*****************************************************************************
@@ -221,3 +227,4 @@ template void BlendMap<NormalBlendMapData>::Set(const Vector& data);
 template void BlendMap<TexturePtr>::Set(const Vector& data);
 
 }
+// end of namespace pov

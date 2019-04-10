@@ -16,7 +16,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -47,7 +47,17 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
-#include "base/types.h"
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <vector>
+
+// POV-Ray header files (base module)
+#include "base/base_fwd.h"
+
+// POV-Ray header files (core module)
+//  (none at the moment)
 
 namespace pov
 {
@@ -61,7 +71,7 @@ using namespace pov_base;
 ///
 /// @{
 
-struct SplineEntry
+struct SplineEntry final
 {
     DBL par;      // Parameter
     EXPRESS vec;  // Value at the parameter
@@ -90,11 +100,11 @@ struct SplineFreedom
   SplineFreedom():freedom_degree(0.0){}
 };
 
-typedef vector<SplineEntry> SplineEntryList;
-typedef vector<SplineCoeff> SplineCoeffList;
-typedef vector<SplineCoeffFour> SplineCoeffFourList;
-typedef vector<SplineTcbParam> SplineTcbParamList;
-typedef vector<SplineFreedom> SplineFreedomList;
+typedef std::vector<SplineEntry> SplineEntryList;
+typedef std::vector<SplineCoeff> SplineCoeffList;
+typedef std::vector<SplineCoeffFour> SplineCoeffFourList;
+typedef std::vector<SplineTcbParam> SplineTcbParamList;
+typedef std::vector<SplineFreedom> SplineFreedomList;
 
 typedef int SplineRefCount;
 
@@ -123,47 +133,47 @@ struct GenericSpline
     virtual Extension Extended()const{ return Extension::None;}
 };
 
-struct LinearSpline : public GenericSpline
+struct LinearSpline final : public GenericSpline
 {
     LinearSpline();
     LinearSpline(const GenericSpline& o);
-    virtual void Get(DBL p, EXPRESS& v);
-    virtual GenericSpline* Clone() const { return new LinearSpline(*this); }
+    virtual void Get(DBL p, EXPRESS& v) override;
+    virtual GenericSpline* Clone() const override { return new LinearSpline(*this); }
 };
 
-struct QuadraticSpline : public GenericSpline
+struct QuadraticSpline final : public GenericSpline
 {
     QuadraticSpline();
     QuadraticSpline(const GenericSpline& o);
-    virtual void Get(DBL p, EXPRESS& v);
-    virtual GenericSpline* Clone() const { return new QuadraticSpline(*this); }
+    virtual void Get(DBL p, EXPRESS& v) override;
+    virtual GenericSpline* Clone() const override { return new QuadraticSpline(*this); }
 };
 
-struct NaturalSpline : public GenericSpline
+struct NaturalSpline final : public GenericSpline
 {
     NaturalSpline();
     NaturalSpline(const GenericSpline& o);
-    virtual void Get(DBL p, EXPRESS& v);
-    virtual GenericSpline* Clone() const { return new NaturalSpline(*this); }
+    virtual void Get(DBL p, EXPRESS& v) override;
+    virtual GenericSpline* Clone() const override { return new NaturalSpline(*this); }
 private:
     SplineCoeffList SplinePreComputed;
     void Precompute();
 };
 
-struct CatmullRomSpline : public GenericSpline
+struct CatmullRomSpline final : public GenericSpline
 {
     CatmullRomSpline();
     CatmullRomSpline(const GenericSpline& o);
-    virtual void Get(DBL p, EXPRESS& v);
-    virtual GenericSpline* Clone() const { return new CatmullRomSpline(*this); }
+    virtual void Get(DBL p, EXPRESS& v) override;
+    virtual GenericSpline* Clone() const override { return new CatmullRomSpline(*this); }
 };
 
 struct SorSpline: public GenericSpline
 {
     SorSpline();
     SorSpline(const GenericSpline& o);
-    virtual void Get(DBL p, EXPRESS& v);
-    virtual GenericSpline* Clone() const { return new SorSpline(*this); }
+    virtual void Get(DBL p, EXPRESS& v) override;
+    virtual GenericSpline* Clone() const override { return new SorSpline(*this); }
 private:
     SplineCoeffFourList SplinePreComputed;
     void Precompute();
@@ -174,8 +184,8 @@ struct AkimaSpline: public GenericSpline
 {
     AkimaSpline();
     AkimaSpline(const GenericSpline& o);
-    virtual void Get(DBL p, EXPRESS& v);
-    virtual GenericSpline* Clone() const { return new AkimaSpline(*this); }
+    virtual void Get(DBL p, EXPRESS& v) override;
+    virtual GenericSpline* Clone() const override { return new AkimaSpline(*this); }
 private:
     SplineCoeffFourList SplinePreComputed;
     void Precompute();
@@ -186,10 +196,10 @@ struct TcbSpline: public GenericSpline
 {
     TcbSpline();
     TcbSpline(const GenericSpline& o);
-    virtual void Get(DBL p, EXPRESS& v);
-    virtual GenericSpline* Clone() const { return new TcbSpline(*this); }
+    virtual void Get(DBL p, EXPRESS& v) override;
+    virtual GenericSpline* Clone() const override { return new TcbSpline(*this); }
     SplineTcbParamList in,out;
-    virtual Extension Extended()const{ return Extension::TCB;}
+    virtual Extension Extended()const override { return Extension::TCB;}
 private:
     SplineCoeffList SplinePreComputedIn;
     SplineCoeffList SplinePreComputedOut;
@@ -202,10 +212,10 @@ struct XSpline: public GenericSpline
 {
     XSpline();
     XSpline( const GenericSpline& o );
-    virtual void Get(DBL p, EXPRESS& v);
-    virtual GenericSpline* Clone() const =0;
+    virtual void Get(DBL p, EXPRESS& v) override;
+    virtual GenericSpline* Clone() const override =0;
     SplineFreedomList node;
-    virtual Extension Extended()const{ return Extension::Freedom;}
+    virtual Extension Extended()const override { return Extension::Freedom;}
 protected:
     virtual DBL interpolate(int i, int k, DBL p, int N)const=0;
 };
@@ -214,10 +224,10 @@ struct BasicXSpline: public GenericSpline
 {
     BasicXSpline();
     BasicXSpline( const GenericSpline& o );
-    virtual void Get(DBL p, EXPRESS& v);
-    virtual GenericSpline* Clone() const { return new BasicXSpline(*this); }
+    virtual void Get(DBL p, EXPRESS& v) override;
+    virtual GenericSpline* Clone() const override { return new BasicXSpline(*this); }
     SplineFreedom freedom;
-    virtual Extension Extended()const{ return Extension::GlobalFreedom;}
+    virtual Extension Extended()const override { return Extension::GlobalFreedom;}
 private:
     DBL interpolate( int i, int k, DBL p, DBL fd)const;
 
@@ -227,9 +237,9 @@ struct ExtendedXSpline: public XSpline
 {
     ExtendedXSpline();
     ExtendedXSpline( const GenericSpline& o );
-    virtual GenericSpline* Clone() const { return new ExtendedXSpline(*this); }
+    virtual GenericSpline* Clone() const override { return new ExtendedXSpline(*this); }
 protected:
-    virtual DBL interpolate(int i, int k, DBL p, int N)const;
+    virtual DBL interpolate(int i, int k, DBL p, int N)const override;
 };
 
 
@@ -237,9 +247,9 @@ struct GeneralXSpline: public XSpline
 {
     GeneralXSpline();
     GeneralXSpline( const GenericSpline& o );
-    virtual GenericSpline* Clone() const { return new GeneralXSpline(*this); }
+    virtual GenericSpline* Clone() const override { return new GeneralXSpline(*this); }
 protected:
-    virtual DBL interpolate(int i, int k, DBL p, int N)const;
+    virtual DBL interpolate(int i, int k, DBL p, int N)const override;
 
 };
 // TODO FIXME - Some of the following are higher-level functions and should be moved to the parser, others should be made part of the class.
@@ -258,5 +268,6 @@ DBL Get_Spline_Val(GenericSpline* sp, DBL p, EXPRESS& v, int *Terms);
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_SPLINE_H

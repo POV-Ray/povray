@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,13 +39,15 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
 
-// Standard C++ header files
-#include <string>
+// C++ variants of C standard header files
+#include <cstdio>
 
-// POV-Ray base header files
-#include "base/fileinputoutput.h"
-#include "base/stringutilities.h"
-#include "base/types.h"
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+#include "base/fileinputoutput_fwd.h"
+#include "base/stringtypes.h"
 
 namespace pov_base
 {
@@ -58,8 +60,6 @@ namespace pov_base
 ///
 /// @{
 
-#define POV_PLATFORM_BASE PlatformBase::GetPlatformBaseReference()
-
 /// Abstract class defining an interface to platform-specific services.
 ///
 /// @note
@@ -69,8 +69,8 @@ class PlatformBase
 {
 public:
 
-    PlatformBase() { POV_ASSERT(!self); self = this; };
-    virtual ~PlatformBase() { self = nullptr; };
+    PlatformBase();
+    virtual ~PlatformBase();
 
     virtual UCS2String GetTemporaryPath() = 0;
     virtual UCS2String CreateTemporaryFile() = 0;
@@ -84,12 +84,6 @@ public:
     /// except that the file name may be a Unicode string.
     ///
     virtual FILE* OpenLocalFile (const UCS2String& name, const char *mode) = 0;
-
-    /// Delete a file.
-    ///
-    /// This method removes a file from the local file system.
-    ///
-    virtual void DeleteLocalFile (const UCS2String& name) = 0;
 
     /// Check whether a file is allowed to be accessed.
     ///
@@ -108,7 +102,7 @@ public:
     ///
     virtual bool AllowLocalFileAccess (const UCS2String& name, const unsigned int fileType, bool write) = 0;
 
-    static PlatformBase& GetInstance() { return *self; };
+    static PlatformBase& GetInstance();
 
 private:
 
@@ -117,29 +111,25 @@ private:
 
 /// Default implementation of @ref PlatformBase.
 ///
-class DefaultPlatformBase : public PlatformBase
+class DefaultPlatformBase final : public PlatformBase
 {
 public:
     DefaultPlatformBase();
-    ~DefaultPlatformBase();
+    virtual ~DefaultPlatformBase() override;
 
-    virtual UCS2String GetTemporaryPath();
-    virtual UCS2String CreateTemporaryFile();
-    virtual void DeleteTemporaryFile(const UCS2String& filename);
+    virtual UCS2String GetTemporaryPath() override;
+    virtual UCS2String CreateTemporaryFile() override;
+    virtual void DeleteTemporaryFile(const UCS2String& filename) override;
 
-    virtual bool ReadFileFromURL(OStream *file, const UCS2String& url, const UCS2String& referrer = UCS2String());
-
-    /// @note
-    ///     This implementation only supports ASCII filenames.
-    virtual FILE* OpenLocalFile(const UCS2String& name, const char *mode);
+    virtual bool ReadFileFromURL(OStream *file, const UCS2String& url, const UCS2String& referrer = UCS2String()) override;
 
     /// @note
     ///     This implementation only supports ASCII filenames.
-    virtual void DeleteLocalFile(const UCS2String& name);
+    virtual FILE* OpenLocalFile(const UCS2String& name, const char *mode) override;
 
     /// @note
     ///     This implementation grants unrestricted access to any file.
-    virtual bool AllowLocalFileAccess(const UCS2String& name, const unsigned int fileType, bool write);
+    virtual bool AllowLocalFileAccess(const UCS2String& name, const unsigned int fileType, bool write) override;
 };
 
 /// @}
@@ -147,5 +137,6 @@ public:
 //##############################################################################
 
 }
+// end of namespace pov_base
 
 #endif // POVRAY_BASE_PLATFORMBASE_H

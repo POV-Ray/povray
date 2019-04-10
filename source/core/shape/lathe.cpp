@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -121,10 +121,17 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/lathe.h"
 
-#include <algorithm>
+// C++ variants of C standard header files
+//  (none at the moment)
 
+// C++ standard header files
+#include <algorithm>
+#include <vector>
+
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
 
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/bounding/boundingcylinder.h"
 #include "core/math/matrix.h"
@@ -132,12 +139,16 @@
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
 #include "core/shape/torus.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov
 {
+
+using std::min;
+using std::max;
 
 /*****************************************************************************
 * Local preprocessor defines
@@ -280,9 +291,9 @@ bool Lathe::Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData 
         return false;
 
     // Intersect all cylindrical bounds.
-    vector<BCYL_INT>& intervals = Thread->BCyl_Intervals;
-    vector<BCYL_INT>& rint = Thread->BCyl_RInt;
-    vector<BCYL_INT>& hint = Thread->BCyl_HInt;
+    std::vector<BCYL_INT>& intervals = Thread->BCyl_Intervals;
+    std::vector<BCYL_INT>& rint = Thread->BCyl_RInt;
+    std::vector<BCYL_INT>& hint = Thread->BCyl_HInt;
 
     if((cnt = Intersect_BCyl(Spline->BCyl, intervals, rint, hint, P, D)) == 0)
         return false;
@@ -948,7 +959,7 @@ void Lathe::Compute_BBox()
 *
 ******************************************************************************/
 
-void Lathe::Compute_Lathe(Vector2d *P, TraceThreadData *Thread)
+void Lathe::Compute_Lathe(Vector2d *P, RenderStatistics& stats)
 {
     int i, i1, i2, i3, n, segment, number_of_segments;
     DBL x[4], y[4];
@@ -1153,7 +1164,7 @@ void Lathe::Compute_Lathe(Vector2d *P, TraceThreadData *Thread)
             c[1] = 2.0 * B[X];
             c[2] = C[X];
 
-            n = Solve_Polynomial(2, c, r, false, 0.0, Thread->Stats());
+            n = Solve_Polynomial(2, c, r, false, 0.0, stats);
 
             while (n--)
             {
@@ -1167,7 +1178,7 @@ void Lathe::Compute_Lathe(Vector2d *P, TraceThreadData *Thread)
             c[1] = 2.0 * B[Y];
             c[2] = C[Y];
 
-            n = Solve_Polynomial(2, c, r, false, 0.0, Thread->Stats());
+            n = Solve_Polynomial(2, c, r, false, 0.0, stats);
 
             while (n--)
             {
@@ -1330,7 +1341,7 @@ bool Lathe::test_hit(const BasicRay &ray, IStack& Depth_Stack, DBL d, DBL w, int
 *
 ******************************************************************************/
 
-void Lathe::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *) const
+void Lathe::UVCoord(Vector2d& Result, const Intersection *Inter) const
 {
     DBL len, theta;
     Vector3d P;
@@ -1377,3 +1388,4 @@ void Lathe::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData
 }
 
 }
+// end of namespace pov

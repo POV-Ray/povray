@@ -14,7 +14,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -42,12 +42,23 @@
 #ifndef POVRAY_BACKEND_POVRAY_H
 #define POVRAY_BACKEND_POVRAY_H
 
-#include <boost/thread.hpp>
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "backend/configbackend.h"
+
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <thread>
+
+// Boost header files
 #include <boost/function.hpp>
 
+// POV-Ray header files (base module)
 #include "base/version_info.h"
 
-#include "povms/povmscpp.h"
+// POV-Ray header files (backend module)
+//  (none at the moment)
 
 /**
  *  This function does essential initialisation that is required before
@@ -56,7 +67,7 @@
  *  @param  addr  If not `nullptr`, backend address on return.
  *  @return       Pointer to the thread resource created.
  */
-boost::thread *povray_init(const boost::function0<void>& threadExit, POVMSAddress *addr = nullptr);
+std::thread *povray_init(const boost::function0<void>& threadExit, POVMSAddress *addr = nullptr);
 
 /**
  *  This function shuts down the main render thread and after it has

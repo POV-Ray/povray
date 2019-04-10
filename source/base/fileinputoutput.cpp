@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,23 +36,30 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/fileinputoutput.h"
 
-// C++ variants of standard C header files
+// C++ variants of C standard header files
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
 
-// Standard C++ header files
-#include <memory>
+// C++ standard header files
+#include <algorithm>
+#include <string>
 
-// POV-Ray base header files
+// POV-Ray header files (base module)
+#include "base/path.h"
 #include "base/platformbase.h"
+#include "base/povassert.h"
 #include "base/pov_err.h"
+#include "base/stringutilities.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov_base
 {
+
+using std::min;
+using std::max;
 
 IOBase::IOBase() : filename(), fail(true)
 {
@@ -80,12 +87,12 @@ IStream::~IStream()
 
 IFileStream::IFileStream(const UCS2String& name) : IStream(name), f(nullptr)
 {
-    if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdin") == 0)
+    if(pov_stricmp(UCS2toSysString(name).c_str(), "stdin") == 0)
     {
         f = stdin;
     }
-    else if((pov_stricmp(UCS2toASCIIString(name).c_str(), "stdout") == 0) ||
-            (pov_stricmp(UCS2toASCIIString(name).c_str(), "stderr") == 0))
+    else if((pov_stricmp(UCS2toSysString(name).c_str(), "stdout") == 0) ||
+            (pov_stricmp(UCS2toSysString(name).c_str(), "stderr") == 0))
     {
         f = nullptr;
     }
@@ -119,16 +126,27 @@ bool IFileStream::UnRead_Byte(int c)
 // However, the macintosh code seems to need it to be called seekg, so it is ...
 bool IFileStream::seekg(POV_OFF_T pos, unsigned int whence)
 {
-    if(!fail)
-        fail = fseek(f, pos, whence) != 0;
+    fail = fseek(f, pos, whence) != 0;
     return !fail;
 }
 
-bool IFileStream::read(void *buffer, size_t count)
+bool IFileStream::read(void *buffer, size_t exactCount)
 {
-    if(!fail && count > 0)
-        fail = fread(buffer, count, 1, f) != 1;
+    if(!fail && exactCount > 0)
+        fail = fread(buffer, exactCount, 1, f) != 1;
     return !fail;
+}
+
+size_t IFileStream::readUpTo(void *buffer, size_t maxCount)
+{
+    if (!fail && maxCount > 0)
+    {
+        size_t count = fread(buffer, 1, maxCount, f);
+        fail = (count == 0);
+        return count;
+    }
+    else
+        return 0;
 }
 
 int IFileStream::Read_Byte()
@@ -175,7 +193,7 @@ bool IFileStream::getline(char *s, size_t buflen)
 }
 
 IMemStream::IMemStream(const unsigned char* data, size_t size, const char* formalName, POV_OFF_T formalStart) :
-    IStream(ASCIItoUCS2String(formalName)), size(size), pos(0), formalStart(formalStart), start(data), mUngetBuffer(EOF)
+    IStream(SysToUCS2String(formalName)), size(size), pos(0), formalStart(formalStart), start(data), mUngetBuffer(EOF)
 {
     fail = false;
 }
@@ -208,18 +226,18 @@ OStream::OStream(const UCS2String& name, unsigned int Flags) : IOBase(name), f(n
         mode = "r+b";
     }
 
-    if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdin") == 0)
+    if(pov_stricmp(UCS2toSysString(name).c_str(), "stdin") == 0)
     {
         f = nullptr;
     }
-    else if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdout") == 0)
+    else if(pov_stricmp(UCS2toSysString(name).c_str(), "stdout") == 0)
     {
         if((Flags & append) != 0)
             f = nullptr;
         else
             f = stdout;
     }
-    else if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stderr") == 0)
+    else if(pov_stricmp(UCS2toSysString(name).c_str(), "stderr") == 0)
     {
         if((Flags & append) != 0)
             f = nullptr;
@@ -312,8 +330,8 @@ IStream *NewIStream(const Path& p, unsigned int stype)
 {
     if (!PlatformBase::GetInstance().AllowLocalFileAccess(p(), stype, false))
     {
-        string str ("IO Restrictions prohibit read access to '") ;
-        str += UCS2toASCIIString(p());
+        std::string str ("IO Restrictions prohibit read access to '") ;
+        str += UCS2toSysString(p());
         str += "'";
         throw POV_EXCEPTION(kCannotOpenFileErr, str);
     }
@@ -330,8 +348,8 @@ OStream *NewOStream(const Path& p, unsigned int stype, bool sappend)
 
     if (!PlatformBase::GetInstance().AllowLocalFileAccess(p(), stype, true))
     {
-        string str ("IO Restrictions prohibit write access to '") ;
-        str += UCS2toASCIIString(p());
+        std::string str ("IO Restrictions prohibit write access to '") ;
+        str += UCS2toSysString(p());
         str += "'";
         throw POV_EXCEPTION(kCannotOpenFileErr, str);
     }
@@ -361,7 +379,7 @@ UCS2String GetFileName(const Path& p)
 
 bool CheckIfFileExists(const Path& p)
 {
-    FILE *tempf = PlatformBase::GetInstance().OpenLocalFile (p().c_str(), "r");
+    FILE *tempf = PlatformBase::GetInstance().OpenLocalFile (p(), "r");
 
     if (tempf != nullptr)
         fclose(tempf);
@@ -373,7 +391,7 @@ bool CheckIfFileExists(const Path& p)
 
 POV_OFF_T GetFileLength(const Path& p)
 {
-    FILE *tempf = PlatformBase::GetInstance().OpenLocalFile (p().c_str(), "rb");
+    FILE *tempf = PlatformBase::GetInstance().OpenLocalFile (p(), "rb");
     POV_OFF_T result = -1;
 
     if (tempf != nullptr)
@@ -386,7 +404,7 @@ POV_OFF_T GetFileLength(const Path& p)
     return result;
 }
 
-bool IMemStream::read(void *buffer, size_t maxCount)
+bool IMemStream::read(void *buffer, size_t exactCount)
 {
     size_t count = 0;
 
@@ -395,7 +413,7 @@ bool IMemStream::read(void *buffer, size_t maxCount)
 
     unsigned char* p = reinterpret_cast<unsigned char*>(buffer);
 
-    if (maxCount == 0)
+    if (exactCount == 0)
         return true;
 
     // read from unget buffer first
@@ -403,19 +421,49 @@ bool IMemStream::read(void *buffer, size_t maxCount)
     {
         *(p++) = (unsigned char)mUngetBuffer;
         mUngetBuffer = EOF;
-        if (++count == maxCount)
+        if (++count == exactCount)
             return true;
     }
 
-    size_t copyFromBuffer = min(maxCount-count, size-pos);
+    size_t copyFromBuffer = min(exactCount-count, size-pos);
     memcpy(p, &(start[pos]), copyFromBuffer);
     count += copyFromBuffer;
     pos += copyFromBuffer;
-    if (count == maxCount)
+    if (count == exactCount)
         return true;
 
     fail = true;
     return false;
+}
+
+size_t IMemStream::readUpTo(void *buffer, size_t maxCount)
+{
+    size_t count = 0;
+
+    if (fail)
+        return count;
+
+    unsigned char* p = reinterpret_cast<unsigned char*>(buffer);
+
+    if (maxCount == 0)
+        return count;
+
+    // read from unget buffer first
+    if (mUngetBuffer != EOF)
+    {
+        *(p++) = (unsigned char)mUngetBuffer;
+        mUngetBuffer = EOF;
+        if (++count == maxCount)
+            return count;
+    }
+
+    size_t copyFromBuffer = min(maxCount - count, size - pos);
+    memcpy(p, &(start[pos]), copyFromBuffer);
+    count += copyFromBuffer;
+    pos += copyFromBuffer;
+
+    fail = (count == 0);
+    return count;
 }
 
 int IMemStream::Read_Byte()
@@ -470,39 +518,38 @@ POV_OFF_T IMemStream::tellg() const
 
 bool IMemStream::seekg(POV_OFF_T posi, unsigned int whence)
 {
-    if(!fail)
-    {
-        // Any seek operation renders the unget buffer's content obsolete.
-        mUngetBuffer = EOF;
+    // Any seek operation renders the end-of-file status and unget buffer's content obsolete.
+    fail = false;
+    mUngetBuffer = EOF;
 
-        switch(whence)
-        {
-            case seek_set:
-                if (posi < formalStart)
-                    fail = true;
-                else if (posi - formalStart <= size)
-                    pos = posi - formalStart;
-                else
-                    fail = true;
-                break;
-            case seek_cur:
-                if ((posi <= size) && (pos <= size-posi))
-                    pos += posi;
-                else
-                    fail = true;
-                break;
-            case seek_end:
-                if (posi <= size)
-                    pos = size - posi;
-                else
-                    fail = true;
-                break;
-            default:
-                POV_ASSERT(false);
-                break;
-        }
+    switch(whence)
+    {
+        case seek_set:
+            if (posi < formalStart)
+                fail = true;
+            else if (posi - formalStart <= size)
+                pos = posi - formalStart;
+            else
+                fail = true;
+            break;
+        case seek_cur:
+            if ((posi <= size) && (pos <= size-posi))
+                pos += posi;
+            else
+                fail = true;
+            break;
+        case seek_end:
+            if (posi <= size)
+                pos = size - posi;
+            else
+                fail = true;
+            break;
+        default:
+            POV_ASSERT(false);
+            break;
     }
     return !fail;
 }
 
 }
+// end of namespace pov_base

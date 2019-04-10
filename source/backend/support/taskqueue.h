@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,19 +36,37 @@
 #ifndef POVRAY_BACKEND_TASKQUEUE_H
 #define POVRAY_BACKEND_TASKQUEUE_H
 
-#include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "backend/configbackend.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <condition_variable>
+#include <list>
+#include <memory>
+#include <mutex>
+#include <queue>
+
+// Boost header files
+#include <boost/function.hpp>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (POVMS module)
 #include "povms/povmscpp.h"
 
+// POV-Ray header files (backend module)
 #include "backend/support/task.h"
 
 namespace pov
 {
 
-class TaskQueue
+class TaskQueue final
 {
-        class TaskEntry
+        class TaskEntry final
         {
             public:
                 enum EntryType
@@ -60,19 +78,19 @@ class TaskQueue
                 };
 
                 TaskEntry(EntryType et) : entryType(et) { }
-                TaskEntry(shared_ptr<Task> rt) : entryType(kTask), task(rt) { }
+                TaskEntry(std::shared_ptr<Task> rt) : entryType(kTask), task(rt) { }
                 TaskEntry(POVMS_Message& m) : entryType(kMessage), msg(m) { }
                 TaskEntry(const boost::function1<void, TaskQueue&>& f) : entryType(kFunction), fn(f) { }
                 ~TaskEntry() { }
 
-                shared_ptr<Task> GetTask() { return task; }
+                std::shared_ptr<Task> GetTask() { return task; }
                 POVMS_Message& GetMessage() { return msg; }
                 boost::function1<void, TaskQueue&>& GetFunction() { return fn; }
 
                 EntryType GetEntryType() { return entryType; }
             private:
                 EntryType entryType;
-                shared_ptr<Task> task;
+                std::shared_ptr<Task> task;
                 POVMS_Message msg;
                 boost::function1<void, TaskQueue&> fn;
         };
@@ -103,20 +121,19 @@ class TaskQueue
         /// queued task list
         std::queue<TaskEntry> queuedTasks;
         /// active task list
-        list<TaskEntry> activeTasks;
+        std::list<TaskEntry> activeTasks;
         /// queue mutex
-        boost::recursive_mutex queueMutex;
+        std::recursive_mutex queueMutex;
         /// failed code
         int failed;
         /// wait for data in queue or related operation to be processed
-        boost::condition processCondition;
-        /// not available
-        TaskQueue(const TaskQueue&);
+        std::condition_variable_any processCondition;
 
-        /// not available
-        TaskQueue& operator=(const TaskQueue&);
+        TaskQueue(const TaskQueue&) = delete;
+        TaskQueue& operator=(const TaskQueue&) = delete;
 };
 
 }
+// end of namespace pov
 
 #endif // POVRAY_BACKEND_TASKQUEUE_H

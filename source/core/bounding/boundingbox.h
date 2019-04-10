@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,9 +38,21 @@
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
+#include "core/bounding/boundingbox_fwd.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <vector>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/coretypes.h"
 #include "core/math/matrix.h"
+#include "core/render/ray_fwd.h"
 
 namespace pov
 {
@@ -52,11 +64,8 @@ namespace pov
 ///
 /// @{
 
-class Intersection;
-class Ray;
 struct RayObjectCondition;
 class RenderStatistics;
-class TraceThreadData;
 
 /*****************************************************************************
 * Global preprocessor defines
@@ -82,7 +91,7 @@ typedef GenericVector3d<BBoxScalar> BBoxVector3d;
 ///             bounding data in min/max format rather than lowerLeft/size, and making sure
 ///             high-precision values are rounded towards positive/negative infinity as appropriate.
 ///
-struct BoundingBox
+struct BoundingBox final
 {
     BBoxVector3d lowerLeft;
     BBoxVector3d size;
@@ -154,19 +163,15 @@ inline bool Inside_BBox(const Vector3d& point, const BoundingBox& bbox)
 
 /// Structure holding bounding box data in min/max format.
 ///
-struct MinMaxBoundingBox
+struct MinMaxBoundingBox final
 {
     BBoxVector3d pmin;
     BBoxVector3d pmax;
 };
 
-typedef struct BBox_Tree_Struct BBOX_TREE;
-typedef BBOX_TREE* BBoxTreePtr;
-typedef const BBOX_TREE* ConstBBoxTreePtr;
-
-struct BBox_Tree_Struct
+struct BBox_Tree_Struct final
 {
-    BBOX_TREE **Node; // If node: children; if leaf: element
+    BBox_Tree_Struct **Node; // If node: children; if leaf: element
     BoundingBox BBox; // Bounding box of this node
     short Entries;    // Number of sub-nodes in this node
     bool Infinite;    // Flag if node is infinite
@@ -174,7 +179,7 @@ struct BBox_Tree_Struct
 
 typedef bool VECTORB[3];
 
-class Rayinfo
+class Rayinfo final
 {
     public:
         BBoxVector3d origin;        ///< Ray's origin.
@@ -241,7 +246,7 @@ enum BBoxDirection
 ///         `std::priority_queue` becase we make use of Clear(), an operation
 ///         which `std::priority_queue` does not support.
 ///
-class BBoxPriorityQueue
+class BBoxPriorityQueue final
 {
     public:
 
@@ -255,13 +260,13 @@ class BBoxPriorityQueue
 
     protected:
 
-        struct Qelem
+        struct Qelem final
         {
             DBL depth;
             ConstBBoxTreePtr node;
         };
 
-        vector<Qelem> mQueue;
+        std::vector<Qelem> mQueue;
 };
 
 
@@ -270,7 +275,7 @@ class BBoxPriorityQueue
 ******************************************************************************/
 
 void Build_BBox_Tree(BBOX_TREE **Root, size_t numOfFiniteObjects, BBOX_TREE **&Finite, size_t numOfInfiniteObjects, BBOX_TREE **Infinite, size_t& maxfinitecount);
-void Build_Bounding_Slabs(BBOX_TREE **Root, vector<ObjectPtr>& objects, unsigned int& numberOfFiniteObjects, unsigned int& numberOfInfiniteObjects, unsigned int& numberOfLightSources);
+void Build_Bounding_Slabs(BBOX_TREE **Root, std::vector<ObjectPtr>& objects, unsigned int& numberOfFiniteObjects, unsigned int& numberOfInfiniteObjects, unsigned int& numberOfLightSources);
 
 void Recompute_BBox(BoundingBox *bbox, const TRANSFORM *trans);
 bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const Ray& ray, Intersection *Best_Intersection, TraceThreadData *Thread);
@@ -294,5 +299,6 @@ inline void BOUNDS_VOLUME(DBL& a, const BoundingBox& b)
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_BOUNDINGBOX_H

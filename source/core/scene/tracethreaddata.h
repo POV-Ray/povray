@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,18 +39,26 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
-#include <vector>
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <memory>
 #include <stack>
+#include <vector>
 
+// POV-Ray header files (base module)
 #include "base/types.h"
+#include "base/colour.h"
 
+// POV-Ray header files (core module)
 #include "core/coretypes.h"
 #include "core/bounding/boundingcylinder.h"
-#include "core/bounding/bsptree.h"
-#include "core/material/pattern.h"
-#include "core/math/randomsequence.h"
-#include "core/shape/mesh.h"
-#include "core/support/statistics.h"
+#include "core/math/randomsequence_fwd.h"
+#include "core/math/vector.h"
+#include "core/scene/scenedata_fwd.h"
+#include "core/support/cracklecache_fwd.h"
+#include "core/support/statistics_fwd.h"
 
 namespace pov
 {
@@ -63,48 +71,39 @@ namespace pov
 
 using namespace pov_base;
 
-class SceneData;
-struct ISO_ThreadData;
-
 class PhotonMap;
 struct Blob_Interval_Struct;
 
 /// Class holding parser thread specific data.
 class TraceThreadData : public ThreadData
 {
-        friend class Scene;
-        friend class Trace;
-        friend class View; // TODO FIXME - needed only to access TraceThreadData for CheckCameraHollowObject()
-
     public:
 
         /// Create thread local data.
         /// @param  sd      Scene data defining scene attributes.
         /// @param  seed    Seed for the stochastic random number generator;
         ///                 should be unique for each render.
-        TraceThreadData(shared_ptr<SceneData> sd, size_t seed);
+        TraceThreadData(std::shared_ptr<SceneData> sd, size_t seed);
 
         /// Destructor.
-        ~TraceThreadData();
+        virtual ~TraceThreadData() override;
 
         /// Get the statistics.
         /// @return     Reference to statistic counters.
-        RenderStatistics& Stats(void) { return renderStats; }
+        RenderStatistics& Stats(void) { return *mpRenderStats; }
 
         DBL *Fractal_IStack[4];
-        BBoxPriorityQueue Mesh_Queue;
         void **Blob_Queue;
         unsigned int Max_Blob_Queue_Size;
         DBL *Blob_Coefficients;
         Blob_Interval_Struct *Blob_Intervals;
         int Blob_Coefficient_Count;
         int Blob_Interval_Count;
-        ISO_ThreadData *isosurfaceData;     ///< @todo We may want to move this data block to the isosurface code as a local variable.
-        vector<BCYL_INT> BCyl_Intervals;
-        vector<BCYL_INT> BCyl_RInt;
-        vector<BCYL_INT> BCyl_HInt;
+        std::vector<BCYL_INT> BCyl_Intervals;
+        std::vector<BCYL_INT> BCyl_RInt;
+        std::vector<BCYL_INT> BCyl_HInt;
         IStackPool stackPool;
-        vector<GenericFunctionContextPtr> functionContextPool;
+        std::vector<GenericFunctionContextPtr> functionContextPool;
         int Facets_Last_Seed;
         int Facets_CVC;
         Vector3d Facets_Cube[81];
@@ -118,7 +117,7 @@ class TraceThreadData : public ThreadData
         // to the lightsource object passed to them (this is not confined
         // just to the area light shadow code). This code ought to be fixed
         // to treat the lightsource as const, after which this can go away.
-        vector<LightSource *> lightSources;
+        std::vector<LightSource*> lightSources;
 
         // all of these are for photons
         // most of them should be refactored into parameters, return values, or other objects
@@ -135,12 +134,12 @@ class TraceThreadData : public ThreadData
         PhotonMap* surfacePhotonMap;
         PhotonMap* mediaPhotonMap;
 
-        CrackleCache mCrackleCache;
+        CrackleCache* mpCrackleCache;
 
         // data for waves and ripples pattern
         unsigned int numberOfWaves;
-        vector<double> waveFrequencies;
-        vector<Vector3d> waveSources;
+        std::vector<double> waveFrequencies;
+        std::vector<Vector3d> waveSources;
 
         /// Called after a rectangle is finished.
         /// Used for crackle cache expiry.
@@ -166,26 +165,20 @@ class TraceThreadData : public ThreadData
         POV_LONG realTime;
         QualityFlags qualityFlags; // TODO FIXME - remove again
 
-        inline shared_ptr<const SceneData> GetSceneData() const { return sceneData; }
+        inline std::shared_ptr<const SceneData> GetSceneData() const { return sceneData; }
 
     protected:
         /// scene data
-        shared_ptr<SceneData> sceneData;
+        std::shared_ptr<SceneData> sceneData;
         /// render statistics
-        RenderStatistics renderStats;
+        RenderStatistics* mpRenderStats;
 
     private:
-        /// not available
-        TraceThreadData();
 
-        /// not available
-        TraceThreadData(const TraceThreadData&);
+        TraceThreadData() = delete;
+        TraceThreadData(const TraceThreadData&) = delete;
+        TraceThreadData& operator=(const TraceThreadData&) = delete;
 
-        /// not available
-        TraceThreadData& operator=(const TraceThreadData&);
-
-        /// current number of Tiles to expire crackle cache entries after
-        size_t CrCache_MaxAge;
         /// current tile index (for crackle cache expiry)
         size_t progress_index;
 };
@@ -195,5 +188,6 @@ class TraceThreadData : public ThreadData
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_TRACETHREADDATA_H

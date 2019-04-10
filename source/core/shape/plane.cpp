@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,9 +36,18 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/plane.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -85,7 +94,7 @@ bool Plane::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
     DBL Depth;
     Vector3d IPoint;
 
-    if (Intersect(ray, &Depth, Thread))
+    if (Intersect(ray, &Depth, Thread->Stats()))
     {
         IPoint = ray.Evaluate(Depth);
 
@@ -127,12 +136,12 @@ bool Plane::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 *
 ******************************************************************************/
 
-bool Plane::Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Thread) const
+bool Plane::Intersect(const BasicRay& ray, DBL *Depth, RenderStatistics& stats) const
 {
     DBL NormalDotOrigin, NormalDotDirection;
     Vector3d P, D;
 
-    Thread->Stats()[Ray_Plane_Tests]++;
+    stats[Ray_Plane_Tests]++;
 
     if (Trans == nullptr)
     {
@@ -164,7 +173,7 @@ bool Plane::Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Thread) 
 
     if ((*Depth >= DEPTH_TOLERANCE) && (*Depth <= MAX_DISTANCE))
     {
-        Thread->Stats()[Ray_Plane_Tests_Succeeded]++;
+        stats[Ray_Plane_Tests_Succeeded]++;
         return (true);
     }
     else
@@ -623,3 +632,4 @@ bool Plane::Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector3
 }
 
 }
+// end of namespace pov

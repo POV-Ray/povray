@@ -20,7 +20,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -48,14 +48,18 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/image/ppm.h"
 
-// C++ variants of standard C header files
+// C++ variants of C standard header files
 #include <cctype>
 
-// Standard C++ header files
-#include <vector>
+// C++ standard header files
+//  (none at the moment)
 
-// POV-Ray base header files
+// POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
 #include "base/types.h"
+#include "base/image/colourspace.h"
+#include "base/image/encoding.h"
+#include "base/image/image.h"
 #include "base/image/metadata.h"
 
 // this must be the last file included
@@ -76,7 +80,7 @@ enum NetpbmDataFormat
 
 /*****************************************************************************/
 
-void Write (OStream *file, const Image *image, const Image::WriteOptions& options)
+void Write (OStream *file, const Image *image, const ImageWriteOptions& options)
 {
     int                 file_type = POV_File_Image_PPM;
     int                 width = image->GetWidth() ;
@@ -287,7 +291,7 @@ inline static POV_UINT16 ReadNetpbmRasterValue (IStream *file, NetpbmDataFormat 
 /*****************************************************************************/
 
 // TODO: make sure we destroy the image if we throw an exception
-Image *Read (IStream *file, const Image::ReadOptions& options)
+Image *Read (IStream *file, const ImageReadOptions& options)
 {
     POV_UINT32          width;
     POV_UINT32          height;
@@ -358,14 +362,9 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
 
     // We'll be using an image container that provides for automatic decoding if possible - unless there's no such decoding to do.
     gamma = ScaledGammaCurve::GetByDecoding(float(maxImageVal)/float(maxval), gamma); // Note that we'll apply the scaling even if we don't officially gamma-correct
-    Image::ImageDataType imagetype = options.itype;
-    if (imagetype == Image::Undefined)
-        imagetype = Image::GetImageDataType( GammaCurve::IsNeutral(gamma) ? (is16BitData ? Image::kImageChannelDataType_Int16
-                                                                                         : Image::kImageChannelDataType_Int8)
-                                                                          : (is16BitData ? Image::kImageChannelDataType_Gamma16
-                                                                                         : Image::kImageChannelDataType_Gamma8),
-                                             isMonochrome ? Image::kImageChannelLayout_Gray
-                                                          : Image::kImageChannelLayout_RGB );
+    ImageDataType imagetype = options.itype;
+    if (imagetype == ImageDataType::Undefined)
+        imagetype = Image::GetImageDataType((is16BitData ? 16 : 8), (isMonochrome ? 1 : 3), false, gamma);
     image = Image::Create (width, height, imagetype) ;
     // NB: PGM files don't use alpha, so premultiplied vs. non-premultiplied is not an issue
     image->TryDeferDecoding(gamma, maxImageVal); // try to have gamma adjustment being deferred until image evaluation.
@@ -394,7 +393,8 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     return image;
 }
 
-} // end of namespace Netpbm
+}
+// end of namespace Netpbm
 
-} // end of namespace pov_base
-
+}
+// end of namespace pov_base

@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,17 +38,15 @@
 #ifndef POVRAY_VFE_VFE_H
 #define POVRAY_VFE_VFE_H
 
-#include <cassert>
+#include <memory>
+#include <vector>
 
-#include <boost/format.hpp>
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
+#include "base/platformbase.h"
+#include "base/stringtypes.h"
+#include "base/timer.h"
 
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
-
-#include "base/platformbase.h"
-#include "base/timer.h"
 
 #include "frontend/console.h"
 #include "frontend/display.h"
@@ -68,46 +66,46 @@ namespace vfe
 {
   using namespace pov_frontend;
 
-  class vfeException : public runtime_error
+  class vfeException : public std::runtime_error
   {
     public:
-      vfeException() : runtime_error("") {}
-      vfeException(const string str) : runtime_error(str) {}
-      virtual ~vfeException() throw() {}
+      vfeException() : std::runtime_error("") {}
+      vfeException(const std::string str) : std::runtime_error(str) {}
+      virtual ~vfeException() throw() override {}
   } ;
 
   class vfeCriticalError : public vfeException
   {
     public:
       vfeCriticalError() : m_Line(0), vfeException() {}
-      vfeCriticalError(const string str) : m_Line(0), vfeException(str) {}
-      vfeCriticalError(const string str, const string filename, int line) :
+      vfeCriticalError(const std::string str) : m_Line(0), vfeException(str) {}
+      vfeCriticalError(const std::string str, const std::string filename, int line) :
         vfeException(str), m_Filename(filename), m_Line(line) {}
-      virtual ~vfeCriticalError() throw() {}
+      virtual ~vfeCriticalError() throw() override {}
 
-      const string Filename() { return m_Filename; }
+      const std::string Filename() { return m_Filename; }
       int Line() { return m_Line; }
 
-      const string m_Filename;
+      const std::string m_Filename;
       const int m_Line;
   };
 
   class vfeInvalidDataError : public vfeCriticalError
   {
     public:
-      vfeInvalidDataError(const string str) : vfeCriticalError(str) {}
-      virtual ~vfeInvalidDataError() throw() {}
+      vfeInvalidDataError(const std::string str) : vfeCriticalError(str) {}
+      virtual ~vfeInvalidDataError() throw() override {}
   };
 
   class vfeConsole : public Console
   {
     public:
       vfeConsole(vfeSession *session, int width = -1);
-      virtual ~vfeConsole();
+      virtual ~vfeConsole() override;
 
-      virtual void Initialise();
-      virtual void Output(const string&);
-      virtual void Output(const string&, vfeSession::MessageType mType);
+      virtual void Initialise() override;
+      virtual void Output(const std::string&) override;
+      virtual void Output(const std::string&, vfeSession::MessageType mType);
       virtual void Output(const char *str, vfeSession::MessageType mType = vfeSession::mUnclassified);
       virtual void BufferOutput(const char *str, unsigned int chars = 0, vfeSession::MessageType mType = vfeSession::mUnclassified);
 
@@ -123,15 +121,14 @@ namespace vfe
     public:
       vfePlatformBase();
       vfePlatformBase(vfeSession& session);
-      virtual ~vfePlatformBase();
+      virtual ~vfePlatformBase() override;
 
-      virtual UCS2String GetTemporaryPath(void);
-      virtual UCS2String CreateTemporaryFile(void);
-      virtual void DeleteTemporaryFile(const UCS2String& filename);
-      virtual bool ReadFileFromURL(OStream *file, const UCS2String& url, const UCS2String& referrer = UCS2String());
-      virtual FILE* OpenLocalFile (const UCS2String& name, const char *mode);
-      virtual void DeleteLocalFile (const UCS2String& name);
-      virtual bool AllowLocalFileAccess (const UCS2String& name, const unsigned int fileType, bool write);
+      virtual UCS2String GetTemporaryPath() override;
+      virtual UCS2String CreateTemporaryFile() override;
+      virtual void DeleteTemporaryFile(const UCS2String& name) override;
+      virtual bool ReadFileFromURL(OStream *file, const UCS2String& url, const UCS2String& referrer = UCS2String()) override;
+      virtual FILE* OpenLocalFile (const UCS2String& name, const char *mode) override;
+      virtual bool AllowLocalFileAccess (const UCS2String& name, const unsigned int fileType, bool write) override;
 
     protected:
       vfeSession* m_Session;
@@ -141,16 +138,16 @@ namespace vfe
   {
     public:
       vfeParserMessageHandler();
-      virtual ~vfeParserMessageHandler();
+      virtual ~vfeParserMessageHandler() override;
 
     protected:
-      virtual void Options(Console *, POVMS_Object&, bool);
-      virtual void Statistics(Console *, POVMS_Object&, bool);
-      virtual void Progress(Console *, POVMS_Object&, bool);
-      virtual void Warning(Console *, POVMS_Object&, bool);
-      virtual void Error(Console *, POVMS_Object&, bool);
-      virtual void FatalError(Console *, POVMS_Object&, bool);
-      virtual void DebugInfo(Console *, POVMS_Object&, bool);
+      virtual void Options(Console *, POVMS_Object&, bool) override;
+      virtual void Statistics(Console *, POVMS_Object&, bool) override;
+      virtual void Progress(Console *, POVMS_Object&, bool) override;
+      virtual void Warning(Console *, POVMS_Object&, bool) override;
+      virtual void Error(Console *, POVMS_Object&, bool) override;
+      virtual void FatalError(Console *, POVMS_Object&, bool) override;
+      virtual void DebugInfo(Console *, POVMS_Object&, bool) override;
 
       vfeSession* m_Session;
   };
@@ -159,15 +156,15 @@ namespace vfe
   {
     public:
       vfeRenderMessageHandler();
-      virtual ~vfeRenderMessageHandler();
+      virtual ~vfeRenderMessageHandler() override;
 
     protected:
-      virtual void Options(Console *, POVMS_Object&, bool);
-      virtual void Statistics(Console *, POVMS_Object&, bool);
-      virtual void Progress(Console *, POVMS_Object&, bool);
-      virtual void Warning(Console *, POVMS_Object&, bool);
-      virtual void Error(Console *, POVMS_Object&, bool);
-      virtual void FatalError(Console *, POVMS_Object&, bool);
+      virtual void Options(Console *, POVMS_Object&, bool) override;
+      virtual void Statistics(Console *, POVMS_Object&, bool) override;
+      virtual void Progress(Console *, POVMS_Object&, bool) override;
+      virtual void Warning(Console *, POVMS_Object&, bool) override;
+      virtual void Error(Console *, POVMS_Object&, bool) override;
+      virtual void FatalError(Console *, POVMS_Object&, bool) override;
 
       vfeSession *m_Session;
   };
@@ -176,18 +173,18 @@ namespace vfe
   {
     public:
       vfeProcessRenderOptions(vfeSession *);
-      virtual ~vfeProcessRenderOptions();
+      virtual ~vfeProcessRenderOptions() override;
 
     protected:
-      virtual int ReadSpecialOptionHandler(INI_Parser_Table *, char *, POVMSObjectPtr);
-      virtual int ReadSpecialSwitchHandler(Cmd_Parser_Table *, char *, POVMSObjectPtr, bool);
-      virtual int WriteSpecialOptionHandler(INI_Parser_Table *, POVMSObjectPtr, OTextStream *);
-      virtual int ProcessUnknownString(char *, POVMSObjectPtr);
-      virtual ITextStream *OpenFileForRead(const char *, POVMSObjectPtr);
-      virtual OTextStream *OpenFileForWrite(const char *, POVMSObjectPtr);
-      virtual void ParseError (const char *, ...);
-      virtual void ParseErrorAt (ITextStream *, const char *, ...);
-      virtual void WriteError (const char *, ...);
+      virtual int ReadSpecialOptionHandler(INI_Parser_Table *, char *, POVMSObjectPtr) override;
+      virtual int ReadSpecialSwitchHandler(Cmd_Parser_Table *, char *, POVMSObjectPtr, bool) override;
+      virtual int WriteSpecialOptionHandler(INI_Parser_Table *, POVMSObjectPtr, OTextStream *) override;
+      virtual int ProcessUnknownString(char *, POVMSObjectPtr) override;
+      virtual ITextStream *OpenFileForRead(const char *, POVMSObjectPtr) override;
+      virtual OTextStream *OpenFileForWrite(const char *, POVMSObjectPtr) override;
+      virtual void ParseError (const char *, ...) override;
+      virtual void ParseErrorAt (ITextStream *, const char *, ...) override;
+      virtual void WriteError (const char *, ...) override;
 
     protected:
       vfeSession* m_Session;
@@ -197,41 +194,41 @@ namespace vfe
   {
     public:
       vfeDisplay(unsigned int width, unsigned int height, vfeSession *session, bool visible = false);
-      virtual ~vfeDisplay();
+      virtual ~vfeDisplay() override;
 
-      virtual void Initialise();
+      virtual void Initialise() override;
       virtual void Close();
       virtual void Show();
       virtual void Hide();
-      virtual void DrawPixel(unsigned int x, unsigned int y, const RGBA8& colour);
-      virtual void DrawRectangleFrame(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8& colour);
-      virtual void DrawFilledRectangle(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8& colour);
-      virtual void DrawPixelBlock(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8 *colour);
-      virtual void Clear();
+      virtual void DrawPixel(unsigned int x, unsigned int y, const RGBA8& colour) override;
+      virtual void DrawRectangleFrame(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8& colour) override;
+      virtual void DrawFilledRectangle(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8& colour) override;
+      virtual void DrawPixelBlock(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8 *colour) override;
+      virtual void Clear() override;
 
     protected:
       vfeSession *m_Session;
-      vector<RGBA8> m_Pixels;
+      std::vector<RGBA8> m_Pixels;
       bool m_VisibleOnCreation;
   };
 
   class VirtualFrontEnd
   {
     public:
-      VirtualFrontEnd(vfeSession& session, POVMSContext ctx, POVMSAddress addr, POVMS_Object& msg, POVMS_Object *result, shared_ptr<Console>& console) ;
-      virtual ~VirtualFrontEnd() ;
+      VirtualFrontEnd(vfeSession& session, POVMSContext ctx, POVMSAddress addr, POVMS_Object& msg, POVMS_Object *result, std::shared_ptr<Console>& console) ;
+      virtual ~VirtualFrontEnd();
 
-      virtual bool Start(POVMS_Object& opts) ;
-      virtual bool Stop() ;
-      virtual bool Pause() ;
-      virtual bool Resume() ;
-      virtual State Process() ;
+      virtual bool Start(POVMS_Object& opts);
+      virtual bool Stop();
+      virtual bool Pause();
+      virtual bool Resume();
+      virtual State Process();
       virtual State GetState() const { return state; }
-      virtual void SetResultPointers(Console **cr, Image **ir, Display **dr) ;
-      virtual bool IsPausable() ;
-      virtual bool Paused() ;
+      virtual void SetResultPointers(Console **cr, Image **ir, Display **dr);
+      virtual bool IsPausable();
+      virtual bool Paused();
       virtual bool PausePending() { return m_PauseRequested; }
-      virtual shared_ptr<Display> GetDisplay() { return renderFrontend.GetDisplay(viewId); }
+      virtual std::shared_ptr<Display> GetDisplay() { return renderFrontend.GetDisplay(viewId); }
 
       // TODO: take care of any pending messages (e.g. a thread waiting on a blocking send)
       virtual void InvalidateBackend() { backendAddress = POVMSInvalidAddress; }
@@ -249,9 +246,9 @@ namespace vfe
       POVMS_Object options;
       RenderFrontendBase::SceneId sceneId;
       RenderFrontendBase::ViewId viewId;
-      shared_ptr<AnimationProcessing> animationProcessing ;
-      shared_ptr<ImageProcessing> imageProcessing ;
-      shared_ptr<ShelloutProcessing> shelloutProcessing;
+      std::shared_ptr<AnimationProcessing> animationProcessing ;
+      std::shared_ptr<ImageProcessing> imageProcessing ;
+      std::shared_ptr<ShelloutProcessing> shelloutProcessing;
       Console **consoleResult;
       Display **displayResult;
       vfeSession* m_Session;
@@ -261,5 +258,6 @@ namespace vfe
       State m_PostPauseState;
   };
 }
+// end of namespace vfe
 
 #endif // POVRAY_VFE_VFE_H

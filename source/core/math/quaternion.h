@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,6 +39,14 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/coretypes.h"
 #include "core/math/vector.h"
 
@@ -52,7 +60,6 @@ namespace pov
 ///
 /// @{
 
-struct BasicRay;
 class Fractal;
 
 /*****************************************************************************
@@ -62,26 +69,26 @@ class Fractal;
 class QuaternionFractalRules : public FractalRules
 {
     public:
-        virtual ~QuaternionFractalRules() {}
-        virtual bool Bound (const BasicRay&, const Fractal *, DBL *, DBL *) const;
+        virtual ~QuaternionFractalRules() override {}
+        virtual bool Bound (const BasicRay&, const Fractal *, DBL *, DBL *) const override;
 };
 
-class JuliaFractalRules : public QuaternionFractalRules
+class JuliaFractalRules final : public QuaternionFractalRules
 {
     public:
-        virtual ~JuliaFractalRules() {}
-        virtual void CalcNormal (Vector3d&, int, const Fractal *, DBL **) const;
-        virtual bool Iterate (const Vector3d&, const Fractal *, DBL **) const;
-        virtual bool Iterate (const Vector3d&, const Fractal *, const Vector3d&, DBL *, DBL **) const;
+        virtual ~JuliaFractalRules() override {}
+        virtual void CalcNormal (Vector3d&, int, const Fractal *, DBL **) const override;
+        virtual bool Iterate (const Vector3d&, const Fractal *, DBL **) const override;
+        virtual bool Iterate (const Vector3d&, const Fractal *, const Vector3d&, DBL *, DBL **) const override;
 };
 
-class Z3FractalRules : public QuaternionFractalRules
+class Z3FractalRules final : public QuaternionFractalRules
 {
     public:
-        virtual ~Z3FractalRules() {}
-        virtual void CalcNormal (Vector3d&, int, const Fractal *, DBL **) const;
-        virtual bool Iterate (const Vector3d&, const Fractal *, DBL **) const;
-        virtual bool Iterate (const Vector3d&, const Fractal *, const Vector3d&, DBL *, DBL **) const;
+        virtual ~Z3FractalRules() override {}
+        virtual void CalcNormal (Vector3d&, int, const Fractal *, DBL **) const override;
+        virtual bool Iterate (const Vector3d&, const Fractal *, DBL **) const override;
+        virtual bool Iterate (const Vector3d&, const Fractal *, const Vector3d&, DBL *, DBL **) const override;
 };
 
 /// @}
@@ -89,5 +96,6 @@ class Z3FractalRules : public QuaternionFractalRules
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_QUATERNION_H

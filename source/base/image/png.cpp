@@ -13,7 +13,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -43,16 +43,23 @@
 
 #ifndef LIBPNG_MISSING
 
-// C++ standard headers
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <string>
 #include <memory>
+#include <vector>
 
-// other 3rd party library headers
+// other 3rd party library header files
 #include <png.h>
 
-// POV-Ray base header files
+// POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
 #include "base/types.h"
+#include "base/image/colourspace.h"
+#include "base/image/encoding.h"
+#include "base/image/image.h"
 #include "base/image/metadata.h"
 
 // this must be the last file included
@@ -82,10 +89,10 @@ const int MAXTEXT = 1024;  // Maximum length of a tEXt message
 /*****************************************************************************
 * Local typedefs
 ******************************************************************************/
-struct Messages
+struct Messages final
 {
-    vector<string> warnings;
-    string error;
+    std::vector<std::string> warnings;
+    std::string error;
 };
 
 /*****************************************************************************
@@ -134,7 +141,7 @@ extern "C"
         Messages *m = reinterpret_cast<Messages *>(png_get_error_ptr(png_ptr));
 
         if (m)
-            m->warnings.push_back (string(msg)) ;
+            m->warnings.push_back (std::string(msg)) ;
     }
 
 
@@ -164,7 +171,7 @@ extern "C"
         Messages *m = reinterpret_cast<Messages *>(png_get_error_ptr(png_ptr));
 
         if (m)
-            m->error = string(msg) ;
+            m->error = std::string(msg) ;
         throw POV_EXCEPTION(kFileDataErr, msg);
     }
 
@@ -197,7 +204,7 @@ extern "C"
         {
             Messages *m = reinterpret_cast<Messages *>(png_get_error_ptr(png_ptr));
             if (m)
-                m->error = string("Cannot read PNG data");
+                m->error = "Cannot read PNG data";
             throw POV_EXCEPTION(kFileDataErr, "Cannot read PNG data");
         }
     }
@@ -231,7 +238,7 @@ extern "C"
         {
             Messages *m = reinterpret_cast<Messages *>(png_get_error_ptr(png_ptr));
             if (m)
-                m->error = string("Cannot write PNG data");
+                m->error = "Cannot write PNG data";
             throw POV_EXCEPTION(kFileDataErr, "Cannot write PNG data");
         }
     }
@@ -312,7 +319,7 @@ extern "C"
 ******************************************************************************/
 
 // TODO: use scoped clean-up class in case of exception
-Image *Read (IStream *file, const Image::ReadOptions& options)
+Image *Read (IStream *file, const ImageReadOptions& options)
 {
     int                   stride;
     int                   j;
@@ -386,7 +393,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     if (color_type == PNG_COLOR_TYPE_PALETTE)
     {
         // color palette image
-        vector<Image::RGBAMapEntry> colormap ;
+        std::vector<Image::RGBAMapEntry> colormap;
         Image::RGBAMapEntry entry;
         png_colorp palette;
         int cmap_len;
@@ -408,9 +415,9 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
             colormap.push_back (entry);
         }
 
-        Image::ImageDataType imagetype = options.itype;
-        if (imagetype == Image::Undefined)
-            imagetype = Image::Colour_Map;
+        ImageDataType imagetype = options.itype;
+        if (imagetype == ImageDataType::Undefined)
+            imagetype = ImageDataType::Colour_Map;
         image = Image::Create (width, height, imagetype, colormap) ;
         image->SetPremultiplied(premul); // specify whether the color map data has premultiplied alpha
         gamma.reset(); // gamma has been taken care of by transforming the color table.
@@ -422,7 +429,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     {
         // grayscale image
         // (To keep the actual data reading code simple, we're pretending this to be a color palette image.)
-        vector<Image::RGBAMapEntry> colormap ;
+        std::vector<Image::RGBAMapEntry> colormap;
         Image::RGBAMapEntry entry;
         int cmap_len = 1 << bit_depth;
         bool has_alpha = png_get_valid(r_png_ptr, r_info_ptr, PNG_INFO_tRNS);
@@ -440,9 +447,9 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
             colormap.push_back (entry);
         }
 
-        Image::ImageDataType imagetype = options.itype;
-        if (imagetype == Image::Undefined)
-            imagetype = has_alpha ? Image::GrayA_Int8 : Image::Gray_Int8;
+        ImageDataType imagetype = options.itype;
+        if (imagetype == ImageDataType::Undefined)
+            imagetype = has_alpha ? ImageDataType::GrayA_Int8 : ImageDataType::Gray_Int8;
         image = Image::Create (width, height, imagetype, colormap) ;
         image->SetPremultiplied(premul); // specify whether the color map data has premultiplied alpha
         gamma.reset(); // gamma has been taken care of by transforming the color table.
@@ -512,25 +519,10 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
             // grayscale image
             // (note that although 8-bit greyscale images should have been handled earlier already, 8-bit greyscale + 8-bit alpha images haven't.)
 
-            Image::ImageDataType imagetype = options.itype;
+            ImageDataType imagetype = options.itype;
 
-            if (imagetype == Image::Undefined)
-            {
-                if (GammaCurve::IsNeutral(gamma))
-                {
-                    if (has_alpha)
-                        imagetype = bit_depth > 8 ? Image::GrayA_Int16 : Image::GrayA_Int8;
-                    else
-                        imagetype = bit_depth > 8 ? Image::Gray_Int16 : Image::Gray_Int8;
-                }
-                else
-                {
-                    if (has_alpha)
-                        imagetype = bit_depth > 8 ? Image::GrayA_Gamma16 : Image::GrayA_Gamma8;
-                    else
-                        imagetype = bit_depth > 8 ? Image::Gray_Gamma16 : Image::Gray_Gamma8;
-                }
-            }
+            if (imagetype == ImageDataType::Undefined)
+                imagetype = Image::GetImageDataType(bit_depth, 1, has_alpha, gamma);
 
             image = Image::Create (width, height, imagetype);
             image->SetPremultiplied(premul); // set desired storage mode regarding alpha premultiplication
@@ -581,25 +573,10 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
         else
         {
             // color image ((color_type & PNG_COLOR_MASK_COLOR) != 0)
-            Image::ImageDataType imagetype = options.itype;
+            ImageDataType imagetype = options.itype;
 
-            if (imagetype == Image::Undefined)
-            {
-                if (GammaCurve::IsNeutral(gamma))
-                {
-                    if (has_alpha)
-                        imagetype = bit_depth > 8 ? Image::RGBA_Int16 : Image::RGBA_Int8;
-                    else
-                        imagetype = bit_depth > 8 ? Image::RGB_Int16 : Image::RGB_Int8;
-                }
-                else
-                {
-                    if (has_alpha)
-                        imagetype = bit_depth > 8 ? Image::RGBA_Gamma16 : Image::RGBA_Gamma8;
-                    else
-                        imagetype = bit_depth > 8 ? Image::RGB_Gamma16 : Image::RGB_Gamma8;
-                }
-            }
+            if (imagetype == ImageDataType::Undefined)
+                imagetype = Image::GetImageDataType(bit_depth, 3, has_alpha, gamma);
 
             image = Image::Create (width, height, imagetype);
             image->SetPremultiplied(premul); // set desired storage mode regarding alpha premultiplication
@@ -672,7 +649,7 @@ void SetChannelValue(png_bytep& p, unsigned int v, unsigned int bpcc)
     *(p++) = (v & 0xFF);
 }
 
-void Write (OStream *file, const Image *image, const Image::WriteOptions& options)
+void Write (OStream *file, const Image *image, const ImageWriteOptions& options)
 {
     int             png_stride;
     int             width = image->GetWidth() ;
@@ -775,7 +752,7 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
 
 #if defined(PNG_WRITE_TEXT_SUPPORTED)
     /* Line feed is "local" */
-    string comment=string("Render Date: ") + meta.getDateTime() + "\n";
+    std::string comment = std::string("Render Date: ") + meta.getDateTime() + "\n";
     if (!meta.getComment1().empty())
         comment += meta.getComment1() + "\n";
     if (!meta.getComment2().empty())
@@ -784,7 +761,7 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
         comment += meta.getComment3() + "\n";
     if (!meta.getComment4().empty())
         comment += meta.getComment4() + "\n";
-    string soft (meta.getSoftware());
+    std::string soft (meta.getSoftware());
     png_text p_text[2] = {
         { PNG_TEXT_COMPRESSION_NONE, const_cast<char *>("Software"), const_cast<char *>(soft.c_str()),    soft.length() },
         { PNG_TEXT_COMPRESSION_NONE, const_cast<char *>("Comment"),  const_cast<char *>(comment.c_str()), comment.length() },
@@ -855,8 +832,10 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
     png_destroy_write_struct(&png_ptr, &info_ptr);
 }
 
-} // end of namespace Png
+}
+// end of namespace Png
 
-} // end of namespace pov_base
+}
+// end of namespace pov_base
 
 #endif  // LIBPNG_MISSING

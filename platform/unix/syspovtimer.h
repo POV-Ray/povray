@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,17 +39,19 @@
 
 #include "base/configbase.h"
 
+#include "base/timer.h"
+
 namespace pov_base
 {
 
-#if !POV_USE_DEFAULT_DELAY
-
-void Delay(unsigned int msec);
-
-#endif // !POV_USE_DEFAULT_DELAY
-
-
 #if !POV_USE_DEFAULT_TIMER
+
+// NOTE: Although we're currently not using platform-specific implementations
+// of the wall clock timer, we may want to keep them around in case we find the
+// default implementation wanting on particular flavours of Unix.
+#define POVUNIX_USE_DEFAULT_REAL_TIMER 1
+
+class DefaultRealTimer;
 
 /// Millisecond-precision timer.
 ///
@@ -62,14 +64,18 @@ void Delay(unsigned int msec);
 ///     in the order of an hour (any system with a 32-bit `clock_t` and a standard `CLOCKS_PER_SEC`
 ///     of 1,000,000).
 ///
-class Timer
+class Timer final
 {
     public:
 
         Timer();
-        ~Timer();
+        ~Timer() = default;
 
+#if POVUNIX_USE_DEFAULT_REAL_TIMER
+        inline POV_LONG ElapsedRealTime() const { return mRealTimer.ElapsedTime(); }
+#else
         POV_LONG ElapsedRealTime() const;
+#endif
         POV_LONG ElapsedProcessCPUTime() const;
         POV_LONG ElapsedThreadCPUTime() const;
 
@@ -80,13 +86,19 @@ class Timer
 
     private:
 
+#if POVUNIX_USE_DEFAULT_REAL_TIMER
+        DefaultRealTimer mRealTimer;
+#else
         POV_ULONG mWallTimeStart;
+#endif
         POV_ULONG mProcessTimeStart;
         POV_ULONG mThreadTimeStart;
 
+#if !POVUNIX_USE_DEFAULT_REAL_TIMER
         bool mWallTimeUseClockGettimeMonotonic  : 1;    ///< Whether we'll measure elapsed wall-clock time using `clock_gettime(CLOCK_MONOTONIC)`.
         bool mWallTimeUseClockGettimeRealtime   : 1;    ///< Whether we'll measure elapsed wall-clock time using `clock_gettime(CLOCK_REALTIME)`.
         bool mWallTimeUseGettimeofday           : 1;    ///< Whether we'll measure elapsed wall-clock time using `gettimeofday()`.
+#endif
 
         bool mProcessTimeUseGetrusageSelf       : 1;    ///< Whether we'll measure per-process CPU time using `getrusage(RUSAGE_SELF)`.
         bool mProcessTimeUseClockGettimeProcess : 1;    ///< Whether we'll measure per-process CPU time using `clock_gettime(CLOCK_PROCESS_CPUTIME_ID)`.
@@ -97,7 +109,9 @@ class Timer
         bool mThreadTimeUseClockGettimeThread   : 1;    ///< Whether we'll measure per-thread CPU time `clock_gettime(CLOCK_THREAD_CPUTIME_ID)`.
         bool mThreadTimeUseFallback             : 1;    ///< Whether we'll fall back to per-process CPU time (or wall-clock time) instead of per-thread CPU time.
 
+#if !POVUNIX_USE_DEFAULT_REAL_TIMER
         POV_ULONG GetWallTime() const;
+#endif
         POV_ULONG GetThreadTime() const;
         POV_ULONG GetProcessTime() const;
 };
@@ -105,5 +119,6 @@ class Timer
 #endif // !POV_USE_DEFAULT_TIMER
 
 }
+// end of namespace pov_base
 
 #endif // POVRAY_UNIX_SYSPOVTIMER_H

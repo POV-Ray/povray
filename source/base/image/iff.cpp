@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,11 +37,16 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/image/iff.h"
 
-// Standard C++ header files
+// C++ variants of C standard header files
+#include <cstdint>
+
+// C++ standard header files
+#include <memory>
 #include <vector>
 
-// Boost header files
-#include <boost/scoped_array.hpp>
+// POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
+#include "base/image/image.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -70,11 +75,13 @@ namespace Iff
 * Type definitions
 ******************************************************************************/
 
-typedef struct Chunk_Header_Struct
+struct Chunk_Header_Struct final
 {
-    int name;
-    int size;
-} CHUNK_HEADER ;
+    std::int_fast32_t name;
+    std::int_fast32_t size;
+};
+
+using CHUNK_HEADER = Chunk_Header_Struct; ///< @deprecated
 
 /*****************************************************************************
 * Static functions
@@ -96,15 +103,15 @@ static int read_word(IStream *file)
     return (result);
 }
 
-static long read_long(IStream *file)
+static std::int_fast32_t read_long(IStream *file)
 {
-    long result = 0;
+    std::int_fast32_t result = 0;
     for (int i = 0; i < 4; i++)
         result = (result << 8) + read_byte(file);
     return (result);
 }
 
-Image *Read (IStream *file, const Image::ReadOptions& options)
+Image *Read (IStream *file, const ImageReadOptions& options)
 {
     int                             nPlanes = 0;
     int                             compression = 0;
@@ -123,16 +130,16 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     unsigned int                    r;
     unsigned int                    g;
     unsigned int                    b;
-    unsigned long                   creg;
+    std::uint_fast32_t              creg;
     Image::RGBMapEntry              entry;
-    vector<Image::RGBMapEntry>      colormap;
+    std::vector<Image::RGBMapEntry> colormap;
 
     while (true)
     {
         Chunk_Header.name = read_long(file);
         Chunk_Header.size = read_long(file);
 
-        switch (IFF_SWITCH_CAST Chunk_Header.name)
+        switch (Chunk_Header.name)
         {
             case FORM:
                 if (read_long(file) != ILBM)
@@ -179,7 +186,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
                     // TODO FIXME - gamma!
                 }
 
-                for (int i = colourmap_size * 3; (long)i < Chunk_Header.size; i++)
+                for (std::int_fast32_t i = colourmap_size * 3; i < Chunk_Header.size; i++)
                     read_byte(file);
 
                 break;
@@ -187,9 +194,9 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
             case BODY:
                 if (width > 0 && height > 0)
                 {
-                    Image::ImageDataType imagetype = options.itype;
-                    if (imagetype == Image::Undefined)
-                        imagetype = ((viewmodes & HAM) != 0 || nPlanes == 24) ? Image::RGB_Int8 : Image::Colour_Map;
+                    ImageDataType imagetype = options.itype;
+                    if (imagetype == ImageDataType::Undefined)
+                        imagetype = ((viewmodes & HAM) != 0 || nPlanes == 24) ? ImageDataType::RGB_Int8 : ImageDataType::Colour_Map;
                     if ((viewmodes & HAM) != 0 || nPlanes == 24)
                         image = Image::Create (width, height, imagetype);
                     else
@@ -197,7 +204,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
                     // NB: IFF-ILBM files don't use alpha, so premultiplied vs. non-premultiplied is not an issue
 
                     int rowlen = ((width + 15) / 16) * 2 ;
-                    boost::scoped_array<unsigned char> row_bytes (new unsigned char [nPlanes * rowlen]);
+                    std::unique_ptr<unsigned char[]> row_bytes (new unsigned char [nPlanes * rowlen]);
 
                     for (int row = 0; row < height; row++)
                     {
@@ -312,7 +319,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
                 break;
 
             default:
-                for (int i = 0; (long)i < Chunk_Header.size; i++)
+                for (std::int_fast32_t i = 0; i < Chunk_Header.size; i++)
                     if (file->Read_Byte() == EOF)
                         throw POV_EXCEPTION(kFileDataErr, "Unexpected EOF while reading IFF-ILBM file");
                 break;
@@ -321,7 +328,8 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     return (image);
 }
 
-} // end of namespace Iff
+}
+// end of namespace Iff
 
 }
-
+// end of namespace pov_base

@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,29 +39,13 @@
 #ifndef POVRAY_UNIX_SYSPOVCONFIG_POSIX_H
 #define POVRAY_UNIX_SYSPOVCONFIG_POSIX_H
 
-#include <unistd.h>
+#include <sys/types.h>  // Pulled in for `off_t`.
+#include <unistd.h>     // Pulled in for `_POSIX_V6_xxx`.
 
-#if defined(_POSIX_V6_LPBIG_OFFBIG) || defined(_POSIX_V6_LP64_OFF64) || defined(_POSIX_V6_ILP32_OFFBIG)
-    // `off_t` is at least 64 bits.
-    // This variant of Unix provides large file support via the `lseek` function,
-    // with file offsets having type `off_t`.
-    #define POV_LSEEK(handle,offset,whence) lseek(handle,offset,whence)
-    #define POV_OFF_T off_t
-#elif defined(_POSIX_V6_ILP32_OFF32)
-    // `off_t` is at least 32 bits.
-    // This variant of Unix does _not_ provide large file support via the `lseek` function.
-    // Comment-out the following line to proceed anyway.
-    #error "Image size will be limited to approx. 100 Megapixels. Proceed at your own risk."
-    #define POV_LSEEK(handle,offset,whence) lseek(handle,offset,whence)
-    #define POV_OFF_T off_t
-#else
-    // Unable to detect `off_t` size at compile-time.
-    // This variant of Unix _may or may not_ provide large file support via the `lseek` function.
-    // Comment-out the following line to proceed anyway
-    #error "Image size may be limited to approx. 100 Megapixels. Proceed at your own risk."
-    #define POV_LSEEK(handle,offset,whence) lseek(handle,offset,whence)
-    #define POV_OFF_T off_t
-#endif
+// POSIX does not provide an explicit 64-bit `lseek`, so we're stuck with
+// whatever size `off_t` happens to have.
+#define POVUNIX_LSEEK64(h,o,w) lseek(h,o,w)
+#define POV_OFF_T off_t
 
 #if defined(_POSIX_V6_LPBIG_OFFBIG) || defined(_POSIX_V6_LP64_OFF64)
     // long is at least 64 bits.

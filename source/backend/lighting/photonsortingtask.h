@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,38 +33,47 @@
 ///
 //******************************************************************************
 
-#ifndef PHOTONSORTINGTASK_H
-#define PHOTONSORTINGTASK_H
+#ifndef POVRAY_BACKEND_PHOTONSORTINGTASK_H
+#define POVRAY_BACKEND_PHOTONSORTINGTASK_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "backend/configbackend.h"
+
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <vector>
+
+// POV-Ray header files (base module)
+#include "core/lighting/photons_fwd.h"
+
+// POV-Ray header files (core module)
 #include "core/render/trace.h"
 
-#include "backend/frame.h"
+// POV-Ray header files (backend module)
+#include "backend/lighting/photonshootingstrategy_fwd.h"
 #include "backend/render/rendertask.h"
 
 namespace pov
 {
 
-using namespace pov_base;
-
-class PhotonMap;
-class PhotonShootingStrategy;
-
-class PhotonSortingTask : public RenderTask
+class PhotonSortingTask final : public RenderTask
 {
     public:
         Timer timer;
 
-        vector<PhotonMap*> surfaceMaps;
-        vector<PhotonMap*> mediaMaps;
+        std::vector<PhotonMap*> surfaceMaps;
+        std::vector<PhotonMap*> mediaMaps;
         PhotonShootingStrategy* strategy;
 
-        PhotonSortingTask(ViewData *vd, const vector<PhotonMap*>& surfaceMaps, const vector<PhotonMap*>& mediaMaps,
+        PhotonSortingTask(ViewData *vd, const std::vector<PhotonMap*>& surfaceMaps, const std::vector<PhotonMap*>& mediaMaps,
                           PhotonShootingStrategy* strategy, size_t seed);
-        ~PhotonSortingTask();
+        virtual ~PhotonSortingTask() override;
 
-        void Run();
-        void Stopped();
-        void Finish();
+        virtual void Run() override;
+        virtual void Stopped() override;
+        virtual void Finish() override;
 
         void SendProgress();
 
@@ -72,11 +81,11 @@ class PhotonSortingTask : public RenderTask
         bool save();
         bool load();
     private:
-        class CooperateFunction : public Trace::CooperateFunctor
+        class CooperateFunction final : public Trace::CooperateFunctor
         {
             public:
                 CooperateFunction(Task& t) : task(t) { }
-                virtual void operator()() { task.Cooperate(); }
+                virtual void operator()() override { task.Cooperate(); }
             private:
                 Task& task;
         };
@@ -85,4 +94,6 @@ class PhotonSortingTask : public RenderTask
 };
 
 }
-#endif
+// end of namespace pov
+
+#endif // POVRAY_BACKEND_PHOTONSORTINGTASK_H

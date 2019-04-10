@@ -19,7 +19,7 @@
 /// ----------------------------------------------------------------------------
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -47,10 +47,15 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/material/texture.h"
 
-#include <algorithm>
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
 
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
+#include "base/povassert.h"
 
+// POV-Ray header files (core module)
 #include "core/material/pattern.h"
 #include "core/material/pigment.h"
 #include "core/material/normal.h"
@@ -61,6 +66,8 @@
 
 namespace pov
 {
+
+using std::vector;
 
 /*****************************************************************************
 *
@@ -711,3 +718,4 @@ TextureBlendMap::~TextureBlendMap()
 }
 
 }
+// end of namespace pov

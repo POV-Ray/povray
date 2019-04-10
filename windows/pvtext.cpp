@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -358,7 +358,7 @@ void buffer_message (msgtype message_type, const char *s, bool addLF)
       message_type = mHorzLine ;
 
     strcpy (s1 + 1, str_buffer) ;
-    *s1 = (uchar) message_type ;
+    *s1 = (unsigned char) message_type ;
 
     if (lf == CR)
     {
@@ -432,7 +432,7 @@ void add_single_line (msgtype message_type, const char *str)
   }
 
   strcpy (s1 + 1, str) ;
-  *s1 = (uchar) message_type ;
+  *s1 = (unsigned char) message_type ;
 
   if (*next_message)
   {
@@ -2016,3 +2016,4 @@ void say_status_message (int section, const char *message)
 }
 
 }
+// end of namespace povwin

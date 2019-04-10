@@ -13,7 +13,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -83,13 +83,22 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/spheresweep.h"
 
+// C++ variants of C standard header files
+#include <cstdlib>
+
+// C++ standard header files
 #include <algorithm>
 
+// POV-Ray header files (base module)
+#include "base/povassert.h"
+
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/math/matrix.h"
 #include "core/math/polynomialsolver.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -208,7 +217,7 @@ bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
     for(i = 0; i < Num_Segments; i++)
     {
         // Are there intersections with this segment?
-        Num_Seg_Isect = Intersect_Segment(New_Ray, &Segment[i], Segment_Isect, Thread);
+        Num_Seg_Isect = Intersect_Segment(New_Ray, &Segment[i], Segment_Isect, Thread->Stats());
 
         // Test for end of vector
         if(Num_Isect + Num_Seg_Isect <= SPHSWEEP_MAX_ISECT)
@@ -226,7 +235,7 @@ bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
     if(Num_Isect > 0)
     {
         // Sort intersections
-        QSORT(reinterpret_cast<void *>(Isect), Num_Isect, sizeof(SPHSWEEP_INT), Comp_Isects);
+        std::qsort(Isect, Num_Isect, sizeof(SPHSWEEP_INT), Comp_Isects);
 
         // Delete invalid intersections inside the sphere sweep
         Num_Isect = Find_Valid_Points(Isect, Num_Isect, New_Ray);
@@ -411,7 +420,7 @@ bool SphereSweep::Intersect_Sphere(const BasicRay &ray, const SPHSWEEP_SPH *Sphe
 ///     The current implementation exhibits numeric instabilities for 3rd order polynomial splines.
 ///     (See GitHub issue #147.)
 ///
-int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segment, SPHSWEEP_INT *Isect, TraceThreadData *Thread)
+int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segment, SPHSWEEP_INT *Isect, RenderStatistics& stats)
 {
     int             Isect_Count;
     DBL             Dot1, Dot2;
@@ -544,7 +553,7 @@ int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segm
             Coef[1] = 4.0 * d * e - 2.0 * b * c * d;
             Coef[2] = Sqr(e) - b * c * e + Sqr(b) * f;
 
-            Num_Poly_Roots = Solve_Polynomial(2, Coef, Root, true, 1e-10, Thread->Stats());
+            Num_Poly_Roots = Solve_Polynomial(2, Coef, Root, true, 1e-10, stats);
             break;
 
         case 4:   // Third order polynomial
@@ -620,7 +629,7 @@ int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segm
             Coef[9] = 4.0 * j * k - 2.0 * c * k * e - 2.0 * d * j * e + 4.0 * c * d * l;
             Coef[10] = Sqr(k) - d * k * e + l * Sqr(d);
 
-            Num_Poly_Roots = bezier_01(10, Coef, Root, true, 1e-10, Thread);
+            Num_Poly_Roots = bezier_01(10, Coef, Root, true, 1e-10, stats);
             break;
 
         default:
@@ -888,7 +897,7 @@ bool SphereSweep::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
                 Coef[6] -= Sqr(Segment[i].Radius_Coef[0]);
 
                 // Find roots
-                Num_Poly_Roots = bezier_01(6, Coef, Root, true, 1e-10, Thread);
+                Num_Poly_Roots = bezier_01(6, Coef, Root, true, 1e-10, Thread->Stats());
 
                 // Test for interval [0, 1]
                 for(j = 0; j < Num_Poly_Roots; j++)
@@ -2039,7 +2048,7 @@ const int lcm_bezier_01[] =
     2520, 252, 56, 21, 12, 10, 12, 21, 56, 252, 2520
 };
 
-int SphereSweep::bezier_01(int degree, const DBL* Coef, DBL* Roots, bool sturm, DBL tolerance, TraceThreadData *Thread)
+int SphereSweep::bezier_01(int degree, const DBL* Coef, DBL* Roots, bool sturm, DBL tolerance, RenderStatistics& stats)
 {
     DBL d[11];
     bool non_negative = true, non_positive = true;
@@ -2055,7 +2064,7 @@ int SphereSweep::bezier_01(int degree, const DBL* Coef, DBL* Roots, bool sturm, 
         non_positive = (non_positive && (d[degree - i] <= 0));
 
         if(!(non_negative || non_positive))
-            return Solve_Polynomial(degree, Coef, Roots, sturm, tolerance, Thread->Stats());
+            return Solve_Polynomial(degree, Coef, Roots, sturm, tolerance, stats);
 
         for(j = 0; j < degree - i; ++j)
             d[j] += d[j+1];
@@ -2065,3 +2074,4 @@ int SphereSweep::bezier_01(int degree, const DBL* Coef, DBL* Roots, bool sturm, 
 }
 
 }
+// end of namespace pov

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,6 +38,10 @@
 // this must be the last file included
 #include "base/povdebug.h"
 
+#include <vector>
+
+#include "base/stringtypes.h"
+
 namespace pov_base
 {
 
@@ -57,7 +61,7 @@ static inline bool IsParentDir(const UCS2String& s)
     return (s.length() == 2) && (s[0] == '.') && (s[1] == '.');
 }
 
-bool Path::ParsePathString (UCS2String& volume, vector<UCS2String>& dirnames, UCS2String& filename, const UCS2String& path)
+bool Path::ParsePathString (UCS2String& volume, std::vector<UCS2String>& dirnames, UCS2String& filename, const UCS2String& path)
 {
     UCS2String stash;
 
@@ -194,3 +198,4 @@ bool Path::ParsePathString (UCS2String& volume, vector<UCS2String>& dirnames, UC
 //******************************************************************************
 
 }
+// end of namespace pov_base

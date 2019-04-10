@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,14 +36,29 @@
 #ifndef POVRAY_BACKEND_BACKENDSCENEDATA_H
 #define POVRAY_BACKEND_BACKENDSCENEDATA_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "backend/configbackend.h"
+#include "backend/scene/backendscenedata_fwd.h"
+
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <map>
+
+// POV-Ray header files (base module)
+#include "base/stringtypes.h"
+
+// POV-Ray header files (core module)
 #include "core/scene/scenedata.h"
 
+// POV-Ray header files (backend module)
 #include "backend/control/renderbackend.h"
 
 namespace pov
 {
 
-class BackendSceneData : public SceneData
+class BackendSceneData final : public SceneData
 {
         // Scene needs access to the private scene data constructor!
         friend class Scene;
@@ -130,13 +145,11 @@ class BackendSceneData : public SceneData
          */
         BackendSceneData();
 
-        /// not available
-        BackendSceneData(const BackendSceneData&);
-
-        /// not available
-        BackendSceneData& operator=(const BackendSceneData&);
+        BackendSceneData(const BackendSceneData&) = delete;
+        BackendSceneData& operator=(const BackendSceneData&) = delete;
 };
 
 }
+// end of namespace pov
 
 #endif // POVRAY_BACKEND_BACKENDSCENEDATA_H

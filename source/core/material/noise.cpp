@@ -17,7 +17,7 @@
 /// ----------------------------------------------------------------------------
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -45,11 +45,26 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/material/noise.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <algorithm>
+
+// POV-Ray header files (base module)
+#include "base/povassert.h"
+
+// POV-Ray header files (core module)
+//  (none at the moment)
+
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov
 {
+
+using std::min;
+using std::max;
 
 /*****************************************************************************
 * Static functions
@@ -77,10 +92,10 @@ static DBL *sintab; // GLOBAL VARIABLE
 #ifdef DYNAMIC_HASHTABLE
 unsigned short *hashTable; // GLOBAL VARIABLE
 #else
-ALIGN16 unsigned short hashTable[8192]; // GLOBAL VARIABLE
+alignas(16) unsigned short hashTable[8192]; // GLOBAL VARIABLE
 #endif
 
-ALIGN16 DBL RTable[267*2] =
+alignas(16) DBL RTable[267*2] =
 {
             -1, 0.0,    0.604974, 0.0,   -0.937102, 0.0,    0.414115, 0.0,    0.576226, 0.0,  -0.0161593, 0.0,
       0.432334, 0.0,    0.103685, 0.0,    0.590539, 0.0,   0.0286412, 0.0,     0.46981, 0.0,    -0.84622, 0.0,
@@ -171,7 +186,7 @@ void Initialize_Noise()
         sintab[i] = sin((DBL)i / SINTABSIZE * TWO_M_PI);
 }
 
-void Initialize_Waves(vector<double>& waveFrequencies, vector<Vector3d>& waveSources, unsigned int numberOfWaves)
+void Initialize_Waves(std::vector<double>& waveFrequencies, std::vector<Vector3d>& waveSources, unsigned int numberOfWaves)
 {
     Vector3d point;
 
@@ -709,3 +724,4 @@ const OptimizedNoiseInfo* GetOptimizedNoise(std::string name)
 #endif // TRY_OPTIMIZED_NOISE
 
 }
+// end of namespace pov

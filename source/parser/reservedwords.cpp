@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,6 +37,15 @@
 
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
+
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+// POV-Ray header files (core module)
+// POV-Ray header files (parser module)
+//  (none at the moment)
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -160,6 +169,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { CLIPPED_BY_TOKEN,             "clipped_by" },
     { CLOCK_TOKEN,                  "clock" },
     { CLOCK_ON_TOKEN,               "clock_on" },
+    { CMAP_TOKEN,                   "cmap" },
     { COLLECT_TOKEN,                "collect" },
     { COLOUR_TOKEN,                 "colour" },
     { COLOUR_MAP_TOKEN,             "colour_map" },
@@ -734,7 +744,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { BACK_SLASH_TOKEN,             "\\" },
     { BAR_TOKEN,                    "|" },
     { COLON_TOKEN,                  ":" },
-    { COMMA_TOKEN,                  ", " }, // TODO REVIEW - is there a reason for the trailing blank?
+    { COMMA_TOKEN,                  "," },
     { DASH_TOKEN,                   "-" },
     { DOLLAR_TOKEN,                 "$" },
     { EQUALS_TOKEN,                 "=" },
@@ -746,7 +756,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { LEFT_PAREN_TOKEN,             "(" },
     { LEFT_SQUARE_TOKEN,            "[" },
     { PERCENT_TOKEN,                "%" },
-    { PERIOD_TOKEN,                 ". (period)" }, // TODO REVIEW - is there a reason for the plaintext?
+    { PERIOD_TOKEN,                 "." },
     { PLUS_TOKEN,                   "+" },
     { QUESTION_TOKEN,               "?" },
     { REL_GE_TOKEN,                 ">=" },
@@ -765,9 +775,10 @@ const RESERVED_WORD Reserved_Words[] = {
     //------------------------------------------------------------------------------
     // Category Pseudo-Tokens.
 
-    { COLOUR_KEY_TOKEN,             "color keyword" },
-    { FLOAT_FUNCT_TOKEN,            "float function" },
-    { VECTOR_FUNCT_TOKEN,           "vector function" },
+    { COLOUR_TOKEN_CATEGORY,        "colour keyword" },
+    { FLOAT_TOKEN_CATEGORY,         "float function" },
+    { SIGNATURE_TOKEN_CATEGORY,     "file signature" },
+    { VECTOR_TOKEN_CATEGORY,        "vector function" },
 
     //------------------------------------------------------------------------------
     // Identifier Pseudo-Tokens.
@@ -821,11 +832,27 @@ const RESERVED_WORD Reserved_Words[] = {
     { END_OF_FILE_TOKEN,            "End of File" },
     { FLOAT_TOKEN,                  "float constant" },
     { STRING_LITERAL_TOKEN,         "string literal" },
+    { UTF8_SIGNATURE_TOKEN,         "UTF-8 signature BOM" },
 
     //------------------------------------------------------------------------------
-    // End of list, marked by `nullptr` token string.
+    // End of list, marked by TokenId TOKEN_COUNT_ and `nullptr` token string.
 
-    { TOKEN_COUNT,                  nullptr }
+    { TOKEN_COUNT_,                 nullptr }
 };
 
-} // end of pov namespace
+TokenId GetCategorizedTokenId(TokenId tokenId)
+{
+    if (tokenId <= SIGNATURE_TOKEN_CATEGORY)
+        return SIGNATURE_TOKEN_CATEGORY;
+    else if (tokenId <= FLOAT_TOKEN_CATEGORY)
+        return FLOAT_TOKEN_CATEGORY;
+    else if (tokenId <= VECTOR_TOKEN_CATEGORY)
+        return VECTOR_TOKEN_CATEGORY;
+    else if (tokenId <= COLOUR_TOKEN_CATEGORY)
+        return COLOUR_TOKEN_CATEGORY;
+    else
+        return tokenId;
+}
+
+}
+// end of namespace pov_parser

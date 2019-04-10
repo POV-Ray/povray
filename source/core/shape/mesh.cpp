@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -60,17 +60,24 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/mesh.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <algorithm>
 #include <limits>
 
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
 
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/material/texture.h"
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
 #include "core/shape/triangle.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -99,6 +106,8 @@ const int INITIAL_NUMBER_OF_ENTRIES = 256;
 HASH_TABLE **Mesh::Vertex_Hash_Table;
 HASH_TABLE **Mesh::Normal_Hash_Table;
 UV_HASH_TABLE **Mesh::UV_Hash_Table;
+
+thread_local std::unique_ptr<BBoxPriorityQueue> Mesh::mtpQueue(new BBoxPriorityQueue());
 
 /*****************************************************************************
 *
@@ -291,7 +300,7 @@ bool Mesh::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
     else
     {
         /* Use the mesh's bounding hierarchy. */
-        inside = inside_bbox_tree(ray, Thread);
+        inside = inside_bbox_tree(ray, Thread->Stats());
     }
 
     if (Test_Flag(this, INVERTED_FLAG))
@@ -1452,7 +1461,7 @@ bool Mesh::intersect_bbox_tree(const BasicRay &ray, const BasicRay &Orig_Ray, DB
     Rayinfo rayinfo(ray);
 
     /* Start with an empty priority queue. */
-    Thread->Mesh_Queue.Clear();
+    mtpQueue->Clear();
     found = false;
 
     Best = BOUND_HUGE;
@@ -1467,13 +1476,13 @@ bool Mesh::intersect_bbox_tree(const BasicRay &ray, const BasicRay &Orig_Ray, DB
 
     /* Set the root object infinite to avoid a test. */
 
-    Check_And_Enqueue(Thread->Mesh_Queue, Root, &Root->BBox, &rayinfo, Thread->Stats());
+    Check_And_Enqueue(*mtpQueue, Root, &Root->BBox, &rayinfo, Thread->Stats());
 
     /* Check elements in the priority queue. */
 
-    while (!Thread->Mesh_Queue.IsEmpty())
+    while (!mtpQueue->IsEmpty())
     {
-        Thread->Mesh_Queue.RemoveMin(Depth, Node);
+        mtpQueue->RemoveMin(Depth, Node);
 
         /*
          * If current intersection is larger than the best intersection found
@@ -1497,7 +1506,7 @@ bool Mesh::intersect_bbox_tree(const BasicRay &ray, const BasicRay &Orig_Ray, DB
             /* This is a node containing leaves to be checked. */
 
             for (i = 0; i < Node->Entries; i++)
-                Check_And_Enqueue(Thread->Mesh_Queue, Node->Node[i], &Node->Node[i]->BBox, &rayinfo, Thread->Stats());
+                Check_And_Enqueue(*mtpQueue, Node->Node[i], &Node->Node[i]->BBox, &rayinfo, Thread->Stats());
         }
         else
         {
@@ -2244,7 +2253,7 @@ bool Mesh::IsOpaque() const
 *
 ******************************************************************************/
 
-void Mesh::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *) const
+void Mesh::UVCoord(Vector2d& Result, const Intersection *Inter) const
 {
     DBL w1, w2, w3, t1, t2;
     Vector3d vA, vB;
@@ -2354,7 +2363,7 @@ void Mesh::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData 
 *
 ******************************************************************************/
 
-bool Mesh::inside_bbox_tree(const BasicRay &ray, TraceThreadData *Thread) const
+bool Mesh::inside_bbox_tree(const BasicRay &ray, RenderStatistics& stats) const
 {
     MeshIndex i, found;
     DBL Best, Depth;
@@ -2364,32 +2373,32 @@ bool Mesh::inside_bbox_tree(const BasicRay &ray, TraceThreadData *Thread) const
     Rayinfo rayinfo(ray);
 
     /* Start with an empty priority queue. */
-    Thread->Mesh_Queue.Clear();
+    mtpQueue->Clear();
     found = 0;
 
     Best = BOUND_HUGE;
 
 #ifdef BBOX_EXTRA_STATS
-    Thread->Stats()[totalQueueResets]++;
+    stats[totalQueueResets]++;
 #endif
 
     /* Check top node. */
     Root = Data->Tree;
 
     /* Set the root object infinite to avoid a test. */
-    Check_And_Enqueue(Thread->Mesh_Queue, Root, &Root->BBox, &rayinfo, Thread->Stats());
+    Check_And_Enqueue(*mtpQueue, Root, &Root->BBox, &rayinfo, stats);
 
     /* Check elements in the priority queue. */
-    while (!Thread->Mesh_Queue.IsEmpty())
+    while (!mtpQueue->IsEmpty())
     {
-        Thread->Mesh_Queue.RemoveMin(Depth, Node);
+        mtpQueue->RemoveMin(Depth, Node);
 
         /* Check current node. */
         if (Node->Entries)
         {
             /* This is a node containing leaves to be checked. */
             for (i = 0; i < Node->Entries; i++)
-                Check_And_Enqueue(Thread->Mesh_Queue, Node->Node[i], &Node->Node[i]->BBox, &rayinfo, Thread->Stats());
+                Check_And_Enqueue(*mtpQueue, Node->Node[i], &Node->Node[i]->BBox, &rayinfo, stats);
         }
         else
         {
@@ -2448,3 +2457,4 @@ void Mesh::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextu
 }
 
 }
+// end of namespace pov

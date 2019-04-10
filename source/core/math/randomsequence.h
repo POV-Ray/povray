@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,9 +38,19 @@
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
+#include "core/math/randomsequence_fwd.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <memory>
 #include <vector>
 
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/math/vector.h"
 
 namespace pov
@@ -53,17 +63,15 @@ namespace pov
 ///
 /// @{
 
-using namespace pov_base;
-
-vector<int> RandomInts(int minval, int maxval, size_t count);
-vector<double> RandomDoubles(int minval, int maxval, size_t count);
+std::vector<int> RandomInts(int minval, int maxval, size_t count);
+std::vector<double> RandomDoubles(int minval, int maxval, size_t count);
 
 DBL POV_rand(unsigned int& next_rand);
 
 // need this to prevent VC++ v8 from thinking that Generator refers to boost::Generator
 class Generator;
 
-class RandomIntSequence
+class RandomIntSequence final
 {
         friend class Generator;
     public:
@@ -71,7 +79,7 @@ class RandomIntSequence
 
         int operator()(size_t seedindex);
 
-        class Generator
+        class Generator final
         {
             public:
                 Generator(RandomIntSequence *seq, size_t seedindex = 0);
@@ -84,10 +92,10 @@ class RandomIntSequence
                 size_t index;
         };
     private:
-        vector<int> values;
+        std::vector<int> values;
 };
 
-class RandomDoubleSequence
+class RandomDoubleSequence final
 {
         friend class Generator;
     public:
@@ -95,7 +103,7 @@ class RandomDoubleSequence
 
         double operator()(size_t seedindex);
 
-        class Generator
+        class Generator final
         {
             public:
                 Generator(RandomDoubleSequence *seq, size_t seedindex = 0);
@@ -108,7 +116,7 @@ class RandomDoubleSequence
                 size_t index;
         };
     private:
-        vector<double> values;
+        std::vector<double> values;
 };
 
 
@@ -127,9 +135,9 @@ class SequentialNumberGenerator
         /// Returns the next number from the sequence.
         virtual Type operator()() = 0;
         /// Returns the next N numbers from the sequence.
-        virtual shared_ptr<vector<Type> > GetSequence(size_t count)
+        virtual std::shared_ptr<std::vector<Type>> GetSequence(size_t count)
         {
-            shared_ptr<vector<Type> > data(new vector<Type>);
+            std::shared_ptr<std::vector<Type>> data(new std::vector<Type>);
             data->reserve(count);
             for (size_t i = 0; i < count; i ++)
                 data->push_back((*this)());
@@ -156,9 +164,9 @@ class IndexedNumberGenerator
         /// Returns a particular number from the sequence.
         virtual Type operator[](size_t index) const = 0;
         /// Returns a particular subsequence from the sequence.
-        virtual shared_ptr<vector<Type> > GetSequence(size_t index, size_t count) const
+        virtual std::shared_ptr<std::vector<Type>> GetSequence(size_t index, size_t count) const
         {
-            shared_ptr<vector<Type> > data(new vector<Type>);
+            std::shared_ptr<std::vector<Type>> data(new std::vector<Type>);
             data->reserve(count);
             for (size_t i = 0; i < count; i ++)
                 data->push_back((*this)[index + i]);
@@ -180,20 +188,20 @@ class IndexedNumberGenerator
 ///
 /// @{
 
-typedef shared_ptr<SequentialNumberGenerator<int> >         SequentialIntGeneratorPtr;
-typedef shared_ptr<SequentialNumberGenerator<double> >      SequentialDoubleGeneratorPtr;
-typedef shared_ptr<SequentialNumberGenerator<Vector3d> >    SequentialVectorGeneratorPtr;
-typedef shared_ptr<SequentialNumberGenerator<Vector2d> >    SequentialVector2dGeneratorPtr;
+typedef std::shared_ptr<SequentialNumberGenerator<int>>         SequentialIntGeneratorPtr;
+typedef std::shared_ptr<SequentialNumberGenerator<double>>      SequentialDoubleGeneratorPtr;
+typedef std::shared_ptr<SequentialNumberGenerator<Vector3d>>    SequentialVectorGeneratorPtr;
+typedef std::shared_ptr<SequentialNumberGenerator<Vector2d>>    SequentialVector2dGeneratorPtr;
 
-typedef shared_ptr<SeedableNumberGenerator<int> >           SeedableIntGeneratorPtr;
-typedef shared_ptr<SeedableNumberGenerator<double> >        SeedableDoubleGeneratorPtr;
-typedef shared_ptr<SeedableNumberGenerator<Vector3d> >      SeedableVectorGeneratorPtr;
-typedef shared_ptr<SeedableNumberGenerator<Vector2d> >      SeedableVector2dGeneratorPtr;
+typedef std::shared_ptr<SeedableNumberGenerator<int>>           SeedableIntGeneratorPtr;
+typedef std::shared_ptr<SeedableNumberGenerator<double>>        SeedableDoubleGeneratorPtr;
+typedef std::shared_ptr<SeedableNumberGenerator<Vector3d>>      SeedableVectorGeneratorPtr;
+typedef std::shared_ptr<SeedableNumberGenerator<Vector2d>>      SeedableVector2dGeneratorPtr;
 
-typedef shared_ptr<IndexedNumberGenerator<int> const>       IndexedIntGeneratorPtr;
-typedef shared_ptr<IndexedNumberGenerator<double> const>    IndexedDoubleGeneratorPtr;
-typedef shared_ptr<IndexedNumberGenerator<Vector3d> const>  IndexedVectorGeneratorPtr;
-typedef shared_ptr<IndexedNumberGenerator<Vector2d> const>  IndexedVector2dGeneratorPtr;
+typedef std::shared_ptr<IndexedNumberGenerator<int> const>      IndexedIntGeneratorPtr;
+typedef std::shared_ptr<IndexedNumberGenerator<double> const>   IndexedDoubleGeneratorPtr;
+typedef std::shared_ptr<IndexedNumberGenerator<Vector3d> const> IndexedVectorGeneratorPtr;
+typedef std::shared_ptr<IndexedNumberGenerator<Vector2d> const> IndexedVector2dGeneratorPtr;
 
 /**
 *  @}
@@ -363,5 +371,6 @@ SequentialVector2dGeneratorPtr GetSubRandom2dGenerator(unsigned int id, double m
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_RANDOMSEQUENCE_H

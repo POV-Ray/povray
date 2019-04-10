@@ -55,7 +55,7 @@ namespace pov_frontend
     using namespace vfe;
     using namespace vfePlatform;
 
-    extern shared_ptr<Display> gDisplay;
+    extern std::shared_ptr<Display> gDisplay;
 
     const UnixOptionsProcessor::Option_Info UnixSDL2Display::Options[] =
     {
@@ -136,7 +136,7 @@ namespace pov_frontend
             // allocate a new pixel counters, dropping influence of previous picture
             m_PxCount.clear(); // not useful, vector was created empty, just to be sure
             m_PxCount.reserve(width*height); // we need that, and the loop!
-            for(vector<unsigned char>::iterator iter = m_PxCount.begin(); iter != m_PxCount.end(); iter++)
+            for(std::vector<unsigned char>::iterator iter = m_PxCount.begin(); iter != m_PxCount.end(); iter++)
                 (*iter) = 0;
         }
         if (m_screen->pixels)
@@ -236,9 +236,9 @@ namespace pov_frontend
           }
 
           // tolerance for border, just hope the Window Manager is not larger than 10
-          width = min(mode.w - 10, width);
+          width = std::min(mode.w - 10, width);
           // tolerance for border and title bar, just hope the Window Manager is not larger than 80
-          height = min(mode.h - 80, height);
+          height = std::min(mode.h - 80, height);
         }
         // calculate display area
         float AspectRatio = float(width)/float(height);
@@ -265,7 +265,7 @@ namespace pov_frontend
 
         m_PxCount.clear();
         m_PxCount.reserve(width*height);
-        for(vector<unsigned char>::iterator iter = m_PxCount.begin(); iter != m_PxCount.end(); iter++)
+        for(std::vector<unsigned char>::iterator iter = m_PxCount.begin(); iter != m_PxCount.end(); iter++)
           (*iter) = 0;
 
         m_valid = true;
@@ -312,7 +312,7 @@ namespace pov_frontend
            * ... and so on
            * TODO: change for integer and use / instead of * in formula ?
            */
-          m_display_scale = min(float(width) / GetWidth(), float(height) / GetHeight());
+          m_display_scale = std::min(float(width) / GetWidth(), float(height) / GetHeight());
         }
 
 
@@ -443,10 +443,10 @@ namespace pov_frontend
         if (!m_valid)
             return;
 
-        int ix1 = min(x1, GetWidth()-1);
-        int ix2 = min(x2, GetWidth()-1);
-        int iy1 = min(y1, GetHeight()-1);
-        int iy2 = min(y2, GetHeight()-1);
+        int ix1 = std::min(x1, GetWidth()-1);
+        int ix2 = std::min(x2, GetWidth()-1);
+        int iy1 = std::min(y1, GetHeight()-1);
+        int iy2 = std::min(y2, GetHeight()-1);
 
         if (SDL_MUSTLOCK(m_screen) && SDL_LockSurface(m_screen) < 0)
             return;
@@ -497,10 +497,10 @@ namespace pov_frontend
         if (!m_valid)
             return;
 
-        unsigned int ix1 = min(x1, GetWidth()-1);
-        unsigned int ix2 = min(x2, GetWidth()-1);
-        unsigned int iy1 = min(y1, GetHeight()-1);
-        unsigned int iy2 = min(y2, GetHeight()-1);
+        unsigned int ix1 = std::min(x1, GetWidth()-1);
+        unsigned int ix2 = std::min(x2, GetWidth()-1);
+        unsigned int iy1 = std::min(y1, GetHeight()-1);
+        unsigned int iy2 = std::min(y2, GetHeight()-1);
 
         if (m_display_scaled)
         {
@@ -526,10 +526,10 @@ namespace pov_frontend
         if (!m_valid)
             return;
 
-        unsigned int ix1 = min(x1, GetWidth()-1);
-        unsigned int ix2 = min(x2, GetWidth()-1);
-        unsigned int iy1 = min(y1, GetHeight()-1);
-        unsigned int iy2 = min(y2, GetHeight()-1);
+        unsigned int ix1 = std::min(x1, GetWidth()-1);
+        unsigned int ix2 = std::min(x2, GetWidth()-1);
+        unsigned int iy1 = std::min(y1, GetHeight()-1);
+        unsigned int iy2 = std::min(y2, GetHeight()-1);
 
         if (SDL_MUSTLOCK(m_screen) && SDL_LockSurface(m_screen) < 0)
             return;

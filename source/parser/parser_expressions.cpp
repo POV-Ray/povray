@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,17 +38,20 @@
 
 // C++ variants of C standard header files
 #include <cctype>
+#include <cmath>
 #include <cstdlib>
+#include <cstring>
 
 // C++ standard header files
 #include <algorithm>
-
-// Boost header files
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <chrono>
 
 // POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
 #include "base/mathutil.h"
+#include "base/pov_mem.h"
+#include "base/stringutilities.h"
+#include "base/image/colourspace.h"
 
 // POV-Ray header files (core module)
 #include "core/material/blendmap.h"
@@ -72,6 +75,9 @@
 // POV-Ray header files (VM module)
 #include "vm/fnpovfpu.h"
 
+// POV-Ray header files (parser module)
+//  (none at the moment)
+
 // this must be the last file included
 #include "base/povdebug.h"
 
@@ -81,30 +87,17 @@ namespace pov_parser
 using namespace pov_base;
 using namespace pov;
 
+using std::min;
+using std::max;
+using std::shared_ptr;
+
 /*****************************************************************************
 * Local preprocessor defines
 ******************************************************************************/
 
-#define ftrue(f) ((int)(fabs(f)>EPSILON))
+#define FTRUE(f) ((int)(fabs(f)>EPSILON))
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 DBL Parser::Parse_Float_Param()
 {
@@ -132,25 +125,7 @@ DBL Parser::Parse_Float_Param()
     return (Local);
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Float_Param2(DBL *Val1,DBL *Val2)
 {
@@ -166,25 +141,7 @@ void Parser::Parse_Float_Param2(DBL *Val1,DBL *Val2)
     Allow_Identifier_In_Call = old_allow_id;
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Vector_Param(Vector3d& Vector)
 {
@@ -193,25 +150,7 @@ void Parser::Parse_Vector_Param(Vector3d& Vector)
     Parse_Paren_End();
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Vector_Param2(Vector3d& Val1, Vector3d& Val2)
 {
@@ -222,23 +161,7 @@ void Parser::Parse_Vector_Param2(Vector3d& Val1, Vector3d& Val2)
     Parse_Paren_End();
 }
 
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_UV_Min(Vector3d& Res)
 {
@@ -249,7 +172,7 @@ void Parser::Parse_UV_Min(Vector3d& Res)
 
     EXPECT
         CASE (OBJECT_ID_TOKEN)
-            uvm = dynamic_cast<UVMeshable*>(reinterpret_cast<ObjectPtr>(Token.Data));
+            uvm = dynamic_cast<UVMeshable*>(CurrentTokenDataPtr<ObjectPtr>());//dynamic_cast<UVMeshable*>(reinterpret_cast<ObjectPtr>(Token.Data));
             EXIT
         END_CASE
 
@@ -296,7 +219,7 @@ void Parser::Parse_UV_Max(Vector3d& Res)
 
     EXPECT
         CASE (OBJECT_ID_TOKEN)
-            uvm = dynamic_cast<UVMeshable*>(reinterpret_cast<ObjectPtr>(Token.Data));
+            uvm = dynamic_cast<UVMeshable*>(CurrentTokenDataPtr<ObjectPtr>());// dynamic_cast<UVMeshable*>(reinterpret_cast<ObjectPtr>(Token.Data));
             EXIT
         END_CASE
 
@@ -344,7 +267,7 @@ void Parser::Parse_UV_Vertex(Vector3d& Res)
 
     EXPECT
         CASE (OBJECT_ID_TOKEN)
-            uvm = dynamic_cast<UVMeshable*>(reinterpret_cast<ObjectPtr>(Token.Data));
+            uvm =  dynamic_cast<UVMeshable*>(CurrentTokenDataPtr<ObjectPtr>());// dynamic_cast<UVMeshable*>(reinterpret_cast<ObjectPtr>(Token.Data));
             EXIT
         END_CASE
 
@@ -398,7 +321,7 @@ void Parser::Parse_UV_Normal(Vector3d& Res)
 
     EXPECT
         CASE (OBJECT_ID_TOKEN)
-            uvm = dynamic_cast<UVMeshable*>(reinterpret_cast<ObjectPtr>(Token.Data));
+            uvm =  dynamic_cast<UVMeshable*>(CurrentTokenDataPtr<ObjectPtr>());// dynamic_cast<UVMeshable*>(reinterpret_cast<ObjectPtr>(Token.Data));
             EXIT
         END_CASE
 
@@ -446,7 +369,7 @@ void Parser::Parse_UV_Normal(Vector3d& Res)
 
 void Parser::Parse_Trace(Vector3d& Res)
 {
-    ObjectPtr Object;
+    ObjectPtr Object = nullptr;
     Intersection intersect;
     TraceTicket ticket(1, 0.0);
     Ray ray(ticket);
@@ -456,16 +379,8 @@ void Parser::Parse_Trace(Vector3d& Res)
 
     Parse_Paren_Begin();
 
-    EXPECT_ONE
-        CASE (OBJECT_ID_TOKEN)
-            Object = reinterpret_cast<ObjectPtr>(Token.Data);
-        END_CASE
-
-        OTHERWISE
-            Object = nullptr;
-            UNGET
-        END_CASE
-    END_EXPECT
+    if (AllowToken(OBJECT_ID_TOKEN))
+        Object = CurrentTokenDataPtr<ObjectPtr>();
 
     if (Object == nullptr)
         Error ("Object identifier expected.");
@@ -484,7 +399,7 @@ void Parser::Parse_Trace(Vector3d& Res)
         Res = intersect.IPoint;
 
         intersect.Object->Normal( Local_Normal, &intersect, GetParserDataPtr());
-        intersect.Object->UVCoord( UVVector, &intersect, GetParserDataPtr());
+        intersect.Object->UVCoord( UVVector, &intersect);
         Local_UV[X] = UVVector[X];
         Local_UV[Y] = UVVector[Y];
         Local_UV[Z] = 0;
@@ -499,20 +414,20 @@ void Parser::Parse_Trace(Vector3d& Res)
         Local_UV = Vector3d(0.0, 0.0, 0.0);
     }
 
-    EXPECT_ONE
-        CASE (VECTOR_FUNCT_TOKEN)
+    EXPECT_ONE_CAT
+        CASE (VECTOR_TOKEN_CATEGORY)
             /* All of these functions return a VECTOR result */
-            if(Token.Function_Id == VECTOR_ID_TOKEN)
+            if(CurrentTrueTokenId() == VECTOR_ID_TOKEN)
             {
-                (*reinterpret_cast<Vector3d *>(Token.Data)) = Local_Normal;
+                SetCurrentTokenData(Local_Normal);
                 /* 2018-12-31, extension: allow UV vector after normal */
                 if ( Parse_Comma() )
                 {
-                    EXPECT_ONE
-                        CASE (VECTOR_FUNCT_TOKEN)
-                        if(Token.Function_Id == VECTOR_ID_TOKEN)
+                    EXPECT_ONE_CAT
+                        CASE (VECTOR_TOKEN_CATEGORY)
+                        if(CurrentTrueTokenId() == VECTOR_ID_TOKEN)
                         {
-                            (*reinterpret_cast<Vector3d *>(Token.Data)) = Local_UV;
+                            SetCurrentTokenData(Local_UV);
                         }
                         else
                         {
@@ -540,23 +455,7 @@ void Parser::Parse_Trace(Vector3d& Res)
     Parse_Paren_End();
 }
 
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_TraceUV(Vector3d& Res)
 {
@@ -570,7 +469,7 @@ void Parser::Parse_TraceUV(Vector3d& Res)
 
     EXPECT_ONE
         CASE (OBJECT_ID_TOKEN)
-            Object = reinterpret_cast<ObjectPtr>(Token.Data);
+            Object = CurrentTokenDataPtr<ObjectPtr>();// reinterpret_cast<ObjectPtr>(Token.Data);
         END_CASE
 
         OTHERWISE
@@ -591,7 +490,7 @@ void Parser::Parse_TraceUV(Vector3d& Res)
 
     if ( Find_Intersection( &intersect, Object, ray, GetParserDataPtr()) )
     {
-        intersect.Object->UVCoord( UVVector, &intersect, GetParserDataPtr());
+        intersect.Object->UVCoord( UVVector, &intersect );
         Res[X] = UVVector[X];
         Res[Y] = UVVector[Y];
         Res[Z] = 0;
@@ -623,26 +522,18 @@ void Parser::Parse_TraceUV(Vector3d& Res)
 
 int Parser::Parse_Inside()
 {
-    ObjectPtr Object;
+    ObjectPtr Object = nullptr;
     Vector3d Local_Vector;
     int Result = 0;
 
     Parse_Paren_Begin();
 
-    EXPECT_ONE
-        CASE (OBJECT_ID_TOKEN)
-            Object = reinterpret_cast<ObjectPtr>(Token.Data);
-        END_CASE
-
-        OTHERWISE
-            Object = nullptr;
-            UNGET
-        END_CASE
-    END_EXPECT
+    if (AllowToken(OBJECT_ID_TOKEN))
+        Object = CurrentTokenDataPtr<ObjectPtr>();
 
     if (Object == nullptr)
         Error ("Object identifier expected.");
-    if((Object->Type & PATCH_OBJECT) == PATCH_OBJECT)
+    if ((Object->Type & PATCH_OBJECT) == PATCH_OBJECT)
         Error ("Solid object identifier expected.");
 
     Parse_Comma();
@@ -721,7 +612,7 @@ bool Parser::Parse_Call()
 * DESCRIPTION
 *
 *   NOTE: Function Parse_RValue in parse.cpp depends on this function to be
-*   able to only use Token.Data of the current token in order to have a kind
+*   able to only use mToken.Data of the current token in order to have a kind
 *   of two token look-ahead in Parse_RValue! [trf]
 *
 * CHANGES
@@ -730,7 +621,7 @@ bool Parser::Parse_Call()
 
 DBL Parser::Parse_Function_Call()
 {
-    FUNCTION_PTR fp = (FUNCTION_PTR )Token.Data;
+    FUNCTION_PTR fp = CurrentTokenDataPtr<AssignableFunction*>()->fn;
     if (fp == nullptr)
         // may happen if a #declare or #local inside a function declaration references the function
         Error("Illegal attempt to evaluate a function being currently declared; did you miss a closing brace?");
@@ -790,7 +681,7 @@ DBL Parser::Parse_Function_Call()
 * DESCRIPTION
 *
 *   NOTE: Function Parse_RValue in parse.cpp depends on this function to be
-*   able to only use Token.Data of the current token in order to have a kind
+*   able to only use mToken.Data of the current token in order to have a kind
 *   of two token look-ahead in Parse_RValue! [trf]
 *
 * CHANGES
@@ -799,7 +690,7 @@ DBL Parser::Parse_Function_Call()
 
 void Parser::Parse_Vector_Function_Call(EXPRESS& Express, int *Terms)
 {
-    FUNCTION_PTR fp = (FUNCTION_PTR )Token.Data;
+    FUNCTION_PTR fp = CurrentTokenDataPtr<AssignableFunction*>()->fn;
     if (fp == nullptr)
         // may happen if a #declare or #local inside a function declaration references the function
         Error("Illegal attempt to evaluate a function being currently declared; did you miss a closing brace?");
@@ -862,7 +753,7 @@ void Parser::Parse_Vector_Function_Call(EXPRESS& Express, int *Terms)
 * DESCRIPTION
 *
 *   NOTE: Function Parse_RValue in parse.cpp depends on this function to be
-*   able to only use Token.Data of the current token in order to have a kind
+*   able to only use mToken.Data of the current token in order to have a kind
 *   of two token look-ahead in Parse_RValue! [trf]
 *
 * CHANGES
@@ -871,7 +762,7 @@ void Parser::Parse_Vector_Function_Call(EXPRESS& Express, int *Terms)
 
 void Parser::Parse_Spline_Call(EXPRESS& Express, int *Terms)
 {
-    GenericSpline *spline = reinterpret_cast<GenericSpline *>(Token.Data);
+    GenericSpline *spline = CurrentTokenDataPtr<GenericSpline*>();
     DBL Val;
     int k;
 
@@ -887,7 +778,7 @@ void Parser::Parse_Spline_Call(EXPRESS& Express, int *Terms)
     Val=Parse_Float();
     Get_Token();
 
-    if(Token.Token_Id == COMMA_TOKEN)
+    if (CurrentTrueTokenId() == COMMA_TOKEN)
     {
         /*If there is a second parameter, make a copy of the spline
         with a new type and evaluate that.*/
@@ -896,7 +787,7 @@ void Parser::Parse_Spline_Call(EXPRESS& Express, int *Terms)
         Release_Spline_Reference(spline);
 
         Get_Token();
-        switch(Token.Token_Id)
+        switch (CurrentTrueTokenId())
         {
             case LINEAR_SPLINE_TOKEN:
                 spline = new LinearSpline(*spline);
@@ -1018,7 +909,7 @@ void Parser::Parse_Spline_Call(EXPRESS& Express, int *Terms)
 * CHANGES
 *
 ******************************************************************************/
-void Parser::Parse_Camera_Access(Vector3d &Vect,const TOKEN t)
+void Parser::Parse_Camera_Access(Vector3d &Vect,const TokenId t)
 {
     Camera that_camera;
     unsigned int idx=0; /* default to first camera */
@@ -1026,21 +917,21 @@ void Parser::Parse_Camera_Access(Vector3d &Vect,const TOKEN t)
     if (sceneData->clocklessAnimation == true)
     {
         EXPECT
-            CASE(LEFT_SQUARE_TOKEN)
+          CASE(LEFT_SQUARE_TOKEN)
             idx = (unsigned int)Parse_Float();
-        GET(RIGHT_SQUARE_TOKEN)
+            GET(RIGHT_SQUARE_TOKEN)
             EXIT
             END_CASE
 
-            OTHERWISE
+          OTHERWISE
             UNGET
             EXIT
             END_CASE
         END_EXPECT
-            if (!(idx<sceneData->cameras.size()))
-            {
-                Error("Not enough cameras.");
-            }
+        if (!(idx<sceneData->cameras.size()))
+        {
+            Error("Not enough cameras.");
+        }
         that_camera = sceneData->cameras[idx];
     }
     else
@@ -1080,6 +971,7 @@ void Parser::Parse_Camera_Access(Vector3d &Vect,const TOKEN t)
 * CHANGES
 *
 ******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 {
@@ -1094,14 +986,14 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
     UCS2 *Local_String, *Local_String2;
     char *Local_C_String;
     UCS2String ign;
-    IStream *f;
+    shared_ptr<IStream> f;
     POV_ARRAY *a;
-    bool Old_Ok=Ok_To_Declare;
+    bool oldOkToDeclare = IsOkToDeclare();
     DBL greater_val, less_val, equal_val;
     PIGMENT *Pigment; // JN2007: Image map dimensions
     GenericSpline *spline;
 
-    Ok_To_Declare=true;
+    SetOkToDeclare(true);
 
     EXPECT
         CASE (PLUS_TOKEN)
@@ -1113,10 +1005,10 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
         END_CASE
     END_EXPECT
 
-    EXPECT_ONE
-        CASE (FLOAT_FUNCT_TOKEN)
+    EXPECT_ONE_CAT
+        CASE (FLOAT_TOKEN_CATEGORY)
             /* All of these functions return a DBL result */
-            switch(Token.Function_Id)
+            switch(CurrentTrueTokenId())
             {
                 case ABS_TOKEN:
                     Val = Parse_Float_Param();
@@ -1175,7 +1067,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
                 case ATAN2_TOKEN:
                     Parse_Float_Param2(&Val,&Val2);
-                    if (ftrue(Val) || ftrue(Val2))
+                    if (FTRUE(Val) || FTRUE(Val2))
                         Val = atan2(Val,Val2);
                     else
                         Error("Domain error in atan2!");
@@ -1184,21 +1076,27 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                 case COSH_TOKEN:
                     Val = cosh(Parse_Float_Param());
                     break;
+
                 case SINH_TOKEN:
                     Val = sinh(Parse_Float_Param());
                     break;
+
                 case TANH_TOKEN:
                     Val = tanh(Parse_Float_Param());
                     break;
+
                 case ACOSH_TOKEN:
-                    Val = acosh(Parse_Float_Param());
+                    Val = std::acosh(Parse_Float_Param());
                     break;
+
                 case ASINH_TOKEN:
-                    Val = asinh(Parse_Float_Param());
+                    Val = std::asinh(Parse_Float_Param());
                     break;
+
                 case ATANH_TOKEN:
-                    Val = atanh(Parse_Float_Param());
+                    Val = std::atanh(Parse_Float_Param());
                     break;
+
                 case CEIL_TOKEN:
                     Val = ceil(Parse_Float_Param());
                     break;
@@ -1237,10 +1135,9 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
                     Local_C_String=Parse_C_String();
 
-                    f = Locate_File(UCS2String(ASCIItoUCS2String(Local_C_String)), POV_File_Text_User, ign, false);
+                    f = Locate_File(SysToUCS2String(Local_C_String), POV_File_Text_User, ign, false);
                     Val = (f == nullptr) ? 0.0 : 1.0;
-                    if (f != nullptr)
-                        delete f;
+                    f = nullptr;
 
                     POV_FREE(Local_C_String);
 
@@ -1248,11 +1145,11 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     break;
 
                 case FLOAT_ID_TOKEN:
-                    Val = *(reinterpret_cast<DBL *>(Token.Data));
+                    Val = CurrentTokenData<DBL>();
                     break;
 
                 case FLOAT_TOKEN:
-                    Val = Token.Token_Float;
+                    Val = mToken.Token_Float;
                     break;
 
                 case FLOOR_TOKEN:
@@ -1378,25 +1275,23 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     less_val = Parse_Float();
                     Parse_Comma();
                     equal_val = Parse_Float();
-                    EXPECT_ONE
-                        CASE(COMMA_TOKEN)
-                            greater_val = Parse_Float();
-                            if(Val < 0.0)
-                                Val = less_val;
-                            else if(Val == 0.0)
-                                Val = equal_val;
-                            else
-                                Val = greater_val;
-                        END_CASE
-
-                        OTHERWISE
-                            UNGET
-                            if(Val < 0.0)
-                                Val = less_val;
-                            else
-                                Val = equal_val;
-                        END_CASE
-                    END_EXPECT
+                    if (AllowToken(COMMA_TOKEN))
+                    {
+                        greater_val = Parse_Float();
+                        if (Val < 0.0)
+                            Val = less_val;
+                        else if (Val == 0.0)
+                            Val = equal_val;
+                        else
+                            Val = greater_val;
+                    }
+                    else
+                    {
+                        if (Val < 0.0)
+                            Val = less_val;
+                        else
+                            Val = equal_val;
+                    }
                     Parse_Paren_End();
                     break;
 
@@ -1517,7 +1412,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                 case DIMENSIONS_TOKEN:
                     Parse_Paren_Begin();
                     GET(ARRAY_ID_TOKEN)
-                    a = reinterpret_cast<POV_ARRAY *>(*(Token.DataPtr));
+                    a = reinterpret_cast<POV_ARRAY *>(*(mToken.DataPtr));
                     Val = a->maxDim + 1;
                     Parse_Paren_End();
                     break;
@@ -1527,7 +1422,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     EXPECT
                         CASE(ARRAY_ID_TOKEN)
                         Parse_Comma();
-                        a = reinterpret_cast<POV_ARRAY *>(*(Token.DataPtr));
+                        a = reinterpret_cast<POV_ARRAY *>(*(mToken.DataPtr));
                         i = (int)Parse_Float()-1;
                         if ((i < 0) || (i > a->maxDim))
                         {
@@ -1540,7 +1435,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                         END_CASE
 
                         CASE(SPLINE_ID_TOKEN)
-                            spline = reinterpret_cast<GenericSpline*>(Token.Data);
+                            spline = reinterpret_cast<GenericSpline*>(mToken.Data);
                             Val = spline->SplineEntries.size();
                         EXIT
                         END_CASE
@@ -1549,22 +1444,21 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                             Expectation_Error("spline or array");
                         END_CASE
                     END_EXPECT
-
                     Parse_Paren_End();
                     break;
 
                 case NOW_TOKEN:
                     {
-                        static boost::posix_time::ptime y2k(boost::gregorian::date(2000,1,1));
-                        boost::posix_time::ptime now(boost::posix_time::microsec_clock::universal_time());
-                        Val = (now-y2k).total_microseconds() * (1.0e-6) / (24*60*60);
+                        auto now = std::chrono::system_clock::now();
+                        using FractionalDays = std::chrono::duration<double, std::ratio<24 * 60 * 60>>;
+                        Val = std::chrono::duration_cast<FractionalDays> (now - mY2K).count();
                     }
                     break;
 
                 case GET_TRIANGLE_COUNT_TOKEN:
                     Parse_Paren_Begin();
                     GET(OBJECT_ID_TOKEN)
-                    Object = (ObjectPtr)Token.Data;
+                    Object = CurrentTokenDataPtr<ObjectPtr>();//(ObjectPtr)Token.Data;
                     if ((LocalMesh=dynamic_cast<Mesh*>(Object)))
                     {
                       Val = LocalMesh->Data->Number_Of_Triangles;
@@ -1579,7 +1473,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                 case GET_VERTEX_COUNT_TOKEN:
                     Parse_Paren_Begin();
                     GET(OBJECT_ID_TOKEN)
-                    Object = (ObjectPtr)Token.Data;
+                    Object = CurrentTokenDataPtr<ObjectPtr>();//(ObjectPtr)Token.Data;
                     if ((LocalMesh=dynamic_cast<Mesh*>(Object)))
                     {
                       Val = LocalMesh->Data->Number_Of_Vertices;
@@ -1594,7 +1488,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                 case IS_SMOOTH_TRIANGLE_TOKEN:
                     Parse_Paren_Begin();
                     GET(OBJECT_ID_TOKEN)
-                    Object = (ObjectPtr)Token.Data;
+                    Object = CurrentTokenDataPtr<ObjectPtr>();//(ObjectPtr)Token.Data;
                     Parse_Comma();
                     i = (int)Parse_Float();
                     if ((LocalMesh = dynamic_cast<Mesh*>(Object))
@@ -1613,7 +1507,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                 case GET_NORMAL_COUNT_TOKEN:
                     Parse_Paren_Begin();
                     GET(OBJECT_ID_TOKEN)
-                    Object = (ObjectPtr)Token.Data;
+                    Object = CurrentTokenDataPtr<ObjectPtr>();//(ObjectPtr)Token.Data;
                     if ((LocalMesh=dynamic_cast<Mesh*>(Object)))
                     {
                       Val = LocalMesh->Data->Number_Of_Normals;
@@ -1628,7 +1522,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                 case GET_UV_COUNT_TOKEN:
                     Parse_Paren_Begin();
                     GET(OBJECT_ID_TOKEN)
-                    Object = (ObjectPtr)Token.Data;
+                    Object = CurrentTokenDataPtr<ObjectPtr>();//(ObjectPtr)Token.Data;
                     if ((LocalMesh=dynamic_cast<Mesh*>(Object)))
                     {
                       Val = LocalMesh->Data->Number_Of_UVCoords;
@@ -1645,9 +1539,9 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
             Express[0]=Val;
         END_CASE
 
-        CASE (VECTOR_FUNCT_TOKEN)
+        CASE (VECTOR_TOKEN_CATEGORY)
             /* All of these functions return a VECTOR result */
-            switch(Token.Function_Id)
+            switch(CurrentTrueTokenId())
             {
                 case VAXIS_ROTATE_TOKEN:
                     Parse_Paren_Begin();
@@ -1667,7 +1561,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     break;
 
                 case VECTOR_ID_TOKEN:
-                    Vect = *reinterpret_cast<Vector3d *>(Token.Data);
+                    Vect = CurrentTokenData<Vector3d>();
                     break;
 
                 case VNORMALIZE_TOKEN:
@@ -1743,19 +1637,17 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
                 case MIN_EXTENT_TOKEN:
                     Parse_Paren_Begin();
-                    EXPECT_ONE
-                        CASE (OBJECT_ID_TOKEN)
-                            Object = reinterpret_cast<ObjectPtr>(Token.Data);
-                            if ( Object )
-                                Vect = Vector3d(Object->BBox.lowerLeft);
-                        END_CASE
-
-                        OTHERWISE
-                            Object = nullptr;
-                            Vect = Vector3d(0.0,0.0,0.0);
-                            UNGET
-                        END_CASE
-                    END_EXPECT
+                    if (AllowToken(OBJECT_ID_TOKEN))
+                    {
+                        Object = CurrentTokenDataPtr<ObjectPtr>();
+                        if (Object)
+                            Vect = Vector3d(Object->BBox.lowerLeft);
+                    }
+                    else
+                    {
+                        Object = nullptr;
+                        Vect = Vector3d(0.0,0.0,0.0);
+                    }
                     Parse_Paren_End();
                     break;
 
@@ -1763,14 +1655,14 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     Parse_Paren_Begin();
                     EXPECT_ONE
                         CASE (OBJECT_ID_TOKEN)
-                            Object = reinterpret_cast<ObjectPtr>(Token.Data);
+                            Object = CurrentTokenDataPtr<ObjectPtr>();
                             if ( Object )
                                 Vect = Vector3d(Object->BBox.lowerLeft+Object->BBox.size);
                         END_CASE
 
                         // JN2007: Image map dimensions:
                         CASE4 (DENSITY_ID_TOKEN,NORMAL_ID_TOKEN,PIGMENT_ID_TOKEN,TEXTURE_ID_TOKEN)
-                            Pigment = reinterpret_cast<PIGMENT *>(Token.Data);
+                            Pigment = CurrentTokenDataPtr<PIGMENT*>();
                             if (const ImagePatternImpl *pattern = dynamic_cast<ImagePatternImpl*>(Pigment->pattern.get()))
                             {
                                 Vect[X] = pattern->pImage->iwidth;
@@ -1802,13 +1694,13 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                 case CAMERA_DIRECTION_TOKEN:
                 case CAMERA_RIGHT_TOKEN:
                 case CAMERA_UP_TOKEN:
-                    Parse_Camera_Access(Vect, Token.Function_Id);
+                    Parse_Camera_Access(Vect, CurrentTrueTokenId() );
                     break;
 
                 case GET_VERTEX_INDICES_TOKEN:
                     Parse_Paren_Begin();
                     GET(OBJECT_ID_TOKEN)
-                    Object = (ObjectPtr)Token.Data;
+                    Object = CurrentTokenDataPtr<ObjectPtr>();//(ObjectPtr)Token.Data;
                     Parse_Comma();
                     i = (int)Parse_Float();
                     if ((LocalMesh = dynamic_cast<Mesh*>(Object))
@@ -1830,7 +1722,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                 case GET_NORMAL_INDICES_TOKEN:
                     Parse_Paren_Begin();
                     GET(OBJECT_ID_TOKEN)
-                    Object = (ObjectPtr)Token.Data;
+                    Object = CurrentTokenDataPtr<ObjectPtr>();//(ObjectPtr)Token.Data;
                     Parse_Comma();
                     i = (int)Parse_Float();
                     if ((LocalMesh = dynamic_cast<Mesh*>(Object))
@@ -1852,7 +1744,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                 case GET_UV_INDICES_TOKEN:
                     Parse_Paren_Begin();
                     GET(OBJECT_ID_TOKEN)
-                    Object = (ObjectPtr)Token.Data;
+                    Object = CurrentTokenDataPtr<ObjectPtr>();//(ObjectPtr)Token.Data;
                     Parse_Comma();
                     i = (int)Parse_Float();
                     if ((LocalMesh = dynamic_cast<Mesh*>(Object))
@@ -1874,7 +1766,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                 case GET_VERTEX_TOKEN:
                     Parse_Paren_Begin();
                     GET(OBJECT_ID_TOKEN)
-                    Object = (ObjectPtr)Token.Data;
+                    Object = CurrentTokenDataPtr<ObjectPtr>();//(ObjectPtr)Token.Data;
                     Parse_Comma();
                     i = (int)Parse_Float();
                     if ((LocalMesh = dynamic_cast<Mesh*>(Object))
@@ -1895,7 +1787,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                 case GET_NORMAL_TOKEN:
                     Parse_Paren_Begin();
                     GET(OBJECT_ID_TOKEN)
-                    Object = (ObjectPtr)Token.Data;
+                    Object = CurrentTokenDataPtr<ObjectPtr>();//(ObjectPtr)Token.Data;
                     Parse_Comma();
                     i = (int)Parse_Float();
                     if ((LocalMesh = dynamic_cast<Mesh*>(Object))
@@ -1916,7 +1808,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                 case GET_UV_TOKEN:
                     Parse_Paren_Begin();
                     GET(OBJECT_ID_TOKEN)
-                    Object = (ObjectPtr)Token.Data;
+                    Object = CurrentTokenDataPtr<ObjectPtr>();//(ObjectPtr)Token.Data;
                     Parse_Comma();
                     i = (int)Parse_Float();
                     if ((LocalMesh = dynamic_cast<Mesh*>(Object))
@@ -1962,19 +1854,19 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
         CASE (COLOUR_ID_TOKEN)
             *Terms=5;
-            (*reinterpret_cast<RGBFTColour *>(Token.Data)).Get(Express, *Terms);
+            CurrentTokenData<RGBFTColour>().Get(Express, *Terms);
         END_CASE
 
         CASE (UV_ID_TOKEN)
             *Terms=2;
             for (i=0; i<2; i++)
-                Express[i]=(DBL)(  (*reinterpret_cast<Vector2d *>(Token.Data))[i]  );
+                Express[i] = CurrentTokenData<Vector2d>()[i];
         END_CASE
 
         CASE (VECTOR_4D_ID_TOKEN)
             *Terms=4;
             for (i=0; i<4; i++)
-                Express[i]=(DBL)(  (reinterpret_cast<DBL *>(Token.Data))[i]  );
+                Express[i] = CurrentTokenDataPtr<DBL*>()[i];
         END_CASE
 
         CASE (T_TOKEN)
@@ -1998,21 +1890,25 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
         END_CASE
 
         CASE (DASH_TOKEN)
-            Ok_To_Declare=Old_Ok;
+            POV_EXPERIMENTAL_ASSERT(IsOkToDeclare());
+            SetOkToDeclare(oldOkToDeclare);
             Parse_Num_Factor(Express,Terms);
-            Old_Ok=Ok_To_Declare;
-            Ok_To_Declare=true;
+            POV_EXPERIMENTAL_ASSERT(oldOkToDeclare == IsOkToDeclare());
+            oldOkToDeclare = IsOkToDeclare();
+            SetOkToDeclare(true);
             for (i=0; i<*Terms; i++)
                 Express[i]=-Express[i];
         END_CASE
 
         CASE (EXCLAMATION_TOKEN)
-            Ok_To_Declare=Old_Ok;
+            POV_EXPERIMENTAL_ASSERT(IsOkToDeclare());
+            SetOkToDeclare(oldOkToDeclare);
             Parse_Num_Factor(Express,Terms);
-            Old_Ok=Ok_To_Declare;
-            Ok_To_Declare=true;
+            POV_EXPERIMENTAL_ASSERT(oldOkToDeclare == IsOkToDeclare());
+            oldOkToDeclare = IsOkToDeclare();
+            SetOkToDeclare(true);
             for (i=0; i<*Terms; i++)
-                Express[i] = ftrue(Express[i])?0.0:1.0;
+                Express[i] = FTRUE(Express[i])?0.0:1.0;
         END_CASE
 
         CASE (LEFT_PAREN_TOKEN)
@@ -2035,18 +1931,18 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
             Express[Y] = Parse_Float();   Parse_Comma();
             *Terms=2;
 
-            EXPECT_ONE
-                CASE_EXPRESS
+            EXPECT_ONE_CAT
+                CASE_EXPRESS_UNGET
                     /* If a 3rd float is found, parse it. */
                     Express[2] = Parse_Float(); Parse_Comma();
                     *Terms=3;
-                    EXPECT_ONE
-                        CASE_EXPRESS
+                    EXPECT_ONE_CAT
+                        CASE_EXPRESS_UNGET
                             /* If a 4th float is found, parse it. */
                             Express[3] = Parse_Float(); Parse_Comma();
                             *Terms=4;
-                            EXPECT_ONE
-                                CASE_EXPRESS
+                            EXPECT_ONE_CAT
+                                CASE_EXPRESS_UNGET
                                     /* If a 5th float is found, parse it. */
                                     Express[4] = Parse_Float();
                                     *Terms=5;
@@ -2081,113 +1977,74 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
         END_CASE
     END_EXPECT
 
-    Ok_To_Declare=Old_Ok;
+    SetOkToDeclare(oldOkToDeclare);
 
     /* Parse VECTOR.x or COLOR.red type things */
-    EXPECT_ONE
-        CASE(PERIOD_TOKEN)
-            EXPECT_ONE
-                CASE (VECTOR_FUNCT_TOKEN)
-                    switch(Token.Function_Id)
-                    {
-                        case X_TOKEN:
-                            i=X;
-                            break;
+    if (AllowToken(PERIOD_TOKEN))
+    {
+        EXPECT_ONE
+            CASE(X_TOKEN)
+                i=X;
+            END_CASE
 
-                        case Y_TOKEN:
-                            i=Y;
-                            break;
+            CASE(Y_TOKEN)
+                i=Y;
+            END_CASE
 
-                        case Z_TOKEN:
-                            i=Z;
-                            break;
+            CASE(Z_TOKEN)
+                i=Z;
+            END_CASE
 
-                        default:
-                            Expectation_Error ("x, y, or z");
-                    }
-                END_CASE
+            CASE(RED_TOKEN)
+                i=pRED;
+            END_CASE
 
-                CASE (COLOUR_KEY_TOKEN)
-                    switch(Token.Function_Id)
-                    {
-                        case RED_TOKEN:
-                            i=pRED;
-                            break;
+            CASE(GREEN_TOKEN)
+                i=pGREEN;
+            END_CASE
 
-                        case GREEN_TOKEN:
-                            i=pGREEN;
-                            break;
+            CASE(BLUE_TOKEN)
+                i=pBLUE;
+            END_CASE
 
-                        case BLUE_TOKEN:
-                            i=pBLUE;
-                            break;
+            CASE(FILTER_TOKEN)
+                i=pFILTER;
+            END_CASE
 
-                        case FILTER_TOKEN:
-                            i=pFILTER;
-                            break;
+            CASE(TRANSMIT_TOKEN)
+                i=pTRANSM;
+            END_CASE
 
-                        case TRANSMIT_TOKEN:
-                            i=pTRANSM;
-                            break;
+            CASE(GRAY_TOKEN)
+                Express[0]=PreciseRGBFTColour(Express).Greyscale();
+                i=1;
+            END_CASE
 
-                        case GRAY_TOKEN:
-                            *Terms=1;
-                            Express[0]=PreciseRGBFTColour(Express).Greyscale();
-                            return;
+            CASE(U_TOKEN)
+                i=U;
+            END_CASE
 
-                        default:
-                            Expectation_Error ("red, green, blue, filter, transmit, gray or vector component");
-                    }
-                END_CASE
+            CASE(V_TOKEN)
+                i=V;
+            END_CASE
 
-                CASE(U_TOKEN)
-                    i=U;
-                END_CASE
+            CASE(T_TOKEN)
+                i=T;
+            END_CASE
 
-                CASE(V_TOKEN)
-                    i=V;
-                END_CASE
+            OTHERWISE
+                Expectation_Error ("x, y, z, u, v, t or color component");
+            END_CASE
+        END_EXPECT
 
-                CASE(T_TOKEN)
-                    i=T;
-                END_CASE
-
-                OTHERWISE
-                    Expectation_Error ("x, y, z, u, v, t or color component");
-                END_CASE
-            END_EXPECT
-
-            if (i>=*Terms)
-                Error("Bad operands for period operator.");
-            *Terms=1;
-            Express[0]=Express[i];
-        END_CASE
-
-        OTHERWISE
-            UNGET
-        END_CASE
-    END_EXPECT
+        if (i>=*Terms)
+            Error("Bad operands for period operator.");
+        *Terms=1;
+        Express[0]=Express[i];
+    }
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 /* Promote_Express promotes Express to the requested number of terms.  If
    *Old_Terms==1, then it sets all terms to Express[0].  Otherwise, it pads
@@ -2364,24 +2221,7 @@ void Parser::Parse_Rel_Factor (EXPRESS& Express,int *Terms)
 
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 DBL Parser::Parse_Rel_String_Term (const UCS2 *lhs)
 {
@@ -2445,23 +2285,7 @@ DBL Parser::Parse_Rel_String_Term (const UCS2 *lhs)
     END_EXPECT
 }
 
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Rel_Term (EXPRESS& Express,int *Terms)
 {
@@ -2469,8 +2293,8 @@ void Parser::Parse_Rel_Term (EXPRESS& Express,int *Terms)
     EXPRESS Local_Express;
     int Local_Terms;
 
-    bool old_Ok_To_Declare = Ok_To_Declare;
-    Ok_To_Declare=true;
+    bool oldOkToDeclare = IsOkToDeclare();
+    SetOkToDeclare(true);
 
     UCS2 *Local_String = Parse_String(false, false);
     if (Local_String != nullptr)
@@ -2478,10 +2302,10 @@ void Parser::Parse_Rel_Term (EXPRESS& Express,int *Terms)
             *Terms = 1;
             Express[0] = Parse_Rel_String_Term(Local_String);
             POV_FREE(Local_String);
-            Ok_To_Declare = old_Ok_To_Declare;
+            SetOkToDeclare(oldOkToDeclare);
             return;
     }
-    Ok_To_Declare = old_Ok_To_Declare;
+    SetOkToDeclare(oldOkToDeclare);
 
     Parse_Rel_Factor(Express,Terms);
 
@@ -2502,7 +2326,7 @@ void Parser::Parse_Rel_Term (EXPRESS& Express,int *Terms)
             Promote_Express(Express,Terms,Local_Terms);
 
             for(i=0;i<*Terms;i++)
-                Express[i] = (DBL)((Express[i] <= Local_Express[i]) || (!ftrue(Express[i]-Local_Express[i])));
+                Express[i] = (DBL)((Express[i] <= Local_Express[i]) || (!FTRUE(Express[i]-Local_Express[i])));
         END_CASE
 
         CASE (EQUALS_TOKEN)
@@ -2510,7 +2334,7 @@ void Parser::Parse_Rel_Term (EXPRESS& Express,int *Terms)
             Promote_Express(Express,Terms,Local_Terms);
 
             for(i=0;i<*Terms;i++)
-                Express[i] = (DBL)(!ftrue(Express[i]-Local_Express[i]));
+                Express[i] = (DBL)(!FTRUE(Express[i]-Local_Express[i]));
         END_CASE
 
         CASE (REL_NE_TOKEN)
@@ -2518,7 +2342,7 @@ void Parser::Parse_Rel_Term (EXPRESS& Express,int *Terms)
             Promote_Express(Express,Terms,Local_Terms);
 
             for(i=0;i<*Terms;i++)
-                Express[i] = (DBL)ftrue(Express[i]-Local_Express[i]);
+                Express[i] = (DBL)FTRUE(Express[i]-Local_Express[i]);
         END_CASE
 
         CASE (REL_GE_TOKEN)
@@ -2526,7 +2350,7 @@ void Parser::Parse_Rel_Term (EXPRESS& Express,int *Terms)
             Promote_Express(Express,Terms,Local_Terms);
 
             for(i=0;i<*Terms;i++)
-                Express[i] = (DBL)((Express[i] >= Local_Express[i]) || (!ftrue(Express[i]-Local_Express[i])));
+                Express[i] = (DBL)((Express[i] >= Local_Express[i]) || (!FTRUE(Express[i]-Local_Express[i])));
         END_CASE
 
         CASE (RIGHT_ANGLE_TOKEN)
@@ -2545,25 +2369,7 @@ void Parser::Parse_Rel_Term (EXPRESS& Express,int *Terms)
 
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Logical (EXPRESS& Express,int *Terms)
 {
@@ -2579,7 +2385,7 @@ void Parser::Parse_Logical (EXPRESS& Express,int *Terms)
             Promote_Express(Express,Terms,Local_Terms);
 
             for(i=0;i<*Terms;i++)
-                Express[i] = (DBL)(ftrue(Express[i]) && ftrue(Local_Express[i]));
+                Express[i] = (DBL)(FTRUE(Express[i]) && FTRUE(Local_Express[i]));
         END_CASE
 
         CASE (BAR_TOKEN)
@@ -2587,7 +2393,7 @@ void Parser::Parse_Logical (EXPRESS& Express,int *Terms)
             Promote_Express(Express,Terms,Local_Terms);
 
             for(i=0;i<*Terms;i++)
-                Express[i] = (DBL)(ftrue(Express[i]) || ftrue(Local_Express[i]));
+                Express[i] = (DBL)(FTRUE(Express[i]) || FTRUE(Local_Express[i]));
         END_CASE
 
         OTHERWISE
@@ -2598,25 +2404,7 @@ void Parser::Parse_Logical (EXPRESS& Express,int *Terms)
 
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Express (EXPRESS& Express,int *Terms)
 {
@@ -2626,54 +2414,33 @@ void Parser::Parse_Express (EXPRESS& Express,int *Terms)
 
     Parse_Logical(Express,&Local_Terms1);
 
-    EXPECT_ONE
-        CASE (QUESTION_TOKEN)
-            if (Local_Terms1 != 1)
-                Error("Conditional must evaluate to a float.");
-            Parse_Express(Local_Express1,&Local_Terms1);
-            GET(COLON_TOKEN);
-            Parse_Express(Local_Express2,&Local_Terms2);
-            if (ftrue(Express[0]))
-            {
-                Chosen = &Local_Express1;
-                *Terms = Local_Terms1;
-            }
-            else
-            {
-                Chosen = &Local_Express2;
-                *Terms = Local_Terms2;
-            }
-            POV_MEMCPY(Express,Chosen,sizeof(EXPRESS));
-        END_CASE
-
-        OTHERWISE
-            /* Not a (c)?a:b expression. */
-            *Terms=Local_Terms1;
-            UNGET
-        END_CASE
-    END_EXPECT
-
+    if (AllowToken(QUESTION_TOKEN))
+    {
+        if (Local_Terms1 != 1)
+            Error("Conditional must evaluate to a float.");
+        Parse_Express(Local_Express1, &Local_Terms1);
+        GET(COLON_TOKEN);
+        Parse_Express(Local_Express2, &Local_Terms2);
+        if (FTRUE(Express[0]))
+        {
+            Chosen = &Local_Express1;
+            *Terms = Local_Terms1;
+        }
+        else
+        {
+            Chosen = &Local_Express2;
+            *Terms = Local_Terms2;
+        }
+        std::memcpy(Express, Chosen, sizeof(EXPRESS));
+    }
+    else
+    {
+        /* Not a (c)?a:b expression. */
+        *Terms = Local_Terms1;
+    }
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 DBL Parser::Parse_Float ()
 {
@@ -2755,32 +2522,14 @@ bool Parser::Parse_Bool(const char* parameterName)
     return value;
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 DBL Parser::Allow_Float (DBL defval)
 {
     DBL retval;
 
-    EXPECT_ONE
-        CASE_EXPRESS
+    EXPECT_ONE_CAT
+        CASE_EXPRESS_UNGET
             retval = Parse_Float();
         END_CASE
 
@@ -2793,31 +2542,14 @@ DBL Parser::Allow_Float (DBL defval)
     return (retval);
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 int Parser::Allow_Vector (Vector3d& Vect)
 {
     int retval;
 
-    EXPECT_ONE
-        CASE_EXPRESS
+    EXPECT_ONE_CAT
+        CASE_EXPRESS_UNGET
             Parse_Vector(Vect);
             retval = true;
         END_CASE
@@ -2853,17 +2585,15 @@ int Parser::Allow_Vector4D (VECTOR_4D Vect)
 {
 	int retval;
 
-	EXPECT
-		CASE_EXPRESS
+	EXPECT_ONE_CAT
+		CASE_EXPRESS_UNGET
 			Parse_Vector4D(Vect);
 			retval = true;
-			EXIT
 		END_CASE
 
 		OTHERWISE
 			UNGET
 			retval = false;
-			EXIT
 		END_CASE
 	END_EXPECT
 
@@ -2889,6 +2619,7 @@ int Parser::Allow_Vector4D (VECTOR_4D Vect)
 * CHANGES
 *
 ******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Vector (Vector3d& Vector)
 {
@@ -2920,24 +2651,7 @@ void Parser::Parse_Vector (Vector3d& Vector)
     Allow_Identifier_In_Call = old_allow_id;
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Vector4D (VECTOR_4D Vector)
 {
@@ -2969,26 +2683,7 @@ void Parser::Parse_Vector4D (VECTOR_4D Vector)
     Allow_Identifier_In_Call = old_allow_id;
 }
 
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_UV_Vect (Vector2d& UV_Vect)
 {
@@ -3020,25 +2715,7 @@ void Parser::Parse_UV_Vect (Vector2d& UV_Vect)
     Allow_Identifier_In_Call = old_allow_id;
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 int Parser::Parse_Unknown_Vector(EXPRESS& Express, bool allow_identifier, bool *had_identifier)
 {
@@ -3068,24 +2745,7 @@ int Parser::Parse_Unknown_Vector(EXPRESS& Express, bool allow_identifier, bool *
     return(Terms);
 }
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Scale_Vector (Vector3d& Vector)
 {
@@ -3108,25 +2768,7 @@ void Parser::Parse_Scale_Vector (Vector3d& Vector)
     }
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
 {
@@ -3148,9 +2790,9 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
 
     ALLOW(COLOUR_TOKEN)
 
-    EXPECT
-        CASE (COLOUR_KEY_TOKEN)
-            switch(Token.Function_Id)
+    EXPECT_CAT
+        CASE (COLOUR_TOKEN_CATEGORY)
+            switch(CurrentTrueTokenId())
             {
                 case ALPHA_TOKEN:
                     VersionWarning(155, "Keyword ALPHA discontinued. Use FILTER instead.");
@@ -3379,8 +3021,7 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
             }
         END_CASE
 
-        CASE_VECTOR
-            UNGET
+        CASE_VECTOR_UNGET
             if (startedParsing)
             {
                 EXIT
@@ -3391,7 +3032,7 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
                 // five value color vector. Any single float will be promoted to the full
                 // 'tgtTerms' value. This usually results in filter and trasmit values >0,
                 // which caused shadow artifacts back to at least version v3.6.1.
-                if ((Token.Token_Id==FLOAT_FUNCT_TOKEN) || (Token.Token_Id==FUNCT_ID_TOKEN))
+                if ((CurrentCategorizedTokenId() == FLOAT_TOKEN_CATEGORY) || (CurrentTrueTokenId() == FUNCT_ID_TOKEN))
                     sawFloatOrFloatFnct = true;
                 else
                     sawFloatOrFloatFnct = false;
@@ -3504,7 +3145,7 @@ void Parser::Parse_BlendMapData<PigmentBlendMapData> (BlendMapTypeId Blend_Type,
             break;
 
         default:
-            POV_PARSER_ASSERT(false);
+            POV_PARSER_PANIC();
             break;
     }
 }
@@ -3534,10 +3175,12 @@ void Parser::Parse_BlendMapData<TexturePtr> (BlendMapTypeId Blend_Type, TextureP
 template<typename MAP_T>
 shared_ptr<MAP_T> Parser::Parse_Blend_Map (BlendMapTypeId Blend_Type,int Pat_Type)
 {
-    shared_ptr<MAP_T>       New;
-    GenericPigmentBlendMapPtr pigmentBlendMap;
-    typename MAP_T::Entry   Temp_Ent;
-    typename MAP_T::Vector  tempList;
+    using MAP_PTR_T = shared_ptr<MAP_T>;
+
+    MAP_PTR_T                   New;
+    GenericPigmentBlendMapPtr   pigmentBlendMap;
+    typename MAP_T::Entry       Temp_Ent;
+    typename MAP_T::Vector      tempList;
     bool old_allow_id = Allow_Identifier_In_Call;
     Allow_Identifier_In_Call = false;
     int blendMode = 0;
@@ -3548,7 +3191,7 @@ shared_ptr<MAP_T> Parser::Parse_Blend_Map (BlendMapTypeId Blend_Type,int Pat_Typ
     EXPECT
         CASE2 (COLOUR_MAP_ID_TOKEN, PIGMENT_MAP_ID_TOKEN)
         CASE3 (NORMAL_MAP_ID_TOKEN, TEXTURE_MAP_ID_TOKEN, SLOPE_MAP_ID_TOKEN)
-            New = Copy_Blend_Map (*(reinterpret_cast<shared_ptr<MAP_T> *> (Token.Data)));
+            New = Copy_Blend_Map (CurrentTokenData<MAP_PTR_T>());
             if (Blend_Type != New->Type)
             {
                 Error("Wrong identifier type");
@@ -3621,7 +3264,7 @@ shared_ptr<MAP_T> Parser::Parse_Blend_Map (BlendMapTypeId Blend_Type,int Pat_Typ
                         Error ("Must have at least one entry in map.");
                     New = Create_Blend_Map<MAP_T> (Blend_Type);
                     New->Set(tempList);
-                    pigmentBlendMap = dynamic_pointer_cast<GenericPigmentBlendMap>(New);
+                    pigmentBlendMap = std::dynamic_pointer_cast<GenericPigmentBlendMap>(New);
                     if (pigmentBlendMap)
                     {
                         pigmentBlendMap->blendMode = blendMode;
@@ -3680,23 +3323,7 @@ template SlopeBlendMapPtr   Parser::Parse_Blend_Map<SlopeBlendMap>      (BlendMa
 template NormalBlendMapPtr  Parser::Parse_Blend_Map<NormalBlendMap>     (BlendMapTypeId Blend_Type,int Pat_Type);
 template TextureBlendMapPtr Parser::Parse_Blend_Map<TextureBlendMap>    (BlendMapTypeId Blend_Type,int Pat_Type);
 
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 template<>
 void Parser::Parse_BlendListData<ColourBlendMapData> (BlendMapTypeId Blend_Type, ColourBlendMapData& rData)
@@ -3800,7 +3427,9 @@ void Parser::Parse_BlendListData_Default<TexturePtr> (const ColourBlendMapData& 
 template<typename MAP_T>
 shared_ptr<MAP_T> Parser::Parse_Blend_List (int Count, ColourBlendMapConstPtr Def_Map, BlendMapTypeId Blend_Type)
 {
-    shared_ptr<MAP_T>       New;
+    using MAP_PTR_T = shared_ptr<MAP_T>;
+
+    MAP_PTR_T               New;
     typename MAP_T::Vector  tempList;
     int i;
     bool old_allow_id = Allow_Identifier_In_Call;
@@ -3813,8 +3442,8 @@ shared_ptr<MAP_T> Parser::Parse_Blend_List (int Count, ColourBlendMapConstPtr De
     switch(Blend_Type)
     {
         case kBlendMapType_Colour:
-            EXPECT
-                CASE_EXPRESS
+            EXPECT_CAT
+                CASE_EXPRESS_UNGET
                     Parse_BlendListData(Blend_Type,tempList[i].Vals);
                     Parse_Comma ();
                     tempList[i].value = (SNGL)i;
@@ -3910,7 +3539,7 @@ shared_ptr<MAP_T> Parser::Parse_Blend_List (int Count, ColourBlendMapConstPtr De
 
     if ((Blend_Type==kBlendMapType_Normal) && (i==0))
     {
-        return shared_ptr<MAP_T>(); // empty pointer
+        return MAP_PTR_T(); // empty pointer
     }
 
     while (i < Count)
@@ -4013,10 +3642,13 @@ template TextureBlendMapPtr Parser::Parse_Blend_List<TextureBlendMap>   (int Cou
 template<typename MAP_T>
 shared_ptr<MAP_T> Parser::Parse_Item_Into_Blend_List (BlendMapTypeId Blend_Type)
 {
-    shared_ptr<MAP_T>       New;
+    using MAP_PTR_T = shared_ptr<MAP_T>;
+
+    MAP_PTR_T               New;
     typename MAP_T::Entry   Temp_Ent;
     typename MAP_T::Vector  tempList;
-    BlendMapTypeId Type;
+    BlendMapTypeId          Type;
+
     bool old_allow_id = Allow_Identifier_In_Call;
     Allow_Identifier_In_Call = false;
 
@@ -4106,7 +3738,7 @@ ColourBlendMapPtr Parser::Parse_Colour_Map<ColourBlendMap> ()
     EXPRESS Express;
     int Terms;
     ColourBlendMapEntry Temp_Ent, Temp_Ent_2;
-    vector<ColourBlendMapEntry> tempList;
+    std::vector<ColourBlendMapEntry> tempList;
     bool old_allow_id = Allow_Identifier_In_Call;
     Allow_Identifier_In_Call = false;
     int blendMode = 0;
@@ -4116,7 +3748,7 @@ ColourBlendMapPtr Parser::Parse_Colour_Map<ColourBlendMap> ()
 
     EXPECT
         CASE (COLOUR_MAP_ID_TOKEN)
-            New = *(reinterpret_cast<ColourBlendMapPtr *>(Token.Data));
+            New = CurrentTokenData<ColourBlendMapPtr>();
             EXIT
         END_CASE
 
@@ -4142,11 +3774,11 @@ ColourBlendMapPtr Parser::Parse_Colour_Map<ColourBlendMap> ()
 
                     Temp_Ent.value = Parse_Float();  Parse_Comma();
 
-                    EXPECT_ONE
+                    EXPECT_ONE_CAT
                         /* After [ must be a float. If 2nd thing found is another
                            float then this is an old style color_map.
                          */
-                        CASE_FLOAT
+                        CASE_FLOAT_UNGET
                             Parse_Express(Express,&Terms);
                             if (Terms==1)
                             {
@@ -4170,7 +3802,7 @@ ColourBlendMapPtr Parser::Parse_Colour_Map<ColourBlendMap> ()
                                     Error("Illegal expression syntax in color_map.");
                         END_CASE
 
-                        CASE_COLOUR
+                        CASE_COLOUR_UNGET
                             Parse_Colour (Temp_Ent.Vals);
                             tempList.push_back(Temp_Ent);
                         END_CASE
@@ -4314,21 +3946,16 @@ GenericSpline *Parser::Parse_Spline()
     MaxTerms = 2;
 
     /*Check for spline identifier*/
-    EXPECT_ONE
-        CASE(SPLINE_ID_TOKEN)
-            Old = reinterpret_cast<GenericSpline *>(Token.Data);
-            i = Old->SplineEntries.size();
-            MaxTerms = Old->Terms;
-            keepOld = true;
-        END_CASE
-
-        OTHERWISE
-            UNGET
-        END_CASE
-    END_EXPECT
+    if (AllowToken(SPLINE_ID_TOKEN))
+    {
+        Old = CurrentTokenDataPtr<GenericSpline*>();
+        i = Old->SplineEntries.size();
+        MaxTerms = Old->Terms;
+        keepOld = true;
+    }
 
     /* Determine kind of spline */
-    EXPECT
+    EXPECT // TODO should probably be EXPECT_ONE
         CASE(LINEAR_SPLINE_TOKEN)
             if (Old)
                 New = new LinearSpline(*Old);
@@ -4496,8 +4123,8 @@ GenericSpline *Parser::Parse_Spline()
           END_EXPECT
         break;
     }
-    EXPECT
-        CASE_FLOAT
+    EXPECT_CAT
+        CASE_FLOAT_UNGET
             /* Entry has the form float,vector */
             par = Parse_Float();
             Parse_Comma();
@@ -4602,25 +4229,7 @@ GenericSpline *Parser::Parse_Spline()
     return New;
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::POV_strupr(char *s)
 {
@@ -4628,29 +4237,11 @@ void Parser::POV_strupr(char *s)
 
     for (i = 0,len = (int)strlen(s); i < len; i++)
     {
-        s[i] = (char)toupper((int)s[i]);
+        s[i] = (char)std::toupper((int)s[i]);
     }
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
+//******************************************************************************
 
 void Parser::POV_strlwr(char *s)
 {
@@ -4658,7 +4249,7 @@ void Parser::POV_strlwr(char *s)
 
     for (i = 0,len = (int)strlen(s); i < len; i++)
     {
-        s[i] = (char)tolower((int)s[i]);
+        s[i] = (char)std::tolower((int)s[i]);
     }
 }
 
@@ -4811,41 +4402,5 @@ void Parser::Destroy_Random_Generators()
     Number_Of_Random_Generators = 0;
 }
 
-DBL Parser::Parse_Signed_Float(void)
-{
-    DBL Sign=1.0;
-    DBL Val=0.0;
-    bool old_allow_id = Allow_Identifier_In_Call;
-    Allow_Identifier_In_Call = false;
-
-    EXPECT
-        CASE (PLUS_TOKEN)
-        END_CASE
-
-        CASE (DASH_TOKEN)
-            Sign=-1.0;
-            Get_Token();
-            // FALLTHROUGH
-        CASE (FLOAT_FUNCT_TOKEN)
-            if (Token.Function_Id==FLOAT_TOKEN)
-            {
-                Val = Sign * Token.Token_Float;
-                EXIT
-            }
-            else
-            {
-                Parse_Error(FLOAT_TOKEN);
-            }
-        END_CASE
-
-        OTHERWISE
-            Parse_Error(FLOAT_TOKEN);
-        END_CASE
-    END_EXPECT
-
-    Allow_Identifier_In_Call = old_allow_id;
-
-    return(Val);
 }
-
-}
+// end of namespace pov_parser

@@ -34,14 +34,18 @@
 //******************************************************************************
 
 
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "core/render/tracepixel.h"
 
+// C++ variants of C standard header files
+#include <cstring>
+
+// C++ standard header files
 #include <vector>
 
-#include <boost/thread.hpp>
-#include <boost/scoped_array.hpp>
+// POV-Ray header files (base module)
+#include <algorithm>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
 #include "core/math/matrix.h"
 #include "core/render/trace.h"
 #include "core/render/tracepixel.h"

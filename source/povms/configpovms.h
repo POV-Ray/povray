@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,6 +44,7 @@
     #error "povms.c must be compiled as a C++ file when used as part of the POV-Ray project."
 #endif
 
+// Pull in other compile-time config header files first
 #include "base/configbase.h"
 #include "syspovconfigpovms.h"
 
@@ -83,7 +84,7 @@
 #endif
 
 #ifndef POVMSUCS2
-    #define POVMSUCS2               UCS2
+    #define POVMSUCS2               char16_t
 #endif
 
 #ifndef kDefaultTimeout

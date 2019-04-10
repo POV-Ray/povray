@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,10 +38,11 @@
 #ifndef POVRAY_VFE_UNIX_VFEPLATFORM_H
 #define POVRAY_VFE_UNIX_VFEPLATFORM_H
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
-#include "base/path.h"
-#include "base/stringutilities.h"
+#include "base/path_fwd.h"
+#include "base/stringtypes.h"
+#include "base/filesystem_fwd.h"
 
 #include "frontend/shelloutprocessing.h"
 
@@ -57,29 +58,30 @@ namespace vfePlatform
     class UnixShelloutProcessing: public pov_frontend::ShelloutProcessing
     {
         public:
-            UnixShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height);
-            virtual ~UnixShelloutProcessing();
+            UnixShelloutProcessing(POVMS_Object& opts, const std::string& scene, unsigned int width, unsigned int height);
+            virtual ~UnixShelloutProcessing() override;
 
-            virtual int ProcessID(void);
-            virtual bool ShelloutsSupported(void) { return true; }
+            virtual int ProcessID(void) override;
+            virtual bool ShelloutsSupported(void) override { return true; }
 
         protected:
-            virtual bool ExecuteCommand(const string& cmd, const string& params);
-            virtual bool KillCommand(int timeout, bool force = false);
-            virtual bool CommandRunning(void);
-            virtual int CollectCommand(string& output);
-            virtual int CollectCommand(void);
-            virtual bool CommandPermitted(const string& command, const string& parameters);
+            virtual bool ExecuteCommand(const std::string& cmd, const std::string& params) override;
+            virtual bool KillCommand(int timeout, bool force = false) override;
+            virtual bool CommandRunning(void) override;
+            virtual int CollectCommand(std::string& output) override;
+            virtual int CollectCommand(void) override;
+            virtual bool CommandPermitted(const std::string& command, const std::string& parameters) override;
 
             bool m_ProcessRunning;
-            string m_Command;
-            string m_Params;
+            std::string m_Command;
+            std::string m_Params;
             unsigned long m_ExitCode;
             unsigned long m_LastError;
             unsigned long m_ProcessId;
 
         private:
-            UnixShelloutProcessing();
+
+            UnixShelloutProcessing() = delete;
     };
 
     ///////////////////////////////////////////////////////////////////////
@@ -89,29 +91,29 @@ namespace vfePlatform
     {
         public:
             vfeUnixSession(int id = 0);
-            virtual ~vfeUnixSession() {}
+            virtual ~vfeUnixSession() override {}
 
-            virtual UCS2String GetTemporaryPath(void) const;
-            virtual UCS2String CreateTemporaryFile(void) const;
-            virtual void DeleteTemporaryFile(const UCS2String& filename) const;
-            virtual POV_LONG GetTimestamp(void) const ;
-            virtual void NotifyCriticalError(const char *message, const char *file, int line);
-            virtual int RequestNewOutputPath(int CallCount, const string& Reason, const UCS2String& OldPath, UCS2String& NewPath);
-            virtual bool TestAccessAllowed(const Path& file, bool isWrite) const;
-            virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height)
+            virtual UCS2String GetTemporaryPath(void) const override;
+            virtual UCS2String CreateTemporaryFile(void) const override;
+            virtual void DeleteTemporaryFile(const UCS2String& filename) const override;
+            virtual POV_LONG GetTimestamp(void) const override;
+            virtual void NotifyCriticalError(const char *message, const char *file, int line) override;
+            virtual int RequestNewOutputPath(int CallCount, const std::string& Reason, const UCS2String& OldPath, UCS2String& NewPath) override;
+            virtual bool TestAccessAllowed(const Path& file, bool isWrite) const override;
+            virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const std::string& scene, unsigned int width, unsigned int height) override
                 { return new UnixShelloutProcessing(opts, scene, width, height); }
 
-            shared_ptr<UnixOptionsProcessor> GetUnixOptions(void) { return m_OptionsProc; }
+            std::shared_ptr<UnixOptionsProcessor> GetUnixOptions(void) { return m_OptionsProc; }
 
         protected:
-            virtual void WorkerThreadStartup();
-            virtual void WorkerThreadShutdown();
+            virtual void WorkerThreadStartup() override;
+            virtual void WorkerThreadShutdown() override;
 
             ///////////////////////////////////////////////////////////////////////
             // return true if the path component of file is equal to the path component
             // of path. will also return true if recursive is true and path is a parent
-            // of file. does not support relative paths, and will convert UCS2 paths to
-            // ASCII and perform case-insensitive comparisons.
+            // of file. does not support relative paths, and will
+            // perform case-sensitive comparisons.
             virtual bool TestPath(const Path& path, const Path& file, bool recursive) const;
 
             ///////////////////////////////////////////////////////////////////////
@@ -127,7 +129,10 @@ namespace vfePlatform
             mutable POV_LONG m_TimestampOffset;
 
             // platform specific configuration options
-            shared_ptr<UnixOptionsProcessor> m_OptionsProc;
+            std::shared_ptr<UnixOptionsProcessor> m_OptionsProc;
+
+            // Temporary files to be deleted when session closes.
+            mutable std::vector<pov_base::Filesystem::TemporaryFilePtr> m_TempFiles;
     } ;
 
     ///////////////////////////////////////////////////////////////////////
@@ -135,5 +140,6 @@ namespace vfePlatform
     // all other running threads in the process (and preferably in the OS).
     POVMS_Sys_Thread_Type GetThreadId();
 }
+// end of namespace vfePlatform
 
 #endif // POVRAY_VFE_UNIX_VFEPLATFORM_H

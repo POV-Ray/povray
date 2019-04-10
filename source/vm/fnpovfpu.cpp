@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -231,16 +231,24 @@ Density of instruction set: 916 / 1024 = 0.8945
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "vm/fnpovfpu.h"
 
+// C++ variants of C standard header files
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 
+// C++ standard header files
 #include <algorithm>
 
+// POV-Ray header files (base module)
 #include "base/mathutil.h"
+#include "base/povassert.h"
 
+// POV-Ray header files (core module)
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
+// POV-Ray header files (VM module)
 #include "vm/fnintern.h"
 
 // this must be the last file included
@@ -248,6 +256,10 @@ Density of instruction set: 916 / 1024 = 0.8945
 
 namespace pov
 {
+
+using std::min;
+using std::max;
+using std::vector;
 
 /*****************************************************************************
 * Local preprocessor defines
@@ -477,9 +489,9 @@ const Sys1 POVFPU_Sys1Table[] =
     sinh,           // 6
     cosh,           // 7
     tanh,           // 8
-    asinh,          // 9
-    acosh,          // 10
-    atanh,          // 11
+    std::asinh,     // 9
+    std::acosh,     // 10
+    std::atanh,     // 11
     floor,          // 12
     ceil,           // 13
     sqrt,           // 14
@@ -1130,13 +1142,13 @@ void POVFPU_Exception(FPUContext *context, FUNCTION fn, const char *msg)
 {
     vector<FunctionEntry>& functions(context->functionvm->functions);
 
-    if (functions[fn].fn.sourceInfo.name != nullptr)
+    if(!functions[fn].fn.sourceInfo.name.empty())
     {
         if (msg != nullptr)
-;// TODO MESSAGE            ErrorAt(functions[fn].fn.filename, functions[fn].fn.filepos.lineno, functions[fn].fn.filepos.offset,
+;// TODO MESSAGE            ErrorAt(functions[fn].fn.sourceInfo,
 //                  "Runtime error detected in function '%s'. %s", functions[fn].fn.name, msg);
         else
-;// TODO MESSAGE            ErrorAt(functions[fn].fn.filename, functions[fn].fn.filepos.lineno, functions[fn].fn.filepos.offset,
+;// TODO MESSAGE            ErrorAt(functions[fn].fn.sourceInfo,
 //                  "Floating-point exception detected in function '%s'. "
 //                  "Your function either attempted a division by zero, used a function outside its "
 //                  "domain or called an internal function with invalid parameters.",
@@ -1145,10 +1157,10 @@ void POVFPU_Exception(FPUContext *context, FUNCTION fn, const char *msg)
     else
     {
         if (msg != nullptr)
-;// TODO MESSAGE            ErrorAt(functions[fn].fn.filename, functions[fn].fn.filepos.lineno, functions[fn].fn.filepos.offset,
+;// TODO MESSAGE            ErrorAt(functions[fn].fn.sourceInfo,
 //                  "Runtime error detected in function. %s", msg);
         else
-;// TODO MESSAGE            ErrorAt(functions[fn].fn.filename, functions[fn].fn.filepos.lineno, functions[fn].fn.filepos.offset,
+;// TODO MESSAGE            ErrorAt(functions[fn].fn.sourceInfo,
 //                  "Floating-point exception detected in unnamed function. "
 //                  "Your function either attempted a division by zero, used a function outside its "
 //                  "domain or called an internal function with invalid parameters.");
@@ -1501,16 +1513,6 @@ void FNCode_Delete(FunctionCode *f)
         POV_FREE(f->program);
         f->program = nullptr;
     }
-    if (f->sourceInfo.name != nullptr)
-    {
-        POV_FREE(f->sourceInfo.name);
-        f->sourceInfo.name = nullptr;
-    }
-    if (f->sourceInfo.filename != nullptr)
-    {
-        POV_FREE(f->sourceInfo.filename);
-        f->sourceInfo.filename = nullptr;
-    }
     for(i = 0; i < f->parameter_cnt; i++)
     {
         if (f->parameter[i] != nullptr)
@@ -1544,7 +1546,7 @@ FUNCTION_PTR FunctionVM::CopyFunction(FUNCTION_PTR pK)
     if (pK == nullptr)
         return nullptr;
 
-    FUNCTION_PTR ptr = (FUNCTION_PTR)POV_MALLOC(sizeof(FUNCTION), "Function ID");
+    FUNCTION_PTR ptr = new FUNCTION;
 
     GetFunctionAndReference(*pK); // increase the reference count
     *ptr = *pK;
@@ -1557,7 +1559,7 @@ void FunctionVM::DestroyFunction(FUNCTION_PTR pK)
     if (pK != nullptr)
     {
         RemoveFunction(*pK);
-        POV_FREE(pK);
+        delete pK;
     }
 }
 
@@ -1616,7 +1618,7 @@ GenericScalarFunctionPtr FunctionVM::CustomFunction::Clone() const
     return new CustomFunction(mpVm.get(), mpVm->CopyFunction(mpFn));
 }
 
-const SourceInfo* FunctionVM::CustomFunction::GetSourceInfo() const
+const CustomFunctionSourceInfo* FunctionVM::CustomFunction::GetSourceInfo() const
 {
     return &(mpVm->GetFunction(*mpFn)->sourceInfo);
 }
@@ -1660,3 +1662,4 @@ FPUContext::~FPUContext()
 }
 
 }
+// end of namespace pov

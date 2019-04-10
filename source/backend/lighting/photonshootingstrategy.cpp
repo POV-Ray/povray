@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -35,12 +35,17 @@
 ///
 //******************************************************************************
 
-#include <algorithm>
-
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "backend/lighting/photonshootingstrategy.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/lighting/lightgroup.h"
 #include "core/lighting/lightsource.h"
@@ -52,6 +57,10 @@
 #include "core/scene/object.h"
 #include "core/shape/csg.h"
 #include "core/support/octree.h"
+
+// POV-Ray header files (POVMS module)
+// POV-Ray header files (backend module)
+//  (none at the moment)
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -66,7 +75,7 @@ void PhotonShootingStrategy::start()
 
 PhotonShootingUnit* PhotonShootingStrategy::getNextUnit()
 {
-    boost::mutex::scoped_lock lock(nextUnitMutex);
+    std::lock_guard<std::mutex> lock(nextUnitMutex);
     if (iter == units.end())
         return nullptr;
     PhotonShootingUnit* unit = *iter;
@@ -74,7 +83,7 @@ PhotonShootingUnit* PhotonShootingStrategy::getNextUnit()
     return unit;
 }
 
-void PhotonShootingStrategy::createUnitsForCombo(ObjectPtr obj, LightSource* light, shared_ptr<SceneData> sceneData)
+void PhotonShootingStrategy::createUnitsForCombo(ObjectPtr obj, LightSource* light, std::shared_ptr<SceneData> sceneData)
 {
     PhotonShootingUnit* unit = new PhotonShootingUnit(light, obj);
     unit->lightAndObject.computeAnglesAndDeltas(sceneData);
@@ -83,7 +92,7 @@ void PhotonShootingStrategy::createUnitsForCombo(ObjectPtr obj, LightSource* lig
 
 PhotonShootingStrategy::~PhotonShootingStrategy()
 {
-    vector<PhotonShootingUnit*>::iterator delIter;
+    std::vector<PhotonShootingUnit*>::iterator delIter;
     for(delIter = units.begin(); delIter != units.end(); delIter++)
     {
         delete (*delIter);
@@ -91,5 +100,5 @@ PhotonShootingStrategy::~PhotonShootingStrategy()
     units.clear();
 }
 
-
 }
+// end of namespace pov
