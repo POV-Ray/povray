@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,9 +36,21 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/shelloutprocessing.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// Boost header files
 #include <boost/algorithm/string.hpp>
 
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (POVMS module)
 #include "povms/povmsid.h"
+
+// POV-Ray header files (frontend module)
+//  (none at the moment)
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -85,7 +97,7 @@ ShelloutAction::ShelloutAction(const ShelloutProcessing *sp, unsigned int attrib
 // expand the parameters in the rawParameters member into the parameters member, applying the escapes
 // documented below. scene is the scene name, ofn the output file name, w/h the width/height, clock the
 // current animation clock value, and frame the current frame number.
-void ShelloutAction::ExpandParameters(const string& scene, const string& ofn, unsigned int w, unsigned int h, float clock, unsigned int frame)
+void ShelloutAction::ExpandParameters(const std::string& scene, const std::string& ofn, unsigned int w, unsigned int h, float clock, unsigned int frame)
 {
     // %o: output file name in full
     // %s: scene name without path or extension
@@ -143,7 +155,7 @@ void ShelloutAction::ExpandParameters(const string& scene, const string& ofn, un
 
 // ------------------------------------------------------------------
 
-ShelloutProcessing::ShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height): sceneName(scene), imageWidth(width), imageHeight(height)
+ShelloutProcessing::ShelloutProcessing(POVMS_Object& opts, const std::string& scene, unsigned int width, unsigned int height): sceneName(scene), imageWidth(width), imageHeight(height)
 {
     skipReturn = cancelReturn = exitCode = 0;
     clockVal = 0.0;
@@ -185,7 +197,7 @@ ShelloutProcessing::~ShelloutProcessing()
 // parameters start will not be removed.
 //
 // this method should return true if the command is non-empty upon completion.
-bool ShelloutProcessing::ExtractCommand(const string& src, string& command, string& parameters) const
+bool ShelloutProcessing::ExtractCommand(const std::string& src, std::string& command, std::string& parameters) const
 {
     bool inSQ = false;
     bool inDQ = false;
@@ -194,7 +206,7 @@ bool ShelloutProcessing::ExtractCommand(const string& src, string& command, stri
 
     command.clear();
     parameters.clear();
-    string str = boost::trim_copy(src);
+    std::string str = boost::trim_copy(src);
     for (s = str.c_str(); *s != '\0'; s++)
     {
         if (hadEscape)
@@ -234,11 +246,11 @@ bool ShelloutProcessing::ExtractCommand(const string& src, string& command, stri
         }
     }
 
-    parameters = boost::trim_copy(string(s));
+    parameters = boost::trim_copy(std::string(s));
     return true;
 }
 
-string ShelloutProcessing::GetPhaseName(shelloutEvent event)
+std::string ShelloutProcessing::GetPhaseName(shelloutEvent event)
 {
     switch (event)
     {
@@ -274,7 +286,7 @@ bool ShelloutProcessing::HandleProcessEvent(shelloutEvent event, bool internalCa
         event = preScene;
 
     bool skipWasSet(skipCallouts);
-    string phaseName(GetPhaseName(event));
+    std::string phaseName(GetPhaseName(event));
     ShelloutPtr sh(shellouts[event]);
 
     switch (event)
@@ -366,9 +378,9 @@ bool ShelloutProcessing::HandleProcessEvent(shelloutEvent event, bool internalCa
 bool ShelloutProcessing::PostProcessEvent(void)
 {
     int             ret;
-    string          output;
+    std::string     output;
     shelloutEvent   event = postProcessEvent;
-    string          phaseName(GetPhaseName(event));
+    std::string     phaseName(GetPhaseName(event));
 
     processStartRequested = false;
     runningProcessName.clear();
@@ -581,7 +593,7 @@ bool ShelloutProcessing::ShelloutRunning(void)
 //   7: the command parameters (CAUTION: may contain escape codes)
 //   8: the command return code (as an integer)
 //   9: output text from the command, as returned by LastShelloutResult()
-string ShelloutProcessing::GetCancelMessage(void)
+std::string ShelloutProcessing::GetCancelMessage(void)
 {
     return str(
         cancelFormat % cancelPhase
@@ -603,7 +615,7 @@ string ShelloutProcessing::GetCancelMessage(void)
 //   4: the command parameters (CAUTION: may contain escape codes)
 //   5: the command return code (as an integer)
 //   6: output text from the command, as returned by LastShelloutResult()
-string ShelloutProcessing::GetSkipMessage(void)
+std::string ShelloutProcessing::GetSkipMessage(void)
 {
     return str(
         skipFormat % skipPhase
@@ -642,9 +654,10 @@ bool ShelloutProcessing::KillShellouts(int timeout, bool force)
 // if the platform implemeting a subclass of this method has the equivalent of a
 // system log (e.g. syslog on unix, event log on windows), the implementation should
 // consider providing a user-controllable option to log any commands using such.
-bool ShelloutProcessing::ExecuteCommand(const string& cmd, const string& params)
+bool ShelloutProcessing::ExecuteCommand(const std::string& cmd, const std::string& params)
 {
     throw POV_EXCEPTION(kCannotOpenFileErr, "Shellouts not implemented on this platform");
 }
 
 }
+// end of namespace pov_frontend

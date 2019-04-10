@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,14 +38,17 @@
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
+#include "base/path_fwd.h"
 
-// Standard C++ header files
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <string>
 #include <vector>
 
-// POV-Ray base header files
-#include "base/stringutilities.h"
-#include "base/types.h"
+// POV-Ray header files (base module)
+#include "base/stringtypes.h"
 
 namespace pov_base
 {
@@ -57,19 +60,19 @@ namespace pov_base
 ///
 /// @{
 
-class Path
+class Path final
 {
     public:
 
-        enum Encoding
+        enum class Encoding
         {
-            ASCII,
-            URL
+            kSystem,
+            kURL
         };
 
         Path();
-        Path(const char *p, Encoding e = ASCII);
-        Path(const string& p, Encoding e = ASCII);
+        Path(const char *p, Encoding e = Encoding::kSystem);
+        Path(const std::string& p, Encoding e = Encoding::kSystem);
         Path(const UCS2 *p);
         Path(const UCS2String& p);
 
@@ -91,16 +94,16 @@ class Path
 
         UCS2String GetVolume() const;
         UCS2String GetFolder() const;
-        vector<UCS2String> GetAllFolders() const;
+        std::vector<UCS2String> GetAllFolders() const;
         UCS2String GetFile() const;
 
         void SetVolume(const char *p);
-        void SetVolume(const string& p);
+        void SetVolume(const std::string& p);
         void SetVolume(const UCS2 *p);
         void SetVolume(const UCS2String& p);
 
         void AppendFolder(const char *p);
-        void AppendFolder(const string& p);
+        void AppendFolder(const std::string& p);
         void AppendFolder(const UCS2 *p);
         void AppendFolder(const UCS2String& p);
 
@@ -108,7 +111,7 @@ class Path
         void RemoveAllFolders();
 
         void SetFile(const char *p);
-        void SetFile(const string& p);
+        void SetFile(const std::string& p);
         void SetFile(const UCS2 *p);
         void SetFile(const UCS2String& p);
 
@@ -119,7 +122,7 @@ class Path
     private:
 
         UCS2String volume;
-        vector<UCS2String> folders;
+        std::vector<UCS2String> folders;
         UCS2String file;
 
         /// Analyze a path string.
@@ -129,7 +132,7 @@ class Path
         /// if the string does not match the platform-specific conventions.
         ///
         /// @note
-        ///     This method calls @ref ParsePathString(UCS2String&,vector<UCS2String>,UCS2String&,const UCS2String&)
+        ///     This method calls @ref ParsePathString(UCS2String&,std::vector<UCS2String>,UCS2String&,const UCS2String&)
         ///     to do the actual work.
         ///
         void ParsePathString(const UCS2String& p);
@@ -162,10 +165,10 @@ class Path
         /// @return         Whether the string constitutes a valid path and/or file name according to the
         ///                 platform-specific conventions.
         ///
-        static bool ParsePathString (UCS2String& v, vector<UCS2String>& d, UCS2String& f, const UCS2String& p);
+        static bool ParsePathString (UCS2String& v, std::vector<UCS2String>& d, UCS2String& f, const UCS2String& p);
 
         UCS2String URLToUCS2String(const char *p) const;
-        UCS2String URLToUCS2String(const string& p) const;
+        UCS2String URLToUCS2String(const std::string& p) const;
 };
 
 /// @}
@@ -173,5 +176,6 @@ class Path
 //##############################################################################
 
 }
+// end of namespace pov_base
 
 #endif // POVRAY_BASE_PATH_H

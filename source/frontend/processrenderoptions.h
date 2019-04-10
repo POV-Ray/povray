@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,8 +39,18 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "frontend/configfrontend.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+// POV-Ray header files (core module)
+//  (none at the moment)
+
+// POV-Ray header files (POVMS module)
 #include "povms/povmscpp.h"
 
+// POV-Ray header files (frontend module)
 #include "frontend/processoptions.h"
 
 namespace pov_frontend
@@ -52,15 +62,15 @@ class ProcessRenderOptions : public ProcessOptions
 {
     public:
         ProcessRenderOptions();
-        ~ProcessRenderOptions();
+        virtual ~ProcessRenderOptions() override;
     protected:
-        virtual int ReadSpecialOptionHandler(INI_Parser_Table *, char *, POVMSObjectPtr);
-        virtual int ReadSpecialSwitchHandler(Cmd_Parser_Table *, char *, POVMSObjectPtr, bool);
-        virtual int WriteSpecialOptionHandler(INI_Parser_Table *, POVMSObjectPtr, OTextStream *);
-        virtual int ProcessUnknownString(char *, POVMSObjectPtr);
+        virtual int ReadSpecialOptionHandler(INI_Parser_Table *, char *, POVMSObjectPtr) override;
+        virtual int ReadSpecialSwitchHandler(Cmd_Parser_Table *, char *, POVMSObjectPtr, bool) override;
+        virtual int WriteSpecialOptionHandler(INI_Parser_Table *, POVMSObjectPtr, OTextStream *) override;
+        virtual int ProcessUnknownString(char *, POVMSObjectPtr) override;
 
-        virtual ITextStream *OpenFileForRead(const char *, POVMSObjectPtr);
-        virtual OTextStream *OpenFileForWrite(const char *, POVMSObjectPtr);
+        virtual ITextStream *OpenFileForRead(const char *, POVMSObjectPtr) override;
+        virtual OTextStream *OpenFileForWrite(const char *, POVMSObjectPtr) override;
 
         ITextStream *OpenINIFileStream(const char *, unsigned int, POVMSObjectPtr);
     public:
@@ -94,5 +104,6 @@ class ProcessRenderOptions : public ProcessOptions
 };
 
 }
+// end of namespace pov_frontend
 
 #endif // POVRAY_FRONTEND_PROCESSRENDEROPTIONS_H

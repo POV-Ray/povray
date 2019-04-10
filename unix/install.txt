@@ -352,12 +352,6 @@ Additional POV-Ray specific options are:
     requests to find the Boost library in the DIR directory.  Boost 1.38 or
     above is mandatory to build POV-Ray.
 
---with-boost-thread=special-lib
-    requests to find the Boost thread library under the special-lib name, for
-    instance --with-boost-thread=boost_thread-gcc-mt if the thread library is
-    libboost_thread-gcc-mt.a (static form) or libboost_thread-gcc-mt.so*
-    (shared form) under the DIR directory specified by the option above.
-
 --with-zlib=DIR or --without-zlib
     requests to find the ZLIB library in the DIR directory, where DIR is
     for instance /path/lib if ZLIB is /path/lib/libz.a (static form) or
@@ -485,17 +479,15 @@ NON_REDISTRIBUTABLE_BUILD=yes
     options.  Using this option means you acknowledge that the generated
     POV-Ray executable must *not* be redistributed.
 
-C99_COMPATIBLE_RADIOSITY={1,2,3,4}
+C99_COMPATIBLE_RADIOSITY={1,2,3,4,5,6,7,8,9}
     adapts the POV-Ray radiosity code to use non-IEEE 754 floating point
     on machines that do not support this standard.  You must specify one
     of the possible values given above (e.g. C99_COMPATIBLE_RADIOSITY=2).
-    Each value corresponds to the C function 'logbf', 'ilogbf', 'logb',
-    and 'ilogb', respectively, to be used with the C function 'copysign'.
-    This option requires having an ISO C99 compiler and its accompanying
-    C library installed on your machine.  More details are given near the
-    top of the octree.cpp source file.  On platforms where integer ('int')
-    and single-precision floating-point ('float') numbers are not 32-bit,
-    configure will try to determine automatically which function to use.
+    Each value corresponds to a different implementation of certain basic
+    operations. More details are given in the configcore.h
+    source file.  On platforms where integer ('int') and single-precision
+    floating-point ('float') numbers are not 32-bit, configure will try to
+    determine automatically which function to use.
 
 
 =================

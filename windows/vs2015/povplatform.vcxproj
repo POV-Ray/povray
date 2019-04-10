@@ -376,6 +376,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\platform\windows\osversioninfo.cpp" />
+    <ClCompile Include="..\..\platform\windows\syspovfilesystem.cpp" />
     <ClCompile Include="..\..\platform\windows\syspovpath.cpp" />
     <ClCompile Include="..\..\platform\windows\syspovtask.cpp" />
     <ClCompile Include="..\..\platform\windows\syspovtimer.cpp" />

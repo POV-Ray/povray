@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,28 +33,37 @@
 ///
 //******************************************************************************
 
-#include <limits>
-#include <vector>
-
-#include <boost/thread.hpp>
-
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "backend/render/tracetask.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <algorithm>
+#include <limits>
+
+// POV-Ray header files (base module)
+#include "base/image/colourspace.h"
+#ifdef PROFILE_INTERSECTIONS
+#include "base/image/image_fwd.h"
+#endif
+
+// POV-Ray header files (core module)
 #include "core/material/normal.h"
 #include "core/math/chi2.h"
 #include "core/math/jitter.h"
 #include "core/math/matrix.h"
 #include "core/render/trace.h"
+#include "core/support/statistics.h"
 
+// POV-Ray header files (POVMS module)
+//  (none at the moment)
+
+// POV-Ray header files (backend module)
 #include "backend/scene/backendscenedata.h"
 #include "backend/scene/view.h"
 #include "backend/scene/viewthreaddata.h"
-
-#ifdef PROFILE_INTERSECTIONS
-#include "base/image/image.h"
-#endif
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -62,18 +71,22 @@
 namespace pov
 {
 
+using std::min;
+using std::max;
+using std::vector;
+
 #ifdef PROFILE_INTERSECTIONS
     bool gDoneBSP;
     bool gDoneBVH;
     POV_ULONG gMinVal = std::numeric_limits<POV_ULONG>::max();
     POV_ULONG gMaxVal = 0;
     POV_ULONG gIntersectionTime;
-    vector<vector<POV_ULONG> > gBSPIntersectionTimes;
-    vector<vector<POV_ULONG> > gBVHIntersectionTimes;
-    vector <vector<POV_ULONG> > *gIntersectionTimes;
+    vector<vector<POV_ULONG>> gBSPIntersectionTimes;
+    vector<vector<POV_ULONG>> gBVHIntersectionTimes;
+    vector<vector<POV_ULONG>> *gIntersectionTimes;
 #endif
 
-class SmartBlock
+class SmartBlock final
 {
     public:
         SmartBlock(int ox, int oy, int bw, int bh);
@@ -330,9 +343,9 @@ void TraceTask::Finish()
         if (width == gBVHIntersectionTimes[0].size() && height == gBVHIntersectionTimes.size())
         {
             SNGL scale = 1.0 / (gMaxVal - gMinVal);
-            Image::WriteOptions opts;
+            ImageWriteOptions opts;
             opts.bitsPerChannel = 16;
-            Image *img = Image::Create(width, height, Image::Gray_Int16, false);
+            Image *img = Image::Create(width, height, ImageDataType::Gray_Int16, false);
             for (int y = 0 ; y < height ; y++)
                 for (int x = 0 ; x < width ; x++)
                     img->SetGrayValue(x, y, (gBSPIntersectionTimes[y][x] - gMinVal) * scale);
@@ -341,7 +354,7 @@ void TraceTask::Finish()
             delete imagefile;
             delete img;
 
-            img = Image::Create(width, height, Image::Gray_Int16, false);
+            img = Image::Create(width, height, ImageDataType::Gray_Int16, false);
             imagefile = NewOStream("bvhprofile.png", 0, false);
             for (int y = 0 ; y < height ; y++)
                 for (int x = 0 ; x < width ; x++)
@@ -350,7 +363,7 @@ void TraceTask::Finish()
             delete imagefile;
             delete img;
 
-            img = Image::Create(width, height, Image::Gray_Int16, false);
+            img = Image::Create(width, height, ImageDataType::Gray_Int16, false);
             imagefile = NewOStream("summedprofile.png", 0, false);
             for (int y = 0 ; y < height ; y++)
                 for (int x = 0 ; x < width ; x++)
@@ -359,7 +372,7 @@ void TraceTask::Finish()
             delete imagefile;
             delete img;
 
-            img = Image::Create(width, height, Image::RGBFT_Float, false);
+            img = Image::Create(width, height, ImageDataType::RGBFT_Float, false);
             imagefile = NewOStream("rgbprofile.png", 0, false);
             for (int y = 0 ; y < height ; y++)
             {
@@ -1061,3 +1074,4 @@ void TraceTask::SubdivideOnePixel(DBL x, DBL y, DBL d, size_t bx, size_t by, siz
 }
 
 }
+// end of namespace pov

@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -97,10 +97,17 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/blob.h"
 
+// C++ variants of C standard header files
+#include <cstring>
+
+// C++ standard header files
 #include <algorithm>
 
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
+#include "base/povassert.h"
 
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/bounding/boundingsphere.h"
 #include "core/material/texture.h"
@@ -108,12 +115,17 @@
 #include "core/math/polynomialsolver.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov
 {
+
+using std::min;
+using std::max;
+using std::vector;
 
 /*****************************************************************************
 * Local preprocessor defines
@@ -589,7 +601,7 @@ bool Blob::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 *
 *   Store the points of intersection. Keep track of: whether this is
 *   the start or end point of the hit, which component was pierced
-*   by the ray, and the point along the ray that the hit occured at.
+*   by the ray, and the point along the ray that the hit occurred at.
 *
 * CHANGES
 *
@@ -597,6 +609,7 @@ bool Blob::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 *   Sep 1995 : Changed to allow use of memcpy if memmove isn't available. [AED]
 *   Jul 1996 : Changed to use POV_MEMMOVE, which can be memmove or pov_memmove.
 *   Oct 1996 : Changed to avoid unnecessary compares. [DB]
+*   Feb 2019 : Changed back to use std::memmove again. [CLi]
 *
 ******************************************************************************/
 
@@ -619,7 +632,7 @@ void Blob::insert_hit(const Blob_Element *Element, DBL t0, DBL t1, Blob_Interval
          * bump the rest and insert it here.
          */
 
-        POV_MEMMOVE(&intervals[k+1], &intervals[k], (*cnt-k)*sizeof(Blob_Interval_Struct));
+        std::memmove(&intervals[k+1], &intervals[k], (*cnt-k)*sizeof(Blob_Interval_Struct));
 
         /* We are entering the component. */
 
@@ -639,7 +652,7 @@ void Blob::insert_hit(const Blob_Element *Element, DBL t0, DBL t1, Blob_Interval
 
         if (k < *cnt)
         {
-            POV_MEMMOVE(&intervals[k+1], &intervals[k], (*cnt-k)*sizeof(Blob_Interval_Struct));
+            std::memmove(&intervals[k+1], &intervals[k], (*cnt-k)*sizeof(Blob_Interval_Struct));
 
             /* We are exiting the component. */
 
@@ -1160,10 +1173,10 @@ int Blob::intersect_sphere(const Blob_Element *Element, const Vector3d& P, const
 *
 ******************************************************************************/
 
-int Blob::intersect_element(const Vector3d& P, const Vector3d& D, const Blob_Element *Element, DBL mindist, DBL *tmin, DBL *tmax, TraceThreadData *Thread)
+int Blob::intersect_element(const Vector3d& P, const Vector3d& D, const Blob_Element *Element, DBL mindist, DBL *tmin, DBL *tmax, RenderStatistics& stats)
 {
 #ifdef BLOB_EXTRA_STATS
-    Thread->Stats()[Blob_Element_Tests]++;
+    stats[Blob_Element_Tests]++;
 #endif
 
     *tmin = BOUND_HUGE;
@@ -1210,7 +1223,7 @@ int Blob::intersect_element(const Vector3d& P, const Vector3d& D, const Blob_Ele
     }
 
 #ifdef BLOB_EXTRA_STATS
-    Thread->Stats()[Blob_Element_Tests_Succeeded]++;
+    stats[Blob_Element_Tests_Succeeded]++;
 #endif
 
     return (true);
@@ -1269,7 +1282,7 @@ int Blob::determine_influences(const Vector3d& P, const Vector3d& D, DBL mindist
 
         for (vector<Blob_Element>::iterator i = Data->Entry.begin(); i != Data->Entry.end(); ++i)
         {
-            if (intersect_element(P, D, &(*i), mindist, &t0, &t1, Thread))
+            if (intersect_element(P, D, &(*i), mindist, &t0, &t1, Thread->Stats()))
             {
                 insert_hit(&(*i), t0, t1, intervals, &cnt);
             }
@@ -1293,7 +1306,7 @@ int Blob::determine_influences(const Vector3d& P, const Vector3d& D, DBL mindist
             {
                 /* Test element. */
 
-                if (intersect_element(P, D, reinterpret_cast<Blob_Element *>(Tree->Node), mindist, &t0, &t1, Thread))
+                if (intersect_element(P, D, reinterpret_cast<Blob_Element *>(Tree->Node), mindist, &t0, &t1, Thread->Stats()))
                 {
                     insert_hit(reinterpret_cast<Blob_Element *>(Tree->Node), t0, t1, intervals, &cnt);
                 }
@@ -3262,3 +3275,4 @@ void Blob::getLocalIPoint(Vector3d& lip, Intersection *isect) const
 }
 
 }
+// end of namespace pov

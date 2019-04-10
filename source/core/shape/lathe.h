@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,6 +39,15 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
+#include "core/bounding/boundingcylinder_fwd.h"
 #include "core/scene/object.h"
 
 namespace pov
@@ -77,25 +86,21 @@ namespace pov
 * Global typedefs
 ******************************************************************************/
 
-typedef struct BCyl_Struct BCYL;
-
-typedef struct Lathe_Struct LATHE;
-typedef struct Lathe_Spline_Struct LATHE_SPLINE;
-typedef struct Lathe_Spline_Entry_Struct LATHE_SPLINE_ENTRY;
-
-struct Lathe_Spline_Entry_Struct
+struct Lathe_Spline_Entry_Struct final
 {
     Vector2d A, B, C, D;  /* Coefficients of segment */
 };
+using LATHE_SPLINE_ENTRY = Lathe_Spline_Entry_Struct;
 
-struct Lathe_Spline_Struct
+struct Lathe_Spline_Struct final
 {
     int References;             /* Count references to this structure. */
     LATHE_SPLINE_ENTRY *Entry;  /* Array of spline segments.           */
     BCYL *BCyl;                 /* bounding cylinder.                  */
 };
+using LATHE_SPLINE = Lathe_Spline_Struct;
 
-class Lathe : public ObjectBase
+class Lathe final : public ObjectBase
 {
     public:
         int Spline_Type;          /* Spline type (linear, quadratic ...)  */
@@ -105,21 +110,21 @@ class Lathe : public ObjectBase
         DBL Radius1, Radius2;     /* Min./Max. radius                     */
 
         Lathe();
-        virtual ~Lathe();
+        virtual ~Lathe() override;
 
-        virtual ObjectPtr Copy();
+        virtual ObjectPtr Copy() override;
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-        virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
-        virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
-        virtual void Translate(const Vector3d&, const TRANSFORM *);
-        virtual void Rotate(const Vector3d&, const TRANSFORM *);
-        virtual void Scale(const Vector3d&, const TRANSFORM *);
-        virtual void Transform(const TRANSFORM *);
-        virtual void Compute_BBox();
+        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) override;
+        virtual bool Inside(const Vector3d&, TraceThreadData *) const override;
+        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const override;
+        virtual void UVCoord(Vector2d&, const Intersection *) const override;
+        virtual void Translate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Rotate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Scale(const Vector3d&, const TRANSFORM *) override;
+        virtual void Transform(const TRANSFORM *) override;
+        virtual void Compute_BBox() override;
 
-        void Compute_Lathe(Vector2d *P, TraceThreadData *);
+        void Compute_Lathe(Vector2d *P, RenderStatistics& stats);
     protected:
         bool Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread);
         bool test_hit(const BasicRay&, IStack&, DBL, DBL, int, TraceThreadData *Thread);
@@ -130,5 +135,6 @@ class Lathe : public ObjectBase
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_LATHE_H

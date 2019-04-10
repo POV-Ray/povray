@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,12 +36,11 @@
 
 #include "syspovtimer.h"
 
-#include <cassert>
-
 #include <sys/timeb.h>
 #include <sys/types.h>
 #include <windows.h>
 
+#include "base/povassert.h"
 #include "base/types.h"
 
 #include "osversioninfo.h"
@@ -54,12 +53,21 @@ namespace pov_base
 
 //******************************************************************************
 
+#if POV_USE_PLATFORM_DELAY
+
+// NOTE: Although we're currently not using this implementation, we may want to
+// keep it around in case we find the default implementation wanting on Windows
+// systems in general or some flavours in particular.
 void Delay(unsigned int msec)
 {
     Sleep (msec);
 }
 
+#endif // POV_USE_PLATFORM_DELAY
+
 //******************************************************************************
+
+#if !POV_USE_DEFAULT_TIMER
 
 Timer::Timer () :
     // TODO - sources on the internet indicate that GetThreadTimes() and GetProcessTimes() have been
@@ -176,4 +184,9 @@ bool Timer::HasValidProcessCPUTime () const
     return mCPUTimeSupported;
 }
 
+#endif // POV_USE_DEFAULT_TIMER
+
+//******************************************************************************
+
 }
+// end of namespace pov_base

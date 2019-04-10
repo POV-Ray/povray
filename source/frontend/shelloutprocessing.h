@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,16 +39,31 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "frontend/configfrontend.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <string>
+#include <memory>
+
+// Boost header files
 #include <boost/format.hpp>
 
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (POVMS module)
 #include "povms/povmscpp.h"
+
+// POV-Ray header files (frontend module)
+//  (none at the moment)
 
 namespace pov_frontend
 {
 
 class ShelloutProcessing;
 
-class ShelloutAction
+class ShelloutAction final
 {
 public:
     typedef enum
@@ -66,23 +81,23 @@ public:
 
     Action ReturnAction(void) const { return returnAction; }
     bool IsSet(void) const { return isSet; }
-    const string& RawCommand(void) const { return rawCommand; }
-    const string& Command(void) const { return command; }
-    const string& RawParameters(void) const { return rawParameters; }
-    const string& Parameters(void) const { return parameters; }
+    const std::string& RawCommand(void) const { return rawCommand; }
+    const std::string& Command(void) const { return command; }
+    const std::string& RawParameters(void) const { return rawParameters; }
+    const std::string& Parameters(void) const { return parameters; }
     bool ReturnNegate(void) const { return returnNegate; }
-    void ExpandParameters(const string& scene, const string& ofn, unsigned int w, unsigned int h, float clock, unsigned int frame);
+    void ExpandParameters(const std::string& scene, const std::string& ofn, unsigned int w, unsigned int h, float clock, unsigned int frame);
 
 private:
     bool          isSet;
     bool          returnNegate;
-    string        command;
-    string        rawCommand;
-    string        parameters;
-    string        rawParameters;
+    std::string   command;
+    std::string   rawCommand;
+    std::string   parameters;
+    std::string   rawParameters;
     Action        returnAction;
 
-    ShelloutAction();
+    ShelloutAction() = delete;
 };
 
 class ShelloutProcessing
@@ -90,7 +105,7 @@ class ShelloutProcessing
     friend class ShelloutAction;
 
 public:
-    typedef shared_ptr<ShelloutAction> ShelloutPtr;
+    typedef std::shared_ptr<ShelloutAction> ShelloutPtr;
 
     typedef enum
     {
@@ -105,7 +120,7 @@ public:
 
     // we use strings rather than UCS2Strings for the scene name and parameters since the passed
     // parameters (via POVMS) are also strings.
-    ShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height);
+    ShelloutProcessing(POVMS_Object& opts, const std::string& scene, unsigned int width, unsigned int height);
 
     // you should reap any processes here as needed, and forcefully terminate ones still running.
     virtual ~ShelloutProcessing();
@@ -117,17 +132,17 @@ public:
     ShelloutAction::Action ReturnAction(shelloutEvent which) const { return shellouts[which]->ReturnAction(); }
 
     // return the command string as passed from the option parser; i.e. complete with parameters
-    string RawCommand(shelloutEvent which) const { return shellouts[which]->RawCommand(); }
+    std::string RawCommand(shelloutEvent which) const { return shellouts[which]->RawCommand(); }
 
     // the command itself, separated from its parameters. quotes around the command will have been removed.
-    string Command(shelloutEvent which) const { return shellouts[which]->Command(); }
+    std::string Command(shelloutEvent which) const { return shellouts[which]->Command(); }
 
     // the raw parameters after separation from the command. any quotes will remain in place.
-    string RawParameters(shelloutEvent which) const { return shellouts[which]->RawParameters(); }
+    std::string RawParameters(shelloutEvent which) const { return shellouts[which]->RawParameters(); }
 
     // the parameters after expansion of terms; e.g. %s to scene name. SetOutputFile() and
     // SetFrameClock() (if relevant) must be called prior to calling this method.
-    string Parameters(shelloutEvent which) const { return shellouts[which]->Parameters(); }
+    std::string Parameters(shelloutEvent which) const { return shellouts[which]->Parameters(); }
 
     // returns true if all frames should be skipped. if so, any subsequent calls for
     // pre-frame and post-frame actions will be ignored (and preferebly should not be
@@ -145,7 +160,7 @@ public:
     int ExitCode(void) const { return exitCode; }
 
     // returns a string representation of the exit code; e.g. 'user abort'
-    string ExitDesc(void) const { return exitCode == 0 ? "SUCCESS" : exitCode == 2 ? "USER ABORT" : "FATAL ERROR"; }
+    std::string ExitDesc(void) const { return exitCode == 0 ? "SUCCESS" : exitCode == 2 ? "USER ABORT" : "FATAL ERROR"; }
 
     // returns true if the render should be halted.
     bool RenderCancelled(void) const { return cancelRender; }
@@ -160,7 +175,7 @@ public:
     // if there is an output file, this method must be called prior to the pre-scene
     // action with the value of the first output file, and prior to pre-frame for each
     // subsequent output file if the render is an animation.
-    void SetOutputFile(const string& filename) { outputFile = filename; }
+    void SetOutputFile(const std::string& filename) { outputFile = filename; }
 
     // if the render is not an animation, there is no need to call SetFrameClock().
     // if it is an animation, it must be called prior to the pre-scene action, and
@@ -185,8 +200,8 @@ public:
     //   7: the command parameters (CAUTION: may contain escape codes)
     //   8: the command return code (as an integer)
     //   9: output text from the command, as returned by LastShelloutResult()
-    virtual string GetCancelMessage(void);
-    virtual void SetCancelMessage(const string& format) { cancelFormat.parse(format); }
+    virtual std::string GetCancelMessage(void);
+    virtual void SetCancelMessage(const std::string& format) { cancelFormat.parse(format); }
 
     // the positional parameters are as follows:
     //   1: the event causing the skip (as a string), e.g. "pre-scene"
@@ -195,8 +210,8 @@ public:
     //   4: the command parameters (CAUTION: may contain escape codes)
     //   5: the command return code (as an integer)
     //   6: output text from the command, as returned by LastShelloutResult()
-    virtual string GetSkipMessage(void);
-    virtual void SetSkipMessage(const string& format) { skipFormat.parse(format); }
+    virtual std::string GetSkipMessage(void);
+    virtual void SetSkipMessage(const std::string& format) { skipFormat.parse(format); }
 
     // advise the code that a particular event should be handled now; e.g. pre-scene, post-scene
     // and so forth. this method should be called even if the platform indicates it does not
@@ -218,7 +233,7 @@ public:
 
     // return the name of the currently running shellout (without parameters)
     // if no shellout is running, an empty string should be returned.
-    virtual string ProcessName(void) { return ShelloutRunning() ? runningProcessName : string(); }
+    virtual std::string ProcessName(void) { return ShelloutRunning() ? runningProcessName : std::string(); }
 
     // return the PID of the currently running shellout (or equivalent thereof).
     // returns 0 if no process is running, and -1 of the platform has no PID equivalent
@@ -229,7 +244,7 @@ public:
     // in a form suitable for display on the console or UI message log - preferably
     // no more than a single line (width unimportant). if not implemented, an empty
     // string should be returned.
-    virtual string LastShelloutResult(void) { return string(); }
+    virtual std::string LastShelloutResult(void) { return std::string(); }
 
     // return true if this platform supports shellouts.
     virtual bool ShelloutsSupported(void) { return false; }
@@ -252,25 +267,25 @@ protected:
     unsigned int imageWidth;
     unsigned int imageHeight;
     float clockVal;
-    string sceneName;
-    string outputFile;
-    string runningProcessName;
-    string cancelPhase;
-    string cancelReason;
-    string cancelCommand;
-    string cancelParameters;
-    string cancelOutput;
-    string skipPhase;
-    string skipReason;
-    string skipCommand;
-    string skipParameters;
-    string skipOutput;
+    std::string sceneName;
+    std::string outputFile;
+    std::string runningProcessName;
+    std::string cancelPhase;
+    std::string cancelReason;
+    std::string cancelCommand;
+    std::string cancelParameters;
+    std::string cancelOutput;
+    std::string skipPhase;
+    std::string skipReason;
+    std::string skipCommand;
+    std::string skipParameters;
+    std::string skipOutput;
     boost::format cancelFormat;
     boost::format skipFormat;
     ShelloutPtr shellouts[lastShelloutEvent];
 
     // helper method
-    string GetPhaseName(shelloutEvent event);
+    std::string GetPhaseName(shelloutEvent event);
 
     // execute the given command with the supplied parameters, which have already
     // been expanded as per the docs, and immediately return true without waiting
@@ -291,7 +306,7 @@ protected:
     // if the platform implemeting a subclass of this method has the equivalent of a
     // system log (e.g. syslog on unix, event log on windows), the implementation should
     // consider providing a user-controllable option to log any commands using such.
-    virtual bool ExecuteCommand(const string& cmd, const string& params);
+    virtual bool ExecuteCommand(const std::string& cmd, const std::string& params);
 
     // shutdown any currently-running shellouts. if force is true, force them to exit.
     // in either case, don't wait more than timeout milliseconds. return true if there
@@ -312,13 +327,13 @@ protected:
     //
     // if the platform does not support capturing output of processes (or the
     // processes are GUI-based), there is no requirement to return any output.
-    virtual int CollectCommand(string& output) { return -2; }
+    virtual int CollectCommand(std::string& output) { return -2; }
     virtual int CollectCommand(void) { return -2; }
 
     // return true if the requested shellout command is permitted. this method is
     // called just before a shellout runs. if it fails, an exception will generally
     // be thrown by the caller (the method itself should not throw an exception).
-    virtual bool CommandPermitted(const string& command, const string& parameters) { return true; }
+    virtual bool CommandPermitted(const std::string& command, const std::string& parameters) { return true; }
 
     // called by the internal parser during construction to separate commands from parameters.
     // given a raw string in the form returned from the POV INI file, extract the command and any parameters.
@@ -340,16 +355,17 @@ protected:
     // parameters start will not be removed.
     //
     // this method should return true if the command is non-empty upon completion.
-    virtual bool ExtractCommand(const string& src, string& command, string& parameters) const;
+    virtual bool ExtractCommand(const std::string& src, std::string& command, std::string& parameters) const;
 
 private:
     bool processStartRequested;
     shelloutEvent postProcessEvent;
 
     bool HandleProcessEvent(shelloutEvent which, bool internalCall);
-    bool PostProcessEvent(void);
+    bool PostProcessEvent();
 };
 
 }
+// end of namespace pov_frontend
 
 #endif // POVRAY_FRONTEND_SHELLOUTPROCESSING_H

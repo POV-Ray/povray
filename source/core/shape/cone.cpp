@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,12 +38,19 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/cone.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
 
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -101,7 +108,7 @@ bool Cone::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 
     Intersection_Found = false;
 
-    if ((cnt = Intersect(ray, I, Thread)) != 0)
+    if ((cnt = Intersect(ray, I, Thread->Stats())) != 0)
     {
         for (i = 0; i < cnt; i++)
         {
@@ -146,14 +153,14 @@ bool Cone::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 *
 ******************************************************************************/
 
-int Cone::Intersect(const BasicRay& ray, CONE_INT *Intersection, TraceThreadData *Thread) const
+int Cone::Intersect(const BasicRay& ray, CONE_INT *Intersection, RenderStatistics& stats) const
 {
     int i = 0;
     DBL a, b, c, z, t1, t2, len;
     DBL d;
     Vector3d P, D;
 
-    Thread->Stats()[Ray_Cone_Tests]++;
+    stats[Ray_Cone_Tests]++;
 
     /* Transform the ray into the cones space */
 
@@ -290,7 +297,7 @@ int Cone::Intersect(const BasicRay& ray, CONE_INT *Intersection, TraceThreadData
     }
 
     if (i)
-        Thread->Stats()[Ray_Cone_Tests_Succeeded]++;
+        stats[Ray_Cone_Tests_Succeeded]++;
 
     return (i);
 }
@@ -957,7 +964,7 @@ void Cone::Compute_BBox()
 *
 ******************************************************************************/
 
-void Cone::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
+void Cone::UVCoord(Vector2d& Result, const Intersection *Inter) const
 {
     CalcUV(Inter->IPoint, Result);
 }
@@ -1151,3 +1158,4 @@ void Cone::maxUV( Vector2d& r )const
 }
 
 }
+// end of namespace pov

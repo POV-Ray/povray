@@ -65,7 +65,7 @@ namespace pov_frontend
     static char theNAME[] =      "povray" ;     /* for the property */
     static char theICONNAME[] =  "POV-Ray";     /* short name for the icon */
 
-    extern shared_ptr<Display> gDisplay;
+    extern std::shared_ptr<Display> gDisplay;
 
     const UnixOptionsProcessor::Option_Info UnixX11Display::Options[] =
     {
@@ -141,7 +141,7 @@ namespace pov_frontend
             // allocate a new pixel counters, dropping influence of previous picture
             m_PxCount.clear(); // not useful, vector was created empty, just to be sure
             m_PxCount.reserve(width*height); // we need that, and the loop!
-            for(vector<unsigned char>::iterator iter = m_PxCount.begin(); iter != m_PxCount.end(); iter++)
+            for(std::vector<unsigned char>::iterator iter = m_PxCount.begin(); iter != m_PxCount.end(); iter++)
                 (*iter) = 0;
         }
         if (theImage->data)
@@ -231,9 +231,9 @@ namespace pov_frontend
             // determine desktop area
             // always scale when window is too big to fit
             // tolerance for border, just hope the Window Manager is not larger than 10
-            width = min(theDispWidth - 10, width);
+            width = std::min(theDispWidth - 10, width);
             // tolerance for border and title bar, just hope the Window Manager is not larger than 80
-            height = min(theDispHeight - 80, height);
+            height = std::min(theDispHeight - 80, height);
             // calculate display area
             float AspectRatio = float(width)/float(height);
             float AspectRatio_Full = float(GetWidth())/float(GetHeight());
@@ -438,7 +438,7 @@ namespace pov_frontend
 
             m_PxCount.clear();
             m_PxCount.reserve(width*height);
-            for(vector<unsigned char>::iterator iter = m_PxCount.begin(); iter != m_PxCount.end(); iter++)
+            for(std::vector<unsigned char>::iterator iter = m_PxCount.begin(); iter != m_PxCount.end(); iter++)
                 (*iter) = 0;
 
             m_valid = true;
@@ -465,7 +465,7 @@ namespace pov_frontend
                  * ... and so on
                  * TODO: change for integer and use / instead of * in formula ?
                  */
-                m_display_scale = min(float(width) / GetWidth(), float(height) / GetHeight());
+                m_display_scale = std::min(float(width) / GetWidth(), float(height) / GetHeight());
             }
 
 
@@ -532,10 +532,10 @@ namespace pov_frontend
         if (!m_valid)
             return;
 
-        int ix1 = min(x1, GetWidth()-1);
-        int ix2 = min(x2, GetWidth()-1);
-        int iy1 = min(y1, GetHeight()-1);
-        int iy2 = min(y2, GetHeight()-1);
+        int ix1 = std::min(x1, GetWidth()-1);
+        int ix2 = std::min(x2, GetWidth()-1);
+        int iy1 = std::min(y1, GetHeight()-1);
+        int iy2 = std::min(y2, GetHeight()-1);
 
         if (m_display_scaled)
         {
@@ -574,10 +574,10 @@ namespace pov_frontend
         if (!m_valid)
             return;
 
-        int ix1 = min(x1, GetWidth()-1);
-        int ix2 = min(x2, GetWidth()-1);
-        int iy1 = min(y1, GetHeight()-1);
-        int iy2 = min(y2, GetHeight()-1);
+        int ix1 = std::min(x1, GetWidth()-1);
+        int ix2 = std::min(x2, GetWidth()-1);
+        int iy1 = std::min(y1, GetHeight()-1);
+        int iy2 = std::min(y2, GetHeight()-1);
 
         if (m_display_scaled)
         {
@@ -609,10 +609,10 @@ namespace pov_frontend
         if (!m_valid)
             return;
 
-        unsigned int ix1 = min(x1, GetWidth()-1);
-        unsigned int ix2 = min(x2, GetWidth()-1);
-        unsigned int iy1 = min(y1, GetHeight()-1);
-        unsigned int iy2 = min(y2, GetHeight()-1);
+        unsigned int ix1 = std::min(x1, GetWidth()-1);
+        unsigned int ix2 = std::min(x2, GetWidth()-1);
+        unsigned int iy1 = std::min(y1, GetHeight()-1);
+        unsigned int iy2 = std::min(y2, GetHeight()-1);
 
         if (m_display_scaled)
         {

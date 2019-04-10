@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -153,7 +153,8 @@ void WinMemStage(bool BeginRender, void *cookie)
     TrackMem = false;
 }
 
-bool WinMemReport(bool global, uint64& allocs, uint64& frees, int64& current, uint64& peak, uint64 &smallest, uint64 &largest)
+bool WinMemReport(bool global, unsigned __int64& allocs, unsigned __int64& frees, __int64& current,
+                  unsigned __int64& peak, unsigned __int64& smallest, unsigned __int64& largest)
 {
   if (!global)
     return false;
@@ -200,7 +201,8 @@ void WinMemThreadCleanup()
   delete lMemStats;
 }
 
-bool WinMemReport(bool global, uint64& allocs, uint64& frees, int64& current, uint64& peak, uint64 &smallest, uint64 &largest)
+bool WinMemReport(bool global, unsigned __int64& allocs, unsigned __int64& frees, __int64& current,
+                  unsigned __int64& peak, unsigned __int64 &smallest, unsigned __int64 &largest)
 {
   HeapLock lock(gHeap);
 
@@ -349,7 +351,8 @@ char *win_strdup(const char *s)
 #endif // else portion of '#ifdef _DEBUG'
 
 #endif // else portion of '#if POV_MEM_STATS == 0 && WIN_MEM_TRACKING == 0'
-} // end of namespace povwin
+}
+// end of namespace povwin
 
 #if WIN_MEM_TRACKING
 

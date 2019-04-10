@@ -12,7 +12,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,13 +40,20 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/isosurface.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <algorithm>
 
+// POV-Ray header files (base module)
 #include "base/messenger.h"
 
+// POV-Ray header files (core module)
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -54,11 +61,36 @@
 namespace pov
 {
 
+using std::min;
+using std::max;
+
+struct IsosurfaceCache final
+{
+    const IsoSurface *current;
+    Vector3d Pglobal;
+    Vector3d Dglobal;
+    DBL fmax;
+    IsosurfaceCache();
+};
+
+IsosurfaceCache::IsosurfaceCache() :
+    current(nullptr)
+{}
+
+struct ISO_ThreadData final
+{
+    IsosurfaceCache cache;
+    GenericScalarFunctionInstance* pFn;
+    DBL Vlength;
+    DBL tl;
+    int Inv3;
+};
+
 /*****************************************************************************
 * Local preprocessor defines
 ******************************************************************************/
 
-struct ISO_Max_Gradient
+struct ISO_Max_Gradient final
 {
     DBL max_gradient, gradient;
     DBL eval_max, eval_cnt, eval_gradient_sum, eval_var;
@@ -127,6 +159,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
     int begin = 0, end = 0;
     bool in_shadow_test = false;
     Vector3d VTmp;
+    thread_local ISO_ThreadData isoData;
 
     Thread->Stats()[Ray_IsoSurface_Bound_Tests]++;
 
@@ -152,7 +185,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
             Dlocal = ray.Direction;
         }
 
-        Thread->isosurfaceData->Inv3 = 1;
+        isoData.Inv3 = 1;
 
         if(closed != false)
         {
@@ -168,7 +201,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
                         Depth_Stack->push(Intersection(Depth1, IPoint, this, 1, Side1));
                         IFound = true;
                         itrace++;
-                        Thread->isosurfaceData->Inv3 *= -1;
+                        isoData.Inv3 *= -1;
                     }
                 }
             }
@@ -179,7 +212,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
                     Depth1 = accuracy * 5.0;
                     VTmp = Plocal + Depth1 * Dlocal;
                     if (IsInside (fn, VTmp))
-                        Thread->isosurfaceData->Inv3 = -1;
+                        isoData.Inv3 = -1;
                     /* Change the sign of the function (IPoint is in the bounding shpae.)*/
                 }
                 VTmp = Plocal + Depth2 * Dlocal;
@@ -205,7 +238,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
             return (false);
         }
         Thread->Stats()[Ray_IsoSurface_Tests]++;
-        if((Depth1 < accuracy) && (Thread->isosurfaceData->Inv3 == 1))
+        if((Depth1 < accuracy) && (isoData.Inv3 == 1))
         {
             /* IPoint is on the isosurface */
             VTmp = Plocal + tmin * Dlocal;
@@ -214,16 +247,16 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
                 tmin = accuracy * 5.0;
                 VTmp = Plocal + tmin * Dlocal;
                 if (IsInside (fn, VTmp))
-                    Thread->isosurfaceData->Inv3 = -1;
+                    isoData.Inv3 = -1;
                 /* change the sign and go into the isosurface */
             }
         }
 
-        Thread->isosurfaceData->pFn = &fn;
+        isoData.pFn = &fn;
 
         for (; itrace < max_trace; itrace++)
         {
-            if(Function_Find_Root(*(Thread->isosurfaceData), Plocal, Dlocal, &tmin, &tmax, maxg, in_shadow_test, Thread) == false)
+            if(Function_Find_Root(isoData, Plocal, Dlocal, &tmin, &tmax, maxg, in_shadow_test, Thread) == false)
                 break;
             else
             {
@@ -237,13 +270,13 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
             tmin += accuracy * 5.0;
             if((tmax - tmin) < accuracy)
                 break;
-            Thread->isosurfaceData->Inv3 *= -1;
+            isoData.Inv3 *= -1;
         }
 
         if(IFound)
             Thread->Stats()[Ray_IsoSurface_Tests_Succeeded]++;
 
-        Thread->isosurfaceData->pFn = nullptr;
+        isoData.pFn = nullptr;
     }
 
     if(eval == true)
@@ -571,7 +604,7 @@ IsoSurface::IsoSurface() :
     ObjectBase(ISOSURFACE_OBJECT),
     positivePolarity(false)
 {
-    container = shared_ptr<ContainedByShape>(new ContainedByBox());
+    container = std::shared_ptr<ContainedByShape>(new ContainedByBox());
 
     Make_BBox(BBox, -1.0, -1.0, -1.0, 2.0, 2.0, 2.0);
 
@@ -591,7 +624,7 @@ IsoSurface::IsoSurface() :
     gradient = 0.0;
     threshold = 0.0;
 
-    mginfo = intrusive_ptr<ISO_Max_Gradient>(new ISO_Max_Gradient());
+    mginfo = boost::intrusive_ptr<ISO_Max_Gradient>(new ISO_Max_Gradient());
 }
 
 
@@ -635,7 +668,7 @@ ObjectPtr IsoSurface::Copy()
 
     New->positivePolarity = positivePolarity;
 
-    New->container = shared_ptr<ContainedByShape>(container->Copy());
+    New->container = std::shared_ptr<ContainedByShape>(container->Copy());
 
     return (New);
 }
@@ -715,7 +748,7 @@ void IsoSurface::DispatchShutdownMessages(GenericMessenger& messenger)
         return;
     }
 
-    const SourceInfo* fnInfo = Function->GetSourceInfo();
+    const CustomFunctionSourceInfo* fnInfo = Function->GetSourceInfo();
 
     if (fnInfo != nullptr)
     {
@@ -730,7 +763,7 @@ void IsoSurface::DispatchShutdownMessages(GenericMessenger& messenger)
 
                 if (((prop <= 0.9) && (diff <= -0.5)) || (((prop <= 0.95) || (diff <= -0.1)) && (mginfo->max_gradient < 10.0)))
                 {
-                    messenger.WarningAt(kWarningGeneral, fnInfo->filename, fnInfo->filepos.lineno, fnInfo->col, fnInfo->filepos.offset,
+                    messenger.WarningAt(kWarningGeneral, *fnInfo,
                                         "The maximum gradient found was %0.3f, but max_gradient of the\n"
                                         "isosurface was set to %0.3f. The isosurface may contain holes!\n"
                                         "Adjust max_gradient to get a proper rendering of the isosurface.",
@@ -739,7 +772,7 @@ void IsoSurface::DispatchShutdownMessages(GenericMessenger& messenger)
                 }
                 else if ((diff >= 10.0) || ((prop >= 1.1) && (diff >= 0.5)))
                 {
-                    messenger.WarningAt(kWarningGeneral, fnInfo->filename, fnInfo->filepos.lineno, fnInfo->col, fnInfo->filepos.offset,
+                    messenger.WarningAt(kWarningGeneral, *fnInfo,
                                         "The maximum gradient found was %0.3f, but max_gradient of\n"
                                         "the isosurface was set to %0.3f. Adjust max_gradient to\n"
                                         "get a faster rendering of the isosurface.",
@@ -756,7 +789,7 @@ void IsoSurface::DispatchShutdownMessages(GenericMessenger& messenger)
             {
                 mginfo->eval_cnt = max(mginfo->eval_cnt, 1.0); // make sure it won't be zero
 
-                messenger.InfoAt(fnInfo->filename, fnInfo->filepos.lineno, fnInfo->col, fnInfo->filepos.offset,
+                messenger.InfoAt(*fnInfo,
                                     "Evaluate found a maximum gradient of %0.3f and an average\n"
                                     "gradient of %0.3f. The maximum gradient variation was %0.3f.\n",
                                     (float)(mginfo->eval_max),
@@ -839,29 +872,29 @@ bool IsoSurface::Function_Find_Root(ISO_ThreadData& itd, const Vector3d& PP, con
 
     itd.Vlength = DD.length();
 
-    if((itd.cache == true) && (itd.current == this))
+    if(itd.cache.current == this)
     {
         pThreadData->Stats()[Ray_IsoSurface_Cache]++;
         VTmp = PP + *Depth1 * DD;
-        VTmp -= itd.Pglobal;
+        VTmp -= itd.cache.Pglobal;
         l_b = VTmp.length();
         VTmp = PP + *Depth2 * DD;
-        VTmp -= itd.Dglobal;
+        VTmp -= itd.cache.Dglobal;
         l_e = VTmp.length();
-        if((itd.fmax - maxg * max(l_b, l_e)) > 0.0)
+        if((itd.cache.fmax - maxg * max(l_b, l_e)) > 0.0)
         {
             pThreadData->Stats()[Ray_IsoSurface_Cache_Succeeded]++;
             return false;
         }
     }
 
-    itd.Pglobal = PP;
-    itd.Dglobal = DD;
+    itd.cache.Pglobal = PP;
+    itd.cache.Dglobal = DD;
 
-    itd.cache = false;
+    itd.cache.current = nullptr;
     EP1.t = *Depth1;
     EP1.f = Float_Function(itd, *Depth1);
-    itd.fmax = EP1.f;
+    itd.cache.fmax = EP1.f;
     if((closed == false) && (EP1.f < 0.0))
     {
         itd.Inv3 *= -1;
@@ -870,7 +903,7 @@ bool IsoSurface::Function_Find_Root(ISO_ThreadData& itd, const Vector3d& PP, con
 
     EP2.t = *Depth2;
     EP2.f = Float_Function(itd, *Depth2);
-    itd.fmax = min(EP2.f, itd.fmax);
+    itd.cache.fmax = min(EP2.f, itd.cache.fmax);
 
     oldmg = maxg;
     t21 = (*Depth2 - *Depth1);
@@ -899,10 +932,9 @@ bool IsoSurface::Function_Find_Root(ISO_ThreadData& itd, const Vector3d& PP, con
     }
     else if(!in_shadow_test)
     {
-        itd.cache = true;
-        itd.Pglobal = PP + EP1.t * DD;
-        itd.Dglobal = PP + EP2.t * DD;
-        itd.current = this;
+        itd.cache.Pglobal = PP + EP1.t * DD;
+        itd.cache.Dglobal = PP + EP2.t * DD;
+        itd.cache.current = this;
 
         return false;
     }
@@ -969,7 +1001,7 @@ bool IsoSurface::Function_Find_Root_R(ISO_ThreadData& itd, const ISO_Pair* EP1, 
         EPa.t = EP1->t + t21;
         EPa.f = Float_Function(itd, EPa.t);
 
-        itd.fmax = min(EPa.f, itd.fmax);
+        itd.cache.fmax = min(EPa.f, itd.cache.fmax);
         if(!Function_Find_Root_R(itd, EP1, &EPa, dt, t21, len * 2.0, maxg, pThreadData))
             return (Function_Find_Root_R(itd, &EPa, EP2, dt, t21, len * 2.0,maxg, pThreadData));
         else
@@ -1010,7 +1042,7 @@ DBL IsoSurface::Float_Function(ISO_ThreadData& itd, DBL t) const
 {
     Vector3d VTmp;
 
-    VTmp = itd.Pglobal + t * itd.Dglobal;
+    VTmp = itd.cache.Pglobal + t * itd.cache.Dglobal;
 
     return ((DBL)itd.Inv3 * EvaluatePolarized (*itd.pFn, VTmp));
 }
@@ -1040,4 +1072,4 @@ bool IsoSurface::IsInside (GenericScalarFunctionInstance& fn, Vector3d& p) const
 }
 
 }
-
+// end of namespace pov

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,21 +39,23 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "frontend/configfrontend.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <list>
 
+// POV-Ray header files (base module)
+#include "base/path_fwd.h"
+
+// POV-Ray header files (POVMS module)
 #include "povms/povmscpp.h"
 
-namespace pov_base
-{
-class Path;
-}
+// POV-Ray header files (frontend module)
+#include "frontend/renderfrontend_fwd.h"
 
 namespace pov_frontend
 {
-
-using namespace pov_base;
-
-struct SceneData;
 
 class FileMessageHandler
 {
@@ -63,13 +65,14 @@ class FileMessageHandler
 
         void HandleMessage(const SceneData&, POVMSType, POVMS_Object&, POVMS_Object&);
     protected:
-        virtual bool FindFile(const list<Path>&, POVMS_Object&, POVMS_Object&);
-        virtual bool ReadFile(const list<Path>&, POVMS_Object&, POVMS_Object&);
+        virtual bool FindFile(const std::list<pov_base::Path>&, POVMS_Object&, POVMS_Object&);
+        virtual bool ReadFile(const std::list<pov_base::Path>&, POVMS_Object&, POVMS_Object&);
         virtual void CreatedFile(POVMS_Object&);
 
-        Path FindFilePath(const list<Path>&, const Path&);
+        pov_base::Path FindFilePath(const std::list<pov_base::Path>&, const pov_base::Path&);
 };
 
 }
+// end of namespace pov_frontend
 
 #endif // POVRAY_FRONTEND_FILEMESSAGEHANDLER_H

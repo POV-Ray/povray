@@ -33,7 +33,6 @@
 ///
 //******************************************************************************
 
-#include "backend/frame.h"
 #include "parser/parser.h"
 #include "core/shape/mesh.h"
 #include "core/material/pigment.h"
@@ -46,9 +45,12 @@
 #include "core/material/texture.h"
 #include "core/material/pattern.h"
 #include "core/scene/tracethreaddata.h"
+#include "base/stringutilities.h"
+#include "base/fileinputoutput.h"
 
 
 #include <set>
+#include <map>
 namespace pov_parser
 {
    void Parser::StartAddingTriangles(UNDERCONSTRUCTION *das)
@@ -398,10 +400,10 @@ namespace pov_parser
      Vector3d * vertice;
      GTS_Edge * edge;
 
-     IStream *filep;
+     std::shared_ptr<IStream> filep;
 
      if ((filep = 
-           Locate_File(ASCIItoUCS2String(filename).c_str(),POV_File_Data_GTS,ign,true)
+           Locate_File(SysToUCS2String(filename),POV_File_Data_GTS,ign,true)
          ) == NULL
         )
      {
@@ -418,7 +420,6 @@ namespace pov_parser
      }
      if ((!ok)||(got < 3))
      {
-       delete filep;
        Error("Error reading the first line (summary) of GTS file.\n");
        return NULL;
      }
@@ -435,7 +436,6 @@ namespace pov_parser
        }
        if ((!ok)||(got < 3))
        {
-         delete filep;
          POV_FREE(vertice);
          POV_FREE(edge);
          Error("Error in reading vertice %d from GTS file.\n",cursor+1);
@@ -456,7 +456,6 @@ namespace pov_parser
        }
        if ((!ok)||(got < 2))
        { 
-         delete filep;
          POV_FREE(vertice);
          POV_FREE(edge);
          Error("Error in reading edge %d from GTS file.(%d %d %d)\n",
@@ -472,7 +471,6 @@ namespace pov_parser
        got = sscanf(buffer,"%i %i %i%*[^\n]",&first,&second,&third);
        if ((!ok)||(got < 3))
        {
-         delete filep;
          POV_FREE(vertice);
          POV_FREE(edge);
          Error("Error in reading face %d from GTS file.\n",cursor+1);
@@ -488,7 +486,6 @@ namespace pov_parser
        AddTriangle(vertice[v1],vertice[v2],vertice[v3],NULL,NULL,NULL,das); 
        // Caveat: AddTriangle will slow down due to the lookup for the normal in the hashed normal array!
      }
-     delete filep;
      POV_FREE(vertice);
      POV_FREE(edge);                                                         
      return (ObjectPtr )das->tesselationMesh;
@@ -547,7 +544,7 @@ namespace pov_parser
              edge.insert(GTS_Edge(second,third));
      }
          
-     if ((filep = CreateFile(ASCIItoUCS2String(filename).c_str(),POV_File_Data_GTS,false) ) == NULL
+     if ((filep = CreateFile(SysToUCS2String(filename).c_str(),POV_File_Data_GTS,false) ) == NULL
         )
      {
        Error("Error opening GTS file.\n");
@@ -639,12 +636,12 @@ namespace pov_parser
    {
      uint_least32_t numberFace;
      STL_Entry entry;
-     IStream *filep;
+     std::shared_ptr<IStream> filep;
      Vector3d v1,v2,v3;
      UCS2String ign;
 
      if ((filep = 
-           Locate_File(ASCIItoUCS2String(filename).c_str(),POV_File_Data_STL,ign,true)
+           Locate_File(SysToUCS2String(filename).c_str(),POV_File_Data_STL,ign,true)
          ) == NULL
         )
      {
@@ -688,7 +685,6 @@ namespace pov_parser
          // Caveat: AddTriangle will slow down due to the lookup for duplicated vectors as mesh grows
        }
      }
-     delete filep;
      return (ObjectPtr )das->tesselationMesh;
 
    }
@@ -706,7 +702,7 @@ namespace pov_parser
      int found1,found2,found3;
 
      number_of_face = meshobj->Data->Number_Of_Triangles;
-     if ((filep = CreateFile(ASCIItoUCS2String(filename).c_str(),POV_File_Data_STL,false) ) == NULL
+     if ((filep = CreateFile(SysToUCS2String(filename).c_str(),POV_File_Data_STL,false) ) == NULL
         )
      {
        Error("Error opening STL file.\n");
@@ -1073,7 +1069,6 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
 
       for(IndY = 0; IndY < YAccuracy; ++IndY)
       {
-         Cooperate();
         DBL CoordY1 = Min[Y] + IndY*Size[Y]/YAccuracy;
         DBL CoordY2 = Min[Y] + (IndY+1)*Size[Y]/YAccuracy;
 
@@ -1786,7 +1781,6 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
 
       for(IndX = 0; IndX < XAccuracy; ++IndX)
       {
-         Cooperate();
         DBL CoordX1 = Min[X] + IndX*Size[X]/XAccuracy;
         DBL CoordX2 = Min[X] + (IndX+1)*Size[X]/XAccuracy;
 
@@ -1930,7 +1924,6 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
 
       for(IndY = 0; IndY < YAccuracy; ++IndY)
       {
-        Cooperate();
         DBL CoordY1 = Min[Y] + (IndY)*Size[Y]/YAccuracy;
         DBL CoordY2 = Min[Y] + (IndY+1.00)*Size[Y]/YAccuracy;
 
@@ -2678,7 +2671,6 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
 
       for(IndY = 0; IndY <= YAccuracy; ++IndY)
       {
-        Cooperate();
         CoordY1 = Min[Y] + (IndY - 0.5)*Size[Y]/YAccuracy;
         CoordY2 = Min[Y] + (IndY + 0.5)*Size[Y]/YAccuracy;
 
@@ -2918,7 +2910,6 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
 
       for(IndY = 0; IndY <= YAccuracy; ++IndY)
       {
-        Cooperate();
         CoordY1 = Min[Y] + (IndY - 0.5)*Size[Y]/YAccuracy;
         CoordY2 = Min[Y] + (IndY + 0.5)*Size[Y]/YAccuracy;
 
@@ -3785,7 +3776,6 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
     }
     for(indix = 0; indix < limit; indix++)
     {
-      Cooperate();
       Extract_Normal(info,n,
           s[indix].N1,v[s[indix].P1],v[s[indix].P2],v[s[indix].P3],
           modif);
@@ -3826,7 +3816,6 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
     }
     for(indice = 0; indice < limit; indice++)
     {
-      Cooperate();
       tria1 = s[indice].P1;
       tria2 = s[indice].P2;
       tria3 = s[indice].P3;
@@ -4704,7 +4693,6 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
     n1 = meshobj->Data->Number_Of_Vertices;
     for(indice = 0; indice < limit; indice++)
     {
-      Cooperate();
       tria1 = s[indice].P1;
       tria2 = s[indice].P2;
       tria3 = s[indice].P3;
@@ -5041,30 +5029,23 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
 
    Mesh* Parser::ParseParameter(int OneParam)
   {
-    Mesh* Obj = NULL;
+    Mesh* Obj = nullptr;
+    ObjectPtr Object = nullptr;
 
     GET (LEFT_PAREN_TOKEN);
 
-    EXPECT
-      CASE (OBJECT_ID_TOKEN)
-      if(((Mesh*)Token.Data)->Type == MESH_OBJECT)
-      {
-        Obj = (Mesh*)Token.Data;
-      }
-    EXIT
-      END_CASE
+    if (AllowToken(OBJECT_ID_TOKEN))
+        Object = CurrentTokenDataPtr<ObjectPtr>();
 
-      OTHERWISE
-      Obj = NULL;
-    UNGET
-      EXIT
-      END_CASE
-      END_EXPECT
+    if (Object == nullptr)
+        Error ("Object identifier expected.");
+    if(Object->Type == MESH_OBJECT)
+        Obj = (Mesh*)Object;
 
-      if(!Obj)
-      {
-        Error("Mesh object identifier expected.\n");
-      }
+    if(!Obj)
+    {
+      Error("Mesh object identifier expected.\n");
+    }
 
     if(OneParam)
     {
@@ -5284,7 +5265,6 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
     Debug_Info("planet : updating the %d triangles             \n",limit);
     for(indice = 0; indice < limit; indice++)
     {
-      Cooperate();
       tria1 = s[indice].P1;
       tria2 = s[indice].P2;
       tria3 = s[indice].P3;
@@ -5514,7 +5494,7 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
         CASE(TEXTURE_TOKEN)
         Parse_Begin();
       GET(TEXTURE_ID_TOKEN);
-      texture = (TEXTURE *)Token.Data;
+      texture = CurrentTokenDataPtr<TEXTURE*>();//(TEXTURE *)Token.Data;
       Parse_End();
       END_CASE 
 
@@ -5605,7 +5585,7 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
         CASE(TEXTURE_TOKEN)
         Parse_Begin();
       GET(TEXTURE_ID_TOKEN);
-      texture = (TEXTURE *)Token.Data;
+      texture = CurrentTokenDataPtr<TEXTURE*>();//(TEXTURE *)Token.Data;
       Parse_End();
       END_CASE 
 
@@ -5693,7 +5673,7 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
         CASE(TEXTURE_TOKEN)
         Parse_Begin();
       GET(TEXTURE_ID_TOKEN);
-      texture = (TEXTURE *)Token.Data;
+      texture = CurrentTokenDataPtr<TEXTURE*>();//(TEXTURE *)Token.Data;
       Parse_End();
       END_CASE 
 
@@ -5790,7 +5770,7 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
         CASE(TEXTURE_TOKEN)
         Parse_Begin();
       GET(TEXTURE_ID_TOKEN);
-      texture = (TEXTURE *)Token.Data;
+      texture = CurrentTokenDataPtr<TEXTURE*>();//(TEXTURE *)Token.Data;
       Parse_End();
       END_CASE 
         OTHERWISE
@@ -5884,7 +5864,7 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
         CASE(TEXTURE_TOKEN)
         Parse_Begin();
       GET(TEXTURE_ID_TOKEN);
-      texture = (TEXTURE *)Token.Data;
+      texture = CurrentTokenDataPtr<TEXTURE*>();//(TEXTURE *)Token.Data;
       Parse_End();
       END_CASE 
 
@@ -5981,7 +5961,7 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
         CASE(TEXTURE_TOKEN)
         Parse_Begin();
       GET(TEXTURE_ID_TOKEN);
-      texture = (TEXTURE *)Token.Data;
+      texture = CurrentTokenDataPtr<TEXTURE*>();//(TEXTURE *)Token.Data;
       Parse_End();
       END_CASE 
 
@@ -6079,7 +6059,7 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
         CASE(TEXTURE_TOKEN)
         Parse_Begin();
       GET(TEXTURE_ID_TOKEN);
-      texture = (TEXTURE *)Token.Data;
+      texture = CurrentTokenDataPtr<TEXTURE*>();//(TEXTURE *)Token.Data;
       Parse_End();
       END_CASE 
         OTHERWISE
@@ -6162,7 +6142,7 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
         CASE(TEXTURE_TOKEN)
         Parse_Begin();
       GET(TEXTURE_ID_TOKEN);
-      texture = (TEXTURE *)Token.Data;
+      texture = CurrentTokenDataPtr<TEXTURE*>();//(TEXTURE *)Token.Data;
       Parse_End();
       END_CASE 
         OTHERWISE
@@ -6243,7 +6223,7 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
         CASE(TEXTURE_TOKEN)
         Parse_Begin();
       GET(TEXTURE_ID_TOKEN);
-      texture = (TEXTURE *)Token.Data;
+      texture = CurrentTokenDataPtr<TEXTURE*>();//(TEXTURE *)Token.Data;
       Parse_End();
       END_CASE 
         OTHERWISE
@@ -6354,7 +6334,7 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
         CASE(TEXTURE_TOKEN)
         Parse_Begin();
       GET(TEXTURE_ID_TOKEN);
-      texture = (TEXTURE *)Token.Data;
+      texture = CurrentTokenDataPtr<TEXTURE*>();//(TEXTURE *)Token.Data;
       Parse_End();
       END_CASE 
         OTHERWISE
@@ -6466,7 +6446,7 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
         CASE(TEXTURE_TOKEN)
         Parse_Begin();
       GET(TEXTURE_ID_TOKEN);
-      texture = (TEXTURE *)Token.Data;
+      texture = CurrentTokenDataPtr<TEXTURE*>();//(TEXTURE *)Token.Data;
       Parse_End();
       END_CASE 
         OTHERWISE
@@ -6585,7 +6565,7 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
         CASE(TEXTURE_TOKEN)
         Parse_Begin();
       GET(TEXTURE_ID_TOKEN);
-      texture = (TEXTURE *)Token.Data;
+      texture = CurrentTokenDataPtr<TEXTURE*>();//(TEXTURE *)Token.Data;
       Parse_End();
       END_CASE 
         OTHERWISE
@@ -6680,7 +6660,7 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
         CASE(TEXTURE_TOKEN)
         Parse_Begin();
       GET(TEXTURE_ID_TOKEN);
-      texture = (TEXTURE *)Token.Data;
+      texture = CurrentTokenDataPtr<TEXTURE*>();//(TEXTURE *)Token.Data;
       Parse_End();
       END_CASE 
         OTHERWISE
@@ -6782,7 +6762,7 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
         CASE(TEXTURE_TOKEN)
         Parse_Begin();
       GET(TEXTURE_ID_TOKEN);
-      texture = (TEXTURE *)Token.Data;
+      texture = CurrentTokenDataPtr<TEXTURE*>();//(TEXTURE *)Token.Data;
       Parse_End();
       END_CASE 
         OTHERWISE
@@ -6860,7 +6840,7 @@ bool Find_TesselIntersection(Intersection *isect, DBL len, ObjectPtr object, con
         CASE(TEXTURE_TOKEN)
         Parse_Begin();
       GET(TEXTURE_ID_TOKEN);
-      texture = (TEXTURE *)Token.Data;
+      texture = CurrentTokenDataPtr<TEXTURE*>();//(TEXTURE *)Token.Data;
       Parse_End();
       END_CASE 
         OTHERWISE

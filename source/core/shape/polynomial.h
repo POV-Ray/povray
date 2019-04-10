@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,6 +39,14 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/scene/object.h"
 
 namespace pov
@@ -74,30 +82,30 @@ inline int term_counts(int x) { return ((x+1)*(x+2)*(x+3)/6); }
 * Global typedefs
 ******************************************************************************/
 
-class Poly : public ObjectBase
+class Poly final : public ObjectBase
 {
     public:
         int Order;
         DBL *Coeffs;
 
         Poly(int order);
-        virtual ~Poly();
+        virtual ~Poly() override;
 
-        virtual ObjectPtr Copy();
+        virtual ObjectPtr Copy() override;
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-        virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
-        virtual void Translate(const Vector3d&, const TRANSFORM *);
-        virtual void Rotate(const Vector3d&, const TRANSFORM *);
-        virtual void Scale(const Vector3d&, const TRANSFORM *);
-        virtual void Transform(const TRANSFORM *);
-        virtual void Compute_BBox();
-        virtual bool Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector3d&, BBoxScalar) const;
+        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) override;
+        virtual bool Inside(const Vector3d&, TraceThreadData *) const override;
+        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const override;
+        virtual void Translate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Rotate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Scale(const Vector3d&, const TRANSFORM *) override;
+        virtual void Transform(const TRANSFORM *) override;
+        virtual void Compute_BBox() override;
+        virtual bool Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector3d&, BBoxScalar) const override;
 
         bool Set_Coeff(const unsigned int x,const unsigned int y, const unsigned int z, const DBL value);
     protected:
-        static int intersect(const BasicRay &Ray, int Order, const DBL *Coeffs, int Sturm_Flag, DBL *Depths, TraceThreadData *Thread);
+        static int intersect(const BasicRay &Ray, int Order, const DBL *Coeffs, int Sturm_Flag, DBL *Depths, RenderStatistics& stats);
         static void normal0(Vector3d& Result, int Order, const DBL *Coeffs, const Vector3d& IPoint);
         static void normal1(Vector3d& Result, int Order, const DBL *Coeffs, const Vector3d& IPoint);
         static DBL inside(const Vector3d& IPoint, int Order, const DBL *Coeffs);
@@ -113,5 +121,6 @@ class Poly : public ObjectBase
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_POLYNOMIAL_H

@@ -16,7 +16,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,15 +44,22 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/math/spline.h"
 
+// C++ variants of C standard header files
 #include <cmath>
 #include <cstdio>
 #include <cstring>
 
+// C++ standard header files
 #include <limits>
 
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
+#include "base/povassert.h"
 #include "base/types.h"
 #include "core/coretypes.h"
+
+// POV-Ray header files (core module)
+//  (none at the moment)
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -445,12 +452,12 @@ DBL BasicXSpline::interpolate( int i, int k, DBL p, DBL fd)const
 
 DBL ExtendedXSpline::interpolate(int i, int k, DBL p, int N)const
 {
-    const int i0=max(min(i  ,N),0);
-    const int i1=max(min(i+1,N),0);
-    const int i2=max(min(i+2,N),0);
-    const int i3=max(min(i+3,N),0);
+    const int i0=std::max(std::min(i  ,N),0);
+    const int i1=std::max(std::min(i+1,N),0);
+    const int i2=std::max(std::min(i+2,N),0);
+    const int i3=std::max(std::min(i+3,N),0);
 
-    const DBL pp=max(min(p,SplineEntries[N].par),SplineEntries[0].par);
+    const DBL pp=std::max(std::min(p,SplineEntries[N].par),SplineEntries[0].par);
 
     const DBL d0=SplineEntries[i1].par-SplineEntries[i0].par;
     const DBL d1=SplineEntries[i2].par-SplineEntries[i1].par;
@@ -487,12 +494,12 @@ inline DBL x_h(DBL q, DBL u){return q*u+2*q*u*u-2*q*u*u*u*u-q*u*u*u*u*u;};
 
 DBL GeneralXSpline::interpolate(int i, int k, DBL p, int N)const
 {
-    const int i0=max(min(i  ,N),0);
-    const int i1=max(min(i+1,N),0);
-    const int i2=max(min(i+2,N),0);
-    const int i3=max(min(i+3,N),0);
+    const int i0=std::max(std::min(i  ,N),0);
+    const int i1=std::max(std::min(i+1,N),0);
+    const int i2=std::max(std::min(i+2,N),0);
+    const int i3=std::max(std::min(i+3,N),0);
 
-    const DBL pp=max(min(p,SplineEntries[N].par),SplineEntries[0].par);
+    const DBL pp=std::max(std::min(p,SplineEntries[N].par),SplineEntries[0].par);
 
     const DBL d0=SplineEntries[i1].par-SplineEntries[i0].par;
     const DBL d1=SplineEntries[i2].par-SplineEntries[i1].par;
@@ -501,22 +508,22 @@ DBL GeneralXSpline::interpolate(int i, int k, DBL p, int N)const
     const DBL d02=(SplineEntries[i2].par-SplineEntries[i0].par)/2;
     const DBL d13=(SplineEntries[i3].par-SplineEntries[i1].par)/2;
 
-    const DBL T0=SplineEntries[i1].par+max(node[i1].freedom_degree,0.0)*d1;
+    const DBL T0=SplineEntries[i1].par+std::max(node[i1].freedom_degree,0.0)*d1;
     const DBL q0=(node[i1].freedom_degree<0)?-node[i1].freedom_degree/2.0:0.0;
     const DBL p0=(d02!=0.0)?2*Sqr((SplineEntries[i2].par-T0)/d02):0.0;
     const DBL A0=(i0==i1)?0.0:((pp>T0)?((q0>0)?x_h(q0,(SplineEntries[i2].par-pp)/d1-1):0.0):x_g(p0,q0,(pp-T0)/(SplineEntries[i0].par-T0)));
 
-    const DBL T1=SplineEntries[i2].par+max(node[i2].freedom_degree,0.0)*d2;
+    const DBL T1=SplineEntries[i2].par+std::max(node[i2].freedom_degree,0.0)*d2;
     const DBL q1=(node[i2].freedom_degree<0)?-node[i2].freedom_degree/2.0:0.0;
     const DBL p1=(d13!=0.0)?2*Sqr((SplineEntries[i3].par-T1)/d13):0.0;
     const DBL A1=(i1==i2)?0.0:((pp>T1)?0.0:x_g(p1,q1,(pp-T1)/(SplineEntries[i1].par-T1)));
 
-    const DBL T2=SplineEntries[i1].par-max(node[i1].freedom_degree,0.0)*d0;
+    const DBL T2=SplineEntries[i1].par-std::max(node[i1].freedom_degree,0.0)*d0;
     const DBL q2=(node[i1].freedom_degree<0)?-node[i1].freedom_degree/2.0:0.0;
     const DBL p2=(d02!=0.0)?2*Sqr((T2-SplineEntries[i0].par)/d02):0.0;
     const DBL A2=(i1==i2)?0.0:((pp<T2)?0.0:x_g(p2,q2,(pp-T2)/(SplineEntries[i2].par-T2)));
 
-    const DBL T3=SplineEntries[i2].par-max(node[i2].freedom_degree,0.0)*d1;
+    const DBL T3=SplineEntries[i2].par-std::max(node[i2].freedom_degree,0.0)*d1;
     const DBL q3=(node[i2].freedom_degree<0)?-node[i2].freedom_degree/2.0:0.0;
     const DBL p3=(d13!=0.0)?2*Sqr((T3-SplineEntries[i1].par)/d13):0.0;
     const DBL A3=(i2==i3)?0.0:((pp<T3)?((q3>0)?x_h(q3,(pp-SplineEntries[i1].par)/d1-1):0.0):x_g(p3,q3,(pp-T3)/(SplineEntries[i3].par-T3)));
@@ -1485,7 +1492,7 @@ void XSpline::Get(DBL p, EXPRESS& v)
             else if(i > last )
                 v[k] = SplineEntries.back().vec[k];
             else
-                v[k] = interpolate( max(int(i-2),int(-1)), k, p, last);
+                v[k] = interpolate( std::max(int(i-2),int(-1)), k, p, last);
         }
     }
 }
@@ -1527,3 +1534,4 @@ DBL Get_Spline_Val(GenericSpline *sp, DBL p, EXPRESS& v, int *Terms)
 }
 
 }
+// end of namespace pov

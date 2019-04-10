@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,9 +38,18 @@
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
+#include "core/support/statistics_fwd.h"
 
-#include <vector>
+// C++ variants of C standard header files
+#include <cstddef>
 
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/support/statisticids.h"
 
 namespace pov
@@ -53,10 +62,8 @@ namespace pov
 ///
 /// @{
 
-using namespace pov_base;
-
 template <typename T>
-class Counter
+class Counter final
 {
     public:
         Counter() { value = 0; } // assumes for all types of T that 0 is a valid assignment
@@ -76,14 +83,14 @@ class Counter
 };
 
 template <typename T, int numElem>
-class StatisticsBase
+class StatisticsBase final
 {
     public:
         StatisticsBase() {}
         virtual ~StatisticsBase() {}
 
-        inline Counter<T>& operator[](size_t idx) { return counters[idx]; }
-        inline Counter<T> operator[](size_t idx) const { return counters[idx]; }
+        inline Counter<T>& operator[](std::size_t idx) { return counters[idx]; }
+        inline Counter<T> operator[](std::size_t idx) const { return counters[idx]; }
 
         void operator+=(const StatisticsBase& other);
         StatisticsBase operator+(const StatisticsBase& other);
@@ -97,7 +104,7 @@ class StatisticsBase
 typedef StatisticsBase<POV_ULONG, MaxIntStat> IntStatistics;
 typedef StatisticsBase<double, MaxFPStat> FPStatistics;
 
-class RenderStatistics
+class RenderStatistics final
 {
 public:
     RenderStatistics() {}
@@ -123,5 +130,6 @@ protected:
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_STATISTICS_H

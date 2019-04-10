@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,9 +41,6 @@
 // Pull in other compile-time config header files first
 #include "base/configbase.h"
 #include "syspovconfigcore.h"
-
-// C++ variants of C standard header files
-#include <cstdlib>
 
 //##############################################################################
 ///
@@ -204,10 +201,6 @@
 ///
 //******************************************************************************
 
-#ifndef QSORT
-    #define QSORT(a,b,c,d) std::qsort((a),(b),(c),(d))
-#endif
-
 /// @def TRY_OPTIMIZED_NOISE
 /// Whether the platform provides dynamic optimized noise.
 ///
@@ -225,6 +218,53 @@
         // TryOptimizedNoise() function.
         #define TRY_OPTIMIZED_NOISE
     #endif
+#endif
+
+/// @def C99_COMPATIBLE_RADIOSITY
+/// @deprecated
+///     This is effectively a legacy alias for @ref POV_PORTABLE_RADIOSITY,
+///     which takes precedence if defined.
+///
+#ifndef C99_COMPATIBLE_RADIOSITY
+    #define C99_COMPATIBLE_RADIOSITY 0
+#endif
+
+/// @def POV_PORTABLE_RADIOSITY
+/// Whether to implement radiosity octree in a portable manner.
+///
+/// This setting selects one of several implementations of certain operations
+/// in the octree code:
+///
+///   - @ref Pow2Floor(): Rounds a positive value down towards the next lower
+///     power of 2.
+///   - @ref BiasedIntLog2(): Computes the (biased) integer base-2 logarithm
+///     of a positive value.
+///   - @ref BiasedIntPow2(): Computes 2 to a (biased) integer ppwer.
+///
+/// The available implementations are based on the following primitives:
+///
+/// | Value | Pow2Floor                   | BiasedIntLog2 | BiasedIntPow2       |  Bias | Prerequisites                         |
+/// | ----: | :---------------------------- | :-------- | :-------------------- | ----: | :------------------------------------ |
+/// |     0 | `float` bit bashing                                             |||  +127 | `float` must be IEEE 754 "binary32"   |
+/// |     1 | `logbf`, `pow`                | `logbf`   | `int` bit shifting    |     0 | `float` must be radix-2               |
+/// |     2 | `ilogbf`, `int` bit shifting  | `ilogbf`  | ^                     |     ^ | ^                                     |
+/// |     3 | `logb`, `pow`                 | `logb`    | ^                     |     ^ | `double` must be radix-2              |
+/// |     4 | `ilogb`, `int` bit shifting   | `ilogb`   | ^                     |     ^ | ^                                     |
+/// |     5 | `double` bit bashing                                            ||| +1023 | `double` must be IEEE 754 "binary64"  |
+/// |     6 | `frexpf`, `ldexpf`            | `frexpf`  | `ldexpf`              |     0 | none                                  |
+/// |     7 | `ilogbf`, `ldexpf`            | `ilogbf`  | `ldexpf`              |     ^ | `float` must be radix-2               |
+/// |     8 | `frexp`, `ldexp`              | `frexp`   | `ldexp`               |     ^ | none                                  |
+/// |     9 | `ilogb`, `ldexp`              | `ilogb`   | `ldexp`               |     ^ | `double` must be radix-2              |
+///
+/// @note
+///     Settings 1-4 are deprecated, due to their restricted numeric range.
+///
+/// @note
+///     This setting defaults to @ref C99_COMPATIBLE_RADIOSITY, which in turn
+///     defaults to 0.
+///
+#ifndef POV_PORTABLE_RADIOSITY
+    #define POV_PORTABLE_RADIOSITY C99_COMPATIBLE_RADIOSITY
 #endif
 
 //******************************************************************************

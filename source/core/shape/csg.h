@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,7 +38,16 @@
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
+#include "core/shape/csg_fwd.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/scene/object.h"
 
 namespace pov
@@ -76,15 +85,15 @@ class CSG : public CompoundObject
 
         int do_split;
 
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const { }
-        virtual void Translate(const Vector3d&, const TRANSFORM *);
-        virtual void Rotate(const Vector3d&, const TRANSFORM *);
-        virtual void Scale(const Vector3d&, const TRANSFORM *);
-        virtual void Transform(const TRANSFORM *);
-        virtual ObjectPtr Invert() = 0;
-        virtual void Compute_BBox();
+        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const override { }
+        virtual void Translate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Rotate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Scale(const Vector3d&, const TRANSFORM *) override;
+        virtual void Transform(const TRANSFORM *) override;
+        virtual ObjectPtr Invert() override = 0;
+        virtual void Compute_BBox() override;
 
-        void Determine_Textures(Intersection *isect, bool hitinside, WeightedTextureVector& textures, TraceThreadData *Threaddata);
+        virtual void Determine_Textures(Intersection *isect, bool hitinside, WeightedTextureVector& textures, TraceThreadData *Threaddata) override;
 };
 
 class CSGUnion : public CSG
@@ -94,35 +103,35 @@ class CSGUnion : public CSG
         CSGUnion(int t);
         CSGUnion(int t, CompoundObject& o, bool transplant) : CSG(t, o, transplant) {}
 
-        virtual ObjectPtr Copy();
+        virtual ObjectPtr Copy() override;
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-        virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-        virtual ObjectPtr Invert();
+        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) override;
+        virtual bool Inside(const Vector3d&, TraceThreadData *) const override;
+        virtual ObjectPtr Invert() override;
 };
 
-class CSGMerge : public CSGUnion
+class CSGMerge final : public CSGUnion
 {
     public:
         CSGMerge();
         CSGMerge(CompoundObject& o, bool transplant);
 
-        virtual ObjectPtr Copy();
+        virtual ObjectPtr Copy() override;
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
+        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) override;
 };
 
-class CSGIntersection : public CSG
+class CSGIntersection final : public CSG
 {
     public:
         CSGIntersection(bool diff);
         CSGIntersection(bool diff, CompoundObject& o, bool transplant);
 
-        virtual ObjectPtr Copy();
+        virtual ObjectPtr Copy() override;
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-        virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-        virtual ObjectPtr Invert();
+        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) override;
+        virtual bool Inside(const Vector3d&, TraceThreadData *) const override;
+        virtual ObjectPtr Invert() override;
 
         bool isDifference;
 };
@@ -132,5 +141,6 @@ class CSGIntersection : public CSG
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_CSG_H

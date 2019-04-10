@@ -87,10 +87,10 @@ private:
     int whichInterval( DBL x, size_t order, const std::vector< DBL > & knots)const;
     void computeCurveNormalizedDerivative( Vector3d& r, const int order, const DBL u, const std::vector< DBL > &knot, const std::vector< Point4D> & points )const;
 public:
-    virtual void evalVertex( Vector3d& r, const DBL u, const DBL v )const;
-    virtual void evalNormal( Vector3d& r, const DBL u, const DBL v )const;
-    virtual void minUV( Vector2d& r )const;
-    virtual void maxUV( Vector2d& r )const;
+    virtual void evalVertex( Vector3d& r, const DBL u, const DBL v )const override;
+    virtual void evalNormal( Vector3d& r, const DBL u, const DBL v )const override;
+    virtual void minUV( Vector2d& r )const override;
+    virtual void maxUV( Vector2d& r )const override;
     virtual ~Nurbs();
     Nurbs( const size_t x, const size_t y, const size_t uo, const size_t vo );
     void setControlPoint( const size_t x, const size_t y, const VECTOR_4D& v );
@@ -100,17 +100,17 @@ public:
     Nurbs(): ObjectBase( NURBS_OBJECT ) {}
 
 
-    virtual ObjectPtr Copy();
+    virtual ObjectPtr Copy() override;
 
-    virtual bool All_Intersections( const Ray&, IStack&, TraceThreadData* );
-    virtual bool Inside( const Vector3d&, TraceThreadData* ) const;
-    virtual void Normal( Vector3d&, Intersection*, TraceThreadData* ) const;
-    virtual void UVCoord( Vector2d&, const Intersection*, TraceThreadData* ) const;
-    virtual void Translate( const Vector3d&, const TRANSFORM* );
-    virtual void Rotate( const Vector3d&, const TRANSFORM* );
-    virtual void Scale( const Vector3d&, const TRANSFORM* );
-    virtual void Transform( const TRANSFORM* );
-    virtual void Compute_BBox();
+    virtual bool All_Intersections( const Ray&, IStack&, TraceThreadData* ) override;
+    virtual bool Inside( const Vector3d&, TraceThreadData* ) const override;
+    virtual void Normal( Vector3d&, Intersection*, TraceThreadData* ) const override;
+    virtual void UVCoord( Vector2d&, const Intersection* ) const override;
+    virtual void Translate( const Vector3d&, const TRANSFORM* ) override;
+    virtual void Rotate( const Vector3d&, const TRANSFORM* ) override;
+    virtual void Scale( const Vector3d&, const TRANSFORM* ) override;
+    virtual void Transform( const TRANSFORM* ) override;
+    virtual void Compute_BBox() override;
 
 
 };

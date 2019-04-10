@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,12 +33,25 @@
 ///
 //******************************************************************************
 
-#ifndef PHOTONESTIMATIONTASK_H
-#define PHOTONESTIMATIONTASK_H
+#ifndef POVRAY_BACKEND_PHOTONESTIMATIONTASK_H
+#define POVRAY_BACKEND_PHOTONESTIMATIONTASK_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "backend/configbackend.h"
+
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <vector>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/render/trace.h"
 
-#include "backend/frame.h"
+// POV-Ray header files (backend module)
 #include "backend/render/rendertask.h"
 
 namespace pov
@@ -46,26 +59,26 @@ namespace pov
 
 using namespace pov_base;
 
-class PhotonEstimationTask : public RenderTask
+class PhotonEstimationTask final : public RenderTask
 {
     public:
         DBL photonCountEstimate;
 
         PhotonEstimationTask(ViewData *vd, size_t seed);
-        ~PhotonEstimationTask();
+        virtual ~PhotonEstimationTask() override;
 
-        void Run();
-        void Stopped();
-        void Finish();
+        virtual void Run() override;
+        virtual void Stopped() override;
+        virtual void Finish() override;
 
-        void SearchThroughObjectsEstimatePhotons(vector<ObjectPtr>& Objects, LightSource *Light);
+        void SearchThroughObjectsEstimatePhotons(std::vector<ObjectPtr>& Objects, LightSource *Light);
         void EstimatePhotonsForObjectAndLight(ObjectPtr Object, LightSource *Light);
     private:
-        class CooperateFunction : public Trace::CooperateFunctor
+        class CooperateFunction final : public Trace::CooperateFunctor
         {
             public:
                 CooperateFunction(Task& t) : task(t) { }
-                virtual void operator()() { task.Cooperate(); }
+                virtual void operator()() override { task.Cooperate(); }
             private:
                 Task& task;
         };
@@ -74,4 +87,6 @@ class PhotonEstimationTask : public RenderTask
 };
 
 }
-#endif
+// end of namespace pov
+
+#endif // POVRAY_BACKEND_PHOTONESTIMATIONTASK_H

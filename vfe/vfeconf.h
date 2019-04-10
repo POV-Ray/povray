@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,25 +44,22 @@
 
 #define POVMS_Sys_Thread_Type                 unsigned long
 
-#include <string>
-#include <cstdio>
-
 namespace vfe
 {
-  typedef class SysQNode POVMS_Sys_QueueNode ;
-  void* /*POVMSAddress*/ vfe_POVMS_Sys_QueueToAddress (POVMS_Sys_QueueNode *q) ;
-  POVMS_Sys_QueueNode *vfe_POVMS_Sys_AddressToQueue (void* /*POVMSAddress*/ a) ;
-  POVMS_Sys_QueueNode *vfe_POVMS_Sys_QueueOpen (void) ;
-  void vfe_POVMS_Sys_QueueClose (POVMS_Sys_QueueNode *q) ;
-  void *vfe_POVMS_Sys_QueueReceive (POVMS_Sys_QueueNode *q, int *l, bool, bool) ;
-  int vfe_POVMS_Sys_QueueSend(POVMS_Sys_QueueNode *q, void *p, int l) ;
+  class SysQNode;
+  void* /*POVMSAddress*/ vfe_POVMS_Sys_QueueToAddress (SysQNode *q) ;
+  SysQNode *vfe_POVMS_Sys_AddressToQueue (void* /*POVMSAddress*/ a) ;
+  SysQNode *vfe_POVMS_Sys_QueueOpen (void) ;
+  void vfe_POVMS_Sys_QueueClose (SysQNode *q) ;
+  void *vfe_POVMS_Sys_QueueReceive (SysQNode *q, int *l, bool, bool) ;
+  int vfe_POVMS_Sys_QueueSend(SysQNode *q, void *p, int l) ;
   POVMS_Sys_Thread_Type POVMS_GetCurrentThread();
   void vfeAssert (const char *message, const char *filename, int line) ;
 }
+// end of namespace vfe
 
 #define POVMS_ASSERT_OUTPUT                   vfe::vfeAssert
-#define POVMS_Sys_Queue_Type                  vfe::POVMS_Sys_QueueNode *
-#define POVMS_Sys_Queue_Type                  vfe::POVMS_Sys_QueueNode *
+#define POVMS_Sys_Queue_Type                  vfe::SysQNode *
 #define POVMS_Sys_QueueToAddress              vfe::vfe_POVMS_Sys_QueueToAddress
 #define POVMS_Sys_AddressToQueue              vfe::vfe_POVMS_Sys_AddressToQueue
 #define POVMS_Sys_QueueOpen                   vfe::vfe_POVMS_Sys_QueueOpen

@@ -272,6 +272,12 @@
     <ClCompile Include="..\..\source\core\material\noise.cpp">
       <Filter>Core Source\Material</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\core\math\vector.cpp">
+      <Filter>Core Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\support\cracklecache.cpp">
+      <Filter>Core Source\Support</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\core\configcore.h">
@@ -495,6 +501,51 @@
     </ClInclude>
     <ClInclude Include="..\..\source\core\material\noise.h">
       <Filter>Core Headers\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\core_fwd.h">
+      <Filter>Core Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\scene\atmosphere_fwd.h">
+      <Filter>Core Headers\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\bounding\boundingcylinder_fwd.h">
+      <Filter>Core Headers\Bounding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\bounding\boundingbox_fwd.h">
+      <Filter>Core Headers\Bounding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\render\ray_fwd.h">
+      <Filter>Core Headers\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\csg_fwd.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\lighting\photons_fwd.h">
+      <Filter>Core Headers\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\material\pattern_fwd.h">
+      <Filter>Core Headers\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\support\octree_fwd.h">
+      <Filter>Core Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\scene\scenedata_fwd.h">
+      <Filter>Core Headers\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\support\statistics_fwd.h">
+      <Filter>Core Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\math\randomsequence_fwd.h">
+      <Filter>Core Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\math\vector_fwd.h">
+      <Filter>Core Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\support\cracklecache_fwd.h">
+      <Filter>Core Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\support\cracklecache.h">
+      <Filter>Core Headers\Support</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

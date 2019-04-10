@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,6 +38,7 @@
 #ifndef POVRAY_PARSER_CONFIGPARSER_H
 #define POVRAY_PARSER_CONFIGPARSER_H
 
+// Pull in other compile-time config header files first
 #include "core/configcore.h"
 #include "syspovconfigparser.h"
 
@@ -46,6 +47,7 @@
 /// @defgroup PovParserConfig Parser Compile-Time Configuration
 /// @ingroup PovParser
 /// @ingroup PovConfig
+/// Compile-Time Configuration of the @ref PovParser.
 ///
 /// @{
 
@@ -105,10 +107,27 @@
 ///
 /// @{
 
+/// @def POV_PARSER_ASSERT
+/// Assert a condition that should hold true by design.
+/// In debug builds, this macro evaluates the specified expression, and halts execution if the
+/// expression does not hold true.
+/// In release builds, this macro evaluates to an empty statement.
 #if POV_PARSER_DEBUG
     #define POV_PARSER_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_PARSER_ASSERT(expr) POV_ASSERT_DISABLE(expr)
+    #define POV_PARSER_ASSERT(expr) POV_ASSERT_SOFT(expr) // POV_ASSERT_DISABLE(expr)
+#endif
+
+/// @def POV_PARSER_PANIC
+/// Indicates code paths that should never be reached.
+/// In debug builds, this macro halts execution.
+/// In release builds, this macro throws an exception to allow the application to fail gracefully.
+/// In static code analysis, this macro may be used to inform the analysis tool that the code branch
+/// is expected to be dead.
+#if POV_PARSER_DEBUG
+    #define POV_PARSER_PANIC()      POV_ASSERT_HARD(false)
+#else
+    #define POV_PARSER_PANIC()      POV_ASSERT_SOFT(false)
 #endif
 
 /// @}

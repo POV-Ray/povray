@@ -12,7 +12,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,18 +40,30 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/bounding/boundingbox.h"
 
+// C++ variants of C standard header files
+#include <cstdlib>
+#include <cstring>
+
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
 
+// POV-Ray header files (core module)
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
 #include "core/scene/object.h"
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov
 {
+
+using std::vector;
 
 const int BUNCHING_FACTOR = 4;
 // Initial number of entries in a priority queue.
@@ -278,7 +290,7 @@ void Build_BBox_Tree(BBOX_TREE **Root, size_t numOfFiniteObjects, BBOX_TREE **&F
         {
             root = *Root;
             root->Node = reinterpret_cast<BBOX_TREE **>(POV_REALLOC(root->Node, (root->Entries + 1) * sizeof(BBOX_TREE *), "composite"));
-            POV_MEMMOVE(&(root->Node[1]), &(root->Node[0]), root->Entries * sizeof(BBOX_TREE *));
+            std::memmove(&(root->Node[1]), &(root->Node[0]), root->Entries * sizeof(BBOX_TREE *));
             root->Entries++;
             cd = create_bbox_node(numOfInfiniteObjects);
             for(size_t i = 0; i < numOfInfiniteObjects; i++)
@@ -842,13 +854,13 @@ bool sort_and_split(BBOX_TREE **Root, BBOX_TREE **&Finite, size_t *numOfFiniteOb
         switch(Axis)
         {
             case X:
-                QSORT(reinterpret_cast<void *>(&Finite[first]), size, sizeof(BBOX_TREE *), compboxes<X>);
+                std::qsort(Finite + first, size, sizeof(BBOX_TREE*), compboxes<X>);
                 break;
             case Y:
-                QSORT(reinterpret_cast<void *>(&Finite[first]), size, sizeof(BBOX_TREE *), compboxes<Y>);
+                std::qsort(Finite + first, size, sizeof(BBOX_TREE*), compboxes<Y>);
                 break;
             case Z:
-                QSORT(reinterpret_cast<void *>(&Finite[first]), size, sizeof(BBOX_TREE *), compboxes<Z>);
+                std::qsort(Finite + first, size, sizeof(BBOX_TREE*), compboxes<Z>);
                 break;
         }
 
@@ -915,3 +927,4 @@ bool sort_and_split(BBOX_TREE **Root, BBOX_TREE **&Finite, size_t *numOfFiniteOb
 }
 
 }
+// end of namespace pov

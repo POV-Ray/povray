@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,6 +39,16 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <vector>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/bounding/boundingsphere.h"
 #include "core/scene/object.h"
 
@@ -88,7 +98,7 @@ namespace pov
 * Global typedefs
 ******************************************************************************/
 
-class Blob_Element
+class Blob_Element final
 {
     public:
         short Type;       /* Type of component: sphere, hemisphere, cylinder */
@@ -104,13 +114,13 @@ class Blob_Element
         ~Blob_Element();
 };
 
-class Blob_Data
+class Blob_Data final
 {
     public:
-        int Number_Of_Components;   /* Number of components     */
-        DBL Threshold;              /* Blob threshold           */
-        vector<Blob_Element> Entry; /* Array of blob components */
-        BSPHERE_TREE *Tree;         /* Bounding hierarchy       */
+        int Number_Of_Components;           /* Number of components     */
+        DBL Threshold;                      /* Blob threshold           */
+        std::vector<Blob_Element> Entry;    /* Array of blob components */
+        BSPHERE_TREE *Tree;                 /* Bounding hierarchy       */
 
         Blob_Data(int count = 0);
         ~Blob_Data();
@@ -122,42 +132,42 @@ class Blob_Data
         int References;             /* Number of references     */
 };
 
-struct Blob_List_Struct
+struct Blob_List_Struct final
 {
     Blob_Element elem;  /* Current element          */
     Blob_List_Struct *next;    /* Pointer to next element  */
 };
 
-struct Blob_Interval_Struct
+struct Blob_Interval_Struct final
 {
     int type;
     DBL bound;
     const Blob_Element *Element;
 };
 
-class Blob : public ObjectBase
+class Blob final : public ObjectBase
 {
     public:
         Blob_Data *Data;
-        vector<TEXTURE*> Element_Texture;
+        std::vector<TEXTURE*> Element_Texture;
 
         Blob();
-        virtual ~Blob();
+        virtual ~Blob() override;
 
-        virtual ObjectPtr Copy();
+        virtual ObjectPtr Copy() override;
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-        virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-        virtual double GetPotential (const Vector3d&, bool subtractThreshold, TraceThreadData *) const;
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
-        virtual void Translate(const Vector3d&, const TRANSFORM *);
-        virtual void Rotate(const Vector3d&, const TRANSFORM *);
-        virtual void Scale(const Vector3d&, const TRANSFORM *);
-        virtual void Transform(const TRANSFORM *);
-        virtual void Compute_BBox();
+        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) override;
+        virtual bool Inside(const Vector3d&, TraceThreadData *) const override;
+        virtual double GetPotential (const Vector3d&, bool subtractThreshold, TraceThreadData *) const override;
+        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const override;
+        virtual void Translate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Rotate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Scale(const Vector3d&, const TRANSFORM *) override;
+        virtual void Transform(const TRANSFORM *) override;
+        virtual void Compute_BBox() override;
         virtual bool IsOpaque() const override;
 
-        void Determine_Textures(Intersection *, bool, WeightedTextureVector&, TraceThreadData *);
+        virtual void Determine_Textures(Intersection *, bool, WeightedTextureVector&, TraceThreadData *) override;
 
         Blob_List_Struct *Create_Blob_List_Element();
         void Create_Blob_Element_Texture_List(Blob_List_Struct *BlobList, int npoints);
@@ -170,7 +180,7 @@ class Blob : public ObjectBase
         static void Transform_Blob_Element(Blob_Element *Element, const TRANSFORM *Trans);
     private:
         static void element_normal(Vector3d& Result, const Vector3d& P, const Blob_Element *Element);
-        static int intersect_element(const Vector3d& P, const Vector3d& D, const Blob_Element *Element, DBL mindist, DBL *t0, DBL *t1, TraceThreadData *Thread);
+        static int intersect_element(const Vector3d& P, const Vector3d& D, const Blob_Element *Element, DBL mindist, DBL *t0, DBL *t1, RenderStatistics& stats);
         static void insert_hit(const Blob_Element *Element, DBL t0, DBL t1, Blob_Interval_Struct *intervals, unsigned int *cnt);
         int determine_influences(const Vector3d& P, const Vector3d& D, DBL mindist, Blob_Interval_Struct *intervals, TraceThreadData *Thread) const;
         DBL calculate_field_value(const Vector3d& P, TraceThreadData *Thread) const;
@@ -196,5 +206,6 @@ class Blob : public ObjectBase
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_BLOB_H

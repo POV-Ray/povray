@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,15 +36,31 @@
 #ifndef POVRAY_CORE_CORETYPES_H
 #define POVRAY_CORE_CORETYPES_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
+#include "core/core_fwd.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <memory>
 #include <stack>
+#include <string>
+#include <vector>
 
+// Boost header files
+#include <boost/intrusive_ptr.hpp>
+
+// POV-Ray header files (base module)
 #include "base/colour.h"
-#include "base/types.h"
-#include "base/textstream.h"
+#include "base/messenger.h"
+#include "base/povassert.h"
+#include "base/stringtypes.h"
 
+// POV-Ray header files (core module)
 #include "core/math/vector.h"
+#include "core/render/ray_fwd.h"
 
 namespace pov
 {
@@ -56,10 +72,6 @@ namespace pov
 /// @{
 
 using namespace pov_base;
-
-// from <algorithm>; we don't want to always type the namespace for these.
-using std::min;
-using std::max;
 
 // from <cmath>; we don't want to always type the namespace for these.
 using std::abs;
@@ -93,11 +105,8 @@ inline T Sqr(T a)
     return a * a;
 }
 
-class ObjectBase;
-typedef ObjectBase * ObjectPtr;
-typedef const ObjectBase * ConstObjectPtr;
-
-typedef struct Transform_Struct TRANSFORM;
+struct Transform_Struct;
+using TRANSFORM = Transform_Struct; ///< @deprecated
 
 /// @}
 ///
@@ -107,11 +116,17 @@ typedef struct Transform_Struct TRANSFORM;
 ///
 /// @{
 
-typedef struct Pattern_Struct TPATTERN;
-typedef struct Texture_Struct TEXTURE;
-typedef struct Pigment_Struct PIGMENT;
-typedef struct Tnormal_Struct TNORMAL;
-typedef struct Finish_Struct FINISH;
+struct Pattern_Struct;
+struct Texture_Struct;
+struct Pigment_Struct;
+struct Tnormal_Struct;
+struct Finish_Struct;
+
+using TPATTERN  = Pattern_Struct;   ///< @deprecated
+using TEXTURE   = Texture_Struct;   ///< @deprecated
+using PIGMENT   = Pigment_Struct;   ///< @deprecated
+using TNORMAL   = Tnormal_Struct;   ///< @deprecated
+using FINISH    = Finish_Struct;    ///< @deprecated
 
 typedef TEXTURE* TexturePtr;
 
@@ -123,7 +138,7 @@ typedef TEXTURE* TexturePtr;
 ///
 /// @{
 
-class Media
+class Media final
 {
     public:
         int Type;
@@ -153,7 +168,7 @@ class Media
         DBL AA_Threshold;
         int AA_Level;
 
-        vector<PIGMENT*> Density;
+        std::vector<PIGMENT*> Density;
 
         Media();
         Media(const Media&);
@@ -175,7 +190,7 @@ class Media
 /// @{
 
 class SubsurfaceInterior;
-class Interior
+class Interior final
 {
     public:
         int  hollow, Disp_NElems;
@@ -183,8 +198,8 @@ class Interior
         SNGL Caustics, Old_Refract;
         SNGL Fade_Distance, Fade_Power;
         MathColour Fade_Colour;
-        vector<Media> media;
-        shared_ptr<SubsurfaceInterior> subsurface;
+        std::vector<Media> media;
+        std::shared_ptr<SubsurfaceInterior> subsurface;
 
         Interior();
         Interior(const Interior&);
@@ -194,11 +209,12 @@ class Interior
 
         void PostProcess();
     private:
-        Interior& operator=(const Interior&);
+
+        Interior& operator=(const Interior&) = delete;
 };
 
-typedef shared_ptr<Interior> InteriorPtr;
-typedef shared_ptr<const Interior> ConstInteriorPtr;
+typedef std::shared_ptr<Interior> InteriorPtr;
+typedef std::shared_ptr<const Interior> ConstInteriorPtr;
 
 /// @}
 ///
@@ -210,8 +226,8 @@ typedef shared_ptr<const Interior> ConstInteriorPtr;
 
 struct BasicPattern;
 
-typedef shared_ptr<BasicPattern> PatternPtr;
-typedef shared_ptr<const BasicPattern> ConstPatternPtr;
+typedef std::shared_ptr<BasicPattern> PatternPtr;
+typedef std::shared_ptr<const BasicPattern> ConstPatternPtr;
 
 
 struct Pattern_Struct
@@ -229,47 +245,44 @@ struct Pattern_Struct
 ///
 /// @{
 
-typedef struct Material_Struct MATERIAL;
-
-struct Material_Struct
+struct Material_Struct final
 {
     TEXTURE *Texture;
     TEXTURE *Interior_Texture;
     InteriorPtr interior;
 };
-
-class LightSource;
+using MATERIAL = Material_Struct; ///< @deprecated
 
 template<typename T>
-class RefPool
+class RefPool final
 {
     public:
         RefPool() { }
-        ~RefPool() { for(typename vector<T*>::iterator i(pool.begin()); i != pool.end(); i++) delete *i; pool.clear(); }
+        ~RefPool() { for(typename std::vector<T*>::iterator i(pool.begin()); i != pool.end(); i++) delete *i; pool.clear(); }
 
         T *alloc() { if(pool.empty()) return new T(); T *ptr(pool.back()); pool.pop_back(); return ptr; }
         void release(T *ptr) { pool.push_back(ptr); }
     private:
-        vector<T*> pool;
+        std::vector<T*> pool;
 
-        RefPool(const RefPool&);
-        RefPool& operator=(RefPool&);
+        RefPool(const RefPool&) = delete;
+        RefPool& operator=(RefPool&) = delete;
 };
 
 template<typename T>
-struct RefClearDefault
+struct RefClearDefault final
 {
     void operator()(T&) { }
 };
 
 template<typename T>
-struct RefClearContainer
+struct RefClearContainer final
 {
     void operator()(T& p) { p.clear(); }
 };
 
-template<typename T, class C = RefClearDefault<T> >
-class Ref
+template<typename T, class C = RefClearDefault<T>>
+class Ref final
 {
     public:
         Ref(RefPool<T>& p) : pool(p), ptr(p.alloc()) { }
@@ -284,12 +297,12 @@ class Ref
         RefPool<T>& pool;
         T *ptr;
 
-        Ref();
-        Ref(const Ref&);
-        Ref& operator=(Ref&);
+        Ref() = delete;
+        Ref(const Ref&) = delete;
+        Ref& operator=(Ref&) = delete;
 };
 
-class ObjectDebugHelper
+class ObjectDebugHelper final
 {
     public:
         int Index;
@@ -319,7 +332,7 @@ typedef unsigned short HF_VAL;
 ///
 /// This class holds various information on a ray-object intersection.
 ///
-class Intersection
+class Intersection final
 {
     public:
 
@@ -442,7 +455,7 @@ class Intersection
         ~Intersection() { }
 };
 
-typedef std::stack<Intersection, vector<Intersection> > IStackData;
+typedef std::stack<Intersection, std::vector<Intersection>> IStackData;
 typedef RefPool<IStackData> IStackPool;
 typedef Ref<IStackData> IStack;
 
@@ -469,26 +482,26 @@ struct BasicRay
 
 struct TraceTicket;
 
-class Ray;
-
 struct RayObjectCondition
 {
+    virtual ~RayObjectCondition() {}
     virtual bool operator()(const Ray& ray, ConstObjectPtr object, DBL data) const = 0;
 };
 
-struct TrueRayObjectCondition : public RayObjectCondition
+struct TrueRayObjectCondition final : public RayObjectCondition
 {
-    virtual bool operator()(const Ray&, ConstObjectPtr, DBL) const { return true; }
+    virtual bool operator()(const Ray&, ConstObjectPtr, DBL) const override { return true; }
 };
 
 struct PointObjectCondition
 {
+    virtual ~PointObjectCondition() {}
     virtual bool operator()(const Vector3d& point, ConstObjectPtr object) const = 0;
 };
 
-struct TruePointObjectCondition : public PointObjectCondition
+struct TruePointObjectCondition final : public PointObjectCondition
 {
-    virtual bool operator()(const Vector3d&, ConstObjectPtr) const { return true; }
+    virtual bool operator()(const Vector3d&, ConstObjectPtr) const override { return true; }
 };
 
 /// @}
@@ -499,7 +512,7 @@ struct TruePointObjectCondition : public PointObjectCondition
 ///
 /// @{
 
-struct FrameSettings
+struct FrameSettings final
 {
     DBL Clock_Value;      // May change between frames of an animation
     int FrameNumber;      // May change between frames of an animation
@@ -540,9 +553,9 @@ class FractalRules
         virtual bool Bound (const BasicRay&, const Fractal *, DBL *, DBL *) const = 0;
 };
 
-typedef shared_ptr<FractalRules> FractalRulesPtr;
+typedef std::shared_ptr<FractalRules> FractalRulesPtr;
 
-struct QualityFlags
+struct QualityFlags final
 {
     bool ambientOnly    : 1;
     bool quickColour    : 1;
@@ -580,15 +593,11 @@ struct QualityFlags
 ///
 /// @{
 
-class TraceThreadData;
-
 class GenericFunctionContext
 {
     public:
         virtual ~GenericFunctionContext() {}
 };
-
-typedef GenericFunctionContext* GenericFunctionContextPtr;
 
 class GenericFunctionContextFactory
 {
@@ -606,15 +615,37 @@ class GenericFunctionContextFactory
 inline void intrusive_ptr_add_ref(GenericFunctionContextFactory* f) { ++f->mRefCounter; }
 inline void intrusive_ptr_release(GenericFunctionContextFactory* f) { if (!(--f->mRefCounter)) delete f; }
 
-typedef intrusive_ptr<GenericFunctionContextFactory>    GenericFunctionContextFactoryIPtr;
-typedef GenericFunctionContextFactory*                  GenericFunctionContextFactoryTPtr;
+typedef boost::intrusive_ptr<GenericFunctionContextFactory> GenericFunctionContextFactoryIPtr;
+typedef GenericFunctionContextFactory*                      GenericFunctionContextFactoryTPtr;
 
-struct SourceInfo
+struct SourcePosition
 {
-    char*                           name;
-    UCS2*                           filename;
-    pov_base::ITextStream::FilePos  filepos;
-    int                             col;
+    POV_LONG    line;
+    POV_LONG    column;
+    POV_OFF_T   offset;
+    SourcePosition() = default;
+    SourcePosition(const SourcePosition&) = default;
+    SourcePosition(POV_LONG l, POV_LONG c, POV_OFF_T o) : line(l), column(c), offset(o) {}
+};
+
+struct SourceInfo : MessageContext
+{
+    UCS2String      fileName;
+    SourcePosition  position;
+    SourceInfo() = default;
+    SourceInfo(const MessageContext& o) : fileName(o.GetFileName()), position(o.GetLine(), o.GetColumn(), o.GetOffset()) {}
+    SourceInfo(const UCS2String& fn, const SourcePosition& p) : fileName(fn), position(p) {}
+    virtual UCS2String GetFileName() const override { return fileName; }
+    virtual POV_LONG GetLine() const override { return position.line; }
+    virtual POV_LONG GetColumn() const override { return position.column; }
+    virtual POV_OFF_T GetOffset() const override { return position.offset; }
+};
+
+struct CustomFunctionSourceInfo : SourceInfo
+{
+    UTF8String  name;
+    CustomFunctionSourceInfo() = default;
+    CustomFunctionSourceInfo(const UTF8String& n, const MessageContext& o) : name(n), SourceInfo(o) {}
 };
 
 template<typename RETURN_T, typename ARG_T>
@@ -628,14 +659,14 @@ public:
     virtual void PushArgument(GenericFunctionContextPtr pContext, ARG_T arg) = 0;
     virtual RETURN_T Execute(GenericFunctionContextPtr pContext) = 0;
     virtual GenericCustomFunction* Clone() const = 0;
-    virtual const SourceInfo* GetSourceInfo() const { return nullptr; }
+    virtual const CustomFunctionSourceInfo* GetSourceInfo() const { return nullptr; }
 };
 
 typedef GenericCustomFunction<double, double> GenericScalarFunction;
 typedef GenericScalarFunction* GenericScalarFunctionPtr;
 
 template<typename RETURN_T, typename ARG_T>
-class GenericCustomFunctionInstance
+class GenericCustomFunctionInstance final
 {
 public:
     inline GenericCustomFunctionInstance(GenericCustomFunction<RETURN_T,ARG_T>* pFn, TraceThreadData* pThreadData) :
@@ -707,7 +738,8 @@ protected:
     bool                                    mReInit;
 
 private:
-    GenericCustomFunctionInstance();
+
+    GenericCustomFunctionInstance() = delete;
 };
 
 typedef GenericCustomFunctionInstance<double, double> GenericScalarFunctionInstance;
@@ -718,5 +750,6 @@ typedef GenericScalarFunctionInstance* GenericScalarFunctionInstancePtr;
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_CORETYPES_H

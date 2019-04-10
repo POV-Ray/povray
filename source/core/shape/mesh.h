@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,6 +39,17 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <memory>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
+#include "core/bounding/boundingbox_fwd.h"
 #include "core/scene/object.h"
 
 namespace pov
@@ -62,40 +73,18 @@ namespace pov
 ///
 //******************************************************************************
 
-typedef struct BBox_Tree_Struct BBOX_TREE;
-
 /*****************************************************************************
 * Global typedefs
 ******************************************************************************/
 
-typedef struct Mesh_Data_Struct MESH_DATA;
-typedef struct Mesh_Triangle_Struct MESH_TRIANGLE;
-
-typedef struct Hash_Table_Struct HASH_TABLE;
-typedef struct UV_Hash_Table_Struct UV_HASH_TABLE;
-
 // TODO - a SnglVector2d should probably suffice for MeshUVVector, and reduce the Mesh's memory footprint by 8 bytes per triangle.
 // TODO - on systems with 64-bit int type, int is probably overkill for MeshIndex; maybe we even want to make Mesh a template, using short for small meshes.
 
-typedef SnglVector3d MeshVector;   ///< Data type used to store vertices and normals.
-typedef Vector2d     MeshUVVector; ///< Data type used to store UV coordinates.
-typedef signed int   MeshIndex;    ///< Data type used to store indices into vertices / normals / uv coordinate / texture tables. Must be signed and able to hold 2*max.
+using MeshVector    = SnglVector3d; ///< Data type used to store vertices and normals.
+using MeshUVVector  = Vector2d;     ///< Data type used to store UV coordinates.
+using MeshIndex     = signed int;   ///< Data type used to store indices into vertices / normals / uv coordinate / texture tables. Must be signed and able to hold 2*max.
 
-struct Mesh_Data_Struct
-{
-    int References;                    ///< Number of references to the mesh.
-    MeshIndex Number_Of_UVCoords;      ///< Number of UV coords in the mesh.
-    MeshIndex Number_Of_Normals;       ///< Number of normals in the mesh.
-    MeshIndex Number_Of_Triangles;     ///< Number of trinagles in the mesh.
-    MeshIndex Number_Of_Vertices;      ///< Number of vertices in the mesh.
-    MeshVector *Normals, *Vertices;    ///< Arrays of normals and vertices.
-    MeshUVVector *UVCoords;            ///< Array of UV coordinates
-    MESH_TRIANGLE *Triangles;          ///< Array of triangles.
-    BBOX_TREE *Tree;                   ///< Bounding box tree for mesh.
-    Vector3d Inside_Vect;              ///< vector to use to test 'inside'
-};
-
-struct Mesh_Triangle_Struct
+struct Mesh_Triangle_Struct final
 {
     MeshVector Perp;               ///< Vector used for smooth triangles.
 
@@ -113,22 +102,40 @@ struct Mesh_Triangle_Struct
     unsigned int vAxis:2;          ///< Axis for smooth triangle.
     unsigned int ThreeTex:1;       ///< Color Triangle Patch.
 };
+using MESH_TRIANGLE = Mesh_Triangle_Struct; ///< @deprecated
 
-struct Hash_Table_Struct
+struct Mesh_Data_Struct final
+{
+    int References;                    ///< Number of references to the mesh.
+    MeshIndex Number_Of_UVCoords;      ///< Number of UV coords in the mesh.
+    MeshIndex Number_Of_Normals;       ///< Number of normals in the mesh.
+    MeshIndex Number_Of_Triangles;     ///< Number of trinagles in the mesh.
+    MeshIndex Number_Of_Vertices;      ///< Number of vertices in the mesh.
+    MeshVector *Normals, *Vertices;    ///< Arrays of normals and vertices.
+    MeshUVVector *UVCoords;            ///< Array of UV coordinates
+    MESH_TRIANGLE *Triangles;          ///< Array of triangles.
+    BBOX_TREE *Tree;                   ///< Bounding box tree for mesh.
+    Vector3d Inside_Vect;              ///< vector to use to test 'inside'
+};
+using MESH_DATA = Mesh_Data_Struct; ///< @deprecated
+
+struct Hash_Table_Struct final
 {
     MeshIndex Index;
     MeshVector P;
-    HASH_TABLE *Next;
+    Hash_Table_Struct *Next;
 };
+using HASH_TABLE = Hash_Table_Struct; ///< @deprecated
 
-struct UV_Hash_Table_Struct
+struct UV_Hash_Table_Struct final
 {
     MeshIndex Index;
     MeshUVVector P;
-    UV_HASH_TABLE *Next;
+    UV_Hash_Table_Struct *Next;
 };
+using UV_HASH_TABLE = UV_Hash_Table_Struct; ///< @deprecated
 
-class Mesh : public ObjectBase
+class Mesh final : public ObjectBase
 {
     public:
         MESH_DATA *Data;                ///< Mesh data holding triangles.
@@ -137,19 +144,19 @@ class Mesh : public ObjectBase
         bool has_inside_vector;
 
         Mesh();
-        virtual ~Mesh();
+        virtual ~Mesh() override;
 
-        virtual ObjectPtr Copy();
+        virtual ObjectPtr Copy() override;
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-        virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
-        virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
-        virtual void Translate(const Vector3d&, const TRANSFORM *);
-        virtual void Rotate(const Vector3d&, const TRANSFORM *);
-        virtual void Scale(const Vector3d&, const TRANSFORM *);
-        virtual void Transform(const TRANSFORM *);
-        virtual void Compute_BBox();
+        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) override;
+        virtual bool Inside(const Vector3d&, TraceThreadData *) const override;
+        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const override;
+        virtual void UVCoord(Vector2d&, const Intersection *) const override;
+        virtual void Translate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Rotate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Scale(const Vector3d&, const TRANSFORM *) override;
+        virtual void Transform(const TRANSFORM *) override;
+        virtual void Compute_BBox() override;
         virtual bool IsOpaque() const override;
 
         void Create_Mesh_Hash_Tables();
@@ -167,7 +174,7 @@ class Mesh : public ObjectBase
         MeshIndex Mesh_Hash_UV(MeshIndex *Number, MeshIndex *Max, MeshUVVector **Elements, const Vector2d& aPoint);
         void Smooth_Mesh_Normal(Vector3d& Result, const MESH_TRIANGLE *Triangle, const Vector3d& IPoint) const;
 
-        void Determine_Textures(Intersection *, bool, WeightedTextureVector&, TraceThreadData *);
+        virtual void Determine_Textures(Intersection *, bool, WeightedTextureVector&, TraceThreadData *) override;
     protected:
         bool Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread);
         void Compute_Mesh_BBox();
@@ -177,7 +184,7 @@ class Mesh : public ObjectBase
         bool test_hit(const MESH_TRIANGLE *Triangle, const BasicRay& OrigRay, DBL Depth, DBL len, IStack& Depth_Stack, TraceThreadData *Thread);
         void get_triangle_bbox(const MESH_TRIANGLE *Triangle, BoundingBox *BBox) const;
         bool intersect_bbox_tree(const BasicRay& ray, const BasicRay& Orig_Ray, DBL len, IStack& Depth_Stack, TraceThreadData *Thread);
-        bool inside_bbox_tree(const BasicRay& ray, TraceThreadData *Thread) const;
+        bool inside_bbox_tree(const BasicRay& ray, RenderStatistics& stats) const;
         void get_triangle_vertices(const MESH_TRIANGLE *Triangle, Vector3d& P1, Vector3d& P2, Vector3d& P3) const;
         void get_triangle_normals(const MESH_TRIANGLE *Triangle, Vector3d& N1, Vector3d& N2, Vector3d& N3) const;
         void get_triangle_uvcoords(const MESH_TRIANGLE *Triangle, Vector2d& U1, Vector2d& U2, Vector2d& U3) const;
@@ -189,6 +196,17 @@ private:
         static HASH_TABLE **Vertex_Hash_Table;
         static HASH_TABLE **Normal_Hash_Table;
         static UV_HASH_TABLE **UV_Hash_Table;
+
+        /// Priority queue object.
+        ///
+        /// This object is for temporary use in the intersection and insideness tests;
+        /// the only reason it is not simply a local variable there is that we want to
+        /// avoid the overhead of repeated construction and destruction on the stack.
+        /// Technically we could get the same performance by keeping it local to the
+        /// functions and making it thread-local, but this would mean having one such
+        /// object per function, when it's perfectly safe for them to share one object.
+        ///
+        static thread_local std::unique_ptr<BBoxPriorityQueue> mtpQueue;
 };
 
 /// @}
@@ -196,5 +214,6 @@ private:
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_MESH_H

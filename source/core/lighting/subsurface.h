@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,9 +39,18 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// Boost header files
 #include <boost/flyweight.hpp>
 #include <boost/flyweight/key_value.hpp>
 
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/coretypes.h"
 
 namespace pov
@@ -58,7 +67,8 @@ using boost::flyweights::flyweight;
 using boost::flyweights::key_value;
 
 /// Class storing SSLT data precomputed based on index of refraction.
-class SubsurfaceInterior {
+class SubsurfaceInterior final
+{
 
     public:
 
@@ -70,13 +80,14 @@ class SubsurfaceInterior {
         static const int ReducedAlbedoSamples = 100;
 
         // precomputed reduced albedo for selected values of diffuse reflectance
-        struct PrecomputedReducedAlbedo {
+        struct PrecomputedReducedAlbedo final
+        {
             float reducedAlbedo[ReducedAlbedoSamples+1];
             PrecomputedReducedAlbedo(float ior);
             PreciseColourChannel operator()(PreciseColourChannel diffuseReflectance) const;
         };
 
-        flyweight<key_value<float,PrecomputedReducedAlbedo> > precomputedReducedAlbedo;
+        flyweight<key_value<float,PrecomputedReducedAlbedo>> precomputedReducedAlbedo;
 };
 
 /// Approximation to the Fresnel diffuse reflectance.
@@ -100,6 +111,7 @@ inline double FresnelDiffuseReflectance(double eta)
 ///
 //##############################################################################
 
-} // end of namespace
+}
+// end of namespace pov
 
 #endif // POVRAY_CORE_SUBSURFACE_H

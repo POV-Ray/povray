@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,13 +36,18 @@
 #ifndef POVRAY_BASE_TYPES_H
 #define POVRAY_BASE_TYPES_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
+#include "base/base_fwd.h"
 
-#include <algorithm>
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <limits>
-#include <string>
-#include <vector>
 
+// POV-Ray header files (base module)
+#include "base/pov_err.h"
 #include "base/pov_mem.h"
 
 namespace pov_base
@@ -53,23 +58,6 @@ namespace pov_base
 /// @addtogroup PovBase
 ///
 /// @{
-
-/// A macro wrapping a sequence of statements into a single one.
-///
-/// This macro is intended to be used in the definition of other macros that should behave
-/// syntactically like a single statement, while evaluating to something that would not normally
-/// behave that way.
-///
-/// Example:
-///
-///     #declare FOO(x) SINGLE_STATEMENT( char buf[128]; foo(buf,x); )
-///     ...
-///     if (some_cond)
-///         FOO(a);
-///     else
-///         ...
-///
-#define SINGLE_STATEMENT( block ) do { block } while (false)
 
 //******************************************************************************
 ///
@@ -194,44 +182,20 @@ namespace pov_base
 /// @}
 ///
 //******************************************************************************
+///
+/// @name Image Stuff
+/// @{
 
-/// A macro that does nothing.
-///
-/// This macro is intended to be used in the definition of other macros that should behave
-/// syntactically like a single statement, while evaluating to a no-operation.
-///
-/// Example:
-///
-///     #declare MY_ASSERT(x) NO_OP
-///     ...
-///     if (some_cond)
-///         MY_ASSERT(some_test);
-///     else
-///         ...
-///
-#define NO_OP SINGLE_STATEMENT(;)
+// Image types.
 
-/// A macro that tests an expression and, if it evaluates false, throws an exception to allow the
-/// application to fail gracefully.
-///
-#define POV_ASSERT_SOFT(expr) SINGLE_STATEMENT( if(!(expr)) throw POV_EXCEPTION_CODE(kUncategorizedError); )
+#define IMAGE_FILE    GIF_FILE+SYS_FILE+TGA_FILE+PGM_FILE+PPM_FILE+PNG_FILE+JPEG_FILE+TIFF_FILE+BMP_FILE+EXR_FILE+HDR_FILE+IFF_FILE+GRAD_FILE
+#define NORMAL_FILE   GIF_FILE+SYS_FILE+TGA_FILE+PGM_FILE+PPM_FILE+PNG_FILE+JPEG_FILE+TIFF_FILE+BMP_FILE+EXR_FILE+HDR_FILE+IFF_FILE+GRAD_FILE
+#define MATERIAL_FILE GIF_FILE+SYS_FILE+TGA_FILE+PGM_FILE+PPM_FILE+PNG_FILE+JPEG_FILE+TIFF_FILE+BMP_FILE+EXR_FILE+HDR_FILE+IFF_FILE+GRAD_FILE
+#define HF_FILE       GIF_FILE+SYS_FILE+TGA_FILE+PGM_FILE+PPM_FILE+PNG_FILE+JPEG_FILE+TIFF_FILE+BMP_FILE+EXR_FILE+HDR_FILE+POT_FILE
 
-/// A macro that tests an expression and, if it evaluates false, causes a hard crash to generate a
-/// core dump or break to a debugger.
+/// @}
 ///
-#define POV_ASSERT_HARD(expr) assert(expr)
-
-/// A macro that does nothing, but is mapped to standard `assert()` during static code analysis.
-///
-#ifdef STATIC_CODE_ANALYSIS
-    #define POV_ASSERT_DISABLE(expr) assert(expr)
-#else
-    #define POV_ASSERT_DISABLE(expr) NO_OP
-#endif
-
-// from <algorithm>; we don't want to always type the namespace for these.
-using std::min;
-using std::max;
+//******************************************************************************
 
 // from <cmath>; we don't want to always type the namespace for these.
 using std::abs;
@@ -258,11 +222,7 @@ using std::sqrt;
 using std::tan;
 using std::tanh;
 
-/// 5-dimensional vector type shared between parser and splines.
-/// @todo Make this obsolete.
-typedef DBL EXPRESS[5];
-
-struct POVRect
+struct POVRect final
 {
     unsigned int top;
     unsigned int left;
@@ -278,14 +238,45 @@ struct POVRect
     unsigned int GetHeight() const { return (bottom - top + 1); }
 };
 
-enum StringEncoding
+/// Legacy (v3.5) `charset` setting.
+enum LegacyCharset : int
 {
-    kStringEncoding_ASCII  = 0,
-    kStringEncoding_UTF8   = 1,
-    kStringEncoding_System = 2
+    kUnspecified,   ///< Global settings `charset` not specified.
+    kASCII,         ///< Global settings `charset ascii` specified.
+    kUTF8,          ///< Global settings `charset utf8` specified.
+    kSystem,        ///< Global settings `charset sys` specified.
 };
 
-typedef std::string UTF8String;
+/// Value identifying a character set.
+///
+/// Each value of this type represents a particular set of characters and associated mapping of
+/// those characters to _code points_.
+///
+/// @note
+///     The values of this type do _not_ identify any particular character _encoding_, i.e. a
+///     scheme of representing streams of characters as a byte stream. For example, all of
+///     UTF-8, UTF-16LE, UTF-16BE, UTF-32LE and UTF-32BE are encoding schemes for the UCS-4
+///     character set.
+///
+/// @note
+///     The numeric values chosen for the individual character sets are generally based on Windows
+///     code page numbers. If you add more character sets, please stick to this scheme wherever
+///     applicable, or use negative values.
+///
+enum class CharsetID : int
+{
+    kUndefined      = 0,        ///< Special value representing undefined character set.
+
+    kUCS2           = 1200,     ///< UCS-2 (16-bit subset of UCS) aka Basic Multilingual Plane (BMP).
+    kWindows1251    = 1251,     ///< Windows code page 1251 (Cyrillic).
+    kWindows1252    = 1252,     ///< Windows code page 1252 (Western) aka [incorrectly] ANSI.
+    kMacOSRoman     = 10000,    ///< Mac OS Roman (as used on classic Mac OS).
+    kUCS4           = 12000,    ///< UCS-4 (full set of UCS) aka [not entirely correctly] Unicode.
+    kLatin1         = 28591,    ///< ISO-8859-1 aka Latin-1.
+
+    kLegacySymbols  = -1,       ///< Special value representing legacy remapping for Microsoft symbol fonts,
+                                ///< remapping U+0000-U+00FF to U+F000-U+F0FF.
+};
 
 enum GammaMode
 {
@@ -341,5 +332,6 @@ class ThreadData
 //##############################################################################
 
 }
+// end of namespace pov_base
 
 #endif // POVRAY_BASE_TYPES_H

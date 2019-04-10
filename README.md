@@ -5,7 +5,7 @@
 [![AppVeyor Build status](https://img.shields.io/appveyor/ci/c-lipka/povray-exwy4.svg?label=appveyor)](https://ci.appveyor.com/project/c-lipka/povray-exwy4 "AppVeyor: Windows Server 2012 with Visual Studio 2015")
 [![Travis CI Build Status](https://img.shields.io/travis/POV-Ray/povray.svg?label=travis%20ci)](https://travis-ci.org/POV-Ray/povray "Travis CI: Ubuntu 12.04 LTE 64-bit with gcc 4.6; OS X 10.11 with clang 4.2")
 [![Coverity Code Analysis](https://scan.coverity.com/projects/269/badge.svg)](https://scan.coverity.com/projects/pov-ray "Coverity: Static Code Analysis")
-[![Maintenance Status](https://img.shields.io/maintenance/yes/2018.svg)](README.md "Last edited 2018-05-22")
+[![Maintenance Status](https://img.shields.io/maintenance/yes/2019.svg)](README.md "Last edited 2019-01-03")
 
 - [License](#license)
 - [Forums](#forums)

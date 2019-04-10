@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,37 +36,49 @@
 #ifndef POVRAY_BACKEND_BOUNDINGTASK_H
 #define POVRAY_BACKEND_BOUNDINGTASK_H
 
-#include <vector>
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "backend/configbackend.h"
 
-#include "backend/frame.h"
-#include "backend/render/rendertask.h"
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <memory>
+
+// POV-Ray header files (base module)
+#include "base/base_fwd.h"
+
+// POV-Ray header files (core module)
+#include "core/core_fwd.h"
+
+// POV-Ray header files (backend module)
+#include "backend/scene/backendscenedata_fwd.h"
+#include "backend/support/task.h"
 
 namespace pov
 {
 
-class SceneData;
-class TraceThreadData;
-
-class BoundingTask : public SceneTask
+class BoundingTask final : public SceneTask
 {
     public:
-        BoundingTask(shared_ptr<BackendSceneData> sd, unsigned int bt, size_t seed);
-        virtual ~BoundingTask();
+        BoundingTask(std::shared_ptr<BackendSceneData> sd, unsigned int bt, size_t seed);
+        virtual ~BoundingTask() override;
 
-        virtual void Run();
-        virtual void Stopped();
-        virtual void Finish();
+        virtual void Run() override;
+        virtual void Stopped() override;
+        virtual void Finish() override;
 
         void AppendObject(ObjectPtr p);
 
         inline TraceThreadData *GetSceneDataPtr() { return reinterpret_cast<TraceThreadData *>(GetDataPtr()); }
     private:
-        shared_ptr<BackendSceneData> sceneData;
+        std::shared_ptr<BackendSceneData> sceneData;
         unsigned int boundingThreshold;
 
         void SendFatalError(pov_base::Exception& e);
 };
 
 }
+// end of namespace pov
 
 #endif // POVRAY_BACKEND_BOUNDINGTASK_H

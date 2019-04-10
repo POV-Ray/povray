@@ -41,29 +41,18 @@ POV-Ray is being developed with portability high in mind. In practice and at pre
           - _Static Thread-Local Template Members_: Template classes _must not_ have thread-local
             static member variables. See the @ref PooledSimpleVector template class for a viable
             workaround. [XCode 8 and later, apparently still unresolved as of 2018-04-08]
-
-  - Source code should use the new features of C++11 with caution, as even some major compiler
-    brands still have not achieved full compliance yet. The following constructs can be considered
-    fair game though, as they are thought to provide significant benefit, and support by all major
-    compiler brands seems to be mature by now:
-      - Features "borrowed" from ISO/IEC 9899:1990 (aka C90, aka C89).
-      - Features "borrowed" from ISO/IEC TR 19768:2007 (aka C++ Technical Report 1, aka TR1).
-      - `decltype(v)`, with `v` being a simple variable or class member (as opposed to a more complex expression)
-      - Range-based for loops (most notably the `for (auto&& i : v)` idiom to iterate over a vector).
-    @note
-        Other C++11 features will be added to the above list at the discretion of the dev team, or
-        upon request if a reasonable case can be made in their favour. Note however that at present
-        we will only consider features that have been properly supported by GCC as early as version
-        4.8, by Clang as early as version 4.2, and by MSVC as early as internal version 19.0
-        (Visual Studio 2015).
+          - _Math Library Float Functions_: The `f`-suffixed variants of `<cmath>` library functions
+            (e.g. `std::fabsf(float)`) _must not_ be used. The float overloads of the non-suffixed
+            variants (e.g. `std::fabs(float)`) should be used instead. [GCC, all versions as of
+            2019-02-11].
 
   - Source code should avoid potential conflicts with later standard extensions to the C++ language,
-    most notably ISO/IEC 14882:2014 (aka C++14) and the upcoming successor (aka C++17).
+    most notably ISO/IEC 14882:2014 (aka C++14), ISO/IEC 14882:2017 (aka C++17)  and the upcoming
+    successor (aka C++20).
 
   - While POV-Ray does require boost, we want to keep dependency on it to a minimum. The following are currently
     considered fair game:
       - Flyweights.
-      - Threads.
       - DateTime **except** features that may require linking with the lib (mostly conversions to/from string).
       - SmartPtr intrusive pointers.
       .
@@ -181,6 +170,8 @@ Parameter and variable names might carry one or more additional prefixes. These 
   .
   - Protected or private member variable names should begin with a (possibly additional) `m` prefix.
   - Global variable names should begin with a (possibly additional) `g` prefix.
+  - Global variables with thread-local storage should begin with a (possibly additional) `gt`
+  - prefix.
   - Constants should begin with a `k` prefix. (Does not apply to const parameters.)
   .
 
@@ -262,6 +253,14 @@ To test whether a smart pointer is (non-)null, do not unnecessarily clutter your
 `.get()`, but do explicitly compare with `nullptr` (rather than rely on automatic conversion to
 `bool`) to make it obvious that you're dealing with pointer data. Never compare smart pointers
 with `NULL`, as that would lead to compile errors on some (perfectly C++11 compliant) compilers.
+
+
+Classes
+=======
+
+  - All classes should be declared `final` unless specifically intended otherwise.
+  - All destructors of polymorphic classes should be declared `virtual`.
+  - All overriding methods (including destructors) should be declared both `virtual` and `override`.
 
 
 Miscellaneous Coding Rules

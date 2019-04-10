@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -56,6 +56,7 @@ namespace pov_frontend
     bool MinimizeShellouts(void) { return false; } // TODO
     bool ShelloutsPermitted(void) { return false; } // TODO
 }
+// end of namespace pov_frontend
 
 
 void PrintStatus (vfeSession *session)

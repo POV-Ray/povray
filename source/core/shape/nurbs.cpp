@@ -300,7 +300,7 @@ bool Nurbs::Inside( const Vector3d&, TraceThreadData* ) const
 void Nurbs::Normal( Vector3d&, Intersection*, TraceThreadData* ) const
 {
 }
-void Nurbs::UVCoord( Vector2d&, const Intersection*, TraceThreadData* ) const
+void Nurbs::UVCoord( Vector2d&, const Intersection* ) const
 {
 }
 void Nurbs::Translate( const Vector3d&, const TRANSFORM* tr )

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,6 +39,16 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <vector>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/math/matrix.h"
 #include "core/math/vector.h"
 
@@ -67,10 +77,10 @@ struct GenericWarp
 
 typedef GenericWarp* WarpPtr;
 typedef const GenericWarp* ConstWarpPtr;
-typedef vector<WarpPtr> WarpList;
+typedef std::vector<WarpPtr> WarpList;
 
 
-struct BlackHoleWarp : public GenericWarp
+struct BlackHoleWarp final : public GenericWarp
 {
     BlackHoleWarp() :
         GenericWarp(), Center(0.0), Repeat_Vector(0.0), Uncertainty_Vector(0.0), Strength(1.0), Radius(1.0),
@@ -83,10 +93,10 @@ struct BlackHoleWarp : public GenericWarp
         Inverted(old.Inverted), Repeat(old.Repeat), Uncertain(old.Uncertain)
     {}
 
-    virtual GenericWarp* Clone() const { return new BlackHoleWarp(*this); }
-    virtual bool WarpPoint(Vector3d& rP) const;
-    virtual bool WarpNormal(Vector3d& rN) const;
-    virtual bool UnwarpNormal(Vector3d& rN) const;
+    virtual GenericWarp* Clone() const override { return new BlackHoleWarp(*this); }
+    virtual bool WarpPoint(Vector3d& rP) const override;
+    virtual bool WarpNormal(Vector3d& rN) const override;
+    virtual bool UnwarpNormal(Vector3d& rN) const override;
 
     Vector3d    Center;
     Vector3d    Repeat_Vector;
@@ -102,18 +112,18 @@ struct BlackHoleWarp : public GenericWarp
     bool        Uncertain;
 };
 
-struct CubicWarp : public GenericWarp
+struct CubicWarp final : public GenericWarp
 {
     CubicWarp() : GenericWarp() {}
     CubicWarp(const CubicWarp& old) : GenericWarp(old) {}
 
-    virtual GenericWarp* Clone() const { return new CubicWarp(*this); }
-    virtual bool WarpPoint(Vector3d& rP) const;
-    virtual bool WarpNormal(Vector3d& rN) const;
-    virtual bool UnwarpNormal(Vector3d& rN) const;
+    virtual GenericWarp* Clone() const override { return new CubicWarp(*this); }
+    virtual bool WarpPoint(Vector3d& rP) const override;
+    virtual bool WarpNormal(Vector3d& rN) const override;
+    virtual bool UnwarpNormal(Vector3d& rN) const override;
 };
 
-struct CylindricalWarp : public GenericWarp
+struct CylindricalWarp final : public GenericWarp
 {
     CylindricalWarp() :
         GenericWarp(), Orientation_Vector(0.0, 0.0, 1.0), DistExp(0.0)
@@ -122,27 +132,27 @@ struct CylindricalWarp : public GenericWarp
         GenericWarp(old), Orientation_Vector(old.Orientation_Vector), DistExp(old.DistExp)
     {}
 
-    virtual GenericWarp* Clone() const { return new CylindricalWarp(*this); }
-    virtual bool WarpPoint(Vector3d& rP) const;
-    virtual bool WarpNormal(Vector3d& rN) const;
-    virtual bool UnwarpNormal(Vector3d& rN) const;
+    virtual GenericWarp* Clone() const override { return new CylindricalWarp(*this); }
+    virtual bool WarpPoint(Vector3d& rP) const override;
+    virtual bool WarpNormal(Vector3d& rN) const override;
+    virtual bool UnwarpNormal(Vector3d& rN) const override;
 
     Vector3d Orientation_Vector;
     DBL DistExp;
 };
 
-struct IdentityWarp : public GenericWarp
+struct IdentityWarp final : public GenericWarp
 {
     IdentityWarp() : GenericWarp() {}
     IdentityWarp(const IdentityWarp& old) : GenericWarp(old) {}
 
-    virtual GenericWarp* Clone() const { return new IdentityWarp(*this); }
-    virtual bool WarpPoint(Vector3d& rP) const;
-    virtual bool WarpNormal(Vector3d& rN) const;
-    virtual bool UnwarpNormal(Vector3d& rN) const;
+    virtual GenericWarp* Clone() const override { return new IdentityWarp(*this); }
+    virtual bool WarpPoint(Vector3d& rP) const override;
+    virtual bool WarpNormal(Vector3d& rN) const override;
+    virtual bool UnwarpNormal(Vector3d& rN) const override;
 };
 
-struct PlanarWarp : public GenericWarp
+struct PlanarWarp final : public GenericWarp
 {
     PlanarWarp() :
         GenericWarp(), Orientation_Vector(0.0, 0.0, 1.0), OffSet(0.0)
@@ -151,16 +161,16 @@ struct PlanarWarp : public GenericWarp
         GenericWarp(old), Orientation_Vector(old.Orientation_Vector), OffSet(old.OffSet)
     {}
 
-    virtual GenericWarp* Clone() const { return new PlanarWarp(*this); }
-    virtual bool WarpPoint(Vector3d& rP) const;
-    virtual bool WarpNormal(Vector3d& rN) const;
-    virtual bool UnwarpNormal(Vector3d& rN) const;
+    virtual GenericWarp* Clone() const override { return new PlanarWarp(*this); }
+    virtual bool WarpPoint(Vector3d& rP) const override;
+    virtual bool WarpNormal(Vector3d& rN) const override;
+    virtual bool UnwarpNormal(Vector3d& rN) const override;
 
     Vector3d Orientation_Vector;
     DBL OffSet;
 };
 
-struct RepeatWarp : public GenericWarp
+struct RepeatWarp final : public GenericWarp
 {
     RepeatWarp() :
         GenericWarp(), Axis(-1), Width(0.0), Flip(1.0), Offset(0.0)
@@ -169,35 +179,35 @@ struct RepeatWarp : public GenericWarp
         GenericWarp(old), Axis(old.Axis), Width(old.Width), Flip(old.Flip), Offset(old.Offset)
     {}
 
-    virtual GenericWarp* Clone() const { return new RepeatWarp(*this); }
-    virtual bool WarpPoint(Vector3d& rP) const;
-    virtual bool WarpNormal(Vector3d& rN) const;
-    virtual bool UnwarpNormal(Vector3d& rN) const;
+    virtual GenericWarp* Clone() const override { return new RepeatWarp(*this); }
+    virtual bool WarpPoint(Vector3d& rP) const override;
+    virtual bool WarpNormal(Vector3d& rN) const override;
+    virtual bool UnwarpNormal(Vector3d& rN) const override;
 
     int Axis;
     SNGL Width;
     Vector3d Flip, Offset;
 };
 
-struct SphericalWarp : public GenericWarp
+struct SphericalWarp final : public GenericWarp
 {
     SphericalWarp() :
         GenericWarp(), Orientation_Vector(0.0, 0.0, 1.0), DistExp(0.0)
     {}
     SphericalWarp(const SphericalWarp& old) :
         GenericWarp(old), Orientation_Vector(old.Orientation_Vector), DistExp(old.DistExp)
-     {}
+    {}
 
-    virtual GenericWarp* Clone() const { return new SphericalWarp(*this); }
-    virtual bool WarpPoint(Vector3d& rP) const;
-    virtual bool WarpNormal(Vector3d& rN) const;
-    virtual bool UnwarpNormal(Vector3d& rN) const;
+    virtual GenericWarp* Clone() const override { return new SphericalWarp(*this); }
+    virtual bool WarpPoint(Vector3d& rP) const override;
+    virtual bool WarpNormal(Vector3d& rN) const override;
+    virtual bool UnwarpNormal(Vector3d& rN) const override;
 
     Vector3d Orientation_Vector;
     DBL DistExp;
 };
 
-struct ToroidalWarp : public GenericWarp
+struct ToroidalWarp final : public GenericWarp
 {
     ToroidalWarp() :
         GenericWarp(), Orientation_Vector(0.0, 0.0, 1.0), DistExp(0.0), MajorRadius(1.0)
@@ -207,17 +217,17 @@ struct ToroidalWarp : public GenericWarp
         MajorRadius(old.MajorRadius)
     {}
 
-    virtual GenericWarp* Clone() const { return new ToroidalWarp(*this); }
-    virtual bool WarpPoint(Vector3d& rP) const;
-    virtual bool WarpNormal(Vector3d& rN) const;
-    virtual bool UnwarpNormal(Vector3d& rN) const;
+    virtual GenericWarp* Clone() const override { return new ToroidalWarp(*this); }
+    virtual bool WarpPoint(Vector3d& rP) const override;
+    virtual bool WarpNormal(Vector3d& rN) const override;
+    virtual bool UnwarpNormal(Vector3d& rN) const override;
 
     Vector3d Orientation_Vector;
     DBL DistExp;
     DBL MajorRadius;
 };
 
-struct TransformWarp : public GenericWarp
+struct TransformWarp final : public GenericWarp
 {
     TransformWarp() :
         GenericWarp()
@@ -229,10 +239,10 @@ struct TransformWarp : public GenericWarp
         GenericWarp(old), Trans(old.Trans)
     {}
 
-    virtual GenericWarp* Clone() const { return new TransformWarp(*this); }
-    virtual bool WarpPoint(Vector3d& rP) const;
-    virtual bool WarpNormal(Vector3d& rN) const;
-    virtual bool UnwarpNormal(Vector3d& rN) const;
+    virtual GenericWarp* Clone() const override { return new TransformWarp(*this); }
+    virtual bool WarpPoint(Vector3d& rP) const override;
+    virtual bool WarpNormal(Vector3d& rN) const override;
+    virtual bool UnwarpNormal(Vector3d& rN) const override;
 
     TRANSFORM Trans;
 };
@@ -247,10 +257,10 @@ struct GenericTurbulenceWarp : public GenericWarp
         GenericWarp(old), Turbulence(old.Turbulence), Octaves(old.Octaves), Lambda(old.Lambda), Omega(old.Omega)
     {}
 
-    virtual GenericWarp* Clone() const = 0;
-    virtual bool WarpPoint(Vector3d& rP) const;
-    virtual bool WarpNormal(Vector3d& rN) const;
-    virtual bool UnwarpNormal(Vector3d& rN) const;
+    virtual GenericWarp* Clone() const override = 0;
+    virtual bool WarpPoint(Vector3d& rP) const override;
+    virtual bool WarpNormal(Vector3d& rN) const override;
+    virtual bool UnwarpNormal(Vector3d& rN) const override;
 
     Vector3d Turbulence;
     int Octaves;
@@ -258,16 +268,16 @@ struct GenericTurbulenceWarp : public GenericWarp
 };
 
 /// Genuine turbulence warp.
-struct TurbulenceWarp : public GenericTurbulenceWarp
+struct TurbulenceWarp final : public GenericTurbulenceWarp
 {
     TurbulenceWarp() : GenericTurbulenceWarp() {}
     TurbulenceWarp(const TurbulenceWarp& old) : GenericTurbulenceWarp(old) {}
 
-    virtual GenericWarp* Clone() const { return new TurbulenceWarp(*this); }
+    virtual GenericWarp* Clone() const override { return new TurbulenceWarp(*this); }
 };
 
 /// Turbulence tied to a pattern.
-struct ClassicTurbulence : public GenericTurbulenceWarp
+struct ClassicTurbulence final : public GenericTurbulenceWarp
 {
     ClassicTurbulence(bool hbp) :
         GenericTurbulenceWarp(), handledByPattern(hbp)
@@ -276,7 +286,7 @@ struct ClassicTurbulence : public GenericTurbulenceWarp
         GenericTurbulenceWarp(old), handledByPattern(old.handledByPattern)
     {}
 
-    virtual GenericWarp* Clone() const { return new ClassicTurbulence(*this); }
+    virtual GenericWarp* Clone() const override { return new ClassicTurbulence(*this); }
 
     bool handledByPattern;
 };
@@ -297,5 +307,6 @@ void UnWarp_Normal (Vector3d& TNorm, const Vector3d& ENorm, const TPATTERN *TPat
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_WARP_H

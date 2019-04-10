@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -45,17 +45,20 @@
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
+#include "core/support/octree_fwd.h"
 
+// C++ variants of C standard header files
 #include <climits>
 
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+#include "base/fileinputoutput_fwd.h"
+
+// POV-Ray header files (core module)
 #include "core/coretypes.h"
 #include "core/math/vector.h"
-
-namespace pov_base
-{
-class IStream;
-class OStream;
-}
 
 namespace pov
 {
@@ -73,8 +76,7 @@ using namespace pov_base;
 * Global preprocessor defines
 ******************************************************************************/
 
-// The addressing scheme of the nodes has a fundamental problem in that it is
-// incapable of providing a common root for nodes which have IDs with differing signs.
+// The addressing scheme of the nodes has an issue near the origin that impedes performance.
 // We're working around this by adding a large positive bias when computing node IDs.
 #define OT_BIAS 10000000.
 
@@ -86,26 +88,20 @@ using namespace pov_base;
 typedef unsigned short OT_TILE;
 #define OT_TILE_MAX USHRT_MAX
 
-typedef unsigned char OT_PASS;
-#define OT_PASS_INVALID 0
-#define OT_PASS_FIRST   1
-#define OT_PASS_FINAL   UCHAR_MAX
-#define OT_PASS_MAX     (OT_PASS_FINAL-2) // OT_PASS_FINAL-1 is reserved
+using OT_PASS = OctreePass;                             ///< @deprecated
+constexpr auto OT_PASS_INVALID = kOctreePassInvalid;    ///< @deprecated
+constexpr auto OT_PASS_FIRST   = kOctreePassFirst;      ///< @deprecated
+constexpr auto OT_PASS_FINAL   = kOctreePassFinal;      ///< @deprecated
+constexpr auto OT_PASS_MAX     = kOctreePassMax;        ///< @deprecated
 
-typedef unsigned char OT_DEPTH;
-#define OT_DEPTH_MAX UCHAR_MAX
-
-typedef struct ot_block_struct OT_BLOCK;
-typedef struct ot_id_struct OT_ID;
-typedef struct ot_node_struct OT_NODE;
-typedef struct ot_read_param_struct OT_READ_PARAM;
-typedef struct ot_read_info_struct OT_READ_INFO;
+using OT_DEPTH = OctreeDepth;
+constexpr auto OT_DEPTH_MAX    = kOctreeDepthMax;       ///< @deprecated
 
 // Each node in the oct-tree has a (possibly null) linked list of these data blocks off it.
-struct ot_block_struct
+struct ot_block_struct final
 {
     // TODO for memory efficiency we could probably use single-precision data types for the vector stuff
-    OT_BLOCK    *next;      // next block in the same node
+    ot_block_struct* next;  // next block in the same node
     Vector3d    Point;
     Vector3d    S_Normal;
     Vector3d    To_Nearest_Surface;
@@ -119,40 +115,45 @@ struct ot_block_struct
     OT_PASS     Pass;       // pass during which this sample was taken (OT_PASS_FINAL for final render)
     OT_DEPTH    Bounce_Depth;
 };
+using OT_BLOCK = ot_block_struct; ///< @deprecated
 
 // This is the information necessary to name an oct-tree node.
-struct ot_id_struct
+struct ot_id_struct final
 {
     int x, y, z;
     int Size;
 
     ot_id_struct() : x(0), y(0), z(0), Size(0) {}
 };
+using OT_ID = ot_id_struct; ///< @deprecated
 
 // These are the structures that make up the oct-tree itself, known as nodes
-struct ot_node_struct
+struct ot_node_struct final
 {
     OT_ID    Id;
     OT_BLOCK *Values;
-    OT_NODE  *Kids[8];
+    ot_node_struct *Kids[8];
 
     ot_node_struct() : Id(), Values(nullptr) { for (unsigned int i = 0; i < 8; i ++) { Kids[i] = nullptr; } }
 };
+using OT_NODE = ot_node_struct; ///< @deprecated
 
 // These are informations the octree reader needs to know
-struct ot_read_param_struct
+struct ot_read_param_struct final
 {
     DBL       RealErrorBound;
 };
+using OT_READ_PARAM = ot_read_param_struct; ///< @deprecated
 
 // These are informations the octree reader generates
-struct ot_read_info_struct
+struct ot_read_info_struct final
 {
     MathColour  Gather_Total;
     long        Gather_Total_Count;
     DBL         Brightness;
     bool        FirstRadiosityPass;
 };
+using OT_READ_INFO = ot_read_info_struct; ///< @deprecated
 
 /*****************************************************************************
 * Global functions
@@ -174,5 +175,6 @@ void ot_parent (OT_ID *dad, OT_ID *kid);
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_OCTREE_H

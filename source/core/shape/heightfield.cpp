@@ -12,7 +12,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -58,21 +58,31 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/heightfield.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <algorithm>
 
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
 
+// POV-Ray header files (core module)
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
 #include "core/shape/box.h"
 #include "core/support/imageutil.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov
 {
+
+using std::min;
+using std::max;
 
 /*****************************************************************************
 * Local preprocessor defines
@@ -94,14 +104,14 @@ const DBL HFIELD_TOLERANCE = 1.0e-6;
 
 typedef short HF_Normals[3];
 
-struct HFBlock
+struct HFBlock final
 {
     int xmin, xmax;
     int zmin, zmax;
     DBL ymin, ymax;
 };
 
-struct HFData
+struct HFData final
 {
     int References;
     int Normals_Height;  /* Needed for Destructor */
@@ -2081,3 +2091,4 @@ bool HField::block_traversal(const BasicRay &ray, const Vector3d& Start, IStack 
 }
 
 }
+// end of namespace pov

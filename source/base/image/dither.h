@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,15 +33,22 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_BASE_IMAGE_DITHER_H
-#define POVRAY_BASE_IMAGE_DITHER_H
+#ifndef POVRAY_BASE_DITHER_H
+#define POVRAY_BASE_DITHER_H
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
+#include "base/image/dither_fwd.h"
+
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <memory>
 
 // POV-Ray header files (base module)
-#include "base/types.h"
 #include "base/colour.h"
+#include "base/image/image_fwd.h"
 
 namespace pov_base
 {
@@ -52,8 +59,6 @@ namespace pov_base
 /// @ingroup PovBaseImage
 ///
 /// @{
-
-class Image;
 
 //*****************************************************************************
 ///
@@ -126,7 +131,7 @@ class DitherStrategy
         virtual void SetError(unsigned int x, unsigned int y, const ColourOffset& err) {}
 };
 
-struct DitherStrategy::ColourOffset
+struct DitherStrategy::ColourOffset final
 {
     union { ColourChannel red, gray; };
     ColourChannel green, blue, alpha;
@@ -142,7 +147,7 @@ struct DitherStrategy::ColourOffset
     inline ColourOffset& operator+=(const ColourOffset& b) { red += b.red; green += b.green; blue += b.blue; alpha += b.alpha; return *this; }
 };
 
-typedef shared_ptr<DitherStrategy> DitherStrategySPtr;
+typedef std::shared_ptr<DitherStrategy> DitherStrategySPtr;
 
 /// Factory function to get a dithering algorithm and state.
 DitherStrategySPtr GetDitherStrategy(DitherMethodId method, unsigned int imageWidth);
@@ -171,7 +176,7 @@ ColourChannel GetDitherOffset(unsigned int x, unsigned int y);
 /// This stateless dithering strategy serves as a placeholder when dithering
 /// is not desired.
 ///
-class NoDither : public DitherStrategy
+class NoDither final : public DitherStrategy
 {
 public:
     virtual void GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt) override;
@@ -184,7 +189,7 @@ public:
 /// This stateless dithering strategy implements a generalized ordered
 /// dithering filter. The specifics of the filter are defined by a matrix.
 ///
-class OrderedDither : public DitherStrategy
+class OrderedDither final : public DitherStrategy
 {
 public:
     class Pattern;
@@ -232,7 +237,7 @@ extern const OrderedDither::Pattern BlueNoise64a;
 ///     DiffusionDither::Filter(
 ///         {{    1 }});
 ///
-class DiffusionDither1D : public DitherStrategy
+class DiffusionDither1D final : public DitherStrategy
 {
 public:
     virtual void GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt) override;
@@ -258,11 +263,11 @@ protected:
 ///         {{       2 },
 ///          { 1, 1, 0 }});
 ///
-class SierraLiteDither : public DitherStrategy
+class SierraLiteDither final : public DitherStrategy
 {
 public:
     SierraLiteDither(unsigned int width);
-    virtual ~SierraLiteDither();
+    virtual ~SierraLiteDither() override;
     virtual void GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt) override;
     virtual void SetError(unsigned int x, unsigned int y, const ColourOffset& err) override;
 protected:
@@ -288,11 +293,11 @@ protected:
 ///         {{       7 },
 ///          { 3, 5, 1 }});
 ///
-class FloydSteinbergDither : public DitherStrategy
+class FloydSteinbergDither final : public DitherStrategy
 {
 public:
     FloydSteinbergDither(unsigned int width);
-    virtual ~FloydSteinbergDither();
+    virtual ~FloydSteinbergDither() override;
     virtual void GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt) override;
     virtual void SetError(unsigned int x, unsigned int y, const ColourOffset& err) override;
 protected:
@@ -310,12 +315,12 @@ protected:
 ///
 /// @note   This implementation uses an additional multi-line pixel buffer to avoid manipulating the original image.
 ///
-class DiffusionDither : public DitherStrategy
+class DiffusionDither final : public DitherStrategy
 {
 public:
     class Filter;
     DiffusionDither(const Filter& matrix, unsigned int width);
-    virtual ~DiffusionDither();
+    virtual ~DiffusionDither() override;
     virtual void GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt) override;
     virtual void SetError(unsigned int x, unsigned int y, const ColourOffset& err) override;
 protected:
@@ -381,6 +386,7 @@ extern const DiffusionDither::Filter StuckiMatrix;
 ///
 //##############################################################################
 
-} // end of namespace pov_base
+}
+// end of namespace pov_base
 
 #endif // POVRAY_BASE_IMAGE_DITHER_H

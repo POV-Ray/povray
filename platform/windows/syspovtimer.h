@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -42,9 +42,9 @@
 namespace pov_base
 {
 
-void Delay(unsigned int msec);
+#if !POV_USE_DEFAULT_TIMER
 
-class Timer
+class Timer final
 {
     public:
         Timer();
@@ -72,6 +72,9 @@ class Timer
         POV_ULONG GetProcessTime () const;
 };
 
+#endif // POV_USE_DEFAULT_TIMER
+
 }
+// end of namespace pov_base
 
 #endif // POVRAY_WINDOWS_SYSPOVTIMER_H

@@ -14,7 +14,7 @@
 /// ----------------------------------------------------------------------------
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -42,8 +42,16 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/material/pigment.h"
 
-#include "base/pov_err.h"
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
 
+// POV-Ray header files (base module)
+#include "base/pov_err.h"
+#include "base/povassert.h"
+#include "base/image/colourspace.h"
+
+// POV-Ray header files (core module)
 #include "core/material/blendmap.h"
 #include "core/material/pattern.h"
 #include "core/material/warp.h"
@@ -56,6 +64,8 @@
 
 namespace pov
 {
+
+using std::vector;
 
 /*****************************************************************************
 * Local preprocessor defines
@@ -157,7 +167,7 @@ PIGMENT *Copy_Pigment (PIGMENT *Old)
         New = Create_Pigment ();
 
         Copy_TPat_Fields (New, Old);
-        New->Blend_Map = shared_ptr<GenericPigmentBlendMap> (Old->Blend_Map);
+        New->Blend_Map = std::shared_ptr<GenericPigmentBlendMap> (Old->Blend_Map);
 
         New->colour = Old->colour;
         New->Quick_Colour = Old->Quick_Colour;
@@ -284,8 +294,8 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
                         break;
 
                     default:
-                        Pigment->Blend_Map = static_pointer_cast<GenericPigmentBlendMap, ColourBlendMap>(
-                                                 const_pointer_cast<ColourBlendMap, const ColourBlendMap>(
+                        Pigment->Blend_Map = std::static_pointer_cast<GenericPigmentBlendMap, ColourBlendMap>(
+                                                 std::const_pointer_cast<ColourBlendMap, const ColourBlendMap>(
                                                      Pigment->pattern->GetDefaultBlendMap()));
                         break;
                 }
@@ -435,8 +445,8 @@ bool Compute_Pigment (TransColour& colour, const PIGMENT *Pigment, const Vector3
 
                 colour.Clear();
 
-                POV_PATTERN_ASSERT(dynamic_pointer_cast<ColourPattern>(Pigment->pattern));
-                Colour_Found = static_pointer_cast<ColourPattern>(Pigment->pattern)->Evaluate(colour, TPoint, Intersect, ray, Thread);
+                POV_PATTERN_ASSERT(std::dynamic_pointer_cast<ColourPattern>(Pigment->pattern));
+                Colour_Found = std::dynamic_pointer_cast<ColourPattern>(Pigment->pattern)->Evaluate(colour, TPoint, Intersect, ray, Thread);
 
                 break;
 
@@ -597,7 +607,7 @@ bool PigmentBlendMap::ComputeUVMapped(TransColour& colour, const Intersection *I
     const BlendMapEntry<PIGMENT*>* Cur = &(Blend_Map_Entries[0]);
 
     /* Don't bother warping, simply get the UV vect of the intersection */
-    Intersect->Object->UVCoord(UV_Coords, Intersect, Thread);
+    Intersect->Object->UVCoord(UV_Coords, Intersect);
     TPoint[X] = UV_Coords[U];
     TPoint[Y] = UV_Coords[V];
     TPoint[Z] = 0;
@@ -671,4 +681,4 @@ PigmentBlendMap::~PigmentBlendMap()
 }
 
 }
-
+// end of namespace pov

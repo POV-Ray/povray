@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,11 +38,20 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/polynomial.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/math/matrix.h"
 #include "core/math/polynomialsolver.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -234,7 +243,7 @@ bool Poly::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 
         default:
 
-            cnt = intersect(New_Ray, Order, Coeffs, Test_Flag(this, STURM_FLAG), Depths, Thread);
+            cnt = intersect(New_Ray, Order, Coeffs, Test_Flag(this, STURM_FLAG), Depths, Thread->Stats());
     }
 
     if (cnt > 0)
@@ -644,7 +653,7 @@ DBL Poly::inside(const Vector3d& IPoint, int Order, const DBL *Coeffs)
 *
 ******************************************************************************/
 
-int Poly::intersect(const BasicRay &ray, int Order, const DBL *Coeffs, int Sturm_Flag, DBL *Depths, TraceThreadData *Thread)
+int Poly::intersect(const BasicRay &ray, int Order, const DBL *Coeffs, int Sturm_Flag, DBL *Depths, RenderStatistics& stats)
 {
     DBL eqn_v[3][MAX_ORDER+1], eqn_vt[3][MAX_ORDER+1];
     DBL eqn[MAX_ORDER+1];
@@ -756,7 +765,7 @@ int Poly::intersect(const BasicRay &ray, int Order, const DBL *Coeffs, int Sturm
 
     if (j > 1)
     {
-        return(Solve_Polynomial(j, &eqn[i], Depths, Sturm_Flag, ROOT_TOLERANCE, Thread->Stats()));
+        return(Solve_Polynomial(j, &eqn[i], Depths, Sturm_Flag, ROOT_TOLERANCE, stats));
     }
     else
     {
@@ -1504,3 +1513,4 @@ bool Poly::Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector3d
 }
 
 }
+// end of namespace pov

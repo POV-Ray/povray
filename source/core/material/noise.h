@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,6 +39,17 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <string>
+#include <vector>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/material/warp.h"
 #include "core/math/vector.h"
 
@@ -86,10 +97,10 @@ const int NOISE_MINZ = NOISE_MINX;
 #ifdef DYNAMIC_HASHTABLE
 extern unsigned short *hashTable;
 #else
-extern ALIGN16 unsigned short hashTable[8192];
+alignas(16) extern unsigned short hashTable[8192];
 #endif
 
-extern ALIGN16 DBL RTable[];
+alignas(16) extern DBL RTable[];
 
 
 /*****************************************************************************
@@ -97,7 +108,7 @@ extern ALIGN16 DBL RTable[];
 ******************************************************************************/
 
 void Initialize_Noise (void);
-void Initialize_Waves(vector<double>& waveFrequencies, vector<Vector3d>& waveSources, unsigned int numberOfWaves);
+void Initialize_Waves(std::vector<double>& waveFrequencies, std::vector<Vector3d>& waveSources, unsigned int numberOfWaves);
 void Free_Noise_Tables (void);
 
 DBL SolidNoise(const Vector3d& P);
@@ -111,7 +122,7 @@ typedef DBL(*NoiseFunction) (const Vector3d& EPoint, int noise_generator);
 typedef void(*DNoiseFunction) (Vector3d& result, const Vector3d& EPoint);
 
 /// Optimized noise dispatch information.
-struct OptimizedNoiseInfo
+struct OptimizedNoiseInfo final
 {
     /// String unambiguously identifying the optimized implementation.
     ///
@@ -173,7 +184,7 @@ extern OptimizedNoiseInfo gaOptimizedNoiseInfo[];
 const OptimizedNoiseInfo* GetRecommendedOptimizedNoise();
 
 /// Get a specific noise generator implementation.
-const OptimizedNoiseInfo* GetOptimizedNoise(std::string name);
+const OptimizedNoiseInfo* GetOptimizedNoise(const std::string& name);
 
 extern NoiseFunction Noise;
 extern DNoiseFunction DNoise;
@@ -195,5 +206,6 @@ void DTurbulence (Vector3d& result, const Vector3d& EPoint, const GenericTurbule
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_NOISE_H

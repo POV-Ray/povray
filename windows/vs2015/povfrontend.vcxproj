@@ -411,6 +411,7 @@
     <ClInclude Include="..\..\source\frontend\animationprocessing.h" />
     <ClInclude Include="..\..\source\frontend\configfrontend.h" />
     <ClInclude Include="..\..\source\frontend\console.h" />
+    <ClInclude Include="..\..\source\frontend\console_fwd.h" />
     <ClInclude Include="..\..\source\frontend\display.h" />
     <ClInclude Include="..\..\source\frontend\filemessagehandler.h" />
     <ClInclude Include="..\..\source\frontend\imagemessagehandler.h" />
@@ -419,6 +420,7 @@
     <ClInclude Include="..\..\source\frontend\processoptions.h" />
     <ClInclude Include="..\..\source\frontend\processrenderoptions.h" />
     <ClInclude Include="..\..\source\frontend\renderfrontend.h" />
+    <ClInclude Include="..\..\source\frontend\renderfrontend_fwd.h" />
     <ClInclude Include="..\..\source\frontend\rendermessagehandler.h" />
     <ClInclude Include="..\..\source\frontend\shelloutprocessing.h" />
     <ClInclude Include="..\..\source\frontend\simplefrontend.h" />
