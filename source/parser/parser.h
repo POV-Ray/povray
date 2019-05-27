@@ -69,6 +69,7 @@
 #include "core/material/pigment.h"
 #include "core/material/warp.h"
 #include "core/shape/mesh.h"
+#include "core/shape/gsd.h"
 #include "core/scene/atmosphere_fwd.h"
 #include "core/scene/camera.h"
 
@@ -864,6 +865,7 @@ class Parser final
         ObjectPtr Parse_Box(void);
         ObjectPtr Parse_Cone(void);
         ObjectPtr Parse_CSG(int CSG_Type);
+        ObjectPtr Parse_GSD(GSD_TYPE GSD_type);
         ObjectPtr Parse_Light_Group(void);
         ObjectPtr Parse_Cylinder(void);
         ObjectPtr Parse_Disc(void);
