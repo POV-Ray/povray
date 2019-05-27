@@ -2611,6 +2611,80 @@ ObjectPtr Parser::Parse_CSG(int CSG_Type)
 
 //******************************************************************************
 
+
+ObjectPtr Parser::Parse_GSD(GSD_TYPE GSD_Type)
+{
+  Vector3d Local_Vector;
+	GSDInterUnion *Object;
+	ObjectPtr Local;
+	unsigned Object_Count = 0;
+
+	Parse_Begin();
+
+  switch(GSD_Type)
+	{
+		case GSD_INTERUNION_TYPE:
+			Object = new GSDInterUnion();
+			break;
+		case GSD_INTERMERGE_TYPE:
+			Object = new GSDInterMerge();
+			break;
+	}
+
+	while((Local = Parse_Object()) != NULL)
+	{
+		if(Local->Type & PATCH_OBJECT)
+			Error("Patch objects not allowed in gsd (intermerge, interunion).");
+		Object_Count++;
+
+		Object->Type |= (Local->Type & CHILDREN_FLAGS);
+		Local->Type |= IS_CHILD_OBJECT;
+		Link(Local, Object->children);
+	}
+
+	if(Object_Count < 3) 
+		Error("Should have at least 3 objects in gsd (intermerge, interunion).");
+
+  Object->prepare(Object_Count);
+
+  EXPECT
+    CASE(RANGE_TOKEN)
+    GET(LEFT_CURLY_TOKEN)
+    while(Allow_Vector(Local_Vector))
+    {
+       int idx1 = Local_Vector[0];
+       int idx2 = Local_Vector[1];
+       if (idx1 < 0) idx1 += Object_Count+1;
+       if (idx2 < 0) idx2 += Object_Count+1;
+       if ((idx1>=0)&&(idx1 <= Object_Count)&&(idx2>=0)&&(idx2 <= Object_Count)&&(idx1<=idx2))
+       {
+         for(unsigned i = idx1;i<=idx2;++i)
+         {
+					 Object->setAsInside(i);
+         }
+       }
+			 Parse_Comma();
+    }
+    GET(RIGHT_CURLY_TOKEN)
+    EXIT
+    END_CASE
+
+    OTHERWISE
+    UNGET
+    EXIT
+		END_CASE
+  END_EXPECT
+
+
+	Object->Compute_BBox();
+
+	Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
+
+	return (reinterpret_cast<ObjectPtr>(Object));
+}
+
+//******************************************************************************
+
 ObjectPtr Parser::Parse_Cone ()
 {
     Cone *Object;
@@ -7241,6 +7315,14 @@ ObjectPtr Parser::Parse_Object ()
             Object = Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
         END_CASE
 
+        CASE (INTERUNION_TOKEN)
+            Object = Parse_GSD (GSD_INTERUNION_TYPE);
+        END_CASE
+
+        CASE (INTERMERGE_TOKEN)
+            Object = Parse_GSD (GSD_INTERMERGE_TYPE);
+        END_CASE
+
         OTHERWISE
             UNGET
         END_CASE
@@ -10140,6 +10222,7 @@ void Parser::Link_To_Frame(ObjectPtr Object)
         if ((dynamic_cast<CSGUnion *>(Object) == nullptr)        && // FIXME
             (dynamic_cast<CSGIntersection *>(Object) == nullptr) && // FIXME
             (dynamic_cast<CSGMerge *>(Object) == nullptr)        && // FIXME
+            (dynamic_cast<GSDInterUnion *>(Object) == nullptr)   && // FIXME
             (dynamic_cast<Poly *>(Object) == nullptr)            && // FIXME
             (dynamic_cast<TrueType *>(Object) == nullptr)        && // FIXME
             ((dynamic_cast<Quadric *>(Object) == nullptr) || (dynamic_cast<Quadric *>(Object)->Automatic_Bounds)))
