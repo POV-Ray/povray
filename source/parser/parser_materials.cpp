@@ -1495,6 +1495,89 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             }
         END_CASE
 
+        CASE (PROXIMITY_TOKEN)
+            {
+                Parse_Begin();
+                vector<ObjectPtr> tempObjects;
+                Parse_Bound_Clip(tempObjects, false);
+                if(tempObjects.size() != 1)
+                    Error ("object or object identifier expected.");
+                New->Type = GENERIC_PATTERN;
+                shared_ptr<ProximityPattern> pattern(new ProximityPattern());
+                pattern->pObject = tempObjects[0];
+                New->pattern = pattern;
+                Parse_End();
+            }
+        END_CASE
+
+        CASE (PROPORTION_TOKEN)
+            {
+                Parse_Begin();
+                vector<ObjectPtr> tempObjects;
+                Parse_Bound_Clip(tempObjects, false);
+                if(tempObjects.size() < 1)
+                    Error ("object(s) or object identifier(s) expected.");
+                New->Type = GENERIC_PATTERN;
+                shared_ptr<ProportionPattern> pattern(new ProportionPattern());
+                pattern->vObject = tempObjects;
+                New->pattern = pattern;
+                Parse_End();
+            }
+        END_CASE
+
+        CASE (BINARY_TOKEN)
+            {
+                Parse_Begin();
+                vector<ObjectPtr> tempObjects;
+                Parse_Bound_Clip(tempObjects, false);
+                if(tempObjects.size() < 1)
+                    Error ("object(s) or object identifier(s) expected.");
+                New->Type = GENERIC_PATTERN;
+                shared_ptr<BinaryPattern> pattern(new BinaryPattern());
+                pattern->vObject = tempObjects;
+                New->pattern = pattern;
+                Parse_End();
+            }
+        END_CASE
+
+        CASE (VORONOI_TOKEN)
+            {
+                Parse_Begin();
+                New->Type = GENERIC_PATTERN;
+                shared_ptr<VoronoiPattern> pattern(new VoronoiPattern());
+                while (Allow_Vector(Local_Vector))
+                {
+                    Vector3d loc(Local_Vector);
+                    pattern->vPoint.push_back(loc);
+                    Parse_Comma();
+                }
+                New->pattern = pattern;
+                Parse_End();
+            }
+        END_CASE
+
+        CASE (MASONRY_TOKEN)
+            {
+                New->Type = GENERIC_PATTERN;
+                shared_ptr<MasonryPattern> pattern(new MasonryPattern());
+                Parse_Vector (Local_Vector);
+                pattern->Thickness = Local_Vector[X];
+                pattern->Border = Local_Vector[Y];
+                pattern->Middle = Local_Vector[Z];
+                VECTOR_4D single_cell;
+                Parse_Begin();
+                while (Allow_Vector4D(single_cell))
+                {
+                    pattern->vValue.push_back(single_cell[3]);
+                    Vector3d center(single_cell);
+                    pattern->vCell.push_back(center);
+                    Parse_Comma();
+                }
+                New->pattern = pattern;
+                Parse_End();
+            }
+        END_CASE
+
         CASE (CELLS_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new CellsPattern());
@@ -1800,6 +1883,13 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                 pattern->facetsCoords = Parse_Float();
             else
                 Only_In("coords", "facets");
+        END_CASE
+
+		CASE (RADIUS_TOKEN)
+            if (ProximityPattern* pattern = dynamic_cast<ProximityPattern*>(New->pattern.get()))
+                pattern->Range = Parse_Float();
+            else
+				Only_In("radius", "proximity");
         END_CASE
 
         CASE (SIZE_TOKEN)
@@ -4886,6 +4976,89 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             }
         END_CASE
 
+        CASE (PROXIMITY_TOKEN)
+            {
+                Parse_Begin();
+                vector<ObjectPtr> tempObjects;
+                Parse_Bound_Clip(tempObjects, false);
+                if(tempObjects.size() != 1)
+                    Error ("object or object identifier expected.");
+                New->Type = GENERIC_PATTERN;
+                shared_ptr<ProximityPattern> pattern(new ProximityPattern());
+                pattern->pObject = tempObjects[0];
+                New->pattern = pattern;
+                Parse_End();
+            }
+        END_CASE
+
+        CASE (PROPORTION_TOKEN)
+            {
+                Parse_Begin();
+                vector<ObjectPtr> tempObjects;
+                Parse_Bound_Clip(tempObjects, false);
+                if(tempObjects.size() < 1)
+                    Error ("object(s) or object identifier(s) expected.");
+                New->Type = GENERIC_PATTERN;
+                shared_ptr<ProportionPattern> pattern(new ProportionPattern());
+                pattern->vObject = tempObjects;
+                New->pattern = pattern;
+                Parse_End();
+            }
+        END_CASE
+
+        CASE (BINARY_TOKEN)
+            {
+                Parse_Begin();
+                vector<ObjectPtr> tempObjects;
+                Parse_Bound_Clip(tempObjects, false);
+                if(tempObjects.size() < 1)
+                    Error ("object(s) or object identifier(s) expected.");
+                New->Type = GENERIC_PATTERN;
+                shared_ptr<BinaryPattern> pattern(new BinaryPattern());
+                pattern->vObject = tempObjects;
+                New->pattern = pattern;
+                Parse_End();
+            }
+        END_CASE
+
+        CASE (VORONOI_TOKEN)
+            {
+                Parse_Begin();
+                New->Type = GENERIC_PATTERN;
+                shared_ptr<VoronoiPattern> pattern(new VoronoiPattern());
+                while (Allow_Vector(Local_Vector))
+                {
+                    Vector3d loc(Local_Vector);
+                    pattern->vPoint.push_back(loc);
+                    Parse_Comma();
+                }
+                New->pattern = pattern;
+                Parse_End();
+            }
+        END_CASE
+
+        CASE (MASONRY_TOKEN)
+            {
+                New->Type = GENERIC_PATTERN;
+                shared_ptr<MasonryPattern> pattern(new MasonryPattern());
+                Parse_Vector (Local_Vector);
+                pattern->Thickness = Local_Vector[X];
+                pattern->Border = Local_Vector[Y];
+                pattern->Middle = Local_Vector[Z];
+                VECTOR_4D single_cell;
+                Parse_Begin();
+                while (Allow_Vector4D(single_cell))
+                {
+                    pattern->vValue.push_back(single_cell[3]);
+                    Vector3d center(single_cell);
+                    pattern->vCell.push_back(center);
+                    Parse_Comma();
+                }
+                New->pattern = pattern;
+                Parse_End();
+            }
+        END_CASE
+
         CASE (CELLS_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new CellsPattern());
@@ -5131,6 +5304,13 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
                 pattern->facetsCoords = Parse_Float();
             else
                 Only_In("coords", "facets");
+        END_CASE
+
+		CASE (RADIUS_TOKEN)
+            if (ProximityPattern* pattern = dynamic_cast<ProximityPattern*>(New->pattern.get()))
+                pattern->Range = Parse_Float();
+            else
+				Only_In("radius", "proximity");
         END_CASE
 
         CASE (SIZE_TOKEN)
