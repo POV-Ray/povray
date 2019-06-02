@@ -43,6 +43,7 @@
 // C++ variants of C standard header files
 // C++ standard header files
 //  (none at the moment)
+#include <vector>
 
 // POV-Ray header files (base module)
 #include "base/fileinputoutput_fwd.h"
@@ -1030,6 +1031,65 @@ struct Spiral2Pattern final : public SpiralPattern
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const override;
 };
 
+//******************************************************************************
+// proximity, binary, proportion, voronoi and masonry Patterns
+
+/// Implements the 'proximity' pattern.
+struct ProximityPattern: public ContinuousPattern
+{
+    ObjectPtr pObject;
+    DBL Range;
+
+    ProximityPattern();
+    ProximityPattern(const ProximityPattern& obj);
+    virtual ~ProximityPattern() override;
+    virtual PatternPtr Clone() const override { return BasicPattern::Clone(*this); }
+    virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const override;
+};
+
+/// Implements the 'binary' pattern.
+struct BinaryPattern: public ContinuousPattern
+{
+    std::vector< ObjectPtr > vObject;
+
+    BinaryPattern();
+    BinaryPattern(const BinaryPattern& obj);
+    virtual ~BinaryPattern() override;
+    virtual PatternPtr Clone() const override { return BasicPattern::Clone(*this); }
+    virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const override;
+};
+
+/// Implements the 'proportion' pattern.
+struct ProportionPattern: public ContinuousPattern
+{
+    std::vector< ObjectPtr > vObject;
+
+    ProportionPattern();
+    ProportionPattern(const ProportionPattern& obj);
+    virtual ~ProportionPattern() override;
+    virtual PatternPtr Clone() const override { return BasicPattern::Clone(*this); }
+    virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const override;
+};
+
+/// Implements the 'voronoi' pattern.
+struct VoronoiPattern: public ContinuousPattern
+{
+    std::vector< Vector3d > vPoint;
+
+    virtual PatternPtr Clone() const override { return BasicPattern::Clone(*this); }
+    virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const override;
+};
+
+/// Implements the 'masonry' pattern.
+struct MasonryPattern: public ContinuousPattern
+{
+    DBL Thickness,Middle,Border;
+    std::vector< Vector3d > vCell;
+    std::vector< DBL > vValue;
+
+    virtual PatternPtr Clone() const override { return BasicPattern::Clone(*this); }
+    virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const override;
+};
 
 //******************************************************************************
 // Coloured Patterns
