@@ -981,6 +981,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
     Vector3d Vect,Vect2,Vect3;
     Mesh * LocalMesh;
     ObjectPtr Object;
+    CompoundObject* compoundObject;
     TRANSFORM Trans;
     TurbulenceWarp Turb;
     UCS2 *Local_String, *Local_String2;
@@ -1446,6 +1447,30 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     END_EXPECT
                     Parse_Paren_End();
                     break;
+
+                case CHILDREN_TOKEN:
+                    Parse_Paren_Begin();
+                    EXPECT
+                        CASE(OBJECT_ID_TOKEN)
+                            Object = CurrentTokenDataPtr<ObjectPtr>();// Safe due to CASE above
+                            compoundObject = dynamic_cast<CompoundObject*>(Object);// try to specialise it
+                            if (compoundObject)
+                            {
+                                Val = compoundObject->children.size();
+                            }
+                            else
+                            {
+                                Val = -1;// Not an error, allow to detect leaf in complex compounds, without stopping parsing
+                            }
+                            EXIT
+                        END_CASE
+
+                    OTHERWISE
+    						Expectation_Error("Object");
+                            END_CASE
+                    END_EXPECT
+                    Parse_Paren_End();
+					break;
 
                 case NOW_TOKEN:
                     {

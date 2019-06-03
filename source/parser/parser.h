@@ -726,6 +726,7 @@ class Parser final
             int* m_tri,int* m_tex,int* m_vert,int* m_norm,
             int* n_tri,int* n_tex,int* n_vert,int* n_norm);
 
+        ObjectPtr Parse_Child(void);
     private:
 
         GenericMessenger&   mMessageFactory;
