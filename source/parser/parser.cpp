@@ -7307,6 +7307,10 @@ ObjectPtr Parser::Parse_Object ()
             Object = Parse_Tessel();
         END_CASE
 
+        CASE (CHILD_TOKEN)
+            Object = Parse_Child();
+        END_CASE
+
         CASE (OBJECT_TOKEN)
             Parse_Begin ();
             Object = Parse_Object ();
@@ -11232,6 +11236,42 @@ UCS2String Parser::BraceStackEntry::GetFileName() const
 }
 
 //******************************************************************************
+
+ObjectPtr Parser::Parse_Child()
+{
+	ObjectPtr Local,Object;
+    CompoundObject * compoundObject;
+	int Object_Index = 0;
+    Parse_Paren_Begin();
+    EXPECT_ONE
+        CASE(OBJECT_ID_TOKEN)
+            Object = CurrentTokenDataPtr<ObjectPtr>();// Safe due to CASE above
+            compoundObject = dynamic_cast<CompoundObject*>(Object);// try to specialise it
+            if (!compoundObject)
+                Error("Object is not Compound.");
+        END_CASE
+
+        OTHERWISE
+            Expectation_Error("Object (compound)");
+        END_CASE
+    END_EXPECT
+
+    Parse_Comma();
+	Object_Index = (int)Parse_Float();
+    Parse_Paren_End();
+
+	if (Object_Index < 0)
+		Error("index must be at least 0.");
+
+	if (Object_Index >= compoundObject->children.size())
+		Error("There is not enough children to reach that index value.");
+	Local = compoundObject->children[Object_Index];
+
+	Local = (ObjectPtr)Copy_Object(Local);
+	Local->Type &= ~IS_CHILD_OBJECT; /* drop the flag about being a child */
+	return Local;
+
+}
 
 }
 // end of namespace pov_parser
