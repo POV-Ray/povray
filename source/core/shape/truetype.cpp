@@ -353,6 +353,23 @@ struct TrueTypeInfo final
     std::vector<CMAPInfo*> cmapInfo;
 };
 
+GalleyInfo::GalleyInfo():
+  // default: do not cut word
+  wrap( false ),
+  thickness( 0.01 ),
+  indentation( 0 ),
+  // recommended value for typography: 120% for leading
+  leading( 1.2 ),
+  // one and a half of leading for spacing (could be 1, 1.5 or 2 leading)
+  spacing( 1.8 ),
+  // no default width: no wrapping
+  width( 0 )
+{
+}
+GalleyInfo::~GalleyInfo()
+{
+}
+
 /*****************************************************************************
 * Local variables
 ******************************************************************************/
@@ -713,6 +730,283 @@ void TrueType::ProcessNewTTF(CSG *Object, TrueTypeFont *ffile, const UCS2 *text_
     ffile->file = nullptr;
 }
 
+/*****************************************************************************
+*
+* FUNCTION
+*
+*   ProcessNewGalley
+*
+* INPUT
+*
+* OUTPUT
+*
+* RETURNS
+*
+* AUTHOR
+*
+*   Jerome Grimbert, based on processNewTTF from Alexander Enzmann
+*
+* DESCRIPTION
+*
+*   Takes an input string and a font filename, and creates a POV-Ray CSG
+*   object for each letter in the string.
+*
+* CHANGES
+*
+******************************************************************************/
+void TrueType::ProcessNewGalley(CSG *Object, TrueTypeFont *ffile, const UCS2 *text_string, const GalleyInfo& tunning )
+{
+    Vector3d local_offset, total_offset;
+    DBL depth = tunning.thickness;
+    TrueType *ttf;
+    DBL funit_size;
+    TTKernTable *table;
+    USHORT coverage;
+    unsigned int search_char;
+    GlyphIndex glyph_index, last_index = 0;
+    FWord kern_value_x, kern_value_min_x;
+    FWord kern_value_y, kern_value_min_y;
+    int i, j, k, l;
+    TRANSFORM Trans;
+
+    /* Get info about each character in the string */
+    total_offset = Vector3d(tunning.indentation, 0.0, 0.0);
+
+    for (i = 0, l = 0; text_string[i] != 0; i++)
+    {
+        search_char = (unsigned int)(text_string[i]);
+
+#ifdef TTF_DEBUG
+        Debug_Info("\nChar: '%c' (0x%X), Offset[%d]: <%g,%g,%g>\n", (char)search_char,
+            search_char, i, total_offset[X], total_offset[Y], total_offset[Z]);
+#endif
+        // do not display life-feed character, perform it
+        if (search_char == 0x00A)
+        {
+            l=0;
+            total_offset[X] = tunning.indentation;
+            total_offset[Y] -= tunning.spacing;
+            continue;
+        }
+        if (search_char == 0x020)
+        {
+            // do not display early space used for text wrapping
+            if ((tunning.width>0.0)&&(total_offset[X] > tunning.width))
+            {
+                total_offset[Y] -= tunning.leading;
+                total_offset[X] = 0;
+                l=0;
+                continue;
+            }
+            else if (l==0)
+            {// do not display space at start of any line
+                last_index = 0;// reset kerning
+                continue;
+            }
+        }
+        /* Make a new child for each character */
+        ttf = new TrueType();
+
+        /* Set the depth information for the character */
+        ttf->depth = depth;
+
+        /*
+         * Get pointers to the contour information for each character
+         * in the text string.
+         */
+        ttf->glyph = ProcessCharacter(ffile, search_char, &glyph_index);
+        funit_size = 1.0 / (DBL)(ffile->info->unitsPerEm);
+
+        /*
+         * Spacing based on the horizontal metric table, the kerning table,
+         * and (possibly) the previous glyph.
+         */
+        if (l == 0) /* Ignore spacing on the left for the first character only */
+        {
+            /* Shift the glyph to start at the origin */
+            total_offset[X] -= ttf->glyph->header.xMin * funit_size;
+
+            Compute_Translation_Transform(&Trans, total_offset);
+
+            ttf->Translate(total_offset, &Trans);
+
+            /* Shift next glyph by the width of this one excluding the left offset*/
+            total_offset[X] += (ffile->info->hmtx_table[ttf->glyph->myMetrics].advanceWidth -
+                    ffile->info->hmtx_table[ttf->glyph->myMetrics].lsb) * funit_size
+                + ttf->glyph->header.xMin * funit_size;
+
+            ++l;
+#ifdef TTF_DEBUG
+            Debug_Info("aw(%d): %g\n", i,
+                    (ffile->info->hmtx_table[ttf->glyph->myMetrics].advanceWidth -
+                     ffile->info->hmtx_table[ttf->glyph->myMetrics].lsb)*funit_size);
+#endif
+        }
+        else /* Kern all of the other characters */
+        {
+            kern_value_x = kern_value_y = 0;
+            kern_value_min_x = kern_value_min_y = -ffile->info->unitsPerEm;
+            local_offset = Vector3d(0.0, 0.0, 0.0);
+
+            for (j = 0; j < ffile->info->kerning_tables.nTables; j++)
+            {
+                table = ffile->info->kerning_tables.tables;
+                coverage = table->coverage;
+
+                /*
+                 * Don't use vertical kerning until such a time when we support
+                 * characters moving in the vertical direction...
+                 */
+                if (!(coverage & KERN_HORIZONTAL))
+                    continue;
+
+                /*
+                 * If we were keen, we could do a binary search for this
+                 * character combination, since the pairs are sorted in
+                 * order as if the left and right index values were a 32 bit
+                 * unsigned int (mostly - at least they are sorted on the
+                 * left glyph).  Something to do when everything else works...
+                 */
+                for (k = 0; k < table[j].nPairs; k++)
+                {
+                    if (table[j].kern_pairs[k].left == last_index &&
+                        table[j].kern_pairs[k].right == ttf->glyph->myMetrics)
+                    {
+#ifdef TTF_DEBUG2
+                        Debug_Info("Found a kerning for <%d, %d> = %d\n",
+                                   last_index, glyph_index, table[j].kern_pairs[k].value);
+#endif
+
+                        /*
+                         * By default, Windows & OS/2 assume at most a single table with
+                         * !KERN_MINIMUM, !KERN_CROSS_STREAM, KERN_OVERRIDE.
+                         */
+                        if (coverage & KERN_MINIMUM)
+                        {
+#ifdef TTF_DEBUG2
+                            Debug_Info(" KERN_MINIMUM\n");
+#endif
+                            if (coverage & KERN_CROSS_STREAM)
+                                kern_value_min_y = table[j].kern_pairs[k].value;
+                            else
+                                kern_value_min_x = table[j].kern_pairs[k].value;
+                        }
+                        else
+                        {
+                            if (coverage & KERN_CROSS_STREAM)
+                            {
+#ifdef TTF_DEBUG2
+                                Debug_Info(" KERN_CROSS_STREAM\n");
+#endif
+                                if (table[j].kern_pairs[k].value == (FWord)0x8000)
+                                {
+                                    kern_value_y = 0;
+                                }
+                                else
+                                {
+                                    if (coverage & KERN_OVERRIDE)
+                                        kern_value_y = table[j].kern_pairs[k].value;
+                                    else
+                                        kern_value_y += table[j].kern_pairs[k].value;
+                                }
+                            }
+                            else
+                            {
+#ifdef TTF_DEBUG2
+                                Debug_Info(" KERN_VALUE\n");
+#endif
+                                if (coverage & KERN_OVERRIDE)
+                                    kern_value_x = table[j].kern_pairs[k].value;
+                                else
+                                    kern_value_x += table[j].kern_pairs[k].value;
+                            }
+                        }
+                        break;
+                    }
+                    /* Abort now if we have passed all potential matches */
+                    else if (table[j].kern_pairs[k].left > last_index)
+                    {
+                        break;
+                    }
+                }
+            }
+            kern_value_x = (kern_value_x > kern_value_min_x ?
+                            kern_value_x : kern_value_min_x);
+            kern_value_y = (kern_value_y > kern_value_min_y ?
+                            kern_value_y : kern_value_min_y);
+
+            /*
+             * Offset this character so that the left edge of the glyph is at
+             * the previous offset + the lsb + any kerning amount.
+             */
+            local_offset[X] = total_offset[X] +
+                (DBL)(ffile->info->hmtx_table[ttf->glyph->myMetrics].lsb -
+                        ttf->glyph->header.xMin + kern_value_x) * funit_size;
+            local_offset[Y] = total_offset[Y] + (DBL)kern_value_y * funit_size;
+
+            /* Translate this glyph to its final position in the string */
+            Compute_Translation_Transform(&Trans, local_offset);
+
+            ttf->Translate(local_offset, &Trans);
+
+            /* Shift next glyph by the width of this one + any kerning amount */
+            DBL extra = (ffile->info->hmtx_table[ttf->glyph->myMetrics].advanceWidth +kern_value_x) * funit_size;
+            total_offset[X] += extra;
+            ++l;
+
+            /* imperfect but should be enough: if the current addition could not be repeated
+             * without getting past the limit, it's time to wrap
+             *
+             * works fine with monospaced font without kerning
+             * for variable spaced font with heavy kerning, it is simple enough for
+             * non-patological cases
+             */
+            if ((tunning.width>0.0)&&(total_offset[X]+extra > tunning.width))
+            {
+                // either  cut word, or use late space for text wrapping
+                if ((tunning.wrap) ||(search_char== 0x020))
+                {
+                    l=0;
+                    total_offset[Y]-= tunning.leading;
+                    total_offset[X] = 0;
+                }
+            }
+
+#ifdef TTF_DEBUG
+            Debug_Info("kern(%d): <%d, %d> (%g,%g)\n", i, last_index, glyph_index,
+                       (DBL)kern_value_x*funit_size, (DBL)kern_value_y * funit_size);
+            Debug_Info("lsb(%d): %g\n", i,
+                       (DBL)ffile->info->hmtx_table[glyph->myMetrics].lsb * funit_size);
+            Debug_Info("aw(%d): %g\n", i,
+                       (DBL)ffile->info->hmtx_table[glyph->myMetrics].advanceWidth *
+                       funit_size);
+#endif
+        }
+
+        /* Link this glyph with the others in the union */
+        Object->Type |= (ttf->Type & CHILDREN_FLAGS);
+        ttf->Type |= IS_CHILD_OBJECT;
+        Object->children.push_back(ttf);
+
+        last_index = glyph_index;
+    }
+
+#ifdef TTF_DEBUG
+    // TODO - text_string is an UCS2 strings, while Debug_Info will expect char strings.
+    #error "broken code"
+    if (!filename.empty())
+    {
+        Debug_Info("TTF parsing of \"%s\" from %s complete\n", text_string, filename.c_str());
+    }
+    else
+    {
+        Debug_Info("TTF parsing of \"%s\" from builtin %d complete\n", text_string, font_id);
+    }
+#endif
+
+    /* Close the font file descriptor */
+    ffile->file = nullptr;
+}
 /*****************************************************************************
 *
 * FUNCTION

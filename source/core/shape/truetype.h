@@ -98,6 +98,20 @@ struct TrueTypeFont final
     TrueTypeInfo*       info;
 };
 
+/// data for galley
+struct GalleyInfo final
+{
+  GalleyInfo();
+  ~GalleyInfo();
+
+  bool wrap;///< when true, wrapping can cut words; when false, wrapping occurs at next space
+  DBL  thickness;///< depth of the letters
+  DBL  indentation;///< in pov-unit, the distance the first letter of a paragraph is shifted, negative for more left
+  DBL  leading;///< in pov-unit, the distance between two wrapped lines of text
+  DBL  spacing;///< in pov-unit, the distance between two lines of text separated by a line feed (paragraphs)
+  DBL  width;///< in pov-unit, the width of desired normal line of text, 0 disables wrapping
+};
+
 class TrueType final : public ObjectBase
 {
     public:
@@ -119,6 +133,7 @@ class TrueType final : public ObjectBase
         virtual void Compute_BBox() override;
 
         static void ProcessNewTTF(CSG *Object, TrueTypeFont* font, const UCS2 *text_string, DBL depth, const Vector3d& offset);
+        static void ProcessNewGalley(CSG *Object, TrueTypeFont* font, const UCS2 *text_string, const GalleyInfo& tunning);
     protected:
         bool Inside_Glyph(double x, double y, const GlyphStruct* glyph) const;
         int solve_quad(double *x, double *y, double mindist, DBL maxdist) const;

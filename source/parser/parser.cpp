@@ -6952,6 +6952,113 @@ ObjectPtr Parser::Parse_TrueType ()
     return (reinterpret_cast<ObjectPtr>(Object));
 }
 
+//******************************************************************************
+
+ObjectPtr Parser::Parse_Galley ()
+{
+    ObjectPtr Object;
+    char *filename = nullptr;
+    UCS2 *text_string;
+    GalleyInfo tunning;
+    int builtin_font = 0;
+    POV_UINT32 cmap;
+    CharsetID charset;
+    LegacyCharset legacyCharset;
+
+
+    legacyCharset = LegacyCharset::kUnspecified;
+
+    Parse_Begin ();
+
+    Object = reinterpret_cast<ObjectPtr>(Parse_Object_Id());
+    if (Object != nullptr)
+        return (reinterpret_cast<ObjectPtr>(Object));
+
+    EXPECT_ONE
+        CASE(TTF_TOKEN)
+            filename = Parse_C_String(true);
+        END_CASE
+        CASE(INTERNAL_TOKEN)
+            builtin_font = (int)Parse_Float();
+        END_CASE
+        OTHERWISE
+            Expectation_Error ("ttf or internal");
+        END_CASE
+    END_EXPECT
+
+    cmap = TrueTypeFont::kAnyCMAP;
+    charset = CharsetID::kUndefined;
+    if (AllowToken(CMAP_TOKEN))
+    {
+        Warning("Text primitive 'cmap' extension is experimental and may be "
+                "subject to future changes.");
+        Parse_Begin();
+        cmap =  POV_UINT16(Parse_Float()) << 16;
+        Parse_Comma();
+        cmap += POV_UINT16(Parse_Float());
+        charset = CharsetID::kUCS4;
+        if (AllowToken(CHARSET_TOKEN))
+        {
+            charset = CharsetID(POV_UINT16(Parse_Float()));
+            if (Charset::Get(charset) == nullptr)
+                Error("Unknown character set %i", int(charset));
+        }
+        Parse_End();
+    }
+
+    EXPECT
+        CASE(THICKNESS_TOKEN)
+            tunning.thickness = Parse_Float();
+        END_CASE
+        CASE(INDENTATION_TOKEN)
+            tunning.indentation = Parse_Float();
+        END_CASE
+        CASE(LEADING_TOKEN)
+            tunning.leading = Parse_Float();
+        END_CASE
+        CASE(SPACING_TOKEN)
+            tunning.spacing = Parse_Float();
+        END_CASE
+        CASE(WIDTH_TOKEN)
+            tunning.width = Parse_Float();
+        END_CASE
+        CASE(WRAP_TOKEN)
+            tunning.wrap = Parse_Float();
+        END_CASE
+        OTHERWISE
+            UNGET
+            EXIT
+        END_CASE
+    END_EXPECT
+
+    /*** Object = Create_TTF(); */
+
+    /* Parse the text string to be rendered */
+    text_string = Parse_String();
+
+    /* Open the font file */
+    TrueTypeFont* font = OpenFontFile(filename, builtin_font, cmap, charset, legacyCharset);
+
+    /* Process all this good info */
+    Object = new CSGUnion();
+    TrueType::ProcessNewGalley(reinterpret_cast<CSG *>(Object), font, text_string, tunning );
+    if (filename)
+    {
+        /* Free up the filename  */
+        POV_FREE (filename);
+    }
+
+    /* Free up the text string memory */
+    POV_FREE (text_string);
+
+    /**** Compute_TTF_BBox(Object); */
+    Object->Compute_BBox();
+
+    /* Get any rotate/translate or texturing stuff */
+    Object = Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+
+    return (reinterpret_cast<ObjectPtr>(Object));
+}
 
 /*****************************************************************************
 *
@@ -7180,6 +7287,10 @@ ObjectPtr Parser::Parse_Object ()
 
         CASE (TEXT_TOKEN)
             Object = Parse_TrueType ();
+        END_CASE
+
+        CASE (GALLEY_TOKEN)
+            Object = Parse_Galley ();
         END_CASE
 
         CASE (OBJECT_ID_TOKEN)

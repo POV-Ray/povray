@@ -906,6 +906,7 @@ class Parser final
 
         TEXTURE *Parse_Mesh_Texture(TEXTURE **t2, TEXTURE **t3);
         ObjectPtr Parse_TrueType(void);
+        ObjectPtr Parse_Galley(void);
         void Parse_Blob_Element_Mods(Blob_Element *Element);
 
         TrueTypeFont *OpenFontFile(const char *asciifn, int font_id, POV_UINT32 cmap, CharsetID charset,

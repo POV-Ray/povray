@@ -287,6 +287,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { FUNCTION_TOKEN,               "function" },
 
     { GALL_TOKEN,                   "gall" },
+    { GALLEY_TOKEN,                 "galley" },
     { GAMMA_TOKEN,                  "gamma" },
     { GATHER_TOKEN,                 "gather" },
     { GENERAL_X_SPLINE_TOKEN,       "general_x_spline" },  
@@ -333,6 +334,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { IMPORTANCE_TOKEN,             "importance" },
     { INBOUND_TOKEN,                "inbound" },
     { INCLUDE_TOKEN,                "include" },
+    { INDENTATION_TOKEN,            "indentation" },
     { INNER_TOKEN,                  "inner" },
     { INSIDE_TOKEN,                 "inside" },
     { INSIDE_POINT_TOKEN,           "inside_point" },
@@ -364,6 +366,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { LAMBERTAZIMUTHAL_TOKEN,       "lambert_azimuthal" },
     { LAMBERTCYLINDRICAL_TOKEN,     "lambert_cylindrical" },   
     { LATHE_TOKEN,                  "lathe" },
+    { LEADING_TOKEN,                "leading" },
     { LEMON_TOKEN,                  "lemon" },
     { LEOPARD_TOKEN,                "leopard" },
     { LIGHT_GROUP_TOKEN,            "light_group" },
@@ -718,6 +721,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { WIDTH_TOKEN,                  "width" },
     { WITH_TOKEN,                   "with" },
     { WOOD_TOKEN,                   "wood" },
+    { WRAP_TOKEN,                   "wrap" },
     { WRINKLES_TOKEN,               "wrinkles" },
     { WRITE_TOKEN,                  "write" },
 
