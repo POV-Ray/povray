@@ -4480,6 +4480,7 @@ void Parser::Parse_Warp (WarpList& warps)
     SphericalWarp *SphereW;
     ToroidalWarp *Toroidal;
     PlanarWarp *PlanarW;
+    RotateWarp *RotateW; 
 
     Parse_Begin();
 
@@ -4693,6 +4694,11 @@ void Parser::Parse_Warp (WarpList& warps)
         // JN2007: Cubic warp
         CASE(CUBIC_TOKEN)
             New = new CubicWarp();
+        END_CASE
+
+        CASE(ROTATE_TOKEN)
+            New = RotateW = new RotateWarp();
+            RotateW->twoPiPerUnit  = TWO_M_PI * Allow_Float(1.0);
         END_CASE
 
         OTHERWISE

@@ -558,6 +558,19 @@ bool GenericTurbulenceWarp::WarpPoint(Vector3d& TPoint) const
     return true;
 }
 
+bool RotateWarp::WarpPoint(Vector3d& EPoint) const
+{
+    DBL x = EPoint[X];
+    DBL y = EPoint[Y];
+    DBL z = EPoint[Z];
+    DBL theta = z * twoPiPerUnit;
+    DBL c = cos( theta );
+    DBL s = sin( theta );
+    // z is unmodified, do not make a matrix for a simple rotation
+    EPoint[X] = x * c - y * s;
+    EPoint[Y] = x * s + y * c;
+    return true;
+}
 
 
 void Warp_Normal (Vector3d& TNorm, const Vector3d& ENorm, const TPATTERN *TPat, bool DontScaleBumps)
@@ -598,6 +611,7 @@ bool RepeatWarp::WarpNormal(Vector3d& TNorm) const              { /* Error("Repe
 bool SphericalWarp::WarpNormal(Vector3d& TNorm) const           { /* Error("Spherical Warp not yet implemented for normals"); */    return false; }
 bool ToroidalWarp::WarpNormal(Vector3d& TNorm) const            { /* Error("Toroidal Warp not yet implemented for normals"); */     return false; }
 bool GenericTurbulenceWarp::WarpNormal(Vector3d& TNorm) const   { /* Error("Turbulence Warp not yet implemented for normals"); */   return false; }
+bool RotateWarp::WarpNormal(Vector3d& TNorm) const              { /* Error("Rotate Warp not yet implemented for normals"); */       return false; }
 
 
 void UnWarp_Normal (Vector3d& TNorm, const Vector3d& ENorm, const TPATTERN *TPat, bool DontScaleBumps)
@@ -638,6 +652,7 @@ bool RepeatWarp::UnwarpNormal(Vector3d& TNorm) const            { /* Error("Repe
 bool SphericalWarp::UnwarpNormal(Vector3d& TNorm) const         { /* Error("Spherical Warp not yet implemented for normals"); */    return false; }
 bool ToroidalWarp::UnwarpNormal(Vector3d& TNorm) const          { /* Error("Toroidal Warp not yet implemented for normals"); */     return false; }
 bool GenericTurbulenceWarp::UnwarpNormal(Vector3d& TNorm) const { /* Error("Turbulence Warp not yet implemented for normals"); */   return false; }
+bool RotateWarp::UnwarpNormal(Vector3d& TNorm) const            { /* Error("Rotate Warp not yet implemented for normals"); */       return false; }
 
 
 /*****************************************************************************
