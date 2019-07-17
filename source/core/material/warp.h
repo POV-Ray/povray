@@ -291,7 +291,19 @@ struct ClassicTurbulence final : public GenericTurbulenceWarp
     bool handledByPattern;
 };
 
+/// rotate/screw warp
+struct RotateWarp final : public GenericWarp
+{
+    RotateWarp() : GenericWarp(), twoPiPerUnit( TWO_M_PI ) {}
+    RotateWarp(const RotateWarp& old) : GenericWarp(old), twoPiPerUnit(old.twoPiPerUnit) {}
 
+    virtual GenericWarp* Clone() const override { return new RotateWarp(*this); }
+    virtual bool WarpPoint(Vector3d& rP) const override;
+    virtual bool WarpNormal(Vector3d& rN) const override;
+    virtual bool UnwarpNormal(Vector3d& rN) const override;
+
+    float twoPiPerUnit;
+};
 /*****************************************************************************
 * Global functions
 ******************************************************************************/
