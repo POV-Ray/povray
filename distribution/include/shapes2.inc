@@ -29,9 +29,9 @@
 #declare Tetrahedron =
  intersection 
   {plane {-y,1}
-   plane {-z,1 rotate <19.47,    0, 0>}
-   plane {-z,1 rotate <19.47, -120, 0>}
-   plane {-z,1 rotate <19.47,  120, 0>}
+   plane {-z,1 rotate <19.47122063449,    0, 0>}
+   plane {-z,1 rotate <19.47122063449, -120, 0>}
+   plane {-z,1 rotate <19.47122063449,  120, 0>}
    
    bounded_by {sphere {0, 3}}
   }
@@ -73,29 +73,29 @@
    
 #declare Icosahedron = 
  intersection 
-  {plane {-z, 1 rotate <52.6625,    0, 0>}
-   plane {-z, 1 rotate <52.6625,  -72, 0>}
-   plane {-z, 1 rotate <52.6625, -144, 0>}
-   plane {-z, 1 rotate <52.6625, -216, 0>}
-   plane {-z, 1 rotate <52.6625, -288, 0>}
+  {plane {-z, 1 rotate <52.62263185935,    0, 0>}
+   plane {-z, 1 rotate <52.62263185935,  -72, 0>}
+   plane {-z, 1 rotate <52.62263185935, -144, 0>}
+   plane {-z, 1 rotate <52.62263185935, -216, 0>}
+   plane {-z, 1 rotate <52.62263185935, -288, 0>}
    
-   plane {-z, 1 rotate <10.8125,    0, 0>}
-   plane {-z, 1 rotate <10.8125,  -72, 0>}
-   plane {-z, 1 rotate <10.8125, -144, 0>}
-   plane {-z, 1 rotate <10.8125, -216, 0>}
-   plane {-z, 1 rotate <10.8125, -288, 0>}
+   plane {-z, 1 rotate <10.81231696357,    0, 0>}
+   plane {-z, 1 rotate <10.81231696357,  -72, 0>}
+   plane {-z, 1 rotate <10.81231696357, -144, 0>}
+   plane {-z, 1 rotate <10.81231696357, -216, 0>}
+   plane {-z, 1 rotate <10.81231696357, -288, 0>}
    
-   plane {-z, 1 rotate <-52.6625,  -36, 0>}
-   plane {-z, 1 rotate <-52.6625, -108, 0>}
-   plane {-z, 1 rotate <-52.6625, -180, 0>}
-   plane {-z, 1 rotate <-52.6625, -252, 0>}
-   plane {-z, 1 rotate <-52.6625, -324, 0>}
+   plane {-z, 1 rotate <-52.62263185935,  -36, 0>}
+   plane {-z, 1 rotate <-52.62263185935, -108, 0>}
+   plane {-z, 1 rotate <-52.62263185935, -180, 0>}
+   plane {-z, 1 rotate <-52.62263185935, -252, 0>}
+   plane {-z, 1 rotate <-52.62263185935, -324, 0>}
    
-   plane {-z, 1 rotate <-10.8125,  -36, 0>}
-   plane {-z, 1 rotate <-10.8125, -108, 0>}
-   plane {-z, 1 rotate <-10.8125, -180, 0>}
-   plane {-z, 1 rotate <-10.8125, -252, 0>}
-   plane {-z, 1 rotate <-10.8125, -324, 0>}
+   plane {-z, 1 rotate <-10.81231696357,  -36, 0>}
+   plane {-z, 1 rotate <-10.81231696357, -108, 0>}
+   plane {-z, 1 rotate <-10.81231696357, -180, 0>}
+   plane {-z, 1 rotate <-10.81231696357, -252, 0>}
+   plane {-z, 1 rotate <-10.81231696357, -324, 0>}
    
    bounded_by {sphere {0, 1.2585}}
   }
