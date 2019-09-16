@@ -238,10 +238,10 @@ void ViewData::getBlockXY(const unsigned int nb, unsigned int &x, unsigned int &
                  unsigned int west = 0;
                  unsigned int north = 0;
                  /*
-                 ** abs are not needed here, but they are needed inside the loop, 
+                 ** labs are not needed here, but they are needed inside the loop, 
                  ** so use the same formula to keep it simple
                  */
-                 unsigned long perimeter = std::abs<long>(south-north)*2+std::abs<long>(east-west)*2;
+                 unsigned long perimeter = std::labs(long(south)-long(north))*2+std::labs(long(east)-long(west))*2;
                  while(neo_nb >= perimeter)
                  {
                      neo_nb -= perimeter;
@@ -249,7 +249,8 @@ void ViewData::getBlockXY(const unsigned int nb, unsigned int &x, unsigned int &
                      --east;
                      ++north;
                      ++west;
-                     perimeter = std::abs<long>(south-north)*2+std::abs<long>(east-west)*2;
+                     // using labs instead of std::abs<long>
+                     perimeter = std::labs(long(south)-long(north))*2+std::labs(long(east)-long(west))*2;
                  }
                  if ((east>west)&&(south>north))
                  {
