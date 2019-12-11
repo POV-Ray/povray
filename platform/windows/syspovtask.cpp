@@ -59,22 +59,6 @@ void WinMemThreadCleanup();
 namespace vfePlatform
 {
 
-// TODO - Maybe move this somewhere else as well.
-static unsigned int GetNumberofCPUs (void)
-{
-    SYSTEM_INFO         sysinfo;
-    static unsigned int result = 0;
-
-    // we cache the result, since this function is called on each thread startup
-    // TODO - this isn't ideal on systems with hot-pluggable CPUs
-    if (result != 0)
-      return result;
-
-    GetSystemInfo (&sysinfo) ;
-    result = sysinfo.dwNumberOfProcessors;
-    return result;
-}
-
 }
 // end of namespace vfeplatform
 
@@ -91,12 +75,6 @@ using namespace vfePlatform;
 
 void Task::Initialize ()
 {
-    // NB This is not thread-safe, but we currently don't care.
-    static volatile unsigned int count = 0;
-    unsigned int numCPUs = GetNumberofCPUs();
-    // TODO - if numCPUs > 64, we need to do more than this
-    if (numCPUs > 1)
-        SetThreadIdealProcessor (GetCurrentThread(), (count++) % numCPUs);
 #ifndef _CONSOLE
     povwin::WinMemThreadStartup();
 #endif

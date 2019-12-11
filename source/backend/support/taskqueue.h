@@ -128,6 +128,8 @@ class TaskQueue final
         int failed;
         /// wait for data in queue or related operation to be processed
         std::condition_variable_any processCondition;
+	/// next task index.
+	int nextTaskIndex;
 
         TaskQueue(const TaskQueue&) = delete;
         TaskQueue& operator=(const TaskQueue&) = delete;

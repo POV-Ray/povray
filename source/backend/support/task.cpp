@@ -58,6 +58,9 @@
 #include "backend/control/messagefactory.h"
 #include "backend/scene/backendscenedata.h"
 
+// Support for processor groups.
+#include "processorGroups.h"
+
 // this must be the last file included
 #include "base/povdebug.h"
 
@@ -77,7 +80,8 @@ Task::Task(ThreadData *td, const boost::function1<void, Exception&>& f) :
     realTime(-1),
     cpuTime(-1),
     taskThread(nullptr),
-    povmsContext(nullptr)
+    povmsContext(nullptr),
+    taskIndex(-1)
 {
     if (td == nullptr)
         throw POV_EXCEPTION_STRING("Internal error: TaskData is NULL in Task constructor");
@@ -171,7 +175,9 @@ POV_LONG Task::ElapsedThreadCPUTime() const
 }
 
 void Task::TaskThread(const boost::function0<void>& completion)
-{
+{	
+    processorGroups::SetThreadAffinity(taskIndex);
+
     int result;
 
     if((result = POVMS_OpenContext(&povmsContext)) != kNoErr)
