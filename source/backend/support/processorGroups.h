@@ -1,3 +1,4 @@
+#if defined (_WIN32) || defined (_WIN64) || defined (WIN32) || defined (WIN64)
 #ifndef POVRAY_BACKEND_PROCESSORGROUPS_H
 #define POVRAY_BACKEND_PROCESSORGROUPS_H
 
@@ -30,4 +31,5 @@ namespace pov
 	}
 }
 
+#endif
 #endif

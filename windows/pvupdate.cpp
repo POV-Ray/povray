@@ -43,8 +43,9 @@
 #include <stdio.h>
 
 #include "pvengine.h"
+#if defined (_WIN32) || defined (_WIN64) || defined (WIN32) || defined (WIN64)
 #include "backend/support/processorGroups.h"
-
+#endif
 // this must be the last file included
 #include "syspovdebug.h"
 

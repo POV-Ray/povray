@@ -58,9 +58,10 @@
 #include "backend/control/messagefactory.h"
 #include "backend/scene/backendscenedata.h"
 
+#if defined (_WIN32) || defined (_WIN64) || defined (WIN32) || defined (_WIN32)
 // Support for processor groups.
 #include "processorGroups.h"
-
+#endif
 // this must be the last file included
 #include "base/povdebug.h"
 
@@ -176,8 +177,9 @@ POV_LONG Task::ElapsedThreadCPUTime() const
 
 void Task::TaskThread(const boost::function0<void>& completion)
 {	
+#if defined (_WIN32) || defined (_WIN64) || defined (WIN32) || defined (WIN64)
     processorGroups::SetThreadAffinity(taskIndex);
-
+#endif
     int result;
 
     if((result = POVMS_OpenContext(&povmsContext)) != kNoErr)
