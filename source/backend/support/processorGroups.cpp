@@ -1,3 +1,5 @@
+#if defined (_WIN32) || defined (_WIN64) || defined (WIN32) || defined (_WIN32)
+
 #include <mutex>
 #include <Windows.h>
 #include "processorGroups.h"
@@ -100,3 +102,4 @@ namespace pov
 		}
 	}
 }
+#endif

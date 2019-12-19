@@ -34,9 +34,9 @@
 //******************************************************************************
 
 #include "syspovtask.h"
-
+#if defined (_WIN32) || defined (_WIN64) || defined (WIN32) || defined (_WIN32)
 #include <windows.h>
-
+#endif
 // this must be the last file included
 #include "base/povdebug.h"
 
