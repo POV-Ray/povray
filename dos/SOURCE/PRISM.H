@@ -4,7 +4,7 @@
 *  This module contains all defines, typedefs, and prototypes for PRISM.C.
 *
 *  from Persistence of Vision(tm) Ray Tracer
-*  Copyright 1996,1999 Persistence of Vision Team
+*  Copyright 1996,1998 Persistence of Vision Team
 *---------------------------------------------------------------------------
 *  NOTICE: This source code file is provided so that users may experiment
 *  with enhancements to POV-Ray and to port the software to platforms other
@@ -12,8 +12,8 @@
 *  which you are permitted to use this file.  The rules are in the file
 *  named POVLEGAL.DOC which should be distributed with this file.
 *  If POVLEGAL.DOC is not available or for more info please contact the POV-Ray
-*  Team Coordinator by email to team-coord@povray.org or visit us on the web at
-*  http://www.povray.org. The latest version of POV-Ray may be found at this site.
+*  Team Coordinator by leaving a message in CompuServe's GO POVRAY Forum or visit
+*  http://www.povray.org. The latest version of POV-Ray may be found at these sites.
 *
 * This program is based on the popular DKB raytracer version 2.12.
 * DKBTrace was originally written by David K. Buck.

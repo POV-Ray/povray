@@ -4,7 +4,7 @@
 *  This file implements a simple IFF format file reader.
 *
 *  from Persistence of Vision(tm) Ray Tracer
-*  Copyright 1996,1999 Persistence of Vision Team
+*  Copyright 1996,1998 Persistence of Vision Team
 *---------------------------------------------------------------------------
 *  NOTICE: This source code file is provided so that users may experiment
 *  with enhancements to POV-Ray and to port the software to platforms other
@@ -12,14 +12,13 @@
 *  which you are permitted to use this file.  The rules are in the file
 *  named POVLEGAL.DOC which should be distributed with this file.
 *  If POVLEGAL.DOC is not available or for more info please contact the POV-Ray
-*  Team Coordinator by email to team-coord@povray.org or visit us on the web at
-*  http://www.povray.org. The latest version of POV-Ray may be found at this site.
+*  Team Coordinator by leaving a message in CompuServe's GO POVRAY Forum or visit
+*  http://www.povray.org. The latest version of POV-Ray may be found at these sites.
 *
 * This program is based on the popular DKB raytracer version 2.12.
 * DKBTrace was originally written by David K. Buck.
 * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
 *
-* Modifications by Hans-Detlev Fink, January 1999, used with permission
 *****************************************************************************/
 
 #include "frame.h"
@@ -289,7 +288,6 @@ void Read_Iff_Image(IMAGE *Image, char *filename)
   if ((f = Locate_File(filename, READ_BINFILE_STRING, ".iff", ".IFF",NULL,TRUE)) == NULL)
   {
     Error("Error opening IFF image.\n");
-    return;	/* -hdf99- */
   }
 
   Previous_Red = Previous_Green = Previous_Blue = 0;
@@ -574,10 +572,9 @@ void Read_Iff_Image(IMAGE *Image, char *filename)
 
           POV_FREE(row_bytes);
         }
-        if (f != NULL)		/* -hdf99- */
-        {
-          fclose(f);
-        }
+
+        fclose(f);
+
         return;
 
       default:

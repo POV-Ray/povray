@@ -4,7 +4,7 @@
 *  This module contains the code to read and write the PNG output file
 *
 *  from Persistence of Vision(tm) Ray Tracer
-*  Copyright 1996,1999 Persistence of Vision Team
+*  Copyright 1996,1998 Persistence of Vision Team
 *---------------------------------------------------------------------------
 *  NOTICE: This source code file is provided so that users may experiment
 *  with enhancements to POV-Ray and to port the software to platforms other
@@ -12,8 +12,8 @@
 *  which you are permitted to use this file.  The rules are in the file
 *  named POVLEGAL.DOC which should be distributed with this file.
 *  If POVLEGAL.DOC is not available or for more info please contact the POV-Ray
-*  Team Coordinator by email to team-coord@povray.org or visit us on the web at
-*  http://www.povray.org. The latest version of POV-Ray may be found at this site.
+*  Team Coordinator by leaving a message in CompuServe's GO POVRAY Forum or visit
+*  http://www.povray.org. The latest version of POV-Ray may be found at these sites.
 *
 * This program is based on the popular DKB raytracer version 2.12.
 * DKBTrace was originally written by David K. Buck.
@@ -26,8 +26,6 @@
 * Updated to set the flush distance based on the file buffer size, Dec 1995
 * Updated to use the libpng 0.87 messaging functions, Dec 1995
 * Updated to use the libpng 0.89 structure interface, Jun 1996
-*
-* Modifications by Hans-Detlev Fink, January 1999, used with permission
 *
 *****************************************************************************/
 
@@ -1380,7 +1378,6 @@ void Read_Png_Image(IMAGE *Image, char *name)
   if ((filep = Locate_File(name, READ_BINFILE_STRING, ".png", ".PNG",NULL,TRUE)) == NULL)
   {
     Error("Error opening PNG file.\n");
-    return;	/* -hdf99- */
   }
 
   if ((r_png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
@@ -1388,7 +1385,6 @@ void Read_Png_Image(IMAGE *Image, char *name)
       (r_info_ptr = png_create_info_struct(r_png_ptr)) == NULL)
   {
     Error("Error allocating PNG data structures");
-    return;	/* -hdf99- */
   }
 
   if (setjmp(r_png_ptr->jmpbuf))
@@ -1397,7 +1393,6 @@ void Read_Png_Image(IMAGE *Image, char *name)
 
     png_destroy_read_struct(&r_png_ptr, &r_info_ptr, (png_infopp)NULL);
     Error("Error reading PNG image.");
-    return;	/* -hdf99- */
   }
 
   /* set up the input control */

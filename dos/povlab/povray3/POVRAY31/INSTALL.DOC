@@ -1,0 +1,63 @@
+                     PERSISTENCE OF VISION RAY TRACER
+
+                            POV-Ray VERSION 3.1
+
+                   INSTALLATION INSTRUCTIONS FOR MS-Dos
+
+
+This file describes how to run the installation program for POV-Ray for 
+MS-Dos.  It is not the full documentation for the program.
+
+These procedures assume you have a basic knowledge of how to work with 
+directories and files under dos.  It assumes you know what the dos path is 
+and how to edit your autoexec.bat file to change the path.  The install
+program will offer to do it for you but if something goes wrong you may
+need to change it yourself.  If you do not have knowledge about directories, 
+paths, batch files or editors, your local bookstore has many tutorial books 
+available that will help you.  Don't be intimidated by the insulting titles 
+of such books.  The only true "dummies" are those who give up trying.
+
+If you have obtained this program on CD-ROM, it may already be set up so 
+you can run it directly from the CD-ROM.  These instructions assume that 
+you will be installing the full package on your hard drive and not running 
+it directly from the CD-ROM.  
+
+You should have obtained this file from a self-extracting archive called
+POVMSDOS.EXE or something very similar.  If you followed its banner 
+instructions, you created a temporary directory and ran the self-extraction
+there.  It should have created at least the following files:
+
+ POVMSDOS.ZIP  INSTALL.DOC  INSTALL.EXE  INSTALL.001  EXTERNAL.LNG
+ FILE_ID.DIZ
+
+If any of these files are missing, you have received an incomplete package.  
+Please notify the place where you obtained this package that distribution 
+of an incomplete package is a violation of our license in the file 
+POVLEGAL.DOC and makes them subject to litigation.
+
+If it created other files, that's probably no problem.
+
+Type the word INSTALL and press [ENTER].  This will run the program
+INSTALL.EXE which will ask you for the drive and directory where POV-Ray
+is actually to be installed.  It will decompress the compressed files.  
+It will offer to update your path in your autoexec.bat for you.
+You will have to re-boot your computer so the new path will take effect.
+If you do not want POV-Ray installed in your path then you have other
+options which are described in POVMSDOS.DOC which will appear in the
+installed directory.
+
+When installation is complete, please read POVMSDOS.DOC to learn how to
+run your first sample scene.  The file includes important information about 
+POV-Ray that is specific to the MS-Dos version of POV-Ray.  It will 
+explain display options, how to use the sample batch files, how to use 
+other utilities with POV-Ray and other interesting information.
+
+If the sample scenes work with no problem, you may delete the all of the 
+files in this temporary directory.  Specifically these files are no longer 
+needed:
+
+ POVMSDOS.ZIP  INSTALL.DOC  INSTALL.EXE  INSTALL.001  EXTERNAL.LNG
+ FILE_ID.DIZ
+
+You should probably keep POVMSDOS.EXE around in case you ever need to 
+re-install the program.

@@ -1,0 +1,99 @@
+
+                          METALS.INC
+
+This file contains the texture definitions for most of the predefined
+metallic textures.  Please read GOLD.DOC for special information on
+using or modifying the gold textures!  Textures available through
+metals.inc are:
+
+    BRASSES : Actually contains both brasses (yellowish) and bronzes
+              (brownish) metals.
+    COPPERS : Several different varieties of copper.
+    CHROMES : Dull iron to shiny chrome.
+    SILVERS : Not much different from chromes, but there are some
+              slight color differences.
+    GOLDS   : The best for general use are found near the "middle"
+              (T_Gold_3C would be the exact "middle") of the
+              pigment/finish range.
+
+BRASSES.INC, CHROMES.INC, SILVERS.INC, and COPPERS.INC
+=========================================================
+All brasses, coppers, silvers, and chromes, but not golds, share a
+common set of finishes.  These finishes are also accessable by
+themselves for use in your own textures.  The finishes are:
+
+    F_MetalA  :  Very soft and dull.
+    F_MetalB  :  Fairly soft and dull.
+    F_MetalC  :  Medium reflectivity. Holds color well.
+    F_MetalD  :  Highly hard and polished. High reflectivity.
+    F_MetalE  :  Very highly polished & reflective.
+
+A set of five pigments for each type of metal are defined, numbered from
+1 to 5, as in "P_Copper1".
+
+These five pigments are combined with all five finishes, giving five
+different version of each pigment, yeilding twenty-five different
+varieties of each metal type.  These textures use a "T_" prefix, and the
+name combines the pigment number and the finish letter:
+
+    T_Copper_1A
+    T_Copper_1B
+    T_Copper_2A
+    T_Silver_3C
+    T_Brass_5F
+    (etc.)
+
+GOLDS.INC
+=========
+The gold metallics had to use a slightly different method. To achieve the
+desired level of realism, special ambient and reflective colors were
+used, based on the pigment.  If you wish to create your own gold textures,
+copy gold.inc to gold2.inc, and modify the GoldBase pigment.
+
+
+The Test Scenes
+===============
+There are five test scenes here: brasses.pov, coppers.pov, chromes.pov,
+golds.pov, and silvers.pov, that demonstrate the five predefined
+metallics groupings.
+
+At the bottom of each is a pair of #include statements, one
+of which will be commented out.  The first,  STAGE_XY.INC, displays the
+test objects in row/column order in the Z plane, whereas STAGE_XZ.INC
+displays the same objects in row/column order on the Y plane.  Since
+metallic textures vary considerably depending on the environment, it is
+suggested that you try both.
+
+The STAGE_XY.INC finishes vary from left to right (columns), while
+the pigments go from top to bottom (rows). In other words, the T_Brass_1A
+example would be at the upper left corner, while the T_Brass_5D example
+would be in the lower right corner.)
+
+The STAGE_XZ.INC finishes also vary from left to right, and the pigments go
+from back to front (ie: T_Brass_1A would be at the left rear corner,
+T_Brass_5D would be in the right front corner.)
+
+A Hint:
+=======
+Both STAGE_.INC files use POV-Ray's new sky sphere using a gradient that
+fades from light to dark gray, which gives an added (but perhaps unfair)
+degree of realism because of the nice sky gradient that gets reflected
+in the metal surfaces.  You may also wish to try with a simple flat
+background if you want to accurately compare with POV-Ray 2.x metal textures.
+
+Synopsis:
+=========
+METALS.INC is the result of studying the current metal textures and a
+few other good ones that we've collected in the past year and doing our
+best at determining what they have in common.  We originally came up with
+nine finishes, but eventually distilled that into the five that you see
+here.  The differences between any two adjacent finishes should be
+negligable, yet the differences between any three should be quite
+noticeable.  At least, that was our goal.
+
+We also did our best at arriving at a set of five color variations for
+each of the metal groups.  This isn't perfect, but we think we came pretty
+close.
+
+The finishes range from soft, rough, & dull (the "A" finishes) to hard &
+highly polished (the "E" finishes)

@@ -6,7 +6,7 @@
 *  rendering glyphs and generously provided us these enhancements.
 *
 *  from Persistence of Vision(tm) Ray Tracer
-*  Copyright 1996,1999 Persistence of Vision Team
+*  Copyright 1996,1998 Persistence of Vision Team
 *---------------------------------------------------------------------------
 *  NOTICE: This source code file is provided so that users may experiment
 *  with enhancements to POV-Ray and to port the software to platforms other
@@ -14,8 +14,8 @@
 *  which you are permitted to use this file.  The rules are in the file
 *  named POVLEGAL.DOC which should be distributed with this file.
 *  If POVLEGAL.DOC is not available or for more info please contact the POV-Ray
-*  Team Coordinator by email to team-coord@povray.org or visit us on the web at
-*  http://www.povray.org. The latest version of POV-Ray may be found at this site.
+*  Team Coordinator by leaving a message in CompuServe's GO POVRAY Forum or visit
+*  http://www.povray.org. The latest version of POV-Ray may be found at these sites.
 *
 * This program is based on the popular DKB raytracer version 2.12.
 * DKBTrace was originally written by David K. Buck.
@@ -37,10 +37,6 @@
 * Cache Format 4 glyph table index to speed up parsing, Mar 1996 [AED]
 * Fixed TTF rendering bug that leaves horizontal streaks, Nov. 1996  Kochin Chang (KochinC@aol.com)
 * Allowed Macintosh-charmap TTF files to be processed, Nov. 1996 Bob Spence/Eduard Schwan
-*
-* Modifications by Hans-Detlev Fink, January 1999, used with permission
-* Modifications by Thomas Willhalm, March 1999, used with permission
-*
 *****************************************************************************/
 
 #include "frame.h"
@@ -372,7 +368,7 @@ static GlyphPtr ConvertOutlineToGlyph (FontFileInfo *ffile, GlyphOutline *ttglyp
 static int Inside_Glyph (double x, double y, GlyphPtr glyph);
 static int solve_quad (double *x, double *y, double mindist, DBL maxdist);
 static void GetZeroOneHits (GlyphPtr glyph, VECTOR P, VECTOR D, DBL glyph_depth, double *t0, double *t1);
-static int GlyphIntersect (OBJECT *Object, VECTOR P, VECTOR D, GlyphPtr glyph, DBL glyph_depth, RAY *Ray, ISTACK *Depth_Stack); /* tw */
+static int GlyphIntersect (OBJECT *Object, VECTOR P, VECTOR D, DBL len, GlyphPtr glyph, DBL glyph_depth, RAY *Ray, ISTACK *Depth_Stack);
 
 /* POV-Ray object intersection/creation routines */
 static TTF *Create_TTF (void);
@@ -711,13 +707,9 @@ void ProcessNewTTF(OBJECT *object, char *filename, char  *text_string, DBL depth
 #endif
 
   /* Close the font file descriptor */
-
-  if (ffile->fp != NULL)	/* just to be sure it exists -hdf99- */
-  {
-    fclose(ffile->fp);
-    ffile->fp = NULL;
-  }
-
+  fclose(ffile->fp);
+  
+  ffile->fp = NULL;
 }
 
 /*****************************************************************************
@@ -901,7 +893,7 @@ static FontFileInfo *ProcessFontFile(char *fontfilename)
 ******************************************************************************/
 static FontFileInfo *OpenFontFile(char *filename)
 {
-  /* int i; */ /* tw, mtg */
+  int i;
   FontFileInfo *fontlist;
   char b[FILE_NAME_LENGTH];
 
@@ -2663,8 +2655,8 @@ static void GetZeroOneHits(GlyphPtr glyph, VECTOR P, VECTOR D, DBL glyph_depth, 
  * This is then solved using the quadratic formula.  Any solutions of s that are
  * between 0 and 1 (inclusive) are valid solutions.
  */
-static int GlyphIntersect(OBJECT *Object, VECTOR P, VECTOR D, GlyphPtr glyph, DBL glyph_depth,
-                          RAY *Ray, ISTACK *Depth_Stack) /* tw */
+static int GlyphIntersect(OBJECT *Object, VECTOR P, VECTOR D, DBL len, GlyphPtr glyph, DBL glyph_depth,
+                          RAY *Ray, ISTACK *Depth_Stack)
 {
   Contour *contour;
   int i, j, k, l, n, m, Flag = 0;
@@ -2894,7 +2886,7 @@ static int GlyphIntersect(OBJECT *Object, VECTOR P, VECTOR D, GlyphPtr glyph, DB
 static int All_TTF_Intersections(OBJECT *Object, RAY *Ray, ISTACK *Depth_Stack)
 {
   TTF *ttf = (TTF *) Object;
-  /* DBL len; */ /* tw, mtg */
+  DBL len;
   VECTOR P, D;
   GlyphPtr glyph;
 
@@ -2916,7 +2908,7 @@ static int All_TTF_Intersections(OBJECT *Object, RAY *Ray, ISTACK *Depth_Stack)
  */
   glyph = (GlyphPtr)ttf->glyph;
 
-  if (GlyphIntersect(Object, P, D, glyph,ttf->depth,Ray,Depth_Stack)) /* tw */
+  if (GlyphIntersect(Object, P, D, len, glyph,ttf->depth,Ray,Depth_Stack))
   {
     Increase_Counter(stats[Ray_TTF_Tests_Succeeded]);
     return TRUE;

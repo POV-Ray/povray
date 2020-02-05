@@ -1,0 +1,57 @@
+BANNER "Persistence of Vision(tm) Ray Tracer 3.1d for MS-Dos"
+           
+HELLO "This program is going to install POV-Ray(tm) version 3.1d"
+HELLO "on your hard disk by copying files from this drive"
+HELLO "and directory to the drive and directory that you enter"
+HELLO "on the screen to follow."
+HELLO ""
+HELLO "It will also test to see if your system meets certain"
+HELLO "minimum requirements and it will offer to update your"
+HELLO "AUTOEXEC.BAT path statement.  It also creates several"
+HELLO "special batch files and creates a POVRAY.INI file that"
+HELLO "is properly configured for the drive and directory that"
+HELLO "you choose."
+HELLO "                 Press a key to continue."
+       
+USER povstuff "Install to:"    C:\POVRAY31
+
+SPACE povstuff 6100
+
+FIRSTDISK "Install Disk"
+
+FPU
+
+CPU 386
+
+VER 3.30
+
+RAM 600
+XMS 3000
+
+PATH !povstuff
+
+UNZIP povstuff POVMSDOS VERIFY
+
+ATTRIBSAVE
+
+RUN "copy !povstuff\povinst.001 !povstuff\povray.ini"
+RUN "echo Library_Path=!povstuff >>!povstuff\povray.ini"
+RUN "echo Library_Path=!povstuff\include >>!povstuff\povray.ini"
+RUN "del !povstuff\povinst.001"
+
+RUN "echo !povstuff\povray !povstuff\rerun.ini %1 %2 %3 %4 %5 %6 %7 %8 %9>!povstuff\rerunpov.bat"
+RUN "echo !povstuff\povray +gi!povstuff\rerun.ini %1 %2 %3 %4 %5 %6 %7 %8 %9>!povstuff\runpov.bat"
+RUN "echo !povstuff\tga2gif -d -m %1 %2 %3 %4 %5 %6 %7 %8 %9>!povstuff\t2g.bat"
+
+GOODBYE "Congratulations!  You have completed POV-Ray installation."
+GOODBYE ""
+GOODBYE "After you have verified that POV-Ray really is working for"
+GOODBYE "you, you may delete the files INSTALL.EXE, INSTALL.001,"
+GOODBYE "INSTALL.DOC, EXTERNAL.LNG, POVMSDOS.ZIP and the temporary"
+GOODBYE "directory where you originally extracted them."
+GOODBYE ""
+GOODBYE "                 Press a key to exit"
+
+VIEW !povstuff\POVLEGAL.DOC
+
+END

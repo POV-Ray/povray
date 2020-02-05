@@ -4,7 +4,7 @@
 *  This module parses textures and atmosphere effects.
 *
 *  from Persistence of Vision(tm) Ray Tracer
-*  Copyright 1996,1999 Persistence of Vision Team
+*  Copyright 1996,1998 Persistence of Vision Team
 *---------------------------------------------------------------------------
 *  NOTICE: This source code file is provided so that users may experiment
 *  with enhancements to POV-Ray and to port the software to platforms other
@@ -12,14 +12,12 @@
 *  which you are permitted to use this file.  The rules are in the file
 *  named POVLEGAL.DOC which should be distributed with this file.
 *  If POVLEGAL.DOC is not available or for more info please contact the POV-Ray
-*  Team Coordinator by email to team-coord@povray.org or visit us on the web at
-*  http://www.povray.org. The latest version of POV-Ray may be found at this site.
+*  Team Coordinator by leaving a message in CompuServe's GO POVRAY Forum or visit
+*  http://www.povray.org. The latest version of POV-Ray may be found at these sites.
 *
 * This program is based on the popular DKB raytracer version 2.12.
 * DKBTrace was originally written by David K. Buck.
 * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
-*
-* Modifications by Thomas Willhalm, March 1999, used with permission.
 *
 *****************************************************************************/
 
@@ -1050,12 +1048,10 @@ void Parse_Tnormal (TNORMAL **Tnormal_Ptr)
    END_EXPECT    /* End [tnormal_id] */
 
    if (*Tnormal_Ptr == NULL)
-   { /* tw */
      if ((Default_Texture->Tnormal) != NULL)
        *Tnormal_Ptr = Copy_Tnormal ((Default_Texture->Tnormal));
      else
        *Tnormal_Ptr = Create_Tnormal ();
-   } /* tw */
 
    Parse_Pattern((TPATTERN *)*Tnormal_Ptr,NORMAL_TYPE);
   }
@@ -1403,8 +1399,7 @@ TEXTURE *Parse_Texture ()
     {
      /* At this point we've either got a texture statement that had
         no p, n or f.  Nor any texture identifier.  Its probably 
-        a patterned texture_map texture. It could be an empty
-        statement such as "texture{}" */
+        a patterned texture_map texture. */
        
        EXPECT
          CASE (TILES_TOKEN)
@@ -1430,14 +1425,6 @@ TEXTURE *Parse_Texture ()
            Texture->Tnormal = NULL;
            Texture->Finish  = NULL;
            Parse_Pattern((TPATTERN *)Texture,TEXTURE_TYPE);
-           /* if following is true, parsed "texture{}" so restore
-              default texture.
-            */
-           if (Texture->Type <= PLAIN_PATTERN)
-           {
-             Destroy_Textures(Texture);
-             Texture = Copy_Textures (Default_Texture);
-           }
            EXIT
          END_CASE
       END_EXPECT
@@ -3087,19 +3074,15 @@ static void Parse_Warp (WARP **Warp_Ptr)
       if (Local_Vector[X]!=0.0) 
         Repeat->Axis=X;
       if (Local_Vector[Y]!=0.0)
-      { /* tw */
         if (Repeat->Axis < X)
           Repeat->Axis=Y;
         else 
           Error("Can only repeat along 1 axis.");
-      } /* tw */
       if (Local_Vector[Z]!=0.0)
-      { /* tw */
         if (Repeat->Axis < X)
           Repeat->Axis=Z;
         else
           Error("Can only repeat along 1 axis.");
-      } /* tw */
       if (Repeat->Axis < X)
         Error("No axis specified in repeat.");
       Repeat->Width=Local_Vector[Repeat->Axis];

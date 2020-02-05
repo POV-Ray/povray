@@ -1,0 +1,731 @@
+                   PERSISTENCE OF VISION RAY TRACER(tm)
+
+                          POV-Ray(tm) VERSION 3.1
+
+      USER DOCUMENTATION FOR POV-Ray FOR MS-DOS USING WATCOM VERSION
+
+
+This file contains the documentation that is specific to the Watcom 
+compiled MS-Dos version of POV-Ray.  This contains technical info about 
+memory usage, how to configure the memory manager and other info that is 
+specific to the compiler that was used to create the program.  It is not 
+the full documentation for the program.  
+
+Other documentation you will need is:
+
+  POVMSDOS.DOC  This contains information about all MS-Dos versions of 
+                POV-Ray.  It discucess command-line switches, display
+                settings, and other dos-related topics.
+  POVUSER.TXT   This is a plain ASCII text file containing the full 
+                tutorial and reference guide for POV-Ray.  It covers all
+                features in detail.
+
+NOTE: The MS-Dos version of POV-Ray no longer contains the hypertext help
+program POVHELP.EXE.  It was too difficult to maintain documentation in
+that format.  We realize that ASCII text is not a good substitute. However
+most MS-Dos users also have Windows 3.x or Windows 95/98/NT available. If
+you have Windows 95/98/NT then you should obtain the Windows version of 
+POV-Ray.  It has POVUSER.HLP which contains the same information as 
+POVUSER.TXT in nicely formatted hypertext help form with illustrations.
+If you don't want to use POV-Ray for Windows 95/98/NT or only have 
+Windows 3.x then check out POVUSER.PDF in Adobe Acrobat PDF format. The
+Acrobat Reader is available for free at http://www.adobe.com and runs
+on Windows, Mac, & Unix.  Finally POVHTML.ZIP is an archive containing
+the povuser information in html format for viewing with an internet 
+browser.
+
+
+1.0   Introduction
+
+The Watcom compiled version of POV-Ray is designated by either
+".msdos.wat-cwa" or ".msdos.wat-d4g" after the POV-Ray version number on 
+the opening banner.  Everything in this document ONLY applies to that 
+version.  Other versions will operate under different rules.  This file is 
+NOT the only documentation for POV-Ray.  There is a file called 
+POVMSDOS.DOC which covers the MSDOS-specific features but that still isn't 
+everything.  There is a hypertext utility POVHELP.EXE that reads a file
+POVHELP.PHE which contains the main documentation for POV-Ray itself that 
+is common to all versions.  
+
+This version has been compiled as a 32-bit DOS protected mode application.  
+It must be run on a 386 or higher system with at least 4 meg of memory.  
+More memory is preferred.
+
+The program uses one of two different DOS extenders to manage memory and
+to create and use virtual memory swap files.  The "wat-cwa" version
+uses the CauseWay DOS extender written by Michael Devore & John Wildsmith.
+It is linked directly into the official POV-Ray executible.  If you
+are using an official version, this is the extender you will use.
+
+Although the CauseWay authors have graciously donated a copy to the
+POV-Team, CauseWay is still very much a commercial product.  We cannot 
+include it with the free source code for POV-Ray for you compile-it-yourself 
+people.  You will have to purchase it directly from the authors.
+
+Alternatly, another DOS extender called DOS4GW is supplied with the
+Watcom compiler.  However it is limited to a total of 32meg of memory.
+If your version is designated "wat-d4g" it uses the DOS4GW extender.
+The instructions below explain how CauseWay and DOS4GW use memory.  Do
+not try to use CauseWay variables with DOS4GW or vice-versa.
+
+Be sure to read POVMSDOS.DOC and run POVHELP to make sure you have all the 
+remaining documentation.  This file only applies to the Watcom compiled 
+version.  Also read POVWHERE.GET for more information on POV-Ray archives 
+and support information.
+
+---------------------------------------------------------------------------
+                    CAUSEWAY DOS EXTENDER CONFIGURATION
+
+Excerpted from Chapter 1 of the CauseWay DOS Extender User's Manual.  
+It is (c) Copyright 1992-1996 by Michael Devore.
+Used by permission.
+
+Postal:         Devore Software & Consulting
+                PO Box 4283
+                Naperville, IL  60567-4283
+                USA
+CompuServe:     71540,62
+Internet:       71540.62@compuserve.com
+Telephone:      1-708-717-6369
+Fax:            1-708-717-6373
+BBS:            1-708-717-9679
+
+Note: The 708 area code changes to 630 in August of 1996.
+
+
+INTRODUCTION
+
+What is CauseWay for Watcom C++ and Assembly Language?
+CauseWay is a 386 DOS extender package for use with Watcom C++ and
+assembly language programs. It consists of a DOS extender, provided as
+a stub EXE for Watcom C++ applications.
+
+Within the standard DOS, and Windows and OS/2 DOS box
+environments, CauseWay supports very large memory models for
+applications on PC compatibles with an 80386SX processor or above
+without the need to use overlays or crude stopgap measures such as
+EMS/XMS swapping. To do this, the DOS extender runs applications in
+protected mode, rather than the real mode normally used in the DOS
+environments. CauseWay supports both 16-bit and 32-bit protected mode
+applications operating under a DOS environment.  It makes full use of
+386-level chip capabilities including demand paging of code and data,
+variable-sized segments up to 4G in length, mixing 16- and 32-bit
+segments as well as support for flat (non-segmented) memory addressing
+models. The CauseWay implementation of these powerful capabilities
+provides all their benefits while being transparent to the application user.
+
+Applications created using CauseWay are compatible with the VCPI and
+DPMI standards and run equally well on systems with no protected mode
+drivers or programs. CauseWay applications work with such diverse
+environments as normal DOS, DesqView, Windows 3.0 and above in
+both standard and enhanced modes, as well as DOS windows within OS/2
+2.0 and above. CauseWay allocates memory from DPMI, VCPI, XMS,
+and INT 15H services, in addition to conventional DOS memory. This
+allows CauseWay applications to allocate memory through the CauseWay
+DOS extender without the need to detect or manipulate the various
+memory handling schemes.
+
+MINIMUM SYSTEM REQUIREMENTS
+
+CauseWay for Watcom C++ and Assembly Language requires a 386SX
+based computer or better. The required operating environment is MS-
+DOS or PC-DOS 3.1 or higher, Windows 3.0 or higher, OS/2 2.0 and
+above, or compatible operating system that provides a DPMI or VCPI
+DOS environment. 
+
+DOS 3.3+ and a 386 machine or better are necessary to run CauseWay
+applications.
+
+CAUSEWAY MEMORY REQUIREMENTS
+
+The recommended minimum amount of total free physical memory for
+CauseWay applications is 500K total. 100-150K of this memory must be
+conventional DOS memory, the remainder may be extended memory.
+CauseWay applications can run in less memory, down to the 300K range,
+provided sufficient virtual (disk-based) memory is available, but
+application performance will decline significantly. More physical
+memory improves a program's performance, reducing virtual memory
+disk access overhead.
+
+When running the DOS-extended application, DOS first loads the
+CauseWay DOS extender in conventional memory. CauseWay
+establishes the protected mode environment, retrieves the application from
+the executable file - loading it first into extended memory, then
+conventional memory if extended is exhausted, then virtual (disk-based)
+memory if conventional is exhausted - sets up the application for
+execution, and finally passes control to the application to begin operation.
+
+No additional files are required to make your application run in 386
+protected mode using the CauseWay DOS extender.
+
+OPERATIONAL CONSIDERATIONS WHEN USING CAUSEWAY
+
+The TEMP, TMP, and CAUSEWAY=SWAP environment variables are
+used by CauseWay to determine where to build its virtual memory swap
+file when an application is not operating under Windows or OS/2
+(Windows and OS/2 use their own virtual memory files). Since
+CauseWay has integrated virtual memory, disk space is considered part of
+total memory. If you use the TEMP, TMP, or SWAP environment
+variable to point to a small RAM disk or almost full disk, free memory
+will be affected accordingly. If virtual (disk-based) memory is less than
+physical (installed on machine) memory, Cause Way turns off virtual
+memory. On the other hand, if you have a disk 300M free, CauseWay
+will have no problem reporting 300M free memory to your program,
+provided that virtual memory is not inhibited or limited by the
+CAUSEWAY environment variable memory settings.
+
+Memory operates differently under Windows and OS/2. With OS/2, the
+DPMI setting for the session determines available memory. With
+Windows, available memory is the total of physical memory plus the
+swap file size less any memory already in use by Windows or another
+Windows application.
+
+When creating a VMM swap file at application startup under DOS,
+CauseWay builds a list of possible paths in order of priority. CauseWay
+then works through the list until one of the entries provides both a valid
+drive and path specification and sufficient free space to begin operation.
+The first entry to succeed becomes the swap file drive with no further
+processing of the list. If CauseWay reaches the end of the list without
+finding a valid drive, it disables the virtual memory manager. The order
+of priority is: CAUSEWAY=SWAP, TEMP, TMP, and application
+execution path.
+
+If endusers reboot the system or turn off power while executing a
+CauseWay application under DOS, a temporary file will be left on the
+system by CauseWay. This will usually be a zero length file unless the
+application was large enough to exceed physical memory and CauseWay
+had started using its virtual memory manager. The temporary file name
+is requested using standard DOS functions, meaning the name will vary
+with different versions of DOS. It typically is a mixture of letters and
+numbers with no extension, although a .$$$ extension may be presented
+when operating under a network. Make sure you do not delete this
+temporary file while the CauseWay application is still active, as improper
+or erratic program operation, including lockups, may occur.
+
+Application startup times may increase significantly if free physical
+memory is less than the executable size. In such cases, not only must the
+executable be loaded into physical memory, but a virtual memory file of
+the executable file size must also be built. This file holds the portions of
+the executable that do not fit into physical memory and which have not
+been recently accessed. After startup is complete, the program will
+operate normally, paging to and from virtual memory as necessary.
+
+CauseWay automatically sets aside 32K of low DOS memory for
+allocation and use by developer routines via the GetMemDOS API
+function. The 32K memory block is available even if CauseWay needs to
+use virtual memory just to load an application. The set-aside amount can
+be increased by using the CAUSEWAY environment variable LOWMEM
+option although the additional set-aside goal is not guaranteed to be
+reached if too little conventional memory is left for CauseWay's
+operating requirements.
+
+ENVIRONMENT VARIABLES
+
+CauseWay can make use of three environment variables at runtime:
+TEMP, TMP, and CAUSEWAY. 
+
+TEMP and TMP Environment Variables
+
+The TEMP and TMP environment variables specify the directory and
+drive where a swap file is built by CauseWay's virtual memory manager
+(VMM) when operating under DOS. Windows and OS/2 provide their
+own memory management functions which override CauseWay's use of
+the TEMP and TMP environment variables. The path indicated by
+TEMP will be used under DOS if both TEMP and TMP environment
+variables exist. Both settings are superseded by the
+CAUSEWAY=SWAP environment variable setting.
+
+SET TMP=C:\SWAP
+
+The example above directs the CauseWay DOS extender to create its
+swap file, if any, in the C:\SWAP directory. 
+
+If no TEMP, TMP and CAUSEWAY=SWAP settings are present or are
+invalid, the current drive is used when creating a swap file. If free drive
+space is less than physical memory (extended and conventional) available
+at startup, then the DOS extender VMM is disabled, no swap file is
+created, and virtual memory is not available to the application.
+
+CAUSEWAY Environment Variable
+
+The CAUSEWAY environment variable controls operation of the DOS
+extender at application runtime. Seven options are supported, although
+they are ignored in a Window or OS/2 DPMI environment. Use any
+combination of the seven options in the following format:
+
+SET CAUSEWAY=[setting_1;] [setting 2;] [setting_n;]
+
+Items in brackets ([ ]) are optional. Do not actually type the brackets if
+you use the optional items. Items in italics should be replaced with actual
+values, separated by semicolons. Following is a description of the seven 
+valid settings:
+
+DPMI          Force DPMI rather than default VCPI usage whenever    
+              possible (recommended for 386^Max and BlueMax         
+              users). The memory manager must support DPMI or       
+              else this setting is ignored.                         
+             
+EXTALL        Force CauseWay to use all extended memory and sub-     
+              allocate memory from the bottom up instead of the      
+              default top-down approach. This setting is most useful 
+              for processor intensive enviromnents which have a      
+              small hardware CPU cache. Use of this setting means    
+              that no extended memory will be available for other    
+              programs while the application is loaded (including    
+              shelling to DOS).                                      
+
+HIMEM:nnn     Set maximum physical (conventional plus extended)     
+              memory that can be consumed by CauseWay. "nnn" is       
+              the decimal number of kilobytes that can be consumed. 
+              If memory allocation requests exceed this figure,     
+              CauseWay will use virtual memory, even if additional  
+              physical memory is present. If the HIMEM memory       
+              value exceeds available physical memory, then memory  
+              allocations operate normally. For example,            
+              HIMEM:2048 on a 4M machine would force virtual        
+              memory use after 2M of memory allocations (including  
+              loading the executable file). The remaining 2M of     
+              memory could be used by other applications while the  
+              CauseWay application is active.                       
+
+LOWMEM:nnn    Set DOS (conventional) memory to restrict it from use  
+              by CauseWay. This memory is in addition to the           
+              default 32K low DOS memory block reserved by             
+              CauseWay for use by any applications which need to       
+              allocate DOS memory. nnn is the decimal number of        
+              kilobytes to reserve. If there is not enough             
+              conventional memory to satisfy the nnn request value     
+              then CauseWay will leave all conventional memory         
+              free that is not required by the extender to operate.    
+              Note that tnis option does not guarantee the amount of   
+              free DOS memory, just how much needs to be free          
+              before CauseWay will consume DOS memory after            
+              exhausting all extended memory. For example,             
+              LOWMEM:200 will attempt to reserve 200K of DOS           
+              memory, even if CauseWay has exhausted all extended      
+              memory and is using conventional memory to fill          
+              memory allocation requests.                              
+
+MAXMEM:nnn    Set maximum linear address space provided by           
+              CauseWay. nnn is the decimal number of megabytes of    
+              linear address space. This setting is similar to HIMEM 
+              except that it includes any virtual memory. For        
+              example, MAXMEM:32 on a 16M memory system              
+              restricts VMM disk space usage to 32M, even if more    
+              disk space is present. MAXMEM:8 on the same            
+              system would restrict the application to 8M of memory  
+              (all physical). Note that the setting is in megabytes, 
+              rather than kilobytes used in the LOWMEM and           
+              HIMEM options.                                         
+
+NOVM          Disable all virtual memory use by CauseWay. If  
+              physical memory is exhausted, CauseWay will fail
+              further memory allocation requests.             
+
+SWAP:path     Set CauseWay's virtual memory manager swap file  
+              path. This path takes precedence for choosing the
+              location of a swap file over the TEMP and TMP    
+              environment variables.                           
+
+---------------------------------------------------------------------------
+This concludes the information on the CauseWay DOS Extender which is
+linked into the official POV-Ray executible.  The information below
+applies ONLY if you have compiled the program yourself using the Watcom
+compiler and the DOS4GW extender.
+
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+                     DOS/4GW Configuration Guide
+
+                  WATCOM International Corporation
+
+                      Waterloo, Ontario, Canada
+
+This chapter explains how to use the DOS4G environment variable to
+suppress the banner that is displayed by DOS/4GW at startup.  It also
+explains how to use the DOS16M environment variable to select the switch
+mode setting, if necessary, and to specify the range of extended memory in
+which DOS/4GW will operate.  DOS/4GW is based on Rational Systems' DOS/16M
+16-bit Protected-Mode support; hence the DOS16M environment variable name
+remains unchanged.
+
+1.1 Suppressing the DOS/4GW Banner
+
+The banner that is displayed by DOS/4GW at startup can be suppressed by
+issuing the following command:
+
+  set DOS4G=quiet
+
+Do not insert a space between DOS4G and the equal sign.  A space to the
+right of the equal sign is optional.
+
+1.2 Changing the Switch Mode Setting
+
+In almost all cases, DOS/4GW programs can detect the type of machine that
+is running and automatically choose an appropriate real- to protected-mode
+switch technique.  For the few cases in which this default setting does
+not work we provide the DOS16M DOS environment variable, which overrides
+the default setting.
+
+Change the switch mode settings by issuing the following command:
+
+  set DOS16M=value
+
+Do not insert a space between DOS16M and the equal sign.  A space to the
+right of the equal sign is optional.
+
+The table below lists the machines and the settings you would use with
+them.  Many settings have mnemonics, listed in the column "Alternate
+Name", that you can use instead of the number.  Settings that you must set
+with the DOS16M variable have the notation req'd in the first column.
+Settings you may use are marked option, and settings that will
+automatically be set are marked auto.
+
++------+---------------+-------+---------+-----------------------------------+
+|      |               |       |Alternate|                                   |
+|Status|Machine        |Setting|Name     |Comment                            |
++------+---------------+-------+---------+-----------------------------------+
+|auto  |386/486 w/ DPMI|0      |None     |Set automatically if DPMI is active|
+|req'd |NEC 98-series  |1      |9801     |Must be set for NEC 98-series      |
+|auto  |PS/2           |2      |None     |Set automatically for PS/2         |
+|auto  |386/486        |3      |386,80386|Set automatically for 386 or 486   |
+|auto  |386            |INBOARD|None     |386 with Intel Inboard             |
+|req'd |Fujitsu FMR-70 |5      |None     |Must be set for Fujitsu FMR-70     |
+|auto  |386/486 w/ VCPI|11     |None     |Set automatically if VCPI detected |
+|req'd |Hitachi B32    |14     |None     |Must be set for Hitachi B32        |
+|req'd |OKI if800      |15     |None     |Must be set for OKI if800          |
+|option|IBM PS/55      |16     |None     |May be needed for some PS/55s      |
++------+---------------+-------+---------+-----------------------------------+
+
+The following procedure shows you how to test the switch mode setting.
+
+  1. If you have one of the machines listed below, set the DOS16M
+    environment variable to the value shown for that machine and specify a
+    range of extended memory.  For example, if your machine is an NEC
+    98-series, set DOS16M=1 @2M-4M.  See the section, "Fine Control of
+    Memory Usage" later in this chapter for more information about setting
+    the memory range.
+
+       +--------------------+---------+
+       | Machine            | Setting |
+       +--------------------+---------+
+       | NEC 98-series      | 1       |
+       | Fujitsu FMR-60,-70 | 5       |
+       | Hitachi B32        | 14      |
+       | OKI if800          | 15      |
+       +--------------------+---------+
+
+    Before running DOS/4GW applications, check the switch mode setting by
+    following this procedure:
+
+  2. Run PMINFO and note the switch setting reported on the last line of
+    the display.  (PMINFO, which reports on the protected-mode resources
+    available to your programs, is described in more detail in the
+    chapter, "Utilities".)
+
+    If PMINFO runs, the setting is usable on your machine.
+
+  3. If you changed the switch setting, add the new setting to your
+    AUTOEXEC.BAT file.
+
+Note:  PMINFO will run successfully on 286 machines.  If your DOS/4GW
+application does not run, and PMINFO does, check the CPU type reported on
+the first line of the display.
+
+You are authorized (and encouraged) to distribute PMINFO to your
+customers.  You may also include a copy of this section in your
+documentation.
+
+1.3 Fine Control of Memory Usage
+
+In addition to setting the switch mode as described above, the DOS16M
+environment variable enables you to specify which portion of extended
+memory DOS/4GW will use.  The variable also allows you to instruct DOS/4GW
+to search for extra memory and use it if it is present.
+
+1.3.1 Specifying a Range of Extended Memory
+
+Normally, you don't need to specify a range of memory with the DOS16M
+variable.  You must use the variable, however, in the following cases:
+
+  * You are running on a Fujitsu FMR-series, NEC 98-series, OKI
+   if800-series or Hitachi B-series machine.
+
+  * You have older programs that use extended memory but don't follow one
+   of the standard disciplines.
+
+  * You want to shell out of DOS/4GW to use another program that requires
+   extended memory.
+
+If none of these conditions applies to you, you can skip this section.
+
+The general syntax is:
+
+  set DOS16M= [switch_mode] [@start_address [- end_address]] [:size]
+
+In the syntax shown above, start_address, end_address and size represent
+numbers, expressed in decimal or in hexadecimal (hex requires a 0x
+prefix).  The number may end with a K to indicate an address or size in
+kilobytes, or an M to indicate megabytes.  If no suffix is given, the
+address or size is assumed to be in kilobytes.  If both a size and a range
+are specified, the more restrictive interpretation is used.
+
+The most flexible strategy is to specify only a size.  However, if you are
+running with other software that does not follow a convention for
+indicating its use of extended memory, and these other programs start
+before DOS/4GW, you will need to calculate the range of memory used by the
+other programs and specify a range for DOS/4GW programs to use.
+
+DOS/4GW ignores specifications (or parts of specifications) that conflict
+with other information about extended memory use.  Below are some examples
+of memory usage control:
+
+set DOS16M= 1 @2m-4m    Mode 1, for NEC 98-series machines, and use
+                        extended memory between 2.0 and 4.0MB.
+
+set DOS16M= :1M         Use the last full megabyte of extended memory, or
+                        as much as available limited to 1MB.
+
+set DOS16M= @2m         Use any extended memory available above 2MB.
+
+set DOS16M= @ 0 - 5m    Use any available extended memory from 0.0 (really
+                        1.0) to 5.0MB.
+
+set DOS16M= :0          Use no extended memory.
+
+As a default condition DOS/4GW applications take all extended memory that
+is not otherwise in use.  Multiple DOS/4GW programs that execute
+simultaneously will share the reserved range of extended memory.  Any
+non-DOS/4GW programs started while DOS/4GW programs are executing will
+find that extended memory above the start of the DOS/4GW range is
+unavailable, so they may not be able to run.  This is very safe.  There
+will be a conflict only if the other program does not check the BIOS
+configuration call (Interrupt 15H function 88H, get extended memory size).
+
+To create a private pool of extended memory for your DOS/4GW application,
+use the PRIVATXM program, described in the chapter, "Utilities".
+
+The default memory allocation strategy is to use extended memory if
+available, and overflow into DOS (low) memory.
+
+In a VCPI or DPMI environment, the start_address and end_address arguments
+are not meaningful.  DOS/4GW memory under these protocols is not allocated
+according to specific addresses because VCPI and DPMI automatically
+prevent address conflicts between extended memory programs.  You can
+specify a size for memory managed by VCPI or DPMI, but DOS/4GW will not
+necessarily allocate this memory from the highest available extended
+memory address, as it does for memory managed under other protocols.
+
+1.3.2 Using Extra Memory
+
+Some machines contain extra non-extended, non-conventional memory just
+below 16MB.  When DOS/4GW runs on a Compaq 386, it automatically uses this
+memory because the memory is allocated according to a certain protocol,
+which DOS/4GW follows.  Other machines have no protocol for allocating
+this memory.  To use the extra memory that may exist on these machines,
+set DOS16M with the + option.
+
+  set DOS16M=+
+
+Setting the + option causes DOS/4GW to search for memory in the range from
+FA0000 to FFFFFF and determine whether the memory is usable.  DOS/4GW does
+this by writing into the extra memory and reading what it has written.  In
+some cases, this memory is mapped for DOS or BIOS usage, or for other
+system uses.  If DOS/4GW finds extra memory that is mapped this way, and
+is not marked read-only, it will write into that memory.  This will cause
+a crash, but won't have any other effect on your system.
+
+1.4 Setting Runtime Options
+
+The DOS16M environment variable sets certain runtime options for all
+DOS/4GW programs running on the same system.
+
+To set the environment variable, the syntax is:
+
+  set DOS16M=[switch_mode_setting]^options.
+
+Note:  Some command line editing TSRs, such as CED, use the caret (^) as a
+delimiter.  If you want to set DOS16M using the syntax above while one of
+these TSRs is resident, modify the TSR to use a different delimiter.
+
+These are the options:
+
+0x01       check A20 line -- This option forces DOS/4GW to wait until the
+           A20 line is enabled before switching to protected mode.  When
+           DOS/4GW switches to real mode, this option suspends your
+           program's execution until the A20 line is disabled, unless an
+           XMS manager (such as HIMEM.SYS) is active.  If an XMS manager
+           is running, your program's execution is suspended until the A20
+           line is restored to the state it had when the CPU was last in
+           real mode.  Specify this option if you have a machine that runs
+           DOS/4GW but is not truly AT-compatible.  For more information
+           on the A20 line, see the section, "Controlling Address Line
+           A20" in this chapter.
+
+0x02       prevent initialization of VCPI -- By default, DOS/4GW searches
+           for a VCPI server and, if one is present, forces it on.  This
+           option is useful if your application does not use EMS
+           explicitly, is not a resident program, and may be used with
+           386-based EMS simulator software.
+
+0x04       directly pass down keyboard status calls -- When this option is
+           set, status requests are passed down immediately and
+           unconditionally.  When disabled, pass-downs are limited so the
+           8042 auxiliary processor does not become overloaded by keyboard
+           polling loops.
+
+0x10       restore only changed interrupts -- Normally, when a DOS/4GW
+           program terminates, all interrupts are restored to the values
+           they had at the time of program startup.  When you use this
+           option, only the interrupts changed by the DOS/4GW program are
+           restored.
+
+0x20       set new memory to 00 -- When DOS/4GW allocates a new segment or
+           increases the size of a segment, the memory is zeroed.  This
+           can help you find bugs having to do with uninitialized memory.
+           You can also use it to provide a consistent working environment
+           regardless of what programs were run earlier.  This option only
+           affects segment allocations or expansions that are made through
+           the DOS/4GW kernel (with DOS function 48H or 4AH).  This option
+           does not affect memory allocated with a compiler's malloc
+           function.
+
+0x40       set new memory to FF -- When DOS/4GW allocates a new segment or
+           increases the size of a segment, the memory is set to 0xFF
+           bytes.  This is helpful in making reproducible cases of bugs
+           caused by using uninitialized memory.  This option only affects
+           segment allocations or expansions that are made through the
+           DOS/4GW kernel (with DOS function 48H or 4AH).  This option
+           does not affect memory allocated with a compiler's malloc
+           function.
+
+0x80       new selector rotation -- When DOS/4GW allocates a new selector,
+           it usually looks for the first available (unused) selector in
+           numerical order starting with the highest selector used when
+           the program was loaded.  When this option is set, the new
+           selector search begins after the last selector that was
+           allocated.  This causes new selectors to rotate through the
+           range.  Use this option to find references to stale selectors,
+           i.e., segments that have been cancelled or freed.
+
+1.5 Controlling Address Line 20
+
+This section explains how DOS/4GW uses address line 20 (A20) and describes
+the related DOS16M environment variable settings.  It is unlikely that you
+will need to use these settings.
+
+Because the 8086 and 8088 chips have a 20-bit address spaces, their
+highest addressable memory location is one byte below 1MB.  If you specify
+an address at 1MB or over, which would require a twenty-first bit to set,
+the address wraps back to zero.  Some parts of DOS depend on this wrap, so
+on the 286 and 386, the twenty-first address bit is disabled.  To address
+extended memory, DOS/4GW enables the twenty-first address bit (the A20
+line).  The A20 line must be enabled for the CPU to run in protected mode,
+but it may be either enabled or disabled in real mode.
+
+By default, when DOS/4GW returns to real mode, it disables the A20 line.
+Some software depends on the line being enabled.  DOS/4GW recognizes the
+most common software in this class, the XMS managers (such as HIMEM.SYS),
+and enables the A20 line when it returns to real mode if an XMS manager is
+present.  For other software that requires the A20 line to be enabled, use
+the A20 option.  The A20 option makes DOS/4GW restore the A20 line to the
+setting it had when DOS/4GW switched to protected mode.  Set the
+environment variable as follows:
+
+  set DOS16M= A20
+
+To specify more than one option on the command line, separate the options
+with spaces.
+
+The DOS16M variable also lets you to specify the length of the delay
+between a DOS/4GW instruction to change the status of the A20 line and the
+next DOS/4GW operation.  By default, this delay is 1 loop instruction when
+DOS/4GW is running on a 386 machine.  In some cases, you may need to
+specify a longer delay for a machine that will run DOS/4GW but is not
+truly AT-compatible.  To change the delay, set DOS16M to the desired
+number of loop instructions, preceded by a comma:
+
+  set DOS16M=,loops
+
+2.0  VMM
+
+The Virtual Memory Manager (VMM) uses a swap file on disk to augment RAM.
+With VMM you can use more memory than your machine actually has.  When RAM
+is not sufficient, part of your program is swapped out to the disk file
+until it is needed again.  The combination of the swap file and available
+RAM is the virtual memory.
+
+Your program can use VMM if you set the DOS environment variable, DOS4GVM,
+as follows.  To set the DOS4GVM environment variable, use the format shown
+below.
+
+  set DOS4GVM= [option[#value]] [option[#value]]
+
+A "#" is used with options that take values since the DOS command shell
+will not accept "=".
+
+If you set DOS4GVM equal to 1, the default parameters are used for all
+options.
+
+Example:
+  C>set DOS4GVM=1
+
+2.1 VMM Default Parameters
+
+VMM parameters control the options listed below.
+
+MINMEM      The minimum amount of RAM managed by VMM.  The default is
+            512KB.
+
+MAXMEM      The maximum amount of RAM managed by VMM.  The default is 4MB.
+
+SWAPMIN     The minimum or initial size of the swap file.  If this option
+            is not used, the size of the swap file is based on VIRTUALSIZE
+            (see below).
+
+SWAPINC     The size by which the swap file grows.
+
+SWAPNAME    The swap file name.  The default name is "DOS4GVM.SWP".  By
+            default the file is in the root directory of the current
+            drive.  Specify the complete path name if you want to keep the
+            swap file somewhere else.
+
+DELETESWAP  Whether the swap file is deleted when your program exits.  By
+            default the file is not deleted.  Program startup is quicker
+            if the file is not deleted.
+
+VIRTUALSIZE The size of the virtual memory space.  The default is 16MB.
+
+2.2 Changing the Defaults
+
+You can change the defaults in two ways.
+
+  1. Specify different parameter values as arguments to the DOS4GVM
+    environment variable, as shown in the example below.
+
+      set DOS4GVM=deleteswap maxmem#8192
+
+  2. Create a configuration file with the filetype extension ".VMC", and
+    call that as an argument to the DOS4GVM environment variable, as shown
+    below.
+
+      set DOS4GVM=@NEW4G.VMC
+
+2.2.1 The .VMC File
+
+A ".VMC" file contains VMM parameters and settings as shown in the example
+below.  Comments are permitted.  Comments on lines by themselves are
+preceded by an exclamation point (!).  Comments that follow option
+settings are preceded by white space.  Do not insert blank lines:
+processing stops at the first blank line.
+
+  !Sample .VMC file
+  !This file shows the default parameter values.
+  minmem = 512            At least 512K bytes of RAM is required.
+  maxmem = 4096           Uses no more than 4MB of RAM
+  virtualsize = 16384     Swap file plus allocated memory is 16MB
+  !To delete the swap file automatically when the program exits, add
+  !deleteswap
+  !To store the swap file in a directory called SWAPFILE, add
+  !swapname = c:\swapfile\dos4gvm.swp
+

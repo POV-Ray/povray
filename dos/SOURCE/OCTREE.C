@@ -6,7 +6,7 @@
 *  This file was written by Jim McElhiney.
 *
 *  from Persistence of Vision(tm) Ray Tracer
-*  Copyright 1996,1999 Persistence of Vision Team
+*  Copyright 1996,1998 Persistence of Vision Team
 *---------------------------------------------------------------------------
 *  NOTICE: This source code file is provided so that users may experiment
 *  with enhancements to POV-Ray and to port the software to platforms other
@@ -14,14 +14,12 @@
 *  which you are permitted to use this file.  The rules are in the file
 *  named POVLEGAL.DOC which should be distributed with this file.
 *  If POVLEGAL.DOC is not available or for more info please contact the POV-Ray
-*  Team Coordinator by email to team-coord@povray.org or visit us on the web at
-*  http://www.povray.org. The latest version of POV-Ray may be found at this site.
+*  Team Coordinator by leaving a message in CompuServe's GO POVRAY Forum or visit
+*  http://www.povray.org. The latest version of POV-Ray may be found at these sites.
 *
 * This program is based on the popular DKB raytracer version 2.12.
 * DKBTrace was originally written by David K. Buck.
 * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
-*
-* Modifications by Thomas Willhalm, March 1999, used with permission
 *
 *****************************************************************************/
 
@@ -887,7 +885,7 @@ ot_write_block/* must be passed as void * for compatibility */(OT_BLOCK *bl, voi
 
   if ( bl->Bounce_Depth == 1 )
   {
-    fprintf((FILE *)fd, "C%ld\t%g\t%g\t%g\t%02lx%02lx%02lx\t%.4f\t%.4f\t%.4f\t%g\t%g\t%02lx%02lx%02lx\n", /* tw */
+    fprintf((FILE *)fd, "C%ld\t%g\t%g\t%g\t%02x%02x%02x\t%.4f\t%.4f\t%.4f\t%g\t%g\t%02x%02x%02x\n",
       (long)bl->Bounce_Depth,
 
       bl->Point[X], bl->Point[Y], bl->Point[Z],
@@ -1091,8 +1089,8 @@ ot_read_file(FILE *fd)
         }    
         case 'C':
         {
-          count = sscanf(line, "C%ld %lf %lf %lf %s %f %f %f %f %f %s\n", /* tw */
-		     &tempdepth,      /* since you can't scan a short */
+          count = sscanf(line, "C%d %lf %lf %lf %s %f %f %f %f %f %s\n",
+                     &tempdepth,      /* since you can't scan a short */
                      &bl.Point[X], &bl.Point[Y], &bl.Point[Z],
                      normal_string,
                      &bl.Illuminance[X], &bl.Illuminance[Y], &bl.Illuminance[Z],

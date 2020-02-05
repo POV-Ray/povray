@@ -1,0 +1,448 @@
+                   PERSISTENCE OF VISION RAY TRACER(tm)
+
+                          POV-Ray(tm) VERSION 3.1
+
+                 PLATFORM SPECIFIC INSTRUCTIONS FOR MS-Dos
+
+
+This file contains the documentation that is specific to the MS-Dos version 
+of POV-Ray.  It is not the full documentation for the program.  Other 
+documentation you will need is:
+
+  USER_???.DOC  This contains technical info about memory usage, how to
+                configure the memory manager and other info that is
+                specific to the compiler that was used to create the
+                program.  The ??? may be WAT for Watcom, BCC for Borland
+                or GCC for DJGPP Gnu Compiler.
+  POVUSER.TXT   This is a plain ASCII text file containing the full 
+                tutorial and reference guide for POV-Ray.  It covers all
+                features in detail.
+
+NOTE: The MS-Dos version of POV-Ray no longer contains the hypertext help
+program POVHELP.EXE.  It was too difficult to maintain documentation in
+that format.  We realize that ASCII text is not a good substitute. However
+most MS-Dos users also have Windows 3.x or Windows 95/98/NT available. If
+you have Windows 95/98/NT then you should obtain the Windows version of 
+POV-Ray.  It has POVUSER.HLP which contains the same information as 
+POVUSER.TXT in nicely formatted hypertext help form with illustrations.
+If you don't want to use POV-Ray for Windows 95/98/NT or only have 
+Windows 3.x then check out POVUSER.PDF in Adobe Acrobat PDF format. The
+Acrobat Reader is available for free at http://www.adobe.com and runs
+on Windows, Mac, & Unix.  Finally POVHTML.ZIP is an archive containing
+the povuser information in html format for viewing with an internet 
+browser.
+
+SYSTEM REQUIREMENTS
+-------------------
+      POV-Ray requires a 386 or better CPU with at least 4 meg of ram.  
+Faster 486-DX or Pentium processors are recommended.  A 386 or 486-sx does 
+not have built-in floating point math capability so it will run very slow.  
+Adding a 387 or 487 co-processor will increase speed 7 to 10 fold.  
+      This version runs in MS-Dos or as an MS-Dos application under Windows 
+3.x, Windows 95, Windows NT and OS/2.  A Windows 95/98/NT specific version
+is also available.
+      While it is working, POV-Ray can display the image on a VGA or SVGA 
+graphics system.  Older CGA, EGA or Mono video cannot use the graphics 
+preview but it can still create an image file.
+      In addition to the programs supplied in this package, you will need a 
+text editor or word processing program that can read, edit and save plain, 
+unformatted ASCII text files.  The EDIT program that comes with MS-Dos will 
+work for moderate size files.  You will need some sort of image viewer to 
+see the images.  One that supports TGA, GIF, and PNG formats is 
+recommended.  If you want to turn TGA files into animations we recommend a 
+program called Dave's Targa Animator (DTA.EXE) and an animation viewer such 
+as AAPLAY or Trilobyte PLAY.  Such programs are available at www.povray.org 
+or are usually available where you obtained POV-Ray.
+      These instructions assume you have a basic knowledge of how to work 
+with directories and files under dos.  It assumes you know what the dos 
+path is; what an environment variable is; and how to edit your AUTOEXEC.BAT 
+file to change the path or environment.  The install program will offer to 
+edit the path for you but if something goes wrong you may need to change it 
+yourself.  If you do not have knowledge about directories, paths, batch 
+files or editors, your local bookstore has many tutorial books available 
+that will help you.  Don't be intimidated by the insulting titles of such 
+books.  The only true "dummies" are those who give up trying.
+
+
+BASIC USAGE
+-----------
+      NOTICE!  IF YOU DID NOT INSTALL THE PROGRAM USING THE INSTALL.EXE
+SYSTEM, THE EXAMPLES AND INSTRUCTIONS GIVEN HERE MAY NOT WORK!  THE
+INSTALLATION PROCESS CONFIGURES POVRAY.INI AND SEVERAL IMPORTANT BATCH 
+FILES.  WITHOUT THESE FILES CONFIGURED, THE EXAMPLES HEREIN MAY NOT WORK.
+      POV-Ray's basic purpose is to read a scene description written in the 
+POV language and to write an image file.  The scene files are plain ASCII 
+text files that you create using a text editor.  Dozens of sample files are 
+included with this package to illustrate the various features.
+      You invoke POV-Ray by typing a command at the MS-Dos prompt.  The 
+command is "POVRAY" and it must be followed by one or more command line 
+switches.  Each switch begins with a plus or minus sign.  Blanks separate 
+the switches.  The switches may be upper or lower case.
+      Note: The examples in this documentation assume you installed POV-Ray 
+in the C:\POVRAY31 directory.  The installer will let you install POV-Ray 
+anywhere and will properly configure it for the drive and directory you 
+specified.  You just substitute that drive and directory anywhere we tell
+you to use C:\POVRAY31.  Change to that directory now.  Then type the
+following command line and press [ENTER]
+
+POVRAY +ISHAPES +D1 
+
+      The +I command (that's "i" for "input") tells the program what file 
+to read as input.  If you don't give an extension on the file name, .POV is 
+assumed.  Thus +ISHAPES tells it to read in SHAPES.POV to be rendered.  
+      The +D switch (for "display") tells the program to turn the graphic 
+preview display on.  A "-D" would turn it off.  The number "1" tells it 
+what type of display to use.  Type 1 is the old fashioned standard generic 
+VGA at 320 by 200 resolution and just 256 colors.  This is pretty much 
+guaranteed to work on any VGA video system.  
+      There are other options in effect besides those you typed on the 
+command line.  They are stored in a file called POVRAY.INI which was 
+created by the install system.  POV-Ray automatically looks for this file 
+in the same directory where POVRAY.EXE resides.  See "USING INI FILES" 
+below for more information on POVRAY.INI and other INI files.
+      When you enter the command shown above, you will see brightly colored 
+geometric shapes begin to appear as POV-Ray calculates the color of each 
+pixel row by row.  You will probably be disappointed with the graphic 
+display results.  That is because this is only a preview display.  The 
+actual image is in full 24-bit color but we cannot display that high 
+quality using simple VGA with a fixed set of 256 colors.  If your hardware 
+supports the VESA interface standard or you have a VESA TSR driver loaded, 
+try running with +DG rather than +D1.  This will give you access to all of 
+the various modes your video hardware can use.  If you have 15-bit or 16-
+bit high color capability try +DGH or if you have 24-bit true color 
+capability try +DGT to see the image in all its glory.  See "DISPLAY TYPES" 
+below for more information on graphics preview.
+      When the program finishes, you will hear beeps.  After admiring the 
+image, press [ENTER].  You will see a text screen of statistics.  If the 
+text is too much to fit on the screen you may press cursor up or down keys 
+to read more text.  Notice that there are tabs at the bottom of the screen.  
+Press cursor left or right keys to view other interesting text information.  
+Press [ENTER] again to exit POV-Ray.
+      If you do not have high color or true color ability you will have to 
+view the image file to see the real colors.  The image file SHAPES.TGA is 
+written to your current directory.  By default POV-Ray creates files in TGA 
+format.  This is a standard format for storing 24-bit true-color images.  
+You will need an image viewing program to view the file.  Such programs are 
+usually available from the same place where you obtained POV-Ray but a 
+viewer is not included in this package.
+      If you cannot view TGA files you may add the switch +FN and POV-Ray 
+will output PNG (Portable Network Graphic) format.  If PNG format viewer is 
+not available then type the following:
+
+T2G SHAPES
+
+and press [ENTER].  This will run a batch file that invokes the TGA2GIF 
+program.  The program will read your SHAPES.TGA file, create an optimal 256 
+color palette and write a GIF format file SHAPES.GIF.  Most image viewing 
+programs support GIF.
+
+
+RUNNING FILES IN OTHER DIRECTORIES
+----------------------------------
+      Normally POV-Ray only looks in the current directory for the files it 
+needs.  It does not search your MS-Dos path for data files; it only 
+searches for programs.  In the sample scene you just ran, file SHAPES.POV 
+was in the current directory so this was no problem.  That scene also 
+needed other files but your POVRAY.INI file tells POV-Ray other places to 
+search for necessary files.
+      If you allowed the install system to update your AUTOEXEC.BAT file,
+then you can change to any drive or directory and can run POV-Ray from that
+directory.  You will also be able to use the batch files and utilities that
+came with this package in any directory.  For future reference let's call 
+the "use-C:\POVRAY31-in-your-path-plan" as "PLAN 1".
+      There are some circumstances where you may not want to put C:\POVRAY31 
+in your path.  There is a limit of 128 characters in your path statement 
+and you may not have room for it.  Try rendering the SHAPES example from a 
+different directory.  If it doesn't work, then you forgot to re-boot your 
+system so the new path takes effect.  If after re-booting it still doesn't 
+work, it probably means your path is too full.  You will have to adopt a 
+different plan.
+      Chances are, you already have several directories in your path.  Most 
+systems have C:\DOS, C:\WINDOWS or some directory such as C:\UTILITY 
+already in the path.  We have provided several small batch files that you 
+can copy to that directory.  For future reference we'll call the 
+"put-batch-files-in-a-directory-already-on-the-path-plan" as "PLAN 2".
+      At any dos prompt, type the word PATH and press [ENTER].  It will 
+show you what directories are already on your path.  Then copy the 
+following files from your C:\POVRAY31 directory to any of the directories 
+already on your path.  The files are:
+
+  RUNPOV.BAT  RERUNPOV.BAT  T2G.BAT  
+
+      Once you have copied these files, try this example...  In this case, 
+do not invoke the program with the command "POVRAY".  Instead use "RUNPOV" 
+as follows:
+
+cd \POVRAY31\SCENES\ADVANCED
+RUNPOV +IWOODBOX +D1
+
+      This changes to the \POVRAY31\SCENES\ADVANCED directory where the file 
+WOODBOX.POV is found.  It runs the file RUNPOV.BAT.  That batch file is set 
+up to run POV-Ray even if it is not on the dos path.  It also passes the 
+switches along to POV-Ray.  These batch files have other uses, even if you 
+are using "PLAN 1" as described above or "PLAN 3" as described below.  For 
+more on these batch files, see "USING BATCH FILES" below.
+      All of the early examples in this document assumed you were running 
+POV-Ray from the directory where it was installed such as C:\POVRAY31.  This 
+approach of always using the installation directory is in fact "PLAN 3".  
+If you are using this method, you need to tell POV-Ray where else to look 
+for files.  In the case of WOODBOX.POV you could do this:
+
+POVRAY +IC:\POVRAY31\SCENES\ADVANCED\WOODBOX +D1
+
+      However some scenes need more than one file.  For example the 
+directory \POVRAY31\SCENES\ADVANCED\DRUMS2 contains three files: DRUMS.POV, 
+DRUMS.INC and REDNEWT.PNG all of which are required for that one scene. In 
+this case you should use the +L switch ("L" for "library") to add new 
+library paths to those that POV-Ray will search.  You would render the 
+scene with this command.
+
+POVRAY +L\POVRAY31\SCENES\ADVANCED\DRUMS2 +IDRUMS +D1
+
+
+USING INI FILES
+---------------
+      There were more options used in these renderings than just the 
+switches +I, +D, and +L that you specify.  When you run the program, POV-
+Ray automatically looks for the file POVRAY.INI in whatever directory that 
+POVRAY.EXE is in.  The POVRAY.INI file contains many options that control 
+how POV-Ray works.  We have set this file up so that it is especially easy 
+to run your first scene with minimal problems.  The file should be placed 
+in the same directory as POVRAY.EXE and it will automatically be read when 
+POVRAY is run.  If you ever move POVRAY.EXE to a different directory, be 
+sure to move POVRAY.INI too.
+      Complete details on all of the available switches and options that 
+can be given on the command line or in POVRAY.INI are given in the 
+reference guide.
+      You may also create INI files of your own with switches or options 
+similar to POVRAY.INI.  If you put a file name on the command line without 
+a plus or minus sign before it, POV-Ray reads it as an INI file.  Try 
+this...
+
+POVRAY RES120 +ISHAPES +D1
+
+      This causes POV-Ray to look for a file called RES120.INI which we 
+have provided.  It sets your resolution to 120 by 90 pixels for a quick 
+preview.  The following INI files have been provided for you.
+
+   RES120.INI     Sets resolution to 120 by 90
+   RES320.INI     Sets resolution to 320 by 200
+   RES640.INI     Sets resolution to 640 by 480
+   RES800.INI     Sets resolution to 800 by 600
+   RES1K.INI      Sets resolution to 1024 by 768
+   LOW.INI        Sets low quality at 120 by 90
+   SLOW.INI       Turns on radiosity and anti-aliasing; very slow
+                    but beautiful.
+   TGAFLI.INI TGAFLC.INI   Create an FLI/FLC animation from TGA images
+   PNGFLI.INI PNGFLC.INI   Create an FLI/FLC animation from PNG images
+   ZIPFLI.INI ZIPFLC.INI   Create an FLI/FLC animation from zipped images
+                           See "ANIMATION TIPS" below.
+   ALLSCENE.INI ALLANIM.INI See "RENDERING ALL SCENES" below.
+
+      You can create your own custom INI's which can contain any command in 
+the reference guide.
+
+
+ALTERNATIVES TO POVRAY.INI
+--------------------------
+      The POVRAY.INI file is supposed to hold your favorite global default 
+options that you want to use all the time.  You should feel free to edit it 
+with new options that suit your needs.  However it must be located in the 
+same directory as POVRAY.EXE or it won't be found.  The dos path isn't 
+searched nor will +L commands help because POVRAY.INI is processed before 
+any command line switches.
+      If your POVRAY.EXE resides on a CD-ROM then you can't edit the 
+POVRAY.INI on the CD.  There is an alternative.  You may use an environment 
+variable to specify an alternative global default.
+      In your AUTOEXEC.BAT file add a line similar to this:
+
+set POVINI=D:\DIRECT\FILE.INI
+
+which sets the POVINI environment variable to whatever drive, directory and 
+INI file you choose.  If you specify any POVINI environment variable then 
+POVRAY.INI is NOT READ.  This is true even if the file you named doesn't 
+exist.  Note that you are specifying an entire path and file name.  This is 
+not a pointer to a directory containing POVRAY.INI.  It is a pointer to the 
+actual file itself.
+      Note that the POVRAYOPT environment variable in early versions of 
+POV-Ray is no longer supported.
+
+
+USING BATCH FILES
+-----------------
+      We've already described how the file RUNPOV.BAT can be used as an 
+alternative to running POV-Ray directly.  RUNPOV.BAT also has one other 
+use.  It uses the +GI switch to create a file called RERUN.INI.  This makes 
+it very easy to run the same file over again with the same parameters.  
+When creating your own scene files you will probably make dozens of test 
+renders.  This is a very valuable feature.  Here is how it works...  
+Suppose you render a scene as follows:
+
+RUNPOV +IMYSCENE +D1 RES120
+
+This renders MYSCENE.POV at 120 by 90 resolution.  (Note there is no such 
+scene.  This is hypothetical.)  After viewing it, you noticed a mistake 
+which you fixed with your text editor.  To rerun the scene type:
+
+RERUNPOV
+
+and that's all.  It will rerun the same scene you just ran.  Suppose you 
+want more detail on the next run.  You can add more switches or INI files.  
+For example:
+
+RERUNPOV RES320
+
+will rerun at higher resolution.  Subsequent uses of RERUNPOV will be at 
+320 by 200 until you tell it differently.  As another example, the +A 
+switch turns on anti-aliasing.  Typing "RERUNPOV +A" reruns with anti-
+aliasing on.  All subsequent reruns will have it on until you do a 
+"RERUNPOV -A" to turn it off. Note if you do another "RUNPOV" it starts 
+over from your POVRAY.INI defaults and it overwrites the old RERUN.INI.
+      One other batch file is included.  The file T2G.BAT invokes the 
+TGA2GIF.EXE program for converting TGA files to GIF files.  You could 
+run TGA2GIF directly but its default parameters do not generally produce 
+the best results.  If you use T2G instead, it adds some command line 
+switches which work better.  For a full list of switches available for 
+TGA2GIF, type "TGA2GIF" with no parameters and it will display the 
+available switches and options.
+
+
+DISPLAY TYPES
+-------------
+      You have already seen how to turn on graphics preview using +D1.  
+Here are details on other variations of the +D switch.  Use -D to turn the 
+display off.  If you use -D then you will probably want to add the +V 
+switch to turn on "v"erbose status messages so you can monitor the progress 
+of the rendering while in progress.
+      The number "1" after the +D tells it what kind of video hardware to 
+use.  If you use +D alone or +D0 then POV-Ray will attempt to auto detect 
+your hardware type.  Use +D? to see a message about what type of hardware 
+POV-Ray found.
+      You may also explicitly tell POV-Ray what hardware to use.  The 
+following chart lists all of the supported types.  
+
+    +D0     Auto detect (S)VGA type (Default)
+    +D1     Standard VGA 320x200
+    +D2     Standard VGA 360 x 480
+    +D3     Tseng Labs 3000 SVGA 640x480
+    +D4     Tseng Labs 4000 SVGA 
+    +D5     AT&T VDC600 SVGA 640x400
+    +D6     Oak Technologies SVGA 640x480
+    +D7     Video 7 SVGA 640x480
+    +D8     Video 7 Vega (Cirrus) VGA 360x480
+    +D9     Paradise SVGA 640x480
+    +DA     Ahead Systems Ver. A SVGA 640x480
+    +DB     Ahead Systems Ver. B SVGA 640x480
+    +DC     Chips & Technologies SVGA 640x480
+    +DD     ATI SGVA (older version) 640x480
+    +DE     Everex SVGA 640x480
+    +DF     Trident SVGA 640x480
+    +DG     VESA Standard SVGA Adapter
+    +DH     ATI XL display card
+    +DI     Diamond Computer Systems SpeedSTAR 24X
+
+      The most common type is a VESA standard card which uses +DG.  VESA is 
+a standard software interface that works on a wide variety of cards.  Those 
+cards which do not have VESA support directly built-in, generally have a 
+video driver that you can load to provide VESA support.  The program 
+UniVBE is a high quality universal VESA driver that may work for you.
+It can be found at www.povray.org or possibly other POV-Ray sites.
+      The options listed above had been tested and worked under earlier 
+versions of POV-Ray but there have been many changes in the program and we 
+cannot guarantee these all still work.  If you can use VESA then do so.  It 
+has been well tested and will give you the most flexibility.
+      After the +D and the type, you may specify a 3rd character that 
+specifies the palette type.
+
+    +D?3 Use 332 palette with dithering (Default and best for VGA systems)
+         This is a fixed palette of 256 colors with each color consisting
+         3-bits of red data, 3-bits green and 2-bits blue.
+
+    +D?0 Use HSV palette option for VGA display
+         This is a fixed palette of 256 colors where colors are matched
+         according to hue, saturation and intensity rather than the amount
+         of red, green and blue.
+
+    +D?G Use fixed gray scale palette option for VGA display
+
+    +D?H Use HiColor option.  Displays 32,000+ colors with dithering. 
+         Supported on VESA, SpeedSTAR 24X, ATI XL HiColor and Tseng 4000
+         based cards with high color 15 or 16 bit options.
+
+    +D?T For Truecolor 24 bit cards. Use 24 bit color.
+         Supported on the Diamond SpeedSTAR 24X and cards with 
+         24bit VESA support only.
+
+Here are some examples:
+
+    +D0H Auto detect the VGA display type and display the image to the
+         screen as it's being worked on. Use the 15-bit HiColor chip and
+         dithering to display more than 32,000 colors on screen. 
+    +D4  Display to a TSENG 4000 chipset VGA using the 332 palette option.
+    +D4H Display to a TSENG 4000 chipset VGA using the HiColor option.
+    +DG0 Display to a VESA VGA adapter and use the HSV palette option.
+    +DG3 Display to a VESA VGA adapter and use the 332 palette option.
+    +DGH Display to a VESA VGA adapter and use the HiColor option for
+         over 32,000 colors.
+    +DGT Display to a VESA VGA adapter and use the TrueColor option for 
+         over 16 million colors.
+
+Note that your VESA BIOS must support these options in order for you to use 
+them.  Some cards may support HiColor and/or TrueColor at the hardware 
+level but not thru their VESA BIOS.
+
+
+ANIMATION TIPS
+--------------
+      The section above on USING INI FILES lists six files for creating 
+animations.  The FLI versions create 320 x 200 FLI files and the FLC 
+versions create FLC files at whatever resolution you specify.  These files 
+use POV-Ray's new command shell-out feature which allows you to execute a 
+dos command before or after any render or before or after each frame.  Full 
+details on these commands are in the reference guide.  They also require 
+DTA.EXE which is not included in this package but is available at 
+www.povray.org and many other places.  If you have DTA, try this example:
+
+RUNPOV +D1 +IFLOAT1 +L\POVRAY31\SCENES\ANIMATE\FLOAT1 TGAFLI RES320 +KFF10
+
+      The +KFF10 command tells POV-Ray to render a 10 frame animation.  
+TGAFLI firsts looks to see if FLOAT1.FLI exists.  It uses a handy program 
+called EXISTS.EXE which we have provided.  (Note if you are using 
+installation plan 2, you must also copy EXISTS.EXE to a directory on your 
+path.  It is a very small program and not worth creating a batch file.)
+      You may interrupt and restart this rendering using RERUNPOV and it 
+will pick up where it left off.  When finished, it calls DTA to assemble 
+MYSCENE.FLI from the TGA files.
+      Because lots of TGA files take up space, you may choose to use PNG 
+which is a compressed file format.  PNGFLI.INI is provided for such 
+rendering.  Note versions of DTA prior to 2.2 beta 24 did not properly 
+handle PNG or did not support PNG at all.
+      Finally if you have the utility PKZIP.EXE (not included) you can use 
+the file ZIPFLI.INI to zip your TGA or PNG files together and create a FLI 
+from it.  The zip method is more efficient to use if you are going to have 
+to interrupt and restart rendering.  This is because files are moved to the 
+archive only when 100% complete.  This let's you test to see if a frame is 
+complete without re-parsing the scene.
+
+
+RENDERING ALL SCENES
+--------------------
+      A set of batch and INI files have been provided to help you render
+all of the sample scenes and animations.  These files must be run in
+your C:\POVRAY31 directory or whatever directory in which you installed
+POV-Ray.  The file ALLSTILL.BAT renders all still scenes using parameters
+from ALLSTILL.INI.  It creates a \POVRAY31\ALLSCENE directory and puts
+all the resulting GIF files there.  ALLANIM.BAT creates animations
+in that same directory.  It assumes that you have the utilities pkzip.exe 
+and dta.exe available in your installation directory or via your dos path.
+ALLANIM.INI contains the parameters for the animations.  You may edit
+these INI files to suit your taste.
+
+
+--------------------------------------------------------------------------
+POV-Ray, POV-Help, and Persistence of Vision Ray Tracer are trademarks of 
+the POV-Team.
+
+MS-Dos and Windows, Windows NT and Windows 95 are trademarks of Microsoft.
+--------------------------------------------------------------------------
+This document (c) Copyright 1998 - POV-Team.

@@ -1,0 +1,271 @@
+; Note!  Versions 2.03 and 2.09 saw the addition of a few strings.
+; Not updating your translation file with the additional strings
+; isn't fatal, it just means those prompts would appear in English.
+
+; Most of the internal Install-Pro string lengths have been lengthened
+; to accommodate some of the more verbose translations.  If you find
+; any that are too short, drop me a note and I'll try to make the
+; necessary adjustments.
+
+"Error parsing installation script"
+
+"Insert"
+
+"line"
+
+; The next four items are Menu items!
+; They must have a preceding space for the menus to work properly, as
+; the second character is used for the hot keys
+
+" Continue "
+
+" Abort "
+
+" Yes "
+
+" No "
+
+"Path:"
+
+"DOS returned:"
+
+"Error copying"
+
+"Error writing"
+
+"Compressed file not found"
+
+"Zip file corrupted"
+
+"Zip file encrypted"
+
+"Invalid command"
+
+"Bypassing    %s"
+
+"Transferring %s to %s"
+
+"Appending    %s to %s"
+
+"Memory allocation error"
+
+"Zip write error - Disk Full?"
+
+"Invalid disk space number"
+
+"Zip output file creation error"
+
+"Invalid Zip file header"
+
+"Error chaining to new program"
+
+"Unexpected end of file"
+
+"Command found was: %s"
+
+"Are these entries okay?"
+
+"<< Insufficient Disk Space? >>"
+
+"What do you want to do?"
+
+"Destination Directory Entry"
+
+"<< File already exists >>"
+
+"<< Newer File Exists >>"
+
+"<< Config.sys not found >>"
+
+"Press a key to retry..."
+
+"Installing files from %s "
+
+"Updating Config.sys..."
+
+"Building directory structure(s)"
+
+"Please insert %s and press Enter..."
+
+"Now attempting to continue."
+
+"Error opening install.001"
+
+"Token was expected but not found"
+
+"Error creating directory"
+
+"System Error - change directory failed"
+
+"Disk write error - disk full?"
+
+"First split to split pair not found"
+
+"Target disk is probably full"
+
+"Space available on drive %c: -> %ld"
+
+"Space needed -> %ld"
+
+"<< Config.sys may need updating >>    "
+
+"Optional Installation Selection"
+
+"Do you want to overwrite this file?"
+
+"Do you want to install another module?"
+
+"the next module's Install Disk"
+
+"Incorrect disk or file not found."
+
+"The following unrecoverable error has occurred:"
+
+"Dos version 3.0 or higher required"
+
+"Cannot copy file onto itself"
+
+"Authorization error - Script invalid"
+
+"Executable integrity Error - bad executable"
+
+"System Error - current directory not available"
+
+"Directories must be 65 characters or less"
+
+"This application requires at least a 80%d CPU."
+
+"The destination path you have entered is either invalid or there " \
+"already exists a file with the same name."
+
+"This application needs MS-Dos %d.%d or higher."
+
+"This application requires a math coprocessor."
+
+"This application requires %dk installed RAM."
+
+"Config.sys not updated - FILES already OK."
+
+"Press a key to continue, or Escape to quit..."
+
+"Press a key to continue..."
+
+"Press a key to terminate..."
+
+"Unexpected EOF - AUTHORIZATION, END or DISK expected"
+
+"The directory portion of this entry cannot be changed"
+
+"An attempt to execute an external program has failed."
+
+"The error message returned by DOS for this failure was:"
+
+"Please re-enter your destination path in the form of a valid DOS path."
+
+"Please enter the directory that your Config.sys " \
+"file is located in (Escape aborts.)"
+
+"Either the entry was typed incorrectly or the " \
+"file does not exist in the specified directory."
+
+"Make sure that you have inserted the correct" \
+"disk and press Enter to continue..."
+
+"Please press your spacebar to check any of these " \
+"optional installation segments that you wish to " \
+"include."
+
+"Please refer to your documentation for manual installation " \
+"instructions if the problem cannot be corrected."
+
+"You have pressed the Escape key, indicating that you want " \
+"to terminate the installation and return to DOS.  If you " \
+"indeed want to abort, press Escape again - otherwise "
+
+"Either Config.sys was not found, or has FILES= " \
+"set to a lower value than needed by this " \
+"application.  Do you want this installation to " \
+"attempt to change Config.sys to correct this " \
+"problem?"
+
+"There is less disk space available than " \
+"required by this application.  If this is a " \
+"first-time installation (not overwriting a " \
+"current installation), you should abort and " \
+"retry after freeing up some disk space."
+
+"You cannot specify your distribution diskette " \
+"as your destination drive."
+
+"The destination drive you have entered does not exist " \
+"on this computer.  Please re-enter your destination " \
+"disk drive with a valid drive letter. " \
+"For example, if your destination is C:\PROGRAM, you " \
+"would enter 'C' here."
+
+"Directory too long"
+
+"Unsupported Zip version"
+
+"Unknown Compression Method"
+
+"Unknown File Type (not binary or text)"
+
+"Not a Zip file"
+
+"Searching %s"
+
+"Label not found"
+
+"<< Autoexec.bat may need updating >>"
+
+"Your AUTOEXEC.BAT PATH statement either does not "\
+"have the PATH entry needed for this program or it couldn't "\
+"find your AUTOEXEC.BAT at all.  Do you want us "\
+"to attempt to update your AUTOEXEC.BAT for you?"
+
+"Please enter the directory that your Autoexec.bat " \
+"file is located in (Escape aborts.)"
+
+"<<Autoexec.bat not found>>"
+
+"Updating Autoexec.bat..."
+
+"Autoexec.bat not updated - PATH already OK."
+
+"Error decompressing"
+
+"Reason:"
+
+; The following strings were added with version 2.03
+
+"Config.sys not updated - Write Error"
+
+; The following strings were added with version 2.09
+
+; The next two strings are menu options (note the preceding space)
+
+" Create "
+
+" Try Again "
+
+; The following strings were added with version 3.00
+
+"<< Reminder >>"
+
+"You will need to reboot your computer to implement the changes " \
+"made to your system files."
+
+"This installation requires, but did not find, %dk available EMS"
+
+"This installation requires, but did not find, %dk available XMS"
+
+"This installation requires, but did not find, VCPI memory mgt."
+
+"This installation requires, but did not find, DPMI %d.%02d or higher"
+
+"There are some environmental variables that need to be set for " \
+"this application to run properly.  Is it okay to add these " \
+"settings to Autoexec.bat?"
+
+"Autoexec.bat not updated - environmental variables already OK."

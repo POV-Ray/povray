@@ -1,0 +1,22 @@
+                               GLASS.INC
+
+This file contains 13 different glass textures, based on 5 different
+glass finishes.  These are:
+    T_Glass1   : Simple clear glass
+    T_Glass2   : Perfectly colorless, more like acrylic plastic
+    T_Glass3   : Slightly grayish, good lead crystal
+    T_Glass4   : Base finish for the following colored glasses:
+
+    T_Old_Glass          : Blue-green
+    T_Winebottle_Glass   : Light green
+    T_Beerbottle_Glass   : Brown
+    T_Ruby_Glass         : Red
+    T_Green_Glass        : Green
+    T_Dark_Green_Glass   : Dark green
+    T_Yellow_Glass       : Yellow
+    T_Orange_Glass       : Orange
+    T_Vicksbottle_Glass  : Dark blue
+
+We didn't attempt to cover each and every possible color of glass, but
+there are a number of examples of colored glass that you can copy and
+modify for your special needs.

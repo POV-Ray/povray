@@ -5,7 +5,7 @@
 *  and material map.
 *
 *  from Persistence of Vision(tm) Ray Tracer
-*  Copyright 1996,1998,1999 Persistence of Vision Team
+*  Copyright 1996,1998,1998 Persistence of Vision Team
 *---------------------------------------------------------------------------
 *  NOTICE: This source code file is provided so that users may experiment
 *  with enhancements to POV-Ray and to port the software to platforms other
@@ -13,8 +13,8 @@
 *  which you are permitted to use this file.  The rules are in the file
 *  named POVLEGAL.DOC which should be distributed with this file.
 *  If POVLEGAL.DOC is not available or for more info please contact the POV-Ray
-*  Team Coordinator by email to team-coord@povray.org or visit us on the web at
-*  http://www.povray.org. The latest version of POV-Ray may be found at this site.
+*  Team Coordinator by leaving a message in CompuServe's GO POVRAY Forum or visit
+*  http://www.povray.org. The latest version of POV-Ray may be found at these sites.
 *
 * This program is based on the popular DKB raytracer version 2.12.
 * DKBTrace was originally written by David K. Buck.
@@ -334,6 +334,7 @@ void bump_map(VECTOR EPoint, TNORMAL *Tnormal, VECTOR normal)
   VNormalize(bump_normal, bump_normal);
 
   Assign_Vector(yprime, normal);
+  VScaleEq(yprime, -1);
   Make_Vector(Temp, 0.0, 1.0, 0.0);
   VCross(xprime, yprime, Temp);
   VLength(Length, xprime);
@@ -361,7 +362,6 @@ void bump_map(VECTOR EPoint, TNORMAL *Tnormal, VECTOR normal)
   VScaleEq(yprime, bump_normal[Y]);
   VScaleEq(zprime, bump_normal[Z]);
   VAdd(Temp, xprime, yprime);
-  VScaleEq(zprime, -1);
   VAdd(normal, Temp, zprime);
 }
 

@@ -1,0 +1,33 @@
+                               SKIES.INC
+
+This file contains some predefined skies for you to use in your scenes.
+There are several different types, each type identified by a mnemonic
+prefix.  All pigment definitions start with "P_", all sky_spheres start
+with "S_", all textures start with "T_", and all objects start with
+"O_".
+
+
+    Pigments:    (building blocks for the stuff below)
+    ========
+    P_Cloud1
+    P_Cloud2
+    P_Cloud3
+
+    SkySpheres:
+    ========
+    S_Cloud1     sky_sphere, uses P_Cloud2.
+    S_Cloud2     sky_sphere  uses P_Cloud2.
+    S_Cloud3     sky_sphere  uses P_Cloud3.
+    S_Cloud4     sky_sphere  uses P_Cloud3.
+    S_Cloud5     sky_sphere.
+
+    Textures:
+    ========
+    T_Cloud1     2-layer texture using P_Cloud1 pigment, contains clear regions.
+    T_Cloud2     1-layer texture, contains clear regions.
+    T_Cloud3     2-layer texture, contains clear regions.
+
+    Objects:
+    ========
+    O_Cloud1     sphere, radius 10000 with T_Cloud1 texture.
+    O_Cloud2     union of 2 planes, with T_Cloud2 and T_Cloud3.

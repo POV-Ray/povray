@@ -4,7 +4,7 @@
 *  This module contains functions for ini-file/command line parsing, streams.
 *
 *  from Persistence of Vision(tm) Ray Tracer
-*  Copyright 1996,1999 Persistence of Vision Team
+*  Copyright 1996,1998 Persistence of Vision Team
 *---------------------------------------------------------------------------
 *  NOTICE: This source code file is provided so that users may experiment
 *  with enhancements to POV-Ray and to port the software to platforms other
@@ -12,8 +12,8 @@
 *  which you are permitted to use this file.  The rules are in the file
 *  named POVLEGAL.DOC which should be distributed with this file.
 *  If POVLEGAL.DOC is not available or for more info please contact the POV-Ray
-*  Team Coordinator by email to team-coord@povray.org or visit us on the web at
-*  http://www.povray.org. The latest version of POV-Ray may be found at this site.
+*  Team Coordinator by leaving a message in CompuServe's GO POVRAY Forum or visit
+*  http://www.povray.org. The latest version of POV-Ray may be found at these sites.
 *
 * This program is based on the popular DKB raytracer version 2.12.
 * DKBTrace was originally written by David K. Buck.
@@ -31,8 +31,6 @@
 *  Written by CEY 4/94 based on existing code and INI code from CDW.
 *
 *  ---
-*
-* Modification by Thomas Willhalm, March 1999, used with permission.
 *
 *****************************************************************************/
 
@@ -747,7 +745,7 @@ void parse_switch (char *Option_String)
 
         case 'f':
         case 'F':
-          if(isdigit((int)Option_String[2])) /* tw */
+          if(isdigit(Option_String[2]))
             process_variable(SUBSET_END_FRAME_OP, &Option_String[2]);
           break;
 
@@ -876,7 +874,7 @@ void parse_switch (char *Option_String)
       }
       else
       {
-        if (!isdigit ((int)Option_String [1])) /* tw */
+        if (!isdigit (Option_String [1]))
         {
           switch (Option_String [1])
           {
@@ -1414,7 +1412,6 @@ void process_variable(TOKEN variable,char *value)
 
     case START_COLUMN_OP:
       if (sscanf (value, DBL_FORMAT_STRING, &floatval) != SCANF_EOF)
-      { /* tw */
         if(floatval > 0.0 && floatval < 1.0)
         {
           opts.First_Column = -1;
@@ -1425,12 +1422,10 @@ void process_variable(TOKEN variable,char *value)
           /* The above used to have -1 but it messed up Write_INI_File.
            * Moved -1 fudge to fix_up_rendering_window 
            */
-      } /* tw */
       return;
 
     case START_ROW_OP:
       if (sscanf (value, DBL_FORMAT_STRING, &floatval) != SCANF_EOF)
-      { /* tw */
         if(floatval > 0.0 && floatval < 1.0)
         {
           opts.First_Line = -1;
@@ -1441,11 +1436,9 @@ void process_variable(TOKEN variable,char *value)
           /* The above used to have -1 but it messed up Write_INI_File
           * Moved -1 fudge to fix_up_rendering_window 
           */
-      } /* tw */
       return;
 
     case END_COLUMN_OP:
-      { /* tw */
       if (sscanf (value, DBL_FORMAT_STRING, &floatval) != SCANF_EOF)
         if(floatval > 0.0 && floatval <= 1.0)
         {
@@ -1454,11 +1447,9 @@ void process_variable(TOKEN variable,char *value)
         }
         else
           opts.Last_Column = (int) floatval;
-      } /* tw */
       return;
 
     case END_ROW_OP:
-      { /* tw */ 
       if (sscanf (value, DBL_FORMAT_STRING, &floatval) != SCANF_EOF)
         if(floatval > 0.0 && floatval <= 1.0)
         {
@@ -1467,7 +1458,6 @@ void process_variable(TOKEN variable,char *value)
         }
         else
           opts.Last_Line = (int) floatval;
-      } /* tw */
       return;
 
     case VERSION_OP:

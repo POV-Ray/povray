@@ -1,0 +1,49 @@
+
+                           WOODS.DOC
+
+
+WOODMAPS.INC
+============
+This file contains color_maps used by woods.inc.  There are two types of
+color_maps used; the first, the "WoodMapxA" color_maps, are intended as
+the 1st layer of multi-layer textures, although many will work quite well
+by themselves, as single layer texture color_maps.
+
+The second, the "WoodMapxB" color_maps, contain transparent colors and are
+intended for use as top layers in conjunction with the "WoodMapxA" maps.
+
+There is a complimentary "B" map for each "A" map in the file.  The maps
+are each numbered (the "x" in "WoodMapxA" and "WoodMapxB") from 1 to 19.
+Thus, WoodMap19A has a complimentary top layer defined as WoodMap19B.
+
+WOODS.INC
+=========
+These textures do not have colormaps assigned in them.  This is so they
+you can mix and match with the colormaps in WOODMAPS.INC as described
+above.
+
+All wood textures are designed with the major axis of the woodgrain
+"cylinder" aligned along the Z axis.  With the exception of a few
+of the textures in this file that have a small amount of X-axis rotation
+built-in for best effect, the textures below will exhibit a very straight
+grain pattern unless you apply a small amount of X-axis rotation to them
+(generally 2-4 degrees will suffice).
+
+Study the scene files in the WOODS subdirectory to see how to use these
+textures.  We would strongly advise that you render all of these files
+and keep them around for reference purposes.
+
+These  textures really need to be rendered with antialiasing and at
+least 640x480 resolution to get the most out of them.  Anything less
+than that and you won't be seeing them as they were designed.
+
+The WOOD_x.POV files display the woods.inc textures on wooden slabs that
+are arranged on the x/y plane.  The slabs have somewhat rounded edges to
+display the effects of the woodgrain on non-flat surfaces.  These files
+use both TESTCAM.INC and TESTOBJS.INC.
+
+WOODS.POV is another scene that demonstrates all of the 30 woodgrains
+defined in woods.inc.  If you're short on harddrive space and can't
+afford to keep samples of all of the woodgrains around, then at least
+retain a copy of the WOODS.TGA image around for reference purposes.
+
