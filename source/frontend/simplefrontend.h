@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,16 +39,27 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "frontend/configfrontend.h"
 
-#include <boost/scoped_ptr.hpp>
+// C++ variants of C standard header files
+//  (none at the moment)
 
+// C++ standard header files
+#include <memory>
+
+// Boost header files
+#include <boost/function.hpp>
+
+// POV-Ray header files (base module)
+#include "base/povassert.h"
+#include "base/stringutilities.h"
+#include "base/image/image_fwd.h"
+
+// POV-Ray header files (POVMS module)
+//  (none at the moment)
+
+// POV-Ray header files (frontend module)
 #include "frontend/animationprocessing.h"
 #include "frontend/renderfrontend.h"
 #include "frontend/shelloutprocessing.h"
-
-namespace pov_base
-{
-class Image;
-}
 
 namespace pov_frontend
 {
@@ -80,16 +91,16 @@ enum State
 };
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
-class SimpleFrontend
+class SimpleFrontend final
 {
     public:
         SimpleFrontend(POVMSContext ctx, POVMSAddress addr, POVMS_Object& msg,
                        boost::function<Console *()> cfn,
-                       boost::function<Display *(unsigned int, unsigned int, GammaCurvePtr)> dfn,
-                       POVMS_Object *result = NULL, shared_ptr<Console> console = shared_ptr<Console>());
+                       boost::function<Display *(unsigned int, unsigned int)> dfn,
+                       POVMS_Object *result = nullptr, std::shared_ptr<Console> console = std::shared_ptr<Console>());
         ~SimpleFrontend();
 
-        bool Start(POVMS_Object& opts, shared_ptr<Image> img = shared_ptr<Image>());
+        bool Start(POVMS_Object& opts, std::shared_ptr<Image> img = std::shared_ptr<Image>());
         bool Stop();
         bool Pause();
         bool Resume();
@@ -98,9 +109,9 @@ class SimpleFrontend
 
         State GetState() const;
 
-        shared_ptr<Console> GetConsole();
-        shared_ptr<Image> GetImage();
-        shared_ptr<Display> GetDisplay();
+        std::shared_ptr<Console> GetConsole();
+        std::shared_ptr<Image> GetImage();
+        std::shared_ptr<Display> GetDisplay();
     private:
         RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH> renderFrontend;
         POVMSAddress backendAddress;
@@ -108,18 +119,18 @@ class SimpleFrontend
         POVMS_Object options;
         RenderFrontendBase::SceneId sceneId;
         RenderFrontendBase::ViewId viewId;
-        shared_ptr<ImageProcessing> imageProcessing;
-        shared_ptr<AnimationProcessing> animationProcessing;
-        shared_ptr<ShelloutProcessing> shelloutProcessing;
+        std::shared_ptr<ImageProcessing> imageProcessing;
+        std::shared_ptr<AnimationProcessing> animationProcessing;
+        std::shared_ptr<ShelloutProcessing> shelloutProcessing;
         boost::function<Console *()> createConsole;
-        boost::function<Display *(unsigned int, unsigned int, GammaCurvePtr)> createDisplay;
+        boost::function<Display *(unsigned int, unsigned int)> createDisplay;
 };
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
 SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::SimpleFrontend(POVMSContext ctx, POVMSAddress addr, POVMS_Object& msg,
                                                                         boost::function<Console *()> cfn,
-                                                                        boost::function<Display *(unsigned int, unsigned int, GammaCurvePtr)> dfn,
-                                                                        POVMS_Object *result, shared_ptr<Console> console) :
+                                                                        boost::function<Display *(unsigned int, unsigned int)> dfn,
+                                                                        POVMS_Object *result, std::shared_ptr<Console> console) :
     renderFrontend(ctx),
     backendAddress(addr),
     state(kReady),
@@ -137,7 +148,7 @@ SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::~SimpleFrontend()
 }
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
-bool SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::Start(POVMS_Object& opts, shared_ptr<Image> img)
+bool SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::Start(POVMS_Object& opts, std::shared_ptr<Image> img)
 {
     int width;
     int height;
@@ -164,20 +175,20 @@ bool SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::Start(POVMS_Object
     opts.Set(kPOVAttrib_Declare, declares);
 
     if(opts.TryGetInt(kPOVAttrib_FinalFrame, 0) > 0)
-        animationProcessing = shared_ptr<AnimationProcessing>(new AnimationProcessing(opts));
+        animationProcessing = std::shared_ptr<AnimationProcessing>(new AnimationProcessing(opts));
 
     options = opts;
 
     if(opts.TryGetBool(kPOVAttrib_OutputToFile, true))
     {
-        if(img != NULL)
-            imageProcessing = shared_ptr<ImageProcessing>(new ImageProcessing(img));
+        if (img != nullptr)
+            imageProcessing = std::shared_ptr<ImageProcessing>(new ImageProcessing(img));
         else
-            imageProcessing = shared_ptr<ImageProcessing>(new ImageProcessing(options));
+            imageProcessing = std::shared_ptr<ImageProcessing>(new ImageProcessing(options));
     }
 
     Path ip (opts.TryGetString(kPOVAttrib_InputFile, ""));
-    shelloutProcessing.reset(new ShelloutProcessing(opts, UCS2toASCIIString(ip.GetFile()), width, height));
+    shelloutProcessing.reset(new ShelloutProcessing(opts, UCS2toSysString(ip.GetFile()), width, height));
 
     state = kStarting;
 
@@ -276,14 +287,14 @@ State SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::Process()
         case kStarting:
             try
             {
-                if(animationProcessing != NULL)
+                if (animationProcessing != nullptr)
                 {
                     options = animationProcessing->GetFrameRenderOptions();
-                    if (imageProcessing != NULL)
+                    if (imageProcessing != nullptr)
                         options.SetUCS2String(kPOVAttrib_OutputFile, imageProcessing->GetOutputFilename(options, animationProcessing->GetNominalFrameNumber(), animationProcessing->GetFrameNumberDigits()).c_str());
                 }
                 else
-                    if (imageProcessing != NULL)
+                    if (imageProcessing != nullptr)
                         options.SetUCS2String(kPOVAttrib_OutputFile, imageProcessing->GetOutputFilename(options, 0, 0).c_str());
             }
             catch(pov_base::Exception&)
@@ -345,7 +356,7 @@ State SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::Process()
                         {
                             // this is not a failure; continue has been requested and
                             // the file has already been rendered, so we skip it.
-                            if ((animationProcessing != NULL) && (animationProcessing->MoreFrames() == true))
+                            if ((animationProcessing != nullptr) && (animationProcessing->MoreFrames() == true))
                             {
                                 animationProcessing->ComputeNextFrame();
                                 state = kStarting;
@@ -365,9 +376,12 @@ State SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::Process()
                     state = kRendering;
 
                     return kRendering;
-            }
 
-            return kParsing;
+                default:
+                    return state;
+            }
+            POV_FRONTEND_ASSERT(false); // All cases of the preceding switch should return.
+
         case kRendering:
             switch(renderFrontend.GetViewState(viewId))
             {
@@ -378,11 +392,11 @@ State SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::Process()
                     state = kStopping;
                     return kStopping;
                 case ViewData::View_Rendered:
-                    if (imageProcessing != NULL)
+                    if (imageProcessing != nullptr)
                     {
                         try
                         {
-                            if(animationProcessing != NULL)
+                            if (animationProcessing != nullptr)
                                 imageProcessing->WriteImage(options, animationProcessing->GetNominalFrameNumber(), animationProcessing->GetFrameNumberDigits());
                             else
                                 imageProcessing->WriteImage(options);
@@ -395,7 +409,7 @@ State SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::Process()
                         }
                     }
 
-                    if((animationProcessing != NULL) && (animationProcessing->MoreFrames() == true))
+                    if ((animationProcessing != nullptr) && (animationProcessing->MoreFrames() == true))
                     {
                         try { renderFrontend.CloseView(viewId); } catch(...) { } // Ignore any error here!
                         try { renderFrontend.CloseScene(sceneId); } catch(...) { } // Ignore any error here!
@@ -408,9 +422,12 @@ State SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::Process()
                         state = kDone;
                         return kDone;
                     }
-            }
 
-            return kRendering;
+                default:
+                    return state;
+            }
+            POV_FRONTEND_ASSERT(false); // All cases of the preceding switch should return.
+
         case kStopping:
             if(renderFrontend.GetSceneState(sceneId) == SceneData::Scene_Ready || renderFrontend.GetSceneState(sceneId) == SceneData::Scene_Failed)
             {
@@ -433,9 +450,11 @@ State SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::Process()
             state = kReady;
 
             return kReady;
-    }
 
-    return state;
+        default:
+            return state;
+    }
+    POV_FRONTEND_ASSERT(false); // All cases of the preceding switch should return.
 }
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
@@ -445,23 +464,24 @@ State SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetState() const
 }
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
-shared_ptr<Console> SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetConsole()
+std::shared_ptr<Console> SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetConsole()
 {
     return renderFrontend.GetConsole(sceneId);
 }
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
-shared_ptr<Image> SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetImage()
+std::shared_ptr<Image> SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetImage()
 {
     return renderFrontend.GetImage(viewId);
 }
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
-shared_ptr<Display> SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetDisplay()
+std::shared_ptr<Display> SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetDisplay()
 {
     return renderFrontend.GetDisplay(viewId);
 }
 
 }
+// end of namespace pov_frontend
 
 #endif // POVRAY_FRONTEND_SIMPLEFRONTEND_H

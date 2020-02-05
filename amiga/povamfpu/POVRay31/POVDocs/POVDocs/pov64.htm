@@ -1,0 +1,32 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Surface Finishes</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov63.htm">Simple Texture Options</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov65.htm">Adding Bumpiness</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405126"><A NAME="_Toc411405402"><A NAME="_Toc414198884"><A NAME="_Toc429993394">Surface Finishes</A></A></A></A></H3>
+<P>One of the main features of a ray-tracer is its ability to do interesting things with surface finishes such as highlights and reflection. Let's add a nice little Phong highlight (shiny spot) to a sphere. To do this we need to add a <b><code>finish</code></b> keyword followed by a parameter. We change the definition of the sphere to this:</P>
+<PRE>  sphere { &lt;0, 1, 2&gt;, 2
+    texture {
+      pigment { color Yellow } // Yellow is pre-defined in COLORS.INC
+      finish { phong 1 }
+    }
+  }</PRE>
+<P>We render the scene. The <b><code>phong</code></b> keyword adds a highlight the same color of the light shining on the object. It adds a lot of credibility to the picture and makes the object look smooth and shiny. Lower values of phong will make the highlight less bright (values should be between 0 and 1).</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov63.htm">Simple Texture Options</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov65.htm">Adding Bumpiness</A>
+</P>
+</BODY>
+</HTML>
+

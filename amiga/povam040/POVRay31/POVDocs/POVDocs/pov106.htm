@@ -1,0 +1,35 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Adding Some Turbulence to the Fog</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov105.htm">Creating a Filtering Fog</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov107.htm">Using Ground Fog</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198926"><A NAME="_Toc429993436">Adding Some Turbulence to the Fog</A></A></H4>
+<P>In order to make our somewhat boring fog a little bit more interesting we can add some turbulence, making it look like it had a non-constant density (<CODE>fog4.pov</CODE>).</P>
+<PRE>  fog {
+    distance 150
+    color rgbf&lt;0.3, 0.5, 0.2, 1.0&gt;
+    turbulence 0.2
+    turb_depth 0.3
+  }</PRE>
+<B><P ALIGN="CENTER"><IMG SRC="Image226.jpg" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">Adding some turbulence makes the fog more interesting.</P>
+</B><P>The <b><code>turbulence</code></b> keyword is used to specify the amount of turbulence used while the <b><code>turb_depth</code></b> value is used to move the point at which the turbulence value is calculated along the viewing ray. Values near zero move the point to the viewer while values near one move it to the intersection point (the default value is 0.5). This parameter can be used to avoid noise that may appear in the fog due to the turbulence (this normally happens at very far away intersection points, especially if no intersection occurs, i. e. the background is hit). If this happens just lower the <b><code>turb_depth</code></b> value until the noise vanishes.</P>
+<P>You should keep in mind that the actual density of the fog does not change. Only the distance-based attenuation value of the fog is modified by the turbulence value at a point along the viewing ray.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov105.htm">Creating a Filtering Fog</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov107.htm">Using Ground Fog</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,35 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Max_Trace_Level</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov381.htm">Irid_Wavelength</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov383.htm">Max_Intersections</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405225"><A NAME="_Toc411405501"><A NAME="_Toc414199229"><A NAME="_Ref422128058"><A NAME="_Toc429993746">Max_Trace_Level</A></A></A></A></A></H3>
+<P>In scenes with many reflective and transparent surfaces POV-Ray can get bogged down tracing multiple reflections and refractions that contribute very little to the color of a particular pixel. The global setting <b><code>max_trace_level</code></b> defines the integer maximum number of recursive levels that POV-Ray will trace a ray.</P>
+<b><code><DL>
+<DD>global_settings { max_trace_level</code></b> <I>Level</I> <b><code>}</DD>
+</DL>
+</code></b><P>This is used when a ray is reflected or is passing through a transparent object and when shadow rays are cast. When a ray hits a reflective surface, it spawns another ray to see what that point reflects. That is trace level one. If it hits another reflective surface another ray is spawned and it goes to trace level two.  The maximum level by default is five.</P>
+<P>One speed enhancement added to POV-Ray in version 3.0 is <I>Adaptive Depth Control </I>(ADC). Each time a new ray is spawned as a result of reflection or refraction its contribution to the overall color of the pixel is reduced by the amount of reflection or the filter value of the refractive surface. At some point this contribution can be considered to be insignificant and there is no point in tracing any more rays. Adaptive depth control is what tracks this contribution and makes the decision of when to bail out. On scenes that use a lot of partially reflective or refractive surfaces this can result in a considerable reduction in the number of rays fired and makes it safer to use much higher <b><code>max_trace_level</code></b> values.</P>
+<P>This reduction in color contribution is a result of scaling by the reflection amount and/or the filter values of each surface, so a perfect mirror or perfectly clear surface will not be optimizable by ADC. You can see the results of ADC by watching the <CODE>Rays Saved</CODE> and <CODE>Highest Trace Level</CODE> displays on the statistics screen.</P>
+<P>The point at which a ray's contribution is considered insignificant is controlled by the <b><code>adc_bailout</code></b> value. The default is 1/255 or approximately 0.0039 since a change smaller than that could not be visible in a 24 bit image.  Generally this setting is perfectly adequate and should be left alone. Setting <b><code>adc_bailout</code></b> to 0 will disable ADC, relying completely on <b><code>max_trace_level</code></b> to set an upper limit on the number of rays spawned.</P>
+<P>If <b><code>max_trace_level</code></b> is reached before a non-reflecting surface is found and if ADC hasn't allowed an early exit from the ray tree the color is returned as black. Raise <b><code>max_trace_level</code></b> if you see black areas in a reflective surface where there should be a color.</P>
+<P>The other symptom you could see is with transparent objects. For instance, try making a union of concentric spheres with a clear texture on them. Make ten of them in the union with radius's from 1 to 10 and render the scene. The image will show the first few spheres correctly, then black. This is because a new level is used every time you pass through a transparent surface. Raise <b><code>max_trace_level</code></b> to fix this problem.</P>
+<P>Note that raising <b><code>max_trace_level</code></b> will use more memory and time and it could cause the program to crash with a stack overflow error, although ADC will alleviate this to a large extent. Values for <b><code>max_trace_level</code></b> are not restricted, so it can be set to any number as long as you have the time and memory. However, increasing its setting does not necessarily equate to increased image quality unless such depths are really needed by the scene.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov381.htm">Irid_Wavelength</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov383.htm">Max_Intersections</A>
+</P>
+</BODY>
+</HTML>
+

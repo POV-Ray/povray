@@ -1,0 +1,112 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Notation and Basic Assumptions</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov5.htm">How Do I Begin?</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov7.htm">What's New in POV-Ray 3.1?</A>
+</P>
+<HR>
+<BR>
+<H2><A NAME="_Toc411405084"><A NAME="_Toc411405360"><A NAME="_Ref412637841"><A NAME="_Toc414198831"><A NAME="_Ref428631793"><A NAME="_Ref428631813"><A NAME="_Toc429993336">Notation and Basic </A></A></A>Assumptions</A></A></A></A></H2>
+<P>Throughout the tutorial and reference section of this document, the following notation is used to mark keywords of the scene description language, command line switches, INI file keywords and file names.</P>
+<P ALIGN="RIGHT"><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=573>
+<TR><TD WIDTH="27%" VALIGN="TOP">
+<p><b><code>keyword</code></b></TD>
+<TD WIDTH="33%" VALIGN="TOP">
+<P>mono-spaced bold</TD>
+<TD WIDTH="40%" VALIGN="TOP">
+<P>POV-Ray keywords and punctuation</TD>
+</TR>
+<TR><TD WIDTH="27%" VALIGN="TOP">
+<p><b><code>+W640 +H480</code></b></TD>
+<TD WIDTH="33%" VALIGN="TOP">
+<P>mono-spaced bold</TD>
+<TD WIDTH="40%" VALIGN="TOP">
+<P>command-line switches</TD>
+</TR>
+<TR><TD WIDTH="27%" VALIGN="TOP">
+<CODE><P>C:\MYFILE.POV</CODE></TD>
+<TD WIDTH="33%" VALIGN="TOP">
+<P>mono-spaced</TD>
+<TD WIDTH="40%" VALIGN="TOP">
+<P>file names, directories, paths</TD>
+</TR>
+<TR><TD WIDTH="27%" VALIGN="TOP">
+<I><P>SYNTAX_ITEM</I></TD>
+<TD WIDTH="33%" VALIGN="TOP">
+<P>italics, all caps</TD>
+<TD WIDTH="40%" VALIGN="TOP">
+<P>required syntax item</TD>
+</TR>
+<TR><TD WIDTH="27%" VALIGN="TOP">
+<I><P>[SYNTAX_ITEM]</I></TD>
+<TD WIDTH="33%" VALIGN="TOP">
+<P>italics, all caps, braces</TD>
+<TD WIDTH="40%" VALIGN="TOP">
+<P>optional syntax item</TD>
+</TR>
+<TR><TD WIDTH="27%" VALIGN="TOP">
+<I><P>SYNTAX_ITEM...</I></TD>
+<TD WIDTH="33%" VALIGN="TOP">
+<P>italics, all caps, ellipsis</TD>
+<TD WIDTH="40%" VALIGN="TOP">
+<P>one or more syntax items</TD>
+</TR>
+<TR><TD WIDTH="27%" VALIGN="TOP">
+<I><P>[SYNTAX_ITEM...]</I></TD>
+<TD WIDTH="33%" VALIGN="TOP">
+<P>italics, all caps, braces, ellipsis</TD>
+<TD WIDTH="40%" VALIGN="TOP">
+<P>zero or more syntax items</TD>
+</TR>
+<TR><TD WIDTH="27%" VALIGN="TOP">
+<I><P>Value_1</I></TD>
+<TD WIDTH="33%" VALIGN="TOP">
+<P>italics, mixed case</TD>
+<TD WIDTH="40%" VALIGN="TOP">
+<P>a float value or expression</TD>
+</TR>
+<TR><TD WIDTH="27%" VALIGN="TOP">
+<I><P>&lt;Value_1&gt;</I></TD>
+<TD WIDTH="33%" VALIGN="TOP">
+<P>italics, mixed case, angle braces</TD>
+<TD WIDTH="40%" VALIGN="TOP">
+<P>a vector value or expression</TD>
+</TR>
+<TR><TD WIDTH="27%" VALIGN="TOP">
+<p><b><code>[</code></b><I> ITEM </I><b><code>]</code></b></TD>
+<TD WIDTH="33%" VALIGN="TOP">
+<P>bold square braces</TD>
+<TD WIDTH="40%" VALIGN="TOP">
+<P>ITEM enclosed in required braces</TD>
+</TR>
+<TR><TD WIDTH="27%" VALIGN="TOP">
+<I><P>ITEM1</I>   |   <I>ITEM2</I></TD>
+<TD WIDTH="33%" VALIGN="TOP">
+<P>vertical bar</TD>
+<TD WIDTH="40%" VALIGN="TOP">
+<P>choice of <I>ITEM1</I> or <I>ITEM2</I></TD>
+</TR>
+</TABLE>
+</P>
+
+<P ALIGN="CENTER">&nbsp;</P>
+<P>In the plain ASCII version of the document there is no visible difference between the different notations.</P>
+<P>Note that POV-Ray is a command-line program on MS-Dos, Unix and other text-based operating system and is menu-driven on Windows and Macintosh platforms.  Some of these operating systems use folders to store files while others use directories.  Some separate the folders and sub-folders with a slash character (<b><code>/</code></b>), back-slash character (<b><code>\</code></b>), or others.  We have tried to make this documentation as generic as possible but sometimes we have to refer to folders, files, options etc. and there's no way to escape it. Here are some assumptions we make...</P>
+<P>1) You installed POV-Ray in the "<CODE>C:\POVRAY3</CODE>" directory.  For MS-Dos this is probably true but for Unix it might be "<CODE>/usr/povray3</CODE>", or for Windows it might be "<CODE>C:\Program Files\POV-Ray for Windows</CODE>", for Mac it might be "<CODE>MyHD:Apps:POV-Ray 3:</CODE>", or you may have used some other drive or directory.  So if we tell you that "Include files are stored in the <CODE>\povray3\include</CODE> directory,"  we assume you can translate that to something like "<CODE>::POVRAY3:INCLUDE</CODE>" or "<CODE>C:\Program Files\POV-Ray for Windows\include</CODE>" or whatever is appropriate for your platform, operating system and installation.</P>
+<P>2) POV-Ray uses command-line switches and INI files to choose options in all versions but Windows and Mac also use dialog boxes or menu choices to set options.  We will describe options assuming you are using switches or INI files when describing what the options do. We have taken care to use the same terminology in designing menus and dialogs as we use in describing switches or INI keywords. See your version-specific documentation on menu and dialogs.</P>
+<P>3) Some of you are reading this using a help-reader, built-in help, web-browser, formatted printout, or plain text file.  We assume you know how to get around in which ever medium you're using.  We'll say "See the chapter on "Setting POV-Ray Option" we assume you can click, scroll, browse, flip pages or whatever to get there.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov5.htm">How Do I Begin?</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov7.htm">What's New in POV-Ray 3.1?</A>
+</P>
+</BODY>
+</HTML>
+

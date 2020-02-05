@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -61,8 +61,16 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/image/gif.h"
 
-// Boost header files
-#include <boost/scoped_array.hpp>
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <memory>
+
+// POV-Ray header files (base module)
+#include "base/fileinputoutput.h"
+#include "base/pov_err.h"
+#include "base/image/image.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -111,7 +119,7 @@ namespace Gif
         0x07FF, 0x0FFF
     };
 
-    typedef struct
+    struct Param_Block final
     {
         short curr_size;                     /* The current code size */
         short clear_code;                    /* Value for a clear code */
@@ -124,7 +132,7 @@ namespace Gif
         UTINY b1;                            /* Current byte */
         UTINY byte_buff[257];                /* Current block */
         UTINY *pbytes;                       /* Pointer to next byte in block */
-    } Param_Block ;
+    };
 
     /* get_next_code()
     * - gets the next code from the GIF file.  Returns the code, or else
@@ -255,10 +263,10 @@ namespace Gif
         params.slot = params.newcodes = params.ending + 1;
         params.navail_bytes = params.nbits_left = 0;
 
-        boost::scoped_array<UTINY> dstack (new UTINY [MAX_CODES + 1]);
-        boost::scoped_array<UTINY> suffix (new UTINY [MAX_CODES + 1]);
-        boost::scoped_array<UWORD> prefix (new UWORD [MAX_CODES + 1]);
-        boost::scoped_array<UTINY> buf (new UTINY [width]);
+        std::unique_ptr<UTINY[]> dstack (new UTINY [MAX_CODES + 1]);
+        std::unique_ptr<UTINY[]> suffix (new UTINY [MAX_CODES + 1]);
+        std::unique_ptr<UWORD[]> prefix (new UWORD [MAX_CODES + 1]);
+        std::unique_ptr<UTINY[]> buf (new UTINY [width]);
 
         /* Initialize in case they forgot to put in a clear code.
          * (This shouldn't happen, but we'll try and decode it anyway...)
@@ -404,5 +412,7 @@ namespace Gif
     }
 
 }
+// end of namespace Gif
 
 }
+// end of namespace pov_base

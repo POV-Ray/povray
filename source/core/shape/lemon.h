@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,6 +41,14 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+#include "base/messenger_fwd.h"
+
+// POV-Ray header files (core module)
 #include "core/coretypes.h"
 #include "core/scene/object.h"
 
@@ -65,31 +73,37 @@ namespace pov
 ///
 //******************************************************************************
 
-class Lemon : public ObjectBase
+class Lemon final : public ObjectBase
 {
     private:
-        struct LEMON_INT
+        struct LEMON_INT final
         {
             DBL d;  /* Distance of intersection point               */
             Vector3d n;/* Normal */
         };
     public:
         Lemon();
-        virtual ~Lemon();
+        virtual ~Lemon() override;
 
-        virtual ObjectPtr Copy();
+        virtual ObjectPtr Copy() override;
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-        virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
-        virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
-        virtual void Translate(const Vector3d&, const TRANSFORM *);
-        virtual void Rotate(const Vector3d&, const TRANSFORM *);
-        virtual void Scale(const Vector3d&, const TRANSFORM *);
-        virtual void Transform(const TRANSFORM *);
-        virtual void Compute_BBox();
+        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) override;
+        virtual bool Inside(const Vector3d&, TraceThreadData *) const override;
+        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const override;
+#ifdef POV_ENABLE_LEMON_UV
+        /// @attention
+        ///     UV mapping of this primitive should not be enabled until the primary
+        ///     parameterization has been amended so that users have full control over the
+        ///     primitive's  orientation, rather than just the axis of rotational symmetry.
+        virtual void UVCoord(Vector2d&, const Intersection *) const override;
+#endif // POV_ENABLE_LEMON_UV
+        virtual void Translate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Rotate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Scale(const Vector3d&, const TRANSFORM *) override;
+        virtual void Transform(const TRANSFORM *) override;
+        virtual void Compute_BBox() override;
 
-        void Compute_Lemon_Data(GenericMessenger& messenger, pov_base::ITextStream *FileHandle, pov_base::ITextStream::FilePos & Token_File_Pos, int Token_Col_No );
+        void Compute_Lemon_Data(GenericMessenger& messenger, const MessageContext& context);
 
         Vector3d apex;          /* Center of the top of the lemon */
         Vector3d base;          /* Center of the bottom of the lemon */
@@ -99,8 +113,10 @@ class Lemon : public ObjectBase
         DBL HorizontalPosition; /* horizontal position of the center of the inner circle */
         DBL VerticalPosition;   /* vertical position of the center of the inner circle */
     protected:
-        int Intersect(const Vector3d& P, const Vector3d& D, LEMON_INT *Intersection, TraceThreadData *Thread) const;
+        int Intersect(const Vector3d& P, const Vector3d& D, LEMON_INT *Intersection, RenderStatistics& stats) const;
+#ifdef POV_ENABLE_LEMON_UV
         void CalcUV(const Vector3d& IPoint, Vector2d& Result) const;
+#endif // POV_ENABLE_LEMON_UV
 };
 
 /// @}
@@ -108,5 +124,6 @@ class Lemon : public ObjectBase
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_OVUS_H

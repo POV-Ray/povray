@@ -1,0 +1,201 @@
+
+Amiga specific compiling notes for POV-Ray V3.1
+
+/*\
+***  The PPC directory tree might not be included in this archive, 
+***  depending on the status of that source at the time this archive
+***  was created and distributed.  The same may apply to the GUI code
+\*/
+
+To compile POV-Ray 3.1 for Amiga68k you need the following:
+
+     complete POV-Ray Amiga68k source (right here)
+
+     Amiga OS3 includes (OS2 is possible, but certain files, as explained
+     below, will need to be excluded)
+
+     Cybergraphics and Picasso96 developer archives
+
+     MUI developer archive for GUI
+     
+     A C compiler (I used SAS/C, so this archive includes the
+     necessary support for that)
+
+
+To compile for AmigaPPC (PowerUP) you need the following:
+
+     POV-Ray AmigaPPC source (in the PPC directory here)
+     
+     Amiga OS3 includes and PowerUp includes and libraries, at
+     least V39.16, and the PPC includes from the SAS/C PPC beta22
+     
+     ppc-amigaos-ld, from the GCC PPC support.  This can be found at
+     ftp.ninemoons.com/pub/geekgadgets/amiga/68k/snapshots/current/
+     and is in the file PPCTools-bin.tgz, which you will need a TGZ
+     extractor to unpack.  Search Aminet for "tgz" to find one.
+     Please note that it is NOT in the geekgadgets/amiga/ppc folder.
+     
+     The smakefiles for libzip.a and libpng.a also require the
+     programs AR and RANLIB from the same source as ppc-amigaos-ld.
+     
+     SAS/C 6.5x, patched to create the SAS/C PPC 7.00 package with
+     the PPC Beta22 release from www.warped.com/~stevek/ .
+
+     
+The basic complete Amiga compile requires the following procedure:
+
+     Compile libpng in the lpng101 directory
+     
+     Compile zlib in the zlib directory
+     
+     Compile POV-Ray itself in the main directory, being sure that
+     libpng and zlib are linked into the final executable.
+     
+     Be sure that the same settings are used for parameters and math
+     options in all three directories!!
+     
+
+The following modules can safely be removed (Amiga68k) if they are not
+desired or cannot be supported (IE, OS2)
+
+     ehbdisp.c - halfbrite display code, depends on OS3 for the function
+     BestModeID() (as do the other display modules)  If you wish to
+     compile for OS2 WITH display code, then you are responsible for
+     replacing BestModeID() dependant code with OS2 compatible means
+     of specifying and opening a screen.
+
+     cyberdisp.c - cybergraphics display code, needs both OS3 and
+     cybergraphics header files.
+          
+     pic96disp.c - Picasso96 display code, needs both OS3 and
+     Picasso96 header files.
+     
+     greydisp.c - greyscale display module, same as ehbdisp.c
+     
+     guidisp.c - special display module, sends pixel data to an
+     external messageport instead of actually displaying it.
+     
+     pdt_pov.c - datatype image loading module.  Datatypes are not
+     availabile on OS2, but if this module is not invoked then the
+     main progam will still function under OS2.  If you remove this
+     then you also must remove the cooresponding #include and #define
+     statements from config.h
+     
+     mem.c (and mem.h) - these are present in the generic POV-Ray
+     source, but Amiga-specific replacements for them have been developed
+     that make use of the Amiga's more efficient memorypool handling.
+
+
+This is the full list of Amiga specific files in the main directory:
+
+amiga.c        main Amiga-specific code
+amiga.h
+Build.info     SAS/C build icon
+config.h       platform-specific defines and includes
+cyberdisp.c
+ehbdisp.c
+greydisp.c
+greydisp.h
+guidisp.c
+hamdisp.c      not included (incomplete)
+lpng101.info
+mem.c
+mem.h
+opaldisp.c     not included (incomplete)
+p3gui.info
+pdt_pov.c
+pdt_pov.h
+pic96disp.c
+ppc.info
+premain.c      startup and setup prior to render, including GUI port
+scoptions      SAS/C settings file
+scoptions.info
+zlib.info
+
+
+In addition, the directories zlib and lpng101 each contain:
+
+build.info
+scoptions
+scoptions.info
+
+to support SAS/C compiling from icons.
+
+
+The directory PPC contains the PowerUp version of the Amiga specific
+sourcecode, and support files for compiling.  The files here are:
+
+amiga.c
+amiga.h
+Build.info
+config.h
+cyberdisp.c
+lpng101.info
+mem.c
+mem.h
+pdt_pov.c
+pdt_pov.h
+premain.c
+smakefile      
+zlib.info
+
+The Smakefile here is intended for use with SAS/C PPC, and handles
+the replacement of 68k source modules with PPC ones, and uses this
+same directory as the target for compiled object modules.  Zlib and
+LPNG101 contain smakefiles and Guild.info icons, and those smakefiles
+are written to use the normal source directories for these two libraries,
+and place the compiled object files in these two directories, where
+smakefile for PPC will expect them to be available at link time.
+
+
+Finally, the directory p3gui contains the source code for the 'official'
+Amiga POV-Ray GUI.  The files in this directory are:
+
+amiga.h        duplicate of same file from main directory
+build.info
+flider.h       outdated (but still used 8^) floating-point slider code
+gui.h
+guibase.c      basic application code for GUI
+inclist.c      MUI custom class for include and ini file lists
+inclist.h
+newkmuiids.h   these two files are my own 'shortcuts' for MUI coding
+newkmuishorts.h
+outname.c      custom class supporting automatic output name completion
+outname.h
+p3gui.c        main MUI code module
+p3gui.h
+p3guicat.c     localization support
+p3guicat.h
+percentclass.c percent slider class, used for partial image controls
+percentclass.h
+povgui.catalog These two files are for translators to localize the GUI
+povgui.cd      (more on localization below)
+pt.c           image for 'about' requester, created with ExtractBody
+pt.h
+scoptions
+scoptions.info
+
+
+GUI Localization
+
+The GUI is fully localized, both labels and help bubbles.  If you are
+compiling the GUI yourself, I ask that you keep the files as they are,
+with English as the default.  Use the povgui.cd file, making appropriate
+changes there to translate all the texts (and please retain copyright
+and credits information). Use a program such as CatEdit (from Aminet)
+to create the final povgui.catalog file for your language.  I also ask
+that if you do so, you send me a copy of the catalog file to place on
+the POVAmiga support web page for others to use.
+
+If you have any questions or problems compiling POV-Ray Amiga standard
+source, feel free to contact us.  Full contact information is listed
+in the POV-Ray Amiga documentation, and on the POV-Ray Amiga support
+site on the WWW.  Or email Joel NewKirk at  newkirk@snip.net.
+We will make every effort to help with any problems you may encounter
+with the provided source and compiler support files, but cannot assure
+you of assistance with any modifications or additions you may make.
+In other words, make sure you can compile what is already here before
+making changes.
+
+j
+

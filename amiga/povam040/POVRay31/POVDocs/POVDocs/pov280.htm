@@ -1,0 +1,47 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Material</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov279.htm">Bounded_By</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov281.htm">Inverse</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref428017426"><A NAME="_Toc429993625">Material</A></A></H4>
+<P>One of the changes in POV-Ray 3.1 was remove several items from <b><code>texture{finish{</code></b>...<b><code>}}</code></b> and to move them to the new <b><code>interior</code></b> statement.  The <b><code>halo</code></b> statement, formerly part of <b><code>texture</code></b>, are now renamed <b><code>media</code></b> and made a part of the <b><code>interior</code></b>.  This split was deliberate and purposeful (see "<A HREF="pov286.htm#_Ref417286060">Why are Interior and Media Necessary?</A>") however beta testers have pointed out that it makes it difficult to entirely describe the surface properties and interior of an object in one statement that can be referenced by a single identifier in a texture library.</P>
+<P>The result is that we created a "wrapper" around <b><code>texture</code></b> and <b><code>interior</code></b> which we call <b><code>material</code></b>.  The syntax is:</P>
+<I><DL>
+<DT>MATERIAL:</DT>
+</I><b><code><DD>material</code></b> <b><code>{</code></b> <I>[MATERIAL_IDENTIFIER][MATERIAL_ITEMS...]</I> <b><code>}</DD>
+</code></b><I><DT>MATERIAL_ITEMS:</DT>
+<DD>TEXTURE</I>   |   <I>INTERIOR</I>   |   <I>TRANSFORMATIONS</DD>
+</DL>
+</I><P>For example:</P>
+<PRE>  #declare MyGlass=material{texture{Glass_T} interior{Glass_I}}
+  object{MyObject material{MyGlass}}</PRE>
+<P>Internally, the "material" isn't attached to the object.  The material is just a container that brings the texture and interior to the object.  It is the texture and interior itself that is attached to the object.  Users should still consider texture and interior as separate items attached to the object.  The material is just a "bucket" to carry them.</P>
+<P>If the object already has a texture, the material texture is layered over it.  If the object already has an interior, the material interior fully replaces it and the old interior is destroyed. </P>
+<P>Transformations inside the material affect only the textures and interiors which are inside the <b><code>material{}</code></b> wrapper and only those textures or interiors specifed are affected.  For example:</P>
+<PRE>  object{MyObject
+    material{
+      texture{MyTexture}
+      scale 4         //affects texture but not object or interior
+      interior{MyInterior}
+      translate 5*x   //affects texture and interior, not object
+    }
+  }</PRE>
+<P>Note: The <b><code>material</code></b> statement has nothing to do with the <b><code>material_map</code></b> statement.  A <b><code>material_map</code></b> is <I>not</I> a way to create patterned material.  See "<A HREF="pov314.htm#_Ref428017081">Material Maps</A>" for explanation of this unrelated, yet similarly named, older feature.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov279.htm">Bounded_By</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov281.htm">Inverse</A>
+</P>
+</BODY>
+</HTML>
+

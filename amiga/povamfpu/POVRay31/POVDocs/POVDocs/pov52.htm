@@ -1,0 +1,212 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Torus Object</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov51.htm">Text Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov53.htm">The Light Source</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405116"><A NAME="_Toc411405392"><A NAME="_Toc414198871"><A NAME="_Toc429993382">Torus Object</A></A></A></A></H3>
+<P>A <b><code>torus</code></b> can be thought of as a donut or an inner-tube. It is a shape that is vastly useful in many kinds of CSG so POV-Ray has adopted this 4th order quartic polynomial as a primitive shape. The syntax for a torus is so simple that it makes it a very easy shape to work with once we learn what the two float values mean. Instead of a lecture on the subject, let's create one and do some experiments with it.</P>
+<P>We create a file called <CODE>tordemo.pov</CODE> and edit it as follows:</P>
+<PRE>  #include "colors.inc"
+  camera {
+    location &lt;0, .1, -25&gt;
+    look_at 0
+    angle 30
+  }
+  background { color Gray50 } // to make the torus easy to see
+  light_source{ &lt;300, 300, -1000&gt; White }
+  torus { 4, 1        // major and minor radius
+    rotate -90*x      // so we can see it from the top
+    pigment { Green }
+  }</PRE>
+<P>We trace the scene. Well, it's a donut alright. Let's try changing the major and minor radius values and see what happens.  We change them as follows:</P>
+<PRE>  torus { 5, .25      // major and minor radius</PRE>
+<P>That looks more like a hula-hoop! Let's try this:</P>
+<PRE>  torus { 3.5, 2.5    // major and minor radius</PRE>
+<P>Whoa! A donut with a serious weight problem!</P>
+<P>With such a simple syntax, there isn't much else we can do to a torus besides change its texture... or is there? Let's see...</P>
+<P>Torii are very useful objects in CSG. Let's try a little experiment. We make a difference of a torus and a box:</P>
+<PRE>  difference {
+    torus { 4, 1
+      rotate x*-90  // so we can see it from the top
+    }
+    box { &lt;-5, -5, -1&gt;, &lt;5, 0, 1&gt; }
+    pigment { Green }
+  }</PRE>
+<P>Interesting... a half-torus. Now we add another one flipped the other way. Only, let's declare the original half-torus and the necessary transformations so we can use them again:</P>
+<PRE>  #declare Half_Torus = difference {
+    torus { 4, 1
+      rotate -90*x  // so we can see it from the top
+    }
+    box { &lt;-5, -5, -1&gt;, &lt;5, 0, 1&gt; }
+    pigment { Green }
+  }
+  #declare Flip_It_Over = 180*x;
+  #declare Torus_Translate = 8;  // twice the major radius</PRE>
+<P>Now we create a union of two <b><code>Half_Torus</code></b> objects:</P>
+<PRE>  union {
+    object { Half_Torus }
+    object { Half_Torus
+      rotate Flip_It_Over
+      translate Torus_Translate*x
+    }
+  }</PRE>
+<P>This makes an S-shaped object, but we can't see the whole thing from our present camera. Let's add a few more links, three in each direction, move the object along the +z-direction and rotate it about the +y-axis so we can see more of it. We also notice that there appears to be a small gap where the half Torii meet. This is due to the fact that we are viewing this scene from directly on the x-z-plane. We will change the camera's y-coordinate from 0 to 0.1 to eliminate this.</P>
+<PRE>  union {
+    object { Half_Torus }
+    object { Half_Torus
+      rotate Flip_It_Over
+      translate x*Torus_Translate
+    }
+    object { Half_Torus
+      translate x*Torus_Translate*2
+    }
+    object { Half_Torus
+      rotate Flip_It_Over
+      translate x*Torus_Translate*3
+    }
+    object { Half_Torus
+      rotate Flip_It_Over
+      translate -x*Torus_Translate
+    }
+    object { Half_Torus
+      translate -x*Torus_Translate*2
+    }
+    object { Half_Torus
+      rotate Flip_It_Over
+      translate -x*Torus_Translate*3
+    }
+    object { Half_Torus
+      translate -x*Torus_Translate*4
+    }
+    rotate y*45
+    translate z*20
+  }</PRE>
+<P>Rendering this we see a cool, undulating, snake-like something-or-other. Neato. But we want to model something useful, something that we might see in real life. How about a chain?</P>
+<P>Thinking about it for a moment, we realize that a single link of a chain can be easily modeled using two half tori and two cylinders. We create a new file. We can use the same camera, background, light source and declared objects and transformations as we used in <CODE>tordemo.pov</CODE>:</P>
+<PRE>  #include "colors.inc"
+  camera {
+    location &lt;0, .1, -25&gt;
+    look_at 0
+    angle 30
+  }
+  background { color Gray50 }
+  light_source{ &lt;300, 300, -1000&gt; White }
+  #declare Half_Torus = difference {
+    torus { 4,1
+      sturm
+      rotate x*-90  // so we can see it from the top
+    }
+    box { &lt;-5, -5, -1&gt;, &lt;5, 0, 1&gt; }
+    pigment { Green }
+  }
+  #declare Flip_It_Over = x*180;
+  #declare Torus_Translate = 8;</PRE>
+<P>Now, we make a complete torus of two half tori:</P>
+<PRE>  union {
+    object { Half_Torus }
+    object { Half_Torus rotate Flip_It_Over }
+  }</PRE>
+<P>This may seem like a wasteful way to make a complete torus, but we are really going to move each half apart to make room for the cylinders. First, we add the declared cylinder before the union:</P>
+<PRE>  #declare Chain_Segment = cylinder { &lt;0, 4, 0&gt;, &lt;0, -4, 0&gt;, 1
+    pigment { Green }
+  }</PRE>
+<P>We then add two <b><code>Chain_Segments</code></b> to the union and translate them so that they line up with the minor radius of the torus on each side:</P>
+<PRE>  union {
+    object { Half_Torus }
+    object { Half_Torus rotate Flip_It_Over }
+    object { Chain_Segment translate  x*Torus_Translate/2 }
+    object { Chain_Segment translate -x*Torus_Translate/2 }
+  }</PRE>
+<P>Now we translate the two half tori +y and -y so that the clipped ends meet the ends of the cylinders. This distance is equal to half of the previously declared <b><code>Torus_Translate</code></b>:</P>
+<PRE>  union {
+    object { Half_Torus
+      translate y*Torus_Translate/2
+    }
+    object { Half_Torus
+      rotate Flip_It_Over
+      translate -y*Torus_Translate/2
+    }
+    object { Chain_Segment
+      translate x*Torus_Translate/2
+    }
+    object { Chain_Segment
+      translate -x*Torus_Translate/2
+    }
+  }</PRE>
+<P>We render this and viola! A single link of a chain. But we aren't done yet! Whoever heard of a green chain? We would rather use a nice metallic color instead. First, we remove any pigment blocks in the declared torsos and cylinders. Then we add the following before the union:</P>
+<PRE>  #declare Chain_Gold = texture {
+    pigment { BrightGold }
+    finish {
+      ambient .1
+      diffuse .4
+      reflection .25
+      specular 1
+      metallic
+    }
+  }</PRE>
+<P>We then add the texture to the union and declare the union as a single link:</P>
+<PRE>  #declare Link = union {
+    object { Half_Torus
+      translate y*Torus_Translate/2
+    }
+    object { Half_Torus
+      rotate Flip_It_Over
+      translate -y*Torus_Translate/2
+    }
+    object { Chain_Segment
+      translate x*Torus_Translate/2
+    }
+    object { Chain_Segment
+      translate -x*Torus_Translate/2
+    }
+    texture { Chain_Gold }
+  }</PRE>
+<P>Now we make a union of two links. The second one will have to be translated +y so that its inner wall just meets the inner wall of the other link, just like the links of a chain. This distance turns out to be double the previously declared <b><code>Torus_Translate</code></b> minus 2 (twice the minor radius). This can be described by the expression:</P>
+<PRE>  Torus_Translate*2-2*y</PRE>
+<P>We declare this expression as follows:</P>
+<PRE>  #declare Link_Translate = Torus_Translate*2-2*y;</PRE>
+<P>In the object block, we will use this declared value so that we can multiply it to create other links. Now, we rotate the second link <b><code>90*y</code></b> so that it is perpendicular to the first, just like links of a chain. Finally, we scale the union by 1/4 so that we can see the whole thing:</P>
+<PRE>  union {
+    object { Link }
+    object { Link translate y*Link_Translate rotate y*90 }
+    scale .25
+  }</PRE>
+<P>We render this and we will see a very realistic pair of links. If we want to make an entire chain, we must declare the above union and then create another union of this declared object. We must be sure to remove the scaling from the declared object:</P>
+<PRE>  #declare Link_Pair =
+  union {
+    object { Link }
+    object { Link translate y*Link_Translate rotate y*90 }
+  }</PRE>
+<P>Now we declare our chain:</P>
+<PRE>  #declare Chain = union {
+    object { Link_Pair}
+    object { Link_Pair translate  y*Link_Translate*2 }
+    object { Link_Pair translate  y*Link_Translate*4 }
+    object { Link_Pair translate  y*Link_Translate*6 }
+    object { Link_Pair translate -y*Link_Translate*2 }
+    object { Link_Pair translate -y*Link_Translate*4 }
+    object { Link_Pair translate -y*Link_Translate*6 }
+  }</PRE>
+<P>And finally we create our chain with a couple of transformations to make it easier to see. These include scaling it down by a factor of 1/10, and rotating it so that we can clearly see each link:</P>
+<PRE>  object { Chain scale .1 rotate &lt;0, 45, -45&gt; }</PRE>
+<B><P ALIGN="CENTER"><IMG SRC="Image30.jpg" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">The torus object can be used to create chains.</P>
+</B><P>We render this and we should see a very realistic gold chain stretched diagonally across the screen.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov51.htm">Text Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov53.htm">The Light Source</A>
+</P>
+</BODY>
+</HTML>
+

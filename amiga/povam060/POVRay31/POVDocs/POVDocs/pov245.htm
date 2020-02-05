@@ -1,0 +1,74 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Prism</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov244.htm">Lathe</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov246.htm">Sphere</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199080"><A NAME="_Toc429993590">Prism</A></A></H4>
+<P>The <b><code>prism</code></b> is an object generated specifying one or more two-dimensional, closed curves in the x-z plane and sweeping them along y axis. These curves are defined by a set of points which are connected by linear, quadratic, cubic or bezier splines.</P>
+<P>The syntax for the prism is:</P>
+<I><DL>
+<DT>PRISM:</DT>
+</I><b><code><DD>prism {</code></b> <I>[PRISM_ITEMS...] Height_1</I><b><code>,</code></b><I> Height_2</I><b><code>,</code></b><I> Number_Of_Points</I><b><code>,</DD>
+</code></b><DD>&#9;<I>&lt;Point_1&gt;</I><b><code>,</code></b><I> &lt;Point_2&gt;</I><b><code>,</code></b><I> ... &lt;Point_n&gt;</DD>
+</I><DD>&#9;<I>[ </I><b><code>open</code></b><I> ]</DD>
+</I><DD>&#9;<I>[PRISM_MODIFIERS...]</DD>
+</I><b><code><DD>}</DD>
+</code></b><I><DT>PRISM_ITEM:</DT>
+</I><b><code><DD>linear_spline</code></b>   |   <b><code>quadratic_spline</code></b>   |   <b><code>cubic_spline</code></b>   |   <b><code>bezier_spline</code></b>   |</DD>
+<b><code><DD>linear_sweep</code></b>   |   <b><code>conic_sweep</DD>
+</code></b><I><DT>PRISM_MODIFIER:</DT>
+</I><b><code><DD>sturm</code></b>   |   <I>OBJECT_MODIFIER</DD>
+</DL>
+</I><P>The first items specify the spline type and sweep type.  The defaults if none is specified is <b><code>linear_spline</code></b> and <b><code>conic_sweep</code></b>.  This is followed by two float values <I>Height_1</I> and <I>Height_2</I> which are the y coordinates of the top and bottom of the prism. This is followed by a float value specifying the number of 2-D points you will use to define the prism. (This includes all control points needed for quadratic, cubic and bezier splines). This is followed by the specified number of 2-D vectors which define the shape in the x-z plane.</P>
+<P>The interpretation of the points depends on the spline type.  The prism object allows you to use any number of sub-prisms inside one prism statement (they are of the same spline and sweep type). Wherever an even number of sub-prisms overlaps a hole appears.  Note you need not have multiple sub-prisms and they need not overlap as these examples do.</P>
+<P>In the <b><code>linear_spline</code></b> the first point specified is the start of the first sub-prism.  The following points are connected by straight lines.  If you specify a value identical to the first point, this closes the sub-prism and next point starts a new one.  When you specify the value of that sub-prism's start, then it is closed.  Each of the sub-prisms has to be closed by repeating the first point of a sub-prism at the end of the sub-prism's point sequence. In this example, there are two rectangular sub-prisms nested inside each other to create a frame.</P>
+<PRE> prism {
+  linear_spline
+  0, 1, 10,
+  &lt;0,0&gt;, &lt;6,0&gt;, &lt;6,8&gt;, &lt;0,8&gt;, &lt;0,0&gt;,  //outer rim
+  &lt;1,1&gt;, &lt;5,1&gt;, &lt;5,7&gt;, &lt;1,7&gt;, &lt;1,1&gt;   //inner rim
+ }</PRE>
+<P>The last sub-prism of a linear spline prism is automatically closed - just like the last sub-polygon in the polygon statement - if the first and last point of the sub-polygon's point sequence are not the same. This make it very easy to convert between polygons and prisms. Quadratic, cubic and bezier splines are never automatically closed.</P>
+<P>In the <b><code>quadratic_spline</code></b>, each sub-prism needs an additional control point at the beginning of each sub-prisms' point sequence to determine the slope at the start of the curve. The first point specified is the control point which is not actually part of the spline.  The second point is the start of the spline.  The sub-prism ends when this second point is duplicated.  The next point is the control point of the next sub-prism.  The point after that is the first point of the second sub-prism.  Here is an example:</P>
+<PRE> prism {
+  quadratic_spline
+  0, 1, 12,
+  &lt;1,-1&gt;, &lt;0,0&gt;, &lt;6,0&gt;, &lt;6,8&gt;, &lt;0,8&gt;, &lt;0,0&gt;,  //outer rim
+      //Control is &lt;1,-1&gt; and &lt;0,0&gt; is first &amp; last point
+  &lt;2,0&gt;, &lt;1,1&gt;, &lt;5,1&gt;, &lt;5,7&gt;, &lt;1,7&gt;, &lt;1,1&gt;   //inner rim
+      //Control is &lt;2,0&gt; and &lt;1,1&gt; is first &amp; last point
+ }</PRE>
+<P>In the <b><code>cubic_spline</code></b>, each sub-prism needs two additional control points -- one at the beginning of each sub-prisms' point sequence to determine the slope at the start of the curve and one at the end. The first point specified is the control point which is not actually part of the spline.  The second point is the start of the spline.  The sub-prism ends when this second point is duplicated.  The next point is the control point of the end of the first sub-prism.  Next is the beginning control point of the next sub-prism.  The point after that is the first point of the second sub-prism.  Here is an example:</P>
+<PRE> prism {
+  cubic_spline
+  0, 1, 14,
+  &lt;1,-1&gt;, &lt;0,0&gt;, &lt;6,0&gt;, &lt;6,8&gt;, &lt;0,8&gt;, &lt;0,0&gt;, &lt;-1,1&gt;, //outer rim
+  //First control is &lt;1,-1&gt; and &lt;0,0&gt; is first &amp; last point
+  // Last control of first spline is &lt;-1,1&gt;
+  &lt;2,0&gt;, &lt;1,1&gt;, &lt;5,1&gt;, &lt;5,7&gt;, &lt;1,7&gt;, &lt;1,1&gt;, &lt;0,2&gt; //inner rim
+  //First control is &lt;2,0&gt; and &lt;1,1&gt; is first &amp; last point
+  // Last control of first spline is &lt;0,2&gt;
+ }</PRE>
+<P>The <b><code>bezier_spline</code></b> is an alternate kind of cubic spline.  Points 1 and 4 specify the end points of a segment and points 2 and 3 are control points which specify the slope at the endpoints. Points 2 and 3 do not actually lie on the spline.  They adjust the slope of the spline.  If you draw an imaginary line between point 1 and 2, it represents the slope at point 1.  It is a line tangent to the curve at point 1.  The greater the distance between 1 and 2, the flatter the curve.  With a short tangent the spline can bend more.  The same holds true for control point 3 and endpoint 4.  If you want the spline to be smooth between segments, point 3 and 4 on one segment and point 1 and 2 on the next segment must form a straight line and point 4 of one segment must be the same as point one on the next segment.</P>
+<P>By default linear sweeping is used to create the prism, i.e. the prism's walls are perpendicular to the x-z-plane (the size of the curve does not change during the sweep). You can also use <b><code>conic_sweep</code></b> that leads to a prism with cone-like walls by scaling the curve down during the sweep.</P>
+<P>Like cylinders the prism is normally closed. You can remove the caps on the prism by using the <b><code>open</code></b> keyword. If you do so you shouldn't use it with CSG because the results may get wrong.</P>
+<P>For an explanation of the spline concept read the description of the "<A HREF="pov244.htm#_Ref415568197">Lathe</A>" object.  Also see the tutorials on "<A HREF="pov40.htm#_Ref415568254">Lathe Object</A>" and "<A HREF="pov44.htm#_Ref415568292">Prism Object</A>".</P>
+<P>The <b><code>sturm</code></b> keyword specifies the slower but more accurate Sturmian root solver which may be used with the cubic or bezier spline prisms if the shape does not render properly. The linear and quadratic spline prisms do not need the Sturmian root solver.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov244.htm">Lathe</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov246.htm">Sphere</A>
+</P>
+</BODY>
+</HTML>
+

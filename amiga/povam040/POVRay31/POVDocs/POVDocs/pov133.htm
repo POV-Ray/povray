@@ -1,0 +1,217 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - General Output Options</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov132.htm">Output Options</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov134.htm">Display Output Options</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198954"><A NAME="_Toc429993463">General Output Options</A></A></H4>
+<H5><A NAME="_Toc414198955"><A NAME="_Toc429993464">Height and Width of Output</A></A></H5>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=432>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>Height=</code></b><I>n</I></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<P>Sets screen height to <I>n</I> pixels</TD>
+</TR>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>Width=</code></b><I>n</I></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<P>Sets screen width to <I>n</I> pixels</TD>
+</TR>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>+H</code></b><I>n</I></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<P>Same as <b><code>Height=</code></b><I>n (when n &gt; 8)</I></TD>
+</TR>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>+W</code></b><I>n</I></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<P>Same as <b><code>Width=</code></b><I>n</I></TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>These switches set the height and width of the image in pixels. This specifies the image size for file output. The preview display, if on, will generally attempt to pick a video mode to accommodate this size but the display settings do not in any way affect the resulting file output.</P>
+<H5><A NAME="_Toc414198956"><A NAME="_Toc429993465">Partial Output Options</A></A></H5>
+
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=456>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<b><code>Start_Column=</code></b><I>n</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Set first column to <I>n</I> pixels</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<b><code>Start_Column=</code></b><I>0.n</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Set first column to <I>n</I> percent of width</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<b><code>+SC</code></b><I>n</I> or <b><code>+SC</code></b><I>0.n</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Same as <b><code>Start_Column</code></b></TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<b><code>Start_Row=</code></b><I>n</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Set first row to <I>n</I> pixels</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<b><code>Start_Row=</code></b><I>0.n</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Set first row to <I>n</I> percent of height</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<b><code>+SR</code></b><I>n</I> or <b><code>+S</code></b><I>n</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Same as <b><code>Start_Row=</code></b><I>n</I></TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<b><code>+SR</code></b><I>0.n</I> or <b><code>+S</code></b><I>0.n</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Same as <b><code>Start_Row=</code></b><I>0.n</I></TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<b><code>End_Column=</code></b><I>n</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Set last column to <I>n</I> pixels</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<b><code>End_Column=</code></b><I>0.n</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Set last column to <I>n</I> percent of width</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<b><code>+EC</code></b><I>n</I> or <b><code>+EC</code></b><I>0.n</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Same as <b><code>End_Column</code></b></TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<b><code>End_Row=</code></b><I>n</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Set last row to <I>n</I> pixels</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<b><code>End_Row=</code></b><I>0.n</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Set last row to <I>n</I> percent of height</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<b><code>+ER</code></b><I>n</I> or <b><code>+E</code></b><I>n</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Same as <b><code>End_Row=</code></b><I>n</I></TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<b><code>+ER</code></b><I>0.n</I> or <b><code>+E</code></b><I>0.n</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Same as <b><code>End_Row=</code></b><I>0.n</I></TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>When doing test rendering it is often convenient to define a small, rectangular sub-section of the whole screen so you can quickly check out one area of the image. The <b><code>Start_Row</code></b>, <b><code>End_Row</code></b>, <b><code>Start_Column</code></b> and <b><code>End_Column</code></b> options allow you to define the subset area to be rendered. The default values are the full size of the image from (1,1) which is the upper left to (w,h) on the lower right where w and h are the <b><code>Width=</code></b><I>n</I> and <b><code>Height=</code></b><I>n</I> values you have set.</P>
+<P>Note if the number specified is greater than 1 then it is interpreted as an absolute row or column number in pixels. If it is a decimal value between 0.0 and 1.0 then it is interpreted as a percent of the total width or height of the image. For example: <b><code>Start_Row=0.75</code></b> and <b><code>Start_Column=0.75</code></b> starts on a row 75% down from the top at a column 75% from the left. Thus it renders only the lower-right 25% of the image regardless of the specified width and height.</P>
+<P>The <b><code>+SR</code></b>, <b><code>+ER</code></b>, <b><code>+SC</code></b> and <b><code>+EC</code></b> switches work in the same way as the corresponding INI-style settings for both absolute settings or percentages. Early versions of POV-Ray allowed only start and end rows to be specified with <b><code>+S</code></b><I>n</I> and <b><code>+E</code></b><I>n</I> so they are still supported in addition to <b><code>+SR</code></b> and <b><code>+ER</code></b>.</P>
+<H5><A NAME="_Toc414198957"><A NAME="_Toc429993466">Interrupting Options</A></A></H5>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=456>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>Test_Abort=</code></b><I>bool</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Turn test for user abort on/off</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>+X</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Turn test abort on</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>-X</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Turn test abort off</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>Test_Abort_Count=</code></b><I>n</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Set to test for abort every <I>n</I> pixels</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>+X</code></b><I>n</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Set to test for abort every <I>n</I> pixels on</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>-X</code></b><I>n</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Set to test for abort off (in future test every <I>n</I> pixels)</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>On some operating systems once you start a rendering you must let it finish. The <b><code>Test_Abort=on</code></b> option or <b><code>+X</code></b> switch causes POV-Ray to test the keyboard for keypress. If you have pressed a key, it will generate a controlled user abort. Files will be flushed and closed but only data through the last full row of pixels is saved. POV-Ray exits with an error code 2 (normally POV-Ray returns 0 for a successful run or 1 for a fatal error).</P>
+<P>When this option is on, the keyboard is polled on every line while parsing the scene file and on every pixel while rendering. Because polling the keyboard can slow down a rendering, the <b><code>Test_Abort_Count=</code></b><I>n</I> option or <b><code>+X</code></b><I>n</I> switch causes the test to be performed only every <I>n</I> pixels rendered or scene lines parsed.</P>
+<H5><A NAME="_Toc414198958"><A NAME="_Toc429993467">Resuming Options</A></A></H5>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=456>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>Continue_Trace=</code></b><I>bool</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Sets continued trace on/off</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>+C</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Sets continued trace on</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>-C</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Sets continued trace off</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>Create_Ini=</code></b><I>file</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Generate an INI file to <I>file</I></TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>Create_Ini=</code></b><I>true</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Generate <CODE>file.ini</CODE> where <I>file</I> is scene name.</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>Create_Ini=</code></b><I>false</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Turn off generation of previously set <CODE>file.ini</CODE></TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>+GI</code></b><I>file</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Same as <b><code>Create_Ini=</code></b><I>file</I></TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>If you abort a render while it's in progress or if you used the <b><code>End_Row</code></b> option to end the render prematurely, you can use <b><code>Continue_Trace=on</code></b> or <b><code>+C</code></b> option to continue the render later at the point where you left off. This option reads in the previously generated output file, displays the partial image rendered so far, then proceeds with the ray-tracing. This option cannot be used if file output is disabled with <b><code>Output_to_file=off</code></b> or <b><code>-F</code></b>.</P>
+<P>The <b><code>Continue_Trace</code></b> option may not work if the <b><code>Start_Row</code></b> option has been set to anything but the top of the file, depending on the output format being used.</P>
+<P>POV-Ray tries to figure out where to resume an interrupted trace by reading any previously generated data in the specified output file. All file formats contain the image size, so this will override any image size settings specified. Some file formats (namely TGA and PNG) also store information about where the file started (i. e. <b><code>+SC</code></b><I>n</I> and <b><code>+SR</code></b><I>n</I> options), alpha output <b><code>+UA</code></b>, and bit-depth <b><code>+FN</code></b><I>n</I>, which will override these settings. It is up to the user to make sure that all other options are set the same as the original render.</P>
+<P>The <b><code>Create_Ini</code></b> option or <b><code>+GI</code></b> switch provides an easy way to create an INI file with all of the rendering options, so you can re-run files with the same options, or ensure you have all the same options when resuming. This option creates an INI file with every option set at the value used for that rendering. This includes default values which you have not specified. For example if you run POV-Ray with...</P>
+<PRE> POVRAY +Isimple.pov MYOPTS +GIrerun.ini MOREOPTS</PRE>
+<P>POV-Ray will create a file called <CODE>rerun.ini</CODE> with all of the options used to generate this scene. The file is not written until all options have been processed. This means that in the above example, the file will include options from both <CODE>myopts.ini</CODE> and <CODE>moreopts.ini</CODE> despite the fact that the <b><code>+GI</code></b> switch is specified between them. You may now re-run the scene with...</P>
+<PRE> POVRAY RERUN</PRE>
+<P>or resume an interrupted trace with</P>
+<PRE> POVRAY RERUN +C</PRE>
+<P>If you add other switches with the <CODE>rerun.ini</CODE> reference, they will be included in future re-runs because the file is re-written every time you use it.</P>
+<P>The <b><code>Create_Ini</code></b> option is also useful for documenting how a scene was rendered. If you render <CODE>waycool.pov</CODE> with <b><code>Create_Ini=on</code></b> then it will create a file <CODE>waycool.ini</CODE> that you could distribute along with your scene file so other users can exactly re-create your image.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov132.htm">Output Options</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov134.htm">Display Output Options</A>
+</P>
+</BODY>
+</HTML>
+

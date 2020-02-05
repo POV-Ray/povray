@@ -1,0 +1,29 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Transformation Order</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov220.htm">Matrix Keyword</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov222.htm">Transform Identifiers</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405187"><A NAME="_Toc411405463"><A NAME="_Toc414199054"><A NAME="_Toc429993564">Transformation Order</A></A></A></A></H3>
+<P>Because rotations are always relative to the axis and scaling is relative to the origin, you will generally want to create an object at the origin and scale and rotate it first. Then you may translate it into its proper position. It is a common mistake to carefully position an object and then to decide to rotate it.  However because a rotation of an object causes it to orbit about the axis, the position of the object may change so much that it orbits out of the field of view of the camera!</P>
+<P>Similarly scaling after translation also moves an object unexpectedly. If you scale after you translate the scale will multiply the translate amount. For example</P>
+<PRE> translate &lt;5, 6, 7&gt;
+ scale 4</PRE>
+<P>will translate to <b><code>&lt;20,24,28&gt;</code></b> instead of <b><code>&lt;5,6,7&gt;</code></b>. Be careful when transforming to get the order correct for your purposes.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov220.htm">Matrix Keyword</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov222.htm">Transform Identifiers</A>
+</P>
+</BODY>
+</HTML>
+

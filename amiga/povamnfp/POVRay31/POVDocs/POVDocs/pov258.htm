@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Plane</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov257.htm">Infinite Solid Primitives</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov259.htm">Poly, Cubic and Quartic</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199093"><A NAME="_Toc429993603">Plane</A></A></H4>
+<P>The <b><code>plane</code></b> primitive is a simple way to define an infinite flat surface. The plane is specified as follows:</P>
+<I><DL>
+<DT>PLANE:</DT>
+</I><b><code><DD>plane {</code></b> <I>&lt;Normal&gt;</I><b><code>,</code></b> <I>Distance</I> <I>[OBJECT_MODIFIERS...]</I> <b><code>}</DD>
+</DL>
+</code></b><P>The <I>&lt;Normal&gt;</I> vector defines the surface normal of the plane. A surface normal is a vector which points up from the surface at a 90 degree angle. This is followed by a float value that gives the distance along the normal that the plane is from the origin (that is only true if the normal vector has unit length; see below). For example:</P>
+<PRE>  plane { &lt;0, 1, 0&gt;, 4 }</PRE>
+<P>This is a plane where straight up is defined in the positive y-direction. The plane is 4 units in that direction away from the origin. Because most planes are defined with surface normals in the direction of an axis you will often see planes defined using the <b><code>x</code></b>, <b><code>y</code></b> or <b><code>z</code></b> built-in vector identifiers. The example above could be specified as:</P>
+<PRE>  plane { y, 4 }</PRE>
+<P>The plane extends infinitely in the x- and z-directions. It effectively divides the world into two pieces. By definition the normal vector points to the outside of the plane while any points away from the vector are defined as inside. This inside/outside distinction is important when using planes in CSG and <b><code>clipped_by</code></b>.  It is also important when using fog or atmospheric media.  If you place a camera on the "inside" half of the world, then the fog or media will not appear.  Such issues arise in any solid object but it is more common with planes.  Users typically know when they've accidentally placed a camera inside a sphere or box but "inside a plane" is an unusual concept.  You can reverse the inside/outside properties of an object by adding the object modifier <b><code>inverse</code></b>.  See "<A HREF="pov281.htm#_Ref415664580">Inverse</A>" and "<A HREF="pov287.htm#_Ref415663975">Empty and Solid Objects</A>" for details.</P>
+<P>A plane is called a <I>polynomial</I> shape because it is defined by a first order polynomial equation. Given a plane:</P>
+<PRE>  plane { &lt;A, B, C&gt;, D }</PRE>
+<P>it can be represented by the equation<I>  A*x + B*y + C*z - D*sqrt(A<SUP>2</SUP> + B<SUP>2</SUP> + C<SUP>2</SUP>) = 0.</P>
+</I><P>Therefore our example <b><code>plane{y,4}</code></b> is actually the polynomial equation y=4. You can think of this as a set of all x, y, z points where all have y values equal to 4, regardless of the x or z values.</P>
+<P>This equation is a first order polynomial because each term contains only single powers of x, y or z. A second order equation has terms like x<SUP>2</SUP>, y<SUP>2</SUP>, z<SUP>2</SUP>, xy, xz and yz. Another name for a 2nd order equation is a quadric equation. Third order polys are called cubics. A 4th order equation is a quartic. Such shapes are described in the sections below.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov257.htm">Infinite Solid Primitives</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov259.htm">Poly, Cubic and Quartic</A>
+</P>
+</BODY>
+</HTML>
+

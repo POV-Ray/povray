@@ -1,0 +1,41 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Pre-defined Textures</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov66.htm">Creating Color Patterns</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov68.htm">Advanced Texture Options</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405129"><A NAME="_Toc411405405"><A NAME="_Toc414198887"><A NAME="_Toc429993397">Pre-defined Textures</A></A></A></A></H3>
+<P>POV-Ray has some very sophisticated textures pre-defined in the standard include files <CODE>glass.inc</CODE>, <CODE>metals.inc</CODE>, <CODE>stones.inc</CODE> and <CODE>woods.inc</CODE>. Some are entire textures with pigment, normal and/or finish parameters already defined. Some are just pigments or just finishes.  We change the definition of our sphere to the following and then re-render it:</P>
+<PRE>  sphere { &lt;0, 1, 2&gt;, 2
+    texture {
+      pigment {
+        DMFWood4       // pre-defined in textures.inc
+        scale 4        // scale by the same amount in all
+                       // directions
+      }
+      finish { Shiny } // pre-defined in finish.inc
+    }
+  }</PRE>
+<P>The pigment identifier <b><code>DMFWood4</code></b> has already been scaled down quite small when it was defined. For this example we want to scale the pattern larger. Because we want to scale it uniformly we can put a single value after the scale keyword rather than a vector of x, y, z scale factors.</P>
+<P>We look through the file <CODE>textures.inc</CODE> to see what pigments and finishes are defined and try them out. We just insert the name of the new pigment where <b><code>DMFWood4</code></b> is now or try a different finish in place of <b><code>Shiny</code></b> and re-render our file.</P>
+<P>Here is an example of using a complete texture identifier rather than just the pieces.</P>
+<PRE>  sphere { &lt;0, 1, 2&gt;, 2
+    texture { PinkAlabaster }
+  }</PRE>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov66.htm">Creating Color Patterns</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov68.htm">Advanced Texture Options</A>
+</P>
+</BODY>
+</HTML>
+

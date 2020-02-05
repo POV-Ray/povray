@@ -1,0 +1,52 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Finish</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov303.htm">Bump Maps</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov305.htm">Ambient</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405207"><A NAME="_Toc411405483"><A NAME="_Toc414199144"><A NAME="_Ref416591872"><A NAME="_Ref417128880"><A NAME="_Ref417300575"><A NAME="_Toc429993655">Finish</A></A></A></A></A></A></A></H3>
+<P>The finish properties of a surface can greatly affect its appearance. How does light reflect? What happens in shadows? What kind of highlights are visible. To answer these questions you need a <b><code>finish</code></b>.</P>
+<P>The syntax for <b><code>finish</code></b> is as follows:</P>
+<I><DL>
+<DT>FINISH:</DT>
+</I><b><code><DD>finish {</code></b> <I>[FINISH_IDENTIFIER] [FINISH_ITEMS...]</I> <b><code>}</DD>
+</code></b><I><DT>FINISH_ITEMS:</DT>
+</I><b><code><DD>ambient</code></b> <I>COLOR</I>   |   <b><code>diffuse</code></b> <I>Amount</I>   |   <b><code>brilliance</code></b> <I>Amount</I>   |</DD>
+<b><code><DD>phong</code></b> <I>Amount</I>   |   <b><code>phong_size</code></b> <I>Amount</I>   |</DD>
+<b><code><DD>specular</code></b> <I>Amount</I>   |   <b><code>roughness</code></b> <I>Amount</I>   |</DD>
+<b><code><DD>metallic</code></b> <I>[Amount]</I>   |   <b><code>reflection</code></b> <I>COLOR</I>   |   <b><code>reflection_exponent</code></b> <I>Amount</I>   |</DD>
+<b><code><DD>irid {</code></b> <I>Irid_Amount [IRID_ITEMS...]</I> <b><code>}</code></b>   |   <b><code>crand</code></b> <I>Amount</DD>
+<DT>IRID_ITEMS:</DT>
+</I><b><code><DD>thickness</code></b> <I>Amount</I>   |   <b><code>turbulence</code></b> <I>Amount</DD>
+</DL>
+</I><P>The <I>FINISH_IDENTIFIER</I> is optional but should proceed all other items. Any items after the <I>FINISH_IDENTIFIER</I> modify or override settings given in the <I>FINISH_IDENTIFIER</I>. If no identifier is specified then the items modify the finish values in the current default texture.  Note that transformations are not allowed inside a finish because finish items cover the entire surface uniformly.  Each of the <I>FINISH_ITEMS</I> listed above is described in sub-sections below.</P>
+<P>In earlier versions of POV-Ray, the <b><code>refraction</code></b>, <b><code>ior</code></b>, and <b><code>caustics</code></b> keywords were part of the <b><code>finish</code></b> statement but they are now part of the <b><code>interior</code></b> statement.  They are still supported under <b><code>finish</code></b> for backward compatibility but the results may not be 100% identical to previous versions. See "<A HREF="pov286.htm#_Ref417286060">Why are Interior and Media Necessary?</A>" for details.</P>
+<P>A <b><code>finish</code></b> statement is part of a <b><code>texture</code></b> specification.  However it can be tedious to use a <b><code>texture</code></b> statement just to add a highlights or other lighting properties to an object. Therefore you may attach a finish directly to an object without explicitly specifying that it as part of a texture. For example instead of this:</P>
+<PRE>  object {My_Object texture{finish{phong 0.5}}}</PRE>
+<P>you may shorten it to:</P>
+<PRE>  object {My_Object finish{phong 0.5}}</PRE>
+<P>Note however that doing so creates an entire <b><code>texture</code></b> structure with default <b><code>pigment</code></b> and <b><code>normal</code></b> statements just as if you had explicitly typed the full <b><code>texture{...}</code></b> around it.</P>
+<P>Finish identifiers may be declared to make scene files more readable and to parameterize scenes so that changing a single declaration changes many values. An identifier is declared as follows.</P>
+<I><DL>
+<DT>FINISH_DECLARATION:</DT>
+</I><b><code><DD>#declare </code></b><I>IDENTIFIER </I><b><code>=</code></b> <I>FINISH</I>   |</DD>
+<b><code><DD>#local </code></b><I>IDENTIFIER </I><b><code>=</code></b> <I>FINISH</DD>
+</DL>
+</I><P>Where <I>IDENTIFIER</I> is the name of the identifier up to 40 characters long and <I>FINISH</I> is any valid <b><code>finish</code></b> statement.  See "<A HREF="pov191.htm#_Ref412711267">#declare vs. #local</A>" for information on identifier scope.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov303.htm">Bump Maps</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov305.htm">Ambient</A>
+</P>
+</BODY>
+</HTML>
+

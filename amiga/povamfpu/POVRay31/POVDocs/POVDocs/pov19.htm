@@ -1,0 +1,32 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Adding Texture to an Object</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov18.htm">Describing an Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov20.htm">Defining a Light Source</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405091"><A NAME="_Toc411405367"><A NAME="_Toc414198838"><A NAME="_Toc429993349">Adding Texture to an Object</A></A></A></A></H3>
+<P>After we have defined the location and size of the sphere, we need to describe the appearance of the surface. The <b><code>texture</code></b> statement specifies these parameters. Texture blocks describe the color, bumpiness and finish properties of an object. In this example we will specify the color only. This is the minimum we must do. All other texture options except color will use default values.</P>
+<P>The color we define is the way we want an object to look if fully illuminated. If we were painting a picture of a sphere we would use dark shades of a color to indicate the shadowed side and bright shades on the illuminated side. However ray-tracing takes care of that for you. We only need to pick the basic color inherent in the object and POV-Ray brightens or darkens it depending on the lighting in the scene. Because we are defining the basic color the object actually <B>has </B>rather than how it <B>looks </B>the parameter is called <b><code>pigment</code></b>.</P>
+<P>Many types of color patterns are available for use in a pigment statement. The keyword <b><code>color</code></b> specifies that the whole object is to be one solid color rather than some pattern of colors. We can use one of the color identifiers previously defined in the standard include file <CODE>colors.inc</CODE>.</P>
+<P>If no standard color is available for our needs, we may define our own color by using the color keyword followed by <b><code>red</code></b>, <b><code>green</code></b>, and <b><code>blue</code></b> keywords specifying the amount of red, green and blue to be mixed. For example a nice shade of pink can be specified by:</P>
+<PRE>  color red 1.0 green 0.8 blue 0.8</PRE>
+<P>The values after each keyword should be in the range from 0.0 to 1.0. Any of the three components not specified will default to 0. A shortcut notation may also be used. The following produces the same shade of pink:</P>
+<PRE>  color rgb &lt;1.0, 0.8, 0.8&gt;</PRE>
+<P>Colors are explained in more detail in section "<A HREF="pov174.htm#_Ref413394014">Specifying Colors</A>".</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov18.htm">Describing an Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov20.htm">Defining a Light Source</A>
+</P>
+</BODY>
+</HTML>
+

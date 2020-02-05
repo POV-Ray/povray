@@ -1,0 +1,37 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Cone Object</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov22.htm">Box Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov24.htm">Cylinder Object</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405095"><A NAME="_Toc411405371"><A NAME="_Toc414198842"><A NAME="_Toc429993353">Cone Object</A></A></A></A></H3>
+<P>Here's another example showing how to use a <b><code>cone</code></b>:</P>
+<PRE>  cone {
+    &lt;0, 1, 0&gt;, 0.3    // Center and radius of one end
+    &lt;1, 2, 3&gt;, 1.0    // Center and radius of other end
+    texture { T_Stone25 scale 4 }
+  }</PRE>
+<P>The cone shape is defined by the center and radius of each end. In this example one end is at location &lt;0,1,0&gt; and has a radius of 0.3 while the other end is centered at &lt;1,2,3&gt; with a radius of 1. If we want the cone to come to a sharp point we must use radius=0. The solid end caps are parallel to each other and perpendicular to the cone axis. If we want an open cone with no end caps we have to add the keyword <b><code>open</code></b> after the 2nd radius like this:</P>
+<PRE>  cone {
+    &lt;0, 1, 0&gt;, 0.3    // Center and radius of one end
+    &lt;1, 2, 3&gt;, 1.0    // Center and radius of other end
+    open              // Removes end caps
+    texture { T_Stone25 scale 4 }
+  }</PRE>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov22.htm">Box Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov24.htm">Cylinder Object</A>
+</P>
+</BODY>
+</HTML>
+

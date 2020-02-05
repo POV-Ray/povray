@@ -1,0 +1,57 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Blob Object</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov35.htm">Bicubic Patch Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov37.htm">Component Types and Other New Features</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405107"><A NAME="_Toc411405383"><A NAME="_Ref413759196"><A NAME="_Toc414198855"><A NAME="_Toc429993366">Blob Object</A></A></A></A></A></H3>
+<P>Blobs are described as spheres and cylinders covered with "goo" which stretches to smoothly join them (see section "<A HREF="pov238.htm#_Ref428631930">Blob</A>"). Ideal for modeling atoms and molecules, blobs are also powerful tools for creating many smooth flowing "organic" shapes.</P>
+<P>A slightly more mathematical way of describing a blob would be to say that it is one object made up of two or more component pieces. Each piece is really an invisible field of force which starts out at a particular strength and falls off smoothly to zero at a given radius. Where ever these components overlap in space, their field strength gets added together (and yes, we can have negative strength which gets subtracted out of the total as well). We could have just one component in a blob, but except for seeing what it looks like there is little point, since the real beauty of blobs is the way the components interact with one another.</P>
+<P>Let us take a simple example blob to start. Now, in fact there are a couple different types of components but we will look at them a little later. For the sake of a simple first example, let us just talk about spherical components. Here is a sample POV-Ray code showing a basic camera, light, and a simple two component blob (this scene is called <CODE>blobdem1.pov</CODE>):</P>
+<PRE>  #include "colors.inc"
+  background{White}
+  camera {
+    angle 15
+    location &lt;0,2,-10&gt;
+    look_at &lt;0,0,0&gt;
+  }
+  light_source { &lt;10, 20, -10&gt; color White }
+  blob {
+    threshold .65
+    sphere { &lt;.5,0,0&gt;, .8, 1 pigment {Blue} }
+    sphere { &lt;-.5,0,0&gt;,.8, 1 pigment {Pink} }
+    finish { phong 1 }
+  }</PRE>
+<B><P ALIGN="CENTER"><IMG SRC="Image203.jpg" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">A simple, two-part blob.</P>
+</B><P>The threshold is simply the overall strength value at which the blob becomes visible. Any points within the blob where the strength matches the threshold exactly form the surface of the blob shape. Those less than the threshold are <I>outside </I>and those greater than are <I>inside </I>the blob.</P>
+<P>We note that the spherical component looks a lot like a simple sphere object. We have the sphere keyword, the vector representing the location of the center of the sphere and the float representing the radius of the sphere. But what is that last float value? That is the individual strength of that component. In a spherical component, that is how strong the component's field is at the center of the sphere. It will fall off in a linear progression until it reaches exactly zero at the radius of the sphere.</P>
+<P>Before we render this test image, we note that we have given each component a different pigment. POV-Ray allows blob components to be given separate textures. We have done this here to make it clearer which parts of the blob are which. We can also texture the whole blob as one, like the finish statement at the end, which applies to all components since it appears at the end, outside of all the components. We render the scene and get a basic kissing spheres type blob.</P>
+<P>The image we see shows the spheres on either side, but they are smoothly joined by that bridge section in the center. This bridge represents where the two fields overlap, and therefore stay above the threshold for longer than elsewhere in the blob. If that is not totally clear, we add the following two objects to our scene and re-render (see file <CODE>blobdem2.pov</CODE>). We note that these are meant to be entered as separate sphere objects, not more components in the blob.</P>
+<PRE>  sphere { &lt;.5,0,0&gt;, .8
+    pigment { Yellow transmit .75 }
+  }
+  sphere { &lt;-.5,0,0&gt;, .8
+    pigment { Green transmit .75 }
+  }</PRE>
+<B><P ALIGN="CENTER"><IMG SRC="Image204.jpg" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">The spherical components made visible.</P>
+</B><P>Now the secrets of the kissing spheres are laid bare. These semi-transparent spheres show where the components of the blob actually are. If we have not worked with blobs before, we might be surprised to see that the spheres we just added extend way farther out than the spheres that actually show up on the blobs. That of course is because our spheres have been assigned a starting strength of one, which gradually fades to zero as we move away from the sphere's center. When the strength drops below the threshold (in this case 0.65) the rest of the sphere becomes part of the outside of the blob and therefore is not visible.</P>
+<P>See the part where the two transparent spheres overlap? We note that it exactly corresponds to the bridge between the two spheres. That is the region where the two components are both contributing to the overall strength of the blob at that point. That is why the bridge appears: that region has a high enough strength to stay over the threshold, due to the fact that the combined strength of two spherical components is overlapping there.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov35.htm">Bicubic Patch Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov37.htm">Component Types and Other New Features</A>
+</P>
+</BODY>
+</HTML>
+

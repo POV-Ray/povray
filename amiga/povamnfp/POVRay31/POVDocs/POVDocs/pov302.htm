@@ -1,0 +1,59 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Normal Maps and Normal Lists</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov301.htm">Slope Maps</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov303.htm">Bump Maps</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199139"><A NAME="_Ref418337380"><A NAME="_Toc429993650">Normal Maps</A> and Normal Lists</A></A></H4>
+<P>Most of the time you will apply single normal pattern to an entire surface but you may also create a pattern or blend of normals using a <b><code>normal_map</code></b>. The syntax for a <b><code>normal_map</code></b> is identical to a <b><code>pigment_map</code></b> except you specify a <b><code>normal</code></b> in each map entry.</P>
+<P>The syntax for <b><code>normal_map</code></b> is as follows:</P>
+<I><DL>
+<DT>NORMAL_MAP:</DT>
+</I><b><code><DD>normal_map{</code></b> <I>NORMAL_MAP_BODY</I> <b><code>}</DD>
+</code></b><I><DT>NORMAL_MAP_BODY:</DT>
+<DD>NORMAL_MAP_IDENTIFIER</I>   |   <I>NORMAL_MAP_ENTRY</I>...</DD>
+<I><DT>NORMAL_MAP_ENTRY:</DT>
+</I><b><code><DD>[</code></b> <I>Value</I>  <I>NORMAL_BODY</I> <b><code>]</DD>
+</DL>
+</code></b><P>Where <I>Value</I> is a float value between 0.0 and 1.0 inclusive and each <I>NORMAL_BODY</I> is anything which can be inside a <b><code>normal{...}</code></b> statement.  The <b><code>normal</code></b> keyword and <b><code>{}</code></b> braces need not be specified.</P>
+<P>Note that the <b><code>[]</code></b> brackets are part of the actual <I>NORMAL_MAP_ENTRY</I>. They are not notational symbols denoting optional parts. The brackets surround each entry in the normal map. There may be from 2 to 256 entries in the map. </P>
+<P>For example</P>
+<PRE>  normal {
+    gradient x       //this is the PATTERN_TYPE
+    normal_map {
+      [0.3  bumps scale 2]
+      [0.3  dents]
+      [0.6  dents]
+      [0.9  marble turbulence 1]
+    }
+  }</PRE>
+<P>When the <b><code>gradient x</code></b> function returns values from 0.0 to 0.3 then the scaled bumps normal is used. From 0.3 to 0.6 dents are From 0.6 up to 0.9 a blend of dents and a turbulent marble is used. From 0.9 on up only the turbulent marble is used.</P>
+<P>Normal maps may be nested to any level of complexity you desire. The normals in a map may have slope maps or normal maps or any type of normal you want.</P>
+<P>A normal map is also used with the <b><code>average</code></b> normal type. See "<A HREF="pov318.htm#_Ref417980778">Average</A>" for details.</P>
+<P>Entire normals in a normal list may also be used with the block patterns such as <b><code>checker</code></b>, <b><code>hexagon</code></b> and <b><code>brick</code></b>. For example...</P>
+<PRE>  normal {
+    checker
+      normal { gradient x scale .2 }
+      normal { gradient y scale .2 }
+    }
+  }</PRE>
+<P>Note that in the case of block patterns the <b><code>normal</code></b> wrapping is required around the normal information.</P>
+<P>You may not use <b><code>normal_map</code></b> or individual normals with a <b><code>bump_map</code></b>. See section "<A HREF="pov312.htm#_Ref417980909">Texture Maps</A>" for an alternative way to do this.</P>
+<P>You may declare and use normal map identifiers but the only way to declare a normal block pattern list is to declare a normal identifier for the entire normal.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov301.htm">Slope Maps</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov303.htm">Bump Maps</A>
+</P>
+</BODY>
+</HTML>
+

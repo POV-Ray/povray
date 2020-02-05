@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,19 +36,32 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/quadric.h"
 
-#include <algorithm>
+// C++ variants of C standard header files
+//  (none at the moment)
 
+// C++ standard header files
+#include <algorithm>
+#include <vector>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
 #include "core/shape/plane.h"
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov
 {
+
+using std::min;
+using std::max;
 
 /*****************************************************************************
 * Local preprocessor defines
@@ -744,13 +757,8 @@ Quadric::~Quadric()
 
 void Quadric::Compute_BBox()
 {
-    Vector3d pOne;
-    Vector3d mOne;
-
-    pOne = Vector3d( 1.0,  1.0,  1.0);
-    mOne = Vector3d(-1.0, -1.0, -1.0);
-
-    Compute_BBox(mOne, pOne);
+    Vector3d clipMin(-1.0), clipMax(1.0);
+    Compute_BBox(clipMin, clipMax);
 }
 
 void Quadric::Compute_BBox(Vector3d& ClipMin, Vector3d& ClipMax)
@@ -765,12 +773,12 @@ void Quadric::Compute_BBox(Vector3d& ClipMin, Vector3d& ClipMax)
     if(!Clip.empty())
     {
         /* Intersect the members bounding boxes. */
-        for(vector<ObjectPtr>::iterator it = Clip.begin(); it != Clip.end(); it++)
+        for(std::vector<ObjectPtr>::iterator it = Clip.begin(); it != Clip.end(); it++)
         {
             ObjectPtr p = *it;
             if (Test_Flag(p, INVERTED_FLAG) == false)
             {
-                if (dynamic_cast<Plane *> (p) != NULL)
+                if (dynamic_cast<Plane *> (p) != nullptr)
                     Compute_Plane_Min_Max(dynamic_cast<Plane *> (p), TmpMin, TmpMax);
                 else
                     Make_min_max_from_BBox(TmpMin, TmpMax, p->BBox);
@@ -1417,7 +1425,7 @@ void Quadric::Compute_Plane_Min_Max(const Plane *plane, Vector3d& Min, Vector3d&
     DBL d;
     Vector3d P, N;
 
-    if (plane->Trans == NULL)
+    if (plane->Trans == nullptr)
     {
         N = plane->Normal_Vector;
 
@@ -1479,3 +1487,4 @@ void Quadric::Compute_Plane_Min_Max(const Plane *plane, Vector3d& Min, Vector3d&
 }
 
 }
+// end of namespace pov

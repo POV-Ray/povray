@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Coincidence Surfaces</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov32.htm">CSG Pitfalls</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov34.htm">Advanced Shapes</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198852"><A NAME="_Toc429993363">Coincidence Surfaces</A></A></H4>
+<P>POV-Ray uses inside/outside tests to determine the points at which a ray intersects a CSG object. A problem arises when the surfaces of two different shapes coincide because there is no way (due to numerical problems) to tell whether a point on the coincident surface belongs to one shape or the other.</P>
+<P>Look at the following example where a cylinder is used to cut a hole in a larger box.</P>
+<PRE>  difference {
+    box { -1, 1 pigment { Red } }
+    cylinder { -z, z, 0.5 pigment { Green } }
+  }</PRE>
+<P>Note that the vectors -1 and 1 in the box definition expand to &lt;-1,-1,-1&gt; and &lt;1,1,1&gt; respectively.</P>
+<P>If we trace this object we see red speckles where the hole is supposed to be. This is caused by the coincident surfaces of the cylinder and the box. One time the cylinder's surface is hit first by a viewing ray, resulting in the correct rendering of the hole, and another time the box is hit first, leading to a wrong result where the hole vanishes and red speckles appear.</P>
+<P>This problem can be avoided by increasing the size of the cylinder to get rid of the coincidence surfaces. This is done by:</P>
+<PRE>  difference {
+    box { -1, 1 pigment { Red } }
+    cylinder { -1.001*z, 1.001*z, 0.5 pigment { Green } }
+  }</PRE>
+<P>In general we have to make the subtracted object a little bit larger in a CSG difference. We just have to look for coincident surfaces and increase the subtracted object appropriately to get rid of those surfaces.</P>
+<P>The same problem occurs in CSG intersections and is also avoided by scaling some of the involved objects.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov32.htm">CSG Pitfalls</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov34.htm">Advanced Shapes</A>
+</P>
+</BODY>
+</HTML>
+

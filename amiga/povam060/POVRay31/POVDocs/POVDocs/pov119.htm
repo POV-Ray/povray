@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - INI File Settings</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov118.htm">Do Not Use Jitter Or Crand</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov120.htm">POV-Ray Options</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref412029139"><A NAME="_Toc414198940"><A NAME="_Toc429993449">INI File Settings</A></A></A></H4>
+<P>Okay, so we have a grasp of how to code our file for animation. We know about the clock variable, user declared clock-relative variables, and the phase keyword. We know not to jitter or crand when we render a scene, and we're all set build some animations. Alright, let's have at it.</P>
+<P>The first concept we'll need to know is the INI file settings, <b><code>Initial_Frame</code></b> and <b><code>Final_Frame</code></b>. These are very handy settings that will allow us to render a particular number of frames and each with its own unique frame number, in a completely hands free way. It is of course, so blindingly simple that it barely needs explanation, but here's an example anyway. We just add the following lines to our favorite INI file settings</P>
+<PRE>  Initial_Frame = 1
+  Final_Frame = 20</PRE>
+<P>and we'll initiate an automated loop that will generate 20 unique frames.  The settings themselves will automatically append a frame number onto the end of whatever we have set the output file name for, thus giving each frame an unique file number without having to think about it. Secondly, by default, it will cycle the clock variable up from 0 to 1 in increments proportional to the number of frames. This is very convenient, since, no matter whether we are making a five frame animated GIF or a 300 frame MPEG sequence, we will have a clock value which smoothly cycles from exactly the same start to exactly the same finish.</P>
+<P>Next, about that clock. In our example with the rolling ball code, we saw that sometimes we want the clock to cycle through values other than the default of 0.0 to 1.0. Well, when that's the case, there are setting for that too.  The format is also quite simple. To make the clock run, as in our example, from 0.0 to 2.0, we would just add to your INI file the lines</P>
+<PRE>  Initial_Clock = 0.0
+  Final_Clock = 2.0</PRE>
+<P>Now, suppose we were developing a sequence of 100 frames, and we detected a visual glitch somewhere in frames, say 51 to 75. We go back over our code and we think we've fixed it. We'd like to render just those 25 frames instead of redoing the whole sequence from the beginning. What do we change?</P>
+<P>If we said make <b><code>Initial_Frame = 51</code></b>, and <b><code>Final_Frame = 75</code></b>, we're wrong. Even though this would re-render files named with numbers 51 through 75, they will not properly fit into our sequence, because the clock will begin at its initial value starting with frame 51, and cycle to final value ending with frame 75. The only time <b><code>Initial_Frame</code></b> and <b><code>Final_Frame</code></b> should change is if we are doing an essentially new sequence that will be appended onto existing material.</P>
+<P>If we wanted to look at just 51 through 75 of the original animation, we need two new INI settings</P>
+<PRE>  Subset_Start_Frame = 51
+  Subset_End_Frame = 75</PRE>
+<P>Added to settings from before, the clock will still cycle through its values proportioned from frames 1 to 100, but we will only be rendering that part of the sequence from the 51st to the 75th frames.</P>
+<P>This should give us a basic idea of how to use animation. Although, this introductory tutorial doesn't cover all the angles. For example, the last two settings we just saw, subset animation, can take fractional values, like 0.5 to 0.75, so that the number of actual frames will not change what portion of the animation is being rendered. There is also support for efficient odd-even field rendering as would be useful for animations prepared for display in interlaced playback such as television (see the reference section for full details).</P>
+<P>With POV-Ray 3 now fully supporting a complete host of animation options, a whole fourth dimension is added to the raytracing experience. Whether we are making a FLIC, AVI, MPEG, or simply an animated GIF for our web site, animation support takes a lot of the tedium out of the process. And don't forget that phase and clock can be used to explore the range of numerous texture elements, as well as some of the more difficult to master objects (hint: the julia fractal for example). So even if we are completely content with making still scenes, adding animation to our repertoire can greatly enhance our understanding of what POV-Ray is capable of. Adventure awaits!</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov118.htm">Do Not Use Jitter Or Crand</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov120.htm">POV-Ray Options</A>
+</P>
+</BODY>
+</HTML>
+

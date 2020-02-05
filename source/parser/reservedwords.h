@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,27 +40,48 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "parser/configparser.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+// POV-Ray header files (core module)
+//  (none at the moment)
+
+// POV-Ray header files (parser module)
+#include "parser/parsertypes.h"
+
 namespace pov_parser
 {
 
-using namespace pov;
-
-typedef struct Reserved_Word_Struct RESERVED_WORD;
-typedef int TOKEN;
-
-struct Reserved_Word_Struct
+struct Reserved_Word_Struct final
 {
-    TOKEN Token_Number;
+    TokenId Token_Number;
     const char *Token_Name;
 };
+using RESERVED_WORD = Reserved_Word_Struct; ///< @deprecated
 
 // Token Definitions for Parser
-enum TOKEN_IDS
+enum TokenId : int
 {
+    //------------------------------------------------------------------------------
+    // Signature Tokens.
+    //
+    // All tokens that indicate a file format must go here.
+    //
+    // Please keep this section neatly sorted by the token identifier name,
+    // sorting underscore characters before digits, digits before letters,
+    // and short names before long ones, but _ignoring_ the trailing `_TOKEN` or
+    // `_ID_TOKEN`.
+
+    UTF8_SIGNATURE_TOKEN,
+
+    SIGNATURE_TOKEN_CATEGORY, // must be last in this section
+
     //------------------------------------------------------------------------------
     // Float Tokens.
     //
-    // All tokens that may start a float expression must go here.
+    // All keyword tokens that may start a float expression must go here.
     //
     // Please keep this section neatly sorted by the token identifier name,
     // sorting underscore characters before digits, digits before letters,
@@ -123,18 +144,18 @@ enum TOKEN_IDS
     TANH_TOKEN,
     TAU_TOKEN,
     TRUE_TOKEN,
-    VDOT_TOKEN,
     VAL_TOKEN,
+    VDOT_TOKEN,
     VERSION_TOKEN,
     VLENGTH_TOKEN,
     YES_TOKEN,
 
-    FLOAT_FUNCT_TOKEN, // must be last in this section
+    FLOAT_TOKEN_CATEGORY, // must be last in this section
 
     //------------------------------------------------------------------------------
     // Vector Tokens.
     //
-    // All tokens that may start a vector expression must go here.
+    // All keyword tokens that may start a vector expression must go here.
     //
     // Please keep this section neatly sorted by the token identifier name,
     // sorting underscore characters before digits, digits before letters,
@@ -154,12 +175,12 @@ enum TOKEN_IDS
     Y_TOKEN,
     Z_TOKEN,
 
-    VECTOR_FUNCT_TOKEN, // must be last in this section
+    VECTOR_TOKEN_CATEGORY, // must be last in this section
 
     //------------------------------------------------------------------------------
     // Colour Tokens.
     //
-    // Tokens that may start a colour expression must typically go here.
+    // Keyword tokens that may start a colour expression must typically go here.
     //
     // Please keep this section neatly sorted by the token identifier name,
     // sorting underscore characters before digits, digits before letters,
@@ -187,7 +208,7 @@ enum TOKEN_IDS
     SRGBT_TOKEN,
     TRANSMIT_TOKEN,
 
-    COLOUR_KEY_TOKEN, // must be last in this section
+    COLOUR_TOKEN_CATEGORY, // must be last in this section
 
     //------------------------------------------------------------------------------
     // More Colour Tokens.
@@ -279,6 +300,7 @@ enum TOKEN_IDS
     CHR_TOKEN,
     CIRCULAR_TOKEN,
     CLIPPED_BY_TOKEN,
+    CMAP_TOKEN,
     COLLECT_TOKEN,
     COLON_TOKEN,
     COLOUR_MAP_TOKEN,
@@ -477,6 +499,7 @@ enum TOKEN_IDS
     METHOD_TOKEN,
     METRIC_TOKEN,
     MINIMUM_REUSE_TOKEN,
+    MIXED_TOKEN,
     MM_PER_UNIT_TOKEN,
     MORTAR_TOKEN,
 
@@ -732,11 +755,17 @@ enum TOKEN_IDS
     //------------------------------------------------------------------------------
     // End of list.
 
-    TOKEN_COUNT // Pseudo-Token to count the number of token identifiers.
+    TOKEN_COUNT_, // Pseudo-Token to count the number of token identifiers.
+    NOT_A_TOKEN = -1 // Pseudo-Token used to invalidate a token identifier variable.
 };
+
+constexpr int TOKEN_COUNT = int(TokenId::TOKEN_COUNT_);
 
 extern const RESERVED_WORD Reserved_Words[];
 
+TokenId GetCategorizedTokenId(TokenId tokenId);
+
 }
+// end of namespace pov_parser
 
 #endif // POVRAY_PARSER_RESERVEDWORDS_H

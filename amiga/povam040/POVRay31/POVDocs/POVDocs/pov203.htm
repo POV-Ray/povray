@@ -1,0 +1,45 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - The #ifdef and #ifndef Directives</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov202.htm">The #if...#else...#end Directives</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov204.htm">The #switch, #case, #range and #break Directives</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref413241864"><A NAME="_Toc414199036"><A NAME="_Toc429993546">The #ifdef and #ifndef Directives</A></A></A></H4>
+<P>The <b><code>#ifdef</code></b> and <b><code>#ifndef</code></b> directive are similar to the <b><code>#if</code></b> directive however they is used to determine if an identifier has been previously declared.</P>
+<I><DL>
+<DT>IFDEF_DIRECTIVE:</DT>
+</I><b><code><DD>#ifdef (</code></b><I> IDENTIFIER </I><b><code>) </code></b><I>TOKENS...  [</I><b><code>#else</code></b> <I>TOKENS...] </I><b><code>#end</DD>
+</code></b><I><DT>IFNDEF_DIRECTIVE:</DT>
+</I><b><code><DD>#ifndef (</code></b><I> IDENTIFIER </I><b><code>) </code></b><I>TOKENS...  [</I><b><code>#else</code></b> <I>TOKENS...] </I><b><code>#end</DD>
+</DL>
+</code></b><P>If the <I>IDENTIFIER </I>exists then the first group of tokens is parsed normally and the second set is skipped.  If false, the first set is skipped and the second set is parsed.  This is especially useful for replacing an undefined item with a default.  For example:</P>
+<P> #ifdef (User_Thing)</P>
+<PRE>  // This section is parsed if the
+  // identifier "User_Thing" was
+  // previously declared
+  object{User_Thing} // invoke identifier
+ #else
+  // This section is parsed if the
+  // identifier "User_Thing" was not
+  // previously declared
+  box{&lt;0,0,0&gt;,&lt;1,1,1&gt;} // use a default
+ #end
+  // End of conditional part</PRE>
+<P>The <b><code>#ifndef</code></b> directive works the opposite.  The first group is parsed if the identifier is <I>not</I> defined.  As with the <b><code>#if</code></b> directive, the <b><code>#else</code></b> clause is optional and the <b><code>#end</code></b> directive is required.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov202.htm">The #if...#else...#end Directives</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov204.htm">The #switch, #case, #range and #break Directives</A>
+</P>
+</BODY>
+</HTML>
+

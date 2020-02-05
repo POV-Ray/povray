@@ -1,0 +1,51 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Invoking Macros</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov210.htm">The #macro Directive</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov212.htm">Are POV-Ray Macros a Function or a Macro?</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref413414330"><A NAME="_Toc414199044"><A NAME="_Toc429993554">Invoking Macros</A></A></A></H4>
+<P>You invoke the macro by specifying the macro name followed by a list of zero or more actual parameters enclosed in parentheses and separated by commas.  The number of actual parameters must match the number of formal parameters in the definition.  The parentheses are required even if no parameters are specified.  The syntax is:</P>
+<I><DL>
+<DT>MACRO_INVOCATION:</DT>
+<DD>MACRO_IDENTIFIER</I> <b><code>(</code></b><I> [ACTUAL_PARAM] [</I><b><code>,</code></b><I>  ACTUAL_PARAM]... </I><b><code>)</DD>
+</code></b><I><DT>ACTUAL_PARAM:</DT>
+<DD>IDENTIFIER&#9;&#9;</I>|</DD>
+<I><DD>RVALUE</DD>
+</DL>
+</I><P>An <I>RVALUE</I> is any value that can legally appear to the right of an equals sign in a <b><code>#declare</code></b> or <b><code>#local</code></b> declaration. See "<A HREF="pov190.htm#_Ref413339528">Declaring identifiers</A>" for information on <I>RVALUE</I>s.  When the macro is invoked, a new local symbol table is created.  The actual parameters are assigned to formal parameter identifiers as local, temporary variables.  POV-Ray jumps to the body of the macro and continues parsing until the matching <b><code>#end</code></b> directive is reached.  There, the local variables created by the parameters are destroyed as well as any local identifiers expressly created in the body of the macro.  It then resumes parsing at the point where the macro was invoked.  It is as though the body of the macro was cut and pasted into the scene at the point where the macro was invoked.</P>
+<P>Here is a simple macro that creates a window frame object when you specify the inner and outer dimensions.</P>
+<PRE> #macro Make_Frame (OuterWidth,OuterHeight,InnerWidth,InnerHeight,Depth)
+  #local Horz = (OuterHeight-InnerHeight)/2;
+  #local Vert = (OuterWidth-InnerWidth)/2;
+  difference
+  {
+   box{&lt;0,0,0&gt;,&lt;OuterWidth,OuterHeight,Depth&gt;}
+   box{&lt;Vert,Hoiz,-0.1&gt;,&lt;OuterWidth-Vert,OuterHeight-Horz,Depth+0.1&gt;}
+  }
+ #end
+ Make_Frame(8,10,7,9,1) //invoke the macro</PRE>
+<P>In this example, the macro has five float parameters.  The actual parameters (the values 8, 10, 7, 9, and 1) are assigned to the five identifiers in the <b><code>#macro</code></b> formal parameter list.  It is as though you had used the following five lines of code.</P>
+<PRE> #local OuterWidth = 8;
+ #local OuterHeight = 10;
+ #local InnerWidth, = 7;
+ #local InnerHeight = 9;
+ #local Depth = 1;</PRE>
+<P>These five identifiers are stored in the same symbol table as any other local identifier such as <b><code>Horz</code></b> or <b><code>Vert</code></b> in this example.  The parameters and local variables are all destroyed when the <b><code>#end</code></b> statement is reached.  See "<A HREF="pov192.htm#_Ref413404001">Identifier Name Collisions</A>" for a detailed discussion of how local identifiers, parameters, and global identifiers work when a local identifier has the same name as a previously declared identifier.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov210.htm">The #macro Directive</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov212.htm">Are POV-Ray Macros a Function or a Macro?</A>
+</P>
+</BODY>
+</HTML>
+

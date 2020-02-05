@@ -1,0 +1,30 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Command Line Switches</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov121.htm">Setting POV-Ray Options</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov123.htm">Using INI Files</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405155"><A NAME="_Toc411405431"><A NAME="_Toc414198943"><A NAME="_Toc429993452">Command Line Switches</A></A></A></A></H3>
+<P>Command line switches consist of a <b><code>+</code></b> (plus) or <b><code>-</code></b> (minus) sign, followed by one or more alphabetic characters and possibly a numeric value. Here is a typical command line with switches.</P>
+<PRE>  POVRAY +Isimple.pov +V +W80 +H60</PRE>
+<CODE><P>povray</CODE> is the name of the program and it is followed by several switches. Each switch begins with a plus or minus sign. The <b><code>+I</code></b> switch with the filename tells POV-Ray what scene file it should use as input and <b><code>+V</code></b> tells the program to output its status to the text screen as it's working. The <b><code>+W</code></b> and <b><code>+H</code></b> switches set the width and height of the image in pixels. This image will be 80 pixels wide by 60 pixels high.</P>
+<P>In switches which toggle a feature, the plus turns it on and minus turns it off. For example <b><code>+P</code></b> turns on the <I>pause for keypress   when finished </I>option while <b><code>-P</code></b> turns it off. Other switches are used to specify values and do not toggle a feature. Either plus or minus may be used in that instance. For example <b><code>+W320</code></b> sets the width to 320 pixels. You could also use <b><code>-W320</code></b> and get the same results.</P>
+<P>Switches may be specified in upper or lower case. They are read left to right but in general may be specified in any order. If you specify a switch more than once, the previous value is generally overwritten with the last specification. The only exception is the <b><code>+L</code></b> switch for setting library paths. Up to ten unique paths may be specified.</P>
+<P>Almost all <b><code>+</code></b> or <b><code>-</code></b> switches have an equivalent option which can be used in an INI file which is described in the next section. A detailed description of each switch is given in the option reference section.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov121.htm">Setting POV-Ray Options</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov123.htm">Using INI Files</A>
+</P>
+</BODY>
+</HTML>
+

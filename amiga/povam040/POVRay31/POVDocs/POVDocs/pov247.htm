@@ -1,0 +1,38 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Superquadric Ellipsoid</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov246.htm">Sphere</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov248.htm">Surface of Revolution</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199082"><A NAME="_Toc429993592">Superquadric Ellipsoid</A></A></H4>
+<P>The <b><code>superellipsoid</code></b> object creates a shape known as a <I>superquadric ellipsoid</I> object.  It is an extension of the quadric ellipsoid. It can be used to create boxes and cylinders with round edges and other interesting shapes. Mathematically it is given by the equation:</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image97.gif" WIDTH=470 HEIGHT=83></P>
+</B><P>The values of <I>e</I> and <I>n</I>, called the <I>east-west </I>and <I>north-south </I>exponent, determine the shape of the superquadric ellipsoid. Both have to be greater than zero. The sphere is given by <I>e = 1 </I>and <I>n = 1</I>.</P>
+<P>The syntax of the superquadric ellipsoid is:</P>
+<I><DL>
+<DT>SUPERELLIPSOID:</DT>
+</I><b><code><DD>superellipsoid{</code></b> <I>&lt;Value_E, Value_N&gt;</I>  <I>[OBJECT_MODIFIERS...]</I> <b><code>}</DD>
+</DL>
+</code></b><P>The 2-D vector specifies the <I>e</I> and <I>n</I> values in the equation above.  The object sits at the origin and occupies a space about the size of a <b><code>box{&lt;-1,-1,-1&gt;,&lt;1,1,1&gt;}</code></b>.</P>
+<P>Two useful objects are the rounded box and the rounded cylinder. These are declared in the following way.</P>
+<PRE> #declare Rounded_Box = superellipsoid { &lt;Round, Round&gt; }
+ #declare Rounded_Cylinder = superellipsoid { &lt;1, Round&gt; }</PRE>
+<P>The roundedness value <b><code>Round</code></b> determines the roundedness of the edges and has to be greater than zero and smaller than one. The smaller you choose the values, the smaller and sharper the edges will get.</P>
+<P>Very small values of <I>e</I> and <I>n</I> might cause problems with the root solver (the Sturmian root solver cannot be used).</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov246.htm">Sphere</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov248.htm">Surface of Revolution</A>
+</P>
+</BODY>
+</HTML>
+

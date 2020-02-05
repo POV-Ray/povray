@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,19 +33,22 @@
 ///
 //******************************************************************************
 
-#include <boost/thread.hpp>
 #include <boost/bind.hpp>
 
 #include <cstdlib>
 
+#include <string>
+
 // configfrontend.h must always be the first POV file included in frontend sources (pulls in platform config)
 #include "frontend/configfrontend.h"
 
+// POV-Ray header files (base module)
 #include "base/timer.h"
-#include "base/image/colourspace.h"
 
+// POV-Ray header files (backend module)
 #include "backend/povray.h"
 
+// POV-Ray header files (frontend module)
 #include "frontend/console.h"
 #include "frontend/display.h"
 #include "frontend/filemessagehandler.h"
@@ -64,31 +67,31 @@ class DefaultConsole : public pov_frontend::Console
 {
     public:
         DefaultConsole() { }
-        ~DefaultConsole() { }
-        void Initialise() { }
-        void Output(const string& str) { std::printf("%s\n", str.c_str()); std::fflush(stdout); }
+        virtual ~DefaultConsole() override { }
+        virtual void Initialise() override { }
+        virtual void Output (const string& str) override { std::printf("%s\n", str.c_str()); std::fflush(stdout); }
 };
 
 class DefaultDisplay : public pov_frontend::Display
 {
     public:
-        DefaultDisplay(unsigned int w, unsigned int h, pov_base::GammaCurvePtr g) : Display(w, h, g) { }
-        ~DefaultDisplay() { }
-        void Initialise() { }
-        void DrawPixel(unsigned int, unsigned int, const RGBA8&) { }
+        DefaultDisplay(unsigned int w, unsigned int h) : Display(w, h) { }
+        virtual ~DefaultDisplay() override { }
+        virtual void Initialise() override { }
+        virtual void DrawPixel (unsigned int, unsigned int, const RGBA8&) override { }
 };
 
 pov_frontend::Console *CreateDefaultConsole();
-pov_frontend::Display *CreateDefaultDisplay(unsigned int w, unsigned int h, pov_base::GammaCurvePtr gf);
+pov_frontend::Display *CreateDefaultDisplay(unsigned int w, unsigned int h);
 
 pov_frontend::Console *CreateDefaultConsole()
 {
     return new DefaultConsole();
 }
 
-pov_frontend::Display *CreateDefaultDisplay(unsigned int w, unsigned int h, pov_base::GammaCurvePtr gf)
+pov_frontend::Display *CreateDefaultDisplay(unsigned int w, unsigned int h)
 {
-    return new DefaultDisplay(w, h, gf);
+    return new DefaultDisplay(w, h);
 }
 
 void BackendExitCallback()
@@ -102,7 +105,7 @@ int main(int argc, char **argv)
     using namespace pov_base;
     using namespace pov_frontend;
 
-    POVMSContext frontendContext = NULL;
+    POVMSContext frontendContext = nullptr;
 
     DefaultPlatformBase platformbase;
     POVMSAddress backendAddress = POVMSInvalidAddress;
@@ -125,7 +128,7 @@ int main(int argc, char **argv)
         POVMS_Object backendMessage;
         SimpleFrontend<ParserMessageHandler, FileMessageHandler, RenderMessageHandler, ImageMessageHandler>
                        frontend(frontendContext, backendAddress, backendMessage,
-                       boost::bind(CreateDefaultConsole), boost::bind(CreateDefaultDisplay, _1, _2, _3));
+                       boost::bind(CreateDefaultConsole), boost::bind(CreateDefaultDisplay, _1, _2));
 
         // Print help screens
         if(argc == 1)
@@ -188,7 +191,7 @@ int main(int argc, char **argv)
             {
                 UCS2 *outputini = new UCS2[l];
                 if(POVMSUtil_GetUCS2String(&obj, kPOVAttrib_CreateIni, outputini, &l) == kNoErr)
-                    renderoptions.WriteFile(UCS2toASCIIString(outputini).c_str(), &obj);
+                    renderoptions.WriteFile(UCS2toSysString(outputini).c_str(), &obj);
             }
 
             POVMS_Object optionsobj(obj);

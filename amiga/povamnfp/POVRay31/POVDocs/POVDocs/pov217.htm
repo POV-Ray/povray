@@ -1,0 +1,35 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Translate</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov216.htm">Transformations</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov218.htm">Scale</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199050"><A NAME="_Toc429993560">Translate</A></A></H4>
+<P>Items may be moved by adding a <b><code>translate</code></b> modifier. It consists of the keyword <b><code>translate</code></b> followed by a vector expression. The three terms of the vector specify the number of units to move in each of the x, y and z directions. Translate moves the element relative to it's current position. For example</P>
+<PRE> sphere { &lt;10, 10, 10&gt;, 1
+  pigment { Green }
+  translate &lt;-5, 2, 1&gt;
+ }</PRE>
+<P>will move the sphere from the location <b><code>&lt;10,10,10&gt;</code></b> to <b><code>&lt;5,12,11&gt;</code></b>. It does not move it to the absolute location <b><code>&lt;-5,2,1&gt;</code></b>. Translations are always relative to the item's location before the move.  Translating by zero will leave the element unchanged on that axis. For example:</P>
+<PRE> sphere { &lt;10, 10, 10&gt;, 1
+  pigment { Green }
+  translate 3*x // evaluates to &lt;3,0,0&gt; so move 3 units
+         // in the x direction and none along y or z
+ }</PRE>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov216.htm">Transformations</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov218.htm">Scale</A>
+</P>
+</BODY>
+</HTML>
+

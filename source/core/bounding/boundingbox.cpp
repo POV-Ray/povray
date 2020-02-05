@@ -12,7 +12,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,18 +40,30 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/bounding/boundingbox.h"
 
+// C++ variants of C standard header files
+#include <cstdlib>
+#include <cstring>
+
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
 
+// POV-Ray header files (core module)
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
 #include "core/scene/object.h"
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov
 {
+
+using std::vector;
 
 const int BUNCHING_FACTOR = 4;
 // Initial number of entries in a priority queue.
@@ -136,7 +148,7 @@ void BBoxPriorityQueue::Clear()
 
 void Destroy_BBox_Tree(BBOX_TREE *Node)
 {
-    if(Node != NULL)
+    if (Node != nullptr)
     {
         if(Node->Entries > 0)
         {
@@ -146,7 +158,7 @@ void Destroy_BBox_Tree(BBOX_TREE *Node)
             POV_FREE(Node->Node);
 
             Node->Entries = 0;
-            Node->Node = NULL;
+            Node->Node = nullptr;
         }
 
         POV_FREE(Node);
@@ -159,7 +171,7 @@ void Recompute_BBox(BoundingBox *bbox, const TRANSFORM *trans)
     Vector3d lower_left, lengths, corner;
     Vector3d mins, maxs;
 
-    if(trans == NULL)
+    if (trans == nullptr)
         return;
 
     lower_left = Vector3d(bbox->lowerLeft);
@@ -203,7 +215,7 @@ void Recompute_Inverse_BBox(BoundingBox *bbox, const TRANSFORM *trans)
     Vector3d lower_left, lengths, corner;
     Vector3d mins, maxs;
 
-    if(trans == NULL)
+    if (trans == nullptr)
         return;
 
     lower_left = Vector3d(bbox->lowerLeft);
@@ -278,7 +290,7 @@ void Build_BBox_Tree(BBOX_TREE **Root, size_t numOfFiniteObjects, BBOX_TREE **&F
         {
             root = *Root;
             root->Node = reinterpret_cast<BBOX_TREE **>(POV_REALLOC(root->Node, (root->Entries + 1) * sizeof(BBOX_TREE *), "composite"));
-            POV_MEMMOVE(&(root->Node[1]), &(root->Node[0]), root->Entries * sizeof(BBOX_TREE *));
+            std::memmove(&(root->Node[1]), &(root->Node[0]), root->Entries * sizeof(BBOX_TREE *));
             root->Entries++;
             cd = create_bbox_node(numOfInfiniteObjects);
             for(size_t i = 0; i < numOfInfiniteObjects; i++)
@@ -330,12 +342,12 @@ void Build_Bounding_Slabs(BBOX_TREE **Root, vector<ObjectPtr>& objects, unsigned
                 numberOfLightSources++;
             }
             else
-                Temp = NULL;
+                Temp = nullptr;
         }
         else
             Temp = (*i);
 
-        if(Temp != NULL)
+        if (Temp != nullptr)
         {
             if(Test_Flag(Temp, INFINITE_FLAG))
                 numberOfInfiniteObjects++;
@@ -348,13 +360,13 @@ void Build_Bounding_Slabs(BBOX_TREE **Root, vector<ObjectPtr>& objects, unsigned
     if(numberOfFiniteObjects + numberOfInfiniteObjects < 1)
         return;
 
-    // This is a resonable guess at the number of finites needed.
+    // This is a reasonable guess at the number of finites needed.
     // This array will be reallocated as needed if it isn't.
     maxfinitecount = 2 * numberOfFiniteObjects;
 
     // Now allocate an array to hold references to these finites and
     // any new composite objects we may generate.
-    Finite = Infinite = NULL;
+    Finite = Infinite = nullptr;
 
     if(numberOfFiniteObjects > 0)
         Finite = new BBOX_TREE* [maxfinitecount];
@@ -380,12 +392,12 @@ void Build_Bounding_Slabs(BBOX_TREE **Root, vector<ObjectPtr>& objects, unsigned
             if((reinterpret_cast<LightSource *>(*i))->children.size() > 0)
                 Temp = (reinterpret_cast<LightSource *>(*i))->children[0];
             else
-                Temp = NULL;
+                Temp = nullptr;
         }
         else
             Temp = (*i);
 
-        if(Temp != NULL)
+        if (Temp != nullptr)
         {
             // Add object to the appropriate list.
             if(Test_Flag(Temp, INFINITE_FLAG))
@@ -410,10 +422,10 @@ void Build_Bounding_Slabs(BBOX_TREE **Root, vector<ObjectPtr>& objects, unsigned
     Build_BBox_Tree(Root, numberOfFiniteObjects, Finite, numberOfInfiniteObjects, Infinite, maxfinitecount);
 
     // Get rid of the Finite and Infinite arrays and just use Root.
-    if(Finite != NULL)
+    if (Finite != nullptr)
         delete[] Finite;
 
-    if(Infinite != NULL)
+    if (Infinite != nullptr)
         delete[] Infinite;
 }
 
@@ -429,7 +441,7 @@ bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const
 
     // Start with an empty priority queue.
     pqueue.Clear();
-    New_Intersection.Object = NULL;
+    New_Intersection.Object = nullptr;
     found = false;
 
     // Check top node.
@@ -482,7 +494,7 @@ bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const
 
     // Start with an empty priority queue.
     pqueue.Clear();
-    New_Intersection.Object = NULL;
+    New_Intersection.Object = nullptr;
     found = false;
 
     // Check top node.
@@ -649,7 +661,7 @@ BBOX_TREE *create_bbox_node(int size)
     if(size)
         New->Node = reinterpret_cast<BBOX_TREE **>(POV_MALLOC(size*sizeof(BBOX_TREE *), "bounding box node"));
     else
-        New->Node = NULL;
+        New->Node = nullptr;
 
     return (New);
 }
@@ -842,13 +854,13 @@ bool sort_and_split(BBOX_TREE **Root, BBOX_TREE **&Finite, size_t *numOfFiniteOb
         switch(Axis)
         {
             case X:
-                QSORT(reinterpret_cast<void *>(&Finite[first]), size, sizeof(BBOX_TREE *), compboxes<X>);
+                std::qsort(Finite + first, size, sizeof(BBOX_TREE*), compboxes<X>);
                 break;
             case Y:
-                QSORT(reinterpret_cast<void *>(&Finite[first]), size, sizeof(BBOX_TREE *), compboxes<Y>);
+                std::qsort(Finite + first, size, sizeof(BBOX_TREE*), compboxes<Y>);
                 break;
             case Z:
-                QSORT(reinterpret_cast<void *>(&Finite[first]), size, sizeof(BBOX_TREE *), compboxes<Z>);
+                std::qsort(Finite + first, size, sizeof(BBOX_TREE*), compboxes<Z>);
                 break;
         }
 
@@ -915,3 +927,4 @@ bool sort_and_split(BBOX_TREE **Root, BBOX_TREE **&Finite, size_t *numOfFiniteOb
 }
 
 }
+// end of namespace pov

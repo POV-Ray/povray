@@ -1,0 +1,47 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Multiple Density vs. Multiple Media</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov365.htm">Density Maps and Density Lists</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov367.htm">Atmospheric Effects</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref428014795"><A NAME="_Ref428014833"><A NAME="_Toc429993730">Multiple Density vs. Multiple Media</A></A></A></H4>
+<P>It is possible to have more than one <b><code>media</code></b> specified per object and it is legal to have more than one <b><code>density</code></b> per <b><code>media</code></b>.  The effects are quite different.  Consider this example:</P>
+<PRE>  object{MyObject
+    pigment{rgbf 1}
+    interior{
+      media{
+        density{Some_Density}
+        density{Another_Density}
+      }
+    }
+  }</PRE>
+<P>As the media is sampled, calculations are performed for each density pattern at each sample point.  The resulting samples are multiplied together.  Suppose one density returned <b><code>rgb&lt;.8,.8,.4&gt;</code></b> and the other returned <b><code>rgb&lt;.25,.25,0&gt;</code></b>.  The resulting color is <b><code>rgb&lt;.2,.2,0&gt;</code></b>.  Note that in areas where one density returns zero, it will wipe out the other density.  The end result is that only density areas which overlap will be visible.  This is similar to a CSG intersection operation.  Now consider</P>
+<PRE>  object{MyObject
+    pigment{rgbf 1}
+    interior{
+      media{
+        density{Some_Density}
+      }
+      media{
+        density{Another_Density}
+      }
+    }
+  }</PRE>
+<P>In this case each media is computed independently.  The resulting colors are added together.  Suppose one density and media returned <b><code>rgb&lt;.8,.8,.4&gt;</code></b> and the other returned <b><code>rgb&lt;.25,.25,0&gt;</code></b>.  The resulting color is <b><code>rgb&lt;1.05,1.05,.4&gt;</code></b>.  The end result is that density areas which overlap will be especially bright and all areas will be visible.  This is similar to a CSG union operation.  See the sample scene <CODE>scenes/interior/media/media4.pov</CODE> for an example which illustrates this.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov365.htm">Density Maps and Density Lists</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov367.htm">Atmospheric Effects</A>
+</P>
+</BODY>
+</HTML>
+

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,28 +33,37 @@
 ///
 //******************************************************************************
 
-#include <limits>
-#include <vector>
-
-#include <boost/thread.hpp>
-
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "backend/render/tracetask.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <algorithm>
+#include <limits>
+
+// POV-Ray header files (base module)
+#include "base/image/colourspace.h"
+#ifdef PROFILE_INTERSECTIONS
+#include "base/image/image_fwd.h"
+#endif
+
+// POV-Ray header files (core module)
 #include "core/material/normal.h"
 #include "core/math/chi2.h"
 #include "core/math/jitter.h"
 #include "core/math/matrix.h"
 #include "core/render/trace.h"
+#include "core/support/statistics.h"
 
+// POV-Ray header files (POVMS module)
+//  (none at the moment)
+
+// POV-Ray header files (backend module)
 #include "backend/scene/backendscenedata.h"
 #include "backend/scene/view.h"
 #include "backend/scene/viewthreaddata.h"
-
-#ifdef PROFILE_INTERSECTIONS
-#include "base/image/image.h"
-#endif
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -62,18 +71,22 @@
 namespace pov
 {
 
+using std::min;
+using std::max;
+using std::vector;
+
 #ifdef PROFILE_INTERSECTIONS
     bool gDoneBSP;
     bool gDoneBVH;
     POV_ULONG gMinVal = std::numeric_limits<POV_ULONG>::max();
     POV_ULONG gMaxVal = 0;
     POV_ULONG gIntersectionTime;
-    vector<vector<POV_ULONG> > gBSPIntersectionTimes;
-    vector<vector<POV_ULONG> > gBVHIntersectionTimes;
-    vector <vector<POV_ULONG> > *gIntersectionTimes;
+    vector<vector<POV_ULONG>> gBSPIntersectionTimes;
+    vector<vector<POV_ULONG>> gBVHIntersectionTimes;
+    vector<vector<POV_ULONG>> *gIntersectionTimes;
 #endif
 
-class SmartBlock
+class SmartBlock final
 {
     public:
         SmartBlock(int ox, int oy, int bw, int bh);
@@ -219,14 +232,17 @@ void TraceTask::SubdivisionBuffer::Clear()
     sampled.assign(sampled.size(), false);
 }
 
-TraceTask::TraceTask(ViewData *vd, unsigned int tm, DBL js, DBL aat, unsigned int aad, pov_base::GammaCurvePtr& aag, unsigned int ps, bool psc, bool contributesToImage, bool hr) :
-    RenderTask(vd, "Trace"),
+TraceTask::TraceTask(ViewData *vd, unsigned int tm, DBL js,
+                     DBL aat, DBL aac, unsigned int aad, pov_base::GammaCurvePtr& aag,
+                     unsigned int ps, bool psc, bool contributesToImage, bool hr, size_t seed) :
+    RenderTask(vd, seed, "Trace"),
     trace(vd->GetSceneData(), &vd->GetCamera(), GetViewDataPtr(), vd->GetSceneData()->parsedMaxTraceLevel, vd->GetSceneData()->parsedAdcBailout,
           vd->GetQualityFeatureFlags(), cooperate, media, radiosity),
     cooperate(*this),
     tracingMethod(tm),
     jitterScale(js),
     aaThreshold(aat),
+    aaConfidence(aac),
     aaDepth(aad),
     aaGamma(aag),
     previewSize(ps),
@@ -289,6 +305,9 @@ void TraceTask::Run()
             case 2:
                 AdaptiveSupersamplingM2();
                 break;
+            case 3:
+                StochasticSupersamplingM3();
+                break;
         }
 
 #ifdef RTR_HACK
@@ -296,7 +315,7 @@ void TraceTask::Run()
         {
             const Camera *camera = GetViewData()->GetRTRData()->CompletedFrame();
             Cooperate();
-            if(camera != NULL)
+            if (camera != nullptr)
                 trace.SetupCamera(*camera);
         }
     } while(forever);
@@ -324,9 +343,9 @@ void TraceTask::Finish()
         if (width == gBVHIntersectionTimes[0].size() && height == gBVHIntersectionTimes.size())
         {
             SNGL scale = 1.0 / (gMaxVal - gMinVal);
-            Image::WriteOptions opts;
+            ImageWriteOptions opts;
             opts.bitsPerChannel = 16;
-            Image *img = Image::Create(width, height, Image::Gray_Int16, false);
+            Image *img = Image::Create(width, height, ImageDataType::Gray_Int16, false);
             for (int y = 0 ; y < height ; y++)
                 for (int x = 0 ; x < width ; x++)
                     img->SetGrayValue(x, y, (gBSPIntersectionTimes[y][x] - gMinVal) * scale);
@@ -335,7 +354,7 @@ void TraceTask::Finish()
             delete imagefile;
             delete img;
 
-            img = Image::Create(width, height, Image::Gray_Int16, false);
+            img = Image::Create(width, height, ImageDataType::Gray_Int16, false);
             imagefile = NewOStream("bvhprofile.png", 0, false);
             for (int y = 0 ; y < height ; y++)
                 for (int x = 0 ; x < width ; x++)
@@ -344,7 +363,7 @@ void TraceTask::Finish()
             delete imagefile;
             delete img;
 
-            img = Image::Create(width, height, Image::Gray_Int16, false);
+            img = Image::Create(width, height, ImageDataType::Gray_Int16, false);
             imagefile = NewOStream("summedprofile.png", 0, false);
             for (int y = 0 ; y < height ; y++)
                 for (int x = 0 ; x < width ; x++)
@@ -353,7 +372,7 @@ void TraceTask::Finish()
             delete imagefile;
             delete img;
 
-            img = Image::Create(width, height, Image::RGBFT_Float, false);
+            img = Image::Create(width, height, ImageDataType::RGBFT_Float, false);
             imagefile = NewOStream("rgbprofile.png", 0, false);
             for (int y = 0 ; y < height ; y++)
             {
@@ -637,6 +656,185 @@ void TraceTask::AdaptiveSupersamplingM2()
     }
 }
 
+void TraceTask::StochasticSupersamplingM3()
+{
+    POVRect rect;
+    vector<RGBTColour> pixels;
+    vector<PreciseRGBTColour> pixelsSum;
+    vector<PreciseRGBTColour> pixelsSumSqr;
+    vector<unsigned int> pixelsSamples;
+    unsigned int serial;
+    bool sampleMore;
+
+    // Create list of thresholds for confidence test.
+    vector<double> confidenceFactor;
+    unsigned int minSamples = 1; // TODO currently hard-coded
+    unsigned int maxSamples = max(minSamples, 1u << (aaDepth*2));
+
+    confidenceFactor.reserve(maxSamples*5);
+    double threshold  = aaThreshold;
+    double confidence = aaConfidence;
+    if(maxSamples > 1)
+    {
+        for(int n = 1; n <= maxSamples*5; n++)
+            confidenceFactor.push_back(ndtri((1+confidence)/2) / sqrt((double)n));
+    }
+    else
+        confidenceFactor.push_back(0.0);
+
+    while(GetViewData()->GetNextRectangle(rect, serial) == true)
+    {
+        GetViewDataPtr()->stochasticRandomGenerator->Seed(GetViewDataPtr()->stochasticRandomSeedBase + serial);
+
+        radiosity.BeforeTile(highReproducibility? serial : 0);
+
+        pixels.clear();
+        pixelsSum.clear();
+        pixelsSumSqr.clear();
+        pixelsSamples.clear();
+        pixels.reserve(rect.GetArea());
+        pixelsSum.reserve(rect.GetArea());
+        pixelsSumSqr.reserve(rect.GetArea());
+        pixelsSamples.reserve(rect.GetArea());
+
+        do
+        {
+            sampleMore = false;
+            unsigned int index = 0;
+            for(unsigned int y = rect.top; y <= rect.bottom; y++)
+            {
+                for(unsigned int x = rect.left; x <= rect.right; x++)
+                {
+                    PreciseRGBTColour neighborSum;
+                    PreciseRGBTColour neighborSumSqr;
+                    unsigned int neighborSamples(0);
+                    unsigned int samples(0);
+                    unsigned int index2;
+
+                    if (index < pixelsSamples.size())
+                    {
+                        samples          = pixelsSamples [index];
+                        neighborSum      = pixelsSum     [index];
+                        neighborSumSqr   = pixelsSumSqr  [index];
+                        neighborSamples  = pixelsSamples [index];
+                    }
+
+                    // TODO - we should obtain information about the neighboring render blocks as well
+                    index2 = index - 1;
+                    if (x > rect.left)
+                    {
+                        neighborSum     += pixelsSum     [index2];
+                        neighborSumSqr  += pixelsSumSqr  [index2];
+                        neighborSamples += pixelsSamples [index2];
+                    }
+                    index2 = index - rect.GetWidth();
+                    if (y > rect.top)
+                    {
+                        neighborSum     += pixelsSum     [index2];
+                        neighborSumSqr  += pixelsSumSqr  [index2];
+                        neighborSamples += pixelsSamples [index2];
+                    }
+                    index2 = index + 1;
+                    if ((x < rect.right) && (index2 < pixelsSamples.size()))
+                    {
+                        neighborSum     += pixelsSum     [index2];
+                        neighborSumSqr  += pixelsSumSqr  [index2];
+                        neighborSamples += pixelsSamples [index2];
+                    }
+                    index2 = index + rect.GetWidth();
+                    if ((y < rect.bottom) && (index2 < pixelsSamples.size()))
+                    {
+                        neighborSum     += pixelsSum     [index2];
+                        neighborSumSqr  += pixelsSumSqr  [index2];
+                        neighborSamples += pixelsSamples [index2];
+                    }
+
+                    while(true)
+                    {
+                        if (samples >= minSamples)
+                        {
+                            if (samples >= maxSamples)
+                                break;
+
+                            PreciseRGBTColour variance = (neighborSumSqr - Sqr(neighborSum)/neighborSamples) / (neighborSamples-1);
+                            double cf = confidenceFactor[neighborSamples-1];
+                            PreciseRGBTColour sqrtvar = Sqrt(variance);
+                            PreciseRGBTColour confidenceDelta = sqrtvar * cf;
+                            if (confidenceDelta.red() +
+                                confidenceDelta.green() +
+                                confidenceDelta.blue() +
+                                confidenceDelta.transm() <= threshold)
+                                break;
+                        }
+
+                        RGBTColour colTemp;
+                        PreciseRGBTColour col, colSqr;
+
+                        Vector2d jitter = Uniform2dOnSquare(GetViewDataPtr()->stochasticRandomGenerator) - 0.5;
+                        trace(x+0.5 + jitter.x(), y+0.5 + jitter.y(), GetViewData()->GetWidth(), GetViewData()->GetHeight(), colTemp);
+
+                        col = PreciseRGBTColour(GammaCurve::Encode(aaGamma, colTemp));
+                        colSqr = Sqr(col);
+
+                        if (index >= pixelsSamples.size())
+                        {
+                            GetViewDataPtr()->Stats()[Number_Of_Pixels]++;
+
+                            pixels.push_back(colTemp);
+                            pixelsSum.push_back(col);
+                            pixelsSumSqr.push_back(colSqr);
+                            pixelsSamples.push_back(1);
+                        }
+                        else
+                        {
+                            pixels [index] += colTemp;
+                            pixelsSum [index] += col;
+                            pixelsSumSqr [index] += colSqr;
+                            pixelsSamples [index] ++;
+                        }
+
+                        neighborSum     += col;
+                        neighborSumSqr  += colSqr;
+                        neighborSamples ++;
+
+                        samples         ++;
+
+                        // Whenever one or more pixels are re-sampled, neighborhood variance constraints may require us to also re-sample others.
+                        sampleMore = true;
+
+                        Cooperate();
+
+                        if (samples >= minSamples) // TODO
+                            break;
+                    }
+
+                    index ++;
+                }
+            }
+        }
+        while (sampleMore);
+
+        // So far we've just accumulated the samples for any pixel;
+        // now compute the actual average.
+        unsigned int index = 0;
+        for(unsigned int y = rect.top; y <= rect.bottom; y++)
+        {
+            for(unsigned int x = rect.left; x <= rect.right; x++)
+            {
+                pixels [index] /= pixelsSamples[index];
+                index ++;
+            }
+        }
+
+        radiosity.AfterTile();
+
+        GetViewDataPtr()->AfterTile();
+        GetViewData()->CompletedRectangle(rect, serial, pixels, 1, passContributesToImage, passCompletesImage);
+
+        Cooperate();
+    }
+}
+
 void TraceTask::NonAdaptiveSupersamplingForOnePixel(DBL x, DBL y, RGBTColour& leftcol, RGBTColour& topcol, RGBTColour& curcol, bool& sampleleft, bool& sampletop, bool& samplecurrent)
 {
     RGBTColour gcLeft = GammaCurve::Encode(aaGamma, leftcol);
@@ -876,3 +1074,4 @@ void TraceTask::SubdivideOnePixel(DBL x, DBL y, DBL d, size_t bx, size_t by, siz
 }
 
 }
+// end of namespace pov

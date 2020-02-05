@@ -1,0 +1,54 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Hexagon</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov329.htm">Granite</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov331.htm">Leopard</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199174"><A NAME="_Toc429993688">Hexagon</A></A></H4>
+<P>The <b><code>hexagon</code></b> pattern is a block pattern that generates a repeating pattern of hexagons in the x-y-plane. In this instance imagine tall rods that are hexagonal in shape and are parallel to the y-axis and grouped in bundles like shown in the example image. Three separate colors should be specified as follows:</P>
+<b><code><DL>
+<DD>pigment{hexagon</code></b> <I>[COLOR_1 [</I><b><code>,</code></b><I> COLOR_2 [</I><b><code>,</code></b><I> COLOR_3]]] [PATTERN_MODIFIERS...] </I><b><code>}</DD>
+</DL>
+</code><P ALIGN="CENTER"><IMG SRC="Image193.gif" WIDTH=332 HEIGHT=212></P>
+<P ALIGN="CENTER">The hexagon pattern.</P>
+</B><P>The three colors will repeat the hexagonal pattern with hexagon <I>COLOR_1</I> centered at the origin, <I>COLOR_2</I> in the +z-direction and <I>COLOR_3</I> to either side. Each side of the hexagon is one unit long.  The hexagonal rods of color extend infinitely in the +y- and -y-directions. If no colors are specified then default blue, green and red colors are used.</P>
+<P>You may also use pigment statements in place of the colors. For example:</P>
+<PRE>  pigment {
+    hexagon pigment { Jade },
+            pigment { White_Marble },
+            pigment { Black_Marble }
+  }</PRE>
+<P>This example uses normals:</P>
+<PRE>  normal { hexagon 0.5 }</PRE>
+<P>The float value is an optional bump size. You may also use full normal statements. For example:</P>
+<PRE>  normal {
+    hexagon
+      normal { gradient x scale .2 },
+      normal { gradient y scale .2 },
+      normal { bumps scale .2 }
+  }</PRE>
+<P>When used with textures, the syntax is...</P>
+<PRE>  texture {
+    hexagon
+      texture { T_Gold_3A },
+      texture { T_Wood_3A },
+      texture { Stone12 }
+  }</PRE>
+<P>This is a block pattern which cannot use wave types, <b><code>color_map</code></b>, or <b><code>slope_map</code></b> modifiers.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov329.htm">Granite</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov331.htm">Leopard</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,41 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - The #write Directive</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov197.htm">The #read Directive</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov199.htm">The #default Directive</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199031"><A NAME="_Toc429993541">The #write Directive</A></A></H4>
+<P>You may write string, float or vector values to a plain ASCII text file from POV-Ray variables using the <b><code>#write</code></b> directive. The file must first be opened in either <b><code>write</code></b> or <b><code>append</code></b> mode using the <b><code>#fopen</code></b> directive. The syntax for <b><code>#write</code></b> is as follows:</P>
+<I><DL>
+<DT>WRITE_DIRECTIVE:</DT>
+</I><b><code><DD>#write(</code></b> <I>FILE_HANDLE_ITEM</I><b><code>,</code></b><I> DATA_ITEM[</I><b><code>,</code></b><I>DATA_ITEM]...</I><b><code>)</DD>
+</code></b><I><DT>DATA_ITEM:</DT>
+<DD>FLOAT</I>   |   <I>VECTOR</I>   |   <I>STRING</DD>
+</DL>
+</I><P>Where <I>FILE_HANDLE_IDENTIFIER</I> is the previously opened file. It is followed by one or more <I>DATA_ITEM</I>s separated by commas. The parentheses around the identifier list are required. A <I>DATA_ITEM</I> is any valid string expression, float expression, or vector expression. Float expressions are evaluated and written as signed float literals. If you require format control, you should use the <b><code>str(VALUE,L,P)</code></b> function to convert it to a formatted string. See "<A HREF="pov183.htm#_Ref413244925">String Functions</A>" for details on the <b><code>str</code></b> function. Vector expressions are evaluated into three signed float constants and are written with angle brackets and commas in standard POV-Ray vector notation. String expressions are evaluated and written as specified.</P>
+<P>Note that data read by the <b><code>#read</code></b> directive must have comma delimiters between values and quotes around string data but the <b><code>#write</code></b> directive does not automatically output commas or quotes. For example the following <b><code>#read</code></b> directive reads a string, float and vector.</P>
+<PRE> #read (MyFile,MyString,MyFloat,MyVect)</PRE>
+<P>It expects to read something like:</P>
+<PRE> "A quote delimeted string" , -123.45, &lt;1,2,-3&gt;</PRE>
+<P>The POV-Ray code to write this might be:</P>
+<PRE> #declare Val1 = -123.45;
+ #declare Vect1 = &lt;1,2,-3&gt;;
+ #write (MyFile,"\"A quote delimited string\",",Val1,",",Vect1,"\n")</PRE>
+<P>See "<A HREF="pov181.htm#_Ref413245145">String Literals</A>" and "<A HREF="pov208.htm#_Ref413245176">Text Formatting</A>" for details on writing special characters such as quotes, newline, etc.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov197.htm">The #read Directive</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov199.htm">The #default Directive</A>
+</P>
+</BODY>
+</HTML>
+

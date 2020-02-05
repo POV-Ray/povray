@@ -1,0 +1,91 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Slope Maps</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov300.htm">Normal</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov302.htm">Normal Maps and Normal Lists</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199138"><A NAME="_Toc429993649">Slope Maps</A></A></H4>
+<P>A <b><code>slope_map</code></b> is a normal pattern modifier which gives the user a great deal of control over the exact shape of the bumpy features. Each of the various pattern types available is in fact a mathematical function that takes any x, y, z location and turns it into a number between 0.0 and 1.0 inclusive. That number is used to specify where the various high and low spots are.  The <b><code>slope_map</code></b> lets you further shape the contours. It is best illustrated with a gradient normal pattern. Suppose you have...</P>
+<PRE>  plane{ z, 0
+    pigment{ White }
+    normal { gradient x }
+  }</PRE>
+<P>This gives a ramp wave pattern that looks like small linear ramps that climb from the points at x=0 to x=1 and then abruptly drops to 0 again to repeat the ramp from x=1 to x=2. A slope map turns this simple linear ramp into almost any wave shape you want. The syntax is as follows...</P>
+<P>The syntax for <b><code>slope_map</code></b> is as follows:</P>
+<I><DL>
+<DT>SLOPE_MAP:</DT>
+</I><b><code><DD>slope_map{</code></b> <I>SLOPE_MAP_BODY</I> <b><code>}</DD>
+</code></b><I><DT>SLOPE_MAP_BODY:</DT>
+<DD>SLOPE_MAP_IDENTIFIER</I>   |   <I>SLOPE_MAP_ENTRY</I>...</DD>
+<I><DT>SLOPE_MAP_ENTRY:</DT>
+</I><b><code><DD>[</code></b> <I>Value</I><b><code>,</code></b> <I>&lt;Height</I><b><code>,</code></b> <I>Slope&gt;</I> <b><code>]</DD>
+</DL>
+</code></b><P>Note that the <b><code>[]</code></b> brackets are part of the actual <I>SLOPE_MAP_ENTRY</I>. They are not notational symbols denoting optional parts. The brackets surround each entry in the slope map. There may be from 2 to 256 entries in the map. </P>
+<P>Each <I>Value</I> is a float value between 0.0 and 1.0 inclusive and each <I>&lt;Height</I><b><code>,</code></b> <I>Slope&gt;</I> is a 2 component vectors such as &lt;0,1&gt; where the first value represents the apparent height of the wave and the second value represents the slope of the wave at that point. The height should range between 0.0 and 1.0 but any value could be used.</P>
+<P>The slope value is the change in height per unit of distance. For example a slope of zero means flat, a slope of 1.0 means slope upwards at a 45 degree angle and a slope of -1 means slope down at 45 degrees. Theoretically a slope straight up would have infinite slope. In practice, slope values should be kept in the range -3.0 to +3.0. Keep in mind that this is only the visually apparent slope. A normal does not actually change the surface.</P>
+<P>For example here is how to make the ramp slope up for the first half and back down on the second half creating a triangle wave with a sharp peak in the center.  </P>
+<PRE>  normal {
+    gradient x       // this is the PATTERN_TYPE
+    slope_map {
+      [0   &lt;0, 1&gt;]   // start at bottom and slope up
+      [0.5 &lt;1, 1&gt;]   // halfway through reach top still climbing
+      [0.5 &lt;1,-1&gt;]   // abruptly slope down
+      [1   &lt;0,-1&gt;]   // finish on down slope at bottom
+    }
+  }</PRE>
+<P>The pattern function is evaluated and the result is a value from 0.0 to 1.0. The first entry says that at x=0 the apparent height is 0 and the slope is 1. At x=0.5 we are at height 1 and slope is still up at 1. The third entry also specifies that at x=0.5 (actually at some tiny fraction above 0.5) we have height 1 but slope -1 which is downwards. Finally at x=1 we are at height 0 again and still sloping down with slope -1.</P>
+<P>Although this example connects the points using straight lines the shape is actually a cubic spline. This example creates a smooth sine wave.</P>
+<PRE>  normal {
+    gradient x          // this is the PATTERN_TYPE
+    slope_map {
+      [0    &lt;0.5, 1&gt;]   // start in middle and slope up
+      [0.25 &lt;1.0, 0&gt;]   // flat slope at top of wave
+      [0.5  &lt;0.5,-1&gt;]   // slope down at mid point
+      [0.75 &lt;0.0, 0&gt;]   // flat slope at bottom
+      [1    &lt;0.5, 1&gt;]   // finish in middle and slope up
+    }
+  }</PRE>
+<P>This example starts at height 0.5 sloping up at slope 1. At a fourth of the way through we are at the top of the curve at height 1 with slope 0 which is flat. The space between these two is a gentle curve because the start and end slopes are different. At half way we are at half height sloping down to bottom out at 3/4ths. By the end we are climbing at slope 1 again to complete the cycle. There are more examples in <CODE>slopemap.pov</CODE> in the sample scenes.</P>
+<P>A <b><code>slope_map</code></b> may be used with any pattern except <b><code>brick</code></b>, <b><code>checker</code></b>, <b><code>hexagon</code></b>, <b><code>bumps</code></b>, <b><code>dents</code></b>, <b><code>ripples</code></b>, <b><code>waves</code></b>, <b><code>wrinkles</code></b> and <b><code>bump_map</code></b>.</P>
+<P>You may declare and use slope map identifiers. For example:</P>
+<PRE>  #declare Fancy_Wave =
+    slope_map {       // Now let's get fancy
+      [0.0  &lt;0, 1&gt;]   // Do tiny triangle here
+      [0.2  &lt;1, 1&gt;]   //  down
+      [0.2  &lt;1,-1&gt;]   //     to
+      [0.4  &lt;0,-1&gt;]   //       here.
+      [0.4  &lt;0, 0&gt;]   // Flat area
+      [0.5  &lt;0, 0&gt;]   //   through here.
+      [0.5  &lt;1, 0&gt;]   // Square wave leading edge
+      [0.6  &lt;1, 0&gt;]   //   trailing edge
+      [0.6  &lt;0, 0&gt;]   // Flat again
+      [0.7  &lt;0, 0&gt;]   //   through here.
+      [0.7  &lt;0, 3&gt;]   // Start scallop
+      [0.8  &lt;1, 0&gt;]   //   flat on top
+      [0.9  &lt;0,-3&gt;]   //     finish here.
+      [0.9  &lt;0, 0&gt;]   // Flat remaining through 1.0
+    }
+  object{ My_Object
+    pigment { White }
+    normal {
+      wood
+      slope_map { Fancy_Wave }
+    }
+  }</PRE>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov300.htm">Normal</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov302.htm">Normal Maps and Normal Lists</A>
+</P>
+</BODY>
+</HTML>
+

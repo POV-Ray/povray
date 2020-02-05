@@ -1,0 +1,54 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - The #switch, #case, #range and #break Directives</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov203.htm">The #ifdef and #ifndef Directives</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov205.htm">The #while...#end Directive</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199037"><A NAME="_Toc429993547">The #switch, #case, #range and #break Directives</A></A></H4>
+<P>A more powerful conditional is the <b><code>#switch</code></b> directive. The syntax is as follows...</P>
+<I><DL>
+<DT>SWITCH_DIRECTIVE:</DT>
+</I><b><code><DD>#switch (</code></b><I> Switch_Value </I><b><code>)</code></b> <I>SWITCH_CLAUSE...  [</I><b><code>#else</code></b> <I>TOKENS...] </I><b><code>#end</DD>
+</code></b><I><DT>SWITCH_CLAUSE:</DT>
+</I><b><code><DD>#case(</code></b> <I>Case_Value</I> <b><code>) </code></b><I>TOKENS...  [</I><b><code>#break</code></b><I>]&#9;&#9;</I>|</DD>
+<b><code><DD>#range(</code></b> <I>Low_Value</I> <b><code>,</code></b><I> High_Value</I> <b><code>) </code></b><I>TOKENS...  [</I><b><code>#break</code></b><I>]</DD>
+</DL>
+</I><P>The <I>TOKENS </I>are any number of POV-Ray keyword, identifiers, or punctuation and <b><code>(</code></b><I> Switch_Value </I><b><code>)</code></b> is a float expression. The parentheses are required.  The <b><code>#end</code></b> directive is required.  The <I>SWITCH_CLAUSE</I> comes in two varieties.  In the <b><code>#case</code></b> variety, the float <I>Switch_Value </I>is compared to the float <I>Case_Value</I>.  If they are equal, the condition is true.  Note that values whose difference is less than 1e-10 are considered equal in case of round off errors.  In the <b><code>#range</code></b> variety, <I>Low_Value Switch </I>and <I>High_Value</I> are floats separated by a comma and enclosed in parentheses.  If <I>Low_Value &lt;= Switch_Value </I>and <I>Switch_Value&lt;=High_Value</I> then the condition is true.</P>
+<P>In either variety, if the clause's condition is true, that clause's tokens are parsed normally and parsing continues until a <b><code>#break</code></b>, <b><code>#else</code></b> or <b><code>#end</code></b> directive is reached. If the condition is false, POV-Ray skips until another <b><code>#case</code></b> or <b><code>#range</code></b> is found.</P>
+<P>There may be any number of <b><code>#case</code></b> or <b><code>#range</code></b> clauses in any order you want. If a clause evaluates true but no <b><code>#break</code></b> is specified, the parsing will fall through to the next <b><code>#case</code></b> or <b><code>#range</code></b> and that clause conditional is evaluated.  Hitting <b><code>#break</code></b> while parsing a successful section causes an immediate jump to the <b><code>#end</code></b> without processing subsequent sections, even if a subsequent condition would also have been satisfied.</P>
+<P>An optional <b><code>#else</code></b> clause may be the last clause.  It is only executed if the clause before it was a false clause.</P>
+<P>Here is an example:</P>
+<PRE> #switch (VALUE)
+  #case (TEST_1)
+   // This section is parsed if VALUE=TEST_1
+  #break //First case ends
+  #case (TEST_2)
+   // This section is parsed if VALUE=TEST_2
+  #break //Second case ends
+  #range (LOW_1,HIGH_1)
+   // This section is parsed if (VALUE&gt;=LOW_1)&amp;(VALUE&lt;=HIGH_1)
+  #break //Third case ends
+  #range (LOW_2,HIGH_2)
+   // This section is parsed if (VALUE&gt;=LOW_2)&amp;(VALUE&lt;=HIGH_2)
+  #break //Fourth case ends
+  #else
+   // This section is parsed if no other case or
+   // range is true.
+ #end // End of conditional part</PRE>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov203.htm">The #ifdef and #ifndef Directives</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov205.htm">The #while...#end Directive</A>
+</P>
+</BODY>
+</HTML>
+

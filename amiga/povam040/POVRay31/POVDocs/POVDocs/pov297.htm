@@ -1,0 +1,61 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Pigment Maps and Pigment Lists</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov296.htm">Color Maps</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov298.htm">Image Maps</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199130"><A NAME="_Ref418337353"><A NAME="_Toc429993642">Pigment Maps</A> and Pigment Lists</A></A></H4>
+<P>In addition to specifying blended colors with a color map you may create a blend of pigments using a <b><code>pigment_map</code></b>. The syntax for a pigment map is identical to a color map except you specify a pigment in each map entry (and not a color).</P>
+<P>The syntax for <b><code>pigment_map</code></b> is as follows:</P>
+<I><DL>
+<DT>PIGMENT_MAP:</DT>
+</I><b><code><DD>pigment_map{</code></b> <I>PIGMENT_MAP_BODY</I> <b><code>}</DD>
+</code></b><I><DT>PIGMENT_MAP_BODY:</DT>
+<DD>PIGMENT_MAP_IDENTIFIER</I>   |   <I>PIGMENT_MAP_ENTRY</I>...</DD>
+<I><DT>PIGMENT_MAP_ENTRY:</DT>
+</I><b><code><DD>[</code></b> <I>Value</I>  <I>PIGMENT_BODY</I> <b><code>]</DD>
+</DL>
+</code></b><P>Where <I>Value</I> is a float value between 0.0 and 1.0 inclusive and each <I>PIGMENT_BODY</I> is anything which can be inside a <b><code>pigment{...}</code></b> statement.  The <b><code>pigment</code></b> keyword and <b><code>{}</code></b> braces need not be specified.</P>
+<P>Note that the <b><code>[]</code></b> brackets are part of the actual <I>PIGMENT_MAP_ENTRY</I>. They are not notational symbols denoting optional parts. The brackets surround each entry in the pigment map. There may be from 2 to 256 entries in the map. </P>
+<P>For example</P>
+<PRE>  sphere {
+    &lt;0,1,2&gt;, 2
+    pigment {
+      gradient x       //this is the PATTERN_TYPE
+      pigment_map {
+        [0.3 wood scale 0.2]
+        [0.3 Jade]    //this is a pigment identifier
+        [0.6 Jade]
+        [0.9 marble turbulence 1]
+      }
+    }
+  }</PRE>
+<P>When the <b><code>gradient x</code></b> function returns values from 0.0 to 0.3 the scaled wood pigment is used. From 0.3 to 0.6 the pigment identifier Jade is used. From 0.6 up to 0.9 a blend of Jade and a turbulent marble is used. From 0.9 on up only the turbulent marble is used.</P>
+<P>Pigment maps may be nested to any level of complexity you desire. The pigments in a map may have color maps or pigment maps or any type of pigment you want. Any entry of a pigment map may be a solid color however if all entries are solid colors you should use a <b><code>color_map</code></b> which will render slightly faster.</P>
+<P>Entire pigments may also be used with the block patterns such as <b><code>checker</code></b>, <b><code>hexagon</code></b> and <b><code>brick</code></b>. For example...</P>
+<PRE>  pigment {
+    checker
+    pigment { Jade scale .8 }
+    pigment { White_Marble scale .5 }
+  }</PRE>
+<P>Note that in the case of block patterns the <b><code>pigment</code></b> wrapping is required around the pigment information.</P>
+<P>A pigment map is also used with the <b><code>average</code></b> pigment type. See "<A HREF="pov318.htm#_Ref417371289">Average</A>" for details.</P>
+<P>You may not use <b><code>pigment_map</code></b> or individual pigments with an <b><code>image_map</code></b>. See section "<A HREF="pov312.htm#_Ref417371359">Texture Maps</A>" for an alternative way to do this.</P>
+<P>You may declare and use pigment map identifiers but the only way to declare a pigment block pattern list is to declare a pigment identifier for the entire pigment.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov296.htm">Color Maps</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov298.htm">Image Maps</A>
+</P>
+</BODY>
+</HTML>
+

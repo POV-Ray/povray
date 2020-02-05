@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - External Animation Loop</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov126.htm">Animation Options</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov128.htm">Internal Animation Loop</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198948"><A NAME="_Toc429993457">External Animation Loop</A></A></H4>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=432>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>Clock=</code></b><I>n.n</I></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<P>Sets <b><code>clock</code></b> float identifier to <I>n.n</I></TD>
+</TR>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>+K</code></b><I>n.n</I></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<P>Same as <b><code>Clock=</code></b><I>n.n</I></TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>The <b><code>Clock=</code></b><I>n.n</I> option or the <b><code>+K</code></b><I>n.n</I> switch may be used to pass a single float value to the program for basic animation. The value is stored in the float identifier <b><code>clock</code></b>.  If an object had a <b><code>rotate &lt;0,clock,0&gt;</code></b> attached then you could rotate the object by different amounts over different frames by setting <b><code>+K10.0</code></b>,<b><code>+K20.0</code></b>... etc. on successive renderings. It is up to the user to repeatedly invoke POV-Ray with a different <b><code>Clock</code></b> value and a different <b><code>Output_File_Name</code></b> for each frame.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov126.htm">Animation Options</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov128.htm">Internal Animation Loop</A>
+</P>
+</BODY>
+</HTML>
+

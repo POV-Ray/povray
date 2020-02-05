@@ -19,7 +19,7 @@
 /// ----------------------------------------------------------------------------
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -47,10 +47,15 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/material/texture.h"
 
-#include <algorithm>
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
 
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
+#include "base/povassert.h"
 
+// POV-Ray header files (core module)
 #include "core/material/pattern.h"
 #include "core/material/pigment.h"
 #include "core/material/normal.h"
@@ -61,6 +66,8 @@
 
 namespace pov
 {
+
+using std::vector;
 
 /*****************************************************************************
 *
@@ -176,7 +183,7 @@ void Transform_Textures(TEXTURE *Textures, const TRANSFORM *Trans)
 {
     TEXTURE *Layer;
 
-    for (Layer = Textures; Layer != NULL; Layer = Layer->Next)
+    for (Layer = Textures; Layer != nullptr; Layer = Layer->Next)
     {
         if (Layer->Type == PLAIN_PATTERN)
         {
@@ -296,13 +303,13 @@ FINISH *Copy_Finish(const FINISH *Old)
 {
     FINISH *New;
 
-    if (Old != NULL)
+    if (Old != nullptr)
     {
         New = Create_Finish();
         *New = *Old;
     }
     else
-        New = NULL;
+        New = nullptr;
     return (New);
 }
 
@@ -336,17 +343,17 @@ TEXTURE *Create_Texture()
 
     Init_TPat_Fields(New);
 
-    New->Next = NULL;
+    New->Next = nullptr;
     New->References = 1;
 
     New->Type    = PLAIN_PATTERN;
     New->Flags  |= NO_FLAGS; // [CLi] Already initialized by Init_TPat_Fields
 
-    New->Pigment = NULL;
-    New->Tnormal = NULL;
-    New->Finish  = NULL;
+    New->Pigment = nullptr;
+    New->Tnormal = nullptr;
+    New->Finish  = nullptr;
 
-    New->Next    = NULL;
+    New->Next    = nullptr;
 
     return (New);
 }
@@ -374,7 +381,7 @@ TEXTURE *Create_Texture()
 
 TEXTURE *Copy_Texture_Pointer(TEXTURE *Texture)
 {
-    if (Texture != NULL)
+    if (Texture != nullptr)
     {
         Texture->References++;
     }
@@ -410,9 +417,9 @@ TEXTURE *Copy_Textures(TEXTURE *Textures)
     TEXTURE *New, *First, *Previous;
     TEXTURE *Layer;
 
-    Previous = First = NULL;
+    Previous = First = nullptr;
 
-    for (Layer = Textures; Layer != NULL; Layer = Layer->Next)
+    for (Layer = Textures; Layer != nullptr; Layer = Layer->Next)
     {
         New = Create_Texture();
         Copy_TPat_Fields (New, Layer);
@@ -420,7 +427,7 @@ TEXTURE *Copy_Textures(TEXTURE *Textures)
 
         /*  Mesh copies a texture pointer that already has multiple
             references.  We just want a clean copy, not a copy
-            that's multply referenced.
+            that's multiply referenced.
          */
 
         New->References = 1;
@@ -445,12 +452,12 @@ TEXTURE *Copy_Textures(TEXTURE *Textures)
                 break;
         }
 
-        if (First == NULL)
+        if (First == nullptr)
         {
             First = New;
         }
 
-        if (Previous != NULL)
+        if (Previous != nullptr)
         {
             Previous->Next = New;
         }
@@ -488,14 +495,14 @@ void Destroy_Textures(TEXTURE *Textures)
     TEXTURE *Layer = Textures;
     TEXTURE *Temp;
 
-    if ((Textures == NULL) || (--(Textures->References) > 0))
+    if ((Textures == nullptr) || (--(Textures->References) > 0))
     {
         return;
     }
 
-    while (Layer != NULL)
+    while (Layer != nullptr)
     {
-        // Theoretically these should only be non-NULL for PLAIN_PATTERN, but let's clean them up either way.
+        // Theoretically these should only be non-`nullptr` for PLAIN_PATTERN, but let's clean them up either way.
         Destroy_Pigment(Layer->Pigment);
         Destroy_Tnormal(Layer->Tnormal);
         if (Layer->Finish)
@@ -538,12 +545,12 @@ void Post_Textures(TEXTURE *Textures)
     TEXTURE *Layer;
     TextureBlendMap *Map;
 
-    if (Textures == NULL)
+    if (Textures == nullptr)
     {
         return;
     }
 
-    for (Layer = Textures; Layer != NULL; Layer = Layer->Next)
+    for (Layer = Textures; Layer != nullptr; Layer = Layer->Next)
     {
         if (!((Layer->Flags) & POST_DONE))
         {
@@ -570,7 +577,7 @@ void Post_Textures(TEXTURE *Textures)
                     break;
             }
 
-            if ((Map=Layer->Blend_Map.get()) != NULL)
+            if ((Map=Layer->Blend_Map.get()) != nullptr)
             {
                 for(vector<TextureBlendMapEntry>::iterator i = Map->Blend_Map_Entries.begin(); i != Map->Blend_Map_Entries.end(); i++)
                 {
@@ -632,7 +639,7 @@ int Test_Opacity(const TEXTURE *Texture)
     int Opaque, Help;
     const TEXTURE *Layer;
 
-    if (Texture == NULL)
+    if (Texture == nullptr)
     {
         return(false);
     }
@@ -643,7 +650,7 @@ int Test_Opacity(const TEXTURE *Texture)
 
     /* Test all layers. If at least one layer is opaque the object is opaque. */
 
-    for (Layer = Texture; Layer != NULL; Layer = Layer->Next)
+    for (Layer = Texture; Layer != nullptr; Layer = Layer->Next)
     {
         switch (Layer->Type)
         {
@@ -711,3 +718,4 @@ TextureBlendMap::~TextureBlendMap()
 }
 
 }
+// end of namespace pov

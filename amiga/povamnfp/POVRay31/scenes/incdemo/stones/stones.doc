@@ -1,0 +1,35 @@
+
+                              STONES.INC
+
+This file simply includes both STONES1.INC and STONES2.INC.  Use it if
+you need access to textures from both files.  For faster parsing and
+reduced memory requirments, if you don't need both files, then you
+should include only the one that you need.
+
+
+                              STONES1.INC
+
+This file contains a set of rich stone textures that were designed for
+us by Mike Miller, using modified texture names.  The original texture
+names have all had a "T_" prepended to them.
+
+
+                               STONES2.INC
+
+
+There are 20 stone textures defined in the file, STONES2.INC.
+Most are at least two layers, and all use turbulence on each
+layer, so they will be a bit slow to render.
+
+Also included are BENIDITI.POV, MARBTEAL.POV, PINKMARB.POV, and
+RDGRANIT.POV.  These textures have been kept separate from the
+STONES2.INC file because they use 256 entry color_maps that would slow
+parsing when not needed.  The color maps for these textures were
+extracted from actual scanned images as described in WOODS.DOC.
+
+
+                              STONEOLD.INC
+
+This file contains a set of rich stone textures that were designed for
+us by Mike Miller, using the original texture names.
+

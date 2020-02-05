@@ -1,0 +1,37 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Vector Identifiers</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov168.htm">Vector Literals</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov170.htm">Vector Operators</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199002"><A NAME="_Toc429993512">Vector Identifiers</A></A></H4>
+<P>Vector identifiers may be declared to make scene files more readable and to parameterize scenes so that changing a single declaration changes many values. An identifier is declared as follows.</P>
+<I><DL>
+<DT>VECTOR_DECLARATION:</DT>
+</I><b><code><DD>#declare </code></b><I>IDENTIFIER </I><b><code>=</code></b> <I>EXPRESSION</I><b><code>;&#9;</code></b>|</DD>
+<b><code><DD>#local </code></b><I>IDENTIFIER </I><b><code>=</code></b> <I>EXPRESSION</I><b><code>;</DD>
+</DL>
+</code></b><P>Where <I>IDENTIFIER</I> is the name of the identifier up to 40 characters long and <I>EXPRESSION</I> is any valid expression which evaluates to a vector value. Note that there should be a semi-colon after the expression in a vector declaration. This semi-colon is new with POV-Ray version 3.1. If omitted, it generates a warning and some macros may not work properly. See "<A HREF="pov191.htm#_Ref412711267">#declare vs. #local</A>" for information on identifier scope.  Here are some examples....</P>
+<PRE> #declare Here = &lt;1,2,3&gt;;
+ #declare There = &lt;3,4,5&gt;;
+ #declare Jump = &lt;Foo*2,Bar-1,Bob/3&gt;;
+ #declare Route = There-Here;
+ #declare Jump = Jump+&lt;1,2,3&gt;;</PRE>
+<P>Note that you invoke a vector identifier by using its name without any angle brackets. As the last example shows, you can re-declare a vector identifier and may use previously declared values in that re-declaration. There are several built-in identifiers which POV-Ray declares for you. See section "<A HREF="pov172.htm#_Ref413233324">Built-in Vector Identifiers</A>" for details.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov168.htm">Vector Literals</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov170.htm">Vector Operators</A>
+</P>
+</BODY>
+</HTML>
+

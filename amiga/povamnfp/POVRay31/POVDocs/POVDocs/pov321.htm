@@ -1,0 +1,47 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Brick</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov320.htm">Bozo</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov322.htm">Bumps</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199167"><A NAME="_Ref419875240"><A NAME="_Toc429993679">Brick</A></A></A></H4>
+<P>The <b><code>brick</code></b> pattern generates a pattern of bricks. The bricks are offset by half a brick length on every other row in the x- and z-directions. A layer of mortar surrounds each brick. The syntax is given by</P>
+<DL>
+<DD>  <b><code>pigment {</DD>
+</code></b><DD>    <b><code>brick</code></b> <I>COLOR_1</I><b><code>,</code></b> <I>COLOR_2</DD>
+</I><DD>    <I>[</I><b><code>brick_size</code></b> <I>&lt;Size&gt;]</DD>
+</I><DD>    <I>[</I><b><code>mortar</code></b> <I>Size]</DD>
+</I><DD>  <b><code>}</DD>
+</DL>
+</code></b><P>where <I>COLOR_1</I> is the color of the mortar and <I>COLOR_2</I> is the color of the brick itself. If no colors are specified a default deep red and dark gray are used. The default size of the brick and mortar together is &lt;8, 3, 4.5&gt; units. The default thickness of the mortar is 0.5 units. These values may be changed using the optional <b><code>brick_size</code></b> and <b><code>mortar</code></b> pattern modifiers. You may also use pigment statements in place of the colors. For example:</P>
+<PRE>  pigment {
+    brick pigment{Jade}, pigment{Black_Marble}
+  }</PRE>
+<P>This example uses normals:</P>
+<PRE>  normal { brick 0.5 }</PRE>
+<P>The float value is an optional bump size. You may also use full normal statements. For example:</P>
+<PRE>  normal {
+    brick normal{bumps 0.2}, normal{granite 0.3}
+  }</PRE>
+<P>When used with textures, the syntax is</P>
+<PRE>  texture {
+    brick texture{T_Gold_1A}, texture{Stone12}
+  }</PRE>
+<P>This is a block pattern which cannot use wave types, <b><code>color_map</code></b>, or <b><code>slope_map</code></b> modifiers.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov320.htm">Bozo</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov322.htm">Bumps</A>
+</P>
+</BODY>
+</HTML>
+

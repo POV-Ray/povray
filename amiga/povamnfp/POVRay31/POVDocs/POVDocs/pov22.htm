@@ -1,0 +1,36 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Box Object</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov21.htm">Simple Shapes</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov23.htm">Cone Object</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405094"><A NAME="_Toc411405370"><A NAME="_Toc414198841"><A NAME="_Toc429993352">Box Object</A></A></A></A></H3>
+<P>The <b><code>box</code></b> is one of the most common objects used. We try this example in place of the sphere:</P>
+<PRE>  box {
+    &lt;-1, 0,   -1&gt;,  // Near lower left corner
+    &lt; 1, 0.5,  3&gt;   // Far upper right corner
+    texture {
+      T_Stone25     // Pre-defined from stones.inc
+      scale 4       // Scale by the same amount in all
+                    // directions
+    }
+    rotate y*20     // Equivalent to "rotate &lt;0,20,0&gt;"
+  }</PRE>
+<P>In the example we can see that a box is defined by specifying the 3D coordinates of its opposite corners. The first vector is generally  the minimum x-, y- and z-coordinates and the 2nd vector should be the maximum x-, y- and z-values however any two opposite corners may be used. Box objects can only be defined parallel to the axes of the world coordinate system. We can later rotate them to any angle. Note that we can perform simple math on values and vectors. In the rotate parameter we multiplied the vector identifier <b><code>y</code></b> by 20. This is the same as &lt;0,1,0&gt;*20 or &lt;0,20,0&gt;.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov21.htm">Simple Shapes</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov23.htm">Cone Object</A>
+</P>
+</BODY>
+</HTML>
+

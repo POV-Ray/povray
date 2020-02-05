@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Frequency and Phase</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov347.htm">Transforming Patterns</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov349.htm">Waveforms</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199190"><A NAME="_Toc429993706">Frequency and Phase</A></A></H4>
+<P>The <b><code>frequency</code></b> and <b><code>phase</code></b> modifiers act as a type of scale and translate modifiers for various blend maps.  They only have effect when blend maps are used.  Blend maps are <b><code>color_map</code></b>, <b><code>pigment_map</code></b>, <b><code>normal_map</code></b>, <b><code>slope_map</code></b>, <b><code>density_map</code></b>, and <b><code>texture_map</code></b>.  This discussion uses a color map as an example but the same principles apply to the other blend map types.</P>
+<P>The <b><code>frequency</code></b> keyword adjusts the number of times that a color map repeats over one cycle of a pattern. For example <b><code>gradient</code></b> covers color map values 0 to 1 over the range from x=0 to x=1. By adding <b><code>frequency 2.0</code></b> the color map repeats twice over that same range. The same effect can be achieved using <b><code>scale 0.5*x</code></b> so the frequency keyword isn't that useful for patterns like gradient.</P>
+<P>However the radial pattern wraps the color map around the +y-axis once. If you wanted two copies of the map (or 3 or 10 or 100) you'd have to build a bigger map. Adding <b><code>frequency 2.0</code></b> causes the color map to be used twice per revolution. Try this:</P>
+<PRE>  pigment {
+    radial
+    color_map{[0.5 color Red][0.5 color White]}
+    frequency 6
+  }</PRE>
+<P>The result is six sets of red and white radial stripes evenly spaced around the object.</P>
+<P>The float after <b><code>frequency</code></b> can be any value. Values greater than 1.0 causes more than one copy of the map to be used. Values from 0.0 to 1.0 cause a fraction of the map to be used. Negative values reverses the map.</P>
+<P>The <b><code>phase</code></b> value causes the map entries to be shifted so that the map starts and ends at a different place. In the example above if you render successive frames at <b><code>phase 0</code></b> then <b><code>phase 0.1</code></b>, <b><code>phase 0.2</code></b>, etc. you could create an animation that rotates the stripes. The same effect can be easily achieved by rotating the <b><code>radial</code></b> pigment using <b><code>rotate y*Angle</code></b> but there are other uses where phase can be handy.</P>
+<P>Sometimes you create a great looking gradient or wood color map but you want the grain slightly adjusted in or out. You could re-order the color map entries but that's a pain. A phase adjustment will shift everything but keep the same scale. Try animating a <b><code>mandel</code></b> pigment for a color palette rotation effect.</P>
+<P>These values work by applying the following formula</P>
+<I><P>  New_Value = fmod ( Old_Value * Frequency + Phase, 1.0 ).</P>
+</I><P>The <b><code>frequency</code></b> and <b><code>phase</code></b> modifiers have no effect on block patterns <b><code>checker</code></b>, <b><code>brick</code></b>, and <b><code>hexagon</code></b> nor do they effect <b><code>image_map</code></b>, <b><code>bump_map</code></b> or <b><code>material_map</code></b>. They also have no effect in normal statements when used with <b><code>bumps</code></b>, <b><code>dents</code></b>, <b><code>quilted</code></b> or <b><code>wrinkles</code></b> because these normal patterns cannot use <b><code>normal_map</code></b> or <b><code>slope_map</code></b>.</P>
+<P>They can be used with normal patterns <b><code>ripples</code></b> and <b><code>waves</code></b> even though these two patterns cannot use <b><code>normal_map</code></b> or <b><code>slope_map</code></b> either. When used with <b><code>ripples</code></b> or <b><code>waves</code></b>, <b><code>frequency</code></b> adjusts the space between features and <b><code>phase</code></b> can be adjusted from 0.0 to 1.0 to cause the ripples or waves to move relative to their center for animating the features.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov347.htm">Transforming Patterns</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov349.htm">Waveforms</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,100 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Understanding The Concept of Splines</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov40.htm">Lathe Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov42.htm">Mesh Object</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref411675833"><A NAME="_Ref411675890"><A NAME="_Ref411675892"><A NAME="_Ref411675936"><A NAME="_Toc414198860"><A NAME="_Toc429993371">Understanding The Concept of Splines</A></A></A></A></A></A></H4>
+<P>It would be helpful, in order to understand splines, if we had a sort of <I>Spline Workshop </I>where we could practice manipulating types and points of splines and see what the effects were like. So let's make one! Now that we know how to create a basic lathe, it will be easy (see file <CODE>lathdem2.pov</CODE>):</P>
+<PRE>  #include "colors.inc"
+  camera {
+    orthographic
+    up &lt;0, 5, 0&gt;
+    right &lt;5, 0, 0&gt;
+    location &lt;2.5, 2.5, -100&gt;
+    look_at &lt;2.5, 2.5, 0&gt;
+  }
+  /* set the control points to be used */
+  #declare Red_Point    = &lt;1.00, 0.00, 0&gt;;
+  #declare Orange_Point = &lt;1.75, 1.00, 0&gt;;
+  #declare Yellow_Point = &lt;2.50, 2.00, 0&gt;;
+  #declare Green_Point  = &lt;2.00, 3.00, 0&gt;;
+  #declare Blue_Point   = &lt;1.50, 4.00, 0&gt;;
+  /* make the control points visible */
+  cylinder { Red_Point, Red_Point - 20*z, .1
+    pigment { Red }
+    finish { ambient 1 }
+  }
+  cylinder { Orange_Point, Orange_Point - 20*z, .1
+    pigment { Orange }
+    finish { ambient 1 }
+  }
+  cylinder { Yellow_Point, Yellow_Point - 20*z, .1
+    pigment { Yellow }
+    finish { ambient 1 }
+  }
+  cylinder { Green_Point, Green_Point - 20*z, .1
+    pigment { Green }
+    finish { ambient 1 }
+  }
+  cylinder { Blue_Point, Blue_Point- 20*z, .1
+    pigment { Blue }
+    finish { ambient 1 }
+  }
+  /* something to make the curve show up */
+  lathe {
+    linear_spline
+    5,
+    Red_Point,
+    Orange_Point,
+    Yellow_Point,
+    Green_Point,
+    Blue_Point
+    pigment { White }
+    finish { ambient 1 }
+  }</PRE>
+<B><P ALIGN="CENTER"><IMG SRC="Image208.gif" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">A simple "Spline Workshop".</P>
+</B><P>Now, we take a deep breath. We know that all looks a bit weird, but with some simple explanations, we can easily see what all this does.</P>
+<P>First, we are using the orthographic camera. If we haven't read up on that yet, a quick summary is: it renders the scene <I>flat</I>, eliminating perspective distortion so that in a side view, the objects look like they were drawn on a piece of graph paper (like in the side view of a modeler or CAD package). There are several uses for this practical new type of camera, but here it is allowing us to see our lathe and cylinders<I> edge on</I>, so that what we see is almost like a cross section of the curve which makes the lathe, rather than the lathe itself. To further that effect, we eliminated shadowing with the <b><code>ambient 1</code></b> finish, which of course also eliminates the need for lighting. We have also positioned this particular side view so that &lt;0,0&gt; appears at the lower left of our scene.</P>
+<P>Next, we declared a set of points. We note that we used 3D vectors for these points rather than the 2D vectors we expect in a lathe. That's the exception we mentioned earlier. When we declare a 3D point, then use it in a lathe, the lathe only uses the first two components of the vector, and whatever is in the third component is simply ignored. This is handy here, since it makes this example possible.</P>
+<P>Next we do two things with the declared points. First we use them to place small diameter cylinders at the locations of the points with the circular caps facing the camera. Then we re-use those same vectors to determine the lathe. Since trying to declare a 2D vector can have some odd results, and isn't really what our cylinder declarations need anyway, we can take advantage of the lathe's tendency to ignore the third component by just setting the z-coordinate in these 3D vectors to zero.</P>
+<P>The end result is: when we render this code, we see a white lathe against a black background showing us how the curve we've declared looks, and the circular ends of the cylinders show us where along the x-y-plane our control points are. In this case, it's very simple. The linear spline has been used so our curve is just straight lines zig-zagging between the points. We change the declarations of <b><code>Red_Point</code></b> and <b><code>Blue_Point</code></b> to read as follows (see file <CODE>lathdem3.pov</CODE>).</P>
+<PRE>  #declare Red_Point  = &lt;2.00, 0.00, 0&gt;;
+  #declare Blue_Point = &lt;0.00, 4.00, 0&gt;;</PRE>
+<B><P ALIGN="CENTER"><IMG SRC="Image209.gif" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">Moving some points of the spline.</P>
+</B><P>We re-render and, as we can see, all that happens is that the straight line segments just move to accommodate the new position of the red and blue points. Linear splines are so simple, we could manipulate them in our sleep, no?</P>
+<P>Let's try something different. First, we change the points to the following (see file <CODE>lathdem4.pov</CODE>).</P>
+<PRE>  #declare Red_Point    = &lt;1.00, 0.00, 0&gt;;
+  #declare Orange_Point = &lt;2.00, 1.00, 0&gt;;
+  #declare Yellow_Point = &lt;3.50, 2.00, 0&gt;;
+  #declare Green_Point  = &lt;2.00, 3.00, 0&gt;;
+  #declare Blue_Point   = &lt;1.50, 4.00, 0&gt;;</PRE>
+<B><P ALIGN="CENTER"> <IMG SRC="Image210.gif" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">A quadratic spline lathe.</P>
+</B><P>We then go down to the lathe declaration and change <b><code>linear_spline</code></b> to <b><code>quadratic_spline</code></b>. We re-render and what do we have?  Well, there's a couple of things worthy of note this time. First, we will see that instead of straight lines we have smooth arcs connecting the points. These arcs are made from quadratic curves, so our lathe looks much more interesting this time. Also, <b><code>Red_Point</code></b> is no longer connected to the curve. What happened?</P>
+<P>Well, while any two points can determine a straight line, it takes three to determine a quadratic curve. POV-Ray looks not only to the two points to be connected, but to the point immediately preceding them to determine the formula of the quadratic curve that will be used to connect them. The problem comes in at the beginning of the curve. Beyond the first point in the curve there is no <I>previous </I>point. So we need to declare one. Therefore, when using a quadratic spline, we must remember that the first point we specify is only there so that POV-Ray can determine what curve to connect the first two points with. It will not show up as part of the actual curve.</P>
+<P>There's just one more thing about this lathe example. Even though our curve is now put together with smooth curving lines, the transitions between those lines is... well, kind of choppy, no? This curve looks like the lines between each individual point have been terribly mismatched. Depending on what we are trying to make, this could be acceptable, or, we might long for a more smoothly curving shape. Fortunately, if the latter is true, we have another option.</P>
+<P>The quadratic spline takes longer to render than a linear spline. The math is more complex. Still longer needs the cubic spline, yet, for a really smoothed out shape, this is the only way to go. We go back into our example, and simply replace <b><code>quadratic_spline</code></b> with <b><code>cubic_spline</code></b> (see file <CODE>lathdem5.pov</CODE>). We render one more time, and take a look at what we have.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image211.gif" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">A cubic spline lathe.</P>
+</B><P>While a quadratic spline takes three points to determine the curve, a cubic needs four. So, as we might expect, <b><code>Blue_Point</code></b> has now dropped out of the curve, just as <b><code>Red_Point</code></b> did, as the first and last points of our curve are now only control points for shaping the curves between the remaining points. But look at the transition from <b><code>Orange_Point</code></b> to <b><code>Yellow_Point</code></b> and then back to <b><code>Green_Point</code></b>. Now, rather than looking mismatched, our curve segments look like one smoothly joined curve.</P>
+<P>The concept of splines is a handy and necessary one, which will be seen again in the prism and polygon objects. But with a little tinkering we can quickly get a feel for working with them.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov40.htm">Lathe Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov42.htm">Mesh Object</A>
+</P>
+</BODY>
+</HTML>
+

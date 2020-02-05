@@ -1,0 +1,69 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Declaring identifiers</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov189.htm">The #declare and #local Directives</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov191.htm">#declare vs. #local</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref413339528"><A NAME="_Toc414199023"><A NAME="_Toc429993533">Declaring identifiers</A></A></A></H4>
+<P>An identifier is declared as follows.</P>
+<I><DL>
+<DT>DECLARATION:</DT>
+</I><b><code><DD>#declare</code></b> <I>IDENTIFIER </I><b><code>=</code></b><I> RVALUE</I>&#9;|</DD>
+<b><code><DD>#local</code></b> <I>IDENTIFIER </I><b><code>=</code></b><I> RVALUE</DD>
+<DT>RVALUE:</DT>
+<DD>FLOAT</I><b><code>;</code></b>   |   <I>VECTOR</I><b><code>;</code></b>   |   <I>COLOR</I><b><code>;</code></b>   |   <I>STRING</I>   |</DD>
+<I><DD>OBJECT</I>   |   <I>TEXTURE</I>   |   <I>PIGMENT</I>   |   <I>NORMAL</I>   |   <I>FINISH</I>   |</DD>
+<I><DD>INTERIOR</I>   |   <I>MEDIA</I>   |   <I>DENSITY</DD>
+<DD>COLOR_MAP</I>   |   <I>PIGMENT_MAP</I>   |   <I>SLOPE_MAP</I>   |   <I>NORMAL_MAP</I>   |   <I>DENSITY_MAP</I>   |</DD>
+<I><DD>CAMERA</I>   |   <I>LIGHT_SOURCE</I>   |</DD>
+<I><DD>FOG</I>   |   <I> RAINBOW</I>   |   <I> SKY_SPHERE</I>   |   <I> TRANSFORM</DD>
+</DL>
+</I><P>Where <I>IDENTIFIER</I> is the name of the identifier up to 40 characters long and <I>RVALUE</I> is any of the listed items.  They are called that because they are values that can appear to the <I>right</I> of the equals sign.  The syntax for each is in the corresponding section of this language reference.</P>
+<P>Here are some examples.</P>
+<PRE> #declare Rows = 5;
+ #declare Count = Count+1;
+ #local  Here = &lt;1,2,3&gt;;
+ #declare White = rgb &lt;1,1,1&gt;;
+ #declare Cyan = color blue 1.0 green 1.0;
+ #declare Font_Name = "ariel.ttf"
+ #declare Rod = cylinder {-5*x,5*x,1}
+ #declare Ring = torus {5,1}
+ #local  Checks = pigment { checker White, Cyan }
+ object{ Rod scale y*5 }     // not "cylinder { Rod }"
+ object {
+  Ring
+  pigment { Checks scale 0.5 }
+  transform Skew
+ }</PRE>
+<P>Note that there should be a semi-colon after the expression in all float, vector and color identifier declarations. This semi-colon is new with POV-Ray version 3.1. If omitted, it generates a warning and some macros may not work properly.</P>
+<P>Declarations, like most language directives, can appear anywhere in the file - even within other statements. For example:</P>
+<PRE> #declare Here=&lt;1,2,3&gt;;
+ #declare Count=0;         // initialize Count
+ union {
+  object { Rod translate Here*Count }
+  #declare Count=Count+1;     // re-declare inside union
+  object { Rod translate Here*Count }
+  #declare Count=Count+1;     // re-declare inside union
+  object { Rod translate Here*Count }
+ }</PRE>
+<P>As this example shows, you can re-declare an identifier and may use previously declared values in that re-declaration. However if you attempt to re-declare an identifier as anything other than its original type, it will generate a warning message.</P>
+<P>Note that object identifiers use the generic wrapper statement <b><code>object{</code></b> ... <b><code>}</code></b>. You do not need to know what kind of object it is.</P>
+<P>Declarations may be nested inside each other within limits. In the example in the previous section you could declare the entire union as a object. However for technical reasons there are instances where you may not use any language directive inside the declaration of floats, vectors or color expressions. Although these limits have been loosened somewhat for POV-Ray 3.1, they still exist.</P>
+<P>Identifiers declared within <b><code>#macro</code></b> ... <b><code>#end</code></b> blocks are not created at the time the macro is defined. They are only created at the time the macro is actually invoked. Like all other items inside such a #macro definition, they are ignored when the macro is defined.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov189.htm">The #declare and #local Directives</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov191.htm">#declare vs. #local</A>
+</P>
+</BODY>
+</HTML>
+

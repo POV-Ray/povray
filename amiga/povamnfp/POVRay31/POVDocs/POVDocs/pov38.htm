@@ -1,0 +1,70 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Complex Blob Constructs and Negative Strength</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov37.htm">Component Types and Other New Features</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov39.htm">Height Field Object</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198857"><A NAME="_Toc429993368">Complex Blob Constructs and Negative Strength</A></A></H4>
+<P>Beginning a new POV-Ray file called <CODE>blobdem3.pov</CODE>, we enter this somewhat more complex example:</P>
+<PRE>  #include "colors.inc"
+  background{White}
+  camera {
+    angle 20
+    location&lt;0,2,-10&gt;
+    look_at&lt;0,0,0&gt;
+  }
+  light_source { &lt;10, 20, -10&gt; color White }
+  blob {
+    threshold .65
+    sphere { &lt;-.23,-.32,0&gt;,.43, 1 scale &lt;1.95,1.05,.8&gt; }   //palm
+    sphere { &lt;+.12,-.41,0&gt;,.43, 1 scale &lt;1.95,1.075,.8&gt; }  //palm
+    sphere { &lt;-.23,-.63,0&gt;, .45, .75 scale &lt;1.78, 1.3,1&gt; } //midhand
+    sphere { &lt;+.19,-.63,0&gt;, .45, .75 scale &lt;1.78, 1.3,1&gt; } //midhand
+    sphere { &lt;-.22,-.73,0&gt;, .45, .85 scale &lt;1.4, 1.25,1&gt; } //heel
+    sphere { &lt;+.19,-.73,0&gt;, .45, .85 scale &lt;1.4, 1.25,1&gt; } //heel
+    cylinder { &lt;-.65,-.28,0&gt;, &lt;-.65,.28,-.05&gt;, .26, 1 }    //lower pinky
+    cylinder { &lt;-.65,.28,-.05&gt;, &lt;-.65, .68,-.2&gt;, .26, 1 }  //upper pinky
+    cylinder { &lt;-.3,-.28,0&gt;, &lt;-.3,.44,-.05&gt;, .26, 1 }      //lower ring
+    cylinder { &lt;-.3,.44,-.05&gt;, &lt;-.3, .9,-.2&gt;, .26, 1 }     //upper ring
+    cylinder { &lt;.05,-.28,0&gt;, &lt;.05, .49,-.05&gt;, .26, 1 }     //lower middle
+    cylinder { &lt;.05,.49,-.05&gt;, &lt;.05, .95,-.2&gt;, .26, 1 }    //upper middle
+    cylinder { &lt;.4,-.4,0&gt;, &lt;.4, .512, -.05&gt;, .26, 1 }      //lower index
+    cylinder { &lt;.4,.512,-.05&gt;, &lt;.4, .85, -.2&gt;, .26, 1 }    //upper index
+    cylinder { &lt;.41, -.95,0&gt;, &lt;.85, -.68, -.05&gt;, .25, 1 }  //lower thumb
+    cylinder { &lt;.85,-.68,-.05&gt;, &lt;1.2, -.4, -.2&gt;, .25, 1 }  //upper thumb
+    pigment { Flesh }
+  }</PRE>
+<B><P ALIGN="CENTER"> <IMG SRC="Image205.jpg" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">A hand made with blobs.</P>
+</B><P>As we can guess from the comments, we are building a hand here. After we render this image, we can see there are a few problems with it. The palm and heel of the hand would look more realistic if we used a couple dozen smaller components rather than the half dozen larger ones we have used, and each finger should have three segments instead of two, but for the sake of a simplified demonstration, we can overlook these points. But there is one thing we really need to address here: This poor fellow appears to have horrible painful swelling of the joints!</P>
+<P>A review of what we know of blobs will quickly reveal what went wrong. The joints are places where the blob components overlap, therefore the combined strength of both components at that point causes the surface to extend further out, since it stays over the threshold longer. To fix this, what we need are components corresponding to the overlap region which have a negative strength to counteract part of the combined field strength. We add the following components to our blob (see file <CODE>blobdem4.pov</CODE>).</P>
+<PRE>  sphere { &lt;-.65,.28,-.05&gt;, .26, -1 } //counteract pinky knuckle bulge
+  sphere { &lt;-.65,-.28,0&gt;, .26, -1 }   //counteract pinky palm bulge
+  sphere { &lt;-.3,.44,-.05&gt;, .26, -1 }  //counteract ring knuckle bulge
+  sphere { &lt;-.3,-.28,0&gt;, .26, -1 }    //counteract ring palm bulge
+  sphere { &lt;.05,.49,-.05&gt;, .26, -1 }  //counteract middle knuckle bulge
+  sphere { &lt;.05,-.28,0&gt;, .26, -1 }    //counteract middle palm bulge
+  sphere { &lt;.4,.512,-.05&gt;, .26, -1 }  //counteract index knuckle bulge
+  sphere { &lt;.4,-.4,0&gt;, .26, -1 }      //counteract index palm bulge
+  sphere { &lt;.85,-.68,-.05&gt;, .25, -1 } //counteract thumb knuckle bulge
+  sphere { &lt;.41,-.7,0&gt;, .25, -.89 }   //counteract thumb heel bulge</PRE>
+<B><P ALIGN="CENTER"><IMG SRC="Image206.jpg" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">The hand without the swollen joints.</P>
+</B><P>Much better! The negative strength of the spherical components counteracts approximately half of the field strength at the points where to components overlap, so the ugly, unrealistic (and painful looking) bulging is cut out making our hand considerably improved. While we could probably make a yet more realistic hand with a couple dozen additional components, what we get this time is a considerable improvement. Any by now, we have enough basic knowledge of blob mechanics to make a wide array of smooth, flowing organic shapes!</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov37.htm">Component Types and Other New Features</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov39.htm">Height Field Object</A>
+</P>
+</BODY>
+</HTML>
+

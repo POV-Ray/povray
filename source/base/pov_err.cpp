@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,9 +36,15 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/pov_err.h"
 
-// C++ variants of standard C header files
+// C++ variants of C standard header files
 #include <cstdio>
 #include <cstring>
+
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -51,13 +57,13 @@ std::string Exception::lookup_code(int err, const char *file, unsigned int line)
     char    str[256];
 
     // skip over part of filename, if present, to make output more compact.
-    if (file != NULL && (strncmp(file, "../../source/", 13) == 0 || strncmp(file, "..\\..\\source\\", 13) == 0))
+    if ((file != nullptr) && ((strncmp(file, "../../source/", 13) == 0) || (strncmp(file, "..\\..\\source\\", 13) == 0)))
         file += 13;
 
     switch(err)
     {
         case kNoErr:
-            if (file == NULL)
+            if (file == nullptr)
                 return "(Failed to determine error: no code found.)";
             sprintf(str, "(Failed to determine error: no code in exception thrown at %s line %d.)", file, line);
             return std::string(str);
@@ -66,7 +72,7 @@ std::string Exception::lookup_code(int err, const char *file, unsigned int line)
             return "Invalid parameter.";
 
         case kMemFullErr:
-            if (file == NULL)
+            if (file == nullptr)
                 return "Out of memory.";
             sprintf(str, "Memory allocation failure exception thrown at %s line %d.", file, line);
             return std::string(str);
@@ -168,7 +174,7 @@ std::string Exception::lookup_code(int err, const char *file, unsigned int line)
             return "A POV-Ray internal nesting limit was reached.";
 
         case kUncategorizedError:
-            if (file == NULL)
+            if (file == nullptr)
                 return "Uncategorized error.";
             sprintf(str, "Uncategorized error thrown at %s line %d.", file, line);
             return std::string(str);
@@ -183,3 +189,4 @@ std::string Exception::lookup_code(int err, const char *file, unsigned int line)
 }
 
 }
+// end of namespace pov_base

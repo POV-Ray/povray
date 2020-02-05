@@ -1,0 +1,35 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Spiral2</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov340.htm">Spiral1</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov342.htm">Spotted</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc429993699">Spiral2</A></A></H4>
+<P>The <b><code>spiral2</code></b> pattern creates a double spiral that winds around the y-axis similar <b><code>spiral1</code></b> except it is two overlapping spirals the twist in opposite directions.  The results sometimes looks like a basket weave or perhaps the skin of pineapple.  The center of a sunflower also has a similar double spiral pattern.  Its syntax is:</P>
+<b><code><DL>
+<DD>pigment {spiral2</code></b> <I>Number_of_Arms</I> <I>[PIGMENT_MODIFIERS...]</I> <b><code>}</DD>
+</DL>
+</code></b><P>The <I>Number_of_Arms</I> value determines how may arms are winding around the y-axis.</P>
+<P>As a normal pattern, the syntax is</P>
+<b><code><DL>
+<DD>normal {spiral2</code></b> <I>Number_of_Arms</I> <I> [</I><b><code>,</code></b> <I>Bump_Size] [NORMAL_MODIFIERS...]</I> <b><code>}</DD>
+</DL>
+</code></b><P>where the vector <I>&lt;Orientation&gt;</I> is a required parameter but the float <I>Bump_Size </I>which follows is optional.  Note that the comma is required especially if <I>Bump_Size</I> is negative.</P>
+<P>The pattern uses the <b><code>triangle_wave</code></b> wave type by default but may use any wave type. </P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov340.htm">Spiral1</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov342.htm">Spotted</A>
+</P>
+</BODY>
+</HTML>
+

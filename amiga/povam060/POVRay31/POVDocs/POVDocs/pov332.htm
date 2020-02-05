@@ -1,0 +1,47 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Mandel</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov331.htm">Leopard</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov333.htm">Marble</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199176"><A NAME="_Toc429993690">Mandel</A></A></H4>
+<P>The <b><code>mandel</code></b> pattern computes the standard Mandelbrot fractal pattern and projects it onto the x-y-plane. It uses the x and y coordinates to compute the Mandelbrot set.</P>
+<P>It is specified as</P>
+<b><code><DL>
+<DD>pigment {mandel</code></b> <I>Max_Iteration</I> <I>[PIGMENT_MODIFIERS...]</I> <b><code>}</DD>
+</DL>
+</code></b><P>The pattern is specified with the keyword <b><code>mandel</code></b> followed by an integer number. This number is the maximum number of iterations to be used to compute the set. Typical values range from 10 up to 256 but any positive integer may be used. For example:</P>
+<PRE>  pigment {
+    mandel 25
+    color_map {
+      [0.0  color Cyan]
+      [0.3  color Yellow]
+      [0.6  color Magenta]
+      [1.0  color Cyan]
+    }
+    scale .5
+  }</PRE>
+<P>The value passed to the color map is computed by the formula:</P>
+<I><P>  value = number_of_iterations / max_iterations</P>
+</I><P>When used as a normal pattern, the syntax is...</P>
+<b><code><DL>
+<DD>normal{mandel</code></b> <I>Max_Iteration [</I><b><code>,</code></b><I> Bump_Size] </I> <I>[NORMAL_MODIFIERS...]</I> <b><code>}</DD>
+</DL>
+</code></b><P>where the integer <I>Max_Iteration</I> is a required parameter but the float <I>Bump_Size </I>which follows is optional.  Note that the comma is required especially if <I>Bump_Size</I> is negative.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov331.htm">Leopard</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov333.htm">Marble</A>
+</P>
+</BODY>
+</HTML>
+

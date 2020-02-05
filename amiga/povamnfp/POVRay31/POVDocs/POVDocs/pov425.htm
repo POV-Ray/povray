@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Configuring POV-Ray Source</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov424.htm">Directory Structure</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov426.htm">Conclusion</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc414199283"><A NAME="_Toc429993798">Configuring POV-Ray Source</A></A></H3>
+<P>Every platform has a header file <CODE>config.h</CODE> that is generally in the platform specific directory but may be in the compiler specific directory. Some platforms have multiple versions of this file and you may need to copy or rename it as <CODE>config.h</CODE>. This file is included in every module of POV-Ray. It contains any prototypes, macros or other definitions that may be needed in the generic parts of POV-Ray but must be customized for a particular platform or compiler.</P>
+<P>For example different operating systems use different characters as a separator between directories and file names. MS-Dos uses back slash, Unix a front slash or Mac a colon. The <CODE>config.h</CODE> file for MS-Dos and Windows contains the following:</P>
+<PRE>  #define FILENAME_SEPARATOR '\'
+</PRE>
+<P>which tells the generic part of POV-Ray to use a back slash.</P>
+<P>Every customization that the generic part of the code needs has a default setting in the file <CODE>source\frame.h</CODE> which is also included in every module after <CODE>config.h</CODE>. The <CODE>frame.h</CODE> header contains many groups of defines such as this:</P>
+<PRE>  #ifndef FILENAME_SEPARATOR
+  #define FILENAME_SEPARATOR '/'
+  #endif</PRE>
+<P>which basically says "If we didn't define this previously in <CODE>config.h</CODE> then here's a default value". See <CODE>frame.h</CODE> to see what other values you might wish to configure.</P>
+<P>If any definitions are used to specify platform specific functions you should also include a prototype for that function. The file <CODE>source\msdos\config.h</CODE>, for example, not only contains the macro:</P>
+<PRE>  #define POV_DISPLAY_INIT(w,h) MSDOS_Display_Init ((w), (h));</PRE>
+<P>to define the name of the graphics display initialization function, it contains the prototype:</P>
+<PRE>  void MSDOS_Display_Init (int w, int h);</PRE>
+<P>If you plan to port POV-Ray to an unsupported platform you should probably start with the simplest, non-display generic Unix version. Then add new custom pieces via the <CODE>config.h</CODE> file.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov424.htm">Directory Structure</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov426.htm">Conclusion</A>
+</P>
+</BODY>
+</HTML>
+

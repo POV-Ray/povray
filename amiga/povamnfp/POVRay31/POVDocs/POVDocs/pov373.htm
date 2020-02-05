@@ -1,0 +1,36 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Global Settings</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov372.htm">Rainbow</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov374.htm">ADC_Bailout</A>
+</P>
+<HR>
+<BR>
+<H2><A NAME="_Toc411405219"><A NAME="_Toc411405495"><A NAME="_Ref412709041"><A NAME="_Toc414199220"><A NAME="_Toc429993737">Global Settings</A></A></A></A></A></H2>
+<P>The <b><code>global_settings</code></b> statement is a catch-all statement that gathers together a number of global parameters. The statement may appear anywhere in a scene as long as it is not inside any other statement. You may have multiple <b><code>global_settings</code></b> statements in a scene. Whatever values were specified in the last <b><code>global_settings</code></b> statement override any previous settings.  Regardless of where you specify the statement, the feature applies to the entire scene.</P>
+<P>Note that some items which were language directives in earlier versions of POV-Ray have been moved inside the <b><code>global_settings</code></b> statement so that it is more obvious to the user that their effect is global. The old syntax is permitted but generates a warning.  The new syntax is:</P>
+<I><DL>
+<DT>GLOBAL_SETTINGS:</DT>
+</I><b><code><DD>global_settings {</code></b> <I>[GLOBAL_SETTINGS_ITEMS...]</I> <b><code>}</DD>
+</code></b><I><DT>GLOBAL_SETTINGS_ITEM:</DT>
+</I><b><code><DD>adc_bailout</code></b> <I>Value</I>   |   <b><code>ambient_light</code></b> <I>COLOR</I>   |   <b><code>assumed_gamma</code></b> <I>Value</I>   |</DD>
+<b><code><DD>hf_gray_16</code></b> <I>[Bool}</I>   |   <b><code>irid_wavelength</code></b> <I>COLOR</I>   |   <b><code>max_intersections</code></b> <I>Number</I>   |</DD>
+<b><code><DD>max_trace_level</code></b> <I>Number</I>   |   <b><code>number_of_waves</code></b> <I>Number</I>   |</DD>
+<b><code><DD>radiosity {</code></b> <I>RADIOSITY_ITEMS...</I> <b><code>}</DD>
+</DL>
+</code></b><P>Each item is optional and may appear in and order. If an item is specified more than once, the last setting overrides previous values. Details on each item are given in the following sections.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov372.htm">Rainbow</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov374.htm">ADC_Bailout</A>
+</P>
+</BODY>
+</HTML>
+

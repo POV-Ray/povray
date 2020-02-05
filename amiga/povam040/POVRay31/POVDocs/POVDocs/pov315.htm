@@ -1,0 +1,50 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Layered Textures</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov314.htm">Material Maps</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov316.htm">Patterns</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405210"><A NAME="_Toc411405486"><A NAME="_Toc414199162"><A NAME="_Ref417301568"><A NAME="_Toc429993673">Layered Textures</A></A></A></A></A></H3>
+<P>It is possible to create a variety of special effects using layered textures. A layered texture consists of several textures that are partially transparent and are laid one on top of the other to create a more complex texture. The different texture layers show through the transparent portions to create the appearance of one texture that is a combination of several textures.</P>
+<P>You create layered textures by listing two or more textures one right after the other. The last texture listed will be the top layer, the first one listed will be the bottom layer. All textures in a layered texture other than the bottom layer should have some transparency.  For example:</P>
+<PRE>  object {
+    My_Object
+    texture {T1}  // the bottom layer
+    texture {T2}  // a semi-transparent layer
+    texture {T3}  // the top semi-transparent layer
+  }</PRE>
+<P>In this example T2 shows only where T3 is transparent and T1 shows only where T2 and T3 are transparent.</P>
+<P>The color of underlying layers is filtered by upper layers but the results do not look exactly like a series of transparent surfaces. If you had a stack of surfaces with the textures applied to each, the light would be filtered twice: once on the way in as the lower layers are illuminated by filtered light and once on the way out. Layered textures do not filter the illumination on the way in. Other parts of the lighting calculations work differently as well. The results look great and allow for fantastic looking textures but they are simply different from multiple surfaces. See <CODE>stones.inc</CODE> in the standard include files directory for some magnificent layered textures.</P>
+<P>Note layered textures must use the <b><code>texture</code></b> wrapped around any pigment, normal or finish statements. Do not use multiple pigment, normal or finish statements without putting them inside the texture statement.</P>
+<P>Layered textures may be declared. For example</P>
+<PRE>  #declare Layered_Examp =
+    texture {T1}
+    texture {T2}
+    texture {T3}</PRE>
+<P>may be invoked as follows:</P>
+<PRE>  object {
+    My_Object
+    texture {
+      Layer_Examp
+      // Any pigment, normal or finish here
+      // modifies the bottom layer only.
+    }
+  }</PRE>
+<P>If you wish to use a layered texture in a block pattern, such as <b><code>checker</code></b>, <b><code>hexagon</code></b>, or <b><code>brick</code></b>, or in a <b><code>material_map</code></b>, you must declare it first and then reference it inside a single texture statement. A patterned texture cannot be used as a layer in a layered texture however you may use layered textures as any of the textures contained within a patterned texture.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov314.htm">Material Maps</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov316.htm">Patterns</A>
+</P>
+</BODY>
+</HTML>
+

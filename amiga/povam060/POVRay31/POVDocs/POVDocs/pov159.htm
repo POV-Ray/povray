@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Comments</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov158.htm">Identifiers and Keywords</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov160.htm">Float Expressions</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405168"><A NAME="_Toc411405444"><A NAME="_Toc414198993"><A NAME="_Toc429993502">Comments</A></A></A></A></H3>
+<P>Comments are text in the scene file included to make the scene file easier to read or understand. They are ignored by the ray-tracer and are there for your information. There are two types of comments in POV-Ray.</P>
+<P>Two slashes are used for single line comments. Anything on a line after a double slash (<b><code>//</code></b>) is ignored by the ray-tracer. For example:</P>
+<PRE> // This line is ignored</PRE>
+<P>You can have scene file information on the line in front of the comment as in:</P>
+<PRE> object { FooBar } // this is an object</PRE>
+<P>The other type of comment is used for multiple lines. It starts with "<b><code>/*</code></b>" and ends with "<b><code>*/</code></b>". Everything in-between is ignored. For example:</P>
+<PRE> /* These lines
+   are ignored
+   by the
+   ray-tracer */</PRE>
+<P>This can be useful if you want to temporarily remove elements from a scene file. <b><code>/*</code></b> ... <b><code>*/</code></b> comments can <I>comment out </I>lines containing other <b><code>//</code></b> comments and thus can be used to temporarily or permanently comment out parts of a scene. <b><code>/*</code></b> ... <b><code>*/</code></b> comments can be nested, the following is legal:</P>
+<PRE> /* This is a comment
+ // This too
+ /* This also */
+ */</PRE>
+<P>Use comments liberally and generously. Well used, they really improve the readability of scene files.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov158.htm">Identifiers and Keywords</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov160.htm">Float Expressions</A>
+</P>
+</BODY>
+</HTML>
+

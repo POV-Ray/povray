@@ -1,0 +1,80 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Using Transparent Pigments and Layered Textures</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov72.htm">Using Pattern Modifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov74.htm">Using Pigment Maps</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198893"><A NAME="_Toc429993403">Using Transparent Pigments and Layered Textures</A></A></H4>
+<P>Pigments are described by numerical values that give the rgb value of the color to be used (like <b><code>color rgb&lt;1,0,0&gt;</code></b> giving us a red color). But this syntax will give us more than just the rgb values. We can specify filtering transparency by changing it as follows: <b><code>color rgbf&lt;1,0,0,1&gt;</code></b>. The <I>f </I>stands for <b><code>filter</code></b>, POV-Ray's word for filtered transparency. A value of one means that the color is completely transparent, but still filters the light according to what the pigment is. In this case, the color will be a transparent red, like red cellophane.</P>
+<P>There is another kind of transparency in POV-Ray. It is called <I>transmittance </I>or non-filtering transparency (the keyword is <b><code>transmit</code></b>). It is different from <b><code>filter</code></b> in that it does not filter the light according to the pigment color. It instead allows all the light to pass through unchanged. It can be specified like this: <b><code>rgbt &lt;1,0,0,1&gt;</code></b>.</P>
+<P>Let's use some transparent pigments to create another kind of texture, the layered texture. Returning to our previous example, declare the following texture.</P>
+<PRE>  #declare LandArea = texture {
+      pigment {
+        agate
+        turbulence 1
+        lambda 1.5
+        omega .8
+        octaves 8
+        color_map {
+          [0.00 color rgb &lt;.5, .25, .15&gt;]
+          [0.33 color rgb &lt;.1, .5, .4&gt;]
+          [0.86 color rgb &lt;.6, .3, .1&gt;]
+          [1.00 color rgb &lt;.5, .25, .15&gt;]
+        }
+      }
+    }</PRE>
+<P>This texture will be the land area. Now let's make the oceans by declaring the following.</P>
+<PRE>  #declare OceanArea = texture {
+      pigment {
+        bozo
+        turbulence .5
+        lambda 2
+        color_map {
+          [0.00, 0.33 color rgb &lt;0, 0, 1&gt;
+                      color rgb &lt;0, 0, 1&gt;]
+          [0.33, 0.66 color rgbf &lt;1, 1, 1, 1&gt;
+                      color rgbf &lt;1, 1, 1, 1&gt;]
+          [0.66, 1.00 color rgb &lt;0, 0, 1&gt;
+                      color rgb &lt;0, 0, 1&gt;]
+        }
+      }
+    }</PRE>
+<P>Note how the ocean is the opaque blue area and the land is the clear area which will allow the underlying texture to show through.</P>
+<P>Now, let's declare one more texture to simulate an atmosphere with swirling clouds.</P>
+<PRE>  #declare CloudArea = texture {
+    pigment {
+      agate
+      turbulence 1
+      lambda 2
+      frequency 2
+      color_map {
+        [0.0 color rgbf &lt;1, 1, 1, 1&gt;]
+        [0.5 color rgbf &lt;1, 1, 1, .35&gt;]
+        [1.0 color rgbf &lt;1, 1, 1, 1&gt;]
+      }
+    }
+  }</PRE>
+<P>Now apply all of these to our sphere.</P>
+<PRE>  sphere { &lt;0,0,0&gt;, 1
+    texture { LandArea }
+    texture { OceanArea }
+    texture { CloudArea }
+  }</PRE>
+<P>We render this and have a pretty good rendition of a little planetoid. But it could be better. We don't particularly like the appearance of the clouds. There is a way they could be done that would be much more realistic.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov72.htm">Using Pattern Modifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov74.htm">Using Pigment Maps</A>
+</P>
+</BODY>
+</HTML>
+

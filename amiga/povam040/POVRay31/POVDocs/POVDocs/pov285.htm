@@ -1,0 +1,41 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Interior</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov284.htm">Sturm</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov286.htm">Why are Interior and Media Necessary?</A>
+</P>
+<HR>
+<BR>
+<H2><A NAME="_Toc411405204"><A NAME="_Toc411405480"><A NAME="_Ref413748577"><A NAME="_Toc414199125"><A NAME="_Toc414199114"><A NAME="_Ref416274104"><A NAME="_Ref417128927"><A NAME="_Ref417290349"><A NAME="_Toc429993630">Interior</A></A></A></A></A></H2>
+<P>New with POV-Ray 3.1 is an object modifier statement called <b><code>interior</code></b>.  The syntax is:</P>
+<I><DL>
+<DT>INTERIOR:</DT>
+</I><b><code><DD>interior {</code></b> <I>[INTERIOR_IDENTIFIER] [INTERIOR_ITEMS...]</I> <b><code>}</DD>
+</code></b><I><DT>INTERIOR_ITEM:</DT>
+</I><b><code><DD>ior</code></b> <I>Value</I>   |   <b><code>caustics</code></b> <I>Value</I>   |</DD>
+<b><code><DD>fade_distance</code></b> <I>Distance</I>   |   <b><code>fade_power</code></b><I> Power</DD>
+<DD>MEDIA...</DD>
+</DL>
+</I><P>The <b><code>interior</code></b> contains items which describe the properties of the interior of the object.  This is in contrast to the <b><code>texture</code></b> which describes the surface properties only.  The interior of an object is only of interest if it has a transparent texture which allows you to see inside the object.  It also applies only to solid objects which have a well-defined inside/outside distinction.  Note that the <b><code>open</code></b> keyword, or <b><code>clipped_by</code></b> modifier also allows you to see inside but interior features may not render properly.  They should be avoided if accurate interiors are required.</P>
+<P>Interior identifiers may be declared to make scene files more readable and to parameterize scenes so that changing a single declaration changes many values. An identifier is declared as follows.</P>
+<I><DL>
+<DT>INTERIOR_DECLARATION:</DT>
+</I><b><code><DD>#declare </code></b><I>IDENTIFIER </I><b><code>=</code></b> <I>INTERIOR</I><b><code>&#9;</code></b>|</DD>
+<b><code><DD>#local </code></b><I>IDENTIFIER </I><b><code>=</code></b> <I>INTERIOR</DD>
+</DL>
+</I><P>Where <I>IDENTIFIER</I> is the name of the identifier up to 40 characters long and <I>INTERIOR</I> is any valid <b><code>interior</code></b> statement.  See "<A HREF="pov191.htm#_Ref412711267">#declare vs. #local</A>" for information on identifier scope. </P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov284.htm">Sturm</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov286.htm">Why are Interior and Media Necessary?</A>
+</P>
+</BODY>
+</HTML>
+

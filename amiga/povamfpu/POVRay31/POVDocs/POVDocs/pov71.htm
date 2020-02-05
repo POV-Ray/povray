@@ -1,0 +1,47 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Using Pigment and Patterns</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov70.htm">Using Color List Pigments</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov72.htm">Using Pattern Modifiers</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198891"><A NAME="_Toc429993401">Using Pigment and Patterns</A></A></H4>
+<P>Let's begin texturing our sphere by using a pattern and a color map consisting of three colors. We replace the pigment block with the following.</P>
+<PRE>  pigment {
+    gradient x
+    color_map {
+      [0.00 color Red]
+      [0.33 color Blue]
+      [0.66 color Yellow]
+      [1.00 color Red]
+    }
+  }</PRE>
+<P>Rendering this we see that the <b><code>gradient</code></b> pattern gives us an interesting pattern of vertical stripes. We change the gradient direction to y. The stripes are horizontal now. We change the gradient direction to z. The stripes are now more like concentric rings. This is because the gradient direction is directly away from the camera. We change the direction back to x and add the following to the pigment block.</P>
+<PRE>  pigment {
+    gradient x
+    color_map {
+      [0.00 color Red]
+      [0.33 color Blue]
+      [0.66 color Yellow]
+      [1.00 color Red]
+    }
+    rotate -45*z          // &lt;- add this line
+  }</PRE>
+<P>The vertical bars are now slanted at a 45 degree angle. All patterns can be rotated, scaled and translated in this manner. Let's now try some different types of patterns. One at a time, we substitute the following keywords for <b><code>gradient x</code></b> and render to see the result: <b><code>bozo</code></b>, <b><code>marble</code></b>, <b><code>agate</code></b>, <b><code>granite</code></b>, <b><code>leopard</code></b>, <b><code>spotted</code></b> and <b><code>wood</code></b> (if we like we can test all patterns listed in section "<A HREF="pov316.htm#_Ref411686157">Patterns</A>").</P>
+<P>Rendering these we see that each results in a slightly different pattern. But to get really good results each type of pattern requires the use of some pattern modifiers.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov70.htm">Using Color List Pigments</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov72.htm">Using Pattern Modifiers</A>
+</P>
+</BODY>
+</HTML>
+

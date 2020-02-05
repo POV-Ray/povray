@@ -1,0 +1,44 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Clipped_By</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov277.htm">Object Modifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov279.htm">Bounded_By</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199120"><A NAME="_Toc429993623">Clipped_By</A></A></H4>
+<P>The <b><code>clipped_by</code></b> statement is technically an object modifier but it provides a type of CSG similar to CSG intersection. The syntax is:</P>
+<I><DL>
+<DT>CLIPPED_BY:</DT>
+</I><b><code><DD>clipped_by</code></b> <b><code>{</code></b> <I>UNTEXTURED_SOLID_OBJECT...</I> <b><code>}</code></b>   |   <b><code>clipped_by</code></b> <b><code>{</code></b> <b><code>bounded_by</code></b> <b><code>}</DD>
+</DL>
+</code></b><P>Where <I>UNTEXTURED_SOLID_OBJECT</I> is one or more solid objects which have had no texture applied.  For example:</P>
+<PRE>  object {
+    My_Thing
+    clipped_by{plane{y,0}}
+  }</PRE>
+<P>Every part of the object <b><code>My_Thing</code></b> that is inside the plane is retained while the remaining part is clipped off and discarded. In an <b><code>intersection</code></b> object the hole is closed off. With <b><code>clipped_by</code></b> it leaves an opening. For example the following figure shows object <b><code>A</code></b> being clipped by object <b><code>B</code></b>.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image191.gif" WIDTH=332 HEIGHT=212></P>
+<P ALIGN="CENTER">An object clipped by another object.</P>
+</B><P>You may use <b><code>clipped_by</code></b> to slice off portions of any shape. In many cases it will also result in faster rendering times than other methods of altering a shape.  Occasionally you will want to use the <b><code>clipped_by</code></b> and <b><code>bounded_by</code></b> options with the same object. The following shortcut saves typing and uses less memory.</P>
+<PRE>  object {
+    My_Thing
+    bounded_by { box { &lt;0,0,0&gt;, &lt;1,1,1&gt; } }
+    clipped_by { bounded_by }
+  }</PRE>
+<P>This tells POV-Ray to use the same box as a clip that was used as a bounds.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov277.htm">Object Modifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov279.htm">Bounded_By</A>
+</P>
+</BODY>
+</HTML>
+

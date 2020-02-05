@@ -1,0 +1,77 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Language Directives</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov186.htm">Array Initalizers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov188.htm">Include Files and the #include Directive.</A>
+</P>
+<HR>
+<BR>
+<H2><A NAME="_Toc411405176"><A NAME="_Toc411405452"><A NAME="_Ref412708721"><A NAME="_Toc414199020"><A NAME="_Toc429993530">Language Directives</A></A></A></A></A></H2>
+<P>The POV Scene Language contains several statements called <I>language directives </I>which tell the file parser how to do its job. These directives can appear in almost any place in the scene file - even in the middle of some other statements. They are used to include other text files in the stream of commands, to declare identifiers, to define macros, conditional, or looped parsing and to control other important aspects of scene file processing.</P>
+<P>Each directive begins with the hash character <b><code>#</code></b> (often called a number sign or pound sign). It is followed by a keyword and optionally other parameters.</P>
+<P>In versions of POV-Ray prior to 3.0, the use of this <b><code>#</code></b> character was optional. Language directives could only be used between objects, camera or light_source statements and could not appear within those statements. The exception was the <b><code>#include</code></b> which could appear anywhere. Now that all language directives can be used almost anywhere, the <b><code>#</code></b> character is mandatory.</P>
+<P>The following keywords introduce language directives.</P>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=480>
+<TR><TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>#break</code></b></TD>
+<TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>#case</code></b></TD>
+<TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>#debug</code></b></TD>
+<TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>#declare</code></b></TD>
+</TR>
+<TR><TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>#default</code></b></TD>
+<TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>#else</code></b></TD>
+<TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>#end</code></b></TD>
+<TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>#fclose</code></b></TD>
+</TR>
+<TR><TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>#fopen</code></b></TD>
+<TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>#local</code></b></TD>
+<TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>#macro</code></b></TD>
+<TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>#read</code></b></TD>
+</TR>
+<TR><TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>#render</code></b></TD>
+<TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>#statistics</code></b></TD>
+<TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>#switch</code></b></TD>
+<TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>#undef</code></b></TD>
+</TR>
+<TR><TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>#version</code></b></TD>
+<TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>#warning</code></b></TD>
+<TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>#write</code></b></TD>
+<TD WIDTH="25%" VALIGN="TOP">&nbsp;</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>Earlier versions of POV-Ray considered the keyword <b><code>#max_intersections</code></b> and the keyword <b><code>#max_trace_level</code></b> to be language directives but they have been moved to the <b><code>global_settings</code></b> statement and should be placed there without the <b><code>#</code></b> sign. Their use as a directive still works but it generates a warning and may be discontinued in the future.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov186.htm">Array Initalizers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov188.htm">Include Files and the #include Directive.</A>
+</P>
+</BODY>
+</HTML>
+

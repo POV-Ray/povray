@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Density_File</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov325.htm">Cylindrical</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov327.htm">Dents</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref421689780"><A NAME="_Toc429993684">Density_File</A></A></H4>
+<P>The <b><code>density_file</code></b> pattern is a 3-D bitmap pattern that occupies a unit cube from location &lt;0,0,0&gt; to &lt;1,1,1&gt;.  The data file is a raw binary file format created for POV-Ray called <b><code>df3</code></b> format.  The syntax provides for the possibility of implementing other formats in the future.  This pattern was originally created for use with <b><code>halo</code></b> or <b><code>media</code></b> but it may be used anywhere any pattern may be used.  The syntax is:</P>
+<b><code><DL>
+<DD>pigment {density_file df3</code></b> <I>"filename.df3"</I> <I>[</I><b><code>interpolate</code></b><I> Type] [PIGMENT_MODIFIERS...]</I> <b><code>}</DD>
+</DL>
+</code></b><P>where <I>"filename.df3"</I> is a file name of the data file.</P>
+<P>As a normal pattern, the syntax is</P>
+<b><code><DL>
+<DD>normal {density_file df3</code></b> <I>"filename.df3"</I> <I> [</I><b><code>,</code></b> <I>Bump_Size]</DD>
+<DD>[</I><b><code>interpolate</code></b><I> Type] [NORMAL_MODIFIERS...]</I> </DD>
+<b><code><DD>}</DD>
+</DL>
+</code></b><P>The optional float <I>Bump_Size </I>should follow the file name and any other modifiers follow that.</P>
+<P>The <b><code>df3</code></b> format consists of a 6 byte header of three 16-bit integers with high order byte first.  These three values give the x,y,z size of the data in pixels (or more appropriately called <I>voxels</I>).  This is followed by x*y*z unsigned integer bytes of data.  The data in the range of 0 to 255 is scaled into a float value in the range 0.0 to 1.0.  It remains at 0.0 for all areas beyond the unit cube.  The pattern occupies the unit cube regardless of the dimensions in voxels. </P>
+<P>The <b><code>interpolate</code></b> keyword may be specified to add interpolation of the data.  The default value of zero specifies no interpolation.  A value of one specifies tri-linear interpolation.</P>
+<P>See the sample scenes for data file <CODE>include\spiral.df3</CODE>,and the scenes which use it: <CODE>scenes\textures\surfaces\densfile.pov</CODE>, <CODE>scenes\interior\media\galaxy.pov</CODE> for examples.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov325.htm">Cylindrical</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov327.htm">Dents</A>
+</P>
+</BODY>
+</HTML>
+

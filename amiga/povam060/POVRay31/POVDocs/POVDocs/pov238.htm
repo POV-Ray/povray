@@ -1,0 +1,74 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Blob</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov237.htm">Finite Solid Primitives</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov239.htm">Box</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref428280785"><A NAME="_Ref428631930"><A NAME="_Toc429993583">Blob</A></A></A></A></A></A></H4>
+<P>Blobs are an interesting and flexible object type. Mathematically they are iso-surfaces of scalar fields, i.e. their surface is defined by the strength of the field in each point. If this strength is equal to a threshold value you're on the surface otherwise you're not.</P>
+<P>Picture each blob component as an object floating in space. This object is <I>filled </I>with a field that has its maximum at the center of the object and drops off to zero at the object's surface. The field strength of all those components are added together to form the field of the blob. Now POV-Ray looks for points where this field has a given value, the threshold value. All these points form the surface of the blob object. Points with a greater field value than the threshold value are considered to be inside while points with a smaller field value are outside.</P>
+<P>There's another, simpler way of looking at blobs. They can be seen as a union of flexible components that attract or repel each other to form a blobby organic looking shape. The components' surfaces actually stretch out smoothly and connect as if they were made of honey or something like that.</P>
+<P>The syntax for <b><code>blob</code></b> is defined as follows:</P>
+<I><DL>
+<DT>BLOB:</DT>
+</I><b><code><DD>blob {</code></b> <I>BLOB_ITEM... [BLOB_MODIFIERS...]</I><b><code>}</DD>
+</code></b><I><DT>BLOB_ITEM:</DT>
+</I><b><code><DD>sphere{</code></b><I>&lt;Center&gt;</I><b><code>,</code></b><I> Radius</I><b><code>,</code></b><I> [ </I><b><code>strength</code></b> <I>] Strength [COMPONENT_MODIFIER...]</I> <b><code>}</code></b>   |</DD>
+<b><code><DD>cylinder{</code></b><I>&lt;End1&gt;</I><b><code>,</code></b><I> &lt;End2&gt;</I><b><code>,</code></b><I> Radius</I><b><code>,</code></b><I> [ </I><b><code>strength</code></b> <I>] Strength [COMPONENT_MODIFIER...]</I> <b><code>}</code></b>   |</DD>
+<b><code><DD>component</code></b> <I>Strength</I><b><code>,</code></b><I> Radius</I><b><code>,</code></b><I> &lt;Center&gt;</I>   |</DD>
+<b><code><DD>threshold</code></b> <I>Amount</DD>
+<DT>COMPONENT_MODIFIER:</DT>
+<DD>TEXTURE</I>   |   <I>PIGMENT</I>   |   <I>NORMAL</I>   |   <I>FINISH</I>   |   <I>TRANSFORMATION</DD>
+<DT>BLOB_MODIFIER:</DT>
+</I><b><code><DD>hierarchy</code></b> <I>[Boolean]</I>   |</DD>
+<b><code><DD>sturm</code></b> <I>[Boolean]</I>   |</DD>
+<I><DD>OBJECT_MODIFIER</DD>
+</DL>
+</I><P>The <b><code>threshold</code></b> keyword is followed by a float value which determines the total field strength value that POV-Ray is looking for. The default value if none is specified is <b><code>threshold 1.0</code></b>.  By following the ray out into space and looking at how each blob component affects the ray, POV-Ray will find the points in space where the field strength is equal to the threshold value. The following list shows some things you should know about the threshold value.</P><dir>
+1) The threshold value must be positive.</P>
+<P>2) A component disappears if the threshold value is greater than its strength.</P>
+<P>3) As the threshold value gets larger, the surface you see gets closer to the centers of the components.</P>
+<P>4) As the threshold value gets smaller, the surface you see gets closer to the surface of the components.</P>
+</dir>
+<P>Cylindrical components are specified by a <b><code>cylinder</code></b> statement.  The center of the end-caps of the cylinder is defined by the vectors <I>&lt;End1&gt;</I> and <I>&lt;End2&gt;</I>.  Next is the float value of the <I>Radius</I> followed by the float <I>Strength</I>.  These vectors and floats are required and should be separated by commas.  The keyword <b><code>strength</code></b> may optionally precede the strength value. The cylinder has hemispherical caps at each end.</P>
+<P>Spherical components are specified by a <b><code>sphere</code></b> statement.  The location is defined by the vector <I>&lt;Center&gt;</I>.  Next is the float value of the <I>Radius</I> followed by the float <I>Strength</I>.  These vector and float values are required and should be separated by commas.  The keyword <b><code>strength</code></b> may optionally precede the strength value.</P>
+<P>You usually will apply a single texture to the entire blob object, and you typically use transformations to change its size, location, and orientation.  However both the <b><code>cylinder</code></b> and <b><code>sphere</code></b> statements may have individual texture, pigment, normal, finish, and transformations applied to them.  You may not apply separate <b><code>interior</code></b> statements to the components but you may specify one for the entire blob.  Note that by unevenly scaling a spherical component you can create ellipsoidal components. The tutorial section on "<A HREF="pov36.htm#_Ref413759196">Blob Object</A>" illustrates individually textured blob components and many other blob examples.</P>
+<P>The <b><code>component</code></b> keyword is an obsolete method for specifying a spherical component and is only used for compatibility with earlier POV-Ray versions.  It may not have textures or transformations individually applied to it.</P>
+<P>The <b><code>strength</code></b> parameter of either type of blob component is a float value specifying the field strength at the center of the object. The strength may be positive or negative. A positive value will make that component attract other components while a negative value will make it repel other components. Components in different, separate blob shapes do not affect each other.</P>
+<P>You should keep the following things in mind.</P><dir>
+1) The strength value may be positive or negative. Zero is a bad value, as the net result is that no field was added --- you might just as well have not used this component.</P>
+<P>2) If strength is positive, then POV-Ray will add the component's field to the space around the center of the component. If this adds enough field strength to be greater than the threshold value you will see a surface.</P>
+<P>3) If the strength value is negative, then POV-Ray will subtract the component's field from the space around the center of the component. This will only do something if there happen to be positive components nearby. What happens is that the surface around any nearby positive components will be dented away from the center of the negative component.</P>
+</dir>
+<P>After all components and the optional <b><code>threshold</code></b> value have been specified you may specify zero or more blob modifiers. A blob modifier is any regular object modifier or the <b><code>hierarchy</code></b> or <b><code>sturm</code></b> keywords.</P>
+<P>The components of each blob object are internally bounded by a spherical bounding hierarchy to speed up blob intersection tests and other operations. By using the optional keyword <b><code>hierarchy</code></b> followed by an optional boolean float value to turn it off or on.  By default it is on.</P>
+<P>The calculations for blobs must be very accurate. If this shape renders improperly you may add the keyword <b><code>sturm</code></b> followed by an optional boolean float value to turn it off or on POV-Ray's slower-yet-more-accurate Sturmian root solver. By default it is off.</P>
+<P>An example of a three component blob is:</P>
+<PRE> blob {
+  threshold 0.6
+  sphere { &lt;.75, 0, 0&gt;, 1, 1 }
+  sphere { &lt;-.375, .64952, 0&gt;, 1, 1 }
+  sphere { &lt;-.375, -.64952, 0&gt;, 1, 1 }
+  scale 2
+ }</PRE>
+<P>If you have a single blob component then the surface you see will just look like the object used, i.e. a sphere or a cylinder, with the surface being somewhere inside the surface specified for the component. The exact surface location can be determined from the blob equation listed below (you will probably never need to know this, blobs are more for visual appeal than for exact modeling).</P>
+<P>For the more mathematically minded, here's the formula used internally by POV-Ray to create blobs. You don't need to understand this to use blobs. The density of the blob field of a single component is:</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image45.gif" WIDTH=305 HEIGHT=66></P>
+</B><P>where <I>distance</I> is the distance of a given point from the spherical blob's center or cylinder blob's axis.  This formula has the nice property that it is exactly equal to the strength parameter at the center of the component and drops off to exactly 0 at a distance from the center of the component that is equal to the radius value. The density formula for more than one blob component is just the sum of the individual component densities.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov237.htm">Finite Solid Primitives</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov239.htm">Box</A>
+</P>
+</BODY>
+</HTML>
+

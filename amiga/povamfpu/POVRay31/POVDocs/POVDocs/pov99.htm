@@ -1,0 +1,71 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Creating a Sky with a Color Gradient</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov98.htm">The Sky Sphere</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov100.htm">Adding the Sun</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198919"><A NAME="_Toc429993429">Creating a Sky with a Color Gradient</A></A></H4>
+<P>Beside the single color sky sphere that is covered with the background feature the simplest sky sphere is a color gradient.</P>
+<P>You may have noticed that the color of the sky varies with the angle to the earth's surface normal. If you look straight up the sky normally has a much deeper blue than it has at the horizon.</P>
+<P>We want to model this effect using the sky sphere as shown in the scene below (<CODE>skysph1.pov</CODE>).</P>
+<PRE>  #include "colors.inc"
+  camera {
+    location &lt;0, 1, -4&gt;
+    look_at &lt;0, 2, 0&gt;
+    angle 80
+  }
+  light_source { &lt;10, 10, -10&gt; White }
+  sphere { 2*y, 1
+    pigment { color rgb &lt;1, 1, 1&gt; }
+    finish { ambient 0.2 diffuse 0 reflection 0.6 }
+  }
+  sky_sphere {
+    pigment {
+      gradient y
+      color_map {
+        [0 color Red]
+        [1 color Blue]
+      }
+      scale 2
+      translate -1
+    }
+  }</PRE>
+<P>The interesting part is the sky sphere statement. It contains a pigment that describe the look of the sky sphere. We want to create a color gradient along the viewing angle measured against the earth's surface normal. Since the ray direction vector is used to calculate the pigment colors we have to use the y-gradient.</P>
+<P>The scale and translate transformation are used to map the points derived from the direction vector to the right range. Without those transformations the pattern would be repeated twice on the sky sphere. The <b><code>scale</code></b> statement is used to avoid the repetition and the <b><code>translate -1</code></b> statement moves the color at index zero to the bottom of the sky sphere (that's the point of the sky sphere you'll see if you look straight down).</P>
+<P>After this transformation the color entry at position 0 will be at the bottom of the sky sphere, i. e. below us, and the color at position 1 will be at the top, i. e. above us.</P>
+<P>The colors for all other positions are interpolated between those two colors as you can see in the resulting image.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image220.jpg" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">A simple gradient sky sphere.</P>
+</B><P>If you want to start one of the colors at a specific angle you'll first have to convert the angle to a color map index. This is done by using the formula</P>
+<P>  color_map_index = (1 - cos(angle)) / 2</P>
+<P>where the angle is measured against the negated earth's surface normal. This is the surface normal pointing towards the center of the earth. An angle of 0 degrees describes the point below us while an angle of 180 degrees represents the zenith.</P>
+<P>In POV-Ray you first have to convert the degree value to radian values as it is shown in the following example.</P>
+<PRE>  sky_sphere {
+    pigment {
+      gradient y
+      color_map {
+        [(1-cos(radians( 30)))/2 color Red]
+        [(1-cos(radians(120)))/2 color Blue]
+      }
+      scale 2
+      translate -1
+    }
+  }</PRE>
+<P>This scene uses a color gradient that starts with a red color at 30 degrees and blends into the blue color at 120 degrees. Below 30 degrees everything is red while above 120 degrees all is blue.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov98.htm">The Sky Sphere</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov100.htm">Adding the Sun</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,32 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Looks_like</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov272.htm">Shadowless Lights</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov274.htm">Light Fading</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199110"><A NAME="_Toc429993618">Looks_like</A></A></H4>
+<P>Normally the light source itself has no visible shape. The light simply radiates from an invisible point or area. You may give a light source any shape by adding a <b><code>looks_like {</code></b><I> OBJECT </I><b><code>}</code></b> statement.</P>
+<P>There is an implied <b><code>no_shadow</code></b> attached to the <b><code>looks_like</code></b> object so that light is not blocked by the object. Without the automatic <b><code>no_shadow</code></b> the light inside the object would not escape. The object would, in effect, cast a shadow over everything.</P>
+<P>If you want the attached object to block light then you should attach it with a <b><code>union</code></b> and not a <b><code>looks_like</code></b> as follows:</P>
+<PRE>  union {
+    light_source { &lt;100, 200, -300&gt; color White }
+    object { My_Lamp_Shape }
+  }</PRE>
+<P>Presumably parts of the lamp shade are transparent to let some light out.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov272.htm">Shadowless Lights</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov274.htm">Light Fading</A>
+</P>
+</BODY>
+</HTML>
+

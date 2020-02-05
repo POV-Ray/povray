@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Returning Values Via Parameters</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov213.htm">Returning a Value Like a Function</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov215.htm">POV-Ray Coordinate System</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199047"><A NAME="_Toc429993557">Returning Values Via Parameters</A></A></H4>
+<P>Sometimes it is necessary to have a macro return more than one value or you may simply prefer to return a value via a parameter as is typical in traditional programming language procedures.  POV-Ray macros are capable of returning values this way.  The syntax for POV-Ray macro parameters says that the actual parameter may be an <I>IDENTIFIER</I> or an <I>RVALUE</I>.  Values may only be returned via a parameter if the parameter is an <I>IDENTIFIER</I>.  Parameters that are <I>RVALUES</I> are constant values that cannot return information.  An <I>RVALUE</I> is anything that legally may appear to the right of an equals sign in a <b><code>#declare</code></b> or <b><code>#local</code></b> directive.  For example consider the following trivial macro which rotates an object about the x-axis.</P>
+<PRE> #macro Turn_Me(Stuff,Degrees)
+   #declare Stuff = object{Stuff rotate x*Degrees}
+ #end</PRE>
+<P>This attempts to re-declare the identifier <b><code>Stuff</code></b> as the rotated version of the object.  However the macro might be invoked with <b><code>Turn_Me(box{0,1},30)</code></b> which uses a box object as an <I>RVALUE</I> parameter.  This won't work because the box is not an identifier.  You can however do this</P>
+<PRE>   #declare MyObject=box{0,1}
+   Turn_Me(MyObject,30)</PRE>
+<P>The identifier <b><code>MyObject</code></b> now contains the rotated box.</P>
+<P>See "<A HREF="pov192.htm#_Ref413404001">Identifier Name Collisions</A>" for a detailed discussion of how local identifiers, parameters, and global identifiers work when a local identifier has the same name as a previously declared identifier.</P>
+<P>While it is obvious that <b><code>MyObject</code></b> is an identifier and <b><code>box{0,1}</code></b> is not, it should be noted that <b><code>Turn_Me(object{MyObject},30)</code></b> will not work because <b><code>object{MyObject}</code></b> is considered an object statement and is not a <I>pure</I> identifier.  This mistake is more likely to be made with float identifiers verses float expressions.  Consider these examples.</P>
+<PRE>  #declare Value=5.0;
+  MyMacro(Value)     //MyMacro can change the value of Value but...
+  MyMacro(+Value)    //This version and the rest are not lone
+  MyMacro(Value+0.0) // identifiers. They are float expressions
+  MyMacro(Value*1.0) // which cannot be changed.</PRE>
+<P>Although all four invocations of <b><code>MyMacro</code></b> are passed the value 5.0, only the first may modify the value of the identifier.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov213.htm">Returning a Value Like a Function</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov215.htm">POV-Ray Coordinate System</A>
+</P>
+</BODY>
+</HTML>
+

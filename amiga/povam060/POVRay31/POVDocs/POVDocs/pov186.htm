@@ -1,0 +1,37 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Array Initalizers</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov185.htm">Declaring Arrays</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov187.htm">Language Directives</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref413231149"><A NAME="_Toc414199019"><A NAME="_Toc429993529">Array Initalizers</A></A></A></H4>
+<P>Because it is cumbersome to individually initialize the elements of an array, you may initialize it as it is created using array initializer syntax. For example:</P>
+<PRE> #include "colors.inc"
+ #declare FlagColors = array[3] {Red,White,Blue}</PRE>
+<P>Multi-dimensional arrays may also be initialized this way. For example:</P>
+<PRE> #declare Digits =
+ array[4][10]
+ {
+  {7,6,7,0,2,1,6,5,5,0},
+  {1,2,3,4,5,6,7,8,9,0},
+  {0,9,8,7,6,5,4,3,2,1},
+  {1,1,2,2,3,3,4,4,5,5}
+ }</PRE>
+<P>The commas are required between elements and between dimensions as shown in the example.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov185.htm">Declaring Arrays</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov187.htm">Language Directives</A>
+</P>
+</BODY>
+</HTML>
+

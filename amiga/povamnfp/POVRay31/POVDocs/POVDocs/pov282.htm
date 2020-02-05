@@ -1,0 +1,37 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Hollow</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov281.htm">Inverse</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov283.htm">No_Shadow</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref416607008"><A NAME="_Toc429993627">Hollow</A></A></A></H4>
+<P>POV-Ray by default assumes that objects are made of a solid material that completely fills the interior of an object. By adding the <b><code>hollow</code></b> keyword to the object you can make it hollow.  That is very useful if you want atmospheric effects to exist inside an object. It is even required for objects containing an interior media.  The keyword may optionally be followed by a float expression which is interpreted as a boolean value.  For example <b><code>hollow off</code></b> may be used to force it off.  When the keyword is specified alone, it is the same as <b><code>hollow on</code></b>.  The default no <b><code>hollow</code></b> is specified is <b><code>off</code></b>.</P>
+<P>In order to get a hollow CSG object you just have to make the top level object hollow. All children will assume the same <b><code>hollow</code></b> state except their state is explicitly set. The following example will set both spheres inside the union hollow</P>
+<PRE>  union {
+    sphere { -0.5*x, 1 }
+    sphere {  0.5*x, 1 }
+    hollow
+  }</PRE>
+<P>while the next example will only set the second sphere hollow because the first sphere was explicitly set to be not hollow.</P>
+<PRE>  union {
+    sphere { -0.5*x, 1 hollow off }
+    sphere {  0.5*x, 1 }
+    hollow on
+  }</PRE>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov281.htm">Inverse</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov283.htm">No_Shadow</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,28 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Do Not Use Jitter Or Crand</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov117.htm">The Phase Keyword</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov119.htm">INI File Settings</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198939"><A NAME="_Toc429993448">Do Not Use Jitter Or Crand</A></A></H4>
+<p><b><code> </code></b>One last piece of basic information to save frustration. Because jitter is an element of anti-aliasing, we could just as easily have mentioned this under the INI file settings section, but there are also forms of anti-aliasing used in area lights, and the new atmospheric effects of POV-Ray, so now is as good a time as any.</P>
+<P>Jitter is a very small amount of random ray perturbation designed to diffuse tiny aliasing errors that might not otherwise totally disappear, even with intense anti-aliasing. By randomizing the placement of erroneous pixels, the error becomes less noticeable to the human eye, because the eye and mind are naturally inclined to look for regular patterns rather than random distortions.</P>
+<P>This concept, which works fantastically for still pictures, can become a nightmare in animations. Because it is random in nature, it will be different for each frame we render, and this becomes even more severe if we dither the final results down to, say 256 color animations (such as FLC's). The result is jumping pixels all over the scene, but especially concentrated any place where aliasing would normally be a problem (e.g., where an infinite plane disappears into the distance).</P>
+<P>For this reason, we should always set jitter to <b><code>off</code></b> in area lights and anti-aliasing options when preparing a scene for an animation. The (relatively) small extra measure quality due to the use of jitter will be offset by the ocean of jumpies that results. This general rule also applies to any truly random texture elements, such as <b><code>crand</code></b>.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov117.htm">The Phase Keyword</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov119.htm">INI File Settings</A>
+</P>
+</BODY>
+</HTML>
+

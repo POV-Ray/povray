@@ -1,0 +1,30 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Patterns</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov315.htm">Layered Textures</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov317.htm">Agate</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405211"><A NAME="_Toc411405487"><A NAME="_Ref411683931"><A NAME="_Ref411686157"><A NAME="_Toc414199163"><A NAME="_Ref417310251"><A NAME="_Ref420919899"><A NAME="_Toc429993674">Patterns</A></A></A></A></A></A></A></A></H3>
+<P>POV-Ray uses a method called <I>three-dimensional solid texturing </I>to define the color, bumpiness and other properties of an object. You specify the way that the texture varies over a surface by specifying a <I>pattern</I>.  Patterns are used in pigments, normals and texture maps as well as media density.</P>
+<P>All patterns in POV-Ray are three dimensional. For every point in space, each pattern has a unique value. Patterns do not wrap around a surface like putting wallpaper on an object. The patterns exist in 3d and the objects are carved from them like carving an object from a solid block of wood or stone.</P>
+<P>Consider a block of wood. It contains light and dark bands that are concentric cylinders being the growth rings of the wood. On the end of the block you see these concentric circles. Along its length you see lines that are the veins. However the pattern exists throughout the entire block. If you cut or carve the wood it reveals the pattern inside. Similarly an onion consists of concentric spheres that are visible only when you slice it. Marble stone consists of wavy layers of colored sediments that harden into rock.</P>
+<P>These solid patterns can be simulated using mathematical functions. Other random patterns such as granite or bumps and dents can be generated using a random number system and a noise function.</P>
+<P>In each case, the x, y, z coordinate of a point on a surface is used to compute some mathematical function that returns a float value. When used with color maps or pigment maps, that value looks up the color of the pigment to be used. In normal statements the pattern function result modifies or perturbs the surface normal vector to give a bumpy appearance. Used with a texture map, the function result determines which combinations of entire textures to be used.  When used with media density it specifies the density of the particles or gasses.</P>
+<P>The following sections describe each pattern. See the sections "<A HREF="pov293.htm#_Ref418334424">Pigment</A>", "<A HREF="pov300.htm#_Ref418334453">Normal</A>", "<A HREF="pov311.htm#_Ref418334482">Patterned Textures</A>" and "<A HREF="pov362.htm#_Ref418334512">Density</A>" for more details on how to use patterns. Unless mentioned otherwise, all patterns use the <b><code>ramp_wave</code></b> wave type by default but may use any wave type and may be used with <b><code>color_map</code></b>, <b><code>pigment_map</code></b>, <b><code>normal_map</code></b>, <b><code>slope_map</code></b>, <b><code>texture_map</code></b>, <b><code>density</code></b>, and <b><code>density_map</code></b>.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov315.htm">Layered Textures</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov317.htm">Agate</A>
+</P>
+</BODY>
+</HTML>
+

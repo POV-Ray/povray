@@ -1,0 +1,33 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Waves</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov342.htm">Spotted</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov344.htm">Wood</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199185"><A NAME="_Toc429993701">Waves</A></A></H4>
+<P>The <b><code>waves</code></b> pattern was originally designed only to be used as a normal pattern. It makes the surface look like waves on water.  The <b><code>waves</code></b> pattern looks similar to the <b><code>ripples</code></b> pattern except the features are rounder and broader. The effect is to make waves that look more like deep ocean waves. The waves radiate from 10 random locations inside the unit cube area &lt;0,0,0&gt; to &lt;1,1,1&gt;. Scale the pattern to make the centers closer or farther apart.</P>
+<P>Usually the waves from any given center are about 1 unit apart. The <b><code>frequency</code></b> keyword changes the spacing between waves. The <b><code>phase</code></b> keyword can be used to move the waves outwards for realistic animation.</P>
+<P>The number of wave centers can be changed with the global parameter </P>
+<b><code><DL>
+<DD>global_settings{number_of_waves</code></b> <I>Count </I><b><code>}</DD>
+</DL>
+</code></b><P>somewhere in the scene. This affects the entire scene. You cannot change the number of wave centers on individual patterns. See section "<A HREF="pov384.htm#_Ref418945803">Number_Of_Waves</A>" for details.</P>
+<P>When used as a normal pattern, this pattern uses a specialized normal perturbation function. This means that the pattern cannot be used with <b><code>normal_map</code></b>, <b><code>slope_map</code></b> or wave type modifiers in a <b><code>normal</code></b> statement.</P>
+<P>When used as a pigment pattern or texture pattern, the <b><code>waves</code></b> pattern is similar to normal waves but is not identical as are most normals when compared to pigments. </P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov342.htm">Spotted</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov344.htm">Wood</A>
+</P>
+</BODY>
+</HTML>
+

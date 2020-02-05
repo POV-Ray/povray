@@ -1,0 +1,48 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Sky Sphere</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov370.htm">Fog</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov372.htm">Rainbow</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405217"><A NAME="_Toc411405493"><A NAME="_Toc414199218"><A NAME="_Toc429993735">Sky Sphere</A></A></A></A></H3>
+<P>The sky sphere is used create a realistic sky background without the need of an additional sphere to simulate the sky. Its syntax is:</P>
+<I><DL>
+<DT>SKY_SPHERE:</DT>
+</I><b><code><DD>sky_sphere {</code></b> <I>[SKY_SPHERE_IDENTIFIER] [SKY_SPHERE_ITEMS...]</I> <b><code>}</DD>
+</code></b><I><DT>SKY_SPHERE_ITEM:</DT>
+<DD>PIGMENT</I>   |   <I>TRANSFORMATION</DD>
+</DL>
+</I><P>The sky sphere can contain several pigment layers with the last pigment being at the top, i. e. it is evaluated last, and the first pigment being at the bottom, i. e. it is evaluated first. If the upper layers contain filtering and/or transmitting components lower layers will shine through. If not lower layers will be invisible.</P>
+<P>The sky sphere is calculated by using the direction vector as the parameter for evaluating the pigment patterns. This leads to results independent from the view point which pretty good models a real sky where the distance to the sky is much larger than the distances between visible objects.</P>
+<P>If you want to add a nice color blend to your background you can easily do this by using the following example.</P>
+<PRE>  sky_sphere {
+    pigment {
+      gradient y
+      color_map {
+        [ 0.5  color CornflowerBlue ]
+        [ 1.0  color MidnightBlue ]
+      }
+      scale 2
+      translate -1
+    }
+  }</PRE>
+<P>This gives a soft blend from <b><code>CornflowerBlue</code></b> at the horizon to <b><code>MidnightBlue</code></b> at the zenith. The scale and translate operations are used to map the direction vector values, which lie in the range from &lt;-1, -1, -1&gt; to &lt;1, 1, 1&gt;, onto the range from &lt;0, 0, 0&gt; to &lt;1, 1, 1&gt;. Thus a repetition of the color blend is avoided for parts of the sky below the horizon.</P>
+<P>In order to easily animate a sky sphere you can transform it using the usual transformations described in "<A HREF="pov216.htm#_Ref421694648">Transformations</A>". Though it may not be a good idea to translate or scale a sky sphere - the results are hardly predictable - it is quite useful to be able to rotate it. In an animation the color blendings of the sky can be made to follow the rising sun for example.</P>
+<P>You should note that only one sky sphere can be used in any scene. It also will not work as you might expect if you use camera types like the orthographic or cylindrical camera. The orthographic camera uses parallel rays and thus you'll only see a very small part of the sky sphere (you'll get one color skies in most cases). Reflections in curved surface will work though, e. g. you will clearly see the sky in a mirrored ball.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov370.htm">Fog</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov372.htm">Rainbow</A>
+</P>
+</BODY>
+</HTML>
+

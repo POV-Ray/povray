@@ -1,0 +1,27 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Vector Operators</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov169.htm">Vector Identifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov171.htm">Operator Promotion</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref412721497"><A NAME="_Toc414199003"><A NAME="_Toc429993513">Vector Operators</A></A></A></H4>
+<P>Vector literals, identifiers and functions may also be combined in expressions the same as float values. Operations are performed on a component-by-component basis. For example <b><code>&lt;1,2,3&gt; + &lt;4,5,6&gt;</code></b> evaluates the same as <b><code>&lt;1+4,2+5,3+6&gt;</code></b> or <b><code>&lt;5,7,9&gt;</code></b>. Other operations are done on a similar component-by-component basis. For example <b><code>(&lt;1,2,3&gt; = &lt;3,2,1&gt;)</code></b> evaluates to <b><code>&lt;0,1,0&gt;</code></b> because the middle components are equal but the others are not. Admittedly this isn't very useful but its consistent with other vector operations.</P>
+<P>Conditional expressions such as <b><code>(C ? A : B)</code></b> require that <b><code>C</code></b> is a float expression but <b><code>A</code></b> and <b><code>B</code></b> may be vector expressions. The result is that the entire conditional evaluates as a valid vector. For example if <b><code>Foo</code></b> and <b><code>Bar</code></b> are floats then <b><code>(Foo &lt; Bar ? &lt;1,2,3&gt; : &lt;5,6,7&gt;)</code></b> evaluates as the vector <b><code>&lt;1,2,3&gt;</code></b> if <b><code>Foo</code></b> is less than <b><code>Bar</code></b> and evaluates as <b><code>&lt;5,6,7&gt;</code></b> otherwise.</P>
+<P>You may use the dot operator to extract a single float component from a vector. Suppose the identifier <b><code>Spot</code></b> was previously defined as a vector. Then <b><code>Spot.x</code></b> is a float value that is the first component of this x, y, z vector. Similarly <b><code>Spot.y</code></b> and <b><code>Spot.z</code></b> reference the 2nd and 3rd components. If <b><code>Spot</code></b> was a two component UV vector you could use <b><code>Spot.u</code></b> and <b><code>Spot.v</code></b> to extract the first and second component. For a 4D vector use <b><code>.x</code></b>, <b><code>.y</code></b>, <b><code>.z</code></b>, and <b><code>.t</code></b> to extract each float component. The dot operator is also used in color expressions which are covered later.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov169.htm">Vector Identifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov171.htm">Operator Promotion</A>
+</P>
+</BODY>
+</HTML>
+

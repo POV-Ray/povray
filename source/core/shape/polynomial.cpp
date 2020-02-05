@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,11 +38,20 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/polynomial.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/math/matrix.h"
 #include "core/math/polynomialsolver.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -145,7 +154,7 @@ bool Poly::Set_Coeff(const unsigned int x, const unsigned int y, const unsigned 
         return false;
     }
     /* pos = binomials[a+2][3]+binomials[b+1][2]+binomials[c][1];
-     * rewriten to stay in bound (max is "Order", not Order+2)
+     * rewritten to stay in bound (max is "Order", not Order+2)
      */
     pos =
         // binomials[a+2][3]
@@ -157,14 +166,14 @@ bool Poly::Set_Coeff(const unsigned int x, const unsigned int y, const unsigned 
         +binomials[b][1]+binomials[b][2]
         +binomials[c][1];
     /* It's magic
-     * Nah... a is the tetraedric sum to jump to get to the power of x index (first entry)
+     * Nah... a is the tetrahedral sum to jump to get to the power of x index (first entry)
      * b is then the triangular sum to add to get to the power of y index (also first entry)
      * and c is the linear sum to add to get to the power of z index (that the one we want)
-   *
+     *
      * Notice that binomials[c][1] == c, but the formula would loose its magic use of
      * pascal triangle everywhere.
-     * triangular sum are in the third ([2] column)
-     * tetraedric sum are in the fourth ([3] column)
+     * triangular sums are in the third ([2] column)
+     * tetrahedral sums are in the fourth ([3] column)
      *
      * (and yes, the 0 at the start of each column is useful)
      */
@@ -234,7 +243,7 @@ bool Poly::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 
         default:
 
-            cnt = intersect(New_Ray, Order, Coeffs, Test_Flag(this, STURM_FLAG), Depths, Thread);
+            cnt = intersect(New_Ray, Order, Coeffs, Test_Flag(this, STURM_FLAG), Depths, Thread->Stats());
     }
 
     if (cnt > 0)
@@ -644,7 +653,7 @@ DBL Poly::inside(const Vector3d& IPoint, int Order, const DBL *Coeffs)
 *
 ******************************************************************************/
 
-int Poly::intersect(const BasicRay &ray, int Order, const DBL *Coeffs, int Sturm_Flag, DBL *Depths, TraceThreadData *Thread)
+int Poly::intersect(const BasicRay &ray, int Order, const DBL *Coeffs, int Sturm_Flag, DBL *Depths, RenderStatistics& stats)
 {
     DBL eqn_v[3][MAX_ORDER+1], eqn_vt[3][MAX_ORDER+1];
     DBL eqn[MAX_ORDER+1];
@@ -756,7 +765,7 @@ int Poly::intersect(const BasicRay &ray, int Order, const DBL *Coeffs, int Sturm
 
     if (j > 1)
     {
-        return(Solve_Polynomial(j, &eqn[i], Depths, Sturm_Flag, ROOT_TOLERANCE, Thread->Stats()));
+        return(Solve_Polynomial(j, &eqn[i], Depths, Sturm_Flag, ROOT_TOLERANCE, stats));
     }
     else
     {
@@ -1504,3 +1513,4 @@ bool Poly::Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector3d
 }
 
 }
+// end of namespace pov

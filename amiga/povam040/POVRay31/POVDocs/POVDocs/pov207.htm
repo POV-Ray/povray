@@ -1,0 +1,53 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Text Message Streams</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov206.htm">User Message Directives</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov208.htm">Text Formatting</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref412625191"><A NAME="_Toc414199040"><A NAME="_Toc429993550">Text Message Streams</A></A></A></H4>
+<P>The syntax for a text message is any of the following:</P>
+<I><DL>
+<DT>TEXT_STREAM_DIRECTIVE:</DT>
+</I><b><code><DD>#debug</code></b> <I>STRING</I>&#9;&#9;|</DD>
+<b><code><DD>#error</code></b> <I>STRING</I>&#9;&#9;|</DD>
+<b><code><DD>#render</code></b> <I>STRING</I>&#9;&#9;|</DD>
+<b><code><DD>#statistics</code></b> <I>STRING</I>&#9;|</DD>
+<b><code><DD>#warning</code></b> <I>STRING</DD>
+</DL>
+</I><P>Where <I>STRING</I> is any valid string of text including string identifiers or functions which return strings. For example:</P>
+<PRE> #switch (clock*360)
+  #range (0,180)
+   #render "Clock in 0 to 180 range\n"
+  #break
+  #range (180,360)
+   #render "Clock in 180 to 360 range\n"
+  #break
+  #else
+   #warning "Clock outside expected range\n"
+   #warning concat("Value is:",str(clock*360,5,0),"\n")
+ #end</PRE>
+<P>There are seven distinct text streams that POV-Ray uses for output. You may output only to five of them. On some versions of POV-Ray, each stream is designated by a particular color. Text from these streams are displayed whenever it is appropriate so there is often an intermixing of the text. The distinction is only important if you choose to turn some of the streams off or to direct some of the streams to text files. On some systems you may be able to review the streams separately in their own scroll-back buffer. See "<A HREF="pov148.htm#_Ref413328828">Directing Text Streams to Files</A>" for details on re-directing the streams to a text file.</P>
+<P>Here is a description of how POV-Ray uses each stream. You may use them for whatever purpose you want except note that use of the <b><code>#error</code></b> stream causes a fatal error after the text is displayed.</P>
+<B><P>Debug:</B> This stream displays debugging messages. It was primarily designed for developers but this and other streams may also be used by the user to display messages from within their scene files.</P>
+<B><P>Fatal:</B> This stream displays fatal error messages. After displaying this text, POV-Ray will terminate. When the error is a scene parsing error, you may be shown several lines of scene text that leads up to the error.</P>
+<B><P>Render:</B> This stream displays information about what options you have specified to render the scene. It includes feedback on all of the major options such as scene name, resolution, animation settings, anti-aliasing and others.</P>
+<B><P>Statistics:</B> This stream displays statistics after a frame is rendered. It includes information about the number of rays traced, the length of time of the processing and other information.</P>
+<B><P>Warning:</B> This stream displays warning messages during the parsing of scene files and other warnings. Despite the warning, POV-Ray can continue to render the scene.</P>
+<P>The banner and status streams can not be accessed by the user.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov206.htm">User Message Directives</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov208.htm">Text Formatting</A>
+</P>
+</BODY>
+</HTML>
+

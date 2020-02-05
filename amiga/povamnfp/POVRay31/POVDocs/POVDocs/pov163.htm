@@ -1,0 +1,116 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Float Operators</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov162.htm">Float Identifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov164.htm">Built-in Float Identifiers</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198997"><A NAME="_Toc429993506">Float Operators</A></A></H4>
+<B><P>Arithmetic expressions:</B> Basic math expressions can be created from float literals, identifiers or functions using the following operators in this order of precedence...</P>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=345>
+<TR><TD WIDTH="31%" VALIGN="TOP">
+<p><b><code>(  )</code></b></TD>
+<TD WIDTH="69%" VALIGN="TOP">
+<P>expressions in parentheses first</TD>
+</TR>
+<TR><TD WIDTH="31%" VALIGN="TOP">
+<p><b><code>+A  -A  !A</code></b></TD>
+<TD WIDTH="69%" VALIGN="TOP">
+<P>unary minus, unary plus and logical "not"</TD>
+</TR>
+<TR><TD WIDTH="31%" VALIGN="TOP">
+<p><b><code>A*B A/B</code></b></TD>
+<TD WIDTH="69%" VALIGN="TOP">
+<P>multiplication and division</TD>
+</TR>
+<TR><TD WIDTH="31%" VALIGN="TOP">
+<p><b><code>A+B A-B</code></b></TD>
+<TD WIDTH="69%" VALIGN="TOP">
+<P>addition and subtraction</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>Relational, logical and conditional expressions may also be created. However there is a restriction that these types of expressions must be enclosed in parentheses first. This restriction, which is not imposed by most computer languages, is necessary because POV-Ray allows mixing of float and vector expressions. Without the parentheses there is an ambiguity problem. Parentheses are not required for the unary logical not operator "!" as shown above. The operators and their precedence are shown here.</P>
+<B><P>Relational expressions: </B>The operands are arithmetic expressions and the result is always boolean with 1 for true and 0 for false. All relational operators have the same precedence.</P>
+
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=424>
+<TR><TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>(A &lt; B)</code></b></TD>
+<TD WIDTH="75%" VALIGN="TOP">
+<P>A is less than B</TD>
+</TR>
+<TR><TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>(A &lt;= B)</code></b></TD>
+<TD WIDTH="75%" VALIGN="TOP">
+<P>A is less than or equal to B</TD>
+</TR>
+<TR><TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>(A = B)</code></b></TD>
+<TD WIDTH="75%" VALIGN="TOP">
+<P>A is equal to B (actually abs(A-B)&lt;EPSILON)</TD>
+</TR>
+<TR><TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>(A != B)</code></b></TD>
+<TD WIDTH="75%" VALIGN="TOP">
+<P>A is not equal to B (actually abs(A-B)&gt;=EPSILON)</TD>
+</TR>
+<TR><TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>(A &gt;= B)</code></b></TD>
+<TD WIDTH="75%" VALIGN="TOP">
+<P>A is greater than or equal to B</TD>
+</TR>
+<TR><TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>(A &gt; B)</code></b></TD>
+<TD WIDTH="75%" VALIGN="TOP">
+<P>A is greater than B</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<B><P>Logical expressions: </B>The operands are converted to boolean values of 0 for false and 1 for true. The result is always boolean. All logical operators have the same precedence. Note that these are not bit-wise operations, they are logical.</P>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=424>
+<TR><TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>(A &amp; B)</code></b></TD>
+<TD WIDTH="75%" VALIGN="TOP">
+<P>true only if both A and B are true, false otherwise</TD>
+</TR>
+<TR><TD WIDTH="25%" VALIGN="TOP">
+<p><b><code>(A | B)</code></b></TD>
+<TD WIDTH="75%" VALIGN="TOP">
+<P>true if either A or B or both are true</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<B><P>Conditional expressions: </B>The operand C is boolean while operands A and B are any expressions. The result is of the same type as A and B.</P>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=326>
+<TR><TD WIDTH="41%" VALIGN="TOP">
+<p><b><code>(C ? A : B)</code></b></TD>
+<TD WIDTH="59%" VALIGN="TOP">
+<P>if C then A else B</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>Assuming the various identifiers have been declared, the following are examples of valid expressions...</P>
+<PRE>1+2+3    2*5     1/3     Row*3    Col*5
+(Offset-5)/2      This/That+Other*Thing
+((This&lt;That) &amp; (Other&gt;=Thing)?Foo:Bar)</PRE>
+<P>Expressions are evaluated left to right with innermost parentheses evaluated first, then unary +, - or !, then multiply or divide, then add or subtract, then relational, then logical, then conditional.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov162.htm">Float Identifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov164.htm">Built-in Float Identifiers</A>
+</P>
+</BODY>
+</HTML>
+

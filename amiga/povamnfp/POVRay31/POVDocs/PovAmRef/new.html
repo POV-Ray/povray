@@ -1,0 +1,56 @@
+<html>
+<header><title>New Features in the V3.1 release</title></header>
+<body>
+<h1>New Features for the V3.1 release, October 1998</h1>
+<P>
+NOTE: This document reflects changes since V3.02, so some of these were
+already available in 3.02c.
+<BR><BR>
+<H4>POV-Ray itself:</H4>
+<p>
+Datatype image loading!  Use imagetype "SYS" to tell POV-Ray to load an 
+image with picture.datatype.  24-bit pictures 
+are not yet supported.  Note:  If you try to save to SYS image format, 
+it will use PNG.  If a later version of the AmigaOS supports proper 
+saving of images through datatypes, then this behavior may be changed.
+<p>
+Generous speed increases.  Thanks to several factors, including the change to SAS/C, all new memory handling code,
+and several little 'tweaks', POV-Ray renders 25%-35% faster now!  68040 and 68060 users may find an increase of up to 200% (Two Hundred)
+due to incorrect specifications I used in compiling previously.
+<p>
+Picasso96 display routines have been rewritten.  If the ENV variable POVDISPLAYSCREEN
+is set, it is used to attempt opening of a Picasso96 PIP window on the named
+public screen.  If the screen is not found (or the variable contains nonsense 8^)
+then POV-Ray will open a PIP window on the default public screen.  <B>Picasso96 display UNTESTED</B>
+<P>
+EHB, Greyscale, and HAM displays all now use BestModeID() to allow Intuition to select
+the displaymode best suited to the image to display.  For example, if you specify HAM8,
+you may get a 320x200 or a 1200x400 HAM screen, depending on the imagesize. <B>HAM Not yet functional - sorry</B>
+OS2 note: Amiga OS2 does not offer the BestModeID() function.  There is an experimental
+capability in place for the GreyDisp to still work, always opening a 640x200/256 or 640x400/512 screen in 16 colors.
+If time permits I will expand on that capability, to support AGA resolutions and to include the ability in the EHB module.
+<br><BR>
+<H4>POV-GUI:</H4>
+<p>
+Fully localized!  English is the default language.  As other catalogs become 
+available, they will be on the POVAmiga homepage.
+<p>
+Multiple Sequential Renders!  If you change the settings and press 'Render' again 
+while POV-Ray is already rendering, the RenderQueue window appears.  This lists any
+pending renders, and allows you to reorder, remove, or interrupt the current trace.
+<p>
+Help bubbles exists for every button, (including it's label) and they are localized.
+<p>
+Automatic filenaming can be selected on the Prefs window.  If selected, the path already
+in the Output filename field will be retained, but the root name will always be changed
+when the scenefile name is changed, and the extension will be changed to match the
+selected imagefile format.
+<p>
+Edit Scenefile menu item will launch the editor selected in Prefs to edit the scenefile.
+If no editor is selected, it will check the standard ENV: variable EDITOR.
+<p>
+If no POV-Ray Binary is selected in prefs, POVRAY31:POVRAY31 is used.
+
+
+</body>
+</html>

@@ -1,0 +1,51 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Identifier Name Collisions</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov191.htm">#declare vs. #local</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov193.htm">Destroying Identifiers with #undef</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref413236810"><A NAME="_Ref413404001"><A NAME="_Toc414199025"><A NAME="_Toc429993535">Identifier Name </A>Collisions</A></A></A></H4>
+<P>Local identifiers may have the same names as previously declared identifiers. In this instance, the most recent, most local identifier takes precedence. Upon entering an include file or invoking a macro, a new symbol table is created. When referencing identifiers, the most recently created symbol table is searched first, then the next most recent and so on back to the global table of the main scene file. As each macro or include file is exited, its table and identifiers are destroyed. Parameters passed by value reside in the same symbol table as the one used for identifiers local to the macro.</P>
+<P>The rules for duplicate identifiers may seem complicated when multiply-nested includes and macros are involved, but in actual practice the results are generally what you intended.</P>
+<P>Consider this example: You have a main scene file called <CODE>myscene.pov</CODE> and it contains</P>
+<PRE> #declare A = 123;
+ #declare B = rgb&lt;1,2,3&gt;;
+ #declare C = 0;
+ #include "myinc.inc"</PRE>
+<P>Inside the include file you invoke a macro called <b><code>MyMacro(J,K,L)</code></b>. Note it isn't important where <b><code>MyMacro</code></b> is defined as long as it is defined before it is invoked. In this example, it is important that the macro is invoked from within <CODE>myinc.inc</CODE>.</P>
+<P>The identifiers <b><code>A</code></b>, <b><code>B</code></b>, and <b><code>C</code></b> are generally available at all levels. If either <CODE>myinc.inc</CODE> or <b><code>MyMacro</code></b> contain a line such as <b><code>#declare C=C+1;</code></b> then the value <b><code>C</code></b> is changed everywhere as you might expect.</P>
+<P>Now suppose inside <CODE>myinc.inc</CODE> you do...</P>
+<PRE> #local A = 546;</PRE>
+<P>The main version of <b><code>A</code></b> is hidden and a new <b><code>A</code></b> is created. This new <b><code>A</code></b> is also available inside <b><code>MyMacro</code></b> because <b><code>MyMacro</code></b> is nested inside <CODE>myinc.inc</CODE>. Once you exit <CODE>myinc.inc</CODE>, the local <b><code>A</code></b> is destroyed and the original <b><code>A</code></b> with its value of <b><code>123</code></b> is now in effect. Once you have created the local <b><code>A</code></b> inside <CODE>myinc.inc</CODE>, there is no way to reference the original global <b><code>A</code></b> unless you <b><code>#undef A</code></b> or exit the include file. Using <b><code>#undef</code></b> always undefines the most local version of an identifier.</P>
+<P>Similarly if <b><code>MyMacro</code></b> contained...</P>
+<PRE> #local B = box{0,1}</PRE>
+<P>then a new identifier <b><code>B</code></b> is created local to the macro only. The original value of <b><code>B</code></b> remains hidden but is restored when the macro is finished. Note that the local <b><code>B</code></b> need not have the same type as the original.</P>
+<P>The complication comes when trying to assign a new value to an identifier at one level that was declared local at an earlier level. Suppose inside <CODE>myinc.inc</CODE> you do...</P>
+<PRE> #local D = 789;</PRE>
+<P>If you are inside <CODE>myinc.inc</CODE> and you want to increment <b><code>D</code></b> by one, you might try to do...</P>
+<PRE> #local D = D + 1;</PRE>
+<P>but if you try to do that inside <b><code>MyMacro</code></b> you'll create a new <b><code>D</code></b> which is local to <b><code>MyMacro</code></b> and not the <b><code>D</code></b> which is external to <b><code>MyMacro</code></b> but local to <CODE>myinc.inc</CODE>. Therefore you've said "create a <b><code>MyMacro D</code></b> from the value of <CODE>myinc.inc</CODE>'s <b><code>D</code></b> plus one". That's probably not what you wanted. Instead you should do...</P>
+<PRE> #declare D = D + 1;</PRE>
+<P>You might think this creates a new <b><code>D</code></b> that is global but it actually increments the myinc.inc version of <b><code>D</code></b>. Confusing isn't it? Here are the rules:</P>
+<P>1.) When referencing an identifier, you always get the most recent, most local version. By "referencing" we mean using the value of the identifier in a POV-Ray statement or using it on the right of an equals sign in either a <b><code>#declare</code></b> or <b><code>#local</code></b>.</P>
+<P>2.) When declaring an identifier using the <b><code>#local</code></b> keyword, the identifier which is created or has a new value assigned, is ALWAYS created at the current nesting level of macros or include files.</P>
+<P>3.) When declaring a NEW, NON-EXISTANT identifier using <b><code>#declare</code></b>, it is created as fully global. It is put in the symbol table of the main scene file.</P>
+<P>4.) When ASSIGNING A VALUE TO AN EXISTING identifier using <b><code>#declare</code></b>, it assigns it to the most recent, most local version at the time.</P>
+<P>In summary, <b><code>#local</code></b> always means "the current level", and <b><code>#declare</code></b> means "global" for new identifiers and "most recent" for existing identifiers.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov191.htm">#declare vs. #local</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov193.htm">Destroying Identifiers with #undef</A>
+</P>
+</BODY>
+</HTML>
+

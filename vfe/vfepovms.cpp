@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,6 +37,9 @@
 
 #include "vfe.h"
 
+#include <condition_variable>
+#include <mutex>
+
 #include "povms/povmscpp.h"
 
 // this must be the last file included
@@ -57,20 +60,20 @@ class SysQNode
     void *Receive (int *pLen, bool Blocking) ;
 
   private:
-    typedef struct _DataNode
+    struct DataNode final
     {
       unsigned int              Len;
       void                      *Data;
-      _DataNode                 *Next;
-    } DataNode ;
+      DataNode                  *Next;
+    };
 
     unsigned int                m_Sanity ;
     unsigned int                m_Count ;
     unsigned int                m_ID ;
     DataNode                    *m_First ;
     DataNode                    *m_Last ;
-    boost::mutex                m_EventMutex ;
-    boost::condition            m_Event ;
+    std::mutex                  m_EventMutex ;
+    std::condition_variable     m_Event ;
 
     static unsigned int         QueueID ;
 } ;
@@ -100,8 +103,8 @@ SysQNode::SysQNode (void)
 {
   m_Sanity = 0xEDFEEFBE ;
   m_Count = 0 ;
-  m_First = NULL ;
-  m_Last = NULL ;
+  m_First = nullptr;
+  m_Last = nullptr;
   m_ID = QueueID++ ;
 }
 
@@ -109,13 +112,13 @@ SysQNode::~SysQNode ()
 {
   assert (m_Sanity == 0xEDFEEFBE) ;
   m_Event.notify_all ();
-  boost::mutex::scoped_lock lock (m_EventMutex);
+  std::lock_guard<std::mutex> lock (m_EventMutex);
   if (m_Count > 0)
   {
     DataNode *current = m_First ;
-    DataNode *next = NULL ;
+    DataNode *next = nullptr;
 
-    while (current != NULL)
+    while (current != nullptr)
     {
       next = current->Next ;
       POVMS_Sys_Free (current) ;
@@ -130,18 +133,18 @@ int SysQNode::Send (void *pData, int Len)
   if (m_Sanity == 0xEDFEEFBE)
   {
     DataNode *dNode = reinterpret_cast<DataNode *>(POVMS_Sys_Malloc (sizeof (DataNode))) ;
-    if (dNode == NULL)
+    if (dNode == nullptr)
       return (-3) ;
 
     dNode->Data = pData ;
     dNode->Len = Len ;
-    dNode->Next = NULL ;
+    dNode->Next = nullptr;
 
-    boost::mutex::scoped_lock lock (m_EventMutex) ;
+    std::lock_guard<std::mutex> lock (m_EventMutex) ;
 
-    if (m_Last != NULL)
+    if (m_Last != nullptr)
       m_Last->Next = dNode ;
-    if (m_First == NULL)
+    if (m_First == nullptr)
       m_First = dNode ;
     m_Last = dNode ;
     m_Count++ ;
@@ -155,7 +158,7 @@ int SysQNode::Send (void *pData, int Len)
 
 void *SysQNode::Receive (int *pLen, bool Blocking)
 {
-  boost::mutex::scoped_lock lock (m_EventMutex);
+  std::unique_lock<std::mutex> lock (m_EventMutex);
 
   assert (m_Sanity == 0xEDFEEFBE) ;
   if (m_Sanity != 0xEDFEEFBE)
@@ -164,30 +167,26 @@ void *SysQNode::Receive (int *pLen, bool Blocking)
   if (m_Count == 0)
   {
     if (Blocking == false)
-      return (NULL);
+      return nullptr;
 
     // TODO: have a shorter wait but loop, and check for system shutdown
-    // TODO FIXME - boost::xtime has been deprecated since boost 1.34.
-    boost::xtime t;
-    boost::xtime_get (&t, POV_TIME_UTC);
-    t.nsec += 50000000 ;
-    m_Event.timed_wait (lock, t);
+    m_Event.wait_for (lock, std::chrono::milliseconds(50));
 
     if (m_Count == 0)
-      return (NULL) ;
+      return nullptr;
   }
 
   DataNode *dNode = m_First ;
-  if (dNode == NULL)
+  if (dNode == nullptr)
     throw vfeInvalidDataError("NULL data node in SysQNode::Receive");
 
   void *dPtr = dNode->Data ;
   *pLen = dNode->Len ;
   if (dNode == m_Last)
-    m_Last = NULL ;
+    m_Last = nullptr;
   m_First = dNode->Next ;
   m_Count-- ;
-  assert (m_Count != 0 || (m_First == NULL && m_Last == NULL)) ;
+  assert ((m_Count != 0) || ((m_First == nullptr) && (m_Last == nullptr)));
   POVMS_Sys_Free (dNode) ;
   return (dPtr) ;
 }
@@ -228,21 +227,21 @@ void vfe_POVMS_Sys_QueueClose (SysQNode *SysQ)
 
 int vfe_POVMS_Sys_QueueSend (SysQNode *SysQ, void *pData, int Len)
 {
-  if (SysQ == NULL)
+  if (SysQ == nullptr)
     return (-1) ;
   return (SysQ->Send (pData, Len)) ;
 }
 
 void *vfe_POVMS_Sys_QueueReceive (SysQNode *SysQ, int *pLen, bool Blocking, bool Yielding)
 {
-  if (pLen == NULL)
-    return (NULL) ;
+  if (pLen == nullptr)
+    return nullptr;
   *pLen = 0 ;
-  if (SysQ == NULL)
+  if (SysQ == nullptr)
   {
     if (Yielding)
       Delay (1) ;
-    return (NULL) ;
+    return nullptr;
   }
   return (SysQ->Receive (pLen, Blocking)) ;
 }
@@ -253,3 +252,4 @@ POVMS_Sys_Thread_Type POVMS_GetCurrentThread (void)
 }
 
 }
+// end of namespace vfe

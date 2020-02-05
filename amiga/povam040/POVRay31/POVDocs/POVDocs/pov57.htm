@@ -1,0 +1,74 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - The Area Light Source</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov56.htm">The Cylindrical Light Source</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov58.htm">The Ambient Light Source</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405122"><A NAME="_Toc411405398"><A NAME="_Toc414198876"><A NAME="_Toc429993387">The Area Light Source</A></A></A></A></H3>
+<P>So far all of our light sources have one thing in common. They produce sharp shadows. This is because the actual light source is a point that is infinitely small. Objects are either in direct sight of the light, in which case they are fully illuminated, or they are not, in which case they are fully shaded. In real life, this kind of stark light and shadow situation exists only in outer space where the direct light of the sun pierces the total blackness of space. But here on Earth, light bends around objects, bounces off objects, and usually the source has some dimension, meaning that it can be partially hidden from sight (shadows are not sharp anymore). They have what is known as an <I>umbra</I>, or an area of fuzziness where there is neither total light or shade. In order to simulate these <I>soft </I>shadows, a ray-tracer must give its light sources dimension. POV-Ray accomplishes this with a feature known as an area light.</P>
+<P>Area lights have dimension in two axis'. These are specified by the first two vectors in the area light syntax. We must also specify how many lights are to be in the array. More will give us cleaner soft shadows but will take longer to render. Usually a 3*3 or a 5*5 array will suffice. We also have the option of specifying an adaptive value. The <b><code>adaptive</code></b> keyword tells the ray-tracer that it can adapt to the situation and send only the needed rays to determine the value of the pixel. If adaptive is not used, a separate ray will be sent for every light in the area light.  This can really slow things down. The higher the adaptive value the cleaner the umbra will be but the longer the trace will take.  Usually an adaptive value of 1 is sufficient. Finally, we probably should use the <b><code>jitter</code></b> keyword.  This tells the ray-tracer to slightly move the position of each light in the area light so that the shadows appear truly soft instead of giving us an umbra consisting of closely banded shadows.</P>
+<P>OK, let's try one. We comment out the cylinder lights and add the following:</P>
+<PRE>  light_source {
+    &lt;2, 10, -3&gt;
+    color White
+    area_light &lt;5, 0, 0&gt;, &lt;0, 0, 5&gt;, 5, 5
+    adaptive 1
+    jitter
+  }</PRE>
+<P>This is a white area light centered at &lt;2,10,-3&gt;. It is 5 units (along the x-axis) by 5 units (along the z-axis) in size and has 25 (5*5) lights in it. We have specified adaptive 1 and jitter. We render this at 200x150 <b><code>-A</code></b>.</P>
+<P>Right away we notice two things. The trace takes quite a bit longer than it did with a point or a spotlight and the shadows are no longer sharp! They all have nice soft umbrae around them. Wait, it gets better.</P>
+<P>Spotlights and cylinder lights can be area lights too! Remember those sharp shadows from the spotlights in our scene? It would not make much sense to use a 5*5 array for a spotlight, but a smaller array might do a good job of giving us just the right amount of umbra for a spotlight.  Let's try it. We comment out the area light and change the cylinder lights so that they read as follows:</P>
+<PRE>  light_source {
+    &lt;2, 10, -3&gt;
+    color White
+    spotlight
+    radius 15
+    falloff 18
+    tightness 10
+    area_light &lt;1, 0, 0&gt;, &lt;0, 0, 1&gt;, 2, 2
+    adaptive 1
+    jitter
+    point_at &lt;0, 0, 0&gt;
+  }
+  light_source {
+    &lt;10, 10, -1&gt;
+    color Red
+    spotlight
+    radius 12
+    falloff 14
+    tightness 10
+    area_light &lt;1, 0, 0&gt;, &lt;0, 0, 1&gt;, 2, 2
+    adaptive 1
+    jitter
+    point_at &lt;2, 0, 0&gt;
+  }
+  light_source {
+    &lt;-12, 10, -1&gt;
+    color Blue
+    spotlight
+    radius 12
+    falloff 14
+    tightness 10
+    area_light &lt;1, 0, 0&gt;, &lt;0, 0, 1&gt;, 2, 2
+    adaptive 1
+    jitter
+    point_at &lt;-2, 0, 0&gt;
+  }</PRE>
+<P>We now have three area-spotlights, one unit square consisting of an array of four (2*2) lights, three different colors, all shining on our scene. We render this at 200x150 <b><code>-A</code></b>. It appears to work perfectly. All our shadows have small, tight umbrae, just the sort we would expect to find on an object under a real spotlight.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov56.htm">The Cylindrical Light Source</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov58.htm">The Ambient Light Source</A>
+</P>
+</BODY>
+</HTML>
+

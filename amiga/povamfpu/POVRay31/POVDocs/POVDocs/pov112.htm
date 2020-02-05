@@ -1,0 +1,48 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Increasing the Rainbow's Translucency</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov111.htm">Starting With a Simple Rainbow</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov113.htm">Using a Rainbow Arc</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198933"><A NAME="_Toc429993442">Increasing the Rainbow's Translucency</A></A></H4>
+<P>The result we have so far looks much too bright. Just reducing the rainbow's color helps but it's much better to increase the translucency of the rainbow because it is more realistic if the background is visible through the rainbow.</P>
+<P>We can use the transmittance channel of the colors in the color map to specify a minimum translucency, just like we did with the fog. To get realistic results we have to use very large transmittance values as you can see in the following example (<CODE>rainbow2.pov</CODE>).</P>
+<PRE>  rainbow {
+    angle 42.5
+    width 5
+    distance 1.0e7
+    direction &lt;-0.2, -0.2, 1&gt;
+    jitter 0.01
+    color_map {
+      [0.000  color r_violet1 transmit 0.98]
+      [0.100  color r_violet2 transmit 0.96]
+      [0.214  color r_indigo  transmit 0.94]
+      [0.328  color r_blue    transmit 0.92]
+      [0.442  color r_cyan    transmit 0.90]
+      [0.556  color r_green   transmit 0.92]
+      [0.670  color r_yellow  transmit 0.94]
+      [0.784  color r_orange  transmit 0.96]
+      [0.900  color r_red1    transmit 0.98]
+    }
+  }</PRE>
+<P>The transmittance values increase at the outer bands of the rainbow to make it softly blend into the background.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image230.jpg" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">A much more realistic rainbow.</P>
+</B><P>The resulting image looks much more realistic than our first rainbow.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov111.htm">Starting With a Simple Rainbow</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov113.htm">Using a Rainbow Arc</A>
+</P>
+</BODY>
+</HTML>
+

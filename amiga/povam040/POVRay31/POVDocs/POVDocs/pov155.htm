@@ -1,0 +1,203 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Anti-Aliasing Options</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov154.htm">Removing User Bounding</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov156.htm">Scene Description Language</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198989"><A NAME="_Toc429993498">Anti-Aliasing Options</A></A></H4>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=600>
+<TR><TD WIDTH="36%" VALIGN="TOP">
+<p><b><code>Antialias=</code></b>bool</TD>
+<TD WIDTH="64%" VALIGN="TOP">
+<P>Turns anti-aliasing on/off</TD>
+</TR>
+<TR><TD WIDTH="36%" VALIGN="TOP">
+<p><b><code>+A</code></b></TD>
+<TD WIDTH="64%" VALIGN="TOP">
+<P>Turns aa on with threshold 0.3 or previous amount</TD>
+</TR>
+<TR><TD WIDTH="36%" VALIGN="TOP">
+<p><b><code>-A</code></b></TD>
+<TD WIDTH="64%" VALIGN="TOP">
+<P>Turns anti-aliasing off</TD>
+</TR>
+<TR><TD WIDTH="36%" VALIGN="TOP">
+<p><b><code>Sampling_Method=</code></b><I>n</I></TD>
+<TD WIDTH="64%" VALIGN="TOP">
+<P>Sets aa-sampling method (only <b><code>1</code></b> or <b><code>2</code></b> are valid)</TD>
+</TR>
+<TR><TD WIDTH="36%" VALIGN="TOP">
+<p><b><code>+AM</code></b><I>n</I></TD>
+<TD WIDTH="64%" VALIGN="TOP">
+<P>Same as <b><code>Sampling_Method=</code></b><I>n</I></TD>
+</TR>
+<TR><TD WIDTH="36%" VALIGN="TOP">
+<p><b><code>Antialias_Threshold=</code></b><I>n.n</I></TD>
+<TD WIDTH="64%" VALIGN="TOP">
+<P>Sets anti-aliasing threshold</TD>
+</TR>
+<TR><TD WIDTH="36%" VALIGN="TOP">
+<p><b><code>+A</code></b><I>n.n</I></TD>
+<TD WIDTH="64%" VALIGN="TOP">
+<P>Sets aa on with aa-threshold at <I>n.n</I></TD>
+</TR>
+<TR><TD WIDTH="36%" VALIGN="TOP">
+<p><b><code>-A</code></b><I>n.n</I></TD>
+<TD WIDTH="64%" VALIGN="TOP">
+<P>Sets aa off (aa-threshold <I>n.n</I> in future)</TD>
+</TR>
+<TR><TD WIDTH="36%" VALIGN="TOP">
+<p><b><code>Jitter=</code></b><I>bool</I></TD>
+<TD WIDTH="64%" VALIGN="TOP">
+<P>Sets aa-jitter on/off</TD>
+</TR>
+<TR><TD WIDTH="36%" VALIGN="TOP">
+<p><b><code>+J</code></b></TD>
+<TD WIDTH="64%" VALIGN="TOP">
+<P>Sets aa-jitter on with 1.0 or previous amount</TD>
+</TR>
+<TR><TD WIDTH="36%" VALIGN="TOP">
+<p><b><code>-J</code></b></TD>
+<TD WIDTH="64%" VALIGN="TOP">
+<P>Sets aa-jitter off</TD>
+</TR>
+<TR><TD WIDTH="36%" VALIGN="TOP">
+<p><b><code>Jitter_Amount=</code></b><I>n.n</I></TD>
+<TD WIDTH="64%" VALIGN="TOP">
+<P>Sets aa-jitter amount to <I>n.n</I>. If <I>n.n &lt;= 0</I> aa-jitter is set off</TD>
+</TR>
+<TR><TD WIDTH="36%" VALIGN="TOP">
+<p><b><code>+J</code></b><I>n.n</I></TD>
+<TD WIDTH="64%" VALIGN="TOP">
+<P>Sets aa-jitter on; jitter amount to <I>n.n</I>. If <I>n.n &lt;= 0</I> aa-jitter is set off</TD>
+</TR>
+<TR><TD WIDTH="36%" VALIGN="TOP">
+<p><b><code>-J</code></b><I>n.n</I></TD>
+<TD WIDTH="64%" VALIGN="TOP">
+<P>Sets aa-jitter off (jitter amount <I>n.n</I> in future)</TD>
+</TR>
+<TR><TD WIDTH="36%" VALIGN="TOP">
+<p><b><code>Antialias_Depth=</code></b><I>n</I></TD>
+<TD WIDTH="64%" VALIGN="TOP">
+<P>Sets aa-depth <I>(1 &lt;= n &lt;= 9)</I></TD>
+</TR>
+<TR><TD WIDTH="36%" VALIGN="TOP">
+<p><b><code>+R</code></b><I>n</I></TD>
+<TD WIDTH="64%" VALIGN="TOP">
+<P>Same as <b><code>Antialias_Depth=</code></b><I>n</I></TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>The ray-tracing process is in effect a discrete, digital sampling of the image with typically one sample per pixel. Such sampling can introduce a variety of errors. This includes a jagged, stair-step appearance in sloping or curved lines, a broken look for thin lines, moir&eacute; patterns of interference and lost detail or missing objects, which are so small they reside between adjacent pixels. The effect that is responsible for those errors is called <I>aliasing</I>.</P>
+<P>Anti-aliasing is any technique used to help eliminate such errors or to reduce the negative impact they have on the image. In general, anti-aliasing makes the ray-traced image look <I>smoother</I>. The <b><code>Antialias=on</code></b> option or <b><code>+A</code></b> switch turns on POV-Ray's anti-aliasing system.</P>
+<P>When anti-aliasing is turned on, POV-Ray attempts to reduce the errors by shooting more than one viewing ray into each pixel and averaging the results to determine the pixel's apparent color. This technique is called super-sampling and can improve the appearance of the final image but it drastically increases the time required to render a scene since many more calculations have to be done.</P>
+<P>POV-Ray gives you the option to use one of two alternate super-sampling methods. The <b><code>Sampling_Method=</code></b><I>n</I> option or <b><code>+AM</code></b><I>n</I> switch selects either type <b><code>1</code></b> or type <b><code>2</code></b>. Selecting one of those methods does not turn anti-aliasing on. This has to be done by using the <b><code>+A</code></b> command line switch or <b><code>Antialias=on</code></b> option.</P>
+<P>Type 1 is an adaptive, non-recursive super-sampling method.  It is <I>adaptive</I> because not every pixel is super-sampled.  Type 2 is an adaptive and recursive super-sampling method.  It is <I>recursive</I> because the pixel is sub-divided and sub-sub-divided recursively.  The <I>adaptive</I> nature of type 2 is the variable depth of recursion.</P>
+<P>In the default, non-recursive method (<b><code>+AM1</code></b>), POV-Ray initially traces one ray per pixel. If the color of a pixel differs from its neighbors (to the left or above) by more than a threshold value then the pixel is super-sampled by shooting a given, fixed number of additional rays. The default threshold is 0.3 but it may be changed using the <b><code>Antialias_Threshold=</code></b><I>n.n</I> option. When the switches are used, the threshold may optionally follow the <b><code>+A</code></b>. For example <b><code>+A0.1</code></b> turns anti-aliasing on and sets the threshold to 0.1.</P>
+<P>The threshold comparison is computed as follows. If r1, g1, b1 and r2, g2, b2 are the rgb components of two pixels then the difference between pixels is computed by</P>
+<PRE>  diff = abs(r1-r2) + abs(g1-g2) + abs(b1-b2)</PRE>
+<P>If this difference is greater than the threshold then both pixels are super-sampled. The rgb values are in the range from 0.0 to 1.0 thus the most two pixels can differ is 3.0. If the anti-aliasing threshold is 0.0 then every pixel is super-sampled. If the threshold is 3.0 then no anti-aliasing is done. Lower threshold means more anti-aliasing and less speed. Use anti-aliasing for your final version of a picture, not the rough draft. The lower the contrast, the lower the threshold should be. Higher contrast pictures can get away with higher tolerance values. Good values seem to be around 0.2 to 0.4.</P>
+<P>When using the non-recursive method, the default number of super-samples is nine per pixel, located on a 3*3 grid. The <b><code>Antialias_Depth=</code></b><I>n</I> option or <b><code>+R</code></b><I>n</I> switch controls the number of rows and columns of samples taken for a super-sampled pixel. For example <b><code>+R4</code></b> would give 4*4=16 samples per pixel.</P>
+<P>The second, adaptive, recursive super-sampling method starts by tracing four rays at the corners of each pixel. If the resulting colors differ more than the threshold amount additional samples will be taken. This is done recursively, i.e. the pixel is divided into four sub-pixels that are separately traced and tested for further subdivision. The advantage of this method is the reduced number of rays that have to be traced. Samples that are common among adjacent pixels and sub-pixels are stored and reused to avoid re-tracing of rays. The recursive character of this method makes the super-sampling concentrate on those parts of the pixel that are more likely to need super-sampling (see figure below).</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image43.gif" WIDTH=481 HEIGHT=388></P>
+<P ALIGN="CENTER">Example of how the recursive super-sampling works.</P>
+</B><P>The maximum number of subdivisions is specified by the <b><code>Antialias_Depth=</code></b><I>n</I> option or <b><code>+R</code></b><I>n</I> switch. This is different from the adaptive, non-recursive method were the total number of super-samples is specified. A maximum number of <I>n</I> subdivisions results in a maximum number of samples per pixel that is given by the following table.</P>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=402>
+<TR><TD WIDTH="12%" VALIGN="TOP" HEIGHT=48>
+<b><code><P ALIGN="CENTER">+R</code></b><I>n</I> </TD>
+<TD WIDTH="43%" VALIGN="TOP" HEIGHT=48>
+<P ALIGN="CENTER">Number of samples per</P>
+<P ALIGN="CENTER">super-sampled pixel for the</P>
+<P ALIGN="CENTER">non-recursive method <b><code>+AM1</code></b></TD>
+<TD WIDTH="45%" VALIGN="TOP" HEIGHT=48>
+<P ALIGN="CENTER">Maximum number of samples</P>
+<P ALIGN="CENTER">per super-sampled pixel for</P>
+<P ALIGN="CENTER">the recursive method <b><code>+AM2</code></b></TD>
+</TR>
+<TR><TD WIDTH="12%" VALIGN="TOP">
+<b><code><P ALIGN="CENTER">1</code></b></TD>
+<TD WIDTH="43%" VALIGN="TOP">
+<P ALIGN="CENTER">1</TD>
+<TD WIDTH="45%" VALIGN="TOP">
+<P ALIGN="CENTER">9</TD>
+</TR>
+<TR><TD WIDTH="12%" VALIGN="TOP">
+<b><code><P ALIGN="CENTER">2</code></b></TD>
+<TD WIDTH="43%" VALIGN="TOP">
+<P ALIGN="CENTER">4</TD>
+<TD WIDTH="45%" VALIGN="TOP">
+<P ALIGN="CENTER">25</TD>
+</TR>
+<TR><TD WIDTH="12%" VALIGN="TOP">
+<b><code><P ALIGN="CENTER">3</code></b></TD>
+<TD WIDTH="43%" VALIGN="TOP">
+<P ALIGN="CENTER">9</TD>
+<TD WIDTH="45%" VALIGN="TOP">
+<P ALIGN="CENTER">81</TD>
+</TR>
+<TR><TD WIDTH="12%" VALIGN="TOP">
+<b><code><P ALIGN="CENTER">4</code></b></TD>
+<TD WIDTH="43%" VALIGN="TOP">
+<P ALIGN="CENTER">16</TD>
+<TD WIDTH="45%" VALIGN="TOP">
+<P ALIGN="CENTER">289</TD>
+</TR>
+<TR><TD WIDTH="12%" VALIGN="TOP">
+<b><code><P ALIGN="CENTER">5</code></b></TD>
+<TD WIDTH="43%" VALIGN="TOP">
+<P ALIGN="CENTER">25</TD>
+<TD WIDTH="45%" VALIGN="TOP">
+<P ALIGN="CENTER">1089</TD>
+</TR>
+<TR><TD WIDTH="12%" VALIGN="TOP">
+<b><code><P ALIGN="CENTER">6</code></b></TD>
+<TD WIDTH="43%" VALIGN="TOP">
+<P ALIGN="CENTER">36</TD>
+<TD WIDTH="45%" VALIGN="TOP">
+<P ALIGN="CENTER">4225</TD>
+</TR>
+<TR><TD WIDTH="12%" VALIGN="TOP">
+<b><code><P ALIGN="CENTER">7</code></b></TD>
+<TD WIDTH="43%" VALIGN="TOP">
+<P ALIGN="CENTER">49</TD>
+<TD WIDTH="45%" VALIGN="TOP">
+<P ALIGN="CENTER">16641</TD>
+</TR>
+<TR><TD WIDTH="12%" VALIGN="TOP">
+<b><code><P ALIGN="CENTER">8</code></b></TD>
+<TD WIDTH="43%" VALIGN="TOP">
+<P ALIGN="CENTER">64</TD>
+<TD WIDTH="45%" VALIGN="TOP">
+<P ALIGN="CENTER">66049</TD>
+</TR>
+<TR><TD WIDTH="12%" VALIGN="TOP">
+<b><code><P ALIGN="CENTER">9</code></b></TD>
+<TD WIDTH="43%" VALIGN="TOP">
+<P ALIGN="CENTER">81</TD>
+<TD WIDTH="45%" VALIGN="TOP">
+<P ALIGN="CENTER">263169</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>You should note that the maximum number of samples in the recursive case is hardly ever reached for a given pixel. If the recursive method is used with no anti-aliasing each pixel will be the average of the rays traced at its corners. In most cases a recursion level of three is sufficient.</P>
+<P>Another way to reduce aliasing artifacts is to introduce noise into the sampling process. This is called <I>jittering </I>and works because the human visual system is much more forgiving to noise than it is to regular patterns. The location of the super-samples is jittered or wiggled a tiny amount when anti-aliasing is used. Jittering is used by default but it may be turned off with the <b><code>Jitter=off</code></b> option or <b><code>-J</code></b> switch. The amount of jittering can be set with the <b><code>Jitter_Amount=</code></b><I>n.n</I> option. When using switches the jitter scale may be specified after the <b><code>+J</code></b><I>n.n</I> switch. For example <b><code>+J0.5</code></b> uses half the normal jitter. The default amount of 1.0 is the maximum jitter which will insure that all super-samples remain inside the original pixel. Note that the jittering noise is random and non-repeatable so you should avoid using jitter in animation sequences as the anti-aliased pixels will vary and flicker annoyingly from frame to frame.</P>
+<P>If anti-aliasing is not used one sample per pixel is taken regardless of the super-sampling method specified.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov154.htm">Removing User Bounding</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov156.htm">Scene Description Language</A>
+</P>
+</BODY>
+</HTML>
+

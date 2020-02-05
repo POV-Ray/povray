@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,15 +33,24 @@
 ///
 //******************************************************************************
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "backend/control/renderbackend.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+#include "base/pov_err.h"
+
+// POV-Ray header files (core module)
+//  (none at the moment)
+
+// POV-Ray header files (POVMS module)
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
 
-#include "base/pov_err.h"
-
+// POV-Ray header files (backend module)
 #include "backend/povray.h"
 #include "backend/control/scene.h"
 #include "backend/scene/view.h"
@@ -54,7 +63,7 @@ namespace pov
 
 using namespace pov_base;
 
-POVMSContext RenderBackend::context = NULL;
+POVMSContext RenderBackend::context = nullptr;
 
 RenderBackend::RenderBackend(POVMSContext ctx,  bool (*val)(POVMSAddress)) :
     POVMS_MessageReceiver(ctx),
@@ -94,7 +103,7 @@ void RenderBackend::SendSceneOutput(SceneId sid, POVMSAddress addr, POVMSType id
     msg.SetInt(kPOVAttrib_SceneId, sid);
     msg.SetDestinationAddress(addr);
 
-    POVMS_SendMessage(RenderBackend::context, msg, NULL, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
+    POVMS_SendMessage(RenderBackend::context, msg, nullptr, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
 }
 
 void RenderBackend::SendViewOutput(ViewId vid, POVMSAddress addr, POVMSType ident, POVMS_Object& obj)
@@ -104,16 +113,16 @@ void RenderBackend::SendViewOutput(ViewId vid, POVMSAddress addr, POVMSType iden
     msg.SetInt(kPOVAttrib_ViewId, vid);
     msg.SetDestinationAddress(addr);
 
-    POVMS_SendMessage(RenderBackend::context, msg, NULL, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
+    POVMS_SendMessage(RenderBackend::context, msg, nullptr, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
 }
 
-void RenderBackend::SendFindFile(POVMSContext ctx, SceneId sid, POVMSAddress addr, const vector<POVMSUCS2String>& filenames, POVMSUCS2String& filename)
+void RenderBackend::SendFindFile(POVMSContext ctx, SceneId sid, POVMSAddress addr, const std::vector<POVMSUCS2String>& filenames, POVMSUCS2String& filename)
 {
     POVMS_Message msg(kPOVObjectClass_FileData, kPOVMsgClass_FileAccess, kPOVMsgIdent_FindFile);
     POVMS_Message result(kPOVObjectClass_FileData, kPOVMsgClass_FileAccess, kPOVMsgIdent_FindFile);
     POVMS_List files;
 
-    for(vector<POVMSUCS2String>::const_iterator i(filenames.begin()); i != filenames.end(); i++)
+    for(std::vector<POVMSUCS2String>::const_iterator i(filenames.begin()); i != filenames.end(); i++)
     {
         POVMS_Attribute attr(i->c_str());
         files.Append(attr);
@@ -154,7 +163,7 @@ void RenderBackend::SendCreatedFile(POVMSContext ctx, SceneId sid, POVMSAddress 
     msg.SetInt(kPOVAttrib_SceneId, sid);
     msg.SetDestinationAddress(addr);
 
-    POVMS_SendMessage(ctx, msg, NULL, kPOVMSSendMode_NoReply);
+    POVMS_SendMessage(ctx, msg, nullptr, kPOVMSSendMode_NoReply);
 }
 
 void RenderBackend::SendSuccessResult(POVMSAddress addr)
@@ -163,7 +172,7 @@ void RenderBackend::SendSuccessResult(POVMSAddress addr)
 
     result.SetDestinationAddress(addr);
 
-    POVMS_SendMessage(RenderBackend::context, result, NULL, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
+    POVMS_SendMessage(RenderBackend::context, result, nullptr, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
 }
 
 void RenderBackend::SendFailedResult(int error, POVMSAddress addr)
@@ -174,7 +183,7 @@ void RenderBackend::SendFailedResult(int error, POVMSAddress addr)
     result.SetString(kPOVAttrib_EnglishText, pov_base::Exception::lookup_code(error).c_str());
     result.SetDestinationAddress(addr);
 
-    POVMS_SendMessage(RenderBackend::context, result, NULL, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
+    POVMS_SendMessage(RenderBackend::context, result, nullptr, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
 }
 
 void RenderBackend::SendFailedResult(const pov_base::Exception& e, POVMSAddress addr)
@@ -186,7 +195,7 @@ void RenderBackend::SendFailedResult(const pov_base::Exception& e, POVMSAddress 
     result.SetString(kPOVAttrib_EnglishText, e.what());
     result.SetDestinationAddress(addr);
 
-    POVMS_SendMessage(RenderBackend::context, result, NULL, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
+    POVMS_SendMessage(RenderBackend::context, result, nullptr, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
 }
 
 void RenderBackend::SendFailedResult(const char *str, POVMSAddress addr)
@@ -196,7 +205,7 @@ void RenderBackend::SendFailedResult(const char *str, POVMSAddress addr)
     result.SetString(kPOVAttrib_EnglishText, str);
     result.SetDestinationAddress(addr);
 
-    POVMS_SendMessage(RenderBackend::context, result, NULL, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
+    POVMS_SendMessage(RenderBackend::context, result, nullptr, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
 }
 
 void RenderBackend::SendSceneSuccessResult(SceneId sid, POVMSAddress addr)
@@ -206,7 +215,7 @@ void RenderBackend::SendSceneSuccessResult(SceneId sid, POVMSAddress addr)
     result.SetInt(kPOVAttrib_SceneId, sid);
     result.SetDestinationAddress(addr);
 
-    POVMS_SendMessage(RenderBackend::context, result, NULL, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
+    POVMS_SendMessage(RenderBackend::context, result, nullptr, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
 }
 
 void RenderBackend::SendSceneFailedResult(SceneId sid, int error, POVMSAddress addr)
@@ -218,7 +227,7 @@ void RenderBackend::SendSceneFailedResult(SceneId sid, int error, POVMSAddress a
     result.SetString(kPOVAttrib_EnglishText, pov_base::Exception::lookup_code(error).c_str());
     result.SetDestinationAddress(addr);
 
-    POVMS_SendMessage(RenderBackend::context, result, NULL, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
+    POVMS_SendMessage(RenderBackend::context, result, nullptr, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
 }
 
 void RenderBackend::SendSceneFailedResult(SceneId sid, const pov_base::Exception& e, POVMSAddress addr)
@@ -231,7 +240,7 @@ void RenderBackend::SendSceneFailedResult(SceneId sid, const pov_base::Exception
     result.SetString(kPOVAttrib_EnglishText, e.what());
     result.SetDestinationAddress(addr);
 
-    POVMS_SendMessage(RenderBackend::context, result, NULL, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
+    POVMS_SendMessage(RenderBackend::context, result, nullptr, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
 }
 
 void RenderBackend::SendSceneFailedResult(SceneId sid, const char *str, POVMSAddress addr)
@@ -242,7 +251,7 @@ void RenderBackend::SendSceneFailedResult(SceneId sid, const char *str, POVMSAdd
     result.SetString(kPOVAttrib_EnglishText, str);
     result.SetDestinationAddress(addr);
 
-    POVMS_SendMessage(RenderBackend::context, result, NULL, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
+    POVMS_SendMessage(RenderBackend::context, result, nullptr, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
 }
 
 void RenderBackend::SendViewSuccessResult(ViewId vid, POVMSAddress addr)
@@ -252,7 +261,7 @@ void RenderBackend::SendViewSuccessResult(ViewId vid, POVMSAddress addr)
     result.SetInt(kPOVAttrib_ViewId, vid);
     result.SetDestinationAddress(addr);
 
-    POVMS_SendMessage(RenderBackend::context, result, NULL, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
+    POVMS_SendMessage(RenderBackend::context, result, nullptr, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
 }
 
 void RenderBackend::SendViewFailedResult(ViewId vid, int error, POVMSAddress addr)
@@ -264,7 +273,7 @@ void RenderBackend::SendViewFailedResult(ViewId vid, int error, POVMSAddress add
     result.SetString(kPOVAttrib_EnglishText, pov_base::Exception::lookup_code(error).c_str());
     result.SetDestinationAddress(addr);
 
-    POVMS_SendMessage(RenderBackend::context, result, NULL, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
+    POVMS_SendMessage(RenderBackend::context, result, nullptr, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
 }
 
 void RenderBackend::SendViewFailedResult(ViewId vid, const pov_base::Exception& e, POVMSAddress addr)
@@ -277,7 +286,7 @@ void RenderBackend::SendViewFailedResult(ViewId vid, const pov_base::Exception& 
     result.SetString(kPOVAttrib_EnglishText, e.what());
     result.SetDestinationAddress(addr);
 
-    POVMS_SendMessage(RenderBackend::context, result, NULL, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
+    POVMS_SendMessage(RenderBackend::context, result, nullptr, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
 }
 
 void RenderBackend::SendViewFailedResult(ViewId vid, const char *str, POVMSAddress addr)
@@ -288,7 +297,7 @@ void RenderBackend::SendViewFailedResult(ViewId vid, const char *str, POVMSAddre
     result.SetString(kPOVAttrib_EnglishText, str);
     result.SetDestinationAddress(addr);
 
-    POVMS_SendMessage(RenderBackend::context, result, NULL, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
+    POVMS_SendMessage(RenderBackend::context, result, nullptr, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
 }
 
 void RenderBackend::CreateScene(POVMS_Message& msg, POVMS_Message& result, int)
@@ -304,7 +313,7 @@ void RenderBackend::CreateScene(POVMS_Message& msg, POVMS_Message& result, int)
         if(err != kNoErr)
             throw POV_EXCEPTION_CODE (err);
 
-        shared_ptr<Scene> scene(new Scene(backendAddress, msg.GetSourceAddress(), scenecounter + 1));
+        std::shared_ptr<Scene> scene(new Scene(backendAddress, msg.GetSourceAddress(), scenecounter + 1));
 
         scenecounter++;
 
@@ -387,7 +396,7 @@ void RenderBackend::CreateView(POVMS_Message& msg, POVMS_Message& result, int)
         if(i == scenes.end())
             throw POV_EXCEPTION_CODE(kInvalidIdentifierErr);
 
-        shared_ptr<View> view(i->second->NewView(msg.TryGetInt(kPOVAttrib_Width, 160), msg.TryGetInt(kPOVAttrib_Height, 120), viewcounter + 1));
+        std::shared_ptr<View> view(i->second->NewView(msg.TryGetInt(kPOVAttrib_Width, 160), msg.TryGetInt(kPOVAttrib_Height, 120), viewcounter + 1));
 
         viewcounter++;
 
@@ -785,3 +794,4 @@ void RenderBackend::MakeDoneResult(POVMS_Message& result)
 }
 
 }
+// end of namespace pov

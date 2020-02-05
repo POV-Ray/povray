@@ -1,0 +1,69 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - CSG Union</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov27.htm">What is CSG?</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov29.htm">CSG Intersection</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405100"><A NAME="_Toc411405376"><A NAME="_Toc414198847"><A NAME="_Toc429993358">CSG Union</A></A></A></A></H3>
+<P>Let's try making a simple union. Create a file called <CODE>csgdemo.pov</CODE> and edit it as follows:</P>
+<PRE>  #include "colors.inc"
+  camera {
+    location &lt;0, 1, -10&gt;
+    look_at 0
+    angle 36
+  }
+  light_source { &lt;500, 500, -1000&gt; White }
+  plane { y, -1.5
+    pigment { checker Green White }
+  }</PRE>
+<P>Let's add two spheres each translated 0.5 units along the x-axis in each direction. We color one blue and the other red.</P>
+<PRE>  sphere { &lt;0, 0, 0&gt;, 1
+    pigment { Blue }
+    translate -0.5*x
+  }
+  sphere { &lt;0, 0, 0&gt;, 1
+    pigment { Red }
+    translate 0.5*x
+  }</PRE>
+<P>We trace this file and note the results. Now we place a union block around the two spheres. This will create a single CSG union out of the two objects.</P>
+<PRE>  union{
+    sphere { &lt;0, 0, 0&gt;, 1
+      pigment { Blue }
+      translate -0.5*x
+    }
+    sphere { &lt;0, 0, 0&gt;, 1
+      pigment { Red }
+      translate 0.5*x
+    }
+  }</PRE>
+<P>We trace the file again. The union will appear no different from what each sphere looked like on its own, but now we can give the entire union a single texture and transform it as a whole. Let's do that now.</P>
+<PRE>  union{
+    sphere { &lt;0, 0, 0&gt;, 1
+      translate -0.5*x
+    }
+    sphere { &lt;0, 0, 0&gt;, 1
+      translate 0.5*x
+    }
+    pigment { Red }
+    scale &lt;1, .25, 1&gt;
+    rotate &lt;30, 0, 45&gt;
+  }</PRE>
+<P>We trace the file again. As we can see, the object has changed dramatically. We experiment with different values of scale and rotate and try some different textures.</P>
+<P>There are many advantages of assigning only one texture to a CSG object instead of assigning the texture to each individual component. First, it is much easier to use one texture if our CSG object has a lot of components because changing the objects appearance involves changing only one single texture. Second, the file parses faster because the texture has to be parsed only once. This may be a great factor when doing large scenes or animations. Third, using only one texture saves memory because the texture is only stored once and referenced by all components of the CSG object. Assigning the texture to all n components means that it is stored n times.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov27.htm">What is CSG?</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov29.htm">CSG Intersection</A>
+</P>
+</BODY>
+</HTML>
+

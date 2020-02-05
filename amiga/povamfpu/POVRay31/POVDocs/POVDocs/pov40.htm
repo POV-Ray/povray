@@ -1,0 +1,55 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Lathe Object</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov39.htm">Height Field Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov41.htm">Understanding The Concept of Splines</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405109"><A NAME="_Toc411405385"><A NAME="_Toc414198859"><A NAME="_Ref415568254"><A NAME="_Toc429993370">Lathe Object</A></A></A></A></A></H3>
+<P>In the real world, <b><code>lathe</code></b> refers to a process of making patterned rounded shapes by spinning the source material in place and carving pieces out as it turns. The results can be elaborate, smoothly rounded, elegant looking artifacts such as table legs, pottery, etc. In POV-Ray, a lathe object is used for creating much the same kind of items, although we are referring to the object itself rather than the means of production.</P>
+<P>Here is some source for a really basic lathe (called <CODE>lathdem1.pov</CODE>).</P>
+<PRE>  #include "colors.inc"
+  background{White}
+  camera {
+    angle 10
+    location &lt;1, 9, -50&gt;
+    look_at &lt;0, 2, 0&gt;
+  }
+  light_source {
+    &lt;20, 20, -20&gt; color White
+  }
+  lathe {
+    linear_spline
+    6,
+    &lt;0,0&gt;, &lt;1,1&gt;, &lt;3,2&gt;, &lt;2,3&gt;, &lt;2,4&gt;, &lt;0,4&gt;
+    pigment { Blue }
+    finish {
+      ambient .3
+      phong .75
+    }
+  }</PRE>
+<B><P ALIGN="CENTER"> <IMG SRC="Image207.gif" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">A simple lathe object.</P>
+</B><P>We render this, and what we see is a fairly simply type of lathe, which looks like a child's top. Let's take a look at how this code produced the effect.</P>
+<P>First, a set of six points are declared which the raytracer connects with lines. We note that there are only two components in the vectors which describe these points. The lines that are drawn are assumed to be in the x-y-plane, therefore it is as if all the z-components were assumed to be zero. The use of a two-dimensional vector is mandatory (Attempting to use a 3D vector would trigger an error... with one exception, which we will explore later in the discussion of splines).</P>
+<P>Once the lines are determined, the ray-tracer rotates this line around the y-axis, and we can imagine a trail being left through space as it goes, with the surface of that trail being the surface of our object.</P>
+<P>The specified points are connected with straight lines because we used the <b><code>linear_spline</code></b> keyword. There are other types of splines available with the lathe, which will result in smooth curving lines, and even rounded curving points of transition, but we will get back to that in a moment.</P>
+<P>First, we would like to digress a moment to talk about the difference between a lathe and a surface of revolution object (SOR). The SOR object, described in a separate tutorial, may seem terribly similar to the lathe at first glance. It too declares a series of points and connects them with curving lines and then rotates them around the y-axis. The lathe has certain advantages, such as different kinds of splines, linear, quadratic and cubic, and one more thing:</P>
+<P>The simpler mathematics used by a SOR doesn't allow the curve to double back over the same y-coordinates, thus, if using a SOR, any sudden twist which cuts back down over the same heights that the curve previously covered will trigger an error. For example, suppose we wanted a lathe to arc up from &lt;0,0&gt; to &lt;2,2&gt;, then to dip back down to &lt;4,0&gt;. Rotated around the y-axis, this would produce something like a gelatin mold - a rounded semi torus, hollow in the middle. But with the SOR, as soon as the curve doubled back on itself in the y-direction, it would become an illegal declaration.</P>
+<P>Still, the SOR has one powerful strong point: because it uses simpler order mathematics, it generally tends to render faster than an equivalent lathe. So in the end, its a matter of: we use a SOR if its limitations will allow, but when we need a more flexible shape, we go with the lathe instead.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov39.htm">Height Field Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov41.htm">Understanding The Concept of Splines</A>
+</P>
+</BODY>
+</HTML>
+

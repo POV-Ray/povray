@@ -1,0 +1,32 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Bozo</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov319.htm">Boxed</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov321.htm">Brick</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199166"><A NAME="_Ref418947705"><A NAME="_Toc429993678">Bozo</A></A></A></H4>
+<P>The <b><code>bozo</code></b> pattern is a very smooth, random noise function that is traditionally used with some turbulence to create clouds. The <b><code>spotted</code></b> pattern is identical to <b><code>bozo</code></b> but in early versions of POV-Ray spotted did not allow turbulence to be added. Turbulence can now be added to any pattern so these are redundant but both are retained for backwards compatibility. The <b><code>bumps</code></b> pattern is also identical to <b><code>bozo</code></b> when used anywhere except in a <b><code>normal</code></b> statement. When used as a normal pattern, <b><code>bumps</code></b> uses a slightly different method to perturb the normal with a similar noise function.</P>
+<P>The <b><code>bozo</code></b> noise function has the following properties:</P><dir>
+  1.  It's defined over 3D space i.e., it takes x, y, and z and returns the noise value there.</P>
+<P>  2.  If two points are far apart, the noise values at those points are relatively random.</P>
+<P>  3.  If two points are close together, the noise values at those points are close to each other.</P>
+</dir>
+<P>You can visualize this as having a large room and a thermometer that ranges from 0.0 to 1.0. Each point in the room has a temperature. Points that are far apart have relatively random temperatures. Points that are close together have close temperatures. The temperature changes smoothly but randomly as we move through the room.</P>
+<P>Now let's place an object into this room along with an artist. The artist measures the temperature at each point on the object and paints that point a different color depending on the temperature.  What do we get? A POV-Ray bozo texture!</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov319.htm">Boxed</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov321.htm">Brick</A>
+</P>
+</BODY>
+</HTML>
+

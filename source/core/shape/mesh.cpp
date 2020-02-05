@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -60,17 +60,24 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/mesh.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <algorithm>
 #include <limits>
 
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
 
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/material/texture.h"
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
 #include "core/shape/triangle.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -99,6 +106,8 @@ const int INITIAL_NUMBER_OF_ENTRIES = 256;
 HASH_TABLE **Mesh::Vertex_Hash_Table;
 HASH_TABLE **Mesh::Normal_Hash_Table;
 UV_HASH_TABLE **Mesh::UV_Hash_Table;
+
+thread_local std::unique_ptr<BBoxPriorityQueue> Mesh::mtpQueue(new BBoxPriorityQueue());
 
 /*****************************************************************************
 *
@@ -176,7 +185,7 @@ bool Mesh::Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *
 
     /* Transform the ray into mesh space. */
 
-    if (Trans != NULL)
+    if (Trans != nullptr)
     {
         MInvTransRay(New_Ray, ray, Trans);
 
@@ -192,7 +201,7 @@ bool Mesh::Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *
 
     found = false;
 
-    if (Data->Tree == NULL)
+    if (Data->Tree == nullptr)
     {
         /* There's no bounding hierarchy so just step through all elements. */
 
@@ -263,7 +272,7 @@ bool Mesh::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
     ray.Origin = IPoint;
 
     /* Transform the ray into mesh space. */
-    if (Trans != NULL)
+    if (Trans != nullptr)
     {
         MInvTransRay(ray, ray, Trans);
 
@@ -272,7 +281,7 @@ bool Mesh::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 
     found = 0;
 
-    if (Data->Tree == NULL)
+    if (Data->Tree == nullptr)
     {
         /* just step through all elements. */
         for (i = 0; i < Data->Number_Of_Triangles; i++)
@@ -291,7 +300,7 @@ bool Mesh::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
     else
     {
         /* Use the mesh's bounding hierarchy. */
-        inside = inside_bbox_tree(ray, Thread);
+        inside = inside_bbox_tree(ray, Thread->Stats());
     }
 
     if (Test_Flag(this, INVERTED_FLAG))
@@ -339,7 +348,7 @@ void Mesh::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread
 
     if (Triangle->Smooth)
     {
-        if (Trans != NULL)
+        if (Trans != nullptr)
         {
             MInvTransPoint(IPoint, Inter->IPoint, Trans);
         }
@@ -350,7 +359,7 @@ void Mesh::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread
 
         Smooth_Mesh_Normal(Result, Triangle, IPoint);
 
-        if (Trans != NULL)
+        if (Trans != nullptr)
         {
             MTransNormal(Result, Result, Trans);
         }
@@ -361,7 +370,7 @@ void Mesh::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread
     {
         Result = Vector3d(Data->Normals[Triangle->Normal_Ind]);
 
-        if (Trans != NULL)
+        if (Trans != nullptr)
         {
             MTransNormal(Result, Result, Trans);
 
@@ -560,7 +569,7 @@ void Mesh::Transform(const TRANSFORM *tr)
 {
     MeshIndex i;
 
-    if (Trans == NULL)
+    if (Trans == nullptr)
     {
         Trans = Create_Transform();
     }
@@ -607,14 +616,14 @@ Mesh::Mesh() : ObjectBase(MESH_OBJECT)
 {
     Set_Flag(this, HIERARCHY_FLAG);
 
-    Trans = NULL;
+    Trans = nullptr;
 
-    Data = NULL;
+    Data = nullptr;
 
     has_inside_vector=false;
 
     Number_Of_Textures=0; /* [LSK] these were uninitialized */
-    Textures=NULL;
+    Textures = nullptr;
 }
 
 
@@ -663,7 +672,7 @@ ObjectPtr Mesh::Copy()
     New->Data->References++;
 
     /* NK 1999 copy textures */
-    if(Textures != NULL)
+    if (Textures != nullptr)
     {
         New->Textures = reinterpret_cast<TEXTURE **>(POV_MALLOC(Number_Of_Textures*sizeof(TEXTURE *), "triangle mesh data"));
         for (i = 0; i < Number_Of_Textures; i++)
@@ -706,7 +715,7 @@ Mesh::~Mesh()
     MeshIndex i;
 
     /* NK 1999 move texture outside of data block */
-    if (Textures != NULL)
+    if (Textures != nullptr)
     {
         for (i = 0; i < Number_Of_Textures; i++)
         {
@@ -720,24 +729,24 @@ Mesh::~Mesh()
     {
         Destroy_BBox_Tree(Data->Tree);
 
-        if (Data->Normals != NULL)
+        if (Data->Normals != nullptr)
         {
             POV_FREE(Data->Normals);
         }
 
         /* NK 1998 */
-        if (Data->UVCoords != NULL)
+        if (Data->UVCoords != nullptr)
         {
             POV_FREE(Data->UVCoords);
         }
         /* NK ---- */
 
-        if (Data->Vertices != NULL)
+        if (Data->Vertices != nullptr)
         {
             POV_FREE(Data->Vertices);
         }
 
-        if (Data->Triangles != NULL)
+        if (Data->Triangles != nullptr)
         {
             POV_FREE(Data->Triangles);
         }
@@ -1396,7 +1405,7 @@ void Mesh::Build_Mesh_BBox_Tree()
     }
 
     size_t maxfinitecount = 0;
-    Build_BBox_Tree(&Data->Tree, nElem, Triangles, 0, NULL, maxfinitecount);
+    Build_BBox_Tree(&Data->Tree, nElem, Triangles, 0, nullptr, maxfinitecount);
 
     /* Get rid of the Triangles array. */
 
@@ -1452,7 +1461,7 @@ bool Mesh::intersect_bbox_tree(const BasicRay &ray, const BasicRay &Orig_Ray, DB
     Rayinfo rayinfo(ray);
 
     /* Start with an empty priority queue. */
-    Thread->Mesh_Queue.Clear();
+    mtpQueue->Clear();
     found = false;
 
     Best = BOUND_HUGE;
@@ -1467,13 +1476,13 @@ bool Mesh::intersect_bbox_tree(const BasicRay &ray, const BasicRay &Orig_Ray, DB
 
     /* Set the root object infinite to avoid a test. */
 
-    Check_And_Enqueue(Thread->Mesh_Queue, Root, &Root->BBox, &rayinfo, Thread->Stats());
+    Check_And_Enqueue(*mtpQueue, Root, &Root->BBox, &rayinfo, Thread->Stats());
 
     /* Check elements in the priority queue. */
 
-    while (!Thread->Mesh_Queue.IsEmpty())
+    while (!mtpQueue->IsEmpty())
     {
-        Thread->Mesh_Queue.RemoveMin(Depth, Node);
+        mtpQueue->RemoveMin(Depth, Node);
 
         /*
          * If current intersection is larger than the best intersection found
@@ -1497,7 +1506,7 @@ bool Mesh::intersect_bbox_tree(const BasicRay &ray, const BasicRay &Orig_Ray, DB
             /* This is a node containing leaves to be checked. */
 
             for (i = 0; i < Node->Entries; i++)
-                Check_And_Enqueue(Thread->Mesh_Queue, Node->Node[i], &Node->Node[i]->BBox, &rayinfo, Thread->Stats());
+                Check_And_Enqueue(*mtpQueue, Node->Node[i], &Node->Node[i]->BBox, &rayinfo, Thread->Stats());
         }
         else
         {
@@ -1571,7 +1580,7 @@ MeshIndex Mesh::mesh_hash(HASH_TABLE **Hash_Table, MeshIndex *Number, MeshIndex 
 
     /* Try to find normal/vertex. */
 
-    for (p = Hash_Table[hash]; p != NULL; p = p->Next)
+    for (p = Hash_Table[hash]; p != nullptr; p = p->Next)
     {
         D = p->P - P;
 
@@ -1581,7 +1590,7 @@ MeshIndex Mesh::mesh_hash(HASH_TABLE **Hash_Table, MeshIndex *Number, MeshIndex 
         }
     }
 
-    if ((p != NULL) && (p->Index >= 0))
+    if ((p != nullptr) && (p->Index >= 0))
     {
         return(p->Index);
     }
@@ -1740,7 +1749,7 @@ MeshIndex Mesh::Mesh_Hash_Texture(MeshIndex *Number_Of_Textures, MeshIndex *Max_
 {
     MeshIndex i;
 
-    if (Texture == NULL)
+    if (Texture == nullptr)
     {
         return(-1);
     }
@@ -1824,7 +1833,7 @@ MeshIndex Mesh::Mesh_Hash_UV(MeshIndex *Number, MeshIndex *Max, MeshUVVector **E
 
     /* Try to find normal/vertex. */
 
-    for (p = UV_Hash_Table[hash]; p != NULL; p = p->Next)
+    for (p = UV_Hash_Table[hash]; p != nullptr; p = p->Next)
     {
         /* VSub(D, p->P, P); */
         D = p->P - P;
@@ -1835,7 +1844,7 @@ MeshIndex Mesh::Mesh_Hash_UV(MeshIndex *Number, MeshIndex *Max, MeshUVVector **E
         }
     }
 
-    if ((p != NULL) && (p->Index >= 0))
+    if ((p != nullptr) && (p->Index >= 0))
     {
         return(p->Index);
     }
@@ -1905,14 +1914,14 @@ void Mesh::Create_Mesh_Hash_Tables()
 
     for (i = 0; i < HASH_SIZE; i++)
     {
-        Vertex_Hash_Table[i] = NULL;
+        Vertex_Hash_Table[i] = nullptr;
     }
 
     Normal_Hash_Table = reinterpret_cast<HASH_TABLE **>(POV_MALLOC(HASH_SIZE*sizeof(HASH_TABLE *), "mesh hash table"));
 
     for (i = 0; i < HASH_SIZE; i++)
     {
-        Normal_Hash_Table[i] = NULL;
+        Normal_Hash_Table[i] = nullptr;
     }
 
     /* NK 1998 */
@@ -1920,7 +1929,7 @@ void Mesh::Create_Mesh_Hash_Tables()
 
     for (i = 0; i < HASH_SIZE; i++)
     {
-        UV_Hash_Table[i] = NULL;
+        UV_Hash_Table[i] = nullptr;
     }
     /* NK ---- */
 }
@@ -1963,7 +1972,7 @@ void Mesh::Destroy_Mesh_Hash_Tables()
 
     for (i = 0; i < HASH_SIZE; i++)
     {
-        while (Vertex_Hash_Table[i] != NULL)
+        while (Vertex_Hash_Table[i] != nullptr)
         {
             Temp = Vertex_Hash_Table[i];
 
@@ -1977,7 +1986,7 @@ void Mesh::Destroy_Mesh_Hash_Tables()
 
     for (i = 0; i < HASH_SIZE; i++)
     {
-        while (Normal_Hash_Table[i] != NULL)
+        while (Normal_Hash_Table[i] != nullptr)
         {
             Temp = Normal_Hash_Table[i];
 
@@ -1992,7 +2001,7 @@ void Mesh::Destroy_Mesh_Hash_Tables()
     /* NK 1998 */
     for (i = 0; i < HASH_SIZE; i++)
     {
-        while (UV_Hash_Table[i] != NULL)
+        while (UV_Hash_Table[i] != nullptr)
         {
             UVTemp = UV_Hash_Table[i];
 
@@ -2201,32 +2210,23 @@ bool Mesh::Degenerate(const Vector3d& P1, const Vector3d& P2, const Vector3d& P3
 *
 ******************************************************************************/
 
-void Mesh::Test_Mesh_Opacity()
+bool Mesh::IsOpaque() const
 {
-    MeshIndex i;
-
-    /* Initialize opacity flag to the opacity of the object's texture. */
-
-    if ((Texture == NULL) || (Test_Opacity(Texture)))
-    {
-        Set_Flag(this, OPAQUE_FLAG);
-    }
-
     if (Test_Flag(this, MULTITEXTURE_FLAG))
     {
-        for (i = 0; i < Number_Of_Textures; i++)
+        for (MeshIndex i = 0; i < Number_Of_Textures; i++)
         {
-            if (Textures[i] != NULL)
-            {
-                /* If component's texture isn't opaque the mesh is neither. */
-
-                if (!Test_Opacity(Textures[i]))
-                {
-                    Clear_Flag(this, OPAQUE_FLAG);
-                }
-            }
+            // If component's texture isn't opaque the mesh is neither.
+            if ((Textures[i] != nullptr) && !Test_Opacity(Textures[i]))
+                return false;
         }
     }
+
+    // Otherwise it's a question of whether the common texture is opaque or not.
+    // TODO FIXME - other objects report as non-opaque if Texture == nullptr.
+    // TODO FIXME - other objects report as non-opaque if Interior_Texture present and non-opaque.
+    // What we probably really want here is `return ObjectBase::IsOpaque()`.
+    return (Texture == nullptr) || Test_Opacity(Texture);
 }
 
 
@@ -2253,7 +2253,7 @@ void Mesh::Test_Mesh_Opacity()
 *
 ******************************************************************************/
 
-void Mesh::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *) const
+void Mesh::UVCoord(Vector2d& Result, const Intersection *Inter) const
 {
     DBL w1, w2, w3, t1, t2;
     Vector3d vA, vB;
@@ -2261,7 +2261,7 @@ void Mesh::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData 
     const MESH_TRIANGLE *Triangle;
     Vector3d P;
 
-    if (Trans != NULL)
+    if (Trans != nullptr)
         MInvTransPoint(P, Inter->IPoint, Trans);
     else
         P = Inter->IPoint;
@@ -2363,7 +2363,7 @@ void Mesh::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData 
 *
 ******************************************************************************/
 
-bool Mesh::inside_bbox_tree(const BasicRay &ray, TraceThreadData *Thread) const
+bool Mesh::inside_bbox_tree(const BasicRay &ray, RenderStatistics& stats) const
 {
     MeshIndex i, found;
     DBL Best, Depth;
@@ -2373,32 +2373,32 @@ bool Mesh::inside_bbox_tree(const BasicRay &ray, TraceThreadData *Thread) const
     Rayinfo rayinfo(ray);
 
     /* Start with an empty priority queue. */
-    Thread->Mesh_Queue.Clear();
+    mtpQueue->Clear();
     found = 0;
 
     Best = BOUND_HUGE;
 
 #ifdef BBOX_EXTRA_STATS
-    Thread->Stats()[totalQueueResets]++;
+    stats[totalQueueResets]++;
 #endif
 
     /* Check top node. */
     Root = Data->Tree;
 
     /* Set the root object infinite to avoid a test. */
-    Check_And_Enqueue(Thread->Mesh_Queue, Root, &Root->BBox, &rayinfo, Thread->Stats());
+    Check_And_Enqueue(*mtpQueue, Root, &Root->BBox, &rayinfo, stats);
 
     /* Check elements in the priority queue. */
-    while (!Thread->Mesh_Queue.IsEmpty())
+    while (!mtpQueue->IsEmpty())
     {
-        Thread->Mesh_Queue.RemoveMin(Depth, Node);
+        mtpQueue->RemoveMin(Depth, Node);
 
         /* Check current node. */
         if (Node->Entries)
         {
             /* This is a node containing leaves to be checked. */
             for (i = 0; i < Node->Entries; i++)
-                Check_And_Enqueue(Thread->Mesh_Queue, Node->Node[i], &Node->Node[i]->BBox, &rayinfo, Thread->Stats());
+                Check_And_Enqueue(*mtpQueue, Node->Node[i], &Node->Node[i]->BBox, &rayinfo, stats);
         }
         else
         {
@@ -2422,7 +2422,7 @@ void Mesh::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextu
 {
     const MESH_TRIANGLE *tri = reinterpret_cast<const MESH_TRIANGLE *>(isect->Pointer);
 
-    if((Interior_Texture != NULL) && (hitinside == true)) // useful feature for checking mesh orientation and other effects [trf]
+    if ((Interior_Texture != nullptr) && (hitinside == true)) // useful feature for checking mesh orientation and other effects [trf]
         textures.push_back(WeightedTexture(1.0, Interior_Texture));
     else if(tri->ThreeTex)
     {
@@ -2431,7 +2431,7 @@ void Mesh::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextu
         COLC w1, w2, w3;
         COLC wsum;
 
-        if(Trans != NULL)
+        if (Trans != nullptr)
             MInvTransPoint(epoint, isect->IPoint, Trans);
         else
             epoint = isect->IPoint;
@@ -2452,8 +2452,9 @@ void Mesh::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextu
     }
     else if(tri->Texture >= 0) // TODO FIXME - make sure there always is some valid texture, also for code above! [trf]
         textures.push_back(WeightedTexture(1.0, Textures[tri->Texture]));
-    else if(Texture != NULL)
+    else if (Texture != nullptr)
         textures.push_back(WeightedTexture(1.0, Texture));
 }
 
 }
+// end of namespace pov

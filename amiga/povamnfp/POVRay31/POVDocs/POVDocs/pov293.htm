@@ -1,0 +1,53 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Pigment</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov292.htm">Textures</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov294.htm">Solid Color Pigments</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405205"><A NAME="_Toc411405481"><A NAME="_Ref413748639"><A NAME="_Toc414199126"><A NAME="_Ref416591760"><A NAME="_Ref417128795"><A NAME="_Ref417300511"><A NAME="_Ref418334424"><A NAME="_Ref418948513"><A NAME="_Toc429993638">Pigment</A></A></A></A></A></A></A></A></A></A></H3>
+<P>The color or pattern of colors for an object is defined by a <b><code>pigment</code></b> statement. All plain textures must have a pigment. If you do not specify one the default pigment is used.  The color you define is the way you want the object to look if fully illuminated. You pick the basic color inherent in the object and POV-Ray brightens or darkens it depending on the lighting in the scene. The parameter is called <b><code>pigment</code></b> because we are defining the basic color the object actually is rather than how it looks.</P>
+<P>The syntax for pigment is:</P>
+<I><DL>
+<DT>PIGMENT:</DT>
+</I><b><code><DD>pigment{</code></b> <I>[PIGMENT_IDENTIFIER] [PIGMENT_TYPE] [PIGMENT_MODIFIER...]</I> <b><code>}</DD>
+</code></b><I><DT>PIGMENT_TYPE:</DT>
+<DD>PATTERN_TYPE</I>   |</DD>
+<I><DD>COLOR</I>   |</DD>
+<b><code><DD>image_map{</code></b> <I>BITMAP_TYPE "bitmap.ext" [IMAGE_MAP_MODS...]</I> <b><code>}</DD>
+</code></b><I><DT>PIGMENT_MODIFIER:</DT>
+<DD>PATTERN_MODIFIER</I>   |   <I>COLOR_LIST</I>   |   <I>PIGMENT_LIST</I>   |</DD>
+<b><code><DD>color_map{</code></b> <I>COLOR_MAP_BODY</I> <b><code>}</code></b>   |   <b><code>colour_map{</code></b> <I>COLOR_MAP_BODY</I> <b><code>}</code></b>   |</DD>
+<b><code><DD>pigment_map{</code></b> <I>PIGMENT_MAP_BODY</I> <b><code>}</code></b>   |</DD>
+<b><code><DD>quick_color</code></b> <I>COLOR</I>   |   <b><code>quick_colour</code></b> <I>COLOR</DD>
+</DL>
+</I><P>Each of the items in a pigment are optional but if they are present, they must be in the order shown. Any items after the <I>PIGMENT_IDENTIFIER</I> modify or override settings given in the identifier. If no identifier is specified then the items modify the pigment values in the current default texture. The <I>PIGMENT_TYPE</I>  fall into roughly four categories. Each category is discussed the sub-sections which follow. The four categories are solid color and image map patterns which are specific to <b><code>pigment</code></b> statements or color list patterns, color mapped patterns which use POV-Ray's wide selection of general patterns.  See "<A HREF="pov316.htm#_Ref417310251">Patterns</A>" for details about specific patterns.</P>
+<P>The pattern type is optionally followed by one or more pigment modifiers.  In addition to general pattern modifiers such as transformations, turbulence, and warp modifiers, pigments may also have a <I>COLOR_LIST</I>, <I>PIGMENT_LIST</I>, <b><code>color_map</code></b>, <b><code>pigment_map</code></b>, and <b><code>quick_color</code></b> which are specific to pigments.  See "<A HREF="pov346.htm#_Ref417310705">Pattern Modifiers</A>" for information on general modifiers.  The pigment-specific modifiers are described in sub-sections which follow.  Pigment modifiers of any kind apply only to the pigment and not to other parts of the texture. Modifiers must be specified last.</P>
+<P>A pigment statement is part of a <b><code>texture</code></b> specification.  However it can be tedious to use a <b><code>texture</code></b> statement just to add a color to an object. Therefore you may attach a pigment directly to an object without explicitly specifying that it as part of a texture. For example instead of this:</P>
+<PRE>  object {My_Object texture{pigment{color Red}}}</PRE>
+<P>you may shorten it to:</P>
+<PRE>  object {My_Object pigment{color Red}}</PRE>
+<P>Note however that doing so creates an entire <b><code>texture</code></b> structure with default <b><code>normal</code></b> and <b><code>finish</code></b> statements just as if you had explicitly typed the full <b><code>texture{...}</code></b> around it.</P>
+<P>Pigment identifiers may be declared to make scene files more readable and to parameterize scenes so that changing a single declaration changes many values. An identifier is declared as follows.</P>
+<I><DL>
+<DT>PIGMENT_DECLARATION:</DT>
+</I><b><code><DD>#declare </code></b><I>IDENTIFIER </I><b><code>=</code></b> <I>PIGMENT</I>   |</DD>
+<b><code><DD>#local </code></b><I>IDENTIFIER </I><b><code>=</code></b> <I>PIGMENT</DD>
+</DL>
+</I><P>Where <I>IDENTIFIER</I> is the name of the identifier up to 40 characters long and <I>PIGMENT</I> is any valid <b><code>pigment</code></b> statement.  See "<A HREF="pov191.htm#_Ref412711267">#declare vs. #local</A>" for information on identifier scope. </P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov292.htm">Textures</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov294.htm">Solid Color Pigments</A>
+</P>
+</BODY>
+</HTML>
+

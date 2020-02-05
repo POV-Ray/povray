@@ -1,0 +1,62 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Using Ambient</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov78.htm">Finishes</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov80.htm">Using Surface Highlights</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198899"><A NAME="_Toc429993409">Using Ambient</A></A></H4>
+<P>Since objects in POV-Ray are illuminated by light sources, the portions of those objects that are in shadow would be completely black were it not for the first two finish properties, <b><code>ambient</code></b> and <b><code>diffuse</code></b>. Ambient is used to simulate the light that is scattered around the scene that does not come directly from a light source. Diffuse determines how much of the light that is seen comes directly from a light source. These two keywords work together to control the simulation of ambient light. Let's use our gray sphere to demonstrate this. Let's also change our plane back to its original green and white checkered pattern.</P>
+<PRE>  plane {y,-1.5
+    pigment {checker Green, White}
+  }
+  sphere { &lt;0,0,0&gt;, 1
+    pigment {Gray75}
+    finish {
+      ambient .2
+      diffuse .6
+  }</PRE>
+<P>In the above example, the default values for ambient and diffuse are used. We render this to see what the effect is and then make the following change to the finish.</P>
+<PRE>  ambient 0
+  diffuse 0</PRE>
+<P>The sphere is black because we have specified that none of the light coming from any light source will be reflected by the sphere. Let's change <b><code>diffuse</code></b> back to the default of 0.6.</P>
+<P>Now we see the gray surface color where the light from the light source falls directly on the sphere but the shaded side is still absolutely black. Now let's change <b><code>diffuse</code></b> to 0.3 and <b><code>ambient</code></b> to 0.3.</P>
+<P>The sphere now looks almost flat. This is because we have specified a fairly high degree of ambient light and only a low amount of the light coming from the light source is diffusely reflected towards the camera. The default values of <b><code>ambient</code></b> and <b><code>diffuse</code></b> are pretty good averages and a good starting point. In most cases, an ambient value of 0.1 ... 0.2 is sufficient and a diffuse value of 0.5 ... 0.7 will usually do the job. There are a couple of exceptions. If we have a completely transparent surface with high refractive and/or reflective values, low values of both ambient and diffuse may be best. Here is an example:</P>
+<PRE>sphere { &lt;0,0,0&gt;, 1
+   pigment { White filter 1 }
+   finish {
+      ambient 0
+      diffuse 0
+      reflection .25
+      specular 1
+      roughness .001
+   }
+   interior{ior 1.33}
+}</PRE>
+<P>This is glass, obviously. Glass is a material that takes nearly all of its appearance from its surroundings. Very little of the surface is seen because it transmits or reflects practically all of the light that shines on it. See <CODE>glass.inc</CODE> for some other examples.</P>
+<P>If we ever need an object to be completely illuminated independently of the lighting situation in a given scene we can do this artificially by specifying an <b><code>ambient</code></b> value of 1 and a <b><code>diffuse</code></b> value of 0. This will eliminate all shading and simply give the object its fullest and brightest color value at all points. This is good for simulating objects that emit light like light bulbs and for skies in scenes where the sky may not be adequately lit by any other means.</P>
+<P>Let's try this with our sphere now.</P>
+<PRE>  sphere { &lt;0,0,0&gt;, 1
+     pigment { White }
+     finish {
+        ambient 1
+        diffuse 0
+     }
+  }</PRE>
+<P>Rendering this we get a blinding white sphere with no visible highlights or shaded parts. It would make a pretty good streetlight.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov78.htm">Finishes</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov80.htm">Using Surface Highlights</A>
+</P>
+</BODY>
+</HTML>
+

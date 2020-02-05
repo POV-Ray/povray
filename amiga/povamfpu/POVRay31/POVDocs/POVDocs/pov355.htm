@@ -1,0 +1,59 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Bitmap Modifiers</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov354.htm">Warps</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov356.htm">Media</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199200"><A NAME="_Ref417983218"><A NAME="_Ref417983800"><A NAME="_Ref417983914"><A NAME="_Toc429993716">Bitmap Modifiers</A></A></A></A></A></H4>
+<P>A bitmap modifier is a modifier used inside an <b><code>image_map</code></b>, <b><code>bump_map</code></b> or <b><code>material_map</code></b> to specify how the 2-D bitmap is to be applied to the 3-D surface. Several bitmap modifiers apply to specific kinds of maps and they are covered in the appropriate sections. The bitmap modifiers discussed in the following sections are applicable to all three types of bitmaps.</P>
+<H5><A NAME="_Toc414199201"><A NAME="_Toc429993717">The once Option</A></A></H5>
+<P>Normally there are an infinite number of repeating image maps, bump maps or material maps created over every unit square of the x-y-plane like tiles. By adding the <b><code>once</code></b> keyword after a file name you can eliminate all other copies of the map except the one at (0,0) to (1,1). In image maps, areas outside this unit square are treated as fully transparent. In bump maps, areas outside this unit square are left flat with no normal modification.  In material maps, areas outside this unit square are textured with the first texture of the texture list.</P>
+<P>For example:</P>
+<PRE>  image_map {
+    gif "mypic.gif"
+    once
+  }</PRE>
+<H5><A NAME="_Toc414199202"><A NAME="_Toc429993718">The map_type Option</A></A></H5>
+<P>The default projection of the image onto the x-y-plane is called a <I>planar map type</I>. This option may be changed by adding the <b><code>map_type</code></b> keyword followed by an integer number specifying the way to wrap the image around the object.</P>
+<P>A <b><code>map_type 0</code></b> gives the default planar mapping already described.</P>
+<P>A <b><code>map_type 1</code></b> gives a spherical mapping. It assumes that the object is a sphere of any size sitting at the origin. The y-axis is the north/south pole of the spherical mapping. The top and bottom edges of the image just touch the pole regardless of any scaling. The left edge of the image begins at the positive x-axis and wraps the image around the sphere from west to east in a -y-rotation. The image covers the sphere exactly once. The <b><code>once</code></b> keyword has no meaning for this mapping type.</P>
+<P>With <b><code>map_type 2</code></b> you get a cylindrical mapping. It assumes that a cylinder of any diameter lies along the y-axis. The image wraps around the cylinder just like the spherical map but the image remains one unit tall from y=0 to y=1. This band of color is repeated at all heights unless the <b><code>once</code></b> keyword is applied.</P>
+<P>Finally <b><code>map_type 5</code></b> is a torus or donut shaped mapping. It assumes that a torus of major radius one sits at the origin in the x-z-plane. The image is wrapped around similar to spherical or cylindrical maps. However the top and bottom edges of the map wrap over and under the torus where they meet each other on the inner rim.</P>
+<P>Types 3 and 4 are still under development.</P>
+<P>Note that the <b><code>map_type</code></b> option may also be applied to <b><code>bump_map</code></b> and <b><code>material_map</code></b> statements.</P>
+<P>For example:</P>
+<PRE>  sphere{&lt;0,0,0&gt;,1
+    pigment{
+      image_map {
+        gif "world.gif"
+        map_type 1
+      }
+    }
+  }</PRE>
+<H5><A NAME="_Toc414199203"><A NAME="_Toc429993719">The interpolate Option</A></A></H5>
+<P>Adding the <b><code>interpolate</code></b> keyword can smooth the jagged look of a bitmap. When POV-Ray asks an image map color or a bump amount for a bump map, it often asks for a point that is not directly on top of one pixel but sort of between several differently colored pixels. Interpolations returns an in-between value so that the steps between the pixels in the map will look smoother.</P>
+<P>Although <b><code>interpolate</code></b> is legal in material maps, the color index is interpolated before the texture is chosen. It does not interpolate the final color as you might hope it would. In general, interpolation of material maps serves no useful purpose but this may be fixed in future versions.</P>
+<P>There are currently two types of interpolation:  <b><code>interpolate 2</code></b> gives bilinear interpolation while <b><code>interpolate 4</code></b> gives normalized distance.  For example:</P>
+<PRE>  image_map {
+    gif "mypic.gif"
+    interpolate 2
+  }</PRE>
+<P>Default is no interpolation. Normalized distance is the slightly faster of the two, bilinear does a better job of picking the between color. Normally bilinear is used.</P>
+<P>If your map looks jaggy, try using interpolation instead of going to a higher resolution image. The results can be very good.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov354.htm">Warps</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov356.htm">Media</A>
+</P>
+</BODY>
+</HTML>
+

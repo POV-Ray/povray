@@ -1,0 +1,28 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Radiosity</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov384.htm">Number_Of_Waves</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov386.htm">How Radiosity Works</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405228"><A NAME="_Toc411405504"><A NAME="_Ref412631781"><A NAME="_Toc414199232"><A NAME="_Toc429993749">Radiosity</A></A></A></A></A></H3>
+<I><P>Important notice: </I>The radiosity features in POV-Ray are somewhat experimental. There is a high probability that the design and implementation of these features will be changed in future versions. We cannot guarantee that scenes using these features in this version will render identically in future releases or that full backwards compatibility of language syntax can be maintained.</P>
+<P>Radiosity is an extra calculation that more realistically computes the diffuse interreflection of light. This diffuse interreflection can be seen if you place a white chair in a room full of blue carpet, blue walls and blue curtains. The chair will pick up a blue tint from light reflecting off of other parts of the room. Also notice that the shadowed areas of your surroundings are not totally dark even if no light source shines directly on the surface. Diffuse light reflecting off of other objects fills in the shadows. Typically ray-tracing uses a trick called <I>ambient </I>light to simulate such effects but it is not very accurate.</P>
+<P>Radiosity is more accurate than simplistic ambient light but it takes much longer to compute. For this reason, POV-Ray does not use radiosity by default. Radiosity is turned on using the <b><code>Radiosity</code></b> INI file option or the <b><code>+QR</code></b> command line switch.</P>
+<P>The following sections describes how radiosity works, how to control it with various global settings and tips on trading quality vs.  speed.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov384.htm">Number_Of_Waves</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov386.htm">How Radiosity Works</A>
+</P>
+</BODY>
+</HTML>
+

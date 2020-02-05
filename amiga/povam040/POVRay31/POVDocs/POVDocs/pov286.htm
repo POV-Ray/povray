@@ -1,0 +1,30 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Why are Interior and Media Necessary?</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov285.htm">Interior</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov287.htm">Empty and Solid Objects</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Ref417286060"><A NAME="_Toc429993631">Why are Interior and Media Necessary?</A></A></H3>
+<P>In previous versions of POV-Ray, most of the items in the <b><code>interior</code></b> statement were previously part of the <b><code>finish</code></b> statement.  Also the <b><code>halo</code></b> statement which was once part of the <b><code>texture</code></b> statement has been discontinued and has been replaced by the <b><code>media</code></b> statement which is part of <b><code>interior</code></b>.</P>
+<P>You are probably asking <B>WHY?</B>  As explained earlier, the <b><code>interior</code></b> contains items which describe the properties of the interior of the object.  This is in contrast to the <b><code>texture</code></b> which describes the surface properties only.  However this is not just a philosophical change.  There were serious inconsistencies in the old model.</P>
+<P>The main problem arises when a <b><code>texture_map</code></b> or other patterned texture is used.  These features allow you to create textures that are a blend of two textures and which vary the entire texture from one point to another.  It does its blending by fully evaluating the apparent color as though only one texture was applied and then fully reevaluating it with the other texture.  The two final results are blended.</P>
+<P>It is totally illogical to have a ray enter an object with one index or refraction and then recalculate with another index.  The result is not an average of the two ior values.  Similarly it makes no sense to have a ray enter at one ior and exit at a different ior without transitioning between them along the way.  POV-Ray only calculates refraction as the ray enters or leaves.  It cannot incrementally compute a changing ior through the interior of an object.  Real world objects such as optical fibers or no-line bifocal eyeglasses can have variable iors but POV-Ray cannot simulate them.</P>
+<P>Similarly the <b><code>halo</code></b> calculations were not performed as the syntax implied.  Using a <b><code>halo</code></b> in such multi-textured objects did not vary the <b><code>halo</code></b> through the interior of the object.  Rather, it computed two separate halos through the whole object and averaged the results.  The new design for <b><code>media</code></b> which replaces <b><code>halo</code></b> makes it possible to have media that varies throughout the interior of the object according to a pattern but it does so independently of the surface texture.  Because there are other changes in the design of this feature which make it significantly different, it was not only moved to the <b><code>interior</code></b> but the name was changed.</P>
+<P>During our development, someone asked if we will create patterned interiors or a hypothetical <b><code>interior_map</code></b> feature.  We will not.  That would defeat the whole purpose of moving these features in the first place.  They cannot be patterned and have logical or self-consistent results.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov285.htm">Interior</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov287.htm">Empty and Solid Objects</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,34 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Adding Bumpiness</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov64.htm">Surface Finishes</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov66.htm">Creating Color Patterns</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405127"><A NAME="_Toc411405403"><A NAME="_Toc414198885"><A NAME="_Toc429993395">Adding Bumpiness</A></A></A></A></H3>
+<P>The highlight we have added illustrates how much of our perception depends on the reflective properties of an object. Ray-tracing can exploit this by playing tricks on our perception to make us see complex details that aren't really there.</P>
+<P>Suppose we wanted a very bumpy surface on the object. It would be very difficult to mathematically model lots of bumps. We can however simulate the way bumps look by altering the way light reflects off of the surface. Reflection calculations depend on a vector called a <I>surface normal</I>. This is a vector which points away from the surface and is perpendicular to it. By artificially modifying (or perturbing) this normal vector we can simulate bumps. We change the scene to read as follows and render it:</P>
+<PRE>  sphere { &lt;0, 1, 2&gt;, 2
+    texture {
+      pigment { color Yellow }
+      normal { bumps 0.4 scale 0.2 }
+      finish { phong 1}
+    }
+  }</PRE>
+<P>This tells POV-Ray to use the <b><code>bumps</code></b> pattern to modify the surface normal. The value 0.4 controls the apparent depth of the bumps. Usually the bumps are about 1 unit wide which doesn't work very well with a sphere of radius 2. The scale makes the bumps 1/5th as wide but does not affect their depth.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov64.htm">Surface Finishes</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov66.htm">Creating Color Patterns</A>
+</P>
+</BODY>
+</HTML>
+

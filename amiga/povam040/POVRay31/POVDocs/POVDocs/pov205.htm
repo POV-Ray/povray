@@ -1,0 +1,36 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - The #while...#end Directive</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov204.htm">The #switch, #case, #range and #break Directives</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov206.htm">User Message Directives</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199038"><A NAME="_Toc429993548">The #while...#end Directive</A></A></H4>
+<P>The <b><code>#while</code></b> directive is a looping feature that makes it easy to place multiple objects in a pattern or other uses.</P>
+<I><DL>
+<DT>WHILE_DIRECTIVE:</DT>
+</I><b><code><DD>#while (</code></b><I> </I>Cond<I> </I><b><code>) </code></b><I>TOKENS... </I><b><code>#end</DD>
+</DL>
+</code></b><P>The <I>TOKENS </I>are any number of POV-Ray keyword, identifiers, or punctuation marks which are the <I>body</I> of the loop.  The <b><code>#while</code></b> directive is followed by a float expression that evaluates to a boolean value. A value of 0.0 is false and any non-zero value is true. Note that extremely small values of about 1e-10 are considered zero in case of round off errors. The parentheses around the expression are required. If the condition is true parsing continues normally until an <b><code>#end</code></b> directive is reached. At the end, POV-Ray loops back to the <b><code>#while</code></b> directive and the condition is re-evaluated. Looping continues until the condition fails. When it fails, parsing continues after the <b><code>#end</code></b> directive. Note it is possible for the condition to fail the first time and the loop is totally skipped.  It is up to the user to insure that something inside the loop changes so that it eventually terminates.  Here is a properly constructed loop example:</P>
+<PRE> #declare Count=0;
+ #while (Count &lt; 5)
+  object{MyObject translate x*3*Count}
+  #declare Count=Count+1;
+ #end</PRE>
+<P>This example places five copies of <b><code>MyObject</code></b> in a row spaced three units apart in the x-direction.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov204.htm">The #switch, #case, #range and #break Directives</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov206.htm">User Message Directives</A>
+</P>
+</BODY>
+</HTML>
+

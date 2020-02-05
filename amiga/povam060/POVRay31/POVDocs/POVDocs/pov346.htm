@@ -1,0 +1,72 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Pattern Modifiers</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov345.htm">Wrinkles</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov347.htm">Transforming Patterns</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405212"><A NAME="_Toc411405488"><A NAME="_Toc414199188"><A NAME="_Ref417310705"><A NAME="_Ref420920063"><A NAME="_Ref421693822"><A NAME="_Toc429993704">Pattern Modifiers</A></A></A></A></A></A></A></H3>
+<P>Pattern modifiers are statements or parameters which modify how a pattern is evaluated or tells what to do with the pattern. The complete syntax is:</P>
+<I><DL>
+<DT>PATTERN_MODIFIER:</DT>
+<DD>BLEND_MAP_MODIFIER</I>   |   <I>AGATE_MODIFIER</I>   |   <I>DENSITY_FILE_MODIFIER</I>   |</DD>
+<I><DD>QUILTED_MODIFIER</I>   |   <I>BRICK_MODIFIER</I>   |</DD>
+<b><code><DD>turbulence</code></b> <I>&lt;Amount&gt;</I>   |   <b><code>octaves</code></b> <I>Count</I>   |   <b><code>omega</code></b> <I>Amount</I>   |   <b><code>lambda</code></b> <I>Amount</I>   |</DD>
+<b><code><DD>warp {</code></b> <I>[WARP_ITEMS...]</I> <b><code>}</code></b>   |</DD>
+<I><DD>TRANSFORMATION</DD>
+<DT>BLEND_MAP_MODIFIER:</DT>
+</I><b><code><DD>frequency</code></b> <I>Amount</I>   |   <b><code>phase</code></b> <I>Amount</I>   |</DD>
+<b><code><DD>ramp_wave</code></b>   |   <b><code>triangle_wave</code></b>   |   <b><code>sine_wave</code></b>   |   <b><code>scallop_wave</code></b>   |</DD>
+<b><code><DD>cubic_wave</code></b>   |   <b><code>poly_wave</code></b> <I>[Exponent]</DD>
+<DT>AGATE_MODIFIER:</DT>
+</I><b><code><DD>agate_turb</code></b> <I>Value</DD>
+<DT>BRICK_MODIFIER:</DT>
+</I><b><code><DD>brick_size</code></b> <I>Size</I>   |   <b><code>mortar</code></b> <I>Size</DD>
+<DT>DENSITY_FILE_MODIFIER:</DT>
+</I><b><code><DD>interpolate</code></b> <I>Type</DD>
+<DT>QUILTED_MODIFIER:</DT>
+</I><b><code><DD>control0</code></b> <I>Value</I>   |   <b><code>control1</code></b> <I>Value</DD>
+<DT>PIGMENT_MODIFIER:</DT>
+<DD>PATTERN_MODIFIER</I>   |   <I>COLOR_LIST</I>   |   <I>PIGMENT_LIST</I>   |</DD>
+<b><code><DD>color_map{</code></b> <I>COLOR_MAP_BODY</I> <b><code>}</code></b>   |   <b><code>colour_map{</code></b> <I>COLOR_MAP_BODY</I> <b><code>}</code></b>   |</DD>
+<b><code><DD>pigment_map{</code></b> <I>PIGMENT_MAP_BODY</I> <b><code>}</code></b>   |</DD>
+<b><code><DD>quick_color</code></b> <I>COLOR</I>   |   <b><code>quick_colour</code></b> <I>COLOR</DD>
+<DT>NORMAL_MODIFIER:</DT>
+<DD>PATTERN_MODIFIER</I>   |   <I>NORMAL_LIST</I>   |</DD>
+<b><code><DD>normal_map{</code></b> <I>NORMAL_MAP_BODY</I> <b><code>}</code></b>   |</DD>
+<b><code><DD>slope_map{</code></b> <I>SLOPE_MAP_BODY</I> <b><code>}</code></b>   |</DD>
+<b><code><DD>bump_size</code></b> <I>Amount</DD>
+<DT>TEXTURE_PATTERN_MODIFIER:</DT>
+<DD>PATTERN_MODIFIER</I>   |   <I>TEXTURE_LIST</I>   |</DD>
+<b><code><DD>texture_map{</code></b> <I>TEXTURE_MAP_BODY</I> <b><code>}</DD>
+</code></b><I><DT>DENSITY_MODIFIER:</DT>
+<DD>PATTERN_MODIFIER</I>   |   <I>DENSITY_LIST</I>   |   <I>COLOR_LIST</I>   |</DD>
+<b><code><DD>color_map{</code></b> <I>COLOR_MAP_BODY</I> <b><code>}</code></b>   |   <b><code>colour_map{</code></b> <I>COLOR_MAP_BODY</I> <b><code>}</code></b>   |</DD>
+<b><code><DD>density_map{</code></b> <I>DENSITY_MAP_BODY</I> <b><code>}</DD>
+</DL>
+</code></b><P>The modifiers <I>PIGMENT_LIST</I>, <b><code>quick_color</code></b>, and <b><code>pigment_map</code></b> apply only to pigments. See section "<A HREF="pov293.htm#_Ref418948513">Pigment</A>" for details on these pigment-specific pattern modifiers.</P>
+<P>The modifiers <I>COLOR_LIST</I> and <b><code>color_map</code></b> apply only to pigments and densities. See sections "<A HREF="pov293.htm#_Ref418948513">Pigment</A>" and "<A HREF="pov362.htm#_Ref420163369">Density</A>" for details on these pigment-specific pattern modifiers.</P>
+<P>The modifiers <I>NORMAL_LIST</I>, <b><code>bump_size</code></b>, <b><code>slope_map</code></b> and <b><code>normal_map</code></b> apply only to normals. See section "<A HREF="pov300.htm#_Ref418948620">Normal</A>" for details on these normal-specific pattern modifiers.</P>
+<P>The <I>TEXTURE_LIST</I> and <b><code>texture_map</code></b> modifiers can only be used with patterned textures. See section "<A HREF="pov312.htm#_Ref418948678">Texture Maps</A>" for details.</P>
+<P>The <I>DENSITY_LIST</I> and <b><code>density_map</code></b> modifiers only work with <b><code>media{density{..}}</code></b> statements.  See "<A HREF="pov362.htm#_Ref418948799">Density</A>" for details.</P>
+<P>The <b><code>agate_turb</code></b> modifier can only be used with the <b><code>agate</code></b> pattern.  See "<A HREF="pov317.htm#_Ref419107472">Agate</A>" for details.</P>
+<P>The <b><code>brick_size</code></b> and <b><code>mortar</code></b> modifiers can only be used with the <b><code>brick</code></b> pattern.  See "<A HREF="pov321.htm#_Ref419875240">Brick</A>" for details.</P>
+<P>The <b><code>control0</code></b> and <b><code>control1</code></b> modifiers can only be used with the <b><code>quilted</code></b> pattern.  See "<A HREF="pov336.htm#_Ref419875421">Quilted</A>" for details.</P>
+<P>The <b><code>interpolate</code></b> modifier can only be used with the <b><code>density_file</code></b> pattern.  See "<A HREF="pov326.htm#_Ref421689780">Density_File</A>" for details.</P>
+<P>The general purpose pattern modifiers in the following sections can be used with <b><code>pigment</code></b>, <b><code>normal</code></b>, <b><code>texture</code></b>, or <b><code>density</code></b> patterns.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov345.htm">Wrinkles</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov347.htm">Transforming Patterns</A>
+</P>
+</BODY>
+</HTML>
+

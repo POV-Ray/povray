@@ -1,0 +1,28 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Scene File Gamma</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov378.htm">Image File Gamma</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov380.htm">HF_Gray_16</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199226"><A NAME="_Toc429993743">Scene File Gamma</A></A></H4>
+<P>The image file gamma problem itself is just a result of how scenes themselves are generated in POV-Ray. When you start out with a new scene and are placing light sources and adjusting surface textures and colors, you generally make several attempts before the lighting is how you like it. How you choose these settings depends upon the preview image or the image file stored to disk, which in turn is dependent upon the overall gamma of the display hardware being used.</P>
+<P>This means that as the artist you are doing gamma correction in the POV-Ray scene file for your particular hardware. This scene file will generate an image file that is also gamma corrected for your hardware and will display correctly on systems similar to your own.  However, when this scene is rendered on another platform, it may be too bright or too dim, regardless of the output file format used.  Rather than have you change all the scene files to have a single fixed gamma value (heaven forbid!), POV-Ray 3.0 allows you to specify in the scene file the display gamma of the system that the scene was created on.</P>
+<P>The <b><code>assumed_gamma</code></b> global setting, in conjunction with the <b><code>Display_Gamma</code></b> INI setting lets POV-Ray know how to do gamma correction on a given scene so that the preview and output image files will appear the correct brightness on any system. Since the gamma correction is done internally to POV-Ray, it will produce output image files that are the correct brightness for the current display, regardless of what output format is used. As well, since the gamma correction is performed in the high-precision data format that POV-Ray uses internally, it produces better results than gamma correction done after the file is written to disk.</P>
+<P>Although you may not notice any difference in the output on your system with and without an <b><code>assumed_gamma</code></b> setting, the assumed gamma is important if the scene is ever rendered on another platform.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov378.htm">Image File Gamma</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov380.htm">HF_Gray_16</A>
+</P>
+</BODY>
+</HTML>
+

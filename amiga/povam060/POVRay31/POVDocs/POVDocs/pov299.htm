@@ -1,0 +1,54 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Quick Color</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov298.htm">Image Maps</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov300.htm">Normal</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199136"><A NAME="_Toc429993647">Quick Color</A></A></H4>
+<P>When developing POV-Ray scenes its often useful to do low quality test runs that render faster. The <b><code>+Q</code></b> command line switch or <b><code>Quality</code></b> INI option can be used to turn off some time consuming color pattern and lighting calculations to speed things up. See "<A HREF="pov151.htm#_Ref417378671">Quality Settings</A>" for details.  However all settings of <b><code>+Q5</code></b> or <b><code>Quality=5</code></b> or lower turns off pigment calculations and creates gray objects.</P>
+<P>By adding a <b><code>quick_color</code></b> to a pigment you tell POV-Ray what solid color to use for quick renders instead of a patterned pigment. For example:</P>
+<PRE>  pigment {
+    gradient x
+    color_map{
+      [0.0 color Yellow]
+      [0.3 color Cyan]
+      [0.6 color Magenta]
+      [1.0 color Cyan]
+    }
+    turbulence 0.5
+    lambda 1.5
+    omega 0.75
+    octaves 8
+    quick_color Neon_Pink
+  }</PRE>
+<P>This tells POV-Ray to use solid <b><code>Neon_Pink</code></b> for test runs at quality <b><code>+Q5</code></b> or lower but to use the turbulent gradient pattern for rendering at <b><code>+Q6</code></b> and higher.</P>
+<P>Note that solid color pigments such as</P>
+<PRE>  pigment {color Magenta}</PRE>
+<P>automatically set the <b><code>quick_color</code></b> to that value. You may override this if you want. Suppose you have 10 spheres on the screen and all are yellow. If you want to identify them individually you could give each a different <b><code>quick_color</code></b> like this:</P>
+<PRE>  sphere {
+    &lt;1,2,3&gt;,4
+    pigment { color Yellow  quick_color Red }
+  }
+  sphere {
+    &lt;-1,-2,-3&gt;,4
+    pigment { color Yellow  quick_color Blue }
+  }</PRE>
+<P>and so on. At <b><code>+Q6</code></b> or higher they will all be yellow but at <b><code>+Q5</code></b> or lower each would be different colors so you could identify them.</P>
+<P>The alternate spelling <b><code>quick_colour</code></b> is also supported.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov298.htm">Image Maps</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov300.htm">Normal</A>
+</P>
+</BODY>
+</HTML>
+

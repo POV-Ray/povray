@@ -1,0 +1,44 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Area Lights</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov270.htm">Cylindrical Lights</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov272.htm">Shadowless Lights</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199108"><A NAME="_Toc429993616">Area Lights</A></A></H4>
+<P>Area light sources occupy a finite, one- or two-dimensional area of space. They can cast soft shadows because an object can partially block their light.  Point sources are either totally blocked or not blocked.</P>
+<P>The <b><code>area_light</code></b> keyword in POV-Ray creates sources that are rectangular in shape, sort of like a flat panel light. Rather than performing the complex calculations that would be required to model a true area light, it is approximated as an array of point light sources spread out over the area occupied by the light. The array-effect applies to shadows only.  The object's illumination is still that of a point source.  The intensity of each individual point light in the array is dimmed so that the total amount of light emitted by the light is equal to the light color specified in the declaration. The syntax is:</P>
+<I><DL>
+<DT>AREA_LIGHT_SOURCE:</DT>
+</I><b><code><DD>light_source {</code></b> <I>&lt;Location&gt;</I><b><code>,</code></b> <I>COLOR </I><b><code>area_light</code></b> <I>&lt;Axis_1&gt;</I><b><code>,</code></b><I> &lt;Axis_2&gt;</I><b><code>,</code></b><I> Size_1</I><b><code>,</code></b><I> Size_2</DD>
+<DD>[</I><b><code>adaptive</code></b> <I>Adaptive] [</I> <b><code>jitter</code></b><I> Jitter</I> <I>]</DD>
+<DD>[LIGHT_MODIFIERS...]</DD>
+</I><b><code><DD>}</DD>
+</DL>
+</code></b><P>The light's location and color are specified in the same way as a for a regular light source.  Any type of light source may be an area light.</P>
+<P>The <b><code>area_light</code></b> command defines the size and orientation of the area light as well as the number of lights in the light source array. The vectors <I>&lt;Axis_1&gt;</I> and <I>&lt;Axis_2&gt;</I> specify the lengths and directions of the edges of the light. Since the area lights are rectangular in shape these vectors should be perpendicular to each other. The larger the size of the light the thicker the soft part of shadows will be. The integers <I>Size_1</I> and <I>Size_2</I> specify the number of rows and columns of point sources of the. The more lights you use the smoother your shadows will be but the longer they will take to render.</P>
+<P>Note that it is possible to specify spotlight parameters along with the area light parameters to create area spotlights. Using area spotlights is a good way to speed up scenes that use area lights since you can confine the lengthy soft shadow calculations to only the parts of your scene that need them.</P>
+<P>An interesting effect can be created using a linear light source. Rather than having a rectangular shape, a linear light stretches along a line sort of like a thin fluorescent tube. To create a linear light just create an area light with one of the array dimensions set to 1.</P>
+<P>The <b><code>jitter</code></b> command is optional. When used it causes the positions of the point lights in the array to be randomly jittered to eliminate any shadow banding that may occur. The jittering is completely random from render to render and should not be used when generating animations.</P>
+<P>The <b><code>adaptive</code></b> command is used to enable adaptive sampling of the light source. By default POV-Ray calculates the amount of light that reaches a surface from an area light by shooting a test ray at every point light within the array. As you can imagine this is very slow. Adaptive sampling on the other hand attempts to approximate the same calculation by using a minimum number of test rays. The number specified after the keyword controls how much adaptive sampling is used. The higher the number the more accurate your shadows will be but the longer they will take to render. If you're not sure what value to use a good starting point is <b><code>adaptive 1</code></b>. The <b><code>adaptive</code></b> keyword only accepts integer values and cannot be set lower than 0.</P>
+<P>When performing adaptive sampling POV-Ray starts by shooting a test ray at each of the four corners of the area light. If the amount of light received from all four corners is approximately the same then the area light is assumed to be either fully in view or fully blocked. The light intensity is then calculated as the average intensity of the light received from the four corners. However, if the light intensity from the four corners differs significantly then the area light is partially blocked. The area light is split into four quarters and each section is sampled as described above. This allows POV-Ray to rapidly approximate how much of the area light is in view without having to shoot a test ray at every light in the array. Visually the sampling goes like shown below.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image112.gif" WIDTH=428 HEIGHT=303></P>
+<P ALIGN="CENTER">Area light adaptive samples.</P>
+</B><P>While the adaptive sampling method is fast (relatively speaking) it can sometimes produces inaccurate shadows. The solution is to reduce the amount of adaptive sampling without completely turning it off. The number after the adaptive keyword adjusts the number of times that the area light will be split before the adaptive phase begins.  For example if you use <b><code>adaptive 0</code></b> a minimum of 4 rays will be shot at the light. If you use <b><code>adaptive 1</code></b> a minimum of 9 rays will be shot (<b><code>adaptive 2</code></b> gives 25 rays, <b><code>adaptive 3</code></b> gives 81 rays, etc). Obviously the more shadow rays you shoot the slower the rendering will be so you should use the lowest value that gives acceptable results.</P>
+<P>The number of rays never exceeds the values you specify for rows and columns of points. For example <b><code>area_light x,y,4,4</code></b> specifies a 4 by 4 array of lights. If you specify <b><code>adaptive 3</code></b> it would mean that you should start with a 9 by 9 array. In this case no adaptive sampling is done. The 4 by 4 array is used.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov270.htm">Cylindrical Lights</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov272.htm">Shadowless Lights</A>
+</P>
+</BODY>
+</HTML>
+

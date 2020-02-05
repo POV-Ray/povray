@@ -1,0 +1,75 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Using Focal Blur</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov94.htm">Using the Camera</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov96.htm">Using Atmospheric Effects</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405145"><A NAME="_Toc411405421"><A NAME="_Toc414198915"><A NAME="_Toc429993425">Using Focal Blur</A></A></A></A></H3>
+<P>Let's construct a simple scene to illustrate the use of focal blur. For this example we will use a pink sphere, a green box and a blue cylinder with the sphere placed in the foreground, the box in the center and the cylinder in the background. A checkered floor for perspective and a couple of light sources will complete the scene. We create a new file called <CODE>focaldem.pov</CODE> and enter the following text</P>
+<PRE>  #include "colors.inc"
+  #include "shapes.inc"
+  #include "textures.inc"
+  sphere { &lt;1, 0, -6&gt;, 0.5
+    finish {
+      ambient 0.1
+      diffuse 0.6
+    }
+    pigment { NeonPink }
+  }
+  box { &lt;-1, -1, -1&gt;, &lt; 1,  1,  1&gt;
+    rotate &lt;0, -20, 0&gt;
+    finish {
+      ambient 0.1
+      diffuse 0.6
+    }
+    pigment { Green }
+  }
+  cylinder { &lt;-6, 6, 30&gt;, &lt;-6, -1, 30&gt;, 3
+    finish {
+      ambient 0.1
+      diffuse 0.6
+    }
+    pigment {NeonBlue}
+  }
+  plane { y, -1.0
+    pigment {
+      checker color Gray65 color Gray30
+    }
+  }
+  light_source { &lt;5, 30, -30&gt; color White }
+  light_source { &lt;-5, 30, -30&gt; color White }</PRE>
+<P>Now we can proceed to place our focal blur camera to an appropriate viewing position. Straight back from our three objects will yield a nice view. Adjusting the focal point will move the point of focus anywhere in the scene. We just add the following lines to the file:</P>
+<PRE>  camera {
+    location &lt;0.0, 1.0, -10.0&gt;
+    look_at  &lt;0.0, 1.0,  0.0&gt;
+  //  focal_point &lt;-6, 1, 30&gt;    // blue cylinder in focus
+  //  focal_point &lt; 0, 1,  0&gt;    // green box in focus
+    focal_point &lt; 1, 1, -6&gt;    // pink sphere in focus
+    aperture 0.4     // a nice compromise
+  //  aperture 0.05    // almost everything is in focus
+  //  aperture 1.5     // much blurring
+  //  blur_samples 4       // fewer samples, faster to render
+    blur_samples 20      // more samples, higher quality image
+  }</PRE>
+<P>The focal point is simply the point at which the focus of the camera is at its sharpest. We position this point in our scene and assign a value to the aperture to adjust how close or how far away we want the focal blur to occur from the focused area.</P>
+<P>The aperture setting can be considered an <I>area of focus</I>. Opening up the aperture has the effect of making the area of focus smaller while giving the aperture a smaller value makes the area of focus larger. This is how we control where focal blur begins to occur around the focal point.</P>
+<P>The blur samples setting determines how many rays are used to sample each pixel. Basically, the more rays that are used the higher the quality of the resultant image, but consequently the longer it takes to render. Each scene is different so we have to experiment.  This tutorial has examples of 4 and 20 samples but we can use more for high resolution images. We should not use more samples than is necessary to achieve the desired quality - more samples take more time to render. The confidence and variance settings are covered in section "<A HREF="pov233.htm#_Ref414259498">Focal Blur</A>".</P>
+<P>We experiment with the focal point, aperture, and blur sample settings.  The scene has lines with other values that we can try by commenting out the default line with double slash marks and un-commenting the line we wish to try out. We make only one change at a time to see the effect on the scene.</P>
+<P>Two final points when tracing a scene using a focal blur camera. We needn't specify anti-aliasing because the focal blur code uses its one sampling method that automatically takes care of anti-aliasing. Focal blur can only be used with the perspective camera.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov94.htm">Using the Camera</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov96.htm">Using Atmospheric Effects</A>
+</P>
+</BODY>
+</HTML>
+

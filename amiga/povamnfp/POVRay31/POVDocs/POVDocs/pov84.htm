@@ -1,0 +1,38 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Working With Normal Maps</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov83.htm">Working With Pigment Maps</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov85.htm">Working With Texture Maps</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405136"><A NAME="_Toc411405412"><A NAME="_Toc414198904"><A NAME="_Toc429993414">Working With Normal Maps</A></A></A></A></H3>
+<P> For our next example, we replace the plane in the scene with this one.</P>
+<PRE>  plane { -z, 0
+    pigment { White }
+    normal {
+      gradient x
+      normal_map {
+        [ 0.0 bumps 1 scale .1]
+        [ 1.0 ripples 1 scale .1]
+      }
+    }
+  }</PRE>
+<P>First of all, we have chosen a solid white color to show off all bumping to best effect. Secondly, we notice that our map blends smoothly from all bumps at 0.0 to all ripples at 1.0, but because this is a default gradient, it falls off abruptly back to bumps at the beginning of the next cycle. We Render this and see just enough sharp transitions to clearly see where one normal gives over to another, yet also an example of how two normal patterns look while they are smoothly blending into one another.</P>
+<P>The syntax is the same as we would expect. We just changed the type of map, moved it into the normal block and supplied appropriate bump types. It is important to remember that as of POV-Ray 3, all patterns that work with pigments work as normals as well (and vice versa, of course) so we could just as easily have blended from wood to granite, or any other pattern we like. We experiment a bit and get a feel for what the different patterns look like.</P>
+<P>After seeing how interesting the various normals look blended, we might like to see them completely blended all the way through rather than this business of fading from one to the next. Well, that is possible too, but we would be getting ahead of ourselves. That is called the <b><code>average</code></b> function, and we will return to it a little bit further down the page.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov83.htm">Working With Pigment Maps</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov85.htm">Working With Texture Maps</A>
+</P>
+</BODY>
+</HTML>
+

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,7 +39,14 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "frontend/configfrontend.h"
 
-#include "base/image/colourspace.h"
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+// POV-Ray header files (POVMS module)
+// POV-Ray header files (frontend module)
+//  (none at the moment)
 
 namespace pov_frontend
 {
@@ -47,17 +54,18 @@ namespace pov_frontend
 class Display
 {
     public:
-        struct RGBA8 { unsigned char red, green, blue, alpha; };
+        struct RGBA8 final
+        {
+            unsigned char red, green, blue, alpha;
+        };
 
-        Display(unsigned int w, unsigned int h, pov_base::GammaCurvePtr g);
+        Display(unsigned int w, unsigned int h);
         virtual ~Display();
 
         virtual void Initialise() = 0;
 
         unsigned int GetWidth();
         unsigned int GetHeight();
-
-        pov_base::GammaCurvePtr GetGamma();
 
         virtual void DrawPixel(unsigned int x, unsigned int y, const RGBA8& colour) = 0;
 
@@ -72,13 +80,11 @@ class Display
         unsigned int width;
         /// display height
         unsigned int height;
-        /// display gamma correction factor
-        pov_base::GammaCurvePtr gamma;
 
-        /// not available
-        Display();
+        Display() = delete;
 };
 
 }
+// end of namespace pov_frontend
 
 #endif // POVRAY_FRONTEND_DISPLAY_H

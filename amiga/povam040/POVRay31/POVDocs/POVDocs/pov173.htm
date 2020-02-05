@@ -1,0 +1,32 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Vector Functions</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov172.htm">Built-in Vector Identifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov174.htm">Specifying Colors</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc411405171"><A NAME="_Toc411405447"><A NAME="_Ref411667947"><A NAME="_Ref413150466"><A NAME="_Toc414199006"><A NAME="_Toc429993516">Vector Functions</A></A></A></H4>
+<P>POV-Ray defines a variety of built-in functions for manipulating floats, vectors and strings. Function calls consist of a keyword which specifies the name of the function followed by a parameter list enclosed in parentheses. Parameters are separated by commas. For example:</P>
+<PRE> keyword(param1,param2)</PRE>
+<P>The following are the functions which return vector values. They take one or more float, integer, vector, or string parameters. Assume that <b><code>A</code></b> and <b><code>B</code></b> are any valid expression that evaluates to a vector; and <b><code>F</code></b> is any float expression.</P>
+<p><b><code>vaxis_rotate(A,B,F)</code></b>&#9;Rotate <b><code>A</code></b> about <b><code>B</code></b> by <b><code>F</code></b>. Given the x,y,z coordinates of a point in space designated by the vector <b><code>A</code></b>, rotate that point about an arbitrary axis defined by the vector <b><code>B</code></b>. Rotate it through an angle specified in degrees by the float value <b><code>F</code></b>. The result is a vector containing the new x,y,z coordinates of the point.</P>
+<p><b><code>vcross(A,B)&#9;</code></b>Cross product of <b><code>A</code></b> and <b><code>B</code></b>. Returns a vector that is the vector cross product of the two vectors. The resulting vector is perpendicular to the two original vectors and its length is proportional to the angle between them. See the animated demo scene <CODE>VECT2.POV</CODE> for an illustration.</P>
+<p><b><code>vnormalize(A)&#9;</code></b>Normalize vector <b><code>A</code></b>. Returns a unit length vector that is the same direction as <b><code>A</code></b>. Formula is <I>vnormalize=A/vlength(A)</I>.</P>
+<p><b><code>vrotate(A,B)&#9;</code></b>Rotate <b><code>A</code></b> about origin by <b><code>B</code></b>. Given the x,y,z coordinates of a point in space designated by the vector <b><code>A</code></b>, rotate that point about the origin by an amount specified by the vector <b><code>B</code></b>. Rotate it about the x-axis by an angle specified in degrees by the float value <b><code>B.x</code></b>. Similarly <b><code>B.y</code></b> and <b><code>B.z</code></b> specify the amount to rotate in degrees about the y-axis and z-axis. The result is a vector containing the new x,y,z coordinates of the point.</P>
+<P>See section "<A HREF="pov166.htm#_Ref413163935">Float Functions</A>" for other functions which are somewhat vector-related but which return floats.  In addition to the above built-in functions, you may also define your own functions using the new <b><code>#macro</code></b> directive. See the section "<A HREF="pov209.htm#_Ref413063326">User Defined Macros</A>" for more details.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov172.htm">Built-in Vector Identifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov174.htm">Specifying Colors</A>
+</P>
+</BODY>
+</HTML>
+

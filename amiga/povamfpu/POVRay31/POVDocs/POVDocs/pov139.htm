@@ -1,0 +1,42 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Library Paths</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov138.htm">Input File Name</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov140.htm">Language Version</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref413142060"><A NAME="_Ref413233147"><A NAME="_Toc414198973"><A NAME="_Toc429993482">Library Paths</A></A></A></A></H4>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=432>
+<TR><TD WIDTH="39%" VALIGN="TOP">
+<p><b><code>Library_Path=</code></b><I>path</I></TD>
+<TD WIDTH="61%" VALIGN="TOP">
+<P>Add <I>path</I> to list of library paths</TD>
+</TR>
+<TR><TD WIDTH="39%" VALIGN="TOP">
+<p><b><code>+L</code></b><I>path</I></TD>
+<TD WIDTH="61%" VALIGN="TOP">
+<P>Same as <b><code>Library_Path=</code></b><I>path</I></TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>POV-Ray looks for files in the current directory. If it does not find a file it needs it looks in various other library directories which you specify. POV-Ray does not search your operating system path. It only searches the current directory and directories which you specify with this option. For example the standard include files are usually kept in one special directory. You tell POV-Ray to look there with...</P>
+<PRE> Library_Path=c:\povray3\include</PRE>
+<P>You must not specify any final path separators ("\" or "/") at the end.</P>
+<P>Multiple uses of this option switch do not override previous settings. Up to twenty unique paths may be specified. If you specify the exact same path twice it is only counts once. The current directory will be searched first followed by the indicated library directories in the order in which you specified them.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov138.htm">Input File Name</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov140.htm">Language Version</A>
+</P>
+</BODY>
+</HTML>
+

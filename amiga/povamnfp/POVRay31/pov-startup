@@ -1,0 +1,11 @@
+cd povray3:
+path povray3: add
+stack 100000
+alias l list
+alias del delete
+alias x execute
+alias ec endcli
+alias t type
+prompt "*e[1;32mPOV>*e[0m"
+
+

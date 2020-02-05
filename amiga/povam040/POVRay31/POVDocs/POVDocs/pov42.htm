@@ -1,0 +1,83 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Mesh Object</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov41.htm">Understanding The Concept of Splines</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov43.htm">Polygon Object</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405110"><A NAME="_Toc411405386"><A NAME="_Toc414198861"><A NAME="_Toc429993372">Mesh Object</A></A></A></A></H3>
+<P>Mesh objects are very useful because they allow us to create objects containing hundreds or thousands of triangles. Compared to a simple union of triangles the mesh object stores the triangles more efficiently. Copies of mesh objects need only a little additional memory because the triangles are stored only once.</P>
+<P>Almost every object can be approximated using triangles but we may need a lot of triangles to create more complex shapes. Thus we will only create a very simple mesh example. This example will show a very useful feature of the triangles meshes though: a different texture can be assigned to each triangle in the mesh.</P>
+<P>Now let's begin. We will create a simple box with differently colored sides. We create an empty file called <CODE>meshdemo.pov</CODE> and add the following lines.</P>
+<PRE>  camera {
+    location &lt;20, 20, -50&gt;
+    look_at &lt;0, 5, 0&gt;
+  }
+  light_source { &lt;50, 50, -50&gt; color rgb&lt;1, 1, 1&gt; }
+  #declare Red = texture {
+    pigment { color rgb&lt;0.8, 0.2, 0.2&gt; }
+    finish { ambient 0.2 diffuse 0.5 }
+  }
+  #declare Green = texture {
+    pigment { color rgb&lt;0.2, 0.8, 0.2&gt; }
+    finish { ambient 0.2 diffuse 0.5 }
+  }
+  #declare Blue = texture {
+    pigment { color rgb&lt;0.2, 0.2, 0.8&gt; }
+    finish { ambient 0.2 diffuse 0.5 }
+  }</PRE>
+<P>We must declare all textures we want to use inside the mesh before the mesh is created. Textures cannot be specified inside the mesh due to the poor memory performance that would result.</P>
+<P>Now we add the mesh object. Three sides of the box will use individual textures while the other will use the <I>global </I>mesh texture.</P>
+<PRE>  mesh {
+    /* top side */
+    triangle { &lt;-10, 10, -10&gt;, &lt;10, 10, -10&gt;, &lt;10, 10, 10&gt;
+      texture { Red }
+    }
+    triangle { &lt;-10, 10, -10&gt;, &lt;-10, 10, 10&gt;, &lt;10, 10, 10&gt;
+      texture { Red }
+    }
+    /* bottom side */
+    triangle { &lt;-10, -10, -10&gt;, &lt;10, -10, -10&gt;, &lt;10, -10, 10&gt; }
+    triangle { &lt;-10, -10, -10&gt;, &lt;-10, -10, 10&gt;, &lt;10, -10, 10&gt; }
+    /* left side */
+    triangle { &lt;-10, -10, -10&gt;, &lt;-10, -10, 10&gt;, &lt;-10, 10, 10&gt; }
+    triangle { &lt;-10, -10, -10&gt;, &lt;-10, 10, -10&gt;, &lt;-10, 10, 10&gt; }
+    /* right side */
+    triangle { &lt;10, -10, -10&gt;, &lt;10, -10, 10&gt;, &lt;10, 10, 10&gt;
+      texture { Green }
+    }
+    triangle { &lt;10, -10, -10&gt;, &lt;10, 10, -10&gt;, &lt;10, 10, 10&gt;
+      texture { Green }
+    }
+    /* front side */
+    triangle { &lt;-10, -10, -10&gt;, &lt;10, -10, -10&gt;, &lt;-10, 10, -10&gt;
+      texture { Blue }
+    }
+    triangle { &lt;-10, 10, -10&gt;, &lt;10, 10, -10&gt;, &lt;10, -10, -10&gt;
+      texture { Blue }
+    }
+    /* back side */
+    triangle { &lt;-10, -10, 10&gt;, &lt;10, -10, 10&gt;, &lt;-10, 10, 10&gt; }
+    triangle { &lt;-10, 10, 10&gt;, &lt;10, 10, 10&gt;, &lt;10, -10, 10&gt; }
+    texture {
+      pigment { color rgb&lt;0.9, 0.9, 0.9&gt; }
+      finish { ambient 0.2 diffuse 0.7 }
+    }
+  }</PRE>
+<P>Tracing the scene at 320x240 we will see that the top, right and front side of the box have different textures. Though this is not a very impressive example it shows what we can do with mesh objects. More complex examples, also using smooth triangles, can be found under the scene directory as <CODE>chesmsh.pov</CODE> and <CODE>robotmsh.pov</CODE>.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov41.htm">Understanding The Concept of Splines</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov43.htm">Polygon Object</A>
+</P>
+</BODY>
+</HTML>
+

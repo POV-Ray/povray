@@ -1,0 +1,1220 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Poly, Cubic and Quartic</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov258.htm">Plane</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov260.htm">Quadric</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199094"><A NAME="_Toc429993604">Poly, Cubic and Quartic</A></A></H4>
+<P>Higher order polynomial surfaces may be defined by the use of a <b><code>poly</code></b> shape. The syntax is</P>
+<I><DL>
+<DT>POLY:</DT>
+</I><b><code><DD>poly {</code></b> <I>Order</I><b><code>,</code></b><I> &lt;A1</I><b><code>,</code></b><I> A2</I><b><code>,</code></b><I> A3</I><b><code>,</code></b><I>... An&gt; [POLY_MODIFIERS...]</I> <b><code>}</DD>
+</code></b><I><DT>POLY_MODIFIERS:</DT>
+</I><b><code><DD>sturm</code></b>   |   <I>OBJECT_MODIFIER</DD>
+</DL>
+</I><P>where <I>Order</I> is an integer number from 2 to 7 inclusively that specifies the order of the equation. <I>A1, A2, ... An</I> are float values for the coefficients of the equation. There are <I>m</I> such terms where</P>
+<I><P>  n = ((Order+1)*(Order+2)*(Order+3))/6.</P>
+</I><P>The <b><code>cubic</code></b> object is an alternate way to specify 3rd order polys.  Its syntax is:</P>
+<I><DL>
+<DT>CUBIC:</DT>
+</I><b><code><DD>cubic {</code></b><I> &lt;A1</I><b><code>,</code></b><I> A2</I><b><code>,</code></b><I> A3</I><b><code>,</code></b><I>... A20&gt; [POLY_MODIFIERS...]</I> <b><code>}</DD>
+</DL>
+</code></b><P>Also 4th order equations may be specified with the <b><code>quartic</code></b> object.  Its syntax is:</P>
+<I><DL>
+<DT>QUARTIC:</DT>
+</I><b><code><DD>quartic {</code></b><I> &lt;A1</I><b><code>,</code></b><I> A2</I><b><code>,</code></b><I> A3</I><b><code>,</code></b><I>... A35&gt; [POLY_MODIFIERS...]</I> <b><code>}</DD>
+</DL>
+</code></b><P>The following table shows which polynomial terms correspond to which x,y,z factors.  Remember <b><code>cubic</code></b> is actually a 3rd order polynomial and <b><code>quartic</code></b> is 4th order.</P>
+<TABLE BORDER CELLSPACING=3 CELLPADDING=2 WIDTH=545>
+<TR><TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>2nd</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>3rd</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>4th</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>5th</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>6th</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>7th</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>5th</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>6th</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>7th</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>6th</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>7th</TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>1</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>x<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>x<FONT SIZE=1>5</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>6</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>7</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>41</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>81</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>z<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>xz<FONT SIZE=1>3</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>xy</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>y</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>x<FONT SIZE=1>4</FONT>y</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>5</FONT>y</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>6</FONT>y</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>42</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>2</FONT>z<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>2</FONT>z<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y<FONT SIZE=1>2</FONT>z<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>82</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>xz<FONT SIZE=1>2</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>xz</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>z</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>z</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>x<FONT SIZE=1>4</FONT>z</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>5</FONT>z</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>5</FONT>z</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>43</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>2</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>2</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y<FONT SIZE=1>2</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>83</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>z</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>xz</TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>x</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>x<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>5</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>5</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>44</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>2</FONT>z</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>2</FONT>z</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y<FONT SIZE=1>2</FONT>z</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>84</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>1</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>x</TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>5</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>y<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>4</FONT>y<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>5</FONT>y<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>45</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>85</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>7</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>6</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>yz</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>xyz</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>yz</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>yz</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>4</FONT>yz</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>5</FONT>yz</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>46</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>yz<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xyz<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>yz<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>86</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>6</FONT>z</TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>7</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>xy</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>y</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>4</FONT>y</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>5</FONT>y</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>47</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>yz<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xyz<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>yz<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>87</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>6</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>8</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>xz<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>4</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>5</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>48</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>yz<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xyz<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>yz<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>88</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>5</FONT>z<FONT SIZE=1>2</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>9</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>z</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>xz</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>z</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>z</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>4</FONT>z</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>5</FONT>z</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>49</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>yz</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xyz</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>yz</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>89</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>5</FONT>z</TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>10</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>1</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>x</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>5</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>50</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xy</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>90</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>5</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>11</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>y<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>4</FONT>y<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>51</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>z<FONT SIZE=1>5</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xz<FONT SIZE=1>5</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>z<FONT SIZE=1>5</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>91</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>4</FONT>z<FONT SIZE=1>3</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>12</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>2</FONT>z</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>2</FONT>z</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y<FONT SIZE=1>2</FONT>z</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>y<FONT SIZE=1>2</FONT>z</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>4</FONT>y<FONT SIZE=1>2</FONT>z</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>52</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>z<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xz<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>z<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>92</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>4</FONT>z<FONT SIZE=1>2</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>13</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>y<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>4</FONT>y<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>53</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>z<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xz<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>z<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>93</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>4</FONT>z</TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>14</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>yz<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>xyz<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>yz<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>yz<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>4</FONT>yz<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>54</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xz<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>94</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>4</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>15</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>yz</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>xyz</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>yz</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>yz</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>4</FONT>yz</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>55</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>z</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xz</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>z</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>95</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>3</FONT>z<FONT SIZE=1>4</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>16</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>xy</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>y</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>4</FONT>y</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>56</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>1</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>x</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>96</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>3</FONT>z<FONT SIZE=1>3</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>17</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>z<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>xz<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>z<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>z<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>4</FONT>z<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>57</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>y<FONT SIZE=1>6</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>6</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>97</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>3</FONT>z<FONT SIZE=1>2</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>18</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>xz<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>4</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>58</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>y<FONT SIZE=1>5</FONT>z</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>5</FONT>z</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>98</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>3</FONT>z</TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>19</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>z</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>xz</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>z</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>z</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>4</FONT>z</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>59</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>y<FONT SIZE=1>5</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>5</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>99</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>3</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>20</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>1</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>x</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>60</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>y<FONT SIZE=1>4</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>4</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>100</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>2</FONT>z<FONT SIZE=1>5</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>21</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>y<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>61</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>y<FONT SIZE=1>4</FONT>z</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>4</FONT>z</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>101</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>2</FONT>z<FONT SIZE=1>4</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>22</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>3</FONT>z</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>3</FONT>z</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y<FONT SIZE=1>3</FONT>z</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>y<FONT SIZE=1>3</FONT>z</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>62</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>y<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>102</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>2</FONT>z<FONT SIZE=1>3</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>23</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>y<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>63</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>y<FONT SIZE=1>3</FONT>z<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>3</FONT>z<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>103</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>2</FONT>z<FONT SIZE=1>2</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>24</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>2</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>2</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y<FONT SIZE=1>2</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>y<FONT SIZE=1>2</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>64</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>y<FONT SIZE=1>3</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>3</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>104</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>2</FONT>z</TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>25</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>2</FONT>z</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>2</FONT>z</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y<FONT SIZE=1>2</FONT>z</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>y<FONT SIZE=1>2</FONT>z</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>65</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>y<FONT SIZE=1>3</FONT>z</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>3</FONT>z</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>105</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>2</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>26</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>y<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>66</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>y<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>106</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>yz<FONT SIZE=1>6</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>27</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>yz<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xyz<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>yz<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>yz<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>67</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>y<FONT SIZE=1>2</FONT>z<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>2</FONT>z<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>107</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>yz<FONT SIZE=1>5</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>28</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>yz<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xyz<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>yz<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>yz<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>68</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>y<FONT SIZE=1>2</FONT>z<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>2</FONT>z<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>108</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>yz<FONT SIZE=1>4</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>29</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>yz</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xyz</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>yz</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>yz</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>69</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>y<FONT SIZE=1>2</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>2</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>109</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>yz<FONT SIZE=1>3</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>30</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xy</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>y</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>70</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>y<FONT SIZE=1>2</FONT>z</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>2</FONT>z</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>110</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>yz<FONT SIZE=1>2</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>31</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>z<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xz<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>z<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>z<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>71</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>y<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>111</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>yz</TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>32</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>z<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xz<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>z<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>z<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>72</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>yz<FONT SIZE=1>5</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xyz<FONT SIZE=1>5</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>112</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>y</TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>33</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xz<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>73</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>yz<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xyz<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>113</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>z<FONT SIZE=1>7</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>34</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>z</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>xz</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>z</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT>z</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>74</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>yz<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xyz<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>114</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>z<FONT SIZE=1>6</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>35</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>1</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>x</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>3</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>75</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>yz<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xyz<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>115</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>z<FONT SIZE=1>5</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>36</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>y<FONT SIZE=1>5</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>5</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y<FONT SIZE=1>5</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>76</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>yz</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xyz</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>116</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>z<FONT SIZE=1>4</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>37</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>y<FONT SIZE=1>4</FONT>z</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>4</FONT>z</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y<FONT SIZE=1>4</FONT>z</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>77</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>y</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xy</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>117</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>z<FONT SIZE=1>3</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>38</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>y<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>78</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>z<FONT SIZE=1>6</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xz<FONT SIZE=1>6</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>118</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>z<FONT SIZE=1>2</FONT></TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>39</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>y<FONT SIZE=1>3</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>3</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y<FONT SIZE=1>3</FONT>z<FONT SIZE=1>2</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>79</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>z<FONT SIZE=1>5</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xz<FONT SIZE=1>5</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>119</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>z</TD>
+</TR>
+<TR><TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>40</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>y<FONT SIZE=1>3</FONT>z</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xy<FONT SIZE=1>3</FONT>z</TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>x<FONT SIZE=1>2</FONT>y<FONT SIZE=1>3</FONT>z</TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="5%" VALIGN="TOP">
+<P>A<FONT SIZE=1>80</FONT></TD>
+<TD WIDTH="6%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="7%" VALIGN="TOP">
+<P>z<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="8%" VALIGN="TOP">
+<P>xz<FONT SIZE=1>4</FONT></TD>
+<TD WIDTH="4%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>A<FONT SIZE=1>120</FONT></TD>
+<TD WIDTH="5%" VALIGN="TOP">&nbsp;</TD>
+<TD WIDTH="6%" VALIGN="TOP">
+<P>1</TD>
+</TR>
+</TABLE>
+
+<P>Polynomial shapes can be used to describe a large class of shapes including the torus, the lemniscate, etc. For example, to declare a quartic surface requires that each of the coefficients (<I>A1 ... A35</I>) be placed in order into a single long vector of 35 terms.</P>
+<P>As an example let's define a torus the hard way. A Torus can be represented by the equation:</P>
+<P> x<SUP>4</SUP> + y<SUP>4</SUP> + z<SUP>4</SUP> + 2 x<SUP>2</SUP> y<SUP>2</SUP> + 2 x<SUP>2</SUP> z<SUP>2</SUP> + 2 y<SUP>2</SUP> z<SUP>2</SUP> -</P>
+<P> 2 (r_0<SUP>2</SUP> + r_1<SUP>2</SUP>) x<SUP>2</SUP> + 2 (r_0<SUP>2</SUP> - r_1<SUP>2</SUP>) y<SUP>2</SUP> -</P>
+<P> 2 (r_0<SUP>2</SUP> + r_1<SUP>2</SUP>) z<SUP>2</SUP> + (r_0<SUP>2</SUP> - r_1<SUP>2</SUP>)<SUP>2</SUP> = 0</P>
+<P>Where r_0 is the major radius of the torus, the distance from the hole of the donut to the middle of the ring of the donut, and r_1 is the minor radius of the torus, the distance from the middle of the ring of the donut to the outer surface. The following object declaration is for a torus having major radius 6.3 minor radius 3.5 (Making the maximum width just under 20).</P>
+<PRE>  // Torus having major radius sqrt(40), minor radius sqrt(12)
+  quartic {
+    &lt; 1,   0,   0,   0,   2,   0,   0,   2,   0,
+   -104,   0,   0,   0,   0,   0,   0,   0,   0,
+      0,   0,   1,   0,   0,   2,   0,  56,   0,
+      0,   0,   0,   1,   0, -104,  0, 784 &gt;
+    sturm
+  }</PRE>
+<P>Poly, cubic and quartics are just like quadrics in that you don't have to understand what one is to use one. The file <CODE>shapesq.inc</CODE> has plenty of pre-defined quartics for you to play with. </P>
+<P>Polys use highly complex computations and will not always render perfectly. If the surface is not smooth, has dropouts, or extra random pixels, try using the optional keyword <b><code>sturm</code></b> in the definition. This will cause a slower but more accurate calculation method to be used. Usually, but not always, this will solve the problem. If sturm doesn't work, try rotating or translating the shape by some small amount.</P>
+<P>There are really so many different polynomial shapes, we can't even begin to list or describe them all. If you are interested and mathematically inclined, an excellent reference book for curves and surfaces where you'll find more polynomial shape formulas is:</P>
+<P>  "The CRC Handbook of Mathematical Curves and Surfaces"</P>
+<P>  David von Seggern</P>
+<P>  CRC Press, 1990</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov258.htm">Plane</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov260.htm">Quadric</A>
+</P>
+</BODY>
+</HTML>
+

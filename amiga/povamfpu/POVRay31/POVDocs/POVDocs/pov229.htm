@@ -1,0 +1,27 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - The Direction Vector</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov228.htm">Angle</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov230.htm">Up and Right Vectors</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199062"><A NAME="_Toc429993572">The Direction Vector</A></A></H4>
+<P>You will probably not need to explicitly specify or change the camera <b><code>direction</code></b> vector but it is described here in case you do.  It tells POV-Ray the initial direction to point the camera before moving it with the <b><code>look_at</code></b> or <b><code>rotate</code></b> vectors (the default value is <b><code>direction&lt;0,0,1&gt;</code></b>). It may also be used to control the (horizontal) field of view with some types of projection. The length of the vector determines the distance of the viewing plane from the camera's location.  A shorter <b><code>direction</code></b> vector gives a wider view while a longer vector zooms in for close-ups.  In early versions of POV-Ray, this was the only way to adjust field of view.  However zooming should now be done using the easier to use <b><code>angle</code></b> keyword.</P>
+<P>If you are using the <b><code>ultra_wide_angle</code></b>, <b><code>panoramic</code></b>, or <b><code>cylindrical</code></b> projection you should use a unit length <b><code>direction</code></b> vector to avoid strange results.</P>
+<P>The length of the <b><code>direction</code></b> vector doesn't matter when using the <b><code>orthographic</code></b>, <b><code>fisheye</code></b>, or <b><code>omnimax</code></b> projection types.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov228.htm">Angle</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov230.htm">Up and Right Vectors</A>
+</P>
+</BODY>
+</HTML>
+

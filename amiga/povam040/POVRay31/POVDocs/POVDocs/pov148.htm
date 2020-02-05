@@ -1,0 +1,185 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Directing Text Streams to Files</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov147.htm">Console Text Output</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov149.htm">Help Screen Switches</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref413328828"><A NAME="_Toc414198982"><A NAME="_Toc429993491">Directing Text Streams to Files</A></A></A></H4>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=542>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>Debug_File=true</code></b></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+Echo debug info text to <CODE>DEBUG.OUT
+</CODE></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>Debug_File=false</code></b></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+Turn off file output of debug info
+</TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>Debug_File=</B></code><i>file</i></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<P>Echo debug info text to <I>file</I></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>+GD</B></code><i>file</i></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<p>Both <code><B>Debug_Console=On</B>, <B>Debug_File=</B></code><i>file</i></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>-GD</B></code><i>file</i></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<p>Both <code><B>Debug_Console=Off</B>, <B>Debug_File=</B></code><i>file</i></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>Fatal_File=true</code></b></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<P>Echo fatal text to <CODE>FATAL.OUT</CODE></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>Fatal_File=false</code></b></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<P>Turn off file output of fatal</TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>Fatal_File=</B></code><i>file</i></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<P>Echo fatal info text to <I>file</I></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>+GF</B></code><i>file</i></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<p>Both <code><B>Fatal_Console=On</B>, <B>Fatal_File=</B></code><i>file</i></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>-GF</B></code><i>file</i></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<p>Both <code><B>Fatal_Console=Off</B>, <B>Fatal_File=</B></code><i>file</i></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>Render_File=true</code></b></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<P>Echo render info text to <CODE>RENDER.OUT</CODE></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>Render_File=false</code></b></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<P>Turn off file output of render info</TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>Render_File=</B></code><i>file</i></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<P>Echo render info text to <I>file</I></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>+GR</B></code><i>file</i></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<p>Both <code><B>Render_Console=On</B>, <B>Render_File=</B></code><i>file</i></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>-GR</B></code><i>file</i></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<p>Both <code><B>Render_Console=Off</B>, <B>Render_File=</B></code><i>file</i></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>Statistic_File=true</code></b></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<P>Echo statistic text to <CODE>STATS.OUT</CODE></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>Statistic_File=false</code></b></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<P>Turn off file output of statistics</TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>Statistic_File=</B></code><i>file</i></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<P>Echo statistic text to <I>file</I></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>+GS</code></b><I>file</I></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<p>Both <code><B>Statistic_Console=On</B>, <B>Statistic_File=</B></code><i>file</i></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>-GS</code></b><I>file</I></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<p>Both <code><B>Statistic_Console=Off</B>, <B>Statistic_File=</B></code><i>file</i></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>Warning_File=true</code></b></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<P>Echo warning info text to <CODE>WARNING.OUT</CODE></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>Warning_File=false</code></b></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<P>Turn off file output of warning info</TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>Warning_File=</B></code><i>file</i></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<P>Echo warning info text to <I>file</I></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>+GW</B></code><i>file</i></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<p>Both <code><B>Warning_Console=On</B>, <B>Warning_File=</B></code><i>file</i></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>-GW</B></code><i>file</i></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<p>Both <code><B>Warning_Console=Off</B>, <B>Warning_File=</B></code><i>file</i></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>All_File=true</code></b></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+Echo all debug, fatal, render, statistic, and warning text to <CODE>ALLTEXT.OUT
+</CODE></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>All_File=false</code></b></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+Turn off file output of all debug, fatal, render, statistic, and warning text.
+</TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>All_File=</B></code><i>file</i></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<P>Echo all debug, fatal, render, statistic, and warning text to <I>file</I></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>+GA</B></code><i>file</i></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<p>Both <code><B>All_Console=On</B>, <B>All_File=</B></code><i>file</i></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>-GA</B></code><i>file</i></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<p>Both <code><B>All_Console=Off</B>, <B>All_File=</B></code><i>file</i></TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>You may direct a copy of the text streams to a text file for the debug, fatal, render, statistic, or warning text streams. For example the <b><code>Statistic_File</code></b>=<I>s</I> option or the <b><code>+GS</code></b><I>s</I> switch. If the string <I>s </I>is <b><code>true</code></b> or any of the other valid <b><code>true</code></b> strings then that stream is redirected to a file with a default name. Valid <b><code>true</code></b> values are <b><code>true</code></b>, <b><code>yes</code></b>, <b><code>on</code></b> or <b><code>1</code></b>. If the value is <b><code>false</code></b> the direction to a text file is turned off. Valid <b><code>false</code></b> values are <b><code>false</code></b>, <b><code>no</code></b>, <b><code>off</code></b> or <b><code>0</code></b>. Any other string specified turns on file output and the string is interpreted as the output file name.</P>
+<P>Similarly you may specify such a true, false or file name string after a switch such as <b><code>+GS</code></b><I>file</I>. You may also direct all five streams to the same file using the <b><code>All_File</code></b> option or <b><code>+GA</code></b> switch. You may not specify the same file for two or more streams because POV-Ray will fail when it tries to open or close the same file twice.</P>
+<P>Note that these options take effect immediately when specified. Obviously any error or warning messages that might occur before the option is read will not be affected.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov147.htm">Console Text Output</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov149.htm">Help Screen Switches</A>
+</P>
+</BODY>
+</HTML>
+

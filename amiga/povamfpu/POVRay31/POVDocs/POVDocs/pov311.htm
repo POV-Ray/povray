@@ -1,0 +1,42 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Patterned Textures</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov310.htm">Halo</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov312.htm">Texture Maps</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405209"><A NAME="_Toc411405485"><A NAME="_Toc414199157"><A NAME="_Ref417301436"><A NAME="_Ref417301470"><A NAME="_Ref418334482"><A NAME="_Toc429993668">Patterned Textures</A></A></A></A></A></A></A></H3>
+<P>Patterned textures are complex textures made up of multiple textures.  The component textures may be plain textures or may be made up of patterned textures. A plain texture has just one pigment, normal and finish statement. Even a pigment with a pigment map is still one pigment and thus considered a plain texture as are normals with normal map statements.</P>
+<P>Patterned textures use either a <b><code>texture_map</code></b> statement to specify a blend or pattern of textures or they use block textures such as <b><code>checker</code></b> with a texture list or a bitmap similar to an image map called a <I>material map</I> specified with a <b><code>material_map</code></b> statement.</P>
+<P>The syntax is...</P>
+<I><DL>
+<DT>PATTERNED_TEXTURE:</DT>
+</I><b><code><DD>texture {</code></b> <I>[PATTERNED_TEXTURE_ID] [TRANSFORMATIONS...] </I><b><code>}</code></b>   |</DD>
+<b><code><DD>texture {</code></b> <I>PATTERN_TYPE [TEXTURE_PATTERN_MODIFIERS...] </I><b><code>}</code></b>   |</DD>
+<b><code><DD>texture {</code></b> <b><code>tiles</code></b><I> TEXTURE </I> <b><code>tile2</code></b><I> TEXTURE [TRANSFORMATIONS...] </I><b><code>}</code></b>   |</DD>
+<b><code><DD>texture {</code></b> </DD>
+<b><code><DD>material_map{</code></b> </DD>
+<I><DD>BITMAP_TYPE "bitmap.ext" [BITMAP_MODS...] TEXTURE... [TRANSFORMATIONS...]</DD>
+</I><b><code><DD>}</DD>
+<DD>}</DD>
+</code></b><I><DT>TEXTURE_PATTERN_MODIFIER:</DT>
+<DD>PATTERN_MODIFIER</I>   |   <I>TEXTURE_LIST</I>   |</DD>
+<b><code><DD>texture_map{</code></b> <I>TEXTURE_MAP_BODY</I> <b><code>}</DD>
+</DL>
+</code></b><P>There are restrictions on using patterned textures. A patterned texture may not be used as a default texture (see section "<A HREF="pov199.htm#_Ref418327261">The #default Directive</A>"). A patterned texture cannot be used as a layer in a layered texture however you may use layered textures as any of the textures contained within a patterned texture.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov310.htm">Halo</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov312.htm">Texture Maps</A>
+</P>
+</BODY>
+</HTML>
+

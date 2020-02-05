@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,6 +36,16 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/scene/object.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <string>
+
+// POV-Ray header files (base module)
+#include "base/povassert.h"
+
+// POV-Ray header files (core module)
 #include "core/material/interior.h"
 #include "core/material/texture.h"
 #include "core/math/matrix.h"
@@ -44,12 +54,15 @@
 #include "core/shape/box.h"
 #include "core/shape/csg.h"
 #include "core/shape/sphere.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov
 {
+
+using std::vector;
 
 template<int BX, int BY, int BZ>
 FORCEINLINE bool Intersect_BBox_Dir(const BoundingBox& bbox, const BBoxVector3d& origin, const BBoxVector3d& invdir, BBoxScalar mind, BBoxScalar maxd);
@@ -68,7 +81,7 @@ std::string& ObjectDebugHelper::SimpleDesc(std::string& result)
     result = str;
     if(IsCopy)
         result += "Copy of ";
-    if(Tag == "")
+    if(Tag.empty())
         result += "Unnamed object";
     else
         result += Tag;
@@ -104,7 +117,7 @@ std::string& ObjectDebugHelper::SimpleDesc(std::string& result)
 
 bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, TraceThreadData *threadData)
 {
-    if(object != NULL)
+    if (object != nullptr)
     {
         DBL closest = HUGE_VAL;
         BBoxVector3d origin;
@@ -158,7 +171,7 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, Tr
 
 bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, const RayObjectCondition& postcondition, TraceThreadData *threadData)
 {
-    if(object != NULL)
+    if (object != nullptr)
     {
         DBL closest = HUGE_VAL;
         BBoxVector3d origin;
@@ -212,7 +225,7 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, co
 
 bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, BBoxDirection variant, const BBoxVector3d& origin, const BBoxVector3d& invdir, TraceThreadData *threadData)
 {
-    if(object != NULL)
+    if (object != nullptr)
     {
         DBL closest = HUGE_VAL;
 
@@ -258,7 +271,7 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, BB
 
 bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, BBoxDirection variant, const BBoxVector3d& origin, const BBoxVector3d& invdir, const RayObjectCondition& postcondition, TraceThreadData *threadData)
 {
-    if(object != NULL)
+    if (object != nullptr)
     {
         DBL closest = HUGE_VAL;
 
@@ -459,7 +472,7 @@ bool Point_In_Clip (const Vector3d& IPoint, const vector<ObjectPtr>& Clip, Trace
 
 void Translate_Object (ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *Trans)
 {
-    if(Object == NULL)
+    if (Object == nullptr)
         return;
 
     for(vector<ObjectPtr>::iterator Sib = Object->Bound.begin(); Sib != Object->Bound.end(); Sib++)
@@ -480,7 +493,7 @@ void Translate_Object (ObjectPtr Object, const Vector3d& Vector, const TRANSFORM
         Transform_Textures(Object->Interior_Texture, Trans);
     }
 
-    if(Object->interior != NULL)
+    if (Object->interior != nullptr)
         Object->interior->Transform(Trans);
 
     Object->Translate(Vector, Trans);
@@ -516,7 +529,7 @@ void Translate_Object (ObjectPtr Object, const Vector3d& Vector, const TRANSFORM
 
 void Rotate_Object (ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *Trans)
 {
-    if (Object == NULL)
+    if (Object == nullptr)
         return;
 
     for(vector<ObjectPtr>::iterator Sib = Object->Bound.begin(); Sib != Object->Bound.end(); Sib++)
@@ -539,7 +552,7 @@ void Rotate_Object (ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *T
         Transform_Textures(Object->Interior_Texture, Trans);
     }
 
-    if(Object->interior != NULL)
+    if (Object->interior != nullptr)
         Object->interior->Transform(Trans);
 
     Object->Rotate(Vector, Trans);
@@ -575,7 +588,7 @@ void Rotate_Object (ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *T
 
 void Scale_Object (ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *Trans)
 {
-    if (Object == NULL)
+    if (Object == nullptr)
         return;
 
     for(vector<ObjectPtr>::iterator Sib = Object->Bound.begin(); Sib != Object->Bound.end(); Sib++)
@@ -596,7 +609,7 @@ void Scale_Object (ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *Tr
         Transform_Textures(Object->Interior_Texture, Trans);
     }
 
-    if(Object->interior != NULL)
+    if (Object->interior != nullptr)
         Object->interior->Transform(Trans);
 
     Object->Scale(Vector, Trans);
@@ -632,7 +645,7 @@ void Scale_Object (ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *Tr
 
 void Transform_Object (ObjectPtr Object, const TRANSFORM *Trans)
 {
-    if (Object == NULL)
+    if (Object == nullptr)
         return;
 
     for(vector<ObjectPtr>::iterator Sib = Object->Bound.begin(); Sib != Object->Bound.end(); Sib++)
@@ -655,7 +668,7 @@ void Transform_Object (ObjectPtr Object, const TRANSFORM *Trans)
         Transform_Textures(Object->Interior_Texture, Trans);
     }
 
-    if(Object->interior != NULL)
+    if (Object->interior != nullptr)
         Object->interior->Transform(Trans);
 
     Object->Transform(Trans);
@@ -693,8 +706,8 @@ ObjectPtr Copy_Object (ObjectPtr Old)
 {
     ObjectPtr New;
 
-    if(Old == NULL)
-        return NULL;
+    if (Old == nullptr)
+        return nullptr;
 
     New = Old->Copy();
 
@@ -720,7 +733,7 @@ ObjectPtr Copy_Object (ObjectPtr Old)
 
     New->Texture = Copy_Textures (Old->Texture);
     New->Interior_Texture = Copy_Textures (Old->Interior_Texture);
-    if(Old->interior != NULL)
+    if (Old->interior != nullptr)
         New->interior = InteriorPtr(new Interior(*(Old->interior)));
     else
         New->interior.reset();
@@ -805,7 +818,7 @@ void Destroy_Object(vector<ObjectPtr>& Objects)
 
 void Destroy_Object(ObjectPtr Object)
 {
-    if(Object != NULL)
+    if (Object != nullptr)
     {
         bool DestroyClip = true;
         if (!Object->Bound.empty() && !Object->Clip.empty())
@@ -818,7 +831,7 @@ void Destroy_Object(ObjectPtr Object)
         if (DestroyClip)
             Destroy_Object(Object->Clip);
 
-        if (dynamic_cast<CompoundObject *> (Object) != NULL)
+        if (dynamic_cast<CompoundObject *>(Object) != nullptr)
             Destroy_Object ((dynamic_cast<CompoundObject *> (Object))->children);
 
         delete Object;
@@ -866,7 +879,7 @@ double ObjectBase::GetPotential (const Vector3d& p, bool subtractThreshold, Trac
 *
 ******************************************************************************/
 
-void ObjectBase::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *) const
+void ObjectBase::UVCoord(Vector2d& Result, const Intersection *Inter) const
 {
     Result[U] = Inter->IPoint[X];
     Result[V] = Inter->IPoint[Y];
@@ -874,11 +887,11 @@ void ObjectBase::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThrea
 
 void ObjectBase::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextureVector& textures, TraceThreadData *threaddata)
 {
-    if((Interior_Texture != NULL) && (hitinside == true))
+    if ((Interior_Texture != nullptr) && (hitinside == true))
         textures.push_back(WeightedTexture(1.0, Interior_Texture));
-    else if(Texture != NULL)
+    else if (Texture != nullptr)
         textures.push_back(WeightedTexture(1.0, Texture));
-    else if(isect->Csg != NULL)
+    else if (isect->Csg != nullptr)
         isect->Csg->Determine_Textures(isect, hitinside, textures, threaddata);
 }
 
@@ -927,6 +940,12 @@ bool ObjectBase::Intersect_BBox(BBoxDirection variant, const BBoxVector3d& origi
     return false; // unreachable
 }
 
+bool ObjectBase::IsOpaque() const
+{
+    return Test_Opacity(Texture) &&
+           ((Interior_Texture == nullptr) || Test_Opacity(Interior_Texture));
+}
+
 void ContainedByBox::ComputeBBox(BoundingBox& rBbox) const
 {
     rBbox.lowerLeft = BBoxVector3d(corner1);
@@ -954,7 +973,7 @@ bool ContainedBySphere::Intersect(const Ray& ray, const TRANSFORM* pTrans, DBL& 
     DBL len;
     BasicRay newRay;
 
-    if(pTrans != NULL)
+    if (pTrans != nullptr)
     {
         MInvTransRay(newRay, ray, pTrans);
         len = newRay.Direction.length();
@@ -1012,7 +1031,7 @@ void ContainedByBox::Normal(const Vector3d& point, const TRANSFORM* pTrans, int 
     }
 
     /* Transform the normal into the world space. */
-    if(pTrans != NULL)
+    if (pTrans != nullptr)
     {
         MTransNormal(rNormal, rNormal, pTrans);
 
@@ -1025,7 +1044,7 @@ void ContainedBySphere::Normal(const Vector3d& point, const TRANSFORM* pTrans, i
     Vector3d newPoint;
 
     /* Transform the point into the isosurface space */
-    if(pTrans != NULL)
+    if (pTrans != nullptr)
         MInvTransPoint(newPoint, point, pTrans);
     else
         newPoint = point;
@@ -1033,7 +1052,7 @@ void ContainedBySphere::Normal(const Vector3d& point, const TRANSFORM* pTrans, i
     rNormal = (newPoint - center) / radius;
 
     /* Transform the normal into the world space. */
-    if(pTrans != NULL)
+    if (pTrans != nullptr)
     {
         MTransNormal(rNormal, rNormal, pTrans);
 
@@ -1090,3 +1109,4 @@ FORCEINLINE bool Intersect_BBox_Dir(const BoundingBox& bbox, const BBoxVector3d&
 }
 
 }
+// end of namespace pov

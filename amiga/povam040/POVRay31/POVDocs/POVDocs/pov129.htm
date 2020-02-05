@@ -1,0 +1,61 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Subsets of Animation Frames</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov128.htm">Internal Animation Loop</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov130.htm">Cyclic Animation</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref412119618"><A NAME="_Toc414198950"><A NAME="_Toc429993459">Subsets of Animation Frames</A></A></A></H4>
+
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=480>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>Subset_Start_Frame=</code></b><I>n</I></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+<P>Set subset starting frame to <I>n</I></TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>Subset_Start_Frame=</code></b><I>0.n</I></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+<P>Set subset starting frame to <I>n</I> percent</TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>Subset_End_Frame=</code></b><I>n</I></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+<P>Set subset ending frame to <I>n</I></TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>Subset_End_Frame=</code></b><I>0.n</I></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+<P>Set subset ending frame to <I>n</I> percent</TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>+SF</code></b><I>n</I> or <b><code>+SF</code></b><I>0.n</I></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+<P>Same as <b><code>Subset_Start_Frame</code></b></TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>+EF</code></b><I>n</I> or <b><code>+EF</code></b><I>0.n</I></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+<P>Same as <b><code>Subset_End_Frame</code></b></TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>When creating a long animation, it may be handy to render only a portion of the animation to see what it looks like. Suppose you have 100 frames but only want to render frames 30 through 40. If you set <b><code>Initial_Frame=30</code></b> and <b><code>Final_Frame=40</code></b> then the clock would vary from 0.0 to 1.0 from frames 30 through 40 rather than 0.30 through 0.40 as it should. Therefore you should leave <b><code>Initial_Frame=1</code></b> and <b><code>Final_Frame=100</code></b> and use <b><code>Subset_Start_Frame=30</code></b> and <b><code>Subset_End_Frame=40</code></b> to selectively render part of the scene. POV-Ray will then properly compute the clock values.</P>
+<P>Usually you will specify the subset using the actual integer frame numbers however an alternate form of the subset commands takes a float value in the range <I>0.0 &lt;=n.nnn &lt;=1.0</I> which is interpreted as a fraction of the whole animation. For example, <b><code>Subset_Start_Frame=0.333</code></b> and <b><code>Subset_End_Frame=0.667</code></b> would render the middle 1/3rd of a sequence regardless of the number of frames.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov128.htm">Internal Animation Loop</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov130.htm">Cyclic Animation</A>
+</P>
+</BODY>
+</HTML>
+

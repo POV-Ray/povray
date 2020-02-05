@@ -1,0 +1,43 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Checker</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov322.htm">Bumps</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov324.htm">Crackle</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199169"><A NAME="_Ref417376730"><A NAME="_Toc429993681">Checker</A></A></A></H4>
+<P>The <b><code>checker</code></b> pattern produces a checkered pattern consisting of alternating squares of two colors.  The syntax is:</P>
+<b><code><DL>
+<DD>pigment { checker</code></b> <I>[COLOR_1 [</I><b><code>,</code></b><I> COLOR_2]] [PATTERN_MODIFIERS...] </I><b><code>}</DD>
+</DL>
+</code></b><P>If no colors are specified then default blue and green colors are used.</P>
+<P>The checker pattern is actually a series of cubes that are one unit in size. Imagine a bunch of 1 inch cubes made from two different colors of modeling clay. Now imagine arranging the cubes in an alternating check pattern and stacking them in layer after layer so that the colors still alternate in every direction. Eventually you would have a larger cube. The pattern of checks on each side is what the POV-Ray checker pattern produces when applied to a box object.  Finally imagine cutting away at the cube until it is carved into a smooth sphere or any other shape. This is what the checker pattern would look like on an object of any kind.</P>
+<P>You may also use pigment statements in place of the colors. For example:</P>
+<PRE>  pigment { checker pigment{Jade}, pigment{Black_Marble} }</PRE>
+<P>This example uses normals:</P>
+<PRE>  normal { checker 0.5 }</PRE>
+<P>The float value is an optional bump size. You may also use full normal statements. For example:</P>
+<PRE>  normal {
+    checker normal{gradient x scale .2},
+            normal{gradient y scale .2}
+  }</PRE>
+<P>When used with textures, the syntax is</P>
+<PRE>  texture { checker texture{T_Wood_3A},texture{Stone12} }</PRE>
+<P>This use of checker as a texture pattern replaces the special tiles texture in previous versions of POV-Ray. You may still use <b><code>tiles</code></b> but it may be phased out in future versions so checker textures are best.</P>
+<P>This is a block pattern which cannot use wave types, <b><code>color_map</code></b>, or <b><code>slope_map</code></b> modifiers.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov322.htm">Bumps</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov324.htm">Crackle</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,59 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Using Reflection and Metallic</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov80.htm">Using Surface Highlights</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov82.htm">Using Iridescence</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198901"><A NAME="_Toc429993411">Using Reflection and Metallic</A></A></H4>
+<P>There is another surface parameter that goes hand in hand with highlights, <b><code>reflection</code></b>. Surfaces that are very shiny usually have a degree of reflection to them. Let's take a look at an example.</P>
+<PRE>  sphere { &lt;0,0,0&gt;, 1
+     pigment { Gray50 }
+     finish {
+        ambient .2
+        diffuse .6
+        specular .75
+        roughness .001
+        reflection .5
+     }
+  }</PRE>
+<P>We see that our sphere now reflects the green and white checkered plane and the black background but the gray color of the sphere seems out of place. This is another time when a lower diffuse value is needed.  Generally, the higher <b><code>reflection</code></b> is the lower <b><code>diffuse</code></b> should be. We lower the diffuse value to 0.3 and the ambient value to 0.1 and render again. That is much better. Let's make our sphere as shiny as a polished gold ball bearing.</P>
+<PRE>  sphere { &lt;0,0,0&gt;, 1
+     pigment { BrightGold }
+     finish {
+        ambient .1
+        diffuse .1
+        specular 1
+        roughness .001
+        reflection .75
+     }
+   }</PRE>
+<P>That is very close but there is something wrong with the highlight. To make the surface appear more like metal the keyword <b><code>metallic</code></b> is used. We add it now to see the difference.</P>
+<PRE>  sphere { &lt;0,0,0&gt;, 1
+     pigment { BrightGold }
+     finish {
+        ambient .1
+        diffuse .1
+        specular 1
+        roughness .001
+        reflection .75
+        metallic
+     }
+  }</PRE>
+<P>We see that the highlight has taken on the color of the surface rather than the light source. This gives the surface a more metallic appearance.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov80.htm">Using Surface Highlights</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov82.htm">Using Iridescence</A>
+</P>
+</BODY>
+</HTML>
+

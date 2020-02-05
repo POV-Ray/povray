@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,20 +36,25 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/math/randomsequence.h"
 
-#include <cassert>
+// C++ variants of C standard header files
+//  (none at the moment)
 
+// C++ standard header files
 #include <limits>
 #include <map>
+#include <mutex>
 #include <stdexcept>
 
+// Boost header files
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
-#if POV_MULTITHREADED
-#include <boost/thread.hpp>
-#endif
 
+// POV-Ray header files (base module)
+#include "base/povassert.h"
+
+// POV-Ray header files (core module)
 #include "core/coretypes.h"
 #include "core/math/randcosweighted.h"
 
@@ -65,6 +70,9 @@ using boost::uniform_int;
 using boost::uniform_real;
 using boost::variate_generator;
 using boost::mt19937;
+
+using std::shared_ptr;
+using std::vector;
 
 #define PRIME_TABLE_COUNT 25
 unsigned int primeTable[PRIME_TABLE_COUNT] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97 };
@@ -118,7 +126,7 @@ vector<int> RandomInts(int minval, int maxval, size_t count)
 {
     mt19937 generator;
     uniform_int<int> distribution(minval, maxval);
-    variate_generator<mt19937, uniform_int<int> > sequence(generator, distribution);
+    variate_generator<mt19937, uniform_int<int>> sequence(generator, distribution);
     vector<int> rands(count);
 
     for(size_t i = 0; i < count; i++)
@@ -131,7 +139,7 @@ vector<double> RandomDoubles(double minval, double maxval, size_t count)
 {
     mt19937 generator;
     uniform_real<double> distribution(minval, maxval);
-    variate_generator<mt19937, uniform_real<double> > sequence(generator, distribution);
+    variate_generator<mt19937, uniform_real<double>> sequence(generator, distribution);
     vector<double> rands(count);
 
     for(size_t i = 0; i < count; i++)
@@ -218,6 +226,45 @@ void RandomDoubleSequence::Generator::SetSeed(size_t seedindex)
 
 
 /**********************************************************************************
+*  Random Distribution Functions
+*********************************************************************************/
+
+
+Vector2d Uniform2dOnSquare(SequentialDoubleGeneratorPtr source)
+{
+    double x = (*source)();
+    double y = (*source)();
+    return Vector2d(x, y);
+}
+
+Vector2d Uniform2dOnDisc(SequentialDoubleGeneratorPtr source)
+{
+    double r = sqrt((*source)());
+    double theta = (*source)() * 2*M_PI;
+    double x = r * cos(theta);
+    double y = r * sin(theta);
+    return Vector2d(x, y);
+}
+
+Vector3d Uniform3dOnSphere(SequentialDoubleGeneratorPtr source)
+{
+    double x = (*source)() * 2 - 1.0;
+    double r = sqrt(1 - x*x);
+    double theta = (*source)() * 2*M_PI;
+    double y = r * cos(theta);
+    double z = r * sin(theta);
+    return Vector3d(x, y, z);
+}
+
+Vector3d CosWeighted3dOnHemisphere(SequentialDoubleGeneratorPtr source)
+{
+    Vector2d v = Uniform2dOnDisc(source);
+    double y = sqrt (1 - v.lengthSqr());
+    return Vector3d(v.x(), y, v.y());
+}
+
+
+/**********************************************************************************
  *  Local Types : Abstract Generators
  *********************************************************************************/
 
@@ -230,11 +277,11 @@ class HybridNumberGenerator : public SeedableNumberGenerator<Type>, public Index
     public:
 
         HybridNumberGenerator(size_t size = 0);
-        virtual Type operator()();
-        virtual shared_ptr<vector<Type> > GetSequence(size_t count);
-        virtual size_t MaxIndex() const;
-        virtual size_t CycleLength() const;
-        virtual void Seed(size_t seed);
+        virtual Type operator()() override;
+        virtual shared_ptr<vector<Type>> GetSequence(size_t count) override;
+        virtual size_t MaxIndex() const override;
+        virtual size_t CycleLength() const override;
+        virtual void Seed(size_t seed) override;
 
     protected:
 
@@ -251,11 +298,12 @@ class HybridNumberGenerator : public SeedableNumberGenerator<Type>, public Index
  *  Template class representing a generator for uniformly distributed numbers in a given range.
  */
 template<class Type, class BoostGenerator, class UniformType, size_t CYCLE_LENGTH = 0>
-class UniformRandomNumberGenerator : public SequentialNumberGenerator<Type>
+class UniformRandomNumberGenerator : public SeedableNumberGenerator<Type>
 {
     public:
 
-        struct ParameterStruct {
+        struct ParameterStruct final
+        {
             ParameterStruct(Type minval, Type maxval);
             Type minval, maxval;
             bool operator< (const ParameterStruct& other) const;
@@ -263,15 +311,16 @@ class UniformRandomNumberGenerator : public SequentialNumberGenerator<Type>
 
         UniformRandomNumberGenerator(const ParameterStruct& param);
         UniformRandomNumberGenerator(Type minval, Type maxval);
-        virtual Type operator()();
-        virtual size_t CycleLength() const;
+        virtual Type operator()() override;
+        virtual size_t CycleLength() const override;
+        virtual void Seed(size_t seed) override;
 
     protected:
         variate_generator<BoostGenerator, UniformType> generator;
 };
 
-typedef UniformRandomNumberGenerator<int,    mt19937, uniform_int<int> >        Mt19937IntGenerator;
-typedef UniformRandomNumberGenerator<double, mt19937, uniform_real<double> >    Mt19937DoubleGenerator;
+typedef UniformRandomNumberGenerator<int,    mt19937, uniform_int<int>>     Mt19937IntGenerator;
+typedef UniformRandomNumberGenerator<double, mt19937, uniform_real<double>> Mt19937DoubleGenerator;
 
 /**
  *  Generator for a 1-dimensional Halton sequence (aka van-der-Corput sequence).
@@ -293,7 +342,7 @@ class HaltonGenerator : public HybridNumberGenerator<Type>
         HaltonGenerator(const ParameterStruct& param);
         HaltonGenerator(unsigned int base, Type minval, Type maxval);
         /// Returns a particular number from the sequence.
-        virtual double operator[](size_t index) const;
+        virtual double operator[](size_t index) const override;
 
     protected:
 
@@ -326,7 +375,7 @@ class LegacyCosWeightedDirectionGenerator : public HybridNumberGenerator<Vector3
         };
 
         LegacyCosWeightedDirectionGenerator(const ParameterStruct& dummy);
-        virtual Vector3d operator[](size_t i) const;
+        virtual Vector3d operator[](size_t i) const override;
 };
 
 
@@ -348,7 +397,7 @@ class Halton2dBasedGenerator : public HybridNumberGenerator<Type>
         };
 
         Halton2dBasedGenerator(const ParameterStruct& param);
-        virtual Type operator[](size_t i) const = 0;
+        virtual Type operator[](size_t i) const override = 0;
 
     protected:
 
@@ -369,7 +418,7 @@ class HaltonCosWeightedDirectionGenerator : public Halton2dBasedGenerator<Vector
         };
 
         HaltonCosWeightedDirectionGenerator(const ParameterStruct& param);
-        virtual Vector3d operator[](size_t i) const;
+        virtual Vector3d operator[](size_t i) const override;
 };
 
 /**
@@ -385,7 +434,7 @@ class HaltonOnDiscGenerator : public Halton2dBasedGenerator<Vector2d, double>
         };
 
         HaltonOnDiscGenerator(const ParameterStruct& param);
-        virtual Vector2d operator[](size_t i) const;
+        virtual Vector2d operator[](size_t i) const override;
 };
 
 /**
@@ -401,7 +450,7 @@ class HaltonUniformDirectionGenerator : public Halton2dBasedGenerator<Vector3d, 
         };
 
         HaltonUniformDirectionGenerator(const ParameterStruct& param);
-        virtual Vector3d operator[](size_t i) const;
+        virtual Vector3d operator[](size_t i) const override;
 };
 
 /**
@@ -411,7 +460,7 @@ class Halton2dGenerator : public Halton2dBasedGenerator<Vector2d, double>
 {
     public:
         Halton2dGenerator(const ParameterStruct& param);
-        virtual Vector2d operator[](size_t i) const;
+        virtual Vector2d operator[](size_t i) const override;
 };
 
 
@@ -430,9 +479,9 @@ class NumberSequenceFactory
         /// Sets up the factory to use a given sequence.
         NumberSequenceFactory(shared_ptr<vector<Type> const> masterSequence);
         /// Sets up the factory to use a given number source.
-        NumberSequenceFactory(shared_ptr<SequentialNumberGenerator<Type> > master);
+        NumberSequenceFactory(shared_ptr<SequentialNumberGenerator<Type>> master);
         /// Sets up the factory to use a given number source, pre-computing a given number of elements.
-        NumberSequenceFactory(shared_ptr<SequentialNumberGenerator<Type> > master, size_t count);
+        NumberSequenceFactory(shared_ptr<SequentialNumberGenerator<Type>> master, size_t count);
         /// Gets a reference to a table of pre-computed numbers having at least the given size.
         /// @note The vector returned may contain more elements than requested.
         shared_ptr<vector<Type> const> operator()(size_t count);
@@ -448,7 +497,7 @@ class NumberSequenceFactory
         GeneratorPtr        master;
         SequenceConstPtr    masterSequence;
 #if POV_MULTITHREADED
-        boost::mutex        masterMutex;
+        std::mutex          masterMutex;
 #endif
 };
 
@@ -465,18 +514,18 @@ class NumberSequenceMetaFactory
 {
     public:
 
-        static shared_ptr<NumberSequenceFactory<ValueType> > GetFactory(const typename GeneratorType::ParameterStruct& param);
+        static shared_ptr<NumberSequenceFactory<ValueType>> GetFactory(const typename GeneratorType::ParameterStruct& param);
 
     protected:
 
         typedef NumberSequenceFactory<ValueType>    Factory;
         typedef shared_ptr<Factory>                 FactoryPtr;
-        typedef weak_ptr<Factory>                   FactoryWeakPtr;
+        typedef std::weak_ptr<Factory>              FactoryWeakPtr;
         typedef std::map<typename GeneratorType::ParameterStruct, FactoryWeakPtr> FactoryTable;
 
         static  FactoryTable*   lookupTable;
 #if POV_MULTITHREADED
-        static  boost::mutex    lookupMutex;
+        static  std::mutex      lookupMutex;
 #endif
 };
 
@@ -499,24 +548,24 @@ class PrecomputedNumberGenerator : public HybridNumberGenerator<Type>
     public:
 
         /// Construct from a sequence factory.
-        PrecomputedNumberGenerator(shared_ptr<NumberSequenceFactory<Type> > master, size_t size) :
+        PrecomputedNumberGenerator(shared_ptr<NumberSequenceFactory<Type>> master, size_t size) :
             HybridNumberGenerator<Type>(size),
             values((*master)(size))
         {}
 
         /// Returns a particular number from the sequence.
-        virtual Type operator[](size_t i) const
+        virtual Type operator[](size_t i) const override
         {
             // According to C++ standard, template classes cannot refer to parent template classes' members by unqualified name
             const size_t& size = HybridNumberGenerator<Type>::size;
             return (*values)[i % size];
         }
         /// Returns a particular subset from the sequence.
-        virtual shared_ptr<vector<Type> > GetSequence(size_t index, size_t count) const
+        virtual shared_ptr<vector<Type>> GetSequence(size_t index, size_t count) const override
         {
             // According to C++ standard, template classes cannot refer to parent template classes' members by unqualified name
             const size_t& size = HybridNumberGenerator<Type>::size;
-            shared_ptr<vector<Type> > data(new vector<Type>);
+            shared_ptr<vector<Type>> data(new vector<Type>);
             data->reserve(count);
             size_t i = index % size;
             while (count >= size - i) // handle wrap-around
@@ -560,9 +609,9 @@ Type HybridNumberGenerator<Type>::operator()()
 }
 
 template<class Type>
-shared_ptr<vector<Type> > HybridNumberGenerator<Type>::GetSequence(size_t count)
+shared_ptr<vector<Type>> HybridNumberGenerator<Type>::GetSequence(size_t count)
 {
-    shared_ptr<vector<Type> > data(IndexedNumberGenerator<Type>::GetSequence(index, count));
+    shared_ptr<vector<Type>> data(IndexedNumberGenerator<Type>::GetSequence(index, count));
     index += count;
     if (size != 0)
         index = index % size;
@@ -634,6 +683,12 @@ size_t UniformRandomNumberGenerator<Type,BoostGenerator,UniformType,CYCLE_LENGTH
         return CYCLE_LENGTH;
 }
 
+template<class Type, class BoostGenerator, class UniformType, size_t CYCLE_LENGTH>
+void UniformRandomNumberGenerator<Type, BoostGenerator, UniformType, CYCLE_LENGTH>::Seed(size_t seed)
+{
+    generator.engine().seed((uint32_t)seed);
+}
+
 
 /**********************************************************************************
  *  HaltonGenerator implementation
@@ -702,12 +757,12 @@ NumberSequenceFactory<Type>::NumberSequenceFactory(shared_ptr<vector<Type> const
 {}
 
 template<class Type>
-NumberSequenceFactory<Type>::NumberSequenceFactory(shared_ptr<SequentialNumberGenerator<Type> > master) :
+NumberSequenceFactory<Type>::NumberSequenceFactory(shared_ptr<SequentialNumberGenerator<Type>> master) :
     master(master)
 {}
 
 template<class Type>
-NumberSequenceFactory<Type>::NumberSequenceFactory(shared_ptr<SequentialNumberGenerator<Type> > master, size_t count) :
+NumberSequenceFactory<Type>::NumberSequenceFactory(shared_ptr<SequentialNumberGenerator<Type>> master, size_t count) :
     master(master)
 {
     (*this)(count); // force initial sequence to be generated
@@ -717,7 +772,7 @@ template<class Type>
 shared_ptr<vector<Type> const> NumberSequenceFactory<Type>::operator()(size_t count)
 {
 #if POV_MULTITHREADED
-    boost::mutex::scoped_lock lock(masterMutex);
+    std::lock_guard<std::mutex> lock(masterMutex);
 #endif
     if (!masterSequence)
     {
@@ -756,18 +811,18 @@ shared_ptr<vector<Type> const> NumberSequenceFactory<Type>::operator()(size_t co
  *********************************************************************************/
 
 template<class ValueType, class GeneratorType>
-std::map<typename GeneratorType::ParameterStruct, weak_ptr<NumberSequenceFactory<ValueType> > >* NumberSequenceMetaFactory<ValueType, GeneratorType>::lookupTable;
+std::map<typename GeneratorType::ParameterStruct, std::weak_ptr<NumberSequenceFactory<ValueType>>>* NumberSequenceMetaFactory<ValueType, GeneratorType>::lookupTable;
 
 #if POV_MULTITHREADED
 template<class ValueType, class GeneratorType>
-boost::mutex NumberSequenceMetaFactory<ValueType, GeneratorType>::lookupMutex;
+std::mutex NumberSequenceMetaFactory<ValueType, GeneratorType>::lookupMutex;
 #endif
 
 template<class ValueType, class GeneratorType>
-shared_ptr<NumberSequenceFactory<ValueType> > NumberSequenceMetaFactory<ValueType, GeneratorType>::GetFactory(const typename GeneratorType::ParameterStruct& param)
+shared_ptr<NumberSequenceFactory<ValueType>> NumberSequenceMetaFactory<ValueType, GeneratorType>::GetFactory(const typename GeneratorType::ParameterStruct& param)
 {
 #if POV_MULTITHREADED
-    boost::mutex::scoped_lock lock(lookupMutex);
+    std::lock_guard<std::mutex> lock(lookupMutex);
 #endif
     if (!lookupTable)
         lookupTable = new FactoryTable();
@@ -775,7 +830,7 @@ shared_ptr<NumberSequenceFactory<ValueType> > NumberSequenceMetaFactory<ValueTyp
     if (!factory)
     {
         shared_ptr<GeneratorType> masterGenerator(new GeneratorType(param));
-        factory = FactoryPtr(new Factory(shared_ptr<SequentialNumberGenerator<ValueType> >(masterGenerator)));
+        factory = FactoryPtr(new Factory(shared_ptr<SequentialNumberGenerator<ValueType>>(masterGenerator)));
         (*lookupTable)[param] = factory;
     }
     return factory;
@@ -929,7 +984,7 @@ SeedableIntGeneratorPtr GetRandomIntGenerator(int minval, int maxval, size_t cou
 {
     POV_RANDOMSEQUENCE_ASSERT(count > 0);
     Mt19937IntGenerator::ParameterStruct param(minval, maxval);
-    shared_ptr<NumberSequenceFactory<int> > factory = Mt19937IntMetaFactory::GetFactory(param);
+    shared_ptr<NumberSequenceFactory<int>> factory = Mt19937IntMetaFactory::GetFactory(param);
     SeedableIntGeneratorPtr generator(new PrecomputedIntGenerator(factory, count));
     (void)(*generator)(); // legacy fix
     return generator;
@@ -939,16 +994,16 @@ SeedableDoubleGeneratorPtr GetRandomDoubleGenerator(double minval, double maxval
 {
     POV_RANDOMSEQUENCE_ASSERT(count > 0);
     Mt19937DoubleGenerator::ParameterStruct param(minval, maxval);
-    shared_ptr<NumberSequenceFactory<double> > factory(Mt19937DoubleMetaFactory::GetFactory(param));
+    shared_ptr<NumberSequenceFactory<double>> factory(Mt19937DoubleMetaFactory::GetFactory(param));
     SeedableDoubleGeneratorPtr generator(new PrecomputedDoubleGenerator(factory, count));
     (void)(*generator)(); // legacy fix
     return generator;
 }
 
-SequentialDoubleGeneratorPtr GetRandomDoubleGenerator(double minval, double maxval)
+SeedableDoubleGeneratorPtr GetRandomDoubleGenerator(double minval, double maxval)
 {
     Mt19937DoubleGenerator::ParameterStruct param(minval, maxval);
-    SequentialDoubleGeneratorPtr generator(new Mt19937DoubleGenerator(param));
+    SeedableDoubleGeneratorPtr generator(new Mt19937DoubleGenerator(param));
     (void)(*generator)(); // legacy fix
     return generator;
 }
@@ -957,7 +1012,7 @@ IndexedDoubleGeneratorPtr GetIndexedRandomDoubleGenerator(double minval, double 
 {
     POV_RANDOMSEQUENCE_ASSERT(count > 0);
     Mt19937DoubleGenerator::ParameterStruct param(minval, maxval);
-    shared_ptr<NumberSequenceFactory<double> > factory(Mt19937DoubleMetaFactory::GetFactory(param));
+    shared_ptr<NumberSequenceFactory<double>> factory(Mt19937DoubleMetaFactory::GetFactory(param));
     return IndexedDoubleGeneratorPtr(new PrecomputedDoubleGenerator(factory, count));
 }
 
@@ -966,7 +1021,7 @@ SequentialVectorGeneratorPtr GetSubRandomCosWeightedDirectionGenerator(unsigned 
     if ((id == 0) && count && (count < LegacyCosWeightedDirectionGenerator::NumEntries))
     {
         LegacyCosWeightedDirectionGenerator::ParameterStruct param;
-        shared_ptr<NumberSequenceFactory<Vector3d> > factory(LegacyCosWeightedDirectionMetaFactory::GetFactory(param));
+        shared_ptr<NumberSequenceFactory<Vector3d>> factory(LegacyCosWeightedDirectionMetaFactory::GetFactory(param));
         return SequentialVectorGeneratorPtr(new PrecomputedVectorGenerator(factory, count));
     }
     else
@@ -974,7 +1029,7 @@ SequentialVectorGeneratorPtr GetSubRandomCosWeightedDirectionGenerator(unsigned 
         HaltonCosWeightedDirectionGenerator::ParameterStruct param(primeTable[id % PRIME_TABLE_COUNT], primeTable[(id+1) % PRIME_TABLE_COUNT]);
         if (count)
         {
-            shared_ptr<NumberSequenceFactory<Vector3d> > factory(HaltonCosWeightedDirectionMetaFactory::GetFactory(param));
+            shared_ptr<NumberSequenceFactory<Vector3d>> factory(HaltonCosWeightedDirectionMetaFactory::GetFactory(param));
             return SequentialVectorGeneratorPtr(new PrecomputedVectorGenerator(factory, count));
         }
         else
@@ -987,7 +1042,7 @@ SequentialDoubleGeneratorPtr GetSubRandomDoubleGenerator(unsigned int id, double
     HaltonDoubleGenerator::ParameterStruct param(primeTable[id % PRIME_TABLE_COUNT], minval, maxval);
     if (count)
     {
-        shared_ptr<NumberSequenceFactory<double> > factory(HaltonUniformDoubleMetaFactory::GetFactory(param));
+        shared_ptr<NumberSequenceFactory<double>> factory(HaltonUniformDoubleMetaFactory::GetFactory(param));
         return SequentialDoubleGeneratorPtr(new PrecomputedDoubleGenerator(factory, count));
     }
     else
@@ -999,7 +1054,7 @@ SequentialVectorGeneratorPtr GetSubRandomDirectionGenerator(unsigned int id, siz
     HaltonUniformDirectionGenerator::ParameterStruct param(primeTable[id % PRIME_TABLE_COUNT], primeTable[(id+1) % PRIME_TABLE_COUNT]);
     if (count)
     {
-        shared_ptr<NumberSequenceFactory<Vector3d> > factory(HaltonUniformDirectionMetaFactory::GetFactory(param));
+        shared_ptr<NumberSequenceFactory<Vector3d>> factory(HaltonUniformDirectionMetaFactory::GetFactory(param));
         return SequentialVectorGeneratorPtr(new PrecomputedVectorGenerator(factory, count));
     }
     else
@@ -1011,7 +1066,7 @@ SequentialVector2dGeneratorPtr GetSubRandomOnDiscGenerator(unsigned int id, doub
     HaltonOnDiscGenerator::ParameterStruct param(primeTable[id % PRIME_TABLE_COUNT], primeTable[(id+1) % PRIME_TABLE_COUNT], radius);
     if (count)
     {
-        shared_ptr<NumberSequenceFactory<Vector2d> > factory(HaltonOnDiscMetaFactory::GetFactory(param));
+        shared_ptr<NumberSequenceFactory<Vector2d>> factory(HaltonOnDiscMetaFactory::GetFactory(param));
         return SequentialVector2dGeneratorPtr(new PrecomputedVector2dGenerator(factory, count));
     }
     else
@@ -1023,11 +1078,12 @@ SequentialVector2dGeneratorPtr GetSubRandom2dGenerator(unsigned int id, double m
     Halton2dGenerator::ParameterStruct param(primeTable[id % PRIME_TABLE_COUNT], primeTable[(id+1) % PRIME_TABLE_COUNT], minX, maxX, minY, maxY);
     if (count)
     {
-        shared_ptr<NumberSequenceFactory<Vector2d> > factory(Halton2dMetaFactory::GetFactory(param));
+        shared_ptr<NumberSequenceFactory<Vector2d>> factory(Halton2dMetaFactory::GetFactory(param));
         return SequentialVector2dGeneratorPtr(new PrecomputedVector2dGenerator(factory, count));
     }
     else
         return SequentialVector2dGeneratorPtr(new Halton2dGenerator(param));
 }
 
-} // end of namespace pov
+}
+// end of namespace pov

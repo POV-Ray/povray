@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Shell Command Sequencing</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov142.htm">String Substitution in Shell Commands</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov144.htm">Shell Command Return Actions</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref412623075"><A NAME="_Toc414198977"><A NAME="_Toc429993486">Shell Command Sequencing</A></A></A></H4>
+<P>Here is the sequence of events in an animation loop. Non-animated scenes work the exact same way except there is no loop.</P><dir>
+1)&#9;Process all INI file keywords and command line switches just once.</P>
+<P>2)&#9;Open any text output streams and do <b><code>Create_INI</code></b> if any.</P>
+<P>3)&#9;Execute <b><code>Pre_Scene_Command</code></b> if any.</P>
+<P>4)&#9;Loop through frames (or just do once on non-animation).</P><dir>
+a)&#9;Execute <b><code>Pre_Frame_Command</code></b> if any.</P>
+<P>b)&#9;Parse entire scene file, open output file and read settings, turn on display, render the frame, destroy all objects, textures etc., close output file, close display.</P>
+<P>c)&#9;Execute <b><code>Post_Frame_Command</code></b> if any.</P>
+<P>d)&#9;Go back to (4a) until all frames are done.</P>
+</dir>
+<P>5)&#9;Execute <b><code>Post_Scene_Command</code></b> if any.</P>
+<P>6)&#9;Exit POV-Ray.</P>
+</dir>
+<P>If the user interrupts processing the <b><code>User_Abort_Command</code></b>, if any, is executed. User aborts can only occur during the parsing and rendering parts of step (4b) above.</P>
+<P>If a fatal error occurs that POV-Ray notices the <b><code>Fatal_Error_Command</code></b>, if any, is executed. Sometimes an unforeseen bug or memory error could cause a total crash of the program in which case there is no chance to shell out. Fatal errors can occur just about anywhere including during the processing of switches or INI files. If a fatal error occurs before POV-Ray has read the <b><code>Fatal_Error_Command</code></b> string then obviously no shell can occur.</P>
+<P>Note that the entire scene is re-parsed for every frame. Future versions of POV-Ray may allow you to hold over parts of a scene from one frame to the next but for now it starts from scratch every time. Note also that the <b><code>Pre_Frame_Command</code></b> occurs before the scene is parsed. You might use this to call some custom scene generation utility before each frame. This utility could rewrite your <CODE>.pov</CODE> or <CODE>.inc</CODE> files if needed. Perhaps you will want to generate new <CODE>.gif</CODE> or <CODE>.tga</CODE> files for image maps or height fields on each frame.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov142.htm">String Substitution in Shell Commands</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov144.htm">Shell Command Return Actions</A>
+</P>
+</BODY>
+</HTML>
+

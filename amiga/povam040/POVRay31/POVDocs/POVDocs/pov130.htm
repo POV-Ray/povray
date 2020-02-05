@@ -1,0 +1,44 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Cyclic Animation</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov129.htm">Subsets of Animation Frames</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov131.htm">Field Rendering</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198951"><A NAME="_Toc429993460">Cyclic Animation</A></A></H4>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=480>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>Cyclic_Animation=</code></b><I>bool</I></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+<P>&#9;Turn cyclic animation on/off</TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>+KC</code></b></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+<P>&#9;Turn cyclic animation on</TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>-KC</code></b></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+<P>&#9;Turn cyclic animation off</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>Many computer animation sequences are designed to be run in a continuous loop. Suppose you have an object that rotates exactly 360 degrees over the course of your animation and you did <b><code>rotate 360*clock*y</code></b> to do so. Both the first and last frames would be identical. Upon playback there would be a brief one frame jerkiness. To eliminate this problem you need to adjust the clock so that the last frame does not match the first. For example a ten frame cyclic animation should not use clock 0.0 to 1.0. It should run from 0.0 to 0.9 in 0.1 increments. However if you change to 20 frames it should run from 0.0 to 0.95 in 0.05 increments. This complicates things because you would have to change the final clock value every time you changed <b><code>Final_Frame</code></b>. Setting <b><code>Cyclic_Animation=on</code></b> or using <b><code>+KC</code></b> will cause POV-Ray to automatically adjust the final clock value for cyclic animation regardless of how many total frames. The default value for this setting is off.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov129.htm">Subsets of Animation Frames</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov131.htm">Field Rendering</A>
+</P>
+</BODY>
+</HTML>
+

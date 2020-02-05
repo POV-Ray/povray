@@ -1,0 +1,98 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Quality Settings</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov150.htm">Tracing Options</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov152.htm">Radiosity Setting</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198985"><A NAME="_Ref417378671"><A NAME="_Toc429993494">Quality Settings</A></A></A></H4>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=336>
+<TR><TD WIDTH="29%" VALIGN="TOP">
+<p><b><code>Quality=</code></b><I>n</I></TD>
+<TD WIDTH="71%" VALIGN="TOP">
+<P>Set quality value to <I>n (0 &lt;= n &lt;= 11)</I></TD>
+</TR>
+<TR><TD WIDTH="29%" VALIGN="TOP">
+<p><b><code>+Q</code></b><I>n</I></TD>
+<TD WIDTH="71%" VALIGN="TOP">
+<P>Same as <b><code>Quality=</code></b><I>n</I></TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>The <b><code>Quality=</code></b><I>n</I> option or <b><code>+Q</code></b><I>n</I> switch allows you to specify the image rendering quality. You may choose to lower the quality for test rendering and raise it for final renders. The quality adjustments are made by eliminating some of the calculations that are normally performed. For example settings below 4 do not render shadows. Settings below 8 do not use reflection or refraction. The duplicate values allow for future expansion.  The values correspond to the following quality levels:</P>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=391>
+<TR><TD WIDTH="18%" VALIGN="TOP">
+<p><code><b>0</B>, <B>1</code></b></TD>
+<TD WIDTH="82%" VALIGN="TOP">
+Just show quick colors. Use full ambient lighting only. Quick colors are used only at 5 or below.
+</TD>
+</TR>
+<TR><TD WIDTH="18%" VALIGN="TOP">
+<p><code><b>2</B>, <B>3</code></b></TD>
+<TD WIDTH="82%" VALIGN="TOP">
+Show specified diffuse and ambient light.
+</TD>
+</TR>
+<TR><TD WIDTH="18%" VALIGN="TOP">
+<p><code><b>4</code></b></TD>
+<TD WIDTH="82%" VALIGN="TOP">
+Render shadows, but no extended lights.
+</TD>
+</TR>
+<TR><TD WIDTH="18%" VALIGN="TOP">
+<p><code><b>5</code></b></TD>
+<TD WIDTH="82%" VALIGN="TOP">
+Render shadows, including extended lights.
+</TD>
+</TR>
+<TR><TD WIDTH="18%" VALIGN="TOP">
+<p><code><b>6</B>, <B>7</code></b></TD>
+<TD WIDTH="82%" VALIGN="TOP">
+Compute texture patterns.
+</TD>
+</TR>
+<TR><TD WIDTH="18%" VALIGN="TOP">
+<p><code><b>8</code></b></TD>
+<TD WIDTH="82%" VALIGN="TOP">
+Compute reflected, refracted, and transmitted rays.
+</TD>
+</TR>
+<TR><TD WIDTH="18%" VALIGN="TOP">
+<p><code><b>9</code></b></TD>
+<TD WIDTH="82%" VALIGN="TOP">
+Compute media.
+</TD>
+</TR>
+<TR><TD WIDTH="18%" VALIGN="TOP">
+<p><code><b>10</code></b></TD>
+<TD WIDTH="82%" VALIGN="TOP">
+Compute radiosity but no media
+</TD>
+</TR>
+<TR><TD WIDTH="18%" VALIGN="TOP">
+<p><code><b>11</code></b></TD>
+<TD WIDTH="82%" VALIGN="TOP">
+Compute radiosity and media
+</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>The default is 9 if not specified.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov150.htm">Tracing Options</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov152.htm">Radiosity Setting</A>
+</P>
+</BODY>
+</HTML>
+

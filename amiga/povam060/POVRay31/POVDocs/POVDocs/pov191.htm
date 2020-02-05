@@ -1,0 +1,32 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - #declare vs. #local</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov190.htm">Declaring identifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov192.htm">Identifier Name Collisions</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref412711267"><A NAME="_Ref413233211"><A NAME="_Toc414199024"><A NAME="_Toc429993534">#declare vs. #local</A></A></A></A></H4>
+<P>Identifiers may be declared either global using <b><code>#declare</code></b> or local using the <b><code>#local</code></b> directive.</P>
+<P>Those created by the <b><code>#declare</code></b> directive are permanent in duration and global in scope. Once created, they are available throughout the scene and they are not released until all parsing is complete or until they are specifically released using <b><code>#undef</code></b>. See "<A HREF="pov193.htm#_Ref413236176">Destroying Identifiers</A>".</P>
+<P>Those created by the <b><code>#local</code></b> directive are temporary in duration and local in scope. They temporarily override any identifiers with the same name. See "<A HREF="pov192.htm#_Ref413236810">Identifier Name </A>".</P>
+<P>If <b><code>#local</code></b> is used inside a <b><code>#macro</code></b> then the identifier is local to that macro. When the macro is invoked and the <b><code>#local</code></b> directive is parsed, the identifier is created. It persists until the <b><code>#end</code></b> directive of the macro is reached. At the <b><code>#end</code></b> directive, the identifier is destroyed. Subsequent invocations of the macro create totally new identifiers.</P>
+<P>Use of <b><code>#local</code></b> within an include file but not in a macro, also creates a temporary identifier that is local to that include file. When the include file is included and the <b><code>#local</code></b> directive is parsed, the identifier is created. It persists until the end of the include file is reached. At the end of file the identifier is destroyed. Subsequent inclusions of the file totally new identifiers.</P>
+<P>Use of <b><code>#local</code></b> in the main scene file (not in an include file and not in a macro) is identical to <b><code>#declare</code></b>. For clarity sake you should not use <b><code>#local</code></b> in a main file except in a macro.</P>
+<P>There is currently no way to create permanent, yet local identifiers in POV-Ray.</P>
+<P>Local identifiers may be specifically released early using <b><code>#undef</code></b> but in general there is no need to do so. See "<A HREF="pov193.htm#_Ref413237003">Destroying Identifiers</A>".</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov190.htm">Declaring identifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov192.htm">Identifier Name Collisions</A>
+</P>
+</BODY>
+</HTML>
+

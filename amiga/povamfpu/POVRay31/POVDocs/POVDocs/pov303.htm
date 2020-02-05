@@ -1,0 +1,59 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Bump Maps</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov302.htm">Normal Maps and Normal Lists</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov304.htm">Finish</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199140"><A NAME="_Toc429993651">Bump Maps</A></A></H4>
+<P>When all else fails and none of the above normal pattern types meets your needs you can use a <b><code>bump_map</code></b> to wrap a 2-D bit-mapped bump pattern around your 3-D objects.</P>
+<P>Instead of placing the color of the image on the shape like an <b><code>image_map</code></b> a <b><code>bump_map</code></b> perturbs the surface normal based on the color of the image at that point. The result looks like the image has been embossed into the surface. By default, a bump map uses the brightness of the actual color of the pixel. Colors are converted to gray scale internally before calculating height. Black is a low spot, white is a high spot. The image's index values may be used instead (see section "<A HREF="#_Ref417981169">Use_Index and Use_Color</A>" below).</P>
+<H5><A NAME="_Toc414199141"><A NAME="_Toc429993652">Specifying a Bump Map</A></A></H5>
+<P>The syntax for an <b><code>bump_map</code></b> is:</P>
+<I><DL>
+<DT>BUMP_MAP:</DT>
+</I><b><code><DD>normal{</DD>
+<DD>bump_map{</code></b> <I>BITMAP_TYPE "bitmap.ext" [BUMP_MAP_MODS...]</I> <b><code>}</DD>
+</code></b><I><DD>[NORMAL_MODFIERS...]</DD>
+</I><b><code><DD>}</DD>
+</code></b><I><DT>BITMAP_TYPE:</DT>
+</I><b><code><DD>gif</code></b>   |   <b><code>tga</code></b>   |   <b><code>iff</code></b>   |   <b><code>ppm</code></b>   |   <b><code>pgm</code></b>   |   <b><code>png</code></b>   |   <b><code>sys</DD>
+</code></b><I><DT>BUMP_MAP_MOD:</DT>
+</I><b><code><DD>map_type</code></b>  <I>Type</I>   |   <b><code>once</code></b>   |   <b><code>interpolate</code></b>  <I>Type</I>   |</DD>
+<b><code><DD>use_color</code></b>   |   <b><code>use_colour</code></b>   |   <b><code>bump_size</code></b>  <I>Value</DD>
+</DL>
+</I><P>After the required <I>BITMAP_TYPE</I> keyword is a string expression containing the name of a bitmapped bump file of the specified type.  Several optional modifiers may follow the file specification. The modifiers are described below. Note that earlier versions of POV-Ray allowed some modifiers before the <I>BITMAP_TYPE</I> but that syntax is being phased out in favor of the syntax described here.  Note <b><code>sys</code></b> format is a system-specific format such as BMP for Windows or Pict for Macintosh.</P>
+<P>Filenames specified in the <b><code>bump_map</code></b> statements will be searched for in the home (current) directory first and, if not found, will then be searched for in directories specified by any <b><code>+L</code></b> or <b><code>Library_Path</code></b> options active. This would facilitate keeping all your bump maps files in a separate subdirectory and giving a <b><code>Library_Path</code></b> option to specify where your library of bump maps are.  See "<A HREF="pov139.htm#_Ref413142060">Library Paths</A>" for details. </P>
+<P>By default, the bump pattern is mapped onto the x-y-plane. The bump pattern is <I>projected </I>onto the object as though there were a slide projector somewhere in the -z-direction. The pattern exactly fills the square area from (x,y) coordinates (0,0) to (1,1) regardless of the pattern's original size in pixels. If you would like to change this default you may translate, rotate or scale the pigment or texture to map it onto the object's surface as desired.  If you would like to change this default orientation you may translate, rotate or scale the pigment or texture to map it onto the object's surface as desired.</P>
+<P>The file name is optionally followed by one or more <I>BITMAP_MODIFIERS</I>. The <b><code>bump_size</code></b>, <b><code>use_color</code></b> and <b><code>use_index</code></b> modifiers are specific to bump maps and are discussed in the following sections. See section "<A HREF="pov355.htm#_Ref417983914">Bitmap Modifiers</A>" for the generic bitmap modifiers <b><code>map_type</code></b>, <b><code>once</code></b> and <b><code>interpolate</code></b> described in "<A HREF="pov355.htm#_Ref417983218">Bitmap Modifiers</A>"</P>
+<H5><A NAME="_Toc414199142"><A NAME="_Toc429993653">Bump_Size</A></A></H5>
+<P>The relative bump size can be scaled using the <b><code>bump_size</code></b> modifier.  The bump size number can be any number other than 0 but typical values are from about 0.1 to as high as 4.0 or 5.0.</P>
+<PRE>  normal {
+    bump_map {
+      gif "stuff.gif"
+      bump_size 5.0
+    }
+  }</PRE>
+<P>Originally <b><code>bump_size</code></b> could only be used inside a bump map but it can now be used with any normal. Typically it is used to override a previously defined size. For example:</P>
+<PRE>  normal {
+    My_Normal   //this is a previously defined normal identifier
+    bump_size 2.0
+  }</PRE>
+<H5><A NAME="_Toc414199143"><A NAME="_Ref417981169"><A NAME="_Toc429993654">Use_Index and Use_Color</A></A></A></H5>
+<P>Usually the bump map converts the color of the pixel in the map to a gray scale intensity value in the range 0.0 to 1.0 and calculates the bumps based on that value. If you specify <b><code>use_index</code></b>, the bump map uses the color's palette number to compute as the height of the bump at that point. So, color number 0 would be low and color number 255 would be high (if the image has 256 palette entries). The actual color of the pixels doesn't matter when using the index. This option is only available on palette based formats. The <b><code>use_color</code></b> keyword may be specified to explicitly note that the color methods should be used instead. The alternate spelling <b><code>use_colour</code></b> is also valid. These modifiers may only be used inside the <b><code>bump_map</code></b> statement.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov302.htm">Normal Maps and Normal Lists</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov304.htm">Finish</A>
+</P>
+</BODY>
+</HTML>
+

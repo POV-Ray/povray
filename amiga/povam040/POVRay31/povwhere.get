@@ -1,0 +1,393 @@
+What to do if you don't have POV-Ray
+This documentation assumes you already have POV-Ray installed and
+running however the POV-Team does distribute this file by itself
+in various formats including online on the internet.  If you
+don't have POV-Ray or aren't sure you have the official version
+or the latest version, then the following sections will tell you
+what to get and where to get it.
+
+
+Which Version of POV-Ray should you use?
+POV-Ray can be used under MS-Dos, Windows 3.x, Windows for
+Workgroups 3.11, Windows 95, Windows NT, Apple Macintosh 68k,
+Power PC, Amiga, Linux, UNIX and other platforms.  The latest
+versions of the necessary files are available over CompuServe,
+Internet, and various CD distributions. See section "Where to
+Find POV-Ray Files" for more info.  If your platform is not
+supported and you are proficient in compiling source code
+programs written in C then, see section "Compiling POV-Ray" for
+more information.
+
+
+Microsoft Windows 95/98/NT
+The Windows version runs under Windows 95, Windows 98, and
+Windows NT4 also should run under OS/2 Warp.
+
+Windows 3.1 and Windows for Workgroups are no longer supported
+however the MS-Dos version will run as a dos application under
+those operating systems.
+
+Required hardware and software:
+  Minimum - 486/100 with 16mb RAM and Windows 95.
+  Disk space - 15 megabytes
+  
+Required POV-Ray files:
+  User archive POVWIN3.EXE - a self-extracting archive
+     containing the program, sample scenes, standard include
+     files and documentation. This file may be split into smaller
+     files for easier downloading. Check the directory of your
+     download or ftp site to see if other files are needed.
+  
+Recommended:
+  Pentium 200 or Pentium II with 32mb and Windows 95 or NT4.
+  SVGA display preferably with high color or true color ability
+     and drivers installed.  (Note: accelerated graphics hardware
+     will not improve performance.)
+  
+Optional: The source code is not needed to use POV-Ray. It is
+provided for the curious and adventurous.
+  POVWIN_S.ZIP --- The C source code for POV-Ray for Windows.
+     Contains generic parts and Windows specific parts. It does
+     not include sample scenes, standard include files and
+     documentation so you should also get the executable archive
+     as well.  POV-Ray can only be compiled using C compilers
+     that create 32-bit Windows applications. We support Watcom
+     10.5a or higher, Borland 4.52/5.0 compilers.
+
+MS-Dos & Windows 3.x
+The MS-Dos version runs under MS-Dos or as a DOS application
+under Windows 3.1 or Windows for Workgroups 3.11. Although it
+also runs under Windows 95/98/NT4 and OS/2 Warp, users of those
+systems should use the Windows version..
+
+Required hardware and software:
+  A 386 or better CPU and at least 8 meg of RAM.
+  About 6 meg disk space to install and 2-10 meg or more beyond
+     that for working space.
+  A text editor capable of editing plain ASCII text files. The
+     EDIT program that comes with MS-Dos will work for moderate
+     size files.
+  Graphic file viewer capable of viewing GIF and perhaps TGA and
+     PNG formats.
+  
+Required POV-Ray files:
+  POVMSDOS.EXE - a self-extracting archive containing the
+     program, sample scenes, standard include files and
+     documentation in plain ASCII text format. This file may be
+     split into smaller files for easier downloading. Check the
+     directory of your download or ftp site to see if other files
+     are needed.
+  
+Recommended:
+  Pentium 200 or Pentium II (faster the better) 32 meg or more
+     RAM.  SVGA display preferably with VESA interface and high
+     color or true color ability.    (Note: accelerated graphics
+     hardware will not improve performance.)
+  
+Optional: The source code is not needed to use POV-Ray. It is
+provided for the curious and adventurous.
+  POVMSD_S.ZIP - The C source code for POV-Ray for MS-Dos.
+     Contains generic parts and MS-Dos specific parts. It does
+     not include sample scenes, standard include files and
+     documentation so you should also get the executable archive
+     as well. Requires a C compiler that can create 32-bit
+     protected mode applications. We support Watcom 11, Borland
+     4.52 with DOS Power Pack and DJGPP 2.
+
+Linux for Intel x86
+Required hardware and software:
+  A 386 or better CPU and at least 8 meg of RAM.
+  About 6 meg disk space to install and 2-10 meg or more beyond
+     that for working space.
+  A text editor capable of editing plain ASCII text files.
+  Graphic file viewer capable of viewing PPM, TGA or PNG
+     formats.
+  Any recent (1994 onwards) Linux kernel and support for ELF
+     format binaries. POV-Ray for Linux is not in a.out-format.
+     ELF libraries libc.so.5, libm.so.5 and one or both of
+     libX11.so.6 or libvga.so.1.
+  
+Required POV-Ray files:
+  POVLINUX.TGZ or POVLINUX.TAR.GZ - archive containing an
+     official binary for each SVGALib and X-Windows modes. Also
+     contains sample scenes, standard include files and
+     documentation in plain ASCII text.
+  
+Recommended:
+  Pentium 200 or Pentium II (faster the better) 32 meg or more
+     RAM.  SVGA display preferably with VESA interface and high
+     color or true color ability.  If you want display, you'll
+     need either SVGALib or X-Windows.  (Note: accelerated
+     graphics hardware will not improve performance.)
+  
+Optional: The source code is not needed to use POV-Ray. It is
+provided for the curious and adventurous.
+  POVUNI_S.TAR.GZ or POVUNI_S.TGZ - The C source code for POV-
+     Ray for Linux. Contains generic parts and Linux specific
+     parts. It does not include sample scenes, standard include
+     files and documentation so you should also get the
+     executable archive as well.  Requires the GNU C compiler and
+     (optionally) the X include files and libraries.
+  
+
+Apple Macintosh
+The MacOS versions run under Apple's MacOS operating system
+version 7.1 or newer, on any 68020/030/040-based Macintosh-
+compatible computer (with or without a floating point
+coprocessor) or any of the PowerPC Macintosh-compatible
+computers.
+
+Required hardware and software:
+  A 68020 or better CPU without a floating point unit (LC or
+     Performa or Centris series); at least 8 MB RAM or
+  A 68020 or better CPU *with* a floating point unit (Mac II or
+     Quadra series); at least 8 MB RAM or
+  Any PowerPC Macintosh computer and at least 8 MB RAM.
+  System 7.1 or newer and color QuickDraw (System 6 is no longer
+     supported). 
+  Appearance Extension is also required now. This comes standard 
+     in MacOS 8, but can be downloaded from Apple's web 
+     site <http://developer.apple.com/sdk/> and installed on any 
+     Mac running 7.1 or newer.
+  Navigation Services is not required, but will enhance the 
+     open/save dialogs if it is present.  It is also a free 
+     extension available from Apple's web site, which can be used 
+     in 7.5.5 or newer.
+  About 6 MB free disk space to install and an additional 2-10
+     MB free space for your own creations (scenes and images).
+  Graphic file viewer utility capable of viewing Mac PICT, GIF
+     and perhaps TGA and PNG formats (the shareware
+     GraphicConverter or GIFConverter applications are good.)
+  
+Required POV-Ray files:
+  POVMACNF.SIT or POVMACNF.SIT.HQX - a Stuffit archive
+     containing the non-FPU 68K Macintosh application, sample
+     scenes, standard include files and documentation (slower
+     version for Macs without an FPU) or
+  POVMAC68.SIT or POVMAC68.SIT.HQX - a Stuffit archive
+     containing the FPU 68K Macintosh application, sample scenes,
+     standard include files and documentation (faster version for
+     Macs WITH an FPU) or
+  POVPMAC.SIT or POVPMAC.SIT.HQX - a Stuffit archive containing
+     the native Power Macintosh application, sample scenes,
+     standard include files and documentation.
+  
+Recommended:
+  68030/33 or faster with FPU, or any Power Macintosh
+  8 MB or more RAM for 68K Macintosh;
+  16 MB or more for Power Macintosh systems.
+  Color monitor preferred, 256 colors OK, but thousands or
+     millions of colors is even better.
+  
+Optional: The source code is not needed to use POV-Ray. It is
+provided for the curious and adventurous. POV-Ray can be compiled
+using Apple's MPW 3.3, Metrowerks CodeWarrior Pro or Symantec 8.
+  POVMACS.SIT or POVMACS.SIT.HQX - The full C source code for
+     POV-Ray for Macintosh. Contains generic parts and Macintosh
+     specific parts. It does not include sample scenes, standard
+     include files and documentation so you should also get the
+     executable archive as well.
+
+Amiga
+The Amiga version comes in several flavors, 68000/68020 without
+FPU, (not recommended, very slow) 68020/68030 with fpu, 68040 and 
+68060. There's two way to use Pov: Shell only and using the
+provided GUI interface which requires MUI 3.8. All versions run
+under OS3.x and up. Support exists for pensharing and window
+display under OS3.x with 256 color palettes, plus CyberGraphics
+and Picasso 96 24-bit display.
+
+Required:
+  At least 4 meg of RAM.
+  At least 2 meg of hard disk space for the necessities, 5-20
+     more recommended for workspace.
+  An ASCII text editor, GUI configurable to launch the editor of
+     your choice.
+  Graphic file viewer - POV-Ray outputs to PNG, Targa (TGA), and
+     PPM formats.  POV-Ray Amiga can load any image format with 
+     Picture.Datatype V43 and the appropriate datatype.
+  
+Required POV-Ray files:
+  POVAMIx0.LHA -- a LHA archive containing executable, sample
+     scenes, standard include files, and documentation for the
+     680x0 version of POV-Ray (i.e.: POVAMI60.LHA stands for
+     68060 version); 68020 version needs FPU.
+
+Recommended:
+  8 meg or more of RAM.
+  68030 & 68882 or higher processor.
+  24bit display card (CyberGFX and Picasso 96 library supported)
+  
+Amiga PowerPC version of POV-Ray is now in beta testing. Watch
+the CompuServe forum or www.povray.org for further news.
+
+Optional: The source code is not needed to use POV-Ray. It is
+provided for the curious and adventurous.
+  POVAMI_S.LHA --- The C source code for POV-Ray for Amiga.
+     Contains generic parts and Amiga specific parts. It does not
+     include sample scenes, standard include files, and
+     documentation so you should also get the executable archive
+     as well.
+
+SunOS
+Required hardware and software:
+  A Sun SPARC processor and at least 4 meg of RAM.
+  About 6 meg disk space to install and 2-10 meg or more beyond
+     that for working space.
+  Graphic file viewer capable of viewing PPM, TGA or PNG
+     formats.
+  A text editor capable of editing plain ASCII text files.
+  SunOS 4.1.3 or other operating system capable of running such
+     a binary (Solaris or possibly Linux for Sparc).
+  
+Required POV-Ray files:
+  POVSUNOS.TGZ or POVSUNOS.TAR.GZ - archive containing an
+     official binary for each text-only and X-Windows modes. Also
+     contains sample scenes, standard include files and
+     documentation.
+  
+Recommended:
+  8 meg or more RAM.
+  If you want display, you'll need X-Windows or an X-Term.-
+     preferably 24-bit TrueColor display ability, although the X
+     display code is known to work with ANY combination of visual
+     and color depth.
+  Graphic file viewer capable of viewing PPM, TGA or PNG
+     formats.
+  
+Optional: The source code is not needed to use POV-Ray. It is
+provided for the curious and adventurous.
+  POVUNI_S.TGZ or POVUNI_S.TAR.GZ - The C source code for POV-
+     Ray for UNIX.  Contains generic parts and Unix/Linux
+     specific parts. It does not include sample scenes, standard
+     include files and documentation so you should also get the
+     executable archive as well. You will need a C compiler and
+     (optionally) the X include files and libraries and knowledge
+     of how to use it. Although we provide source code for
+     generic Unix systems, we do not provide technical support on
+     how to compile the program.
+
+Generic Unix
+Because Unix runs on a wide variety of hardware and CPUs, the POV-
+Team cannot provide executable versions for every type of Unix.
+We distribute generic Unix source code in portable ANSI C source
+code.  You will need a C compiler and (optionally) the X include
+files and libraries and knowledge of how to use it. Although we
+provide source code for generic Unix systems, we do not provide
+technical support on how to compile the program.
+
+Required:
+  POVUNI_S.TGZ or POVUNI_S.TAR.GZ - The C source code for POV-
+     Ray for UNIX.  Contains generic parts and Unix/Linux
+     specific parts. It does not include sample scenes, standard
+     include files and documentation so you should also get an
+     executable archive for another platform or get
+  POVUNI_D.TGZ or POVUNI_D.TAR.GZ which contains the sample
+     scenes, standard include files and documentation.
+  A C compiler for your computer and KNOWLEDGE OF HOW TO USE IT.
+  Graphic file viewer capable of viewing PPM, TGA or PNG
+     formats.
+  A text editor capable of editing plain ASCII text files.
+  
+Recommended:
+  Math co-processor.
+  8 meg or more RAM.
+  
+Optional:
+  X Windows if you want to be able to display as you render.
+  You will need the X-Windows include files as well. If you're
+     not familiar with compiling programs for X-Windows you may
+     need some help from someone who is knowledgeable at your
+     installation because the X include files and libraries are
+     not always in a standard place.
+
+All Versions
+Each executable archive includes full documentation for POV-Ray
+itself as well as specific instructions for using POV-Ray with
+your type of platform. All versions of the program share the same
+ray-tracing features like shapes, lighting and textures. In other
+words, an MS-Dos-PC can create the same pictures as a Cray
+supercomputer as long as it has enough memory. The user will want
+to get the executable that best matches their computer hardware.
+
+In addition to the files listed above, the POV-Team also
+distributes the user documentation in two alternate forms.  Note
+this is the same documentation distributed in other archives but
+in a different format.  This may be especially useful for MS-Dos
+or Unix users because their documentation is plain ASCII text
+only.
+  POVUSER.PDF - Tutorial and Reference documentation in Adobe
+     Acrobat PDF format.  Requires Adobe Acrobat Reader available
+     for Windows 3.x, Windows 95/98/NT, Mac and some Unix
+     systems.  Go to
+     http://www.adobe.com/prodindex/acrobat/readstep.html to get
+     the reader for free.
+  POVHTML.ZIP - Archive containing Tutorial and Reference
+     documentation in html for viewing with any internet browser.
+  POV31W97.ZIP - Archive containing Tutorial and Reference
+     documentation in Microsoft Word 97 format.
+
+See the section "Where to Find POV-Ray Files" for where to find
+these files. You can contact those sources to find out what the
+best version is for you and your computer.
+
+Where to Find POV-Ray Files
+The latest versions of the POV-Ray software are available from
+the following sources.
+
+POV-Ray Forum on CompuServe
+The headquarters of POV-Ray are on CompuServe in the GO POVRAY
+forum, that is managed by some of the team members. We meet there
+to share information, useful programs and utilities and graphics
+created by POV-Ray. Members of our CompuServe Forum also get
+early access to beta versions and first hand support from POV-
+Team members. Everyone is welcome to join in on the action on
+CIS:POVRAY. Hope to see you there! You can get information on
+joining CompuServe by calling (800)848-8990 or visit the
+CompuServe home page http://www.compuserve.com. Direct CompuServe
+access is also available in Japan, Europe and many other
+countries.
+
+
+World Wide Website www.povray.org
+The internet home of POV-Ray is reachable on the World Wide Web
+via the address http://www.povray.org and via ftp as
+ftp.povray.org. Please stop by often for the latest files,
+utilities, news and images from the official POV-Ray internet
+site.
+
+The comp.graphics.rendering.raytracing newsgroup has many
+competent POV-Ray users that are very willing to share their
+knowledge. They generally ask that you first browse a few files
+to see if someone has already answered the same question, and of
+course, that you follow proper "netiquette". If you have any
+doubts about the qualifications of the folks that frequent the
+group, a few minutes spend at the Ray Tracing Competition pages
+at www.povray.org will quickly convince you!
+
+Also the POV-Team operates its own news server on the internet 
+with several news groups related to POV-Ray and other interesting
+programs.  For more information about the server 
+see http://www.povray.org/groups.html.
+
+Books, Magazines and CD-ROMs
+Unfortunately all English language books on POV-Ray are out of 
+print and there are no plans to reprint them.  However there 
+is now a POV-Ray 3.02 book and CD-ROM available in Japanese.  
+It talks about the Windows and Mac versions of POV-Ray, and 
+various utilities.  The CD-ROM is dual format, Windows/Mac. 
+It was written in Japan by Hideki Komuro-san, and published 
+by ASCII Corp. in June 1998, ISBN 4-7561-1831-3.
+
+Many popular computer magazines have been authorized to 
+distribute POV-Ray on cover CDs.  Note that such distributions
+of the official version of POV-Ray is permitted under the terms
+of the General License in the file POVLEGAL.DOC.  The POV-Team 
+does not endorse the distributor or its products.  The POV-Team 
+receives no compensation for this distribution.
+
+The POV-Team does endorse some CD-ROMs containing POV-Ray which
+are prepared by team members.  A portion of the proceeds from
+these CDs support our internet sites and other team activities.
+You can always find the latest information on what is available
+at our web site www.povray.org.

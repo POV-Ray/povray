@@ -1,0 +1,43 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Input File Name</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov137.htm">Scene Parsing Options</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov139.htm">Library Paths</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198972"><A NAME="_Toc429993481">Input File Name</A></A></H4>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=456>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>Input_File_Name=</code></b><I>file</I></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Sets input file name to <I>file</I></TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>+I</code></b><I>file</I></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Same as <b><code>Input_File_Name=</code></b><I>file</I></TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>You will probably always set this option but if you do not the default input filename is <CODE>object.pov</CODE>. If you do not have an extension then <CODE>.pov</CODE> is assumed. On case-sensitive operating systems both <CODE>.pov</CODE> and <CODE>.POV</CODE> are tried. A full path specification may be used (on MS-DOS systems <CODE>+Ic:\povray3\mystuff\myfile.pov</CODE> is allowed for example). In addition to specifying the input file name this also establishes the <I>scene name</I>.</P>
+<P>The scene name is the input name with drive, path and extension stripped. In the above example the scene name is <CODE>myfile</CODE>. This name is used to create a default output file name and it is referenced other places.</P>
+<P>If you use "-" as the input file name the input will be read from standard input. Thus you can pipe a scene created by a program to POV-Ray and render it without having a scene file.</P>
+<P>Under MS-DOS you can try this feature by typing.</P>
+<PRE> type ANYSCENE.POV | povray +I-</PRE>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov137.htm">Scene Parsing Options</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov139.htm">Library Paths</A>
+</P>
+</BODY>
+</HTML>
+

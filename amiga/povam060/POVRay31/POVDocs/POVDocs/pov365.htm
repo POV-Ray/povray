@@ -1,0 +1,46 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Density Maps and Density Lists</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov364.htm">Density with color_map</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov366.htm">Multiple Density vs. Multiple Media</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref428014731"><A NAME="_Toc429993729">Density Maps and Density Lists</A></A></H4>
+<P>In addition to specifying blended colors with a color map you may create a blend of densities using a <b><code>density_map</code></b>. The syntax for a density map is identical to a color map except you specify a density in each map entry (and not a color).</P>
+<P>The syntax for <b><code>density_map</code></b> is as follows:</P>
+<I><DL>
+<DT>DENSITY_MAP:</DT>
+</I><b><code><DD>density_map{</code></b> <I>DENSITY_MAP_BODY</I> <b><code>}</DD>
+</code></b><I><DT>DENSITY_MAP_BODY:</DT>
+<DD>DENSITY_MAP_IDENTIFIER</I>   |   <I>DENSITY_MAP_ENTRY</I>...</DD>
+<I><DT>DENSITY_MAP_ENTRY:</DT>
+</I><b><code><DD>[</code></b> <I>Value</I>  <I>DENSITY_BODY</I> <b><code>]</DD>
+</DL>
+</code></b><P>Where <I>Value</I> is a float value between 0.0 and 1.0 inclusive and each <I>DENSITY_BODY</I> is anything which can be inside a <b><code>density{...}</code></b> statement.  The <b><code>density</code></b> keyword and <b><code>{}</code></b> braces need not be specified.</P>
+<P>Note that the <b><code>[]</code></b> brackets are part of the actual <I>DENSITY_MAP_ENTRY</I>. They are not notational symbols denoting optional parts. The brackets surround each entry in the density map. There may be from 2 to 256 entries in the map. </P>
+<P>Density maps may be nested to any level of complexity you desire. The densities in a map may have color maps or density maps or any type of density you want. </P>
+<P>Entire densities may also be used with the block patterns such as <b><code>checker</code></b>, <b><code>hexagon</code></b> and <b><code>brick</code></b>. For example...</P>
+<PRE>  density {
+    checker
+    density { Flame scale .8 }
+    density { Fire scale .5 }
+  }</PRE>
+<P>Note that in the case of block patterns the <b><code>density</code></b> wrapping is required around the density information.</P>
+<P>A density map is also used with the <b><code>average</code></b> density type. See "<A HREF="pov318.htm#_Ref417371289">Average</A>" for details.</P>
+<P>You may declare and use density map identifiers but the only way to declare a density block pattern list is to declare a density identifier for the entire density.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov364.htm">Density with color_map</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov366.htm">Multiple Density vs. Multiple Media</A>
+</P>
+</BODY>
+</HTML>
+

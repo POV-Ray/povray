@@ -1,0 +1,41 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Density with color_map</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov363.htm">General Density Modifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov365.htm">Density Maps and Density Lists</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc429993728">Density with color_map</A></H4>
+<P>Typically a <b><code>media</code></b> uses just one constant color throughout.  Even if you vary the density, it is usually just one color which is specified by the <b><code>absorption</code></b>, <b><code>emission</code></b>, or <b><code>scattering</code></b> keywords.  However when using <b><code>emission</code></b> to simulate fire or explosions, the center of the flame (high density area) is typically brighter and white or yellow.  The outer edge of the flame (less density) fades to orange, red, or in some cases deep blue.  To model the density-dependent change in color which is visible, you may specify a <b><code>color_map</code></b>.  The pattern function returns a value from 0.0 to 1.0 and the value is passed to the color map to compute what color or blend of colors is used.  See "<A HREF="pov296.htm#_Ref420922745">Color Maps</A>" for details on how pattern values work with <b><code>color_map</code></b>. This resulting color is multiplied by the <b><code>absorption</code></b>, <b><code>emission</code></b> and <b><code>scattering</code></b> color.  Currently there is no way to specify different color maps for each media type within the same <b><code>media</code></b> statement.</P>
+<P>Consider this example:</P>
+<PRE>  media{
+    emission 0.75
+    scattering {1, 0.5}
+    density { spherical
+      color_map{
+        [0.0 rgb &lt;0,0,0.5&gt;]
+        [0.5 rgb &lt;0.8, 0.8, 0.4&gt;]
+        [1.0 rgb &lt;1,1,1&gt;]
+      }
+    }
+  }</PRE>
+<P>The color map ranges from white at density 1.0 to bright yellow at density 0.5 to deep blue at density 0.  Assume we sample a point at density 0.5.  The emission is 0.75*&lt;0.8,0.8,0.4&gt; or &lt;0.6,0.6,0.3&gt;.  Similarly the scattering color is 0.5*&lt;0.8,0.8,0.4&gt; or &lt;0.4,0.4,0.2&gt;.</P>
+<P>For block pattern types <b><code>checker</code></b>, <b><code>hexagon</code></b>, and <b><code>brick</code></b> you may specify a color list such as this:</P>
+<PRE>  density{checker rgb&lt;1,0,0&gt;, rgb&lt;0,0,0&gt;}</PRE>
+<P>See "<A HREF="pov295.htm#_Ref420923317">Color List Pigments</A>" which describes how <b><code>pigment</code></b> uses a color list.  The same principles apply when using them with <b><code>density</code></b>.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov363.htm">General Density Modifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov365.htm">Density Maps and Density Lists</A>
+</P>
+</BODY>
+</HTML>
+

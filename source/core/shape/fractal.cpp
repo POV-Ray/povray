@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,8 +38,14 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/fractal.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
 
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/math/hypercomplex.h"
 #include "core/math/matrix.h"
@@ -47,6 +53,7 @@
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
 #include "core/shape/sphere.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -134,7 +141,7 @@ bool Fractal::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 
     /* Get into Fractal's world. */
 
-    if (Trans != NULL)
+    if (Trans != nullptr)
     {
         MInvTransDirection(Direction, ray.Direction, Trans);
         LenSqr = Direction.lengthSqr();
@@ -282,7 +289,7 @@ bool Fractal::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
             }
         }
 
-        if (Trans != NULL)
+        if (Trans != nullptr)
         {
             MTransPoint(Real_Pt, IPoint, Trans);
             Normal_Calc(this, F_Normal, Thread->Fractal_IStack);
@@ -350,7 +357,7 @@ bool Fractal::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
     bool Result;
     Vector3d New_Point;
 
-    if (Trans != NULL)
+    if (Trans != nullptr)
     {
         MInvTransPoint(New_Point, IPoint, Trans);
 
@@ -514,7 +521,7 @@ void Fractal::Scale(const Vector3d&, const TRANSFORM *tr)
 
 void Fractal::Transform(const TRANSFORM *tr)
 {
-    if(Trans == NULL)
+    if (Trans == nullptr)
         Trans = Create_Transform();
 
     Compose_Transforms(Trans, tr);
@@ -610,7 +617,7 @@ void Fractal::Compute_BBox()
 
 Fractal::Fractal() : ObjectBase(BASIC_OBJECT)
 {
-    Trans = NULL;
+    Trans = nullptr;
 
     Center = Vector3d(0.0, 0.0, 0.0);
 
@@ -865,12 +872,13 @@ void Fractal::Free_Iteration_Stack(DBL **IStack)
 {
     for (int i = 0 ; i < 4 ; i++)
     {
-        if (IStack [i] != NULL)
+        if (IStack [i] != nullptr)
         {
             POV_FREE (IStack [i]) ;
-            IStack [i] = NULL ;
+            IStack [i] = nullptr;
         }
     }
 }
 
 }
+// end of namespace pov

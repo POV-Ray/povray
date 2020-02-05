@@ -1,0 +1,54 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Using Pattern Modifiers</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov71.htm">Using Pigment and Patterns</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov73.htm">Using Transparent Pigments and Layered Textures</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198892"><A NAME="_Toc429993402">Using Pattern Modifiers</A></A></H4>
+<P>Let's take a look at some pattern modifiers. First, we change the pattern type to bozo. Then we add the following change.</P>
+<PRE>  pigment {
+    bozo
+    frequency 3            // &lt;- add this line
+    color_map {
+      [0.00 color Red]
+      [0.33 color Blue]
+      [0.66 color Yellow]
+      [1.00 color Red]
+    }
+    rotate -45*z
+  }</PRE>
+<P>The <b><code>frequency</code></b> modifier determines the number of times the color map repeats itself per unit of size. This change makes the <b><code>bozo</code></b> pattern we saw earlier have many more bands in it. Now we change the pattern type to <b><code>marble</code></b>. When we rendered this earlier, we saw a banded pattern similar to <b><code>gradient y</code></b> that really did not look much like marble at all. This is because marble really is a kind of gradient and it needs another pattern modifier to look like marble. This modifier is called <b><code>turbulence</code></b>. We change the line <b><code>frequency 3</code></b> to <b><code>turbulence 1</code></b> and render again. That's better! Now let's put <b><code>frequency 3</code></b> back in right after the turbulence and take another look. Even more interesting!</P>
+<P>But wait, it gets better! Turbulence itself has some modifiers of its own. We can adjust the turbulence several ways. First, the float that follows the <b><code>turbulence</code></b> keyword can be any value with higher values giving us more turbulence. Second, we can use the keywords <b><code>omega</code></b>, <b><code>lambda</code></b> and <b><code>octaves</code></b> to change the turbulence parameters. Let's try this now:</P>
+<PRE>  pigment {
+    marble
+    turbulence 0.5
+    lambda 1.5
+    omega 0.8
+    octaves 5
+    frequency 3
+    color_map {
+      [0.00 color Red]
+      [0.33 color Blue]
+      [0.66 color Yellow]
+      [1.00 color Red]
+    }
+    rotate 45*z
+  }</PRE>
+<P>Rendering this we see that the turbulence has changed and the pattern looks different. We play around with the numerical values of turbulence, lambda, omega and octaves to see what they do.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov71.htm">Using Pigment and Patterns</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov73.htm">Using Transparent Pigments and Layered Textures</A>
+</P>
+</BODY>
+</HTML>
+

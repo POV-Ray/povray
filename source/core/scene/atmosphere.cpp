@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,8 +36,14 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/scene/atmosphere.h"
 
-#include <algorithm>
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
 
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/material/pattern.h"
 #include "core/material/warp.h"
 #include "core/material/pigment.h"
@@ -51,8 +57,8 @@ namespace pov
 {
 
 Fog_Struct::Fog_Struct() :
-    Turb(NULL),
-    Next(NULL)
+    Turb(nullptr),
+    Next(nullptr)
 {}
 
 Fog_Struct::~Fog_Struct()
@@ -104,10 +110,10 @@ FOG *Create_Fog()
 
     New->Up = Vector3d(0.0, 1.0, 0.0);
 
-    New->Turb = NULL;
+    New->Turb = nullptr;
     New->Turb_Depth = 0.5;
 
-    New->Next = NULL;
+    New->Next = nullptr;
 
     return (New);
 }
@@ -189,7 +195,7 @@ FOG *Copy_Fog(const FOG *Old)
 
 void Destroy_Fog(FOG *Fog)
 {
-    if (Fog != NULL)
+    if (Fog != nullptr)
         delete Fog;
 }
 
@@ -238,14 +244,14 @@ RAINBOW *Create_Rainbow()
     New->Arc_Angle      = 180.0;
     New->Falloff_Angle  = 180.0;
 
-    New->Pigment = NULL;
+    New->Pigment = nullptr;
 
     New->Antisolar_Vector = Vector3d(0.0, 0.0, 0.0);
 
     New->Right_Vector = Vector3d(1.0, 0.0, 0.0);
     New->Up_Vector = Vector3d(0.0, 1.0, 0.0);
 
-    New->Next = NULL;
+    New->Next = nullptr;
 
     return (New);
 }
@@ -325,7 +331,7 @@ RAINBOW *Copy_Rainbow(const RAINBOW *Old)
 
 void Destroy_Rainbow(RAINBOW *Rainbow)
 {
-    if (Rainbow != NULL)
+    if (Rainbow != nullptr)
         delete Rainbow;
 }
 
@@ -418,7 +424,7 @@ SKYSPHERE *Copy_Skysphere(const SKYSPHERE *Old)
 
     // The standard assignment operator of SKYSPHERE has created a shallow copy of the Pigments vector, but we need a
     // deep copy in case Old gets destroyed.
-    for (vector<PIGMENT*>::iterator i = New->Pigments.begin(); i != New->Pigments.end(); ++ i)
+    for (std::vector<PIGMENT*>::iterator i = New->Pigments.begin(); i != New->Pigments.end(); ++ i)
     {
         *i = Copy_Pigment(*i);
     }
@@ -458,13 +464,13 @@ SKYSPHERE *Copy_Skysphere(const SKYSPHERE *Old)
 
 void Destroy_Skysphere(SKYSPHERE *Skysphere)
 {
-    if (Skysphere != NULL)
+    if (Skysphere != nullptr)
         delete Skysphere;
 }
 
 Skysphere_Struct::~Skysphere_Struct()
 {
-    for (vector<PIGMENT*>::iterator i = Pigments.begin(); i != Pigments.end(); ++ i)
+    for (std::vector<PIGMENT*>::iterator i = Pigments.begin(); i != Pigments.end(); ++ i)
         delete *i;
     Destroy_Transform(Trans);
 }
@@ -625,7 +631,7 @@ void Translate_Skysphere(SKYSPHERE *Skysphere, const Vector3d& Vector)
 
 void Transform_Skysphere(SKYSPHERE *Skysphere, const TRANSFORM *Trans)
 {
-    if (Skysphere->Trans == NULL)
+    if (Skysphere->Trans == nullptr)
     {
         Skysphere->Trans = Create_Transform();
     }
@@ -634,3 +640,4 @@ void Transform_Skysphere(SKYSPHERE *Skysphere, const TRANSFORM *Trans)
 }
 
 }
+// end of namespace pov

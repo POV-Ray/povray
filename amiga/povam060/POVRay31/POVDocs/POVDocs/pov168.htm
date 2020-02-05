@@ -1,0 +1,29 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Vector Literals</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov167.htm">Vector Expressions</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov169.htm">Vector Identifiers</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199001"><A NAME="_Toc429993511">Vector Literals</A></A></H4>
+<P>Vectors literals consist of two to five float expressions that are bracketed by angle brackets <b><code>&lt;</code></b> and <b><code>&gt;</code></b>. The terms are separated by commas. For example here is a typical three component vector:</P>
+<PRE> &lt; 1.0, 3.2, -5.4578 &gt;</PRE>
+<P>The commas between components are necessary to keep the program from thinking that the 2nd term is the single float expression <b><code>3.2-5.4578</code></b> and that there is no 3rd term. If you see an error message such as "Float expected but '&gt;' found instead" then you probably have missed a comma.</P>
+<P>Sometimes POV-Ray requires you to specify floats and vectors side-by-side. The rules for vector expressions allow for mixing of vectors with vectors or vectors with floats so commas are required separators whenever an ambiguity might arise. For example <b><code>&lt;1,2,3&gt;-4</code></b> evaluates as a mixed float and vector expression where 4 is subtracted from each component resulting in <b><code>&lt;-3,-2,-1&gt;</code></b>. However the comma in <b><code>&lt;1,2,3&gt;,-4</code></b> means this is a vector followed by a float.</P>
+<P>Each component may be a full float expression. For example <b><code>&lt;This+3,That/3,5*Other_Thing&gt;</code></b> is a valid vector.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov167.htm">Vector Expressions</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov169.htm">Vector Identifiers</A>
+</P>
+</BODY>
+</HTML>
+

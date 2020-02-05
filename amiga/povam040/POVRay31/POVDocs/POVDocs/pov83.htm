@@ -1,0 +1,58 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Working With Pigment Maps</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov82.htm">Using Iridescence</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov84.htm">Working With Normal Maps</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405135"><A NAME="_Toc411405411"><A NAME="_Toc414198903"><A NAME="_Toc429993413">Working With Pigment Maps</A></A></A></A></H3>
+<P>Let's look at the pigment map. We must not confuse this with a color map, as color maps can only take individual colors as entries in the map, while pigment maps can use entire other pigment patterns. To get a feel for these, let's begin by setting up a basic plane with a simple pigment map. Now, in the following example, we are going to declare each of the pigments we are going to use before we actually use them. This isn't strictly necessary (we could put an entire pigment description in each entry of the map) but it just makes the whole thing more readable.</P>
+<PRE>  // simple Black on White checkboard... it's a classic
+  #declare Pigment1 = pigment {
+    checker color Black color White
+    scale .1
+  }
+  // kind of a "psychedelic rings" effect
+  #declare Pigment2 = pigment {
+    wood
+    color_map {
+      [ 0.0 Red ]
+      [ 0.3 Yellow ]
+      [ 0.6 Green ]
+      [ 1.0 Blue ]
+    }
+  }
+  plane { -z, 0
+    pigment {
+      gradient x
+      pigment_map {
+        [ 0.0 Pigment1 ]
+        [ 0.5 Pigment2 ]
+        [ 1.0 Pigment1 ]
+      }
+    }
+  }</PRE>
+<P>Okay, what we have done here is very simple, and probably quite recognizable if we have been working with color maps all along anyway. All we have done is substituted a pigment map where a color map would normally go, and as the entries in our map, we have referenced our declared pigments. When we render this example, we see a pattern which fades back and forth between the classic checkerboard, and those colorful rings. Because we fade from Pigment1 to Pigment2 and then back again, we see a clear blending of the two patterns at the transition points. We could just as easily get a sudden transition by amending the map to read.</P>
+<PRE>  pigment_map {
+    [ 0.0 Pigment1 ]
+    [ 0.5 Pigment1 ]
+    [ 0.5 Pigment2 ]
+    [ 1.0 Pigment2 ]
+  }</PRE>
+<P>Blending individual pigment patterns is just the beginning.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov82.htm">Using Iridescence</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov84.htm">Working With Normal Maps</A>
+</P>
+</BODY>
+</HTML>
+

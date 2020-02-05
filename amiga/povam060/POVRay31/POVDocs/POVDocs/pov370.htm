@@ -1,0 +1,48 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Fog</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov369.htm">Background</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov371.htm">Sky Sphere</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405216"><A NAME="_Toc411405492"><A NAME="_Ref411773210"><A NAME="_Toc414199217"><A NAME="_Ref421003334"><A NAME="_Ref421696014"><A NAME="_Toc429993734">Fog</A></A></A></A></A></A></A></H3>
+<P>If it is not necessary for light beams to interact with atmospheric media, then <b><code>fog</code></b> may be a faster way to simulate haze or fog.  This feature artificially adds color to every pixel based on the distance the ray has traveled.  The syntax for fog is:</P>
+<I><DL>
+<DT>FOG:</DT>
+</I><b><code><DD>fog {</code></b> <I>[FOG_IDENTIFIER] [FOG_ITEMS...]</I> <b><code>}</DD>
+</code></b><I><DT>FOG_ITEMS:</DT>
+</I><b><code><DD>fog_type</code></b><I> Fog_Type</I>   |   <b><code>distance</code></b><I> Distance</I>   |   <I>COLOR</I>   |</DD>
+<b><code><DD>turbulence</code></b><I> &lt;Turbulence&gt;</I>   |   <b><code>turb_depth</code></b><I> Turb_Depth</I>   |</DD>
+<b><code><DD>omega</code></b><I> Omega</I>   |   <b><code>lambda</code></b><I> Lambda</I>   |   <b><code>octaves</code></b><I> Octaves</I>   |   </DD>
+<b><code><DD>fog_offset</code></b><I> Fog_Offset</I>   |   <b><code>fog_alt</code></b><I> Fog_Alt</I>   |   </DD>
+<b><code><DD>up</code></b><I> &lt;Fog_Up&gt; </I>  |   <I>TRANSFORMATION</DD>
+</DL>
+</I><P>Currently there are two fog types, the default <b><code>fog_type 1</code></b> is a constant fog and <b><code>fog_type 2</code></b> is ground fog. The constant fog has a constant density everywhere while the ground fog has a constant density for all heights below a given point on the up axis and thins out along this axis. </P>
+<P>The color of a pixel with an intersection depth <I>d</I> is calculated by</P>
+<I><P>  PIXEL_COLOR = exp(-d/D) * OBJECT_COLOR + (1-exp(-d/D)) * FOG_COLOR</P>
+</I><P>where <I>D</I> is the specified value of the required fog <b><code>distance</code></b> keyword. At depth 0 the final color is the object's color. If the intersection depth equals the fog distance the final color consists of 64% of the object's color and 36% of the fog's color.</P>
+<P>For ground fog, the height below which the fog has constant density is specified by the <b><code>fog_offset</code></b> keyword. The <b><code>fog_alt</code></b> keyword is used to specify the rate by which the fog fades away. The default values for both are 0.0 so be sure to specify them if ground fog is used.  At an altitude of <I>Fog_Offset+Fog_Alt</I> the fog has a density of 25%. The density of the fog at height less than or equal to <I>Fog_Alt </I>is 1.0 and for height <I>y </I>less than <I>Fog_Alt</I> is calculated by</P>
+<I><P>  1/(1 + (y - Fog_Offset) / Fog_Alt) ^2)</P>
+</I><P>The total density along a ray is calculated by integrating from the height of the starting point to the height of the end point.</P>
+<P>The optional <b><code>up</code></b> vector specifies a direction pointing up, generally the same as the camera's up vector. All calculations done during the ground fog evaluation are done relative to this up vector, i. e. the actual heights are calculated along this vector. The up vector can also be modified using any of the known transformations described in "<A HREF="pov216.htm#_Ref421693483">Transformations</A>". Though it may not be a good idea to scale the up vector - the results are hardly predictable - it is quite useful to be able to rotate it. You should also note that translations do not affect the up direction (and thus don't affect the fog).</P>
+<P>The required fog color has three purposes. First it defines the color to be used in blending the fog and the background. Second it is used to specify a translucency threshold. By using a transmittance larger than zero one can make sure that at least that amount of light will be seen through the fog.  With a transmittance of 0.3 you'll see at least 30% of the background. Third it can be used to make a filtering fog. With a filter value larger than zero the amount of background light given by the filter value will be multiplied with the fog color. A filter value of 0.7 will lead to a fog that filters 70% of the background light and leaves 30% unfiltered.</P>
+<P>Fogs may be layered. That is, you can apply as many layers of fog as you like. Generally this is most effective if each layer is a ground fog of different color, altitude and with different turbulence values. To use multiple layers of fogs, just add all of them to the scene.</P>
+<P>You may optionally stir up the fog by adding turbulence. The <b><code>turbulence</code></b> keyword may be followed by a float or vector to specify an amount of turbulence to be used. The <b><code>omega</code></b>, <b><code>lambda</code></b> and <b><code>octaves</code></b> turbulence parameters may also be specified. See section "<A HREF="pov346.htm#_Ref421693822">Pattern Modifiers</A>" for details on all of these turbulence parameters.</P>
+<P>Additionally the fog turbulence may be scaled along the direction of the viewing ray using the <b><code>turb_depth</code></b> amount. Typical values are from 0.0 to 1.0 or more. The default value is 0.5 but any float value may be used.</P>
+<P>You should note that the fog feature will not work if the camera is inside a non-hollow object (see section "<A HREF="pov287.htm#_Ref421693928">Empty and Solid Objects</A>" for a detailed explanation).</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov369.htm">Background</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov371.htm">Sky Sphere</A>
+</P>
+</BODY>
+</HTML>
+

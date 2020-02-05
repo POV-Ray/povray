@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Transformations</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov215.htm">POV-Ray Coordinate System</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov217.htm">Translate</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405186"><A NAME="_Toc411405462"><A NAME="_Toc414199049"><A NAME="_Ref419875652"><A NAME="_Ref421693465"><A NAME="_Ref421693483"><A NAME="_Ref421694648"><A NAME="_Toc429993559">Transformations</A></A></A></A></A></A></A></A></H3>
+<P>The supported transformations are <b><code>rotate</code></b>, <b><code>scale</code></b>, and <b><code>translate</code></b>. They are used to turn, size and move an object or texture. A transformation matrix may also be used to specify complex transformations directly. Groups of transformations may be merged together and stored in a transformation identifier.  The syntax for transformations is as follows.</P>
+<I><DL>
+<DT>TRANSFORMATION:</DT>
+</I><b><code><DD>rotate</code></b><I> &lt;Rotate_Amt&gt;</I>&#9;&#9;&#9;|</DD>
+<b><code><DD>scale</code></b><I> &lt;Scale_Amt&gt;</I>&#9;&#9;&#9;&#9;|</DD>
+<b><code><DD>translate</code></b><I> &lt;Translate_Amt&gt;</I>&#9;&#9;|</DD>
+<b><code><DD>transform</code></b> <I>TRANSFORM_IDENTIFIER</I>&#9;|</DD>
+<b><code><DD>matrix &lt;</code></b><I>Val00</I><b><code>,</code></b><I> Val01</I><b><code>,</code></b><I> Val02</I><b><code>,</DD>
+</code></b><I><DD>Val10</I><b><code>,</code></b><I> Val11</I><b><code>,</code></b><I> Val12</I><b><code>,</DD>
+</code></b><I><DD>Val20</I><b><code>,</code></b><I> Val21</I><b><code>,</code></b><I> Val22</I><b><code>,</DD>
+</code></b><I><DD>Val30</I><b><code>,</code></b><I> Val31</I><b><code>,</code></b><I> Val32</I><b><code>&gt;</DD>
+</code></b><I><DT>TRANSFORM_DECLARATION:</DT>
+</I><b><code><DD>#declare</code></b> <I>IDENTIFIER</I> <b><code>= transform{</code></b> <I>TRANSFORMATION...</I> <b><code>}</code></b>&#9;|</DD>
+<b><code><DD>#local</code></b> <I>IDENTIFIER</I> <b><code>= transform{</code></b> <I>TRANSFORMATION...</I> <b><code>}</DD>
+</DL>
+</code></b>
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov215.htm">POV-Ray Coordinate System</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov217.htm">Translate</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,35 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Marble</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov332.htm">Mandel</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov334.htm">Onion</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199177"><A NAME="_Toc429993691">Marble</A></A></H4>
+<P>The <b><code>marble</code></b> pattern is very similar to the <b><code>gradient x</code></b> pattern. The gradient pattern uses a default <b><code>ramp_wave</code></b> wave type which means it uses colors from the color map from 0.0 up to 1.0 at location x=1 but then jumps back to the first color for x &gt; 1 and repeats the pattern again and again. However the <b><code>marble</code></b> pattern uses the <b><code>triangle_wave</code></b> wave type in which it uses the color map from 0 to 1 but then it reverses the map and blends from 1 back to zero. For example:</P>
+<PRE>  pigment {
+    gradient x
+    color_map {
+      [0.0  color Yellow]
+      [1.0  color Cyan]
+    }
+  }</PRE>
+<P>This blends from yellow to cyan and then it abruptly changes back to yellow and repeats. However replacing <b><code>gradient x</code></b> with <b><code>marble</code></b> smoothly blends from yellow to cyan as the x coordinate goes from 0.0 to 0.5 and then smoothly blends back from cyan to yellow by x=1.0.</P>
+<P>Earlier versions of POV-Ray did not allow you to change wave types.  Now that wave types can be changed for most any pattern, the distinction between <b><code>marble</code></b> and <b><code>gradient x</code></b> is only a matter of default wave types.</P>
+<P>When used with turbulence and an appropriate color map, this pattern looks like veins of color of real marble, jade or other types of stone. By default, marble has no turbulence.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov332.htm">Mandel</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov334.htm">Onion</A>
+</P>
+</BODY>
+</HTML>
+

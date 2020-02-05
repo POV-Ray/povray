@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Component Types and Other New Features</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov36.htm">Blob Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov38.htm">Complex Blob Constructs and Negative Strength</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198856"><A NAME="_Toc429993367">Component Types and Other New Features</A></A></H4>
+<P>The shape shown so far is interesting, but limited. POV-Ray has a few extra tricks that extend its range of usefulness however. For example, as we have seen, we can assign individual textures to blob components, we can also apply individual transformations (translate, rotate and scale) to stretch, twist, and squash pieces of the blob as we require. And perhaps most interestingly, the blob code has been extended to allow cylindrical components.</P>
+<P>Before we move on to cylinders, it should perhaps be mentioned that the old style of components used in previous versions of POV-Ray still work. Back then, all components were spheres, so it was not necessary to say sphere or cylinder. An old style component had the form:</P>
+<b><code><DL>
+<DD>component</code></b> <I>Strength</I><b><code>,</code></b><I> Radius</I><b><code>,</code></b><I> &lt;Center&gt;</DD>
+</DL>
+</I><P>This has the same effect as a spherical component, just as we already saw above. This is only useful for backwards compatibility. If we already have POV-Ray files with blobs from earlier versions, this is when we would need to recognize these components. We note that the old style components did not put braces around the strength, radius and center, and of course, we cannot independently transform or texture them.  Therefore if we are modifying an older work into a new version, it may arguably be of benefit to convert old style components into spherical components anyway.</P>
+<P>Now for something new and different: cylindrical components. It could be argued that all we ever needed to do to make a roughly cylindrical portion of a blob was string a line of spherical components together along a straight line. Which is fine, if we like having extra to type, and also assuming that the cylinder was oriented along an axis.  If not, we would have to work out the mathematical position of each component to keep it is a straight line. But no more! Cylindrical components have arrived.</P>
+<P>We replace the blob in our last example with the following and re-render. We can get rid of the transparent spheres too, by the way.</P>
+<PRE>  blob {
+    threshold .65
+    cylinder { &lt;-.75,-.75,0&gt;, &lt;.75,.75,0&gt;, .5, 1 }
+    pigment { Blue }
+    finish { phong 1 }
+  }</PRE>
+<P>We only have one component so that we can see the basic shape of the cylindrical component. It is not quite a true cylinder - more of a sausage shape, being a cylinder capped by two hem-spheres. We think of it as if it were an array of spherical components all closely strung along a straight line.</P>
+<P>As for the component declaration itself: simple, logical, exactly as we would expect it to look (assuming we have been awake so far): it looks pretty much like the declaration of a cylinder object, with vectors specifying the two endpoints and a float giving the radius of the cylinder. The last float, of course, is the strength of the component. Just as with spherical components, the strength will determine the nature and degree of this component's interaction with its fellow components. In fact, next let us give this fellow something to interact with, shall we?</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov36.htm">Blob Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov38.htm">Complex Blob Constructs and Negative Strength</A>
+</P>
+</BODY>
+</HTML>
+

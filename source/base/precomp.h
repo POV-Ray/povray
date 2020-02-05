@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -45,10 +45,10 @@
 ///     absolute minimum when precompiled headers are _not_ used.
 /// @endparblock
 
-// Module config header file must be the first file included within POV-Ray unit header files
-#include "base/configbase.h"
+#include "base/configbase.h" // only pulled in for POV_MULTITHREADED
 
-// C++ variants of standard C header files
+// C++ variants of C standard header files
+#include <cassert>
 #include <cctype>
 #include <cfloat>
 #include <climits>
@@ -57,12 +57,11 @@
 #include <cstdlib>
 #include <cstring>
 
-// Standard C++ header files
+// C++ standard header files
 #include <algorithm>
-#include <exception>
 #include <list>
-#include <map>
 #include <memory>
+#include <mutex>
 #include <new>
 #include <set>
 #include <stack>
@@ -71,16 +70,4 @@
 #include <vector>
 
 // Boost header files
-#include <boost/bind.hpp>
-#include <boost/format.hpp>
-#include <boost/function.hpp>
-#include <boost/functional/hash/hash.hpp>
-#include <boost/intrusive_ptr.hpp>
-#include <boost/scoped_array.hpp>
-#include <boost/scoped_ptr.hpp>
-#if POV_MULTITHREADED
-#include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
-#endif
-#include <boost/unordered_map.hpp>
-
+#include <boost/date_time/posix_time/posix_time.hpp>

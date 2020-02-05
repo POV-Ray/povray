@@ -1,0 +1,44 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Quilted</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov335.htm">Planar</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov337.htm">Radial</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199179"><A NAME="_Ref419875421"><A NAME="_Toc429993694">Quilted</A></A></A></H4>
+<P>The <b><code>quilted</code></b> pattern was originally designed only to be used as a normal pattern. The quilted pattern is so named because it can create a pattern somewhat like a quilt or a tiled surface. The squares are actually 3-D cubes that are 1 unit in size.</P>
+<P>When used as a normal pattern, this pattern uses a specialized normal perturbation function. This means that the pattern cannot be used with <b><code>normal_map</code></b>, <b><code>slope_map</code></b> or wave type modifiers in a <b><code>normal</code></b> statement.</P>
+<P>When used as a pigment pattern or texture pattern, the <b><code>quilted</code></b> pattern is similar to normal quilted but is not identical as are most normals when compared to pigments. </P>
+<P>The two parameters <b><code>control0</code></b> and <b><code>control1</code></b> are used to adjust the curvature of the <I>seam</I> or <I>gouge</I> area between the <b><code>quilts</code></b>.  The syntax is:</P>
+<P>It is specified as</P>
+<b><code><DL>
+<DD>pigment {quilted </code></b><I>[QUILTED_MODIFIERS...]</I> <b><code>}</DD>
+</code></b><I><DT>QUILTED_MODIFIERS:</DT>
+</I><b><code><DD>control0</code></b> <I>Value_0</I>   |   <b><code>control</code></b> <I>Value_1</I>   |   <I>PIGMENT_MODIFIERS</DD>
+</DL>
+</I><P>The values should generally be kept to around the 0.0 to 1.0 range.  The default value is 1.0 if none is specified. Think of this gouge between the tiles in cross-section as a sloped line.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image194.gif" WIDTH=347 HEIGHT=288></P>
+<P ALIGN="CENTER">Quilted pattern with c0=0 and different values for c1.</P>
+<P ALIGN="CENTER"><IMG SRC="Image195.gif" WIDTH=347 HEIGHT=288></P>
+<P ALIGN="CENTER">Quilted pattern with c0=0.33 and different values for c1.</P>
+<P ALIGN="CENTER"><IMG SRC="Image196.gif" WIDTH=359 HEIGHT=297></P>
+<P ALIGN="CENTER">Quilted pattern with c0=0.67 and different values for c1.</P>
+<P ALIGN="CENTER"><IMG SRC="Image197.gif" WIDTH=370 HEIGHT=302></P>
+<P ALIGN="CENTER">Quilted pattern with c0=1 and different values for c1.</P>
+</B><P>This straight slope can be made to curve by adjusting the two control values. The control values adjust the slope at the top and bottom of the curve. A control values of 0 at both ends will give a linear slope, as shown above, yielding a hard edge. A control value of 1 at both ends will give an "s" shaped curve, resulting in a softer, more rounded edge.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov335.htm">Planar</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov337.htm">Radial</A>
+</P>
+</BODY>
+</HTML>
+

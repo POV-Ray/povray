@@ -1,0 +1,44 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Defining a Light Source</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov19.htm">Adding Texture to an Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov21.htm">Simple Shapes</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405092"><A NAME="_Toc411405368"><A NAME="_Toc414198839"><A NAME="_Toc429993350">Defining a Light Source</A></A></A></A></H3>
+<P>One more detail is needed for our scene. We need a light source. Until we create one, there is no light in this virtual world. Thus we add the line</P>
+<P>Thus we add the line</P>
+<PRE>  light_source { &lt;2, 4, -3&gt; color White}</PRE>
+<P>to the scene file to get our first complete POV-Ray scene file as shown below.</P>
+<PRE>  #include "colors.inc"
+  background { color Cyan }
+  camera {
+    location &lt;0, 2, -3&gt;
+    look_at  &lt;0, 1,  2&gt;
+  }
+  sphere {
+    &lt;0, 1, 2&gt;, 2
+    texture {
+      pigment { color Yellow }
+    }
+  }
+  light_source { &lt;2, 4, -3&gt; color White}</PRE>
+<P>The vector in the <b><code>light_source</code></b> statement specifies the location of the light as two units to our right, four units above the origin and three units back from the origin. The light source is an invisible tiny point that emits light.  It has no physical shape, so no texture is needed.</P>
+<P>That's it! We close the file and render a small picture of it using whatever methods you used for your particular platform.  If you specified a preview display it will appear on your screen.  If you specified an output file (the default is file output on), then POV-Ray also created a file.  Note that if you do not have high color or true color display hardware then the preview image may look poor but the full detail is written to the image file regardless of the type of display.</P>
+<P>The scene we just traced isn't quite state of the art but we will have to start with the basics before we soon get to much more fascinating features and scenes.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov19.htm">Adding Texture to an Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov21.htm">Simple Shapes</A>
+</P>
+</BODY>
+</HTML>
+

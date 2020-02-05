@@ -1,0 +1,58 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - The #default Directive</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov198.htm">The #write Directive</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov200.htm">The #version Directive</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405180"><A NAME="_Toc411405456"><A NAME="_Toc414199032"><A NAME="_Ref417299112"><A NAME="_Ref418327261"><A NAME="_Toc429993542">The #default Directive</A></A></A></A></A></A></H3>
+<P>POV-Ray creates a default texture when it begins processing. You may change those defaults as described below. Every time you specify a <b><code>texture</code></b> statement, POV-Ray creates a copy of the default texture. Anything you put in the texture statement overrides the default settings. If you attach a <b><code>pigment</code></b>, <b><code>normal</code></b>, or <b><code>finish</code></b> to an object without any texture statement then POV-Ray checks to see if a texture has already been attached. If it has a texture then the pigment, normal or finish will modify the existing texture. If no texture has yet been attached to the object then the default texture is copied and the pigment, normal or finish will modify that texture.</P>
+<P>You may change the default texture, pigment, normal or finish using the language directive <b><code>#default</code></b> as follows:</P>
+<I><DL>
+<DT>DEFAULT_DIRECTIVE:</DT>
+</I><b><code><DD>#default {</code></b><I>DEFAULT_ITEM </I><b><code>}</DD>
+</code></b><I><DT>DEFAULT_ITEM:</DT>
+<DD>TEXTURE</I>   |   <I>PIGMENT</I>   |   <I>NORMAL</I>   |   <I>FINISH</DD>
+</DL>
+</I><P>For example:</P>
+<PRE> #default{
+   texture{
+     pigment{rgb &lt;1,0,0&gt;}
+     normal{bumps 0.3}
+     finish{ambient 0.4}
+   }
+ }</PRE>
+<P>means objects will default to red bumps and slightly high ambient finish.  Note also you may change just part of it like this:</P>
+<PRE> #default {
+  pigment {rgb &lt;1,0,0&gt;}
+ }</PRE>
+<P>This still changes the pigment of the default texture. At any time there is only one default texture made from the default pigment, normal and finish. The example above does not make a separate default for pigments alone. Note that the special textures <b><code>tiles</code></b> and <b><code>material_map</code></b> or a texture with a <b><code>texture_map</code></b> may not be used as defaults.</P>
+<P>You may change the defaults several times throughout a scene as you wish. Subsequent <b><code>#default</code></b> statements begin with the defaults that were in effect at the time. If you wish to reset to the original POV-Ray defaults then you should first save them as follows:</P>
+<PRE> //At top of file
+ #declare Original_Default = texture {}</PRE>
+<P>later after changing defaults you may restore it with...</P>
+<PRE> #default {texture {Original_Default}}</PRE>
+<P>If you do not specify a texture for an object then the default texture is attached when the object appears in the scene. It is not attached when an object is declared. For example:</P>
+<PRE> #declare My_Object =
+  sphere{ &lt;0,0,0&gt;, 1 } // Default texture not applied
+  object{ My_Object }  // Default texture added here</PRE>
+<P>You may force a default texture to be added by using an empty texture statement as follows:</P>
+<PRE> #declare My_Thing =
+  sphere { &lt;0,0,0&gt;, 1 texture {} } // Default texture applied</PRE>
+<P>The original POV-Ray defaults for all items are given throughout the documentation under each appropriate section.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov198.htm">The #write Directive</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov200.htm">The #version Directive</A>
+</P>
+</BODY>
+</HTML>
+

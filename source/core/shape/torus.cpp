@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -48,11 +48,20 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/torus.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/math/matrix.h"
 #include "core/math/polynomialsolver.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -129,7 +138,7 @@ bool Torus::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 
     Found = false;
 
-    if ((max_i = Intersect(ray, Depth, Thread)) > 0)
+    if ((max_i = Intersect(ray, Depth, Thread->Stats())) > 0)
     {
         for (i = 0; i < max_i; i++)
         {
@@ -158,7 +167,7 @@ bool SpindleTorus::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceT
 
     Found = false;
 
-    if ((max_i = Intersect(ray, Depth, Thread)) > 0)
+    if ((max_i = Intersect(ray, Depth, Thread->Stats())) > 0)
     {
         for (i = 0; i < max_i; i++)
         {
@@ -229,7 +238,7 @@ bool SpindleTorus::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceT
 *
 ******************************************************************************/
 
-int Torus::Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Thread) const
+int Torus::Intersect(const BasicRay& ray, DBL *Depth, RenderStatistics& stats) const
 {
     int i, n;
     DBL len, R2, Py2, Dy2, PDy2, k1, k2;
@@ -241,7 +250,7 @@ int Torus::Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Thread) c
     DBL BoundingSphereRadius; // Sphere fully (amply) enclosing torus.
     DBL Closer;               // P is moved Closer*D closer to torus.
 
-    Thread->Stats()[Ray_Torus_Tests]++;
+    stats[Ray_Torus_Tests]++;
 
     /* Transform the ray into the torus space. */
 
@@ -265,13 +274,13 @@ int Torus::Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Thread) c
     r2 = Sqr(MajorRadius + MinorRadius);
 
 #ifdef TORUS_EXTRA_STATS
-    Thread->Stats()[Torus_Bound_Tests]++;
+    stats[Torus_Bound_Tests]++;
 #endif
 
     if (Test_Thick_Cylinder(P, D, y1, y2, r1, r2))
     {
 #ifdef TORUS_EXTRA_STATS
-        Thread->Stats()[Torus_Bound_Tests_Succeeded]++;
+        stats[Torus_Bound_Tests_Succeeded]++;
 #endif
 
         // Move P close to bounding sphere to have more precise root calculation.
@@ -307,14 +316,14 @@ int Torus::Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Thread) c
 
         c[4] = k1 * k1 + 4.0 * R2 * (Py2 - r2);
 
-        n = Solve_Polynomial(4, c, r, Test_Flag(this, STURM_FLAG), ROOT_TOLERANCE, Thread->Stats());
+        n = Solve_Polynomial(4, c, r, Test_Flag(this, STURM_FLAG), ROOT_TOLERANCE, stats);
 
         while(n--)
             Depth[i++] = (r[n] + Closer) / len;
     }
 
     if (i)
-        Thread->Stats()[Ray_Torus_Tests_Succeeded]++;
+        stats[Ray_Torus_Tests_Succeeded]++;
 
     return(i);
 }
@@ -662,7 +671,7 @@ void Torus::Scale(const Vector3d&, const TRANSFORM *tr)
 
 void Torus::Transform(const TRANSFORM *tr)
 {
-    if(Trans == NULL)
+    if (Trans == nullptr)
         Trans = Create_Transform();
 
     Compose_Transforms(Trans, tr);
@@ -1074,7 +1083,7 @@ bool Torus::Test_Thick_Cylinder(const Vector3d& P, const Vector3d& D, DBL h1, DB
 *
 ******************************************************************************/
 
-void Torus::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
+void Torus::UVCoord(Vector2d& Result, const Intersection *Inter) const
 {
     CalcUV(Inter->IPoint, Result);
 }
@@ -1131,3 +1140,4 @@ void Torus::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
 }
 
 }
+// end of namespace pov

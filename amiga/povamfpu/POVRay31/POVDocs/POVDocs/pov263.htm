@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Union</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov262.htm">Inside and Outside</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov264.htm">Intersection</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199100"><A NAME="_Toc429993608">Union</A></A></H4>
+<B><P ALIGN="CENTER"><IMG SRC="Image103.gif" WIDTH=313 HEIGHT=199></P>
+<P ALIGN="CENTER">The union of two objects.</P>
+</B><P>The simplest kind of CSG is the <b><code>union</code></b>. The syntax is:</P>
+<I><DL>
+<DT>UNION:</DT>
+</I><b><code><DD>union {</code></b> <I>OBJECTS...  [OBJECT_MODIFIERS...]</I> <b><code>}</DD>
+</DL>
+</code></b><P>Unions are simply glue used to bind two or more shapes into a single entity that can be manipulated as a single object. The image above shows the union of <b><code>A</code></b> and <b><code>B</code></b>. The new object created by the union operation can be scaled, translated and rotated as a single shape. The entire union can share a single texture but each object contained in the union may also have its own texture, which will override any texture statements in the parent object.</P>
+<P>You should be aware that the surfaces inside the union will not be removed. As you can see from the figure this may be a problem for transparent unions. If you want those surfaces to be removed you'll have to use the <b><code>merge</code></b> operations explained in a later section.</P>
+<P>The following union will contain a box and a sphere.</P>
+<PRE>  union {
+    box { &lt;-1.5, -1, -1&gt;, &lt;0.5, 1, 1&gt; }
+    cylinder { &lt;0.5, 0, -1&gt;, &lt;0.5, 0, 1&gt;, 1 }
+  }</PRE>
+<P>Earlier versions of POV-Ray placed restrictions on unions so you often had to combine objects with <b><code>composite</code></b> statements.  Those earlier restrictions have been lifted so <b><code>composite</code></b> is no longer needed. It is still supported for backwards compatibility.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov262.htm">Inside and Outside</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov264.htm">Intersection</A>
+</P>
+</BODY>
+</HTML>
+

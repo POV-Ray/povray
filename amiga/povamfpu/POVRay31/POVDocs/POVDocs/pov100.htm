@@ -1,0 +1,50 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Adding the Sun</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov99.htm">Creating a Sky with a Color Gradient</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov101.htm">Adding Some Clouds</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198920"><A NAME="_Toc429993430">Adding the Sun</A></A></H4>
+<P>In the following example we will create a sky with a red sun surrounded by a red color halo that blends into the dark blue night sky. We'll do this using only the sky sphere feature.</P>
+<P>The sky sphere we use is shown below. A ground plane is also added for greater realism (<CODE>skysph2.pov</CODE>).</P>
+<PRE>  sky_sphere {
+    pigment {
+      gradient y
+      color_map {
+        [0.000 0.002 color rgb &lt;1.0, 0.2, 0.0&gt;
+                     color rgb &lt;1.0, 0.2, 0.0&gt;]
+        [0.002 0.200 color rgb &lt;0.8, 0.1, 0.0&gt;
+                     color rgb &lt;0.2, 0.2, 0.3&gt;]
+      }
+      scale 2
+      translate -1
+    }
+    rotate -135*x
+  }
+  plane { y, 0
+    pigment { color Green }
+    finish { ambient .3 diffuse .7 }
+  }</PRE>
+<P>The gradient pattern and the transformation inside the pigment are the same as in the example in the previous section.</P>
+<P>The color map consists of three colors. A bright, slightly yellowish red that is used for the sun, a darker red for the halo and a dark blue for the night sky. The sun's color covers only a very small portion of the sky sphere because we don't want the sun to become too big. The color is used at the color map values 0.000 and 0.002 to get a sharp contrast at value 0.002 (we don't want the sun to blend into the sky). The darker red color used for the halo blends into the dark blue sky color from value 0.002 to 0.200. All values above 0.200 will reveal the dark blue sky.</P>
+<P>The <b><code>rotate -135*x</code></b> statement is used to rotate the sun and the complete sky sphere to its final position. Without this rotation the sun would be at 0 degrees, i.e. right below us.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image221.jpg" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">A red sun descends into the night.</P>
+</B><P>Looking at the resulting image you'll see what impressive effects you can achieve with the sky sphere.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov99.htm">Creating a Sky with a Color Gradient</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov101.htm">Adding Some Clouds</A>
+</P>
+</BODY>
+</HTML>
+

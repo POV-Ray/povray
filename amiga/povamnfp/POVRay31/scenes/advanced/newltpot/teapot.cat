@@ -1,0 +1,14 @@
+TEAPOT2.POV   <- The classic Newell/Blinn/Enzmann Utah Teapot done in
+                 spheres and cylinders.
+TEAPOT3.POV   <- The classic Newell/Blinn/Enzmann Utah Teapot done in
+                 gold cylinders and white marble triangles.
+TEAPOT4.POV   <- The classic Newell/Blinn/Enzmann Utah Teapot done in
+                 gold cylinders and reticulated gold triangles.
+TEAPOT.SPH   <-  #include file for above, teapot done in spheres.
+TEAPOT.TRI   <-  #include file for above, teapot done in triangles.
+TEAPOT.C1    <-  #include file for above, teapot done in cylinders along
+                 the diagonals.
+TEAPOT.C2    <-  #include file for above, teapot done in cylinders along
+                 the horizontals.
+TEAPOT.C3    <-  #include file for above, teapot done in cylinders along
+                 the verticals.

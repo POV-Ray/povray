@@ -1,0 +1,36 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Diffuse Reflection Items</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov305.htm">Ambient</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov307.htm">Highlights</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199146"><A NAME="_Toc429993657">Diffuse Reflection Items</A></A></H4>
+<P>When light reflects off of a surface the laws of physics say that it should leave the surface at the exact same angle it came in. This is similar to the way a billiard ball bounces off a bumper of a pool table. This perfect reflection is called <I>specular reflection</I>. However only very smooth polished surfaces reflect light in this way. Most of the time, light reflects and is scattered in all directions by the roughness of the surface. This scattering is called <I>diffuse reflection</I> because the light diffuses or spreads in a variety of directions. It accounts for the majority of the reflected light we see.</P>
+<P>POV-Ray and most other ray-tracers can only simulate directly light which comes directly from actual light sources.  Light coming from other objects such as mirrors via specular reflection (such as shining a flashlight onto a mirror for example) cannot be simulated.  Neither can we simulate light coming from other objects via diffuse reflections.  For example look at some dark area under a desk or in a corner: even though a lamp may not directly illuminate that spot, you can still see a little bit because light comes from diffuse reflection off of nearby objects.</P>
+<H5><A NAME="_Toc414199147"><A NAME="_Toc429993658">Diffuse</A></A></H5>
+<P>The keyword <b><code>diffuse</code></b> is used in a <b><code>finish</code></b> statement to control how much of the light coming directly from any light sources is reflected via diffuse reflection. For example</P>
+<PRE>  finish {diffuse 0.7}</PRE>
+<P>means that 70% of the light seen comes from direct illumination from light sources. The default value is <b><code>diffuse 0.6</code></b>.</P>
+<H5><A NAME="_Toc414199148"><A NAME="_Toc429993659">Brilliance</A></A></H5>
+<P>The amount of direct light that diffuses from an object depends upon the angle at which it hits the surface. When light hits at a shallow angle it illuminates less. When it is directly above a surface it illuminates more. The <b><code>brilliance</code></b> keyword can be used in a <b><code>finish</code></b> statement to vary the way light falls off depending upon the angle of incidence.  This controls the tightness of the basic diffuse illumination on objects and slightly adjusts the appearance of surface shininess.  Objects may appear more metallic by increasing their brilliance. The default value is 1.0.  Higher values from 5.0 to about 10.0 cause the light to fall off less at medium to low angles. There are no limits to the brilliance value.  Experiment to see what works best for a particular situation. This is best used in concert with highlighting.</P>
+<H5><A NAME="_Toc414199149"><A NAME="_Toc429993660">Crand Graininess</A></A></H5>
+<P>Very rough surfaces, such as concrete or sand, exhibit a dark graininess in their apparent color. This is caused by the shadows of the pits or holes in the surface. The <b><code>crand</code></b> keyword can be added to a <b><code>finish</code></b> cause a minor random darkening in the diffuse reflection of direct illumination. Typical values range from <b><code>crand 0.01</code></b> to <b><code>crand 0.5</code></b> or higher. The default value is 0. For example:</P>
+<PRE>  finish { crand 0.05 }</PRE>
+<P>This feature is carried over from the earliest versions of POV-Ray and is considered obsolete. This is because the grain or noise introduced by this feature is applied on a pixel-by-pixel basis. This means that it will look the same on far away objects as on close objects. The effect also looks different depending upon the resolution you are using for the rendering. Note that this should not be used when rendering animations. This is the one of a few truly random features in POV-Ray and will produce an annoying flicker of flying pixels on any textures animated with a <b><code>crand</code></b> value.  For these reasons it is not a very accurate way to model the rough surface effect.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov305.htm">Ambient</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov307.htm">Highlights</A>
+</P>
+</BODY>
+</HTML>
+

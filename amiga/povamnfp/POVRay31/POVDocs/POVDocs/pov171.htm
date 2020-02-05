@@ -1,0 +1,29 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Operator Promotion</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov170.htm">Vector Operators</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov172.htm">Built-in Vector Identifiers</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref412891853"><A NAME="_Toc414199004"><A NAME="_Toc429993514">Operator Promotion</A></A></A></H4>
+<P>You may use a lone float expression to define a vector whose components are all the same. POV-Ray knows when it needs a vector of a particular type and will promote a float into a vector if need be. For example the POV-Ray <b><code>scale</code></b> statement requires a three component vector. If you specify <b><code>scale 5</code></b> then POV-Ray interprets this as <b><code>scale &lt;5,5,5&gt;</code></b> which means you want to scale by 5 in every direction.</P>
+<P>Versions of POV-Ray prior to 3.0 only allowed such use of a float as a vector in various limited places such as <b><code>scale</code></b> and <b><code>turbulence</code></b>. However you may now use this trick anywhere. For example...</P>
+<PRE> box{0,1}  // Same as box{&lt;0,0,0&gt;,&lt;1,1,1&gt;}
+ sphere{0,1} // Same as sphere{&lt;0,0,0&gt;,1}</PRE>
+<P>When promoting a float into a vector of 2, 3, 4 or 5 components, all components are set to the float value, however when promoting a vector of a lower number of components into a higher order vector, all remaining components are set to zero. For example if POV-Ray expects a 4D vector and you specify <b><code>9</code></b> the result is <b><code>&lt;9,9,9,9&gt;</code></b> but if you specify <b><code>&lt;7,6&gt;</code></b> the result is <b><code>&lt;7,6,0,0&gt;</code></b>.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov170.htm">Vector Operators</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov172.htm">Built-in Vector Identifiers</A>
+</P>
+</BODY>
+</HTML>
+

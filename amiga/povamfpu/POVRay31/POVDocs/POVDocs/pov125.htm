@@ -1,0 +1,90 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Options Reference</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov124.htm">Using the POVINI Environment Variable</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov126.htm">Animation Options</A>
+</P>
+<HR>
+<BR>
+<H2><A NAME="_Toc411405158"><A NAME="_Toc411405434"><A NAME="_Toc414198946"><A NAME="_Toc429993455">Options Reference</A></A></A></A></H2>
+<P>As explained in the previous section, options may be specified by switches or INI-style options. Almost all INI-style options have equivalent  <b><code>+</code></b>/ <b><code>-</code></b> switches and most switches have equivalent INI-style option. The following sections give a detailed description of each POV-Ray option. It includes both the INI-style settings and the <b><code>+</code></b>/ <b><code>-</code></b> switches.</P>
+<P>The notation and terminology used is described in the tables below.</P>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=528>
+<TR><TD WIDTH="27%" VALIGN="TOP">
+<b><code>Keyword=</code></b><I>bool</I></TD>
+<TD WIDTH="73%" VALIGN="TOP">
+Turn <b><code>Keyword</code></b> on if <I>bool</I> equals <b><code>true</code></b>, <b><code>yes</code></b>, <b><code>on</code></b> or <b><code>1</code></b> and Turn it off if it is any other value.
+</TD>
+</TR>
+<TR><TD WIDTH="27%" VALIGN="TOP">
+
+<b><code>Keyword=true
+</code></b></TD>
+<TD WIDTH="73%" VALIGN="TOP">
+Do this option if <b><code>true</code></b>, <b><code>yes</code></b>, <b><code>on</code></b> or <b><code>1</code></b> is specified.
+</TD>
+</TR>
+<TR><TD WIDTH="27%" VALIGN="TOP">
+<b><code>Keyword=false</code></b></TD>
+<TD WIDTH="73%" VALIGN="TOP">
+Do this option if <b><code>false</code></b>, <b><code>no</code></b>, <b><code>off</code></b> or <b><code>0</code></b> is specified.
+</TD>
+</TR>
+<TR><TD WIDTH="27%" VALIGN="TOP">
+<p><b><code>Keyword=</code></b><I>filename</I></TD>
+<TD WIDTH="73%" VALIGN="TOP">
+Set <b><code>Keyword</code></b> to <I>filename</I> where <I>filename</I> is any valid file name. Note: some options prohibit the use of any of the above <b><code>true</code></b> or <b><code>false</code></b> values as a file name. They are noted in later sections.
+</TD>
+</TR>
+<TR><TD WIDTH="27%" VALIGN="TOP">
+<I><P>n</I></TD>
+<TD WIDTH="73%" VALIGN="TOP">
+Any integer such as in <b><code>+W320
+</code></b></TD>
+</TR>
+<TR><TD WIDTH="27%" VALIGN="TOP">
+<I><P>n.n</I></TD>
+<TD WIDTH="73%" VALIGN="TOP">Any float such as in <b><code>Clock=3.45</code></b></TD>
+</TR>
+<TR><TD WIDTH="27%" VALIGN="TOP">
+<I><P>0.n</I></TD>
+<TD WIDTH="73%" VALIGN="TOP">
+Any float &lt; 1.0 even if it has no leading 0
+</TD>
+</TR>
+<TR><TD WIDTH="27%" VALIGN="TOP">
+s
+</TD>
+<TD WIDTH="73%" VALIGN="TOP">
+Any string of text</TD>
+</TR>
+<TR><TD WIDTH="27%" VALIGN="TOP">
+<I><P>x</I> or <I>y</I></TD>
+<TD WIDTH="73%" VALIGN="TOP">
+<P>Any single character</TD>
+</TR>
+<TR><TD WIDTH="27%" VALIGN="TOP">
+<I><P>path</I></TD>
+<TD WIDTH="73%" VALIGN="TOP">
+Any directory name, drive optional, no final path separator ("\" or "/", depending on the operating system)
+</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>Unless otherwise specifically noted, you may assume that either a plus or minus sign before a switch will produce the same results.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov124.htm">Using the POVINI Environment Variable</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov126.htm">Animation Options</A>
+</P>
+</BODY>
+</HTML>
+

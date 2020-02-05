@@ -1,0 +1,33 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - The #fopen Directive</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov194.htm">File I/O Directives</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov196.htm">The #fclose Directive</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref413244037"><A NAME="_Toc414199028"><A NAME="_Toc429993538">The #fopen Directive</A></A></A></H4>
+<P>Users may open a text file using the <b><code>#fopen</code></b> directive. The syntax is as follows:</P>
+<I><DL>
+<DT>FOPEN_DIRECTIVE:</DT>
+</I><b><code><DD>#fopen</code></b> <I>IDENTIFIER "filename" OPEN_TYPE</DD>
+<DT>OPEN_TYPE:</DT>
+</I><b><code><DD>read</code></b>   |   <b><code>write</code></b>   |   <b><code>append</DD>
+</DL>
+</code></b><P>Where <I>IDENTIFIER</I> is an undefined identifier used to reference this file as a file handle, <I>"filename"</I> is any string literal or string expression which specifies the file name.  Files opened with the <b><code>read</code></b> are open for read only. Those opened with <b><code>write</code></b> create a new file with the specified name and it overwrites any existing file with that name. Those opened with <b><code>append</code></b> opens a file for writing but appends the text to the end of any existing file.</P>
+<P>The file handle identifier created by <b><code>#fopen</code></b> is always global and remains in effect (and the file remains open) until the scene parsing is complete or until you <b><code>#fclose</code></b> the file. You may use <b><code>#ifdef</code></b> <I>FILE_HANDLE_IDENTIFIER</I> to see if a file is open.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov194.htm">File I/O Directives</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov196.htm">The #fclose Directive</A>
+</P>
+</BODY>
+</HTML>
+

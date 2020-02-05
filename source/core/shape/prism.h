@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,6 +39,14 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/scene/object.h"
 
 namespace pov
@@ -80,23 +88,22 @@ namespace pov
 * Global typedefs
 ******************************************************************************/
 
-typedef struct Prism_Spline_Struct PRISM_SPLINE;
-typedef struct Prism_Spline_Entry_Struct PRISM_SPLINE_ENTRY;
-
-struct Prism_Spline_Entry_Struct
+struct Prism_Spline_Entry_Struct final
 {
     DBL x1, y1, x2, y2;  /* Min./Max. coordinates of segment   */
     DBL v1, u2, v2;      /* Min./Max. coordinates of segment in <u,v>, u1 not needed  */
     Vector2d A, B, C, D; /* Coefficients of segment            */
 };
+using PRISM_SPLINE_ENTRY = Prism_Spline_Entry_Struct; ///< @deprecated
 
-struct Prism_Spline_Struct
+struct Prism_Spline_Struct final
 {
     int References;
     PRISM_SPLINE_ENTRY *Entry;
 };
+using PRISM_SPLINE = Prism_Spline_Struct; ///< @deprecated
 
-class Prism : public ObjectBase
+class Prism final : public ObjectBase
 {
     public:
         int Number;
@@ -108,22 +115,22 @@ class Prism : public ObjectBase
         DBL u1, v1, u2, v2;       /* Overall <u,v> bounding rectangle of spline */
 
         Prism();
-        virtual ~Prism();
+        virtual ~Prism() override;
 
-        virtual ObjectPtr Copy();
+        virtual ObjectPtr Copy() override;
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-        virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
-        virtual void Translate(const Vector3d&, const TRANSFORM *);
-        virtual void Rotate(const Vector3d&, const TRANSFORM *);
-        virtual void Scale(const Vector3d&, const TRANSFORM *);
-        virtual void Transform(const TRANSFORM *);
-        virtual void Compute_BBox();
+        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) override;
+        virtual bool Inside(const Vector3d&, TraceThreadData *) const override;
+        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const override;
+        virtual void Translate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Rotate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Scale(const Vector3d&, const TRANSFORM *) override;
+        virtual void Transform(const TRANSFORM *) override;
+        virtual void Compute_BBox() override;
 
-        void Compute_Prism(Vector2d *P, TraceThreadData *Thread);
+        void Compute_Prism(Vector2d *P, RenderStatistics& stats);
     protected:
-        int in_curve(DBL u, DBL v, TraceThreadData *Thread) const;
+        int in_curve(DBL u, DBL v, RenderStatistics& stats) const;
         static bool test_rectangle(const Vector3d& P, const Vector3d& D, DBL x1, DBL y1, DBL x2, DBL y2);
 };
 
@@ -132,5 +139,6 @@ class Prism : public ObjectBase
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_PRISM_H

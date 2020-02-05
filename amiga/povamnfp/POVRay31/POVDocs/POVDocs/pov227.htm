@@ -1,0 +1,32 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - The Sky Vector</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov226.htm">Location and Look_At</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov228.htm">Angle</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199060"><A NAME="_Toc429993570">The Sky Vector</A></A></H4>
+<P>Normally POV-Ray pans left or right by rotating about the y-axis until it lines up with the <b><code>look_at</code></b> point and then tilts straight up or down until the point is met exactly. However you may want to slant the camera sideways like an airplane making a banked turn. You may change the tilt of the camera using the <b><code>sky</code></b> vector. For example:</P>
+<PRE> camera {
+  location &lt;3,5,-10&gt;
+  sky   &lt;1,1,0&gt;
+  look_at &lt;0,2,1&gt;
+ }</PRE>
+<P>This tells POV-Ray to roll the camera until the top of the camera is in line with the sky vector. Imagine that the sky vector is an antenna pointing out of the top of the camera. Then it uses the <b><code>sky</code></b> vector as the axis of rotation left or right and then to tilt up or down in line with the <b><code>sky</code></b> until pointing at the <b><code>look_at</code></b> point. In effect you're telling POV-Ray to assume that the sky isn't straight up. Note that the <b><code>sky</code></b> vector must appear before the <b><code>look_at</code></b> vector.</P>
+<P>The <b><code>sky</code></b> vector does nothing on its own. It only modifies the way the <b><code>look_at</code></b> vector turns the camera. The default value is <b><code>sky&lt;0,1,0&gt;</code></b>.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov226.htm">Location and Look_At</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov228.htm">Angle</A>
+</P>
+</BODY>
+</HTML>
+

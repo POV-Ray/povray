@@ -1,0 +1,46 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Bounded_By</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov278.htm">Clipped_By</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov280.htm">Material</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199121"><A NAME="_Toc429993624">Bounded_By</A></A></H4>
+<P>The calculations necessary to test if a ray hits an object can be quite time consuming. Each ray has to be tested against every object in the scene. POV-Ray attempts to speed up the process by building a set of invisible boxes, called bounding boxes, which cluster the objects together. This way a ray that travels in one part of the scene doesn't have to be tested against objects in another, far away part of the scene. When large a number of objects are present the boxes are nested inside each other. POV-Ray can use bounding boxes on any finite object and even some clipped or bounded quadrics. However infinite objects (such as a planes, quartic, cubic and poly) cannot be automatically bound. CSG objects are automatically bound if they contain finite (and in some cases even infinite) objects. This works by applying the CSG set operations to the bounding boxes of all objects used inside the CSG object. For difference and intersection operations this will hardly ever lead to an optimal bounding box. It's sometimes better (depending on the complexity of the CSG object) to have you place a bounding shape yourself using a <b><code>bounded_by</code></b> statement.  </P>
+<P>Normally bounding shapes are not necessary but there are cases where they can be used to speed up the rendering of complex objects. Bounding shapes tell the ray-tracer that the object is totally enclosed by a simple shape. When tracing rays, the ray is first tested against the simple bounding shape. If it strikes the bounding shape the ray is further tested against the more complicated object inside. Otherwise the entire complex shape is skipped, which greatly speeds rendering.  The syntax is:</P>
+<I><DL>
+<DT>BOUNDED_BY:</DT>
+</I><b><code><DD>bounded_by</code></b> <b><code>{</code></b> <I>UNTEXTURED_SOLID_OBJECT...</I> <b><code>}</code></b>   |   <b><code>bounded_by</code></b> <b><code>{</code></b> <b><code>clipped_by</code></b> <b><code>}</DD>
+</DL>
+</code></b><P>Where <I>UNTEXTURED_SOLID_OBJECT</I> is one or more solid objects which have had no texture applied.  For example:</P>
+<PRE>  intersection {
+    sphere { &lt;0,0,0&gt;, 2 }
+    plane  { &lt;0,1,0&gt;, 0 }
+    plane  { &lt;1,0,0&gt;, 0 }
+    bounded_by { sphere { &lt;0,0,0&gt;, 2 } }
+  }</PRE>
+<P>The best bounding shape is a sphere or a box since these shapes are highly optimized, although, any shape may be used. If the bounding shape is itself a finite shape which responds to bounding slabs then the object which it encloses will also be used in the slab system.</P>
+<P>While it may a good idea to manually add a <b><code>bounded_by</code></b> to intersection, difference and merge, it is best to <I>never</I> bound a union. If a union has no <b><code>bounded_by</code></b> POV-Ray can internally split apart the components of a union and apply automatic bounding slabs to any of its finite parts. Note that some utilities such as <CODE>raw2pov</CODE> may be able to generate bounds more efficiently than POV-Ray's current system. However most unions you create yourself can be easily bounded by the automatic system. For technical reasons POV-Ray cannot split a merge object. It is may be best to hand bound a merge, especially if it is very complex.</P>
+<P>Note that if bounding shape is too small or positioned incorrectly it may clip the object in undefined ways or the object may not appear at all. To do true clipping, use <b><code>clipped_by</code></b> as explained in the previous section. Occasionally you will want to use the <b><code>clipped_by</code></b> and <b><code>bounded_by</code></b> options with the same object. The following shortcut saves typing and uses less memory.</P>
+<PRE>  object {
+    My_Thing
+    clipped_by{ box { &lt;0,0,0&gt;,&lt;1,1,1 &gt; }}
+    bounded_by{ clipped_by }
+  }</PRE>
+<P>This tells POV-Ray to use the same box as a bounds that was used as a clip.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov278.htm">Clipped_By</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov280.htm">Material</A>
+</P>
+</BODY>
+</HTML>
+

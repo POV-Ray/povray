@@ -1,0 +1,45 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Teaching An Old Spline New Tricks</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov44.htm">Prism Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov46.htm">Smooth Transitions</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198864"><A NAME="_Toc429993375">Teaching An Old Spline New Tricks</A></A></H4>
+<P>If we followed the section on splines covered under the lathe tutorial (see section "<A HREF="pov41.htm#_Ref411675936">Understanding The Concept of Splines</A>"), we know that there are two additional kinds of splines besides linear: the quadratic and the cubic spline. Sure enough, we can use these with prisms to make a more free form, smoothly curving type of prism.</P>
+<P>There is just one catch, and we should read this section carefully to keep from tearing our hair out over mysterious "too few points in prism" messages which keep our prism from rendering. We can probably guess where this is heading: how to close a non-linear spline. Unlike the linear spline, which simply draws a line between the last and first points if we forget to make the last point equal to the first, quadratic and cubic splines are a little more fussy.</P>
+<P>First of all, we remember that quadratic splines determine the equation of the curve which connects any two points based on those two points and the previous point, so the first point in any quadratic spline is just <I>control point </I>and won't actually be part of the curve.  What this means is: when we make our shape out of a quadratic spline, we must match the second point to the last, since the first point is not on the curve - it's just a control point needed for computational purposes.</P>
+<P>Likewise, cubic splines need both the first and last points to be control points, therefore, to close a shape made with a cubic spline, we must match the second point to the second from last point. If we don't match the correct points on a quadratic or cubic shape, that's when we will get the "too few points in prism" error. POV-Ray is still waiting for us to close the shape, and when it runs out of points without seeing the closure, an error is issued.</P>
+<P>Confused? Okay, how about an example? We replace the prism in our last bit of code with this one (see file <CODE>prismdm2.pov</CODE>).</P>
+<PRE>  prism {
+    cubic_spline
+    0, // sweep the following shape from here ...
+    1, // ... up through here
+    6, // the number of points making up the shape ...
+    &lt; 3, -5&gt;, // point#1 (control point... not on curve)
+    &lt; 3,  5&gt;, // point#2  ... THIS POINT ...
+    &lt;-5,  0&gt;, // point#3
+    &lt; 3, -5&gt;, // point#4
+    &lt; 3,  5&gt;, // point#5 ... MUST MATCH THIS POINT
+    &lt;-5,  0&gt;  // point#6 (control point... not on curve)
+    pigment { Green }
+  }</PRE>
+<B><P ALIGN="CENTER"><IMG SRC="Image214.gif" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">A cubic, triangular prism shape.</P>
+</B><P>This simple prism produces what looks like an extruded triangle with its corners sanded smoothly off. Points two, three and four are the corners of the triangle and point five closes the shape by returning to the location of point two. As for points one and six, they are our control points, and aren't part of the shape - they're just there to help compute what curves to use between the other points.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov44.htm">Prism Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov46.htm">Smooth Transitions</A>
+</P>
+</BODY>
+</HTML>
+

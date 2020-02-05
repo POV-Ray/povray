@@ -1,0 +1,94 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Material Maps</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov313.htm">Tiles</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov315.htm">Layered Textures</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199160"><A NAME="_Ref428017081"><A NAME="_Toc429993671">Material Maps</A></A></A></H4>
+<P>The <b><code>material_map</code></b> patterned texture extends the concept of image maps to apply to entire textures rather than solid colors. A material map allows you to wrap a 2-D bit-mapped texture pattern around your 3-D objects.</P>
+<P>Instead of placing a solid color of the image on the shape like an image map, an entire texture is specified based on the index or color of the image at that point. You must specify a list of textures to be used like a <I>texture palette </I>rather than the usual color palette.</P>
+<P>When used with mapped file types such as GIF, and some PNG and TGA images, the index of the pixel is used as an index into the list of textures you supply. For unmapped file types such as some PNG and TGA images the 8 bit value of the red component in the range 0-255 is used as an index.</P>
+<P>If the index of a pixel is greater than the number of textures in your list then the index is taken modulo N where N is the length of your list of textures.</P>
+<P>Note: The <b><code>material_map</code></b> statement has nothing to do with the <b><code>material</code></b> statement.  A <b><code>material_map</code></b> is <I>not</I> a way to create patterned <b><code>material</code></b>.  See "<A HREF="pov280.htm#_Ref428017426">Material</A>" for explanation of this unrelated, yet similarly named, older feature.</P>
+<H5><A NAME="_Toc414199161"><A NAME="_Toc429993672">Specifying a Material Map</A></A></H5>
+<P>The syntax for an <b><code>material_map</code></b> is:</P>
+<I><DL>
+<DT>MATERIAL_MAP:</DT>
+</I><b><code><DD>texture {</code></b> </DD>
+<b><code><DD>material_map{</code></b> </DD>
+<I><DD>BITMAP_TYPE "bitmap.ext" [BITMAP_MODS...] TEXTURE... [TRANSFORMATIONS...]</DD>
+</I><b><code><DD>}</DD>
+<DD>}</DD>
+</code></b><I><DT>BITMAP_TYPE:</DT>
+</I><b><code><DD>gif</code></b>   |   <b><code>tga</code></b>   |   <b><code>iff</code></b>   |   <b><code>ppm</code></b>   |   <b><code>pgm</code></b>   |   <b><code>png</code></b>   |   <b><code>sys</DD>
+</code></b><I><DT>BITMAP_MOD:</DT>
+</I><b><code><DD>map_type</code></b>  <I>Type</I>   |   <b><code>once</code></b>   |   <b><code>interpolate</code></b>  <I>Type</DD>
+</DL>
+</I><P>After the required <I>BITMAP_TYPE</I> keyword is a string expression containing the name of a bitmapped material file of the specified type.  Several optional modifiers may follow the file specification. The modifiers are described below. Note that earlier versions of POV-Ray allowed some modifiers before the <I>BITMAP_TYPE</I> but that syntax is being phased out in favor of the syntax described here.  Note <b><code>sys</code></b> format is a system-specific format such as BMP for Windows or Pict for Macintosh.</P>
+<P>Filenames specified in the <b><code>material_map</code></b> statements will be searched for in the home (current) directory first and, if not found, will then be searched for in directories specified by any <b><code>+L</code></b> or <b><code>Library_Path</code></b> options active. This would facilitate keeping all your material maps files in a separate subdirectory and giving a <b><code>Library_Path</code></b> option to specify where your library of material maps are.  See "<A HREF="pov139.htm#_Ref413142060">Library Paths</A>" for details. </P>
+<P>By default, the material is mapped onto the x-y-plane. The material is <I>projected </I>onto the object as though there were a slide projector somewhere in the -z-direction. The material exactly fills the square area from (x,y) coordinates (0,0) to (1,1) regardless of the material's original size in pixels. If you would like to change this default you may translate, rotate or scale the texture or texture to map it onto the object's surface as desired.</P>
+<P>The file name is optionally followed by one or more <I>BITMAP_MODIFIERS</I>.  There are no modifiers which are unique to a <b><code>material_map</code></b>.  It only uses the generic bitmap modifiers <b><code>map_type</code></b>, <b><code>once</code></b> and <b><code>interpolate</code></b> described in "<A HREF="pov355.htm#_Ref417983218">Bitmap Modifiers</A>".</P>
+<P>Although <b><code>interpolate</code></b> is legal in material maps, the color index is interpolated before the texture is chosen. It does not interpolate the final color as you might hope it would. In general, interpolation of material maps serves no useful purpose but this may be fixed in future versions.</P>
+<P>Next is one or more <b><code>texture</code></b> statements.  Each texture in the list corresponds to an index in the bitmap file.  For example:</P>
+<PRE>   texture {
+      material_map {
+         png "povmap.png"
+         texture {  //used with index 0
+            pigment {color red 0.3 green 0.1 blue 1}
+            normal  {ripples 0.85 frequency 10 }
+            finish  {specular 0.75}
+            scale 5
+         }
+         texture {  //used with index 1
+            pigment {White}
+            finish {ambient 0 diffuse 0 reflection 0.9 specular 0.75}
+         }
+         // used with index 2
+         texture {pigment{NeonPink} finish{Luminous}}
+         texture {  //used with index 3
+            pigment {
+               gradient y
+               color_map {
+                  [0.00 rgb &lt; 1 , 0 , 0&gt;]
+                  [0.33 rgb &lt; 0 , 0 , 1&gt;]
+                  [0.66 rgb &lt; 0 , 1 , 0&gt;]
+                  [1.00 rgb &lt; 1 , 0 , 0&gt;]
+               }
+            }
+            finish{specular 0.75}
+            scale 8
+         }
+      }
+      scale 30
+      translate &lt;-15, -15, 0&gt;
+   }</PRE>
+<P>After a <b><code>material_map</code></b> statement but still inside the texture statement you may apply any legal texture modifiers. Note that no other pigment, normal, or finish statements may be added to the texture outside the material map. The following is illegal:</P>
+<PRE>  texture {
+    material_map {
+      gif "matmap.gif"
+      texture {T1}
+      texture {T2}
+      texture {T3}
+    }
+    finish {phong 1.0}
+  }</PRE>
+<P>The finish must be individually added to each texture.  Note that earlier versions of POV-Ray allowed such specifications but they were ignored. The above restrictions on syntax were necessary for various bug fixes. This means some POV-Ray 1.0 scenes using material maps many need minor modifications that cannot be done automatically with the version compatibility mode.</P>
+<P>If particular index values are not used in an image then it may be necessary to supply dummy textures. It may be necessary to use a paint program or other utility to examine the map file's palette to determine how to arrange the texture list.</P>
+<P>The textures within a material map texture may be layered but material map textures do not work as part of a layered texture. To use a layered texture inside a material map you must declare it as a texture identifier and invoke it in the texture list.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov313.htm">Tiles</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov315.htm">Layered Textures</A>
+</P>
+</BODY>
+</HTML>
+

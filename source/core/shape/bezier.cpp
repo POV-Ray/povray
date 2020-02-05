@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,19 +38,30 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/bezier.h"
 
+// C++ variants of C standard header files
+#include <cstring>
+
+// C++ standard header files
 #include <algorithm>
 
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
+#include "base/pov_mem.h"
 
+// POV-Ray header files (core module)
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov
 {
+
+using std::min;
+using std::max;
 
 /*****************************************************************************
 * Local preprocessor defines
@@ -93,7 +104,7 @@ BEZIER_NODE *BicubicPatch::create_new_bezier_node()
 {
     BEZIER_NODE *Node = reinterpret_cast<BEZIER_NODE *>(POV_MALLOC(sizeof(BEZIER_NODE), "bezier node"));
 
-    Node->Data_Ptr = NULL;
+    Node->Data_Ptr = nullptr;
 
     return (Node);
 }
@@ -774,7 +785,7 @@ void BicubicPatch::Precompute_Patch_Values()
 
     if (Patch_Type == 1)
     {
-        if (Node_Tree != NULL)
+        if (Node_Tree != nullptr)
         {
             bezier_tree_deleter(Node_Tree);
         }
@@ -1918,8 +1929,8 @@ BicubicPatch::BicubicPatch() : NonsolidObject(BICUBIC_PATCH_OBJECT)
     Flatness_Value = 0.0;
     accuracy = 0.01;
 
-    Node_Tree = NULL;
-    Weights = NULL;
+    Node_Tree = nullptr;
+    Weights = nullptr;
 
     /*
      * NOTE: Control_Points[4][4] is initialized in Parse_Bicubic_Patch.
@@ -1975,10 +1986,10 @@ ObjectPtr BicubicPatch::Copy()
     New->U_Steps = U_Steps;
     New->V_Steps = V_Steps;
 
-    if (Weights != NULL)
+    if (Weights != nullptr)
     {
         New->Weights = reinterpret_cast<BEZIER_WEIGHTS *>(POV_MALLOC( sizeof(BEZIER_WEIGHTS),"bicubic patch" ));
-        POV_MEMCPY( New->Weights, Weights, sizeof(BEZIER_WEIGHTS) );
+        std::memcpy( New->Weights, Weights, sizeof(BEZIER_WEIGHTS) );
     }
 
     for (i = 0; i < 4; i++)
@@ -2034,13 +2045,13 @@ BicubicPatch::~BicubicPatch()
 {
     if (Patch_Type == 1)
     {
-        if (Node_Tree != NULL)
+        if (Node_Tree != nullptr)
         {
             bezier_tree_deleter(Node_Tree);
         }
     }
 
-    if (Weights != NULL)
+    if (Weights != nullptr)
         POV_FREE(Weights);
 }
 
@@ -2126,7 +2137,7 @@ void BicubicPatch::Compute_BBox()
 *
 ******************************************************************************/
 
-void BicubicPatch::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
+void BicubicPatch::UVCoord(Vector2d& Result, const Intersection *Inter) const
 {
     /* Use preocmputed uv coordinates. */
 
@@ -2176,3 +2187,4 @@ void BicubicPatch::Compute_Texture_UV(const Vector2d& p, const Vector2d st[4], V
 }
 
 }
+// end of namespace pov

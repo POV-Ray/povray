@@ -12,7 +12,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -43,8 +43,19 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <memory>
+
+// Boost header files
 #include <boost/intrusive_ptr.hpp>
 
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/coretypes.h"
 #include "core/scene/object.h"
 
@@ -80,24 +91,15 @@ class IsoSurface;
 
 typedef unsigned char IsosurfaceMaxTrace;
 
-struct ISO_Pair { DBL t,f; };
-
-struct ISO_Max_Gradient;
-
-struct ISO_ThreadData
+struct ISO_Pair final
 {
-    const IsoSurface *current;
-    GenericScalarFunctionInstance* pFn;
-    Vector3d Pglobal;
-    Vector3d Dglobal;
-    DBL Vlength;
-    DBL tl;
-    DBL fmax;
-    bool cache;
-    int Inv3;
+    DBL t, f;
 };
 
-class IsoSurface : public ObjectBase
+struct ISO_Max_Gradient;
+struct ISO_ThreadData;
+
+class IsoSurface final : public ObjectBase
 {
     public:
 
@@ -112,24 +114,24 @@ class IsoSurface : public ObjectBase
         bool eval               : 1;
         bool positivePolarity   : 1; ///< `true` if values above threshold are considered inside, `false` if considered outside.
 
-        shared_ptr<ContainedByShape> container;
+        std::shared_ptr<ContainedByShape> container;
 
         IsoSurface();
-        virtual ~IsoSurface();
+        virtual ~IsoSurface() override;
 
-        virtual ObjectPtr Copy();
+        virtual ObjectPtr Copy() override;
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-        virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-        virtual double GetPotential (const Vector3d&, bool subtractThreshold, TraceThreadData *) const;
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
-        virtual void Translate(const Vector3d&, const TRANSFORM *);
-        virtual void Rotate(const Vector3d&, const TRANSFORM *);
-        virtual void Scale(const Vector3d&, const TRANSFORM *);
-        virtual void Transform(const TRANSFORM *);
-        virtual void Compute_BBox();
+        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) override;
+        virtual bool Inside(const Vector3d&, TraceThreadData *) const override;
+        virtual double GetPotential (const Vector3d&, bool subtractThreshold, TraceThreadData *) const override;
+        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const override;
+        virtual void Translate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Rotate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Scale(const Vector3d&, const TRANSFORM *) override;
+        virtual void Transform(const TRANSFORM *) override;
+        virtual void Compute_BBox() override;
 
-        virtual void DispatchShutdownMessages(GenericMessenger& messenger);
+        virtual void DispatchShutdownMessages(GenericMessenger& messenger) override;
 
     protected:
         bool Function_Find_Root(ISO_ThreadData& itd, const Vector3d&, const Vector3d&, DBL*, DBL*, DBL& max_gradient, bool in_shadow_test, TraceThreadData* pThreadData);
@@ -142,7 +144,7 @@ class IsoSurface : public ObjectBase
 
     private:
 
-        intrusive_ptr<ISO_Max_Gradient> mginfo; // global, but just a statistic (read: not thread safe but we don't care) [trf]
+        boost::intrusive_ptr<ISO_Max_Gradient> mginfo; // global, but just a statistic (read: not thread safe but we don't care) [trf]
 };
 
 /// @}
@@ -150,5 +152,6 @@ class IsoSurface : public ObjectBase
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_ISOSURFACE_H

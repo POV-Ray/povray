@@ -1,0 +1,30 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Radial</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov336.htm">Quilted</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov338.htm">Ripples</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199180"><A NAME="_Toc429993695">Radial</A></A></H4>
+<P>The <b><code>radial</code></b> pattern is a radial blend that wraps around the +y-axis. The color for value 0.0 starts at the +x-direction and wraps the color map around from east to west with 0.25 in the -z-direction, 0.5 in -x, 0.75 at +z and back to 1.0 at +x. Typically the pattern is used with a <b><code>frequency</code></b> modifier to create multiple bands that radiate from the y-axis.  For example:</P>
+<PRE>  pigement {
+    radial color_map{[0.5 Black][0.5 White]}
+    frequency 10
+  }</PRE>
+<P>creates 10 white bands and 10 black bands radiating from the y axis.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov336.htm">Quilted</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov338.htm">Ripples</A>
+</P>
+</BODY>
+</HTML>
+

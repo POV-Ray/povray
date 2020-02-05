@@ -12,7 +12,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,6 +44,7 @@
 
 // C++ standard header files
 #include <fstream>
+#include <vector>
 
 // Boost header files
 #include <boost/format.hpp>
@@ -56,6 +57,8 @@ namespace vfePlatform
 {
     using std::cerr;
     using std::endl;
+    using std::string;
+    using std::list;
 
     extern bool gShelloutsPermittedFixThis;
 
@@ -330,12 +333,12 @@ namespace vfePlatform
                     strcpy(nargv[i], oargv[i]);
                 }
 
-                nargv[nargc] = NULL;
+                nargv[nargc] = nullptr;
 
-                vector<string> CmdVariations;
+                std::vector<string> CmdVariations;
                 boost::split(CmdVariations, (*iter).CmdOption, boost::is_any_of("|"));
 
-                for (vector<string>::iterator iter_c = CmdVariations.begin(); iter_c != CmdVariations.end(); iter_c++)
+                for (std::vector<string>::iterator iter_c = CmdVariations.begin(); iter_c != CmdVariations.end(); iter_c++)
                 {
                     for (int i = 1; i < nargc;)
                     {
@@ -344,7 +347,7 @@ namespace vfePlatform
                             if ((*iter).has_param)
                             {
                                 int j = i + 1;
-                                if (j < nargc && nargv[j] != NULL)
+                                if (j < nargc && nargv[j] != nullptr)
                                 {
                                     (*iter).Value = nargv[j];
                                     remove_arg(&nargc, nargv, j);
@@ -356,7 +359,7 @@ namespace vfePlatform
                         }
                         else
                             i++;
-                        if (nargv[i] == NULL)
+                        if (nargv[i] == nullptr)
                             break;
                     }
                 }
@@ -377,7 +380,7 @@ namespace vfePlatform
         if (index >= *argc || index == 0)
             return;
 
-        if (argv[index] != NULL)
+        if (argv[index] != nullptr)
             free(argv[index]);
 
         for (; index < *argc; index++)
@@ -395,14 +398,14 @@ namespace vfePlatform
         len = 256;  // default buffer size
         char *tmp = new char[len];
 
-        while(getcwd(tmp, len) == NULL)  // buffer is too small
+        while (getcwd(tmp, len) == nullptr)  // buffer is too small
         {
             delete[] tmp;
             len *= 2;  // double buffer size and try again
             tmp = new char[len];
         }
 #else
-        string tmp = std::getenv("PWD");  // must not be NULL; checked by configure
+        string tmp = std::getenv("PWD");  // must not be `nullptr`; checked by configure
         if(tmp.length() == 0)        // run-time checks are safer anyway
         {
             // TODO: correct error handling
@@ -513,13 +516,13 @@ namespace vfePlatform
     string UnixOptionsProcessor::CanonicalizePath(const string &path)
     {
         int   i;
-        typedef struct { const char *match, *replace; } subst;
+        struct subst final { const char *match, *replace; };
         const subst strings[] = {  // beware: order does matter
             { "%INSTALLDIR%", POVLIBDIR },
             { "%HOME%", m_home.c_str() },
             { "//", "/" },
             { "/./", "/" },
-            { NULL, NULL }  // sentinel
+            { nullptr, nullptr }  // sentinel
         };
 
         // nothing to canonicalize; return an empty string
@@ -720,33 +723,33 @@ namespace vfePlatform
 
         typedef enum { NONE, FILE_IO, SHELLOUT, PERMITTED_PATHS, UNKNOWN } SectionVal;
         SectionVal section;
-        typedef struct Section { const char *label; const SectionVal value; } Section;
+        struct Section final { const char *label; const SectionVal value; };
         const Section sections[] =
         {
             { ""                   , NONE            },  // init
             { "[File I/O Security]", FILE_IO         },
             { "[Shellout Security]", SHELLOUT        },
             { "[Permitted Paths]"  , PERMITTED_PATHS },
-            { NULL                 , UNKNOWN         }   // sentinel
+            { nullptr              , UNKNOWN         }   // sentinel
         };
 
-        typedef struct IOSettings { const char *label; const FileIO value; } IOSettings;
+        struct IOSettings final { const char *label; const FileIO value; };
         const IOSettings io_settings[] =
         {
             { ""          , IO_UNSET      },
             { "none"      , IO_NONE       },
             { "read-only" , IO_READONLY   },
             { "restricted", IO_RESTRICTED },
-            { NULL        , IO_UNKNOWN    }
+            { nullptr     , IO_UNKNOWN    }
         };
 
-        typedef struct SHLSettings { const char *label; const ShellOut value; } SHLSettings;
+        struct SHLSettings final { const char *label; const ShellOut value; };
         const SHLSettings shl_settings[] =
         {
             { ""         , SHL_UNSET     },
             { "allowed"  , SHL_ALLOWED   },
             { "forbidden", SHL_FORBIDDEN },
-            { NULL       , SHL_UNKNOWN   }
+            { nullptr    , SHL_UNKNOWN   }
         };
 
         // inits
@@ -1069,7 +1072,7 @@ namespace vfePlatform
     {
         FILE *file = fopen(name.c_str(), "r");
 
-        if(file != NULL)
+        if (file != nullptr)
             fclose(file);
         else
             return false;
@@ -1227,3 +1230,4 @@ namespace vfePlatform
     }
 
 }
+// end of namespace vfePlatform

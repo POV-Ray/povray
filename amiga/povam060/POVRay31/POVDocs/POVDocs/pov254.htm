@@ -1,0 +1,46 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Mesh</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov253.htm">Disc</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov255.htm">Polygon</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref412632666"><A NAME="_Toc414199089"><A NAME="_Toc429993599">Mesh</A></A></A></H4>
+<P>The <b><code>mesh</code></b> object can be used to efficiently store large numbers of triangles. Its syntax is:</P>
+<I><DL>
+<DT>MESH:</DT>
+</I><b><code><DD>mesh {</code></b> <I>MESH_TRIANGLE... [MESH_MODIFIER...]</I> <b><code>}</DD>
+</code></b><I><DT>MESH_TRIANGLE:</DT>
+</I><b><code><DD>triangle {</code></b> <I>&lt;Corner_1&gt;</I><b><code>,</code></b> <I>&lt;Corner_2&gt;</I><b><code>,</code></b> <I>&lt;Corner_3&gt; [MESH_TEXTURE]</I> <b><code>}</code></b>   |</DD>
+<b><code><DD>smooth_triangle {</DD>
+</code></b><DD>     <I>&lt;Corner_1&gt;</I><b><code>,</code></b> <I>&lt;Normal_1&gt;</I><b><code>,</code></b> </DD>
+<DD>     <I>&lt;Corner_2&gt;</I><b><code>,</code></b> <I>&lt;Normal_2&gt;</I><b><code>,</code></b> </DD>
+<DD>     <I>&lt;Corner_3&gt;</I><b><code>,</code></b> <I>&lt;Normal_3&gt;</DD>
+</I><DD>     <I>[MESH_TEXTURE]</I> </DD>
+<b><code><DD>}</DD>
+</code></b><I><DT>MESH_TEXTURE:</DT>
+</I><b><code><DD>texture {</code></b> <I>TEXTURE_IDENTIFIER</I> <b><code>}</DD>
+</code></b><I><DT>MESH_MODIFIER:</DT>
+</I><b><code><DD>hierarchy</code></b> <I>[ Boolean ]</I>   |   <I>OBJECT_MODIFIER</DD>
+</DL>
+</I><P>Any number of <b><code>triangle</code></b> and/or <b><code>smooth_triangle</code></b> statements can be used and each of those triangles can be individually textured by assigning a texture identifier to it. The texture has to be declared before the mesh is parsed. It is not possible to use texture definitions inside the triangle or smooth triangle statements. This is a restriction that is necessary for an efficient storage of the assigned textures.  See "<A HREF="pov256.htm#_Ref415659046">Triangle and Smooth Triangle</A>" for more information on triangles.</P>
+<P>The mesh's components are internally bounded by a bounding box hierarchy to speed up intersection testing. The bounding hierarchy can be turned off with the <b><code>hierarchy off</code></b> keyword. This should only be done if memory is short or the mesh consists of only a few triangles.  The default is <b><code>hierarchy on</code></b>.</P>
+<P>Copies of a mesh object refer to the same triangle data and thus consume very little memory. You can easily trace hundred copies of an 10000 triangle mesh without running out of memory (assuming the first mesh fits into memory).</P>
+<P>The mesh object has two advantages over a union of triangles: it needs less memory and it is transformed faster. The memory requirements are reduced by efficiently storing the triangles vertices and normals. The parsing time for transformed meshes is reduced because only the mesh object has to be transformed and not every single triangle as it is necessary for unions.</P>
+<P>The mesh object can currently only include triangle and smooth triangle components. That restriction may change, allowing polygonal components, at some point in the future.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov253.htm">Disc</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov255.htm">Polygon</A>
+</P>
+</BODY>
+</HTML>
+

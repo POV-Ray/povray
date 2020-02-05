@@ -1,0 +1,58 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Types of Projection</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov231.htm">Transforming the Camera</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov233.htm">Focal Blur</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405192"><A NAME="_Toc411405468"><A NAME="_Ref411762296"><A NAME="_Ref411762349"><A NAME="_Toc414199067"><A NAME="_Toc429993577"></A></A>Types of Projection</A></A></H3>
+<P>The following list explains the different projection types that can be used with the camera. The most common types are the perspective and orthographic projections.  In general the <I>CAMERA_TYPE</I> should be the <I>first</I> item in a <b><code>camera</code></b> statement.  If none is specified, the <b><code>perspective</code></b> camera is the default.</P>
+<B><P>Perspective projection: </B>The <b><code>perspective</code></b> specifies the default perspective camera which simulates the classic pinhole camera. The (horizontal) viewing angle is either determined by the ratio between the length of the <b><code>direction</code></b> vector and the length of the <b><code>right</code></b> vector or by the optional keyword <b><code>angle</code></b>, which is the preferred way. The viewing angle has to be larger than 0 degrees and smaller than 180 degrees. See the figure in "<A HREF="pov225.htm#_Ref413677066">Placing the Camera</A>" for the geometry of the perspective camera.</P>
+<B><P>Orthographic projection: </B>This projection uses parallel camera rays to create an image of the scene. The size of the image is determined by the lengths of the <b><code>right</code></b> and <b><code>up</code></b> vectors.</P>
+<P>If you add the <b><code>orthographic</code></b> keyword after all other parameters of a perspective camera you'll get an orthographic view with the same image area, i.e. the size of the image is the same. In this case you needn't specify the lengths of the <b><code>right</code></b> and <b><code>up</code></b> vector because they'll be calculated automatically. You should be aware though that the visible parts of the scene change when switching from perspective to orthographic view. As long as all objects of interest are near the <b><code>look_at</code></b> point they'll be still visible if the orthographic camera is used. Objects farther away may get out of view while nearer objects will stay in view.</P>
+<B><P>Fisheye projection: </B>This is a spherical projection. The viewing angle is specified by the <b><code>angle</code></b> keyword. An angle of 180 degrees creates the "standard" fisheye while an angle of 360 degrees creates a super-fisheye ("I-see-everything-view"). If you use this projection you should get a circular image. If this isn't the case, i.e. you get an elliptical image, you should read "<A HREF="pov230.htm#_Ref413677452">Aspect Ratio</A>".</P>
+<B><P>Ultra wide angle projection: </B>This projection is somewhat similar to the fisheye but it projects the image onto a rectangle instead of a circle. The viewing angle can be specified using the <b><code>angle</code></b> keyword.</P>
+<B><P>Omnimax projection: </B>The omnimax projection is a 180 degrees fisheye that has a reduced viewing angle in the vertical direction. In reality this projection is used to make movies that can be viewed in the dome-like Omnimax theaters. The image will look somewhat elliptical. The <b><code>angle</code></b> keyword isn't used with this projection.</P>
+<B><P>Panoramic projection: </B>This projection is called "cylindrical equirectangular projection". It overcomes the degeneration problem of the perspective projection if the viewing angle approaches 180 degrees. It uses a type of cylindrical projection to be able to use viewing angles larger than 180 degrees with a tolerable lateral-stretching distortion. The <b><code>angle</code></b> keyword is used to determine the viewing angle.</P>
+<B><P>Cylindrical projection: </B>Using this projection the scene is projected onto a cylinder. There are four different types of cylindrical projections depending on the orientation of the cylinder and the position of the viewpoint. A float value in the range 1 to 4 must follow the <b><code>cylinder</code></b> keyword.  The viewing angle and the length of the <b><code>up</code></b> or <b><code>right</code></b> vector determine the dimensions of the camera and the visible image. The camera to use is specified by a number. The types are:</P>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=380>
+<TR><TD WIDTH="7%" VALIGN="TOP">
+<P>1</TD>
+<TD WIDTH="93%" VALIGN="TOP">
+<P>vertical cylinder, fixed viewpoint</TD>
+</TR>
+<TR><TD WIDTH="7%" VALIGN="TOP">
+<P>2</TD>
+<TD WIDTH="93%" VALIGN="TOP">
+<P>horizontal cylinder, fixed viewpoint</TD>
+</TR>
+<TR><TD WIDTH="7%" VALIGN="TOP">
+<P>3</TD>
+<TD WIDTH="93%" VALIGN="TOP">
+<P>vertical cylinder, viewpoint moves along the cylinder's axis</TD>
+</TR>
+<TR><TD WIDTH="7%" VALIGN="TOP">
+<P>4</TD>
+<TD WIDTH="93%" VALIGN="TOP">
+<P>horizontal cylinder, viewpoint moves along the cylinder's axis</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>You should note that the vista buffer can only be used with the perspective and orthographic camera.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov231.htm">Transforming the Camera</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov233.htm">Focal Blur</A>
+</P>
+</BODY>
+</HTML>
+

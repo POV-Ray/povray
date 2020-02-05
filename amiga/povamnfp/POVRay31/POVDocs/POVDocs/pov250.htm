@@ -1,0 +1,36 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Torus</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov249.htm">Text</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov251.htm">Finite Patch Primitives</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199085"><A NAME="_Toc429993595">Torus</A></A></H4>
+<P>A <b><code>torus</code></b> is a 4th order quartic polynomial shape that looks like a donut or inner tube. Because this shape is so useful and quartics are difficult to define, POV-Ray lets you take a short-cut and define a torus by:</P>
+<I><DL>
+<DT>TORUS:</DT>
+</I><b><code><DD>torus {</code></b> <I>Major</I><b><code>,</code></b><I> Minor [TORUS_MODIFIER...]</I> <b><code>}</DD>
+</code></b><I><DT>TORUS_MODIFIER:</DT>
+</I><b><code><DD>sturm</code></b>   |   <I>OBJECT_MODIFIER</DD>
+</DL>
+</I><P>where <I>Major</I> is a float value giving the major radius and <I>Minor</I> is a float specifying the minor radius. The major radius extends from the center of the hole to the mid-line of the rim while the minor radius is the radius of the cross-section of the rim. The torus is centered at the origin and lies in the x-z-plane with the y-axis sticking through the hole.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image101.gif" WIDTH=364 HEIGHT=297></P>
+<P ALIGN="CENTER">Major and minor radius of a torus.</P>
+</B><P>The torus is internally bounded by two cylinders and two rings forming a thick cylinder. With this bounding cylinder the performance of the torus intersection test is vastly increased. The test for a valid torus intersection, i.e. solving a 4th order polynomial, is only performed if the bounding cylinder is hit. Thus a lot of slow root solving calculations are avoided.</P>
+<P>Calculations for all higher order polynomials must be very accurate. If the torus renders improperly you may add the keyword <b><code>sturm</code></b> to use POV-Ray's slower-yet-more-accurate Sturmian root solver.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov249.htm">Text</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov251.htm">Finite Patch Primitives</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,179 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - File Output Options</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov134.htm">Display Output Options</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov136.htm">CPU Utilization Histogram</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198963"><A NAME="_Toc429993472">File Output Options</A></A></H4>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=456>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>Output_to_File=</code></b><I>bool</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Sets file output on/off</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>+F</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Sets file output on (use default type)</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>-F</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Sets file output off</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>By default, POV-Ray writes an image file to disk. When you are developing a scene and doing test renders, the graphic preview may be sufficient. To save time and disk activity you may turn file output off with <b><code>Output_to_File=off</code></b> or <b><code>-F</code></b>.</P>
+<H5><A NAME="_Ref412528893"><A NAME="_Toc414198964"><A NAME="_Toc429993473">Output File Type</A></A></A></H5>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=487>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>Output_File_Type=</code></b><I>x</I></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<P>Sets file output format to <I>x</I></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>+F</code></b><I>xn</I></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<P>Sets file output on; sets format <I>x</I>, depth <I>n</I></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>-F</code></b><I>xn</I></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<P>Sets file output off; but in future use format <I>x</I>, depth <I>n</I></TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>Output_Alpha=</code></b><I>bool</I></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<P>Sets alpha output on/off</TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>+UA</code></b></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<P>Sets alpha output on</TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>-UA</code></b></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<P>Sets alpha output off</TD>
+</TR>
+<TR><TD WIDTH="34%" VALIGN="TOP">
+<p><b><code>Bits_Per_Color=</code></b><I>n</I></TD>
+<TD WIDTH="66%" VALIGN="TOP">
+<P>Sets file output bits/color to <I>n</I></TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>The default type of image file depends on which platform you are using. MS-DOS and most others default to 24-bit uncompressed Targa. See your platform-specific documentation to see what your default file type is. You may select one of several different file types using <b><code>Output_File_Type=</code></b><I>x</I> or <b><code>+F</code></b><I>x</I> where <I>x</I> is one of the following...</P>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=370>
+<TR><TD WIDTH="13%" VALIGN="TOP">
+<p><b><code>+FC</code></b></TD>
+<TD WIDTH="87%" VALIGN="TOP">
+<U><P>C</U>ompressed Targa-24 format (RLE, run length encoded)</TD>
+</TR>
+<TR><TD WIDTH="13%" VALIGN="TOP">
+<p><b><code>+FN</code></b></TD>
+<TD WIDTH="87%" VALIGN="TOP">
+<P>New P<U>N</U>G (portable network graphics) format</TD>
+</TR>
+<TR><TD WIDTH="13%" VALIGN="TOP">
+<p><b><code>+FP</code></b></TD>
+<TD WIDTH="87%" VALIGN="TOP">
+<P>Unix <U>P</U>PM format</TD>
+</TR>
+<TR><TD WIDTH="13%" VALIGN="TOP">
+<p><b><code>+FS</code></b></TD>
+<TD WIDTH="87%" VALIGN="TOP">
+<U><P>S</U>ystem-specific such as Mac Pict or Windows BMP</TD>
+</TR>
+<TR><TD WIDTH="13%" VALIGN="TOP">
+<p><b><code>+FT</code></b></TD>
+<TD WIDTH="87%" VALIGN="TOP">
+<P>Uncompressed <U>T</U>arga-24 format</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>Note that the obsolete <b><code>+FD</code></b> dump format and <b><code>+FR</code></b> raw format have been dropped from POV-Ray 3.0 because they were rarely used and no longer necessary. PPM, PNG, and system specific formats have been added. PPM format images are uncompressed, and have a simple text header, which makes it a widely portable image format. PNG is a new image format designed not only to replace GIF, but to improve on its shortcomings. PNG offers the highest compression available without loss for high quality applications, such as ray-tracing. The system specific format depends on the platform used and is covered in the appropriate system specific documentation.</P>
+<P>Most of these formats output 24 bits per pixel with 8 bits for each of red, green and blue data. PNG allows you to optionally specify the output bit depth from 5 to 16 bits for each of the red, green, and blue colors, giving from 15 to 48 bits of color information per pixel. The default output depth for all formats is 8 bits/color (16 million possible colors), but this may be changed for PNG format files by setting <b><code>Bits_Per_Color=</code></b><I>n</I> or by specifying <b><code>+FN</code></b><I>n</I>, where n is the desired bit depth.</P>
+<P>Specifying a smaller color depth like 5 bits/color (32768 colors) may be enough for people with 8- or 16-bit (256 or 65536 color) displays, and will improve compression of the PNG file. Higher bit depths like 10 or 12 may be useful for video or publishing applications, and 16 bits/color is good for grayscale height field output (See section "<A HREF="pov242.htm#_Ref414188528">Height Field</A>" for details on height fields).</P>
+<P>Targa format also allows 8 bits of alpha transparency data to be output, while PNG format allows 5 to 16 bits of alpha transparency data, depending on the color bit depth as specified above. You may turn this option on with <b><code>Output_Alpha=on</code></b> or <b><code>+UA</code></b>. The default is off or <b><code>-UA</code></b>. See section "<A HREF="pov298.htm#_Ref412464620">Using the Alpha Channel</A>" for further details on transparency.</P>
+<P>In addition to support for variable bit-depths, alpha channel, and grayscale formats, PNG files also store the <b><code>Display_Gamma</code></b> value so the image displays properly on all systems (see section "<A HREF="pov134.htm#_Ref412464789">Display Hardware Settings</A>"). The <b><code>hf_gray_16</code></b> global setting, as described in section "<A HREF="pov380.htm#_Ref412464870">HF_Gray_16</A>" will also affect the type of data written to the output file.</P>
+<H5><A NAME="_Toc414198965"><A NAME="_Toc429993474">Output File Name</A></A></H5>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=438>
+<TR><TD WIDTH="45%" VALIGN="TOP">
+<p><b><code>Output_File_Name=</code></b><I>file</I></TD>
+<TD WIDTH="55%" VALIGN="TOP">
+<P>Sets output file to <I>file</I></TD>
+</TR>
+<TR><TD WIDTH="45%" VALIGN="TOP">
+<p><b><code>+O</code></b><I>file</I></TD>
+<TD WIDTH="55%" VALIGN="TOP">
+<P>Same as <b><code>Output_File_Name=</code></b><I>file</I></TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>The default output filename is created from the scene name and need not be specified. The scene name is the input name with all drive, path, and extension information stripped. For example if the input file name is <CODE>c:\povray3\mystuff\myfile.pov</CODE> the scene name is <CODE>myfile</CODE>. The proper extension is appended to the scene name based on the file type. For example <CODE>myfile.tga</CODE> or <CODE>myfile.png</CODE> might be used.</P>
+<P>You may override the default output name using <b><code>Output_File_Name=</code></b><I>file </I>or <b><code>+O</code></b><I>file</I>. For example:</P>
+<PRE> Input_File_Name=myinput.pov
+ Output_File_Name=myoutput.tga</PRE>
+<P>If an output file name of "-" is specified (a single minus sign), then the image will be written to standard output, usually the screen. The output can then be piped into another program or to a GUI if desired.</P>
+<P>If the file specified is actually a path or directory or folder name and not a file name, then the default output name is used but it is written to the specified directory.  For example:</P>
+<PRE> Input_File_Name=myscene.pov
+ Output_File_Name=c:\povray3\myimages\</PRE>
+<P>This will create <CODE>c:\povray3\myimages\myscene.tga</CODE> as the output file.</P>
+<H5><A NAME="_Toc414198966"><A NAME="_Toc429993475">Output File Buffer</A></A></H5>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=454>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>Buffer_Output=</code></b><I>bool</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Turn output buffering on/off</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>+B</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Turn output buffering on</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>-B</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Turn output buffering off</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP" HEIGHT=48>
+<p><b><code>Buffer_Size=</code></b><I>n</I></TD>
+<TD WIDTH="63%" VALIGN="TOP" HEIGHT=48>
+<P>Set output buffer size to <I>n</I> kilobytes.  If <I>n</I> is zero, no buffering. If <I>n</I> &lt; system default, the system default is used.</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>+B</code></b><I>n</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Turn buffer on, set size <I>n</I></TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>-B</code></b><I>n</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Turn buffer off, but for future set size <I>n</I></TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>The <b><code>Buffer_Output</code></b> and <b><code>Buffer_Size</code></b> options and the <b><code>+B</code></b> switch allows you to assign large buffers to the output file. This reduces the amount of time spent writing to the disk. If this parameter is not specified, then as each row of pixels is finished, the line is written to the file and the file is flushed. On most systems, this operation ensures that the file is written to the disk so that in the event of a system crash or other catastrophic event, at least a part of the picture has been stored properly and retrievable on disk. The default is not to use any buffer.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov134.htm">Display Output Options</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov136.htm">CPU Utilization Histogram</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,59 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - A Constant Fog</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov102.htm">The Fog</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov104.htm">Setting a Minimum Translucency</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198923"><A NAME="_Toc429993433">A Constant Fog</A></A></H4>
+<P>The simplest fog type is the constant fog that has a constant density in all locations. It is specified by a <b><code>distance</code></b> keyword which actually describes the fog's density and a fog <b><code>color</code></b>.</P>
+<P>The distance value determines the distance at which 36.8% of the background are still visible (for a more detailed explanation of how the fog is calculated read the reference section "<A HREF="pov370.htm#_Ref411773210">Fog</A>").</P>
+<P>The fog color can be used to create anything from a pure white to a red, blood-colored fog. You can also use a black fog to simulate the effect of a limited range of vision.</P>
+<P>The following example will show you how to add fog to a simple scene (<CODE>fog1.pov</CODE>).</P>
+<PRE>  #include "colors.inc"
+  camera {
+    location  &lt;0, 20, -100&gt;
+  }
+  background { color SkyBlue }
+  plane { y, -10
+    pigment {
+      checker color Yellow color Green
+      scale 20
+    }
+  }
+  sphere { &lt;0, 25, 0&gt;, 40
+    pigment { Red }
+    finish { phong 1.0 phong_size 20 }
+  }
+  sphere { &lt;-100, 150, 200&gt;,  20
+    pigment { Green }
+    finish { phong 1.0 phong_size 20 }
+  }
+  sphere { &lt;100, 25, 100&gt;, 30
+    pigment { Blue }
+    finish { phong 1.0 phong_size 20 }
+  }
+  light_source { &lt;100, 120, 40&gt; color White}
+  fog {
+    distance 150
+    color rgb&lt;0.3, 0.5, 0.2&gt;
+  }</PRE>
+<B><P ALIGN="CENTER"><IMG SRC="Image223.jpg" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">A foggy scene.</P>
+</B><P>According to their distance the spheres in this scene more or less vanish in the greenish fog we used, as does the checkerboard plane.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov102.htm">The Fog</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov104.htm">Setting a Minimum Translucency</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,47 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Using Iridescence</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov81.htm">Using Reflection and Metallic</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov83.htm">Working With Pigment Maps</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198902"><A NAME="_Toc429993412">Using Iridescence</A></A></H4>
+<I><P>Iridescence </I>is what we see on the surface of an oil slick when the sun shines on it. The rainbow effect is created by something called <I>thin-film interference </I>(read section "<A HREF="pov309.htm#_Ref411753015">Iridescence</A>" for details). For now let's just try using it. Iridescence is specified by the <b><code>irid</code></b> statement and three values: amount, <b><code>thickness</code></b> and <b><code>turbulence</code></b>. The amount is the contribution to the overall surface color. Usually 0.1 to 0.5 is sufficient here. The thickness affects the "busyness" of the effect. Keep this between 0.25 and 1 for best results. The turbulence is a little different from pigment or normal turbulence. We cannot set <b><code>octaves</code></b>, <b><code>lambda</code></b> or <b><code>omega</code></b> but we can specify an amount which will affect the thickness in a slightly different way from the thickness value. Values between 0.25 and 1 work best here too. Finally, iridescence will respond to the surface normal since it depends on the angle of incidence of the light rays striking the surface. With all of this in mind, let's add some iridescence to our glass sphere. </P>
+<PRE>sphere { &lt;0,0,0&gt;, 1
+     pigment { White filter 1 }
+     finish {
+        ambient .1
+        diffuse .1
+        reflection .2
+        specular 1
+        roughness .001
+        irid {
+          0.35
+          thickness .5
+          turbulence .5
+        }
+     }
+     interior{
+        ior 1.5
+        fade_distance 5
+        fade_power 1
+        caustics 1
+     }
+}</PRE>
+<P>We try to vary the values for amount, thickness and turbulence to see what changes they make. We also try to add a <b><code>normal</code></b> block to see what happens.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov81.htm">Using Reflection and Metallic</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov83.htm">Working With Pigment Maps</A>
+</P>
+</BODY>
+</HTML>
+

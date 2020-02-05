@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,15 +36,15 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/textstreambuffer.h"
 
-// C++ variants of standard C header files
+// C++ variants of C standard header files
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
 
-// Standard C++ header files
+// C++ standard header files
 #include <algorithm>
 
-// POV-Ray base header files
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
 #include "base/stringutilities.h"
 #include "base/types.h"
@@ -55,6 +55,9 @@
 namespace pov_base
 {
 
+using std::min;
+using std::max;
+
 TextStreamBuffer::TextStreamBuffer(size_t buffersize, unsigned int wrapwidth)
 {
     boffset = 0;
@@ -62,7 +65,7 @@ TextStreamBuffer::TextStreamBuffer(size_t buffersize, unsigned int wrapwidth)
     wrap = wrapwidth;
     curline = 0;
     buffer = new char[bsize];
-    if(buffer == NULL)
+    if (buffer == nullptr)
         throw POV_EXCEPTION_CODE(kOutOfMemoryErr);
 }
 
@@ -72,9 +75,9 @@ TextStreamBuffer::~TextStreamBuffer()
     bsize = 0;
     wrap = 0;
     curline = 0;
-    if(buffer != NULL)
+    if (buffer != nullptr)
         delete[] buffer;
-    buffer = NULL;
+    buffer = nullptr;
 }
 
 void TextStreamBuffer::printf(const char *format, ...)
@@ -113,7 +116,7 @@ void TextStreamBuffer::printfile(const char *filename, POV_OFF_T offset, POV_LON
 {
     FILE *file = fopen(filename, "r");
 
-    if(file != NULL)
+    if (file != nullptr)
     {
         fseek(file, offset, SEEK_SET);
         printfile(file, lines);
@@ -123,7 +126,7 @@ void TextStreamBuffer::printfile(const char *filename, POV_OFF_T offset, POV_LON
 
 void TextStreamBuffer::printfile(FILE *file, POV_LONG lines)
 {
-    if(file != NULL)
+    if (file != nullptr)
     {
         bool stopposset = (lines < 0); // only if walking backwards stop at current position
         POV_OFF_T stoppos = (POV_OFF_T)(ftell(file));
@@ -332,3 +335,4 @@ void TextStreamBuffer::directflush(const char *str, unsigned int chars)
 }
 
 }
+// end of namespace pov_base

@@ -13,7 +13,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -81,13 +81,22 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/spheresweep.h"
 
+// C++ variants of C standard header files
+#include <cstdlib>
+
+// C++ standard header files
 #include <algorithm>
 
+// POV-Ray header files (base module)
+#include "base/povassert.h"
+
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/math/matrix.h"
 #include "core/math/polynomialsolver.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -177,7 +186,7 @@ bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
 
     Thread->Stats()[Ray_Sphere_Sweep_Tests]++;
 
-    if(Trans == NULL)
+    if (Trans == nullptr)
     {
         New_Ray.Origin = ray.Origin;
         New_Ray.Direction = ray.Direction;
@@ -206,7 +215,7 @@ bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
     for(i = 0; i < Num_Segments; i++)
     {
         // Are there intersections with this segment?
-        Num_Seg_Isect = Intersect_Segment(New_Ray, &Segment[i], Segment_Isect, Thread);
+        Num_Seg_Isect = Intersect_Segment(New_Ray, &Segment[i], Segment_Isect, Thread->Stats());
 
         // Test for end of vector
         if(Num_Isect + Num_Seg_Isect <= SPHSWEEP_MAX_ISECT)
@@ -224,7 +233,7 @@ bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
     if(Num_Isect > 0)
     {
         // Sort intersections
-        QSORT(reinterpret_cast<void *>(Isect), Num_Isect, sizeof(SPHSWEEP_INT), Comp_Isects);
+        std::qsort(Isect, Num_Isect, sizeof(SPHSWEEP_INT), Comp_Isects);
 
         // Delete invalid intersections inside the sphere sweep
         Num_Isect = Find_Valid_Points(Isect, Num_Isect, New_Ray);
@@ -233,7 +242,7 @@ bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
         for (i = 0; i < Num_Isect; i++)
         {
             // Was the ray transformed?
-            if (Trans != NULL)
+            if (Trans != nullptr)
             {
                 // Yes, invert the transformation
                 Isect[i].t /= len;
@@ -392,7 +401,7 @@ bool SphereSweep::Intersect_Sphere(const BasicRay &ray, const SPHSWEEP_SPH *Sphe
 ///     The current implementation exhibits numeric instabilities for 3rd order polynomial splines.
 ///     (See GitHub issue #147.)
 ///
-int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segment, SPHSWEEP_INT *Isect, TraceThreadData *Thread)
+int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segment, SPHSWEEP_INT *Isect, RenderStatistics& stats)
 {
     int             Isect_Count;
     DBL             Dot1, Dot2;
@@ -515,7 +524,7 @@ int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segm
             Coef[1] = 4.0 * d * e - 2.0 * b * c * d;
             Coef[2] = Sqr(e) - b * c * e + Sqr(b) * f;
 
-            Num_Poly_Roots = Solve_Polynomial(2, Coef, Root, true, 1e-10, Thread->Stats());
+            Num_Poly_Roots = Solve_Polynomial(2, Coef, Root, true, 1e-10, stats);
             break;
 
         case 4:   // Third order polynomial
@@ -591,7 +600,7 @@ int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segm
             Coef[9] = 4.0 * j * k - 2.0 * c * k * e - 2.0 * d * j * e + 4.0 * c * d * l;
             Coef[10] = Sqr(k) - d * k * e + l * Sqr(d);
 
-            Num_Poly_Roots = bezier_01(10, Coef, Root, true, 1e-10, Thread);
+            Num_Poly_Roots = bezier_01(10, Coef, Root, true, 1e-10, stats);
             break;
 
         default:
@@ -746,7 +755,7 @@ bool SphereSweep::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 
     inside = false;
 
-    if(Trans == NULL)
+    if (Trans == nullptr)
         New_Point = IPoint;
     else
         MInvTransPoint(New_Point, IPoint, Trans);
@@ -850,7 +859,7 @@ bool SphereSweep::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
                 Coef[6] -= Sqr(Segment[i].Radius_Coef[0]);
 
                 // Find roots
-                Num_Poly_Roots = bezier_01(6, Coef, Root, true, 1e-10, Thread);
+                Num_Poly_Roots = bezier_01(6, Coef, Root, true, 1e-10, Thread->Stats());
 
                 // Test for interval [0, 1]
                 for(j = 0; j < Num_Poly_Roots; j++)
@@ -954,8 +963,8 @@ ObjectPtr SphereSweep::Copy()
     Destroy_Transform(New->Trans);
     *New = *this;
 
-    New->Segment = NULL;
-    New->Sphere = NULL;
+    New->Segment = nullptr;
+    New->Sphere = nullptr;
     New->Interpolation = Interpolation;
 
     New->Num_Modeling_Spheres = Num_Modeling_Spheres;
@@ -1008,7 +1017,7 @@ ObjectPtr SphereSweep::Copy()
 
 void SphereSweep::Translate(const Vector3d& Vector, const TRANSFORM *tr)
 {
-    if(Trans == NULL)
+    if (Trans == nullptr)
     {
         for(int i = 0; i < Num_Modeling_Spheres; i++)
             Modeling_Sphere[i].Center += Vector;
@@ -1055,7 +1064,7 @@ void SphereSweep::Translate(const Vector3d& Vector, const TRANSFORM *tr)
 
 void SphereSweep::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
-    if(Trans == NULL)
+    if (Trans == nullptr)
     {
         for (int i = 0; i < Num_Modeling_Spheres; i++)
             MTransPoint(Modeling_Sphere[i].Center, Modeling_Sphere[i].Center, tr);
@@ -1104,11 +1113,11 @@ void SphereSweep::Scale(const Vector3d& Vector, const TRANSFORM *tr)
 {
     if((Vector[X] != Vector[Y]) || (Vector[X] != Vector[Z]))
     {
-        if(Trans == NULL)
+        if (Trans == nullptr)
             Trans = Create_Transform();
     }
 
-    if(Trans == NULL)
+    if (Trans == nullptr)
     {
         for(int i = 0; i < Num_Modeling_Spheres; i++)
         {
@@ -1161,17 +1170,17 @@ SphereSweep::SphereSweep() : ObjectBase(SPHERE_SWEEP_OBJECT)
     Interpolation = -1;
 
     Num_Modeling_Spheres = 0;
-    Modeling_Sphere = NULL;
+    Modeling_Sphere = nullptr;
 
     Num_Spheres = 0;
-    Sphere = NULL;
+    Sphere = nullptr;
 
     Num_Segments = 0;
-    Segment = NULL;
+    Segment = nullptr;
 
     Depth_Tolerance = DEPTH_TOLERANCE;
 
-    Trans = NULL;
+    Trans = nullptr;
 }
 
 
@@ -1210,7 +1219,7 @@ SphereSweep::SphereSweep() : ObjectBase(SPHERE_SWEEP_OBJECT)
 
 void SphereSweep::Transform(const TRANSFORM *tr)
 {
-    if(Trans == NULL)
+    if (Trans == nullptr)
         Trans = Create_Transform();
 
     Compose_Transforms(Trans, tr);
@@ -1340,7 +1349,7 @@ void SphereSweep::Compute_BBox()
 
     Make_BBox_from_min_max(BBox, mins, maxs);
 
-    if(Trans != NULL)
+    if (Trans != nullptr)
         Recompute_BBox(&BBox, Trans);
 }
 
@@ -1391,7 +1400,7 @@ void SphereSweep::Compute()
     {
         case LINEAR_SPHERE_SWEEP:
             // Allocate memory if necessary
-            if(Segment == NULL)
+            if (Segment == nullptr)
             {
                 Num_Segments = Num_Modeling_Spheres - 1;
                 size = Num_Segments * sizeof(SPHSWEEP_SEG);
@@ -1423,7 +1432,7 @@ void SphereSweep::Compute()
             break;
         case CATMULL_ROM_SPLINE_SPHERE_SWEEP:
             // Allocate memory if necessary
-            if(Segment == NULL)
+            if (Segment == nullptr)
             {
                 Num_Segments = Num_Modeling_Spheres - 3;
                 size = Num_Segments * sizeof(SPHSWEEP_SEG);
@@ -1466,7 +1475,7 @@ void SphereSweep::Compute()
             break;
         case B_SPLINE_SPHERE_SWEEP:
             // Allocate memory if necessary
-            if(Segment == NULL)
+            if (Segment == nullptr)
             {
                 Num_Segments = Num_Modeling_Spheres - 3;
                 size = Num_Segments * sizeof(SPHSWEEP_SEG);
@@ -1583,7 +1592,7 @@ void SphereSweep::Compute()
     // Calculate single spheres
 
     // Allocate memory if necessary
-    if(Sphere == NULL)
+    if (Sphere == nullptr)
     {
         Num_Spheres = Num_Segments + 1;
         size = Num_Spheres * sizeof(SPHSWEEP_SPH);
@@ -1791,7 +1800,7 @@ const int lcm_bezier_01[] =
     2520, 252, 56, 21, 12, 10, 12, 21, 56, 252, 2520
 };
 
-int SphereSweep::bezier_01(int degree, const DBL* Coef, DBL* Roots, bool sturm, DBL tolerance, TraceThreadData *Thread)
+int SphereSweep::bezier_01(int degree, const DBL* Coef, DBL* Roots, bool sturm, DBL tolerance, RenderStatistics& stats)
 {
     DBL d[11];
     bool non_negative = true, non_positive = true;
@@ -1807,7 +1816,7 @@ int SphereSweep::bezier_01(int degree, const DBL* Coef, DBL* Roots, bool sturm, 
         non_positive = (non_positive && (d[degree - i] <= 0));
 
         if(!(non_negative || non_positive))
-            return Solve_Polynomial(degree, Coef, Roots, sturm, tolerance, Thread->Stats());
+            return Solve_Polynomial(degree, Coef, Roots, sturm, tolerance, stats);
 
         for(j = 0; j < degree - i; ++j)
             d[j] += d[j+1];
@@ -1817,3 +1826,4 @@ int SphereSweep::bezier_01(int degree, const DBL* Coef, DBL* Roots, bool sturm, 
 }
 
 }
+// end of namespace pov

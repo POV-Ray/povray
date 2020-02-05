@@ -1,0 +1,23 @@
+ADDITIONAL WOOD TEXTURES:
+=========================
+
+In addition to the woods listed in WOODS.INC, there are several
+additional new wood textures defined in the following files.  These
+textures use pigments defined in WOODS.INC, but they use 256 entry
+colormaps that are defined in files of the same name, but with a file
+extension of ".MAP" (ie: ASH.POV uses ASH.MAP).  The names of these
+files are:
+
+        ASH.POV....... ASH.MAP
+        BUBINGA.POV... BUBINGA.MAP
+        CEDAR.POV..... CEDAR.MAP
+        ORNGWOOD.POV.. ORNGWOOD.MAP
+        TEAK.POV...... TEAK.MAP
+        WHITEASH.POV.. WHITEASH.MAP
+
+The color maps for these files were designed by pulling the color map
+from scanned images of actual textures.  The images were first converted
+to .GIF format, loaded into Fractint where the color map was saved,
+sorted with a text editor, and converted into a POV-Ray style colormap
+with the program FMAP2POV.EXE.
+

@@ -1,0 +1,37 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Object Modifiers</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov276.htm">Atmospheric Attenuation</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov278.htm">Clipped_By</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405203"><A NAME="_Toc411405479"><A NAME="_Toc414199119"><A NAME="_Toc429993622">Object Modifiers</A></A></A></A></H3>
+<P>A variety of modifiers may be attached to objects. The following items may be applied to any object:</P>
+<I><DL>
+<DT>OBJECT_MODIFIER:</DT>
+</I><b><code><DD>clipped_by</code></b> <b><code>{</code></b> <I>UNTEXTURED_SOLID_OBJECT...</I> <b><code>}</code></b>   |   <b><code>clipped_by</code></b> <b><code>{</code></b> <b><code>bounded_by</code></b> <b><code>}</code></b>   |</DD>
+<b><code><DD>bounded_by</code></b> <b><code>{</code></b> <I>UNTEXTURED_SOLID_OBJECT...</I> <b><code>}</code></b>   |   <b><code>bounded_by</code></b> <b><code>{</code></b> <b><code>clipped_by</code></b> <b><code>}</code></b>   |</DD>
+<b><code><DD>no_shadow</code></b>   |   <b><code>inverse</code></b>   |   <b><code>sturm</code></b> <I>[ Bool ]</I>   |   <b><code>hierarchy</code></b> <I>[ Bool ]</I>   |</DD>
+<b><code><DD>interior</code></b> <b><code>{</code></b> <I>INTERIOR_ITEMS...</I> <b><code>}</code></b>   |   </DD>
+<b><code><DD>material</code></b> <b><code>{</code></b> <I>[MATERIAL_IDENTIFIER][MATERIAL_ITEMS...]</I> <b><code>}</code></b>   |   </DD>
+<b><code><DD>texture</code></b> <b><code>{</code></b> <I>TEXTURE_BODY</I> <b><code>}</code></b>   |   <b><code>pigment</code></b> <b><code>{</code></b> <I>PIGMENT_BODY</I> <b><code>}</code></b>   |</DD>
+<b><code><DD>normal</code></b> <b><code>{</code></b> <I>NORMAL_BODY</I> <b><code>}</code></b>   |   <b><code>finish</code></b> <b><code>{</code></b> <I>FINISH_ITEMS...</I> <b><code>}</code></b>   |</DD>
+<I><DD>TRANSFORMATION</DD>
+</DL>
+</I><P>Transformations such as translate, rotate and scale have already been discussed. The modifiers "<A HREF="pov292.htm#_Ref416274068">Textures</A>" and its parts "<A HREF="pov293.htm#_Ref416591760">Pigment</A>", "<A HREF="pov300.htm#_Ref416591806">Normal</A>", and "<A HREF="pov304.htm#_Ref416591872">Finish</A>" as well as "<A HREF="pov285.htm#_Ref416274104">Interior</A>", and "<A HREF="pov356.htm#_Ref413750547">Media</A>" (which is part of interior) are each in major chapters of their own below. In the sub-sections below we cover several other important modifiers: <b><code>clipped_by</code></b>, <b><code>bounded_by</code></b>, <b><code>material</code></b>, <b><code>no_shadow</code></b>, <b><code>hollow</code></b>, <b><code>inverse</code></b>, <b><code>sturm</code></b>, and <b><code>hierarchy</code></b>. Although the examples below use object statements and object identifiers, these modifiers may be used on any type of object such as sphere, box etc.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov276.htm">Atmospheric Attenuation</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov278.htm">Clipped_By</A>
+</P>
+</BODY>
+</HTML>
+

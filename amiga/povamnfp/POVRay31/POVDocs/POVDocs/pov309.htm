@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Iridescence</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov308.htm">Specular Reflection</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov310.htm">Halo</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref411753015"><A NAME="_Toc414199155"><A NAME="_Toc429993666">Iridescence</A></A></A></H4>
+<I><P>Iridescence</I>, or Newton's thin film interference, simulates the effect of light on surfaces with a microscopic transparent film overlay. The effect is like an oil slick on a puddle of water or the rainbow hues of a soap bubble.  This effect is controlled by the <b><code>irid</code></b> statement specified inside a <b><code>finish</code></b> statement.</P>
+<P>This parameter modifies the surface color as a function of the angle between the light source and the surface. Since the effect works in conjunction with the position and angle of the light sources to the surface it does not behave in the same ways as a procedural pigment pattern.</P>
+<P>The syntax is:</P>
+<I><DL>
+<DT>IRID:</DT>
+</I><b><code><DD>irid {</code></b> <I>Irid_Amount [IRID_ITEMS...]</I> <b><code>}</DD>
+</code></b><I><DT>IRID_ITEMS:</DT>
+</I><b><code><DD>thickness</code></b> <I>Amount</I>   |   <b><code>turbulence</code></b> <I>Amount</DD>
+</DL>
+</I><P>The required <I>Irid_Amount</I> parameter is the contribution of the iridescence effect to the overall surface color. As a rule of thumb keep to around 0.25 (25% contribution) or less, but experiment. If the surface is coming out too white, try lowering the <b><code>diffuse</code></b> and possibly the <b><code>ambient</code></b> values of the surface.</P>
+<P>The <b><code>thickness</code></b> keyword represents the film's thickness. This is an awkward parameter to set, since the thickness value has no relationship to the object's scale.  Changing it affects the scale or <I>busy-ness </I>of the effect. A very thin film will have a high frequency of color changes while a thick film will have large areas of color.  The default value is zero.</P>
+<P>The thickness of the film can be varied with the <b><code>turbulence</code></b> keyword. You can only specify the amount of turbulence with iridescence.  The octaves, lambda, and omega values are internally set and are not adjustable by the user at this time.  This parameter varies only a single value: the thickness. Therefore the value must be a single float value.  It cannot be a vector as in other uses of the <b><code>turbulence</code></b> keyword.</P>
+<P>In addition, perturbing the object's surface normal through the use of bump patterns will affect iridescence.</P>
+<P>For the curious, thin film interference occurs because, when the ray hits the surface of the film, part of the light is reflected from that surface, while a portion is transmitted into the film. This <I>subsurface </I>ray travels through the film and eventually reflects off the opaque substrate. The light emerges from the film slightly out of phase with the ray that was reflected from the surface.</P>
+<P>This phase shift creates interference, which varies with the wavelength of the component colors, resulting in some wavelengths being reinforced, while others are cancelled out. When these components are recombined, the result is iridescence.  See also the global setting "<A HREF="pov381.htm#_Ref418325405">Irid_Wavelength</A>".</P>
+<P>The concept used for this feature came from the book <I>Fundamentals of Three-Dimensional Computer Graphics</I> by Alan Watt (Addison-Wesley).</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov308.htm">Specular Reflection</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov310.htm">Halo</A>
+</P>
+</BODY>
+</HTML>
+

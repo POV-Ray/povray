@@ -16,7 +16,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -47,6 +47,8 @@
 #ifdef MACHINE_INTRINSICS_H
 #include MACHINE_INTRINSICS_H
 #endif
+
+#include "base/povassert.h"
 
 #include "core/material/noise.h"
 
@@ -119,7 +121,7 @@ const bool kAVX2FMA3NoiseEnabled = true;
 
 extern DBL RTable[];
 
-ALIGN32 static AVX2TABLETYPE AVX2RTable[267];
+alignas(32) static AVX2TABLETYPE AVX2RTable[267];
 
 void AVX2FMA3NoiseInit()
 {
@@ -516,6 +518,7 @@ void AVX2FMA3DNoise(Vector3d& result, const Vector3d& EPoint) { POV_ASSERT(false
 #endif // DISABLE_OPTIMIZED_NOISE_AVX2FMA3
 
 }
+// end of namespace pov
 
 #endif // TRY_OPTIMIZED_NOISE_AVX2FMA3
 

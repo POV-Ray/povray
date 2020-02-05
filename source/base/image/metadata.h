@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,12 +39,17 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
 
-// Standard C++ header files
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <string>
 
 // Boost header files
-#include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
 
 namespace pov_base
 {
@@ -56,7 +61,7 @@ namespace pov_base
 /// @{
 
 /// Generates metadata to write into output images.
-class Metadata
+class Metadata final
 {
     public:
         Metadata();
@@ -67,7 +72,7 @@ class Metadata
          *  @note   This method should return at most 40 ascii bytes, otherwise it may become truncated by some file formats.
          *          non-printable characters, line feeds and tabs are not allowed.
          */
-        string getSoftware() const;
+        std::string getSoftware() const;
 
         /* Up to 4 comments, each at most 80 ascii bytes, no line feed, no tab
          * if it's longer, it can either fit anyway or get truncated, it's the
@@ -79,31 +84,31 @@ class Metadata
          *  @note   This method should return at most 80 ascii bytes, otherwise it may become truncated by some file formats.
          *          non-printable characters, line feeds and tabs are not allowed.
          */
-        string getComment1() const;
+        std::string getComment1() const;
 
         /**
          *  Get comment string #2.
          *  @note   This method should return at most 80 ascii bytes, otherwise it may become truncated by some file formats.
          *          non-printable characters, line feeds and tabs are not allowed.
          */
-        string getComment2() const;
+        std::string getComment2() const;
 
         /**
          *  Get comment string #3.
          *  @note   This method should return at most 80 ascii bytes, otherwise it may become truncated by some file formats.
          *          non-printable characters, line feeds and tabs are not allowed.
          */
-        string getComment3() const;
+        std::string getComment3() const;
 
         /**
          *  Get comment string #4.
          *  @note   This method should return at most 80 ascii bytes, otherwise it may become truncated by some file formats.
          *          non-printable characters, line feeds and tabs are not allowed.
          */
-        string getComment4() const;
+        std::string getComment4() const;
 
         /// Get date string in ISO 8601 format.
-        string getDateTime() const;
+        std::string getDateTime() const;
 
         /// Get year (including full century)
         int getYear() const;
@@ -128,4 +133,6 @@ class Metadata
 //##############################################################################
 
 }
-#endif
+// end of namespace pov_base
+
+#endif // POVRAY_BASE_METADATA_H

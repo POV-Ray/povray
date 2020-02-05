@@ -1,0 +1,30 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Media Replaces Halo &amp; Atmosphere</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov7.htm">What's New in POV-Ray 3.1?</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov9.htm">New #macro Feature</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc429993338">Media Replaces Halo &amp; Atmosphere</A></H3>
+<P>The keywords <b><code>halo</code></b> and <b><code>atmosphere</code></b> have been totally eliminated with no backwards compatibility of any kind provided. They have been replaced by a new feature called <b><code>media</code></b>.  At the scene level, media acts as atmospheric media for fog, haze, dust, etc.  On objects, media is not part of texture like halo was. Object media is now part of a new feature called <b><code>interior</code></b>.  Media is not just a rename for halo.  It is a new model with some similar features of halo.  BECAUSE POV-Ray 3.1 DISCONTINUES SOME 3.0 FEATURES YOU MAY WISH TO KEEP 3.0 TO RENDER OLDER SCENES.</P>
+<P>Any pattern type (<b><code>bozo</code></b>, <b><code>wood</code></b>, <b><code>dents</code></b>, etc.) may be used as a <b><code>density</code></b> function for media.</P>
+<P>New patterns <b><code>spherical</code></b>, <b><code>cylindrical</code></b>, <b><code>planar</code></b>, and <b><code>boxed</code></b> added for <b><code>pigment</code></b>, <b><code>normal</code></b>, <b><code>texture</code></b>, and <b><code>density</code></b>.</P>
+<P>New wave types <b><code>cubic_wave</code></b> and <b><code>poly_wave</code></b> <I>Float</I> have been added.</P>
+<P>New object modifier <b><code>interior{...}</code></b>.  Interior contains information about the interior of the object which was formerly contained in the <b><code>finish</code></b> and <b><code>halo</code></b> parts of a <b><code>texture</code></b>. Interior items are no longer part of the texture.  Instead, they attach directly to the objects. The <b><code>finish</code></b> items moved are <b><code>ior</code></b>, <b><code>caustic</code></b>, <b><code>fade_power</code></b>, and <b><code>fade_distance</code></b>.  The <b><code>refraction</code></b> keyword is no longer necessary.  Any <b><code>ior</code></b> other than 1.0 turns on refraction.  These 5 finish keywords which are now part of interior will still work in finish but will generate warnings.  Some obscure <b><code>texture_map</code></b> statements with varying ior will not work.</P>
+<P>Added <b><code>reflection_exponent</code></b><I> Float </I>to <b><code>finish</code></b> to give more realistic reflection of very bright objects.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov7.htm">What's New in POV-Ray 3.1?</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov9.htm">New #macro Feature</A>
+</P>
+</BODY>
+</HTML>
+

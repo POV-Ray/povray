@@ -1,0 +1,44 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Matrix Keyword</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov219.htm">Rotate</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov221.htm">Transformation Order</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199053"><A NAME="_Toc429993563">Matrix Keyword</A></A></H4>
+<P>The <b><code>matrix</code></b> keyword can be used to explicitly specify the transformation matrix to be used for objects or textures. Its syntax is:</P>
+<I><DL>
+<DT>MATRIX:</DT>
+</I><b><code><DD>matrix &lt;</code></b><I>Val00</I><b><code>,</code></b><I> Val01</I><b><code>,</code></b><I> Val02</I><b><code>,</DD>
+</code></b><I><DD>Val10</I><b><code>,</code></b><I> Val11</I><b><code>,</code></b><I> Val12</I><b><code>,</DD>
+</code></b><I><DD>Val20</I><b><code>,</code></b><I> Val21</I><b><code>,</code></b><I> Val22</I><b><code>,</DD>
+</code></b><I><DD>Val30</I><b><code>,</code></b><I> Val31</I><b><code>,</code></b><I> Val32</I><b><code>&gt;</DD>
+</DL>
+</code></b><P>Where <I>Val00</I> through <I>Val32</I> are float expressions enclosed in angle brackets and separated by commas.  Note this is not a vector.  It is a set of 12 float expressions.  These floats specify the elements of a 4 by 4 matrix with the fourth column implicitly set to <b><code>&lt;0,0,0,1&gt;</code></b>. At any given point <I>P, P=&lt;px, py, pz&gt;</I>, is transformed into the point <I>Q, Q=&lt;qx, qy, qz&gt;</I> by</P>
+<I><P> qx = Val00 * px + Val10 * py + Val20 * pz + Val30</P>
+<P> qy = Val01 * px + Val11 * py + Val21 * pz + Val31</P>
+<P> qz = Val02 * px + Val12 * py + Val22 * pz + Val32</P>
+</I><P>Normally you won't use the matrix keyword because it's less descriptive than the transformation commands and harder to visualize. However the matrix command allows more general transformation effects like <I>shearing</I>. The following matrix causes an object to be sheared along the y-axis.</P>
+<PRE> object {
+  MyObject
+  matrix &lt; 1, 1, 0,
+       0, 1, 0,
+       0, 0, 1,
+       0, 0, 0 &gt;
+ }</PRE>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov219.htm">Rotate</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov221.htm">Transformation Order</A>
+</P>
+</BODY>
+</HTML>
+

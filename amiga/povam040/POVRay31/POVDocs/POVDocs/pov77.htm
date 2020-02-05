@@ -1,0 +1,98 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Blending Normals</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov76.htm">Using Basic Normal Modifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov78.htm">Finishes</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198897"><A NAME="_Toc429993407">Blending Normals</A></A></H4>
+<P>Normals can be layered similar to pigments but the results can be unexpected. Let's try that now by editing the sphere as follows.</P>
+<PRE>  sphere { &lt;0,0,0&gt;, 1
+    pigment { Gray75 }
+      normal { radial frequency 10 }
+      normal { gradient y scale .2 }
+  }</PRE>
+<P>As we can see, the resulting pattern is neither a radial nor a gradient. It is instead the result of first calculating a radial pattern and then calculating a gradient pattern. The results are simply additive. This can be difficult to control so POV-Ray gives the user other ways to blend normals.</P>
+<P>One way is to use normal maps. A normal map works the same way as the pigment map we used earlier. Let's change our sphere texture as follows.</P>
+<PRE>  sphere { &lt;0,0,0&gt;, 1
+    pigment { Gray75 }
+    normal {
+      gradient y
+      frequency 3
+      turbulence .5
+      normal_map {
+        [0.00 granite]
+        [0.25 spotted turbulence .35]
+        [0.50 marble turbulence .5]
+        [0.75 bozo turbulence .25]
+        [1.00 granite]
+      }
+    }
+  }</PRE>
+<P>Rendering this we see that the sphere now has a very irregular bumpy surface. The gradient pattern type separates the normals into bands but they are turbulated, giving the surface a chaotic appearance. But this give us an idea.</P>
+<P>Suppose we use the same pattern for a normal map that we used to create the oceans on our planetoid and applied it to the land areas. Does it follow that if we use the same pattern and modifiers on a sphere the same size that the shape of the pattern would be the same? Wouldn't that make the land areas bumpy while leaving the oceans smooth? Let's try it. First, let's render the two spheres side-by-side so we can see if the pattern is indeed the same. We un-comment the planetoid sphere and make the following changes.</P>
+<PRE>  sphere { &lt;0,0,0&gt;, 1
+    texture { LandArea }
+    texture { OceanArea }
+    //texture { CloudArea }  // &lt;-comment this out
+    translate -x             // &lt;- add this transformation
+  }</PRE>
+<P>Now we change the gray sphere as follows.</P>
+<PRE>  sphere { &lt;0,0,0&gt;, 1
+    pigment { Gray75 }
+    normal {
+      bozo
+      turbulence .5
+      lambda 2
+      normal_map {
+        [0.4 dents .15 scale .01]
+        [0.6 agate turbulence 1]
+        [1.0 dents .15 scale .01]
+      }
+    }
+    translate x // &lt;- add this transformation
+  }</PRE>
+<P>We render this to see if the pattern is the same. We see that indeed it is. So let's comment out the gray sphere and add the <b><code>normal</code></b> block it contains to the land area texture of our planetoid. We remove the transformations so that the planetoid is centered in the scene again.</P>
+<PRE>  #declare LandArea = texture {
+    pigment {
+      agate
+      turbulence 1
+      lambda 1.5
+      omega .8
+      octaves 8
+      color_map {
+        [0.00 color rgb &lt;.5, .25, .15&gt;]
+        [0.33 color rgb &lt;.1, .5, .4&gt;]
+        [0.86 color rgb &lt;.6, .3, .1&gt;]
+        [1.00 color rgb &lt;.5, .25, .15&gt;]
+      }
+    }
+    normal {
+      bozo
+      turbulence .5
+      lambda 2
+      normal_map {
+        [0.4 dents .15 scale .01]
+        [0.6 agate turbulence 1]
+        [1.0 dents .15 scale .01]
+      }
+    }
+  }</PRE>
+<P>Looking at the resulting image we see that indeed our idea works! The land areas are bumpy while the oceans are smooth. We add the cloud layer back in and our planetoid is complete.</P>
+<P>There is much more that we did not cover here due to space constraints. On our own, we should take the time to explore slope maps, average and bump maps.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov76.htm">Using Basic Normal Modifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov78.htm">Finishes</A>
+</P>
+</BODY>
+</HTML>
+

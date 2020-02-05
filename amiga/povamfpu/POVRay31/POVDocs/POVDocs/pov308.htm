@@ -1,0 +1,33 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Specular Reflection</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov307.htm">Highlights</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov309.htm">Iridescence</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199154"><A NAME="_Toc429993665">Specular Reflection</A></A></H4>
+<P>When light does not diffuse and it <I>does</I> reflect at the same angle as it hits an object, it is called <I>specular reflection</I>. Such mirror-like reflection is controlled by the <b><code>reflection</code></b> keyword in a <b><code>finish</code></b> statement. For example:</P>
+<PRE>  finish { reflection 1.0 ambient 0 diffuse 0 }</PRE>
+<P>This gives the object a mirrored finish. It will reflect all other elements in the scene. Usually a single float value is specified after the keyword even though the syntax calls for a color. For example a float value of 0.3 gets promoted to the full color vector &lt; 0.3,0.3,0.3,0.3,0.3&gt; which is acceptable because only the red, green and blue parts are used.</P>
+<P>The value can range from 0.0 to 1.0. By default there is no reflection.</P>
+<P>Adding reflection to a texture makes it take longer to render because an additional ray must be traced. The reflected light may be tinted by specifying a color rather than a float. For example</P>
+<PRE>   finish { reflection rgb &lt;1,0,0&gt; }</PRE>
+<P>gives a red mirror that only reflects red light.</P>
+<P>POV-Ray uses a limited light model that cannot distinguish between objects which are simply brightly colored and objects which are extremely bright.  A white piece of paper, a light bulb, the sun, and a supernova, all would be modeled as <b><code>rgb&lt;1,1,1&gt;</code></b> and slightly off-white objects would be only slightly darker.  It is especially difficult to model partially reflective surfaces in a realistic way.  Middle and lower brightness objects typically look too bright when reflected.  If you reduce the <b><code>reflection</code></b> value, it tends to darken the bright objects too much.  Therefore the <b><code>reflection_exponent</code></b> keyword has been added.  It produces non-linear reflection intensities.  The default value of 1.0 produces a linear curve.  Lower values darken middle and low intensities and keeps high intensity reflections bright.  This is a somewhat experimental feature designed for artistic use.  It does not directly correspond to any real world reflective properties.  We are researching ways to deal with this issue in a more scientific model.  The <b><code>reflection_exponent</code></b> has no effect unless <b><code>reflection</code></b> is used.</P>
+<P>Note that although such reflection is called specular it is not controlled by the <b><code>specular</code></b> keyword. That keyword controls a specular highlight.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov307.htm">Highlights</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov309.htm">Iridescence</A>
+</P>
+</BODY>
+</HTML>
+

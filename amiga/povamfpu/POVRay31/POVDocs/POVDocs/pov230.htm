@@ -1,0 +1,57 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Up and Right Vectors</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov229.htm">The Direction Vector</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov231.htm">Transforming the Camera</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199063"><A NAME="_Toc429993573">Up and Right Vectors</A></A></H4>
+<P>The primary purpose of the <b><code>up</code></b> and <b><code>right</code></b> vectors is to tell POV-Ray the relative height and width of the view screen. The default values are:</P>
+<PRE> right 4/3*x
+ up y</PRE>
+<P>In the default <b><code>perspective</code></b> camera, these two vectors also define the initial plane of the view screen before moving it with the <b><code>look_at</code></b> or <b><code>rotate</code></b> vectors.  The length of the <b><code>right</code></b> vector (together with the <b><code>direction</code></b> vector) may also be used to control the (horizontal) field of view with some types of projection.  The <b><code>look_at</code></b> modifier changes both <b><code>up</code></b> and <b><code>right</code></b> so you should always specify them before <b><code>look_at</code></b>.  Also the <b><code>angle</code></b> calculation depends on the <b><code>right</code></b> vector so <b><code>right</code></b> should precede it.</P>
+<P>Most camera types treat the <b><code>up</code></b> and <b><code>right</code></b> vectors the same as the <b><code>perspective</code></b> type.  However several make special use of them.  In the <b><code>orthographic</code></b> projection: The lengths of the <b><code>up</code></b> and <b><code>right</code></b> vectors set the size of the viewing window regardless of the <b><code>direction</code></b> vector length, which is not used by the orthographic camera.</P>
+<P>When using <b><code>cylindrical</code></b> projection: types 1 and 3, the axis of the cylinder lies along the <b><code>up</code></b> vector and the width is determined by the length of <b><code>right</code></b> vector or it may be overridden with the <b><code>angle</code></b> vector. In type 3 the <b><code>up</code></b> vector determines how many units high the image is. For example if you have <b><code>up 4*y</code></b> on a camera at the origin. Only points from y=2 to y=-2 are visible. All viewing rays are perpendicular to the y-axis. For type 2 and 4, the cylinder lies along the <b><code>right</code></b> vector. Viewing rays for type 4 are perpendicular to the <b><code>right</code></b> vector.</P>
+<P>Note that the <b><code>up</code></b>, <b><code>right</code></b>, and <b><code>direction</code></b> vectors should always remain perpendicular to each other or the image will be distorted. If this is not the case a warning message will be printed. The vista buffer will not work for non-perpendicular camera vectors.  If you specify the 3 vectors as initially perpendicular and do not explicitly re-specify the after any <b><code>look_at</code></b> or <b><code>rotate</code></b> vectors, the everything will work fine.</P>
+<H5><A NAME="_Ref413590329"><A NAME="_Ref413677452"><A NAME="_Toc414199064"><A NAME="_Toc429993574">Aspect Ratio</A></A></A></A></H5>
+<P>Together the <b><code>up</code></b> and <b><code>right</code></b> vectors define the <I>aspect ratio </I>(height to width ratio) of the resulting image. The default values <b><code>up&lt;0,1,0&gt;</code></b> and <b><code>right&lt;1.33,0,0&gt;</code></b> result in an aspect ratio of 4 to 3. This is the aspect ratio of a typical computer monitor. If you wanted a tall skinny image or a short wide panoramic image or a perfectly square image you should adjust the <b><code>up</code></b> and <b><code>right</code></b> vectors to the appropriate proportions.</P>
+<P>Most computer video modes and graphics printers use perfectly square pixels. For example Macintosh displays and IBM SVGA modes 640x480, 800x600 and 1024x768 all use square pixels. When your intended viewing method uses square pixels then the width and height you set with the <b><code>Width</code></b> and <b><code>Height</code></b> options or <b><code>+W</code></b> or <b><code>+H</code></b> switches should also have the same ratio as the <b><code>up</code></b> and <b><code>right</code></b> vectors. Note that 640/480 = 4/3 so the ratio is proper for this square pixel mode.</P>
+<P>Not all display modes use square pixels however. For example IBM VGA mode 320x200 and Amiga 320x400 modes do not use square pixels. These two modes still produce a 4/3 aspect ratio image. Therefore images intended to be viewed on such hardware should still use 4/3 ratio on their <b><code>up</code></b> and <b><code>right</code></b> vectors but the pixel settings will not be 4/3.</P>
+<P>For example:</P>
+<PRE> camera {
+  location &lt;3,5,-10&gt;
+  up    &lt;0,1,0&gt;
+  right  &lt;1,0,0&gt;
+  look_at &lt;0,2,1&gt;
+ }</PRE>
+<P>This specifies a perfectly square image. On a square pixel display like SVGA you would use pixel settings such as <b><code>+W480 +H480</code></b> or <b><code>+W600 +H600</code></b>. However on the non-square pixel Amiga 320x400 mode you would want to use values of <b><code>+W240 +H400</code></b> to render a square image.</P>
+<P>The bottom line issue is this: the <b><code>up</code></b> and <b><code>right</code></b> vectors should specify the artist's intended aspect ratio for the image and the pixel settings should be adjusted to that same ratio for square pixels and to an adjusted pixel resolution for non-square pixels.  The <b><code>up</code></b> and <b><code>right</code></b> vectors should <I>not</I> be adjusted based on non-square pixels.</P>
+<H5><A NAME="_Ref411611541"><A NAME="_Toc414199065"><A NAME="_Toc429993575">Handedness</A></A></A></H5>
+<P>The <b><code>right</code></b> vector also describes the direction to the right of the camera. It tells POV-Ray where the right side of your screen is. The sign of the <b><code>right</code></b> vector can be used to determine the handedness of the coordinate system in use. The default value is: <b><code>right&lt;1.33,0,0&gt;</code></b>.  This means that the +x-direction is to the right. It is called a <I>left-handed </I>system because you can use your left hand to keep track of the axes. Hold out your left hand with your palm facing to your right. Stick your thumb up. Point straight ahead with your index finger. Point your other fingers to the right. Your bent fingers are pointing to the +x-direction. Your thumb now points into +y-direction. Your index finger points into the +z-direction.</P>
+<P>To use a right-handed coordinate system, as is popular in some CAD programs and other ray-tracers, make the same shape using your right hand. Your thumb still points up in the +y-direction and your index finger still points forward in the +z-direction but your other fingers now say the +x-direction is to the left. That means that the right side of your screen is now in the -x-direction. To tell POV-Ray to act like this you can use a negative x value in the <b><code>right</code></b> vector such as: <b><code>right&lt;-1.33,0,0&gt;</code></b>.  Since having x values increasing to the left doesn't make much sense on a 2D screen you now rotate the whole thing 180 degrees around by using a positive z value in your camera's location. You end up with something like this.</P>
+<PRE> camera {
+  location &lt;0,0,10&gt;
+  up    &lt;0,1,0&gt;
+  right  &lt;-1.33,0,0&gt;
+  look_at &lt;0,0,0&gt;
+ }</PRE>
+<P>Now when you do your ray-tracer's aerobics, as explained in the section "<A HREF="pov15.htm#_Ref413593367">Understanding POV-Ray's Coordinate System</A>", you use your right hand to determine the direction of rotations.</P>
+<P>In a two dimensional grid, x is always to the right and y is up. The two versions of handedness arise from the question of whether z points into the screen or out of it and which axis in your computer model relates to up in the real world.</P>
+<P>Architectural CAD systems, like AutoCAD, tend to use the <I>God's Eye </I>orientation that the z-axis is the elevation and is the model's up direction. This approach makes sense if you're an architect looking at a building blueprint on a computer screen. z means up, and it increases towards you, with x and y still across and up the screen. This is the basic right handed system.</P>
+<P>Stand alone rendering systems, like POV-Ray, tend to consider you as a participant. You're looking at the screen as if you were a photographer standing in the scene. The up direction in the model is now y, the same as up in the real world and x is still to the right, so z must be depth, which increases away from you into the screen. This is the basic left handed system.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov229.htm">The Direction Vector</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov231.htm">Transforming the Camera</A>
+</P>
+</BODY>
+</HTML>
+

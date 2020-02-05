@@ -1,0 +1,52 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Spotlights</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov268.htm">Point Lights</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov270.htm">Cylindrical Lights</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199106"><A NAME="_Ref416105656"><A NAME="_Toc429993614">Spotlights</A></A></A></H4>
+<P>Normally light radiates outward equally in all directions from the source.  However the <b><code>spotlight</code></b> keyword can be used to create a cone of light that is bright in the center and falls of to darkness in a soft fringe effect at the edge.  Although the cone of light fades to soft edges, objects illuminated by spotlights still cast hard shadows.  The syntax is:</P>
+<I><DL>
+<DT>SPOTLIGHT_SOURCE:</DT>
+</I><b><code><DD>light_source {</code></b> <I>&lt;Location&gt;</I><b><code>,</code></b> <I>COLOR </I><b><code>spotlight</code></b> <I>[LIGHT_MODIFIERS...]</I> <b><code>}</DD>
+</code></b><I><DT>LIGHT_MODIFIER:</DT>
+<DD>SPOTLIGHT_ITEM</I>   |   <I>AREA_LIGHT_ITEMS</I>   |   <I>GENERAL_LIGHT_MODIFIERS</DD>
+<DT>SPOTLIGHT_ITEM:</DT>
+</I><b><code><DD>radius</code></b> <I>Radius</I>   |   <b><code>falloff</code></b> <I>Falloff</I>   |   <b><code>tightness</code></b><I> Tightness</I>   |   <b><code>point_at</code></b> <I>&lt;Spot&gt;</DD>
+</DL>
+</I><P>The <b><code>point_at</code></b> keyword tells the spotlight to point at a particular 3D coordinate.  A line from the location of the spotlight to the <b><code>point_at</code></b> coordinate forms the center line of the cone of light.  The following illustration will be helpful in understanding how these values relate to each other.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image107.gif" WIDTH=241 HEIGHT=273></P>
+<P ALIGN="CENTER">The geometry of a spotlight.</P>
+</B><P>The <b><code>falloff</code></b>, <b><code>radius</code></b>, and <b><code>tightness</code></b> keywords control the way that light tapers off at the edges of the cone.  These four keywords apply only when the <b><code>spotlight</code></b> or <b><code>cylinder</code></b> keywords are used.</P>
+<P>The <b><code>falloff</code></b> keyword specifies the overall size of the cone of light.  This is the point where the light falls off to zero intensity.  The float value you specify is the angle, in degrees, between the edge of the cone and center line.  The <b><code>radius</code></b> keyword specifies the size of the "hot-spot" at the center of the cone of light.  The "hot-spot" is a brighter cone of light inside the spotlight cone and has the same center line.  The <b><code>radius</code></b> value specifies the angle, in degrees, between the edge of this bright, inner cone and the center line.  The light inside the inner cone is of uniform intensity.  The light between the inner and outer cones tapers off to zero.</P>
+<P>For example with <b><code>radius 10</code></b> and <b><code>falloff 20</code></b> the light from the center line out to 10 degrees is full intensity.  From 10 to 20 degrees from the center line the light falls off to zero intensity.  At 20 degrees or greater there is no light.  Note that if the radius and falloff values are close or equal the light intensity drops rapidly and the spotlight has a sharp edge.  The default values for both <b><code>radius</code></b> and <b><code>falloff</code></b> is 70.</P>
+<P>The values for these two parameters are half the opening angles of the corresponding cones, both angles have to be smaller than 90 degrees. The light smoothly falls off between the radius and the falloff angle like shown in the figures below (as long as the radius angle is not negative).</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image108.gif" WIDTH=306 HEIGHT=254></P>
+<P ALIGN="CENTER">Intensity multiplier curve with a fixed falloff angle of 45 degrees.</P>
+<P ALIGN="CENTER"><IMG SRC="Image109.gif" WIDTH=306 HEIGHT=254></P>
+<P ALIGN="CENTER">Intensity multiplier curve with a fixed radius angle of 45 degrees.</P>
+</B><P>The <b><code>tightness</code></b> keyword is used to specify an <I>additional </I>exponential softening of the edges.  The intensity of light at an angle from the center line is given by: <I>intensity * cos(angle)<SUP>tightness</I></SUP>.  The default value for tightness is 10. Lower tightness values will make the spotlight brighter, making the spot wider and the edges sharper. Higher values will dim the spotlight, making the spot tighter and the edges softer. Values from 1 to 100 are acceptable.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image110.gif" WIDTH=376 HEIGHT=312></P>
+<P ALIGN="CENTER">Intensity multiplier curve with fixed angle and falloff angles </P>
+<P ALIGN="CENTER">of 30 and 60 degrees respectively and different tightness values.</P>
+</B><P>You should note from the figures that the radius and falloff angles interact with the tightness parameter. Only negative radius angles will give the tightness value full control over the spotlight's appearance as you can see from the figure below. In that case the falloff angle has no effect and the lit area is only determined by the tightness parameter.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image111.gif" WIDTH=387 HEIGHT=321></P>
+<P ALIGN="CENTER">Intensity multiplier curve with a negative radius angle and different tightness values.</P>
+</B><P>Spotlights may be used anyplace that a normal light source is used. Like any light sources, they are invisible. They may also be used in conjunction with area lights.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov268.htm">Point Lights</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov270.htm">Cylindrical Lights</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,38 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Directory Structure</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov423.htm">Compiling POV-Ray</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov425.htm">Configuring POV-Ray Source</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc414199282"><A NAME="_Toc429993797">Directory Structure</A></A></H3>
+<P>POV-Ray source code is distributed in archives with files arranged in a particular hierarchy of directories or folders. When extracting the archives you should do so in a way that keeps the directory structure intact. In general we suggest you create a directory called <CODE>povray3</CODE> or <CODE>povray31</CODE> and extract the files from there. The extraction will create a directory called <CODE>source</CODE> with many files and sub-directories.</P>
+<P>In general, there are separate archives for each hardware platform and operating system but each of these archives may support more than one compiler. For example here is the directory structure for the MS-Dos archive.  Other platforms use similar structures.</P>
+<P>  SOURCE</P>
+<P>  SOURCE\LPNG101</P>
+<P>  SOURCE\ZLIB</P>
+<P>  SOURCE\MSDOS</P>
+<P>  SOURCE\MSDOS\PMODE</P>
+<P>  SOURCE\MSDOS\BORLAND</P>
+<P>  SOURCE\MSDOS\DJGPP</P>
+<P>  SOURCE\MSDOS\WATCOM</P>
+<P>The <CODE>source</CODE> directory contains source files for the generic parts of POV-Ray that are the same on all platforms. The <CODE>source\lpng101</CODE> contains files for compiling a library of routines used in reading and writing PNG (Portable Network Graphics) image files. The <CODE>source\zlib</CODE> contains files for compiling a library of routines used by <CODE>libpng</CODE> to compress and uncompress data streams. All of these files are used by all platforms and compilers.  They are in every version of the source archives.</P>
+<P>The <CODE>source\msdos</CODE> directory contains all source files for the MS-Dos version common to all supported MS-Dos compilers. The <CODE>pmode</CODE> sub-directory contains source files for <CODE>pmode.lib</CODE> which is required by all MS-Dos versions. The <CODE>borland</CODE>, <CODE>djgpp</CODE>, and <CODE>watcom</CODE> sub-directories contain source, makefiles and project files for C compilers by Borland, DJGPP and Watcom.</P>
+<P>The <CODE>source\msdos</CODE> directory is only in the MS-Dos archive. Similarly the Windows archive contains a <CODE>source\windows</CODE> directory. The Unix archive contains <CODE>source/unix</CODE> etc.</P>
+<P>The <CODE>source\msdos</CODE> directory contains a file <CODE>cmpl_msd.doc</CODE> which contains compiling information specific to the MS-Dos version. Other platform specific directories contain similar <CODE>cmpl_xxx.doc</CODE> files and the compiler specific sub-directories also contain compiler specific <CODE>cmpl_xxx.doc</CODE> files.  Be sure to read all pertinent <CODE>cmpl_xxx.doc</CODE> files for your platform and compiler.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov423.htm">Compiling POV-Ray</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov425.htm">Configuring POV-Ray Source</A>
+</P>
+</BODY>
+</HTML>
+

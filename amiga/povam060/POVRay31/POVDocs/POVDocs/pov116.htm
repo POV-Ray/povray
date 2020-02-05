@@ -1,0 +1,64 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Clock Dependant Variables And Multi-Stage Animations</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov115.htm">The Clock Variable: Key To It All</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov117.htm">The Phase Keyword</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198937"><A NAME="_Toc429993446">Clock Dependant Variables And Multi-Stage Animations</A></A></H4>
+<P>Okay, what if we wanted the ball to roll left to right for the first half of the animation, then change direction 135 degrees and roll right to left, and toward the back of the scene. We would need to make use of POV-Ray's new conditional rendering directives, and test the clock value to determine when we reach the halfway point, then start rendering a different clock dependant sequence. But our goal, as above, it to be working in each stage with a variable in the range of 0 to 1 (normalized) because this makes the math so much cleaner to work with when we have to control multiple aspects during animation. So let's assume we keep the same camera, light, and plane, and let the clock run from 0 to 2! Now, replace the single sphere declaration with the following...</P>
+<PRE>  #if ( clock &lt;= 1 )
+    sphere { &lt;0, 0, 0&gt; , 1
+      pigment {
+        gradient x
+        color_map {
+          [0.0 Blue  ]
+          [0.5 Blue  ]
+          [0.5 White ]
+          [1.0 White ]
+        }
+        scale .25
+      }
+      rotate &lt;0, 0, -clock*360&gt;
+      translate &lt;-pi, 1, 0&gt;
+      translate &lt;2*pi*clock, 0, 0&gt;
+    }
+  #else
+    // (if clock is &gt; 1, we're on the second phase)
+    // we still want to work with  a value from 0 - 1
+    #declare ElseClock = clock - 1;
+    sphere { &lt;0, 0, 0&gt; , 1
+      pigment {
+        gradient x
+        color_map {
+          [0.0 Blue  ]
+          [0.5 Blue  ]
+          [0.5 White ]
+          [1.0 White ]
+        }
+        scale .25
+      }
+      rotate &lt;0, 0, ElseClock*360&gt;
+      translate &lt;-2*pi*ElseClock, 0, 0&gt;
+      rotate &lt;0, 45, 0&gt;
+      translate &lt;pi, 1, 0&gt;
+    }
+  #end</PRE>
+<P>If we spotted the fact that this will cause the ball to do an unrealistic <I>snap turn </I>when changing direction, bonus points for us - we're a born animator. However, for the simplicity of the example, let's ignore that for now. It will be easy enough to fix in the real world, once we examine how the existing code works.</P>
+<P>All we did differently was assume that the clock would run 0 to 2, and that we wanted to be working with a normalized value instead. So when the clock goes over 1.0, POV assumes the second phase of the journey has begun, and we declare a new variable <b><code>Elseclock</code></b> which we make relative to the original built in clock, in such a way that while clock is going 1 to 2, Elseclock is going 0 to 1. So, even though there is only one <b><code>clock</code></b>, there can be as many additional variables as we care to declare (and have memory for), so even in fairly complex scenes, the single clock variable can be made the common coordinating factor which orchestrates all other motions.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov115.htm">The Clock Variable: Key To It All</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov117.htm">The Phase Keyword</A>
+</P>
+</BODY>
+</HTML>
+

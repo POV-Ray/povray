@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Adding Standard Include Files</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov15.htm">Understanding POV-Ray's Coordinate System</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov17.htm">Adding a Camera</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405088"><A NAME="_Toc411405364"><A NAME="_Toc414198835"><A NAME="_Toc429993346">Adding Standard Include Files</A></A></A></A></H3>
+<P>Using our personal favorite text editor, we create a file called <CODE>demo.pov</CODE>. Note some versions of POV-Ray come with their own built-in text editor which may be easier to use. We then type in the following text. The input is case sensitive, so we have to be sure to get capital and lowercase letters correct.</P>
+<PRE>  #include "colors.inc"    // The include files contain
+  #include "stones.inc"    // pre-defined scene elements</PRE>
+<P>The first include statement reads in definitions for various useful colors. The second include statement reads in a collection of stone textures.</P>
+<P>POV-Ray comes with many standard include files.  Others of interest are:</P>
+<PRE>  #include "textures.inc"    // pre-defined scene elements
+  #include "shapes.inc"
+  #include "glass.inc"
+  #include "metals.inc"
+  #include "woods.inc"</PRE>
+<P>They read pre-defined textures, shapes, glass, metal, and wood textures. It is a good idea to have a look through them to see a few of the many possible shapes and textures available.</P>
+<P>We should only include files we really need in our scene. Some of the include files coming with POV-Ray are quite large and we should better save the parsing time and memory if we don't need them. In the following examples we will only use the <CODE>colors.inc</CODE>, and <CODE>stones.inc</CODE> include files.</P>
+<P>We may have as many include files as needed in a scene file. Include files may themselves contain include files, but we are limited to declaring includes nested only ten levels deep.</P>
+<P>Filenames specified in the include statements will be searched for in the current directory first. If it fails to find your .Inc files in the current directory, POV-Ray searches any "library paths" that you have specified.  Library paths are options set by the <b><code>+L</code></b> command-line switch or <b><code>Library_Path</code></b> option. See the chapter "<A HREF="pov121.htm#_Ref411667354">Setting POV-Ray Options</A>" for more information on library paths.</P>
+<P>Because it is more useful to keep include files in a separate directory, standard installation of POV-Ray place these files in the \povray3\include directory.  If you get an error message saying that POV-Ray cannot open "<CODE>colors.inc</CODE>" or other include files, make sure that you specify the library path properly.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov15.htm">Understanding POV-Ray's Coordinate System</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov17.htm">Adding a Camera</A>
+</P>
+</BODY>
+</HTML>
+

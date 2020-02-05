@@ -1,0 +1,109 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Text Object</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov50.htm">Surface of Revolution Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov52.htm">Torus Object</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405115"><A NAME="_Toc411405391"><A NAME="_Toc414198870"><A NAME="_Toc429993381">Text Object</A></A></A></A></H3>
+<P>Creating <b><code>text</code></b> objects using POV-Ray always used to mean that the letters had to be built either from CSG, a painstaking process or by using a black and white image of the letters as a height field, a method that was only somewhat satisfactory. Now, for POV-Ray 3.0, a new primitive has been introduced that can use any TrueType font to create text objects. These objects can be used in CSG, transformed and textured just like any other POV primitive.</P>
+<P>For this tutorial, we will make two uses of the text object. First, let's just make some block letters sitting on a checkered plane. Any TTF font should do, but for this tutorial, we will use the <CODE>timrom.ttf</CODE> or <CODE>cyrvetic.ttf</CODE> which come bundled with POV-Ray. We create a file called <CODE>textdemo.pov</CODE> and edit it as follows:</P>
+<PRE>  #include "colors.inc"
+  camera {
+    location &lt;0, 1, -10&gt;
+    look_at 0
+    angle 35
+  }
+  light_source { &lt;500,500,-1000&gt; White }
+  plane { y,0
+    pigment { checker Green White }
+  }</PRE>
+<P>Now let's add the text object. We will use the font <CODE>timrom.ttf</CODE> and we will create the string "POV-RAY 3.0". For now, we will just make the letters red. The syntax is very simple. The first string in quotes is the font name, the second one is the string to be rendered. The two floats are the thickness and offset values. The thickness float determines how thick the block letters will be. Values of .5 to 2 are usually best for this. The offset value will add to the kerning distance of the letters. We will leave this a 0 for now.</P>
+<PRE>  text { ttf "timrom.ttf" "POV-RAY 3.0" 1, 0
+    pigment { Red }
+  }</PRE>
+<P>Rendering this at 200x150 <b><code>-A</code></b>, we notice that the letters are off to the right of the screen. This is because they are placed so that the lower left front corner of the first letter is at the origin. To center the string we need to translate it -x some distance. But how far? In the docs we see that the letters are all 0.5 to 0.75 units high. If we assume that each one takes about 0.5 units of space on the x-axis, this means that the string is about 6 units long (12 characters and spaces). Let's translate the string 3 units along the negative x-axis.</P>
+<PRE>  text { ttf "timrom.ttf" "POV-RAY 3.0" 1, 0
+    pigment { Red }
+    translate -3*x
+  }</PRE>
+<P>That's better. Now let's play around with some of the parameters of the text object. First, let's raise the thickness float to something outlandish... say 25!</P>
+<PRE>  text { ttf "timrom.ttf" "POV-RAY 3.0" 25, 0
+    pigment { Red }
+    translate -2.25*x
+  }</PRE>
+<P>Actually, that's kind of cool. Now let's return the thickness value to 1 and try a different offset value. Change the offset float from 0 to 0.1 and render it again.</P>
+<P>Wait a minute?! The letters go wandering off up at an angle! That is not what the docs describe! It almost looks as if the offset value applies in both the x- and y-axis instead of just the x axis like we intended. Could it be that a vector is called for here instead of a float? Let's try it. We replace <b><code>0.1</code></b> with <b><code>0.1*x</code></b> and render it again.</P>
+<P>That works! The letters are still in a straight line along the x-axis, just a little further apart. Let's verify this and try to offset just in the y-axis. We replace <b><code>0.1*x</code></b> with <b><code>0.1*y</code></b>. Again, this works as expected with the letters going up to the right at an angle with no additional distance added along the x-axis. Now let's try the z-axis. We replace <b><code>0.1*y</code></b> with <b><code>0.1*z</code></b>. Rendering this yields a disappointment. No offset occurs! The offset value can only be applied in the x- and y-directions.</P>
+<P>Let's finish our scene by giving a fancier texture to the block letters, using that cool large thickness value, and adding a slight y-offset. For fun, we will throw in a sky sphere, dandy up our plane a bit, and use a little more interesting camera viewpoint (we render the following scene at 640x480 <b><code>+A0.2</code></b>):</P>
+<PRE>  #include "colors.inc"
+  camera {
+    location &lt;-5,.15,-2&gt;
+    look_at &lt;.3,.2,1&gt;
+    angle 35
+  }
+  light_source { &lt;500,500,-1000&gt; White }
+  plane { y,0
+    texture {
+      pigment { SeaGreen }
+      finish { reflection .35 specular 1 }
+      normal { ripples .35 turbulence .5 scale .25 }
+    }
+  }
+  text { ttf "timrom.ttf" "POV-RAY 3.0" 25, 0.1*y
+    pigment { BrightGold }
+    finish { reflection .25 specular 1 }
+    translate -3*x
+  }
+  #include "skies.inc"
+  sky_sphere { S_Cloud5 }</PRE>
+<P>Let's try using text in a CSG object. We will attempt to create an inlay in a stone block using a text object. We create a new file called <CODE>textcsg.pov</CODE> and edit it as follows:</P>
+<PRE>  #include "colors.inc"
+  #include "stones.inc"
+  background { color rgb 1 }
+  camera {
+    location &lt;-3, 5, -15&gt;
+    look_at 0
+    angle 25
+  }
+  light_source { &lt;500,500,-1000&gt; White }</PRE>
+<P>Now let's create the block. We want it to be about eight units across because our text string "POV-RAY 3.0" is about six units long. We also want it about four units high and about one unit deep. But we need to avoid a potential coincident surface with the text object so we will make the first z-coordinate 0.1 instead of 0. Finally, we will give this block a nice stone texture.</P>
+<PRE>  box { &lt;-3.5, -1, 0.1&gt;, &lt;3.5, 1, 1&gt;
+    texture { T_Stone10 }
+  }</PRE>
+<P>Next, we want to make the text object. We can use the same object we used in the first tutorial except we will use slightly different thickness and offset values.</P>
+<PRE>  text { ttf "timrom.ttf" "POV-RAY 3.0" 0.15, 0
+    pigment { BrightGold }
+    finish { reflection .25 specular 1 }
+    translate -3*x
+  }</PRE>
+<P>We remember that the text object is placed by default so that its front surface lies directly on the x-y-plane. If the front of the box begins at z=0.1 and thickness is set at 0.15, the depth of the inlay will be 0.05 units. We place a difference block around the two objects.</P>
+<PRE>  difference {
+    box { &lt;-3.5, -1, 0.1&gt;, &lt;3.5, 1, 1&gt;
+      texture { T_Stone10 }
+    }
+    text { ttf "timrom.ttf" "POV-RAY 3.0" 0.15, 0
+      pigment { BrightGold }
+      finish { reflection .25 specular 1 }
+      translate -3*x
+    }
+  }</PRE>
+<B><P ALIGN="CENTER"><IMG SRC="Image29.jpg" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">Text carved from stone.</P>
+</B><P>We render this at 200x150 <b><code>-A</code></b>. We can see the inlay clearly and that it is indeed a bright gold color. We re-render at 640x480 <b><code>+A0.2</code></b> to see the results more clearly, but be forewarned... this trace will take a little time.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov50.htm">Surface of Revolution Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov52.htm">Torus Object</A>
+</P>
+</BODY>
+</HTML>
+

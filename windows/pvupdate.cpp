@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -67,8 +67,6 @@
 
 #define SCRIPTPATH      "/updates/checkv2"
 
-using std::string;
-
 namespace povwin
 {
 
@@ -102,7 +100,7 @@ bool InternetConnected (void)
 }
 
 // -1 == error, 0 == no update, 1 == update
-int IsUpdateAvailable (bool SendSysinfo, char *CurrentVersion, string& NewVersion, string& Info)
+int IsUpdateAvailable (bool SendSysinfo, char *CurrentVersion, std::string& NewVersion, std::string& Info)
 {
   int                   result = -1 ;
   char                  poststr [2048] ;
@@ -231,8 +229,8 @@ int IsUpdateAvailable (bool SendSysinfo, char *CurrentVersion, string& NewVersio
             result = 1 ;
             Info.clear();
             NewVersion = reply + 4;
-            string::size_type pos = NewVersion.find(' ');
-            if (pos != string::npos)
+            std::string::size_type pos = NewVersion.find(' ');
+            if (pos != std::string::npos)
             {
               Info = NewVersion.substr(pos);
               NewVersion.resize(pos);
@@ -257,4 +255,5 @@ int IsUpdateAvailable (bool SendSysinfo, char *CurrentVersion, string& NewVersio
   return (result) ;
 }
 
-} // end of namespace povwin
+}
+// end of namespace povwin

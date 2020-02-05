@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,6 +39,14 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/scene/object.h"
 
 namespace pov
@@ -68,22 +76,8 @@ namespace pov
 ******************************************************************************/
 
 typedef DBL BEZIER_WEIGHTS[4][4];
-typedef struct Bezier_Node_Struct BEZIER_NODE;
-typedef struct Bezier_Child_Struct BEZIER_CHILDREN;
-typedef struct Bezier_Vertices_Struct BEZIER_VERTICES;
 
-struct Bezier_Child_Struct
-{
-    BEZIER_NODE *Children[4];
-};
-
-struct Bezier_Vertices_Struct
-{
-    float uvbnds[4];
-    Vector3d Vertices[4];
-};
-
-struct Bezier_Node_Struct
+struct Bezier_Node_Struct final
 {
     int Node_Type;      // Is this an interior node, or a leaf
     Vector3d Center;    // Center of sphere bounding the (sub)patch
@@ -91,8 +85,22 @@ struct Bezier_Node_Struct
     int Count;          // # of subpatches associated with this node
     void *Data_Ptr;     // Either pointer to vertices or pointer to children
 };
+using BEZIER_NODE = Bezier_Node_Struct; ///< @deprecated
 
-class BicubicPatch : public NonsolidObject
+struct Bezier_Child_Struct final
+{
+    BEZIER_NODE *Children[4];
+};
+using BEZIER_CHILDREN = Bezier_Child_Struct; ///< @deprecated
+
+struct Bezier_Vertices_Struct final
+{
+    float uvbnds[4];
+    Vector3d Vertices[4];
+};
+using BEZIER_VERTICES = Bezier_Vertices_Struct; ///< @deprecated
+
+class BicubicPatch final : public NonsolidObject
 {
     public:
         typedef Vector3d ControlPoints[4][4];
@@ -106,19 +114,19 @@ class BicubicPatch : public NonsolidObject
         BEZIER_WEIGHTS *Weights;
 
         BicubicPatch();
-        virtual ~BicubicPatch();
+        virtual ~BicubicPatch() override;
 
-        virtual ObjectPtr Copy();
+        virtual ObjectPtr Copy() override;
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-        virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
-        virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
-        virtual void Translate(const Vector3d&, const TRANSFORM *);
-        virtual void Rotate(const Vector3d&, const TRANSFORM *);
-        virtual void Scale(const Vector3d&, const TRANSFORM *);
-        virtual void Transform(const TRANSFORM *);
-        virtual void Compute_BBox();
+        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) override;
+        virtual bool Inside(const Vector3d&, TraceThreadData *) const override;
+        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const override;
+        virtual void UVCoord(Vector2d&, const Intersection *) const override;
+        virtual void Translate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Rotate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Scale(const Vector3d&, const TRANSFORM *) override;
+        virtual void Transform(const TRANSFORM *) override;
+        virtual void Compute_BBox() override;
 
         void Precompute_Patch_Values();
     protected:
@@ -152,5 +160,6 @@ class BicubicPatch : public NonsolidObject
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_BEZIER_H

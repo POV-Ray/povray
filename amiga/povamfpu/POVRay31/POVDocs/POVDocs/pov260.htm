@@ -1,0 +1,52 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Quadric</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov259.htm">Poly, Cubic and Quartic</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov261.htm">Constructive Solid Geometry</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199095"><A NAME="_Toc429993605">Quadric</A></A></H4>
+<P>The <b><code>quadric</code></b> object can produce shapes like paraboloids (dish shapes) and hyperboloids (saddle or hourglass shapes). It can also produce ellipsoids, spheres, cones, and cylinders but you should use the <b><code>sphere</code></b>, <b><code>cone</code></b>, and <b><code>cylinder</code></b> objects built into POV-Ray because they are faster than the quadric version.  Note that you do not confuse "quaDRic" with "quaRTic". A quadric is a 2nd order polynomial while a quartic is 4th order. Quadrics render much faster and are less error-prone but produce less complex objects.  The syntax is:</P>
+<I><DL>
+<DT>QUADRIC:</DT>
+</I><b><code><DD>quadric {</code></b> <I>&lt;A</I><b><code>,</code></b><I>B</I><b><code>,</code></b><I>C&gt;</I><b><code>,</code></b><I>&lt;D</I><b><code>,</code></b><I>E</I><b><code>,</code></b><I>F&gt;</I><b><code>,</code></b><I>&lt;G</I><b><code>,</code></b><I>H</I><b><code>,</code></b><I>I&gt;</I><b><code>,</code></b><I>J  [OBJECT_MODIFIERS...]</I> <b><code>}</DD>
+</DL>
+</code></b><P>Although the syntax actually will parse 3 vector expressions followed by a float, we traditionally have written the syntax as above where <I>A</I> through <I>J</I> are float expressions.  These 10 float that define a surface of x, y, z points which satisfy the equation</P>
+<I><P> A x<SUP>2</SUP> + B y<SUP>2</SUP> + C z<SUP>2</SUP> + D xy + E xz + F yz + G x + H y + I z + J = 0</P>
+</I><P>Different values of <I>A, B, C, ... J </I>will give different shapes. If you take any three dimensional point and use its x, y and z coordinates in the above equation the answer will be 0 if the point is on the surface of the object. The answer will be negative if the point is inside the object and positive if the point is outside the object.  Here are some examples:</P>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=357>
+<TR><TD WIDTH="45%" VALIGN="TOP">
+<P>X<SUP>2</SUP> + Y<SUP>2</SUP> + Z<SUP>2</SUP> - 1 = 0</TD>
+<TD WIDTH="55%" VALIGN="TOP">
+<P>Sphere</TD>
+</TR>
+<TR><TD WIDTH="45%" VALIGN="TOP">
+<P>X<SUP>2</SUP> + Y<SUP>2</SUP> - 1 = 0</TD>
+<TD WIDTH="55%" VALIGN="TOP">
+<P>Infinite cylinder along the Z axis</TD>
+</TR>
+<TR><TD WIDTH="45%" VALIGN="TOP">
+<P>X<SUP>2</SUP> + Y<SUP>2</SUP> - Z<SUP>2</SUP> = 0</TD>
+<TD WIDTH="55%" VALIGN="TOP">
+<P>Infinite cone along the Z axis</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>The easiest way to use these shapes is to include the standard file <CODE>shapes.inc</CODE> into your program. It contains several pre-defined quadrics and you can transform these pre-defined shapes (using translate, rotate and scale) into the ones you want. For a complete list, see the file <CODE>shapes.inc</CODE>.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov259.htm">Poly, Cubic and Quartic</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov261.htm">Constructive Solid Geometry</A>
+</P>
+</BODY>
+</HTML>
+

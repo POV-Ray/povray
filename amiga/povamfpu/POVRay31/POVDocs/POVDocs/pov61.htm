@@ -1,0 +1,61 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Assigning an Object to a Light Source</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov60.htm">Using Shadowless Lights</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov62.htm">Using Light Fading</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc411405123"><A NAME="_Toc411405399"><A NAME="_Toc414198880"><A NAME="_Toc429993391">Assigning an Object to a Light Source</A></A></A></A></H4>
+<P>Light sources are invisible. They are just a location where the light appears to be coming from. They have no true size or shape. If we want our light source to be a visible shape, we can use the <b><code>looks_like</code></b> keyword. We can specify that our light source can look like any object we choose. When we use <b><code>looks_like</code></b>, then <b><code>no_shadow</code></b> is applied to the object automatically. This is done so that the object will not block any illumination from the light source.  If we want some blocking to occur (as in a lampshade), it is better to simply use a union to do the same thing. Let's add such an object to our scene. Here is a light bulb we have made just for this purpose:</P>
+<PRE>  #declare Lightbulb = union {
+    merge {
+      sphere { &lt;0,0,0&gt;,1 }
+      cylinder { &lt;0,0,1&gt;, &lt;0,0,0&gt;, 1
+        scale &lt;0.35, 0.35, 1.0&gt;
+        translate  0.5*z
+      }
+      texture {
+        pigment {color rgb &lt;1, 1, 1&gt;}
+        finish {ambient .8 diffuse .6}
+      }
+    }
+    cylinder { &lt;0,0,1&gt;, &lt;0,0,0&gt;, 1
+      scale &lt;0.4, 0.4, 0.5&gt;
+      texture { Brass_Texture }
+      translate  1.5*z
+    }
+    rotate -90*x
+    scale .5
+  }</PRE>
+<P>Now we add the light source:</P>
+<PRE>  light_source {
+    &lt;0, 2, 0&gt;
+    color White
+    looks_like { Lightbulb }
+  }</PRE>
+<P>Rendering this we see that a fairly believable light bulb now illuminates the scene. However, if we do not specify a high ambient value, the light bulb is not lit by the light source. On the plus side, all of the shadows fall away from the light bulb, just as they would in a real situation. The shadows are sharp, so let's make our bulb an area light:</P>
+<PRE>  light_source {
+    &lt;0, 2, 0&gt;
+    color White
+    area_light &lt;1, 0, 0&gt;, &lt;0, 1, 0&gt;, 2, 2
+    adaptive 1
+    jitter
+    looks_like { Lightbulb }
+  }</PRE>
+<P>We note that we have placed this area light in the x-y-plane instead of the x-z-plane. We also note that the actual appearance of the light bulb is not affected in any way by the light source. The bulb must be illuminated by some other light source or by, as in this case, a high ambient value.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov60.htm">Using Shadowless Lights</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov62.htm">Using Light Fading</A>
+</P>
+</BODY>
+</HTML>
+

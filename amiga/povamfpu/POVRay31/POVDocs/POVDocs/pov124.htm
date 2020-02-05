@@ -1,0 +1,32 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Using the POVINI Environment Variable</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov123.htm">Using INI Files</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov125.htm">Options Reference</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405157"><A NAME="_Toc411405433"><A NAME="_Toc414198945"><A NAME="_Toc429993454">Using the POVINI Environment Variable</A></A></A></A></H3>
+<P>The environment variable POVINI is used to specify the location and name of a default INI file that is read every time POV-Ray is executed. If POVINI is not specified, or if your computer platform does not use environment variables, a default INI file may be read. If the specified file does not exist, a warning message is printed.</P>
+<P>To set the environment variable under MS-DOS you might put the following line in your <CODE>autoexec.bat</CODE> file...</P>
+<PRE>  set POVINI=c:\povray3\default.ini</PRE>
+<P>On most operating systems the sequence of reading options is as follows:</P><dir>
+  1.  Read options from default INI file specified by the POVINI environment variable or platform specific INI file.</P>
+<P>  2.  Read switches from command line (this includes reading any specified INI/DEF files).</P>
+</dir>
+<P>The POVRAYOPT environment variable supported by previous POV-Ray versions is no longer available.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov123.htm">Using INI Files</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov125.htm">Options Reference</A>
+</P>
+</BODY>
+</HTML>
+

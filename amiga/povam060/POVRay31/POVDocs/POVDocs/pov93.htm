@@ -1,0 +1,50 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Limitations Of Special Textures</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov92.htm">When All Else Fails: Material Maps</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov94.htm">Using the Camera</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405143"><A NAME="_Toc411405419"><A NAME="_Toc414198913"><A NAME="_Toc429993423">Limitations Of Special Textures</A></A></A></A></H3>
+<P>There are a couple limitations to all of the special textures we have seen (from textures, pigment and normal maps through material maps). First, if we have used the default directive to set the default texture for all items in our scene, it will not accept any of the special textures discussed here.  This is really quite minor, since we can always declare such a texture and apply it individually to all objects. It doesn't actually prevent us from doing anything we couldn't otherwise do.</P>
+<P>The other is more limiting, but as we will shortly see, can be worked around quite easily. If we have worked with layered textures, we have already seen how we can pile multiple texture patterns on top of one another (as long as one texture has transparency in it). This very useful technique has a problem incorporating the special textures we have just seen as a layer. But there is an answer!</P>
+<P>For example, say we have a layered texture called <b><code>Speckled_Metal</code></b>, which produces a silver metallic surface, and then puts tiny specks of rust all over it. Then we decide, for a really rusty look, we want to create patches of concentrated rust, randomly over the surface. The obvious approach is to create a special texture pattern, with transparency to use as the top layer. But of course, as we have seen, we wouldn't be able to use that texture pattern as a layer. We would just generate an error message. The solution is to turn the problem inside out, and make our layered texture part of the texture pattern instead, like this</P>
+<PRE>  // This part declares a pigment for use
+  // in the rust patch texture pattern
+  #declare Rusty = pigment {
+    granite
+    color_map {
+      [ 0 rgb &lt;0.2, 0, 0&gt; ]
+      [ 1 Brown ]
+    }
+    frequency 20
+  }
+  // And this part applies it
+  // Notice that our original layered texture
+  // "Speckled_Metal" is now part of the map
+  #declare Rust_Patches = texture {
+    bozo
+    texture_map {
+      [ 0.0  pigment {Rusty} ]
+      [ 0.75 Speckled_Metal ]
+      [ 1.0  Speckled_Metal ]
+    }
+  }</PRE>
+<P>And the ultimate effect is the same as if we had layered the rust patches on to the speckled metal anyway.</P>
+<P>With the full array of patterns, pigments, normals, finishes, layered and special textures, there is now practically nothing we cannot create in the way of amazing textures. An almost infinite number of new possibilities are just waiting to be created!</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov92.htm">When All Else Fails: Material Maps</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov94.htm">Using the Camera</A>
+</P>
+</BODY>
+</HTML>
+

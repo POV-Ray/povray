@@ -1,0 +1,51 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Objects</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov235.htm">Camera Identifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov237.htm">Finite Solid Primitives</A>
+</P>
+<HR>
+<BR>
+<H2><A NAME="_Toc411405196"><A NAME="_Toc411405472"><A NAME="_Ref412708763"><A NAME="_Toc414199071"><A NAME="_Toc429993581">Objects</A></A></A></A></A></H2>
+<P>Objects are the building blocks of your scene. There are a lot of different types of objects supported by POV-Ray.  In the sections which follow, we describe "<A HREF="pov237.htm#_Ref413745376">Finite Solid Primitives</A>", "<A HREF="pov251.htm#_Ref413745425">Finite Patch Primitives</A>", "<A HREF="pov257.htm#_Ref413745485">Infinite Solid Primitives</A>", and "<A HREF="pov267.htm#_Ref413745531">Light Sources</A>". These primitive shapes may be combined into complex shapes using "<A HREF="pov261.htm#_Ref413745643">Constructive Solid Geometry</A>" or CSG.</P>
+<P>The basic syntax of an object is a keyword describing its type, some floats, vectors or other parameters which further define its location and/or shape and some optional object modifiers such as texture, pigment, normal, finish, interior, bounding, clipping or transformations.  Specifically the syntax is:</P>
+<I><DL>
+<DT>OBJECT:</DT>
+<DD>FINITE_SOLID_OBJECT</I>   |   <I>FINITE_PATCH_OBJECT</I>   |</DD>
+<I><DD>INFINITE_SOLID_OBJECT</I>   |   <I>CSG_OBJECT</I>   |   <I>LIGHT_SOURCE</I>   |</DD>
+<b><code><DD>object {</code></b> <I>OBJECT_IDENTIFIER  [OBJECT_MODIFIERS...]</I> <b><code>}</DD>
+</code></b><I><DT>FINITE_SOLID_OBJECT:</DT>
+<DD>BLOB</I>   |   <I>BOX</I>   |   <I>CONE</I>   |   <I>CYLINDER</I>   |   <I>HEIGHT_FIELD</I>   |   <I>JULIA_FRACTAL</I>   |</DD>
+<I><DD>LATHE</I>   |   <I>PRISM</I>   |   <I>SPHERE</I>   |   <I>SUPERELLIPSOID</I>   |   <I>SOR</I>   |   <I>TEXT</I>   |   <I>TORUS</DD>
+<DT>FINITE_PATCH_OBJECT:</DT>
+<DD>BICUBIC_PATCH</I>   |   <I>DISC</I>   |   <I>MESH</I>   |   <I>POLYGON</I>   |   <I>TRIANGLE</I>   |   <I>SMOOTH_TRIANGLE</DD>
+<DT>INFINITE_SOLID_OBJECT:</DT>
+<DD>PLANE</I>   |   <I>POLY</I>   |   <I>CUBIC</I>   |   <I>QUARTIC</I>   |   <I>QUADRIC</DD>
+<DT>CSG_OBJECT:</DT>
+<DD>UNION</I>   |   <I>INTERSECTION</I>   |   <I>DIFFERENCE</I>   |   <I>MERGE</DD>
+</DL>
+</I><P>Object identifiers may be declared to make scene files more readable and to parameterize scenes so that changing a single declaration changes many values. An identifier is declared as follows.</P>
+<I><DL>
+<DT>OBJECT_DECLARATION:</DT>
+</I><b><code><DD>#declare </code></b><I>IDENTIFIER </I><b><code>=</code></b> <I>OBJECT</I>   |</DD>
+<b><code><DD>#local </code></b><I>IDENTIFIER </I><b><code>=</code></b> <I>OBJECT</DD>
+</DL>
+</I><P>Where <I>IDENTIFIER</I> is the name of the identifier up to 40 characters long and <I>OBJECT</I> is any valid object.  Note that to invoke an object identifier, you wrap it in an <b><code>object{...}</code></b> statement.  You use the <b><code>object</code></b> statement regardless of what type of object it originally was.  Although early versions of POV-Ray required this <b><code>object</code></b> wrapper all of the time, now it is only used with <I>OBJECT_IDENTIFIERS</I>.</P>
+<P>Object modifiers are covered in detail later.  However here is a brief overview.</P>
+<P>The texture describes the surface properties of the object.  Complete details are in "<A HREF="pov292.htm#_Ref416274068">Textures</A>".  Textures are combinations of pigments, normals, and finishes. In the section "<A HREF="pov293.htm#_Ref417128795">Pigment</A>" you'll learn how to specify the color or pattern of colors inherent in the. In "<A HREF="pov300.htm#_Ref417128833">Normal</A>" we describe a method of simulating various patterns of bumps, dents, ripples or waves by modifying the surface normal vector. The section on "<A HREF="pov304.htm#_Ref417128880">Finish</A>" describes the reflective properties of the surface.  The "<A HREF="pov285.htm#_Ref417128927">Interior</A>" is a new feature in POV-Ray 3.1.  It contains information about the interior of the object which was formerly contained in the finish and halo parts of a texture.  Interior items are no longer part of the texture.  Instead, they attach directly to the objects.  The halo feature has been discontinued and replaced with a new feature called "<A HREF="pov356.htm#_Ref413750547">Media</A>" which replaces both halo and atmosphere.</P>
+<P>Bounding shapes are finite, invisible shapes which wrap around complex, slow rendering shapes in order to speed up rendering time. Clipping shapes are used to cut away parts of shapes to expose a hollow interior. Transformations tell the ray-tracer how to move, size or rotate the shape and/or the texture in the scene.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov235.htm">Camera Identifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov237.htm">Finite Solid Primitives</A>
+</P>
+</BODY>
+</HTML>
+

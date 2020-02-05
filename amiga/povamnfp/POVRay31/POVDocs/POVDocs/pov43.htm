@@ -1,0 +1,95 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Polygon Object</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov42.htm">Mesh Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov44.htm">Prism Object</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405111"><A NAME="_Toc411405387"><A NAME="_Ref411676227"><A NAME="_Toc414198862"><A NAME="_Toc429993373">Polygon Object</A></A></A></A></A></H3>
+<P>The <b><code>polygon</code></b> object can be used to create any planar, n-sided shapes like squares, rectangles, pentagons, hexagons, octagons, etc.</P>
+<P>A polygon is defined by a number of points that describe its shape. Since polygons have to be closed the first point has to be repeated at the end of the point sequence.</P>
+<P>In the following example we will create the word "POV" using just one polygon statement.</P>
+<P>We start with thinking about the points we need to describe the desired shape. We want the letters to lie in the x-y-plane with the letter O being at the center. The letters extend from y=0 to y=1. Thus we get the following points for each letter (the z coordinate is automatically set to zero).</P>
+<P>Letter P (outer polygon):</P>
+<P>    &lt;-0.8, 0.0&gt;, &lt;-0.8, 1.0&gt;,</P>
+<P>    &lt;-0.3, 1.0&gt;, &lt;-0.3, 0.5&gt;,</P>
+<P>    &lt;-0.7, 0.5&gt;, &lt;-0.7, 0.0&gt;</P>
+<P>Letter P (inner polygon):</P>
+<P>    &lt;-0.7, 0.6&gt;, &lt;-0.7, 0.9&gt;,</P>
+<P>    &lt;-0.4, 0.9&gt;, &lt;-0.4, 0.6&gt;</P>
+<P>Letter O (outer polygon):</P>
+<P>    &lt;-0.25, 0.0&gt;, &lt;-0.25, 1.0&gt;,</P>
+<P>    &lt; 0.25, 1.0&gt;, &lt; 0.25, 0.0&gt;</P>
+<P>Letter O (inner polygon):</P>
+<P>    &lt;-0.15, 0.1&gt;, &lt;-0.15, 0.9&gt;,</P>
+<P>    &lt; 0.15, 0.9&gt;, &lt; 0.15, 0.1&gt;</P>
+<P>Letter V:</P>
+<P>    &lt;0.45, 0.0&gt;, &lt;0.30, 1.0&gt;,</P>
+<P>    &lt;0.40, 1.0&gt;, &lt;0.55, 0.1&gt;,</P>
+<P>    &lt;0.70, 1.0&gt;, &lt;0.80, 1.0&gt;,</P>
+<P>    &lt;0.65, 0.0&gt;</P>
+<P>Both letters P and O have a hole while the letter V consists of only one polygon. We'll start with the letter V because it is easier to define than the other two letters.</P>
+<P>We create a new file called <CODE>polygdem.pov</CODE> and add the following text.</P>
+<PRE>  camera {
+    orthographic
+    location &lt;0, 0, -10&gt;
+    right 1.3 * 4/3 * x
+    up 1.3 * y
+    look_at &lt;0, 0.5, 0&gt;
+  }
+  light_source { &lt;25, 25, -100&gt; color rgb 1 }
+  polygon {
+    8,
+    &lt;0.45, 0.0&gt;, &lt;0.30, 1.0&gt;, // Letter "V"
+    &lt;0.40, 1.0&gt;, &lt;0.55, 0.1&gt;,
+    &lt;0.70, 1.0&gt;, &lt;0.80, 1.0&gt;,
+    &lt;0.65, 0.0&gt;,
+    &lt;0.45, 0.0&gt;
+    pigment { color rgb &lt;1, 0, 0&gt; }
+  }</PRE>
+<P>As noted above the polygon has to be closed by appending the first point to the point sequence. A closed polygon is always defined by a sequence of points that ends when a point is the same as the first point.</P>
+<P>After we have created the letter V we'll continue with the letter P. Since it has a hole we have to find a way of cutting this hole into the basic shape. This is quite easy. We just define the outer shape of the letter P, which is a closed polygon, and add the sequence of points that describes the hole, which is also a closed polygon. That's all we have to do. There'll be a hole where both polygons overlap.</P>
+<P>In general we will get holes whenever an even number of sub-polygons inside a single polygon statement overlap. A sub-polygon is defined by a closed sequence of points.</P>
+<P>The letter P consists of two sub-polygons, one for the outer shape and one for the hole. Since the hole polygon overlaps the outer shape polygon we'll get a hole.</P>
+<P>After we have understood how multiple sub-polygons in a single polygon statement work, it is quite easy to add the missing O letter.</P>
+<P>Finally, we get the complete word POV.</P>
+<PRE>  polygon {
+    30,
+    &lt;-0.8, 0.0&gt;, &lt;-0.8, 1.0&gt;,    // Letter "P"
+    &lt;-0.3, 1.0&gt;, &lt;-0.3, 0.5&gt;,    // outer shape
+    &lt;-0.7, 0.5&gt;, &lt;-0.7, 0.0&gt;,
+    &lt;-0.8, 0.0&gt;,
+    &lt;-0.7, 0.6&gt;, &lt;-0.7, 0.9&gt;,    // hole
+    &lt;-0.4, 0.9&gt;, &lt;-0.4, 0.6&gt;,
+    &lt;-0.7, 0.6&gt;
+    &lt;-0.25, 0.0&gt;, &lt;-0.25, 1.0&gt;,  // Letter "O"
+    &lt; 0.25, 1.0&gt;, &lt; 0.25, 0.0&gt;,  // outer shape
+    &lt;-0.25, 0.0&gt;,
+    &lt;-0.15, 0.1&gt;, &lt;-0.15, 0.9&gt;,  // hole
+    &lt; 0.15, 0.9&gt;, &lt; 0.15, 0.1&gt;,
+    &lt;-0.15, 0.1&gt;,
+    &lt;0.45, 0.0&gt;, &lt;0.30, 1.0&gt;,    // Letter "V"
+    &lt;0.40, 1.0&gt;, &lt;0.55, 0.1&gt;,
+    &lt;0.70, 1.0&gt;, &lt;0.80, 1.0&gt;,
+    &lt;0.65, 0.0&gt;,
+    &lt;0.45, 0.0&gt;
+    pigment { color rgb &lt;1, 0, 0&gt; }
+  }</PRE>
+<B><P ALIGN="CENTER"><IMG SRC="Image212.gif" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">The word "POV" made with one polygon statement.</P>
+</B>
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov42.htm">Mesh Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov44.htm">Prism Object</A>
+</P>
+</BODY>
+</HTML>
+

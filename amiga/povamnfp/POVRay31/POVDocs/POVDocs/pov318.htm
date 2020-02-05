@@ -1,0 +1,48 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Average</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov317.htm">Agate</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov319.htm">Boxed</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199165"><A NAME="_Ref417371289"><A NAME="_Ref417980778"><A NAME="_Toc429993676">Average</A></A></A></A></H4>
+<P>Technically <b><code>average</code></b> is not a pattern type but it is listed here because the syntax is similar to other patterns. Typically a pattern type specifies how colors or normals are chosen from a <b><code>pigment_map</code></b>¸ <b><code>texture_map</code></b>, <b><code>density_map</code></b>, or <b><code>normal_map</code></b>, however <b><code>average</code></b> tells POV-Ray to average together all of the patterns you specify.  Average was originally designed to be used in a normal statement with a <b><code>normal_map</code></b> as a method of specifying more than one normal pattern on the same surface. However average may be used in a pigment statement with a <b><code>pigment_map</code></b> or in a texture statement with a <b><code>texture_map</code></b> or media density with <b><code>density_map</code></b> to average colors too.</P>
+<P>When used with pigments, the syntax is:</P>
+<I><DL>
+<DT>AVERAGED_PIGMENT:</DT>
+</I><b><code><DD>pigment {</DD>
+<DD>  pigment_map{</code></b> <I>PIGMENT_MAP_ENTRY...</I> <b><code>}</DD>
+<DD>}</DD>
+</code></b><I><DT>PIGMENT_MAP_ENTRY:</DT>
+</I><b><code><DD>[</code></b> <I>[Weight]</I>  <I>PIGMENT_BODY</I> <b><code>]</DD>
+</DL>
+</code></b><P>Where <I>Weight</I> is an optional float value that defaults to 1.0 if not specified.  This weight value is the relative weight applied to that pigment.  Each <I>PIGMENT_BODY</I> is anything which can be inside a <b><code>pigment{...}</code></b> statement.  The <b><code>pigment</code></b> keyword and <b><code>{}</code></b> braces need not be specified.</P>
+<P>Note that the <b><code>[]</code></b> brackets are part of the actual <I>PIGMENT_MAP_ENTRY</I>. They are not notational symbols denoting optional parts. The brackets surround each entry in the <b><code>pigment_map</code></b>. There may be from 2 to 256 entries in the map. </P>
+<P>For example</P>
+<PRE>    pigment {
+      average
+      pigment_map {
+        [1.0  Pigment_1]
+        [2.0  Pigment_2]
+        [0.5  Pigment_3]
+      }
+    }</PRE>
+<P>All three pigments are evaluated.  The weight values are multiplied by the resulting color.  It is then divided by the total of the weights which, in this example is 3.5.  When used with <b><code>texture_map</code></b> or <b><code>density_map</code></b> it works the same way.</P>
+<P>When used with a <b><code>normal_map</code></b> in a normal statement, multiple copies of the original surface normal are created and are perturbed by each pattern. The perturbed normals are then weighted, added and normalized.</P>
+<P>See the sections "<A HREF="pov297.htm#_Ref418337353">Pigment Maps and Pigment Lists</A>", "<A HREF="pov302.htm#_Ref418337380">Normal Maps and Normal Lists</A>", "<A HREF="pov312.htm#_Ref418337408">Texture Maps</A>", and "<A HREF="pov365.htm#_Ref428014731">Density Maps and Density Lists</A>" for more information.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov317.htm">Agate</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov319.htm">Boxed</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Language Version</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov139.htm">Library Paths</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov141.htm">Shell-out to Operating System</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref413248722"><A NAME="_Toc414198974"><A NAME="_Toc429993483">Language Version</A></A></A></H4>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=432>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>Version=</code></b><I>n.n</I></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<P>Set initial language compatibility to version <I>n.n</I></TD>
+</TR>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>+MV</code></b><I>n.n</I></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<P>Same as <b><code>Version=</code></b><I>n.n</I></TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>As POV-Ray as evolved from version 1.0 through 3.1 we have made every effort to maintain some amount of backwards compatibility with earlier versions.  Some old or obsolete features can be handled directly without any special consideration by the user.  Some old or obsolete features can no longer be handled at all.  However <I>some</I> old features can still be used if you warn POV-Ray that this is an older scene.  In the POV-Ray scene language you can use the <b><code>#version</code></b> directive to switch version compatibility to different setting.  See section "<A HREF="pov200.htm#_Ref412535627">The #version Directive</A>" for more details about the language version directive.  Additionally you may use the <b><code>Version=</code></b><I>n.n</I> option or the <b><code>+MV</code></b><I>n.n</I> switch to establish the <I>initial</I> setting.  For example one feature introduced in 2.0 that was incompatible with any 1.0 scene files is the parsing of float expressions. Setting <b><code>Version=1.0</code></b> or using <b><code>+MV1.0</code></b> turns off expression parsing as well as many warning messages so that nearly all 1.0 files will still work. Naturally the default setting for this option is <b><code>Version=3.1</code></b>.</P>
+<P>NOTE: Some obsolete or re-designed features <I>are totally unavailable in POV-Ray 3.1 REGARDLES OF THE VERSION SETTING.</I>  Details on these features are noted throughout this documentation.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov139.htm">Library Paths</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov141.htm">Shell-out to Operating System</A>
+</P>
+</BODY>
+</HTML>
+

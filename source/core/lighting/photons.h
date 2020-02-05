@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,9 +38,18 @@
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
+#include "core/lighting/photons_fwd.h"
+
+// C++ variants of C standard header files
+//  (none at the moment)
 
 // C++ standard header files
+#include <memory>
 #include <string>
+#include <vector>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
 
 // POV-Ray header files (core module)
 #include "core/material/media.h"
@@ -61,7 +70,7 @@ using namespace pov_base;
 #define MEDIA_INTERACTION 1
 
 /* ------------------------------------------------------ */
-class ScenePhotonSettings
+class ScenePhotonSettings final
 {
     public:
         ScenePhotonSettings()
@@ -156,7 +165,7 @@ class ScenePhotonSettings
 typedef float PhotonScalar;
 typedef GenericVector3d<PhotonScalar> PhotonVector3d;
 
-struct Photon
+struct Photon final
 {
     void init(unsigned char _info)
     {
@@ -173,7 +182,7 @@ struct Photon
 /* photon map */
 /* ------------------------------------------------------ */
 
-class PhotonMap
+class PhotonMap final
 {
 
     private:
@@ -257,7 +266,7 @@ typedef Photon* PhotonPtr;
 /* ------------------------------------------------------ */
 /* photon gatherer */
 /* ------------------------------------------------------ */
-class GatheredPhotons
+class GatheredPhotons final
 {
     public:
         // priority queue arrays
@@ -271,7 +280,7 @@ class GatheredPhotons
         ~GatheredPhotons();
 };
 
-class PhotonGatherer
+class PhotonGatherer final
 {
     public:
         ScenePhotonSettings& photonSettings;
@@ -301,30 +310,30 @@ class PhotonGatherer
         void FullPQInsert(Photon *photon, DBL d);
 };
 
-class PhotonMediaFunction : public MediaFunction
+class PhotonMediaFunction final : public MediaFunction
 {
     public:
-        PhotonMediaFunction(shared_ptr<SceneData> sd, TraceThreadData *td, Trace *t, PhotonGatherer *pg);
+        PhotonMediaFunction(std::shared_ptr<SceneData> sd, TraceThreadData *td, Trace *t, PhotonGatherer *pg);
 
         void ComputeMediaAndDepositPhotons(MediaVector& medias, const Ray& ray, const Intersection& isect, MathColour& colour);
     protected:
         void DepositMediaPhotons(MathColour& colour, MediaVector& medias, LightSourceEntryVector& lights, MediaIntervalVector& mediaintervals,
                                  const Ray& ray, int minsamples, bool ignore_photons, bool use_scattering, bool all_constant_and_light_ray);
     private:
-        shared_ptr<SceneData> sceneData;
+        std::shared_ptr<SceneData> sceneData;
 
         void addMediaPhoton(const Vector3d& Point, const Vector3d& Origin, const MathColour& LightCol, DBL depthDiff);
 };
 
-class PhotonTrace : public Trace
+class PhotonTrace final : public Trace
 {
     public:
-        PhotonTrace(shared_ptr<SceneData> sd, TraceThreadData *td, const QualityFlags& qf, Trace::CooperateFunctor& cf);
-        ~PhotonTrace();
+        PhotonTrace(std::shared_ptr<SceneData> sd, TraceThreadData *td, const QualityFlags& qf, Trace::CooperateFunctor& cf);
+        virtual ~PhotonTrace() override;
 
-        virtual DBL TraceRay(Ray& ray, MathColour& colour, ColourChannel&, COLC weight, bool continuedRay, DBL maxDepth = 0.0);
+        virtual DBL TraceRay(Ray& ray, MathColour& colour, ColourChannel&, COLC weight, bool continuedRay, DBL maxDepth = 0.0) override;
     protected:
-        virtual void ComputeLightedTexture(MathColour& LightCol, ColourChannel&, const TEXTURE *Texture, vector<const TEXTURE *>& warps, const Vector3d& ipoint, const Vector3d& rawnormal, Ray& ray, COLC weight, Intersection& isect);
+        virtual void ComputeLightedTexture(MathColour& LightCol, ColourChannel&, const TEXTURE *Texture, std::vector<const TEXTURE *>& warps, const Vector3d& ipoint, const Vector3d& rawnormal, Ray& ray, COLC weight, Intersection& isect) override;
         bool ComputeRefractionForPhotons(const FINISH* finish, Interior *interior, const Vector3d& ipoint, Ray& ray, const Vector3d& normal, const Vector3d& rawnormal, MathColour& colour, COLC weight);
         bool TraceRefractionRayForPhotons(const FINISH* finish, const Vector3d& ipoint, Ray& ray, Ray& nray, DBL ior, DBL n, const Vector3d& normal, const Vector3d& rawnormal, const Vector3d& localnormal, MathColour& colour, COLC weight);
     private:
@@ -334,14 +343,11 @@ class PhotonTrace : public Trace
         void addSurfacePhoton(const Vector3d& Point, const Vector3d& Origin, const MathColour& LightCol);
 };
 
-// forward declaration
-class LightTargetCombo;
-
 /* ------------------------------------------------------ */
 /* photon map builder */
 /* ------------------------------------------------------ */
 
-class ShootingDirection
+class ShootingDirection final
 {
     public:
         ShootingDirection(LightSource* light, ObjectPtr target):light(light),target(target) {}
@@ -357,7 +363,7 @@ class ShootingDirection
     };
 
 
-class LightTargetCombo
+class LightTargetCombo final
 {
     public:
         LightTargetCombo(LightSource *light, ObjectPtr target):light(light),target(target),shootingDirection(light,target) {}
@@ -371,11 +377,11 @@ class LightTargetCombo
         ShootingDirection shootingDirection;
 
         int computeMergedFlags();
-        void computeAnglesAndDeltas(shared_ptr<SceneData> sceneData);
+        void computeAnglesAndDeltas(std::shared_ptr<SceneData> sceneData);
 };
 
 
-class PhotonShootingUnit
+class PhotonShootingUnit final
 {
     public:
         PhotonShootingUnit(LightSource* light, ObjectPtr target):lightAndObject(light,target) {}
@@ -385,7 +391,7 @@ class PhotonShootingUnit
 
 
 
-class SinCosOptimizations
+class SinCosOptimizations final
 {
     public:
         // speed optimization data - sin/cos stored in two arrays
@@ -411,5 +417,6 @@ void ChooseRay(BasicRay &NewRay, const Vector3d& Normal, const Vector3d& Raw_Nor
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_PHOTONS_H

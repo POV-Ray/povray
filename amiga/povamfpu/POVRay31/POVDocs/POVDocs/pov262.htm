@@ -1,0 +1,33 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Inside and Outside</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov261.htm">Constructive Solid Geometry</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov263.htm">Union</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199098"><A NAME="_Toc429993607">Inside and Outside</A></A></H4>
+<P>Most shape primitives, like spheres, boxes and blobs divide the world into two regions. One region is inside the object and one is outside. Given any point in space you can say it's either inside or outside any particular primitive object. Well, it could be exactly on the surface but this case is rather hard to determine due to numerical problems.</P>
+<P>Even planes have an inside and an outside. By definition, the surface normal of the plane points towards the outside of the plane. You should note that triangles and triangle-based shapes cannot be used as solid objects in CSG since they have no well defined inside and outside.</P>
+<P>CSG uses the concepts of inside and outside to combine shapes together as explained in the following sections.</P>
+<P>Imagine you have two objects that partially overlap like shown in the figure below. Four different areas of points can be distinguished: points that are neither in object <b><code>A</code></b> nor in object <b><code>B</code></b>, points that are in object <b><code>A</code></b> but not in object <b><code>B</code></b>, points that are not in object <b><code>A</code></b> but in object <b><code>B</code></b> and last not least points that are in object <b><code>A</code></b> and object <b><code>B</code></b>.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image102.gif" WIDTH=307 HEIGHT=195></P>
+<P ALIGN="CENTER">Two overlapping objects.</P>
+</B><P>Keeping this in mind it will be quite easy to understand how the CSG operations work.</P>
+<P>When using CSG it is often useful to invert an object so that it'll be inside-out. The appearance of the object is not changed, just the way that POV-Ray perceives it. When the <b><code>inverse</code></b> keyword is used the <I>inside </I>of the shape is flipped to become the <I>outside </I>and vice versa.</P>
+<P>The inside/outside distinction is not important for a <b><code>union</code></b>, but is important for <b><code>intersection</code></b>, <b><code>difference</code></b>, and <b><code>merge</code></b>.Therefore any objects may be combined using <b><code>union</code></b> but only solid objects, i.e. objects that have a well-defined interior can be used in the other kinds of CSG. The objects described in "<A HREF="pov251.htm#_Ref416092785">Finite Patch Primitives</A>" have no well defined inside/outside.  All objects described in the sections "<A HREF="pov237.htm#_Ref416092921">Finite Solid Primitives</A>" and "<A HREF="pov257.htm#_Ref416092986">Infinite Solid Primitives</A>".</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov261.htm">Constructive Solid Geometry</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov263.htm">Union</A>
+</P>
+</BODY>
+</HTML>
+

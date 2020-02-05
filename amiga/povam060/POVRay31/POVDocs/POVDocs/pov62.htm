@@ -1,0 +1,35 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Using Light Fading</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov61.htm">Assigning an Object to a Light Source</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov63.htm">Simple Texture Options</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198881"><A NAME="_Toc429993392">Using Light Fading</A></A></H4>
+<P>If it is realism we want, it is not realistic for the plane to be evenly illuminated off into the distance. In real life, light gets scattered as it travels so it diminishes its ability to illuminate objects the farther it gets from its source. To simulate this, POV-Ray allows us to use two keywords: <b><code>fade_distance</code></b>, which specifies the distance at which full illumination is achieved, and <b><code>fade_power</code></b>, an exponential value which determines the actual rate of attenuation. Let's apply these keywords to our fill light.</P>
+<P>First, we make the fill light a little brighter by changing <b><code>Gray50</code></b> to <b><code>Gray75</code></b>. Now we change that fill light as follows:</P>
+<PRE>  light_source {
+    &lt;0, 20, 0&gt;
+    color Gray75
+    fade_distance 5
+    fade_power 1
+    shadowless
+  }</PRE>
+<P>This means that the full value of the fill light will be achieved at a distance of 5 units away from the light source. The fade power of 1 means that the falloff will be linear (the light falls of at a constant rate). We render this to see the result.</P>
+<P>That definitely worked!  Now let's try a fade power of 2 and a fade distance of 10. Again, this works well. The falloff is much faster with a fade power of 2 so we had to raise the fade distance to 10.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov61.htm">Assigning an Object to a Light Source</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov63.htm">Simple Texture Options</A>
+</P>
+</BODY>
+</HTML>
+

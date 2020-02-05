@@ -1,0 +1,216 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Shell Command Return Actions</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov143.htm">Shell Command Sequencing</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov145.htm">Text Output</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198978"><A NAME="_Toc429993487">Shell Command Return Actions</A></A></H4>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=456>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>Pre_Scene_Return=</code></b><I>s</I></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Set pre scene return actions</TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>Pre_Frame_Return=</code></b><I>s</I></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Set pre frame return actions</TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>Post_Scene_Return=</code></b><I>s</I></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Set post scene return actions</TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>Post_Frame_Return=</code></b><I>s</I></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Set post frame return actions</TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>User_Abort_Return=</code></b><I>s</I></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Set user abort return actions</TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>Fatal_Error_Return=</code></b><I>s</I></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Set fatal return actions</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>Note that no <b><code>+</code></b> or <b><code>-</code></b> switches are available for these options. They cannot be used from the command line. They may only be used from INI files.</P>
+<P>Most operating systems allow application programs to return an error code if something goes wrong. When POV-Ray executes a shell command it can make use of this error code returned from the shell process and take some appropriate action if the code is zero or non-zero. POV-Ray itself returns such codes. It returns 0 for success, 1 for fatal error and 2 for user abort.</P>
+<P>The actions are designated by a single letter in the different <b><code>..._Return</code></b>=s options. The possible actions are:</P>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=268>
+<TR><TD WIDTH="11%" VALIGN="TOP">
+<p><b><code>I</code></b></TD>
+<TD WIDTH="89%" VALIGN="TOP">
+<P>ignore the code</TD>
+</TR>
+<TR><TD WIDTH="11%" VALIGN="TOP">
+<p><b><code>S</code></b></TD>
+<TD WIDTH="89%" VALIGN="TOP">
+<P>skip one step</TD>
+</TR>
+<TR><TD WIDTH="11%" VALIGN="TOP">
+<p><b><code>A</code></b></TD>
+<TD WIDTH="89%" VALIGN="TOP">
+<P>all steps skipped</TD>
+</TR>
+<TR><TD WIDTH="11%" VALIGN="TOP">
+<p><b><code>Q</code></b></TD>
+<TD WIDTH="89%" VALIGN="TOP">
+<P>quit POV-Ray immediately</TD>
+</TR>
+<TR><TD WIDTH="11%" VALIGN="TOP">
+<p><b><code>U</code></b></TD>
+<TD WIDTH="89%" VALIGN="TOP">
+<P>generate a user abort in POV-Ray</TD>
+</TR>
+<TR><TD WIDTH="11%" VALIGN="TOP">
+<p><b><code>F</code></b></TD>
+<TD WIDTH="89%" VALIGN="TOP">
+<P>generate a fatal error in POV-Ray</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>For example if your <b><code>Pre_Frame_Command</code></b> calls a program which generates your height field data and that utility fails then it will return a non-zero code. We would probably want POV-Ray to abort as well. The option <b><code>Pre_Frame_Return=F</code></b> will cause POV-Ray to do a fatal abort if the <b><code>Pre_Frame_Command</code></b> returns a non-zero code.</P>
+<P>Sometimes a non-zero code from the external process is a good thing. Suppose you want to test if a frame has already been rendered. You could use the <b><code>S</code></b> action to skip this frame if the file is already rendered. Most utilities report an error if the file is not found. For example the command...</P>
+<PRE> pkzip -V myscene mysce012.tga</PRE>
+<P>tells pkzip you want to view the catalog of <CODE>myscene.zip</CODE> for the file <CODE>mysce012.tga</CODE>. If the file isn't in the archive <CODE>pkzip</CODE> returns a non-zero code.</P>
+<P>However we want to skip if the file is found. Therefore we need to reverse the action so it skips on zero and doesn't skip on non-zero. To reverse the zero vs. non-zero triggering of an action precede it with a "<b><code>-</code></b>" sign (note a "<b><code>!</code></b>" will also work since it is used in many programming languages as a negate operator).</P>
+<p><b><code>Pre_Frame_Return=S</code></b> will skip if the code shows error (non-zero) and will proceed normally on no error (zero). <b><code>Pre_Frame_Return=-S</code></b> will skip if there is no error (zero) and will proceed normally if there is an error (non-zero).</P>
+<P>The default for all shells is <b><code>I</code></b> which means that the return action is ignored no matter what. POV-Ray simply proceeds with whatever it was doing before the shell command. The other actions depend upon the context. You may want to refer back to the animation loop sequence chart in the previous section "<A HREF="pov143.htm#_Ref412623075">Shell Command Sequencing</A>". The action for each shell is as follows.</P>
+<P>On return from any <b><code>User_Abort_Command</code></b> if there is an action triggered...</P>
+
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=432>
+<TR><TD WIDTH="39%" VALIGN="TOP">
+<P>and you have specified... </TD>
+<TD WIDTH="61%" VALIGN="TOP">
+<P>... then POV-Ray will..</TD>
+</TR>
+<TR><TD WIDTH="39%" VALIGN="TOP">
+<p><b><code>F</code></b></TD>
+<TD WIDTH="61%" VALIGN="TOP">
+<P>Then turn this user abort into a fatal error.</P>
+<P>Do the <b><code>Fatal_Error_Command</code></b>, if any.</P>
+<P>Exit POV-Ray with error code 1.</TD>
+</TR>
+<TR><TD WIDTH="39%" VALIGN="TOP">
+<p><b><code>S</code></b>, <b><code>A</code></b>, <b><code>Q</code></b>, or <b><code>U</code></b></TD>
+<TD WIDTH="61%" VALIGN="TOP">
+<P>Then proceed with the user abort.</P>
+<P>Exit POV-Ray with error code 2.</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>On return from any <b><code>Fatal_Error_Command</code></b> then POV-Ray will proceed with the fatal error no matter what. It will exit POV-Ray with error code 1.</P>
+<P>On return from any <b><code>Pre_Scene_Command</code></b>, <b><code>Pre_Frame_Command</code></b>, <b><code>Post_Frame_Command</code></b> or <b><code>Post_Scene_Commands</code></b> if there is an action triggered...</P>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=456>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<P>...and you have specified... </TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>... then POV-Ray will...</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>F</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+...turn this user abort into a fatal error. Do the <b><code>Fatal_Error_Command</code></b>, if any. Exit POV-Ray with error code 1.
+</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>U</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+...generate a user abort. Do the <b><code>User_Abort_Command</code></b>, if any. Exit POV-Ray with an error code 2.
+</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>Q</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+..quit POV-Ray immediately. Acts as though POV-Ray never really ran. Do no further shells, (not even a <b><code>Post_Scene_Command</code></b>) and exit POV-Ray with an error code 0.
+</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>On return from a <b><code>Pre_Scene_Command</code></b> if there is an action triggered...</P>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=456>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<P>...and you have specified... </TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>... then POV-Ray will...</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>S</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+...skip rendering all frames. Acts as though the scene completed all frames normally. Do not do any <b><code>Pre_Frame_Command</code></b> or <b><code>Post_Frame_Commands</code></b>. Do the <b><code>Post_Scene_Command</code></b>, if any. Exit POV-Ray with error code 0. On the earlier chart this means skip step #4.
+</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>A</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+...skip all scene activity. Works exactly like <b><code>Q</code></b> quit. On the earlier chart this means skip to step #6. Acts as though POV-Ray never really ran. Do no further shells, (not even a <b><code>Post_Scene_Command</code></b>) and exit POV-Ray with an error code 0.
+</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>On return from a <b><code>Pre_Frame_Command</code></b> if there is an action triggered...</P>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=456>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<P>...and you have specified... </TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>... then POV-Ray will...</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>S</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+...skip only this frame. Acts as though this frame never existed. Do not do the <b><code>Post_Frame_Command</code></b>. Proceed with the next frame. On the earlier chart this means skip steps (4b) and (4c) but loop back as needed in (4d).
+</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>A</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+...skip rendering this frame and all remaining frames. Acts as though the scene completed all frames normally. Do not do any further <b><code>Post_Frame_Commands</code></b>. Do the <b><code>Post_Scene_Command</code></b>, if any. Exit POV-Ray with error code 0. On the earlier chart this means skip the rest of step (4) and proceed at step (5).
+</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>On return from a <b><code>Post_Frame_Command</code></b> if there is an action triggered...</P>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=456>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<P>...and you have specified... </TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>... then POV-Ray will...</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>S</code></b> or <b><code>A</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+...skip all remaining frames. Acts as though the scene completed all frames normally. Do not do any further <b><code>Post_Frame_Commands</code></b>. Do the <b><code>Post_Scene_Command</code></b>, if any. Exit POV-Ray with error code 0. On the earlier chart this means skip the rest of step (4) and proceed at step (5).
+</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>On return from any <b><code>Post_Scene_Command</code></b> if there is an action triggered and you have specified <b><code>S</code></b> or <b><code>A</code></b> then no special action occurs.  This is the same as <b><code>I</code></b> for this shell command.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov143.htm">Shell Command Sequencing</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov145.htm">Text Output</A>
+</P>
+</BODY>
+</HTML>
+

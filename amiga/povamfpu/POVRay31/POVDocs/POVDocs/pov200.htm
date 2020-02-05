@@ -1,0 +1,38 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - The #version Directive</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov199.htm">The #default Directive</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov201.htm">Conditional Directives</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405181"><A NAME="_Toc411405457"><A NAME="_Ref412535627"><A NAME="_Toc414199033"><A NAME="_Toc429993543">The #version Directive</A></A></A></A></A></H3>
+<P>As POV-Ray as evolved from version 1.0 through 3.1 we have made every effort to maintain some amount of backwards compatibility with earlier versions.  Some old or obsolete features can be handled directly without any special consideration by the user.  Some old or obsolete features can no longer be handled at all.  However <I>some</I> old features can still be used if you warn POV-Ray that this is an older scene.  The <b><code>#version</code></b> directive can be used to switch version compatibility to different setting several times throughout a scene file.  The syntax is:</P>
+<I><DL>
+<DT>VERSION_DIRECTIVE:</DT>
+</I><b><code><DD>#version</code></b> <I>FLOAT</I><b><code>;</DD>
+</DL>
+</code></b><P>Note that there should be a semi-colon after the float expression in a <b><code>#version</code></b> directive. This semi-colon is new with POV-Ray version 3.1. If omitted, it generates a warning and some macros may not work properly.</P>
+<P>Additionally you may use the <b><code>Version=</code></b><I>n.n</I> option or the <b><code>+MV</code></b><I>n.n</I> switch to establish the <I>initial</I> setting.  See "<A HREF="pov140.htm#_Ref413248722">Language Version</A>" for details. For example one feature introduced in 2.0 that was incompatible with any 1.0 scene files is the parsing of float expressions. Using <b><code>#version 1.0</code></b> turns off expression parsing as well as many warning messages so that nearly all 1.0 files will still work. Naturally the default setting for this option is <b><code>#version 3.1</code></b>.</P>
+<P>NOTE: Some obsolete or re-designed features <I>are totally unavailable in POV-Ray 3.1 REGARDLES OF THE VERSION SETTING.</I>  Details on these features are noted throughout this documentation.</P>
+<P>The built-in float identifier <b><code>version</code></b> contains the current setting of the version compatibility option. See "<A HREF="pov164.htm#_Ref413233292">Built-in Float Identifiers</A>".  Together with the built-in <b><code>version</code></b> identifier the <b><code>#version</code></b> directive allows you to save and restore the previous values of this compatibility setting. The new <b><code>#local</code></b> identifier option is especially useful here. For example suppose <CODE>mystuff.inc</CODE> is in version 1 format. At the top of the file you could put:</P>
+<PRE> #local Temp_Vers = version;  // Save previous value
+ #version 1.0;         // Change to 1.0 mode
+ ... // Version 1.0 stuff goes here...
+ #version Temp_Vers;      // Restore previous version</PRE>
+<P>Future versions of POV-Ray may not continue to maintain full backward compatibility even with the <b><code>#version</code></b> directive. We strongly encourage you to phase in 3.1 syntax as much as possible.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov199.htm">The #default Directive</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov201.htm">Conditional Directives</A>
+</P>
+</BODY>
+</HTML>
+

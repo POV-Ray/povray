@@ -1,0 +1,28 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Destroying Identifiers with #undef</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov192.htm">Identifier Name Collisions</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov194.htm">File I/O Directives</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref413236176"><A NAME="_Ref413237003"><A NAME="_Ref413339194"><A NAME="_Toc414199026"><A NAME="_Toc429993536">Destroying Identifiers</A></A> with #undef</A></A></A></H4>
+<P>Identifiers created with <b><code>#declare</code></b> will generally persist until parsing is complete. Identifiers created with <b><code>#local</code></b> will persist until the end of the macro or include file in which they were created. You may however un-define an identifier using the <b><code>#undef</code></b> directive. For example:</P>
+<PRE> #undef MyValue</PRE>
+<P>If multiple local nested versions of the identifier exist, the most local most recent version is deleted and any identically named identifiers which were created at higher levels will still exist.</P>
+<P>See also "<A HREF="pov203.htm#_Ref413241864">The #ifdef and #ifndef Directives</A>".</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov192.htm">Identifier Name Collisions</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov194.htm">File I/O Directives</A>
+</P>
+</BODY>
+</HTML>
+

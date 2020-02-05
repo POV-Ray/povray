@@ -1,0 +1,76 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Working With Layered Textures</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov88.htm">Average Function</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov90.htm">Declaring Layered Textures</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405141"><A NAME="_Toc411405417"><A NAME="_Toc414198909"><A NAME="_Toc429993419">Working With Layered Textures</A></A></A></A></H3>
+<P>With the multitudinous colors, patterns, and options for creating complex textures in POV-Ray, we can easily become deeply engrossed in mixing and tweaking just the right textures to apply to our latest creations. But as we go, sooner or later there is going to come that <I>special</I> texture. That texture that is sort of like wood, only varnished, and with a kind of spotty yellow streaking, and some vertical gray flecks, that looks like someone started painting over it all, and then stopped, leaving part of the wood visible through the paint.</P>
+<P>Only... now what? How do we get all that into one texture? No pattern can do that many things. Before we panic and say image map there is at least one more option: <I>layered textures</I>.</P>
+<P>With layered textures, we only need to specify a series of textures, one after the other, all associated with the same object. Each texture we list will be applied one on top of the other, from bottom to top in the order they appear.</P>
+<P>It is very important to note that we must have some degree of transparency (filter or transmit) in the pigments of our upper textures, or the ones below will get lost underneath. We won't receive a warning or an error - technically it is legal to do this: it just doesn't make sense. It is like spending hours sketching an elaborate image on a bare wall, then slapping a solid white coat of latex paint over it.</P>
+<P>Let's design a very simple object with a layered texture, and look at how it works. We create a file called <CODE>LAYTEX.POV</CODE> and add the following lines.</P>
+<PRE>  #include "colors.inc"
+  #include "textures.inc"
+  camera {
+    location &lt;0, 5, -30&gt;
+    look_at &lt;0, 0, 0&gt;
+  }
+  light_source { &lt;-20, 30, -50&gt; color White }
+  plane { y, 0 pigment { checker color Green color Yellow  } }
+  background { rgb &lt;.7, .7, 1&gt; }
+  box { &lt;-10, 0, -10&gt;, &lt;10, 10, 10&gt;
+    texture {
+      Silver_Metal // a metal object ...
+      normal {     // ... which has suffered a beating
+        dents 2
+        scale 1.5
+      }
+    } // (end of base texture)
+    texture { // ... has some flecks of rust ...
+      pigment {
+        granite
+        color_map {
+          [0.0 rgb &lt;.2, 0, 0&gt; ]
+          [0.2 color Brown ]
+          [0.2 rgbt &lt;1, 1, 1, 1&gt; ]
+          [1.0 rgbt &lt;1, 1, 1, 1&gt; ]
+        }
+        frequency 16
+      }
+    } // (end rust fleck texture)
+    texture { // ... and some sooty black marks
+      pigment {
+        bozo
+        color_map {
+          [0.0 color Black ]
+          [0.2 color rgbt &lt;0, 0, 0, .5&gt; ]
+          [0.4 color rgbt &lt;.5, .5, .5, .5&gt; ]
+          [0.5 color rgbt &lt;1, 1, 1, 1&gt; ]
+          [1.0 color rgbt &lt;1, 1, 1, 1&gt; ]
+        }
+        scale 3
+      }
+    } // (end of sooty mark texture)
+  } // (end of box declaration)</PRE>
+<P>Whew. This gets complicated, so to make it easier to read, we have included comments showing what we are doing and where various parts of the declaration end (so we don't get lost in all those closing brackets!). To begin, we created a simple box over the classic checkerboard floor, and give the background sky a pale blue color. Now for the fun part...</P>
+<P>To begin with we made the box use the <b><code>Silver_Metal</code></b> texture as declared in textures.inc (for bonus points, look up <CODE>textures.inc</CODE> and see how this standard texture was originally created sometime). To give it the start of its abused state, we added the dents normal pattern, which creates the illusion of some denting in the surface as if our mysterious metal box had been knocked around quite a bit.</P>
+<P>The flecks of rust are nothing but a fine grain granite pattern fading from dark red to brown which then abruptly drops to fully transparent for the majority of the color map. True, we could probably come up with a more realistic pattern of rust using pigment maps to cluster rusty spots, but pigment maps are a subject for another tutorial section, so let's skip that just now.</P>
+<P>Lastly, we have added a third texture to the pot. The randomly shifting <b><code>bozo</code></b> texture gradually fades from blackened centers to semi-transparent medium gray, and then ultimately to fully transparent for the latter half of its color map. This gives us a look of sooty burn marks further marring the surface of the metal box. The final result leaves our mysterious metal box looking truly abused, using multiple texture patterns, one on top of the other, to produce an effect that no single pattern could generate!</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov88.htm">Average Function</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov90.htm">Declaring Layered Textures</A>
+</P>
+</BODY>
+</HTML>
+

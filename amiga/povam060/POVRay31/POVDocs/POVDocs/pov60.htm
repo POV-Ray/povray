@@ -1,0 +1,32 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Using Shadowless Lights</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov59.htm">Light Source Specials</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov61.htm">Assigning an Object to a Light Source</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198879"><A NAME="_Toc429993390">Using Shadowless Lights</A></A></H4>
+<P>Light sources can be assigned the <b><code>shadowless</code></b> keyword and no shadows will be cast due to its presence in a scene. Sometimes, scenes are difficult to illuminate properly using the lights we have chosen to illuminate our objects.  It is impractical and unrealistic to apply a higher ambient value to the texture of every object in the scene. So instead, we would place a couple of <I>fill lights</I> around the scene. Fill lights are simply dimmer lights with the <b><code>shadowless</code></b> keyword that act to boost the illumination of other areas of the scene that may not be lit well.  Let's try using one in our scene.</P>
+<P>Remember the three colored area spotlights? We go back and un-comment them and comment out any other lights we have made. Now we add the following:</P>
+<PRE>  light_source {
+    &lt;0, 20, 0&gt;
+    color Gray50
+    shadowless
+  }</PRE>
+<P>This is a fairly dim light 20 units over the center of the scene. It will give a dim illumination to all objects including the plane in the background. We render it and see.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov59.htm">Light Source Specials</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov61.htm">Assigning an Object to a Light Source</A>
+</P>
+</BODY>
+</HTML>
+

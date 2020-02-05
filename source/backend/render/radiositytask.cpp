@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,16 +33,27 @@
 ///
 //******************************************************************************
 
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
-
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "backend/render/radiositytask.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <algorithm>
+#include <vector>
+
+// POV-Ray header files (base module)
 #include "base/timer.h"
 #include "base/types.h"
 
+// POV-Ray header files (core module)
+#include "core/support/statistics.h"
+
+// POV-Ray header files (POVMS module)
+//  (none at the moment)
+
+// POV-Ray header files (backend module)
 #include "backend/scene/backendscenedata.h"
 #include "backend/scene/view.h"
 #include "backend/scene/viewthreaddata.h"
@@ -55,8 +66,12 @@ namespace pov
 
 using namespace pov_base;
 
-RadiosityTask::RadiosityTask(ViewData *vd, DBL ptsz, DBL ptesz, unsigned int pts, unsigned int ptsc, unsigned int nt) :
-    RenderTask(vd, "Radiosity", vd->GetViewId()),
+using std::min;
+using std::max;
+
+RadiosityTask::RadiosityTask(ViewData *vd, DBL ptsz, DBL ptesz, unsigned int pts, unsigned int ptsc, unsigned int nt,
+                             size_t seed) :
+    RenderTask(vd, seed, "Radiosity", vd->GetViewId()),
     trace(vd->GetSceneData(), &vd->GetCamera(), GetViewDataPtr(), vd->GetSceneData()->parsedMaxTraceLevel, vd->GetSceneData()->parsedAdcBailout,
           vd->GetQualityFeatureFlags(), cooperate, media, radiosity, !vd->GetSceneData()->radiositySettings.vainPretrace),
     cooperate(*this),
@@ -88,8 +103,8 @@ void RadiosityTask::Run()
     DBL height = GetViewData()->GetHeight();
 
     POVRect rect;
-    vector<Vector2d> pixelpositions;
-    vector<RGBTColour> pixelcolors;
+    std::vector<Vector2d> pixelpositions;
+    std::vector<RGBTColour> pixelcolors;
     unsigned int serial;
 
     float progressWeightTotal = (pow(4.0f, (float)pretraceStepCount) - 1.0) / 3.0; // equal to SUM[i=0,N-1](pow(4.0, i))
@@ -104,7 +119,7 @@ void RadiosityTask::Run()
             if (pInfo)
             {
                 delete pInfo;
-                pInfo = NULL;
+                pInfo = nullptr;
             }
             pBlockInfo = new RadiosityBlockInfo();
         }
@@ -236,7 +251,7 @@ void RadiosityTask::Run()
             // no more passes please
             progressWeight = 1.0 - pBlockInfo->completion;
             delete pBlockInfo;
-            pBlockInfo = NULL;
+            pBlockInfo = nullptr;
         }
 
         GetViewDataPtr()->AfterTile();
@@ -260,3 +275,4 @@ void RadiosityTask::Finish()
 }
 
 }
+// end of namespace pov

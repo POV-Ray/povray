@@ -14,7 +14,7 @@
 /// ----------------------------------------------------------------------------
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -42,11 +42,19 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/material/pattern.h"
 
-#include <limits>
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <algorithm>
+#include <limits>
+#include <vector>
 
+// POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
+#include "base/povassert.h"
 
+// POV-Ray header files (core module)
 #include "core/material/blendmap.h"
 #include "core/material/noise.h"
 #include "core/material/pigment.h"
@@ -57,13 +65,18 @@
 #include "core/scene/object.h"
 #include "core/scene/scenedata.h"
 #include "core/scene/tracethreaddata.h"
+#include "core/support/cracklecache.h"
 #include "core/support/imageutil.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov
 {
+
+using std::min;
+using std::max;
 
 /*****************************************************************************
 * Local preprocessor defines
@@ -287,11 +300,11 @@ bool BasicPattern::HasSpecialTurbulenceHandling() const { return false; }
 
 
 ImagePatternImpl::ImagePatternImpl() :
-    pImage(NULL)
+    pImage(nullptr)
 {}
 
 ImagePatternImpl::ImagePatternImpl(const ImagePatternImpl& obj) :
-    pImage(obj.pImage ? Copy_Image(obj.pImage) : NULL)
+    pImage(obj.pImage ? Copy_Image(obj.pImage) : nullptr)
 {}
 
 ImagePatternImpl::~ImagePatternImpl()
@@ -429,7 +442,7 @@ ColourFunctionPattern::ColourFunctionPattern()
 {
     for (int iChannel = 0; iChannel < 5; ++iChannel)
     {
-        pFn[iChannel] = NULL;
+        pFn[iChannel] = nullptr;
     }
 }
 
@@ -441,7 +454,7 @@ ColourFunctionPattern::ColourFunctionPattern(const ColourFunctionPattern& obj) :
         if (obj.pFn[iChannel])
             pFn[iChannel] = obj.pFn[iChannel]->Clone();
         else
-            pFn[iChannel] = NULL;
+            pFn[iChannel] = nullptr;
     }
 }
 
@@ -507,12 +520,12 @@ bool ColourImagePattern::HasTransparency() const
 
 
 DensityFilePattern::DensityFilePattern() :
-    densityFile(NULL)
+    densityFile(nullptr)
 {}
 
 DensityFilePattern::DensityFilePattern(const DensityFilePattern& obj) :
     ContinuousPattern(obj),
-    densityFile(NULL)
+    densityFile(nullptr)
 {
     if (obj.densityFile)
         densityFile = Copy_Density_File(obj.densityFile);
@@ -544,7 +557,7 @@ DBL FacetsPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsec
 
 
 FunctionPattern::FunctionPattern() :
-    pFn(NULL)
+    pFn(nullptr)
 {}
 
 FunctionPattern::FunctionPattern(const FunctionPattern& obj) :
@@ -585,12 +598,12 @@ ColourBlendMapConstPtr MarblePattern::GetDefaultBlendMap() const { return gpDefa
 
 
 ObjectPattern::ObjectPattern() :
-    pObject(NULL)
+    pObject(nullptr)
 {}
 
 ObjectPattern::ObjectPattern(const ObjectPattern& obj) :
     DiscretePattern(obj),
-    pObject(NULL)
+    pObject(nullptr)
 {
     if (obj.pObject)
         pObject = Copy_Object(obj.pObject);
@@ -610,12 +623,12 @@ PavementPattern::PavementPattern() : Side(3), Tile(1), Number(1), Exterior(0), I
 
 
 PigmentPattern::PigmentPattern() :
-    pPigment(NULL)
+    pPigment(nullptr)
 {}
 
 PigmentPattern::PigmentPattern(const PigmentPattern& obj) :
     ContinuousPattern(obj),
-    pPigment(NULL)
+    pPigment(nullptr)
 {
     if (obj.pPigment)
         pPigment = Copy_Pigment(obj.pPigment);
@@ -629,7 +642,7 @@ PigmentPattern::~PigmentPattern()
 
 
 PotentialPattern::PotentialPattern() :
-    pObject(NULL),
+    pObject(nullptr),
     subtractThreshold(false)
 {
     waveType = kWaveType_Raw;
@@ -637,7 +650,7 @@ PotentialPattern::PotentialPattern() :
 
 PotentialPattern::PotentialPattern(const PotentialPattern& obj) :
     ContinuousPattern(obj),
-    pObject(NULL),
+    pObject(nullptr),
     subtractThreshold(obj.subtractThreshold)
 {
     if (obj.pObject)
@@ -915,7 +928,7 @@ void Translate_Tpattern(TPATTERN *Tpattern, const Vector3d& Vector)
 {
     TRANSFORM Trans;
 
-    if (Tpattern != NULL)
+    if (Tpattern != nullptr)
     {
         Compute_Translation_Transform (&Trans, Vector);
 
@@ -950,7 +963,7 @@ void Rotate_Tpattern(TPATTERN *Tpattern, const Vector3d& Vector)
 {
     TRANSFORM Trans;
 
-    if (Tpattern != NULL)
+    if (Tpattern != nullptr)
     {
         Compute_Rotation_Transform (&Trans, Vector);
 
@@ -985,7 +998,7 @@ void Scale_Tpattern(TPATTERN *Tpattern, const Vector3d& Vector)
 {
     TRANSFORM Trans;
 
-    if (Tpattern != NULL)
+    if (Tpattern != nullptr)
     {
         Compute_Scaling_Transform (&Trans, Vector);
 
@@ -1018,9 +1031,9 @@ void Scale_Tpattern(TPATTERN *Tpattern, const Vector3d& Vector)
 
 void Transform_Tpattern(TPATTERN *Tpattern, const TRANSFORM *Trans)
 {
-    if ((Tpattern != NULL) && (Tpattern->pattern != NULL))
+    if ((Tpattern != nullptr) && (Tpattern->pattern != nullptr))
     {
-        TransformWarp* temp = NULL;
+        TransformWarp* temp = nullptr;
         if (!Tpattern->pattern->warps.empty())
             temp = dynamic_cast<TransformWarp*>(Tpattern->pattern->warps.back());
         if (!temp)
@@ -1068,8 +1081,8 @@ void BlendMap<DATA_T>::Search (DBL value, EntryConstPtr& rpPrev, EntryConstPtr& 
     {
         // TODO - we might use a binary search instead
 
-        typename vector<Entry>::const_iterator iP;
-        typename vector<Entry>::const_iterator iN;
+        typename std::vector<Entry>::const_iterator iP;
+        typename std::vector<Entry>::const_iterator iN;
 
         iP = iN = Blend_Map_Entries.begin();
 
@@ -5735,7 +5748,7 @@ DBL CheckerPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsecti
 *   neighbours from a set of disjoint points, like the membranes in suds are
 *   to the centres of the bubbles).
 *
-*   All "crackle" specific source code and examples are in the public domain.
+*   The original "crackle" specific source code and examples are in the public domain.
 *
 * CHANGES
 *   Oct 1994    : adapted from pigment by [CY]
@@ -5784,36 +5797,30 @@ DBL CracklePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
     CrackleCacheEntry dummy_entry;
     CrackleCacheEntry* entry = &dummy_entry;
 
-    // search for this hash value in the cache
-    CrackleCache::iterator iter = pThread->mCrackleCache.find(ccoord);
-    if (iter == pThread->mCrackleCache.end())
+    if (pThread->mpCrackleCache->Lookup(entry, ccoord))
     {
-        /*
-         * No, not same unit cube.  Calculate the random points for this new
-         * cube and its 80 neighbours which differ in any axis by 1 or 2.
-         * Why distance of 2?  If there is 1 point in each cube, located
-         * randomly, it is possible for the closest random point to be in the
-         * cube 2 over, or the one two over and one up.  It is NOT possible
-         * for it to be two over and two up.  Picture a 3x3x3 cube with 9 more
-         * cubes glued onto each face.
-         */
+        // Cache hit. `entry` now points to the cached entry.
+        pThread->Stats()[CrackleCache_Tests_Succeeded]++;
+    }
+    else
+    {
+        // Cache miss. `entry` now points to a pristine entry set up in the
+        // cache, or to `dummy_entry` if the cache is too crowded already.
+        // In either case we need to fill in the blanks.
 
-        // generate a new cache entry, but only if the size of the cache is reasonable.
-        // having to re-calculate entries that would have been cache hits had we not
-        // skipped on adding an entry is less expensive than chewing up immense amounts
-        // of RAM and finally hitting the swapfile. unfortunately there's no good way
-        // to tell how much memory is 'too much' for the cache, so we just use a hard-
-        // coded number for now (ideally we should allow the user to configure this).
-        // keep in mind that the cache memory usage is per-thread, so the more threads,
-        // the more RAM. if we don't do the insert, entry will point at a local variable.
-        if (pThread->mCrackleCache.size() * sizeof(CrackleCache::value_type) < 30 * 1024 * 1024)
-        {
-            iter = pThread->mCrackleCache.insert(pThread->mCrackleCache.end(), CrackleCache::value_type(ccoord, CrackleCacheEntry()));
-            entry = &iter->second;
-            entry->lastUsed = pThread->ProgressIndex();
-        }
+        // Calculate the random points for this new
+        // cube and its 80 neighbours which differ in any axis by 1 or 2.
+        // Why distance of 2?  If there is 1 point in each cube, located
+        // randomly, it is possible for the closest random point to be in the
+        // cube 2 over, or the one two over and one up.  It is NOT possible
+        // for it to be two over and two up.  Picture a 3x3x3 cube with 9 more
+        // cubes glued onto each face.
 
-        // see InitializeCrackleCubes() below.
+        // TODO - Note that we're currently re-computing each cell up to 81
+        //        times - once as a main cell and 80 times as a neighbor -
+        //        even in the best case scenario. Wouldn't it be more efficient
+        //        to just cache the individual cells?
+
         int *pc = gaCrackleCubeTable;
         for (int i = 0; i < 81; i++, pc += 3)
         {
@@ -5842,11 +5849,6 @@ DBL CracklePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
             IntPickInCube(cacheX, cacheY, cacheZ, entry->aCellNuclei[i]);
             entry->aCellNuclei[i] += wrappingOffset;
         }
-    }
-    else
-    {
-        pThread->Stats()[CrackleCache_Tests_Succeeded]++;
-        entry = &iter->second;
     }
 
     // Find the 3 points with the 3 shortest distances from the input point.
@@ -6098,7 +6100,7 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
     Ey=EPoint[Y];
     Ez=EPoint[Z];
 
-    if((densityFile != NULL) && ((Data = densityFile->Data) != NULL) &&
+    if ((densityFile != nullptr) && ((Data = densityFile->Data) != nullptr) &&
        (Data->Sx) && (Data->Sy) && (Data->Sz))
     {
 /*      if(Data->Cyclic == true)
@@ -6525,7 +6527,7 @@ DBL HexagonPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsecti
 
     /* Avoid mirroring across x-axis. */
 
-    z = z < 0.0 ? 5.196152424 - fabs(z) : z;
+    z = z < 0.0 ? 5.196152424 - fabs(z) : z;    /// TODO FIXME - magic number! Use an aptly named const instead.
 
     /* Scale point to make calcs easier. */
 
@@ -7888,7 +7890,7 @@ DBL NoisePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
 
 DBL ObjectPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-    if(pObject != NULL)
+    if (pObject != nullptr)
     {
         if(Inside_Object(EPoint, pObject, pThread))
             return 1.0;
@@ -8033,7 +8035,7 @@ DBL PlanarPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsec
 
 DBL PotentialPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-    if (pObject != NULL)
+    if (pObject != nullptr)
         return pObject->GetPotential (EPoint, subtractThreshold, pThread);
 
     return 0.0;
@@ -8201,7 +8203,7 @@ DBL RipplesPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 *
 * RETURNS
 *
-*   DBL value in the range 0.0 to 1.0, 0.0 if normal is NULL
+*   DBL value in the range 0.0 to 1.0, 0.0 if intersection struct is `nullptr`
 *
 * AUTHOR
 *
@@ -8222,7 +8224,7 @@ DBL SlopePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
 {
     DBL value, value1, value2;
 
-    if (pIsection == NULL) return 0.0; /* just in case ... */
+    if (pIsection == nullptr) return 0.0; /* just in case ... */
 
     if (pointAt)
     {
@@ -8271,7 +8273,7 @@ DBL SlopePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
         return value1; /* no altitude defined */
     }
 
-    /* Calculate projection of Epoint along altitude vector */
+    /* Calculate projection of EPoint along altitude vector */
     if (altitudeAxis > 0)
         /* short case 1: altitude vector in x, y or z direction */
         value2 = EPoint[altitudeAxis - 1];
@@ -8279,7 +8281,7 @@ DBL SlopePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
         /* short case 2: altitude vector in negative x, y or z direction */
         value2 = -EPoint[-altitudeAxis - 1];
     else
-        /* projection of Epoint along altitude vector */
+        /* projection of EPoint along altitude vector */
         value2 = dot(EPoint, altitudeDirection);
 
     if (0.0 != altitudeModWidth)
@@ -8342,7 +8344,7 @@ DBL AOIPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsectio
     Vector3d  a, b;
     DBL       cosAngle, angle;
 
-    if ((pIsection == NULL) || (pRay == NULL))
+    if ((pIsection == nullptr) || (pRay == nullptr))
         return 0.0;
 
     a = pIsection->PNormal.normalized(); // TODO - shouldn't pIsection->PNormal be normalized already?
@@ -8904,6 +8906,7 @@ int PickInCube(const Vector3d& tv, Vector3d& p1)
 ******************************************************************************/
 
 #ifndef HAVE_BOOST_HASH
+// NOTE: Keep this around - we may need it when we get rid of boost::hash.
 static unsigned long int NewHash(long int tvx, long int tvy, long int tvz)
 {
     unsigned long int seed;
@@ -9091,7 +9094,7 @@ DENSITY_FILE *Create_Density_File()
 
     New->Data->References = 1;
 
-    New->Data->Name = NULL;
+    New->Data->Name = nullptr;
 
     New->Data->Sx =
     New->Data->Sy =
@@ -9099,9 +9102,9 @@ DENSITY_FILE *Create_Density_File()
 
     New->Data->Type = 0;
 
-    New->Data->Density32 = NULL;
-    New->Data->Density16 = NULL;
-    New->Data->Density8 = NULL;
+    New->Data->Density32 = nullptr;
+    New->Data->Density16 = nullptr;
+    New->Data->Density8 = nullptr;
 
     return (New);
 }
@@ -9137,7 +9140,7 @@ DENSITY_FILE *Copy_Density_File(DENSITY_FILE *Old)
 {
     DENSITY_FILE *New;
 
-    if (Old != NULL)
+    if (Old != nullptr)
     {
         New = new DENSITY_FILE;
 
@@ -9147,7 +9150,7 @@ DENSITY_FILE *Copy_Density_File(DENSITY_FILE *Old)
     }
     else
     {
-        New=NULL;
+        New = nullptr;
     }
 
     return(New);
@@ -9182,7 +9185,7 @@ DENSITY_FILE *Copy_Density_File(DENSITY_FILE *Old)
 
 void Destroy_Density_File(DENSITY_FILE *Density_File)
 {
-    if(Density_File != NULL)
+    if (Density_File != nullptr)
     {
         if (Density_File->Data)
         {
@@ -9221,12 +9224,12 @@ void Read_Density_File(IStream *file, DENSITY_FILE *df)
 
     size_t x, y, z, sx, sy, sz, len;
 
-    if (df == NULL)
+    if (df == nullptr)
         return;
 
     /* Allocate and read density file. */
 
-    if((df != NULL) && (df->Data->Name != NULL))
+    if ((df != nullptr) && (df->Data->Name != nullptr))
     {
         sx = df->Data->Sx = ReadUShort(file);
         sy = df->Data->Sy = ReadUShort(file);
@@ -9287,8 +9290,6 @@ void Read_Density_File(IStream *file, DENSITY_FILE *df)
         }
         else
             throw POV_EXCEPTION_STRING("Invalid density file size");
-
-        delete file;
     }
 }
 
@@ -9380,3 +9381,4 @@ void InitializePatternGenerators(void)
 }
 
 }
+// end of namespace pov

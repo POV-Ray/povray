@@ -1,0 +1,42 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Creating Color Patterns</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov65.htm">Adding Bumpiness</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov67.htm">Pre-defined Textures</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405128"><A NAME="_Toc411405404"><A NAME="_Toc414198886"><A NAME="_Toc429993396">Creating Color Patterns</A></A></A></A></H3>
+<P>We can do more than assigning a solid color to an object. We can create complex patterns in the pigment block like in this example:</P>
+<PRE>  sphere { &lt;0, 1, 2&gt;, 2
+    texture {
+      pigment {
+        wood
+        color_map {
+          [0.0 color DarkTan]
+          [0.9 color DarkBrown]
+          [1.0 color VeryDarkBrown]
+        }
+        turbulence 0.05
+        scale &lt;0.2, 0.3, 1&gt;
+      }
+      finish { phong 1 }
+    }
+  }</PRE>
+<P>The keyword <b><code>wood</code></b> specifies a pigment pattern of concentric rings like rings in wood. The <b><code>color_map</code></b> keyword specifies that the color of the wood should blend from <b><code>DarkTan</code></b> to <b><code>DarkBrown</code></b> over the first 90% of the vein and from <b><code>DarkBrown</code></b> to <b><code>VeryDarkBrown</code></b> over the remaining 10%. The <b><code>turbulence</code></b> keyword slightly stirs up the pattern so the veins aren't perfect circles and the <b><code>scale</code></b> keyword adjusts the size of the pattern.</P>
+<P>Most patterns are set up by default to give us one <I>feature </I>across a sphere of radius 1.0. A feature is very roughly defined as a color transition. For example, a wood texture would have one band on a sphere of radius 1.0. In this example we scale the pattern using the <b><code>scale</code></b> keyword followed by a vector. In this case we scaled 0.2 in the x direction, 0.3 in the y direction and the z direction is scaled by 1, which leaves it unchanged. Scale values larger than one will stretch an element. Scale values smaller than one will squish an element. A scale value of one will leave an element unchanged.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov65.htm">Adding Bumpiness</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov67.htm">Pre-defined Textures</A>
+</P>
+</BODY>
+</HTML>
+

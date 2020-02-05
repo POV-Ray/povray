@@ -1,0 +1,58 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Adding Some Clouds</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov100.htm">Adding the Sun</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov102.htm">The Fog</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198921"><A NAME="_Toc429993431">Adding Some Clouds</A></A></H4>
+<P>To further improve our image we want to add some clouds by adding a second pigment. This new pigment uses the bozo pattern to create some nice clouds. Since it lays on top of the other pigment it needs some transparent colors in the color map (look at entries 0.5 to 1.0).</P>
+<PRE>  sky_sphere {
+    pigment {
+      gradient y
+      color_map {
+        [0.000 0.002 color rgb &lt;1.0, 0.2, 0.0&gt;
+                     color rgb &lt;1.0, 0.2, 0.0&gt;]
+        [0.002 0.200 color rgb &lt;0.8, 0.1, 0.0&gt;
+                     color rgb &lt;0.2, 0.2, 0.3&gt;]
+      }
+      scale 2
+      translate -1
+    }
+    pigment {
+      bozo
+      turbulence 0.65
+      octaves 6
+      omega 0.7
+      lambda 2
+      color_map {
+          [0.0 0.1 color rgb &lt;0.85, 0.85, 0.85&gt;
+                   color rgb &lt;0.75, 0.75, 0.75&gt;]
+          [0.1 0.5 color rgb &lt;0.75, 0.75, 0.75&gt;
+                   color rgbt &lt;1, 1, 1, 1&gt;]
+          [0.5 1.0 color rgbt &lt;1, 1, 1, 1&gt;
+                   color rgbt &lt;1, 1, 1, 1&gt;]
+      }
+      scale &lt;0.2, 0.5, 0.2&gt;
+    }
+    rotate -135*x
+  }</PRE>
+<B><P ALIGN="CENTER"><IMG SRC="Image222.jpg" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">A cloudy sky with a setting sun.</P>
+</B><P>The sky sphere has one drawback as you might notice when looking at the final image (<CODE>skysph3.pov</CODE>). The sun doesn't emit any light and the clouds will not cast any shadows. If you want to have clouds that cast shadows you'll have to use a real, large sphere with an appropriate texture and a light source somewhere outside the sphere.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov100.htm">Adding the Sun</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov102.htm">The Fog</A>
+</P>
+</BODY>
+</HTML>
+

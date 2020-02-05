@@ -1,0 +1,36 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Color Keywords</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov175.htm">Color Vectors</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov177.htm">Color Identifiers</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199009"><A NAME="_Toc429993519">Color Keywords</A></A></H4>
+<P>The older keyword method of specifying a color is still useful and many users prefer it.</P>
+<I><DL>
+<DT>COLOR_KEYWORD_GROUP:</DT>
+<DD>[ COLOR_KEYWORD_ITEM ]...</DD>
+<DT>COLOR_KEYWORD_ITEM:</DT>
+<DD>COLOR_IDENTIFIER&#9;&#9;|</DD>
+</I><b><code><DD>red</code></b><I> Red_Amount</I>   |   <b><code>blue</code></b><I> Blue_Amount</I>   |   <b><code>green</code></b><I> Green_Amount</I>   |</DD>
+<b><code><DD>filter</code></b> <I>Filter_Amount</I>   |   <b><code>transmit</code></b> <I>Transmit_Amount</DD>
+</DL>
+</I><P>Although the <b><code>color</code></b> keyword at the beginning is optional, it is more common to see it in this usage. This is followed by any of five additional keywords <b><code>red</code></b>, <b><code>green</code></b>, <b><code>blue</code></b>, <b><code>filter</code></b>, or <b><code>transmit</code></b>. Each of these component keywords is followed by a float expression. For example</P>
+<PRE> color red 1.0 green 0.5</PRE>
+<P>This specifies a color whose red component is 1.0 or 100% of full intensity and the green component is 0.5 or 50% of full intensity. Although the blue, filter and transmit components are not explicitly specified, they exist and are set to their default values of 0. The component keywords may be given in any order and if any component is unspecified its value defaults to zero.  A <I>COLOR_IDENTIFIER </I>can also be specified but it should always be first in the group.  See "<A HREF="pov179.htm#_Ref412904357">Common Color Pitfalls</A>" for details.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov175.htm">Color Vectors</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov177.htm">Color Identifiers</A>
+</P>
+</BODY>
+</HTML>
+

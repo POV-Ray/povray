@@ -1,0 +1,166 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Warps</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov353.htm">Omega</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov355.htm">Bitmap Modifiers</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199196"><A NAME="_Ref419875889"><A NAME="_Toc429993712">Warps</A></A></A></H4>
+<P>The <b><code>warp</code></b> statement is a pattern modifier that is similar to turbulence. Turbulence works by taking the pattern evaluation point and pushing it about in a series of random steps. However warps push the point in very well-defined, non-random, geometric ways. The <b><code>warp</code></b> statement also overcomes some limitations of traditional turbulence and transformations by giving the user more control over the order in which turbulence, transformation and warp modifiers are applied to the pattern.</P>
+<P>Currently there are three types of warps but the syntax was designed to allow future expansion. The first two, the <b><code>repeat</code></b> warp and the <b><code>black_hole</code></b> warp are new features for POV-Ray that modify the pattern in geometric ways. The other warp provides an alternative way to specify turbulence.</P>
+<P>The syntax for using a <b><code>warp</code></b> statement is:</P>
+<I><DL>
+<DT>WARP:</DT>
+</I><b><code><DD>warp {</code></b> <I>WARP_ITEM</I> <b><code>}</DD>
+</code></b><I><DT>WARP_ITEM:</DT>
+</I><b><code><DD>repeat</code></b> <I>&lt;Directiont&gt;  [REPEAT_ITEMS...]</I>   |</DD>
+<b><code><DD>black_hole</code></b> <I>&lt;Location&gt;</I><b><code>,</code></b> <I>Radius [BLACK_HOLE_ITEMS...]</I>   |</DD>
+<b><code><DD>turbulence</code></b> <I>&lt;Amount&gt; [TURB_ITEMS...]</DD>
+<DT>REPEAT_ITEMS:</DT>
+</I><b><code><DD>offset</code></b> <I>&lt;Amount&gt;</I>   |   <b><code>flip</code></b> <I>&lt;Axis&gt;</DD>
+<DT>BLACK_HOLE_ITEMS:</DT>
+</I><b><code><DD>strength</code></b> <I>Strength</I>   |   <b><code>falloff</code></b> <I>Amount</I>   |   <b><code>inverse</code></b>   |   <b><code>type</code></b> <I>Type</I>   |</DD>
+<b><code><DD>repeat</code></b> <I>&lt;Repeat&gt;</I>   |   <b><code>turbulence</code></b> <I>&lt;Amount&gt;</DD>
+<DT>TURB_ITEMS:</DT>
+</I><b><code><DD>octaves</code></b> <I>Count</I>   |   <b><code>omega</code></b> <I>Amount</I>   |   <b><code>lambda</code></b> <I>Amount</DD>
+</DL>
+</I><P>You may have as many separate warp statements as you like in each pattern. The placement of warp statements relative to other modifiers such as <b><code>color_map</code></b> or <b><code>turbulence</code></b> is not important. However placement of warp statements relative to each other and to transformations is significant. Multiple warps and transformations are evaluated in the order in which you specify them. For example if you translate, then warp or warp, then translate, the results can be different.</P>
+<H5><A NAME="_Toc414199197"><A NAME="_Toc429993713">Black Hole Warp</A></A></H5>
+<P>A <b><code>black_hole</code></b> warp is so named because of its similarity to real black holes. Just like the real thing, you cannot actually see a black hole. The only way to detect its presence is by the effect it has on things that surround it.</P>
+<P>Take, for example, a wood grain. Using POV-Ray's normal turbulence and other texture modifier functions, you can get a nice, random appearance to the grain. But in its randomness it is regular - it is regularly random! Adding a black hole allows you to create a localized disturbance in a wood grain in either one or multiple locations. The black hole can have the effect of either <I>sucking </I>the surrounding texture into itself (like the real thing) or <I>pushing </I>it away. In the latter case, applied to a wood grain, it would look to the viewer as if there were a knothole in the wood. In this text we use a wood grain regularly as an example, because it is ideally suitable to explaining black holes. However, black holes may in fact be used with any texture or pattern.  The effect that the black hole has on the texture can be specified.  By default, it <I>sucks </I>with the strength calculated exponentially (inverse-square). You can change this if you like.</P>
+<P>Black holes may be used anywhere a warp is permitted. The syntax is:</P>
+<I><DL>
+<DT>BLACK_HOLE_WARP:</DT>
+</I><b><code><DD>warp {black_hole</code></b> <I>&lt;Location&gt;</I><b><code>,</code></b> <I>Radius [BLACK_HOLE_ITEMS...]</I> <b><code>}</DD>
+</code></b><I><DT>BLACK_HOLE_ITEMS:</DT>
+</I><b><code><DD>strength</code></b> <I>Strength</I>   |   <b><code>falloff</code></b> <I>Amount</I>   |   <b><code>inverse</code></b>   |   <b><code>type</code></b> <I>Type</I>   |</DD>
+<b><code><DD>repeat</code></b> <I>&lt;Repeat&gt;</I>   |   <b><code>turbulence</code></b> <I>&lt;Amount&gt;</DD>
+</DL>
+</I><P>The minimal requirement is the <b><code>black_hole</code></b> keyword followed by a vector <I>&lt;Location&gt;</I> followed by a comma and a float <I>Radius</I>.  Black holes effect all points within the spherical region around the location and within the radius.  This is optionally followed by any number of other keywords which control how the texture is warped.</P>
+<P>The <b><code>falloff</code></b> keyword may be used with a float value to specify the power by which the effect of the black hole falls off. The default is two. The force of the black hole at any given point, before applying the <b><code>strength</code></b> modifier, is as follows.</P>
+<P>First, convert the distance from the point to the center to a proportion (0 to 1) that the point is from the edge of the black hole. A point on the perimeter of the black hole will be 0.0; a point at the center will be 1.0; a point exactly halfway will be 0.5, and so forth.  Mentally you can consider this to be a closeness factor. A closeness of 1.0 is as close as you can get to the center (i.e. at the center), a closeness of 0.0 is as far away as you can get from the center and still be inside the black hole and a closeness of 0.5 means the point is exactly halfway between the two.</P>
+<P>Call this value c. Raise c to the power specified in <b><code>falloff</code></b>. By default Falloff is 2, so this is c<SUP>2</SUP> or c squared. The resulting value is the force of the black hole at that exact location and is used, after applying the <b><code>strength</code></b> scaling factor as described below, to determine how much the point is perturbed in space. For example, if c is 0.5 the force is 0.5<SUP>2</SUP> or 0.25. If c is 0.25 the force is 0.125. But if c is exactly 1.0 the force is 1.0.  Recall that as c gets smaller the point is farther from the center of the black hole. Using the default power of 2, you can see that as c reduces, the force reduces exponentially in an inverse-square relationship. Put in plain English, it means that the force is much stronger (by a power of two) towards the center than it is at the outside.</P>
+<P>By increasing <b><code>falloff</code></b>, you can increase the magnitude of the falloff. A large value will mean points towards the perimeter will hardly be affected at all and points towards the center will be affected strongly.  A value of 1.0 for <b><code>falloff</code></b> will mean that the effect is linear. A point that is exactly halfway to the center of the black hole will be affected by a force of exactly 0.5.  A value of <b><code>falloff</code></b> of less than one but greater than zero means that as you get closer to the outside, the force increases rather than decreases. This can have some uses but there is a side effect.  Recall that the effect of a black hole ceases outside its perimeter.  This means that points just within the perimeter will be affected strongly and those just outside not at all. This would lead to a visible border, shaped as a sphere.  A value for <b><code>falloff</code></b> of 0 would mean that the force would be 1.0 for all points within the black hole, since any number larger 0 raised to the power of 0 is 1.0.  </P>
+<P>The <b><code>strength</code></b> keyword may be specified with a float value to give you a bit more control over how much a point is perturbed by the black hole. Basically, the force of the black hole (as determined above) is multiplied by the value of <b><code>strength</code></b>, which defaults to 1.0. If you set strength to 0.5, for example, all points within the black hole will be moved by only half as much as they would have been. If you set it to 2.0 they will be moved twice as much.</P>
+<P>There is a rider to the latter example, though - the movement is clipped to a maximum of the original distance from the center.  That is to say, a point that is 0.75 units from the center may only be moved by a maximum of 0.75 units either towards the center or away from it, regardless of the value of <b><code>strength</code></b>. The result of this clipping is that you will have an exclusion area near the center of the black hole where all points whose final force value exceeded or equaled 1.0 were moved by a fixed amount.</P>
+<P>If the <b><code>inverted</code></b> keyword is specified then points <I>pushed </I>away from the center instead of being pulled in.</P>
+<P>The <b><code>repeat</code></b> keyword followed by a vector, allows you to simulate the effect of many black holes without having to explicitly declare them. Repeat is a vector that tells POV-Ray to use this black hole at multiple locations.  Using <b><code>repeat</code></b> logically divides your scene up into cubes, the first being located at &lt;0,0,0&gt; and going to <I>&lt;Repeat&gt;</I>. Suppose your repeat vector was &lt;1,5,2&gt;. The first cube would be from &lt;0,0,0&gt; to &lt; 1,5,2&gt;. This cube repeats, so there would be one at &lt; -1,-5,-2&gt;, &lt;1,5,2&gt;, &lt;2,10,4&gt; and so forth in all directions, ad infinitum.</P>
+<P>When you use <b><code>repeat</code></b>, the center of the black hole does not specify an absolute location in your scene but an offset into each block. It is only possible to use positive offsets. Negative values will produce undefined results.</P>
+<P>Suppose your center was &lt;0.5,1,0.25&gt; and the repeat vector is &lt;2,2,2&gt;. This gives us a block at &lt; 0,0,0&gt; and &lt;2,2,2&gt;, etc. The centers of the black hole's for these blocks would be &lt;0,0,0&gt; + &lt; 0.5,1.0,0.25&gt;, i. e. &lt;0.5,1.0,0.25&gt;, and &lt; 2,2,2&gt; + &lt;0.5,1.0,0.25&gt;, i. e. &lt; 2,5,3.0,2.25&gt;.</P>
+<P>Due to the way repeats are calculated internally, there is a restriction on the values you specify for the repeat vector. Basically, each black hole must be totally enclosed within each block (or cube), with no part crossing into a neighboring one. This means that, for each of the x, y and z dimensions, the offset of the center may not be less than the radius, and the repeat value for that dimension must be &gt;=the center plus the radius since any other values would allow the black hole to cross a boundary. Put another way, for each of x, y and z</P>
+<I><P>Radius &lt;= Offset or Center &lt;= Repeat - Radius.</P>
+</I><P>If the repeat vector in any dimension is too small to fit this criteria, it will be increased and a warning message issued. If the center is less than the radius it will also be moved but no message will be issued.</P>
+<P>Note that none of the above should be read to mean that you can't overlap black holes. You most certainly can and in fact this can produce some most useful effects. The restriction only applies to elements of the <CODE>same</CODE> black hole which is repeating. You can declare a second black hole that also repeats and its elements can quite happily overlap the first and causing the appropriate interactions.  It is legal for the repeat value for any dimension to be 0, meaning that POV-Ray will not repeat the black hole in that direction.</P>
+<P>The <b><code>turbulence</code></b> can only be used in a black hole with <b><code>repeat</code></b>. It allows an element of randomness to be inserted into the way the black holes repeat, to cause a more natural look. A good example would be an array of knotholes in wood - it would look rather artificial if each knothole were an exact distance from the previous.</P>
+<P>The <b><code>turbulence</code></b> vector is a measurement that is added to each individual back hole in an array, after each axis of the vector is multiplied by a different random amount ranging from 0 to 1.  The resulting actual position of the black hole's center for that particular repeat element is random (but consistent, so renders will be repeatable) and somewhere within the above co-ordinates.  There is a rider on the use of turbulence, which basically is the same as that of the repeat vector. You can't specify a value which would cause a black hole to potentially cross outside of its particular block.</P>
+<P>In summary: For each of x, y and z the offset of the center must be &gt;=radius and the value of the repeat must be &gt;= center + radius + turbulence. The exception being that repeat may be 0 for any dimension, which means do not repeat in that direction.</P>
+<P>Some examples are given by</P>
+<PRE>  warp
+  {
+    black_hole &lt;0, 0, 0&gt;, 0.5
+  }
+  warp
+  {
+    black_hole &lt;0.15, 0.125, 0&gt;, 0.5
+    falloff 7
+    strength 1.0
+    repeat &lt;1.25, 1.25, 0&gt;
+    turbulence &lt;0.25, 0.25, 0&gt;
+    inverse
+  }
+  warp
+  {
+    black_hole &lt;0, 0, 0&gt;, 1.0
+    falloff 2
+    strength 2
+    inverse
+  }</PRE>
+<H5><A NAME="_Toc414199198"><A NAME="_Toc429993714">Repeat Warp</A></A></H5>
+<P>The <b><code>repeat</code></b> warp causes a section of the pattern to be repeated over and over. It takes a slice out of the pattern and makes multiple copies of it side-by-side. The warp has many uses but was originally designed to make it easy to model wood veneer textures. Veneer is made by taking very thin slices from a log and placing them side-by-side on some other backing material. You see side-by-side nearly identical ring patterns but each will be a slice perhaps 1/32th of an inch deeper.</P>
+<P>The syntax for a repeat warp is</P>
+<I><DL>
+<DT>REPEAT_WARP:</DT>
+</I><b><code><DD>warp {</code></b> <b><code>repeat</code></b> <I>&lt;Directiont&gt;  [REPEAT_ITEMS...]</I> <b><code>}</DD>
+</code></b><I><DT>REPEAT_ITEMS:</DT>
+</I><b><code><DD>offset</code></b> <I>&lt;Amount&gt;</I>   |   <b><code>flip</code></b> <I>&lt;Axis&gt;</DD>
+</DL>
+</I><P>The <b><code>repeat</code></b> vector specifies the direction in which the pattern repeats and the width of the repeated area. This vector must lie entirely along an axis. In other words, two of its three components must be 0. For example</P>
+<PRE>  pigment {
+    wood
+    warp {repeat 2*x}
+  }</PRE>
+<P>which means that from x=0 to x=2 you get whatever the pattern usually is. But from x=2 to x=4 you get the same thing exactly shifted two units over in the x-direction. To evaluate it you simply take the x-coordinate modulo 2. Unfortunately you get exact duplicates which isn't very realistic. The optional <b><code>offset</code></b> vector tells how much to translate the pattern each time it repeats. For example</P>
+<PRE>  pigment {
+    wood
+    warp {repeat x*2  offset z*0.05}
+  }</PRE>
+<P>means that we slice the first copy from x=0 to x=2 at z=0 but at x=2 to x=4 we offset to z=0.05. In the 4 to 6 interval we slice at z=0.10. At the n-th copy we slice at 0.05 n z. Thus each copy is slightly different. There are no restrictions on the offset vector.</P>
+<P>Finally the <b><code>flip</code></b> vector causes the pattern to be flipped or mirrored every other copy of the pattern. The first copy of the pattern in the positive direction from the axis is not flipped. The next farther is, the next is not, etc. The flip vector is a three component x, y, z vector but each component is treated as a boolean value that tells if you should or should not flip along a given axis. For example</P>
+<PRE>  pigment {
+    wood
+    warp {repeat 2*x  flip &lt;1,1,0&gt;}
+  }</PRE>
+<P>means that every other copy of the pattern will be mirrored about the x- and y- axis but not the z-axis. A non-zero value means flip and zero means do not flip about that axis. The magnitude of the values in the flip vector doesn't matter.</P>
+<H5><A NAME="_Toc414199199"><A NAME="_Toc429993715">Turbulence Warp</A></A></H5>
+<P>The POV-Ray language contains an ambiguity and limitation on the way you specify <b><code>turbulence</code></b> and transformations such as <b><code>translate</code></b>, <b><code>rotate</code></b>, <b><code>scale</code></b>, <b><code>matrix</code></b>, and <b><code>transform</code></b> transforms. Usually the turbulence is done first.  Then all translate, rotate, scale, matrix, and transform operations are always done after turbulence regardless of the order in which you specify them. For example this</P>
+<PRE> pigment {
+   wood
+   scale .5
+   turbulence .2
+ }</PRE>
+<P>works exactly the same as</P>
+<PRE> pigment {
+   wood
+   turbulence .2
+   scale .5
+ }</PRE>
+<P>The turbulence is always first. A better example of this limitation is with uneven turbulence and rotations.</P>
+<PRE>  pigment {
+    wood
+    turbulence 0.5*y
+    rotate z*60
+  }
+  // as compared to
+  pigment {
+   wood
+   rotate z*60
+   turbulence 0.5*y
+  }</PRE>
+<P>The results will be the same either way even though you'd think it should look different.</P>
+<P>We cannot change this basic behavior in POV-Ray now because lots of scenes would potentially render differently if suddenly the order transformation vs. turbulence suddenly mattered when in the past, it didn't.</P>
+<P>However, by specifying our turbulence inside warp statement you tell POV-Ray that the order in which turbulence, transformations and other warps are applied is significant. Here's an example of a turbulence warp.</P>
+<PRE>  warp { turbulence &lt;0,1,1&gt; octaves 3 lambda 1.5 omega 0.3 }</PRE>
+<P>The significance is that this</P>
+<PRE> pigment {
+   wood
+   translate &lt;1,2,3&gt; rotate x*45 scale 2
+   warp { turbulence &lt;0,1,1&gt; octaves 3 lambda 1.5 omega 0.3 }
+ }</PRE>
+<P>produces <I>different results </I>than this...</P>
+<PRE> pigment {
+   wood
+   warp { turbulence &lt;0,1,1&gt; octaves 3 lambda 1.5 omega 0.3 }
+   translate &lt;1,2,3&gt; rotate x*45 scale 2
+ }</PRE>
+<P>You may specify turbulence without using a warp statement. However you cannot control the order in which they are evaluated unless you put them in a warp.</P>
+<P>The evaluation rules are as follows:</P>
+<dir>
+  1)&#9;First any turbulence not inside a warp statement is applied regardless of the order in which it appears relative to warps or transformations.</P>
+<P>  2)&#9;Next each warp statement, translate, rotate, scale or matrix one-by-one, is applied in the order the user specifies. If you want turbulence done in a specific order, you simply specify it inside a warp in the proper place.</P>
+</dir>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov353.htm">Omega</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov355.htm">Bitmap Modifiers</A>
+</P>
+</BODY>
+</HTML>
+

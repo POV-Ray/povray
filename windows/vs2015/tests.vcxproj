@@ -278,9 +278,6 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="boost_system.vcxproj">
-      <Project>{d870a978-8130-4d1d-9fb2-3ee2028d2c50}</Project>
-    </ProjectReference>
     <ProjectReference Include="povbackend.vcxproj">
       <Project>{c6d9b754-11eb-4fc3-8683-593b53e9ad1f}</Project>
     </ProjectReference>

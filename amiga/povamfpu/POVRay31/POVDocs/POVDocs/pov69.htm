@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Pigments</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov68.htm">Advanced Texture Options</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov70.htm">Using Color List Pigments</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405132"><A NAME="_Toc411405408"><A NAME="_Toc414198889"><A NAME="_Toc429993399">Pigments</A></A></A></A></H3>
+<P>Every surface must have a color. In POV-Ray this color is called a <b><code>pigment</code></b>. It does not have to be a single color. It can be a color pattern, a color list or even an image map. Pigments can also be layered one on top of the next so long as the uppermost layers are at least partially transparent so the ones beneath can show through. Let's play around with some of these kinds of pigments.</P>
+<P>We create a file called <CODE>texdemo.pov</CODE> and edit it as follows:</P>
+<PRE>  #include "colors.inc"
+  camera {
+    location &lt;1, 1, -7&gt;
+    look_at 0
+    angle 36
+  }
+  light_source { &lt;1000, 1000, -1000&gt; White }
+  plane { y, -1.5
+    pigment { checker Green, White }
+  }
+  sphere { &lt;0,0,0&gt;, 1
+    pigment { Red }
+  }</PRE>
+<P>Giving this file a quick test render at 200x150 <b><code>-A</code></b> we see that it is a simple red sphere against a green and white checkered plane. We will be using the sphere for our textures.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov68.htm">Advanced Texture Options</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov70.htm">Using Color List Pigments</A>
+</P>
+</BODY>
+</HTML>
+

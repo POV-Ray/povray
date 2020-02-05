@@ -1,0 +1,31 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Rotate</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov218.htm">Scale</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov220.htm">Matrix Keyword</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199052"><A NAME="_Toc429993562">Rotate</A></A></H4>
+<P>You may change the orientation of an object or texture pattern by adding a <b><code>rotate</code></b> modifier. It consists of the keyword <b><code>rotate</code></b> followed by a vector expression. The three terms of the vector specify the number of degrees to rotate about each of the x-, y- and z-axes.</P>
+<P>Note that the order of the rotations does matter. Rotations occur about the x-axis first, then the y-axis, then the z-axis. If you are not sure if this is what you want then you should only rotate on one axis at a time using multiple rotation statements to get a correct rotation. As in</P>
+<PRE> rotate &lt;0, 30, 0&gt;  // 30 degrees around Y axis then,
+ rotate &lt;-20, 0, 0&gt; // -20 degrees around X axis then,
+ rotate &lt;0, 0, 10&gt;  // 10 degrees around Z axis.</PRE>
+<P>Rotation is always performed relative to the axis. Thus if an object is some distance from the axis of rotation it will not only rotate but it will <I>orbit</I> about the axis as though it was swinging around on an invisible string.</P>
+<P>POV-Ray uses a left-handed rotation system. Using the famous "<I>Computer Graphics Aerobics</I>" exercise, you hold up your left hand and point your thumb in the positive direction of the axis of rotation. Your fingers will curl in the positive direction of rotation. Similarly if you point your thumb in the negative direction of the axis your fingers will curl in the negative direction of rotation.  See "<A HREF="pov15.htm#_Ref413506445">Understanding POV-Ray's Coordinate System</A>" for a illustration.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov218.htm">Scale</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov220.htm">Matrix Keyword</A>
+</P>
+</BODY>
+</HTML>
+

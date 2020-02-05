@@ -1,0 +1,32 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - The #macro Directive</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov209.htm">User Defined Macros</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov211.htm">Invoking Macros</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199043"><A NAME="_Toc429993553">The #macro Directive</A></A></H4>
+<P>The syntax for declaring a macro is:</P>
+<I><DL>
+<DT>MACRO_DEFINITION:</DT>
+</I><b><code><DD>#macro </code></b><I>IDENTIFIER</I> <b><code>(</code></b><I> [PARAM_IDENT] [</I><b><code>,</code></b><I>  PARAM_IDENT]... </I><b><code>)</code></b> <I>TOKENS...</I> <b><code>#end</DD>
+</DL>
+</code></b><P>Where <I>IDENTIFIER</I> is the name of the macro and <I>PARAM_IDENT</I>s are a list of zero or more formal parameter identifiers separated by commas and enclosed by parentheses. The parentheses are required even if no parameters are specified.</P>
+<P>The <I>TOKENS </I>are any number of POV-Ray keyword, identifiers, or punctuation marks which are the <I>body</I> of the macro.  The body of the macro may contain almost any POV-Ray syntax items you desire. It is terminated my the <b><code>#end</code></b> directive. Note however that any conditional directives such as <b><code>#if</code></b>...<b><code>#end</code></b>, <b><code>#while</code></b>...<b><code>#end</code></b>, etc. must be fully nested inside or outside the macro so that the corresponding <b><code>#end</code></b> directives pair-up properly. Also you may not nest macro declarations.</P>
+<P>A macro must be declared before it is invoked.  All macro names are global in scope and permanent in duration.  You may redefine a macro by another <b><code>#macro</code></b> directive with the same name.  The previous definition is lost.  Macro names respond to <b><code>#ifdef</code></b>, <b><code>#ifndef</code></b>, and <b><code>#undef</code></b> directives.  See "<A HREF="pov203.htm#_Ref413241864">The #ifdef and #ifndef Directives</A>" and "<A HREF="pov193.htm#_Ref413339194">Destroying Identifiers with #undef</A>".</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov209.htm">User Defined Macros</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov211.htm">Invoking Macros</A>
+</P>
+</BODY>
+</HTML>
+

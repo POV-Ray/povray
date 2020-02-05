@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,6 +36,13 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/colour.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
 // this must be the last file included
 #include "base/povdebug.h"
 
@@ -45,12 +52,12 @@ namespace pov_base
 #if (NUM_COLOUR_CHANNELS == 3)
 
     // Approximate dominant wavelengths of primary hues.
-    // Source: 3D Computer Graphics by John Vince (Addison Wesely)
+    // Source: 3D Computer Graphics by John Vince (Addison Wesley)
     // These are user-adjustable with the irid_wavelength keyword.
     // Red = 700 nm  Grn = 520 nm Blu = 480 nm
     // Divided by 1000 gives: rwl = 0.70;  gwl = 0.52;  bwl = 0.48;
-    template<> const MathColour MathColour::mkDefaultWavelengths = MathColour(RGBColour(0.70, 0.52, 0.48));
-    template<> const PreciseMathColour PreciseMathColour::mkDefaultWavelengths = PreciseMathColour(PreciseRGBColour(0.70, 0.52, 0.48));
+    template<typename T>
+    const GenericColour<T> GenericColour<T>::mkDefaultWavelengths = GenericColour<T>(GenericRGBColour<T>(0.70, 0.52, 0.48));
 
 #else
 
@@ -58,4 +65,8 @@ namespace pov_base
 
 #endif
 
+template class GenericColour<ColourChannel>;
+template class GenericColour<PreciseColourChannel>;
+
 }
+// end of namespace pov_base

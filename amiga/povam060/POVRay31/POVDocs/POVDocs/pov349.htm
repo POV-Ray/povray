@@ -1,0 +1,31 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Waveforms</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov348.htm">Frequency and Phase</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov350.htm">Turbulence</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199191"><A NAME="_Toc429993707">Waveform</A>s</A></H4>
+<P>POV-Ray allows you to apply various wave forms to the pattern function before applying it to a blend map. Blend maps are <b><code>color_map</code></b>, <b><code>pigment_map</code></b>, <b><code>normal_map</code></b>, <b><code>slope_map</code></b>, <b><code>density_map</code></b>, and <b><code>texture_map</code></b>.</P>
+<P>Most of the patterns which use a blend map, use the entries in the map in order from 0.0 to 1.0. The effect can most easily be seen when these patterns are used as normal patterns with no maps.  Patterns such as <b><code>gradient</code></b> or <b><code>onion</code></b> generate a grove or slot that looks like a ramp that drops off sharply.  This is called a  <b><code>ramp_wave</code></b> wave type and it is the default wave type for most patterns. However the <b><code>wood</code></b> and <b><code>marble</code></b> patterns use the map from 0.0 to 1.0 and then reverses it and runs it from 1.0 to 0.0. The result is a wave form which slopes upwards to a peak, then slopes down again in a <b><code>triangle_wave</code></b>. In earlier versions of POV-Ray there was no way to change the wave types. You could simulate a triangle wave on a ramp wave pattern by duplicating the map entries in reverse, however there was no way to use a ramp wave on wood or marble.</P>
+<P>Now any pattern that takes a map can have the default wave type overridden. For example:</P>
+<PRE>  pigment { wood color_map { MyMap } ramp_wave }</PRE>
+<P>Also available are <b><code>sine_wave</code></b>, <b><code>scallop_wave</code></b>, <b><code>cubic_wave</code></b> and <b><code>poly_wave</code></b> types. These types are of most use in normal patterns as a type of built-in slope map. The  <b><code>sine_wave</code></b> takes the zig-zag of a ramp wave and turns it into a gentle rolling wave with smooth transitions. The <b><code>scallop_wave</code></b> uses the absolute value of the sine wave which looks like corduroy when scaled small or like a stack of cylinders when scaled larger.  The <b><code>cubic_wave</code></b> is a gentle cubic curve from 0.0 to 1.0 with zero slope at the start and end.  The <b><code>poly_wave</code></b> is an exponential function.  It is followed by an optional float value which specifies exponent.  For example <b><code>poly_wave 2</code></b> starts low and climbs rapidly at the end while <b><code>poly_wave 0.5</code></b> climbs rapidly at first and levels off at the end.  If no float value is specified, the default is 1.0 which produces a linear function identical to <b><code>ramp_wave</code></b>.</P>
+<P>Although any of these wave types can be used for pigments, normals, textures, or density the effect of many of the wave types are not as noticeable on pigments, textures, or density as they are for normals.</P>
+<P>Wave type modifiers have no effect on block patterns <b><code>checker</code></b>, <b><code>brick</code></b>, and <b><code>hexagon</code></b> nor do they effect <b><code>image_map</code></b>, <b><code>bump_map</code></b> or <b><code>material_map</code></b>. They also have no effect in normal statements when used with <b><code>bumps</code></b>, <b><code>dents</code></b>, <b><code>quilted</code></b>, <b><code>ripples</code></b>, <b><code>waves</code></b>, or <b><code>wrinkles</code></b> because these normal patterns cannot use <b><code>normal_map</code></b> or <b><code>slope_map</code></b>.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov348.htm">Frequency and Phase</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov350.htm">Turbulence</A>
+</P>
+</BODY>
+</HTML>
+

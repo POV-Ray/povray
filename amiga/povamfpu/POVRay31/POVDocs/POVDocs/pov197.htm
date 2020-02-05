@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - The #read Directive</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov196.htm">The #fclose Directive</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov198.htm">The #write Directive</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199030"><A NAME="_Ref429985373"><A NAME="_Toc429993540">The #read Directive</A></A></A></H4>
+<P>You may read string, float or vector values from a plain ASCII text file directly into POV-Ray variables using the #read directive. The file must first be opened in "read" mode using the #fopen directive. The syntax for #read is as follows:</P>
+<I><DL>
+<DT>READ_DIRECTIVE:</DT>
+</I><b><code><DD>#read(</code></b> <I>FILE_HANDLE_IDENTIFIER</I><b><code>,</code></b><I> DATA_IDENTIFIER[</I><b><code>,</code></b><I>DATA_IDENTIFIER]...</I><b><code>)</DD>
+</code></b><I><DT>DATA_IDENTIFIER:</DT>
+<DD>UNDECLARED_IDENTIFIER</I>   |   <I>FLOAT_IDENTIFIER</I>   |</DD>
+<I><DD>VECTOR_IDENTIFIER</I>   |   <I>STRING_IDENTIFIER</DD>
+</DL>
+</I><P>Where <I>FILE_HANDLE_IDENTIFIER</I> is the previously opened file. It is followed by one or more <I>DATA_IDENTIFIER</I>s separated by commas. The parentheses around the identifier list are required. A <I>DATA_IDENTIFIER</I> is any undeclared identifier or any previously declared string identifier, float identifier, or vector identifier. Undefined identifiers will be turned into global identifiers of the type determined by the data which is read. Previously defined identifiers remain at whatever global/local status they had when originally created. Type checking is performed to insure that the proper type data is read into these identifiers.</P>
+<P>The format of the data to be read must be a series of valid string literals, float literals, or vector literals separated by commas. Expressions or identifiers are not permitted in the data file however unary minus signs and exponential notation are permitted on float values.</P>
+<P>If you attempt to read past end-of-file, the file is automatically closed and the <I>FILE_HANDLE_IDENTIFIER</I> is deleted from the symbol table.  This means that the boolean function <b><code>defined(</code></b><I>IDENTIFIER</I><b><code>)</code></b> can be used to detect end-of-file.  For example:</P>
+<PRE>  #fopen MyFile "mydata.txt" read
+  #while (defined(MyFile))
+    #read (MyFile,Var1,Var2,Var3)
+    ...
+  #end</PRE>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov196.htm">The #fclose Directive</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov198.htm">The #write Directive</A>
+</P>
+</BODY>
+</HTML>
+

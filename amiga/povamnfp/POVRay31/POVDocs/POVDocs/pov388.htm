@@ -1,0 +1,27 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Tips on Radiosity</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov387.htm">Adjusting Radiosity</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov389.htm">APPENDICES</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199245"><A NAME="_Toc429993761">Tips on Radiosity</A></A></H4>
+<P>If you want to see where your values are being calculated set radiosity <b><code>count</code></b> down to about 20, set radiosity <b><code>nearest_count</code></b> to 1 and set <b><code>gray_threshold</code></b> to 0. This will make everything maximally patchy, so you'll be able to see the borders between patches. There will have been a radiosity calculation at the center of most patches. As a bonus, this is quick to run. You can then change the <b><code>error_bound</code></b> up and down to see how it changes things. Likewise modify <b><code>minimum_reuse</code></b> and <b><code>distance_maximum</code></b>.</P>
+<P>One way to get extra smooth results: crank up the sample count (we've gone as high as 1300) and drop the <b><code>low_error_factor</code></b> to something small like 0.6. Bump up the <b><code>nearest_count</code></b> to 7 or 8. This will get better values, and more of them, then interpolate among more of them on the last pass. This is not for people with a lack of patience since it is like a squared function. If your blotchiness is only in certain corners or near certain objects try tuning the error bound instead. Never drop it by more than a little at a time, since the run time will get very long.</P>
+<P>If your scene looks good but right near some objects you get spots of the right (usually darker) color showing on a flat surface of the wrong color (same as far away from the object), then try dropping <b><code>distance_maximum</code></b>. If that still doesn't work well increase your ray count by 100 and drop the error bound just a bit. If you still have problems, drop <b><code>nearest_count</code></b> to about 4.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov387.htm">Adjusting Radiosity</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov389.htm">APPENDICES</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,74 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - The Pointlight Source</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov53.htm">The Light Source</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov55.htm">The Spotlight Source</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405119"><A NAME="_Toc411405395"><A NAME="_Toc414198873"><A NAME="_Toc429993384">The Pointlight Source</A></A></A></A></H3>
+<P>Pointlights are exactly what the name indicates. A pointlight has no size, is invisible and illuminates everything in the scene equally no matter how far away from the light source it may be (this behavior can be changed). This is the simplest and most basic light source. There are only two important parameters, location and color. Let's design a simple scene and place a pointlight source in it.</P>
+<P>We create a new file and name it <CODE>litedemo.pov</CODE>. We edit it as follows:</P>
+<PRE>  #include "colors.inc"
+  #include "textures.inc"
+  camera {
+    location  &lt;-4, 3, -9&gt;
+    look_at   &lt;0, 0, 0&gt;
+    angle 48
+  }</PRE>
+<P>We add the following simple objects:</P>
+<PRE>  plane { y, -1
+    texture {
+      pigment {
+        checker
+        color rgb&lt;0.5, 0, 0&gt;
+        color rgb&lt;0, 0.5, 0.5&gt;
+      }
+      finish {
+        diffuse 0.4
+        ambient 0.2
+        phong 1
+        phong_size 100
+        reflection 0.25
+      }
+    }
+  }
+  torus { 1.5, 0.5
+    texture { Brown_Agate }
+    rotate &lt;90, 160, 0&gt;
+    translate  &lt;-1, 1, 3&gt;
+  }
+  box { &lt;-1, -1, -1&gt;, &lt;1, 1, 1&gt;
+    texture { DMFLightOak }
+    translate  &lt;2, 0, 2.3&gt;
+  }
+  cone { &lt;0,1,0&gt;, 0, &lt;0,0,0&gt;, 1
+    texture { PinkAlabaster }
+    scale &lt;1, 3, 1&gt;
+    translate  &lt;-2, -1, -1&gt;
+  }
+  sphere { &lt;0,0,0&gt;,1
+    texture { Sapphire_Agate }
+    translate  &lt;1.5, 0, -2&gt;
+  }</PRE>
+<P>Now we add a pointlight:</P>
+<PRE>  light_source {
+    &lt;2, 10, -3&gt;
+    color White
+  }</PRE>
+<P>We render this at 200x150 <b><code>-A</code></b> and see that the objects are clearly visible with sharp shadows. The sides of curved objects nearest the light source are brightest in color with the areas that are facing away from the light source being darkest. We also note that the checkered plane is illuminated evenly all the way to the horizon. This allows us to see the plane, but it is not very realistic.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov53.htm">The Light Source</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov55.htm">The Spotlight Source</A>
+</P>
+</BODY>
+</HTML>
+

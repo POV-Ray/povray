@@ -1,0 +1,75 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - String Substitution in Shell Commands</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov141.htm">Shell-out to Operating System</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov143.htm">Shell Command Sequencing</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198976"><A NAME="_Toc429993485">String Substitution in Shell Commands</A></A></H4>
+<P>It could get cumbersome to change the <b><code>Post_Scene_Command</code></b> every time you changed scene names. POV-Ray can substitute various values into a command string for you. For example:</P>
+<PRE> Post_Scene_Command=tga2gif -d -m %s</PRE>
+<P>POV-Ray will substitute the <b><code>%s</code></b> with the scene name in the command. The <I>scene name </I>is the <b><code>Input_File_Name</code></b> or <b><code>+I</code></b> setting with any drive, directory and extension removed. For example:</P>
+<PRE> Input_File_Name=c:\povray3\scenes\waycool.pov</PRE>
+<P>is stripped down to the scene name <CODE>waycool</CODE> which results in...</P>
+<PRE> Post_Scene_Command=tga2gif -d -m waycool</PRE>
+<P>In an animation it may be necessary to have the exact output file name with the frame number included. The string <b><code>%o</code></b> will substitute the output file name. Suppose you want to save your output files in a zip archive using the utility program <CODE>pkzip</CODE>. You could do...</P>
+<PRE> Post_Frame_Command=pkzip -m %s %o</PRE>
+<P>After rendering frame 12 of <CODE>myscene.pov</CODE> POV-Ray would shell to the operating system with</P>
+<PRE> pkzip -m myscene mysce012.tga</PRE>
+<P>The <b><code>-M</code></b> switch in <CODE>pkzip</CODE> moves <CODE>mysce012.tga</CODE> to <CODE>myscene.zip</CODE> and removes it from the directory. Note that <b><code>%o</code></b> includes frame numbers only when in an animation loop. During the <b><code>Pre_Scene_Command</code></b> and <b><code>Post_Scene_Command</code></b> there is no frame number so the original, unnumbered <b><code>Output_File_Name</code></b> is used. Any <b><code>User_Abort_Command</code></b> or <b><code>Fatal_Error_Command</code></b> not inside the loop will similarly give an unnumbered <b><code>%o</code></b> substitution.</P>
+<P>Here is the complete list of substitutions available for a command string.</P>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=432>
+<TR><TD WIDTH="11%" VALIGN="TOP">
+<p><b><code>%o</code></b></TD>
+<TD WIDTH="89%" VALIGN="TOP">
+<P>Output file name with extension and embedded frame number if any</TD>
+</TR>
+<TR><TD WIDTH="11%" VALIGN="TOP">
+<p><b><code>%s</code></b></TD>
+<TD WIDTH="89%" VALIGN="TOP">
+<P>Scene name derived by stripping path and ext from input name</TD>
+</TR>
+<TR><TD WIDTH="11%" VALIGN="TOP">
+<p><b><code>%n</code></b></TD>
+<TD WIDTH="89%" VALIGN="TOP">
+<P>Frame number of this frame</TD>
+</TR>
+<TR><TD WIDTH="11%" VALIGN="TOP">
+<p><b><code>%k</code></b></TD>
+<TD WIDTH="89%" VALIGN="TOP">
+<P>Clock value of this frame</TD>
+</TR>
+<TR><TD WIDTH="11%" VALIGN="TOP">
+<p><b><code>%h</code></b></TD>
+<TD WIDTH="89%" VALIGN="TOP">
+<P>Height of image in pixels</TD>
+</TR>
+<TR><TD WIDTH="11%" VALIGN="TOP">
+<p><b><code>%w</code></b></TD>
+<TD WIDTH="89%" VALIGN="TOP">
+<P>Width of image in pixels</TD>
+</TR>
+<TR><TD WIDTH="11%" VALIGN="TOP">
+<p><b><code>%%</code></b></TD>
+<TD WIDTH="89%" VALIGN="TOP">
+<P>A single % sign.</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov141.htm">Shell-out to Operating System</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov143.htm">Shell Command Sequencing</A>
+</P>
+</BODY>
+</HTML>
+

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,6 +38,16 @@
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
+
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <stdexcept>
+#include <string>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
 
 namespace pov_base
 {
@@ -121,81 +131,105 @@ enum
 /**
  *  POV-Ray exception class.
  */
-class Exception : public runtime_error
+class Exception : public std::runtime_error
 {
     public:
         /**
          *  Create a new exception without location information.
          *  @param  str         Error message string.
          */
-        Exception(const char *str) throw() : runtime_error(str), xfunction(NULL), xfile(NULL), xline(0), xcode(0), xcodevalid(false), xfrontendnotified(false) { }
+        Exception(const char *str) noexcept :
+            std::runtime_error(str),
+            xfunction(nullptr), xfile(nullptr), xline(0),
+            xcode(0), xcodevalid(false), xfrontendnotified(false)
+        {}
 
         /**
          *  Create a new exception with location information; looks up message from code.
-         *  @param  fn          __FUNCTION__ or NULL
-         *  @param  fi          __FILE__
-         *  @param  li          __LINE__
+         *  @param  fn          `__FUNCTION__` or `nullptr`
+         *  @param  fi          `__FILE__`
+         *  @param  li          `__LINE__`
          *  @param  err         Error number.
          */
-        Exception(const char *fn, const char *fi, unsigned int li, int err) throw() : runtime_error(Exception::lookup_code(err, fi, li)), xfunction(fn), xfile(fi), xline(li), xcode(err), xcodevalid(true), xfrontendnotified(false) { }
+        Exception(const char *fn, const char *fi, unsigned int li, int err) noexcept :
+            std::runtime_error(Exception::lookup_code(err, fi, li)),
+            xfunction(fn), xfile(fi), xline(li),
+            xcode(err), xcodevalid(true), xfrontendnotified(false)
+        {}
 
         /**
          *  Create a new exception with code, location information, and an explicit message.
-         *  @param  fn          __FUNCTION__ or NULL
-         *  @param  fi          __FILE__
-         *  @param  li          __LINE__
+         *  @param  fn          `__FUNCTION__` or `nullptr`
+         *  @param  fi          `__FILE__`
+         *  @param  li          `__LINE__`
          *  @param  str         Error message string.
          */
-        Exception(const char *fn, const char *fi, unsigned int li, const char *str) throw() : runtime_error(str), xfunction(fn), xfile(fi), xline(li), xcode(0), xcodevalid(false), xfrontendnotified(false) { }
+        Exception(const char *fn, const char *fi, unsigned int li, const char *str) noexcept :
+            std::runtime_error(str),
+            xfunction(fn), xfile(fi), xline(li),
+            xcode(0), xcodevalid(false), xfrontendnotified(false)
+        {}
 
         /**
          *  Create a new exception with code, location information, and an explicit message.
-         *  @param  fn          __FUNCTION__ or NULL
-         *  @param  fi          __FILE__
-         *  @param  li          __LINE__
+         *  @param  fn          `__FUNCTION__` or `nullptr`
+         *  @param  fi          `__FILE__`
+         *  @param  li          `__LINE__`
          *  @param  str         Error message string.
          */
-        Exception(const char *fn, const char *fi, unsigned int li, const string& str) throw() : runtime_error(str), xfunction(fn), xfile(fi), xline(li), xcode(0), xcodevalid(false), xfrontendnotified(false) { }
+        Exception(const char *fn, const char *fi, unsigned int li, const std::string& str) noexcept :
+            std::runtime_error(str),
+            xfunction(fn), xfile(fi), xline(li),
+            xcode(0), xcodevalid(false), xfrontendnotified(false)
+        {}
 
         /**
          *  Create a new exception with code, location information, and an explicit message.
-         *  @param  fn          __FUNCTION__ or NULL
-         *  @param  fi          __FILE__
-         *  @param  li          __LINE__
+         *  @param  fn          `__FUNCTION__` or `nullptr`
+         *  @param  fi          `__FILE__`
+         *  @param  li          `__LINE__`
          *  @param  err         Error number.
          *  @param  str         Error message string.
          */
-        Exception(const char *fn, const char *fi, unsigned int li, int err, const char *str) throw() : runtime_error(str), xfunction(fn), xfile(fi), xline(li), xcode(err), xcodevalid(true), xfrontendnotified(false) { }
+        Exception(const char *fn, const char *fi, unsigned int li, int err, const char *str) noexcept :
+            std::runtime_error(str),
+            xfunction(fn), xfile(fi), xline(li),
+            xcode(err), xcodevalid(true), xfrontendnotified(false)
+        {}
 
         /**
          *  Create a new exception with code, location information, and an explicit message.
-         *  @param  fn          __FUNCTION__ or NULL
-         *  @param  fi          __FILE__
-         *  @param  li          __LINE__
+         *  @param  fn          `__FUNCTION__` or `nullptr`
+         *  @param  fi          `__FILE__`
+         *  @param  li          `__LINE__`
          *  @param  err         Error number.
          *  @param  str         Error message string.
          */
-        Exception(const char *fn, const char *fi, unsigned int li, int err, const string& str) throw() : runtime_error(str), xfunction(fn), xfile(fi), xline(li), xcode(err), xcodevalid(true), xfrontendnotified(false) { }
+        Exception(const char *fn, const char *fi, unsigned int li, int err, const std::string& str) noexcept :
+            std::runtime_error(str),
+            xfunction(fn), xfile(fi), xline(li),
+            xcode(err), xcodevalid(true), xfrontendnotified(false)
+        {}
 
         /**
          *  Destructor.
          */
-        virtual ~Exception() throw() { }
+        virtual ~Exception() noexcept override { }
 
         /**
-         *  Determine the function name where the exception occured.
-         *  @return             Function name or NULL.
+         *  Determine the function name where the exception occurred.
+         *  @return             Function name or `nullptr`.
          */
         const char *function() const { return xfunction; }
 
         /**
-         *  Determine the name of the source file where the exception occured.
-         *  @return             File name or NULL.
+         *  Determine the name of the source file where the exception occurred.
+         *  @return             File name or `nullptr`.
          */
         const char *file() const { return xfile; }
 
         /**
-         *  Determine the line number in the source file where the exception occured.
+         *  Determine the line number in the source file where the exception occurred.
          *  @return             File line or 0.
          */
         unsigned int line() const { return xline; }
@@ -226,24 +260,24 @@ class Exception : public runtime_error
 
         /**
          *  Set the front-end notification flag
-         *  @param  yes         true to indicate notification has been passed on
+         *  @param  notified    true to indicate notification has been passed on
          *  @return             previous value of notification flag
          */
-        bool frontendnotified(bool yes) { bool oldval = xfrontendnotified; xfrontendnotified = yes; return oldval; }
+        bool frontendnotified(bool notified) { bool oldval = xfrontendnotified; xfrontendnotified = notified; return oldval; }
 
         /**
          *  Return the error description for the given code.
          *  @param  err         Error code.
          *  @return             Error string for error code.
          */
-        static std::string lookup_code(int err, const char *file = NULL, unsigned int line = 0);
+        static std::string lookup_code(int err, const char *file = nullptr, unsigned int line = 0);
 
     private:
-        /// Function where the exception occured
+        /// Function where the exception occurred
         const char *xfunction;
-        /// File name of the source file where the exception occured
+        /// File name of the source file where the exception occurred
         const char *xfile;
-        // Line number in the source file where the exception occured
+        // Line number in the source file where the exception occurred
         unsigned int xline;
         // Error code
         int xcode;
@@ -258,5 +292,6 @@ class Exception : public runtime_error
 //##############################################################################
 
 }
+// end of namespace pov_base
 
 #endif // POVRAY_BASE_POV_ERR_H

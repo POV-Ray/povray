@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,6 +36,18 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/parsermessagehandler.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <sstream>
+#include <string>
+
+// POV-Ray header files (base module)
+// POV-Ray header files (POVMS module)
+//  (none at the moment)
+
+// POV-Ray header files (frontend module)
 #include "frontend/renderfrontend.h"
 
 // this must be the last file included
@@ -57,14 +69,14 @@ void ParserMessageHandler::HandleMessage(const SceneData& sd, POVMSType ident, P
     if(ident != kPOVMsgIdent_Progress)
     {
         sd.console->flush();
-        if(sd.streams[STATUS_STREAM] != NULL)
+        if (sd.streams[STATUS_STREAM] != nullptr)
             sd.streams[STATUS_STREAM]->flush();
     }
 
     if(ident != kPOVMsgIdent_Debug)
     {
         sd.console->flush();
-        if(sd.streams[DEBUG_STREAM] != NULL)
+        if (sd.streams[DEBUG_STREAM] != nullptr)
             sd.streams[DEBUG_STREAM]->flush();
     }
 
@@ -72,12 +84,12 @@ void ParserMessageHandler::HandleMessage(const SceneData& sd, POVMSType ident, P
     {
         case kPOVMsgIdent_ParserOptions:
             Options(sd.console.get(), obj, sd.consoleoutput[RENDER_STREAM]);
-            if(sd.streams[RENDER_STREAM].get() != NULL)
+            if (sd.streams[RENDER_STREAM].get() != nullptr)
             {
                 Message2Console::ParserOptions(obj, sd.streams[RENDER_STREAM].get());
                 Message2Console::OutputOptions(obj, sd.streams[RENDER_STREAM].get());
             }
-            if(sd.streams[ALL_STREAM].get() != NULL)
+            if (sd.streams[ALL_STREAM].get() != nullptr)
             {
                 Message2Console::ParserOptions(obj, sd.streams[ALL_STREAM].get());
                 Message2Console::OutputOptions(obj, sd.streams[ALL_STREAM].get());
@@ -85,12 +97,12 @@ void ParserMessageHandler::HandleMessage(const SceneData& sd, POVMSType ident, P
             break;
         case kPOVMsgIdent_ParserStatistics:
             Statistics(sd.console.get(), obj, sd.consoleoutput[STATISTIC_STREAM]);
-            if(sd.streams[STATISTIC_STREAM].get() != NULL)
+            if (sd.streams[STATISTIC_STREAM].get() != nullptr)
             {
                 Message2Console::ParserStatistics(obj, sd.streams[STATISTIC_STREAM].get());
                 Message2Console::ParserTime(obj, sd.streams[STATISTIC_STREAM].get());
             }
-            if(sd.streams[ALL_STREAM].get() != NULL)
+            if (sd.streams[ALL_STREAM].get() != nullptr)
             {
                 Message2Console::ParserStatistics(obj, sd.streams[ALL_STREAM].get());
                 Message2Console::ParserTime(obj, sd.streams[ALL_STREAM].get());
@@ -98,35 +110,35 @@ void ParserMessageHandler::HandleMessage(const SceneData& sd, POVMSType ident, P
             break;
         case kPOVMsgIdent_Progress:
             Progress(sd.console.get(), obj, sd.verbose);
-//          if(sd.streams[ALL_STREAM].get() != NULL)
+//          if (sd.streams[ALL_STREAM].get() != nullptr)
 //              Message2Console::Progress(obj, sd.streams[ALL_STREAM].get());
             break;
         case kPOVMsgIdent_Warning:
             Warning(sd.console.get(), obj, sd.consoleoutput[WARNING_STREAM]);
-            if(sd.streams[WARNING_STREAM].get() != NULL)
+            if (sd.streams[WARNING_STREAM].get() != nullptr)
                 Message2Console::Warning(obj, sd.streams[WARNING_STREAM].get());
-            if(sd.streams[ALL_STREAM].get() != NULL)
+            if (sd.streams[ALL_STREAM].get() != nullptr)
                 Message2Console::Warning(obj, sd.streams[ALL_STREAM].get());
             break;
         case kPOVMsgIdent_Error:
             Error(sd.console.get(), obj, sd.consoleoutput[WARNING_STREAM]);
-            if(sd.streams[WARNING_STREAM].get() != NULL)
+            if (sd.streams[WARNING_STREAM].get() != nullptr)
                 Message2Console::Error(obj, sd.streams[WARNING_STREAM].get());
-            if(sd.streams[ALL_STREAM].get() != NULL)
+            if (sd.streams[ALL_STREAM].get() != nullptr)
                 Message2Console::Error(obj, sd.streams[ALL_STREAM].get());
             break;
         case kPOVMsgIdent_FatalError:
             FatalError(sd.console.get(), obj, sd.consoleoutput[FATAL_STREAM]);
-            if(sd.streams[FATAL_STREAM].get() != NULL)
+            if (sd.streams[FATAL_STREAM].get() != nullptr)
                 Message2Console::FatalError(obj, sd.streams[FATAL_STREAM].get());
-            if(sd.streams[ALL_STREAM].get() != NULL)
+            if (sd.streams[ALL_STREAM].get() != nullptr)
                 Message2Console::FatalError(obj, sd.streams[ALL_STREAM].get());
             break;
         case kPOVMsgIdent_Debug:
             DebugInfo(sd.console.get(), obj, sd.consoleoutput[DEBUG_STREAM]);
-            if(sd.streams[DEBUG_STREAM].get() != NULL)
+            if (sd.streams[DEBUG_STREAM].get() != nullptr)
                 Message2Console::DebugInfo(obj, sd.streams[DEBUG_STREAM].get());
-            if(sd.streams[ALL_STREAM].get() != NULL)
+            if (sd.streams[ALL_STREAM].get() != nullptr)
                 Message2Console::DebugInfo(obj, sd.streams[ALL_STREAM].get());
             break;
     }
@@ -196,9 +208,10 @@ void ParserMessageHandler::DebugInfo(Console *console, POVMS_Object& obj, bool c
     if(conout == true)
     {
         // TODO FIXME HACK
-        string str(obj.GetString(kPOVAttrib_EnglishText));
+        std::string str(obj.GetString(kPOVAttrib_EnglishText));
         console->Output(str);
     }
 }
 
 }
+// end of namespace pov_frontend

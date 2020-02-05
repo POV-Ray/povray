@@ -1,0 +1,36 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - String Identifiers</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov181.htm">String Literals</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov183.htm">String Functions</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199015"><A NAME="_Toc429993525">String Identifiers</A></A></H4>
+<P>String identifiers may be declared to make scene files more readable and to parameterize scenes so that changing a single declaration changes many values. An identifier is declared as follows.</P>
+<I><DL>
+<DT>STRING_DECLARATION:</DT>
+</I><b><code><DD>#declare </code></b><I>IDENTIFIER </I><b><code>=</code></b> <I>STRING</I><b><code>&#9;</code></b>|</DD>
+<b><code><DD>#local </code></b><I>IDENTIFIER </I><b><code>=</code></b> <I>STRING</DD>
+</DL>
+</I><P>Where <I>IDENTIFIER</I> is the name of the identifier up to 40 characters long and <I>STRING</I> is any valid string specification. Note that unlike floats, vectors, or colors, there need not be a semi-colon at the end of the declaration. See "<A HREF="pov191.htm#_Ref412711267">#declare vs. #local</A>" for information on identifier scope.  Here are some examples...</P>
+<PRE> #declare Font_Name = "ariel.ttf"
+ #declare Inc_File = "myfile.inc"
+ #declare Name = "John"
+ #declare Name = concat(Name," Doe")</PRE>
+<P>As the last example shows, you can re-declare a string identifier and may use previously declared values in that re-declaration.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov181.htm">String Literals</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov183.htm">String Functions</A>
+</P>
+</BODY>
+</HTML>
+

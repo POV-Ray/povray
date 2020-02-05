@@ -1,0 +1,58 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Conic Sweeps And The Tapering Effect</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov47.htm">Multiple Sub-Shapes</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov49.htm">Superquadric Ellipsoid Object</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198867"><A NAME="_Toc429993378">Conic Sweeps And The Tapering Effect</A></A></H4>
+<P>In our original prism, the keyword <b><code>linear_sweep</code></b> is actually optional. This is the default sweep assumed for a prism if no type of sweep is specified. But there is another, extremely useful kind of sweep: the conic sweep. The basic idea is like the original prism, except that while we are sweeping the shape from the first height through the second height, we are constantly expanding it from a single point until, at the second height, the shape has expanded to the original points we made it from. To give a small idea of what such effects are good for, we replace our existing prism with this (see file <CODE>prismdm4.pov</CODE>):</P>
+<PRE>  prism {
+    conic_sweep
+    linear_spline
+    0, // height 1
+    1, // height 2
+    5, // the number of points making up the shape...
+    &lt;4,4&gt;,&lt;-4,4&gt;,&lt;-4,-4&gt;,&lt;4,-4&gt;,&lt;4,4&gt;
+    rotate &lt;180, 0, 0&gt;
+    translate &lt;0, 1, 0&gt;
+    scale &lt;1, 4, 1&gt;
+    pigment { gradient y scale .2 }
+  }</PRE>
+<B><P ALIGN="CENTER"><IMG SRC="Image216.gif" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">Creating a pyramid using conic sweeping.</P>
+</B><P>The gradient pigment was selected to give some definition to our object without having to fix the lights and the camera angle right at this moment, but when we render it, we what we've created? A horizontally striped pyramid! By now we can recognize the linear spline connecting the four points of a square, and the familiar final point which is there to close the spline.</P>
+<P>Notice all the transformations in the object declaration. That's going to take a little explanation. The rotate and translate are easy. Normally, a conic sweep starts full sized at the top, and tapers to a point at y=0, but of course that would be upside down if we're making a pyramid. So we flip the shape around the x-axis to put it right side up, then since we actually orbited around the point, we translate back up to put it in the same position it was in when we started.</P>
+<P>The scale is to put the proportions right for this example. The base is eight units by eight units, but the height (from y=1 to y=0) is only one unit, so we've stretched it out a little. At this point, we're probably thinking, "why not just sweep up from y=0 to y=4 and avoid this whole scaling thing?"</P>
+<P>That is a very important gotcha! with conic sweeps. To see what's wrong with that, let's try and put it into practice (see file <CODE>prismdm5.pov</CODE>). We must make sure to remove the scale statement, and then replace the line which reads</P>
+<PRE>  1, // height 2</PRE>
+<P>with</P>
+<PRE>  4, // height 2</PRE>
+<P>This sets the second height at y=4, so let's re-render and see if the effect is the same.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image217.gif" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">Choosing a second height larger than one for the conic sweep.</P>
+</B><P>Whoa! Our height is correct, but our pyramid's base is now huge! What went wrong here? Simple. The base, as we described it with the points we used actually occurs at y=1 no matter what we set the second height for. But if we do set the second height higher than one, once the sweep passes y=1, it keeps expanding outward along the same lines as it followed to our original base, making the actual base bigger and bigger as it goes.</P>
+<P>To avoid losing control of a conic sweep prism, it is usually best to let the second height stay at y=1, and use a scale statement to adjust the height from its unit size. This way we can always be sure the base's corners remain where we think they are.</P>
+<P>That leads to one more interesting thing about conic sweeps. What if we for some reason don't want them to taper all the way to a point? What if instead of a complete pyramid, we want more of a ziggurat step? Easily done. After putting the second height back to one, and replacing our scale statement, we change the line which reads</P>
+<PRE>  0, // height 1</PRE>
+<P>to</P>
+<PRE>  0.251, // height 1</PRE>
+<B><P ALIGN="CENTER"><IMG SRC="Image218.gif" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">Increasing the first height for the conic sweep.</P>
+</B><P>When we re-render, we see that the sweep stops short of going all the way to its point, giving us a pyramid without a cap. Exactly how much of the cap is cut off depends on how close the first height is to the second height.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov47.htm">Multiple Sub-Shapes</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov49.htm">Superquadric Ellipsoid Object</A>
+</P>
+</BODY>
+</HTML>
+

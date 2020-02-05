@@ -401,6 +401,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\source\parser\fncode.cpp" />
     <ClCompile Include="..\..\source\parser\parser.cpp" />
+    <ClCompile Include="..\..\source\parser\parsertypes.cpp" />
     <ClCompile Include="..\..\source\parser\parser_expressions.cpp" />
     <ClCompile Include="..\..\source\parser\parser_functions.cpp" />
     <ClCompile Include="..\..\source\parser\parser_functions_utilities.cpp" />
@@ -417,13 +418,21 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\source\parser\scanner.cpp" />
+    <ClCompile Include="..\..\source\parser\rawtokenizer.cpp" />
+    <ClCompile Include="..\..\source\parser\symboltable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\parser\fncode.h" />
     <ClInclude Include="..\..\source\parser\parser.h" />
+    <ClInclude Include="..\..\source\parser\parsertypes.h" />
+    <ClInclude Include="..\..\source\parser\parser_fwd.h" />
     <ClInclude Include="..\..\source\parser\reservedwords.h" />
     <ClInclude Include="..\..\source\parser\configparser.h" />
     <ClInclude Include="..\..\source\parser\precomp.h" />
+    <ClInclude Include="..\..\source\parser\scanner.h" />
+    <ClInclude Include="..\..\source\parser\rawtokenizer.h" />
+    <ClInclude Include="..\..\source\parser\symboltable.h" />
     <ClInclude Include="..\povconfig\syspovconfigparser.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

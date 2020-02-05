@@ -1,0 +1,28 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Faked Caustics</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov289.htm">Attenuation</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov291.htm">Object Media</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc429993635">Faked Caustics</A></H3>
+<P>Caustics are light effects that occur if light is reflected or refracted by specular reflective or refractive surfaces. Imagine a glass of water standing on a table. If sunlight falls onto the glass you will see spots of light on the table. Some of the spots are caused by light being reflected by the glass while some of them are caused by light being refracted by the water in the glass.</P>
+<P>Since it is a very difficult and time-consuming process to actually calculate those effects (though it is not impossible) POV-Ray uses a quite simple method to simulate caustics caused by refraction. The method calculates the angle between the incoming light ray and the surface normal.  Where they are nearly parallel it makes the shadow brighter.  Where the angle is greater, the effect is diminished.  Unlike real-world caustics, the effect does not vary based on distance.  This caustic effect is limited to areas that are shaded by the transparent object. You'll get no caustic effects from reflective surfaces nor in parts that are not shaded by the object.</P>
+<P>The <b><code>caustics</code></b> <I>Power</I> keyword controls the effect.  Values typically range from 0.0 to 1.0 or higher.  Zero is the default which is no caustics.  Low, non-zero values give broad hot-spots while higher values give tighter, smaller simulated focal points.</P>
+<P>The <b><code>caustics</code></b> keyword was originally specified in <b><code>finish</code></b> but is now properly specified in <b><code>interior</code></b>.  It is accepted in <b><code>finish</code></b> for backward compatibility and generates a warning message.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov289.htm">Attenuation</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov291.htm">Object Media</A>
+</P>
+</BODY>
+</HTML>
+

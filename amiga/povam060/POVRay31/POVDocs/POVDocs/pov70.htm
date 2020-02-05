@@ -1,0 +1,29 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Using Color List Pigments</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov69.htm">Pigments</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov71.htm">Using Pigment and Patterns</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198890"><A NAME="_Toc429993400">Using Color List Pigments</A></A></H4>
+<P>Before we begin we should note that we have already made one kind of pigment, the color list pigment. In the previous example we have used a checkered pattern on our plane. There are two other kinds of color list pigments, <b><code>brick</code></b> and <b><code>hexagon</code></b>. Let's quickly try each of these. First, we change the plane's pigment as follows:</P>
+<PRE>  pigment { hexagon Green, White, Yellow }</PRE>
+<P>Rendering this we see a three-color hexagonal pattern. Note that this pattern requires three colors. Now we change the pigment to...</P>
+<PRE>  pigment { brick Gray75, Red rotate -90*x scale .25 }</PRE>
+<P>Looking at the resulting image we see that the plane now has a brick pattern. We note that we had to rotate the pattern to make it appear correctly on the flat plane. This pattern normally is meant to be used on vertical surfaces. We also had to scale the pattern down a bit so we could see it more easily. We can play around with these color list pigments, change the colors, etc. until we get a floor that we like.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov69.htm">Pigments</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov71.htm">Using Pigment and Patterns</A>
+</P>
+</BODY>
+</HTML>
+

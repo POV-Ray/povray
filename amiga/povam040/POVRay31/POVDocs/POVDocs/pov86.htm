@@ -1,0 +1,64 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Working With List Textures</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov85.htm">Working With Texture Maps</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov87.htm">What About Tiles?</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405138"><A NAME="_Toc411405414"><A NAME="_Toc414198906"><A NAME="_Toc429993416">Working With List Textures</A></A></A></A></H3>
+<p><b><code> </code></b>If we have followed the corresponding tutorials on simple pigments, we know that there are three patterns called <I>color list </I>patterns, because rather than using a color map, these simple but useful patterns take a list of colors immediately following the pattern keyword. We're talking about checker, hexagon, and, new to POV-Ray 3, the brick pattern.</P>
+<P>Naturally they also work with whole pigments, normals, and entire textures, just as the other patterns do above. The only difference is that we list entries in the pattern (as we would do with individual colors) rather than using a map of entries. Here is an example. We strike the plane and any declared pigments we had left over in our last example, and add the following to our basic file.</P>
+<PRE>  #declare Pigment1 = pigment {
+    hexagon
+    color Yellow color Green color Grey
+    scale .1
+  }
+  #declare Pigment2 = pigment {
+    checker
+    color Red color Blue
+    scale .1
+  }
+  #declare Pigment3 = pigment {
+    brick
+    color White color Black
+    rotate -90*x
+    scale .1
+  }
+  box { -5, 5
+    pigment {
+      hexagon
+      pigment {Pigment1}
+      pigment {Pigment2}
+      pigment {Pigment3}
+      rotate 90*x
+    }
+  }</PRE>
+<P>We begin by declaring an example of each of the color list patterns as individual pigments. Then we use the hexagon pattern as a <I>pigment list </I>pattern, simply feeding it a list of pigments rather than colors as we did above. There are two rotate statements throughout this example, because bricks are aligned along the z-direction, while hexagons align along the y-direction, and we wanted everything to face toward the camera we originally declared out in the -z-direction so we can really see the patterns within patterns effect here.</P>
+<P>Of course color list patterns used to be only for pigments, but as of POV-Ray 3, everything that worked for pigments can now also be adapted for normals or entire textures. A couple of quick examples might look like</P>
+<PRE>  normal {
+    brick
+    normal { granite .1 }
+    normal { bumps 1 scale .1 }
+  }</PRE>
+<P>or...</P>
+<PRE>  texture {
+    checker
+    texture { Gold_Metal }
+    texture { Silver_Metal }
+  }</PRE>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov85.htm">Working With Texture Maps</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov87.htm">What About Tiles?</A>
+</P>
+</BODY>
+</HTML>
+

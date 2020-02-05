@@ -1,0 +1,29 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Are POV-Ray Macros a Function or a Macro?</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov211.htm">Invoking Macros</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov213.htm">Returning a Value Like a Function</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199045"><A NAME="_Toc429993555">Are POV-Ray Macros a Function or a Macro?</A></A></H4>
+<P>POV-Ray macros are a strange mix of macros and functions.  In traditional computer programming languages, a macro works entirely by token substitution.  The body of the routine is inserted into the invocation point by simply copying the tokens and parsing them as if they had been cut and pasted in place.  Such cut-and-paste substitution is often called <I>macro substitution</I> because it is what macros are all about.  In this respect, POV-Ray macros are exactly like traditional macros in that they use macro substitution for the body of the macro.  However traditional macros also use this cut-and-paste substitution strategy for parameters but POV-Ray does not.</P>
+<P>Suppose you have a macro in the C programming language <b><code>Typical_Cmac(Param)</code></b> and you invoke it as <b><code>Typical_Cmac(else A=B)</code></b>. Anywhere that <b><code>Param</code></b> appears in the macro body, the four tokens <b><code>else</code></b>, <b><code>A</code></b>, <b><code>=</code></b>, and <b><code>B</code></b> are substituted into the program code using a cut-and-paste operation.  No type checking is performed because anything is legal.  The ability to pass an arbitrary group of tokens via a macro parameter is a powerful (and sadly often abused) feature of traditional macros.</P>
+<P>After careful deliberation, we have decided against this type of parameters for our macros.  The reason is that POV-Ray uses commas more frequently in its syntax than do most programming languages.  Suppose you create a macro that is designed to operate on one vector and two floats.  It might be defined <b><code>OurMac(V,F1,F2)</code></b>.  If you allow arbitrary strings of tokens and invoke a macro such as <b><code>OurMac(&lt;1,2,3&gt;,4,5)</code></b> then it is impossible to tell if this is a vector and two floats or if its 5 parameters with the two tokens <b><code>&lt;</code></b> and <b><code>1</code></b> as the first parameter.  If we design the macro to accept 5 parameters then we cannot invoke it like this... <b><code>OurMac(MyVector,4,5)</code></b>.</P>
+<P>Function parameters in traditional programming languages do not use token substitution to pass values.  They create temporary, local variables to store parameters that are either constant values or identifier references which are in effect a pointer to a variable.  POV-Ray macros use this function-like system for passing parameters to its macros.  In our example <b><code>OurMac(&lt;1,2,3&gt;,4,5)</code></b>, POV-Ray sees the <b><code>&lt;</code></b> and knows it must be the start of a vector.  It parses the whole vector expression and assigns it to the first parameter exactly as though you had used the statement <b><code>#local V=&lt;1,2,3&gt;;</code></b>.</P>
+<P>Although we say that POV-Ray parameters are more like traditional function parameters than macro parameters, there still is one difference.  Most languages require you to declare the type of each parameter in the definition before you use it but POV-Ray does not.  This should be no surprise because Most languages require you to declare the type of any identifier before you use it but POV-Ray does not.  This means that if you pass the wrong type value in a POV-Ray macro parameter, it may not generate an error until you reference the identifier in the macro body.  No type checking is performed as the parameter is passed.  So in this very limited respect, POV-Ray parameters are somewhat macro-like but are mostly function-like.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov211.htm">Invoking Macros</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov213.htm">Returning a Value Like a Function</A>
+</P>
+</BODY>
+</HTML>
+

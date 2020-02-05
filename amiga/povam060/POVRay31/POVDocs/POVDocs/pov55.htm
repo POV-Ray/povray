@@ -1,0 +1,55 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - The Spotlight Source</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov54.htm">The Pointlight Source</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov56.htm">The Cylindrical Light Source</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405120"><A NAME="_Toc411405396"><A NAME="_Toc414198874"><A NAME="_Toc429993385">The Spotlight Source</A></A></A></A></H3>
+<P>Spotlights are a very useful type of light source. They can be used to add highlights and illuminate features much as a photographer uses spots to do the same thing. To create a spotlight simply add the <b><code>spotlight</code></b> keyword to a regular point light.  There are a few more parameters with spotlights than with pointlights. These are <b><code>radius</code></b>, <b><code>falloff</code></b>, <b><code>tightness</code></b> and <b><code>point_at</code></b>.  The <b><code>radius</B> </code>parameter is the angle of the fully illuminated cone.  The <b><code>falloff</B> </code>parameter is the angle of the <I>umbra </I>cone where the light falls off to darkness. The <b><code>tightness</code></b> is a parameter that determines the rate of the light falloff. The <b><code>point_at</B> </code>parameter is just what it says, the location where the spotlight is pointing to. Let's change the light in our scene as follows:</P>
+<PRE>  light_source {
+    &lt;0, 10, -3&gt;
+    color White
+    spotlight
+    radius 15
+    falloff 20
+    tightness 10
+    point_at &lt;0, 0, 0&gt;
+  }</PRE>
+<P>We render this at 200x150 <b><code>-A</code></b> and see that only the objects are illuminated. The rest of the plane and the outer portions of the objects are now unlit. There is a broad falloff area but the shadows are still razor sharp. Let's try fiddling with some of these parameters to see what they do. We change the falloff value to 16 (it must always be larger than the radius value) and render again.  Now the falloff is very narrow and the objects are either brightly lit or in total darkness. Now we change falloff back to 20 and change the tightness value to 100 (higher is tighter) and render again. The spotlight appears to have gotten much smaller but what has really happened is that the falloff has become so steep that the radius actually appears smaller.</P>
+<P>We decide that a tightness value of 10 (the default) and a falloff value of 18 are best for this spotlight and we now want to put a few spots around the scene for effect. Let's place a slightly narrower blue and a red one in addition to the white one we already have:</P>
+<PRE>  light_source {
+    &lt;10, 10, -1&gt;
+    color Red
+    spotlight
+    radius 12
+    falloff 14
+    tightness 10
+    point_at &lt;2, 0, 0&gt;
+  }
+  light_source {
+    &lt;-12, 10, -1&gt;
+    color Blue
+    spotlight
+    radius 12
+    falloff 14
+    tightness 10
+    point_at &lt;-2, 0, 0&gt;
+  }</PRE>
+<P>Rendering this we see that the scene now has a wonderfully mysterious air to it. The three spotlights all converge on the objects making them blue on one side and red on the other with enough white in the middle to provide a balance.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov54.htm">The Pointlight Source</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov56.htm">The Cylindrical Light Source</A>
+</P>
+</BODY>
+</HTML>
+

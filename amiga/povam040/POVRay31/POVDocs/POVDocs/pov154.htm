@@ -1,0 +1,60 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Removing User Bounding</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov153.htm">Automatic Bounding Control</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov155.htm">Anti-Aliasing Options</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198988"><A NAME="_Toc429993497">Removing User Bounding</A></A></H4>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=456>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>Remove_Bounds=</code></b><I>bool</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Turn unnecessary bounds removal on/off</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>+UR</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Turn unnecessary bounds removal on</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>-UR</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Turn unnecessary bounds removal off</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>Split_Unions=</code></b><I>bool</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Turn split bounded unions on/off</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>+SU</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Turn split bounded unions on</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>-SU</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Turn split bounded unions off</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>Early versions of POV-Ray had no system of automatic bounding or spatial sub-division to speed up ray-object intersection tests. Users had to manually create bounding boxes to speed up the rendering. Since version 3.0, POV-Ray has had more sophisticated automatic bounding than any previous version. In many cases the manual bounding on older scenes is slower than the new automatic systems. Therefore POV-Ray removes manual bounding when it knows it will help. In rare instances you may want to keep manual bounding. Some older scenes incorrectly used bounding when they should have used clipping. If POV-Ray removes the bounds in these scenes the image will not look right. To turn off the automatic removal of manual bounds you should specify <b><code>Remove_Bounds=off</code></b> or use <b><code>-UR</code></b>. The default is <b><code>Remove_Bounds=on</code></b>.</P>
+<P>One area where the jury is still out is the splitting of manually bounded unions. Unbounded unions are always split into their component parts so that automatic bounding works better. Most users do not bound unions because they know that doing so is usually slower. If you do manually bound a union we presume you really want it bound. For safety sake we do not presume to remove such bounds. If you want to remove manual bounds from unions you should specify <b><code>Split_Unions=on</code></b> or use <b><code>+SU</code></b>. The default is <b><code>Split_Unions=off</code></b>.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov153.htm">Automatic Bounding Control</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov155.htm">Anti-Aliasing Options</A>
+</P>
+</BODY>
+</HTML>
+

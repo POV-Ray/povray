@@ -1,0 +1,53 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Specifying Colors</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov173.htm">Vector Functions</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov175.htm">Color Vectors</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Ref413394014"><A NAME="_Toc414199007"><A NAME="_Toc429993517">Specifying Colors</A></A></A></A></A></A></H3>
+<P>POV-Ray often requires you to specify a color. Colors consist of five values or color components. The first three are called <b><code>red</code></b>, <b><code>green</code></b>, and <b><code>blue</code></b>. They specify the intensity of the primary colors red, green and blue using an additive color system like the one used by the red, green and blue color phosphors on a color monitor.</P>
+<P>The 4th component, called <b><code>filter</code></b>, specifies the amount of filtered transparency of a substance. Some real-world examples of filtered transparency are stained glass windows or tinted cellophane. The light passing through such objects is tinted by the appropriate color as the material selectively absorbs some frequencies of light while allowing others to pass through. The color of the object is subtracted from the light passing through so this is called subtractive transparency.</P>
+<P>The 5th component, called <b><code>transmit</code></b>, specifies the amount of non-filtered light that is transmitted through a surface. Some real-world examples of non-filtered transparency are thin see-through cloth, fine mesh netting and dust on a surface. In these examples, all frequencies of light are allowed to pass through tiny holes in the surface. Although the amount of light passing through is diminished, the color of the light passing through is unchanged. The color of the object is added to the light passing through so this is called additive transparency.</P>
+<P>Note that early versions of POV-Ray used the keyword <b><code>alpha</code></b> to specify filtered transparency. However that word is often used to describe non-filtered transparency. For this reason <b><code>alpha</code></b> is no longer used.</P>
+<P>Each of the five components of a color are float values which are normally in the range between 0.0 and 1.0. However any values, even negatives may be used.</P>
+<P>Under most circumstances the keyword <b><code>color</code></b> is optional and may be omitted. We also support the British or Canadian spelling <b><code>colour</code></b>.  Colors may be specified using vectors, keywords with floats or identifiers. You may also create very complex color expressions from combinations of any of these using various familiar operators. The syntax for specifying a color has evolved since POV-Ray was first released. We have maintained the original keyword-based syntax and added a short-cut vector notation. Either the old or new syntax is acceptable however the vector syntax is easier to use when creating color expressions.</P>
+<P>The syntax for combining color literals into color expressions is almost identical to the rules for vector and float expressions.  In the syntax for vector expressions below, some of the syntax items are defined in the section for float expressions.  See "<A HREF="pov160.htm#_Ref412720567">Float Expressions</A>" for those definitions.  Detailed explanations of color-specific issues are given in the following sub-sections.</P>
+<I><DL>
+<DT>COLOR:</DT>
+<DD>COLOR_BODY</I>&#9;&#9;&#9;|</DD>
+<b><code><DD>color</code></b> <I>COLOR_BODY</I>&#9;&#9;|    <I>(this means the keyword </I><b><code>color</code></b> or <b><code>colour</code></b> <I>may</DD>
+</I><b><code><DD>colour</code></b> <I>COLOR_BODY</I>&#9;&#9;     <I>  optionally precede any color specification)</DD>
+<DT>COLOR_BODY:</DT>
+<DD>COLOR_VECTOR</I>&#9;&#9;&#9;|</DD>
+<I><DD>COLOR_KEYWORD_GROUP</I>&#9;&#9;|</DD>
+<I><DD>COLOR_IDENTIFIER</DD>
+<DT>COLOR_VECTOR:</DT>
+</I><b><code><DD>rgb</code></b> <I>&lt;3_Term_Vector&gt;</I>&#9;&#9;|</DD>
+<b><code><DD>rgbf</code></b> <I>&lt;4_Term_Vector&gt;</I>&#9;&#9;|</DD>
+<b><code><DD>rgbt</code></b> <I>&lt;4_Term_Vector&gt;</I>&#9;&#9;|</DD>
+<I><DD>[ </I><b><code>rgbft</code></b> <I>]</I> <I>&lt;5_Term_Vector&gt;</DD>
+<DT>COLOR_KEYWORD_GROUP:</DT>
+<DD>[ COLOR_KEYWORD_ITEM ]...</DD>
+<DT>COLOR_KEYWORD_ITEM:</DT>
+<DD>COLOR_IDENTIFIER&#9;&#9;|</DD>
+</I><b><code><DD>red</code></b><I> Red_Amount</I>   |   <b><code>blue</code></b><I> Blue_Amount</I>   |   <b><code>green</code></b><I> Green_Amount</I>   |</DD>
+<b><code><DD>filter</code></b><I> Filter_Amount</I>   |   <b><code>transmit</code></b><I> Transmit_Amount</DD>
+</DL>
+</I><P>Note: <I>COLOR_IDENTIFIERS</I> are identifiers previously declared to have color values.  The 3, 4, and 5 term vectors are usually vector literals but may be vector expressions or floats promoted to vectors.  See "<A HREF="pov171.htm#_Ref412891853">Operator Promotion</A>" and the sections below.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov173.htm">Vector Functions</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov175.htm">Color Vectors</A>
+</P>
+</BODY>
+</HTML>
+

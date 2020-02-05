@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -97,10 +97,17 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/blob.h"
 
+// C++ variants of C standard header files
+#include <cstring>
+
+// C++ standard header files
 #include <algorithm>
 
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
+#include "base/povassert.h"
 
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/bounding/boundingsphere.h"
 #include "core/material/texture.h"
@@ -108,12 +115,17 @@
 #include "core/math/polynomialsolver.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov
 {
+
+using std::min;
+using std::max;
+using std::vector;
 
 /*****************************************************************************
 * Local preprocessor defines
@@ -245,7 +257,7 @@ bool Blob::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 
     /* Transform the ray into blob space. */
 
-    if (Trans != NULL)
+    if (Trans != nullptr)
     {
         MInvTransPoint(P, ray.Origin, Trans);
         MInvTransDirection(D, ray.Direction, Trans);
@@ -315,7 +327,7 @@ bool Blob::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
      * influence of each component as it appears.
      */
 
-    fcoeffs = NULL;
+    fcoeffs = nullptr;
 
     for (i = in_flag = 0; i < cnt; i++)
     {
@@ -589,7 +601,7 @@ bool Blob::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 *
 *   Store the points of intersection. Keep track of: whether this is
 *   the start or end point of the hit, which component was pierced
-*   by the ray, and the point along the ray that the hit occured at.
+*   by the ray, and the point along the ray that the hit occurred at.
 *
 * CHANGES
 *
@@ -597,6 +609,7 @@ bool Blob::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 *   Sep 1995 : Changed to allow use of memcpy if memmove isn't available. [AED]
 *   Jul 1996 : Changed to use POV_MEMMOVE, which can be memmove or pov_memmove.
 *   Oct 1996 : Changed to avoid unnecessary compares. [DB]
+*   Feb 2019 : Changed back to use std::memmove again. [CLi]
 *
 ******************************************************************************/
 
@@ -619,7 +632,7 @@ void Blob::insert_hit(const Blob_Element *Element, DBL t0, DBL t1, Blob_Interval
          * bump the rest and insert it here.
          */
 
-        POV_MEMMOVE(&intervals[k+1], &intervals[k], (*cnt-k)*sizeof(Blob_Interval_Struct));
+        std::memmove(&intervals[k+1], &intervals[k], (*cnt-k)*sizeof(Blob_Interval_Struct));
 
         /* We are entering the component. */
 
@@ -639,7 +652,7 @@ void Blob::insert_hit(const Blob_Element *Element, DBL t0, DBL t1, Blob_Interval
 
         if (k < *cnt)
         {
-            POV_MEMMOVE(&intervals[k+1], &intervals[k], (*cnt-k)*sizeof(Blob_Interval_Struct));
+            std::memmove(&intervals[k+1], &intervals[k], (*cnt-k)*sizeof(Blob_Interval_Struct));
 
             /* We are exiting the component. */
 
@@ -1160,10 +1173,10 @@ int Blob::intersect_sphere(const Blob_Element *Element, const Vector3d& P, const
 *
 ******************************************************************************/
 
-int Blob::intersect_element(const Vector3d& P, const Vector3d& D, const Blob_Element *Element, DBL mindist, DBL *tmin, DBL *tmax, TraceThreadData *Thread)
+int Blob::intersect_element(const Vector3d& P, const Vector3d& D, const Blob_Element *Element, DBL mindist, DBL *tmin, DBL *tmax, RenderStatistics& stats)
 {
 #ifdef BLOB_EXTRA_STATS
-    Thread->Stats()[Blob_Element_Tests]++;
+    stats[Blob_Element_Tests]++;
 #endif
 
     *tmin = BOUND_HUGE;
@@ -1210,7 +1223,7 @@ int Blob::intersect_element(const Vector3d& P, const Vector3d& D, const Blob_Ele
     }
 
 #ifdef BLOB_EXTRA_STATS
-    Thread->Stats()[Blob_Element_Tests_Succeeded]++;
+    stats[Blob_Element_Tests_Succeeded]++;
 #endif
 
     return (true);
@@ -1263,13 +1276,13 @@ int Blob::determine_influences(const Vector3d& P, const Vector3d& D, DBL mindist
 
     cnt = 0;
 
-    if (Data->Tree == NULL)
+    if (Data->Tree == nullptr)
     {
         /* There's no bounding hierarchy so just step through all elements. */
 
         for (vector<Blob_Element>::iterator i = Data->Entry.begin(); i != Data->Entry.end(); ++i)
         {
-            if (intersect_element(P, D, &(*i), mindist, &t0, &t1, Thread))
+            if (intersect_element(P, D, &(*i), mindist, &t0, &t1, Thread->Stats()))
             {
                 insert_hit(&(*i), t0, t1, intervals, &cnt);
             }
@@ -1293,7 +1306,7 @@ int Blob::determine_influences(const Vector3d& P, const Vector3d& D, DBL mindist
             {
                 /* Test element. */
 
-                if (intersect_element(P, D, reinterpret_cast<Blob_Element *>(Tree->Node), mindist, &t0, &t1, Thread))
+                if (intersect_element(P, D, reinterpret_cast<Blob_Element *>(Tree->Node), mindist, &t0, &t1, Thread->Stats()))
                 {
                     insert_hit(reinterpret_cast<Blob_Element *>(Tree->Node), t0, t1, intervals, &cnt);
                 }
@@ -1496,7 +1509,7 @@ DBL Blob::calculate_field_value(const Vector3d& P, TraceThreadData *Thread) cons
 
     density = 0.0;
 
-    if (Data->Tree == NULL)
+    if (Data->Tree == nullptr)
     {
         /* There's no tree --> step through all elements. */
 
@@ -1586,7 +1599,7 @@ bool Blob::Inside(const Vector3d& Test_Point, TraceThreadData *Thread) const
 
     /* Transform the point into blob space. */
 
-    if (Trans != NULL)
+    if (Trans != nullptr)
     {
         MInvTransPoint(New_Point, Test_Point, Trans);
     }
@@ -1614,7 +1627,7 @@ double Blob::GetPotential (const Vector3d& globalPoint, bool subtractThreshold, 
 {
     Vector3d localPoint;
 
-    if (Trans != NULL)
+    if (Trans != nullptr)
         MInvTransPoint (localPoint, globalPoint, Trans);
     else
         localPoint = globalPoint;
@@ -1815,7 +1828,7 @@ void Blob::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread
 
     /* For each component that contributes to this point, add its bit to the normal */
 
-    if (Data->Tree == NULL)
+    if (Data->Tree == nullptr)
     {
         /* There's no tree --> step through all elements. */
 
@@ -1879,7 +1892,7 @@ void Blob::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread
 
     /* Transform back to world space. */
 
-    if (Trans != NULL)
+    if (Trans != nullptr)
     {
         MTransNormal(Result, Result, Trans);
 
@@ -2032,7 +2045,7 @@ void Blob::Scale(const Vector3d&, const TRANSFORM *tr)
 
 void Blob::Transform(const TRANSFORM *tr)
 {
-    if(Trans == NULL)
+    if (Trans == nullptr)
         Trans = Create_Transform();
 
     Recompute_BBox(&BBox, tr);
@@ -2078,8 +2091,8 @@ void Blob::Transform(const TRANSFORM *tr)
 Blob::Blob() : ObjectBase(BLOB_OBJECT)
 {
     Set_Flag(this, HIERARCHY_FLAG);
-    Trans = NULL;
-    Data = NULL;
+    Trans = nullptr;
+    Data = nullptr;
 }
 
 /*****************************************************************************
@@ -2207,7 +2220,7 @@ Blob::~Blob()
 {
     for (vector<TEXTURE*>::iterator i = Element_Texture.begin(); i != Element_Texture.end(); ++i)
         Destroy_Textures(*i);
-    if (Data != NULL)
+    if (Data != nullptr)
         Data->ReleaseReference () ;
 }
 
@@ -2268,7 +2281,7 @@ void Blob::Compute_BBox()
 
     Make_BBox_from_min_max(BBox, Min, Max);
 
-    if (Trans != NULL)
+    if (Trans != nullptr)
     {
         Recompute_BBox(&BBox, Trans);
     }
@@ -2351,7 +2364,7 @@ void Blob::get_element_bounding_sphere(const Blob_Element *Element, Vector3d& Ce
     }
 
     /* Transform bounding sphere if necessary. */
-    if (Element->Trans != NULL)
+    if (Element->Trans != nullptr)
     {
         r = sqrt(r2);
 
@@ -2406,8 +2419,8 @@ Blob_Element::Blob_Element (void)
     c[0] = 0.0;
     c[1] = 0.0;
     c[2] = 0.0;
-    Texture = NULL;
-    Trans = NULL;
+    Texture = nullptr;
+    Trans = nullptr;
 }
 
 Blob_Element::~Blob_Element ()
@@ -2417,7 +2430,7 @@ Blob_Element::~Blob_Element ()
 Blob_Data::Blob_Data (int Count)
 {
     References = 1;
-    Tree = NULL;
+    Tree = nullptr;
     Entry.resize(Count);
 }
 
@@ -2542,7 +2555,7 @@ int Blob::Make_Blob(DBL threshold, Blob_List_Struct *BlobList, int npoints, Trac
         *Entry = temp->elem;
 
         /* We have a multi-texture blob. */
-        if (Entry->Texture != NULL)
+        if (Entry->Texture != nullptr)
             Set_Flag(this, MULTITEXTURE_FLAG);
 
         /* Store blob specific information. */
@@ -2638,30 +2651,23 @@ int Blob::Make_Blob(DBL threshold, Blob_List_Struct *BlobList, int npoints, Trac
 *
 ******************************************************************************/
 
-void Blob::Test_Blob_Opacity()
+bool Blob::IsOpaque() const
 {
-    /* Initialize opacity flag to the opacity of the object's texture. */
-
-    if ((Texture == NULL) || (Test_Opacity(Texture)))
-    {
-        Set_Flag(this, OPAQUE_FLAG);
-    }
-
     if (Test_Flag(this, MULTITEXTURE_FLAG))
     {
-        for (vector<TEXTURE*>::iterator i = Element_Texture.begin(); i != Element_Texture.end(); ++i)
+        for (auto&& elementTexture : Element_Texture)
         {
-            if (*i != NULL)
-            {
-                /* If component's texture isn't opaque the blob is neither. */
-
-                if (!Test_Opacity(*i))
-                {
-                    Clear_Flag(this, OPAQUE_FLAG);
-                }
-            }
+            // If component's texture isn't opaque the blob is neither.
+            if ((elementTexture != nullptr) && !Test_Opacity(elementTexture))
+                return false;
         }
     }
+
+    // Otherwise it's a question of whether the common texture is opaque or not.
+    // TODO FIXME - other objects report as non-opaque if Texture == nullptr.
+    // TODO FIXME - other objects report as non-opaque if Interior_Texture present and non-opaque.
+    // What we probably really want here is `return ObjectBase::IsOpaque()`.
+    return (Texture == nullptr) || Test_Opacity(Texture);
 }
 
 
@@ -2772,7 +2778,7 @@ void Blob::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextu
     /* Transform the point into the blob space. */
     getLocalIPoint(P, isect);
 
-    if (Data->Tree == NULL)
+    if (Data->Tree == nullptr)
     {
         /* There's no tree --> step through all elements. */
 
@@ -2867,10 +2873,10 @@ void Blob::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextu
 
 void Blob::determine_element_texture(const Blob_Element *Element, TEXTURE *ElementTex, const Vector3d& P, WeightedTextureVector& textures)
 {
-        DBL density = fabs(calculate_element_field(Element, P));
+    DBL density = fabs(calculate_element_field(Element, P));
 
-        if(density > 0.0)
-                textures.push_back(WeightedTexture(density, ElementTex != NULL ? ElementTex : Texture));
+    if(density > 0.0)
+        textures.push_back(WeightedTexture(density, ElementTex != nullptr ? ElementTex : Texture));
 }
 
 
@@ -2912,7 +2918,7 @@ void Blob::Translate_Blob_Element(Blob_Element *Element, const Vector3d& Vector)
 
     Compute_Translation_Transform(&Trans, Vector);
 
-    if (Element->Trans == NULL)
+    if (Element->Trans == nullptr)
     {
         /* This is a sphere component. */
 
@@ -2966,7 +2972,7 @@ void Blob::Rotate_Blob_Element(Blob_Element *Element, const Vector3d& Vector)
 
     Compute_Rotation_Transform(&Trans, Vector);
 
-    if (Element->Trans == NULL)
+    if (Element->Trans == nullptr)
     {
         /* This is a sphere component. */
 
@@ -3020,7 +3026,7 @@ void Blob::Scale_Blob_Element(Blob_Element *Element, const Vector3d& Vector)
 
     if ((Vector[X] != Vector[Y]) || (Vector[X] != Vector[Z]))
     {
-        if (Element->Trans == NULL)
+        if (Element->Trans == nullptr)
         {
             /* This is a sphere component --> change to ellipsoid component. */
 
@@ -3032,7 +3038,7 @@ void Blob::Scale_Blob_Element(Blob_Element *Element, const Vector3d& Vector)
 
     Compute_Scaling_Transform(&Trans, Vector);
 
-    if (Element->Trans == NULL)
+    if (Element->Trans == nullptr)
     {
         /* This is a sphere component. */
 
@@ -3085,7 +3091,7 @@ void Blob::Scale_Blob_Element(Blob_Element *Element, const Vector3d& Vector)
 
 void Blob::Transform_Blob_Element(Blob_Element *Element, const TRANSFORM *Trans)
 {
-    if (Element->Trans == NULL)
+    if (Element->Trans == nullptr)
     {
         /* This is a sphere component --> change to ellipsoid component. */
 
@@ -3257,7 +3263,7 @@ void Blob::getLocalIPoint(Vector3d& lip, Intersection *isect) const
 {
     if(isect->haveLocalIPoint == false)
     {
-        if(Trans != NULL)
+        if (Trans != nullptr)
             MInvTransPoint(isect->LocalIPoint, isect->IPoint, Trans);
         else
             isect->LocalIPoint = isect->IPoint;
@@ -3269,3 +3275,4 @@ void Blob::getLocalIPoint(Vector3d& lip, Intersection *isect) const
 }
 
 }
+// end of namespace pov

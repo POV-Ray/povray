@@ -1,0 +1,30 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - New #macro Feature</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov8.htm">Media Replaces Halo &amp; Atmosphere</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov10.htm">Arrays Added</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc429993339">New #macro Feature</A></H3>
+<P>Add fully recursive and parameterized <b><code>#macro</code></b> directive.  Define like this...</P>
+<PRE>  #macro MyMacro (P1,P2,P3)   ...  #end</PRE>
+<P>Invoke like this...</P>
+<PRE>  MyMacro (5,x*5,MyTexture)</PRE>
+<P>Note no '#' sign precedes invocation.  Macros can be invoked almost anywhere. Parameters must be identifiers or any item that can be declared, <b><code>MyMacro(pigment{Green},MyObject)</code></b> for example.</P>
+<P>Added <b><code>#local</code></b> <I>IDENTIFIER</I><b><code>=</code></b> <I>STATEMENT</I> as alternative to <b><code>#declare</code></b> to create temporary local identifier in macros or include files.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov8.htm">Media Replaces Halo &amp; Atmosphere</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov10.htm">Arrays Added</A>
+</P>
+</BODY>
+</HTML>
+

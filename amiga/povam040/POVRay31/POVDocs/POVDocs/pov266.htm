@@ -1,0 +1,33 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Merge</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov265.htm">Difference</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov267.htm">Light Sources</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199103"><A NAME="_Toc429993611">Merge</A></A></H4>
+<P>The <b><code>union</code></b> operation just glues objects together, it does not remove the objects' surfaces inside the <b><code>union</code></b>.  Under most circumstances this doesn't matter.  However if a transparent <b><code>union</code></b> is used, those interior surfaces will be visible.  The <b><code>merge</code></b> operations can be used to avoid this problem. It works just like <b><code>union</code></b> but it eliminates the inner surfaces like shown in the figure below.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image106.gif" WIDTH=300 HEIGHT=191></P>
+<P ALIGN="CENTER">Merge removes inner surfaces.</P>
+</B><P>The syntax is:</P>
+<I><DL>
+<DT>MERGE:</DT>
+</I><b><code><DD>merge {</code></b> SOLID_<I>OBJECTS...  [OBJECT_MODIFIERS...]</I> <b><code>}</DD>
+</DL>
+</code></b><P>The component objects must have well defined inside/outside properties.  Patch objects are not allowed.  Note that <b><code>merge</code></b> is slower rendering than <b><code>union</code></b> so it should only be used when it is really necessary.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov265.htm">Difference</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov267.htm">Light Sources</A>
+</P>
+</BODY>
+</HTML>
+

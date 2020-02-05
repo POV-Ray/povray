@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,12 +38,19 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/lemon.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
 #include "base/messenger.h"
 
+// POV-Ray header files (core module)
 #include "core/math/matrix.h"
 #include "core/math/polynomialsolver.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -107,7 +114,7 @@ bool Lemon::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 
     Intersection_Found = false;
 
-    if ((cnt = Intersect(P, D, I, Thread)) != 0)
+    if ((cnt = Intersect(P, D, I, Thread->Stats())) != 0)
     {
         for (i = 0; i < cnt; i++)
         {
@@ -154,7 +161,7 @@ bool Lemon::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 *
 ******************************************************************************/
 
-int Lemon::Intersect(const Vector3d& P, const Vector3d& D, LEMON_INT *Intersection, TraceThreadData *Thread) const
+int Lemon::Intersect(const Vector3d& P, const Vector3d& D, LEMON_INT *Intersection, RenderStatistics& stats) const
 {
     int i = 0;
     DBL a, b, c[5], r[4];
@@ -189,7 +196,7 @@ int Lemon::Intersect(const Vector3d& P, const Vector3d& D, LEMON_INT *Intersecti
 
         c[4] = k1 * k1 + 4.0 * R2 * (Pz2 - r2);
 
-        n = Solve_Polynomial(4, c, r, Test_Flag(this, STURM_FLAG), ROOT_TOLERANCE, Thread->Stats());
+        n = Solve_Polynomial(4, c, r, Test_Flag(this, STURM_FLAG), ROOT_TOLERANCE, stats);
         while (n--)
         {
             // here we only keep the 'lemon' inside the torus
@@ -501,7 +508,7 @@ void Lemon::Scale(const Vector3d&, const TRANSFORM *tr)
 
 void Lemon::Transform(const TRANSFORM *tr)
 {
-    if(Trans == NULL)
+    if(Trans == nullptr)
         Trans = Create_Transform();
 
     Compose_Transforms(Trans, tr);
@@ -613,7 +620,7 @@ ObjectPtr Lemon::Copy()
 *
 ******************************************************************************/
 
-void Lemon::Compute_Lemon_Data(GenericMessenger& messenger, pov_base::ITextStream *FileHandle, pov_base::ITextStream::FilePos & Token_File_Pos, int Token_Col_No )
+void Lemon::Compute_Lemon_Data(GenericMessenger& messenger, const MessageContext& context)
 {
     DBL len;
     Vector3d axis;
@@ -665,8 +672,7 @@ void Lemon::Compute_Lemon_Data(GenericMessenger& messenger, pov_base::ITextStrea
     if (inner_radius < low )
     {
         inner_radius = low;
-        messenger.WarningAt(kWarningGeneral, FileHandle->name(), Token_File_Pos.lineno,
-                            Token_Col_No, FileHandle->tellg().offset,
+        messenger.WarningAt(kWarningGeneral, context,
                             "Inner (last) radius of lemon is too small. Minimal would be %g. Value has been adjusted.",
                             inner_radius * len);
     }
@@ -754,6 +760,8 @@ void Lemon::Compute_BBox()
 }
 
 
+#ifdef POV_ENABLE_LEMON_UV
+
 /*****************************************************************************
 *
 * FUNCTION
@@ -776,7 +784,7 @@ void Lemon::Compute_BBox()
 *
 ******************************************************************************/
 
-void Lemon::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
+void Lemon::UVCoord(Vector2d& Result, const Intersection *Inter) const
 {
     CalcUV(Inter->IPoint, Result);
 }
@@ -877,4 +885,7 @@ void Lemon::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
 
 }
 
+#endif // POV_ENABLE_LEMON_UV
+
 }
+// end of namespace pov

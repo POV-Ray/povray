@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Plane Object</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov24.htm">Cylinder Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov26.htm">CSG Objects</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405097"><A NAME="_Toc411405373"><A NAME="_Toc414198844"><A NAME="_Toc429993355">Plane Object</A></A></A></A></H3>
+<P>Let's try out a computer graphics standard <I>"The Checkered Floor". </I>We add the following object to the first version of the <CODE>demo.pov</CODE> file, the one including the sphere.</P>
+<PRE>  plane { &lt;0, 1, 0&gt;, -1
+    pigment {
+      checker color Red, color Blue
+    }
+  }</PRE>
+<P>The object defined here is an infinite plane. The vector &lt;0,1,0&gt; is the surface normal of the plane (i.e. if we were standing on the surface, the normal points straight up). The number afterward is the distance that the plane is displaced along the normal from the origin -- in this case, the floor is placed at y=-1 so that the sphere at y=1, radius=2, is resting on it.</P>
+<P>We note that even though there is no <b><code>texture</code></b> statement there is an implied texture here. We might find that continually typing statements that are nested like <b><code>texture {pigment</code></b>} can get to be tiresome so POV-Ray let's us leave out the <b><code>texture</code></b> statement under many circumstances. In general we only need the texture block surrounding a texture identifier (like the <b><code>T_Stone25</code></b> example above), or when creating layered textures (which are covered later).</P>
+<P>This pigment uses the checker color pattern and specifies that the two colors red and blue should be used.</P>
+<P>Because the vectors &lt;1,0,0&gt;, &lt;0,1,0&gt; and &lt;0,0,1&gt; are used frequently, POV-Ray has three built-in vector identifiers <b><code>x</code></b>, <b><code>y</code></b> and <b><code>z</code></b> respectively that can be used as a shorthand. Thus the plane could be defined as:</P>
+<PRE>  plane { y, -1
+    pigment { ... }
+  }</PRE>
+<P>Note that we do not use angle brackets around vector identifiers.</P>
+<P>Looking at the floor, we notice that the ball casts a shadow on the floor. Shadows are calculated very accurately by the ray-tracer, which creates precise, sharp shadows. In the real world, penumbral or "soft" shadows are often seen. Later we will learn how to use extended light sources to soften the shadows.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov24.htm">Cylinder Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov26.htm">CSG Objects</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,63 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Texture Maps</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov311.htm">Patterned Textures</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov313.htm">Tiles</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199158"><A NAME="_Ref417371359"><A NAME="_Ref417980909"><A NAME="_Ref418328214"><A NAME="_Ref418337408"><A NAME="_Ref418948678"><A NAME="_Toc429993669">Texture Maps</A></A></A></A></A></A></A></H4>
+<P>In addition to specifying blended color with a color map or a pigment map you may create a blend of textures using <b><code>texture_map</code></b>.  The syntax for a texture map is identical to the pigment map except you specify a texture in each map entry.</P>
+<P>The syntax for <b><code>texture_map</code></b> is as follows:</P>
+<I><DL>
+<DT>TEXTURE_MAP:</DT>
+</I><b><code><DD>texture_map{</code></b> <I>TEXTURE_MAP_BODY</I> <b><code>}</DD>
+</code></b><I><DT>TEXTURE_MAP_BODY:</DT>
+<DD>TEXTURE_MAP_IDENTIFIER</I>   |   <I>TEXTURE_MAP_ENTRY</I>...</DD>
+<I><DT>TEXTURE_MAP_ENTRY:</DT>
+</I><b><code><DD>[</code></b> <I>Value</I>  <I>TEXTURE_BODY</I> <b><code>]</DD>
+</DL>
+</code></b><P>Where <I>Value</I> is a float value between 0.0 and 1.0 inclusive and each <I>TEXTURE_BODY</I> is anything which can be inside a <b><code>texture{...}</code></b> statement.  The <b><code>texture</code></b> keyword and <b><code>{}</code></b> braces need not be specified.</P>
+<P>Note that the <b><code>[]</code></b> brackets are part of the actual <I>TEXTURE_MAP_ENTRY</I>. They are not notational symbols denoting optional parts. The brackets surround each entry in the texture map. There may be from 2 to 256 entries in the map. </P>
+<P>For example:</P>
+<PRE>  texture {
+    gradient x       //this is the PATTERN_TYPE
+    texture_map {
+      [0.3  pigment{Red} finish{phong 1}]
+      [0.3  T_Wood11]    //this is a texture identifier
+      [0.6  T_Wood11]
+      [0.9  pigment{DMFWood4} finish{Shiny}]
+    }
+  }</PRE>
+<P>When the <b><code>gradient x</code></b> function returns values from 0.0 to 0.3 the red highlighted texture is used. From 0.3 to 0.6 the texture identifier <b><code>T_Wood11</code></b> is used. From 0.6 up to 0.9 a blend of <b><code>T_Wood11</code></b> and a shiny <b><code>DMFWood4</code></b> is used. From 0.9 on up only the shiny wood is used.</P>
+<P>Texture maps may be nested to any level of complexity you desire. The textures in a map may have color maps or texture maps or any type of texture you want.</P>
+<P>The blended area of a texture map works by fully calculating both contributing textures in their entirety and then linearly interpolating the apparent colors. This means that reflection, refraction and lighting calculations are done twice for every point.  This is in contrast to using a pigment map and a normal map in a plain texture, where the pigment is computed, then the normal, then reflection, refraction and lighting are calculated once for that point.</P>
+<P>Entire textures may also be used with the block patterns such as <b><code>checker</code></b>, <b><code>hexagon</code></b> and <b><code>brick</code></b>. For example...</P>
+<PRE>  texture {
+    checker
+      texture { T_Wood12 scale .8 }
+      texture {
+        pigment { White_Marble }
+        finish { Shiny }
+        scale .5
+      }
+    }
+  }</PRE>
+<P>Note that in the case of block patterns the <b><code>texture</code></b> wrapping is required around the texture information. Also note that this syntax prohibits the use of a layered texture however you can work around this by declaring a texture identifier for the layered texture and referencing the identifier.</P>
+<P>A texture map is also used with the <b><code>average</code></b> texture type. See "<A HREF="pov318.htm#_Ref417371289">Average</A>" for details.</P>
+<P>You may declare and use texture map identifiers but the only way to declare a texture block pattern list is to declare a texture identifier for the entire texture.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov311.htm">Patterned Textures</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov313.htm">Tiles</A>
+</P>
+</BODY>
+</HTML>
+

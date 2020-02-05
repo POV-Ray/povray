@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,6 +33,21 @@
 ///
 //******************************************************************************
 
+/// @file
+/// @note
+/// @parblock
+///     This header file is _not_ explicitly included in any source file (except @ref vfe/vfeprecomp.cpp
+///     which is designed to allow for precompiling this header in the first place). To use
+///     precompiled headers, you will therefore have to make your build environment automatically
+///     inject this header at the start of every source file.
+///
+///     The rationale behind this is to keep the set of headers included in each source file at an
+///     absolute minimum when precompiled headers are _not_ used.
+/// @endparblock
+
+#include "base/configbase.h" // only pulled in for POV_MULTITHREADED
+
+// C++ variants of C standard header files
 #include <cassert>
 #include <cctype>
 #include <cfloat>
@@ -42,10 +57,12 @@
 #include <cstdlib>
 #include <cstring>
 
+// C++ standard header files
 #include <algorithm>
-#include <exception>
+#include <chrono>
 #include <list>
 #include <map>
+#include <memory>
 #include <new>
 #include <set>
 #include <stack>
@@ -53,9 +70,5 @@
 #include <string>
 #include <vector>
 
-#include <boost/bind.hpp>
+// Boost header files
 #include <boost/format.hpp>
-#include <boost/function.hpp>
-#include <boost/scoped_array.hpp>
-#include <boost/scoped_ptr.hpp>
-#include <boost/thread.hpp>

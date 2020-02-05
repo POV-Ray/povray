@@ -1,0 +1,28 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Inverse</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov280.htm">Material</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov282.htm">Hollow</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199122"><A NAME="_Ref415664580"><A NAME="_Toc429993626">Inverse</A></A></H4>
+<P>When using CSG it is often useful to invert an object so that it'll be inside-out. The appearance of the object is not changed, just the way that POV-Ray perceives it. When the <b><code>inverse</code></b> keyword is used the <I>inside</I> of the shape is flipped to become the <I>outside</I> and vice versa.  For example:</P>
+<PRE>  object { MyObject inverse }</PRE>
+<P>The inside/outside distinction is also important when attaching <b><code>interior</code></b> to an object especially if <b><code>media</code></b> is also used.  Atmospheric media and fog also do not work as expected if your camera is inside an object.  Using <b><code>inverse</code></b> is useful to correct that problem.</P>
+<P>Finally the <b><code>internal_reflections</code></b> and <b><code>internal_highlights</code></b> keywords depend upon the inside/outside status of an object.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov280.htm">Material</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov282.htm">Hollow</A>
+</P>
+</BODY>
+</HTML>
+

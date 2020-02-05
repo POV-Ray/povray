@@ -1,0 +1,52 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Lathe</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov243.htm">Julia Fractal</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov245.htm">Prism</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199079"><A NAME="_Ref415568197"><A NAME="_Toc429993589">Lathe</A></A></A></H4>
+<P>The <b><code>lathe</code></b> is an object generated from rotating a two-dimensional curve about an axis. This curve is defined by a set of points which are connected by linear, quadratic, cubic or bezier spline curves. The syntax is:</P>
+<I><DL>
+<DT>LATHE:</DT>
+</I><b><code><DD>lathe {</DD>
+</code></b><DD>     <I>[SPLINE_TYPE]</I>  <I>Number_Of_Points</I><b><code>,</code></b> <I>&lt;Point_1&gt; &lt;Point_2&gt;... &lt;Point_n&gt; </DD>
+</I><DD>     <I>[LATHE_MODIFIER...]</DD>
+</I><b><code><DD>}</DD>
+</code></b><I><DT>SPLINE_TYPE:</DT>
+</I><b><code><DD>linear_spline</code></b>   |   <b><code>quadratic_spline</code></b>   |   <b><code>cubic_spline</code></b>   |   <b><code>bezier_spline</DD>
+</code></b><I><DT>LATHE_MODIFIER:</DT>
+</I><b><code><DD>sturm</code></b>   |   <I>OBJECT_MODIFIER</DD>
+</DL>
+</I><P>The first item is a keyword specifying the type of spline.  The default if none is specified is <b><code>linear_spline</code></b>.  The required integer value <I>Number_Of_Points</I> specifies how many two-dimensional points are used to define the curve. The points follow and are specified by 2-D vectors.  The curve is not automatically closed, i.e. the first and last points are not automatically connected.  You will have to do this by your own if you want a closed curve. The curve thus defined is rotated about the y-axis to form the lathe object which is centered at the origin.</P>
+<P>The following examples creates a simple lathe object that looks like a thick cylinder, i.e. a cylinder with a thick wall:</P>
+<PRE> lathe {
+  linear_spline
+  5,
+  &lt;2, 0&gt;, &lt;3, 0&gt;, &lt;3, 5&gt;, &lt;2, 5&gt;, &lt;2, 0&gt;
+  pigment {Red}
+ }</PRE>
+<P>The cylinder has an inner radius of 2 and an outer radius of 3, giving a wall width of 1. It's height is 5 and it's located at the origin pointing up, i.e. the rotation axis is the y-axis. Note that the first and last point are equal to get a closed curve.</P>
+<P>The splines that are used by the lathe and prism objects are a little bit difficult to understand. The basic concept of splines is to draw a curve through a given set of points in a determined way. The default <b><code>linear_spline</code></b> is the simplest spline because it's nothing more than connecting consecutive points with a line. This means that the curve that is drawn between two points only depends on those two points. No additional information is taken into account. The other splines are different in that they do take other points into account when connecting two points.  This creates a smooth curve and, in the case of the cubic spline, produces smoother transitions at each point.</P>
+<P>The <b><code>quadratic_spline</code></b> keyword creates splines that are made of quadratic curves. Each of them connects two consecutive points. Since those two points (call them second and third point) are not sufficient to describe a quadratic curve the predecessor of the second point is taken into account when the curve is drawn. Mathematically the relationship (their location on the 2-D plane) between the first and second point determines the slope of the curve at the second point. The slope of the curve at the third point is out of control. Thus quadratic splines look much smoother than linear splines but the transitions at each point are generally not smooth because the slopes on both sides of the point are different.</P>
+<P>The <b><code>cubic_spline</code></b> keyword creates splines overcome the transition problem of quadratic splines because they also take the fourth point into account when drawing the curve between the second and third point. The slope at the fourth point is under control now and allows a smooth transition at each point. Thus cubic splines produce the most flexible and smooth curves.</P>
+<P>The <b><code>bezier_spline</code></b> is an alternate kind of cubic spline.  Points 1 and 4 specify the end points of a segment and points 2 and 3 are control points which specify the slope at the endpoints. Points 2 and 3 do not actually lie on the spline.  They adjust the slope of the spline.  If you draw an imaginary line between point 1 and 2, it represents the slope at point 1.  It is a line tangent to the curve at point 1.  The greater the distance between 1 and 2, the flatter the curve.  With a short tangent the spline can bend more.  The same holds true for control point 3 and endpoint 4.  If you want the spline to be smooth between segments, point 3 and 4 on one segment and point 1 and 2 on the next segment must form a straight line and point 4 of one segment must be the same as point one on the next segment.</P>
+<P>You should note that the number of spline segments, i. e. curves between two points, depends on the spline type used. For linear splines you get n-1 segments connecting the points P[i], i=1,...,n. A quadratic spline gives you n-2 segments because the last point is only used for determining the slope as explained above (thus you'll need at least three points to define a quadratic spline). The same holds for cubic splines where you get n-3 segments with the first and last point used only for slope calculations (thus needing at least four points).  The bezier spline requires 4 points per segment.</P>
+<P>If you want to get a closed quadratic and cubic spline with smooth transitions at the end points you have to make sure that in the cubic case P[n-1] = P[2] (to get a closed curve), P[n] = P[3] and P[n-2] = P[1] (to smooth the transition). In the quadratic case P[n-1] = P[1] (to close the curve) and P[n] = P[2].</P>
+<P>The <b><code>sturm</code></b> keyword can be used to specify that the slower but more accurate Sturmian root solver should be used.  Use it with the quadratic spline lathe if the shape does not render properly. Since a quadratic polynomial has to be solved for the linear spline lathe the Sturmian root solver is not needed. In case of cubic or bezier splines, the Sturmian root solver is always used because a 6th order polynomial has to be solved.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov243.htm">Julia Fractal</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov245.htm">Prism</A>
+</P>
+</BODY>
+</HTML>
+

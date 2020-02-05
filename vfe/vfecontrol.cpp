@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,6 +37,8 @@
 
 #include <cstring>
 
+#include <list>
+
 #include "vfe.h"
 
 /***************************************************************************************/
@@ -49,13 +51,14 @@ namespace pov_frontend
   extern struct ProcessOptions::INI_Parser_Table RenderOptions_INI_Table[];
   extern struct ProcessRenderOptions::Output_FileType_Table FileTypeTable[];
 }
+// end of namespace pov_frontend
 
 static struct pov_frontend::ProcessOptions::INI_Parser_Table *GetPT(const char *OptionName)
 {
-  for (struct pov_frontend::ProcessOptions::INI_Parser_Table *op = pov_frontend::RenderOptions_INI_Table; op->keyword != NULL; op++)
+  for (struct pov_frontend::ProcessOptions::INI_Parser_Table *op = pov_frontend::RenderOptions_INI_Table; op->keyword != nullptr; op++)
     if (strcmp(op->keyword, OptionName) == 0)
       return op;
-  return NULL;
+  return nullptr;
 }
 
 /***************************************************************************************/
@@ -68,7 +71,7 @@ static int GetUCS2String(POVMSObjectPtr object, POVMSType key, char *result, int
   UCS2 *str = new UCS2 [*maxlen] ;
   int err = POVMSUtil_GetUCS2String (object, key, str, maxlen) ;
   if (err == kNoErr)
-    strcpy (result, UCS2toASCIIString (str).c_str ()) ;
+    strcpy (result, UCS2toSysString (str).c_str ()) ;
   delete[] str ;
   return err ;
 }
@@ -93,7 +96,7 @@ bool vfeSession::ProcessCancelRender (void)
         // TODO FIXME
         // char str [256] ;
         // sprintf (str, "Failed to send stop rendering message (%s)", e.what()) ;
-        // MessageBox (NULL, str, "POVMS error", MB_OK | MB_ICONEXCLAMATION) ;
+        // MessageBox (nullptr, str, "POVMS error", MB_OK | MB_ICONEXCLAMATION) ;
         Delay (100) ;
         return (m_Frontend->GetState () == kReady);
       }
@@ -103,9 +106,9 @@ bool vfeSession::ProcessCancelRender (void)
   {
     if (m_Frontend->GetState () == kReady)
     {
-      // we possibly have an anamolous situation
+      // we possibly have an anomalous situation
       // TODO FIXME
-      // MessageBox (NULL, "Warning: had to force state to stopped", "Cancel Render", MB_OK | MB_ICONEXCLAMATION) ;
+      // MessageBox (nullptr, "Warning: had to force state to stopped", "Cancel Render", MB_OK | MB_ICONEXCLAMATION) ;
       RenderStopped();
     }
   }
@@ -132,7 +135,7 @@ int vfeSession::CancelRender()
   return (m_LastError = vfeNoError);
 }
 
-bool vfeSession::StopRender(const string& reason)
+bool vfeSession::StopRender(const std::string& reason)
 {
   if (m_Frontend->GetState() <= kReady)
     return true;
@@ -233,14 +236,14 @@ int vfeSession::SetOptions (vfeRenderOptions& opts)
   m_InputFilename = opts.m_SourceFile;
 
   // most likely povray.ini will be the first INI file processed here (as it's included by default)
-  for (vector<UCS2String>::iterator i = opts.m_IniFiles.begin(); i != opts.m_IniFiles.end(); i++)
+  for (std::vector<UCS2String>::iterator i = opts.m_IniFiles.begin(); i != opts.m_IniFiles.end(); i++)
   {
     // we call TestAccessAllowed() here, even though ParseFile() will do it also, since if
     // access is denied, the reason will not be obvious (ParseFile() just returns kCannotOpenFileErr).
     if (!TestAccessAllowed (Path(*i), false))
       return (m_LastError = vfeIORestrictionDeny);
 
-    if ((err = options.ParseFile (UCS2toASCIIString(*i).c_str(), &obj)) != kNoErr)
+    if ((err = options.ParseFile (UCS2toSysString(*i).c_str(), &obj)) != kNoErr)
       return (m_LastError = vfeFailedToParseINI) ;
 
     // we keep this up to date since the IO permissions feature will use the current input
@@ -260,7 +263,7 @@ int vfeSession::SetOptions (vfeRenderOptions& opts)
   }
 
   // any source file set on the command-line overrides a source file set another way
-  for (vector<string>::iterator i = opts.m_Commands.begin(); i != opts.m_Commands.end(); i++)
+  for (std::vector<std::string>::iterator i = opts.m_Commands.begin(); i != opts.m_Commands.end(); i++)
   {
     if ((err = options.ParseString (i->c_str(), &obj)) != kNoErr)
       return (m_LastError = vfeFailedToParseCommand) ;
@@ -292,7 +295,7 @@ int vfeSession::SetOptions (vfeRenderOptions& opts)
     // we use the Path equivalence operator rather than a string compare since
     // using Path should handle platform-specific issues like case-sensitivity (or,
     // rather, lack thereof). note that at the time of writing, the Path class did
-    // not yet implement case-insensitive comparisions.
+    // not yet implement case-insensitive comparisons.
     //
     // NB while it would of course be more efficient to sort the list so searches are
     // faster, we'd have to make a copy of it to do that, as we can't change the order
@@ -311,7 +314,7 @@ int vfeSession::SetOptions (vfeRenderOptions& opts)
 
   if (opts.m_LibraryPaths.empty() == false)
   {
-    for (vector<UCS2String>::const_iterator i = opts.m_LibraryPaths.begin(); i != opts.m_LibraryPaths.end(); i++)
+    for (std::vector<UCS2String>::const_iterator i = opts.m_LibraryPaths.begin(); i != opts.m_LibraryPaths.end(); i++)
     {
       Path path(*i);
 
@@ -323,7 +326,7 @@ int vfeSession::SetOptions (vfeRenderOptions& opts)
   if (libpaths.empty() == false)
   {
     POVMS_List pathlist;
-    for (list<Path>::iterator i = libpaths.begin(); i != libpaths.end(); i++)
+    for (std::list<Path>::iterator i = libpaths.begin(); i != libpaths.end(); i++)
     {
       POVMS_Attribute attr((*i)().c_str());
       pathlist.Append(attr);
@@ -390,8 +393,8 @@ int vfeSession::SetOptions (vfeRenderOptions& opts)
   }
 
   n = sizeof (str) ;
-  if ((err = POVMSUtil_GetUCS2String (&obj, kPOVAttrib_CreateIni, str, &n)) == kNoErr && str [0] != 0)
-    if ((err = options.WriteFile (UCS2toASCIIString(str).c_str(), &obj)) != kNoErr)
+  if ((err = POVMSUtil_GetUCS2String (&obj, kPOVAttrib_CreateIni, str, &n)) == kNoErr && str [0] != '\0')
+    if ((err = options.WriteFile (UCS2toSysString(str).c_str(), &obj)) != kNoErr)
       return (m_LastError = vfeFailedToWriteINI);
 
   opts.m_Options = ropts;
@@ -404,7 +407,7 @@ int vfeSession::SetOptions (vfeRenderOptions& opts)
 bool vfeSession::OptionPresent(const char *OptionName)
 {
   struct ProcessOptions::INI_Parser_Table *op = GetPT(OptionName);
-  if (op == NULL)
+  if (op == nullptr)
     throw POV_EXCEPTION_STRING("Invalid option");
 
   if (m_OptionsSet == false)
@@ -416,7 +419,7 @@ bool vfeSession::OptionPresent(const char *OptionName)
 bool vfeSession::GetBoolOption(const char *OptionName, bool DefaultVal)
 {
   struct ProcessOptions::INI_Parser_Table *op = GetPT(OptionName);
-  if (op == NULL)
+  if (op == nullptr)
     throw POV_EXCEPTION_STRING("Invalid option");
   if (m_OptionsSet == false)
     throw POV_EXCEPTION_STRING("Options not set");
@@ -427,7 +430,7 @@ bool vfeSession::GetBoolOption(const char *OptionName, bool DefaultVal)
 int vfeSession::GetIntOption(const char *OptionName, int DefaultVal)
 {
   struct ProcessOptions::INI_Parser_Table *op = GetPT(OptionName);
-  if (op == NULL)
+  if (op == nullptr)
     throw POV_EXCEPTION_STRING("Invalid option");
   if (m_OptionsSet == false)
     throw POV_EXCEPTION_STRING("Options not set");
@@ -438,7 +441,7 @@ int vfeSession::GetIntOption(const char *OptionName, int DefaultVal)
 float vfeSession::GetFloatOption(const char *OptionName, float DefaultVal)
 {
   struct ProcessOptions::INI_Parser_Table *op = GetPT(OptionName);
-  if (op == NULL)
+  if (op == nullptr)
     throw POV_EXCEPTION_STRING("Invalid option");
   if (m_OptionsSet == false)
     throw POV_EXCEPTION_STRING("Options not set");
@@ -449,7 +452,7 @@ float vfeSession::GetFloatOption(const char *OptionName, float DefaultVal)
 std::string vfeSession::GetStringOption(const char *OptionName, const char *DefaultVal)
 {
   struct ProcessOptions::INI_Parser_Table *op = GetPT(OptionName);
-  if (op == NULL)
+  if (op == nullptr)
     throw POV_EXCEPTION_STRING("Invalid option");
   if (m_OptionsSet == false)
     throw POV_EXCEPTION_STRING("Options not set");
@@ -460,7 +463,7 @@ std::string vfeSession::GetStringOption(const char *OptionName, const char *Defa
 UCS2String vfeSession::GetUCS2StringOption(const char *OptionName, const UCS2String& DefaultVal)
 {
   struct ProcessOptions::INI_Parser_Table *op = GetPT(OptionName);
-  if (op == NULL)
+  if (op == nullptr)
     throw POV_EXCEPTION_STRING("Invalid option");
   if (m_OptionsSet == false)
     throw POV_EXCEPTION_STRING("Options not set");
@@ -497,7 +500,7 @@ int vfeSession::StartRender()
     {
       vfeProcessRenderOptions options(this);
       POVMSObject obj = *m_RenderOptions.GetOptions();
-      if (options.WriteFile (UCS2toASCIIString(fn).c_str(), &obj) != kNoErr)
+      if (options.WriteFile (UCS2toSysString(fn).c_str(), &obj) != kNoErr)
         return (m_LastError = vfeFailedToWriteINI);
     }
   }
@@ -509,7 +512,7 @@ int vfeSession::StartRender()
   }
   catch (std::exception& e)
   {
-    if (dynamic_cast<pov_base::Exception *> (&e) != NULL)
+    if (dynamic_cast<pov_base::Exception *> (&e) != nullptr)
       m_RenderErrorCode = dynamic_cast<pov_base::Exception *> (&e)->code() ;
     if (m_RenderErrorCode == 0)
       m_RenderErrorCode = -1 ;
@@ -532,3 +535,4 @@ int vfeSession::StartRender()
 }
 
 }
+// end of namespace vfe

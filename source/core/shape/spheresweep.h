@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,6 +41,14 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/scene/object.h"
 
 namespace pov
@@ -83,19 +91,16 @@ namespace pov
 * Global typedefs
 ******************************************************************************/
 
-typedef struct Sphere_Sweep_Sphere_Struct SPHSWEEP_SPH;
-typedef struct Sphere_Sweep_Segment_Struct SPHSWEEP_SEG;
-typedef struct Sphere_Sweep_Intersection_Structure SPHSWEEP_INT;
-
 /* Single sphere, used to connect two adjacent segments */
-struct Sphere_Sweep_Sphere_Struct
+struct Sphere_Sweep_Sphere_Struct final
 {
     Vector3d    Center;
     DBL         Radius;
 };
+using SPHSWEEP_SPH = Sphere_Sweep_Sphere_Struct; ///< @deprecated
 
 /* One segment of the sphere sweep */
-struct Sphere_Sweep_Segment_Struct
+struct Sphere_Sweep_Segment_Struct final
 {
     SPHSWEEP_SPH  Closing_Sphere[2];              /* Spheres closing the segment   */
     Vector3d      Center_Deriv[2];                /* Derivatives of center funcs for 0 and 1   */
@@ -104,17 +109,19 @@ struct Sphere_Sweep_Segment_Struct
     Vector3d      Center_Coef[SPH_SWP_MAX_COEFS]; /* Coefs of center polynomial    */
     DBL           Radius_Coef[SPH_SWP_MAX_COEFS]; /* Coefs of radius polynomial    */
 };
+using SPHSWEEP_SEG = Sphere_Sweep_Segment_Struct; ///< @deprecated
 
 // Temporary storage for intersection values
-struct Sphere_Sweep_Intersection_Structure
+struct Sphere_Sweep_Intersection_Structure final
 {
     DBL         t;          // Distance along ray
     Vector3d    Point;      // Intersection point
     Vector3d    Normal;     // Normal at intersection point
 };
+using SPHSWEEP_INT = Sphere_Sweep_Intersection_Structure; ///< @deprecated
 
 /* The complete object */
-class SphereSweep : public ObjectBase
+class SphereSweep final : public ObjectBase
 {
     public:
         int             Interpolation;
@@ -127,18 +134,18 @@ class SphereSweep : public ObjectBase
         DBL             Depth_Tolerance;        /* Preferred depth tolerance     */
 
         SphereSweep();
-        virtual ~SphereSweep();
+        virtual ~SphereSweep() override;
 
-        virtual ObjectPtr Copy();
+        virtual ObjectPtr Copy() override;
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-        virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
-        virtual void Translate(const Vector3d&, const TRANSFORM *);
-        virtual void Rotate(const Vector3d&, const TRANSFORM *);
-        virtual void Scale(const Vector3d&, const TRANSFORM *);
-        virtual void Transform(const TRANSFORM *);
-        virtual void Compute_BBox();
+        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) override;
+        virtual bool Inside(const Vector3d&, TraceThreadData *) const override;
+        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const override;
+        virtual void Translate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Rotate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Scale(const Vector3d&, const TRANSFORM *) override;
+        virtual void Transform(const TRANSFORM *) override;
+        virtual void Compute_BBox() override;
 
         void Compute();
     protected:
@@ -155,7 +162,7 @@ class SphereSweep : public ObjectBase
         ///     (if any), even in the case of a "glancing blow", and with surface normals oriented
         ///     away from the spline "backbone".
         ///
-        static int Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segment, SPHSWEEP_INT *Isect, TraceThreadData *Thread);
+        static int Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segment, SPHSWEEP_INT *Isect, RenderStatistics& stats);
 
         /// Eliminate interior surfaces.
         ///
@@ -169,7 +176,7 @@ class SphereSweep : public ObjectBase
         static int Find_Valid_Points(SPHSWEEP_INT *Inter, int Num_Inter, const BasicRay &ray);
 
         static int Comp_Isects(const void *Intersection_1, const void *Intersection_2);
-        static int bezier_01(int degree, const DBL* Coef, DBL* Roots, bool sturm, DBL tolerance, TraceThreadData *Thread);
+        static int bezier_01(int degree, const DBL* Coef, DBL* Roots, bool sturm, DBL tolerance, RenderStatistics& stats);
 };
 
 /// @}
@@ -177,5 +184,6 @@ class SphereSweep : public ObjectBase
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_SPHERESWEEP_H

@@ -1,0 +1,30 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Refraction</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov287.htm">Empty and Solid Objects</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov289.htm">Attenuation</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc414199116"><A NAME="_Toc429993633">Refraction</A></A></H3>
+<P>When light passes through a surface either into or out of a dense medium the path of the ray of light is bent. Such bending is called <I>refraction</I>.  The amount of bending or refracting of light depends upon the density of the material. Air, water, crystal and diamonds all have different densities and thus refract differently. The <I>index of refraction</I> or <I>ior</I> value is used by scientists to describe the relative density of substances. The <b><code>ior</code></b> keyword is used in POV-Ray in the <b><code>interior</code></b> to turn on refraction and to specify the ior value. For example:</P>
+<PRE>  object{ MyObject pigment{Clear} interior{ior 1.5}}</PRE>
+<P>The default ior value of 1.0 will give no refraction. The index of refraction for air is 1.0, water is 1.33, glass is 1.5 and diamond is 2.4. </P>
+<P>Normally transparent or semi-transparent surfaces in POV-Ray do not refract light. Earlier versions of POV-Ray required you to use the <b><code>refraction</code></b> keyword in the <b><code>finish</code></b> statement to turn on refraction.  This is no longer necessary.  Any non-zero <b><code>ior</code></b> value now turns refraction on.</P>
+<P>In addition to turning refraction on or off, the old <b><code>refraction</code></b> keyword was followed by a float value from 0.0 to 1.0.  Values in between 0.0 and 1.0 would darken the refracted light in ways that do not correspond to any physical property. Many POV-Ray scenes were created with intermediate refraction values before this bug was discovered so the feature has been maintained. A more appropriate way to reduce the brightness of refracted light is to change the <b><code>filter</code></b> or <b><code>transmit</code></b> value in the colors specified in the pigment statement or to use the <b><code>fade_power</code></b> and <b><code>fade_distance</code></b> keywords.  See "<A HREF="pov289.htm#_Ref417128162">Attenuation</A>". Note also that neither the <b><code>ior</code></b> nor <b><code>refraction</code></b> keywords cause the object to be transparent. Transparency only occurs if there is a non-zero <b><code>filter</code></b> or <b><code>transmit</code></b> value in the color.</P>
+<P>The <b><code>refraction</code></b> and <b><code>ior</code></b> keywords were original specified in <b><code>finish</code></b> but are now properly specified in <b><code>interior</code></b>.  They are accepted in <b><code>finish</code></b> for backward compatibility and generate a warning message.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov287.htm">Empty and Solid Objects</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov289.htm">Attenuation</A>
+</P>
+</BODY>
+</HTML>
+

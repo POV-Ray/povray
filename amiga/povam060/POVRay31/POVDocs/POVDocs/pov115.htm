@@ -1,0 +1,62 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - The Clock Variable: Key To It All</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov114.htm">Animation</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov116.htm">Clock Dependant Variables And Multi-Stage Animations</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198936"><A NAME="_Toc429993445">The Clock Variable: Key To It All</A></A></H4>
+<P>POV-Ray supports an automatically declared floating point variable identified as <b><code>clock</code></b> (all lower case). This is the key to making image files that can be automated. In command line operations, the clock variable is set using the <b><code>+k</code></b> switch. For example, <b><code>+k3.4</code></b> from the command line would set the value of clock to 3.4. The same could be accomplished from the INI file using <b><code>Clock=3.4</code></b> in an INI file.</P>
+<P>If we don't set clock for anything, and the animation loop is not used (as will be described a little later) the clock variable is still there - it's just set for the default value of 0.0, so it is possible to set up some POV code for the purpose of animation, and still render it as a still picture during the object/world creation stage of our project.</P>
+<P>The simplest example of using this to our advantage would be having an object which is travelling at a constant rate, say, along the x-axis. We would have the statement</P>
+<PRE>  translate &lt;clock, 0, 0&gt;</PRE>
+<P>in our object's declaration, and then have the animation loop assign progressively higher values to clock. And that's fine, as long as only one element or aspect of our scene is changing, but what happens when we want to control multiple changes in the same scene simultaneously?</P>
+<P>The secret here is to use normalized clock values, and then make other variables in your scene proportional to clock. That is, when we set up our clock, (we're getting to that, patience!) have it run from 0.0 to 1.0, and then use that as a multiplier to some other values. That way, the other values can be whatever we need them to be, and clock can be the same 0 to 1 value for every application. Let's look at a (relatively) simple example</P>
+<PRE>  #include "colors.inc"
+  camera {
+    location &lt;0, 3, -6&gt;
+    look_at &lt;0, 0, 0&gt;
+  }
+  light_source { &lt;20, 20, -20&gt; color White }
+  plane { y, 0
+    pigment { checker color White color Black }
+  }
+  sphere { &lt;0, 0, 0&gt; , 1
+    pigment {
+      gradient x
+      color_map {
+        [0.0 Blue  ]
+        [0.5 Blue  ]
+        [0.5 White ]
+        [1.0 White ]
+      }
+      scale .25
+    }
+    rotate &lt;0, 0, -clock*360&gt;
+    translate &lt;-pi, 1, 0&gt;
+    translate &lt;2*pi*clock, 0, 0&gt;
+  }</PRE>
+<P>Assuming that a series of frames is run with the clock progressively going from 0.0 to 1.0, the above code will produce a striped ball which rolls from left to right across the screen. We have two goals here:</P>
+
+<P>1.  Translate the ball from point A to point B, and,</P><dir>
+2.  Rotate the ball in exactly the right proportion to its linear movement to imply that it is rolling -- not gliding -- to its final position.</P>
+</dir>
+<P>Taking the second goal first, we start with the sphere at the origin, because anywhere else and rotation will cause it to orbit the origin instead of rotating. Throughout the course of the animation, the ball will turn one complete 360 degree turn. Therefore, we used the formula, <b><code>360*clock</code></b> to determine the rotation in each frame. Since clock runs 0 to 1, the rotation of the sphere runs from 0 degrees through 360.</P>
+<P>Then we used the first translation to put the sphere at its initial starting point. Remember, we couldn't have just declared it there, or it would have orbited the origin, so before we can meet our other goal (translation), we have to compensate by putting the sphere back where it would have been at the start. After that, we re-translate the sphere by a clock relative distance, causing it to move relative to the starting point. We've chosen the formula of 2*pi* r*clock (the widest circumference of the sphere times current clock value) so that it will appear to move a distance equal to the circumference of the sphere in the same time that it rotates a complete 360 degrees. In this way, we've synchronized the rotation of the sphere to its translation, making it appear to be smoothly rolling along the plane.</P>
+<P>Besides allowing us to coordinate multiple aspects of change over time more cleanly, mathematically speaking, the other good reason for using normalized clock values is that it will not matter whether we are doing a ten frame animated GIF, or a three hundred frame AVI. Values of the clock are proportioned to the number of frames, so that same POV code will work without regard to how long the frame sequence is. Our rolling ball will still travel the exact same amount no matter how many frames our animation ends up with.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov114.htm">Animation</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov116.htm">Clock Dependant Variables And Multi-Stage Animations</A>
+</P>
+</BODY>
+</HTML>
+

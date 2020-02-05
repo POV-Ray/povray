@@ -1,0 +1,33 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Creating a Filtering Fog</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov104.htm">Setting a Minimum Translucency</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov106.htm">Adding Some Turbulence to the Fog</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198925"><A NAME="_Toc429993435">Creating a Filtering Fog</A></A></H4>
+<P>The greenish fog we have used so far doesn't filter the light passing through it. All it does is to diminish the light's intensity. We can change this by using a non-zero filter channel in the fog's color (<CODE>fog3.pov</CODE>).</P>
+<PRE>  fog {
+    distance 150
+    color rgbf&lt;0.3, 0.5, 0.2, 1.0&gt;
+  }</PRE>
+<P>The filter value determines the amount of light that is filtered by the fog. In our example 100% of the light passing through the fog will be filtered by the fog. If we had used a value of 0.7 only 70% of the light would have been filtered. The remaining 30% would have passed unfiltered.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image225.jpg" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">A filtering fog.</P>
+</B><P>You'll notice that the intensity of the objects in the fog is not only diminished due to the fog's color but that the colors are actually influenced by the fog. The red and especially the blue sphere got a green hue.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov104.htm">Setting a Minimum Translucency</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov106.htm">Adding Some Turbulence to the Fog</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,84 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Float Expressions</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov159.htm">Comments</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov161.htm">Float Literals</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405169"><A NAME="_Toc411405445"><A NAME="_Ref412720567"><A NAME="_Toc414198994"><A NAME="_Toc429993503">Float Expressions</A></A></A></A></A></H3>
+<P>Many parts of the POV-Ray language require you to specify one or more floating point numbers. A floating point number is a number with a decimal point. Floats may be specified using literals, identifiers or functions which return float values. You may also create very complex float expressions from combinations of any of these using various familiar operators.</P>
+<P>Where POV-Ray needs an integer value it allows you to specify a float value and it truncates it to an integer. When POV-Ray needs a logical or boolean value it interprets any non-zero float as true and zero as false. Because float comparisons are subject to rounding errors POV-Ray accepts values extremely close to zero as being false when doing boolean functions. Typically values whose absolute values are less than a preset value <I>epsilon</I> are considered false for logical expressions. The value of <I>epsilon </I>is system dependent but is generally about 1.0e-10. Two floats <I>a</I> and <I>b</I> are considered to be equal if <I>abs(a-b) &lt; epsilon.</P>
+</I><P>The full syntax for float expressions is given below.  Detailed explanations are given in the following sub-sections.</P>
+<I><DL>
+<DT>FLOAT:</DT>
+<DD>NUMERIC_TERM  [SIGN  NUMERIC_TERM]</DD>
+<DT>SIGN:</DT>
+</I><b><code><DD>+</code></b>    |    <b><code>-</DD>
+</code></b><I><DT>NUMERIC_TERM:</DT>
+<DD>NUMERIC_FACTOR  [MULT  NUMERIC_FACTOR]</DD>
+<DT>MULT:</DT>
+</I><b><code><DD>*</code></b>    |    <b><code>/</DD>
+</code></b><I><DT>NUMERIC_FACTOR:</DT>
+<DD>FLOAT_LITERAL</I>&#9;&#9;|</DD>
+<I><DD>FLOAT_IDENTIFIER</I>&#9;&#9;|</DD>
+<I><DD>SIGN  NUMERIC_FACTOR</I>&#9;|</DD>
+<I><DD>FLOAT_FUNCTION</I>&#9;&#9;|</DD>
+<I><DD>FLOAT_BUILT-IN_IDENT</I>&#9;|</DD>
+<b><code><DD>(</code></b> <I>FULL_EXPRESSION</I> <b><code>)</code></b>&#9;|</DD>
+<b><code><DD>!</code></b>  <I>NUMERIC_FACTOR</I>&#9;|</DD>
+<I><DD>VECTOR DECIMAL_POINT DOT_ITEM</DD>
+<DD></DD>
+<DT>FLOAT_LITERAL:</DT>
+<DD>[DIGIT...] [DECIMAL_POINT] DIGIT... [EXP [SIGN] DIGIT...]</DD>
+<DT>DIGIT:</DT>
+</I><b><code><DD>0</code></b>   |   <b><code>1</code></b>   |   <b><code>2</code></b>   |   <b><code>3</code></b>   |   <b><code>4</code></b>   |   <b><code>5</code></b>   |   <b><code>6</code></b>   |   <b><code>7</code></b>   |   <b><code>8</code></b>   |   <b><code>9</DD>
+</code></b><I><DT>DECIMAL_POINT:</DT>
+</I><b><code><DD>.</DD>
+</code></b><I><DT>EXP:</DT>
+</I><b><code><DD>e</code></b>   |   <b><code>E</DD>
+</code></b><I><DT>DOT_ITEM:</DT>
+</I><b><code><DD>x</code></b>   |   <b><code>y</code></b>   |   <b><code>z</code></b>   |   <b><code>t</code></b>   |   <b><code>u</code></b>   |   <b><code>v</code></b>   |   <b><code>red</code></b>   |   <b><code>blue</code></b>   |   <b><code>green</code></b>   |   <b><code>filter</code></b>   |   <b><code>transmit</DD>
+</code></b><I><DT>FLOAT_FUNCTION:</DT>
+</I><b><code><DD>abs(</code></b><I> FLOAT </I><b><code>)</code></b>   |   <b><code>acos(</code></b><I> FLOAT </I><b><code>)</code></b>   |   <b><code>val(</code></b><I> STRING </I><b><code>)</code></b>   |   <b><code>asc(</code></b><I> STRING </I><b><code>)</code></b>   |</DD>
+<b><code><DD>asin(</code></b><I> FLOAT </I><b><code>)</code></b>   |   <b><code>atan2(</code></b><I> FLOAT </I><b><code>,</code></b><I> FLOAT </I><b><code>)</code></b>   |   <b><code>ceil(</code></b><I> FLOAT </I><b><code>)</code></b>   |   <b><code>cos(</code></b><I> FLOAT </I><b><code>)</code></b>   |</DD>
+<b><code><DD>defined(</code></b><I>IDENTIFIER </I><b><code>)</code></b>   |   <b><code>degrees(</code></b><I> FLOAT </I><b><code>)</code></b>   |   <b><code>div(</code></b><I> FLOAT </I><b><code>,</code></b><I> FLOAT </I><b><code>)</code></b>   |   <b><code>exp(</code></b><I> FLOAT </I><b><code>)</code></b>   |</DD>
+<b><code><DD>file_exists(</code></b><I> STRING </I><b><code>)</code></b>   |   <b><code>floor(</code></b><I> FLOAT </I><b><code>)</code></b>   |   <b><code>int(</code></b><I> FLOAT </I><b><code>)</code></b>   |   <b><code>log(</code></b><I> FLOAT </I><b><code>)</code></b>   |</DD>
+<b><code><DD>max(</code></b><I> FLOAT </I><b><code>,</code></b><I> FLOAT </I><b><code>)</code></b>   |   <b><code>min(</code></b><I> FLOAT </I><b><code>,</code></b><I> FLOAT </I><b><code>)</code></b>   |   <b><code>mod(</code></b><I> FLOAT </I><b><code>,</code></b><I> FLOAT </I><b><code>)</code></b>   |</DD>
+<b><code><DD>pow(</code></b><I> FLOAT </I><b><code>,</code></b><I> FLOAT </I><b><code>)</code></b>   |   <b><code>radians(</code></b><I> FLOAT </I><b><code>)</code></b>   |   <b><code>sin(</code></b><I> FLOAT </I><b><code>)</code></b>   |   <b><code>sqrt(</code></b><I> FLOAT </I><b><code>)</code></b>   |</DD>
+<b><code><DD>strcmp(</code></b><I> STRING </I><b><code>,</code></b><I> STRING </I><b><code>)</code></b>   |   <b><code>strlen(</code></b><I> STRING </I><b><code>)</code></b>   |   <b><code>tan(</code></b><I> FLOAT </I><b><code>)</code></b>   |</DD>
+<b><code><DD>vdot(</code></b><I> VECTOR </I><b><code>,</code></b><I> VECTOR </I><b><code>)</code></b>   |   <b><code>vlength(</code></b><I> VECTOR </I><b><code>)</code></b>   |   <b><code>seed(</code></b><I> FLOAT </I><b><code>)</code></b>   |   <b><code>rand(</code></b><I> FLOAT </I><b><code>)</code></b>   |</DD>
+<b><code><DD>dimensions(</code></b><I> ARRAY_IDENTIFIER </I><b><code>)</code></b>   |   <b><code>dimension_size(</code></b><I> ARRAY_IDENTIFIER </I><b><code>,</code></b><I> FLOAT </I><b><code>)</DD>
+</code></b><I><DT>FLOAT_BUILT-IN_IDENT:</DT>
+</I><b><code><DD>clock</code></b>   |   <b><code>pi</code></b>   |   <b><code>version</code></b>   |   <b><code>true</code></b>   |   <b><code>yes</code></b>   |   <b><code>on</code></b>   |   <b><code>false</code></b>   |   <b><code>no</code></b>   |</DD>
+<b><code><DD>off</code></b>   |   <b><code>clock_delta</DD>
+</code></b><I><DT>FULL_EXPRESSION:</DT>
+<DD>LOGICAL_EXPRESSION  [</I><b><code>?</code></b> <I>FULL_EXPRESSION </I><b><code>:</code></b><I> FULL_EXPRESSION]</DD>
+<DT>LOGICAL_EXPRESSION:</DT>
+<DD>REL_TERM  [LOGICAL_OPERATOR  REL_TERM]</DD>
+<DT>LOGICAL_OPERATOR:</DT>
+</I><b><code><DD>&amp;</code></b>   |   <b><code>|</code></b>        <I>(note this means an ampersand or a vertical bar is a logical operator)</DD>
+<DT>REL_TERM:</DT>
+<DD>FLOAT  [REL_OPERATOR  FLOAT]</DD>
+<DT>REL_OPERATOR:</DT>
+</I><b><code><DD>&lt;</code></b>   |   <b><code>&lt;=</code></b>   |   <b><code>=</code></b>   |   <b><code>&gt;=</code></b>   |   <b><code>&gt;</code></b>   |   <b><code>!=</DD>
+</code></b><I><DT>INT:</DT>
+<DD>FLOAT</I>&#9;<I>(note any syntax which requires a integer INT will accept a FLOAT and it will be truncated</DD>
+</I><DD>  to an integer internally by POV-Ray).</DD>
+</DL>
+<P>Note: <I>FLOAT_IDENTIFIERS</I> are identifiers previously declared to have float values.  The <I>DOT_ITEM</I> syntax is actually a vector or color operator but it returns a float value.  See "<A HREF="pov170.htm#_Ref412721497">Vector Operators</A>" or "<A HREF="pov178.htm#_Ref412722038">Color Operators</A>" for details.  An <I>ARRAY_IDENTIFIER</I> is just the identifier name of a previously declared array, it does not include the <b><code>[]</code></b> braces nor the index.  The syntax for <I>STRING</I> is in the section "<A HREF="pov180.htm#_Ref413065577">Strings</A>".</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov159.htm">Comments</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov161.htm">Float Literals</A>
+</P>
+</BODY>
+</HTML>
+

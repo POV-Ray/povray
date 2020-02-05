@@ -1,0 +1,42 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - The #if...#else...#end Directives</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov201.htm">Conditional Directives</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov203.htm">The #ifdef and #ifndef Directives</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199035"><A NAME="_Toc429993545">The #if...#else...#end Directives</A></A></H4>
+<P>The simplest conditional directive is a traditional <b><code>#if</code></b> directive. It is of the form...</P>
+<I><DL>
+<DT>IF_DIRECTIVE:</DT>
+</I><b><code><DD>#if (</code></b><I> Cond </I><b><code>) </code></b><I>TOKENS...  [</I><b><code>#else</code></b> <I>TOKENS...] </I><b><code>#end</DD>
+</DL>
+</code></b><P>The <I>TOKENS </I>are any number of POV-Ray keyword, identifiers, or punctuation and <b><code>(</code></b><I> Cond </I><b><code>)</code></b> is a float expression that is interpreted as a boolean value. The parentheses are required.  The <b><code>#end</code></b> directive is required.  A value of 0.0 is false and any non-zero value is true. Note that extremely small values of about 1e-10 are considered zero in case of round off errors. If <I>Cond </I>is true, the first group of tokens is parsed normally and the second set is skipped.  If false, the first set is skipped and the second set is parsed.  For example:</P>
+<PRE> #declare Which=1;
+ #if (Which)
+   box{0,1}
+ #else
+   sphere{0,1}
+ #end</PRE>
+<P>The box is parsed and the sphere is skipped.  Changing the value of <b><code>Which</code></b> to <b><code>0</code></b> means the box is skipped and the sphere is used.  The <b><code>#else</code></b> directive and second token group is optional. For example:</P>
+<PRE> #declare Which=1;
+ #if (Which)
+   box{0,1}
+ #end</PRE>
+<P>Changing the value of <b><code>Which</code></b> to <b><code>0</code></b> means the box is removed.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov201.htm">Conditional Directives</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov203.htm">The #ifdef and #ifndef Directives</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,121 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Console Text Output</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov146.htm">Text Streams</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov148.htm">Directing Text Streams to Files</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198981"><A NAME="_Toc429993490">Console Text Output</A></A></H4>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=494>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>Debug_Console=</code></b><I>bool</I></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Turn console display of debug info text on/off</TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>+GD</code></b></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Same as <b><code>Debug_Console=On</code></b></TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>-GD</code></b></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Same as <b><code>Debug_Console=Off</code></b></TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>Fatal_Console=</code></b><I>bool</I></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Turn console display of fatal error text on/off</TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>+GF</code></b></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Same as <b><code>Fatal_Console=On</code></b></TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>-GF</code></b></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Same as <b><code>Fatal_Console=Off</code></b></TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>Render_Console=</code></b><I>bool</I></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Turn console display of render info text on/off</TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>+GR</code></b></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Same as <b><code>Render_Console=On</code></b></TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>-GR</code></b></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Same as <b><code>Render_Console=Off</code></b></TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>Statistic_Console=</code></b><I>bool</I></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Turn console display of statistic text on/off</TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>+GS</code></b></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Same as <b><code>Statistic_Console=On</code></b></TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>-GS</code></b></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Same as <b><code>Statistic_Console=Off</code></b></TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>Warning_Console=</code></b><I>bool</I></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Turn console display of warning text on/off</TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>+GW</code></b></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Same as <b><code>Warning_Console=On</code></b></TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>-GW</code></b></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Same as <b><code>Warning_Console=Off</code></b></TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>All_Console=</code></b><I>bool</I></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+Turn on/off all debug, fatal, render, statistic and warning text to console.
+</TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>+GA</code></b></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Same as <b><code>All_Console=On</code></b></TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>-GA</code></b></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Same as <b><code>All_Console=Off</code></b></TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>You may suppress the output to the console of the debug, fatal, render, statistic or warning text streams. For example the <b><code>Statistic_Console=off</code></b> option or the <b><code>-GS</code></b> switch can turn off the statistic stream. Using <b><code>on</code></b> or <b><code>+GS</code></b> you may turn it on again. You may also turn all five of these streams on or off at once using the <b><code>All_Console</code></b> option or <b><code>+GA</code></b> switch.</P>
+<P>Note that these options take effect immediately when specified. Obviously any error or warning messages that might occur before the option is read are not be affected.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov146.htm">Text Streams</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov148.htm">Directing Text Streams to Files</A>
+</P>
+</BODY>
+</HTML>
+

@@ -12,7 +12,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -43,6 +43,16 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <memory>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/coretypes.h"
 #include "core/scene/object.h"
 
@@ -72,18 +82,15 @@ namespace pov
 * Global typedefs
 ******************************************************************************/
 
-typedef struct PrecompParValues_Struct PRECOMP_PAR_DATA;
-
-struct PrecompParValues_Struct
+struct PrecompParValues_Struct final
 {
     int use, depth;
     char flags;
     DBL *Low[3], *Hi[3];     /*  X,Y,Z  */
 };
+using PRECOMP_PAR_DATA = PrecompParValues_Struct; ///< @deprecated
 
-class FPUContext;
-
-class Parametric : public NonsolidObject
+class Parametric final : public NonsolidObject
 {
     public:
 
@@ -92,22 +99,22 @@ class Parametric : public NonsolidObject
         DBL accuracy;
         DBL max_gradient;
 
-        shared_ptr<ContainedByShape> container;
+        std::shared_ptr<ContainedByShape> container;
 
         Parametric();
-        virtual ~Parametric();
+        virtual ~Parametric() override;
 
-        virtual ObjectPtr Copy();
+        virtual ObjectPtr Copy() override;
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-        virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
-        virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
-        virtual void Translate(const Vector3d&, const TRANSFORM *);
-        virtual void Rotate(const Vector3d&, const TRANSFORM *);
-        virtual void Scale(const Vector3d&, const TRANSFORM *);
-        virtual void Transform(const TRANSFORM *);
-        virtual void Compute_BBox();
+        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) override;
+        virtual bool Inside(const Vector3d&, TraceThreadData *) const override;
+        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const override;
+        virtual void UVCoord(Vector2d&, const Intersection *) const override;
+        virtual void Translate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Rotate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Scale(const Vector3d&, const TRANSFORM *) override;
+        virtual void Transform(const TRANSFORM *) override;
+        virtual void Compute_BBox() override;
 
         void Precompute_Parametric_Values(char flags, int depth, TraceThreadData *Thread);
     protected:
@@ -127,5 +134,6 @@ class Parametric : public NonsolidObject
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_PARAMETRIC_H

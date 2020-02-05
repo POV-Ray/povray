@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,10 +36,19 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/sphere.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -458,7 +467,7 @@ void Sphere::Rotate(const Vector3d&, const TRANSFORM *tr)
     }
     else
     {
-        if (Trans == NULL)
+        if (Trans == nullptr)
             Trans = Create_Transform();
         Compose_Transforms(Trans, tr);
 
@@ -608,48 +617,6 @@ void Sphere::Transform(const TRANSFORM *tr)
 *
 * FUNCTION
 *
-*   Destroy_Sphere
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   ?
-*
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-Sphere::~Sphere()
-{
-#if(DUMP_OBJECT_DATA == 1)
-    Debug_Info("{ // SPHERE \n");
-    DUMP_OBJECT_FIELDS(this);
-    Debug_Info("\t{ %f, %f, %f }, // Center\n", \
-               (DBL)Center[X],  \
-               (DBL)Center[Y],  \
-               (DBL)Center[Z]); \
-    Debug_Info("\t%f // Radius\n", (DBL)Radius);
-    Debug_Info("}\n");
-#endif
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
 *   Compute_Sphere_BBox
 *
 * INPUT
@@ -718,7 +685,7 @@ void Sphere::Compute_BBox()
 *
 ******************************************************************************/
 
-void Sphere::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
+void Sphere::UVCoord(Vector2d& Result, const Intersection *Inter) const
 {
     DBL len, phi, theta;
     DBL x,y,z;
@@ -732,7 +699,7 @@ void Sphere::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadDat
     else
     {
         New_Point = Inter->IPoint - Center;
-        if (Trans != NULL)
+        if (Trans != nullptr)
             MInvTransPoint(New_Point, New_Point, Trans);
     }
     x = New_Point[X];
@@ -789,3 +756,4 @@ bool Sphere::Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector
 }
 
 }
+// end of namespace pov

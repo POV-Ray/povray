@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,16 +36,24 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/display.h"
 
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
+
+// POV-Ray header files (base module)
+// POV-Ray header files (POVMS module)
+// POV-Ray header files (frontend module)
+//  (none at the moment)
+
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov_frontend
 {
 
-Display::Display(unsigned int w, unsigned int h, pov_base::GammaCurvePtr g) :
+Display::Display(unsigned int w, unsigned int h) :
     width(w),
-    height(h),
-    gamma(g)
+    height(h)
 {
     // nothing to do
 }
@@ -63,11 +71,6 @@ unsigned int Display::GetWidth()
 unsigned int Display::GetHeight()
 {
     return height;
-}
-
-pov_base::GammaCurvePtr Display::GetGamma()
-{
-    return pov_base::GammaCurvePtr(gamma);
 }
 
 void Display::DrawRectangleFrame(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8& colour)
@@ -111,3 +114,4 @@ void Display::Clear()
 }
 
 }
+// end of namespace pov_frontend

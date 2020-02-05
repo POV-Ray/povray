@@ -1,0 +1,83 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Internal Animation Loop</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov127.htm">External Animation Loop</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov129.htm">Subsets of Animation Frames</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198949"><A NAME="_Toc429993458">Internal Animation Loop</A></A></H4>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=441>
+<TR><TD WIDTH="35%" VALIGN="TOP">
+<p><b><code>Initial_Frame=</code></b><I>n</I></TD>
+<TD WIDTH="65%" VALIGN="TOP">
+<P>Sets initial frame number to <I>n</I></TD>
+</TR>
+<TR><TD WIDTH="35%" VALIGN="TOP">
+<p><b><code>Final_Frame=</code></b><I>n</I></TD>
+<TD WIDTH="65%" VALIGN="TOP">
+<P>Sets final frame number to <I>n</I></TD>
+</TR>
+<TR><TD WIDTH="35%" VALIGN="TOP">
+<p><b><code>Initial_Clock=</code></b><I>n.n</I></TD>
+<TD WIDTH="65%" VALIGN="TOP">
+<P>Sets initial clock value to <I>n.n</I></TD>
+</TR>
+<TR><TD WIDTH="35%" VALIGN="TOP">
+<p><b><code>Final_Clock=</code></b><I>n.n</I></TD>
+<TD WIDTH="65%" VALIGN="TOP">
+<P>Sets final clock value to <I>n.n</I></TD>
+</TR>
+<TR><TD WIDTH="35%" VALIGN="TOP">
+<p><b><code>+KFI</code></b><I>n</I></TD>
+<TD WIDTH="65%" VALIGN="TOP">
+<P>Same as <b><code>Initial_Frame=</code></b><I>n</I></TD>
+</TR>
+<TR><TD WIDTH="35%" VALIGN="TOP">
+<p><b><code>+KFF</code></b><I>n</I></TD>
+<TD WIDTH="65%" VALIGN="TOP">
+<P>Same as <b><code>Final_Frame=</code></b><I>n</I></TD>
+</TR>
+<TR><TD WIDTH="35%" VALIGN="TOP">
+<p><b><code>+KI</code></b><I>n.n</I></TD>
+<TD WIDTH="65%" VALIGN="TOP">
+<P>Same as <b><code>Initial_Clock=</code></b><I>n.n</I></TD>
+</TR>
+<TR><TD WIDTH="35%" VALIGN="TOP">
+<p><b><code>+KF</code></b><I>n.n</I></TD>
+<TD WIDTH="65%" VALIGN="TOP">
+<P>Same as <b><code>Final_Clock=</code></b><I>n.n</I></TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>The internal animation loop new to POV-Ray 3.0 relieves the user of the task of generating complicated sets of batch files to invoke POV-Ray multiple times with different settings. While the multitude of options may look intimidating, the clever set of default values means that you will probably only need to specify the <b><code>Final_Frame</code></b>=<I>n </I>or the <b><code>+KFF</code></b><I>n</I> option to specify the number of frames. All other values may remain at their defaults.</P>
+<P>Any <b><code>Final_Frame</code></b> setting other than -1 will trigger POV-Ray's internal animation loop. For example <b><code>Final_Frame=10</code></b> or <b><code>+KFF10</code></b> causes POV-Ray to render your scene 10 times. If you specified <b><code>Output_File_Name=file.tga</code></b> then each frame would be output as <CODE>file01.tga</CODE>, <CODE>file02.tga</CODE>, <CODE>file03.tga</CODE> etc. The number of zero-padded digits in the file name depends upon the final frame number. For example <b><code>+KFF100</code></b> would generate <CODE>file001.tga</CODE> through <CODE>file100.tga</CODE>. The frame number may encroach upon the file name. On MS-DOS with an eight character limit, <CODE>myscene.pov</CODE> would render to <CODE>mysce001.tga</CODE> through <CODE>mysce100.tga</CODE>.</P>
+<P>The default <b><code>Initial_Frame=1</code></b> will probably never have to be changed. You would only change it if you were assembling a long animation sequence in pieces. One scene might run from frame 1 to 50 and the next from 51 to 100. The <b><code>Initial_Frame</code></b>=<I>n </I>or <b><code>+KFI</code></b><I>n</I> option is for this purpose.</P>
+<P>Note that if you wish to render a subset of frames such as 30 through 40 out of a 1 to 100 animation, you should not change <b><code>Frame_Initial</code></b> or <b><code>Frame_Final</code></b>. Instead you should use the subset commands described in section "<A HREF="pov129.htm#_Ref412119618">Subsets of Animation Frames</A>".</P>
+<P>Unlike some animation packages, the action in POV-Ray animated scenes does not depend upon the integer frame numbers. Rather you should design your scenes based upon the float identifier <b><code>clock</code></b>. By default, the clock value is 0.0 for the initial frame and 1.0 for the final frame. All other frames are interpolated between these values. For example if your object is supposed to rotate one full turn over the course of the animation, you could specify <b><code>rotate 360*clock*y</code></b>. Then as clock runs from 0.0 to 1.0, the object rotates about the y-axis from 0 to 360 degrees.</P>
+<P>The major advantage of this system is that you can render a 10 frame animation or a 100 frame or 500 frame or 329 frame animation yet you still get one full 360 degree rotation. Test renders of a few frames work exactly like final renders of many frames.</P>
+<P>In effect you define the motion over a continuous float valued parameter (the clock) and you take discrete samples at some fixed intervals (the frames). If you take a movie or video tape of a real scene it works the same way. An object's actual motion depends only on time.  It does not depend on the frame rate of your camera.</P>
+<P>Many users have already created scenes for POV-Ray 2 that expect clock values over a range other than the default 0.0 to 1.0. For this reason we provide the <b><code>Initial_Clock</code></b>=<I>n.n</I> or <b><code>+KI</code></b><I>n.n</I> and <b><code>Final_Clock</code></b>=<I>n.n</I> or <b><code>+KF</code></b><I>n.n</I> options. For example to run the clock from 25.0 to 75.0 you would specify <b><code>Initial_Clock=25.0</code></b> and <b><code>Final_Clock=75.0</code></b>. Then the clock would be set to 25.0 for the initial frame and 75.0 for the final frame. In-between frames would have clock values interpolated from 25.0 through 75.0 proportionally.</P>
+<P>Users who are accustomed to using frame numbers rather than clock values could specify <b><code>Initial_Clock=1.0</code></b> and <b><code>Final_Clock=10.0</code></b> and <b><code>Frame_Final=10</code></b> for a 10 frame animation.</P>
+<P>For new scenes, we recommend you do not change the <b><code>Initial_Clock</code></b> or <b><code>Final_Clock</code></b> from their default 0.0 to 1.0 values. If you want the clock to vary over a different range than the default 0.0 to 1.0, we recommend you handle this inside your scene file as follows...</P>
+<PRE>  #declare Start    = 25.0;
+  #declare End      = 75.0;
+  #declare My_Clock = Start+(End-Start)*clock;</PRE>
+<P>Then use <b><code>My_Clock</code></b> in the scene description. This keeps the critical values 25.0 and 75.0 in your .pov file.</P>
+<P>Note that more details concerning the inner workings of the animation loop are in the section on shell-out operating system commands in section "<A HREF="pov141.htm#_Ref412212281">Shell-out to Operating System</A>".</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov127.htm">External Animation Loop</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov129.htm">Subsets of Animation Frames</A>
+</P>
+</BODY>
+</HTML>
+

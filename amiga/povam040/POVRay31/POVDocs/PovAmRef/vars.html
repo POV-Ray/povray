@@ -1,0 +1,41 @@
+<html>
+<head><title>ENV Variables</title></head>
+<body>
+<h1>ENV Variables</h1>
+<p>
+POV-Ray will attempt to read the environment variable 'POVINI'.  If found,
+the path&amp;filename in it (IE &quot;povray31:include/povray.ini&quot;) will be used to load
+the default settings before anything else.  If not found, it will attempt
+to load &quot;povray.ini&quot; from the same directory as the binary was executed
+from.  Failing that, it will resort to internal defaults.
+<p>
+If the variable 'POVRAYTASKPRI' is found, it's integer content is used
+to set the task priority for the POV-Ray renderer.  USE WITH CAUTION.
+If the priority is set much above zero, your system will slow tremendously,
+or even appear to lock up, and you may experience communication problems
+with the GUI if it is in use.  The GUI will also read 'POVRAYTASKPRI',
+and set it's own priority to ONE HIGHER than that specified for POV-Ray.
+<p>
+If using the GUI, the ENV variable POVGUIINI is checked for the location
+and name of the settings file being passed from the GUI.  If either the
+file specified or the variable are not located, &quot;t:povray.ini&quot; is used.
+<p>
+Also with the GUI, the ENV variable POVHELP is checked for the path and
+name of the main pov-ray .guide file (NOT the one you are reading!) to
+enable 'HELP' button links from the GUI to the guide.
+<BR>**** Not enabled, since documents are HTML ****
+<p>
+If using OS3 display, the ENV variable 'POVRENDERSCREEEN' will be read, 
+and if found, it's contents used as the name for a public screen on which 
+to open the display preview.
+<BR>**OS3 display is not yet implemented**
+<P>
+With Picasso96 display, if 'POVRENDERSCREEN' is found, POV-Ray will attempt to
+open a Picasso96 PIP window on the named screen.  If the screen is not available,
+it will fallback to the default pubscreen.  If that fails (which it should not)
+then it continues with the normal Picasso96 full-screen display opening, which 
+will probably also fail, since the most likely reason for a PIP opening to fail
+on the default screen is from low memory.
+
+</body>
+</html>

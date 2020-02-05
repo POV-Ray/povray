@@ -4,13 +4,11 @@
 ///
 /// Declarations related to geometric shapes.
 ///
-/// @note   `frame.h` contains other object stuff.
-///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,13 +39,18 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <vector>
+
+// POV-Ray header files (base module)
+#include "base/messenger_fwd.h"
+
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/material/texture.h"
-
-namespace pov_base
-{
-    class GenericMessenger;
-}
 
 namespace pov
 {
@@ -95,7 +98,7 @@ namespace pov
 #define HIERARCHY_FLAG            0x00000400L ///< Object can have a bounding hierarchy.
 #define HOLLOW_FLAG               0x00000800L ///< Object is hollow (atmosphere inside).
 #define HOLLOW_SET_FLAG           0x00001000L ///< Hollow explicitly set in scene file.
-#define UV_FLAG                   0x00002000L ///< Object uses UV mapping.
+#define UV_FLAG                   0x00002000L ///< Object uses UV mapping. Set if `uv_mapping` is specified on an object itself.
 #define DOUBLE_ILLUMINATE_FLAG    0x00004000L ///< Illuminate both sides of the surface.
 #define NO_IMAGE_FLAG             0x00008000L ///< Object doesn't catch camera rays.
 #define NO_REFLECTION_FLAG        0x00010000L ///< Object doesn't catch reflection rays.
@@ -170,13 +173,14 @@ namespace pov
 class ObjectBase
 {
     public:
+
         int Type; // TODO - make obsolete
         TEXTURE *Texture;
         TEXTURE *Interior_Texture;
         InteriorPtr interior;
-        vector<ObjectPtr> Bound;
-        vector<ObjectPtr> Clip;
-        vector<LightSource *> LLights;  ///< Used for light groups.
+        std::vector<ObjectPtr> Bound;
+        std::vector<ObjectPtr> Clip;
+        std::vector<LightSource*> LLights;  ///< Used for light groups.
         BoundingBox BBox;
         TRANSFORM *Trans;
         SNGL Ph_Density;
@@ -191,7 +195,7 @@ class ObjectBase
         /// Construct object from scratch.
         ObjectBase(int t) :
             Type(t),
-            Texture(NULL), Interior_Texture(NULL), interior(), Trans(NULL),
+            Texture(nullptr), Interior_Texture(nullptr), interior(), Trans(nullptr),
             Ph_Density(0), RadiosityImportance(0.0), RadiosityImportanceSet(false), Flags(0)
         {
             Make_BBox(BBox, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
@@ -212,10 +216,10 @@ class ObjectBase
         {
             if (transplant)
             {
-                o.Texture = NULL;
-                o.Interior_Texture = NULL;
+                o.Texture = nullptr;
+                o.Interior_Texture = nullptr;
                 o.interior.reset();
-                o.Trans = NULL;
+                o.Trans = nullptr;
                 o.Bound.clear();
                 o.Clip.clear();
                 o.LLights.clear();
@@ -229,13 +233,13 @@ class ObjectBase
         ///
         /// @return True if object parameters are within reasonable limits.
         ///
-        virtual bool Precompute() { return true; };
+        virtual bool Precompute() { return true; }
 
         virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) = 0; // could be "const", if it wasn't for isosurface max_gradient estimation stuff
         virtual double GetPotential (const Vector3d&, bool subtractThreshold, TraceThreadData *) const;
         virtual bool Inside(const Vector3d&, TraceThreadData *) const = 0;
         virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const = 0;
-        virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
+        virtual void UVCoord(Vector2d&, const Intersection *) const;
         virtual void Translate(const Vector3d&, const TRANSFORM *) = 0;
         virtual void Rotate(const Vector3d&, const TRANSFORM *) = 0;
         virtual void Scale(const Vector3d&, const TRANSFORM *) = 0;
@@ -263,7 +267,22 @@ class ObjectBase
         ///
         virtual void DispatchShutdownMessages(GenericMessenger& messenger) {};
 
+        /// Test texture for opacity.
+        ///
+        /// This method will be called by the parser as part of object post-processing,
+        /// to test whether the object's material is guaranteed to be fully opaque.
+        ///
+        /// The default implementation reports the object as opaque if if has a texture that is
+        /// guaranteed to be opaque (as determined by @ref Test_Opacity()), and it has either no
+        /// explicit interior texture or that texture is also guaranteed to be opaque.
+        ///
+        /// Primitives with innate textures (such as blob or mesh) must override this method, and
+        /// return false if any of their innate textures is potentially non-opaque.
+        ///
+        virtual bool IsOpaque() const;
+
     protected:
+
         explicit ObjectBase(const ObjectBase&) { }
 };
 
@@ -272,7 +291,7 @@ class NonsolidObject : public ObjectBase
 {
     public:
         NonsolidObject(int t) : ObjectBase(t) {}
-        virtual ObjectPtr Invert();
+        virtual ObjectPtr Invert() override;
 };
 
 /// Abstract base class for compound geometric objects.
@@ -284,14 +303,14 @@ class CompoundObject : public ObjectBase
     public:
         CompoundObject(int t) : ObjectBase(t) {}
         CompoundObject(int t, CompoundObject& o, bool transplant) : ObjectBase(t, o, transplant), children(o.children) { if (transplant) o.children.clear(); }
-        vector<ObjectPtr> children;
-        virtual ObjectPtr Invert();
+        std::vector<ObjectPtr> children;
+        virtual ObjectPtr Invert() override;
 };
 
 
 /// Light source.
 /// @ingroup PovCoreLightingLightsource
-class LightSource : public CompoundObject
+class LightSource final : public CompoundObject
 {
     public:
         size_t index;
@@ -316,19 +335,19 @@ class LightSource : public CompoundObject
         bool lightGroupLight : 1;
 
         LightSource();
-        virtual ~LightSource();
+        virtual ~LightSource() override;
 
-        virtual ObjectPtr Copy();
+        virtual ObjectPtr Copy() override;
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-        virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
-        virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
-        virtual void Translate(const Vector3d&, const TRANSFORM *);
-        virtual void Rotate(const Vector3d&, const TRANSFORM *);
-        virtual void Scale(const Vector3d&, const TRANSFORM *);
-        virtual void Transform(const TRANSFORM *);
-        virtual void Compute_BBox() {}
+        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) override;
+        virtual bool Inside(const Vector3d&, TraceThreadData *) const override;
+        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const override;
+        virtual void UVCoord(Vector2d&, const Intersection *) const override;
+        virtual void Translate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Rotate(const Vector3d&, const TRANSFORM *) override;
+        virtual void Scale(const Vector3d&, const TRANSFORM *) override;
+        virtual void Transform(const TRANSFORM *) override;
+        virtual void Compute_BBox() override {}
 };
 
 
@@ -345,49 +364,49 @@ struct ContainedByShape
 };
 
 /// Class used for containing inherently infinite objects (isosurface, parametric) in a box.
-struct ContainedByBox : public ContainedByShape
+struct ContainedByBox final : public ContainedByShape
 {
     Vector3d corner1;
     Vector3d corner2;
 
     ContainedByBox() : corner1(-1,-1,-1), corner2(1,1,1) {}
 
-    virtual void ComputeBBox(BoundingBox& rBox) const;
-    virtual bool Intersect(const Ray& ray, const TRANSFORM* pTrans, DBL& rDepth1, DBL& rDepth2, int& rSide1, int& sSide2) const;
-    virtual bool Inside(const Vector3d& IPoint) const;
-    virtual void Normal(const Vector3d& IPoint, const TRANSFORM* pTrans, int side, Vector3d& rNormal) const;
-    virtual ContainedByShape* Copy() const;
+    virtual void ComputeBBox(BoundingBox& rBox) const override;
+    virtual bool Intersect(const Ray& ray, const TRANSFORM* pTrans, DBL& rDepth1, DBL& rDepth2, int& rSide1, int& sSide2) const override;
+    virtual bool Inside(const Vector3d& IPoint) const override;
+    virtual void Normal(const Vector3d& IPoint, const TRANSFORM* pTrans, int side, Vector3d& rNormal) const override;
+    virtual ContainedByShape* Copy() const override;
 };
 
 /// Class used for containing inherently infinite objects (isosurface, parametric) in a sphere.
-struct ContainedBySphere : public ContainedByShape
+struct ContainedBySphere final : public ContainedByShape
 {
     Vector3d center;
     DBL radius;
 
     ContainedBySphere() : center(0,0,0), radius(1) {}
 
-    virtual void ComputeBBox(BoundingBox& rBox) const;
-    virtual bool Intersect(const Ray& ray, const TRANSFORM* pTrans, DBL& rDepth1, DBL& rDepth2, int& rSide1, int& sSide2) const;
-    virtual bool Inside(const Vector3d& IPoint) const;
-    virtual void Normal(const Vector3d& IPoint, const TRANSFORM* pTrans, int side, Vector3d& rNormal) const;
-    virtual ContainedByShape* Copy() const;
+    virtual void ComputeBBox(BoundingBox& rBox) const override;
+    virtual bool Intersect(const Ray& ray, const TRANSFORM* pTrans, DBL& rDepth1, DBL& rDepth2, int& rSide1, int& sSide2) const override;
+    virtual bool Inside(const Vector3d& IPoint) const override;
+    virtual void Normal(const Vector3d& IPoint, const TRANSFORM* pTrans, int side, Vector3d& rNormal) const override;
+    virtual ContainedByShape* Copy() const override;
 };
 
 bool Find_Intersection(Intersection *Ray_Intersection, ObjectPtr Object, const Ray& ray, TraceThreadData *Thread);
 bool Find_Intersection(Intersection *Ray_Intersection, ObjectPtr Object, const Ray& ray, const RayObjectCondition& postcondition, TraceThreadData *Thread);
 bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, BBoxDirection variant, const BBoxVector3d& origin, const BBoxVector3d& invdir, TraceThreadData *ThreadData);
 bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, BBoxDirection variant, const BBoxVector3d& origin, const BBoxVector3d& invdir, const RayObjectCondition& postcondition, TraceThreadData *ThreadData);
-bool Ray_In_Bound(const Ray& ray, const vector<ObjectPtr>& Bounding_Object, TraceThreadData *Thread);
-bool Point_In_Clip(const Vector3d& IPoint, const vector<ObjectPtr>& Clip, TraceThreadData *Thread);
+bool Ray_In_Bound(const Ray& ray, const std::vector<ObjectPtr>& Bounding_Object, TraceThreadData *Thread);
+bool Point_In_Clip(const Vector3d& IPoint, const std::vector<ObjectPtr>& Clip, TraceThreadData *Thread);
 ObjectPtr Copy_Object(ObjectPtr Old);
-vector<ObjectPtr> Copy_Objects(vector<ObjectPtr>& Src);
+std::vector<ObjectPtr> Copy_Objects(std::vector<ObjectPtr>& Src);
 void Translate_Object(ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *Trans);
 void Rotate_Object(ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *Trans);
 void Scale_Object(ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *Trans);
 void Transform_Object(ObjectPtr Object, const TRANSFORM *Trans);
 bool Inside_Object(const Vector3d& IPoint, ObjectPtr Object, TraceThreadData *Thread);
-void Destroy_Object(vector<ObjectPtr>& Object);
+void Destroy_Object(std::vector<ObjectPtr>& Object);
 void Destroy_Object(ObjectPtr Object);
 void Destroy_Single_Object(ObjectPtr *ObjectPtr);
 
@@ -396,5 +415,6 @@ void Destroy_Single_Object(ObjectPtr *ObjectPtr);
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_OBJECT_H

@@ -12,7 +12,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,11 +40,18 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "vm/fnintern.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
 #include <algorithm>
 
+// POV-Ray header files (base module)
 #include "base/mathutil.h"
 
+// POV-Ray header files (core module)
 #include "core/material/noise.h"
+#include "core/material/pattern.h"
 #include "core/material/pigment.h"
 #include "core/material/warp.h"
 #include "core/math/matrix.h"
@@ -52,6 +59,7 @@
 #include "core/scene/scenedata.h"
 #include "core/scene/tracethreaddata.h"
 
+// POV-Ray header files (VM module)
 #include "vm/fnpovfpu.h"
 
 // this must be the last file included
@@ -59,6 +67,9 @@
 
 namespace pov
 {
+
+using std::max;
+using std::min;
 
 /*****************************************************************************
 * Local preprocessor defines
@@ -258,7 +269,7 @@ const Trap POVFPU_TrapTable[] =
     { f_noise3d,                 0 + 3 }, // 76
     { f_pattern,                 0 + 3 }, // 77
     { f_noise_generator,         1 + 3 }, // 78
-    { NULL, 0 }
+    { nullptr, 0 }
 };
 
 const TrapS POVFPU_TrapSTable[] =
@@ -266,7 +277,7 @@ const TrapS POVFPU_TrapSTable[] =
     { f_pigment,                 0 + 3 }, // 0
     { f_transform,               0 + 3 }, // 1
     { f_spline,                  0 + 1 }, // 2
-    { NULL, 0 }
+    { nullptr, 0 }
 };
 
 const unsigned int POVFPU_TrapTableSize = 79;
@@ -455,8 +466,8 @@ DBL f_enneper(FPUContext *ctx, DBL *ptr, unsigned int) // 18
     DBL r, r2,x2=PARAM_X*PARAM_X, y2=PARAM_Y*PARAM_Y, z2=PARAM_Z*PARAM_Z;
     if (fabs(PARAM_Z)<0.2)
         PARAM_Z=0.2;
-    r =((y2-x2)/(2*PARAM_Z)+2*z2/9+2/3);                  // TODO FIXME - was this supposed to be 2.0/3.0 ??
-    r2=((y2-x2)/(4*PARAM_Z)-(1/4)*(x2+y2+(8/9)*z2)+2/9);  // TODO FIXME - was this supposed to be 1.0/4.0, 8.0/9.0 and 2.0/9.0 respectively ??
+    r =((y2-x2)/(2*PARAM_Z)+2*z2/9+(2/3.));
+    r2=((y2-x2)/(4*PARAM_Z)-(1/4.)*(x2+y2+(8/9.)*z2)+(2/9.));
     r=-( r*r*r -6*r2*r2);
     return( min(10., max(PARAM(0)*r,-10.)) );
 }
@@ -990,7 +1001,7 @@ DBL f_ridged_mf(FPUContext *ctx, DBL *ptr, unsigned int fn) // 59
     int ngen = (int)PARAM(5) & 0x03;
 
     V1 = Vector3d(PARAM_X, PARAM_Y, PARAM_Z);
-    if (f->private_data == NULL)
+    if (f->private_data == nullptr)
     {
         ea = reinterpret_cast<DBL *>(POV_MALLOC((PARAM(2) + 1)*sizeof(DBL), "exponent array"));
         freq = 1.0;
@@ -1194,12 +1205,12 @@ DBL f_pattern(FPUContext *ctx, DBL *ptr, unsigned int fn) // 77
     Vector3d Vec = Vector3d(PARAM_X, PARAM_Y, PARAM_Z);
     FunctionCode *f = ctx->functionvm->GetFunction(fn);
 
-    if(f->private_data == NULL)
+    if (f->private_data == nullptr)
         return 0.0;
 
     Warp_EPoint (TPoint, Vec, reinterpret_cast<const TPATTERN *>(f->private_data));
 
-    return Evaluate_TPat(reinterpret_cast<const TPATTERN *>(f->private_data), TPoint, NULL, NULL, ctx->threaddata);
+    return Evaluate_TPat(reinterpret_cast<const TPATTERN *>(f->private_data), TPoint, nullptr, nullptr, ctx->threaddata);
 }
 
 DBL f_noise_generator(FPUContext *ctx, DBL *ptr, unsigned int) // 78
@@ -1217,7 +1228,7 @@ void f_pigment(FPUContext *ctx, DBL *ptr, unsigned int fn, unsigned int sp) // 0
     RGBFTColour rgbftCol;
     FunctionCode *f = ctx->functionvm->GetFunction(fn);
 
-    if(f->private_data == NULL)
+    if (f->private_data == nullptr)
     {
         ctx->SetLocal(sp + pRED,    0.0);
         ctx->SetLocal(sp + pGREEN,  0.0);
@@ -1227,7 +1238,7 @@ void f_pigment(FPUContext *ctx, DBL *ptr, unsigned int fn, unsigned int sp) // 0
         return;
     }
 
-    Compute_Pigment(Col, reinterpret_cast<const PIGMENT *>(f->private_data), Vec, NULL, NULL, ctx->threaddata);
+    Compute_Pigment(Col, reinterpret_cast<const PIGMENT *>(f->private_data), Vec, nullptr, nullptr, ctx->threaddata);
     rgbftCol = ToRGBFTColour(Col);
 
     ctx->SetLocal(sp + pRED,    rgbftCol.red());
@@ -1243,7 +1254,7 @@ void f_transform(FPUContext *ctx, DBL *ptr, unsigned int fn, unsigned int sp) //
     Vector3d Result;
     FunctionCode *f = ctx->functionvm->GetFunction(fn);
 
-    if(f->private_data == NULL)
+    if (f->private_data == nullptr)
     {
         ctx->SetLocal(sp + X, 0.0);
         ctx->SetLocal(sp + Y, 0.0);
@@ -1264,7 +1275,7 @@ void f_spline(FPUContext *ctx, DBL *ptr, unsigned int fn, unsigned int sp) // 2
     FunctionCode *f = ctx->functionvm->GetFunction(fn);
     int Terms;
 
-    if(f->private_data == NULL)
+    if (f->private_data == nullptr)
     {
         ctx->SetLocal(sp + X, 0.0);
         ctx->SetLocal(sp + Y, 0.0);
@@ -1291,3 +1302,4 @@ void f_spline(FPUContext *ctx, DBL *ptr, unsigned int fn, unsigned int sp) // 2
 }
 
 }
+// end of namespace pov

@@ -1,0 +1,29 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Max_Intersections</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov382.htm">Max_Trace_Level</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov384.htm">Number_Of_Waves</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405226"><A NAME="_Toc411405502"><A NAME="_Toc414199230"><A NAME="_Toc429993747">Max_Intersections</A></A></A></A></H3>
+<P>POV-Ray uses a set of internal stacks to collect ray/object intersection points. The usual maximum number of entries in these <I>I-Stacks </I>is 64. Complex scenes may cause these stacks to overflow.  POV-Ray doesn't stop but it may incorrectly render your scene. When POV-Ray finishes rendering, a number of statistics are displayed. If you see <CODE>I-Stack Overflows</CODE> reported in the statistics you should increase the stack size. Add a global setting to your scene as follows:</P>
+<b><code><DL>
+<DD>global_settings { max_intersections</code></b><I> Integer </I><b><code>}</DD>
+</DL>
+</code></b><P>If the <CODE>I-Stack Overflows</CODE> remain increase this value until they stop.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov382.htm">Max_Trace_Level</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov384.htm">Number_Of_Waves</A>
+</P>
+</BODY>
+</HTML>
+

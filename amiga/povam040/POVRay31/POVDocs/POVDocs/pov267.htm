@@ -1,0 +1,47 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Light Sources</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov266.htm">Merge</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov268.htm">Point Lights</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405202"><A NAME="_Toc411405478"><A NAME="_Ref413745531"><A NAME="_Toc414199104"><A NAME="_Toc429993612">Light Sources</A></A></A></A></A></H3>
+<P>The <b><code>light_source</code></b> is not really an object. Light sources have no visible shape of their own.  They are just points or areas which emit light. They are categorized as objects so that they can be combined with regular objects using <b><code>union</code></b>.  Their full syntax is:</P>
+<I><DL>
+<DT>LIGHT_SOURCE:</DT>
+</I><b><code><DD>light_source {</code></b> <I>&lt;Location&gt;</I><b><code>,</code></b> <I>COLOR [LIGHT_MODIFIERS...]</I> <b><code>}</DD>
+</code></b><I><DT>LIGHT_MODIFIER:</DT>
+<DD>LIGHT_TYPE</I>   |   <I>SPOTLIGHT_ITEM</I>   |</DD>
+<I><DD>AREA_LIGHT_ITEMS</I>   |   <I>GENERAL_LIGHT_MODIFIERS</DD>
+<DT>LIGHT_TYPE:</DT>
+</I><b><code><DD>spotlight</code></b>   |   <b><code>shadowless</code></b>   |   <b><code>cylinder</DD>
+</code></b><I><DT>SPOTLIGHT_ITEM:</DT>
+</I><b><code><DD>radius</code></b> <I>Radius</I>   |   <b><code>falloff</code></b> <I>Falloff</I>   |   <b><code>tightness</code></b><I> Tightness</I>   |   <b><code>point_at</code></b> <I>&lt;Spot&gt;</DD>
+<DT>AREA_LIGHT_ITEM:</DT>
+</I><b><code><DD>area_light</code></b> <I>&lt;Axis_1&gt;</I><b><code>,</code></b><I> &lt;Axis_2&gt;</I><b><code>,</code></b><I> Size_1</I><b><code>,</code></b><I> Size_2</I>   |</DD>
+<b><code><DD>adaptive</code></b> <I>Adaptive</I>   |   <b><code>jitter</code></b><I> Jitter</DD>
+<DT>GENERAL_LIGHT_MODIFIERS:</DT>
+</I><b><code><DD>looks_like {</code></b> OBJECT <b><code>}</code></b>   |   <I>TRANSFORMATION</DD>
+</I><b><code><DD>fade_distance</code></b> <I>Fade_Distance</I>   |   <b><code>fade_power</code></b> <I>Fade_Power</I>   |</DD>
+<b><code><DD>media_attenuation</code></b> <I>[Bool]</I>   |   <b><code>media_interaction</code></b> <I>[Bool]</DD>
+</DL>
+</I><P>The different types of light sources and the optional modifiers are described in the following sections.</P>
+<P>The first two items are common to all light sources.  The <I>&lt;Location&gt;</I> vector gives the location of the light.  The <I>COLOR</I> gives the color of the light.  Only the red, green, and blue components are significant.  Any transmit or filter values are ignored.  Note that you vary the intensity of the light as well as the color using this parameter.  A color such as <b><code>rgb &lt;0.5,0.5,0.5&gt;</code></b> gives a white light that is half the normal intensity.</P>
+<P>All of the keywords or items in the syntax specification above may appear in any order.  Some keywords only have effect if specified with other keywords.  The keywords are grouped into functional categories to make it clear which keywords work together.  The <I>GENERAL_LIGHT_MODIFIERS</I> work with all types of lights and all options.  Note that <I>TRANSFORMATIONS</I> such as <b><code>translate</code></b>, <b><code>rotate</code></b> etc. may be applied but no other <I>OBJECT_MODIFIERS</I> may be used.</P>
+<P>There are four mutually exclusive light types.  If no <I>LIGHT_TYPE</I> is specified it is a point light.  The other choices are <b><code>spotlight</code></b>, <b><code>shadowless</code></b>, and <b><code>cylinder</code></b>.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov266.htm">Merge</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov268.htm">Point Lights</A>
+</P>
+</BODY>
+</HTML>
+

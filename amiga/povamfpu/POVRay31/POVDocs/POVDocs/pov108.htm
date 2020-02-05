@@ -1,0 +1,54 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Using Multiple Layers of Fog</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov107.htm">Using Ground Fog</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov109.htm">Fog and Hollow Objects</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198928"><A NAME="_Toc429993438">Using Multiple Layers of Fog</A></A></H4>
+<P>It is possible to use several layers of fog by using more than one fog statement in your scene file. This is quite useful if you want to get nice effects using turbulent ground fogs. You could add up several, differently colored fogs to create an eerie scene for example.</P>
+<P>Just try the following example (<CODE>fog6.pov</CODE>).</P>
+<PRE>  fog {
+    distance 150
+    color rgb&lt;0.3, 0.5, 0.2&gt;
+    fog_type 2
+    fog_offset 25
+    fog_alt 1
+    turbulence 0.1
+    turb_depth 0.2
+  }
+  fog {
+    distance 150
+    color rgb&lt;0.5, 0.1, 0.1&gt;
+    fog_type 2
+    fog_offset 15
+    fog_alt 4
+    turbulence 0.2
+    turb_depth 0.2
+  }
+  fog {
+    distance 150
+    color rgb&lt;0.1, 0.1, 0.6&gt;
+    fog_type 2
+    fog_offset 10
+    fog_alt 2
+  }</PRE>
+<B><P ALIGN="CENTER"><IMG SRC="Image228.jpg" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">Quite nice results can be achieved using multiple layers of fog.</P>
+</B><P>You can combine constant density fogs, ground fogs, filtering fogs, non-filtering fogs, fogs with a translucency threshold, etc.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov107.htm">Using Ground Fog</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov109.htm">Fog and Hollow Objects</A>
+</P>
+</BODY>
+</HTML>
+

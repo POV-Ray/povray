@@ -1,0 +1,36 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Declaring Layered Textures</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov89.htm">Working With Layered Textures</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov91.htm">Another Layered Textures Example</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198910"><A NAME="_Toc429993420">Declaring Layered Textures</A></A></H4>
+<P>In the event we want to reuse a layered texture on several objects in our scene, it is perfectly legal to declare a layered texture. We won't repeat the whole texture from above, but the general format would be something like this:</P>
+<PRE>  #declare Abused_Metal =
+    texture { /* insert your base texture here... */ }
+    texture { /* and your rust flecks here... */ }
+    texture { /* and of course, your sooty burn marks here */ }</PRE>
+<P>POV-Ray has no problem spotting where the declaration ends, because the textures follow one after the other with no objects or directives in between. The layered texture to be declared will be assumed to continue until it finds something other than another texture, so any number of layers can be added in to a declaration in this fashion.</P>
+<P>One final word about layered textures: whatever layered texture we create, whether declared or not, we must not leave off the texture wrapper. In conventional single textures a common shorthand is to have just a pigment, or just a pigment and finish, or just a normal, or whatever, and leave them outside of a texture statement. This shorthand does not extend to layered textures. As far as POV-Ray is concerned we can layer entire textures, but not individual pieces of textures. For example</P>
+<PRE>  #declare Bad_Texture =
+    texture { /* insert your base texture here... */ }
+    pigment { Red filter .5 }
+    normal { bumps 1 }</PRE>
+<P>will not work. The pigment and the normal are just floating there without being part of any particular texture. Inside an object, with just a single texture, we can do this sort of thing, but with layered textures, we would just generate an error whether inside the object or in a declaration.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov89.htm">Working With Layered Textures</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov91.htm">Another Layered Textures Example</A>
+</P>
+</BODY>
+</HTML>
+

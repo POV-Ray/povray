@@ -1,0 +1,44 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Scattering</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov359.htm">Emission</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov361.htm">Sampling Parameters</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199208"><A NAME="_Toc429993724">Scattering</A></A></H4>
+<P>The syntax of a <b><code>scattering</code></b> statement is:</P>
+<I><DL>
+<DT>SCATTERING:</DT>
+</I><b><code><DD>scattering {</code></b> <I>Type</I><b><code>,</code></b> <I>COLOR</I>  <I>[</I> <b><code>eccentricity</code></b> <I>Value</I> <I>]</I> <I>[</I> <b><code>extinction</code></b> <I>Value</I> <I>]</I> <b><code>}</DD>
+</DL>
+</code></b><P>The first float value specifies the type of scattering.  This is followed by the color of the scattered light.  The default value if no <b><code>scattering</code></b> statement is given is <b><code>rgb&lt;0,0,0&gt;</code></b> which means no scattering occurs.</P>
+<P>The scattering effect is only visible when light is shining on the media from a light source.  This is similar to <b><code>difuse</code></b> reflection off of an object.  In addition to reflecting light, a scattering media also absorbs light like an <b><code>absorption</code></b> media.  The balance between how much absorption occurs for a given amount of scattering is controlled by the optional <b><code>extinction</code></b> keyword and a single float value.  The default value of 1.0 gives an extinction effect that matches the scattering.  Values such as <b><code>extinction 0.25</code></b> give 25% the normal amount.  Using <b><code>extinction 0.0</code></b> turns it off completely.  Any value other than the 1.0 default is contrary to the real physical model but decreasing extinction can give you more artistic flexibility.</P>
+<P>The integer value <I>Type</I> specifies one of five different scattering phase functions representing the different models: isotropic, Mie (haze and murky atmosphere), Rayleigh, and Henyey-Greenstein.</P>
+<P>Type 1, <I>isotropic scattering </I>is the simplest form of scattering because it is independent of direction. The amount of light scattered by particles in the atmosphere does not depend on the angle between the viewing direction and the incoming light.</P>
+<P>Types 2 and 3 are <I>Mie haze</I> and <I>Mie murky</I> scattering which are used for relatively small particles such as minuscule water droplets of fog, cloud particles, and particles responsible for the polluted sky. In this model the scattering is extremely directional in the forward direction i.e. the amount of scattered light is largest when the incident light is anti-parallel to the viewing direction (the light goes directly to the viewer). It is smallest when the incident light is parallel to the viewing direction. The haze and murky atmosphere models differ in their scattering characteristics. The murky model is much more directional than the haze model.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image199.gif" WIDTH=347 HEIGHT=288></P>
+<P ALIGN="CENTER">The Mie "haze" scattering function.</P>
+<P ALIGN="CENTER"><IMG SRC="Image200.gif" WIDTH=347 HEIGHT=288></P>
+<P ALIGN="CENTER">The Mie "murky" scattering function.</P>
+</B><P>Type 3 <I>Rayleigh scattering </I>models the scattering for extremely small particles such as molecules of the air. The amount of scattered light depends on the incident light angle. It is largest when the incident light is parallel or anti-parallel to the viewing direction and smallest when the incident light is perpendicular to the viewing direction. You should note that the Rayleigh model used in POV-Ray does not take the dependency of scattering on the wavelength into account.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image201.gif" WIDTH=330 HEIGHT=273></P>
+<P ALIGN="CENTER">The Rayleigh scattering function.</P>
+</B><P>Type 5 is the <I>Henyey-Greenstein scattering </I>model.  It is based on an analytical function and can be used to model a large variety of different scattering types. The function models an ellipse with a given eccentricity e. This eccentricity is specified by the optional keyword <b><code>eccentricity</code></b> which is only used for scattering type five. The default eccentricity value of zero defines isotropic scattering while positive values lead to scattering in the direction of the light and negative values lead to scattering in the opposite direction of the light. Larger values of e (or smaller values in the negative case) increase the directional property of the scattering.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image202.gif" WIDTH=330 HEIGHT=273></P>
+<P ALIGN="CENTER">The Heyney-Greenstein scattering function for different eccentricity values.</P>
+</B>
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov359.htm">Emission</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov361.htm">Sampling Parameters</A>
+</P>
+</BODY>
+</HTML>
+

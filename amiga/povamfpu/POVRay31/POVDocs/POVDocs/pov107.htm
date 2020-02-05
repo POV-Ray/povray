@@ -1,0 +1,35 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Using Ground Fog</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov106.htm">Adding Some Turbulence to the Fog</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov108.htm">Using Multiple Layers of Fog</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198927"><A NAME="_Toc429993437">Using Ground Fog</A></A></H4>
+<P>The much more interesting and flexible fog type is the ground fog, which is selected with the <b><code>fog_type</code></b> statement. It's appearance is described with the <b><code>fog_offset</code></b> and <b><code>fog_alt</code></b> keywords. The <b><code>fog_offset</code></b> specifies the height, i. e. y value, below which the fog has a constant density of one. The <b><code>fog_alt</code></b> keyword determines how fast the density of the fog will approach zero as one moves along the y axis. At a height of fog_offset+fog_alt the fog will have a density of 25%.</P>
+<P>The following example (<CODE>fog5.pov</CODE>) uses a ground fog which has a constant density below y=25 (the center of the red sphere) and quickly falls off for increasing altitudes.</P>
+<PRE>  fog {
+    distance 150
+    color rgbf&lt;0.3, 0.5, 0.2, 1.0&gt;
+    fog_type 2
+    fog_offset 25
+    fog_alt 1
+  }</PRE>
+<B><P ALIGN="CENTER"><IMG SRC="Image227.jpg" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">The ground fog only covers the lower parts of the world.'</P>
+</B>
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov106.htm">Adding Some Turbulence to the Fog</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov108.htm">Using Multiple Layers of Fog</A>
+</P>
+</BODY>
+</HTML>
+

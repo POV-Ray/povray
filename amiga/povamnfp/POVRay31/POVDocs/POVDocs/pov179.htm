@@ -1,0 +1,57 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Common Color Pitfalls</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov178.htm">Color Operators</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov180.htm">Strings</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref412904357"><A NAME="_Toc414199012"><A NAME="_Toc429993522">Common Color Pitfalls</A></A></A></H4>
+<P>The variety and complexity of color specification methods can lead to some common mistakes. Here are some things to consider when specifying a color.</P>
+<P>When using filter transparency, the colors which come through are multiplied by the primary color components. For example if gray light such as <b><code>rgb&lt;0.9,0.9,0.9&gt;</code></b> passes through a filter such as <b><code>rgbf&lt;1.0,0.5,0.0,1.0&gt;</code></b> the result is <b><code>rgb&lt;0.9,0.45,0.0&gt;</code></b> with the red let through 100%, the green cut in half from 0.9 to 0.45 and the blue totally blocked. Often users mistakenly specify a clear object by</P>
+<PRE> color filter 1.0</PRE>
+<P>but this has implied red, green and blue values of zero. You've just specified a totally black filter so no light passes through. The correct way is either</P>
+<PRE> color red 1.0  green 1.0  blue 1.0  filter 1.0</PRE>
+<P>or</P>
+<PRE> color transmit 1.0</PRE>
+<P>In the 2nd example it doesn't matter what the rgb values are. All of the light passes through untouched.</P>
+<P>Another pitfall is the use of color identifiers and expressions with color keywords. For example...</P>
+<PRE> color My_Color red 0.5</PRE>
+<P>this substitutes whatever was the red component of <b><code>My_Color</code></b> with a red component of 0.5 however...</P>
+<PRE> color My_Color + red 0.5</PRE>
+<P>adds 0.5 to the red component of <b><code>My_Color</code></b> and even less obvious...</P>
+<PRE> color My_Color * red 0.5</PRE>
+<P>that cuts the red component in half as you would expect but it also multiplies the green, blue, filter and transmit components by zero! The part of the expression after the multiply operator evaluates to <b><code>rgbft&lt;0.5,0,0,0,0&gt;</code></b> as a full 5 component color.</P>
+<P>The following example results in no change to <b><code>My_Color</code></b>.</P>
+<PRE> color red 0.5 My_Color</PRE>
+<P>This is because the identifier fully overwrites the previous value. When using identifiers with color keywords, the identifier should be first.</P>
+<P>Another issue to consider: some POV-Ray syntax allows full color specifications but only uses the rgb part. In these cases it is legal to use a float where a color is needed. For example:</P>
+<PRE> finish { ambient 1 }</PRE>
+<P>The ambient keyword expects a color so the value <b><code>1</code></b> is promoted to <b><code>&lt;1,1,1,1,1&gt;</code></b> which is no problem. However</P>
+<PRE> pigment { color 0.4 }</PRE>
+<P>is legal but it may or may not be what you intended. The <b><code>0.4</code></b> is promoted to <b><code>&lt;0.4,0.4,0.4,0.4,0.4&gt;</code></b> with the filter and transmit set to 0.4 as well. It is more likely you wanted...</P>
+<PRE> pigment { color rgb 0.4 }</PRE>
+<P>in which case a 3 component vector is expected. Therefore the <b><code>0.4</code></b> is promoted to <b><code>&lt;0.4,0.4,0.4,0.0,0.0&gt;</code></b> with default zero for filter and transmit.</P>
+<P>Finally there is another problem which arises when using color dot operators in <b><code>#declare</code></b> or <b><code>#local</code></b> directives.  Consider the directive:</P>
+<PRE> #declare MyColor = rgb &lt;0.75, 0.5, 0.75&gt;;
+ #declare RedAmt = MyColor.red;</PRE>
+<P>Now <b><code>RedAmt</code></b> should be a float but unfortunately it is a color.  POV-Ray looks at the first keyword after the equals to try to guess what type of identifier you want.  It sees the color identifier <b><code>MyColor</code></b> and assumes you want to declare a color.  It then computes the float value as 0.75 then promotes that into <b><code>rgbft&lt;0.75,0.75,0.75,0.75,0.75&gt;</code></b>.  </P>
+<P>It would take a major rewrite to fix this problem so we're just warning you about it.  Any of the following work-arounds will work properly.</P>
+<PRE> #declare RedAmt = 0.0+MyColor.red;
+ #declare RedAmt = 1.0*MyColor.red;
+ #declare RedAmt = (MyColor.red);</PRE>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov178.htm">Color Operators</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov180.htm">Strings</A>
+</P>
+</BODY>
+</HTML>
+

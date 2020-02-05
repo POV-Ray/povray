@@ -1,0 +1,157 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Superquadric Ellipsoid Object</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov48.htm">Conic Sweeps And The Tapering Effect</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov50.htm">Surface of Revolution Object</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405113"><A NAME="_Toc411405389"><A NAME="_Toc414198868"><A NAME="_Toc429993379">Superquadric Ellipsoid Object</A></A></A></A></H3>
+<P>Sometimes we want to make an object that does not have perfectly sharp edges like a box does. Then, the superquadric ellipsoid shape made by the <b><code>superellipsoid</code></b> is a useful object. It is described by the simple syntax:</P>
+<DL>
+<DD> <b><code> superellipsoid {</code></b><I> </I><b><code>&lt;</code></b><I>Value_E</I><b><code>,</code></b><I> Value_N </I><b><code>&gt;}</DD>
+</DL>
+</code></b><P>Where <I>Value_E</I> and <I>Value_N</I> are float values greater than zero and less than or equal to one. Let's make a superellipsoid and experiment with the values of <I>Value_E</I> and <I>Value_N</I> to see what kind of shapes we can make.</P>
+<P>We create a file called <CODE>supellps.pov</CODE> and edit it as follows:</P>
+<PRE>  #include "colors.inc"
+  camera {
+    location &lt;10, 5, -20&gt;
+    look_at 0
+    angle 15
+  }
+  background { color rgb &lt;.5, .5, .5&gt; }
+  light_source { &lt;10, 50, -100&gt; White }</PRE>
+<P>The addition of a gray background makes it a little easier to see our object. We now type:</P>
+<PRE>  superellipsoid { &lt;.25, .25&gt;
+    pigment { Red }
+  }</PRE>
+<P>We save the file and trace it at 200x150 <b><code>-A</code></b> to see the shape. It will look like a box, but the edges will be rounded off. Now let's experiment with different values of <I>Value_E</I> and <I>Value_N</I>. For the next trace, try &lt;1, 0.2&gt;. The shape now looks like a cylinder, but the top edges are rounded. Now try &lt;0.1, 1&gt;. This shape is an odd one! We don't know exactly what to call it, but it is interesting. Finally, lets try &lt;1, 1&gt;. Well, this is more familiar... a sphere!</P>
+<P>There are a couple of facts about superellipsoids we should know. First, we should not use a value of 0 for either <I>Value_E</I> nor <I>Value_N</I>. This will cause POV-Ray to incorrectly make a black box instead of our desired shape. Second, very small values of <I>Value_E</I> and <I>Value_N</I> may yield strange results so they should be avoided. Finally, the Sturmian root solver will not work with superellipsoids.</P>
+<P>Superellipsoids are finite objects so they respond to auto-bounding and can be used in CSG.</P>
+<P>Now let's use the superellipsoid to make something that would be useful in a scene. We will make a tiled floor and place a couple of superellipsoid objects hovering over it. We can start with the file we have already made.</P>
+<P>We rename it to <CODE>tiles.pov</CODE> and edit it so that it reads as follows:</P>
+<PRE>  #include "colors.inc"
+  #include "textures.inc"
+  camera {
+    location &lt;10, 5, -20&gt;
+    look_at 0
+    angle 15
+  }
+  background { color rgb &lt;.5, .5, .5&gt; }
+  light_source{ &lt;10, 50, -100&gt; White }</PRE>
+<P>Note that we have added <b><code>#include "textures.inc"</code></b> so we can use pre-defined textures. Now we want to define the superellipsoid which will be our tile.</P>
+<PRE>  #declare Tile = superellipsoid { &lt;0.5, 0.1&gt;
+    scale &lt;1, .05, 1&gt;
+  }</PRE>
+<P>Superellipsoids are roughly 2*2*2 units unless we scale them otherwise. If we wish to lay a bunch of our tiles side by side, they will have to be offset from each other so they don't overlap. We should select an offset value that is slightly more than 2 so that we have some space between the tiles to fill with grout. So we now add this:</P>
+<PRE>  #declare Offset = 2.1;</PRE>
+<P>We now want to lay down a row of tiles. Each tile will be offset from the original by an ever-increasing amount in both the +z and -z directions. We refer to our offset and multiply by the tile's rank to determine the position of each tile in the row. We also union these tiles into a single object called <b><code>Row</code></b> like this:</P>
+<PRE>  #declare Row = union {
+    object { Tile }
+    object { Tile translate z*Offset }
+    object { Tile translate z*Offset*2 }
+    object { Tile translate z*Offset*3 }
+    object { Tile translate z*Offset*4 }
+    object { Tile translate z*Offset*5 }
+    object { Tile translate z*Offset*6 }
+    object { Tile translate z*Offset*7 }
+    object { Tile translate z*Offset*8 }
+    object { Tile translate z*Offset*9 }
+    object { Tile translate z*Offset*10 }
+    object { Tile translate -z*Offset }
+    object { Tile translate -z*Offset*2 }
+    object { Tile translate -z*Offset*3 }
+    object { Tile translate -z*Offset*4 }
+    object { Tile translate -z*Offset*5 }
+    object { Tile translate -z*Offset*6 }
+  }</PRE>
+<P>This gives us a single row of 17 tiles, more than enough to fill the screen. Now we must make copies of the <b><code>Row</code></b> and translate them, again by the offset value, in both the +x and -x directions in ever increasing amounts in the same manner.</P>
+<PRE>  object { Row }
+  object { Row translate x*Offset }
+  object { Row translate x*Offset*2 }
+  object { Row translate x*Offset*3 }
+  object { Row translate x*Offset*4 }
+  object { Row translate x*Offset*5 }
+  object { Row translate x*Offset*6 }
+  object { Row translate x*Offset*7 }
+  object { Row translate -x*Offset }
+  object { Row translate -x*Offset*2 }
+  object { Row translate -x*Offset*3 }
+  object { Row translate -x*Offset*4 }
+  object { Row translate -x*Offset*5 }
+  object { Row translate -x*Offset*6 }
+  object { Row translate -x*Offset*7 }</PRE>
+<P>Finally, our tiles are complete. But we need a texture for them. To do this we union all of the <b><code>Rows</code></b> together and apply a <b><code>White Marble</code></b> pigment and a somewhat shiny reflective surface to it:</P>
+<PRE>  union{
+    object { Row }
+    object { Row translate x*Offset }
+    object { Row translate x*Offset*2 }
+    object { Row translate x*Offset*3 }
+    object { Row translate x*Offset*4 }
+    object { Row translate x*Offset*5 }
+    object { Row translate x*Offset*6 }
+    object { Row translate x*Offset*7 }
+    object { Row translate -x*Offset }
+    object { Row translate -x*Offset*2 }
+    object { Row translate -x*Offset*3 }
+    object { Row translate -x*Offset*4 }
+    object { Row translate -x*Offset*5 }
+    object { Row translate -x*Offset*6 }
+    object { Row translate -x*Offset*7 }
+    pigment { White_Marble }
+    finish { phong 1 phong_size 50 reflection .35 }
+  }</PRE>
+<P>We now need to add the grout. This can simply be a white plane. We have stepped up the ambient here a little so it looks whiter.</P>
+<PRE>  plane { y, 0  //this is the grout
+    pigment { color White }
+    finish { ambient .4 diffuse .7 }
+  }</PRE>
+<P>To complete our scene, let's add five different superellipsoids, each a different color, so that they hover over our tiles and are reflected in them.</P>
+<PRE>  superellipsoid {
+    &lt;0.1, 1&gt;
+    pigment { Red }
+    translate &lt;5, 3, 0&gt;
+    scale .45
+  }
+  superellipsoid {
+    &lt;1, 0.25&gt;
+    pigment { Blue }
+    translate &lt;-5, 3, 0&gt;
+    scale .45
+  }
+  superellipsoid {
+    &lt;0.2, 0.6&gt;
+    pigment { Green }
+    translate &lt;0, 3, 5&gt;
+    scale .45
+  }
+  superellipsoid {
+    &lt;0.25, 0.25&gt;
+    pigment { Yellow }
+    translate &lt;0, 3, -5&gt;
+    scale .45
+  }
+  superellipsoid {
+    &lt;1, 1&gt;
+    pigment { Pink }
+    translate y*3
+    scale .45
+  }</PRE>
+<B><P ALIGN="CENTER"><IMG SRC="Image26.jpg" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">Some superellipsoids hovering above a tiled floor.</P>
+</B><P>We trace the scene at 320x200 <b><code>-A</code></b> to see the result. If we are happy with that, we do a final trace at 640x480 <b><code>+A0.2</code></b>.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov48.htm">Conic Sweeps And The Tapering Effect</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov50.htm">Surface of Revolution Object</A>
+</P>
+</BODY>
+</HTML>
+

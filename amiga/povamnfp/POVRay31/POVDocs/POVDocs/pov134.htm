@@ -1,0 +1,169 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Display Output Options</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov133.htm">General Output Options</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov135.htm">File Output Options</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198959"><A NAME="_Toc429993468">Display Output Options</A></A></H4>
+<H5><A NAME="_Ref412464789"><A NAME="_Toc414198960"><A NAME="_Toc429993469">Display Hardware Settings</A></A></A></H5>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=456>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>Display=</code></b><I>bool</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Turns graphic display on/off</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>+D</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Turns graphic display on</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>-D</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Turns graphic display off</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>Video_Mode=</code></b><I>x</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Set video mode to <I>x</I>; does not affect on/off</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>+D</code></b><I>x</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Set display on; Set mode to <I>x</I></TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>-D</code></b><I>x</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Set display off; but for future use mode <I>x</I></TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>Palette=</code></b><I>y</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Set display palette to <I>y</I>; does not affect on/off</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>+D</code></b><I>xy</I><b><code> </code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Set display on; Set mode <I>x</I>; Set palette <I>y</I></TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>-D</code></b><I>xy</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Set display off; use mode <I>x</I>, palette <I>y</I> in future</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>Display_Gamma=</code></b><I>n.n</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Sets the display gamma to <I>n.n</I></TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>The <b><code>Display=on</code></b> or <b><code>+D</code></b> switch will turn on the graphics display of the image while it is being rendered. Even on some non-graphics systems, POV-Ray may display an 80 by 24 character <b><code> </code></b><I>"ASCII-Art" </I>version of your image. Where available, the display may be full, 24-bit true color. Setting <b><code>Display=off</code></b> or using the <b><code>-D</code></b> switch will turn off the graphics display which is the default.</P>
+<P>The <b><code>Video_Mode=</code></b><I>x</I> option sets the display mode or hardware type chosen where <I>x</I> is a single digit or letter that is machine dependent. Generally <b><code>Video_Mode=0</code></b> means the default or an auto-detected setting should be used. When using switches, this character immediately follows the switch. For example the <b><code>+D0</code></b> switch will turn on the graphics display in the default mode.</P>
+<P>The <b><code>Palette=</code></b><I>y</I> option selects the palette to be used. Typically the single character parameter <I>y</I> is a digit which selects one of several fixed palettes or a letter such <b><code>G</code></b> for gray scale, <b><code>H</code></b> for 15-bit or 16-bit high color or <b><code>T</code></b> for 24-bit true color. When using switches, this character is the 2nd character after the switch. For example the <b><code>+D0T</code></b> switch will turn on the graphics display in the default mode with a true color palette.</P>
+<P>The <b><code>Display_Gamma=</code></b><I>n.n</I> setting is new with POV-Ray 3.0, and is not available as a command-line switch. The <b><code>Display_Gamma</code></b> setting overcomes the problem of images (whether ray-traced or not) having different brightness when being displayed on different monitors, different video cards, and under different operating systems. Note that the <b><code>Display_Gamma</code></b> is a setting based on your computer's display hardware, and should be set correctly once and not changed. The <b><code>Display_Gamma</code></b> INI setting works in conjunction with the new <b><code>assumed_gamma</code></b> global setting to ensure that POV scenes and the images they create look the same on all systems. See section "<A HREF="pov376.htm#_Ref412453576">Assumed_Gamma</A>" which describes the <b><code>assumed_gamma</code></b> global setting and describes gamma more thoroughly.</P>
+<P>While the <b><code>Display_Gamma</code></b> can be different for each system, there are a few general rules that can be used for setting <b><code>Display_Gamma</code></b> if you don't know it exactly. If the <b><code>Display_Gamma</code></b> keyword does not appear in the INI file, POV-Ray assumes that the display gamma is 2.2. This is because most PC monitors have a gamma value in the range 1.6 to 2.6 (newer models seem to have a lower gamma value). Mac has the ability to do gamma correction inside the system software (based on a user setting in the gamma control panel). If the gamma control panel is turned off, or is not available, the default Macintosh system gamma is 1.8. Some high-end PC graphics cards can do hardware gamma correction and should use the current Display_Gamma setting, usually 1.0. A gamma test image is also available to help users to set their <b><code>Display_Gamma</code></b> accurately.</P>
+<P>For scene files that do not contain an <b><code>assumed_gamma</code></b> global setting the INI file option <b><code>Display_Gamma</code></b> will not have any affect on the preview output of POV-Ray or for most output file formats. However, the <b><code>Display_Gamma</code></b> value is used when creating PNG format output files, and also when rendering the POV-Ray example files (because they have an <b><code>assumed_gamma</code></b>), so it should still be correctly set for your system to ensure proper results.</P>
+<H5><A NAME="_Toc414198961"><A NAME="_Toc429993470">Display Related Settings</A></A></H5>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=456>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>Pause_When_Done=</code></b><I>bool</I></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Sets pause when done on/off</TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>+P</code></b></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Sets pause when done on</TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>-P</code></b></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Sets pause when done off</TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>Verbose=</code></b><I>bool</I></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Set verbose messages on/off</TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>+V</code></b></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Set verbose messages on</TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>-V</code></b></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Set verbose messages off</TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>Draw_Vistas=</code></b><I>bool</I></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Turn draw vistas on/off</TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>+UD</code></b></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Turn draw vistas on</TD>
+</TR>
+<TR><TD WIDTH="42%" VALIGN="TOP">
+<p><b><code>-UD</code></b></TD>
+<TD WIDTH="58%" VALIGN="TOP">
+<P>Turn draw vistas off</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>On some systems, when the image is complete, the graphics display is cleared and POV-Ray switches back into text mode to print the final statistics and to exit. Normally when the graphics display is on, you want to look at the image awhile before continuing. Using <b><code>Pause_When_Done=on</code></b> or <b><code>+P</code></b> causes POV-Ray to pause in graphics mode until you press a key to continue. The default is not to pause (<b><code>-P</code></b>).</P>
+<P>When the graphics display is not used, it is often desirable to monitor progress of the rendering. Using <b><code>Verbose=on</code></b> or <b><code>+V</code></b> turns on verbose reporting of your rendering progress. This reports the number of the line currently being rendered, the elapsed time for the current frame and other information. On some systems, this textual information can conflict with the graphics display. You may need to turn this off when the display is on. The default setting is off (<b><code>-V</code></b>).</P>
+<P>The option <b><code>Draw_Vistas=on</code></b> or <b><code>+UD</code></b> was originally a debugging help for POV-Ray's vista buffer feature but it was such fun we decided to keep it. Vista buffering is a spatial sub-division method that projects the 2-D extents of bounding boxes onto the viewing window. POV-Ray tests the 2-D x, y pixel location against these rectangular areas to determine quickly which objects, if any, the viewing ray will hit. This option shows you the 2-D rectangles used. The default setting is off (<b><code>-UD</code></b>) because the drawing of the rectangles can take considerable time on complex scenes and it serves no critical purpose. See section "<A HREF="pov153.htm#_Ref412454596">Automatic Bounding Control</A>" for more details.</P>
+<H5><A NAME="_Toc414198962"><A NAME="_Toc429993471">Mosaic Preview</A></A></H5>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=480>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<b><code>Preview_Start_Size=</code></b><I>n</I></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+<P>Set mosaic preview start size to n</TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>+SP</code></b><I>n</I></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+<P>Same as Preview_Start_Size=n</TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>Preview_End_Size=</code></b><I>n</I></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+<P>Set mosaic preview end size to n</TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>+EP</code></b><I>n</I></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+<P>Same as Preview_End_Size=n</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>Typically, while you are developing a scene, you will do many low resolution test renders to see if objects are placed properly. Often this low resolution version doesn't give you sufficient detail and you have to render the scene again at a higher resolution. A feature called <I>"mosaic preview"</I> solves this problem by automatically rendering your image in several passes.</P>
+<P>The early passes paint a rough overview of the entire image using large blocks of pixels that look like mosaic tiles. The image is then refined using higher resolutions on subsequent passes. This display method very quickly displays the entire image at a low resolution, letting you look for any major problems with the scene. As it refines the image, you can concentrate on more details, like shadows and textures. You don't have to wait for a full resolution render to find problems, since you can interrupt the rendering early and fix the scene, or if things look good, you can let it continue and render the scene at high quality and resolution.</P>
+<P>To use this feature you should first select a <b><code>Width</code></b> and <b><code>Height</code></b> value that is the highest resolution you will need. Mosaic preview is enabled by specifying how big the mosaic blocks will be on the first pass using <b><code>Preview_Start_Size=</code></b><I>n</I> or <b><code>+SP</code></b><I>n</I>. The value n should be a number greater than zero that is a power of two (1, 2, 4, 8, 16, 32, etc.) If it is not a power of two, the nearest power of two less than n is substituted. This sets the size of the squares, measured in pixels. A value of 16 will draw every 16th pixel as a 16*16 pixel square on the first pass. Subsequent passes will use half the previous value (such as 8*8, 4*4 and so on.)</P>
+<P>The process continues until it reaches 1*1 pixels or until it reaches the size you set with <b><code>Preview_End_Size=</code></b><I>n</I> or <b><code>+EP</code></b><I>n</I>. Again the value n should be a number greater than zero that is a power of two and less than or equal to <b><code>Preview_Start_Size</code></b>. If it is not a power of two, the nearest power of two less than n is substituted. The default ending value is 1. If you set <b><code>Preview_End_Size</code></b> to a value greater than 1 the mosaic passes will end before reaching 1*1, but POV-Ray will always finish with a 1*1. For example, if you want a single 8*8 mosaic pass before rendering the final image, set <b><code>Preview_Start_Size=8</code></b> and <b><code>Preview_End_Size=8.</P>
+</code></b><P>No file output is performed until the final 1*1 pass is reached. Although the preliminary passes render only as many pixels as needed, the 1*1 pass re-renders every pixel so that anti-aliasing and file output streams work properly. This makes the scene take up to 25% longer than the regular 1*1 pass to render, so it is suggested that mosaic preview not be used for final rendering. Also, the lack of file output until the final pass means that renderings which are interrupted before the 1*1 pass can not be resumed without starting over from the beginning.</P>
+<P>Future versions of POV-Ray will include some system of temporary files or buffers which will eliminate these inefficiencies and limitations. Mosaic preview is still a very useful feature for test renderings.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov133.htm">General Output Options</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov135.htm">File Output Options</A>
+</P>
+</BODY>
+</HTML>
+

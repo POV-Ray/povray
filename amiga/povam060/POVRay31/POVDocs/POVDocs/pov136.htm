@@ -1,0 +1,114 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - CPU Utilization Histogram</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov135.htm">File Output Options</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov137.htm">Scene Parsing Options</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198967"><A NAME="_Toc429993476">CPU Utilization Histogram</A></A></H4>
+<P>The CPU utilization histogram is a way of finding out where POV-Ray is spending its rendering time, as well as an interesting way of generating heightfields. The histogram splits up the screen into a rectangular grid of blocks. As POV-Ray renders the image, it calculates the amount of time it spends rendering each pixel and then adds this time to the total rendering time for each grid block. When the rendering is complete, the histogram is a file which represents how much time was spent computing the pixels in each grid block.</P>
+<P>Not all versions of POV-Ray allow the creation of histograms. The histogram output is dependent on the file type and the system that POV-Ray is being run on.</P>
+<H5><A NAME="_Toc414198968"><A NAME="_Toc429993477">File Type</A></A></H5>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=456>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>Histogram_Type=</code></b><I>y</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Set histogram type to <I>y</I> (Turn off if type is '<b><code>X</code></b>')</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>+HT</code></b><I>y</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Same as <b><code>Histogram_Type=</code></b><I>y</I></TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>The histogram output file type is nearly the same as that used for the image output file types in "<A HREF="pov135.htm#_Ref412528893">Output File Type</A>". The available histogram file types are as follows.</P>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=432>
+<TR><TD WIDTH="22%" VALIGN="TOP">
+<p><b><code>+HTC</code></b></TD>
+<TD WIDTH="78%" VALIGN="TOP">
+<P>Comma separated values (CSV) often used in spreadsheets</TD>
+</TR>
+<TR><TD WIDTH="22%" VALIGN="TOP">
+<p><b><code>+HTN</code></b></TD>
+<TD WIDTH="78%" VALIGN="TOP">
+<P>New PNG (portable network graphics) format grayscale</TD>
+</TR>
+<TR><TD WIDTH="22%" VALIGN="TOP">
+<p><b><code>+HTP</code></b></TD>
+<TD WIDTH="78%" VALIGN="TOP">
+<P>Unix PPM format</TD>
+</TR>
+<TR><TD WIDTH="22%" VALIGN="TOP">
+<p><b><code>+HTS</code></b></TD>
+<TD WIDTH="78%" VALIGN="TOP">
+<P>System-specific such as Mac Pict or Windows BMP</TD>
+</TR>
+<TR><TD WIDTH="22%" VALIGN="TOP">
+<p><b><code>+HTT</code></b></TD>
+<TD WIDTH="78%" VALIGN="TOP">
+<P>Uncompressed Targa-24 format (TGA)</TD>
+</TR>
+<TR><TD WIDTH="22%" VALIGN="TOP">
+<p><b><code>+HTX</code></b></TD>
+<TD WIDTH="78%" VALIGN="TOP">
+<P>No histogram file output is generated</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>Note that <b><code>+HTC</code></b> does not generate a compressed Targa-24 format output file but rather a text file with a comma-separated list of the time spent in each grid block, in left-to-right and top-to bottom order. The units of time output to the CSV file are system dependent. See the system specific documentation for further details on the time units in CSV files.</P>
+<P>The Targa and PPM format files are in the POV heightfield format (see "<A HREF="pov242.htm#_Ref414188528">Height Field</A>"), so the histogram information is stored in both the red and green parts of the image, which makes it unsuitable for viewing. When used as a height field, lower values indicate less time spent calculating the pixels in that block, while higher indicate more time spent in that block.</P>
+<P>PNG format images are stored as grayscale images and are useful for both viewing the histogram data as well as for use as a heightfield. In PNG files, the darker (lower) areas indicate less time spent in that grid block, while the brighter (higher) areas indicate more time spent in that grid block.</P>
+<H5><A NAME="_Toc414198969"><A NAME="_Toc429993478">File Name</A></A></H5>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=456>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>Histogram_Name=</code></b><I>file</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Set histogram name to <I>file</I></TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>+HN</code></b><I>file</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Same as <b><code>Histogram_Name=</code></b><I>file</I></TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>The histogram file name is the name of the file in which to write the histogram data. If the file name is not specified it will default to <CODE>histgram.ext</CODE>, where <CODE>ext</CODE> is based on the file type specified previously. Note that if the histogram name is specified the file name extension should match the file type.</P>
+<H5><A NAME="_Toc414198970"><A NAME="_Toc429993479">Grid Size</A></A></H5>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=510>
+<TR><TD WIDTH="44%" VALIGN="TOP">
+<p><b><code>Histogram_Grid_Size=</code></b><I>nn.mm</I></TD>
+<TD WIDTH="56%" VALIGN="TOP">
+<P>Set histogram grid to <I>nn</I> by <I>mm</I></TD>
+</TR>
+<TR><TD WIDTH="44%" VALIGN="TOP">
+<p><b><code>+HS</code></b><I>nn.mm</I></TD>
+<TD WIDTH="56%" VALIGN="TOP">
+<P>Same as <b><code>Histogram_Grid_Size=</code></b><I>nn.mm</I></TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>The histogram grid size gives the number of times the image is split up in both the horizontal and vertical directions. For example</P>
+<PRE> povray +Isample +W640 +H480 +HTN +HS160.120 +HNhistogrm.png</PRE>
+<P>will split the image into 160*120 grid blocks, each of size 4*4 pixels, and output a PNG file, suitable for viewing or for use as a heightfield. Smaller numbers for the grid size mean more pixels are put into the same grid block. With CSV output, the number of values output is the same as the number of grid blocks specified. For the other formats the image size is identical to the rendered image rather than the specified grid size, to allow easy comparison between the histogram and the rendered image. If the histogram grid size is not specified, it will default to the same size as the image, so there will be one grid block per pixel.</P>
+<P>Note that on systems that do task-switching or multi-tasking the histogram may not exactly represent the amount of time POV-Ray spent in a given grid block since the histogram is based on real time rather than CPU time. As a result, time may be spent for operating system overhead or on other tasks running at the same time. This will cause the histogram to have speckling, noise or large spikes. This can be reduced by decreasing the grid size so that more pixels are averaged into a given grid block.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov135.htm">File Output Options</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov137.htm">Scene Parsing Options</A>
+</P>
+</BODY>
+</HTML>
+

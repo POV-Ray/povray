@@ -1,0 +1,35 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Ambient</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov304.htm">Finish</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov306.htm">Diffuse Reflection Items</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199145"><A NAME="_Ref422128412"><A NAME="_Toc429993656">Ambient</A></A></A></H4>
+<P>The light you see in dark shadowed areas comes from diffuse reflection off of other objects. This light cannot be directly modeled using ray-tracing. However we can use a trick called <I>ambient lighting </I>to simulate the light inside a shadowed area.</P>
+<P>Ambient light is light that is scattered everywhere in the room. It bounces all over the place and manages to light objects up a bit even where no light is directly shining. Computing real ambient light would take far too much time, so we simulate ambient light by adding a small amount of white light to each texture whether or not a light is actually shining on that texture.</P>
+<P>This means that the portions of a shape that are completely in shadow will still have a little bit of their surface color. It's almost as if the texture glows, though the ambient light in a texture only affects the shape it is used on.</P>
+<P>The <b><code>ambient</code></b> keyword controls the amount of ambient light. Usually a single float value is specified even though the syntax calls for a color. For example a float value of <b><code>0.3</code></b> gets promoted to the full color vector <b><code>&lt;0.3,0.3,0.3,0.3,0.3&gt;</code></b> which is acceptable because only the red, green and blue parts are used.</P>
+<P>The default value is 0.1 which gives very little ambient light. The value can range from 0.0 to 1.0. Ambient light affects both shadowed and non-shadowed areas so if you turn up the <b><code>ambient</code></b> value you may want to turn down the <b><code>diffuse</code></b> and <b><code>reflection</code></b> values.</P>
+<P>Note that this method doesn't account for the color of surrounding objects. If you walk into a room that has red walls, floor and ceiling then your white clothing will look pink from the reflected light. POV-Ray's ambient shortcut doesn't account for this. There is also no way to model specular reflected indirect illumination such as the flashlight shining in a mirror.</P>
+<P>You may color the ambient light using one of two methods. You may specify a color rather than a float after the ambient keyword in each finish statement. For example</P>
+<PRE>   finish { ambient rgb &lt;0.3,0.1,0.1&gt; } //a pink ambient</PRE>
+<P>You may also specify the overall ambient light source used when calculating the ambient lighting of an object using the global <b><code>ambient_light</code></b> setting. The formula is given by</P>
+<I><P>   Ambient = Finish_Ambient * Global_Ambient_Light_Source</P>
+</I><P>See section "<A HREF="pov375.htm#_Ref418066764">Ambient Light</A>" for details.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov304.htm">Finish</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov306.htm">Diffuse Reflection Items</A>
+</P>
+</BODY>
+</HTML>
+

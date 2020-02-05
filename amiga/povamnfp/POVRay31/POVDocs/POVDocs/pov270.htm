@@ -1,0 +1,35 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Cylindrical Lights</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov269.htm">Spotlights</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov271.htm">Area Lights</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199107"><A NAME="_Toc429993615">Cylindrical Lights</A></A></H4>
+<P>The <b><code>cylinder</code></b> keyword specifies a cylindrical light source that is great for simulating laser beams.  Cylindrical light sources work pretty much like spotlights except that the light rays are constrained by a cylinder and not a cone. The syntax is:</P>
+<I><DL>
+<DT>CYLINDER_LIGHT_SOURCE:</DT>
+</I><b><code><DD>light_source {</code></b> <I>&lt;Location&gt;</I><b><code>,</code></b> <I>COLOR </I><b><code>cylinder</code></b> <I>[LIGHT_MODIFIERS...]</I> <b><code>}</DD>
+</code></b><I><DT>LIGHT_MODIFIER:</DT>
+<DD>SPOTLIGHT_ITEM</I>   |   <I>AREA_LIGHT_ITEMS</I>   |   <I>GENERAL_LIGHT_MODIFIERS</DD>
+<DT>SPOTLIGHT_ITEM:</DT>
+</I><b><code><DD>radius</code></b> <I>Radius</I>   |   <b><code>falloff</code></b> <I>Falloff</I>   |   <b><code>tightness</code></b><I> Tightness</I>   |   <b><code>point_at</code></b> <I>&lt;Spot&gt;</DD>
+</DL>
+</I><P>The <b><code>point_at</code></b>, <b><code>radius</code></b>, <b><code>falloff</code></b> and <b><code>tightness</code></b> keywords control the same features as with the spotlight.  See "<A HREF="pov269.htm#_Ref416105656">Spotlights</A>" for details.</P>
+<P>You should keep in mind that the cylindrical light source is still a point light source. The rays are emitted from one point and are only constraint by a cylinder. The light rays are not parallel.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov269.htm">Spotlights</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov271.htm">Area Lights</A>
+</P>
+</BODY>
+</HTML>
+

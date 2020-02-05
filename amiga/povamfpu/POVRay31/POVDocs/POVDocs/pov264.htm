@@ -1,0 +1,38 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Intersection</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov263.htm">Union</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov265.htm">Difference</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199101"><A NAME="_Toc429993609">Intersection</A></A></H4>
+<P>The <b><code>intersection</code></b> object creates a shape containing only those areas where all components overlap.  A point is part an intersection if it is inside both objects, <b><code>A</code></b> and <b><code>B</code></b>, as show in the figure below.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image104.gif" WIDTH=300 HEIGHT=191></P>
+<P ALIGN="CENTER">The intersection of two objects.</P>
+</B><P>The syntax is:</P>
+<I><DL>
+<DT>INTERSECTION:</DT>
+</I><b><code><DD>intersection {</code></b> SOLID_<I>OBJECTS...  [OBJECT_MODIFIERS...]</I> <b><code>}</DD>
+</DL>
+</code></b><P>The component objects must have well defined inside/outside properties.  Patch objects are not allowed.  Note that if all components do not overlap, the intersection object disappears.</P>
+<P>Here is an example that overlaps:</P>
+<PRE>  intersection {
+    box { &lt;-1.5, -1, -1&gt;, &lt;0.5, 1, 1&gt; }
+    cylinder { &lt;0.5, 0, -1&gt;, &lt;0.5, 0, 1&gt;, 1 }
+  }</PRE>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov263.htm">Union</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov265.htm">Difference</A>
+</P>
+</BODY>
+</HTML>
+

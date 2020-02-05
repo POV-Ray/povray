@@ -1,0 +1,33 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - CSG Merge</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov30.htm">CSG Difference</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov32.htm">CSG Pitfalls</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405103"><A NAME="_Toc411405379"><A NAME="_Toc414198850"><A NAME="_Toc429993361">CSG Merge</A></A></A></A></H3>
+<P>This brings us to the fourth kind of CSG object, the <b><code>merge</code></b>. Merges are the same as unions, but the geometry of the objects in the CSG that is inside the merge is not traced. This should eliminate the problem with our object. Let's try it.</P>
+<PRE>  merge {
+    object { Lens_With_Hole translate &lt;-.65, .65, 0&gt; }
+    object { Lens_With_Hole translate &lt;.65, .65, 0&gt; }
+    object { Lens_With_Hole translate &lt;-.65, -.65, 0&gt; }
+    object { Lens_With_Hole translate &lt;.65, -.65, 0&gt; }
+    pigment { Red filter .5 }
+  }</PRE>
+<P>Sure enough, it does!</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov30.htm">CSG Difference</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov32.htm">CSG Pitfalls</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,35 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - How Radiosity Works</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov385.htm">Radiosity</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov387.htm">Adjusting Radiosity</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199233"><A NAME="_Toc429993750">How Radiosity Works</A></A></H4>
+<P>The problem of ray-tracing is to figure out what the light level is at each point that you can see in a scene. Traditionally, in ray tracing, this is broken into the sum of these components:</P><dir>
+  -  Diffuse, the effect that makes the side of things facing the light brighter;</P>
+<P>  -  Specular, the effect that makes shiny things have dings or sparkles on them;</P>
+<P>  -  Reflection, the effect that mirrors give; and</P>
+<P>  -  Ambient, the general all-over light level that any scene has, which keeps things in shadow from being pure black.</P>
+</dir>
+<P>POV-Ray's radiosity system, based on a method by Greg Ward, provides a way to replace the last term - the constant ambient light value - with a light level which is based on what surfaces are nearby and how bright in turn they are.</P>
+<P>The first thing you might notice about this definition is that it is circular: the light of everything is dependent on everything else and vice versa. This is true in real life but in the world of ray-tracing, we can make an approximation. The approximation that is used is: the objects you are looking at have their <b><code>ambient</code></b> values calculated for you by checking the other objects nearby. When those objects are checked during this process, however, a traditional constant ambient term is used.</P>
+<P>How does POV-Ray calculate the ambient term for each point? By sending out more rays, in many different directions, and averaging the results. A typical point might use 200 or more rays to calculate its ambient light level correctly.</P>
+<P>Now this sounds like it would make the ray-tracer 200 times slower. This is true, except that the software takes advantage of the fact that ambient light levels change quite slowly (remember, shadows are calculated separately, so sharp shadow edges are not a problem). Therefore, these extra rays are sent out only <I>once in a while</I> (about 1 time in 50), then these calculated values are saved and reused for nearby pixels in the image when possible.</P>
+<P>This process of saving and reusing values is what causes the need for a variety of tuning parameters, so you can get the scene to look just the way you want.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov385.htm">Radiosity</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov387.htm">Adjusting Radiosity</A>
+</P>
+</BODY>
+</HTML>
+

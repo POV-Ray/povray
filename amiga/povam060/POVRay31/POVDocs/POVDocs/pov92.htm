@@ -1,0 +1,81 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - When All Else Fails: Material Maps</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov91.htm">Another Layered Textures Example</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov93.htm">Limitations Of Special Textures</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405142"><A NAME="_Toc411405418"><A NAME="_Toc414198912"><A NAME="_Toc429993422">When All Else Fails: Material Maps</A></A></A></A></H3>
+<P>We have some pretty powerful texturing tools at our disposal, but what if we want a more free form arrangement of complex textures? Well, just as image maps do for pigments, and bump maps do for normals, whole textures can be mapped using a material map, should the need arise.</P>
+<P>Just as with image maps and bump maps, we need a source image in bitmapped format which will be called by POV-Ray to serve as the map of where the individual textures will go, but this time, we need to specify what texture will be associated with which palette index. To make such an image, we can use a paint program which allows us to select colors by their palette index number (the actual color is irrelevant, since it is only a map to tell POV-Ray what texture will go at that location). Now, if we have the complete package that comes with POV-Ray, we have in our include files an image called <CODE>povmap.gif</CODE> which is a bitmapped image that uses only the first four palette indices to create a bordered square with the words "Persistence of Vision" in it. This will do just fine as a sample map for the following example. Using our same include files, the camera and light source, we enter the following object.</P>
+<PRE>  plane { -z, 0
+    texture {
+      material_map {
+        gif "povmap.gif"
+        interpolate 2
+        once
+        texture { PinkAlabaster }          // the inner border
+        texture { pigment { DMFDarkOak } } // outer border
+        texture { Gold_Metal }             // lettering
+        texture { Chrome_Metal }           // the window panel
+      }
+      translate &lt;-0.5, -0.5, 0&gt;
+      scale 5
+    }
+  }</PRE>
+<P>The position of the light source and the lack of foreground objects to be reflected do not show these textures off to their best advantage. But at least we can see how the process works. The textures have simply been placed according to the location of pixels of a particular palette index. By using the <b><code>once</code></b> keyword (to keep it from tiling), and translating and scaling our map to match the camera we have been using, we get to see the whole thing laid out for us.</P>
+<P>Of course, that is just with palette mapped image formats, such as GIF and certain flavors of PNG. Material maps can also use non-paletted formats, such as the TGA files that POV-Ray itself outputs. That leads to an interesting consequence: We can use POV-Ray to produce source maps for POV-Ray! Before we wrap up with some of the limitations of special textures, let's do one more thing with material maps, to show how POV-Ray can make its own source maps.</P>
+<P>To begin with, if using an non-paletted image, POV-Ray looks at the 8 bit red component of the pixel's color (which will be a value from 0 to 255) to determine which texture from the list to use. So to create a source map, we need to control very precisely what the red value of a given pixel will be. We can do this by</P><dir>
+  1.)  Using an rgb statement to choose our color such as <b><code>rgb &lt;N/255,0,0&gt;</code></b>, where "N" is the red value we want to assign that pigment, and then...</P>
+<P>  2.)  Use no light sources and apply a finish of <b><code>finish{ambient 1}</code></b> to all objects, to ensure that highlighting and shadowing will not interfere.</P>
+</dir>
+<P>Confused? Alright, here is an example, which will generate a map very much like <CODE>povmap.gif</CODE> which we used earlier, except in TGA file format. We notice that we have given the pigments blue and green components too. POV-Ray will ignore that in our final map, so this is really for us humans, whose unaided eyes cannot tell the difference between red variances of 0 to 4/255ths. Without those blue and green variances, our map would look to our eyes like a solid black screen. That may be a great way to send secret messages using POV-Ray (plug it into a material map to decode) but it is no use if we want to see what our source map looks like to make sure we have what we expected to.</P>
+<P>We render the following code, and name the resulting file <CODE>povmap.tga</CODE>.</P>
+<PRE>  camera {
+    orthographic
+    up &lt;0, 5, 0&gt;
+    right &lt;5, 0, 0&gt;
+    location &lt;0, 0, -25&gt;
+    look_at &lt;0, 0, 0&gt;
+  }
+  plane { -z, 0
+    pigment { rgb &lt;1/255, 0, 0.5&gt; }
+    finish { ambient 1 }
+  }
+  box { &lt;-2.3, -1.8, -0.2&gt;, &lt;2.3, 1.8, -0.2&gt;
+    pigment { rgb &lt;0/255, 0, 1&gt; }
+    finish { ambient 1 }
+  }
+  box { &lt;-1.95, -1.3, -0.4&gt;, &lt;1.95, 1.3, -0.3&gt;
+    pigment { rgb &lt;2/255, 0.5, 0.5&gt; }
+    finish { ambient 1 }
+  }
+  text { ttf "crystal.ttf", "The vision", 0.1, 0
+    scale &lt;0.7, 1, 1&gt;
+    translate &lt;-1.8, 0.25, -0.5&gt;
+    pigment { rgb &lt;3/255, 1, 1&gt; }
+    finish { ambient 1 }
+  }
+  text { ttf "crystal.ttf", "Persists!", 0.1, 0
+    scale &lt;0.7, 1, 1&gt;
+    translate &lt;-1.5, -1, -0.5&gt;
+    pigment { rgb &lt;3/255, 1, 1&gt; }
+    finish { ambient 1 }
+  }</PRE>
+<P>All we have to do is modify our last material map example by changing the material map from GIF to TGA and modifying the filename. When we render using the new map, the result is extremely similar to the palette mapped GIF we used before, except that we didn't have to use an external paint program to generate our source: POV-Ray did it all!</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov91.htm">Another Layered Textures Example</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov93.htm">Limitations Of Special Textures</A>
+</P>
+</BODY>
+</HTML>
+

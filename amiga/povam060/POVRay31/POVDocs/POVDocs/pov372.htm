@@ -1,0 +1,54 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Rainbow</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov371.htm">Sky Sphere</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov373.htm">Global Settings</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405218"><A NAME="_Toc411405494"><A NAME="_Ref412028912"><A NAME="_Toc414199219"><A NAME="_Toc429993736">Rainbow</A></A></A></A></A></H3>
+<P>Rainbows are implemented using fog-like, circular arcs. Their syntax is:</P>
+<I><DL>
+<DT>RAINBOW:</DT>
+</I><b><code><DD>rainbow {</code></b> <I>[RAINBOW_IDENTIFIER] [RAINBOW_ITEMS...]</I> <b><code>}</DD>
+</code></b><I><DT>RAINBOW_ITEM:</DT>
+</I><b><code><DD>direction</code></b> <I>&lt;Dir&gt;</I>   |   <b><code>angle</code></b> <I>Angle</I>   |   <b><code>width</code></b> <I>Width</I>   |   <b><code>distance</code></b> <I>Distance</I>   |</DD>
+<I><DD>COLOR_MAP</I>   |   <b><code>jitter</code></b> <I>Jitter</I>   |   <b><code>up</code></b> <I>&lt;Up&gt;</I>   |</DD>
+<b><code><DD>arc_angle</code></b> <I>Arc_Angle</I>   |   <b><code>falloff_angle</code></b> <I>Falloff_Angle </DD>
+</DL>
+</I><P>The required <b><code>direction</code></b> vector determines the direction of the (virtual) light that is responsible for the rainbow. Ideally this is an infinitely far away light source like the sun that emits parallel light rays. The position and size of the rainbow are specified by the required <b><code>angle</code></b> and <b><code>width</code></b> keywords. To understand how they work you should first know how the rainbow is calculated.</P>
+<P>For each ray the angle between the rainbow's direction vector and the ray's direction vector is calculated. If this angle lies in the interval from <I>Angle-Width/2</I> to <I>Angle+Width/2</I> the rainbow is hit by the ray. The color is then determined by using the angle as an index into the rainbow's color_map. After the color has been determined it will be mixed with the background color in the same way like it is done for fogs.</P>
+<P>Thus the angle and width parameters determine the angles under which the rainbow will be seen. The optional <b><code>jitter</code></b> keyword can be used to add random noise to the index. This adds some irregularity to the rainbow that makes it look more realistic.</P>
+<P>The required <b><code>distance</code></b> keyword is the same like the one used with fogs. Since the rainbow is a fog-like effect it's possible that the rainbow is noticeable on objects. If this effect is not wanted it can be avoided by using a large distance value. By default a sufficiently large value is used to make sure that this effect does not occur.</P>
+<P>The <b><code>color_map</code></b> statement is used to assign a color map that will be mapped onto the rainbow. To be able to create realistic rainbows it is important to know that the index into the color map increases with the angle between the ray's and rainbow's direction vector. The index is zero at the innermost ring and one at the outermost ring. The filter and transmittance values of the colors in the color map have the same meaning as the ones used with fogs (see section "<A HREF="pov370.htm#_Ref421696014">Fog</A>").</P>
+<P>The default rainbow is a 360 degree arc that looks like a circle.  This is no problem as long as you have a ground plane that hides the lower, non-visible part of the rainbow. If this isn't the case or if you don't want the full arc to be visible you can use the optional keywords <b><code>up</code></b>, <b><code>arc_angle</code></b> and <b><code>falloff_angle</code></b> to specify a smaller arc.</P>
+<P>The <b><code>arc_angle</code></b> keyword determines the size of the arc in degrees (from 0 to 360 degrees). A value smaller than 360 degrees results in an arc that abruptly vanishes. Since this doesn't look nice you can use the <b><code>falloff_angle</code></b> keyword to specify a region in which the rainbow will smoothly blend into the background making it vanish softly. The falloff angle has to be smaller or equal to the arc angle.</P>
+<P>The <b><code>up</code></b> keyword determines were the zero angle position is. By changing this vector you can rotate the rainbow about its direction. You should note that the arc goes from <I>-Arc_Angle/2</I> to <I>+Arc_Angle/2</I>. The soft regions go from <I>-Arc_Angle/2</I> to <I>-Falloff_Angle/2</I> and from <I>+Falloff_Angle/2</I> to <I>+Arc_Angle/2</I>.</P>
+<P>The following example generates a 120 degrees rainbow arc that has a falloff region of 30 degrees at both ends:</P>
+<PRE>  rainbow {
+    direction &lt;0, 0, 1&gt;
+    angle 42.5
+    width 5
+    distance 1000
+    jitter 0.01
+    color_map { Rainbow_Color_Map }
+    up &lt;0, 1, 0&gt;
+    arc_angle 120
+    falloff_angle 30
+  }</PRE>
+<P>It is possible to use any number of rainbows and to combine them with other atmospheric effects.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov371.htm">Sky Sphere</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov373.htm">Global Settings</A>
+</P>
+</BODY>
+</HTML>
+

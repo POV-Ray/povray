@@ -1,0 +1,31 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Boolean Keywords</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov164.htm">Built-in Float Identifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov166.htm">Float Functions</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc429993508">Boolean Keywords</A></H4>
+<P>The built-in float identifiers <b><code>on</code></b>, <b><code>off</code></b>, <b><code>yes</code></b>, <b><code>no</code></b>, <b><code>true</code></b>, and <b><code>false</code></b> are most often used as boolean values with object modifiers or parameters such as <b><code>sturm</code></b>, <b><code>hollow</code></b>, <b><code>hierarchy</code></b>, <b><code>smooth</code></b>, <b><code>media_attenuation</code></b>, and <b><code>media_interaction</code></b>.  Whenever you see syntax of the form <b><code>keyword</code></b> <I>[Bool]</I>, if you simply specify the keyword without the optional boolean then it assumes <b><code>keyword on</code></b>.  You need not use the boolean but for readability it is a good idea.  You must use one of the false booleans or an expression which evaluates to zero to turn it off.  Note some of these keywords default on if no keyword is specified.  For example:</P>
+<PRE>  object{MyBlob}  //sturm defaults off but hierarchy defaults on
+  object{MyBlob sturm}      //turn sturm on
+  object{MyBlob sturm on}   //turn sturm on
+  object{MyBlob sturm off}  //turn sturm off
+  object{MyBlob hierarchy}  //does nothing, hierarchy was already on
+  object{MyBlob hierarchy off}  //turn hierarchy off</PRE>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov164.htm">Built-in Float Identifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov166.htm">Float Functions</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,45 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Prism Object</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov43.htm">Polygon Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov45.htm">Teaching An Old Spline New Tricks</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405112"><A NAME="_Toc411405388"><A NAME="_Toc414198863"><A NAME="_Ref415568292"><A NAME="_Toc429993374">Prism Object</A></A></A></A></A></H3>
+<P>The prism is essentially a polygon or closed curve which is swept along a linear path. We can imagine the shape so swept leaving a trail in space, and the surface of that trail is the surface of our prism. The curve or polygon making up a prism's face can be a composite of any number of sub-shapes, can use any kind of three different splines, and can either keep a constant width as it is swept, or slowly tapering off to a fine point on one end. But before this gets too confusing, let's start one step at a time with the simplest form of prism. We enter and render the following POV code (see file <CODE>prismdm1.pov</CODE>).</P>
+<PRE>  #include "colors.inc"
+  background{White}
+  camera {
+    angle 20
+    location &lt;2, 10, -30&gt;
+    look_at &lt;0, 1, 0&gt;
+  }
+  light_source { &lt;20, 20, -20&gt; color White }
+  prism {
+    linear_sweep
+    linear_spline
+    0, // sweep the following shape from here ...
+    1, // ... up through here
+    7, // the number of points making up the shape ...
+    &lt;3,5&gt;, &lt;-3,5&gt;, &lt;-5,0&gt;, &lt;-3,-5&gt;, &lt;3, -5&gt;, &lt;5,0&gt;, &lt;3,5&gt;
+    pigment { Green }
+  }</PRE>
+<B><P ALIGN="CENTER"> <IMG SRC="Image213.gif" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">A hexagonal prism shape.</P>
+</B><P>This produces a hexagonal polygon, which is then swept from y=0 through y=1. In other words, we now have an extruded hexagon. One point to note is that although this is a six sided figure, we have used a total of seven points. That is because the polygon is supposed to be a closed shape, which we do here by making the final point the same as the first. Technically, with linear polygons, if we didn't do this, POV-Ray would automatically join the two ends with a line to force it to close, although a warning would be issued. However, this only works with linear splines, so we mustn't get too casual about those warning messages!</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov43.htm">Polygon Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov45.htm">Teaching An Old Spline New Tricks</A>
+</P>
+</BODY>
+</HTML>
+

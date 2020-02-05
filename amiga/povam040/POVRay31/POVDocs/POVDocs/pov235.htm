@@ -1,0 +1,45 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Camera Identifiers</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov234.htm">Camera Ray Perturbation</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov236.htm">Objects</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405195"><A NAME="_Toc411405471"><A NAME="_Toc414199070"><A NAME="_Toc429993580">Camera Identifiers</A></A></A></A></H3>
+<P>Camera identifiers may be declared to make scene files more readable and to parameterize scenes so that changing a single declaration changes many values. You may declare several camera identifiers if you wish. This makes it easy to quickly change cameras. An identifier is declared as follows.</P>
+<I><DL>
+<DT>CAMERA_DECLARATION:</DT>
+</I><b><code><DD>#declare </code></b><I>IDENTIFIER </I><b><code>=</code></b> <I>CAMERA</I><b><code>&#9;</code></b>|</DD>
+<b><code><DD>#local </code></b><I>IDENTIFIER </I><b><code>=</code></b> <I>CAMERA</DD>
+</DL>
+</I><P>Where <I>IDENTIFIER</I> is the name of the identifier up to 40 characters long and <I>CAMERA</I> is any valid camera statement. See "<A HREF="pov191.htm#_Ref412711267">#declare vs. #local</A>" for information on identifier scope.  Here is an example...</P>
+<PRE> #declare Long_Lens =
+  camera {
+   location -z*100
+   angle 3
+  }
+ #declare Short_Lens =
+  camera {
+   location -z*50
+   angle 15
+  }
+ camera {
+  Long_Lens  // edit this line to change lenses
+  look_at Here
+ }</PRE>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov234.htm">Camera Ray Perturbation</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov236.htm">Objects</A>
+</P>
+</BODY>
+</HTML>
+

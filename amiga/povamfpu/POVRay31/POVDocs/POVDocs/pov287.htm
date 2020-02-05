@@ -1,0 +1,34 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Empty and Solid Objects</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov286.htm">Why are Interior and Media Necessary?</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov288.htm">Refraction</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405197"><A NAME="_Toc411405473"><A NAME="_Ref412028393"><A NAME="_Toc414199115"><A NAME="_Ref415663975"><A NAME="_Ref417287889"><A NAME="_Ref421004161"><A NAME="_Ref421693928"><A NAME="_Toc429993632">Empty and Solid Objects</A></A></A></A></A></A></A></A></A></H3>
+<P>It is very important that you know the basic concept behind empty and solid objects in POV-Ray to fully understand how features like interior and translucency are used.  Objects in POV-Ray can either be solid, empty or filled with (small) particles. </P>
+<P>A solid object is made from the material specified by its pigment and finish statements (and to some degree its normal statement). By default all objects are assumed to be solid. If you assign a stone texture to a sphere you'll get a ball made completely of stone. It's like you had cut this ball from a block of stone. A glass ball is a massive sphere made of glass.  You should be aware that solid objects are conceptual things. If you clip away parts of the sphere you'll clearly see that the interior is empty and it just has a very thin surface. </P>
+<P>This is not contrary to the concept of a solid object used in POV-Ray. It is assumed that all space inside the sphere is covered by the sphere's <b><code>interior</code></b>. Light passing through the object is affected by attenuation and refraction properties.  However there is no room for any other particles like those used by fog or interior media. </P>
+<P>Empty objects are created by adding the <b><code>hollow</code></b> keyword (see "<A HREF="pov282.htm#_Ref416607008">Hollow</A>") to the object statement. An empty (or hollow) object is assumed to be made of a very thin surface which is of the material specified by the pigment, finish and normal statements. The object's interior is empty, it normally contains air molecules. </P>
+<P>An empty object can be filled with particles by adding fog or atmospheric media to the scene or by adding an interior media to the object.  It is very important to understand that in order to fill an object with  any kind of particles it first has to be made hollow. </P>
+<P>There is a pitfall in the empty/solid object implementation that you have to be aware of. </P>
+<P>In order to be able to put solid objects inside a media or fog, a test has to be made for every ray that passes through the media. If this ray travels through a solid object the media will not be calculated. This is what anyone will expect. A solid glass sphere in a fog bank does not contain fog.</P>
+<P>The problem arises when the camera ray is inside any non-hollow object. In this case the ray is already traveling through a solid object and even if the media's container object is hit and it is hollow, the media will not be calculated. There is no way of telling between these two cases. </P>
+<P>POV-Ray has to determine whether the camera is inside any object prior to tracing a camera ray in order to be able to correctly render medias when the camera is inside the container object. There's no way around doing this. </P>
+<P>The solution to this problem (that will often happen with infinite objects like planes) is to make those objects hollow too. Thus the ray will travel through a hollow object, will hit the container object and the media will be calculated. </P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov286.htm">Why are Interior and Media Necessary?</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov288.htm">Refraction</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Turbulence</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov349.htm">Waveforms</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov351.htm">Octaves</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199192"><A NAME="_Toc429993708">Turbulence</A></A></H4>
+<P>The keyword <b><code>turbulence</code></b> followed by a float or vector may be used to stir up any <b><code>pigment</code></b>, <b><code>normal</code></b>, <b><code>texture</code></b>, <b><code>irid</code></b> or <b><code>density</code></b>. A number of optional parameters may be used with turbulence to control how it is computed. The syntax is:</P>
+<I><DL>
+<DT>TURBULENCE_ITEM:</DT>
+</I><b><code><DD>turbulence</code></b> <I>&lt;Amount&gt;</I>   |   <b><code>octaves</code></b> <I>Count</I>   |   <b><code>omega</code></b> <I>Amount</I>   |   <b><code>lambda</code></b> <I>Amount</DD>
+</DL>
+</I><P>Typical turbulence values range from the default 0.0, which is no turbulence, to 1.0 or more, which is very turbulent. If a vector is specified different amounts of turbulence are applied in the x-, y- and z-direction. For example</P>
+<PRE>  turbulence &lt;1.0, 0.6, 0.1&gt;</PRE>
+<P>has much turbulence in the x-direction, a moderate amount in the y-direction and a small amount in the z-direction.</P>
+<P>Turbulence uses a random noise function called <I>DNoise</I>. This is similar to the noise used in the <b><code>bozo</code></b> pattern except that instead of giving a single value it gives a direction. You can think of it as the direction that the wind is blowing at that spot. Points close together generate almost the same value but points far apart are randomly different.</P>
+<P>In general the order of turbulence parameters relative to other pattern modifiers such as transformations, color maps and other maps is not important. For example scaling before or after turbulence makes no difference. The turbulence is done first, then the scaling regardless of which is specified first. See section "" for a way to work around this behavior.</P>
+<P>In general, the order of turbulence parameters relative to each other and to other pattern modifiers such as transformations or <b><code>color_map</code></b> and other maps is not important. For example scaling before or after turbulence makes no difference. The turbulence is done first, then the scaling regardless of which is specified first. However the order in which transformations are performed relative to <b><code>warp</code></b> statements is important. You can also specify turbulence inside <b><code>warp</code></b> and in this way you can force turbulence to be applied after transformations.  See "<A HREF="pov354.htm#_Ref419875889">Warps</A>" for details.</P>
+<P>Turbulence uses <I>DNoise </I>to push a point around in several steps called <b><code>octaves</code></b>. We locate the point we want to evaluate, then push it around a bit using turbulence to get to a different point then look up the color or pattern of the new point.</P>
+<P>It says in effect <I>"Don't give me the color at this spot... take a   few random steps in different directions and give me that color"</I>. Each step is typically half as long as the one before. For example:</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image232.gif" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">Turbulence random walk.</P>
+</B><P>The magnitude of these steps is controlled by the turbulence value. There are three additional parameters which control how turbulence is computed. They are <b><code>octaves</code></b>, <b><code>lambda</code></b> and <b><code>omega</code></b>. Each is optional. Each is followed by a single float value. Each has no effect when there is no turbulence.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov349.htm">Waveforms</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov351.htm">Octaves</A>
+</P>
+</BODY>
+</HTML>
+

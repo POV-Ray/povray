@@ -1,0 +1,37 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Average Function</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov87.htm">What About Tiles?</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov89.htm">Working With Layered Textures</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405140"><A NAME="_Toc411405416"><A NAME="_Toc414198908"><A NAME="_Toc429993418">Average Function</A></A></A></A></H3>
+<P>Now things get interesting. Above, we began to see how pigments and normals can fade from one to the other when we used them in maps. But how about if we want a smooth blend of patterns all the way through? That is where a new feature called <b><code>average</code></b> can come in very handy. Average works with pigment, normal, and texture maps, although the syntax is a little bit different, and when we are not expecting it, the change can be confusing. Here is a simple example. We use our standard includes, camera and light source from above, and enter the following object.</P>
+<PRE>  plane { -z, 0
+    pigment { White }
+    normal {
+      average
+      normal_map {
+        [ gradient x ]
+        [ gradient y ]
+      }
+    }
+  }</PRE>
+<P>What we have done here is pretty self explanatory as soon as we render it. We have combined a vertical with a horizontal gradient bump pattern, creating crisscrossing gradients. Actually, the crisscrossing effect is a smooth blend of gradient x with gradient y all the way across our plane. Now, what about that syntax difference?</P>
+<P>We see how our normal map has changed from earlier examples. The floating point value to the left-hand side of each map entry has been removed.  That value usually helps in procedurally mapping each entry to the pattern we have selected, but average is a smooth blend all the way through, not a pattern, so it cannot use those values. In fact, including them may sometimes lead to unexpected results, such as entries being lost or misrepresented in some way. To ensure that we'll get the pattern blend we anticipate, we leave off the floating point value.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov87.htm">What About Tiles?</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov89.htm">Working With Layered Textures</A>
+</P>
+</BODY>
+</HTML>
+

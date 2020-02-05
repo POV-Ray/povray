@@ -1,0 +1,47 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Media</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov355.htm">Bitmap Modifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov357.htm">Media Types</A>
+</P>
+<HR>
+<BR>
+<H2><A NAME="_Ref413750547"><A NAME="_Toc414199204"><A NAME="_Toc429993720">Media</A></A></A></H2>
+<P>The <b><code>media</code></b> statement is used to specify particulate matter suspended in a medium such air or water.  It can be used to specify smoke, haze, fog, gas, fire, dust etc.  Previous versions of POV-Ray had two incompatible systems for generating such effects.  One was <b><code>halo</code></b> for effects enclosed in a transparent or semi-transparent object.  The other was <b><code>atmosphere</code></b> for effects that  permeated the entire scene.  This duplication of systems was complex and unnecessary.  Both <b><code>halo</code></b> and <b><code>atmosphere</code></b> have been eliminated.  See "<A HREF="pov286.htm#_Ref417286060">Why are Interior and Media Necessary?</A>" for further details on this change.  See "<A HREF="pov291.htm#_Ref420157351">Object Media</A>" for details on how to use <b><code>media</code></b> with objects.  See "<A HREF="pov368.htm#_Ref420157406">Atmospheric Media</A>" for details on using <b><code>media</code></b> for atmospheric effects outside of objects.  This section and the sub-sections which follow explains the details of the various <b><code>media</code></b> options which are useful for either object media or atmospheric media.</P>
+<P>Media works by sampling the density of particles at some specified number of points along the ray's path.  Sub-samples are also taken until the results reach a specified confidence level.  When used in an object's <b><code>interior</code></b> statement, sampling only occurs inside the object.  When used for atmospheric media, the samples run from the camera location until the ray strikes an object.  Therefore for localized effects, it is best to use an enclosing object even though the density pattern might only produce results in a small area whether the media was enclosed or not.</P>
+<P>The complete syntax for a <b><code>media</code></b> statement is as follows:</P>
+<I><DL>
+<DT>MEDIA:</DT>
+</I><b><code><DD>media {</code></b> <I>[MEDIA_IDENTIFIER] [MEDIA_ITEMS...]</I> <b><code>}</DD>
+</code></b><I><DT>MEDIA_ITEMS:</DT>
+</I><b><code><DD>intervals</code></b> <I>Number</I>   |   <b><code>samples</code></b> <I>Min</I><b><code>,</code></b> <I>Max</I>   |</DD>
+<b><code><DD>confidence</code></b> <I>Value</I>   |   <b><code>variance</code></b> <I>Value</I>   |   <b><code>ratio</code></b> <I>Value</I>   |</DD>
+<b><code><DD>absorption</code></b>  <I>COLOR</I>   |   <b><code>emission</code></b> <I>COLOR</I>   |</DD>
+<b><code><DD>scattering {</code></b> <I>Type</I><b><code>,</code></b> <I>COLOR</I>  <I>[</I> <b><code>eccentricity</code></b> <I>Value</I> <I>]</I> <I>[</I> <b><code>extinction</code></b> <I>Value</I> <I>]</I> <b><code>}</code></b>   |</DD>
+<b><code><DD>density {</code></b> <I>[DENSITY_IDENTIFIER] [PATTERN_TYPE] [DENSITY_MODIFIER...]</I>  <b><code>}</code></b>   |</DD>
+<I><DD>TRANSFORMATIONS</DD>
+<DT>DENSITY_MODIFIER:</DT>
+<DD>PATTERN_MODIFIER</I>   |   <I>DENSITY_LIST</I>   |   <I>COLOR_LIST</I>   |</DD>
+<b><code><DD>color_map{</code></b> <I>COLOR_MAP_BODY</I> <b><code>}</code></b>   |   <b><code>colour_map{</code></b> <I>COLOR_MAP_BODY</I> <b><code>}</code></b>   |</DD>
+<b><code><DD>density_map{</code></b> <I>DENSITY_MAP_BODY</I> <b><code>}</DD>
+</DL>
+</code></b><P>If a media identifier is specified, it must be the first item.  All other media items may be specified in any order.  All are optional.  You may have multiple <b><code>density</code></b> statements in a single <b><code>media</code></b> statement.  See "<A HREF="pov366.htm#_Ref428014795">Multiple Density vs. Multiple Media</A>" for details.  Transformations apply only the <b><code>density</code></b> statements which have been already specified.  Any <b><code>density</code></b> after a transformation is not affected.  If the <b><code>media</code></b> has no <b><code>density</code></b> statements and none was specified in any media identifier, then the transformation has no effect.  All other media items except for <b><code>density</code></b> and transformations override default values or any previously set values for this <b><code>media</code></b> statement.</P>
+<P>Note that some media effects depend upon light sources.  However the participation of a light source depends upon the <b><code>media_interaction</code></b> and <b><code>media_attenuation</code></b> keywords.  See "<A HREF="pov275.htm#_Ref420911832">Atmospheric Media Interaction</A>" and "<A HREF="pov276.htm#_Ref420911866">Atmospheric Attenuation</A>" for details.</P>
+<P>Note a strange design side-effect was discovered during testing and it was too difficult to fix.  If the enclosing object uses <b><code>transmit</code></b> rather than <b><code>filter</code></b> for transparency, then the <b><code>media</code></b> casts no shadows.  For example:</P>
+<PRE> object{MyObject pigment{rgbt 1.0} interior{media{MyMedia}}} //no shadows
+ object{MyObject pigment{rgbf 1.0} interior{media{MyMedia}}} //shadows</PRE>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov355.htm">Bitmap Modifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov357.htm">Media Types</A>
+</P>
+</BODY>
+</HTML>
+

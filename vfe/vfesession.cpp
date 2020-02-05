@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,28 +41,36 @@
 #endif
 
 #include "vfe.h"
+
+#include <boost/bind.hpp>
+
 #include "backend/povray.h"
 
-static POVMSContext POVMS_Output_Context = NULL;
+static POVMSContext POVMS_Output_Context = nullptr;
 
 namespace pov
 {
-  static volatile POVMSContext POVMS_GUI_Context = NULL ;
+  static volatile POVMSContext POVMS_GUI_Context = nullptr;
   static volatile POVMSAddress RenderThreadAddr = POVMSInvalidAddress ;
   static volatile POVMSAddress GUIThreadAddr = POVMSInvalidAddress ;
 }
+// end of namespace pov
 
 namespace vfe
 {
 
+using std::min;
+using std::max;
+using std::string;
+
 bool vfeSession::m_Initialized = false;
-vfeSession *vfeSession::m_CurrentSessionTemporaryHack = NULL;
+vfeSession *vfeSession::m_CurrentSessionTemporaryHack = nullptr;
 
 vfeSession::vfeSession(int id)
 {
   m_Id = id ;
-  m_Frontend = NULL;
-  m_BackendThread = m_WorkerThread = NULL;
+  m_Frontend = nullptr;
+  m_BackendThread = m_WorkerThread = nullptr;
   m_WorkerThreadShutdownRequest = false;
   m_HadCriticalError = false;
   m_CurrentSessionTemporaryHack = this;
@@ -78,7 +86,7 @@ vfeSession::vfeSession(int id)
   m_RequestFlag = rqNoRequest;
   m_RequestResult = 0;
   m_StartTime = 0;
-  m_DisplayCreator = boost::bind(&vfe::vfeSession::DefaultDisplayCreator, this, _1, _2, _3, _4, _5);
+  m_DisplayCreator = boost::bind(&vfe::vfeSession::DefaultDisplayCreator, this, _1, _2, _3, _4);
   Reset();
 }
 
@@ -86,7 +94,7 @@ vfeSession::~vfeSession()
 {
   // note: shouldn't delete m_Frontend here since it will cause a POVMS context error
   m_Initialized = false;
-  m_CurrentSessionTemporaryHack = NULL;
+  m_CurrentSessionTemporaryHack = nullptr;
 }
 
 // Clears many of the internal state information held by VFE regarding
@@ -160,7 +168,7 @@ void vfeSession::SetSucceeded (bool ok)
 // Clears all messages from the status message queue.
 void vfeSession::ClearStatusMessages()
 {
-  boost::mutex::scoped_lock lock(m_MessageMutex);
+  std::lock_guard<std::mutex> lock(m_MessageMutex);
 
   while (m_StatusQueue.empty() == false)
     m_StatusQueue.pop();
@@ -194,7 +202,7 @@ void vfeSession::AppendStreamMessage (MessageType type, const char *message, boo
 
   const char *begin = message ;
   const char *end = begin + strlen (message) - 1;
-  boost::mutex::scoped_lock lock(m_MessageMutex);
+  std::lock_guard<std::mutex> lock(m_MessageMutex);
 
   for (const char *s = begin ; s <= end ; s++)
   {
@@ -221,7 +229,7 @@ void vfeSession::AppendStreamMessage (MessageType type, const boost::format& fmt
 
 void vfeSession::AppendErrorMessage (const string& Msg)
 {
-  boost::mutex::scoped_lock lock(m_MessageMutex);
+  std::lock_guard<std::mutex> lock(m_MessageMutex);
   bool possibleError = Msg.find("Possible ") == 0 ;
 
   // for the purpose of setting m_HadErrorMessage, we don't consider a
@@ -237,7 +245,7 @@ void vfeSession::AppendErrorMessage (const string& Msg)
 
 void vfeSession::AppendErrorMessage (const string& Msg, const UCS2String& File, int Line, int Col)
 {
-  boost::mutex::scoped_lock lock(m_MessageMutex);
+  std::lock_guard<std::mutex> lock(m_MessageMutex);
   bool possibleError = Msg.find("Possible ") == 0 ;
 
   // for the purpose of setting m_HadErrorMessage, we don't consider a
@@ -253,7 +261,7 @@ void vfeSession::AppendErrorMessage (const string& Msg, const UCS2String& File, 
 
 void vfeSession::AppendWarningMessage (const string& Msg)
 {
-  boost::mutex::scoped_lock lock(m_MessageMutex);
+  std::lock_guard<std::mutex> lock(m_MessageMutex);
 
   m_MessageQueue.push (GenericMessage (*this, mWarning, Msg));
   if (m_MaxGenericMessages != -1)
@@ -264,7 +272,7 @@ void vfeSession::AppendWarningMessage (const string& Msg)
 
 void vfeSession::AppendWarningMessage (const string& Msg, const UCS2String& File, int Line, int Col)
 {
-  boost::mutex::scoped_lock lock(m_MessageMutex);
+  std::lock_guard<std::mutex> lock(m_MessageMutex);
 
   m_MessageQueue.push (GenericMessage (*this, mWarning, Msg, File, Line, Col));
   if (m_MaxGenericMessages != -1)
@@ -275,7 +283,7 @@ void vfeSession::AppendWarningMessage (const string& Msg, const UCS2String& File
 
 void vfeSession::AppendStatusMessage (const string& Msg, int RecommendedPause)
 {
-  boost::mutex::scoped_lock lock(m_MessageMutex);
+  std::lock_guard<std::mutex> lock(m_MessageMutex);
 
   m_StatusQueue.push (StatusMessage (*this, Msg, RecommendedPause));
   m_StatusLineMessage = Msg;
@@ -287,7 +295,7 @@ void vfeSession::AppendStatusMessage (const string& Msg, int RecommendedPause)
 
 void vfeSession::AppendStatusMessage (const boost::format& fmt, int RecommendedPause)
 {
-  boost::mutex::scoped_lock lock(m_MessageMutex);
+  std::lock_guard<std::mutex> lock(m_MessageMutex);
 
   m_StatusQueue.push (StatusMessage (*this, fmt.str(), RecommendedPause));
   m_StatusLineMessage = fmt.str();
@@ -299,7 +307,7 @@ void vfeSession::AppendStatusMessage (const boost::format& fmt, int RecommendedP
 
 void vfeSession::AppendAnimationStatus (int FrameId, int SubsetFrame, int SubsetTotal, const UCS2String& Filename)
 {
-  boost::mutex::scoped_lock lock(m_MessageMutex);
+  std::lock_guard<std::mutex> lock(m_MessageMutex);
 
   m_CurrentFrameId = FrameId;
   m_CurrentFrame = SubsetFrame;
@@ -334,7 +342,7 @@ bool vfeSession::GetNextCombinedMessage (MessageType &Type, string& Message)
   POV_LONG                    mqTime = 0x7fffffffffffffffLL ;
   POV_LONG                    sqTime = 0x7fffffffffffffffLL ;
   POV_LONG                    cqTime = 0x7fffffffffffffffLL ;
-  boost::mutex::scoped_lock   lock(m_MessageMutex);
+  std::lock_guard<std::mutex> lock(m_MessageMutex);
 
   if (m_MessageQueue.empty() && m_StatusQueue.empty() && m_ConsoleQueue.empty())
     return (false);
@@ -373,14 +381,14 @@ bool vfeSession::GetNextCombinedMessage (MessageType &Type, string& Message)
 // from the aforementioned queues; whichever is the earliest. Returns false
 // if there is no message to fetch, otherwise will set the message type,
 // filename, line, and column parameters supplied. If the message retrieved
-// did not contain this information, the relevent entry is either set to 0
+// did not contain this information, the relevant entry is either set to 0
 // (line and column) or the empty string (filename). The filename parameter
 // is a UCS2String.
 bool vfeSession::GetNextNonStatusMessage (MessageType &Type, string& Message, UCS2String& File, int& Line, int& Col)
 {
   POV_LONG                    mqTime = 0x7fffffffffffffffLL ;
   POV_LONG                    cqTime = 0x7fffffffffffffffLL ;
-  boost::mutex::scoped_lock   lock(m_MessageMutex);
+  std::lock_guard<std::mutex> lock(m_MessageMutex);
 
   if (m_MessageQueue.empty() && m_ConsoleQueue.empty())
     return (false);
@@ -419,7 +427,7 @@ bool vfeSession::GetNextNonStatusMessage (MessageType &Type, string& Message, UC
 // from the aforementioned queues; whichever is the earliest. Returns false
 // if there is no message to fetch, otherwise will set the message type,
 // filename, line, and column parameters supplied. If the message retrieved
-// did not contain this information, the relevent entry is either set to 0
+// did not contain this information, the relevant entry is either set to 0
 // (line and column) or the empty string (filename). The filename parameter
 // is a std::string.
 bool vfeSession::GetNextNonStatusMessage (MessageType &Type, string& Message, string& File, int& Line, int& Col)
@@ -427,7 +435,7 @@ bool vfeSession::GetNextNonStatusMessage (MessageType &Type, string& Message, st
   UCS2String str;
   bool result = GetNextNonStatusMessage (Type, Message, str, Line, Col);
   if (result)
-    File = UCS2toASCIIString(str);
+    File = UCS2toSysString(str);
   return result;
 }
 
@@ -450,7 +458,7 @@ bool vfeSession::GetNextNonStatusMessage (MessageType &Type, string& Message)
 // as a parameter, then returns true.
 bool vfeSession::GetNextStatusMessage (StatusMessage& Message)
 {
-  boost::mutex::scoped_lock lock(m_MessageMutex);
+  std::lock_guard<std::mutex> lock(m_MessageMutex);
 
   if (m_StatusQueue.empty())
     return (false);
@@ -465,7 +473,7 @@ bool vfeSession::GetNextStatusMessage (StatusMessage& Message)
 // parameter, then returns true.
 bool vfeSession::GetNextGenericMessage (GenericMessage& Message)
 {
-  boost::mutex::scoped_lock lock(m_MessageMutex);
+  std::lock_guard<std::mutex> lock(m_MessageMutex);
 
   if (m_MessageQueue.empty())
     return (false);
@@ -480,7 +488,7 @@ bool vfeSession::GetNextGenericMessage (GenericMessage& Message)
 // then returns true.
 bool vfeSession::GetNextConsoleMessage (MessageBase& Message)
 {
-  boost::mutex::scoped_lock lock(m_MessageMutex);
+  std::lock_guard<std::mutex> lock(m_MessageMutex);
 
   if (m_ConsoleQueue.empty())
     return (false);
@@ -497,7 +505,7 @@ bool vfeSession::GetNextConsoleMessage (MessageBase& Message)
 
 bool vfeSession::ProcessFrontend (void)
 {
-  if (m_Frontend == NULL)
+  if (m_Frontend == nullptr)
     return (false);
   m_Frontend->Process () ;
   if (m_Frontend->GetState () == m_BackendState)
@@ -543,11 +551,11 @@ const char *vfeSession::GetBackendStateName (void) const
 
 // Returns a copy of the shared pointer containing the current instance
 // of a pov_frontend::Display-derived render preview instance, which may
-// be NULL.
-shared_ptr<Display> vfeSession::GetDisplay() const
+// be `nullptr`.
+std::shared_ptr<Display> vfeSession::GetDisplay() const
 {
-  if (m_Frontend == NULL)
-    return (shared_ptr<Display>());
+  if (m_Frontend == nullptr)
+    return (std::shared_ptr<Display>());
   return m_Frontend->GetDisplay();
 }
 
@@ -555,7 +563,7 @@ void vfeSession::BackendThreadNotify()
 {
   m_BackendThreadExited = true;
   pov::RenderThreadAddr = POVMSInvalidAddress;
-  if (m_Frontend != NULL)
+  if (m_Frontend != nullptr)
     m_Frontend->InvalidateBackend();
 }
 
@@ -585,11 +593,11 @@ void vfeSession::WorkerThread()
   m_BackendThread = povray_init (boost::bind(&vfeSession::BackendThreadNotify, this), const_cast<void **>(&pov::RenderThreadAddr)) ;
   POVMS_Output_Context = pov::POVMS_GUI_Context ;
 
-  m_Console = shared_ptr<vfeConsole> (new vfeConsole(this, m_ConsoleWidth)) ;
+  m_Console = std::shared_ptr<vfeConsole> (new vfeConsole(this, m_ConsoleWidth)) ;
 
   POVMS_Object obj ;
-  m_Frontend = new VirtualFrontEnd (*this, POVMS_Output_Context, (POVMSAddress) pov::RenderThreadAddr, obj, NULL, m_Console) ;
-  if (m_Frontend == NULL)
+  m_Frontend = new VirtualFrontEnd (*this, POVMS_Output_Context, (POVMSAddress) pov::RenderThreadAddr, obj, nullptr, m_Console);
+  if (m_Frontend == nullptr)
     throw POV_EXCEPTION_STRING ("Worker thread failed to create frontend");
   m_BackendState = m_Frontend->GetState();
   m_InitializeEvent.notify_all ();
@@ -648,7 +656,7 @@ void vfeSession::WorkerThread()
           }
           m_RequestEvent.notify_all ();
         }
-        boost::thread::yield();
+        std::this_thread::yield();
       }
       catch (pov_base::Exception& e)
       {
@@ -700,13 +708,13 @@ void vfeSession::WorkerThread()
   try
   {
     delete m_Frontend;
-    m_Frontend = NULL;
+    m_Frontend = nullptr;
     WorkerThreadShutdown();
     m_Initialized = false;
-    m_BackendThread = NULL;
+    m_BackendThread = nullptr;
     povray_terminate();
     POVMS_CloseContext (POVMS_Output_Context);
-    m_CurrentSessionTemporaryHack = NULL;
+    m_CurrentSessionTemporaryHack = nullptr;
     m_WorkerThreadExited = true;
     m_ShutdownEvent.notify_all ();
   }
@@ -732,27 +740,27 @@ void vfeSession::WorkerThread()
 // global variable.
 vfeSession *vfeSession::GetSessionFromThreadID()
 {
-  if (m_CurrentSessionTemporaryHack == NULL)
+  if (m_CurrentSessionTemporaryHack == nullptr)
     throw vfeCriticalError("connection to backend has been terminated");
   return m_CurrentSessionTemporaryHack ;
 }
 
-vfeDisplay *vfeSession::DefaultDisplayCreator (unsigned int width, unsigned int height, GammaCurvePtr gamma, vfeSession *session, bool visible)
+vfeDisplay *vfeSession::DefaultDisplayCreator (unsigned int width, unsigned int height, vfeSession *session, bool visible)
 {
-  return new vfeDisplay (width, height, gamma, session, visible) ;
+  return new vfeDisplay (width, height, session, visible) ;
 }
 
 // If a VFE implementation has provided the address of a display creator
 // function via vfeSession::SetDisplayCreator(), this method will call it
 // with the width, height, gamma factor, and default visibility flag (false
-// if not specified). Otherwise it will return NULL. It is used when the
+// if not specified). Otherwise it will return `nullptr`. It is used when the
 // core POV-Ray code requests that a render preview window be created.
 // If a display instance is returned, it is expected to conform to the
 // definition of the pov_frontend::Display class, but will typically be
 // a platform-specific derivative of that.
-vfeDisplay *vfeSession::CreateDisplay (unsigned int width, unsigned int height, GammaCurvePtr gamma, bool visible)
+vfeDisplay *vfeSession::CreateDisplay (unsigned int width, unsigned int height, bool visible)
 {
-  return m_DisplayCreator (width, height, gamma, this, visible);
+  return m_DisplayCreator (width, height, this, visible);
 }
 
 // This method causes a shutdown of the vfeSession instance. Specifically
@@ -764,7 +772,7 @@ vfeDisplay *vfeSession::CreateDisplay (unsigned int width, unsigned int height, 
 // period of time). It is not mandatory to implement the forced feature.
 void vfeSession::Shutdown(bool forced)
 {
-  if (m_Initialized == false || m_WorkerThread == NULL)
+  if ((m_Initialized == false) || (m_WorkerThread == nullptr))
     return ;
 
   // TODO: implement forced if possible (may need to be platform-specific)
@@ -772,10 +780,10 @@ void vfeSession::Shutdown(bool forced)
   NotifyEvent(stShutdown);
   m_WorkerThread->join();
   delete m_WorkerThread;
-  m_WorkerThread = NULL;
+  m_WorkerThread = nullptr;
 }
 
-// Returns a string giving a short english description of the error code
+// Returns a string giving a short English description of the error code
 // supplied as the only parameter. If no parameter is supplied, the default
 // value (-1) instructs the method to instead use the value of m_LastError.
 const char *vfeSession::GetErrorString(int code) const
@@ -898,7 +906,7 @@ const char *vfeSession::GetErrorString(int code) const
 // provided for VFE does this).
 vfeStatusFlags vfeSession::GetStatus(bool Clear, int WaitTime)
 {
-  boost::mutex::scoped_lock lock (m_SessionMutex);
+  std::unique_lock<std::mutex> lock (m_SessionMutex);
 
   if ((m_StatusFlags & m_EventMask) != 0)
   {
@@ -911,12 +919,7 @@ vfeStatusFlags vfeSession::GetStatus(bool Clear, int WaitTime)
 
   if (WaitTime > 0)
   {
-    // TODO FIXME - boost::xtime has been deprecated since boost 1.34.
-    boost::xtime t;
-    boost::xtime_get (&t, POV_TIME_UTC);
-    t.sec += WaitTime / 1000 ;
-    t.nsec += (WaitTime % 1000) * 1000000 ;
-    m_SessionEvent.timed_wait (lock, t);
+    m_SessionEvent.wait_for (lock, std::chrono::milliseconds(WaitTime));
   }
   else if (WaitTime == -1)
     m_SessionEvent.wait (lock);
@@ -973,18 +976,14 @@ bool vfeSession::Paused() const
 // vfeSession::Initialize() hasn't been called or failed when called).
 bool vfeSession::Pause()
 {
-  boost::mutex::scoped_lock lock (m_RequestMutex);
+  std::unique_lock<std::mutex> lock (m_RequestMutex);
 
   CheckFrontend();
 
   // we can't call pause directly since it will result in a thread context
   // error. pause must be called from the context of the worker thread.
-  // TODO FIXME - boost::xtime has been deprecated since boost 1.34.
-  boost::xtime t;
-  boost::xtime_get (&t, POV_TIME_UTC);
-  t.sec += 3 ;
   m_RequestFlag = rqPauseRequest;
-  if (m_RequestEvent.timed_wait(lock, t) == false)
+  if (m_RequestEvent.wait_for(lock, std::chrono::seconds(3)) == std::cv_status::timeout)
   {
     m_RequestFlag = rqNoRequest;
     m_LastError = vfeRequestTimedOut;
@@ -997,18 +996,14 @@ bool vfeSession::Pause()
 // The converse of vfeSession::Pause(). All the same considerations apply.
 bool vfeSession::Resume()
 {
-  boost::mutex::scoped_lock lock (m_RequestMutex);
+  std::unique_lock<std::mutex> lock (m_RequestMutex);
 
   CheckFrontend();
 
   // we can't call resume directly since it will result in a thread context
   // error. it must be called from the context of the worker thread.
-  // TODO FIXME - boost::xtime has been deprecated since boost 1.34.
-  boost::xtime t;
-  boost::xtime_get (&t, POV_TIME_UTC);
-  t.sec += 3 ;
   m_RequestFlag = rqResumeRequest;
-  if (m_RequestEvent.timed_wait(lock, t) == false)
+  if (m_RequestEvent.wait_for(lock, std::chrono::seconds(3)) == std::cv_status::timeout)
   {
     m_RequestFlag = rqNoRequest;
     m_LastError = vfeRequestTimedOut;
@@ -1021,7 +1016,7 @@ bool vfeSession::Resume()
 // Internal method used to generate an event notification.
 void vfeSession::NotifyEvent(vfeStatusFlags Status)
 {
-  boost::mutex::scoped_lock lock (m_SessionMutex);
+  std::lock_guard<std::mutex> lock (m_SessionMutex);
 
   m_StatusFlags = vfeStatusFlags(m_StatusFlags | Status);
   if ((m_StatusFlags & m_EventMask) != 0)
@@ -1030,7 +1025,7 @@ void vfeSession::NotifyEvent(vfeStatusFlags Status)
 
 // Used to set up a session with a POV backend. Accepts two
 // parameters - a destination (vfeDestInfo) and authorization
-// (vfeAuthInfo), both pointers. Currently these must be NULL.
+// (vfeAuthInfo), both pointers. Currently these must be `nullptr`.
 //
 // Intialize() will call the Reset() method, and then create
 // the session's worker thread, at which time it will wait on
@@ -1050,10 +1045,10 @@ void vfeSession::NotifyEvent(vfeStatusFlags Status)
 // connection with the backend code.
 int vfeSession::Initialize(vfeDestInfo *Dest, vfeAuthInfo *Auth)
 {
-  boost::mutex::scoped_lock lock (m_InitializeMutex);
+  std::unique_lock<std::mutex> lock (m_InitializeMutex);
 
-  // params must be NULL in this version
-  if (Dest != NULL || Auth != NULL)
+  // params must be `nullptr` in this version
+  if ((Dest != nullptr) || (Auth != nullptr))
     return (m_LastError = vfeInvalidParameter);
 
   // only one session at once permitted in this version
@@ -1070,18 +1065,14 @@ int vfeSession::Initialize(vfeDestInfo *Dest, vfeAuthInfo *Auth)
   m_MessageCount = 0;
   m_LastError = vfeNoError;
 
-  // TODO FIXME - boost::xtime has been deprecated since boost 1.34.
-  boost::xtime t;
-  boost::xtime_get (&t, POV_TIME_UTC);
-  t.sec += 3 ;
+  auto timeout = 3;
 #ifdef _DEBUG
-  t.sec += 120;
+  timeout += 120;
 #endif
-  t.nsec = 0;
-  m_WorkerThread = new boost::thread(vfeSessionWorker(*this));
+  m_WorkerThread = new std::thread(vfeSessionWorker(*this));
 
   // TODO FIXME: see thread <47ca756c$1@news.povray.org>
-  if (m_BackendState == kUnknown && m_InitializeEvent.timed_wait(lock, t)  == false)
+  if ((m_BackendState == kUnknown) && (m_InitializeEvent.wait_for(lock, std::chrono::seconds(timeout)) == std::cv_status::timeout))
   {
     m_WorkerThreadShutdownRequest = true ;
     m_Initialized = false ;
@@ -1091,7 +1082,7 @@ int vfeSession::Initialize(vfeDestInfo *Dest, vfeAuthInfo *Auth)
   {
     m_WorkerThread->join();
     delete m_WorkerThread;
-    m_WorkerThread = NULL;
+    m_WorkerThread = nullptr;
     return (m_LastError);
   }
 
@@ -1101,3 +1092,4 @@ int vfeSession::Initialize(vfeDestInfo *Dest, vfeAuthInfo *Auth)
 }
 
 }
+// end of namespace vfe

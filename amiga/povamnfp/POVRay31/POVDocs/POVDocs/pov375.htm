@@ -1,0 +1,30 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Ambient Light</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov374.htm">ADC_Bailout</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov376.htm">Assumed_Gamma</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405221"><A NAME="_Toc411405497"><A NAME="_Ref411751086"><A NAME="_Toc414199222"><A NAME="_Ref418066764"><A NAME="_Toc429993739">Ambient Light</A></A></A></A></A></A></H3>
+<P>Ambient light is used to simulate the effect of inter-diffuse reflection that is responsible for lighting areas that partially or completely lie in shadow.  POV-Ray provides the <b><code>ambient_light</code></b> keyword to let you easily change the brightness of the ambient lighting without changing every ambient value in all finish statements. It also lets you create interesting effects by changing the color of the ambient light source. The syntax is:</P>
+<b><code><DL>
+<DD>global_settings { ambient_light</code></b><I> COLOR </I><b><code>}</DD>
+</DL>
+</code></b><P>The default is a white ambient light source set at <b><code>rgb &lt;1,1,1&gt;</code></b>.  Only the rgb components are used.  The actual ambient used is:    <I>Ambient = Finish_Ambient * Global_Ambient.</P>
+</I><P>See section "<A HREF="pov305.htm#_Ref422128412">Ambient</A>" for more information.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov374.htm">ADC_Bailout</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov376.htm">Assumed_Gamma</A>
+</P>
+</BODY>
+</HTML>
+

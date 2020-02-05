@@ -1,0 +1,81 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Color Maps</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov295.htm">Color List Pigments</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov297.htm">Pigment Maps and Pigment Lists</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199129"><A NAME="_Ref420922745"><A NAME="_Toc429993641">Color Maps</A></A></A></H4>
+<P>Most of the color patterns do not use abrupt color changes of just two or three colors like those in the brick, checker or hexagon patterns.  They instead use smooth transitions of many colors that gradually change from one point to the next. The colors are defined in a pigment modifier called a <b><code>color_map</code></b> that describes how the pattern blends from one color to the next.</P>
+<P>Each of the various pattern types available is in fact a mathematical function that takes any x, y, z location and turns it into a number between 0.0 and 1.0 inclusive. That number is used to specify what mix of colors to use from the color map.</P>
+<P>The syntax for <b><code>color_map</code></b> is as follows:</P>
+<I><DL>
+<DT>COLOR_MAP:</DT>
+</I><b><code><DD>color_map{</code></b> <I>COLOR_MAP_BODY</I> <b><code>}</code></b>   |   <b><code>colour_map{</code></b> <I>COLOR_MAP_BODY</I> <b><code>}</DD>
+</code></b><I><DT>COLOR_MAP_BODY:</DT>
+<DD>COLOR_MAP_IDENTIFIER</I>   |   <I>COLOR_MAP_ENTRY</I>...</DD>
+<I><DT>COLOR_MAP_ENTRY:</DT>
+</I><b><code><DD>[</code></b> <I>Value</I>  <I>COLOR</I> <b><code>]</code></b>   |   <b><code>[</code></b> <I>Value_1</I>, <I>Value_2</I> <b><code>color</code></b> <I>COLOR_1</I> <b><code>color</code></b> <I>COLOR_2</I> <b><code>]</DD>
+</DL>
+</code></b><P>Where each <I>Value_n</I> is a float values between 0.0 and 1.0 inclusive and each <I>COLOR_n</I>, is color specifications. Note that the <b><code>[]</code></b> brackets are part of the actual <I>COLOR_MAP_ENTRY</I>. They are not notational symbols denoting optional parts. The brackets surround each entry in the color map. There may be from 2 to 256 entries in the map. The alternate spelling <b><code>colour_map</code></b> may be used.</P>
+<P>Here is an example:</P>
+<PRE>  sphere {
+    &lt;0,1,2&gt;, 2
+    pigment {
+      gradient x       //this is the PATTERN_TYPE
+      color_map {
+        [0.1  color Red]
+        [0.3  color Yellow]
+        [0.6  color Blue]
+        [0.6  color Green]
+        [0.8  color Cyan]
+      }
+    }
+  }</PRE>
+<P>The pattern function <b><code>gradient x</code></b> is evaluated and the result is a value from 0.0 to 1.0. If the value is less than the first entry (in this case 0.1) then the first color (red) is used. Values from 0.1 to 0.3 use a blend of red and yellow using linear interpolation of the two colors. Similarly values from 0.3 to 0.6 blend from yellow to blue. Note that the 3rd and 4th entries both have values of 0.6. This causes an immediate abrupt shift of color from blue to green. Specifically a value that is less than 0.6 will be blue but exactly equal to 0.6 will be green. Moving along, values from 0.6 to 0.8 will be a blend of green and cyan. Finally any value greater than or equal to 0.8 will be cyan.</P>
+<P>If you want areas of unchanging color you simply specify the same color for two adjacent entries. For example:</P>
+<PRE>  color_map {
+    [0.1  color Red]
+    [0.3  color Yellow]
+    [0.6  color Yellow]
+    [0.8  color Green]
+  }</PRE>
+<P>In this case any value from 0.3 to 0.6 will be pure yellow.</P>
+<P>The first syntax version of <I>COLOR_MAP_ENTRY</I> with one float and one color is the current standard.  The other double entry version is obsolete and should be avoided.  The previous example would look as follows using the old syntax.</P>
+<PRE>  color_map {
+    [0.0 0.1  color Red color Red]
+    [0.1 0.3  color Red color Yellow]
+    [0.3 0.6  color Yellow color Yellow]
+    [0.6.0.8  color Yellow color Green]
+    [0.8 1.0  color Green color Green]
+  }</PRE>
+<P>You may use <b><code>color_map</code></b> with any patterns except <b><code>brick</code></b>, <b><code>checker</code></b>, <b><code>hexagon</code></b> and <b><code>image_map</code></b>. You may declare and use <b><code>color_map</code></b> identifiers. For example:</P>
+<PRE>  #declare Rainbow_Colors=
+    color_map {
+      [0.0   color Magenta]
+      [0.33  color Yellow]
+      [0.67  color Cyan]
+      [1.0   color Magenta]
+    }
+  object{My_Object
+    pigment{
+      gradient x
+      color_map{Rainbow_Colors}
+    }
+  }</PRE>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov295.htm">Color List Pigments</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov297.htm">Pigment Maps and Pigment Lists</A>
+</P>
+</BODY>
+</HTML>
+

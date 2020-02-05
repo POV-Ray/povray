@@ -1,0 +1,76 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Using Pigment Maps</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov73.htm">Using Transparent Pigments and Layered Textures</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov75.htm">Normals</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198894"><A NAME="_Toc429993404">Using Pigment Maps</A></A></H4>
+<P>Pigments may be blended together in the same way as the colors in a color map using the same pattern keywords and a <b><code>pigment_map</code></b>. Let's just give it a try.</P>
+<P>We add the following declarations, making sure they appear before the other declarations in the file.</P>
+<PRE>  #declare Clouds1 = pigment {
+      bozo
+      turbulence 1
+      color_map {
+        [0.0 color White filter 1]
+        [0.5 color White]
+        [1.0 color White filter 1]
+      }
+    }
+  #declare Clouds2 = pigment {
+    agate
+    turbulence 1
+    color_map {
+      [0.0 color White filter 1]
+      [0.5 color White]
+      [1.0 color White filter 1]
+      }
+    }
+  #declare Clouds3 = pigment {
+    marble
+    turbulence 1
+    color_map {
+      [0.0 color White filter 1]
+      [0.5 color White]
+      [1.0 color White filter 1]
+    }
+  }
+  #declare Clouds4 = pigment {
+    granite
+    turbulence 1
+    color_map {
+      [0.0 color White filter 1]
+      [0.5 color White]
+      [1.0 color White filter 1]
+    }
+  }</PRE>
+<P>Now we use these declared pigments in our cloud layer on our planetoid. We replace the declared cloud layer with.</P>
+<PRE>  #declare CloudArea = texture {
+    pigment {
+      gradient y
+      pigment_map {
+        [0.00 Clouds1]
+        [0.25 Clouds2]
+        [0.50 Clouds3]
+        [0.75 Clouds4]
+        [1.00 Clouds1]
+      }
+    }
+  }</PRE>
+<P>We render this and see a remarkable pattern that looks very much like weather patterns on the planet earth. They are separated into bands, simulating the different weather types found at different latitudes.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov73.htm">Using Transparent Pigments and Layered Textures</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov75.htm">Normals</A>
+</P>
+</BODY>
+</HTML>
+

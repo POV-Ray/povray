@@ -1,0 +1,26 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Smooth Transitions</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov45.htm">Teaching An Old Spline New Tricks</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov47.htm">Multiple Sub-Shapes</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198865"><A NAME="_Toc429993376">Smooth Transitions</A></A></H4>
+<P>Now a handy thing to note is that we have made point one equal point four, and also point six equals point three. Yes, this is important. Although this prism would still be legally closed if the control points were not what we've made them, the curve transitions between points would not be as smooth. We change points one and six to &lt;4,6&gt; and &lt;0,7&gt; respectively and re-render to see how the back edge of the shape is altered (see file <CODE>prismdm3.pov</CODE>).</P>
+<P>To put this more generally, if we want a smooth closure on a cubic spline, we make the first control point equal to the third from last point, and the last control point equal to the third point. On a quadratic spline, the trick is similar, but since only the first point is a control point, make that equal to the second from last point.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov45.htm">Teaching An Old Spline New Tricks</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov47.htm">Multiple Sub-Shapes</A>
+</P>
+</BODY>
+</HTML>
+

@@ -31,6 +31,21 @@
     <ClInclude Include="..\..\source\parser\precomp.h">
       <Filter>Parser Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\parser\scanner.h">
+      <Filter>Parser Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\parser\parsertypes.h">
+      <Filter>Parser Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\parser\rawtokenizer.h">
+      <Filter>Parser Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\parser\symboltable.h">
+      <Filter>Parser Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\parser\parser_fwd.h">
+      <Filter>Parser Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\parser\parser.cpp">
@@ -64,6 +79,18 @@
       <Filter>Parser Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\parser\parser_obj.cpp">
+      <Filter>Parser Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\parser\scanner.cpp">
+      <Filter>Parser Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\parser\rawtokenizer.cpp">
+      <Filter>Parser Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\parser\parsertypes.cpp">
+      <Filter>Parser Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\parser\symboltable.cpp">
       <Filter>Parser Source</Filter>
     </ClCompile>
   </ItemGroup>

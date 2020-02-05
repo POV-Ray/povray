@@ -29,7 +29,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -60,10 +60,16 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+// C++ variants of C standard header files
+#include <vector>
+
+// C++ standard header files
 #include <stdexcept>
 
+// POV-Ray header files (base module)
 #include "base/pov_err.h"
 
+// POV-Ray header files (core module)
 #include "core/coretypes.h"
 
 namespace pov
@@ -86,8 +92,8 @@ namespace pov
 // This is intentional as we currently do not store any objects in it that
 // require this functionality. // TODO FIXME
 ////////////////////////////////////////////////////////////////////////////
-template<class ContainerType, class Allocator = std::allocator<ContainerType> >
-class SimpleVector
+template<class ContainerType, class Allocator = std::allocator<ContainerType>>
+class SimpleVector final
 {
 public:
     typedef SimpleVector<ContainerType> MyType;
@@ -106,12 +112,12 @@ public:
 
     SimpleVector()
     {
-        m_First = m_Last = m_End = NULL;
+        m_First = m_Last = m_End = nullptr;
     }
 
     SimpleVector(size_type nItems, const ContainerType& InitialVal)
     {
-        m_First = m_Last = m_End = NULL;
+        m_First = m_Last = m_End = nullptr;
         if (nItems)
             allocate (nItems, InitialVal);
     }
@@ -125,13 +131,13 @@ public:
                 *m_Last++ = *p++;
         }
         else
-            m_First = m_Last = m_End = NULL;
+            m_First = m_Last = m_End = nullptr;
     }
 
     ~SimpleVector()
     {
         // we don't call destructors, even if they exist
-        if (m_First != NULL)
+        if (m_First != nullptr)
             deallocate ();
     }
 
@@ -139,7 +145,7 @@ public:
     {
         if (RHS.size() > capacity())
         {
-            if (m_First != NULL)
+            if (m_First != nullptr)
                 deallocate ();
             allocate (RHS.size());
         }
@@ -309,7 +315,7 @@ public:
                 p [i] = m_First [i];
             for (size_type i = Index + 1 ; i < c ; i++)
                 p [i] = m_First [i];
-            if (m_First != NULL)
+            if (m_First != nullptr)
                 alloc.deallocate (m_First, n);
             m_First = p;
             m_End = m_First + nc;
@@ -357,7 +363,7 @@ public:
             size_type n = size();
             for (size_type i = 0; i < n; ++i)
                 p[i] = m_First[i];
-            if (m_First != NULL)
+            if (m_First != nullptr)
                 alloc.deallocate(m_First, c);
             m_First = p;
             m_End = m_First + nItems;
@@ -406,7 +412,7 @@ private:
 // require this functionality.
 ////////////////////////////////////////////////////////////////////////////
 template<class ContainerType, int ElementCount>
-class FixedSimpleVector
+class FixedSimpleVector final
 {
 public:
     typedef FixedSimpleVector<ContainerType, ElementCount> MyType;
@@ -616,8 +622,14 @@ private:
 
 /// Helper class for @ref PooledSimpleVector
 ///
+/// @attention
+///     During thread cleanup, vectors handed out by one instance of this class
+///     (via the @ref alloc() method) may happen to be returned to a different
+///     instance (via the @ref release() method). The implementation must handle
+///     such cases gracefully.
+///
 template<class VECTOR_T>
-class VectorPool
+class VectorPool final
 {
 public:
 
@@ -627,6 +639,12 @@ public:
     {
         if (initialPoolSize != 0)
             mPool.reserve(initialPoolSize);
+    }
+
+    ~VectorPool()
+    {
+        for (auto&& p : mPool)
+            delete p;
     }
 
     VectorPool(const VectorPool&) = delete;
@@ -658,7 +676,7 @@ public:
 
 private:
 
-    vector<VECTOR_T*> mPool;
+    std::vector<VECTOR_T*> mPool;
     size_t mSizeHint;
 };
 
@@ -672,7 +690,7 @@ private:
 ///     require this functionality.
 ///
 template<typename ELEMENT_T, size_t SIZE_HINT>
-class PooledSimpleVector
+class PooledSimpleVector final
 {
 public:
 
@@ -780,5 +798,6 @@ private:
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_SIMPLEVECTOR_H

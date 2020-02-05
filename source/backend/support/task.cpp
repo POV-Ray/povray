@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,19 +33,28 @@
 ///
 //******************************************************************************
 
-#include <cassert>
-#include <stdexcept>
-
-#include <boost/bind.hpp>
-#include <boost/thread.hpp>
-
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "backend/support/task.h"
 
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <stdexcept>
+
+// Boost header files
+#include <boost/bind.hpp>
+
+// POV-Ray header files (base module)
+#include "base/povassert.h"
 #include "base/timer.h"
 #include "base/types.h"
 
+// POV-Ray header files (core module)
+// POV-Ray header files (POVMS module)
+//  (none at the moment)
+
+// POV-Ray header files (backend module)
 #include "backend/control/messagefactory.h"
 #include "backend/scene/backendscenedata.h"
 
@@ -64,13 +73,13 @@ Task::Task(ThreadData *td, const boost::function1<void, Exception&>& f) :
     paused(false),
     done(false),
     failed(kNoError),
-    timer(NULL),
+    timer(nullptr),
     realTime(-1),
     cpuTime(-1),
-    taskThread(NULL),
-    povmsContext(NULL)
+    taskThread(nullptr),
+    povmsContext(nullptr)
 {
-    if (td == NULL)
+    if (td == nullptr)
         throw POV_EXCEPTION_STRING("Internal error: TaskData is NULL in Task constructor");
 }
 
@@ -78,8 +87,8 @@ Task::~Task()
 {
     Stop();
 
-    // NOTE: Freeing taskData is the responsiblity of the task creator!
-    taskData = NULL;
+    // NOTE: Freeing taskData is the responsibility of the task creator!
+    taskData = nullptr;
 }
 
 int Task::FailureCode(int defval)
@@ -102,8 +111,8 @@ POV_LONG Task::ConsumedCPUTime() const
 
 void Task::Start(const boost::function0<void>& completion)
 {
-    if((done == false) && (taskThread == NULL))
-        taskThread = NewBoostThread(boost::bind(&Task::TaskThread, this, completion), POV_THREAD_STACK_SIZE);
+    if ((done == false) && (taskThread == nullptr))
+        taskThread = new std::thread(boost::bind(&Task::TaskThread, this, completion));
 }
 
 void Task::RequestStop()
@@ -115,11 +124,11 @@ void Task::Stop()
 {
     stopRequested = true;
 
-    if(taskThread != NULL)
+    if (taskThread != nullptr)
     {
         taskThread->join();
         delete taskThread;
-        taskThread = NULL;
+        taskThread = nullptr;
     }
 }
 
@@ -133,15 +142,31 @@ void Task::Resume()
     paused = false;
 }
 
+void Task::Cooperate()
+{
+    if (stopRequested == true)
+        throw StopThreadException();
+    else if (paused == true)
+    {
+        while (paused == true)
+        {
+            std::this_thread::yield();
+            Delay(100);
+            if (stopRequested == true)
+                throw StopThreadException();
+        }
+    }
+}
+
 POV_LONG Task::ElapsedRealTime() const
 {
-    POV_TASK_ASSERT(timer != NULL);
+    POV_TASK_ASSERT(timer != nullptr);
     return timer->ElapsedRealTime();
 }
 
 POV_LONG Task::ElapsedThreadCPUTime() const
 {
-    POV_TASK_ASSERT(timer != NULL);
+    POV_TASK_ASSERT(timer != nullptr);
     return timer->ElapsedThreadCPUTime();
 }
 
@@ -152,7 +177,7 @@ void Task::TaskThread(const boost::function0<void>& completion)
     if((result = POVMS_OpenContext(&povmsContext)) != kNoErr)
     {
         failed = result;
-        timer = NULL;
+        timer = nullptr;
         done = true;
         return;
     }
@@ -240,7 +265,7 @@ void Task::TaskThread(const boost::function0<void>& completion)
         FatalErrorHandler(POV_EXCEPTION_STRING("An unknown error occured finishing a task!"));
     }
 
-    timer = NULL;
+    timer = nullptr;
     done = true;
 
     Cleanup();
@@ -270,9 +295,15 @@ void Task::Cleanup ()
 #endif // POV_USE_DEFAULT_TASK_CLEANUP
 
 
-SceneTask::SceneTask(ThreadData *td, const boost::function1<void, Exception&>& f, const char* sn, shared_ptr<BackendSceneData> sd, RenderBackend::ViewId vid) :
+SceneTask::SceneTask(ThreadData *td, const boost::function1<void, Exception&>& f, const char* sn, std::shared_ptr<BackendSceneData> sd, RenderBackend::ViewId vid) :
     Task(td, f),
-    messageFactory(sd->warningLevel, sn, sd->backendAddress, sd->frontendAddress, sd->sceneId, vid)
+    mpMessageFactory(new MessageFactory(sd->warningLevel, sn, sd->backendAddress, sd->frontendAddress, sd->sceneId, vid))
 {}
 
+SceneTask::~SceneTask()
+{
+    delete mpMessageFactory;
 }
+
+}
+// end of namespace pov

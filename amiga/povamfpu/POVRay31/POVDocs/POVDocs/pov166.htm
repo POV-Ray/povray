@@ -1,0 +1,64 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Float Functions</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov165.htm">Boolean Keywords</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov167.htm">Vector Expressions</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref413163935"><A NAME="_Toc414198999"><A NAME="_Toc429993509">Float Functions</A></A></A></H4>
+<P>POV-Ray defines a variety of built-in functions for manipulating floats, vectors and strings. Function calls consist of a keyword which specifies the name of the function followed by a parameter list enclosed in parentheses. Parameters are separated by commas. For example:</P>
+<PRE> keyword(param1,param2)</PRE>
+<P>The following are the functions which return float values. They take one or more float, integer, vector, or string parameters. Assume that <b><code>A</code></b> and <b><code>B</code></b> are any valid expression that evaluates to a float; <b><code>I</code></b> is a float which is truncated to integer internally, <b><code>S</code></b>, <b><code>S1</code></b>, <b><code>S2</code></b> etc. are strings, and <b><code>V</code></b>, <b><code>V1</code></b>, <b><code>V2</code></b> etc. are any vector expressions.</P>
+<p><b><code>abs(A)</code></b>&#9;Absolute value of <b><code>A</code></b>. If <b><code>A</code></b> is negative, returns <b><code>-A</code></b> otherwise returns <b><code>A</code></b>.</P>
+<p><b><code>acos(A)&#9;</code></b>Arc-cosine of <b><code>A</code></b>. Returns the angle, measured in radians, whose cosine is <b><code>A</code></b>.</P>
+<p><b><code>asc(S)&#9;</code></b>Returns an integer value in the range 0 to 255 that is the ASCII value of the first character of the string <b><code>S</code></b>. For example <b><code>asc("ABC")</code></b> is 65 because that is the value of the character "A".</P>
+<p><b><code>asin(A)&#9;</code></b>Arc-sine of <b><code>A</code></b>. Returns the angle, measured in radians, whose sine is <b><code>A</code></b>.</P>
+<p><b><code>atan2(A,B)&#9;</code></b>Arc-tangent of <b><code>(A/B)</code></b>. Returns the angle, measured in radians, whose tangent is <b><code>(A/B)</code></b>. Returns appropriate value even if <b><code>B</code></b> is zero. Use <b><code>atan2(A,1)</code></b> to compute usual atan(A) function.</P>
+<p><b><code>ceil(A)</code></b>&#9;Ceiling of <b><code>A</code></b>. Returns the smallest integer greater than <b><code>A</code></b>. Rounds up to the next higher integer.</P>
+<p><b><code>cos(A)&#9;</code></b>Cosine of <b><code>A</code></b>. Returns the cosine of the angle <b><code>A</code></b>, where <b><code>A</code></b> is measured in radians.</P>
+<p><b><code>defined(</code></b><I>IDENTIFIER</I> <b><code>)&#9;</code></b>Returns <b><code>true</code></b> if the identifier is currently defined, <b><code>false</code></b> otherwise.  This is especially useful for detecting end-of-file after a <b><code>#read</code></b> directive because the file identifer is automatically undefined when end-of-file is reached.  See "<A HREF="pov197.htm#_Ref429985373">The #read Directive</A>" for details.</P>
+<p><b><code>degrees(A)&#9;</code></b>Convert radians to degrees. Returns the angle measured in degrees whose value in radians is <b><code>A</code></b>. Formula is <I>degrees=A/pi*180.0</I>.</P>
+<p><b><code>dimensions(</code></b> <I>ARRAY_IDENTIFIER</I> <b><code>)&#9;</code></b>Returns the number of dimensions of a previously declared array identifier.  For example if you do <b><code>#declare MyArray=array[6][10]</code></b> then <b><code>dimensions(MyArray)</code></b> returns the value <b><code>2</code></b>.</P>
+<p><b><code>dimension_size(</code></b> <I>ARRAY_IDENTIFIER, FLOAT </I><b><code>)&#9;</code></b>Returns the size of a given dimension of a previously declared array identifier.  Dimensions are numbered left-to-right starting with 1. For example if you do <b><code>#declare MyArray=array[6][10]</code></b> then <b><code>dimension_size(MyArray,2)</code></b> returns the value <b><code>10</code></b>.</P>
+<p><b><code>div(A,B)&#9;</code></b>Integer division. The integer part of <b><code>(A/B)</code></b>.</P>
+<p><b><code>exp(A)&#9;</code></b>Exponential of <b><code>A</code></b>. Returns the value of <I>e</I> raised to the power <b><code>A</code></b> where <I>e</I> is the base of the natural logarithm, i.e. the non-repeating value approximately equal to 2.71828182846.</P>
+<p><b><code>file_exists(S)&#9;</code></b>Attempts to open the file specified by the string <b><code>S</code></b>. The current directory and all library directories specified by the <b><code>Library_Path</code></b> or <b><code>+L</code></b> options are also searched.  See "<A HREF="pov139.htm#_Ref413142060">Library Paths</A>" for details.  Returns <b><code>1</code></b> if successful and <b><code>0</code></b> if unsuccessful.</P>
+<p><b><code>floor(A)&#9;</code></b>Floor of <b><code>A</code></b>. Returns the largest integer less than <b><code>A</code></b>. Rounds down to the next lower integer.</P>
+<p><b><code>int(A)&#9;</code></b>Integer part of <b><code>A</code></b>. Returns the truncated integer part of <b><code>A</code></b>. Rounds towards zero.</P>
+<p><b><code>log(A)&#9;</code></b>Natural logarithm of <b><code>A</code></b>. Returns the natural logarithm base <I>e</I> of the value <b><code>A</code></b>.</P>
+<p><b><code>max(A,B)&#9;</code></b>Maximum of <b><code>A</code></b> and <b><code>B</code></b>. Returns <b><code>A</code></b> if <b><code>A</code></b> larger than <b><code>B</code></b>. Otherwise returns <b><code>B</code></b>.</P>
+<p><b><code>min(A,B)&#9;</code></b>Minimum of <b><code>A</code></b> and <b><code>B</code></b>. Returns <b><code>A</code></b> if <b><code>A</code></b> smaller than <b><code>B</code></b>. Otherwise returns <b><code>B</code></b>.</P>
+<p><b><code>mod(A,B)&#9;</code></b>Value of <b><code>A</code></b> modulo <b><code>B</code></b>. Returns the remainder after the integer division of <b><code>A</code></b>/<b><code>B</code></b>. Formula is <I>mod=((A/B)-int(A/B))*B.</P>
+</I><p><b><code>pow(A,B)&#9;</code></b>Exponentiation. Returns the value of <b><code>A</code></b> raised to the power <b><code>B</code></b>.</P>
+<p><b><code>radians(A)&#9;</code></b>Convert degrees to radians. Returns the angle measured in radians whose value in degrees is <b><code>A</code></b>. Formula is <I>radians=A*pi/180.0.</P>
+</I><p><b><code>rand(I)&#9;</code></b>Returns the next pseudo-random number from the stream specified by the positive integer <b><code>I</code></b>. You must call <b><code>seed()</code></b> to initialize a random stream before calling <b><code>rand()</code></b>. The numbers are uniformly distributed, and have values between <b><code>0.0</code></b> and <b><code>1.0</code></b>, inclusively. The numbers generated by separate streams are independent random variables.</P>
+<p><b><code>seed(A)&#9;</code></b>Initializes a new pseudo-random stream with the initial seed value <b><code>A</code></b>. The number corresponding to this random stream is returned. Any number of pseudo-random streams may be used as shown in the example below:</P>
+<PRE> #declare R1 = seed(0);
+ #declare R2 = seed(12345);
+ #sphere { &lt;rand(R1), rand(R1), rand(R1)&gt;, rand(R2) }</PRE>
+<P>Multiple random generators are very useful in situations where you use <b><code>rand()</code></b> to place a group of objects, and then decide to use <b><code>rand()</code></b> in another location earlier in the file to set some colors or place another group of objects. Without separate <b><code>rand()</code></b> streams, all of your objects would move when you added more calls to <b><code>rand()</code></b>. This is very annoying.</P>
+<p><b><code>sin(A)&#9;</code></b>Sine of <b><code>A</code></b>. Returns the sine of the angle <b><code>A</code></b>, where <b><code>A</code></b> is measured in radians.</P>
+<p><b><code>strcmp(S1,S2)&#9;</code></b>Compare string <b><code>S1</code></b> to <b><code>S2</code></b>. Returns a float value zero if the strings are equal, a positive number if <b><code>S1</code></b> comes after <b><code>S2</code></b> in the ASCII collating sequence, else a negative number.</P>
+<p><b><code>strlen(S)&#9;</code></b>Length of <b><code>S</code></b>. Returns an integer value that is the number of characters in the string <b><code>S</code></b>.</P>
+<p><b><code>sqrt(A)&#9;</code></b>Square root of <b><code>A</code></b>. Returns the value whose square is <b><code>A</code></b>.</P>
+<p><b><code>tan(A)&#9;</code></b>Tangent of <b><code>A</code></b>. Returns the tangent of the angle <b><code>A</code></b>, where <b><code>A</code></b> is measured in radians.</P>
+<p><b><code>val(S)&#9;</code></b>Convert string <b><code>S</code></b> to float. Returns a float value that is represented by the text in string <b><code>S</code></b>. For example <b><code>val("123.45")</code></b> is 123.45 as a float.</P>
+<p><b><code>vdot(V1,V2)&#9;</code></b>Dot product of <b><code>V1</code></b> and <b><code>V2</code></b>. Returns a float value that is the dot product (sometimes called scalar product of <b><code>V1</code></b> with <b><code>V2</code></b>. Formula is <I>vdot=V1.x*V2.x + V1.y*V2.y + V1.z*V2.z</I>. See the animated demo scene <CODE>VECT2.POV</CODE> for an illustration.</P>
+<p><b><code>vlength(V)&#9;</code></b>Length of <b><code>V</code></b>. Returns a float value that is the length of vector <b><code>V</code></b>. Formula is <I>vlength=sqrt(vdot(A,A))</I>.  Can be used to compute the distance between two points. <b><code>Dist=vlength(V2-V1)</code></b>.</P>
+<P>See section "<A HREF="pov173.htm#_Ref413150466">Vector Functions</A>" and section "<A HREF="pov183.htm#_Ref413150500">String Functions</A>" for other functions which are somewhat float-related but which return vectors and strings.  In addition to the above built-in functions, you may also define your own functions using the new <b><code>#macro</code></b> directive. See the section "<A HREF="pov209.htm#_Ref413063326">User Defined Macros</A>" for more details.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov165.htm">Boolean Keywords</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov167.htm">Vector Expressions</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,29 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - ADC_Bailout</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov373.htm">Global Settings</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov375.htm">Ambient Light</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405220"><A NAME="_Toc411405496"><A NAME="_Toc414199221"><A NAME="_Toc429993738">ADC_Bailout</A></A></A></A></H3>
+<P>In scenes with many reflective and transparent surfaces, POV-Ray can get bogged down tracing multiple reflections and refractions that contribute very little to the color of a particular pixel. The program uses a system called <I>Adaptive Depth Control </I>(ADC) to stop computing additional reflected or refracted rays when their contribution is insignificant.</P>
+<P>You may use the global setting <b><code>adc_bailout</code></b> keyword followed by float value to specify the point at which a ray's contribution is considered insignificant.  For example:</P>
+<PRE>  global_settings { adc_bailout 0.01 }</PRE>
+<P>The default value is 1/255, or approximately 0.0039, since a change smaller than that could not be visible in a 24 bit image. Generally this setting is perfectly adequate and should be left alone. Setting <b><code>adc_bailout</code></b> to 0 will disable ADC, relying completely on <b><code>max_trace_level</code></b> to set an upper limit on the number of rays spawned.</P>
+<P>See section "<A HREF="pov382.htm#_Ref422128058">Max_Trace_Level</A>" for details on how ADC and <b><code>max_trace_level</code></b> interact.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov373.htm">Global Settings</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov375.htm">Ambient Light</A>
+</P>
+</BODY>
+</HTML>
+

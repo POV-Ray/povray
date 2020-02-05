@@ -1,0 +1,110 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Text Formatting</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov207.htm">Text Message Streams</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov209.htm">User Defined Macros</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref412960691"><A NAME="_Ref413245176"><A NAME="_Toc414199041"><A NAME="_Toc429993551">Text Formatting</A></A></A></A></H4>
+<P>Some escape sequences are available to include non-printing control characters in your text. These sequences are similar to those used in string literals in the C programming language. The sequences are:</P>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=233>
+<TR><TD WIDTH="23%" VALIGN="TOP">
+<p><b><code>"\a"</code></b></TD>
+<TD WIDTH="55%" VALIGN="TOP">
+<P>Bell or alarm,</TD>
+<TD WIDTH="22%" VALIGN="TOP">
+<P>0x07</TD>
+</TR>
+<TR><TD WIDTH="23%" VALIGN="TOP">
+<p><b><code>"\b"</code></b></TD>
+<TD WIDTH="55%" VALIGN="TOP">
+<P>Backspace,</TD>
+<TD WIDTH="22%" VALIGN="TOP">
+<P>0x08</TD>
+</TR>
+<TR><TD WIDTH="23%" VALIGN="TOP">
+<p><b><code>"\f"</code></b></TD>
+<TD WIDTH="55%" VALIGN="TOP">
+<P>Form feed,</TD>
+<TD WIDTH="22%" VALIGN="TOP">
+<P>0x0C</TD>
+</TR>
+<TR><TD WIDTH="23%" VALIGN="TOP">
+<p><b><code>"\n"</code></b></TD>
+<TD WIDTH="55%" VALIGN="TOP">
+<P>New line (line feed)</TD>
+<TD WIDTH="22%" VALIGN="TOP">
+<P>0x0A</TD>
+</TR>
+<TR><TD WIDTH="23%" VALIGN="TOP">
+<p><b><code>"\r"</code></b></TD>
+<TD WIDTH="55%" VALIGN="TOP">
+<P>Carriage return</TD>
+<TD WIDTH="22%" VALIGN="TOP">
+<P>0x0D</TD>
+</TR>
+<TR><TD WIDTH="23%" VALIGN="TOP">
+<p><b><code>"\t"</code></b></TD>
+<TD WIDTH="55%" VALIGN="TOP">
+<P>Horizontal tab</TD>
+<TD WIDTH="22%" VALIGN="TOP">
+<P>0x09</TD>
+</TR>
+<TR><TD WIDTH="23%" VALIGN="TOP">
+<p><b><code>"\v"</code></b></TD>
+<TD WIDTH="55%" VALIGN="TOP">
+<P>Vertical tab</TD>
+<TD WIDTH="22%" VALIGN="TOP">
+<P>0x0B</TD>
+</TR>
+<TR><TD WIDTH="23%" VALIGN="TOP">
+<p><b><code>"\0"</code></b></TD>
+<TD WIDTH="55%" VALIGN="TOP">
+<P>Null</TD>
+<TD WIDTH="22%" VALIGN="TOP">
+<P>0x00</TD>
+</TR>
+<TR><TD WIDTH="23%" VALIGN="TOP">
+<p><b><code>"\\"</code></b></TD>
+<TD WIDTH="55%" VALIGN="TOP">
+<P>Backslash</TD>
+<TD WIDTH="22%" VALIGN="TOP">
+<P>0x5C</TD>
+</TR>
+<TR><TD WIDTH="23%" VALIGN="TOP">
+<p><b><code>"\'"</code></b></TD>
+<TD WIDTH="55%" VALIGN="TOP">
+<P>Single quote</TD>
+<TD WIDTH="22%" VALIGN="TOP">
+<P>0x27</TD>
+</TR>
+<TR><TD WIDTH="23%" VALIGN="TOP">
+<p><b><code>"\""</code></b></TD>
+<TD WIDTH="55%" VALIGN="TOP">
+<P>Double quote</TD>
+<TD WIDTH="22%" VALIGN="TOP">
+<P>0x22</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>For example:</P>
+<PRE> #debug "This is one line.\nBut this is another"</PRE>
+<P>Depending on what platform you are using, they may not be fully supported for console output. However they will appear in any text file if you re-direct a stream to a file.</P>
+<P>Note that most of these control characters only apply in text message directives and <b><code>#write</code></b> directives which write strings They are not implemented for other string usage in POV-Ray such as text objects or file names.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov207.htm">Text Message Streams</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov209.htm">User Defined Macros</A>
+</P>
+</BODY>
+</HTML>
+

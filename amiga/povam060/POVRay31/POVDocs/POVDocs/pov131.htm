@@ -1,0 +1,60 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Field Rendering</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov130.htm">Cyclic Animation</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov132.htm">Output Options</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198952"><A NAME="_Toc429993461">Field Rendering</A></A></H4>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=456>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>Field_Render=</code></b><I>bool</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Turn field rendering on/off</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>Odd_Field=</code></b><I>bool</I></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Set odd field flag</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>+UF</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Turn field rendering on</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>-UF</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Turn field rendering off</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>+UO</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Set odd field flag on</TD>
+</TR>
+<TR><TD WIDTH="37%" VALIGN="TOP">
+<p><b><code>-UO</code></b></TD>
+<TD WIDTH="63%" VALIGN="TOP">
+<P>Set odd field flag off</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>Field rendering is sometimes used for animations when the animation is being output for television. TVs only display alternate scan lines on each vertical refresh. When each frame is being displayed the fields are interlaced to give the impression of a higher resolution image. The even scan lines make up the even field, and are drawn first (i.e. scan lines 0, 2, 4, etc.), followed by the odd field, made up of the odd numbered scan lines are drawn afterwards. If objects in an animation are moving quickly, their position can change noticeably from one field to the next. As a result, it may be desirable in these cases to have POV-Ray render alternate fields at the actual field rate (which is twice the frame rate), rather than rendering full frames at the normal frame rate. This would save a great deal of time compared to rendering the entire animation at twice the frame rate, and then only using half of each frame.</P>
+<P>By default, field rendering is not used. Setting <b><code>Field_Render=on</code></b> or using <b><code>+UF</code></b> will cause alternate frames in an animation to be only the even or odd fields of an animation. By default, the first frame is the even field, followed by the odd field. You can have POV-Ray render the odd field first by specifying <b><code>Odd_Field=on</code></b>, or by using the <b><code>+UO</code></b> switch.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov130.htm">Cyclic Animation</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov132.htm">Output Options</A>
+</P>
+</BODY>
+</HTML>
+

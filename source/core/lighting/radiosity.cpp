@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -63,16 +63,23 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/lighting/radiosity.h"
 
+// C++ variants of C standard header files
 #include <cstring>
+
+// C++ standard header files
 #include <algorithm>
 
+// POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
+#include "base/povassert.h"
 
+// POV-Ray header files (core module)
 #include "core/lighting/photons.h"
 #include "core/render/ray.h"
 #include "core/scene/scenedata.h"
 #include "core/scene/tracethreaddata.h"
 #include "core/support/octree.h"
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -81,6 +88,9 @@ namespace pov
 {
 
 using namespace pov_base;
+
+using std::min;
+using std::max;
 
 // #define RAD_GRADIENT 1 // [CLi] gradient seems to provide no gain at best, and may actually cause artifacts
 // #define SAW_METHOD 1
@@ -106,7 +116,7 @@ const int PRETRACE_STEP_LOADED = std::numeric_limits<signed char>::max();   // d
 #define BRILLIANCE_EPSILON 1e-5
 
 // structure used to gather weighted average during tree traversal
-struct WT_AVG
+struct WT_AVG final
 {
     MathColour Weights_Times_Illuminances;  // Aggregates during traversal
     DBL Weights;                            // Aggregates during traversal
@@ -152,7 +162,7 @@ inline QualityFlags GetRadiosityQualityFlags(const SceneRadiositySettings& rs, c
 
 static const unsigned int BLOCK_POOL_UNIT_SIZE = 32;
 
-struct RadiosityCache::BlockPool::PoolUnit
+struct RadiosityCache::BlockPool::PoolUnit final
 {
     PoolUnit *next;
     ot_block_struct blocks[BLOCK_POOL_UNIT_SIZE];
@@ -284,7 +294,7 @@ RadiosityRecursionSettings* SceneRadiositySettings::GetRecursionSettings(bool fi
     return recSettings;
 }
 
-RadiosityFunction::RadiosityFunction(shared_ptr<SceneData> sd, TraceThreadData *td, const SceneRadiositySettings& rs,
+RadiosityFunction::RadiosityFunction(std::shared_ptr<SceneData> sd, TraceThreadData *td, const SceneRadiositySettings& rs,
                                      RadiosityCache& rc, Trace::CooperateFunctor& cf, bool ft, const Vector3d& camera) :
     threadData(td),
     trace(sd, td, GetRadiosityQualityFlags(rs, QualityFlags(9)), cf, media, *this), // TODO FIXME - the only reason we can safely hard-code level-9 quality here is because radiosity happens to be disabled at lower settings
@@ -299,7 +309,7 @@ RadiosityFunction::RadiosityFunction(shared_ptr<SceneData> sd, TraceThreadData *
     topLevelQueryCount(0),
     topLevelReuse(0.0),
     tileId(0),
-    cacheBlockPool(NULL),
+    cacheBlockPool(nullptr),
     settings(rs),
     recursionSettings(rs.GetRecursionSettings(ft))
 {
@@ -309,10 +319,10 @@ RadiosityFunction::RadiosityFunction(shared_ptr<SceneData> sd, TraceThreadData *
 
 RadiosityFunction::~RadiosityFunction()
 {
-    if (cacheBlockPool != NULL) // shouldn't happen normally, but does happen when render is aborted
+    if (cacheBlockPool != nullptr) // shouldn't happen normally, but does happen when render is aborted
     {
         radiosityCache.ReleaseBlockPool(cacheBlockPool);
-        cacheBlockPool = NULL;
+        cacheBlockPool = nullptr;
     }
 
     delete[] recursionSettings;
@@ -361,7 +371,7 @@ void RadiosityFunction::BeforeTile(int id, unsigned int pts)
     for (unsigned int depth = 0; depth < settings.recursionLimit; depth ++)
         recursionParameters[depth].directionGenerator.Reset(settings.directionPoolSize);
 
-    POV_RADIOSITY_ASSERT(cacheBlockPool == NULL);
+    POV_RADIOSITY_ASSERT(cacheBlockPool == nullptr);
     cacheBlockPool = radiosityCache.AcquireBlockPool();
 }
 
@@ -369,7 +379,7 @@ void RadiosityFunction::AfterTile()
 {
     // release block pool, just in case this happens to be the last tile for this thread
     radiosityCache.ReleaseBlockPool(cacheBlockPool);
-    cacheBlockPool = NULL;
+    cacheBlockPool = nullptr;
 }
 
 void RadiosityFunction::ComputeAmbient(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, DBL brilliance, MathColour& ambient_colour, DBL weight, TraceTicket& ticket)
@@ -882,7 +892,7 @@ bool RadiosityFunction::SampleDirectionGenerator::GetDirection(Vector3d& directi
 RadiosityCache::RadiosityCache(const SceneRadiositySettings& radset) :
     ra_reuse_count(0),
     ra_gather_count(0),
-    ot_fd(NULL),
+    ot_fd(nullptr),
     Gather_Total_Count(0),
     recursionSettings(radset.GetRecursionSettings(true)) // be prepared for the main render
 {
@@ -900,7 +910,7 @@ bool RadiosityCache::Load(const Path& inputFile)
 {
     bool ok = false;
     IStream* fd = NewIStream(inputFile, POV_File_Data_RCA);
-    if(fd != NULL)
+    if (fd != nullptr)
     {
         BlockPool* pool = AcquireBlockPool();
 
@@ -975,7 +985,7 @@ bool RadiosityCache::Load(const Path& inputFile)
 
                         line_num++;
 
-                        AddBlock(pool, NULL, point, normal, 1.0 /* TODO FIXME - brilliance */, to_nearest, dx, dy, dz, illuminance, harmonic_mean, nearest, 1.0 /* TODO FIXME - quality */, depth, PRETRACE_STEP_LOADED, 0);
+                        AddBlock(pool, nullptr, point, normal, 1.0 /* TODO FIXME - brilliance */, to_nearest, dx, dy, dz, illuminance, harmonic_mean, nearest, 1.0 /* TODO FIXME - quality */, depth, PRETRACE_STEP_LOADED, 0);
                         goodreads++;
                     }
                     break;
@@ -1036,29 +1046,29 @@ RadiosityCache::~RadiosityCache()
 
     { // mutex scope
 #if POV_MULTITHREADED
-        boost::mutex::scoped_lock lock(fileMutex);
+        std::lock_guard<std::mutex> lock(fileMutex);
 #endif
         // finish up cache file
-        if(ot_fd != NULL)
+        if (ot_fd != nullptr)
         {
             // close cache file
             delete ot_fd;
-            ot_fd = NULL;
+            ot_fd = nullptr;
         }
     }
 
     { // mutex scope
 #if POV_MULTITHREADED
-        boost::mutex::scoped_lock lockTree(octree.treeMutex);
-        boost::mutex::scoped_lock lockBlock(octree.blockMutex);
+        std::lock_guard<std::mutex> lockTree(octree.treeMutex);
+        std::lock_guard<std::mutex> lockBlock(octree.blockMutex);
 #endif
-        if (octree.root != NULL)
+        if (octree.root != nullptr)
             ot_free_tree(&octree.root);
     }
 
     { // mutex scope
 #if POV_MULTITHREADED
-        boost::mutex::scoped_lock lock(blockPoolsMutex);
+        std::lock_guard<std::mutex> lock(blockPoolsMutex);
 #endif
         while (!blockPools.empty())
         {
@@ -1074,7 +1084,7 @@ RadiosityCache::~RadiosityCache()
 RadiosityCache::BlockPool* RadiosityCache::AcquireBlockPool()
 {
 #if POV_MULTITHREADED
-    boost::mutex::scoped_lock lock(blockPoolsMutex);
+    std::lock_guard<std::mutex> lock(blockPoolsMutex);
 #endif
     if (blockPools.empty())
         return new BlockPool();
@@ -1090,14 +1100,14 @@ void RadiosityCache::ReleaseBlockPool(RadiosityCache::BlockPool* pool)
 {
     { // mutex scope
 #if POV_MULTITHREADED
-        boost::mutex::scoped_lock lock(fileMutex);
+        std::lock_guard<std::mutex> lock(fileMutex);
 #endif
         pool->Save(ot_fd);
     }
 
     { // mutex scope
 #if POV_MULTITHREADED
-        boost::mutex::scoped_lock lock(blockPoolsMutex);
+        std::lock_guard<std::mutex> lock(blockPoolsMutex);
 #endif
         blockPools.push_back(pool);
     }
@@ -1105,9 +1115,9 @@ void RadiosityCache::ReleaseBlockPool(RadiosityCache::BlockPool* pool)
 
 ot_block_struct *RadiosityCache::BlockPool::NewBlock()
 {
-    ot_block_struct *block = NULL;
+    ot_block_struct *block = nullptr;
 
-    if(head == NULL || nextFreeBlock >= BLOCK_POOL_UNIT_SIZE)
+    if (head == nullptr || nextFreeBlock >= BLOCK_POOL_UNIT_SIZE)
     {
         head = new PoolUnit(head);
         nextFreeBlock = 0;
@@ -1121,8 +1131,8 @@ ot_block_struct *RadiosityCache::BlockPool::NewBlock()
 }
 
 RadiosityCache::BlockPool::BlockPool() :
-    head(NULL),
-    savedHead(NULL),
+    head(nullptr),
+    savedHead(nullptr),
     nextFreeBlock(0),
     nextUnsavedBlock(0)
 {
@@ -1131,10 +1141,10 @@ RadiosityCache::BlockPool::BlockPool() :
 
 void RadiosityCache::BlockPool::Save(OStream* fd)
 {
-    if (fd != NULL)
+    if (fd != nullptr)
     {
         PoolUnit* unit = head;
-        while (unit != NULL && unit != savedHead)
+        while ((unit != nullptr) && (unit != savedHead))
         {
             unsigned int from = 0;
             unsigned int to   = BLOCK_POOL_UNIT_SIZE;
@@ -1154,7 +1164,7 @@ void RadiosityCache::BlockPool::Save(OStream* fd)
     }
     // no else; if we're not writing to a file, still pretend we saved so the destructor doesn't assert
 
-    if (head != NULL)
+    if (head != nullptr)
     {
         // update the variables indicating how far we have saved
         savedHead = head->next; // the head is incomplete, so it cannot be saved completely...
@@ -1162,7 +1172,7 @@ void RadiosityCache::BlockPool::Save(OStream* fd)
     }
     else
     {
-        POV_RADIOSITY_ASSERT(savedHead == NULL);
+        POV_RADIOSITY_ASSERT(savedHead == nullptr);
         POV_RADIOSITY_ASSERT(nextUnsavedBlock == 0);
     }
 }
@@ -1170,9 +1180,9 @@ void RadiosityCache::BlockPool::Save(OStream* fd)
 RadiosityCache::BlockPool::~BlockPool()
 {
     // require that block has been saved by now
-    POV_RADIOSITY_ASSERT(head == NULL || ((savedHead == head->next) && (nextUnsavedBlock == nextFreeBlock)));
+    POV_RADIOSITY_ASSERT((head == nullptr) || ((savedHead == head->next) && (nextUnsavedBlock == nextFreeBlock)));
 
-    while(head != NULL)
+    while (head != nullptr)
     {
         PoolUnit *b = head;
         head = head->next;
@@ -1210,7 +1220,7 @@ void RadiosityCache::AddBlock(BlockPool* pool, RenderStatistics* stats, const Ve
     block->TileId = OT_TILE(tileId);
     block->Point = point;
     block->S_Normal = normal;
-    block->next = NULL;
+    block->next = nullptr;
 
     // figure out the block id
     ot_index_sphere(point, harmonicMeanDistance * recSettings.octreeAddressFactor, &id);
@@ -1229,7 +1239,7 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
     ot_id_struct temp_id;
 
 #if POV_MULTITHREADED
-    boost::mutex::scoped_lock treeLock(octree.treeMutex, boost::defer_lock_t()); // we may need to lock this mutex - but not now.
+    std::unique_lock<std::mutex> treeLock(octree.treeMutex, std::defer_lock); // we may need to lock this mutex - but not now.
 #endif
 
 #ifdef RADSTATS
@@ -1237,21 +1247,8 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
 #endif
 
     // If there is no root yet, create one.  This is a first-time-through
-    if (octree.root == NULL)
+    if (octree.root == nullptr)
     {
-        // CLi moved C99_COMPATIBLE_RADIOSITY check from ot_newroot() to ot_ins() NULL root handling section
-        // (no need to do this again and again for every new node inserted)
-#if(C99_COMPATIBLE_RADIOSITY == 0)
-        if((sizeof(int) != 4) || (sizeof(float) != 4))
-        {
-            throw POV_EXCEPTION_STRING("Radiosity is not available in this unofficial version because\n"
-                "the person who made this unofficial version available did not\n"
-                "properly check for compatibility on your platform.\n"
-                "Look for C99_COMPATIBLE_RADIOSITY in the source code to find\n"
-                "out how to correct this.");
-        }
-#endif
-
         // now is the time to lock the tree for modification
 #if POV_MULTITHREADED
         treeLock.lock();
@@ -1259,11 +1256,12 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
 
         // Now that we have exclusive write access, make sure we REALLY don't have a root
         // (some other thread might have created it just as we were waiting to get the lock)
-        if (octree.root == NULL)
+        if (octree.root == nullptr)
         {
             octree.root = new ot_node_struct;
 #ifdef OCTREE_PERFORMANCE_DEBUG
-            if (stats != NULL) (*stats)[Radiosity_OctreeNodes]++;
+            if (stats != nullptr)
+                (*stats)[Radiosity_OctreeNodes]++;
 #endif
 
 #ifdef RADSTATS
@@ -1380,7 +1378,7 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
 
         index = dx + dy + dz;
 
-        if (this_node->Kids[index] == NULL)
+        if (this_node->Kids[index] == nullptr)
         {
             // Next level down doesn't exist yet, so create it
 
@@ -1391,11 +1389,12 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
 #endif
 
             // We may have acquired the lock just now, so some other task may have changed the root since last time we looked
-            if (this_node->Kids[index] == NULL)
+            if (this_node->Kids[index] == nullptr)
             {
                 temp_node = new ot_node_struct;
 #ifdef OCTREE_PERFORMANCE_DEBUG
-                if (stats!= NULL) (*stats)[Radiosity_OctreeNodes]++;
+                if (stats!= nullptr)
+                    (*stats)[Radiosity_OctreeNodes]++;
 #endif
 
 #ifdef RADSTATS
@@ -1422,7 +1421,7 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
 void RadiosityCache::InsertBlock(ot_node_struct *node, ot_block_struct *block)
 {
 #if POV_MULTITHREADED
-    boost::mutex::scoped_lock lock(octree.blockMutex);
+    std::lock_guard<std::mutex> lock(octree.blockMutex);
 #endif
 
     block->next = node->Values;
@@ -1458,7 +1457,7 @@ void RadiosityCache::InsertBlock(ot_node_struct *node, ot_block_struct *block)
 
 DBL RadiosityCache::FindReusableBlock(RenderStatistics& stats, DBL errorbound, const Vector3d& ipoint, const Vector3d& snormal, DBL brilliance, MathColour& illuminance, int recursionDepth, int pretraceStep, int tileId)
 {
-    if(octree.root != NULL)
+    if (octree.root != nullptr)
     {
         WT_AVG gather;
 
@@ -1769,4 +1768,5 @@ bool RadiosityCache::AverageNearBlock(ot_block_struct *block, void *void_info)
     return true;
 }
 
-} // end of namespace
+}
+// end of namespace pov

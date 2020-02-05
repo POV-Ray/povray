@@ -1,0 +1,32 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Adding a Camera</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov16.htm">Adding Standard Include Files</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov18.htm">Describing an Object</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405089"><A NAME="_Toc411405365"><A NAME="_Toc414198836"><A NAME="_Toc429993347">Adding a Camera</A></A></A></A></H3>
+<P>The <b><code>camera</code></b> statement describes where and how the camera sees the scene. It gives x-, y- and z-coordinates to indicate the position of the camera and what part of the scene it is pointing at.  We describe the coordinates using a three-part <I>vector</I>. A vector is specified by putting three numeric values between a pair of angle brackets and separating the values with commas.</P>
+<P>We add the following camera statement to the scene.</P>
+<PRE>  camera {
+    location &lt;0, 2, -3&gt;
+    look_at  &lt;0, 1,  2&gt;
+  }</PRE>
+<P>Briefly, <b><code>location &lt;0,2,-3&gt;</code></b> places the camera up two units and back three units from the center of the ray-tracing universe which is at &lt;0,0,0&gt;. By default +z is into the screen and -z is back out of the screen.</P>
+<P>Also <b><code>look_at &lt;0,1,2&gt;</code></b> rotates the camera to point at the coordinates &lt;0,1,2&gt;. A point 1 unit up from the origin and 2 units away from the origin.  This makes it 5 units in front of and 1 unit lower than the camera. The <b><code>look_at</code></b> point should be the center of attention of our image.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov16.htm">Adding Standard Include Files</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov18.htm">Describing an Object</A>
+</P>
+</BODY>
+</HTML>
+

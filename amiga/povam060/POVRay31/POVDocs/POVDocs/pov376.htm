@@ -1,0 +1,32 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Assumed_Gamma</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov375.htm">Ambient Light</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov377.htm">Monitor Gamma</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405222"><A NAME="_Toc411405498"><A NAME="_Ref412453576"><A NAME="_Toc414199223"><A NAME="_Toc429993740">Assumed_Gamma</A></A></A></A></A></H3>
+<P>Many people may have noticed at one time or another that some images are too bright or dim when displayed on their system. As a rule, Macintosh users find that images created on a PC are too bright, while PC users find that images created on a Macintosh are too dim.</P>
+<P>The <b><code>assumed_gamma</code></b> global setting works in conjunction with the <b><code>Display_Gamma</code></b> INI setting (see section "<A HREF="pov134.htm#_Ref412464789">Display Hardware Settings</A>") to ensure that scene files render the same way across the wide variety of hardware platforms that POV-Ray is used on. The assumed gamma setting is used in a scene file by adding</P>
+<b><code><DL>
+<DD>global_settings { assumed_gamma</code></b> <I>Value</I> <b><code>}</DD>
+</DL>
+</code></b><P>where the assumed gamma value is the correction factor to be applied before the pixels are displayed and/or saved to disk. For scenes created in older versions of POV-Ray, the assumed gamma value will be the same as the display gamma value of the system the scene was created on. For PC systems, the most common display gamma is 2.2, while for scenes created on Macintosh systems should use a scene gamma of 1.8. Another gamma value that sometimes occurs in scenes is 1.0.</P>
+<P>Scenes that do not have an <b><code>assumed_gamma</code></b> global setting will not have any gamma correction performed on them, for compatibility reasons. If you are creating new scenes or rendering old scenes, it is strongly recommended that you put in an appropriate <b><code>assumed_gamma</code></b> global setting. For new scenes, you should use an assumed gamma value of 1.0 as this models how light appears in the real world more realistically.</P>
+<P>The following sections explain more thoroughly what gamma is and why it is important.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov375.htm">Ambient Light</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov377.htm">Monitor Gamma</A>
+</P>
+</BODY>
+</HTML>
+

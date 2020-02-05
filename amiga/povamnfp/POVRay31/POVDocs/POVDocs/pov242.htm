@@ -1,0 +1,57 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Height Field</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov241.htm">Cylinder</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov243.htm">Julia Fractal</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref414188528"><A NAME="_Toc414199077"><A NAME="_Toc429993587">Height Field</A></A></A></H4>
+<P>Height fields are fast, efficient objects that are generally used to create mountains or other raised surfaces out of hundreds of triangles in a mesh. The <b><code>height_field</code></b> statement syntax is:</P>
+<I><DL>
+<DT>HEIGHT_FIELD:</DT>
+</I><b><code><DD>height_field{</code></b> <I>HF_TYPE "filename" [HF_MODIFIER...] </I><b><code>}</DD>
+</code></b><I><DT>HF_TYPE:</DT>
+</I><b><code><DD>gif</code></b>   |   <b><code>tga</code></b>   |   <b><code>pot</code></b>   |   <b><code>png</code></b>   |   <b><code>pgm</code></b>   |   <b><code>ppm</code></b>   |   <b><code>sys</DD>
+</code></b><I><DT>HF_MODIFIER:</DT>
+</I><b><code><DD>hierarchy</code></b> <I>[Boolean]</I>   |</DD>
+<b><code><DD>smooth</code></b> <I>[Boolean]</I>   |</DD>
+<b><code><DD>water_level</code></b> <I>Level</I>   |</DD>
+<I><DD>OBJECT_MODIFIER</DD>
+</DL>
+</I><P>A height field is essentially a one unit wide by one unit long square with a mountainous surface on top. The height of the mountain at each point is taken from the color number or palette index of the pixels in a graphic image file. The maximum height is one, which corresponds to the maximum possible color or palette index value in the image file.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image49.gif" WIDTH=304 HEIGHT=321></P>
+<P ALIGN="CENTER">The size and orientation of an un-scaled height field.</P>
+</B><P>The mesh of triangles corresponds directly to the pixels in the image file. Each square formed by four neighboring pixels is divided into two triangles. An image with a resolution of <I>N*M</I> pixels has <I>(N-1)*(M-1)</I> squares that are divided into <I>2*(N-1)*(M-1)</I> triangles.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image50.gif" WIDTH=342 HEIGHT=259></P>
+<P ALIGN="CENTER">Four pixels of an image and the resulting heights and triangles in the height field.</P>
+</B><P>The resolution of the height field is influenced by two factors: the resolution of the image and the resolution of the color/index values. The size of the image determines the resolution in the x- and z-direction. A larger image uses more triangles and looks smoother. The resolution of the color/index value determines the resolution along the y-axis. A height field made from an 8 bit image can have 256 different height levels while one made from a 16 bit image can have up to 65536 different height levels. Thus the second height field will look much smoother in the y-direction if the height field is created appropriately.</P>
+<P>The size/resolution of the image does not affect the size of the height field. The un-scaled height field size will always be 1 by 1 by 1. Higher resolution image files will create smaller triangles, not larger height fields.</P>
+<P>There are six or possibly seven types of files which can define a height field. The image file type used to create a height field is specified by one of the keywords <b><code>gif</code></b>, <b><code>tga</code></b>, <b><code>pot</code></b>, <b><code>png</code></b>, <b><code>pgm</code></b>, <b><code>ppm</code></b>, and possibly <b><code>sys</code></b> which is a system specific (e. g. Windows BMP or Macintosh Pict) format file. The GIF, PNG, PGM, and possibly SYS format files are the only ones that can be created using a standard paint program. Though there are paint programs for creating TGA image files they won't be of much use for creating the special 16 bit TGA files used by POV-Ray (see below and "<A HREF="pov380.htm#_Ref413835579">HF_Gray_16</A>" for more details).</P>
+<P>In an image file like GIF that uses a color palette the color number is the palette index at a given pixel. Use a paint program to look at the palette of a GIF image. The first color is palette index zero, the second is index one, the third is index two and so on. The last palette entry is index 255. Portions of the image that use low palette entries will result in lower parts of the height field. Portions of the image that use higher palette entries will result in higher parts of the height field.</P>
+<P>Height fields created from GIF files can only have 256 different height levels because the maximum number of colors in a GIF file is 256.</P>
+<P>The color of the palette entry does not affect the height of the pixel. Color entry 0 could be red, blue, black or orange but the height of any pixel that uses color entry 0 will always be 0. Color entry 255 could be indigo, hot pink, white or sky blue but the height of any pixel that uses color entry 255 will always be 1.</P>
+<P>You can create height field GIF images with a paint program or a fractal program like <CODE>Fractint</CODE>. You can usually get <CODE>Fractint</CODE> from most of the same sources as POV-Ray.</P>
+<P>A POT file is essentially a GIF file with a 16 bit palette. The maximum number of colors in a POT file is 65536. This means a POT height field can have up to 65536 possible height values. This makes it possible to have much smoother height fields. Note that the maximum height of the field is still 1 even though more intermediate values are possible. At the time of this writing the only program that created POT files was a freeware MS-Dos/Windows program called <CODE>Fractint</CODE>. POT files generated with this fractal program create fantastic landscapes.</P>
+<P>The TGA and PPM file formats may be used as a storage device for 16 bit numbers rather than an image file. These formats use the red and green bytes of each pixel to store the high and low bytes of a height value. These files are as smooth as POT files but they must be generated with special custom-made programs. Several programs can create TGA heightfields in the format POV uses, such as Gforge and Terrain Maker.</P>
+<P>PNG format heightfields are usually stored in the form of a grayscale image with black corresponding to lower and white to higher parts of the height field. Because PNG files can store up to 16 bits in grayscale images they will be as smooth as TGA and PPM images. Since they are grayscale images you will be able to view them with a regular image viewer. <CODE>gforge</CODE> can create 16-bit heightfields in PNG format. Color PNG images will be used in the same way as TGA and PPM images.</P>
+<P>SYS format is a platform specific file format. See your platform specific documentation for details.</P>
+<P>In addition to all the usual object modifiers, there are three additional height field modifiers available.</P>
+<P>The optional <b><code>water_level</code></b> parameter may be added after the file name. It consists of the keyword <b><code>water_level</code></b> followed by a float value telling the program to ignore parts of the height field below that value. The default value is zero and legal values are between zero and one. For example <b><code>water_level 0.5</code></b> tells POV-Ray to only render the top half of the height field. The other half is <I>below the water </I>and couldn't be seen anyway. Using <b><code>water_level</code></b> renders faster than cutting off the lower part using CSG or clipping. This term comes from the popular use of height fields to render landscapes. A height field would be used to create islands and another shape would be used to simulate water around the islands. A large portion of the height field would be obscured by the water so the <b><code>water_level</code></b> parameter was introduced to allow the ray-tracer to ignore the unseen parts of the height field. <b><code>water_level</code></b> is also used to cut away unwanted lower values in a height field. For example if you have an image of a fractal on a solid colored background, where the background color is palette entry 0, you can remove the background in the height field by specifying, <b><code>water_level 0.001</code></b>.</P>
+<P>Normally height fields have a rough, jagged look because they are made of lots of flat triangles. Adding the keyword <b><code>smooth</code></b> causes POV-Ray to modify the surface normal vectors of the triangles in such a way that the lighting and shading of the triangles will give a smooth look. This may allow you to use a lower resolution file for your height field than would otherwise be needed. However, smooth triangles will take longer to render.  The default value is off.  You may optionally use a boolean value such as <b><code>smooth on</code></b> or <b><code>smooth off</code></b>.</P>
+<P>In order to speed up the intersection tests an one-level bounding hierarchy is available. By default it is always used but it can be switched off using <b><code>hierarchy off</code></b> to improve the rendering speed for small height fields (i.e. low resolution images).  You may optionally use a boolean value such as <b><code>hierarchy on</code></b> or <b><code>hierarchy off</code></b>.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov241.htm">Cylinder</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov243.htm">Julia Fractal</A>
+</P>
+</BODY>
+</HTML>
+

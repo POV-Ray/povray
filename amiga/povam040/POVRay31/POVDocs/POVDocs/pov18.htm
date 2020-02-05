@@ -1,0 +1,32 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Describing an Object</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov17.htm">Adding a Camera</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov19.htm">Adding Texture to an Object</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405090"><A NAME="_Toc411405366"><A NAME="_Toc414198837"><A NAME="_Toc429993348">Describing an Object</A></A></A></A></H3>
+<P>Now that the camera is set up to record the scene, let's place a yellow sphere into the scene. We add the following to our scene file:</P>
+<PRE>  sphere {
+    &lt;0, 1, 2&gt;, 2
+    texture {
+      pigment { color Yellow }
+    }
+  }</PRE>
+<P>The first vector specifies the center of the sphere. In this example the x coordinate is zero so it is centered left and right. It is also at y=1 or one unit up from the origin. The z coordinate is 2 which is five units in front of the camera, which is at z=-3. After the center vector is a comma followed by the radius which in this case is two units. Since the radius is half the width of a sphere, the sphere is four units wide.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov17.htm">Adding a Camera</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov19.htm">Adding Texture to an Object</A>
+</P>
+</BODY>
+</HTML>
+

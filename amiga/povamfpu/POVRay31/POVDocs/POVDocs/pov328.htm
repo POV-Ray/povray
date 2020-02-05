@@ -1,0 +1,37 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Gradient</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov327.htm">Dents</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov329.htm">Granite</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199172"><A NAME="_Toc429993686">Gradient</A></A></H4>
+<P>One of the simplest patterns is the <b><code>gradient</code></b> pattern. It is specified as</P>
+<b><code><DL>
+<DD>pigment {gradient</code></b> <I>&lt;Orientation&gt;</I> <I>[PIGMENT_MODIFIERS...]</I> <b><code>}</DD>
+</DL>
+</code></b><P>where <I>&lt;Orientation&gt;</I> is a vector pointing in the direction that the colors blend. For example</P>
+<PRE>   pigment { gradient x } // bands of color vary as you move
+                          // along the "x" direction.</PRE>
+<P>produces a series of smooth bands of color that look like layers of colors next to each other. Points at x=0 are the first color in the color map. As the x location increases it smoothly turns to the last color at x=1. Then it starts over with the first again and gradually turns into the last color at x=2. The pattern reverses for negative values of x. Using <b><code>gradient y</code></b> or <b><code>gradient z</code></b> makes the colors blend along the y- or z-axis. Any vector may be used but x, y and z are most common.</P>
+<P>As a normal pattern, gradient generates a saw-tooth or ramped wave appearance. The syntax is</P>
+<b><code><DL>
+<DD>normal {gradient</code></b> <I>&lt;Orientation&gt; [</I><b><code>,</code></b> <I>Bump_Size] [NORMAL_MODIFIERS...]</I> <b><code>}</DD>
+</DL>
+</code></b><P>where the vector <I>&lt;Orientation&gt;</I> is a required parameter but the float <I>Bump_Size </I>which follows is optional.  Note that the comma is required especially if <I>Bump_Size</I> is negative.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov327.htm">Dents</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov329.htm">Granite</A>
+</P>
+</BODY>
+</HTML>
+

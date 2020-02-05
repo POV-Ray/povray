@@ -1,0 +1,34 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Understanding POV-Ray's Coordinate System</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov14.htm">Our First Image</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov16.htm">Adding Standard Include Files</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405087"><A NAME="_Toc411405363"><A NAME="_Ref413502879"><A NAME="_Ref413506445"><A NAME="_Ref413593367"><A NAME="_Toc414198834"><A NAME="_Toc429993345">Understanding POV-Ray's Coordinate System</A></A></A></A></A></A></A></H3>
+<P>First, we have to tell POV-Ray where our camera is and where it is looking. To do this, we use 3D coordinates. The usual coordinate system for POV-Ray has the positive y-axis pointing up, the positive x-axis pointing to the right, and the positive z-axis pointing into the screen as follows:</P>
+<P ALIGN="CENTER"><IMG SRC="Image6.gif" WIDTH=464 HEIGHT=468></P>
+<B><P ALIGN="CENTER">The left-handed coordinate system (the z-axis is pointing away)</P>
+</B><P>This kind of coordinate system is called a left-handed coordinate system. If we use our left hand's fingers we can easily see why it is called left-handed. We just point our thumb in the direction of the positive x-axis (to the right), the index finger in the direction of the positive y-axis (straight up) and the middle finger in the positive z-axis direction (forward). We can only do this with our left hand. If we had used our right hand we would not have been able to point the middle finger in the correct direction.</P>
+<P>The left hand can also be used to determine rotation directions. To do this we must perform the famous "<I>Computer Graphics Aerobics</I>" exercise. We hold up our left hand and point our thumb in the positive direction of the axis of rotation. Our fingers will curl in the positive direction of rotation. Similarly if we point our thumb in the negative direction of the axis our fingers will curl in the negative direction of rotation.</P>
+<P ALIGN="CENTER"><IMG SRC="Image7.jpg" WIDTH=320 HEIGHT=240></P>
+<B><P ALIGN="CENTER">"Computer Graphics Aerobics" to determine the rotation direction.</P>
+</B><P>In the above illustration, the left hand is curling around the x-axis. The thumb points in the positive x direction and the fingers curl over in the positive rotation direction.</P>
+<P>If we want to use a right-handed system, as some CAD systems and modelers do, the <b><code>right</code></b> vector in the camera specification needs to be changed. See the detailed description in "<A HREF="pov230.htm#_Ref411611541">Handedness</A>". In a right-handed system we use our right hand for the "Aerobics".</P>
+<P>There is some controversy over whether POV-Ray's method of doing a right-handed system is really proper. To avoid problems we stick with the left-handed system which is not in dispute.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov14.htm">Our First Image</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov16.htm">Adding Standard Include Files</A>
+</P>
+</BODY>
+</HTML>
+

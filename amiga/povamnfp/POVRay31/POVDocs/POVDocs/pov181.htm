@@ -1,0 +1,35 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - String Literals</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov180.htm">Strings</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov182.htm">String Identifiers</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref413245145"><A NAME="_Toc414199014"><A NAME="_Toc429993524">String Literals</A></A></A></H4>
+<P>String literals begin with a double quote mark '"' which is followed by up to 256 printable ASCII characters and are terminated by another double quote mark. The following are all valid string literals:</P>
+<P> "Here"  "There"  "myfile.gif"  "textures.inc"</P>
+<P>Note if you need to specify a quote mark in a string literal you must precede it with a backslash. For example</P>
+<P> "Joe said \"Hello\" as he walked in."</P>
+<P>is converted to</P>
+<P> Joe said "Hello" as he walked in.</P>
+<P>If you need to specify a backslash, most of the time you need do nothing special. However if the string ends in a backslash, you will have to specify two. For example:</P>
+<P> "This is a backslash \ and so is this\\"</P>
+<P>Is converted to:</P>
+<P> This is a backslash \ and so is this\</P>
+<P>The substitution of <b><code>\"</code></b> with a <b><code>"</code></b> occurs in all POV-Ray string literals regardless usage however other formatting codes such as <b><code>\n</code></b> for new line are only supported in user message streams. See "<A HREF="pov208.htm#_Ref412960691">Text Formatting</A>" for details.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov180.htm">Strings</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov182.htm">String Identifiers</A>
+</P>
+</BODY>
+</HTML>
+

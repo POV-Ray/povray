@@ -1,0 +1,71 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Using INI Files</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov122.htm">Command Line Switches</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov124.htm">Using the POVINI Environment Variable</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405156"><A NAME="_Toc411405432"><A NAME="_Toc414198944"><A NAME="_Toc429993453">Using INI Files</A></A></A></A></H3>
+<P>Because it is difficult to set more than a few options on a command line, you have the ability to put multiple options in one or more text files. These initialization files or INI files have .ini as their default extension. Previous versions of POV-Ray called them default files or DEF files. You may still use existing DEF files with this version of POV-Ray.</P>
+<P>The majority of options you use will be stored in INI files. The command line switches are recommended for options which you will turn off or on frequently as you perform test renderings of a scene you are developing. The file <CODE>povray.ini</CODE> is automatically read if present.  You may specify additional INI files on the command-line by simply typing the file name on the command line. For example:</P>
+<PRE>  POVRAY MYOPTS.INI</PRE>
+<P>If no extension is given, then <CODE>.ini</CODE> is assumed. POV-Ray knows this is not a switch because it is not preceded by a plus or minus. In fact a common error among new users is that they forget to put the <b><code>+I</code></b> switch before the input file name. Without the switch, POV-Ray thinks that the scene file <CODE>simple.pov</CODE> is an INI file. Don't forget! If no plus or minus precedes a command line switch, it is assumed to be an INI file name.</P>
+<P>You may have multiple INI files on the command line along with switches. For example:</P>
+<PRE>  POVRAY MYOPTS +V OTHER</PRE>
+<P>This reads options from <CODE>myopts.ini</CODE>, then sets the <b><code>+V</code></b> switch, then reads options from <CODE>other.ini</CODE>.</P>
+<P>An INI file is a plain ASCII text file with options of the form...</P>
+<PRE>  Option_keyword=VALUE ; Text after semicolon is a comment</PRE>
+<P>For example the INI equivalent of the switch <b><code>+Isimple.pov</code></b> is...</P>
+<PRE>  Input_File_Name=simple.pov</PRE>
+<P>Options are read top to bottom in the file but in general may be specified in any order. If you specify an option more than once, the previous values are generally overwritten with the last specification. The only exception is the <b><code>Library_Path=path</code></b> options. Up to ten unique paths may be specified.</P>
+<P>Almost all INI-style options have equivalent <b><code>+</code></b> or <b><code>-</code></b> switches. The option reference section gives a detailed description of all POV-Ray options. It includes both the INI-style settings and the <b><code>+</code></b>/<b><code>-</code></b> switches.</P>
+<P>The INI keywords are not case sensitive. Only one INI option is permitted per line of text. You may also include switches in your INI file if they are easier for you. You may have multiple switches per line but you should not mix switches and INI options on the same line. You may nest INI files by simply putting the file name on a line by itself with no equals sign after it. Nesting may occur up to ten levels deep.</P>
+<P>For example:</P>
+<PRE>  ; This is a sample INI file. This entire line is a comment.
+  ; Blank lines are permitted.
+  Input_File_Name=simple.pov ;This sets the input file name
+  +W80 +H60 ; Traditional +/- switches are permitted too
+  MOREOPT   ; Read MOREOPT.INI and continue with next line
+  +V        ; Another switch
+  ; That's all folks!</PRE>
+<P>INI files may have labeled sections so that more than one set of options may be stored in a single file. Each section begins with a label in [] brackets. For example:</P>
+<PRE>  ; RES.INI
+  ; This sample INI file is used to set resolution.
+  +W120 +H100  ; This section has no label.
+               ; Select it with "RES"
+  [Low]
+  +W80 +H60    ; This section has a label.
+               ; Select it with "RES[Low]"
+  [Med]
+  +W320 +H200  ; This section has a label.
+               ; Select it with "RES[Med]"
+  [High]
+  +W640 +H480  ; Labels are not case sensitive.
+               ; "RES[high]" works
+  [Really High]
+  +W800 +H600  ; Labels may contain blanks</PRE>
+<P>When you specify the INI file you should follow it with the section label in brackets. For example...</P>
+<PRE>  POVRAY RES[Med] +Imyfile.pov</PRE>
+<P>POV-Ray reads <CODE>res.ini</CODE> and skips all options until it finds the label <b><code>Med</code></b>. It processes options after that label until it finds another label and then it skips. If no label is specified on the command line then only the unlabeled area at the top of the file is read. If a label is specified, the unlabeled area is ignored.</P>
+<P>Because a blank space is considered a delimiter for command-line switches, POV-Ray has a difficult time reading file names or INI labels containing blanks.  The rule is that INI-style options allow blanks in INI files but switches do not allow blanks whether in INI files or on the command line.  For example:</P>
+<PRE> +Imy file.pov               ;doesn't work anywhere
+ Input_File=my file.pov      ;works only in INI file</PRE>
+<P>To nest INI files which have blanks in the file name or labels use the <b><code>Include_INI</code></b> option like this:</P>
+<PRE>  Input_File=my file.pov
+  Include_Ini=my options[this section]</PRE>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov122.htm">Command Line Switches</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov124.htm">Using the POVINI Environment Variable</A>
+</P>
+</BODY>
+</HTML>
+

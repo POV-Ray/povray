@@ -1,0 +1,31 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Focal Blur</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov232.htm">Types of Projection</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov234.htm">Camera Ray Perturbation</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc414199068"><A NAME="_Ref414259498"><A NAME="_Toc429993578">Focal Blur</A></A></A></A></A></A></A></H3>
+<P>POV-Ray can simulate focal depth-of-field by shooting a number of sample rays from jittered points within each pixel and averaging the results.</P>
+<P>To turn on focal blur, you must specify the <b><code>aperture</code></b> keyword followed by a float value which determines the depth of the sharpness zone. Large apertures give a lot of blurring, while narrow apertures will give a wide zone of sharpness. Note that, while this behaves as a real camera does, the values for aperture are purely arbitrary and are not related to <I>f</I>-stops.</P>
+<P>You must also specify the <b><code>blur_samples</code></b> keyword followed by an integer value specifying the maximum number of rays to use for each pixel. More rays give a smoother appearance but is slower.  By default no focal blur is used, i. e. the default aperture is 0 and the default number of samples is 0.</P>
+<P>The center of the <I>zone of sharpness </I>is specified by the <b><code>focal_point</code></b> vector.  Objects close to this point are in focus and those farther from that point are more blurred.  The default value is <b><code>focal_point&lt;0,0,0&gt;</code></b>.</P>
+<P>Although <b><code>blur_samples</code></b> specifies the maximum number of samples, there is an adaptive mechanism that stops shooting rays when a certain degree of confidence has been reached.  At that point, shooting more rays would not result in a significant change.  The <b><code>confidence</code></b> and <b><code>variance</code></b> keywords are followed by float values to control the adaptive function. The <b><code>confidence</code></b> value is used to determine when the samples seem to be <I>close enough </I>to the correct color. The <b><code>variance</code></b> value specifies an acceptable tolerance on the variance of the samples taken so far. In other words, the process of shooting sample rays is terminated when the estimated color value is very likely (as controlled by the confidence probability) near the real color value.</P>
+<P>Since the <b><code>confidence</code></b> is a probability its values can range from 0 to 1 (the default is 0.9, i. e. 90%). The value for the <b><code>variance</code></b> should be in the range of the smallest displayable color difference (the default is 1/128).</P>
+<P>Larger <b><code>confidence</code></b> values will lead to more samples, slower traces and better images. The same holds for smaller <b><code>variance</code></b> thresholds.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov232.htm">Types of Projection</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov234.htm">Camera Ray Perturbation</A>
+</P>
+</BODY>
+</HTML>
+

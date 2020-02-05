@@ -1,0 +1,60 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Returning a Value Like a Function</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov212.htm">Are POV-Ray Macros a Function or a Macro?</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov214.htm">Returning Values Via Parameters</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199046"><A NAME="_Toc429993556">Returning a Value Like a Function</A></A></H4>
+<P>POV-Ray macros have a variety of uses.  Like most macros, they provide a parameterized way to insert arbitrary code into a scene file.  However most POV-Ray macros will be used like functions or procedures in a traditional programming language.  This is especially true because the POV-Ray language has no user-defined functions or procedures.  Macros are designed to fill all of these roles.</P>
+<P>When the body of a macro consists of statements that create an entire item such as an object, texture, etc. then the macro acts like a function which returns a single value.  The <b><code>Make_Frame</code></b> macro example in the section "<A HREF="pov211.htm#_Ref413414330">Invoking Macros</A>" above is such a macro which returns a value that is an object.  Here are some examples of how you might invoke it.</P>
+<PRE> union {  //make a union of two objects
+   object{ Make_Frame(8,10,7,9,1) translate  20*x}
+   object{ Make_Frame(8,10,7,9,1) translate -20*x}
+ }
+ #declare BigFrame = object{ Make_Frame(8,10,7,9,1)}
+ #declare SmallFrame = object{ Make_Frame(5,4,4,3,0.5)}</PRE>
+<P>Because no type checking is performed on parameters and because the expression syntax for floats, vectors, and colors is identical, you can create clever macros which work on all three.  See the sample scene <CODE>MACRO3.POV</CODE> which includes this macro to interpolate values.</P>
+<PRE>// Define the macro.  Parameters are:
+//   T:  Middle value of time
+//   T1: Initial time
+//   T2: Final time
+//   P1: Initial position (may be float, vector or color)
+//   P2: Final position (may be float, vector or color)
+//   Result is a value between P1 and P2 in the same proportion
+//    as T is between T1 and T2.
+#macro Interpolate(T,T1,T2,P1,P2)
+   (P1+(T1+T/(T2-T1))*(P2-P1))
+#end</PRE>
+<P>You might invoke it with <b><code>P1</code></b> and <b><code>P2</code></b> as floats, vectors, or colors as follows.</P>
+<PRE>  sphere{
+    Interpolate(I,0,15,&lt;2,3,4&gt;,&lt;9,8,7&gt;),  //center location is vector
+    Interpolate(I,0,15,3.0,5.5)           //radius is float
+    pigment{
+      color Interpolate(I,0,15,rgb&lt;1,1,0&gt;,rgb&lt;0,1,1&gt;)
+    }
+  }</PRE>
+<P>As the float value <b><code>I</code></b> varies from 0 to 15, the location, radius, and color of the sphere vary accordingly.</P>
+<P>There is a danger in using macros as functions.  In a traditional programming language function, the result to be returned is actually assigned to a temporary variable and the invoking code treats it as a variable of a given type.  However macro substitution may result in invalid or undesired syntax.  Note the definition of the macro <b><code>Interpolate</code></b> above has an outermost set of parentheses.  If those parentheses are omitted, it will not matter in the examples above, but what if you do this...</P>
+<PRE> #declare Value = Interpolate(I,0,15,3.0,5.5)*15;</PRE>
+<P>The end result is as if you had done...</P>
+<PRE> #declare Value = P1+(T1+T/(T2-T1))*(P2-P1) * 15;</PRE>
+<P>which is syntactically legal but not mathematically correct because the <b><code>P1</code></b> term is not multiplied.  The parentheses in the original example solves this problem.  The end result is as if you had done...</P>
+<PRE> #declare Value = (P1+(T1+T/(T2-T1))*(P2-P1)) * 15;</PRE>
+<P>which is correct.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov212.htm">Are POV-Ray Macros a Function or a Macro?</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov214.htm">Returning Values Via Parameters</A>
+</P>
+</BODY>
+</HTML>
+

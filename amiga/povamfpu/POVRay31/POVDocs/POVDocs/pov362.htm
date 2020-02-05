@@ -1,0 +1,37 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Density</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov361.htm">Sampling Parameters</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov363.htm">General Density Modifiers</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc414199210"><A NAME="_Ref418334512"><A NAME="_Ref418948799"><A NAME="_Ref420163369"><A NAME="_Toc429993726">Density</A></A></A></A></A></H3>
+<P>Particles of media are normally distributed in constant density throughout the media.  However the <b><code>density</code></b> statement allows you to vary the density across space using any of POV-Ray's pattern functions such as those used in textures.  If no <b><code>density</code></b> statement is given then the density remains a constant value of 1.0 throughout the media.  More than one <b><code>density</code></b> may be specified per <b><code>media</code></b> statement.  See "<A HREF="pov366.htm#_Ref428014833">Multiple Density vs. Multiple Media</A>".</P>
+<P>The syntax for <b><code>density</code></b> is:</P>
+<I><DL>
+<DT>DENSITY:</DT>
+</I><b><code><DD>density {</code></b> <I>[DENSITY_IDENTIFIER] [DENSITY_TYPE] [DENSITY_MODIFIER...]</I>  <b><code>}</DD>
+</code></b><I><DT>DENSITY_TYPE:</DT>
+<DD>PATTERN_TYPE</I>   |   <I>COLOR</DD>
+<DT>DENSITY_MODIFIER:</DT>
+<DD>PATTERN_MODIFIER</I>   |   <I>DENSITY_LIST</I>   |</DD>
+<b><code><DD>color_map{</code></b> <I>COLOR_MAP_BODY</I> <b><code>}</code></b>   |   <b><code>colour_map{</code></b> <I>COLOR_MAP_BODY</I> <b><code>}</code></b>   |</DD>
+<b><code><DD>density_map{</code></b> <I>DENSITY_MAP_BODY</I> <b><code>}</DD>
+</DL>
+</code></b><P>The <b><code>density</code></b> statement may begin with an optional density identifier.  All subsequent values modify the defaults or the values in the identifier.  The next item is a pattern type.  This is any one of POV-Ray's pattern functions such as <b><code>bozo</code></b>, <b><code>wood</code></b>, <b><code>gradient</code></b>, <b><code>waves</code></b>, etc.  Of particular usefulness are the <b><code>spherical</code></b>, <b><code>planar</code></b>, <b><code>cylindrical</code></b>, and <b><code>boxed</code></b> patterns which were previously available only for use with our discontinued <b><code>halo</code></b> feature.  All patterns return a value from 0.0 to 1.0.  This value is interpreted as the density of the media at that particular point.  See "<A HREF="pov316.htm#_Ref420919899">Patterns</A>" for details on particular pattern types.   Although a solid <I>COLOR</I> pattern is legal, in general it is used only when the <b><code>density</code></b> statement is inside a <b><code>density_map</code></b>. </P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov361.htm">Sampling Parameters</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov363.htm">General Density Modifiers</A>
+</P>
+</BODY>
+</HTML>
+

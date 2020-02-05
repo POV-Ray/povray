@@ -1,0 +1,51 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Working With Texture Maps</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov84.htm">Working With Normal Maps</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov86.htm">Working With List Textures</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405137"><A NAME="_Toc411405413"><A NAME="_Toc414198905"><A NAME="_Toc429993415">Working With Texture Maps</A></A></A></A></H3>
+<P>We know how to blend colors, pigment patterns, and normals, and we are probably thinking what about finishes? What about whole textures? Both of these can be kind of covered under one topic. While there is no finish map per se, there are texture maps, and we can easily adapt these to serve as finish maps, simply by putting the same pigment and/or normal in each of the texture entries of the map. Here is an example. We eliminate the declared pigments we used before and the previous plane, and add the following.</P>
+<PRE>  #declare Texture1 = texture {
+    pigment { Grey }
+    finish { reflection 1 }
+  }
+  #declare Texture2 = texture {
+    pigment { Grey }
+    finish { reflection 0 }
+  }
+  cylinder { &lt;-2, 5, -2&gt;, &lt;-2, -5, -2&gt;, 1
+    pigment { Blue }
+  }
+  plane { -z, 0
+    rotate y * 30
+    texture {
+      gradient y
+      texture_map {
+        [ 0.0 Texture1 ]
+        [ 0.4 Texture1 ]
+        [ 0.6 Texture2 ]
+        [ 1.0 Texture2 ]
+      }
+      scale 2
+    }
+  }</PRE>
+<P>Now, what have we done here? The background plane alternates vertically between two textures, identical except for their finishes. When we render this, the cylinder has a reflection part of the way down the plane, and then stops reflecting, then begins and then stops again, in a gradient pattern down the surface of the plane. With a little adaptation, this could be used with any pattern, and in any number of creative ways, whether we just wanted to give various parts of an object different finishes, as we are doing here, or whole different textures altogether.</P>
+<P>One might ask: if there is a texture map, why do we need pigment and normal maps? Fair question. The answer: speed of calculation. If we use a texture map, for every in-between point, POV-Ray must make multiple calculations for each texture element, and then run a weighted average to produce the correct value for that point. Using just a pigment map (or just a normal map) decreases the overall number of calculations, and our texture renders a bit faster in the bargain. As a rule of thumb: we use pigment or normal maps where we can and only fall back on texture maps if we need the extra flexibility.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov84.htm">Working With Normal Maps</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov86.htm">Working With List Textures</A>
+</P>
+</BODY>
+</HTML>
+

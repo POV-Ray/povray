@@ -1,0 +1,45 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Sturm</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov283.htm">No_Shadow</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov285.htm">Interior</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199124"><A NAME="_Toc429993629">Sturm</A></A></H4>
+<P>Some of POV-Ray's objects allow you to choose between a fast but sometimes inaccurate root solver and a slower but more accurate one. This is the case for all objects that involve the solution of a cubic or quartic polynomial. There are analytic mathematical solutions for those polynomials that can be used.</P>
+<P>Lower order polynomials are trivial to solve while higher order polynomials require iterative algorithms to solve them. One of those algorithms is the Sturmian root solver.  For example:</P>
+<PRE>  blob {
+    threshold .65
+    sphere { &lt;.5,0,0&gt;, .8, 1 }
+    sphere { &lt;-.5,0,0&gt;,.8, 1 }
+    sturm
+  }
+</PRE>
+<P>The keyword may optionally be followed by a float expression which is interpreted as a boolean value.  For example <b><code>sturm off</code></b> may be used to force it off.  When the keyword is specified alone, it is the same as <b><code>sturm on</code></b>.  The default no <b><code>sturm</code></b> is specified is <b><code>off</code></b>.</P>
+<P>The following list shows all objects for which the Sturmian root solver can be used.</P><DIR>
+<dir>
+  blob</P>
+<P>  cubic</P>
+<P>  lathe    (only with quadratic splines)</P>
+<P>  poly</P>
+<P>  prism    (only with cubic splines)</P>
+<P>  quartic</P>
+<P>  sor</P>
+</dir>
+</dir>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov283.htm">No_Shadow</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov285.htm">Interior</A>
+</P>
+</BODY>
+</HTML>
+

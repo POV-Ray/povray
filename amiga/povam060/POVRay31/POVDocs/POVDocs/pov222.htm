@@ -1,0 +1,51 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Transform Identifiers</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov221.htm">Transformation Order</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov223.htm">Transforming Textures and Objects</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405188"><A NAME="_Toc411405464"><A NAME="_Toc414199055"><A NAME="_Toc429993565">Transform Identifiers</A></A></A></A></H3>
+<P>At times it is useful to combine together several transformations and apply them in multiple places. A transform identifier may be used for this purpose. Transform identifiers are declared as follows:</P>
+<I><DL>
+<DT>TRANSFORM_DECLARATION:</DT>
+</I><b><code><DD>#declare</code></b> <I>IDENTIFIER</I> <b><code>= transform{</code></b> <I>TRANSFORMATION...</I> <b><code>}</code></b>&#9;|</DD>
+<b><code><DD>#local</code></b> <I>IDENTIFIER</I> <b><code>= transform{</code></b> <I>TRANSFORMATION...</I> <b><code>}</DD>
+</DL>
+</code></b><P>Where <I>IDENTIFIER</I> is the name of the identifier up to 40 characters long and <I>TRANSFORMATION</I> is any valid transformation modifier.  See "<A HREF="pov191.htm#_Ref412711267">#declare vs. #local</A>" for information on identifier scope.  Here is an example...</P>
+<PRE> #declare MyTrans = transform {
+   rotate ThisWay
+   scale SoMuch
+   rotate -ThisWay
+   scale Bigger
+   translate OverThere
+   rotate WayAround
+  }</PRE>
+<P>A transform identifier is invoked by the <b><code>transform</code></b> keyword without any brackets as shown here:</P>
+<PRE> object {
+  MyObject      // Get a copy of MyObject
+  transform MyTrans // Apply the transformation
+  translate -x*5   // Then move it 5 units left
+ }
+ object {
+  MyObject      // Get another copy of MyObject
+  transform MyTrans // Apply the same transformation
+  translate x*5   // Then move this one 5 units right
+ }</PRE>
+<P>On extremely complex CSG objects with lots of components it may speed up parsing if you apply a declared transformation rather than the individual <b><code>translate</code></b>, <b><code>rotate</code></b>, <b><code>scale</code></b>, or <b><code>matrix</code></b> modifiers. The <b><code>transform</code></b> is attached just once to each component. Applying each individual <b><code>translate</code></b>, <b><code>rotate</code></b>, <b><code>scale</code></b>, or <b><code>matrix</code></b> modifiers takes longer. This only affects parsing - rendering works the same either way.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov221.htm">Transformation Order</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov223.htm">Transforming Textures and Objects</A>
+</P>
+</BODY>
+</HTML>
+

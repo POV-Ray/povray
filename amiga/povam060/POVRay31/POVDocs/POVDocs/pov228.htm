@@ -1,0 +1,27 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Angle</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov227.htm">The Sky Vector</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov229.htm">The Direction Vector</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199061"><A NAME="_Toc429993571">Angle</A></A></H4>
+<P>The <b><code>angle</code></b> keyword followed by a float expression specifies the (horizontal) viewing angle in degrees of the camera used. Even though it is possible to use the <b><code>direction</code></b> vector to determine the viewing angle for the perspective camera it is much easier to use the <b><code>angle</code></b> keyword.</P>
+<P>When you specify the <b><code>angle</code></b>, POV-Ray adjusts the length of the <b><code>direction</code></b> vector accordingly.  The formula used is <I>direction_length = 0.5 * right_length / tan(angle / 2)</I> where <I>right_length</I> is the length of the <b><code>right</code></b> vector.  You should therefore specify the <b><code>direction</code></b> and <b><code>right</code></b> vectors before the <b><code>angle</code></b> keyword.  The <b><code>right</code></b> vector is explained in the next section.</P>
+<P>There is no limitation to the viewing angle except for the perspective projection. If you choose viewing angles larger than 360 degrees you'll see repeated images of the scene (the way the repetition takes place depends on the camera). This might be useful for special effects.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov227.htm">The Sky Vector</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov229.htm">The Direction Vector</A>
+</P>
+</BODY>
+</HTML>
+

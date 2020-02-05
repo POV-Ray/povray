@@ -1,0 +1,54 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Normal</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov299.htm">Quick Color</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov301.htm">Slope Maps</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405206"><A NAME="_Toc411405482"><A NAME="_Ref413681462"><A NAME="_Toc414199137"><A NAME="_Ref416591806"><A NAME="_Ref417128833"><A NAME="_Ref417300541"><A NAME="_Ref418334453"><A NAME="_Ref418948620"><A NAME="_Toc429993648">Normal</A></A></A></A></A></A></A></A></A></A></H3>
+<P>Ray-tracing is known for the dramatic way it depicts reflection, refraction and lighting effects. Much of our perception depends on the reflective properties of an object. Ray tracing can exploit this by playing tricks on our perception to make us see complex details that aren't really there.</P>
+<P>Suppose you wanted a very bumpy surface on the object. It would be very difficult to mathematically model lots of bumps. We can however simulate the way bumps look by altering the way light reflects off of the surface. Reflection calculations depend on a vector called a <I>surface normal </I>vector. This is a vector which points away from the surface and is perpendicular to it. By artificially modifying (or perturbing) this normal vector you can simulate bumps.  This is done by adding an optional <b><code>normal</code></b> statement.</P>
+<P>Note that attaching a normal pattern does not really modify the surface. It only affects the way light reflects or refracts at the surface so that it looks bumpy.  The syntax is:</P>
+<I><DL>
+<DT>NORMAL:</DT>
+</I><b><code><DD>normal{</code></b> <I>[NORMAL_IDENTIFIER] [NORMAL_TYPE] [NORMAL_MODIFIER...]</I> <b><code>}</DD>
+</code></b><I><DT>NORMAL_TYPE:</DT>
+<DD>PATTERN_TYPE</I> <I>Amount</I>   |</DD>
+<b><code><DD>bump_map{</code></b> <I>BITMAP_TYPE "bitmap.ext" [BUMP_MAP_MODS...]</I> <b><code>}</DD>
+</code></b><I><DT>NORMAL_MODIFIER:</DT>
+<DD>PATTERN_MODIFIER</I>   |   <I>NORMAL_LIST</I>   |</DD>
+<b><code><DD>normal_map{</code></b> <I>NORMAL_MAP_BODY</I> <b><code>}</code></b>   |</DD>
+<b><code><DD>slope_map{</code></b> <I>SLOPE_MAP_BODY</I> <b><code>}</code></b>   |</DD>
+<b><code><DD>bump_size</code></b> <I>Amount</DD>
+</DL>
+</I><P>Each of the items in a normal are optional but if they are present, they must be in the order shown. Any items after the <I>NORMAL_IDENTIFIER</I> modify or override settings given in the identifier. If no identifier is specified then the items modify the normal values in the current default texture. The <I>PATTERN_TYPE</I> may optionally be followed by a float value that controls the apparent depth of the bumps. Typical values range from 0.0 to 1.0 but any value may be used. Negative values invert the pattern. The default value if none is specified is 0.5.</P>
+<P>There are four basic types of <I>NORMAL_TYPE</I>s. They are block pattern normals, continuous pattern normals, specialized normals and bump maps. They differ in the types of modifiers you may use with them. The pattern type is optionally followed by one or more normal modifiers.  In addition to general pattern modifiers such as transformations, turbulence, and warp modifiers, normals may also have a <I>NORMAL_LIST</I>, <b><code>slope_map</code></b>, <b><code>normal_map</code></b>, and <b><code>bump_size</code></b>which are specific to normals.  See "<A HREF="pov346.htm#_Ref417310705">Pattern Modifiers</A>" for information on general modifiers.  The normal-specific modifiers are described in sub-sections which follow.  Normal modifiers of any kind apply only to the normal and not to other parts of the texture. Modifiers must be specified last.</P>
+<P>Originally POV-Ray had some patterns which were exclusively used for pigments while others were exclusively used for normals. Since POV-Ray 3.0 you can use any pattern for either pigments or normals. For example it is now valid to use <b><code>ripples</code></b> as a pigment or <b><code>wood</code></b> as a normal type. The patterns <b><code>bumps</code></b>, <b><code>dents</code></b>, <b><code>ripples</code></b>, <b><code>waves</code></b>, <b><code>wrinkles</code></b>, and <b><code>bump_map</code></b> were once exclusively normal patterns which could not be used as pigments. Because these six types use specialized normal modification calculations they cannot have <b><code>slope_map</code></b>, <b><code>normal_map</code></b> or wave shape modifiers. All other normal pattern types may use them.  Because block patterns <b><code>checker</code></b>, <b><code>hexagon</code></b>, and <b><code>brick</code></b> do not return a continuous series of values, they cannot use these modifiers either.  See "<A HREF="pov316.htm#_Ref417310251">Patterns</A>" for details about specific patterns.</P>
+<P>A <b><code>normal</code></b> statement is part of a <b><code>texture</code></b> specification.  However it can be tedious to use a <b><code>texture</code></b> statement just to add a bumps to an object. Therefore you may attach a normal directly to an object without explicitly specifying that it as part of a texture. For example instead of this:</P>
+<PRE>  object {My_Object texture{normal{bumps 0.5}}}</PRE>
+<P>you may shorten it to:</P>
+<PRE>  object {My_Object normal{bumps 0.5}}</PRE>
+<P>Note however that doing so creates an entire <b><code>texture</code></b> structure with default <b><code>pigment</code></b> and <b><code>finish</code></b> statements just as if you had explicitly typed the full <b><code>texture{...}</code></b> around it.</P>
+<P>Normal identifiers may be declared to make scene files more readable and to parameterize scenes so that changing a single declaration changes many values. An identifier is declared as follows.</P>
+<I><DL>
+<DT>NORMAL_DECLARATION:</DT>
+</I><b><code><DD>#declare </code></b><I>IDENTIFIER </I><b><code>=</code></b> <I>NORMAL</I>   |</DD>
+<b><code><DD>#local </code></b><I>IDENTIFIER </I><b><code>=</code></b> <I>NORMAL</DD>
+</DL>
+</I><P>Where <I>IDENTIFIER</I> is the name of the identifier up to 40 characters long and <I>NORMAL</I> is any valid <b><code>normal</code></b> statement.  See "<A HREF="pov191.htm#_Ref412711267">#declare vs. #local</A>" for information on identifier scope. </P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov299.htm">Quick Color</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov301.htm">Slope Maps</A>
+</P>
+</BODY>
+</HTML>
+

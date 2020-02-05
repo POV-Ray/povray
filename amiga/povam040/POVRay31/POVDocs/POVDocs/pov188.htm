@@ -1,0 +1,33 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Include Files and the #include Directive.</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov187.htm">Language Directives</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov189.htm">The #declare and #local Directives</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405177"><A NAME="_Toc411405453"><A NAME="_Toc414199021"><A NAME="_Toc429993531">Include Files</A></A> and the #include Directive.</A></A></H3>
+<P>The language allows include files to be specified by placing the line</P>
+<PRE> #include "filename.inc"</PRE>
+<P>at any point in the input file. The filename may be specified by any valid string expression but it usually is a literal string enclosed in double quotes. It may be up to 40 characters long (or your computer's limit), including the two double-quote characters.</P>
+<P>The include file is read in as if it were inserted at that point in the file. Using include is almost the same as cutting and pasting the entire contents of this file into your scene.</P>
+<P>Include files may be nested. You may have at most 10 nested include files. There is no limit on un-nested include files.</P>
+<P>Generally, include files have data for scenes but are not scenes in themselves. By convention scene files end in <CODE>.pov</CODE> and include files end with <CODE>.inc</CODE>.</P>
+<P>It is legal to specify drive and directory information in the file specification however it is discouraged because it makes scene files less portable between various platforms.  Use of full lower case is also recommended but not required.</P>
+<P>It is typical to put standard include files in a special sub-directory. POV-Ray can only read files in the current directory or one referenced by the <b><code>Library_Path</code></b> option or <b><code>+L</code></b> switch.  See section "<A HREF="pov139.htm#_Ref413233147">Library Paths</A>".</P>
+<P>You may use the <b><code>#local</code></b> directive to declare identifiers which are temporary in duration and local to the include file in scope. For details see "<A HREF="pov191.htm#_Ref413233211">#declare vs. #local</A>".</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov187.htm">Language Directives</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov189.htm">The #declare and #local Directives</A>
+</P>
+</BODY>
+</HTML>
+

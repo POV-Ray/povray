@@ -1,0 +1,31 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Light Fading</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov273.htm">Looks_like</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov275.htm">Atmospheric Media Interaction</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199111"><A NAME="_Toc429993619">Light Fading</A></A></H4>
+<P>By default POV-Ray does not diminish light from any light source as it travels through space. In order to get a more realistic effect <b><code>fade_distance</code></b> and <b><code>fade_power</code></b> keywords followed by float values can be used to model the distance based falloff in light intensity.</P>
+<P>The <b><code>fade_distance</code></b> <I>Fade_Distance</I> is used to specify the distance at which the full light intensity arrives, i. e. the intensity which was given by the <I>COLOR</I> specification. The actual attenuation is described by the <b><code>fade_power</code></b> <I>Fade_Power</I>, which determines the falloff rate. For example linear or quadratic falloff can be used by setting <b><code>fade_power</code></b> to 1 or 2 respectively. The complete formula to calculate the factor by which the light is attenuated is</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image113.gif" WIDTH=355 HEIGHT=101></P>
+</B><P>with <I>d</I> being the distance the light has traveled.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image114.gif" WIDTH=382 HEIGHT=316></P>
+<P ALIGN="CENTER">Light fading functions for different fading powers.</P>
+</B><P>You should note two important facts: First, for <I>Fade_Distance</I> larger than one the light intensity at distances smaller than <I>Fade_Distance</I> actually increases. This is necessary to get the light source color if the distance traveled equals the <I>Fade_Distance</I>. Second, only light coming directly from light sources is attenuated. Reflected or refracted light is not attenuated by distance.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov273.htm">Looks_like</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov275.htm">Atmospheric Media Interaction</A>
+</P>
+</BODY>
+</HTML>
+

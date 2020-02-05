@@ -1,0 +1,86 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - CSG Difference</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov29.htm">CSG Intersection</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov31.htm">CSG Merge</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405102"><A NAME="_Toc411405378"><A NAME="_Toc414198849"><A NAME="_Toc429993360">CSG Difference</A></A></A></A></H3>
+<P>We rotate the lens-shaped intersection about the y-axis so that the broad side is facing the camera.</P>
+<PRE>  intersection{
+    sphere { &lt;0, 0, 0&gt;, 1
+      translate -0.5*x
+    }
+    sphere { &lt;0, 0, 0&gt;, 1
+      translate 0.5*x
+    }
+    pigment { Red }
+    rotate 90*y
+  }</PRE>
+<P>Let's create a cylinder and stick it right in the middle of the lens.</P>
+<PRE>  cylinder { &lt;0, 0, -1&gt; &lt;0, 0, 1&gt;, .35
+    pigment { Blue }
+  }</PRE>
+<P>We render the scene to see the position of the cylinder. We will place a <b><code>difference</code></b> block around both the lens-shaped intersection and the cylinder like this:</P>
+<PRE>  difference {
+    intersection {
+      sphere { &lt;0, 0, 0&gt;, 1
+        translate -0.5*x
+      }
+      sphere { &lt;0, 0, 0&gt;, 1
+        translate 0.5*x
+      }
+      pigment { Red }
+      rotate 90*y
+    }
+    cylinder { &lt;0, 0, -1&gt; &lt;0, 0, 1&gt;, .35
+      pigment { Blue }
+    }
+  }</PRE>
+<P>We render the file again and see the lens-shaped intersection with a neat hole in the middle of it where the cylinder was. The cylinder has been <b><code>subtracted</code></b> from the intersection. Note that the pigment of the cylinder causes the surface of the hole to be colored blue. If we eliminate this pigment the surface of the hole will be red.</P>
+<P>OK, let's get a little wilder now. Let's declare our perforated lens object to give it a name. Let's also eliminate all textures in the declared object because we will want them to be in the final union instead.</P>
+<PRE>  #declare Lens_With_Hole = difference {
+    intersection {
+      sphere { &lt;0, 0, 0&gt;, 1
+        translate -0.5*x
+      }
+      sphere { &lt;0, 0, 0&gt;, 1
+        translate 0.5*x
+      }
+      rotate 90*y
+    }
+    cylinder { &lt;0, 0, -1&gt; &lt;0, 0, 1&gt;, .35 }
+  }</PRE>
+<P>Let's use a union to build a complex shape composed of copies of this object.</P>
+<PRE>  union {
+    object { Lens_With_Hole translate &lt;-.65, .65, 0&gt; }
+    object { Lens_With_Hole translate &lt;.65, .65, 0&gt; }
+    object { Lens_With_Hole translate &lt;-.65, -.65, 0&gt; }
+    object { Lens_With_Hole translate &lt;.65, -.65, 0&gt; }
+    pigment { Red }
+  }</PRE>
+<P>We render the scene. An interesting object to be sure. But let's try something more. Let's make it a partially-transparent object by adding some filter to the pigment block.</P>
+<PRE>  union {
+    object { Lens_With_Hole translate &lt;-.65, .65, 0&gt; }
+    object { Lens_With_Hole translate &lt;.65, .65, 0&gt; }
+    object { Lens_With_Hole translate &lt;-.65, -.65, 0&gt; }
+    object { Lens_With_Hole translate &lt;.65, -.65, 0&gt; }
+    pigment { Red filter .5 }
+  }</PRE>
+<P>We render the file again. This looks pretty good... only... we can see parts of each of the lens objects inside the union! This is not good.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov29.htm">CSG Intersection</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov31.htm">CSG Merge</A>
+</P>
+</BODY>
+</HTML>
+

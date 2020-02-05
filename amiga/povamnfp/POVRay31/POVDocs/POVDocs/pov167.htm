@@ -1,0 +1,52 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Vector Expressions</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov166.htm">Float Functions</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov168.htm">Vector Literals</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc414199000"><A NAME="_Toc429993510">Vector Expressions</A></A></A></A></H3>
+<P>POV-Ray often requires you to specify a <I>vector</I>. A vector is a set of related float values. Vectors may be specified using literals, identifiers or functions which return vector values. You may also create very complex vector expressions from combinations of any of these using various familiar operators.</P>
+<P>POV-Ray vectors may have from two to five components but the vast majority of vectors have three components. Unless specified otherwise, you should assume that the word "vector" means a three component vector. POV-Ray operates in a 3D x, y, z coordinate system and you will use three component vectors to specify x, y and z values. In some places POV-Ray needs only two coordinates. These are often specified by a 2D vector called an <I>UV vector</I>. Fractal objects use 4D vectors. Color expressions use 5D vectors but allow you to specify 3, 4 or 5 components and use default values for the unspecified components. Unless otherwise noted, all 2, 4 or 5 component vectors work just like 3D vectors but they have a different number of components.</P>
+<P>The syntax for combining vector literals into vector expressions is almost identical to the rules for float expressions.  In the syntax for vector expressions below, some of the syntax items are defined in the section for float expressions.  See "<A HREF="pov160.htm#_Ref412720567">Float Expressions</A>" for those definitions.  Detailed explanations of vector-specific issues are given in the following sub-sections.</P>
+<I><DL>
+<DT>VECTOR:</DT>
+<DD>NUMERIC_TERM  [SIGN  NUMERIC_TERM]</DD>
+<DT>NUMERIC_TERM:</DT>
+<DD>NUMERIC_FACTOR  [MULT  NUMERIC_FACTOR]</DD>
+<DT>NUMERIC_FACTOR:</DT>
+<DD>VECTOR_LITERAL</I>&#9;&#9;|</DD>
+<I><DD>VECTOR_IDENTIFIER</I>&#9;|</DD>
+<I><DD>SIGN  NUMERIC_FACTOR</I>&#9;|</DD>
+<I><DD>VECTOR_FUNCTION</I>&#9;|</DD>
+<I><DD>VECTOR_BUILT-IN_IDENT</I>&#9;|</DD>
+<b><code><DD>(</code></b> <I>FULL_EXPRESSION</I> <b><code>)</code></b>&#9;|</DD>
+<b><code><DD>!</code></b>  <I>NUMERIC_FACTOR</I>&#9;|</DD>
+<I><DD>FLOAT</DD>
+<DT>VECTOR_LITERAL:</DT>
+</I><b><code><DD>&lt;</code></b><I> FLOAT </I><b><code>,</code></b><I> FLOAT </I><b><code>,</code></b><I> FLOAT </I><b><code>&gt;</DD>
+</code></b><I><DT>VECTOR_FUNCTION:</DT>
+</I><b><code><DD>vaxis_rotate(</code></b><I> VECTOR </I><b><code>,</code></b><I> VECTOR </I><b><code>,</code></b><I> FLOAT </I><b><code>)</code></b>   |</DD>
+<b><code><DD>vcross(</code></b><I> VECTOR </I><b><code>,</code></b><I> VECTOR </I><b><code>)</code></b>   |</DD>
+<b><code><DD>vrotate(</code></b><I> VECTOR </I><b><code>,</code></b><I> VECTOR </I><b><code>)</code></b>   |</DD>
+<b><code><DD>vnormalize(</code></b><I> VECTOR </I><b><code>)</DD>
+</code></b><I><DT>VECTOR_BUILT-IN_IDENT:</DT>
+</I><b><code><DD>x</code></b>   |   <b><code>y</code></b>   |   <b><code>z</code></b>   |   <b><code>t</code></b>   |   <b><code>u</code></b>   |   <b><code>v</DD>
+</DL>
+</code></b><P>Note: <I>VECTOR_IDENTIFIERS</I> are identifiers previously declared to have vector values.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov166.htm">Float Functions</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov168.htm">Vector Literals</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,210 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Julia Fractal</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov242.htm">Height Field</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov244.htm">Lathe</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199078"><A NAME="_Toc429993588">Julia Fractal</A></A></H4>
+<P>A <I>julia fractal </I>object is a 3-D <I>slice </I>of a 4-D object created by generalizing the process used to create the classic Julia sets. You can make a wide variety of strange objects using the <b><code>julia_fractal</code></b> statement including some that look like bizarre blobs of twisted taffy. The <b><code>julia_fractal</code></b> syntax is:</P>
+<I><DL>
+<DT>JULIA_FRACTAL:</DT>
+</I><b><code><DD>julia_fractal{</code></b> <I>&lt;4D_Julia_Parameter&gt; [JF_ITEM...]</I> <I>[OBJECT_MODIFIER...] </I><b><code>}</DD>
+</code></b><I><DT>JF_ITEM:</DT>
+<DD>ALGEBRA_TYPE</I>   |   <I>FUNCTION_TYPE</I>   |</DD>
+<b><code><DD>max_iteration</code></b> <I>Count</I>   |   <b><code>precision</code></b> <I>Amt</I>   |</DD>
+<b><code><DD>slice</code></b> <I>&lt;4D_Normal&gt;</I><b><code>,</code></b> <I>Distance</DD>
+<DT>ALGEBRA_TYPE:</DT>
+</I><b><code><DD>quaternion</code></b>   |   <b><code>hypercomplex</DD>
+</code></b><I><DT>FUNCTION_TYPE:</DT>
+</I><b><code><DD>sqr</code></b>   |   <b><code>cube</code></b>   |   <b><code>exp</code></b>   |   <b><code>reciprocal</code></b>   |   <b><code>sin</code></b>   |   <b><code>asin</code></b>   |</DD>
+<b><code><DD>sinh</code></b>   |   <b><code>asinh</code></b>   |   <b><code>cos</code></b>   |   <b><code>acos</code></b>   |   <b><code>cosh</code></b>   |   <b><code>acosh</code></b>   |</DD>
+<b><code><DD>tan</code></b>   |   <b><code>atan</code></b>   |   <b><code>tanh</code></b>   |   <b><code>atanh</code></b>   |   <b><code>log</code></b>   |   <b><code>pwr(</code></b> <I>X_Val</I><b><code>,</code></b> <I>Y_Val</I> <b><code>)</DD>
+</DL>
+</code></b><P>The required 4-D vector <I>&lt;4D_Julia_Parameter&gt;</I> is the classic Julia parameter <I>p</I> in the iterated formula <I>f(h) + p</I>.</P>
+<P>The julia fractal object is calculated by using an algorithm that determines whether an arbitrary point <I>h(0)</I> in 4-D space is inside or outside the object. The algorithm requires generating the sequence of vectors <I>h(0), h(1), ...</I> by iterating the formula <I>h(n+1) = f(h(n)) + p (n = 0, 1, ..., max_iteration-1)</I> where <I>p</I> is the fixed 4-D vector parameter of the julia fractal and <I>f()</I> is one of the functions <b><code>sqr</code></b>, <b><code>cube</code></b>, ... specified by the presence of the corresponding keyword. The point <I>h(0)</I> that begins the sequence is considered inside the julia fractal object if none of the vectors in the sequence escapes a hypersphere of radius 4 about the origin before the iteration number reaches the integer <b><code>max_iteration</code></b> value. As you increase <b><code>max_iteration</code></b>, some points escape that did not previously escape, forming the julia fractal. Depending on the <I>&lt;4D_Julia_Parameter&gt;</I>, the julia fractal object is not necessarily connected; it may be scattered fractal dust. Using a low <b><code>max_iteration</code></b> can fuse together the dust to make a solid object. A high <b><code>max_iteration</code></b> is more accurate but slows rendering. Even though it is not accurate, the solid shapes you get with a low, <b><code>max_iteration</code></b> value can be quite interesting.  If none is specified, the default is <b><code>max_iteration 20</code></b>.</P>
+<P>Since the mathematical object described by this algorithm is four-dimensional and POV-Ray renders three dimensional objects, there must be a way to reduce the number of dimensions of the object from four dimensions to three. This is accomplished by intersecting the 4-D fractal with a 3-D "plane" defined by the <b><code>slice</code></b> modifier and then projecting the intersection to 3-D space. The keyword is followed by 4D vector and a float separated by a comma.  The slice plane is the 3-D space that is perpendicular to <I>&lt;4D_Normal&gt;</I> and is <I>Distance</I> units from the origin. Zero length  <I>&lt;4D_Normal&gt;</I> vectors or a  <I>&lt;4D_Normal&gt;</I> vector with a zero fourth component are illegal.  If none is specified, the default is <b><code>slice &lt;0,0,0,1&gt;,0</code></b>.</P>
+<P>You can get a good feel for the four dimensional nature of a julia fractal by using POV-Ray's animation feature to vary a slice's <I>Distance</I> parameter. You can make the julia fractal appear from nothing, grow, then shrink to nothing as <I>Distance</I>changes, much as the cross section of a 3-D object changes as it passes through a plane.</P>
+<P>The <b><code>precision</code></b> parameter is a tolerance used in the determination of whether points are inside or outside the fractal object. Larger values give more accurate results but slower rendering. Use as low a value as you can without visibly degrading the fractal object's appearance but note values less than 1.0 are clipped at 1.0.  The default if none is specified is <b><code>precision 20</code></b>.</P>
+<P>The presence of the keywords <b><code>quaternion</code></b> or <b><code>hypercomplex</code></b> determine which 4-D algebra is used to calculate the fractal. The default is <b><code>quaternion</code></b>. Both are 4-D generalizations of the complex numbers but neither satisfies all the field properties (all the properties of real and complex numbers that many of us slept through in high school). Quaternions have non-commutative multiplication and hypercomplex numbers can fail to have a multiplicative inverse for some non-zero elements (it has been proved that you cannot successfully generalize complex numbers to four dimensions with all the field properties intact, so something has to break). Both of these algebras were discovered in the 19th century. Of the two, the quaternions are much better known, but one can argue that hypercomplex numbers are more useful for our purposes, since complex valued functions such as sin, cos, etc. can be generalized to work for hypercomplex numbers in a uniform way.</P>
+<P>For the mathematically curious, the algebraic properties of these two algebras can be derived from the multiplication properties of the unit basis vectors 1 = &lt;1,0,0,0&gt;, i=&lt; 0,1,0,0&gt;, j=&lt;0,0,1,0&gt; and k=&lt; 0,0,0,1&gt;. In both algebras 1 x = x 1 = x for any x (1 is the multiplicative identity). The basis vectors 1 and i behave exactly like the familiar complex numbers 1 and i in both algebras.</P>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=360>
+<TR><TD VALIGN="TOP" COLSPAN=3>
+<P>Quaternion basis vector multiplication rules:</TD>
+</TR>
+<TR><TD WIDTH="47%" VALIGN="TOP">
+<p><b><code>ij = k</code></b></TD>
+<TD WIDTH="27%" VALIGN="TOP">
+<p><b><code>jk = i</code></b></TD>
+<TD WIDTH="27%" VALIGN="TOP">
+<p><b><code>ki = j</code></b></TD>
+</TR>
+<TR><TD WIDTH="47%" VALIGN="TOP">
+<p><b><code>ji = -k</code></b></TD>
+<TD WIDTH="27%" VALIGN="TOP">
+<p><b><code>kj = -i</code></b></TD>
+<TD WIDTH="27%" VALIGN="TOP">
+<p><b><code>ik = -j</code></b></TD>
+</TR>
+<TR><TD WIDTH="47%" VALIGN="TOP">
+<p><b><code>ii = jj = kk = -1</code></b></TD>
+<TD WIDTH="27%" VALIGN="TOP">
+<p><b><code>ijk = -1</code></b></TD>
+<TD WIDTH="27%" VALIGN="TOP">&nbsp;</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=360>
+<TR><TD VALIGN="TOP" COLSPAN=3>
+<P>Hypercomplex basis vector multiplication rules:</TD>
+</TR>
+<TR><TD WIDTH="47%" VALIGN="TOP">
+<p><b><code>ij = k</code></b></TD>
+<TD WIDTH="27%" VALIGN="TOP">
+<p><b><code>jk = -i</code></b></TD>
+<TD WIDTH="27%" VALIGN="TOP">
+<p><b><code>ki = -j</code></b></TD>
+</TR>
+<TR><TD WIDTH="47%" VALIGN="TOP">
+<p><b><code>ji = k</code></b></TD>
+<TD WIDTH="27%" VALIGN="TOP">
+<p><b><code>kj = -i</code></b></TD>
+<TD WIDTH="27%" VALIGN="TOP">
+<p><b><code>ik = -j</code></b></TD>
+</TR>
+<TR><TD WIDTH="47%" VALIGN="TOP">
+<p><b><code>ii = jj = kk = -1</code></b></TD>
+<TD WIDTH="27%" VALIGN="TOP">
+<p><b><code>ijk = 1</code></b></TD>
+<TD WIDTH="27%" VALIGN="TOP">&nbsp;</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>A distance estimation calculation is used with the quaternion calculations to speed them up. The proof that this distance estimation formula works does not generalize from two to four dimensions but the formula seems to work well anyway, the absence of proof notwithstanding!</P>
+<P>The presence of one of the function keywords <b><code>sqr</code></b>, <b><code>cube</code></b>, etc. determines which function is used for <I>f(h)</I> in the iteration formula <I>h(n+1) = f(h(n)) + p</I>. The default is <b><code>sqr.</code></b> Most of the function keywords work only if the <b><code>hypercomplex</code></b> keyword is present. Only <b><code>sqr</code></b> and <b><code>cube</code></b> work with <b><code>quaternion</code></b>. The functions are all familiar complex functions generalized to four dimensions.</P>
+
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=312>
+<TR><TD VALIGN="TOP" COLSPAN=2>
+<P>Function Keyword  Maps 4-D value <I>h</I> to:</TD>
+</TR>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>sqr</code></b></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<I><P>h*h</I></TD>
+</TR>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>cube</code></b></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<I><P>h*h*h</I></TD>
+</TR>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>exp</code></b></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<I><P>e</I> raised to the power <I>h</I></TD>
+</TR>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>reciprocal</code></b></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<I><P>1/h</I></TD>
+</TR>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>sin</code></b></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<P>sine of <I>h</I></TD>
+</TR>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>asin</code></b></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<P>arcsine of <I>h</I></TD>
+</TR>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>sinh</code></b></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<P>hyperbolic sine of <I>h</I></TD>
+</TR>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>asinh</code></b></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<P>inverse hyperbolic sine of <I>h</I></TD>
+</TR>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>cos</code></b></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<P>cosine of <I>h</I></TD>
+</TR>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>acos</code></b></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<P>arccosine of <I>h</I></TD>
+</TR>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>cosh</code></b></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<P>hyperbolic cos of <I>h</I></TD>
+</TR>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>acosh</code></b></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<P>inverse hyperbolic cosine of <I>h</I></TD>
+</TR>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>tan</code></b></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<P>tangent of <I>h</I></TD>
+</TR>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>atan</code></b></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<P>arctangent of <I>h</I></TD>
+</TR>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>tanh</code></b></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<P>hyperbolic tangent of <I>h</I></TD>
+</TR>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>atanh</code></b></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<P>inverse hyperbolic tangent of <I>h</I></TD>
+</TR>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>log</code></b></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<P>natural logarithm of <I>h</I></TD>
+</TR>
+<TR><TD WIDTH="33%" VALIGN="TOP">
+<p><b><code>pwr(x,y)</code></b></TD>
+<TD WIDTH="67%" VALIGN="TOP">
+<I><P>h</I> raised to the complex power <I>x+</I><B>i</B><I>y</I></TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>A simple example of a julia fractal object is:</P>
+<PRE> julia_fractal {
+  &lt;-0.083,0.0,-0.83,-0.025&gt;
+  quaternion
+  sqr
+  max_iteration 8
+  precision 15
+ }</PRE>
+<P>The first renderings of julia fractals using quaternions were done by Alan Norton and later by John Hart in the '80's. This new POV-Ray implementation follows <CODE>Fractint</CODE> in pushing beyond what is known in the literature by using hypercomplex numbers and by generalizing the iterating formula to use a variety of transcendental functions instead of just the classic Mandelbrot <I>z<SUP>2</SUP> + c</I> formula. With an extra two dimensions and eighteen functions to work with, intrepid explorers should be able to locate some new fractal beasts in hyperspace, so have at it!</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov242.htm">Height Field</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov244.htm">Lathe</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,31 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Location and Look_At</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov225.htm">Placing the Camera</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov227.htm">The Sky Vector</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199059"><A NAME="_Toc429993569">Location and Look_At</A></A></H4>
+<P>Under many circumstances just two vectors in the camera statement are all you need to position the camera: <b><code>location</code></b> and <b><code>look_at</code></b> vectors. For example:</P>
+<PRE> camera {
+  location &lt;3,5,-10&gt;
+  look_at &lt;0,2,1&gt;
+ }</PRE>
+<P>The location is simply the x, y, z coordinates of the camera. The camera can be located anywhere in the ray-tracing universe. The default location is <b><code>&lt;0,0,0&gt;</code></b>. The <b><code>look_at</code></b> vector tells POV-Ray to pan and tilt the camera until it is looking at the specified x, y, z coordinates. By default the camera looks at a point one unit in the z-direction from the location.</P>
+<P>The <b><code>look_at</code></b> modifier should almost always be the last item in the camera statement. If other camera items are placed after the <b><code>look_at</code></b> vector then the camera may not continue to look at the specified point.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov225.htm">Placing the Camera</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov227.htm">The Sky Vector</A>
+</P>
+</BODY>
+</HTML>
+

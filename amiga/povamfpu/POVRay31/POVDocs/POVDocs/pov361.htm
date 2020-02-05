@@ -1,0 +1,28 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Sampling Parameters</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov360.htm">Scattering</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov362.htm">Density</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc414199209"><A NAME="_Toc429993725">Sampling Parameters</A></A></H3>
+<P>Media effects are calculated by sampling the media along the path of the ray.  It uses a method called <I>Monte Carlo integration.</I>  The <b><code>intervals</code></b> keyword may be used to specify the integer number of intervals used to sample the ray.  The default number of intervals is 10.  For object media the intervals are spread between the entry and exit points as the ray passes through the container object.  For atmospheric media, the intervals span entire length of the ray from its start until it hits an object.</P>
+<P>For media types which interact with spotlights or cylinder lights, the intervals which are not illuminated by these light types are weighted differently than the illuminated intervals when distributing samples.  The <b><code>ratio</code></b> keyword distributes intervals differently between lit and unlit areas.  The default value of <b><code>ratio 0.9</code></b> means that lit intervals get more samples than unlit intervals.  Note that the total number of intervals must exceed the number of illuminated intervals.  If a ray passes in and out of 8 spotlights but you've only specified 5 intervals then an error occurs.</P>
+<P>The <b><code>samples</code></b> <I>Min</I><b><code>,</code></b> <I>Max</I> keyword specifies the minimum and maximum number of samples taken per interval.  The default values are <b><code>samples 1,1</code></b>.  </P>
+<P>As each interval is sampled, the variance is computed.  If the variance is below a threshold value, then no more samples are needed.  The <b><code>variance</code></b> and <b><code>confidence</code></b> keywords specify the permitted variance allowed and the confidence that you are within that variance.  The exact calculations are quite complex and involve chi-squared tests and other statistical principles too messy to describe here.  The default values are <b><code>varience 1.0/128</code></b> and <b><code>confidence 0.9</code></b>.  For slower more accurate results, decrease the variance and increase the confidence.  Note however that the maximum number of samples limits the calculations even if the proper variance and confidence are never reached.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov360.htm">Scattering</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov362.htm">Density</A>
+</P>
+</BODY>
+</HTML>
+

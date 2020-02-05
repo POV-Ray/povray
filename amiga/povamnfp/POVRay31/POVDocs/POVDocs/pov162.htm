@@ -1,0 +1,37 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Float Identifiers</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov161.htm">Float Literals</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov163.htm">Float Operators</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198996"><A NAME="_Toc429993505">Float Identifiers</A></A></H4>
+<P>Float identifiers may be declared to make scene files more readable and to parameterize scenes so that changing a single declaration changes many values. An identifier is declared as follows.</P>
+<I><DL>
+<DT>FLOAT_DECLARATION:</DT>
+</I><b><code><DD>#declare </code></b><I>IDENTIFIER </I><b><code>=</code></b> <I>EXPRESSION</I><b><code>;&#9;</code></b>|</DD>
+<b><code><DD>#local </code></b><I>IDENTIFIER </I><b><code>=</code></b> <I>EXPRESSION</I><b><code>;</DD>
+</DL>
+</code></b><P>Where <I>IDENTIFIER</I> is the name of the identifier up to 40 characters long and <I>EXPRESSION</I> is any valid expression which evaluates to a float value. Note that there should be a semi-colon after the expression in a float declaration. This semi-colon is new with POV-Ray version 3.1. If omitted, it generates a warning and some macros may not work properly. See "<A HREF="pov191.htm#_Ref412711267">#declare vs. #local</A>" for information on identifier scope.  Here are some examples.</P>
+<PRE> #declare Count = 0;
+ #declare Rows = 5.3;
+ #declare Cols = 6.15;
+ #declare Number = Rows*Cols;
+ #declare Count = Count+1;</PRE>
+<P>As the last example shows, you can re-declare a float identifier and may use previously declared values in that re-declaration. There are several built-in identifiers which POV-Ray declares for you. See "<A HREF="pov164.htm#_Ref413233292">Built-in Float Identifiers</A>" for details.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov161.htm">Float Literals</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov163.htm">Float Operators</A>
+</P>
+</BODY>
+</HTML>
+

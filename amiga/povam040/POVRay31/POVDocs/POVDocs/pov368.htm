@@ -1,0 +1,30 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Atmospheric Media</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov367.htm">Atmospheric Effects</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov369.htm">Background</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405214"><A NAME="_Toc411405490"><A NAME="_Toc414199215"><A NAME="_Ref417287116"><A NAME="_Ref420157406"><A NAME="_Toc429993732">Atmospher</A></A>ic Media</A></A></A></A></H3>
+<P>Atmospheric effects such as fog, dust, haze, or visible gas may be simulated by a <b><code>media</code></b> statement specified in the scene but not attached to any object.  All areas not inside a non-hollow object in the entire scene.  A very simple approach to add fog to a scene is explained in section "<A HREF="pov370.htm#_Ref421003334">Fog</A>" however this kind of fog does not interact with any light sources like <b><code>media</code></b> does. It will not show light beams or other effects and is therefore not very realistic.</P>
+<P>The atmosphere media effect overcomes some of the fog's limitations by calculating the interaction between light and the particles in the atmosphere using volume sampling. Thus shaft of light beams will become visible and objects will cast shadows onto smoke or fog.</P>
+<P>With spotlights you'll be able to create the best results because their cone of light will become visible. Pointlights can be used to create effects like street lights in fog. Lights can be made to not interact with the atmosphere by adding <b><code>media_interaction off</code></b> to the light source. They can be used to increase the overall light level of the scene to make it look more realistic.</P>
+<P>Complete details on <b><code>media</code></b> are given in the section "<A HREF="pov356.htm#_Ref413750547">Media</A>".  Earlier versions of POV-Ray used an <b><code>atmosphere</code></b> statement for atmospheric effects but that system was incompatible with the old object <b><code>halo</code></b> system.  So <b><code>atmosphere</code></b> has been eliminated and replaced with a simpler and more powerful media feature.  The user now only has to learn one <b><code>media</code></b> system for either atmospheric or object use.</P>
+<P>If you only want media effects in a particular area, you should use object media rather than only relying upon the media pattern.  In general it will be faster and more accurate because it only calculates inside the constraining object.</P>
+<P>You should note that the atmosphere feature will not work if the camera is inside a non-hollow object (see section "<A HREF="pov287.htm#_Ref421004161">Empty and Solid Objects</A>" for a detailed explanation).</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov367.htm">Atmospheric Effects</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov369.htm">Background</A>
+</P>
+</BODY>
+</HTML>
+

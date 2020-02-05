@@ -1,0 +1,38 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Color Identifiers</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov176.htm">Color Keywords</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov178.htm">Color Operators</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199010"><A NAME="_Toc429993520">Color Identifiers</A></A></H4>
+<P>Color identifiers may be declared to make scene files more readable and to parameterize scenes so that changing a single declaration changes many values. An identifier is declared as follows.</P>
+<I><DL>
+<DT>COLOR_DECLARATION:</DT>
+</I><b><code><DD>#declare </code></b><I>IDENTIFIER </I><b><code>=</code></b> <I>COLOR</I><b><code>;&#9;</code></b>|</DD>
+<b><code><DD>#local </code></b><I>IDENTIFIER </I><b><code>=</code></b> <I>COLOR</I><b><code>;</DD>
+</DL>
+</code></b><P>Where <I>IDENTIFIER</I> is the name of the identifier up to 40 characters long and <I>COLOR</I> is any valid specification. Note that there should be a semi-colon at the end of the declaration. This semi-colon is new with POV-Ray version 3.1. If omitted, it generates a warning and some macros may not work properly. See "<A HREF="pov191.htm#_Ref412711267">#declare vs. #local</A>" for information on identifier scope.  Here are some examples....</P>
+<PRE> #declare White = rgb &lt;1,1,1&gt;;
+ #declare Cyan = color blue 1.0 green 1.0;
+ #declare Weird = rgb &lt;Foo*2,Bar-1,Bob/3&gt;;
+ #declare LightGray = White*0.8;
+ #declare LightCyan = Cyan red 0.6;</PRE>
+<P>As the <b><code>LightGray</code></b> example shows you do not need any color keywords when creating color expressions based on previously declared colors. The last example shows you may use a color identifier with the keyword style syntax. Make sure that the identifier comes first before any other component keywords.</P>
+<P>Like floats and vectors, you may re-define colors throughout a scene but the need to do so is rare.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov176.htm">Color Keywords</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov178.htm">Color Operators</A>
+</P>
+</BODY>
+</HTML>
+

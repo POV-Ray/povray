@@ -1,0 +1,31 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - HF_Gray_16</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov379.htm">Scene File Gamma</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov381.htm">Irid_Wavelength</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405223"><A NAME="_Toc411405499"><A NAME="_Ref412464870"><A NAME="_Ref413835579"><A NAME="_Toc414199227"><A NAME="_Ref418325376"><A NAME="_Toc429993744">HF_Gray_16</A></A></A></A></A></A></A></H3>
+<P>The <b><code>hf_gray_16</code></b> setting is useful when using POV-Ray to generate heightfields for use in other POV-Ray scenes. The syntax is...</P>
+<b><code><DL>
+<DD>global_settings { hf_gray_16</code></b> <I>[Bool]</I> <b><code>}</DD>
+</DL>
+</code></b><P>The boolean value turns the option on or off. If the keyword is specified without the boolean value then the option is turned on. If <b><code>hf_gray_16</code></b> is not specified in any <b><code>global_settings</code></b> statement in the entire scene then the default is off.</P>
+<P>When <b><code>hf_gray_16</code></b> is on, the output file will be in the form of a heightfield, with the height at any point being dependent on the brightness of the pixel. The brightness of a pixel is calculated in the same way that color images are converted to grayscale images:<I>  height = 0.3 * red + 0.59 * green + 0.11 * blue.</P>
+</I><P>Setting the <b><code>hf_gray_16</code></b> option will cause the preview display, if used, to be grayscale rather than color. This is to allow you to see how the heightfield will look because some file formats store heightfields in a way that is difficult to understand afterwards. See section "<A HREF="pov242.htm#_Ref414188528">Height Field</A>" for a description of how POV-Ray heightfields are stored for each file type.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov379.htm">Scene File Gamma</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov381.htm">Irid_Wavelength</A>
+</P>
+</BODY>
+</HTML>
+

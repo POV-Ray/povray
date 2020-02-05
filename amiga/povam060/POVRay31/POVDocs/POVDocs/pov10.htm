@@ -1,0 +1,35 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Arrays Added</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov9.htm">New #macro Feature</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov11.htm">File I/O and other Directives</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc429993340">Arrays Added</A></H3>
+<P>Added multi-dimension arrays</P>
+<PRE>  #declare MyArray=array[20]</PRE>
+<P> or</P>
+<PRE>  #local PrivateArray=array[30]</PRE>
+<P> or</P>
+<PRE>  #declare Rows=5; #declare Cols=4;
+  #declare Table=array[Rows][Cols]</PRE>
+<P>Added optional initializer syntax for arrays.</P>
+<PRE> #declare MyArray=array[2][3]{{1,2,3},{4,5,6}}</PRE>
+<P>Subscripts start at 0.  Anything that can be declared may be in an array. Arrays are initialized as null.  You must later fill each element with values.</P>
+<P>Added float functions for arrays.  Given <b><code>#declare MyArray = array[4][5]</code></b> then <b><code>dimensions(MyArray)</code></b> is 2 and <b><code>dimension_size(MyArray,2)</code></b> is 5.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov9.htm">New #macro Feature</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov11.htm">File I/O and other Directives</A>
+</P>
+</BODY>
+</HTML>
+

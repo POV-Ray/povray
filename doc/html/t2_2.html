@@ -1565,7 +1565,7 @@ have made just for this purpose:</p>
       }
       texture {
         pigment {color rgb &lt;1, 1, 1&gt;}
-        finish {ambient .8 diffuse .6}
+        finish {emission .8 diffuse .6}
       }
     }
     cylinder {
@@ -1589,7 +1589,7 @@ have made just for this purpose:</p>
 </pre>
 
 <p>Rendering this we see that a fairly believable light bulb now illuminates
-the scene. However, if we do not specify a high ambient value, the light bulb
+the scene. However, if we do not specify a high value for <code>emission</code>, the light bulb
 is not lit by the light source. On the plus side, all of the shadows fall
 away from the light bulb, just as they would in a real situation. The shadows
 are sharp, so let's make our bulb an area light:</p>
@@ -1607,7 +1607,7 @@ are sharp, so let's make our bulb an area light:</p>
 <p>We note that we have placed this area light in the x-y-plane instead of
 the x-z-plane. We also note that the actual appearance of the light bulb is
 not affected in any way by the light source. The bulb must be illuminated by
-some other light source or by, as in this case, a high ambient value.</p>
+some other light source or by, as in this case, a high value for <code>emission</code>.</p>
 
 </div>
 <a name="t2_2_4_6_3"></a>

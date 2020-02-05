@@ -1,0 +1,43 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Built-in Vector Identifiers</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov171.htm">Operator Promotion</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov173.htm">Vector Functions</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref413233324"><A NAME="_Toc414199005"><A NAME="_Toc429993515">Built-in Vector Identifiers</A></A></A></H4>
+<P>There are several built-in vector identifiers. You can use them to specify values or to create expressions but you cannot re-declare them to change their values.  They are:</P>
+<I><DL>
+<DT>VECTOR_BUILT-IN_IDENT:</DT>
+</I><b><code><DD>x</code></b>   |   <b><code>y</code></b>   |   <b><code>z</code></b>   |   <b><code>t</code></b>   |   <b><code>u</code></b>   |   <b><code>v</DD>
+</DL>
+</code></b><P>All built-in vector identifiers never change value. They are defined as though the following lines were at the start of every scene.</P>
+<PRE> #declare x = &lt;1, 0, 0&gt;;
+ #declare y = &lt;0, 1, 0&gt;;
+ #declare z = &lt;0, 0, 1&gt;;
+ #declare t = &lt;0, 0, 0, 1&gt;;
+ #declare u = &lt;1, 0&gt;;
+ #declare v = &lt;0, 1&gt;;</PRE>
+<P>The built-in vector identifiers <b><code>x</code></b>, <b><code>y</code></b>, and <b><code>z</code></b> provide much greater readability for your scene files when used in vector expressions. For example....</P>
+<PRE> plane { y, 1}    // The normal vector is obviously "y".
+ plane { &lt;0,1,0&gt;, 1} // This is harder to read.
+ translate 5*x    // Move 5 units in the "x" direction.
+ translate &lt;5,0,0&gt;  // This is less obvious.</PRE>
+<P>An expression like <b><code>5*x</code></b> evaluates to <b><code>5*&lt;1,0,0&gt;</code></b> or <b><code>&lt;5,0,0&gt;</code></b>.</P>
+<P>Similarly <b><code>u</code></b> and <b><code>v</code></b> may be used in 2D vectors. When using 4D vectors you should use <b><code>x</code></b>, <b><code>y</code></b>, <b><code>z</code></b>, and <b><code>t</code></b> and POV-Ray will promote <b><code>x</code></b>, <b><code>y</code></b>, and <b><code>z</code></b> to 4D when used where 4D is required.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov171.htm">Operator Promotion</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov173.htm">Vector Functions</A>
+</P>
+</BODY>
+</HTML>
+

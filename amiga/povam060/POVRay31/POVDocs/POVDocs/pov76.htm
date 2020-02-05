@@ -1,0 +1,35 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Using Basic Normal Modifiers</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov75.htm">Normals</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov77.htm">Blending Normals</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198896"><A NAME="_Toc429993406">Using Basic Normal Modifiers</A></A></H4>
+<P>We comment out the planetoid sphere for now and, at the bottom of the file, create a new sphere with a simple, single color texture.</P>
+<PRE>  sphere { &lt;0,0,0&gt;, 1
+    pigment { Gray75 }
+    normal { bumps 1 scale .2 }
+  }</PRE>
+<P>Here we have added a <b><code>normal</code></b> block in addition to the <b><code>pigment</code></b> block (note that these do not have to be included in a <b><code>texture</code></b> block unless they need to be transformed together or need to be part of a layered texture). We render this to see what it looks like. Now, one at a time, we substitute for the keyword <b><code>bumps</code></b> the following keywords: <b><code>dents</code></b>, <b><code>wrinkles</code></b>, <b><code>ripples</code></b> and <b><code>waves</code></b> (we can also use any of the patterns listed in "Patterns"). We render each to see what they look like. We play around with the float value that follows the keyword. We also experiment with the scale value.</P>
+<P>For added interest, we change the plane texture to a single color with a normal as follows.</P>
+<PRE>  plane { y, -1.5
+    pigment { color rgb &lt;.65, .45, .35&gt; }
+    normal { dents .75 scale .25 }
+  }</PRE>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov75.htm">Normals</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov77.htm">Blending Normals</A>
+</P>
+</BODY>
+</HTML>
+

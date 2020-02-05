@@ -1,0 +1,670 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<B><font SIZE=5><P ALIGN="CENTER"><A NAME="_Toc411405076"><A NAME="_Toc411405352">Persistence of Vision &trade; Ray-Tracer</A></A><BR>
+<P ALIGN="CENTER"><A NAME="_Toc411405077"><A NAME="_Toc411405353">POV-Ray &trade; Version 3.1</A></A><BR>
+<P ALIGN="CENTER"><A NAME="_Toc411405078"><A NAME="_Toc411405354">User's Documentation</A></A><BR>
+</font><P ALIGN="CENTER">August 1998</P>
+<P ALIGN="CENTER">Copyright 1998 POV-Team &trade;</P>
+</B><P ALIGN="CENTER">POV-Ray &trade; is based on DKBTrace 2.12 by David K. Buck and Aaron A. Collins.</P>
+<P ALIGN="CENTER">POV-Ray, POV-Help, POV-Team, and Persistence of Vision are trademarks of the POV-Team.</P>
+
+<B><FONT SIZE=4>Table of Contents</code></B>
+<dir>
+<A HREF="povdocs/pov1.htm#_Toc429993331">Introduction</A>
+<DIR>
+<A HREF="povdocs/pov2.htm#_Toc429993332">Program Description</A><BR>
+<A HREF="povdocs/pov3.htm#_Toc429993333">What is Ray-Tracing?</A><BR>
+<A HREF="povdocs/pov4.htm#_Toc429993334">What is POV-Ray?</A><BR>
+<A HREF="povdocs/pov5.htm#_Toc429993335">How Do I Begin?</A><BR>
+<A HREF="povdocs/pov6.htm#_Toc429993336">Notation and Basic Assumptions</A><BR>
+<A HREF="povdocs/pov7.htm#_Toc429993337">What's New in POV-Ray 3.1?</A><BR>
+<dir>
+<A HREF="povdocs/pov8.htm#_Toc429993338">Media Replaces Halo &amp; Atmosphere</A><BR>
+<A HREF="povdocs/pov9.htm#_Toc429993339">New #macro Feature</A><BR>
+<A HREF="povdocs/pov10.htm#_Toc429993340">Arrays Added</A><BR>
+<A HREF="povdocs/pov11.htm#_Toc429993341">File I/O and other Directives</A><BR>
+<A HREF="povdocs/pov12.htm#_Toc429993342">Additional New Features</A><BR>
+
+</dir>
+</dir><A HREF="povdocs/pov13.htm#_Toc429993343">Beginning Tutorial</A><BR>
+<DIR>
+<A HREF="povdocs/pov14.htm#_Toc429993344">Our First Image</A><BR>
+<DIR>
+<A HREF="povdocs/pov15.htm#_Toc429993345">Understanding POV-Ray's Coordinate System</A><BR>
+<A HREF="povdocs/pov16.htm#_Toc429993346">Adding Standard Include Files</A><BR>
+<A HREF="povdocs/pov17.htm#_Toc429993347">Adding a Camera</A><BR>
+<A HREF="povdocs/pov18.htm#_Toc429993348">Describing an Object</A><BR>
+<A HREF="povdocs/pov19.htm#_Toc429993349">Adding Texture to an Object</A><BR>
+<A HREF="povdocs/pov20.htm#_Toc429993350">Defining a Light Source</A><BR>
+
+</dir><A HREF="povdocs/pov21.htm#_Toc429993351">Simple Shapes</A><BR>
+<dir>
+<A HREF="povdocs/pov22.htm#_Toc429993352">Box Object</A><BR>
+<A HREF="povdocs/pov23.htm#_Toc429993353">Cone Object</A><BR>
+<A HREF="povdocs/pov24.htm#_Toc429993354">Cylinder Object</A><BR>
+<A HREF="povdocs/pov25.htm#_Toc429993355">Plane Object</A><BR>
+
+</dir><A HREF="povdocs/pov26.htm#_Toc429993356">CSG Objects</A><BR>
+<dir>
+<A HREF="povdocs/pov27.htm#_Toc429993357">What is CSG?</A><BR>
+<A HREF="povdocs/pov28.htm#_Toc429993358">CSG Union</A><BR>
+<A HREF="povdocs/pov29.htm#_Toc429993359">CSG Intersection</A><BR>
+<A HREF="povdocs/pov30.htm#_Toc429993360">CSG Difference</A><BR>
+<A HREF="povdocs/pov31.htm#_Toc429993361">CSG Merge</A><BR>
+<A HREF="povdocs/pov32.htm#_Toc429993362">CSG Pitfalls</A><BR>
+<DIR>
+<A HREF="povdocs/pov33.htm#_Toc429993363">Coincidence Surfaces</A><BR>
+
+</dir>
+</dir><A HREF="povdocs/pov34.htm#_Toc429993364">Advanced Shapes</A><BR>
+<dir>
+<A HREF="povdocs/pov35.htm#_Toc429993365">Bicubic Patch Object</A><BR>
+<A HREF="povdocs/pov36.htm#_Toc429993366">Blob Object</A><BR>
+<DIR>
+<A HREF="povdocs/pov37.htm#_Toc429993367">Component Types and Other New Features</A><BR>
+<A HREF="povdocs/pov38.htm#_Toc429993368">Complex Blob Constructs and Negative Strength</A><BR>
+
+</dir><A HREF="povdocs/pov39.htm#_Toc429993369">Height Field Object</A><BR>
+<A HREF="povdocs/pov40.htm#_Toc429993370">Lathe Object</A><BR>
+<DIR>
+<A HREF="povdocs/pov41.htm#_Toc429993371">Understanding The Concept of Splines</A><BR>
+
+</dir><A HREF="povdocs/pov42.htm#_Toc429993372">Mesh Object</A><BR>
+<A HREF="povdocs/pov43.htm#_Toc429993373">Polygon Object</A><BR>
+<A HREF="povdocs/pov44.htm#_Toc429993374">Prism Object</A><BR>
+<DIR>
+<A HREF="povdocs/pov45.htm#_Toc429993375">Teaching An Old Spline New Tricks</A><BR>
+<A HREF="povdocs/pov46.htm#_Toc429993376">Smooth Transitions</A><BR>
+<A HREF="povdocs/pov47.htm#_Toc429993377">Multiple Sub-Shapes</A><BR>
+<A HREF="povdocs/pov48.htm#_Toc429993378">Conic Sweeps And The Tapering Effect</A><BR>
+
+</dir><A HREF="povdocs/pov49.htm#_Toc429993379">Superquadric Ellipsoid Object</A><BR>
+<A HREF="povdocs/pov50.htm#_Toc429993380">Surface of Revolution Object</A><BR>
+<A HREF="povdocs/pov51.htm#_Toc429993381">Text Object</A><BR>
+<A HREF="povdocs/pov52.htm#_Toc429993382">Torus Object</A><BR>
+
+</dir><A HREF="povdocs/pov53.htm#_Toc429993383">The Light Source</A><BR>
+<dir>
+<A HREF="povdocs/pov54.htm#_Toc429993384">The Pointlight Source</A><BR>
+<A HREF="povdocs/pov55.htm#_Toc429993385">The Spotlight Source</A><BR>
+<A HREF="povdocs/pov56.htm#_Toc429993386">The Cylindrical Light Source</A><BR>
+<A HREF="povdocs/pov57.htm#_Toc429993387">The Area Light Source</A><BR>
+<A HREF="povdocs/pov58.htm#_Toc429993388">The Ambient Light Source</A><BR>
+<A HREF="povdocs/pov59.htm#_Toc429993389">Light Source Specials</A><BR>
+<DIR>
+<A HREF="povdocs/pov60.htm#_Toc429993390">Using Shadowless Lights</A><BR>
+<A HREF="povdocs/pov61.htm#_Toc429993391">Assigning an Object to a Light Source</A><BR>
+<A HREF="povdocs/pov62.htm#_Toc429993392">Using Light Fading</A><BR>
+
+</dir>
+</dir><A HREF="povdocs/pov63.htm#_Toc429993393">Simple Texture Options</A><BR>
+<dir>
+<A HREF="povdocs/pov64.htm#_Toc429993394">Surface Finishes</A><BR>
+<A HREF="povdocs/pov65.htm#_Toc429993395">Adding Bumpiness</A><BR>
+<A HREF="povdocs/pov66.htm#_Toc429993396">Creating Color Patterns</A><BR>
+<A HREF="povdocs/pov67.htm#_Toc429993397">Pre-defined Textures</A><BR>
+
+</dir><A HREF="povdocs/pov68.htm#_Toc429993398">Advanced Texture Options</A><BR>
+<dir>
+<A HREF="povdocs/pov69.htm#_Toc429993399">Pigments</A><BR>
+<DIR>
+<A HREF="povdocs/pov70.htm#_Toc429993400">Using Color List Pigments</A><BR>
+<A HREF="povdocs/pov71.htm#_Toc429993401">Using Pigment and Patterns</A><BR>
+<A HREF="povdocs/pov72.htm#_Toc429993402">Using Pattern Modifiers</A><BR>
+<A HREF="povdocs/pov73.htm#_Toc429993403">Using Transparent Pigments and Layered Textures</A><BR>
+<A HREF="povdocs/pov74.htm#_Toc429993404">Using Pigment Maps</A><BR>
+
+</dir><A HREF="povdocs/pov75.htm#_Toc429993405">Normals</A><BR>
+<DIR>
+<A HREF="povdocs/pov76.htm#_Toc429993406">Using Basic Normal Modifiers</A><BR>
+<A HREF="povdocs/pov77.htm#_Toc429993407">Blending Normals</A><BR>
+
+</dir><A HREF="povdocs/pov78.htm#_Toc429993408">Finishes</A><BR>
+<DIR>
+<A HREF="povdocs/pov79.htm#_Toc429993409">Using Ambient</A><BR>
+<A HREF="povdocs/pov80.htm#_Toc429993410">Using Surface Highlights</A><BR>
+<A HREF="povdocs/pov81.htm#_Toc429993411">Using Reflection and Metallic</A><BR>
+<A HREF="povdocs/pov82.htm#_Toc429993412">Using Iridescence</A><BR>
+
+</dir><A HREF="povdocs/pov83.htm#_Toc429993413">Working With Pigment Maps</A><BR>
+<A HREF="povdocs/pov84.htm#_Toc429993414">Working With Normal Maps</A><BR>
+<A HREF="povdocs/pov85.htm#_Toc429993415">Working With Texture Maps</A><BR>
+<A HREF="povdocs/pov86.htm#_Toc429993416">Working With List Textures</A><BR>
+<A HREF="povdocs/pov87.htm#_Toc429993417">What About Tiles?</A><BR>
+<A HREF="povdocs/pov88.htm#_Toc429993418">Average Function</A><BR>
+<A HREF="povdocs/pov89.htm#_Toc429993419">Working With Layered Textures</A><BR>
+<DIR>
+<A HREF="povdocs/pov90.htm#_Toc429993420">Declaring Layered Textures</A><BR>
+<A HREF="povdocs/pov91.htm#_Toc429993421">Another Layered Textures Example</A><BR>
+
+</dir><A HREF="povdocs/pov92.htm#_Toc429993422">When All Else Fails: Material Maps</A><BR>
+<A HREF="povdocs/pov93.htm#_Toc429993423">Limitations Of Special Textures</A><BR>
+
+</dir><A HREF="povdocs/pov94.htm#_Toc429993424">Using the Camera</A><BR>
+<dir>
+<A HREF="povdocs/pov95.htm#_Toc429993425">Using Focal Blur</A><BR>
+
+</dir><A HREF="povdocs/pov96.htm#_Toc429993426">Using Atmospheric Effects</A><BR>
+<dir>
+<A HREF="povdocs/pov97.htm#_Toc429993427">The Background</A><BR>
+<A HREF="povdocs/pov98.htm#_Toc429993428">The Sky Sphere</A><BR>
+<DIR>
+<A HREF="povdocs/pov99.htm#_Toc429993429">Creating a Sky with a Color Gradient</A><BR>
+<A HREF="povdocs/pov100.htm#_Toc429993430">Adding the Sun</A><BR>
+<A HREF="povdocs/pov101.htm#_Toc429993431">Adding Some Clouds</A><BR>
+
+</dir><A HREF="povdocs/pov102.htm#_Toc429993432">The Fog</A><BR>
+<DIR>
+<A HREF="povdocs/pov103.htm#_Toc429993433">A Constant Fog</A><BR>
+<A HREF="povdocs/pov104.htm#_Toc429993434">Setting a Minimum Translucency</A><BR>
+<A HREF="povdocs/pov105.htm#_Toc429993435">Creating a Filtering Fog</A><BR>
+<A HREF="povdocs/pov106.htm#_Toc429993436">Adding Some Turbulence to the Fog</A><BR>
+<A HREF="povdocs/pov107.htm#_Toc429993437">Using Ground Fog</A><BR>
+<A HREF="povdocs/pov108.htm#_Toc429993438">Using Multiple Layers of Fog</A><BR>
+<A HREF="povdocs/pov109.htm#_Toc429993439">Fog and Hollow Objects</A><BR>
+
+</dir><A HREF="povdocs/pov110.htm#_Toc429993440">The Rainbow</A><BR>
+<DIR>
+<A HREF="povdocs/pov111.htm#_Toc429993441">Starting With a Simple Rainbow</A><BR>
+<A HREF="povdocs/pov112.htm#_Toc429993442">Increasing the Rainbow's Translucency</A><BR>
+<A HREF="povdocs/pov113.htm#_Toc429993443">Using a Rainbow Arc</A><BR>
+
+</dir><A HREF="povdocs/pov114.htm#_Toc429993444">Animation</A><BR>
+<DIR>
+<A HREF="povdocs/pov115.htm#_Toc429993445">The Clock Variable: Key To It All</A><BR>
+<A HREF="povdocs/pov116.htm#_Toc429993446">Clock Dependant Variables And Multi-Stage Animations</A><BR>
+<A HREF="povdocs/pov117.htm#_Toc429993447">The Phase Keyword</A><BR>
+<A HREF="povdocs/pov118.htm#_Toc429993448">Do Not Use Jitter Or Crand</A><BR>
+<A HREF="povdocs/pov119.htm#_Toc429993449">INI File Settings</A><BR>
+
+</dir>
+</dir>
+</dir><A HREF="povdocs/pov120.htm#_Toc429993450">POV-Ray Options</A><BR>
+<DIR>
+<A HREF="povdocs/pov121.htm#_Toc429993451">Setting POV-Ray Options</A><BR>
+<DIR>
+<A HREF="povdocs/pov122.htm#_Toc429993452">Command Line Switches</A><BR>
+<A HREF="povdocs/pov123.htm#_Toc429993453">Using INI Files</A><BR>
+<A HREF="povdocs/pov124.htm#_Toc429993454">Using the POVINI Environment Variable</A><BR>
+
+</dir><A HREF="povdocs/pov125.htm#_Toc429993455">Options Reference</A><BR>
+<DIR>
+<A HREF="povdocs/pov126.htm#_Toc429993456">Animation Options</A><BR>
+<DIR>
+<A HREF="povdocs/pov127.htm#_Toc429993457">External Animation Loop</A><BR>
+<A HREF="povdocs/pov128.htm#_Toc429993458">Internal Animation Loop</A><BR>
+<A HREF="povdocs/pov129.htm#_Toc429993459">Subsets of Animation Frames</A><BR>
+<A HREF="povdocs/pov130.htm#_Toc429993460">Cyclic Animation</A><BR>
+<A HREF="povdocs/pov131.htm#_Toc429993461">Field Rendering</A><BR>
+
+</dir><A HREF="povdocs/pov132.htm#_Toc429993462">Output Options</A><BR>
+<DIR>
+<A HREF="povdocs/pov133.htm#_Toc429993463">General Output Options</A><BR>
+<DIR>
+<A HREF="povdocs/pov133.htm#_Toc429993464">Height and Width of Output</A><BR>
+<A HREF="povdocs/pov133.htm#_Toc429993465">Partial Output Options</A><BR>
+<A HREF="povdocs/pov133.htm#_Toc429993466">Interrupting Options</A><BR>
+<A HREF="povdocs/pov133.htm#_Toc429993467">Resuming Options</A><BR>
+
+</dir><A HREF="povdocs/pov134.htm#_Toc429993468">Display Output Options</A><BR>
+<DIR>
+<A HREF="povdocs/pov134.htm#_Toc429993469">Display Hardware Settings</A><BR>
+<A HREF="povdocs/pov134.htm#_Toc429993470">Display Related Settings</A><BR>
+<A HREF="povdocs/pov134.htm#_Toc429993471">Mosaic Preview</A><BR>
+
+</dir><A HREF="povdocs/pov135.htm#_Toc429993472">File Output Options</A><BR>
+<DIR>
+<A HREF="povdocs/pov135.htm#_Toc429993473">Output File Type</A><BR>
+<A HREF="povdocs/pov135.htm#_Toc429993474">Output File Name</A><BR>
+<A HREF="povdocs/pov135.htm#_Toc429993475">Output File Buffer</A><BR>
+
+</dir><A HREF="povdocs/pov136.htm#_Toc429993476">CPU Utilization Histogram</A><BR>
+<DIR>
+<A HREF="povdocs/pov136.htm#_Toc429993477">File Type</A><BR>
+<A HREF="povdocs/pov136.htm#_Toc429993478">File Name</A><BR>
+<A HREF="povdocs/pov136.htm#_Toc429993479">Grid Size</A><BR>
+
+</dir>
+</dir><A HREF="povdocs/pov137.htm#_Toc429993480">Scene Parsing Options</A><BR>
+<DIR>
+<A HREF="povdocs/pov138.htm#_Toc429993481">Input File Name</A><BR>
+<A HREF="povdocs/pov139.htm#_Toc429993482">Library Paths</A><BR>
+<A HREF="povdocs/pov140.htm#_Toc429993483">Language Version</A><BR>
+
+</dir><A HREF="povdocs/pov141.htm#_Toc429993484">Shell-out to Operating System</A><BR>
+<DIR>
+<A HREF="povdocs/pov142.htm#_Toc429993485">String Substitution in Shell Commands</A><BR>
+<A HREF="povdocs/pov143.htm#_Toc429993486">Shell Command Sequencing</A><BR>
+<A HREF="povdocs/pov144.htm#_Toc429993487">Shell Command Return Actions</A><BR>
+
+</dir><A HREF="povdocs/pov145.htm#_Toc429993488">Text Output</A><BR>
+<DIR>
+<A HREF="povdocs/pov146.htm#_Toc429993489">Text Streams</A><BR>
+<A HREF="povdocs/pov147.htm#_Toc429993490">Console Text Output</A><BR>
+<A HREF="povdocs/pov148.htm#_Toc429993491">Directing Text Streams to Files</A><BR>
+<A HREF="povdocs/pov149.htm#_Toc429993492">Help Screen Switches</A><BR>
+
+</dir><A HREF="povdocs/pov150.htm#_Toc429993493">Tracing Options</A><BR>
+<DIR>
+<A HREF="povdocs/pov151.htm#_Toc429993494">Quality Settings</A><BR>
+<A HREF="povdocs/pov152.htm#_Toc429993495">Radiosity Setting</A><BR>
+<A HREF="povdocs/pov153.htm#_Toc429993496">Automatic Bounding Control</A><BR>
+<A HREF="povdocs/pov154.htm#_Toc429993497">Removing User Bounding</A><BR>
+<A HREF="povdocs/pov155.htm#_Toc429993498">Anti-Aliasing Options</A><BR>
+
+</dir>
+</dir>
+</dir><A HREF="povdocs/pov156.htm#_Toc429993499">Scene Description Language</A><BR>
+<DIR>
+<A HREF="povdocs/pov157.htm#_Toc429993500">Language Basics</A><BR>
+<DIR>
+<A HREF="povdocs/pov158.htm#_Toc429993501">Identifiers and Keywords</A><BR>
+<A HREF="povdocs/pov159.htm#_Toc429993502">Comments</A><BR>
+<A HREF="povdocs/pov160.htm#_Toc429993503">Float Expressions</A><BR>
+<DIR>
+<A HREF="povdocs/pov161.htm#_Toc429993504">Float Literals</A><BR>
+<A HREF="povdocs/pov162.htm#_Toc429993505">Float Identifiers</A><BR>
+<A HREF="povdocs/pov163.htm#_Toc429993506">Float Operators</A><BR>
+<A HREF="povdocs/pov164.htm#_Toc429993507">Built-in Float Identifiers</A><BR>
+<A HREF="povdocs/pov165.htm#_Toc429993508">Boolean Keywords</A><BR>
+<A HREF="povdocs/pov166.htm#_Toc429993509">Float Functions</A><BR>
+
+</dir><A HREF="povdocs/pov167.htm#_Toc429993510">Vector Expressions</A><BR>
+<DIR>
+<A HREF="povdocs/pov168.htm#_Toc429993511">Vector Literals</A><BR>
+<A HREF="povdocs/pov169.htm#_Toc429993512">Vector Identifiers</A><BR>
+<A HREF="povdocs/pov170.htm#_Toc429993513">Vector Operators</A><BR>
+<A HREF="povdocs/pov171.htm#_Toc429993514">Operator Promotion</A><BR>
+<A HREF="povdocs/pov172.htm#_Toc429993515">Built-in Vector Identifiers</A><BR>
+<A HREF="povdocs/pov173.htm#_Toc429993516">Vector Functions</A><BR>
+
+</dir><A HREF="povdocs/pov174.htm#_Toc429993517">Specifying Colors</A><BR>
+<DIR>
+<A HREF="povdocs/pov175.htm#_Toc429993518">Color Vectors</A><BR>
+<A HREF="povdocs/pov176.htm#_Toc429993519">Color Keywords</A><BR>
+<A HREF="povdocs/pov177.htm#_Toc429993520">Color Identifiers</A><BR>
+<A HREF="povdocs/pov178.htm#_Toc429993521">Color Operators</A><BR>
+<A HREF="povdocs/pov179.htm#_Toc429993522">Common Color Pitfalls</A><BR>
+
+</dir><A HREF="povdocs/pov180.htm#_Toc429993523">Strings</A><BR>
+<DIR>
+<A HREF="povdocs/pov181.htm#_Toc429993524">String Literals</A><BR>
+<A HREF="povdocs/pov182.htm#_Toc429993525">String Identifiers</A><BR>
+<A HREF="povdocs/pov183.htm#_Toc429993526">String Functions</A><BR>
+
+</dir><A HREF="povdocs/pov184.htm#_Toc429993527">Array Identifiers</A><BR>
+<DIR>
+<A HREF="povdocs/pov185.htm#_Toc429993528">Declaring Arrays</A><BR>
+<A HREF="povdocs/pov186.htm#_Toc429993529">Array Initalizers</A><BR>
+
+</dir><A HREF="povdocs/pov187.htm#_Toc429993530">Language Directives</A><BR>
+<DIR>
+<A HREF="povdocs/pov188.htm#_Toc429993531">Include Files and the #include Directive.</A><BR>
+<A HREF="povdocs/pov189.htm#_Toc429993532">The #declare and #local Directives</A><BR>
+<DIR>
+<A HREF="povdocs/pov190.htm#_Toc429993533">Declaring identifiers</A><BR>
+<A HREF="povdocs/pov191.htm#_Toc429993534">#declare vs. #local</A><BR>
+<A HREF="povdocs/pov192.htm#_Toc429993535">Identifier Name Collisions</A><BR>
+<A HREF="povdocs/pov193.htm#_Toc429993536">Destroying Identifiers with #undef</A><BR>
+
+</dir><A HREF="povdocs/pov194.htm#_Toc429993537">File I/O Directives</A><BR>
+<DIR>
+<A HREF="povdocs/pov195.htm#_Toc429993538">The #fopen Directive</A><BR>
+<A HREF="povdocs/pov196.htm#_Toc429993539">The #fclose Directive</A><BR>
+<A HREF="povdocs/pov197.htm#_Toc429993540">The #read Directive</A><BR>
+<A HREF="povdocs/pov198.htm#_Toc429993541">The #write Directive</A><BR>
+
+</dir><A HREF="povdocs/pov199.htm#_Toc429993542">The #default Directive</A><BR>
+<A HREF="povdocs/pov200.htm#_Toc429993543">The #version Directive</A><BR>
+<A HREF="povdocs/pov201.htm#_Toc429993544">Conditional Directives</A><BR>
+<DIR>
+<A HREF="povdocs/pov202.htm#_Toc429993545">The #if...#else...#end Directives</A><BR>
+<A HREF="povdocs/pov203.htm#_Toc429993546">The #ifdef and #ifndef Directives</A><BR>
+<A HREF="povdocs/pov204.htm#_Toc429993547">The #switch, #case, #range and #break Directives</A><BR>
+<A HREF="povdocs/pov205.htm#_Toc429993548">The #while...#end Directive</A><BR>
+
+</dir><A HREF="povdocs/pov206.htm#_Toc429993549">User Message Directives</A><BR>
+<DIR>
+<A HREF="povdocs/pov207.htm#_Toc429993550">Text Message Streams</A><BR>
+<A HREF="povdocs/pov208.htm#_Toc429993551">Text Formatting</A><BR>
+
+</dir><A HREF="povdocs/pov209.htm#_Toc429993552">User Defined Macros</A><BR>
+<DIR>
+<A HREF="povdocs/pov210.htm#_Toc429993553">The #macro Directive</A><BR>
+<A HREF="povdocs/pov211.htm#_Toc429993554">Invoking Macros</A><BR>
+<A HREF="povdocs/pov212.htm#_Toc429993555">Are POV-Ray Macros a Function or a Macro?</A><BR>
+<A HREF="povdocs/pov213.htm#_Toc429993556">Returning a Value Like a Function</A><BR>
+<A HREF="povdocs/pov214.htm#_Toc429993557">Returning Values Via Parameters</A><BR>
+
+</dir>
+</dir><A HREF="povdocs/pov215.htm#_Toc429993558">POV-Ray Coordinate System</A><BR>
+<DIR>
+<A HREF="povdocs/pov216.htm#_Toc429993559">Transformations</A><BR>
+<DIR>
+<A HREF="povdocs/pov217.htm#_Toc429993560">Translate</A><BR>
+<A HREF="povdocs/pov218.htm#_Toc429993561">Scale</A><BR>
+<A HREF="povdocs/pov219.htm#_Toc429993562">Rotate</A><BR>
+<A HREF="povdocs/pov220.htm#_Toc429993563">Matrix Keyword</A><BR>
+
+</dir><A HREF="povdocs/pov221.htm#_Toc429993564">Transformation Order</A><BR>
+<A HREF="povdocs/pov222.htm#_Toc429993565">Transform Identifiers</A><BR>
+<A HREF="povdocs/pov223.htm#_Toc429993566">Transforming Textures and Objects</A><BR>
+
+</dir><A HREF="povdocs/pov224.htm#_Toc429993567">Camera</A><BR>
+<DIR>
+<A HREF="povdocs/pov225.htm#_Toc429993568">Placing the Camera</A><BR>
+<DIR>
+<A HREF="povdocs/pov226.htm#_Toc429993569">Location and Look_At</A><BR>
+<A HREF="povdocs/pov227.htm#_Toc429993570">The Sky Vector</A><BR>
+<A HREF="povdocs/pov228.htm#_Toc429993571">Angle</A><BR>
+<A HREF="povdocs/pov229.htm#_Toc429993572">The Direction Vector</A><BR>
+<A HREF="povdocs/pov230.htm#_Toc429993573">Up and Right Vectors</A><BR>
+<DIR>
+<A HREF="povdocs/pov230.htm#_Toc429993574">Aspect Ratio</A><BR>
+<A HREF="povdocs/pov230.htm#_Toc429993575">Handedness</A><BR>
+
+</dir><A HREF="povdocs/pov231.htm#_Toc429993576">Transforming the Camera</A><BR>
+
+</dir><A HREF="povdocs/pov232.htm#_Toc429993577">Types of Projection</A><BR>
+<A HREF="povdocs/pov233.htm#_Toc429993578">Focal Blur</A><BR>
+<A HREF="povdocs/pov234.htm#_Toc429993579">Camera Ray Perturbation</A><BR>
+<A HREF="povdocs/pov235.htm#_Toc429993580">Camera Identifiers</A><BR>
+
+</dir><A HREF="povdocs/pov236.htm#_Toc429993581">Objects</A><BR>
+<DIR>
+<A HREF="povdocs/pov237.htm#_Toc429993582">Finite Solid Primitives</A><BR>
+<DIR>
+<A HREF="povdocs/pov238.htm#_Toc429993583">Blob</A><BR>
+<A HREF="povdocs/pov239.htm#_Toc429993584">Box</A><BR>
+<A HREF="povdocs/pov240.htm#_Toc429993585">Cone</A><BR>
+<A HREF="povdocs/pov241.htm#_Toc429993586">Cylinder</A><BR>
+<A HREF="povdocs/pov242.htm#_Toc429993587">Height Field</A><BR>
+<A HREF="povdocs/pov243.htm#_Toc429993588">Julia Fractal</A><BR>
+<A HREF="povdocs/pov244.htm#_Toc429993589">Lathe</A><BR>
+<A HREF="povdocs/pov245.htm#_Toc429993590">Prism</A><BR>
+<A HREF="povdocs/pov246.htm#_Toc429993591">Sphere</A><BR>
+<A HREF="povdocs/pov247.htm#_Toc429993592">Superquadric Ellipsoid</A><BR>
+<A HREF="povdocs/pov248.htm#_Toc429993593">Surface of Revolution</A><BR>
+<A HREF="povdocs/pov249.htm#_Toc429993594">Text</A><BR>
+<A HREF="povdocs/pov250.htm#_Toc429993595">Torus</A><BR>
+
+</dir><A HREF="povdocs/pov251.htm#_Toc429993596">Finite Patch Primitives</A><BR>
+<DIR>
+<A HREF="povdocs/pov252.htm#_Toc429993597">Bicubic Patch</A><BR>
+<A HREF="povdocs/pov253.htm#_Toc429993598">Disc</A><BR>
+<A HREF="povdocs/pov254.htm#_Toc429993599">Mesh</A><BR>
+<A HREF="povdocs/pov255.htm#_Toc429993600">Polygon</A><BR>
+<A HREF="povdocs/pov256.htm#_Toc429993601">Triangle and Smooth Triangle</A><BR>
+
+</dir><A HREF="povdocs/pov257.htm#_Toc429993602">Infinite Solid Primitives</A><BR>
+<DIR>
+<A HREF="povdocs/pov258.htm#_Toc429993603">Plane</A><BR>
+<A HREF="povdocs/pov259.htm#_Toc429993604">Poly, Cubic and Quartic</A><BR>
+<A HREF="povdocs/pov260.htm#_Toc429993605">Quadric</A><BR>
+
+</dir><A HREF="povdocs/pov261.htm#_Toc429993606">Constructive Solid Geometry</A><BR>
+<DIR>
+<A HREF="povdocs/pov262.htm#_Toc429993607">Inside and Outside</A><BR>
+<A HREF="povdocs/pov263.htm#_Toc429993608">Union</A><BR>
+<A HREF="povdocs/pov264.htm#_Toc429993609">Intersection</A><BR>
+<A HREF="povdocs/pov265.htm#_Toc429993610">Difference</A><BR>
+<A HREF="povdocs/pov266.htm#_Toc429993611">Merge</A><BR>
+
+</dir><A HREF="povdocs/pov267.htm#_Toc429993612">Light Sources</A><BR>
+<DIR>
+<A HREF="povdocs/pov268.htm#_Toc429993613">Point Lights</A><BR>
+<A HREF="povdocs/pov269.htm#_Toc429993614">Spotlights</A><BR>
+<A HREF="povdocs/pov270.htm#_Toc429993615">Cylindrical Lights</A><BR>
+<A HREF="povdocs/pov271.htm#_Toc429993616">Area Lights</A><BR>
+<A HREF="povdocs/pov272.htm#_Toc429993617">Shadowless Lights</A><BR>
+<A HREF="povdocs/pov273.htm#_Toc429993618">Looks_like</A><BR>
+<A HREF="povdocs/pov274.htm#_Toc429993619">Light Fading</A><BR>
+<A HREF="povdocs/pov275.htm#_Toc429993620">Atmospheric Media Interaction</A><BR>
+<A HREF="povdocs/pov276.htm#_Toc429993621">Atmospheric Attenuation</A><BR>
+
+</dir><A HREF="povdocs/pov277.htm#_Toc429993622">Object Modifiers</A><BR>
+<DIR>
+<A HREF="povdocs/pov278.htm#_Toc429993623">Clipped_By</A><BR>
+<A HREF="povdocs/pov279.htm#_Toc429993624">Bounded_By</A><BR>
+<A HREF="povdocs/pov280.htm#_Toc429993625">Material</A><BR>
+<A HREF="povdocs/pov281.htm#_Toc429993626">Inverse</A><BR>
+<A HREF="povdocs/pov282.htm#_Toc429993627">Hollow</A><BR>
+<A HREF="povdocs/pov283.htm#_Toc429993628">No_Shadow</A><BR>
+<A HREF="povdocs/pov284.htm#_Toc429993629">Sturm</A><BR>
+
+</dir>
+</dir><A HREF="povdocs/pov285.htm#_Toc429993630">Interior</A><BR>
+<DIR>
+<A HREF="povdocs/pov286.htm#_Toc429993631">Why are Interior and Media Necessary?</A><BR>
+<A HREF="povdocs/pov287.htm#_Toc429993632">Empty and Solid Objects</A><BR>
+<A HREF="povdocs/pov288.htm#_Toc429993633">Refraction</A><BR>
+<A HREF="povdocs/pov289.htm#_Toc429993634">Attenuation</A><BR>
+<A HREF="povdocs/pov290.htm#_Toc429993635">Faked Caustics</A><BR>
+<A HREF="povdocs/pov291.htm#_Toc429993636">Object Media</A><BR>
+
+</dir><A HREF="povdocs/pov292.htm#_Toc429993637">Textures</A><BR>
+<DIR>
+<A HREF="povdocs/pov293.htm#_Toc429993638">Pigment</A><BR>
+<DIR>
+<A HREF="povdocs/pov294.htm#_Toc429993639">Solid Color Pigments</A><BR>
+<A HREF="povdocs/pov295.htm#_Toc429993640">Color List Pigments</A><BR>
+<A HREF="povdocs/pov296.htm#_Toc429993641">Color Maps</A><BR>
+<A HREF="povdocs/pov297.htm#_Toc429993642">Pigment Maps and Pigment Lists</A><BR>
+<A HREF="povdocs/pov298.htm#_Toc429993643">Image Maps</A><BR>
+<DIR>
+<A HREF="povdocs/pov298.htm#_Toc429993644">Specifying an Image Map</A><BR>
+<A HREF="povdocs/pov298.htm#_Toc429993645">The Filter and Transmit Bitmap Modifiers</A><BR>
+<A HREF="povdocs/pov298.htm#_Toc429993646">Using the Alpha Channel</A><BR>
+
+</dir><A HREF="povdocs/pov299.htm#_Toc429993647">Quick Color</A><BR>
+
+</dir><A HREF="povdocs/pov300.htm#_Toc429993648">Normal</A><BR>
+<DIR>
+<A HREF="povdocs/pov301.htm#_Toc429993649">Slope Maps</A><BR>
+<A HREF="povdocs/pov302.htm#_Toc429993650">Normal Maps and Normal Lists</A><BR>
+<A HREF="povdocs/pov303.htm#_Toc429993651">Bump Maps</A><BR>
+<DIR>
+<A HREF="povdocs/pov303.htm#_Toc429993652">Specifying a Bump Map</A><BR>
+<A HREF="povdocs/pov303.htm#_Toc429993653">Bump_Size</A><BR>
+<A HREF="povdocs/pov303.htm#_Toc429993654">Use_Index and Use_Color</A><BR>
+
+</dir>
+</dir><A HREF="povdocs/pov304.htm#_Toc429993655">Finish</A><BR>
+<DIR>
+<A HREF="povdocs/pov305.htm#_Toc429993656">Ambient</A><BR>
+<A HREF="povdocs/pov306.htm#_Toc429993657">Diffuse Reflection Items</A><BR>
+<DIR>
+<A HREF="povdocs/pov306.htm#_Toc429993658">Diffuse</A><BR>
+<A HREF="povdocs/pov306.htm#_Toc429993659">Brilliance</A><BR>
+<A HREF="povdocs/pov306.htm#_Toc429993660">Crand Graininess</A><BR>
+
+</dir><A HREF="povdocs/pov307.htm#_Toc429993661">Highlights</A><BR>
+<DIR>
+<A HREF="povdocs/pov307.htm#_Toc429993662">Phong Highlights</A><BR>
+<A HREF="povdocs/pov307.htm#_Toc429993663">Specular Highlight</A><BR>
+<A HREF="povdocs/pov307.htm#_Toc429993664">Metallic Highlight Modifier</A><BR>
+
+</dir><A HREF="povdocs/pov308.htm#_Toc429993665">Specular Reflection</A><BR>
+<A HREF="povdocs/pov309.htm#_Toc429993666">Iridescence</A><BR>
+
+</dir><A HREF="povdocs/pov310.htm#_Toc429993667">Halo</A><BR>
+<A HREF="povdocs/pov311.htm#_Toc429993668">Patterned Textures</A><BR>
+<DIR>
+<A HREF="povdocs/pov312.htm#_Toc429993669">Texture Maps</A><BR>
+<A HREF="povdocs/pov313.htm#_Toc429993670">Tiles</A><BR>
+<A HREF="povdocs/pov314.htm#_Toc429993671">Material Maps</A><BR>
+<DIR>
+<A HREF="povdocs/pov314.htm#_Toc429993672">Specifying a Material Map</A><BR>
+
+</dir>
+</dir><A HREF="povdocs/pov315.htm#_Toc429993673">Layered Textures</A><BR>
+<A HREF="povdocs/pov316.htm#_Toc429993674">Patterns</A><BR>
+<DIR>
+<A HREF="povdocs/pov317.htm#_Toc429993675">Agate</A><BR>
+<A HREF="povdocs/pov318.htm#_Toc429993676">Average</A><BR>
+<A HREF="povdocs/pov319.htm#_Toc429993677">Boxed</A><BR>
+<A HREF="povdocs/pov320.htm#_Toc429993678">Bozo</A><BR>
+<A HREF="povdocs/pov321.htm#_Toc429993679">Brick</A><BR>
+<A HREF="povdocs/pov322.htm#_Toc429993680">Bumps</A><BR>
+<A HREF="povdocs/pov323.htm#_Toc429993681">Checker</A><BR>
+<A HREF="povdocs/pov324.htm#_Toc429993682">Crackle</A><BR>
+<A HREF="povdocs/pov325.htm#_Toc429993683">Cylindrical</A><BR>
+<A HREF="povdocs/pov326.htm#_Toc429993684">Density_File</A><BR>
+<A HREF="povdocs/pov327.htm#_Toc429993685">Dents</A><BR>
+<A HREF="povdocs/pov328.htm#_Toc429993686">Gradient</A><BR>
+<A HREF="povdocs/pov329.htm#_Toc429993687">Granite</A><BR>
+<A HREF="povdocs/pov330.htm#_Toc429993688">Hexagon</A><BR>
+<A HREF="povdocs/pov331.htm#_Toc429993689">Leopard</A><BR>
+<A HREF="povdocs/pov332.htm#_Toc429993690">Mandel</A><BR>
+<A HREF="povdocs/pov333.htm#_Toc429993691">Marble</A><BR>
+<A HREF="povdocs/pov334.htm#_Toc429993692">Onion</A><BR>
+<A HREF="povdocs/pov335.htm#_Toc429993693">Planar</A><BR>
+<A HREF="povdocs/pov336.htm#_Toc429993694">Quilted</A><BR>
+<A HREF="povdocs/pov337.htm#_Toc429993695">Radial</A><BR>
+<A HREF="povdocs/pov338.htm#_Toc429993696">Ripples</A><BR>
+<A HREF="povdocs/pov339.htm#_Toc429993697">Spherical</A><BR>
+<A HREF="povdocs/pov340.htm#_Toc429993698">Spiral1</A><BR>
+<A HREF="povdocs/pov341.htm#_Toc429993699">Spiral2</A><BR>
+<A HREF="povdocs/pov342.htm#_Toc429993700">Spotted</A><BR>
+<A HREF="povdocs/pov343.htm#_Toc429993701">Waves</A><BR>
+<A HREF="povdocs/pov344.htm#_Toc429993702">Wood</A><BR>
+<A HREF="povdocs/pov345.htm#_Toc429993703">Wrinkles</A><BR>
+
+</dir><A HREF="povdocs/pov346.htm#_Toc429993704">Pattern Modifiers</A><BR>
+<DIR>
+<A HREF="povdocs/pov347.htm#_Toc429993705">Transforming Patterns</A><BR>
+<A HREF="povdocs/pov348.htm#_Toc429993706">Frequency and Phase</A><BR>
+<A HREF="povdocs/pov349.htm#_Toc429993707">Waveforms</A><BR>
+<A HREF="povdocs/pov350.htm#_Toc429993708">Turbulence</A><BR>
+<A HREF="povdocs/pov351.htm#_Toc429993709">Octaves</A><BR>
+<A HREF="povdocs/pov352.htm#_Toc429993710">Lambda</A><BR>
+<A HREF="povdocs/pov353.htm#_Toc429993711">Omega</A><BR>
+<A HREF="povdocs/pov354.htm#_Toc429993712">Warps</A><BR>
+<DIR>
+<A HREF="povdocs/pov354.htm#_Toc429993713">Black Hole Warp</A><BR>
+<A HREF="povdocs/pov354.htm#_Toc429993714">Repeat Warp</A><BR>
+<A HREF="povdocs/pov354.htm#_Toc429993715">Turbulence Warp</A><BR>
+
+</dir><A HREF="povdocs/pov355.htm#_Toc429993716">Bitmap Modifiers</A><BR>
+<DIR>
+<A HREF="povdocs/pov355.htm#_Toc429993717">The once Option</A><BR>
+<A HREF="povdocs/pov355.htm#_Toc429993718">The map_type Option</A><BR>
+<A HREF="povdocs/pov355.htm#_Toc429993719">The interpolate Option</A><BR>
+
+</dir>
+</dir>
+</dir><A HREF="povdocs/pov356.htm#_Toc429993720">Media</A><BR>
+<DIR>
+<A HREF="povdocs/pov357.htm#_Toc429993721">Media Types</A><BR>
+<DIR>
+<A HREF="povdocs/pov358.htm#_Toc429993722">Absorption</A><BR>
+<A HREF="povdocs/pov359.htm#_Toc429993723">Emission</A><BR>
+<A HREF="povdocs/pov360.htm#_Toc429993724">Scattering</A><BR>
+
+</dir><A HREF="povdocs/pov361.htm#_Toc429993725">Sampling Parameters</A><BR>
+<A HREF="povdocs/pov362.htm#_Toc429993726">Density</A><BR>
+<DIR>
+<A HREF="povdocs/pov363.htm#_Toc429993727">General Density Modifiers</A><BR>
+<A HREF="povdocs/pov364.htm#_Toc429993728">Density with color_map</A><BR>
+<A HREF="povdocs/pov365.htm#_Toc429993729">Density Maps and Density Lists</A><BR>
+<A HREF="povdocs/pov366.htm#_Toc429993730">Multiple Density vs. Multiple Media</A><BR>
+
+</dir>
+</dir><A HREF="povdocs/pov367.htm#_Toc429993731">Atmospheric Effects</A><BR>
+<DIR>
+<A HREF="povdocs/pov368.htm#_Toc429993732">Atmospheric Media</A><BR>
+<A HREF="povdocs/pov369.htm#_Toc429993733">Background</A><BR>
+<A HREF="povdocs/pov370.htm#_Toc429993734">Fog</A><BR>
+<A HREF="povdocs/pov371.htm#_Toc429993735">Sky Sphere</A><BR>
+<A HREF="povdocs/pov372.htm#_Toc429993736">Rainbow</A><BR>
+
+</dir><A HREF="povdocs/pov373.htm#_Toc429993737">Global Settings</A><BR>
+<A HREF="povdocs/pov374.htm#_Toc429993738">ADC_Bailout</A><BR>
+<A HREF="povdocs/pov375.htm#_Toc429993739">Ambient Light</A><BR>
+<A HREF="povdocs/pov376.htm#_Toc429993740">Assumed_Gamma</A><BR>
+<DIR>
+<A HREF="povdocs/pov377.htm#_Toc429993741">Monitor Gamma</A><BR>
+<A HREF="povdocs/pov378.htm#_Toc429993742">Image File Gamma</A><BR>
+<A HREF="povdocs/pov379.htm#_Toc429993743">Scene File Gamma</A><BR>
+
+</dir><A HREF="povdocs/pov380.htm#_Toc429993744">HF_Gray_16</A><BR>
+<A HREF="povdocs/pov381.htm#_Toc429993745">Irid_Wavelength</A><BR>
+<A HREF="povdocs/pov382.htm#_Toc429993746">Max_Trace_Level</A><BR>
+<A HREF="povdocs/pov383.htm#_Toc429993747">Max_Intersections</A><BR>
+<A HREF="povdocs/pov384.htm#_Toc429993748">Number_Of_Waves</A><BR>
+<A HREF="povdocs/pov385.htm#_Toc429993749">Radiosity</A><BR>
+<DIR>
+<A HREF="povdocs/pov386.htm#_Toc429993750">How Radiosity Works</A><BR>
+<A HREF="povdocs/pov387.htm#_Toc429993751">Adjusting Radiosity</A><BR>
+<DIR>
+<A HREF="povdocs/pov387.htm#_Toc429993752">brightness</A><BR>
+<A HREF="povdocs/pov387.htm#_Toc429993753">count</A><BR>
+<A HREF="povdocs/pov387.htm#_Toc429993754">distance_maximum</A><BR>
+<A HREF="povdocs/pov387.htm#_Toc429993755">error_bound</A><BR>
+<A HREF="povdocs/pov387.htm#_Toc429993756">gray_threshold</A><BR>
+<A HREF="povdocs/pov387.htm#_Toc429993757">low_error_factor</A><BR>
+<A HREF="povdocs/pov387.htm#_Toc429993758">minimum_reuse</A><BR>
+<A HREF="povdocs/pov387.htm#_Toc429993759">nearest_count</A><BR>
+<A HREF="povdocs/pov387.htm#_Toc429993760">recursion_limit</A><BR>
+
+</dir><A HREF="povdocs/pov388.htm#_Toc429993761">Tips on Radiosity</A><BR>
+
+</dir>
+</dir>
+</dir><A HREF="povdocs/pov389.htm#_Toc429993762">APPENDICES</A><BR>
+<DIR>
+<A HREF="povdocs/pov390.htm#_Toc429993763">Copyright, Legal Information and License -- POVLEGAL.DOC</A><BR>
+<A HREF="povdocs/pov391.htm#_Toc429993764">General License Agreement -- POVLEGAL.DOC</A><BR>
+<A HREF="povdocs/pov392.htm#_Toc429993765">Usage Provisions</A><BR>
+<A HREF="povdocs/pov393.htm#_Toc429993766">General Rules For All Distribution</A><BR>
+<A HREF="povdocs/pov394.htm#_Toc429993767">Definition Of "Full Package"</A><BR>
+<A HREF="povdocs/pov395.htm#_Toc429993768">Conditions For Shareware/Freeware Distribution Companies</A><BR>
+<A HREF="povdocs/pov396.htm#_Toc429993769">Conditions For On-Line Services And Bbs's Including Internet</A><BR>
+<A HREF="povdocs/pov397.htm#_Toc429993770">Online Or Remote Execution Of POV-Ray</A><BR>
+<A HREF="povdocs/pov398.htm#_Toc429993771">Permitted Modification And Custom Versions</A><BR>
+<A HREF="povdocs/pov399.htm#_Toc429993772">Conditions For Distribution Of Custom Versions</A><BR>
+<A HREF="povdocs/pov400.htm#_Toc429993773">Conditions For Commercial Bundling</A><BR>
+<A HREF="povdocs/pov401.htm#_Toc429993774">POV-Team Endorsement Prohibitions</A><BR>
+<A HREF="povdocs/pov402.htm#_Toc429993775">Retail Value Of This Software</A><BR>
+<A HREF="povdocs/pov403.htm#_Toc429993776">Other Provisions</A><BR>
+<A HREF="povdocs/pov404.htm#_Toc429993777">Revocation Of License</A><BR>
+<A HREF="povdocs/pov405.htm#_Toc429993778">Disclaimer</A><BR>
+<A HREF="povdocs/pov406.htm#_Toc429993779">Technical Support</A><BR>
+
+</dir><A HREF="povdocs/pov407.htm#_Toc429993780">Authors</A><BR>
+<DIR>
+<A HREF="povdocs/pov408.htm#_Toc429993781">Contacting the Authors</A><BR>
+
+</dir><A HREF="povdocs/pov409.htm#_Toc429993782">What to do if you don't have POV-Ray</A><BR>
+<DIR>
+<A HREF="povdocs/pov410.htm#_Toc429993783">Which Version of POV-Ray should you use?</A><BR>
+<DIR>
+<A HREF="povdocs/pov411.htm#_Toc429993784">Microsoft Windows 95/98/NT</A><BR>
+<A HREF="povdocs/pov412.htm#_Toc429993785">MS-Dos &amp; Windows 3.x</A><BR>
+<A HREF="povdocs/pov413.htm#_Toc429993786">Linux for Intel x86</A><BR>
+<A HREF="povdocs/pov414.htm#_Toc429993787">Apple Macintosh</A><BR>
+<A HREF="povdocs/pov415.htm#_Toc429993788">Amiga</A><BR>
+<A HREF="povdocs/pov416.htm#_Toc429993789">SunOS</A><BR>
+<A HREF="povdocs/pov417.htm#_Toc429993790">Generic Unix</A><BR>
+<A HREF="povdocs/pov418.htm#_Toc429993791">All Versions</A><BR>
+
+</dir><A HREF="povdocs/pov419.htm#_Toc429993792">Where to Find POV-Ray Files</A><BR>
+<DIR>
+<A HREF="povdocs/pov420.htm#_Toc429993793">POV-Ray Forum on CompuServe</A><BR>
+<A HREF="povdocs/pov421.htm#_Toc429993794">World Wide Website www.povray.org</A><BR>
+<A HREF="povdocs/pov422.htm#_Toc429993795">Books, Magazines and CD-ROMs</A><BR>
+
+</dir>
+</dir><A HREF="povdocs/pov423.htm#_Toc429993796">Compiling POV-Ray</A><BR>
+<DIR>
+<A HREF="povdocs/pov424.htm#_Toc429993797">Directory Structure</A><BR>
+<A HREF="povdocs/pov425.htm#_Toc429993798">Configuring POV-Ray Source</A><BR>
+<A HREF="povdocs/pov426.htm#_Toc429993799">Conclusion</A><BR>
+
+</dir><A HREF="povdocs/pov427.htm#_Toc429993800">Suggested Reading</A><BR>
+
+</dir>
+</dir>

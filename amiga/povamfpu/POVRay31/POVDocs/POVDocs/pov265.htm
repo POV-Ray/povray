@@ -1,0 +1,44 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Difference</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov264.htm">Intersection</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov266.htm">Merge</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199102"><A NAME="_Toc429993610">Difference</A></A></H4>
+<P>The CSG <b><code>difference</code></b> operation takes the intersection between the first object and the inverse of all subsequent objects. Thus only points inside object <b><code>A</code></b> and outside object <b><code>B</code></b> belong to the difference of both objects.</P>
+<P>The results is a subtraction of the 2nd shape from the first shape as shown in the figure below.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image105.gif" WIDTH=313 HEIGHT=199></P>
+<P ALIGN="CENTER">The difference between two objects.</P>
+</B><P>The syntax is:</P>
+<I><DL>
+<DT>DIFFERENCE:</DT>
+</I><b><code><DD>difference {</code></b> SOLID_<I>OBJECTS...  [OBJECT_MODIFIERS...]</I> <b><code>}</DD>
+</DL>
+</code></b><P>The component objects must have well defined inside/outside properties.  Patch objects are not allowed.  Note that if the first object is entirely inside the subtracted objects, the difference object disappears.</P>
+<P>Here is an example of a properly formed difference:</P>
+<PRE>  difference {
+    box { &lt;-1.5, -1, -1&gt;, &lt;0.5, 1, 1&gt; }
+    cylinder { &lt;0.5, 0, -1&gt;, &lt;0.5, 0, 1&gt;, 1 }
+  }</PRE>
+<P>Note that internally, POV-Ray simply adds the <b><code>inverse</code></b> keyword to the second (and subsequent) objects and then performs an intersection.  The example above is equivalent to:</P>
+<PRE>  intersection {
+    box { &lt;-1.5, -1, -1&gt;, &lt;0.5, 1, 1&gt; }
+    cylinder { &lt;0.5, 0, -1&gt;, &lt;0.5, 0, 1&gt;, 1 inverse }
+  }</PRE>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov264.htm">Intersection</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov266.htm">Merge</A>
+</P>
+</BODY>
+</HTML>
+

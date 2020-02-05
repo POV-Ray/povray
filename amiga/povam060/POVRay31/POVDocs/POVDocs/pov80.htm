@@ -1,0 +1,46 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Using Surface Highlights</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov79.htm">Using Ambient</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov81.htm">Using Reflection and Metallic</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198900"><A NAME="_Toc429993410">Using Surface Highlights</A></A></H4>
+<P>In the glass example above, we noticed that there were bright little <I>hotspots </I>on the surface. This gave the sphere a hard, shiny appearance. POV-Ray gives us two ways to specify surface specular highlights. The first is called <I>Phong highlighting. </I>Usually, Phong highlights are described using two keywords: <b><code>phong</code></b> and <b><code>phong_size</code></b>. The float that follows <b><code>phong</code></b> determines the brightness of the highlight while the float following <b><code>phong_size</code></b> determines its size. Let's try this.</P>
+<PRE>  sphere { &lt;0,0,0&gt;, 1
+    pigment { Gray50 }
+    finish {
+      ambient .2
+      diffuse .6
+      phong .75
+      phong_size 25
+    }
+  }</PRE>
+<P>Rendering this we see a fairly broad, soft highlight that gives the sphere a kind of plastic appearance. Now let's change <b><code>phong_size</code></b> to 150. This makes a much smaller highlight which gives the sphere the appearance of being much harder and shinier.</P>
+<P>There is another kind of highlight that is calculated by a different means called <I>specular highlighting</I>. It is specified using the keyword <b><code>specular</code></b> and operates in conjunction with another keyword called <b><code>roughness</code></b>. These two keywords work together in much the same way as <b><code>phong</code></b> and <b><code>phong_size</code></b> to create highlights that alter the apparent shininess of the surface. Let's try using specular in our sphere.</P>
+<PRE>  sphere { &lt;0,0,0&gt;, 1
+     pigment { Gray50 }
+     finish {
+        ambient .2
+        diffuse .6
+        specular .75
+        roughness .1
+    }
+  }</PRE>
+<P>Looking at the result we see a broad, soft highlight similar to what we had when we used <b><code>phong_size</code></b> of 25. Change <b><code>roughness</code></b> to .001 and render again. Now we see a small, tight highlight similar to what we had when we used <b><code>phong_size</code></b> of 150. Generally speaking, specular is slightly more accurate and therefore slightly more realistic than phong but you should try both methods when designing a texture. There are even times when both phong and specular may be used on a finish.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov79.htm">Using Ambient</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov81.htm">Using Reflection and Metallic</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,35 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - CSG Intersection</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov28.htm">CSG Union</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov30.htm">CSG Difference</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405101"><A NAME="_Toc411405377"><A NAME="_Toc414198848"><A NAME="_Toc429993359">CSG Intersection</A></A></A></A></H3>
+<P>Now let's use these same spheres to illustrate the next kind of CSG object, the <b><code>intersection</code></b>. We change the word <b><code>union</code></b> to <b><code>intersection</code></b> and delete the <b><code>scale</code></b> and <b><code>rotate</code></b> statements:</P>
+<PRE>  intersection {
+    sphere { &lt;0, 0, 0&gt;, 1
+      translate -0.5*x
+    }
+    sphere { &lt;0, 0, 0&gt;, 1
+      translate 0.5*x
+    }
+    pigment { Red }
+  }</PRE>
+<P>We trace the file and will see a lens-shaped object instead of the two spheres. This is because an intersection consists of the area shared by both shapes, in this case the lens-shaped area where the two spheres overlap. We like this lens-shaped object so we will use it to demonstrate differences.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov28.htm">CSG Union</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov30.htm">CSG Difference</A>
+</P>
+</BODY>
+</HTML>
+

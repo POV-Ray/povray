@@ -1,0 +1,38 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Color Vectors</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov174.htm">Specifying Colors</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov176.htm">Color Keywords</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199008"><A NAME="_Toc429993518">Color Vectors</A></A></H4>
+<P>The syntax for a color vector is...</P>
+<I><DL>
+<DT>COLOR_VECTOR:</DT>
+</I><b><code><DD>rgb</code></b> <I>&lt;3_Term_Vector&gt;</I>&#9;&#9;|</DD>
+<b><code><DD>rgbf</code></b> <I>&lt;4_Term_Vector&gt;</I>&#9;&#9;|</DD>
+<b><code><DD>rgbt</code></b> <I>&lt;4_Term_Vector&gt;</I>&#9;&#9;|</DD>
+<I><DD>[ </I><b><code>rgbft</code></b> <I>]</I> <I>&lt;5_Term_Vector&gt;</DD>
+</DL>
+</I><P>...where the vectors are any valid vector expressions of 3, 4 or 5 components. For example</P>
+<PRE> color rgb &lt;1.0, 0.5, 0.2&gt;</PRE>
+<P>This specifies a color whose red component is 1.0 or 100% of full intensity. The green component is 0.5 or 50% of full intensity and the blue component is 0.2 or 20% of full intensity. Although the filter and transmit components are not explicitly specified, they exist and are set to their default values of 0 or no transparency.</P>
+<P>The <b><code>rgbf</code></b> keyword requires a four component vector. The 4th component is the filter component and the transmit component defaults to zero. Similarly the <b><code>rgbt</code></b> keyword requires four components where the 4th value is moved to the 5th component which is transmit and then the filter component is set to zero.</P>
+<P>The <b><code>rgbft</code></b> keyword allows you to specify all five components. Internally in expressions all five are always used.</P>
+<P>Under some circumstances, if the vector expression is a 5 component expression or there is a color identifier in the expression then the <b><code>rgbtf</code></b> keyword is optional.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov174.htm">Specifying Colors</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov176.htm">Color Keywords</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,52 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Highlights</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov306.htm">Diffuse Reflection Items</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov308.htm">Specular Reflection</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199150"><A NAME="_Toc429993661">Highlights</A></A></H4>
+<P>Highlights are the bright spots that appear when a light source reflects off of a smooth object. They are a blend of specular reflection and diffuse reflection. They are specular-like because they depend upon viewing angle and illumination angle. However they are diffuse-like because some scattering occurs. In order to exactly model a highlight you would have to calculate specular reflection off of thousands of microscopic bumps called micro facets. The more that micro facets are facing the viewer the shinier the object appears and the tighter the highlights become. POV-Ray uses two different models to simulate highlights without calculating micro facets. They are the <I>specular </I>and <I>Phong </I>models.</P>
+<P>Note that specular and Phong highlights are <I>not </I>mutually exclusive. It is possible to specify both and they will both take effect. Normally, however, you will only specify one or the other.</P>
+<H5><A NAME="_Toc414199151"><A NAME="_Toc429993662">Phong Highlights</A></A></H5>
+<P>The <b><code>phong</code></b> keyword in the <b><code>finish</code></b> statement controls the amount of Phong highlighting on the object. It causes bright shiny spots on the object that are the color of the light source being reflected.</P>
+<P>The Phong method measures the average of the facets facing in the mirror direction from the light sources to the viewer.</P>
+<P>Phong's value is typically from 0.0 to 1.0, where 1.0 causes complete saturation to the light source's color at the brightest area (center) of the highlight. The default <b><code>phong 0.0</code></b> gives no highlight.</P>
+<P>The size of the highlight spot is defined by the <b><code>phong_size</code></b> value. The larger the phong size the tighter, or smaller, the highlight and the shinier the appearance.  The smaller the phong size the looser, or larger, the highlight and the less glossy the appearance.</P>
+<P>Typical values range from 1.0 (very dull) to 250 (highly polished) though any values may be used. Default phong size is 40 (plastic) if <b><code>phong_size</code></b> is not specified. For example:</P>
+<PRE>  finish { phong 0.9 phong_size 60 }</PRE>
+<P>If <b><code>phong</code></b> is not specified <b><code>phong_size</code></b> has no effect.</P>
+<H5><A NAME="_Toc414199152"><A NAME="_Toc429993663">Specular Highlight</A></A></H5>
+<P>The <b><code>specular</code></b> keyword in a <b><code>finish</code></b> statement produces a highlight which is very similar to Phong highlighting but it uses slightly different model. The specular model more closely resembles real specular reflection and provides a more credible spreading of the highlights occurring near the object horizons.</P>
+<P>The specular value is typically from 0.0 to 1.0, where 1.0 causes complete saturation to the light source's color at the brightest area (center) of the highlight. The default <b><code>specular 0.0</code></b> gives no highlight.</P>
+<P>The size of the spot is defined by the value given the <b><code>roughness</code></b> keyword. Typical values range from 1.0 (very rough - large highlight) to 0.0005 (very smooth - small highlight). The default value, if roughness is not specified, is 0.05 (plastic).</P>
+<P>It is possible to specify wrong values for roughness that will generate an error when you try to render the file. Don't use 0 and if you get errors check to see if you are using a very, very small roughness value that may be causing the error. For example:</P>
+<PRE>  finish {specular 0.9  roughness 0.02}</PRE>
+<P>If <b><code>specular</code></b> is not specified <b><code>roughness</code></b> has no effect.  </P>
+<P>Note that when light reflects perfectly of a smooth surface such as a mirror, it is called <I>specular reflection</I> however such reflection is not controlled by the <b><code>specular</code></b> keyword. The <b><code>reflection</code></b> keyword controls mirror-like specular reflection.</P>
+<H5><A NAME="_Toc414199153"><A NAME="_Toc429993664">Metallic Highlight Modifier</A></A></H5>
+<P>The keyword <b><code>metallic</code></b> may be used with Phong or specular highlights. This keyword indicates that the color of the highlights will be calculated by an empirical function that models the reflectivity of metallic surfaces.</P>
+<P>Normally highlights are the color of the light source.  Adding this keyword filters the highlight so that white light reflected from a metallic surface takes the color of the surface.</P>
+<P>The <b><code>metallic</code></b> keyword may optionally be follow by a numeric value to specify the influence the amount of the effect.  If no keyword is specified, the default value is zero.  If the keyword is specified without a value, the default value is one. For example:</P>
+<PRE>  finish {
+    phong 0.9
+    phong_size 60
+    metallic
+  }</PRE>
+<P>If <b><code>phong</code></b> or <b><code>specular</code></b> keywords are not specified then <b><code>metallic</code></b> has no effect.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov306.htm">Diffuse Reflection Items</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov308.htm">Specular Reflection</A>
+</P>
+</BODY>
+</HTML>
+

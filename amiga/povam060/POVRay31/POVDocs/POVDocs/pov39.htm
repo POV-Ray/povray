@@ -1,0 +1,71 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Height Field Object</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov38.htm">Complex Blob Constructs and Negative Strength</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov40.htm">Lathe Object</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405108"><A NAME="_Toc411405384"><A NAME="_Toc414198858"><A NAME="_Toc429993369">Height Field Object</A></A></A></A></H3>
+<P>A <b><code>height_field</code></b> is an object that has a surface that is determined by the color value or palette index number of an image designed for that purpose. With height fields, realistic mountains and other types of terrain can easily be made. First, we need an image from which to create the height field. It just so happens that POV-Ray is ideal for creating such an image.</P>
+<P>We make a new file called <CODE>image.pov</CODE> and edit it to contain the following:</P>
+<PRE>  #include "colors.inc"
+  global_settings {
+    assumed_gamma 2.2
+    hf_gray_16
+  }</PRE>
+<P>The <b><code>hf_gray_16</code></b> keyword causes the output to be in a special 16 bit grayscale that is perfect for generating height fields. The normal 8 bit output will lead to less smooth surfaces.</P>
+<P>Now we create a camera positioned so that it points directly down the z-axis at the origin.</P>
+<PRE>  camera {
+    location &lt;0, 0, -10&gt;
+    look_at 0
+  }</PRE>
+<P>We then create a plane positioned like a wall at z=0. This plane will completely fill the screen. It will be colored with white and gray wrinkles.</P>
+<PRE>  plane { z, 10
+    pigment {
+      wrinkles
+      color_map {
+       [0 0.3*White]
+       [1 White]
+      }
+    }
+  }</PRE>
+<P>Finally, create a light source.</P>
+<PRE>  light_source { &lt;0, 20, -100&gt; color White }</PRE>
+<P>We render this scene at 640x480 <b><code>+A0.1</code></b> <b><code>+FT</code></b>. We will get an image that will produce an excellent height field. We create a new file called <CODE>hfdemo.pov</CODE> and edit it as follows:</P>
+<PRE>  #include "colors.inc"</PRE>
+<P>We add a camera that is two units above the origin and ten units back ...</P>
+<PRE>  camera{
+    location &lt;0, 2, -10&gt;
+    look_at 0
+    angle 30
+  }</PRE>
+<P>... and a light source.</P>
+<PRE>  light_source{ &lt;1000,1000,-1000&gt; White }</PRE>
+<P>Now we add the height field. In the following syntax, a Targa image file is specified, the height field is smoothed, it is given a simple white pigment, it is translated to center it around the origin and it is scaled so that it resembles mountains and fills the screen.</P>
+<PRE>  height_field {
+    tga "image.tga"
+    smooth
+    pigment { White }
+    translate &lt;-.5, -.5, -.5&gt;
+    scale &lt;17, 1.75, 17&gt;
+  }</PRE>
+<P>We save the file and render it at 320x240 <b><code>-A</code></b>. Later, when we are satisfied that the height field is the way we want it, we render it at a higher resolution with anti-aliasing.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image13.jpg" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">A height field created completely with POV-Ray.</P>
+</B><P>Wow! The Himalayas have come to our computer screen!</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov38.htm">Complex Blob Constructs and Negative Strength</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov40.htm">Lathe Object</A>
+</P>
+</BODY>
+</HTML>
+

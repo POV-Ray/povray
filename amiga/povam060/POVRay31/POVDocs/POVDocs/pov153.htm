@@ -1,0 +1,104 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Automatic Bounding Control</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov152.htm">Radiosity Setting</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov154.htm">Removing User Bounding</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref412454596"><A NAME="_Toc414198987"><A NAME="_Toc429993496">Automatic Bounding Control</A></A></A></H4>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=480>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>Bounding=</code></b><I>bool</I></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+Turn bounding on/off
+</TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>+MB</code></b></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+Turn bounding on; Set threshold to 25 or previous amount
+</TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>-MB</code></b></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+Turn bounding off
+</TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>Bounding_Threshold=</code></b><I>n</I></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+Set bound threshold to <I>n</I></TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>+MB</code></b><I>n</I></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+Turn bounding on; bound threshold to <I>n</I></TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>-MB</code></b><I>n</I></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+Turn bounding off; for future threshold to <I>n</I></TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>Light_Buffer=</code></b><I>bool</I></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+Turn light buffer on/off
+</TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>+UL</code></b></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+Turn light buffer on
+</TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>-UL</code></b></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+Turn light buffer off
+</TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>Vista_Buffer=</code></b><I>bool</I></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+Turn vista buffer on/off
+</TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>+UV</code></b></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+Turn vista buffer on
+</TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>-UV</code></b></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+Turn vista buffer off
+</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>POV-Ray uses a variety of spatial sub-division systems to speed up ray-object intersection tests. The primary system uses a hierarchy of nested bounding boxes. This system compartmentalizes all finite objects in a scene into invisible rectangular boxes that are arranged in a tree-like hierarchy. Before testing the objects within the bounding boxes the tree is descended and only those objects are tested whose bounds are hit by a ray. This can greatly improve rendering speed. However for scenes with only a few objects the overhead of using a bounding system is not worth the effort. The <b><code>Bounding=off</code></b> option or <b><code>-MB</code></b> switch allows you to force bounding off. The default value is on.</P>
+<P>The <b><code>Bounding_Threshold=</code></b><I>n</I> or <b><code>+MB</code></b><I>n</I> switch allows you to set the minimum number of objects necessary before bounding is used. The default is <b><code>+MB25</code></b> which means that if your scene has fewer than 25 objects POV-Ray will automatically turn bounding off because the overhead isn't worth it. Generally it's a good idea to use a much lower threshold like <b><code>+MB5.</P>
+</code></b><P>Additionally POV-Ray uses systems known as <I>vista buffers </I>and <I>light buffers </I>to further speed things up. These systems only work when bounding is on and when there are a sufficient number of objects to meet the bounding threshold. The vista buffer is created by projecting the bounding box hierarchy onto the screen and determining the rectangular areas that are covered by each of the elements in the hierarchy. Only those objects whose rectangles enclose a given pixel are tested by the primary viewing ray. The vista buffer can only be used with perspective and orthographic cameras because they rely on a fixed viewpoint and a reasonable projection (i. e. straight lines have to stay straight lines after the projection).</P>
+<P>The light buffer is created by enclosing each light source in an imaginary box and projecting the bounding box hierarchy onto each of its six sides. Since this relies on a fixed light source, light buffers will not be used for area lights.</P>
+<P>Reflected and transmitted rays do not take advantage of the light and vista buffer.</P>
+<P>The default settings are <b><code>Vista_Buffer=on</code></b> or <b><code>+UV</code></b> and <b><code>Light_Buffer=on</code></b> or <b><code>+UL</code></b>. The option to turn these features off is available to demonstrate their usefulness and as protection against unforeseen bugs which might exist in any of these bounding systems.</P>
+<P>In general, any finite object and many types of CSG of finite objects will properly respond to this bounding system. In addition blobs and meshes use an additional internal bounding system. These systems are not affected by the above switch. They can be switched off using the appropriate syntax in the scene file (see "<A HREF="pov238.htm#_Ref428280785">Blob</A>" and "<A HREF="pov254.htm#_Ref412632666">Mesh</A>" for details). Text objects are split into individual letters that are bounded using the bounding box hierarchy. Some CSG combinations of finite and infinite objects are also automatically bound. The end result is that you will rarely need to add manual bounding objects as was necessary in earlier versions of POV-Ray unless you use many infinite objects.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov152.htm">Radiosity Setting</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov154.htm">Removing User Bounding</A>
+</P>
+</BODY>
+</HTML>
+

@@ -1,0 +1,51 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Built-in Float Identifiers</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov163.htm">Float Operators</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov165.htm">Boolean Keywords</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc411405170"><A NAME="_Toc411405446"><A NAME="_Ref413233292"><A NAME="_Toc414198998"><A NAME="_Toc429993507">Built-in Float Identifiers</A></A></A></H4>
+<P>There are several built-in float identifiers. You can use them to specify values or to create expressions but you cannot re-declare them to change their values.  They are:</P>
+<I><DL>
+<DT>FLOAT_BUILT-IN_IDENT:</DT>
+</I><b><code><DD>clock</code></b>   |   <b><code>pi</code></b>   |   <b><code>version</code></b>   |   <b><code>true</code></b>   |   <b><code>yes</code></b>   |   <b><code>on</code></b>   |   <b><code>false</code></b>   |   <b><code>no</code></b>   |</DD>
+<b><code><DD>off</code></b>   |   <b><code>clock_delta</DD>
+</DL>
+</code></b><P>Most built-in identifiers never change value. They are defined as though the following lines were at the start of every scene.</P>
+<PRE> #declare pi = 3.1415926535897932384626;
+ #declare true = 1;
+ #declare yes = 1;
+ #declare on = 1;
+ #declare false = 0;
+ #declare no = 0;
+ #declare off = 0;</PRE>
+<P>The built-in float identifier <b><code>pi</code></b> is obviously useful in math expressions involving circles.  The built-in float identifiers <b><code>on</code></b>, <b><code>off</code></b>, <b><code>yes</code></b>, <b><code>no</code></b>, <b><code>true</code></b>, and <b><code>false</code></b> are designed for use as boolean constants.</P>
+<P>The built-in float identifier <b><code>clock</code></b> is used to control animations in POV-Ray. Unlike some animation packages, the action in POV-Ray animated scenes does not depend upon the integer frame numbers. Rather you should design your scenes based upon the float identifier <b><code>clock</code></b>. For non-animated scenes its default value is 0 but you can set it to any float value using the INI file option <b><code>Clock=</code></b><I>n.n</I> or the command-line switch <b><code>+K</code></b><I>n.n</I> to pass a single float value your scene file.</P>
+<P>Other INI options and switches may be used to animate scenes by automatically looping through the rendering of frames using various values for <b><code>clock</code></b>. By default, the clock value is 0 for the initial frame and 1 for the final frame. All other frames are interpolated between these values. For example if your object is supposed to rotate one full turn over the course of the animation you could specify <b><code>rotate 360*clock*y</code></b>. Then as clock runs from 0 to 1, the object rotates about the y-axis from 0 to 360 degrees.</P>
+<P>Although the value of <b><code>clock</code></b> will change from frame-to-frame, it will never change throughout the parsing of a scene.</P>
+<P>The built-in float identifier <b><code>clock_delta</code></b> returns the amount of time between clock values in animations in POV-Ray. While most animations only need the clock value itself, some animation calculations are easier if you know how long since the last frame. Caution must be used when designing such scenes. If you render a scene with too few frames, the results may be different than if you render with more frames in a given time period.  On non-animated scenes, <b><code>clock_delta</code></b> defaults to 1.0.  See section "<A HREF="pov126.htm#_Ref413057470">Animation Options</A>" for more details.</P>
+<P>The built-in float identifier <b><code>version</code></b> contains the current setting of the version compatibility option. Although this value defaults to 3.1 which is the current POV-Ray version number, the initial value of <b><code>version</code></b> may be set by the INI file option <b><code>Version=</code></b><I>n.n</I> or by the <b><code>+MV</code></b><I>n.n</I> command-line switch. This tells POV-Ray to parse the scene file using syntax from an earlier version of POV-Ray.</P>
+<P>The INI option or switch only affects the initial setting. Unlike other built-in identifiers, you may change the value of <b><code>version</code></b> throughout a scene file. You do not use <b><code>#declare</code></b> to change it though. The <b><code>#version</code></b> language directive is used to change modes. Such changes may occur several times within scene files.</P>
+<P>Together with the built-in <b><code>version</code></b> identifier the <b><code>#version</code></b> directive allows you to save and restore the previous values of this compatibility setting. The new <b><code>#local</code></b> identifier option is especially useful here. For example suppose <CODE>mystuff.inc</CODE> is in version 1 format. At the top of the file you could put:</P>
+<PRE> #local Temp_Vers = version;  // Save previous value
+ #version 1.0;         // Change to 1.0 mode
+ ... // Version 1.0 stuff goes here...
+ #version Temp_Vers;      // Restore previous version</PRE>
+<P>Note that there should be a semi-colon after the float expression in a <b><code>#version</code></b> directive. This semi-colon is new with POV-Ray version 3.1. If omitted, it generates a warning and some macros may not work properly.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov163.htm">Float Operators</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov165.htm">Boolean Keywords</A>
+</P>
+</BODY>
+</HTML>
+

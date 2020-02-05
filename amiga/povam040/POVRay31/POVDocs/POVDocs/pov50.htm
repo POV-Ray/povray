@@ -1,0 +1,59 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Surface of Revolution Object</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov49.htm">Superquadric Ellipsoid Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov51.htm">Text Object</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405114"><A NAME="_Toc411405390"><A NAME="_Toc414198869"><A NAME="_Toc429993380">Surface of Revolution Object</A></A></A></A></H3>
+<P>Bottles, vases and glasses make nice objects in ray-traced scenes. We want to create a golden cup using the <I>surface of revolution </I>object (SOR object).</P>
+<P>We first start by thinking about the shape of the final object. It is quite difficult to come up with a set of points that describe a given curve without the help of a modeling program supporting POV-Ray's surface of revolution object. If such a program is available we should take advantage of it.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image95.gif" WIDTH=528 HEIGHT=420></P>
+<P ALIGN="CENTER">The point configuration of our cup object.</P>
+</B><P>We will use the point configuration shown in the figure above. There are eight points describing the curve that will be rotated about the y-axis to get our cup. The curve was calculated using the method described in the reference section (see "<A HREF="pov248.htm#_Ref411680043">Surface of Revolution</A>").</P>
+<P>Now it is time to come up with a scene that uses the above SOR object. We edit a file called <CODE>sordemo.pov</CODE> and enter the following text.</P>
+<PRE>  #include "colors.inc"
+  #include "golds.inc"
+  global_settings { assumed_gamma 2.2 }
+  camera {
+    location &lt;10, 15, -20&gt;
+    look_at &lt;0, 5, 0&gt;
+    angle 45
+  }
+  background { color rgb&lt;0.2, 0.4, 0.8&gt;  }
+  light_source { &lt;100, 100, -100&gt; color rgb 1 }
+  plane { y, 0
+    pigment { checker color Red, color Green scale 10 }
+  }
+  sor {
+    8,
+    &lt;0.0,  -0.5&gt;,
+    &lt;3.0,   0.0&gt;,
+    &lt;1.0,   0.2&gt;,
+    &lt;0.5,   0.4&gt;,
+    &lt;0.5,   4.0&gt;,
+    &lt;1.0,   5.0&gt;,
+    &lt;3.0,  10.0&gt;,
+    &lt;4.0,  11.0&gt;
+    texture { T_Gold_1B }
+  }</PRE>
+<P>The scene contains our cup object resting on a checkered plane. Tracing this scene results in the image below.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image219.gif" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">A surface of revolution object.</P>
+</B><P>The surface of revolution is described by starting with the number of points followed by the points with ascending heights. Each point determines the radius of the curve for a given height. E. g. the first point tells POV-Ray that at height -0.5 the radius is 0. We should take care that each point has a larger height than its predecessor. If this is not the case the program will abort with an error message.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov49.htm">Superquadric Ellipsoid Object</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov51.htm">Text Object</A>
+</P>
+</BODY>
+</HTML>
+

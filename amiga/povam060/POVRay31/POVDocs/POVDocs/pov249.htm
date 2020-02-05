@@ -1,0 +1,37 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Text</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov248.htm">Surface of Revolution</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov250.htm">Torus</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199084"><A NAME="_Toc429993594">Text</A></A></H4>
+<P>A <b><code>text</code></b> object creates 3-D text as an extruded block letter. Currently only TrueType fonts are supported but the syntax allows for other font types to be added in the future. The syntax is:</P>
+<I><DL>
+<DT>TEXT_OBECT:</DT>
+</I><b><code><DD>text { ttf</code></b> <I>"fontname.ttf" "String_of_Text"</I> <I>Thickness</I><b><code>,</code></b><I> &lt;Offset&gt;</I> <I>[OBJECT_MODIFIERS...]</I> <b><code>}</DD>
+</DL>
+</code></b><P>Where <CODE>fontname.ttf</CODE> is the name of the TrueType font file.  It is a quoted string literal or string expression. The string expression which follows is the actual text of the string object. It too may be a quoted string literal or string expression. See section "<A HREF="pov180.htm#_Ref415649609">Strings</A>" for more on string expressions.</P>
+<P>The text will start with the origin at the lower left, front of the first character and will extend in the +x-direction. The baseline of the text follows the x-axis and decenders drop into the -y-direction.  The front of the character sits in the x-y-plane and the text is extruded in the +z-direction. The front-to-back thickness is specified by the required value <I>Thickness</I>.</P>
+<P>Characters are generally sized so that 1 unit of vertical spacing is correct. The characters are about 0.5 to 0.75 units tall.</P>
+<P>The horizontal spacing is handled by POV-Ray internally including any kerning information stored in the font. The required vector <I>&lt;Offset&gt;</I> defines any extra translation between each character. Normally you should specify a zero for this value. Specifying <b><code>0.1*x</code></b> would put additional 0.1 units of space between each character.  Here is an example:</P>
+<PRE>  text { ttf "timrom.ttf" "POV-Ray 3.1" 1, 0
+    pigment { Red }
+  }</PRE>
+<P>Only printable characters are allowed in text objects. Characters such as return, line feed, tabs, backspace etc. are not supported.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov248.htm">Surface of Revolution</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov250.htm">Torus</A>
+</P>
+</BODY>
+</HTML>
+

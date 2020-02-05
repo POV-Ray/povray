@@ -17,7 +17,7 @@
 /// ----------------------------------------------------------------------------
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -45,10 +45,18 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/material/normal.h"
 
-#include "base/pov_err.h"
+// C++ variants of C standard header files
+// C++ standard header files
+//  (none at the moment)
 
+// POV-Ray header files (base module)
+#include "base/pov_err.h"
+#include "base/povassert.h"
+
+// POV-Ray header files (core module)
 #include "core/material/blendmap.h"
 #include "core/material/noise.h"
+#include "core/material/pattern.h"
 #include "core/material/pigment.h"
 #include "core/material/warp.h"
 #include "core/scene/object.h"
@@ -126,7 +134,7 @@ static void ripples (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& n
     Vector3d point;
 
     RipplesPattern* pPat = dynamic_cast<RipplesPattern*>(Tnormal->pattern.get());
-    if (pPat == NULL)
+    if (pPat == nullptr)
         throw POV_EXCEPTION_STRING("Invalid pattern type.");
 
     for (i = 0; i < Thread->numberOfWaves; i++)
@@ -176,7 +184,7 @@ static void waves (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& nor
     Vector3d point;
 
     WavesPattern* pPat = dynamic_cast<WavesPattern*>(Tnormal->pattern.get());
-    if (pPat == NULL)
+    if (pPat == nullptr)
         throw POV_EXCEPTION_STRING("Invalid pattern type.");
 
     for (i = 0; i < Thread->numberOfWaves; i++)
@@ -635,7 +643,7 @@ TNORMAL *Copy_Tnormal (TNORMAL *Old)
 {
     TNORMAL *New;
 
-    if (Old != NULL)
+    if (Old != nullptr)
     {
         New = Create_Tnormal();
 
@@ -647,7 +655,7 @@ TNORMAL *Copy_Tnormal (TNORMAL *Old)
     }
     else
     {
-        New = NULL;
+        New = nullptr;
     }
 
     return (New);
@@ -679,7 +687,7 @@ TNORMAL *Copy_Tnormal (TNORMAL *Old)
 
 void Destroy_Tnormal(TNORMAL *Tnormal)
 {
-    if (Tnormal != NULL)
+    if (Tnormal != nullptr)
         delete Tnormal;
 }
 
@@ -711,7 +719,7 @@ void Post_Tnormal (TNORMAL *Tnormal)
 {
     GenericNormalBlendMapPtr Map;
 
-    if (Tnormal != NULL)
+    if (Tnormal != nullptr)
     {
         if (Tnormal->Flags & POST_DONE)
         {
@@ -725,7 +733,7 @@ void Post_Tnormal (TNORMAL *Tnormal)
 
         Tnormal->Flags |= POST_DONE;
 
-        if ((Map = Tnormal->Blend_Map) != NULL)
+        if ((Map = Tnormal->Blend_Map) != nullptr)
         {
             Map->Post((Tnormal->Flags & DONT_SCALE_BUMPS_FLAG) != 0);
         }
@@ -778,24 +786,24 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
     Vector3d TPoint,P1;
     DBL value1,Amount;
     int i;
-    shared_ptr<NormalBlendMap> Blend_Map;
+    std::shared_ptr<NormalBlendMap> Blend_Map;
 
-    if (Tnormal==NULL)
+    if (Tnormal == nullptr)
     {
         return;
     }
 
     /* If normal_map present, use it and return */
 
-    Blend_Map = dynamic_pointer_cast<NormalBlendMap>(Tnormal->Blend_Map);
-    if (Blend_Map != NULL)
+    Blend_Map = std::dynamic_pointer_cast<NormalBlendMap>(Tnormal->Blend_Map);
+    if (Blend_Map != nullptr)
     {
         if (Tnormal->Type == UV_MAP_PATTERN)
         {
             Vector2d UV_Coords;
 
             /* Don't bother warping, simply get the UV vect of the intersection */
-            Intersection->Object->UVCoord(UV_Coords, Intersection, Thread);
+            Intersection->Object->UVCoord(UV_Coords, Intersection);
             TPoint[X] = UV_Coords[U];
             TPoint[Y] = UV_Coords[V];
             TPoint[Z] = 0;
@@ -871,7 +879,7 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
     }
     else
     {
-        shared_ptr<SlopeBlendMap> slopeMap = dynamic_pointer_cast<SlopeBlendMap>(Tnormal->Blend_Map);
+        std::shared_ptr<SlopeBlendMap> slopeMap = std::dynamic_pointer_cast<SlopeBlendMap>(Tnormal->Blend_Map);
 
         Warp_Normal(Layer_Normal,Layer_Normal, Tnormal,
                     Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
@@ -923,7 +931,7 @@ static DBL Do_Slope_Map (DBL value, const SlopeBlendMap *Blend_Map)
     DBL prevWeight, curWeight;
     const SlopeBlendMapEntry *Prev, *Cur;
 
-    if (Blend_Map == NULL)
+    if (Blend_Map == nullptr)
     {
         return(value);
     }
@@ -1048,5 +1056,5 @@ void NormalBlendMap::ComputeAverage (const Vector3d& EPoint, Vector3d& normal, I
     normal = V1 / Total;
 }
 
-
 }
+// end of namespace pov

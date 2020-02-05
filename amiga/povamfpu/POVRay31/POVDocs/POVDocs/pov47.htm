@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Multiple Sub-Shapes</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov46.htm">Smooth Transitions</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov48.htm">Conic Sweeps And The Tapering Effect</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198866"><A NAME="_Toc429993377">Multiple Sub-Shapes</A></A></H4>
+<P>Just as with the polygon object (see section "<A HREF="pov43.htm#_Ref411676227">Polygon Object</A>") the prism is very flexible, and allows us to make one prism out of several sub-prisms. To do this, all we need to do is keep listing points after we have already closed the first shape. The second shape can be simply an add on going off in another direction from the first, but one of the more interesting features is that if any even number of sub-shapes overlap, that region where they overlap behaves as though it has been cut away from both sub-shapes. Let's look at another example. Once again, same basic code as before for camera, light and so forth, but we substitute this complex prism (see file <CODE>prismdm4.pov</CODE>).</P>
+<PRE>  prism {
+    linear_sweep
+    cubic_spline
+    0,  // sweep the following shape from here ...
+    1,  // ... up through here
+    18, // the number of points making up the shape ...
+    &lt;3,-5&gt;, &lt;3,5&gt;, &lt;-5,0&gt;, &lt;3, -5&gt;, &lt;3,5&gt;, &lt;-5,0&gt;, // sub-shape #1
+    &lt;2,-4&gt;, &lt;2,4&gt;, &lt;-4,0&gt;, &lt;2,-4&gt;, &lt;2,4&gt;, &lt;-4,0&gt;,  // sub-shape #2
+    &lt;1,-3&gt;, &lt;1,3&gt;, &lt;-3,0&gt;, &lt;1, -3&gt;, &lt;1,3&gt;, &lt;-3,0&gt;  // sub-shape #3
+    pigment { Green }
+  }</PRE>
+<B><P ALIGN="CENTER"><IMG SRC="Image215.gif" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">Using sub-shapes to create a more complex shape.</P>
+</B><P>For readability purposes, we have started a new line every time we moved on to a new sub-shape, but the ray-tracer of course tells where each shape ends based on whether the shape has been closed (as described earlier). We render this new prism, and look what we've got. It's the same familiar shape, but it now looks like a smaller version of the shape has been carved out of the center, then the carved piece was sanded down even smaller and set back in the hole.</P>
+<P>Simply, the outer rim is where only sub-shape one exists, then the carved out part is where sub-shapes one and two overlap. In the extreme center, the object reappears because sub-shapes one, two, and three overlap, returning us to an odd number of overlapping pieces. Using this technique we could make any number of extremely complex prism shapes!</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov46.htm">Smooth Transitions</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov48.htm">Conic Sweeps And The Tapering Effect</A>
+</P>
+</BODY>
+</HTML>
+

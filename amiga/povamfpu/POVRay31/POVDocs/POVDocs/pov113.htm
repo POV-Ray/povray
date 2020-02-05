@@ -1,0 +1,52 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Using a Rainbow Arc</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov112.htm">Increasing the Rainbow's Translucency</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov114.htm">Animation</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198934"><A NAME="_Toc429993443">Using a Rainbow Arc</A></A></H4>
+<P>Currently our rainbow has a circular shape, even though most of it is hidden below the ground plane. You can easily create a rainbow arc by using the <b><code>arc_angle</code></b> keyword with an angle below 360 degrees.</P>
+<P>If you use <b><code>arc_angle 120</code></b> for example you'll get a rainbow arc that abruptly vanishes at the arc's ends. This does not look good. To avoid this the <b><code>falloff_angle</code></b> keyword can be used to specify a region where the arc smoothly blends into the background.</P>
+<P>As explained in the rainbow's reference section (see "<A HREF="pov372.htm#_Ref412028912">Rainbow</A>") the arc extends from -arc_angle/2 to arc_angle/2 while the blending takes place from -arc_angle/2 to -falloff_angle/2 and falloff_angle/2 to arc_angle/2. This is the reason why the <b><code>falloff_angle</code></b> has to be smaller or equal to the <b><code>arc_angle</code></b>.</P>
+<P>In the following examples we use an 120 degrees arc with a 45 degree falloff region on both sides of the arc (<CODE>rainbow3.pov</CODE>).</P>
+<PRE>  rainbow {
+    angle 42.5
+    width 5
+    arc_angle 120
+    falloff_angle 30
+    distance 1.0e7
+    direction &lt;-0.2, -0.2, 1&gt;
+    jitter 0.01
+    color_map {
+      [0.000  color r_violet1 transmit 0.98]
+      [0.100  color r_violet2 transmit 0.96]
+      [0.214  color r_indigo  transmit 0.94]
+      [0.328  color r_blue    transmit 0.92]
+      [0.442  color r_cyan    transmit 0.90]
+      [0.556  color r_green   transmit 0.92]
+      [0.670  color r_yellow  transmit 0.94]
+      [0.784  color r_orange  transmit 0.96]
+      [0.900  color r_red1    transmit 0.98]
+    }
+  }</PRE>
+<P>The arc angles are measured against the rainbows up direction which can be specified using the <b><code>up</code></b> keyword. By default the up direction is the y-axis.</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image231.jpg" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">A rainbow arc.</P>
+</B><P>We finally have a realistic looking rainbow arc.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov112.htm">Increasing the Rainbow's Translucency</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov114.htm">Animation</A>
+</P>
+</BODY>
+</HTML>
+

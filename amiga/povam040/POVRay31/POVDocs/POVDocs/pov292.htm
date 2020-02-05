@@ -1,0 +1,81 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Textures</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov291.htm">Object Media</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov293.htm">Pigment</A>
+</P>
+<HR>
+<BR>
+<H2><A NAME="_Ref416274068"><A NAME="_Toc429993637">Textures</A></A></A></A></A></A></H2>
+<P>The <b><code>texture</code></b> statement is an object modifier which describes what the surface of an object looks like, i.e. its material. Textures are combinations of pigments, normals, and finishes. Pigment is the color or pattern of colors inherent in the material. Normal is a method of simulating various patterns of bumps, dents, ripples or waves by modifying the surface normal vector. Finish describes the reflective properties of a material.  </P>
+<P>Note that in previous versions of POV-Ray, the texture also contained information about the interior of an object.  This information has been moved to a separate object modifier called <b><code>interior</code></b>.  See "<A HREF="pov285.htm#_Ref417290349">Interior</A>" for details.</P>
+<P>There are three basic kinds of textures: plain, patterned, and layered. A <I>plain texture </I>consists of a single pigment, an optional normal, and a single finish. A <I>patterned texture </I>combines two or more textures using a block pattern or blending function pattern.  Patterned textures may be made quite complex by nesting patterns within patterns. At the innermost levels however, they are made up from plain textures. A <I>layered texture</I> consists of two or more semi-transparent textures layered on top of one another. Note that although we call a plain texture <I>plain </I>it may be a very complex texture with patterned pigments and normals. The term <I>plain </I>only means that it has a single pigment, normal, and finish.</P>
+<P>The syntax for <b><code>texture</code></b> is as follows:</P>
+<I><DL>
+<DT>TEXTURE:</DT>
+<DD>PLAIN_TEXTURE</I>   |   <I>PATTERNED_TEXTURE</I>   |   <I>LAYERED_TEXTURE</DD>
+<DT>PLAIN_TEXTURE:</DT>
+</I><b><code><DD>texture {</code></b> <I>[TEXTURE_IDENTIFIER] [PNF_IDENTIFIER...] [PNF_ITEMS...]</I> <b><code>}</DD>
+</code></b><I><DT>PNF_IDENTIFIER:</DT>
+<DD>PIGMENT_IDENTIFIER   |   NORMAL_IDENTIFIER   |   FINISH_IDENTIFIER</DD>
+<DT>PNF_ITEMS:</DT>
+<DD>PIGMENT</I>   |   <I>NORMAL</I>   |   <I>FINISH</I>   |   <I>TRANSFORMATION</DD>
+<DT>LAYERED_TEXTURE:</DT>
+<DD>NON_PATTERNED_TEXTURE...</DD>
+<DT>PATTERNED_TEXTURE:</DT>
+</I><b><code><DD>texture {</code></b> <I>[PATTERNED_TEXTURE_ID] [TRANSFORMATIONS...] </I><b><code>}</code></b>   |</DD>
+<b><code><DD>texture {</code></b> <I>PATTERN_TYPE [TEXTURE_PATTERN_MODIFIERS...] </I><b><code>}</code></b>   |</DD>
+<b><code><DD>texture {</code></b> <b><code>tiles</code></b><I> TEXTURE </I> <b><code>tile2</code></b><I> TEXTURE [TRANSFORMATIONS...] </I><b><code>}</code></b>   |</DD>
+<b><code><DD>texture {</code></b> </DD>
+<b><code><DD>material_map{</code></b> </DD>
+<I><DD>BITMAP_TYPE "bitmap.ext" [MATERIAL_MODS...] TEXTURE... [TRANSFORMATIONS...]</DD>
+</I><b><code><DD>}</DD>
+<DD>}</DD>
+</code></b><I><DT>TEXTURE_PATTERN_MODIFIER:</DT>
+<DD>PATTERN_MODIFIER</I>   |   <I>TEXTURE_LIST</I>   |</DD>
+<b><code><DD>texture_map{</code></b> <I>TEXTURE_MAP_BODY</I> <b><code>}</DD>
+</DL>
+</code></b><P>In the <I>PLAIN_TEXTURE</I>, each of the items are optional but if they are present the <I>TEXTURE_IDENTIFIER</I> must be first. If no texture identifier is given, then POV-Ray creates a copy of the default texture.  See "<A HREF="pov199.htm#_Ref417299112">The #default Directive</A>" for details.</P>
+<P>Next are optional pigment, normal, and/or finish identifiers which fully override the any pigment, normal and finish already specified in the previous texture identifier or default texture. Typically this is used for backward compatibility to allow things like: <b><code>texture{MyPigment}</code></b> where <b><code>MyPigment</code></b> is a pigment identifier.</P>
+<P>Finally we have optional <b><code>pigment</code></b>, <b><code>normal</code></b> or <b><code>finish</code></b> statements which modify any pigment, normal and finish already specified in the identifier. If no texture identifier is specified the <b><code>pigment</code></b>, <b><code>normal</code></b> and <b><code>finish</code></b> statements modify the current default values. This is the typical plain texture:</P>
+<PRE>  texture{
+    pigment{MyPigment}
+    normal{MyNormal}
+    finish{MyFinish}
+    scale SoBig
+    rotate SoMuch
+    translate SoFar
+}</PRE>
+<P>The <I>TRANSFORMATIONS</I> may be interspersed between the pigment, normal and finish statements but are generally specified last.  If they are interspersed, then they modify only those parts of the texture already specified.  For example:</P>
+<PRE>  texture{
+    pigment{MyPigment}
+    scale SoBig        //affects pigment only
+    normal{MyNormal}
+    rotate SoMuch      //affects pigment and normal
+    finish{MyFinish}
+    translate SoFar    //finish is never transformable no matter what.
+                       //Therefore affects pigment and normal only
+}</PRE>
+<P>Texture identifiers may be declared to make scene files more readable and to parameterize scenes so that changing a single declaration changes many values. An identifier is declared as follows.</P>
+<I><DL>
+<DT>TEXTURE_DECLARATION:</DT>
+</I><b><code><DD>#declare </code></b><I>IDENTIFIER </I><b><code>=</code></b> <I>TEXTURE</I><b><code>&#9;</code></b>   |</DD>
+<b><code><DD>#local </code></b><I>IDENTIFIER </I><b><code>=</code></b> <I>TEXTURE</DD>
+</DL>
+</I><P>Where <I>IDENTIFIER</I> is the name of the identifier up to 40 characters long and <I>TEXTURE</I> is any valid <b><code>texture</code></b> statement.  See "<A HREF="pov191.htm#_Ref412711267">#declare vs. #local</A>" for information on identifier scope. </P>
+<P>The sections below describe all of the options available in "<A HREF="pov293.htm#_Ref417300511">Pigment</A>", "<A HREF="pov300.htm#_Ref417300541">Normal</A>", and "<A HREF="pov304.htm#_Ref417300575">Finish</A>" which are the main part of plain textures.. There are also separate sections for "<A HREF="pov311.htm#_Ref417301436">Patterned Textures</A>" and "<A HREF="pov315.htm#_Ref417301568">Layered Textures</A>" which are made up of plain textures.  Note that the <b><code>tiles</code></b> and <b><code>material_map</code></b> versions of patterned textures are obsolete and are only supported for backwards compatibility.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov291.htm">Object Media</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov293.htm">Pigment</A>
+</P>
+</BODY>
+</HTML>
+

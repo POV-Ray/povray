@@ -1,0 +1,174 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Another Layered Textures Example</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov90.htm">Declaring Layered Textures</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov92.htm">When All Else Fails: Material Maps</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198911"><A NAME="_Toc429993421">Another Layered Textures Example</A></A></H4>
+<P>To further explain how layered textures work another example is described in detail. A tablecloth is created to be used in a picnic scene. Since a simple red and white checkered cloth looks entirely too new, too flat, and too much like a tiled floor, layered textures are used to stain the cloth.</P>
+<P>We're going to create a scene containing four boxes. The first box has that plain red and white texture we started with in our picnic scene, the second adds a layer meant to realistically fade the cloth, the third adds some wine stains, and the final box adds a few wrinkles (not another layer, but we must note when and where adding changes to the surface normal have an effect in layered textures).</P>
+<P>We start by placing a camera, some lights, and the first box. At this stage, the texture is plain tiling, not layered. See file <CODE>layered1.pov</CODE>.</P>
+<PRE>  #include "colors.inc"
+  camera {
+    location &lt;0, 0, -6&gt;
+    look_at &lt;0, 0, 0&gt;
+  }
+  light_source { &lt;-20, 30, -100&gt; color White }
+  light_source { &lt;10, 30, -10&gt; color White }
+  light_source { &lt;0, 30, 10&gt; color White }
+  #declare PLAIN_TEXTURE =
+    // red/white check
+    texture {
+      pigment {
+        checker
+        color rgb&lt;1.000, 0.000, 0.000&gt;
+        color rgb&lt;1.000, 1.000, 1.000&gt;
+        scale &lt;0.2500, 0.2500, 0.2500&gt;
+      }
+    }
+  // plain red/white check box
+  box { &lt;-1, -1, -1&gt;, &lt;1, 1, 1&gt;
+    texture {
+      PLAIN_TEXTURE
+    }
+    translate  &lt;-1.5, 1.2, 0&gt;
+  }</PRE>
+<P>We render this scene. It is not particularly interesting, isn't it? That is why we will use some layered textures to make it more interesting.</P>
+<P>First, we add a layer of two different, partially transparent grays. We tile them as we had tiled the red and white colors, but we add some turbulence to make the fading more realistic. We add following box to the previous scene and re-render (see file <CODE>layered2.pov</CODE>).</P>
+<PRE>  #declare FADED_TEXTURE =
+    // red/white check texture
+    texture {
+      pigment {
+        checker
+        color rgb&lt;0.920, 0.000, 0.000&gt;
+        color rgb&lt;1.000, 1.000, 1.000&gt;
+        scale &lt;0.2500, 0.2500, 0.2500&gt;
+      }
+    }
+    // greys to fade red/white
+    texture {
+      pigment {
+        checker
+        color rgbf&lt;0.632, 0.612, 0.688, 0.698&gt;
+        color rgbf&lt;0.420, 0.459, 0.520, 0.953&gt;
+        turbulence 0.500
+        scale &lt;0.2500, 0.2500, 0.2500&gt;
+      }
+    }
+  // faded red/white check box
+  box { &lt;-1, -1, -1&gt;, &lt;1, 1, 1&gt;
+    texture {
+      FADED_TEXTURE
+    }
+    translate  &lt;1.5, 1.2, 0&gt;
+  }</PRE>
+<P>Even though it is a subtle difference, the red and white checks no longer look quite so new.</P>
+<P>Since there is a bottle of wine in the picnic scene, we thought it might be a nice touch to add a stain or two. While this effect can almost be achieved by placing a flattened blob on the cloth, what we really end up with is a spill effect, not a stain. Thus it is time to add another layer.</P>
+<P>Again, we add another box to the scene we already have scripted and re-render (see file <CODE>layered3.pov</CODE>).</P>
+<PRE>  #declare STAINED_TEXTURE =
+    // red/white check
+    texture {
+      pigment {
+        checker
+        color rgb&lt;0.920, 0.000, 0.000&gt;
+        color rgb&lt;1.000, 1.000, 1.000&gt;
+        scale &lt;0.2500, 0.2500, 0.2500&gt;
+      }
+    }
+    // greys to fade check
+    texture {
+      pigment {
+        checker
+        color rgbf&lt;0.634, 0.612, 0.688, 0.698&gt;
+        color rgbf&lt;0.421, 0.463, 0.518, 0.953&gt;
+        turbulence 0.500
+        scale &lt;0.2500, 0.2500, 0.2500&gt;
+      }
+    }
+    // wine stain
+    texture {
+      pigment {
+        spotted
+        color_map {
+          [ 0.000  color rgb&lt;0.483, 0.165, 0.165&gt; ]
+          [ 0.329  color rgbf&lt;1.000, 1.000, 1.000, 1.000&gt; ]
+          [ 0.734  color rgbf&lt;1.000, 1.000, 1.000, 1.000&gt; ]
+          [ 1.000  color rgb&lt;0.483, 0.165, 0.165&gt; ]
+        }
+        turbulence 0.500
+        frequency 1.500
+      }
+    }
+  // stained box
+  box { &lt;-1, -1, -1&gt;, &lt;1, 1, 1&gt;
+    texture {
+      STAINED_TEXTURE
+    }
+    translate  &lt;-1.5, -1.2, 0&gt;
+  }</PRE>
+<P>Now there's a tablecloth texture with personality.</P>
+<P>Another touch we want to add to the cloth are some wrinkles as if the cloth had been rumpled. This is not another texture layer, but when working with layered textures, we must keep in mind that changes to the surface normal must be included in the uppermost layer of the texture. Changes to lower layers have no effect on the final product (no matter how transparent the upper layers are).</P>
+<P>We add this final box to the script and re-render (see file <CODE>layered4.pov</CODE>)</P>
+<PRE>  #declare WRINKLED_TEXTURE =
+    // red and white check
+    texture {
+      pigment {
+        checker
+        color rgb&lt;0.920, 0.000, 0.000&gt;
+        color rgb&lt;1.000, 1.000, 1.000&gt;
+        scale &lt;0.2500, 0.2500, 0.2500&gt;
+      }
+    }
+    // greys to "fade" checks
+    texture {
+      pigment {
+        checker
+        color rgbf&lt;0.632, 0.612, 0.688, 0.698&gt;
+        color rgbf&lt;0.420, 0.459, 0.520, 0.953&gt;
+        turbulence 0.500
+        scale &lt;0.2500, 0.2500, 0.2500&gt;
+      }
+    }
+    // the wine stains
+    texture {
+      pigment {
+        spotted
+        color_map {
+          [ 0.000  color rgb&lt;0.483, 0.165, 0.165&gt; ]
+          [ 0.329  color rgbf&lt;1.000, 1.000, 1.000, 1.000&gt; ]
+          [ 0.734  color rgbf&lt;1.000, 1.000, 1.000, 1.000&gt; ]
+          [ 1.000  color rgb&lt;0.483, 0.165, 0.165&gt; ]
+        }
+        turbulence 0.500
+        frequency 1.500
+      }
+      normal {
+        wrinkles 5.0000
+      }
+    }
+  // wrinkled box
+  box { &lt;-1, -1, -1&gt;, &lt;1, 1, 1&gt;
+    texture {
+      WRINKLED_TEXTURE
+    }
+    translate  &lt;1.5, -1.2, 0&gt;
+  }</PRE>
+<P>Well, this may not be the tablecloth we want at any picnic we're attending, but if we compare the final box to the first, we see just how much depth, dimension, and personality is possible just by the use of creative texturing.</P>
+<P>One final note: the comments concerning the surface normal do not hold true for finishes. If a <I>lower </I>layer contains a specular finish and an <I>upper </I>layer does not, any place where the upper layer is transparent, the specular will show through.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov90.htm">Declaring Layered Textures</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov92.htm">When All Else Fails: Material Maps</A>
+</P>
+</BODY>
+</HTML>
+

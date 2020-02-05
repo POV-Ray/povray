@@ -1,0 +1,33 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Setting a Minimum Translucency</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov103.htm">A Constant Fog</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov105.htm">Creating a Filtering Fog</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198924"><A NAME="_Toc429993434">Setting a Minimum Translucency</A></A></H4>
+<P>If you want to make sure that the background does not completely vanish in the fog you can set the transmittance channel of the fog's color to the amount of background you always want to be visible.</P>
+<P>Using as transmittance value of 0.2 as in</P>
+<PRE>  fog {
+    distance 150
+    color rgbt&lt;0.3, 0.5, 0.2, 0.2&gt;
+  }</PRE>
+<P>the fog's translucency never drops below 20% as you can see in the resulting image (<CODE>fog2.pov</CODE>).</P>
+<B><P ALIGN="CENTER"><IMG SRC="Image224.jpg" WIDTH=320 HEIGHT=240></P>
+<P ALIGN="CENTER">Adding a translucency threshold you make sure that the background does not vanish.</P>
+</B>
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov103.htm">A Constant Fog</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov105.htm">Creating a Filtering Fog</A>
+</P>
+</BODY>
+</HTML>
+

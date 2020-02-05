@@ -1,0 +1,33 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Object Media</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov290.htm">Faked Caustics</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov292.htm">Textures</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc414199118"><A NAME="_Ref420157351"><A NAME="_Toc429993636">Object Media</A></A></A></H3>
+<P>The <b><code>interior</code></b>statement may contain one or more <b><code>media</code></b> statements.  Media is used to simulate suspended particles such as smoke, haze, or dust.  Or visible gasses such as steam or fire and explosions.  When used with an object interior, the effect is constrained by the object's shape.  The calculations begin when the ray enters an object and ends when it leaves the object.  This section only discusses media when used with object interior.  The complete syntax and an explanation of all of the parameters and options for <b><code>media</code></b> is given in the section "<A HREF="pov356.htm#_Ref413750547">Media</A>".</P>
+<P>Typically the object itself is given a fully transparent texture however media also works in partially transparent objects.  The texture pattern itself does not effect the interior media except perhaps to create shadows on it.  The texture pattern of an object applies only to the surface shell.  Any interior media patterns are totally independent of the texture.</P>
+<P>In previous versions of POV-Ray, this feature was called <b><code>halo</code></b> and was part of the <b><code>texture</code></b> specification along with <b><code>pigment</code></b>, <b><code>normal</code></b>, and <b><code>finish</code></b>.  See "<A HREF="pov286.htm#_Ref417286060">Why are Interior and Media Necessary?</A>" for an explanation of the reasons for the change.</P>
+<P>Note a strange design side-effect was discovered during testing and it was too difficult to fix.  If the enclosing object uses <b><code>transmit</code></b> rather than <b><code>filter</code></b> for transparency, then the <b><code>media</code></b> casts no shadows.  For example:</P>
+<PRE> object{MyObject pigment{rgbt 1.0} interior{media{MyMedia}}} //no shadows
+ object{MyObject pigment{rgbf 1.0} interior{media{MyMedia}}} //shadows</PRE>
+<P>Media may also be specified outside an object to simulate atmospheric media.  There is no constraining object in this case.  If you only want media effects in a particular area, you should use object media rather than only relying upon the media pattern.  In general it will be faster and more accurate because it only calculates inside the constraining object.  See "<A HREF="pov368.htm#_Ref417287116">Atmospheric Media</A>" for details on unconstrained uses of media.</P>
+<P>You may specify more than one <b><code>media</code></b> statement per <b><code>interior</code></b> statement.  In that case, all of the media participate and where they overlap, they add together.</P>
+<P>Any object which is supposed to have media effects inside it, whether those effects are object media or atmospheric media, must have the <b><code>hollow on</code></b> keyword applied.  Otherwise the media is blocked.  See "<A HREF="pov287.htm#_Ref417287889">Empty and Solid Objects</A>" for details.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov290.htm">Faked Caustics</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov292.htm">Textures</A>
+</P>
+</BODY>
+</HTML>
+

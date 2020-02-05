@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,10 +39,16 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
-#include <vector>
-#include <list>
-#include <cstdio>
+// C++ variants of C standard header files
+//  (none at the moment)
 
+// C++ standard header files
+#include <vector>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 
 namespace pov
@@ -55,16 +61,16 @@ namespace pov
 ///
 /// @{
 
-class BSPTree
+class BSPTree final
 {
     public:
 
-        class Mailbox
+        class Mailbox final
         {
                 friend class BSPTree;
             public:
                 inline Mailbox(unsigned int range) : objects((range >> 5) + 1), count(0) { }
-                inline void clear() { count = 0; memset(&objects[0], 0, objects.size() * sizeof(unsigned int)); } // using memset here as std::fill may not be fast with every standard libaray [trf]
+                void clear();
                 inline unsigned int size() const { return count; }
 
                 inline bool insert(unsigned int i)
@@ -79,12 +85,11 @@ class BSPTree
                 }
             private:
                 /// bit marking object (by index) in mailbox
-                vector<unsigned int> objects;
+                std::vector<unsigned int> objects;
                 /// number of objects in mailbox
                 unsigned int count;
 
-                /// unavailable
-                Mailbox();
+                Mailbox() = delete;
         };
 
         class Objects
@@ -142,7 +147,7 @@ class BSPTree
 
     private:
 
-        struct Node
+        struct Node final
         {
             enum NodeType
             {
@@ -181,7 +186,7 @@ class BSPTree
             };
         };
 
-        struct Split
+        struct Split final
         {
             enum Side
             {
@@ -201,13 +206,13 @@ class BSPTree
 
             inline bool operator<(const Split& r) const { return (plane < r.plane); }
 
-            struct CompareIndex
+            struct CompareIndex final
             {
                 inline bool operator()(const Split& left, const Split& right) const { return (left.index < right.index); }
             };
         };
 
-        struct TraceStack
+        struct TraceStack final
         {
             unsigned int inode;
             float rentry;
@@ -215,11 +220,11 @@ class BSPTree
         };
 
         /// array of all nodes
-        vector<Node> nodes;
+        std::vector<Node> nodes;
         /// array of all object pointer lists
-        vector<unsigned int> lists;
+        std::vector<unsigned int> lists;
         /// splits, only used while building tree
-        vector<Split> splits[3];
+        std::vector<Split> splits[3];
         /// lower left corner of bounding box
         Vector3d bmin;
         /// upper right corner of bounding box
@@ -253,7 +258,7 @@ class BSPTree
         /// tree depth counter
         POV_LONG treeDepthCounter;
         /// object index list (only used while building tree)
-        vector<unsigned int> indices;
+        std::vector<unsigned int> indices;
 
         void BuildRecursive(const Progress& progress, const Objects& objects, unsigned int inode, unsigned int indexbegin, unsigned int indexend, MinMaxBoundingBox& cell, unsigned int maxlevel);
         void SetObjectNode(unsigned int inode, unsigned int indexbegin, unsigned int indexend);
@@ -264,18 +269,18 @@ class BSPTree
 };
 
 
-class BSPIntersectFunctor : public BSPTree::Intersect
+class BSPIntersectFunctor final : public BSPTree::Intersect
 {
     public:
 
-        BSPIntersectFunctor(Intersection& bi, const Ray& r, vector<ObjectPtr>& objs, TraceThreadData *t);
-        virtual bool operator()(unsigned int index, double& maxdist);
-        virtual bool operator()() const;
+        BSPIntersectFunctor(Intersection& bi, const Ray& r, std::vector<ObjectPtr>& objs, TraceThreadData *t);
+        virtual bool operator()(unsigned int index, double& maxdist) override;
+        virtual bool operator()() const override;
 
     private:
 
         bool found;
-        vector<ObjectPtr>& objects;
+        std::vector<ObjectPtr>& objects;
         Intersection& bestisect;
         const Ray& ray;
         BBoxVector3d origin;
@@ -284,19 +289,19 @@ class BSPIntersectFunctor : public BSPTree::Intersect
         TraceThreadData *traceThreadData;
 };
 
-class BSPIntersectCondFunctor : public BSPTree::Intersect
+class BSPIntersectCondFunctor final : public BSPTree::Intersect
 {
     public:
 
-        BSPIntersectCondFunctor(Intersection& bi, const Ray& r, vector<ObjectPtr>& objs, TraceThreadData *t,
+        BSPIntersectCondFunctor(Intersection& bi, const Ray& r, std::vector<ObjectPtr>& objs, TraceThreadData *t,
                                 const RayObjectCondition& prec, const RayObjectCondition& postc);
-        virtual bool operator()(unsigned int index, double& maxdist);
-        virtual bool operator()() const;
+        virtual bool operator()(unsigned int index, double& maxdist) override;
+        virtual bool operator()() const override;
 
     private:
 
         bool found;
-        vector<ObjectPtr>& objects;
+        std::vector<ObjectPtr>& objects;
         Intersection& bestisect;
         const Ray& ray;
         BBoxVector3d origin;
@@ -307,19 +312,19 @@ class BSPIntersectCondFunctor : public BSPTree::Intersect
         const RayObjectCondition& postcondition;
 };
 
-class BSPInsideCondFunctor : public BSPTree::Inside
+class BSPInsideCondFunctor final : public BSPTree::Inside
 {
     public:
 
-        BSPInsideCondFunctor(Vector3d o, vector<ObjectPtr>& objs, TraceThreadData *t,
+        BSPInsideCondFunctor(Vector3d o, std::vector<ObjectPtr>& objs, TraceThreadData *t,
                              const PointObjectCondition& prec, const PointObjectCondition& postc);
-        virtual bool operator()(unsigned int index);
-        virtual bool operator()() const;
+        virtual bool operator()(unsigned int index) override;
+        virtual bool operator()() const override;
 
     private:
 
         bool found;
-        vector<ObjectPtr>& objects;
+        std::vector<ObjectPtr>& objects;
         Vector3d origin;
         const PointObjectCondition& precondition;
         const PointObjectCondition& postcondition;
@@ -331,5 +336,6 @@ class BSPInsideCondFunctor : public BSPTree::Inside
 //##############################################################################
 
 }
+// end of namespace pov
 
 #endif // POVRAY_CORE_BSPTREE_H

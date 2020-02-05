@@ -1,0 +1,44 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Camera</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov223.htm">Transforming Textures and Objects</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov225.htm">Placing the Camera</A>
+</P>
+<HR>
+<BR>
+<H2><A NAME="_Toc411405190"><A NAME="_Toc411405466"><A NAME="_Ref412708795"><A NAME="_Toc414199057"><A NAME="_Toc429993567">Camera</A></A></A></A></A></H2>
+<P>The camera definition describes the position, projection type and properties of the camera viewing the scene. Its syntax is:</P>
+<I><DL>
+<DT>CAMERA:</DT>
+</I><b><code><DD>camera{</code></b><I> [CAMERA_ITEMS...] </I><b><code>}</DD>
+</code></b><I><DT>CAMERA_ITEM:</DT>
+<DD>CAMERA_TYPE</I>   |   <I>CAMERA_VECTOR</I>   |   <I>CAMERA_MODIFIER</I>   |   <I>CAMERA_IDENTIFIER</DD>
+<DT>CAMERA_TYPE:</DT>
+</I><b><code><DD>perspective</code></b>   |   <b><code>orthographic</code></b>   |   <b><code>fisheye</code></b>   |   <b><code>ultra_wide_angle</code></b>   |</DD>
+<b><code><DD>omnimax</code></b>   |   <b><code>panoramic</code></b>   |   <b><code>cylinder</code></b> <I>CylinderType</DD>
+<DT>CAMERA_VECTOR:</DT>
+</I><b><code><DD>location</code></b> <I>&lt;Location&gt;</I>   |   <b><code>right</code></b> <I>&lt;Right&gt;</I>   |   <b><code>up</code></b> <I>&lt;Up&gt;</I>   |   <b><code>direction</code></b> <I>&lt;Direction&gt;</I>   |</DD>
+<b><code><DD>sky</code></b> <I>&lt;Sky&gt;</DD>
+<DT>CAMERA_MODIFIER:</DT>
+</I><b><code><DD>angle</code></b> <I>Degrees</I>   |   <b><code>look_at</code></b> <I>&lt;Look_At&gt;</I>   |</DD>
+<b><code><DD>blur_samples</code></b> <I>Num_of_Samples</I>   |   <b><code>aperture</code></b> <I>Size</I>   |   <b><code>focal_point</code></b> <I>&lt;Point&gt;</I>   |</DD>
+<b><code><DD>confidence</code></b> <I>Blur_Confidence</I>   |   <b><code>varience</code></b> <I>Blur_Varience</I>   |</DD>
+<I><DD>NORMAL</I>   |</DD>
+<I><DD>TRANSFORMATION</DD>
+</DL>
+</I><P>Depending on the projection type some of the parameters are required, some are optional and some aren't used. If no projection type is given the perspective camera will be used (pinhole camera). If no camera is specified a default camera is used.  <I>CAMERA_ITEM</I>s may legally appear in any order but the order of some items is critical to the proper functioning of the camera.  Follow the guidelines in this document closely because POV-Ray will not stop you from making mistakes.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov223.htm">Transforming Textures and Objects</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov225.htm">Placing the Camera</A>
+</P>
+</BODY>
+</HTML>
+

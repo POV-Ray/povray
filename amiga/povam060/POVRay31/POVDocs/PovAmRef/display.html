@@ -1,0 +1,45 @@
+<html>
+<head><title>Display preview modes</title></head>
+<body>
+
+<h1>Display Preview Modes</h1>
+
+The following display preview (+D or Display=) settings are available:
+<UL>
+* Not Yet Implemented (Sorry 8^)
+
+<LI>'E' Extra-HalfBrite mode.  A fixed, 'best-spread' 32/64 color palette is
+    used.  Works fairly well for images needing a variety of colors.
+<LI>'G' Greyscale.  16 shades on OCS/ECS systems.  256 shades on AGA and Displaycard systems.
+<LI>'W'<B>*</B>Window display under OS3.  ENV variable 'POVRENDERSCREEN' can
+    be used to select a public screen to open the display preview
+    on, else default is used.
+<LI>'M' A special mode that sends the pixel information to the GUI as a
+    message packet, to be used as supported.  The included GUI does
+    not currently make use of this message, but may support external
+    display modules in the future. Read <a href="guicom.html"> GUI Communications</a>
+    about how to implement your own GUI, or even an AREXX front-end.
+
+<LI>'H'<B>*</B>Hold-And-Modify mode.  A fixed, 'best-spread' base palette is used.
+    This module supports HAM6 (OCS/ECS) and HAM8 (AGA). If palette option of '8' or '6' 
+    is used, the appropriate mode will be forced.  If no option, then HAM6 is used.
+<LI>'P' Picasso96 support.  Palette options control screen type:
+<UL>      <LI>T: 24 bit true-color
+<LI>      H: 16(15) bit high-color R5G6B5 (R5G5B5)
+<LI>      8: 8 bit palette based (256 color)
+</UL>
+    If no palette is specified, or a selection fails, will fallback
+    from 24 to 16 to 15 to 8 then fail.
+    If the ENV variable 'POVRENDERSCREEN' is set, it's contents will be used
+    as the name of a public screen to open a Picasso96 PIP window on.  If the 
+    screen is not found, it will fallback to the default pubscreen.  If 'POVRENDERSCREEN' is NOT set, then 
+    it will open a custom screen.
+<LI>'C' CyberGfx support.  Same palette options as Picasso96.  Does not currently
+     support windows, just full screen.
+</ul>
+<p>
+Auto-Interlacing has been removed, when updating to use BestModeID() to choose screen resolution.  There is still no way to force interlacing, so if you (for example) render a 200x200 image, it will always (probably...) be non-interlaced lo-res.  NOTE: OS2 doesn't offer the BestModeID() function, so
+display will fail on OS2 systems.  There is an experimental change in place in the Grey display module to revert to the older screen
+opening code (16 color 640x??? resolution) which DOES incorporate the Auto-Interlace feature.
+</body>
+</html>

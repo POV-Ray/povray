@@ -13,7 +13,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -55,54 +55,13 @@
 // failure to do so will lead to link errors.
 // #define _CONSOLE
 
-// C++ variants of C standard headers
-#include <cmath>
-#include <cstdarg>
-#include <cstdlib>
+// C++ variants of C standard header files
+#include <cmath>        // TODO - Required for `_isnan()`, `_finite()`.
+#include <cstdlib>      // TODO - required for `_MAX_PATH`, `std::memcpy()`[1], `std::malloc()`, `std::realloc()`, `std::free()`.
+#include <cstring>      // TODO - Required for `std::memmove() `std::memcpy()`[1], `std::strdup()`.
 
-// C++ standard headers
-#include <exception>
-#include <list>
-#include <memory>
-#include <stdexcept>
-#include <string>
-#include <vector>
-
-// boost headers
-#include <boost/intrusive_ptr.hpp>
-
-#include <io.h>
-#include <fcntl.h>
-
-#ifndef STD_TYPES_DECLARED
-#define STD_TYPES_DECLARED
-
-// the following types are used extensively throughout the POV source and hence are
-// included and named here for reasons of clarity and convenience.
-
-// when we say 'string' we mean std::string
-using std::string;
-
-// and vector is a std::vector
-using std::vector;
-
-// yup, list too
-using std::list;
-
-// runtime_error is the base of our Exception class, plus is referred
-// to in a few other places.
-using std::runtime_error;
-
-// we use the C++11 standard shared pointers
-using std::shared_ptr;
-using std::weak_ptr;
-using std::dynamic_pointer_cast;
-using std::static_pointer_cast;
-using std::const_pointer_cast;
-
-using boost::intrusive_ptr;
-
-#endif // STD_POV_TYPES_DECLARED
+// C++ standard header files
+//  (none at the moment)
 
 // the build command-line is expected to declare WIN32_LEAN_AND_MEAN, which will
 // prevent Window's objidl.h from being pulled in (which dupes IStream)
@@ -149,16 +108,6 @@ using boost::intrusive_ptr;
 
 /////////////////////////////////////////////////////////////
 
-#ifndef __GENDEFS
-  #define __GENDEFS
-  typedef unsigned char     uchar;
-  typedef unsigned short    ushort;
-  typedef unsigned int      uint;
-  typedef unsigned long     ulong;
-  typedef unsigned __int64  uint64;
-  typedef __int64           int64;
-#endif
-
 #ifdef __INTEL_COMPILER
 // Intel C++ whines about the lack of a return on RDTSC() for each and every file
 // it is included in. VC++ is smarter (or dumber, depending on your point of view).
@@ -181,11 +130,13 @@ namespace povwin
   void win_free(void *p, const void *ptr, int line);
   char *win_strdup(const char *s);
   char *win_strdup(const char *s, const void *ptr, int line);
-  bool WinMemReport(bool global, uint64& allocs, uint64& frees, int64& current, uint64& peak, uint64& smallest, uint64& largest);
+  bool WinMemReport(bool global, unsigned __int64& allocs, unsigned __int64& frees, __int64& current,
+                    unsigned __int64& peak, unsigned __int64& smallest, unsigned __int64& largest);
   void WinMemStage(bool BeginRender, void *cookie = NULL);
 #endif
 
 #ifndef _WIN64
+  // TODO FIXME - The following will obviously only work on x86 machines.
   inline void DebugBreak() { _asm _emit 0cch } // rather than use the windows one
   inline POV_LONG RDTSC(){ _asm _emit 0Fh _asm _emit 31h }
   #define READ_PROFILE_TIMER RDTSC()
@@ -194,29 +145,12 @@ namespace povwin
   #define READ_PROFILE_TIMER 0
 #endif
 }
+// end of namespace povwin
 #ifdef __INTEL_COMPILER
 #pragma warning(pop)
 #endif
 
-// MS Windows provides large file support via the `_lseeki64` function,
-// with file offsets having type `__int64`.
-#define POV_LSEEK(handle,offset,whence) _lseeki64(handle,offset,whence)
-#define POV_OFF_T __int64
-
-namespace pov_base
-{
-  // declare these to avoid warnings in image.cpp, rather than turn off the deprecation warnings.
-  static inline int open(const char *name, int flags, int mode) { return _open(name, flags|_O_BINARY, mode); }
-  static inline int close(int handle) { return _close(handle); }
-  static inline int write(int handle, const void *data, int count) { return _write(handle, data, count); }
-  static inline int read(int handle, void *data, int count) { return _read(handle, data, count); }
-}
-
-#define S_IRUSR                             _S_IREAD
-#define S_IWUSR                             _S_IWRITE
-
 #define ALTMAIN
-#define LITTLE_ENDIAN
 #define POV_PATH_SEPARATOR                  '\\'
 #define POV_IS_PATH_SEPARATOR(c)            (((c) == POV_PATH_SEPARATOR) || ((c) == '/'))
 #define POV_SLASH_IS_SWITCH_CHARACTER       1 // allow forward slash as a switch character (even despite its use as a path separator!)
@@ -225,24 +159,17 @@ namespace pov_base
 #define POV_IS2                             ".BMP"
 #define DEFAULT_DISPLAY_GAMMA_TYPE          kPOVList_GammaType_SRGB
 #define DEFAULT_DISPLAY_GAMMA               2.2
-#define RENAME_FILE(orig,new)               rename(orig,new)
-#define POV_DELETE_FILE(name)               _unlink(name)
 #define POV_NEW_LINE_STRING                 "\r\n"
 #define POV_SYS_IMAGE_EXTENSION             ".bmp"
 #define POV_SYS_IMAGE_TYPE                  BMP
 #define POV_FILENAME_BUFFER_CHARS           (_MAX_PATH-1)   // (NB: _MAX_PATH includes terminating NUL character)
-#define IFF_SWITCH_CAST                     (long)
-#define USE_OFFICIAL_BOOST                  1
-
-#define POV_MEMMOVE(dst,src,len)            std::memmove((dst),(src),(len))
-#define POV_MEMCPY(dst,src,len)             std::memcpy((dst),(src),(len))
 
 #ifdef _CONSOLE
 
-#define POV_MALLOC(size,msg)                malloc (size)
-#define POV_REALLOC(ptr,size,msg)           realloc ((ptr), (size))
-#define POV_FREE(ptr)                       do { free (static_cast<void *>(ptr)); (ptr) = NULL; } while(false)
-#define POV_STRDUP(str)                     strdup(str)
+#define POV_MALLOC(size,msg)                std::malloc (size)
+#define POV_REALLOC(ptr,size,msg)           std::realloc ((ptr), (size))
+#define POV_FREE(ptr)                       do { std::free (static_cast<void *>(ptr)); (ptr) = NULL; } while(false)
+#define POV_STRDUP(str)                     _strdup(str)
 
 #define NO_RTR                              1
 #define MEM_STATS                           0
@@ -277,6 +204,7 @@ namespace pov
 {
   class VideoCaptureImpl;
 }
+// end of namespace pov
 #endif // end of not _CONSOLE
 
 // see RLP comment in v3.6 windows config.h
@@ -288,11 +216,6 @@ namespace pov
 // this adds some useful debugging information to each POV-Ray SDL object
 #if defined _DEBUG
   #define OBJECT_DEBUG_HELPER
-#endif
-
-// TODO REVIEW - Is this actually required for any Windows platform?
-#ifndef MAX_PATH
-  #define MAX_PATH _MAX_PATH
 #endif
 
 #ifndef NO_RTR

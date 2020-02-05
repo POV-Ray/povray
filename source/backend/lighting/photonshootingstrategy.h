@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,41 +33,54 @@
 ///
 //******************************************************************************
 
-#ifndef PHOTONSHOOTINGSTRATEGY_H
-#define PHOTONSHOOTINGSTRATEGY_H
+#ifndef POVRAY_BACKEND_PHOTONSHOOTINGSTRATEGY_H
+#define POVRAY_BACKEND_PHOTONSHOOTINGSTRATEGY_H
 
-#include <boost/thread.hpp>
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "backend/configbackend.h"
+#include "backend/lighting/photonshootingstrategy_fwd.h"
 
-#include "backend/frame.h"
+// C++ variants of C standard header files
+//  (none at the moment)
+
+// C++ standard header files
+#include <memory>
+#include <mutex>
+#include <vector>
+
+// POV-Ray header files (base module)
+//  (none at the moment)
+
+// POV-Ray header files (core module)
+#include "core/core_fwd.h"
+
+// POV-Ray header files (backend module)
+//  (none at the moment)
 
 namespace pov
 {
 
-using namespace pov_base;
-
-class PhotonShootingUnit;
-class SceneData;
-
-class PhotonShootingStrategy
+class PhotonShootingStrategy final
 {
     public:
         ObjectPtr obj;
         LightSource *light;
 
-        vector<PhotonShootingUnit*> units;
+        std::vector<PhotonShootingUnit*> units;
 
-        void createUnitsForCombo(ObjectPtr obj, LightSource* light, shared_ptr<SceneData> sceneData);
+        void createUnitsForCombo(ObjectPtr obj, LightSource* light, std::shared_ptr<SceneData> sceneData);
         void start();
         PhotonShootingUnit* getNextUnit();
 
         virtual ~PhotonShootingStrategy();
 
     private:
-        vector<PhotonShootingUnit*>::iterator iter;
-        boost::mutex nextUnitMutex;
+        std::vector<PhotonShootingUnit*>::iterator iter;
+        std::mutex nextUnitMutex;
 
 };
 
 }
+// end of namespace pov
 
-#endif
+#endif // POVRAY_BACKEND_PHOTONSHOOTINGSTRATEGY_H

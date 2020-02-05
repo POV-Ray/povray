@@ -1,0 +1,56 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Transforming Textures and Objects</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov222.htm">Transform Identifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov224.htm">Camera</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405189"><A NAME="_Toc411405465"><A NAME="_Toc414199056"><A NAME="_Toc429993566">Transforming Textures and Objects</A></A></A></A></H3>
+<P>When an object is transformed all textures attached to the object <I>at that time </I>are transformed as well. This means that if you have a <b><code>translate</code></b>, <b><code>rotate</code></b>, <b><code>scale</code></b>, or <b><code>matrix</code></b> modifier in an object <I>before </I>a texture, then the texture will not be transformed. If the transformation is <I>after </I>the texture then the texture will be transformed with the object. If the transformation is <I>inside </I>the <b><code>texture</code></b> statement then <I>only the texture </I>is affected. The shape remains the same. For example:</P>
+<PRE> sphere { 0, 1
+  texture { Jade } // texture identifier from TEXTURES.INC
+  scale 3      // this scale affects both the
+           // shape and texture
+ }
+ sphere { 0, 1
+  scale 3      // this scale affects the shape only
+  texture { Jade }
+ }
+ sphere { 0, 1
+  texture {
+   Jade
+   scale 3     // this scale affects the texture only
+  }
+ }</PRE>
+<P>Transformations may also be independently applied to pigment patterns and surface normal patterns. Note that scaling a normal pattern affects only the width and spacing. It does not affect the apparent height or depth of the bumps. For example:</P>
+<PRE> box { &lt;0, 0, 0&gt;, &lt;1, 1, 1&gt;
+  texture {
+   pigment {
+    checker Red, White
+    scale 0.25 // This affects only the color pattern
+   }
+   normal {
+    bumps 0.3 // This specifies apparent height of bumps
+    scale 0.2 // Scales diameter and space between bumps
+          // but not the height. Has no effect on
+          // color pattern.
+   }
+   rotate y*45 // This affects the entire texture but
+  }       // not the object.
+ }</PRE>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov222.htm">Transform Identifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov224.htm">Camera</A>
+</P>
+</BODY>
+</HTML>
+

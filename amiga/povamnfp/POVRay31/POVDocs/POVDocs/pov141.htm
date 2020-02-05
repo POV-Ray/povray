@@ -1,0 +1,62 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Shell-out to Operating System</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov140.htm">Language Version</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov142.htm">String Substitution in Shell Commands</A>
+</P>
+<HR>
+<BR>
+<H3><A NAME="_Toc411405162"><A NAME="_Toc411405438"><A NAME="_Ref412212281"><A NAME="_Toc414198975"><A NAME="_Toc429993484">Shell-out to Operating System</A></A></A></A></A></H3>
+<P ALIGN="CENTER"><CENTER><TABLE BORDER CELLSPACING=1 CELLPADDING=7 WIDTH=480>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>Pre_Scene_Command=</code></b><I>s</I></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+<P>Set command before entire scene</TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>Pre_Frame_Command=</code></b><I>s</I></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+<P>Set command before each frame</TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>Post_Scene_Command=</code></b><I>s</I></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+<P>Set command after entire scene</TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>Post_Frame_Command=</code></b><I>s</I></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+<P>Set command after each frame</TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>User_Abort_Command=</code></b><I>s</I></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+<P>Set command when user aborts POV-Ray</TD>
+</TR>
+<TR><TD WIDTH="40%" VALIGN="TOP">
+<p><b><code>Fatal_Error_Command=</code></b><I>s</I></TD>
+<TD WIDTH="60%" VALIGN="TOP">
+<P>Set command when POV-Ray has fatal error</TD>
+</TR>
+</TABLE>
+</CENTER></P>
+
+<P>Note that no <b><code>+</code></b> or <b><code>-</code></b> switches are available for these options. They cannot be used from the command line. They may only be used from INI files.</P>
+<P>POV-Ray offers you the opportunity to shell-out to the operating system at several key points to execute another program or batch file. Usually this is used to manage files created by the internal animation loop however the shell commands are available for any scene. The string <I>s</I> is a single line of text which is passed to the operating system to execute a program. For example</P>
+<PRE> Post_Scene_Command=tga2gif -d -m myfile</PRE>
+<P>would use the utility <CODE>tga2gif</CODE> with the <b><code>-D</code></b> and <b><code>-M</code></b> parameters to convert <CODE>myfile.tga</CODE> to <CODE>myfile.gif</CODE> after the scene had finished rendering.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov140.htm">Language Version</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov142.htm">String Substitution in Shell Commands</A>
+</P>
+</BODY>
+</HTML>
+

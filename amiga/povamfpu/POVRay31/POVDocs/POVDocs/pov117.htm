@@ -1,0 +1,64 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - The Phase Keyword</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov116.htm">Clock Dependant Variables And Multi-Stage Animations</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov118.htm">Do Not Use Jitter Or Crand</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414198938"><A NAME="_Toc429993447">The Phase Keyword</A></A></H4>
+<P>There is another keyword we should know for purposes of animations: the <b><code>phase</code></b> keyword. The phase keyword can be used on many texture elements, especially those that can take a color, pigment, normal or texture map.  Remember the form that these maps take. For example:</P>
+<PRE>  color_map {
+    [0.00 White ]
+    [0.25 Blue ]
+    [0.76 Green ]
+    [1.00 Red ]
+  }</PRE>
+<P>The floating point value to the left inside each set of brackets helps POV-Ray to map the color values to various areas of the object being textured.  Notice that the map runs cleanly from 0.0 to 1.0?</P>
+<P>Phase causes the color values to become shifted along the map by a floating point value which follows the keyword <b><code>phase</code></b>. Now, if we are using a normalized clock value already anyhow, we can make the variable clock the floating point value associated with phase, and the pattern will smoothly shift over the course of the animation. Let's look at a common example using a gradient normal pattern</P>
+<PRE>  #include "colors.inc"
+  #include "textures.inc"
+  #background { rgb&lt;0.8, 0.8, 0.8&gt; }
+  camera {
+    location &lt;1.5, 1, -30&gt;
+    look_at &lt;0, 1, 0&gt;
+    angle 10
+  }
+  light_source { &lt;-100, 20, -100&gt; color White }
+  // flag
+  polygon { 5, &lt;0, 0&gt;, &lt;0, 1&gt;, &lt;1, 1&gt;, &lt;1, 0&gt;, &lt;0, 0&gt;
+    pigment { Blue }
+    normal {
+      gradient x
+      phase clock
+      scale &lt;0.2, 1, 1&gt;
+      sine_wave
+    }
+    scale &lt;3, 2, 1&gt;
+    translate &lt;-1.5, 0, 0&gt;
+  }
+  // flagpole
+  cylinder { &lt;-1.5, -4, 0&gt;, &lt;-1.5, 2.25, 0&gt;, 0.05
+    texture { Silver_Metal }
+  }
+  // polecap
+  sphere { &lt;-1.5, 2.25, 0&gt;, 0.1
+    texture { Silver_Metal }
+  }</PRE>
+<P>Now, here we've created a simple blue flag with a gradient normal pattern on it. We've forced the gradient to use a sine-wave type wave so that it looks like the flag is rolling back and forth as though flapping in a breeze. But the real magic here is that phase keyword. It's been set to take the clock variable as a floating point value which, as the clock increments slowly toward 1.0, will cause the crests and troughs of the flag's wave to shift along the x-axis.  Effectively, when we animate the frames created by this code, it will look like the flag is actually rippling in the wind.</P>
+<P>This is only one, simple example of how a clock dependant phase shift can create interesting animation effects. Trying phase will all sorts of texture patterns, and it is amazing the range of animation effects we can create simply by phase alone, without ever actually moving the object.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov116.htm">Clock Dependant Variables And Multi-Stage Animations</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov118.htm">Do Not Use Jitter Or Crand</A>
+</P>
+</BODY>
+</HTML>
+

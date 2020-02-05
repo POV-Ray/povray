@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -45,6 +45,13 @@
 #include <cstdarg>
 #include <cstdio>
 
+#include <boost/bind.hpp>
+#include <boost/format.hpp>
+
+#include "base/filesystem.h"
+#include "base/povassert.h"
+#include "base/textstream.h"
+
 #include "frontend/animationprocessing.h"
 #include "frontend/imageprocessing.h"
 
@@ -57,11 +64,12 @@ namespace vfe
 using namespace pov_base;
 using namespace pov_frontend;
 using boost::format;
+using std::shared_ptr;
+using std::string;
 
 static int Allow_File_Read(const UCS2 *Filename, const unsigned int FileType);
 static int Allow_File_Write(const UCS2 *Filename, const unsigned int FileType);
 static FILE *vfeFOpen(const UCS2String& name, const char *mode);
-static bool vfeRemove(const UCS2String& name);
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -97,17 +105,17 @@ POVMSMessageDetails::POVMSMessageDetails (POVMS_Object& Obj)
 
   Line = Col = 0 ;
   Offset = -1 ;
-  ubuffer[0] = 0 ;
+  ubuffer[0] = '\0';
 
   if (POVMSUtil_GetUCS2String (msg, kPOVAttrib_FileName, ubuffer, &l) == kNoErr)
   {
     UCS2File = ubuffer ;
-    File = UCS2toASCIIString (UCS2File);
+    File = UCS2toSysString(UCS2File);
   }
   if (POVMSUtil_GetLong (msg, kPOVAttrib_Line, &ll) == kNoErr)
     Line = POVMSInt(ll) ;
   if (POVMSUtil_GetLong (msg, kPOVAttrib_Column, &ll) == kNoErr)
-    Col = POVMSInt(ll + 1) ;
+    Col = POVMSInt(ll) ;
   if(POVMSUtil_GetLong(msg, kPOVAttrib_FilePosition, &ll) == kNoErr)
     Offset = ll ;
   l = sizeof (buffer) ;
@@ -132,7 +140,7 @@ class ParseWarningDetails : public POVMSMessageDetails
 {
   public:
     ParseWarningDetails (POVMS_Object &Obj) : POVMSMessageDetails (Obj) {} ;
-    virtual ~ParseWarningDetails () {} ;
+    virtual ~ParseWarningDetails () override {} ;
 
   public:
     using POVMSMessageDetails::File ;
@@ -147,7 +155,7 @@ class ParseErrorDetails : public POVMSMessageDetails
 {
   public:
     ParseErrorDetails (POVMS_Object &Obj) : POVMSMessageDetails (Obj) {} ;
-    virtual ~ParseErrorDetails () {} ;
+    virtual ~ParseErrorDetails () override {} ;
 
   public:
     using POVMSMessageDetails::File ;
@@ -201,7 +209,7 @@ void vfeConsole::BufferOutput(const char *str, unsigned int chars, vfeSession::M
   if (sLen > sizeof (rawBuffer) - bLen - 1)
     sLen = sizeof (rawBuffer) - bLen - 1 ;
   strncat (rawBuffer, str, sLen) ;
-  if ((s = strrchr (rawBuffer, '\n')) != NULL)
+  if ((s = strrchr (rawBuffer, '\n')) != nullptr)
   {
     *s++ = '\0' ;
     m_Session->AppendStreamMessage (mType, rawBuffer) ;
@@ -262,11 +270,6 @@ bool vfePlatformBase::ReadFileFromURL(OStream *file, const UCS2String& url, cons
 FILE* vfePlatformBase::OpenLocalFile (const UCS2String& name, const char *mode)
 {
   return vfeFOpen (name, mode);
-}
-
-void vfePlatformBase::DeleteLocalFile (const UCS2String& name)
-{
-  vfeRemove (name);
 }
 
 bool vfePlatformBase::AllowLocalFileAccess (const UCS2String& name, const unsigned int fileType, bool write)
@@ -603,8 +606,8 @@ VirtualFrontEnd::VirtualFrontEnd(vfeSession& session, POVMSContext ctx, POVMSAdd
   backendAddress = addr ;
   state = kReady ;
   m_PostPauseState = kReady;
-  consoleResult = NULL ;
-  displayResult = NULL ;
+  consoleResult = nullptr;
+  displayResult = nullptr;
   m_PauseRequested = m_PausedAfterFrame = false;
   renderFrontend.ConnectToBackend(backendAddress, msg, result, console);
 }
@@ -631,7 +634,7 @@ bool VirtualFrontEnd::Start(POVMS_Object& opts)
   m_PostPauseState = kReady;
 
   Path ip (m_Session->GetInputFilename());
-  shelloutProcessing.reset(m_Session->CreateShelloutProcessing(opts, UCS2toASCIIString(ip.GetFile()), m_Session->GetRenderWidth(), m_Session->GetRenderHeight())) ;
+  shelloutProcessing.reset(m_Session->CreateShelloutProcessing(opts, UCS2toSysString(ip.GetFile()), m_Session->GetRenderWidth(), m_Session->GetRenderHeight())) ;
   shelloutProcessing->SetCancelMessage("Render halted because the %1% shell-out ('%6%') requested POV-Ray to %5%.");
   shelloutProcessing->SetSkipMessage("The %1% shell-out ('%3%') requested POV-Ray to %2%.");
 
@@ -651,7 +654,7 @@ bool VirtualFrontEnd::Start(POVMS_Object& opts)
 
   POVMS_Object input_file_name(kPOVMSType_WildCard);
   input_file_name.SetString(kPOVAttrib_Identifier, "input_file_name");
-  input_file_name.SetString(kPOVAttrib_Value, UCS2toASCIIString(ip.GetFile()).c_str());
+  input_file_name.SetString(kPOVAttrib_Value, UCS2toSysString(ip.GetFile()).c_str());
   declares.Append(input_file_name);
 
   int initialFrame = opts.TryGetInt (kPOVAttrib_InitialFrame, 0) ;
@@ -716,11 +719,11 @@ bool VirtualFrontEnd::Start(POVMS_Object& opts)
       if (imageProcessing->OutputIsStdout() == false && imageProcessing->OutputIsStderr() == false && m_Session->TestAccessAllowed(filename, true) == false)
       {
         string str ("IO Restrictions prohibit write access to '") ;
-        str += UCS2toASCIIString(filename);
+        str += UCS2toSysString(filename);
         str += "'";
         throw POV_EXCEPTION(kCannotOpenFileErr, str);
       }
-      shelloutProcessing->SetOutputFile(UCS2toASCIIString(filename));
+      shelloutProcessing->SetOutputFile(UCS2toSysString(filename));
       m_Session->AdviseOutputFilename (filename);
     }
   }
@@ -802,6 +805,10 @@ bool VirtualFrontEnd::Stop()
           state = kStopping;
         }
         result = true;
+        break;
+
+      default:
+        // Do nothing special.
         break;
     }
   }
@@ -931,7 +938,7 @@ State VirtualFrontEnd::Process()
       try
       {
         m_Session->SetSucceeded (false);
-        if (animationProcessing != NULL)
+        if (animationProcessing != nullptr)
         {
           shelloutProcessing->SetFrameClock(animationProcessing->GetNominalFrameNumber(), animationProcessing->GetClockValue());
           if (shelloutProcessing->SkipNextFrame() == false)
@@ -950,11 +957,11 @@ State VirtualFrontEnd::Process()
               if (m_Session->TestAccessAllowed(filename, true) == false)
               {
                 string str ("IO Restrictions prohibit write access to '");
-                str += UCS2toASCIIString(filename);
+                str += UCS2toSysString(filename);
                 str += "'";
                 throw POV_EXCEPTION(kCannotOpenFileErr, str);
               }
-              shelloutProcessing->SetOutputFile(UCS2toASCIIString(filename));
+              shelloutProcessing->SetOutputFile(UCS2toSysString(filename));
               m_Session->AdviseOutputFilename (filename);
             }
             m_Session->AppendAnimationStatus (frameId, frame, animationProcessing->GetTotalFramesToRender(), filename);
@@ -1018,7 +1025,7 @@ State VirtualFrontEnd::Process()
         string str(shelloutProcessing->GetSkipMessage());
         m_Session->AppendStatusMessage (str) ;
         m_Session->AppendStreamMessage (vfeSession::mInformation, str.c_str()) ;
-        if ((animationProcessing != NULL) && (animationProcessing->MoreFrames() == true))
+        if ((animationProcessing != nullptr) && (animationProcessing->MoreFrames() == true))
         {
           animationProcessing->ComputeNextFrame();
           m_Session->SetPixelsRendered(0, m_Session->GetTotalPixels());
@@ -1092,7 +1099,7 @@ State VirtualFrontEnd::Process()
             // case.
             return state;
           }
-          try { viewId = renderFrontend.CreateView(sceneId, options, imageProcessing, boost::bind(&vfe::VirtualFrontEnd::CreateDisplay, this, _1, _2, _3)); }
+          try { viewId = renderFrontend.CreateView(sceneId, options, imageProcessing, boost::bind(&vfe::VirtualFrontEnd::CreateDisplay, this, _1, _2)); }
           catch(pov_base::Exception& e)
           {
             m_Session->SetFailed();
@@ -1120,7 +1127,7 @@ State VirtualFrontEnd::Process()
               try { renderFrontend.CloseScene(sceneId); }
               catch (pov_base::Exception&) { /* Ignore any error here! */ }
 
-              if ((animationProcessing != NULL) && (animationProcessing->MoreFrames() == true))
+              if ((animationProcessing != nullptr) && (animationProcessing->MoreFrames() == true))
               {
                 animationProcessing->ComputeNextFrame();
                 m_Session->SetPixelsRendered(0, m_Session->GetTotalPixels());
@@ -1141,16 +1148,22 @@ State VirtualFrontEnd::Process()
           }
 
           // now we display the render window, if enabled
-          shared_ptr<Display> display(GetDisplay());
-          if (display != NULL)
           {
-            vfeDisplay *disp = dynamic_cast<vfeDisplay *>(display.get());
-            if (disp != NULL)
-              disp->Show () ;
+            shared_ptr<Display> display(GetDisplay());
+            if (display != nullptr)
+            {
+              vfeDisplay *disp = dynamic_cast<vfeDisplay *>(display.get());
+              if (disp != nullptr)
+                disp->Show () ;
+            }
           }
           return state = kRendering;
+
+        default:
+          // Do nothing special.
+          return state;
       }
-      return kParsing;
+      POV_ASSERT(false); // All cases of the preceding switch should return.
 
     case kRendering:
     case kPausedRendering:
@@ -1174,7 +1187,7 @@ State VirtualFrontEnd::Process()
           }
           try
           {
-            if (animationProcessing != NULL)
+            if (animationProcessing != nullptr)
             {
               if (m_Session->OutputToFileSet())
                 m_Session->AdviseOutputFilename (imageProcessing->WriteImage(options, animationProcessing->GetNominalFrameNumber(), animationProcessing->GetFrameNumberDigits()));
@@ -1223,7 +1236,7 @@ State VirtualFrontEnd::Process()
     case kPostFrameShellout:
       if (shelloutProcessing->ShelloutRunning() || HandleShelloutCancel())
         return state;
-      if ((animationProcessing == NULL) || animationProcessing->MoreFrames() == false)
+      if ((animationProcessing == nullptr) || animationProcessing->MoreFrames() == false)
       {
         m_Session->SetSucceeded (true);
         if (m_PauseRequested)
@@ -1326,7 +1339,11 @@ State VirtualFrontEnd::Process()
 
     case kDone:
       return state = kReady;
+
+    default:
+      return state;
   }
+  POV_ASSERT(false); // All cases of the preceding switch should return.
 
   return state;
 }
@@ -1383,7 +1400,7 @@ bool VirtualFrontEnd::Paused (void)
 
 int Allow_File_Write (const UCS2 *Filename, const unsigned int FileType)
 {
-  if (strcmp(UCS2toASCIIString(Filename).c_str(), "stdout") == 0 || strcmp(UCS2toASCIIString(Filename).c_str(), "stderr") == 0)
+  if (strcmp(UCS2toSysString(Filename).c_str(), "stdout") == 0 || strcmp(UCS2toSysString(Filename).c_str(), "stderr") == 0)
     return true;
   return (vfeSession::GetSessionFromThreadID()->TestAccessAllowed(Filename, true));
 }
@@ -1395,13 +1412,8 @@ int Allow_File_Read (const UCS2 *Filename, const unsigned int FileType)
 
 FILE *vfeFOpen (const UCS2String& name, const char *mode)
 {
-  return (fopen (UCS2toASCIIString (name).c_str(), mode)) ;
-}
-
-bool vfeRemove(const UCS2String& Filename)
-{
-  return (POV_DELETE_FILE (UCS2toASCIIString (Filename).c_str()) == 0);
+  return (fopen (UCS2toSysString (name).c_str(), mode)) ;
 }
 
 }
-
+// end of namespace vfe

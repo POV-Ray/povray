@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Scene Description Language</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov155.htm">Anti-Aliasing Options</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov157.htm">Language Basics</A>
+</P>
+<HR>
+<BR>
+<H1><A NAME="_Ref413248430"><A NAME="_Ref413248456"><A NAME="_Ref413502655"><A NAME="_Toc414198990"><A NAME="_Toc429993499"></A></A></A></A></A></A>Scene Description Language</A></A></A></H1>
+<P>The reference section describes the POV-Ray <I>scene description language</I>.  It is supposed to be used as a reference for looking up things. It does not contain detailed explanations on how scenes are written or how POV-Ray is used. It just explains all features, their syntax, applications, limits, drawbacks, etc.</P>
+<P>The scene description language allows you to describe the world in a readable and convenient way. Files are created in plain ASCII text using an editor of your choice. The input file name is specified using the <b><code>Input_File_Name</code></b>=<I>file </I>option or <b><code>+I</code></b><I>file</I> switch. By default the files have the extension <CODE>.pov</CODE>. POV-Ray reads the file, processes it by creating an internal model of the scene and then renders the scene.</P>
+<P>The overall syntax of a scene is shown below.  See "<A HREF="pov6.htm#_Ref428631813">Notation and Basic Assumptions</A>" for more information on syntax notation.</P>
+<I><DL>
+<DT>SCENE:</DT>
+<DD>SCENE_ITEM...</DD>
+<DT>SCENE_ITEM:</DT>
+<DD>LANGUAGE_DIRECTIVES&#9;&#9;|</DD>
+</I><b><code><DD>camera { </code></b><I>CAMERA_ITEMS...</I><b><code> }</code></b>&#9;|</DD>
+<I><DD>OBJECTS</I>&#9;&#9;&#9;&#9;|</DD>
+<I><DD>ATMOSPHERIC_EFFECTS</I>&#9;&#9;|</DD>
+<b><code><DD>global_settings {</code> </B><I>GLOBAL_ITEMS</I><b><code> }</DD>
+</DL>
+</code></b><P>In plain English, this means that a scene contains one or more scene items and that a scene item may be any of the five items listed below it.  The items may appear in any order.  None is a required item.  In addition to the syntax depicted above, a <I>LANGUAGE_DIRECTIVE</I> may also appear anywhere embedded in other statements between any two tokens.  There are some restrictions on nesting directives also.</P>
+<P>For details on those five items see section "<A HREF="pov187.htm#_Ref412708721">Language Directives</A>", section "<A HREF="pov236.htm#_Ref412708763">Objects</A>", section "<A HREF="pov224.htm#_Ref412708795">Camera</A>", section "<A HREF="pov367.htm#_Ref412709003">Atmospheric Effects</A>" and section "<A HREF="pov373.htm#_Ref412709041">Global Settings</A>" for details.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov155.htm">Anti-Aliasing Options</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov157.htm">Language Basics</A>
+</P>
+</BODY>
+</HTML>
+

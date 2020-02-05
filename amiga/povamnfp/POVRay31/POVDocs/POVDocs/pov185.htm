@@ -1,0 +1,53 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Declaring Arrays</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov184.htm">Array Identifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov186.htm">Array Initalizers</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Ref413068936"><A NAME="_Toc414199018"><A NAME="_Toc429993528">Declaring Arrays</A></A></A></H4>
+<P>The syntax for declaring an array is as follows:</P>
+<I><DL>
+<DT>STRING_DECLARATION:</DT>
+</I><b><code><DD>#declare </code></b><I>IDENTIFIER </I><b><code>=</code></b> <b><code>array[</code></b><I> INT </I><b><code>]</code></b><I>[ </I><b><code>[</code></b><I> INT </I><b><code>]</code></b><I> ]...[ARRAY_INITIALIZER]</I><b><code>&#9;</code></b>|</DD>
+<b><code><DD>#local </code></b><I>IDENTIFIER </I><b><code>=</code></b> <b><code>array[</code></b><I> INT </I><b><code>]</code></b><I>[ </I><b><code>[</code></b><I> INT </I><b><code>]</code></b><I> ]...[ARRAY_INITIALIZER]</DD>
+<DT>ARRAY_INITIALIZER:</DT>
+</I><b><code><DD>{</code></b><I>ARRAY_ITEM</I><b><code>,</code></b> <I>[ARRAY_ITEM</I><b><code>,</code></b><I> ]...</I> <b><code>}</DD>
+</code></b><I><DT>ARRAY_ITEM:</DT>
+<DD>RVALUE&#9;</I>&#9;&#9;|</DD>
+<I><DD>ARRAY_INITIALIZER</DD>
+</DL>
+</I><P>Where IDENTIFIER is the name of the identifier up to 40 characters long and INT is a valid float expression which is internally truncated to an integer which specifies the size of the array. The optional <I>ARRAY_INITIALIZER </I>is discussed in the next section "<A HREF="pov186.htm#_Ref413231149">Array Initalizers</A>".  Here is an example of a one-dimensional, uninitalized array.</P>
+<PRE> #declare MyArray = array[10]</PRE>
+<P>This declares an uninitalized array of ten elements. The elements are referenced as <b><code>MyArray[0]</code></b> through <b><code>MyArray[9]</code></b>. As yet, the type of the elements are undetermined. Once you have initialized any element of the array, all other elements can only be defined as that type. An attempt to reference an uninitalized element results in an error. For example:</P>
+<PRE> #declare MyArray = array[10];
+ #declare MyArray[5] = pigment{White}  //all other elements must be
+                     //pigments too.
+ #declare MyArray[2] = normal{bumps 0.2} //generates an error
+ #declare Thing = MyArray[4] //error: uninitalized array element</PRE>
+<P>Multi-dimensional arrays up to five dimensions may be declared. For example:</P>
+<PRE> #declare MyGrid = array[4][5]</PRE>
+<P>declares a 20 element array of 4 rows and 5 columns. Elements are referenced from <b><code>MyGrid[0][0]</code></b> to <b><code>MyGrid[3][4]</code></b>. Although it is permissible to reference an entire array as a whole, you may not reference just one dimension of a multi-dimensional array. For example:</P>
+<PRE> #declare MyArray = array[10]
+ #declare MyGrid = array[4][5]
+ #declare YourArray = MyArray  //this is ok
+ #declare YourGrid = MyGrid   //so is this
+ #declare OneRow  = MyGrid[2] //this is illegal</PRE>
+<P>Large uninitalized arrays do not take much memory. Internally they are arrays of pointers so they probably use just 4 bytes per element. Once initialized with values, they consume memory depending on what you put in them.</P>
+<P>The rules for local vs. global arrays are the same as any other identifier. Note that this applies to the entire array. You cannot mix local and global elements in the same array.  See "<A HREF="pov191.htm#_Ref412711267">#declare vs. #local</A>" for information on identifier scope.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov184.htm">Array Identifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov186.htm">Array Initalizers</A>
+</P>
+</BODY>
+</HTML>
+

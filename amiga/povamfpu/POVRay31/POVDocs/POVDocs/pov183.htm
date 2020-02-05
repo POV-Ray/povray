@@ -1,0 +1,46 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - String Functions</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov182.htm">String Identifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov184.htm">Array Identifiers</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc411405174"><A NAME="_Toc411405450"><A NAME="_Ref413065106"><A NAME="_Ref413150500"><A NAME="_Ref413244925"><A NAME="_Toc414199016"><A NAME="_Toc429993526">String Functions</A></A></A></A></A></H4>
+<P>POV-Ray defines a variety of built-in functions for manipulating floats, vectors and strings. Function calls consist of a keyword which specifies the name of the function followed by a parameter list enclosed in parentheses. Parameters are separated by commas. For example:</P>
+<PRE> keyword(param1,param2)</PRE>
+<P>The following are the functions which return string values. They take one or more float, integer, vector, or string parameters. Assume that <b><code>A</code></b> is any valid expression that evaluates to a float; <b><code>B</code></b>, <b><code>L</code></b>, and <b><code>P</code></b> are floats which are truncated to integers internally, <b><code>S</code></b>, <b><code>S1</code></b>, <b><code>S2</code></b> etc are strings.</P>
+<p><b><code>chr(B)&#9;</code></b>Character whose ASCII value is <b><code>B</code></b>. Returns a single character string. The ASCII value of the character is specified by an integer <b><code>B</code></b> which must be in the range 0 to 255. For example <b><code>chr(70)</code></b> is the string "F". When rendering text objects you should be aware that the characters rendered for values of <I>B &gt; 127</I> are dependent on the (TTF) font being used. Many (TTF) fonts use the Latin-1 (ISO 8859-1) character set, but not all do.</P>
+<p><b><code>concat(S1,S2,...)&#9;</code></b>Concatenate strings <b><code>S1</code></b> and <b><code>S2</code></b>. Returns a string that is the concatenation of all parameter strings. Must have at least 2 parameters but may have more. For example:</P>
+<PRE> concat("Value is ", str(A,3,1), " inches")</PRE>
+<P>If the float value <b><code>A</code></b> was <b><code>12.34321</code></b> the result is <b><code>"Value is 12.3 inches"</code></b> which is a string.</P>
+<p><b><code>str(A,L,P):</code></b> Convert float A to a formatted string. Returns a formatted string representation of float value <b><code>A</code></b>. The integer parameter <b><code>L</code></b> specifies the minimum length of the string and the type of left padding used if the string's representation is shorter than the minimum. If <b><code>L</code></b> is positive then the padding is with blanks. If <b><code>L</code></b> is negative then the padding is with zeros. The overall minimum length of the formatted string is <I>abs(L)</I>. If the string needs to be longer, it will be made as long as necessary to represent the value.</P>
+<P>The integer parameter <b><code>P</code></b> specifies the number of digits after the decimal point. If <b><code>P</code></b> is negative then a compiler-specific default precision is use. Here are some examples:</P>
+<P> str(123.456,0,3)  "123.456"</P>
+<P> str(123.456,4,3)  "123.456"</P>
+<P> str(123.456,9,3)  "  123.456"</P>
+<P> str(123.456,-9,3) "00123.456"</P>
+<P> str(123.456,0,2)  "123.46"</P>
+<P> str(123.456,0,0)  "123"</P>
+<P> str(123.456,5,0)  "  123"</P>
+<P> str(123.000,7,2)  "  123.00"</P>
+<P> str(123.456,0,-1) "123.456000" (platform specific)</P>
+<p><b><code>strlwr(S)&#9;</code></b>Lower case of <b><code>S</code></b>. Returns a new string in which all upper case letters in the string S1 are converted to lower case. The original string is not affected. For example <b><code>strlwr("Hello There!")</code></b> results in "hello there!".</P>
+<p><b><code>substr(S,P,L)&#9;</code></b>Sub-string from <b><code>S</code></b>. Returns a string that is a subset of the characters in parameter <b><code>S</code></b> starting at the position specified by the integer value <b><code>P</code></b> for a length specified by the integer value <b><code>L</code></b>. For example <b><code>substr("ABCDEFGHI",4,2)</code></b> evaluates to the string "EF". If <I>P+L&gt;strlen(S) </I>an error occurs.</P>
+<p><b><code>strupr(S)&#9;</code></b>Upper case of <b><code>S</code></b>. Returns a new string in which all lower case letters in the string <b><code>S</code></b> are converted to upper case. The original string is not affected. For example <b><code>strupr("Hello There!")</code></b> results in "HELLO THERE!".</P>
+<P>See section "<A HREF="pov166.htm#_Ref413163935">Float Functions</A>" for other functions which are somewhat string-related but which return floats.  In addition to the above built-in functions, you may also define your own functions using the new <b><code>#macro</code></b> directive. See the section "<A HREF="pov209.htm#_Ref413063326">User Defined Macros</A>" for more details.</P>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov182.htm">String Identifiers</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov184.htm">Array Identifiers</A>
+</P>
+</BODY>
+</HTML>
+

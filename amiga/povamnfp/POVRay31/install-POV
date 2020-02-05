@@ -1,0 +1,712 @@
+; Install-Script for POV-Ray(tm) V3.1a
+
+
+(welcome    "Welcome to Amiga POV-Ray(tm) v3.1a installation.\n"
+            "You will need MUI(tm) by Stefan Stuntz in order\n"
+            "to use the provided GUI.  The GUI and the docs\n"
+            "directory can be installed in a different place\n"
+            "than the rest of the package.\n"
+            "Full Installation requires about 6 MB\n")
+
+(set ChooseDir "Please choose a directory to install in.  A subdir named \"POVRAY31\" will be created. (If you have a previously installed POV-Ray, it will NOT be deleted!)")
+(set makingdir "Creating directory ")
+(set copypov "Copying POV-Ray, #includes, sample scenefiles, and supporting files to ")
+(set copypov1 ".  This will take a few minutes.  If you have chosen to install a scenefile icon for the sample scenes, that will take an additional few minutes.  No further interaction will be needed until installation is complete.  (Go have a snack)")
+(set WhereDocs "Where do you want POV-Reference dir installed? (HTML files)")
+(set copydocs "Copying Reference Guide (HTML) and sample scenes to ")
+(set AskGUI "Install POV-GUI?")
+(set WhereGUI "Where do you want POV-GUI installed?")
+(set envnote1 "Creating default ENV: files.  GUI will use t: for settings file, POV-Ray will expect the 'povray.ini' default settings file to be in the main POVRay31 directory.\nYou can change these later by editing the two files, or by using the SetEnv command, and copying the env:pov31 directory to envarc:")
+(set muinote "POV-GUI needs MUI 3.3 or greater, which I can't find.  Still install GUI?")
+(set affirm "Yes")
+(set deny "No")
+(set notgui "POV-GUI not installed.")
+(set envnote2 "Creating ENV:POV31 and ENVARC:POV31 dirs. Don't Change Name!!")
+(set guinote "Installing POV-GUI.")
+(set closing "I recommend that you read AmigaPOV.html now.")
+(set askicons "What Scenefile Icons would you like to install?")
+(set iconogr "Iconographics")
+(set newicon "NewIcons style")
+(set simpleicon "Simple 4-color")
+(set noicons "None")
+
+(set muiver (getversion "MUI:mui"))
+(set muiver (/ muiver 65536))
+
+
+; If MUI is not available, or is too old, remind that GUI needs MUI >v3.2
+
+(if (< muiver 14)
+    (if
+        (NOT
+            (askbool
+                (prompt muinote)
+                (help @askchoice-help)
+                (choices affirm deny)
+                (default 1)
+            )
+        )
+        (set nogui 1)
+    )
+)
+
+
+; If the povray3: assign exists, use it's parent as the default target
+
+( set @p3dir (expandpath (getassign "povray3")))
+
+(if (> (exists "povray3:" (noreq)) 0)
+     (set @default-dest (cat (getdevice @p3dir) ":"))
+)
+
+(set @default-dest
+    (askdir
+        (prompt ChooseDir)
+        (help @askdir-help)
+        (default @default-dest)
+    )
+)
+
+(set maindir @default-dest)
+
+(set @default-dest
+    (tackon @default-dest "POVRay31")
+)
+
+
+; For 'Novice' user level, we have to set defaults for Icons, and
+; for GUI and Docs placement (in the main directory)
+
+(if (= @user-level 0)
+     (set icontype 0)
+     (set icontype
+          (askchoice
+               (prompt askicons)
+               (choices iconogr newicon simpleicon noicons)
+               (default 0)
+               (help askchoice-help)
+          )
+     )
+)
+
+(if (= @user-level 0)
+     (
+          (set installgui 1)
+          (set @guidir @default-dest)
+          (set @docdir @default-dest)
+     )
+     (
+          (set installgui 0)
+
+          (makedir @default-dest
+              (prompt makingdir @default-dest)
+              (help @makedir-help)
+              (infos)
+              (confirm)
+          )
+
+          (if (askbool
+                  (prompt AskGUI)
+                  (help @askchoice-help)
+                  (choices affirm deny)
+                  (default 1)
+               )
+               ( set installgui 1)
+          )
+
+          (if (= installgui 1)
+               (set @guidir
+                   (askdir
+                       (prompt WhereGUI @guidir)
+                       (help @askdir-help)
+                       (default @default-dest)
+                       (newpath)
+                   )
+               )
+          )
+
+          (set @docdir
+              (askdir
+                  (prompt WhereDocs @docdir)
+                  (help @askdir-help)
+                  (default @default-dest)
+                  (newpath)
+              )
+          )
+     )
+)
+
+(set envarcdir "ENVARC:POV31")
+(set envdir "ENV:POV31")
+
+(startup "POV-RayV3.1" 
+     (prompt "an assignment for povray31: will be added to user-startup")
+     (command "assign povray31: "default-dest)
+     (help @startup-help)
+)
+
+(complete 0)
+
+     (message envnote2)
+
+
+; Only Expert level user will be informed of the ENV: work
+
+(if (= @user-level 1)
+     (
+          (makedir envarcdir)
+          (makedir envdir)
+     )
+     (
+          (makedir envarcdir
+              (prompt envnote2)
+              (help @makedir-help)
+          )
+
+          (makedir envdir
+              (prompt envnote2)
+              (help @makedir-help)
+          )
+     )
+)
+
+(copyfiles
+    (source "/")
+    (dest maindir)
+    (pattern "POVRay31.info")
+)
+
+(if (= @user-level 2)
+     (message envnote1)
+)
+
+    (delete (tackon envdir "POVINI"))
+    (delete (tackon envarcdir "POVINI"))
+    (delete (tackon envdir "POVGUIINI"))
+    (delete (tackon envarcdir "POVGUIINI"))
+
+    (textfile (dest (tackon envdir "POVINI"))
+        (append (tackon @default-dest "POVRAY.INI"))
+    )
+
+    (textfile (dest (tackon envarcdir "POVINI"))
+        (append (tackon @default-dest "POVRAY.INI"))
+    )
+
+    (textfile (dest (tackon envdir "POVGUIINI"))
+        (append "T:povray.ini")
+    )
+
+    (textfile (dest (tackon envarcdir "POVGUIINI"))
+        (append "T:povray.ini")
+    )
+
+     (message (cat copypov @default-dest copypov1))
+
+(copyfiles
+    (source "")
+    (dest @default-dest)
+    (pattern "pov-ray31")
+    (nogauge)
+    (infos)
+)
+(copyfiles
+    (source "")
+    (dest @default-dest)
+    (pattern "povray31")
+    (nogauge)
+    (infos)
+)
+(copyfiles
+    (source "")
+    (dest @default-dest)
+    (pattern "povray.ini")
+    (nogauge)
+    (infos)
+)
+(copyfiles
+    (source "")
+    (dest @default-dest)
+    (pattern "pov-startup")
+    (nogauge)
+    (infos)
+)
+
+(complete 5)
+
+(copyfiles
+    (source "")
+    (dest @default-dest)
+    (pattern "include")
+    (nogauge)
+    (infos)
+)
+
+(complete 10)
+
+(copyfiles
+    (source "")
+    (dest @default-dest)
+    (pattern "scenes")
+    (nogauge)
+    (infos)
+)
+
+
+; Why this check?  Well, the Icon installation takes about half of the
+; total installation time, so if it's disabled, then we're farther along
+
+(if (< icontype 3)
+     (complete 15)
+     (complete 30)
+)
+
+(copyfiles
+    (source "")
+    (dest @default-dest)
+    (pattern "scripts")
+    (nogauge)
+    (infos)
+)
+
+(copyfiles
+    (source "")
+    (dest @default-dest)
+    (pattern "s")
+    (nogauge)
+    (infos)
+)
+
+
+; This is the second-longest step, copying the POVDocs directory.
+; Unfortunately, unless we break it up into several illogically
+; divided copyfiles commands, it is all one 'indivisible' step, so
+; the % complete cannot be updated during this step
+
+(copyfiles
+    (prompt copydocs @docdir)
+    (help @copyfiles-help)
+    (source "")
+    (dest @docdir)
+    (pattern "POVD#?")
+    (nogauge)
+    (infos)
+)
+
+(if (< icontype 3) 
+     (complete 60)
+     (complete 95)
+)
+
+(if (= installgui 1)
+    (
+        (copyfiles
+            (prompt guinote)
+            (help @copyfiles-help)
+            (source "")
+            (dest @guidir)
+            (pattern "pov-gui")
+            (infos)
+        )
+    )
+)
+
+
+; If icon copying is disabled, then we are done.  Otherwise, we still
+; have half the installation to go.  This half, however, is already
+; divided into several small steps, so we can get a reasonable good
+; progress indication.  This could be handled more elegantly, but
+; not as effectively.  If we have three nested 'foreach' loops,
+; recursing down the directory tree when subdirs are encountered,
+; this part could be about 30 lines, but progress indication would
+; be difficult at best.
+
+(if (< icontype 3)
+     (
+          (set icon (select icontype "icons/igfx.pov.info" "icons/newicon.pov.info" "icons/simple.pov.info" ))
+
+          (foreach ( "scenes/camera") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/camera"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/incdemo/glasses") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/incdemo/glasses"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/incdemo/metals") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/incdemo/metals"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/incdemo/stones") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/incdemo/stones"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/incdemo/woods") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/incdemo/woods"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+(complete 65)
+          (foreach ("scenes/textures/pigments") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/textures/pigments"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/textures/pigments/skies") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/textures/pigments/skies"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/textures/surfaces") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/textures/surfaces"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/advanced/drums2") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/advanced/drums2"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/advanced/ionic5") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/advanced/ionic5"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/advanced/ntreal") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/advanced/ntreal"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+(complete 70)
+          (foreach ("scenes/advanced/fish13") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/advanced/fish13"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/advanced/piece2") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/advanced/piece2"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/advanced/piece3") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/advanced/piece3"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/advanced/teapot") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/advanced/teapot"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/objects") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/objects"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/objects/math") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/objects/math"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+(complete 75)
+          (foreach ("scenes/lights") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/lights"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/csg") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/csg"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/incdemo") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/incdemo"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/arrays") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/arrays"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/advanced") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/advanced"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/advanced/newltpot") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/advanced/newltpot"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+(complete 80)
+          (foreach ("scenes/fileio") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/fileio"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/interior") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/interior"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/interior/media") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/interior/media"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/macros") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/macros"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/radios") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/radios"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+(complete 85)
+          (foreach ("scenes/animate/vect1") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/animate/vect1"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/animate/slinky") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/animate/slinky"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/animate/quilted") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/animate/quilted"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/animate/l_o") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/animate/l_o"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/animate/float1") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/animate/float1"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+(complete 90)
+          (foreach ("scenes/animate/float2") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/animate/float2"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/animate/float3") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/animate/float3"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/animate/float4") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/animate/float4"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/animate/camera2") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/animate/camera2"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/animate/vect2") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/animate/vect2"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+(complete 95)
+          (foreach ("scenes/animate/life") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/animate/life"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/animate/ambient") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/animate/ambient"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/animate/boing") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/animate/boing"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/animate/diffuse") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/animate/diffuse"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/animate/pentmap") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/animate/pentmap"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/animate/raddem") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/animate/raddem"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/animate/reflect") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/animate/reflect"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+          (foreach ("scenes/animate/speclr") ("#?.pov")
+               (copyfiles
+                    (source icon)
+                    (dest (tackon @default-dest "scenes/animate/speclr"))
+                    (newname (cat @each-name ".info"))
+                    (nogauge)
+               )
+          )
+     )
+)
+
+
+; All Done!!
+
+(complete 100)
+
+(message closing)
+(exit)

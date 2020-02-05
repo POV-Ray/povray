@@ -1,0 +1,37 @@
+<HTML>
+<HEAD>
+<TITLE>POV-Ray 3.1 Documentation - Scale</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFCC66" TEXT="#000000" LINK="#0000FF" VLINK="#000080" ALINK="#FF0000">
+<P ALIGN="CENTER">
+Previous:<A HREF="pov217.htm">Translate</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov219.htm">Rotate</A>
+</P>
+<HR>
+<BR>
+<H4><A NAME="_Toc414199051"><A NAME="_Toc429993561">Scale</A></A></H4>
+<P>You may change the size of an object or texture pattern by adding a <b><code>scale</code></b> modifier. It consists of the keyword <b><code>scale</code></b> followed by a vector expression. The three terms of the vector specify the amount of scaling in each of the x, y and z directions.</P>
+<P>Uneven scaling is used to <I>stretch </I>or <I>squish </I>an element. Values larger than one stretch the element on that axis while values smaller than one are used to squish it. Scale is relative to the current element size. If the element has been previously re-sized using scale then scale will size relative to the new size. Multiple scale values may used.</P>
+<P>For example</P>
+<PRE> sphere { &lt;0,0,0&gt;, 1
+  scale &lt;2,1,0.5&gt;
+ }</PRE>
+<P>will stretch and smash the sphere into an ellipsoid shape that is twice the original size along the x-direction, remains the same size in the y-direction and is half the original size in the z-direction.</P>
+<P>If a lone float expression is specified it is promoted to a three component vector whose terms are all the same. Thus the item is uniformly scaled by the same amount in all directions. For example:</P>
+<PRE> object {
+  MyObject
+  scale 5 // Evaluates as &lt;5,5,5&gt; so uniformly scale
+      // by 5 in every direction.
+ }</PRE>
+
+<BR>
+<HR>
+<P ALIGN="CENTER">
+Previous:<A HREF="pov217.htm">Translate</A>&nbsp;&nbsp;
+<A HREF="povuser.htm">Main Index</A>&nbsp;&nbsp;
+Next:<A HREF="pov219.htm">Rotate</A>
+</P>
+</BODY>
+</HTML>
+
