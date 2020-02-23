@@ -37,7 +37,7 @@
 
 // C++ variants of C standard header files
 #include <map>
-#include <uchar.h>
+#include <cuchar>
 
 #include <sys/types.h>
 #include <sys/stat.h>
