@@ -1387,11 +1387,14 @@ ImageData *Copy_Image(ImageData *Old)
 
 void Destroy_Image(ImageData *image)
 {
-    if ((image == nullptr) || (--(image->References) > 0))
-         return;
-    
-    image->data = nullptr; // Prevent the image from being deleted. Images are now cached.
-    delete image;
+    return;
+
+    // Images are now cached
+
+    // if ((image == nullptr) || (--(image->References) > 0))
+    //     return;
+    // 
+    // delete image;
 }
 
 void Remove_Cached_Image(Image* image) {
