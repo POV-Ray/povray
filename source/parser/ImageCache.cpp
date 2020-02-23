@@ -37,6 +37,7 @@
 
 // C++ variants of C standard header files
 #include <map>
+#include <xlocbuf>
 #include <cuchar>
 
 #include <sys/types.h>
