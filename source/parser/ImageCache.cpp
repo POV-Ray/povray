@@ -37,6 +37,8 @@
 
 // C++ variants of C standard header files
 #include <map>
+#include <uchar.h>
+#include <cstring>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -57,7 +59,6 @@
 #include "base/textstream_fwd.h"
 #include "base/textstreambuffer.h"
 #include "base/image/image_fwd.h"
-#include "base/stringutilities.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -67,7 +68,9 @@ namespace pov_image_cache
 {
 	using namespace pov_base;
 	using namespace std;
-	//static inline char* StrToChar(const std::string str);
+	static inline std::string U16toString(const std::u16string& wstr);
+	static inline char* StrToChar(const std::string str);
+	static inline char* U16toChar(const std::u16string& wstr);
 
 	struct ImageCacheEntry final
 	{
@@ -80,20 +83,22 @@ namespace pov_image_cache
 	// Gets the last modified time from the filesystem
 	__time64_t GetLastModifiedTime(const std::string filename)
 	{
-		const char* cstrFilename = filename.c_str();
+		char* cstrFilename = StrToChar(filename);
 
 		struct stat result;
 		if (stat(cstrFilename, &result) == 0)
 		{
+			delete cstrFilename;
 			return result.st_mtime;
 		}
+		delete cstrFilename;
 		return 0;
 	}
 
 	// Try to get the image from the cache
 	Image* GetCachedImage(const UCS2* filename)
 	{
-		std::string lookupFilename = pov_base::UCS2toSysString(filename);
+		std::string lookupFilename = U16toString(filename);
 		
 		std::map<std::string, ImageCacheEntry>::iterator idx = Cache.find(lookupFilename);
 		if (idx != Cache.end()) 
@@ -113,7 +118,7 @@ namespace pov_image_cache
 	// Store a new image into cache
 	void StoreImageInCache(const UCS2* filename, Image* image)
 	{
-		std::string lookupFilename = pov_base::UCS2toSysString(filename);
+		std::string lookupFilename = U16toString(filename);
 		__time64_t lastModified = GetLastModifiedTime(lookupFilename);
 		Cache[lookupFilename] = ImageCacheEntry{ image = image, lastModified = lastModified };
 	}
@@ -131,4 +136,31 @@ namespace pov_image_cache
 			Cache.erase(it);
 		}
 	}
+
+	static inline std::string U16toString(const std::u16string& wstr) 
+	{
+		std::string str = "";
+		char cstr[3] = "\0";
+		mbstate_t mbs;
+		for (const auto& it : wstr) {
+			memset(&mbs, 0, sizeof(mbs));//set shift state to the initial state
+			memmove(cstr, "\0\0\0", 3);
+			c16rtomb(cstr, it, &mbs);
+			str.append(std::string(cstr));
+		}//for
+		return str;
+	}
+
+	static inline char* StrToChar(const std::string str) 
+	{
+		char* cstring = new char[str.length() + 1];
+		strcpy(cstring, str.c_str());
+		return cstring;
+	}
+
+	static inline char* U16toChar(const std::u16string& wstr) 
+	{
+		return StrToChar(U16toString(wstr));
+	}
+
 }
