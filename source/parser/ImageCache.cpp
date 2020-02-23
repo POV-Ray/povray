@@ -73,20 +73,20 @@ namespace pov_image_cache
 	struct ImageCacheEntry final
 	{
 		Image* image;
-		__time64_t lastModified;
+		long lastModified;
 	};
 
 	static std::map<std::string, ImageCacheEntry> Cache; // <- The actual cache
 
 	// Gets the last modified time from the filesystem
-	__time64_t GetLastModifiedTime(const std::string filename)
+	long GetLastModifiedTime(const std::string filename)
 	{
 		const char* cstrFilename = filename.c_str();
 
 		struct stat result;
 		if (stat(cstrFilename, &result) == 0)
 		{
-			return result.st_mtime;
+			return (long)result.st_mtime;
 		}
 		return 0;
 	}
@@ -99,12 +99,11 @@ namespace pov_image_cache
 		std::map<std::string, ImageCacheEntry>::iterator idx = Cache.find(lookupFilename);
 		if (idx != Cache.end()) 
 		{
-			__time64_t lastModified = GetLastModifiedTime(lookupFilename);
+			long lastModified = GetLastModifiedTime(lookupFilename);
 			if (lastModified == Cache[lookupFilename].lastModified) 
 				return idx->second.image; //Cache[lookupFilename].image;
 			
 			// Remove old image from cache and release memory so the newer version can be loaded
-			//delete idx->second.image;
 			pov::Remove_Cached_Image(idx->second.image);
 			Cache.erase(idx);
 		}
@@ -116,7 +115,7 @@ namespace pov_image_cache
 	void StoreImageInCache(const UCS2* filename, Image* image)
 	{
 		std::string lookupFilename = pov_base::UCS2toSysString(filename);
-		__time64_t lastModified = GetLastModifiedTime(lookupFilename);
+		long lastModified = GetLastModifiedTime(lookupFilename);
 		Cache[lookupFilename] = ImageCacheEntry{ image = image, lastModified = lastModified };
 	}
 
@@ -129,7 +128,6 @@ namespace pov_image_cache
 		// Iterate over the map using Iterator till end.
 		while (it != Cache.end())
 		{
-			//delete it->second.image;
 			pov::Remove_Cached_Image(it->second.image);
 			Cache.erase(it);
 		}
