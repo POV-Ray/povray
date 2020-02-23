@@ -1387,14 +1387,10 @@ ImageData *Copy_Image(ImageData *Old)
 
 void Destroy_Image(ImageData *image)
 {
-    return;
+    if ((image == nullptr) || (--(image->References) > 0))
+        return;
 
-    // Images are now cached
-
-    // if ((image == nullptr) || (--(image->References) > 0))
-    //     return;
-    // 
-    // delete image;
+    delete image;
 }
 
 ImageData::~ImageData()
