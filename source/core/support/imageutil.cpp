@@ -1397,6 +1397,11 @@ void Destroy_Image(ImageData *image)
     // delete image;
 }
 
+void Remove_Cached_Image(Image* image) {
+    delete image;
+}
+
+
 ImageData::~ImageData()
 {
 #ifdef POV_VIDCAP_IMPL

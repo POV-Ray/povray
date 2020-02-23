@@ -58,6 +58,7 @@
 #include "base/textstreambuffer.h"
 #include "base/image/image_fwd.h"
 #include "base/stringutilities.h"
+#include "core/support/imageutil.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -67,7 +68,7 @@ namespace pov_image_cache
 {
 	using namespace pov_base;
 	using namespace std;
-	//static inline char* StrToChar(const std::string str);
+	using namespace pov;
 
 	struct ImageCacheEntry final
 	{
@@ -103,7 +104,8 @@ namespace pov_image_cache
 				return idx->second.image; //Cache[lookupFilename].image;
 			
 			// Remove old image from cache and release memory so the newer version can be loaded
-			delete idx->second.image;
+			//delete idx->second.image;
+			pov::Remove_Cached_Image(idx->second.image);
 			Cache.erase(idx);
 		}
 
@@ -127,7 +129,8 @@ namespace pov_image_cache
 		// Iterate over the map using Iterator till end.
 		while (it != Cache.end())
 		{
-			delete it->second.image;
+			//delete it->second.image;
+			pov::Remove_Cached_Image(it->second.image);
 			Cache.erase(it);
 		}
 	}
