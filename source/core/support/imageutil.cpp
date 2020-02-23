@@ -1389,7 +1389,7 @@ void Destroy_Image(ImageData *image)
 {
     if ((image == nullptr) || (--(image->References) > 0))
         return;
-
+    
     delete image;
 }
 
