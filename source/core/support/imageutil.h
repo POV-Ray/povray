@@ -143,7 +143,6 @@ int map_pos(const Vector3d& EPoint, const ImageData* pImage, DBL *xcoor, DBL *yc
 ImageData *Copy_Image(ImageData *old);
 ImageData *Create_Image(void);
 void Destroy_Image(ImageData *image);
-void Remove_Cached_Image(Image* image);
 
 /// @}
 ///
