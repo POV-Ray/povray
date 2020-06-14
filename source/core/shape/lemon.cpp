@@ -895,7 +895,7 @@ void Lemon::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
 
 // UVMeshable part
 
-void Lemon::evalVertex( Vector3d& r, const DBL u, const DBL v )const
+void Lemon::evalVertex( Vector3d& r, const DBL u, const DBL v, TraceThreadData * )const
 {
   if (v<0.25)
   {
@@ -926,7 +926,7 @@ void Lemon::evalVertex( Vector3d& r, const DBL u, const DBL v )const
     MTransPoint( r, r, Trans );
   }
 }
-void Lemon::evalNormal( Vector3d& r, const DBL u, const DBL v )const
+void Lemon::evalNormal( Vector3d& r, const DBL u, const DBL v, TraceThreadData * )const
 {
   if (v<0.25)
   {

@@ -171,7 +171,7 @@ void Nurbs::computeCurveNormalizedDerivative( Vector3d& r, const int order, cons
   r = next - base;
   r.normalize();
 }
-void Nurbs::evalNormal( Vector3d& r, const DBL u, const DBL v )const
+void Nurbs::evalNormal( Vector3d& r, const DBL u, const DBL v, TraceThreadData * )const
 {
 // compute the normal : cross product of the 2 first derivatives
     Vector3d n1, n2, value;
@@ -228,7 +228,7 @@ void Nurbs::evalNormal( Vector3d& r, const DBL u, const DBL v )const
     value = cross( n1, n2 );
     MTransNormal( r, value, Trans );
 }
-void Nurbs::evalVertex( Vector3d& Real_Pt, const DBL u, const DBL v )const
+void Nurbs::evalVertex( Vector3d& Real_Pt, const DBL u, const DBL v, TraceThreadData * )const
 {
 // TODO optimise to not compute all the points of temp
     Vector3d Point;

@@ -292,7 +292,7 @@ void Parser::Parse_UV_Vertex(Vector3d& Res)
     if (( u< minvalue[U])||(v<minvalue[V])||(u>maxvalue[U])||(v>maxvalue[V]))
       Error("u, v must be in range");
 
-    uvm->evalVertex(Res, u,v);
+    uvm->evalVertex(Res, u,v, GetParserDataPtr() );
 }
 /*****************************************************************************
 *
@@ -346,7 +346,7 @@ void Parser::Parse_UV_Normal(Vector3d& Res)
     if (( u< minvalue[U])||(v<minvalue[V])||(u>maxvalue[U])||(v>maxvalue[V]))
       Error("u, v must be in range");
 
-    uvm->evalNormal( Res, u,v);
+    uvm->evalNormal( Res, u,v, GetParserDataPtr());
 }
 
 /*****************************************************************************

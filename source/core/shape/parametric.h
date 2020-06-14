@@ -55,6 +55,7 @@
 // POV-Ray header files (core module)
 #include "core/coretypes.h"
 #include "core/scene/object.h"
+#include "core/shape/uvmeshable.h"
 
 namespace pov
 {
@@ -90,7 +91,7 @@ struct PrecompParValues_Struct final
 };
 using PRECOMP_PAR_DATA = PrecompParValues_Struct; ///< @deprecated
 
-class Parametric final : public NonsolidObject
+class Parametric final : public NonsolidObject,  public UVMeshable
 {
     public:
 
@@ -117,6 +118,12 @@ class Parametric final : public NonsolidObject
         virtual void Compute_BBox() override;
 
         void Precompute_Parametric_Values(char flags, int depth, TraceThreadData *Thread);
+
+        virtual void evalVertex( Vector3d& r, const DBL u, const DBL v, TraceThreadData *Thread )const override;
+        virtual void evalNormal( Vector3d& r, const DBL u, const DBL v, TraceThreadData *Thread )const override;
+        virtual void minUV( Vector2d& r )const override;
+        virtual void maxUV( Vector2d& r )const override;
+
     protected:
         void Precomp_Par_Int(int depth, DBL umin, DBL vmin, DBL umax, DBL vmax, GenericScalarFunctionInstance aFn[3]);
         PRECOMP_PAR_DATA *Copy_PrecompParVal();

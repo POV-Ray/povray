@@ -1134,5 +1134,72 @@ void Parametric::Evaluate_Function_Interval_UV(GenericScalarFunctionInstance& fn
     /* f_min and f_max now contain the maximum interval. */
 }
 
+void Parametric::evalVertex( Vector3d& r, const DBL u, const DBL v, TraceThreadData *Thread  )const
+{
+  std::array<GenericScalarFunctionInstance,3> aFn = {
+        GenericScalarFunctionInstance(Function[0], Thread),
+        GenericScalarFunctionInstance(Function[1], Thread),
+        GenericScalarFunctionInstance(Function[2], Thread)
+    };
+
+  Vector2d uv_vect;
+  uv_vect[U] = u;
+  uv_vect[V] = v;
+
+  r[X]= aFn[X].Evaluate(uv_vect);
+  r[Y]= aFn[Y].Evaluate(uv_vect);
+  r[Z]= aFn[Z].Evaluate(uv_vect);
+
+  if (Trans != nullptr)
+  {
+    MTransPoint( r, r, Trans );
+  }
+  
+}
+void Parametric::evalNormal( Vector3d& r, const DBL u, const DBL v, TraceThreadData *Thread )const
+{
+  Vector3d RU, RV;
+  Vector2d uv_vect;
+
+  std::array<GenericScalarFunctionInstance,3> aFn = {
+    GenericScalarFunctionInstance(Function[0], Thread),
+    GenericScalarFunctionInstance(Function[1], Thread),
+    GenericScalarFunctionInstance(Function[2], Thread)
+  };
+
+  uv_vect[U] = u;
+  uv_vect[V] = v;
+  RU[X] = RV[X] = -aFn[X].Evaluate(uv_vect);
+  RU[Y] = RV[Y] = -aFn[Y].Evaluate(uv_vect);
+  RU[Z] = RV[Z] = -aFn[Z].Evaluate(uv_vect);
+
+  uv_vect[U] += accuracy;
+  RU[X] += aFn[X].Evaluate(uv_vect);
+  RU[Y] += aFn[Y].Evaluate(uv_vect);
+  RU[Z] += aFn[Z].Evaluate(uv_vect);
+
+  uv_vect[U] = u;
+  uv_vect[V] += accuracy;
+  RV[X] += aFn[X].Evaluate(uv_vect);
+  RV[Y] += aFn[Y].Evaluate(uv_vect);
+  RV[Z] += aFn[Z].Evaluate(uv_vect);
+
+  r = cross(RU, RV);
+  if (Trans != nullptr)
+    MTransNormal(r, r, Trans);
+  r.normalize();
+
+}
+void Parametric::minUV( Vector2d& r )const
+{
+  r[U] = umin;
+  r[V] = vmin;
+}
+void Parametric::maxUV( Vector2d& r )const
+{
+  r[U] = umax;
+  r[V] = vmax;
+}
+
 }
 // end of namespace pov

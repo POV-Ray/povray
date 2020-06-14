@@ -597,7 +597,7 @@ void Disc::Compute_BBox()
     Recompute_BBox(&BBox, Trans);
 }
 
-void Disc::evalVertex( Vector3d& r, const DBL u, const DBL v )const
+void Disc::evalVertex( Vector3d& r, const DBL u, const DBL v, TraceThreadData * )const
 {
   DBL iradius = sqrt(iradius2);
   DBL oradius = sqrt(oradius2);
@@ -609,7 +609,7 @@ void Disc::evalVertex( Vector3d& r, const DBL u, const DBL v )const
   }
 }
 
-void Disc::evalNormal( Vector3d& r, const DBL , const DBL )const
+void Disc::evalNormal( Vector3d& r, const DBL , const DBL, TraceThreadData * )const
 {
   r = normal;
   if (Trans)

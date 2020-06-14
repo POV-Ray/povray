@@ -994,7 +994,7 @@ bool RationalBezierPatch::Grid::bounds( Vector2d& l )const
     ret |= ( min > EPSILON ) || ( max < -EPSILON );
     return ret;
 }
-void RationalBezierPatch::evalNormal( Vector3d& Real_Normal, const DBL u, const DBL v )const
+void RationalBezierPatch::evalNormal( Vector3d& Real_Normal, const DBL u, const DBL v, TraceThreadData * )const
 {
     DBL cx2, cx3, cy2, cy3, cz2, cz3, w2, w3, notused;
     Vector3d Normal_Vector;
@@ -1015,7 +1015,7 @@ void RationalBezierPatch::evalNormal( Vector3d& Real_Normal, const DBL u, const 
     MTransNormal( Real_Normal, Normal_Vector, Trans );
     Real_Normal.normalize();
 }
-void RationalBezierPatch::evalVertex( Vector3d& Real_Pt, const DBL u, const DBL v )const
+void RationalBezierPatch::evalVertex( Vector3d& Real_Pt, const DBL u, const DBL v, TraceThreadData * )const
 {
     DBL cx, cy, cz, w1, notused;
     bool vFirst = weight.dimX() > weight.dimY();

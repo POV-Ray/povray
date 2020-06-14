@@ -95,8 +95,8 @@ class Torus : public ObjectBase, public UVMeshable
         virtual void Transform(const TRANSFORM *) override;
         virtual void Compute_BBox() override;
 
-        virtual void evalVertex( Vector3d& r, const DBL u, const DBL v )const override;
-        virtual void evalNormal( Vector3d& r, const DBL u, const DBL v )const override;
+        virtual void evalVertex( Vector3d& r, const DBL u, const DBL v, TraceThreadData *Thread )const override;
+        virtual void evalNormal( Vector3d& r, const DBL u, const DBL v, TraceThreadData *Thread )const override;
         virtual void minUV( Vector2d& r )const override;
         virtual void maxUV( Vector2d& r )const override;
 

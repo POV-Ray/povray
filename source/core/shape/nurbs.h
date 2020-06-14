@@ -87,8 +87,8 @@ private:
     int whichInterval( DBL x, size_t order, const std::vector< DBL > & knots)const;
     void computeCurveNormalizedDerivative( Vector3d& r, const int order, const DBL u, const std::vector< DBL > &knot, const std::vector< Point4D> & points )const;
 public:
-    virtual void evalVertex( Vector3d& r, const DBL u, const DBL v )const override;
-    virtual void evalNormal( Vector3d& r, const DBL u, const DBL v )const override;
+    virtual void evalVertex( Vector3d& r, const DBL u, const DBL v, TraceThreadData *Thread )const override;
+    virtual void evalNormal( Vector3d& r, const DBL u, const DBL v, TraceThreadData *Thread )const override;
     virtual void minUV( Vector2d& r )const override;
     virtual void maxUV( Vector2d& r )const override;
     virtual ~Nurbs();

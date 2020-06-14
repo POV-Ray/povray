@@ -49,15 +49,17 @@ class UVMeshable
          * \param[out] r computed position
          * \param[in] u value of u
          * \param[in] v value of v
+         * \param[in] Thread pointer to parser thread data
          */
-        virtual void evalVertex( Vector3d& r, const DBL u, const DBL v )const=0;
+        virtual void evalVertex( Vector3d& r, const DBL u, const DBL v, TraceThreadData * Thread )const=0;
         /**
          * get normal for u,v values
          * \param[out] r computed normal
          * \param[in] u value of u
          * \param[in] v value of v
+         * \param[in] Thread pointer to parser thread data
          */
-        virtual void evalNormal( Vector3d& r, const DBL u, const DBL v )const=0;
+        virtual void evalNormal( Vector3d& r, const DBL u, const DBL v, TraceThreadData * Thread )const=0;
         /**
          * retrieve the minimal values for u,v
          * \param[out] r retrieved minimal values

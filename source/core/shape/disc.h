@@ -99,8 +99,8 @@ class Disc final : public ObjectBase, public UVMeshable
 
         void Compute_Disc();
 
-        virtual void evalVertex( Vector3d& r, const DBL u, const DBL v )const override;
-        virtual void evalNormal( Vector3d& r, const DBL u, const DBL v )const override;
+        virtual void evalVertex( Vector3d& r, const DBL u, const DBL v, TraceThreadData *Thread )const override;
+        virtual void evalNormal( Vector3d& r, const DBL u, const DBL v, TraceThreadData *Thread )const override;
         virtual void minUV( Vector2d& r )const override;
         virtual void maxUV( Vector2d& r )const override;
 

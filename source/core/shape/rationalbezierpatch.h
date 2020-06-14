@@ -117,8 +117,8 @@ public:
     RationalBezierPatch( const size_t x, const size_t y );
     void set( const size_t x, const size_t y, const VECTOR_4D& v );
     void setAccuracy( const DBL a ) {accuracy = a;}
-    virtual void evalVertex( Vector3d& r, const DBL u, const DBL v )const override;
-    virtual void evalNormal( Vector3d& r, const DBL u, const DBL v )const override;
+    virtual void evalVertex( Vector3d& r, const DBL u, const DBL v, TraceThreadData *Thread )const override;
+    virtual void evalNormal( Vector3d& r, const DBL u, const DBL v, TraceThreadData *Thread )const override;
     virtual void minUV( Vector2d& r )const override;
     virtual void maxUV( Vector2d& r )const override;
     virtual ~RationalBezierPatch();

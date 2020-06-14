@@ -757,7 +757,7 @@ bool Sphere::Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector
 
 // UVMeshable part
 
-void Sphere::evalVertex( Vector3d& r, const DBL u, const DBL v )const
+void Sphere::evalVertex( Vector3d& r, const DBL u, const DBL v, TraceThreadData * )const
 {
   DBL lat = -M_PI*(0.5-v);
   r = Vector3d( Radius * cos( lat )*cos( u * TWO_M_PI ), Radius * sin( lat ) , Radius * cos( lat )*sin( u * TWO_M_PI ) );
@@ -767,7 +767,7 @@ void Sphere::evalVertex( Vector3d& r, const DBL u, const DBL v )const
     MTransPoint( r, r, Trans );
   }
 }
-void Sphere::evalNormal( Vector3d& r, const DBL u, const DBL v )const
+void Sphere::evalNormal( Vector3d& r, const DBL u, const DBL v, TraceThreadData * )const
 {
   r = Vector3d( cos( v * M_PI )*cos( u * TWO_M_PI ), sin( v * M_PI ) , cos( v * M_PI )*sin( u * TWO_M_PI ) );
   if (Trans)

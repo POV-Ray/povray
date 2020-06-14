@@ -94,8 +94,8 @@ class Sphere final : public ObjectBase, public UVMeshable
 
         static bool Intersect(const BasicRay& ray, const Vector3d& Center, DBL Radius2, DBL *Depth1, DBL  *Depth2);
 
-        virtual void evalVertex( Vector3d& r, const DBL u, const DBL v )const override;
-        virtual void evalNormal( Vector3d& r, const DBL u, const DBL v )const override;
+        virtual void evalVertex( Vector3d& r, const DBL u, const DBL v, TraceThreadData *Thread )const override;
+        virtual void evalNormal( Vector3d& r, const DBL u, const DBL v, TraceThreadData *Thread )const override;
         virtual void minUV( Vector2d& r )const override;
         virtual void maxUV( Vector2d& r )const override;
     private:

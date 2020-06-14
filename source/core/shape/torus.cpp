@@ -1141,7 +1141,7 @@ void Torus::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
 
 // UVMeshable part
 
-void Torus::evalVertex( Vector3d& r, const DBL u, const DBL v )const
+void Torus::evalVertex( Vector3d& r, const DBL u, const DBL v, TraceThreadData * )const
 {
   DBL lat = -TWO_M_PI*(0.5-v);
   DBL lon = TWO_M_PI*(0.5-u);
@@ -1151,7 +1151,7 @@ void Torus::evalVertex( Vector3d& r, const DBL u, const DBL v )const
     MTransPoint( r, r, Trans );
   }
 }
-void Torus::evalNormal( Vector3d& r, const DBL u, const DBL v )const
+void Torus::evalNormal( Vector3d& r, const DBL u, const DBL v, TraceThreadData * )const
 {
   DBL lat = -TWO_M_PI*(0.5-v);
   DBL lon = TWO_M_PI*(0.5-u);

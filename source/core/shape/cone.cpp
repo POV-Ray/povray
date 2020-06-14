@@ -1076,7 +1076,7 @@ void Cone::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
 
 // UVMeshable part
 
-void Cone::evalVertex( Vector3d& r, const DBL u, const DBL v )const
+void Cone::evalVertex( Vector3d& r, const DBL u, const DBL v, TraceThreadData * )const
 {
   if (v<0.25)
   {
@@ -1100,7 +1100,7 @@ void Cone::evalVertex( Vector3d& r, const DBL u, const DBL v )const
     MTransPoint( r, r, Trans );
   }
 }
-void Cone::evalNormal( Vector3d& r, const DBL u, const DBL v )const
+void Cone::evalNormal( Vector3d& r, const DBL u, const DBL v, TraceThreadData * )const
 {
   if (v<0.25)
   {

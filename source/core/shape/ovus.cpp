@@ -996,7 +996,7 @@ void Ovus::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
 
 // UVMeshable part
 
-void Ovus::evalVertex( Vector3d& r, const DBL u, const DBL v )const
+void Ovus::evalVertex( Vector3d& r, const DBL u, const DBL v, TraceThreadData * )const
 {
   DBL y;
   if ( v < 0.25)
@@ -1042,7 +1042,7 @@ void Ovus::evalVertex( Vector3d& r, const DBL u, const DBL v )const
     MTransPoint( r, r, Trans );
   }
 }
-void Ovus::evalNormal( Vector3d& r, const DBL u, const DBL v )const
+void Ovus::evalNormal( Vector3d& r, const DBL u, const DBL v, TraceThreadData * )const
 {
   DBL y;
   if ( v < 0.25)
