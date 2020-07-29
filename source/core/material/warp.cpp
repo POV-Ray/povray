@@ -572,6 +572,140 @@ bool RotateWarp::WarpPoint(Vector3d& EPoint) const
     return true;
 }
 
+bool ConeWarp::WarpPoint(Vector3d& EPoint) const
+{
+  Vector3d Delta = EPoint-Center;
+  if (!Inverted)
+  {
+    DBL y = Delta [Y];
+    if (Delta[Y] != 0.0)
+    {
+      Delta[Y] = 0.0;
+      DBL Length= Delta.length() ;
+      EPoint [X] = Length * (Param [X]) / Radius /fabs( y );
+    }
+    else
+    {  
+      /* Special case: the <xz> plane at the origin cannot be described
+         with the conic coordinates
+         Let's keep the Z valid, but the X is at the origin 
+         */
+      EPoint [X] = 0.0;
+    }
+    EPoint [Y] = y * Param [Y];
+    EPoint [Z] = atan2(Delta[Z],Delta[X])/M_PI * Param[Z];
+  }
+  else
+  {
+    /* Delta[]
+     ** X is cone slope
+     ** Y is height
+     ** Z is angle [-1,1]
+     */
+    DBL z = fmod( Delta [Z], 2.0)*M_PI;
+    EPoint[Y] = Delta[Y] * Param[Y];
+    DBL Length = Delta[X] * Radius * fabs(Delta[Y]) ;
+    EPoint[Z] = Length * sin(z) * Param[Z];
+    EPoint[X] = Length * cos(z) * Param[X];
+  }
+  return true;
+}
+bool TorusWarp::WarpPoint(Vector3d& EPoint) const
+{
+  Vector3d Delta = EPoint-Center;
+  if (!Inverted)
+  {
+    TRANSFORM Trans;
+    Vector3d Angle( 0.0, atan2(Delta[Z], Delta[X]), 0.0);
+    DBL z = Angle[Y]/M_PI*Param[Z];
+    Angle[Y] *= 180.0/M_PI;
+    Compute_Rotation_Transform(&Trans, Angle);
+    MTransPoint( Angle, Delta, &Trans);
+    Angle[X]-= Radius;
+    DBL Length = Angle.length();
+    EPoint[X]= Length*Param[X];
+    EPoint[Y]= atan2(Angle[Y],Angle[X])/M_PI_2*Param[Y];
+    EPoint[Z]= z;
+  }
+  else
+  {
+    /* Delta[]
+     ** X is angle [-1,1], elevation
+     ** Y is length from circle
+     ** Z is angle [-1,1]
+     */
+    Vector3d Tmp;
+    Tmp [X] = -1.0*fmod( Delta [X], 2.0)*M_PI;
+    Tmp [Z] = fmod( Delta [Z], 2.0)*M_PI;
+    DBL Length = Delta [Y];
+    EPoint[Y] = Length * sin(Center[X]) * Param[Y];
+    EPoint[X] = (Radius + (Length * cos(Tmp[X])))*cos(Tmp[Z]) * Param[X];
+    EPoint[Z] = (Radius + (Length * cos(Tmp[X])))*sin(Tmp[Z]) * Param[Z];
+
+  }
+  return true;
+}
+bool CylinderWarp::WarpPoint(Vector3d& EPoint) const
+{
+  Vector3d Delta = EPoint-Center;
+  if (!Inverted)
+  {
+    EPoint [Y] = Delta[Y] * Param [Y];
+    Delta[Y] = 0.0;
+    DBL Length = Delta.length() ;
+    EPoint [X] = Length * (Param [X]);
+    EPoint [Z] = atan2(Delta[Z],Delta[X])/M_PI * Param[Z];
+  }
+  else
+  {
+    /* Delta[]
+     ** X is radial length in x,z plane
+     ** Y is height
+     ** Z is angle [-1,1]
+     */
+    DBL z = fmod( Delta [Z], 2.0)*M_PI;
+    DBL Length = Delta [X];
+    EPoint [Y] = Delta[Y] * Param [Y];
+    EPoint [X] = Length * cos(z) * Param[X];
+    EPoint [Z] = Length * sin(z) * Param[Z];
+  }
+  return true;
+}
+bool SphereWarp::WarpPoint(Vector3d& EPoint) const
+{
+  Vector3d Delta = EPoint-Center;
+  if (!Inverted)
+  {
+    TRANSFORM Trans;
+    DBL Length = Delta.length();
+    DBL x = Length * Param[X];
+    Vector3d Angle( 0.0, atan2(Delta[Z], Delta[X]), 0.0);
+    DBL z = Angle[Y]/M_PI*Param[Z];
+    Angle[Y] *= 180.0/M_PI;
+    Compute_Rotation_Transform(&Trans, Angle);
+    MTransPoint( Angle, Delta, &Trans);
+    EPoint[X]= x;
+    EPoint[Y]= atan2(Angle[Y],Angle[X])/M_PI_2*Param[Y];
+    EPoint[Z]= z;
+  }
+  else
+  {
+    /* Delta[]
+     ** X is angle (elevation) [-1,1]
+     ** Y is length [0...infinity]
+     ** Z is angle  [-1,1]
+     */
+     DBL Length = Delta [Y];
+     Vector3d Tmp;
+     Tmp [X] = -1.0*fmod( Delta [X], 2.0)*M_PI_2;
+     Tmp [Z] = fmod( Delta [Z], 2.0)*M_PI;
+     EPoint [X] = Length * cos (Tmp [X])*cos(Tmp[Z]) * Param[X];
+     EPoint [Y] = Length * sin(Tmp[X])* Param[Y];
+     EPoint [Z] = Length * cos (Tmp [X])*sin(Tmp[Z])* Param[Z];
+  }
+
+  return true;
+}
 
 void Warp_Normal (Vector3d& TNorm, const Vector3d& ENorm, const TPATTERN *TPat, bool DontScaleBumps)
 {
@@ -612,6 +746,10 @@ bool SphericalWarp::WarpNormal(Vector3d& TNorm) const           { /* Error("Sphe
 bool ToroidalWarp::WarpNormal(Vector3d& TNorm) const            { /* Error("Toroidal Warp not yet implemented for normals"); */     return false; }
 bool GenericTurbulenceWarp::WarpNormal(Vector3d& TNorm) const   { /* Error("Turbulence Warp not yet implemented for normals"); */   return false; }
 bool RotateWarp::WarpNormal(Vector3d& TNorm) const              { /* Error("Rotate Warp not yet implemented for normals"); */       return false; }
+bool ConeWarp::WarpNormal(Vector3d& TNorm) const                { /* Error("Cone Warp not yet implemented for normals"); */         return false; }
+bool TorusWarp::WarpNormal(Vector3d& TNorm) const               { /* Error("Torus Warp not yet implemented for normals"); */        return false; }
+bool CylinderWarp::WarpNormal(Vector3d& TNorm) const            { /* Error("Cylinder Warp not yet implemented for normals"); */     return false; }
+bool SphereWarp::WarpNormal(Vector3d& TNorm) const              { /* Error("Sphere Warp not yet implemented for normals"); */       return false; }
 
 
 void UnWarp_Normal (Vector3d& TNorm, const Vector3d& ENorm, const TPATTERN *TPat, bool DontScaleBumps)
@@ -653,6 +791,10 @@ bool SphericalWarp::UnwarpNormal(Vector3d& TNorm) const         { /* Error("Sphe
 bool ToroidalWarp::UnwarpNormal(Vector3d& TNorm) const          { /* Error("Toroidal Warp not yet implemented for normals"); */     return false; }
 bool GenericTurbulenceWarp::UnwarpNormal(Vector3d& TNorm) const { /* Error("Turbulence Warp not yet implemented for normals"); */   return false; }
 bool RotateWarp::UnwarpNormal(Vector3d& TNorm) const            { /* Error("Rotate Warp not yet implemented for normals"); */       return false; }
+bool ConeWarp::UnwarpNormal(Vector3d& TNorm) const              { /* Error("Cone Warp not yet implemented for normals"); */         return false; }
+bool TorusWarp::UnwarpNormal(Vector3d& TNorm) const             { /* Error("Torus Warp not yet implemented for normals"); */        return false; }
+bool CylinderWarp::UnwarpNormal(Vector3d& TNorm) const          { /* Error("Cylinder Warp not yet implemented for normals"); */     return false; }
+bool SphereWarp::UnwarpNormal(Vector3d& TNorm) const            { /* Error("Sphere Warp not yet implemented for normals"); */       return false; }
 
 
 /*****************************************************************************
