@@ -304,6 +304,61 @@ struct RotateWarp final : public GenericWarp
 
     float twoPiPerUnit;
 };
+/// wrap plane around surface warp
+struct ConeWarp final: public GenericWarp
+{
+  ConeWarp(): GenericWarp(), Center(0.0, 0.0, 0.0), Param(0.0, 0.0, 0.0), Radius(0.0), Inverted(false) {}
+  ConeWarp(const ConeWarp& old): GenericWarp(old), Center(old.Center), Param(old.Param), Radius(old.Radius), Inverted(old.Inverted) {}
+  virtual GenericWarp * Clone() const override {return new ConeWarp(*this); }
+  virtual bool WarpPoint(Vector3d& rP) const override;
+  virtual bool WarpNormal(Vector3d& rN) const override;
+  virtual bool UnwarpNormal(Vector3d& rN) const override;
+
+  Vector3d    Center;
+  Vector3d    Param;
+  DBL         Radius;
+  bool        Inverted;
+};
+struct TorusWarp final: public GenericWarp
+{
+  TorusWarp(): GenericWarp(), Center(0.0, 0.0, 0.0), Param(0.0, 0.0, 0.0), Radius(0.0), Inverted(false)  {}
+  TorusWarp(const TorusWarp& old): GenericWarp(old), Center(old.Center), Param(old.Param), Radius(old.Radius), Inverted(old.Inverted)  {}
+  virtual GenericWarp * Clone() const override {return new TorusWarp(*this); }
+  virtual bool WarpPoint(Vector3d& rP) const override;
+  virtual bool WarpNormal(Vector3d& rN) const override;
+  virtual bool UnwarpNormal(Vector3d& rN) const override;
+
+  Vector3d    Center;
+  Vector3d    Param;
+  DBL         Radius;
+  bool        Inverted;
+};
+struct CylinderWarp final: public GenericWarp
+{
+  CylinderWarp(): GenericWarp(), Center(0.0, 0.0, 0.0), Param(0.0, 0.0, 0.0), Inverted(false)  {}
+  CylinderWarp(const CylinderWarp& old): GenericWarp(old),  Center(old.Center), Param(old.Param), Inverted(old.Inverted)  {}
+  virtual GenericWarp * Clone() const override {return new CylinderWarp(*this); }
+  virtual bool WarpPoint(Vector3d& rP) const override;
+  virtual bool WarpNormal(Vector3d& rN) const override;
+  virtual bool UnwarpNormal(Vector3d& rN) const override;
+
+  Vector3d    Center;
+  Vector3d    Param;
+  bool        Inverted;
+};
+struct SphereWarp final: public GenericWarp
+{
+  SphereWarp(): GenericWarp(), Center(0.0, 0.0, 0.0), Param(0.0, 0.0, 0.0), Inverted(false)  {}
+  SphereWarp(const SphereWarp& old): GenericWarp(old),  Center(old.Center), Param(old.Param), Inverted(old.Inverted)  {}
+  virtual GenericWarp * Clone() const override {return new SphereWarp(*this); }
+  virtual bool WarpPoint(Vector3d& rP) const override;
+  virtual bool WarpNormal(Vector3d& rN) const override;
+  virtual bool UnwarpNormal(Vector3d& rN) const override;
+
+  Vector3d    Center;
+  Vector3d    Param;
+  bool        Inverted;
+};
 /*****************************************************************************
 * Global functions
 ******************************************************************************/

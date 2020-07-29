@@ -4481,6 +4481,11 @@ void Parser::Parse_Warp (WarpList& warps)
     ToroidalWarp *Toroidal;
     PlanarWarp *PlanarW;
     RotateWarp *RotateW; 
+    SphereWarp *SpW;
+    CylinderWarp *CylinderW;
+    TorusWarp *TorusW;
+    ConeWarp *ConeW;
+
 
     Parse_Begin();
 
@@ -4699,6 +4704,96 @@ void Parser::Parse_Warp (WarpList& warps)
         CASE(ROTATE_TOKEN)
             New = RotateW = new RotateWarp();
             RotateW->twoPiPerUnit  = TWO_M_PI * Allow_Float(1.0);
+        END_CASE
+
+        CASE(SPHERE_TOKEN)
+            New = SpW = new SphereWarp();
+            Parse_Vector( Local_Vector );
+            SpW->Center = Local_Vector;
+            Parse_Comma();
+            Parse_Vector( Local_Vector );
+            SpW->Param = Local_Vector;
+            EXPECT
+              CASE(INVERSE_TOKEN)
+                SpW->Inverted = true;
+              END_CASE
+
+              OTHERWISE
+                UNGET
+                EXIT
+              END_CASE
+            END_EXPECT
+        END_CASE
+
+        CASE(CYLINDER_TOKEN)
+            New = CylinderW = new CylinderWarp();
+            Parse_Vector( Local_Vector );
+            CylinderW->Center = Local_Vector;
+            Parse_Comma();
+            Parse_Vector( Local_Vector );
+            CylinderW->Param = Local_Vector;
+            EXPECT
+              CASE(INVERSE_TOKEN)
+                CylinderW->Inverted = true;
+              END_CASE
+
+              OTHERWISE
+                UNGET
+                EXIT
+              END_CASE
+            END_EXPECT
+        END_CASE
+
+
+        CASE(TORUS_TOKEN)
+            New = TorusW = new TorusWarp();
+            Parse_Vector( Local_Vector );
+            TorusW->Center = Local_Vector;
+            Parse_Comma();
+            TorusW->Radius = Parse_Float();
+            if (TorusW->Radius == 0.0)
+            {
+              Warning("Degenerated Torus warp (think about Sphere warp).");
+            }
+            Parse_Comma();
+            Parse_Vector( Local_Vector );
+            TorusW->Param = Local_Vector;
+            EXPECT
+              CASE(INVERSE_TOKEN)
+                TorusW->Inverted = true;
+              END_CASE
+
+              OTHERWISE
+                UNGET
+                EXIT
+              END_CASE
+            END_EXPECT
+        END_CASE
+
+        CASE(CONE_TOKEN)
+            New = ConeW = new ConeWarp();
+            Parse_Vector( Local_Vector );
+            ConeW->Center = Local_Vector;
+            Parse_Comma();
+            ConeW->Radius = Parse_Float();
+            if (ConeW->Radius == 0.0)
+            {
+              Warning("Radius of Cone warp is null, reset to 1.0");
+              ConeW->Radius = 1.0;
+            }
+            Parse_Comma();
+            Parse_Vector( Local_Vector );
+            ConeW->Param = Local_Vector;
+            EXPECT
+              CASE(INVERSE_TOKEN)
+                ConeW->Inverted = true;
+              END_CASE
+
+              OTHERWISE
+                UNGET
+                EXIT
+              END_CASE
+            END_EXPECT
         END_CASE
 
         OTHERWISE
