@@ -570,7 +570,7 @@ void RationalBezierPatch::Compute_BBox()
 *
 ******************************************************************************/
 
-void RationalBezierPatch::UVCoord( Vector2d& Result, const Intersection* Inter, TraceThreadData* Thread ) const
+void RationalBezierPatch::UVCoord( Vector2d& Result, const Intersection* Inter ) const
 {
     /* Use preocmputed uv coordinates. */
     Result[U] = Inter->Iuv[U];
