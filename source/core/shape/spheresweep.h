@@ -154,7 +154,7 @@ class SphereSweep final : public ObjectBase
         virtual void Scale(const Vector3d&, const TRANSFORM *) override;
         virtual void Transform(const TRANSFORM *) override;
         virtual void Compute_BBox() override;
-        virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
+        virtual void UVCoord(Vector2d&, const Intersection *) const override;
 
         void Compute();
     protected:

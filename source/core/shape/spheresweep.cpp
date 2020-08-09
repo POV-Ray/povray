@@ -1971,7 +1971,7 @@ int SphereSweep::Comp_Isects(const void *Intersection_1, const void *Intersectio
         return 1;
 }
 
-void SphereSweep::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
+void SphereSweep::UVCoord(Vector2d& Result, const Intersection *Inter) const
 {
     Result[U] = Inter->Iuv[U];
     Result[V] = Inter->Iuv[V];
