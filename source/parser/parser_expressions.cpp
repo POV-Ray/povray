@@ -1472,6 +1472,11 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     Parse_Paren_End();
 					break;
 
+                case PARSED_TOKENS_TOKEN:
+                {
+                  Val = mTokenCount;
+                }
+                break;
                 case NOW_TOKEN:
                     {
                         auto now = std::chrono::system_clock::now();

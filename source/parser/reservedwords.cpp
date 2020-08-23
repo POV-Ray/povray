@@ -474,6 +474,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { PARALLAXE_TOKEN,              "parallaxe" },
     { PARALLEL_TOKEN,               "parallel" },
     { PARAMETRIC_TOKEN,             "parametric" },
+    { PARSED_TOKENS_TOKEN,          "parsed_tokens" },
     { PASS_THROUGH_TOKEN,           "pass_through" },
     { PATTERN_TOKEN,                "pattern" },
     { PAVEMENT_TOKEN,               "pavement" },
