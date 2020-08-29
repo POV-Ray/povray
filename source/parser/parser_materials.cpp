@@ -4485,6 +4485,7 @@ void Parser::Parse_Warp (WarpList& warps)
     CylinderWarp *CylinderW;
     TorusWarp *TorusW;
     ConeWarp *ConeW;
+    DiscWarp *DiscW; 
 
 
     Parse_Begin();
@@ -4704,6 +4705,10 @@ void Parser::Parse_Warp (WarpList& warps)
         CASE(ROTATE_TOKEN)
             New = RotateW = new RotateWarp();
             RotateW->twoPiPerUnit  = TWO_M_PI * Allow_Float(1.0);
+        END_CASE
+
+        CASE(DISC_TOKEN)
+            New = DiscW = new DiscWarp();
         END_CASE
 
         CASE(SPHERE_TOKEN)

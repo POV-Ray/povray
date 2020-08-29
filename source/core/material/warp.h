@@ -304,6 +304,18 @@ struct RotateWarp final : public GenericWarp
 
     float twoPiPerUnit;
 };
+
+/// hyperbolic disc warp
+struct DiscWarp final : public GenericWarp
+{
+    DiscWarp(): GenericWarp(){}
+    DiscWarp(const DiscWarp& old): GenericWarp(old){}
+
+    virtual GenericWarp* Clone() const override { return new DiscWarp(*this); }
+    virtual bool WarpPoint(Vector3d& rP) const override;
+    virtual bool WarpNormal(Vector3d& rN) const override;
+    virtual bool UnwarpNormal(Vector3d& rN) const override;
+};
 /// wrap plane around surface warp
 struct ConeWarp final: public GenericWarp
 {
