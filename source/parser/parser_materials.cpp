@@ -4709,6 +4709,26 @@ void Parser::Parse_Warp (WarpList& warps)
 
         CASE(DISC_TOKEN)
             New = DiscW = new DiscWarp();
+            EXPECT
+              CASE(SCALE_TOKEN)
+                 DiscW->Scale = Allow_Float(1.0);
+              END_CASE
+
+              CASE(RADIUS_TOKEN)
+                 DiscW->Radius = Allow_Float(1.0);
+              END_CASE
+
+              OTHERWISE
+                UNGET
+                EXIT
+              END_CASE
+            END_EXPECT
+
+            if (DiscW->Radius == 0.0)
+            {
+              Error("Impossible disc warp with a null radius");
+            }
+
         END_CASE
 
         CASE(SPHERE_TOKEN)
@@ -4728,6 +4748,7 @@ void Parser::Parse_Warp (WarpList& warps)
                 EXIT
               END_CASE
             END_EXPECT
+
         END_CASE
 
         CASE(CYLINDER_TOKEN)

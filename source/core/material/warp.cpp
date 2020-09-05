@@ -574,8 +574,8 @@ bool RotateWarp::WarpPoint(Vector3d& EPoint) const
 
 bool DiscWarp::WarpPoint(Vector3d& EPoint) const
 {
-    DBL x = EPoint[X];
-    DBL y = EPoint[Y];
+    DBL x = EPoint[X]/Radius;
+    DBL y = EPoint[Y]/Radius;
     // z is unmodified, and not used
     // factor computation for disc criteria and later formula
     DBL l = -1.0+x*x+y*y;
@@ -583,6 +583,7 @@ bool DiscWarp::WarpPoint(Vector3d& EPoint) const
     if (l<0.0)
     {
       // x,y are moved to the hyberbolic upper fold of 2 fold of poincare disc
+      l *= Scale;
       EPoint[X] = -2.0*x/l;
       EPoint[Y] = -2.0*y/l;
     }
