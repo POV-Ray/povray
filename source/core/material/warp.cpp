@@ -572,6 +572,25 @@ bool RotateWarp::WarpPoint(Vector3d& EPoint) const
     return true;
 }
 
+bool DiscWarp::WarpPoint(Vector3d& EPoint) const
+{
+    DBL x = EPoint[X]/Radius;
+    DBL y = EPoint[Y]/Radius;
+    // z is unmodified, and not used
+    // factor computation for disc criteria and later formula
+    DBL l = -1.0+x*x+y*y;
+    // only for points inside the disc, strictly (avoid dividing by 0)
+    if (l<0.0)
+    {
+      // x,y are moved to the hyberbolic upper fold of 2 fold of poincare disc
+      l *= Scale;
+      EPoint[X] = -2.0*x/l;
+      EPoint[Y] = -2.0*y/l;
+    }
+    // outside and on the disc, no modification
+    return true;
+}
+
 bool ConeWarp::WarpPoint(Vector3d& EPoint) const
 {
   Vector3d Delta = EPoint-Center;
@@ -750,6 +769,7 @@ bool ConeWarp::WarpNormal(Vector3d& TNorm) const                { /* Error("Cone
 bool TorusWarp::WarpNormal(Vector3d& TNorm) const               { /* Error("Torus Warp not yet implemented for normals"); */        return false; }
 bool CylinderWarp::WarpNormal(Vector3d& TNorm) const            { /* Error("Cylinder Warp not yet implemented for normals"); */     return false; }
 bool SphereWarp::WarpNormal(Vector3d& TNorm) const              { /* Error("Sphere Warp not yet implemented for normals"); */       return false; }
+bool DiscWarp::WarpNormal(Vector3d& TNorm) const                { /* Error("Disc Warp not yet implemented for normals"); */       return false; }
 
 
 void UnWarp_Normal (Vector3d& TNorm, const Vector3d& ENorm, const TPATTERN *TPat, bool DontScaleBumps)
@@ -795,6 +815,7 @@ bool ConeWarp::UnwarpNormal(Vector3d& TNorm) const              { /* Error("Cone
 bool TorusWarp::UnwarpNormal(Vector3d& TNorm) const             { /* Error("Torus Warp not yet implemented for normals"); */        return false; }
 bool CylinderWarp::UnwarpNormal(Vector3d& TNorm) const          { /* Error("Cylinder Warp not yet implemented for normals"); */     return false; }
 bool SphereWarp::UnwarpNormal(Vector3d& TNorm) const            { /* Error("Sphere Warp not yet implemented for normals"); */       return false; }
+bool DiscWarp::UnwarpNormal(Vector3d& TNorm) const              { /* Error("Disc Warp not yet implemented for normals"); */       return false; }
 
 
 /*****************************************************************************
