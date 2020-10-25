@@ -235,7 +235,7 @@ void TracePixelCameraData::SetupCamera(const Camera& cam)
     bool normalise = false;
     camera = cam;
     useFocalBlur = false;
-    //precomputeContainingInteriors = true;
+    precomputeContainingInteriors = true;
     cameraDirection = camera.Direction;
     cameraRight = camera.Right;
     cameraUp =  camera.Up;
