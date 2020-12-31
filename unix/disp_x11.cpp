@@ -60,11 +60,7 @@ static ::Display * theDisplay;// to be messed by the error handling routine
 
 static int xioErrorHandler( ::Display * disp )
 {
-    fprintf(stderr, "\nX I/O error\n");
-    if (theDisplay)
-    {
-    XFlush(theDisplay);
-    }
+    fprintf(stderr, "\nX I/O error for povray\n");
     theDisplay = nullptr;
     return true;
 }
@@ -72,7 +68,7 @@ static int xErrorHandler( ::Display * disp, XErrorEvent *errorEvent)
 {
     char message[130];
     XGetErrorText(disp, errorEvent->error_code, message, 125);
-    fprintf(stderr, "\nX error: %s\n", message);
+    fprintf(stderr, "\nX error of povray: %s\n", message);
     return true;
 }
 
@@ -96,6 +92,7 @@ namespace pov_frontend
 
     bool UnixX11Display::Register(vfeUnixSession *session)
     {
+	XInitThreads();
         session->GetUnixOptions()->Register(Options);
         return true;
     }
@@ -106,7 +103,6 @@ namespace pov_frontend
         m_valid = false;
         m_display_scaled = false;
         m_display_scale = 1.;
-        //theDisplay = nullptr;
         theImage = nullptr;
         theWindow = 0;
     }
@@ -150,7 +146,6 @@ namespace pov_frontend
         // protect against Close(), as the resources are transfered and not copied
         p->m_display_scaled=false;
         p->m_display_scale=1;
-        // p->theDisplay = nullptr;
         p->theImage = nullptr;
         p->theWindow = 0;
 
@@ -175,9 +170,11 @@ namespace pov_frontend
                 --c;
             }
 
+            XLockDisplay(theDisplay);
             XPutImage(theDisplay, theWindow, theGC, theImage, 0, 0, 0, 0,
                         theImage->width, theImage->height);
             XFlush(theDisplay);
+            XUnlockDisplay(theDisplay);
         }
 
         return true;
@@ -188,7 +185,9 @@ namespace pov_frontend
         if (!m_valid)
             return;
 
+        XLockDisplay(theDisplay);
         XFlush(theDisplay);
+        XUnlockDisplay(theDisplay);
         m_PxCount.clear();
         m_valid = false;
 
@@ -201,6 +200,7 @@ namespace pov_frontend
         }
         if (theWindow)
         {
+          XLockDisplay(theDisplay);
             XDestroyWindow(theDisplay, theWindow);
 #ifdef USE_CURSOR
             XFreeCursor(theDisplay, theCursor);
@@ -212,6 +212,7 @@ namespace pov_frontend
 
             XFreeColormap(theDisplay, theColormap);
             XFreeGC(theDisplay, theGC);
+            XUnlockDisplay(theDisplay);// unlock before close
             XCloseDisplay( theDisplay );
             theDisplay = nullptr;
         }
@@ -233,7 +234,9 @@ namespace pov_frontend
                 % (paused ? " [paused]" : "");
 
         {
+            XLockDisplay(theDisplay);
             XStoreName(theDisplay, theWindow, f.str().c_str());
+            XUnlockDisplay(theDisplay);
         }
     }
 
@@ -249,6 +252,7 @@ namespace pov_frontend
             XSetIOErrorHandler( xioErrorHandler );
 
             theDisplay = XOpenDisplay( NULL );
+            XLockDisplay(theDisplay);
             Visual *theVisual;
             unsigned long        theWindowMask;
 
@@ -467,6 +471,7 @@ namespace pov_frontend
 
             XPutImage(theDisplay, theWindow, theGC, theImage, 0, 0, 0, 0, width, height);
             XFlush(theDisplay);
+            XUnlockDisplay(theDisplay);
 
             m_PxCount.clear();
             m_PxCount.reserve(width*height);
@@ -505,10 +510,12 @@ namespace pov_frontend
         }
         else
         {
+            XLockDisplay(theDisplay);
             {
                 XPutImage( theDisplay, theWindow, theGC, theImage, 0, 0, 0, 0, theImage->width, theImage->height);
             }
             XFlush(theDisplay);
+            XUnlockDisplay(theDisplay);
         }
     }
 
@@ -556,14 +563,18 @@ namespace pov_frontend
         {
             SetPixelScaled(x, y, colour);
             {
+                XLockDisplay(theDisplay);
                 XPutImage( theDisplay, theWindow, theGC, theImage, x*m_display_scale, y*m_display_scale, x*m_display_scale, y*m_display_scale, 1, 1 );
+                XUnlockDisplay(theDisplay);
             }
         }
         else
         {
             SetPixel(x, y, colour);
             {
+                XLockDisplay(theDisplay);
                 XPutImage( theDisplay, theWindow, theGC, theImage, x, y, x, y, 1, 1 );
+                XUnlockDisplay(theDisplay);
             }
         }
 
@@ -593,7 +604,9 @@ namespace pov_frontend
                 SetPixelScaled(ix2, y, colour);
             }
             {
+                XLockDisplay(theDisplay);
                 XPutImage( theDisplay, theWindow, theGC, theImage, ix1*m_display_scale, iy1*m_display_scale, ix1*m_display_scale, iy1*m_display_scale, (uint_least64_t(ix2*m_display_scale)-uint_least64_t(ix1*m_display_scale)+1), (uint_least64_t(iy2*m_display_scale)-uint_least64_t(iy1*m_display_scale)+1));
+                XUnlockDisplay(theDisplay);
             }
         }
         else
@@ -610,7 +623,9 @@ namespace pov_frontend
                 SetPixel(ix2, y, colour);
             }
             {
+                XLockDisplay(theDisplay);
                 XPutImage( theDisplay, theWindow, theGC, theImage, ix1, iy1, ix1, iy1, (ix2-ix1+1), (iy2-iy1+1));
+                XUnlockDisplay(theDisplay);
             }
         }
     }
@@ -635,7 +650,9 @@ namespace pov_frontend
                 }
             }
             {
+                XLockDisplay(theDisplay);
                 XPutImage( theDisplay, theWindow, theGC, theImage, ix1*m_display_scale, iy1*m_display_scale, ix1*m_display_scale, iy1*m_display_scale, (uint_least64_t(ix2*m_display_scale)-uint_least64_t(ix1*m_display_scale)+1), (uint_least64_t(iy2*m_display_scale)-uint_least64_t(iy1*m_display_scale)+1));
+                XUnlockDisplay(theDisplay);
             }
         }
         else
@@ -649,7 +666,9 @@ namespace pov_frontend
             }
 
             {
+                XLockDisplay(theDisplay);
                 XPutImage( theDisplay, theWindow, theGC, theImage, ix1, iy1, ix1, iy1, (ix2-ix1+1), (iy2-iy1+1));
+                XUnlockDisplay(theDisplay);
             }
         }
 
@@ -671,7 +690,9 @@ namespace pov_frontend
                 for(unsigned int x = ix1; x <= ix2; x++, i++)
                     SetPixelScaled(x, y, colour[i]);
             {
+                XLockDisplay(theDisplay);
                 XPutImage( theDisplay, theWindow, theGC, theImage, ix1*m_display_scale, iy1*m_display_scale, ix1*m_display_scale, iy1*m_display_scale, (uint_least64_t(ix2*m_display_scale)-uint_least64_t(ix1*m_display_scale)+1), (uint_least64_t(iy2*m_display_scale)-uint_least64_t(iy1*m_display_scale)+1));
+                XUnlockDisplay(theDisplay);
             }
         }
         else
@@ -680,7 +701,9 @@ namespace pov_frontend
                 for(unsigned int x = ix1; x <= ix2; x++, i++)
                     SetPixel(x, y, colour[i]);
             {
+                XLockDisplay(theDisplay);
                 XPutImage( theDisplay, theWindow, theGC, theImage, ix1, iy1, ix1, iy1, (ix2-ix1+1), (iy2-iy1+1));
+                XUnlockDisplay(theDisplay);
             }
         }
 
@@ -693,7 +716,9 @@ namespace pov_frontend
 
         if (Force )
         {
+            XLockDisplay(theDisplay);
             XFlush(theDisplay);
+            XUnlockDisplay(theDisplay);
         }
     }
 
@@ -721,6 +746,7 @@ namespace pov_frontend
         XEvent event;
         bool do_quit = false;
 
+        XLockDisplay(theDisplay);
         while (XCheckMaskEvent(theDisplay, (
                 ButtonPressMask |
                 KeyPressMask|
@@ -760,6 +786,7 @@ namespace pov_frontend
                     break;
             }
         }
+        XUnlockDisplay(theDisplay);
 
         return do_quit;
     }
@@ -773,6 +800,7 @@ namespace pov_frontend
 
         bool do_quit = false;
 
+        XLockDisplay(theDisplay);
         // consum all requested events, including button press, even for doing nothing
         while (XCheckMaskEvent(theDisplay, 
               ButtonPressMask| 
@@ -822,6 +850,7 @@ namespace pov_frontend
             if (do_quit)
                 break;
         }
+        XUnlockDisplay(theDisplay);
 
         return do_quit;
     }
