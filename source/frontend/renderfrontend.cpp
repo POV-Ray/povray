@@ -625,6 +625,8 @@ void RenderFrontendBase::NewBackup(POVMS_Object& ropts, ViewData& vd, const Path
     {
         Backup_File_Header hdr;
 
+	memset(&hdr,0,sizeof(hdr));
+
         if(!*vd.imageBackup)
             throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot create render state output file.");
         memcpy(hdr.sig, RENDER_STATE_SIG, sizeof(hdr.sig));
