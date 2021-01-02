@@ -121,9 +121,9 @@ fi
 SCRIPT_DIR=`dirname "$0"`
 
 if [ -z "$RENDER_ALL" ] ; then
-  FILE_LIST=`find "$SCENE_DIR" -not -path "*animations*" -not -path "*portfolio*" -name "*.pov" | sort -r |  xargs grep -l -E '^//[ ]+[-+]{1}[^ -]'`
+  FILE_LIST=`find "$SCENE_DIR/" -not -path "*animations*" -not -path "*portfolio*" -name "*.pov" | sort -r |  xargs grep -l -E '^//[ ]+[-+]{1}[^ -]'`
 else
-  FILE_LIST=`find "$SCENE_DIR" -not -path "*animations*" -not -path "*portfolio*" -name "*.pov" | sort -r`
+  FILE_LIST=`find "$SCENE_DIR/" -not -path "*animations*" -not -path "*portfolio*" -name "*.pov" | sort -r`
 fi
 
 if [ -z "$LOG_FILE" ] ; then

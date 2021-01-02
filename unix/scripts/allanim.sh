@@ -115,7 +115,7 @@ fi
 
 SCRIPT_DIR=`dirname "$0"`
 
-FILE_LIST=`find "$SCENE_DIR" -path "*animations*" -name "*.pov" | sort`
+FILE_LIST=`find "$SCENE_DIR/" -path "*animations*" -name "*.pov" | sort`
 
 if [ -z "$LOG_FILE" ] ; then
   echo "$FILE_LIST" | xargs -n 1 "$SCRIPT_DIR/render_anim.sh" "$OUTPUT_DIR"
