@@ -673,6 +673,8 @@ install-data-local:
 	for f in \$\$filelist ; do \\
 	  \$(INSTALL_DATA) \$(top_srcdir)/doc/\$\$f \$(DESTDIR)\$(povdocdir)/\$\$f && echo "\$(DESTDIR)\$(povdocdir)/\$\$f" >> \$(povinstall); \\
 	done
+
+install-user-data-local:
 	@echo "Creating user directories..."; \\
 	for p in \$(povuser) \$(povconfuser) ; do \\
 	  \$(mkdir_p) \$\$p && chown \$(povowner) \$\$p && chgrp \$(povgroup) \$\$p && printf "%s\\n" "\$\$p" "\`cat \$(povinstall)\`" > \$(povinstall); \\
