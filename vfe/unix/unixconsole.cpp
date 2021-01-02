@@ -495,7 +495,7 @@ int main (int argc, char **argv)
     if (sizeof(POV_LONG) != 8) 
     {
       fprintf(stderr, "sizeof(POV_LONG) = %d != 8\n", (int)sizeof(POV_LONG));
-      return -sizeof(POV_LONG);
+      return -(int)sizeof(POV_LONG);
     }
 
     vfeUnixSession   *session;
