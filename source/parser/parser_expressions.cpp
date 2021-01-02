@@ -4186,6 +4186,15 @@ GenericSpline *Parser::Parse_Spline()
                   END_CASE
                 END_EXPECT
               break;
+              case GenericSpline::Extension::Freedom:
+              // nothing, make Clang happy
+              break;
+              case GenericSpline::Extension::GlobalFreedom:
+              // nothing, make Clang happy
+              break;
+              case GenericSpline::Extension::None:
+              // nothing, make Clang happy
+              break;
             }
 
             Parse_Express(Express, &Terms);
