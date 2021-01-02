@@ -618,7 +618,11 @@ CONFIG_CLEAN_FILES =
 # Render a test scene for 'make check'.
 # This is meant to run before 'make install'.
 check: all
-	\$(top_builddir)/unix/povray +i\$(top_srcdir)/scenes/advanced/biscuit.pov -f +d +p +v +w320 +h240 +a0.3 +L\$(top_srcdir)/include
+	if test -n "\$(DISPLAY)"; then \\
+	\$(top_builddir)/unix/povray +i\$(top_srcdir)/scenes/advanced/biscuit.pov -f +d +p +v +w320 +h240 +a0.3 +L\$(top_srcdir)/include ;\\
+	else \\
+	\$(top_builddir)/unix/povray +i\$(top_srcdir)/scenes/advanced/biscuit.pov -f -d -p +v +w320 +h240 +a0.3 +L\$(top_srcdir)/include ;\\
+	fi
 
 # Install scripts in povlibdir.
 nobase_povlib_SCRIPTS = `echo $scriptfiles`
