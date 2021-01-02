@@ -952,6 +952,9 @@ void Parser::Parse_Camera_Access(Vector3d &Vect,const TokenId t)
         case CAMERA_UP_TOKEN:
             Vect = that_camera.Up;
             break;
+        default:
+            // nothing, make clang happy
+            break;
     }
 }
 /*****************************************************************************
@@ -1563,6 +1566,10 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     }
                     Parse_Paren_End();
                     break;
+                default:
+                    // nothing
+                    // make clang happy
+                    break;
             }
 
             *Terms = 1;
@@ -1854,6 +1861,10 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                       Vect = Vector3d(0.0,0.0,0.0);
                     }
                     Parse_Paren_End();
+                    break;
+                default:
+                    // nothing
+                    // make clang happy
                     break;
             }
 
@@ -3026,6 +3037,10 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
                             Warning("Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
                     }
                     break;
+                default:
+                    // nothing
+                    // make clang happy
+                    break;
             }
             startedParsing = true;
         END_CASE
@@ -4118,6 +4133,9 @@ GenericSpline *Parser::Parse_Spline()
     
     switch( New->Extended() )
     {
+      case GenericSpline::Extension::None:
+        // nothing, make Clang happy
+        break;
       case GenericSpline::Extension::TCB:
         	EXPECT
             CASE (TENSION_TOKEN)
@@ -4185,6 +4203,15 @@ GenericSpline *Parser::Parse_Spline()
                     EXIT
                   END_CASE
                 END_EXPECT
+              break;
+              case GenericSpline::Extension::Freedom:
+              // nothing, make Clang happy
+              break;
+              case GenericSpline::Extension::GlobalFreedom:
+              // nothing, make Clang happy
+              break;
+              case GenericSpline::Extension::None:
+              // nothing, make Clang happy
               break;
             }
 

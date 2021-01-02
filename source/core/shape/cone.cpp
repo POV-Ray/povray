@@ -779,7 +779,7 @@ void Cone::Compute_Cone_Data()
         base_radius = apex_radius;
         apex_radius = tmpf;
         axis.invert();
-        vInverted =~vInverted;
+        vInverted = !vInverted;
     }
     /* apex & base are different, yet, it might looks like a cylinder */
     tmpf = base_radius * len / (apex_radius - base_radius);

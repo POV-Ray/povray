@@ -488,6 +488,16 @@ static void TerminateSignalHandler(std::thread* sigthread)
 
 int main (int argc, char **argv)
 {
+    // Debian checks that POV_LONG is 64 bits
+    // assert does nothing if NDEBUG was defined when assert.h was included
+    // so handle it also manually
+    assert(sizeof(POV_LONG) == 8);
+    if (sizeof(POV_LONG) != 8) 
+    {
+      fprintf(stderr, "sizeof(POV_LONG) = %d != 8\n", (int)sizeof(POV_LONG));
+      return -(int)sizeof(POV_LONG);
+    }
+
     vfeUnixSession   *session;
     vfeStatusFlags    flags;
     vfeRenderOptions  opts;

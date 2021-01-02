@@ -124,7 +124,7 @@ CURR_DIR=`pwd`
 SCENE_DIR=`echo "$SCENE_DIR" | sed "s?^\.?$CURR_DIR?"`
 SCENE_DIR=`echo "$SCENE_DIR" | sed "s?^\([^/]\)?$CURR_DIR/\1?"`
 
-FILE_LIST=`find "$SCENE_DIR" -not -path "*__empty*" -name "*.ini" | sort`
+FILE_LIST=`find "$SCENE_DIR/" -not -path "*__empty*" -name "*.ini" | sort`
 
 cd "$OUTPUT_DIR"
 

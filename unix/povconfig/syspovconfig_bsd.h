@@ -49,7 +49,11 @@
 
 /// @file
 /// @todo The POV_LONG stuff is just copied from the Posix settings; someone needs to verify universal BSD compatibility.
-#if defined(_POSIX_V6_LPBIG_OFFBIG) || defined(_POSIX_V6_LP64_OFF64)
+//
+// if _POSIX_V6_LP*_OFF* is defined to -1 the feature is *not* available
+//(as seen on most 32bit platforms: arm*, mips*, (!linux)-i386)
+#if (defined(_POSIX_V6_LPBIG_OFFBIG) && _POSIX_V6_LPBIG_OFFBIG > 0) \
+ || (defined(_POSIX_V6_LP64_OFF64) && _POSIX_V6_LP64_OFF64 > 0)
     // long is at least 64 bits.
     #define POV_LONG long
 #elif defined(_POSIX_V6_ILP32_OFFBIG) || defined(_POSIX_V6_ILP32_OFF32)
