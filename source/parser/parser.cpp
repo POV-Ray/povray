@@ -1646,6 +1646,9 @@ void Parser::Parse_Camera (Camera& Cam)
 
         switch(New.Type)
         {
+            case GRID_CAMERA:
+                // nothing, cannot happen, make clang happy
+                break;
             case PERSPECTIVE_CAMERA:
                 EXPECT
                     CASE (ANGLE_TOKEN)

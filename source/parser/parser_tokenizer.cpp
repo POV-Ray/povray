@@ -2705,6 +2705,10 @@ void Parser::Parse_Write(void)
                     case UINT16LE_TOKEN: val_min = 0;            val_max = UNSIGNED16_MAX; num_bytes = 2; big_endian = false; break;
                     case SINT32BE_TOKEN: val_min = SIGNED32_MIN; val_max = SIGNED32_MAX;   num_bytes = 4; big_endian = true;  break;
                     case SINT32LE_TOKEN: val_min = SIGNED32_MIN; val_max = SIGNED32_MAX;   num_bytes = 4; big_endian = false; break;
+                    default:
+                    // nothing
+                    // make clang happy
+                    break;
                 }
                 EXPECT_CAT
                     CASE_VECTOR_UNGET
