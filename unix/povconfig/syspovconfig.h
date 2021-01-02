@@ -281,7 +281,7 @@
 #elif defined(__unix__)
     // Some Unix other than the above detected.
     #include <sys/param.h>
-    #if defined(BSD)
+    #if defined(BSD) || definied(__FreeBSD_kernel__)
         // BSD-style Unix detected.
         #include "syspovconfig_bsd.h"
     #else
