@@ -210,7 +210,7 @@ void Task::TaskThread(const boost::function0<void>& completion)
         }
         catch(...)
         {
-            FatalErrorHandler(POV_EXCEPTION_STRING("An unknown error occured stopping a task!"));
+            FatalErrorHandler(POV_EXCEPTION_STRING("An unknown error occurred stopping a task!"));
             failed = kUncategorizedError;
         }
     }
@@ -238,7 +238,7 @@ void Task::TaskThread(const boost::function0<void>& completion)
     }
     catch(...)
     {
-        FatalErrorHandler(POV_EXCEPTION_STRING("An unknown error occured running a task!"));
+        FatalErrorHandler(POV_EXCEPTION_STRING("An unknown error occurred running a task!"));
         failed = kUncategorizedError;
     }
 
@@ -262,7 +262,7 @@ void Task::TaskThread(const boost::function0<void>& completion)
     }
     catch(...)
     {
-        FatalErrorHandler(POV_EXCEPTION_STRING("An unknown error occured finishing a task!"));
+        FatalErrorHandler(POV_EXCEPTION_STRING("An unknown error occurred finishing a task!"));
     }
 
     timer = nullptr;
