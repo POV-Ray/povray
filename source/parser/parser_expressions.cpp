@@ -2057,8 +2057,11 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
             END_CASE
 
             CASE(GRAY_TOKEN)
-                Express[0]=PreciseRGBFTColour(Express).Greyscale();
-                i=1;
+            // at least 3 terms are needed for Greyscale to be correctly computed, 
+            // so store in [2] to generate error for smaller expression
+            // See code after END_EXPECT
+                Express[2]=PreciseRGBFTColour(Express).Greyscale();
+                i=2;
             END_CASE
 
             CASE(U_TOKEN)
