@@ -135,7 +135,7 @@ void Write (OStream *file, const Image *image, const ImageWriteOptions& options)
 {
     pix                     current;
     pix                     next;
-    bool                    opaque = options.AlphaIsEnabled();
+    bool                    opaque = !options.AlphaIsEnabled();
     bool                    compress = (options.compression > 0);
     vector<unsigned char>   header;
     vector<unsigned char>   line;

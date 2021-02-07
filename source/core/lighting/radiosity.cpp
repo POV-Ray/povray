@@ -910,7 +910,8 @@ bool RadiosityCache::Load(const Path& inputFile)
 {
     bool ok = false;
     IStream* fd = NewIStream(inputFile, POV_File_Data_RCA);
-    if (fd != nullptr)
+    // only stream is not failing, *fd is overloaded operator *
+    if (*fd)
     {
         BlockPool* pool = AcquireBlockPool();
 
@@ -1006,9 +1007,8 @@ bool RadiosityCache::Load(const Path& inputFile)
         ok = true;
 
         ReleaseBlockPool(pool);
-
-        delete fd;
     }
+    delete fd;
     return ok;
 }
 
