@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -953,7 +953,7 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
                     radiosityContribution += (layCol.colour() * ambBackCol) * (att * diffuse);
                 }
 
-#if POV_PARSER_EXPERIMENTAL_BRILLIANCE_OUT
+#if POV_EXPERIMENTAL_BRILLIANCE_OUT
                 if((sceneData->radiositySettings.brilliance) && (layer->Finish->BrillianceOut != 1.0))
                     radiosityContribution *= pow(fabs(cos_Angle_Incidence), layer->Finish->BrillianceOut-1.0) * (layer->Finish->BrillianceOut+7.0)/8.0;
 #endif
@@ -1025,7 +1025,7 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
 
                     ComputeDiffuseLight(layer->Finish, isect.IPoint, ray, layNormal, layCol.colour(), classicContribution, att, isect.Object, relativeIor);
 
-#if POV_PARSER_EXPERIMENTAL_BRILLIANCE_OUT
+#if POV_EXPERIMENTAL_BRILLIANCE_OUT
                     if(layer->Finish->BrillianceOut != 1.0)
                     {
                         double cos_angle_of_incidence = dot(ray.Direction, layNormal);
@@ -1046,7 +1046,7 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
 
                     ComputePhotonDiffuseLight(layer->Finish, isect.IPoint, ray, layNormal, rawnormal, layCol.colour(), photonsContribution, att, isect.Object, relativeIor, *surfacePhotonGatherer);
 
-#if POV_PARSER_EXPERIMENTAL_BRILLIANCE_OUT
+#if POV_EXPERIMENTAL_BRILLIANCE_OUT
                     if(layer->Finish->BrillianceOut != 1.0)
                     {
                         double cos_angle_of_incidence = dot(ray.Direction, layNormal);

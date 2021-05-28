@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -2270,7 +2270,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
 
         CASE (BRILLIANCE_TOKEN)
             New->Brilliance = Parse_Float ();
-#if POV_PARSER_EXPERIMENTAL_BRILLIANCE_OUT
+#if POV_EXPERIMENTAL_BRILLIANCE_OUT
             Parse_Comma();
             New->BrillianceOut = Allow_Float(1.0);
 #endif

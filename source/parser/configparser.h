@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -50,13 +50,6 @@
 /// Compile-Time Configuration of the @ref PovParser.
 ///
 /// @{
-
-/// @def POV_PARSER_EXPERIMENTAL_BRILLIANCE_OUT
-/// Whether experimental second brilliance parameter should be enabled.
-///
-#ifndef POV_PARSER_EXPERIMENTAL_BRILLIANCE_OUT
-    #define POV_PARSER_EXPERIMENTAL_BRILLIANCE_OUT 0
-#endif
 
 /// @def POV_PARSER_EXPERIMENTAL_OBJ_IMPORT
 /// Whether experimental Wavefront OBJ import should be enabled.
