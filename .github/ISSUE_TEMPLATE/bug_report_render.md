@@ -1,8 +1,8 @@
 ---
 name: Bug report (Render)
-about: Report unexpected behavior during rendering of a scene
+about: Report unexpected behavior during parsing or rendering of a scene
 title: "[BUG] "
-labels: bug?
+labels: 'bug?'
 assignees: ''
 
 ---
@@ -51,7 +51,8 @@ command line version of POV-Ray.]
 
 **Output**
 ~~~
-[Please copy the terminal output / message pane contents here.]
+[Please copy the terminal output / message pane contents here, and attach the output image file to
+the issue report if relevant.]
 ~~~
 
 **Additional context** (optional)

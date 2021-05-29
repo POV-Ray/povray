@@ -2,7 +2,7 @@
 name: Bug report (Miscellaneous: Windows)
 about: Report some other problem with POV-Ray for Windows
 title: "[BUG] "
-labels: bug?, Windows GUI
+labels: 'bug?'
 assignees: ''
 
 ---

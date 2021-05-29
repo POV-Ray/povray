@@ -2,7 +2,7 @@
 name: Feature request
 about: Suggest an idea for POV-Ray in general
 title: "[FEATURE] "
-labels: feature
+labels: 'feature'
 assignees: ''
 
 ---

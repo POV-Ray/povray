@@ -2,7 +2,7 @@
 name: Feature request (Unix)
 about: Suggest an idea specifically for POV-Ray for Unix
 title: "[FEATURE][UNIX] "
-labels: feature
+labels: 'feature'
 assignees: ''
 
 ---

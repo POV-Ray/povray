@@ -2,7 +2,7 @@
 name: Build error report (Windows)
 about: Report a problem with compiling POV-Ray for Windows
 title: "[BUILD][WINDOWS] "
-labels: compatibility?, OS: Windows
+labels: 'compatibility?, OS: Windows'
 assignees: ''
 
 ---
