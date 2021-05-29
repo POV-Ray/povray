@@ -1,7 +1,7 @@
 ---
-name: Bug report (Miscellaneous: Windows)
+name: Bug report (Windows)
 about: Report some other problem with POV-Ray for Windows
-title: "[BUG] "
+title: "[BUG][WINDOWS] "
 labels: 'bug?'
 assignees: ''
 

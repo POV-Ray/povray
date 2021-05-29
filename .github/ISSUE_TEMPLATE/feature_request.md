@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an idea for POV-Ray in general
+about: Suggest an idea for POV-Ray
 title: "[FEATURE] "
 labels: 'feature'
 assignees: ''

@@ -1,7 +1,7 @@
 ---
-name: Bug report (Miscellaneous: Unix)
+name: Bug report (Unix)
 about: Report some other problem with POV-Ray for Unix
-title: "[BUG] "
+title: "[BUG][UNIX] "
 labels: 'bug?'
 assignees: ''
 
