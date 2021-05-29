@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -434,8 +434,8 @@ void SymbolTable::Remove_Symbol(const char *Name, bool is_array_elem, void **Dat
     {
         POV_EXPERIMENTAL_ASSERT(DataPtr != nullptr);
 
-        POV_EXPERIMENTAL_ASSERT((ttype != FLOAT_TOKEN_CATEGORY) &&
-                                (ttype != FLOAT_ID_TOKEN) &&
+        POV_EXPERIMENTAL_ASSERT((ttype != SIGNATURE_TOKEN_CATEGORY) &&
+                                (ttype != FLOAT_TOKEN_CATEGORY) &&
                                 (ttype != VECTOR_TOKEN_CATEGORY) &&
                                 (ttype != COLOUR_TOKEN_CATEGORY));
 
