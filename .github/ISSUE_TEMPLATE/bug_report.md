@@ -1,3 +1,12 @@
+---
+name: Bug report
+about: Create a report to help us improve
+title: "[BUG] "
+labels: bug
+assignees: ''
+
+---
+
 <!-- -----------------------------------------------------------------------------------------------
 NOTE: THIS IS NOT A QUESTIONNAIRE, but rather a collection of building blocks to help you write a
 good issue report. PLEASE DISCARD any portions you don't understand or deem irrelevant for your type
