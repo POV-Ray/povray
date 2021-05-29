@@ -2,7 +2,7 @@
 name: Feature request (Windows)
 about: Suggest an idea specifically for POV-Ray for Windows
 title: "[FEATURE][WINDOWS] "
-labels: feature
+labels: 'feature, OS: Unix'
 assignees: ''
 
 ---

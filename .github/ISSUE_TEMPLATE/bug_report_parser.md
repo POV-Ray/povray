@@ -2,7 +2,7 @@
 name: Bug report (Parser)
 about: Report unexpected behavior during parsing of a scene
 title: "[BUG] "
-labels: bug?, parser
+labels: parser
 assignees: ''
 
 ---

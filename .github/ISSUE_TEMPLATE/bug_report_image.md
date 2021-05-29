@@ -2,7 +2,7 @@
 name: Bug report (Image)
 about: Report unexpected image output generated from a scene
 title: "[BUG] "
-labels: bug?
+labels: ''
 assignees: ''
 
 ---

@@ -2,7 +2,7 @@
 name: Bug report (Render)
 about: Report unexpected behavior during rendering of a scene
 title: "[BUG] "
-labels: bug?
+labels: ''
 assignees: ''
 
 ---

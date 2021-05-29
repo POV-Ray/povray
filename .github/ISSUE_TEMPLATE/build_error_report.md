@@ -1,8 +1,9 @@
 ---
 name: Build error report (Other)
-about: Report a problem with compiling POV-Ray for a yet unsupported platform, UI framework or build process
+about: Report a problem with compiling POV-Ray for a yet unsupported platform, UI
+  framework or build process
 title: "[BUILD][PORT] "
-labels: compatibility?
+labels: ''
 assignees: ''
 
 ---
