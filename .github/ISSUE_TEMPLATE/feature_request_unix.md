@@ -1,7 +1,7 @@
 ---
-name: Feature request
-about: Suggest an idea for POV-Ray in general
-title: "[FEATURE] "
+name: Feature request (Unix)
+about: Suggest an idea specifically for POV-Ray for Unix
+title: "[FEATURE][UNIX] "
 labels: feature
 assignees: ''
 

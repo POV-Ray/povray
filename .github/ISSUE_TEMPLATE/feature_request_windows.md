@@ -1,7 +1,7 @@
 ---
-name: Feature request
-about: Suggest an idea for POV-Ray in general
-title: "[FEATURE] "
+name: Feature request (Windows)
+about: Suggest an idea specifically for POV-Ray for Windows
+title: "[FEATURE][WINDOWS] "
 labels: feature
 assignees: ''
 
