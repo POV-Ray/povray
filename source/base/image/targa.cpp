@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -135,7 +135,7 @@ void Write (OStream *file, const Image *image, const ImageWriteOptions& options)
 {
     pix                     current;
     pix                     next;
-    bool                    opaque = options.AlphaIsEnabled();
+    bool                    opaque = !options.AlphaIsEnabled();
     bool                    compress = (options.compression > 0);
     vector<unsigned char>   header;
     vector<unsigned char>   line;
