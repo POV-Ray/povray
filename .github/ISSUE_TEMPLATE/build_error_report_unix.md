@@ -2,7 +2,7 @@
 name: Build error report (Unix)
 about: Report a problem with compiling POV-Ray for Unix
 title: "[BUILD][UNIX] "
-labels: 'compatibility? OS: Unix'
+labels: 'compatibility?, OS: Unix'
 assignees: ''
 
 ---
