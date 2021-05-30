@@ -50,7 +50,7 @@ VERSION_BASE=`echo $PACKAGE_VERSION | sed 's,\([[0-9]]*.[[0-9]]*\).*,\1,g'`
 AC_SUBST([VERSION_BASE])
 AC_DEFINE_UNQUOTED([VERSION_BASE], ["$VERSION_BASE"], [Base version number of package.])
 AC_CONFIG_AUX_DIR([unix/config])
-AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_HEADERS([unix/config.h])
 AC_CONFIG_SRCDIR([unix/disp_text.cpp])
 
 # Additional autoconf macros.

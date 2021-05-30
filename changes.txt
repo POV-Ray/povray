@@ -46,6 +46,11 @@ Fixed or Mitigated Bugs
     "Building on postmarketOS on PinePhone").
   - Eliminate uint type from platform-independent code (concludes fix of
     GitHub issue #400, "Building on postmarketOS on PinePhone").
+  - Change locations of auto-generated `config.h` and origonal `VERSION` file
+    to prevent the latter or its copy from erroneously being picked up on some
+    systems as `<version>` standard C++20 include file by libraries (notably
+    boost thread 1.73 and later; fixes GitHub issue #403, "povray 3.7.0.8 does
+    not build on macOS 11.0 Big Sur").
 
 
 Changes between 3.7.0.7 and 3.7.0.8

@@ -44,7 +44,7 @@
 
 umask 022
 
-pov_version_base=`cat ./VERSION | sed 's,\([0-9]*.[0-9]*\).*,\1,g'`
+pov_version_base=`cat ./prebuild/VERSION | sed 's,\([0-9]*.[0-9]*\).*,\1,g'`
 pov_config_bugreport="POV-Ray Bugtracker http://bugs.povray.org/"
 
 # documentation
@@ -350,7 +350,7 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
   # some shells seem unable to expand properly wildcards in the list entries
   # (e.g. ../distribution/in*/).
   for file in \
-    AUTHORS ChangeLog configure.ac COPYING NEWS README VERSION \
+    AUTHORS ChangeLog configure.ac COPYING NEWS README prebuild/VERSION \
     povray.1 povray.conf \
     scripts \
     ../distribution/ini ../distribution/include ../distribution/scenes
@@ -425,7 +425,6 @@ povray_SOURCES = \\
 
 # Include paths for headers.
 AM_CPPFLAGS = \\
-  -I\$(top_srcdir) \\
   -I\$(top_srcdir)/source \\
   -I\$(top_builddir)/source \\
   -I\$(top_srcdir)/source/backend \\
@@ -789,7 +788,6 @@ libpovray_a_SOURCES = \\
 
 # Include paths for headers.
 AM_CPPFLAGS = \\
-  -I\$(top_srcdir) \\
   -I\$(top_srcdir)/source/backend \\
   -I\$(top_srcdir)/source/base \\
   -I\$(top_srcdir)/source/frontend \\
