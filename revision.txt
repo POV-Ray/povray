@@ -32,8 +32,50 @@ Notes:
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
+POV-Ray v3.7.0.9
+------------------------------------------------------------------------------
+
+Commit 17abe5f7 on 2021-06-02 by Christoph Lipka (c-lipka)
+
+    List OpenEXR 3.0.0 and higher as currently not supported in Unix
+    install docs.
+
+Commit f68653cc on 2021-06-02 by Christoph Lipka (c-lipka)
+
+    Prevent `VERSION` from being picked up as C++20 `<version>` standard
+    header.
+
+    - Move `config.h` (created by `configure`) from main directory to
+    `unix` subdirectory
+    - Move original `VERSION` from `unix` to `unix/prebuild` subdirectory.
+    - Fix some instances in `prebuild.sh` where we're adding the main
+    directory to the include search path for no obvious reason.
+
+    This should fix GitHub issue #403.
+
+Commit 48b1951d on 2021-06-02 by Christoph Lipka (c-lipka)
+
+    Fix Travis CI automated build tests.
+
+Commit a7b6a94f on 2021-05-30 by Christoph Lipka
+
+    Eliminate `uint` type from platform-independent code.
+
+Commit 3d513983 on 2021-05-30 by Christoph Lipka (c-lipka)
+
+    Modify Unix `./configure` script `stat` invocation to support
+    busybox-style systems.
+
+    `./configure` will now formally probe which `stat` parameter to use, and
+    in addition to `--format=` (GNU) and `-f` (BSD) also try `-c` (busybox).
+
+------------------------------------------------------------------------------
 POV-Ray v3.7.0.8
 ------------------------------------------------------------------------------
+
+Commit 908900d9 on 2018-05-27 by Christoph Lipka
+
+    Bump version number and update change log.
 
 Commit e711a323 on 2018-05-27 by Christoph Lipka
 
