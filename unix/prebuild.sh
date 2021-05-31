@@ -91,6 +91,8 @@ if test x"$1" = x""; then
     autoconf=`echo $autoconf | sed -e 's,\([0-9]*\),Z\1Z,g' -e 's,Z\([0-9]\)Z,Z0\1Z,g' -e 's,[^0-9],,g'`
     required=`echo $required_autoconf | sed -e 's,\([0-9]*\),Z\1Z,g' -e 's,Z\([0-9]\)Z,Z0\1Z,g' -e 's,[^0-9],,g'`
     expr $autoconf \>= $required > /dev/null || autoconf=""
+  else
+    echo "Failed to detect autoconf"
   fi
   if test x"$autoconf" = x""; then
     echo "$scriptname: error: requires autoconf $required_autoconf or above"
@@ -104,6 +106,8 @@ if test x"$1" = x""; then
     automake=`echo $automake | sed -e 's,\([0-9]*\),Z\1Z,g' -e 's,Z\([0-9]\)Z,Z0\1Z,g' -e 's,[^0-9],,g'`
     required=`echo $required_automake | sed -e 's,\([0-9]*\),Z\1Z,g' -e 's,Z\([0-9]\)Z,Z0\1Z,g' -e 's,[^0-9],,g'`
     expr $automake \>= $required > /dev/null || automake=""
+  else
+    echo "Failed to detect automake"
   fi
   if test x"$automake" = x""; then
     echo "$scriptname: error: requires automake $required_automake or above"
