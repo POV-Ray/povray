@@ -29,7 +29,7 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
-Changes between 3.7.0.8 and 3.7.0.TBD
+Changes between 3.7.0.8 and 3.7.0.9
 ===================================
 
 (Note: This version has not been released in binary form, as it does not
