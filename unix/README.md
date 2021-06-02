@@ -8,6 +8,9 @@ will need to run a pre-build step. This generates the configure script
 and does a few other things usually performed by our developers prior to
 releasing a source package.
 
+Should you run into problems, please consult `unix/install.txt` for more
+in-depth installation mojo.
+
 NB if you have improvements to the below instructions, please add a comment
 to issue #1, or (if you are working in a branch) send us a pull request.
 

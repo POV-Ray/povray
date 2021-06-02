@@ -141,6 +141,10 @@ recommanded to generate a fully-featured POV-Ray executable.
 
 - When using Boost 1.65 or above, the compiler must conform to C++11 or later.
 
+- OpenEXR version 3.0.0 or higher is currently not supported, nor even
+  properly tested for. We hope to change this in the future, but fixing it is
+  a bit more complicated.
+
 
 ====================================================
 3. Configuring, building, and (un)installing POV-Ray
