@@ -457,7 +457,6 @@ endif
 # Include paths for headers.
 AM_CPPFLAGS = \\
   -I\$(top_srcdir)/unix/povconfig \\
-  -I\$(top_srcdir) \\
   -I\$(top_srcdir)/source \\
   -I\$(top_builddir)/source \\
   -I\$(top_srcdir)/platform/unix \\
@@ -829,7 +828,6 @@ endif
 # Include paths for headers.
 AM_CPPFLAGS = \\
   -I\$(top_srcdir)/unix/povconfig \\
-  -I\$(top_srcdir) \\
   -I\$(top_srcdir)/platform/unix \\
   \$(cppflags_platformcpu) \\
   -I\$(top_srcdir)/unix \\

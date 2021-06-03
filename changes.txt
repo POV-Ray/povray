@@ -130,6 +130,7 @@ Reported via GitHub:
     -lboost_system with Boost 1.66)
   - #342 ("AX_FIX_INCORRECT_PATH is broken", configure script failing to
     properly handle `.` directory in `C_INCLUDE_PATH` or `CPLUS_INCLUDE_PATH`)
+  - #403 ("povray 3.7.0.8 does not build on macOS 11.0 Big Sur").
 
 Reported via the Newsgroups:
 
