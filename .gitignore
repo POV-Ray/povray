@@ -177,7 +177,6 @@ $RECYCLE.BIN/
 /VERSION
 /aclocal.m4
 /bootstrap
-/config.h.in
 /configure
 /configure.ac
 /kde_install.sh
@@ -191,6 +190,7 @@ $RECYCLE.BIN/
 /source/Makefile.in
 /unix/Makefile.am
 /unix/Makefile.in
+/unix/config.h.in
 /unix/config/ar-lib
 /unix/config/compile
 /unix/config/config.guess
@@ -209,13 +209,13 @@ $RECYCLE.BIN/
 
 # Files created by configure script in main directory
 /Makefile
-/config.h
 /config.status
-/stamp-h1
 # Files created by configure script in specific subdirectories
 /platform/Makefile
 /source/Makefile
 /unix/Makefile
+/unix/config.h
+/unix/stamp-h1
 /vfe/Makefile
 # Directories created by configure script
 .deps/
