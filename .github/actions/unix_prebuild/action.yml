@@ -1,0 +1,8 @@
+name: 'Pre-Build POV-Ray for Unix'
+description: 'Run `prebuild.sh` build step for POV-Ray for Unix'
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        cd unix && ./prebuild.sh && cd ..

@@ -1,0 +1,20 @@
+name: 'Install Packages (brew)'
+description: 'Install required packages using brew'
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        # Make sure our package list is up to date
+        brew update
+        # Make sure we have all the libraries we want
+        brew install boost
+        brew install zlib
+        brew install libpng
+        brew install libjpeg
+        brew install libtiff
+        brew install openexr
+        brew install sdl
+        # Make sure we have all the tools we want
+        brew install automake
+        brew install pkg-config

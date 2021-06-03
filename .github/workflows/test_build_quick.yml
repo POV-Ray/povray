@@ -1,0 +1,89 @@
+name: 'Quick Tests'
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'release/*'
+  pull_request:
+    branches:
+      - 'release/*'
+
+jobs:
+  build_unix:
+    name: 'Unix Build Test'
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: 'Check out Repository'
+      uses: actions/checkout@v2
+
+    - name: 'Install Prerequisites'
+      uses: POV-Ray/povray/.github/actions/unix_getlibs_apt@master
+
+    - name: 'Prebuild'
+      uses: POV-Ray/povray/.github/actions/unix_prebuild@master
+    - name: 'Sanity-Check Working Tree'
+      uses: POV-Ray/povray/.github/actions/unix_check_repo@master
+
+    - name: 'Configure'
+      uses: POV-Ray/povray/.github/actions/unix_configure@master
+    - name: 'Sanity-Check Working Tree'
+      uses: POV-Ray/povray/.github/actions/unix_check_repo@master
+
+    - name: 'Bundle Artifacts for Diagnostics'
+      if: ${{ always() }}
+      uses: POV-Ray/povray/.github/actions/unix_bundle_ignored@master
+      with:
+        name: artifact_diag_unix.tar
+
+    - name: 'Build'
+      uses: POV-Ray/povray/.github/actions/unix_make@master
+    - name: 'Sanity-Check Working Tree'
+      uses: POV-Ray/povray/.github/actions/unix_check_repo@master
+
+    - name: 'Check Functionality'
+      uses: POV-Ray/povray/.github/actions/unix_make@master
+      with:
+        make-target: check
+    - name: 'Sanity-Check Working Tree'
+      uses: POV-Ray/povray/.github/actions/unix_check_repo@master
+
+#    - name: 'Install'
+#      uses: POV-Ray/povray/.github/actions/unix_make@master
+#      with:
+#        make-target: install
+#    - name: 'Sanity-Check Working Tree'
+#      uses: POV-Ray/povray/.github/actions/unix_check_repo@master
+
+    - name: 'Upload Artifacs for Diagnostics'
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: artifact_diag_unix
+        path: artifact_diag_unix.tar
+
+    # TODO: Maybe do some basic installation checking.
+
+  build_windows:
+    name: 'Windows Build Test'
+    runs-on: windows-latest
+    steps:
+
+    - name: 'Check out Repository'
+      uses: actions/checkout@v2
+
+    - name: 'Add MSBuild to PATH'
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: 'Build'
+      uses: POV-Ray/povray/.github/actions/windows_build@master
+      with:
+        pov-ray-build-id: gh${{github.run_number}}
+        solution: vs2015
+        configuration: Release
+        platform: x64
+        toolset: v142
+        msbuild-options: ''
+    - name: 'Sanity-Check Working Tree'
+      uses: POV-Ray/povray/.github/actions/unix_check_repo@master

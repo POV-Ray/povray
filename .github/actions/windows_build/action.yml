@@ -1,0 +1,52 @@
+name: 'Build POV-Ray for Windows'
+description: 'Build POV-Ray for Windows'
+
+inputs:
+  pov-ray-is-autobuild: 
+    description: 'POV_RAY_IS_AUTOBUILD value'
+    required: true
+    default: '1'
+  pov-ray-build-id: 
+    description: 'POV_RAY_BUILD_ID value'
+    required: true
+  built-by: 
+    description: 'BUILT_BY value'
+    required: true
+    default: 'GitHub'
+  solution: 
+    description: 'subdirectory of `windows` in which `povray.sln` is located'
+    required: true
+  configuration:
+    description: 'solution configuration to build'
+    required: false
+    default: 'Release'
+  platform:
+    description: 'solution platform to build'
+    required: false
+    default: 'x64'
+  toolset: 
+    description: 'Platform toolset version'
+    required: false
+    default: 'v140'
+  msbuild-options: 
+    description: 'additional MSBuild options'
+    required: false
+    default: ''
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: 'Prebuild'
+      shell: pwsh
+      run: |
+        $env:PovBuildDefs  = 'POV_RAY_IS_AUTOBUILD=${{ inputs.pov-ray-is-autobuild }};'
+        $env:PovBuildDefs += 'POV_RAY_BUILD_ID="${{ inputs.pov-ray-build-id }}";'
+        $env:PovBuildDefs += 'BUILT_BY="${{ inputs.built-by }}";'
+        msbuild `
+          /t:Rebuild /m `
+          /p:Configuration=${{ inputs.configuration }} `
+          /p:Platform=${{ inputs.platform }} `
+          /p:PlatformToolset=${{ inputs.toolset }} `
+          ${{ inputs.msbuild-options }} `
+          windows/${{ inputs.solution }}/povray.sln
