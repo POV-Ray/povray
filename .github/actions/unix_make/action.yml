@@ -1,0 +1,15 @@
+name: 'Make POV-Ray for Unix'
+description: 'Run `make` build step for POV-Ray for Unix'
+
+inputs:
+  make-target: 
+    description: 'Target for `make` command'
+    required: false
+    default: ''
+
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        make ${{ inputs.make-target }}

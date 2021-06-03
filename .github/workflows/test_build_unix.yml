@@ -1,0 +1,105 @@
+name: 'Unix Build Compatibility Tests'
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_unix:
+    name: '${{ matrix.os }} ${{ matrix.c-compiler }}'
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-18.04, ubuntu-20.04, macos-10.15]
+        c-compiler: [gcc, clang]
+        exclude:
+        - os: macos-10.15
+          c-compiler: gcc
+        include:
+        # os-specific
+        - os: ubuntu-18.04
+          package-manager: apt
+          configure-options: ''
+        - os: ubuntu-20.04
+          package-manager: apt
+          configure-options: ''
+        - os: macos-10.15
+          package-manager: brew
+          configure-options: '--without-openexr' # TODO: Fix for OpenEXR 3.0.0 and later
+        # compiler-specific
+        - c-compiler: gcc
+          cxx-compiler: g++
+        - c-compiler: clang
+          cxx-compiler: clang++
+
+    steps:
+
+    - name: 'Matrix Diagnostics'
+      run: |
+        echo "os:                '${{matrix.os}}'"
+        echo "c-compiler:        '${{matrix.c-compiler}}'"
+        echo ---
+        echo "package-manager:   '${{matrix.package-manager}}'"
+        echo "cxx-compiler:      '${{matrix.cxx-compiler}}'"
+        echo "configure-options: '${{matrix.configure-options}}'"
+        echo ---
+        ${{matrix.c-compiler}} --version
+
+    - name: 'Check out Repository'
+      uses: actions/checkout@v2
+
+    - name: 'Install Prerequisites (apt)'
+      if: ${{ matrix.package-manager == 'apt' }}
+      uses: c-lipka/povray/.github/actions/unix_getlibs_apt@master
+    - name: 'Install Prerequisites (brew)'
+      if: ${{ matrix.package-manager == 'brew' }}
+      uses: c-lipka/povray/.github/actions/unix_getlibs_brew@master
+
+    - name: 'Prebuild'
+      uses: c-lipka/povray/.github/actions/unix_prebuild@master
+    - name: 'Sanity-Check Working Tree'
+      uses: c-lipka/povray/.github/actions/unix_check_repo@master
+
+    - name: 'Configure'
+      uses: c-lipka/povray/.github/actions/unix_configure@master
+      with:
+        c-compiler: ${{ matrix.c-compiler }}
+        cxx-compiler: ${{ matrix.cxx-compiler }}
+        configure-options: ${{ matrix.configure-options }}
+    - name: 'Sanity-Check Working Tree'
+      uses: c-lipka/povray/.github/actions/unix_check_repo@master
+
+    - name: 'Bundle Artifacts for Diagnostics'
+      if: ${{ always() }}
+      uses: c-lipka/povray/.github/actions/unix_bundle_ignored@master
+      with:
+        name: artifact_diag_${{ matrix.os }}_${{ matrix.c-compiler }}.tar
+
+    - name: 'Build'
+      uses: c-lipka/povray/.github/actions/unix_make@master
+    - name: 'Sanity-Check Working Tree'
+      uses: c-lipka/povray/.github/actions/unix_check_repo@master
+
+    - name: 'Check Functionality'
+      uses: c-lipka/povray/.github/actions/unix_make@master
+      with:
+        make-target: check
+    - name: 'Sanity-Check Working Tree'
+      uses: c-lipka/povray/.github/actions/unix_check_repo@master
+
+#    - name: 'Install'
+#      uses: c-lipka/povray/.github/actions/unix_make@master
+#      with:
+#        make-target: install
+#    - name: 'Sanity-Check Working Tree'
+#      uses: c-lipka/povray/.github/actions/unix_check_repo@master
+
+    - name: 'Upload Artifacs for Diagnostics'
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: artifact_diag_${{ matrix.os }}_${{ matrix.c-compiler }}
+        path: artifact_diag_${{ matrix.os }}_${{ matrix.c-compiler }}.tar
+
+    # TODO: Maybe do some basic installation checking.

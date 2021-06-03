@@ -1,0 +1,22 @@
+name: 'Install Packages (apt)'
+description: 'Install required packages using apt'
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        # Make sure our package list is up to date
+        sudo apt-get update
+          # Make sure we have all the libraries we want,
+          # but don't bother upgrading pre-installed ones.
+        sudo apt-get install --no-upgrade \
+          libboost-dev            \
+          libboost-date-time-dev  \
+          libz-dev                \
+          libpng-dev              \
+          libjpeg-dev             \
+          libtiff-dev             \
+          libopenexr-dev          \
+          libsdl-dev
+        # Make sure we have all the tools we want
+        # (nothing here at the moment)

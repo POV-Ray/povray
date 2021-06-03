@@ -1,0 +1,27 @@
+name: 'Sanity-Check Working Tree'
+description: 'Verify that working tree (and index) of repository is "clean"'
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        changed=$( git status --porcelain )
+        if test -z "$changed" ; then
+          echo "No unexpected changes to the working tree found."
+          exit 0
+        fi
+        untracked=$( echo "$changed" | egrep '^[?]' || true )
+        changed=$( echo "$changed" | egrep '^[^?]' || true )
+        if test -n "$untracked" ; then
+          echo "Build process adds files not covered by .gitignore:"
+          echo "$untracked"
+        else
+          echo "No unexpected untracked files found."
+        fi
+        if test -n "$changed" ; then
+          echo "Build process tampers with tracked files:"
+          echo "$changed"
+        else
+          echo "No changes to tracked files found."
+        fi
+        exit 1

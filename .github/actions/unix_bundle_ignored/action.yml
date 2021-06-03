@@ -1,0 +1,16 @@
+name: 'Bundle Ignored Files'
+description: 'Bundle all untracked ignored files as an artifact'
+
+inputs:
+  name:
+    description: 'Artifact name'
+    required: true
+    default: 'artifact_diag'
+
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        artifacts=$( git status --porcelain --ignored -uall | egrep '^[!]' | cut -c 4- || true )
+        tar -cvf "${{inputs.name}}" $artifacts || true
