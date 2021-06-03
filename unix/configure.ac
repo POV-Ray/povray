@@ -217,11 +217,16 @@ echo "trying stat --format='%u,%g' ." >>config.log
 if stat --format='%u,%g' . >>config.log 2>>config.log && test x`stat --format=Foo .` = x"Foo"; then
   stat_format="--format="
 else
-  echo "trying stat --f '%u,%g' ." >>config.log
+  echo "trying stat -f '%u,%g' ." >>config.log
   if stat -f '%u,%g' . >>config.log 2>>config.log && test x`stat -f Foo .` = x"Foo"; then
     stat_format="-f "
   else
-    AC_MSG_FAILURE([stat command does not behave as required])
+    echo "trying stat -c'%u,%g' ." >>config.log
+    if stat -c '%u,%g' . >>config.log 2>>config.log && test x`stat -c Foo .` = x"Foo"; then
+      stat_format="-c "
+    else
+      AC_MSG_FAILURE([stat command does not behave as required])
+    fi
   fi
 fi
 AC_MSG_RESULT([$stat_format])
