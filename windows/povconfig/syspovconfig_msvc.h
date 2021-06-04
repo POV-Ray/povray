@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -93,75 +93,43 @@
   #pragma warning(disable : 4305) /* truncation from 'type1' to 'type2' (mostly double to float) */
   #pragma warning(disable : 4244) /* possible loss of data (converting ints to shorts) */
 
-  #if _MSC_VER >= 1400 && _MSC_VER < 1500 && !defined (_WIN64)
-    // MS Visual C++ 2005 (aka 8.0), compiling for 32 bit target
-    #define POV_COMPILER_VER                  "msvc8"
-    #define METADATA_COMPILER_STRING          "msvc 8"
-    #define NEED_INVHYP
-    #define POV_CPP11_SUPPORTED               0
-    #define POV_CPP14_SUPPORTED               0
-  #elif _MSC_VER >= 1400 && _MSC_VER < 1500 && defined (_WIN64)
-    // MS Visual C++ 2005 (aka 8.0), compiling for 64 bit target
-    #define POV_COMPILER_VER                  "msvc8"
-    #define METADATA_COMPILER_STRING          "msvc 8"
-    inline const int& max(const int& _X, const int& _Y) {return (_X < _Y ? _Y : _X); }
-    inline const int& min(const int& _X, const int& _Y) {return (_Y < _X ? _Y : _X); }
-    inline const unsigned int& max(const unsigned int& _X, const unsigned int& _Y) {return (_X < _Y ? _Y : _X); }
-    inline const unsigned int& min(const unsigned int& _X, const unsigned int& _Y) {return (_Y < _X ? _Y : _X); }
-    inline const long& max(const long& _X, const long& _Y) {return (_X < _Y ? _Y : _X); }
-    inline const long& min(const long& _X, const long& _Y) {return (_Y < _X ? _Y : _X); }
-    inline const unsigned long& max(const unsigned long& _X, const unsigned long& _Y) {return (_X < _Y ? _Y : _X); }
-    inline const unsigned long& min(const unsigned long& _X, const unsigned long& _Y) {return (_Y < _X ? _Y : _X); }
-    #define NEED_INVHYP
-    #define POV_CPP11_SUPPORTED               0
-    #define POV_CPP14_SUPPORTED               0
-  #elif _MSC_VER >= 1500 && _MSC_VER < 1600
-    // MS Visual C++ 2008 (aka 9.0)
-    #define POV_COMPILER_VER                  "msvc9"
-    #define METADATA_COMPILER_STRING          "msvc 9"
-    #define NEED_INVHYP
-    #define POV_CPP11_SUPPORTED               0
-    #define POV_CPP14_SUPPORTED               0
-  #elif _MSC_VER >= 1600 && _MSC_VER < 1700
-    // MS Visual C++ 2010 (aka 10.0)
-    #define POV_COMPILER_VER                  "msvc10"
-    #define METADATA_COMPILER_STRING          "msvc 10"
-    // msvc10 defines std::hash<> as a class, while boost's flyweight_fwd.hpp may forward-declare it as a struct;
-    // this is valid according to the C++ standard, but causes msvc10 to issue warnings.
-    #pragma warning(disable : 4099)
-    #define NEED_INVHYP
-    #define POV_CPP11_SUPPORTED               0
-    #define POV_CPP14_SUPPORTED               0
-  #elif _MSC_VER >= 1700 && _MSC_VER < 1800
-    // MS Visual C++ 2012 (aka 11.0)
-    #define POV_COMPILER_VER                  "msvc11"
-    #define METADATA_COMPILER_STRING          "msvc 11"
-    #error "Please update syspovconfig_msvc.h to include this version of MSVC"
-    // The following settings are just guesswork, and have never been tested:
-    #define NEED_INVHYP
-    #define POV_CPP11_SUPPORTED               0
-    #define POV_CPP14_SUPPORTED               0
-  #elif _MSC_VER >= 1800 && _MSC_VER < 1900
-    // MS Visual C++ 2013 (aka 12.0)
-    #define POV_COMPILER_VER                  "msvc12"
-    #define METADATA_COMPILER_STRING          "msvc 12"
-    #error "Please update syspovconfig_msvc.h to include this version of MSVC"
-    // The following settings are just guesswork, and have never been tested:
-    #define POV_CPP11_SUPPORTED               0
-    #define POV_CPP14_SUPPORTED               0
-  // NB: The Microsoft Visual Studio developers seem to have skipped internal version number 13 entirely.
-  #elif _MSC_VER >= 1900 && _MSC_VER < 2000
+  #if _MSC_VER < 1900
+    // Visual C++ 2013 and earlier do not comply with C++11,
+    // which as of v3.8.0 is a prerequisite for compiling POV-Ray.
+    #error "This software no longer supports your version of MS Visual C++"
+  #elif _MSC_VER >= 1900 && _MSC_VER < 1910
     // MS Visual C++ 2015 (aka 14.0)
     #define POV_COMPILER_VER                  "msvc14"
-    #define METADATA_COMPILER_STRING          "msvc 14"
+    #define METADATA_COMPILER_STRING          "msvc 14.0"
+    // Visual C++ 2015 defines `__cplusplus` as `199711L` (C++98),
+    // but supports all the C++11 features we need
     #define POV_CPP11_SUPPORTED               1
-    #define POV_CPP14_SUPPORTED               1
     #ifndef DEBUG
       // Suppress erroneous warning about `string` having different alignment in base and parser.
       #pragma warning(disable : 4742) // 'var' has different alignment in 'file1' and 'file2': number and number
     #endif
+  #elif _MSC_VER >= 1910 && _MSC_VER < 1920
+    // MS Visual C++ 2017 (aka 14.1x)
+    #define POV_COMPILER_VER                  "msvc141"
+    #define METADATA_COMPILER_STRING          "msvc 14.1x"
+    // Visual C++ 2017 15.6 (and earlier) defines `__cplusplus` as `199711L` (C++98),
+    // but supports all the C++11 features we need (and also pretty much all of C++14)
+    #define POV_CPP11_SUPPORTED               1
+    #define POV_CPP14_SUPPORTED               1
+    // TODO - This compiler version has been tested, but no effort has been made yet
+    // to iron out any inconveniences such as unwarranted warnings or the like.
+  #elif _MSC_VER >= 1920 && _MSC_VER < 1930
+    // MS Visual C++ 2019 (aka 14.2x)
+    #define POV_COMPILER_VER                  "msvc142"
+    #define METADATA_COMPILER_STRING          "msvc 14.2x"
+    // (no need to set `POV_*_SUPPORTED for VS 2019 and later, we can probe `__cplusplus`)
+    // TODO - This compiler version has been tested, but no effort has been made yet
+    // to iron out any inconveniences such as unwarranted warnings or the like.
   #else
-    #error "Please update syspovconfig_msvc.h to include this version of MSVC"
+    // Unrecognized version of MS Visual C++
+    #error("Your version of MS Visual C++ is still unknown to us. Proceed at your own risk.")
+    #define POV_COMPILER_VER                  "msvc"
+    #define METADATA_COMPILER_STRING          "msvc"
   #endif
   #define COMPILER_NAME                       "Microsoft Visual C++"
   #define COMPILER_VERSION                    _MSC_VER
