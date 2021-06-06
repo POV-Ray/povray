@@ -116,6 +116,11 @@ Performance Improvements
     `#if(false) ... #end`), especially for blocks containing few directives
     (stuff that begins with `#`).
 
+Miscellaneous Improvements
+--------------------------
+
+  - String literals are no longer limited to 256 characters.
+
 Fixed or Mitigated Bugs
 -----------------------
 
