@@ -6215,7 +6215,7 @@ ObjectPtr Parser::Parse_TrueType ()
             prism->Height1 = -depth;
             prism->Height2 = 0;
             prism->Number = controlPoints.size();
-            prism->Compute_Prism(controlPoints.data(), GetParserDataPtr());
+            prism->Compute_Prism(controlPoints.data(), GetParserDataPtr()->Stats());
             prism->Compute_BBox();
             prisms.push_back(prism);
         }
