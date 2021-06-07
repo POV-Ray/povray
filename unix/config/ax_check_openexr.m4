@@ -50,7 +50,7 @@ AC_DEFUN([AX_CHECK_OPENEXR],
       # FIXME: workaround for versions >= 1.4.0
       AX_COMPARE_VERSION([$ax_check_openexr_version], [ge], [1.4],
         [LIBS="$ax_check_openexr_libs -lIlmThread $LIBS"],
-	[LIBS="$ax_check_openexr_libs $LIBS"]
+        [LIBS="$ax_check_openexr_libs $LIBS"]
       )
 
       # check include file

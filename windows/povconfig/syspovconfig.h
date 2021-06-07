@@ -13,7 +13,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -117,6 +117,9 @@
 
 namespace povwin
 {
+  // Debugging aids.
+  // These are not normally called from the POV-Ray code, but are kept around as useful helpers
+  // during debug sessions.
   void WIN_Debug_Log(unsigned int from, const char *msg) ;
   void WIN32_DEBUG_OUTPUT(const char *format,...) ;
   void WIN32_DEBUG_FILE_OUTPUT(const char *format,...) ;
@@ -169,7 +172,7 @@ namespace povwin
 #define POV_MALLOC(size,msg)                std::malloc (size)
 #define POV_REALLOC(ptr,size,msg)           std::realloc ((ptr), (size))
 #define POV_FREE(ptr)                       do { std::free (static_cast<void *>(ptr)); (ptr) = NULL; } while(false)
-#define POV_STRDUP(str)                     std::strdup(str)
+#define POV_STRDUP(str)                     _strdup(str)
 
 #define NO_RTR                              1
 #define MEM_STATS                           0

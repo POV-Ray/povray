@@ -2973,7 +2973,7 @@ ObjectPtr Parser::Parse_Lathe()
 
     /* Compute spline segments. */
 
-    Object->Compute_Lathe(Points, GetParserDataPtr());
+    Object->Compute_Lathe(Points, GetParserDataPtr()->Stats());
 
     /* Compute bounding box. */
 
@@ -5491,7 +5491,7 @@ ObjectPtr Parser::Parse_Prism()
 
     /* Compute spline segments. */
 
-    Object->Compute_Prism(Points, GetParserDataPtr());
+    Object->Compute_Prism(Points, GetParserDataPtr()->Stats());
 
     /* Compute bounding box. */
 
@@ -5688,7 +5688,7 @@ ObjectPtr Parser::Parse_Sor()
 
     /* Compute spline segments. */
 
-    Object->Compute_Sor(Points, GetParserDataPtr());
+    Object->Compute_Sor(Points, GetParserDataPtr()->Stats());
 
     /* Compute bounding box. */
 

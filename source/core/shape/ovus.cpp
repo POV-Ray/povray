@@ -99,7 +99,7 @@ namespace pov
 void Ovus::Intersect_Ovus_Spheres(const Vector3d& P, const Vector3d& D,
                                   DBL * Depth1, DBL * Depth2, DBL * Depth3,
                                   DBL * Depth4, DBL * Depth5, DBL * Depth6,
-                                  TraceThreadData *Thread) const
+                                  RenderStatistics& stats) const
 {
     DBL OCSquared, t_Closest_Approach, Half_Chord, t_Half_Chord_Squared;
     Vector3d Padj;
@@ -205,14 +205,14 @@ void Ovus::Intersect_Ovus_Spheres(const Vector3d& P, const Vector3d& D,
 
     c[4] = k1 * k1 + 4.0 * R2 * (Py2 - r2);
 
-    n = Solve_Polynomial(4, c, r, Test_Flag(this, STURM_FLAG), RootTolerance, Thread->Stats());
+    n = Solve_Polynomial(4, c, r, Test_Flag(this, STURM_FLAG), RootTolerance, stats);
     while (n--)
     {
         // here we only keep the 'lemon' inside the torus
         // and dismiss the 'apple'
         // If you find a solution to resolve the rotation of
         //   (x + r)^2 + y^2 = R^2 around y (so replacing x by sqrt(x^2+z^2))
-        // with something which is faster than a 4th degree polynome,
+        // with something which is faster than a 4th degree polynomial,
         // please feel welcome to update and share...
 
         IPoint = P + r[n] * D;
@@ -285,7 +285,7 @@ bool Ovus::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
     D /= len;
 
     Intersect_Ovus_Spheres(P, D, &Depth1, &Depth2, &Depth3,
-                           &Depth4, &Depth5, &Depth6, Thread);
+                           &Depth4, &Depth5, &Depth6, Thread->Stats());
     if (Depth1 > EPSILON)
     {
         IPoint = P + Depth1 * D;
@@ -879,7 +879,7 @@ void Ovus::Compute_BBox()
 *
 ******************************************************************************/
 
-void Ovus::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
+void Ovus::UVCoord(Vector2d& Result, const Intersection *Inter) const
 {
     CalcUV(Inter->IPoint, Result);
 }

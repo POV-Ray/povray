@@ -84,7 +84,7 @@ class Ovus final : public ObjectBase
         virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) override;
         virtual bool Inside(const Vector3d&, TraceThreadData *) const override;
         virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const override;
-        virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const override;
+        virtual void UVCoord(Vector2d&, const Intersection *) const override;
         virtual void Translate(const Vector3d&, const TRANSFORM *) override;
         virtual void Rotate(const Vector3d&, const TRANSFORM *) override;
         virtual void Scale(const Vector3d&, const TRANSFORM *) override;
@@ -116,7 +116,7 @@ class Ovus final : public ObjectBase
         void Intersect_Ovus_Spheres(const Vector3d&, const Vector3d&,
                                     DBL * Depth1,DBL *Depth2, DBL * Depth3,
                                     DBL * Depth4, DBL * Depth5, DBL * Depth6,
-                                    TraceThreadData *Thread) const;
+                                    RenderStatistics& stats) const;
 
 };
 

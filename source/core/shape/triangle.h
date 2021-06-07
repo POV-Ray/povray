@@ -90,7 +90,7 @@ class Triangle : public NonsolidObject
         virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) override;
         virtual bool Inside(const Vector3d&, TraceThreadData *) const override;
         virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const override;
-        // virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const override; // TODO FIXME - why is there no UV-mapping for this trivial object? [trf]
+        // virtual void UVCoord(Vector2d&, const Intersection *) const override; // TODO FIXME - why is there no UV-mapping for this trivial object? [trf]
         virtual void Translate(const Vector3d&, const TRANSFORM *) override;
         virtual void Rotate(const Vector3d&, const TRANSFORM *) override;
         virtual void Scale(const Vector3d&, const TRANSFORM *) override;

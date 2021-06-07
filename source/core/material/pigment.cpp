@@ -608,7 +608,7 @@ bool PigmentBlendMap::ComputeUVMapped(TransColour& colour, const Intersection *I
     const BlendMapEntry<PIGMENT*>* Cur = &(Blend_Map_Entries[0]);
 
     /* Don't bother warping, simply get the UV vect of the intersection */
-    Intersect->Object->UVCoord(UV_Coords, Intersect, Thread);
+    Intersect->Object->UVCoord(UV_Coords, Intersect);
     TPoint[X] = UV_Coords[U];
     TPoint[Y] = UV_Coords[V];
     TPoint[Z] = 0;

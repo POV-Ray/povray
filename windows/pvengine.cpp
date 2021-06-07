@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -375,7 +375,7 @@ CRITICAL_SECTION        critical_section ;
 // key is the name of an included file (all lower case).
 // content is the name of the most recent rendered file that caused it to be included.
 map<std::string, std::string> IncludeToSourceMap;
-map<std::string, bool>    IncludeAlternateDecisionMap;
+map<std::string, bool>  IncludeAlternateDecisionMap;
 
 char                    queued_files [MAX_QUEUE] [_MAX_PATH] ;
 char                    dir [_MAX_PATH] ;

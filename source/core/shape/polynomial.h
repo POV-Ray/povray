@@ -105,7 +105,7 @@ class Poly final : public ObjectBase
 
         bool Set_Coeff(const unsigned int x,const unsigned int y, const unsigned int z, const DBL value);
     protected:
-        static int intersect(const BasicRay &Ray, int Order, const DBL *Coeffs, int Sturm_Flag, DBL *Depths, TraceThreadData *Thread);
+        static int intersect(const BasicRay &Ray, int Order, const DBL *Coeffs, int Sturm_Flag, DBL *Depths, RenderStatistics& stats);
         static void normal0(Vector3d& Result, int Order, const DBL *Coeffs, const Vector3d& IPoint);
         static void normal1(Vector3d& Result, int Order, const DBL *Coeffs, const Vector3d& IPoint);
         static DBL inside(const Vector3d& IPoint, int Order, const DBL *Coeffs);

@@ -99,7 +99,7 @@ class Cone final : public ObjectBase
         ///     UV mapping of this primitive should not be enabled until the primary
         ///     parameterization has been amended so that users have full control over the
         ///     primitive's  orientation, rather than just the axis of rotational symmetry.
-        virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const override;
+        virtual void UVCoord(Vector2d&, const Intersection *) const override;
 #endif // POV_ENABLE_CONE_UV
         virtual void Translate(const Vector3d&, const TRANSFORM *) override;
         virtual void Rotate(const Vector3d&, const TRANSFORM *) override;
@@ -110,7 +110,7 @@ class Cone final : public ObjectBase
         void Compute_Cone_Data();
         void Compute_Cylinder_Data();
     protected:
-        int Intersect(const BasicRay& ray, CONE_INT *Intersection, TraceThreadData *Thread) const;
+        int Intersect(const BasicRay& ray, CONE_INT *Intersection, RenderStatistics& stats) const;
 #ifdef POV_ENABLE_CONE_UV
         void CalcUV(const Vector3d& IPoint, Vector2d& Result) const;
 #endif // POV_ENABLE_CONE_UV
