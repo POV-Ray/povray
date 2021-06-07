@@ -104,6 +104,6 @@ for:
     release: $(pov_build_title) $(pov_build_version)
     description: $(pov_build_message)
     auth_token:
-      secure: WkcFPXyr/SJ9TXixTQyivhfoR9FzlryIbc4deHeQ0eA6YRXL0wQopMYJ6XL1/FJK
+      secure: Il7kbUpGx5Fx4ioI7cmEpEciqsq27HYiT/i4RYivOjfetfCLfMNQhIXEFGzvovoo
     draft: true
     prerelease: true
