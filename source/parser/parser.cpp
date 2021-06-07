@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -6202,6 +6202,11 @@ ObjectPtr Parser::Parse_TrueType ()
         {
             auto controlPoints = fontFace->GetCubicBezierOutline(glyph);
 
+            if (controlPoints.size() == 0)
+                // glyph is whitespace
+                continue;
+
+            // Font module produces control points in the wrong order.
             for (size_t i = 0; i < controlPoints.size() / 2; ++i)
                 std::swap(controlPoints[i], controlPoints[controlPoints.size() - i - 1]);
 
