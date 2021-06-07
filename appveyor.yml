@@ -6,9 +6,12 @@ branches:
   # Special branch "coverity_scan" is used only to trigger Coverity Scan;
   # no AppVeyor activity needed.
   - coverity_scan
+  # Branches starting with "housekeeping" are intended for small changes that do not affect
+  # the software per se (e.g. fixing typos in documentation or comments); no activity desired.
+  - /^housekeeping/
   # Branches ending with "-stable" are used only to point to other branches,
   # which should already have been test-built at this point; no activity needed.
-  - /.*-stable/
+  - /-stable$/
 
 # We're not using tags to trigger deployment, so there's no need to re-build tagged commits.
 skip_tags: true

@@ -35,6 +35,252 @@ Notes:
 POV-Ray v3.8.0-???
 ------------------------------------------------------------------------------
 
+Commit 37b99bd1 on 2021-06-04 by Christoph Lipka
+
+    Miscellaneous hosekeeping.
+
+    - Update `windows/povconfig/syspovconfig_msvc.h` to detect modern
+      versions of Visual Studio. Also, discard detailed detection of earlier
+      versions we no longer support anyway.
+    - Move `POV_BOMB_ON_ERROR` compile-time config setting from core to
+      base where it belongs.
+    - Clean up whitespace in some files.
+    - Added a few comments.
+
+Commit 110df4f4 on 2021-06-04 by Christoph Lipka
+
+    Fix `.gitignore` to catch a few files created by Windows build process.
+
+    Also a few other minor changes to the file.
+
+Commit d73361c4 on 2021-06-03 by Christoph Lipka
+
+    Check in file missing from earlier commit 3cdbaee3
+
+Commit b8ed76c6 on 2021-06-03 by Christoph Lipka
+
+    Modify Unix `./configure` script `stat` invocation to support
+    busybox-style systems.
+
+    `./configure` will now formally probe which `stat` parameter to use,
+    and in addition to `--format=` (GNU) and `-f` (BSD) also try `-c`
+    (busybox). Should fix issue #400.
+
+Commit 3cdbaee3 on 2021-06-03 by Christoph Lipka
+
+    Prevent `VERSION` from being picked up as C++20 `<version>` standard
+    header.
+
+    - Move `config.h` (created by `configure`) from main directory to
+      `unix` subdirectory
+    - Fix some instances in `prebuild.sh` where we're adding the main
+      directory to the include search path for no obvious reason.
+
+    This should fix GitHub issue #403 for v3.8.
+
+Commit 9468ec5e on 2021-05-31 by Christoph Lipka
+
+    [ci skip] Update issue templates to have folding sections.
+
+Commit bd2786ea on 2021-05-31 by Christoph Lipka
+
+    Make `unix/prebuild.sh` more verbose when unable to find autotools.
+
+Commit 42b88928 on 2021-05-29 by Christoph Lipka
+
+    Fix bug in transparent TGA output introduced with commit.bd73d0e6.
+
+    See <web.601de5a761b9256174b337b70@news.povray.org>
+
+Commit d00b7962 on 2021-05-29 by Christoph Lipka
+
+    Fix parse error in debug version when undefining a float variable.
+
+    See <web.5f351a7de6b33f6a4d00143e0@news.povray.org>
+
+Commit 747f7870 on 2021-05-29 by Christoph Lipka
+
+    [ci skip] Update issue templates
+
+    Unix build error report was still borked. Should be the last fiddling
+    with the templates (for today).
+
+Commit 55a0225d on 2021-05-29 by Christoph Lipka
+
+    [ci skop[ci skip] Update issue templates one more time, reducing their
+    number a bit and fixing problems in them. Again.
+
+Commit 53d908aa on 2021-05-29 by Christoph Lipka
+
+    [ci skip] Update issue templates one more time, reducing their number
+    a bit and fixing problems in them
+
+Commit 5b660e53 on 2021-05-29 by Christoph Lipka
+
+    [ci skip] Update issue templates, adding a lot more while discarding
+    the old clunky generic one.
+
+Commit c680ddea on 2021-05-29 by Christoph Lipka
+
+    [ci skip] Update issue templates, re-enabling old clunky generic bug
+    report for now
+
+Commit 2ca92103 on 2021-05-29 by Christoph Lipka
+
+    Update issue templates
+
+Commit 7b7319a3 on 2021-05-28 by Christoph Lipka
+
+    [ci skip] update build status icons in `README.md`
+
+Commit 7fe331a9 on 2021-05-28 by Christoph Lipka
+
+    Update `README.md` to let the world know the repository is still alive.
+
+Commit 7bab7e8f on 2021-05-28 by Christoph Lipka
+
+    Move `POV_PARSER_EXPERIMENTAL_BRILLIANCE_OUT` config option to core
+    where it belongs, renaming it along the way.
+
+Commit 74b3ebe0 on 2019-03-08 by Christoph Lipka
+
+    [windows] Fix Github issue #370.
+
+Commit 67698fd2 on 2019-02-23 by Christoph Lipka
+
+    [core] Prune more unnecessary use of `TraceThreadData`.
+
+Commit 0f3efc8e on 2019-02-19 by Christoph Lipka
+
+    [unix] Fix Unix builds using the SDL library.
+
+------------------------------------------------------------------------------
+POV-Ray v3.8.0-alpha.10064268
+------------------------------------------------------------------------------
+
+Commit 29a10823 on 2019-02-19 by Christoph Lipka
+
+    Fix another Mac OS X build error.
+
+Commit 162aa58a on 2019-02-19 by Christoph Lipka
+
+    Fix broken Mac OS X build.
+
+Commit 2d35fd4b on 2019-02-18 by Christoph Lipka
+
+    Drop now-unused boost_thread and boost_system libraries from our repo
+    and Windows solution.
+
+Commit 77d267d2 on 2019-02-18 by Christoph Lipka
+
+    More miscellaneous code cleanup / modernization.
+
+    - Change include hierarchy, using more dedicated forward declaration
+      headers.
+    - Make use of C++11 standard library for threads and timing.
+    - Start work on tearing down `TraceThreadData`.
+    - Some odds and ends.
+
+Commit 55c04883 on 2019-02-11 by Christoph Lipka
+
+    [doc] Minor update to coding style guide.
+
+Commit f0c66483 on 2019-02-11 by Christoph Lipka
+
+    Fix broken clang build.
+
+Commit 5219e71c on 2019-02-11 by Christoph Lipka
+
+    Miscellaneous code cleanup / modernization.
+
+    - Make liberal use of C++11 `override` and `final` specifiers.
+    - Replace various `typedef struct` with plain structs and `using`
+      declarations.
+    - Change include hierarchy, now using dedicated forward declaration
+      headers.
+    - Refactor (non-)portable portions of radiosity octree code, and add
+      truly portable alternative implementations.
+    - Some odds and ends.
+
+Commit 1fa6d360 on 2019-01-29 by Christoph Lipka
+
+    [parser] Fix "uncategorized error" in nested array initializers.
+
+Commit c79d3481 on 2019-01-26 by Christoph Lipka
+
+    Fix some misnomers related to conversion to/from "ASCII" (but really
+    platform-specific).
+
+Commit 7d04c132 on 2019-01-22 by Christoph Lipka
+
+    [parser] Modify token ID handling.
+
+Commit 8824108f on 2019-01-17 by Christoph Lipka
+
+    Fix AppVeyor building 64-bit version twice in auto-build branches.
+
+Commit 054e75c8 on 2019-01-16 by Christoph Lipka
+
+    Change AppVeyor config to no longer build 32-bit versions for mere
+    build testing.
+    32-bit versions are still built on branches intended for automated
+    binary creation.
+
+Commit 005893b2 on 2019-01-14 by Christoph Lipka
+
+    [parser] Clean up some messed-up source code indentations.
+
+------------------------------------------------------------------------------
+POV-Ray v3.8.0-alpha.10013324
+------------------------------------------------------------------------------
+
+Commit b5c0c83b on 2019-01-14 by Christoph Lipka
+
+    [parser] Fix bug in scanner that caused parse errors in certain recursive
+    macro call scenarios.
+
+Commit f9e8bce2 on 2019-01-13 by Christoph Lipka
+
+    [core] Fix crash in `text` primitive occurring under certain
+    circumstances.
+
+Commit 64e69879 on 2019-01-13 by Christoph Lipka
+
+    [base] Some code cleanup in `pov_err.h`.
+
+Commit 6e3888d6 on 2019-01-13 by Christoph Lipka
+
+    [parser] Fix crash on some platforms when using user-defined functions.
+
+------------------------------------------------------------------------------
+POV-Ray v3.8.0-alpha.10011104
+------------------------------------------------------------------------------
+
+Commit a065f44f on 2019-01-12 by Christoph Lipka
+
+    [parser] Fix bug in scanner when rewinding from end of file.
+
+Commit e649921c on 2019-01-12 by Christoph Lipka
+
+    [parser] Fix crash when using `text` primitive without global `charset`
+    setting.
+
+Commit 39ef6ec2 on 2019-01-11 by Christoph Lipka
+
+    [parser] Minor change to handling of super-fatal errors.
+
+Commit d515dc68 on 2019-01-11 by Christoph Lipka
+
+    [parser] Check for properly balanced `#end`, braces, parentheses etc.
+
+------------------------------------------------------------------------------
+POV-Ray v3.8.0-alpha.10008988
+------------------------------------------------------------------------------
+
+Commit c6f8284f on 2019-01-11 by Christoph Lipka
+
+    [ci skip] Update change log.
+
 Commit c341c943 on 2019-01-11 by Christoph Lipka
 
     Merge branch 'refactor/tokenizer'
@@ -2454,7 +2700,7 @@ Commit e287133b on 2016-04-29 by Christoph Lipka
 
     - Remove the `+avN` postfix from generated release tags.
     - Automatically flag builds as experimental if their version number
-    has a prefix beginning with `-x`, e.g. `3.7.1-x.foo.8765432`.
+      has a prefix beginning with `-x`, e.g. `3.7.1-x.foo.8765432`.
 
     Also updated the developers' documentation on version numbering.
 
@@ -2750,20 +2996,20 @@ Commit e1e7b0df on 2016-01-24 by Christoph Lipka
 
     Fix GitHub issue #53.
 
-      - The `version` pseudo-variable will now evaluate to the effective
-        language version at the time the expression is parsed, _except_
-        when used in a `#version` directive, in which case the behaviour
-        remains unchanged.
-      - Using the `version` pseudo-variable in a `#version` directive is now
-        deprecated. A new dedicated syntax, `#version auto`, has been added
-        to explicitly set the scene language version to whatever version of
-        POV-Ray is used to render the scene, making the `#version version`
-        idiom obsolete.
-      - The requirement to start each scene with a `#version` statement
-        is now more strongly enforced for POV-Ray 3.7 scenes, by reporting
-        a parse error if the scene file does not begin with a `#version`
-        directive but does have a `#version 3.7` (or later) directive anywhere
-        in the main scene file.
+    - The `version` pseudo-variable will now evaluate to the effective
+      language version at the time the expression is parsed, _except_
+      when used in a `#version` directive, in which case the behaviour
+      remains unchanged.
+    - Using the `version` pseudo-variable in a `#version` directive is now
+      deprecated. A new dedicated syntax, `#version auto`, has been added
+      to explicitly set the scene language version to whatever version of
+      POV-Ray is used to render the scene, making the `#version version`
+      idiom obsolete.
+    - The requirement to start each scene with a `#version` statement
+      is now more strongly enforced for POV-Ray 3.7 scenes, by reporting
+      a parse error if the scene file does not begin with a `#version`
+      directive but does have a `#version 3.7` (or later) directive anywhere
+      in the main scene file.
 
 Commit bb59a4e1 on 2016-01-20 by Christoph Lipka
 
@@ -3445,7 +3691,7 @@ Commit fd2e0dd1 on 2015-01-30 by Christoph Lipka
     - Added Doxygen configuration.
     - Minor changes to stand-alone source documentation pages.
     - Styleguide change: `@startuml` tag format is now to be used for
-    sequence charts instead of `@msc` tag format.
+      sequence charts instead of `@msc` tag format.
     - Added page on compiler requirements.
 
 ------------------------------------------------------------------------------
@@ -3638,24 +3884,24 @@ Commit 54b283a0 on 2014-07-23 by Christoph Lipka
 
     Improved finish features for more realism:
 
-      - Radiosity support for brilliance is now available; to activate it,
-        specify `brilliance on` in the global radiosity settings.
-      - The brilliance effect can now be applied not only to incoming
-        light, but also to outgoing light; to activate this, specify a second
-        FLOAT value
-        after the `brilliance` keyword. For maximum realism, both parameters
-        should be set to the same value.
-      - Fresnel angle-dependent attenuation can now also be enabled for
-        highlights and the diffuse component, by specifying `fresnel on`
-        directly in the finish block.
-        (Note that you will still need to enable fresnel attenuation
-        for reflections separately; also note that where reflection and
-        highlights increase at shallow angles,
-        the diffuse component decreases accordingly.) For a perfect match
-        between reflection and highlights use the `albedo` keyword for the
-        highlight with the same
-        value as the reflection maximum; the reflection minimum should be
-        set to zero.
+    - Radiosity support for brilliance is now available; to activate it,
+      specify `brilliance on` in the global radiosity settings.
+    - The brilliance effect can now be applied not only to incoming
+      light, but also to outgoing light; to activate this, specify a second
+      FLOAT value
+      after the `brilliance` keyword. For maximum realism, both parameters
+      should be set to the same value.
+    - Fresnel angle-dependent attenuation can now also be enabled for
+      highlights and the diffuse component, by specifying `fresnel on`
+      directly in the finish block.
+      (Note that you will still need to enable fresnel attenuation
+      for reflections separately; also note that where reflection and
+      highlights increase at shallow angles,
+      the diffuse component decreases accordingly.) For a perfect match
+      between reflection and highlights use the `albedo` keyword for the
+      highlight with the same
+      value as the reflection maximum; the reflection minimum should be
+      set to zero.
 
 Commit 9b10411d on 2014-07-21 by Christoph Lipka
 
@@ -3710,8 +3956,8 @@ Commit 365fc8fd on 2014-06-27 by Christoph Lipka
 
     5th iteration of the styleguide draft; Minor changes:
 
-      - Source comments can now use the "Dot" tool.
-      - Certain method names can now use `camelCase`.
+    - Source comments can now use the "Dot" tool.
+    - Certain method names can now use `camelCase`.
 
 Commit a190a10c on 2014-06-12 by Christoph Lipka
 

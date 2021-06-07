@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -119,7 +119,6 @@ UCS2 *Parser::Parse_String(bool pathname, bool require)
                                 " As of POV-Ray v3.8, this is interpreted as an escape sequence just like in any other string literal."
                                 " If this is supposed to be a path separator, use a forward slash instead.");
 #endif
-
                     }
                     pString = &stringValue->GetData();
                 }
