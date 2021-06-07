@@ -19,7 +19,7 @@
 /// ----------------------------------------------------------------------------
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -241,7 +241,7 @@ FINISH *Create_Finish()
     New->Diffuse                = 0.6;
     New->DiffuseBack            = 0.0;
     New->Brilliance             = 1.0;
-#if POV_PARSER_EXPERIMENTAL_BRILLIANCE_OUT
+#if POV_EXPERIMENTAL_BRILLIANCE_OUT
     New->BrillianceOut          = 1.0;
 #endif
     New->BrillianceAdjust       = 1.0;

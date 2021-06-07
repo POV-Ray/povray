@@ -97,19 +97,7 @@ struct ISO_Pair final
 };
 
 struct ISO_Max_Gradient;
-
-struct ISO_ThreadData final
-{
-    const IsoSurface *current;
-    GenericScalarFunctionInstance* pFn;
-    Vector3d Pglobal;
-    Vector3d Dglobal;
-    DBL Vlength;
-    DBL tl;
-    DBL fmax;
-    bool cache;
-    int Inv3;
-};
+struct ISO_ThreadData;
 
 class IsoSurface final : public ObjectBase
 {

@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -47,8 +47,16 @@
 /// @defgroup PovCoreConfig Core Compile-Time Configuration
 /// @ingroup PovCore
 /// @ingroup PovConfig
+/// Compile-Time Configuration of the @ref PovCore.
 ///
 /// @{
+
+/// @def POV_EXPERIMENTAL_BRILLIANCE_OUT
+/// Whether experimental second brilliance parameter should be enabled.
+///
+#ifndef POV_EXPERIMENTAL_BRILLIANCE_OUT
+    #define POV_EXPERIMENTAL_BRILLIANCE_OUT 0
+#endif
 
 //******************************************************************************
 ///
@@ -62,44 +70,44 @@
 /// @{
 
 #ifndef MEDIA_VECTOR_SIZE
-#define MEDIA_VECTOR_SIZE               256
+    #define MEDIA_VECTOR_SIZE               256
 #endif
 
 #ifndef MEDIA_INTERVAL_VECTOR_SIZE
-#define MEDIA_INTERVAL_VECTOR_SIZE      256
+    #define MEDIA_INTERVAL_VECTOR_SIZE      256
 #endif
 
 #ifndef LIT_INTERVAL_VECTOR_SIZE
-#define LIT_INTERVAL_VECTOR_SIZE        512
+    #define LIT_INTERVAL_VECTOR_SIZE        512
 #endif
 
 #ifndef LIGHT_INTERSECTION_VECTOR_SIZE
-#define LIGHT_INTERSECTION_VECTOR_SIZE  512 // TODO - I think this should be LIGHTSOURCE_VECTOR_SIZE*2 [CLi]
+    #define LIGHT_INTERSECTION_VECTOR_SIZE  512 // TODO - I think this should be LIGHTSOURCE_VECTOR_SIZE*2 [CLi]
 #endif
 
 #ifndef LIGHTSOURCE_VECTOR_SIZE
-#define LIGHTSOURCE_VECTOR_SIZE         1024
+    #define LIGHTSOURCE_VECTOR_SIZE         1024
 #endif
 
 #ifndef WEIGHTEDTEXTURE_VECTOR_SIZE
-#define WEIGHTEDTEXTURE_VECTOR_SIZE     512
+    #define WEIGHTEDTEXTURE_VECTOR_SIZE     512
 #endif
 
 #ifndef RAYINTERIOR_VECTOR_SIZE
-#define RAYINTERIOR_VECTOR_SIZE         512
+    #define RAYINTERIOR_VECTOR_SIZE         512
 #endif
 
 /// @def POV_VECTOR_POOL_SIZE
 /// Initial size of @ref PooledSimpleVector pools.
 #ifndef POV_VECTOR_POOL_SIZE
-#define POV_VECTOR_POOL_SIZE            16
+    #define POV_VECTOR_POOL_SIZE            16
 #endif
 
 /// @def POV_SIMPLE_VECTOR
 /// Vector type optimized for performance.
 /// May be either `std::vector`, `pov::SimpleVector`, or a compatible template.
 #ifndef POV_SIMPLE_VECTOR
-#define POV_SIMPLE_VECTOR               pov::SimpleVector
+    #define POV_SIMPLE_VECTOR               pov::SimpleVector
 #endif
 
 /// @}
@@ -281,24 +289,6 @@
 /// builds, in which case they will default to @ref POV_CORE_DEBUG unless noted otherwise.
 ///
 /// @{
-
-/// @def POV_BOMB_ON_ERROR
-/// Fail hard on all errors, allowing a debugger to kick in.
-///
-/// Define as non-zero integer to enable, or zero to disable.
-///
-/// If left undefined by system-specific configurations, this setting defaults to `0`.
-///
-/// @attention
-///     This setting is _strictly_ for debugging purposes only, and should _never ever_ be enabled
-///     in a release build!
-///
-/// @note
-///     At present, this is not yet supported by all error conditions.
-///
-#ifndef POV_BOMB_ON_ERROR
-    #define POV_BOMB_ON_ERROR 0
-#endif
 
 /// @def POV_CORE_DEBUG
 /// Default setting for enabling or disabling @ref PovCore debugging aids.

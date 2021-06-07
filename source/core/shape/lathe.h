@@ -117,14 +117,14 @@ class Lathe final : public ObjectBase
         virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) override;
         virtual bool Inside(const Vector3d&, TraceThreadData *) const override;
         virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const override;
-        virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const override;
+        virtual void UVCoord(Vector2d&, const Intersection *) const override;
         virtual void Translate(const Vector3d&, const TRANSFORM *) override;
         virtual void Rotate(const Vector3d&, const TRANSFORM *) override;
         virtual void Scale(const Vector3d&, const TRANSFORM *) override;
         virtual void Transform(const TRANSFORM *) override;
         virtual void Compute_BBox() override;
 
-        void Compute_Lathe(Vector2d *P, TraceThreadData *);
+        void Compute_Lathe(Vector2d *P, RenderStatistics& stats);
     protected:
         bool Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread);
         bool test_hit(const BasicRay&, IStack&, DBL, DBL, int, TraceThreadData *Thread);

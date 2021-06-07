@@ -957,7 +957,7 @@ void Sor::Compute_BBox()
 *
 ******************************************************************************/
 
-void Sor::Compute_Sor(Vector2d *P, TraceThreadData *Thread)
+void Sor::Compute_Sor(Vector2d *P, RenderStatistics& stats)
 {
     int i, n;
     DBL *tmp_r1;
@@ -1073,7 +1073,7 @@ void Sor::Compute_Sor(Vector2d *P, TraceThreadData *Thread)
         c[1] = 2.0 * B;
         c[2] = C;
 
-        n = Solve_Polynomial(2, c, r, false, 0.0, Thread->Stats());
+        n = Solve_Polynomial(2, c, r, false, 0.0, stats);
 
         while (n--)
         {
@@ -1242,7 +1242,7 @@ bool Sor::test_hit(const BasicRay &ray, IStack& Depth_Stack, DBL d, DBL k, int t
 *
 ******************************************************************************/
 
-void Sor::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
+void Sor::UVCoord(Vector2d& Result, const Intersection *Inter) const
 {
     DBL len, theta;
     DBL h, v_per_segment;

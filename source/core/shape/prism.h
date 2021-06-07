@@ -128,9 +128,9 @@ class Prism final : public ObjectBase
         virtual void Transform(const TRANSFORM *) override;
         virtual void Compute_BBox() override;
 
-        void Compute_Prism(Vector2d *P, TraceThreadData *Thread);
+        void Compute_Prism(Vector2d *P, RenderStatistics& stats);
     protected:
-        int in_curve(DBL u, DBL v, TraceThreadData *Thread) const;
+        int in_curve(DBL u, DBL v, RenderStatistics& stats) const;
         static bool test_rectangle(const Vector3d& P, const Vector3d& D, DBL x1, DBL y1, DBL x2, DBL y2);
 };
 

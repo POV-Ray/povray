@@ -114,7 +114,7 @@ bool Lemon::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 
     Intersection_Found = false;
 
-    if ((cnt = Intersect(P, D, I, Thread)) != 0)
+    if ((cnt = Intersect(P, D, I, Thread->Stats())) != 0)
     {
         for (i = 0; i < cnt; i++)
         {
@@ -161,7 +161,7 @@ bool Lemon::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 *
 ******************************************************************************/
 
-int Lemon::Intersect(const Vector3d& P, const Vector3d& D, LEMON_INT *Intersection, TraceThreadData *Thread) const
+int Lemon::Intersect(const Vector3d& P, const Vector3d& D, LEMON_INT *Intersection, RenderStatistics& stats) const
 {
     int i = 0;
     DBL a, b, c[5], r[4];
@@ -196,7 +196,7 @@ int Lemon::Intersect(const Vector3d& P, const Vector3d& D, LEMON_INT *Intersecti
 
         c[4] = k1 * k1 + 4.0 * R2 * (Pz2 - r2);
 
-        n = Solve_Polynomial(4, c, r, Test_Flag(this, STURM_FLAG), ROOT_TOLERANCE, Thread->Stats());
+        n = Solve_Polynomial(4, c, r, Test_Flag(this, STURM_FLAG), ROOT_TOLERANCE, stats);
         while (n--)
         {
             // here we only keep the 'lemon' inside the torus
@@ -784,7 +784,7 @@ void Lemon::Compute_BBox()
 *
 ******************************************************************************/
 
-void Lemon::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
+void Lemon::UVCoord(Vector2d& Result, const Intersection *Inter) const
 {
     CalcUV(Inter->IPoint, Result);
 }

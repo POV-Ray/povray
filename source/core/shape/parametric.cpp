@@ -783,7 +783,7 @@ Parametric::Parametric() : NonsolidObject(PARAMETRIC_OBJECT)
  *
 ******************************************************************************/
 
-void Parametric::UVCoord(Vector2d& Result, const Intersection *inter, TraceThreadData *Thread) const
+void Parametric::UVCoord(Vector2d& Result, const Intersection *inter) const
 {
     Result = inter->Iuv;
 }

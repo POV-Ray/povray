@@ -50,7 +50,6 @@
 #include "core/scene/scenedata.h"
 #include "core/shape/blob.h"
 #include "core/shape/fractal.h"
-#include "core/shape/isosurface.h"
 #include "core/support/cracklecache.h"
 
 // this must be the last file included
@@ -76,14 +75,6 @@ TraceThreadData::TraceThreadData(std::shared_ptr<SceneData> sd, size_t seed) :
     Blob_Queue = reinterpret_cast<void **>(POV_MALLOC(sizeof(void *), "Blob Queue"));
     Blob_Coefficients = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * Blob_Coefficient_Count, "Blob Coefficients"));
     Blob_Intervals = new Blob_Interval_Struct [Blob_Interval_Count];
-    isosurfaceData = reinterpret_cast<ISO_ThreadData *>(POV_MALLOC(sizeof(ISO_ThreadData), "Isosurface Data"));
-    isosurfaceData->pFn = nullptr;
-    isosurfaceData->current = nullptr;
-    isosurfaceData->cache = false;
-    isosurfaceData->Inv3 = 1;
-    isosurfaceData->fmax = 0.0;
-    isosurfaceData->tl = 0.0;
-    isosurfaceData->Vlength = 0.0;
 
     BCyl_Intervals.reserve(4*sceneData->Max_Bounding_Cylinders);
     BCyl_RInt.reserve(2*sceneData->Max_Bounding_Cylinders);
@@ -111,7 +102,6 @@ TraceThreadData::TraceThreadData(std::shared_ptr<SceneData> sd, size_t seed) :
     passThruPrev = false;           // was the previous object pass-through?
     Light_Is_Global = false;       // is the current light global? (not part of a light_group?)
 
-    CrCache_MaxAge = 1;
     progress_index = 0;
 
     surfacePhotonMap = new PhotonMap();
@@ -128,7 +118,6 @@ TraceThreadData::~TraceThreadData()
 
     POV_FREE(Blob_Coefficients);
     POV_FREE(Blob_Queue);
-    POV_FREE(isosurfaceData);
     Fractal::Free_Iteration_Stack(Fractal_IStack);
     delete surfacePhotonMap;
     delete mediaPhotonMap;
