@@ -108,7 +108,7 @@ bool Cone::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 
     Intersection_Found = false;
 
-    if ((cnt = Intersect(ray, I, Thread)) != 0)
+    if ((cnt = Intersect(ray, I, Thread->Stats())) != 0)
     {
         for (i = 0; i < cnt; i++)
         {
@@ -153,14 +153,14 @@ bool Cone::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 *
 ******************************************************************************/
 
-int Cone::Intersect(const BasicRay& ray, CONE_INT *Intersection, TraceThreadData *Thread) const
+int Cone::Intersect(const BasicRay& ray, CONE_INT *Intersection, RenderStatistics& stats) const
 {
     int i = 0;
     DBL a, b, c, z, t1, t2, len;
     DBL d;
     Vector3d P, D;
 
-    Thread->Stats()[Ray_Cone_Tests]++;
+    stats[Ray_Cone_Tests]++;
 
     /* Transform the ray into the cones space */
 
@@ -297,7 +297,7 @@ int Cone::Intersect(const BasicRay& ray, CONE_INT *Intersection, TraceThreadData
     }
 
     if (i)
-        Thread->Stats()[Ray_Cone_Tests_Succeeded]++;
+        stats[Ray_Cone_Tests_Succeeded]++;
 
     return (i);
 }
@@ -962,7 +962,7 @@ void Cone::Compute_BBox()
 *
 ******************************************************************************/
 
-void Cone::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
+void Cone::UVCoord(Vector2d& Result, const Intersection *Inter) const
 {
     CalcUV(Inter->IPoint, Result);
 }

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -119,7 +119,7 @@ struct Texture_Struct final : public Pattern_Struct
 struct Finish_Struct final
 {
     SNGL Diffuse, DiffuseBack, Brilliance;
-#if POV_PARSER_EXPERIMENTAL_BRILLIANCE_OUT
+#if POV_EXPERIMENTAL_BRILLIANCE_OUT
     SNGL BrillianceOut;
 #endif
     SNGL BrillianceAdjust, BrillianceAdjustRad;

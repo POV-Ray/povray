@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2019 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -901,6 +901,24 @@
 ///
 #ifndef POV_STRING_DEBUG
     #define POV_STRING_DEBUG POV_DEBUG
+#endif
+
+/// @def POV_BOMB_ON_ERROR
+/// Fail hard on all errors, allowing a debugger to kick in.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+/// If left undefined by system-specific configurations, this setting defaults to `0`.
+///
+/// @attention
+///     This setting is _strictly_ for debugging purposes only. It should _never ever_ be enabled
+///     in _any_ builds released to end users, be it release builds or otherwise!
+///
+/// @note
+///     At present, this is not yet supported by all error conditions.
+///
+#ifndef POV_BOMB_ON_ERROR
+    #define POV_BOMB_ON_ERROR 0
 #endif
 
 /// @}

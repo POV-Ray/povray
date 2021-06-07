@@ -150,6 +150,11 @@ $RECYCLE.BIN/
 # POV-Ray Windows build artefacts
 # ===============================
 
+/libraries/ilmbase/Half/eLut.h
+/libraries/ilmbase/Half/toFloat.h
+/libraries/png/pnglibconf.h
+/libraries/tiff/libtiff/tif_config.h
+/libraries/tiff/libtiff/tiffconf.h
 /windows/vs*/.vs/
 /windows/vs*/bin32/
 /windows/vs*/bin64/
@@ -172,7 +177,6 @@ $RECYCLE.BIN/
 /VERSION
 /aclocal.m4
 /bootstrap
-/config.h.in
 /configure
 /configure.ac
 /kde_install.sh
@@ -186,6 +190,7 @@ $RECYCLE.BIN/
 /source/Makefile.in
 /unix/Makefile.am
 /unix/Makefile.in
+/unix/config.h.in
 /unix/config/ar-lib
 /unix/config/compile
 /unix/config/config.guess
@@ -204,23 +209,22 @@ $RECYCLE.BIN/
 
 # Files created by configure script in main directory
 /Makefile
-/config.h
 /config.status
-/stamp-h1
 # Files created by configure script in specific subdirectories
 /platform/Makefile
 /source/Makefile
 /unix/Makefile
+/unix/config.h
+/unix/stamp-h1
 /vfe/Makefile
 # Directories created by configure script
 .deps/
 
-# Files created by make in main directory
-/povray.ini
-# Files created by make in specific subdirectories
+# Files created by make
 /unix/povray
-# Files created by make in various subdirectories
 .dirstamp
+# Files created by make check
+/povray.ini
 
 # ===========================
 # POV-Ray meta-build detritus
@@ -251,3 +255,10 @@ $RECYCLE.BIN/
 /tools/windows/htmlhelp/output
 /tools/windows/htmlhelp/debug.txt
 /tools/windows/htmlhelp/filelist.txt
+
+# ========================
+# GitHub Actions artefacts
+# ========================
+
+# Used specifically by our own workflows
+/artifact*

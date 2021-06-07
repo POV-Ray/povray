@@ -40,7 +40,7 @@ AC_DEFUN([AX_CHECK_LIBJPEG],
         [jpeglib.h],
         [
           # check library version, update LIBS
-	  if test x"$1" != x"$ax_check_libjpeg_version_num"; then
+          if test x"$1" != x"$ax_check_libjpeg_version_num"; then
             AC_MSG_CHECKING([for libjpeg version >= $1 ($ax_check_libjpeg_version_num)])
           else
             AC_MSG_CHECKING([for libjpeg version >= $1])

@@ -685,7 +685,7 @@ void Sphere::Compute_BBox()
 *
 ******************************************************************************/
 
-void Sphere::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
+void Sphere::UVCoord(Vector2d& Result, const Intersection *Inter) const
 {
     DBL len, phi, theta;
     DBL x,y,z;

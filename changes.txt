@@ -90,7 +90,7 @@ New Features
     details.
   - Anti-aliasing now supports a new mode 3, which can actually serve as a
     generic oversampling mechanism not only suited to perform edge
-    anti-aliasing, but also to successtully suppress moire patterns as well as
+    anti-aliasing, but also to successfully suppress moire patterns as well as
     reduce image noise from stochastic mechanisms (e.g. jittered area lights,
     subsurface light transport or micronormals). The mathematical background
     and parameterization is similar to that of adaptive focal blur.
@@ -116,6 +116,11 @@ Performance Improvements
     `#if(false) ... #end`), especially for blocks containing few directives
     (stuff that begins with `#`).
 
+Miscellaneous Improvements
+--------------------------
+
+  - String literals are no longer limited to 256 characters.
+
 Fixed or Mitigated Bugs
 -----------------------
 
@@ -130,6 +135,8 @@ Reported via GitHub:
     -lboost_system with Boost 1.66)
   - #342 ("AX_FIX_INCORRECT_PATH is broken", configure script failing to
     properly handle `.` directory in `C_INCLUDE_PATH` or `CPLUS_INCLUDE_PATH`)
+  - #400 ("Building on postmarketOS on PinePhone")
+  - #403 ("povray 3.7.0.8 does not build on macOS 11.0 Big Sur").
 
 Reported via the Newsgroups:
 

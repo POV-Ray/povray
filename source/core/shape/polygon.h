@@ -97,7 +97,7 @@ class Polygon final : public NonsolidObject
         virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) override;
         virtual bool Inside(const Vector3d&, TraceThreadData *) const override;
         virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const override;
-        // virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const override; // TODO FIXME - does this use the default mapping? [trf]
+        // virtual void UVCoord(Vector2d&, const Intersection *) const override; // TODO FIXME - does this use the default mapping? [trf]
         virtual void Translate(const Vector3d&, const TRANSFORM *) override;
         virtual void Rotate(const Vector3d&, const TRANSFORM *) override;
         virtual void Scale(const Vector3d&, const TRANSFORM *) override;
@@ -106,7 +106,7 @@ class Polygon final : public NonsolidObject
 
         void Compute_Polygon(int number, Vector3d *points);
     protected:
-        bool Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Thread) const;
+        bool Intersect(const BasicRay& ray, DBL *Depth, RenderStatistics& stats) const;
         static bool in_polygon(int number, Vector2d *points, DBL u, DBL  v);
 };
 

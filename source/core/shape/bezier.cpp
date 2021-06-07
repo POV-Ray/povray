@@ -2137,7 +2137,7 @@ void BicubicPatch::Compute_BBox()
 *
 ******************************************************************************/
 
-void BicubicPatch::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
+void BicubicPatch::UVCoord(Vector2d& Result, const Intersection *Inter) const
 {
     /* Use preocmputed uv coordinates. */
 

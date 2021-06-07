@@ -243,7 +243,7 @@ bool Poly::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 
         default:
 
-            cnt = intersect(New_Ray, Order, Coeffs, Test_Flag(this, STURM_FLAG), Depths, Thread);
+            cnt = intersect(New_Ray, Order, Coeffs, Test_Flag(this, STURM_FLAG), Depths, Thread->Stats());
     }
 
     if (cnt > 0)
@@ -653,7 +653,7 @@ DBL Poly::inside(const Vector3d& IPoint, int Order, const DBL *Coeffs)
 *
 ******************************************************************************/
 
-int Poly::intersect(const BasicRay &ray, int Order, const DBL *Coeffs, int Sturm_Flag, DBL *Depths, TraceThreadData *Thread)
+int Poly::intersect(const BasicRay &ray, int Order, const DBL *Coeffs, int Sturm_Flag, DBL *Depths, RenderStatistics& stats)
 {
     DBL eqn_v[3][MAX_ORDER+1], eqn_vt[3][MAX_ORDER+1];
     DBL eqn[MAX_ORDER+1];
@@ -765,7 +765,7 @@ int Poly::intersect(const BasicRay &ray, int Order, const DBL *Coeffs, int Sturm
 
     if (j > 1)
     {
-        return(Solve_Polynomial(j, &eqn[i], Depths, Sturm_Flag, ROOT_TOLERANCE, Thread->Stats()));
+        return(Solve_Polynomial(j, &eqn[i], Depths, Sturm_Flag, ROOT_TOLERANCE, stats));
     }
     else
     {

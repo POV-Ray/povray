@@ -260,7 +260,7 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
                         u = P[X] + k * D[X];
                         v = P[Z] + k * D[Z];
 
-                        if (in_curve(u, v, Thread))
+                        if (in_curve(u, v, Thread->Stats()))
                         {
                             distance = k / len;
                             if ((distance > DEPTH_TOLERANCE) && (distance < MAX_DISTANCE))
@@ -284,7 +284,7 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
                         u = P[X] + k * D[X];
                         v = P[Z] + k * D[Z];
 
-                        if (in_curve(u, v, Thread))
+                        if (in_curve(u, v, Thread->Stats()))
                         {
                             distance = k / len;
                             if ((distance > DEPTH_TOLERANCE) && (distance < MAX_DISTANCE))
@@ -437,7 +437,7 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
                             u = (P[X] + k * D[X]) / Height2;
                             v = (P[Z] + k * D[Z]) / Height2;
 
-                            if (in_curve(u, v, Thread))
+                            if (in_curve(u, v, Thread->Stats()))
                             {
                                 distance = k / len;
                                 if ((distance > DEPTH_TOLERANCE) && (distance < MAX_DISTANCE))
@@ -464,7 +464,7 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
                             u = (P[X] + k * D[X]) / Height1;
                             v = (P[Z] + k * D[Z]) / Height1;
 
-                            if (in_curve(u, v, Thread))
+                            if (in_curve(u, v, Thread->Stats()))
                             {
                                 distance = k / len;
                                 if ((distance > DEPTH_TOLERANCE) && (distance < MAX_DISTANCE))
@@ -662,7 +662,7 @@ bool Prism::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
             }
         }
 
-        if (in_curve(P[X], P[Z], Thread))
+        if (in_curve(P[X], P[Z], Thread->Stats()))
         {
             return(!Test_Flag(this, INVERTED_FLAG));
         }
@@ -1151,7 +1151,7 @@ void Prism::Compute_BBox()
 *
 ******************************************************************************/
 
-int Prism::in_curve(DBL u, DBL v, TraceThreadData *Thread) const
+int Prism::in_curve(DBL u, DBL v, RenderStatistics& stats) const
 {
     int i, n, NC;
     DBL k, w;
@@ -1179,7 +1179,7 @@ int Prism::in_curve(DBL u, DBL v, TraceThreadData *Thread) const
                 x[2] = Entry.C[Y];
                 x[3] = Entry.D[Y] - v;
 
-                n = Solve_Polynomial(3, x, y, Test_Flag(this, STURM_FLAG), 0.0, Thread->Stats());
+                n = Solve_Polynomial(3, x, y, Test_Flag(this, STURM_FLAG), 0.0, stats);
 
                 while (n--)
                 {
@@ -1372,7 +1372,7 @@ bool Prism::test_rectangle(const Vector3d& P, const Vector3d& D, DBL x1, DBL z1,
 *
 ******************************************************************************/
 
-void Prism::Compute_Prism(Vector2d *P, TraceThreadData *Thread)
+void Prism::Compute_Prism(Vector2d *P, RenderStatistics& stats)
 {
     int i, n, number_of_splines;
     int i1, i2, i3;
@@ -1562,7 +1562,7 @@ void Prism::Compute_Prism(Vector2d *P, TraceThreadData *Thread)
             c[1] = 2.0 * B[X];
             c[2] =       C[X];
 
-            n = Solve_Polynomial(2, c, r, false, 0.0, Thread->Stats());
+            n = Solve_Polynomial(2, c, r, false, 0.0, stats);
 
             while (n--)
             {
@@ -1576,7 +1576,7 @@ void Prism::Compute_Prism(Vector2d *P, TraceThreadData *Thread)
             c[1] = 2.0 * B[Y];
             c[2] =       C[Y];
 
-            n = Solve_Polynomial(2, c, r, false, 0.0, Thread->Stats());
+            n = Solve_Polynomial(2, c, r, false, 0.0, stats);
 
             while (n--)
             {

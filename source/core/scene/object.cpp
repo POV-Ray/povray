@@ -879,7 +879,7 @@ double ObjectBase::GetPotential (const Vector3d& p, bool subtractThreshold, Trac
 *
 ******************************************************************************/
 
-void ObjectBase::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *) const
+void ObjectBase::UVCoord(Vector2d& Result, const Intersection *Inter) const
 {
     Result[U] = Inter->IPoint[X];
     Result[V] = Inter->IPoint[Y];

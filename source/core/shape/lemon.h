@@ -95,7 +95,7 @@ class Lemon final : public ObjectBase
         ///     UV mapping of this primitive should not be enabled until the primary
         ///     parameterization has been amended so that users have full control over the
         ///     primitive's  orientation, rather than just the axis of rotational symmetry.
-        virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const override;
+        virtual void UVCoord(Vector2d&, const Intersection *) const override;
 #endif // POV_ENABLE_LEMON_UV
         virtual void Translate(const Vector3d&, const TRANSFORM *) override;
         virtual void Rotate(const Vector3d&, const TRANSFORM *) override;
@@ -113,7 +113,7 @@ class Lemon final : public ObjectBase
         DBL HorizontalPosition; /* horizontal position of the center of the inner circle */
         DBL VerticalPosition;   /* vertical position of the center of the inner circle */
     protected:
-        int Intersect(const Vector3d& P, const Vector3d& D, LEMON_INT *Intersection, TraceThreadData *Thread) const;
+        int Intersect(const Vector3d& P, const Vector3d& D, LEMON_INT *Intersection, RenderStatistics& stats) const;
 #ifdef POV_ENABLE_LEMON_UV
         void CalcUV(const Vector3d& IPoint, Vector2d& Result) const;
 #endif // POV_ENABLE_LEMON_UV
