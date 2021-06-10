@@ -20,6 +20,9 @@ jobs:
 
     - name: 'Install Prerequisites'
       uses: POV-Ray/povray/.github/actions/unix_getlibs_apt@master
+      with:
+        need-boost-system: true
+        need-boost-thread: true
 
     - name: 'Prebuild'
       uses: POV-Ray/povray/.github/actions/unix_prebuild@master

@@ -52,9 +52,15 @@ jobs:
     - name: 'Install Prerequisites (apt)'
       if: ${{ matrix.package-manager == 'apt' }}
       uses: POV-Ray/povray/.github/actions/unix_getlibs_apt@master
+      with:
+        need-boost-system: true
+        need-boost-thread: true
     - name: 'Install Prerequisites (brew)'
       if: ${{ matrix.package-manager == 'brew' }}
       uses: POV-Ray/povray/.github/actions/unix_getlibs_brew@master
+      with:
+        need-boost-system: true
+        need-boost-thread: true
 
     - name: 'Prebuild'
       uses: POV-Ray/povray/.github/actions/unix_prebuild@master
