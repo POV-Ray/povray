@@ -102,7 +102,7 @@
     #define POV_COMPILER_VER                  "msvc14"
     #define METADATA_COMPILER_STRING          "msvc 14.0"
     // Visual C++ 2015 defines `__cplusplus` as `199711L` (C++98),
-    // but supports all the C++11 features we need
+    // but supports all the C++11 features we need.
     #define POV_CPP11_SUPPORTED               1
     #ifndef DEBUG
       // Suppress erroneous warning about `string` having different alignment in base and parser.
@@ -112,16 +112,22 @@
     // MS Visual C++ 2017 (aka 14.1x)
     #define POV_COMPILER_VER                  "msvc141"
     #define METADATA_COMPILER_STRING          "msvc 14.1x"
-    // Visual C++ 2017 15.6 (and earlier) defines `__cplusplus` as `199711L` (C++98),
-    // but supports all the C++11 features we need (and also pretty much all of C++14)
+    // Visual C++ 2017 defines `__cplusplus` as `199711L` (C++98) when in default (C++11-ish) mode,
+    // but supports all the C++11 features we need.
+    // Later versions of Visual C++ 2017 allegedly support C++14, but allegedly need the `/std` switch
+    // to turn it on, in which case support can allegedly be detected properly by probing `__cplusplus`.
     #define POV_CPP11_SUPPORTED               1
-    #define POV_CPP14_SUPPORTED               1
     // TODO - This compiler version has been tested, but no effort has been made yet
     // to iron out any inconveniences such as unwarranted warnings or the like.
   #elif _MSC_VER >= 1920 && _MSC_VER < 1930
     // MS Visual C++ 2019 (aka 14.2x)
     #define POV_COMPILER_VER                  "msvc142"
     #define METADATA_COMPILER_STRING          "msvc 14.2x"
+    // Visual C++ 2019 defines `__cplusplus` as `199711L` (C++98) when in default (C++11-ish) mode,
+    // but supports all the C++11 features we need.
+    // It also allegedly supports C++14 (and later standards), but allegedly need the `/std` switch
+    // to turn it on, in which case support can allegedly be detected properly by probing `__cplusplus`.
+    #define POV_CPP11_SUPPORTED               1
     // (no need to set `POV_*_SUPPORTED for VS 2019 and later, we can probe `__cplusplus`)
     // TODO - This compiler version has been tested, but no effort has been made yet
     // to iron out any inconveniences such as unwarranted warnings or the like.
@@ -130,6 +136,7 @@
     #error("Your version of MS Visual C++ is still unknown to us. Proceed at your own risk.")
     #define POV_COMPILER_VER                  "msvc"
     #define METADATA_COMPILER_STRING          "msvc"
+    #define POV_CPP11_SUPPORTED               1
   #endif
   #define COMPILER_NAME                       "Microsoft Visual C++"
   #define COMPILER_VERSION                    _MSC_VER
