@@ -30,10 +30,10 @@ runs:
           libopenexr-dev          \
           libsdl-dev
         # Only install the following if we plan on needing them
-        if {{ $inputs.need-boost-system }} ; then
+        if ${{ inputs.need-boost-system }} ; then
           sudo apt-get install --no-upgrade libboost-system-dev
         fi
-        if {{ $inputs.need-boost-thread }} ; then
+        if ${{ inputs.need-boost-thread }} ; then
           sudo apt-get install --no-upgrade libboost-thread-dev
         fi
         # Make sure we have all the tools we want
