@@ -1,5 +1,16 @@
 name: 'Install Packages (apt)'
 description: 'Install required packages using apt'
+
+inputs:
+  need-boost-system:
+    description: 'whether version under test needs boost thread library'
+    required: false
+    default: false
+  need-boost-thread:
+    description: 'whether version under test needs boost thread library'
+    required: false
+    default: false
+
 runs:
   using: "composite"
   steps:
@@ -7,8 +18,8 @@ runs:
       run: |
         # Make sure our package list is up to date
         sudo apt-get update
-          # Make sure we have all the libraries we want,
-          # but don't bother upgrading pre-installed ones.
+        # Make sure we have all the libraries we want,
+        # but don't bother upgrading pre-installed ones.
         sudo apt-get install --no-upgrade \
           libboost-dev            \
           libboost-date-time-dev  \
@@ -18,5 +29,12 @@ runs:
           libtiff-dev             \
           libopenexr-dev          \
           libsdl-dev
+        # Only install the following if we plan on needing them
+        if {{ $inputs.need-boost-system }} ; then
+          sudo apt-get install --no-upgrade libboost-system-dev
+        fi
+        if {{ $inputs.need-boost-thread }} ; then
+          sudo apt-get install --no-upgrade libboost-thread-dev
+        fi
         # Make sure we have all the tools we want
         # (nothing here at the moment)
