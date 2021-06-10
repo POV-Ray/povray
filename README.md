@@ -1,11 +1,11 @@
 [POV-Ray](http://www.povray.org/) - The Persistence of Vision Raytracer
 =======================================================================
 
-[![Semaphore Build Status](https://semaphoreci.com/api/v1/pov-ray/povray/branches/master/shields_badge.svg?label=Semaphore)](https://semaphoreci.com/pov-ray/povray  "Semaphore: Ubuntu 14.04 LTE 64-bit with gcc 4.8")
+[![Quick Tests](https://github.com/POV-Ray/povray/actions/workflows/test_build_quick.yml/badge.svg)](https://github.com/POV-Ray/povray/actions/workflows/test_build_quick.yml "Arbitrary Ubuntu gcc / Visual Studio")
 [![AppVeyor Build status](https://img.shields.io/appveyor/ci/c-lipka/povray-exwy4.svg?label=appveyor)](https://ci.appveyor.com/project/c-lipka/povray-exwy4 "AppVeyor: Windows Server 2012 R2 with Visual Studio 2015")
 [![Travis CI Build Status](https://img.shields.io/travis/POV-Ray/povray.svg?label=travis%20ci)](https://travis-ci.com/POV-Ray/povray "Travis CI: Ubuntu 14.04 LTE 64-bit with gcc 4.8.4; OS X 10.13 with clang ?.?")
 [![Coverity Code Analysis](https://scan.coverity.com/projects/269/badge.svg)](https://scan.coverity.com/projects/pov-ray "Coverity: Static Code Analysis")
-[![Maintenance Status](https://img.shields.io/maintenance/yes/2021.svg)](README.md "Last edited 2021-05-28")
+[![Maintenance Status](https://img.shields.io/maintenance/yes/2021.svg)](README.md "Last edited 2021-06-10")
 
 - [License](#license)
 - [Forums](#forums)
