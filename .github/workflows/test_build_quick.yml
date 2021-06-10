@@ -25,42 +25,42 @@ jobs:
       uses: actions/checkout@v2
 
     - name: 'Install Prerequisites'
-      uses: c-lipka/povray/.github/actions/unix_getlibs_apt@master
+      uses: POV-Ray/povray/.github/actions/unix_getlibs_apt@master
 
     - name: 'Prebuild'
-      uses: c-lipka/povray/.github/actions/unix_prebuild@master
+      uses: POV-Ray/povray/.github/actions/unix_prebuild@master
     - name: 'Sanity-Check Working Tree'
-      uses: c-lipka/povray/.github/actions/unix_check_repo@master
+      uses: POV-Ray/povray/.github/actions/unix_check_repo@master
 
     - name: 'Configure'
-      uses: c-lipka/povray/.github/actions/unix_configure@master
+      uses: POV-Ray/povray/.github/actions/unix_configure@master
     - name: 'Sanity-Check Working Tree'
-      uses: c-lipka/povray/.github/actions/unix_check_repo@master
+      uses: POV-Ray/povray/.github/actions/unix_check_repo@master
 
     - name: 'Bundle Artifacts for Diagnostics'
       if: ${{ always() }}
-      uses: c-lipka/povray/.github/actions/unix_bundle_ignored@master
+      uses: POV-Ray/povray/.github/actions/unix_bundle_ignored@master
       with:
         name: artifact_diag_unix.tar
 
     - name: 'Build'
-      uses: c-lipka/povray/.github/actions/unix_make@master
+      uses: POV-Ray/povray/.github/actions/unix_make@master
     - name: 'Sanity-Check Working Tree'
-      uses: c-lipka/povray/.github/actions/unix_check_repo@master
+      uses: POV-Ray/povray/.github/actions/unix_check_repo@master
 
     - name: 'Check Functionality'
-      uses: c-lipka/povray/.github/actions/unix_make@master
+      uses: POV-Ray/povray/.github/actions/unix_make@master
       with:
         make-target: check
     - name: 'Sanity-Check Working Tree'
-      uses: c-lipka/povray/.github/actions/unix_check_repo@master
+      uses: POV-Ray/povray/.github/actions/unix_check_repo@master
 
 #    - name: 'Install'
-#      uses: c-lipka/povray/.github/actions/unix_make@master
+#      uses: POV-Ray/povray/.github/actions/unix_make@master
 #      with:
 #        make-target: install
 #    - name: 'Sanity-Check Working Tree'
-#      uses: c-lipka/povray/.github/actions/unix_check_repo@master
+#      uses: POV-Ray/povray/.github/actions/unix_check_repo@master
 
     - name: 'Upload Artifacs for Diagnostics'
       if: ${{ failure() }}
@@ -83,7 +83,7 @@ jobs:
       uses: microsoft/setup-msbuild@v1.0.2
 
     - name: 'Build'
-      uses: c-lipka/povray/.github/actions/windows_build@master
+      uses: POV-Ray/povray/.github/actions/windows_build@master
       with:
         pov-ray-build-id: gh${{github.run_number}}
         solution: vs2015
@@ -92,4 +92,4 @@ jobs:
         toolset: v142
         msbuild-options: ''
     - name: 'Sanity-Check Working Tree'
-      uses: c-lipka/povray/.github/actions/unix_check_repo@master
+      uses: POV-Ray/povray/.github/actions/unix_check_repo@master

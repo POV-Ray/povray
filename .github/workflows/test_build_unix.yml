@@ -51,49 +51,49 @@ jobs:
 
     - name: 'Install Prerequisites (apt)'
       if: ${{ matrix.package-manager == 'apt' }}
-      uses: c-lipka/povray/.github/actions/unix_getlibs_apt@master
+      uses: POV-Ray/povray/.github/actions/unix_getlibs_apt@master
     - name: 'Install Prerequisites (brew)'
       if: ${{ matrix.package-manager == 'brew' }}
-      uses: c-lipka/povray/.github/actions/unix_getlibs_brew@master
+      uses: POV-Ray/povray/.github/actions/unix_getlibs_brew@master
 
     - name: 'Prebuild'
-      uses: c-lipka/povray/.github/actions/unix_prebuild@master
+      uses: POV-Ray/povray/.github/actions/unix_prebuild@master
     - name: 'Sanity-Check Working Tree'
-      uses: c-lipka/povray/.github/actions/unix_check_repo@master
+      uses: POV-Ray/povray/.github/actions/unix_check_repo@master
 
     - name: 'Configure'
-      uses: c-lipka/povray/.github/actions/unix_configure@master
+      uses: POV-Ray/povray/.github/actions/unix_configure@master
       with:
         c-compiler: ${{ matrix.c-compiler }}
         cxx-compiler: ${{ matrix.cxx-compiler }}
         configure-options: ${{ matrix.configure-options }}
     - name: 'Sanity-Check Working Tree'
-      uses: c-lipka/povray/.github/actions/unix_check_repo@master
+      uses: POV-Ray/povray/.github/actions/unix_check_repo@master
 
     - name: 'Bundle Artifacts for Diagnostics'
       if: ${{ always() }}
-      uses: c-lipka/povray/.github/actions/unix_bundle_ignored@master
+      uses: POV-Ray/povray/.github/actions/unix_bundle_ignored@master
       with:
         name: artifact_diag_${{ matrix.os }}_${{ matrix.c-compiler }}.tar
 
     - name: 'Build'
-      uses: c-lipka/povray/.github/actions/unix_make@master
+      uses: POV-Ray/povray/.github/actions/unix_make@master
     - name: 'Sanity-Check Working Tree'
-      uses: c-lipka/povray/.github/actions/unix_check_repo@master
+      uses: POV-Ray/povray/.github/actions/unix_check_repo@master
 
     - name: 'Check Functionality'
-      uses: c-lipka/povray/.github/actions/unix_make@master
+      uses: POV-Ray/povray/.github/actions/unix_make@master
       with:
         make-target: check
     - name: 'Sanity-Check Working Tree'
-      uses: c-lipka/povray/.github/actions/unix_check_repo@master
+      uses: POV-Ray/povray/.github/actions/unix_check_repo@master
 
 #    - name: 'Install'
-#      uses: c-lipka/povray/.github/actions/unix_make@master
+#      uses: POV-Ray/povray/.github/actions/unix_make@master
 #      with:
 #        make-target: install
 #    - name: 'Sanity-Check Working Tree'
-#      uses: c-lipka/povray/.github/actions/unix_check_repo@master
+#      uses: POV-Ray/povray/.github/actions/unix_check_repo@master
 
     - name: 'Upload Artifacs for Diagnostics'
       if: ${{ failure() }}

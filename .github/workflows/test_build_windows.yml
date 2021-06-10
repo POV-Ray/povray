@@ -71,7 +71,7 @@ jobs:
       uses: microsoft/setup-msbuild@v1.0.2
 
     - name: 'Build'
-      uses: c-lipka/povray/.github/actions/windows_build@master
+      uses: POV-Ray/povray/.github/actions/windows_build@master
       with:
         pov-ray-build-id: ghvs${{matrix.visual-studio}}${{matrix.compatibility}}${{github.run_number}}
         solution: ${{matrix.solution}}
@@ -80,4 +80,4 @@ jobs:
         toolset: ${{matrix.toolset}}${{matrix.toolset-variant}}
         msbuild-options: ${{matrix.msbuild-options}}
     - name: 'Sanity-Check Working Tree'
-      uses: c-lipka/povray/.github/actions/unix_check_repo@master
+      uses: POV-Ray/povray/.github/actions/unix_check_repo@master
