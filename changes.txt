@@ -83,7 +83,7 @@ New Features
     details.
   - Anti-aliasing now supports a new mode 3, which can actually serve as a
     generic oversampling mechanism not only suited to perform edge
-    anti-aliasing, but also to successtully suppress moire patterns as well as
+    anti-aliasing, but also to successfully suppress moire patterns as well as
     reduce image noise from stochastic mechanisms (e.g. jittered area lights,
     subsurface light transport or micronormals). The mathematical background
     and parameterization is similar to that of adaptive focal blur.
@@ -146,7 +146,7 @@ Reported by Coverity static code analysis:
 
 Miscellaneous:
 
-  - Fix `interior_texture` for text objects (as mentioned in GitHub issue #65)
+  - Fix `interior_texture` for text objects (as mentioned in GitHub issue #65).
   - Eliminated use of deprecated C++ `register` keyword (except in 3rd party
     libraries bundled with the POV-Ray source code).
   - Fix long-standing bug in Julia fractal primitive using hypercomplex numbers.

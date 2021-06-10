@@ -35,6 +35,67 @@ Notes:
 POV-Ray v3.8.0-???
 ------------------------------------------------------------------------------
 
+Commit d4cf497d on 2021-06-10 by Christoph Lipka
+
+    Fix bug in transparent TGA output introduced with commit.bd73d0e6.
+
+    See <web.601de5a761b9256174b337b70@news.povray.org>
+
+Commit bf7c4c62 on 2021-06-10 by Christoph Lipka
+
+    Prevent `VERSION` from being picked up as C++20 `<version>` standard
+    header.
+
+    - Move `config.h` (created by `configure`) from main directory to
+      `unix` subdirectory
+    - Fix some instances in `prebuild.sh` where we're adding the main
+      directory to the include search path for no obvious reason.
+
+    This should fix GitHub issue #403 for v3.8.
+
+Commit f2fabfdf on 2021-06-10 by Christoph Lipka
+
+    [ci skip] Update build status badges for v3.8 branch.
+
+Commit b550d03b on 2021-06-10 by Christoph Lipka
+
+    [ci skip] Fix `.gitignore` to catch a few files created by Windows
+    build process.
+
+    Also a few other minor changes to the file.
+
+Commit b6777977 on 2021-06-10 by Christoph Lipka
+
+    Fix GitHub workflows to install boost thread library for v3.8 test builds.
+
+Commit be72d893 on 2021-06-10 by Christoph Lipka (c-lipka)
+
+    Set up repo to use GitHub Actions.
+
+Commit 89fd4c06 on 2021-06-10 by Christoph Lipka
+
+    [ci skip] General fix for auto-build branches.
+
+    Needs to be propagated to the actual auto-build branches to take effect.
+
+Commit fc89ed16 on 2021-06-09 by Christoph Lipka
+
+    Prepare v3.8.0 for Beta phase.
+
+    **NOTE**: It has been decided to roll back some changes made during
+    v3.8.0-alpha development, most notably the internal overhaul of the
+    parser. To this end, v3.8.0-pre-beta branches off not from the last
+    v3.8.0-alpha, but from the commit right before those parser changes
+    were merged, now tagged as `nexus-v3.8-v4.0`.
+
+------------------------------------------------------------------------------
+POV-Ray v3.8.0-alpha "nexus-v3.8-v4.0"
+------------------------------------------------------------------------------
+
+Commit 85db57d9 on 2019-01-11 by Christoph Lipka
+
+    [ci skip] Update change log.
+
 Commit 851c3e3d on 2019-01-03 by Christoph Lipka
 
     [ci skip] Fix bug in `ior.inc`.
