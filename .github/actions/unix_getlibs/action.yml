@@ -1,0 +1,76 @@
+name: 'Install Packages'
+description: 'Install required packages'
+runs:
+  using: composite
+  steps:
+  - env:
+      package_matrix: |
+        _os                     | Linux                             | macOS         |
+        _update                 | sudo apt-get update               | brew update   | cmd to update pkg mgr database
+        _install                | sudo apt-get install --no-upgrade | brew install  | cmd to install pkg
+        boost/                  | libboost-dev                      | boost         | bulk of boost lib
+        boost/boost/date_time/  | libboost-date-time-dev            |               | boost date-time lib
+        boost/libs/system/      | libboost-system-dev               |               | boost system lib
+        boost/libs/thread/      | libboost-thread-dev               |               | boost thread lib
+        freetype/               | libfreetype-dev                   | freetype      |
+        jpeg/                   | libjpeg-dev                       | libjpeg       |
+        openexr/                | libopenexr-dev                    | openexr       |
+        png/                    | libpng-dev                        | libpng        |
+                                | libsdl-dev                        | sdl           | simple direct media layer
+        tiff/                   | libtiff-dev                       | libtiff       |
+        zlib/                   | libz-dev                          | zlib          |
+                                | automake                          | automake      |
+                                | pkg-config                        | pkg-config    |
+    shell: bash
+    run: |
+      echo "Preparing to install packages for ${{ runner.os }}"
+      package_matrix=`echo "${package_matrix}" | sed 's/ *| */|/g'`
+      col_list=`echo "${package_matrix}" | head -n1 | tr '|' '\n'`
+      col_os=`echo "${col_list}" | grep -nx "${{ runner.os }}" || true`
+      if test -z "${col_os}" ; then
+        echo "::error::Operating system not found in matrix."
+        exit 1
+      fi
+      col_index=`echo "${col_os}" | cut -d':' -f1`
+      package_matrix=`echo "${package_matrix}" | cut -d'|' -f"1,${col_index}"`
+      do_update=`echo "${package_matrix}" | grep '_update' | cut -d'|' -f2`
+      do_install=`echo "${package_matrix}" | grep '_install' | cut -d'|' -f2`
+      echo "::group::Determine packages to install"
+      cp /dev/null ~PACKAGE_LIST
+      echo "${package_matrix}" | while read line ; do
+        key=`echo ${line} | cut -d'|' -f1`
+        value=`echo ${line} | cut -d'|' -f2`
+        if test -z "${value}" ; then
+          continue
+        fi
+        case "${key}" in
+          _*) continue ;;
+          '') condition="true" ;;
+          */) condition="test -d 'libraries/${key}'" ;;
+          *)  echo "::warning::Ignoring unexpected key '${key}' in package matrix." ; continue ;;
+        esac
+        if eval "${condition}" ; then
+          echo "${value}" | tee -a ~PACKAGE_LIST
+        else
+          echo "(${value} not required for this version)"
+        fi
+      done
+      package_list=`cat ~PACKAGE_LIST`
+      rm ~PACKAGE_LIST
+      echo "::endgroup::"
+      if test -n "${do_update}" ; then
+        echo "::group::Update package manager database"
+        ${do_update}
+        echo "::endgroup::"
+      else
+        echo "::warning::No package manager update command found in matrix."
+      fi
+      if test -n "${do_install}" ; then
+        echo "::group::Install packages"
+        ${do_install} ${package_list}
+        echo "::endgroup::"
+      elif test -n "${package_list}" ; then
+        echo "::error::No package manager install command found in matrix."
+      else
+        echo "::warning::No package manager install command found in matrix (nor packages to install)."
+      fi

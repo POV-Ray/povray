@@ -1,0 +1,52 @@
+name: 'Create Release'
+description: 'Create GitHub Release from commit under examination'
+
+inputs:
+  token:
+    description: 'GitHub access token'
+    required: true
+  is-draft:
+    description: 'Whether to generate a draft only'
+    required: true
+  is-prerelease:
+    description: 'Whether to generate a pre-release only'
+    required: true
+  tag-name:
+    description: 'Name of the associated tag to create'
+    required: true
+  title:
+    description: 'Title of the release'
+    required: true
+  notes-file:
+    description: 'File containing release notes'
+    required: true
+  assets:
+    description: 'Blank-separated list of filenames to attach as assets'
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+  - shell: bash
+    run: |
+      if ${{ inputs.is-draft }} ; then
+        draft_switch='--draft'
+      else
+        draft_switch=''
+        # git config --global user.name "${{ inputs.token }}"
+        # git tag -a -m "${{ inputs.message }}" "${{ inputs.tag-name }}"
+        # git push origin "${{ inputs.tag-name }}"
+      fi
+      if ${{ inputs.is-prerelease }} ; then
+        prerelease_switch='--prerelease'
+      else
+        prerelease_switch=''
+      fi
+      gh auth login --with-token <<< "${{ inputs.token }}"
+      gh release create ${{ inputs.tag-name }}                        \
+        --target ${{ github.sha }}                                    \
+        $draft_switch $prerelease_switch                              \
+        --title "${{ inputs.title }}"                                 \
+        --notes-file "${{ inputs.notes-file }}"                       \
+        ${{ inputs.assets }}

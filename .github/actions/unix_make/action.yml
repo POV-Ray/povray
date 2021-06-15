@@ -8,8 +8,8 @@ inputs:
     default: ''
 
 runs:
-  using: "composite"
+  using: composite
   steps:
-    - shell: bash
-      run: |
-        make ${{ inputs.make-target }}
+  - shell: bash
+    run: |
+      make ${{ inputs.make-target }}

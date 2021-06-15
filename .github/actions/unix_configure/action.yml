@@ -16,17 +16,16 @@ inputs:
     default: ''
 
 runs:
-  using: "composite"
+  using: composite
   steps:
-    - shell: bash
-      run: |
-        # TODO: Figure out a neat way to compile with SDL to check the build,
-        # but have `make check` pass -D instead of +D to POV-Ray
-        # TODO: Invoke the chosen compiler, rather than the standard one
-        if test -n "${{inputs.c-compiler}}" ; then
-          export CC="${{inputs.c-compiler}}"
-        fi
-        if test -n "${{inputs.cxx-compiler}}" ; then
-          export CXX="${{inputs.cxx-compiler}}"
-        fi
-        ./configure --without-libsdl --without-x ${{inputs.configure-options}} COMPILED_BY="GitHub"
+  - shell: bash
+    run: |
+      # TODO: Figure out a neat way to compile with SDL to check the build,
+      # but have `make check` pass -D instead of +D to POV-Ray
+      if test -n "${{inputs.c-compiler}}" ; then
+        export CC="${{inputs.c-compiler}}"
+      fi
+      if test -n "${{inputs.cxx-compiler}}" ; then
+        export CXX="${{inputs.cxx-compiler}}"
+      fi
+      ./configure --without-libsdl --without-x ${{inputs.configure-options}} COMPILED_BY="GitHub"

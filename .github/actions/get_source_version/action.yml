@@ -1,0 +1,11 @@
+name: 'Get Source Version Information'
+description: 'Extract version information from source code'
+runs:
+  using: composite
+  steps:
+  - name: 'Extract Version Information from Source'
+    shell: bash
+    run: ./tools/unix/get-source-version.sh ./source/base/version.h -github_env $GITHUB_ENV
+  - name: 'Version Information Diagnostics'
+    shell: bash
+    run: set | grep -E '^POV_?RAY_'

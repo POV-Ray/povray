@@ -1,5 +1,5 @@
-name: 'Build POV-Ray for Windows'
-description: 'Build POV-Ray for Windows'
+name: 'Build POV-Ray for Windows Binary'
+description: 'Build POV-Ray for Windows Binary'
 
 inputs:
   pov-ray-is-autobuild: 
@@ -34,19 +34,17 @@ inputs:
     default: ''
 
 runs:
-  using: "composite"
+  using: composite
   steps:
-
-    - name: 'Prebuild'
-      shell: pwsh
-      run: |
-        $env:PovBuildDefs  = 'POV_RAY_IS_AUTOBUILD=${{ inputs.pov-ray-is-autobuild }};'
-        $env:PovBuildDefs += 'POV_RAY_BUILD_ID="${{ inputs.pov-ray-build-id }}";'
-        $env:PovBuildDefs += 'BUILT_BY="${{ inputs.built-by }}";'
-        msbuild `
-          /t:Rebuild /m `
-          /p:Configuration=${{ inputs.configuration }} `
-          /p:Platform=${{ inputs.platform }} `
-          /p:PlatformToolset=${{ inputs.toolset }} `
-          ${{ inputs.msbuild-options }} `
-          windows/${{ inputs.solution }}/povray.sln
+  - shell: pwsh
+    run: |
+      $env:PovBuildDefs  = 'POV_RAY_IS_AUTOBUILD=${{ inputs.pov-ray-is-autobuild }};'
+      $env:PovBuildDefs += 'POV_RAY_BUILD_ID="${{ inputs.pov-ray-build-id }}";'
+      $env:PovBuildDefs += 'BUILT_BY="${{ inputs.built-by }}";'
+      msbuild `
+        /t:Rebuild /m `
+        /p:Configuration=${{ inputs.configuration }} `
+        /p:Platform=${{ inputs.platform }} `
+        /p:PlatformToolset=${{ inputs.toolset }} `
+        ${{ inputs.msbuild-options }} `
+        windows/${{ inputs.solution }}/povray.sln

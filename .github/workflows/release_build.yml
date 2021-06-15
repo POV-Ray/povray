@@ -1,0 +1,409 @@
+name: 'Release Build'
+
+on:
+  workflow_dispatch:
+  push:
+    # Do not automatically trigger a new build unless the branch is dedicated to that purpose.
+    branches: [ 'autobuild/*' ]
+    # Do not automatically trigger a new build unless the version number has been bumped.
+    paths: [ 'source/base/version.h' ]
+
+jobs:
+
+  sanity_check:
+    name: 'Sanity-Check'
+    runs-on: ubuntu-latest
+    outputs:
+      do-build-installer: ${{ steps.check_validity.do-build-installer }}
+    steps:
+
+    - name: 'Check out Repository'
+      uses: actions/checkout@v2
+
+    - name: 'Extract Source Version Information'
+      uses: POV-Ray/povray/.github/actions/get_source_version@gh-actions-v1
+
+    - name: 'Check Commit for Validity'
+      id: check_validity
+      shell: bash
+      run: |
+        tag_name="v${POV_RAY_FULL_VERSION}"
+        git fetch --tags --quiet
+        if git rev-parse "${tag_name}" >/dev/null 2>&1 ; then
+          echo "::error::Tag '${tag_name}' already exists, or conflicts with some other moniker."
+          exit 1
+        fi
+        if ! echo "${tag_name}" | egrep '[.][1-9][0-9]*$' >/dev/null 2>&1 ; then
+          echo "::error::Tag '${tag_name}' does not end in a numeric field."
+          exit 1
+        fi
+        if test -z "${POV_RAY_PRERELEASE}" ; then
+          echo "::warning::Proper release installers must be built manually from signed binaries."
+          echo "::set-output name=do-build-installer::false"
+          exit 0
+        fi
+        if echo "${POV_RAY_PRERELEASE}" | grep '^rc[.]' >/dev/null 2>&1 ; then
+          echo "::warning::Release candidate installers must be built manually from signed binaries."
+          echo "::set-output name=do-build-installer::false"
+          exit 0
+        fi
+        echo "::set-output name=do-build-installer::true"
+
+  build_unix_package:
+    name: 'Build Unix Source Package'
+    needs: sanity_check
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: 'Check out Repository'
+      uses: actions/checkout@v2
+
+    - name: 'Extract Source Version Information'
+      uses: POV-Ray/povray/.github/actions/get_source_version@gh-actions-v1
+
+    - name: 'Prebuild'
+      uses: POV-Ray/povray/.github/actions/unix_prebuild@gh-actions-v1
+
+    - name: 'Package'
+      shell: bash
+      run: |
+        prebuild_made=`git status --porcelain --ignored | egrep '^[!]' | cut -c 4- || true`
+        echo "::group::Files and directories created by prebuild:"
+        echo "${prebuild_made}"
+        echo "::endgroup::"
+        tarfile="povunix-v${POV_RAY_FULL_VERSION}.tar"
+        # Bundle relevant portions of the original source tree, making sure
+        # to exclude interim products placed there by the prebuild process.
+        tar -chWf "${tarfile}"           \
+          --anchored                    \
+          --exclude="*Makefile.am"      \
+          --exclude="unix/prebuild*"    \
+          --exclude="unix/scripts*"     \
+          --exclude="platform/windows"  \
+          --exclude="vfe/win"           \
+          doc platform source unix vfe  \
+          LICENSE README.md changes.txt revision.txt
+        # Add everything created by the prebuild process, except for some
+        # interim products created by the prebuild process.
+        # (Note that some files may have already been added by the previous
+        # command, so we're using `-u` instead of `-r` to avoid duplicates.)
+        tar -uhWf "${tarfile}"           \
+          --anchored                    \
+          --exclude="*Makefile.am"      \
+          --exclude="configure.ac"      \
+          --exclude="bootstrap"         \
+          ${prebuild_made}
+        # Compress bundle into proper tarball
+        gzip "${tarfile}"
+
+    - name: 'Upload Artifacts for Release'
+      uses: actions/upload-artifact@v2
+      with:
+        name: artifact_unix_package
+        path: povunix-*.tar.gz
+
+  build_sourcedoc:
+    name: 'Build Source Documentation'
+    needs: sanity_check
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: 'Check out Repository'
+      uses: actions/checkout@v2
+
+    - name: 'Extract Source Version Information'
+      uses: POV-Ray/povray/.github/actions/get_source_version@gh-actions-v1
+
+    - name: 'Install Prerequisites'
+      shell: bash
+      run: |
+        # Make sure our package list is up to date
+        sudo apt-get update
+        # Make sure we have all the tools we want
+        sudo apt-get install --no-upgrade \
+          doxygen                         \
+          doxygen-latex                   \
+          graphviz                        \
+          p7zip-full
+
+    - name: 'Build Source Documentation'
+      shell: bash
+      run: |
+        cd tools/doxygen
+        ./doxygen.sh
+
+    - name: 'Bundle Source Documentation'
+      shell: bash
+      run: |
+        mkdir artifact
+        basedir=`pwd`
+        cd tools/doxygen/source-doc/html
+        7z a "${basedir}/artifact/povray-v${POV_RAY_FULL_VERSION}-sourcedoc-html.7z" .
+        cd ../pdf
+        cp *.pdf "${basedir}/artifact/povray-v${POV_RAY_FULL_VERSION}-sourcedoc.pdf"
+
+    - name: 'Upload Artifacts for Installer Release'
+      uses: actions/upload-artifact@v2
+      with:
+        name: artifact_sourcedoc
+        path: artifact/*
+
+  build_windows_binaries:
+    name: 'Build ${{ matrix.artifact-suffix }} Binary'
+    needs: sanity_check
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true # If any build fails, we need to re-run anyway.
+      matrix:
+        include:
+
+        - artifact-suffix: Win64
+          configuration: Release
+          platform: x64
+          bin-dir: bin64
+          bin-name: pvengine64.exe
+          install-name: pvengine64.exe
+          compatibility: ''
+          os: windows-2016
+          solution-dir: vs2015
+          toolset: v140 # VS 2015
+          msbuild-options: ''
+
+        - artifact-suffix: Win32-sse2
+          configuration: Release-SSE2
+          platform: Win32
+          bin-dir: bin32
+          bin-name: pvengine32-sse2.exe
+          install-name: pvengine-sse2.exe
+          compatibility: ''
+          os: windows-2016
+          solution-dir: vs2015
+          toolset: v140 # VS 2015
+          msbuild-options: ''
+
+        - artifact-suffix: Win32
+          configuration: Release
+          platform: Win32
+          bin-dir: bin32
+          bin-name: pvengine32.exe
+          install-name: pvengine.exe
+          compatibility: ''
+          os: windows-2016
+          solution-dir: vs2015
+          toolset: v140 # VS 2015
+          msbuild-options: ''
+
+#        - artifact-suffix: Win32-xp
+#          configuration: Release
+#          platform: Win32
+#          bin-dir: bin32
+#          bin-name: pvengine32.exe
+#          install-name: pvengine.exe
+#          compatibility: 'xp'
+#          os: windows-2016
+#          solution-dir: vs2015
+#          toolset: v140_xp # VS 2015 with XP support
+#          msbuild-options: '/p:TargetUniversalCRTVersion=10.0.10586.0'
+
+    steps:
+
+    - name: 'Matrix Diagnostics'
+      shell: pwsh
+      run: |
+        echo "${{ toJSON(matrix) }}"
+
+    - name: 'Check out Repository'
+      uses: actions/checkout@v2
+
+    - name: 'Add MSBuild to PATH'
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: 'Build'
+      uses: POV-Ray/povray/.github/actions/windows_build@gh-actions-v1
+      with:
+        pov-ray-build-id: gh${{github.run_number}}${{matrix.compatibility}}
+        solution: ${{matrix.solution-dir}}
+        configuration: ${{matrix.configuration}}
+        platform: ${{matrix.platform}}
+        toolset: ${{matrix.toolset}}
+        msbuild-options: ${{matrix.msbuild-options}}
+
+    - name: 'Prepare Binary for Artifact Upload'
+      shell: pwsh
+      run: |
+        $env:pov_binary = "windows/${{matrix.solution-dir}}/${{matrix.bin-dir}}/${{matrix.bin-name}}"
+        New-Item -ItemType directory -Path "installer/core/bin" | Out-Null
+        Copy-Item $env:pov_binary "installer/core/bin/${{matrix.install-name}}"
+
+    - name: 'Upload Artifacts for Installer Build'
+      uses: actions/upload-artifact@v2
+      with:
+        name: artifact_installer_tree
+        path: installer/*
+
+  build_windows_installer:
+    name: 'Build Windows Installer'
+    needs: [ sanity_check, build_windows_binaries ]
+    if: ${{ needs.sanity_check.outputs.do-build-installer }}
+    runs-on: windows-latest
+    steps:
+
+    - name: 'Check out Repository'
+      uses: actions/checkout@v2
+
+    - name: 'Populate Installer Tree'
+      env:
+        POV_RAY_SETUP_NSI: ${{ secrets.POV_RAY_SETUP_NSI_V3_8 }}
+      shell: bash
+      run: |
+
+        mkdir "installer"
+        cp "distribution/agpl-3.0.txt"  "installer"
+        cp "changes.txt"                "installer"
+        cp "revision.txt"               "installer"
+        echo "${POV_RAY_SETUP_NSI}" >   "installer/setup.nsi"
+
+        mkdir "installer/core"
+        cp -R "distribution/platform-specific/windows/Icons/."          "installer/core/bin"
+        cp -R "distribution/platform-specific/windows/Help/."           "installer/core/help"
+        cp -R "distribution/platform-specific/windows/Sounds/."         "installer/core/sounds"
+        cp -R "distribution/platform-specific/windows/Tiles/."          "installer/core/tiles"
+
+        mkdir "installer/user"
+        cp -R "distribution/include/."                                  "installer/user/include"
+        cp -R "distribution/ini/."                                      "installer/user/ini"
+        cp -R "distribution/platform-specific/windows/Ini/."            "installer/user/ini"
+        cp -R "distribution/platform-specific/windows/Insert Menu/."    "installer/user/Insert Menu"
+        cp -R "distribution/scenes/."                                   "installer/user/scenes"
+
+    - name: 'Retrieve Artifacts for Installer Build'
+      uses: actions/download-artifact@v2
+      with:
+        name: artifact_installer_tree
+        path: installer
+
+    - name: 'Build Installer'
+      id: build-installer
+      uses: POV-Ray/povray/.github/actions/windows_build_installer@gh-actions-v1
+      with:
+        installer-path: "installer"
+        version-prototype: "installer/core/bin/pvengine64.exe"
+
+    - name: 'Upload Artifacts for Release'
+      uses: actions/upload-artifact@v2
+      with:
+        name: artifact_installer
+        path: ${{ steps.build-installer.outputs.installer-file }}
+
+    - name: 'Upload Installer Artifacts for Diagnostics'
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: artifact_installer_diag
+        path: installer/*
+
+  create_release:
+    name: 'Create GitHub Release'
+    runs-on: ubuntu-latest
+    needs: [ sanity_check, build_windows_installer, build_sourcedoc, build_unix_package ]
+    if: ${{ always() }}
+    permissions:
+      contents: write
+    steps:
+
+    - name: 'Recap Sanity Check Result'
+      shell: bash
+      run: |
+        ${{ needs.sanity_check.result == 'success' }}
+
+    - name: 'Check out Repository'
+      uses: actions/checkout@v2
+
+    - name: 'Retrieve Installer Artifacts for Release'
+      if: ${{ needs.build_windows_installer.status == 'success' }}
+      uses: actions/download-artifact@v2
+      with:
+        name: artifact_installer
+        path: installer
+
+    - name: 'Retrieve Source Documentation Artifacts for Release'
+      if: ${{ needs.build_sourcedoc.status == 'success' }}
+      uses: actions/download-artifact@v2
+      with:
+        name: artifact_sourcedoc
+        path: sourcedoc
+
+    - name: 'Retrieve Unix Source Package Artifacts for Release'
+      if: ${{ needs.build_unix_package.status == 'success' }}
+      uses: actions/download-artifact@v2
+      with:
+        name: artifact_unix_package
+        path: unix_package
+
+    - name: 'Extract Source Version Information'
+      uses: POV-Ray/povray/.github/actions/get_source_version@gh-actions-v1
+
+    - name: 'Generate Version Derived Information'
+      shell: bash
+      run: |
+        echo "tag_name=v${POV_RAY_FULL_VERSION}" >> ${GITHUB_ENV}
+        echo "prerelease=${POV_RAY_PRERELEASE}"  >> ${GITHUB_ENV}
+
+    - name: 'Prepare Release Message'
+      id: prepare_release_message
+      env:
+        release_message_x: |
+          **EXPERIMENTAL: This version of POV-Ray is not part of the official development branch!**
+        release_message_binary: |
+          **Note:** This is a binary-only release; to install, copy the binary into an existing
+          POV-Ray ${{ env.POV_RAY_HOST_VERSION }} installation. (Make sure to backup the original
+          binary first.)
+        release_message_no_xp: |
+          These binaries require Windows Vista or higher, due to limitations of our automated
+          build system. Please contact us on http://news.povray.org/povray.beta-test if you need
+          Windows XP-compatible binaries of this particular version.
+      shell: bash
+      run: |
+        cp /dev/null ~RELEASE_MESSAGE.txt
+        case "${prerelease}" in
+          x*)     echo "${release_message_x}"       >> ~RELEASE_MESSAGE.txt
+                  echo                              >> ~RELEASE_MESSAGE.txt
+                  release_type="Experimental Release"
+                  is_prerelease="true"
+                  ;;
+          alpha*) release_type="Development Release"
+                  is_prerelease="true"
+                  ;;
+          beta*)  release_type="Beta Release"
+                  is_prerelease="true"
+                  ;;
+          rc*)    release_type="Release Candidate"
+                  is_prerelease="true"
+                  ;;
+          "")     release_type="Release"
+                  is_prerelease="false"
+                  ;;
+          *)      echo "Unable to determine type of release."
+                  exit 1
+        esac
+        echo "${release_message_no_xp}" >> ~RELEASE_MESSAGE.txt
+        cp /dev/null ~RELEASE_ASSETS.txt
+        find "installer"    -type f >> ~RELEASE_ASSETS.txt || true
+        find "sourcedoc"    -type f >> ~RELEASE_ASSETS.txt || true
+        find "unix_package" -type f >> ~RELEASE_ASSETS.txt || true
+        echo "::set-output name=release-type::${release_type}"
+        echo "::set-output name=is-prerelease::${is_prerelease}"
+        echo "::set-output name=release-title::POV-Ray ${release_type} v${POV_RAY_FULL_VERSION}"
+        echo "::set-output name=release-assets::"`cat ~RELEASE_ASSETS.txt`
+
+    - name: 'Create Release'
+      uses: POV-Ray/povray/.github/actions/github_create_release@gh-actions-v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        is-draft: true
+        is-prerelease: ${{ steps.prepare_release_message.outputs.is-prerelease }}
+        tag-name: "v${{ env.POV_RAY_FULL_VERSION }}"
+        title: "${{ steps.prepare_release_message.outputs.release-title }}"
+        notes-file: ~RELEASE_MESSAGE.txt
+        assets: ${{ steps.prepare_release_message.outputs.release-assets }}

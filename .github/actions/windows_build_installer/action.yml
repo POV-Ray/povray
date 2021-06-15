@@ -1,0 +1,43 @@
+name: 'Build POV-Ray for Windows Installer'
+description: 'Build POV-Ray for Windows Installer'
+
+inputs:
+  installer-path:
+    description: 'Location of the installer source files'
+    required: true
+  version-prototype:
+    description: 'Location of binary to pull version information from'
+    required: true
+
+outputs:
+  installer-file:
+    description: 'Name of the compiled installer binary file'
+    value: ${{ steps.build-installer.outputs.installer-file }}
+
+runs:
+  using: composite
+  steps:
+
+  - name: 'Extract Binary Version Information'
+    shell: pwsh
+    run: |
+      ./tools/windows/get-exe-version.ps1 ${{ inputs.version-prototype }} -bat ~version.bat
+
+  - name: 'Build Installer'
+    id: build-installer
+    shell: cmd
+    run: |
+      call ~version.bat
+      set BINVER=%BINARY_PRODUCTMAJORPART%.%BINARY_PRODUCTMINORPART%.%BINARY_PRODUCTBUILDPART%.%BINARY_PRODUCTPRIVATEPART%
+      set FULLVER=%BINARY_PRODUCTVERSION%
+      for /f "tokens=1    delims=+" %%I in ("%FULLVER%")    do set SOURCEVER=%%I
+      for /f "tokens=1*   delims=-" %%I in ("%SOURCEVER%")  do set PRERELEASE=%%J
+      for /f "tokens=1    delims=." %%I in ("%PRERELEASE%") do set PRERELEASE_TYPE=%%I
+      for /f "tokens=1,2  delims=." %%I in ("%SOURCEVER%")  do set VER=%%I.%%J
+      set BETA=
+      if "%PRERELEASE_TYPE%" == "beta" set BETA=-beta
+      cd installer
+      makensis.exe setup.nsi
+      set INSTALLER_FILE=povwin-v%FULLVER%-setup.exe
+      ren "povwin-%VER%-agpl3-setup.exe" "%INSTALLER_FILE%"
+      echo ::set-output name=installer-file::installer/%INSTALLER_FILE%
