@@ -16,9 +16,9 @@ jobs:
         compatibility: ['', xp]
         exclude:
         - visual-studio: 2019
-          compatibility: 'xp'
+          compatibility: xp
         include:
-        # Set up various other options based on Visual Studio version to emulate
+        # Set up various options based on Visual Studio version to emulate
         - visual-studio: 2015
           os: windows-2016
           toolset: v140
@@ -31,7 +31,7 @@ jobs:
           os: windows-2019
           toolset: v142
           solution: vs2015
-        # pick configuration / paltform combo
+        # Pick configuration / paltform combo
         - variant: 64
           configuration: Release
           platform: x64
@@ -41,28 +41,20 @@ jobs:
         - variant: 32
           configuration: Release
           platform: Win32
-        # Set up various other options based on compatibility requirements
+        # Set up various options based on compatibility requirements
         - compatibility: ''
           toolset-variant: ''
           msbuild-options: ''
-        - compatibility: 'xp'
+        - compatibility: xp
           toolset-variant: '_xp'
           msbuild-options: '/p:TargetUniversalCRTVersion=10.0.10586.0'
 
     steps:
 
     - name: 'Matrix Diagnostics'
+      shell: bash
       run: |
-        echo "visual-studio:   '${{matrix.visual-studio}}'"
-        echo "variant:         '${{matrix.variant}}'"
-        echo "compatibility:   '${{matrix.compatibility}}'"
-        echo "---"
-        echo "os:              '${{matrix.os}}'"
-        echo "solution:        '${{matrix.solution}}'"
-        echo "configuration:   '${{matrix.configuration}}'"
-        echo "platform:        '${{matrix.platform}}'"
-        echo "toolset:         '${{matrix.toolset}}${{matrix.toolset-variant}}'"
-        echo "msbuild-options: '${{matrix.msbuild-options}}'"
+        echo '${{ toJSON(matrix) }}'
 
     - name: 'Check out Repository'
       uses: actions/checkout@v2
@@ -71,13 +63,18 @@ jobs:
       uses: microsoft/setup-msbuild@v1.0.2
 
     - name: 'Build'
-      uses: POV-Ray/povray/.github/actions/windows_build@master
+      uses: POV-Ray/povray/.github/actions/windows_build@gh-actions-v1
       with:
-        pov-ray-build-id: ghvs${{matrix.visual-studio}}${{matrix.compatibility}}${{github.run_number}}
+        pov-ray-build-id: ghvs${{matrix.visual-studio}}${{github.run_number}}${{matrix.compatibility}}
         solution: ${{matrix.solution}}
         configuration: ${{matrix.configuration}}
         platform: ${{matrix.platform}}
         toolset: ${{matrix.toolset}}${{matrix.toolset-variant}}
         msbuild-options: ${{matrix.msbuild-options}}
     - name: 'Sanity-Check Working Tree'
-      uses: POV-Ray/povray/.github/actions/unix_check_repo@master
+      uses: POV-Ray/povray/.github/actions/git_check_repo@gh-actions-v1
+    - name: 'Upload Artifacts for Manual Testing'
+      uses: actions/upload-artifact@v2
+      with:
+        name: artifact_bin_${{matrix.visual-studio}}_${{matrix.variant}}${{matrix.compatibility}}
+        path: windows/${{matrix.solution}}/bin*/*.exe

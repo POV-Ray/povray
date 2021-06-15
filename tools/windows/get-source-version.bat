@@ -12,6 +12,7 @@ REM *   POV_RAY_COPYRIGHT       Copyright string
 REM *   POV_RAY_GENERATION      First two fields of the version string (`X.Y`)
 REM *   POV_RAY_FULL_VERSION    Full version string (`X.Y.Z`[`.P`][`-PRE`])
 REM *   POV_RAY_PRERELEASE      Pre-release tag portion of the version string (`PRE`), or undefined if not applicable
+REM *   POV_RAY_HOST_VERSION    First two fields of the "host" version string (`V.W`), or undefined if not applicable
 REM *
 REM * For backward compatibility with earlier versions of the script, the following (deprecated)
 REM * environment variables will also be set:

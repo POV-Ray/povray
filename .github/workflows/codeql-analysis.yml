@@ -1,0 +1,48 @@
+name: 'Code Analysis'
+
+on:
+  push:
+    branches: [ 'master', 'release/*' ]
+    # There's no actual source code to examine in the following directories.
+    paths-ignore: [ 'distribution/**', 'doc/**', 'source-doc/**', 'tools/**' ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ 'master', 'release/*' ]
+    # There's no actual source code to examine in the following directories.
+    paths-ignore: [ 'distribution/**', 'doc/**', 'source-doc/**', 'tools/**' ]
+
+jobs:
+  analyze:
+    name: 'Analyze'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+
+    - name: 'Check out Repository'
+      uses: actions/checkout@v2
+
+    - name: 'Initialize CodeQL'
+      uses: github/codeql-action/init@v1
+      with:
+        languages: cpp
+        # Comment out the following to perform just the bare minimum of checks:
+        queries: security-extended
+        # Use the following instead to perform the whole suite of pre-defined checks:
+        # queries: security-and-quality
+
+    - name: 'Install Prerequisites'
+      uses: POV-Ray/povray/.github/actions/unix_getlibs@gh-actions-v1
+
+    - name: 'Prebuild'
+      uses: POV-Ray/povray/.github/actions/unix_prebuild@gh-actions-v1
+    - name: 'Configure'
+      uses: POV-Ray/povray/.github/actions/unix_configure@gh-actions-v1
+    - name: 'Build'
+      uses: POV-Ray/povray/.github/actions/unix_make@gh-actions-v1
+
+    - name: 'Perform CodeQL Analysis'
+      uses: github/codeql-action/analyze@v1

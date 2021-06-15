@@ -3,11 +3,11 @@ name: 'Quick Tests'
 on:
   workflow_dispatch:
   push:
-    branches:
-      - 'release/*'
+    # For now, there's nothing in the following directories that we're actually checking.
+    paths-ignore: [ 'distribution/**', 'doc/**', 'source-doc/**' ]
   pull_request:
-    branches:
-      - 'release/*'
+    # For now, there's nothing in the following directories that we're actually checking.
+    paths-ignore: [ 'distribution/**', 'doc/**', 'source-doc/**' ]
 
 jobs:
   build_unix:
@@ -19,52 +19,49 @@ jobs:
       uses: actions/checkout@v2
 
     - name: 'Install Prerequisites'
-      uses: POV-Ray/povray/.github/actions/unix_getlibs_apt@master
-      with:
-        need-boost-system: true
-        need-boost-thread: true
+      uses: POV-Ray/povray/.github/actions/unix_getlibs@gh-actions-v1
 
     - name: 'Prebuild'
-      uses: POV-Ray/povray/.github/actions/unix_prebuild@master
+      uses: POV-Ray/povray/.github/actions/unix_prebuild@gh-actions-v1
     - name: 'Sanity-Check Working Tree'
-      uses: POV-Ray/povray/.github/actions/unix_check_repo@master
+      uses: POV-Ray/povray/.github/actions/git_check_repo@gh-actions-v1
 
     - name: 'Configure'
-      uses: POV-Ray/povray/.github/actions/unix_configure@master
+      uses: POV-Ray/povray/.github/actions/unix_configure@gh-actions-v1
     - name: 'Sanity-Check Working Tree'
-      uses: POV-Ray/povray/.github/actions/unix_check_repo@master
+      uses: POV-Ray/povray/.github/actions/git_check_repo@gh-actions-v1
 
     - name: 'Bundle Artifacts for Diagnostics'
       if: ${{ always() }}
-      uses: POV-Ray/povray/.github/actions/unix_bundle_ignored@master
+      uses: POV-Ray/povray/.github/actions/git_bundle_ignored@gh-actions-v1
       with:
-        name: artifact_diag_unix.tar
+        name: artifact_diag_unix.tar.gz
 
     - name: 'Build'
-      uses: POV-Ray/povray/.github/actions/unix_make@master
+      uses: POV-Ray/povray/.github/actions/unix_make@gh-actions-v1
     - name: 'Sanity-Check Working Tree'
-      uses: POV-Ray/povray/.github/actions/unix_check_repo@master
+      uses: POV-Ray/povray/.github/actions/git_check_repo@gh-actions-v1
 
     - name: 'Check Functionality'
-      uses: POV-Ray/povray/.github/actions/unix_make@master
+      uses: POV-Ray/povray/.github/actions/unix_make@gh-actions-v1
       with:
         make-target: check
     - name: 'Sanity-Check Working Tree'
-      uses: POV-Ray/povray/.github/actions/unix_check_repo@master
+      uses: POV-Ray/povray/.github/actions/git_check_repo@gh-actions-v1
 
 #    - name: 'Install'
-#      uses: POV-Ray/povray/.github/actions/unix_make@master
+#      uses: POV-Ray/povray/.github/actions/unix_make@gh-actions-v1
 #      with:
 #        make-target: install
 #    - name: 'Sanity-Check Working Tree'
-#      uses: POV-Ray/povray/.github/actions/unix_check_repo@master
+#      uses: POV-Ray/povray/.github/actions/git_check_repo@gh-actions-v1
 
-    - name: 'Upload Artifacs for Diagnostics'
+    - name: 'Upload Artifacts for Diagnostics'
       if: ${{ failure() }}
       uses: actions/upload-artifact@v2
       with:
         name: artifact_diag_unix
-        path: artifact_diag_unix.tar
+        path: artifact_diag_unix.tar.gz
 
     # TODO: Maybe do some basic installation checking.
 
@@ -80,7 +77,7 @@ jobs:
       uses: microsoft/setup-msbuild@v1.0.2
 
     - name: 'Build'
-      uses: POV-Ray/povray/.github/actions/windows_build@master
+      uses: POV-Ray/povray/.github/actions/windows_build@gh-actions-v1
       with:
         pov-ray-build-id: gh${{github.run_number}}
         solution: vs2015
@@ -89,4 +86,4 @@ jobs:
         toolset: v142
         msbuild-options: ''
     - name: 'Sanity-Check Working Tree'
-      uses: POV-Ray/povray/.github/actions/unix_check_repo@master
+      uses: POV-Ray/povray/.github/actions/git_check_repo@gh-actions-v1

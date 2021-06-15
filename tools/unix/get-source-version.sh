@@ -17,6 +17,7 @@
 #   POV_RAY_GENERATION      First two fields of the version string (`X.Y`)
 #   POV_RAY_FULL_VERSION    Full version string (`X.Y.Z`[`.P`][`-PRE`])
 #   POV_RAY_PRERELEASE      Pre-release tag portion of the version string (`PRE`), or empty if not applicable
+#   POV_RAY_HOST_VERSION    First two fields of the "host" version string (`V.W`), or empty if not applicable
 
 version_h="$1"
 format="$2"
@@ -46,6 +47,7 @@ revision=`GetNumericMacro "$version_h" POV_RAY_REVISION_INT`
 patchlevel=`GetNumericMacro "$version_h" POV_RAY_PATCHLEVEL_INT`
 
 prerelease=`GetStringMacro "$version_h" POV_RAY_PRERELEASE`
+hostversion=`GetStringMacro "$version_h" POV_RAY_HOST_VERSION`
 
 generation="$major.$minor"
 if test "$patchlevel" -eq 0 ; then
@@ -79,3 +81,4 @@ SetVariable POV_RAY_COPYRIGHT    "$copyright"
 SetVariable POV_RAY_GENERATION   "$generation"
 SetVariable POV_RAY_FULL_VERSION "$version"
 SetVariable POV_RAY_PRERELEASE   "$prerelease"
+SetVariable POV_RAY_HOST_VERSION "$hostversion"
