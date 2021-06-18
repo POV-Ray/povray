@@ -11,7 +11,12 @@
 #   call version~.bat
 #   del version~.bat
 #
-# Both procedures will cause the following envionment variables to be set:
+# From GitHub Workflow scripts, run as a dedicated step as follows:
+#
+#   - shell: pwsh
+#     run: ./tools/windows/get-source-version.ps1 ./source/base/version.h -github_env $env:GITHUB_ENV
+#
+# All procedures will cause the following envionment variables to be set:
 #
 #   POV_RAY_COPYRIGHT       Copyright string
 #   POV_RAY_GENERATION      First two fields of the version string (`X.Y`)
@@ -28,7 +33,7 @@
 #
 # [*In the batch version of the procedure, empty environment variables will be left undefined.]
 
-param ([string]$version_h, [string]$bat)
+param ([string]$version_h, [string]$bat, [string]$github_env)
 
 function GetMacro ([string]$file, [string]$macro, [string]$pattern1, [string]$pattern2, [string]$pattern3) {
     $regexp = '^\s*#define\s+' + $macro + $pattern1 + '\s*$'
@@ -55,11 +60,11 @@ $patchlevel = GetNumericMacro $version_h 'POV_RAY_PATCHLEVEL_INT'
 
 $prerelease = GetStringMacro  $version_h 'POV_RAY_PRERELEASE'
 
-$generation = $major + "." + $minor
+$generation = $major + '.' + $minor
 if ([int]$patchlevel -eq 0) {
-    $release = $generation + "." + $revision
+    $release = $generation + '.' + $revision
 } else {
-    $release = $generation + "." + $revision + "." + $patchlevel
+    $release = $generation + '.' + $revision + '.' + $patchlevel
 }
 if ($prerelease) {
     $version = $release + '-' + $prerelease
@@ -69,31 +74,31 @@ if ($prerelease) {
 
 if ($bat) {
 
-    $text =  ""
+    function SetVariable ([string]$name, [string]$value) {
+        ('set ' + $name + '=' + $value) | Out-File -FilePath $bat -Encoding ASCII -Append
+    }
 
-    $text += "set POV_RAY_COPYRIGHT="       + $copyright + "`n"
-    $text += "set POV_RAY_GENERATION="      + $generation + "`n"
-    $text += "set POV_RAY_FULL_VERSION="    + $version + "`n"
-    $text += "set POV_RAY_PRERELEASE="      + $prerelease + "`n"
+} elseif ($github_env) {
 
-    $text += "set POV_SOURCE_COPYRIGHT="    + $copyright + "`n"
-    $text += "set POV_SOURCE_GENERATION="   + $generation + "`n"
-    $text += "set POV_SOURCE_VERSION="      + $version + "`n"
-    $text += "set POV_SOURCE_PRERELEASE="   + $prerelease + "`n"
-
-    Out-File -LiteralPath $bat -Encoding ASCII -InputObject $text -NoNewline
+    function SetVariable ([string]$name, [string]$value) {
+        ($name + '=' + $value) | Out-File -FilePath $github_env -Encoding UTF8 -Append
+    }
 
 } else {
 
-    $env:POV_RAY_COPYRIGHT      = $copyright
-    $env:POV_RAY_GENERATION     = $generation
-    $env:POV_RAY_FULL_VERSION   = $version
-    $env:POV_RAY_PRERELEASE     = $prerelease
-
-    $env:POV_SOURCE_COPYRIGHT   = $copyright
-    $env:POV_SOURCE_GENERATION  = $generation
-    $env:POV_SOURCE_VERSION     = $version
-    $env:POV_SOURCE_PRERELEASE  = $prerelease
+    function SetVariable ([string]$name, [string]$value) {
+        $expr = '$env:' + $name + ' = "' + $value + '"'
+        Invoke-Expression $expr
+    }
 
 }
 
+SetVariable 'POV_RAY_COPYRIGHT'     $copyright
+SetVariable 'POV_RAY_GENERATION'    $generation
+SetVariable 'POV_RAY_FULL_VERSION'  $version
+SetVariable 'POV_RAY_PRERELEASE'    $prerelease
+
+SetVariable 'POV_SOURCE_COPYRIGHT'  $copyright
+SetVariable 'POV_SOURCE_GENERATION' $generation
+SetVariable 'POV_SOURCE_VERSION'    $version
+SetVariable 'POV_SOURCE_PRERELEASE' $prerelease

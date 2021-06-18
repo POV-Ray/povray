@@ -6,7 +6,12 @@
 #
 #   eval `./tools/unix/get-source-version.sh ./source/base/version.h`
 #
-# This procedure will cause the following envionment variables to be set:
+# From GitHub Workflow scripts, run as a dedicated step as follows:
+#
+#   - shell: bash
+#     run: ./tools/unix/get-source-version.sh ./source/base/version.h -github_env $GITHUB_ENV
+#
+# All procedures will cause the following envionment variables to be set:
 #
 #   POV_RAY_COPYRIGHT       Copyright string
 #   POV_RAY_GENERATION      First two fields of the version string (`X.Y`)
@@ -14,6 +19,8 @@
 #   POV_RAY_PRERELEASE      Pre-release tag portion of the version string (`PRE`), or empty if not applicable
 
 version_h="$1"
+format="$2"
+outfile="$3"
 
 GetMacro() {
   file="$1"
@@ -52,10 +59,23 @@ else
   version="$release"
 fi
 
-cat << hereEOF
-POV_RAY_COPYRIGHT="$copyright" ;
-POV_RAY_GENERATION="$generation" ;
-POV_RAY_FULL_VERSION="$version" ;
-POV_RAY_PRERELEASE="$prerelease" ;
-hereEOF
+case "$format" in
 
+  '')
+    SetVariable() {
+      echo "$1='$2' ;"
+    }
+    ;;
+
+  -github_env)
+    SetVariable() {
+      echo "$1=$2" >> "$outfile"
+    }
+    ;;
+
+esac
+
+SetVariable POV_RAY_COPYRIGHT    "$copyright"
+SetVariable POV_RAY_GENERATION   "$generation"
+SetVariable POV_RAY_FULL_VERSION "$version"
+SetVariable POV_RAY_PRERELEASE   "$prerelease"
