@@ -14,7 +14,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -2524,13 +2524,18 @@ void Parser::Parse_Directive(int After_Hash)
                                         "Use '#version 3.8' instead.");
                             }
 
+#if 0                       // We've decided to disable this error in v3.8.0, as there is still some unaccounted-for
+                            // scenario involving the `Include_Header=...` INI setting that might lead us here even
+                            // though the main scene file is at no fault whatsoever. Note that we'll still be issuing
+                            // a warning later anyway.
+
                             if ((sceneData->languageVersionLate) && (sceneData->languageVersion >= 380))
                             {
                                 // As of POV-Ray v3.7, all scene files are supposed to begin with a `#version` directive.
                                 // As of POV-Ray v3.8, we no longer tolerate violation of that rule if the main scene
                                 // file claims to be compatible with POV-Ray v3.8 anywhere further down the road.
                                 // (We need to be more lax with include files though, as they may just as well be
-                                // standard include files that happens to have been updated since the scene was
+                                // standard include files that happen to have been updated since the scene was
                                 // originally designed.)
 
                                 if (Include_File_Index == 0)
@@ -2539,6 +2544,7 @@ void Parser::Parse_Directive(int After_Hash)
                                           "adapt to whatever POV-Ray version is actually used, start your scene with "
                                           "'#version version;'.");
                             }
+#endif
 
                             // Initialize various defaults depending on language version specified.
                             InitDefaults(sceneData->languageVersion);
