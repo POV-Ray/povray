@@ -226,6 +226,80 @@ void ViewData::getBlockXY(const unsigned int nb, unsigned int &x, unsigned int &
                  y /= 2;
              }
              break;
+         case 6:
+             /* spiral from center to top left */
+             neo_nb = sz - 1 - neo_nb;
+             /* go through on purpose */
+         case 7:
+             /* spiral from top left to center */
+             {
+                 unsigned int south = blockHeight -1;
+                 unsigned int east = blockWidth -1;
+                 unsigned int west = 0;
+                 unsigned int north = 0;
+                 /*
+                 ** abs are not needed here, but they are needed inside the loop, 
+                 ** so use the same formula to keep it simple
+                 */
+                 unsigned long perimeter = abs<long>(south-north)*2+abs<long>(east-west)*2;
+                 while(neo_nb >= perimeter)
+                 {
+                     neo_nb -= perimeter;
+                     --south;
+                     --east;
+                     ++north;
+                     ++west;
+                     perimeter = abs<long>(south-north)*2+abs<long>(east-west)*2;
+                 }
+                 if ((east>west)&&(south>north))
+                 {
+                     /* usual rectangle */
+                     if (neo_nb <=(east-west))
+                     {
+                         x = neo_nb+west;
+                         y = north;
+                     }
+                     else
+                     {
+                         neo_nb -= (east-west+1);
+                         if (neo_nb<=(south-north-1))
+                         {
+                             x = east;
+                             y = north +1+neo_nb;
+                         }
+                         else
+                         {
+                             neo_nb -= (south-north);
+                             if( neo_nb <= (east-west-1))
+                             {
+                                 x = east-neo_nb-1;
+                                 y = south;
+                             }
+                             else
+                             {
+                                 neo_nb -= (east-west);
+                                 x = west;
+                                 y = south-neo_nb-1;
+                             }
+                         }
+                     }
+                 }
+                 else
+                 {
+                     /* degenerate line */
+                     if (east>west)
+                     {
+                         x = min(west,east+1)+neo_nb;
+                         y = min(north,south+1);
+                     }
+                     else
+                     {
+                         x = min(west,east+1);
+                         y = min(north,south+1)+neo_nb;
+                     }
+                 }
+             }
+             break;
          default:
              x = neo_nb % blockWidth;
              y = neo_nb / blockWidth;
