@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -42,6 +42,7 @@
 #include <shellapi.h>
 #include <cstring>
 #include <sys/stat.h>
+#include <delayimp.h>
 #include "pvengine.h"
 #include "pvedit.h"
 #include "parser/reservedwords.h"
@@ -162,6 +163,37 @@ char                    *FunctionNames [] =
                          NULL
                         } ;
 
+void EditorDLLNotFoundPopup(const char* function, long err)
+{
+    char str[2048];
+#ifdef _DEBUG
+    sprintf(str,
+            "Editor DLL initialisation failed [%s failed, code is %08lx]\n\n"
+            "Debug build: if you have renamed cmedit as cmeditd, keep in mind that it "
+            "will still look for povcmax.dll, not povcmaxd.dll. Also, for debug builds "
+            "the build output directory is checked for the DLL's before the install dir.\n\n"
+            "Check the README in the source for instructions on how to copy the DLL's from "
+            "the official distribution to the naming convention used by debug builds.",
+            function, err);
+    PovMessageBox(str, "POV-Ray Editor error");
+    PovMessageBox("See the 'Internal Editor Reference' section in the help file for\n"
+                  "instructions on how to correct this or turn editor loading off.", "Important!");
+#else
+    if (MessageBox(main_window,
+                   "POV-Ray could not load its internal editor. This is to be expected "
+                   "if you installed the AGPL-licensed distribution, as the editor DLL "
+                   "is not included. If you do not wish to use the editor you can turn "
+                   "it off (and stop this message appearing) by unchecking 'Use Editor' "
+                   "under the 'Other Settings' sub-menu of the Options menu.\n\n"
+                   "If you wish to enable the editor, clicking 'Yes' below will take "
+                   "you to its download page.",
+                   "Could not load internal editor - download it?",
+                   MB_ICONQUESTION | MB_YESNO) == IDYES)
+        ShellExecute(NULL, NULL, "http://www.povray.org/download/wineditdll/" POV_RAY_VERSION,
+                     NULL, NULL, SW_SHOWNORMAL);
+#endif
+}
+
 bool LoadEditorDLL (char *path, bool errorOK)
 {
   int                   DllVersion ;
@@ -171,7 +203,7 @@ bool LoadEditorDLL (char *path, bool errorOK)
   void                  ***f ;
   struct stat           statbuf ;
 
-   if (!editors_enabled)
+  if (!editors_enabled)
     return (false) ;
   if (debugging)
     debug_output ("Trying to load editor DLL from '%s' [%s]\n", path, stat (path, &statbuf) != 0 ? "missing" : "found") ;
@@ -181,36 +213,9 @@ bool LoadEditorDLL (char *path, bool errorOK)
   {
     err = GetLastError () ;
     if (debugging)
-      debug_output ("Could not load editor DLL '%s', error code is %08lx\n", path, err) ;
+      debug_output ("Could not load editor DLL '%s', error code is %08x\n", path, err) ;
     if (!errorOK)
-    {
-#ifdef _DEBUG
-      sprintf (str,
-               "Editor DLL initialisation failed [LoadLibrary failed, code is %08lx]\n\n"
-               "Debug build: if you have renamed cmedit as cmeditd, keep in mind that it "
-               "will still look for povcmax.dll, not povcmaxd.dll. Also, for debug builds "
-               "the build output directory is checked for the DLL's before the install dir.\n\n"
-               "Check the README in the source for instructions on how to copy the DLL's from "
-               "the official distribution to the naming convention used by debug builds.",
-               err) ;
-      PovMessageBox (str, "POV-Ray Editor error") ;
-      PovMessageBox ("See the 'Internal Editor Reference' section in the help file for\n"
-                     "instructions on how to correct this or turn editor loading off.", "Important!") ;
-#else
-      if (MessageBox (main_window,
-                      "POV-Ray could not load its internal editor. This is to be expected "
-                      "if you installed the AGPL-licensed distribution, as the editor DLL "
-                      "is not included. If you do not wish to use the editor you can turn "
-                      "it off (and stop this message appearing) by unchecking 'Use Editor' "
-                      "under the 'Other Settings' sub-menu of the Options menu.\n\n"
-                      "If you wish to enable the editor, clicking 'Yes' below will take "
-                      "you to its download page.",
-                      "Could not load internal editor - download it?",
-                      MB_ICONQUESTION | MB_YESNO) == IDYES)
-                        ShellExecute (NULL, NULL, "http://www.povray.org/download/wineditdll/" POV_RAY_VERSION,
-                                      NULL, NULL, SW_SHOWNORMAL) ;
-#endif
-    }
+      EditorDLLNotFoundPopup("LoadLibraryEx", err);
     return (false) ;
   }
 
@@ -337,22 +342,32 @@ HWND InitialiseEditor (HWND ParentWindow, HWND StatusWindow, const char *Binarie
 {
   HWND        hwnd ;
 
-  if (!editors_enabled || !use_editors)
+  __try // First call to the delay-loaded editor DLL might fail spectacularly if the DLL can't be found.
+  {
+    if (!editors_enabled || !use_editors)
     return (NULL) ;
 
-  char *s1 = Get_User_Keywords(DocumentsPath);
-  char *s2 = Get_Reserved_Words(s1) ;
-  char *s3 = Get_INI_Keywords() ;
-  EditSetKeywords (s2, s3) ;
-  free(s1) ;
-  free(s2);
-  free(s3);
-  if ((hwnd = CreateTabWindow (ParentWindow, StatusWindow, BinariesPath, DocumentsPath)) == NULL)
-  {
-    PovMessageBox ("TabWindow error: see the 'Built-In Editors' section in the help file", "Important!") ;
-    return (NULL) ;
+    char *s1 = Get_User_Keywords(DocumentsPath);
+    char *s2 = Get_Reserved_Words(s1) ;
+    char *s3 = Get_INI_Keywords() ;
+    EditSetKeywords (s2, s3) ;
+    free(s1) ;
+    free(s2);
+    free(s3);
+    if ((hwnd = CreateTabWindow (ParentWindow, StatusWindow, BinariesPath, DocumentsPath)) == NULL)
+    {
+      PovMessageBox ("TabWindow error: see the 'Built-In Editors' section in the help file", "Important!") ;
+      return (NULL) ;
+    }
+    return (hwnd) ;
   }
-  return (hwnd) ;
+  __except (GetExceptionCode() == VcppException(ERROR_SEVERITY_ERROR, ERROR_MOD_NOT_FOUND))
+  {
+    if (debugging)
+      debug_output("Could not delayed-link editor DLL\n");
+    EditorDLLNotFoundPopup("delayed linkage", GetExceptionCode());
+    return (NULL);
+  }
 }
 
 void SetEditorPosition (int x, int y, int w, int h)

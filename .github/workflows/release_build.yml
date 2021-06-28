@@ -164,6 +164,7 @@ jobs:
           bin-dir: bin64
           bin-name: pvengine64.exe
           install-name: pvengine64.exe
+          dll-name: cmedit64.dll
           compatibility: ''
           os: windows-2016
           solution-dir: vs2015
@@ -176,6 +177,7 @@ jobs:
           bin-dir: bin32
           bin-name: pvengine32-sse2.exe
           install-name: pvengine-sse2.exe
+          dll-name: ''
           compatibility: ''
           os: windows-2016
           solution-dir: vs2015
@@ -188,6 +190,7 @@ jobs:
           bin-dir: bin32
           bin-name: pvengine32.exe
           install-name: pvengine.exe
+          dll-name: cmedit32.dll
           compatibility: ''
           os: windows-2016
           solution-dir: vs2015
@@ -236,6 +239,10 @@ jobs:
         $env:pov_binary = "windows/${{matrix.solution-dir}}/${{matrix.bin-dir}}/${{matrix.bin-name}}"
         New-Item -ItemType directory -Path "installer/core/bin" | Out-Null
         Copy-Item $env:pov_binary "installer/core/bin/${{matrix.install-name}}"
+        if ( '${{matrix.dll-name}}' -ne '' ) {
+          $env:pov_dll = "windows/${{matrix.solution-dir}}/${{matrix.bin-dir}}/${{matrix.dll-name}}"
+          Copy-Item $env:pov_dll "installer/core/bin/${{matrix.dll-name}}"
+        }
 
     - name: 'Upload Artifacts for Installer Build'
       uses: actions/upload-artifact@v2

@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -122,12 +122,7 @@
 #else
   #define BINDIRNAME            "bin32"
   #define INSTALLTIMEKEY        "InstallTime32"
-  // TODO - use the standard editor DLLs regardless of architecture optimization (e.g. SSE2)
-  #ifdef BUILD_SSE2
-    #define EDITDLLNAME         "cmedit32-sse2.dll"
-  #else
-    #define EDITDLLNAME         "cmedit32.dll"
-  #endif
+  #define EDITDLLNAME           "cmedit32.dll"
   #define EDITDLLNAME_DEBUG     "cmedit32d.dll"
   #define VERSIONVAL            POVWIN_BETA_PREFIX "VersionNo32"
 #endif

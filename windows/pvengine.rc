@@ -1,13 +1,13 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
-#include "povwin_version.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
+#include "povwin_version.h"
 #include "winuser.h"
 #define APSTUDIO_HIDDEN_SYMBOLS
 #include "windows.h"

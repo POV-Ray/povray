@@ -7,6 +7,7 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
+#include "../povwin_version.h"
 #include "winuser.h"
 #define APSTUDIO_HIDDEN_SYMBOLS
 #include "windows.h"
@@ -268,6 +269,7 @@ END
 
 2 TEXTINCLUDE 
 BEGIN
+    "#include ""../povwin_version.h""\r\n"
     "#include ""winuser.h""\r\n"
     "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
     "#include ""windows.h""\r\n"
@@ -284,8 +286,8 @@ BEGIN
     "#endif\r\n"
     "\r\n"
     "1 VERSIONINFO\r\n"
-    "FILEVERSION 3,7,0,0\r\n"
-    "PRODUCTVERSION 3,7,0,0\r\n"
+    "FILEVERSION POVWIN_VERSION_RC\r\n"
+    "PRODUCTVERSION POVWIN_VERSION_RC\r\n"
     "FILEFLAGSMASK 0x3fL\r\n"
     "#ifdef _DEBUG\r\n"
     "FILEFLAGS 0x1L\r\n"
@@ -300,14 +302,15 @@ BEGIN
     "    BEGIN\r\n"
     "        BLOCK ""0c0904e4""\r\n"
     "        BEGIN\r\n"
-    "            VALUE ""CompanyName"", ""Persistence of Vision Raytracer Pty. Ltd.""\r\n"
-    "            VALUE ""FileDescription"", ""POV-Ray for Windows editor interface DLL""\r\n"
-    "            VALUE ""FileVersion"", ""3.8.0.0""\r\n"
-    "            VALUE ""InternalName"", DLLNAME\r\n"
-    "            VALUE ""LegalCopyright"", ""Copyright 2004-2017 Persistence of Vision Raytracer Pty. Ltd.""\r\n"
-    "            VALUE ""OriginalFilename"", DLLNAME\r\n"
-    "            VALUE ""ProductName"", ""The Persistence of Vision Raytracer""\r\n"
-    "            VALUE ""ProductVersion"", ""3.8.0.0""\r\n"
+    "            VALUE ""CompanyName"",        POVWIN_WINRC_COMPANY_NAME\r\n"
+    "            VALUE ""FileDescription"",    POVWIN_APPLICATION_NAME "" editor interface DLL""\r\n"
+    "            VALUE ""FileVersion"",        POVWIN_WINRC_FILE_VERSION\r\n"
+    "            VALUE ""InternalName"",       DLLNAME\r\n"
+    "            VALUE ""LegalCopyright"",     POVWIN_WINRC_LEGAL_COPYRIGHT\r\n"
+    "            VALUE ""LegalTrademarks"",    POVWIN_WINRC_LEGAL_TRADEMARKS\r\n"
+    "            VALUE ""OriginalFilename"",   DLLNAME\r\n"
+    "            VALUE ""ProductName"",        POVWIN_WINRC_PRODUCT_NAME\r\n"
+    "            VALUE ""ProductVersion"",     POVWIN_WINRC_PRODUCT_VERSION\r\n"
     "        END\r\n"
     "    END\r\n"
     "    BLOCK ""VarFileInfo""\r\n"
@@ -804,8 +807,8 @@ END
 #endif
 
 1 VERSIONINFO
-FILEVERSION 3,7,0,0
-PRODUCTVERSION 3,7,0,0
+FILEVERSION POVWIN_VERSION_RC
+PRODUCTVERSION POVWIN_VERSION_RC
 FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
 FILEFLAGS 0x1L
@@ -820,14 +823,15 @@ BEGIN
     BEGIN
         BLOCK "0c0904e4"
         BEGIN
-            VALUE "CompanyName", "Persistence of Vision Raytracer Pty. Ltd."
-            VALUE "FileDescription", "POV-Ray for Windows editor interface DLL"
-            VALUE "FileVersion", "3.8.0.0"
-            VALUE "InternalName", DLLNAME
-            VALUE "LegalCopyright", "Copyright 2004-2017 Persistence of Vision Raytracer Pty. Ltd."
-            VALUE "OriginalFilename", DLLNAME
-            VALUE "ProductName", "The Persistence of Vision Raytracer"
-            VALUE "ProductVersion", "3.8.0.0"
+            VALUE "CompanyName",        POVWIN_WINRC_COMPANY_NAME
+            VALUE "FileDescription",    POVWIN_APPLICATION_NAME " editor interface DLL"
+            VALUE "FileVersion",        POVWIN_WINRC_FILE_VERSION
+            VALUE "InternalName",       DLLNAME
+            VALUE "LegalCopyright",     POVWIN_WINRC_LEGAL_COPYRIGHT
+            VALUE "LegalTrademarks",    POVWIN_WINRC_LEGAL_TRADEMARKS
+            VALUE "OriginalFilename",   DLLNAME
+            VALUE "ProductName",        POVWIN_WINRC_PRODUCT_NAME
+            VALUE "ProductVersion",     POVWIN_WINRC_PRODUCT_VERSION
         END
     END
     BLOCK "VarFileInfo"
