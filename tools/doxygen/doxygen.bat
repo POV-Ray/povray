@@ -2,7 +2,8 @@
 
 if "%~1" == "" goto :PARAMETER_ERROR
 
-rem set PLANTUML_JAR_PATH=C:\Program Files\PlantUML
+pushd "%~dp0"
+set PLANTUML_JAR_PATH=%CD%/plantuml
 
 call "../windows/get-source-version.bat" "../../source/base/version.h"
 set POV_VER=%POV_SOURCE_VERSION%
@@ -28,6 +29,7 @@ pause
 goto :EOF
 
 :DOXYGEN_FAIL
+popd
 popd
 echo *** FAILED TO GENERATE SOURCE DOCUMENTATION ***
 pause
