@@ -203,7 +203,7 @@ bool LoadEditorDLL (char *path, bool errorOK)
   void                  ***f ;
   struct stat           statbuf ;
 
-   if (!editors_enabled)
+  if (!editors_enabled)
     return (false) ;
   if (debugging)
     debug_output ("Trying to load editor DLL from '%s' [%s]\n", path, stat (path, &statbuf) != 0 ? "missing" : "found") ;
