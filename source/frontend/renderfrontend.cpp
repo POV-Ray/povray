@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -747,6 +747,7 @@ void InitInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
     POVMSObject msgobj(cppmsg());
     POVMSObjectPtr msg = &msgobj;
     const int NUMBER_OF_AUTHORS_ACROSS = 4;
+    const char* FORMAT_OF_AUTHORS_ITEM = "  %-18s";
     POVMSAttributeList attrlist;
     POVMSAttribute item;
     char charbuf[1024];
@@ -762,7 +763,7 @@ void InitInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
 
     l = 1024;
     charbuf[0] = 0;
-    if (POVMSUtil_GetString(msg, kPOVAttrib_CoreVersion, charbuf, &l) == kNoErr)
+    if (POVMSUtil_GetString(msg, kPOVAttrib_CoreGeneration, charbuf, &l) == kNoErr)
         generation = charbuf;
 
     l = 1024;
@@ -788,7 +789,7 @@ void InitInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
                         l = 1023;
                         charbuf[0] = 0;
                         if(POVMSAttr_Get(&item, kPOVMSType_CString, charbuf, &l) == kNoErr)
-                            tsb->printf("  %-18s", charbuf);
+                            tsb->printf(FORMAT_OF_AUTHORS_ITEM, charbuf);
 
                         (void)POVMSAttr_Delete(&item);
                     }
@@ -817,7 +818,7 @@ void InitInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
                         l = 1023;
                         charbuf[0] = 0;
                         if(POVMSAttr_Get(&item, kPOVMSType_CString, charbuf, &l) == kNoErr)
-                            tsb->printf("  %-18s", charbuf);
+                            tsb->printf(FORMAT_OF_AUTHORS_ITEM, charbuf);
 
                         (void)POVMSAttr_Delete(&item);
                     }
@@ -846,7 +847,7 @@ void InitInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
                         l = 1023;
                         charbuf[0] = 0;
                         if(POVMSAttr_Get(&item, kPOVMSType_CString, charbuf, &l) == kNoErr)
-                            tsb->printf("  %-18s", charbuf);
+                            tsb->printf(FORMAT_OF_AUTHORS_ITEM, charbuf);
 
                         (void)POVMSAttr_Delete(&item);
                     }

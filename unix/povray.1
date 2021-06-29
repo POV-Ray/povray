@@ -1,9 +1,9 @@
-.TH POV-Ray 1 "April 2018" "POV\-Team" "Version 3.8.0" \" -*- nroff -*-
+.TH POV-Ray 1 "July 2021" "POV\-Team" "Version 3.8.0" \" -*- nroff -*-
 .\" man page written by Andreas Dilger
-.\" updated by Mark Gordon for POV-Ray 3.5
-.\" updated by Nicolas Calimet and Christoph Hormann for POV-Ray 3.6
-.\" updated by James Holsenback for POV-Ray 3.7
-.\" updated by William F. Pokorny and Christoph Lipka for POV-Ray 3.8
+.\" updated by Mark Gordon for POV-Ray v3.5
+.\" updated by Nicolas Calimet and Christoph Hormann for POV-Ray v3.6
+.\" updated by James Holsenback for POV-Ray v3.7
+.\" updated by William F. Pokorny and Christoph Lipka for POV-Ray v3.8
 
 .SH NAME
 povray \- POV\-Ray: The Persistence of Vision Ray Tracer
@@ -29,7 +29,7 @@ or for a better explanation of the meaning of the
 command\-line and INI file options, please consult the online documentation
 at http://wiki.povray.org/content/Documentation:Contents or the documentation
 capture that should accompany all versions of \fBPOV\-Ray\fP. The documentation
-is installed in PREFIX/share/doc/povray-3.7, where PREFIX is /usr/local
+is installed in PREFIX/share/doc/povray-3.8, where PREFIX is /usr/local
 by default, or a path specified when configuring the source package for
 compilation and installation.
 .LP
@@ -272,12 +272,12 @@ Write the stream to the console and/or the specified file.  The streams are
 .LP
 \fBPOV\-Ray\fP for UNIX allows a \fIpovray.ini\fP file in the current
 directory to override the individual setting in
-\fI$HOME/.povray/3.7/povray.ini\fP.
+\fI$HOME/.povray/3.8/povray.ini\fP.
 \fBPOV\-Ray\fP looks for initial configuration information, like the
 Library_Path settings, which gives the location for the standard include
 files, first in the environment variable \fI$POVINI\fP, then in
-\fI./povray.ini\fP, then in \fI$HOME/.povray/3.7/povray.ini\fP, then in
-\fIPREFIX/etc/povray/3.7/povray.ini\fP. The PREFIX directory can be changed
+\fI./povray.ini\fP, then in \fI$HOME/.povray/3.8/povray.ini\fP, then in
+\fIPREFIX/etc/povray/3.8/povray.ini\fP. The PREFIX directory can be changed
 at compile\-time using the \-\-prefix option of the configure script.
 For backward compatibility with \fBPOV\-Ray\fP version 3.5 and earlier,
 the \fI$HOME/.povrayrc\fP and \fI$PREFIX/etc/povray.ini\fP files are also
@@ -287,9 +287,9 @@ Since version 3.5 \fBPOV\-Ray\fP features an I/O Restriction mechanism.
 I/O Restrictions attempt to at least partially protect a machine running
 \fBPOV-Ray\fP from having files read or written outside of a given set
 of directories. The settings are defined in two \fIconfiguration files\fP,
-a system-level \fIPREFIX/etc/povray/3.7/povray.conf\fP file and an user-level
-\fI$HOME/.povray/3.7/povray.conf\fP file with more restrictive settings.
-In \fBPOV-Ray\fP 3.7 the format of these configuration files has changed,
+a system-level \fIPREFIX/etc/povray/3.8/povray.conf\fP file and an user-level
+\fI$HOME/.povray/3.8/povray.conf\fP file with more restrictive settings.
+As of \fBPOV-Ray\fP v3.6 the format of these configuration files has changed,
 and no backward compatibility is retained with the configuration files
 in \fBPOV-Ray\fP 3.5. See the documentation for further details and
 examples of I/O Restriction settings.
@@ -333,15 +333,13 @@ http://news.povray.org/groups. You should try to find
 help and assistance in there before lodging a bug report.
 
 .SH AUTHORS
-Primary POV-Ray 3.7 Architects/Developers: (Alphabetically)
+Primary POV-Ray v3.8 Architects/Developers: (Alphabetically)
 .LP
-  Chris Cason         Thorsten Froehlich  Christoph Lipka
+  Chris Cason         Christoph Lipka
 .LP
 With Assistance From: (Alphabetically)
 .LP
-  Nicolas Calimet     Jerome Grimbert     James Holsenback
-  Christoph Hormann   Nathan Kopp         Juha Nieminen
-  William F. Pokorny
+  Jerome Grimbert     James Holsenback    William F. Pokorny
 .LP
 Past Contributors: (Alphabetically)
 .LP

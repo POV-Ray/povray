@@ -1,14 +1,13 @@
 Persistence of Vision(tm) Ray Tracer Version 3.8.0.
 
 POV-Ray is based on DKBTrace 2.12 by David K. Buck & Aaron A. Collins
-Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 
-Primary POV-Ray 3.7 Architects/Developers: (Alphabetically)
-  Chris Cason         Thorsten Froehlich  Christoph Lipka   
+Primary POV-Ray v3.8 Architects/Developers: (Alphabetically)
+  Chris Cason         Christoph Lipka
 
 With Assistance From: (Alphabetically)
-  Nicolas Calimet     Jerome Grimbert     James Holsenback    Christoph Hormann
-  Nathan Kopp         Juha Nieminen       William F. Pokorny
+  Jerome Grimbert     James Holsenback    William F. Pokorny
 
 Past Contributors: (Alphabetically)
   Steve Anger         Eric Barish         Dieter Bayer        David K. Buck

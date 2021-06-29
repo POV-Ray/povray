@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -139,29 +139,40 @@ using namespace pov;
 using namespace pov_base;
 
 /// Primary Developers.
+/// `nullptr`-terminated list of primary developers of this "generation" of
+/// POV-Ray (as identified by the first two components of the version number).
+/// @note
+///     Please keep this list sorted by last name.
 const char *PrimaryDevelopers[] =
 {
     "Chris Cason",
-    "Thorsten Froehlich",
     "Christoph Lipka",
     nullptr
 };
 
 /// Assisting Developers.
+/// `nullptr`-terminated list of additional contributors to this "generation" of
+/// POV-Ray (as identified by the first two components of the version number).
+/// @note
+///     Please keep this list sorted by last name; contributors known only
+///     by some user name should go at the end, using simple ASCII sort order.
 const char *AssistingDevelopers[] =
 {
-    "Nicolas Calimet",
     "Jerome Grimbert",
     "James Holsenback",
-    "Christoph Hormann",
-    "Nathan Kopp",
-    "Juha Nieminen",
     "William F. Pokorny",
     nullptr
 };
 
 /// Past Contributing Developers.
-/// By convention, current developers are also already included here.
+/// `nullptr`-terminated list of contributors to previous "generations" of
+/// POV-Ray (as identified by the first two components of the version number).
+/// @note
+///     Please keep this list sorted by last name; contributors known only
+///     by some user name should go at the end, using simple ASCII sort order.
+/// @note
+///     By convention, current developers are also included here, provided they had
+///     already contributed to earlier "generations" of POV-Ray.
 const char *ContributingDevelopers[] =
 {
     "Steve Anger",
@@ -205,7 +216,7 @@ const char *ContributingDevelopers[] =
     "Timothy Wegner",
     "Drew Wells",
     "Chris Young",
-    nullptr   // `nullptr` flags the end of the list
+    nullptr
 };
 
 /// POVMS context to receive messages from the frontend
