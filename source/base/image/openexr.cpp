@@ -46,21 +46,11 @@
 
 #ifndef OPENEXR_MISSING
 
-#ifdef NON_UNIX_OPENEXR_HEADERS
-
 #include <ImfRgbaFile.h>
 #include <ImfStringAttribute.h>
 #include <ImfMatrixAttribute.h>
 #include <ImfArray.h>
 
-#else
-
-#include <OpenEXR/ImfRgbaFile.h>
-#include <OpenEXR/ImfStringAttribute.h>
-#include <OpenEXR/ImfMatrixAttribute.h>
-#include <OpenEXR/ImfArray.h>
-
-#endif
 #include "metadata.h"
 
 // this must be the last file included
@@ -105,7 +95,7 @@ class POV_EXR_OStream : public Imf::OStream
 				throw POV_EXCEPTION(kFileDataErr, "Error while writing EXR output");
 		}
 
-		Int64 tellp()
+		unsigned long tellp()
 		{
 			unsigned long pos = os.tellg();
 			if((int) pos == -1)
@@ -113,9 +103,9 @@ class POV_EXR_OStream : public Imf::OStream
 			return(pos);
 		}
 
-		void seekp(Int64 pos)
+		void seekp(unsigned long pos)
 		{
-			if(!os.seekg((unsigned long)pos))
+			if(!os.seekg(pos))
 				throw POV_EXCEPTION(kFileDataErr, "Error when writing EXR output");
 		}
 	private:
@@ -147,7 +137,7 @@ class POV_EXR_IStream : public Imf::IStream
 			return (is.tellg() < fsize);
 		}
 
-		Int64 tellg()
+		unsigned long tellg()
 		{
 			unsigned long pos = is.tellg();
 			if((int)pos == -1)
@@ -155,9 +145,9 @@ class POV_EXR_IStream : public Imf::IStream
 			return pos;
 		}
 
-		void seekg(Int64 pos)
+		void seekg(unsigned long pos)
 		{
-			if(!is.seekg((unsigned long)pos))
+			if(!is.seekg(pos))
 				throw POV_EXCEPTION(kFileDataErr, "Error while reading EXR file");
 		}
 	private:
@@ -282,7 +272,7 @@ void Write(OStream *file, const Image *image, const Image::WriteOptions& options
 			comments += meta.getComment3() + "\n";
 		if (!meta.getComment4().empty())
 			comments += meta.getComment4() + "\n";
-		
+
 		if (!comments.empty())
 			hdr.insert("comments",StringAttribute(comments.c_str()));
 
