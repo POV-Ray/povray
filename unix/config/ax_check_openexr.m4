@@ -8,7 +8,7 @@
 #
 # LAST MODIFICATION
 #
-#   2007-11-08
+#   2021-06-15
 #
 # COPYLEFT
 #
@@ -46,17 +46,11 @@ AC_DEFUN([AX_CHECK_OPENEXR],
       ax_check_openexr_save_cppflags="$CPPFLAGS"
       ax_check_openexr_save_libs="$LIBS"
       CPPFLAGS="$ax_check_openexr_cflags $CPPFLAGS"
+      LIBS="$ax_check_openexr_libs $LIBS"
 
-      # FIXME: workaround for versions >= 1.4.0
-      AX_COMPARE_VERSION([$ax_check_openexr_version], [ge], [1.4],
-        [LIBS="$ax_check_openexr_libs -lIlmThread $LIBS"],
-	[LIBS="$ax_check_openexr_libs $LIBS"]
-      )
-
-      # check include file
       AC_CHECK_HEADER(
         [OpenEXR/ImfCRgbaFile.h],
-        [AC_CHECK_LIB([IlmImf], [ImfInputReadPixels], [], [ax_check_openexr="not found"])],
+        [ax_check_openexr="ok"],
         [ax_check_openexr="no headers"]
       )
     fi

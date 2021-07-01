@@ -98,13 +98,21 @@
         }
     #endif
     #ifndef OPENEXR_MISSING
-        #include <IlmBaseConfig.h>
         #include <OpenEXRConfig.h>
+        #if (OPENEXR_VERSION_MAJOR < 3)
+            #include <IlmBaseConfig.h>
+        #else
+            #include <Imath/ImathConfig.h>
+        #endif
+
         // NOTE:
         //  Versions of OpenEXR and IlmImf prior to 1.7.1 do not seem to have a way to get the version number,
         //  nor do the official hard-coded Windows config headers.
         #ifndef ILMBASE_PACKAGE_STRING
             #define ILMBASE_PACKAGE_STRING "IlmBase"
+        #endif
+        #ifndef IMATH_PACKAGE_STRING
+            #define IMATH_PACKAGE_STRING "Imath"
         #endif
         #ifndef OPENEXR_PACKAGE_STRING
             #define OPENEXR_PACKAGE_STRING "OpenEXR"
@@ -476,7 +484,11 @@ void BuildInitInfo(POVMSObjectPtr msg)
         err = POVMSAttr_New(&attr);
         if(err == kNoErr)
         {
+#if (OPENEXR_VERSION_MAJOR < 3)
             const char *tempstr = OPENEXR_PACKAGE_STRING " and " ILMBASE_PACKAGE_STRING ", Copyright (c) 2002-2011 Industrial Light & Magic.";
+#else
+            const char *tempstr = OPENEXR_PACKAGE_STRING " and " IMATH_PACKAGE_STRING ", Copyright (c) Contributors to the OpenEXR Project.";
+#endif
             err = POVMSAttr_Set(&attr, kPOVMSType_CString, reinterpret_cast<const void *>(tempstr), (int) strlen(tempstr) + 1);
             if(err == kNoErr)
                 err = POVMSAttrList_Append(&attrlist, &attr);
