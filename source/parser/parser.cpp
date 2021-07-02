@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -393,7 +393,7 @@ void Parser::Run()
                 "version v3.1 or earlier is not guaranteed. Please use POV-Ray v3.5 or earlier if\n"
                 "your scene depends on rendering defects caused by these bugs.");
 
-        sceneData->languageVersion = 350;
+        sceneData->languageVersion = POVRayVersion(350);
     }
 
     if(sceneData->languageVersionLate)
@@ -527,7 +527,7 @@ void Parser::Frame_Init()
 
 /****************************************************************************/
 
-void Parser::InitDefaults(int version)
+void Parser::InitDefaults(POVRayVersion version)
 {
     // Initialize defaults depending on version:
     // As of v3.8...
@@ -1591,6 +1591,7 @@ void Parser::Parse_Camera (Camera& Cam)
             END_CASE
 
             CASE (USER_DEFINED_TOKEN)
+                NewFeatureWarning(380, HERE, "'user_defined' in 'camera'");
                 mExperimentalFlags.userDefinedCamera = true;
                 Parse_User_Defined_Camera(New);
             END_CASE
@@ -4997,12 +4998,15 @@ ObjectPtr Parser::Parse_Ovus()
     Object->ConnectingRadius = 2.0 * std::max(Object->BottomRadius, Object->TopRadius);
     EXPECT
         CASE(RADIUS_TOKEN)
+            NewFeatureWarning(380, HERE, "'radius' in 'ovus'");
             Object->ConnectingRadius = Parse_Float();
         END_CASE
         CASE(DISTANCE_TOKEN)
+            NewFeatureWarning(380, HERE, "'distance' in 'ovus'");
             Object->VerticalSpherePosition = Parse_Float();
         END_CASE
         CASE(PRECISION_TOKEN)
+            NewFeatureWarning(380, HERE, "'precision' in 'ovus'");
             Object->RootTolerance = Parse_Float();
         END_CASE
         OTHERWISE
@@ -6372,9 +6376,11 @@ ObjectPtr Parser::Parse_Torus()
 
     EXPECT_ONE
         CASE(DIFFERENCE_TOKEN)
+            NewFeatureWarning(380, HERE, "'difference' in 'torus'");
             spindleMode = SpindleTorus::DifferenceSpindle;
         END_CASE
         CASE(INTERSECTION_TOKEN)
+            NewFeatureWarning(380, HERE, "'intersection' in 'torus'");
             spindleMode = SpindleTorus::IntersectionSpindle;
             if (!spindleTorus)
             {
@@ -6383,9 +6389,11 @@ ObjectPtr Parser::Parse_Torus()
             }
         END_CASE
         CASE(MERGE_TOKEN)
+            NewFeatureWarning(380, HERE, "'merge' in 'torus'");
             spindleMode = SpindleTorus::MergeSpindle;
         END_CASE
         CASE(UNION_TOKEN)
+            NewFeatureWarning(380, HERE, "'union' in 'torus'");
             spindleMode = SpindleTorus::UnionSpindle;
         END_CASE
         OTHERWISE
@@ -7561,12 +7569,14 @@ void Parser::Parse_Global_Settings()
                     {
                         Error("Radiosity nearest count must be a value from 1 to %d.", RadiosityFunction::MAX_NEAREST_COUNT);
                     }
-                    Parse_Comma();
-                    sceneData->radiositySettings.nearestCountAPT = (int)Allow_Float(0.0);
-                    if (( sceneData->radiositySettings.nearestCountAPT < 0) ||
-                        ( sceneData->radiositySettings.nearestCountAPT >= sceneData->radiositySettings.nearestCount))
+                    if (Allow_Int(sceneData->radiositySettings.nearestCountAPT, 0, true))
                     {
-                        Error("Radiosity nearest count for adaptive pretrace must be non-negative and smaller than general nearest count.");
+                        NewFeatureWarning(370, HERE, "two-parameter form of 'nearest_count' radiosity setting");
+                        if ((sceneData->radiositySettings.nearestCountAPT < 0) ||
+                            (sceneData->radiositySettings.nearestCountAPT >= sceneData->radiositySettings.nearestCount))
+                        {
+                            Error("Radiosity nearest count for adaptive pretrace must be non-negative and smaller than general nearest count.");
+                        }
                     }
                 END_CASE
 
@@ -7602,6 +7612,7 @@ void Parser::Parse_Global_Settings()
                 END_CASE
 
                 CASE (BRILLIANCE_TOKEN)
+                    NewFeatureWarning(380, HERE, "'brilliance' in 'radiosity'");
                     sceneData->radiositySettings.brilliance = ((int)Parse_Float() != 0);
                 END_CASE
 
@@ -8692,14 +8703,17 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
 
     EXPECT_ONE
         CASE (LEFT_PAREN_TOKEN)
+            NewFeatureWarning(380, HERE, "tuple-style bulk assignment");
             UNGET
             tupleDeclare = true;
         END_CASE
         CASE (LEFT_ANGLE_TOKEN)
+            NewFeatureWarning(380, HERE, "vector-style bulk assignment");
             UNGET
             lvectorDeclare = true;
         END_CASE
         CASE (LEFT_CURLY_TOKEN)
+            NewFeatureWarning(380, HERE, "array-style bulk assignment");
             UNGET
             larrayDeclare = true;
         END_CASE
@@ -9725,13 +9739,13 @@ void Parser::Link_Textures (TEXTURE **Old_Textures, TEXTURE *New_Textures)
     }
     for (Layer = New_Textures; Layer->Next != nullptr; Layer = Layer->Next)
     {
-        /* NK layers - 1999 June 10 - for backwards compatiblity with layered textures */
-        if(sceneData->EffectiveLanguageVersion() <= 310)
+        /* NK layers - 1999 June 10 - for backwards compatibility with layered textures */
+        if(sceneData->EffectiveLanguageVersion() < 350)
             Convert_Filter_To_Transmit(Layer->Pigment);
     }
 
-    /* NK layers - 1999 Nov 16 - for backwards compatiblity with layered textures */
-    if ((sceneData->EffectiveLanguageVersion() <= 310) && (*Old_Textures != nullptr))
+    /* NK layers - 1999 Nov 16 - for backwards compatibility with layered textures */
+    if ((sceneData->EffectiveLanguageVersion() < 350) && (*Old_Textures != nullptr))
         Convert_Filter_To_Transmit(Layer->Pigment);
 
     Layer->Next = *Old_Textures;
@@ -10853,6 +10867,38 @@ void Parser::Warning(WarningLevel level, const char *format,...)
         messageFactory.WarningAt(level, Token.FileHandle->name(), Token.Token_File_Pos.lineno, Token.Token_Col_No, Token.FileHandle->tellg().offset, "%s", localvsbuffer);
     else
         messageFactory.Warning(level, "%s", localvsbuffer);
+}
+
+void Parser::WarningOnce(WarningLevel level, SourceLocation id, const char *format, ...)
+{
+    POV_PARSER_ASSERT(level >= kWarningGeneral);
+
+    if (mWarningsIssued.insert(id).second)
+    {
+        va_list marker;
+        char localvsbuffer[1024];
+
+        va_start(marker, format);
+        std::vsnprintf(localvsbuffer, sizeof(localvsbuffer), format, marker);
+        va_end(marker);
+
+        if (Token.FileHandle != nullptr)
+            messageFactory.WarningAt(level, Token.FileHandle->name(), Token.Token_File_Pos.lineno, Token.Token_Col_No, Token.FileHandle->tellg().offset, "%s", localvsbuffer);
+        else
+            messageFactory.Warning(level, "%s", localvsbuffer);
+    }
+}
+
+void Parser::NewFeatureWarning(int sinceVersion, SourceLocation id, const char *feature)
+{
+    if (sceneData->EffectiveLanguageVersion() < sinceVersion)
+    {
+        WarningOnce(kWarningLanguage, id,
+                    "Use of POV-Ray v%s feature (%s) detected in alleged v%s scene.",
+                    POVRayVersion(sinceVersion).str().c_str(),
+                    feature,
+                    sceneData->EffectiveLanguageVersion().str().c_str());
+    }
 }
 
 void Parser::VersionWarning(unsigned int sinceVersion, const char *format,...)

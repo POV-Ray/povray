@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -1051,14 +1051,14 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                         // Normally, the `version` pseudo-variable needs to return the effective language version
                         // (which now defaults to v3.6.2) so that include files can properly switch back after
                         // temporarily overriding the `#version` setting.
-                        Val = sceneData->EffectiveLanguageVersion() / 100.0;
+                        Val = double(sceneData->EffectiveLanguageVersion());
                     }
                     else
                     {
                         // When used inside a `#version` statement, special handling is needed to support the
                         // `#version version` idiom to set the effective language version to whatever version
                         // of POV-Ray is actually used.
-                        Val = sceneData->languageVersion / 100.0;
+                        Val = double(sceneData->languageVersion);
                     }
                     break;
 
@@ -1245,6 +1245,10 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                             {
                                 Error("A pigment, normal or density parameter to max_extent must be based on an image or density file.");
                             }
+                            if (Token.Token_Id == PIGMENT_ID_TOKEN)
+                                NewFeatureWarning(370, HERE, "'max_extent' to probe input image dimensions");
+                            else
+                                NewFeatureWarning(380, HERE, "'max_extent' to probe input image or density file dimensions");
                         END_CASE
 
                         OTHERWISE
@@ -1709,6 +1713,7 @@ DBL Parser::Parse_Rel_String_Term (const UCS2 *lhs)
 {
     int Val;
     UCS2 *rhs = nullptr;
+    bool result;
 
     EXPECT_ONE
         CASE (LEFT_ANGLE_TOKEN)
@@ -1716,7 +1721,7 @@ DBL Parser::Parse_Rel_String_Term (const UCS2 *lhs)
             Val = UCS2_strcmp(lhs, rhs);
             POV_FREE(rhs);
 
-            return (DBL)(Val < 0);
+            result = (Val < 0);
         END_CASE
 
         CASE (REL_LE_TOKEN)
@@ -1724,7 +1729,7 @@ DBL Parser::Parse_Rel_String_Term (const UCS2 *lhs)
             Val = UCS2_strcmp(lhs, rhs);
             POV_FREE(rhs);
 
-            return (DBL)(Val <= 0);
+            result = (Val <= 0);
         END_CASE
 
         CASE (EQUALS_TOKEN)
@@ -1732,7 +1737,7 @@ DBL Parser::Parse_Rel_String_Term (const UCS2 *lhs)
             Val = UCS2_strcmp(lhs, rhs);
             POV_FREE(rhs);
 
-            return (DBL)(Val == 0);
+            result = (Val == 0);
         END_CASE
 
         CASE (REL_NE_TOKEN)
@@ -1740,7 +1745,7 @@ DBL Parser::Parse_Rel_String_Term (const UCS2 *lhs)
             Val = UCS2_strcmp(lhs, rhs);
             POV_FREE(rhs);
 
-            return (DBL)(Val != 0);
+            result = (Val != 0);
         END_CASE
 
         CASE (REL_GE_TOKEN)
@@ -1748,7 +1753,7 @@ DBL Parser::Parse_Rel_String_Term (const UCS2 *lhs)
             Val = UCS2_strcmp(lhs, rhs);
             POV_FREE(rhs);
 
-            return (DBL)(Val >= 0);
+            result = (Val >= 0);
         END_CASE
 
         CASE (RIGHT_ANGLE_TOKEN)
@@ -1756,7 +1761,7 @@ DBL Parser::Parse_Rel_String_Term (const UCS2 *lhs)
             Val = UCS2_strcmp(lhs, rhs);
             POV_FREE(rhs);
 
-            return (DBL)(Val > 0);
+            result = (Val > 0);
         END_CASE
 
         OTHERWISE
@@ -1765,6 +1770,9 @@ DBL Parser::Parse_Rel_String_Term (const UCS2 *lhs)
             return 0.0;
         END_CASE
     END_EXPECT
+
+    NewFeatureWarning(370, HERE, "string comparison operator");
+    return (DBL)result;
 }
 
 /*****************************************************************************
@@ -2100,19 +2108,74 @@ bool Parser::Parse_Bool(const char* parameterName)
 DBL Parser::Allow_Float (DBL defval)
 {
     DBL retval;
+    (void)Allow_Float(retval, defval);
+    return (retval);
+}
+
+bool Parser::Allow_Float(DBL& retval, DBL defval, bool allowComma)
+{
+    if (allowComma && !Parse_Comma())
+    {
+        retval = defval;
+        return false;
+    }
 
     EXPECT_ONE
         CASE_EXPRESS
             retval = Parse_Float();
+            return true;
         END_CASE
 
         OTHERWISE
             UNGET
             retval = defval;
+            return false;
         END_CASE
     END_EXPECT
+}
 
-    return (retval);
+bool Parser::Allow_Float(float& retval, float defval, bool allowComma)
+{
+    DBL rawValue;
+    bool ret = Allow_Float(rawValue, defval, allowComma);
+    retval = (float)rawValue;
+    return ret;
+}
+
+bool Parser::Allow_Int(long& retval, long defval, bool allowComma)
+{
+    DBL rawValue;
+    if (Allow_Float(rawValue, 0.0, allowComma))
+    {
+        long value = long(rawValue); // TODO - Maybe we want round-to-nearest here.
+        if (fabs(value - rawValue) >= EPSILON)
+            Warning("Expected integer; rounding down fractional value %lf to %i.", rawValue, value);
+        retval = value;
+        return true;
+    }
+    else
+    {
+        retval = defval;
+        return false;
+    }
+}
+
+bool Parser::Allow_Int(int& retval, int defval, bool allowComma)
+{
+    DBL rawValue;
+    if (Allow_Float(rawValue, 0.0, allowComma))
+    {
+        int value = int(rawValue); // TODO - Maybe we want round-to-nearest here.
+        if (fabs(value - rawValue) >= EPSILON)
+            Warning("Expected integer; rounding down fractional value %lf to %i.", rawValue, value);
+        retval = value;
+        return true;
+    }
+    else
+    {
+        retval = defval;
+        return false;
+    }
 }
 
 

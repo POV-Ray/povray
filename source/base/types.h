@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,6 +44,7 @@
 #include <vector>
 
 #include "base/pov_mem.h"
+#include "base/version.h"
 
 namespace pov_base
 {
@@ -334,6 +335,95 @@ class ThreadData
 {
     public:
         virtual ~ThreadData() { }
+};
+
+/// Class representing POV-Ray version numbers.
+struct POVRayVersion
+{
+    /// Set to actual software version.
+    inline POVRayVersion() :
+        POVRayVersion(POV_RAY_MAJOR_VERSION_INT, POV_RAY_MINOR_VERSION_INT, POV_RAY_REVISION_INT)
+    {}
+
+    inline POVRayVersion(const POVRayVersion& v) :
+        data(v.data)
+    {}
+
+    /// Set according to numeric fields.
+    inline POVRayVersion(int major, int minor, int revision) :
+        data(major * 100 + minor * 10 + revision)
+    {
+        POV_ASSERT((major > 0) && (major < 4));
+        POV_ASSERT((minor >= 0) && (minor < 10));
+        POV_ASSERT((revision >= 0) && (revision < 10));
+    }
+
+    /// Set as specified by parser-internal integer code.
+    inline explicit POVRayVersion(int intCode) :
+        data(intCode)
+    {
+        POV_ASSERT((intCode == 0) || ((intCode >= 100) && (intCode < 400)));
+    }
+
+    /// Set as specified by `#version`-style floating-point code.
+    inline explicit POVRayVersion(float floatCode) :
+        data(std::min(std::max((unsigned int)(floatCode * 100.0f + .5f), 100u), 10000u))
+    {
+        POV_ASSERT((floatCode >= 1.00) && (floatCode < 4.00));
+    }
+
+    /// Set as specified by `#version`-style floating-point code.
+    inline explicit POVRayVersion(double floatCode) :
+        data(std::min(std::max((unsigned int)(floatCode * 100.0 + .5), 100u), 10000u))
+    {
+        POV_ASSERT((floatCode >= 1.00) && (floatCode < 4.00));
+    }
+
+    inline POVRayVersion& operator=(const POVRayVersion& v)
+    {
+        data = v.data;
+        return *this;
+    }
+
+    /// Return first version field.
+    inline int major() const { return data / 100; }
+
+    /// Return second version field.
+    inline int minor() const { return (data / 10) % 10; }
+
+    /// Return third version field.
+    inline int revision() const { return data % 10; }
+
+    /// Return as `#version`-style floating-point code.
+    inline explicit operator double() const { return data * 0.01; }
+
+    /// Return as string.
+    inline std::string str() const
+    {
+        if (revision() == 0)
+            return std::string({ char('0'+major()), '.', char('0'+minor()) });
+        else
+            return std::string({ char('0'+major()), '.', char('0'+minor()), '.', char('0'+revision()) });
+    }
+
+    inline bool operator== (POVRayVersion v) const { return data == v.data; }
+    inline bool operator>= (POVRayVersion v) const { return data >= v.data; }
+    inline bool operator<= (POVRayVersion v) const { return data <= v.data; }
+    inline bool operator> (POVRayVersion v) const { return data > v.data; }
+    inline bool operator< (POVRayVersion v) const { return data < v.data; }
+
+    /// Compare to parser-internal integer code.
+    inline bool operator== (int parserCode) const { return data == parserCode; }
+
+    /// Compare to parser-internal integer code.
+    inline bool operator>= (int parserCode) const { return data >= parserCode; }
+
+    /// Compare to parser-internal integer code.
+    inline bool operator< (int parserCode) const { return data < parserCode; }
+
+private:
+
+    int data;
 };
 
 /// @}

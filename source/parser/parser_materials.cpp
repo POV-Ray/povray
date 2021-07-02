@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -594,7 +594,9 @@ void Parser::Parse_Image_Map (PIGMENT *Pigment)
                 case SPHERICAL_MAP:
                 case CYLINDRICAL_MAP:
                 case TORUS_MAP:
+                    break;
                 case ANGULAR_MAP:
+                    NewFeatureWarning(380, HERE, "specific 'map_type' value");
                     break;
 
                 default:
@@ -798,10 +800,12 @@ void Parser::Parse_Bump_Map (TNORMAL *Tnormal)
 
         CASE (MAP_TYPE_TOKEN)
             image->Map_Type = (int) Parse_Float ();
+            // TODO FIXME - check validity of parameter, as we do in Parse_Image_Map().
         END_CASE
 
         CASE (INTERPOLATE_TOKEN)
             image->Interpolation_Type = (int)Parse_Float();
+            // TODO FIXME - check validity of parameter, as we do in Parse_Image_Map().
         END_CASE
 
         CASE (BUMP_SIZE_TOKEN)
@@ -902,10 +906,12 @@ PatternPtr Parser::ParseImagePattern()
 
         CASE (MAP_TYPE_TOKEN)
             image->Map_Type = (int) Parse_Float ();
+            // TODO FIXME - check validity of parameter, as we do in Parse_Image_Map().
         END_CASE
 
         CASE (INTERPOLATE_TOKEN)
             image->Interpolation_Type = (int)Parse_Float();
+            // TODO FIXME - check validity of parameter, as we do in Parse_Image_Map().
         END_CASE
 
         CASE (USE_COLOUR_TOKEN)
@@ -1069,6 +1075,7 @@ PatternPtr Parser::ParseSlopePattern()
 
             EXPECT_ONE
                 CASE(POINT_AT_TOKEN)
+                    NewFeatureWarning(370, HERE, "'point_at' in 'slope' pattern");
                     pattern->pointAt = true;
                 END_CASE
                 OTHERWISE
@@ -1544,6 +1551,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
 
         // JN2007: Cubic pattern
         CASE (CUBIC_TOKEN)
+            NewFeatureWarning(370, HERE, "'cubic' pattern");
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new CubicPattern());
             New->Blend_Map = Parse_Blend_List<MAP_T>(6,New->pattern->GetDefaultBlendMap(),TPat_Type);
@@ -1709,6 +1717,8 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                 pattern->exteriorType = (int)Parse_Float();
                 if((pattern->exteriorType < 0) || (pattern->exteriorType > 8))
                     Error("Invalid fractal pattern exterior type. Valid types are 0 to 8.");
+                if (pattern->exteriorType > 6)
+                    NewFeatureWarning(370, HERE, "specific fractal pattern 'exterior' value");
                 Parse_Comma();
                 pattern->exteriorFactor = Parse_Float();
             }
@@ -2074,6 +2084,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         CASE (INTERPOLATE_TOKEN)
             if (DensityFilePattern* pattern = dynamic_cast<DensityFilePattern*>(New->pattern.get()))
                 pattern->densityFile->Interpolation = (int)Parse_Float();
+                // TODO FIXME - check validity of parameter, as we do in Parse_Image_Map().
             else
                 Not_With ("interpolate","non-density_file");
         END_CASE
@@ -2135,6 +2146,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         CASE (REPEAT_TOKEN)
             if (CracklePattern* pattern = dynamic_cast<CracklePattern*>(New->pattern.get()))
             {
+                NewFeatureWarning(380, HERE, "'repeat' in 'crackle' pattern");
                 Parse_Vector(Local_Vector);
                 pattern->repeat = IntVector3d(Local_Vector);
                 if ((pattern->repeat.x() < 0) ||
@@ -2281,6 +2293,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
         END_CASE
 
         CASE (EMISSION_TOKEN)
+            NewFeatureWarning(370, HERE, "'emission' in 'finish'");
             emissionSet = true;
             Parse_Colour(New->Emission);
         END_CASE
@@ -2305,8 +2318,8 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
             END_EXPECT
 
             New->Diffuse = Parse_Float ();
-            Parse_Comma();
-            New->DiffuseBack = Allow_Float(0.0);
+            if (Allow_Float(New->DiffuseBack, 0.0, true))
+                NewFeatureWarning(370, HERE, "two-parameter form of 'diffuse' finish setting");
             if (New->DiffuseBack != 0.0)
                 mExperimentalFlags.backsideIllumination = true;
         END_CASE
@@ -2439,6 +2452,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
         END_CASE
 
         CASE(FRESNEL_TOKEN)
+            NewFeatureWarning(380, HERE, "'fresnel' directly in 'finish'");
             New->Fresnel = Allow_Float(1.0);
             New->Reflection_Fresnel = (New->Fresnel != 0.0);
         END_CASE
@@ -2504,6 +2518,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
         END_CASE
 
         CASE (USE_ALPHA_TOKEN)
+            NewFeatureWarning(380, HERE, "'use_alpha' in 'finish'");
             New->AlphaKnockout = ((int) Allow_Float(1.0) != 0);
         END_CASE
 
@@ -2930,10 +2945,12 @@ TEXTURE *Parser::Parse_Material_Map()
 
         CASE (INTERPOLATE_TOKEN)
             pImage->Interpolation_Type=(int)Parse_Float();
+            // TODO FIXME - check validity of parameter, as we do in Parse_Image_Map().
         END_CASE
 
         CASE (MAP_TYPE_TOKEN)
             pImage->Map_Type = (int) Parse_Float ();
+            // TODO FIXME - check validity of parameter, as we do in Parse_Image_Map().
         END_CASE
 
         CASE (REPEAT_TOKEN)
@@ -4275,6 +4292,7 @@ SKYSPHERE *Parser::Parse_Skysphere()
         END_CASE
 
         CASE (EMISSION_TOKEN)
+            NewFeatureWarning(370, HERE, "'emission' in 'sky_sphere'");
             Parse_Colour(Skysphere->Emission);
         END_CASE
 
@@ -4683,6 +4701,7 @@ void Parser::Parse_Warp (WarpList& warps)
 
         // JN2007: Cubic warp
         CASE(CUBIC_TOKEN)
+            NewFeatureWarning(370, HERE, "'cubic' warp");
             New = new CubicWarp();
         END_CASE
 
@@ -4998,6 +5017,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 
         // JN2007: Cubic pattern
         CASE (CUBIC_TOKEN)
+            NewFeatureWarning(370, HERE, "'cubic' pattern");
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new CubicPattern());
             // New->Blend_Map not parsed in pattern functions.
@@ -5424,6 +5444,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         CASE (INTERPOLATE_TOKEN)
             if (DensityFilePattern* pattern = dynamic_cast<DensityFilePattern*>(New->pattern.get()))
                 pattern->densityFile->Interpolation = (int)Parse_Float();
+                // TODO FIXME - check validity of parameter, as we do in Parse_Image_Map().
             else
                 Not_With ("interpolate","non-density_file");
         END_CASE
@@ -5485,6 +5506,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         CASE (REPEAT_TOKEN)
             if (CracklePattern* pattern = dynamic_cast<CracklePattern*>(New->pattern.get()))
             {
+                NewFeatureWarning(380, HERE, "'repeat' in 'crackle' pattern");
                 Parse_Vector(Local_Vector);
                 pattern->repeat = IntVector3d(Local_Vector);
                 if ((pattern->repeat.x() < 0) ||

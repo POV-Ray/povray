@@ -55,7 +55,7 @@
 /// @name Primary Version and Copyright Information
 ///
 /// @note
-///     The macro definition in this section may be probed by external tools, and must therefore
+///     The macro definitions in this section may be probed by external tools, and must therefore
 ///     conform to the following rules:
 ///       - The definitions must reside on a single line each.
 ///       - The lines must not be disabled via conditional compilation or multi-line comments.
@@ -140,9 +140,6 @@
 /// @name Secondary Version and Copyright Information
 ///
 /// @{
-
-/// Source code version as a 3-digit integer number.
-#define POV_RAY_VERSION_INT (POV_RAY_MAJOR_VERSION_INT * 100 + POV_RAY_MINOR_VERSION_INT * 10 + POV_RAY_REVISION_INT)
 
 /// Helper macro to convert a parameter into a string.
 /// @note This macro can _not_ be used directly to stringify another macro's value, as it would

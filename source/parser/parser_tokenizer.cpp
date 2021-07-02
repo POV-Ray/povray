@@ -1383,6 +1383,7 @@ void Parser::Read_Symbol()
     {
         if (!Parsing_Directive && (Temp_Entry->Token_Number == LOCAL_TOKEN))
         {
+            NewFeatureWarning(380, HERE, "'local' pseudo-dictionary");
             pseudoDictionary = Table_Index;
         }
         else if (!Parsing_Directive && (Temp_Entry->Token_Number == GLOBAL_TOKEN))
@@ -1391,10 +1392,20 @@ void Parser::Read_Symbol()
         }
         else if (Inside_Ifdef)
         {
-            Warning("Tried to test whether a reserved keyword is defined. Test result may not be what you expect.");
+            Warning("Tried to test whether a reserved keyword is defined. Test result may not be what you expect, "
+                    "and may fundamentally differ in future versions.");
         }
         else
         {
+            if (sceneData->languageVersionSet && (sceneData->EffectiveLanguageVersion() < Temp_Entry->sinceVersion) && !Temp_Entry->legacyUseWarned)
+            {
+                Warning(kWarningLanguage,
+                        "Use of POV-Ray v%s keyword ('%s') detected in alleged v%s scene.",
+                        Temp_Entry->sinceVersion.str().c_str(),
+                        Temp_Entry->Token_Name,
+                        sceneData->EffectiveLanguageVersion().str().c_str());
+                Temp_Entry->legacyUseWarned = true;
+            }
             Write_Token (Temp_Entry->Token_Number, Token.Token_Col_No);
             return;
         }
@@ -2515,7 +2526,7 @@ void Parser::Parse_Directive(int After_Hash)
                                 END_CASE
                             END_EXPECT
 
-                            sceneData->languageVersion = (int)(Parse_Float() * 100 + 0.5);
+                            sceneData->languageVersion = POVRayVersion(Parse_Float());
 
                             if (sceneData->languageVersion == 371)
                             {
@@ -2578,9 +2589,9 @@ void Parser::Parse_Directive(int After_Hash)
                             }
                             Parse_Semi_Colon(false);
 
-                            if (sceneData->EffectiveLanguageVersion() > POV_RAY_VERSION_INT)
+                            if (sceneData->EffectiveLanguageVersion() > POVRayVersion())
                             {
-                                Error("Your scene file requires POV-Ray version %g or later!\n", (DBL)(sceneData->EffectiveLanguageVersion() / 100.0));
+                                Error("Your scene file requires POV-Ray v%s or later!\n", sceneData->EffectiveLanguageVersion().str().c_str());
                             }
 
                             Ok_To_Declare = true;
@@ -3025,6 +3036,9 @@ void Parser::Break()
     if (CS_Index == 0)
         Error ("Invalid context for #break");
 
+    if (Cond_Stack[CS_Index].Cond_Type != CASE_TRUE_COND)
+        NewFeatureWarning(370, HERE, "'#break' outside '#switch' context");
+
     if (Cond_Stack[CS_Index].Cond_Type == INVOKING_MACRO_COND)
     {
         Skipping=Prev_Skip;
@@ -3123,7 +3137,8 @@ void Parser::init_sym_tables()
 
     for (i = 0; Reserved_Words[i].Token_Name != nullptr; i++)
     {
-        Add_Symbol(SYM_TABLE_RESERVED,Reserved_Words[i].Token_Name,Reserved_Words[i].Token_Number);
+        auto&& Entry = Add_Symbol(SYM_TABLE_RESERVED, Reserved_Words[i].Token_Name, Reserved_Words[i].Token_Number);
+        Entry->sinceVersion = POVRayVersion(Reserved_Words[i].sinceVersion);
     }
 
     Add_Sym_Table();
@@ -3210,6 +3225,8 @@ SYM_ENTRY *Parser::Create_Entry (const char *Name, TOKEN Number, bool copyName)
     New->deprecated          = false;
     New->deprecatedOnce      = false;
     New->deprecatedShown     = false;
+    New->sinceVersion        = POVRayVersion(0);
+    New->legacyUseWarned     = false;
     New->Deprecation_Message = nullptr;
     New->ref_count           = 1;
     if (copyName)
@@ -3231,6 +3248,7 @@ SYM_ENTRY *Parser::Copy_Entry (const SYM_ENTRY *oldEntry)
     newEntry->deprecated          = false;
     newEntry->deprecatedOnce      = false;
     newEntry->deprecatedShown     = false;
+    newEntry->sinceVersion        = POVRayVersion(0);
     newEntry->Deprecation_Message = nullptr;
     newEntry->ref_count           = 1;
     newEntry->Token_Name          = POV_STRDUP (oldEntry->Token_Name);
@@ -3428,23 +3446,12 @@ void Parser::Remove_Symbol (int Index, const char *Name, bool is_array_elem, voi
     return Remove_Symbol (Tables[Index], Name, is_array_elem, DataPtr, ttype);
 }
 
-void Parser::Check_Macro_Vers(void)
-{
-    if (sceneData->EffectiveLanguageVersion() < 310)
-    {
-        Error("Macros require #version 3.1 or later but #version %x.%02d is set.",
-               sceneData->EffectiveLanguageVersion() / 100, sceneData->EffectiveLanguageVersion() % 100);
-    }
-}
-
 Parser::Macro *Parser::Parse_Macro()
 {
     Macro *New;
     SYM_ENTRY *Table_Entry = nullptr;
     bool Old_Ok = Ok_To_Declare;
     MacroParameter newParameter;
-
-    Check_Macro_Vers();
 
     Ok_To_Declare = false;
 
@@ -3548,8 +3555,6 @@ Parser::Macro *Parser::Parse_Macro()
 
     Parse_Paren_End();
 
-    Check_Macro_Vers();
-
     return (New);
 }
 
@@ -3569,8 +3574,6 @@ void Parser::Invoke_Macro()
         else
             Error("Error in Invoke_Macro");
     }
-
-    Check_Macro_Vers();
 
     Parse_Paren_Begin();
 
@@ -3694,15 +3697,10 @@ void Parser::Invoke_Macro()
     Token.is_array_elem = false;
     Token.is_mixed_array_elem = false;
     Token.is_dictionary_elem = false;
-
-    Check_Macro_Vers();
-
 }
 
 void Parser::Return_From_Macro()
 {
-    Check_Macro_Vers();
-
     if (!Cond_Stack[CS_Index].Macro_Same_Flag)
     {
         if (Token.FileHandle == Input_File->In_File)

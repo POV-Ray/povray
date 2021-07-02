@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,6 +41,7 @@
 
 #include <map>
 
+#include "base/types.h"
 #include "base/image/colourspace.h"
 
 #include "core/lighting/radiosity.h"
@@ -112,7 +113,7 @@ class SceneData
         /// skysphere around scene
         Skysphere_Struct *skysphere;
         /// language version to assume
-        int languageVersion;
+        POVRayVersion languageVersion;
         /// true if a #version statement has been encountered
         bool languageVersionSet;
         /// true if the first #version statement was found after other declarations
@@ -236,15 +237,15 @@ class SceneData
         /// (which was the latest version before v3.7.0).
         /// @note       It is recommended to use this function only where behaviour differs
         ///             significantly from pre-v3.7 versions.
-        /// @return     The current language version in integer format (e.g. 370 for v3.7.0)
-        ///             if explicitly specified, or 362 otherwise.
+        /// @return     The current language version as a POVRayVersion object
+        ///             if explicitly specified, or v3.6.2 otherwise.
         ///
-        inline unsigned int EffectiveLanguageVersion() const
+        inline POVRayVersion EffectiveLanguageVersion() const
         {
             if (languageVersionSet)
                 return languageVersion;
             else
-                return 362;
+                return POVRayVersion(362);
         }
 
         /// Create new scene specific data.

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -92,7 +92,7 @@ void Scene::StartParser(POVMS_Object& parseOptions)
 
     if (parseOptions.Exist(kPOVAttrib_Version))
     {
-        sceneData->languageVersion = clip(int(parseOptions.GetFloat(kPOVAttrib_Version) * 100.0f + .5f), 100, 10000);
+        sceneData->languageVersion = POVRayVersion(parseOptions.GetFloat(kPOVAttrib_Version));
         sceneData->languageVersionSet = true;
     }
 

@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -117,9 +117,11 @@ struct Sym_Table_Entry
     char *Deprecation_Message;  ///< Warning to print if the symbol is deprecated
     void *Data;                 ///< Reference to the symbol value
     TOKEN Token_Number;         ///< Unique ID of this symbol
+    POVRayVersion sinceVersion;
     bool deprecated      : 1;
     bool deprecatedOnce  : 1;
     bool deprecatedShown : 1;
+    bool legacyUseWarned : 1;
     SymTableEntryRefCount ref_count; ///< normally 1, but may be greater when passing symbols out of macros
 };
 
@@ -204,6 +206,27 @@ struct BetaFlags
         videoCapture(false)
     {}
 };
+
+/// Class representing a source location for later reference.
+struct SourceLocation
+{
+    SourceLocation(const char* file, unsigned int line) :
+        file(file), line(line)
+    {}
+    inline bool operator== (const SourceLocation& other) const
+    {
+        return (file == other.file) && (line == other.line);
+    }
+    inline bool operator< (const SourceLocation& other) const
+    {
+        return (file < other.file) || ((file == other.file) && (line < other.line));
+    }
+private:
+    const char*     file;
+    unsigned int    line;
+};
+
+#define HERE SourceLocation(__FILE__, __LINE__)
 
 /*****************************************************************************
 * Global typedefs
@@ -383,6 +406,8 @@ class Parser : public SceneTask
 
         void Warning(const char *format,...);
         void Warning(WarningLevel level, const char *format,...);
+        void WarningOnce(WarningLevel level, SourceLocation id, const char *format, ...);
+        void NewFeatureWarning(int sinceVersion, SourceLocation id, const char *feature);
         void VersionWarning(unsigned int sinceVersion, const char *format,...);
         void PossibleError(const char *format,...);
         void Error(const char *format,...);
@@ -467,6 +492,18 @@ class Parser : public SceneTask
         /// Parses an optional FLOAT.
         DBL Allow_Float (DBL defval);
 
+        /// Parses an optional FLOAT.
+        bool Allow_Float(DBL& retval, DBL defval, bool allowComma = false);
+
+        /// Parses an optional FLOAT.
+        bool Allow_Float(float& retval, float defval, bool allowComma = false);
+
+        /// Parses an optional FLOAT as an integer value.
+        bool Allow_Int(long& retval, long defval, bool allowComma = false);
+
+        /// Parses an optional FLOAT as an integer value.
+        bool Allow_Int(int& retval, int defval, bool allowComma = false);
+
         /// Parses a FLOAT as an integer value.
         int Parse_Int(const char* parameterName = nullptr);
 
@@ -546,6 +583,8 @@ class Parser : public SceneTask
 
         ExperimentalFlags mExperimentalFlags;
         BetaFlags mBetaFeatureFlags;
+
+        std::set<SourceLocation> mWarningsIssued;
 
         DBL clockValue;
         bool useClock;
@@ -666,7 +705,7 @@ class Parser : public SceneTask
 
         // parse.h/parse.cpp
         void Frame_Init(void);
-        void InitDefaults(int version);
+        void InitDefaults(POVRayVersion version);
         void Parse_Coeffs(int order, DBL *Coeffs);
 
         ObjectPtr Parse_Bicubic_Patch(void);
@@ -785,7 +824,6 @@ class Parser : public SceneTask
         void Parse_Read(void);
         void Parse_Write(void);
         int Parse_Read_Value(DATA_FILE *User_File,int Previous,int *NumberPtr,void **DataPtr);
-        void Check_Macro_Vers(void);
         DBL Parse_Cond_Param(void);
         void Parse_Cond_Param2(DBL *V1,DBL *V2);
         void Inc_CS_Index();
