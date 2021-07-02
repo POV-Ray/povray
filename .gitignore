@@ -150,6 +150,11 @@ $RECYCLE.BIN/
 # POV-Ray Windows build artefacts
 # ===============================
 
+/libraries/ilmbase/Half/eLut.h
+/libraries/ilmbase/Half/toFloat.h
+/libraries/png/pnglibconf.h
+/libraries/tiff/libtiff/tif_config.h
+/libraries/tiff/libtiff/tiffconf.h
 /windows/vs*/.vs/
 /windows/vs*/bin32/
 /windows/vs*/bin64/
@@ -207,6 +212,7 @@ $RECYCLE.BIN/
 # Files created by configure script in specific subdirectories
 /platform/Makefile
 /source/Makefile
+/source/jversion.h
 /unix/Makefile
 /unix/config.h
 /unix/stamp-h1
@@ -243,3 +249,10 @@ $RECYCLE.BIN/
 /tools/windows/htmlhelp/output
 /tools/windows/htmlhelp/debug.txt
 /tools/windows/htmlhelp/filelist.txt
+
+# ========================
+# GitHub Actions artefacts
+# ========================
+
+# Used specifically by our own workflows
+/artifact*

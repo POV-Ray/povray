@@ -1,0 +1,89 @@
+name: 'Windows Build Compatibility Tests'
+
+on:
+  workflow_dispatch
+
+jobs:
+  build_windows:
+    name: Visual Studio ${{ matrix.visual-studio }} ${{ matrix.configuration }} ${{ matrix.platform }} ${{ matrix.compatibility}}
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        visual-studio: [2015, 2017, 2019]
+        variant: [64, sse2, 32]
+        compatibility: ['', xp]
+        exclude:
+        - visual-studio: 2019
+          compatibility: xp
+        include:
+        # Set up various options based on Visual Studio version to emulate
+        - visual-studio: 2015
+          os: windows-2016
+          toolset: v140
+          solution: vs10
+        - visual-studio: 2017
+          os: windows-2016
+          toolset: v141
+          solution: vs10
+        - visual-studio: 2019
+          os: windows-2019
+          toolset: v142
+          solution: vs10
+        # Pick configuration / paltform combo
+        - variant: 64
+          configuration: Release
+          platform: x64
+        - variant: sse2
+          configuration: Release-SSE2
+          platform: Win32
+        - variant: 32
+          configuration: Release
+          platform: Win32
+        # Set up various options based on compatibility requirements
+        - compatibility: ''
+          toolset-variant: ''
+          msbuild-options: ''
+        - compatibility: xp
+          toolset-variant: '_xp'
+          msbuild-options: '/p:TargetUniversalCRTVersion=10.0.10586.0'
+
+    steps:
+
+    - name: 'Matrix Diagnostics'
+      shell: bash
+      run: |
+        echo '${{ toJSON(matrix) }}'
+
+    - name: 'Check out Repository'
+      uses: actions/checkout@v2
+
+    - name: 'Add MSBuild to PATH'
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: 'Patch povray.h'
+      shell: pwsh
+      run: |
+        (Get-Content source\backend\povray.h).replace('FILL IN NAME HERE.........................', 'GitHub') | Set-Content source\backend\povray.h
+        (Get-Content source\backend\povray.h).replace('#error Please complete the following DISTRIBUTION_MESSAGE_2 definition', '') | Set-Content source\backend\povray.h
+
+    - name: 'Build'
+      uses: POV-Ray/povray/.github/actions/windows_build@gh-actions-v1
+      with:
+        pov-ray-build-id: ghvs${{matrix.visual-studio}}${{github.run_number}}${{matrix.compatibility}}
+        solution: ${{matrix.solution}}
+        configuration: ${{matrix.configuration}}
+        platform: ${{matrix.platform}}
+        toolset: ${{matrix.toolset}}${{matrix.toolset-variant}}
+        msbuild-options: ${{matrix.msbuild-options}}
+    - name: 'Unpatch povray.h'
+      shell: bash
+      run: git checkout source/backend/povray.h
+    - name: 'Sanity-Check Working Tree'
+      uses: POV-Ray/povray/.github/actions/git_check_repo@gh-actions-v1
+    - name: 'Upload Artifacts for Manual Testing'
+      uses: actions/upload-artifact@v2
+      with:
+        name: artifact_bin_${{matrix.visual-studio}}_${{matrix.variant}}${{matrix.compatibility}}
+        path: windows/${{matrix.solution}}/bin*/*.exe

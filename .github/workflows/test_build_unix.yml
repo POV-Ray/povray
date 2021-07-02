@@ -1,0 +1,93 @@
+name: 'Unix Build Compatibility Tests'
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_unix:
+    name: '${{ matrix.os }} ${{ matrix.c-compiler }}'
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-18.04, ubuntu-20.04, macos-10.15]
+        c-compiler: [gcc, clang]
+        exclude:
+        - os: macos-10.15
+          c-compiler: gcc
+        include:
+        # os-specific
+        - os: ubuntu-18.04
+          configure-options: ''
+        - os: ubuntu-20.04
+          configure-options: ''
+        - os: macos-10.15
+          configure-options: '--without-openexr' # TODO: Fix for OpenEXR 3.0.0 and later
+        # compiler-specific
+        - c-compiler: gcc
+          cxx-compiler: g++
+        - c-compiler: clang
+          cxx-compiler: clang++
+
+    steps:
+
+    - name: 'Matrix Diagnostics'
+      shell: bash
+      run: |
+        echo '${{ toJSON(matrix) }}'
+        ${{matrix.c-compiler}} --version
+
+    - name: 'Check out Repository'
+      uses: actions/checkout@v2
+
+    - name: 'Install Prerequisites'
+      uses: POV-Ray/povray/.github/actions/unix_getlibs@gh-actions-v1
+
+    - name: 'Prebuild'
+      uses: POV-Ray/povray/.github/actions/unix_prebuild@gh-actions-v1
+    - name: 'Sanity-Check Working Tree'
+      uses: POV-Ray/povray/.github/actions/git_check_repo@gh-actions-v1
+
+    - name: 'Configure'
+      uses: POV-Ray/povray/.github/actions/unix_configure@gh-actions-v1
+      with:
+        c-compiler: ${{ matrix.c-compiler }}
+        cxx-compiler: ${{ matrix.cxx-compiler }}
+        configure-options: ${{ matrix.configure-options }}
+    - name: 'Sanity-Check Working Tree'
+      uses: POV-Ray/povray/.github/actions/git_check_repo@gh-actions-v1
+
+    - name: 'Bundle Artifacts for Diagnostics'
+      if: ${{ always() }}
+      uses: POV-Ray/povray/.github/actions/git_bundle_ignored@gh-actions-v1
+      with:
+        name: artifact_diag_${{ matrix.os }}_${{ matrix.c-compiler }}.tar.gz
+
+    - name: 'Build'
+      uses: POV-Ray/povray/.github/actions/unix_make@gh-actions-v1
+    - name: 'Sanity-Check Working Tree'
+      uses: POV-Ray/povray/.github/actions/git_check_repo@gh-actions-v1
+
+    - name: 'Check Functionality'
+      uses: POV-Ray/povray/.github/actions/unix_make@gh-actions-v1
+      with:
+        make-target: check
+    - name: 'Sanity-Check Working Tree'
+      uses: POV-Ray/povray/.github/actions/git_check_repo@gh-actions-v1
+
+#    - name: 'Install'
+#      uses: POV-Ray/povray/.github/actions/unix_make@gh-actions-v1
+#      with:
+#        make-target: install
+#    - name: 'Sanity-Check Working Tree'
+#      uses: POV-Ray/povray/.github/actions/git_check_repo@gh-actions-v1
+
+    - name: 'Upload Artifacts for Diagnostics'
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: artifact_diag_${{ matrix.os }}_${{ matrix.c-compiler }}
+        path: artifact_diag_${{ matrix.os }}_${{ matrix.c-compiler }}.tar.gz
+
+    # TODO: Maybe do some basic installation checking.
