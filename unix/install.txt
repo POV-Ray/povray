@@ -141,9 +141,12 @@ recommanded to generate a fully-featured POV-Ray executable.
 
 - When using Boost 1.65 or above, the compiler must conform to C++11 or later.
 
-- OpenEXR version 3.0.0 or higher is currently not supported, nor even
-  properly tested for. We hope to change this in the future, but fixing it is
-  a bit more complicated.
+- Modern versions of certain libraries (notably Imath 3.0.0 or above, as used
+  by OpenEXR 3.0.0 or above) require the compiler to explicitly identify as
+  C++11-compliant (as opposed to just supporting C++11 features quietly or
+  with warnings). If you are using any such libraries, you may need to specify
+  `CXXFLAGS=...` accordingly when invoking the `configure` script (e.g.
+  `configure CXXFLAGS="-std=c++11" ...` for gcc or clang).
 
 
 ====================================================

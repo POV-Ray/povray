@@ -103,7 +103,7 @@ class POV_EXR_OStream : public Imf::OStream
 		OPENEXR_INT64 tellp()
 		{
 			POV_LONG pos = os.tellg();
-			if((int) pos == -1)
+			if(pos == (POV_LONG)-1)
 				throw POV_EXCEPTION(kFileDataErr, "Error while writing EXR output");
 			return(pos);
 		}
@@ -145,7 +145,7 @@ class POV_EXR_IStream : public Imf::IStream
 		OPENEXR_INT64 tellg()
 		{
 			POV_LONG pos = is.tellg();
-			if((int)pos == -1)
+			if(pos == (POV_LONG)-1)
 				throw POV_EXCEPTION(kFileDataErr, "Error while reading EXR file");
 			return pos;
 		}
