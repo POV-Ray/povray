@@ -136,6 +136,7 @@ const char *PrimaryDevelopers[] =
 /// assisting developers
 const char *AssistingDevelopers[] =
 {
+    "Ton van den Broek",
 	"Nicolas Calimet",
 	"Jerome Grimbert",
 	"James Holsenback",

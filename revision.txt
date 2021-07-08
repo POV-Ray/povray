@@ -32,8 +32,57 @@ Notes:
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
+POV-Ray v3.7.0.10
+------------------------------------------------------------------------------
+
+Commit 371eb0fb on 2021-07-08 by Christoph Lipka (c-lipka)
+
+    Address minor issues related to OpenEXR.
+
+    - OpenEXR handling code could conceivably report an unwarranted error
+      when handling OpenEXR files > 2 GB on some platforms (notably Windows
+      or 32-bit systems).
+    - Document that use of OpenEXR 3.0.0 or later requires compiler to
+      explicitly claim C++11 support.
+
+Commit e13ab3eb on 2021-07-08 by Christoph Lipka
+
+    Fix crash in radiosity.cpp related to mosaic preview. (#299)
+
+Commit fe934337 on 2021-07-08 by TonVanDenBroek
+
+    Changes to support OpenEXR 3.0. (#422)
+
+Commit 63ed4541 on 2021-07-08 by Christoph Lipka (c-lipka)
+
+    Amend GitHub build test Workflow to enable C++11 on macOS (needed for
+    OpenEXR 3)
+
+Commit 56dbaf49 on 2021-07-02 by Christoph Lipka (c-lipka)
+
+    Activate GitHub Workflows build tests on v3.7 branch and disabe AppVeyor
+    and Travis CI.
+
+Commit 564675d3 on 2021-07-02 by Christoph Lipka (c-lipka)
+
+    Fix missing dependency in Visual Studio projects.
+
+Commit 387040ed on 2021-06-03 by Christoph Lipka (c-lipka)
+
+    [ci skip] Fix `.gitignore` to catch a few files now created in `unix`
+    subdirectory.
+
+Commit 08409ebd on 2021-06-02 by Christoph Lipka (c-lipka)
+
+    [ci skip] Minor fix to change log.
+
+------------------------------------------------------------------------------
 POV-Ray v3.7.0.9
 ------------------------------------------------------------------------------
+
+Commit cb927576 on 2021-06-02 by Christoph Lipka (c-lipka)
+
+    Bump version number and update change log.
 
 Commit 17abe5f7 on 2021-06-02 by Christoph Lipka (c-lipka)
 
@@ -46,10 +95,10 @@ Commit f68653cc on 2021-06-02 by Christoph Lipka (c-lipka)
     header.
 
     - Move `config.h` (created by `configure`) from main directory to
-    `unix` subdirectory
+      `unix` subdirectory
     - Move original `VERSION` from `unix` to `unix/prebuild` subdirectory.
     - Fix some instances in `prebuild.sh` where we're adding the main
-    directory to the include search path for no obvious reason.
+      directory to the include search path for no obvious reason.
 
     This should fix GitHub issue #403.
 

@@ -29,6 +29,28 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
+Changes between 3.7.0.9 and 3.7.0.10
+====================================
+
+(Note: This version has not been released in binary form, as it does not
+feature significant changes in functionality over the original 3.7.0 binaries,
+and any fixed bugs are deemed highly unlikely to actually occur in the wild.)
+
+This version constitutes a maintenance update of the POV-Ray 3.7.0 source
+code, focused on improving compatibility with modern OpenEXR versions.
+
+Fixed or Mitigated Bugs
+-----------------------
+
+  - Fix incompatibilities with OpenEXR 3 library (GitHub issue #408).
+    (Note: Use of OpenEXR 3 may require `configure CXXFLAGS="-std=c++11" ...`)
+  - OpenEXR handling code could conceivably report an unwarranted error
+    when handling OpenEXR files > 2 GB on some platforms (notably Windows
+    or 32-bit systems).
+  - Using mosaic preview together with radiosity would cause failed assertions
+    (and thus crashes) in debug builds.
+
+
 Changes between 3.7.0.8 and 3.7.0.9
 ===================================
 
@@ -46,7 +68,7 @@ Fixed or Mitigated Bugs
     "Building on postmarketOS on PinePhone").
   - Eliminate uint type from platform-independent code (concludes fix of
     GitHub issue #400, "Building on postmarketOS on PinePhone").
-  - Change locations of auto-generated `config.h` and origonal `VERSION` file
+  - Change locations of auto-generated `config.h` and original `VERSION` file
     to prevent the latter or its copy from erroneously being picked up on some
     systems as `<version>` standard C++20 include file by libraries (notably
     boost thread 1.73 and later; fixes GitHub issue #403, "povray 3.7.0.8 does
