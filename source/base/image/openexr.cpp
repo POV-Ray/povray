@@ -68,6 +68,11 @@ using namespace Imath;
 /*****************************************************************************
 * Local preprocessor defines
 ******************************************************************************/
+#if (OPENEXR_VERSION_MAJOR < 3)
+    #define OPENEXR_INT64 Int64
+#else
+    #define OPENEXR_INT64 uint64_t
+#endif
 
 /*****************************************************************************
 * Local typedefs
@@ -95,17 +100,17 @@ class POV_EXR_OStream : public Imf::OStream
 				throw POV_EXCEPTION(kFileDataErr, "Error while writing EXR output");
 		}
 
-		unsigned long tellp()
+		OPENEXR_INT64 tellp()
 		{
-			unsigned long pos = os.tellg();
+			POV_LONG pos = os.tellg();
 			if((int) pos == -1)
 				throw POV_EXCEPTION(kFileDataErr, "Error while writing EXR output");
 			return(pos);
 		}
 
-		void seekp(unsigned long pos)
+		void seekp(OPENEXR_INT64 pos)
 		{
-			if(!os.seekg(pos))
+			if(!os.seekg((POV_LONG)pos))
 				throw POV_EXCEPTION(kFileDataErr, "Error when writing EXR output");
 		}
 	private:
@@ -137,22 +142,22 @@ class POV_EXR_IStream : public Imf::IStream
 			return (is.tellg() < fsize);
 		}
 
-		unsigned long tellg()
+		OPENEXR_INT64 tellg()
 		{
-			unsigned long pos = is.tellg();
+			POV_LONG pos = is.tellg();
 			if((int)pos == -1)
 				throw POV_EXCEPTION(kFileDataErr, "Error while reading EXR file");
 			return pos;
 		}
 
-		void seekg(unsigned long pos)
+		void seekg(OPENEXR_INT64 pos)
 		{
-			if(!is.seekg(pos))
+			if(!is.seekg((POV_LONG)pos))
 				throw POV_EXCEPTION(kFileDataErr, "Error while reading EXR file");
 		}
 	private:
 		pov_base::IStream& is;
-		unsigned long fsize;
+		POV_LONG fsize;
 };
 
 /*****************************************************************************
