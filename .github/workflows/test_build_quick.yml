@@ -22,10 +22,12 @@ jobs:
           os: ubuntu-latest
           c-compiler: gcc
           cxx-compiler: g++
+          configure-options: ''
         - os-name: 'MacOS'
           os: macos-latest
           c-compiler: clang
           cxx-compiler: clang++
+          configure-options: 'CXXFLAGS="-std=c++11"' # OpenEXR 3 needs C++11
 
     steps:
 
@@ -51,6 +53,7 @@ jobs:
       with:
         c-compiler: ${{ matrix.c-compiler }}
         cxx-compiler: ${{ matrix.cxx-compiler }}
+        configure-options: ${{ matrix.configure-options }}
     - name: 'Sanity-Check Working Tree'
       uses: POV-Ray/povray/.github/actions/git_check_repo@gh-actions-v1
 
