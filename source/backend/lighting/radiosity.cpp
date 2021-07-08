@@ -318,10 +318,12 @@ void RadiosityFunction::ResetTopLevelStats()
 
 void RadiosityFunction::BeforeTile(int id, unsigned int pts)
 {
+	/*
 	if (isFinalTrace)
 		assert( pts == FINAL_TRACE );
 	else
 		assert( (pts >= PRETRACE_FIRST) && (pts <= PRETRACE_MAX) );
+	*/
 
 	// different pretrace step than last tile
 	if (pts != pretraceStep)
