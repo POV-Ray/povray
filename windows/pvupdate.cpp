@@ -43,7 +43,9 @@
 #include <stdio.h>
 
 #include "pvengine.h"
-
+#if defined (_WIN32) || defined (_WIN64) || defined (WIN32) || defined (WIN64)
+#include "backend/support/processorGroups.h"
+#endif
 // this must be the last file included
 #include "syspovdebug.h"
 
@@ -155,7 +157,7 @@ int IsUpdateAvailable (bool SendSysinfo, char *CurrentVersion, std::string& NewV
     strcpy (s, "&NoInfo=false\n") ;
     GetSystemInfo (&sysinfo) ;
     s += sprintf (s, "CPUArchitecture=0x%04x\n", (DWORD) sysinfo.wProcessorArchitecture) ;
-    s += sprintf (s, "NumberOfCPUs=0x%04x\n", sysinfo.dwNumberOfProcessors) ;
+    s += sprintf (s, "NumberOfCPUs=0x%04x\n", pov::processorGroups::GetNumberOfProcessors()) ;
     s += sprintf (s, "ProcessorType=0x%04x\n", sysinfo.dwProcessorType) ;
     s += sprintf (s, "ProcessorLevel=0x%04x\n", (DWORD) sysinfo.wProcessorLevel) ;
     s += sprintf (s, "ProcessorRevision=0x%04x\n", (DWORD) sysinfo.wProcessorRevision) ;
