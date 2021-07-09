@@ -71,6 +71,11 @@ using namespace Imath;
 /*****************************************************************************
 * Local preprocessor defines
 ******************************************************************************/
+#if (OPENEXR_VERSION_MAJOR < 3)
+    #define OPENEXR_INT64 Int64
+#else
+    #define OPENEXR_INT64 uint64_t
+#endif
 
 /*****************************************************************************
 * Local typedefs
@@ -96,17 +101,17 @@ class POV_EXR_OStream : public Imf::OStream
                 throw POV_EXCEPTION(kFileDataErr, "Error while writing EXR output");
         }
 
-        Int64 tellp()
+        OPENEXR_INT64 tellp()
         {
-            unsigned long pos = os.tellg();
+            POV_OFF_T pos = os.tellg();
             if((int) pos == -1)
                 throw POV_EXCEPTION(kFileDataErr, "Error while writing EXR output");
             return(pos);
         }
 
-        void seekp(Int64 pos)
+        void seekp(OPENEXR_INT64 pos)
         {
-            if(os.seekg((unsigned long)pos) == false)
+            if(os.seekg((POV_OFF_T)pos) == false)
                 throw POV_EXCEPTION(kFileDataErr, "Error when writing EXR output");
         }
     private:
@@ -137,22 +142,22 @@ class POV_EXR_IStream : public Imf::IStream
             return (is.tellg() < fsize);
         }
 
-        Int64 tellg()
+        OPENEXR_INT64 tellg()
         {
-            unsigned long pos = is.tellg();
+            POV_OFF_T pos = is.tellg();
             if((int)pos == -1)
                 throw POV_EXCEPTION(kFileDataErr, "Error while reading EXR file");
             return pos;
         }
 
-        void seekg(Int64 pos)
+        void seekg(OPENEXR_INT64 pos)
         {
-            if(is.seekg((unsigned long)pos) == false)
+            if(is.seekg((POV_OFF_T)pos) == false)
                 throw POV_EXCEPTION(kFileDataErr, "Error while reading EXR file");
         }
     private:
         pov_base::IStream& is;
-        unsigned long fsize;
+        POV_OFF_T fsize;
 };
 
 /*****************************************************************************
