@@ -29,10 +29,8 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
-Changes between v3.7.1-rc.1 and v3.8.0-???
-==========================================
-
-This version is still under active development, and not finalized yet.
+Changes between v3.7.1-rc.1 and v3.8.0-beta.1
+=============================================
 
 NOTE: This release cycle has been redesignated v3.8.0. There will not be a
 v3.7.1 release proper.
@@ -74,6 +72,11 @@ Changed Behaviour
   - Greyscale output no longer automatically forces bit depth to 16 bpc. To get
     16 bpp greyscale output, explicitly specify `Bits_Per_Color=16`.
   - Preview now reflects greyscale setting.
+  - POV-Ray will now warn when using v3.7 or v3.8 features without matching
+    `#version` directive.
+  - For consistency, POV-Ray will no longer throw an error whenever
+    encountering anything macro-related in v3.0 scenes, and instead just
+    warn when encountering `#macro` in such scenes.
 
 New Features
 ------------
@@ -117,7 +120,7 @@ Reported via GitHub:
   - #317 ("Boost 1.65.0 incompatibility")
   - #319 ("Need -lboost_date_time in non-optimized Unix builds")
   - #341 ("macOS build failure for 3.7.0.5", configure script failing to use
-    -lboost_system with Boost 1.66)
+    `-lboost_system` with Boost 1.66)
   - #342 ("AX_FIX_INCORRECT_PATH is broken", configure script failing to
     properly handle `.` directory in `C_INCLUDE_PATH` or `CPLUS_INCLUDE_PATH`)
   - #403 ("povray 3.7.0.8 does not build on macOS 11.0 Big Sur").
@@ -174,9 +177,6 @@ Development Related
 Other Noteworthy
 ----------------
 
-  - During alpha development phase, POV-Ray v3.8.0-alpha for Windows will
-    piggypack on an existing v3.7 installation to allow for raw binary
-    distribution.
   - The source code now requires a C++11-compliant compiler.
   - The Unix build process now officially requires Autoconf 2.68 or later.
   - Added `--generation` command-line switch to POV-Ray for Unix, which will

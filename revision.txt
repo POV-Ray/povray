@@ -32,8 +32,91 @@ Notes:
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-POV-Ray v3.8.0-???
+POV-Ray v3.8.0-beta.1
 ------------------------------------------------------------------------------
+
+Commit 946673f5 on 2021-07-11 by Christoph Lipka
+
+    Warn when using v3.8 features without `#version 3.8`.
+
+    - Addresses issue #420
+    - POV-Ray will now warn when using v3.7 or v3.8 features without matching
+      `#version` directive.
+    - For consistency, POV-Ray will no longer throw an error whenever
+      encountering anything macro-related in v3.0 scenes, and instead just
+      warn when encountering `#macro` in such scenes.
+    - Modified internal tracking of scene language version to use a dedicated
+      class instead of an `int`.
+    - Added a framework to print certain warnings only once.
+
+Commit a50e1202 on 2021-07-11 by Christoph Lipka
+
+    Change editor DLL distribution method.
+
+    - `cmedit*.dll` will now be distributed under the AGPL 3 as part of
+      the POV-Ray installer proper; only `povcmax*.dll` will continue to be
+      deployed separately.
+    - Editor DLLs no longer come in a 32-bit SSE2 flavor. Instead, both
+      32-bit variants of POV-Ray for Windows now use the same set of DLLs.
+
+Commit b408434a on 2021-07-11 by Christoph Lipka
+
+    Miscellaneous housekeeping for v3.8.0 beta.
+
+    - Update list of contributors (preliminary).
+    - Fix typo in `scenes/portfolio/readme.txt`.
+    - Fix GitHub Workflow for automated builds.
+    - Update GitHub release build Workflow to earmark binary as official.
+
+Commit 50dfa9b4 on 2021-07-11 by Christoph Lipka
+
+    Try to fix GitHub release build Workflow failing to build source
+    documentation.
+
+    - Update `tools/doxygen/doxygen.sh` script (and a few otther tool scripts)
+      to check out as executable.
+    - Include PlantUML tool in repository.
+
+Commit f6d214dd on 2021-07-09 by TonVanDenBroek
+
+    Changes to support OpenEXR 3.0. (#423)
+
+Commit 5385cec6 on 2021-06-26 by Christoph Lipka
+
+    More work on GitHub Actions.
+
+    - Add Workflows for automated releases and GitHub CodeQL code analysis.
+    - Remove GitHub Actions from this branch, as we're referencing those
+      on the master branch anyway.
+    - Remove Travis CI and AppVeyor config files for this branch.
+
+Commit a4759368 on 2021-06-21 by Christoph Lipka
+
+    Refrain from issuing an error when `#version 3.8` seems to be specified
+    late.
+
+    Previous v3.8 development versions issued an outright error when the
+    scene did not start with `#version`, but specified `#version 3.8`
+    or higher later; the rationale was that such scenes would clearly not
+    be legacy scenes, and the lack of a now-mandatory leading `#version`
+    statement therefore safe to be considered an outright error without
+    breaking backward compatibility. However, the current implementation
+    fails to account for a fringe scenario involving the `Include_Header`
+    INI setting. We're therefore disabling this error for now, and just
+    let the parser issue a warning as in v3.7.
+
+Commit 065fafed on 2021-06-18 by Christoph Lipka
+
+    [ci skip] Update version information extraction scripts.
+
+    Updated the scripts that extract version information from
+    `source/base/version.h`, and added a script to extract version information
+    from binaries, in preparation for auto-building installable releases
+    using GitHub Actions.
+
+Commit e3a97fbc on 2021-06-10 by Christoph Lipka
+
+    Update change log.
 
 Commit d4cf497d on 2021-06-10 by Christoph Lipka
 
@@ -2354,7 +2437,7 @@ Commit e287133b on 2016-04-29 by Christoph Lipka
 
     - Remove the `+avN` postfix from generated release tags.
     - Automatically flag builds as experimental if their version number
-    has a prefix beginning with `-x`, e.g. `3.7.1-x.foo.8765432`.
+      has a prefix beginning with `-x`, e.g. `3.7.1-x.foo.8765432`.
 
     Also updated the developers' documentation on version numbering.
 
@@ -2650,20 +2733,20 @@ Commit e1e7b0df on 2016-01-24 by Christoph Lipka
 
     Fix GitHub issue #53.
 
-      - The `version` pseudo-variable will now evaluate to the effective
-        language version at the time the expression is parsed, _except_
-        when used in a `#version` directive, in which case the behaviour
-        remains unchanged.
-      - Using the `version` pseudo-variable in a `#version` directive is now
-        deprecated. A new dedicated syntax, `#version auto`, has been added
-        to explicitly set the scene language version to whatever version of
-        POV-Ray is used to render the scene, making the `#version version`
-        idiom obsolete.
-      - The requirement to start each scene with a `#version` statement
-        is now more strongly enforced for POV-Ray 3.7 scenes, by reporting
-        a parse error if the scene file does not begin with a `#version`
-        directive but does have a `#version 3.7` (or later) directive anywhere
-        in the main scene file.
+    - The `version` pseudo-variable will now evaluate to the effective
+      language version at the time the expression is parsed, _except_
+      when used in a `#version` directive, in which case the behaviour
+      remains unchanged.
+    - Using the `version` pseudo-variable in a `#version` directive is now
+      deprecated. A new dedicated syntax, `#version auto`, has been added
+      to explicitly set the scene language version to whatever version of
+      POV-Ray is used to render the scene, making the `#version version`
+      idiom obsolete.
+    - The requirement to start each scene with a `#version` statement
+      is now more strongly enforced for POV-Ray 3.7 scenes, by reporting
+      a parse error if the scene file does not begin with a `#version`
+      directive but does have a `#version 3.7` (or later) directive anywhere
+      in the main scene file.
 
 Commit bb59a4e1 on 2016-01-20 by Christoph Lipka
 
@@ -3345,7 +3428,7 @@ Commit fd2e0dd1 on 2015-01-30 by Christoph Lipka
     - Added Doxygen configuration.
     - Minor changes to stand-alone source documentation pages.
     - Styleguide change: `@startuml` tag format is now to be used for
-    sequence charts instead of `@msc` tag format.
+      sequence charts instead of `@msc` tag format.
     - Added page on compiler requirements.
 
 ------------------------------------------------------------------------------
@@ -3538,24 +3621,24 @@ Commit 54b283a0 on 2014-07-23 by Christoph Lipka
 
     Improved finish features for more realism:
 
-      - Radiosity support for brilliance is now available; to activate it,
-        specify `brilliance on` in the global radiosity settings.
-      - The brilliance effect can now be applied not only to incoming
-        light, but also to outgoing light; to activate this, specify a second
-        FLOAT value
-        after the `brilliance` keyword. For maximum realism, both parameters
-        should be set to the same value.
-      - Fresnel angle-dependent attenuation can now also be enabled for
-        highlights and the diffuse component, by specifying `fresnel on`
-        directly in the finish block.
-        (Note that you will still need to enable fresnel attenuation
-        for reflections separately; also note that where reflection and
-        highlights increase at shallow angles,
-        the diffuse component decreases accordingly.) For a perfect match
-        between reflection and highlights use the `albedo` keyword for the
-        highlight with the same
-        value as the reflection maximum; the reflection minimum should be
-        set to zero.
+    - Radiosity support for brilliance is now available; to activate it,
+      specify `brilliance on` in the global radiosity settings.
+    - The brilliance effect can now be applied not only to incoming
+      light, but also to outgoing light; to activate this, specify a second
+      FLOAT value
+      after the `brilliance` keyword. For maximum realism, both parameters
+      should be set to the same value.
+    - Fresnel angle-dependent attenuation can now also be enabled for
+      highlights and the diffuse component, by specifying `fresnel on`
+      directly in the finish block.
+      (Note that you will still need to enable fresnel attenuation
+      for reflections separately; also note that where reflection and
+      highlights increase at shallow angles,
+      the diffuse component decreases accordingly.) For a perfect match
+      between reflection and highlights use the `albedo` keyword for the
+      highlight with the same
+      value as the reflection maximum; the reflection minimum should be
+      set to zero.
 
 Commit 9b10411d on 2014-07-21 by Christoph Lipka
 
@@ -3610,8 +3693,8 @@ Commit 365fc8fd on 2014-06-27 by Christoph Lipka
 
     5th iteration of the styleguide draft; Minor changes:
 
-      - Source comments can now use the "Dot" tool.
-      - Certain method names can now use `camelCase`.
+    - Source comments can now use the "Dot" tool.
+    - Certain method names can now use `camelCase`.
 
 Commit a190a10c on 2014-06-12 by Christoph Lipka
 
