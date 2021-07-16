@@ -67,7 +67,7 @@ jobs:
 
   build_windows:
     name: 'Windows Build Test'
-    runs-on: windows-latest
+    runs-on: windows-2016
     steps:
 
     - name: 'Check out Repository'
@@ -83,7 +83,7 @@ jobs:
         solution: vs2015
         configuration: Release
         platform: x64
-        toolset: v142
+        toolset: v140
         msbuild-options: ''
     - name: 'Sanity-Check Working Tree'
       uses: POV-Ray/povray/.github/actions/git_check_repo@gh-actions-v1

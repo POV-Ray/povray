@@ -71,27 +71,30 @@ jobs:
         echo "::group::Files and directories created by prebuild:"
         echo "${prebuild_made}"
         echo "::endgroup::"
-        tarfile="povunix-v${POV_RAY_FULL_VERSION}.tar"
+        tarbase="povunix-v${POV_RAY_FULL_VERSION}-src"
+        tarfile="${tarbase}.tar"
         # Bundle relevant portions of the original source tree, making sure
         # to exclude interim products placed there by the prebuild process.
-        tar -chWf "${tarfile}"           \
-          --anchored                    \
-          --exclude="*Makefile.am"      \
-          --exclude="unix/prebuild*"    \
-          --exclude="unix/scripts*"     \
-          --exclude="platform/windows"  \
-          --exclude="vfe/win"           \
-          doc platform source unix vfe  \
+        tar -chf "${tarfile}"               \
+          --anchored                        \
+          --exclude="*Makefile.am"          \
+          --exclude="unix/prebuild*"        \
+          --exclude="unix/scripts*"         \
+          --exclude="platform/windows"      \
+          --exclude="vfe/win"               \
+          --transform "s,^,${tarbase}/,"    \
+          doc platform source unix vfe      \
           LICENSE README.md changes.txt revision.txt
         # Add everything created by the prebuild process, except for some
         # interim products created by the prebuild process.
         # (Note that some files may have already been added by the previous
         # command, so we're using `-u` instead of `-r` to avoid duplicates.)
-        tar -uhWf "${tarfile}"           \
-          --anchored                    \
-          --exclude="*Makefile.am"      \
-          --exclude="configure.ac"      \
-          --exclude="bootstrap"         \
+        tar -uhf "${tarfile}"               \
+          --anchored                        \
+          --exclude="*Makefile.am"          \
+          --exclude="configure.ac"          \
+          --exclude="bootstrap"             \
+          --transform "s,^,${tarbase}/,"    \
           ${prebuild_made}
         # Compress bundle into proper tarball
         gzip "${tarfile}"
