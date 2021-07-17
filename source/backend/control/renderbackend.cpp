@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,17 +31,21 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "backend/control/renderbackend.h"
 
+// POV-Ray header files (base module)
+#include "base/pov_err.h"
+
+// POV-Ray header files (POVMS module)
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
 
-#include "base/pov_err.h"
-
+// POV-Ray header files (backend module)
 #include "backend/povray.h"
 #include "backend/control/scene.h"
 #include "backend/scene/view.h"
@@ -784,4 +788,4 @@ void RenderBackend::MakeDoneResult(POVMS_Message& result)
     result = newmsg;
 }
 
-}
+} // end of namespace

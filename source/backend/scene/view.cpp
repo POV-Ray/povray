@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,29 +31,41 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
-#include <boost/thread.hpp>
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "backend/scene/view.h"
+
+// C++ variants of standard C header files
+
+// Standard C++ header files
+
+// Boost header files
 #include <boost/bind.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/math/common_factor.hpp>
+#if POV_MULTITHREADED
+#include <boost/thread.hpp>
+#endif
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/scene/view.h"
-
+// POV-Ray header files (base module)
 #include "base/path.h"
 #include "base/timer.h"
 
+// POV-Ray header files (core module)
 #include "core/lighting/photons.h"
 #include "core/lighting/radiosity.h"
 #include "core/math/matrix.h"
 #include "core/support/octree.h"
 
+// POV-Ray header files (POVMS module)
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
 
+// POV-Ray header files (backend module)
 #include "backend/control/renderbackend.h"
 #include "backend/lighting/photonestimationtask.h"
 #include "backend/lighting/photonshootingstrategy.h"
@@ -1546,4 +1558,4 @@ const Camera *RTRData::CompletedFrame()
     return (ca ? &cameras[numRTRframes % cameras.size()] : nullptr);
 }
 
-}
+} // end of namespace

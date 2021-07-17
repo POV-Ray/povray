@@ -31,17 +31,20 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/scene/scenedata.h"
 
-#include <sstream>
-
+// Boost header files
 #include <boost/bind.hpp>
 
+// POV-Ray header files (base module)
 #include "base/version_info.h"
 
+// POV-Ray header files (core module)
 #include "core/material/pattern.h"
 #include "core/material/noise.h"
 #include "core/scene/atmosphere.h"
@@ -130,4 +133,4 @@ SceneData::~SceneData()
         delete tree;
 }
 
-}
+} // end of namespace

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,12 +31,17 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
 #ifndef POVRAY_VFE_WIN_SYSPOVIMAGE_H
 #define POVRAY_VFE_WIN_SYSPOVIMAGE_H
 
 #ifdef POV_VIDCAP_IMPL
+
+#include "base/image/image.h"
+
   namespace pov
   {
     class WinCapture;
@@ -45,7 +50,7 @@
     public:
       VideoCaptureImpl();
       ~VideoCaptureImpl();
-      Image *Init(const char *params, Image::ReadOptions& options, bool doubleBuffer);
+      pov_base::Image *Init(const char *params, pov_base::Image::ReadOptions& options, bool doubleBuffer);
       void UpdateImage();
       bool WaitFrame(int count, unsigned int timeout);
 
@@ -54,6 +59,7 @@
       int m_WaitFrames;
     };
   }
+
 #endif // POV_VIDCAP_IMPL
 
 #endif // POVRAY_VFE_WIN_SYSPOVIMAGE_H

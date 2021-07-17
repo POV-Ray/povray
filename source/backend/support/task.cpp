@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,21 +31,27 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
-#include <cassert>
-#include <stdexcept>
-
-#include <boost/bind.hpp>
-#include <boost/thread.hpp>
-
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "backend/support/task.h"
 
+// C++ variants of standard C header files
+#include <cassert>
+
+// Standard C++ header files
+#include <stdexcept>
+
+// Boost header files
+#include <boost/bind.hpp>
+
+// POV-Ray header files (base module)
 #include "base/timer.h"
 #include "base/types.h"
 
+// POV-Ray header files (backend module)
 #include "backend/control/messagefactory.h"
 #include "backend/scene/backendscenedata.h"
 
@@ -275,4 +281,4 @@ SceneTask::SceneTask(ThreadData *td, const boost::function1<void, Exception&>& f
     messageFactory(sd->warningLevel, sn, sd->backendAddress, sd->frontendAddress, sd->sceneId, vid)
 {}
 
-}
+} // end of namespace

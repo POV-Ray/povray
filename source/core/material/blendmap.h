@@ -4,13 +4,11 @@
 ///
 /// Declarations related to blend maps.
 ///
-/// @note   `frame.h` contains other colour stuff.
-///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,6 +31,8 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
 #ifndef POVRAY_CORE_BLENDMAP_H
@@ -108,6 +108,6 @@ shared_ptr<MAP_T> Copy_Blend_Map (shared_ptr<MAP_T>& Old);
 ///
 //##############################################################################
 
-}
+} // end of namespace
 
 #endif // POVRAY_CORE_BLENDMAP_H

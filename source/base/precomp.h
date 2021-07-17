@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,6 +31,8 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
 /// @file
@@ -74,13 +76,12 @@
 #include <boost/bind.hpp>
 #include <boost/format.hpp>
 #include <boost/function.hpp>
-#include <boost/functional/hash/hash.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/unordered_map.hpp>
+#include <boost/functional/hash/hash.hpp>
 #if POV_MULTITHREADED
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
 #endif
-#include <boost/unordered_map.hpp>
-

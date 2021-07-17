@@ -33,6 +33,8 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
 #ifndef PVENGINE_H_INCLUDED
@@ -64,7 +66,6 @@
 #include <stdlib.h>
 
 #include "pvfrontend.h"
-#include "backend/frame.h"
 #include "backend/povray.h"
 
 #include <time.h>

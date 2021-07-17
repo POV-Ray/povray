@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,30 +31,38 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "backend/render/tracetask.h"
+
+// Standard C++ header files
 #include <limits>
 #include <vector>
 
+// Boost header files
+#if POV_MULTITHREADED
 #include <boost/thread.hpp>
+#endif
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/render/tracetask.h"
+// POV-Ray header files (base module)
+#ifdef PROFILE_INTERSECTIONS
+#include "base/image/image.h"
+#endif
 
+// POV-Ray header files (core module)
 #include "core/material/normal.h"
 #include "core/math/chi2.h"
 #include "core/math/jitter.h"
 #include "core/math/matrix.h"
 #include "core/render/trace.h"
 
+// POV-Ray header files (backend module)
 #include "backend/scene/backendscenedata.h"
 #include "backend/scene/view.h"
 #include "backend/scene/viewthreaddata.h"
-
-#ifdef PROFILE_INTERSECTIONS
-#include "base/image/image.h"
-#endif
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -1060,4 +1068,4 @@ void TraceTask::SubdivideOnePixel(DBL x, DBL y, DBL d, size_t bx, size_t by, siz
     }
 }
 
-}
+} // end of namespace

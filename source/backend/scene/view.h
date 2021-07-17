@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,17 +31,32 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
 #ifndef POVRAY_BACKEND_VIEW_H
 #define POVRAY_BACKEND_VIEW_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "backend/configbackend.h"
+
+// Standard C++ header files
 #include <vector>
 
+// Boost header files
+#if POV_MULTITHREADED
+#include <boost/thread.hpp>
+#include <boost/thread/condition.hpp>
+#endif
+
+// POV-Ray header files (core module)
 #include "core/bounding/bsptree.h"
 #include "core/lighting/radiosity.h"
 #include "core/scene/camera.h"
 
+// POV-Ray header files (backend module)
+#include "backend/control/renderbackend.h"
 #include "backend/support/taskqueue.h"
 
 namespace pov
@@ -49,6 +64,7 @@ namespace pov
 
 using namespace pov_base;
 
+class BackendSceneData;
 class Scene;
 class SceneData;
 class ViewData;
@@ -504,6 +520,6 @@ class View
         bool CheckCameraHollowObject(const Vector3d& point, const BBOX_TREE *node); // TODO - comment missing - consider moving elsewhere [trf]
 };
 
-}
+} // end of namespace
 
 #endif // POVRAY_BACKEND_VIEW_H
