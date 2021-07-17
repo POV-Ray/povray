@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,14 +31,17 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
-#include <algorithm>
-
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "backend/lighting/photonsortingtask.h"
 
+// Standard C++ header files
+#include <algorithm>
+
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/lighting/lightgroup.h"
 #include "core/lighting/lightsource.h"
@@ -47,10 +50,12 @@
 #include "core/shape/csg.h"
 #include "core/support/octree.h"
 
+// POV-Ray header files (POVMS module)
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
 #include "povms/povmsutil.h"
 
+// POV-Ray header files (backend module)
 #include "backend/lighting/photonshootingstrategy.h"
 #include "backend/scene/backendscenedata.h"
 #include "backend/scene/view.h"
@@ -398,5 +403,4 @@ bool PhotonSortingTask::load()
     return true;
 }
 
-
-}
+} // end of namespace

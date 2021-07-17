@@ -31,19 +31,21 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
-// C++ variants of C standard header files
+// C++ variants of standard C header files
 #include <cctype>
 #include <cmath>
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
 
-// C++ standard header files
+// Standard C++ header files
 #include <algorithm>
 
 // Boost header files
@@ -9579,7 +9581,7 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
             Destroy_Vector_4D(reinterpret_cast<VECTOR_4D *>(Data));
             break;
         case FLOAT_ID_TOKEN:
-            Destroy_Float(reinterpret_cast<DBL *>(Data));
+            delete reinterpret_cast<DBL *>(Data);
             break;
         case PIGMENT_ID_TOKEN:
         case DENSITY_ID_TOKEN:
@@ -11335,4 +11337,4 @@ void Parser::POV_ARRAY::Shrink()
     }
 }
 
-}
+} // end of namespace

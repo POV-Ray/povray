@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,14 +31,20 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
-#ifndef PHOTONSORTINGTASK_H
-#define PHOTONSORTINGTASK_H
+#ifndef POVRAY_BACKEND_PHOTONSORTINGTASK_H
+#define POVRAY_BACKEND_PHOTONSORTINGTASK_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "backend/configbackend.h"
+
+// POV-Ray header files (core module)
 #include "core/render/trace.h"
 
-#include "backend/frame.h"
+// POV-Ray header files (backend module)
 #include "backend/render/rendertask.h"
 
 namespace pov
@@ -84,5 +90,6 @@ class PhotonSortingTask : public RenderTask
         CooperateFunction cooperate;
 };
 
-}
-#endif
+} // end of namespace
+
+#endif // POVRAY_BACKEND_PHOTONSORTINGTASK_H

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,22 +31,38 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
 #ifndef POVRAY_BACKEND_TASK_H
 #define POVRAY_BACKEND_TASK_H
 
-#include <queue>
-#include <vector>
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "backend/configbackend.h"
 
-#include <boost/thread.hpp>
+// Boost header files
 #include <boost/function.hpp>
+#if POV_MULTITHREADED
+#include <boost/thread.hpp>
+#endif
 
-#include "backend/frame.h"
+// POV-Ray header files (base module)
+#include "base/pov_err.h"
+#include "base/timer.h"
 
+// POV-Ray header files (POVMS module)
+#include "povms/povms.h"
+
+// POV-Ray header files (backend module)
 #include "backend/control/messagefactory.h"
 #include "backend/control/renderbackend.h"
-#include "base/timer.h"
+
+namespace pov_base
+{
+class ThreadData;
+class Timer;
+}
 
 namespace pov
 {
@@ -54,7 +70,6 @@ namespace pov
 using namespace pov_base;
 
 class BackendSceneData;
-
 
 class Task
 {
@@ -190,7 +205,6 @@ class Task
         void Cleanup();
 };
 
-
 class SceneTask : public Task
 {
     public:
@@ -200,6 +214,6 @@ class SceneTask : public Task
         MessageFactory messageFactory;
 };
 
-}
+} // end of namespace
 
 #endif // POVRAY_BACKEND_TASK_H

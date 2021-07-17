@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,10 +31,15 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
-#ifndef BENCHMARK_H
-#define BENCHMARK_H
+#ifndef POVRAY_BACKEND_BENCHMARK_H
+#define POVRAY_BACKEND_BENCHMARK_H
+
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "backend/configbackend.h"
 
 namespace pov
 {
@@ -46,6 +51,6 @@ namespace pov
 bool Write_Benchmark_File (const char *Scene_File_Name, const char *INI_File_Name) ;
 unsigned int Get_Benchmark_Version (void) ;
 
-}
+} // end of namespace
 
-#endif
+#endif // POVRAY_BACKEND_BENCHMARK_H

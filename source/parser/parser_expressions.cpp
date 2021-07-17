@@ -31,6 +31,8 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
@@ -40,7 +42,7 @@
 #include <cctype>
 #include <cstdlib>
 
-// C++ standard header files
+// Standard C++ header files
 #include <algorithm>
 
 // Boost header files
@@ -4010,4 +4012,4 @@ DBL Parser::Parse_Signed_Float(void)
     return(Val);
 }
 
-}
+} // end of namespace

@@ -31,29 +31,38 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
-
-#include <cstdlib>
-
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "backend/povray.h"
 
-#include "povms/povmscpp.h"
-#include "povms/povmsid.h"
-#include "povms/povmsutil.h"
+// C++ variants of standard C header files
+#include <cstdlib>
 
+// Boost header files
+#include <boost/bind.hpp>
+#if POV_MULTITHREADED
+#include <boost/thread.hpp>
+#endif
+
+// POV-Ray header files (base module)
 #include "base/platformbase.h"
 #include "base/pov_err.h"
 #include "base/timer.h"
 #include "base/types.h"
 
+// POV-Ray header files (core module)
 #include "core/material/noise.h"
 #include "core/material/pattern.h"
 
+// POV-Ray header files (POVMS module)
+#include "povms/povmscpp.h"
+#include "povms/povmsid.h"
+#include "povms/povmsutil.h"
+
+// POV-Ray header files (backend module)
 #include "backend/control/renderbackend.h"
 #include "backend/support/task.h"
 

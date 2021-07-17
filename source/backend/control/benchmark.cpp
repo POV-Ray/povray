@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -32,14 +32,17 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
-#include <cstdio>
-
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "backend/control/benchmark.h"
 
+// C++ variants of standard C header files
+#include <cstdio>
+
+// POV-Ray header files (backend module)
 #include "backend/control/benchmark_ini.h"
 #include "backend/control/benchmark_pov.h"
 
@@ -77,5 +80,4 @@ unsigned int Get_Benchmark_Version (void)
     return (0x0203) ; // Benchmark version 2.03
 }
 
-}
-
+} // end of namespace

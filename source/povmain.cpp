@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,20 +31,32 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
-
-#include <cstdlib>
-
-// configfrontend.h must always be the first POV file included in frontend sources (pulls in platform config)
+// This unit source file is a special case, as it bundles both back- and front-end;
+// also, it does not have an associated unit header file, so it must pull in
+// config itself.
+#include "backend/configbackend.h"
 #include "frontend/configfrontend.h"
 
+// C++ variants of standard C header files
+#include <cstdlib>
+
+// Boost header files
+#include <boost/bind.hpp>
+#if POV_MULTITHREADED
+#include <boost/thread.hpp>
+#endif
+
+// POV-Ray header files (base module)
 #include "base/timer.h"
 
+// POV-Ray header files (backend module)
 #include "backend/povray.h"
 
+// POV-Ray header files (frontend module)
 #include "frontend/console.h"
 #include "frontend/display.h"
 #include "frontend/filemessagehandler.h"

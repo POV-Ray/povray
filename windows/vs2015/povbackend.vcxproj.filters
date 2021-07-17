@@ -116,9 +116,6 @@
     <ClInclude Include="..\..\source\backend\configbackend.h">
       <Filter>Backend Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\backend\frame.h">
-      <Filter>Backend Headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\backend\povray.h">
       <Filter>Backend Headers</Filter>
     </ClInclude>

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,20 +31,28 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
 #ifndef POVRAY_BACKEND_TRACETASK_H
 #define POVRAY_BACKEND_TRACETASK_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "backend/configbackend.h"
+
+// Standard C++ header files
 #include <vector>
 
+// POV-Ray header files (base module)
 #include "base/image/colourspace.h"
 
+// POV-Ray header files (core module)
 #include "core/lighting/radiosity.h"
 #include "core/material/media.h"
 #include "core/render/tracepixel.h"
 
-#include "backend/frame.h"
+// POV-Ray header files (backend module)
 #include "backend/render/rendertask.h"
 
 namespace pov
@@ -127,6 +135,6 @@ class TraceTask : public RenderTask
         void SubdivideOnePixel(DBL x, DBL y, DBL d, size_t bx, size_t by, size_t bstep, SubdivisionBuffer& buffer, RGBTColour& result, int level);
 };
 
-}
+} // end of namespace
 
 #endif // POVRAY_BACKEND_TRACETASK_H

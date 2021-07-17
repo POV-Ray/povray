@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,16 +31,24 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
 #ifndef POVRAY_BACKEND_MESSAGEFACTORY_H
 #define POVRAY_BACKEND_MESSAGEFACTORY_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "backend/configbackend.h"
+
+// POV-Ray header files (base module)
+#include "base/messenger.h"
+
+// POV-Ray header files (POVMS module)
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
 
-#include "base/messenger.h"
-
+// POV-Ray header files (backend module)
 #include "backend/control/renderbackend.h"
 
 namespace pov
@@ -66,6 +74,6 @@ class MessageFactory : public GenericMessenger
                                  const UCS2 *filename = nullptr, POV_LONG line = -1, POV_LONG column = -1, POV_OFF_T offset = -1);
 };
 
-}
+} // end of namespace
 
 #endif // POVRAY_BACKEND_MESSAGEFACTORY_H

@@ -31,21 +31,28 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
-#include <sstream>
-
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
-
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "backend/control/scene.h"
 
+// Boost header files
+#include <boost/bind.hpp>
+#if POV_MULTITHREADED
+#include <boost/thread.hpp>
+#endif
+
+// POV-Ray header files (base module)
+
+// POV-Ray header files (core module)
 #include "core/scene/tracethreaddata.h"
 
+// POV-Ray header files (parser module)
 #include "parser/parser.h"
 
+// POV-Ray header files (backend module)
 #include "backend/bounding/boundingtask.h"
 #include "backend/scene/view.h"
 
@@ -350,4 +357,4 @@ void Scene::ParserControlThread()
     }
 }
 
-}
+} // end of namespace

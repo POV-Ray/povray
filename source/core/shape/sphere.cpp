@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,11 +31,14 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/sphere.h"
 
+// POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
@@ -631,18 +634,7 @@ void Sphere::Transform(const TRANSFORM *tr)
 ******************************************************************************/
 
 Sphere::~Sphere()
-{
-#if(DUMP_OBJECT_DATA == 1)
-    Debug_Info("{ // SPHERE \n");
-    DUMP_OBJECT_FIELDS(this);
-    Debug_Info("\t{ %f, %f, %f }, // Center\n", \
-               (DBL)Center[X],  \
-               (DBL)Center[Y],  \
-               (DBL)Center[Z]); \
-    Debug_Info("\t%f // Radius\n", (DBL)Radius);
-    Debug_Info("}\n");
-#endif
-}
+{}
 
 
 
@@ -788,4 +780,4 @@ bool Sphere::Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector
     return true;
 }
 
-}
+} // end of namespace
