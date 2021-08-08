@@ -38,7 +38,7 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
-// C++ variants of C standard header files
+// C++ variants of standard C header files
 #include <cctype>
 #include <cstdlib>
 
@@ -3728,7 +3728,7 @@ GenericSpline *Parser::Parse_Spline()
     if (!New)
     {
         if (Old)
-            New = new LinearSpline(*Old);
+            New = Old->Clone();
         else
             New = new LinearSpline();
     }
