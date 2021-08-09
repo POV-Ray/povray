@@ -1,0 +1,18 @@
+/**
+
+@dir
+@brief Files to be moved around or used as input by the `unix/prebuild.sh` script.
+
+This directory primarily contains Unix-specific files that, in a Unix-specific source package,
+should be residing in locations that either do not exist in the repository, or which we want to
+keep free from platform-specific clutter there.
+
+The files need to be processed and/or moved to their final locations by the `unix/prebuild.sh`
+script, which is to be run on the "raw" source package - as stored in the repository - before
+running the Autotools-based Unix build process proper (`configure`/`make`).
+
+@note
+    The originals residing in this directory are not required for the build process proper, and
+    should therefore not be included in a Unix-specific source package.
+
+*/
