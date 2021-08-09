@@ -212,25 +212,21 @@ void Parser::Run()
 
         Frame_Init ();
 
-        for(SceneData::DeclaredVariablesMap::const_iterator i(sceneData->declaredVariables.begin()); i != sceneData->declaredVariables.end(); i++)
+        for(SceneData::DeclaredStringsMap::const_iterator i(sceneData->declaredStrings.begin()); i != sceneData->declaredStrings.end(); i++)
         {
-            if(i->second.length() > 0)
-            {
-                SYM_ENTRY *Temp_Entry = nullptr;
+            SYM_ENTRY *Temp_Entry = nullptr;
 
-                if(i->second[0] == '\"')
-                {
-                    string tmp(i->second, 1, i->second.length() - 2);
-                    Temp_Entry = Add_Symbol(SYM_TABLE_GLOBAL, const_cast<char *>(i->first.c_str()), STRING_ID_TOKEN);
-                    Temp_Entry->Data = String_Literal_To_UCS2(const_cast<char *>(tmp.c_str()), false);
-                }
-                else
-                {
-                    Temp_Entry = Add_Symbol(SYM_TABLE_GLOBAL, const_cast<char *>(i->first.c_str()), FLOAT_ID_TOKEN);
-                    Temp_Entry->Data = Create_Float();
-                    *(reinterpret_cast<DBL *>(Temp_Entry->Data)) = std::atof(i->second.c_str());
-                }
-            }
+            Temp_Entry = Add_Symbol(SYM_TABLE_GLOBAL, const_cast<char *>(i->first.c_str()), STRING_ID_TOKEN);
+            Temp_Entry->Data = String_Literal_To_UCS2(const_cast<char *>(i->second.c_str()), false);
+        }
+
+        for (SceneData::DeclaredNumbersMap::const_iterator i(sceneData->declaredNumbers.begin()); i != sceneData->declaredNumbers.end(); i++)
+        {
+            SYM_ENTRY *Temp_Entry = nullptr;
+
+            Temp_Entry = Add_Symbol(SYM_TABLE_GLOBAL, const_cast<char *>(i->first.c_str()), FLOAT_ID_TOKEN);
+            Temp_Entry->Data = Create_Float();
+            *(reinterpret_cast<DBL *>(Temp_Entry->Data)) = i->second;
         }
 
         IncludeHeader(sceneData->headerFile);
