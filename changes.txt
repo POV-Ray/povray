@@ -29,6 +29,42 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
+Changes between v3.8.0-beta.1 and v3.8.0-beta.2
+===============================================
+
+Changed Behaviour
+-----------------
+
+  - On some platforms, `now` returned days since 2000-01-01 00:00 local time
+    (as opposed to UTC). While interpreted as intentional by most users,
+    this was actually a bug, and the behavior has been changed to return a
+    UTC-based timestamp on all systems as intended and documented (provided
+    `#version 3.8` (or later) is specified).
+
+
+Fixed or Mitigated Bugs
+-----------------------
+
+Reported via GitHub:
+
+  - #428 ("Loss of precision where variables declared on command line / ini
+    files. [Bug]"; partial fix, improving precision back to v3.6 levels)
+  - #432 ("Pseudo-variable now does not work as intended on Linux machines.")
+
+Reported via the Newsgroups:
+
+  - <XnsAD687938A665Aseed7@news.povray.org>
+    (2021-07-15, povray.beta-test, "spline in, out array bug")
+    When used in `spline { SPLINE_IDENTIFIER ... }` without explicitly
+    specifying spline type again, the new copy would get demoted to
+    `linear_spline`.
+
+Miscellaneous:
+
+  - Silenced warnings in `functions.inc` and `glass_old.inc` due to `#version`
+    statement not matching the features used.
+
+
 Changes between v3.7.1-rc.1 and v3.8.0-beta.1
 =============================================
 

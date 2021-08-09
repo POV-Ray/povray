@@ -32,8 +32,64 @@ Notes:
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
+POV-Ray v3.8.0-beta.2
+------------------------------------------------------------------------------
+
+Commit 89c1b28a on 2021-08-09 by Christoph Lipka
+
+    [ci skip] Fix warnings in `functions.inc` and `glass_old.inc`.
+
+Commit 88d65985 on 2021-08-09 by Christoph Lipka
+
+    Partial fix for #428. (#431)
+
+    Precision of `Declare` INI setting was erroneously truncated to 6
+    digits. Reverted back to 7 digits, matching v3.6 behavior.
+
+Commit 5c8aface on 2021-08-09 by Christoph Lipka
+
+    Fix for #432. (#433)
+
+    To work around Boost's msec-precision UTC timer erroneously reporting
+    local time instead of UTC on some systems, we're now also probing the
+    sec-precision UTC timer, which should be more reliable in terms of
+    time zone: The rounded difference between the two should be able to
+    give us the time zone offset (if any) in the msec-precision timer,
+    which we then compensate for accordingly.
+
+Commit 3b43b71a on 2021-08-08 by Christoph Lipka
+
+    Fix splines becoming linear when duplicated. (#426)
+
+    When used in `spline { SPLINE_IDENTIFIER ... }` without
+    explicitly specifying spline type again, the new copy
+    would get demoted to `linear_spline` (see newsgroup post
+    <XnsAD687938A665Aseed7@news.povray.org>, 2021-07-15, povray.beta-test,
+    "spline in, out array bug").
+
+Commit ec535839 on 2021-07-17 by Christoph Lipka
+
+    Eliminate `backend/frame.h`. (#427)
+
+    Also clean up various header files and file headers along the way,
+    mainly in the back-end module.
+
+Commit 93536837 on 2021-07-16 by Christoph Lipka
+
+    Miscellaneous GitHub Workflows improvements.
+
+    - Unix source package created for a release build will extract in a
+      subdirectory rather than the current directory.
+    - Quick build test for Windows will now use VS 2015 build tools
+      (currently needed for `cmedit*.dll`).
+
+------------------------------------------------------------------------------
 POV-Ray v3.8.0-beta.1
 ------------------------------------------------------------------------------
+
+Commit 0f65b619 on 2021-07-11 by Christoph Lipka
+
+    ﻿Bump version number and update change log.
 
 Commit 946673f5 on 2021-07-11 by Christoph Lipka
 

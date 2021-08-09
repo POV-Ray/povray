@@ -3,8 +3,6 @@ name: 'Code Analysis'
 on:
   push:
     branches: [ 'master', 'release/*' ]
-    # There's no actual source code to examine in the following directories.
-    paths-ignore: [ 'distribution/**', 'doc/**', 'source-doc/**', 'tools/**' ]
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ 'master', 'release/*' ]
