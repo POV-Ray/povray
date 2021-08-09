@@ -41,7 +41,6 @@
 
 // C++ standard header files
 #include <algorithm>
-#include <sstream>
 
 // Boost header files
 #include <boost/bind.hpp>
@@ -155,28 +154,26 @@ void Scene::StartParser(POVMS_Object& parseOptions)
         parseOptions.Get(kPOVAttrib_Declare, ds);
         for(int i = 1; i <= ds.GetListSize(); i++)
         {
-            std::ostringstream sstr;
             POVMS_Attribute a;
             POVMS_Object d;
 
             ds.GetNth(i, d);
+            std::string ident = d.GetString(kPOVAttrib_Identifier);
             d.Get(kPOVAttrib_Value, a);
             switch (a.Type())
             {
                 case kPOVMSType_CString:
-                    sstr << "\"" + d.TryGetString(kPOVAttrib_Value, "") + "\"";
+                    sceneData->declaredStrings.insert(make_pair(ident, d.TryGetString(kPOVAttrib_Value, "")));
                     break;
 
                 case kPOVMSType_Float:
-                    sstr << d.TryGetFloat(kPOVAttrib_Value, 0.0);
+                    sceneData->declaredNumbers.insert(make_pair(ident, d.TryGetFloat(kPOVAttrib_Value, 0.0)));
                     break;
 
                 default:
                     // shouldn't happen unless we make a coding error
                     throw POV_EXCEPTION(kParamErr, "Invalid type passed in declare list");
             }
-
-            sceneData->declaredVariables.insert(make_pair(d.GetString(kPOVAttrib_Identifier), sstr.str()));
         }
     }
 

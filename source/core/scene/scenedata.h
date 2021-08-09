@@ -86,7 +86,8 @@ class SceneData
 {
     public:
 
-        typedef std::map<std::string, std::string> DeclaredVariablesMap;
+        typedef std::map<std::string, std::string> DeclaredStringsMap;
+        typedef std::map<std::string, double>      DeclaredNumbersMap;
 
         /// Destructor.
         virtual ~SceneData();
@@ -208,7 +209,8 @@ class SceneData
         int defaultFileType;
 
         FrameSettings frameSettings; // TODO - move ???
-        DeclaredVariablesMap declaredVariables; // TODO - move to parser
+        DeclaredStringsMap declaredStrings; // TODO - move to parser
+        DeclaredNumbersMap declaredNumbers; // TODO - move to parser
         Camera parsedCamera; // TODO - handle differently or move to parser
         bool clocklessAnimation; // TODO - this is support for an experimental feature and may be changed or removed
         std::vector<Camera> cameras; // TODO - this is support for an experimental feature and may be changed or removed
