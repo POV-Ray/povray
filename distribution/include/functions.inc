@@ -2,18 +2,18 @@
 // To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/ or send a
 // letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
 
-//    Persistence of Vision Ray Tracer version 3.5 Include File
+//    Persistence of Vision Ray Tracer version 3.8 Include File
 
 #ifndef(Functions_Inc_Temp)
 #declare Functions_Inc_Temp = version;
-#version 3.5;
+#version 3.8;
 
 #ifdef(View_POV_Include_Stack)
 #   debug "including function.inc\n"
 #end
 
 /*
-              Persistence of Vision Raytracer Version 3.5
+              Persistence of Vision Raytracer Version 3.8
             Many pre-defined functions for use in scene files.
 */
 

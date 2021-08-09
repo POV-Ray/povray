@@ -4,13 +4,15 @@
 
 //    Persistence of Vision Ray Tracer Include File
 //    File: glass_old.inc
-//    Last updated: 2001.8.9
+//    Last updated: 2021-08-09
 //    Description: Glass finishes and textures (was glass.inc in versions prior to 3.5).
 //    Changes in version 3.1: moved refraction and ior to the interior statment.
 //    Use I_Glass in conjunction with each of the finish statments below.
 //    Version 3.5: Renamed file as glass_old.inc.
+//    Version 3.8: Added deprecation warnings.
 //
-//    Updated: 27Sep2008(jh)
+//    Updated: 2008-09-27 (jh)
+//    Updated: 2021-08-09 (CLi)
 //
 //    To suppress warnings generated from using these deprecated textures you should consider
 //    converting them to materials.
@@ -27,7 +29,7 @@
 
 #ifndef(Glass_Old_Inc_Temp)
 #declare Glass_Old_Inc_Temp=version;
-#version 3.5;
+#version 3.8;
 
 #ifdef(View_POV_Include_Stack)
     #debug "including glass_old.inc\n"
