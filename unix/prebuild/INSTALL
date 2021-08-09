@@ -13,7 +13,7 @@ news://news.povray.org/povray.unix/ or http://news.povray.org/povray.unix/
 | source package, you have received a platform-neutral package. In that case |
 | make sure to run the following command before you proceed:                 |
 |                                                                            |
-|   cd unix/ ; ./prebuild.sh ; cd ../                                        |
+|   unix/prebuild.sh                                                         |
 +----------------------------------------------------------------------------+
 
 Table of contents
