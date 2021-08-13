@@ -264,6 +264,51 @@ To test whether a smart pointer is (non-)null, do not unnecessarily clutter your
 with `NULL`, as that would lead to compile errors on some (perfectly C++11 compliant) compilers.
 
 
+Thread Safety
+=============
+
+POV-Ray is a multithreaded application, and therefore all code should be written to be
+thread-safe. While there may be instances where it makes sense to waive complete thread-safety
+in favor of performance, all the more thought should go into such code, and those thoughts
+well-documented, including an explanation of how the absence of thread-safety in the specific code
+will not endanger the thread-safety of the application as a whole.
+
+Note that even some C++ standard library functions are explicitly not thread-safe. Most of such
+functions are originally C functions adopted by the C++ standard. Such thread-unsafe functionality
+**must not be called**, either directly or indirectly, **except** via the wrapper functions
+defined in `source/base/threadsafe.h`.
+
+So far, we are aware of the following classes of functions have been identified to be problematic:
+
+  - **Locale handling**: POV-Ray uses the `"C"` locale throughout, except for date/time related
+    aspects (`LC_TIME`), for which it uses the default (`""`) locale. The function
+    `std::setlocale()` **must not be invoked** under any circumstance. If your code needs the
+    locale to be switched to anything else, consider it broken, and search for an alternative.
+  - **<ctime>**: Many functions in the `<ctime>` header (aka `<time.h>` in C) are not thread-safe,
+    and **must not** be invoked directly. If you are not _absolutely_ sure whether a function in
+    this header file is thread-safe, chances are it is _not_. Also, when consulting sources about
+    a function's thread safety, make sure your sources are authoritative: Just because a POSIX
+    operating system manual asserts that a function is thread-safe doesn't necessarily mean that
+    this is universally guaranteed by the C/C++ standard.
+
+The above rules are non-negotiable, as violating them _will_ cause threads to step on each others'
+toes.
+
+@attention
+    Any instances of existing POV-Ray code violating this coding standard are just instances of
+    legacy code that haven't been overhauled yet, and - fortunately - haven't caused actual issues
+    in the wild... yet. Don't take those as role models for new code.
+
+@attention
+    Some libraries, such as boost, may provoide the same or similar functionalities as the above
+    problematic classes of functions, but promise to do so in a thread-safe manner. Be wary of
+    such promises, and carefully review the actual implementation, as they might actually be doing
+    essentially the same as `source/base/threadsafe.h`, namely providing guarded entry points to
+    the same underlying thread-unsafe functions, while relying on being the only entry points ever
+    used. Libraries built on that principle _will_ undermine the thread-safety of
+    `source/base/threadsafe.h` (and vice versa).
+
+
 Miscellaneous Coding Rules
 ==========================
 

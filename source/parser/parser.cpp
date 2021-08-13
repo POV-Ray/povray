@@ -54,6 +54,7 @@
 
 // POV-Ray header files (base module)
 #include "base/fileutil.h"
+#include "base/threadsafe.h"
 #include "base/types.h"
 
 // POV-Ray header files (core module)
@@ -167,6 +168,24 @@ Parser::Parser(shared_ptr<BackendSceneData> sd, bool useclk, DBL clk, size_t see
     next_rand(nullptr),
     Debug_Message_Buffer(messageFactory)
 {
+    std::tm tmY2k;
+    // Field        = Value - Base
+    tmY2k.tm_year   = 2000  - 1900;
+    tmY2k.tm_mon    = 1     - 1;
+    tmY2k.tm_mday   = 1     - 0;
+    tmY2k.tm_hour   = 0;
+    tmY2k.tm_min    = 0;
+    tmY2k.tm_sec    = 0;
+    tmY2k.tm_isdst  = 0; // Tell `std::mktime()` to pretend that DST was not in effect.
+    // `std::mktime()` doesn't need `tmY2K.tm_wday` nor `tmY2K.yday` to be set.
+    auto y2kLocal = std::mktime(&tmY2k); // Time since 2000-01-01 00:00 local time (non-DST, if anyone asks)
+    pov_base::SafeGmtime(&tmY2k, &y2kLocal); // 2000-01-01 00:00 local time (non-DST), represented as UTC
+    tmY2k.tm_isdst  = 0; // Make sure `std::mktime()` uses the exact same DST setting as before.
+    auto tzOffset = y2kLocal - std::mktime(&tmY2k); // Time between 2000-01-01 00:00 local time (non-DST) and 2000-01-01 00:00 UTC
+    auto y2kUTC = y2kLocal + tzOffset; // Time since 2000-01-01 00:00 UTC
+
+    mY2k = std::chrono::system_clock::from_time_t(y2kUTC);
+
     pre_init_tokenizer();
     if (sceneData->realTimeRaytracing)
         mBetaFeatureFlags.realTimeRaytracing = true;
@@ -204,6 +223,8 @@ void Parser::Run()
 
         // Initialize various defaults depending on language version as per command line / INI settings.
         InitDefaults(sceneData->EffectiveLanguageVersion());
+
+        localTime = false;
 
         Not_In_Default = true;
         Ok_To_Declare = true;
@@ -7653,6 +7674,10 @@ void Parser::Parse_Global_Settings()
                 END_CASE
             END_EXPECT
             Parse_End();
+        END_CASE
+
+        CASE (LOCAL_TIME_TOKEN)
+            localTime = ((int)Parse_Float() != 0);
         END_CASE
 
         OTHERWISE

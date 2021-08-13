@@ -50,6 +50,7 @@
 // POV-Ray header files (base module)
 #include "base/platformbase.h"
 #include "base/pov_err.h"
+#include "base/threadsafe.h"
 #include "base/timer.h"
 #include "base/types.h"
 
@@ -674,6 +675,7 @@ boost::thread *povray_init(const boost::function0<void>& threadExit, POVMSAddres
         POV_TerminateMainThread = false;
         POV_MainThreadTerminated = false;
 
+        pov_base::InitLocale();
         Initialize_Noise();
         pov::InitializePatternGenerators();
 
