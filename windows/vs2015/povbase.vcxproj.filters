@@ -144,6 +144,9 @@
     <ClCompile Include="..\..\source\base\image\dither.cpp">
       <Filter>Base source\Image</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\base\threadsafe.cpp">
+      <Filter>Base source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\base\configbase.h">
@@ -283,6 +286,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\base\image\dither.h">
       <Filter>Base Headers\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\threadsafe.h">
+      <Filter>Base Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
