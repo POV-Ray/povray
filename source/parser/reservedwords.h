@@ -32,6 +32,8 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
 #ifndef POVRAY_PARSER_RESERVEDWORDS_H
@@ -443,6 +445,7 @@ enum TOKEN_IDS
     LINEAR_SWEEP_TOKEN,
     LOAD_FILE_TOKEN,
     LOCAL_TOKEN,
+    LOCAL_TIME_TOKEN,
     LOCATION_TOKEN,
     LOOK_AT_TOKEN,
     LOOKS_LIKE_TOKEN,

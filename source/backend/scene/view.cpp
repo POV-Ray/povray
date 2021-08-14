@@ -39,13 +39,13 @@
 #include "backend/scene/view.h"
 
 // C++ variants of standard C header files
+//  (none at the moment)
 
 // Standard C++ header files
+#include <chrono>
 
 // Boost header files
 #include <boost/bind.hpp>
-#include <boost/date_time/gregorian/gregorian.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/math/common_factor.hpp>
 #if POV_MULTITHREADED
 #include <boost/thread.hpp>
@@ -733,9 +733,11 @@ void View::StartRender(POVMS_Object& renderOptions)
     seed = renderOptions.TryGetInt(kPOVAttrib_StochasticSeed, 0);
     if (seed == 0)
     {
-        boost::posix_time::ptime now = boost::posix_time::second_clock::universal_time();
-        boost::posix_time::ptime base = boost::posix_time::ptime(boost::gregorian::date(1970, 1, 1));
-        seed = (now - base).total_seconds();
+        // The following expression returns the number of _ticks_ elapsed since
+        // the system clock's _epoch_, where a _tick_ is the platform-dependent
+        // shortest time interval the system clock can measure, and _epoch_ is a
+        // platform-dependent point in time (usually 1970-01-01 00:00:00).
+        seed = std::chrono::system_clock::now().time_since_epoch().count();
     }
 
     // TODO FIXME - [CLi] handle loading, storing (and later optionally deleting) of radiosity cache file for trace abort & continue feature

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2018 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,18 +31,24 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
-// C++ variants of C standard header files
+// C++ variants of standard C header files
 #include <cctype>
 #include <cstdio>
 #include <cstdlib>
+#include <ctime>
 
-// Boost header files
-#include <boost/date_time/posix_time/posix_time.hpp>
+// Standard C++ header files
+#include <chrono>
+
+// POV-Ray header files (platform module)
+#include "syspovctime.h"
 
 // POV-Ray header files (core module)
 #include "core/scene/scenedata.h"
@@ -468,25 +474,106 @@ UCS2 *Parser::Parse_Chr(bool /*pathname*/)
  *
 ******************************************************************************/
 
-#define PARSE_NOW_VAL_LENGTH 200
+static bool FindDatetimeFormatSpecifier(const char** list, const char* first, const char* last)
+{
+    POV_PARSER_ASSERT((*first != '\0') && (*last != '\0'));
+
+    if (first == last)
+        return (std::strchr(list[0], *first) != nullptr);
+
+    POV_PARSER_ASSERT(last - first == 1);
+
+    for (int i = 1; list[i] != nullptr; ++i)
+        if (list[i][0] == *first)
+            return (std::strchr(list[i] + 1, *last) != nullptr);
+
+    return false;
+}
 
 UCS2 *Parser::Parse_Datetime(bool pathname)
 {
+    // Enum representing a type of placeholder offense.
+    enum OffenseType { kNoOffense, kLocaleSensitive, kTimezoneSensitive, kLegacyNonPortable, kNonPortable, kIncomplete };
+    // Structure representing a placeholder and its offense.
+    struct Offense
+    {
+        // Offense, in ascending order of severity.
+        OffenseType type;
+        // Start of offending placeholder.
+        std::string field; // Offending placeholder
+        // Default Constructor.
+        Offense() : type(kNoOffense), field() {}
+        // Constructor.
+        Offense(OffenseType t, const char* first) : type(t), field(first) {}
+        // Constructor.
+        Offense(OffenseType t, const char* first, const char* last) : type(t), field(first, (last-first+1)) {}
+        // Overwrite data, provided other offense is more severe.
+        Offense& operator|=(const Offense& o) { if (o.type > type) { type = o.type; field = o.field; } return *this; }
+        // Convert to boolean
+        explicit operator bool() const { return type != kNoOffense; }
+    };
+
+    // Known prefixes of 2-character conversion specifiers.
+    // NB: `#` is a Microsoft extension.
+    static const char* knownPrefixes = "EO#";
+
+    // Conversion specifiers _guaranteed_ to be supported across _all_ platforms by specific versions of POV-Ray,
+    // as a nullptr-terminated list of strings.
+    // First string is a plain list of valid single-character specifiers; all other strings start with the respective
+    // prefix, followed by the corresponding list of valid secondary characters.
+    // NB: These lists should exactly match the set of conversion specifiers defined by the minimum C++ standard
+    // required to compile the respective version of POV-Ray.
+
+    // POV-Ray v3.8, which requires C++11.
+    static const char* portableFieldsCurrent[] {
+        "aAbBcCdDeFgGhHIjmMnprRStTuUVwWxXyYzZ%",
+        "EcCxXyY",
+        "OdeHImMSuUVwWy",
+        nullptr };
+    // POV-Ray v3.7, which required only C++03.
+    static const char* portableFieldsLegacy370[] {
+        "aAbBcdHIjmMpSUwWxXyYZ%",
+        nullptr };
+
+    // Conversion specifiers sensitive to time zone information (same format as above).
+    static const char* timezoneFields[] { "zZ", nullptr };
+
+    // Locale-independent conversion specifiers (same format as above).
+    // NB: The 2-character conversion specifiers defined in C/C++ are inherently locale-specific.
+    // NB: `z` qualifies in that its format is locale-independent, even though the value is not.
+    static const char* localeAgnosticFields[] { "CdDeFgGHIjmMnRStTuUVwWyYz%", nullptr };
+
+    // Fields that might evaluate to empty strings (same format as above).
+    // NB: `P` is a GNU extension.
+    static const char* potentiallyEmptyFields[] { "pPzZ", nullptr };
+
+    static constexpr int kMaxResultSize = 200; // Max number of chars in result, _including_ terminating NUL character.
+
     char *FormatStr = nullptr;
     bool CallFree;
+
+    Offense offense;
     int vlen = 0;
-    char val[PARSE_NOW_VAL_LENGTH + 1]; // Arbitrary size, usually a date format string is far less
+    char val[kMaxResultSize]; // Arbitrary size, usually a date format string is far less
 
     Parse_Paren_Begin();
 
-    std::time_t timestamp = floor((Parse_Float() + (365*30+7)) * 24*60*60 + 0.5);
+    const char** portableFieldsLegacy; // Fields reliably supported by whatever POV-Ray version is specified via `#version`.
+    if (sceneData->EffectiveLanguageVersion() < 380)
+        portableFieldsLegacy = portableFieldsLegacy370;
+    else
+        portableFieldsLegacy = nullptr; // skip legacy portability check
+
+    FractionalDays daysSinceY2k(Parse_Float());
     Parse_Comma();
     EXPECT_ONE
         CASE(RIGHT_PAREN_TOKEN)
             UNGET
             CallFree = false;
-            // we use GMT as some platforms (e.g. windows) have different ideas of what to print when handling '%z'.
-            FormatStr = (char *)"%Y-%m-%d %H:%M:%SZ";
+            if (localTime)
+                FormatStr = "%Y-%m-%d %H:%M:%S%z";
+            else
+                FormatStr = "%Y-%m-%d %H:%M:%SZ";
         END_CASE
 
         OTHERWISE
@@ -496,50 +583,211 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
             if (FormatStr[0] == '\0')
             {
                 POV_FREE(FormatStr);
-                Error("Empty format string.");
+                Error("Empty 'datetime' format string.");
             }
-            if (strlen(FormatStr) > PARSE_NOW_VAL_LENGTH)
+            for (const char* pc = FormatStr; *pc != '\0'; ++pc)
             {
-                POV_FREE(FormatStr);
-                Error("Format string too long.");
+                // Skip over any non-placeholders.
+                if (*pc != '%')
+                    continue;
+
+                // Keep track of start of placeholder, so we can more easily report it
+                // in case it turns out to be offensive.
+                const char* po = pc;
+
+                if (*(++pc) == '\0')
+                {
+                    offense |= Offense(kIncomplete, po);
+                    break;
+                }
+
+                // Keep track of first "payload" character of placeholder.
+                const char* pc1 = pc;
+
+                // Check if we appear to have a two-character placeholder, and if so,
+                // advance to the next character.
+                if (std::strchr(knownPrefixes, *pc) != nullptr)
+                {
+                    if (*(++pc) == '\0')
+                    {
+                        offense |= Offense(kIncomplete, po);
+                        break;
+                    }
+                }
+
+                // NB: The next character should be the last one comprising the placeholder.
+
+                if (offense.type >= kNonPortable)
+                    continue; // We won't find any worse issue with this placeholder; next please.
+
+                // Check if placeholder is portable across all platforms for this version of POV-Ray.
+                if (!FindDatetimeFormatSpecifier(portableFieldsCurrent, pc1, pc))
+                    offense |= Offense(kNonPortable, po, pc);
+
+                if (offense.type >= kLegacyNonPortable)
+                    continue; // We won't find any worse issue with this placeholder; next please.
+
+                // Check if placeholder is portable across all platforms for the version the scene was designed for.
+                if ((portableFieldsLegacy != nullptr) && !FindDatetimeFormatSpecifier(portableFieldsLegacy, pc1, pc))
+                    offense |= Offense(kLegacyNonPortable, po, pc);
+
+                if (offense.type >= kTimezoneSensitive)
+                    continue; // We won't find any worse issue with this placeholder; next please.
+
+                // Check if placeholder requires time zone information that we might not have.
+                if (!localTime && FindDatetimeFormatSpecifier(timezoneFields, pc1, pc))
+                    offense |= Offense(kTimezoneSensitive, po, pc);
+
+                if (offense.type >= kLocaleSensitive)
+                    continue; // We won't find any worse issue with this placeholder; next please.
+
+                // Check if placeholder may have different format depending on locale.
+                if (!FindDatetimeFormatSpecifier(localeAgnosticFields, pc1, pc))
+                    offense |= Offense(kLocaleSensitive, po, pc);
+            }
+            switch (offense.type)
+            {
+                case kIncomplete:
+                    Error("Incomplete 'datetime' format placeholder ('%s').",
+                          offense.field.c_str());
+                    break;
+
+                case kNonPortable:
+                    WarningOnce(kWarningGeneral, HERE,
+                                "Scene uses 'datetime' format placeholder(s) that may not be supported on all "
+                                "platforms ('%s').",
+                                offense.field.c_str());
+                    break;
+
+                case kLegacyNonPortable:
+                    WarningOnce(kWarningGeneral, HERE,
+                                "Legacy scene uses 'datetime' format placeholder(s) that POV-Ray v%s "
+                                "did not support on all platforms ('%s').",
+                                sceneData->EffectiveLanguageVersion().str().c_str(),
+                                offense.field.c_str());
+                    break;
+
+                case kTimezoneSensitive:
+                    WarningOnce(kWarningGeneral, HERE,
+                                "Scene uses 'datetime' format placeholder(s) relating to time zone information "
+                                "('%s') without 'local_time' global setting turned on, implying UTC mode of "
+                                "operation. On some systems, this may cause the placeholder(s) to not work as "
+                                "expected.",
+                                offense.field.c_str());
+                    break;
+
+                case kLocaleSensitive:
+                    WarningOnce(kWarningGeneral, HERE,
+                                "Scene uses 'datetime' format placeholder(s) that may produce "
+                                "different results depending on system locale settings ('%s').",
+                                offense.field.c_str());
+                    break;
+
+                case kNoOffense:
+                    break;
             }
         END_CASE
     END_EXPECT
 
     Parse_Paren_End();
 
-    // NB don't wrap only the call to strftime() in the try, because visual C++ will, in release mode,
-    // optimize the try/catch away since it doesn't believe that the RTL can throw exceptions. since
+    // NB: Don't wrap only the call to strftime() in the try, because Visual C++ will, in release mode,
+    // optimize the try/catch away since it doesn't believe that the RTL can throw exceptions. Since
     // the windows version of POV hooks the invalid parameter handler RTL callback and throws an exception
     // if it's called, they can.
     try
     {
-        std::tm t = boost::posix_time::to_tm(boost::posix_time::from_time_t(timestamp));
-        // TODO FIXME - we should either have this locale setting globally, or avoid it completely; in either case it shouldn't be *here*.
-        setlocale(LC_TIME,""); // Get the local preferred format
-        vlen = strftime(val, PARSE_NOW_VAL_LENGTH, FormatStr, &t);
+        auto timeSinceY2k = std::chrono::duration_cast<std::chrono::system_clock::duration>(daysSinceY2k);
+        auto timeToPrint = mY2k + timeSinceY2k;
+        std::time_t timestamp = std::chrono::system_clock::to_time_t(timeToPrint);
+
+        std::tm t;
+        if (localTime)
+            (void)safe_localtime(&timestamp, &t);
+        else
+            (void)safe_gmtime(&timestamp, &t);
+
+        vlen = std::strftime(val, kMaxResultSize, FormatStr, &t);
+
+        if (vlen == 0)
+        {
+            // As per the the C/C++ standard, a `strftime` return value of zero _per se_ may not
+            // necessarily indicate an error: The resulting string could simply be empty due to
+            // the format consisting of only conversion specifiers that happen to evaluate to
+            // empty strings for the current locale (e.g. `%p`).
+
+            // We employ some strong logics as well as weaker heuristics to figure out whether
+            // this is definitely an error; in that case, we report it to code further downstream
+            // by setting the length value to the buffer size (which also happens to be how
+            // libc 4.4.1 and earlier reported overflow), which can never happen in case of a
+            // success.
+
+            // TODO - we could avoid this whole mess by simply injecting some arbitrary character
+            // at the start or end of the format string, and cut it away again after the
+            // conversion. That way, even an "empty" string would give us at least 1 character.
+
+            if (val[0] != '\0')
+            {
+                // In absence of an non-error, the result string would have to be empty,
+                // but that's not what we're seeing here, confirming that this is indeed
+                // unambiguously an error.
+                vlen = kMaxResultSize;
+            }
+            else
+            {
+                // Check if the result string could conceivably be empty.
+                for (const char* pc = FormatStr; *pc != '\0'; ++pc)
+                {
+                    if (*pc != '%')
+                    {
+                        // Any non-placeholder character would have to be copied verbatim,
+                        // and should therefore have resulted in a non-empty string.
+                        vlen = kMaxResultSize;
+                        break;
+                    }
+                    ++pc;
+                    const char* pc1 = pc;
+                    if (std::strchr(knownPrefixes, *pc) != nullptr)
+                        ++pc;
+                    if (!FindDatetimeFormatSpecifier(potentiallyEmptyFields, pc1, pc))
+                    {
+                        // Placeholder is not in the list of those we expect to be replaced with empty strings.
+                        vlen = kMaxResultSize;
+                        break;
+                    }
+                }
+            }
+        }
     }
     catch (pov_base::Exception& e)
     {
-        // the windows version of strftime calls the invalid parameter handler if
-        // it gets a bad format string. this will in turn raise an exception of type
-        // kParamErr. if the exception isn't that, allow normal exception processing
+        if (CallFree)
+            POV_FREE(FormatStr);
+
+        // The windows version of `strftime` calls the invalid parameter handler if
+        // it gets a bad format string. This will in turn raise an exception of type
+        // `kParamErr`. If the exception isn't that, allow normal exception processing
         // to continue, otherwise we issue a more useful error message.
         if ((e.codevalid() == false) || (e.code() != kParamErr))
             throw;
-        vlen = 0;
+        Error("Invalid 'datetime' format placeholder");
     }
-    if (vlen == PARSE_NOW_VAL_LENGTH) // on error: max for libc 4.4.1 & before
-        vlen = 0; // return an empty string on error (content of val[] is undefined)
-    val[vlen]='\0'; // whatever, that operation is now safe (and superfluous except for error)
-
     if (CallFree)
-    {
         POV_FREE(FormatStr);
-    }
+
+    if (vlen == kMaxResultSize)
+        // Unambiguous error
+        Error("Invalid 'datetime' format placeholder, or resulting string too long (>%i characters).",
+              kMaxResultSize - 1);
 
     if (vlen == 0)
-        Error("Invalid formatting code in format string, or resulting string too long.");
+    {
+        // Maybe an error, maybe just an empty result string
+        PossibleError("'datetime' result string empty; if this is unexpected, check for "
+                      "invalid 'datetime' format placeholders, or whether the resulting "
+                      "string would have been too long (>%i characters).",
+                      kMaxResultSize - 1);
+    }
 
     return String_To_UCS2(val);
 }

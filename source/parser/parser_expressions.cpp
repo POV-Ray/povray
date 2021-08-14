@@ -45,9 +45,6 @@
 // Standard C++ header files
 #include <algorithm>
 
-// Boost header files
-#include <boost/date_time/posix_time/posix_time.hpp>
-
 // POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
 #include "base/mathutil.h"
@@ -1112,45 +1109,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     break;
 
                 case NOW_TOKEN:
-                    {
-                        static boost::posix_time::ptime y2k(boost::gregorian::date(2000,1,1));
-                        boost::posix_time::ptime now(boost::posix_time::microsec_clock::universal_time());
-
-                        // Due to a bug in `boost::posix_time::microsec_clock::universal_time()`,
-                        // the value returned may actually be local time rather than UTC. We try to fix this
-                        // by comparing with `boost::posix_time::second_clock::universal_time()`, which is
-                        // less precise but more reliable in terms of time zone behavior.
-                        // (NB: While we could theoretically compute the offset once, and then re-use it every time
-                        // `new` is invoked, this would cause issues when rendering a scene during transition to or
-                        // from daylight savings time, or other events affecting the time zone. The current approach
-                        // is immune to such issues.)
-                        boost::posix_time::ptime lowPrecisionNow(boost::posix_time::second_clock::universal_time());
-                        // The difference between the two timers, rounded to quarters of an hour,
-                        // should correspond to the time zone offset (in seconds in this case).
-                        const auto tzPrecisionInSeconds = 15 * 60;
-                        int_least32_t tzOffset = std::lround(float((now - lowPrecisionNow).total_seconds()) / tzPrecisionInSeconds) * tzPrecisionInSeconds;
-                        // Unless someone paused the code in between the above statements, the resulting difference
-                        // should be our time zone offset in seconds (unless we're running on a system that's not
-                        // subject to the bug, in which case the resulting difference should be zero).
-                        if (tzOffset != 0)
-                        {
-                            if (sceneData->EffectiveLanguageVersion() < 380)
-                            {
-                                WarningOnce(kWarningGeneral, HERE,
-                                    "In POV-Ray v3.7, on some platforms 'now' erroneously evaluated to days since "
-                                    "2000-01-01 00:00 local time instead of UTC. For backward compatibility, this "
-                                    "bug is reproduced in legacy scenes, but the scene may produce different "
-                                    "results on other platforms.");
-                            }
-                            else
-                            {
-                                now -= boost::posix_time::time_duration(0, 0, tzOffset);
-                            }
-                        }
-
-                        const auto daysPerMicrosecond = 1.0e-6 / (24 * 60 * 60);
-                        Val = (now - y2k).total_microseconds() * daysPerMicrosecond;
-                    }
+                    Val = std::chrono::duration_cast<FractionalDays>(std::chrono::system_clock::now() - mY2k).count();
                     break;
             }
 

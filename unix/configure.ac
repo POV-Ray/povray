@@ -645,6 +645,9 @@ AC_CHECK_DECLS([CLOCK_MONOTONIC, CLOCK_REALTIME, CLOCK_PROCESS_CPUTIME_ID, CLOCK
 )
 AC_CHECK_TYPES([clockid_t], [], [], [[#include <time.h>]])
 
+# timegm <time.h>
+AC_CHECK_FUNCS([timegm])
+
 # getrusage and related <sys/resource.h>
 AC_CHECK_FUNCS([getrusage])
 AC_CHECK_DECLS([RUSAGE_SELF, RUSAGE_THREAD, RUSAGE_LWP],

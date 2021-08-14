@@ -52,6 +52,9 @@
 #include <boost/bind.hpp>
 #include <boost/scoped_ptr.hpp>
 
+// POV-Ray header files (platform module)
+#include "syspovctime.h"
+
 // POV-Ray header files (base module)
 #include "base/fileutil.h"
 #include "base/types.h"
@@ -167,6 +170,17 @@ Parser::Parser(shared_ptr<BackendSceneData> sd, bool useclk, DBL clk, size_t see
     next_rand(nullptr),
     Debug_Message_Buffer(messageFactory)
 {
+    std::tm tmY2k;
+    // Field        = Value - Base
+    tmY2k.tm_year   = 2000  - 1900;
+    tmY2k.tm_mon    = 1     - 1;
+    tmY2k.tm_mday   = 1     - 0;
+    tmY2k.tm_hour   = 0;
+    tmY2k.tm_min    = 0;
+    tmY2k.tm_sec    = 0;
+    tmY2k.tm_isdst  = 0;
+    mY2k = std::chrono::system_clock::from_time_t(pov_base::mktime_utc(&tmY2k));
+
     pre_init_tokenizer();
     if (sceneData->realTimeRaytracing)
         mBetaFeatureFlags.realTimeRaytracing = true;
@@ -204,6 +218,8 @@ void Parser::Run()
 
         // Initialize various defaults depending on language version as per command line / INI settings.
         InitDefaults(sceneData->EffectiveLanguageVersion());
+
+        localTime = false;
 
         Not_In_Default = true;
         Ok_To_Declare = true;
@@ -7653,6 +7669,10 @@ void Parser::Parse_Global_Settings()
                 END_CASE
             END_EXPECT
             Parse_End();
+        END_CASE
+
+        CASE (LOCAL_TIME_TOKEN)
+            localTime = ((int)Parse_Float() != 0);
         END_CASE
 
         OTHERWISE
