@@ -781,7 +781,7 @@ void PrintRenderTimes (int Finished, int NormalCompletion)
           time_t t = time(NULL);
           std::tm tm;
           _locale_t loc = _create_locale(LC_TIME, "C");
-          (void)pov_base::safe_gmtime(&tm, &t);
+          (void)pov_base::safe_gmtime(&t, &tm);
           _strftime_l(ts, sizeof(ts), "%Y%m%d.%H%M%S", &tm, loc);
           sprintf(fn, "%sbenchmark-%s.txt", DocumentsPath, ts);
           FILE *f = fopen(fn, "wt");
