@@ -95,8 +95,7 @@
 #endif
 
 #include "cpuid.h"
-
-#include "base/threadsafe.h"
+#include "syspovctime.h"
 
 #ifdef TRY_OPTIMIZED_NOISE
 // TODO - This is a hack; we should get the noise generator choice information via POVMS from the back-end.
@@ -782,7 +781,7 @@ void PrintRenderTimes (int Finished, int NormalCompletion)
           time_t t = time(NULL);
           std::tm tm;
           _locale_t loc = _create_locale(LC_TIME, "C");
-          pov_base::SafeGmtime(&tm, &t);
+          (void)pov_base::safe_gmtime(&tm, &t);
           _strftime_l(ts, sizeof(ts), "%Y%m%d.%H%M%S", &tm, loc);
           sprintf(fn, "%sbenchmark-%s.txt", DocumentsPath, ts);
           FILE *f = fopen(fn, "wt");

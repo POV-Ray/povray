@@ -404,7 +404,6 @@
     <ClCompile Include="..\..\source\base\stringutilities.cpp" />
     <ClCompile Include="..\..\source\base\textstream.cpp" />
     <ClCompile Include="..\..\source\base\textstreambuffer.cpp" />
-    <ClCompile Include="..\..\source\base\threadsafe.cpp" />
     <ClCompile Include="..\..\source\base\timer.cpp" />
     <ClCompile Include="..\..\source\base\image\bmp.cpp" />
     <ClCompile Include="..\..\source\base\image\colourspace.cpp" />
@@ -468,7 +467,6 @@
     <ClInclude Include="..\..\source\base\stringutilities.h" />
     <ClInclude Include="..\..\source\base\textstream.h" />
     <ClInclude Include="..\..\source\base\textstreambuffer.h" />
-    <ClInclude Include="..\..\source\base\threadsafe.h" />
     <ClInclude Include="..\..\source\base\timer.h" />
     <ClInclude Include="..\..\source\base\types.h" />
     <ClInclude Include="..\..\source\base\image\bmp.h" />

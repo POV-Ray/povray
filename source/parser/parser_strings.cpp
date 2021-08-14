@@ -47,8 +47,8 @@
 // Standard C++ header files
 #include <chrono>
 
-// POV-Ray header files (base module)
-#include "base/threadsafe.h"
+// POV-Ray header files (platform module)
+#include "syspovctime.h"
 
 // POV-Ray header files (core module)
 #include "core/scene/scenedata.h"
@@ -550,25 +550,13 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
     static constexpr int kMaxResultSize = 200; // Max number of chars in result, _including_ terminating NUL character.
 
     char *FormatStr = nullptr;
-    bool CallFree = false;
+    bool CallFree;
 
     Offense offense;
-    void(*convertTime)(std::tm*, const std::time_t* time);
     int vlen = 0;
     char val[kMaxResultSize]; // Arbitrary size, usually a date format string is far less
 
     Parse_Paren_Begin();
-
-    if (localTime)
-    {
-        convertTime = &pov_base::SafeLocaltime;
-        FormatStr = "%Y-%m-%d %H:%M:%S%z";
-    }
-    else
-    {
-        convertTime = &pov_base::SafeGmtime;
-        FormatStr = "%Y-%m-%d %H:%M:%SZ";
-    }
 
     const char** portableFieldsLegacy; // Fields reliably supported by whatever POV-Ray version is specified via `#version`.
     if (sceneData->EffectiveLanguageVersion() < 380)
@@ -581,6 +569,11 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
     EXPECT_ONE
         CASE(RIGHT_PAREN_TOKEN)
             UNGET
+            CallFree = false;
+            if (localTime)
+                FormatStr = "%Y-%m-%d %H:%M:%S%z";
+            else
+                FormatStr = "%Y-%m-%d %H:%M:%SZ";
         END_CASE
 
         OTHERWISE
@@ -698,7 +691,7 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
 
     Parse_Paren_End();
 
-    // NB don't wrap only the call to strftime() in the try, because Visual C++ will, in release mode,
+    // NB: Don't wrap only the call to strftime() in the try, because Visual C++ will, in release mode,
     // optimize the try/catch away since it doesn't believe that the RTL can throw exceptions. Since
     // the windows version of POV hooks the invalid parameter handler RTL callback and throws an exception
     // if it's called, they can.
@@ -709,7 +702,10 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
         std::time_t timestamp = std::chrono::system_clock::to_time_t(timeToPrint);
 
         std::tm t;
-        convertTime(&t, &timestamp);
+        if (localTime)
+            (void)safe_localtime(&timestamp, &t);
+        else
+            (void)safe_gmtime(&timestamp, &t);
 
         vlen = std::strftime(val, kMaxResultSize, FormatStr, &t);
 
@@ -765,6 +761,9 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
     }
     catch (pov_base::Exception& e)
     {
+        if (CallFree)
+            POV_FREE(FormatStr);
+
         // The windows version of `strftime` calls the invalid parameter handler if
         // it gets a bad format string. This will in turn raise an exception of type
         // `kParamErr`. If the exception isn't that, allow normal exception processing
