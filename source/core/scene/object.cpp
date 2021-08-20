@@ -150,7 +150,7 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, Tr
             {
                 tmpDepth = depthstack->top().Depth;
                 // TODO FIXME - This was SMALL_TOLERANCE, but that's too rough for some scenes [cjc] need to check what it was in the old code [trf]
-                if(tmpDepth < closest && (ray.IsSubsurfaceRay() || tmpDepth >= MIN_ISECT_DEPTH))
+                if(tmpDepth < closest && (ray.IsSubsurfaceRay() || tmpDepth > MIN_ISECT_DEPTH))
                 {
                     *isect = depthstack->top();
                     closest = tmpDepth;
@@ -204,7 +204,7 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, co
             {
                 tmpDepth = depthstack->top().Depth;
                 // TODO FIXME - This was SMALL_TOLERANCE, but that's too rough for some scenes [cjc] need to check what it was in the old code [trf]
-                if(tmpDepth < closest && (ray.IsSubsurfaceRay() || tmpDepth >= MIN_ISECT_DEPTH) && postcondition(ray, object, tmpDepth))
+                if(tmpDepth < closest && (ray.IsSubsurfaceRay() || tmpDepth > MIN_ISECT_DEPTH) && postcondition(ray, object, tmpDepth))
                 {
                     *isect = depthstack->top();
                     closest = tmpDepth;
@@ -250,7 +250,7 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, BB
             {
                 tmpDepth = depthstack->top().Depth;
                 // TODO FIXME - This was SMALL_TOLERANCE, but that's too rough for some scenes [cjc] need to check what it was in the old code [trf]
-                if(tmpDepth < closest && (ray.IsSubsurfaceRay() || tmpDepth >= MIN_ISECT_DEPTH))
+                if(tmpDepth < closest && (ray.IsSubsurfaceRay() || tmpDepth > MIN_ISECT_DEPTH))
                 {
                     *isect = depthstack->top();
                     closest = tmpDepth;
@@ -296,7 +296,7 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, BB
             {
                 tmpDepth = depthstack->top().Depth;
                 // TODO FIXME - This was SMALL_TOLERANCE, but that's too rough for some scenes [cjc] need to check what it was in the old code [trf]
-                if(tmpDepth < closest && (ray.IsSubsurfaceRay() || tmpDepth >= MIN_ISECT_DEPTH) && postcondition(ray, object, tmpDepth))
+                if(tmpDepth < closest && (ray.IsSubsurfaceRay() || tmpDepth > MIN_ISECT_DEPTH) && postcondition(ray, object, tmpDepth))
                 {
                     *isect = depthstack->top();
                     closest = tmpDepth;
@@ -917,24 +917,25 @@ ObjectPtr CompoundObject::Invert()
 bool ObjectBase::Intersect_BBox(BBoxDirection variant, const BBoxVector3d& origin, const BBoxVector3d& invdir, BBoxScalar maxd) const
 {
     // TODO FIXME - This was SMALL_TOLERANCE, but that's too rough for some scenes [cjc] need to check what it was in the old code [trf]
+    // reverting to SMALL_TOLERANCE and using a far smaller MIN_ISECT_DEPTH with a strictly greater check, for FS324 [jg]
     switch(variant)
     {
         case BBOX_DIR_X0Y0Z0: // 000
-            return Intersect_BBox_Dir<0, 0, 0>(BBox, origin, invdir, MIN_ISECT_DEPTH, maxd);
+            return Intersect_BBox_Dir<0, 0, 0>(BBox, origin, invdir, SMALL_TOLERANCE, maxd);
         case BBOX_DIR_X0Y0Z1: // 001
-            return Intersect_BBox_Dir<0, 0, 1>(BBox, origin, invdir, MIN_ISECT_DEPTH, maxd);
+            return Intersect_BBox_Dir<0, 0, 1>(BBox, origin, invdir, SMALL_TOLERANCE, maxd);
         case BBOX_DIR_X0Y1Z0: // 010
-            return Intersect_BBox_Dir<0, 1, 0>(BBox, origin, invdir, MIN_ISECT_DEPTH, maxd);
+            return Intersect_BBox_Dir<0, 1, 0>(BBox, origin, invdir, SMALL_TOLERANCE, maxd);
         case BBOX_DIR_X0Y1Z1: // 011
-            return Intersect_BBox_Dir<0, 1, 1>(BBox, origin, invdir, MIN_ISECT_DEPTH, maxd);
+            return Intersect_BBox_Dir<0, 1, 1>(BBox, origin, invdir, SMALL_TOLERANCE, maxd);
         case BBOX_DIR_X1Y0Z0: // 100
-            return Intersect_BBox_Dir<1, 0, 0>(BBox, origin, invdir, MIN_ISECT_DEPTH, maxd);
+            return Intersect_BBox_Dir<1, 0, 0>(BBox, origin, invdir, SMALL_TOLERANCE, maxd);
         case BBOX_DIR_X1Y0Z1: // 101
-            return Intersect_BBox_Dir<1, 0, 1>(BBox, origin, invdir, MIN_ISECT_DEPTH, maxd);
+            return Intersect_BBox_Dir<1, 0, 1>(BBox, origin, invdir, SMALL_TOLERANCE, maxd);
         case BBOX_DIR_X1Y1Z0: // 110
-            return Intersect_BBox_Dir<1, 1, 0>(BBox, origin, invdir, MIN_ISECT_DEPTH, maxd);
+            return Intersect_BBox_Dir<1, 1, 0>(BBox, origin, invdir, SMALL_TOLERANCE, maxd);
         case BBOX_DIR_X1Y1Z1: // 111
-            return Intersect_BBox_Dir<1, 1, 1>(BBox, origin, invdir, MIN_ISECT_DEPTH, maxd);
+            return Intersect_BBox_Dir<1, 1, 1>(BBox, origin, invdir, SMALL_TOLERANCE, maxd);
     }
 
     return false; // unreachable
