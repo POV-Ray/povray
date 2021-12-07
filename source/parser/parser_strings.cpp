@@ -465,6 +465,27 @@ UCS2 *Parser::Parse_CameraType(bool )
         case GRID_CAMERA:
             textual = Get_Token_String(GRID_TOKEN);
             break;
+        case BLANK_CAMERA:
+            textual = Get_Token_String(BLANK_TOKEN);
+            break;
+        case HORIZONTAL_CAMERA:
+            textual = Get_Token_String(HORIZONTAL_TOKEN);
+            break;
+        case VERTICAL_CAMERA:
+            textual = Get_Token_String(VERTICAL_TOKEN);
+            break;
+        case MATTE_CAMERA:
+            textual = Get_Token_String(MATTE_TOKEN);
+            break;
+        case LINER_CAMERA:
+            textual = Get_Token_String(LINER_TOKEN);
+            break;
+        case DISC_CAMERA:
+            textual = Get_Token_String(DISC_TOKEN);
+            break;
+        case DIAMOND_CAMERA:
+            textual = Get_Token_String(DIAMOND_TOKEN);
+            break;
         case PERSPECTIVE_CAMERA:
             textual = Get_Token_String(PERSPECTIVE_TOKEN);
             break;

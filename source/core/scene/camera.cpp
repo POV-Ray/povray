@@ -264,6 +264,11 @@ void Camera::Init()
     Max_Ray_Distance = 0.0;
     GridSize[X] = 0;
     GridSize[Y] = 0;
+    FirstPart = 0.5;
+    TopBegin = 0.0;
+    LeftBegin = 0.0;
+    BottomEnd = 1.0;
+    RightEnd = 1.0;
 
     for (unsigned int i = 0; i < 3; ++i)
     {
@@ -368,6 +373,11 @@ Camera& Camera::operator=(const Camera& src)
     GridSize[X] = src.GridSize[X];
     GridSize[Y] = src.GridSize[Y];
     Cameras = src.Cameras;
+    FirstPart = src.FirstPart;
+    TopBegin = src.TopBegin;
+    LeftBegin = src.LeftBegin;
+    BottomEnd = src.BottomEnd;
+    RightEnd = src.RightEnd;
 
 
     for (std::vector<ObjectPtr>::iterator it = Meshes.begin(); it != Meshes.end(); it++)

@@ -1346,6 +1346,7 @@ void Parser::Parse_Camera (Camera& Cam)
     TRANSFORM Local_Trans;
     bool only_mods = false;
     bool early_exit = false;
+    Vector2d temp2d;
 
     Parse_Begin ();
 
@@ -1354,6 +1355,113 @@ void Parser::Parse_Camera (Camera& Cam)
             Cam = CurrentTokenData<Camera>();
             if (sceneData->EffectiveLanguageVersion() >= 350)
                 only_mods = true;
+        END_CASE
+
+        CASE (BLANK_TOKEN)
+         Cam.Type = BLANK_CAMERA;
+         early_exit = true;
+        END_CASE
+
+        CASE (DISC_TOKEN)
+        CASE (DIAMOND_TOKEN)
+         if ( CurrentTrueTokenId() == DISC_TOKEN )
+         {
+         Cam.Type = DISC_CAMERA;
+         }
+         else
+         {
+         Cam.Type = DIAMOND_CAMERA;
+         }
+         Cam.Cameras.reserve(1);
+            EXPECT
+               CASE (CAMERA_ID_TOKEN)
+               Cam.Cameras.push_back( CurrentTokenData<Camera>() );
+                  EXIT
+               END_CASE
+
+               OTHERWISE
+                  Error("Expected camera identifier");
+                  EXIT
+               END_CASE
+            END_EXPECT
+         early_exit = true;
+        END_CASE
+
+        CASE (HORIZONTAL_TOKEN)
+        CASE (VERTICAL_TOKEN)
+         if ( CurrentTrueTokenId() == HORIZONTAL_TOKEN )
+         {
+         Cam.Type = HORIZONTAL_CAMERA;
+         }
+         else
+         {
+         Cam.Type = VERTICAL_CAMERA;
+         }
+         Cam.Cameras.reserve(2);
+         Cam.FirstPart = Allow_Float(0.5);
+         if (( Cam.FirstPart < 0.0)||(Cam.FirstPart>1.0))
+         {
+           Error("Expected proprotion as percentage, between 0.00 and 1.00, for the first camera");
+         }
+         for(size_t c=0;c<2;++c)
+         {
+            EXPECT
+               CASE (CAMERA_ID_TOKEN)
+               Cam.Cameras.push_back( CurrentTokenData<Camera>() );
+                  EXIT
+               END_CASE
+
+               OTHERWISE
+                  Error("Expected camera identifier");
+                  EXIT
+               END_CASE
+            END_EXPECT
+         }
+         early_exit = true;
+        END_CASE
+
+        CASE (LINER_TOKEN)
+        CASE (MATTE_TOKEN)
+         if ( CurrentTrueTokenId() == LINER_TOKEN )
+         {
+         Cam.Type = LINER_CAMERA;
+         }
+         else
+         {
+         Cam.Type = MATTE_CAMERA;
+         }
+         Cam.Cameras.reserve(1);
+         Parse_UV_Vect(temp2d);
+         Cam.TopBegin=temp2d[0];
+         Cam.BottomEnd=1.0-temp2d[1];
+         Parse_Comma();
+         Parse_UV_Vect(temp2d);
+         Cam.LeftBegin=temp2d[0];
+         Cam.RightEnd=1.0-temp2d[1];
+         Parse_Comma();
+         if (
+           ( Cam.TopBegin < 0.0)||(Cam.TopBegin > 1.0)||
+           ( Cam.BottomEnd < 0.0)||(Cam.BottomEnd > 1.0)||
+           ( Cam.LeftBegin < 0.0)||(Cam.LeftBegin > 1.0)||
+           ( Cam.RightEnd < 0.0)||(Cam.RightEnd > 1.0)||
+           ( Cam.TopBegin > Cam.BottomEnd )||
+           ( Cam.LeftBegin > Cam.RightEnd )
+           )
+         {
+           Error("inconsistent border specifications");
+         }
+            EXPECT
+               CASE (CAMERA_ID_TOKEN)
+               Cam.Cameras.push_back( CurrentTokenData<Camera>() );
+                  EXIT
+               END_CASE
+
+               OTHERWISE
+                  Error("Expected camera identifier");
+                  EXIT
+               END_CASE
+            END_EXPECT
+         early_exit = true;
         END_CASE
 
         CASE (GRID_TOKEN)
@@ -1638,6 +1746,10 @@ void Parser::Parse_Camera (Camera& Cam)
                 Parse_User_Defined_Camera(New);
             END_CASE
 
+            CASE (BLANK_TOKEN)
+                New.Type = BLANK_CAMERA;
+            END_CASE
+
             OTHERWISE
                 UNGET
                 EXIT
@@ -1646,6 +1758,14 @@ void Parser::Parse_Camera (Camera& Cam)
 
         switch(New.Type)
         {
+            case BLANK_CAMERA:
+                break;
+            case MATTE_CAMERA:
+            case LINER_CAMERA:
+            case DISC_CAMERA:
+            case DIAMOND_CAMERA:
+            case HORIZONTAL_CAMERA:
+            case VERTICAL_CAMERA:
             case GRID_CAMERA:
                 // nothing, cannot happen, make clang happy
                 break;
@@ -1665,6 +1785,8 @@ void Parser::Parse_Camera (Camera& Cam)
                     CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
                     CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
                     CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_TOKEN )
+                    CASE3( BLANK_TOKEN, DISC_TOKEN, DIAMOND_TOKEN )
+                    CASE5( GRID_TOKEN, VERTICAL_TOKEN, HORIZONTAL_TOKEN, LINER_TOKEN, MATTE_TOKEN ) 
                     CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                         Expectation_Error("perspective camera modifier");
                     END_CASE
@@ -1693,6 +1815,8 @@ void Parser::Parse_Camera (Camera& Cam)
                     CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
                     CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
                     CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_TOKEN )
+                    CASE3( BLANK_TOKEN, DISC_TOKEN, DIAMOND_TOKEN )
+                    CASE5( GRID_TOKEN, VERTICAL_TOKEN, HORIZONTAL_TOKEN, LINER_TOKEN, MATTE_TOKEN ) 
                     CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                         Expectation_Error("orthographic camera modifier");
                     END_CASE
@@ -1724,6 +1848,8 @@ void Parser::Parse_Camera (Camera& Cam)
                     CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
                     CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
                     CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_TOKEN )
+                    CASE3( BLANK_TOKEN, DISC_TOKEN, DIAMOND_TOKEN )
+                    CASE5( GRID_TOKEN, VERTICAL_TOKEN, HORIZONTAL_TOKEN, LINER_TOKEN, MATTE_TOKEN ) 
                     CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                         Expectation_Error("fisheye camera modifier");
                     END_CASE
@@ -1752,6 +1878,8 @@ void Parser::Parse_Camera (Camera& Cam)
                     CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
                     CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
                     CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_TOKEN )
+                    CASE3( BLANK_TOKEN, DISC_TOKEN, DIAMOND_TOKEN )
+                    CASE5( GRID_TOKEN, VERTICAL_TOKEN, HORIZONTAL_TOKEN, LINER_TOKEN, MATTE_TOKEN ) 
                     CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                         Expectation_Error("ultra_wide_angle camera modifier");
                     END_CASE
@@ -1780,6 +1908,8 @@ void Parser::Parse_Camera (Camera& Cam)
                     CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
                     CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
                     CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_TOKEN )
+                    CASE3( BLANK_TOKEN, DISC_TOKEN, DIAMOND_TOKEN )
+                    CASE5( GRID_TOKEN, VERTICAL_TOKEN, HORIZONTAL_TOKEN, LINER_TOKEN, MATTE_TOKEN ) 
                     CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                         Expectation_Error("omnimax camera modifier");
                     END_CASE
@@ -1808,6 +1938,8 @@ void Parser::Parse_Camera (Camera& Cam)
                     CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
                     CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
                     CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_TOKEN )
+                    CASE3( BLANK_TOKEN, DISC_TOKEN, DIAMOND_TOKEN )
+                    CASE5( GRID_TOKEN, VERTICAL_TOKEN, HORIZONTAL_TOKEN, LINER_TOKEN, MATTE_TOKEN ) 
                     CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                         Expectation_Error("panoramic camera modifier");
                     END_CASE
@@ -1839,6 +1971,8 @@ void Parser::Parse_Camera (Camera& Cam)
                     CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
                     CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
                     CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_TOKEN )
+                    CASE3( BLANK_TOKEN, DISC_TOKEN, DIAMOND_TOKEN )
+                    CASE5( GRID_TOKEN, VERTICAL_TOKEN, HORIZONTAL_TOKEN, LINER_TOKEN, MATTE_TOKEN ) 
                     CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                         Expectation_Error("cylinder camera modifier");
                     END_CASE
@@ -1871,6 +2005,8 @@ void Parser::Parse_Camera (Camera& Cam)
                     CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
                     CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
                     CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_TOKEN )
+                    CASE3( BLANK_TOKEN, DISC_TOKEN, DIAMOND_TOKEN )
+                    CASE5( GRID_TOKEN, VERTICAL_TOKEN, HORIZONTAL_TOKEN, LINER_TOKEN, MATTE_TOKEN ) 
                     CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                         Expectation_Error("spherical camera modifier");
                     END_CASE
@@ -1893,6 +2029,8 @@ void Parser::Parse_Camera (Camera& Cam)
                     CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
                     CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
                     CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_TOKEN )
+                    CASE3( BLANK_TOKEN, DISC_TOKEN, DIAMOND_TOKEN )
+                    CASE5( GRID_TOKEN, VERTICAL_TOKEN, HORIZONTAL_TOKEN, LINER_TOKEN, MATTE_TOKEN ) 
                     CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                         Expectation_Error("mesh camera modifier");
                     END_CASE
@@ -1916,6 +2054,8 @@ void Parser::Parse_Camera (Camera& Cam)
                     CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
                     CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
                     CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_TOKEN )
+                    CASE3( BLANK_TOKEN, DISC_TOKEN, DIAMOND_TOKEN )
+                    CASE5( GRID_TOKEN, VERTICAL_TOKEN, HORIZONTAL_TOKEN, LINER_TOKEN, MATTE_TOKEN ) 
                     CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                         Expectation_Error("user-defined camera modifier");
                     END_CASE
@@ -1957,6 +2097,8 @@ void Parser::Parse_Camera (Camera& Cam)
                         CASE5(	HOBO_DYER_TOKEN, PETERS_TOKEN, GALL_TOKEN, BALTHASART_TOKEN, MOLLWEIDE_TOKEN)
                         CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
                         CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
+                        CASE3( BLANK_TOKEN, DISC_TOKEN, DIAMOND_TOKEN )
+                        CASE5( GRID_TOKEN, VERTICAL_TOKEN, HORIZONTAL_TOKEN, LINER_TOKEN, MATTE_TOKEN ) 
                         CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                             Expectation_Error("camera modifier, not another camera type");
                         END_CASE
@@ -1991,6 +2133,8 @@ void Parser::Parse_Camera (Camera& Cam)
                     CASE5(	HOBO_DYER_TOKEN, PETERS_TOKEN, GALL_TOKEN, BALTHASART_TOKEN, MOLLWEIDE_TOKEN)
                     CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
                     CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
+                    CASE3( BLANK_TOKEN, DISC_TOKEN, DIAMOND_TOKEN )
+                    CASE5( GRID_TOKEN, VERTICAL_TOKEN, HORIZONTAL_TOKEN, LINER_TOKEN, MATTE_TOKEN ) 
                     CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                         Expectation_Error("stereo camera modifier");
                     END_CASE
@@ -2017,6 +2161,8 @@ void Parser::Parse_Camera (Camera& Cam)
                     CASE5(	HOBO_DYER_TOKEN, PETERS_TOKEN, GALL_TOKEN, BALTHASART_TOKEN, MOLLWEIDE_TOKEN)
                     CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
                     CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
+                    CASE3( BLANK_TOKEN, DISC_TOKEN, DIAMOND_TOKEN )
+                    CASE5( GRID_TOKEN, VERTICAL_TOKEN, HORIZONTAL_TOKEN, LINER_TOKEN, MATTE_TOKEN ) 
                     CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                         Expectation_Error("omni_directional_stereo camera modifier");
                     END_CASE
@@ -2226,6 +2372,8 @@ void Parser::Parse_Camera (Camera& Cam)
             CASE4(	AITOFF_HAMMER_TOKEN, ECKERT4_TOKEN, ECKERT6_TOKEN, MILLERCYLINDRICAL_TOKEN)
             CASE5( TETRA_TOKEN, CUBE_TOKEN, OCTA_TOKEN, ICOSA_TOKEN, STEREO_TOKEN )
             CASE3( FISHEYE_ORTHOGRAPHIC_TOKEN, FISHEYE_EQUISOLIDANGLE_TOKEN, FISHEYE_STEREOGRAPHIC_TOKEN )
+            CASE3( BLANK_TOKEN, DISC_TOKEN, DIAMOND_TOKEN )
+            CASE5( GRID_TOKEN, VERTICAL_TOKEN, HORIZONTAL_TOKEN, LINER_TOKEN, MATTE_TOKEN ) 
             CASE( OMNI_DIRECTIONAL_STEREO_TOKEN )
                 Error("This camera type not supported for language version < v3.5");
             END_CASE
