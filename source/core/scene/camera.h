@@ -110,7 +110,14 @@ enum CameraType
      FISHEYE_EQUISOLIDANGLE_CAMERA,
      FISHEYE_STEREOGRAPHIC_CAMERA,
      OMNI_DIRECTIONAL_STEREO_CAMERA,
-     GRID_CAMERA
+     GRID_CAMERA,
+     BLANK_CAMERA,
+     DISC_CAMERA,
+     DIAMOND_CAMERA,
+     MATTE_CAMERA,
+     LINER_CAMERA,
+     HORIZONTAL_CAMERA,
+     VERTICAL_CAMERA
 };
 
 /*****************************************************************************
@@ -144,6 +151,15 @@ public:
     // the following declarations are used for the grid camera
     unsigned int GridSize[2];// division of picture in part
     std::vector<Camera> Cameras;// list of camera as sub-part, recursive
+    // above is also used by horizontal & verticla camera, with below data
+    DBL FirstPart;// as percent
+    // Cameras also used by Diamond and Disc cameras, as well as Matte and Liner cameras
+    // Matte and Liner need 4 margins, as percent on image
+    DBL TopBegin;
+    DBL LeftBegin;
+    DBL BottomEnd;
+    DBL RightEnd;
+    // back to traditional povray
     mutable std::vector<TracePixelCameraData> TracePixels;
 
     GenericScalarFunctionPtr Location_Fn[3];  // [USER_DEFINED_CAMERA] Set of functions defining the ray's origin for each screen position.
