@@ -251,10 +251,6 @@ void TracePixelCameraData::SetupCamera(const Camera& cam)
         case DISC_CAMERA:
         case MATTE_CAMERA:
         case LINER_CAMERA:
-            camera.TracePixels.reserve( 1 );
-            camera.TracePixels.push_back(*this);
-            camera.TracePixels[0].SetupCamera( camera.Cameras[0] );
-            break;
         case HORIZONTAL_CAMERA:
         case VERTICAL_CAMERA:
             camera.TracePixels.reserve( 2 );
@@ -409,9 +405,15 @@ bool TracePixelCameraData::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DB
                 y0 -= 0.5;
                 // 
                 rad = fabs(x0)+fabs(y0);
+                bool r;
                 if (rad>0.5)
-                  return false;
-                bool r = camera.TracePixels[0].CreateCameraRay(ray, x, y, width, height, ray_number, parent);
+                {
+                  r = camera.TracePixels[1].CreateCameraRay(ray, x, y, width, height, ray_number, parent);
+                }
+                else
+                {
+                  r = camera.TracePixels[0].CreateCameraRay(ray, x, y, width, height, ray_number, parent);
+                }
                 ray.SetFlags(Ray::PrimaryRay, false, false, false, false, false);
                 return r;
           }
@@ -424,9 +426,15 @@ bool TracePixelCameraData::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DB
                 x0 -= 0.5;
                 y0 -= 0.5;
                 rad = sqrt(x0 * x0 + y0 * y0);
+                bool r;
                 if (rad >0.5)
-                  return false;
-                bool r = camera.TracePixels[0].CreateCameraRay(ray, x, y, width, height, ray_number, parent);
+                {
+                  r = camera.TracePixels[1].CreateCameraRay(ray, x, y, width, height, ray_number, parent);
+                }
+                else
+                {
+                  r = camera.TracePixels[0].CreateCameraRay(ray, x, y, width, height, ray_number, parent);
+                }
                 ray.SetFlags(Ray::PrimaryRay, false, false, false, false, false);
                 return r;
           }
@@ -434,14 +442,18 @@ bool TracePixelCameraData::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DB
           {
             x0 = x / width;//from 0 to 1
             y0 = y / height;//from 0 to 1
+            bool r;
             if (
                 ( x0 < camera.LeftBegin )||(x0> camera.RightEnd)
               ||( y0 < camera.TopBegin) ||(y0> camera.BottomEnd)
               )
             {
-              return false;
+              r = camera.TracePixels[1].CreateCameraRay(ray, x, y, width, height, ray_number, parent);
             }
-            bool r = camera.TracePixels[0].CreateCameraRay(ray, x, y, width, height, ray_number, parent);
+            else
+            {
+              r = camera.TracePixels[0].CreateCameraRay(ray, x, y, width, height, ray_number, parent);
+            }
             ray.SetFlags(Ray::PrimaryRay, false, false, false, false, false);
             return r;
           }
@@ -449,20 +461,24 @@ bool TracePixelCameraData::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DB
           {
             x0 = x / width;//from 0 to 1
             y0 = y / height;//from 0 to 1
+            bool r;
             if (
                 ( x0 < camera.LeftBegin )||(x0> camera.RightEnd)
               ||( y0 < camera.TopBegin) ||(y0> camera.BottomEnd)
               )
             {
-              return false;
+              r = camera.TracePixels[1].CreateCameraRay(ray, x, y, width, height, ray_number, parent);
             }
-            x0 -= camera.LeftBegin;
-            y0 -= camera.TopBegin;
-            x0 /= (camera.RightEnd-camera.LeftBegin);
-            y0 /= (camera.BottomEnd-camera.TopBegin);
-            x0 *= width;
-            y0 *= height;
-            bool r = camera.TracePixels[0].CreateCameraRay(ray, x0, y0, width, height, ray_number, parent);
+            else
+            {
+              x0 -= camera.LeftBegin;
+              y0 -= camera.TopBegin;
+              x0 /= (camera.RightEnd-camera.LeftBegin);
+              y0 /= (camera.BottomEnd-camera.TopBegin);
+              x0 *= width;
+              y0 *= height;
+              r = camera.TracePixels[0].CreateCameraRay(ray, x0, y0, width, height, ray_number, parent);
+            }
             ray.SetFlags(Ray::PrimaryRay, false, false, false, false, false);
             return r;
           }

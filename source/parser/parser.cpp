@@ -1372,7 +1372,9 @@ void Parser::Parse_Camera (Camera& Cam)
          {
          Cam.Type = DIAMOND_CAMERA;
          }
-         Cam.Cameras.reserve(1);
+         Cam.Cameras.reserve(2);
+         for(size_t c=0;c<2;++c)
+         {
             EXPECT
                CASE (CAMERA_ID_TOKEN)
                Cam.Cameras.push_back( CurrentTokenData<Camera>() );
@@ -1384,6 +1386,7 @@ void Parser::Parse_Camera (Camera& Cam)
                   EXIT
                END_CASE
             END_EXPECT
+         }
          early_exit = true;
         END_CASE
 
@@ -1430,7 +1433,7 @@ void Parser::Parse_Camera (Camera& Cam)
          {
          Cam.Type = MATTE_CAMERA;
          }
-         Cam.Cameras.reserve(1);
+         Cam.Cameras.reserve(2);
          Parse_UV_Vect(temp2d);
          Cam.TopBegin=temp2d[0];
          Cam.BottomEnd=1.0-temp2d[1];
@@ -1448,8 +1451,10 @@ void Parser::Parse_Camera (Camera& Cam)
            ( Cam.LeftBegin > Cam.RightEnd )
            )
          {
-           Error("inconsistent border specifications");
+           Error("inconsistent border specifications (<fromTop, fromBottom>, <fromLeft, fromRight>, each between 0.00 and 1.00)");
          }
+         for(size_t c=0;c<2;++c)
+         {
             EXPECT
                CASE (CAMERA_ID_TOKEN)
                Cam.Cameras.push_back( CurrentTokenData<Camera>() );
@@ -1461,6 +1466,7 @@ void Parser::Parse_Camera (Camera& Cam)
                   EXIT
                END_CASE
             END_EXPECT
+         }
          early_exit = true;
         END_CASE
 
