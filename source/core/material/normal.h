@@ -121,7 +121,15 @@ TNORMAL *Copy_Tnormal (TNORMAL *Old);
 void Destroy_Tnormal (TNORMAL *Tnormal);
 void Post_Tnormal (TNORMAL *Tnormal);
 void Perturb_Normal (Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector3d& IPoint, Intersection *Intersection, const Ray *ray, TraceThreadData *Thread);
+#ifdef TRY_OPTIMIZED_NOISE
+typedef void (*wrinklesFunction) (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal);
+extern wrinklesFunction wrinkles;
+#else
+void wrinkles (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal);
+#endif
 
+void wrinklesAVX512 (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal);
+void wrinklesAVX (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal);
 /// @}
 ///
 //##############################################################################

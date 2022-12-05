@@ -146,6 +146,9 @@ const int NULL=0;
         #define HAVE_ASM_AVX2
         #define HAVE_ASM_FMA3
     #endif
+    #if (__INTEL_COMPILER >= 1500) // 15.0
+        #define HAVE_ASM_AVX512
+    #endif
 #elif defined(__GNUC__)
     // GCC compiler (or yet another compiler imitating GCC)
     #if (__GNUC__ == 4) // 4.x
@@ -159,6 +162,12 @@ const int NULL=0;
             #define HAVE_ASM_AVX2
             #define HAVE_ASM_FMA3
         #endif
+    #elif (__GNUC__ >= 6) // 6.x or later
+        #define HAVE_ASM_AVX
+        #define HAVE_ASM_AVX2
+        #define HAVE_ASM_FMA3
+        #define HAVE_ASM_FMA4
+        #define HAVE_ASM_AVX512
     #elif (__GNUC__ >= 5) // 5.x or later
         #define HAVE_ASM_AVX
         #define HAVE_ASM_AVX2
@@ -184,6 +193,9 @@ const int NULL=0;
     #endif
     #if !defined (__FMA4__)
         #define DISABLE_FMA4
+    #endif
+    #if !defined (__AVX512F__)
+        #define DISABLE_AVX512
     #endif
 #endif
 
@@ -216,6 +228,15 @@ const int NULL=0;
 
 #if defined(DISABLE_AVX2) || defined(DISABLE_FMA3)
     #define DISABLE_OPTIMIZED_NOISE_AVX2FMA3
+#endif
+
+#if defined(HAVE_ASM_AVX512)
+    #define TRY_OPTIMIZED_NOISE                 // optimized noise master switch.
+    #define TRY_OPTIMIZED_NOISE_AVX512       // AVX2/FMA3 hand-optimized noise (Intel).
+#endif
+
+#if defined(DISABLE_AVX512)
+    #define DISABLE_OPTIMIZED_NOISE_AVX512
 #endif
 
 #endif // BUILD_X86

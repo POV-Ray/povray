@@ -545,11 +545,37 @@ struct GradientPattern : public ContinuousPattern
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
 };
 
-/// Implements the `granite` pattern.
-struct GranitePattern : public ContinuousPattern
+/// Implements the `granite` pattern. - original implementation
+struct GranitePatternAVX : public ContinuousPattern
 {
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
+};
+
+/// Implements the `granite` pattern. - AVX512 implementation
+struct GranitePatternAVX512 : public ContinuousPattern
+{
+    virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+    virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
+};
+
+/// GranitePattern struct that takes up either of GranitePatternAVX or GranitePatternAVX512 implementation
+struct GranitePattern
+{
+    // Type stores the AVX512 or AVX2 implementation object
+    ContinuousPattern* type;
+    // Shared boolean value to set the implementation
+    static bool choose_implementation;
+    // Constructor to set the type
+    GranitePattern();
+    // Returns the implementation
+    ContinuousPattern* CreateObject();
+    // Returns the clone of the implementation
+    PatternPtr Clone();
+    // Performs the EvaluateRaw function of thee implementation
+    DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread);
+    // Destructor
+    ~GranitePattern();
 };
 
 /// Implements the `hexagon` pattern.
@@ -789,11 +815,36 @@ protected:
     bool hasTurbulence : 1;
 };
 
-/// Implements the `wrinkles` pattern.
-struct WrinklesPattern : public ContinuousPattern
+/// Implements the `wrinkles` pattern - implemenattion for AVX512 architecture
+struct WrinklesPatternAVX512 : public ContinuousPattern
 {
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
+};
+
+/// Implements the `gradient` pattern - original implementation
+struct WrinklesPatternAVX : public ContinuousPattern
+{
+    virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+    virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
+};
+
+struct WrinklesPattern
+{
+    // The type fof implementation - AVX512 or original
+    ContinuousPattern* type;
+    // Shared boolean variable to choose the type of implementation
+    static bool choose_implementation;
+    // Constructor to set the type
+    WrinklesPattern();
+    // Returns the object of the implementation type
+    ContinuousPattern* CreateObject();
+    // Returns the clone of the implementation type
+    PatternPtr Clone();
+    // Implements the Evaluate Raw function based on the architecture
+    DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread);
+    // Destructor
+    ~WrinklesPattern();
 };
 
 

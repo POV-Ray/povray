@@ -70,6 +70,9 @@ namespace pov
 ******************************************************************************/
 
 #define CLIP_DENSITY(r) { if((r) < 0.0) { (r) = 1.0; } else if((r) > 1.0) { (r) = 0.0; } else { (r) = 1.0 - (r); } }
+// Tenth power of 2 and 0.5 used in the implementation of WrinklesPattern::EvaluateRaw
+#define lambda_10 512
+#define omega_10 0.001953125
 
 /*****************************************************************************
 * Local variables
@@ -6424,12 +6427,14 @@ DBL GradientPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIs
 *
 ******************************************************************************/
 
-DBL GranitePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+// Original implementation of GranitePattern::EvaluateRaw
+DBL GranitePatternAVX::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
     int noise_generator = GetNoiseGen(pThread);
 
     int i;
     DBL temp, noise = 0.0, freq = 1.0;
+
     Vector3d tv1, tv2;
 
     tv1 = EPoint * 4.0;
@@ -6438,8 +6443,6 @@ DBL GranitePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
     {
         tv2 = tv1 * freq;
 
-        // TODO - This distinction (with minor variations that seem to be more of an inconsistency rather than intentional)
-        // appears in other places as well; make it a function.
         switch (noise_generator)
         {
             case kNoiseGen_Default:
@@ -6457,8 +6460,83 @@ DBL GranitePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 
         noise += temp / freq;
     }
-
     return(noise);
+}
+
+//Implementation of GranitePattern::EvaluateRaw for AVX512 version
+DBL GranitePatternAVX512::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+{
+    int noise_generator = GetNoiseGen(pThread);
+
+    int i;
+    DBL noise = 0.0, freq = 1.0;
+    Vector3d tv1, tv2[2];
+    DBL temp[2];
+    tv1 = EPoint * 4.0;
+
+    for (i = 0; i < 6; freq *= 4.0, i+=2)
+    {
+        tv2[0] = tv1 * freq;
+        tv2[1] = tv2[0] * 2.0;
+        // TODO - This distinction (with minor variations that seem to be more of an inconsistency rather than intentional)
+        // appears in other places as well; make it a function.
+        switch (noise_generator)
+        {
+            case kNoiseGen_Default:
+            case kNoiseGen_Original:
+                Noise2D (*tv2, noise_generator, *temp);
+                temp[0] = 0.5 - temp[0];
+                temp[1] = 0.5 - temp[1];
+                temp[0] = fabs(temp[0]);
+                temp[1] = fabs(temp[1]);
+                break;
+
+            default:
+                Noise2D (*tv2, noise_generator, *temp);
+                temp[0] = 1.0 - 2.0 * temp[0]; // TODO similar code clips the result
+                temp[1] = 1.0 - 2.0 * temp[1];
+                temp[0] = fabs(temp[0]);
+                temp[1] = fabs(temp[1]);
+                if (temp[0]>0.5) temp[0]=0.5;
+                if (temp[1]>0.5) temp[1]=0.5;
+                break;
+        }
+        noise += temp[0] / freq;
+        noise += temp[1] / (freq * 2.0);
+    }
+    return(noise);
+}
+
+// Base struct where the variable is used to set the type of implementation based on architecture
+bool GranitePattern::choose_implementation = false;
+
+// Constructor that sets the implementation
+GranitePattern::GranitePattern() {
+    if(choose_implementation) {
+        type = new GranitePatternAVX512();
+    } else {
+        type = new GranitePatternAVX();
+    }
+}
+
+// Returns the implementation struct
+ContinuousPattern* GranitePattern::CreateObject() {
+    return type;
+}
+
+// Returns clone of the derived struct implementation
+PatternPtr GranitePattern::Clone() {
+    return type->Clone();
+}
+
+// The base struct function implements the required derived struct function
+DBL GranitePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) {
+    return type->EvaluateRaw(EPoint, pIsection, pRay, pThread);
+}
+
+// Destructor of the base struct
+GranitePattern::~GranitePattern() {
+    delete type;
 }
 
 
@@ -8715,7 +8793,8 @@ bool WoodPattern::HasSpecialTurbulenceHandling() const
 *
 ******************************************************************************/
 
-DBL WrinklesPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+//Original implementation of WrinklesPattern::EvaluateRaw
+DBL WrinklesPatternAVX::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
     int noise_generator = GetNoiseGen(pThread);
 
@@ -8764,8 +8843,85 @@ DBL WrinklesPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIs
 
         omega *= 0.5;
     }
-
     return(value/2.0);
+}
+
+// Implementation of WrinklesPattern::EvaluateRaw for AVX512 architecture
+DBL WrinklesPatternAVX512::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+{
+    int noise_generator = GetNoiseGen(pThread);
+
+    int i;
+    DBL lambda = 2.0;
+    DBL omega = 0.5;
+    DBL value;
+    Vector3d temp;
+    DBL noise;
+
+    // TODO - This distinction (with minor variations that seem to be more of an inconsistency rather than intentional)
+    // appears in other places as well; make it a function.
+    switch (noise_generator)
+    {
+        case kNoiseGen_Default:
+        case kNoiseGen_Original:
+            value = Noise(EPoint, noise_generator);
+            break;
+
+        default:
+            noise = Noise(EPoint, noise_generator)*2.0-0.5;
+            value = min(max(noise,0.0),1.0);
+            break;
+    }
+
+    //Processes 8 multiples of the input EPoint in a single function and reduces the value with omega and lambda
+    value += Noise8D(EPoint, noise_generator);
+
+    temp = EPoint * lambda_10;
+    switch (noise_generator)
+    {
+        case kNoiseGen_Default:
+        case kNoiseGen_Original:
+            value += omega_10 * Noise(temp, noise_generator);
+            break;
+
+        default:
+            noise = Noise(temp, noise_generator)*2.0-0.5;
+            value += omega_10 * min(max(noise,0.0),1.0);
+            break;
+    }
+    return(value/2.0);
+}
+
+// Base struct where the variable is used to set the type of implementation based on architecture
+bool WrinklesPattern::choose_implementation = false;
+
+// Constructor that sets the implementation
+WrinklesPattern::WrinklesPattern() {
+    if(choose_implementation) {
+        type = new WrinklesPatternAVX512();
+    } else {
+        type = new WrinklesPatternAVX();
+    }
+}
+
+// Returns the implementation struct
+ContinuousPattern* WrinklesPattern::CreateObject() {
+    return type;
+}
+
+// Returns clone of the derived struct implementation
+PatternPtr WrinklesPattern::Clone() {
+    return type->Clone();
+}
+
+// The base struct function implements the required derived struct function
+DBL WrinklesPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) {
+    return type->EvaluateRaw(EPoint, pIsection, pRay, pThread);
+}
+
+// Destructor of the base struct
+WrinklesPattern::~WrinklesPattern() {
+    delete type;
 }
 
 
