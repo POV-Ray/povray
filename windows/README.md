@@ -46,20 +46,20 @@ These groups provide the best means for support with relation to this subject.
 Compilers
 =========
 
-Visual Studio 2015
+Visual Studio 2022
 ------------------
 
 Currently the only officially supported means of building the Windows
-version of POV-Ray is via the provided Visual Studio 2015 solution.
+version of POV-Ray is via the provided Visual Studio 2022 solution.
 
-You will need Visual Studio 2015 (Community Edition will suffice) or later.
+You will need Visual Studio 2022 (Community Edition will suffice) or later.
 
 Earlier Versions of Visual Studio
 ---------------------------------
 
-Due to the free availability of Visual Studio 2015 Community Edition
-and better performance of the generated binaries, we have ceased support
-for earlier versions of Visual Studio.
+Due to the free availability of Visual Studio 2022 Community Edition
+(which also gives AVX512 support) and better performance of the generated binaries
+, we have ported the code to VS2022
 
 
 
@@ -95,7 +95,7 @@ Build Steps
     support files are present. If you don't do this, your compiled code
     will probably not work on your machine.
 
-2.  Open `windows\vs2015\povray.sln` in Visual Studio. Set
+2.  Open `windows\vs2022\povray.sln` in Visual Studio. Set
     'Windows Targets > GUI' as the start-up project if it is not already
     selected. Then, select the 'Generic POV-Ray > povbase' project
     and expand 'Backend Headers', then open the file `build.h` listed
@@ -103,6 +103,9 @@ Build Steps
     make unofficial versions distinguishable from each other. Remove the
     `#error` directive afterwards to proceed with the build. Note that
     if you do not do this you will get compile errors.
+    **Note:** (Presently with the updated code the GUI project is skipped for building,
+    as the cmedit64.dll and povcmax64.dll from official windows distribution are
+    incompatible with VS2022. The console version alone is available to build and test).
 
     Note: If you are building in a Git local workspace, we recommend you run
     `git update-index --skip-workspace source/base/build.h`. This will keep
@@ -131,8 +134,8 @@ Build Steps
 
     If all goes well, you should end up with the POV-Ray for Windows
     executable. All 32-bit binaries should end up in
-    `windows\vs2015\bin32`, and the 64-bit ones should be in
-    `windows\vs2015\bin64`.
+    `windows\vs2022\bin32`, and the 64-bit ones should be in
+    `windows\vs2022\bin64`.
 
     Note: if you are building a DEBUG version of POV-Ray, be aware that
     the executable will attempt to load the debug version of POV-Ray's
@@ -150,9 +153,9 @@ Build Steps
 (if they are present), as they are not actively maintained, and may
 generate flawed binaries or fail to compile at all:
 
--   `Release-AVX|Win32` (This target would be useless, as to the best of
-    our knowledge there are no 32-bit processors or operating systems with
-    AVX support.)
+-   `Release-AVX|Win32` and `Release-AVX512|Win32` (These targets would be useless,
+    as to the best of our knowledge there are no 32-bit processors or operating
+     systems with AVX/AVX2/AVX512 support.)
 -   `Release-SSE2|x64` (This target would be redundant, as SSE2 is a
     standard feature of the x64 architecture and is therefore implicitly
     enabled in all `x64` builds, including vanilla `Release|x64`.)
@@ -168,6 +171,10 @@ in mind' at the end.
 
 Building for Legacy Windows Versions
 ------------------------------------
+
+**Attention:** By default, binaries generated with Visual Studio 2022 will only
+run on Windows 10 or later. (Present version with VS2022 not tested with earlier
+windows versions. Retained the Old README in this part).
 
 By default, binaries generated with Visual Studio 2015 will only run on
 Windows Vista or later. Visual Studio 2015 can be used to generate binaries

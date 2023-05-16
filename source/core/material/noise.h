@@ -40,6 +40,8 @@
 #include "core/configcore.h"
 
 #include "core/material/warp.h"
+#include "core/material/normal.h"
+#include "core/material/pattern.h"
 #include "core/math/vector.h"
 
 namespace pov
@@ -97,7 +99,6 @@ extern ALIGN16 DBL RTable[];
 ******************************************************************************/
 
 void Initialize_Noise (void);
-void Initialize_Waves(vector<double>& waveFrequencies, vector<Vector3d>& waveSources, unsigned int numberOfWaves);
 void Free_Noise_Tables (void);
 
 DBL SolidNoise(const Vector3d& P);
@@ -107,9 +108,15 @@ void PortableDNoise(Vector3d& result, const Vector3d& EPoint);
 
 #ifdef TRY_OPTIMIZED_NOISE
 
+// Function pointers that will be assigned and that will eventually decide the flow of the function
 typedef DBL(*NoiseFunction) (const Vector3d& EPoint, int noise_generator);
 typedef void(*DNoiseFunction) (Vector3d& result, const Vector3d& EPoint);
-
+typedef void(*NoiseFunction2D) (const Vector3d& EPoint, int noise_generator, double& value);
+typedef void(*DNoiseFunction2D) (Vector3d& result, const Vector3d& EPoint);
+typedef DBL(*NoiseFunction8D) (const Vector3d& EPoint, int noise_generator);
+typedef void (*DTurbulenceFunction) (Vector3d& result, const Vector3d& EPoint, const GenericTurbulenceWarp *Turb);
+typedef void (*Initialize_WavesFunction) (vector<double>& waveFrequencies, vector<Vector3d>& waveSources, unsigned int numberOfWaves);
+typedef DBL (*TurbulenceFunction) (const Vector3d& EPoint, const GenericTurbulenceWarp *Turb, int noise_generator);
 /// Optimized noise dispatch information.
 struct OptimizedNoiseInfo
 {
@@ -137,6 +144,30 @@ struct OptimizedNoiseInfo
 
     /// Pointer to the optimized implementation of @ref PortableDNoise().
     DNoiseFunction dNoise;
+
+    // Pointer to the optimized implementation of @ref PortableNoise() for two inputs
+    NoiseFunction2D noise2D;
+
+    // Pointer to the optimized implementation of @ref PortableDNoise() for two inputs
+    DNoiseFunction2D dnoise2D;
+
+    // Pointer to the optimized implementation of @ref PortableNoise() for eight multiples of a single input
+    NoiseFunction8D noise8D;
+
+    // Pointer to the implemetation of DTurbulence based on architecture
+    DTurbulenceFunction DTurbulence;
+
+    // Pointer to the implemetation of Initialize Waves based on architecture
+    Initialize_WavesFunction Initialize_Waves;
+
+    // Pointer to the implemetation of Turbulence based on architecture
+    TurbulenceFunction Turbulence;
+
+    // Pointer to the implemetation of wrinkles based on architecture
+    wrinklesFunction wrinkles;
+
+    // boolean value used to set the implementation of WrinklesPattern and GranitePattern classes
+    bool PatternConstructor;
 
     /// Pointer to a constant indicating whether the implementation is enabled in the binary.
     const bool* enabled;
@@ -175,8 +206,15 @@ const OptimizedNoiseInfo* GetRecommendedOptimizedNoise();
 /// Get a specific noise generator implementation.
 const OptimizedNoiseInfo* GetOptimizedNoise(std::string name);
 
+// Function pointers that will decide the flow of functions
 extern NoiseFunction Noise;
 extern DNoiseFunction DNoise;
+extern NoiseFunction2D Noise2D;
+extern DNoiseFunction2D DNoise2D;
+extern NoiseFunction8D Noise8D;
+extern DTurbulenceFunction DTurbulence;
+extern Initialize_WavesFunction Initialize_Waves;
+extern TurbulenceFunction Turbulence;
 
 void Initialise_NoiseDispatch();
 
@@ -184,11 +222,20 @@ void Initialise_NoiseDispatch();
 
 inline DBL Noise(const Vector3d& EPoint, int noise_generator) { return PortableNoise(EPoint, noise_generator); }
 inline void DNoise(Vector3d& result, const Vector3d& EPoint) { PortableDNoise(result, EPoint); }
-
+inline void Noise2D(const Vector3d& EPoint, int noise_generator, double &value) { }//PortableNoise2D(EPoint, noise_generator, value); }
+inline void DNoise2D(Vector3d& result, const Vector3d& EPoint) { }//PortableDNoise2D(result, EPoint); }
+inline DBL Noise8D(Vector3d& result, const Vector3d& EPoint) { return 0.0;}
+void DTurbulence (Vector3d& result, const Vector3d& EPoint, const GenericTurbulenceWarp* Turb) {}
+void Initialize_Waves(vector<double>& waveFrequencies, vector<Vector3d>& waveSources, unsigned int numberOfWaves) {}
+DBL Turbulence (const Vector3d& EPoint, const GenericTurbulenceWarp* Turb, int noise_generator) {return 0.0;}
 #endif // TRY_OPTIMIZED_NOISE
 
-DBL Turbulence (const Vector3d& EPoint, const GenericTurbulenceWarp* Turb, int noise_generator);
-void DTurbulence (Vector3d& result, const Vector3d& EPoint, const GenericTurbulenceWarp* Turb);
+void Initialize_WavesAVX512(vector<double>& waveFrequencies, vector<Vector3d>& waveSources, unsigned int numberOfWaves);
+void Initialize_WavesAVX(vector<double>& waveFrequencies, vector<Vector3d>& waveSources, unsigned int numberOfWaves);
+void DTurbulenceAVX512(Vector3d& result, const Vector3d& EPoint, const GenericTurbulenceWarp *Turb);
+void DTurbulenceAVX(Vector3d& result, const Vector3d& EPoint, const GenericTurbulenceWarp *Turb);
+DBL TurbulenceAVX512 (const Vector3d& EPoint, const GenericTurbulenceWarp* Turb, int noise_generator);
+DBL TurbulenceAVX (const Vector3d& EPoint, const GenericTurbulenceWarp* Turb, int noise_generator);
 
 /// @}
 ///

@@ -449,6 +449,9 @@ endif
 if BUILD_x86avx2fma3
 ldadd_platformcpu += \$(top_builddir)/platform/libx86avx2fma3.a
 endif
+if BUILD_x86avx512
+ldadd_platformcpu += \$(top_builddir)/platform/libx86avx512.a
+endif
 
 # Include paths for headers.
 AM_CPPFLAGS = \\
@@ -1403,7 +1406,7 @@ case "$1" in
   *)
   files=`find $dir/unix -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g | sort`
   files_x86=`find $dir/x86 -maxdepth 1 -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g | sort`
-  for ext in avx avxfma4 avx2fma3; do
+  for ext in avx avxfma4 avx2fma3 avx512; do
     files_ext=`find $dir/x86/$ext -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g | sort`
     eval files_x86$ext='$files_ext'
   done
@@ -1438,6 +1441,11 @@ if BUILD_x86avx2fma3
 libraries_platformcpu += libx86avx2fma3.a
 libx86avx2fma3_a_SOURCES =  `echo $files_x86avx2fma3`
 libx86avx2fma3_a_CXXFLAGS = \$(CXXFLAGS) -mavx2 -mfma
+endif
+if BUILD_x86avx512
+libraries_platformcpu += libx86avx512.a
+libx86avx512_a_SOURCES =  `echo $files_x86avx512`
+libx86avx512_a_CXXFLAGS = \$(CXXFLAGS) -mavx512f
 endif
 
 # Libraries to build.
