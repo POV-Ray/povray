@@ -196,8 +196,8 @@ light_source { <100.0, 400.0, -600.0> color White }
 //   a back-light to create a highlight on the board
 light_source { <12.0, 4.0, 12.0> color White }
 
-//  We'll build our chessboard out of one big pine block and 32
-// little rosewood ones
+//  We'll build our chessboard out of 32 pine blocks and 32
+// rosewood ones
 #declare Fours = union {
    object { UnitBox
       texture {
@@ -214,6 +214,18 @@ light_source { <12.0, 4.0, 12.0> color White }
 
    object { UnitBox
       texture {
+         Yellow_Pine
+         finish {
+            phong 0.5
+            reflection 0.3
+         }
+         scale 2
+      }
+      translate <-1, -1, -1>
+   }
+
+   object { UnitBox
+      texture {
          Rosewood
          finish {
             phong 0.3
@@ -223,6 +235,18 @@ light_source { <12.0, 4.0, 12.0> color White }
          }
       }
       translate <1, -1, -1>
+   }
+
+   object { UnitBox
+      texture {
+         Yellow_Pine
+         finish {
+            phong 0.5
+            reflection 0.3
+         }
+         scale 2
+      }
+      translate <1, -1, 1>
    }
 
 
@@ -285,24 +309,10 @@ light_source { <12.0, 4.0, 12.0> color White }
       translate <4, 0, -4>
    }
 
-   object { UnitBox
-      scale <8, 0.25, 8>
-      translate -0.25*y
-   }
-
    object { rail rotate 0*y }
    object { rail rotate 90*y }
    object { rail rotate 180*y }
    object { rail rotate 270*y }
-
-   texture {
-      Yellow_Pine
-      finish {
-         phong 0.5
-         reflection 0.3
-      }
-      scale 2
-   }
 
 
 }
