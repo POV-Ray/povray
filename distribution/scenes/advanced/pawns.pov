@@ -23,18 +23,18 @@ global_settings { assumed_gamma 1.8 }
       wood
       turbulence 0.02
       color_map {
-         [0.000, 0.222  color red  0.808  green  0.671  blue  0.251  filter  0.000
-                        color red  0.808  green  0.671  blue  0.251  filter  0.000]
-         [0.222, 0.342  color red  0.808  green  0.671  blue  0.251  filter  0.000
-                        color red  0.600  green  0.349  blue  0.043  filter  0.000]
-         [0.342, 0.393  color red  0.600  green  0.349  blue  0.043  filter  0.000
-                        color red  0.808  green  0.671  blue  0.251  filter  0.000]
-         [0.393, 0.709  color red  0.808  green  0.671  blue  0.251  filter  0.000
-                        color red  0.808  green  0.671  blue  0.251  filter  0.000]
-         [0.709, 0.821  color red  0.808  green  0.671  blue  0.251  filter  0.000
-                        color red  0.533  green  0.298  blue  0.027  filter  0.000]
-         [0.821, 1      color red  0.533  green  0.298  blue  0.027  filter  0.000
-                        color red  0.808  green  0.671  blue  0.251  filter  0.000]
+         [0.000, 0.222  color red  0.808  green  0.671  blue  0.251  transmit  0.000
+                        color red  0.808  green  0.671  blue  0.251  transmit  0.000]
+         [0.222, 0.342  color red  0.808  green  0.671  blue  0.251  transmit  0.000
+                        color red  0.600  green  0.349  blue  0.043  transmit  0.000]
+         [0.342, 0.393  color red  0.600  green  0.349  blue  0.043  transmit  0.000
+                        color red  0.808  green  0.671  blue  0.251  transmit  0.000]
+         [0.393, 0.709  color red  0.808  green  0.671  blue  0.251  transmit  0.000
+                        color red  0.808  green  0.671  blue  0.251  transmit  0.000]
+         [0.709, 0.821  color red  0.808  green  0.671  blue  0.251  transmit  0.000
+                        color red  0.533  green  0.298  blue  0.027  transmit  0.000]
+         [0.821, 1      color red  0.533  green  0.298  blue  0.027  transmit  0.000
+                        color red  0.808  green  0.671  blue  0.251  transmit  0.000]
       }
       scale 0.1
       translate 10*x
@@ -47,18 +47,18 @@ texture {
       wood
       turbulence 0.01
       color_map {
-         [0.000, 0.120   color red  1.000  green  1.000  blue  1.000  filter  1.000
-                         color red  0.702  green  0.412  blue  0.118  filter  0.608]
-         [0.120, 0.231   color red  0.702  green  0.412  blue  0.118  filter  0.608
-                         color red  0.702  green  0.467  blue  0.118  filter  0.608]
-         [0.231, 0.496   color red  0.702  green  0.467  blue  0.118  filter  0.608
-                         color red  1.000  green  1.000  blue  1.000  filter  1.000]
-         [0.496, 0.701   color red  1.000  green  1.000  blue  1.000  filter  1.000
-                         color red  1.000  green  1.000  blue  1.000  filter  1.000]
-         [0.701, 0.829   color red  1.000  green  1.000  blue  1.000  filter  1.000
-                         color red  0.702  green  0.467  blue  0.118  filter  0.608]
-         [0.829, 1       color red  0.702  green  0.467  blue  0.118  filter  0.608
-                         color red  1.000  green  1.000  blue  1.000  filter  1.000]
+         [0.000, 0.120   color red  1.000  green  1.000  blue  1.000  transmit  1.000
+                         color red  0.702  green  0.412  blue  0.118  transmit  0.608]
+         [0.120, 0.231   color red  0.702  green  0.412  blue  0.118  transmit  0.608
+                         color red  0.702  green  0.467  blue  0.118  transmit  0.608]
+         [0.231, 0.496   color red  0.702  green  0.467  blue  0.118  transmit  0.608
+                         color red  1.000  green  1.000  blue  1.000  transmit  1.000]
+         [0.496, 0.701   color red  1.000  green  1.000  blue  1.000  transmit  1.000
+                         color red  1.000  green  1.000  blue  1.000  transmit  1.000]
+         [0.701, 0.829   color red  1.000  green  1.000  blue  1.000  transmit  1.000
+                         color red  0.702  green  0.467  blue  0.118  transmit  0.608]
+         [0.829, 1       color red  0.702  green  0.467  blue  0.118  transmit  0.608
+                         color red  1.000  green  1.000  blue  1.000  transmit  1.000]
       }
       scale 0.5
       translate 10*x
@@ -73,18 +73,18 @@ texture {
       bozo
       turbulence 0.04
       color_map {
-         [0.000, 0.256   color red  0.204  green  0.110  blue  0.078  filter  0.000
-                         color red  0.231  green  0.125  blue  0.090  filter  0.000]
-         [0.256, 0.393   color red  0.231  green  0.125  blue  0.090  filter  0.000
-                         color red  0.247  green  0.133  blue  0.090  filter  0.000]
-         [0.393, 0.581   color red  0.247  green  0.133  blue  0.090  filter  0.000
-                         color red  0.204  green  0.110  blue  0.075  filter  0.000]
-         [0.581, 0.726   color red  0.204  green  0.110  blue  0.075  filter  0.000
-                         color red  0.259  green  0.122  blue  0.102  filter  0.000]
-         [0.726, 0.983   color red  0.259  green  0.122  blue  0.102  filter  0.000
-                         color red  0.231  green  0.125  blue  0.086  filter  0.000]
-         [0.983, 1       color red  0.231  green  0.125  blue  0.086  filter  0.000
-                         color red  0.204  green  0.110  blue  0.078  filter  0.000]
+         [0.000, 0.256   color red  0.204  green  0.110  blue  0.078  transmit  0.000
+                         color red  0.231  green  0.125  blue  0.090  transmit  0.000]
+         [0.256, 0.393   color red  0.231  green  0.125  blue  0.090  transmit  0.000
+                         color red  0.247  green  0.133  blue  0.090  transmit  0.000]
+         [0.393, 0.581   color red  0.247  green  0.133  blue  0.090  transmit  0.000
+                         color red  0.204  green  0.110  blue  0.075  transmit  0.000]
+         [0.581, 0.726   color red  0.204  green  0.110  blue  0.075  transmit  0.000
+                         color red  0.259  green  0.122  blue  0.102  transmit  0.000]
+         [0.726, 0.983   color red  0.259  green  0.122  blue  0.102  transmit  0.000
+                         color red  0.231  green  0.125  blue  0.086  transmit  0.000]
+         [0.983, 1       color red  0.231  green  0.125  blue  0.086  transmit  0.000
+                         color red  0.204  green  0.110  blue  0.078  transmit  0.000]
       }
       scale <0.5, 0.5, 1>
       translate 10*x
@@ -101,22 +101,22 @@ texture {
       wood
       turbulence 0.04
       color_map {
-         [0.000, 0.139   color red  0.545  green  0.349  blue  0.247  filter  1.000
-                         color red  0.000  green  0.000  blue  0.000  filter  0.004]
-         [0.139, 0.148   color red  0.000  green  0.000  blue  0.000  filter  0.004
-                         color red  0.000  green  0.000  blue  0.000  filter  0.004]
-         [0.148, 0.287   color red  0.000  green  0.000  blue  0.000  filter  0.004
-                         color red  0.545  green  0.349  blue  0.247  filter  1.000]
-         [0.287, 0.443   color red  0.545  green  0.349  blue  0.247  filter  1.000
-                         color red  0.545  green  0.349  blue  0.247  filter  1.000]
-         [0.443, 0.626   color red  0.545  green  0.349  blue  0.247  filter  1.000
-                         color red  0.000  green  0.000  blue  0.000  filter  0.004]
-         [0.626, 0.635   color red  0.000  green  0.000  blue  0.000  filter  0.004
-                         color red  0.000  green  0.000  blue  0.000  filter  0.004]
-         [0.635, 0.843   color red  0.000  green  0.000  blue  0.000  filter  0.004
-                         color red  0.545  green  0.349  blue  0.247  filter  1.000]
-         [0.843, 1       color red  0.545  green  0.349  blue  0.247  filter  1.000
-                         color red  0.545  green  0.349  blue  0.247  filter  1.000]
+         [0.000, 0.139   color red  0.545  green  0.349  blue  0.247  transmit  1.000
+                         color red  0.000  green  0.000  blue  0.000  transmit  0.004]
+         [0.139, 0.148   color red  0.000  green  0.000  blue  0.000  transmit  0.004
+                         color red  0.000  green  0.000  blue  0.000  transmit  0.004]
+         [0.148, 0.287   color red  0.000  green  0.000  blue  0.000  transmit  0.004
+                         color red  0.545  green  0.349  blue  0.247  transmit  1.000]
+         [0.287, 0.443   color red  0.545  green  0.349  blue  0.247  transmit  1.000
+                         color red  0.545  green  0.349  blue  0.247  transmit  1.000]
+         [0.443, 0.626   color red  0.545  green  0.349  blue  0.247  transmit  1.000
+                         color red  0.000  green  0.000  blue  0.000  transmit  0.004]
+         [0.626, 0.635   color red  0.000  green  0.000  blue  0.000  transmit  0.004
+                         color red  0.000  green  0.000  blue  0.000  transmit  0.004]
+         [0.635, 0.843   color red  0.000  green  0.000  blue  0.000  transmit  0.004
+                         color red  0.545  green  0.349  blue  0.247  transmit  1.000]
+         [0.843, 1       color red  0.545  green  0.349  blue  0.247  transmit  1.000
+                         color red  0.545  green  0.349  blue  0.247  transmit  1.000]
       }
       scale <0.5, 0.5, 1>
       translate <10, 0, 0>
@@ -135,18 +135,18 @@ texture {
       bozo
       turbulence 0.2
       color_map {
-         [0.000, 0.171   color red  0.725  green  0.659  blue  0.455  filter  0.000
-                         color red  0.682  green  0.549  blue  0.420  filter  0.000]
-         [0.171, 0.274   color red  0.682  green  0.549  blue  0.420  filter  0.000
-                         color red  0.557  green  0.451  blue  0.322  filter  0.000]
-         [0.274, 0.393   color red  0.557  green  0.451  blue  0.322  filter  0.000
-                         color red  0.725  green  0.659  blue  0.455  filter  0.000]
-         [0.393, 0.564   color red  0.725  green  0.659  blue  0.455  filter  0.000
-                         color red  0.682  green  0.549  blue  0.420  filter  0.000]
-         [0.564, 0.701   color red  0.682  green  0.549  blue  0.420  filter  0.000
-                         color red  0.482  green  0.392  blue  0.278  filter  0.000]
-         [0.701, 1       color red  0.482  green  0.392  blue  0.278  filter  0.000
-                         color red  0.725  green  0.659  blue  0.455  filter  0.000]
+         [0.000, 0.171   color red  0.725  green  0.659  blue  0.455  transmit  0.000
+                         color red  0.682  green  0.549  blue  0.420  transmit  0.000]
+         [0.171, 0.274   color red  0.682  green  0.549  blue  0.420  transmit  0.000
+                         color red  0.557  green  0.451  blue  0.322  transmit  0.000]
+         [0.274, 0.393   color red  0.557  green  0.451  blue  0.322  transmit  0.000
+                         color red  0.725  green  0.659  blue  0.455  transmit  0.000]
+         [0.393, 0.564   color red  0.725  green  0.659  blue  0.455  transmit  0.000
+                         color red  0.682  green  0.549  blue  0.420  transmit  0.000]
+         [0.564, 0.701   color red  0.682  green  0.549  blue  0.420  transmit  0.000
+                         color red  0.482  green  0.392  blue  0.278  transmit  0.000]
+         [0.701, 1       color red  0.482  green  0.392  blue  0.278  transmit  0.000
+                         color red  0.725  green  0.659  blue  0.455  transmit  0.000]
       }
       scale <0.2, 0.2, 1>
       scale 2
@@ -158,22 +158,22 @@ texture {
       bozo
       turbulence 0.8
       color_map {
-         [0.000, 0.087   color red  0.682  green  0.604  blue  0.380  filter  1.000
-                         color red  0.761  green  0.694  blue  0.600  filter  0.020]
-         [0.087, 0.226   color red  0.761  green  0.694  blue  0.600  filter  0.020
-                         color red  0.635  green  0.553  blue  0.325  filter  1.000]
-         [0.226, 0.348   color red  0.635  green  0.553  blue  0.325  filter  1.000
-                         color red  0.761  green  0.694  blue  0.600  filter  0.020]
-         [0.348, 0.496   color red  0.761  green  0.694  blue  0.600  filter  0.020
-                         color red  0.682  green  0.604  blue  0.380  filter  1.000]
-         [0.496, 0.565   color red  0.682  green  0.604  blue  0.380  filter  1.000
-                         color red  0.761  green  0.694  blue  0.600  filter  0.020]
-         [0.565, 0.661   color red  0.761  green  0.694  blue  0.600  filter  0.020
-                         color red  0.682  green  0.604  blue  0.380  filter  1.000]
-         [0.661, 0.835   color red  0.682  green  0.604  blue  0.380  filter  1.000
-                         color red  0.761  green  0.694  blue  0.600  filter  0.020]
-         [0.835, 1       color red  0.761  green  0.694  blue  0.600  filter  0.020
-                         color red  0.682  green  0.604  blue  0.380  filter  1.000]
+         [0.000, 0.087   color red  0.682  green  0.604  blue  0.380  transmit  1.000
+                         color red  0.761  green  0.694  blue  0.600  transmit  0.020]
+         [0.087, 0.226   color red  0.761  green  0.694  blue  0.600  transmit  0.020
+                         color red  0.635  green  0.553  blue  0.325  transmit  1.000]
+         [0.226, 0.348   color red  0.635  green  0.553  blue  0.325  transmit  1.000
+                         color red  0.761  green  0.694  blue  0.600  transmit  0.020]
+         [0.348, 0.496   color red  0.761  green  0.694  blue  0.600  transmit  0.020
+                         color red  0.682  green  0.604  blue  0.380  transmit  1.000]
+         [0.496, 0.565   color red  0.682  green  0.604  blue  0.380  transmit  1.000
+                         color red  0.761  green  0.694  blue  0.600  transmit  0.020]
+         [0.565, 0.661   color red  0.761  green  0.694  blue  0.600  transmit  0.020
+                         color red  0.682  green  0.604  blue  0.380  transmit  1.000]
+         [0.661, 0.835   color red  0.682  green  0.604  blue  0.380  transmit  1.000
+                         color red  0.761  green  0.694  blue  0.600  transmit  0.020]
+         [0.835, 1       color red  0.761  green  0.694  blue  0.600  transmit  0.020
+                         color red  0.682  green  0.604  blue  0.380  transmit  1.000]
       }
       scale 0.2
       scale 2
