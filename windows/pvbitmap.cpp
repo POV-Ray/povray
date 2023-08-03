@@ -531,7 +531,7 @@ HPALETTE CreateDIBPalette(HDIB hDIB)
  *
  * NOTE:
  *
- * The bitmap returned from this funciton is always a bitmap compatible
+ * The bitmap returned from this function is always a bitmap compatible
  * with the screen (e.g. same bits/pixel and color planes) rather than
  * a bitmap with the same attributes as the DIB.  This behavior is by
  * design, and occurs because this function calls CreateDIBitmap to

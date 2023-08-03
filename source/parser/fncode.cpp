@@ -498,7 +498,7 @@ void FNCode::SetFlag(unsigned int flag, char *str)
 *
 * DESCRIPTION
 *
-*   Compiles an expression (sub-) tree recursivly.
+*   Compiles an expression (sub-) tree recursively.
 *
 * CHANGES
 *
@@ -1181,7 +1181,7 @@ void FNCode::compile_select(ExprNode *expr)
 * INPUT
 *
 *   expr - list of function parameters
-*   op - operation to perfrom on value and result for each step
+*   op - operation to perform on value and result for each step
 *   neutral - neutral element of the operation to apply
 *
 * OUTPUT

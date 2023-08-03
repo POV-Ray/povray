@@ -2265,7 +2265,7 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
             {
                 // Note: Setting up for potential warning on single value float promote to
                 // five value color vector. Any single float will be promoted to the full
-                // 'tgtTerms' value. This usually results in filter and trasmit values >0,
+                // 'tgtTerms' value. This usually results in filter and transmit values >0,
                 // which caused shadow artifacts back to at least version v3.6.1.
                 if ((CurrentCategorizedTokenId() == FLOAT_TOKEN_CATEGORY) || (CurrentTrueTokenId() == FUNCT_ID_TOKEN))
                     sawFloatOrFloatFnct = true;
@@ -2861,7 +2861,7 @@ template TextureBlendMapPtr Parser::Parse_Blend_List<TextureBlendMap>   (int Cou
 *
 * DESCRIPTION
 *
-*   This performs a similar funciton to Parse_Blend_List.  It was created
+*   This performs a similar function to Parse_Blend_List.  It was created
 *   specifically for uv mapping.  It is different from Parse_Blend_List in
 *   the following ways:
 *     It will parse exactly one item (normal,pigment, or texture).

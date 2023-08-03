@@ -50,7 +50,7 @@ At this point in time, the only platform for which the project distributes pre-b
 obtained via http://www.povray.org/download/. We do intend to provide Mac OS X
 binaries shortly, but these will be console-mode only (based on the unix build).
 
-Official Windows binaries of selected development versions are made availabe at
+Official Windows binaries of selected development versions are made available at
 https://github.com/POV-Ray/povray/releases on a semi-irregular basis.
 
 Building POV-Ray

@@ -241,7 +241,7 @@ RenderFrontendBase::SceneId RenderFrontendBase::CreateScene(SceneData& shd, POVM
         if(obj.Exist(kPOVAttrib_AllConsole))
         {
             bool b = obj.GetBool(kPOVAttrib_AllConsole);
-            // NEVERE disable copyright banner BANNER_STREAM stream! [trf]
+            // NEVER disable copyright banner BANNER_STREAM stream! [trf]
             shd.consoleoutput[DEBUG_STREAM] = b;
             shd.consoleoutput[FATAL_STREAM] = b;
             shd.consoleoutput[RENDER_STREAM] = b;

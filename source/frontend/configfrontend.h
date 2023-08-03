@@ -81,7 +81,7 @@
 #endif
 
 /// @def DEFAULT_DISPLAY_GAMMA
-/// Gamma curve numerial parameter.
+/// Gamma curve numerical parameter.
 ///
 /// If @ref DEFAULT_DISPLAY_GAMMA_TYPE is set to @ref kPOVList_GammaType_PowerLaw,
 /// this is the overall effective gamma of the display system.

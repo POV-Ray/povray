@@ -499,7 +499,7 @@ ExprNode *Parser::new_expr_node(int stage, int op)
 *
 * INPUT
 *
-*   current - current poistion in expression tree
+*   current - current position in expression tree
 *   stage - stage/precedence of operation
 *   op - operation
 *
@@ -537,7 +537,7 @@ bool Parser::expr_noop(ExprNode *&, int, int)
 *
 * INPUT
 *
-*   current - current poistion in expression tree
+*   current - current position in expression tree
 *   stage - stage/precedence of operation
 *   op - operation
 *
@@ -635,7 +635,7 @@ bool Parser::expr_grow(ExprNode *&current, int stage, int op)
 *
 * INPUT
 *
-*   current - current poistion in expression tree
+*   current - current position in expression tree
 *   stage - stage/precedence of operation
 *   op - operation
 *
@@ -710,7 +710,7 @@ bool Parser::expr_call(ExprNode *&current, int stage, int op)
 *
 * INPUT
 *
-*   current - current poistion in expression tree
+*   current - current position in expression tree
 *   stage - stage/precedence of operation
 *   op - operation
 *
@@ -771,7 +771,7 @@ bool Parser::expr_put(ExprNode *&current, int stage, int op)
 *
 * INPUT
 *
-*   current - current poistion in expression tree
+*   current - current position in expression tree
 *   stage - stage/precedence of operation
 *   op - operation
 *
@@ -820,7 +820,7 @@ bool Parser::expr_new(ExprNode *&current, int /*stage*/, int /*op*/)
 *
 * INPUT
 *
-*   current - current poistion in expression tree
+*   current - current position in expression tree
 *   stage - stage/precedence of operation
 *   op - operation
 *
@@ -861,7 +861,7 @@ bool Parser::expr_ret(ExprNode *&, int, int)
 *
 * INPUT
 *
-*   current - current poistion in expression tree
+*   current - current position in expression tree
 *   stage - stage/precedence of operation
 *   op - operation
 *
