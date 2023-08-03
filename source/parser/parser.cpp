@@ -619,7 +619,7 @@ void Parser::Destroy_Frame()
     // This is necessary as a user who hits CANCEL during any IO performed
     // by this routine (e.g. Destroy_Object(), which can complain about
     // isosurface max_gradient), will cause this routine to be entered again
-    // before the relevent data member has been set to `nullptr` (this is able
+    // before the relevant data member has been set to `nullptr` (this is able
     // to happen since cancel will invoke a longjmp on most platforms).
     // This causes the currently-executing segment to be destroyed twice,
     // which is a Bad Thing(tm). [CJC 11/01]
@@ -8868,12 +8868,12 @@ void Parser::Link_Textures (TEXTURE **Old_Textures, TEXTURE *New_Textures)
     }
     for (Layer = New_Textures; Layer->Next != nullptr; Layer = Layer->Next)
     {
-        /* NK layers - 1999 June 10 - for backwards compatiblity with layered textures */
+        /* NK layers - 1999 June 10 - for backwards compatibility with layered textures */
         if(sceneData->EffectiveLanguageVersion() <= 310)
             Convert_Filter_To_Transmit(Layer->Pigment);
     }
 
-    /* NK layers - 1999 Nov 16 - for backwards compatiblity with layered textures */
+    /* NK layers - 1999 Nov 16 - for backwards compatibility with layered textures */
     if ((sceneData->EffectiveLanguageVersion() <= 310) && (*Old_Textures != nullptr))
         Convert_Filter_To_Transmit(Layer->Pigment);
 

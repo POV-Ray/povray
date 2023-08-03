@@ -303,7 +303,7 @@ protected:
     // you should reap any processes in your destructor in case CollectCommand doesn't
     // get called.
     //
-    // if the platform implemeting a subclass of this method has the equivalent of a
+    // if the platform implementing a subclass of this method has the equivalent of a
     // system log (e.g. syslog on unix, event log on windows), the implementation should
     // consider providing a user-controllable option to log any commands using such.
     virtual bool ExecuteCommand(const std::string& cmd, const std::string& params);
