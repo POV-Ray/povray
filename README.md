@@ -26,7 +26,7 @@ as SDL includes, macros, sample scenes and so forth are under the Creative Commo
 Forums
 --------------------------------------
 
-Discussion regarding POV-Ray is traditionally done via our forums at http://news.povray.org/.
+Discussion regarding POV-Ray is traditionally done via our forums at https://news.povray.org/.
 These are also available via NNTP at news://news.povray.org/ for those preferring that.
 
 Please note that the POV-Ray developers do not monitor all forums regularly. The ones we
@@ -47,8 +47,7 @@ Official Binaries
 
 At this point in time, the only platform for which the project distributes pre-built
 'official' (i.e. supported) binaries is Microsoft Windows. These may be
-obtained via http://www.povray.org/download/. We do intend to provide Mac OS X
-binaries shortly, but these will be console-mode only (based on the unix build).
+obtained via https://www.povray.org/download/..
 
 Official Windows binaries of selected development versions are made available at
 https://github.com/POV-Ray/povray/releases on a semi-irregular basis.
@@ -112,9 +111,9 @@ of POV-Ray come with documentation. For the Unix build, this is in the form of a
 manpage giving basic usage, and full HTML-based documentation. For the Windows
 version, there is a HtmlHelp (.CHM) file provided.
 
-The official location for the online documentation is http://www.povray.org/documentation/.
+The official location for the online documentation is https://www.povray.org/documentation/.
 Further information, as well as online documentation for the current development
-version, can be found at http://wiki.povray.org.
+version, can be found at https://wiki.povray.org.
 
 Contacting Us
 --------------------------------------
@@ -122,5 +121,5 @@ Contacting Us
 We prefer that you contact us via the forums mentioned at the head of this document.
 If the matter is one that requires direct email contact (and this generally will NOT
 include tech support requests, though exceptions are made for package maintainers)
-you may use the address listed at the bottom of http://www.povray.org/povlegal.html.
+you may use the address listed at the bottom of https://www.povray.org/povlegal.html.
 
