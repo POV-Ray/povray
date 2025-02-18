@@ -75,7 +75,10 @@ namespace pov
 
 void Camera::Translate(const Vector3d& Vector)
 {
-    Location += Vector;
+    TRANSFORM Trans;
+
+    Compute_Translation_Transform(&Trans, Vector);
+    Transform(&Trans);
 }
 
 
@@ -183,7 +186,9 @@ void Camera::Transform(const TRANSFORM *Trans)
     MTransPoint(Location, Location, Trans);
     MTransDirection(Direction, Direction, Trans);
     MTransDirection(Up, Up, Trans);
-    MTransDirection(Right, Right, Trans);
+    MTransDirection(Right, Right, Trans);  
+    
+    Compose_Transforms (UserTrans, Trans);
 }
 
 
@@ -257,6 +262,8 @@ void Camera::Init()
         Location_Fn[i]  = nullptr;
         Direction_Fn[i] = nullptr;
     }
+
+    UserTrans = Create_Transform();
 }
 
 /*****************************************************************************
@@ -384,6 +391,10 @@ Camera& Camera::operator=(const Camera& src)
 
     }
 
+    if (UserTrans != nullptr)
+        Destroy_Transform(UserTrans);
+    UserTrans = (src.UserTrans ? Copy_Transform(src.UserTrans) : nullptr);
+
     return *this;
 }
 
@@ -397,6 +408,7 @@ Camera::Camera(const Camera& src)
         Location_Fn[i]  = nullptr;
         Direction_Fn[i] = nullptr;
     }
+    UserTrans = nullptr;
     operator=(src);
 }
 
@@ -441,6 +453,7 @@ Camera::~Camera()
         if (Direction_Fn[i] != nullptr)
             delete Direction_Fn[i];
     }
+    Destroy_Transform(UserTrans);
 }
 
 }

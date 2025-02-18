@@ -100,6 +100,7 @@ public:
     PIGMENT *Bokeh;                 // Pigment to use for the bokeh
     GenericScalarFunctionPtr Location_Fn[3];  // [USER_DEFINED_CAMERA] Set of functions defining the ray's origin for each screen position.
     GenericScalarFunctionPtr Direction_Fn[3]; // [USER_DEFINED_CAMERA] Set of functions defining the ray's direction for each screen position.
+    TRANSFORM *UserTrans;           // [USER_DEFINED_CAMERA] Transformation to apply after calculating functions
 
     // the following declarations are used for the mesh camera
     unsigned int Face_Distribution_Method;  // how to associate a pixel to a face within a mesh
