@@ -45,6 +45,7 @@ public:
     static bool SupportsSSE2();             ///< Test whether CPU and OS support SSE2.
     static bool SupportsAVX();              ///< Test whether CPU and OS support AVX.
     static bool SupportsAVX2();             ///< Test whether CPU and OS support AVX2.
+    static bool SupportsAVX512();           ///< Test whether CPU and OS support AVX512.
     static bool SupportsFMA3();             ///< Test whether CPU and OS support FMA3.
     static bool SupportsFMA4();             ///< Test whether CPU and OS support FMA4.
     static bool IsIntel();                  ///< Test whether CPU is genuine Intel product.

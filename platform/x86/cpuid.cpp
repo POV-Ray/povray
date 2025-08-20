@@ -114,6 +114,7 @@ static unsigned long long getXCR0()
 #define CPUID_00000001_ECX_AVX_MASK     (0x1 << 28)
 #define CPUID_00000001_EDX_SSE2_MASK    (0x1 << 26)
 #define CPUID_00000007_EBX_AVX2_MASK    (0x1 <<  5)
+#define CPUID_00000007_EBX_AVX512_MASK  (0x1 << 16)
 #define CPUID_80000001_ECX_FMA4_MASK    (0x1 << 16)
 
 // Masks for relevant XCR0 register bits.
@@ -170,6 +171,7 @@ struct CPUIDInfo
     bool        sse2   : 1;
     bool        avx    : 1;
     bool        avx2   : 1;
+    bool        avx512 : 1;
     bool        fma3   : 1;
     bool        fma4   : 1;
 #if POV_CPUINFO_DEBUG
@@ -184,6 +186,7 @@ CPUIDInfo::CPUIDInfo() :
     sse2(false),
     avx(false),
     avx2(false),
+    avx512(false),
     fma3(false),
     fma4(false),
     vendorId(kCPUVendor_Unrecognized)
@@ -220,6 +223,11 @@ CPUIDInfo::CPUIDInfo() :
         CPUID(info, 0x7);
         avx2    = ((info[CPUID_EBX] & CPUID_00000007_EBX_AVX2_MASK)    != 0);
     }
+    if (maxLeaf >= 0x7)
+    {
+        CPUID(info, 0x7);
+        avx512 = ((info[CPUID_EBX] & CPUID_00000007_EBX_AVX512_MASK) != 0);
+    }
     CPUID(info, 0x80000000);
     int maxLeafExt = info[CPUID_EAX];
     if (maxLeafExt >= (int)0x80000001)
@@ -233,6 +241,7 @@ struct OSInfo
 {
     bool xcr0_sse : 1;
     bool xcr0_avx : 1;
+    bool xcr0_avx512 : 1;
     OSInfo(const CPUIDInfo& cpuinfo);
 };
 
@@ -274,6 +283,16 @@ bool CPUInfo::SupportsAVX()
 {
     return gpData->cpuidInfo.osxsave
         && gpData->cpuidInfo.avx
+        && gpData->osInfo.xcr0_sse
+        && gpData->osInfo.xcr0_avx;
+}
+
+bool CPUInfo::SupportsAVX512()
+{
+    return gpData->cpuidInfo.osxsave
+        && gpData->cpuidInfo.avx
+        && gpData->cpuidInfo.avx2
+        && gpData->cpuidInfo.avx512
         && gpData->osInfo.xcr0_sse
         && gpData->osInfo.xcr0_avx;
 }
@@ -329,6 +348,8 @@ std::string CPUInfo::GetFeatures()
         features.push_back("AVX");
     if (SupportsAVX2())
         features.push_back("AVX2");
+    if (SupportsAVX512()) 
+        features.push_back("AVX512");
     if (SupportsFMA3())
         features.push_back("FMA3");
     if (SupportsFMA4())
@@ -356,6 +377,8 @@ std::string CPUInfo::GetDetails()
         cpuidFeatures.push_back("AVX");
     if (gpData->cpuidInfo.avx2)
         cpuidFeatures.push_back("AVX2");
+    if (gpData->cpuidInfo.avx512)
+        cpuidFeatures.push_back("AVX512");
     if (gpData->cpuidInfo.fma3)
         cpuidFeatures.push_back("FMA");
     if (gpData->cpuidInfo.fma4)
@@ -371,6 +394,8 @@ std::string CPUInfo::GetDetails()
 
     if (gpData->osInfo.xcr0_avx)
         xcr0Features.push_back("AVX");
+    if (gpData->osInfo.xcr0_avx)
+        xcr0Features.push_back("AVX512");
     if (gpData->osInfo.xcr0_sse)
         xcr0Features.push_back("SSE");
 

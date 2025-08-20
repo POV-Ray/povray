@@ -1397,7 +1397,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
 
         CASE (GRANITE_TOKEN)
             New->Type = GENERIC_PATTERN;
-            New->pattern = PatternPtr(new GranitePattern());
+            New->pattern = PatternPtr((new GranitePattern())->CreateObject());
         END_CASE
 
         CASE (LEOPARD_TOKEN)
@@ -1591,7 +1591,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
 
         CASE (WRINKLES_TOKEN)
             New->Type = WRINKLES_PATTERN;
-            New->pattern = PatternPtr(new WrinklesPattern());
+            New->pattern = PatternPtr((new WrinklesPattern())->CreateObject());
         END_CASE
 
         CASE (BUMPS_TOKEN)
@@ -3120,7 +3120,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 CASE (GRANITE_TOKEN)
                     Warn_State(Token.Token_Id, PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_PATTERN;
-                    Pigment->pattern = PatternPtr(new GranitePattern());
+                    Pigment->pattern = PatternPtr((new GranitePattern())->CreateObject());
                 END_CASE
 
                 CASE (LEOPARD_TOKEN)
@@ -3290,7 +3290,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                     Warn_State(Token.Token_Id, NORMAL_TOKEN);
                     ADD_TNORMAL
                     Tnormal->Type = WRINKLES_PATTERN;
-                    Tnormal->pattern = PatternPtr(new WrinklesPattern());
+                    Tnormal->pattern = PatternPtr((new WrinklesPattern())->CreateObject());
                     Tnormal->Amount = Parse_Float ();
                 END_CASE
 
@@ -4891,7 +4891,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 
         CASE (GRANITE_TOKEN)
             New->Type = GENERIC_PATTERN;
-            New->pattern = PatternPtr(new GranitePattern());
+            New->pattern = PatternPtr((new GranitePattern())->CreateObject());
         END_CASE
 
         CASE (LEOPARD_TOKEN)
@@ -5039,7 +5039,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 
         CASE (WRINKLES_TOKEN)
             New->Type = WRINKLES_PATTERN;
-            New->pattern = PatternPtr(new WrinklesPattern());
+            New->pattern = PatternPtr((new WrinklesPattern())->CreateObject());
         END_CASE
 
         CASE (BUMPS_TOKEN)

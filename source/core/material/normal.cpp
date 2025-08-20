@@ -90,7 +90,6 @@ static void ripples (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& V
 static void waves (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& Vector, const TraceThreadData *Thread);
 static void bumps (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal);
 static void dents (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal, const TraceThreadData *Thread);
-static void wrinkles (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal);
 static void quilted (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal);
 static DBL Hermite_Cubic (DBL T1, const Vector2d& UV1, const Vector2d& UV2);
 static DBL Do_Slope_Map (DBL value, const SlopeBlendMap *Blend_Map);
@@ -313,8 +312,13 @@ static void dents (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& nor
 * CHANGES
 *
 ******************************************************************************/
+// Defined function pointer to assign it accordingly to wither wrinklesAVX or wrinklesAVX512
+#ifdef TRY_OPTIMIZED_NOISE
+wrinklesFunction wrinkles;
+#endif
 
-static void wrinkles (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal)
+// Original implementation of wrinkles
+void wrinklesAVX (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal)
 {
     int i;
     DBL scale = 1.0;
@@ -330,6 +334,34 @@ static void wrinkles (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& 
         result[X] += fabs(value[X] / scale);
         result[Y] += fabs(value[Y] / scale);
         result[Z] += fabs(value[Z] / scale);
+    }
+
+    /* Displace "normal". */
+
+    normal += (DBL)Tnormal->Amount * result;
+}
+
+// Updated implementation of wrinkles where we process two inputs simultaneously in DNoise
+void wrinklesAVX512 (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal)
+{
+    int i;
+    DBL scale = 1.0;
+
+    Vector3d result, value[2], value2[2];
+    result = Vector3d(0.0, 0.0, 0.0);
+
+    for (i = 0; i < 10; scale *= 4.0, i += 2)
+    {
+        value2[0] = EPoint * scale;
+        value2[1] = EPoint * scale * 2.0;
+        DNoise2D(*value, *value2);
+
+        result[X] += fabs(value[0][X] / scale);
+        result[Y] += fabs(value[0][Y] / scale);
+        result[Z] += fabs(value[0][Z] / scale);
+        result[X] += fabs(value[1][X] / (scale * 2.0));
+        result[Y] += fabs(value[1][Y] / (scale * 2.0));
+        result[Z] += fabs(value[1][Z] / (scale * 2.0));
     }
 
     /* Displace "normal". */

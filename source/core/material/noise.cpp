@@ -44,6 +44,8 @@
 
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/material/noise.h"
+#include "core/material/normal.h"
+#include "core/material/pattern.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -171,8 +173,11 @@ void Initialize_Noise()
         sintab[i] = sin((DBL)i / SINTABSIZE * TWO_M_PI);
 }
 
-void Initialize_Waves(vector<double>& waveFrequencies, vector<Vector3d>& waveSources, unsigned int numberOfWaves)
+// Original Initialze Waves function
+
+void Initialize_WavesAVX(vector<double>& waveFrequencies, vector<Vector3d>& waveSources, unsigned int numberOfWaves)
 {
+
     Vector3d point;
 
     waveFrequencies.clear();
@@ -184,6 +189,37 @@ void Initialize_Waves(vector<double>& waveFrequencies, vector<Vector3d>& waveSou
         DNoise(point, point);
         waveSources.push_back(point.normalized());
 
+        next_rand = next_rand * 1812433253L + 12345L;
+        waveFrequencies.push_back((double((int)(next_rand >> 16) & 0x7FFF) * 0.000030518509476) + 0.01);
+    }
+}
+
+// Variant of Initialize Waves for AVX512 version - DNoise function processes two inputs at one time
+
+void Initialize_WavesAVX512(vector<double>& waveFrequencies, vector<Vector3d>& waveSources, unsigned int numberOfWaves)
+{
+    Vector3d point[2];
+
+    waveFrequencies.clear();
+    waveSources.clear();
+
+    int i, next_rand;
+    for(i = 0, next_rand = -560851967; i < numberOfWaves - 1; i += 2)
+    {
+        point[0] = Vector3d((double)i,0.0,0.0);
+        point[1] = Vector3d((double)i + 1,0.0,0.0);
+        DNoise2D(*point, *point);
+        waveSources.push_back(point[0].normalized());
+        waveSources.push_back(point[1].normalized());
+        next_rand = next_rand * 1812433253L + 12345L;
+        waveFrequencies.push_back((double((int)(next_rand >> 16) & 0x7FFF) * 0.000030518509476) + 0.01);
+        next_rand = next_rand * 1812433253L + 12345L;
+        waveFrequencies.push_back((double((int)(next_rand >> 16) & 0x7FFF) * 0.000030518509476) + 0.01);
+    }
+    if(i == numberOfWaves - 1) {
+        point[0] = Vector3d((double)i,0.0,0.0);
+        DNoise(point[0], point[0]);
+        waveSources.push_back(point[0].normalized());
         next_rand = next_rand * 1812433253L + 12345L;
         waveFrequencies.push_back((double((int)(next_rand >> 16) & 0x7FFF) * 0.000030518509476) + 0.01);
     }
@@ -504,7 +540,9 @@ SolidDNoise(const Vector3d& P, Vector3d& D)
 *
 ******************************************************************************/
 
-DBL Turbulence(const Vector3d& EPoint, const GenericTurbulenceWarp *Turb, int noise_generator)
+// Original Turbulence function
+
+DBL TurbulenceAVX(const Vector3d& EPoint, const GenericTurbulenceWarp *Turb, int noise_generator)
 {
     int i;
     DBL Lambda, Omega, l, o, value;
@@ -549,6 +587,74 @@ DBL Turbulence(const Vector3d& EPoint, const GenericTurbulenceWarp *Turb, int no
             o *= Omega;
         }
     }
+
+    return (value);
+}
+
+// Variant of Turbulence written for AVX512 version - Noise processes two inputs at one time
+
+DBL TurbulenceAVX512(const Vector3d& EPoint, const GenericTurbulenceWarp *Turb, int noise_generator)
+{
+    int i;
+    DBL Lambda, Omega, l, o, value, noise[2];
+    Vector3d temp[2];
+
+    int Octaves=Turb->Octaves;
+
+    // TODO - This distinction (with minor variations that seem to be more of an inconsistency rather than intentional)
+    // appears in other places as well; make it a function.
+    switch(noise_generator)
+    {
+        case kNoiseGen_Default:
+        case kNoiseGen_Original:
+            value = Noise(EPoint, noise_generator);
+            break;
+        default:
+            value = (2.0 * Noise(EPoint, noise_generator) - 0.5);
+            value = min(max(value,0.0),1.0);
+            break;
+    }
+
+    l = Lambda = Turb->Lambda;
+    o = Omega  = Turb->Omega;
+
+    for (i = 2; i < Octaves; i+=2)
+    {
+        temp[0] = EPoint * l;
+        temp[1] = EPoint * l * Lambda;
+        Noise2D(*temp, noise_generator, *noise);
+        switch(noise_generator)
+        {
+            case kNoiseGen_Default:
+            case kNoiseGen_Original:
+                value += o * noise[0];
+                value += o * Omega * noise[1];
+                break;
+            default:
+                value += o * (2.0 * noise[0] - 0.5); // TODO similar code clips the (2.0 * Noise(temp, noise_generator) - 0.5) term
+                value += o * Omega * (2.0 * noise[1] - 0.5);
+                break;
+        }
+        l *= Lambda * Lambda;
+        o *= Omega * Omega;
+    }
+
+    if(i == Octaves) {
+        temp[0] = EPoint * l;
+        // TODO - This distinction (with minor variations that seem to be more of an inconsistency rather than intentional)
+        // appears in other places as well; make it a function.
+        switch(noise_generator)
+        {
+            case kNoiseGen_Default:
+            case kNoiseGen_Original:
+                value += o * Noise(temp[0], noise_generator);
+                break;
+            default:
+                value += o * (2.0 * Noise(temp[0], noise_generator) - 0.5); // TODO similar code clips the (2.0 * Noise(temp, noise_generator) - 0.5) term
+                break;
+        }
+    }
+
     return (value);
 }
 
@@ -582,9 +688,9 @@ DBL Turbulence(const Vector3d& EPoint, const GenericTurbulenceWarp *Turb, int no
 *   ??? ???? : Updated with varible Octaves, Lambda, & Omega by [DMF]
 *
 ******************************************************************************/
+// Original DTurbulence function
 
-
-void DTurbulence(Vector3d& result, const Vector3d& EPoint, const GenericTurbulenceWarp *Turb)
+void DTurbulenceAVX(Vector3d& result, const Vector3d& EPoint, const GenericTurbulenceWarp *Turb)
 {
     DBL Omega, Lambda;
     int i;
@@ -614,11 +720,54 @@ void DTurbulence(Vector3d& result, const Vector3d& EPoint, const GenericTurbulen
     }
 }
 
+// Variant of DTurbulence written for AVX512 version
+
+void DTurbulenceAVX512(Vector3d& result, const Vector3d& EPoint, const GenericTurbulenceWarp *Turb)
+{
+    DBL Omega, Lambda;
+    int i;
+    DBL l, o;
+    int Octaves=Turb->Octaves;
+    Vector3d value[2], temp[2];
+    result[X] = result[Y] = result[Z] = 0.0;
+    value[0][X] = value[0][Y] = value[0][Z] = 0.0;
+    value[1][X] = value[1][Y] = value[1][Z] = 0.0;
+
+    DNoise(result, EPoint);
+
+    l = Lambda = Turb->Lambda;
+    o = Omega  = Turb->Omega;
+
+    // Processes two input Vector3D EPoint at a time - Result vector reduced from the resultant DNoise vectors
+    for (i = 2; i < Octaves; i += 2)
+    {
+        temp[0] = EPoint * l;
+        temp[1] = EPoint * l * Lambda;
+        DNoise2D(*value, *temp);
+        result += o * value[0];
+        result += o * Omega * value[1];
+        l *= Lambda * Lambda;
+        o *= Omega * Omega;
+    }
+
+    if(i == Octaves) {
+        temp[0] = EPoint * l;
+        DNoise(value[0], temp[0]);
+        result += o * value[0];
+    }
+}
+
 
 #ifdef TRY_OPTIMIZED_NOISE
 
 NoiseFunction Noise;
 DNoiseFunction DNoise;
+NoiseFunction2D Noise2D;
+DNoiseFunction2D DNoise2D;
+NoiseFunction8D Noise8D;
+DTurbulenceFunction DTurbulence;
+Initialize_WavesFunction Initialize_Waves;
+TurbulenceFunction Turbulence;
 
 /*****************************************************************************
 *
@@ -660,18 +809,35 @@ void Initialise_NoiseDispatch()
         if (pNoiseImpl->init) pNoiseImpl->init();
         Noise = pNoiseImpl->noise;
         DNoise = pNoiseImpl->dNoise;
+        Noise2D = pNoiseImpl->noise2D;
+        DNoise2D = pNoiseImpl->dnoise2D;
+        Noise8D = pNoiseImpl->noise8D;
+        DTurbulence = pNoiseImpl->DTurbulence;
+        Initialize_Waves = pNoiseImpl->Initialize_Waves;
+        Turbulence = pNoiseImpl->Turbulence;
+        wrinkles = pNoiseImpl -> wrinkles;
+        GranitePattern::choose_implementation = pNoiseImpl->PatternConstructor;
+        WrinklesPattern::choose_implementation = pNoiseImpl->PatternConstructor;
     }
 }
 
 OptimizedNoiseInfo gPortableNoiseInfo = {
-    "generic",      // name,
-    "portable",     // info,
-    PortableNoise,  // noise,
-    PortableDNoise, // dNoise,
-    nullptr,        // enabled,
-    nullptr,        // supported,
-    nullptr,        // recommended,
-    nullptr         // init
+    "generic",            // name,
+    "portable",           // info,
+    PortableNoise,        // noise,
+    PortableDNoise,       // dNoise,
+    nullptr,              //noise2D
+    nullptr,              //dnoise2D
+    nullptr,              // noise8D
+    DTurbulenceAVX,       // DTurbulence
+    Initialize_WavesAVX,  // Initalize Waves
+    TurbulenceAVX,        // Turbulence
+    wrinklesAVX,          // wrinkles
+    false,                // value to set versions of WrinklesPattern and GranitePattern
+    nullptr,              // enabled,
+    nullptr,              // supported,
+    nullptr,              // recommended,
+    nullptr               // init
 };
 
 const OptimizedNoiseInfo* GetRecommendedOptimizedNoise()

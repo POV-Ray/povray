@@ -136,8 +136,9 @@ using boost::intrusive_ptr;
 #ifndef POV_COMPILER_VER
   #define POV_COMPILER_VER "u"
 #endif
-
-#if defined(BUILD_AVX2)
+#if defined(BUILD_AVX512)
+    #define POV_BUILD_INFO POV_COMPILER_VER ".avx512." POVRAY_PLATFORM_NAME
+#elif defined(BUILD_AVX2)
   #define POV_BUILD_INFO POV_COMPILER_VER ".avx2." POVRAY_PLATFORM_NAME
 #elif defined(BUILD_AVX)
   #define POV_BUILD_INFO POV_COMPILER_VER ".avx." POVRAY_PLATFORM_NAME
