@@ -119,7 +119,7 @@ typedef POV_UINT32  ULONG;
 typedef POV_INT16   FWord;
 typedef POV_UINT16  uFWord;
 
-#if !defined(TARGET_OS_MAC)
+#if !defined(__MACTYPES__)
 typedef int Fixed;
 #endif
 
@@ -3065,4 +3065,3 @@ TrueTypeInfo::~TrueTypeInfo()
 }
 
 }
-
