@@ -113,7 +113,7 @@
 #include "vm/fnpovfpu.h"
 
 // POV-Ray header files (parser module)
-//  (none at the moment)
+#include "parser/ImageCache.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -122,6 +122,7 @@ namespace pov_parser
 {
 
 using namespace pov;
+using namespace pov_image_cache;
 
 using std::min;
 using std::max;
@@ -9971,8 +9972,12 @@ OStream *Parser::CreateFile(const UCS2String& filename, unsigned int stype, bool
 
 //******************************************************************************
 
-Image *Parser::Read_Image(int filetype, const UCS2 *filename, const ImageReadOptions& options)
+Image *Parser::Read_Image(int filetype, const UCS2* filename, const ImageReadOptions& options)
 {
+    Image* img = pov_image_cache::GetCachedImage(filename);
+    if (img != nullptr)
+        return img;
+
     unsigned int stype;
     Image::ImageFileType type;
     UCS2String ign;
@@ -10040,7 +10045,11 @@ Image *Parser::Read_Image(int filetype, const UCS2 *filename, const ImageReadOpt
     if (file == nullptr)
         throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot find image file.");
 
-    return Image::Read(type, file.get(), options);
+    img = Image::Read(type, file.get(), options);
+
+    pov_image_cache::StoreImageInCache(filename, img);
+    
+    return img;
 }
 
 //******************************************************************************
