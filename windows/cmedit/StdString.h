@@ -64,7 +64,7 @@
 //			- Jim Cline
 //			- Jeff Kohn
 //			- Todd Heckel
-//			- Ullrich Pollähne
+//			- Ullrich Pollï¿½hne
 //			- Joe Vitaterna
 //			- Joe Woodbury
 //			- Aaron (no last name)
@@ -212,7 +212,7 @@
 //	  2000-APR-17 - Thanks to Joe Vitaterna for pointing out that ReverseFind
 //					is supposed to be a const function.
 //
-//	  2000-MAR-07 - Thanks to Ullrich Pollähne for catching a range bug in one
+//	  2000-MAR-07 - Thanks to Ullrich Pollï¿½hne for catching a range bug in one
 //					of the overloads of assign.
 //
 //    2000-FEB-01 - You can now use CStdString on the Mac with CodeWarrior!
@@ -714,7 +714,7 @@ inline const Type& SSMAX(const Type& arg1, const Type& arg2)
 		#endif
 		#define SS_USE_FACET(loc, fac) std::use_facet<fac >(loc)
 	#elif defined(_MSC_VER )
-	#define SS_USE_FACET(loc, fac) std::_USE(loc, fac)
+	#define SS_USE_FACET(loc, fac) std::use_facet<fac>(loc)
 
 	// ...and
 	#elif defined(_RWSTD_NO_TEMPLATE_ON_RETURN_TYPE)
@@ -2090,7 +2090,7 @@ public:
 			// <nChars> or the NULL terminator, whichever comes first.  Since we
 			// are about to call a less forgiving overload (in which <nChars>
 			// must be a valid length), we must adjust the length here to a safe
-			// value.  Thanks to Ullrich Pollähne for catching this bug
+			// value.  Thanks to Ullrich Pollï¿½hne for catching this bug
 
 			nChars		= SSMIN(nChars, str.length() - nStart);
 
@@ -2121,7 +2121,7 @@ public:
 			// <nChars> or the NULL terminator, whichever comes first.  Since we
 			// are about to call a less forgiving overload (in which <nChars>
 			// must be a valid length), we must adjust the length here to a safe
-			// value. Thanks to Ullrich Pollähne for catching this bug
+			// value. Thanks to Ullrich Pollï¿½hne for catching this bug
 
 			nChars		= SSMIN(nChars, str.length() - nStart);
 
