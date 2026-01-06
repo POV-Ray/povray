@@ -138,18 +138,14 @@ InputFile::Data::Data (int numThreads):
 
 InputFile::Data::~Data ()
 {
-    if (tFile)
-        delete tFile;
-    if (sFile)
-        delete sFile;
-    if (dsFile)
-        delete dsFile;
-    if (compositor)
-        delete compositor;
+    delete tFile;
+    delete sFile;
+    delete dsFile;
+    delete compositor;
 
     deleteCachedBuffer();
 
-    if (multiPartBackwardSupport && multiPartFile)
+    if (multiPartBackwardSupport)
         delete multiPartFile;
 }
 
@@ -384,15 +380,15 @@ InputFile::InputFile (const char fileName[], int numThreads):
     }
     catch (IEX_NAMESPACE::BaseExc &e)
     {
-        if (is)          delete is;
+        delete is;
          
-        if ( _data && !_data->multiPartBackwardSupport  && _data->_streamData)
+        if ( _data && !_data->multiPartBackwardSupport)
         {
             delete _data->_streamData;
             _data->_streamData=NULL;
         }
         
-        if (_data)       delete _data;
+        delete _data;
         _data=NULL;
 
         REPLACE_EXC (e, "Cannot read image file "
@@ -401,12 +397,12 @@ InputFile::InputFile (const char fileName[], int numThreads):
     }
     catch (...)
     {
-        if (is)          delete is;
-        if (_data && !_data->multiPartBackwardSupport && _data->_streamData)
+        delete is;
+        if (_data && !_data->multiPartBackwardSupport)
         {
             delete _data->_streamData;
         }
-        if (_data)       delete _data;
+        delete _data;
 
         throw;
     }
@@ -452,8 +448,8 @@ InputFile::InputFile (OPENEXR_IMF_INTERNAL_NAMESPACE::IStream &is, int numThread
     }
     catch (IEX_NAMESPACE::BaseExc &e)
     {
-        if (_data && !_data->multiPartBackwardSupport && _data->_streamData) delete _data->_streamData;
-        if (_data)       delete _data;
+        if (_data && !_data->multiPartBackwardSupport) delete _data->_streamData;
+        delete _data;
         _data=NULL; 
 
         REPLACE_EXC (e, "Cannot read image file "
@@ -462,8 +458,8 @@ InputFile::InputFile (OPENEXR_IMF_INTERNAL_NAMESPACE::IStream &is, int numThread
     }
     catch (...)
     {
-        if (_data &&  !_data->multiPartBackwardSupport  && _data->_streamData) delete _data->_streamData;
-        if (_data)       delete _data;
+        if (_data &&  !_data->multiPartBackwardSupport) delete _data->_streamData;
+        delete _data;
         _data=NULL;
         throw;
     }
@@ -605,10 +601,10 @@ InputFile::~InputFile ()
 
     // unless this file was opened via the multipart API,
     // delete the streamData object too
-    if (_data->partNumber==-1 && _data->_streamData)
+    if (_data->partNumber==-1)
         delete _data->_streamData;
 
-    if (_data)  delete _data;
+    delete _data;
 }
 
 const char *

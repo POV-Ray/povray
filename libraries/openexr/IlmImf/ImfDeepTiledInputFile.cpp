@@ -440,7 +440,7 @@ readTileData (InputStreamMutex *streamData,
     {
         // (TODO) check if the packed data size is too big?
         // (TODO) better memory management here. Don't delete buffer everytime.
-        if (buffer != 0) delete[] buffer;
+        delete[] buffer;
         buffer = new char[dataSize];
         streamData->is->read (buffer, dataSize);
     }
@@ -611,8 +611,7 @@ TileBufferTask::execute ()
         }
 
         // (TODO) don't do this every time.
-        if (_tileBuffer->compressor != 0)
-            delete _tileBuffer->compressor;
+        delete _tileBuffer->compressor;
         _tileBuffer->compressor = newTileCompressor
                                   (_ifd->header.compression(),
                                    maxBytesPerTileLine,
@@ -824,9 +823,9 @@ DeepTiledInputFile::DeepTiledInputFile (const char fileName[], int numThreads):
     }
     catch (IEX_NAMESPACE::BaseExc &e)
     {
-        if (is)          delete is;
-        if (_data && !_data->multiPartBackwardSupport && _data->_streamData) delete _data->_streamData;
-        if (_data)       delete _data;
+        delete is;
+        if (_data && !_data->multiPartBackwardSupport) delete _data->_streamData;
+        delete _data;
 
         REPLACE_EXC (e, "Cannot open image file "
                         "\"" << fileName << "\". " << e);
@@ -834,9 +833,9 @@ DeepTiledInputFile::DeepTiledInputFile (const char fileName[], int numThreads):
     }
     catch (...)
     {
-        if (is)          delete is;
-        if (_data && !_data->multiPartBackwardSupport && _data->_streamData) delete _data->_streamData;
-        if (_data)       delete _data;
+        delete is;
+        if (_data && !_data->multiPartBackwardSupport) delete _data->_streamData;
+        delete _data;
 
         throw;
     }
@@ -879,8 +878,8 @@ DeepTiledInputFile::DeepTiledInputFile (OPENEXR_IMF_INTERNAL_NAMESPACE::IStream 
     }
     catch (IEX_NAMESPACE::BaseExc &e)
     {
-        if (_data && !_data->multiPartBackwardSupport && _data->_streamData) delete _data->_streamData;
-        if (_data)       delete _data;
+        if (_data && !_data->multiPartBackwardSupport) delete _data->_streamData;
+        delete _data;
 
         REPLACE_EXC (e, "Cannot open image file "
                         "\"" << is.fileName() << "\". " << e);
@@ -888,8 +887,8 @@ DeepTiledInputFile::DeepTiledInputFile (OPENEXR_IMF_INTERNAL_NAMESPACE::IStream 
     }
     catch (...)
     {
-        if (_data && !_data->multiPartBackwardSupport && _data->_streamData) delete _data->_streamData;
-        if (_data)       delete _data;
+        if (_data && !_data->multiPartBackwardSupport) delete _data->_streamData;
+        delete _data;
 
         throw;
     }
@@ -1052,8 +1051,7 @@ DeepTiledInputFile::~DeepTiledInputFile ()
 {
     if (!_data->memoryMapped)
         for (size_t i = 0; i < _data->tileBuffers.size(); i++)
-            if (_data->tileBuffers[i]->buffer != 0)
-                delete [] _data->tileBuffers[i]->buffer;
+            delete [] _data->tileBuffers[i]->buffer;
 
     if (_data->_deleteStream)
         delete _data->_streamData->is;

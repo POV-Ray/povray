@@ -132,8 +132,7 @@ SceneData::~SceneData()
     //       to handle cleanup of individual objects ?
     Destroy_Object(objects);
 
-    if (tree != nullptr)
-        delete tree;
+    delete tree;
 }
 
 }

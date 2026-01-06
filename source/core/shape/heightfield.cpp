@@ -1340,10 +1340,7 @@ HField::~HField()
         {
             for (i = 0; i < Data->max_z+2; i++)
             {
-                if (Data->Map[i] != nullptr)
-                {
-                    delete[] Data->Map[i];
-                }
+                delete[] Data->Map[i];
             }
 
             delete[] Data->Map;

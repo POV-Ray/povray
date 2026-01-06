@@ -59,7 +59,7 @@ Imf::Zip::Zip(size_t maxScanLineSize, size_t numScanLines):
 
 Imf::Zip::~Zip()
 {
-    if (_tmpBuffer) delete[] _tmpBuffer;
+    delete[] _tmpBuffer;
 }
 
 size_t

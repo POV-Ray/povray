@@ -216,8 +216,7 @@ void Copy_Pigments (vector<PIGMENT*>& New, const vector<PIGMENT*>& Old)
 
 void Destroy_Pigment (PIGMENT *Pigment)
 {
-    if (Pigment != nullptr)
-        delete Pigment;
+    delete Pigment;
 }
 
 

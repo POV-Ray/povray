@@ -599,8 +599,7 @@ Polygon::~Polygon()
     {
         if (--(Data->References) == 0)
         {
-            if (Data->Points != nullptr)
-                delete[] Data->Points;
+            delete[] Data->Points;
             delete Data;
         }
     }

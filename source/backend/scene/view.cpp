@@ -119,8 +119,7 @@ ViewData::ViewData(shared_ptr<BackendSceneData> sd) :
 
 ViewData::~ViewData()
 {
-    if (rtrData != nullptr)
-        delete rtrData;
+    delete rtrData;
 }
 
 void ViewData::getBlockXY(const unsigned int nb, unsigned int &x, unsigned int &y)

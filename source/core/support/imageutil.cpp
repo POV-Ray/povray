@@ -1397,12 +1397,10 @@ ImageData::~ImageData()
 {
 #ifdef POV_VIDCAP_IMPL
     // beta-test feature
-    if (VidCap != nullptr)
-        delete VidCap;
+    delete VidCap;
 #endif
 
-    if (data != nullptr)
-        delete data;
+    delete data;
 }
 
 }

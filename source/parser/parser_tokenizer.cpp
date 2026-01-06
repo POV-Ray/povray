@@ -2142,8 +2142,7 @@ Parser::Macro::~Macro()
         POV_FREE(parameters[i].name);
     }
 
-    if (Cache != nullptr)
-        delete[] Cache;
+    delete[] Cache;
 }
 
 Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)

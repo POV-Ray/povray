@@ -3104,9 +3104,7 @@ TrueTypeFont::TrueTypeFont(const UCS2String& fn, const std::shared_ptr<IStream>&
 TrueTypeFont::~TrueTypeFont()
 {
     file = nullptr;
-
-    if (info != nullptr)
-        delete info;
+    delete info;
 }
 
 CMAPSelector::CMAPSelector(USHORT pid, USHORT sid, CharsetID cs) :
@@ -3131,17 +3129,10 @@ CMAP4Info::CMAP4Info() :
 
 CMAP4Info::~CMAP4Info()
 {
-    if (endCount != nullptr)
-        delete[] endCount;
-
-    if (startCount != nullptr)
-        delete[] startCount;
-
-    if (idDelta != nullptr)
-        delete[] idDelta;
-
-    if (idRangeOffset != nullptr)
-        delete[] idRangeOffset;
+    delete[] endCount;
+    delete[] startCount;
+    delete[] idDelta;
+    delete[] idRangeOffset;
 }
 
 TrueTypeInfo::TrueTypeInfo() :
@@ -3160,13 +3151,11 @@ TrueTypeInfo::TrueTypeInfo() :
 
 TrueTypeInfo::~TrueTypeInfo()
 {
-    if (loca_table != nullptr)
-        delete[] loca_table;
+    delete[] loca_table;
 
     for (GlyphPtrMap::iterator iGlyph = glyphsByIndex.begin(); iGlyph != glyphsByIndex.end(); ++iGlyph)
     {
-        if ((*iGlyph).second->contours != nullptr)
-            delete[] (*iGlyph).second->contours;
+        delete[] (*iGlyph).second->contours;
         delete (*iGlyph).second;
     }
 
@@ -3174,19 +3163,16 @@ TrueTypeInfo::~TrueTypeInfo()
     {
         for (int i = 0; i < kerning_tables.nTables; i++)
         {
-            if (kerning_tables.tables[i].kern_pairs != nullptr)
-                delete[] kerning_tables.tables[i].kern_pairs;
+            delete[] kerning_tables.tables[i].kern_pairs;
         }
 
         delete[] kerning_tables.tables;
     }
 
-    if (hmtx_table != nullptr)
-        delete[] hmtx_table;
+    delete[] hmtx_table;
 
     for (std::vector<CMAPInfo*>::iterator i = cmapInfo.begin(); i != cmapInfo.end(); ++i)
-        if (*i != nullptr)
-            delete *i;
+        delete *i;
 }
 
 }

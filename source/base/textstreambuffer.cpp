@@ -75,8 +75,7 @@ TextStreamBuffer::~TextStreamBuffer()
     bsize = 0;
     wrap = 0;
     curline = 0;
-    if (buffer != nullptr)
-        delete[] buffer;
+    delete[] buffer;
     buffer = nullptr;
 }
 

@@ -462,8 +462,7 @@ ColourFunctionPattern::~ColourFunctionPattern()
 {
     for (int iChannel = 0; iChannel < 5; ++iChannel)
     {
-        if (pFn[iChannel])
-            delete pFn[iChannel];
+        delete pFn[iChannel];
     }
 }
 
@@ -567,8 +566,7 @@ FunctionPattern::FunctionPattern(const FunctionPattern& obj) :
 
 FunctionPattern::~FunctionPattern()
 {
-    if (pFn)
-        delete pFn;
+    delete pFn;
 }
 
 
@@ -9196,18 +9194,15 @@ void Destroy_Density_File(DENSITY_FILE *Density_File)
 
                 if(Density_File->Data->Type == 4)
                 {
-                    if (Density_File->Data->Density32)
-                        delete[] Density_File->Data->Density32;
+                    delete[] Density_File->Data->Density32;
                 }
                 else if(Density_File->Data->Type == 2)
                 {
-                    if (Density_File->Data->Density16)
-                        delete[] Density_File->Data->Density16;
+                    delete[] Density_File->Data->Density16;
                 }
                 else if(Density_File->Data->Type == 1)
                 {
-                    if (Density_File->Data->Density8)
-                        delete[] Density_File->Data->Density8;
+                    delete[] Density_File->Data->Density8;
                 }
 
                 delete Density_File->Data;

@@ -505,8 +505,7 @@ void Destroy_Textures(TEXTURE *Textures)
         // Theoretically these should only be non-`nullptr` for PLAIN_PATTERN, but let's clean them up either way.
         Destroy_Pigment(Layer->Pigment);
         Destroy_Tnormal(Layer->Tnormal);
-        if (Layer->Finish)
-            delete Layer->Finish;
+        delete Layer->Finish;
 
         // Theoretically these should only be non-empty for BITMAP_PATTERN, but let's clean them up either way.
         for(vector<TEXTURE*>::iterator i = Layer->Materials.begin(); i != Layer->Materials.end(); ++ i)

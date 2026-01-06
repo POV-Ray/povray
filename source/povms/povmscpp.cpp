@@ -1412,22 +1412,16 @@ void POVMS_Object::Read(InputStream& stream, bool continued, bool headeronly)
                 throw POV_EXCEPTION_CODE(pov_base::kCannotHandleDataErr);
         }
 
-        if (objectstream != nullptr)
-            delete[] objectstream;
+        delete[] objectstream;
         objectstream = nullptr;
 
-        if (compressedstream != nullptr)
-            delete[] compressedstream;
+        delete[] compressedstream;
         compressedstream = nullptr;
     }
     catch(...)
     {
-        if (objectstream != nullptr)
-            delete[] objectstream;
-
-        if (compressedstream != nullptr)
-            delete[] compressedstream;
-
+        delete[] objectstream;
+        delete[] compressedstream;
         throw;
     }
 }
@@ -1504,22 +1498,16 @@ void POVMS_Object::Write(OutputStream& stream, bool append, bool compress)
                 throw POV_EXCEPTION_CODE(pov_base::kFileDataErr);
         }
 
-        if (objectstream != nullptr)
-            delete[] objectstream;
+        delete[] objectstream;
         objectstream = nullptr;
 
-        if (compressedstream != nullptr)
-            delete[] compressedstream;
+        delete[] compressedstream;
         compressedstream = nullptr;
     }
     catch(...)
     {
-        if (objectstream != nullptr)
-            delete[] objectstream;
-
-        if (compressedstream != nullptr)
-            delete[] compressedstream;
-
+        delete[] objectstream;
+        delete[] compressedstream;
         throw;
     }
 }
@@ -1822,10 +1810,8 @@ void POVMS_MessageReceiver::RemoveNode(HandlerNode *nodeptr)
         if(receivers == nodeptr)
             receivers = nodeptr->next;
 
-        if (nodeptr->handleroo != nullptr)
-            delete nodeptr->handleroo;
-        if (nodeptr->handler != nullptr)
-            delete nodeptr->handler;
+        delete nodeptr->handleroo;
+        delete nodeptr->handler;
 
         delete nodeptr;
     }
