@@ -114,6 +114,9 @@
     <ClCompile Include="..\..\source\backend\control\parsertask.cpp">
       <Filter>Backend Source\Control</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\backend\support\processorGroups.cpp">
+      <Filter>Backend Source\Support</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\backend\configbackend.h">
@@ -208,6 +211,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\backend\control\messagefactory_fwd.h">
       <Filter>Backend Headers\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\support\processorGroups.h">
+      <Filter>Backend Headers\Support</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
