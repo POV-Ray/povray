@@ -394,6 +394,10 @@ process(register int code, unsigned char** fill)
     }
 
     if (oldcode == -1) {
+        if (code >= clear) {
+            fprintf(stderr, "bad input: code=%d is larger than clear=%d\n",code, clear);
+            return 0;
+        }
 	*(*fill)++ = suffix[code];
 	firstchar = oldcode = code;
 	return 1;
