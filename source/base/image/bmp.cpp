@@ -667,24 +667,56 @@ Image *Read (IStream *file, const ImageReadOptions& options)
         int pad = has_alpha ? 0 : (4 - ((file_width * 3) % 4)) & 0x03 ;
         unsigned int a = 255 ; // value to use for files that don't have an alpha channel (full opacity)
 
-        for (int y = file_height - 1 ; y >= 0 ; y--)
+        const unsigned int pixelWidth = (has_alpha ? 4 : 3);
+        const unsigned int rowLength = file_width * pixelWidth;
+
+        unsigned char* rowBuffer = new unsigned char[rowLength];
+
+        if (has_alpha)
         {
-            for (int x = 0 ; x < file_width ; x++)
+            for (int y = file_height - 1; y >= 0; y--)
             {
-                unsigned int b = Read_Safe_Char (*file);
-                unsigned int g = Read_Safe_Char (*file);
-                unsigned int r = Read_Safe_Char (*file);
-                if (has_alpha)
-                    a = Read_Safe_Char (*file);
-                SetEncodedRGBAValue (image, x, y, gamma, 255, r, g, b, a, premul);
+                file->read(rowBuffer, rowLength);
+                if (!file)
+                    throw POV_EXCEPTION(kFileDataErr, "Error reading data from BMP image.");
+
+                int offset = rowLength - pixelWidth;
+
+                for (int x = file_width - 1; x >= 0; x--)
+                {
+                    SetEncodedRGBAValue(image, x, y, gamma, 255, rowBuffer[offset + 2], rowBuffer[offset + 1], rowBuffer[offset], rowBuffer[offset + 3], premul);
+                    offset -= pixelWidth;
+                }
+
+                if (pad && !Skip(file, pad))
+                    throw POV_EXCEPTION(kFileDataErr, "Error reading data from BMP image.");
             }
-            if (pad && !Skip (file, pad))
-                throw POV_EXCEPTION(kFileDataErr, "Error reading data from BMP image.") ;
         }
+        else
+        {
+            for (int y = file_height - 1; y >= 0; y--)
+            {
+                file->read(rowBuffer, rowLength);
+                if (!file)
+                    throw POV_EXCEPTION(kFileDataErr, "Error reading data from BMP image.");
+
+                int offset = rowLength - pixelWidth;
+
+                for (int x = file_width - 1; x >= 0; x--)
+                {
+                    SetEncodedRGBValue(image, x, y, gamma, 255, rowBuffer[offset + 2], rowBuffer[offset + 1], rowBuffer[offset]);
+                    offset -= pixelWidth;
+                }
+
+                if (pad && !Skip(file, pad))
+                    throw POV_EXCEPTION(kFileDataErr, "Error reading data from BMP image.");
+            }
+        }
+
+        delete[] rowBuffer;
     }
 
-    return (image) ;
-
+    return (image);
 }
 
 }
