@@ -855,6 +855,7 @@ if test x"$enable_optimiz" != x"no"; then
         AX_TEST_COMPILER_FLAGS([-finline-functions])
       fi
       AX_TEST_COMPILER_FLAGS([-ffast-math])
+      AX_TEST_COMPILER_FLAGS([-fno-finite-math-only])
       ;;
 
     intel)
