@@ -16,11 +16,14 @@
 - [Documentation](#documentation)
 - [Contacting Us](#contacting-us)
 
+Development Status (October 2026)
+---------------------------------
+We are finally able to start clearing a long backlog of PR's and fix our CI. A beta .3 release is
+anticipated by the end of this month.
+
+
 Development Status (November 2024)
 --------------------------------------
-After a long break in releases of 3.8 beta test candidates, development is resuming, though not at the
-pace of past releases.
-
 One impediment we have yet to overcome is code signing for the Windows platform. Currently we have
 no means of doing so as our previous key has expired. The difficulty is both cost and the need for
 flexibility in verifying us as an organization. Despite the fact that we have a company registered
