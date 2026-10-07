@@ -5,7 +5,7 @@
 [![Code Analysis](https://github.com/POV-Ray/povray/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/POV-Ray/povray/actions/workflows/codeql-analysis.yml)
 [![Maintenance Status](https://img.shields.io/maintenance/yes/2024.svg)](README.md "Last edited 2024-11-03")
 
-- [Development Status (November 2024)](#development-status-november-2024)
+- [Development Status (October 2026)](#development-status-october-2026)
 - [License](#license)
 - [Forums](#forums)
 - [Bug Reports](#bug-reports)
@@ -20,19 +20,6 @@ Development Status (October 2026)
 ---------------------------------
 We are finally able to start clearing a long backlog of PR's and fix our CI. A beta .3 release is
 anticipated by the end of this month.
-
-
-Development Status (November 2024)
---------------------------------------
-One impediment we have yet to overcome is code signing for the Windows platform. Currently we have
-no means of doing so as our previous key has expired. The difficulty is both cost and the need for
-flexibility in verifying us as an organization. Despite the fact that we have a company registered
-in Australia (Persistence of Vision Raytracer Pty. Ltd.) and it is visible on the ASIC website, it
-is our experience that the verification process gets hung up by the fact the company doesn't sell
-anything, have a street address, or have a phone number.
-
-While we do not generally sign beta releases, it is our policy that official releases for the Windows
-platform are expected to be signed.
 
 License
 --------------------------------------
