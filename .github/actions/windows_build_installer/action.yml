@@ -40,4 +40,4 @@ runs:
       makensis.exe setup.nsi
       set INSTALLER_FILE=povwin-v%FULLVER%-setup.exe
       ren "povwin-%VER%-agpl3-setup.exe" "%INSTALLER_FILE%"
-      echo ::set-output name=installer-file::installer/%INSTALLER_FILE%
+      echo installer-file=installer/%INSTALLER_FILE%>> %GITHUB_OUTPUT%

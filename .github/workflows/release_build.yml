@@ -14,14 +14,14 @@ jobs:
     name: 'Sanity-Check'
     runs-on: ubuntu-latest
     outputs:
-      do-build-installer: ${{ steps.check_validity.do-build-installer }}
+      do-build-installer: ${{ steps.check_validity.outputs.do-build-installer }}
     steps:
 
     - name: 'Check out Repository'
-      uses: actions/checkout@v2
+      uses: actions/checkout@v7
 
     - name: 'Extract Source Version Information'
-      uses: POV-Ray/povray/.github/actions/get_source_version@gh-actions-v1
+      uses: ./.github/actions/get_source_version
 
     - name: 'Check Commit for Validity'
       id: check_validity
@@ -39,15 +39,15 @@ jobs:
         fi
         if test -z "${POV_RAY_PRERELEASE}" ; then
           echo "::warning::Proper release installers must be built manually from signed binaries."
-          echo "::set-output name=do-build-installer::false"
+          echo "do-build-installer=false" >> "$GITHUB_OUTPUT"
           exit 0
         fi
         if echo "${POV_RAY_PRERELEASE}" | grep '^rc[.]' >/dev/null 2>&1 ; then
           echo "::warning::Release candidate installers must be built manually from signed binaries."
-          echo "::set-output name=do-build-installer::false"
+          echo "do-build-installer=false" >> "$GITHUB_OUTPUT"
           exit 0
         fi
-        echo "::set-output name=do-build-installer::true"
+        echo "do-build-installer=true" >> "$GITHUB_OUTPUT"
 
   build_unix_package:
     name: 'Build Unix Source Package'
@@ -56,13 +56,13 @@ jobs:
     steps:
 
     - name: 'Check out Repository'
-      uses: actions/checkout@v2
+      uses: actions/checkout@v7
 
     - name: 'Extract Source Version Information'
-      uses: POV-Ray/povray/.github/actions/get_source_version@gh-actions-v1
+      uses: ./.github/actions/get_source_version
 
     - name: 'Prebuild'
-      uses: POV-Ray/povray/.github/actions/unix_prebuild@gh-actions-v1
+      uses: ./.github/actions/unix_prebuild
 
     - name: 'Package'
       shell: bash
@@ -97,7 +97,7 @@ jobs:
         gzip "${tarfile}"
 
     - name: 'Upload Artifacts for Release'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v7
       with:
         name: artifact_unix_package
         path: povunix-*.tar.gz
@@ -110,10 +110,10 @@ jobs:
     steps:
 
     - name: 'Check out Repository'
-      uses: actions/checkout@v2
+      uses: actions/checkout@v7
 
     - name: 'Extract Source Version Information'
-      uses: POV-Ray/povray/.github/actions/get_source_version@gh-actions-v1
+      uses: ./.github/actions/get_source_version
 
     - name: 'Install Prerequisites'
       shell: bash
@@ -144,7 +144,7 @@ jobs:
         cp *.pdf "${basedir}/artifact/povray-v${POV_RAY_FULL_VERSION}-sourcedoc.pdf"
 
     - name: 'Upload Artifacts for Installer Release'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v7
       with:
         name: artifact_sourcedoc
         path: artifact/*
@@ -214,13 +214,13 @@ jobs:
         echo "${{ toJSON(matrix) }}"
 
     - name: 'Check out Repository'
-      uses: actions/checkout@v2
+      uses: actions/checkout@v7
 
     - name: 'Add MSBuild to PATH'
-      uses: microsoft/setup-msbuild@v1.0.2
+      uses: microsoft/setup-msbuild@v3
 
     - name: 'Build'
-      uses: POV-Ray/povray/.github/actions/windows_build@gh-actions-v1
+      uses: ./.github/actions/windows_build
       with:
         pov-ray-build-id: gh${{github.run_number}}${{matrix.compatibility}}
         solution: ${{matrix.solution-dir}}
@@ -237,9 +237,9 @@ jobs:
         Copy-Item $env:pov_binary "installer/core/bin/${{matrix.install-name}}"
 
     - name: 'Upload Artifacts for Installer Build'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v7
       with:
-        name: artifact_installer_tree
+        name: artifact_installer_tree-${{ matrix.artifact-suffix }}
         path: installer/*
 
   build_windows_installer:
@@ -250,7 +250,7 @@ jobs:
     steps:
 
     - name: 'Check out Repository'
-      uses: actions/checkout@v2
+      uses: actions/checkout@v7
 
     - name: 'Populate Installer Tree'
       env:
@@ -278,27 +278,28 @@ jobs:
         cp -R "distribution/scenes/."                                   "installer/user/scenes"
 
     - name: 'Retrieve Artifacts for Installer Build'
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v8
       with:
-        name: artifact_installer_tree
+        pattern: artifact_installer_tree-*
         path: installer
+        merge-multiple: true
 
     - name: 'Build Installer'
       id: build-installer
-      uses: POV-Ray/povray/.github/actions/windows_build_installer@gh-actions-v1
+      uses: ./.github/actions/windows_build_installer
       with:
         installer-path: "installer"
         version-prototype: "installer/core/bin/pvengine64.exe"
 
     - name: 'Upload Artifacts for Release'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v7
       with:
         name: artifact_installer
         path: ${{ steps.build-installer.outputs.installer-file }}
 
     - name: 'Upload Installer Artifacts for Diagnostics'
       if: ${{ failure() }}
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v7
       with:
         name: artifact_installer_diag
         path: installer/*
@@ -318,31 +319,31 @@ jobs:
         ${{ needs.sanity_check.result == 'success' }}
 
     - name: 'Check out Repository'
-      uses: actions/checkout@v2
+      uses: actions/checkout@v7
 
     - name: 'Retrieve Installer Artifacts for Release'
       if: ${{ needs.build_windows_installer.status == 'success' }}
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v8
       with:
         name: artifact_installer
         path: installer
 
     - name: 'Retrieve Source Documentation Artifacts for Release'
       if: ${{ needs.build_sourcedoc.status == 'success' }}
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v8
       with:
         name: artifact_sourcedoc
         path: sourcedoc
 
     - name: 'Retrieve Unix Source Package Artifacts for Release'
       if: ${{ needs.build_unix_package.status == 'success' }}
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v8
       with:
         name: artifact_unix_package
         path: unix_package
 
     - name: 'Extract Source Version Information'
-      uses: POV-Ray/povray/.github/actions/get_source_version@gh-actions-v1
+      uses: ./.github/actions/get_source_version
 
     - name: 'Generate Version Derived Information'
       shell: bash
@@ -392,13 +393,17 @@ jobs:
         find "installer"    -type f >> ~RELEASE_ASSETS.txt || true
         find "sourcedoc"    -type f >> ~RELEASE_ASSETS.txt || true
         find "unix_package" -type f >> ~RELEASE_ASSETS.txt || true
-        echo "::set-output name=release-type::${release_type}"
-        echo "::set-output name=is-prerelease::${is_prerelease}"
-        echo "::set-output name=release-title::POV-Ray ${release_type} v${POV_RAY_FULL_VERSION}"
-        echo "::set-output name=release-assets::"`cat ~RELEASE_ASSETS.txt`
+        {
+          echo "release-type=${release_type}"
+          echo "is-prerelease=${is_prerelease}"
+          echo "release-title=POV-Ray ${release_type} v${POV_RAY_FULL_VERSION}"
+          echo "release-assets<<EOF"
+          cat ~RELEASE_ASSETS.txt
+          echo "EOF"
+        } >> "$GITHUB_OUTPUT"
 
     - name: 'Create Release'
-      uses: POV-Ray/povray/.github/actions/github_create_release@gh-actions-v1
+      uses: ./.github/actions/github_create_release
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         is-draft: true

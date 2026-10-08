@@ -57,13 +57,13 @@ jobs:
         echo '${{ toJSON(matrix) }}'
 
     - name: 'Check out Repository'
-      uses: actions/checkout@v2
+      uses: actions/checkout@v7
 
     - name: 'Add MSBuild to PATH'
-      uses: microsoft/setup-msbuild@v1.0.2
+      uses: microsoft/setup-msbuild@v3
 
     - name: 'Build'
-      uses: POV-Ray/povray/.github/actions/windows_build@gh-actions-v1
+      uses: ./.github/actions/windows_build
       with:
         pov-ray-build-id: ghvs${{matrix.visual-studio}}${{github.run_number}}${{matrix.compatibility}}
         solution: ${{matrix.solution}}
@@ -72,9 +72,9 @@ jobs:
         toolset: ${{matrix.toolset}}${{matrix.toolset-variant}}
         msbuild-options: ${{matrix.msbuild-options}}
     - name: 'Sanity-Check Working Tree'
-      uses: POV-Ray/povray/.github/actions/git_check_repo@gh-actions-v1
+      uses: ./.github/actions/git_check_repo
     - name: 'Upload Artifacts for Manual Testing'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v7
       with:
         name: artifact_bin_${{matrix.visual-studio}}_${{matrix.variant}}${{matrix.compatibility}}
         path: windows/${{matrix.solution}}/bin*/*.exe

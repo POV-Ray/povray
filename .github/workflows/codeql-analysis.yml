@@ -23,10 +23,10 @@ jobs:
     steps:
 
     - name: 'Check out Repository'
-      uses: actions/checkout@v2
+      uses: actions/checkout@v7
 
     - name: 'Initialize CodeQL'
-      uses: github/codeql-action/init@v1
+      uses: github/codeql-action/init@v4
       with:
         languages: cpp
         # Comment out the following to perform just the bare minimum of checks:
@@ -35,14 +35,14 @@ jobs:
         # queries: security-and-quality
 
     - name: 'Install Prerequisites'
-      uses: POV-Ray/povray/.github/actions/unix_getlibs@gh-actions-v1
+      uses: ./.github/actions/unix_getlibs
 
     - name: 'Prebuild'
-      uses: POV-Ray/povray/.github/actions/unix_prebuild@gh-actions-v1
+      uses: ./.github/actions/unix_prebuild
     - name: 'Configure'
-      uses: POV-Ray/povray/.github/actions/unix_configure@gh-actions-v1
+      uses: ./.github/actions/unix_configure
     - name: 'Build'
-      uses: POV-Ray/povray/.github/actions/unix_make@gh-actions-v1
+      uses: ./.github/actions/unix_make
 
     - name: 'Perform CodeQL Analysis'
-      uses: github/codeql-action/analyze@v1
+      uses: github/codeql-action/analyze@v4
