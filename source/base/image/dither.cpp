@@ -118,8 +118,7 @@ OrderedDither::Pattern::Pattern(std::initializer_list<std::initializer_list<int>
 
 OrderedDither::Pattern::~Pattern()
 {
-    if (maData != nullptr)
-        delete[] maData;
+    delete[] maData;
 }
 
 const ColourChannel& OrderedDither::Pattern::operator()(unsigned int x, unsigned int y) const
@@ -298,8 +297,7 @@ DiffusionDither::Filter::Filter(std::initializer_list<std::initializer_list<int>
 
 DiffusionDither::Filter::~Filter()
 {
-    if (maData != nullptr)
-        delete[] maData;
+    delete[] maData;
 }
 
 //------------------------------------------------------------------------------

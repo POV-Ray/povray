@@ -252,11 +252,8 @@ TileBuffer::TileBuffer ():
 
 TileBuffer::~TileBuffer ()
 {
-    if (compressor != 0)
-        delete compressor;
-
-    if (sampleCountTableCompressor != 0)
-        delete sampleCountTableCompressor;
+    delete compressor;
+    delete sampleCountTableCompressor;
 }
 
 
@@ -993,8 +990,7 @@ TileBufferTask::execute ()
         _tileBuffer->dataPtr = _tileBuffer->buffer;
 
         // (TODO) don't do this all the time.
-        if (_tileBuffer->compressor != 0)
-            delete _tileBuffer->compressor;
+        delete _tileBuffer->compressor;
         _tileBuffer->compressor = newTileCompressor
                                     (_ofd->header.compression(),
                                      maxBytesPerTileLine,
@@ -1074,9 +1070,9 @@ DeepTiledOutputFile::DeepTiledOutputFile
     }
     catch (IEX_NAMESPACE::BaseExc &e)
     {
-        if (_data && _data->_streamData && _data->_streamData->os) delete _data->_streamData->os;
-        if (_data && _data->_streamData)     delete _data->_streamData;
-        if (_data)           delete _data;
+        if (_data && _data->_streamData) delete _data->_streamData->os;
+        if (_data)  delete _data->_streamData;
+        delete _data;
 
         REPLACE_EXC (e, "Cannot open image file "
                         "\"" << fileName << "\". " << e);
@@ -1084,9 +1080,9 @@ DeepTiledOutputFile::DeepTiledOutputFile
     }
     catch (...)
     {
-        if (_data && _data->_streamData && _data->_streamData->os) delete _data->_streamData->os;
-        if (_data->_streamData)     delete _data->_streamData;
-        if (_data)           delete _data;
+        if (_data && _data->_streamData) delete _data->_streamData->os;
+        if (_data)     delete _data->_streamData;
+        delete _data;
 
         throw;
     }
@@ -1118,8 +1114,8 @@ DeepTiledOutputFile::DeepTiledOutputFile
     }
     catch (IEX_NAMESPACE::BaseExc &e)
     {
-        if (_data && _data->_streamData) delete _data->_streamData;
-        if (_data)       delete _data;
+        if (_data) delete _data->_streamData;
+        delete _data;
 
         REPLACE_EXC (e, "Cannot open image file "
                         "\"" << os.fileName() << "\". " << e);
@@ -1127,8 +1123,8 @@ DeepTiledOutputFile::DeepTiledOutputFile
     }
     catch (...)
     {
-        if (_data && _data->_streamData) delete _data->_streamData;
-        if (_data)       delete _data;
+        if (_data) delete _data->_streamData;
+        delete _data;
 
         throw;
     }
@@ -1154,7 +1150,7 @@ DeepTiledOutputFile::DeepTiledOutputFile(const OutputPartData* part)
     }
     catch (IEX_NAMESPACE::BaseExc &e)
     {
-        if (_data) delete _data;
+        delete _data;
 
         REPLACE_EXC (e, "Cannot initialize output part "
                         "\"" << part->partNumber << "\". " << e);
@@ -1162,7 +1158,7 @@ DeepTiledOutputFile::DeepTiledOutputFile(const OutputPartData* part)
     }
     catch (...)
     {
-        if (_data) delete _data;
+        delete _data;
 
         throw;
     }
@@ -1218,8 +1214,7 @@ DeepTiledOutputFile::initialize (const Header &header)
 
     _data->format = defaultFormat (compressor);
 
-    if (compressor != 0)
-        delete compressor;
+    delete compressor;
 
     _data->tileOffsets = TileOffsets (_data->tileDesc.mode,
                                       _data->numXLevels,
@@ -1293,7 +1288,7 @@ DeepTiledOutputFile::~DeepTiledOutputFile ()
         // this file or by a parent multipart file.
         //
 
-        if (_data->partNumber == -1 && _data->_streamData)
+        if (_data->partNumber == -1)
             delete _data->_streamData;
 
         delete _data;

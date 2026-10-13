@@ -191,8 +191,7 @@ LineBuffer::LineBuffer ():
 
 LineBuffer::~LineBuffer ()
 {
-    if (compressor != 0)
-        delete compressor;
+    delete compressor;
 }
 
 } // namespace
@@ -295,14 +294,12 @@ DeepScanLineInputFile::Data::Data (int numThreads):
 DeepScanLineInputFile::Data::~Data ()
 {
     for (size_t i = 0; i < lineBuffers.size(); i++)
-        if (lineBuffers[i] != 0)
-            delete lineBuffers[i];
+        delete lineBuffers[i];
 
     for (size_t i = 0; i < slices.size(); i++)
         delete slices[i];
 
-    if (sampleCountTableComp != 0)
-        delete sampleCountTableComp;
+    delete sampleCountTableComp;
     
     if (multiPartBackwardSupport)
         delete multiPartFile;
@@ -513,7 +510,7 @@ readPixelData (InputStreamMutex *streamData,
     {
         // (TODO) check if the packed data size is too big?
         // (TODO) better memory management. Don't delete buffer all the time.
-        if (buffer != 0) delete[] buffer;
+        delete[] buffer;
         buffer = new char[packedDataSize];
         streamData->is->read (buffer, packedDataSize);
     }
@@ -612,8 +609,7 @@ LineBufferTask::execute ()
             // (TODO) optimize this. don't do this every time.
             //
 
-            if (_lineBuffer->compressor != 0)
-                delete _lineBuffer->compressor;
+            delete _lineBuffer->compressor;
             Int64 maxBytesPerLine = 0;
             for (int i = _lineBuffer->minY - _ifd->minY;
                  i <= maxY - _ifd->minY;
@@ -975,9 +971,9 @@ DeepScanLineInputFile::DeepScanLineInputFile
     }
     catch (IEX_NAMESPACE::BaseExc &e)
     {
-        if (is)          delete is;
-        if (_data && _data->_streamData) delete _data->_streamData;
-        if (_data)       delete _data;
+        delete is;
+        if (_data) delete _data->_streamData;
+        delete _data;
 
         REPLACE_EXC (e, "Cannot read image file "
                         "\"" << fileName << "\". " << e);
@@ -985,9 +981,9 @@ DeepScanLineInputFile::DeepScanLineInputFile
     }
     catch (...)
     {
-        if (is)          delete is;
-        if (_data && _data->_streamData) delete _data->_streamData;
-        if (_data)       delete _data;
+        delete is;
+        if (_data) delete _data->_streamData;
+        delete _data;
 
         throw;
     }
@@ -1755,10 +1751,7 @@ void DeepScanLineInputFile::readPixelSampleCounts (const char* rawPixelData,
         }
     }
     
-    if(decomp)
-    {
-       delete decomp;
-    }
+    delete decomp;
 }
 
 

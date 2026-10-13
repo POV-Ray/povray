@@ -2161,8 +2161,7 @@ void ShowHint (HMENU hMenu, DWORD id)
   if (index == count)
     return ;
 
-  if (pCurrentHintBitmap != NULL)
-    delete pCurrentHintBitmap;
+  delete pCurrentHintBitmap;
 
   CStdStringW fn(filename);
   pCurrentHintBitmap = new Bitmap(fn, true);

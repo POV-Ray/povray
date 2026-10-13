@@ -180,11 +180,8 @@ LineBuffer::LineBuffer (int linesInBuffer) :
 
 LineBuffer::~LineBuffer ()
 {
-    if (compressor != 0)
-        delete compressor;
-
-    if (sampleCountTableCompressor != 0)
-        delete sampleCountTableCompressor;
+    delete compressor;
+    delete sampleCountTableCompressor;
 }
 
 } // namespace
@@ -265,8 +262,7 @@ DeepScanLineOutputFile::Data::Data (int numThreads):
 DeepScanLineOutputFile::Data::~Data ()
 {
     for (size_t i = 0; i < lineBuffers.size(); i++)
-        if (lineBuffers[i] != 0)
-            delete lineBuffers[i];
+        delete lineBuffers[i];
 
     for (size_t i = 0; i < slices.size(); i++)
         delete slices[i];
@@ -752,8 +748,7 @@ LineBufferTask::execute ()
         //
 
         // (TODO) don't do this all the time.
-        if (_lineBuffer->compressor != 0)
-            delete _lineBuffer->compressor;
+        delete _lineBuffer->compressor;
         _lineBuffer->compressor = newCompressor (_ofd->header.compression(),
                                                  maxBytesPerLine,
                                                  _ofd->header);
@@ -951,8 +946,7 @@ DeepScanLineOutputFile::initialize (const Header &header)
                                             _data->header);
     _data->format = defaultFormat (compressor);
     _data->linesInBuffer = numLinesInBuffer (compressor);
-    if (compressor != 0)
-        delete compressor;
+    delete compressor;
 
     int lineOffsetSize = (_data->maxY - _data->minY +
                           _data->linesInBuffer) / _data->linesInBuffer;

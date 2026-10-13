@@ -280,16 +280,13 @@ static void InitTextureTable()
 
 void Free_Noise_Tables()
 {
-    if (sintab != nullptr)
-    {
-        delete[] sintab;
-        sintab = nullptr;
+    delete[] sintab;
+    sintab = nullptr;
 
 #ifdef DYNAMIC_HASHTABLE
-        delete[] hashTable;
-        hashTable = nullptr;
+    delete[] hashTable;
+    hashTable = nullptr;
 #endif
-    }
 }
 
 

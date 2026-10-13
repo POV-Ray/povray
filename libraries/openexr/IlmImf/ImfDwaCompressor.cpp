@@ -1922,8 +1922,7 @@ DwaCompressor::compress
     if (outBufferSize > _outBufferSize) 
     {
         _outBufferSize = outBufferSize;
-        if (_outBuffer == 0)
-            delete[] _outBuffer;       
+        delete[] _outBuffer;       
         _outBuffer = new char[outBufferSize];
     }
 
@@ -2435,8 +2434,7 @@ DwaCompressor::uncompress
     if (_maxScanLineSize * numScanLines() > _outBufferSize) 
     {
         _outBufferSize = _maxScanLineSize * numScanLines();
-        if (_outBuffer != 0)
-            delete[] _outBuffer;
+        delete[] _outBuffer;
         _outBuffer = new char[_maxScanLineSize * numScanLines()];
     }
 
@@ -3023,8 +3021,7 @@ DwaCompressor::initializeBuffers (size_t &outBufferSize)
     if (maxLossyDctAcSize * numLossyDctChans > _packedAcBufferSize)
     {
         _packedAcBufferSize = maxLossyDctAcSize * numLossyDctChans;
-        if (_packedAcBuffer != 0) 
-            delete[] _packedAcBuffer;
+        delete[] _packedAcBuffer;
         _packedAcBuffer = new char[_packedAcBufferSize];
     }
 
@@ -3035,16 +3032,14 @@ DwaCompressor::initializeBuffers (size_t &outBufferSize)
     if (maxLossyDctDcSize * numLossyDctChans > _packedDcBufferSize)
     {
         _packedDcBufferSize = maxLossyDctDcSize * numLossyDctChans;
-        if (_packedDcBuffer != 0) 
-            delete[] _packedDcBuffer;
+        delete[] _packedDcBuffer;
         _packedDcBuffer     = new char[_packedDcBufferSize];
     }
 
     if (rleBufferSize > _rleBufferSize) 
     {
         _rleBufferSize = rleBufferSize;
-        if (_rleBuffer != 0) 
-            delete[] _rleBuffer;
+        delete[] _rleBuffer;
         _rleBuffer = new char[rleBufferSize];
     }
 
@@ -3104,8 +3099,7 @@ DwaCompressor::initializeBuffers (size_t &outBufferSize)
         if (planarUncBufferSize[i] > _planarUncBufferSize[i]) 
         {
             _planarUncBufferSize[i] = planarUncBufferSize[i];
-            if (_planarUncBuffer[i] != 0) 
-                delete[] _planarUncBuffer[i];
+            delete[] _planarUncBuffer[i];
             _planarUncBuffer[i] = new char[planarUncBufferSize[i]];
         }
     }

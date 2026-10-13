@@ -736,8 +736,7 @@ TiledInputFile::TiledInputFile (const char fileName[], int numThreads):
             delete _data->_streamData;
         }
 
-        if (is != 0)
-            delete is;
+        delete is;
 
 	REPLACE_EXC (e, "Cannot open image file "
 			"\"" << fileName << "\". " << e);
@@ -756,8 +755,7 @@ TiledInputFile::TiledInputFile (const char fileName[], int numThreads):
             delete _data->_streamData;
         }
 
-        if (is != 0)
-            delete is;
+        delete is;
         throw;
     }
 }
