@@ -1323,6 +1323,17 @@ void Parser::Parse_Pigment (PIGMENT **Pigment_Ptr)
 *
 ******************************************************************************/
 
+namespace
+{
+// Parse_Pattern is instantiated for PIGMENT, TNORMAL and TEXTURE; these give typed access to the
+// pigment- or normal-only fields without a cast. The exact-match overload wins; the base-class one
+// is reached only if a caller ever pairs a pattern type with the wrong BlendMapTypeId.
+inline PIGMENT* PigmentPart(PIGMENT* p) { return p; }
+inline PIGMENT* PigmentPart(TPATTERN*) { throw std::logic_error("internal error: pigment-only pattern field accessed on a non-pigment"); }
+inline TNORMAL* NormalPart(TNORMAL* p) { return p; }
+inline TNORMAL* NormalPart(TPATTERN*) { throw std::logic_error("internal error: normal-only pattern field accessed on a non-normal"); }
+}
+
 template<typename MAP_T, typename PATTERN_T>
 void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
 {
@@ -1462,7 +1473,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                 Only_In("color","pigment or density");
             New->Type = PLAIN_PATTERN;
             New->pattern = PatternPtr(new PlainPattern());
-            Parse_Colour ((reinterpret_cast<PIGMENT *>(New))->colour);
+            Parse_Colour (PigmentPart(New)->colour);
         END_CASE
 
         CASE (UV_MAPPING_TOKEN)
@@ -1476,7 +1487,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             New->pattern = PatternPtr(new CheckerPattern());
             New->Blend_Map = Parse_Blend_List<MAP_T>(2,New->pattern->GetDefaultBlendMap(),TPat_Type);
             if (TPat_Type == kBlendMapType_Normal)
-                (reinterpret_cast<TNORMAL *>(New))->Delta = 0.02;
+                NormalPart(New)->Delta = 0.02;
         END_CASE
 
         CASE (OBJECT_TOKEN)
@@ -1508,7 +1519,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             }
             New->Blend_Map = Parse_Blend_List<MAP_T>(2,New->pattern->GetDefaultBlendMap(),TPat_Type);
             if (TPat_Type == kBlendMapType_Normal)
-                (reinterpret_cast<TNORMAL *>(New))->Delta = 0.02;
+                NormalPart(New)->Delta = 0.02;
         END_CASE
 
         CASE (HEXAGON_TOKEN)
@@ -1516,7 +1527,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             New->pattern = PatternPtr(new HexagonPattern());
             New->Blend_Map = Parse_Blend_List<MAP_T>(3,New->pattern->GetDefaultBlendMap(),TPat_Type);
             if (TPat_Type == kBlendMapType_Normal)
-                (reinterpret_cast<TNORMAL *>(New))->Delta = 0.02;
+                NormalPart(New)->Delta = 0.02;
         END_CASE
 
         CASE (SQUARE_TOKEN)
@@ -1524,7 +1535,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             New->pattern = PatternPtr(new SquarePattern());
             New->Blend_Map = Parse_Blend_List<MAP_T>(4,New->pattern->GetDefaultBlendMap(),TPat_Type);
             if (TPat_Type == kBlendMapType_Normal)
-                (reinterpret_cast<TNORMAL *>(New))->Delta = 0.02;
+                NormalPart(New)->Delta = 0.02;
         END_CASE
 
         CASE (TRIANGULAR_TOKEN)
@@ -1532,7 +1543,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             New->pattern = PatternPtr(new TriangularPattern());
             New->Blend_Map = Parse_Blend_List<MAP_T>(6,New->pattern->GetDefaultBlendMap(),TPat_Type);
             if (TPat_Type == kBlendMapType_Normal)
-                (reinterpret_cast<TNORMAL *>(New))->Delta = 0.02;
+                NormalPart(New)->Delta = 0.02;
         END_CASE
 
         // JN2007: Cubic pattern
@@ -1541,7 +1552,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             New->pattern = PatternPtr(new CubicPattern());
             New->Blend_Map = Parse_Blend_List<MAP_T>(6,New->pattern->GetDefaultBlendMap(),TPat_Type);
             if (TPat_Type == kBlendMapType_Normal)
-                (reinterpret_cast<TNORMAL *>(New))->Delta = 0.02;
+                NormalPart(New)->Delta = 0.02;
         END_CASE
 
         CASE (IMAGE_MAP_TOKEN)
@@ -1549,7 +1560,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                 Only_In("image_map","pigment");
             New->Type = IMAGE_MAP_PATTERN;
             New->pattern = PatternPtr(new ColourImagePattern());
-            Parse_Image_Map (reinterpret_cast<PIGMENT *>(New));
+            Parse_Image_Map (PigmentPart(New));
         END_CASE
 
         CASE (BUMP_MAP_TOKEN)
@@ -1560,7 +1571,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                 shared_ptr<ImagePattern> pattern(new ImagePattern());
                 pattern->waveFrequency = 0.0;
                 New->pattern = pattern;
-                Parse_Bump_Map (reinterpret_cast<TNORMAL *>(New));
+                Parse_Bump_Map (NormalPart(New));
             }
         END_CASE
 
@@ -1673,7 +1684,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
     if (TPat_Type == kBlendMapType_Normal)
     {
         Parse_Comma();
-        (reinterpret_cast<TNORMAL *>(New))->Amount = Allow_Float ((reinterpret_cast<TNORMAL *>(New))->Amount );
+        NormalPart(New)->Amount = Allow_Float (NormalPart(New)->Amount);
     }
 
     EXPECT         /* Look for pattern_modifier */
@@ -1682,7 +1693,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             {
                 Error("accuracy can only be used with normal patterns.");
             }
-            (reinterpret_cast<TNORMAL *>(New))->Delta = Parse_Float();
+            NormalPart(New)->Delta = Parse_Float();
         END_CASE
 
         CASE (SOLID_TOKEN)
@@ -1912,7 +1923,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             {
                 Only_In("quick_color","pigment");
             }
-            Parse_Colour ((reinterpret_cast<PIGMENT *>(New))->Quick_Colour);
+            Parse_Colour (PigmentPart(New)->Quick_Colour);
         END_CASE
 
         CASE (CONTROL0_TOKEN)
@@ -2027,7 +2038,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         CASE (BUMP_SIZE_TOKEN)
             if (TPat_Type != kBlendMapType_Normal)
                 Only_In ("bump_size","normal");
-            (reinterpret_cast<TNORMAL *>(New))->Amount = Parse_Float ();
+            NormalPart(New)->Amount = Parse_Float ();
         END_CASE
 
         CASE (NOISE_GENERATOR_TOKEN)
