@@ -11,5 +11,5 @@ cd tools/doxygen
 cd source-doc/latex
 make pdf
 cd ../..
-mkdir pdf
+mkdir -p source-doc/pdf
 cp "source-doc/latex/refman.pdf" "source-doc/pdf/POV-Ray Developer Manual.pdf"
