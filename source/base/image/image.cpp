@@ -3087,7 +3087,7 @@ class FileBackedPixelContainer
         {
             if (!m_File.CreateRW(m_Path))
                 throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot open backing file for intermediate image storage.");
-            m_Blocksize = bs;
+            m_Blocksize = (bs != 0) ? bs : 1; // a zero block size would divide by zero below
             m_Buffer.resize(m_Blocksize);
             // write extra data to create the big file and help 3rd party reader
             std::int_least64_t pos;

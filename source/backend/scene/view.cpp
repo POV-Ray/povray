@@ -813,6 +813,9 @@ void View::StartRender(POVMS_Object& renderOptions)
         viewData.blockSize = 4;
     if(viewData.blockSize > max(viewData.renderArea.GetWidth(), viewData.renderArea.GetHeight()))
         viewData.blockSize = max(viewData.renderArea.GetWidth(), viewData.renderArea.GetHeight());
+    const unsigned int kMaxBlockSize = 46340; // floor(sqrt(INT_MAX)): the block classes use int offsets
+    if(viewData.blockSize > kMaxBlockSize)
+        viewData.blockSize = kMaxBlockSize;
     viewData.blockWidth = ((viewData.renderArea.GetWidth() + viewData.blockSize - 1) / viewData.blockSize);
     viewData.blockHeight = ((viewData.renderArea.GetHeight() + viewData.blockSize - 1) / viewData.blockSize);
     // Block serials, the block list and the gcd below all assume the block count fits in an int.
