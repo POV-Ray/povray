@@ -3607,7 +3607,7 @@ void Parser::Invoke_Macro()
                     CASE (RIGHT_PAREN_TOKEN)
                         if (!(finalParameter && properlyDelimited))
                             // the parameter list was closed prematurely
-                            Error("Expected %d parameters but only %d found.",PMac->parameters.size(),i);
+                            Error("Expected %d parameters but only %d found.",int(PMac->parameters.size()),i);
                         // the parameter was left empty
                         if (!PMac->parameters[i].optional)
                             Error("Cannot omit non-optional macro parameter %d.",i+1);

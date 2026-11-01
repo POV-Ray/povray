@@ -426,7 +426,7 @@ void Parser::Run()
         }
         else
         {
-            Warning("Clockless animation: total of %d cameras will be used.", sceneData->cameras.size());
+            Warning("Clockless animation: total of %d cameras will be used.", int(sceneData->cameras.size()));
             sceneData->parsedCamera = sceneData->cameras[0];
         }
     }
@@ -7176,7 +7176,7 @@ void Parser::Parse_Frame ()
     {
         // Some other exceptional situation occurred in a library or some such and couldn't be handled gracefully;
         // handle it now by failing with a corresponding parse error
-        Error(e.what());
+        Error("%s", e.what());
     }
 }
 
@@ -9053,7 +9053,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                     CASE (RIGHT_PAREN_TOKEN)
                         if (!finalParameter)
                             // the parameter list was closed prematurely
-                            Error("Expected %d RValues but only %d found.",lvalues.size(),i);
+                            Error("Expected %d RValues but only %d found.",int(lvalues.size()),i);
                         // the parameter was left empty
                         if (!optional)
                             Error("Cannot omit RValue for non-optional LValue.");
