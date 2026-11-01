@@ -63,7 +63,7 @@ vfeDisplay::~vfeDisplay()
 void vfeDisplay::Initialise()
 {
   m_Pixels.clear();
-  m_Pixels.resize(GetWidth() * GetHeight());
+  m_Pixels.resize(size_t(GetWidth()) * GetHeight());
 }
 
 void vfeDisplay::Close()
@@ -81,7 +81,7 @@ void vfeDisplay::Hide()
 void vfeDisplay::DrawPixel(unsigned int x, unsigned int y, const RGBA8& colour)
 {
   assert (x < GetWidth() && y < GetHeight());
-  m_Pixels[y * GetHeight() + x] = colour;
+  m_Pixels[size_t(y) * GetWidth() + x] = colour;
 }
 
 void vfeDisplay::DrawRectangleFrame(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8& colour)
