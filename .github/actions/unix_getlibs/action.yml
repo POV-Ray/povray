@@ -16,7 +16,7 @@ runs:
         jpeg/                   | libjpeg-dev                       | libjpeg       |
         openexr/                | libopenexr-dev                    | openexr       |
         png/                    | libpng-dev                        | libpng        |
-                                | libsdl-dev                        | sdl           | simple direct media layer
+                                | libsdl1.2-dev                     | sdl           | simple direct media layer
         tiff/                   | libtiff-dev                       | libtiff       |
         zlib/                   | libz-dev                          | zlib          |
                                 | automake                          | automake      |

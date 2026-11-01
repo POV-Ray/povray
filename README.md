@@ -3,7 +3,7 @@
 
 [![Quick Tests](https://github.com/POV-Ray/povray/actions/workflows/test_build_quick.yml/badge.svg)](https://github.com/POV-Ray/povray/actions/workflows/test_build_quick.yml)
 [![Code Analysis](https://github.com/POV-Ray/povray/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/POV-Ray/povray/actions/workflows/codeql-analysis.yml)
-[![Maintenance Status](https://img.shields.io/maintenance/yes/2024.svg)](README.md "Last edited 2024-11-03")
+[![Last Commit](https://img.shields.io/github/last-commit/POV-Ray/povray)](https://github.com/POV-Ray/povray/commits/master)
 
 - [Development Status (October 2026)](#development-status-october-2026)
 - [License](#license)

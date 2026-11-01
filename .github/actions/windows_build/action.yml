@@ -31,7 +31,7 @@ inputs:
   toolset:
     description: 'Platform toolset version'
     required: false
-    default: 'v140'
+    default: 'v142'
   msbuild-options:
     description: 'additional MSBuild options'
     required: false
