@@ -11,25 +11,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        visual-studio: [2015, 2017, 2019]
+        visual-studio: [2019, 2022]
         variant: [64, sse2, 32]
-        compatibility: ['', xp]
-        exclude:
-        - visual-studio: 2019
-          compatibility: xp
+        compatibility: ['']
         include:
         # Set up various options based on Visual Studio version to emulate
-        - visual-studio: 2015
-          os: windows-2016
-          toolset: v140
-          solution: vs2015
-        - visual-studio: 2017
-          os: windows-2016
-          toolset: v141
-          solution: vs2015
         - visual-studio: 2019
-          os: windows-2019
+          os: windows-2022
           toolset: v142
+          solution: vs2015
+        - visual-studio: 2022
+          os: windows-2022
+          toolset: v143
           solution: vs2015
         # Pick configuration / paltform combo
         - variant: 64
@@ -44,10 +37,7 @@ jobs:
         # Set up various options based on compatibility requirements
         - compatibility: ''
           toolset-variant: ''
-          msbuild-options: ''
-        - compatibility: xp
-          toolset-variant: '_xp'
-          msbuild-options: '/p:TargetUniversalCRTVersion=10.0.10586.0'
+          msbuild-options: '/p:WindowsTargetPlatformVersion=10.0.19041.0'
 
     steps:
 
@@ -57,13 +47,13 @@ jobs:
         echo '${{ toJSON(matrix) }}'
 
     - name: 'Check out Repository'
-      uses: actions/checkout@v2
+      uses: actions/checkout@v7
 
     - name: 'Add MSBuild to PATH'
-      uses: microsoft/setup-msbuild@v1.0.2
+      uses: microsoft/setup-msbuild@v3
 
     - name: 'Build'
-      uses: POV-Ray/povray/.github/actions/windows_build@gh-actions-v1
+      uses: ./.github/actions/windows_build
       with:
         pov-ray-build-id: ghvs${{matrix.visual-studio}}${{github.run_number}}${{matrix.compatibility}}
         solution: ${{matrix.solution}}
@@ -72,9 +62,9 @@ jobs:
         toolset: ${{matrix.toolset}}${{matrix.toolset-variant}}
         msbuild-options: ${{matrix.msbuild-options}}
     - name: 'Sanity-Check Working Tree'
-      uses: POV-Ray/povray/.github/actions/git_check_repo@gh-actions-v1
+      uses: ./.github/actions/git_check_repo
     - name: 'Upload Artifacts for Manual Testing'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v7
       with:
         name: artifact_bin_${{matrix.visual-studio}}_${{matrix.variant}}${{matrix.compatibility}}
         path: windows/${{matrix.solution}}/bin*/*.exe
