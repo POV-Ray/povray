@@ -287,6 +287,10 @@ void Parser::Run()
         {
             Error(e, "Illegal escape sequence '%s' in string literal.", e.offendingText.c_str());
         }
+        catch (const InvalidNumericLiteralException& e)
+        {
+            Error(e, "Invalid numeric literal '%s'.", e.offendingText.c_str());
+        }
         catch (pov_base::Exception& e)
         {
             // Error was detected by the parser, and already reported when first thrown

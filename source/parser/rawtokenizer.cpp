@@ -193,8 +193,9 @@ bool RawTokenizer::ProcessFloatLiteralLexeme(RawToken& token)
     token.id = int(FLOAT_TOKEN);
     token.expressionId = FLOAT_TOKEN_CATEGORY;
 
-    if (sscanf(token.lexeme.text.c_str(), POV_DBL_FORMAT_STRING, &token.floatValue) == 0)
-        return false;
+    // Not just == 0: the Windows C runtime returns EOF for an exponent without digits ("1e").
+    if (sscanf(token.lexeme.text.c_str(), POV_DBL_FORMAT_STRING, &token.floatValue) != 1)
+        throw InvalidNumericLiteralException(GetInputStreamName(), token.lexeme.position, token.lexeme.text);
 
     token.isReservedWord = false;
     token.isPseudoIdentifier = false;
