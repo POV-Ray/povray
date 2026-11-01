@@ -1013,8 +1013,7 @@ TRANSFORM *Copy_Transform (const TRANSFORM*Old)
 
 void Destroy_Transform (TRANSFORM *Trans)
 {
-    if (Trans != nullptr)
-        delete Trans;
+    delete Trans;
 }
 
 

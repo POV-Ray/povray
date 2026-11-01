@@ -376,15 +376,13 @@ Camera& Camera::operator=(const Camera& src)
 
     for (unsigned int i = 0; i < 3; ++i)
     {
-        if (Location_Fn[i] != nullptr)
-            delete Location_Fn[i];
+        delete Location_Fn[i];
         if (src.Location_Fn[i] == nullptr)
             Location_Fn[i] = nullptr;
         else
             Location_Fn[i] = src.Location_Fn[i]->Clone();
 
-        if (Direction_Fn[i] != nullptr)
-            delete Direction_Fn[i];
+        delete Direction_Fn[i];
         if (src.Direction_Fn[i] == nullptr)
             Direction_Fn[i] = nullptr;
         else
@@ -444,10 +442,8 @@ Camera::~Camera()
     Meshes.clear();
     for (unsigned int i = 0; i < 3; ++i)
     {
-        if (Location_Fn[i] != nullptr)
-            delete Location_Fn[i];
-        if (Direction_Fn[i] != nullptr)
-            delete Direction_Fn[i];
+        delete Location_Fn[i];
+        delete Direction_Fn[i];
     }
 }
 

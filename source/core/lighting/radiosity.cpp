@@ -1049,12 +1049,9 @@ RadiosityCache::~RadiosityCache()
         std::lock_guard<std::mutex> lock(fileMutex);
 #endif
         // finish up cache file
-        if (ot_fd != nullptr)
-        {
-            // close cache file
-            delete ot_fd;
-            ot_fd = nullptr;
-        }
+        // close cache file
+        delete ot_fd;
+        ot_fd = nullptr;
     }
 
     { // mutex scope

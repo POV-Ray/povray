@@ -63,7 +63,7 @@ Fog_Struct::Fog_Struct() :
 
 Fog_Struct::~Fog_Struct()
 {
-    if (Turb) delete Turb;
+    delete Turb;
 }
 
 /*****************************************************************************
@@ -195,8 +195,7 @@ FOG *Copy_Fog(const FOG *Old)
 
 void Destroy_Fog(FOG *Fog)
 {
-    if (Fog != nullptr)
-        delete Fog;
+    delete Fog;
 }
 
 
@@ -331,8 +330,7 @@ RAINBOW *Copy_Rainbow(const RAINBOW *Old)
 
 void Destroy_Rainbow(RAINBOW *Rainbow)
 {
-    if (Rainbow != nullptr)
-        delete Rainbow;
+    delete Rainbow;
 }
 
 
@@ -464,8 +462,7 @@ SKYSPHERE *Copy_Skysphere(const SKYSPHERE *Old)
 
 void Destroy_Skysphere(SKYSPHERE *Skysphere)
 {
-    if (Skysphere != nullptr)
-        delete Skysphere;
+    delete Skysphere;
 }
 
 Skysphere_Struct::~Skysphere_Struct()

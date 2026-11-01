@@ -116,8 +116,7 @@ int ProcessOptions::ParseFile(const char *filespec, POVMSObjectPtr obj)
             if(token == '[')
             {
                 // free old section name, if any
-                if (currentsection != nullptr)
-                    delete[] currentsection;
+                delete[] currentsection;
 
                 // read until the section name end marker
                 currentsection = Parse_INI_String(file, ']');
@@ -210,8 +209,7 @@ int ProcessOptions::ParseFile(const char *filespec, POVMSObjectPtr obj)
                     if(err == kFalseErr)
                         err = ProcessUnknownString(plainstring, obj);
 
-                    if (plainstring != nullptr)
-                        delete[] plainstring;
+                    delete[] plainstring;
                 }
             }
         }
@@ -237,18 +235,12 @@ int ProcessOptions::ParseFile(const char *filespec, POVMSObjectPtr obj)
             }
         }
 
-        if (currentsection != nullptr)
-            delete[] currentsection;
+        delete[] currentsection;
     }
 
-    if (filename != nullptr)
-        delete[] filename;
-
-    if (sectionname != nullptr)
-        delete[] sectionname;
-
-    if (file != nullptr)
-        delete file;
+    delete[] filename;
+    delete[] sectionname;
+    delete file;
 
     return err;
 }
@@ -332,8 +324,7 @@ int ProcessOptions::ParseString(const char *commandline, POVMSObjectPtr obj, boo
             if(err == kFalseErr)
                 err = ProcessUnknownString(plainstring, obj);
 
-            if (plainstring != nullptr)
-                delete[] plainstring;
+            delete[] plainstring;
         }
     }
 
@@ -992,10 +983,8 @@ int ProcessOptions::Parse_INI_Switch(ITextStream *file, int token, POVMSObjectPt
         }
     }
 
-    if (key != nullptr)
-        delete[] key;
-    if (value != nullptr)
-        delete[] value;
+    delete[] key;
+    delete[] value;
 
     return err;
 }
@@ -1301,10 +1290,8 @@ int ProcessOptions::Parse_CL_Switch(const char *&commandline, int token, POVMSOb
         }
     }
 
-    if (key != nullptr)
-        delete[] key;
-    if (value != nullptr)
-        delete[] value;
+    delete[] key;
+    delete[] value;
 
     return err;
 }

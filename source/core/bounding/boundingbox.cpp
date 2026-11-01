@@ -422,11 +422,8 @@ void Build_Bounding_Slabs(BBOX_TREE **Root, vector<ObjectPtr>& objects, unsigned
     Build_BBox_Tree(Root, numberOfFiniteObjects, Finite, numberOfInfiniteObjects, Infinite, maxfinitecount);
 
     // Get rid of the Finite and Infinite arrays and just use Root.
-    if (Finite != nullptr)
-        delete[] Finite;
-
-    if (Infinite != nullptr)
-        delete[] Infinite;
+    delete[] Finite;
+    delete[] Infinite;
 }
 
 bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const Ray& ray, Intersection *Best_Intersection, TraceThreadData *Thread)
