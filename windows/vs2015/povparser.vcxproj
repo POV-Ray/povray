@@ -400,6 +400,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\parser\fncode.cpp" />
+    <ClCompile Include="..\..\source\parser\ImageCache.cpp" />
     <ClCompile Include="..\..\source\parser\parser.cpp" />
     <ClCompile Include="..\..\source\parser\parsertypes.cpp" />
     <ClCompile Include="..\..\source\parser\parser_expressions.cpp" />
@@ -424,6 +425,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\parser\fncode.h" />
+    <ClInclude Include="..\..\source\parser\ImageCache.h" />
     <ClInclude Include="..\..\source\parser\parser.h" />
     <ClInclude Include="..\..\source\parser\parsertypes.h" />
     <ClInclude Include="..\..\source\parser\parser_fwd.h" />
