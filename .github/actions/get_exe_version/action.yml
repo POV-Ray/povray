@@ -1,0 +1,17 @@
+name: 'Get Windows Executable Version Information'
+description: 'Extract version information from Windows executable'
+
+inputs:
+  binary:
+    description: 'Path and name of binary to examine'
+    required: true
+
+runs:
+  using: composite
+  steps:
+  - name: 'Extract Version Information from Binary'
+    shell: pwsh
+    run: ./tools/windows/get-exe-version.ps1 ${{ inputs.binary }} -github_env $env:GITHUB_ENV
+  - name: 'Version Information Diagnostics'
+    shell: bash
+    run: set | grep -e '^BINARY_'

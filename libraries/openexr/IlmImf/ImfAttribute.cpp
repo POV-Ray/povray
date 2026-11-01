@@ -45,6 +45,7 @@
 #include "Iex.h"
 #include <string.h>
 #include <map>
+#include <functional>
 
 #include "ImfNamespace.h"
 
