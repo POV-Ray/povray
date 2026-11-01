@@ -121,8 +121,9 @@ ViewData::~ViewData()
 
 void ViewData::getBlockXY(const unsigned int nb, unsigned int &x, unsigned int &y)
 {
-    unsigned long neo_nb = nb; /* must be larger, if possible */
-    unsigned long sz = blockWidth*blockHeight;
+    // 64-bit on purpose: unsigned long is 32 bits on Windows, and nb*renderBlockStep must not wrap.
+    POV_ULONG neo_nb = nb;
+    POV_ULONG sz = static_cast<POV_ULONG>(blockWidth)*blockHeight;
 
     if (renderBlockStep>1)
     {
@@ -405,11 +406,11 @@ void ViewData::CompletedRectangle(const POVRect& rect, unsigned int serial, cons
         POV_RTR_ASSERT(pixels.size() == rect.GetArea());
         int y = rect.top - 1;
         int x = rect.right;
-        int offset;
+        size_t offset = 0;
         for(vector<RGBTColour>::const_iterator i(pixels.begin()); i != pixels.end(); i++)
         {
             if (++x > rect.right)
-                offset = (++y * width + (x = rect.left)) * 5;
+                offset = (size_t(++y) * width + (x = rect.left)) * 5;
             POV_RTR_ASSERT(rtrData->rtrPixels.size() >= offset + 5);
             rtrData->rtrPixels[offset++] = i->red();
             rtrData->rtrPixels[offset++] = i->green();
@@ -808,8 +809,14 @@ void View::StartRender(POVMS_Object& renderOptions)
         viewData.blockSize = 4;
     if(viewData.blockSize > max(viewData.renderArea.GetWidth(), viewData.renderArea.GetHeight()))
         viewData.blockSize = max(viewData.renderArea.GetWidth(), viewData.renderArea.GetHeight());
+    const unsigned int kMaxBlockSize = 46340; // floor(sqrt(INT_MAX)): the block classes use int offsets
+    if(viewData.blockSize > kMaxBlockSize)
+        viewData.blockSize = kMaxBlockSize;
     viewData.blockWidth = ((viewData.renderArea.GetWidth() + viewData.blockSize - 1) / viewData.blockSize);
     viewData.blockHeight = ((viewData.renderArea.GetHeight() + viewData.blockSize - 1) / viewData.blockSize);
+    // Block serials, the block list and the gcd below all assume the block count fits in an int.
+    if (static_cast<POV_ULONG>(viewData.blockWidth) * viewData.blockHeight > static_cast<POV_ULONG>(std::numeric_limits<int>::max()))
+        throw POV_EXCEPTION(kParamErr, "Too many render blocks; increase the render block size");
 
     viewData.renderPattern = (unsigned int)renderOptions.TryGetInt(kPOVAttrib_RenderPattern,0);
     viewData.renderBlockStep = (unsigned int)renderOptions.TryGetInt(kPOVAttrib_RenderBlockStep,0);
@@ -831,7 +838,7 @@ void View::StartRender(POVMS_Object& renderOptions)
             viewData.renderBlockStep--;
     }
 
-    viewData.blockInfoList.resize(viewData.blockWidth * viewData.blockHeight);
+    viewData.blockInfoList.resize(size_t(viewData.blockWidth) * viewData.blockHeight);
 
     viewData.pixelsPending = 0;
     viewData.pixelsCompleted = 0;
@@ -1471,7 +1478,7 @@ RTRData::RTRData(ViewData& v, int mrt) :
 {
     width = viewData.GetWidth();
     height = viewData.GetHeight();
-    rtrPixels.resize(width * height * 5);
+    rtrPixels.resize(size_t(width) * size_t(height) * 5);
 }
 
 RTRData::~RTRData()

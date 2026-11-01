@@ -1304,10 +1304,10 @@ bool Parser::Read_Float()
 
     Write_Token (FLOAT_TOKEN, col);
 
-    if (sscanf (String, POV_DBL_FORMAT_STRING, &Token.Token_Float) == 0)
-    {
-        return (false);
-    }
+    // Not just == 0: the Windows C runtime returns EOF for an exponent without digits ("1e").
+    // Returning false is no use: Get_Token would hand on the token with the previous literal's value.
+    if (sscanf (String, POV_DBL_FORMAT_STRING, &Token.Token_Float) != 1)
+        Error ("Invalid numeric literal '%s'.", String);
 
     return (true);
 }
@@ -1421,6 +1421,7 @@ void Parser::Read_Symbol()
             Token.is_dictionary_elem = false;
             Token.NumberPtr = &(Temp_Entry->Token_Number);
             Token.DataPtr   = &(Temp_Entry->Data);
+            Local_Index     = pseudoDictionary; // the table the pseudo-dictionary stands for
 
             table = nullptr;
         }
@@ -3606,7 +3607,7 @@ void Parser::Invoke_Macro()
                     CASE (RIGHT_PAREN_TOKEN)
                         if (!(finalParameter && properlyDelimited))
                             // the parameter list was closed prematurely
-                            Error("Expected %d parameters but only %d found.",PMac->parameters.size(),i);
+                            Error("Expected %d parameters but only %d found.",int(PMac->parameters.size()),i);
                         // the parameter was left empty
                         if (!PMac->parameters[i].optional)
                             Error("Cannot omit non-optional macro parameter %d.",i+1);
