@@ -11,15 +11,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        visual-studio: [2019]
+        visual-studio: [2019, 2022]
         variant: [64, sse2, 32]
         compatibility: ['']
         include:
         # Set up various options based on Visual Studio version to emulate
-        # (a 2022 row with toolset v143 needs the syspovconfig_msvc.h and ImfAttribute.cpp fixes first)
         - visual-studio: 2019
           os: windows-2022
           toolset: v142
+          solution: vs2015
+        - visual-studio: 2022
+          os: windows-2022
+          toolset: v143
           solution: vs2015
         # Pick configuration / paltform combo
         - variant: 64
