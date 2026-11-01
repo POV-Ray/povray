@@ -1421,6 +1421,7 @@ void Parser::Read_Symbol()
             Token.is_dictionary_elem = false;
             Token.NumberPtr = &(Temp_Entry->Token_Number);
             Token.DataPtr   = &(Temp_Entry->Data);
+            Local_Index     = pseudoDictionary; // the table the pseudo-dictionary stands for
 
             table = nullptr;
         }
