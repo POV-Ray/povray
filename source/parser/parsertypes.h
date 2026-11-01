@@ -182,6 +182,20 @@ struct InvalidEscapeSequenceException final : TokenizerException
                                    const UTF8String::const_iterator& otb, const UTF8String::const_iterator& ote);
 };
 
+/// Invalid numeric literal.
+///
+/// This exception is thrown by @ref RawTokenizer to indicate that a lexeme the scanner
+/// classified as a float literal (e.g. `1e`, with an empty exponent) could not be
+/// converted to a number.
+///
+struct InvalidNumericLiteralException final : TokenizerException
+{
+    /// Offending literal.
+    UTF8String offendingText;
+
+    InvalidNumericLiteralException(const UCS2String& osn, const LexemePosition& op, const UTF8String& ot);
+};
+
 //------------------------------------------------------------------------------
 
 /// Base class for miscellaneous things that can be assigned to a symbol.

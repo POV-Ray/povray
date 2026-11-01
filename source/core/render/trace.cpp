@@ -2082,7 +2082,7 @@ void Trace::TraceAreaLightShadowRay(const LightSource &lightsource, double& ligh
     Vector3d axis1Temp, axis2Temp;
     double axis1_Length;
 
-    lightGrid.resize(lightsource.Area_Size1 * lightsource.Area_Size2);
+    lightGrid.resize(size_t(lightsource.Area_Size1) * size_t(lightsource.Area_Size2));
 
     // Flag uncalculated points with a negative value for Red
     /*

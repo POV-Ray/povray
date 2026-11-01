@@ -129,7 +129,8 @@ inline static bool ReadFloat (DBL& result, char *buffer, pov_base::ITextStream *
 {
     if (!ReadWord (buffer, file))
         return false;
-    if (sscanf (buffer, POV_DBL_FORMAT_STRING, &result) == 0)
+    // Not just == 0: the Windows C runtime returns EOF for "1e", "-", "+" and ".".
+    if (sscanf (buffer, POV_DBL_FORMAT_STRING, &result) != 1)
         return false;
     return true;
 }

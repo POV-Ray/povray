@@ -128,5 +128,11 @@ InvalidEscapeSequenceException::InvalidEscapeSequenceException(const UCS2String&
     offendingText(otb, ote)
 {}
 
+InvalidNumericLiteralException::InvalidNumericLiteralException(const UCS2String& osn, const LexemePosition& op,
+                                                               const UTF8String& ot) :
+    TokenizerException(osn, op),
+    offendingText(ot)
+{}
+
 }
 // end of namespace pov_parser

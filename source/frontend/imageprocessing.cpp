@@ -88,7 +88,11 @@ ImageProcessing::ImageProcessing(POVMS_Object& ropts)
     unsigned int blockSize(ropts.TryGetInt(kPOVAttrib_RenderBlockSize, 32));
     unsigned int maxBufferMem(ropts.TryGetInt(kPOVAttrib_MaxImageBufferMem, 128)); // number is megabytes
 
-    image = shared_ptr<Image>(Image::Create(width, height, ImageDataType::RGBFT_Float, maxBufferMem, blockSize * blockSize));
+    // The product is only a hint for the file-backed container, but an unbounded one wraps to zero at +BS65536.
+    POV_ULONG pixelsPerBlock = static_cast<POV_ULONG>(blockSize) * blockSize;
+    if (pixelsPerBlock > (static_cast<POV_ULONG>(1) << 20))
+        pixelsPerBlock = static_cast<POV_ULONG>(1) << 20;
+    image = shared_ptr<Image>(Image::Create(width, height, ImageDataType::RGBFT_Float, maxBufferMem, (unsigned int)pixelsPerBlock));
     toStdout = OutputIsStdout(ropts);
     toStderr = OutputIsStderr(ropts);
 

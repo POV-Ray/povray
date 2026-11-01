@@ -1249,9 +1249,10 @@ TracePixel::FocalBlurData::FocalBlurData(const Camera& camera, TraceThreadData* 
             int Grid_Size = 2 * (int)ceil(minGridRadius) + 1;
 
             // Allocate temporary grid.
-            std::unique_ptr<char[]> Grid_Data (new char [Grid_Size * Grid_Size]);
+            const size_t gridCells = size_t(Grid_Size) * size_t(Grid_Size);
+            std::unique_ptr<char[]> Grid_Data (new char [gridCells]);
             char *p = Grid_Data.get();
-            std::memset(p, 0, Grid_Size * Grid_Size);
+            std::memset(p, 0, gridCells);
             std::vector<char*> Grid(Grid_Size);
             for(int i = 0; i < Grid_Size; i++, p += Grid_Size)
                 Grid[i] = p;
@@ -1264,7 +1265,7 @@ TracePixel::FocalBlurData::FocalBlurData(const Camera& camera, TraceThreadData* 
                 Grid[yi][xi]++;
             }
 
-            size_t remain = camera.Blur_Samples * 10;
+            size_t remain = size_t(camera.Blur_Samples) * 10;
             SequentialVector2dGeneratorPtr randgen(GetSubRandomOnDiscGenerator(0, 0.5, remain));
 
             // Distribute remaining samples.

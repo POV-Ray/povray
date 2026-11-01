@@ -118,9 +118,9 @@ SmartBlock::SmartBlock(int ox, int oy, int bw, int bh) :
     blockheight(bh)
 {
     framepixels.resize((blockwidth * 2) + (blockheight * 2) + 4);
-    pixels.resize(blockwidth * blockheight);
+    pixels.resize(size_t(blockwidth) * size_t(blockheight));
     frameflags.resize((blockwidth * 2) + (blockheight * 2) + 4);
-    flags.resize(blockwidth * blockheight);
+    flags.resize(size_t(blockwidth) * size_t(blockheight));
 }
 
 bool SmartBlock::GetFlag(int x, int y) const

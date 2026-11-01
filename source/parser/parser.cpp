@@ -287,6 +287,10 @@ void Parser::Run()
         {
             Error(e, "Illegal escape sequence '%s' in string literal.", e.offendingText.c_str());
         }
+        catch (const InvalidNumericLiteralException& e)
+        {
+            Error(e, "Invalid numeric literal '%s'.", e.offendingText.c_str());
+        }
         catch (pov_base::Exception& e)
         {
             // Error was detected by the parser, and already reported when first thrown
@@ -296,7 +300,7 @@ void Parser::Run()
         {
             // Some other exceptional situation occurred in a library or some such and couldn't be handled gracefully;
             // handle it now by failing with a corresponding parse error
-            Error(e.what());
+            Error("%s", e.what());
         }
     }
     catch(std::bad_alloc&)
@@ -472,7 +476,7 @@ void Parser::Run()
         }
         else
         {
-            Warning("Clockless animation: total of %d cameras will be used.", sceneData->cameras.size());
+            Warning("Clockless animation: total of %d cameras will be used.", int(sceneData->cameras.size()));
             sceneData->parsedCamera = sceneData->cameras[0];
         }
     }
@@ -729,10 +733,10 @@ ObjectPtr Parser::Parse_Bicubic_Patch ()
 
     Parse_Begin ();
 
-    Object = reinterpret_cast<BicubicPatch *>(Parse_Object_Id());
-    if (Object != nullptr)
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
     {
-        return (reinterpret_cast<ObjectPtr>(Object));
+        return idObject;
     }
 
     Object = new BicubicPatch();
@@ -817,9 +821,9 @@ ObjectPtr Parser::Parse_Bicubic_Patch ()
 
     Object->Compute_BBox();
 
-    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods(Object);
 
-    return (reinterpret_cast<ObjectPtr>(Object));
+    return (Object);
 }
 
 
@@ -859,10 +863,10 @@ ObjectPtr Parser::Parse_Blob()
 
     Parse_Begin();
 
-    Object = reinterpret_cast<Blob *>(Parse_Object_Id());
-    if (Object != nullptr)
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
     {
-        return (reinterpret_cast<ObjectPtr>(Object));
+        return idObject;
     }
 
     Object = new Blob();
@@ -1009,7 +1013,7 @@ ObjectPtr Parser::Parse_Blob()
 
     Object->Create_Blob_Element_Texture_List(blob_components, npoints);
 
-    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods(Object);
 
     /* The blob's texture has to be processed before Make_Blob() is called. */
 
@@ -1021,7 +1025,7 @@ ObjectPtr Parser::Parse_Blob()
     if (components > sceneData->Max_Blob_Components)
         sceneData->Max_Blob_Components = components;
 
-    return (reinterpret_cast<ObjectPtr>(Object));
+    return (Object);
 }
 
 
@@ -1151,9 +1155,9 @@ ObjectPtr Parser::Parse_Box ()
 
     Parse_Begin ();
 
-    Object = reinterpret_cast<Box *>(Parse_Object_Id());
-    if (Object != nullptr)
-        return (reinterpret_cast<ObjectPtr>(Object));
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
+        return idObject;
 
     Object = new Box();
 
@@ -1178,9 +1182,9 @@ ObjectPtr Parser::Parse_Box ()
 
     Object->Compute_BBox();
 
-    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods (Object);
 
-    return (reinterpret_cast<ObjectPtr>(Object));
+    return (Object);
 }
 
 void Parser::Parse_Mesh_Camera (Camera& Cam)
@@ -2203,9 +2207,9 @@ ObjectPtr Parser::Parse_CSG(int CSG_Type)
 
     Parse_Begin();
 
-    Object = reinterpret_cast<CSG *>(Parse_Object_Id());
-    if(Object != nullptr)
-        return (reinterpret_cast<ObjectPtr>(Object));
+    ObjectPtr idObject = Parse_Object_Id();
+    if(idObject != nullptr)
+        return idObject;
 
     if(CSG_Type & CSG_UNION_TYPE)
         Object = new CSGUnion();
@@ -2241,13 +2245,13 @@ ObjectPtr Parser::Parse_CSG(int CSG_Type)
     // if the invert flag is in the object mods, the returned pointer will be
     // different than the passed one, though the object will still be an instance
     // of a CSG. we use dynamic_cast here to aid debugging since the overhead is small.
-    Object = dynamic_cast<CSG *>(Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object)));
+    Object = dynamic_cast<CSG *>(Parse_Object_Mods(Object));
     POV_PARSER_ASSERT(Object != nullptr);
 
     if(CSG_Type & CSG_DIFFERENCE_TYPE)
         Object->Type |= CSG_DIFFERENCE_OBJECT;
 
-    return (reinterpret_cast<ObjectPtr>(Object));
+    return (Object);
 }
 
 //******************************************************************************
@@ -2258,9 +2262,9 @@ ObjectPtr Parser::Parse_Cone ()
 
     Parse_Begin ();
 
-    Object = reinterpret_cast<Cone *>(Parse_Object_Id());
-    if (Object != nullptr)
-        return (reinterpret_cast<ObjectPtr>(Object));
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
+        return idObject;
 
     Object = new Cone();
 
@@ -2278,9 +2282,9 @@ ObjectPtr Parser::Parse_Cone ()
 
     Object->Compute_BBox();
 
-    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods(Object);
 
-    return (reinterpret_cast<ObjectPtr>(Object));
+    return (Object);
 }
 
 //******************************************************************************
@@ -2291,9 +2295,9 @@ ObjectPtr Parser::Parse_Cylinder ()
 
     Parse_Begin ();
 
-    Object = reinterpret_cast<Cone *>(Parse_Object_Id());
-    if (Object != nullptr)
-        return (reinterpret_cast<ObjectPtr>(Object));
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
+        return idObject;
 
     Object = new Cone();
     Object->Cylinder();
@@ -2310,9 +2314,9 @@ ObjectPtr Parser::Parse_Cylinder ()
 
     Object->Compute_BBox();
 
-    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods(Object);
 
-    return (reinterpret_cast<ObjectPtr>(Object));
+    return (Object);
 }
 
 //******************************************************************************
@@ -2324,9 +2328,9 @@ ObjectPtr Parser::Parse_Disc ()
 
     Parse_Begin();
 
-    Object = reinterpret_cast<Disc *>(Parse_Object_Id());
-    if(Object != nullptr)
-        return (reinterpret_cast<ObjectPtr>(Object));
+    ObjectPtr idObject = Parse_Object_Id();
+    if(idObject != nullptr)
+        return idObject;
 
     Object = new Disc();
 
@@ -2354,9 +2358,9 @@ ObjectPtr Parser::Parse_Disc ()
 
     Object->Compute_Disc();
 
-    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods (Object);
 
-    return (reinterpret_cast<ObjectPtr>(Object));
+    return (Object);
 }
 
 //******************************************************************************
@@ -2370,9 +2374,9 @@ ObjectPtr Parser::Parse_HField ()
 
     Parse_Begin ();
 
-    Object = reinterpret_cast<HField *>(Parse_Object_Id());
-    if (Object != nullptr)
-        return (reinterpret_cast<ObjectPtr>(Object));
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
+        return idObject;
 
     Object = new HField();
 
@@ -2391,7 +2395,7 @@ ObjectPtr Parser::Parse_HField ()
             Temp_Water_Level = Parse_Float();
             if (sceneData->EffectiveLanguageVersion() < 200)
                 Temp_Water_Level /=256.0;
-            (reinterpret_cast<HField *>(Object))->bounding_corner1[Y] = 65536.0 * Temp_Water_Level;
+            Object->bounding_corner1[Y] = 65536.0 * Temp_Water_Level;
         END_CASE
 
         CASE (SMOOTH_TOKEN)
@@ -2404,7 +2408,7 @@ ObjectPtr Parser::Parse_HField ()
         END_CASE
     END_EXPECT
 
-    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods(Object);
 
     Object->Compute_HField(image);
 
@@ -2412,7 +2416,7 @@ ObjectPtr Parser::Parse_HField ()
 
     Destroy_Image(image);
 
-    return (reinterpret_cast<ObjectPtr>(Object));
+    return (Object);
 }
 
 
@@ -2441,9 +2445,9 @@ ObjectPtr Parser::Parse_Isosurface()
 
     Parse_Begin();
 
-    Object = reinterpret_cast<IsoSurface *>(Parse_Object_Id());
-    if (Object != nullptr)
-        return (reinterpret_cast<ObjectPtr>(Object));
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
+        return idObject;
 
     Object = new IsoSurface();
 
@@ -2510,9 +2514,9 @@ ObjectPtr Parser::Parse_Isosurface()
         Object->max_gradient = 1.1;
     }
 
-    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods (Object);
 
-    return (reinterpret_cast<ObjectPtr>(Object));
+    return (Object);
 }
 
 //******************************************************************************
@@ -2633,9 +2637,9 @@ ObjectPtr Parser::Parse_Julia_Fractal ()
 
     Parse_Begin();
 
-    Object = reinterpret_cast<Fractal *>(Parse_Object_Id());
-    if (Object != nullptr)
-        return(reinterpret_cast<ObjectPtr>(Object));
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
+        return idObject;
 
     Object = new Fractal();
 
@@ -2769,7 +2773,7 @@ ObjectPtr Parser::Parse_Julia_Fractal ()
 
     END_EXPECT
 
-    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods(Object);
 
     int num_iterations = Object->SetUp_Fractal();
     if (num_iterations > sceneData->Fractal_Iteration_Stack_Length)
@@ -2779,7 +2783,7 @@ ObjectPtr Parser::Parse_Julia_Fractal ()
         Fractal::Allocate_Iteration_Stack(td->Fractal_IStack, sceneData->Fractal_Iteration_Stack_Length);
     }
 
-    return(reinterpret_cast<ObjectPtr>(Object));
+    return(Object);
 }
 /*****************************************************************************
 *
@@ -2818,9 +2822,9 @@ ObjectPtr Parser::Parse_Lathe()
 
     Parse_Begin();
 
-    Object = reinterpret_cast<Lathe *>(Parse_Object_Id());
-    if(Object != nullptr)
-        return(reinterpret_cast<ObjectPtr>(Object));
+    ObjectPtr idObject = Parse_Object_Id();
+    if(idObject != nullptr)
+        return idObject;
 
     Object = new Lathe();
 
@@ -2977,7 +2981,7 @@ ObjectPtr Parser::Parse_Lathe()
 
     /* Parse object's modifiers. */
 
-    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods(Object);
 
     /* Destroy temporary points. */
 
@@ -2992,7 +2996,7 @@ ObjectPtr Parser::Parse_Lathe()
         td->BCyl_HInt.reserve(2*sceneData->Max_Bounding_Cylinders);
     }
 
-    return (reinterpret_cast<ObjectPtr>(Object));
+    return (Object);
 }
 
 //******************************************************************************
@@ -3004,9 +3008,9 @@ ObjectPtr Parser::Parse_Lemon ()
 
     Parse_Begin ();
 
-    Object = reinterpret_cast<Lemon *>(Parse_Object_Id());
-    if (Object != nullptr)
-        return (reinterpret_cast<ObjectPtr>(Object));
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
+        return idObject;
 
     Object = new Lemon();
 
@@ -3032,7 +3036,7 @@ ObjectPtr Parser::Parse_Lemon ()
     Object->Compute_Lemon_Data(mMessageFactory, CurrentTokenMessageContext());
 
     Object->Compute_BBox();
-    ptr = reinterpret_cast<ObjectPtr>(Object);
+    ptr = Object;
 
     Parse_Object_Mods(ptr);
 
@@ -3233,9 +3237,9 @@ ObjectPtr Parser::Parse_Light_Source ()
 
     Parse_Begin ();
 
-    Object = reinterpret_cast<LightSource *>(Parse_Object_Id());
-    if (Object != nullptr)
-        return (reinterpret_cast<ObjectPtr>(Object));
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
+        return idObject;
 
     Object = new LightSource ();
 
@@ -3419,16 +3423,27 @@ ObjectPtr Parser::Parse_Light_Source ()
         END_CASE
 
         CASE (AREA_LIGHT_TOKEN)
-            Object->Area_Light = true;
-            Parse_Vector (Object->Axis1); Parse_Comma ();
-            Parse_Vector (Object->Axis2); Parse_Comma ();
-            Object->Area_Size1 = (int)Parse_Float();
-            if (Object->Area_Size1 == 0)
-                Error("Area size must be greater than zero.");
-            Parse_Comma ();
-            Object->Area_Size2 = (int)Parse_Float();
-            if (Object->Area_Size2 == 0)
-                Error("Area size must be greater than zero.");
+            {
+                Object->Area_Light = true;
+                Parse_Vector (Object->Axis1); Parse_Comma ();
+                Parse_Vector (Object->Axis2); Parse_Comma ();
+                // The sizes index the light grid, so they must be positive ints whose product fits in an int.
+                DBL areaSize = Parse_Float();
+                if (!(areaSize >= 1.0))
+                    Error("Area size must be greater than zero.");
+                if (areaSize > std::numeric_limits<int>::max())
+                    Error("Area size is too large.");
+                Object->Area_Size1 = (int)areaSize;
+                Parse_Comma ();
+                areaSize = Parse_Float();
+                if (!(areaSize >= 1.0))
+                    Error("Area size must be greater than zero.");
+                if (areaSize > std::numeric_limits<int>::max())
+                    Error("Area size is too large.");
+                Object->Area_Size2 = (int)areaSize;
+                if (static_cast<POV_LONG>(Object->Area_Size1) * Object->Area_Size2 > std::numeric_limits<int>::max())
+                    Error("Area light has too many samples.");
+            }
         END_CASE
 
         CASE (JITTER_TOKEN)
@@ -3477,29 +3492,29 @@ ObjectPtr Parser::Parse_Light_Source ()
         CASE (TRANSLATE_TOKEN)
             Parse_Vector (Local_Vector);
             Compute_Translation_Transform(&Local_Trans, Local_Vector);
-            Translate_Object (reinterpret_cast<ObjectPtr>(Object), Local_Vector, &Local_Trans);
+            Translate_Object (Object, Local_Vector, &Local_Trans);
         END_CASE
 
         CASE (ROTATE_TOKEN)
             Parse_Vector (Local_Vector);
             Compute_Rotation_Transform(&Local_Trans, Local_Vector);
-            Rotate_Object (reinterpret_cast<ObjectPtr>(Object), Local_Vector, &Local_Trans);
+            Rotate_Object (Object, Local_Vector, &Local_Trans);
         END_CASE
 
         CASE (SCALE_TOKEN)
             Parse_Scale_Vector (Local_Vector);
             Compute_Scaling_Transform(&Local_Trans, Local_Vector);
-            Scale_Object (reinterpret_cast<ObjectPtr>(Object), Local_Vector, &Local_Trans);
+            Scale_Object (Object, Local_Vector, &Local_Trans);
         END_CASE
 
         CASE (TRANSFORM_TOKEN)
-            Transform_Object (reinterpret_cast<ObjectPtr>(Object), Parse_Transform(&Local_Trans));
+            Transform_Object (Object, Parse_Transform(&Local_Trans));
         END_CASE
 
         CASE (MATRIX_TOKEN)
             Parse_Matrix (Local_Matrix);
             Compute_Matrix_Transform(&Local_Trans, Local_Matrix);
-            Transform_Object (reinterpret_cast<ObjectPtr>(Object), &Local_Trans);
+            Transform_Object (Object, &Local_Trans);
         END_CASE
 
         OTHERWISE
@@ -3536,7 +3551,7 @@ ObjectPtr Parser::Parse_Light_Source ()
         }
     }
 
-    return (reinterpret_cast<ObjectPtr>(Object));
+    return (Object);
 }
 
 
@@ -3575,9 +3590,9 @@ ObjectPtr Parser::Parse_Mesh()
 
     Parse_Begin();
 
-    Object = reinterpret_cast<Mesh *>(Parse_Object_Id());
-    if (Object != nullptr)
-        return (reinterpret_cast<ObjectPtr>(Object));
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
+        return idObject;
 
     /* Create object. */
 
@@ -3618,7 +3633,7 @@ ObjectPtr Parser::Parse_Mesh()
 
     // Parse object modifiers.
 
-    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods (Object);
 
     // Create bounding box tree.
 
@@ -4051,9 +4066,9 @@ ObjectPtr Parser::Parse_Mesh2()
 
     Parse_Begin();
 
-    Object = reinterpret_cast<Mesh *>(Parse_Object_Id());
-    if (Object != nullptr)
-        return (reinterpret_cast<ObjectPtr>(Object));
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
+        return idObject;
 
     /* Create object. */
 
@@ -4067,7 +4082,7 @@ ObjectPtr Parser::Parse_Mesh2()
 
     // Parse object modifiers.
 
-    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods (Object);
 
     // Create bounding box tree.
 
@@ -4742,10 +4757,10 @@ ObjectPtr Parser::Parse_Ovus()
 
     Parse_Begin();
 
-    Object = reinterpret_cast<Ovus *>(Parse_Object_Id());
-    if (Object != nullptr)
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
     {
-        return(reinterpret_cast<ObjectPtr>(Object));
+        return idObject;
     }
 
     Object = new Ovus();
@@ -4865,8 +4880,8 @@ ObjectPtr Parser::Parse_Ovus()
     }
 
     Object->Compute_BBox();
-    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
-    return (reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods (Object);
+    return (Object);
 }
 
 /*****************************************************************************
@@ -4899,9 +4914,9 @@ ObjectPtr Parser::Parse_Parametric(void)
 
     Parse_Begin();
 
-    Object = reinterpret_cast<Parametric *>(Parse_Object_Id());
-    if (Object != nullptr)
-        return (reinterpret_cast<ObjectPtr>(Object));
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
+        return idObject;
 
     Object = new Parametric();
 
@@ -4966,12 +4981,12 @@ ObjectPtr Parser::Parse_Parametric(void)
         END_CASE
     END_EXPECT
 
-    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods(Object);
 
     if(PrecompFlag != 0)
         Object->Precompute_Parametric_Values(PrecompFlag, PrecompDepth, GetParserDataPtr());
 
-    return (reinterpret_cast<ObjectPtr>(Object));
+    return (Object);
 }
 
 //******************************************************************************
@@ -4983,9 +4998,9 @@ ObjectPtr Parser::Parse_Plane ()
 
     Parse_Begin ();
 
-    Object = reinterpret_cast<Plane *>(Parse_Object_Id());
-    if (Object != nullptr)
-        return (reinterpret_cast<ObjectPtr>(Object));
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
+        return idObject;
 
     Object = new Plane();
 
@@ -5000,9 +5015,9 @@ ObjectPtr Parser::Parse_Plane ()
 
     Object->Compute_BBox();
 
-    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods (Object);
 
-    return (reinterpret_cast<ObjectPtr>(Object));
+    return (Object);
 }
 
 //******************************************************************************
@@ -5013,9 +5028,9 @@ ObjectPtr Parser::Parse_Poly (int order)
 
     Parse_Begin ();
 
-    Object = reinterpret_cast<Poly *>(Parse_Object_Id());
-    if (Object != nullptr)
-        return (reinterpret_cast<ObjectPtr>(Object));
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
+        return idObject;
 
     if (order == 0)
     {
@@ -5030,9 +5045,9 @@ ObjectPtr Parser::Parse_Poly (int order)
 
     Object->Compute_BBox();
 
-    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods (Object);
 
-    return (reinterpret_cast<ObjectPtr>(Object));
+    return (Object);
 }
 
 //******************************************************************************
@@ -5046,9 +5061,9 @@ ObjectPtr Parser::Parse_Polynom ()
 
     Parse_Begin ();
 
-    Object = reinterpret_cast<Poly *>(Parse_Object_Id());
-    if (Object != nullptr)
-        return (reinterpret_cast<ObjectPtr>(Object));
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
+        return idObject;
 
     order = (int)Parse_Float();      Parse_Comma();
     if (order < 2 || order > MAX_ORDER)
@@ -5084,9 +5099,9 @@ ObjectPtr Parser::Parse_Polynom ()
 
     Object->Compute_BBox();
 
-    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods (Object);
 
-    return (reinterpret_cast<ObjectPtr>(Object));
+    return (Object);
 }
 
 /*****************************************************************************
@@ -5129,10 +5144,10 @@ ObjectPtr Parser::Parse_Polygon()
 
     Parse_Begin();
 
-    Object = reinterpret_cast<Polygon *>(Parse_Object_Id());
-    if (Object != nullptr)
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
     {
-        return(reinterpret_cast<ObjectPtr>(Object));
+        return idObject;
     }
 
     Object = new Polygon();
@@ -5197,9 +5212,9 @@ ObjectPtr Parser::Parse_Polygon()
 
     POV_FREE (Points);
 
-    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods (Object);
 
-    return(reinterpret_cast<ObjectPtr>(Object));
+    return(Object);
 }
 
 
@@ -5244,10 +5259,10 @@ ObjectPtr Parser::Parse_Prism()
 
     Parse_Begin();
 
-    Object = reinterpret_cast<Prism *>(Parse_Object_Id());
-    if (Object != nullptr)
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
     {
-        return(reinterpret_cast<ObjectPtr>(Object));
+        return idObject;
     }
 
     Object = new Prism();
@@ -5495,13 +5510,13 @@ ObjectPtr Parser::Parse_Prism()
 
     /* Parse object's modifiers. */
 
-    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods(Object);
 
     /* Destroy temporary points. */
 
     POV_FREE (Points);
 
-    return(reinterpret_cast<ObjectPtr>(Object));
+    return(Object);
 }
 
 //******************************************************************************
@@ -5513,9 +5528,9 @@ ObjectPtr Parser::Parse_Quadric ()
 
     Parse_Begin ();
 
-    Object = reinterpret_cast<Quadric *>(Parse_Object_Id());
-    if (Object != nullptr)
-        return (reinterpret_cast<ObjectPtr>(Object));
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
+        return idObject;
 
     Object = new Quadric();
 
@@ -5529,9 +5544,9 @@ ObjectPtr Parser::Parse_Quadric ()
 
     Object->Compute_BBox(Min, Max);
 
-    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods (Object);
 
-    return (reinterpret_cast<ObjectPtr>(Object));
+    return (Object);
 }
 
 //******************************************************************************
@@ -5546,9 +5561,9 @@ ObjectPtr Parser::Parse_Smooth_Triangle ()
 
     Parse_Begin ();
 
-    Object = reinterpret_cast<SmoothTriangle *>(Parse_Object_Id());
-    if (Object != nullptr)
-        return (reinterpret_cast<ObjectPtr>(Object));
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
+        return idObject;
 
     Object = new SmoothTriangle();
 
@@ -5590,9 +5605,9 @@ ObjectPtr Parser::Parse_Smooth_Triangle ()
 
     Object->Compute_BBox();
 
-    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods(Object);
 
-    return (reinterpret_cast<ObjectPtr>(Object));
+    return (Object);
 }
 
 
@@ -5633,10 +5648,10 @@ ObjectPtr Parser::Parse_Sor()
 
     Parse_Begin();
 
-    Object = reinterpret_cast<Sor *>(Parse_Object_Id());
-    if (Object != nullptr)
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
     {
-        return(reinterpret_cast<ObjectPtr>(Object));
+        return idObject;
     }
 
     Object = new Sor();
@@ -5692,7 +5707,7 @@ ObjectPtr Parser::Parse_Sor()
 
     /* Parse object's modifiers. */
 
-    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods(Object);
 
     /* Destroy temporary points. */
 
@@ -5707,7 +5722,7 @@ ObjectPtr Parser::Parse_Sor()
         td->BCyl_HInt.reserve(2*sceneData->Max_Bounding_Cylinders);
     }
 
-    return (reinterpret_cast<ObjectPtr>(Object));
+    return (Object);
 }
 
 //******************************************************************************
@@ -5718,10 +5733,10 @@ ObjectPtr Parser::Parse_Sphere()
 
     Parse_Begin();
 
-    Object = reinterpret_cast<Sphere *>(Parse_Object_Id());
-    if (Object != nullptr)
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
     {
-        return (reinterpret_cast<ObjectPtr>(Object));
+        return idObject;
     }
 
     Object = new Sphere();
@@ -5734,9 +5749,9 @@ ObjectPtr Parser::Parse_Sphere()
 
     Object->Compute_BBox();
 
-    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods(Object);
 
-    return(reinterpret_cast<ObjectPtr>(Object));
+    return(Object);
 }
 
 
@@ -5776,9 +5791,9 @@ ObjectPtr Parser::Parse_Sphere_Sweep()
 
     Parse_Begin();
 
-    Object = reinterpret_cast<SphereSweep *>(Parse_Object_Id());
-    if (Object != nullptr)
-        return (reinterpret_cast<ObjectPtr>(Object));
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
+        return idObject;
 
     Object = new SphereSweep();
 
@@ -5835,9 +5850,9 @@ ObjectPtr Parser::Parse_Sphere_Sweep()
 
     Object->Compute_BBox();
 
-    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods(Object);
 
-    return (reinterpret_cast<ObjectPtr>(Object));
+    return (Object);
 }
 
 
@@ -5877,10 +5892,10 @@ ObjectPtr Parser::Parse_Superellipsoid()
 
     Parse_Begin();
 
-    Object = reinterpret_cast<Superellipsoid *>(Parse_Object_Id());
-    if (Object != nullptr)
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
     {
-        return(reinterpret_cast<ObjectPtr>(Object));
+        return idObject;
     }
 
     Object = new Superellipsoid();
@@ -5899,9 +5914,9 @@ ObjectPtr Parser::Parse_Superellipsoid()
 
     /* Parse object's modifiers. */
 
-    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods(Object);
 
-    return(reinterpret_cast<ObjectPtr>(Object));
+    return(Object);
 }
 
 
@@ -5943,10 +5958,10 @@ ObjectPtr Parser::Parse_Torus()
 
     Parse_Begin();
 
-    Object = reinterpret_cast<Torus *>(Parse_Object_Id());
-    if (Object != nullptr)
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
     {
-        return(reinterpret_cast<ObjectPtr>(Object));
+        return idObject;
     }
 
     /* Read in the two radii. */
@@ -6010,12 +6025,12 @@ ObjectPtr Parser::Parse_Torus()
 
     Object->Compute_BBox();
 
-    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods (Object);
 
     if (invert)
-        Object = reinterpret_cast<Torus *>(Object->Invert());
+        Object = static_cast<Torus *>(Object->Invert()); // Torus does not override Invert(), which returns this
 
-    return (reinterpret_cast<ObjectPtr>(Object));
+    return (Object);
 }
 
 //******************************************************************************
@@ -6026,10 +6041,10 @@ ObjectPtr Parser::Parse_Triangle()
 
     Parse_Begin();
 
-    Object = reinterpret_cast<Triangle *>(Parse_Object_Id());
-    if (Object != nullptr)
+    ObjectPtr idObject = Parse_Object_Id();
+    if (idObject != nullptr)
     {
-        return(reinterpret_cast<ObjectPtr>(Object));
+        return idObject;
     }
 
     Object = new Triangle();
@@ -6043,9 +6058,9 @@ ObjectPtr Parser::Parse_Triangle()
     if(!Object->Compute_Triangle())
         Warning("Degenerate triangle. Please remove.");
 
-    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
+    Parse_Object_Mods(Object);
 
-    return(reinterpret_cast<ObjectPtr>(Object));
+    return(Object);
 }
 
 //******************************************************************************
@@ -8319,7 +8334,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                     CASE (RIGHT_PAREN_TOKEN)
                         if (!finalParameter)
                             // the parameter list was closed prematurely
-                            Error("Expected %d RValues but only %d found.",lvalues.size(),i);
+                            Error("Expected %d RValues but only %d found.",int(lvalues.size()),i);
                         // the parameter was left empty
                         if (!optional)
                             Error("Cannot omit RValue for non-optional LValue.");

@@ -396,7 +396,7 @@ void Parser::Read_Symbol(const RawToken& rawToken)
     size_t j;
     int k;
     POV_ARRAY *a;
-    SYM_ENTRY *Temp_Entry;
+    SYM_ENTRY *Temp_Entry = nullptr;
     POV_PARAM *Par;
     DBL val;
     SymbolTable* table = nullptr;
@@ -436,8 +436,9 @@ void Parser::Read_Symbol(const RawToken& rawToken)
             mToken.is_array_elem = false;
             mToken.is_mixed_array_elem = false;
             mToken.is_dictionary_elem = false;
-            mToken.NumberPtr = &(Temp_Entry->Token_Number);
-            mToken.DataPtr   = &(Temp_Entry->Data);
+            mToken.NumberPtr = nullptr; // a pseudo-dictionary has no symbol entry of its own
+            mToken.DataPtr   = nullptr;
+            Local_Index      = pseudoDictionary; // the table the pseudo-dictionary stands for
 
             table = nullptr;
         }
@@ -2020,7 +2021,7 @@ void Parser::Invoke_Macro()
                     CASE (RIGHT_PAREN_TOKEN)
                         if (!(finalParameter && properlyDelimited))
                             // the parameter list was closed prematurely
-                            Error("Expected %d parameters but only %d found.",PMac->parameters.size(),i);
+                            Error("Expected %d parameters but only %d found.",int(PMac->parameters.size()),i);
                         // the parameter was left empty
                         if (!PMac->parameters[i].optional)
                             Error("Cannot omit non-optional macro parameter %d.",i+1);
