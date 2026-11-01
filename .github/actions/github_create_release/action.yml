@@ -29,6 +29,8 @@ runs:
   using: composite
   steps:
   - shell: bash
+    env:
+      GH_TOKEN: ${{ inputs.token }}
     run: |
       if ${{ inputs.is-draft }} ; then
         draft_switch='--draft'
@@ -43,7 +45,6 @@ runs:
       else
         prerelease_switch=''
       fi
-      gh auth login --with-token <<< "${{ inputs.token }}"
       gh release create ${{ inputs.tag-name }}                        \
         --target ${{ github.sha }}                                    \
         $draft_switch $prerelease_switch                              \
