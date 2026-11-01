@@ -3068,7 +3068,7 @@ class FileBackedPixelContainer
         {
             if ((m_File = open(UCS2toASCIIString(m_Path).c_str(), O_CREAT | O_RDWR | O_TRUNC, S_IRUSR | S_IWUSR)) == -1)
                 throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot open backing file for intermediate image storage.");
-            m_Blocksize = bs;
+            m_Blocksize = (bs != 0) ? bs : 1; // a zero block size would divide by zero below
             m_Buffer.resize(m_Blocksize);
             // write extra data to create the big file and help 3rd party reader
             POV_OFF_T pos;
