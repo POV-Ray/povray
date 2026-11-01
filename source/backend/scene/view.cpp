@@ -406,11 +406,11 @@ void ViewData::CompletedRectangle(const POVRect& rect, unsigned int serial, cons
         POV_RTR_ASSERT(pixels.size() == rect.GetArea());
         int y = rect.top - 1;
         int x = rect.right;
-        int offset;
+        size_t offset = 0;
         for(vector<RGBTColour>::const_iterator i(pixels.begin()); i != pixels.end(); i++)
         {
             if (++x > rect.right)
-                offset = (++y * width + (x = rect.left)) * 5;
+                offset = (size_t(++y) * width + (x = rect.left)) * 5;
             POV_RTR_ASSERT(rtrData->rtrPixels.size() >= offset + 5);
             rtrData->rtrPixels[offset++] = i->red();
             rtrData->rtrPixels[offset++] = i->green();
@@ -1478,7 +1478,7 @@ RTRData::RTRData(ViewData& v, int mrt) :
 {
     width = viewData.GetWidth();
     height = viewData.GetHeight();
-    rtrPixels.resize(width * height * 5);
+    rtrPixels.resize(size_t(width) * size_t(height) * 5);
 }
 
 RTRData::~RTRData()
