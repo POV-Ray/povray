@@ -335,6 +335,12 @@ MultiPartInputFile::initialize()
     // Perform usual check on headers.
     //
 
+    if ( _data->_headers.size() == 0)
+    {
+        throw IEX_NAMESPACE::ArgExc ("Files must contain at least one header");
+    }
+
+
     for (size_t i = 0; i < _data->_headers.size(); i++)
     {
         //
