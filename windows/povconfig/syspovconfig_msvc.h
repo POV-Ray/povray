@@ -131,6 +131,15 @@
     // (no need to set `POV_*_SUPPORTED for VS 2019 and later, we can probe `__cplusplus`)
     // TODO - This compiler version has been tested, but no effort has been made yet
     // to iron out any inconveniences such as unwarranted warnings or the like.
+  #elif _MSC_VER >= 1930 && _MSC_VER < 1950
+    // MS Visual C++ 2022 (aka 14.3x and 14.4x)
+    #define POV_COMPILER_VER                  "msvc143"
+    #define METADATA_COMPILER_STRING          "msvc 14.3x/14.4x"
+    // Visual C++ 2022 also defines `__cplusplus` as `199711L` unless `/Zc:__cplusplus` is given,
+    // but supports all the C++11 features we need.
+    #define POV_CPP11_SUPPORTED               1
+    // TODO - This compiler version has been tested, but no effort has been made yet
+    // to iron out any inconveniences such as unwarranted warnings or the like.
   #else
     // Unrecognized version of MS Visual C++
     #error("Your version of MS Visual C++ is still unknown to us. Proceed at your own risk.")

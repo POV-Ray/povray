@@ -86,7 +86,7 @@ jobs:
         solution: vs2015
         configuration: Release
         platform: x64
-        toolset: v142
+        toolset: v143
         msbuild-options: '/p:WindowsTargetPlatformVersion=10.0.19041.0'
     - name: 'Sanity-Check Working Tree'
       uses: ./.github/actions/git_check_repo
