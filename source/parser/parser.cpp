@@ -3423,16 +3423,27 @@ ObjectPtr Parser::Parse_Light_Source ()
         END_CASE
 
         CASE (AREA_LIGHT_TOKEN)
-            Object->Area_Light = true;
-            Parse_Vector (Object->Axis1); Parse_Comma ();
-            Parse_Vector (Object->Axis2); Parse_Comma ();
-            Object->Area_Size1 = (int)Parse_Float();
-            if (Object->Area_Size1 == 0)
-                Error("Area size must be greater than zero.");
-            Parse_Comma ();
-            Object->Area_Size2 = (int)Parse_Float();
-            if (Object->Area_Size2 == 0)
-                Error("Area size must be greater than zero.");
+            {
+                Object->Area_Light = true;
+                Parse_Vector (Object->Axis1); Parse_Comma ();
+                Parse_Vector (Object->Axis2); Parse_Comma ();
+                // The sizes index the light grid, so they must be positive ints whose product fits in an int.
+                DBL areaSize = Parse_Float();
+                if (!(areaSize >= 1.0))
+                    Error("Area size must be greater than zero.");
+                if (areaSize > std::numeric_limits<int>::max())
+                    Error("Area size is too large.");
+                Object->Area_Size1 = (int)areaSize;
+                Parse_Comma ();
+                areaSize = Parse_Float();
+                if (!(areaSize >= 1.0))
+                    Error("Area size must be greater than zero.");
+                if (areaSize > std::numeric_limits<int>::max())
+                    Error("Area size is too large.");
+                Object->Area_Size2 = (int)areaSize;
+                if (static_cast<POV_LONG>(Object->Area_Size1) * Object->Area_Size2 > std::numeric_limits<int>::max())
+                    Error("Area light has too many samples.");
+            }
         END_CASE
 
         CASE (JITTER_TOKEN)
