@@ -642,20 +642,57 @@ bool VirtualFrontEnd::Start(POVMS_Object& opts)
   if(opts.Exist(kPOVAttrib_Declare) == true)
     opts.Get(kPOVAttrib_Declare, declares);
 
+  float width  = (float)opts.TryGetInt(kPOVAttrib_Width, 160);
+  float height = (float)opts.TryGetInt(kPOVAttrib_Height, 120);
+
   POVMS_Object image_width(kPOVMSType_WildCard);
   image_width.SetString(kPOVAttrib_Identifier, "image_width");
-  image_width.SetFloat(kPOVAttrib_Value, opts.TryGetInt(kPOVAttrib_Width, 160));
+  image_width.SetFloat(kPOVAttrib_Value, width);
   declares.Append(image_width);
 
   POVMS_Object image_height(kPOVMSType_WildCard);
   image_height.SetString(kPOVAttrib_Identifier, "image_height");
-  image_height.SetFloat(kPOVAttrib_Value, opts.TryGetInt(kPOVAttrib_Height, 120));
+  image_height.SetFloat(kPOVAttrib_Value, height);
   declares.Append(image_height);
 
   POVMS_Object input_file_name(kPOVMSType_WildCard);
   input_file_name.SetString(kPOVAttrib_Identifier, "input_file_name");
   input_file_name.SetString(kPOVAttrib_Value, UCS2toSysString(ip.GetFile()).c_str());
   declares.Append(input_file_name);
+
+  float start_column = opts.TryGetFloat(kPOVAttrib_StartColumn, 0.0);
+  float end_column   = opts.TryGetFloat(kPOVAttrib_EndColumn,   1.0);
+  float start_row    = opts.TryGetFloat(kPOVAttrib_StartRow,    0.0);
+  float end_row      = opts.TryGetFloat(kPOVAttrib_EndRow,      1.0);
+
+  if(start_column >= 1.0)
+      start_column = (int)start_column / width;
+  if(end_column > 1.0)
+      end_column = (int)end_column / width;
+  if(start_row >= 1.0)
+      start_row = (int)start_row / height;
+  if(end_row > 1.0)
+      end_row = (int)end_row / height;
+
+  POVMS_Object image_start_column(kPOVMSType_WildCard);
+  image_start_column.SetString(kPOVAttrib_Identifier, "image_start_column");
+  image_start_column.SetFloat(kPOVAttrib_Value, start_column);
+  declares.Append(image_start_column);
+
+  POVMS_Object image_end_column(kPOVMSType_WildCard);
+  image_end_column.SetString(kPOVAttrib_Identifier, "image_end_column");
+  image_end_column.SetFloat(kPOVAttrib_Value, end_column);
+  declares.Append(image_end_column);
+
+  POVMS_Object image_start_row(kPOVMSType_WildCard);
+  image_start_row.SetString(kPOVAttrib_Identifier, "image_start_row");
+  image_start_row.SetFloat(kPOVAttrib_Value, start_row);
+  declares.Append(image_start_row);
+
+  POVMS_Object image_end_row(kPOVMSType_WildCard);
+  image_end_row.SetString(kPOVAttrib_Identifier, "image_end_row");
+  image_end_row.SetFloat(kPOVAttrib_Value, end_row);
+  declares.Append(image_end_row);
 
   int initialFrame = opts.TryGetInt (kPOVAttrib_InitialFrame, 0) ;
   int finalFrame = opts.TryGetInt (kPOVAttrib_FinalFrame, 0) ;
