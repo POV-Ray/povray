@@ -1,0 +1,95 @@
+# POV-Ray CLI windows build check
+# Trevor SANDY <trevor.sandy@gmail.com>
+# Last Update: May 22, 2022
+#
+# This action should be added under the 'build_windows' job as follows:
+#    - name: 'Check Functionality'
+#      if: ${{ success() }}
+#      uses: POV-Ray/povray/.github/actions/windows_check@gh-actions-v2
+#      with:
+#        version-base: 3.8
+#        solution: vs2015
+#        platform: x64
+        
+name: 'Check POV-Ray CLI for Windows'
+description: 'Run build check step for POV-Ray CLI for Windows'
+
+inputs:
+  solution:
+    description: 'subdirectory of `windows` in which `povray.sln` is located'
+    required: true
+  version-base:
+    description: 'VERSION_BASE value'
+    required: true
+  platform:
+    description: 'solution platform to build'
+    required: false
+    default: 'x64'
+  check-output:
+    description: 'check output file with path'
+    required: false
+    default: 'checks\space in dir name test\biscuit space in file name test'
+  check-pov-file:
+    description: 'check pov input file'
+    required: false
+    default: 'checks\space in dir name test\biscuit.pov'
+  check-parameters:
+    description: 'image render parameters'
+    required: false
+    default: '-d -p +a0.3 +UA +A +w320 +h240'
+  check-includes:
+    description: 'paths to include ini files'
+    required: false
+    default: '+L"..\..\distribution\ini" +L"..\..\distribution\include" +L"..\..\distribution\scenes"'
+
+runs:
+  using: composite
+  steps:
+  - shell: cmd
+    run: |
+      @ECHO OFF &SETLOCAL
+      SET PL=64
+      SET PACKAGE=pvengine
+      SET POV_IGNORE_SYSCONF_MSG=yes
+      SET PLAFORM=${{ inputs.platform }}
+      SET VERSION_BASE=${{ inputs.version-base }}
+      SET SOLUTION_PATH=windows/${{ inputs.solution }}/
+      SET BUILD_CHK_OUTPUT=${{ inputs.check-output }}
+      SET BUILD_CHK_POV_FILE=${{ inputs.check-pov-file }}
+      SET BUILD_CHK_PARAMS=${{ inputs.check-parameters }}
+      SET BUILD_CHK_INCLUDE=${{ inputs.check-includes }}
+      IF %PLAFORM% NEQ x64 SET PL=32
+      IF EXIST "%BUILD_CHK_OUTPUT%" DEL /Q "%BUILD_CHK_OUTPUT%"
+      SET CONFIG_DIR=%USERPROFILE%\AppData\Local\POV-Ray Software\POV-Ray\%PACKAGE%-%VERSION_BASE%\config
+      IF NOT EXIST "%CONFIG_DIR%\" MKDIR "%CONFIG_DIR%\"
+      CD %SOLUTION_PATH%
+      ECHO Create %CONFIG_DIR%\povray.conf...
+      COPY /V /Y "..\..\distribution\povray.conf" "%CONFIG_DIR%\povray.conf" /A
+      SET genConfigFile="%CONFIG_DIR%\povray.conf" ECHO
+      :GENERATE build check povray.conf settings file
+      >>%genConfigFile%.
+      >>%genConfigFile% ; POV-Ray build check conf settings
+      >>%genConfigFile%.
+      >>%genConfigFile% read* = "%CONFIG_DIR%"
+      >>%genConfigFile%.
+      >>%genConfigFile% ; POV-Ray is called from (%CD%).
+      >>%genConfigFile% read* = "..\..\distribution\ini"
+      >>%genConfigFile% read* = "..\..\distribution\include"
+      >>%genConfigFile% read* = "..\..\distribution\scenes"
+      >>%genConfigFile% read+write* = ".\tests\space in dir name test"
+      ECHO Create %CONFIG_DIR%\povray.ini...
+      COPY /V /Y "..\..\distribution\ini\povray.ini" "%CONFIG_DIR%\povray.ini" /A
+      SET genConfigFile="%CONFIG_DIR%\povray.ini" ECHO
+      :GENERATE build check povray.ini settings file
+      >>%genConfigFile%.
+      >>%genConfigFile% ; POV-Ray build check ini settings
+      >>%genConfigFile%.
+      >>%genConfigFile% Output_to_File=true
+      >>%genConfigFile% Output_File_Type=N8             ; (+/-Ftype)
+      SET BUILD_CHK_COMMAND=+I"%BUILD_CHK_POV_FILE%" +O"%BUILD_CHK_OUTPUT%.%PL%bit.png" %BUILD_CHK_PARAMS% %BUILD_CHK_INCLUDE%
+      ECHO BUILD_CHECK_COMMAND......[%PACKAGE%%PL%.exe %BUILD_CHK_COMMAND%]
+      bin%PL%\%PACKAGE%%PL%.exe %BUILD_CHK_COMMAND%
+      ENDLOCAL
+
+
+
