@@ -1506,7 +1506,8 @@ bool ot_read_file(OT_NODE **root, IStream *fd, const OT_READ_PARAM* param, OT_RE
 {
     bool retval, got_eof;
     int line_num = 0;
-    int tempdepth, tx, ty, tz;
+    int tempdepth;
+    unsigned int tx, ty, tz;   // %x takes unsigned int*
     int goodreads = 0;
     int count;
     bool goodparse = true;
@@ -1515,7 +1516,7 @@ bool ot_read_file(OT_NODE **root, IStream *fd, const OT_READ_PARAM* param, OT_RE
     OT_BLOCK *new_block;
     OT_ID id;
     char normal_string[30], to_nearest_string[30];
-    char line[101];
+    char line[256];            // lines POV-Ray itself writes can exceed 98 characters
 
     memset(&bl, 0, sizeof(OT_BLOCK));
 
@@ -1524,7 +1525,7 @@ bool ot_read_file(OT_NODE **root, IStream *fd, const OT_READ_PARAM* param, OT_RE
         info->Gather_Total.Clear();
         info->Gather_Total_Count = 0;
 
-        while (!(got_eof = !fd->getline (line, 99)) && goodparse)
+        while (!(got_eof = !fd->getline (line, sizeof(line))) && goodparse)
         {
             switch ( line[0] )
             {
@@ -1545,7 +1546,7 @@ bool ot_read_file(OT_NODE **root, IStream *fd, const OT_READ_PARAM* param, OT_RE
                 {
 #if (NUM_COLOUR_CHANNELS == 3)
                     RGBColour tempCol;
-                    count = sscanf(line, "C%d %lf %lf %lf %s %f %f %f %f %f %s\n", // tw
+                    count = sscanf(line, "C%d %lf %lf %lf %29s %f %f %f %f %f %29s\n", // tw
                                    &tempdepth,      // since you can't scan a short
                                    &bl.Point[X], &bl.Point[Y], &bl.Point[Z],
                                    normal_string,
@@ -1564,13 +1565,15 @@ bool ot_read_file(OT_NODE **root, IStream *fd, const OT_READ_PARAM* param, OT_RE
                         bl.Bounce_Depth = (short)tempdepth - 1;
 
                         // normals aren't very critical for direction precision, so they are packed
-                        sscanf(normal_string, "%02x%02x%02x", &tx, &ty, &tz);
+                        if (sscanf(normal_string, "%2x%2x%2x", &tx, &ty, &tz) != 3)
+                            break; // malformed or cut-short packed vector: skip the line
                         bl.S_Normal[X] = ((double)tx * (1./ 254.))*2.-1.;
                         bl.S_Normal[Y] = ((double)ty * (1./ 254.))*2.-1.;
                         bl.S_Normal[Z] = ((double)tz * (1./ 254.))*2.-1.;
                         bl.S_Normal.normalize();
 
-                        sscanf(to_nearest_string, "%02x%02x%02x", &tx, &ty, &tz);
+                        if (sscanf(to_nearest_string, "%2x%2x%2x", &tx, &ty, &tz) != 3)
+                            break; // malformed or cut-short packed vector: skip the line
                         bl.To_Nearest_Surface[X] = ((double)tx * (1./ 254.))*2.-1.;
                         bl.To_Nearest_Surface[Y] = ((double)ty * (1./ 254.))*2.-1.;
                         bl.To_Nearest_Surface[Z] = ((double)tz * (1./ 254.))*2.-1.;

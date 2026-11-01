@@ -916,7 +916,8 @@ bool RadiosityCache::Load(const Path& inputFile)
 
         bool got_eof;
         int line_num = 0;
-        int depth, tx, ty, tz;
+        int depth;
+        unsigned int tx, ty, tz;   // %x takes unsigned int*
         Vector3d point;
         Vector3d normal;
         Vector3d to_nearest;
@@ -928,12 +929,12 @@ bool RadiosityCache::Load(const Path& inputFile)
         int count;
         DBL brightness;
         char normal_string[30], to_nearest_string[30];
-        char line[101];
+        char line[256];            // lines POV-Ray itself writes can exceed 98 characters
 
         //info->Gather_Total.clear();
         //info->Gather_Total_Count = 0;
 
-        while (!(got_eof = !fd->getline (line, 99)))
+        while (!(got_eof = !fd->getline (line, sizeof(line))))
         {
             switch ( line[0] )
             {
@@ -954,7 +955,7 @@ bool RadiosityCache::Load(const Path& inputFile)
                 {
 #if (NUM_COLOUR_CHANNELS == 3)
                     RGBColour tempCol;
-                    count = sscanf(line, "C%d %lf %lf %lf %s %f %f %f %lf %lf %s\n", // tw
+                    count = sscanf(line, "C%d %lf %lf %lf %29s %f %f %f %lf %lf %29s\n", // tw
                         &depth,
                         &point[X], &point[Y], &point[Z],
                         normal_string,
@@ -971,13 +972,15 @@ bool RadiosityCache::Load(const Path& inputFile)
                         depth = depth - 1; // file format still uses 1-based bounce depth counting
 
                         // normals aren't very critical for direction precision, so they are packed
-                        sscanf(normal_string, "%02x%02x%02x", &tx, &ty, &tz);
+                        if (sscanf(normal_string, "%2x%2x%2x", &tx, &ty, &tz) != 3)
+                            break; // malformed or cut-short packed vector: skip the line
                         normal[X] = ((double)tx * (1./ 254.))*2.-1.;
                         normal[Y] = ((double)ty * (1./ 254.))*2.-1.;
                         normal[Z] = ((double)tz * (1./ 254.))*2.-1.;
                         normal.normalize();
 
-                        sscanf(to_nearest_string, "%02x%02x%02x", &tx, &ty, &tz);
+                        if (sscanf(to_nearest_string, "%2x%2x%2x", &tx, &ty, &tz) != 3)
+                            break; // malformed or cut-short packed vector: skip the line
                         to_nearest[X] = ((double)tx * (1./ 254.))*2.-1.;
                         to_nearest[Y] = ((double)ty * (1./ 254.))*2.-1.;
                         to_nearest[Z] = ((double)tz * (1./ 254.))*2.-1.;
