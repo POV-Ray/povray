@@ -6,6 +6,8 @@
 # written November 2003 by Christoph Hormann
 # This file is part of POV-Ray and subject to the POV-Ray licence
 # see POVLEGAL.DOC for details
+# 260930 bug fix, reported including suggested fix (thanks!) by 'CutieMc',
+# in the p.bugreports newsgroup; file update by jr.
 # ------------------------------------------------------------------------------
 # calling conventions:
 #
@@ -81,7 +83,7 @@ if [ ! -z "$1" ] ; then
       echo "==========================================================================="
 
       echo "########################"
-      povray +L$SCENE_DIR +L$OUTPUT_DIR -i$POV_FILE -o$OUTPUT_DIR/ $POV_OPTIONS -p
+      povray +L$SCENE_DIR +L$OUTPUT_DIR -i$RENDER_NAME -o$OUTPUT_DIR/ $POV_OPTIONS -p
       #echo "povray +L$SCENE_DIR +L$OUTPUT_DIR -i$RENDER_NAME -o$OUTPUT_DIR/ $POV_OPTIONS -p"
 
     fi
