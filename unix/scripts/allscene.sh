@@ -7,10 +7,12 @@
 # updated 2017-09-10 for POV-Ray v3.8 by Christoph Lipka
 # This file is part of POV-Ray and subject to the POV-Ray licence
 # see POVLEGAL.DOC for details.
+# 261105, modified by jr.  fix 'file' protocol use, add html file to calling
+# convention, add option checks for same.
 # ------------------------------------------------------------------------------
 # calling conventions:
 #
-#   allscene.sh [log] [all] [-d scene_directory] [-o output_directory]
+#   allscene.sh [log] [all] [-d scene_directory] [-o output_directory] [-h html_file]
 #
 # output_directory: if specified all images are written to this directory
 #                   if not specified the images are written into the scene 
@@ -54,7 +56,7 @@ install_dir()
   fi
 }
 
-OPTIONS="$1 $2 $3 $4 $5 $6"
+OPTIONS="$1 $2 $3 $4 $5 $6 $7 $8"
 
 case "$OPTIONS" in
   *log* | *LOG* | *Log* )
@@ -72,6 +74,8 @@ test "$2" = "-d" && SCENE_DIR="$3"
 test "$3" = "-d" && SCENE_DIR="$4"
 test "$4" = "-d" && SCENE_DIR="$5" 
 test "$5" = "-d" && SCENE_DIR="$6"
+test "$6" = "-d" && SCENE_DIR="$7"
+test "$7" = "-d" && SCENE_DIR="$8"
 
 if [ -z "$SCENE_DIR" ] ; then
   INSTALL_DIR="`install_dir`"
@@ -107,6 +111,8 @@ test "$2" = "-o" && OUTPUT_DIR="$3"
 test "$3" = "-o" && OUTPUT_DIR="$4"
 test "$4" = "-o" && OUTPUT_DIR="$5" 
 test "$5" = "-o" && OUTPUT_DIR="$6"
+test "$6" = "-o" && OUTPUT_DIR="$7"
+test "$7" = "-o" && OUTPUT_DIR="$8"
 
 if [ -z "$OUTPUT_DIR" ] ; then
   if [ ! -w "$SCENE_DIR" ] ; then
@@ -142,6 +148,7 @@ test "$3" = "-h" && HTML_FILE="$4"
 test "$4" = "-h" && HTML_FILE="$5"
 test "$5" = "-h" && HTML_FILE="$6"
 test "$6" = "-h" && HTML_FILE="$7"
+test "$7" = "-h" && HTML_FILE="$8"
 
 if [ ! -z "$HTML_FILE" ] ; then
 
@@ -197,13 +204,13 @@ for POV_FILE in $FILE_LIST2 ; do
   FILE_BASE=`basename $POV_FILE .pov`
 
   echo "  <tr>
-    <td><a href=\"file:${POV_FILE}\">${POV_NAME}</a></td>" >> "$HTML_FILE"
+    <td><a href=\"file://${POV_FILE}\">${POV_NAME}</a></td>" >> "$HTML_FILE"
     if [ -f "$OUTPUT_DIR/$FILE_BASE.png" ] ; then
       if [ -z "$CONVERT" ] ; then
-        echo "    <td><a href=\"file:$OUTPUT_DIR/$FILE_BASE.png\">$FILE_BASE.png</a></td>" >> "$HTML_FILE"
+        echo "    <td><a href=\"file://$OUTPUT_DIR/$FILE_BASE.png\">$FILE_BASE.png</a></td>" >> "$HTML_FILE"
       else
         convert -sample 80x60 "$OUTPUT_DIR/$FILE_BASE.png" "$OUTPUT_DIR/${FILE_BASE}_a.png"
-        echo "    <td><a href=\"file:$OUTPUT_DIR/$FILE_BASE.png\"><img src=\"file:$OUTPUT_DIR/${FILE_BASE}_a.png\" alt=\"$FILE_BASE.png\"></a></td>" >> "$HTML_FILE"
+        echo "    <td><a href=\"file://$OUTPUT_DIR/$FILE_BASE.png\"><img src=\"file://$OUTPUT_DIR/${FILE_BASE}_a.png\" alt=\"$FILE_BASE.png\"></a></td>" >> "$HTML_FILE"
       fi
     else
       PNG_LIST=`find "$OUTPUT_DIR" -regex "${OUTPUT_DIR}/${FILE_BASE}[0123456789]+.png" | sort | xargs`
@@ -211,7 +218,7 @@ for POV_FILE in $FILE_LIST2 ; do
       CNT=1
       for PNG_FILE in $PNG_LIST ; do
         PNG_BASE=`basename $PNG_FILE`
-        PNG_LINKS="$PNG_LINKS <a href=\"file:$PNG_FILE\">[${CNT}]</a>"
+        PNG_LINKS="$PNG_LINKS <a href=\"file://$PNG_FILE\">[${CNT}]</a>"
         CNT=`expr $CNT + 1`
       done
       if [ -z "$PNG_LINKS" ] ; then

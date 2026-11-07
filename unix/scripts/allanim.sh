@@ -7,6 +7,8 @@
 # updated 2017-09-10 for POV-Ray v3.8 by Christoph Lipka
 # This file is part of POV-Ray and subject to the POV-Ray licence
 # see POVLEGAL.DOC for details.
+# 261105, modified by jr.  fix 'file' protocol use, remove unused conditional
+# file deletes.
 # ------------------------------------------------------------------------------
 # calling conventions:
 #
@@ -188,15 +190,15 @@ for POV_FILE in $FILE_LIST2 ; do
   FILE_BASE=`basename $POV_FILE .pov`
 
   echo "  <tr>
-    <td><a href=\"file:${POV_FILE}\">${POV_NAME}</a></td>" >> "$HTML_FILE"
+    <td><a href=\"file://${POV_FILE}\">${POV_NAME}</a></td>" >> "$HTML_FILE"
     if [ -f "$OUTPUT_DIR/$FILE_BASE.mpg" ] ; then
-      echo "    <td><a href=\"file:$OUTPUT_DIR/$FILE_BASE.mpg\">$FILE_BASE.mpg</a></td>" >> "$HTML_FILE"
+      echo "    <td><a href=\"file://$OUTPUT_DIR/$FILE_BASE.mpg\">$FILE_BASE.mpg</a></td>" >> "$HTML_FILE"
     else
       PNG_LIST=`find "$OUTPUT_DIR" -regex "${OUTPUT_DIR}/${FILE_BASE}[0123456789]+.png" | sort | xargs`
       PNG_LINKS=
       for PNG_FILE in $PNG_LIST ; do
         PNG_BASE=`basename $PNG_FILE`
-        PNG_LINKS="$PNG_LINKS <a href=\"file:$PNG_FILE\">${PNG_BASE}</a>"
+        PNG_LINKS="$PNG_LINKS <a href=\"file://$PNG_FILE\">${PNG_BASE}</a>"
       done
       if [ -z "$PNG_LINKS" ] ; then
         echo "    <td>--</td>" >> "$HTML_FILE"
@@ -215,5 +217,3 @@ echo "</table>
 
 fi
 
-test -f "bounce.txt" && rm -f "bounce.txt"
-test -f "lifedata.inc" && rm -f "lifedata.inc"
