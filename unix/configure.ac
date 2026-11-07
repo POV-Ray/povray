@@ -969,6 +969,7 @@ case "$pov_built_for" in
     AX_CHECK_COMPILE_FLAG([-mavx2], [pov_avx2='-mavx2'], [pov_avx2=''])
     AX_CHECK_COMPILE_FLAG([-mfma],  [pov_fma3='-mfma'],  [pov_fma3=''])
     AX_CHECK_COMPILE_FLAG([-mfma4], [pov_fma4='-mfma4'], [pov_fma4=''])
+    AX_CHECK_COMPILE_FLAG([-mavx512f], [pov_avx512='-mavx512f'], [pov_avx512=''])
     ;;
   *)
     pov_cpu=''
@@ -978,6 +979,7 @@ AM_CONDITIONAL([BUILD_x86], [test x"$pov_cpu" = x"x86"])
 AM_CONDITIONAL([BUILD_x86avx], [test x"$pov_avx" != x""])
 AM_CONDITIONAL([BUILD_x86avxfma4], [test x"$pov_avx" != x"" -a x"$pov_fma4" != x"" ])
 AM_CONDITIONAL([BUILD_x86avx2fma3], [test x"$pov_avx2" != x"" -a x"$pov_fma3" != x"" ])
+AM_CONDITIONAL([BUILD_x86avx512], [test x"$pov_avx512" != x""])
 
 
 # Add flags specified at the command line.

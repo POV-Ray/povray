@@ -146,10 +146,10 @@
     // The following settings are just guesswork, and have never been tested:
     #define POV_CPP11_SUPPORTED               0
   // NB: The Microsoft Visual Studio developers seem to have skipped internal version number 13 entirely.
-  #elif _MSC_VER >= 1900 && _MSC_VER < 2000
-    // MS Visual C++ 2015 (aka 14.0)
-    #define POV_COMPILER_VER                  "msvc14"
-    #define METADATA_COMPILER_STRING          "msvc 14"
+  #elif _MSC_VER >= 1930 && _MSC_VER < 2000
+    // MS Visual C++ 2022 (aka 14.3)
+    #define POV_COMPILER_VER                  "msvc14.3"
+    #define METADATA_COMPILER_STRING          "msvc 14.3"
     #define POV_CPP11_SUPPORTED               1
   #else
     #error "Please update syspovconfig_msvc.h to include this version of MSVC"
@@ -229,9 +229,10 @@
 #endif
 
 #if _MSC_VER >= 1900
-    // compiler supports AVX2.
+    // compiler supports AVX2 and AVX512.
     #define TRY_OPTIMIZED_NOISE                 // optimized noise master switch.
     #define TRY_OPTIMIZED_NOISE_AVX2FMA3        // AVX2/FMA3 hand-optimized noise (Intel).
+    #define TRY_OPTIMIZED_NOISE_AVX512          // AVX512 hand-optimized noise
 #endif
 
 #define POV_CPUINFO         CPUInfo::GetFeatures()
