@@ -34,6 +34,7 @@
 //******************************************************************************
 
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "base/types.h"
 #include "backend/support/taskqueue.h"
 
 // C++ variants of C standard header files
@@ -59,7 +60,7 @@ namespace pov
 using std::list;
 using std::shared_ptr;
 
-TaskQueue::TaskQueue() : failed(kNoError)
+TaskQueue::TaskQueue() : failed(kNoError), nextTaskIndex(0)
 {
 }
 
@@ -169,6 +170,7 @@ ThreadData *TaskQueue::AppendTask(Task *task)
 
     Notify();
 
+    task->taskIndex = nextTaskIndex++;
     return task->GetDataPtr();
 }
 
@@ -195,7 +197,6 @@ void TaskQueue::AppendFunction(const boost::function1<void, TaskQueue&>& fn)
     std::lock_guard<std::recursive_mutex> lock(queueMutex);
 
     queuedTasks.push(TaskEntry(fn));
-
     Notify();
 }
 
@@ -229,7 +230,7 @@ bool TaskQueue::Process()
         switch(queuedTasks.front().GetEntryType())
         {
             case TaskEntry::kTask:
-            {
+            {				
                 activeTasks.push_back(queuedTasks.front());
                 queuedTasks.front().GetTask()->Start(boost::bind(&TaskQueue::Notify, this));
                 queuedTasks.pop();
