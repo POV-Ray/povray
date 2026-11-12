@@ -223,6 +223,7 @@ texture {                              // The upper part of the clouds
     }
     finish {
         emission 1.0
+        ambient 0
         diffuse 0
     }
 }
@@ -233,6 +234,7 @@ texture {                              // The darker underside of the clouds
     }
     finish {
         emission 0.6
+        ambient 0
         diffuse 0
     }
 }
@@ -269,6 +271,7 @@ texture {
 
     finish {
         emission 0.9
+        ambient 0
         diffuse 0.1
     }
 }
@@ -292,6 +295,7 @@ texture {
     }
     finish {
         emission 1.0
+        ambient 0
         diffuse 0.0
     }
 }
@@ -313,6 +317,7 @@ texture {
     }
     finish {
         emission 0.95
+        ambient 0
         diffuse 0.0
     }
 scale .9
