@@ -42,10 +42,10 @@
    #ifndef (Camera_Zoom)     #declare Camera_Zoom = 1;           #end
    
    
-   #declare CamL=Camera_Location;                     // wherever you're putting it
-   #declare CamD=vnormalize(Camera_Look_At-CamL);     // direction of camera view
-   #declare CamR=vnormalize(vcross(Camera_Sky,CamD)); // to the right
-   #declare CamU=vnormalize(vcross(CamD,CamR));       // camera up
+   #local CamL=Camera_Location;                     // wherever you're putting it
+   #local CamD=vnormalize(Camera_Look_At-CamL);     // direction of camera view
+   #local CamR=vnormalize(vcross(Camera_Sky,CamD)); // to the right
+   #local CamU=vnormalize(vcross(CamD,CamR));       // camera up
    #declare Camera_Transform =
    transform {
       matrix <
@@ -54,7 +54,7 @@
          CamD.x, CamD.y, CamD.z,
          CamL.x, CamL.y, CamL.z
       >
-   }
+   };
    
    camera {
      direction CamD*Camera_Zoom
@@ -142,6 +142,7 @@ Update_Camera()
       scale <Camera_Aspect_Ratio,1,1>
       no_shadow     // shouldn't cast shadows in the scene
       no_reflection // shouldn't be reflected in scene elements
+      no_radiosity
       hollow on     // for media/fog
       translate Camera_Zoom*z
       scale Scaling
