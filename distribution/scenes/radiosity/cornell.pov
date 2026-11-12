@@ -69,7 +69,7 @@ camera{
 
 box{
   <21.3,54.87,33.2><34.3,54.88,22.7> no_shadow
-  pigment{rgb<1,1,1>} finish{ambient 0.78 diffuse 0}
+  pigment{rgb<1,1,1>} finish{emission 0.78 diffuse 0}
 }
 
 union{
