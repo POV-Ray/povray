@@ -632,8 +632,7 @@ void mem_release_all()
         FREE(tmp);
     }
 
-    if (f != nullptr)
-        delete f;
+    delete f;
 
 //  if (totsize > 0)
 //      Debug_Info("\n%lu bytes reclaimed\n", totsize);

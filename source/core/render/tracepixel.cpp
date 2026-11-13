@@ -221,14 +221,11 @@ TracePixel::TracePixel(std::shared_ptr<SceneData> sd, const Camera* cam, TraceTh
 
 TracePixel::~TracePixel()
 {
-    if (focalBlurData != nullptr)
-        delete focalBlurData;
+    delete focalBlurData;
     for (unsigned int i = 0; i < 3; ++i)
     {
-        if (mpCameraLocationFn[i] != nullptr)
-            delete mpCameraLocationFn[i];
-        if (mpCameraDirectionFn[i] != nullptr)
-            delete mpCameraDirectionFn[i];
+        delete mpCameraLocationFn[i];
+        delete mpCameraDirectionFn[i];
     }
 }
 
@@ -271,12 +268,10 @@ void TracePixel::SetupCamera(const Camera& cam)
             normalise = true;
             for (unsigned int i = 0; i < 3; ++i)
             {
-                if (mpCameraLocationFn[i] != nullptr)
-                    delete mpCameraLocationFn[i];
+                delete mpCameraLocationFn[i];
                 if (camera.Location_Fn[i] != nullptr)
                     mpCameraLocationFn[i] = new GenericScalarFunctionInstance(camera.Location_Fn[i], threadData);
-                if (mpCameraDirectionFn[i] != nullptr)
-                    delete mpCameraDirectionFn[i];
+                delete mpCameraDirectionFn[i];
                 if (camera.Direction_Fn[i] != nullptr)
                     mpCameraDirectionFn[i] = new GenericScalarFunctionInstance(camera.Direction_Fn[i], threadData);
             }
@@ -293,11 +288,8 @@ void TracePixel::SetupCamera(const Camera& cam)
         cameraDirection.normalize();
     }
 
-    if (focalBlurData != nullptr)
-    {
-        delete focalBlurData;
-        focalBlurData = nullptr;
-    }
+    delete focalBlurData;
+    focalBlurData = nullptr;
 
     // TODO: there is little point in calculating the grid separately for each thread.
     // since all threads in a given render must have identical grids, we should calculate

@@ -678,8 +678,8 @@ OutputFile::OutputFile
     }
     catch (IEX_NAMESPACE::BaseExc &e)
     {
-        if (_data && _data->_streamData) delete _data->_streamData;
-	if (_data)       delete _data;
+        if (_data) delete _data->_streamData;
+        delete _data;
 
 	REPLACE_EXC (e, "Cannot open image file "
 			"\"" << fileName << "\". " << e);
@@ -687,8 +687,8 @@ OutputFile::OutputFile
     }
     catch (...)
     {
-        if (_data && _data->_streamData) delete _data->_streamData;
-        if (_data)       delete _data;
+        if (_data) delete _data->_streamData;
+        delete _data;
 
         throw;
     }
@@ -722,8 +722,8 @@ OutputFile::OutputFile
     }
     catch (IEX_NAMESPACE::BaseExc &e)
     {
-        if (_data && _data->_streamData) delete _data->_streamData;
-	if (_data)       delete _data;
+        if (_data) delete _data->_streamData;
+	delete _data;
 
 	REPLACE_EXC (e, "Cannot open image file "
 			"\"" << os.fileName() << "\". " << e);
@@ -731,8 +731,8 @@ OutputFile::OutputFile
     }
     catch (...)
     {
-        if (_data && _data->_streamData) delete _data->_streamData;
-        if (_data)       delete _data;
+        if (_data) delete _data->_streamData;
+        delete _data;
 
         throw;
     }
@@ -757,7 +757,7 @@ OutputFile::OutputFile(const OutputPartData* part) : _data(NULL)
     }
     catch (IEX_NAMESPACE::BaseExc &e)
     {
-        if (_data) delete _data;
+        delete _data;
 
         REPLACE_EXC (e, "Cannot initialize output part "
                         "\"" << part->partNumber << "\". " << e);
@@ -765,7 +765,7 @@ OutputFile::OutputFile(const OutputPartData* part) : _data(NULL)
     }
     catch (...)
     {
-        if (_data) delete _data;
+        delete _data;
 
         throw;
     }
@@ -861,7 +861,7 @@ OutputFile::~OutputFile ()
         if (_data->_deleteStream && _data->_streamData)
             delete _data->_streamData->os;
 
-        if (_data->partNumber == -1 && _data->_streamData)
+        if (_data->partNumber == -1)
             delete _data->_streamData;
 
 	delete _data;
