@@ -873,32 +873,51 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             break;
 
         case USER_DEFINED_CAMERA:
-            // Convert the x coordinate to be a DBL from -0.5 to 0.5.
-            x0 = x / width - 0.5;
-
-            // Convert the y coordinate to be a DBL from -0.5 to 0.5.
-            y0 = 0.5 - y / height;
-
-            for (unsigned int i = 0; i < 3; ++i)
             {
-                if (camera.Location_Fn[i] != nullptr)
-                    cameraLocation[i] = mpCameraLocationFn[i]->Evaluate(x0, y0);
-                if (!IsFinite(cameraLocation[i]))
+                // Convert the x coordinate to be a DBL from -0.5 to 0.5.
+                x0 = x / width - 0.5;
+
+                // Convert the y coordinate to be a DBL from -0.5 to 0.5.
+                y0 = 0.5 - y / height;
+
+                bool bLocationFunction = false;
+                bool bDirectionFunction = false;
+
+                for (unsigned int i = 0; i < 3; ++i)
+                {
+                    if (camera.Location_Fn[i] != nullptr)
+                    {
+                        cameraLocation[i] = mpCameraLocationFn[i]->Evaluate(x0, y0);
+                        bLocationFunction = true;
+                    }
+                    if (!IsFinite(cameraLocation[i]))
+                        return false;
+
+                    if (camera.Direction_Fn[i] != nullptr)
+                    {
+                        cameraDirection[i] = mpCameraDirectionFn[i]->Evaluate(x0, y0);
+                        bDirectionFunction = true;
+                    }
+                    if (!IsFinite(cameraDirection[i]))
+                        return false;
+                }
+
+                if (bLocationFunction)
+                    MTransPoint(cameraLocation, cameraLocation, camera.UserTrans);
+
+                if (bDirectionFunction)
+                    MTransDirection(cameraDirection, cameraDirection, camera.UserTrans);
+
+                if (cameraDirection.IsNearNull(EPSILON))
                     return false;
-                if (camera.Direction_Fn[i] != nullptr)
-                    cameraDirection[i] = mpCameraDirectionFn[i]->Evaluate(x0, y0);
-                if (!IsFinite(cameraDirection[i]))
-                    return false;
+                ray.Origin    = cameraLocation;
+                ray.Direction = cameraDirection;
+
+                if(useFocalBlur)
+                    JitterCameraRay(ray, x, y, ray_number);
+
+                InitRayContainerState(ray, true);
             }
-            if (cameraDirection.IsNearNull(EPSILON))
-                return false;
-            ray.Origin    = cameraLocation;
-            ray.Direction = cameraDirection;
-
-            if(useFocalBlur)
-                JitterCameraRay(ray, x, y, ray_number);
-
-            InitRayContainerState(ray, true);
             break;
 
         default:
