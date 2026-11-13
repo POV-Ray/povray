@@ -37,10 +37,10 @@
 #declare Phong_Glossy = finish {phong 1 phong_size 300 reflection 0.13}
 
 // Luminous for shadowless skies and light_sources.
-#declare Luminous = finish {ambient 1  diffuse 0}
+#declare Luminous = finish {ambient 0 emission 1  diffuse 0}
 
 // a perfectly mirrored finish with no highlights
-#declare Mirror = finish {ambient 0  diffuse 0 reflection 1}
+#declare Mirror = finish {ambient 0 emission 0  diffuse 0 reflection 1}
 
 #version Finish_Inc_Temp;
 #end

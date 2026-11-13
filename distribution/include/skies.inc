@@ -222,7 +222,8 @@ texture {                              // The upper part of the clouds
         P_Cloud1
     }
     finish {
-        ambient 1.0
+        emission 1.0
+        ambient 0
         diffuse 0
     }
 }
@@ -232,7 +233,8 @@ texture {                              // The darker underside of the clouds
         translate -0.15*y
     }
     finish {
-        ambient 0.6
+        emission 0.6
+        ambient 0
         diffuse 0
     }
 }
@@ -268,7 +270,8 @@ texture {
     }
 
     finish {
-        ambient 0.9
+        emission 0.9
+        ambient 0
         diffuse 0.1
     }
 }
@@ -291,7 +294,8 @@ texture {
         }
     }
     finish {
-        ambient 1.0
+        emission 1.0
+        ambient 0
         diffuse 0.0
     }
 }
@@ -312,7 +316,8 @@ texture {
         }
     }
     finish {
-        ambient 0.95
+        emission 0.95
+        ambient 0
         diffuse 0.0
     }
 scale .9

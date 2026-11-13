@@ -43,7 +43,7 @@ texture {
     sine_wave
     scale .5
     }
-    finish { diffuse 0 ambient 1 }
+    finish { diffuse 0 ambient 0 emission 1 }
 }
 
 #declare Starfield2 =
@@ -65,7 +65,7 @@ texture {
     sine_wave
     scale .5
     }
-    finish { diffuse 0 ambient 1 }
+    finish { diffuse 0 ambient 0 emission 1 }
 }
 
 #declare Starfield3 =
@@ -87,7 +87,7 @@ texture {
     sine_wave
     scale .5
     }
-    finish { diffuse 0 ambient 1 }
+    finish { diffuse 0 ambient 0 emission 1 }
 }
 
 #declare Starfield4 =
@@ -109,7 +109,7 @@ texture {
     sine_wave
     scale .5
     }
-    finish { diffuse 0 ambient 1 }
+    finish { diffuse 0 ambient 0 emission 1 }
 }
 
 #declare Starfield5 =
@@ -131,7 +131,7 @@ texture {
     sine_wave
     scale .5
     }
-    finish { diffuse 0 ambient 1 }
+    finish { diffuse 0 ambient 0 emission 1 }
 }
 
 #declare Starfield6 =
@@ -153,7 +153,7 @@ texture {
     sine_wave
     scale .5
     }
-    finish { diffuse 0 ambient 1 }
+    finish { diffuse 0 ambient 0 emission 1 }
 }
 
 #version Stars_Inc_Temp;
