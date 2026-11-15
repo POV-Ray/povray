@@ -328,7 +328,7 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
   chmod -R u+rw ../doc/html/
   mv -f         ../doc/html/*.txt ../doc/
   mv -f         ../doc/html/*.doc ../doc/
-  $cp_u -f      README.unix ../doc/
+  $cp_u -f      prebuild/README.unix ../doc/
   chmod -R u+rw ../doc/
 
   # [C.H.]
@@ -356,24 +356,29 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
   *)
   # some shells seem unable to expand properly wildcards in the list entries
   # (e.g. ../distribution/in*/).
-  for file in \
-    AUTHORS ChangeLog configure.ac COPYING NEWS README \
-    povray.1 povray.conf \
+
+  # Directories
+  for dir in \
     scripts \
     ../distribution/ini ../distribution/include ../distribution/scenes
   do
-    out=`basename $file`
-    echo "Create ../$out`test -d $file && echo /`"
-    $cp_u -f -R $file ../  ||  echo "$file not copied !"
+    out=`basename $dir`
+    echo "Create ../$out/"
+    $cp_u -f -R $dir ../  ||  echo "$dir not copied !"
     chmod -f -R u+rw ../$out
   done
 
-  # special cases:
+  # Individual Files
+  for file in \
+    AUTHORS ChangeLog configure.ac COPYING INSTALL NEWS README \
+    povray.1 povray.conf
+  do
+    echo "Create ../$file"
+    $cp_u -f prebuild/$file ../  ||  echo "$file not copied !"
+    chmod -f -R u+rw ../$file
+  done
 
-  # INSTALL
-  echo "Create ../INSTALL"
-  $cp_u -f install.txt ../INSTALL  ||  echo "INSTALL not copied !"
-  chmod -f u+rw ../INSTALL
+  # special cases:
 
   # VERSION
   echo "Create ../VERSION"
@@ -419,7 +424,7 @@ case "$1" in
 
   *)
   echo "Create $makefile.am"
-  cat Makefile.header > $makefile.am
+  cat prebuild/Makefile.header > $makefile.am
   cat << pbEOF >> $makefile.am
 
 # Makefile.am for the source distribution of POV-Ray $pov_version_base for UNIX
@@ -583,7 +588,7 @@ case "$1" in
   scriptfiles=`find scripts -type f`
 
   echo "Create $makefile.am"
-  cat Makefile.header > $makefile.am
+  cat prebuild/Makefile.header > $makefile.am
   cat << pbEOF >> $makefile.am
 
 # Makefile.am for the source distribution of POV-Ray $pov_version_base for UNIX
@@ -803,7 +808,7 @@ case "$1" in
   files=`find $dir -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g | sort`
 
   echo "Create $makefile.am"
-  cat Makefile.header > $makefile.am
+  cat prebuild/Makefile.header > $makefile.am
   cat << pbEOF >> $makefile.am
 
 # Makefile.am for the source distribution of POV-Ray $pov_version_base for UNIX
@@ -1340,7 +1345,7 @@ case "$1" in
   files=`find $dir $dir/unix -maxdepth 1 -name \*.cpp -or -name \*.h | sed s,"$dir/",,g | sort`
 
   echo "Create $makefile.am"
-  cat Makefile.header > $makefile.am
+  cat prebuild/Makefile.header > $makefile.am
   cat << pbEOF >> $makefile.am
 
 # Makefile.am for the source distribution of POV-Ray $pov_version_base for UNIX
@@ -1409,7 +1414,7 @@ case "$1" in
   done
 
   echo "Create $makefile.am"
-  cat Makefile.header > $makefile.am
+  cat prebuild/Makefile.header > $makefile.am
   cat << pbEOF >> $makefile.am
 
 # Makefile.am for the source distribution of POV-Ray $pov_version_base for UNIX
