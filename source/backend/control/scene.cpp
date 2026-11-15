@@ -37,11 +37,10 @@
 #include "backend/control/scene.h"
 
 // C++ variants of C standard header files
-//  (none at the moment)
+#include <cstdlib>
 
 // C++ standard header files
 #include <algorithm>
-#include <sstream>
 
 // Boost header files
 #include <boost/bind.hpp>
@@ -155,28 +154,33 @@ void Scene::StartParser(POVMS_Object& parseOptions)
         parseOptions.Get(kPOVAttrib_Declare, ds);
         for(int i = 1; i <= ds.GetListSize(); i++)
         {
-            std::ostringstream sstr;
             POVMS_Attribute a;
             POVMS_Object d;
 
             ds.GetNth(i, d);
+            std::string ident = d.GetString(kPOVAttrib_Identifier);
             d.Get(kPOVAttrib_Value, a);
             switch (a.Type())
             {
                 case kPOVMSType_CString:
-                    sstr << "\"" + d.TryGetString(kPOVAttrib_Value, "") + "\"";
+                    sceneData->declaredStrings.insert(make_pair(ident, d.TryGetString(kPOVAttrib_Value, "")));
                     break;
 
                 case kPOVMSType_Float:
-                    sstr << d.TryGetFloat(kPOVAttrib_Value, 0.0);
+                    // POVMS carries floating-point values in single precision only. A number set via the
+                    // `Declare` option also carries its text, from which we restore the full
+                    // double-precision value (GitHub issue #428). Numbers declared by the front-end
+                    // itself (e.g. `image_width`) have no text.
+                    if (d.Exist(kPOVAttrib_ValueText))
+                        sceneData->declaredNumbers.insert(make_pair(ident, std::strtod(d.GetString(kPOVAttrib_ValueText).c_str(), nullptr)));
+                    else
+                        sceneData->declaredNumbers.insert(make_pair(ident, d.TryGetFloat(kPOVAttrib_Value, 0.0)));
                     break;
 
                 default:
                     // shouldn't happen unless we make a coding error
                     throw POV_EXCEPTION(kParamErr, "Invalid type passed in declare list");
             }
-
-            sceneData->declaredVariables.insert(make_pair(d.GetString(kPOVAttrib_Identifier), sstr.str()));
         }
     }
 

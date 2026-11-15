@@ -37,10 +37,12 @@
 #include "frontend/processrenderoptions.h"
 
 // C++ variants of C standard header files
+#include <cctype>
+#include <cstdio>
 #include <cstdlib>
 
 // C++ standard header files
-//  (none at the moment)
+#include <string>
 
 // POV-Ray header files (base module)
 #include "base/fileutil.h"
@@ -476,7 +478,30 @@ int ProcessRenderOptions::ReadSpecialOptionHandler(INI_Parser_Table *option, cha
                         err = POVMSUtil_SetString(&decobj, kPOVAttrib_Value, ptr);
                     }
                     else
-                        err = POVMSUtil_SetFloat(&decobj, kPOVAttrib_Value, std::atof(ptr));
+                    {
+                        // POVMS carries floating-point values in single precision only, so besides the
+                        // value we also pass the number as text; the back-end restores the full
+                        // double-precision value from that text (GitHub issue #428).
+                        char *end = nullptr;
+                        double value = std::strtod(ptr, &end);
+                        err = POVMSUtil_SetFloat(&decobj, kPOVAttrib_Value, value);
+                        if ((err == kNoErr) && (end != ptr))
+                        {
+                            const char *start = ptr;
+                            while (std::isspace(static_cast<unsigned char>(*start)))
+                                ++start;
+                            std::string text(start, static_cast<const char *>(end));
+                            if (text.length() > 64)
+                            {
+                                // Unusually long; 17 significant digits identify a double-precision value
+                                // exactly, and keep the text within what `Create_Ini` can write.
+                                char buffer[32];
+                                std::snprintf(buffer, sizeof(buffer), "%.17g", value);
+                                text = buffer;
+                            }
+                            err = POVMSUtil_SetString(&decobj, kPOVAttrib_ValueText, text.c_str());
+                        }
+                    }
                 }
                 if(err == kNoErr)
                     err = POVMSAttrList_Append(&list, &decobj);
@@ -743,7 +768,27 @@ int ProcessRenderOptions::WriteSpecialOptionHandler(INI_Parser_Table *option, PO
                         bufptr[0] = 0;
                         if((POVMSUtil_GetFloat(&decobj, kPOVAttrib_Value, &floatval) == 0) &&
                            (POVMSAttr_Get(&item, kPOVMSType_CString, bufptr, &l) == 0))
-                            file->printf("%s=%s=%g\n", option->keyword, bufptr, (float)floatval);
+                        {
+                            // A number set via `Declare` also carries its text (see ReadSpecialOptionHandler);
+                            // write that back, as the value itself is limited to single precision.
+                            int textlen = 0;
+                            char *textptr = nullptr;
+                            if((POVMSUtil_GetStringLength(&decobj, kPOVAttrib_ValueText, &textlen) == 0) && (textlen > 0))
+                            {
+                                textptr = new char[textlen];
+                                textptr[0] = 0;
+                                if(POVMSUtil_GetString(&decobj, kPOVAttrib_ValueText, textptr, &textlen) != 0)
+                                {
+                                    delete[] textptr;
+                                    textptr = nullptr;
+                                }
+                            }
+                            if(textptr != nullptr)
+                                file->printf("%s=%s=%s\n", option->keyword, bufptr, textptr);
+                            else
+                                file->printf("%s=%s=%g\n", option->keyword, bufptr, (float)floatval);
+                            delete[] textptr;
+                        }
                         delete[] bufptr;
                     }
                     (void)POVMSAttr_Delete(&item);
