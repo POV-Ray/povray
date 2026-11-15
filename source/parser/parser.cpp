@@ -180,6 +180,126 @@ Parser::~Parser()
     delete fnVMContext;
 }
 
+/// Tells whether a string set via the `Declare` option looks like a file name written with single
+/// backslashes, in which an escape sequence silently changes the text.
+///
+/// Strings set via `Declare` are subject to the same escape sequences as string literals in a scene
+/// file. A file name such as `C:\temp\new.png` therefore parses without an error, but `\t` becomes a
+/// tab and `\n` a line feed, and the file name is lost. Likewise `\u` takes the next four characters
+/// as a character code, whether or not they are hexadecimal digits, so `out\untitled.png` ends after
+/// `out`.
+///
+/// @param[in]  text    The string as given by the user.
+/// @param[out] escape  The letter of the first escape sequence that silently changes the text.
+/// @return             Whether the string contains such an escape sequence and also looks like a file
+///                     name: it begins with a drive letter and path separator or with a UNC prefix,
+///                     or it ends in a file extension, or it has no white space and the escape
+///                     sequence stands between two parts of a name, as in `renders\final`.
+///
+static bool LooksLikeUnescapedFileName(const std::string& text, char& escape)
+{
+    bool found = false;
+    bool betweenNames = false;
+    bool whiteSpace = false;
+
+    for (std::string::size_type i = 0; i < text.length(); ++i)
+    {
+        if (std::isspace(static_cast<unsigned char>(text[i])))
+            whiteSpace = true;
+    }
+
+    for (std::string::size_type i = 0; i + 1 < text.length(); ++i)
+    {
+        if (text[i] != '\\')
+            continue;
+
+        // The character before the backslash, if it could be the end of a file or folder name.
+        bool nameBefore = (i > 0) && (std::isalnum(static_cast<unsigned char>(text[i - 1])) ||
+                                      (text[i - 1] == '_') || (text[i - 1] == '-') || (text[i - 1] == '.'));
+
+        // The character after the backslash belongs to the escape sequence, whatever it is.
+        ++i;
+
+        bool changesText = false;
+
+        switch (text[i])
+        {
+            case 'a':
+            case 'b':
+            case 'f':
+            case 'n':
+            case 'r':
+            case 't':
+            case 'v':
+                changesText = true;
+                break;
+
+            case 'u':
+                // The next four characters are taken as a character code; a proper one is no cause for concern.
+                {
+                    bool code = (i + 4 < text.length());
+                    for (std::string::size_type j = i + 1; code && (j <= i + 4); ++j)
+                        code = (std::isxdigit(static_cast<unsigned char>(text[j])) != 0);
+                    changesText = !code;
+                }
+                break;
+        }
+
+        if (changesText)
+        {
+            if (!found)
+            {
+                escape = text[i];
+                found = true;
+            }
+            if (nameBefore && (i + 1 < text.length()) && std::isalnum(static_cast<unsigned char>(text[i + 1])))
+                betweenNames = true;
+        }
+
+        if (text[i] == 'u')
+            i += 4;
+    }
+
+    if (!found)
+        return false;
+
+    // A drive letter and path separator?
+    if ((text.length() >= 3) && std::isalpha(static_cast<unsigned char>(text[0])) && (text[1] == ':') &&
+        ((text[2] == '\\') || (text[2] == '/')))
+        return true;
+
+    // A UNC prefix?
+    if ((text.length() >= 2) && (text[0] == '\\') && (text[1] == '\\'))
+        return true;
+
+    // A file extension, i.e. one to five letters or digits after the last dot, at least one of them a letter?
+    std::string::size_type dot = text.rfind('.');
+    if ((dot != std::string::npos) && (dot > 0))
+    {
+        std::string::size_type length = text.length() - dot - 1;
+        bool letter = false;
+        bool valid = (length >= 1) && (length <= 5);
+
+        for (std::string::size_type i = dot + 1; valid && (i < text.length()); ++i)
+        {
+            unsigned char c = static_cast<unsigned char>(text[i]);
+            if (std::isalpha(c))
+                letter = true;
+            else if (!std::isdigit(c))
+                valid = false;
+        }
+
+        if (valid && letter)
+            return true;
+    }
+
+    // Folder or file names joined by the escape sequence, with no white space anywhere, as in `renders\final`?
+    if (betweenNames && !whiteSpace)
+        return true;
+
+    return false;
+}
+
 /* Parse the file. */
 void Parser::Run()
 {
@@ -215,6 +335,13 @@ void Parser::Run()
         for(SceneData::DeclaredStringsMap::const_iterator i(sceneData->declaredStrings.begin()); i != sceneData->declaredStrings.end(); i++)
         {
             SYM_ENTRY *Temp_Entry = nullptr;
+
+            char escape = '\0';
+            if (LooksLikeUnescapedFileName(i->second, escape))
+                Warning(kWarningGeneral, "The string given for '%.100s' via the 'Declare' option contains '\\%c', which is read as"
+                                         " an escape sequence, so the string is not used as typed. If it is a file name,"
+                                         " double each backslash or use forward slashes instead.",
+                        i->first.c_str(), escape);
 
             Temp_Entry = Add_Symbol(SYM_TABLE_GLOBAL, const_cast<char *>(i->first.c_str()), STRING_ID_TOKEN);
             Temp_Entry->Data = String_Literal_To_UCS2(const_cast<char *>(i->second.c_str()), false);

@@ -38,6 +38,9 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "backend/control/scene.h"
 
+// C++ variants of C standard header files
+#include <cstdlib>
+
 // Boost header files
 #include <boost/bind.hpp>
 #if POV_MULTITHREADED
@@ -156,7 +159,14 @@ void Scene::StartParser(POVMS_Object& parseOptions)
                     break;
 
                 case kPOVMSType_Float:
-                    sceneData->declaredNumbers.insert(make_pair(ident, d.TryGetFloat(kPOVAttrib_Value, 0.0)));
+                    // POVMS carries floating-point values in single precision only. A number set via the
+                    // `Declare` option also carries its text, from which we restore the full
+                    // double-precision value (GitHub issue #428). Numbers declared by the front-end
+                    // itself (e.g. `image_width`) have no text.
+                    if (d.Exist(kPOVAttrib_ValueText))
+                        sceneData->declaredNumbers.insert(make_pair(ident, std::strtod(d.GetString(kPOVAttrib_ValueText).c_str(), nullptr)));
+                    else
+                        sceneData->declaredNumbers.insert(make_pair(ident, d.TryGetFloat(kPOVAttrib_Value, 0.0)));
                     break;
 
                 default:
