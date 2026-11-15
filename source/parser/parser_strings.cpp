@@ -644,6 +644,10 @@ UCS2 *Parser::String_Literal_To_UCS2(const std::string& str)
         {
             index_in++;
 
+            // The backslash may be the last character, e.g. in a string set via the `Declare` option.
+            if(index_in >= char_array_size)
+                Error("Unexpected end of escape sequence in text string.");
+
             switch(char_array[index_in])
             {
                 case 'a':
