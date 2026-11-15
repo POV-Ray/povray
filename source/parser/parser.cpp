@@ -191,21 +191,36 @@ Parser::~Parser()
 ///
 /// @param[in]  text    The string as given by the user.
 /// @param[out] escape  The letter of the first escape sequence that silently changes the text.
-/// @return             Whether the string contains such an escape sequence and also begins with a
-///                     drive letter and path separator or with a UNC prefix, or ends in a file
-///                     extension.
+/// @return             Whether the string contains such an escape sequence and also looks like a file
+///                     name: it begins with a drive letter and path separator or with a UNC prefix,
+///                     or it ends in a file extension, or it has no white space and the escape
+///                     sequence stands between two parts of a name, as in `renders\final`.
 ///
 static bool LooksLikeUnescapedFileName(const std::string& text, char& escape)
 {
     bool found = false;
+    bool betweenNames = false;
+    bool whiteSpace = false;
+
+    for (std::string::size_type i = 0; i < text.length(); ++i)
+    {
+        if (std::isspace(static_cast<unsigned char>(text[i])))
+            whiteSpace = true;
+    }
 
     for (std::string::size_type i = 0; i + 1 < text.length(); ++i)
     {
         if (text[i] != '\\')
             continue;
 
+        // The character before the backslash, if it could be the end of a file or folder name.
+        bool nameBefore = (i > 0) && (std::isalnum(static_cast<unsigned char>(text[i - 1])) ||
+                                      (text[i - 1] == '_') || (text[i - 1] == '-') || (text[i - 1] == '.'));
+
         // The character after the backslash belongs to the escape sequence, whatever it is.
         ++i;
+
+        bool changesText = false;
 
         switch (text[i])
         {
@@ -216,11 +231,7 @@ static bool LooksLikeUnescapedFileName(const std::string& text, char& escape)
             case 'r':
             case 't':
             case 'v':
-                if (!found)
-                {
-                    escape = text[i];
-                    found = true;
-                }
+                changesText = true;
                 break;
 
             case 'u':
@@ -229,15 +240,24 @@ static bool LooksLikeUnescapedFileName(const std::string& text, char& escape)
                     bool code = (i + 4 < text.length());
                     for (std::string::size_type j = i + 1; code && (j <= i + 4); ++j)
                         code = (std::isxdigit(static_cast<unsigned char>(text[j])) != 0);
-                    if (!code && !found)
-                    {
-                        escape = text[i];
-                        found = true;
-                    }
+                    changesText = !code;
                 }
-                i += 4;
                 break;
         }
+
+        if (changesText)
+        {
+            if (!found)
+            {
+                escape = text[i];
+                found = true;
+            }
+            if (nameBefore && (i + 1 < text.length()) && std::isalnum(static_cast<unsigned char>(text[i + 1])))
+                betweenNames = true;
+        }
+
+        if (text[i] == 'u')
+            i += 4;
     }
 
     if (!found)
@@ -272,6 +292,10 @@ static bool LooksLikeUnescapedFileName(const std::string& text, char& escape)
         if (valid && letter)
             return true;
     }
+
+    // Folder or file names joined by the escape sequence, with no white space anywhere, as in `renders\final`?
+    if (betweenNames && !whiteSpace)
+        return true;
 
     return false;
 }
