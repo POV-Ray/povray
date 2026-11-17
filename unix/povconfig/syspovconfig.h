@@ -331,6 +331,9 @@ const int NULL=0;
     // Not officially supported yet; comment-out the following line to try with default POSIX settings.
     #error "Cygwin detected, but not explicitly supported yet; proceed at your own risk."
     #include "syspovconfig_posix.h"
+#elif defined(__EMSCRIPTEN__)
+    // Emscripten (WebAssembly) detected.
+    #include "syspovconfig_posix.h"
 #elif defined(__unix__)
     // Some Unix other than the above detected.
     #include <sys/param.h>
