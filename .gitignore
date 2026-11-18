@@ -262,3 +262,9 @@ $RECYCLE.BIN/
 
 # Used specifically by our own workflows
 /artifact*
+
+# ======================
+# Web (WebAssembly) build
+# ======================
+
+/build-web/
