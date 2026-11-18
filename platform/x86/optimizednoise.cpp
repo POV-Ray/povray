@@ -39,6 +39,10 @@
 
 #include "core/material/noise.h"
 
+#ifdef TRY_OPTIMIZED_NOISE_AVX512
+#include "avx512/avx512noise.h"
+#endif
+
 #ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
 #include "avx2fma3/avx2fma3noise.h"
 #endif
@@ -65,6 +69,7 @@ namespace pov
 static bool AVXSupported()      { return CPUInfo::SupportsAVX(); }
 static bool AVXFMA4Supported()  { return CPUInfo::SupportsAVX() && CPUInfo::SupportsFMA4(); }
 static bool AVX2FMA3Supported() { return CPUInfo::SupportsAVX2() && CPUInfo::SupportsFMA3(); }
+static bool AVX512Supported()   { return CPUInfo::SupportsAVX512(); }
 
 /// List of optimized noise implementations.
 ///
@@ -72,12 +77,40 @@ static bool AVX2FMA3Supported() { return CPUInfo::SupportsAVX2() && CPUInfo::Sup
 ///     Entries must be listed in descending order of preference.
 ///
 OptimizedNoiseInfo gaOptimizedNoiseInfo[] = {
+#ifdef TRY_OPTIMIZED_NOISE_AVX512
+    {
+        "avx512-mcw",             // name,
+        "hand-optimized by MCW",  // info,
+        AVX512Noise,              // noise,
+        AVX512DNoise,             // dNoise,
+        AVX512Noise2D,            // noise2D,
+        AVX512DNoise2D,           // dNoise2D,
+        AVX512Noise8D,            // noise8D,
+        DTurbulenceAVX512,        // DTurbulence
+        Initialize_WavesAVX512,   // Initalize Waves
+        TurbulenceAVX512,         // Turbulence
+        wrinklesAVX512,           // wrinkles
+        true,                     // value to set versions of WrinklesPattern and GranitePattern
+        &kAVX512NoiseEnabled,     // enabled,
+        AVX512Supported,          // supported,
+        nullptr,                  // recommended,
+        AVX512NoiseInit           // init
+    },
+#endif
 #ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
     {
         "avx2fma3-intel",           // name,
         "hand-optimized by Intel",  // info,
         AVX2FMA3Noise,              // noise,
         AVX2FMA3DNoise,             // dNoise,
+        nullptr,                    // noise2D
+        nullptr,                    // dnoise2D,
+        nullptr,                    // noise8D,
+        DTurbulenceAVX,             // DTurbulence
+        Initialize_WavesAVX,        // Initalize Waves
+        TurbulenceAVX,              // Turbulence
+        wrinklesAVX,                // wrinkles
+        false,                      // value to set versions of WrinklesPattern and GranitePattern
         &kAVX2FMA3NoiseEnabled,     // enabled,
         AVX2FMA3Supported,          // supported,
         CPUInfo::IsIntel,           // recommended,
@@ -90,6 +123,14 @@ OptimizedNoiseInfo gaOptimizedNoiseInfo[] = {
         "hand-optimized by AMD, 2017-04 update", // info,
         AVXFMA4Noise,               // noise,
         AVXFMA4DNoise,              // dNoise,
+        nullptr,                    // noise2D
+        nullptr,                    // dnoise2D,
+        nullptr,                    // noise8D,
+        DTurbulenceAVX,             // DTurbulence
+        Initialize_WavesAVX,        // Initalize Waves
+        TurbulenceAVX,              // Turbulence
+        wrinklesAVX,                // wrinkles
+        false,                      // value to set versions of WrinklesPattern and GranitePattern
         &kAVXFMA4NoiseEnabled,      // enabled,
         AVXFMA4Supported,           // supported,
         nullptr,                    // recommended,
@@ -102,6 +143,14 @@ OptimizedNoiseInfo gaOptimizedNoiseInfo[] = {
         "hand-optimized by Intel",  // info,
         AVXNoise,                   // noise,
         AVXDNoise,                  // dNoise,
+        nullptr,                    // noise2D
+        nullptr,                    // dnoise2D,
+        nullptr,                    // noise8D,
+        DTurbulenceAVX,             // DTurbulence
+        Initialize_WavesAVX,        // Initalize Waves
+        TurbulenceAVX,              // Turbulence
+        wrinklesAVX,                // wrinkles
+        false,                      // value to set versions of WrinklesPattern and GranitePattern
         &kAVXNoiseEnabled,          // enabled,
         AVXSupported,               // supported,
         CPUInfo::IsIntel,           // recommended,
@@ -114,6 +163,14 @@ OptimizedNoiseInfo gaOptimizedNoiseInfo[] = {
         "compiler-optimized",       // info,
         AVXPortableNoise,           // noise,
         AVXPortableDNoise,          // dNoise,
+        nullptr,                    // noise2D
+        nullptr,                    // dnoise2D,
+        nullptr,                    // noise8D,
+        DTurbulenceAVX,             // DTurbulence
+        Initialize_WavesAVX,        // Initalize Waves
+        TurbulenceAVX,              // Turbulence
+        wrinklesAVX,                // wrinkles
+        false,                      // value to set versions of WrinklesPattern and GranitePattern
         &kAVXPortableNoiseEnabled,  // enabled,
         AVXSupported,               // supported,
         nullptr,                    // recommended,
