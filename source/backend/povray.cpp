@@ -39,6 +39,7 @@
 #include "backend/povray.h"
 
 // C++ variants of standard C header files
+#include <clocale>
 #include <cstdlib>
 
 // Boost header files
@@ -673,6 +674,12 @@ boost::thread *povray_init(const boost::function0<void>& threadExit, POVMSAddres
     {
         POV_TerminateMainThread = false;
         POV_MainThreadTerminated = false;
+
+        // Standard "C" locale for all aspects, except as amended further below.
+        // (NB: Since this is the standard C/C++ default, it shouldn't matter, but it also won't hurt.)
+        std::setlocale(LC_ALL, "C");
+        // User-preferred locale for date/time aspect.
+        std::setlocale(LC_TIME, "");
 
         Initialize_Noise();
         pov::InitializePatternGenerators();

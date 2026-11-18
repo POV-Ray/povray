@@ -33,6 +33,8 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
 #ifndef POVRAY_PARSER_PARSE_H
@@ -42,6 +44,7 @@
 #include "parser/configparser.h"
 
 #include <string>
+#include <chrono>
 
 #include "base/image/image.h"
 #include "base/messenger.h"
@@ -702,6 +705,10 @@ class Parser : public SceneTask
         bool Allow_Identifier_In_Call, Identifier_In_Call;
 
         size_t MaxCachedMacroSize;
+
+        using FractionalDays = std::chrono::duration<double, std::ratio<24 * 60 * 60>>;
+        std::chrono::system_clock::time_point mY2k;
+        bool localTime;
 
         // parse.h/parse.cpp
         void Frame_Init(void);
