@@ -1364,7 +1364,10 @@ void View::GetStatistics(POVMS_Object& renderStats)
     for(vector<ViewThreadData *>::iterator i(viewThreadData.begin()); i != viewThreadData.end(); i++)
     {
         timeData[(*i)->timeType].realTime = max(timeData[(*i)->timeType].realTime, (*i)->realTime);
-        timeData[(*i)->timeType].cpuTime += (*i)->cpuTime;
+        if ((*i)->cpuTime >= 0)
+            timeData[(*i)->timeType].cpuTime += (*i)->cpuTime;
+        else
+            timeData[(*i)->timeType].cpuTime = -1;
         timeData[(*i)->timeType].samples++;
     }
 
@@ -1375,7 +1378,8 @@ void View::GetStatistics(POVMS_Object& renderStats)
             POVMS_Object elapsedTime(kPOVObjectClass_ElapsedTime);
 
             elapsedTime.SetLong(kPOVAttrib_RealTime, timeData[i].realTime);
-            elapsedTime.SetLong(kPOVAttrib_CPUTime, timeData[i].cpuTime);
+            if (timeData[i].cpuTime >= 0)
+                elapsedTime.SetLong(kPOVAttrib_CPUTime, timeData[i].cpuTime);
             elapsedTime.SetInt(kPOVAttrib_TimeSamples, (int) timeData[i].samples);
 
             switch(i)

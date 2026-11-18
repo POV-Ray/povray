@@ -263,7 +263,8 @@ void PhotonShootingTask::ShootPhotonsAtObject(LightTargetCombo& combo)
                         notComputed = true;
                     }
 
-                    DBL dist_of_initial_from_center;
+                    // Used only for cylinder lights, which are always parallel.
+                    DBL dist_of_initial_from_center = 0.0;
 
                     if (combo.light->Parallel)
                     {
