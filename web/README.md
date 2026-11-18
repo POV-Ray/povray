@@ -84,6 +84,29 @@ prevent that, the build stamps a hash of the site into `index.html`
 (`web/tools/stamp_version.py`), and the page appends it to the URLs of its
 code and data files. Example scenes are not versioned.
 
+Testing
+-------
+
+`web/tools/sweep.py` renders every example scene from `distribution/scenes`
+at 80x60 in headless Chromium, using the same render worker as the page, and
+fails if a scene does not render. It serves the built site in
+`build-web/site/` itself, so build first. It needs Playwright, installed
+for the same Python:
+
+    python3 -m pip install playwright
+    python3 -m playwright install chromium
+    python3 web/tools/sweep.py                    # all scenes
+    python3 web/tools/sweep.py --filter '^advanced/'
+
+`web/tools/sweep-expected.txt` lists the scenes that the sweep skips,
+expects to fail, or renders with their INI file; the file's header
+describes the format. The sweep also fails if a scene listed as failing
+renders successfully, so the list stays current.
+
+The workflow `.github/workflows/web_build.yml` runs on every push and pull
+request that changes files outside `doc/` and `source-doc/`. It builds the
+site, uploads it as the `povray-web-site` artifact, and runs the sweep.
+
 How it works
 ------------
 
@@ -98,6 +121,7 @@ Paths in this table are relative to `web/`.
 | `shell/` | The web page (`index.html`, `app.js`, `style.css`), the render worker (`render-worker.js`) and `coi-serviceworker.js`. |
 | `tools/make_manifest.py` | Copies the example scenes into the site and writes `scenes.json`. |
 | `tools/stamp_version.py` | Writes `index.html` with the build version stamped into asset URLs and the footer filled in. |
+| `tools/sweep.py`, `tools/sweep-expected.txt` | Renders all example scenes in headless Chromium; see Testing. |
 | `tools/serve.py` | Local web server with the required headers. |
 
 - The page starts one long-lived worker (`render-worker.js`) that hosts one
