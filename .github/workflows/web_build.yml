@@ -34,7 +34,7 @@ jobs:
 
     - name: 'Cache Emscripten SDK'
       id: cache-emsdk
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: emsdk
         key: emsdk-${{ env.EMSDK_VERSION }}-${{ runner.os }}
