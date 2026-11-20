@@ -268,3 +268,5 @@ $RECYCLE.BIN/
 # ======================
 
 /build-web/
+# Emscripten SDK, cloned here by .github/workflows/web_build.yml
+/emsdk/
