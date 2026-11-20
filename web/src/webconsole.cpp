@@ -16,6 +16,8 @@
 /// it and show a live preview on an HTML canvas. Cancellation is requested
 /// from JavaScript via an exported function instead of POSIX signals.
 ///
+/// @author Christopher Swenson
+///
 /// @copyright
 /// @parblock
 ///
@@ -40,6 +42,7 @@
 //******************************************************************************
 
 // C++ variants of C standard header files
+#include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -98,10 +101,26 @@ static std::atomic<uint32_t> gFrameSerial(0);
 static std::atomic<int>      gCurrentFrame(0);
 static std::atomic<int>      gTotalFrames(0);
 
-// Framebuffers of the current job, one per display. They are freed when the
-// next job starts rather than when their display is destroyed, because
-// JavaScript may still read the latest one after the render ends.
-static std::vector<std::unique_ptr<uint8_t[]>> gFrameBuffers;
+// Framebuffers of the current job. POV-Ray creates a display for every frame
+// of an animation; consecutive displays of the same size share one buffer.
+// Buffers are freed when the next job starts rather than when their display
+// is destroyed, because JavaScript may still read the latest one after the
+// render ends.
+struct FrameBuffer
+{
+    std::unique_ptr<uint8_t[]> pixels;
+    size_t size;
+};
+static std::vector<FrameBuffer> gFrameBuffers;
+
+// Whether a frame that reuses a framebuffer starts from a blank preview.
+// When false, each frame paints over the previous one.
+static std::atomic<bool>     gClearBetweenFrames(false);
+
+// Upper limit for the default number of render threads. The pthread pool is
+// sized for at most this many render threads (see PTHREAD_POOL_SIZE in
+// web/CMakeLists.txt).
+static const int kMaxDefaultThreads = 32;
 
 // Job queue: JavaScript writes the command-line arguments of a render to
 // kJobArgsFile (one per line) and calls povweb_submit().
@@ -122,6 +141,12 @@ extern "C"
 
     /// Ask the current render to stop.
     EMSCRIPTEN_KEEPALIVE void povweb_cancel() { gCancelRender = true; }
+
+    /// Choose whether each animation frame starts from a blank preview.
+    EMSCRIPTEN_KEEPALIVE void povweb_set_clear_between_frames(int clear) { gClearBetweenFrames = (clear != 0); }
+
+    /// POV-Ray's version string, as `--version` reports it.
+    EMSCRIPTEN_KEEPALIVE const char* povweb_version() { return POV_RAY_VERSION; }
 
     /// RGBA8 preview framebuffer (`povweb_width() * povweb_height() * 4` bytes), or null.
     EMSCRIPTEN_KEEPALIVE uint8_t* povweb_framebuffer() { return gFramePixels; }
@@ -154,9 +179,18 @@ class WebDisplay final : public vfeDisplay
         virtual void Initialise() override
         {
             const size_t size = size_t(GetWidth()) * size_t(GetHeight()) * 4;
-            gFrameBuffers.emplace_back(new uint8_t[size]);
-            mPixels = gFrameBuffers.back().get();
-            std::fill(mPixels, mPixels + size, 0);
+            if (gFrameBuffers.empty() || gFrameBuffers.back().size != size)
+            {
+                gFrameBuffers.push_back(FrameBuffer{ std::unique_ptr<uint8_t[]>(new uint8_t[size]), size });
+                mPixels = gFrameBuffers.back().pixels.get();
+                std::fill(mPixels, mPixels + size, 0);
+            }
+            else
+            {
+                mPixels = gFrameBuffers.back().pixels.get();
+                if (gClearBetweenFrames)
+                    std::fill(mPixels, mPixels + size, 0);
+            }
             gFrameWidth = int(GetWidth());
             gFrameHeight = int(GetHeight());
             gFramePixels = mPixels;
@@ -375,11 +409,12 @@ static ReturnValue RenderJob(vfeUnixSession *session, const std::vector<std::str
     session->Reset();
 
     // Default number of render threads: the number of logical CPUs reported
-    // by the browser (`navigator.hardwareConcurrency`).
+    // by the browser (`navigator.hardwareConcurrency`), up to
+    // kMaxDefaultThreads.
     int nthreads = int(sysconf(_SC_NPROCESSORS_ONLN));
     if (nthreads < 1)
         nthreads = 4;
-    opts.SetThreadCount(nthreads);
+    opts.SetThreadCount(std::min(nthreads, kMaxDefaultThreads));
 
     // process INI settings
     session->GetUnixOptions()->Process_povray_ini(opts);
