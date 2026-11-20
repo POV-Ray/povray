@@ -111,8 +111,7 @@ Media::Media(const Media& source)
 
 Media::~Media()
 {
-    if (Sample_Threshold != nullptr)
-        delete[] Sample_Threshold;
+    delete[] Sample_Threshold;
 
     for (vector<PIGMENT*>::iterator i = Density.begin(); i != Density.end(); ++ i)
         Destroy_Pigment(*i);
@@ -146,8 +145,7 @@ Media& Media::operator=(const Media& source)
         AA_Threshold = source.AA_Threshold;
         AA_Level = source.AA_Level;
 
-        if (Sample_Threshold != nullptr)
-            delete[] Sample_Threshold;
+        delete[] Sample_Threshold;
         Sample_Threshold = nullptr;
 
         for (vector<PIGMENT*>::iterator i = Density.begin(); i != Density.end(); ++ i)
@@ -195,8 +193,7 @@ void Media::PostProcess()
     use_extinction = use_absorption || use_scattering;
 
     // Init sample threshold array.
-    if (Sample_Threshold != nullptr)
-        delete[] Sample_Threshold;
+    delete[] Sample_Threshold;
 
     // Create list of thresholds for confidence test.
     Sample_Threshold = new DBL[Max_Samples];

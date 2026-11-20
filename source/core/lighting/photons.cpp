@@ -1262,11 +1262,8 @@ SinCosOptimizations::SinCosOptimizations()
 
 SinCosOptimizations::~SinCosOptimizations()
 {
-    if (sinTheta)
-        delete[] sinTheta;
-
-    if (cosTheta)
-        delete[] cosTheta;
+    delete[] sinTheta;
+    delete[] cosTheta;
 }
 
 
@@ -1395,8 +1392,7 @@ PhotonMap::~PhotonMap()
     // free all non-nullptr blocks
     for (auto&& block : mBlockList)
     {
-        if (block != nullptr)
-            delete block;
+        delete block;
     }
 }
 
@@ -2610,11 +2606,8 @@ GatheredPhotons::GatheredPhotons(int maxGatherCount)
 
 GatheredPhotons::~GatheredPhotons()
 {
-    if (photonGatherList != nullptr)
-        delete[] photonGatherList;
-
-    if (photonDistances != nullptr)
-        delete[] photonDistances;
+    delete[] photonGatherList;
+    delete[] photonDistances;
 }
 
 

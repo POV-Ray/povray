@@ -2257,8 +2257,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
 
     if (AllowToken(FINISH_ID_TOKEN))
     {
-        if (*Finish_Ptr)
-            delete *Finish_Ptr;
+        delete *Finish_Ptr;
         *Finish_Ptr = Copy_Finish(CurrentTokenDataPtr<FINISH*>());
     }
 
@@ -2617,8 +2616,7 @@ TEXTURE *Parser::Parse_Texture ()
 
             CASE (FINISH_ID_TOKEN)
                 Warn_State(FINISH_TOKEN);
-                if (Texture->Finish)
-                    delete Texture->Finish;
+                delete Texture->Finish;
                 Texture->Finish = Copy_Finish (CurrentTokenDataPtr<FINISH*>());
                 Modified_Pnf = true;
             END_CASE
@@ -2737,8 +2735,7 @@ TEXTURE *Parser::Parse_Texture ()
                 UNGET
                 Destroy_Pigment(Texture->Pigment);
                 Destroy_Tnormal(Texture->Tnormal);
-                if (Texture->Finish)
-                    delete Texture->Finish;
+                delete Texture->Finish;
                 Texture->Pigment = nullptr;
                 Texture->Tnormal = nullptr;
                 Texture->Finish  = nullptr;
@@ -2789,8 +2786,7 @@ TEXTURE *Parser::Parse_Tiles()
     Texture = Create_Texture ();
     Destroy_Pigment(Texture->Pigment);
     Destroy_Tnormal(Texture->Tnormal);
-    if (Texture->Finish)
-        delete Texture->Finish;
+    delete Texture->Finish;
     Texture->Pigment = nullptr;
     Texture->Tnormal = nullptr;
     Texture->Finish  = nullptr;
@@ -2873,8 +2869,7 @@ TEXTURE *Parser::Parse_Material_Map()
     Texture = Create_Texture ();
     Destroy_Pigment(Texture->Pigment);
     Destroy_Tnormal(Texture->Tnormal);
-    if (Texture->Finish)
-        delete Texture->Finish;
+    delete Texture->Finish;
     Texture->Pigment = nullptr;
     Texture->Tnormal = nullptr;
     Texture->Finish  = nullptr;
@@ -3014,8 +3009,7 @@ TEXTURE *Parser::Parse_Vers1_Texture ()
                 END_CASE
 
                 CASE (FINISH_ID_TOKEN)
-                    if (Texture->Finish)
-                        delete Texture->Finish;
+                    delete Texture->Finish;
                     Texture->Finish = Copy_Finish (CurrentTokenDataPtr<FINISH*>());
                 END_CASE
 
