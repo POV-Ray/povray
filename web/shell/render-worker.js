@@ -13,6 +13,9 @@
 // Emscripten starts its pthread workers from this same script (it uses
 // `self.location` as the script URL), so a worker named "em-pthread" only
 // needs to load the module; `povray.js` bootstraps itself in that case.
+//
+// The messages this worker accepts and sends are listed under "Render worker
+// protocol" in web/README.md.
 
 'use strict';
 
@@ -23,6 +26,8 @@ const VERSION_QUERY = self.location.search;
 importScripts('povray.js' + VERSION_QUERY);
 
 if (self.name !== 'em-pthread') {
+  // Increment when the message format changes in a way that breaks callers.
+  const PROTOCOL_VERSION = 1;
   const JOB_ARGS_FILE = '/povweb/job.args';  // see webconsole.cpp
   const OUT_DIR = '/out';
   const LOCAL_ROOT = '/work';
@@ -41,7 +46,7 @@ if (self.name !== 'em-pthread') {
     if (msg.type === 'init') {
       start().catch(reportFatal);
     } else if (msg.type === 'render') {
-      start().then(() => runJob(msg)).catch(reportFatal);
+      start().then(() => runJob(msg), reportFatal);
     } else if (msg.type === 'cancel') {
       if (povray && job) povray._povweb_cancel();
     }
@@ -93,7 +98,11 @@ if (self.name !== 'em-pthread') {
         povray.callMain([]);
       }, reject);
     });
-    startup.then(() => post({ type: 'ready' }), () => {});
+    startup.then(() => post({
+      type: 'ready',
+      protocol: PROTOCOL_VERSION,
+      povrayVersion: povray.UTF8ToString(povray._povweb_version()),
+    }), () => {});
     return startup;
   }
 
@@ -165,9 +174,25 @@ if (self.name !== 'em-pthread') {
 
   function runJob(msg) {
     if (job) {
-      post({ type: 'log', stream: 'stderr', text: 'A render is already running.' });
+      refuseJob('A render is already running.');
       return;
     }
+    try {
+      submitJob(msg);
+    } catch (e) {
+      if (job) restoreFiles(povray.FS, [], job.written);
+      job = null;
+      refuseJob('Could not start the render: ' + ((e && e.message) || e));
+    }
+  }
+
+  // Answers a job that did not start. The running job, if any, is unaffected.
+  function refuseJob(message) {
+    post({ type: 'log', stream: 'stderr', text: message });
+    post({ type: 'done', code: 1, refused: true, outputs: [], memory: povray.wasmMemory.buffer.byteLength });
+  }
+
+  function submitJob(msg) {
     const FS = povray.FS;
     FS.chdir('/');
 
@@ -193,6 +218,7 @@ if (self.name !== 'em-pthread') {
     FS.chdir(msg.cwd);
 
     FS.writeFile(JOB_ARGS_FILE, msg.args.join('\n') + '\n');
+    povray._povweb_set_clear_between_frames(msg.clearBetweenFrames ? 1 : 0);
     lastSerial = -1;
     post({ type: 'started' });
     previewTimer = setInterval(pollPreview, 100);
@@ -215,20 +241,7 @@ if (self.name !== 'em-pthread') {
       post({ type: 'log', stream: 'stderr', text: 'Could not read output files: ' + e });
     }
 
-    // Put the file system back the way it was for the next job.
-    try {
-      FS.chdir('/');
-      for (const o of outputs) {
-        try { FS.unlink(o.path); } catch (e) { /* already gone */ }
-      }
-      for (const path of job.written) {
-        try { FS.unlink(path); } catch (e) { /* already gone */ }
-        // Restore example files that the job replaced with edited versions.
-        if (lazyFiles.has(path)) mountLazy(FS, path, lazyFiles.get(path));
-      }
-    } catch (e) {
-      post({ type: 'log', stream: 'stderr', text: 'Could not clean up after the render: ' + e });
-    }
+    restoreFiles(FS, outputs, job.written);
     job = null;
 
     const files = outputs.map((o) => ({ name: o.name, data: o.data }));
@@ -236,11 +249,29 @@ if (self.name !== 'em-pthread') {
     post({ type: 'done', code, outputs: files, memory }, files.map((o) => o.data));
   }
 
+  // Put the file system back the way it was before a job, for the next one.
+  function restoreFiles(FS, outputs, written) {
+    try {
+      FS.chdir('/');
+      for (const o of outputs) {
+        try { FS.unlink(o.path); } catch (e) { /* already gone */ }
+      }
+      for (const path of written) {
+        try { FS.unlink(path); } catch (e) { /* already gone */ }
+        // Restore example files that the job replaced with edited versions.
+        if (lazyFiles.has(path)) mountLazy(FS, path, lazyFiles.get(path));
+      }
+    } catch (e) {
+      post({ type: 'log', stream: 'stderr', text: 'Could not clean up after the render: ' + e });
+    }
+  }
+
   function pollPreview(force) {
     if (!povray) return;
     const serial = povray._povweb_frame_serial();
     if (!force && serial === lastSerial) return;
-    const ptr = povray._povweb_framebuffer();
+    // Pointers above 2 GB come back from WebAssembly as negative numbers.
+    const ptr = povray._povweb_framebuffer() >>> 0;
     const width = povray._povweb_width();
     const height = povray._povweb_height();
     if (!ptr || !width || !height) return;

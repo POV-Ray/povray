@@ -9,6 +9,8 @@
 /// reused for the web build; this file provides the feature macros that
 /// `./configure` would normally detect.
 ///
+/// @author Christopher Swenson
+///
 /// @copyright
 /// @parblock
 ///
@@ -48,7 +50,7 @@
 
 // Build information.
 #ifndef BUILT_BY
-    #define BUILT_BY        "POV-Ray Web build"
+    #define BUILT_BY        "unknown"
 #endif
 #define BUILD_ARCH          "wasm32-unknown-emscripten"
 #define BUILT_FOR           "WebAssembly (Emscripten)"

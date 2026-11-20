@@ -24,7 +24,7 @@ set(WEB_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
 set(SITE_DIR "${CMAKE_BINARY_DIR}/site")
 
 option(POVWEB_SIMD "Enable WebAssembly SIMD (supported by all current browsers)" ON)
-set(POVWEB_BUILT_BY "POV-Ray Web build" CACHE STRING "Value reported as 'compiled by'")
+set(POVWEB_BUILT_BY "unknown" CACHE STRING "Value reported as 'compiled by'")
 set(POVWEB_SOURCE_URL "https://github.com/POV-Ray/povray" CACHE STRING
     "Repository the page footer links to for the source code of this build")
 
@@ -163,6 +163,8 @@ set(POVWEB_LINK_FLAGS
     # worker started by the front-end) stays free to service file system
     # and thread-creation requests from POV-Ray's own threads.
     -sPROXY_TO_PTHREAD=1
+    # Workers for up to 32 render threads (kMaxDefaultThreads in
+    # webconsole.cpp) plus POV-Ray's other threads.
     "-sPTHREAD_POOL_SIZE=Math.min(navigator.hardwareConcurrency||4,32)+8"
     -sPTHREAD_POOL_SIZE_STRICT=0
     -sSTACK_SIZE=8MB
@@ -176,8 +178,8 @@ set(POVWEB_LINK_FLAGS
     -sINVOKE_RUN=0
     -sEXIT_RUNTIME=0
     -sFORCE_FILESYSTEM=1
-    -sEXPORTED_RUNTIME_METHODS=callMain,FS,wasmMemory
-    -sEXPORTED_FUNCTIONS=_main,_povweb_submit,_povweb_cancel,_povweb_framebuffer,_povweb_width,_povweb_height,_povweb_frame_serial,_povweb_current_frame,_povweb_total_frames
+    -sEXPORTED_RUNTIME_METHODS=callMain,FS,wasmMemory,UTF8ToString
+    -sEXPORTED_FUNCTIONS=_main,_povweb_submit,_povweb_cancel,_povweb_set_clear_between_frames,_povweb_version,_povweb_framebuffer,_povweb_width,_povweb_height,_povweb_frame_serial,_povweb_current_frame,_povweb_total_frames
     # Standard include files and INI files, packaged as `povray.data`.
     # (`SHELL:` keeps CMake from de-duplicating the repeated flag.)
     "SHELL:--preload-file ${POV_ROOT}/distribution/include@/povray/include"

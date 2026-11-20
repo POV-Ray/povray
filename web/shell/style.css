@@ -258,12 +258,12 @@ input[type="number"] { width: 5.2em; }
   padding: 8px 10px;
   border: none;
   resize: none;
-  outline: none;
   background: var(--editor-bg);
   color: var(--text);
   white-space: pre;
   overflow: auto;
 }
+#editor:focus-visible { outline-offset: -2px; }
 #editor:disabled { opacity: 0.6; }
 
 .assets {

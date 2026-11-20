@@ -32,9 +32,10 @@
       <label title="Image width in pixels">W <input id="opt-width" type="number" min="1" max="16384" value="640"></label>
       <label title="Image height in pixels">H <input id="opt-height" type="number" min="1" max="16384" value="480"></label>
       <label title="Anti-aliasing"><input id="opt-aa" type="checkbox" checked> AA</label>
+      <label title="Animations: clear the preview before each frame, instead of painting each frame over the previous one"><input id="opt-clear-frames" type="checkbox"> Clear frames</label>
       <label id="ini-wrap" title="Render using one of the example's INI files (e.g. for animations)" hidden>INI
         <select id="opt-ini"></select></label>
-      <label title="Render threads (0 = one per CPU core)">Threads <input id="opt-threads" type="number" min="0" max="64" value="0"></label>
+      <label title="Number of render threads, 1 to 64. The default, 0, uses one thread per CPU core, but no more than 32.">Threads <input id="opt-threads" type="number" min="0" max="64" value="0"></label>
       <label class="grow" title="Additional POV-Ray command-line options, e.g. +Q9 +KFF10 Declare=Foo=1">
         <input id="opt-extra" type="text" placeholder="More options, e.g. +Q9 +A0.1 +R4" spellcheck="false">
       </label>
@@ -53,7 +54,8 @@
       <div class="editor">
         <div class="gutter" id="gutter" aria-hidden="true"></div>
         <textarea id="editor" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off"
-                  aria-label="Scene source"></textarea>
+                  aria-label="Scene source" aria-describedby="editor-keys"></textarea>
+        <span id="editor-keys" hidden>Tab indents. Press Escape, then Tab, to leave the editor.</span>
       </div>
       <div class="assets" id="assets" hidden></div>
     </section>
@@ -82,7 +84,8 @@
   </main>
 
   <footer class="site-footer">
-    <span>POV-Ray @POVWEB_POVRAY_VERSION@</span>
+    <span>Unofficial development build</span>
+    <span id="povray-version" hidden></span>
     <a href="@POVWEB_SOURCE_URL@">@POVWEB_SOURCE_LABEL@</a>
     <a href="LICENSE.txt">Licence: AGPL-3.0</a>
     <a href="https://www.povray.org/">povray.org</a>

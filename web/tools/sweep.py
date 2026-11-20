@@ -4,8 +4,10 @@
 Serves a built site (see web/build.sh), opens it in Chromium with Playwright,
 and renders each scene listed in the site's `scenes.json` at a small size,
 using the same render worker and job format as the page. Each render must
-finish with POV-Ray reporting success. Scenes listed in `sweep-expected.txt`
-are skipped, expected to fail, or rendered with one of their INI files.
+finish with POV-Ray reporting success and write one image. Scenes listed in
+`sweep-expected.txt` are skipped, expected to fail, or rendered with one of
+their INI files. One scene is also rendered as a short animation, which must
+write an image for every frame.
 
 The sweep fails if a scene fails unexpectedly, crashes the WebAssembly
 module, or times out, and also if a scene expected to fail renders
@@ -39,6 +41,10 @@ from serve import Handler  # noqa: E402
 
 SCENES_ROOT = "/povray/scenes"  # see app.js
 HARNESS_PATH = "/__sweep__.html"
+
+# Scene, INI file and number of frames of the animation job.
+ANIMATION = ("animations/clockd/clockd.pov", "clockd.ini", 3)
+IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".bmp", ".tga", ".ppm", ".pgm", ".hdr", ".exr")
 
 # Runs in the page. Each slot hosts one render worker (one POV-Ray instance);
 # a slot's worker is replaced after a crash or a render that does not stop.
@@ -77,7 +83,8 @@ window.sweep = (() => {
         if (msg.type === 'log') {
           log.push(msg.text);
         } else if (msg.type === 'done') {
-          finish({ status: timer === 0 ? 'timeout' : (msg.code === 0 ? 'ok' : 'error'), code: msg.code });
+          finish({ status: timer === 0 ? 'timeout' : (msg.code === 0 ? 'ok' : 'error'), code: msg.code,
+                   outputs: msg.outputs.map((o) => o.name) });
         } else if (msg.type === 'fatal') {
           discard();
           finish({ status: 'crash', message: msg.message });
@@ -124,13 +131,14 @@ def start_server(site):
     return httpd, f"http://127.0.0.1:{httpd.server_address[1]}"
 
 
-def build_request(base, manifest, scene, ini, args):
+def build_request(base, manifest, job, args):
+    scene = job["scene"]
     lazy_files = [{"path": f"{SCENES_ROOT}/{f['path']}", "url": f"{base}/scenes/{f['path']}"}
                   for f in manifest["files"]]
     render_args = []
-    if ini:
-        # The INI may define an animation; render only its first frame.
-        render_args += [ini, "+SF1", "+EF1"]
+    if job["ini"]:
+        # The INI may define an animation; render only the first frames.
+        render_args += [job["ini"], "+SF1", f"+EF{job['frames']}"]
     render_args += ["+I" + os.path.basename(scene["path"]), "+O/out/",
                     f"+W{args.width}", f"+H{args.height}", "-A", "+D", "-P",
                     f"+WT{args.threads}"]
@@ -150,8 +158,17 @@ async def sweep(args):
     scenes = [s for s in manifest["scenes"] if re.search(args.filter, s["path"])]
     if not scenes:
         sys.exit(f"sweep.py: no example scene matches {args.filter!r}")
-    jobs = [s for s in scenes if expected.get(s["path"]) != "skip"]
-    skipped = len(scenes) - len(jobs)
+    jobs = []
+    for s in scenes:
+        exp = expected.get(s["path"], "ok")
+        if exp != "skip":
+            jobs.append({"key": s["path"], "scene": s, "frames": 1,
+                         "ini": exp[4:] if exp.startswith("ini=") else None,
+                         "want": "error" if exp == "error" else "ok"})
+        if s["path"] == ANIMATION[0]:
+            jobs.append({"key": f"{s['path']} ({ANIMATION[2]} frames)", "scene": s,
+                         "ini": ANIMATION[1], "frames": ANIMATION[2], "want": "ok"})
+    skipped = sum(1 for s in scenes if expected.get(s["path"]) == "skip")
 
     httpd, base = start_server(args.site)
     results = {}
@@ -175,42 +192,42 @@ async def sweep(args):
         async def run_slot(slot):
             nonlocal done
             while queue:
-                scene = queue.pop(0)
-                exp = expected.get(scene["path"], "ok")
-                ini = exp[4:] if exp.startswith("ini=") else None
-                request = build_request(base, manifest, scene, ini, args)
+                job = queue.pop(0)
+                request = build_request(base, manifest, job, args)
                 result = await page.evaluate("([s, r, t]) => sweep.render(s, r, t)",
                                              [slot, request, args.timeout * 1000])
-                results[scene["path"]] = result
+                results[job["key"]] = result
                 done += 1
-                want = "error" if exp == "error" else "ok"
-                mark = "" if result["status"] == want else "  <-- unexpected"
+                mark = "" if result["status"] == job["want"] else "  <-- unexpected"
+                ini = f" ({job['ini']})" if job["ini"] and job["frames"] == 1 else ""
                 print(f"[{done:3d}/{len(jobs)}] {result['status']:7s} {result['seconds']:6.1f}s  "
-                      f"{scene['path']}{' (' + ini + ')' if ini else ''}{mark}", flush=True)
+                      f"{job['key']}{ini}{mark}", flush=True)
 
         await asyncio.gather(*(run_slot(i) for i in range(args.workers)))
         await browser.close()
     httpd.shutdown()
 
-    for scene in jobs:
-        path = scene["path"]
-        result = results[path]
-        exp = expected.get(path, "ok")
-        want = "error" if exp == "error" else "ok"
+    for job in jobs:
+        key, want = job["key"], job["want"]
+        result = results[key]
         if result["status"] == want:
+            images = [n for n in result.get("outputs", []) if n.lower().endswith(IMAGE_EXTENSIONS)]
+            if want == "ok" and len(images) != job["frames"]:
+                problems.append(f"{key}: wrote {len(images)} images, expected {job['frames']}: "
+                                f"{', '.join(images) or 'none'}")
             continue
         if want == "error" and result["status"] == "ok":
-            problems.append(f"{path}: rendered successfully; remove it from {os.path.basename(args.expected)}")
+            problems.append(f"{key}: rendered successfully; remove it from {os.path.basename(args.expected)}")
         else:
             lines = ([result["message"]] if result.get("message") else []) + result["log"]
             detail = "\n".join("    " + l for l in lines)
-            problems.append(f"{path}: {result['status']} (expected {want})\n{detail}")
+            problems.append(f"{key}: {result['status']} (expected {want})\n{detail}")
 
     counts = {}
     for r in results.values():
         counts[r["status"]] = counts.get(r["status"], 0) + 1
     summary = ", ".join(f"{n} {k}" for k, n in sorted(counts.items()))
-    print(f"\n{len(jobs)} scenes rendered in {time.monotonic() - started:.0f}s ({summary}); {skipped} skipped")
+    print(f"\n{len(jobs)} jobs rendered in {time.monotonic() - started:.0f}s ({summary}); {skipped} skipped")
 
     if args.report:
         with open(args.report, "w", encoding="utf-8") as f:

@@ -34,7 +34,7 @@ The site is assembled in `build-web/site/`. Extra arguments are passed to
 CMake as options:
 
 - `-DPOVWEB_BUILT_BY="Your Name"` sets the "compiled by" name that POV-Ray
-  reports in its version information.
+  reports in its version information. The default is "unknown".
 - `-DPOVWEB_SOURCE_URL=...` sets the repository that the page footer links
   to (see Deploying).
 
@@ -70,13 +70,16 @@ The site in `build-web/site/` is static and can be served by any web
 server that sends the headers above, or over HTTPS by one that cannot (see
 Running).
 
-The page footer names the POV-Ray version and links to the licence and to
-the source code at the git commit the site was built from. The source link
-points to `https://github.com/POV-Ray/povray` by default; when deploying a
-build from another repository, pass
+The page footer says that the site is an unofficial development build,
+shows POV-Ray's version string once POV-Ray has loaded, and links to the
+licence and to the source code at the git commit the site was built from.
+The source link points to `https://github.com/POV-Ray/povray` by default;
+when deploying a build from another repository, pass
 `-DPOVWEB_SOURCE_URL=https://github.com/<owner>/<repository>` to
-`web/build.sh`. If the working tree had uncommitted changes, the footer says
-so.
+`web/build.sh`. If the working tree had uncommitted or untracked files, the
+footer says "modified". If the source tree is not a git checkout (for
+example, a source archive), the link goes to the repository itself and the
+footer says "unknown commit".
 
 Static hosts cache each file separately, so right after a deployment a
 browser could combine a new `povray.js` with a cached `povray.wasm`. To
@@ -101,7 +104,9 @@ for the same Python:
 `web/tools/sweep-expected.txt` lists the scenes that the sweep skips,
 expects to fail, or renders with their INI file; the file's header
 describes the format. The sweep also fails if a scene listed as failing
-renders successfully, so the list stays current.
+renders successfully, so the list stays current. In addition, the sweep
+renders the first three frames of `distribution/scenes/animations/clockd`
+and checks that the render writes an image for each frame.
 
 The workflow `.github/workflows/web_build.yml` runs on every push and pull
 request that changes files outside `doc/` and `source-doc/`. It builds the
@@ -141,7 +146,73 @@ Paths in this table are relative to `web/`.
   files opened from disk are written to `/work`. Render output goes to
   `/out`.
 - The preview is drawn from an RGBA framebuffer in shared WebAssembly memory,
-  which the worker polls and forwards to the page.
+  which the worker polls and forwards to the page. Frames of an animation
+  that have the same size share one framebuffer, and each frame paints over
+  the previous one unless "Clear frames" in the toolbar is checked.
+
+Render worker protocol
+----------------------
+
+Other pages can render with POV-Ray by starting `render-worker.js` as a web
+worker and exchanging the messages below with it. The worker loads
+`povray.js`, `povray.wasm` and `povray.data` from its own directory, so it
+needs the built site beside it, served from the same origin as the page.
+The page must be cross-origin isolated (see Running).
+
+    const worker = new Worker('render-worker.js');
+    worker.onmessage = (e) => console.log(e.data);
+    worker.postMessage({ type: 'render', cwd: '/work',
+                         files: [{ path: '/work/scene.pov', data: 'sphere { 0, 1 pigment { rgb 1 } }' }],
+                         args: ['+Iscene.pov', '+O/out/', '+W320', '+H240'] });
+
+Each message is an object with a `type` field. File paths are absolute
+paths in POV-Ray's virtual file system. The standard include files are in
+`/povray/include`.
+
+Messages to the worker:
+
+| `type` | Fields | Meaning |
+| --- | --- | --- |
+| `init` | | Load POV-Ray without rendering. Optional; `render` also loads it. |
+| `render` | `args`, `cwd`, `files`, `lazyFiles`, `clearBetweenFrames` | Start a render. |
+| `cancel` | | Stop the current render. |
+
+The fields of `render`:
+
+- `args`: POV-Ray command-line options, one string per option. They apply
+  after the settings in `/povray/etc/povray.ini` (from `web/etc/`), which
+  turn on the display, and so `preview` messages, and select PNG output.
+  Pass `+O/out/` to get the rendered image back in `done`.
+- `cwd`: the directory to render in; relative paths in `args` and in the
+  scene resolve against it. It is created if it does not exist. The
+  directories `/out` and `/work` are emptied before the render's `files`
+  are written.
+- `files` (optional): `{path, data}` objects, written before the render and
+  deleted after it. `data` is a string or an `ArrayBuffer`.
+- `lazyFiles` (optional): `{path, url}` objects. Each file is downloaded from
+  `url` (an absolute URL) when POV-Ray first reads it, and stays available to
+  later renders.
+- `clearBetweenFrames` (optional): if true, the preview is cleared before each
+  animation frame.
+
+The worker runs one render at a time. It sends `ready` once, after the
+first `init` or `render`. A render that starts sends `started`, then any
+number of `log`, `status`, `state`, `frame` and `preview` messages, then
+`done`. If POV-Ray crashes, `fatal` is sent in place of `done`.
+
+Messages from the worker:
+
+| `type` | Fields | Meaning |
+| --- | --- | --- |
+| `ready` | `protocol`, `povrayVersion` | POV-Ray has loaded. `protocol` is the version of this protocol (currently 1); `povrayVersion` is POV-Ray's version string. |
+| `started` | | The render has started. |
+| `log` | `stream`, `text` | One line of POV-Ray's output; `stream` is `stdout` or `stderr`. |
+| `status` | `text` | POV-Ray's current status line, e.g. render progress. |
+| `state` | `state` | `parsing` or `rendering`. |
+| `frame` | `current`, `total` | An animation frame has started. `current` counts from 1 up to `total`, the number of frames being rendered. |
+| `preview` | `width`, `height`, `pixels` | The preview image: an `ArrayBuffer` of RGBA bytes, top row first. Sent while the image changes, at most once every 100 ms. |
+| `done` | `code`, `outputs`, `memory`, `refused` | The render has ended. `code` is 0 on success, 1 on error and 2 if cancelled. `outputs` lists `{name, data}` objects (`data` is an `ArrayBuffer`): the files in `/out`, then the files the render wrote in `cwd`. `memory` is the size of the WebAssembly memory in bytes. `refused` is true if the render did not start, because another render was running or its files could not be written; in that case the running render is not affected. |
+| `fatal` | `message` | POV-Ray crashed or could not load. Terminate the worker and start a new one. |
 
 Limitations
 -----------

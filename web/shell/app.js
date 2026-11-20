@@ -134,8 +134,14 @@ sphere {
   function storageGet() {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); } catch (e) { return null; }
   }
+  // Returns the error if the value could not be stored (quota or storage disabled).
   function storageSet(value) {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(value)); } catch (e) { /* quota or disabled */ }
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
+      return null;
+    } catch (e) {
+      return e;
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -226,7 +232,21 @@ sphere {
     updateGutter();
   });
 
+  // Tab indents. After Escape, the next Tab or Shift+Tab moves the focus out
+  // of the editor instead. Escape in the editor does not stop a render.
+  let tabMovesFocus = false;
+  editor.addEventListener('blur', () => { tabMovesFocus = false; });
   editor.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      e.stopPropagation();
+      tabMovesFocus = true;
+      return;
+    }
+    if (e.key === 'Tab' && tabMovesFocus) {
+      tabMovesFocus = false;
+      return;
+    }
+    if (e.key !== 'Shift') tabMovesFocus = false;
     if (e.key === 'Tab' && !e.ctrlKey && !e.metaKey && !e.altKey) {
       e.preventDefault();
       const start = editor.selectionStart;
@@ -437,6 +457,8 @@ sphere {
   // ---------------------------------------------------------------------------
 
   let saveTimer = 0;
+  let storageWarned = false;
+
   function scheduleSave() {
     clearTimeout(saveTimer);
     saveTimer = setTimeout(saveState, 500);
@@ -448,6 +470,7 @@ sphere {
         width: $('opt-width').value,
         height: $('opt-height').value,
         aa: $('opt-aa').checked,
+        clearFrames: $('opt-clear-frames').checked,
         threads: $('opt-threads').value,
         extra: $('opt-extra').value,
       },
@@ -465,7 +488,12 @@ sphere {
         main: mainName,
       };
     }
-    storageSet(state);
+    const error = storageSet(state);
+    if (error && !storageWarned) {
+      log('Could not keep your edits in the browser\'s storage (' + (error.message || error) + '). ' +
+          'They will be lost when this page is closed; save them to disk.', 'error');
+    }
+    storageWarned = !!error;
   }
 
   // ---------------------------------------------------------------------------
@@ -941,7 +969,7 @@ sphere {
     args.push('+D', '-P');
     args.push(...splitArgs($('opt-extra').value));
 
-    return { type: 'render', cwd, files, lazyFiles, args };
+    return { type: 'render', cwd, files, lazyFiles, args, clearBetweenFrames: $('opt-clear-frames').checked };
   }
 
   async function startRender() {
@@ -1032,6 +1060,8 @@ sphere {
         showPreview(msg.width, msg.height, msg.pixels);
         break;
       case 'ready':
+        $('povray-version').textContent = 'POV-Ray ' + msg.povrayVersion;
+        $('povray-version').hidden = false;
         if (!job) setState('Ready');
         break;
       case 'fatal':
@@ -1119,7 +1149,7 @@ sphere {
   $('btn-cancel').addEventListener('click', cancelRender);
   $('btn-save-image').addEventListener('click', saveImage);
   $('btn-clear-log').addEventListener('click', clearLog);
-  for (const id of ['opt-width', 'opt-height', 'opt-aa', 'opt-threads', 'opt-extra']) {
+  for (const id of ['opt-width', 'opt-height', 'opt-aa', 'opt-clear-frames', 'opt-threads', 'opt-extra']) {
     $(id).addEventListener('change', scheduleSave);
   }
 
@@ -1169,6 +1199,7 @@ sphere {
       if (o.width) $('opt-width').value = o.width;
       if (o.height) $('opt-height').value = o.height;
       if (typeof o.aa === 'boolean') $('opt-aa').checked = o.aa;
+      if (typeof o.clearFrames === 'boolean') $('opt-clear-frames').checked = o.clearFrames;
       if (o.threads !== undefined) $('opt-threads').value = o.threads;
       if (o.extra !== undefined) $('opt-extra').value = o.extra;
     }
