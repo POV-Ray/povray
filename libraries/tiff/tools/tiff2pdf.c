@@ -266,7 +266,7 @@ tsize_t t2p_readwrite_pdf_image_tile(T2P*, TIFF*, TIFF*, ttile_t);
 int t2p_process_ojpeg_tables(T2P*, TIFF*);
 #endif
 #ifdef JPEG_SUPPORT
-int t2p_process_jpeg_strip(unsigned char*, tsize_t*, unsigned char*, tsize_t*, tstrip_t, uint32);
+int t2p_process_jpeg_strip(unsigned char*, tsize_t*, unsigned char*, tsize_t, tsize_t*, tstrip_t, uint32);
 #endif
 void t2p_tile_collapse_left(tdata_t, tsize_t, uint32, uint32, uint32);
 void t2p_write_advance_directory(T2P*, TIFF*);
@@ -2236,7 +2236,8 @@ tsize_t t2p_readwrite_pdf_image(T2P* t2p, TIFF* input, TIFF* output){
 				if(!t2p_process_jpeg_strip(
 					stripbuffer, 
 					&striplength, 
-					buffer, 
+					buffer,
+					t2p->tiff_datasize, 
 					&bufferoffset, 
 					i, 
 					t2p->tiff_length)){
@@ -3252,6 +3253,7 @@ int t2p_process_jpeg_strip(
 	unsigned char* strip, 
 	tsize_t* striplength, 
 	unsigned char* buffer, 
+	tsize_t buffersize, 
 	tsize_t* bufferoffset, 
 	tstrip_t no, 
 	uint32 height){
@@ -3267,6 +3269,8 @@ int t2p_process_jpeg_strip(
 	while(i<(*striplength)){
 		switch( strip[i] ){
 			case 0xd8:
+				if( *bufferoffset + 2 > buffersize )
+                    return(0);
 				i+=2;
 				break;
 			case 0xc0:
@@ -3275,7 +3279,11 @@ int t2p_process_jpeg_strip(
 			case 0xc9:
 			case 0xca:
 				if(no==0){
+					if( *bufferoffset + datalen + 2 + 6 > buffersize )
+                        return(0);
 					_TIFFmemcpy(&(buffer[*bufferoffset]), &(strip[i-1]), strip[i+2]+2);
+					if( *bufferoffset + 9 >= buffersize )
+                        return(0);
 					for(j=0;j<buffer[*bufferoffset+9];j++){
 						if( (buffer[*bufferoffset+11+(2*j)]>>4) > h_samp) 
 							h_samp = (buffer[*bufferoffset+11+(2*j)]>>4);
@@ -3309,16 +3317,22 @@ int t2p_process_jpeg_strip(
 				break;
 			case 0xc4:
 			case 0xdb:
+				if( *bufferoffset + datalen + 2 > buffersize )
+                    return(0);
 				_TIFFmemcpy(&(buffer[*bufferoffset]), &(strip[i-1]), strip[i+2]+2);
 				*bufferoffset+=strip[i+2]+2;
 				i+=strip[i+2]+2;
 				break;
 			case 0xda:
 				if(no==0){
+					if( *bufferoffset + datalen + 2 > buffersize )
+                        return(0);
 					_TIFFmemcpy(&(buffer[*bufferoffset]), &(strip[i-1]), strip[i+2]+2);
 					*bufferoffset+=strip[i+2]+2;
 					i+=strip[i+2]+2;
 				} else {
+					if( *bufferoffset + 2 > buffersize )
+                        return(0);
 					buffer[(*bufferoffset)++]=0xff;
 					buffer[(*bufferoffset)++]=
                                             (unsigned char)(0xd0 | ((no-1)%8));
