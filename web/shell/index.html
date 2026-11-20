@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>POV-Ray Web</title>
+  <meta name="description" content="The Persistence of Vision Raytracer, compiled to WebAssembly.">
+  <!-- Enables SharedArrayBuffer (needed for threads) on hosts that cannot send COOP/COEP headers. -->
+  <script src="coi-serviceworker.js"></script>
+  <!-- The @POVWEB_...@ placeholders in this file are filled in by web/tools/stamp_version.py. -->
+  <meta name="povweb-version" content="@POVWEB_VERSION@">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3CradialGradient id='g' cx='.35' cy='.3' r='.75'%3E%3Cstop offset='0' stop-color='%23fff'/%3E%3Cstop offset='.2' stop-color='%23ffb36b'/%3E%3Cstop offset='.6' stop-color='%23e0561b'/%3E%3Cstop offset='1' stop-color='%236d1f05'/%3E%3C/radialGradient%3E%3Ccircle cx='16' cy='16' r='15' fill='url(%23g)'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css?v=@POVWEB_VERSION@">
+</head>
+<body>
+  <header class="toolbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true"></span>
+      <span>POV-Ray <small>Web</small></span>
+    </div>
+
+    <div class="group">
+      <button id="btn-new" title="New scene">New</button>
+      <button id="btn-examples" title="Browse the example scenes">Examples…</button>
+      <button id="btn-open" title="Open scene files from disk: scenes, include files, image maps… (Ctrl+O)">Open…</button>
+      <button id="btn-open-folder" title="Open a folder containing a scene and its files">Open folder…</button>
+      <button id="btn-save" title="Save the current file to disk (Ctrl+S)">Save</button>
+      <button id="btn-save-as" title="Save the current file under a new name">Save as…</button>
+    </div>
+
+    <div class="group render-opts">
+      <label title="Image width in pixels">W <input id="opt-width" type="number" min="1" max="16384" value="640"></label>
+      <label title="Image height in pixels">H <input id="opt-height" type="number" min="1" max="16384" value="480"></label>
+      <label title="Anti-aliasing"><input id="opt-aa" type="checkbox" checked> AA</label>
+      <label title="Animations: clear the preview before each frame, instead of painting each frame over the previous one"><input id="opt-clear-frames" type="checkbox"> Clear frames</label>
+      <label id="ini-wrap" title="Render using one of the example's INI files (e.g. for animations)" hidden>INI
+        <select id="opt-ini"></select></label>
+      <label title="Number of render threads, 1 to 64. The default, 0, uses one thread per CPU core, but no more than 32.">Threads <input id="opt-threads" type="number" min="0" max="64" value="0"></label>
+      <label class="grow" title="Additional POV-Ray command-line options, e.g. +Q9 +KFF10 Declare=Foo=1">
+        <input id="opt-extra" type="text" placeholder="More options, e.g. +Q9 +A0.1 +R4" spellcheck="false">
+      </label>
+    </div>
+
+    <div class="group">
+      <button id="btn-render" class="primary" title="Render the main scene (Ctrl+Enter)">Render</button>
+      <button id="btn-cancel" title="Stop the render" disabled>Stop</button>
+      <button id="btn-save-image" title="Save the rendered image to disk" disabled>Save image</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="pane editor-pane" aria-label="Scene editor">
+      <div class="tabs" id="tabs" role="tablist"></div>
+      <div class="editor">
+        <div class="gutter" id="gutter" aria-hidden="true"></div>
+        <textarea id="editor" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off"
+                  aria-label="Scene source" aria-describedby="editor-keys"></textarea>
+        <span id="editor-keys" hidden>Tab indents. Press Escape, then Tab, to leave the editor.</span>
+      </div>
+      <div class="assets" id="assets" hidden></div>
+    </section>
+
+    <div class="splitter" id="splitter" role="separator" aria-orientation="vertical" tabindex="0"></div>
+
+    <section class="pane output-pane" aria-label="Render output">
+      <div class="preview" id="preview">
+        <canvas id="canvas" width="640" height="480"></canvas>
+        <div class="placeholder" id="placeholder">
+          <p>Pick an example scene or open a <code>.pov</code> file, then press <b>Render</b>.</p>
+        </div>
+      </div>
+      <div class="statusbar">
+        <span class="state" id="state">Idle</span>
+        <span class="status" id="status"></span>
+        <span class="elapsed" id="elapsed"></span>
+      </div>
+      <div class="outputs" id="outputs" hidden></div>
+      <div class="log-header">
+        <span>Messages</span>
+        <button id="btn-clear-log" class="small">Clear</button>
+      </div>
+      <pre class="log" id="log" aria-live="polite"></pre>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>Unofficial development build</span>
+    <span id="povray-version" hidden></span>
+    <a href="@POVWEB_SOURCE_URL@">@POVWEB_SOURCE_LABEL@</a>
+    <a href="LICENSE.txt">Licence: AGPL-3.0</a>
+    <a href="https://www.povray.org/">povray.org</a>
+  </footer>
+
+  <dialog id="examples-dialog" class="examples">
+    <form method="dialog" class="examples-head">
+      <input id="examples-search" type="search" placeholder="Search example scenes…" autocomplete="off">
+      <select id="examples-category" aria-label="Category"></select>
+      <button value="close" aria-label="Close">✕</button>
+    </form>
+    <div class="examples-grid" id="examples-grid"></div>
+  </dialog>
+
+  <input type="file" id="file-input" multiple hidden>
+
+  <div class="drop-overlay" id="drop-overlay" hidden>Drop scene files to open them</div>
+
+  <script src="app.js?v=@POVWEB_VERSION@"></script>
+</body>
+</html>
