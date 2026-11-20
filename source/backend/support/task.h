@@ -92,6 +92,9 @@ class Task
 
         inline POVMSContext GetPOVMSContext() { return povmsContext; }
 
+	/// assigned task index.
+	int taskIndex;
+
     protected:
 
         struct StopThreadException final {}; // TODO - consider subclassing from std::exception hierarchy.
@@ -126,7 +129,7 @@ class Task
         /// task thread
         std::thread *taskThread;
         /// POVMS message receiving context
-        POVMSContext povmsContext;
+        POVMSContext povmsContext;		
 
         inline void FatalErrorHandler(const Exception& e)
         {
