@@ -141,6 +141,7 @@ CodemaxLanguage LangINI =
   "Render_Console\n"
   "Render_File\n"
   "Sampling_Method\n"
+  "Shared_Memory_File\n"
   "Split_Unions\n"
   "Start_Column\n"
   "Start_Row\n"

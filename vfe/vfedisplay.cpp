@@ -60,15 +60,6 @@ namespace vfe
 
 using pov_base::Filesystem::MappedFile;
 
-struct vfeDisplayBufferHeader
-{
-  std::uint32_t Version;
-  std::uint32_t Width;
-  std::uint32_t Height;
-  std::uint32_t PixelsWritten;
-  std::uint32_t PixelsRead;
-};
-
 static_assert(sizeof(vfeDisplayBufferHeader) == 20, "shared display buffer header must be 20 bytes");
 static_assert(sizeof(Display::RGBA8) == 4, "shared display buffer pixels must be 4 bytes");
 

@@ -215,6 +215,7 @@ struct ProcessOptions::INI_Parser_Table RenderOptions_INI_Table[] =
     { "Render_Pattern",      kPOVAttrib_RenderPattern,      kPOVMSType_Int },
 
     { "Sampling_Method",     kPOVAttrib_SamplingMethod,     kPOVMSType_Int },
+    { "Shared_Memory_File",  kPOVAttrib_SharedMemory,       kPOVMSType_UCS2String },
     { "Split_Unions",        kPOVAttrib_SplitUnions,        kPOVMSType_Bool },
     { "Start_Column",        kPOVAttrib_Left,               kPOVMSType_Float },
     { "Start_Row",           kPOVAttrib_Top,                kPOVMSType_Float },
