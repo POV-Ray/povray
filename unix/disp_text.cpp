@@ -62,12 +62,13 @@ namespace pov_frontend
 
     void UnixTextDisplay::Initialise()
     {
-        vfeDisplay::Initialise();
+        // No preview to show; only the shared display buffer (+SM), if requested.
+        InitialiseSharedBuffer();
     }
 
     void UnixTextDisplay::DrawPixel(unsigned int x, unsigned int y, const RGBA8& colour)
     {
-        vfeDisplay::DrawPixel(x, y, colour);
+        SharedBufferDrawPixel(x, y, colour);
         //fprintf(stderr, "DrawPixel(%d,%d)\n", x, y);
     }
 }

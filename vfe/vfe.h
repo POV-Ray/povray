@@ -208,13 +208,33 @@ namespace vfe
       virtual void DrawPixelBlock(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8 *colour) override;
       virtual void Clear() override;
 
+      /// Whether this display is writing a shared display buffer (`+SM`).
+      bool HasSharedBuffer() const { return m_SharedBuffer != nullptr; }
+
+      /// Unmap the shared display buffer, if any. The file and its content are kept.
+      void CloseSharedBuffer();
+
     protected:
+      /// Map the shared display buffer if the `+SM` option names a file, and
+      /// reset its header and pixels; do nothing otherwise.
+      /// Derived displays that override @ref Initialise() call this to support
+      /// `+SM`, and the `SharedBuffer*` methods below from their drawing methods.
+      /// @throws pov_base::Exception if the file cannot be created or mapped.
+      void InitialiseSharedBuffer();
+      void SharedBufferDrawPixel(unsigned int x, unsigned int y, const RGBA8& colour);
+      void SharedBufferDrawPixelBlock(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8 *colour);
+      void SharedBufferDrawFilledRectangle(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8& colour);
+      void SharedBufferClear();
+
       vfeSession *m_Session;
-      void *m_Buffer;
+      std::vector<RGBA8> m_Pixels;
       bool m_VisibleOnCreation;
-      std::vector<unsigned char> m_HeapBuffer;
+
+    private:
       std::unique_ptr<pov_base::Filesystem::MappedFile> m_SharedBuffer;
-      std::uint32_t m_PixelsWritten;
+      std::uint32_t m_SharedPixelsWritten;
+
+      void SharedBufferAdvance(std::uint_least64_t count);
   };
 
   class VirtualFrontEnd
