@@ -298,6 +298,10 @@ bool WinLegacyDisplay::CreateRenderWindow (void)
 
 void WinLegacyDisplay::Initialise()
 {
+  // map the shared display buffer (+SM) first: if that fails, the render fails without a window.
+  // this must happen before the test below, since a display that took over the window of the
+  // previous render (see TakeOver()) is already marked as initialised.
+  InitialiseSharedBuffer();
   if (m_Initialised)
     return;
   m_Initialised = true;
@@ -405,6 +409,7 @@ inline void WinLegacyDisplay::SetPixel (unsigned int x, unsigned int y, unsigned
 
 void WinLegacyDisplay::DrawPixel(unsigned int x, unsigned int y, const RGBA8& colour)
 {
+  SharedBufferDrawPixel(x, y, colour);
   unsigned char         Red = colour.red ;
   unsigned char         Green = colour.green ;
   unsigned char         Blue = colour.blue ;
@@ -448,6 +453,7 @@ void WinLegacyDisplay::DrawRectangleFrame(unsigned int x1, unsigned int y1, unsi
 
 void WinLegacyDisplay::DrawFilledRectangle(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8& colour)
 {
+  SharedBufferDrawFilledRectangle(x1, y1, x2, y2, colour);
   if (GetWidth() == 0 || GetHeight() == 0)
     return;
 
@@ -478,6 +484,7 @@ void WinLegacyDisplay::DrawFilledRectangle(unsigned int x1, unsigned int y1, uns
 
 void WinLegacyDisplay::DrawPixelBlock(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8 *colour)
 {
+  SharedBufferDrawPixelBlock(x1, y1, x2, y2, colour);
 #ifdef RTR_SUPPORT
   if (m_Session->GetRealTimeRaytracing() == true)
     NextFrame();
@@ -607,6 +614,7 @@ void WinLegacyDisplay::InvalidatePixelBlock(unsigned int x1, unsigned int y1, un
 
 void WinLegacyDisplay::Clear()
 {
+  SharedBufferClear();
   if (m_BitmapSurface == NULL)
     return ;
   if (m_Depth8Bit)
