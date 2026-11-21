@@ -179,6 +179,12 @@ void vfeDisplay::InitialiseSharedBuffer()
     throw POV_EXCEPTION(kOutOfMemoryErr, "Shared display buffer size out of range");
   const std::uint_least64_t size = pixelCount * sizeof(RGBA8) + sizeof(vfeDisplayBufferHeader);
 
+  // VirtualFrontEnd::Start() has checked the name against the I/O restrictions
+  // already, but check again right before the file is opened, as is done for
+  // the output image, since the file system may have changed while parsing.
+  if (!m_Session->TestAccessAllowed(fileName, true))
+    throw POV_EXCEPTION(kCannotOpenFileErr, "IO Restrictions prohibit write access to '" + UCS2toSysString(fileName) + "'");
+
   std::unique_ptr<MappedFile> file(new MappedFile);
   if (!file->Open(fileName, size))
     throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot use '" + UCS2toSysString(fileName) + "' as shared display buffer: " + file->GetErrorText());

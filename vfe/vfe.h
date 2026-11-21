@@ -264,6 +264,8 @@ namespace vfe
       virtual Display *CreateDisplay(unsigned int width, unsigned int height)
         { return m_Session->CreateDisplay(width, height) ; }
       bool HandleShelloutCancel();
+      void CheckSharedDisplayBuffer();
+      void CloseSharedDisplayBuffer();
 
       RenderFrontend<vfeParserMessageHandler,FileMessageHandler,vfeRenderMessageHandler,ImageMessageHandler> renderFrontend;
       POVMSAddress backendAddress;
@@ -280,6 +282,7 @@ namespace vfe
       vfePlatformBase m_PlatformBase;
       bool m_PausedAfterFrame;
       bool m_PauseRequested;
+      bool m_SharedBufferWarned;
       State m_PostPauseState;
   };
 }
