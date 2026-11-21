@@ -606,6 +606,7 @@ VirtualFrontEnd::VirtualFrontEnd(vfeSession& session, POVMSContext ctx, POVMSAdd
   consoleResult = nullptr;
   displayResult = nullptr;
   m_PauseRequested = m_PausedAfterFrame = false;
+  m_SharedBufferWarned = false;
   renderFrontend.ConnectToBackend(backendAddress, msg, result, console);
 }
 
@@ -648,6 +649,19 @@ bool VirtualFrontEnd::Start(POVMS_Object& opts)
   image_height.SetString(kPOVAttrib_Identifier, "image_height");
   image_height.SetFloat(kPOVAttrib_Value, opts.TryGetInt(kPOVAttrib_Height, 120));
   declares.Append(image_height);
+
+  // the shared display buffer is an output file like any other, so test access
+  // to it now rather than failing when the display is created. without a display
+  // it is not written at all (SetOptions() has warned about that already).
+  UCS2String sharedBufferName = opts.TryGetUCS2String(kPOVAttrib_SharedMemory, "");
+  if (!sharedBufferName.empty() && opts.TryGetBool(kPOVAttrib_Display, true) && m_Session->TestAccessAllowed(sharedBufferName, true) == false)
+  {
+    string str ("IO Restrictions prohibit write access to '") ;
+    str += UCS2toASCIIString(sharedBufferName);
+    str += "'";
+    throw POV_EXCEPTION(kCannotOpenFileErr, str);
+  }
+  m_SharedBufferWarned = false;
 
   POVMS_Object input_file_name(kPOVMSType_WildCard);
   input_file_name.SetString(kPOVAttrib_Identifier, "input_file_name");
@@ -739,6 +753,31 @@ bool VirtualFrontEnd::Start(POVMS_Object& opts)
   state = kStarting;
 
   return true;
+}
+
+// The shared display buffer (+SM) is written by the display, so it exists only
+// if the display supports it; say so once per render if it does not.
+void VirtualFrontEnd::CheckSharedDisplayBuffer()
+{
+  if (m_SharedBufferWarned || options.TryGetUCS2String(kPOVAttrib_SharedMemory, "").empty())
+    return;
+  shared_ptr<vfeDisplay> display(std::dynamic_pointer_cast<vfeDisplay>(GetDisplay()));
+  // no display at all (Display=off) has already been reported by SetOptions().
+  if (GetDisplay() != nullptr && (display == nullptr || !display->HasSharedBuffer()))
+  {
+    m_Session->AppendWarningMessage ("Warning: The render preview of this version of POV-Ray does not support a shared display buffer (+SM); none will be written.") ;
+    m_SharedBufferWarned = true;
+  }
+}
+
+// Unmap the shared display buffer when the render ends. The file and its content
+// stay for the reader; some front-ends keep their display (and with it the
+// mapping) alive after the render to repaint the preview.
+void VirtualFrontEnd::CloseSharedDisplayBuffer()
+{
+  shared_ptr<vfeDisplay> display(std::dynamic_pointer_cast<vfeDisplay>(GetDisplay()));
+  if (display != nullptr)
+    display->CloseSharedBuffer();
 }
 
 bool VirtualFrontEnd::Stop()
@@ -1104,6 +1143,7 @@ State VirtualFrontEnd::Process()
             m_Session->AppendStatusMessage (e.what()) ;
             return state = kFailed;
           }
+          CheckSharedDisplayBuffer();
           try { renderFrontend.StartRender(viewId, options); }
           catch(pov_base::Exception& e)
           {
@@ -1119,6 +1159,7 @@ State VirtualFrontEnd::Process()
                * the post frame shellout (that won't be reached because
                * the image was already there).
                */
+              CloseSharedDisplayBuffer();
               try { renderFrontend.CloseView(viewId); }
               catch (pov_base::Exception&) { /* Ignore any error here! */ }
               try { renderFrontend.CloseScene(sceneId); }
@@ -1304,6 +1345,7 @@ State VirtualFrontEnd::Process()
       return state = kStopped;
 
     case kStopped:
+      CloseSharedDisplayBuffer();
       try { renderFrontend.CloseView(viewId); }
       catch (pov_base::Exception&) { /* Ignore any error here! */ }
       try { renderFrontend.CloseScene(sceneId); }
