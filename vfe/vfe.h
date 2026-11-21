@@ -249,6 +249,62 @@ namespace vfe
       std::unique_ptr<Data> mpData;
   };
 
+  /// Header of the shared display buffer.
+  ///
+  /// The `+SM<file>` option (INI `Shared_Memory_File=<file>`) makes the render
+  /// preview display write its pixels to a memory-mapped file as well, so that
+  /// another process can show the image while it is being rendered. The option
+  /// was contributed by Leonardo Zide for LeoCAD (GitHub pull request #344);
+  /// LeoCAD's reader is `qt/lc_renderdialog.cpp` in its repository, and the
+  /// layout below is the one it reads.
+  ///
+  /// @par Layout
+  /// The file starts with this 20-byte header: five unsigned 32-bit integers in
+  /// the byte order of the machine that renders (little-endian on every platform
+  /// POV-Ray currently ships for), without padding. The pixels follow at byte
+  /// offset 20: `Width * Height` pixels of 4 bytes each, red, green, blue and
+  /// alpha in that order (8 bits each, encoded with the display gamma, alpha not
+  /// premultiplied), row by row from the top row down, each row from left to
+  /// right, with no padding between rows. Pixels not rendered yet are 0 (transparent
+  /// black). The file is at least `20 + Width * Height * 4` bytes long and may be
+  /// longer: POV-Ray grows it as needed but never shortens it, since a reader may
+  /// still have it mapped.
+  ///
+  /// @par Life cycle
+  /// The file is created (or opened, if it exists) when the display of a frame is
+  /// created, after the scene has been parsed. For every frame of an animation the
+  /// header is rewritten: `Version` is set to 0, `Width`, `Height`,
+  /// `PixelsWritten` and `PixelsRead` are set, the pixels are cleared, and then
+  /// `Version` is set to 1. During the render each pixel is stored before
+  /// `PixelsWritten` is advanced past it. POV-Ray unmaps the file when the render
+  /// ends, keeps it, and never deletes it: the reader deletes it when done.
+  ///
+  /// @par Reading
+  /// A reader maps the file (or re-reads it) and treats the header as valid only
+  /// while `Version` is 1. A change of `Width` or `Height`, or `PixelsWritten`
+  /// going back to a value lower than the last one seen, means a new frame has
+  /// started. `PixelsWritten` differing from the last value seen means there are
+  /// new pixels. `PixelsRead` is for the reader: POV-Ray resets it to 0 at the
+  /// start of each frame and never reads it; LeoCAD stores the `PixelsWritten`
+  /// value it has displayed there and takes `PixelsRead == 0` to mean "new
+  /// image". If the image size can change between frames, a reader that maps the
+  /// file must re-map it when `Width` or `Height` change.
+  ///
+  struct vfeDisplayBufferHeader final
+  {
+    std::uint32_t Version;        ///< Layout version: 1, or 0 while the header is being rewritten.
+    std::uint32_t Width;          ///< Image width in pixels.
+    std::uint32_t Height;         ///< Image height in pixels.
+    /// Number of rendered pixels stored in the current frame so far, modulo 2^32.
+    /// Preview blocks (the mosaic preview, `+SP`, and the radiosity pretrace) are
+    /// written to the buffer but not counted, so without `+SP` the value reaches
+    /// `Width * Height` exactly when the frame is complete. With `+SP` it ends
+    /// lower, since pixels already shown in their final colour by the last
+    /// preview pass are not stored again.
+    std::uint32_t PixelsWritten;
+    std::uint32_t PixelsRead;     ///< Reserved for the reader; set to 0 at the start of each frame.
+  };
+
   class vfeDisplay : public Display
   {
     public:

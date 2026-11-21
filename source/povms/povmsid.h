@@ -423,7 +423,7 @@ enum
 
     kPOVAttrib_MaxImageBufferMem     = 'MIBM', // [JG] for file backed image
 
-    kPOVAttrib_SharedMemory          = 'ShaM',
+    kPOVAttrib_SharedMemory          = 'ShaM', // shared display buffer file (+SM), see vfe::vfeDisplayBufferHeader
 
     kPOVAttrib_CameraIndex           = 'CIdx',
 
