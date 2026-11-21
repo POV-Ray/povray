@@ -39,13 +39,13 @@
 #define POVRAY_VFE_VFE_H
 
 #include <cassert>
+#include <cstdint>
+#include <memory>
+#include <string>
 
 #include <boost/format.hpp>
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
-
-#include <boost/interprocess/file_mapping.hpp>
-#include <boost/interprocess/mapped_region.hpp>
 
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
@@ -196,6 +196,59 @@ namespace vfe
       vfeSession* m_Session;
   };
 
+  /// Memory-mapped file shared with other processes.
+  ///
+  /// This class maps the beginning of a file into memory for read/write access,
+  /// such that changes become visible to any other process mapping or reading
+  /// the same file.
+  ///
+  /// @note
+  ///     The implementation is platform specific, in `vfe/unix/vfeplatform.cpp`
+  ///     and `vfe/win/vfeplatform.cpp`. On a Unix system without `<sys/mman.h>`
+  ///     @ref Open() always fails with an explanatory error text.
+  ///
+  class MappedFile final
+  {
+    public:
+
+      MappedFile();
+      MappedFile(const MappedFile&) = delete;
+      MappedFile& operator=(const MappedFile&) = delete;
+      ~MappedFile();
+
+      /// Create or open a file and map its first `size` bytes for read/write access.
+      ///
+      /// The file is created if it does not exist, and grown to `size` bytes if it
+      /// is shorter. A longer file is not shortened, since another process may
+      /// still have it mapped. The content is not changed (except that bytes added
+      /// by growing the file read as zero). Any mapping held by this object is
+      /// closed first.
+      ///
+      /// @param  fileName    Name of the file.
+      /// @param  size        Number of bytes to map; must be non-zero.
+      /// @return             `true` on success. On failure the object is closed and
+      ///                     @ref GetErrorText() describes the reason.
+      ///
+      bool Open(const UCS2String& fileName, std::uint_least64_t size);
+
+      /// Unmap and close the file. The file itself is kept.
+      void Close();
+
+      /// Start of the mapped data, or `nullptr` if no file is mapped.
+      void* GetData() const;
+
+      /// Size of the mapped data in bytes, or 0 if no file is mapped.
+      std::size_t GetSize() const;
+
+      /// Description of the reason the last call to @ref Open() failed.
+      const std::string& GetErrorText() const;
+
+    private:
+
+      struct Data;
+      std::unique_ptr<Data> mpData;
+  };
+
   class vfeDisplay : public Display
   {
     public:
@@ -216,8 +269,9 @@ namespace vfe
       vfeSession *m_Session;
       void *m_Buffer;
       bool m_VisibleOnCreation;
-      boost::interprocess::file_mapping  *m_FileMapping;
-      boost::interprocess::mapped_region *m_MappedRegion;
+      std::vector<unsigned char> m_HeapBuffer;
+      std::unique_ptr<MappedFile> m_SharedBuffer;
+      std::uint32_t m_PixelsWritten;
   };
 
   class VirtualFrontEnd

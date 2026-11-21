@@ -39,6 +39,7 @@
 #include "syspovconfig.h"
 
 // C++ variants of C standard headers
+#include <cerrno>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -46,14 +47,24 @@
 # include <ctime>
 #endif
 
+// C++ standard headers
+#include <limits>
+#include <system_error>
+
 // other library headers
+#include <fcntl.h>
 #include <pthread.h>
+#ifdef HAVE_SYS_MMAN_H
+# include <sys/mman.h>
+#endif
+#include <sys/stat.h>
 #ifdef HAVE_SYS_TIME_H
 # include <sys/time.h>
 #endif
 #ifdef HAVE_SYS_WAIT_H
 # include <sys/wait.h>
 #endif
+#include <unistd.h>
 
 // from directory "vfe"
 #include "vfe.h"
@@ -435,4 +446,203 @@ namespace vfePlatform
             return false;
         return gShelloutsPermittedFixThis;
     }
+}
+
+namespace vfe
+{
+    //////////////////////////////////////////////////////////////
+    // Memory-mapped file (shared display buffer, +SM)
+    //////////////////////////////////////////////////////////////
+
+#ifdef HAVE_SYS_MMAN_H
+
+    struct MappedFile::Data final
+    {
+        void* data;
+        std::size_t size;
+        std::string errorText;
+        Data() : data(nullptr), size(0) {}
+    };
+
+    static std::string ErrnoText(const char* what, int err)
+    {
+        return std::string(what) + ": " + std::generic_category().message(err);
+    }
+
+    MappedFile::MappedFile() :
+        mpData(new Data)
+    {}
+
+    MappedFile::~MappedFile()
+    {
+        Close();
+    }
+
+    bool MappedFile::Open(const UCS2String& fileName, std::uint_least64_t size)
+    {
+        Close();
+        mpData->errorText.clear();
+
+        if (size == 0)
+        {
+            mpData->errorText = "cannot map an empty file";
+            return false;
+        }
+        if ((size > std::numeric_limits<std::size_t>::max()) ||
+            (size > std::uint_least64_t(std::numeric_limits<off_t>::max())))
+        {
+            mpData->errorText = "file too large for this build";
+            return false;
+        }
+
+        const std::string name = UCS2toASCIIString(fileName);
+
+        // O_NOCTTY and O_NONBLOCK make opening a device or FIFO harmless; such files
+        // are refused below.
+        int openFlags = O_RDWR | O_NOCTTY | O_NONBLOCK;
+#ifdef O_CLOEXEC
+        openFlags |= O_CLOEXEC; // Don't leak the descriptor into shell-out commands.
+#endif
+        // Note whether we create the file, so that a failure can remove it again.
+        bool created = false;
+        int handle = open(name.c_str(), openFlags);
+        if ((handle == -1) && (errno == ENOENT))
+        {
+            handle = open(name.c_str(), openFlags | O_CREAT | O_EXCL,
+                          S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+            if (handle != -1)
+                created = true;
+            else if (errno == EEXIST)
+                handle = open(name.c_str(), openFlags); // Someone else was faster.
+        }
+        if (handle == -1)
+        {
+            mpData->errorText = ErrnoText("cannot open file", errno);
+            return false;
+        }
+
+        struct stat info;
+        if (fstat(handle, &info) != 0)
+        {
+            mpData->errorText = ErrnoText("cannot query file", errno);
+            close(handle);
+            return false;
+        }
+        if (!S_ISREG(info.st_mode))
+        {
+            mpData->errorText = "not a regular file";
+            close(handle);
+            return false;
+        }
+        const off_t originalSize = info.st_size;
+        const bool grow = (std::uint_least64_t(originalSize) < size);
+
+        // Reserve the disk space for the whole mapped range now if we can, also when
+        // the file is long enough already (it may be sparse): writing to a page that
+        // has no disk space behind it on a full file system raises SIGBUS.
+        int err = EINVAL;
+#ifdef HAVE_POSIX_FALLOCATE
+        err = posix_fallocate(handle, 0, off_t(size));
+#endif
+        if ((err == EINVAL) || (err == EOPNOTSUPP))
+        {
+            // No reservation possible; just set the size.
+            err = 0;
+            if (grow && (ftruncate(handle, off_t(size)) != 0))
+                err = errno;
+        }
+        void* data = MAP_FAILED;
+        if (err != 0)
+            mpData->errorText = ErrnoText("cannot set file size", err);
+        else
+        {
+            data = mmap(nullptr, std::size_t(size), PROT_READ | PROT_WRITE, MAP_SHARED, handle, 0);
+            if (data == MAP_FAILED)
+                mpData->errorText = ErrnoText("cannot map file", errno);
+        }
+
+        if (data == MAP_FAILED)
+        {
+            // Leave no trace of the attempt: remove a file we created, and give a
+            // file we grew its old size back (releasing the disk space reserved).
+            if (created)
+                (void)unlink(name.c_str());
+            else if (grow && (ftruncate(handle, originalSize) != 0))
+                {} // Nothing more we can do; the original error is the one to report.
+            close(handle);
+            return false;
+        }
+
+        // The mapping keeps its own reference to the file.
+        close(handle);
+
+        mpData->data = data;
+        mpData->size = std::size_t(size);
+        return true;
+    }
+
+    void MappedFile::Close()
+    {
+        if (mpData->data != nullptr)
+        {
+            (void)munmap(mpData->data, mpData->size);
+            mpData->data = nullptr;
+            mpData->size = 0;
+        }
+    }
+
+    void* MappedFile::GetData() const
+    {
+        return mpData->data;
+    }
+
+    std::size_t MappedFile::GetSize() const
+    {
+        return mpData->size;
+    }
+
+    const std::string& MappedFile::GetErrorText() const
+    {
+        return mpData->errorText;
+    }
+
+#else // HAVE_SYS_MMAN_H
+
+    struct MappedFile::Data final
+    {
+        std::string errorText;
+    };
+
+    MappedFile::MappedFile() :
+        mpData(new Data)
+    {}
+
+    MappedFile::~MappedFile()
+    {}
+
+    bool MappedFile::Open(const UCS2String& fileName, std::uint_least64_t size)
+    {
+        mpData->errorText = "memory-mapped files are not supported on this platform";
+        return false;
+    }
+
+    void MappedFile::Close()
+    {}
+
+    void* MappedFile::GetData() const
+    {
+        return nullptr;
+    }
+
+    std::size_t MappedFile::GetSize() const
+    {
+        return 0;
+    }
+
+    const std::string& MappedFile::GetErrorText() const
+    {
+        return mpData->errorText;
+    }
+
+#endif // HAVE_SYS_MMAN_H
 }
