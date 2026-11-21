@@ -41,6 +41,7 @@
 
 // C++ standard header files
 #include <limits>
+#include <system_error>
 
 // POSIX standard header files
 #include <fcntl.h>
@@ -49,6 +50,7 @@
 
 // Windows API header files
 #include <windows.h>
+#include <winioctl.h>
 
 // POV-Ray header files (base module)
 #include "base/pov_err.h"
@@ -149,6 +151,174 @@ void LargeFile::Close()
 }
 
 #endif // POV_USE_DEFAULT_LARGEFILE
+
+//******************************************************************************
+
+#if !POV_USE_DEFAULT_MAPPEDFILE
+
+struct MappedFile::Data final
+{
+    void* data;
+    std::size_t size;
+    std::string errorText;
+    Data() : data(nullptr), size(0) {}
+};
+
+static std::string WindowsErrorText(const char* what, DWORD err)
+{
+    return std::string(what) + ": " + std::system_category().message(int(err));
+}
+
+MappedFile::MappedFile() :
+    mpData(new Data)
+{}
+
+MappedFile::~MappedFile()
+{
+    Close();
+}
+
+bool MappedFile::Open(const UCS2String& fileName, std::uint_least64_t size)
+{
+    Close();
+    mpData->errorText.clear();
+
+    if (size == 0)
+    {
+        mpData->errorText = "cannot map an empty file";
+        return false;
+    }
+    if ((size > std::numeric_limits<SIZE_T>::max()) ||
+        (size > std::uint_least64_t(std::numeric_limits<LONGLONG>::max())))
+    {
+        mpData->errorText = "file too large for this build";
+        return false;
+    }
+
+    // The name is passed to the system exactly as `TestAccessAllowed()` checks it
+    // (and as the output image is opened): as a narrow string. Opening the wide
+    // name instead would let a name with characters outside Latin-1 be checked
+    // as one path and opened as another.
+    // TODO - use the wide name once the I/O restriction check works with it.
+    const std::string name = UCS2toSysString(fileName);
+
+    // Other processes must be able to open, map and eventually delete the file
+    // while we have it open. The security flags stop a named pipe server from
+    // acting on our behalf; such files are refused below anyway.
+    HANDLE file = CreateFileA(name.c_str(),
+                              GENERIC_READ | GENERIC_WRITE,
+                              FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                              nullptr, OPEN_ALWAYS,
+                              FILE_ATTRIBUTE_NORMAL | SECURITY_SQOS_PRESENT | SECURITY_IDENTIFICATION,
+                              nullptr);
+    if (file == INVALID_HANDLE_VALUE)
+    {
+        mpData->errorText = WindowsErrorText("cannot open file", GetLastError());
+        return false;
+    }
+    // Note whether we created the file, so that a failure can remove it again.
+    const bool existed = (GetLastError() == ERROR_ALREADY_EXISTS);
+    const bool created = !existed && (GetFileType(file) == FILE_TYPE_DISK);
+
+    LARGE_INTEGER originalSize;
+    originalSize.QuadPart = 0;
+    bool grow = false;
+    DWORD err = ERROR_SUCCESS;
+    const char* what = nullptr;
+    void* data = nullptr;
+
+    BY_HANDLE_FILE_INFORMATION info;
+    if (GetFileType(file) != FILE_TYPE_DISK)
+        mpData->errorText = "not a regular file";
+    else if (!GetFileSizeEx(file, &originalSize) || !GetFileInformationByHandle(file, &info))
+        what = "cannot query file";
+    else
+    {
+        grow = (std::uint_least64_t(originalSize.QuadPart) < size);
+        DWORD bytesReturned;
+        FILE_SET_SPARSE_BUFFER notSparse;
+        notSparse.SetSparse = FALSE;
+        LARGE_INTEGER newSize;
+        newSize.QuadPart = LONGLONG(size);
+        // Writing to a page of a sparse file that has no disk space behind it on
+        // a full disk raises an exception; making the file non-sparse allocates
+        // the space, as growing a non-sparse file does.
+        if ((info.dwFileAttributes & FILE_ATTRIBUTE_SPARSE_FILE) &&
+            !DeviceIoControl(file, FSCTL_SET_SPARSE, &notSparse, sizeof(notSparse), nullptr, 0, &bytesReturned, nullptr))
+            what = "cannot allocate sparse file";
+        else if (grow && (!SetFilePointerEx(file, newSize, nullptr, FILE_BEGIN) || !SetEndOfFile(file)))
+            what = "cannot set file size";
+        else
+        {
+            ULARGE_INTEGER mapSize;
+            mapSize.QuadPart = size;
+            HANDLE mapping = CreateFileMappingW(file, nullptr, PAGE_READWRITE, mapSize.HighPart, mapSize.LowPart, nullptr);
+            if (mapping == nullptr)
+                what = "cannot map file";
+            else
+            {
+                data = MapViewOfFile(mapping, FILE_MAP_WRITE, 0, 0, SIZE_T(size));
+                if (data == nullptr)
+                    what = "cannot map file";
+                err = GetLastError();
+                // The view keeps its own references to the mapping and the file.
+                CloseHandle(mapping);
+            }
+        }
+        if (what != nullptr && err == ERROR_SUCCESS)
+            err = GetLastError();
+    }
+    if (what != nullptr)
+        mpData->errorText = WindowsErrorText(what, err);
+
+    if (data == nullptr)
+    {
+        // Leave no trace of the attempt: remove a file we created, and give a
+        // file we grew its old size back.
+        if (!created && grow)
+        {
+            if (SetFilePointerEx(file, originalSize, nullptr, FILE_BEGIN))
+                (void)SetEndOfFile(file);
+        }
+        CloseHandle(file);
+        if (created)
+            (void)DeleteFileA(name.c_str());
+        return false;
+    }
+
+    CloseHandle(file);
+
+    mpData->data = data;
+    mpData->size = std::size_t(size);
+    return true;
+}
+
+void MappedFile::Close()
+{
+    if (mpData->data != nullptr)
+    {
+        (void)UnmapViewOfFile(mpData->data);
+        mpData->data = nullptr;
+        mpData->size = 0;
+    }
+}
+
+void* MappedFile::GetData() const
+{
+    return mpData->data;
+}
+
+std::size_t MappedFile::GetSize() const
+{
+    return mpData->size;
+}
+
+const std::string& MappedFile::GetErrorText() const
+{
+    return mpData->errorText;
+}
+
+#endif // POV_USE_DEFAULT_MAPPEDFILE
 
 //******************************************************************************
 

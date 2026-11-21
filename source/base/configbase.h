@@ -790,6 +790,20 @@
     #define POV_USE_DEFAULT_LARGEFILE 1
 #endif
 
+/// @def POV_USE_DEFAULT_MAPPEDFILE
+/// Whether to use a default implementation for memory-mapped files.
+///
+/// Define as non-zero to use a default implementation for the @ref pov_base::Filesystem::MappedFile class,
+/// or zero if the platform provides its own implementation.
+///
+/// @note
+///     The default implementation does not support memory-mapped files; any attempt to open one
+///     fails with an explanatory error text.
+///
+#ifndef POV_USE_DEFAULT_MAPPEDFILE
+    #define POV_USE_DEFAULT_MAPPEDFILE 1
+#endif
+
 /// @def POV_OFF_T
 /// Type representing a particular absolute or relative location in a (large) file.
 ///

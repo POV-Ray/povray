@@ -83,4 +83,13 @@
 // We want to implement a specialized Filesystem::LargeFile.
 #define POV_USE_DEFAULT_LARGEFILE 0
 
+// We want to implement a specialized Filesystem::MappedFile, using mmap(); without
+// <sys/mman.h> we fall back to the default, which reports memory-mapped files as
+// not supported.
+#ifdef HAVE_SYS_MMAN_H
+    #define POV_USE_DEFAULT_MAPPEDFILE 0
+#else
+    #define POV_USE_DEFAULT_MAPPEDFILE 1
+#endif
+
 #endif // POVRAY_UNIX_SYSPOVCONFIGBASE_H

@@ -64,4 +64,7 @@
 // Windows gets a platform-specific implementation of large file handling.
 #define POV_USE_DEFAULT_LARGEFILE 0
 
+// Windows gets a platform-specific implementation of memory-mapped files.
+#define POV_USE_DEFAULT_MAPPEDFILE 0
+
 #endif // POVRAY_WINDOWS_SYSPOVCONFIGBASE_H

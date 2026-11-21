@@ -620,6 +620,12 @@ AC_CHECK_DECLS([RUSAGE_SELF, RUSAGE_THREAD, RUSAGE_LWP],
 # gettimeofday <sys/time.h>
 AC_CHECK_FUNCS([gettimeofday])
 
+# mmap <sys/mman.h> (shared display buffer)
+AC_CHECK_HEADERS([sys/mman.h])
+
+# posix_fallocate <fcntl.h>
+AC_CHECK_FUNCS([posix_fallocate])
+
 # (Not checking for `asinh` and friends anymore, as they are mandatory as of C++11. [CLi])
 
 # support for non-IEEE compilers
