@@ -86,6 +86,7 @@ namespace pov_frontend
 
     void UnixSDLDisplay::Initialise()
     {
+        InitialiseSharedBuffer();
         if (m_VisibleOnCreation)
             Show();
     }
@@ -376,6 +377,7 @@ namespace pov_frontend
 
     void UnixSDLDisplay::DrawPixel(unsigned int x, unsigned int y, const RGBA8& colour)
     {
+        SharedBufferDrawPixel(x, y, colour);
         if (!m_valid || x >= GetWidth() || y >= GetHeight())
             return;
         if (SDL_MUSTLOCK(m_display) && SDL_LockSurface(m_display) < 0)
@@ -450,6 +452,7 @@ namespace pov_frontend
 
     void UnixSDLDisplay::DrawFilledRectangle(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8& colour)
     {
+        SharedBufferDrawFilledRectangle(x1, y1, x2, y2, colour);
         if (!m_valid)
             return;
 
@@ -482,6 +485,7 @@ namespace pov_frontend
 
     void UnixSDLDisplay::DrawPixelBlock(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8 *colour)
     {
+        SharedBufferDrawPixelBlock(x1, y1, x2, y2, colour);
         if (!m_valid)
             return;
 
@@ -516,6 +520,7 @@ namespace pov_frontend
 
     void UnixSDLDisplay::Clear()
     {
+        SharedBufferClear();
         for(vector<unsigned char>::iterator iter = m_PxCount.begin(); iter != m_PxCount.end(); iter++)
             (*iter) = 0;
 
