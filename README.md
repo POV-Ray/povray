@@ -9,6 +9,7 @@
 - [License](#license)
 - [Forums](#forums)
 - [Bug Reports](#bug-reports)
+- [Contributing](#contributing)
 - [Official Binaries](#official-binaries)
 - [Building POV-Ray](#building-pov-ray)
 - [IDE Versions](#ide-versions)
@@ -47,6 +48,12 @@ should also first check the [known issues](https://github.com/POV-Ray/povray/iss
 to see if it has been reported already.
 
 If you're sure something is a bug then please do lodge a bug report on the GitHub issues tracker.
+
+Contributing
+--------------------------------------
+
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) first: it covers pull requests,
+licensing, and our policy on contributions made with the help of AI tools.
 
 Official Binaries
 --------------------------------------
