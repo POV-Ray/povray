@@ -772,7 +772,7 @@ void InitInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
 
     l = 1024;
     charbuf[0] = 0;
-    if (POVMSUtil_GetString(msg, kPOVAttrib_CoreVersion, charbuf, &l) == kNoErr)
+    if (POVMSUtil_GetString(msg, kPOVAttrib_CoreGeneration, charbuf, &l) == kNoErr)
         generation = charbuf;
 
     l = 1024;
