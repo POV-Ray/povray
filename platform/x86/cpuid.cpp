@@ -70,7 +70,7 @@ static void cpuid(int *out, int in)
                           movl %%edx, 0xc(%%edi);   \
                           popl %%ebx;"              \
                           : : "D" (out), "S" (in)   \
-                          : "%eax", "%ecx", "%edx");
+                          : "%eax", "%ecx", "%edx", "memory");
 #elif defined(__x86_64__) // Architecture: x86-64 (64 bit)
     __asm__ __volatile__("pushq %%rbx;              \
                           xorq %%rax, %%rax;        \
@@ -83,7 +83,7 @@ static void cpuid(int *out, int in)
                           movl %%edx, 0xc(%%rdi);   \
                           popq %%rbx;"              \
                           : : "D" (out), "S" (in)   \
-                          : "%rax", "%rcx", "%rdx");
+                          : "%rax", "%rcx", "%rdx", "memory");
 #else // Architecture
 #error "Don't know how to invoke CPUID on this target architecture."
 #endif // Architecture
