@@ -29,6 +29,83 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
+Changes between v3.8.0-beta.2 and v3.8.0-beta.3
+===============================================
+
+Changed Behaviour
+-----------------
+
+  - A string set via `Declare` now draws a warning if it looks like a file
+    name written with single backslashes, such as `C:\temp\new.png` or
+    `out\tmp`. Such strings are subject to the same escape sequences as string
+    literals in a scene file (as they have been since v3.7), so `\t` silently
+    becomes a tab and `\n` a line feed. Escape handling itself is unchanged;
+    use doubled backslashes or forward slashes to get the intended name.
+  - Area light sizes below 1, or too large to be handled, are now reported as
+    parse errors. Previously only a size of zero was rejected.
+  - A malformed float literal, such as `1e` (an exponent without digits), is
+    now reported as a parse error on all platforms. Previously it could
+    silently take the value of the preceding literal.
+  - The render block size (`+BS`) is now limited to a value that can be
+    handled safely, and renders needing more blocks than can be handled are
+    refused at the start.
+  - On platforms that cannot measure per-thread CPU time, the statistics now
+    omit the CPU time instead of reporting a nonsensical value.
+
+
+Fixed or Mitigated Bugs
+-----------------------
+
+Reported via GitHub:
+
+  - #428 ("Loss of precision where variables declared on command line / ini
+    files. [Bug]"; values set via `Declare` now keep full double precision,
+    completing the partial fix in v3.8.0-beta.2)
+  - #460 ("[BUG] Parse error when using povray built by GCC 13, no error with
+    GCC 12") and #482 ("[BUG][UNIX]"): Unix builds made with GCC 13 or later,
+    or with recent versions of Clang, failed to parse a camera without `angle`
+    and rendered only the background for a camera without `up`. The Unix build
+    now uses `-fno-finite-math-only`.
+
+Miscellaneous:
+
+  - Unix builds made with newer versions of GCC (seen with 11.2 and 15.2)
+    could misdetect the CPU's features, e.g. reporting `AMD,FMA4` for a
+    processor that also supports SSE2 and AVX, and as a result fall back to the
+    portable noise generator. Renders were correct, but slower in scenes making
+    heavy use of noise. The CPU type and noise generator chosen are shown under
+    "Dynamic optimizations" at startup.
+  - With `+RS` (render block step) and a large number of render blocks, most
+    of the image could be left unrendered on Windows, e.g. a 4K render with
+    `+BS4 +RS500000`.
+  - A string set via `Declare` and ending in a backslash caused a read past
+    the end of the string.
+  - Negative area light sizes could cause writes outside the light's grid.
+  - The `local` and `global` pseudo-dictionaries used an uninitialised value
+    when checking for `#local` assignments to non-local dictionary elements.
+  - Loading a radiosity cache file could use uninitialised values, and lines
+    longer than 98 characters (which POV-Ray itself writes) were cut short,
+    loading wrong data from valid files.
+  - Photon shooting passed an uninitialised value for lights other than
+    cylinder lights. The results were not affected, but it was undefined
+    behaviour.
+  - Very large `blur_samples` values overflowed the computation of the focal
+    blur sampling grid.
+  - Three parser messages were formatted with mismatched argument types, and
+    the text of an internal error could be misused as a format string.
+  - Fixed the row stride of the default VFE display, which wrote out of bounds
+    for images taller than wide. Neither of the official front ends uses it.
+  - Fixed an overflow in the size of the pixel buffer used by real-time
+    raytracing for very large images.
+
+
+Other Noteworthy
+----------------
+
+  - The Windows source now builds with the Visual Studio 2022 (v143) toolset.
+  - The Unix source can be configured for Emscripten builds.
+
+
 Changes between v3.8.0-beta.1 and v3.8.0-beta.2
 ===============================================
 
