@@ -5,7 +5,7 @@
 [![Code Analysis](https://github.com/POV-Ray/povray/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/POV-Ray/povray/actions/workflows/codeql-analysis.yml)
 [![Last Commit](https://img.shields.io/github/last-commit/POV-Ray/povray)](https://github.com/POV-Ray/povray/commits/master)
 
-- [Development Status (October 2026)](#development-status-october-2026)
+- [Development Status (November 2026)](#development-status-november-2026)
 - [License](#license)
 - [Forums](#forums)
 - [Bug Reports](#bug-reports)
@@ -17,10 +17,11 @@
 - [Documentation](#documentation)
 - [Contacting Us](#contacting-us)
 
-Development Status (October 2026)
----------------------------------
-We are finally able to start clearing a long backlog of PR's and fix our CI. A beta .3 release is
-anticipated by the end of this month.
+Development Status (November 2026)
+----------------------------------
+We have cleared much of a long backlog of pull requests and repaired our CI. A third beta of
+v3.8.0 is planned for the end of this year. Depending on how that beta performs, it will be
+followed in February or March 2027 by either the v3.8.0 release or a fourth beta.
 
 License
 --------------------------------------
