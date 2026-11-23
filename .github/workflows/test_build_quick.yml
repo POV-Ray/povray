@@ -4,10 +4,36 @@ on:
   workflow_dispatch:
   push:
     # For now, there's nothing in the following directories that we're actually checking.
-    paths-ignore: [ 'distribution/**', 'doc/**', 'source-doc/**' ]
+    paths-ignore:
+      - 'distribution/**'
+      - 'doc/**'
+      - 'source-doc/**'
+      # Documentation and repository housekeeping files that no build or test depends on.
+      - '*.md'
+      - 'LICENSE'
+      - 'changes.txt'
+      - 'revision.txt'
+      - '.gitignore'
+      - '.github/*.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/CODEOWNERS'
+      - '.github/FUNDING.yml'
   pull_request:
     # For now, there's nothing in the following directories that we're actually checking.
-    paths-ignore: [ 'distribution/**', 'doc/**', 'source-doc/**' ]
+    paths-ignore:
+      - 'distribution/**'
+      - 'doc/**'
+      - 'source-doc/**'
+      # Documentation and repository housekeeping files that no build or test depends on.
+      - '*.md'
+      - 'LICENSE'
+      - 'changes.txt'
+      - 'revision.txt'
+      - '.gitignore'
+      - '.github/*.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/CODEOWNERS'
+      - '.github/FUNDING.yml'
 
 permissions:
   contents: read
