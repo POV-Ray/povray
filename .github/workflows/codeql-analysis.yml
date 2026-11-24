@@ -5,12 +5,40 @@ on:
   push:
     branches: [ 'master', 'release/*' ]
     # There's no actual source code to examine in the following directories.
-    paths-ignore: [ 'distribution/**', 'doc/**', 'source-doc/**', 'tools/**' ]
+    paths-ignore:
+      - 'distribution/**'
+      - 'doc/**'
+      - 'source-doc/**'
+      - 'tools/**'
+      # Documentation and repository housekeeping files that no build or test depends on.
+      - '*.md'
+      - 'LICENSE'
+      - 'changes.txt'
+      - 'revision.txt'
+      - '.gitignore'
+      - '.github/*.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/CODEOWNERS'
+      - '.github/FUNDING.yml'
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ 'master', 'release/*' ]
     # There's no actual source code to examine in the following directories.
-    paths-ignore: [ 'distribution/**', 'doc/**', 'source-doc/**', 'tools/**' ]
+    paths-ignore:
+      - 'distribution/**'
+      - 'doc/**'
+      - 'source-doc/**'
+      - 'tools/**'
+      # Documentation and repository housekeeping files that no build or test depends on.
+      - '*.md'
+      - 'LICENSE'
+      - 'changes.txt'
+      - 'revision.txt'
+      - '.gitignore'
+      - '.github/*.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/CODEOWNERS'
+      - '.github/FUNDING.yml'
 
 jobs:
   analyze:
