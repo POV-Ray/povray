@@ -379,10 +379,6 @@ int vfeSession::SetOptions (vfeRenderOptions& opts)
     }
   }
 
-  // the shared display buffer is written by the render preview display.
-  if (!ropts.TryGetUCS2String(kPOVAttrib_SharedMemory, "").empty() && !ropts.TryGetBool(kPOVAttrib_Display, true))
-    AppendWarningMessage ("Warning: Display is off, so no shared display buffer (+SM) will be written.") ;
-
   if (ropts.TryGetInt(kPOVAttrib_RenderBlockSize, 32) < 4)
     return (m_LastError = vfeRenderBlockSizeTooSmall);
 

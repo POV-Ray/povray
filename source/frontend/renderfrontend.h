@@ -565,7 +565,10 @@ RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_M
                     vh.data.image = std::shared_ptr<Image>(Image::Create(width, height, ImageDataType::RGBFT_Float));
             }
 
-            if(obj.TryGetBool(kPOVAttrib_Display, true) == true)
+            // a display is created for the render preview, and also without a preview
+            // when the shared display buffer (+SM) is to be written; the function
+            // supplied by the front-end decides what kind of display that is.
+            if((obj.TryGetBool(kPOVAttrib_Display, true) == true) || !obj.TryGetUCS2String(kPOVAttrib_SharedMemory, "").empty())
                 vh.data.display = std::shared_ptr<Display>(fn(width, height));
 
             viewhandler[vid] = vh;
