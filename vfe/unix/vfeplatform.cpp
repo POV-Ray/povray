@@ -526,6 +526,8 @@ namespace vfe
         {
             mpData->errorText = ErrnoText("cannot query file", errno);
             close(handle);
+            if (created)
+                (void)unlink(name.c_str());
             return false;
         }
         if (!S_ISREG(info.st_mode))
