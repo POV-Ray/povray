@@ -61,7 +61,7 @@ namespace pov_frontend
 
 void PrintStatus (vfeSession *session)
 {
-  string str;
+  std::string str;
   vfeSession::MessageType type;
   static vfeSession::MessageType lastType = vfeSession::mUnclassified;
 
