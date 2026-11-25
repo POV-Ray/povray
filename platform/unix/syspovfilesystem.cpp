@@ -221,6 +221,8 @@ bool MappedFile::Open(const UCS2String& fileName, std::uint_least64_t size)
     {
         mpData->errorText = ErrnoText("cannot query file", errno);
         close(handle);
+        if (created)
+            (void)unlink(name.c_str());
         return false;
     }
     if (!S_ISREG(info.st_mode))
