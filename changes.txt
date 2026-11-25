@@ -51,6 +51,12 @@ Changed Behaviour
     without the single quotes the documentation calls for, i.e.
     `Declare=Name="text"` instead of `Declare='Name="text"'`, which in an INI
     file used to be ignored without any message.
+  - POV-Ray for Windows: with `/EXIT`, the program now also exits when the
+    render could not be started (e.g. due to an invalid option or a missing
+    file); previously it stayed open. The process exit code is now 0 if the
+    render succeeded and non-zero otherwise (it used to be 0 always), no
+    message box is shown for a render that fails to start, and the internal
+    editor is not loaded.
   - Area light sizes below 1, or too large to be handled, are now reported as
     parse errors. Previously only a size of zero was rejected.
   - A malformed float literal, such as `1e` (an exponent without digits), is

@@ -2240,7 +2240,8 @@ bool start_rendering (bool ignore_source_file)
       say_status_message (StatusMessage, str) ;
       message_printf ("%s\n", str) ;
     }
-    if (errorCode != kCannotOpenFileErr && errorCode != kParseErr && errorCode != kOutOfMemoryErr)
+    // no message box if we were asked to exit after the render: nobody may be there to dismiss it
+    if (!exit_after_render && errorCode != kCannotOpenFileErr && errorCode != kParseErr && errorCode != kOutOfMemoryErr)
     {
       sprintf (str, "Failed to set render options (%s).\nSee message pane for more details.", e.what()) ;
       MessageBox (main_window, str, "Error", MB_OK | MB_ICONSTOP) ;
@@ -5818,7 +5819,9 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
     if (_getcwd (str, sizeof (str) - 1) != NULL)
       debug_output("CWD is %s\n", str) ;
 
-  if (editors_enabled)
+  // asked to render and exit (/EXIT): the editor is not needed, so we don't load it. This also
+  // avoids the dialog shown when the editor DLLs are missing, which nobody may be there to dismiss.
+  if (editors_enabled && !exit_after_render)
   {
     if (EditDLLPath != NULL)
     {
@@ -6329,7 +6332,10 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
     }
     if (argc > 1)
       wrapped_printf ("Calling rendering engine with parameters '%s'", command_line) ;
-    start_rendering (!render_requested) ;
+    // with /EXIT, a render that could not even be started (e.g. a bad command line) must still
+    // end the program; `render_stopped`, which does so for all other renders, is never called then.
+    if (!start_rendering (!render_requested) && exit_after_render)
+      DestroyWindow (main_window) ;
   }
 
   if (homeInferred)
@@ -6452,5 +6458,6 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 
   if (debugging)
     debug_output ("exiting WinMain()\n") ;
-  return (0) ;
+  // with /EXIT, let the caller tell a failed render from a successful one
+  return (exit_after_render ? povray_return_code : 0) ;
 }
