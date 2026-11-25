@@ -172,7 +172,16 @@ void Scene::StartParser(POVMS_Object& parseOptions)
                     // double-precision value (GitHub issue #428). Numbers declared by the front-end
                     // itself (e.g. `image_width`) have no text.
                     if (d.Exist(kPOVAttrib_ValueText))
-                        sceneData->declaredNumbers.insert(make_pair(ident, std::strtod(d.GetString(kPOVAttrib_ValueText).c_str(), nullptr)));
+                    {
+                        // The text is as typed if it was not entirely a number (e.g. `off`); the parser
+                        // warns about those.
+                        std::string text = d.GetString(kPOVAttrib_ValueText);
+                        char *end = nullptr;
+                        double value = std::strtod(text.c_str(), &end);
+                        sceneData->declaredNumbers.insert(make_pair(ident, value));
+                        if ((end == text.c_str()) || (*end != '\0'))
+                            sceneData->declaredNotNumeric.insert(make_pair(ident, text));
+                    }
                     else
                         sceneData->declaredNumbers.insert(make_pair(ident, d.TryGetFloat(kPOVAttrib_Value, 0.0)));
                     break;
