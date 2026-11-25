@@ -162,9 +162,10 @@ program can show the render while it runs: a header of five 32-bit unsigned
 integers in native byte order (version 1, width, height, pixels written, pixels
 read), then width\(muheight pixels of 8-bit red, green, blue and alpha, top row
 first. The file is created or grown as needed and kept after the render; the
-reading program deletes it. Requires the display to be on. The file is subject
-to the I/O restrictions like any output file. An empty file name turns the
-option off.
+reading program deletes it. Also works with the display off (\fB\-D\fP): then no
+preview is shown and only the file is written. The file is subject to the I/O
+restrictions like any output file. \fB+SM\fP without a file name is an error;
+\fBShared_Memory_File=\fP with an empty value turns the option off.
 .TP
 \fBUD\fP or \fBDraw_Vistas\fP=\fIbool\fP
 Draw vista rectangles before rendering has been deprecated.
