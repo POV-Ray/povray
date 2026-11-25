@@ -120,9 +120,11 @@
          rotate<0,0,0> 
        }// end of box
  
+   #if (Segment_Angle != 180)
    box { <-R_max+D,O_min.y-D, Box_z>,< R_max+D, O_max.y+D,0> 
          rotate<0, Segment_Angle,0> 
         }// end of box
+   #end // only need the second box if angle != 180
 
   #if (abs(Segment_Angle) >= 180) 
    } // end of merge
@@ -180,9 +182,11 @@
          rotate<0,0,0> 
        }// end of box
  
+   #if (Segment_Angle != 180)
    box { <-R_o+D,-D,-R_o+D>,< R_o+D, H+D,0> 
          rotate<0,  Segment_Angle,0>  
        }// end of box
+   #end // only need the second box if angle != 180
 
   #if (Segment_Angle >= 180)
    } // end of merge
@@ -226,10 +230,12 @@ intersection{
  box   { <-1,-1,0>,<1,1,1>
          scale < R_major+R_minor+D, R_minor+D, R_major+R_minor+D>
        }// end of box
+ #if (Segment_Angle != 180)
  box   { <-1,-1,-1>,<1,1,0>
          scale < R_major+R_minor+D, R_minor+D, R_major+R_minor+D>
          rotate < 0,-Segment_Angle,0 >
        }// end of box
+ #end // only need a second box if the angle != 180
 
  #if (Segment_Angle > 180)
  }
