@@ -477,7 +477,27 @@ int ProcessRenderOptions::ReadSpecialOptionHandler(INI_Parser_Table *option, cha
                         char *end = nullptr;
                         double value = std::strtod(ptr, &end);
                         err = POVMSUtil_SetFloat(&decobj, kPOVAttrib_Value, value);
-                        if ((err == kNoErr) && (end != ptr))
+                        const char *rest = end;
+                        while (std::isspace(static_cast<unsigned char>(*rest)))
+                            ++rest;
+                        if ((err == kNoErr) && ((end == ptr) || (*rest != '\0')))
+                        {
+                            // Not a number, or a number followed by other text (e.g. `off`, `true`, `1.5cm`).
+                            // The value used is whatever `strtod` made of it, which is zero for plain text.
+                            // We pass the text as typed, so that the parser can warn about it and so that
+                            // `Create_Ini` writes back what the user wrote.
+                            const char *start = ptr;
+                            while (std::isspace(static_cast<unsigned char>(*start)))
+                                ++start;
+                            std::string text(start);
+                            while (!text.empty() && std::isspace(static_cast<unsigned char>(text.back())))
+                                text.pop_back();
+                            if (text.length() > 64)
+                                text.resize(64);
+                            if (!text.empty())
+                                err = POVMSUtil_SetString(&decobj, kPOVAttrib_ValueText, text.c_str());
+                        }
+                        else if (err == kNoErr)
                         {
                             const char *start = ptr;
                             while (std::isspace(static_cast<unsigned char>(*start)))

@@ -41,6 +41,12 @@ Changed Behaviour
     literals in a scene file (as they have been since v3.7), so `\t` silently
     becomes a tab and `\n` a line feed. Escape handling itself is unchanged;
     use doubled backslashes or forward slashes to get the intended name.
+  - An unquoted value set via `Declare` that is not entirely a number, such as
+    `Declare=Fast=on` or `Declare=Size=2*3`, now draws a warning. `Declare`
+    takes a number or a string in double quotes; any other text has always
+    been silently read as the number it starts with, or as 0 if it starts
+    with none (so `on`, `off`, `true` and `false` all gave 0). The value used
+    is unchanged.
   - Area light sizes below 1, or too large to be handled, are now reported as
     parse errors. Previously only a size of zero was rejected.
   - A malformed float literal, such as `1e` (an exponent without digits), is

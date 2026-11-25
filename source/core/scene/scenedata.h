@@ -206,6 +206,7 @@ class SceneData
         FrameSettings frameSettings; // TODO - move ???
         DeclaredStringsMap declaredStrings; // TODO - move to parser
         DeclaredNumbersMap declaredNumbers; // TODO - move to parser
+        DeclaredStringsMap declaredNotNumeric; ///< Unquoted `Declare` values that were not entirely a number, as typed.
         Camera parsedCamera; // TODO - handle differently or move to parser
         bool clocklessAnimation; // TODO - this is support for an experimental feature and may be changed or removed
         vector<Camera> cameras; // TODO - this is support for an experimental feature and may be changed or removed
