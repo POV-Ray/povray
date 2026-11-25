@@ -374,8 +374,7 @@ namespace vfe
     protected:
       virtual Console *CreateConsole()
         { return new vfeConsole(m_Session, m_Session->GetConsoleWidth()); }
-      virtual Display *CreateDisplay(unsigned int width, unsigned int height)
-        { return m_Session->CreateDisplay(width, height) ; }
+      virtual Display *CreateDisplay(unsigned int width, unsigned int height);
       bool HandleShelloutCancel();
       void CheckSharedDisplayBuffer();
       void CloseSharedDisplayBuffer();

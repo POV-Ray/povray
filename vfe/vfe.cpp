@@ -651,10 +651,10 @@ bool VirtualFrontEnd::Start(POVMS_Object& opts)
   declares.Append(image_height);
 
   // the shared display buffer is an output file like any other, so test access
-  // to it now rather than failing when the display is created. without a display
-  // it is not written at all (SetOptions() has warned about that already).
+  // to it now rather than failing when the display is created. this applies with
+  // the display off too, since the buffer is written then as well.
   UCS2String sharedBufferName = opts.TryGetUCS2String(kPOVAttrib_SharedMemory, "");
-  if (!sharedBufferName.empty() && opts.TryGetBool(kPOVAttrib_Display, true) && m_Session->TestAccessAllowed(sharedBufferName, true) == false)
+  if (!sharedBufferName.empty() && m_Session->TestAccessAllowed(sharedBufferName, true) == false)
   {
     string str ("IO Restrictions prohibit write access to '") ;
     str += UCS2toASCIIString(sharedBufferName);
@@ -755,6 +755,20 @@ bool VirtualFrontEnd::Start(POVMS_Object& opts)
   return true;
 }
 
+// Called by RenderFrontend::CreateView() when the display is on, and when it is
+// off but the shared display buffer (+SM) is to be written. Without a preview,
+// or if the front-end has no preview display to offer, a plain vfeDisplay writes
+// the buffer and shows nothing.
+Display *VirtualFrontEnd::CreateDisplay(unsigned int width, unsigned int height)
+{
+  Display *display = nullptr;
+  if (options.TryGetBool(kPOVAttrib_Display, true))
+    display = m_Session->CreateDisplay(width, height);
+  if (display == nullptr && !options.TryGetUCS2String(kPOVAttrib_SharedMemory, "").empty())
+    display = new vfeDisplay(width, height, m_Session, false);
+  return display;
+}
+
 // The shared display buffer (+SM) is written by the display, so it exists only
 // if the display supports it; say so once per render if it does not.
 void VirtualFrontEnd::CheckSharedDisplayBuffer()
@@ -762,8 +776,7 @@ void VirtualFrontEnd::CheckSharedDisplayBuffer()
   if (m_SharedBufferWarned || options.TryGetUCS2String(kPOVAttrib_SharedMemory, "").empty())
     return;
   shared_ptr<vfeDisplay> display(std::dynamic_pointer_cast<vfeDisplay>(GetDisplay()));
-  // no display at all (Display=off) has already been reported by SetOptions().
-  if (GetDisplay() != nullptr && (display == nullptr || !display->HasSharedBuffer()))
+  if (display == nullptr || !display->HasSharedBuffer())
   {
     m_Session->AppendWarningMessage ("Warning: The render preview of this version of POV-Ray does not support a shared display buffer (+SM); none will be written.") ;
     m_SharedBufferWarned = true;
