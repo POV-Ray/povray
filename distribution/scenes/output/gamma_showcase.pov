@@ -10,6 +10,7 @@
 // Auth: Christoph Lipka
 //
 
+// +w640 +h480 +a0.3 +am1 File_Gamma=sRGB
 // +w640 +h480 +a0.3 +am1 +fN -d File_Gamma=sRGB Output_File_Name=gamma_showcase.png
 // +w640 +h480 +a0.3 +am1 +fN -d File_Gamma=1.0  Output_File_Name=gamma_showcase_linear.png
 // +w320 +h240 +a0.3 +am1 +fN -d File_Gamma=sRGB Output_File_Name=gamma_showcase_ref0.png Declare=Stripes=off
