@@ -196,8 +196,10 @@ namespace vfe
   ///
   /// The `+SM<file>` option (INI `Shared_Memory_File=<file>`) makes the render
   /// preview display write its pixels to a memory-mapped file as well, so that
-  /// another process can show the image while it is being rendered. The option
-  /// was contributed by Leonardo Zide for LeoCAD (GitHub pull request #344);
+  /// another process can show the image while it is being rendered. With the
+  /// display off (`-D`), POV-Ray creates a plain `vfeDisplay` that shows nothing
+  /// and only writes the file (see `VirtualFrontEnd::CreateDisplay()`), so the
+  /// buffer can be had without a preview window. The option was contributed by Leonardo Zide for LeoCAD (GitHub pull request #344);
   /// LeoCAD's reader is `qt/lc_renderdialog.cpp` in its repository, and the
   /// layout below is the one it reads.
   ///
