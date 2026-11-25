@@ -459,7 +459,11 @@ int ProcessRenderOptions::ReadSpecialOptionHandler(INI_Parser_Table *option, cha
                 {
                     ptr = strtok(nullptr, "");
                     if (ptr == nullptr)
+                    {
+                        ParseError("No value given for '%s' in 'Declare' option; expected Declare=NAME=NUMBER, or"
+                                   " for a string Declare='NAME=\"text\"' with the whole setting in single quotes.", param);
                         err = kParseErr;
+                    }
                 }
                 if(err == kNoErr)
                 {

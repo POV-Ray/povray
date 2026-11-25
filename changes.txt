@@ -47,6 +47,10 @@ Changed Behaviour
     been silently read as the number it starts with, or as 0 if it starts
     with none (so `on`, `off`, `true` and `false` all gave 0). The value used
     is unchanged.
+  - A `Declare` without a value is now reported. This includes a string written
+    without the single quotes the documentation calls for, i.e.
+    `Declare=Name="text"` instead of `Declare='Name="text"'`, which in an INI
+    file used to be ignored without any message.
   - Area light sizes below 1, or too large to be handled, are now reported as
     parse errors. Previously only a size of zero was rejected.
   - A malformed float literal, such as `1e` (an exponent without digits), is
