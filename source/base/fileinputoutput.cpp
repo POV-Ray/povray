@@ -45,6 +45,9 @@
 #include <algorithm>
 #include <string>
 
+// System header files
+#include <sys/stat.h>
+
 // POV-Ray header files (base module)
 #include "base/path.h"
 #include "base/platformbase.h"
@@ -381,10 +384,21 @@ bool CheckIfFileExists(const Path& p)
 {
     FILE *tempf = PlatformBase::GetInstance().OpenLocalFile (p(), "r");
 
-    if (tempf != nullptr)
-        fclose(tempf);
-    else
+    if (tempf == nullptr)
         return false;
+
+#ifdef S_ISDIR
+    // On POSIX systems a directory can be opened like a file, but it is not one that can be
+    // read, so do not report it as one. (On Windows opening a directory fails anyway.)
+    struct stat info;
+    if ((fstat(fileno(tempf), &info) == 0) && S_ISDIR(info.st_mode))
+    {
+        fclose(tempf);
+        return false;
+    }
+#endif
+
+    fclose(tempf);
 
     return true;
 }

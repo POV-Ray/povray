@@ -81,6 +81,19 @@ Changed Behaviour
     expected. Input files conforming to ASCII, UTF-8, Latin-1 or Windows-1252
     encoding will instead be auto-detected, while other encodings are currently
     unsupported.
+  - A file named in a scene (e.g. by `#include` or as an image map) with a
+    relative name is now also looked for in the directory of the scene file,
+    after the current directory and before the library paths. Previously that
+    directory was not searched, so a scene started from another directory
+    (e.g. `povray +I/path/to/scene.pov`, or a scene named by `+I` or an INI
+    file in POV-Ray for Windows) could not find its own include files and
+    images unless they were also on a library path. The current directory is
+    still searched first. As a result, a file present both in the scene's
+    directory and on a library path is now taken from the scene's directory.
+    The scene's directory is taken from the input file name as given; if the
+    scene file itself was found on a library path, that directory is still
+    read relative to the current directory, and may then not be the one the
+    scene is in. The search for the scene file itself is unchanged.
 
 New Features
 ------------
@@ -174,6 +187,11 @@ Miscellaneous:
   - Eliminated use of deprecated C++ `register` keyword (except in 3rd party
     libraries bundled with the POV-Ray source code).
   - Fix long-standing bug in Julia fractal primitive using hypercomplex numbers.
+  - On Unix, a directory named like a file named in a scene (e.g. an include
+    file) in the current directory or on a library path was taken for that
+    file and read as an empty one, so that a file of that name further along
+    the search was not used. Directories are now skipped when looking for
+    files.
 
 Development Related
 -------------------
