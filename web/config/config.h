@@ -121,6 +121,12 @@
 #define HAVE_INF
 #define HAVE_STD_ISINF
 
+// libc++ (LLVM 19 and later) has no generic std::char_traits, so
+// std::basic_string<unsigned short> no longer compiles; release/v3.8.0's
+// default UCS2/UTF16 type is POV_UINT16. Use char16_t, as master does.
+#define UCS2  char16_t
+#define UTF16 char16_t
+
 // Type sizes for wasm32.
 #define SIZEOF_FLOAT 4
 #define SIZEOF_INT 4

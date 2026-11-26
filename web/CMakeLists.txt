@@ -81,6 +81,28 @@ target_include_directories(povweb_jpeg PUBLIC "${LIB_ROOT}/jpeg")
 target_compile_options(povweb_jpeg PRIVATE -Wno-shift-negative-value)
 
 #-------------------------------------------------------------------------------
+# Bundled Boost libraries that need compiling (release/v3.8.0 still uses
+# Boost.Thread, which needs Boost.System and Boost.DateTime)
+#-------------------------------------------------------------------------------
+
+set(BOOST_ROOT_DIR "${LIB_ROOT}/boost")
+add_library(povweb_boost STATIC
+    ${BOOST_ROOT_DIR}/libs/thread/src/pthread/thread.cpp
+    ${BOOST_ROOT_DIR}/libs/thread/src/pthread/once.cpp
+    ${BOOST_ROOT_DIR}/libs/thread/src/future.cpp
+    ${BOOST_ROOT_DIR}/libs/system/src/error_code.cpp
+    ${BOOST_ROOT_DIR}/libs/date_time/src/gregorian/greg_month.cpp
+    ${BOOST_ROOT_DIR}/libs/date_time/src/gregorian/greg_weekday.cpp
+    ${BOOST_ROOT_DIR}/libs/date_time/src/gregorian/date_generators.cpp
+)
+target_include_directories(povweb_boost SYSTEM PUBLIC "${BOOST_ROOT_DIR}")
+target_compile_definitions(povweb_boost PUBLIC
+    BOOST_ALL_NO_LIB BOOST_THREAD_POSIX BOOST_NO_AUTO_PTR BOOST_BIND_GLOBAL_PLACEHOLDERS)
+target_compile_definitions(povweb_boost PRIVATE BOOST_THREAD_BUILD_LIB BOOST_SYSTEM_STATIC_LINK BOOST_DATE_TIME_STATIC_LINK)
+set_target_properties(povweb_boost PROPERTIES CXX_STANDARD 11 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
+target_compile_options(povweb_boost PRIVATE -Wno-deprecated-declarations -Wno-unused-command-line-argument)
+
+#-------------------------------------------------------------------------------
 # POV-Ray sources
 #-------------------------------------------------------------------------------
 
@@ -89,7 +111,7 @@ file(GLOB_RECURSE POV_CORE_SOURCES CONFIGURE_DEPENDS "${POV_ROOT}/source/*.cpp")
 set(POV_SOURCES
     ${POV_CORE_SOURCES}
     # Unix platform layer, reused as-is.
-    ${POV_ROOT}/platform/unix/syspovfilesystem.cpp
+    # (release/v3.8.0 has no platform/unix/syspovfilesystem.cpp.)
     ${POV_ROOT}/platform/unix/syspovtimer.cpp
     # Virtual front-end.
     ${POV_ROOT}/vfe/vfe.cpp
@@ -140,7 +162,7 @@ target_compile_definitions(povray PRIVATE
 # POV-Ray compiler and linker settings
 #-------------------------------------------------------------------------------
 
-target_link_libraries(povray PRIVATE povweb_png povweb_jpeg povweb_zlib)
+target_link_libraries(povray PRIVATE povweb_png povweb_jpeg povweb_zlib povweb_boost)
 
 set_target_properties(povray PROPERTIES CXX_STANDARD 11 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
 
@@ -155,6 +177,8 @@ target_compile_options(povray PRIVATE
     -Wno-deprecated-register
     -Wno-register
     -Wno-unused-command-line-argument
+    # release/v3.8.0 marks some overrides with `override` and others not.
+    -Wno-inconsistent-missing-override
 )
 
 set(POVWEB_LINK_FLAGS
