@@ -355,6 +355,13 @@ void Parser::Run()
             {
                 SYM_ENTRY *Temp_Entry = nullptr;
 
+                SceneData::DeclaredStringsMap::const_iterator notNumeric(sceneData->declaredNotNumeric.find(i->first));
+                if (notNumeric != sceneData->declaredNotNumeric.end())
+                    Warning(kWarningGeneral, "The value '%.64s' given for '%.100s' via the 'Declare' option is not a number;"
+                                             " %g is used. 'Declare' takes a number or a string in double quotes, not"
+                                             " keywords such as 'on' or 'off' and not expressions.",
+                            notNumeric->second.c_str(), i->first.c_str(), i->second);
+
                 Temp_Entry = mSymbolStack.GetGlobalTable()->Add_Symbol(i->first, FLOAT_ID_TOKEN);
                 Temp_Entry->Data = Create_Float();
                 *(reinterpret_cast<DBL *>(Temp_Entry->Data)) = i->second;
