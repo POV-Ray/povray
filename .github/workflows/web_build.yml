@@ -1,0 +1,129 @@
+name: 'Web Build'
+
+# Builds the WebAssembly version of POV-Ray (see web/README.md) and renders
+# every example scene with it in headless Chromium (web/tools/sweep.py).
+# The site is uploaded as the `povray-web-site` artifact.
+
+on:
+  workflow_dispatch:
+  push:
+    paths-ignore:
+      - 'doc/**'
+      - 'source-doc/**'
+      # Documentation and repository housekeeping files that no build or test depends on.
+      - '*.md'
+      - 'LICENSE'
+      - 'changes.txt'
+      - 'revision.txt'
+      - '.gitignore'
+      - '.github/*.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/CODEOWNERS'
+      - '.github/FUNDING.yml'
+  pull_request:
+    paths-ignore:
+      - 'doc/**'
+      - 'source-doc/**'
+      # Documentation and repository housekeeping files that no build or test depends on.
+      - '*.md'
+      - 'LICENSE'
+      - 'changes.txt'
+      - 'revision.txt'
+      - '.gitignore'
+      - '.github/*.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/CODEOWNERS'
+      - '.github/FUNDING.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-build-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  EMSDK_VERSION: '6.0.12'
+  PLAYWRIGHT_VERSION: '1.64.1'
+
+jobs:
+  build:
+    name: 'Build'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+    - name: 'Check out Repository'
+      uses: actions/checkout@v7
+
+    - name: 'Cache Emscripten SDK'
+      id: cache-emsdk
+      uses: actions/cache@v6
+      with:
+        path: emsdk
+        key: emsdk-${{ env.EMSDK_VERSION }}-${{ runner.os }}
+
+    - name: 'Install Emscripten SDK'
+      if: steps.cache-emsdk.outputs.cache-hit != 'true'
+      run: |
+        git clone --depth 1 --branch "$EMSDK_VERSION" https://github.com/emscripten-core/emsdk.git emsdk
+        emsdk/emsdk install "$EMSDK_VERSION"
+
+    - name: 'Build'
+      run: |
+        emsdk/emsdk activate "$EMSDK_VERSION"
+        source emsdk/emsdk_env.sh
+        web/build.sh \
+          -DPOVWEB_BUILT_BY="GitHub Actions (${{ github.repository }}@${GITHUB_SHA::7})" \
+          -DPOVWEB_SOURCE_URL="${{ github.server_url }}/${{ github.repository }}"
+
+    - name: 'Check Site'
+      run: |
+        site=build-web/site
+        for f in index.html app.js render-worker.js coi-serviceworker.js style.css \
+                 povray.js povray.wasm povray.data scenes.json LICENSE.txt; do
+          test -s "$site/$f" || { echo "::error::missing $site/$f"; exit 1; }
+        done
+        python3 -c "import json,sys; m=json.load(open('$site/scenes.json')); print(len(m['scenes']), 'example scenes')"
+        du -sh "$site"
+
+    - name: 'Upload Site'
+      uses: actions/upload-artifact@v7
+      with:
+        name: povray-web-site
+        path: build-web/site
+        retention-days: 14
+
+  sweep:
+    name: 'Scene Sweep'
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+
+    steps:
+    - name: 'Check out Repository'
+      uses: actions/checkout@v7
+
+    - name: 'Download Site'
+      uses: actions/download-artifact@v8
+      with:
+        name: povray-web-site
+        path: build-web/site
+
+    - name: 'Install Playwright'
+      run: |
+        python3 -m venv .venv
+        .venv/bin/pip install "playwright==$PLAYWRIGHT_VERSION"
+        .venv/bin/python -m playwright install --with-deps --only-shell chromium
+
+    - name: 'Render All Example Scenes'
+      run: .venv/bin/python web/tools/sweep.py --workers 2 --report sweep-results.json
+
+    - name: 'Upload Results'
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v7
+      with:
+        name: sweep-results
+        path: sweep-results.json
+        if-no-files-found: ignore
+        retention-days: 14

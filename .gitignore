@@ -262,3 +262,11 @@ $RECYCLE.BIN/
 
 # Used specifically by our own workflows
 /artifact*
+
+# ======================
+# Web (WebAssembly) build
+# ======================
+
+/build-web/
+# Emscripten SDK, cloned here by .github/workflows/web_build.yml
+/emsdk/

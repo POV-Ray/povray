@@ -1,0 +1,31 @@
+# Example scenes that web/tools/sweep.py does not render as-is.
+#
+# One scene per line, relative to distribution/scenes, followed by one of:
+#   skip        not rendered
+#   error       expected to fail; the sweep reports it if it succeeds
+#   ini=<file>  rendered with this INI file from the scene's directory
+
+# Does not finish within the 300 s per-scene limit, even at 80x60; the scene's
+# header warns that it is slow.
+advanced/diffuse_back.pov           skip
+
+# Template for new portfolio scenes; includes a placeholder file name.
+portfolio/__empty.pov               error
+
+# Portfolio scenes read the frame number to pick an item and fail without their INI.
+portfolio/allnormals.pov            ini=allnormals.ini
+portfolio/allpatterns.pov           ini=allpatterns.ini
+portfolio/c_colors.pov              ini=c_colors.ini
+portfolio/f_finish.pov              ini=f_finish.ini
+portfolio/m_textures.pov            ini=m_textures.ini
+portfolio/o_2shapes.pov             ini=o_2shapes.ini
+portfolio/o_shapes_old.pov          ini=o_shapes_old.ini
+portfolio/p_skies.pov               ini=p_skies.ini
+portfolio/p_textures.pov            ini=p_textures.ini
+portfolio/p_woods.pov               ini=p_woods.ini
+portfolio/t_1stones.pov             ini=t_1stones.ini
+portfolio/t_2stones.pov             ini=t_2stones.ini
+portfolio/t_metals.pov              ini=t_metals.ini
+portfolio/t_stars.pov               ini=t_stars.ini
+portfolio/t_textures.pov            ini=t_textures.ini
+portfolio/t_woods.pov               ini=t_woods.ini
