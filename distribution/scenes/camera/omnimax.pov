@@ -7,7 +7,7 @@
 // Created by Fabien Mosen - April 8 2001
 // This file demonstrates the use of the "omnimax" camera.
 //
-//  
+//
 // update to 3.7 by Friedrich A. Lohmüller, Feb-2013
 
 #version 3.7;

@@ -7,7 +7,7 @@
 // Desc: logo.inc demo scene
 // Date: September 2001
 // Auth: Rune S. Johansen
-// 
+//
 // This file is an example of how to use the official POV-Ray Logo
 // in a scene. The original version as well as a prism version and
 // a bevel version are available. Any texture or material can be
@@ -47,7 +47,7 @@ camera {
    // always use orthographic camera.
    orthographic angle 69
    location -2*z
-   
+
    right   x*image_width/image_height
    look_at <0,0,0>
 }

@@ -4,14 +4,14 @@
 //       For the individual triangles you have to use declared textures
 
 
-#declare T0=texture { pigment { color rgb<1,0.5,0> } } 
-#declare T1=texture { pigment { color rgb<1,0.7,0> } } 
-#declare T2=texture { pigment { color rgb<0.3,0.7,0> } } 
-#declare T3=texture { pigment { color rgb<0.1,0.8,0>*0.6 } } 
-#declare T4=texture { pigment { color rgb<0.7,1,0> } } 
-#declare T5=texture { pigment { color rgb<1,1,0>*1.2 } } 
+#declare T0=texture { pigment { color rgb<1,0.5,0> } }
+#declare T1=texture { pigment { color rgb<1,0.7,0> } }
+#declare T2=texture { pigment { color rgb<0.3,0.7,0> } }
+#declare T3=texture { pigment { color rgb<0.1,0.8,0>*0.6 } }
+#declare T4=texture { pigment { color rgb<0.7,1,0> } }
+#declare T5=texture { pigment { color rgb<1,1,0>*1.2 } }
 
-mesh { // box example here 
+mesh { // box example here
   /* top side */
   triangle { <-2,  2, -2>, < 2,  2, -2>, < 2,  2,  2> texture { T1 } }
   triangle { <-2,  2, -2>, <-2,  2,  2>, < 2,  2,  2> texture { T0 } }

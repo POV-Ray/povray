@@ -8,7 +8,7 @@
 // Date: August 30 2001
 // Auth: Rune S. Johansen
 // Desc: Render this file and then render SLOPEMT.POV.
-// 
+//
 // +w400 +h400
 
 #version 3.6;

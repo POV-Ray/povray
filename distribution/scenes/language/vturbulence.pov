@@ -109,8 +109,8 @@ union {
               <PosX, 0, PosZ>+Turb ,
               Radius*0.7
               texture { T_Cyl }
-            } 
-          #end  
+            }
+          #end
         #end
 
         #declare PosZ=PosZ+Spacing;

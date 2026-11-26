@@ -69,7 +69,7 @@ light_source { <250.0, 25.0, -100.0> colour DimGray }
 
 camera {
    location <0.0, 20.0, -15.0>
-   angle 65 
+   angle 65
    right     x*image_width/image_height
    look_at <0, 0, 0>
 }

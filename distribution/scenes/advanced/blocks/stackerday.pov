@@ -31,9 +31,9 @@
 // choose a number of cubes (has no effect unless WriteFile=True)
 // large n values give long parsing time
 #declare num=400;
-//#declare num=100; 
-//#declare num=10; 
-//#declare num=5;     
+//#declare num=100;
+//#declare num=10;
+//#declare num=5;
 // ------------------------------
 
 // ------------------------------
@@ -58,7 +58,7 @@ global_settings{
 
 #default {finish { ambient 0 diffuse 1 }}
 
-#declare CamLoc=<0,7,-21>; 
+#declare CamLoc=<0,7,-21>;
 #declare CamEye=<0,4.5,-10>;
 #declare CamSky=y;
 #declare CamZoom=1;
@@ -75,17 +75,17 @@ sky_sphere{  // white sky sphere with a blue far end
         gradient z
         poly_wave 2
         color_map{
-            [0  White*1.5]            
-            [1 rgb <116,138,176>/255]            
+            [0  White*1.5]
+            [1 rgb <116,138,176>/255]
         }
         scale 2
         translate -z
     }
-}                         
+}
 
 
-plane{y,0 texture{pigment{White} finish{ambient 0 diffuse 1}}} 
-plane{y,0 rotate x*-20 texture{pigment{White} finish{ambient 0 diffuse 1}} translate z*10000} 
+plane{y,0 texture{pigment{White} finish{ambient 0 diffuse 1}}}
+plane{y,0 rotate x*-20 texture{pigment{White} finish{ambient 0 diffuse 1}} translate z*10000}
 
 // ------------------------------
 // centers the text
@@ -108,8 +108,8 @@ union{
         box{<-1,-0.45,-0.45>,<1,0.45,0.45>}
         box{<-0.45,-1,-0.45>,<0.45,1,0.45>}
         txtBox(COL)
-    }                
-    box{-0.45,0.45 texture{pigment{White*1.4}}}                                
+    }
+    box{-0.45,0.45 texture{pigment{White*1.4}}}
     #declare Font="cyrvetic"
     #declare sFont=<0.76,0.76,0.05>;
     #local P=text { ttf Font "P" 1, 0 scale sFont}
@@ -120,11 +120,11 @@ union{
     #local Y=text { ttf Font "Y" 1, 0 scale sFont}
     union{
         object{P centertext(P) translate -0.5*z rotate y*90 txtBox(COL)}
-        object{O centertext(O) translate -0.5*z  txtBox(COL)}                        
-        object{V centertext(V) translate -0.5*z rotate -90*y txtBox(COL)}   
-        object{R centertext(R) translate -0.5*z rotate 180*y txtBox(COL)}                   
-        object{A centertext(A) translate -0.5*z rotate 90*x txtBox(COL)}  
-        object{Y centertext(Y) translate -0.5*z rotate -90*x txtBox(COL)}  
+        object{O centertext(O) translate -0.5*z  txtBox(COL)}
+        object{V centertext(V) translate -0.5*z rotate -90*y txtBox(COL)}
+        object{R centertext(R) translate -0.5*z rotate 180*y txtBox(COL)}
+        object{A centertext(A) translate -0.5*z rotate 90*x txtBox(COL)}
+        object{Y centertext(Y) translate -0.5*z rotate -90*x txtBox(COL)}
     }
 }
 #end
@@ -139,16 +139,16 @@ union{
     texture{
        pigment { rgb <COL.x+rand(rd)*sc1,COL.y+rand(rd)*sc1,COL.z+rand(rd)*sc1>*sc2}
        finish{ambient 0 diffuse 1}
-    }                   
-#end                                                    
+    }
+#end
 
 
 // ------------------------------
 // scene
 // ------------------------------
-#if (WriteFile) 
+#if (WriteFile)
     #include "makestacks.inc" // calls the stacking routine
-#end    
+#end
 #include "stacks.inc"     // place the cubes
 
 

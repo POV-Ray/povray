@@ -11,7 +11,7 @@
 // Date: 2001/07/30
 // Auth: Ingo Janssen
 #version 3.6;
-global_settings { 
+global_settings {
   assumed_gamma 1
 }
 
@@ -60,7 +60,7 @@ global_settings {
             contained_by {box {<-2,-2,-2>,<2,2,2>}}
             max_gradient 3.168
             rotate <0,-30,0>
-            rotate<-30,0,0>  
+            rotate<-30,0,0>
             pigment {rgb <0.9,0.9,1>}
             finish{specular 0.4}
          }
@@ -72,7 +72,7 @@ global_settings {
             contained_by {box {<-2,-2,-2>,<2,2,2>}}
             max_gradient 1.407
             rotate <0,-30,0>
-            rotate<-30,0,0>  
+            rotate<-30,0,0>
             pigment {rgb <0.9,0.9,1>}
             finish{specular 0.4}
          }
@@ -84,10 +84,10 @@ global_settings {
             contained_by {box {<-2,-2,-2>,<2,2,2>}}
             max_gradient 200.786
             rotate <0,-30,0>
-            rotate<-30,0,0>  
+            rotate<-30,0,0>
             pigment {rgb <0.9,0.9,1>}
             finish{specular 0.4}
-         }      
+         }
       #break
       #case(5)//5
          isosurface {
@@ -96,10 +96,10 @@ global_settings {
             contained_by {box {<-2,-2,-2>,<2,2,2>}}
             max_gradient 150.393
             rotate <0,-30,0>
-            rotate<-30,0,0>  
+            rotate<-30,0,0>
             pigment {rgb <0.9,0.9,1>}
             finish{specular 0.4}
-         }      
+         }
       #break
       #case(6)//6
          isosurface {
@@ -108,10 +108,10 @@ global_settings {
             contained_by {box {<-2,-2,-2>,<2,2,2>}}
             max_gradient 1.658
             rotate <0,-30,0>
-            rotate<-30,0,0>  
+            rotate<-30,0,0>
             pigment {rgb <0.9,0.9,1>}
             finish{specular 0.4}
-         }      
+         }
       #break
       #case(7)//7
          isosurface {
@@ -120,10 +120,10 @@ global_settings {
             contained_by {box {<-2,-2,-2>,<2,2,2>}}
             max_gradient 1.5
             rotate <0,-30,0>
-            rotate<-30,0,0>  
+            rotate<-30,0,0>
             pigment {rgb <0.9,0.9,1>}
             finish{specular 0.4}
-         }      
+         }
       #break
       #case(9)//9
          isosurface {
@@ -132,10 +132,10 @@ global_settings {
             contained_by {box {<-2,-2.5,-2>,<2,2.5,2>}}
             max_gradient 311.034
             rotate <0,-30,0>
-            rotate<-30,0,0>  
+            rotate<-30,0,0>
             pigment {rgb <0.9,0.9,1>}
             finish{specular 0.4}
-         }      
+         }
       #break
       #case(10)
          isosurface {
@@ -144,10 +144,10 @@ global_settings {
             contained_by {box {<-2,-2.5,-2>,<2,2.5,2>}}
             max_gradient 400.348
             rotate <0,-30,0>
-            rotate<-30,0,0>  
+            rotate<-30,0,0>
             pigment {rgb <0.9,0.9,1>}
             finish{specular 0.4}
-         }      
+         }
       #break
       #case(11)
          isosurface {
@@ -156,10 +156,10 @@ global_settings {
             contained_by {box {<-2,-2.5,-2>,<2,2.5,2>}}
             max_gradient 383.490
             rotate <0,-30,0>
-            rotate<-30,0,0>  
+            rotate<-30,0,0>
             pigment {rgb <0.9,0.9,1>}
             finish{specular 0.4}
-         }      
+         }
       #break
       #case(12)//12
          isosurface {
@@ -168,10 +168,10 @@ global_settings {
             contained_by {box {<-2,-2,-2>,<2,2,2>}}
             max_gradient 2.059
             rotate <0,-30,0>
-            rotate<-30,0,0>  
+            rotate<-30,0,0>
             pigment {rgb <0.9,0.9,1>}
             finish{specular 0.4}
-         }      
+         }
       #break
       #case(13)//13
          isosurface {
@@ -180,10 +180,10 @@ global_settings {
             contained_by {box {<-2,-2.5,-2>,<2,2.5,2>}}
             max_gradient 397.690
             rotate <0,-30,0>
-            rotate<-30,0,0>  
+            rotate<-30,0,0>
             pigment {rgb <0.9,0.9,1>}
             finish{specular 0.4}
-         }      
+         }
       #break
       #case(14)
          isosurface {
@@ -192,10 +192,10 @@ global_settings {
             contained_by {box {<-2,-2,-2>,<2,2,2>}}
             max_gradient 2.449
             rotate <0,-30,0>
-            rotate<-30,0,0>  
+            rotate<-30,0,0>
             pigment {rgb <0.9,0.9,1>}
             finish{specular 0.4}
-         }      
+         }
       #break
       #case(15)//15
          isosurface {
@@ -204,10 +204,10 @@ global_settings {
             contained_by {box {<-2,-2.5,-2>,<2,2.5,2>}}
             max_gradient 254.601
             rotate <0,-30,0>
-            rotate<-30,0,0>  
+            rotate<-30,0,0>
             pigment {rgb <0.9,0.9,1>}
             finish{specular 0.4}
-         }      
+         }
       #break
       #case(16)//16
          isosurface {
@@ -216,10 +216,10 @@ global_settings {
             contained_by {box {<-2,-2.5,-2>,<2,2.5,2>}}
             max_gradient 1.376
             rotate <0,-30,0>
-            rotate<-30,0,0>  
+            rotate<-30,0,0>
             pigment {rgb <0.9,0.9,1>}
             finish{specular 0.4}
-         }      
+         }
       #break
       #case(17)//17
          isosurface {
@@ -228,10 +228,10 @@ global_settings {
             contained_by {box {<-2,-2,-2>,<2,2,2>}}
             max_gradient 200.357
             rotate <0,-30,0>
-            rotate<-30,0,0>  
+            rotate<-30,0,0>
             pigment {rgb <0.9,0.9,1>}
             finish{specular 0.4}
-         }      
+         }
       #break
       #case(18)
          isosurface {
@@ -240,10 +240,10 @@ global_settings {
             contained_by {box {<-2,-2,-2>,<2,2,2>}}
             max_gradient 2.673
             rotate <0,-30,0>
-            rotate<-30,0,0>  
+            rotate<-30,0,0>
             pigment {rgb <0.9,0.9,1>}
             finish{specular 0.4}
-         }      
+         }
       #break
       #case(19)//19
          isosurface {
@@ -252,7 +252,7 @@ global_settings {
             contained_by {box {<-2,-2,-2>,<2,2,2>}}
             max_gradient 1.398
             rotate <0,-30,0>
-            rotate<-30,0,0>  
+            rotate<-30,0,0>
             pigment {rgb 1}
             finish{specular 0.4}
          }
@@ -264,10 +264,10 @@ global_settings {
             contained_by {box {<-2,-2,-2>,<2,2,2>}}
             max_gradient 64.333
             rotate <0,-30,0>
-            rotate<-30,0,0>  
+            rotate<-30,0,0>
             pigment {rgb <0.9,0.9,1>}
             finish{specular 0.4}
-         }      
+         }
       #break
       #case(21)//21
          isosurface {
@@ -276,10 +276,10 @@ global_settings {
             contained_by {box {<-2,-2,-2>,<2,2,2>}}
             max_gradient 81.406
             rotate <0,-30,0>
-            rotate<-30,0,0>  
+            rotate<-30,0,0>
             pigment {rgb <0.9,0.9,1>}
             finish{specular 0.4}
-         }      
+         }
       #break
       #case(23) //23
          isosurface {
@@ -288,10 +288,10 @@ global_settings {
             contained_by {box {<-2,-2,-2>,<2,2,2>}}
             max_gradient 1.818
             rotate <0,-30,0>
-            rotate<-30,0,0>  
+            rotate<-30,0,0>
             pigment {rgb <0.9,0.9,1>}
             finish{specular 0.4}
-         }      
+         }
       #break
       #case(24)//24
          isosurface {
@@ -303,7 +303,7 @@ global_settings {
             rotate<-30,0,0>
             pigment {rgb <0.9,0.9,1>}
             finish{specular 0.4}
-         }      
+         }
       #break
       #case(25)//25
          isosurface {
@@ -312,10 +312,10 @@ global_settings {
             contained_by {box {<-2,-2,-2>,<2,2,2>}}
             max_gradient 1.585
             rotate <0,-30,0>
-            rotate<-30,0,0>  
+            rotate<-30,0,0>
             pigment {rgb <0.9,0.9,1>}
             finish{specular 0.4}
-         }      
+         }
       #break
 
       #else   //case2 bozo, case4 bumps, case8 dents, case 22 spotted
@@ -325,28 +325,28 @@ global_settings {
             contained_by {box {<-2,-2,-2>,<2,2,2>}}
             max_gradient 1.866
             rotate <0,-30,0>
-            rotate<-30,0,0>  
+            rotate<-30,0,0>
             pigment {rgb <0.9,0.9,1>}
             finish{specular 0.4}
-         }      
+         }
    #end
    camera {
      location  <0,0,-6>
      right x*image_width/image_height
      look_at   <0,0,0>
    }
-   
+
    light_source {
      <500,100,-500>
      rgb 1  // light's color
    }
-   
+
    light_source {
      <10,50,-500>
      rgb <0.4,0.3,0.3>
      shadowless
    }
-   
+
    light_source {
      <-500,50,-500>
      rgb <0.2,0.2,0.4>

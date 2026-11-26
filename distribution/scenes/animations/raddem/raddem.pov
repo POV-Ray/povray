@@ -17,7 +17,7 @@
 
 global_settings {
   assumed_gamma 2.2
-  
+
   radiosity {
     Rad_Settings(Radiosity_Default, off, off)
     //Rad_Settings(Radiosity_Debug, off, off)

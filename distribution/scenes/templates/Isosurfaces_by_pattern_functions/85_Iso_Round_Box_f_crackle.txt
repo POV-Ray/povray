@@ -1,4 +1,4 @@
-isosurface { //--------------------------------------- 
+isosurface { //---------------------------------------
   function{
    f_rounded_box( x, y, z,
                   0.3,  // radius of curvature
@@ -15,6 +15,6 @@ isosurface { //---------------------------------------
 	  }
   scale 0.90
   rotate <0,-50,0>
-  rotate <-20,0,0>  
+  rotate <-20,0,0>
   translate < 0, 1.4, -0.5>
-} // end of isosurface -------------------------------- 
+} // end of isosurface --------------------------------

@@ -6,4 +6,4 @@
                                                      [1.0, rgb 0]}
                                           rotate< 90,0,0> scale 0.5} 4}
                 finish { phong 1 reflection 0.2}
-               } // end of texture -------------------------------------- 
+               } // end of texture --------------------------------------

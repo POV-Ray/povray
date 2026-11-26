@@ -9,8 +9,8 @@
 // -w320 -h240
 // -w800 -h600 +a0.3
 #version 3.7;
-global_settings { 
-  assumed_gamma 2.2 
+global_settings {
+  assumed_gamma 2.2
   max_trace_level 5
 }
 
@@ -37,7 +37,7 @@ background { color SkyBlue }
 
 plane { y, 0
    pigment {
-      checker colour Yellow colour rgb<0.75,1,0> 
+      checker colour Yellow colour rgb<0.75,1,0>
       scale 5
    }
    finish {

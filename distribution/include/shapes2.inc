@@ -27,94 +27,94 @@
 
 // Shapes by Tom Price [75300,620]:
 #declare Tetrahedron =
- intersection 
+ intersection
   {plane {-y,1}
    plane {-z,1 rotate <19.47,    0, 0>}
    plane {-z,1 rotate <19.47, -120, 0>}
    plane {-z,1 rotate <19.47,  120, 0>}
-   
+
    bounded_by {sphere {0, 3}}
   }
-   
-#declare Octahedron = 
- intersection 
+
+#declare Octahedron =
+ intersection
   {plane { z, 1 rotate < 35.26438968275, 0, 0>}
    plane { z, 1 rotate <-35.26438968275, 0, 0>}
    plane {-z, 1 rotate < 35.26438968275, 0, 0>}
    plane {-z, 1 rotate <-35.26438968275, 0, 0>}
-   
+
    plane { x, 1 rotate <0, 0, -35.26438968275>}
    plane { x, 1 rotate <0, 0,  35.26438968275>}
    plane {-x, 1 rotate <0, 0, -35.26438968275>}
    plane {-x, 1 rotate <0, 0,  35.26438968275>}
-   
+
    bounded_by {sphere {0, 1.7321}}
   }
-   
-#declare Dodecahedron = 
- intersection 
+
+#declare Dodecahedron =
+ intersection
   {plane {-z, 1 rotate <-26.56505117708,    0, 0>}
    plane {-z, 1 rotate <-26.56505117708,  -72, 0>}
    plane {-z, 1 rotate <-26.56505117708, -144, 0>}
    plane {-z, 1 rotate <-26.56505117708, -216, 0>}
    plane {-z, 1 rotate <-26.56505117708, -288, 0>}
-   
+
    plane {-z, 1 rotate <26.56505117708,  -36, 0>}
    plane {-z, 1 rotate <26.56505117708, -108, 0>}
    plane {-z, 1 rotate <26.56505117708, -180, 0>}
    plane {-z, 1 rotate <26.56505117708, -252, 0>}
    plane {-z, 1 rotate <26.56505117708, -324, 0>}
-   
+
    plane { y, 1}
    plane {-y, 1}
-   
+
    bounded_by {sphere {0, 1.2585}}
   }
-   
-#declare Icosahedron = 
- intersection 
+
+#declare Icosahedron =
+ intersection
   {plane {-z, 1 rotate <52.6625,    0, 0>}
    plane {-z, 1 rotate <52.6625,  -72, 0>}
    plane {-z, 1 rotate <52.6625, -144, 0>}
    plane {-z, 1 rotate <52.6625, -216, 0>}
    plane {-z, 1 rotate <52.6625, -288, 0>}
-   
+
    plane {-z, 1 rotate <10.8125,    0, 0>}
    plane {-z, 1 rotate <10.8125,  -72, 0>}
    plane {-z, 1 rotate <10.8125, -144, 0>}
    plane {-z, 1 rotate <10.8125, -216, 0>}
    plane {-z, 1 rotate <10.8125, -288, 0>}
-   
+
    plane {-z, 1 rotate <-52.6625,  -36, 0>}
    plane {-z, 1 rotate <-52.6625, -108, 0>}
    plane {-z, 1 rotate <-52.6625, -180, 0>}
    plane {-z, 1 rotate <-52.6625, -252, 0>}
    plane {-z, 1 rotate <-52.6625, -324, 0>}
-   
+
    plane {-z, 1 rotate <-10.8125,  -36, 0>}
    plane {-z, 1 rotate <-10.8125, -108, 0>}
    plane {-z, 1 rotate <-10.8125, -180, 0>}
    plane {-z, 1 rotate <-10.8125, -252, 0>}
    plane {-z, 1 rotate <-10.8125, -324, 0>}
-   
+
    bounded_by {sphere {0, 1.2585}}
   }
 
 // Shapes by others
 // Convenient  finite cone primitive, pointing up in the Y axis
-#declare HalfCone_Y = 
- intersection 
+#declare HalfCone_Y =
+ intersection
   {object {Cone_Y}
    plane  { y, 0}
    plane  {-y, 2}
    translate <0, 1, 0>
    scale <0.5, 1, 0.5>
-   
+
    bounded_by {sphere{0, 1.5}}
   }
 
 /* Hexagonal Solid, axis along x */
-#declare  Hexagon = 
+#declare  Hexagon =
  intersection
   {plane {z, 1}  /* Rotate 90 in z axis to stand up */
    plane {z, 1 rotate < 60, 0, 0>}
@@ -124,26 +124,26 @@
    plane {z, 1 rotate <300, 0, 0>}
    plane { x, 1}
    plane {-x, 1}
-   
+
    bounded_by {sphere{0, 1.5}}
   }
 
 /* Three Dimensional 4-Sided Diamond */
-#declare Rhomboid = 
- intersection 
+#declare Rhomboid =
+ intersection
   {plane {-x, 1 rotate <0, 0, -30>}
    plane { x, 1 rotate <0, 0, -30>}
    plane { z, 1}
    plane {-z, 1}
    plane { y, 1}
    plane {-y, 1}
-   
+
    bounded_by {sphere{0, 2.3}}
   }
 
 // Classic four-sided pyramids.
 // The first can't be used correctly in CSG, the second can.
-#declare Pyramid = 
+#declare Pyramid =
    union { // This isn't true CSG, it's just used for convenience
       triangle { <-1, 0, -1>, <+1, 0, -1>, <0, 1, 0>  }
       triangle { <+1, 0, -1>, <+1, 0, +1>, <0, 1, 0>  }
@@ -163,25 +163,25 @@
    plane { < 0, 0, -1>, 1  rotate < 40, 0,   0>}
    plane { <0, -1, 0>, 0 }
    translate <0 ,-1, 0>
-   
+
    bounded_by {box {<-1,0,-1>, <1,1,1>}}
-}            
-             
+}
+
 // These next three are finite planes.
 #declare Square_X = /* Scale-able plane in x */
-  union 
+  union
    {triangle {<0, 1, -1>, <0, -1, 1>, <0,  1,  1>}
     triangle {<0, 1, -1>, <0, -1, 1>, <0, -1, -1>}
    }
 
 #declare Square_Y =  /* Scale-able plane in y */
-  union 
+  union
    {triangle {<-1, 0, 1>, <1, 0, -1>, < 1, 0,  1>}
     triangle {<-1, 0, 1>, <1, 0, -1>, <-1, 0, -1>}
    }
 
 #declare Square_Z =  /* Scale-able plane in z */
-  union 
+  union
    {triangle {<-1, 1, 0>, <1, -1, 0>, <-1, -1, 0>}
     triangle {<-1, 1, 0>, <1, -1, 0>, < 1,  1, 0>}
    }

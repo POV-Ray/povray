@@ -2,13 +2,13 @@
 // Author Friedrich A. Lohmueller, June-2012,
 // expanded  March 2013
 
-#version 3.7; 
+#version 3.7;
 
   // #declare Typ =71; // for tests
 
 #if ((Typ > 35) & ( Typ < 70))
-global_settings{ assumed_gamma 1.0 } 
-#end 
+global_settings{ assumed_gamma 1.0 }
+#end
 
 #default{ finish{ ambient 0.1 diffuse 0.9 }}
 #include "shapes.inc"
@@ -143,10 +143,10 @@ sky_sphere{ pigment{ gradient <0,1,0>
 
 #if (Typ=35)
 light_source{<-1500,2500,-2500> color White}
-plane{ <0,1,0>, 0 
+plane{ <0,1,0>, 0
        texture{ pigment{ color rgb <1.00,0.95,0.8>}
                 normal { bumps 0.75 scale 0.025  }
-                finish { phong 0.1 } 
+                finish { phong 0.1 }
               } // end of texture
      } // end of plane
 //#include "10 - Ready made scenes/30 - Basic Scene 03 - White sands with blue sky.txt"

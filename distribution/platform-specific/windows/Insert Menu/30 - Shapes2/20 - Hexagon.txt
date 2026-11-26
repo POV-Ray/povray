@@ -1,4 +1,4 @@
-object{ Hexagon  
+object{ Hexagon
         scale <1,1,1>*1.00
         texture{ pigment{ color rgb<1,1,1> }
                  finish { phong 1 }

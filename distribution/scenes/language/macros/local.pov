@@ -21,9 +21,9 @@ light_source { <100,1000,-1000>, White}
 
 background{rgb 0.4}
 
-camera { location -9*z 
+camera { location -9*z
          right    x*image_width/image_height
-         angle 35 // direction 2*z 
+         angle 35 // direction 2*z
          look_at <0,0,0>
        }
 

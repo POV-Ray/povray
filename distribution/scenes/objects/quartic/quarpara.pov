@@ -11,7 +11,7 @@
 // By Alexander Enzmann
 /* sample quartic scene file written by Alexander Enzmann */
 #version  3.7;
-global_settings { 
+global_settings {
   assumed_gamma 1.0
 }
 
@@ -52,7 +52,7 @@ intersection {
 
 camera {
    location  <0.0, 0.0, -10.0>
-   angle 30  
+   angle 30
    right     x*image_width/image_height
 }
 
@@ -60,5 +60,5 @@ light_source { <200, 30, -300> colour White }
 
 light_source { <-200, 30, -300> colour White }
 
-background { color rgb<1,1,1>*0.03 } 
- 
+background { color rgb<1,1,1>*0.03 }
+

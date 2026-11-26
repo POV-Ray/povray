@@ -44,7 +44,7 @@
 #ifndef (Plane_Pigment)
   #declare Plane_Pigment=
     pigment {
-      color rgb 0.1   
+      color rgb 0.1
     }
 #end
 
@@ -413,7 +413,7 @@ sky_sphere {
 merge {
    sphere{<0, 5, 0>, 1}
    cone { y*1.9,1, y*4.1, 0.5 }
-   box { <-1.1, 0, -1.1>, <1.1, 2, 1.1> } 
+   box { <-1.1, 0, -1.1>, <1.1, 2, 1.1> }
    translate 0.01*y
 }
 

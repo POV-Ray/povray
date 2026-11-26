@@ -11,7 +11,7 @@
 // By Alexander Enzmann
 /* sample quartic scene file written by Alexander Enzmann */
 #version  3.7;
-global_settings { 
+global_settings {
   assumed_gamma 1.0
 }
 
@@ -29,7 +29,7 @@ intersection {
 
       texture {
          pigment{ color rgb<0.7,0.0,0.0>  }
-         normal { radial 0.5 frequency 20 sine_wave }  
+         normal { radial 0.5 frequency 20 sine_wave }
          finish {
             //specular 0.5 roughness 0.05
             phong 1 phong_size 30
@@ -49,8 +49,8 @@ intersection {
 }
 
 //-------------------------------------------------------------------------
-// This scene uses a non-standard camera set-up. 
-// (See CAMERA in the included documentation for details.) 
+// This scene uses a non-standard camera set-up.
+// (See CAMERA in the included documentation for details.)
 // If you are new to POV-Ray, you might want to try a different demo scene.
 //-------------------------------------------------------------------------
 camera {
@@ -64,5 +64,5 @@ light_source { <1200, 30, -300> colour White }
 
 light_source { <-200,1000, -300> colour White }
 
-background { color rgb<1,1,1>*0.03 } 
- 
+background { color rgb<1,1,1>*0.03 }
+

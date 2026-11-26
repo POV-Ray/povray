@@ -12,10 +12,10 @@
 
 /* sample quartic scene file written by Alexander Enzmann */
 #version  3.7;
-global_settings { 
+global_settings {
   assumed_gamma 1.0
 }
-#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
 
 #include "shapes.inc"
 #include "colors.inc"
@@ -73,7 +73,7 @@ union {
 camera {
    location  <0.0, 0.0, -6.0>
    right     x*image_width/image_height
-   angle 65 
+   angle 65
 }
 
 light_source { <200, 30, -30> colour White }
@@ -97,5 +97,5 @@ plane {
    rotate 5*x
 }
 */
-background { color rgb<1,1,1>*0.03 } 
- 
+background { color rgb<1,1,1>*0.03 }
+

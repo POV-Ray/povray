@@ -9,7 +9,7 @@
 // -w320 -h240
 // -w800 -h600 +a0.3
 #version 3.7;
-global_settings { assumed_gamma 1.0 } 
+global_settings { assumed_gamma 1.0 }
 
 camera {
   location  <0, 8, -10>
@@ -34,7 +34,7 @@ blob {
   sphere { < 1, 1,  1>, 1.5, 1 }
   sphere { <-1, 1, -1>, 1.5, 1 }
   sphere { < 1, 1, -1>, 1.5, 1 }
-  
+
   scale<1,1,1.5>
   pigment { color red 1 green 0 blue 0 }
   finish { ambient 0.1 diffuse 0.7 phong 1 }

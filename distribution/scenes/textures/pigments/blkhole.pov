@@ -47,11 +47,11 @@ light_source { <-50,  10, -500> color Gray65}
 //------------------------------------------------
 //------------------------------------------------
 
-#declare Tree = 
+#declare Tree =
 
 Correct_Pigment_Gamma( // gamma correction
 pigment
-{  DMFWood4  
+{  DMFWood4
   scale 2
   translate <1/2,0,1>
   rotate x*85

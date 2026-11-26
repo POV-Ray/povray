@@ -38,7 +38,7 @@ light_source { < 500, 500, -200> White*0.9}
 
 #declare Thing=
 object {
-   box{<-1,-1,-1>,<1,1,1>}  
+   box{<-1,-1,-1>,<1,1,1>}
    scale Radius
    pigment {color rgb<1,1,1> }
    finish  {phong 1 }

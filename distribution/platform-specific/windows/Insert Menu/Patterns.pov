@@ -8,7 +8,7 @@
 // -w120 -h64 +a0.1 +am2 -j +r3
 
 #version 3.7;
-global_settings{ assumed_gamma 1.0 } 
+global_settings{ assumed_gamma 1.0 }
 
 #include "colors.inc"
 
@@ -251,9 +251,9 @@ plane {
           color rgb<0.10, 0.70, 0.00>,
           color Orange  rotate<-90,0,0> scale 0.2
           #break
-       
+
         #case (38) // new in 3.7
-          triangular //max.6 colors/textures 
+          triangular //max.6 colors/textures
           color Red,
           color rgb<1.0, 0.4, 0.0>,
           color rgb<1.0, 0.9, 0.0>,
@@ -323,8 +323,8 @@ plane {
  #end //  #if (Typ<39)
 
   // 101 - 299 -------------------------------------------------------------
-  #if (Typ>=101 & Typ<=127) // tiling - new in 3.7 
-      #local Nr= Typ-100; 
+  #if (Typ>=101 & Typ<=127) // tiling - new in 3.7
+      #local Nr= Typ-100;
 
         pigment{
            tiling Nr // 1~24 Pattern_Number
@@ -335,13 +335,13 @@ plane {
                 } // end color_map
         #if (Nr = 6|  Nr=7 | Nr=11 | Nr=12 | Nr=13 | Nr=14 | Nr=15 | Nr=18 )
           scale 0.20
-         
+
         #else
-         #if (Nr= 22 | Nr=23 | Nr=24) 
+         #if (Nr= 22 | Nr=23 | Nr=24)
           scale 0.10
          #else
           scale 0.25
-         #end 
+         #end
         #end
           rotate<-90,0,0>
         } // end pigment
@@ -349,75 +349,75 @@ plane {
   #end //------------------------------------------------------------------
 
 
-   #if (Typ>=150 & Typ<=271) // pavement - new in 3.7 
- 
+   #if (Typ>=150 & Typ<=271) // pavement - new in 3.7
 
-   pigment{ // ------------------------------------------------------------ 
+
+   pigment{ // ------------------------------------------------------------
      pavement  // polyform paving the x-z plane
 
      // ----------------------
-     #if (Typ>=150 & Typ<=171)  
-        number_of_sides 3 //   3 triangle 
+     #if (Typ>=150 & Typ<=171)
+        number_of_sides 3 //   3 triangle
 
-         #if (Typ>=150 & Typ<=152)  
-             number_of_tiles Typ-149 pattern 1      //  11,21,31 ;    
+         #if (Typ>=150 & Typ<=152)
+             number_of_tiles Typ-149 pattern 1      //  11,21,31 ;
          #end
-         #if (Typ>=153 & Typ<=155 )  
-             number_of_tiles 4      pattern Typ-152 // 41, 42, 43,  
+         #if (Typ>=153 & Typ<=155 )
+             number_of_tiles 4      pattern Typ-152 // 41, 42, 43,
          #end
-         #if (Typ>=156 & Typ<=159 )  
-             number_of_tiles 5      pattern Typ-155 // 51, 52, 53, 54  
+         #if (Typ>=156 & Typ<=159 )
+             number_of_tiles 5      pattern Typ-155 // 51, 52, 53, 54
          #end
-         #if (Typ>=160 & Typ<=171 )   
-             number_of_tiles 6      pattern Typ-159 //   6 with 1,...12  
-             
+         #if (Typ>=160 & Typ<=171 )
+             number_of_tiles 6      pattern Typ-159 //   6 with 1,...12
+
         #end
-     #end  // end triangle 
+     #end  // end triangle
      //-----------------------------
      //----------------------------
-     #if (Typ>=172 & Typ<=173)  
+     #if (Typ>=172 & Typ<=173)
         number_of_sides 4 //   4 sqare
         number_of_tiles  Typ-171   pattern 1  // 11,21
      #end // end sqare
      //----------------------------
-     #if (Typ>=174 & Typ<=175)  
-        number_of_sides 4 //   
+     #if (Typ>=174 & Typ<=175)
+        number_of_sides 4 //
         number_of_tiles 3   pattern Typ-173  // 31,32
      #end // end sqare
      //----------------------------
-     #if (Typ>=176 & Typ<=180)  
-        number_of_sides 4 //   
+     #if (Typ>=176 & Typ<=180)
+        number_of_sides 4 //
         number_of_tiles 4   pattern Typ-175  // 41,42,... 45
      #end // end sqare
      //----------------------------
-     #if (Typ>=181 & Typ<=192)  
-        number_of_sides 4 //    
+     #if (Typ>=181 & Typ<=192)
+        number_of_sides 4 //
         number_of_tiles 5   pattern Typ-180  // 5 01,..., 5 12 //1...12
      #end // end sqare
      //----------------------------
-     #if (Typ>=195 & Typ<=229)  
-        number_of_sides 4 //    
+     #if (Typ>=195 & Typ<=229)
+        number_of_sides 4 //
         number_of_tiles 6     pattern Typ-194  // 1,...35
      #end // end sqare
      //-----------------------------
      //-----------------------------
-     #if (Typ>=238 & Typ<=239) 
+     #if (Typ>=238 & Typ<=239)
         number_of_sides 6 //   6 hexagon
-        number_of_tiles Typ-237 pattern 1  // 1,2,3 
+        number_of_tiles Typ-237 pattern 1  // 1,2,3
      #end
 
-     #if (Typ>=240 & Typ<=242) 
-        number_of_sides 6 //    
-        number_of_tiles 3 pattern Typ-239  // 1,2,3 
+     #if (Typ>=240 & Typ<=242)
+        number_of_sides 6 //
+        number_of_tiles 3 pattern Typ-239  // 1,2,3
      #end
 
-     #if (Typ>=243 & Typ<=249) 
-        number_of_sides 6 //    
+     #if (Typ>=243 & Typ<=249)
+        number_of_sides 6 //
         number_of_tiles 4 pattern Typ-242  // 1, ... 7
      #end
 
-     #if (Typ>=250 & Typ<=271)  
-        number_of_sides 6 //   
+     #if (Typ>=250 & Typ<=271)
+        number_of_sides 6 //
         number_of_tiles 5 pattern Typ-249  // 1, ... 22
      #end // end hexagon
 
@@ -425,29 +425,29 @@ plane {
 
 
 
-            exterior 0 //  0, 1, 2;   
-            interior 0  // 0, 1, 2  
-            form 0//  0, 1 or 2, (3 for square only) copies the look of interior for some additional variations. 
+            exterior 0 //  0, 1, 2;
+            interior 0  // 0, 1, 2
+            form 0//  0, 1 or 2, (3 for square only) copies the look of interior for some additional variations.
             color_map{
-                       [ 0.00 color rgb<1.00, 1.00, 1.00> ] 
-                       [ 0.20 color rgb<1.00, 1.00, 1.00> ] 
-                       [ 0.20 color rgb<0.00, 0.00, 0.00> ] 
-                       [ 0.60 color rgb<0.00, 0.00, 0.00> ] 
-                       [ 0.60 color rgb<1.00, 0.60, 0.20> ] 
-                       [ 1.00 color rgb<1.00, 0.60, 0.20> ] 
+                       [ 0.00 color rgb<1.00, 1.00, 1.00> ]
+                       [ 0.20 color rgb<1.00, 1.00, 1.00> ]
+                       [ 0.20 color rgb<0.00, 0.00, 0.00> ]
+                       [ 0.60 color rgb<0.00, 0.00, 0.00> ]
+                       [ 0.60 color rgb<1.00, 0.60, 0.20> ]
+                       [ 1.00 color rgb<1.00, 0.60, 0.20> ]
                      } // end color_map
 
 
-      #if (Typ>=150 & Typ<=152 ) frequency 3 #end 
-      // scales:               
-      #if (Typ>=150 & Typ<=152 ) scale 0.3 #end 
-      #if (Typ>=153 & Typ<=171 ) scale 0.15 #end 
-    
-             
-      #if (Typ>=172 &  Typ<=237 ) scale 0.1 #end 
-      #if (Typ>=238 &  Typ<=271 ) scale 0.1 #end 
+      #if (Typ>=150 & Typ<=152 ) frequency 3 #end
+      // scales:
+      #if (Typ>=150 & Typ<=152 ) scale 0.3 #end
+      #if (Typ>=153 & Typ<=171 ) scale 0.15 #end
+
+
+      #if (Typ>=172 &  Typ<=237 ) scale 0.1 #end
+      #if (Typ>=238 &  Typ<=271 ) scale 0.1 #end
           rotate<-90,0,0>
-         } // end pigment ------------------------------------------------  
+         } // end pigment ------------------------------------------------
 
 
 

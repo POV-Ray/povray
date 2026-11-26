@@ -130,9 +130,9 @@ object {BigBottle}
 
 //=========================================== SCENERY =========================
 light_source {<100,300,200> White*2}
-camera { location <100,100,100> 
+camera { location <100,100,100>
          right x*image_width/image_height
-         angle 25 //  direction z*3 
+         angle 25 //  direction z*3
          look_at <0,25,0>
        }
 plane {y,0 pigment {White}}

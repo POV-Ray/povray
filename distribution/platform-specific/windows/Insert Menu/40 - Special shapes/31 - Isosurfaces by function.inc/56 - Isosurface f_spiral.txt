@@ -9,12 +9,12 @@ isosurface { //-------------------------------------------------------------
         0,    // not used,
         0.75   // cross section type
      )
-  }          
+  }
  contained_by {sphere {<0,0,0>,1}}
  threshold 0
  max_gradient 5
- 
- texture{ pigment{ color rgb <1,0.75,0.00>} 
+
+ texture{ pigment{ color rgb <1,0.75,0.00>}
           //normal { bumps 0.15 scale 0.015}
           finish { specular 0.2 phong 0.7 }
         }

@@ -13,7 +13,7 @@
 // -w800 -h600 +a0.3
 
 #version 3.7;
-global_settings { assumed_gamma 1.2 } 
+global_settings { assumed_gamma 1.2 }
 
 #include "colors.inc"
 #include "textures.inc"

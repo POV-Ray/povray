@@ -52,7 +52,7 @@ light_source { <-50,  10, -500> color Gray65}
 
 #declare Thing = plane{z,0.1 hollow on clipped_by{box{<-2.75,-2,-2>,<2.75,2,2>}}}
 
-#declare Tree = 
+#declare Tree =
   Correct_Pigment_Gamma( // gamma correction
     pigment{ DMFWood4 scale 2 translate <1/2,0,1>
              rotate x*85 translate 10*y}

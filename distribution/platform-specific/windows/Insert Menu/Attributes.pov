@@ -7,7 +7,7 @@
 // -w120 -h48 +a0.1 +am2 -j +r3
 
 #version 3.7;
-global_settings{ assumed_gamma 1.0 } 
+global_settings{ assumed_gamma 1.0 }
 
 #include "colors.inc"
 #include "shapes.inc"
@@ -21,7 +21,7 @@ global_settings{ assumed_gamma 1.0 }
 #declare Typ=6;     // black_hole warp
 #declare Typ=7;     // repeat warp
 #declare Typ=8;     // mapping warp
-*/    
+*/
 
 global_settings {
  // assumed_gamma 1
@@ -144,10 +144,10 @@ plane
     texture { Tex1 }
     no_shadow
     translate <-4.0+Cnt*2, 0, 0>
-  }           
-  
+  }
+
   #undef fn_grad
-  
+
   #declare Cnt=Cnt+1;
 #end
 
@@ -191,7 +191,7 @@ plane
 
     }
     finish { diffuse 1 brilliance 2 }
-    
+
   }
 
   object {
@@ -277,7 +277,7 @@ plane
 
       checker
       color Copper,
-      color rgb <1.2, 1.2, 1.4> 
+      color rgb <1.2, 1.2, 1.4>
 
       scale 0.5
 

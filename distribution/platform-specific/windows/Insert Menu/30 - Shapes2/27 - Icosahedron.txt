@@ -1,4 +1,4 @@
-object{ Icosahedron  
+object{ Icosahedron
         scale <1,1,1>
         material{   //-----------------------------------------------------------
          texture { pigment{ color rgbf<0.6,0.95,0.7,0.45> }
@@ -9,4 +9,3 @@ object{ Icosahedron
         } // end of material ----------------------------------------------------
              scale <1,1,1>*1  rotate< 0,0,0> translate<0,0,0>
        } // end of object  ------------------------------------------------------
- 

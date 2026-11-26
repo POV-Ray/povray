@@ -162,7 +162,7 @@ texture {
 camera {
   location <0, 0, -6.5>
   right   x*image_width/image_height
-  angle 65 
+  angle 65
   look_at <0, 0, 0>
 }
 

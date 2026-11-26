@@ -6,9 +6,9 @@
 
 
    Demo for the new mesh_camera:
-  
-   Baking meshes to textures and using these back on the same scene  
-  
+
+   Baking meshes to textures and using these back on the same scene
+
    --
    Jaime Vives Piqueres, Jan. 2011  <jaime@ignorancia.org> */
 
@@ -54,25 +54,25 @@ global_settings{
 #if (use_baking=1)
 
 // to bake all the textures, just use the included script bake.sh (bake.bat still missing, volunteers welcome).
-// for individual baking, render with +Kn, where n is the number of the mesh on the switch below, 
+// for individual baking, render with +Kn, where n is the number of the mesh on the switch below,
 // also +O with the corresponding texture name, and +FP for PNG output
 camera{
   mesh_camera{ 1 3 // distribution 3 is what we want here
   #switch (clock)
     #case (1)
-      mesh{vase1 
+      mesh{vase1
           scale scl_vase1
           translate pos_vase1
       }
       #break
     #case (2)
-      mesh{vase2 
+      mesh{vase2
           scale scl_vase2
           translate pos_vase2
       }
       #break
     #case (3)
-      mesh{room 
+      mesh{room
           scale scl_room
           translate pos_room
       }

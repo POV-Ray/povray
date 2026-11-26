@@ -27,7 +27,7 @@ camera {
         }
 
 //don't forget to render this with the image ratio equal to 1 (height = width),
-//because of the image being framed in a circle. 
+//because of the image being framed in a circle.
 
 box {<-15,0,-15>,<15,-1,15>
      pigment {checker White,Gray90 scale 5}

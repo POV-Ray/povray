@@ -24,8 +24,8 @@ light_source {
 }
 
 //-------------------------------------------------------------------------
-// This scene uses a non-standard camera set-up. 
-// (See CAMERA in the included documentation for details.) 
+// This scene uses a non-standard camera set-up.
+// (See CAMERA in the included documentation for details.)
 // If you are new to POV-Ray, you might want to try a different demo scene.
 //-------------------------------------------------------------------------
 camera {
@@ -57,7 +57,7 @@ sphere {
 
 plane {
    z, 0
-   
+
    texture {
       pigment {
          crackle
@@ -79,9 +79,9 @@ plane {
          }
          conserve_energy
       }
-    
+
    }
-   
+
 }
 
 #macro Objs(Metr)
@@ -96,8 +96,8 @@ union {
          scale 0.7
       }
    }
-   
-   
+
+
    #local T_Crack=
    texture {
       pigment {
@@ -124,18 +124,18 @@ union {
          specular 0.3
       }
    }
-   
+
    superellipsoid {
       <0.1, 0.1>
       scale <1.0, 1.0, 0.6>
       texture { T_Crack }
       translate <0.0, 3.0, 0.3>
    }
-   
+
    superellipsoid {
       <0.1, 0.1>
       scale <1.0, 1.0, 0.6>
-      
+
       texture {
          pigment { rgb <0.2, 0.8, 0.5> }
          finish {
@@ -151,10 +151,10 @@ union {
             scale 0.7
          }
       }
-      
+
       translate <0.0, -3.0, 0.3>
    }
-   
+
    #if (Metr != 1)
       isosurface {
          function { z-fn_Crack(x, y, 0.6).red*0.35 }
@@ -162,7 +162,7 @@ union {
          max_gradient 1.5
          accuracy 0.001
          contained_by { box { <-1.0,-1.0,-0.6>,<1.0,1.0,1.1> } }
-         
+
          texture {
             pigment { rgb <0.3, 0.2, 0.95> }
             finish {
@@ -173,12 +173,12 @@ union {
                ambient 0.1
             }
          }
-         
+
          translate 0.6*z
       }
    #end
-   
-   
+
+
    object {
       text
       {
@@ -186,18 +186,18 @@ union {
          "crystal.ttf",
          concat("metric ", str(Metr,0,1)),
          0.1, 0
-         
+
          rotate 90*x
          rotate 180*z
          scale 0.3
          translate <0.85, 4.01, 0.5>
-         
+
          texture {
             pigment { color Red*0.8 }
          }
       }
    }
-   
+
    translate -1*y
 }
 #end

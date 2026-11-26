@@ -19,9 +19,9 @@ global_settings {assumed_gamma 1.0}
 
 #include "colors.inc"
 
-camera { location <100,70,-60> 
+camera { location <100,70,-60>
          right     x*image_width/image_height
-         angle 20 // direction z*4 
+         angle 20 // direction z*4
          look_at <0,0,0>
        }
 light_source {<400,500,-300> White*2}
@@ -69,17 +69,17 @@ object {Group2}
     box {<0,Amplitude.y,0>,<Amplitude.x,Amplitude.y-Thick,Thick>}
     box {<0,0,Amplitude.z>,<Amplitude.x,Thick,Amplitude.z-Thick>}
     box {<0,Amplitude.y,Amplitude.z>,<Amplitude.x,Amplitude.y-Thick,Amplitude.z-Thick>}
-  
+
     box {<0,0,0>,<Thick,Amplitude.y,Thick> translate 0}
     box {<0,0,0>,<Thick,Amplitude.y,Thick> translate <Amplitude.x-Thick,0,0>}
     box {<0,0,0>,<Thick,Amplitude.y,Thick> translate <0,0,Amplitude.z-Thick>}
     box {<0,0,0>,<Thick,Amplitude.y,Thick> translate <Amplitude.x-Thick,0,Amplitude.z-Thick>}
-  
+
     box {0,<Thick,Thick,Amplitude.z>}
     box {0,<Thick,Thick,Amplitude.z> translate <Amplitude.x-Thick,Amplitude.y-Thick,0>}
     box {0,<Thick,Thick,Amplitude.z> translate <0,Amplitude.y-Thick,0>}
     box {0,<Thick,Thick,Amplitude.z> translate <Amplitude.x-Thick,0,0>}
-  
+
     translate SmallCorner
   }
 #end

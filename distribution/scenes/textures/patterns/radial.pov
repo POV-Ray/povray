@@ -30,7 +30,7 @@ global_settings { assumed_gamma 1.0 }
    normal{
      radial 1.6
      frequency 8
-     scale 0.24 
+     scale 0.24
      rotate<90,0,0>
    }
    finish{phong 1 phong_size 400  reflection{ 0.1 } }

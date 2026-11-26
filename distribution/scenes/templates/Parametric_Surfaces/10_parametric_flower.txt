@@ -11,10 +11,10 @@ parametric {
   accuracy 0.01 // 0.001 default, lower slower but better
   precompute 15 x,y,z // precompute normally gives faster rendering (<=20) but longer parsing
 
-  scale 1.5 rotate<0,0,0> translate <0,0,0> 
-  texture{ pigment{ color rgb<1,1,1> } 
-            
-         } 
+  scale 1.5 rotate<0,0,0> translate <0,0,0>
+  texture{ pigment{ color rgb<1,1,1> }
+
+         }
   translate<0,0,0>
 }
 

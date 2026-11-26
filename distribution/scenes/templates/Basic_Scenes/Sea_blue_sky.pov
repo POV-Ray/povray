@@ -1,10 +1,10 @@
 // POV-Ray 3.7 Scene File " ... .pov"
-// author:   ...  
+// author:   ...
 // date:   ...
 //--------------------------------------------------------------------------
 #version 3.7;
 global_settings{ assumed_gamma 1.0 }
-#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
 //--------------------------------------------------------------------------
 #include "colors.inc"
 #include "textures.inc"
@@ -45,17 +45,17 @@ sky_sphere { pigment { gradient <0,1,0>
                        color_map { [0.00 rgb <0.8,0.9,1.0>]
                                    [0.35 rgb <0.0,0.1,0.8>]
                                    [0.65 rgb <0.0,0.1,0.8>]
-                                   [1.00 rgb <0.8,0.9,1.0>] 
-                                 } 
-                       scale 2         
+                                   [1.00 rgb <0.8,0.9,1.0>]
+                                 }
+                       scale 2
                      } // end of pigment
            } //end of skysphere
 //------------------------------
 //fog{distance 300000 color White}
 // sea ---------------------------------------------------------------------
-plane{ <0,1,0>, 0 
+plane{ <0,1,0>, 0
        texture{ Polished_Chrome
-                normal{ bumps 0.25 scale <0.25,0.25,0.25>*0.5 turbulence 0.5 } 
+                normal{ bumps 0.25 scale <0.25,0.25,0.25>*0.5 turbulence 0.5 }
                 finish{ reflection 0.60 }}}
 
 //--------------------------------------------------------------------------

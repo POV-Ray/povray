@@ -17,11 +17,11 @@
 rainbow {
   angle 40         // 30~50 apparture against center in degrees
   width  6         // width in degrees
-  distance 1500     // 
-  direction < 0.05,-0.27,1> //direction to the center of the rainbow arc   
+  distance 1500     //
+  direction < 0.05,-0.27,1> //direction to the center of the rainbow arc
   arc_angle 150    // length of arc in degrees
-  falloff_angle 10 // in degrees, must be smaller than arc_angle 
-  // up <0.6,1,0>  // 
+  falloff_angle 10 // in degrees, must be smaller than arc_angle
+  // up <0.6,1,0>  //
   // jitter 0.01   // don't use this with animations
 
   color_map {

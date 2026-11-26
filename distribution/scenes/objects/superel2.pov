@@ -11,11 +11,11 @@
 // -w800 -h600 +a0.3
 #version  3.7;
 global_settings { assumed_gamma 1.0 }
-#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
 
 //-------------------------------------------------------------------------
-// This scene uses a non-standard camera set-up. 
-// (See CAMERA in the included documentation for details.) 
+// This scene uses a non-standard camera set-up.
+// (See CAMERA in the included documentation for details.)
 // If you are new to POV-Ray, you might want to try a different demo scene.
 //-------------------------------------------------------------------------
 camera {
@@ -36,7 +36,7 @@ plane { <0, 0, 1>, 2
   finish { ambient 0.1 diffuse 0.4 }
 }
 */
-background { color rgb<1,1,1>*0.35 } 
+background { color rgb<1,1,1>*0.35 }
 
 #declare Row1 = +5;
 #declare Row2 =  0;
@@ -69,4 +69,4 @@ superellipsoid { <1.0, 0.2> scale <1, 1, 1>*2 rotate <-105, 30, 0> translate <Co
 
 superellipsoid { <1.0, 0.1> scale <1, 1, 1>*2 rotate <-105, 30, 0> translate <Col3, Row3, 0> texture { Tex } }
 
-
+

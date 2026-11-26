@@ -1,5 +1,5 @@
 #declare FBozo =  // -------------------------
- function{ pigment{ bozo scale 0.5 
+ function{ pigment{ bozo scale 0.5
                     color_map{ [0 rgb 0]
                                [0.2 rgb 0.4]
                                [1 rgb 1]
@@ -8,7 +8,7 @@
           } // end of function "FBozo" -------
 isosurface { //-------------------------------
 
-  function  { 
+  function  {
     FBozo(2*x,2*y,2*z).gray  -0.5
   }
   contained_by { box { -1.2, 1.2 } }
@@ -19,5 +19,5 @@ isosurface { //-------------------------------
            finish { phong 1}}
   scale 0.8
   rotate<0,30,0>
-  translate <0,1.3,0> 
+  translate <0,1.3,0>
 } // end of isosurface -----------------------

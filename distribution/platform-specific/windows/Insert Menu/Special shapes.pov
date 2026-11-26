@@ -1,14 +1,14 @@
 // Insert menu illustration scene
 // Author Friedrich A. Lohmueller, June-2012
-// updated Feb-2013 
+// updated Feb-2013
 #version 3.7;
 
   //  #declare Typ = 350; // for tests
 
-#if(( Typ < 500 | Typ > 831 ) 
-   & (Typ !=110) & (Typ !=430) & (Typ !=431) ) 
-global_settings{ assumed_gamma 1.0 } 
-#end 
+#if(( Typ < 500 | Typ > 831 )
+   & (Typ !=110) & (Typ !=430) & (Typ !=431) )
+global_settings{ assumed_gamma 1.0 }
+#end
 
 
 #default{ finish{ ambient 0.1 diffuse 0.9 }}
@@ -32,7 +32,7 @@ global_settings{ assumed_gamma 1.0 }
 #declare Sub_Path9 = "50 - Parametric/"
 //------------------------------------------------------------
 
-   
+
 
 #switch (Typ)  //----------------------------------------------------------
 // 10 - 3D text shapes/
@@ -344,9 +344,9 @@ sky_sphere{ pigment{ gradient <0,1,0>
            } // end of sky_sphere
 #end // of macro
 //------------------------------------------------------------------------
-// sky -------------------------------------------------------------- 
+// sky --------------------------------------------------------------
 #macro MySky3()
-plane{<0,1,0>,1 hollow  
+plane{<0,1,0>,1 hollow
        texture{ pigment{ bozo turbulence 0.92
                          color_map { [0.00 rgb <0.20, 0.20, 1.0>*0.9]
                                      [0.50 rgb <0.20, 0.20, 1.0>*0.9]
@@ -355,12 +355,12 @@ plane{<0,1,0>,1 hollow
                                      [1.0 rgb <0.5,0.5,0.5>]}
                         scale<1,1,1.5>*2.5  translate< 0,0,0>
                        }
-                finish {ambient 1 diffuse 0} }      
+                finish {ambient 1 diffuse 0} }
        scale 10000}
 // fog on the ground -------------------------------------------------
 fog { fog_type   2
       distance   150
-      color      White  
+      color      White
       fog_offset 0.1
       fog_alt    1.5
       turbulence 1.8
@@ -481,14 +481,14 @@ object{ AxisXYZ_( 6.65, 3.7, 1.5, T_Dark, T_Light, 0, 0,   0.65,0.65,0.15) scale
 // 15 - height_field and HF_macros/
 #if (Typ=209)
 object{ Raster_Ground scale 1}  MySky()
-camera{ angle 65 location<0.0 , 1.0 ,-3.0> look_at<0.0 , 1.0 , 0.0>}   
+camera{ angle 65 location<0.0 , 1.0 ,-3.0> look_at<0.0 , 1.0 , 0.0>}
 light_source{<-2500,1500,-1500> color rgb<1,1,1>*1}     // sun light
 #include concat(In_Path,Sub_Path2,Txt_Path) // "15 - height_field and HF_macros/10 - height_field mountains1.txt"
 #end
 // ----
 #if (Typ=210)
 object{ Raster_Ground scale 1}  MySky()
-camera{ angle 65 location<0.0 , 1.0 ,-3.0> look_at<0.0 , 1.0 , 0.0>}   
+camera{ angle 65 location<0.0 , 1.0 ,-3.0> look_at<0.0 , 1.0 , 0.0>}
 light_source{<-2500,1500,-2500> color rgb<1,1,1>*1}     // sun light
 #include concat(In_Path,Sub_Path2,Txt_Path) // "15 - height_field and HF_macros/10 - height_field mountains2.txt"
 #end
@@ -560,7 +560,7 @@ object{ AxisXYZ_( 3.05, 1.75, 4.5, T_Dark, T_Light, 25, -45,   0.45,0.55,0.75) s
 #case(371)  #declare Txt_Path="71 - mesh cube sample.txt" #break
 #case(385)  #declare Txt_Path="85 - mesh2 sample.txt" #break
 
-*/ 
+*/
 // ----
 #if (Typ=300)
 object{ Raster_Ground }
@@ -615,15 +615,15 @@ light_source{<2500, 2500,-1000> color rgb<1,1,1>*0.8}     // sun light
 light_source{< 2.65,0.00,-2.50> color rgb<0.9,0.9,1>*0.1}  // flash light
 object{ AxisXYZ_( 2.55, 3.2, 8.5, T_Dark, T_Light, 20, -36,   0.75,0.75,1.15) scale 1}
 #include concat(In_Path,Sub_Path3,Txt_Path) //71 - mesh cube sample.txt
-#end 
+#end
 #if (Typ=385)
 object{ Raster_Ground }
 camera{ angle 35 location < 2.50, 4.50, -3.70> look_at< 0.5, 0.0,  1.40>}
 light_source{<2500, 2500,-1000> color rgb<1,1,1>*0.8}     // sun light
 light_source{< 2.65,0.00,-2.50> color rgb<0.9,0.9,1>*0.1}  // flash light
 object{ AxisXYZ_( 1.95, 1.8, 3.5, T_Dark, T_Light, 30, -06,   0.45,0.45,0.65) scale 1}
- #include concat(In_Path,Sub_Path3,Txt_Path)//85 - mesh2 sample.txt 
-#end 
+ #include concat(In_Path,Sub_Path3,Txt_Path)//85 - mesh2 sample.txt
+#end
 // --------20 - mesh and non-CSG shapes///
 #if (Typ=350)
 MySky2(1)
@@ -771,7 +771,7 @@ object{ AxisXYZ_( 2.8, 2.2, 3.5, T_Dark, T_Light, 20, -45,   0.45,0.45,0.65) sca
 #case(527)  #declare Txt_Path="27 - Isosurface sine sphere y.txt" #break
 #case(528)  #declare Txt_Path="28 - Isosurface sine sphere double sine wave.txt" #break
 */
-// Isosurfaces_by_function 
+// Isosurfaces_by_function
 #if (Typ=640) #include concat(In_Path,Sub_Path6,Txt_Path) #end
 #if (Typ=641) #include concat(In_Path,Sub_Path6,Txt_Path) #end
 #if (Typ=642) #include concat(In_Path,Sub_Path6,Txt_Path) #end
@@ -804,7 +804,7 @@ object{ AxisXYZ_( 2.8, 2.2, 3.5, T_Dark, T_Light, 20, -45,   0.45,0.45,0.65) sca
 #case(659)  #declare Txt_Path="59 - Isosurface f_spikes.txt" #break
 #case(660)  #declare Txt_Path="60 - Isosurface f_spikes_2d.txt" #break
 */
-//  Isosurfaces by pattern_functions 
+//  Isosurfaces by pattern_functions
 #if (Typ=781) #include concat(In_Path,Sub_Path7,Txt_Path) #end
 #if (Typ=782) #include concat(In_Path,Sub_Path7,Txt_Path) #end
 #if (Typ=785) #include concat(In_Path,Sub_Path7,Txt_Path) #end

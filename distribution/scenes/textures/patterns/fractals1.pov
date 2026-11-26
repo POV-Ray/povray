@@ -29,7 +29,7 @@ global_settings {
   max_trace_level 5
 }
 
-camera { location <-1,2,-5>*1.2 
+camera { location <-1,2,-5>*1.2
          right     x*image_width/image_height
          look_at <0,0.2,0>
          angle 35

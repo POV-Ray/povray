@@ -24,4 +24,4 @@
 #declare Radiosity_OutdoorLight = 8;
 #declare Radiosity_IndoorLQ = 9;
 #declare Radiosity_IndoorHQ = 10;
-*/  
+*/

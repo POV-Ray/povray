@@ -11,7 +11,7 @@
 // By Alexander Enzmann
 /* sample quartic scene file written by Alexander Enzmann */
 #version  3.7;
-global_settings { 
+global_settings {
   assumed_gamma 1.0
 }
 
@@ -58,8 +58,8 @@ plane {
 }
 */
 //-------------------------------------------------------------------------
-// This scene uses a non-standard camera set-up. 
-// (See CAMERA in the included documentation for details.) 
+// This scene uses a non-standard camera set-up.
+// (See CAMERA in the included documentation for details.)
 // If you are new to POV-Ray, you might want to try a different demo scene.
 //-------------------------------------------------------------------------
 camera {
@@ -74,5 +74,5 @@ light_source { <50, 100, 0> colour White }
 
 light_source { <-200, 30, -300> colour White }
 
-background { color rgb<1,1,1>*0.03 } 
- 
+background { color rgb<1,1,1>*0.03 }
+

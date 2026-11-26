@@ -5,17 +5,17 @@
 // Persistence Of Vision Ray Tracer Scene Description File
 // Desc: Brick wall & Stucco
 // Date: 2000/03/14
-// Updated: 2001/07/26  
+// Updated: 2001/07/26
 // Auth: Ingo Janssen
 // Updated: 2013/02/15 for 3.7
-// 
+//
 // -w320 -h240
 // -w800 -h600 +a0.3
 //
 
 #version 3.7;
-global_settings { assumed_gamma 1.0 
-                  noise_generator 1 } // change to 2 or 3.  
+global_settings { assumed_gamma 1.0
+                  noise_generator 1 } // change to 2 or 3.
 
 light_source {
    < 500, 500,-500>
@@ -26,7 +26,7 @@ camera {
    location  <0.2, 0.0,-25.0>
    look_at   <0.0, 0.0,  0.0>
    right x*image_width/image_height // keep propotions with any aspect ratio
-   angle 65 
+   angle 65
 }
 
 //====== Doing the Stucco ======

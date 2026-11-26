@@ -11,7 +11,7 @@
 // Date: 2001/07/30
 // Auth: Ingo Janssen
 #version 3.6;
-global_settings { 
+global_settings {
   assumed_gamma 1.0
 }
 
@@ -56,10 +56,10 @@ global_settings {
      look_at   <0,0, 0.0>
      angle 35
    }
-   
+
    light_source {<-500,300,-500> rgb 1}
    light_source {<500,500,500> rgb 0.7 shadowless}
-   
+
    plane {
       y, 0
       texture{textureArr[frame_number-1]}   // put the right arrray name here !!

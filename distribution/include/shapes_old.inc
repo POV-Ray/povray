@@ -82,7 +82,7 @@ the "Disk_?" group, were changed from an earlier beta test and DKB-Trace
    <0, 0, 0>, 0
   }
 
-// Unit cones    
+// Unit cones
 // The Cone_n objects were formerly defined as intersections of
 // quadrics and boxes but now can be redefined with the cone primative.
 

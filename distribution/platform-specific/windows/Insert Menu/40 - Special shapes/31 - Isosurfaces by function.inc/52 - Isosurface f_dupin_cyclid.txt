@@ -9,11 +9,11 @@ isosurface { //-------------------------------------------------------------
        0.25,  // x displacement of torus,
        0.0,   // y displacement of torus,
        0.75   // radius of inversion
-     ) 
+     )
   }
   contained_by {sphere {0,1.25}}
- 
-  texture{ pigment{ color rgb <0.6,0.5,1>} 
+
+  texture{ pigment{ color rgb <0.6,0.5,1>}
            finish { specular 0.1 roughness 0.1 phong 0.2 }
            }
   scale 1.2

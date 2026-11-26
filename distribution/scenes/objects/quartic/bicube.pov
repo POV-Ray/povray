@@ -12,7 +12,7 @@
 // by Alexander Enzmann
 
 #version  3.7;
-global_settings { 
+global_settings {
   assumed_gamma 1.0
 }
 
@@ -36,7 +36,7 @@ quartic {
         // ambient 0.2
         // diffuse 0.8
       }
-   } 
+   }
    scale 1.25
    rotate -45*x
    translate <0,0,20>
@@ -70,5 +70,5 @@ light_source { <50, 100, 0> colour White }
 
 light_source { <-200, 30, -300> colour White }
 
-background { color rgb<1,1,1>*0.03 } 
+background { color rgb<1,1,1>*0.03 }
 

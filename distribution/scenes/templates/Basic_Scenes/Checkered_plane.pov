@@ -4,7 +4,7 @@
 //--------------------------------------------------------------------------
 #version 3.7;
 global_settings{ assumed_gamma 1.0 }
-#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
 //--------------------------------------------------------------------------
 #include "colors.inc"
 #include "textures.inc"
@@ -44,13 +44,13 @@ sky_sphere { pigment { gradient <0,1,0>
                        color_map { [0.00 rgb <0.6,0.7,1.0>]
                                    [0.35 rgb <0.1,0.0,0.8>]
                                    [0.65 rgb <0.1,0.0,0.8>]
-                                   [1.00 rgb <0.6,0.7,1.0>] 
-                                 } 
-                       scale 2         
+                                   [1.00 rgb <0.6,0.7,1.0>]
+                                 }
+                       scale 2
                      } // end of pigment
            } //end of skysphere
 // ground -------------------------------------------------------------------
-plane{ <0,1,0>, 0 
+plane{ <0,1,0>, 0
        texture{ pigment{ checker color rgb<1,1,1>*1.2 color rgb<0.25,0.15,0.1>*0}
               //normal { bumps 0.75 scale 0.025}
                 finish { phong 0.1}
@@ -61,12 +61,12 @@ plane{ <0,1,0>, 0
 //---------------------------------------------------------------------------
 
 // sample sphere
-sphere { <0,0,0>, 1 
+sphere { <0,0,0>, 1
          texture { Polished_Chrome
                    //pigment{ color Red } // rgb< 1, 0.0, 0.0>}
                    //finish { phong 1 reflection {0.40 metallic 0.5}}
-                 } // end of texture 
+                 } // end of texture
 
-          scale<1,1,1>  rotate<0,0,0>  translate<0,1.35,0>  
-       }  // end of sphere ----------------------------------- 
+          scale<1,1,1>  rotate<0,0,0>  translate<0,1.35,0>
+       }  // end of sphere -----------------------------------
 

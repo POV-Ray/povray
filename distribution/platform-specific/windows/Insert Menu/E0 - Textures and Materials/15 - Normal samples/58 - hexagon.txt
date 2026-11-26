@@ -1,5 +1,5 @@
-       texture{ Chrome_Metal  
-                normal { hexagon 
+       texture{ Chrome_Metal
+                normal { hexagon
                          normal { gradient x  scale .2 },
                          normal { ripples 5   scale .2 },
                          normal { crackle 4   scale .2 }

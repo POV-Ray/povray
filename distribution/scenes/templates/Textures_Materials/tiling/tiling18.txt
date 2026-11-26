@@ -1,4 +1,4 @@
-// tiling pattern in the xz plane  
+// tiling pattern in the xz plane
 pigment{
            tiling 18 // 1~24 Pattern_Number
               color_map{
@@ -9,4 +9,3 @@ pigment{
            scale 0.5
            // rotate<-90,0,0> // align to xy plane
         } // end pigment
- 

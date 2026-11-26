@@ -13,11 +13,11 @@
 #
 #   render_scene.sh [output_directory] [--all] scene_file
 #
-# output_directory: directory where to write the rendered image 
+# output_directory: directory where to write the rendered image
 # scene_file: scene to render
 #
 # the render options have to be given as a '//' comment within the first
-# 50 lines of the file.  There must be a space after the '//' and the first 
+# 50 lines of the file.  There must be a space after the '//' and the first
 # option has to start with '-' or '+'.  If option '--all' is given scenes
 # with no options given are rendered, otherwise not.
 # ==============================================================================
@@ -49,7 +49,7 @@ if [ ! -z "$1" ] ; then
           *)
             RENDER_NAME="$2"
             ;;
-        esac        
+        esac
         ;;
     esac
   else
@@ -71,7 +71,7 @@ if [ ! -z "$1" ] ; then
     echo "==========================================================================="
     echo "$POV_FILE: $OPTIONS"
     echo "==========================================================================="
-    
+
     povray +L$SCENE_DIR +L$OUTPUT_DIR -i$POV_FILE -o$OUTPUT_DIR/ $OPTIONS $POV_OPTIONS -p
     #echo "povray +L$SCENE_DIR +L$OUTPUT_DIR -i$POV_FILE -o$OUTPUT_DIR/ $OPTIONS $POV_OPTIONS -p"
 

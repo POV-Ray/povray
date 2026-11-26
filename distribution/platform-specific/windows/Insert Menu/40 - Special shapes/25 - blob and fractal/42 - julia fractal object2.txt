@@ -11,4 +11,4 @@ julia_fractal{ <-0.083,0.0,-0.83,-0.025>
    scale<1,1,1>
    rotate<0,0,0>
    translate<0,0,0>
-} // end of julia_fractal ---------- 
+} // end of julia_fractal ----------

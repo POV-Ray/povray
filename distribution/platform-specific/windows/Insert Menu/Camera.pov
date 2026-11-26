@@ -7,7 +7,7 @@
 
 // +fs4 +w120 +h60 +a0.2 +r2 +am2 +j0.5
 #version 3.7;
-global_settings{ assumed_gamma 1.0 } 
+global_settings{ assumed_gamma 1.0 }
 
 
 /*
@@ -97,7 +97,7 @@ camera
                                // which way is +right <X Y Z> and aspect ratio
   up        y                  // which way is +up <X Y Z>
  #else
-   right  x*image_width/image_height 
+   right  x*image_width/image_height
   // right x*6 // for orthographic only
   //up y*3
  #end

@@ -31,7 +31,7 @@
 //    - photons (objects on the table)
 //
 // ***********************************************************************
-// 
+//
 // Command line options:
 //
 // -w240 -h320
@@ -65,7 +65,7 @@
 global_settings{
   max_trace_level 15
   assumed_gamma 1
-    
+
   #if (Radiosity=on)
     radiosity{
       pretrace_start 0.08
@@ -93,8 +93,8 @@ global_settings{
 }
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-// This scene uses a non-standard camera set-up. 
-// (See CAMERA in the included documentation for details.) 
+// This scene uses a non-standard camera set-up.
+// (See CAMERA in the included documentation for details.)
 // If you are new to POV-Ray, you might want to try a different demo scene.
 
 camera {

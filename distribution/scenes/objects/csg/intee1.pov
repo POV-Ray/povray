@@ -12,12 +12,12 @@
 //
 // -w320 -h240
 // -w800 -h600 +a0.3
-#version  3.7; 
+#version  3.7;
 global_settings { assumed_gamma 1.5 }
 
 #include "colors.inc"           // Standard colors library
 #include "shapes.inc"           // Commonly used object shapes
-#include "textures.inc"         // LOTS of neat textures.  
+#include "textures.inc"         // LOTS of neat textures.
 
 camera {
    location <0.0, 10, -26>

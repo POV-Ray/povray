@@ -5,7 +5,7 @@
 /* Persistence Of Vision Raytracer sample file.
 
    Demo for the Mesh Camera macros for use with the new mesh_camera:
-  
+
    Shows how to use the macros to create a pure orthographic mesh camera
 
    --
@@ -44,7 +44,7 @@
 // create a mesh simulating an orthographic camera, with optional load/save mechanism
 #if (meshcam_file>0)
   // get the file name
-  #declare Prefix="meshcam-ortho_"; 
+  #declare Prefix="meshcam-ortho_";
   #declare mesh_file=concat(concat(concat(concat(Prefix,str(image_width,0,0)),"x"),str(image_height,0,0)),".inc");
 #else
   // ..wich should be empty to turn the mesh file off
@@ -61,7 +61,7 @@
 
 // create the camera with the generated or loaded mesh
 camera{
-  mesh_camera{ 1 0  // 1 ray per pixel, distribution 0 
+  mesh_camera{ 1 0  // 1 ray per pixel, distribution 0
     mesh{camera_mesh
       meshcam_placement(c_location,c_look_at)
     }
