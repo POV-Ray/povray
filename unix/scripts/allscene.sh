@@ -13,18 +13,18 @@
 #   allscene.sh [log] [all] [-d scene_directory] [-o output_directory]
 #
 # output_directory: if specified all images are written to this directory
-#                   if not specified the images are written into the scene 
-#                   file directories, if these are not writable they are 
+#                   if not specified the images are written into the scene
+#                   file directories, if these are not writable they are
 #                   written in the current directory.
-# log:              log all text output of POV-Ray to a file (log.txt) 
-# all:              also render scenes that don't contain any suggested 
+# log:              log all text output of POV-Ray to a file (log.txt)
+# all:              also render scenes that don't contain any suggested
 #                   options for running
-# scene_directory:  if specified the sample scene in this directory are rendered, 
-#                   otherwise the scene directory is determined form the main 
+# scene_directory:  if specified the sample scene in this directory are rendered,
+#                   otherwise the scene directory is determined form the main
 #                   povray ini file (usually /usr/local/share/povray-X.Y/scenes,
 #                   where X.Y represents the first two fields of the version
 #                   number, e.g. for v3.8.1 this would be 3.8).
-# html_file:        if specified a HTML file with links to the rendered 
+# html_file:        if specified a HTML file with links to the rendered
 #                   images is written.  If Imagemagick 'convert' is installed
 #                   thumbnails for the images are generated as well.
 # for the format of the render options in the scene file see render_scene.sh
@@ -70,7 +70,7 @@ esac
 test "$1" = "-d" && SCENE_DIR="$2"
 test "$2" = "-d" && SCENE_DIR="$3"
 test "$3" = "-d" && SCENE_DIR="$4"
-test "$4" = "-d" && SCENE_DIR="$5" 
+test "$4" = "-d" && SCENE_DIR="$5"
 test "$5" = "-d" && SCENE_DIR="$6"
 
 if [ -z "$SCENE_DIR" ] ; then
@@ -105,7 +105,7 @@ fi
 test "$1" = "-o" && OUTPUT_DIR="$2"
 test "$2" = "-o" && OUTPUT_DIR="$3"
 test "$3" = "-o" && OUTPUT_DIR="$4"
-test "$4" = "-o" && OUTPUT_DIR="$5" 
+test "$4" = "-o" && OUTPUT_DIR="$5"
 test "$5" = "-o" && OUTPUT_DIR="$6"
 
 if [ -z "$OUTPUT_DIR" ] ; then

@@ -1,6 +1,6 @@
-intersection { 
+intersection {
  box {<-2,0,-2.5>,<2.5, 4.00,2.5>}
- object{ Paraboloid_Y}  
+ object{ Paraboloid_Y}
          texture{ pigment{ color rgb<1, 0.5, 0.7> }
                   finish { phong 1}
                 }

@@ -9,7 +9,7 @@
 // -w800 -h600 +a0.3
 #version 3.7;
 global_settings { assumed_gamma 1.0 }
- 
+
 
 #include "prism3.inc"
 

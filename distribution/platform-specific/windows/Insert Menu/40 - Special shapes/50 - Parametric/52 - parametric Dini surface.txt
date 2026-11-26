@@ -1,5 +1,5 @@
-// --------------------------------------- parametric surface ------------- 
-#declare a = 1;                     // Dini-Surface 
+// --------------------------------------- parametric surface -------------
+#declare a = 1;                     // Dini-Surface
 #declare b = 0.2;
 parametric{
   function{ a*cos(u)*sin(v) }          //x(u,v)
@@ -14,4 +14,4 @@ parametric{
     pigment{ color rgb<1,1,1>*1.2}
     finish { phong 0.5 }}
   scale  0.5
-} // end of parametric ---------------------------------------------------- 
+} // end of parametric ----------------------------------------------------

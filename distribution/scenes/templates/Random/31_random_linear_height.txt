@@ -1,11 +1,11 @@
-#declare Random_1 = seed (27053); // Use: "rand(Random_1)" 
+#declare Random_1 = seed (27053); // Use: "rand(Random_1)"
 
 union{
  #local Nr = -8;   // start
  #local EndNr = 8; // end
- #while (Nr< EndNr+1) 
+ #while (Nr< EndNr+1)
 
- sphere{ <0,0,0>,0.125 
+ sphere{ <0,0,0>,0.125
 	 texture{ pigment{ color rgb<1,0.65,0>}
                   finish { diffuse 0.9 phong 1}
                 } // end of texture
@@ -16,8 +16,8 @@ union{
 
 
  #local Nr = Nr + 1;  // next Nr
- #end // --------------- end of loop 
+ #end // --------------- end of loop
 
-rotate<0,0,0> 
+rotate<0,0,0>
 translate<0,0,0>
 } // end of union

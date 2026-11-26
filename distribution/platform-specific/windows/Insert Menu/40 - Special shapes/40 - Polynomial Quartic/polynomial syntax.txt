@@ -30,7 +30,7 @@ poly {
    0,          0,          0,          0,
 // yz,         y,          z^5,        z^4,
    0,          0,          0,          0,
-// z^3,        z^2,        z,          C           
+// z^3,        z^2,        z,          C
    0,          0,          0,          0
   >
   sturm // optional, slower but reduces speckles

@@ -11,7 +11,7 @@
 global_settings { assumed_gamma 1 }
 
 #include "colors.inc"
-#include "shapes.inc"                
+#include "shapes.inc"
 
 camera {
   location <0, 15, -50>

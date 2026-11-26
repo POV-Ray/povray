@@ -7,7 +7,7 @@
 //------------------------------------------------------------------------
 #version 3.7;
 global_settings{ assumed_gamma 1.0 }
-#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
 //------------------------------------------------------------------------
 #include "colors.inc"
 #include "textures.inc"
@@ -50,16 +50,16 @@ sky_sphere{ pigment{ gradient <0,1,0>
                                 [1.0 color rgb<1,1,1>         ]//White
                               }
                      scale 2 }
-           } // end of sky_sphere 
+           } // end of sky_sphere
 //------------------------------------------------------------------------
 
 // ground -----------------------------------------------------------------
 //---------------------------------<<< settings of squared plane dimensions
 #declare RasterScale = 0.3;
-#declare RasterHalfLine  = 0.035;  
-#declare RasterHalfLineZ = 0.035; 
+#declare RasterHalfLine  = 0.035;
+#declare RasterHalfLineZ = 0.035;
 //-------------------------------------------------------------------------
-#macro Raster(RScale, HLine) 
+#macro Raster(RScale, HLine)
        pigment{ gradient x scale RScale
                 color_map{[0.000   color rgbt<1,1,1,0>*0.3]
                           [0+HLine color rgbt<1,1,1,0>*0.3]
@@ -67,17 +67,17 @@ sky_sphere{ pigment{ gradient <0,1,0>
                           [1-HLine color rgbt<1,1,1,1>]
                           [1-HLine color rgbt<1,1,1,0>*0.3]
                           [1.000   color rgbt<1,1,1,0>*0.3]} }
- #end// of Raster(RScale, HLine)-macro    
+ #end// of Raster(RScale, HLine)-macro
 //-------------------------------------------------------------------------
-    
- 
+
+
 box { <-2,-0.1,-1.5>,<1.5,0,2>     // plane with layered textures
         texture { pigment{color White*1.1}}
         texture { Raster(RasterScale,RasterHalfLine ) rotate<0,0,0> }
         texture { Raster(RasterScale,RasterHalfLineZ) rotate<0,90,0>}
         rotate<0,0,0>
       }
- 
+
 //------------------------------------------------ end of squared plane XZ
 
 //--------------------------------------------------------------------------
@@ -88,47 +88,47 @@ box { <-2,-0.1,-1.5>,<1.5,0,2>     // plane with layered textures
 //------------------------------------------------------------------- optional textures
 #declare Socket_Tex_1 =  // sphere
 //texture{ pigment{color rgb<1,0,0>}
-texture{ Chrome_Metal  
+texture{ Chrome_Metal
          normal { bumps 0.85 scale 0.01 }
-         finish { phong 0.5 } 
+         finish { phong 0.5 }
        }
-#declare Socket_Tex_2 =  // box 
+#declare Socket_Tex_2 =  // box
 //texture{ pigment{color rgb<1,0.65,0>}
 texture{ pigment{color rgb<1,1,1>*0.7}
-         finish { phong 0.5 } 
+         finish { phong 0.5 }
        }
 #declare Socket_Tex_3 =  // cylinders
 // texture{ pigment{color rgb<0.5,1,0> }
 texture{ Chrome_Metal
-         finish { phong 1 } 
+         finish { phong 1 }
        }
 //-------------------------------------------------------------------------------------//
 #include "Socket.inc"
 //-------------------------------------------------------------------------------------//
-object{ Socket 
+object{ Socket
         scale <1,1,1>*1
         rotate<0,0,0>
         translate<0.50,0.50, 0.00>
       } //------------------------
 
-// re-declared textures 
+// re-declared textures
 #declare Socket_Tex_1 =  // sphere
 texture{ pigment{color rgb<1,0,0>}
-         finish { phong 0.5 } 
+         finish { phong 0.5 }
        }
-#declare Socket_Tex_2 =  // box 
+#declare Socket_Tex_2 =  // box
 texture{ pigment{color rgb<1,0.65,0>}
-         finish { phong 0.5 } 
+         finish { phong 0.5 }
        }
 #declare Socket_Tex_3 =  // cylinders
 texture{ pigment{color rgb<0.5,1,0> }
-         finish { phong 1 } 
+         finish { phong 1 }
        }
 // loading object definition again ----------------------------------------------------//
 #include "Socket.inc"
 //-------------------------------------------------------------------------------------//
 
-object{ Socket 
+object{ Socket
         scale <1,1,1>*1
         rotate<0,0,0>
         translate<-1.00,0.50, 0.00>

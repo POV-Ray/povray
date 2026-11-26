@@ -1,7 +1,7 @@
 // Insert menu illustration scene "Loops_sweep_spline.pov"
 // Author Friedrich A. Lohmueller, June-2012
 #version 3.7;
-global_settings{ assumed_gamma 1.0 } 
+global_settings{ assumed_gamma 1.0 }
 
 #default{ finish{ ambient 0.1 diffuse 0.9 }}
 #include "shapes.inc"
@@ -18,7 +18,7 @@ global_settings{ assumed_gamma 1.0 }
 
  //#declare Typ = 107; // for tests
 
-#switch (Typ)  //--------------------------------------------------------- 
+#switch (Typ)  //---------------------------------------------------------
 // #while loops and #for loops/
 #case(100)  #declare Txt_Path="00 - while loop linear.txt" #break
 #case(102)  #declare Txt_Path="02 - while loop quadratic 2D nested.txt" #break
@@ -48,8 +48,8 @@ global_settings{ assumed_gamma 1.0 }
 #case(255)  #declare Txt_Path="55 - spline closed natural_spline.txt" #break
 
 
-#end // of '#switch (Typ)' ----------------------------------------------- 
-//------------------------------------------------------------------------ 
+#end // of '#switch (Typ)' -----------------------------------------------
+//------------------------------------------------------------------------
 //------------------------------ the Axes --------------------------------
 #macro Axis_( AxisLen, Dark_Texture,Light_Texture)
  union{
@@ -61,8 +61,8 @@ global_settings{ assumed_gamma 1.0 }
     cone{<0,AxisLen,0>,0.2,<0,AxisLen+0.7,0>,0
           texture{Dark_Texture}
          }
-     } 
-#end // of macro 
+     }
+#end // of macro
 //------------------------------------------------------------------------
 #macro AxisXYZ_( AxisLenX, AxisLenY, AxisLenZ, Tex_Dark, Tex_Light,
                  Rot_X,Rot_Y, ScaleX,ScaleY,ScaleZ)
@@ -258,7 +258,7 @@ light_source{<    0, 1.00,   -3> color rgb<0.9,0.9,1>*0.1 shadowless}  // flash
 #include concat(In_Path,Txt_Path)
 #end
 
-#if (Typ=114) //  
+#if (Typ=114) //
 object { Sand_Ground  }
 Small_Clouds ()
 camera{ angle 60 location < 2.00, 2.00,-2.00> look_at< 0.30, 0.95,  0.00> right x*image_width/image_height}
@@ -266,7 +266,7 @@ light_source{<-1000, 1800,-2500> color rgb<1,1,1>*0.9}     // sun light
 light_source{< 2.00, 2.00,-2.00> color rgb<0.9,0.9,1>*0.1}  // flash light
 #include concat(In_Path,Txt_Path)
 #end
- 
+
 
 // #for loops
 #if (Typ=120) // 20 - for_loop linear.txt

@@ -6,10 +6,9 @@ object{ Facetted_Sphere( 6, 16 )// ( Quarter_Meridian_Segments, Equatorial_Segme
                  //normal { bumps 0.5 scale 0.0125}
                  finish { phong 1 reflection{ 0.15 } }
                } // end of texture
-         
-        scale <1,1,1>*1 
+
+        scale <1,1,1>*1
         rotate <0,0,0>
         translate< 0, 0, 0>
-      } // end of object  //-------------------------------------------------------- 
+      } // end of object  //--------------------------------------------------------
 //----------------------------------------------------------------------------------
-  

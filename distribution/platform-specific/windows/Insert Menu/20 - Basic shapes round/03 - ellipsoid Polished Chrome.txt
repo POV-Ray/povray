@@ -1,4 +1,4 @@
-sphere{ <0,0,0>, 0.5 
+sphere{ <0,0,0>, 0.5
 
         texture { Polished_Chrome
                   //pigment{color rgb< 1, 0.6, 0> }
@@ -6,5 +6,5 @@ sphere{ <0,0,0>, 0.5
                   finish { phong 1 phong_size 50}
                 } // end of texture
 
-        scale<2.5,1,1>  rotate<0,0,0>  translate<0,1,0>  
-      } // end of sphere ----------------------------------- 
+        scale<2.5,1,1>  rotate<0,0,0>  translate<0,1,0>
+      } // end of sphere -----------------------------------

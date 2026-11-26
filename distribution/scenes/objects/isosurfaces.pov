@@ -31,7 +31,7 @@
 //*******************************************
 #version 3.7;
 global_settings { assumed_gamma 1.0 }
-#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
 
 #include "colors.inc"
 #include "functions.inc"
@@ -50,7 +50,7 @@ camera {
 light_source {CamLoc color White*0.35}
 light_source {<-50, 150,-75> color White}
 
-background { color rgb<1,1,1>*0.35 } 
+background { color rgb<1,1,1>*0.35 }
 
 
 /*
@@ -99,7 +99,7 @@ isosurface {
 	function {sqrt(x*x + z*z) - 1}
 	threshold 0
 	contained_by {box {<-1,-1,-1>, < 1, 1, 1>}}
-	texture {              
+	texture {
 		pigment {color rgb<0.8,0.3,0>}
 		finish {IsoFinish}
 	}
@@ -247,7 +247,7 @@ isosurface {
 	scale 1/vlength(1)
 	rotate < 36,-24, 0>
 	translate < 3,-2, 0>
-} 
+}
 
 //*******************************************
 

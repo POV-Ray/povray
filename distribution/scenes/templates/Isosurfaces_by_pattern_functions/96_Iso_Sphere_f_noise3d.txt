@@ -1,7 +1,7 @@
 isosurface { //------------------------------------------------
 
   function{
-   f_sphere(x, y, z, 1.8) - (-f_snoise3d(x*1.5, y*1, z*1)*2.25) 
+   f_sphere(x, y, z, 1.8) - (-f_snoise3d(x*1.5, y*1, z*1)*2.25)
 
   }
   contained_by { sphere {<0,0,0>, -3.3 } }

@@ -34,7 +34,7 @@ global_settings {
 
 camera {
 	location CamPos
-	up y 
+	up y
         right     x*image_width/image_height // keep propotions with any aspect ratio
 	look_at < 0, 7.5, 0>
 	angle 90

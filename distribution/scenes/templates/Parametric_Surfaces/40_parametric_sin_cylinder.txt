@@ -1,4 +1,4 @@
-// --------------------------------------- parametric surface -------------- 
+// --------------------------------------- parametric surface --------------
 parametric{
   function{ sin(u)+0.25*sin(v*2*pi)}// x(u,v)
   function{ cos(u) }   // y(u,v)
@@ -12,4 +12,4 @@ parametric{
     pigment{ color rgb<1,1,1>*.8}
     finish { phong 0.1 }}
   scale 0.5
-} // end of parametric ----------------------------------------------------- 
+} // end of parametric -----------------------------------------------------

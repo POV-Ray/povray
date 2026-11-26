@@ -19,7 +19,7 @@ camera {location <50,42,0> direction z*1 look_at <0,2,0>}
 
 //lights
 light_source {<0,15,8+3> White*1.5
-              area_light x*1.5,z*1.5,4,4 jitter adaptive 2 
+              area_light x*1.5,z*1.5,4,4 jitter adaptive 2
               circular
               orient //that's here !
               }

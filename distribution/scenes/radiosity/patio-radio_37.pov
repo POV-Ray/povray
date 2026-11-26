@@ -89,8 +89,8 @@ sphere {                  // --- Sky ---
 
 #include "colors.inc"
 
-camera { location <500,150,0> 
-         angle 65 // direction z 
+camera { location <500,150,0>
+         angle 65 // direction z
          right     x*image_width/image_height
          look_at <0,150,320>
        }

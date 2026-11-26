@@ -13,16 +13,16 @@
 #   allanim.sh [log] [-d scene_directory] [-o output_directory] [-h html_file]
 #
 # output_directory: if specified all images are written to this directory
-#                   if not specified the images are written into the scene 
-#                   file directories, if these are not writable they are 
+#                   if not specified the images are written into the scene
+#                   file directories, if these are not writable they are
 #                   written in the current directory.
 # log:              log all text output of POV-Ray to a file (log.txt)
-# scene_directory:  if specified the sample scene in this directory are rendered, 
-#                   otherwise the scene directory is determined form the main 
+# scene_directory:  if specified the sample scene in this directory are rendered,
+#                   otherwise the scene directory is determined form the main
 #                   povray ini file (usually /usr/local/share/povray-X.Y/scenes,
 #                   where X.Y represents the first two fields of the version
 #                   number, e.g. for v3.8.1 this would be 3.8).
-# html_file:        if specified a HTML file with links to the rendered 
+# html_file:        if specified a HTML file with links to the rendered
 #                   animations is written.
 # ==============================================================================
 

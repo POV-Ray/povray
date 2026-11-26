@@ -26,7 +26,7 @@ camera {
         look_at <-1,10,-2>
         }
 
-// Don't forget to render this with the image ratio 2:1 (width = height*2).  
+// Don't forget to render this with the image ratio 2:1 (width = height*2).
 // Command line  +w200 +h100  or -w800 -h400 +a0.3
 // Then, you can use the output image in a VR panoramic viewer !
 

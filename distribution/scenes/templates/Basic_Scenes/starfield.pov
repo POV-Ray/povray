@@ -4,7 +4,7 @@
 //--------------------------------------------------------------------------
 #version 3.7;
 global_settings{ assumed_gamma 1.0 }
-#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
 //--------------------------------------------------------------------------
 #include "colors.inc"
 #include "textures.inc"
@@ -52,7 +52,7 @@ sphere { <0,0,0>, 1
 
 // ground ------------------------------------------------------------------
 /*
-plane{ <0,1,0>, 0 
+plane{ <0,1,0>, 0
        texture{ pigment{ color rgb <0.7,0.5,0.3>}
               //normal { bumps 0.75 scale 0.025}
                 finish { phong 0.1}

@@ -53,7 +53,7 @@ plane {
 // Here are the basic textures.
 
 // Plain yellowish sand for the beaches.
-#declare Sand_Texture =                                                       
+#declare Sand_Texture =
 texture {
    pigment {color <0.9,0.75,0.3>*0.9}
 }
@@ -61,8 +61,8 @@ texture {
 // A green texture for grass, plants, trees, etc.
 #declare Vege_Texture =
 texture {
-   pigment{ color <0.2,0.5,0.1>*0.5} 
-   normal { bumps 0.5 scale 0.005 } 
+   pigment{ color <0.2,0.5,0.1>*0.5}
+   normal { bumps 0.5 scale 0.005 }
 }
 
 // A brown texture for the soil, where the plants can't grow.
@@ -98,7 +98,7 @@ texture {
    slope {
       -y*3, 0, 0.5
       altitude y, 0.005, 0.400
-   } 
+   }
    texture_map {
       [0.45, Vege_Texture]
       [0.55, Soil_Texture]
@@ -137,16 +137,16 @@ height_field {
       texture_map { // Notice the values in this texture_map.
                     // Then compare them to the altitude values
                     // in the slope pattern textures above.
-         
+
          [0.000, Sand_Texture] // At the foot of the mountain
          [0.005, Sand_Texture] // we want some plain sand.
-         
+
          [0.005, Vege2Rock_Texture] // Then some vegetation,
          [0.400, Vege2Rock_Texture] // soil and rock.
-         
+
          [0.400, Rock2Snow_Texture] // Then from rock to snow
          [1.000, Rock2Snow_Texture] // at the top.
-         
+
       }
    }
 }

@@ -19,7 +19,7 @@ camera {
    look_at   <0, 0, 0>
 }
 
-background { color rgb<1,1,1>*0.02 } 
+background { color rgb<1,1,1>*0.02 }
 
 light_source { <-15, 30, -25> color red 1 green 1 blue 1 }
 light_source { < 15, 30, -25> color red 1 green 1 blue 1 }

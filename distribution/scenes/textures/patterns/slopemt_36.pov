@@ -97,7 +97,7 @@ texture {
    slope {
       -y*3, 0, 0.5
       altitude y, 0.005, 0.400
-   } 
+   }
    texture_map {
       [0.45, Vege_Texture]
       [0.55, Soil_Texture]
@@ -136,16 +136,16 @@ height_field {
       texture_map { // Notice the values in this texture_map.
                     // Then compare them to the altitude values
                     // in the slope pattern textures above.
-         
+
          [0.000, Sand_Texture] // At the foot of the mountain
          [0.005, Sand_Texture] // we want some plain sand.
-         
+
          [0.005, Vege2Rock_Texture] // Then some vegetation,
          [0.400, Vege2Rock_Texture] // soil and rock.
-         
+
          [0.400, Rock2Snow_Texture] // Then from rock to snow
          [1.000, Rock2Snow_Texture] // at the top.
-         
+
       }
    }
 }

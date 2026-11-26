@@ -17,7 +17,7 @@
 #include "stars.inc"      // Some star fields
 #include "strings.inc"    // macros for generating and manipulating text strings
 #include "sunpos.inc"     // macro for sun position on a given date, time, and location on earth
-#include "transforms.inc" // transformation macros 
+#include "transforms.inc" // transformation macros
 
 // --- textures ---
 #include "finish.inc"     // Some basic finishes

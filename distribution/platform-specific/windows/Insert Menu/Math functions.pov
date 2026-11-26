@@ -2,13 +2,13 @@
 // Author Friedrich A. Lohmueller, Feb-2013
 #version 3.7;
 
-#declare In_Path  = "80 - Math functions/" 
+#declare In_Path  = "80 - Math functions/"
 
   //#declare Typ = 1; // for testing
 
-// Basic Scenes 
+// Basic Scenes
 #switch (Typ)  //-----------------------------------------------------------------------------
-#case(1)   #declare Txt_Path="10 - parabola.txt"  #break 
+#case(1)   #declare Txt_Path="10 - parabola.txt"  #break
 #case(2)   #declare Txt_Path="20 - hyperbola.txt"  #break
 #case(3)   #declare Txt_Path="50 - function 0 derived.txt"  #break
 #case(4)   #declare Txt_Path="51 - function 1 derived.txt"  #break

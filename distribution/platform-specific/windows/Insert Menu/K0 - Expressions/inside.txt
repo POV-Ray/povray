@@ -1,4 +1,4 @@
-// inside function tests if a certain point  
+// inside function tests if a certain point
 // is inside a specified object
 
 #declare Obj = sphere { 0, 1 }

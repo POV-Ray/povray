@@ -11,7 +11,7 @@
 // Date: 2001/07/28
 // Auth: Ingo Janssen
 #version 3.6;
-global_settings { 
+global_settings {
   assumed_gamma 1.0
 }
 
@@ -68,24 +68,24 @@ global_settings {
      look_at   <0,0, 0.0>
      angle 35
    }
-   
+
    light_source {<-500,300,-500> rgb 1}
    light_source {<500,500,500> rgb 0.7 shadowless}
-   
+
    union {
       plane {y, 0}
       sphere{
-         0,1 
+         0,1
          scale <0.6,0.3,0.6>
          translate<0.55,0,0.5>
       }
       pigment{pigmentArr[frame_number-1]}
    }
-   
+
    box {
       -1,1
       scale 0.5
       translate <-0.65,-0.4,0.5>
       pigment{pigmentArr[frame_number-1] rotate<90,0,0>}
-   }                             
+   }
 #end

@@ -25,10 +25,10 @@ julia_fractal {
 background { color rgb <1,1,1> }
 
 light_source { <4,3.99,10> color rgb <.9,.95,.9> }
- 
+
 //-------------------------------------------------------------------------
-// This scene uses a non-standard camera set-up. 
-// (See CAMERA in the included documentation for details.) 
+// This scene uses a non-standard camera set-up.
+// (See CAMERA in the included documentation for details.)
 // If you are new to POV-Ray, you might want to try a different demo scene.
 //-------------------------------------------------------------------------
 camera { location <0,3.0,2>

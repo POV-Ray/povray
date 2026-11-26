@@ -78,9 +78,9 @@ torus {7 2
         }
 
 //some usual scene elements
-camera { location  <10,20,10> 
+camera { location  <10,20,10>
          right     x*image_width/image_height
-         look_at   <0,2,4> 
+         look_at   <0,2,4>
          angle     50
        }
 plane {y,0 pigment {rgb <.2,.4,.3>}}

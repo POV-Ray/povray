@@ -21,8 +21,8 @@ global_settings {
 
 camera { location <0.0, 0.0, -2.5>
          right     x*image_width/image_height
-         look_at 0 
-         angle 30 
+         look_at 0
+         angle 30
        }
 
 #declare Spl_Pat = function {

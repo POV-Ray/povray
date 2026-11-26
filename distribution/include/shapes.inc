@@ -165,34 +165,34 @@ Justification: One of the constants Align_Left, Align_Right, or Align_Center
         Angle: The point on the circle from which rendering will begin.  The
                +x direction is 0 and the +y direction is 90 (i.e. the angle
                increases anti-clockwise. */
- 
+
 #macro Circle_Text(F, T, S, Sp, Th, R, I, J, A) //----------------------------------------
-object{ Circle_Text_Valigned( F, // Font, i.e.: "arial.ttf", 
+object{ Circle_Text_Valigned( F, // Font, i.e.: "arial.ttf",
                               T, // Text, i.e.: "POVRay",
-                              S, // LetterSize,    i.e.:  0.75, 
+                              S, // LetterSize,    i.e.:  0.75,
                               Sp,// LetterSpacing, i.e.: 0.025,
-                              Th,// Deepth,        i.e.: 15.00, 
+                              Th,// Deepth,        i.e.: 15.00,
                               R, // Radius,        i.e.: 1.25
                               I, // Inverted,      0 or 1
-                              J, // Justification: Align_Left, Align_Right, or Align_Center  
+                              J, // Justification: Align_Left, Align_Right, or Align_Center
                               A, // Circle angle
-                              0  // Valign:  Rotates for vertical objects. 
+                              0  // Valign:  Rotates for vertical objects.
                                  //   -90 = right side up, 90 = upside-down, 0 = horzontal.
-                            ) }  //-------------------------------------------------------- 
+                            ) }  //--------------------------------------------------------
 #end //-------------------------------------------------------------- end macro Circle_Text
 
-// Cicle_Text macro expanded by rotating the letters: 
-#macro Circle_Text_Valigned( F, // Font, i.e.: "arial.ttf", 
+// Cicle_Text macro expanded by rotating the letters:
+#macro Circle_Text_Valigned( F, // Font, i.e.: "arial.ttf",
                              T, // Text, i.e.: "POVRay",
-                             S, // LetterSize,    i.e.:  0.75, 
+                             S, // LetterSize,    i.e.:  0.75,
                              Sp,// LetterSpacing, i.e.: 0.025,
-                             Th,// Deepth,        i.e.: 15.00, 
+                             Th,// Deepth,        i.e.: 15.00,
                              R, // Radius,        i.e.: 1.25
                              I, // Inverted,      0 or 1
-                             J, // Justification: Align_Left, Align_Right, or Align_Center  
+                             J, // Justification: Align_Left, Align_Right, or Align_Center
                              A, // Circle angle
                              Valign// Valign:  Rotates the letters. -90 = right side up, 90 = upside-down, 0 = horzontal.
-                           ) //----------------------------------------------------------------------------------------------  
+                           ) //----------------------------------------------------------------------------------------------
    #local FW = Text_Width(F, T, S, Sp);
    #local TO = text {ttf F T 1 0 scale<S, S, 1>}
    #local TH = max_extent(TO).y;

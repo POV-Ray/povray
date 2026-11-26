@@ -5,7 +5,7 @@
 //--------------------------------------------------------------------------
 #version 3.7;
 global_settings{ assumed_gamma 1.0 }
-#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
 //--------------------------------------------------------------------------
 #include "colors.inc"
 #include "textures.inc"
@@ -23,9 +23,9 @@ sky_sphere{ pigment { gradient <0,1,0>
                       color_map { [0.00 rgb <1.0,1.0,1.0>]
                                   [0.30 rgb <1,1,1.0>]
                                   [0.70 rgb <1,1,1.0>]
-                                  [1.00 rgb <1.0,1.0,1.0>] 
-                                } 
-                      scale 2         
+                                  [1.00 rgb <1.0,1.0,1.0>]
+                                }
+                      scale 2
                     } // end of pigment
           } //end of skysphere
 // fog ---------------------------------------------------------------------
@@ -38,11 +38,11 @@ fog{ fog_type   2
 //--------------------------------------------------------------------------
 //---------------------------- objects in scene ----------------------------
 //--------------------------------------------------------------------------
-sphere{ <0,0,0>, 0.25 
+sphere{ <0,0,0>, 0.25
         texture { pigment{ color Red } // rgb< 1, 0.0, 0.0>}
                   finish { phong 1}
-                } // end of texture 
-        scale<1,1,1> 
+                } // end of texture
+        scale<1,1,1>
         translate<1,0.75,0>
-        rotate<0,360*(clock+0.00),0>    
-      } // end of sphere ----------------------------------- 
+        rotate<0,360*(clock+0.00),0>
+      } // end of sphere -----------------------------------

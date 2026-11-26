@@ -1,6 +1,6 @@
 object{ // Round_Box(A, B, WireRadius, UseMerge)
-        Round_Box(<-1,0,-1>,<1,1,1>, 0.25   , 0)  
-         
+        Round_Box(<-1,0,-1>,<1,1,1>, 0.25   , 0)
+
         texture{ pigment{ color rgb<0.7,0.25,0.5>}
                //normal { radial sine_wave frequency 30 scale 0.25 }
                  finish { phong 1 }

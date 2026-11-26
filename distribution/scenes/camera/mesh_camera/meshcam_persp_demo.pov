@@ -5,9 +5,9 @@
 /* Persistence Of Vision Raytracer sample file.
 
    Demo for the Mesh Camera macros for use with the new mesh_camera:
-  
+
    Shows how to use the macros to create a custom mesh camera and apply some effects, like antialiasing
-   and vignetting, or to save it to a file for reuse. 
+   and vignetting, or to save it to a file for reuse.
 
    --
    Jaime Vives Piqueres, Jan. 2011  <jaime@ignorancia.org> */
@@ -25,9 +25,9 @@
 #declare meshcam_file=1;      // 0=off, 1=save mesh to file, 2=load mesh from file
 #declare aa_samples=5;        // extra rays per pixel (one mesh copy per ray) (use 0 to turn aa off)
 #declare aa_aperture=.02;     // max displacement along up and right vector
-#declare aa_rand=seed(78);    // random seed for the fake aa 
+#declare aa_rand=seed(78);    // random seed for the fake aa
 #declare use_vignetting=1;    // vignetting effect: 0=off, 1=on, fixed amount
-#declare use_distortion=.15;    // lens distortion: 0=off, >0=barrel, <0=pincushion 
+#declare use_distortion=.15;    // lens distortion: 0=off, >0=barrel, <0=pincushion
 
 // common globals for all the demos
 #include "demo_globals.inc"
@@ -46,17 +46,17 @@
 #declare c_location=<4,2,-3>;   // location
 #declare c_look_at=<0,1.1,1>;  // look at
 #declare c_angle=54;         // angle
-// calculate up and right vector transforms for fake antialiasing 
+// calculate up and right vector transforms for fake antialiasing
 #declare f_up=vtransform(y,Reorient_Trans(z,c_look_at-c_location));
 #declare f_right=vtransform(x,Reorient_Trans(z,c_look_at-c_location));
 
 // create a mesh simulating a perspective camera, with or without distortion, with optional load/save mechanism
 #if (meshcam_file>0)
   // get the file name
-  #if (use_distortion=0) 
-    #declare Prefix="meshcam-pinhole_"; 
-  #else 
-    #declare Prefix="meshcam-lens_"; 
+  #if (use_distortion=0)
+    #declare Prefix="meshcam-pinhole_";
+  #else
+    #declare Prefix="meshcam-lens_";
   #end
   #declare mesh_file=concat(concat(concat(concat(concat(concat(Prefix,str(image_width,0,0)),"x"),str(image_height,0,0)),"-angle_"),str(c_angle,0,0)),".inc");
 #else
@@ -86,7 +86,7 @@ camera{
     #declare i_samples=0;
     #while (i_samples<aa_samples)
       #declare c_look_at_tmp=c_look_at+((-f_up*.5+f_up*rand(aa_rand))*aa_aperture*i_samples/aa_samples)
-                                      +((-f_right*.5+f_right*rand(aa_rand))*aa_aperture*i_samples/aa_samples);       
+                                      +((-f_right*.5+f_right*rand(aa_rand))*aa_aperture*i_samples/aa_samples);
       mesh{camera_mesh
         meshcam_placement(c_location,c_look_at_tmp)
       }
@@ -109,7 +109,7 @@ mesh{camera_mesh
       }
       rotate 90*x
       scale <image_width/image_height,1,1>
-    } 
+    }
     finish{emission 1}
   }
   hollow no_shadow

@@ -16,7 +16,7 @@
 #version 3.6;
 global_settings {assumed_gamma 1.0}
 
-camera { angle 35 // direction z*2 
+camera { angle 35 // direction z*2
          location <0,0,-10>
        }
 

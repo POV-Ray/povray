@@ -21,7 +21,7 @@ camera {
    look_at <0, 0, 0>
 }
 
-background{ color rgb<1,1,1>*0.1 } 
+background{ color rgb<1,1,1>*0.1 }
 
 
 // Light source

@@ -65,9 +65,9 @@ difference
   box {
     <0, -5, 0>, <5, 5, -5>
     rotate <0, 30, 0>
-    
+
     pigment {
-     color rgb<1,1,0.7>*1.2 
+     color rgb<1,1,0.7>*1.2
     }
     finish {
       ambient 0.1
@@ -75,6 +75,6 @@ difference
       phong 0.6
       phong_size 7
     }
-   
+
   }
 }

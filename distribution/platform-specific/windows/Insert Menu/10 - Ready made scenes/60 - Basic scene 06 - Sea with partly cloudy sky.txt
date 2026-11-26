@@ -4,7 +4,7 @@
 //--------------------------------------------------------------------------
 #version 3.7;
 global_settings{ assumed_gamma 1.0 }
-#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
 //--------------------------------------------------------------------------
 #include "colors.inc"
 #include "textures.inc"
@@ -40,20 +40,20 @@ camera{Camera_0}
 // sun ---------------------------------------------------------------------
 light_source{<1500,2500,-2500> color White}
 // sky ---------------------------------------------------------------------
-plane{<0,1,0>,1 hollow  
+plane{<0,1,0>,1 hollow
        texture{pigment{ bozo turbulence 0.85 scale 1.0 translate<5,0,0>
                         color_map { [0.5 rgb <0.20, 0.20, 1.0>]
                                     [0.6 rgb <1,1,1>]
                                     [1.0 rgb <0.5,0.5,0.5>]}
                        }
-               finish {ambient 1 diffuse 0} }      
+               finish {ambient 1 diffuse 0} }
        scale 10000}
 //------------------------------
 fog{distance 300000 color White}
 // sea ---------------------------------------------------------------------
-plane{<0,1,0>, 0 
+plane{<0,1,0>, 0
        texture{Polished_Chrome
-               normal { crackle 0.15 scale <0.35,0.25,0.25> turbulence 0.5 } 
+               normal { crackle 0.15 scale <0.35,0.25,0.25> turbulence 0.5 }
                finish { reflection 0.60 }}}
 
 //--------------------------------------------------------------------------

@@ -64,9 +64,9 @@ global_settings {
     finish { ambient 1 }
   }
 
-camera { 
-          right x*3 
-          location -z*4 
+camera {
+          right x*3
+          location -z*4
           look_at 0
         }
 object { P translate -x*4 }

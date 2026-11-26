@@ -1,7 +1,7 @@
-// --------------------------------------- parametric surface -------------- 
-parametric{ 
+// --------------------------------------- parametric surface --------------
+parametric{
   function{ u*v*sin(15*v) }
-  function{ v }   
+  function{ v }
   function{ u*v*cos(15*v) }
   <0,-1>,<1,1>
   contained_by {box {<-1,-1,-1>, < 1, 1, 1>}}
@@ -17,4 +17,4 @@ parametric{
   scale <0.5,0.5,0.5>
   rotate <0, 0, 0>
   translate < 0, 0.5, 0>
-} // end of parametric ----------------------------------------------------- 
+} // end of parametric -----------------------------------------------------

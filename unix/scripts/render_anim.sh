@@ -11,16 +11,16 @@
 #
 #   render_anim.sh [output_directory] scene_file
 #
-# output_directory: directory where to write the rendered images and animation 
+# output_directory: directory where to write the rendered images and animation
 # scene_file: scene to render
 #
 # if an ini file with the same basename as the scene_file exists this is
-# used for rendering the animation.  Otherwise the render options have to be 
-# given as a '//' comment within the first 50 lines of the file.  There must 
-# be a space after the '//' and the first option has to start with '-' or '+'.  
-# 
-# The scene is rendered into a set of png files and then compiled to an mpeg 
-# using ffmpeg (which has to be available in PATH).  The png files are deleted 
+# used for rendering the animation.  Otherwise the render options have to be
+# given as a '//' comment within the first 50 lines of the file.  There must
+# be a space after the '//' and the first option has to start with '-' or '+'.
+#
+# The scene is rendered into a set of png files and then compiled to an mpeg
+# using ffmpeg (which has to be available in PATH).  The png files are deleted
 # afterwards if the animation has been generated successfully.
 # ==============================================================================
 
@@ -51,7 +51,7 @@ if [ ! -z "$1" ] ; then
     echo "==========================================================================="
     echo "$INI_FILE"
     echo "==========================================================================="
-    
+
     povray +L$SCENE_DIR $INI_FILE -o$OUTPUT_DIR/ $POV_OPTIONS -p +fn
     #echo "povray +L$SCENE_DIR $INI_FILE -o$OUTPUT_DIR/ $POV_OPTIONS -p +fn"
 
@@ -68,7 +68,7 @@ if [ ! -z "$1" ] ; then
       echo "==========================================================================="
       echo "$POV_FILE: $OPTIONS"
       echo "==========================================================================="
-    
+
       povray +L$SCENE_DIR -i$POV_FILE -o$OUTPUT_DIR/ $OPTIONS $POV_OPTIONS -p +fn
       #echo "povray +L$SCENE_DIR -i$POV_FILE -o$OUTPUT_DIR/ $OPTIONS $POV_OPTIONS -p +fn"
 
@@ -76,7 +76,7 @@ if [ ! -z "$1" ] ; then
   fi
 
   PNG_NAME=`find $OUTPUT_DIR -path "$OUTPUT_DIR/$FILE_BASE*.png" | head -n 1`
-  PNG_FILE_BASE=`basename $PNG_NAME`  
+  PNG_FILE_BASE=`basename $PNG_NAME`
 
   OCNT=`echo "$FILE_BASE.png" | wc -c`
   CCNT=`echo "$PNG_FILE_BASE" | wc -c`
@@ -90,7 +90,7 @@ if [ ! -z "$1" ] ; then
         # -- basic mpeg --
         ffmpeg -i "$OUTPUT_DIR/$FILE_BASE%${NCNT}d.png" -y "$OUTPUT_DIR/$FILE_BASE.mpg"
         # -- divx avi --
-        #ffmpeg -i "$OUTPUT_DIR/$FILE_BASE%${NCNT}d.png" -y -b 400 -f avi -vcodec msmpeg4 "$OUTPUT_DIR/$FILE_BASE.avi" 
+        #ffmpeg -i "$OUTPUT_DIR/$FILE_BASE%${NCNT}d.png" -y -b 400 -f avi -vcodec msmpeg4 "$OUTPUT_DIR/$FILE_BASE.avi"
         echo "-------------- finished compiling animation -----------------"
         if [ -f "$OUTPUT_DIR/$FILE_BASE.mpg" ] ; then
           rm -f $OUTPUT_DIR/$FILE_BASE*.png

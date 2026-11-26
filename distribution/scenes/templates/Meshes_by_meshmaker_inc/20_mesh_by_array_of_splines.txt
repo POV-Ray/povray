@@ -33,7 +33,7 @@
     1.0, < 0, 2.5,-1.5> //last point
     4/3, < 0, 3,-1>
 }
-//--------------------------------------------- 
+//---------------------------------------------
 #declare An=array[7]{   // array of splines
    spline{A4},
    spline{A1}, //first point
@@ -47,35 +47,35 @@
 //----------------------------------------------------------------------------------------------------
 #include "meshmaker.inc"
 //----------------------------------------------------------------------------------------------------
-object { // MSM(SplineArray, SplRes, Interp_type, InterpRes, FileName) 
+object { // MSM(SplineArray, SplRes, Interp_type, InterpRes, FileName)
          // Generates a surface from an array of splines, (the white curves).
-         // From these input splines the points with the same t-values are 
+         // From these input splines the points with the same t-values are
          // connected by newly generated splines (red curves).
-         // From these the surface is build. 
+         // From these the surface is build.
     MSM(  An, // array of splines
-         100, // amount of triangles, in the direction of the input splines. 
-         "c", //  type of interpolation ( string!) 
-              // "C" or "c": cubic_spline; "L" or "l": linear_spline; 
-              // "N" or "n": natural_spline; "Q" or "q": quadratic_spline 
+         100, // amount of triangles, in the direction of the input splines.
+         "c", //  type of interpolation ( string!)
+              // "C" or "c": cubic_spline; "L" or "l": linear_spline;
+              // "N" or "n": natural_spline; "Q" or "q": quadratic_spline
          100, // amount of triangles, in the direction of the new splines.
-          ""  // FileName: ""= non, "NAME.obj'= Wavefront objectfile, "NAME.pcm" compressed mesh file 
+          ""  // FileName: ""= non, "NAME.obj'= Wavefront objectfile, "NAME.pcm" compressed mesh file
               // "NAME.arr" include file with arrays to build a mesh2 from,
-              //  others: includefile with a mesh2 object 
+              //  others: includefile with a mesh2 object
        ) // ------------------------------------------------------------------------------------------
    texture{          // outside texture
      uv_mapping
      pigment {checker color rgb <0.3,0.2,0.6> rgb <1,1,1> scale <0.035,0.1,1>}
      finish{specular 0.5}
-   } // 
+   } //
    interior_texture{   // inside texture
      uv_mapping
      pigment {checker color rgb <0.0,0,0.0> rgb <1,0.8,0.8> scale <0.035,0.1,1>}
      finish{specular 0.5}
-   } // 
+   } //
 
    rotate <0,45,0>
    translate <2,0,0>
-} // end of object 
+} // end of object
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 
@@ -105,7 +105,7 @@ union {
 #declare TempSplArr=array[N];
 #declare Pos=0.0;
 union {
-  #while(Pos<=1)   
+  #while(Pos<=1)
      #declare I=0;
      #while (I<N)
         #declare Spl=spline{An[I]}

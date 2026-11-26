@@ -18,9 +18,9 @@
 
 // Persistence Of Vision raytracer sample file.
 // Copyright 2001 Fabien Mosen
-// 
+//
 // Updated: 2013/02/15 for 3.7
-// 
+//
 #version 3.6;
 global_settings{ assumed_gamma 1.3 max_trace_level 5}
 
@@ -29,8 +29,8 @@ global_settings{ assumed_gamma 1.3 max_trace_level 5}
 #include "logo.inc"
 
 
-camera{ location  <20,40,28>  
-        angle 40 // direction 2*z 
+camera{ location  <20,40,28>
+        angle 40 // direction 2*z
         right     x*image_width/image_height // keep propotions with any aspect ratio
         look_at   <0,2,0>
       }

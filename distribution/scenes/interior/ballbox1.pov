@@ -18,7 +18,7 @@ global_settings {
   assumed_gamma 2.0
   max_trace_level 5
   }
-  
+
 #include "colors.inc"
 #include "shapes.inc"
 #include "textures.inc"

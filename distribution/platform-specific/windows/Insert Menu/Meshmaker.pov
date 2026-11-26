@@ -5,10 +5,10 @@
 
     // #declare Typ = 163; // for tests
 
-//#if(( Typ < 500 | Typ > 831 ) 
-//   & (Typ !=110) & (Typ !=430) & (Typ !=431) ) 
-global_settings{ assumed_gamma 1.0 } 
-//#end 
+//#if(( Typ < 500 | Typ > 831 )
+//   & (Typ !=110) & (Typ !=430) & (Typ !=431) )
+global_settings{ assumed_gamma 1.0 }
+//#end
 
 
 #default{ finish{ ambient 0.1 diffuse 0.9 }}
@@ -66,7 +66,7 @@ global_settings{ assumed_gamma 1.0 }
 
 #case(90)  #declare Txt_Path="90 - p_moebius 1.txt" #break
 #case(92)  #declare Txt_Path="92 - p_moebius 2.txt" #break
-#case(94)  #declare Txt_Path="94 - p_moebius 3.txt" #break 
+#case(94)  #declare Txt_Path="94 - p_moebius 3.txt" #break
 
 #case(101)  #declare Txt_Path="A1 - p_klein8 1.txt" #break
 #case(102)  #declare Txt_Path="A2 - p_klein8 2.txt" #break
@@ -166,17 +166,17 @@ texture {
 // sky ---------------------------------------------------------------
 #macro MySkyP()
 sky_sphere{ pigment{ gradient <0,1,0>
-                     color_map{ [0   color rgb<0.24,0.34,0.56>*0.7] 
-                                [0.5 color rgb<0.24,0.34,0.56>*0.4] 
-                                [0.5 color rgb<0.24,0.34,0.56>*0.4] 
-                                [1.0 color rgb<0.24,0.34,0.56>*0.7] 
+                     color_map{ [0   color rgb<0.24,0.34,0.56>*0.7]
+                                [0.5 color rgb<0.24,0.34,0.56>*0.4]
+                                [0.5 color rgb<0.24,0.34,0.56>*0.4]
+                                [1.0 color rgb<0.24,0.34,0.56>*0.7]
                               }
-                     
-                      rotate< 0,0, 0>  
-                   
+
+                      rotate< 0,0, 0>
+
                      scale 2 }
            } // end of sky_sphere
-#end // of macro 
+#end // of macro
 //---------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------
@@ -187,7 +187,7 @@ sky_sphere{ pigment{ gradient <0,1,0>
 
 
 #if (Typ=801)
-#include "10 - Ready made scenes/M0 - Basic Scene M0 - DarkBlueSky + Axes.txt"  #include concat(In_Path,Sub_Path8,Txt_Path) 
+#include "10 - Ready made scenes/M0 - Basic Scene M0 - DarkBlueSky + Axes.txt"  #include concat(In_Path,Sub_Path8,Txt_Path)
 #end
 // ----
 
@@ -346,7 +346,7 @@ object{ AxisXYZ_(  3.5, 4.75, 8, T_Dark, T_Light, 25,-25,   0.9,0.9,1.15) scale 
 #include concat(In_Path,Sub_Path10,Txt_Path) // "63 - p_cylinder_crackle_2.txt"
 #end
 // ----
- 
+
 // ----
 #if (Typ=80)
 MySkyP()

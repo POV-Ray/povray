@@ -1,7 +1,7 @@
 // Insert menu illustration scene
 // Author Friedrich A. Lohmueller, June-2012
 #version 3.7;
-global_settings{ assumed_gamma 1.0 } 
+global_settings{ assumed_gamma 1.0 }
 
 #default{ finish{ ambient 0.1 diffuse 0.9 }}
 #include "shapes.inc"
@@ -56,7 +56,7 @@ global_settings{ assumed_gamma 1.0 }
 #end
 // -------------------------------------------------------------------------------------------
 // --------
-// #include concat(In_Path,Txt_Path) 
+// #include concat(In_Path,Txt_Path)
 
 // ---------------------------
 //------------------------------ the Axes --------------------------------

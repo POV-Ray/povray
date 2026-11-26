@@ -12,24 +12,24 @@
 // When adding to the menu previews simply append to the existing scene files
 // and use next number in series.  Or add new file and insert a new range.
 // Be sure to also add entries into Insert Menu\Image.ini
-// Aspect ratios are not standardized, 
+// Aspect ratios are not standardized,
 // for correct options see file 'image.ini'
 
 
 #version 3.7;
 
 #switch (Switch)
- 
-  #range (101,138)     // --- patterns ---  
+
+  #range (101,138)     // --- patterns ---
     #declare Typ=Switch-100;
     #include "Patterns.pov"
     #break
-       
+
   #range (401,599)     // --- patterns --- new tiling, pavement
     #declare Typ=Switch-300;
     #include "Patterns.pov"
     #break
- 
+
   #range (201,208)     // --- pattern texture attributes ---
     #declare Typ=Switch-200;
     #include "Attributes.pov"
@@ -55,17 +55,17 @@
     #include "CSG_Material.pov"
   #break
 
-  #range (1001,1009)     // --- lights ---  
+  #range (1001,1009)     // --- lights ---
     #declare Typ=Switch-1000;
     #include "Lights.pov"
   #break
- 
+
   #range (1101,1106)     // --- include --- overview
-    #declare Typ=Switch-1100; 
-    #include "Include.pov"     
+    #declare Typ=Switch-1100;
+    #include "Include.pov"
   #break
-  
-  #range (1301,1311)     // --- camera ---  
+
+  #range (1301,1311)     // --- camera ---
     #declare Typ=Switch-1300;
     #include "Camera.pov"
   #break
@@ -82,7 +82,7 @@
     #declare Typ=Switch-3000;
     #include "Basic shapes.pov"
   #break
-   
+
   #range(4001,4077)     // --- shapes2 Lo---
     #declare Typ=Switch-4000;
     #include "Shapes2.pov"
@@ -92,12 +92,12 @@
     #declare Typ=Switch-3500;
     #include "Shapes3.pov"
   #break
- 
+
   #range(5110,5955)     // --- special shapes Lo -- all!
     #declare Typ=Switch-5000;
     #include "Special shapes.pov"
   #break
- 
+
   #range(6010,6089)     // --- colors Lo---
     #declare Typ=Switch-6000;
     #include "Colors.pov"
@@ -117,7 +117,7 @@
     #declare Typ=Switch-8000;
     #include "Random.pov"
   #break
- 
+
   #range(8110,8121)     // --- animation Lo---
     #declare Typ=Switch-8100;
     #include "Animation.pov"
@@ -152,22 +152,22 @@
     #declare Typ=Switch-9400;
     #include "Metals.pov"
   #break
- 
+
   #range(9501,9511)     // --- Include files own Lo---
     #declare Typ=Switch-9500;
     #include "IncludeFiles_own.pov"
   #break
- 
+
   #range(9601,9611)     // --- math function samples Lo---
     #declare Typ=Switch-9600;
     #include "Math functions.pov"
   #break
- 
+
   #range(9700,9784)     // --- stones and granites  Lo---
     #declare Typ=Switch-9700;
     #include "Stones_and_Granites.pov"
   #break
- 
+
   #range(10010,10163)     // --- metals  Lo---
     #declare Typ=Switch-10000;
     #include "Meshmaker.pov"

@@ -5,7 +5,7 @@
 // Persistence Of Vision raytracer sample file.
 //============================================
 // The field, new improved version  October. 2001
-// Copyright Gilles Tran 2001 
+// Copyright Gilles Tran 2001
 // http://www.oyonale.com
 //--------------------------------------------
 // Render with a 2.67 ratio such as 320*120, 640*240, 1024*384, 1280*480
@@ -95,7 +95,7 @@ light_source {PdV color colWater2*2 shadowless media_interaction off}
                 color_map{[0 Clear][0.25  rgbt<0,0,0,0.7>] [0.4 rgbt<0,0,0,0.3>]}
                 scale 38 translate -y*17
                 }
-                
+
         finish{ambient 0 diffuse 0.6 specular 0.1 roughness 1/10}
 }
 #declare trb=0.0001;
@@ -123,7 +123,7 @@ light_source {PdV color colWater2*2 shadowless media_interaction off}
 // Thanks to Bob H. for the help regarding these textures
 #declare txtSubBase=texture {
     pigment {
-    
+
         cells
         color_map {
             [.45 rgb <colSub.x*0.1,colSub.y*0.1,colSub.z*0.1>]
@@ -131,7 +131,7 @@ light_source {PdV color colWater2*2 shadowless media_interaction off}
         }
         scale <100,.125,1>
     }
-    
+
     scale 3
     finish {ambient 0 diffuse 0.3 specular 0.05   roughness 0.1}
 }
@@ -163,14 +163,14 @@ light_source {PdV color colWater2*2 shadowless media_interaction off}
         }
         scale 2.5
         finish {ambient 0 diffuse 0.3 specular 0.05   roughness 0.1}
-    }                                 
-    
+    }
+
     texture{txtSkin}
 
 #declare txtSubBottom=
 
     texture{txtSubBase}
-    
+
     texture {
         pigment {
             cells
@@ -183,7 +183,7 @@ light_source {PdV color colWater2*2 shadowless media_interaction off}
         scale 5
         finish {ambient 0 diffuse 0.3 specular 0.05   roughness 0.1}
     }
-    
+
     texture {
         pigment {
             cells
@@ -196,9 +196,9 @@ light_source {PdV color colWater2*2 shadowless media_interaction off}
         scale 5
         translate 1
         finish {ambient 0 diffuse 0.3 specular 0.05   roughness 0.1}
-    } 
-    
-    texture{txtLettre}  
+    }
+
+    texture{txtLettre}
     texture{txtSkin}
 
 

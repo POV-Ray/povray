@@ -2,13 +2,13 @@
 // Author Friedrich A. Lohmueller, Feb-2013
 #version 3.7;
 
-#declare In_Path  = "10 - Ready made scenes/" 
+#declare In_Path  = "10 - Ready made scenes/"
 
  // #declare Typ = 17; // for testing
 
-// Basic Scenes 
+// Basic Scenes
 #switch (Typ)  //-----------------------------------------------------------------------------
-#case(1)   #declare Txt_Path="10 - Basic scene 01 - Checkered plane.txt"  #break 
+#case(1)   #declare Txt_Path="10 - Basic scene 01 - Checkered plane.txt"  #break
 #case(2)   #declare Txt_Path="20 - Basic scene 02 - Desert with blue sky.txt"  #break
 #case(3)   #declare Txt_Path="30 - Basic scene 03 - White sands with blue sky.txt"  #break
 #case(4)   #declare Txt_Path="40 - Basic scene 04 - Grass with partly cloudy sky.txt"  #break

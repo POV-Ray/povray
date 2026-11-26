@@ -7,7 +7,7 @@
 //------------------------------------------------------------------------
 #version 3.7;
 global_settings{ assumed_gamma 1.0 }
-#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
 //------------------------------------------------------------------------
 #include "colors.inc"
 #include "textures.inc"
@@ -50,16 +50,16 @@ sky_sphere{ pigment{ gradient <0,1,0>
                                 [1.0 color rgb<1,1,1>         ]//White
                               }
                      scale 2 }
-           } // end of sky_sphere 
+           } // end of sky_sphere
 //------------------------------------------------------------------------
 
 // ground -----------------------------------------------------------------
 //---------------------------------<<< settings of squared plane dimensions
 #declare RasterScale = 0.3;
-#declare RasterHalfLine  = 0.035;  
-#declare RasterHalfLineZ = 0.035; 
+#declare RasterHalfLine  = 0.035;
+#declare RasterHalfLineZ = 0.035;
 //-------------------------------------------------------------------------
-#macro Raster(RScale, HLine) 
+#macro Raster(RScale, HLine)
        pigment{ gradient x scale RScale
                 color_map{[0.000   color rgbt<1,1,1,0>*0.3]
                           [0+HLine color rgbt<1,1,1,0>*0.3]
@@ -67,9 +67,9 @@ sky_sphere{ pigment{ gradient <0,1,0>
                           [1-HLine color rgbt<1,1,1,1>]
                           [1-HLine color rgbt<1,1,1,0>*0.3]
                           [1.000   color rgbt<1,1,1,0>*0.3]} }
- #end// of Raster(RScale, HLine)-macro    
+ #end// of Raster(RScale, HLine)-macro
 //-------------------------------------------------------------------------
-    
+
 
 box { <-2,-0.1,-1.5>,<1.5,0,2>     // plane with layered textures
         texture { pigment{color White*1.1}}
@@ -84,24 +84,24 @@ box { <-2,-0.1,-1.5>,<1.5,0,2>     // plane with layered textures
 //--------------------------------------------------------------------------
 // path/name of include file "Chair.inc"
 // use  ' #include "Chair.inc" ' if it's in the same directory like this scene file!
-#include "../Insert Menu/A0 - Include files/20 - own include files/50 - Include_File Chair.txt"  
+#include "../Insert Menu/A0 - Include files/20 - own include files/50 - Include_File Chair.txt"
 
       //Chair( seat h, chair width, backrest h, feet d)
 object{ Chair( 0.45, 0.45, 0.90, 0.04 )
         rotate<0,-70,0>
         translate<-1,0, 0.1>
-      }  
+      }
 object{ Chair( 0.45, 0.45, 0.90, 0.04 )
         rotate<0,-20,0>
         translate<-0.5,0, 0.8>
-      }  
+      }
 object{ Chair( 0.45, 0.45, 0.90, 0.04 )
         rotate<0, 20,0>
         translate<0.75,0, 0.2>
-      }  
+      }
 
 object{ Chair( 0.45, 0.45, 0.90, 0.04 )
         rotate<0, -160,0>
         translate<-0.45,0,-1.0>
-      }  
+      }
 //--------------------------------------------------------------------------

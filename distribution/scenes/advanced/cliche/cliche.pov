@@ -5,12 +5,12 @@
 // Persistence Of Vision raytracer sample file.
 // "No More Chrome Spheres Please!"
 // Copyright 2001 Rune S. Johansen
-// 
+//
 // The "chrome sphere over checkered plane" is an overused raytracing cliche.
 // The last thing we need is another of those images...
-// 
+//
 // ...but who cares! ;)
-// 
+//
 // NOTE:
 // First render the file SIGN.POV and then render this file.
 //

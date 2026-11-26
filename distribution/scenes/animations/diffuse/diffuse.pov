@@ -19,7 +19,7 @@ global_settings { assumed_gamma 1.0 }
 #declare Font="cyrvetic.ttf"
 text{ ttf Font
     concat("diffuse=",str(D,1,2)),0.1,0
-    rotate<0,-5,0> 
+    rotate<0,-5,0>
     scale <1.25, 1.5, 4>
     translate <-3.2, 0, -1>
     pigment { rgb <1, 0.5, 0.2> }

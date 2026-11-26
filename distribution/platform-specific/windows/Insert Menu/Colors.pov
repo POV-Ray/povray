@@ -1,21 +1,21 @@
 // Insert menu illustration scene "Colors.pov"
 // Author Friedrich A. Lohmueller, May 2010
-// ----------- submenu 'Colors' -------------- 
+// ----------- submenu 'Colors' --------------
 
 // -w96 -h64 +a0.1 +am2 -j +r3
 
 #version 3.7;
-global_settings{ assumed_gamma 1.0 } 
+global_settings{ assumed_gamma 1.0 }
 
-#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
 
 #include "colors.inc"
 #include "textures.inc"
-// --------------------------- 
-#declare In_Path  = "D0 - Colors/" 
+// ---------------------------
+#declare In_Path  = "D0 - Colors/"
 
 
- //  #declare Typ = 35; 
+ //  #declare Typ = 35;
 
 //#declare Typ=Switch-6000;
 #switch (Typ)  //----------------------------------------------------------
@@ -79,24 +79,24 @@ global_settings{ assumed_gamma 1.0 }
 #case(89)  #declare Txt_Path="89 - violet.txt" #break
 
 #end // end of '#switch (Typ)'//------------------------------------------
-// ----------------------------------------------------------------------- 
+// -----------------------------------------------------------------------
 
 
 //------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------
-background { color rgb<1,1,1>*0.5} 
-//-------------- 
+background { color rgb<1,1,1>*0.5}
+//--------------
 camera{ angle 45 location <0,0,-4.25> look_at<0,0,0> right x*image_width/image_height}
-//-------------- 
+//--------------
 light_source{< 2500, 2500,-2500> color rgb<1,1,1>*1}     // sun light
-//-------------- 
+//--------------
 union{
 sphere{ <-0.7,0,0>,1}
 cylinder{<-0.7,0,0>,<0.7,0,0>,1}
 sphere{ <0.7,0,0>,1}
-scale <0.9,1,1> 
-        #include concat(In_Path,Txt_Path) // 
+scale <0.9,1,1>
+        #include concat(In_Path,Txt_Path) //
 
 } //------------------
 

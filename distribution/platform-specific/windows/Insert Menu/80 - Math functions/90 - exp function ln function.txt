@@ -1,8 +1,8 @@
 // POV-Ray 3.6 / 3.7 Scene File "exp_function.pov"
 // by Friedrich A. Lohmueller, Feb-2013
 //------------------------------------------------------------------------
-// Choose image_size by                
-// adding to the command line:         
+// Choose image_size by
+// adding to the command line:
 //
 //                      +w700 +h700
 //
@@ -130,10 +130,10 @@ plane { <0,1,0>, 0    // plane with layered textures
 
 
 //------------------------------------------------------------------------
-// Choose image_size by               
-// adding to the commandline:          
-// ( 2nd white field on top             
-//   of the POV-Ray editor! )             
+// Choose image_size by
+// adding to the commandline:
+// ( 2nd white field on top
+//   of the POV-Ray editor! )
 //
 //                      +w700 +h700
 //

@@ -27,24 +27,24 @@
 #include "meshmaker.inc"
 //-------------------------------------------------------------------------------------------------
 object { // TwoVarSurf( __Fuv, Urange, Vrange, Iter_U, Iter_V, FileName )
-         // Builds a mesh2 surface of a function with two variables (u,v). 
-         // The uv_coordinates for texturing the surface come from the square <0,0> - <1,1> 
+         // Builds a mesh2 surface of a function with two variables (u,v).
+         // The uv_coordinates for texturing the surface come from the square <0,0> - <1,1>
 
    TwoVarSurf(     HF, // The function to be turned into a mesh2 object.
-                       // the ranges within which the surface is calculated: 
-               <-6,6>, // 2-D vector that gives the boundaries of u. 
+                       // the ranges within which the surface is calculated:
+               <-6,6>, // 2-D vector that gives the boundaries of u.
                <-6,6>, // 2-D vector that gives the boundaries of v.
-                 200, //  resolution of the mesh in the u range 
-                 200, //  resolution of the mesh in the v range. 
-                ""  // FileName: ""= non, "NAME.obj'= Wavefront objectfile, "NAME.pcm" compressed mesh file 
+                 200, //  resolution of the mesh in the u range
+                 200, //  resolution of the mesh in the v range.
+                ""  // FileName: ""= non, "NAME.obj'= Wavefront objectfile, "NAME.pcm" compressed mesh file
                     // "NAME.arr" include file with arrays to build a mesh2 from,
-                    //  others: includefile with a mesh2 object 
+                    //  others: includefile with a mesh2 object
              ) // ---------------------------------------------------------------------------------
- texture{ 
+ texture{
    uv_mapping
    pigment{checker color rgb <0,0,0.2> color rgb <1,0.85,0.85> scale 1/12}
    finish{specular 0.4}
- } // 
+ } //
 
  scale <1,1,1>*1
  rotate <90,0,0>

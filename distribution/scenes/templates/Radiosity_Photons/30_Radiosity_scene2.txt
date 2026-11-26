@@ -1,19 +1,19 @@
 // PoV-Ray 3.6 / 3.7 Scene File " ... .pov"
-// Author:   ...  
+// Author:   ...
 // Date:   ...
 //--------------------------------------------------------------------------
 //--------------------------------------------------------------------------
 #version 3.7;
-global_settings{ assumed_gamma 1.0 }  
+global_settings{ assumed_gamma 1.0 }
 //--------------------------------------------------------------------------
 
-#declare Radiosity_ON = 1; 
+#declare Radiosity_ON = 1;
 
 #if (Radiosity_ON = 1 )
 
-#default{ finish{ ambient 0 diffuse 1 }} 
+#default{ finish{ ambient 0 diffuse 1 }}
 global_settings {
-    
+
     radiosity {
       pretrace_start 0.08
       pretrace_end   0.01
@@ -32,7 +32,7 @@ global_settings {
     }
   } // end global_settings
 #else
-#default{ finish{ ambient 0.1 diffuse 0.8 }} 
+#default{ finish{ ambient 0.1 diffuse 0.8 }}
 
 #end // of 'Radiosity_ON = 1'
 //--------------------------------------------------------------------------
@@ -71,9 +71,9 @@ sky_sphere { pigment { gradient <0,1,0>
                        color_map { [0.00 rgb <0.6,0.7,1.0>]
                                    [0.35 rgb <0.1,0.15,0.7>]
                                    [0.65 rgb <0.1,0.15,0.7>]
-                                   [1.00 rgb <0.6,0.7,1.0>] 
-                                 } 
-                       scale 2         
+                                   [1.00 rgb <0.6,0.7,1.0>]
+                                 }
+                       scale 2
                      } // end of pigment
            } //end of skysphere
 // fog ---------------------------------------------------------------------
@@ -84,10 +84,10 @@ fog{fog_type   2
     fog_alt    2.0
     turbulence 0.8}
 // ground ------------------------------------------------------------------
-plane{ <0,1,0>, 0 
+plane{ <0,1,0>, 0
        texture{ pigment{ color rgb <1.00,0.95,0.8>}
                 normal { bumps 0.75 scale 0.025  }
-                finish { phong 0.1 } 
+                finish { phong 0.1 }
               } // end of texture
      } // end of plane
 //--------------------------------------------------------------------------
@@ -95,7 +95,7 @@ plane{ <0,1,0>, 0
 //--------------------------------------------------------------------------
 //--------------------------------------------------------------------------
 
-sphere{ <0,0,0>, 1 
+sphere{ <0,0,0>, 1
         texture{ pigment{ spiral1 5 rotate<90,0,0>
                           color_map{
                            [ 0.0 color rgb<1,1,1> ]
@@ -108,8 +108,8 @@ sphere{ <0,0,0>, 1
                  //normal  { bumps 0.5 scale  0.005 }
                  finish  { phong 1 reflection 0.00 }
                } // end of texture ------------------
-  scale<1,1,1> 
-  rotate<-45,0,0> 
+  scale<1,1,1>
+  rotate<-45,0,0>
   translate<0.5,1.1,-0.7>
 } //-------------------------------------------------
 //--------------------------------------------------------------------------

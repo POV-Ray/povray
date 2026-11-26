@@ -5,12 +5,12 @@
 /* Persistence Of Vision Raytracer sample file.
 
    Demo for the Mesh Camera macros for use with the new mesh_camera:
-  
+
    Simple demo of the UV version of the pinhole camera, for use with the smooth
-   modifier of the distribution method #3. It gives the same results, but it is 
-   independant of the resolution: it allows for much smaller mesh camera sizes, 
-   and works with standard AA too. 
-  
+   modifier of the distribution method #3. It gives the same results, but it is
+   independant of the resolution: it allows for much smaller mesh camera sizes,
+   and works with standard AA too.
+
    --
    Jaime Vives Piqueres, Jan. 2011  <jaime@ignorancia.org> */
 
@@ -55,11 +55,11 @@
 
 // create the camera with the generated mesh, using distrib.#3 and smooth
 camera{
-  mesh_camera{ 1 3 
-    mesh{camera_mesh 
+  mesh_camera{ 1 3
+    mesh{camera_mesh
       meshcam_placement(c_location,c_look_at)
     }
     smooth
   }
-  location <0,0,-.01> 
+  location <0,0,-.01>
 }

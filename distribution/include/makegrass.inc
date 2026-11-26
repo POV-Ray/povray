@@ -6,8 +6,8 @@
 // File: makegrass.inc
 // --------------------------------------
 // Author: Gilles Tran, 1999-2004, http://www.oyonale.com
-// former mgrass.pov by Gilles Tran 
-// Updated for POV-Ray 3.7: March-2013 
+// former mgrass.pov by Gilles Tran
+// Updated for POV-Ray 3.7: March-2013
 //
 // Description: macros for creating grass.
 // ================================================
@@ -38,7 +38,7 @@
 // It first creates an array of points (vertices)
 // Then it calculates the normals (optional)
 /*
-#declare doSmooth = true;       // smooth triangles                           
+#declare doSmooth = true;       // smooth triangles
 #declare posBlade = <0,0,0>;    // position of blade
 #declare rotBlade = 100;        // rotation of blade around y
 #declare segBlade= 20;          // number of blade segments - try low values (5 for instance) for tests
@@ -56,7 +56,7 @@
 
 //---------------------------------------------------------------------------------------------------------------
 #macro MakeBlade( doSmooth,      //  0 or 1,// smooth triangles
-                  posBlade,      // <0,0,0>,// position of blade 
+                  posBlade,      // <0,0,0>,// position of blade
                   rotBlade,      //      00,// rotation of blade around y
                   segBlade,      //      20,// number of blade segments, try low values (5 for instance) for tests
                   lBlade,        //      10,// length of blade
@@ -74,13 +74,13 @@
         #local nI=3;
 #else
         #local nI=2;
-#end                
+#end
 #local nJ=segBlade+1;
 #local nP=nI*nJ;
 #local P=array[nP]
-#local N=array[nP]  
-#local pBlade=<0,0,0>;              
-#local Count=0;                                       
+#local N=array[nP]
+#local pBlade=<0,0,0>;
+#local Count=0;
 #local xBlade=xBladeStart;
 #local zBlade=zBladeStart;
 #if (dofold=true)
@@ -92,12 +92,12 @@
         #local P[1]=vaxis_rotate(x*xBlade,y,rotBlade)+posBlade;
 
 #end
-#local Count=1; 
+#local Count=1;
 #local pBlade=vnormalize(startBend)*lsegBlade;
 // --------------------------------------
 // Fills the array of points
 // --------------------------------------
-#while (Count<nJ)          
+#while (Count<nJ)
         #local tBlade=Count/segBlade;
         // This is where the blade shape is defined
         #local pBlade=pBlade+lsegBlade*vnormalize(vnormalize(pBlade)+ vBend*pow(tBlade,pwBend));
@@ -111,7 +111,7 @@
                 #local P[Count*nI]=vaxis_rotate(pBlade-x*xBlade,y,rotBlade)+posBlade;
                 #local P[Count*nI+1]=vaxis_rotate(pBlade+x*xBlade,y,rotBlade)+posBlade;
         #end
-        #local Count=Count+1;        
+        #local Count=Count+1;
 #end
 // --------------------------------------
 // Calculates normals if doSmooth = true
@@ -164,15 +164,15 @@
             smooth_triangle{P[q],N[q],P[q+nI],N[q+nI],P[q+nI+1],N[q+nI+1]}
          #end
 
-    #else        
+    #else
          #if (dofile=true)
              #write(filehandle,"triangle{<",P[q].x,",",P[q].y,",",P[q].z,">,<",P[q+1].x,",",P[q+1].y,",",P[q+1].z,">,<",P[q+nI+1].x,",",P[q+nI+1].y,",",P[q+nI+1].z,">}\n")
              #write(filehandle,"triangle{<",P[q].x,",",P[q].y,",",P[q].z,">,<",P[q+nI].x,",",P[q+nI].y,",",P[q+nI].z,">,<",P[q+nI+1].x,",",P[q+nI+1].y,",",P[q+nI+1].z,">}\n")
-         #else                        
+         #else
              triangle{P[q],P[q+1],P[q+nI+1]}
              triangle{P[q],P[q+nI],P[q+nI+1]}
          #end
-    #end       
+    #end
 #end
 #local q=q+1;#end
 
@@ -187,8 +187,8 @@
 // The MakeGrassPatch macro creates a grass patch by creating
 // individual blades with the MakeBlade macro
 // The resulting patch is a mesh of nBlade*nBlade individual blades
-// Its size is lPatch*lPatch                    
-// The main tuning parameters are segBlade and nBlade (keep low to test) 
+// Its size is lPatch*lPatch
+// The main tuning parameters are segBlade and nBlade (keep low to test)
 // --------------------------------------
 // Patch parameters
 // --------------------------------------
@@ -223,7 +223,7 @@
                        wBlade,      //    1, // width of blade at start
                        wBladeEnd,   //  0.3, // width of blade at the end
 
-                       doSmooth,  // 0 or 1, // true or 1 makes smooth triangles   
+                       doSmooth,  // 0 or 1, // true or 1 makes smooth triangles
                        startBend,//<0,1,0.3>,// bending of blade at start (<0,1,0>=no bending)
                        vBend,    //<0,-1,2>, // direction of the force bending the blade (<0,1,1> = 45°)
                        pwBend,      //    3, // bending power (how slowly the curve bends)
@@ -236,7 +236,7 @@
                        dofile,     //0 or 1, // true or 1 creates a mesh file
                        fname  // "grass_01.inc" // string, name of the mesh file to create
                      ) //-------------------------------------------------------------------------------
-#if(dofile=true)          
+#if(dofile=true)
         #warning concat(fname," mesh file creation starts\n")
 
         #fopen filehandle fname write  // creates the leaf mesh (individual leaf)
@@ -248,15 +248,15 @@
 #local s1=seed(rd);
 #local zCount=0;
 #while (zCount<nBlade)
-        #local xCount=0;                          
-        
-        #while (xCount<nBlade)                                          
+        #local xCount=0;
+
+        #while (xCount<nBlade)
 
                 #local posBlade=<xCount*iBlade,0,zCount*iBlade>+<iBlade*(0.5-rand(s1))*stdposBlade,0,iBlade*(0.5-rand(s1))*stdposBlade>;
                 #local rotBlade=ryBlade+(0.5-rand(s1))*stdrotBlade;
-//                #local lBladetmp=max(lBlade*0.3,lBlade+(0.5-rand(s1))*stdlBlade);     
+//                #local lBladetmp=max(lBlade*0.3,lBlade+(0.5-rand(s1))*stdlBlade);
                 #local scBlade=max(0.5,(0.5-rand(s1))*stdBlade*2);
-                #local lBladetmp=lBlade*scBlade;     
+                #local lBladetmp=lBlade*scBlade;
                 #local xBladeStart=wBlade*scBlade;
                 #local xBladeEnd=wBladeEnd*scBlade;
                 #local zBladeStart=xBladeStart*0.5;
@@ -276,7 +276,7 @@
 #else
         translate <-lPatch/2,0,-lPatch/2>
         }
-        
+
 #end
 
 #end
@@ -321,20 +321,20 @@ union{
 #local zCount=0;
 #local nxCounttmp=nxPrairie;
 #local s2=seed(rd);
-#while (zCount<nzPrairie)                            
+#while (zCount<nzPrairie)
         #local xCount=0;
-        
+
         #while (xCount<nxCounttmp)
-                
+
                 #if (doTest=true)
 //                        sphere{<-nxCounttmp*0.5+xCount,0,zCount>*lPatch,lPatch*0.5 pigment{Red} scale <1,0.2,1>}
                         sphere{0,lPatch*0.5 pigment{Red} scale <1,0.2,1>
-                        scale (1+stdscale*rand(s2)) rotate y*360*(0.5-rand(rd))*stdrotate 
+                        scale (1+stdscale*rand(s2)) rotate y*360*(0.5-rand(rd))*stdrotate
                         translate <xCount-(nxCounttmp-1)*0.5,0,zCount>*lPatch}
                 #else
-                        object{ objectPatch 
-                                scale (1+stdscale*rand(s2)) 
-                                rotate y*360*(0.5-rand(s2))*stdrotate 
+                        object{ objectPatch
+                                scale (1+stdscale*rand(s2))
+                                rotate y*360*(0.5-rand(s2))*stdrotate
                                 translate <-(nxCounttmp-1)*0.5+xCount,0,zCount>*lPatch}
                 #end
                 #local xCount=xCount+1;
