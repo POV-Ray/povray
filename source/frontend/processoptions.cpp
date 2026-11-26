@@ -951,6 +951,12 @@ int ProcessOptions::Parse_INI_Switch(ITextStream *file, int token, POVMSObjectPt
                 {
                     err = Process_Switch(table, srcptr, obj, (token != '-'));
                 }
+                // a switch that cannot do without its parameter says so rather than being ignored
+                else if ((table->flags & kCmdOptFlag_Required) && (*srcptr <= ' '))
+                {
+                    ParseErrorAt(file, "Parameter expected for switch '%s', found none.", table->command);
+                    err = kParseErr;
+                }
 
                 // We're aborting the search now either way, because due how the table is supposed to be sorted,
                 // if the switch would match another entry we should have encountered that one earlier.
@@ -1259,6 +1265,12 @@ int ProcessOptions::Parse_CL_Switch(const char *&commandline, int token, POVMSOb
                     ((*srcptr <= ' ') && (table->type == kPOVMSType_Null)))
                 {
                     err = Process_Switch(table, srcptr, obj, (token != '-'));
+                }
+                // a switch that cannot do without its parameter says so rather than being ignored
+                else if ((table->flags & kCmdOptFlag_Required) && (*srcptr <= ' '))
+                {
+                    ParseError("Parameter expected for switch '%s', found none.", table->command);
+                    err = kParseErr;
                 }
 
                 // We're aborting the search now either way, because due how the table is supposed to be sorted,

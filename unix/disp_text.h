@@ -56,7 +56,7 @@ namespace pov_frontend
             UnixTextDisplay(unsigned int w, unsigned int h, vfeSession *session, bool visible) :
                 UnixDisplay(w, h, session, visible) {};
             virtual ~UnixTextDisplay() {} ;
-            void Initialise() {};
+            void Initialise();
             void Close() {};
             void Show() {};
             void Hide() {};

@@ -69,6 +69,19 @@ Changed Behaviour
     omit the CPU time instead of reporting a nonsensical value.
 
 
+New Features
+------------
+
+  - The new option `+SM<file>` (INI `Shared_Memory_File=<file>`) also writes
+    the render preview to a memory-mapped file, so that another program can
+    show the image while it is being rendered. It also works headless: with
+    the display off (`-D`) the file is written without any preview window.
+    The file starts with a 20-byte header (version, width, height, pixels
+    written, pixels read) followed by the pixels as 8-bit RGBA, top row first.
+    Contributed by Leonardo Zide, who uses it for the live render preview of
+    LeoCAD (#344).
+
+
 Fixed or Mitigated Bugs
 -----------------------
 

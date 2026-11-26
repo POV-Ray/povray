@@ -55,6 +55,7 @@ enum {
 
 enum {
     kCmdOptFlag_Optional        = 0x0001,   ///< Parameter is optional
+    kCmdOptFlag_Required        = 0x0002,   ///< Report a missing parameter as an error rather than ignore the switch
 };
 
 class ProcessOptions

@@ -207,6 +207,7 @@ struct ProcessOptions::INI_Parser_Table RenderOptions_INI_Table[] =
     { "Render_Pattern",      kPOVAttrib_RenderPattern,      kPOVMSType_Int },
 
     { "Sampling_Method",     kPOVAttrib_SamplingMethod,     kPOVMSType_Int },
+    { "Shared_Memory_File",  kPOVAttrib_SharedMemory,       kPOVMSType_UCS2String },
     { "Split_Unions",        kPOVAttrib_SplitUnions,        kPOVMSType_Bool },
     { "Start_Column",        kPOVAttrib_Left,               kPOVMSType_Float },
     { "Start_Row",           kPOVAttrib_Top,                kPOVMSType_Float },
@@ -325,6 +326,7 @@ struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
     { "SC",  kPOVAttrib_Left,               kPOVMSType_Float,       kNoParameter },
     { "SF0", kPOVAttrib_SubsetStartFrame,   kPOVMSType_Float,       kNoParameter },
     { "SF",  kPOVAttrib_SubsetStartFrame,   kPOVMSType_Int,         kNoParameter },
+    { "SM",  kPOVAttrib_SharedMemory,       kPOVMSType_UCS2String,  kNoParameter,                   kCmdOptFlag_Required },
     { "SP",  kPOVAttrib_PreviewStartSize,   kPOVMSType_Int,         kNoParameter },
     { "SR",  kPOVAttrib_Top,                kPOVMSType_Float,       kNoParameter },
     { "SS",  kPOVAttrib_StochasticSeed,     kPOVMSType_Int,         kNoParameter },

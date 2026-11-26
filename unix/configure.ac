@@ -654,6 +654,12 @@ AC_CHECK_DECLS([RUSAGE_SELF, RUSAGE_THREAD, RUSAGE_LWP],
 # gettimeofday <sys/time.h>
 AC_CHECK_FUNCS([gettimeofday])
 
+# mmap <sys/mman.h> (shared display buffer)
+AC_CHECK_HEADERS([sys/mman.h])
+
+# posix_fallocate <fcntl.h>
+AC_CHECK_FUNCS([posix_fallocate])
+
 # asinh and friends (requires libm)
 AC_CHECK_FUNCS([asinh],
   [],
