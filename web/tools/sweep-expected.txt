@@ -9,9 +9,6 @@
 # header warns that it is slow.
 advanced/diffuse_back.pov           skip
 
-# Contains a form feed (line 72), which the parser rejects as an illegal character.
-objects/superel2.pov                error
-
 # Template for new portfolio scenes; includes a placeholder file name.
 portfolio/__empty.pov               error
 
