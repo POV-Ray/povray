@@ -224,6 +224,7 @@ OStream *NewOStream(const Path&, unsigned int, bool);
 UCS2String GetFileExtension(const Path& p);
 UCS2String GetFileName(const Path& p);
 
+/// Tells whether a file exists and can be opened for reading; a directory does not count.
 bool CheckIfFileExists(const Path& p);
 POV_OFF_T GetFileLength(const Path& p);
 

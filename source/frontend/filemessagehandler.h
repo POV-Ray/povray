@@ -41,6 +41,8 @@
 
 #include <list>
 
+#include "base/stringutilities.h"
+
 #include "povms/povmscpp.h"
 
 namespace pov_base
@@ -63,11 +65,22 @@ class FileMessageHandler
 
         void HandleMessage(const SceneData&, POVMSType, POVMS_Object&, POVMS_Object&);
     protected:
-        virtual bool FindFile(const list<Path>&, POVMS_Object&, POVMS_Object&);
-        virtual bool ReadFile(const list<Path>&, POVMS_Object&, POVMS_Object&);
+        virtual bool FindFile(const list<Path>&, const Path&, const UCS2String&, POVMS_Object&, POVMS_Object&);
+        virtual bool ReadFile(const list<Path>&, const Path&, const UCS2String&, POVMS_Object&, POVMS_Object&);
         virtual void CreatedFile(POVMS_Object&);
 
-        Path FindFilePath(const list<Path>&, const Path&);
+        /// Looks for a file named in a scene.
+        ///
+        /// The name is tried as given (i.e. relative to the current working directory, or as
+        /// an absolute path), then, if it is relative, in the scene file's directory, and then
+        /// in each library path in turn.
+        ///
+        /// @param  lps         Library paths.
+        /// @param  scenepath   Directory of the scene file, as given (may be empty).
+        /// @param  f           Name of the file to look for.
+        /// @return             Path to the file, or an empty path if not found.
+        ///
+        Path FindFilePath(const list<Path>& lps, const Path& scenepath, const Path& f);
 };
 
 }

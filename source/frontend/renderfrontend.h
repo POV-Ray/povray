@@ -101,7 +101,8 @@ struct SceneData
     mutable list<POVMS_Object> readfiles;
     mutable list<POVMS_Object> createdfiles;
 
-    Path scenepath;
+    UCS2String inputfile; ///< Name of the scene file, as given.
+    Path scenepath;       ///< Directory of the scene file, as given.
     Path outputpath;
 
     list<Path> searchpaths;
