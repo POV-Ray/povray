@@ -50,6 +50,7 @@ namespace pov_base
 namespace Filesystem
 {
 
+class MappedFile;
 class TemporaryFile;
 using TemporaryFilePtr = std::shared_ptr<TemporaryFile>;
 

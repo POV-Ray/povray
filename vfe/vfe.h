@@ -38,9 +38,11 @@
 #ifndef POVRAY_VFE_VFE_H
 #define POVRAY_VFE_VFE_H
 
+#include <cstdint>
 #include <memory>
 #include <vector>
 
+#include "base/filesystem_fwd.h"
 #include "base/platformbase.h"
 #include "base/stringtypes.h"
 #include "base/timer.h"
@@ -190,6 +192,64 @@ namespace vfe
       vfeSession* m_Session;
   };
 
+  /// Header of the shared display buffer.
+  ///
+  /// The `+SM<file>` option (INI `Shared_Memory_File=<file>`) makes the render
+  /// preview display write its pixels to a memory-mapped file as well, so that
+  /// another process can show the image while it is being rendered. With the
+  /// display off (`-D`), POV-Ray creates a plain `vfeDisplay` that shows nothing
+  /// and only writes the file (see `VirtualFrontEnd::CreateDisplay()`), so the
+  /// buffer can be had without a preview window. The option was contributed by Leonardo Zide for LeoCAD (GitHub pull request #344);
+  /// LeoCAD's reader is `qt/lc_renderdialog.cpp` in its repository, and the
+  /// layout below is the one it reads.
+  ///
+  /// @par Layout
+  /// The file starts with this 20-byte header: five unsigned 32-bit integers in
+  /// the byte order of the machine that renders (little-endian on every platform
+  /// POV-Ray currently ships for), without padding. The pixels follow at byte
+  /// offset 20: `Width * Height` pixels of 4 bytes each, red, green, blue and
+  /// alpha in that order (8 bits each, encoded with the display gamma, alpha not
+  /// premultiplied), row by row from the top row down, each row from left to
+  /// right, with no padding between rows. Pixels not rendered yet are 0 (transparent
+  /// black). The file is at least `20 + Width * Height * 4` bytes long and may be
+  /// longer: POV-Ray grows it as needed but never shortens it, since a reader may
+  /// still have it mapped.
+  ///
+  /// @par Life cycle
+  /// The file is created (or opened, if it exists) when the display of a frame is
+  /// created, after the scene has been parsed. For every frame of an animation the
+  /// header is rewritten: `Version` is set to 0, `Width`, `Height`,
+  /// `PixelsWritten` and `PixelsRead` are set, the pixels are cleared, and then
+  /// `Version` is set to 1. During the render each pixel is stored before
+  /// `PixelsWritten` is advanced past it. POV-Ray unmaps the file when the render
+  /// ends, keeps it, and never deletes it: the reader deletes it when done.
+  ///
+  /// @par Reading
+  /// A reader maps the file (or re-reads it) and treats the header as valid only
+  /// while `Version` is 1. A change of `Width` or `Height`, or `PixelsWritten`
+  /// going back to a value lower than the last one seen, means a new frame has
+  /// started. `PixelsWritten` differing from the last value seen means there are
+  /// new pixels. `PixelsRead` is for the reader: POV-Ray resets it to 0 at the
+  /// start of each frame and never reads it; LeoCAD stores the `PixelsWritten`
+  /// value it has displayed there and takes `PixelsRead == 0` to mean "new
+  /// image". If the image size can change between frames, a reader that maps the
+  /// file must re-map it when `Width` or `Height` change.
+  ///
+  struct vfeDisplayBufferHeader final
+  {
+    std::uint32_t Version;        ///< Layout version: 1, or 0 while the header is being rewritten.
+    std::uint32_t Width;          ///< Image width in pixels.
+    std::uint32_t Height;         ///< Image height in pixels.
+    /// Number of rendered pixels stored in the current frame so far, modulo 2^32.
+    /// Preview blocks (the mosaic preview, `+SP`, and the radiosity pretrace) are
+    /// written to the buffer but not counted, so without `+SP` the value reaches
+    /// `Width * Height` exactly when the frame is complete. With `+SP` it ends
+    /// lower, since pixels already shown in their final colour by the last
+    /// preview pass are not stored again.
+    std::uint32_t PixelsWritten;
+    std::uint32_t PixelsRead;     ///< Reserved for the reader; set to 0 at the start of each frame.
+  };
+
   class vfeDisplay : public Display
   {
     public:
@@ -206,10 +266,33 @@ namespace vfe
       virtual void DrawPixelBlock(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8 *colour) override;
       virtual void Clear() override;
 
+      /// Whether this display is writing a shared display buffer (`+SM`).
+      bool HasSharedBuffer() const { return m_SharedBuffer != nullptr; }
+
+      /// Unmap the shared display buffer, if any. The file and its content are kept.
+      void CloseSharedBuffer();
+
     protected:
+      /// Map the shared display buffer if the `+SM` option names a file, and
+      /// reset its header and pixels; do nothing otherwise.
+      /// Derived displays that override @ref Initialise() call this to support
+      /// `+SM`, and the `SharedBuffer*` methods below from their drawing methods.
+      /// @throws pov_base::Exception if the file cannot be created or mapped.
+      void InitialiseSharedBuffer();
+      void SharedBufferDrawPixel(unsigned int x, unsigned int y, const RGBA8& colour);
+      void SharedBufferDrawPixelBlock(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8 *colour);
+      void SharedBufferDrawFilledRectangle(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, const RGBA8& colour);
+      void SharedBufferClear();
+
       vfeSession *m_Session;
       std::vector<RGBA8> m_Pixels;
       bool m_VisibleOnCreation;
+
+    private:
+      std::unique_ptr<pov_base::Filesystem::MappedFile> m_SharedBuffer;
+      std::uint32_t m_SharedPixelsWritten;
+
+      void SharedBufferAdvance(std::uint_least64_t count);
   };
 
   class VirtualFrontEnd
@@ -236,9 +319,10 @@ namespace vfe
     protected:
       virtual Console *CreateConsole()
         { return new vfeConsole(m_Session, m_Session->GetConsoleWidth()); }
-      virtual Display *CreateDisplay(unsigned int width, unsigned int height)
-        { return m_Session->CreateDisplay(width, height) ; }
+      virtual Display *CreateDisplay(unsigned int width, unsigned int height);
       bool HandleShelloutCancel();
+      void CheckSharedDisplayBuffer();
+      void CloseSharedDisplayBuffer();
 
       RenderFrontend<vfeParserMessageHandler,FileMessageHandler,vfeRenderMessageHandler,ImageMessageHandler> renderFrontend;
       POVMSAddress backendAddress;
@@ -255,6 +339,7 @@ namespace vfe
       vfePlatformBase m_PlatformBase;
       bool m_PausedAfterFrame;
       bool m_PauseRequested;
+      bool m_SharedBufferWarned;
       State m_PostPauseState;
   };
 }

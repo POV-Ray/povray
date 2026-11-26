@@ -152,6 +152,48 @@ void LargeFile::Close()
 
 //******************************************************************************
 
+#if POV_USE_DEFAULT_MAPPEDFILE
+
+struct MappedFile::Data final
+{
+    std::string errorText;
+};
+
+MappedFile::MappedFile() :
+    mpData(new Data)
+{}
+
+MappedFile::~MappedFile()
+{}
+
+bool MappedFile::Open(const UCS2String& fileName, std::uint_least64_t size)
+{
+    mpData->errorText = "memory-mapped files are not supported on this platform";
+    return false;
+}
+
+void MappedFile::Close()
+{}
+
+void* MappedFile::GetData() const
+{
+    return nullptr;
+}
+
+std::size_t MappedFile::GetSize() const
+{
+    return 0;
+}
+
+const std::string& MappedFile::GetErrorText() const
+{
+    return mpData->errorText;
+}
+
+#endif // POV_USE_DEFAULT_MAPPEDFILE
+
+//******************************************************************************
+
 TemporaryFile::TemporaryFile() :
     mFileName(SuggestName())
 {}
