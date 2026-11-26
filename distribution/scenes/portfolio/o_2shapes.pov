@@ -11,7 +11,7 @@
 // Date: 2001/08/06
 // Auth: Ingo Janssen
 #version 3.6;
-global_settings { 
+global_settings {
   assumed_gamma 1.0
 }
 
@@ -63,7 +63,7 @@ global_settings {
      look_at   <0,0,0>
      angle 35
    }
-   
+
    light_source {<500,500,-50> rgb 1}
    light_source {<-500,500,-500> rgb <0.1,0.1,0.3> shadowless}
    light_source {<3,3,-3> rgb <0.5,0.4,0.4>}

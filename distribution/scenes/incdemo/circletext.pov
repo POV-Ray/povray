@@ -17,7 +17,7 @@ global_settings { assumed_gamma 2.2 }
 
 #include "shapes.inc"
 
-camera{ location -3*z 
+camera{ location -3*z
         right     x*image_width/image_height
         look_at 0
       }

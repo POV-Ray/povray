@@ -21,7 +21,7 @@ global_settings {assumed_gamma 1.0}
 
 camera { location <0,2,-10>
          right     x*image_width/image_height
-         angle 50 // direction z*1.5 
+         angle 50 // direction z*1.5
          look_at <0,2,0>#
        }
 

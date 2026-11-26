@@ -13,9 +13,9 @@ parametric {
 
   rotate 180*x
   scale 1
-  texture{ pigment{ color rgb<1,1,1> } 
-            
-         } 
+  texture{ pigment{ color rgb<1,1,1> }
+
+         }
   translate<0,1,0>
 }
 

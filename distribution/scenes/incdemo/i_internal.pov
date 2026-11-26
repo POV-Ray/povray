@@ -23,10 +23,10 @@
 #include "functions.inc"
 #declare AreaLightOn = off;	//Specify if you want soft shadows (slower!) or not
 global_settings {
-  assumed_gamma 1.8 
+  assumed_gamma 1.8
 	noise_generator 2
 }
-camera{  
+camera{
 	location <0, 0, -40>
         right     x*image_width/image_height
 	look_at <0, 0, 0>
@@ -78,7 +78,7 @@ texture { pigment { rgb 0.65 } finish { ambient 0.35 phong 1.0  phong_size 40 } 
 			no_shadow
 		}
 		box { <-1.05, -0.4, -0.01>*0.9999, <1.05, 0.4, 3>*0.9999  texture { ContTexture } }
-		scale 3  rotate x*-10 translate <-3, -1, 0> 
+		scale 3  rotate x*-10 translate <-3, -1, 0>
 	}
 #end
 //***  FRAME 2  ***************************************************
@@ -232,8 +232,8 @@ isosurface {
 		scale 4
 	}
 #end
-	
-	
+
+
 //***  FRAME 8  ***************************************************
 #if ( frame_number = 8 )
 	#declare LCorner = <-0.5, -0.5, -0.5>;  #declare RCorner = <1.4, 0.5, 0.5>;
@@ -605,7 +605,7 @@ isosurface {
 #if ( frame_number = 28 )
 	#declare LCorner = <-4, -4, -4>;  #declare RCorner = <4, 4, 4>;
 	isosurface {
-		function { f_hex_x(x,y,z, 1) } 
+		function { f_hex_x(x,y,z, 1) }
 			//P0= not used
 		threshold 0.6
 		contained_by { box { LCorner, RCorner } }
@@ -618,7 +618,7 @@ isosurface {
 #if ( frame_number = 29 )
 	#declare LCorner = <-4, -4, -4>;  #declare RCorner = <4, 4, 4>;
 	isosurface {
-		function { f_hex_y(x,y,z, 1) } 
+		function { f_hex_y(x,y,z, 1) }
 			//P0= not used
 		threshold 0.1
 		contained_by { box { LCorner, RCorner } }
@@ -727,7 +727,7 @@ isosurface {
 			contained_by { box { LCorner, RCorner } }
 			max_gradient 0.2
 			texture { IsoTexture }
-			
+
 		}
 		box { LCorner*0.9999, RCorner*0.9999  texture { ContTexture }  }
 		scale 1.9  rotate x*-1  translate <3, -1, 0>
@@ -789,10 +789,10 @@ isosurface {
 		function  { f_kummer_surface_v2(x,y,z, -0.0005, -0.3, -0.97, 0) }
 			//P0= Field Strength
 			//P1= Rod width (negative): Setting this parameter to larger negative values increases the diameter of the rods
-			//P2= Divergence (negative): Setting this number to -1 causes the rods to become approximately cylindrical. 
+			//P2= Divergence (negative): Setting this number to -1 causes the rods to become approximately cylindrical.
 			//			Larger negative values cause the rods to become fatter further from the origin
 			//			Smaller negative values cause the rods to become narrower away from the origin, and have a finite length
-			//P3= Influences the length of half of the rods. Changing the sign affects the other half of the rods. 0 has no effect 
+			//P3= Influences the length of half of the rods. Changing the sign affects the other half of the rods. 0 has no effect
 		contained_by { box { -3.8, 3.8 } }
 		max_gradient 0.2
 		texture { IsoTexture }
@@ -875,7 +875,7 @@ isosurface {
 //***  FRAME 42  ***************************************************
 #if ( frame_number = 42 )
 isosurface {
-	function  { f_mitre(x,y,z, -0.5) }	
+	function  { f_mitre(x,y,z, -0.5) }
 		//P0= Field Strength
 	contained_by {box { <-0.4, -1, -1>, <0.4, 1, 1> }}
 	max_gradient 3.1
@@ -917,7 +917,7 @@ isosurface {
 //***  FRAME 45  ***************************************************
 #if ( frame_number = 45 )
 isosurface {
-	function  { f_ovals_of_cassini(x,y,z, -0.1, 0.4, 0.18, 6) }	
+	function  { f_ovals_of_cassini(x,y,z, -0.1, 0.4, 0.18, 6) }
 		//P0= Field strength
 		//P1= Major radius - like the major radius of a torus
 		//P2= Filling. Zero for a torus. With higher values the hole in the middle starts to fill up. Even higher values give an ellipsoid with a dimple
@@ -1262,7 +1262,7 @@ isosurface {
 		contained_by { sphere { 0, 0.6 } }
 		max_gradient 0.3
 		texture { IsoTexture }
-		scale 8.5  rotate y*25  rotate x*-25 
+		scale 8.5  rotate y*25  rotate x*-25
 		no_shadow
 	}
 #end
@@ -1497,4 +1497,4 @@ isosurface {
 	}
 #end
 //***  END OF FILE  *************************************************/
-      
+

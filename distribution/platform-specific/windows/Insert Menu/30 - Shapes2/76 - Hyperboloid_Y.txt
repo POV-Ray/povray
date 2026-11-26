@@ -1,8 +1,8 @@
 intersection{
 
-  box{ <-2.5,-2.0,-2.5>,<2.5, 2.00,2.5> } 
+  box{ <-2.5,-2.0,-2.5>,<2.5, 2.00,2.5> }
   object{ Hyperboloid_Y }
-   
+
   texture { pigment{ color rgb<1.0, 1.0, 0.0> }
             finish { phong 0.1 }
           }

@@ -9,7 +9,7 @@
 // -w800 -h800 +a0.3
 #version 3.6;
 global_settings { assumed_gamma 2.2 }
-#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
 
 julia_fractal {
         <.49,.5,-.34,.1>
@@ -29,8 +29,8 @@ light_source { <-6, 4.2,-10> color rgb <1,0.90,0.55>*0.5 }
 light_source { <0,3.3,0>  color rgb <0.9,0.95,1>*0.2 shadowless }
 
 //-------------------------------------------------------------------------
-// This scene uses a non-standard camera set-up. 
-// (See CAMERA in the included documentation for details.) 
+// This scene uses a non-standard camera set-up.
+// (See CAMERA in the included documentation for details.)
 // If you are new to POV-Ray, you might want to try a different demo scene.
 //-------------------------------------------------------------------------
 camera { location <0,3.3,0>

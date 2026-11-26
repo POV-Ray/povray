@@ -11,7 +11,7 @@
 // Date: 2001/08/13
 // Auth: Ingo Janssen
 #version 3.6;
-global_settings { 
+global_settings {
   assumed_gamma 1.0
 }
 
@@ -50,7 +50,7 @@ global_settings {
 #end
 
 #if(Generate_Images)
-   
+
    #switch(frame_number-1)
       #case(0)
          object {
@@ -70,7 +70,7 @@ global_settings {
          }
       #break
       #case(2)
-         object { 
+         object {
             Supercone(<0,-1.5,0>,1,1.5, <0,1.5,0>,1,.4)
             rotate <0,33,0>
             scale 0.6
@@ -91,7 +91,7 @@ global_settings {
          object {
             Wire_Box(<-1,-0.75,-0.5>, <1,0.75,3>, 0.1, 0)
             pigment {rgb 1}finish {specular 0.3}
-         } 
+         }
       #break
       #case(5)
          object{
@@ -155,7 +155,7 @@ global_settings {
               finish {specular 0.3}
            }
         }
-      #break 
+      #break
       #case(13)
          #declare HF_Function=function {pattern{crackle scale 0.3}}
           object {
@@ -166,7 +166,7 @@ global_settings {
              }
              rotate<-45.0,0,0>
           }
-      #break 
+      #break
       #case(14)
          object {
             Wedge(45)
@@ -191,7 +191,7 @@ global_settings {
          }
       #break
    #end
-   
+
    camera {
      right x*image_width/image_height
      location  <0,0,-3>

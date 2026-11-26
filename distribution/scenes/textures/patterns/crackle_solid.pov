@@ -17,9 +17,9 @@ global_settings { assumed_gamma 1.0 }
 #include "colors.inc"
 #include "woods.inc"
 
-camera { location <70,100,60> 
+camera { location <70,100,60>
          right   x*image_width/image_height
-         angle 40 
+         angle 40
          look_at <0,15,0>
        }
 

@@ -9,14 +9,14 @@
 #include "glass.inc"
 //------------------------------------
 
-#declare In_Path1  = "E0 - Textures and Materials/15 - Normal samples/"   
-//#declare In_Path2  = "E0 - Textures and Materials/20 - Mirrors and Glasses/"   
+#declare In_Path1  = "E0 - Textures and Materials/15 - Normal samples/"
+//#declare In_Path2  = "E0 - Textures and Materials/20 - Mirrors and Glasses/"
 
     // #declare Typ = 58 ; // for tests
 
 #switch (Typ)  //----------------------------------------------------------
 // In_Path1
-#case(10)  #declare Txt_Path="10 - white ripples.txt" #break 
+#case(10)  #declare Txt_Path="10 - white ripples.txt" #break
 #case(11)  #declare Txt_Path="11 - normal checker.txt" #break
 #case(12)  #declare Txt_Path="12 - hexagon.txt" #break
 #case(13)  #declare Txt_Path="13 - brick.txt" #break
@@ -75,91 +75,91 @@
 //-------------------------------------------------------------------------
 #macro Base_Shape0( Tex )
  sphere{<0,0,0>,1 texture{Tex} translate<0,1,-0.35>
- }//  
+ }//
 #end // macro
 
 #macro Base_Shape1( Tex ) // left box, right sphere
-union{ 
- box{<-1.0,0,0>,<0,2,2> rotate<0,-40,0> texture{Tex} translate<-0.40,0,0.1> } 
- sphere{<0,0,0>,1 texture{Tex} translate<0.65,1,0> } 
+union{
+ box{<-1.0,0,0>,<0,2,2> rotate<0,-40,0> texture{Tex} translate<-0.40,0,0.1> }
+ sphere{<0,0,0>,1 texture{Tex} translate<0.65,1,0> }
  translate<0,0,-0.35>
- }//  
+ }//
 #end // macro
 
 #macro Base_Shape2( Tex ) // box + small sphere
-union{ 
- box{<-1,-1,-1>,<1,1,1> scale 0.95 texture{Tex  rotate<90,0,0>} scale 0.8 rotate<30,25,0> translate<-0.30,0.9 ,0> } 
- sphere{<0,0,0>,1 texture{Tex  rotate<90,0,0>} scale 0.5 translate<0.90,1.3,-0.60> } 
+union{
+ box{<-1,-1,-1>,<1,1,1> scale 0.95 texture{Tex  rotate<90,0,0>} scale 0.8 rotate<30,25,0> translate<-0.30,0.9 ,0> }
+ sphere{<0,0,0>,1 texture{Tex  rotate<90,0,0>} scale 0.5 translate<0.90,1.3,-0.60> }
  translate<0,0,-0.35>
- }//  
+ }//
 #end // macro
 #macro Base_Shape2b( Tex ) // box + small sphere
-union{ 
- box{<-1,-1,-1>,<1,1,1> scale 0.95 texture{Tex  rotate< 0,0,0>} scale 0.8 rotate<30,25,0> translate<-0.30,0.9 ,0> } 
- sphere{<0,0,0>,1 texture{Tex  rotate< 0,0,0>} scale 0.5 translate<0.90,1.3,-0.60> } 
+union{
+ box{<-1,-1,-1>,<1,1,1> scale 0.95 texture{Tex  rotate< 0,0,0>} scale 0.8 rotate<30,25,0> translate<-0.30,0.9 ,0> }
+ sphere{<0,0,0>,1 texture{Tex  rotate< 0,0,0>} scale 0.5 translate<0.90,1.3,-0.60> }
  translate<0,0,-0.35>
- }//  
+ }//
 #end // macro
 
 
 #macro Base_Shape3( Tex ) // box only
- box{<-1,-1,-1>,<1,1,1> texture{Tex rotate<90,0,0>} scale 0.8 rotate<45,-45,0> translate< 0.00,1.0 ,0>  
+ box{<-1,-1,-1>,<1,1,1> texture{Tex rotate<90,0,0>} scale 0.8 rotate<45,-45,0> translate< 0.00,1.0 ,0>
  translate<0,0,-0.35>
- }//  
+ }//
 #end // macro
 
-#macro Base_Shape4( Tex ) // sphere only 
- sphere{<0,0,0>,1 texture{Tex  rotate< 15,-20,0> }  translate<-0.00,1,-0.10>  
+#macro Base_Shape4( Tex ) // sphere only
+ sphere{<0,0,0>,1 texture{Tex  rotate< 15,-20,0> }  translate<-0.00,1,-0.10>
  translate<0,0,-0.35>
- }//  
+ }//
 #end // macro
 #macro Base_Shape4b( Tex ) // box only
- box{<-1,-1,-1>,<1,1,1> texture{Tex rotate<0,0,0>} scale 0.8 rotate< 0,-35,0> translate< 0.00,1.0 ,0>   
+ box{<-1,-1,-1>,<1,1,1> texture{Tex rotate<0,0,0>} scale 0.8 rotate< 0,-35,0> translate< 0.00,1.0 ,0>
  translate<0,0,-0.35>
- }//  
+ }//
 #end // macro
-#macro Base_Shape4c( Tex ) // cone only 
+#macro Base_Shape4c( Tex ) // cone only
  cone{<0,0,0>,0.5,<0,1,0>,0  texture{Tex rotate< 0,0,0> }
- }//  
+ }//
 #end // macro
-#macro Base_Shape4d( Tex ) // torus only 
-torus{ 0.8,0.3  texture{Tex rotate< 0,0,0>}  }//  
+#macro Base_Shape4d( Tex ) // torus only
+torus{ 0.8,0.3  texture{Tex rotate< 0,0,0>}  }//
 #end // macro
 
 
 #macro Base_Shape5( Tex )
-union{ 
- cylinder{<0,0,0>,<0,2,0>,0.35 texture{Tex rotate<0,0,0>} translate<1.20,0,0> } 
- sphere{<0,0,0>,1 texture{Tex} rotate<-30,0,0> translate<-0.45,1,0> } 
+union{
+ cylinder{<0,0,0>,<0,2,0>,0.35 texture{Tex rotate<0,0,0>} translate<1.20,0,0> }
+ sphere{<0,0,0>,1 texture{Tex} rotate<-30,0,0> translate<-0.45,1,0> }
  translate<0,0,-0.5>
- }//  
+ }//
 #end // macro
 
 #macro Base_Shape6( Tex )
-union{ 
- box{<-0.75,0,-1>,<0.75,0.1,1> texture{Tex} translate<-0.80,0,0.5> } 
- sphere{<0,0,0>,1 texture{Tex} translate<0.65,1,0> } 
+union{
+ box{<-0.75,0,-1>,<0.75,0.1,1> texture{Tex} translate<-0.80,0,0.5> }
+ sphere{<0,0,0>,1 texture{Tex} translate<0.65,1,0> }
  translate<0,0,-0.35>
- }//  
+ }//
 #end // macro
 
 
 #macro Base_Shape7( Tex )
  sphere{<0,0,0>,1 material{Tex} translate<0,1,-0.35>
- }//  
+ }//
 #end // macro
 //--------------------------------------------------------------------------------------------
 #macro Base_Scene_2 ()
-camera { perspective 
-         angle 75 
+camera { perspective
+         angle 75
          location  <0.0 , 1.0 ,-3.0>
          right     x*image_width/image_height
          look_at   <0.0 , 1.0 , 0.0> }
- 
+
 light_source{<-3000, 2000, -500> color rgb<1, 0.95, 0.9>*0.9 }
 light_source{< 0.0, 1.0, -3.0>   color rgb<0.9,0.,9,1>*0.1  shadowless }
 // sky ----------------------------------------------------------------------
-plane{<0,1,0>,1 hollow  
+plane{<0,1,0>,1 hollow
        texture{ pigment{ bozo turbulence 0.92
                          color_map { [0.00 rgb <0.20, 0.20, 1.0>*0.9]
                                      [0.50 rgb <0.20, 0.20, 1.0>*0.9]
@@ -168,221 +168,221 @@ plane{<0,1,0>,1 hollow
                                      [1.0 rgb <0.5,0.5,0.5>]}
                         scale<1,1,1.5>*2.5  translate< 0,0,0>
                        }
-                finish {ambient 1 diffuse 0} }      
+                finish {ambient 1 diffuse 0} }
        scale 10000}
 // fog on the ground -------------------------------------------------
 fog { fog_type   2
       distance   50
-      color      White  
+      color      White
       fog_offset 0.1
       fog_alt    1.5
       turbulence 1.8
     }
 // ground -------------------------------------------------------------------
-plane{ <0,1,0>, 0 
+plane{ <0,1,0>, 0
        texture{ pigment{ checker color rgb<1,1,1>*1.2*0.8 color rgb<0.25,0.15,0.1>*0}
                 finish { phong 0.1}
               } // end of texture
      } // end of plane
- 
-#end 
-//------------------------------------------------------------------------- 
+
+#end
+//-------------------------------------------------------------------------
 //----------
-#if ( (Typ >=10) & (Typ <=60)) // 
+#if ( (Typ >=10) & (Typ <=60)) //
 #include "10 - Ready made scenes/80 - Basic Scene 08 - Sea with blue sky.txt"
 plane{ <0,1,0>, 0.001 texture{ pigment{  color rgb<0.55,0.45,0.43>*0.3} finish { phong 0.1} } }
 #end //----------
 
 
-#if (Typ=10) // 
-object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+#if (Typ=10) //
+object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=11) // 
+#if (Typ=11) //
 light_source{< 0.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape3( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape3( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=12) // 
-object{ Base_Shape2( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+#if (Typ=12) //
+object{ Base_Shape2( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=13) // 
-object{ Base_Shape2b( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+#if (Typ=13) //
+object{ Base_Shape2b( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=14) // 
-object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+#if (Typ=14) //
+object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=15) // 
-object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+#if (Typ=15) //
+object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=16) // 
+#if (Typ=16) //
 light_source{< 0.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape3( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape3( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=17) // 
+#if (Typ=17) //
 light_source{< 0.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=18) // 
+#if (Typ=18) //
 light_source{< 0.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape2( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape2( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=19) // 
+#if (Typ=19) //
 light_source{<5.0, 0.2, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape2b( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape2b( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=20) // 
+#if (Typ=20) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape2( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape2( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=21) // 
+#if (Typ=21) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.15  shadowless }
-object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=22) // 
+#if (Typ=22) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape2( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape2( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=23) // 
+#if (Typ=23) //
 //light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=24) // 
+#if (Typ=24) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.1  shadowless }
-object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=25) // 
+#if (Typ=25) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape2( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape2( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=26) // 
+#if (Typ=26) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=27) // 
+#if (Typ=27) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=28) // 
+#if (Typ=28) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape2( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape2( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=29) // 
+#if (Typ=29) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=30) // 
+#if (Typ=30) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=31) // 
+#if (Typ=31) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=32) // 
+#if (Typ=32) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape2b( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape2b( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=33) // 
+#if (Typ=33) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=34) // 
+#if (Typ=34) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape4( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape4( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=35) // 
+#if (Typ=35) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape4b( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape4b( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=36) // 
+#if (Typ=36) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape4( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape4( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-#if (Typ=37) // 
+#if (Typ=37) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape4( #include concat(In_Path1,Txt_Path) )  scale<1,1,0.2> translate<0,0,-1.00> } 
+object{ Base_Shape4( #include concat(In_Path1,Txt_Path) )  scale<1,1,0.2> translate<0,0,-1.00> }
 #end //----------
-#if (Typ=38) // 
+#if (Typ=38) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape4( #include concat(In_Path1,Txt_Path) ) scale 1.1 translate<0,0,-0.00> } 
+object{ Base_Shape4( #include concat(In_Path1,Txt_Path) ) scale 1.1 translate<0,0,-0.00> }
 #end //----------
-#if (Typ=39) // 
+#if (Typ=39) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape4( #include concat(In_Path1,Txt_Path) ) scale 1.05 translate<0,0,-0.00> } 
+object{ Base_Shape4( #include concat(In_Path1,Txt_Path) ) scale 1.05 translate<0,0,-0.00> }
 #end //----------
-#if (Typ=40) // 
+#if (Typ=40) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape4( #include concat(In_Path1,Txt_Path) ) scale 1.05 scale 1.0 translate<0,0,-0.00> } 
+object{ Base_Shape4( #include concat(In_Path1,Txt_Path) ) scale 1.05 scale 1.0 translate<0,0,-0.00> }
 #end //----------
-#if (Typ=41) // 
+#if (Typ=41) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape4( #include concat(In_Path1,Txt_Path) )  scale <1,1,0.5>*1.2  translate<0,0,-0.00> } 
+object{ Base_Shape4( #include concat(In_Path1,Txt_Path) )  scale <1,1,0.5>*1.2  translate<0,0,-0.00> }
 #end //----------
-#if (Typ=42) // 
+#if (Typ=42) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape4( #include concat(In_Path1,Txt_Path) )   scale <1,1,0.5>*1.2 translate<0,0,-0.00> } 
+object{ Base_Shape4( #include concat(In_Path1,Txt_Path) )   scale <1,1,0.5>*1.2 translate<0,0,-0.00> }
 #end //----------
-#if (Typ=43) // 
+#if (Typ=43) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.65  shadowless }
-object{ Base_Shape4( #include concat(In_Path1,Txt_Path) ) scale  1.1 rotate<-50, 0,0> translate<0,0.6, 1.00> } 
+object{ Base_Shape4( #include concat(In_Path1,Txt_Path) ) scale  1.1 rotate<-50, 0,0> translate<0,0.6, 1.00> }
 #end //----------
-#if (Typ=44) // 
+#if (Typ=44) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape4( #include concat(In_Path1,Txt_Path) ) scale  1.05  rotate<-10, 0,0> translate<0,0.1,-0.00> } 
+object{ Base_Shape4( #include concat(In_Path1,Txt_Path) ) scale  1.05  rotate<-10, 0,0> translate<0,0.1,-0.00> }
 #end //----------
-#if (Typ=45) // 
+#if (Typ=45) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape4( #include concat(In_Path1,Txt_Path) ) scale  1.05  rotate<-10, 0,0> translate<0,0.15, 0.10> } 
+object{ Base_Shape4( #include concat(In_Path1,Txt_Path) ) scale  1.05  rotate<-10, 0,0> translate<0,0.15, 0.10> }
 #end //----------
-#if (Typ=46) // 
+#if (Typ=46) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.15  shadowless }
-object{ Base_Shape4( #include concat(In_Path1,Txt_Path) ) scale  1.0   rotate<-30,-10,0> translate<-0.2,0.35, 0.10> } 
+object{ Base_Shape4( #include concat(In_Path1,Txt_Path) ) scale  1.0   rotate<-30,-10,0> translate<-0.2,0.35, 0.10> }
 #end //----------
-#if (Typ=47) // 
+#if (Typ=47) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape4( #include concat(In_Path1,Txt_Path) )  scale  1.3   rotate< 60, 50,0> translate<-0.5, 0.1  ,-0.210> } 
+object{ Base_Shape4( #include concat(In_Path1,Txt_Path) )  scale  1.3   rotate< 60, 50,0> translate<-0.5, 0.1  ,-0.210> }
 #end //----------
-#if (Typ=48) // 
+#if (Typ=48) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.3  shadowless }
-object{ Base_Shape4( #include concat(In_Path1,Txt_Path) )  scale  1.3   rotate< 60, 50,0> translate<-0.5, 0.1  ,-0.210> } 
+object{ Base_Shape4( #include concat(In_Path1,Txt_Path) )  scale  1.3   rotate< 60, 50,0> translate<-0.5, 0.1  ,-0.210> }
 #end //----------
-#if (Typ=49) // 
+#if (Typ=49) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape4( #include concat(In_Path1,Txt_Path) ) scale  1.0   rotate< -20,10,0> translate<-0.0, 0.2 ,-0.00>  } 
+object{ Base_Shape4( #include concat(In_Path1,Txt_Path) ) scale  1.0   rotate< -20,10,0> translate<-0.0, 0.2 ,-0.00>  }
 #end //----------
-#if (Typ=50) // 
+#if (Typ=50) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape4( #include concat(In_Path1,Txt_Path) ) scale  1.1  translate<0,0,-0.00> } 
+object{ Base_Shape4( #include concat(In_Path1,Txt_Path) ) scale  1.1  translate<0,0,-0.00> }
 #end //----------
-#if (Typ=51) // 
+#if (Typ=51) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape4( #include concat(In_Path1,Txt_Path) )  scale  1.1  translate<0,0,-0.00> } 
+object{ Base_Shape4( #include concat(In_Path1,Txt_Path) )  scale  1.1  translate<0,0,-0.00> }
 #end //----------
-#if (Typ=52) // 
+#if (Typ=52) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape4c( #include concat(In_Path1,Txt_Path) ) scale 2 rotate<-10,0,-20> translate<0,0.40,-0.30> } 
+object{ Base_Shape4c( #include concat(In_Path1,Txt_Path) ) scale 2 rotate<-10,0,-20> translate<0,0.40,-0.30> }
 #end //----------
-#if (Typ=53) // 
+#if (Typ=53) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape4c( #include concat(In_Path1,Txt_Path) ) scale<1,0.8,1>*2 rotate<-50,-10,-20> translate<0,0.80,-0.40> } 
+object{ Base_Shape4c( #include concat(In_Path1,Txt_Path) ) scale<1,0.8,1>*2 rotate<-50,-10,-20> translate<0,0.80,-0.40> }
 #end //----------
-#if (Typ=54) // 
+#if (Typ=54) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.05  shadowless }
-object{ Base_Shape4d( #include concat(In_Path1,Txt_Path) ) scale 1 rotate<-90,-40,0> translate<0,1.1,-0.50> } 
+object{ Base_Shape4d( #include concat(In_Path1,Txt_Path) ) scale 1 rotate<-90,-40,0> translate<0,1.1,-0.50> }
 #end //----------
-#if (Typ=55) // 
+#if (Typ=55) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.5  shadowless }
-object{ Base_Shape4d( #include concat(In_Path1,Txt_Path) ) scale 1 rotate<-90,-30,0> translate<0,1.06,-0.70> } 
+object{ Base_Shape4d( #include concat(In_Path1,Txt_Path) ) scale 1 rotate<-90,-30,0> translate<0,1.06,-0.70> }
 #end //----------
-#if (Typ=56) // 
+#if (Typ=56) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.25  shadowless }
-object{ Base_Shape4d( #include concat(In_Path1,Txt_Path) ) scale<1,2,1>*0.95 rotate<-90,-40,0> translate<0,1.05,-0.70> } 
+object{ Base_Shape4d( #include concat(In_Path1,Txt_Path) ) scale<1,2,1>*0.95 rotate<-90,-40,0> translate<0,1.05,-0.70> }
 #end //----------
-#if (Typ=57) // 
+#if (Typ=57) //
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.05  shadowless }
-object{ Base_Shape4d( #include concat(In_Path1,Txt_Path) ) scale<1,1.3,1>*1  rotate<-90,-50,0> translate<0,1.1,-0.50> } 
+object{ Base_Shape4d( #include concat(In_Path1,Txt_Path) ) scale<1,1.3,1>*1  rotate<-90,-50,0> translate<0,1.1,-0.50> }
 #end //----------
-#if (Typ=58) // 
-#default{ finish{ ambient 0.1 diffuse 0.6 }} 
+#if (Typ=58) //
+#default{ finish{ ambient 0.1 diffuse 0.6 }}
 light_source{<10.0, 1.0, -3.0>   color rgb<1,1,1>*0.1  shadowless }
-object{ Base_Shape4d( #include concat(In_Path1,Txt_Path) ) scale<1,2,1>  rotate<-90,-40,0> translate<0,1.05,-0.50> } 
+object{ Base_Shape4d( #include concat(In_Path1,Txt_Path) ) scale<1,2,1>  rotate<-90,-40,0> translate<0,1.05,-0.50> }
 #end

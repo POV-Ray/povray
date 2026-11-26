@@ -10,8 +10,8 @@
 // -w800 -h600 +a0.3
 
 #version 3.7;
-global_settings { assumed_gamma 1.0 } 
- 
+global_settings { assumed_gamma 1.0 }
+
 
 camera {
   location  <0, 5, -5>
@@ -20,7 +20,7 @@ camera {
   angle 58
 }
 
-background { color rgb<1,1,1>*0.03 } 
+background { color rgb<1,1,1>*0.03 }
 
 
 light_source { <-20, 30, -25> color red 0.6 green 0.6 blue 0.6 }

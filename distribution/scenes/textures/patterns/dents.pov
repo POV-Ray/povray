@@ -30,7 +30,7 @@ global_settings { assumed_gamma 1.0 }
      dents 5.6
      scale 0.24
    }
-   finish{  phong 1 phong_size 400  reflection{ 0.1 }} 
+   finish{  phong 1 phong_size 400  reflection{ 0.1 }}
  }
 
 #include "pignorm.inc"

@@ -4,7 +4,7 @@
 //--------------------------------------------------------------------------
 #version 3.7;
 global_settings{ assumed_gamma 1.0 }
-#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
 //--------------------------------------------------------------------------
 #include "colors.inc"
 #include "textures.inc"
@@ -40,36 +40,36 @@ camera{Camera_0}
 // sun ---------------------------------------------------------------------
 light_source{<1500,2500,-2500> color White}
 // sky ---------------------------------------------------------------------
-light_source{ <-1000, 800, 3000> 
+light_source{ <-1000, 800, 3000>
               color White
-              looks_like{ sphere{ <0,0,0>,300 
+              looks_like{ sphere{ <0,0,0>,300
                                   texture{ pigment{ color White }
                                            normal { bumps 0.5
                                                     scale 50    }
-                                           finish { ambient 0.8   
+                                           finish { ambient 0.8
                                                     diffuse 0.2
                                                     phong 1     }
-                                                  
+
                                          } // end of texture
                                 } // end of sphere
                         } //end of looks_like
             } //end of light_source
 // sky --------------------------------------------------------------------
   // the dark blue
-plane{ <0,1,0>,1 hollow  
+plane{ <0,1,0>,1 hollow
        texture{ pigment { color rgb <0.20, 0.20, 1.0> }
-                finish  { ambient 0.25 diffuse 0 } 
-              }      
+                finish  { ambient 0.25 diffuse 0 }
+              }
        scale 10000}
-  // the clouds 
-plane{<0,1,0>,1 hollow  
+  // the clouds
+plane{<0,1,0>,1 hollow
        texture{pigment{ bozo turbulence 0.76
                         color_map { [0.5 rgbf<1.0,1.0,1.0,1.0> ]
                                     [0.6 rgb <1.0,1.0,1.0>     ]
                                     [1.0 rgb <0.5,0.5,0.5>     ]}
                        }
-               finish { ambient 0.25 diffuse 0} 
-              }      
+               finish { ambient 0.25 diffuse 0}
+              }
        scale 500}
 
 // fog ---------------------------------------------------------------------
@@ -83,7 +83,7 @@ fog{ fog_type   2
    }
 // ground ------------------------------------------------------------------
 
-plane { <0,1,0>, 0 
+plane { <0,1,0>, 0
         texture { pigment{ color rgb<0.35,0.65,0.0>*0.72}
                   normal { bumps 0.75 scale 0.015  }
                   finish { phong 0.1 }

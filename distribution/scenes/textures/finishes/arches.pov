@@ -12,7 +12,7 @@
 
 #version 3.6;
 
-global_settings { 
+global_settings {
   assumed_gamma 2.2
   max_trace_level 5
 }
@@ -25,7 +25,7 @@ global_settings {
 
 camera {
    location <60.0, 0.0, -135.0>
-   angle 40 
+   angle 40
    right     x*image_width/image_height
    look_at <0.0, 0.0, 0.0>
 }

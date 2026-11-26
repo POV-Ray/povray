@@ -21,7 +21,7 @@ camera {
 
 light_source { <10, 30, -20> color red 1 green 1 blue 1 }
 
-background { color rgb<1,1,1>*0.02 } 
+background { color rgb<1,1,1>*0.02 }
 
 blob {
   threshold 0.5

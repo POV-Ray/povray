@@ -7,7 +7,7 @@
 // -w320 -h240
 // -w800 -h600 +a0.3
 
-#version 3.6;   
+#version 3.6;
 
 #include "colors.inc"
 #include "woods.inc"

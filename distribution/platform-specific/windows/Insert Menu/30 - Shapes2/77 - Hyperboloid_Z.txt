@@ -1,6 +1,6 @@
-object{ Hyperboloid_Y rotate<90,0,0> 
+object{ Hyperboloid_Y rotate<90,0,0>
         clipped_by { box {<-2.5,-2.5,-2.0>,<2.5, 2.50,2.0>} }
-   
+
         texture { pigment{ color rgb<0.5, 0.4, 0.80> }
                   finish { phong 0.1 }
                 }

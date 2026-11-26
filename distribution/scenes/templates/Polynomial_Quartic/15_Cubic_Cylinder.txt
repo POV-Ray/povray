@@ -1,10 +1,10 @@
 
 #include "shapesq.inc"
-object{ Cubic_Cylinder     //--------------------------------  
+object{ Cubic_Cylinder     //--------------------------------
         sturm
-        texture { pigment{ color White } 
+        texture { pigment{ color White }
                   finish { phong 1}
-                } // end of texture 
+                } // end of texture
         rotate<90,35,0>
         translate <0,1,5>
       } // ------------------------------------ end of object

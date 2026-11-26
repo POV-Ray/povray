@@ -15,9 +15,9 @@ global_settings {assumed_gamma 1.0}
 #include "colors.inc"
 #include "thingy.inc"
 
-camera { location <100,100,100> 
+camera { location <100,100,100>
          right     x*image_width/image_height
-         angle 65 //  direction z*1 
+         angle 65 //  direction z*1
          look_at <0,0,0>
        }
 

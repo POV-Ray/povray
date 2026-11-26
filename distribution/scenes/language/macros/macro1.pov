@@ -14,15 +14,15 @@
 
 #version 3.7;
 global_settings {assumed_gamma 1.0}
-#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
 
 #include "colors.inc"
 
 light_source { <1000,1000,-1000>, White}
 
-camera { location <3,3,-10> 
+camera { location <3,3,-10>
          right    x*image_width/image_height
-         angle 35 // direction 2*z 
+         angle 35 // direction 2*z
          look_at <0,0,0>
        }
 

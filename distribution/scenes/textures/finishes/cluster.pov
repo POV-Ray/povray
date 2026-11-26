@@ -20,8 +20,8 @@ global_settings {
 #include "colors.inc"
 
 //-------------------------------------------------------------------------
-// This scene uses a non-standard camera set-up. 
-// (See CAMERA in the included documentation for details.) 
+// This scene uses a non-standard camera set-up.
+// (See CAMERA in the included documentation for details.)
 // If you are new to POV-Ray, you might want to try a different demo scene.
 //-------------------------------------------------------------------------
 camera { // This is an unusual camera since it is a converted file

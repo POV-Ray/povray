@@ -7,13 +7,13 @@
 //
 //--------------------------------------------------------------------------
 #version 3.7;
-global_settings{ assumed_gamma 1.0 }  
-#default{ finish{ ambient 0 diffuse 1 }} 
+global_settings{ assumed_gamma 1.0 }
+#default{ finish{ ambient 0 diffuse 1 }}
 //--------------------------------------------------------------------------
 #declare Photons=on;
 
 global_settings {
- 
+
   max_trace_level 5
   #if (Photons)          // global photon block
     photons {

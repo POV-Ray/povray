@@ -7,7 +7,7 @@
 // -w72 -h72 +a0.1 +am2 -j +r3
 
 #version 3.7;
-global_settings{ assumed_gamma 1.0 } 
+global_settings{ assumed_gamma 1.0 }
 
 #include "colors.inc"
 #include "finish.inc"
@@ -17,7 +17,7 @@ global_settings{ assumed_gamma 1.0 }
 #include "stones2.inc"
 #include "woods.inc"
 
- 
+
 //#declare Typ=1;     // colors
 //#declare Typ=2;     // finish
 //#declare Typ=3;     // glass
@@ -40,7 +40,7 @@ camera {
   orthographic
   location <0,0,1>
   look_at  <0,0,0>
-  
+
   #if (Typ=3)   // glass
     right 2*x
     up 2*y
@@ -48,7 +48,7 @@ camera {
     right 1*x
     up 1*y
   #end
- 
+
 }
 
 sky_sphere {

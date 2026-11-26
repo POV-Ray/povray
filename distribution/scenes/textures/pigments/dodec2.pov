@@ -118,7 +118,7 @@ pigment {
 
 camera {
    location  <0, 0, -6>
-   angle 40 
+   angle 40
    right   x*image_width/image_height
    look_at   <0, 0,   0>
 }

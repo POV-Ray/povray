@@ -23,7 +23,7 @@ global_settings { assumed_gamma 1.0 }
 #declare CamLoc = < 5, 5,-5>;
 
 camera {
-	up y  
+	up y
 	right x*image_width/image_height
 	location CamLoc
 	look_at < 0, 0, 0>

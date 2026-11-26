@@ -1,20 +1,20 @@
 // These identifiers are built in to POV-Ray, ready to use
-//  #declare pi = 3.1415926535897932384626 
-//  #declare e.. = 1*10^... // 3.4e4 = 34000, 2e-5 =0.00002 ; 
-//  #declare E.. = 1*10^... // 3.4E4 = 34000, 2E-5 =0.00002 ; 
-//  #declare true = 1 
-//  #declare yes = 1 
-//  #declare on = 1 
-//  #declare false = 0 
-//  #declare no = 0 
-//  #declare off = 0 
-//  #declare u = <1,0> 
-//  #declare v = <0,1> 
-//  #declare o = <0,0,0> 
-//  #declare x = <1,0,0> 
-//  #declare y = <0,1,0> 
-//  #declare z = <0,0,1> 
-//  #declare t = <0,0,0,1> 
+//  #declare pi = 3.1415926535897932384626
+//  #declare e.. = 1*10^... // 3.4e4 = 34000, 2e-5 =0.00002 ;
+//  #declare E.. = 1*10^... // 3.4E4 = 34000, 2E-5 =0.00002 ;
+//  #declare true = 1
+//  #declare yes = 1
+//  #declare on = 1
+//  #declare false = 0
+//  #declare no = 0
+//  #declare off = 0
+//  #declare u = <1,0>
+//  #declare v = <0,1>
+//  #declare o = <0,0,0>
+//  #declare x = <1,0,0>
+//  #declare y = <0,1,0>
+//  #declare z = <0,0,1>
+//  #declare t = <0,0,0,1>
 
 // Other built in identifiers with no fixed values :
 /*

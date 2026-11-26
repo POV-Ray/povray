@@ -18,7 +18,7 @@ global_settings {assumed_gamma 1.5 max_trace_level 5}
 
 camera {
    location <-1.5, 30.0, -150.0>
-   angle 35 
+   angle 35
    right   x*image_width/image_height
    look_at <0.0, 25.0, 35.0>
 }

@@ -6,7 +6,7 @@
 
    Mitigates the problem with the visible seams on UV maps
    + used by the bake.sh script to automate the process
-  
+
    --
    Jaime Vives Piqueres, Jan. 2011  <jaime@ignorancia.org> */
 

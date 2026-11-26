@@ -4,6 +4,6 @@
                                      [1.0 rgb <0.5,0.5,0.5>]}
                          scale 0.25
                        }
-                finish { phong 1 } 
+                finish { phong 1 }
                 rotate<0,0,0> scale 1 translate<0,0,0>
-              } // end of texture 
+              } // end of texture

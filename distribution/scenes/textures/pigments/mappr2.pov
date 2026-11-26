@@ -64,7 +64,7 @@ object { Paraboloid_Y
 
 camera {
    location  <0, 0, -25>
-   angle 65 
+   angle 65
    right   x*image_width/image_height
    look_at <0, 0, 0>
 }

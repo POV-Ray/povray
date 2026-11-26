@@ -1,9 +1,9 @@
-//---------------------------------------------------------------------------- 
+//----------------------------------------------------------------------------
 #include "shapes3.inc"
 //----------------------------------------------------------------------------
 //global_settings { max_trace_level 30 } // for transparent materials
 //----------------------------------------------------------------------------
-object{ Round_N_Tube_Polygon ( // A round polygon tube ring with N corners 
+object{ Round_N_Tube_Polygon ( // A round polygon tube ring with N corners
                             6, // number of corners must be >= 3 !!!
                             0.100,// tube radius < base width
                             0.850,     // base width (center to edge middle)
@@ -21,13 +21,12 @@ object{ Round_N_Tube_Polygon ( // A round polygon tube ring with N corners
                 } // end of interior ------------------------------------------
       } // end of material ----------------------------------------------------
    */
-  
+
       texture{ pigment{ color rgb<1,1,1>}
                finish { phong 1}
              } // end of texture
-  
+
    // rotate<90,0,0>
       translate< 0,0,0>
 } // end of object -----------------------------------------------------------
 //----------------------------------------------------------------------------
- 

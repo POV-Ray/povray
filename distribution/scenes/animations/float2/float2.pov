@@ -29,9 +29,9 @@ camera {
 }
 
 light_source { <5000, 10000, -20000> color White}
-plane { z, Rad hollow on pigment {checker color rgb <1,1,1>*1.2 color rgb <1,1,.8>} 
+plane { z, Rad hollow on pigment {checker color rgb <1,1,1>*1.2 color rgb <1,1,.8>}
         translate<0,-0.2,0> }
-        
+
 union{
  text{ttf Font concat("F=clock*10-5=",str(F,0,2)),0.1,0 translate TFudge}
  sphere {<F,-0.5,0>,Rad}

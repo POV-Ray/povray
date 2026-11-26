@@ -18,7 +18,7 @@ global_settings { assumed_gamma 1.0 }
 #declare T1=
  texture{
    pigment{
-     hexagon color Black color White color Gray50 
+     hexagon color Black color White color Gray50
      scale 0.124
      rotate<90,0,0>
    }

@@ -1,24 +1,24 @@
 // Insert menu illustration scene "Sky.pov"
 // Author: Friedrich A. Lohmueller, June-2012
 #version 3.7;
-#if( Typ > 42 ) 
-global_settings{ assumed_gamma 1.0 } 
+#if( Typ > 42 )
+global_settings{ assumed_gamma 1.0 }
 #end
 
-#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
 #include "shapes.inc"
 #include "colors.inc"
 #include "textures.inc"
 #include "glass.inc"
 //------------------------------------
-#declare In_Path1  = "E0 - Textures and Materials/10 - Texture samples/"   
-#declare In_Path2  = "E0 - Textures and Materials/20 - Mirrors and Glasses/"   
+#declare In_Path1  = "E0 - Textures and Materials/10 - Texture samples/"
+#declare In_Path2  = "E0 - Textures and Materials/20 - Mirrors and Glasses/"
 
      // #declare Typ = 41; // for tests
 
 #switch (Typ)  //----------------------------------------------------------
 // In_Path1
-#case(1)  #declare Txt_Path="01 - checker.txt" #break 
+#case(1)  #declare Txt_Path="01 - checker.txt" #break
 #case(2)  #declare Txt_Path="02 - checker_spherical_warp.txt" #break
 #case(3)  #declare Txt_Path="03 - hexagon.txt" #break
 #case(4)  #declare Txt_Path="04 - brick - 1.txt" #break
@@ -33,7 +33,7 @@ global_settings{ assumed_gamma 1.0 }
 #case(13)  #declare Txt_Path="13 - Radial.txt" #break
 #case(14)  #declare Txt_Path="14 - gradient_peel.txt" #break
 #case(15)  #declare Txt_Path="15 - spiral_peel.txt" #break
-// In_Path2 
+// In_Path2
 #case(40)  #declare Txt_Path="40 - Polished_Chrome.txt" #break
 #case(41)  #declare Txt_Path="41 - Polished_Chrome bumps.txt" #break
 #case(42)  #declare Txt_Path="42 - Polished_Chrome crackle.txt" #break
@@ -57,48 +57,48 @@ global_settings{ assumed_gamma 1.0 }
 //-------------------------------------------------------------------------
 #macro Base_Shape0( Tex )
  sphere{<0,0,0>,1 texture{Tex} translate<0,1,-0.35>
- }//  
+ }//
 #end // macro
 
 #macro Base_Shape1( Tex )
-union{ 
- box{<-1.0,0,0>,<0,2,2> texture{Tex} translate<-0.80,0,0> } 
- sphere{<0,0,0>,1 texture{Tex} translate<0.65,1,0> } 
+union{
+ box{<-1.0,0,0>,<0,2,2> texture{Tex} translate<-0.80,0,0> }
+ sphere{<0,0,0>,1 texture{Tex} translate<0.65,1,0> }
  translate<0,0,-0.35>
- }//  
+ }//
 #end // macro
 
 #macro Base_Shape2( Tex )
-union{ 
- cylinder{<0,0,0>,<0,2,0>,0.35 texture{Tex rotate<0,0,0>} translate<1.20,0,0> } 
- sphere{<0,0,0>,1 texture{Tex} rotate<-30,0,0> translate<-0.45,1,0> } 
+union{
+ cylinder{<0,0,0>,<0,2,0>,0.35 texture{Tex rotate<0,0,0>} translate<1.20,0,0> }
+ sphere{<0,0,0>,1 texture{Tex} rotate<-30,0,0> translate<-0.45,1,0> }
  translate<0,0,-0.5>
- }//  
+ }//
 #end // macro
 
 #macro Base_Shape3( Tex )
-union{ 
- box{<-0.75,0,-1>,<0.75,0.1,1> texture{Tex} translate<-0.80,0,0.5> } 
- sphere{<0,0,0>,1 texture{Tex} translate<0.65,1,0> } 
+union{
+ box{<-0.75,0,-1>,<0.75,0.1,1> texture{Tex} translate<-0.80,0,0.5> }
+ sphere{<0,0,0>,1 texture{Tex} translate<0.65,1,0> }
  translate<0,0,-0.35>
- }//  
+ }//
 #end // macro
 
 
 #macro Base_ShapeM( Tex )
  sphere{<0,0,0>,1 material{Tex} translate<0,1,-0.35>
- }//  
+ }//
 #end // macro
 //--------------------------------------------------------------------------------------------
 #macro Base_Scene_2 ()
 
- 
+
 camera {perspective angle 75 location  <0.0 , 1.0 ,-3.0>
                             right     x*image_width/image_height
                             look_at   <0.0 , 1.0 , 0.0>}
 light_source{< 3000,3000,-3000> color White}
 // sky ----------------------------------------------------------------------
-plane{<0,1,0>,1 hollow  
+plane{<0,1,0>,1 hollow
        texture{ pigment{ bozo turbulence 0.92
                          color_map { [0.00 rgb <0.20, 0.20, 1.0>*0.9]
                                      [0.50 rgb <0.20, 0.20, 1.0>*0.9]
@@ -107,62 +107,62 @@ plane{<0,1,0>,1 hollow
                                      [1.0 rgb <0.5,0.5,0.5>]}
                         scale<1,1,1.5>*2.5  translate< 0,0,0>
                        }
-                finish {ambient 1 diffuse 0} }      
+                finish {ambient 1 diffuse 0} }
        scale 10000}
 // fog on the ground -------------------------------------------------
 fog { fog_type   2
       distance   50
-      color      White  
+      color      White
       fog_offset 0.1
       fog_alt    1.5
       turbulence 1.8
     }
 // ground -------------------------------------------------------------------
-plane{ <0,1,0>, 0 
+plane{ <0,1,0>, 0
        texture{ pigment{ checker color rgb<1,1,1>*1.2 color rgb<0.25,0.15,0.1>*0}
                 finish { phong 0.1}
               } // end of texture
      } // end of plane
- 
-#end 
-//------------------------------------------------------------------------- 
+
+#end
+//-------------------------------------------------------------------------
 //----------
-#if (Typ=1) // 
+#if (Typ=1) //
 #include "10 - Ready made scenes/50 - Basic Scene 05 - Grass with small clouds in sky.txt"
-object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00>} 
+object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00>}
 #end
 //----------
-#if (Typ=2) // 
+#if (Typ=2) //
 #include "10 - Ready made scenes/50 - Basic Scene 05 - Grass with small clouds in sky.txt"
-object{ Base_Shape0( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.20> } 
+object{ Base_Shape0( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.20> }
 #end
 //----------
-#if (Typ=3) // 
+#if (Typ=3) //
 #include "10 - Ready made scenes/50 - Basic Scene 05 - Grass with small clouds in sky.txt"
-object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end
 //----------
-#if (Typ=4) // 
+#if (Typ=4) //
 #include "10 - Ready made scenes/50 - Basic Scene 05 - Grass with small clouds in sky.txt"
-object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end
 //----------
-#if (Typ=5) // 
+#if (Typ=5) //
 #include "10 - Ready made scenes/50 - Basic Scene 05 - Grass with small clouds in sky.txt"
-object{ Base_Shape1( #include concat(In_Path1,Txt_Path)) translate<0,0,-0.00> } 
+object{ Base_Shape1( #include concat(In_Path1,Txt_Path)) translate<0,0,-0.00> }
 #end
 //----------
-#if (Typ=6) // 
+#if (Typ=6) //
 #include "10 - Ready made scenes/50 - Basic Scene 05 - Grass with small clouds in sky.txt"
-object{ Base_Shape0( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.20> } 
+object{ Base_Shape0( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.20> }
 #end
 //----------
-#if (Typ=7) // 
+#if (Typ=7) //
 #include "10 - Ready made scenes/50 - Basic Scene 05 - Grass with small clouds in sky.txt"
-object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) rotate<0,10,0> translate<0,0,-0.00> } 
+object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) rotate<0,10,0> translate<0,0,-0.00> }
 #end
 //----------
-#if (Typ=8) // 
+#if (Typ=8) //
 #include "10 - Ready made scenes/50 - Basic Scene 05 - Grass with small clouds in sky.txt"
 #declare Texture_W =
  texture{ pigment{ color White*0.9}
@@ -174,125 +174,125 @@ object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) rotate<0,10,0> transla
           finish { phong 1 }
           scale 0.5 translate<0,0,0>
         } // end of texture
-object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) rotate<0,10,0>  translate<0,0,-0.00> } 
+object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) rotate<0,10,0>  translate<0,0,-0.00> }
 #end
 //----------
-#if (Typ=9) // 
+#if (Typ=9) //
 #include "10 - Ready made scenes/50 - Basic Scene 05 - Grass with small clouds in sky.txt"
-object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) rotate<0,0,0>  translate<0,0,-0.00> } 
+object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) rotate<0,0,0>  translate<0,0,-0.00> }
 #end
 //----------
-#if (Typ=10) // 
+#if (Typ=10) //
 #include "10 - Ready made scenes/50 - Basic Scene 05 - Grass with small clouds in sky.txt"
-object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end
 //----------
-#if (Typ=11) // 
+#if (Typ=11) //
 #include "10 - Ready made scenes/50 - Basic Scene 05 - Grass with small clouds in sky.txt"
-object{ Base_Shape2( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape2( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end
 //----------
-#if (Typ=12) // 
+#if (Typ=12) //
 #include "10 - Ready made scenes/50 - Basic Scene 05 - Grass with small clouds in sky.txt"
-object{ Base_Shape3( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape3( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end
 //----------
-#if (Typ=13) // 
+#if (Typ=13) //
 #include "10 - Ready made scenes/50 - Basic Scene 05 - Grass with small clouds in sky.txt"
-object{ Base_Shape3( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape3( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end
 //----------
-#if (Typ=14) // 
+#if (Typ=14) //
 #include "10 - Ready made scenes/50 - Basic Scene 05 - Grass with small clouds in sky.txt"
-object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end
 //----------
-#if (Typ=15) // 
+#if (Typ=15) //
 #include "10 - Ready made scenes/50 - Basic Scene 05 - Grass with small clouds in sky.txt"
-object{ Base_Shape2( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+object{ Base_Shape2( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end
 
 
 //---------- Mirrors + Glasses
-#if (Typ=40) // 
+#if (Typ=40) //
 #include "10 - Ready made scenes/50 - Basic Scene 05 - Grass with small clouds in sky.txt"
-object{ Base_Shape0( #include concat(In_Path2,Txt_Path) ) translate<0, 0.20,-0.00> } 
+object{ Base_Shape0( #include concat(In_Path2,Txt_Path) ) translate<0, 0.20,-0.00> }
 #end
 //----------
-#if (Typ=41) // 
+#if (Typ=41) //
 #include "10 - Ready made scenes/50 - Basic Scene 05 - Grass with small clouds in sky.txt"
-object{ Base_Shape0( #include concat(In_Path2,Txt_Path) ) translate<0, 0.20,-0.00> } 
+object{ Base_Shape0( #include concat(In_Path2,Txt_Path) ) translate<0, 0.20,-0.00> }
 #end
 //----------
-#if (Typ=42) // 
+#if (Typ=42) //
 #include "10 - Ready made scenes/50 - Basic Scene 05 - Grass with small clouds in sky.txt"
-object{ Base_Shape0( #include concat(In_Path2,Txt_Path) ) translate<0, 0.20,0> } 
+object{ Base_Shape0( #include concat(In_Path2,Txt_Path) ) translate<0, 0.20,0> }
 #end
 
-//---------- 
-#if (Typ=80) //  
+//----------
+#if (Typ=80) //
 Base_Scene_2()
-object{ Base_Shape1( #include concat(In_Path2,Txt_Path) ) scale 0.95 translate<0, 0.50,-0.00> } 
+object{ Base_Shape1( #include concat(In_Path2,Txt_Path) ) scale 0.95 translate<0, 0.50,-0.00> }
 #end
 //----------
-#if (Typ=81) // 
+#if (Typ=81) //
 Base_Scene_2()
-object{ Base_ShapeM( #include concat(In_Path2,Txt_Path) ) translate<0, 0.10,-0.10> } 
+object{ Base_ShapeM( #include concat(In_Path2,Txt_Path) ) translate<0, 0.10,-0.10> }
 #end
 //----------
-#if (Typ=82) // 
+#if (Typ=82) //
 Base_Scene_2()
-object{ Base_ShapeM( #include concat(In_Path2,Txt_Path) ) translate<0, 0.10,-0.10> } 
+object{ Base_ShapeM( #include concat(In_Path2,Txt_Path) ) translate<0, 0.10,-0.10> }
 #end
 //----------
-#if (Typ=83) // 
+#if (Typ=83) //
 Base_Scene_2()
-object{ Base_ShapeM( #include concat(In_Path2,Txt_Path) ) translate<0, 0.10,-0.10> } 
+object{ Base_ShapeM( #include concat(In_Path2,Txt_Path) ) translate<0, 0.10,-0.10> }
 #end
 //----------
-#if (Typ=84) // 
+#if (Typ=84) //
 Base_Scene_2()
-object{ Base_ShapeM( #include concat(In_Path2,Txt_Path) ) translate<0, 0.10,-0.10> } 
+object{ Base_ShapeM( #include concat(In_Path2,Txt_Path) ) translate<0, 0.10,-0.10> }
 #end
 //----------
-#if (Typ=85) // 
+#if (Typ=85) //
 Base_Scene_2()
-object{ Base_ShapeM( #include concat(In_Path2,Txt_Path) ) translate<0, 0.10,-0.10> } 
+object{ Base_ShapeM( #include concat(In_Path2,Txt_Path) ) translate<0, 0.10,-0.10> }
 #end
 //----------
-#if (Typ=86) // 
+#if (Typ=86) //
 Base_Scene_2()
-object{ Base_ShapeM( #include concat(In_Path2,Txt_Path) ) translate<0, 0.10,-0.10> } 
+object{ Base_ShapeM( #include concat(In_Path2,Txt_Path) ) translate<0, 0.10,-0.10> }
 #end
 //----------
-#if (Typ=87) // 
+#if (Typ=87) //
 Base_Scene_2()
-object{ Base_ShapeM( #include concat(In_Path2,Txt_Path) ) translate<0, 0.10,-0.10> } 
+object{ Base_ShapeM( #include concat(In_Path2,Txt_Path) ) translate<0, 0.10,-0.10> }
 #end
 //----------
-#if (Typ=88) // 
+#if (Typ=88) //
 Base_Scene_2()
-object{ Base_ShapeM( #include concat(In_Path2,Txt_Path) ) translate<0, 0.10,-0.10> } 
+object{ Base_ShapeM( #include concat(In_Path2,Txt_Path) ) translate<0, 0.10,-0.10> }
 #end
 //----------
-#if (Typ=89) // 
+#if (Typ=89) //
 Base_Scene_2()
-object{ Base_ShapeM( #include concat(In_Path2,Txt_Path) ) translate<0, 0.10,-0.10> } 
+object{ Base_ShapeM( #include concat(In_Path2,Txt_Path) ) translate<0, 0.10,-0.10> }
 #end
 //----------
-#if (Typ=90) // 
+#if (Typ=90) //
 Base_Scene_2()
-object{ Base_ShapeM( #include concat(In_Path2,Txt_Path) ) translate<0, 0.10,-0.10> } 
+object{ Base_ShapeM( #include concat(In_Path2,Txt_Path) ) translate<0, 0.10,-0.10> }
 #end
 //----------
-#if (Typ=91) // 
+#if (Typ=91) //
 Base_Scene_2()
-object{ Base_ShapeM( #include concat(In_Path2,Txt_Path) ) translate<0, 0.10,-0.10> } 
+object{ Base_ShapeM( #include concat(In_Path2,Txt_Path) ) translate<0, 0.10,-0.10> }
 #end
 //----------
-#if (Typ=92) // 
+#if (Typ=92) //
 Base_Scene_2()
-object{ Base_ShapeM( #include concat(In_Path2,Txt_Path) ) translate<0, 0.10,-0.10> } 
+object{ Base_ShapeM( #include concat(In_Path2,Txt_Path) ) translate<0, 0.10,-0.10> }
 #end
 
 //---------- End Mirrors + Glasses

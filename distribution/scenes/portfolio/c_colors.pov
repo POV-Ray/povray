@@ -11,7 +11,7 @@
 // Date: 2001/07/28
 // Auth: Ingo Janssen
 #version 3.6;
-global_settings { 
+global_settings {
   assumed_gamma 1.0
 }
 
@@ -101,7 +101,7 @@ global_settings {
      look_at   <0,0, 0.0>
      angle 35
    }
-   
+
    //the colour in light
    light_group {
       light_source {<-50,500,-200> rgb 1}
@@ -115,7 +115,7 @@ global_settings {
          pigment{colorArr[frame_number-1]}
       }
    }
-   
+
    //the pure colour
    box {
       -1,1
@@ -125,16 +125,16 @@ global_settings {
       pigment {colorArr[frame_number-1]}
       finish {ambient 1 diffuse 0}
    }
-   
-   //background plane for transparent colors   
+
+   //background plane for transparent colors
    plane {
       y,-1
       no_shadow
       pigment{
-         checker 
-         color rgb 1 
-         color blue 1 
-         scale 0.25 
+         checker
+         color rgb 1
+         color blue 1
+         scale 0.25
          rotate <0,45,0>
       }
       finish {ambient 1}

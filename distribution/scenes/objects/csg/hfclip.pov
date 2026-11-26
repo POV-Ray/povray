@@ -21,7 +21,7 @@ global_settings { assumed_gamma 1.5 }
 
 camera {
    location  <0, 6, -6>
-   angle 35 
+   angle 35
    right     x*image_width/image_height
    look_at  <0, 0, 0>
 }
@@ -36,7 +36,7 @@ camera {
    finish {
       ambient 0.1
       diffuse 0.55
-      phong 0.2 
+      phong 0.2
    }
 }
 

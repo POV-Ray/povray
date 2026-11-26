@@ -1,5 +1,5 @@
 ; Persistence Of Vision raytracer
-; version 3.6 / 3.7 
+; version 3.6 / 3.7
 ; animation ini sample file.
 
 Antialias=On

@@ -69,10 +69,10 @@ light_source { <-20, 30, -100> color White }
 
 light_source { <0, 50, 10> color AmbientLight }
 
-box { <-6,-1,-5>,<8,0,8> 
-      pigment{ color rgb<0.45,0.38,0.35>*0.2  } 
+box { <-6,-1,-5>,<8,0,8>
+      pigment{ color rgb<0.45,0.38,0.35>*0.2  }
       translate<0,-1,0>
-    } //      
+    } //
 
 // Flat-topped sphere/plane intersection
 #declare MelonHalf = intersection {

@@ -4,7 +4,7 @@
 //--------------------------------------------------------------------------
 #version 3.7;
 global_settings{ assumed_gamma 1.0 }
-#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
 //--------------------------------------------------------------------------
 #include "colors.inc"
 #include "textures.inc"
@@ -43,7 +43,7 @@ light_source{<1500,2500,-2500> color White}
 // sky ---------------------------------------------------------------
 #include "skies.inc"
 sky_sphere {S_Cloud4  // 1 - 5
-            scale 1         
+            scale 1
            } //end of skysphere
 // fog ---------------------------------------------------------------------
 fog{fog_type   2
@@ -54,7 +54,7 @@ fog{fog_type   2
     turbulence 0.8}
 
 // ground ------------------------------------------------------------
-plane { <0,1,0>, 0 
+plane { <0,1,0>, 0
         texture{ pigment{ color rgb<0.35,0.65,0.0>*0.72}
 	         normal { bumps 0.75 scale 0.015}
                  finish { phong 0.1}

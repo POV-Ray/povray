@@ -7,16 +7,16 @@
 // Desc: Spline demo animation that shows how to make an object or
 //       the camera fly along a spline. This is a cyclic animation.
 // Date: August 30 2001
-// Auth: Rune S. Johansen 
+// Auth: Rune S. Johansen
 
 // Use these command line settings to view the animation
 // in REGULAR MODE:
-// 
+//
 // +kf0.1666 +kff20 +kc declare=fp=0
 
 // Use these command line settings to view the animation
 // in FIRST PERSON MODE:
-// 
+//
 // +kff120 +kc declare=fp=1
 
 #version 3.7;
@@ -32,7 +32,7 @@ global_settings {assumed_gamma 1.0}
       #declare FirstPerson = fp;
    #else
       #declare FirstPerson = no;
-   #end 
+   #end
 #end
 
 // Overview camera
@@ -87,10 +87,10 @@ torus { // blue ring
 #declare MySpline =
 spline {
    cubic_spline
-   
+
    -2, <-5, 3, 0>, // control point
    -1, <-2, 2, 0>, // control point
-   
+
    00, < 0, 2, 0>, // start
    01, < 2, 2, 0>,
    02, < 5, 3, 0>, // through yellow ring
@@ -103,7 +103,7 @@ spline {
    09, <-5, 3, 0>, // through blue ring
    10, <-2, 2, 0>,
    11, < 0, 2, 0>, // stop
-   
+
    12, < 2, 2, 0>, // control point
    13, < 5, 3, 0>, // control point
 }

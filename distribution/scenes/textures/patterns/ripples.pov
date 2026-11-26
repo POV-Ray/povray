@@ -20,7 +20,7 @@ global_settings { assumed_gamma 1.0 }
    pigment{
      ripples
      color_map{
-       [0.0 Black][0.1 Black][0.9 White][1.0 White] 
+       [0.0 Black][0.1 Black][0.9 White][1.0 White]
      }
      scale 0.1
    }

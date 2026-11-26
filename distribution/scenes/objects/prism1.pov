@@ -36,7 +36,7 @@ background { color SkyBlue }
 
 plane { y, 0
    pigment {
-      checker colour Yellow colour  rgb<0.75,1,0> 
+      checker colour Yellow colour  rgb<0.75,1,0>
       scale 5
    }
    finish {

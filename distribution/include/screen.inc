@@ -32,7 +32,7 @@
 #end
 
 #macro Update_Camera()
-   
+
    #ifndef (Camera_Aspect_Ratio)
       #declare Camera_Aspect_Ratio = image_width/image_height;
    #end
@@ -40,8 +40,8 @@
    #ifndef (Camera_Look_At)  #declare Camera_Look_At = z;        #end
    #ifndef (Camera_Sky)      #declare Camera_Sky = y;            #end
    #ifndef (Camera_Zoom)     #declare Camera_Zoom = 1;           #end
-   
-   
+
+
    #local CamL=Camera_Location;                     // wherever you're putting it
    #local CamD=vnormalize(Camera_Look_At-CamL);     // direction of camera view
    #local CamR=vnormalize(vcross(Camera_Sky,CamD)); // to the right
@@ -55,7 +55,7 @@
          CamL.x, CamL.y, CamL.z
       >
    };
-   
+
    camera {
      direction CamD*Camera_Zoom
      right CamR*Camera_Aspect_Ratio
@@ -63,7 +63,7 @@
      sky Camera_Sky
      location CamL
    }
-   
+
 #end
 
 Update_Camera()

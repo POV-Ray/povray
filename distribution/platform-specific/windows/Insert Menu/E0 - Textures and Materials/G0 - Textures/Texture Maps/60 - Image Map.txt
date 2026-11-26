@@ -54,8 +54,8 @@ plane {
   texture {
     pigment {
       image_map {
-        png "test.png" 
-     // file_gamma 1.8 // new in 3.7 
+        png "test.png"
+     // file_gamma 1.8 // new in 3.7
 
         interpolate 2 // smooth it
         once   // don't tile image, just one copy

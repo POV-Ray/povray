@@ -20,7 +20,7 @@ global_settings {
 #declare Font="cyrvetic.ttf"
 text{ ttf Font
     concat("reflection=",str(R,1,1)),0.1,0
-    rotate<0,-5,0> 
+    rotate<0,-5,0>
     scale <1.25, 1.5, 4>
     translate <-3.25, 0, -1>
     pigment { rgb <1, 0.5, 0.2> }

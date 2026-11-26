@@ -14,7 +14,7 @@
 //
 //    To suppress warnings generated from using these deprecated textures you should consider
 //    converting them to materials.
-//    
+//
 //    In this example texture {T_Glass4} interior {I_Glass caustics 1} becomes
 //
 //    material {
@@ -23,7 +23,7 @@
 //        finish { F_Glass4 }
 //        }
 //      interior { I_Glass caustics 1 }
-//      } 
+//      }
 
 #ifndef(Glass_Old_Inc_Temp)
 #declare Glass_Old_Inc_Temp=version;
@@ -38,7 +38,7 @@
 interior {
     ior 1.5
 }
-  
+
 // Glass Finishes
 #declare F_Glass1 =
 finish {
@@ -47,9 +47,9 @@ finish {
     ambient 0
     diffuse 0
     reflection 0.1
-}   
+}
 
-#declare F_Glass2 = 
+#declare F_Glass2 =
 finish {
     ambient 0
     diffuse 0

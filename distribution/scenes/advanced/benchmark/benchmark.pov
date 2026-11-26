@@ -205,8 +205,8 @@ global_settings {
 
 //====================================================================================
 
-// This scene uses a non-standard camera set-up. 
-// (See CAMERA in the included documentation for details.) 
+// This scene uses a non-standard camera set-up.
+// (See CAMERA in the included documentation for details.)
 // If you are new to POV-Ray, you might want to try a different demo scene.
 camera {
    location  <3.2, 3.2, 1.8>
@@ -262,11 +262,11 @@ fog{
 #declare f_ridged_mf = function { internal(59) }
 // Parameters: x, y, z
    // Six extra parameters required:
-   // 1. H 
-   // 2. Lacunarity 
+   // 1. H
+   // 2. Lacunarity
    // 3. octaves
-   // 4. offset 
-   // 5. Gain 
+   // 4. offset
+   // 5. Gain
    // 6. noise
 
 #declare RMF = function{ f_ridged_mf(x, y, z, 0.07, 2.2,  7, 0.6, 0.9, 1)}

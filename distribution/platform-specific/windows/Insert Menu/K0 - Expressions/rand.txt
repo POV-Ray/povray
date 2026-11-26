@@ -1,4 +1,4 @@
-// the rand() function creates a reproducible sequence 
+// the rand() function creates a reproducible sequence
 // of pseudo-random numbers between 0.0 and 1.0
 
 #declare R1 = seed(0);      // initialize random number streams

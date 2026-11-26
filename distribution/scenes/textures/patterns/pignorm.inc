@@ -15,7 +15,7 @@
 camera {
   location <0,1,-14>
   right     x*image_width/image_height
-  angle 25  
+  angle 25
 }
 
 plane {

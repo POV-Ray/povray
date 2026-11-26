@@ -7,14 +7,14 @@ isosurface { //-------------------------------------------------------------
        10,    // inverse size,
        0.53,  // flange, (1 = off)
        1      // threshold
-       )                                                                       
-  }          
+       )
+  }
  contained_by {sphere {0,1.5}}
- threshold 0.01 
+ threshold 0.01
  accuracy 0.00001
  max_gradient 5
- 
- texture{ pigment{ color rgb <0.9,0.4,0.7>} 
+
+ texture{ pigment{ color rgb <0.9,0.4,0.7>}
           finish { specular 0.1 roughness 0.1 phong 0.2 }
         }
  rotate<45,45,0>

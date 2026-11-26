@@ -9,7 +9,7 @@
 
 #version 3.7;
 global_settings { assumed_gamma 1.0 }
- 
+
 #include "colors.inc"
 #include "benediti.map"
 

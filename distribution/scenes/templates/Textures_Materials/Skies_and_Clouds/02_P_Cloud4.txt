@@ -3,5 +3,5 @@
 
          texture{ pigment{ P_Cloud4 }
                   finish { phong 1 }
-                  scale 1 
-                } // end of texture ---------------------- 
+                  scale 1
+                } // end of texture ----------------------

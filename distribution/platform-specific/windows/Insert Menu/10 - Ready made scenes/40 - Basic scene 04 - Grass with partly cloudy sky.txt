@@ -4,7 +4,7 @@
 //--------------------------------------------------------------------------
 #version 3.7;
 global_settings{ assumed_gamma 1.0 }
-#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
 //--------------------------------------------------------------------------
 #include "colors.inc"
 #include "textures.inc"
@@ -40,13 +40,13 @@ camera{Camera_0}
 // sun ---------------------------------------------------------------------
 light_source{<1500,2500,-2500> color White}
 // sky ---------------------------------------------------------------------
-plane{<0,1,0>,1 hollow  
+plane{<0,1,0>,1 hollow
        texture{ pigment{ bozo turbulence 0.76
                          color_map { [0.5 rgb <0.20, 0.20, 1.0>]
                                      [0.6 rgb <1,1,1>]
                                      [1.0 rgb <0.5,0.5,0.5>]}
                        }
-                finish {ambient 1 diffuse 0} }      
+                finish {ambient 1 diffuse 0} }
        scale 10000}
 // fog ---------------------------------------------------------------------
 fog{fog_type   2
@@ -56,7 +56,7 @@ fog{fog_type   2
     fog_alt    2.0
     turbulence 0.8}
 // ground ------------------------------------------------------------------
-plane { <0,1,0>, 0 
+plane { <0,1,0>, 0
         texture{ pigment{ color rgb<0.35,0.65,0.0>*0.9 }
 	         normal { bumps 0.75 scale 0.015 }
                  finish { phong 0.1 }

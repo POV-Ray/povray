@@ -11,7 +11,7 @@
 // Sample quartic file
 // by Alexander Enzmann
 #version  3.7;
-global_settings { 
+global_settings {
   assumed_gamma 1.0
 }
 
@@ -47,7 +47,7 @@ object {
 camera {
    location  <0.0, 0.0, -8.0>
    right     x*image_width/image_height
-   angle 65 
+   angle 65
 }
 
 // Put in some light sources so that highlighting can give visual clues
@@ -56,5 +56,5 @@ light_source { <500, 100, -300> colour White }
 
 light_source { <-200, 100, -300> colour White }
 
-background { color rgb<1,1,1>*0.03 } 
- 
+background { color rgb<1,1,1>*0.03 }
+

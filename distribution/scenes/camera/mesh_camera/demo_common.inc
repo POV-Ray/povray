@@ -18,7 +18,7 @@
  ***********************************************************************************/
 
 // if we are not rendering the baking demo, ensure the switch is off
-#ifndef(use_baking) 
+#ifndef(use_baking)
   #declare use_baking=0;
 #end
 
@@ -29,7 +29,7 @@
 // + these use the baked texture maps when use_baking is set to 2 (load)
 // + reflections are not used when baking, to avoid camera dependant textures
 // + in this case I didn't use the uv mapping for the baking step, to allow to bake procedural textures
-#declare wm_vase1_auv = 
+#declare wm_vase1_auv =
 texture{
 #if (use_baking<2)
 	pigment{
@@ -46,17 +46,17 @@ texture{
   finish{reflection{0.01,0.99 falloff 5}}
 #end
 }
-#declare wm_vase2_auv = 
+#declare wm_vase2_auv =
 texture{
 #if (use_baking<2)
 	pigment{
-    granite color_map{Blood_Marble_Map} 
+    granite color_map{Blood_Marble_Map}
     turbulence .33 lambda 3 scale 2
   }
 #else
   uv_mapping
 	pigment{
-     image_map{png "im_vase2_baked.png" interpolate 2} 
+     image_map{png "im_vase2_baked.png" interpolate 2}
   }
   finish{emission 1}
 #end
@@ -67,7 +67,7 @@ texture{
 
 // room walls texture
 // + uses the baked texture map when use_baking is set to 2 (load)
-#declare wm_t_room_auv = 
+#declare wm_t_room_auv =
 texture{
   uv_mapping
 #if (use_baking<2)
@@ -89,14 +89,14 @@ texture{
 // + scale and position declared for use in the mesh camera when baking
 #declare scl_vase1=.67;
 #declare pos_vase1=<1.1,1.8276*.67,1>+.01*y;
-#include "vase1.inc" 
-object{vase1 
+#include "vase1.inc"
+object{vase1
   scale scl_vase1
   translate pos_vase1
 }
 #declare scl_vase2=.75;
 #declare pos_vase2=<-1,1.8276*.75,0.5>+.01*y;
-#include "vase2.inc" 
+#include "vase2.inc"
 object{vase2 scale scl_vase2
   translate pos_vase2
 }

@@ -73,7 +73,7 @@ camera {
     color Color
     area_light x*vlength(Pos)/10, y*vlength(Pos)/10, 9,9 adaptive 1 jitter circular orient
   }
-  
+
 #end
 
 LightSource(<-500,500,-500>, rgb Brightness)

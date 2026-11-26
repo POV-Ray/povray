@@ -22,7 +22,7 @@
 // ------------------------------------------
 
 #version 3.7;
-global_settings { assumed_gamma 1.0 } 
+global_settings { assumed_gamma 1.0 }
 
 #declare Test_Render=false;   // use simplified trees if true
 #declare use_iso=false;       // use an isosurface object (HF with function image type otherwise)
@@ -31,18 +31,18 @@ global_settings { assumed_gamma 1.0 }
 global_settings {
   assumed_gamma 1.0
   max_trace_level 25
-  noise_generator 2  
+  noise_generator 2
 }
 //-------------------------------------------------------------------------
-// This scene uses a non-standard camera set-up. 
-// (See CAMERA in the included documentation for details.) 
+// This scene uses a non-standard camera set-up.
+// (See CAMERA in the included documentation for details.)
 // If you are new to POV-Ray, you might want to try a different demo scene.
 //-------------------------------------------------------------------------
-                
-               
+
+
 #if (Viewpoint=1)
   camera {
-    //location    <3.7, -0.55, 0.3>    
+    //location    <3.7, -0.55, 0.3>
     location    <3.0, 2.3, 0.3>
     direction   y
     sky         z
@@ -63,7 +63,7 @@ global_settings {
   }
 #end
 
-light_source {               
+light_source {
   <1.0, 4.0, 1.3>*100000
   color rgb <1.5, 1.4, 1.1>
 }
@@ -225,8 +225,8 @@ sphere {
 #declare T_Sand=
 texture {
   pigment { color rgb <1.1, 0.7, 0.3> }
-  finish { 
-    specular 0.06 
+  finish {
+    specular 0.06
     ambient <0.8, 0.9, 1.4>*0.1
   }
   normal {
@@ -300,7 +300,7 @@ texture {
         [1.0 color rgb 1.0]
       }
       warp { turbulence 0.01 }
-      scale 5 
+      scale 5
       translate <1.8, -6.7, 0>
     }
   }
@@ -333,16 +333,16 @@ texture {
           [1.0 color rgb 1.0]
         }
         warp { turbulence 0.01 }
-        scale 5 
+        scale 5
         translate <1.8, -6.7, 0>
-     
+
         translate <3, 3, 0>
         scale 1/6
-        
-        translate -0.5*y    
+
+        translate -0.5*y
         scale <1, -1, 1>
         translate 0.5*y
-      } 
+      }
     }
 
     rotate -90*x

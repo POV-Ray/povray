@@ -12,7 +12,7 @@
 // by Alexander Enzmann
 
 #version  3.7;
-global_settings { 
+global_settings {
   assumed_gamma 1.0
 }
 
@@ -144,14 +144,14 @@ object {
    rotate -90*x
    translate <0, -2, 5>
 }
-rotate<-30,0,30> 
-translate<1.5,-3.5,-4> 
+rotate<-30,0,30>
+translate<1.5,-3.5,-4>
 
 }
 
 camera {
    location  <0.0, 0.0, -10.0>
-   angle 65 
+   angle 65
    right     x*image_width/image_height
 }
 
@@ -160,5 +160,5 @@ light_source { <200, 100, -300> colour red 1.0 green 1.0 blue 1.0 }
 
 light_source { <-200, 100, -300> colour red 1.0 green 1.0 blue 1.0 }
 
-background { color rgb<1,1,1>*0.03 } 
- 
+background { color rgb<1,1,1>*0.03 }
+
