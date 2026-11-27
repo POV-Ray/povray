@@ -52,6 +52,7 @@
 #include <system_error>
 
 // other library headers
+#include <dirent.h>
 #include <fcntl.h>
 #include <pthread.h>
 #ifdef HAVE_SYS_MMAN_H
@@ -172,6 +173,25 @@ namespace vfePlatform
     void vfeUnixSession::DeleteTemporaryFile(const UCS2String& filename) const
     {
         POV_DELETE_FILE (UCS2toASCIIString (filename).c_str());
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+    // names are converted as for opening files (see vfeFOpen() in vfe.cpp)
+    bool vfeUnixSession::ListDirectory(const UCS2String& dir, vector<UCS2String>& names) const
+    {
+        names.clear();
+        DIR *d = opendir(dir.empty() ? "." : UCS2toASCIIString(dir).c_str());
+        // a directory that is not there is empty; one that cannot be listed (e.g. mode 0111)
+        // may still have files that can be opened by name, so the caller looks for them
+        if (d == nullptr)
+            return ((errno == ENOENT) || (errno == ENOTDIR));
+        while (struct dirent *e = readdir(d))
+        {
+            if ((strcmp(e->d_name, ".") != 0) && (strcmp(e->d_name, "..") != 0))
+                names.push_back(ASCIItoUCS2String(e->d_name));
+        }
+        closedir(d);
+        return true;
     }
 
     //////////////////////////////////////////////////////////////

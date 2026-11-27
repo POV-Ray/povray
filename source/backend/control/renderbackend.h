@@ -77,7 +77,7 @@ class RenderBackend : public POVMS_MessageReceiver
         static void SendSceneOutput(SceneId sid, POVMSAddress addr, POVMSType ident, POVMS_Object& obj);
         static void SendViewOutput(ViewId vid, POVMSAddress addr, POVMSType ident, POVMS_Object& obj);
 
-        static void SendFindFile(POVMSContext ctx, SceneId sid, POVMSAddress addr, const vector<UCS2String>& filenames, UCS2String& filename);
+        static void SendFindFile(POVMSContext ctx, SceneId sid, POVMSAddress addr, const vector<UCS2String>& filenames, UCS2String& filename, bool probe = false, bool fromBuiltinFile = false);
         static void SendReadFile(POVMSContext ctx, SceneId sid, POVMSAddress addr, const UCS2String& filename, UCS2String& localfile, UCS2String& fileurl);
         static void SendCreatedFile(POVMSContext ctx, SceneId sid, POVMSAddress addr, const UCS2String& filename);
 

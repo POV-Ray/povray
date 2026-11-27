@@ -126,7 +126,7 @@ static void ThrowFileAccessError(POVMS_Message& result)
     throw POV_EXCEPTION(result.GetInt(kPOVAttrib_ErrorNumber), result.TryGetString(kPOVAttrib_EnglishText, "File access failed."));
 }
 
-void RenderBackend::SendFindFile(POVMSContext ctx, SceneId sid, POVMSAddress addr, const vector<POVMSUCS2String>& filenames, POVMSUCS2String& filename)
+void RenderBackend::SendFindFile(POVMSContext ctx, SceneId sid, POVMSAddress addr, const vector<POVMSUCS2String>& filenames, POVMSUCS2String& filename, bool probe, bool fromBuiltinFile)
 {
     POVMS_Message msg(kPOVObjectClass_FileData, kPOVMsgClass_FileAccess, kPOVMsgIdent_FindFile);
     POVMS_Message result(kPOVObjectClass_FileData, kPOVMsgClass_FileAccess, kPOVMsgIdent_FindFile);
@@ -139,6 +139,10 @@ void RenderBackend::SendFindFile(POVMSContext ctx, SceneId sid, POVMSAddress add
     }
 
     msg.Set(kPOVAttrib_ReadFile, files);
+    if (probe)
+        msg.SetBool(kPOVAttrib_FindFileProbe, true);
+    if (fromBuiltinFile)
+        msg.SetBool(kPOVAttrib_FromBuiltinFile, true);
 
     msg.SetInt(kPOVAttrib_SceneId, sid);
     msg.SetDestinationAddress(addr);

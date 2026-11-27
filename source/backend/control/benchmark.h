@@ -49,6 +49,11 @@ namespace pov
 ******************************************************************************/
 
 bool Write_Benchmark_File (const char *Scene_File_Name, const char *INI_File_Name) ;
+
+/// Make the benchmark scene and INI file available from memory, as `<builtin>/benchmark.pov`
+/// and `<builtin>/benchmark.ini` (see `pov_base::RegisterBuiltinText()`), so that the
+/// benchmark can be run without writing them to temporary files. Called when the back end starts.
+void Register_Benchmark_Files (void) ;
 unsigned int Get_Benchmark_Version (void) ;
 
 } // end of namespace

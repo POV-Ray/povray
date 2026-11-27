@@ -1003,6 +1003,17 @@ namespace vfe
       // implementation in vfe/win/vfeplatform.cpp).
       virtual bool TestAccessAllowed(const Path& file, bool isWrite) const { return true; }
 
+      // Lists the names of the entries of a local directory, not including `.`
+      // and `..`. A directory that does not exist is listed as empty. Returns
+      // false if the platform cannot list directories, or if the directory exists
+      // but cannot be listed (its files may still be readable by name), in which
+      // case callers look for each name they are interested in instead. The
+      // front end uses this to find out once per render whether a library path
+      // holds standard include files, with one listing per directory however
+      // many names it looks for (library paths may be on network shares). The
+      // default implementation returns false.
+      virtual bool ListDirectory(const UCS2String& dir, vector<UCS2String>& names) const { return false; }
+
       // Allows you to manually set the console wrap width.
       // The supplied value is clipped to the range 80-999.
       virtual void SetConsoleWidth(int width) { m_ConsoleWidth = max(min(999,width),80); }

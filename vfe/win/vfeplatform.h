@@ -95,6 +95,7 @@ namespace vfePlatform
       virtual void NotifyCriticalError(const char *message, const char *file, int line);
       virtual int RequestNewOutputPath(int CallCount, const string& Reason, const UCS2String& OldPath, UCS2String& NewPath);
       virtual bool TestAccessAllowed(const Path& file, bool isWrite) const;
+      virtual bool ListDirectory(const UCS2String& dir, vector<UCS2String>& names) const;
       virtual bool ImageOutputToStdoutSupported(void) const { return m_OptimizeForConsoleOutput; }
       virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height) { return new WinShelloutProcessing(opts, scene, width, height); }
 
