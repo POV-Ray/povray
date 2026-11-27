@@ -1,3 +1,8 @@
+# Never convert line endings: every file is checked out and committed exactly
+# as stored, whatever `core.autocrlf` is set to on the machine. The files of
+# this repository use LF line endings, except a few third-party library files.
+*                       -text
+
 # Override language auto-detection on GitHub.
 libraries/*             linguist-vendored
 distribution/**/*.inc   linguist-language=POV-Ray
