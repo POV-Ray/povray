@@ -37,8 +37,10 @@
 #include "frontend/filemessagehandler.h"
 
 // C++ variants of C standard header files
-// C++ standard header files
 //  (none at the moment)
+
+// C++ standard header files
+#include <new>
 
 // POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
@@ -70,19 +72,47 @@ FileMessageHandler::~FileMessageHandler()
 
 void FileMessageHandler::HandleMessage(const SceneData& sd, POVMSType ident, POVMS_Object& msg, POVMS_Object& result)
 {
-    switch(ident)
+    // The back-end waits for our reply to a find or read request, so an exception must not
+    // escape from here: it would leave the request unanswered until it times out, and the
+    // reason would be lost. Instead the error is returned in the reply (see
+    // RenderBackend::SendFindFile and RenderBackend::SendReadFile).
+    try
     {
-        case kPOVMsgIdent_FindFile:
-            (void)FindFile(sd.searchpaths, sd.scenepath, sd.inputfile, msg, result);
-            break;
-        case kPOVMsgIdent_ReadFile:
-            if(ReadFile(sd.searchpaths, sd.scenepath, sd.inputfile, msg, result) == true)
-                sd.readfiles.push_back(result);
-            break;
-        case kPOVMsgIdent_CreatedFile:
-            CreatedFile(msg);
-            sd.createdfiles.push_back(msg);
-            break;
+        switch(ident)
+        {
+            case kPOVMsgIdent_FindFile:
+                (void)FindFile(sd.searchpaths, sd.scenepath, sd.inputfile, msg, result);
+                break;
+            case kPOVMsgIdent_ReadFile:
+                if(ReadFile(sd.searchpaths, sd.scenepath, sd.inputfile, msg, result) == true)
+                    sd.readfiles.push_back(result);
+                break;
+            case kPOVMsgIdent_CreatedFile:
+                CreatedFile(msg);
+                sd.createdfiles.push_back(msg);
+                break;
+        }
+    }
+    catch(pov_base::Exception& e)
+    {
+        if (ident == kPOVMsgIdent_CreatedFile)
+            throw;
+        result.SetInt(kPOVAttrib_ErrorNumber, ((e.codevalid() == true) && (e.code() != kNoErr)) ? e.code() : kCannotOpenFileErr);
+        result.SetString(kPOVAttrib_EnglishText, e.what());
+    }
+    catch(std::bad_alloc&)
+    {
+        if (ident == kPOVMsgIdent_CreatedFile)
+            throw;
+        result.SetInt(kPOVAttrib_ErrorNumber, kOutOfMemoryErr);
+        result.SetString(kPOVAttrib_EnglishText, "Out of memory.");
+    }
+    catch(std::exception& e)
+    {
+        if (ident == kPOVMsgIdent_CreatedFile)
+            throw;
+        result.SetInt(kPOVAttrib_ErrorNumber, kCannotOpenFileErr);
+        result.SetString(kPOVAttrib_EnglishText, e.what());
     }
 }
 
@@ -112,7 +142,27 @@ bool FileMessageHandler::FindFile(const list<Path>& lps, const Path& scenepath, 
 
         files.GetNth(i, attr);
 
-        path = FindFilePath(lps, sceneFile ? Path() : scenepath, Path(attr.GetUCS2String()));
+        UCS2String name(attr.GetUCS2String());
+
+        try
+        {
+            path = FindFilePath(lps, sceneFile ? Path() : scenepath, Path(name));
+        }
+        catch(pov_base::Exception&)
+        {
+            // If the name is not a valid path, report it as the scene gave it rather than with an
+            // extension appended: that is the shortest of the names offered, a prefix of the others.
+            for(int j = 1; j <= files.GetListSize(); j++)
+            {
+                POVMS_Attribute other;
+
+                files.GetNth(j, other);
+                UCS2String othername(other.GetUCS2String());
+                if((othername.size() < name.size()) && (name.compare(0, othername.size(), othername) == 0))
+                    (void)Path(othername); // throws if it is invalid too, naming it
+            }
+            throw;
+        }
 
         if(path.Empty() == false)
             break;

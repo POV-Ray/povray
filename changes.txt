@@ -192,6 +192,20 @@ Miscellaneous:
     file and read as an empty one, so that a file of that name further along
     the search was not used. Directories are now skipped when looking for
     files.
+  - Windows: a drive-relative path, i.e. a drive letter and colon not followed
+    by a separator (such as `K:scene.pov`, `K:inc/file.inc`, or a bare `K:`),
+    is not supported, and is now reported as such, naming the path: e.g.
+    "Drive-relative path 'K:main.pov' is not supported; give the full path,
+    such as 'K:/path/to/main.pov'.". Previously the message was "Invalid
+    path." or none at all: the Windows console build printed "Unknown error
+    code" for `+I` or `+O`, and crashed for `+L` or an INI file name, and an
+    `#include` or image file name of that form in a scene waited for a timeout
+    before failing with "Operation timed out.". Other invalid paths are now
+    reported as "Invalid path '<path>'." instead of "Invalid path.".
+  - The text of an error that prevents a render from starting is now shown by
+    the console builds, which used to print "Unknown error code" instead.
+  - A file name in a scene that the front end cannot handle now fails at once
+    with the reason, instead of after a timeout.
 
 Development Related
 -------------------

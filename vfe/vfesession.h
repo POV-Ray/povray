@@ -827,6 +827,10 @@ namespace vfe
       // any set via a parsed INI file. Furthermore, any source file set via a
       // command-line option overrides both of the above.
       //
+      // If processing the options throws a pov_base::Exception (for instance because
+      // a file name is not a valid path), its code is returned (or kParamErr if it
+      // has none) and GetErrorString() returns the text of the exception.
+      //
       // Note that it is your responsibility to add any default INI files that should
       // be processed to the INI file list; neither SetOptions() nor any other part
       // of the VFE or POV-Ray code will do that for you. This includes non-platform
@@ -995,6 +999,8 @@ namespace vfe
       // Returns a string giving a short english description of the error code
       // supplied as the only parameter. If no parameter is supplied, the default
       // value (-1) instructs the method to instead use the value of m_LastError.
+      // For the (negative) error codes taken from an exception caught by
+      // SetOptions() or StartRender(), the text of that exception is returned.
       virtual const char *GetErrorString(int code = -1) const ;
 
       // Returns true if opening the given file in the specified mode is to
@@ -1125,6 +1131,7 @@ namespace vfe
 
     protected:
       // All of the following are internal to vfe.
+      virtual int SetOptionsInternal (vfeRenderOptions& opts);
       virtual void SetFailed();
       virtual void SetSucceeded (bool ok);
       virtual void AdviseOutputFilename(const UCS2String& Filename);
@@ -1232,6 +1239,7 @@ namespace vfe
       int m_RenderErrorCode;
       int m_InitializeErrorCode;
       int m_LastError;
+      std::string m_LastExceptionText;
       int m_ConsoleWidth;
       int m_PercentComplete;
       int m_PixelsRendered;
