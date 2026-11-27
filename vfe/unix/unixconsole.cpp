@@ -36,6 +36,7 @@
 // C++ variants of C standard header files
 #include <csignal>
 #include <cstdlib>
+#include <cstring>
 
 // Other library header files
 #include <termios.h>
@@ -53,6 +54,7 @@
 // from directory "source"
 #include "backend/povray.h"
 #include "backend/control/benchmark.h"
+#include "base/builtinfiles.h"
 
 namespace pov_frontend
 {
@@ -303,6 +305,32 @@ static void PauseWhenDone(vfeSession *session)
     GetRenderWindow()->PauseWhenDoneNotifyEnd();
 }
 
+static ReturnValue WriteIncludes(const string& dir)
+{
+    if (dir.empty())
+    {
+        fprintf(stderr, "%s: --write-includes needs a directory, as in --write-includes=DIR (. for the current directory)\n", PACKAGE);
+        return RETURN_ERROR;
+    }
+
+    pov_base::WriteBuiltinFilesResult result = pov_base::WriteBuiltinFiles(ASCIItoUCS2String(dir.c_str()));
+
+    for (vector<string>::const_iterator i = result.written.begin(); i != result.written.end(); i++)
+        fprintf(stderr, "%s: wrote %s\n", PACKAGE, i->c_str());
+    for (vector<string>::const_iterator i = result.existing.begin(); i != result.existing.end(); i++)
+        fprintf(stderr, "%s: %s already exists\n", PACKAGE, i->c_str());
+
+    if (result.ok)
+    {
+        fprintf(stderr, "%s: wrote the %u built-in standard include files (%lu bytes) to %s\n",
+                PACKAGE, (unsigned int)result.written.size(), (unsigned long)result.bytes, dir.c_str());
+        return RETURN_OK;
+    }
+
+    fprintf(stderr, "%s: %s\n", PACKAGE, result.message.c_str());
+    return RETURN_ERROR;
+}
+
 static ReturnValue PrepareBenchmark(vfeSession *session, vfeRenderOptions& opts, string& ini, string& pov, int argc, char **argv)
 {
     // parse command-line options
@@ -466,6 +494,11 @@ int main (int argc, char **argv)
         nthreads = 4;
     opts.SetThreadCount(nthreads);
 
+    // `--write-includes` with an empty or missing directory is an error, not an option left unset
+    bool writeIncludesGiven = false;
+    for (int i = 1; (i < argc) && !writeIncludesGiven; i++)
+        writeIncludesGiven = (strcmp(argv[i], "--write-includes") == 0) || (strncmp(argv[i], "--write-includes=", 17) == 0);
+
     // process command-line options
     session->GetUnixOptions()->ProcessOptions(&argc, &argv);
     if (session->GetUnixOptions()->isOptionSet("general", "help"))
@@ -493,6 +526,14 @@ int main (int argc, char **argv)
         delete sigthread;
         delete session;
         return RETURN_OK;
+    }
+    else if (writeIncludesGiven)
+    {
+        retval = WriteIncludes(session->GetUnixOptions()->QueryOptionString("general", "write-includes"));
+        session->Shutdown();
+        delete sigthread;
+        delete session;
+        return retval;
     }
     else if (session->GetUnixOptions()->isOptionSet("general", "benchmark"))
     {
