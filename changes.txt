@@ -200,6 +200,14 @@ New Features
     missing or empty `DIR` is an error (`.` is the current directory). Put on
     a library path, such a directory is then used instead of the built-in
     files.
+  - The standard benchmark scene and its INI file, which are built into the
+    program, can be rendered from memory as `<builtin>/benchmark.pov` and
+    `<builtin>/benchmark.ini` (e.g. `povray <builtin>/benchmark.ini
+    +I<builtin>/benchmark.pov`); these two names are available whatever the
+    `Builtin_Includes` option says. The Unix console's `--benchmark` now uses
+    them instead of writing the two files to the temporary directory and
+    removing them afterwards, and no longer says that it needs POV-Ray to be
+    installed.
 
 Performance Improvements
 ------------------------

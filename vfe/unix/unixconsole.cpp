@@ -389,8 +389,8 @@ static ReturnValue PrepareBenchmark(vfeSession *session, vfeRenderOptions& opts,
     fprintf(stderr, "\
 %s %s\n\n\
 Entering the standard POV-Ray %s benchmark version %x.%02x.\n\n\
-This built-in benchmark requires POV-Ray to be installed on your system\n\
-before running it.  There will be neither display nor file output, and\n\
+This built-in benchmark renders a scene held in the program, and needs no\n\
+installed files.  There will be neither display nor file output, and\n\
 any additional command-line option except setting the number of render\n\
 threads (+wtN for N threads) and library paths (+Lpath) will be ignored.\n\
 To get an accurate benchmark result you might consider running POV-Ray\n\
@@ -429,30 +429,12 @@ Press <Enter> to continue or <Ctrl-C> to abort.\n\
         Delay(20);
     }
 
-    std::string basename = UCS2toSysString(session->CreateTemporaryFile());
-    ini = basename + ".ini";
-    pov = basename + ".pov";
-    if (pov::Write_Benchmark_File(pov.c_str(), ini.c_str()))
-    {
-        fprintf(stderr, "%s: creating %s\n", PACKAGE, ini.c_str());
-        fprintf(stderr, "%s: creating %s\n", PACKAGE, pov.c_str());
-        fprintf(stderr, "Running standard POV-Ray benchmark version %x.%02x\n", benchversion / 256, benchversion % 256);
-    }
-    else
-    {
-        fprintf(stderr, "%s: failed to write temporary files for benchmark\n", PACKAGE);
-        return RETURN_ERROR;
-    }
+    // the scene and INI file are read from memory (see pov::Register_Benchmark_Files())
+    ini = "<builtin>/benchmark.ini";
+    pov = "<builtin>/benchmark.pov";
+    fprintf(stderr, "Running standard POV-Ray benchmark version %x.%02x\n", benchversion / 256, benchversion % 256);
 
     return RETURN_OK;
-}
-
-static void CleanupBenchmark(vfeUnixSession *session, std::string& ini, std::string& pov)
-{
-    fprintf(stderr, "%s: removing %s\n", PACKAGE, ini.c_str());
-    session->DeleteTemporaryFile(SysToUCS2String(ini.c_str()));
-    fprintf(stderr, "%s: removing %s\n", PACKAGE, pov.c_str());
-    session->DeleteTemporaryFile(SysToUCS2String(pov.c_str()));
 }
 
 static void TerminateSignalHandler(std::thread* sigthread)
@@ -688,9 +670,6 @@ int main (int argc, char **argv)
         PauseWhenDone(session);
         gCancelRender = false;
     }
-
-    if (running_benchmark)
-        CleanupBenchmark(session, bench_ini_name, bench_pov_name);
 
     if (session->Succeeded() == false)
         retval = gCancelRender ? RETURN_USER_ABORT : RETURN_ERROR;

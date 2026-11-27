@@ -81,6 +81,10 @@ typedef std::shared_ptr<BuiltinFileData> BuiltinFileDataPtr;
 std::mutex gBuiltinFileCacheMutex;
 std::map<const BuiltinFileEntry*, BuiltinFileDataPtr> gBuiltinFileCache;
 
+/// Texts registered by RegisterBuiltinText(), by bare name.
+std::mutex gBuiltinTextMutex;
+std::map<std::string, const char*> gBuiltinTexts;
+
 /// Convert a name to ASCII if it is plain ASCII with no directory part.
 bool ToBareAsciiName(const UCS2String& name, size_t start, std::string& result)
 {
@@ -96,6 +100,16 @@ bool ToBareAsciiName(const UCS2String& name, size_t start, std::string& result)
         result += char(c);
     }
     return true;
+}
+
+const char* FindBuiltinText(const UCS2String& path)
+{
+    std::string bare;
+    if (!IsBuiltinFilePath(path) || !ToBareAsciiName(path, kBuiltinFilePrefixLength, bare))
+        return nullptr;
+    std::lock_guard<std::mutex> lock(gBuiltinTextMutex);
+    std::map<std::string, const char*>::const_iterator i = gBuiltinTexts.find(bare);
+    return (i == gBuiltinTexts.end()) ? nullptr : i->second;
 }
 
 const BuiltinFileEntry* FindBareAsciiName(const std::string& name)
@@ -200,9 +214,23 @@ IMemStream* OpenBuiltinFile(const BuiltinFileEntry& entry)
 IMemStream* OpenBuiltinFile(const UCS2String& path)
 {
     const BuiltinFileEntry* entry = FindBuiltinFileByPath(path);
-    if (entry == nullptr)
-        return nullptr;
-    return OpenBuiltinFile(*entry);
+    if (entry != nullptr)
+        return OpenBuiltinFile(*entry);
+    const char* text = FindBuiltinText(path);
+    if (text != nullptr)
+        return new IMemStream(reinterpret_cast<const unsigned char*>(text), std::strlen(text), path);
+    return nullptr;
+}
+
+void RegisterBuiltinText(const char* name, const char* text)
+{
+    std::lock_guard<std::mutex> lock(gBuiltinTextMutex);
+    gBuiltinTexts[name] = text;
+}
+
+bool IsBuiltinTextPath(const UCS2String& path)
+{
+    return (FindBuiltinText(path) != nullptr);
 }
 
 void ReleaseBuiltinFileCache()

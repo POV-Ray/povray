@@ -281,6 +281,11 @@ UCS2String FileMessageHandler::FindBuiltinCopy(const SceneData& sd, const FindFi
         if ((given == nullptr) || (i->size() < given->size()))
             given = &(*i); // the name as given is the shortest, a prefix of the others
 
+        // a text registered in memory (the benchmark) is not a stand-in for a file on
+        // disk, so it is always available
+        if (IsBuiltinTextPath(*i) == true)
+            return *i;
+
         const BuiltinFileEntry* entry = FindBuiltinFileByPath(*i);
         if (entry == nullptr)
             continue;

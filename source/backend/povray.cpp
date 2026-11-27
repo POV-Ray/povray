@@ -62,6 +62,7 @@
 #include "povms/povmsutil.h"
 
 // POV-Ray header files (backend module)
+#include "backend/control/benchmark.h"
 #include "backend/control/renderbackend.h"
 #include "backend/support/task.h"
 
@@ -652,6 +653,7 @@ std::thread *povray_init(const boost::function0<void>& threadExit, POVMSAddress 
 
         Initialize_Noise();
         pov::InitializePatternGenerators();
+        pov::Register_Benchmark_Files();
 
         POV_MainThread = new std::thread(boost::bind(&MainThreadFunction, threadExit));
 

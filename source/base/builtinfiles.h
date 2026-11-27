@@ -146,10 +146,28 @@ IMemStream* OpenBuiltinFile(const BuiltinFileEntry& entry);
 
 /// Open a built-in file named by its pseudo-path.
 ///
+/// This also opens the texts registered by @ref RegisterBuiltinText().
+///
 /// @return     A new stream, owned by the caller, or `nullptr` if @p path names no
 ///             built-in file.
 ///
 IMemStream* OpenBuiltinFile(const UCS2String& path);
+
+/// Make a text held in memory available as a built-in file, e.g. `<builtin>/benchmark.pov`.
+///
+/// Unlike the standard include files, such a text is not a stand-in for a file on
+/// disk: it is only ever found by its pseudo-path, is available whatever the
+/// render's use of the standard include files and the `Builtin_Includes` option,
+/// and is not written out by @ref WriteBuiltinFiles(). The back end registers the
+/// benchmark scene and INI file this way when it starts.
+///
+/// @param  name    Bare name, e.g. `benchmark.pov`; must differ from those of the table.
+/// @param  text    The contents, a null-terminated string that must stay valid.
+///
+void RegisterBuiltinText(const char* name, const char* text);
+
+/// Tell whether a pseudo-path names a text registered by @ref RegisterBuiltinText().
+bool IsBuiltinTextPath(const UCS2String& path);
 
 /// Drop the inflated copies kept by @ref OpenBuiltinFile().
 ///
