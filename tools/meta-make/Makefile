@@ -5,7 +5,6 @@
 rootdir         = ../..
 
 # Location of generated source files
-fontsrc         = $(rootdir)/source/base/font
 scenesrc        = $(rootdir)/source/backend/control
 bluenoisesrc    = $(rootdir)/source/base/data
 builtinsrc      = $(rootdir)/source/base
@@ -24,7 +23,6 @@ metagen_sh      = $(metamake)/metagen.sh
 #*************************************************************************************
 # What to Generate
 
-FONTS           = crystal cyrvetic povlogo timrom
 BENCHMARK       = benchmark_pov benchmark_ini
 BLUENOISE       = bluenoise64a
 BUILTIN         = builtinfiles_data
@@ -38,12 +36,11 @@ bluenoise64a_opts = kBlueNoise64a  4711 64
 #-------------------------------------------------------------------------------------
 # Files to Generate
 
-FONTFILES      = $(foreach font,$(FONTS),$(addprefix $(fontsrc)/$(font),.cpp .h))
 BENCHMARKFILES = $(foreach scene,$(BENCHMARK),$(addprefix $(scenesrc)/$(scene),.cpp .h))
 BLUENOISEFILES = $(foreach noise,$(BLUENOISE),$(addprefix $(bluenoisesrc)/$(noise),.cpp .h))
 BUILTINFILES   = $(foreach table,$(BUILTIN),$(addprefix $(builtinsrc)/$(table),.cpp))
 
-ALLFILES       = $(FONTFILES) $(BENCHMARKFILES) $(BLUENOISEFILES) $(BUILTINFILES)
+ALLFILES       = $(BENCHMARKFILES) $(BLUENOISEFILES) $(BUILTINFILES)
 
 #*************************************************************************************
 # Rules
@@ -54,17 +51,6 @@ all: $(ALLFILES)
 .PHONY: clean
 clean: 
 	-rm $(ALLFILES)
-
-#-------------------------------------------------------------------------------------
-# Fonts
-
-vpath %.ttf $(include)
-
-$(fontsrc)/%.cpp: %.ttf $(reswrap_header)
-	$(reswrap_sh) "$@" "$<" "pov_base" "font_$(*F)" "-z"
-
-$(fontsrc)/%.h: %.ttf $(reswrap_header)
-	$(reswrap_sh) "$@" "$<" "pov_base" "font_$(*F)" "-z"
 
 #-------------------------------------------------------------------------------------
 # Scenes
@@ -97,7 +83,8 @@ $(BLUENOISEFILES): %: $(metagen_header)
 #-------------------------------------------------------------------------------------
 # Built-in Standard Include Files
 # (declared in the hand-written `source/base/builtinfiles.h`, so there is no
-# generated header; the list of files to leave out is in the generator itself)
+# generated header; the list of files to leave out is in the generator itself;
+# the fonts used by `internal` text objects are read from this table too)
 
 builtin_py      = $(metamake)/builtinfiles/metagen-builtinfiles.py
 

@@ -391,10 +391,6 @@
     <ClCompile Include="..\..\source\base\builtinfiles_data.cpp" />
     <ClCompile Include="..\..\source\base\fileinputoutput.cpp" />
     <ClCompile Include="..\..\source\base\fileutil.cpp" />
-    <ClCompile Include="..\..\source\base\font\crystal.cpp" />
-    <ClCompile Include="..\..\source\base\font\cyrvetic.cpp" />
-    <ClCompile Include="..\..\source\base\font\povlogo.cpp" />
-    <ClCompile Include="..\..\source\base\font\timrom.cpp" />
     <ClCompile Include="..\..\source\base\image\dither.cpp" />
     <ClCompile Include="..\..\source\base\image\metadata.cpp" />
     <ClCompile Include="..\..\source\base\mathutil.cpp" />
@@ -454,10 +450,6 @@
     <ClInclude Include="..\..\source\base\builtinfiles.h" />
     <ClInclude Include="..\..\source\base\fileinputoutput.h" />
     <ClInclude Include="..\..\source\base\fileutil.h" />
-    <ClInclude Include="..\..\source\base\font\crystal.h" />
-    <ClInclude Include="..\..\source\base\font\cyrvetic.h" />
-    <ClInclude Include="..\..\source\base\font\povlogo.h" />
-    <ClInclude Include="..\..\source\base\font\timrom.h" />
     <ClInclude Include="..\..\source\base\image\dither.h" />
     <ClInclude Include="..\..\source\base\mathutil.h" />
     <ClInclude Include="..\..\source\base\messenger.h" />

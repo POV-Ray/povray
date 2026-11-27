@@ -249,6 +249,9 @@ Other Noteworthy
 
   - The Windows source now builds with the Visual Studio 2022 (v143) toolset.
   - The Unix source can be configured for Emscripten builds.
+  - The four fonts used by `text` objects given as `internal 0` to
+    `internal 3` are now read from the built-in standard include files, so the
+    program no longer holds a second, uncompressed copy of them.
 
 
 Changes between v3.8.0-beta.1 and v3.8.0-beta.2
