@@ -132,7 +132,7 @@
 
 #declare asind = function (x) {degrees(asin(x))}
 #declare acosd = function (x) {degrees(acos(x))}
-#declare atand = function (x) {degrees(atan(x))} 
+#declare atand = function (x) {degrees(atan(x))}
 #declare atan2d = function (x, y) {degrees(atan2(x, y))}
 
 
@@ -166,7 +166,7 @@
 #declare adj_range = function (x, y, z) {x*(z - y) + y}
 
 // Adjusts values in a specified range [Rmn, Rmx] to the specified range [Min, Max]
-#declare adj_range2 = 
+#declare adj_range2 =
   function (x, y, z, _Math_INC_OMn, _Math_INC_OMx) {
     ((x - y)/(z - y))*(_Math_INC_OMx - _Math_INC_OMn) + _Math_INC_OMn
   }
@@ -435,12 +435,12 @@
   #local p0x=p0.x;
   #local p0y=p0.y;
   #local p0z=p0.z;
-  
+
   (
     <
       __Gradient_Fnz(p0x, p0y + __Gradient_Fn_Accuracy_, p0z) - __Gradient_Fnz(p0x, p0y - __Gradient_Fn_Accuracy_, p0z) -
       __Gradient_Fny(p0x, p0y, p0z + __Gradient_Fn_Accuracy_) + __Gradient_Fny(p0x, p0y, p0z - __Gradient_Fn_Accuracy_),
-      
+
       __Gradient_Fnx(p0x, p0y, p0z + __Gradient_Fn_Accuracy_) - __Gradient_Fnx(p0x, p0y, p0z - __Gradient_Fn_Accuracy_) -
       __Gradient_Fnz(p0x + __Gradient_Fn_Accuracy_, p0y, p0z) + __Gradient_Fnz(p0x - __Gradient_Fn_Accuracy_, p0y, p0z),
 
@@ -466,7 +466,7 @@
   #local p0x=p0.x;
   #local p0y=p0.y;
   #local p0z=p0.z;
-  
+
    (
     (
      __Gradient_Fnx(p0x + __Gradient_Fn_Accuracy_, p0y, p0z) - __Gradient_Fnx(p0x - __Gradient_Fn_Accuracy_, p0y, p0z)+

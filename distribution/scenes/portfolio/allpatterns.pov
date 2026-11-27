@@ -11,7 +11,7 @@
 // Date: 2001/08/08
 // Auth: ingo Janssen
 #version 3.6;
-global_settings { 
+global_settings {
   assumed_gamma 1.0
 }
 
@@ -34,7 +34,7 @@ global_settings {
 #declare Dents         = pigment {dents colour_map {[0, rgb 0][1, rgb 1]}scale 0.5}
 #declare Mandel        = pigment {mandel 50 interior 2,.5  exterior 1,.01 colour_map {[0, rgb 0][1, rgb 1]}}
 #declare Julia         = pigment {julia <0.353, 0.288>, 30 interior 1, 1 color_map {[0 rgb 0][1 rgb 1]}scale 1.2}
-#declare Function      = pigment {function {(sin(x*x)-cos(y*y))} scale 0.6 colour_map {[0, rgb 0][1, rgb 1]}}  
+#declare Function      = pigment {function {(sin(x*x)-cos(y*y))} scale 0.6 colour_map {[0, rgb 0][1, rgb 1]}}
 #declare Gradient      = pigment {gradient x colour_map {[0, rgb 0][1, rgb 1]}scale 0.5}
 #declare Granite       = pigment {granite colour_map {[0, rgb 0][1, rgb 1]} scale 0.5}
 #declare Hexagon       = pigment {hexagon color rgb 1, colour rgb 0, color rgb 0.5 rotate <90,0,0> scale 0.5}
@@ -58,9 +58,9 @@ global_settings {
 // as strings for the generation of the html-files
 // and as identfiers for the generation of the images.
 #declare str_patternArr=array[32] {
-   "Agate","Average","Boxed","Bozo","Brick","Bumps"        
+   "Agate","Average","Boxed","Bozo","Brick","Bumps"
    "Cells","Checker","Crackle","Cylindrical",
-   "Dents","Mandel", "Julia",       
+   "Dents","Mandel", "Julia",
    "Function","Gradient","Granite","Hexagon","Image_pattern"
    "Leopard","Marble","Onion","Planar","Quilted"
    "Radial","Ripples","Spherical","Spiral1","Spiral2"
@@ -68,13 +68,13 @@ global_settings {
 
 }
 #declare patternArr=array[32] {
-   Agate,Average,Boxed,Bozo,Brick,Bumps        
+   Agate,Average,Boxed,Bozo,Brick,Bumps
    Cells,Checker,Crackle,Cylindrical,
-   Dents,Mandel, Julia,       
+   Dents,Mandel, Julia,
    Function,Gradient,Granite,Hexagon,Image_pattern
-   Leopard,Marble,Onion,Planar,Quilted      
-   Radial,Ripples,Spherical,Spiral1,Spiral2      
-   Spotted,Waves,Wood,Wrinkles     
+   Leopard,Marble,Onion,Planar,Quilted
+   Radial,Ripples,Spherical,Spiral1,Spiral2
+   Spotted,Waves,Wood,Wrinkles
 }
 
 
@@ -103,14 +103,14 @@ global_settings {
                texture {
                   pigment {rgbf 1}
                   finish {
-                     ambient 0 
+                     ambient 0
                      diffuse 0
                   }
                }
                interior {
                   media {
                      emission 0.3
-                     samples 10,10 
+                     samples 10,10
                      intervals 10
                      method 2
                      density {
@@ -126,7 +126,7 @@ global_settings {
             }
             rotate <0,-35,0>
             rotate <-25,0,0>
-            translate<0,0,-1.5>   
+            translate<0,0,-1.5>
          }
       #break
       #case(9)//9 cylindrical
@@ -137,14 +137,14 @@ global_settings {
                texture {
                   pigment {rgbf 1}
                   finish {
-                     ambient 0 
+                     ambient 0
                      diffuse 0
                   }
                }
                interior {
                   media {
                      emission 0.3
-                     samples 10,10 
+                     samples 10,10
                      intervals 10
                      method 2
                      density {
@@ -160,7 +160,7 @@ global_settings {
             }
             rotate <0,-35,0>
             rotate <-25,0,0>
-            translate<0,0,-1.5>   
+            translate<0,0,-1.5>
          }
       #break
       #case(25)//25 spherical
@@ -171,14 +171,14 @@ global_settings {
                texture {
                   pigment {rgbf 1}
                   finish {
-                     ambient 0 
+                     ambient 0
                      diffuse 0
                   }
                }
                interior {
                   media {
                      emission 0.3
-                     samples 10,10 
+                     samples 10,10
                      intervals 10
                      method 2
                      density {
@@ -194,7 +194,7 @@ global_settings {
             }
             rotate <0,-35,0>
             rotate <-25,0,0>
-            translate<0,0,-1.5>   
+            translate<0,0,-1.5>
          }
       #break
    #else
@@ -205,12 +205,12 @@ global_settings {
          -1.5,1.5
          translate<0,0,1.5>
          texture{T}
-         translate<0,0,-1.5>   
+         translate<0,0,-1.5>
          rotate <0,-35,0>
          rotate <-25,0,0>
       }
    #end
-   
+
    camera {
      right x*image_width/image_height
      location  <0,0,-8>

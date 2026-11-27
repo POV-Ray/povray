@@ -55,7 +55,7 @@ texture {
         octaves 5
         scale 0.65
         rotate <0, 45, 60>
-        color_map { 
+        color_map {
             [0.02 color rgbt <0.30, 0.60, 0.45, 0.95> ]
             [0.06 color rgbt <0.35, 0.55, 0.40, 0.75> ]
             [0.10 color rgbt <0.25, 0.25, 0.20, 0.65> ]
@@ -87,7 +87,7 @@ texture {
     pigment {
         granite
         rotate y*90
-        color_map { 
+        color_map {
             [0.02 color rgbt <0.25, 0.45, 0.60, 0.0> ]
             [0.06 color rgbt <0.20, 0.40, 0.55, 0.0> ]
             [0.10 color rgbt <0.15, 0.20, 0.25, 0.0> ]
@@ -157,7 +157,7 @@ texture {
         scale 0.5
         frequency 3
         rotate <0, -45, 30>
-        color_map { 
+        color_map {
             [0.02 color rgbt <0.25, 0.45, 0.60, 0.0> ]
             [0.06 color rgbt <0.20, 0.40, 0.55, 0.0> ]
             [0.10 color rgbt <0.05, 0.10, 0.15, 0.0> ]
@@ -177,7 +177,7 @@ texture {
         frequency 1
         phase 0.25
         rotate <0, 45, 60>
-        color_map { 
+        color_map {
             [0.00 color Clear ]
             [0.20 color rgbt <1.00, 1.00, 1.00, 0.75> ]
             [0.25 color rgbt <0.25, 0.45, 0.40, 0.50> ]
@@ -199,7 +199,7 @@ texture {
         scale 2
         frequency 2
         rotate <0, 90, 0>
-        color_map { 
+        color_map {
             [0.00 color Clear ]
             [0.20 color rgbt <1.00, 1.00, 1.00, 0.75> ]
             [0.25 color rgbt <0.35, 0.55, 0.40, 0.50> ]
@@ -221,7 +221,7 @@ texture {
         frequency 6
         scale 0.5
         rotate <0, -45, 5>
-        color_map { 
+        color_map {
             [0.02 color rgbt <0.65, 0.45, 0.25, 0.0> ]
             [0.06 color rgbt <0.55, 0.40, 0.20, 0.0> ]
             [0.10 color rgbt <0.15, 0.10, 0.05, 0.0> ]
@@ -240,7 +240,7 @@ texture {
         frequency 1
         phase 0.25
         rotate <0, 45, 60>
-        color_map { 
+        color_map {
             [0.00 color Clear ]
             [0.25 color rgbt <0.40, 0.25, 0.15, 0.50> ]
             [0.30 color rgbt <0.00, 0.00, 0.00, 0.00> ]
@@ -261,7 +261,7 @@ texture {
         frequency 2
         phase 0.25
         rotate <0, 5, 60>
-        color_map { 
+        color_map {
             [0.00 color Clear ]
             [0.25 color rgbt <0.65, 0.25, 0.40, 0.50> ]
             [0.30 color rgbt <0.00, 0.00, 0.00, 0.00> ]
@@ -298,7 +298,7 @@ texture {
         octaves 4
         scale 0.45
         rotate <0, 5, 60>
-        color_map { 
+        color_map {
             [0.01 color rgbt <0.00, 0.00, 0.00, 0.00> ]
             [0.02 color rgbt <0.40, 0.25, 0.15, 0.20> ]
             [0.05 color rgbt <0.40, 0.35, 0.20, 0.40> ]
@@ -336,7 +336,7 @@ texture {
         frequency 6
         scale 0.5
         rotate <0, -45, 30>
-        color_map { 
+        color_map {
             [0.02 color rgbt <0.85, 0.85, 0.45, 0.0> ]
             [0.06 color rgbt <0.65, 0.65, 0.40, 0.0> ]
             [0.10 color rgbt <0.90, 0.90, 0.65, 0.0> ]
@@ -355,7 +355,7 @@ texture {
         frequency 2
         phase 0.25
         rotate <0, 5, 60>
-        color_map { 
+        color_map {
             [0.00 color Clear ]
             [0.25 color rgbt <0.40, 0.40, 0.15, 0.50> ]
             [0.30 color rgbt <0.00, 0.00, 0.00, 0.00> ]
@@ -377,7 +377,7 @@ texture {
         frequency 1
         phase 0.25
         rotate <0, 45, 60>
-        color_map { 
+        color_map {
             [0.00 color Clear ]
             [0.15 color rgbt <0.40, 0.15, 0.45, 0.60> ]
             [0.18 color rgbt <0.20, 0.10, 0.00, 0.00> ]
@@ -398,7 +398,7 @@ texture {
         octaves 5
         scale 0.45
         rotate <0, 5, 60>
-        color_map { 
+        color_map {
             [0.00 color Gray90 ]
             [0.02 color rgb <0.95, 0.90, 0.85> ]
             [0.03 color rgb <0.75, 0.85, 0.80> ]
@@ -416,7 +416,7 @@ texture {
         octaves 5
         scale 0.65
         rotate <0, 45, 60>
-        color_map { 
+        color_map {
             [0.00 color Clear ]
             [0.02 color rgb <0.95, 0.90, 0.85> ]
             [0.03 color rgb <0.75, 0.85, 0.80> ]
@@ -436,7 +436,7 @@ texture {
         octaves 5
         scale 0.45
         rotate <0, 5, 60>
-        color_map { 
+        color_map {
             [0, 1 color rgb <0.9, 0.75, 0.75>
                   color rgb <0.6, 0.6, 0.6> ]
         }
@@ -452,8 +452,8 @@ texture {
         octaves 5
         scale 0.65
         rotate <0, 45, 60>
-        color_map { 
-            [0.0, 0.9 color rgbt <0.52, 0.39, 0.39, 1.0> 
+        color_map {
+            [0.0, 0.9 color rgbt <0.52, 0.39, 0.39, 1.0>
                       color rgbt <0.52, 0.39, 0.39, 0.5>]
             [0.9, 1.0 color rgbt <0.42, 0.14, 0.55, 0.0>
                       color rgbt <0.42, 0.14, 0.55, 0.0>]

@@ -23,4 +23,4 @@
   ... // do this only if both A and B are true
 #end
 
-#undef IDENTIFIER // 
+#undef IDENTIFIER //

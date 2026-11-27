@@ -1,5 +1,5 @@
 // radiosity (global illumination) settings
-#default{ finish{ ambient 0 diffuse 1 }} 
+#default{ finish{ ambient 0 diffuse 1 }}
 
 global_settings {
   radiosity {

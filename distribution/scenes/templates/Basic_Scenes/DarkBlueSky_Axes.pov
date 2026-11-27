@@ -4,7 +4,7 @@
 //--------------------------------------------------------------------------
 #version 3.7;
 global_settings{ assumed_gamma 1.0 }
-#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
 //--------------------------------------------------------------------------
 #include "colors.inc"
 #include "textures.inc"
@@ -42,31 +42,31 @@ light_source{<1500,2500,-2500> color White}
 
 // sky ---------------------------------------------------------------
 sky_sphere{ pigment{ gradient <0,1,0>
-                     color_map{ [0   color rgb<0.24,0.34,0.56>*1.5]        
-                                [0.5 color rgb<0.24,0.34,0.56>*0.7] 
-                                [0.5 color rgb<0.24,0.34,0.56>*0.7] 
-                                [1.0 color rgb<0.24,0.34,0.56>*1.5]          
+                     color_map{ [0   color rgb<0.24,0.34,0.56>*1.5]
+                                [0.5 color rgb<0.24,0.34,0.56>*0.7]
+                                [0.5 color rgb<0.24,0.34,0.56>*0.7]
+                                [1.0 color rgb<0.24,0.34,0.56>*1.5]
                               }
-                     
-                      rotate< 0,0, 0>  
-                   
+
+                      rotate< 0,0, 0>
+
                      scale 2 }
            } // end of sky_sphere
- 
+
 //------------------------------ the Axes --------------------------------
- 
+
 //------------------------------------------------------------------------
-#macro Axis_( AxisLen, Dark_Texture,Light_Texture) 
+#macro Axis_( AxisLen, Dark_Texture,Light_Texture)
  union{
     cylinder { <0,-AxisLen,0>,<0,AxisLen,0>,0.05
-               texture{checker texture{Dark_Texture } 
+               texture{checker texture{Dark_Texture }
                                texture{Light_Texture}
                        translate<0.1,0,0.1>}
              }
     cone{<0,AxisLen,0>,0.2,<0,AxisLen+0.7,0>,0
           texture{Dark_Texture}
          }
-     } // end of union                   
+     } // end of union
 #end // of macro "Axis()"
 //------------------------------------------------------------------------
 #macro AxisXYZ( AxisLenX, AxisLenY, AxisLenZ, Tex_Dark, Tex_Light)
@@ -74,19 +74,19 @@ sky_sphere{ pigment{ gradient <0,1,0>
 union{
 #if (AxisLenX != 0)
  object { Axis_(AxisLenX, Tex_Dark, Tex_Light)   rotate< 0,0,-90>}// x-Axis
- text   { ttf "arial.ttf",  "x",  0.15,  0  texture{Tex_Dark} 
+ text   { ttf "arial.ttf",  "x",  0.15,  0  texture{Tex_Dark}
           scale 0.5 translate <AxisLenX+0.05,0.4,-0.10>}
-#end // of #if 
+#end // of #if
 #if (AxisLenY != 0)
  object { Axis_(AxisLenY, Tex_Dark, Tex_Light)   rotate< 0,0,  0>}// y-Axis
- text   { ttf "arial.ttf",  "y",  0.15,  0  texture{Tex_Dark}    
+ text   { ttf "arial.ttf",  "y",  0.15,  0  texture{Tex_Dark}
            scale 0.5 translate <-0.75,AxisLenY+0.50,-0.10>}
-#end // of #if 
+#end // of #if
 #if (AxisLenZ != 0)
  object { Axis_(AxisLenZ, Tex_Dark, Tex_Light)   rotate<90,0,  0>}// z-Axis
  text   { ttf "arial.ttf",  "z",  0.15,  0  texture{Tex_Dark}
                scale 0.5 translate <-0.75,0.2,AxisLenZ+0.10>}
-#end // of #if 
+#end // of #if
 } // end of union
 #end// of macro "AxisXYZ( ... )"
 //------------------------------------------------------------------------
@@ -95,7 +95,7 @@ union{
                                pigment{ color rgb<1,0.45,0>}
                                finish { phong 1}
                              }
-#declare Texture_A_Light = texture { 
+#declare Texture_A_Light = texture {
                                pigment{ color rgb<1,1,1>}
                                finish { phong 1}
                              }

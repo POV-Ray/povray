@@ -21,10 +21,10 @@ file_exists(S1)  // returns 1 if file S1 is found in library path
   "\n" New line (line feed) 0x0A
   "\r" Carriage return 0x0D
   "\t" Horizontal tab 0x09
-  "\uNNNN"  Unicode character code NNNN  0xNNNN  
+  "\uNNNN"  Unicode character code NNNN  0xNNNN
   "\v" Vertical tab 0x0B
   "\0" Null 0x00
   "\\" Backslash 0x5C
   "\'" Single quote 0x27
-  "\""  Double quote  0x22  
+  "\""  Double quote  0x22
 */

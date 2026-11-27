@@ -6,7 +6,7 @@
 // CRATER.POV
 // Render CRATER_DAT.POV to create the height_field image that
 // is needed in CRATER.POV (this file). Then render this file.
-// 
+//
 // ( When CRATER.POV is rendered, the output image type must be
 // the same as when CRATER_DAT.POV was rendered. That is how it
 // works when no image type is specified in the height_field.
@@ -23,7 +23,7 @@ global_settings { assumed_gamma 1.5 }
 
 camera{ location <0,8,-20>
         right     x*image_width/image_height
-        direction z*5 
+        direction z*5
         look_at 0
       }
 

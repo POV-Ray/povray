@@ -11,8 +11,8 @@
 global_settings { assumed_gamma 1.0 }
 
 //-------------------------------------------------------------------------
-// This scene uses a non-standard camera set-up. 
-// (See CAMERA in the included documentation for details.) 
+// This scene uses a non-standard camera set-up.
+// (See CAMERA in the included documentation for details.)
 // If you are new to POV-Ray, you might want to try a different demo scene.
 //-------------------------------------------------------------------------
 #include "prism3.inc"

@@ -1,4 +1,4 @@
-// --------------------------------------- parametric surface ------------- 
+// --------------------------------------- parametric surface -------------
 #declare a = 1.0;                       // conical spiral
 #declare b = 8;
 #declare c = 0.2;
@@ -18,4 +18,4 @@ parametric{
            finish { phong 0.5}}
   scale 0.125
   rotate <0, 90, 0>
-} // end of parametric ----------------------------------------------------  
+} // end of parametric ----------------------------------------------------

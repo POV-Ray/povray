@@ -26,12 +26,12 @@ global_settings { assumed_gamma 1.0 }
 #declare T2=
  texture{
    pigment{White}
-   normal{ 
-     pigment_pattern{ 
-          brick color rgb<1,1,1> color rgb<0.5,0.1,0> 
+   normal{
+     pigment_pattern{
+          brick color rgb<1,1,1> color rgb<0.5,0.1,0>
           scale 0.1
-        }   
-     , 0.5  
+        }
+     , 0.5
    }
    finish{phong 0.8 phong_size 200}
  }

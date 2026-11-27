@@ -105,7 +105,7 @@ pigment {
 
 #declare P_WoodGrain2B =
 pigment {
-    wood  
+    wood
     turbulence <0.1, 0.35, 0.1>
     octaves 5
     lambda 3.25
@@ -114,9 +114,9 @@ pigment {
     translate -x*2
 }
 
-#declare P_WoodGrain3A = 
+#declare P_WoodGrain3A =
 pigment {
-    wood  
+    wood
     turbulence 0.04
     octaves 3
     scale <0.05, .05, 1>
@@ -125,8 +125,8 @@ pigment {
 
 #declare P_WoodGrain3B =
 pigment {
-    wood  
-    turbulence <0.1, 0.5, 1> 
+    wood
+    turbulence <0.1, 0.5, 1>
     octaves 5
     lambda 3.25
     scale <0.15, .5, 1>
@@ -134,7 +134,7 @@ pigment {
     translate -x*2
 }
 
-#declare P_WoodGrain4A = 
+#declare P_WoodGrain4A =
 pigment {
     wood
     turbulence 0.04
@@ -153,7 +153,7 @@ pigment {
 }
 #declare P_WoodGrain5A =
 pigment {
-    wood  
+    wood
     turbulence <0.04, 0.04, 0.1>
     octaves 4
     omega 1.25
@@ -162,7 +162,7 @@ pigment {
 
 #declare P_WoodGrain5B =
 pigment {
-    wood  
+    wood
     turbulence <0.025, 0.025, 0.1>
     octaves 4
     omega 1.3
@@ -173,7 +173,7 @@ pigment {
 
 #declare P_WoodGrain6A =
 pigment {
-    wood 
+    wood
     turbulence <0.05, 0.08, 1>
     octaves 4
     scale <0.15, .15, 1>
@@ -182,11 +182,11 @@ pigment {
 
 #declare P_WoodGrain6B =
 pigment {
-    wood  
+    wood
     turbulence <0.05, 0.05, 0>
     octaves 4
     omega 0.95
-    scale <0.20, 0.20, 1>             
+    scale <0.20, 0.20, 1>
     rotate x*20
 }
 
@@ -225,7 +225,7 @@ pigment {
 
 #declare P_WoodGrain9A =
 pigment {
-    wood  
+    wood
     turbulence 0.1
     octaves 4
     lambda 3
@@ -236,7 +236,7 @@ pigment {
 #declare P_WoodGrain9B =
 pigment {
     wood
-    turbulence 0.1          
+    turbulence 0.1
     octaves 4
     lambda 3.5
     scale 0.2
@@ -247,7 +247,7 @@ pigment {
 
 #declare P_WoodGrain10A =
 pigment {
-    wood  
+    wood
     turbulence 0.02
     octaves 4
     lambda 3
@@ -317,7 +317,7 @@ pigment {
 pigment {
     wood
     turbulence 0.01
-    scale 0.05 
+    scale 0.05
 //    translate <10, 0, 0>
 }
 
@@ -384,7 +384,7 @@ pigment {
 }
 
 
-#declare P_WoodGrain17A = 
+#declare P_WoodGrain17A =
 pigment {
     wood
     colour_map { M_Wood17A }
@@ -460,8 +460,8 @@ pigment {
     texture { pigment { P_WoodGrain2B  color_map { M_Wood2B }}}
 
 // Bleached oak (white)
-#declare T_Wood3   =         
-    texture { pigment { P_WoodGrain3A  color_map { M_Wood3A }}} 
+#declare T_Wood3   =
+    texture { pigment { P_WoodGrain3A  color_map { M_Wood3A }}}
     texture { pigment { P_WoodGrain3B  color_map { M_Wood3B }}}
 
 // Mahogany (purplish-red)
@@ -470,68 +470,68 @@ pigment {
     texture { pigment { P_WoodGrain4B  color_map { M_Wood4B }}}
 
 // Dark yellow with reddish overgrain
-#declare T_Wood5   =         
-    texture { pigment { P_WoodGrain5A  color_map { M_Wood5A }}} 
+#declare T_Wood5   =
+    texture { pigment { P_WoodGrain5A  color_map { M_Wood5A }}}
     texture { pigment { P_WoodGrain5B  color_map { M_Wood5B }}}
 
 // Cocabola (red)
-#declare T_Wood6   =         
+#declare T_Wood6   =
     texture { pigment { P_WoodGrain6A  color_map { M_Wood6A }}}
     texture { pigment { P_WoodGrain6B  color_map { M_Wood6B }}}
 
 // Yellow pine (ragged grain)
-#declare T_Wood7   =         
-    texture { pigment { P_WoodGrain7A  color_map { M_Wood7A }}} 
+#declare T_Wood7   =
+    texture { pigment { P_WoodGrain7A  color_map { M_Wood7A }}}
     texture { pigment { P_WoodGrain7B  color_map { M_Wood7B }}}
 
-// Dark brown. Walnut?    
+// Dark brown. Walnut?
 #declare T_Wood8   =
-    texture { pigment { P_WoodGrain8A  color_map { M_Wood8A }}} 
+    texture { pigment { P_WoodGrain8A  color_map { M_Wood8A }}}
     texture { pigment { P_WoodGrain8B  color_map { M_Wood8B }}}
 
 // Yellowish-brown burl (heavily turbulated)
-#declare T_Wood9   =         
+#declare T_Wood9   =
     texture { pigment { P_WoodGrain9A  color_map { M_Wood9A }}}
     texture { pigment { P_WoodGrain9B  color_map { M_Wood9B }}}
 
 // Soft pine (light yellow, smooth grain)
-#declare T_Wood10 = 
-    texture {  pigment{ P_WoodGrain10A color_map { M_Wood10A }}} 
+#declare T_Wood10 =
+    texture {  pigment{ P_WoodGrain10A color_map { M_Wood10A }}}
     texture {  pigment{ P_WoodGrain10B color_map { M_Wood10B }}}
 
 // Spruce (yellowish, very straight, fine grain)
-#declare T_Wood11 = 
-    texture {  pigment{ P_WoodGrain11A color_map { M_Wood11A }}} 
+#declare T_Wood11 =
+    texture {  pigment{ P_WoodGrain11A color_map { M_Wood11A }}}
     texture {  pigment{ P_WoodGrain11B color_map { M_Wood11B }}}
 
 // Another very dark brown.  Walnut-stained pine, perhaps?
-#declare T_Wood12 = 
-    texture {  pigment{ P_WoodGrain12A color_map { M_Wood12A }}} 
+#declare T_Wood12 =
+    texture {  pigment{ P_WoodGrain12A color_map { M_Wood12A }}}
     texture {  pigment{ P_WoodGrain12B color_map { M_Wood12B }}}
 
 // Very straight grained, whitish
-#declare T_Wood13 = 
+#declare T_Wood13 =
     texture {  pigment{ P_WoodGrain13A color_map { M_Wood13A }}}
     texture {  pigment{ P_WoodGrain13B color_map { M_Wood13B }}}
 
 // Red, rough grain
-#declare T_Wood14 = 
-    texture {  pigment{ P_WoodGrain14A color_map { M_Wood14A }}} 
+#declare T_Wood14 =
+    texture {  pigment{ P_WoodGrain14A color_map { M_Wood14A }}}
     texture {  pigment{ P_WoodGrain14B color_map { M_Wood14B }}}
 
 // Medium brown
 #declare T_Wood15 =
-    texture {  pigment{ P_WoodGrain15A color_map { M_Wood15A }}} 
+    texture {  pigment{ P_WoodGrain15A color_map { M_Wood15A }}}
     texture {  pigment{ P_WoodGrain15B color_map { M_Wood15B }}}
 
 // Medium brown
-#declare T_Wood16 = 
-    texture {  pigment{ P_WoodGrain16A color_map { M_Wood16A }}} 
+#declare T_Wood16 =
+    texture {  pigment{ P_WoodGrain16A color_map { M_Wood16A }}}
     texture {  pigment{ P_WoodGrain16B color_map { M_Wood16B }}}
 
 // Medium brown
-#declare T_Wood17 = 
-    texture {  pigment{ P_WoodGrain17A color_map { M_Wood17A }}} 
+#declare T_Wood17 =
+    texture {  pigment{ P_WoodGrain17A color_map { M_Wood17A }}}
     texture {  pigment{ P_WoodGrain17B color_map { M_Wood17B }}}
 
 // Orange

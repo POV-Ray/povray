@@ -34,8 +34,8 @@ global_settings {
   }
 }
 //-------------------------------------------------------------------------
-// This scene uses a non-standard camera set-up. 
-// (See CAMERA in the included documentation for details.) 
+// This scene uses a non-standard camera set-up.
+// (See CAMERA in the included documentation for details.)
 // If you are new to POV-Ray, you might want to try a different demo scene.
 //-------------------------------------------------------------------------
 camera {
@@ -48,12 +48,12 @@ camera {
   angle       23
 }
 
- 
+
 light_source {
   <3.2, -2.3, 1.8>*1
   color rgb 1.0
 }
-   
+
 
 sphere {
   <0, 0, 0>, 1

@@ -4,7 +4,7 @@
 
 // Persistence Of Vision raytracer sample file.
 // File used for cliche.pov by Rune S. Johansen
-// 
+//
 // +w400 +h400 +a0.3
 
 #version 3.6;

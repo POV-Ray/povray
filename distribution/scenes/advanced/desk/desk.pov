@@ -327,7 +327,7 @@ light_source { <0, 0, 0> color White
 }
 camera {
    location <0.0, 40.0, -150.0>
-   angle 65 
+   angle 65
    right x*image_width/image_height // keep propotions with any aspect ratio
    look_at <0.0, 0.0, 0.0>
 }

@@ -11,7 +11,7 @@
 #version 3.7;
 
 global_settings {
-  assumed_gamma 2.2 
+  assumed_gamma 2.2
   max_trace_level 5
 }
 

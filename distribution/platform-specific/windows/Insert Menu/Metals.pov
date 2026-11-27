@@ -1,7 +1,7 @@
 // Insert menu illustration scene "Metals.pov"
 // Author: Friedrich A. Lohmueller, March-2013
 #version 3.7;
-global_settings{ assumed_gamma 1.0 } 
+global_settings{ assumed_gamma 1.0 }
 //--------------------------------------------------------------------------
 
 #include "shapes.inc"
@@ -10,13 +10,13 @@ global_settings{ assumed_gamma 1.0 }
 #include "glass.inc"
 //------------------------------------
 
-#declare In_Path1  = "E0 - Textures and Materials/35 - Metals/"   
+#declare In_Path1  = "E0 - Textures and Materials/35 - Metals/"
 
      //  #declare Typ =  35  ; // for tests
 
 #switch (Typ)  //----------------------------------------------------------
 // In_Path1
-#case(1)  #declare Txt_Path="01 - Rust.txt" #break 
+#case(1)  #declare Txt_Path="01 - Rust.txt" #break
 #case(2)  #declare Txt_Path="02 - Rusty_Iron.txt" #break
 #case(3)  #declare Txt_Path="03 - Brass_Valley.txt" #break
 #case(4)  #declare Txt_Path="04 - Silver1.txt" #break
@@ -78,20 +78,20 @@ global_settings{ assumed_gamma 1.0 }
 #end // of '#switch (Typ)' ------------------------------------------------
 //-------------------------------------------------------------------------
 #macro Base_Shape1( Tex ) // left box, right sphere
-union{ 
+union{
   object{ Round_Box( <-0.5,-0.5,-0.5>,<0.5,0.5,0.5>, 0.1, 0) texture{Tex}
-          scale 1.1 rotate<0,10,0> translate<-0.4 ,0.9,-0.8> } 
-// box{<-0.3,-1.9/2,0>,<0.3,1.9/2,7> rotate<0, 0,0> texture{Tex} translate<-0.95 ,0.1+1.9/2,-0.8> } 
- sphere{<0,0,0>,1.1 texture{Tex} translate<0.55,1.2,0> } 
+          scale 1.1 rotate<0,10,0> translate<-0.4 ,0.9,-0.8> }
+// box{<-0.3,-1.9/2,0>,<0.3,1.9/2,7> rotate<0, 0,0> texture{Tex} translate<-0.95 ,0.1+1.9/2,-0.8> }
+ sphere{<0,0,0>,1.1 texture{Tex} translate<0.55,1.2,0> }
  translate<0,0,-0.35>
- }//  
+ }//
 #end // macro
-//------------------------------------------------------------------------- 
-//------------------------------------------------------------------------- 
-//------------------------------------------------------------------------- 
-#if ( (Typ >=1) & (Typ <=43)) // 
+//-------------------------------------------------------------------------
+//-------------------------------------------------------------------------
+//-------------------------------------------------------------------------
+#if ( (Typ >=1) & (Typ <=43)) //
 
-#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
 #include "metals.inc"
 
 camera { angle 75      // front view
@@ -99,8 +99,8 @@ camera { angle 75      // front view
          right     x*image_width/image_height
          look_at   <0.0 , 1.0 , 0.0>}
 light_source{< 2500,2000,-2500> color White}
-// sky 
-plane{<0,1,0>,1 hollow  
+// sky
+plane{<0,1,0>,1 hollow
        texture{ pigment{ bozo turbulence 0.92
                          color_map { [0.00 rgb <0.20, 0.20, 1.0>*0.9]
                                      [0.50 rgb <0.20, 0.20, 1.0>*0.9]
@@ -109,18 +109,18 @@ plane{<0,1,0>,1 hollow
                                      [1.0 rgb <0.5,0.5,0.5>]}
                         scale<1,1,1.5>*2.5  translate< 0,0,0>
                        }
-                finish {ambient 1 diffuse 0} }      
+                finish {ambient 1 diffuse 0} }
        scale 10000}
-// fog on the ground ------------------------- 
+// fog on the ground -------------------------
 fog { fog_type   2
       distance   50
-      color      White  
+      color      White
       fog_offset 0.1
       fog_alt    1.5
       turbulence 1.8
     }
-// ground ------------------------------------ 
-plane { <0,1,0>, 0 
+// ground ------------------------------------
+plane { <0,1,0>, 0
         texture{ pigment{ color rgb<0.35,0.65,0.0>*0.72 }
 	         normal { bumps 0.75 scale 0.015 }
                  finish { phong 0.1 }
@@ -128,12 +128,12 @@ plane { <0,1,0>, 0
       } // end of plane
 //plane{ <0,1,0>, 0.001 texture{ pigment{  color rgb<0.55,0.45,0.43>*0.3} finish { phong 0.1} } }
 #end //--------------------------------------------------------------------
-//------------------------------------------------------------------------- 
+//-------------------------------------------------------------------------
 
-#if ( (Typ>=1) & (Typ<=43) ) //  
-object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> } 
+#if ( (Typ>=1) & (Typ<=43) ) //
+object{ Base_Shape1( #include concat(In_Path1,Txt_Path) ) translate<0,0,-0.00> }
 #end //----------
-//------------------------------------------------------------------------- 
+//-------------------------------------------------------------------------
 
 
 

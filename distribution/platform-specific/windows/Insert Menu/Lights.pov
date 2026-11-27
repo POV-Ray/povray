@@ -9,7 +9,7 @@
 
 // +w120 +h60 +a0.2 +r2 +am2 +j0.5
 #version 3.7;
-global_settings{ assumed_gamma 1.0 } 
+global_settings{ assumed_gamma 1.0 }
 
 /*
 #declare Typ=1;   // point source

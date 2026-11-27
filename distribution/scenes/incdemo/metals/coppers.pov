@@ -5,7 +5,7 @@
 // Persistence Of Vision Raytracer sample file.
 //
 // -w320 -h240
-// -w800 -h600 +a0.3  
+// -w800 -h600 +a0.3
 
 #version 3.6;
 

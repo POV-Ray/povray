@@ -8,14 +8,14 @@ isosurface { //-------------------------------------------
   contained_by {box {<-1,-1,-1>*1.35,<1,1,1>*1.35}}
   max_gradient 3.0
   accuracy 0.0001
- 
+
   texture { pigment{ color rgb<0.75,1.0,0.0>*0.9}
             //normal {bumps 0.5 scale 0.05}
-            finish { specular 0.3 
+            finish { specular 0.3
                      phong 0.3 reflection 0.07}
 	  }
   scale 0.75
   rotate <0,-50,0>
-  rotate <-40,0,0>  
+  rotate <-40,0,0>
   translate < 0, 1.2, 0>
 } // end of isosurface -----------------------------------

@@ -16,12 +16,12 @@ global_settings { assumed_gamma 1.9 }
 
 camera {
    location  <0, 3.5, -3.7>
-   angle 69 
+   angle 69
    right     x*image_width/image_height
    look_at   <0, -0.25,    0>
 }
 
-background{ color rgb<1,1,1>*0.15 } 
+background{ color rgb<1,1,1>*0.15 }
 
 // Light source
 

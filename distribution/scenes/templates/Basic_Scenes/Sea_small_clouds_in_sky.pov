@@ -1,10 +1,10 @@
 // POV-Ray 3.7 Scene File " ... .pov"
-// author:   ...  
+// author:   ...
 // date:   ...
 //--------------------------------------------------------------------------
 #version 3.7;
 global_settings{ assumed_gamma 1.0 }
-#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
 //--------------------------------------------------------------------------
 #include "colors.inc"
 #include "textures.inc"
@@ -40,7 +40,7 @@ camera{Camera_0}
 // sun ---------------------------------------------------------------------
 light_source{<1500,2500,-2500> color White}
 // sky ---------------------------------------------------------------------
-plane{<0,1,0>,1 hollow  
+plane{<0,1,0>,1 hollow
        texture{ pigment{ bozo turbulence 0.92
                          color_map { [0.00 rgb <0.20, 0.20, 1.0>*0.9]
                                      [0.50 rgb <0.20, 0.20, 1.0>*0.9]
@@ -49,20 +49,20 @@ plane{<0,1,0>,1 hollow
                                      [1.0 rgb <0.5,0.5,0.5>]}
                         scale<1,1,1.5>*2.5  translate< 0,0,0>
                        }
-                finish {ambient 1 diffuse 0} }      
+                finish {ambient 1 diffuse 0} }
        scale 10000}
 // fog on the ground -------------------------------------------------
 fog { fog_type   2
       distance   50
-      color      White  
+      color      White
       fog_offset 0.1
       fog_alt    1.5
       turbulence 1.8
     }
 // sea ---------------------------------------------------------------------
-plane{<0,1,0>, 0 
+plane{<0,1,0>, 0
        texture{Polished_Chrome
-               normal { crackle 0.15 scale <0.35,0.25,0.25> turbulence 0.5 } 
+               normal { crackle 0.15 scale <0.35,0.25,0.25> turbulence 0.5 }
                finish { reflection 0.60}}}
 
 //--------------------------------------------------------------------------

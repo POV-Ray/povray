@@ -9,7 +9,7 @@
 // -w800 -h600 +a0.3
 #version 3.7;
 global_settings { assumed_gamma 1.0 }
-#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
 
 #include "colors.inc"
 
@@ -31,7 +31,7 @@ camera {
   location  <0.0, 5.0, -17.5>
   look_at   <0.0, 7.0,  0.0>
   right     x*image_width/image_height
-  angle 65 
+  angle 65
 }
 // create a regular point light source
 light_source {
@@ -40,9 +40,9 @@ light_source {
   translate <200, 500, -500>
 }
 
-background { color rgb<1,1,1>*0.35 } 
+background { color rgb<1,1,1>*0.35 }
 
-#declare ThisGreen = color rgb<0.6,1,0>; 
+#declare ThisGreen = color rgb<0.6,1,0>;
 
 #declare Fade=
 texture {

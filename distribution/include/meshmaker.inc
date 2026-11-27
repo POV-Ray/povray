@@ -5,11 +5,11 @@
 // Persistence of Vision Ray Tracer Include File
 // File: meshmaker.inc
 // Vers: 3.7
-// 
+//
 // Desc: Macros and functions used in builing mesh2 objects.
-// Packed together and updated for POV-Ray 3.7 
+// Packed together and updated for POV-Ray 3.7
 // by Friedrich A. Lohmueller, April-2013.
-// Original author: Ingo Janssen 
+// Original author: Ingo Janssen
 // Date: 2002/04/27
 // Rev 2002/10/23 : Added the CheckFileName macro.
 //                  Added the option to write Wavefront *.obj files.
@@ -36,9 +36,9 @@ LInterpolate() : Linear interpolation of a vector or float between Min and Max.
 Min : minimal float value or vector.
 Max : Maximal float value or vector.
 Val : A float in the range 0 - 1.
-*/   
+*/
    #macro LInterpolate(Val, Min, Max)
-      (Min+(Max-Min)*Val) 
+      (Min+(Max-Min)*Val)
    #end
 
 
@@ -46,14 +46,14 @@ Val : A float in the range 0 - 1.
 RangeMM() : Adjusts input values in the range [RMin, RMax] to fit in the range
 [Min, Max].
 Val : A float value in the range [Rmin, Rmax].
-*/   
+*/
    #declare RangeMM=function(Val,Rmin,Rmax,Min,Max){
       (((Val-Rmin)/(Rmax-Rmin))*(Max-Min)+Min)
    }
 
 /*=================
   If Return has a value of 0 the mesh will not be build,
-  but it will be parsed from file. 
+  but it will be parsed from file.
 */
 #macro CheckFileName(FileName)
    #local Len=strlen(FileName);
@@ -65,7 +65,7 @@ Val : A float value in the range [Rmin, Rmax].
                #local Return=99;
             #else
                #local Return=0;
-            #end  
+            #end
          #else
             #local Return=0;
          #end
@@ -84,7 +84,7 @@ Val : A float value in the range [Rmin, Rmax].
                #end
             #else
                #local Return=1;
-            #end  
+            #end
          #else
             #local Return=1;
          #end
@@ -95,7 +95,7 @@ Val : A float value in the range [Rmin, Rmax].
    (Return)
 #end
 
-/*================= 
+/*=================
 BuildWriteMesh2() : Builds and optionally writes a mesh2 object based on 3 input
 arrays, the number of quads in U and V direction and a filename.
 VecArr   : The array that contains the vertices of the triangles in the mesh.
@@ -124,10 +124,10 @@ FileName : The name of the file to which the mesh will be written. If is an
             #debug concat(
                "\n\n The exis","ting file: '", FileName ,"' will not be over-written\n",
                " The mesh2 will not be parsed from the ", FileName," file",
-               "\n   - vertex_vectors\n")   
+               "\n   - vertex_vectors\n")
          #else
             #debug concat(
-               "\n\n Building mesh2 & Writing file: '", FileName , 
+               "\n\n Building mesh2 & Writing file: '", FileName ,
                "'\n   - vertex_vectors\n"
             )
             #fopen MeshFile FileName write
@@ -162,9 +162,9 @@ FileName : The name of the file to which the mesh will be written. If is an
          #end
       #else
          #local Write=0;
-         #debug concat("\n\n Building mesh2: \n   - vertex_vectors\n")   
+         #debug concat("\n\n Building mesh2: \n   - vertex_vectors\n")
       #end
-     
+
       #local NumVertices=dimension_size(VecArr,1);
       #switch (Write)
          #case(1)
@@ -224,10 +224,10 @@ FileName : The name of the file to which the mesh will be written. If is an
                   #if(mod(I,3)=0)
                      #write(MeshFile,"\n    ")
                   #end
-               #end 
+               #end
             #end
             #switch(Write)
-               #case(1) 
+               #case(1)
                   #write(MeshFile,"\n  }\n")
                #break
                #case(2)
@@ -236,13 +236,13 @@ FileName : The name of the file to which the mesh will be written. If is an
                #case(3)
                   // do nothing
                #break
-               #case(4) 
+               #case(4)
                   #write(MeshFile,"\n}\n")
                #break
             #end
          }
-   
-         #debug concat("   - normal_vectors\n")     
+
+         #debug concat("   - normal_vectors\n")
          #local NumVertices=dimension_size(NormArr,1);
          #switch(Write)
             #case(1)
@@ -294,11 +294,11 @@ FileName : The name of the file to which the mesh will be written. If is an
                   #break
                #end
                #local I=I+1;
-               #if(Write=1 | Write=4) 
+               #if(Write=1 | Write=4)
                   #if(mod(I,3)=0)
                      #write(MeshFile,"\n    ")
                   #end
-               #end 
+               #end
             #end
             #switch(Write)
                #case(1)
@@ -315,13 +315,13 @@ FileName : The name of the file to which the mesh will be written. If is an
                #break
             #end
          }
-         
-         #debug concat("   - uv_vectors\n")   
+
+         #debug concat("   - uv_vectors\n")
          #local NumVertices=dimension_size(UVArr,1);
          #switch(Write)
             #case(1)
                #write(
-                  MeshFile, 
+                  MeshFile,
                   "  uv_vectors {\n",
                   "    ", str(NumVertices,0,0),"\n    "
                )
@@ -364,13 +364,13 @@ FileName : The name of the file to which the mesh will be written. If is an
                      #write(MeshFile UVArr[I])
                   #break
                #end
-               #local I=I+1; 
+               #local I=I+1;
                #if(Write=1 | Write=4)
                   #if(mod(I,3)=0)
                      #write(MeshFile,"\n    ")
-                  #end 
+                  #end
                #end
-            #end 
+            #end
             #switch(Write)
                #case(1)
                   #write(MeshFile,"\n  }\n")
@@ -386,8 +386,8 @@ FileName : The name of the file to which the mesh will be written. If is an
                #break
             #end
          }
-   
-         #debug concat("   - face_indices\n")   
+
+         #debug concat("   - face_indices\n")
          #declare NumFaces=U*V*2;
          #switch(Write)
             #case(1)
@@ -459,7 +459,7 @@ FileName : The name of the file to which the mesh will be written. If is an
                   #if(Write=1 | Write=4)
                      #if(mod(H,3)=0)
                         #write(MeshFile,"\n    ")
-                     #end 
+                     #end
                   #end
                #end
                #local I=I+1;
@@ -492,7 +492,7 @@ FileName : The name of the file to which the mesh will be written. If is an
 
 // former "msm.inc"
 
-/*======   
+/*======
 The uv_coordinates come from the square <0,0> - <1,1>.
 
            The spline is evaluated from t=0 to t=1. For the normal calculation,
@@ -502,7 +502,7 @@ The uv_coordinates come from the square <0,0> - <1,1>.
 #macro BuildSpline(Arr, SplType)
    #local Ds=dimension_size(Arr,1);
    #local Asc=asc(strupr(SplType));
-   #if(Asc!=67 & Asc!=76 & Asc!=81) 
+   #if(Asc!=67 & Asc!=76 & Asc!=81)
       #local Asc=76;
       #debug "\nWrong spline type defined (C/c/L/l/N/n/Q/q), using default linear_spline\n"
    #end
@@ -525,12 +525,12 @@ The uv_coordinates come from the square <0,0> - <1,1>.
       #local J=0-Add;
       #local I=0;
       #while (I<Ds)
-         J 
+         J
          Arr[I]
          #local I=I+1;
          #local J=J+Add;
       #end
-   }      
+   }
 #end
 
 #macro MSM(SplineArray, SplRes, Interp_type,  InterpRes, FileName)
@@ -554,7 +554,7 @@ The uv_coordinates come from the square <0,0> - <1,1>.
       #local InterpStep=1/InterpRes;
       #local Count=0;
       #local Pos=0;
-      #while(Pos<=1)   
+      #while(Pos<=1)
          #local I=0;
          #if (Pos=0)
             #while (I<N)
@@ -623,7 +623,7 @@ The uv_coordinates come from the square <0,0> - <1,1>.
    #ifdef(__Fx) #undef __Fx #end
    #ifdef(__Fy) #undef __Fy #end
    #ifdef(__Fz) #undef __Fz #end
-   #declare __Fx= function(u,v){__F1__(u,v)} 
+   #declare __Fx= function(u,v){__F1__(u,v)}
    #declare __Fy= function(u,v){__F2__(u,v)}
    #declare __Fz= function(u,v){__F3__(u,v)}
    Paramcalc(UVmin, UVmax, Iter_U, Iter_V, FileName)
@@ -646,33 +646,33 @@ The uv_coordinates come from the square <0,0> - <1,1>.
       #local NumFaces=Iter_U*Iter_V*2;
       #debug concat("\n Calculating ",str(NumVertices,0,0)," vertices for ", str(NumFaces,0,0)," triangles\n\n")
       #debug "\n"
-      #local VecArr=array[NumVertices] 
-      #local NormArr=array[NumVertices] 
+      #local VecArr=array[NumVertices]
+      #local NormArr=array[NumVertices]
       #local UVArr=array[NumVertices]
-      #local Count=0;       
-      #local I=0;           
-      #local V=Vmin-iV;     
-      #while (I<Iter_V+1)   
-         #local V=V+iV;     
-         #local J=0;        
-         #local U=Umin-iU;  
+      #local Count=0;
+      #local I=0;
+      #local V=Vmin-iV;
+      #while (I<Iter_V+1)
+         #local V=V+iV;
+         #local J=0;
+         #local U=Umin-iU;
          #while (J<Iter_U+1)
-            #local U=U+iU;  
-            #local P=<(__Fx(U,V)),(__Fy(U,V)),(__Fz(U,V))>;       //     |      |      |        
+            #local U=U+iU;
+            #local P=<(__Fx(U,V)),(__Fy(U,V)),(__Fz(U,V))>;       //     |      |      |
             #local Un=U+(iU);                                     //  -- x --- Vn ---- x --
-            #local Vn=V+(iV);                                     //     |   /  |   /  |   
-            #local Um=U-(iU);                                     //     | /    | /    |   
+            #local Vn=V+(iV);                                     //     |   /  |   /  |
+            #local Um=U-(iU);                                     //     | /    | /    |
             #local Vm=V-(iV);                                     //  - Um ---- P ---- Un -
-            #if(__TU&Un>=Umax)                                    //     |   /  |   /  |   
-               #local Un=U+EPSNorm;                               //     | /    | /    |   
+            #if(__TU&Un>=Umax)                                    //     |   /  |   /  |
+               #local Un=U+EPSNorm;                               //     | /    | /    |
             #end                                                  //  -- x --- Vm ---- x --
-            #if(__TV&Vn>=Vmax)                                    //     |      |      |   
+            #if(__TV&Vn>=Vmax)                                    //     |      |      |
                #local Vn=V+EPSNorm;
             #end
             #if(__FU&Um<=Umin)
               #local Um=U-EPSNorm;
             #end
-            #if(__FV&Vm<=Vmin)         
+            #if(__FV&Vm<=Vmin)
                #local Vm=V-EPSNorm;
             #end
             #local N1=<(__Fx(Un,V)),(__Fy(Un,V)),(__Fz(Un,V))>;   // Recalculating these points on each pass
@@ -680,18 +680,18 @@ The uv_coordinates come from the square <0,0> - <1,1>.
             #local N3=<(__Fx(Um,V)),(__Fy(Um,V)),(__Fz(Um,V))>;   // and retreiving them from arrays.
             #local N4=<(__Fx(U,Vm)),(__Fy(U,Vm)),(__Fz(U,Vm))>;
             #local A=(N1-P);
-            #local B=(N2-P);      
+            #local B=(N2-P);
             #local C=(N3-P);
             #local D=(N4-P);
             #local N1=vcross(A,B);
             #local N2=vcross(B,C);
             #local N3=vcross(C,D);
             #local N4=vcross(D,A);
-            #local NormArr[Count]=vnormalize(N4+N1+N2+N3); 
+            #local NormArr[Count]=vnormalize(N4+N1+N2+N3);
             #local VecArr[Count]=P;
             #local UVArr[Count]=<(U-Umin)/dU,(V-Vmin)/dV>;
             #local Count=Count+1;
-            #local J=J+1;            
+            #local J=J+1;
          #end
          #debug concat("\r Done ", str(Count,0,0)," vertices : ",str(100*Count/NumVertices,0,2)," %")
          #local I=I+1;
@@ -703,7 +703,7 @@ The uv_coordinates come from the square <0,0> - <1,1>.
    #undef __Fx
    #undef __Fy
    #undef __Fz
-#end   
+#end
 
 // ====================== end of former "param.inc" ====================================
 
@@ -712,7 +712,7 @@ The uv_coordinates come from the square <0,0> - <1,1>.
 Prism(Spl, ResSpl, Height, HRes, FileName): Extrudes the spline along the y-axis.
            The uv_coordinates come from the square <0,0> - <1,1>.
 
-Spl      : The spline to be extruded. 
+Spl      : The spline to be extruded.
            The spline is evaluated from t=0 to t=1. For the normal calculation,
            it is required that all splines (also linear_spline) have one extra
            point before t=0 and after t=1.
@@ -727,7 +727,7 @@ FileName : The name of the file to which the mesh will be written. If is an
            If that is so, it will try to parse the existing file unless it's a '*.obj',
            '*.pcm' or '*.arr' file as POV-Ray can not read them directly. In this case a new
            mesh will be generated, but the existing files will _not_ be over-written.
-*/ 
+*/
 #macro Prism(Spl, ResSpl, Height, HRes, FileName)
    #local __LinSpl=spline {
       linear_spline
@@ -752,7 +752,7 @@ Spl      : The spline to be extruded.
 ResSpl   : The amount of triangles to be used along the spline.
 PSpl     : The spline that determines by what amount the extrusion is scaled in
            each step. The scaling is based on the relative distance from the y-axis.
-           That is, at t=0 the scale is always 1, so that the start of the shape is 
+           That is, at t=0 the scale is always 1, so that the start of the shape is
            identical to the spline Spl.
            PSpl also sets the height of the resulting shape (its y-value at t=1).
            The spline is evaluated from t=0 to t=1. For the normal calculation,
@@ -826,7 +826,7 @@ FileName : The name of the file to which the mesh will be written. If is an empt
    #end
 #end
 // ======================== end of former "prism.inc" =======================================
- 
+
 // former: lathe.inc
 /*=======
 Lathe(Spl, ResSpl, Rot, ResRot, FileName) : The Lathe  macro generates an
@@ -849,7 +849,7 @@ FileName : The name of the file to which the mesh will be written. If is an
            If that is so, it will try to parse the existing file unless it's a '*.obj',
            '*.pcm' or '*.arr' file as POV-Ray can not read them directly. In this case a new
            mesh will be generated, but the existing files will _not_ be over-written.
-*/ 
+*/
 #macro Lathe(Spl, ResSpl, Rot, ResRot, FileName)
    #declare Build=CheckFileName(FileName);
    #if(Build=0)
@@ -913,7 +913,7 @@ FileName : The name of the file to which the mesh will be written. If is an
 #end
 
 // ========== end of former "lathe.inc" ===============================================
-// former "coons.inc" 
+// former "coons.inc"
 /*======
 Coons(Spl1, Spl2, Spl3, Spl4, Iter_U, Iter_V, FileName): Generates a "coons
            surface". The surface is defined by four splines, all attached head
@@ -944,9 +944,9 @@ FileName : The name of the file to which the mesh will be written. If is an
       #local NumVertices=(Iter_U+1)*(Iter_V+1);
       #local NumFaces=Iter_U*Iter_V*2;
       #debug concat("\n Calculating ", str(NumVertices,0,0), " vertices for ",str(NumFaces,0,0), " triangles\n\n")
-      #declare VecArr=array[NumVertices]   
-      #declare NormArr=array[NumVertices]   
-      #local UVArr=array[NumVertices]      
+      #declare VecArr=array[NumVertices]
+      #declare NormArr=array[NumVertices]
+      #local UVArr=array[NumVertices]
       #local Spl1_0=Spl1(0);
       #local Spl2_0=Spl2(0);
       #local Spl3_0=Spl3(0);
@@ -961,7 +961,7 @@ FileName : The name of the file to which the mesh will be written. If is an
          #while (J<=1)
             #local Jm=1-J;
             #local C0=Im*Jm*(Spl1_0)+Im*J*(Spl2_0)+I*J*(Spl3_0)+I*Jm*(Spl4_0);
-            #local P0=LInterpolate(I, Spl1(J), Spl3(Jm)) + 
+            #local P0=LInterpolate(I, Spl1(J), Spl3(Jm)) +
                LInterpolate(Jm, Spl2(I), Spl4(Im))-C0;
             #declare VecArr[Count]=P0;
             #local UVArr[Count]=<J,I>;
@@ -995,7 +995,7 @@ FileName : The name of the file to which the mesh will be written. If is an
             #if (I=0)
                #local P3=P0+(P0-VecArr[Ind+Iter_U+1]);
             #else
-               #local P3=VecArr[Ind-Iter_U-1];                       
+               #local P3=VecArr[Ind-Iter_U-1];
             #end
             #if (I=Iter_V)
                #local P4=P0+(P0-VecArr[Ind-Iter_U-1]);
@@ -1010,7 +1010,7 @@ FileName : The name of the file to which the mesh will be written. If is an
             #local N2=vcross(B2,B3);
             #local N3=vcross(B3,B4);
             #local N4=vcross(B4,B1);
-            #local Norm=vnormalize((N1+N2+N3+N4));      
+            #local Norm=vnormalize((N1+N2+N3+N4));
             #declare NormArr[Count]=Norm;
             #local J=J+1;
             #local Count=Count+1;
@@ -1043,11 +1043,11 @@ FileName : The name of the file to which the mesh will be written. If is an
       #local NumVertices=(Iter_U+1)*(Iter_V+1);
       #declare NumFaces=Iter_U*Iter_V*2;
       #debug concat("\n Calculating ",str(NumVertices,0,0)," vertices for ", str(NumFaces,0,0)," triangles\n\n")
-      #local VecArr=array[NumVertices] 
-      #local NormArr=array[NumVertices] 
+      #local VecArr=array[NumVertices]
+      #local NormArr=array[NumVertices]
       #local UVArr=array[NumVertices]
-      #local Count=0;   
-      #local I=0;  
+      #local Count=0;
+      #local I=0;
       #while (I<Iter_V+1)
          #local V=RangeMM(I,0,Iter_V,Vmin,Vmax);
          #local J=0;
@@ -1072,11 +1072,11 @@ FileName : The name of the file to which the mesh will be written. If is an
             #local N3=vcross(B3,B4);
             #local N4=vcross(B4,B1);
             #local Norm=vnormalize((N1+N2+N3+N4));
-            #local VecArr[Count]=P0;  
-            #local NormArr[Count]=Norm;  
+            #local VecArr[Count]=P0;
+            #local NormArr[Count]=Norm;
             #local UVArr[Count]=<(U-Umin)/dU,(V-Vmin)/dV>;
             #local Count=Count+1;
-            #local J=J+1;            
+            #local J=J+1;
          #end
          #debug concat("\r Done ", str(Count,0,0)," vertices : ",str(100*Count/NumVertices,0,2)," %")
          #local I=I+1;
@@ -1097,12 +1097,12 @@ FileName : The name of the file to which the mesh will be written. If is an
 // Date: 1-Mar-2004
 // Auth: Mike Williams
 // Based on an idea by Greg M. Johnson
-// Requires makemesh.inc by Ingo Janssen 
+// Requires makemesh.inc by Ingo Janssen
 //
 // Parameters
 // Track        A spline that specifies the path along the object
 //              The section of the spline between control points 0 and 1 will be used
-// Shape        A spline that describes the cross section 
+// Shape        A spline that describes the cross section
 //              The section of the spline between control points 0 and 1 will be used
 // Waist        A spline with x coordinates that specify the radius of the spheresweep
 //              The section of the spline between control points 0 and 1 will be used
@@ -1117,12 +1117,12 @@ FileName : The name of the file to which the mesh will be written. If is an
 
 #macro FindPoint(su,sv)
 
-     // Spline point and radius 
+     // Spline point and radius
      #local P = Track(su);
      #local W = vlength(Waist(su).x);
 
      // Vertex position
-     // To prevent flipping, calculate from the previous DRY vector 
+     // To prevent flipping, calculate from the previous DRY vector
      #local DRX = W*vnormalize(vcross(DR,DRY));
      #local DRY = W*vnormalize(vcross(DRX,DR));
      P + (Shape(sv).x)*DRX + (Shape(sv).y)*DRY;
@@ -1148,7 +1148,7 @@ FileName : The name of the file to which the mesh will be written. If is an
 #local Verts = array[U*(V+1)]
 #local Norms = array[U*(V+1)]
 #local UV    = array[U*(V+1)]
-                           
+
 // Calculate the Vertexes, Normals and UV arrays
 #local DRY = y; // Arbitrary initial vector that X will be perpendicular to
 #local uu=0;
@@ -1161,27 +1161,27 @@ FileName : The name of the file to which the mesh will be written. If is an
      #local UV[uu*(V+1)+vv] = <su,sv>;
 
      // Direction the spline is pointing
-     #local DR = Track(su+0.001)-Track(su-0.001); 
-     
+     #local DR = Track(su+0.001)-Track(su-0.001);
+
      // Find some points
      #local P = FindPoint(su,sv);
      #local Verts[uu*(V+1)+vv] = P;
-     
-     #local Pu0=P; 
+
+     #local Pu0=P;
      #local Pu1 = FindPoint(su+0.001,sv);
      #if (vlength(Pu1-Pu0)=0)
        #local Pu1 = Pu0;
        #local Pu0 = FindPoint(su-0.001,sv);
      #end
-     
-     #local Pv0=P; 
+
+     #local Pv0=P;
      #local Pv1 = FindPoint(su,sv+0.001);
      #if (vlength(Pv1-Pv0)=0)
        #local Pv1 = Pv0;
        #local Pv0 = FindPoint(su,sv-0.001);
      #end
-                        
-     // calculate the normal                        
+
+     // calculate the normal
      #local Norms[uu*(V+1)+vv] = vcross(Pu1-Pu0,Pv1-Pv0);
 
      #local vv=vv+1;
@@ -1212,7 +1212,7 @@ FileName : The name of the file to which the mesh will be written. If is an
 #if (Build)#local Verts = array[U*(V+1)]
 #local Norms = array[U*(V+1)]
 #local UV    = array[U*(V+1)]
-                           
+
 // Calculate the Vertexes, Normals and UV arrays
 #local DRY = y; // Arbitrary initial vector that X will be perpendicular to
 #local uu=0;
@@ -1223,29 +1223,29 @@ FileName : The name of the file to which the mesh will be written. If is an
      #local su = uu/U;
      #local sv = vv/V;
      #local UV[uu*(V+1)+vv] = <su,sv>;
-     
-     // Spline point and radius 
+
+     // Spline point and radius
      #local P = Track(su);
      #local W = vlength(Waist(su).x);
 
      // Direction the spline is pointing
-     #local DR = Track(su+0.001)-Track(su-0.001); 
+     #local DR = Track(su+0.001)-Track(su-0.001);
 
      // Vertex position
-     // To prevent flipping, calculate from the previous DRY vector 
+     // To prevent flipping, calculate from the previous DRY vector
      #local DRX = W*vnormalize(vcross(DR,DRY));
      #local DRY = W*vnormalize(vcross(DRX,DR));
      #local Verts[uu*(V+1)+vv] = P + (Shape(sv).x)*DRX + (Shape(sv).y)*DRY;
 
      // Normal
-     #local NP1 = (Shape(sv).x)*DRX + (Shape(sv).y)*DRY; 
+     #local NP1 = (Shape(sv).x)*DRX + (Shape(sv).y)*DRY;
      #local NP2 = (Shape(sv+0.001).x)*DRX + (Shape(sv+0.001).y)*DRY;
      #local DS = NP2-NP1;
      #if (vlength(DS) = 0) // can happen at end point of Shape
-       #local NP1 = (Shape(sv-0.001).x)*DRX + (Shape(sv-0.001).y)*DRY; 
+       #local NP1 = (Shape(sv-0.001).x)*DRX + (Shape(sv-0.001).y)*DRY;
        #local NP2 = (Shape(sv+0.001).x)*DRX + (Shape(sv+0.001).y)*DRY;
        #local DS = NP2-NP1;
-     #end     
+     #end
 
      #local Norms[uu*(V+1)+vv] = vcross(DR,DS);
 
@@ -1261,5 +1261,5 @@ BuildWriteMesh2(Verts, Norms, UV, V, U-1, Filename)
 
 
 // ------------------------------------------------------
-#version makemesh_Inc_Temp; 
+#version makemesh_Inc_Temp;
 #end //ifndef

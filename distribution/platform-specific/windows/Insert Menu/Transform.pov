@@ -7,7 +7,7 @@
 // -w120 -h48 +a0.1 +am2 -j +r3
 
 #version 3.7;
-global_settings{ assumed_gamma 1.0 } 
+global_settings{ assumed_gamma 1.0 }
 
 #include "colors.inc"
 

@@ -8,11 +8,11 @@
 // -w320 -h240
 // -w800 -h600 +a0.3
 #version 3.7;
-global_settings { 
+global_settings {
   assumed_gamma 1.0
   max_trace_level 5
 }
-#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
 
 #include "colors.inc"
 #include "textures.inc"
@@ -23,7 +23,7 @@ global_settings {
 camera {
     location <0.0, 0.0, -6.0>
     right     x*image_width/image_height
-    angle 49  
+    angle 49
     look_at <0,0.5,0>
 }
 
@@ -90,7 +90,7 @@ julia_fractal {
     rotate <-80, 30, -120>
     translate <1.35,1.45,0>
 }
- 
+
 intersection {
     julia_fractal {
         <-0.54, 0.57, 0.0, -0.37>
@@ -109,6 +109,6 @@ intersection {
     scale 1
     translate <1.2,-0.45,0>
 }
-   
-background { color rgb<1,1,1>*1 } 
+
+background { color rgb<1,1,1>*1 }
 

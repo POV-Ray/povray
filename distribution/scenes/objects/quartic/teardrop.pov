@@ -11,7 +11,7 @@
 // Sample qaurtic file
 // by Alexander Enzmann
 #version  3.7;
-global_settings { 
+global_settings {
   assumed_gamma 1.0
 }
 
@@ -46,5 +46,5 @@ camera {
 
 light_source { <200, 30, -500> colour White }
 
-background { color rgb<1,1,1>*0.02 } 
- 
+background { color rgb<1,1,1>*0.02 }
+

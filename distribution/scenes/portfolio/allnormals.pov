@@ -11,7 +11,7 @@
 // Date: 2001/08/08
 // Auth: ingo Janssen
 #version 3.6;
-global_settings { 
+global_settings {
   assumed_gamma 1.0
 }
 
@@ -60,9 +60,9 @@ global_settings {
 // as strings for the generation of the html-files
 // and as identfiers for the generation of the images.
 #declare str_normalArr=array[33] {
-   "Agate","Average""Boxed","Bozo","Brick","Bumps"        
+   "Agate","Average""Boxed","Bozo","Brick","Bumps"
    "Cells","Checker","Crackle","Cylindrical",
-   "Dents","Mandel", "Julia", "Facets",      
+   "Dents","Mandel", "Julia", "Facets",
    "Function","Gradient","Granite","Hexagon","Image_pattern"
    "Leopard","Marble","Onion","Planar","Quilted"
    "Radial","Ripples","Spherical","Spiral1","Spiral2"
@@ -70,13 +70,13 @@ global_settings {
 
 }
 #declare normalArr=array[33] {
-   Agate,Average,Boxed,Bozo,Brick,Bumps        
+   Agate,Average,Boxed,Bozo,Brick,Bumps
    Cells,Checker,Crackle,Cylindrical,
-   Dents,Mandel, Julia, Facets,       
+   Dents,Mandel, Julia, Facets,
    Function,Gradient,Granite,Hexagon,Image_pattern
-   Leopard,Marble,Onion,Planar,Quilted      
-   Radial,Ripples,Spherical,Spiral1,Spiral2      
-   Spotted,Waves,Wood,Wrinkles     
+   Leopard,Marble,Onion,Planar,Quilted
+   Radial,Ripples,Spherical,Spiral1,Spiral2
+   Spotted,Waves,Wood,Wrinkles
 }
 
 
@@ -113,7 +113,7 @@ global_settings {
       -1.5,1.5
       translate<0,0,1.5>
       texture{T}
-      translate<0,0,-1.5>   
+      translate<0,0,-1.5>
       rotate <0,-35,0>
       rotate <-15,0,0>
    }

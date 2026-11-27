@@ -10,7 +10,7 @@
 
 #version 3.7;
 global_settings { assumed_gamma 1.3 }
- 
+
 #include "stdinc.inc"
 #include "arrays.inc"
 
@@ -134,7 +134,7 @@ isosurface {
 	}
 	threshold 0
         max_gradient 5
-        
+
 	contained_by {sphere {< 0, 0, 0>, 3.1}}
 	texture {
 		pigment {radial

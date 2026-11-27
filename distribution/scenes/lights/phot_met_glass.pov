@@ -67,7 +67,7 @@ sphere {
     finish { ambient 1 diffuse 0 }
   }
 
-  scale 1000 
+  scale 1000
   hollow on
 }
 

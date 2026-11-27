@@ -5,10 +5,10 @@
 /* Persistence Of Vision Raytracer sample file.
 
    Test scene for the Mesh Camera macros
-  
+
    Comparison of the meshcam pinhole cameras with a regular camera
    to test the correctness of the results
-   
+
    --
    Jaime Vives Piqueres, Jan. 2011  <jaime@ignorancia.org> */
 
@@ -22,7 +22,7 @@
 #version 3.7;
 
 // control center:
-#declare use_mesh_cam=1;  //  0=regular camera, 1=pinhole mesh, 2=pinhole mesh with UV 
+#declare use_mesh_cam=1;  //  0=regular camera, 1=pinhole mesh, 2=pinhole mesh with UV
 
 // common globals for all the demos
 #include "demo_globals.inc"
@@ -69,14 +69,14 @@
         smooth
       }
       location <0,0,-.01>
-    } 
+    }
   #end
 
 // test regular camera for comparison
 #else
 
   camera{
-    perspective   
+    perspective
     location c_location
     up 1*y right (image_width/image_height)*x
     angle c_angle

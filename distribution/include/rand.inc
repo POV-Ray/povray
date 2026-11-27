@@ -149,7 +149,7 @@
          #else
             #local X=-ln((B-P)/Alpha);
          #end
-         #local R1=rand(Stream); 
+         #local R1=rand(Stream);
          #if(!( ((P<=1) & (R1>exp(-X))) | ((P>1) & (R1>pow(X,Alpha-1))) ))
              #local RETURN=X;
              #local Loop=false;
@@ -165,7 +165,7 @@
 #macro Rand_Beta(Alpha, Beta, Stream)
    #if(Alpha<=0 | Beta<=0)
       #error "Alpha and Beta should be bigger than 0"
-   #end 
+   #end
    #local Gamma1=Rand_Gamma(Alpha,1,Stream);
    #if (Gamma1=0)
       #local Return=0;
@@ -245,7 +245,7 @@
 
 // Bernoulli distribution
 // Input: P = probability range: 0 - 1. And a random stream.
-// Output: the BOOLEAN value TRUE with a probability equal 
+// Output: the BOOLEAN value TRUE with a probability equal
 //         to the value of P and FALSE with a probability of 1 - P.
 #macro Rand_Bernoulli(P,Stream)
    (P>=rand(Stream)?true:false)

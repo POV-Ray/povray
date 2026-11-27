@@ -71,17 +71,17 @@
 #declare P_Silver1   = color rgb <0.94, 0.93, 0.80>;
 #declare P_Silver2   = color rgb <0.94, 0.93, 0.85>;
 #declare P_Silver3   = color rgb <0.94, 0.93, 0.90>;
-#declare P_Silver4   = color rgb <0.95, 0.91, 0.91>;             
-#declare P_Silver5   = color rgb <0.91, 0.95, 0.91>;   
+#declare P_Silver4   = color rgb <0.95, 0.91, 0.91>;
+#declare P_Silver5   = color rgb <0.91, 0.95, 0.91>;
 
 //*****************************************************************************
 //                           BASIC METAL FINISHES
 //*****************************************************************************
 
-// F_MetalA  :  Very soft and dull.  
+// F_MetalA  :  Very soft and dull.
 // F_MetalB  :  Fairly soft and dull.
 // F_MetalC  :  Medium reflectivity. Holds color well.
-// F_MetalD  :  Highly hard and polished. High reflectivity.   
+// F_MetalD  :  Highly hard and polished. High reflectivity.
 // F_MetalE  :  Very highly polished & reflective.
 
 #declare F_MetalA  =
@@ -95,7 +95,7 @@ finish {
     reflection 0.1
 }
 
-#declare F_MetalB  = 
+#declare F_MetalB  =
 finish {
     ambient 0.30
     brilliance 3
@@ -180,87 +180,87 @@ finish {
 #declare T_Copper_1C = texture { pigment { P_Copper1 } finish { F_MetalC  } }
 #declare T_Copper_1D = texture { pigment { P_Copper1 } finish { F_MetalD  } }
 #declare T_Copper_1E = texture { pigment { P_Copper1 } finish { F_MetalE  } }
-                                           
+
 #declare T_Copper_2A = texture { pigment { P_Copper2 } finish { F_MetalA  } }
 #declare T_Copper_2B = texture { pigment { P_Copper2 } finish { F_MetalB  } }
 #declare T_Copper_2C = texture { pigment { P_Copper2 } finish { F_MetalC  } }
 #declare T_Copper_2D = texture { pigment { P_Copper2 } finish { F_MetalD  } }
 #declare T_Copper_2E = texture { pigment { P_Copper2 } finish { F_MetalE  } }
-                                           
+
 #declare T_Copper_3A = texture { pigment { P_Copper3 } finish { F_MetalA  } }
 #declare T_Copper_3B = texture { pigment { P_Copper3 } finish { F_MetalB  } }
 #declare T_Copper_3C = texture { pigment { P_Copper3 } finish { F_MetalC  } }
 #declare T_Copper_3D = texture { pigment { P_Copper3 } finish { F_MetalD  } }
 #declare T_Copper_3E = texture { pigment { P_Copper3 } finish { F_MetalE  } }
-                                           
+
 #declare T_Copper_4A = texture { pigment { P_Copper4 } finish { F_MetalA  } }
 #declare T_Copper_4B = texture { pigment { P_Copper4 } finish { F_MetalB  } }
 #declare T_Copper_4C = texture { pigment { P_Copper4 } finish { F_MetalC  } }
 #declare T_Copper_4D = texture { pigment { P_Copper4 } finish { F_MetalD  } }
 #declare T_Copper_4E = texture { pigment { P_Copper4 } finish { F_MetalE  } }
-                                           
+
 #declare T_Copper_5A = texture { pigment { P_Copper5 } finish { F_MetalA  } }
 #declare T_Copper_5B = texture { pigment { P_Copper5 } finish { F_MetalB  } }
 #declare T_Copper_5C = texture { pigment { P_Copper5 } finish { F_MetalC  } }
 #declare T_Copper_5D = texture { pigment { P_Copper5 } finish { F_MetalD  } }
 #declare T_Copper_5E = texture { pigment { P_Copper5 } finish { F_MetalE  } }
 
-//                           CHROMES & STEELS  
+//                           CHROMES & STEELS
 #declare T_Chrome_1A = texture { pigment { P_Chrome1 } finish { F_MetalA  } }
 #declare T_Chrome_1B = texture { pigment { P_Chrome1 } finish { F_MetalB  } }
 #declare T_Chrome_1C = texture { pigment { P_Chrome1 } finish { F_MetalC  } }
 #declare T_Chrome_1D = texture { pigment { P_Chrome1 } finish { F_MetalD  } }
 #declare T_Chrome_1E = texture { pigment { P_Chrome1 } finish { F_MetalE  } }
-                                           
+
 #declare T_Chrome_2A = texture { pigment { P_Chrome2 } finish { F_MetalA  } }
 #declare T_Chrome_2B = texture { pigment { P_Chrome2 } finish { F_MetalB  } }
 #declare T_Chrome_2C = texture { pigment { P_Chrome2 } finish { F_MetalC  } }
 #declare T_Chrome_2D = texture { pigment { P_Chrome2 } finish { F_MetalD  } }
 #declare T_Chrome_2E = texture { pigment { P_Chrome2 } finish { F_MetalE  } }
-                                           
+
 #declare T_Chrome_3A = texture { pigment { P_Chrome3 } finish { F_MetalA  } }
 #declare T_Chrome_3B = texture { pigment { P_Chrome3 } finish { F_MetalB  } }
 #declare T_Chrome_3C = texture { pigment { P_Chrome3 } finish { F_MetalC  } }
 #declare T_Chrome_3D = texture { pigment { P_Chrome3 } finish { F_MetalD  } }
 #declare T_Chrome_3E = texture { pigment { P_Chrome3 } finish { F_MetalE  } }
-                                           
+
 #declare T_Chrome_4A = texture { pigment { P_Chrome4 } finish { F_MetalA  } }
 #declare T_Chrome_4B = texture { pigment { P_Chrome4 } finish { F_MetalB  } }
 #declare T_Chrome_4C = texture { pigment { P_Chrome4 } finish { F_MetalC  } }
 #declare T_Chrome_4D = texture { pigment { P_Chrome4 } finish { F_MetalD  } }
 #declare T_Chrome_4E = texture { pigment { P_Chrome4 } finish { F_MetalE  } }
-                                           
+
 #declare T_Chrome_5A = texture { pigment { P_Chrome5 } finish { F_MetalA  } }
 #declare T_Chrome_5B = texture { pigment { P_Chrome5 } finish { F_MetalB  } }
 #declare T_Chrome_5C = texture { pigment { P_Chrome5 } finish { F_MetalC  } }
 #declare T_Chrome_5D = texture { pigment { P_Chrome5 } finish { F_MetalD  } }
 #declare T_Chrome_5E = texture { pigment { P_Chrome5 } finish { F_MetalE  } }
 
-//                               SILVERS        
+//                               SILVERS
 #declare T_Silver_1A = texture { pigment { P_Silver1 } finish { F_MetalA  } }
 #declare T_Silver_1B = texture { pigment { P_Silver1 } finish { F_MetalB  } }
 #declare T_Silver_1C = texture { pigment { P_Silver1 } finish { F_MetalC  } }
 #declare T_Silver_1D = texture { pigment { P_Silver1 } finish { F_MetalD  } }
 #declare T_Silver_1E = texture { pigment { P_Silver1 } finish { F_MetalE  } }
-                                           
+
 #declare T_Silver_2A = texture { pigment { P_Silver2 } finish { F_MetalA  } }
 #declare T_Silver_2B = texture { pigment { P_Silver2 } finish { F_MetalB  } }
 #declare T_Silver_2C = texture { pigment { P_Silver2 } finish { F_MetalC  } }
 #declare T_Silver_2D = texture { pigment { P_Silver2 } finish { F_MetalD  } }
 #declare T_Silver_2E = texture { pigment { P_Silver2 } finish { F_MetalE  } }
-                                           
+
 #declare T_Silver_3A = texture { pigment { P_Silver3 } finish { F_MetalA  } }
 #declare T_Silver_3B = texture { pigment { P_Silver3 } finish { F_MetalB  } }
 #declare T_Silver_3C = texture { pigment { P_Silver3 } finish { F_MetalC  } }
 #declare T_Silver_3D = texture { pigment { P_Silver3 } finish { F_MetalD  } }
 #declare T_Silver_3E = texture { pigment { P_Silver3 } finish { F_MetalE  } }
-                                           
+
 #declare T_Silver_4A = texture { pigment { P_Silver4 } finish { F_MetalA  } }
 #declare T_Silver_4B = texture { pigment { P_Silver4 } finish { F_MetalB  } }
 #declare T_Silver_4C = texture { pigment { P_Silver4 } finish { F_MetalC  } }
 #declare T_Silver_4D = texture { pigment { P_Silver4 } finish { F_MetalD  } }
 #declare T_Silver_4E = texture { pigment { P_Silver4 } finish { F_MetalE  } }
-                                           
+
 #declare T_Silver_5A = texture { pigment { P_Silver5 } finish { F_MetalA  } }
 #declare T_Silver_5B = texture { pigment { P_Silver5 } finish { F_MetalB  } }
 #declare T_Silver_5C = texture { pigment { P_Silver5 } finish { F_MetalC  } }

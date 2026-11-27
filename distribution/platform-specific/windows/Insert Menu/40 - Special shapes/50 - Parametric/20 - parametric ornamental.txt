@@ -12,9 +12,9 @@ parametric {
   precompute 10 x,y,z // precompute normally gives faster rendering (<=20) but longer parsing
 
   scale 1.5 rotate -90*x
-  texture{ pigment{ color rgb<1,1,1> } 
-            
-         } 
+  texture{ pigment{ color rgb<1,1,1> }
+
+         }
   translate<0,0,0>
 }
 

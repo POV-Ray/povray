@@ -1,4 +1,4 @@
-// new more compact mesh FINITE shape (for CSG with inside_vector) 
+// new more compact mesh FINITE shape (for CSG with inside_vector)
 mesh2 {
   vertex_vectors {
     number_of_vertices,
@@ -35,6 +35,6 @@ mesh2 {
     <index_d, index_e, index_f>,
     ...
   }
- inside_vector <0,0,1> // for use in CSG 
+ inside_vector <0,0,1> // for use in CSG
  [object modifiers]
 }

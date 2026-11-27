@@ -10,10 +10,10 @@
          Persistence of Vision Raytracer Version 3.1
 
 
-Here are some updated/additional Starfield textures which you can include 
-in distribution with POVRAY 3.1.  These textures use some of the new 
-features in POVRAY 3.1.  The starfields become more "dense" as you progress 
-from Starfield1 to Starfield6 and add a little color since all stars are not 
+Here are some updated/additional Starfield textures which you can include
+in distribution with POVRAY 3.1.  These textures use some of the new
+features in POVRAY 3.1.  The starfields become more "dense" as you progress
+from Starfield1 to Starfield6 and add a little color since all stars are not
 white but light shades of white, blue, red, and yellow.
 
 Respectfully;

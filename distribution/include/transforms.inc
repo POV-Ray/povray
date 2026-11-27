@@ -140,7 +140,7 @@
             translate x*(Pt - Mx.x)
          #end
       #end
-      
+
       #if(Axis.y < -0.5)
          translate y*(Pt - Mn.y)
       #else
@@ -148,7 +148,7 @@
             translate y*(Pt - Mx.y)
          #end
       #end
-      
+
       #if(Axis.z < -0.5)
          translate z*(Pt - Mn.z)
       #else
@@ -162,23 +162,23 @@
 // Aligns an object to a spline for a given time value.
 // The Z axis of the object will point in the forward direction
 // of the spline and the Y axis of the object will point upwards.
-// 
+//
 // usage:     object {MyObj Spline_Trans(MySpline, clock, y, 0.1, 0.5)}
-// 
+//
 // Spline:    The spline that the object is aligned to.
-// 
+//
 // Time:      The time value to feed to the spline, for example clock.
-// 
+//
 // Sky:       The vector that is upwards in your scene, usually y.
-// 
+//
 // Foresight: How much in advance the object will turn and bank.
 //            Values close to 0 will give precise results, while higher
 //            values give smoother results. It will not affect parsing
 //            speed, so just find the value that looks best.
-// 
+//
 // Banking:   How much the object tilts when turning. Note that the amount
 //            of tilting is equally much controlled by the ForeSight value.
-// 
+//
 // Author: Rune S. Johansen
 #macro Spline_Trans (Spline, Time, Sky, Foresight, Banking)
    #local Location = <0,0,0>+Spline(Time);

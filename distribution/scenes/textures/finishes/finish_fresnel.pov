@@ -23,7 +23,7 @@ global_settings {
   }
 }
 
-#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
 
 camera {
   perspective angle 75
@@ -36,7 +36,7 @@ light_source {
   <-3000,3000,-3000> color rgb 0.01
 }
 
-plane{ <0,1,0>, 0 
+plane{ <0,1,0>, 0
   pigment{ checker color rgb 1 color rgb 0 }
   finish { diffuse albedo 1 }
   rotate y*45

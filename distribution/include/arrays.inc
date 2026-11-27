@@ -110,7 +110,7 @@
          #while(Sort_Compare(Array, FInd, J)) #local J = J-1; #end
          #local I = I+1;
          #while(Sort_Compare(Array, I, FInd)) #local I = I+1; #end
-         
+
          #if(I < J)
             Sort_Swap_Data(Array, I, J)
          #else

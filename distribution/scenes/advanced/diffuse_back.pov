@@ -9,11 +9,11 @@
 //
 // -w640 -h480
 // -w800 -h600 +a0.3
-// 
+//
 // Warning: this will take time!
 
 #version 3.7;
-  
+
 #declare Photons=on;
 #declare Radiosity=on;
 
@@ -91,7 +91,7 @@ plane { y, -10
   texture {
     pigment { color rgb <1.0, 0.8, 0.6> }
     finish { diffuse 0.5 }
-  }  
+  }
 }
 
 #declare M_SolidWhite= material {
@@ -107,7 +107,7 @@ difference {
   box { <-3.1,-1,-4>, <3.1,3.5,4> }     // solid block
   box { <-3,-0.2,-3>, <3,2.5,3> }       // main room cutout
   box { <-3.2,0.3,-2>, <2.9,2,2> }      // window cutout
-  texture { 
+  texture {
     pigment { color rgb <0.9, 0.9, 0.9> }
     finish { diffuse 1.0 }
   }
@@ -120,7 +120,7 @@ union {
   cylinder { <-3.05,0, 1>, <-3.05,2, 1>, 0.05 }
   cylinder { <-3.05,0,-1>, <-3.05,2,-1>, 0.05 }
   material { M_SolidWhite }
-  scale OverallScale 
+  scale OverallScale
 }
 
 // Baseboards
@@ -131,13 +131,13 @@ union {
   material { M_SolidWhite }
   translate z*3
 }
-                                        
-union {                                        
+
+union {
   object { Baseboard }
   object { Baseboard rotate y*90 }
   object { Baseboard rotate y*180 }
   object { Baseboard rotate y*270 }
-  scale OverallScale 
+  scale OverallScale
 }
 
 
@@ -160,7 +160,7 @@ box { <-3,0,-3>, <3,-0.1,3>
 }
 
 #declare Curtain= union {
-  polygon{ 5, <0,0.1,2.0>, <0,0.1,0.1>, <0,2.45,0.1>, <0,2.45,2.0>, <0,0.1,2.0> material { M_Curtains } }          
+  polygon{ 5, <0,0.1,2.0>, <0,0.1,0.1>, <0,2.45,0.1>, <0,2.45,2.0>, <0,0.1,2.0> material { M_Curtains } }
   cylinder { <0,0.1,2.025>, <0,0.1,0.075>, 0.025 material { M_SolidWhite } }
   cylinder { <0,2.45,2.025>, <0,2.45,0.075>, 0.025 material { M_SolidWhite } }
   translate <-2.8,0,0>
@@ -170,7 +170,7 @@ box { <-3,0,-3>, <3,-0.1,3>
 union {
   object { Curtain }
   object { Curtain scale <1,1,-1> }
-  scale OverallScale 
+  scale OverallScale
 }
 
 // Screen
@@ -196,7 +196,7 @@ union {
 union {
   object { Screen rotate y*45 translate <-2.25,0,2> }
   object { Screen rotate y*0  translate <-2.25,0,-1.0> }
-  scale OverallScale 
+  scale OverallScale
 }
 
 // Glass Objects

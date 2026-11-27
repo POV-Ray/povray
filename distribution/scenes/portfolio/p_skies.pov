@@ -11,7 +11,7 @@
 // Date: 2001/07/30
 // Auth: Ingo Janssen
 #version 3.6;
-global_settings { 
+global_settings {
   assumed_gamma 1.0
 }
 
@@ -55,10 +55,10 @@ global_settings {
      look_at   <0,1.5,1>
      angle 75
    }
-   
+
    light_source {<-500,300,-500> rgb 1}
    light_source {<500,500,500> rgb 0.7 shadowless}
-   
+
    sky_sphere{
       pigment {planar colour_map{[0,rgb <0.9,0.9,1>][1, rgb <0.1,0.2,1>]}}
       pigment{pigmentArr[frame_number-1]}   // put the right arrray name here !!

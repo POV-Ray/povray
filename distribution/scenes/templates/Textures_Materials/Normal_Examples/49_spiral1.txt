@@ -3,7 +3,7 @@
                                            color_map {[0, rgb 0.2]
                                                       [1, rgb 0.8]}
                                          } // end pigment_pattern
-                          1 // intensity 
+                          1 // intensity
                         } // end normal
                  finish { phong 1  reflection{ 0.1 } }
-               } // end of texture ---------------------------------------------------   
+               } // end of texture ---------------------------------------------------

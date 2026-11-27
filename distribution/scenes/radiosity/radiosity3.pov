@@ -20,7 +20,7 @@
 
 global_settings {
   assumed_gamma 1.0
-  
+
   radiosity {
     pretrace_start 0.08
     pretrace_end   0.04

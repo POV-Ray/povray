@@ -8,7 +8,7 @@
 // -w320 -h240
 // -w800 -h600 +a0.3
 #version  3.7;
-global_settings { 
+global_settings {
   assumed_gamma 1.9
 }
 
@@ -16,7 +16,7 @@ global_settings {
 
 camera {
    location  <0, 10,-20>
-   angle 60 
+   angle 60
    right     x*image_width/image_height
    look_at   <0, 0, 0>
    }

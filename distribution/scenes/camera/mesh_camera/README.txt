@@ -193,17 +193,17 @@ Finally I ended up writing a set of macros to help creating and placing
 such camera meshes. Here are some quick informations about the macros:
 
     * The meshes are mesh{} objects, since mesh2{} will not get better
-results, and the former is easier to create for me. 
+results, and the former is easier to create for me.
 
     * The meshes are optionally written to an include file for later
-use, as the creation process can be long for big resolutions. 
+use, as the creation process can be long for big resolutions.
 
     * The mesh camera is created initially witouth a location or
 look_at, as it  allows for easier creation, and for reuse of the camera
-on different locations/scenes once written to file. 
+on different locations/scenes once written to file.
 
     * An additional macro automates the transformations needed to place
-the camera with the desired location and look_at. 
+the camera with the desired location and look_at.
 
 -----------
 DEMO SCENES
@@ -217,20 +217,20 @@ Here is the description of the included demos and auxiliary files:
 - demo_globals.inc
 
   Common global settings for all the scenes.
-	
+
 - demo_common.inc
 
-  Common textures, object and lighting. 
-  
+  Common textures, object and lighting.
+
 - demo_room.inc
 
   Room used by all the demos, created with Wings3D.
-  
+
 - vase1.inc
 - vase2.inc
 
   Test objects for all the demos, created with Wings3D.
-  
+
 
 + texture baking:
 -----------------
@@ -241,18 +241,18 @@ Here is the description of the included demos and auxiliary files:
 see the scene witouth using any trick, just the "real thing". Then use
 the script bake.sh to bake all the meshes on the scene. Finally, set
 use_baking to 2 and render again to compare the results (and speed)
-with the first render. 
+with the first render.
 
 - baking_repair_seams.pov
 
   Tool to mitigate the problem with visible UV seams on the baked
-textures. 
+textures.
 
 - bake.sh
 
   Script to automatically bake and repair all the textures for the
 demo. Calls the above scenes in turn for each mesh, with output files
-named according to the ones used on the baked textures. 
+named according to the ones used on the baked textures.
 
 + custom cameras:
 -----------------
@@ -260,29 +260,29 @@ named according to the ones used on the baked textures.
 - meshcam_macros.inc
 
   These are macros to help creating the grid-like meshes needed to make
-a custom camera, with the desired horizontal angle. I implemented a classic 
-pinhole camera, and a variant with optional lens distortion, as well as a 
+a custom camera, with the desired horizontal angle. I implemented a classic
+pinhole camera, and a variant with optional lens distortion, as well as a
 typical orthographic camera. All the mesh cameras have an uv-mapped version,
-for use withouth the need of a triangle per pixel. There is also a macro to 
-help placing the camera at the desired "location", looking at the desired 
-"look_at". 
+for use withouth the need of a triangle per pixel. There is also a macro to
+help placing the camera at the desired "location", looking at the desired
+"look_at".
 
 - meshcam_persp_demo.pov
 
   Example usage for the meshcam macros with distrib. #0. It shows how to use
-the macros to create a custom mesh for a perspective (pinhole) camera, and 
-how to apply some effects, like antialiasing and vignetting, or how to save 
-the mesh to a file for reuse. 
+the macros to create a custom mesh for a perspective (pinhole) camera, and
+how to apply some effects, like antialiasing and vignetting, or how to save
+the mesh to a file for reuse.
 
 - meshcam_persps_demo_uv.pov
 
-  Same as the above, but using the uv-version of the macros with distrib. #3 
+  Same as the above, but using the uv-version of the macros with distrib. #3
 and the smooth modifier, to avoid having to use a face for each pixel.
 
 - meshcam_persp_compare.pov
 
   Tool to compare the pinhole mesh cameras created by the macros against the
-default perspective camera. I used it to verify if my results did match the 
+default perspective camera. I used it to verify if my results did match the
 standard camera.
 
 - meshcam_ortho_demo.pov, meshcam_ortho_demo_uv.pov
@@ -292,7 +292,7 @@ standard camera.
 - meshcam_stereo_demo.pov
 
   Example scene for usage of the macros with distrib. #2, to set up a
-stereo pair. 
+stereo pair.
 
 
 
@@ -308,7 +308,7 @@ that where interesting enough for my brain to remember them:
 
 - Baking "lighting maps" (that it's, baking with plain white textures
 in all the objects), which can be used later to change the textures on
-the "baked render" with little cost. 
+the "baked render" with little cost.
 
 - Baking pseudo-Ao maps for dirt patterns.
 
@@ -334,8 +334,8 @@ using distrib. #2.
 
 
 
--- 
+--
 Jaime Vives Piqueres <jaime@ignorancia.org>
-		
+
 La Persistencia de la Ignorancia
 http://www.ignorancia.org

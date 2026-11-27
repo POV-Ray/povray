@@ -6,13 +6,13 @@
 // CRATER_DAT.POV
 // Render CRATER_DAT.POV (this file) to create the height_field
 // image that is needed in CRATER.POV. Then render CRATER.POV.
-// 
+//
 // ( You can use any output image type, but the quality will be
 // best with the special 16-bit gray output that is supported
 // by the PNG, TGA and PPM image types. For example the command
 // line setting +fn will set the output image type to PNG. See
-// the documentation for details. ) 
-//                                                      
+// the documentation for details. )
+//
 // In POV-Ray 3.7 and later 'hf_gray_16' has to be specified as
 // an option on the command-line (e.g. '+FNg'), in an INI file
 // (e.g. 'Grayscale_Output=true'), or (on some platforms) in a dialog.

@@ -8,14 +8,14 @@
   #case (1)
     // The set of functions is not declared, but directly defined in Parametric.
   #break
-  
+
   #case (2)
-    // Set below is for use with Parametric. 
+    // Set below is for use with Parametric.
     #declare F1= function(u,v){sin((u/3)-(2*v)) + 2*sin((u/3)+v)}
     #declare F2= function(u,v){cos(u)*((7+cos((u/3)-(2*v))+(2*cos((u/3)+v))))}
     #declare F3= function(u,v){sin(u)*((7+cos((u/3)-(2*v))+(2*cos((u/3)+v))))}
   #break
-  
+
     // The two sets below are for use with Paramcalc. The functions or macros
     // need to have the names __Fx, __Fy, __Fz.
   #case (3)
@@ -23,9 +23,9 @@
     #declare __Fy= function(u,v){cos(u)*((7+cos((u/3)-(2*v))+(2*cos((u/3)+v))))}
     #declare __Fz= function(u,v){sin(u)*((7+cos((u/3)-(2*v))+(2*cos((u/3)+v))))}
   #break
-  
+
   #case (4)
-    #macro __Fx(U,V)sin((U/3)-(2*V)) + 2*sin((U/3)+V)#end               
+    #macro __Fx(U,V)sin((U/3)-(2*V)) + 2*sin((U/3)+V)#end
     #macro __Fy(U,V)cos(U)*((7+cos((U/3)-(2*V))+(2*cos((U/3)+V))))#end
     #macro __Fz(U,V)sin(U)*((7+cos((U/3)-(2*V))+(2*cos((U/3)+V))))#end
   #break
@@ -33,10 +33,10 @@
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
 object {
-  
-  #if (Set=1) 
+
+  #if (Set=1)
     Parametric(
-      function(u,v){sin((u/3)-(2*v)) + 2*sin((u/3)+v)}             
+      function(u,v){sin((u/3)-(2*v)) + 2*sin((u/3)+v)}
       function(u,v){cos(u)*((7+cos((u/3)-(2*v))+(2*cos((u/3)+v))))}
       function(u,v){sin(u)*((7+cos((u/3)-(2*v))+(2*cos((u/3)+v))))}
       <-pi, -pi>, < pi, pi>,
@@ -44,7 +44,7 @@ object {
     )
   #end
   //-----------------------------
-  #if (Set=2) 
+  #if (Set=2)
     Parametric(
       F1, F2, F3,
       <-pi, -pi>, < pi, pi>,
@@ -64,17 +64,17 @@ object {
      uv_mapping
      pigment{ checker color rgb <0.5,0.0,0.1> rgb <1,1,1> scale <0.015 ,0.025,0.01>}
      finish { specular 0.25}
-   } // 
+   } //
   */
    texture{      // outside (interior_texture)
      uv_mapping
      pigment{ checker color rgb <0.0,0,0.0> rgb <1,0.9,0.9>  scale <0.015 ,0.025,1>}
      finish { phong 0.5 }
-   } // 
-   
+   } //
+
    rotate< 0,0,90>
    scale< 1,1,1>*0.18
    translate< 0,0,0 >
-} // end of object 
+} // end of object
 //---------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------

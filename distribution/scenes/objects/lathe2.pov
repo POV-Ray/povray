@@ -7,7 +7,7 @@
 // Demo showing several surfaces of revolution ... Dieter Bayer, June 1994
 // dmf -- changed glass textures to solid pigments for speed's sake.
 // Changed to more harmonic colors by Friedrich A. Lohmüller, Feb 2013
-//  
+//
 // -w320 -h240
 // -w800 -h600 +a0.3
 #version 3.7;

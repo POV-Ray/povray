@@ -30,14 +30,14 @@ global_settings { assumed_gamma 1.0 }
 
 // The aspect ratio of the image.
 // (To get equal thickness of vertical and horizontal lines.)
-// E.g.: 800/600 = 4/3, 320/200 = 8/5 
+// E.g.: 800/600 = 4/3, 320/200 = 8/5
 #declare AspectRatio = 4/3;
 
 #declare vAR = <AspectRatio, 1>;
 
 
 // Set to true to get a border.  S L O W.
-#declare Border = false; 
+#declare Border = false;
 
 // Half of the "thickness" of the lines
 #declare CylRadius = 0.006;
@@ -55,7 +55,7 @@ global_settings { assumed_gamma 1.0 }
 
   #local pGraphCtr = (pGraphMax + pGraphMin)/2;
   #local vA = (v0 - pGraphCtr)/(pGraphMax - pGraphMin);
-  
+
   (vA*vAR)
 
 #end // macro vNorm
@@ -110,7 +110,7 @@ global_settings { assumed_gamma 1.0 }
 
 
 #macro GraphSetup()
-  
+
   // Coordinate grid
   box {
     -<1, 1, 0>, <1, 1, 1>

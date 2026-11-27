@@ -19,8 +19,8 @@ global_settings {assumed_gamma 1.0}
 
 light_source { <100,1000,-1000>, White}
 
-camera { location <0,1,-16> 
-         angle 35  
+camera { location <0,1,-16>
+         angle 35
          right    x*image_width/image_height
          look_at <0,1,0>
        }

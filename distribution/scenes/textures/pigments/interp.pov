@@ -22,7 +22,7 @@ global_settings {assumed_gamma 1.0}
 
 camera {
    location <0.0, 0.0, -2.0>
-   angle 65 
+   angle 65
    right   x*image_width/image_height
    look_at <0, 0, 0>
 }

@@ -55,7 +55,7 @@ light_source {
       brilliance 0.6
     }
   }
-  
+
 cylinder {
   0*y, 9*y, 30
 

@@ -5,15 +5,15 @@
 /* Persistence Of Vision Raytracer sample file.
 
    Demo for the Mesh Camera macros :
-  
+
    How to create an stereo pair witht the mesh_camera using distribution #2
-   
-   This shows how to use the mesh camera, not how to setup a stereo pair... I know 
+
+   This shows how to use the mesh camera, not how to setup a stereo pair... I know
    this is not the most correct way, but it was the quickest.
-   
+
    Note you have to render it twice as wide as the scene, as the output contains the two images
    side by side.
-  
+
    --
    Jaime Vives Piqueres, Jan. 2011  <jaime@ignorancia.org> */
 
@@ -68,10 +68,10 @@
   meshcam_pinhole(image_width*.5, image_height, c_angle, mesh_file)
 #end
 
-// create the camera with the generated or loaded mesh, 
+// create the camera with the generated or loaded mesh,
 // using two copies placed side by side (moved along the right vector of the camera)
-#declare c_location_left =c_location+c_stereo_base*.5*vtransform(x,Reorient_Trans(z,c_look_at-c_location));  
-#declare c_location_right=c_location-c_stereo_base*.5*vtransform(x,Reorient_Trans(z,c_look_at-c_location)); 
+#declare c_location_left =c_location+c_stereo_base*.5*vtransform(x,Reorient_Trans(z,c_look_at-c_location));
+#declare c_location_right=c_location-c_stereo_base*.5*vtransform(x,Reorient_Trans(z,c_look_at-c_location));
 camera{
   mesh_camera{ 1 2 // distribution #2 is the appropiate on this case
     mesh{camera_mesh

@@ -1,9 +1,9 @@
-//---------------------------------------------------------------------------- 
+//----------------------------------------------------------------------------
 #include "shapes3.inc"
 //----------------------------------------------------------------------------
 global_settings { max_trace_level 30 } // for transparent materials
 //----------------------------------------------------------------------------
-object{ Round_N_Tube_Polygon ( // A round polygon tube ring with N corners 
+object{ Round_N_Tube_Polygon ( // A round polygon tube ring with N corners
                             4, // number of corners must be >= 3 !!!
                             0.125+0.05,// tube radius < base width
                             0.775,     // base width (center to edge middle)

@@ -6,11 +6,11 @@ blob{
   sphere{<-0.375, 0.65,0>, Radius1, Strength}
   sphere{<-0.375,-0.65,0>, Radius1, Strength}
   //cylinder{<-1.50,0,0>,< -0.25,1.50,0>, Radius1, Strength}
-  // sturm 
+  // sturm
   scale 1
   rotate<30,0,0>
   translate<0,1.0,-0.3>
   texture{ pigment{ color rgb<1,0.0,0.2> }
            finish { phong 1 }
          }
- } //------------------------------------------------------ end of blob object  
+ } //------------------------------------------------------ end of blob object

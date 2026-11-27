@@ -14,13 +14,13 @@
 
 #version 3.7;
 #if ( Typ != 4 )
-global_settings{ assumed_gamma 1.0 } 
-#end 
+global_settings{ assumed_gamma 1.0 }
+#end
 
-#include "textures.inc" 
-#include "glass.inc" 
-#include "shapes.inc" 
-#include "shapes2.inc" 
+#include "textures.inc"
+#include "glass.inc"
+#include "shapes.inc"
+#include "shapes2.inc"
 
 //#declare Typ=1;  // CSG union
 //#declare Typ=2;  // CSG difference
@@ -101,7 +101,7 @@ global_settings{ assumed_gamma 1.0 }
 //#include "colors.inc"
 
 global_settings {
- 
+
  // assumed_gamma 1.0
   ambient_light 1
   max_trace_level 15
@@ -117,7 +117,7 @@ light_source {
   #else
     color rgb 1
   #end
- 
+
   #if(Typ=9)
   translate <-250, 250,  100>
   #else
@@ -126,7 +126,7 @@ light_source {
   media_interaction off
 }
 
-camera {  
+camera {
 
   #if(Typ=9)
   location  <-6,9.5, -13>
@@ -140,8 +140,8 @@ camera {
   look_at   <-0.3,0,0>
   angle 26
 
-  #end 
-  right x*image_width/image_height  
+  #end
+  right x*image_width/image_height
 }
 
 
@@ -173,8 +173,8 @@ plane {<0,1,0>, -1.001
     }
   }
 }
-#declare Base_Color = color rgb<1,0,0>; 
-#declare Cut_Color  = color rgb<1,0.85,0>; 
+#declare Base_Color = color rgb<1,0,0>;
+#declare Cut_Color  = color rgb<1,0.85,0>;
 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -198,7 +198,7 @@ merge
 #end
  {
 sphere {
-  z/2, 1 
+  z/2, 1
   #if (Inverse1=yes) inverse #end
   texture {
      pigment {
@@ -578,7 +578,7 @@ cylinder {
 #break
 
 //////////////////////////////////////////////////////////////////////////////////
- 
+
 #case (4) /* atmospheric media example, light beams through window/door */
 
 camera { angle 75 location<0.0, 2.5,-3.0> look_at   <-0.2 , 1.5 , 0.0> right x*image_width/image_height }
@@ -586,7 +586,7 @@ camera { angle 75 location<0.0, 2.5,-3.0> look_at   <-0.2 , 1.5 , 0.0> right x*i
 light_source {<-125,50,100>,<5,5,2.5>*0.6  spotlight radius 2 falloff 3 point_at 0 }
 
 /* atmospheric media example, light beams through window/door */
-union { 
+union {
 // window/door
 difference {
 box {-1,1 scale <1,1,.1>}
@@ -626,22 +626,22 @@ rotate 180*y
 
 #if(Typ=9)
 union{
-sphere { <0,0,0>, 1 
+sphere { <0,0,0>, 1
          texture{ pigment{ color rgb<1,0,0> }
                   finish{ diffuse 0.9 ambient 0.1 specular 0.2 }
                 }
          clipped_by { box{<-1,-1,-1>,<1,0.25,1>}}
        } //-----------------------
 object { // Wire_Box(A, B, WireRadius, UseMerge)
-         Wire_Box(<-1,-1,-1>,<1,0.25,1>, 0.01   , 0)  
-         
+         Wire_Box(<-1,-1,-1>,<1,0.25,1>, 0.01   , 0)
+
          texture{ pigment{ color rgb<1,1,1>}
                 }
          scale<1,1,1>  rotate<0, 0,0> translate<0,0.1,0>
-       } // --------------------------------------------- 
+       } // ---------------------------------------------
  scale 2
  translate<0,1,0>
-} 
+}
 
 
 

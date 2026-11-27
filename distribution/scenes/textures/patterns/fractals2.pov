@@ -24,10 +24,10 @@ global_settings {
   max_trace_level 5
 }
 
-camera { location <-2,5,-10>*1.4 
+camera { location <-2,5,-10>*1.4
          look_at <0,-1,0>
          right   x*image_width/image_height
-         angle   35 
+         angle   35
        }
 light_source { <0,0,-.1>,<1,.95,.8> }
 

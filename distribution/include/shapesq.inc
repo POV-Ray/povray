@@ -50,7 +50,7 @@
   its central axis. The final form of the equation is:
      y^2 + z^2 = 0.5 (x^3 + x^2) */
 #declare Cubic_Cylinder =
- quartic 
+ quartic
   {< 0,   0,   0,   -0.5, 0,   0,   0,   0,   0, -0.5,
      0,   0,   0,    0,   0,   0,   0,   0,   0,  0,
      0,   0,   0,    0,   0,   1,   0,   0,   0,  0,
@@ -59,7 +59,7 @@
 
 /* a cubic saddle. The equation is: z = x^3 - y^3. */
 #declare Cubic_Saddle_1 =
- quartic 
+ quartic
   {< 0,   0,   0,    1,   0,   0,   0,   0,   0,  0,
      0,   0,   0,    0,   0,   0,   0,   0,   0,  0,
      0,   0,  -1,    0,   0,   0,   0,   0,   0,  0,
@@ -72,7 +72,7 @@
   teardrop shaped holes. The equation is:
      x^4 + 2 x^2 z^2 - 0.36 x^2 - y^4 + 0.25 y^2 + z^4 = 0.  */
 #declare Devils_Curve =
- quartic 
+ quartic
   {<-1,   0,   0,    0,  0,   0,    0,  -2,   0,  0.36,
      0,   0,   0,    0,  0,   0,    0,   0,   0,  0,
      1,   0,   0,    0,  0,  -0.25, 0,   0,   0,  0,
@@ -83,7 +83,7 @@
   This is a folium rotated about the x-axis.  The formula is:
      2 x^2 - 3 x y^2 - 3 x z^2 + y^2 + z^2 = 0. */
 #declare Folium =
- quartic 
+ quartic
   {< 0,   0,   0,    0,  0,   0,   0,   0,   0,  2,
      0,   0,  -3,    0,  0,   0,   0,  -3,   0,  0,
      0,   0,   0,    0,  0,   1,   0,   0,   0,  0,
@@ -93,7 +93,7 @@
 /* Glob - sort of like basic teardrop shape. The equation is:
    y^2 + z^2 = 0.5 x^5 + 0.5 x^4. */
 #declare Glob_5 =
- poly 
+ poly
   {5,
    <-0.5, 0,   0,  -0.5, 0,   0,   0,   0,   0,  0,
      0,   0,   0,   0,   0,   0,   0,   0,   0,  0,
@@ -105,7 +105,7 @@
 
 /* Variant of a lemniscate - the two lobes are much more teardrop-like. */
 #declare Twin_Glob =
- poly 
+ poly
   {6,
    < 4,   0,   0,   0,   0,   0,   0,   0,   0, -4,
      0,   0,   0,   0,   0,   0,   0,   0,   0,  0,
@@ -143,7 +143,7 @@
   0 <= z <= sqrt(2) = 1.4042.
 */
 #declare Helix =
- quartic 
+ quartic
   {<  0,   0,   0,    0,  0,   0,   0,      0,   0,  0,
       0,   0,   0,    0,  0,   0,  -0.1666, 0,   1,  0,
       0,   0,   0,    0,  0,   0,   0,      0.5, 0, -1,
@@ -168,7 +168,7 @@
 
   See the description for the torus below. */
 #declare Hyperbolic_Torus_40_12 =
- quartic 
+ quartic
   {< 1,   0,   0,    0,     2,   0,   0,  -2,   0, -104,
      0,   0,   0,    0,     0,   0,   0,   0,   0,    0,
      1,   0,   0,   -2,     0,  56,   0,   0,   0,    0,
@@ -181,7 +181,7 @@
   The formula is:
      x^4 - x^2 + y^2 + z^2 = 0. */
 #declare Lemniscate =
- quartic 
+ quartic
   {< 1,   0,   0,   0,   0,   0,   0,   0,   0, -1,
      0,   0,   0,   0,   0,   0,   0,   0,   0,  0,
      0,   0,   0,   0,   0,   1,   0,   0,   0,  0,
@@ -198,7 +198,7 @@
 
 */
 #declare Quartic_Loop_1 =
- quartic 
+ quartic
   {<99,   0,   0, -40,  98,   0,   0,  98,   0, -99,
      0,   0, -40,   0,   0,   0,   0, -40,   0,   0,
     -1,   0,   0,  -2,   0,   1,   0,   0,   0,   0,
@@ -214,7 +214,7 @@
   The value c gives a vertical scale to the surface - the smaller the
   value of c, the flatter the surface will be (near the origin). */
 #declare Monkey_Saddle =
- quartic 
+ quartic
   {< 0,   0,   0,   1,  0,   0,   0,   0,   0,  0,
      0,   0,  -3,   0,  0,   0,   0,   0,   0,  0,
      0,   0,   0,   0,  0,   0,   0,   0,   0,  0,
@@ -230,7 +230,7 @@
 
   See the description for the torus below. */
 #declare Parabolic_Torus_40_12 =
- quartic 
+ quartic
   {< 1,   0,   0,    0,     2,   0,   0,   0,  -2, -104,
      0,   0,   0,    0,     0,   0,   0,   0,   0,    0,
      1,   0,   0,    0,    -2,  56,   0,   0,   0,    0,
@@ -243,7 +243,7 @@
      (x^4 - x^3) + y^2 + z^2 = 0.
 */
 #declare Piriform =
- quartic 
+ quartic
   {< 4,   0,   0,   -4,  0,   0,   0,   0,   0,  0,
      0,   0,   0,    0,  0,   0,   0,   0,   0,  0,
      0,   0,   0,    0,  0,   1,   0,   0,   0,  0,
@@ -264,7 +264,7 @@
   that has been swept around the z axis. The equation is:
      0.1 x^4 - x^2 - y^2 - z^2 + 0.9 = 0. */
 #declare Quartic_Paraboloid =
- quartic 
+ quartic
   {< 0.1, 0,   0,  0,   0,   0,   0,   0,   0,  -1,
      0,   0,   0,  0,   0,   0,   0,   0,   0,   0,
      0,   0,   0,  0,   0,   0,   0,   0,   0,  -1,
@@ -273,7 +273,7 @@
 
 /* Quartic Cylinder - a Space Needle?  */
 #declare Quartic_Cylinder =
- quartic 
+ quartic
   {< 0,   0,   0,    0,   1,   0,   0,   0,   0,   0.01,
      0,   0,   0,    0,   0,   0,   0,   0,   0,   0,
      0,   0,   0,    1,   0,   0,   0,   0,   0,   0,
@@ -282,7 +282,7 @@
 
 /* Steiners quartic surface */
 #declare Steiner_Surface =
- quartic 
+ quartic
   {< 0,   0,   0,  0,  1,   0,   0,   1,   0,   0,
      0,   0,   0,  0,  1,   0,   0,   0,   0,   0,
      0,   0,   0,  1,  0,   0,   0,   0,   0,   0,
@@ -291,7 +291,7 @@
 
 /* Torus having major radius sqrt(40), minor radius sqrt(12) */
 #declare Torus_40_12 =
- quartic 
+ quartic
   {< 1,   0,   0,    0,     2,   0,   0,   2,   0, -104,
      0,   0,   0,    0,     0,   0,   0,   0,   0,    0,
      1,   0,   0,    2,     0,  56,   0,   0,   0,    0,
@@ -300,7 +300,7 @@
 
 /* Witch of Agnesi */
 #declare Witch_Hat =
- quartic 
+ quartic
   {<  0,   0,   0,   0,   0,   0,   1,   0,   0,   0,
       0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
       0,   0,   0,   0,   0,   0,   0,   1,   0,   0.04,
@@ -313,7 +313,7 @@
   would require around 200k coefficients. For best results, scale by
   something like <1 1 0.2>. */
 #declare Sinsurf =
- poly 
+ poly
   {6,
    <    0,   0,   0,    0,  0,   0,   0,   0,   0,  0,
     -1116.226, 0, 0,    0,  0,   0,   0,   0,   0,  0,
