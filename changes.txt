@@ -226,6 +226,12 @@ Miscellaneous:
     the console builds, which used to print "Unknown error code" instead.
   - A file name in a scene that the front end cannot handle now fails at once
     with the reason, instead of after a timeout.
+  - In an INI file, an unquoted file name or other word not following `=`
+    lost its first character if that was punctuation such as `.`, `~` or `\`,
+    `/` on Unix, or a non-ASCII byte: e.g. `../scene.pov` was read as
+    `./scene.pov`, `./scene.pov` as `/scene.pov`, and on Unix
+    `/home/user/scene.pov` as the relative `home/user/scene.pov`. Such a word
+    is now read whole, as it is on the command line.
 
 Development Related
 -------------------
